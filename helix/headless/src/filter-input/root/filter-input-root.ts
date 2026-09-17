@@ -100,20 +100,19 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * `selectionStart` and `setSelectionRange` to write a completion back and put
  * the caret after it, or the next parse reads the wrong term.
  *
- * **Three things here have three different owners, and only one of them is a
- * controlled property.**
+ * **Three things here have three different owners.**
  *
- * `value` is the text, and it is uncontrolled by default: the reader types, the
- * element applies it, and `input` says so. **Writing `value` does not take that
- * over.** It is a seed and a correction, so a consumer who sets it and then
- * expects the field to hold still will watch the next keystroke overwrite them.
+ * `value` is the text: the reader types, the element applies it, and `input`
+ * says so. **Writing `value` does not take that over.** It is a seed and a
+ * correction, so a consumer who sets it and then expects the field to hold
+ * still will watch the next keystroke overwrite them.
  * Ownership is taken by refusing `helix-before-change` and writing the value
  * you want, which is the same shape every field in this library uses and is
  * worth saying out loud here because the property looks like React's.
  * `default-value` seeds the field without claiming anything.
  *
- * `open` is the suggestions panel, and it is the ordinary controlled pair:
- * refuse `helix-before-open` or `helix-before-close` to take the decision, and
+ * `open` is the suggestions panel, and it is the ordinary pair: refuse
+ * `helix-before-open` or `helix-before-close` to take the decision, and
  * `default-open` to seed it.
  *
  * The tokens are neither, because they are not state. They are the consumer's

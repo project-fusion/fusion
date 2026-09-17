@@ -281,11 +281,10 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
      * reads the value it still holds: one choice behind, and on the first
      * choice nothing at all.
      *
-     * And the listbox never applies it anyway. The select passes `.value` down,
-     * which is a consumer declaring ownership, so the listbox inside the panel
-     * is controlled by the select and correctly waits to be told. That is the
-     * right arrangement, and it makes reading the listbox's own value the one
-     * thing that can never work. */
+     * `.value` going down to the listbox does not change that. It is a seed and
+     * a correction rather than a claim of ownership, and the listbox applies its
+     * own changes unless somebody refuses them, so its value catches up after
+     * this handler and never before it. */
     const next = (event as CustomEvent<{ value: string }>).detail.value
     /* Nothing happens on a refusal.
      *

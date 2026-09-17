@@ -446,7 +446,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`.
+    // `MixinPickerField.updated`.
     this.sync()
     /* Said once, and said because the alternative is a property that quietly
        does something other than what it says. Both refusals are recoverable and

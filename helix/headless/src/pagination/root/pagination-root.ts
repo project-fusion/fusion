@@ -476,9 +476,9 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * Says where the reader now is, once they have moved.
    *
-   * In `updated` rather than in `request`, so it covers both modes: a controlled
-   * consumer assigns `page` and never goes through the request path at all, and
-   * a reader who got there that way deserves the same sentence.
+   * In `updated` rather than in `request`, so it covers every path a page moves
+   * by: a consumer assigning `page` reaches no request at all, and a reader who
+   * got there that way deserves the same sentence.
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)

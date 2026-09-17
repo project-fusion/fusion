@@ -122,10 +122,10 @@ export class AriaForwardController implements ReactiveController {
        exists to prevent, one element later.
 
        **No component in this library replaces its control**, which is worth
-       saying because the comment here used to name one. All fifteen consumers
-       resolve to a single fixed part rendered once. `target` is a callback and
+       saying because the comment here used to name one. Every consumer
+       resolves to a single fixed part rendered once. `target` is a callback and
        its contract permits a swap, so a controller in `core` is held to the
-       contract rather than to the fifteen callers it happens to have today. */
+       contract rather than to the callers it happens to have today. */
     if (target !== this.recorded) {
       this.forwarded.clear()
       this.recorded = target

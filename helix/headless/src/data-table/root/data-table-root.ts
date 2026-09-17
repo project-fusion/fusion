@@ -70,9 +70,10 @@ import {
  * **`selectable` adds a column of checkboxes, keyed on `row-key`.** A row is
  * selected by its identity rather than its position, so a selection survives a
  * sort, a filter and a page. `selected` is the chosen keys, comma separated, the
- * shape Listbox uses for a multiple choice, and like `sort` it is controlled
- * when set and seeded by `default-selected`. The box in the heading selects every
- * row in the result, across pages, and shows a dash while only some are chosen.
+ * shape Listbox uses for a multiple choice, and like `sort` writing it applies
+ * while `default-selected` is what the markup declared. The box in the heading
+ * selects every row in the result, across pages, and shows a dash while only
+ * some are chosen.
  * Choosing one of many, rather than several, is opening a row, and that is a
  * link or a button in a cell rather than a selection.
  *
@@ -483,7 +484,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private warnedAboutKey = false
 
   /* No `overscan`. The controller's four is a frame of fast scrolling at a 32
-     pixel row, which is a fact about the platform rather than a preference. */
+     pixel row, which is a fact about the platform rather than a preference.
+
+     **The box this scrolls carries no `data-scroller`**, which is a departure
+     from the rule in `HelixElement` rather than an oversight: the `overflow`
+     and the height that make the window mean anything both come from the styled
+     sheet, so a page loading only `helix/headless` draws the spacers into a box
+     with nothing to scroll. Marking it here is the fix and it moves layout, so
+     it is measured rather than assumed, for `Megamenu`'s reason. */
   private readonly virtualize = new VirtualizeController(this, {
     /* Null while `windowed` is off, which is what keeps the controller inert
        rather than conditionally constructed: a controller is built once and

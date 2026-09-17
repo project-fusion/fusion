@@ -36,12 +36,19 @@ height, an `overscroll-behavior`, a scrollbar treatment. Those stay in
 `helix/styled`.
 
 **A component marks a box whose scroll state it reads, with `data-scroller`, and
-no other.** Three do: `ScrollArea`, `VirtualList` and `Carousel`. `Megamenu`'s
-panel also scrolls and is deliberately unmarked, because it scrolls only from a
-`max-block-size` the styled tier chose and the headless tier never asks it where
-it is scrolled to. That line was found by measurement rather than by argument:
-marking it moved a heading four pixels, `overflow` establishing a block
-formatting context and margins that had been collapsing stopping.
+no other.** `ScrollArea`, `VirtualList`, `Carousel` and `ObjectInspector` do.
+`Megamenu`'s panel also scrolls and is deliberately unmarked, because it scrolls
+only from a `max-block-size` the styled tier chose and the headless tier never
+asks it where it is scrolled to. That line was found by measurement rather than
+by argument: marking it moved a heading four pixels, `overflow` establishing a
+block formatting context and margins that had been collapsing stopping.
+
+**`Chat` and `DataTable` are a departure and not a second exception.** Both read
+`scrollTop` on the headless tier and both take the `overflow` that makes the
+reading mean anything from their styled sheet, so the window each of them draws
+is inert on a page that loads only `helix/headless`. Written down rather than
+corrected in passing, because marking a box is the change `Megamenu` says to
+measure first.
 
 **A chart marks the drawing that runs along the line of text, with
 `data-mirror`**, and on a right-to-left page `core` turns it about its vertical
@@ -1350,9 +1357,10 @@ The notification is the platform's own name and carries no detail, because by
 then the state is on the element: `input` and `change` on a value control,
 `toggle` with `newState` and `oldState` on anything that opens, `close` on a
 dialog. `announcesInput` survives and means something narrower now, picking
-which native event a control sends rather than what its request is called: five
-are continuous, Input, Textarea, Number Input, Pin Input and Slider, and the
-rest send `input` and `change` together the way a native `<select>` does.
+which native event a control sends rather than what its request is called:
+Input, Textarea, Number Input, Pin Input, Filter Input and Slider are
+continuous, and the rest send `input` and `change` together the way a native
+`<select>` does.
 
 **The eleven families that sent a generic `helix-change` have verbs of their
 own.** They are not form controls, so no native word applied, and one word was doing for them

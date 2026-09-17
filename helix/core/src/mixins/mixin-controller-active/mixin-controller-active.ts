@@ -26,7 +26,7 @@ export declare class MixinControllerActiveInterface {
    */
   active: string
 
-  /** Initial item for uncontrolled use. Ignored once `active` is written. */
+  /** Which item the markup declared current. Ignored once `active` is written. */
   defaultActive: string
 
   /** Requests a new current item, and reports whether the request stood. */
@@ -88,7 +88,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
     }
 
     /**
-     * Initial item for uncontrolled use.
+     * Which item the markup declared current.
      *
      * Ignored once `active` is written.
      */

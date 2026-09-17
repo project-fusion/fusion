@@ -38,7 +38,8 @@ import '../../select/index.js'
  * way, through `ElementInternals.states` rather than an attribute the server
  * never wrote.
  *
- * `value` is the controlled property and `default-value` seeds one this owns.
+ * `value` is the size the control holds and `default-value` is what the markup
+ * declared.
  * Changing it announces `helix-before-change`; re-querying and moving back to
  * page one is the consumer's, because only they know whether the reader's
  * position should survive it.
