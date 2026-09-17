@@ -407,8 +407,17 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.requestValue(joined)
   }
 
+  /* **And only if the option's own choice stood.** `helix-select` is cancelable
+     and `Option` documents it as refusable; this element is the only thing that
+     acts on it, so a refusal nothing read was a veto that did nothing. The
+     event is still stopped either way, the list being the single voice for the
+     set, and a consumer on this element refuses with `helix-before-change`,
+     which `choose` dispatches through the mixin. */
   private readonly handleSelection = (event: HelixSelectEvent): void => {
     event.stopPropagation()
+    if (event.defaultPrevented) {
+      return
+    }
     this.activeValue = event.detail.value
     this.choose(event.detail.value)
   }

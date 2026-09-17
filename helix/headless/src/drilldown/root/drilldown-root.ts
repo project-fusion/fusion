@@ -169,10 +169,24 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     /* A row with a page drills rather than announcing. The event is stopped so
        a consumer listening for a choice does not hear navigation as one: going
        somewhere and choosing something are different acts, and a consumer that
-       had to tell them apart would be doing the stack's job. */
+       had to tell them apart would be doing the stack's job.
+
+       **And only if the choice stood**, which is the whole of what makes the
+       row's `helix-select` refusable: the drill is the one thing in the library
+       that acts on it, so a refusal nothing read left the stack moving anyway.
+       The stop stays synchronous, the decision does not: this listener is in
+       capture and the dispatch is synchronous, so a microtask is after every
+       listener that was going to run. Capture is also who can refuse. Stopping
+       here keeps the event off the row and off this host, so the refusal has to
+       come from a capture listener above the drilldown, which is the same
+       position the stop itself is argued from below. */
     if (this.drilldown.hasPage(item)) {
       event.stopPropagation()
-      this.enter(item)
+      queueMicrotask(() => {
+        if (!event.defaultPrevented) {
+          this.enter(item)
+        }
+      })
     }
   }
 

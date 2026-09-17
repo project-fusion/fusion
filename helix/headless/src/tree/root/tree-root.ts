@@ -133,9 +133,17 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
 
   /* Through the mixin, so a consumer can refuse the change. Writing the value
      straight from the event makes `helix-before-activate` an announcement
-     nobody can answer. */
+     nobody can answer.
+
+     **And only if the item's own choice stood.** `helix-select` is cancelable
+     and the item documents it as refusable; this element is the only thing that
+     acts on it, so a refusal nothing read was a veto that did nothing. The rows
+     are still synced either way: what a refusal stops is the selection moving,
+     not the tree redrawing what it already holds. */
   private readonly handleSelection = (event: Event): void => {
-    this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+    if (!event.defaultPrevented) {
+      this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
+    }
     this.syncItems()
   }
 

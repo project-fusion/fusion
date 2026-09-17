@@ -60,6 +60,26 @@ describe('toggle group', () => {
     ).toEqual(['dark'])
   })
 
+  test('and refusing the item`s own event leaves the group where it was', async () => {
+    /* `helix-select` is cancelable and the item documents it as refusable. The
+       group is the one thing that acts on it, so a refusal it ignored was a
+       veto that did nothing anywhere: valid code, no error, and the selection
+       happening regardless. Bound on the item, which is the position that can
+       refuse a bubbling event before the group sees it. */
+    const group = (await mount(markup)) as Updatable & { value: string }
+    const dark = items(group)[2] as unknown as HTMLElement & { select: () => void }
+    dark.addEventListener('helix-select', (event) => event.preventDefault())
+    dark.select()
+    await Promise.resolve()
+
+    expect(group.value).toBe('light')
+    expect(
+      items(group)
+        .filter((item) => item.selected)
+        .map((item) => item.value),
+    ).toEqual(['light'])
+  })
+
   /* The markup's own answer, which is the half a server can state.
    *
    * The fault these hold: `sync` matched items against a `value` of `''`,

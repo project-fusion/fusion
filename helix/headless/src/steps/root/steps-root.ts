@@ -111,7 +111,18 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     }
   }
 
+  /* Through the mixin, so a consumer can refuse the change with
+     `helix-before-activate`.
+
+     **And only if the step's own choice stood.** `helix-select` is cancelable
+     and the step documents it as refusable; this element is the only thing that
+     acts on it, so a refusal nothing read was a veto that did nothing. This is
+     a bubble listener for an event from a child, so every listener on the step
+     has already run by the time it arrives. */
   private readonly handleSelection = (event: Event): void => {
+    if (event.defaultPrevented) {
+      return
+    }
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
   }
 
