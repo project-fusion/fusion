@@ -333,8 +333,19 @@ styling**.
    resolve to a light-DOM id.
 5. **Guard generated ids** with `if (!this.id)`. The server writes the id into
    the HTML; the client sees it present and skips generation, so both agree.
-6. **A child announces itself to its parent.** A parent cannot poll for a child
-   that has not upgraded. Dispatch a bubbling ready event.
+6. **A parent finds its children; they do not announce themselves.** There is no
+   ready event, and reaching for one is the wrong instinct: a parent cannot poll
+   for a child that has not upgraded, and what it needs from that child decides
+   which of four mechanisms it takes. For what a consumer slotted,
+   `assignedElements` on the slot, re-read on `slotchange`. For children that
+   arrive, move or change outside a slot, a `MutationObserver` on the light DOM.
+   For a child's *property*, `customElements.whenDefined`, which is the case
+   Toolbar states best: a custom element has no properties at all before it
+   upgrades, so a pass that ran first would find no `focusable`, take the
+   `tabindex` fallback, and write the very attribute the property exists to
+   avoid. And where the child is the one that knows, it reaches up by identity
+   with `closestInstance` rather than announcing, which is what `Accordion.Item`
+   and the video playlist's menu do.
 7. **Every component needs a `*.ssr.spec.ts`** asserting the server output. A
    DOM spec runs after hydration, when everything already looks correct.
 
