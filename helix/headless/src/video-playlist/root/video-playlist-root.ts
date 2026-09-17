@@ -1,7 +1,7 @@
 import { customElement, HelixElement, MixinControllerActive } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
+import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
 
 /**
  * @summary A set of clips and the one player they take turns in.
@@ -37,7 +37,7 @@ import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot - The entries.
- * @slot player - The `helix-video` they play in.
+ * @slot player - The player the entries take turns in.
  *
  * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current entry changes, and cancelable.
@@ -67,11 +67,15 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    * for both.
    */
   private get items(): HelixHeadlessVideoPlaylistItem[] {
-    return [
-      ...this.querySelectorAll<HelixHeadlessVideoPlaylistItem>(
-        'helix-video-playlist-item, helix-headless-video-playlist-item',
-      ),
-    ].filter((one) => one.value !== '')
+    /* By identity rather than by tag, the reason Splitter writes out at
+       `findOuter`: a tag list names one tier's element from the other's
+       package, and misses any third tag, which is what subclassing an entry
+       produces. The entry then vanishes from the playlist with nothing
+       reported. */
+    return [...this.querySelectorAll('*')].filter(
+      (one): one is HelixHeadlessVideoPlaylistItem =>
+        one instanceof HelixHeadlessVideoPlaylistItem && one.value !== '',
+    )
   }
 
   /**
@@ -93,10 +97,10 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   /**
    * The player, whichever tag the consumer slotted.
    *
-   * Asked of the slot rather than matched by tag name: the headless tier's
-   * player is `helix-headless-video` and the styled tier's is `helix-video`, and
-   * a consumer bringing a third under either name should still be driven. What
-   * is needed of it is `src`, which is the whole of the contract.
+   * Asked of the slot rather than matched by tag name: each tier registers its
+   * own player under its own name, and a consumer bringing a third should still
+   * be driven. What is needed of it is `src`, which is the whole of the
+   * contract.
    */
   private get player():
     | (HTMLElement & {

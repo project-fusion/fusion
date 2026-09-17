@@ -249,11 +249,16 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
       return
     }
     this.warnedAboutNegatives = true
+    /* The subject is interpolated and the recommendation is a family rather
+       than a tag. A tag written out would be one tier's, so a headless consumer
+       was being sent to an element their package does not register, and
+       interpolating a second one here would make this a composition to the
+       rules that read `tag()`. */
     console.warn(
       `<${this.localName}> read a negative number and drew it as none. Its bands are parts of a ` +
         'total, and a part cannot be less than nothing: a band drawn below its neighbor would say ' +
         'the part took some of the one beneath it away. A series that crosses zero is a line, so ' +
-        'reach for `helix-line-chart`.',
+        'reach for the line chart in this tier instead.',
     )
   }
 

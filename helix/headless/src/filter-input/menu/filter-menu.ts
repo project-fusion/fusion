@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
    the placeholder as the element otherwise, which shifts every attribute after
    it by one. `Notification` records the same trap. */
 import { html } from 'lit/static-html.js'
-import type { HelixHeadlessFilterField } from '../field/filter-field.js'
+import { HelixHeadlessFilterField } from '../field/filter-field.js'
 import type { FilterGrammarOperator } from '../grammar.js'
 import '../../divider/index.js'
 import '../../menu/index.js'
@@ -108,10 +108,16 @@ export class HelixHeadlessFilterMenu extends HelixElement {
    *
    * What a render may know of them: none on a server, whose shim has no tree
    * and threw here, and none while hydrating what one sent.
+   *
+   * By identity rather than by tag. A list of names can only hold the tags this
+   * package knows about, so it misses any third one, which is what subclassing
+   * a headless element produces, and it is also how a headless package learns a
+   * styled tag. `instanceof` answers for every one of them and proves the type
+   * the signature claims.
    */
   get fields(): HelixHeadlessFilterField[] {
-    return this.knownChildren.filter((child): child is HelixHeadlessFilterField =>
-      ['helix-headless-filter-field', 'helix-filter-field'].includes(child.localName),
+    return this.knownChildren.filter(
+      (child): child is HelixHeadlessFilterField => child instanceof HelixHeadlessFilterField,
     )
   }
 

@@ -18,6 +18,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import { optionsAmong } from '../../option/root/option-root.js'
+import { HelixHeadlessTag } from '../../tag/root/tag-root.js'
 /* Relative, so this registers the base listbox and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../listbox/index.js'
@@ -42,10 +43,10 @@ const isInsertion = (event: Event): boolean =>
  * @summary A field that filters a list as it is typed into.
  *
  * @description
- * **The list is `helix-listbox`, and the filtering is its own.** It owns
- * narrowing, the empty state, the highlight, `aria-activedescendant` and
- * scrolling an option into view. What is left for this element is the field,
- * the panel and the traffic between them.
+ * **The list is `Listbox`, and the filtering is its own.** It owns narrowing,
+ * the empty state, the highlight, `aria-activedescendant` and scrolling an
+ * option into view. What is left for this element is the field, the panel and
+ * the traffic between them.
  *
  * **The text and the value are two things.** What a reader types is a filter:
  * it narrows the list and is thrown away. The value is whichever option they
@@ -74,7 +75,7 @@ const isInsertion = (event: Event): boolean =>
  * @aliases Autocomplete, Typeahead, Search select
  * @documentation https://fusion.dev/helix/components/combobox
  *
- * @slot - The options, which are `helix-option` elements.
+ * @slot - The options.
  * @slot end - After it, for a unit or a clear button.
  * @slot indicator - Replaces the caret saying the field opens.
  * @slot start - Before the text, for an icon.
@@ -606,16 +607,16 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * It only ever opens. Closing is Escape, a choice, or leaving, which is what
    * the input already did and what a text field wants: a control that closed
    * when you clicked into the middle of your own typing would be unusable.
+   *
+   * The tag is found by identity rather than by tag name. A name matches one
+   * tier's element and leaves the other's press falling through to the open,
+   * and a subclass under a third name is missed by both.
    */
   private readonly handleFieldClick = (event: MouseEvent): void => {
     if (this.isDisabled) {
       return
     }
-    if (
-      event
-        .composedPath()
-        .some((node) => node instanceof HTMLElement && node.localName === 'helix-tag')
-    ) {
+    if (event.composedPath().some((node) => node instanceof HelixHeadlessTag)) {
       return
     }
     this.partNamed('control')?.focus()
