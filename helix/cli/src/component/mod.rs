@@ -45,6 +45,7 @@ pub mod composed;
 pub mod compositions;
 pub mod constructed;
 pub mod corners;
+pub mod decided;
 pub mod derived_steps;
 pub mod disabled;
 pub mod displaced;
