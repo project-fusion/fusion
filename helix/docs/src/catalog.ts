@@ -431,8 +431,26 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
         entries.find((entry) => entry.tagName === `helix-${slug}`) ??
         (entries[0] as HelixDeclaration)
 
+      /* **Aliases come from both roots, and every other field from the styled
+         one.** An alias is a word somebody searches for, a fact about the
+         family rather than about a tier, and fourteen families declare theirs
+         on the headless root alone, measured 17 Sep 2026: read off the styled
+         root, those fourteen published none, and `heatmap` lost the only route
+         to "contribution graph". The rest stay on the styled root on purpose, since a
+         description or a category read twice would be two answers to one
+         question; the two roots are held to the same alias list by
+         `helix component`'s `aliases`, so this union can never hide a
+         disagreement. */
+      const named = (tag: string): HelixDeclaration | undefined =>
+        entries.find((entry) => entry.tagName === tag)
+      /* Styled first, then headless, deduplicated: where both declare, the
+         order a reader already sees is the styled root's. */
+      const roots = [named(`helix-${slug}`), named(`helix-${HEADLESS}-${slug}`)].filter(
+        (entry) => entry !== undefined,
+      )
+
       return {
-        aliases: root.helix?.aliases ?? [],
+        aliases: [...new Set(roots.flatMap((entry) => entry.helix?.aliases ?? []))],
         category: root.helix?.category ?? '',
         documentation: root.helix?.documentation ?? '',
         elements: entries

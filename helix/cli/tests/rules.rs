@@ -251,6 +251,49 @@ fn attributes() {
     );
 }
 
+/// Both layers declare a root for one family, so the rule has two lists to
+/// compare. `file` is the bare family name, which comes from the manifest path's
+/// second segment, so the fixture's modules sit at `src/<family>/...`.
+#[test]
+fn aliases() {
+    let manifest = |tag: &str, words: &str| {
+        format!(
+            r#"{{ "modules": [ {{ "path": "src/badge/badge.ts", "declarations": [
+  {{ "tagName": "{tag}", "helix": {{ "aliases": [{words}] }} }} ] }} ] }}"#
+        )
+    };
+    plant(
+        "aliases",
+        &[
+            ("helix.json", PAIR),
+            (
+                "packages/base/src/badge/badge.ts",
+                "export class BaseBadge extends LitElement {}\n",
+            ),
+            (
+                "packages/styled/src/badge/badge.ts",
+                "export class HelixBadge extends LitElement {}\n",
+            ),
+            (
+                "packages/base/custom-elements.json",
+                &manifest("base-badge", r#""Chip", "Pill""#),
+            ),
+            (
+                "packages/styled/custom-elements.json",
+                &manifest("helix-badge", r#""Pill", "Chip""#),
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "packages/base/custom-elements.json",
+                &manifest("base-badge", r#""Chip", "Tag""#),
+            );
+        },
+        "declares different aliases on its two roots",
+        "badge",
+    );
+}
+
 /// `file` here is the bare family name. `tone` is the axis chosen because a
 /// single layer paints nothing, and every other axis would be refused for it.
 #[test]

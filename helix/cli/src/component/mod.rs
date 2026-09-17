@@ -35,6 +35,7 @@
 //! coverage here is a superset: 85 reflected properties against the script's
 //! 80, the extra five clean.
 
+pub mod aliases;
 pub mod applied;
 pub mod attribute_names;
 pub mod attributes;
@@ -510,6 +511,12 @@ pub fn all() -> Vec<Rule> {
             name: "attributes",
             run: Runner::Source(attributes::run),
             summary: "a document rule selects a component only by an attribute it reflects",
+        },
+        Rule {
+            fix: None,
+            name: "aliases",
+            run: Runner::Source(aliases::run),
+            summary: "a family's two roots declare one list of aliases, or only one of them does",
         },
         Rule {
             fix: None,
