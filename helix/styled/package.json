@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix",
   "description": "Styled component tier. Extends the headless tier with token-driven presentation.",
-  "version": "0.53.0",
+  "version": "0.53.1",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
