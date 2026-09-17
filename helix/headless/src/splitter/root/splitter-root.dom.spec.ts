@@ -172,21 +172,55 @@ describe('splitter settling', () => {
   })
 
   /**
-   * **Refusing it takes the whole of where the gesture ended, collapse and all.**
+   * **Refusing it takes the position and leaves the rest of the gesture.**
    *
-   * The two announcements are one gesture: `shutAt` reads the position being
-   * settled, so a collapse derived from a refused number is a collapse of
-   * something that did not happen. Announced regardless, the refusal produced
-   * exactly the outcome it refused: measured on a divider at 40 with a listener
-   * calling `preventDefault`, Home left `position` reporting 0 and `collapsed`
-   * reporting `start`, because the collapse stood and `position` reads the sliver
-   * once a pane is shut.
+   * The reading this replaces was that the two announcements are one decision,
+   * `shutAt` computing the collapse from the position being settled, so refusing
+   * the first left the second derived from a number that did not happen. That
+   * holds for a splitter nobody else owns, and it reads "no" as "the gesture is
+   * over", which is not what a consumer who owns the position means by it: the
+   * sandbox refuses every one of these in order to *take* the decision, and
+   * returning on its refusal left `panel-collapsed-size` inert two folders away.
+   *
+   * The collapse is honest on its own because it carries its own position: the
+   * pane lands on `collapsed-size`, here 10, and never on the 0 that was
+   * refused.
    */
-  test('refusing the settling leaves the divider where it was, and open', async () => {
-    const host = (await splitter('default-position="40"')) as Splitter & {
+  test('refusing the settling leaves the divider where it was, and still offers the collapse', async () => {
+    const host = (await splitter('default-position="40" collapsed-size="10"')) as Splitter & {
+      collapsed?: 'end' | 'start'
+    }
+    let asked = ''
+    host.addEventListener('helix-before-resize', (event) => event.preventDefault())
+    host.addEventListener('helix-before-collapse', (event) => {
+      asked = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    await press(host, 'Home')
+    expect(asked).toBe('start')
+    expect(host.collapsed).toBe('start')
+    expect(host.position).toBe(10)
+  })
+
+  /** And the position they kept is the one it opens back to, never the refused one. */
+  test('a collapse allowed over a refused resize opens back to the consumer position', async () => {
+    const host = (await splitter('default-position="40" collapsed-size="10"')) as Splitter & {
+      collapsed?: 'end' | 'start' | undefined
+    }
+    host.addEventListener('helix-before-resize', (event) => event.preventDefault())
+    await press(host, 'Home')
+    expect(host.collapsed).toBe('start')
+    host.collapsed = undefined
+    await host.updateComplete
+    expect(host.position).toBe(40)
+  })
+
+  /** Refusing both is the way to take the whole gesture, and it still is. */
+  test('refusing the settling and the collapse leaves the divider where it was, and open', async () => {
+    const host = (await splitter('default-position="40" collapsed-size="10"')) as Splitter & {
       collapsed?: 'end' | 'start'
     }
     host.addEventListener('helix-before-resize', (event) => event.preventDefault())
+    host.addEventListener('helix-before-collapse', (event) => event.preventDefault())
     await press(host, 'Home')
     expect(host.position).toBe(40)
     expect(host.collapsed).toBeUndefined()

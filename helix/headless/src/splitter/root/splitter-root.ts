@@ -66,8 +66,8 @@ const STACK_BELOW = 512
  * @slot end - The pane after it.
  * @slot start - The pane before the divider.
  *
- * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, and only where the position it is derived from stood. Cancelable: refusing it leaves the pane as it was and the divider where the gesture put it.
- * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and only where the gesture moved it: a press that moved nothing, a drag that came back, an arrow with nowhere left to go and a corner that moved the other divider are all silent on this one. Cancelable: refusing it takes the whole of where the gesture ended, so no collapse follows from it either. A drag has already drawn itself by then and holds where it was dropped until the consumer assigns their own.
+ * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, whether or not the resize that reached it was allowed, and carrying its own position: a shut pane sits at `collapsed-size` rather than at the number the resize named. Cancelable: refusing it leaves the pane as it was and the divider where the gesture put it.
+ * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and only where the gesture moved it: a press that moved nothing, a drag that came back, an arrow with nowhere left to go and a corner that moved the other divider are all silent on this one. Cancelable: refusing it takes the position and leaves the rest of the gesture, so a collapse the gesture reached is still announced and still yours to refuse. A drag has already drawn itself by then and holds where it was dropped until the consumer assigns their own.
  *
  * @csspart corner - The handle where two dividers cross, added on the client.
  * @csspart end - The box holding the second.
@@ -562,21 +562,36 @@ export class HelixHeadlessSplitter extends HelixElement {
    * Through the audited path, so a consumer who owns `position` is told what was
    * asked for and decides, and one who does not has already had it applied.
    *
-   * **The second announcement is conditional on the first, because it is derived
-   * from it.** `shutAt` reads the position the gesture ended on, so a refused
-   * `helix-before-resize` leaves a collapse computed from a number that was
-   * refused. Announced anyway, the refusal produced the outcome it was refusing:
-   * measured on a divider at 40 with a listener calling `preventDefault`, Home
-   * left `position` reporting 0 and `collapsed` reporting `start`, because the
-   * collapse applied and `position` reads the sliver once a pane is shut. The
-   * return of the first request is what says so, and it was being dropped: a
-   * cancelable event dispatched as a bare statement with nothing reading the
-   * answer, which is the shape the navigation cohort named on `Outline` and left.
+   * **A refused resize ends the resize and not the gesture.** `shutAt` reads the
+   * position the gesture ended on, so the collapse is computed from a number the
+   * consumer may have declined, and the reading this replaces was that the two
+   * are therefore one decision: refuse the first and the second cannot stand.
+   * That is a reasonable thing to believe about a splitter nobody else owns, and
+   * it takes "no" to mean the gesture is over. What it misses is that a consumer
+   * who owns the position refuses in order to *take* the decision, not to end
+   * it. The sandbox two folders away refuses every `helix-before-resize` from
+   * the splitter inside it, re-announces the same move in its own vocabulary and
+   * writes the answer back through `position`, which is what makes it the single
+   * decision point; returning on its refusal left `panel-collapsed-size` inert
+   * there, the shipped `with-a-panel` example measuring a 0px panel against the
+   * 36 its summary promises. So the collapse is reached either way and is
+   * refused, or not, on its own.
+   *
+   * **Which is honest because the collapse carries its own position.** A shut
+   * pane sits at `collapsed-size`, which is where `position` reads it from once
+   * `collapsed` is set, and never at the number the resize named: refuse a drag
+   * to 100 on a splitter with `collapsed-size="10"`, allow the collapse, and the
+   * divider is at 90. Nothing writes the refused number either, `requestChange`
+   * applying nothing when it is refused and the collapse below writing the open
+   * position back over whatever a drag had already drawn, so a consumer who says
+   * no to the position and yes to the collapse gets the pane shut and keeps the
+   * number they had to reopen to. The two coincide only where `collapsed-size`
+   * is zero, and the states differ even there: a shut pane knows where to open
+   * back to and a divider parked at the edge does not.
    *
    * Refusing the collapse alone still leaves the resize, which is the other way
    * round and is coherent: the divider goes where the drag put it and the pane
-   * is not declared shut. What a consumer cannot have is a pane that collapses
-   * out from under a position they said no to.
+   * is not declared shut.
    *
    * **A gesture that moved nothing announces nothing, and this is the one place
    * that can say so.** A change carrying the position the divider already had
@@ -622,7 +637,10 @@ export class HelixHeadlessSplitter extends HelixElement {
     if (wanted === began && shut === this.collapsed) {
       return
     }
-    const moved = requestChange({
+    /* The answer is deliberately not read, which is the one place in this file
+       where that is right: nothing below is conditional on it, because a
+       refusal ends this request and not the gesture. See above. */
+    requestChange({
       apply: (value) => {
         const previous = this.position
         this.positionState = value
@@ -632,9 +650,6 @@ export class HelixHeadlessSplitter extends HelixElement {
       host: this,
       next: wanted,
     })
-    if (!moved) {
-      return
-    }
     if (shut !== this.collapsed) {
       /* Two values from one gesture, so two announcements. `ChangeDetail`
          carries a name for exactly this, and a consumer listening for one of
