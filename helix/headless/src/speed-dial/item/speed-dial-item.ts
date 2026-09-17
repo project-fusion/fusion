@@ -18,7 +18,7 @@ import { property } from 'lit/decorators.js'
  * being there, so it is read, searched and translated like anything else.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases Speed dial action, FAB action, Quick action
  * @documentation https://fusion.dev/helix/components/speed-dial

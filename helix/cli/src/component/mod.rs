@@ -35,6 +35,7 @@
 //! coverage here is a superset: 85 reflected properties against the script's
 //! 80, the extra five clean.
 
+pub mod applied;
 pub mod attribute_names;
 pub mod attributes;
 pub mod axes;
@@ -494,6 +495,12 @@ pub fn all() -> Vec<Rule> {
             name: "floors",
             run: Runner::Meta(floors::run),
             summary: "every rule counted something",
+        },
+        Rule {
+            fix: None,
+            name: "applied",
+            run: Runner::Source(applied::run),
+            summary: "an event only a mixin sends is declared only where that mixin is applied",
         },
         Rule {
             fix: None,

@@ -12,7 +12,7 @@ import { styles } from './speed-dial-item.css.js'
  * over. Everything about choosing it is the base class.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases Speed dial action, FAB action, Quick action
  * @documentation https://fusion.dev/helix/components/speed-dial

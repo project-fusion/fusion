@@ -28,7 +28,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * something.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @documentation https://fusion.dev/helix/components/toast
  *
  * @slot - The message.

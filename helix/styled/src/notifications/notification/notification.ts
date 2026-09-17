@@ -33,7 +33,7 @@ import '../../format-date/index.js'
  * viewport rule would hand it the wide branch.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @documentation https://fusion.dev/helix/components/notifications
  *

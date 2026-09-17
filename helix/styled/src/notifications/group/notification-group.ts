@@ -22,7 +22,7 @@ import { styles } from './notification-group.css.js'
  * that says there is something back there.
  *
  * @since 0.24.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases NotificationSection, FeedGroup
  * @documentation https://fusion.dev/helix/components/notifications

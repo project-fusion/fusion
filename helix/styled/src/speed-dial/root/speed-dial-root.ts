@@ -14,7 +14,7 @@ import '../../icon/index.js'
  * moves through it is the base class.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases FAB, Floating action button, Action button, Quick actions
  * @documentation https://fusion.dev/helix/components/speed-dial

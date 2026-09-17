@@ -34,10 +34,6 @@ export function Example() {
     say('helix-complete', 'the last stop was reached, which is not refusable')
   }
 
-  const moved = (event: Event & { newState?: string; oldState?: string }) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the run moved`)
-  }
-
   return (
     <helix-flex
       direction="column"
@@ -52,7 +48,6 @@ export function Example() {
         onhelix-before-close={leaving}
         onhelix-complete={finished}
         onhelix-tour-ask={asked}
-        onToggle={moved}
         open
       >
         <helix-tour-stop for="anchor">This is where a deploy starts.</helix-tour-stop>

@@ -21,9 +21,9 @@ import { styles } from './toast-root.css.js'
  * into the top layer.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
- * @aliases Toaster, Snackbar, Notifications
+ * @aliases Toaster, Snackbar
  * @documentation https://fusion.dev/helix/components/toast
  *
  * @cssproperty --toast-gap - Space between one message and the next.

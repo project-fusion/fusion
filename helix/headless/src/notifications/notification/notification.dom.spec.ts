@@ -180,6 +180,26 @@ describe('the trailing swap', () => {
   test('a row with none says that too', async () => {
     expect(hasState(await item(), 'actions')).toBe(false)
   })
+
+  /**
+   * The case the slot's own listener is for, and the one it was not doing.
+   *
+   * A row filled from a response has its actions appear after the first render,
+   * and nothing about a light-DOM child arriving changes a property here, so the
+   * `slotchange` is the only thing that asks again. It called the handler for
+   * the *other* state, which reads `dismissible` and nothing else, so a row that
+   * gained a button kept `:state(actions)` off for the life of the element.
+   */
+  test('actions arriving after the first render are counted', async () => {
+    const element = await item()
+    expect(hasState(element, 'actions')).toBe(false)
+    const later = document.createElement('button')
+    later.slot = 'actions'
+    later.textContent = 'View'
+    element.append(later)
+    await element.updateComplete
+    expect(hasState(element, 'actions')).toBe(true)
+  })
 })
 
 /* Where the actions are is the whole of what makes them visible, so it is

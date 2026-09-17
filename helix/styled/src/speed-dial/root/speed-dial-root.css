@@ -23,12 +23,22 @@
 /*
  *  Lined up on the end the trigger is on, which is what makes the marks sit in a
  *    column under it rather than wandering by the length of each name.
+ *
+ * **The row order goes down with it, as a property.** An action is slotted here,
+ * so its own sheet can only match `:host(…)`, which is the action; the selector
+ * that would answer this is `:host-context()` and that is Chromium-only, which
+ * `Steps` records. Custom properties inherit through the flat tree into slotted
+ * content, so the panel says which way round and the action reads it.
  */
 [part="actions"] {
+  --_speed-dial-row: row-reverse;
+
   align-items: flex-end;
 }
 
 [part="actions"][data-placement$="-start"] {
+  --_speed-dial-row: row;
+
   align-items: flex-start;
 }
 

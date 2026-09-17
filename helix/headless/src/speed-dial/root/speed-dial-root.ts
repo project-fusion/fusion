@@ -41,7 +41,7 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * with no reason to argue with it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases FAB, Floating action button, Action button, Quick actions
  * @documentation https://fusion.dev/helix/components/speed-dial
