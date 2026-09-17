@@ -1,5 +1,5 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { customElement, HelixElement, MixinSelectableItem } from '@fusion.dev/helix-core'
+import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -44,13 +44,7 @@ import { property } from 'lit/decorators.js'
  * @cssstate selected - While it is the one chosen.
  */
 @customElement('helix-headless-radio')
-export class HelixHeadlessRadio extends HelixElement {
-  /**
-   * Whether this choice can be made.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
-
+export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
   /**
    * Whether the markup declared this one chosen, which is what a reset returns to.
    *
@@ -104,53 +98,6 @@ export class HelixHeadlessRadio extends HelixElement {
    */
   @property({ attribute: false })
   focusable = false
-
-  /**
-   * Whether this is the current choice.
-   *
-   * Written by the group.
-   */
-  @property({ type: Boolean })
-  selected = false
-
-  /**
-   * Identifies this choice to the group, and is what the form submits.
-   */
-  @property()
-  value = ''
-
-  /** Moves focus to this choice, for the group's arrow keys. */
-  focusItem(): void {
-    this.partNamed('item')?.focus()
-  }
-
-  /** Makes this choice and announces it. */
-  select(): void {
-    if (this.disabled) {
-      return
-    }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
-  }
-
-  /**
-   * Mirrors the chosen state where a stylesheet can select on it.
-   *
-   * **A custom state rather than the `selected` attribute.** The parent writes
-   * this: a listbox choosing a row, a tab strip moving the tab, a radio group
-   * answering for its set. Reflected, that puts the element's own bookkeeping
-   * onto markup a consumer wrote and a consumer's server never sent, which
-   * React reconciles and reports as a mismatch, and which a serialized element
-   * pasted back declares as a choice nobody made. `ElementInternals` holds it
-   * instead, where it is not in the DOM at all.
-   *
-   * Reading `selected` is unaffected and so is writing it: the attribute still
-   * seeds the property, which is what `<helix-radio selected>` in a consumer's
-   * markup means. There is no write back.
-   */
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    this.toggleState('selected', this.selected)
-  }
 
   protected override render(): TemplateResult {
     /* Roving `tabindex`: one stop for the whole set, which is what a radio
