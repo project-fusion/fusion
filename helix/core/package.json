@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-core",
   "description": "Helix element primitives: base classes, mixins, decorators, utilities.",
-  "version": "0.53.4",
+  "version": "0.53.5",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
