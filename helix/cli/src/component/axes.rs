@@ -51,6 +51,17 @@
 //! ones: a legend whose swatches are solid while the bars they key are outlined
 //! is a legend that does not match its own chart, and nothing else could see
 //! that. Failing would pressure someone into declaring an axis to silence it.
+//!
+//! **A union behind a name is still a union.** A manifest carries a property's
+//! type as the text somebody wrote, so `shape: QrStyle` arrives as one
+//! identifier with no quote mark in it, every value in that union goes unread,
+//! and the check passes having compared nothing. That is how `dots` and
+//! `rounded` reached the registry: the family was never asked. There is nothing
+//! in the manifest to follow, the analyzer records the annotation rather than
+//! resolving it, so the aliases are read from the same tier sources the rest of
+//! this rule walks and substituted before the values are split out. One
+//! substitution pass, because an alias of an alias is a shape this library does
+//! not have and a fixed point would be a loop written for nothing.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -77,6 +88,21 @@ static WRITTEN: LazyLock<Regex> =
 /// the library calls things belongs beside the rule that holds it.
 pub const REFUSED: &str = "appearance";
 
+/// A type alias and the text on the right of its `=`, on one line.
+///
+/// Every string union this library names is written on one line, so a
+/// continuation is not matched rather than half matched: a pattern that took
+/// the next line as well would swallow whatever followed a multi-line object
+/// type and put its member names into an axis.
+static ALIAS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?m)^\s*(?:export\s+)?type\s+(\w+)\s*=\s*([^\n;]+)")
+        .expect("a literal pattern compiles")
+});
+
+/// An identifier in a type annotation, which is what an alias is reached by.
+static NAMED: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"[A-Za-z_$][\w$]*").expect("a literal pattern compiles"));
+
 /// The vocabulary. A component takes a subset; nobody invents a value.
 pub const AXES: [(&str, &[&str]); 7] = [
     (
@@ -93,14 +119,63 @@ pub const AXES: [(&str, &[&str]); 7] = [
     (
         "tone",
         &[
-            "accent", "danger", "info", "neutral", "primary", "success", "surface", "warning",
+            "accent", "danger", "info", "neutral", "primary", "success", "warning",
         ],
     ),
-    ("width", &["auto", "full", "standard"]),
+    ("width", &["auto", "full"]),
 ];
 
 /// The axes a base layer may carry, because none of them is about paint.
 const UNPAINTED: [&str; 3] = ["nesting", "shape", "tone"];
+
+/// Every named union the tiers declare, by the name a property reaches it by.
+///
+/// Read from the sources rather than from a manifest, which carries the
+/// annotation and not what it resolves to. A name declared twice keeps the
+/// first reading: a collision is the `redeclared` rule's business, and guessing
+/// which of two a property meant would be worse than checking one of them.
+fn aliases(context: &Context) -> BTreeMap<String, String> {
+    let mut found: BTreeMap<String, String> = BTreeMap::new();
+    for tier in context.settings.roots(&context.root) {
+        let mut files = Vec::new();
+        sources(&tier, &mut files);
+        for file in files {
+            let Ok(text) = fs::read_to_string(&file) else {
+                continue;
+            };
+            for capture in ALIAS.captures_iter(&text) {
+                let (Some(name), Some(body)) = (capture.get(1), capture.get(2)) else {
+                    continue;
+                };
+                found
+                    .entry(name.as_str().to_owned())
+                    .or_insert_with(|| body.as_str().to_owned());
+            }
+        }
+    }
+    found
+}
+
+/// The string values a type annotation offers, with any alias resolved first.
+fn values_in(text: &str, aliases: &BTreeMap<String, String>) -> Vec<String> {
+    let mut resolved = String::new();
+    let mut read = 0;
+    for name in NAMED.find_iter(text) {
+        let Some(body) = aliases.get(name.as_str()) else {
+            continue;
+        };
+        resolved.push_str(&text[read..name.start()]);
+        resolved.push_str(body);
+        read = name.end();
+    }
+    resolved.push_str(&text[read..]);
+    resolved
+        .split('\'')
+        .skip(1)
+        .step_by(2)
+        .map(str::to_owned)
+        .collect()
+}
 
 /// What every family declares, gathered before anything is judged.
 ///
@@ -114,7 +189,10 @@ struct Survey {
 }
 
 fn survey(context: &Context, findings: &mut Vec<Finding>) -> Survey {
-    let axes: BTreeMap<&str, &[&str]> = AXES.into_iter().collect();
+    let vocabulary = Vocabulary {
+        aliases: aliases(context),
+        axes: AXES.into_iter().collect(),
+    };
     let mut checked = 0;
     let mut declares: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     let mut groups: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
@@ -172,7 +250,7 @@ fn survey(context: &Context, findings: &mut Vec<Finding>) -> Survey {
                         paints,
                         tag,
                     },
-                    &axes,
+                    &vocabulary,
                     context,
                     &mut declares,
                     &mut seen_lengths,
@@ -190,6 +268,16 @@ fn survey(context: &Context, findings: &mut Vec<Finding>) -> Survey {
     }
 }
 
+/// What the values are judged against: the registry, and the names it hides behind.
+///
+/// One argument rather than two because they are one thing to the check, and
+/// because a helper reaching eight parameters is the signal that its arguments
+/// have grown a shape nobody named.
+struct Vocabulary<'a> {
+    aliases: BTreeMap<String, String>,
+    axes: BTreeMap<&'a str, &'a [&'a str]>,
+}
+
 /// The family an attribute belongs to and the layer it is declared on.
 #[derive(Clone, Copy)]
 struct Where<'a> {
@@ -202,7 +290,7 @@ struct Where<'a> {
 fn attribute_of(
     declaration: &Value,
     at: Where,
-    axes: &BTreeMap<&str, &[&str]>,
+    vocabulary: &Vocabulary,
     context: &Context,
     declares: &mut BTreeMap<String, BTreeSet<String>>,
     seen_lengths: &mut BTreeSet<String>,
@@ -213,6 +301,7 @@ fn attribute_of(
         paints,
         tag,
     } = at;
+    let Vocabulary { aliases, axes } = vocabulary;
     let mut checked = 0;
     {
         {
@@ -277,12 +366,9 @@ fn attribute_of(
                         .and_then(|one| one.get("text"))
                         .and_then(Value::as_str)
                         .unwrap_or("");
-                    let invented: Vec<String> = text
-                        .split('\'')
-                        .skip(1)
-                        .step_by(2)
-                        .filter(|one| !values.contains(one))
-                        .map(str::to_owned)
+                    let invented: Vec<String> = values_in(text, aliases)
+                        .into_iter()
+                        .filter(|one| !values.contains(&one.as_str()))
                         .collect();
                     if invented.is_empty() {
                         continue;
