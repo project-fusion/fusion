@@ -375,6 +375,18 @@
   opacity: 0.5;
 }
 
+/* Read-only, which is not this control at half opacity.
+ *
+ * A read-only picker still submits its color and is still reachable, so nothing
+ * here is faded or removed: what goes is the promise that pressing will do
+ * something. The square takes the page's own cursor rather than a crosshair,
+ * and a preset stops looking like a button. The ramps under it are sliders and
+ * keep theirs, a handle being draggable-looking wherever it is. */
+:host([readonly]) [part="grid"],
+:host([readonly]) [part="swatch"] {
+  cursor: default;
+}
+
 /* Print: a control prints the value it holds, and the state has to survive: a
  * state drawn as a fill prints as an empty box, which is a document saying the
  * opposite of the truth.

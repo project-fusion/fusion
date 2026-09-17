@@ -184,6 +184,56 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   noValue = false
 
   /**
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a color somebody
+   * else set needs.
+   *
+   * **One gate is not enough here, and the second is `move`.** This picker
+   * holds a model beside its value, which Date Picker and Time Picker do not:
+   * `moved` is the HSB the square is drawn from, and it is written before the
+   * value is requested. Gating only the request would leave the square under
+   * the reader's pointer and the value where it was, which is a control that
+   * refuses and looks like it accepted.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /**
+   * Whether the form refuses to submit while no color is chosen.
+   *
+   * **A color is exactly as requirable as a date**, which is the comparison
+   * that settles it: this element extends `HelixFormElement`, carries `name`
+   * and reports its value, so a consumer writing
+   * `<helix-color-picker name="brand" required>` inside a form has every reason
+   * to expect the form to refuse an empty one. Its two siblings in the same
+   * composition position, Date Picker and Time Picker, both check it.
+   *
+   * Written out rather than taken from `MixinField`, for the reason those two
+   * record: the mixin brings a label, a hint and a feedback region, and this is
+   * a panel composed *into* a field that already has all three, so taking it
+   * would give one control two of each. What is left is the validity call and
+   * the anchor the browser points its bubble at.
+   *
+   * **Emptiness is the only fault reported, and bad input deliberately is
+   * not.** The value row is typed into a character at a time and every
+   * keystroke reaches `requestValue`, so `#0`, `#00` and `#00f` would each be a
+   * reported fault on the way to `#00ff00`. Date Picker and Time Picker can
+   * report bad input because their value moves only on a commit. Color Input
+   * reports it for this family instead, once, against the field the reader
+   * typed into.
+   */
+  @property({ reflect: true, type: Boolean })
+  required = false
+
+  /**
    * Colors offered under the picker, as a comma-separated list.
    */
   @property()
@@ -261,6 +311,11 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     // Stopped for the reason `Input.handleInput` gives: the inner control's own
     // `input` is composed and would reach a consumer beside this element's.
     event.stopPropagation()
+    /* The field already carries `readonly`, so this is the second lock rather
+       than the first: it covers an `input` a consumer's own script dispatched. */
+    if (this.readOnly) {
+      return
+    }
     const typed = (event.target as HTMLInputElement).value
     const parsed = parseColor(typed)
     if (parsed) {
@@ -270,8 +325,22 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     this.requestValue(typed)
   }
 
+  /** Refuses every change while read-only. See `readOnly`. */
+  override requestValue(next: string): boolean {
+    if (this.readOnly) {
+      return false
+    }
+    return super.requestValue(next)
+  }
+
   /** Moves part of the model and announces the value that follows from it. */
   private readonly move = (next: Partial<Color>): void => {
+    /* Before the model is touched, not after: the square is drawn from `moved`
+       rather than from the value, so a refusal taken only at `requestValue`
+       would move the handle and leave the value behind it. See `readOnly`. */
+    if (this.readOnly) {
+      return
+    }
     this.moved = { ...this.color, ...next }
     this.owned = true
     this.requestValue(formatColor(this.moved, this.format ?? 'hex', this.alpha))
@@ -301,6 +370,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
 
   /** Walks the format on, and rewrites the value in it. */
   private readonly handleFormat = (): void => {
+    /* Refused whole rather than half. Walking the syntax on is a rewrite of the
+       value, so a read-only picker that let the toggle move would show `rgb`
+       over a hex it was no longer allowed to restate. */
+    if (this.readOnly) {
+      return
+    }
     this.format = FORMATS[(FORMATS.indexOf(this.format ?? 'hex') + 1) % FORMATS.length] ?? 'hex'
     if (this.value !== '') {
       this.move({})
@@ -388,12 +463,37 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    *
    * `null` rather than an empty string where there is no color, which is the
    * difference between a control that submits nothing and one that submits a
-   * blank. There is no `setValidity` beside it: this element does not take
-   * `MixinField`, and every validity member of `ElementInternals` is the
-   * consumer's to reach through the field that wraps it.
+   * blank.
+   *
+   * The verdict goes beside it, because `required` is this element's own claim
+   * and nothing else can answer it: a picker standing on a page has no field
+   * around it to check on its behalf. What it is *not* is a second opinion on
+   * everything else, which is why bad input is left to Color Input. See
+   * `required`.
    */
   private sync(): void {
     this.internals.setFormValue(this.value === '' ? null : this.value)
+    this.reportRequired()
+  }
+
+  /**
+   * Reports "required and empty", or clears it.
+   *
+   * Anchored on the square, which is where a reader would go to answer: it is
+   * the first control in the panel and the one `focus` puts the keyboard on, so
+   * the browser's bubble points at the thing to do rather than at the row that
+   * states the result.
+   */
+  private reportRequired(): void {
+    if (this.required && this.value === '') {
+      this.internals.setValidity(
+        { valueMissing: true },
+        'Choose a color.',
+        this.partNamed('grid') ?? undefined,
+      )
+      return
+    }
+    this.internals.setValidity({})
   }
 
   protected override updated(changed: import('lit').PropertyValues): void {
@@ -458,8 +558,29 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   private takeArea(axis: 'brightness' | 'saturation', event: Event): void {
     event.stopPropagation()
-    const { value } = event.target as HTMLInputElement
-    this.move({ [axis]: Number(value) })
+    const control = event.target as HTMLInputElement
+    if (this.readOnly) {
+      this.putBack(control, this.color[axis])
+      return
+    }
+    this.move({ [axis]: Number(control.value) })
+  }
+
+  /**
+   * Returns a control that moved itself to what the model still holds.
+   *
+   * **A refusal has to undo something, and here it is a handle.** Every other
+   * control in this picker is drawn from the model, so refusing the change
+   * leaves the picture right on its own. The two area ranges and the two
+   * channel sliders are not: each moved before it announced, and each is bound
+   * with `.value`, which lit dirty-checks against the value it last committed.
+   * The model never changed, so that binding writes nothing and the handle
+   * stays where the reader dragged it, on a control that refused. Carousel
+   * settles the same question the same way: a refusal puts the track back on
+   * the slide the index still holds.
+   */
+  private putBack(control: { value: string }, at: number): void {
+    control.value = String(at)
   }
 
   /**
@@ -483,8 +604,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   private takeChannel(channel: 'alpha' | 'hue', event: Event): void {
     event.stopPropagation()
-    const { value } = event.target as unknown as { value: number }
-    this.move({ [channel]: Number(value) })
+    const control = event.target as unknown as { value: string }
+    if (this.readOnly) {
+      this.putBack(control, this.color[channel])
+      return
+    }
+    this.move({ [channel]: Number(control.value) })
   }
 
   /* `ariaInvalid` on the host through `ElementInternals`, the same route
@@ -602,6 +727,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                 spellcheck="false"
                 .value=${this.value}
                 ?disabled=${this.isDisabled}
+                ?readonly=${this.readOnly}
                 @input=${this.handleValueInput}
               />`
         }

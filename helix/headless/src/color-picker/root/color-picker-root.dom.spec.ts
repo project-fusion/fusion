@@ -395,3 +395,110 @@ describe('color picker in a form', () => {
     expect(formValue(host)).toBe(host.value)
   })
 })
+
+describe('a required color', () => {
+  /* A color is exactly as requirable as a date, and the two pickers in the same
+     composition position both check it. This one carried the property nowhere,
+     so a form holding an unanswered required picker submitted, `:valid` true
+     and the entry absent. */
+  const internals = (host: HTMLElement): ElementInternals =>
+    (host as unknown as { internals: ElementInternals }).internals
+
+  test('with nothing chosen is missing', async () => {
+    const host = await picker('name="brand" required')
+    expect(internals(host).validity.valueMissing).toBe(true)
+  })
+
+  test('and is valid once a color is in it', async () => {
+    const host = await picker('name="brand" required value="#336699"')
+    expect(internals(host).validity.valid).toBe(true)
+  })
+
+  test('becomes valid as the reader answers, rather than at the next submit', async () => {
+    const host = await picker('name="brand" required')
+    await axis(host, 'brightness', 50)
+    expect(internals(host).validity.valid).toBe(true)
+  })
+
+  test('a picker nobody required is never missing, whatever it holds', async () => {
+    expect(internals(await picker('name="brand"')).validity.valid).toBe(true)
+  })
+
+  test('the message points at the square, which is where the answer is given', async () => {
+    const host = await picker('required')
+    expect(part(host, 'grid')).not.toBeNull()
+    expect(internals(host).validationMessage).toBe('Choose a color.')
+  })
+
+  test('and a half-typed color is left alone, the field above owning bad input', async () => {
+    /* Every keystroke in the value row reaches `requestValue`, so reporting
+       bad input here would fault `#0`, `#00` and `#00f` on the way to a color.
+       Color Input reports it once, against the field that was typed into. */
+    const host = await picker('name="brand" required')
+    const field = part(host, 'value') as HTMLInputElement
+    field.value = '#00f'
+    field.dispatchEvent(new Event('input', { bubbles: true }))
+    await host.updateComplete
+    expect(internals(host).validity.valid).toBe(true)
+  })
+})
+
+describe('a read-only color picker', () => {
+  test('refuses the square, and the handle goes back where the value still is', async () => {
+    /* The square is drawn from the model rather than from the value, so a
+       refusal taken at `requestValue` alone would move the handle and leave the
+       color behind it. */
+    const host = await picker('readonly value="#ff0000"')
+    await axis(host, 'brightness', 20)
+    expect(host.value).toBe('#ff0000')
+    expect((part(host, 'grid-brightness') as HTMLInputElement).value).toBe('100')
+  })
+
+  test('refuses a ramp, and puts that handle back too', async () => {
+    const host = await picker('readonly value="#ff0000"')
+    await ramp(host, 'hue', 200)
+    expect(host.value).toBe('#ff0000')
+    const slider = host.shadowRoot?.querySelector('[data-channel="hue"]') as unknown as {
+      value: string
+    }
+    expect(slider.value).toBe('0')
+  })
+
+  test('refuses a preset', async () => {
+    const host = await picker('readonly swatches="#00ff00" value="#ff0000"')
+    ;(part(host, 'swatch') as HTMLElement).click()
+    await host.updateComplete
+    expect(host.value).toBe('#ff0000')
+  })
+
+  test('refuses the syntax toggle whole, that being a rewrite of the value', async () => {
+    /* Half-refused, the toggle would say `rgb` over a hex it was no longer
+       allowed to restate. */
+    const host = await picker('format="hex" readonly value="#ff0000"')
+    ;(part(host, 'format') as HTMLElement).click()
+    await host.updateComplete
+    expect(host.format).toBe('hex')
+    expect(host.value).toBe('#ff0000')
+  })
+
+  test('refuses a value asked for in script, which is the one seam every path comes through', async () => {
+    const host = await picker('readonly value="#ff0000"')
+    const asked = (host as unknown as { requestValue: (next: string) => boolean }).requestValue(
+      '#00ff00',
+    )
+    expect(asked).toBe(false)
+    expect(host.value).toBe('#ff0000')
+  })
+
+  test('marks the field read-only rather than disabling it, so the color can still be read', async () => {
+    const host = await picker('readonly value="#ff0000"')
+    const field = part(host, 'value') as HTMLInputElement
+    expect(field.hasAttribute('readonly')).toBe(true)
+    expect(field.disabled).toBe(false)
+  })
+
+  test('and still submits what it holds, which is the whole difference from disabled', async () => {
+    const host = await picker('readonly name="brand" value="#ff0000"')
+    expect(formValue(host)).toBe('#ff0000')
+  })
+})
