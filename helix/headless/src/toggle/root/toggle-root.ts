@@ -1,5 +1,5 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { customElement, HelixElement, MixinSelectableItem } from '@fusion.dev/helix-core'
+import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -27,13 +27,7 @@ import { property } from 'lit/decorators.js'
  * @cssstate selected - While it is on.
  */
 @customElement('helix-headless-toggle')
-export class HelixHeadlessToggle extends HelixElement {
-  /**
-   * Whether the item can be chosen.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
-
+export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   /**
    * Whether the markup declared this one chosen, which is what a reset returns to.
    *
@@ -80,57 +74,6 @@ export class HelixHeadlessToggle extends HelixElement {
    */
   @property({ attribute: false })
   focusable = false
-
-  /**
-   * Whether this item is the current one.
-   */
-  @property({ type: Boolean })
-  selected = false
-
-  /**
-   * Moves focus to this item's own control.
-   *
-   * The group drives arrow-key navigation and cannot reach the control itself,
-   * which is inside this shadow root. Exposing the intent as a method keeps the
-   * group out of the child's internals.
-   */
-  focusItem(): void {
-    this.partNamed('item')?.focus()
-  }
-
-  /** Chooses this item and announces it. */
-  select(): void {
-    if (this.disabled) {
-      return
-    }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
-  }
-
-  /**
-   * Identifies the item to the group.
-   */
-  @property()
-  value = ''
-
-  /**
-   * Mirrors the chosen state where a stylesheet can select on it.
-   *
-   * **A custom state rather than the `selected` attribute.** The parent writes
-   * this: a listbox choosing a row, a tab strip moving the tab, a radio group
-   * answering for its set. Reflected, that puts the element's own bookkeeping
-   * onto markup a consumer wrote and a consumer's server never sent, which
-   * React reconciles and reports as a mismatch, and which a serialized element
-   * pasted back declares as a choice nobody made. `ElementInternals` holds it
-   * instead, where it is not in the DOM at all.
-   *
-   * Reading `selected` is unaffected and so is writing it: the attribute still
-   * seeds the property, which is what `<helix-toggle selected>` in a consumer's
-   * markup means. There is no write back.
-   */
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    this.toggleState('selected', this.selected)
-  }
 
   protected override render(): TemplateResult {
     return html`<button
