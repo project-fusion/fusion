@@ -151,6 +151,15 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
        for the set: a consumer listening here wants the whole answer, not one
        box's half of it. */
     event.stopImmediatePropagation()
+    /* **And only if the box's own request stood.** A consumer listening on the
+       box refuses at the target phase, which is before this bubble listener
+       runs, and the box then applies nothing. Read it here or the group records
+       a box that never moved: the set would carry a value no checkbox in it
+       agrees with, and the form would submit the group's answer beside the
+       boxes' own. */
+    if (event.defaultPrevented) {
+      return
+    }
 
     const wanted = (event as HelixBeforeToggleEvent).detail.checked
     /* Announced before it is written, never after: dispatching once the group's

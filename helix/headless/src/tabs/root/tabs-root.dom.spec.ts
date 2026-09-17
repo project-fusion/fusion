@@ -41,6 +41,23 @@ describe('tabs selection', () => {
     expect(hasState(panels(host)[0] as Element, 'selected')).toBe(false)
   })
 
+  test('and refusing the tab`s own event leaves the strip where it was', async () => {
+    /* `helix-select` is cancelable and the tab documents it as refusable. This
+       element is the one thing that acts on it, so a refusal it ignored was a
+       veto that did nothing anywhere: valid code, no error, and the selection
+       happening regardless. Bound on the tab, which is the position that can
+       refuse a bubbling event before the strip sees it. */
+    const host = (await mount(markup)) as Updatable & { active: string }
+    const second = tabs(host)[1] as Updatable & { select(): void }
+    second.addEventListener('helix-select', (event) => event.preventDefault())
+    second.select()
+    await host.updateComplete
+
+    expect(host.active).toBe('one')
+    expect(hasState(second, 'selected')).toBe(false)
+    expect(hasState(panels(host)[0] as Element, 'selected')).toBe(true)
+  })
+
   test('a disabled tab cannot be chosen', async () => {
     const host = (await mount(markup)) as Updatable
     const third = tabs(host)[2] as Updatable & { select(): void }

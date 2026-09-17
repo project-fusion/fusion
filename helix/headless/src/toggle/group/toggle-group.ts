@@ -163,7 +163,19 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     )
   }
 
+  /* Through the mixin, so a consumer can refuse the change with
+     `helix-before-change`.
+
+     **And only if the item's own choice stood.** `helix-select` is cancelable
+     and the item documents it as refusable; this group is the only thing that
+     acts on it, so a refusal nothing read was a veto that did nothing. Read
+     here rather than a microtask later: this is a bubble listener for an event
+     from a child, so every listener on the item has already run. A consumer on
+     the group refuses with `helix-before-change` instead. */
   private readonly handleSelection = (event: Event): void => {
+    if (event.defaultPrevented) {
+      return
+    }
     this.requestValue((event as CustomEvent<{ value: string }>).detail.value)
   }
 

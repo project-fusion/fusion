@@ -112,8 +112,21 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
 
   /* Through the mixin, so a consumer can refuse the change. Moving `active`
      straight from the event leaves `helix-before-activate` an announcement
-     nobody can answer. */
+     nobody can answer.
+
+     **And only if the tab's own choice stood.** `helix-select` is cancelable
+     and the tab documents it as refusable; this element is the only thing that
+     acts on it, so a refusal nothing read was a veto that did nothing. Read
+     here rather than a microtask later, which is the difference from `Menu`:
+     that listener runs in capture, ahead of a consumer's on the same host, and
+     this one is a bubble listener for an event from a child, so every listener
+     on the tab has already run by the time it arrives. A consumer on this
+     element refuses with `helix-before-activate` instead, which the mixin
+     dispatches below. */
   private readonly handleSelection = (event: Event): void => {
+    if (event.defaultPrevented) {
+      return
+    }
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
   }
 

@@ -218,6 +218,22 @@ describe('the list can hold which step is current', () => {
     expect(currents(host)).toEqual([false, false, true])
   })
 
+  test('and refusing the step`s own event leaves the sequence where it was', async () => {
+    /* `helix-select` is cancelable and the step documents it as refusable. This
+       element is the one thing that acts on it, so a refusal it ignored was a
+       veto that did nothing anywhere: valid code, no error, and the move
+       happening regardless. Bound on the step, which is the position that can
+       refuse a bubbling event before the sequence sees it. */
+    const host = await seq('default-active="one"')
+    const third = host.querySelectorAll('helix-headless-step')[2] as HTMLElement
+    await (third as unknown as Steps).updateComplete
+    third.addEventListener('helix-select', (event) => event.preventDefault())
+    ;(part(third, 'label') as HTMLElement).click()
+    await host.updateComplete
+    expect((host as unknown as { active: string }).active).toBe('one')
+    expect(currents(host)).toEqual([true, false, false])
+  })
+
   test('and announces and moves, a declared active being a seed', async () => {
     /* Control is an action: a declared `active` applies, and a consumer refuses
        to take the decision. */

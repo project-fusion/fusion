@@ -58,6 +58,24 @@ describe('drilldown', () => {
     expect(heard).toBe('')
   })
 
+  test('and refusing that choice leaves the stack on its page', async () => {
+    /* `helix-select` is cancelable and the row documents it as refusable. The
+       drill is the one thing in the library that acts on it, so a refusal
+       nothing read left the stack moving anyway: valid code, no error, and the
+       navigation happening regardless.
+
+       Refused from above and in capture, which is the only position there is.
+       This element stops the event in capture so a consumer does not hear
+       navigation as a choice, and that stop is ahead of the row and of the host
+       alike, so a listener nearer the event never runs at all. */
+    const host = await stack()
+    const refuse = (event: Event): void => event.preventDefault()
+    document.addEventListener('helix-select', refuse, true)
+    await press(host, host.querySelector('helix-headless-drilldown-item') as Element)
+    document.removeEventListener('helix-select', refuse, true)
+    expect(showing(host)).toEqual(['appearance', 'about'])
+  })
+
   test('a row with no page announces instead of drilling', async () => {
     const host = await stack()
     let heard = ''

@@ -81,6 +81,21 @@ describe('listbox', () => {
     await press(host, 'ArrowDown')
     expect(host.value).toBe('one')
   })
+
+  test('and refusing the option`s own event leaves it alone too', async () => {
+    /* `helix-select` is cancelable and `Option` documents it as refusable. The
+       list is the one thing that acts on it, so a refusal it ignored was a veto
+       that did nothing anywhere: valid code, no error, and the option being
+       chosen regardless. Bound on the option, which is the position that can
+       refuse a bubbling event before the list sees it. */
+    const host = (await list('default-value="one"')) as Updatable & { value: string }
+    const third = options(host)[2] as HTMLElement & { select(): void }
+    third.addEventListener('helix-select', (event) => event.preventDefault())
+    third.select()
+    await settle(host)
+    expect(host.value).toBe('one')
+    expect(options(host).map((option) => option.selected)).toEqual([true, false, false])
+  })
 })
 
 /** The search field, which only exists on a list that says it is filterable. */

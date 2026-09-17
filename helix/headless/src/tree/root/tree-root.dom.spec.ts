@@ -73,6 +73,26 @@ describe('the horizontal arrows', () => {
 /* The base tier ships no stylesheet, so everything it owes somebody drawing
    depth is a fact they can select on: what the tree says depth means, and how
    deep each row sits. Neither is drawn here and both are readable. */
+describe('a choice the item refuses', () => {
+  test('leaves the selection where it was', async () => {
+    /* `helix-select` is cancelable and the item documents it as refusable. The
+       tree is the one thing that acts on it, so a refusal it ignored was a veto
+       that did nothing anywhere: valid code, no error, and the selection
+       happening regardless. Bound on the item, which is the position that can
+       refuse a bubbling event before the tree sees it. */
+    const { branch, child } = await tree()
+    const host = branch.parentElement as Tree & { active: string }
+    branch.select()
+    await host.updateComplete
+    expect(host.active).toBe('branch')
+
+    child.addEventListener('helix-select', (event) => event.preventDefault())
+    child.select()
+    await host.updateComplete
+    expect(host.active).toBe('branch')
+  })
+})
+
 describe('depth is published, not drawn', () => {
   for (const answer of ['heading', 'subordinate'] as const) {
     test(`the tree carries ${answer}, and carries nothing until it is asked`, async () => {
