@@ -1,0 +1,28 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-listbox
+        label="Region"
+        loading
+        loading-text="Fetching regions"
+        name="region"
+      ></helix-listbox>
+
+      <helix-listbox
+        empty-text="No time zone matches that"
+        filter="antarctica"
+        filter-label="Search time zones"
+        filterable
+        label="Time zone"
+        name="zone"
+      >
+        <helix-option value="lisbon">Europe/Lisbon</helix-option>
+        <helix-option value="london">Europe/London</helix-option>
+        <helix-option value="tokyo">Asia/Tokyo</helix-option>
+      </helix-listbox>
+    </helix-flex>
+  )
+}

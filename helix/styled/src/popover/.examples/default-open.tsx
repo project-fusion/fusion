@@ -1,0 +1,31 @@
+import './default-open.css'
+
+export function Example() {
+  return (
+    <helix-popover
+      className="hint"
+      default-open
+      id="whats-new"
+      label="What is new"
+    >
+      <helix-button slot="trigger">What is new</helix-button>
+      <helix-flex
+        direction="column"
+        gap="md"
+      >
+        <helix-text variant="body">
+          Shelves can be shared now. Anything you add to one later goes with it.
+        </helix-text>
+        <helix-flex justify="end">
+          <helix-button
+            command="--close"
+            commandfor="whats-new"
+            emphasis="outlined"
+          >
+            Got it
+          </helix-button>
+        </helix-flex>
+      </helix-flex>
+    </helix-popover>
+  )
+}
