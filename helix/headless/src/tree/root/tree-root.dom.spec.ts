@@ -119,4 +119,26 @@ describe('depth is published, not drawn', () => {
     expect([branch.level, child.level]).toEqual([1, 2])
     expect(part(child, 'row')?.getAttribute('style')).toContain('--tree-level: 2')
   })
+
+  /* And the tree is the only one counting. `level` was an attribute with an
+     example setting it across a flat list, and the tree overwrote all four
+     before the first paint: the depth a consumer could state was never the
+     depth any row drew at. Nesting is the statement, and it is also what
+     decides which rows a shut branch hides and where the outward arrow goes. */
+  test('a depth declared on a row does not survive, because the tree counts it', async () => {
+    const host = await mount(`
+      <helix-headless-tree label="Packages">
+        <helix-headless-tree-item level="1" value="cortex">cortex</helix-headless-tree-item>
+        <helix-headless-tree-item level="2" value="core">core</helix-headless-tree-item>
+      </helix-headless-tree>`)
+    const rows = [...host.querySelectorAll('helix-headless-tree-item')] as Item[]
+    for (const row of rows) {
+      await row.updateComplete
+    }
+    expect(rows.map((row) => row.level)).toEqual([1, 1])
+    expect(rows.map((row) => part(row, 'row')?.getAttribute('style'))).toEqual([
+      '--tree-level: 1',
+      '--tree-level: 1',
+    ])
+  })
 })

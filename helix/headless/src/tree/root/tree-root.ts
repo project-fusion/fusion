@@ -36,7 +36,7 @@ const KEYS = new Set([
  * does not learn about the styled one.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases FileTree, Navigation tree
  * @documentation https://fusion.dev/helix/components/tree

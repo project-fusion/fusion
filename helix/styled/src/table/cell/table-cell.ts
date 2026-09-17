@@ -13,7 +13,7 @@ import { styles } from './table-cell.css.js'
  * identifier breaks rather than running into the next column.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The cell's content.

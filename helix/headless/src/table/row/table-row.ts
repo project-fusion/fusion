@@ -11,7 +11,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * cells are laid out by the table algorithm.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Row, TableRow
  * @documentation https://fusion.dev/helix/components/table
  *

@@ -13,7 +13,7 @@ import { styles } from './table-root.css.js'
  * decorating none of it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @documentation https://fusion.dev/helix/components/table
  *
@@ -21,7 +21,7 @@ import { styles } from './table-root.css.js'
  *
  * @csspart table - The grid.
  *
- * @cssproperty --table-columns - Track list for the columns.
+ * @cssproperty --table-columns - Track list for the columns, which wins over the one the columns worked out.
  */
 @customElement('helix-table')
 export class HelixTable extends HelixHeadlessTable {

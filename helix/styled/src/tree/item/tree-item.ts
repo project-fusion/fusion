@@ -17,7 +17,7 @@ import { styles } from './tree-item.css.js'
  * the row itself stays flat.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases TreeNode, Branch, Leaf
  * @documentation https://fusion.dev/helix/components/tree
  *

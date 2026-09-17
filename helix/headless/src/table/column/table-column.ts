@@ -68,11 +68,14 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  *
  * @description
  * **The column is the source of both its heading and its track.** Add one and
- * the table has another track; remove one and it does not. Declaring the widths
- * separately, as a CSS track list on the table, leaves nothing tying the two
- * together: a table with three headings and a two-track list renders without
- * complaint, and a track list that is accidentally the headings is invalid CSS
- * the grid silently ignores, collapsing the whole table into one column.
+ * the table has another track; remove one and it does not. That is what ties
+ * the two together, and a table-level track list on its own does not: a list
+ * that is accidentally the headings is invalid CSS a grid ignores in silence,
+ * drawing the whole table as one column. `helix-table`'s `columns` is dealt out
+ * a track at a time against the columns declared under it, so a heading among
+ * the widths costs its own column a width and no more, and a list longer or
+ * shorter than the columns is trimmed or shared rather than being a second
+ * count of them. A column's own `width` wins over the track in its place.
  *
  * **It is also where every per-column fact goes**, which is the reason
  * `helix-data-table` needs no column config object. `field` names the key the
@@ -108,7 +111,7 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  * a grip the table moves.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Column header, Th
  * @documentation https://fusion.dev/helix/components/table
  *

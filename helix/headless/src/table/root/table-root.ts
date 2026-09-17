@@ -90,7 +90,7 @@ const tracksOf = (list: string, wanted: number): string[] => {
  * without measuring anything itself.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases DataTable, Grid table
  * @documentation https://fusion.dev/helix/components/table
@@ -102,7 +102,6 @@ const tracksOf = (list: string, wanted: number): string[] => {
  * @csspart loading - Shown while the rows are still on their way.
  * @csspart table - The grid.
  *
- * @cssproperty --table-columns - Track list for the columns.
  * @cssproperty --table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set.
  */
 @customElement('helix-headless-table')
@@ -126,6 +125,19 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * were this list to win, the drag would move the separator and leave the
    * track where the list put it. This is the table's default for its columns,
    * and each column may say otherwise.
+   *
+   * **It is also the only track list a server can send.** The shim has no tree
+   * to walk, so a render there knows of no columns and this attribute is the
+   * whole answer: a table given one lays its grid out in the first paint, and a
+   * table sized only by its columns is one track wide until it upgrades.
+   *
+   * **`helix-data-table` has none of this, and should not.** Its columns are
+   * its schema rather than an option, so there is always a column to write a
+   * `width` on and a list here would be a second way to say what that says.
+   * This table's cells are markup, and a table written as rows of cells with no
+   * `helix-table-column` in it has nowhere else to be sized from. Both families
+   * take the same CSS hook, `--table-columns` and `--data-table-columns`, which
+   * wins over whichever list the element worked out.
    */
   @property()
   columns = ''
