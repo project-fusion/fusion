@@ -576,8 +576,9 @@ describe('splitter collapsing', () => {
     }
     const bar = separator(host)
     await grab(host, bar, 'pointerdown')
-    // Every move overwrites the position, so by the edge the start is gone
-    // unless the press took it.
+    /* The moves are stood in for, a pointer drag needing a box this harness
+       does not lay out. What matters is that every one of them overwrites the
+       position, so by the edge the start is gone unless the press took it. */
     host.position = 20
     await host.updateComplete
     await press(host, 'Home')
@@ -585,6 +586,54 @@ describe('splitter collapsing', () => {
     host.collapsed = undefined
     await host.updateComplete
     expect(host.position).toBe(60)
+  })
+
+  /* **And so does every other way of shutting one**, which is the half the
+     press capture could not answer for. A key applies nothing before it
+     settles, so where the divider is when the settling starts is where it was;
+     read from the press alone, this reopened at the edge the resize had just
+     written, under a class docstring saying a shut pane knows where to go
+     back to. */
+  test('a key ending shut opens back to where it was, not to the edge', async () => {
+    const host = (await splitter('default-position="60"')) as Splitter & {
+      collapsed?: 'end' | 'start' | undefined
+    }
+    await press(host, 'Home')
+    expect(host.collapsed).toBe('start')
+    host.collapsed = undefined
+    await host.updateComplete
+    expect(host.position).toBe(60)
+  })
+
+  test('and a step that lands on the edge is the same', async () => {
+    const host = (await splitter('default-position="4" step="2"')) as Splitter & {
+      collapsed?: 'end' | 'start' | undefined
+    }
+    await press(host, 'ArrowLeft')
+    await press(host, 'ArrowLeft')
+    expect(host.collapsed).toBe('start')
+    host.collapsed = undefined
+    await host.updateComplete
+    expect(host.position).toBe(2)
+  })
+
+  test('and the reading is this gesture’s, never the one before it', async () => {
+    /* Never cleared, the press capture outlived its own gesture and measured
+       the next one: a press at 60, an hour of other work, and a key collapse
+       from 20 reopened at 60. */
+    const host = (await splitter('default-position="60"')) as Splitter & {
+      collapsed?: 'end' | 'start' | undefined
+    }
+    const bar = separator(host)
+    await grab(host, bar, 'pointerdown')
+    await grab(host, bar, 'pointerup')
+    host.position = 20
+    await host.updateComplete
+    await press(host, 'Home')
+    expect(host.collapsed).toBe('start')
+    host.collapsed = undefined
+    await host.updateComplete
+    expect(host.position).toBe(20)
   })
 
   test('any move opens it, so a shut pane is still draggable', async () => {
