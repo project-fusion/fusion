@@ -19,7 +19,7 @@ import { styles } from './tabs-root.css.js'
  * box inside a sunken track.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @documentation https://fusion.dev/helix/components/tabs
  *

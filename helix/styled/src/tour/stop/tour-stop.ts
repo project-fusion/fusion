@@ -8,11 +8,13 @@ import '../../button/index.js'
  * @summary One stop on a tour: what it points at, and a panel to say it in.
  *
  * @description
- * The styled tier of `BaseTourStop`. The panel is `Popover`'s panel by another
- * name, on purpose.
+ * The panel is `Popover`'s panel by another name, on purpose: a surface, an
+ * inset and a lift, so a stop and a flyout on the same page are the same
+ * object. What this tier adds beyond that is the point, which no other surface
+ * here draws.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @documentation https://fusion.dev/helix/components/tour
  *

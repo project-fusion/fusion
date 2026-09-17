@@ -24,7 +24,7 @@ import { property, state } from 'lit/decorators.js'
  * with headings close together several are in it at once.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Table of contents, On this page, Outline
  * @documentation https://fusion.dev/helix/components/outline
