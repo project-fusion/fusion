@@ -419,6 +419,21 @@ describe('carousel settling', () => {
     }).toEqual({ index: 3, marker: 3 })
   })
 
+  test('a settled drag can be refused, and the track goes back where it was', async () => {
+    /* This was the one dispatch in the library of a cancelable event whose
+       answer nothing read: `helix-select` announced after `index` had already
+       moved, on the argument that a reader has already dragged the track and
+       `preventDefault()` could not un-drag it. The track is ours to scroll, so
+       it can: the index stays where it was and the scroller is put back on the
+       slide that index names. */
+    const { host, track } = await scrolling('default-index="0"')
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    settle(track, 200)
+    await host.updateComplete
+    expect(host.index).toBe(0)
+    expect(track.scrollLeft).toBe(0)
+  })
+
   test('a stray scrollend after a move of ours does not drag the index back', async () => {
     // The flip-back. Our own smooth scroll ends with a `scrollend` too, and
     // reading it as a reader's drag lets whichever slide happens to be nearest

@@ -38,7 +38,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The slides.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the slide in view changes, with its index. Cancelable where the carousel is about to move: refusing a control or an indicator takes the decision and nothing moves. A drag has already moved the track, so that one announces after the fact and refusing it does nothing. See `handleScroll`.
+ * @event {HelixSelectEvent} helix-select - Fired before the slide in view changes, with the index being asked for. Cancelable: refusing it takes the decision and nothing moves, including a drag, which is put back on the slide the index still holds. See `handleScroll`.
  *
  * @csspart controls - The row of controls.
  * @csspart indicator - One of them, and a way to reach that slide.
@@ -568,18 +568,30 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (nearest === undefined) {
       return
     }
-    /* Announced after the fact, and deliberately, where `goTo` announces
-       before. The reader has already dragged the track here: there is nothing
-       to refuse, and `preventDefault()` could not un-drag it. This is the case
-       the controlled-change helper's own documentation distinguishes, a native
-       control that has already moved, and putting it on that path would offer a
-       refusal that cannot be honored. */
     if (nearest === this.index) {
       return
     }
-    this.indexState = nearest
-    this.requestUpdate('index')
-    this.dispatchEvent(new HelixSelectEvent({ value: String(nearest) }))
+    /* Through the same door as every other index change, and that is a
+       correction. This announced after the fact on the argument that a reader
+       has already dragged the track here, so there was nothing to refuse and
+       `preventDefault()` could not un-drag it. The first half is true and the
+       second is not: the track is ours to scroll, so a refusal is honored by
+       putting it back on the slide the index still holds, which is exactly what
+       `scrollToIndex` does. Left as it was, this was the one place in the
+       library dispatching a cancelable event that nothing read. */
+    const applied = requestChange({
+      apply: (value) => {
+        const previous = this.index
+        this.indexState = value
+        this.requestUpdate('index', previous)
+      },
+      event: (value) => new HelixSelectEvent({ value: String(value) }),
+      host: this,
+      next: nearest,
+    })
+    if (!applied) {
+      this.scrollToIndex()
+    }
   }
 
   /**
