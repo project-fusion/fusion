@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -43,5 +43,24 @@ describe('tabs tab server output', () => {
       'helix-headless-tab',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
+  })
+
+  /**
+   * **A server's strip is reachable**, for the reason `Radio.Root`'s own server
+   * spec writes out. Here the stop rides on `selected` alone, which is the
+   * root's word, and the root says it by reading its children: a server has
+   * none, so `-1` on every tab is a claim about a stop that does not exist yet
+   * and it left the strip impossible to enter.
+   *
+   * **The cost is a strip where every tab is a stop, and it is the right side of
+   * the trade.** A consumer who wrote `selected` on one tab did answer, and a
+   * server cannot tell the other tabs about it, so they open too. Nothing there
+   * is false and the extra stops last until the update after hydration; the
+   * alternative states that every tab is out of a tab order no tab is in.
+   */
+  test('a tab nothing has answered for is in the tab order rather than out of it', () => {
+    expect(partTag(ssr(html`<helix-headless-tab></helix-headless-tab>`), 'tab')).toContain(
+      'tabindex="0"',
+    )
   })
 })

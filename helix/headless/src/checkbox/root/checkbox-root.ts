@@ -192,13 +192,26 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
 
        `mark-checked` and `mark-indeterminate` repeat the host's state on the
        mark, for the box a component draws in its own shadow root: Data Table's
-       are out of reach of any selector naming the host. */
+       are out of reach of any selector naming the host.
+
+       **`.checked` falls back to `nothing`, where `?disabled` and `?required`
+       two lines down are plain booleans.** The difference is the platform:
+       `disabled` and `required` are their own state, so the attribute is the
+       whole answer, and `checked` is not. A checkbox's `checked` attribute is
+       its *default*, and the first click sets the dirty flag that severs it
+       from the control, so only the property moves a box a reader has touched.
+       A property binding alone is what a server stringifies, and a boolean
+       attribute is true whenever it is present: `checked="false"` is a ticked
+       box to anything reading the markup before hydration. `nothing` is the one
+       value that serves no attribute and sets the property to `undefined`, so
+       the client keeps the property it needs and the server states nothing it
+       cannot support. */
     return html`<label part="field">
       <span part="box">
         <input
           part="control"
           type="checkbox"
-          .checked=${this.checked}
+          .checked=${this.checked || nothing}
           .indeterminate=${this.indeterminate}
           ?disabled=${this.isDisabled}
           ?required=${this.required}

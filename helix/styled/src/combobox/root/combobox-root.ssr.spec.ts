@@ -19,16 +19,26 @@ describe('combobox server output', () => {
     expect(partTag(markup, 'surface')).toContain('hidden')
   })
 
-  test('the placeholder is what the server can say, since options are children', () => {
+  test('the placeholder is what the server can say, and only where nothing is chosen', () => {
     /* The field's words are the chosen option's, and the server cannot see
-       light-DOM children to resolve a value into any. So it renders the
-       placeholder and the words arrive on hydration, which is the same bargain
-       Select makes. */
-    const control = partTag(
+       light-DOM children to resolve a value into any. So the words arrive on
+       hydration, which is the same bargain Select makes.
+
+       **Both polarities, because only the declared one can fail.** A
+       placeholder says nothing is chosen. Over a declared `value` that is
+       false, and this spec pinned it: it asserted the declared case alone and
+       the assertion was that the field lies. Nothing declared is the one case a
+       server is sure of, and there the placeholder is exactly right. */
+    const empty = partTag(
+      ssr(html`<helix-combobox placeholder="Search owners"></helix-combobox>`),
+      'control',
+    )
+    expect(empty).toContain('Search owners')
+    const declared = partTag(
       ssr(html`<helix-combobox placeholder="Search owners" value="ross"></helix-combobox>`),
       'control',
     )
-    expect(control).toContain('Search owners')
-    expect(control).not.toContain('ross')
+    expect(declared).not.toContain('Search owners')
+    expect(declared).not.toContain('ross')
   })
 })

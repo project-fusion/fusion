@@ -335,16 +335,40 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
      * Without one, nothing changes: the wrapper is the `treeitem` and holds the
      * group, which is what an `<li>` holding a `<ul>` is. */
     const linked = this.href !== ''
+    /* The indent falls back to one, because a row has to be drawn somewhere and
+       the outermost column is where an uncounted row belongs. */
     const level = this.level ?? 1
+    /* **`aria-level` does not, because a depth is a claim and `1` is the wrong
+       one.** The tree counts a row's ancestors to assign `level`, and a server
+       has no tree to walk: it served `aria-level="1"` on all fourteen rows of a
+       three-deep example, so a screen reader was told a flat list where the
+       markup holds a nested one. Absent is "unknown", which is the answer this
+       library reaches for everywhere else and the one `Data Table`'s own server
+       spec argues for `aria-colcount` in the same words: a reader told nothing
+       falls back to the structure, and the structure is right here, each nested
+       row sitting inside its parent's `group` in the flattened tree. A reader
+       told `1` has been overruled with something false.
+
+       `TreeRoot.syncItems` writes the depth through `whenHydrated`, so the
+       render after hydration is what fills this in. */
+    const depth = this.level ?? nothing
     const expanded = this.branch ? (this.open ? 'true' : 'false') : nothing
-    const tabIndex = this.focusable ? '0' : '-1'
+    /* **A render the tree has not reached holds the stop open.** `focusable` is
+       the tree's word and the tree reads its rows to say it, so on a server no
+       row has it and a bare `'-1'` served a tree the keyboard could not enter
+       at all. Untold, every row is a stop, which is what a document with no
+       script does anyway, there being no arrow keys to move a single stop with
+       until one arrives. `childrenKnown` is the test `FilterInput.Chip` uses in
+       the same words, a server and the render that has to be its, so a browser
+       draws what it drew before. */
+    const tabIndex = this.focusable || !this.childrenKnown ? '0' : '-1'
 
     return html`<div
         part="item"
         role=${linked ? 'none' : 'treeitem'}
         aria-expanded=${linked ? nothing : expanded}
         aria-selected=${linked ? nothing : this.selected ? 'true' : 'false'}
-        aria-level=${linked ? nothing : level}
+        aria-level=${linked ? nothing : depth}
         tabindex=${linked ? nothing : tabIndex}
       >
         ${
@@ -357,7 +381,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
                 rel=${this.rel || nothing}
                 aria-expanded=${expanded}
                 aria-selected=${this.selected ? 'true' : 'false'}
-                aria-level=${level}
+                aria-level=${depth}
                 tabindex=${tabIndex}
                 style="--tree-level: ${level}"
                 @click=${this.handleRowClick}

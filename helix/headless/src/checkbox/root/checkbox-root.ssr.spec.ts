@@ -25,18 +25,26 @@ describe('checkbox server output', () => {
     )
   })
 
-  test('a default-checked box is checked on the server, in the control', () => {
+  test('the server says checked on a ticked box and says nothing on an unticked one', () => {
     /* Anything that waited for a lifecycle hook would render unchecked here and
        change at hydration.
 
        Asked of the `<input>`, the checked state living in
        `ElementInternals.states`, which no server writes. The control is the
        half that has to be right anyway: it is what carries the state into a
-       form and what a reader is shown. */
-    const markup = withoutStyles(
+       form and what a reader is shown.
+
+       **Both polarities, because only the unticked one can fail.** `checked` is
+       a boolean attribute and is true wherever it is present, so an unticked box
+       is the absence and nothing else. This asked the ticked case alone and
+       would have passed inverted: it held while every unticked box on every
+       server shipped `checked="false"`, which is a ticked box to a reader. */
+    const ticked = withoutStyles(
       ssr(html`<helix-headless-checkbox default-checked>x</helix-headless-checkbox>`),
     )
-    expect(partTag(markup, 'control')).toContain('checked')
+    expect(partTag(ticked, 'control')).toContain('checked')
+    const unticked = withoutStyles(ssr(html`<helix-headless-checkbox>x</helix-headless-checkbox>`))
+    expect(partTag(unticked, 'control')).not.toContain('checked')
   })
 
   test('the host carries only what the consumer wrote', () => {

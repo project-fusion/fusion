@@ -99,20 +99,45 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
   @property({ attribute: false })
   focusable = false
 
+  /**
+   * Asks for the render that follows a hydration, so the stop stops being every
+   * choice's.
+   *
+   * `tabindex` reads `childrenKnown` and a hydrating render is one where that is
+   * false, which is what keeps the hydrating render the server's. Nothing else
+   * would ask: the group writes an already-false `focusable` onto every choice
+   * but one, which changes nothing and so re-renders nothing.
+   */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   protected override render(): TemplateResult {
     /* Roving `tabindex`: one stop for the whole set, which is what a radio
        group is in the tab order, and the arrow keys move within it. The group
        owns the keys, because moving between items is a fact about the set.
 
        `focusable` is the unanswered set's entry stop, and it is on the button
-       rather than on the host so that what a reader tabs to is the radio. */
+       rather than on the host so that what a reader tabs to is the radio.
+
+       **And a render the group has not reached holds the stop open.** Both
+       halves are the group's word and the group reads its children to say
+       either, so on a server neither is true of anything and a bare `'-1'`
+       served a set the keyboard could not enter at all: the fault `focusable`
+       exists to prevent, arriving through the one render `focusable` cannot be
+       written in. Untold, every choice is a stop, which is what a document with
+       no script does anyway, there being no arrow keys to move a single stop
+       with until one arrives. `childrenKnown` is the test `FilterInput.Chip`
+       uses in the same words, a server and the render that has to be its, so a
+       browser draws what it drew before. */
     return html`<button
       part="item"
       type="button"
       role="radio"
       aria-checked=${this.selected ? 'true' : 'false'}
       ?disabled=${this.disabled}
-      tabindex=${this.selected || this.focusable ? '0' : '-1'}
+      tabindex=${this.selected || this.focusable || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
     >
       <span part="box"><span part="mark" aria-hidden="true"></span></span>

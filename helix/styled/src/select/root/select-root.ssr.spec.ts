@@ -27,14 +27,26 @@ describe('select server output', () => {
     expect(partTag(markup, 'surface')).toContain('hidden')
   })
 
-  test('the trigger’s words come from the placeholder, since options are children', () => {
-    // The server cannot see light-DOM children, so a value it cannot resolve
-    // has to fall back to something rather than render blank.
-    const markup = ssr(
+  test('the placeholder stands over no value and says nothing over a declared one', () => {
+    /* The server cannot see light-DOM children, so a value it cannot resolve
+       has no words to show. What it had instead was the placeholder, on the
+       argument that the trigger has to fall back to something rather than
+       render blank, and the box is the part of that argument that holds: an
+       empty trigger that gains a word is not a layout moving.
+
+       The rest of it does not. A placeholder says nothing is chosen, and over a
+       declared `value` that is false, which this test asked for by name. So the
+       placeholder where there is genuinely no value, the one case a server is
+       sure of, and an empty box where there is a value whose word cannot be
+       read. `Combobox` makes the same trade in the same position. */
+    const declared = ssr(
       html`<helix-select placeholder="Choose an owner" value="ross"></helix-select>`,
     )
-    expect(partTag(markup, 'value')).not.toBe('')
-    expect(rendered(markup, TAG)).toContain('Choose an owner')
+    expect(partTag(declared, 'value')).not.toBe('')
+    expect(rendered(declared, TAG)).not.toContain('Choose an owner')
+    expect(rendered(declared, TAG)).not.toContain('ross')
+    const empty = ssr(html`<helix-select placeholder="Choose an owner"></helix-select>`)
+    expect(rendered(empty, TAG)).toContain('Choose an owner')
   })
 
   test('the label is served and names the trigger', () => {

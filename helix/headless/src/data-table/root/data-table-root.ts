@@ -793,9 +793,35 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * The mixin's own answer counts children with no `slot`, which for this
    * element is the columns. Left in place, a table with columns and no data
    * would call itself full.
+   *
+   * **`sourceKnown` is the half the mixin was keeping**, and overriding without
+   * it is what put "Nothing to show" over eight rows of files on every server
+   * render of this family's own preview. `MixinCollection.hasRows` answers true
+   * until the rows have been counted for exactly that reason, and a count is
+   * what this replaced.
    */
   protected override get hasRows(): boolean {
-    return this.view.available > 0
+    return this.view.available > 0 || !this.sourceKnown
+  }
+
+  /**
+   * Whether this render can tell a result with no rows from one not yet handed
+   * over.
+   *
+   * **Unknown is not empty, which is what an empty state must never say.** The
+   * rows are a property, and a property is set by whoever holds the element: a
+   * consumer binding it in a template has it on the server, and a consumer
+   * assigning it from a script has it only once that script has run, which is
+   * after the parse a server's markup ends at. A render that cannot see a
+   * document cannot tell the two apart, and a hydrating render must not look,
+   * its output having to be the server's.
+   *
+   * The same shape as `Heatmap.sourceKnown`, asked of a property rather than of
+   * a document, and `childrenKnown` is already both halves of the question: a
+   * server has no tree and a hydrating render may not read one.
+   */
+  private get sourceKnown(): boolean {
+    return this.childrenKnown
   }
 
   /**
@@ -1347,12 +1373,23 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const template = this.template
     const columns = this.shownColumns
     const pagination = this.tag('pagination')
+    /* How long the result is, and whether this render is entitled to say.
+       `mode="server"` reads the consumer's own `total`, which is an attribute
+       and so is there on a server too; anything else counts the rows, which are
+       a property. A count of nothing where `sourceKnown` is false is not a
+       count, and every number below is left off rather than served as a zero:
+       `aria-colcount` on the next line has answered it that way since this
+       family's server spec was written, and the argument there is the argument
+       here. A screen reader told a table has no rows has been told something
+       false; one told nothing counts what it can see. */
+    const counted = this.mode === 'server' ? Math.max(this.total, available) : matched
+    const countKnown = counted > 0 || this.sourceKnown
     return html`<div part="toolbar"><slot name="toolbar"></slot></div>
       <div
         part="table"
         role="rowgroup"
         aria-busy=${this.loading ? 'true' : nothing}
-        aria-rowcount=${this.mode === 'server' ? Math.max(this.total, available) + 1 : matched + 1}
+        aria-rowcount=${countKnown ? counted + 1 : nothing}
         aria-colcount=${columns.length ? columns.length + (this.selectable ? 1 : 0) : nothing}
         style=${template ? `--data-table-template: ${template}` : nothing}
         @scroll=${this.handleScroll}
@@ -1383,7 +1420,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
                 status: pagination-status"
               page=${this.page}
               page-size=${this.pageSize || 1}
-              total=${matched}
+              total=${countKnown ? matched : nothing}
               @helix-navigate=${this.handleNavigate}
             ></${pagination}>`
             : nothing

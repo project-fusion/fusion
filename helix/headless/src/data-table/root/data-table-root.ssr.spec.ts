@@ -114,4 +114,30 @@ describe('data table server output', () => {
   test('the column count is absent rather than zero, since the server cannot count them', () => {
     expect(partTag(markup, 'table')).not.toContain('aria-colcount')
   })
+
+  /**
+   * **The row direction of the same argument, which this spec used to ask in
+   * one direction only.**
+   *
+   * A consumer who binds `.rows` in a template has them on the server, which is
+   * the render every test above is made against. A consumer who assigns them
+   * from a script has them only once that script has run, and a server's markup
+   * ends at the parse: `rows` is empty there and empty is not the answer, it is
+   * the absence of one. Served anyway it was three false statements at once, and
+   * the reader met the worst of them first, "Nothing to show" over a result on
+   * its way in.
+   */
+  test('a table whose rows have not arrived says nothing about them', () => {
+    const unknown = withoutStyles(
+      ssr(html`<helix-headless-data-table label="Files" page-size="4">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`),
+    )
+    expect(rendered(unknown, 'helix-headless-data-table')).not.toContain('part="empty"')
+    expect(partTag(unknown, 'table')).not.toContain('aria-rowcount')
+    expect(partTag(unknown, 'pagination')).not.toContain('total=')
+    /* The other polarity is the test above, so the pair cannot be met by a
+       table that says nothing whatever: bound rows are known on a server and
+       are counted there. */
+  })
 })

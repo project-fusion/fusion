@@ -31,6 +31,20 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
      is, so the one thing the shared item has to know is said here. */
   protected override itemPart = 'tab'
 
+  /**
+   * Asks for the render that follows a hydration, so the stop stops being every
+   * tab's.
+   *
+   * `tabindex` reads `childrenKnown` and a hydrating render is one where that is
+   * false, which is what keeps the hydrating render the server's. Nothing else
+   * would ask: the root writes an already-false `selected` onto an unchosen tab,
+   * which changes nothing and so re-renders nothing.
+   */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   protected override render(): TemplateResult {
     /* No `aria-controls`, and no id for one to point at.
      *
@@ -42,14 +56,24 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
      * reference is valid only into the same tree or a shadow-including ancestor
      * of it, and the panel's shadow root is neither, it is a sibling. The
      * relationship a reader actually needs is the panel's name, and the panel
-     * takes that as a string, which crosses anything. */
+     * takes that as a string, which crosses anything.
+     *
+     * **The roving stop rides on `selected`, and a render nothing has answered
+     * for holds it open.** `selected` is the root's word and the root reads its
+     * children to say it, so on a server every tab is unselected and a bare
+     * `'-1'` served a strip the keyboard could not enter at all. Untold, every
+     * tab is a stop, which is what a document with no script does anyway: there
+     * are no arrow keys to move a single stop with until one arrives. Told, one
+     * is, which is the pattern. `childrenKnown` is the test `FilterInput.Chip`
+     * uses in the same words, a server and the render that has to be its, so a
+     * browser draws what it drew before. */
     return html`<button
       part="tab"
       role="tab"
       type="button"
       aria-selected=${this.selected ? 'true' : 'false'}
       ?disabled=${this.disabled}
-      tabindex=${this.selected ? '0' : '-1'}
+      tabindex=${this.selected || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
     >
       <slot></slot>

@@ -226,13 +226,40 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * `slotchange`, which a declarative shadow root fires before anything listens,
    * so a hydrated select kept "Choose" for good. Nothing on a server or while
    * hydrating what one sent, which drew the placeholder too.
+   *
+   * **And the placeholder is a statement, so a render that cannot read the
+   * words does not make it.** "Choose" means nothing is chosen. `value` is an
+   * attribute and a server has it, the words are the children's and a server
+   * has none, so a `<helix-select default-value="two">` served "Choose" over an
+   * answer the consumer had already given: false to a reader, and false to a
+   * crawler, on every select in the library's own examples. Where a value is
+   * declared and the word for it cannot be read, the trigger says nothing and
+   * keeps its box, which is the answer this library reaches for everywhere it
+   * cannot tell empty from unknown. `firstUpdated` asks for the render that
+   * fills it in.
+   *
+   * The placeholder still stands where there is genuinely no value, which is
+   * what it is for and the one case a server can be sure of.
+   *
+   * **`nothing` and never `''`, which is the difference between a word that
+   * arrives and one that never does.** Lit's hydration primes a child part with
+   * whatever the render computed, and `''` is a primitive, so `_commitText`
+   * takes the branch that assumes the server left a text node to overwrite.
+   * There is none, the write lands on the closing part marker's comment data,
+   * and the trigger stays empty for the life of the page: measured by
+   * `check:spec:dsd`, which caught all nine of these and showed a blank select
+   * beside a client's "Option Two". `nothing` primes the sentinel instead, so
+   * the commit creates the text node it needs.
    */
-  private get display(): string {
+  private get display(): string | typeof nothing {
     const chosen = new Set(this.value === '' ? [] : this.value.split(','))
     const words = optionsAmong(this.knownChildren)
       .filter((option) => chosen.has(option.value))
       .map((option) => option.text)
-    return words.length > 0 ? words.join(', ') : this.placeholder
+    if (words.length > 0) {
+      return words.join(', ')
+    }
+    return chosen.size > 0 && !this.childrenKnown ? nothing : this.placeholder
   }
 
   /** Closes the list and puts focus back where it came from. */

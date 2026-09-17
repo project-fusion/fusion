@@ -22,16 +22,23 @@ describe('switch server output', () => {
     expect(rendered(markup, 'helix-headless-switch')).toContain('Dark mode')
   })
 
-  test('checked reaches the input, and the host carries only what was typed', () => {
+  test('checked reaches the input, an off switch says nothing, and the host carries only what was typed', () => {
     /* No `data-checked` beside it, though the fill and the thumb's travel
        select on it. Shadow styles arrive with the definition rather than in the
        markup, so nothing is drawn in either position until the element upgrades
        and `elements.css` hides the tag by visibility until it does: serving the
        attribute buys no first paint and costs a hydration mismatch on every
-       switch a React consumer serves checked. */
-    const markup = ssr(html`<helix-headless-switch checked></helix-headless-switch>`)
-    expect(partTag(markup, 'control')).toContain('checked')
-    expect(hostAttributes(markup, 'helix-headless-switch')).toEqual(['checked'])
+       switch a React consumer serves checked.
+
+       **Both polarities, because only the off one can fail.** `checked` is a
+       boolean attribute and is true wherever it is present. This asked the on
+       case alone and would have passed inverted: it held while every off switch
+       on every server shipped `checked="false"`, which a reader is told is on. */
+    const on = ssr(html`<helix-headless-switch checked></helix-headless-switch>`)
+    expect(partTag(on, 'control')).toContain('checked')
+    expect(hostAttributes(on, 'helix-headless-switch')).toEqual(['checked'])
+    const off = ssr(html`<helix-headless-switch></helix-headless-switch>`)
+    expect(partTag(off, 'control')).not.toContain('checked')
   })
 
   test('the role is not an attribute, because it goes through internals', () => {

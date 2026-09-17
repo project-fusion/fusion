@@ -338,6 +338,25 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   }
 
   /**
+   * Whether a value is declared and this render cannot say what it is.
+   *
+   * **A placeholder is a statement, so a render that cannot read the words does
+   * not make it.** `value` is an attribute and a server has it; the words are
+   * the options' and the options are light-DOM children a server has none of.
+   * The field then came out empty with "Search owners" over it, which says
+   * nothing is chosen where the consumer had already said what is. Blank, it
+   * says nothing, keeps its box, and is filled in by the render after
+   * hydration, which is the answer `Select.Root.display` reaches for in the same
+   * position and for the same reason.
+   *
+   * The placeholder still stands where there is genuinely no value, which is
+   * what it is for and the one case a server can be sure of.
+   */
+  private get unresolved(): boolean {
+    return this.values.length > 0 && !this.childrenKnown
+  }
+
+  /**
    * Whether the filter has left anything to choose.
    *
    * Read off the options rather than asked of the listbox, which keeps its own
@@ -793,7 +812,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
           aria-autocomplete=${this.suggest ? 'both' : 'list'}
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-describedby=${this.describedBy ?? nothing}
-          placeholder=${(this.chosen.length > 0 ? '' : this.placeholder) || nothing}
+          placeholder=${(this.chosen.length > 0 || this.unresolved ? '' : this.placeholder) || nothing}
           ?disabled=${this.isDisabled}
           .value=${this.multiple || this.open ? this.suggestion || this.typed : this.word}
           @input=${this.handleInput}

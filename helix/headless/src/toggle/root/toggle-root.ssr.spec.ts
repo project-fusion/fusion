@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -43,5 +43,17 @@ describe('toggle server output', () => {
       'helix-headless-toggle',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
+  })
+
+  /**
+   * **A server's set is reachable**, for the reason `Radio.Root`'s own server
+   * spec writes out: `selected` and `focusable` are both the group's word, a
+   * server has no children for the group to read, and `-1` on every item is a
+   * claim about a stop that does not exist yet.
+   */
+  test('an item nothing has answered for is in the tab order rather than out of it', () => {
+    expect(partTag(ssr(html`<helix-headless-toggle></helix-headless-toggle>`), 'item')).toContain(
+      'tabindex="0"',
+    )
   })
 })

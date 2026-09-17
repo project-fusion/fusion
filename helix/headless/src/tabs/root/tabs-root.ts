@@ -4,6 +4,7 @@ import {
   IndicatorController,
   KeyboardNavigationController,
   MixinControllerActive,
+  whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -150,16 +151,28 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
        fallback to the first child shows a disabled tab as current and opens its
        panel with it. */
     const value = (declared ?? this.resolveActive(tabs))?.value ?? ''
+    /* Not into a tab or a panel still hydrating what a server sent: see
+       `whenHydrated`. `Steps` writes into its children the same way. Both sides
+       read `childrenKnown` now, so a hydrating child renders a strip every tab
+       can be tabbed to and a panel that is open, which is what the server sent;
+       writing into that render is the mark the markup never showed. */
     for (const tab of tabs) {
-      tab.selected = tab.value === value
+      const selected = tab.value === value
+      whenHydrated(tab, () => {
+        tab.selected = selected
+      })
     }
     /* The panel's name comes from its tab, and only this element sees both.
        Read from the tab's light DOM, which is where the consumer wrote the
        words, so it is whatever the reader sees on the tab. */
     const names = new Map(tabs.map((tab) => [tab.value, (tab.textContent ?? '').trim()]))
     for (const panel of this.panels) {
-      panel.selected = panel.value === value
-      panel.label = names.get(panel.value) ?? ''
+      const selected = panel.value === value
+      const label = names.get(panel.value) ?? ''
+      whenHydrated(panel, () => {
+        panel.selected = selected
+        panel.label = label
+      })
     }
   }
 
