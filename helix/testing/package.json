@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-testing",
   "description": "Shared spec helpers for DOM and server-rendered component tests.",
-  "version": "0.43.0",
+  "version": "0.44.0",
   "private": true,
   "license": "MIT",
   "repository": {
