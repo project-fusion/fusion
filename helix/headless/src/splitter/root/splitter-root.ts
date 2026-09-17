@@ -52,10 +52,12 @@ const STACK_BELOW = 512
  * **A pane can be shut, and that is not the same as a divider at the edge.**
  * The geometry is identical and the knowledge is not: only a shut pane knows
  * where to open back to. So `collapsed` is a second state rather than a reading
- * of the position, and the position it opens to is the one collapsing never
- * overwrote. `collapsed-size` keeps a sliver showing where a pane has a tab
- * strip worth leaving, and collapse overrides `min` and `max`, which is what
- * those are for.
+ * of the position, and the position it opens to is where the gesture that shut
+ * it began, whichever gesture that was: a drag takes its reading on the press,
+ * and every other door takes it in `settle`, nothing having been applied there
+ * yet. `collapsed-size` keeps a sliver showing where a pane has a tab strip
+ * worth leaving, and collapse overrides `min` and `max`, which is what those
+ * are for.
  *
  * @since 0.1.0
  * @status experimental
@@ -319,6 +321,14 @@ export class HelixHeadlessSplitter extends HelixElement {
    * the edge the number it started from is gone. Taken once, on the press, and
    * written back if the gesture ends shut, so the pane opens to where it was
    * rather than to the edge it was dragged against.
+   *
+   * **A pointer gesture only, because it is the only one that loses it**, and
+   * `settle` answers for the rest from `began`: a key and a double click apply
+   * nothing before they settle, so where the divider is at the top of that
+   * method is where it was. Read once and cleared there, exactly as `began` is,
+   * and for the second reason as well as the first. Left standing it measured
+   * the next gesture against the last one's press, so a collapse pressed from
+   * 20 reopened at the 60 a drag had started from an hour earlier.
    */
   private opened: number | undefined = undefined
 
@@ -574,8 +584,8 @@ export class HelixHeadlessSplitter extends HelixElement {
    * writes the answer back through `position`, which is what makes it the single
    * decision point; returning on its refusal left `panel-collapsed-size` inert
    * there, the shipped `with-a-panel` example measuring a 0px panel against the
-   * 36 its summary promises. So the collapse is reached either way and is
-   * refused, or not, on its own.
+   * 36 it asks for. So the collapse is reached either way and is refused, or
+   * not, on its own.
    *
    * **Which is honest because the collapse carries its own position.** A shut
    * pane sits at `collapsed-size`, which is where `position` reads it from once
@@ -592,6 +602,18 @@ export class HelixHeadlessSplitter extends HelixElement {
    * Refusing the collapse alone still leaves the resize, which is the other way
    * round and is coherent: the divider goes where the drag put it and the pane
    * is not declared shut.
+   *
+   * **The open position is taken here for every door but the pointer's, which
+   * is the same split `began` makes and for the same reason.** A drag has
+   * overwritten the position on the way to the edge, so it reads it on the
+   * press; a key, a double click and `moveTo` apply nothing until the request
+   * below, so where the divider is at the top of this method is where it was.
+   * Captured on the press alone, the class docstring's promise that a shut pane
+   * knows where to open back to held for a drag and for nothing else: measured
+   * 17 Sep 2026, `Home` on a splitter resting at 60 shut the start pane and
+   * reopened it at 0, the resize above having written the edge and the collapse
+   * having nothing to put back. Stale, it was worse than absent, `opened` never
+   * being cleared: a press at 60, then a key collapse from 20, reopened at 60.
    *
    * **A gesture that moved nothing announces nothing, and this is the one place
    * that can say so.** A change carrying the position the divider already had
@@ -634,6 +656,14 @@ export class HelixHeadlessSplitter extends HelixElement {
        the next gesture against the last one's press. */
     const began = this.began ?? this.position
     this.began = undefined
+    /* Where a pane shut by this gesture opens back to, on the same terms and
+       cleared for the same reason. A pointer drag has already overwritten the
+       position by now, so it took its own reading on the press; every other
+       door applies nothing until below, where `began` is that reading. Undefined
+       for a pane that was already shut, which is a pane with no open position
+       to keep rather than one at the edge. */
+    const opened = this.opened ?? (this.collapsed ? undefined : began)
+    this.opened = undefined
     if (wanted === began && shut === this.collapsed) {
       return
     }
@@ -658,9 +688,9 @@ export class HelixHeadlessSplitter extends HelixElement {
         apply: (value) => {
           const previous = this.collapsed
           // Back to where the gesture started, so opening it again is a return
-          // rather than a jump to the edge it was dragged against.
-          if (value !== '' && this.opened !== undefined) {
-            this.positionState = this.opened
+          // rather than a jump to the edge it was driven against.
+          if (value !== '' && opened !== undefined) {
+            this.positionState = opened
           }
           this.collapsedState = value === '' ? 'none' : (value as 'end' | 'start')
           this.requestUpdate('collapsed', previous)
