@@ -74,11 +74,6 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @csspart tooltip-top - The bubble while it is above the reading, beside `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
- * @cssproperty --heatmap-cell-height - How tall a cell is. A row of a tall thin cell is what a status page draws.
- * @cssproperty --heatmap-cell-inline-size - How wide a cell is. The strip fits as many as the container allows.
- * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
- * @cssproperty --heatmap-cell-size - The size a cell wants on both axes, where neither is given its own.
- * @cssproperty --heatmap-gap - Space between cells. Zero is a continuous field rather than a grid of tiles.
  * @cssproperty --heatmap-rows - How many rows the strip lays out. Written by the component from the data, read by the tier that draws it.
  * @cssproperty --heatmap-tone - The tone of the cell this is set on. Written by the component, read by the sheet that paints.
  * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
@@ -121,12 +116,12 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * consumer has to keep by hand, and the one number a summary is told to trust
    * is the one it gets wrong.
    *
-   * The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
-   * enough on their own and these two are the estimate used until the first
-   * measurement lands. Writing the attribute pins the value and stops the
-   * measurement being consulted, which is what a container query or a transition
-   * on the cell size wants, where what is drawn this frame is not what the
-   * arithmetic should plan around.
+   * The strip measures itself, so sizing the cells in a sheet is enough on its
+   * own and these two are the estimate used until the first measurement lands.
+   * Writing the attribute pins the value and stops the measurement being
+   * consulted, which is what a container query or a transition on the cell size
+   * wants, where what is drawn this frame is not what the arithmetic should
+   * plan around.
    *
    * Zero turns the dropping off altogether, which is right for a strip in a
    * container that cannot get narrow.
@@ -205,13 +200,13 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   /**
    * The cell and gap the strip is drawing, in pixels, once it has been read.
    *
-   * **The arithmetic's inputs are a stylesheet's decisions, so the honest way to
-   * learn them is to ask the stylesheet.** A cell's size is a length that only
-   * the cascade can resolve: it may be a `rem` against a root font size, a
+   * **The arithmetic's inputs are a stylesheet's decisions, so the honest way
+   * to learn them is to ask the stylesheet.** A cell's size is a length that
+   * only the cascade can resolve: it may be a `rem` against a root font size, a
    * percentage of a container, or whatever a container query chose this frame.
    * Every one of those is invisible to a number typed into an attribute, and
-   * each of `--heatmap-cell-inline-size`, `--heatmap-cell-height` and `--heatmap-gap`
-   * added one more way for the two to drift apart silently.
+   * every hook a sheet offers for the cell box or the gap is one more way for
+   * the two to drift apart silently.
    *
    * Reading it back is not styling and does not breach the tier: this asks what
    * was decided rather than deciding, which is the same direction as the facts
@@ -394,11 +389,11 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * than the fill, and is false either way. Both verified in a browser.
    */
   private markEmpty(): void {
-    /* `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
-       sheet reads, and this tier ships no sheet, so an empty region left in the box
-       tree would be a gap a headless consumer cannot close without knowing to look
-       for it. The styled rule stays too, because that sheet sets `display` on these
-       parts and therefore outranks the UA's `[hidden]` one. */
+    /* `hidden` beside the `data-empty` mirror: `data-empty` is the hook a sheet
+       selects on, and this tier ships none, so an empty region left in the box
+       tree would be a gap a consumer cannot close without knowing to look for
+       it. Both stay, since `[hidden]` is a UA rule and a sheet setting `display`
+       on these parts outranks it. */
     markRegion(this.renderRoot, 'footer', ['start', 'summary', 'end'])
   }
 

@@ -5,6 +5,17 @@
 //! consumer sets it. A hook read and never documented is one a later edit
 //! removes without knowing it was API.
 //!
+//! **And the pairing is held to one package, not to the workspace.** A
+//! declaration paired with a reader anywhere passes while the two sit in
+//! different packages, which is a hook on one tier's reference page that only
+//! another tier's sheet has ever read: a consumer taking the package that
+//! published the name sets it and nothing moves. Five heatmap cell and gap
+//! hooks were exactly that, all five declared verbatim on the styled twin that
+//! does read them, and `--table-columns` was the same shape and went. A package
+//! shipping no stylesheet still passes, because the write counts: `headless`
+//! and `core` publish what they write out of a template or a `setProperty`, and
+//! the examples beside a component read it back.
+//!
 //! **A name a consumer cannot predict is one they never try**, and one they
 //! mistype resolves to nothing with no error to go on, so a hook is named after
 //! the family that owns it: the directory the component sits in, whichever of
@@ -80,7 +91,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::text::COMMENT;
+use crate::component::text::{blanked, uncommented, COMMENT};
 use crate::component::{walk_outside, Context, Finding, Report};
 
 static DOCUMENTED: LazyLock<Regex> = LazyLock::new(|| {
@@ -132,6 +143,24 @@ static INTERPOLATED: LazyLock<Regex> = LazyLock::new(|| {
 static WHOLE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"var\(\s*(--[a-z0-9-]+)\)").expect("a literal pattern compiles"));
 
+/// A public hook set anywhere on a line rather than in column one.
+///
+/// Anchored nowhere, because a template writes one inside a string beside the
+/// value it interpolates: a chart's `--bar-chart-secondary: var(--chart-series-3)`
+/// is a whole declaration in one expression. A `var(--x, y)` cannot match it,
+/// carrying a comma where this wants a colon.
+static TOUCH_WRITTEN: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(--[a-z][a-z0-9-]*)\s*:").expect("a literal pattern compiles"));
+
+/// A hook written onto an element from a module, by name or by family.
+static TOUCH_SET: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new("setProperty\\(\\s*['\"`](--[a-z][a-z0-9-]*)").expect("a literal pattern compiles")
+});
+
+/// A family reached by interpolating its suffix, in a template or a `setProperty`.
+static TOUCH_FAMILY: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(--[a-z][a-z0-9-]*)-\$\{").expect("a literal pattern compiles"));
+
 /// Whether a name is a component hook rather than a private or a design token.
 fn ours(name: &str) -> bool {
     !name.starts_with("--_") && !name.starts_with("--helix-")
@@ -178,6 +207,15 @@ struct Survey {
     private_read_at: BTreeMap<String, String>,
     private_written: BTreeSet<String>,
     read: BTreeMap<String, String>,
+    /// Which packages interpolate each family's suffix.
+    touched_family: BTreeMap<String, BTreeSet<String>>,
+    /// Which packages read or write each public hook, whatever the file kind.
+    ///
+    /// The two-way check above pairs a declaration with a reader anywhere in
+    /// the workspace, which is what let five hooks live on one tier's page and
+    /// be read only from another's sheet. This is the same pairing held to one
+    /// package.
+    touched_in: BTreeMap<String, BTreeSet<String>>,
     /// Public hooks a stylesheet sets, and the first file to do it.
     written: BTreeMap<String, String>,
 }
@@ -274,12 +312,60 @@ fn survey(context: &Context) -> Survey {
                 }
             }
 
+            touches(&mut survey, &text, &where_, stylesheet);
             privates(&mut survey, context, &text, &where_, stylesheet);
             borrowed(&mut survey, &text, &where_, stylesheet);
         }
     }
 
     survey
+}
+
+/// Every public hook one file touches, and the package it touched it from.
+///
+/// Wider than the two maps above on purpose. Those answer "is this hook read by
+/// a rule" and "is it set by a sheet", which are questions about the mechanism;
+/// this one answers "does the package that published the name have anything to
+/// do with it", which is what a declaration on a reference page promises. So a
+/// module's `var()` counts wherever it sits and not only inside a `style=`, and
+/// a `setProperty` counts as the write it is.
+///
+/// Comments are stripped, or the `@cssproperty` line directly above a hook and
+/// the paragraph explaining it would both answer for it.
+fn touches(survey: &mut Survey, text: &str, where_: &str, stylesheet: bool) {
+    let source = if stylesheet {
+        blanked(text)
+    } else {
+        uncommented(text)
+    };
+    let package = package_of(where_);
+    let mut touched = |name: &str| {
+        if ours(name) {
+            survey
+                .touched_in
+                .entry(name.to_owned())
+                .or_default()
+                .insert(package.clone());
+        }
+    };
+    for found in READS.captures_iter(&source) {
+        touched(&found[1]);
+    }
+    for found in TOUCH_WRITTEN.captures_iter(&source) {
+        touched(&found[1]);
+    }
+    for found in TOUCH_SET.captures_iter(&source) {
+        touched(&found[1]);
+    }
+    for found in TOUCH_FAMILY.captures_iter(&source) {
+        if ours(&found[1]) {
+            survey
+                .touched_family
+                .entry(found[1].to_owned())
+                .or_default()
+                .insert(package.clone());
+        }
+    }
 }
 
 /// What a shared stylesheet publishes, and who takes it.
@@ -425,6 +511,8 @@ fn judge(survey: &Survey, context: &Context) -> Vec<Finding> {
         });
     }
 
+    findings.extend(elsewhere(survey));
+
     for (name, path) in &survey.declared {
         if survey.read.contains_key(name) || in_family(survey, name) {
             continue;
@@ -503,6 +591,45 @@ fn judge(survey: &Survey, context: &Context) -> Vec<Finding> {
     findings
 }
 
+/// A hook declared by a package that has nothing to do with it.
+///
+/// The two-way check pairs a declaration with a reader anywhere in the
+/// workspace, so a hook published on one tier's page and read only from
+/// another tier's sheet passes it while a consumer of the publishing package
+/// sets it and nothing moves. Held to one package it fails, and a package that
+/// ships no stylesheet still passes on the write: a template or a
+/// `setProperty` is what `headless` and `core` publish, and the examples beside
+/// a component read it back.
+fn elsewhere(survey: &Survey) -> Vec<Finding> {
+    let mut findings = Vec::new();
+    for (path, name) in survey.declared_at.keys() {
+        let package = package_of(path);
+        let touched = survey
+            .touched_in
+            .get(name)
+            .is_some_and(|packages| packages.contains(&package));
+        let family = name.rfind('-').filter(|at| *at > 0).is_some_and(|at| {
+            survey
+                .touched_family
+                .get(&name[..at])
+                .is_some_and(|packages| packages.contains(&package))
+        });
+        if touched || family {
+            continue;
+        }
+        findings.push(Finding {
+            detail: "A hook published by a package that neither writes it nor reads it back \
+                     offers a consumer of that package a name it does nothing with, and the \
+                     pairing above cannot see it, being satisfied by a reader anywhere in the \
+                     workspace. Declare it where it is read, or write it here."
+                .to_owned(),
+            file: path.clone(),
+            message: format!("documents `{name}`, which nothing in {package} reads or writes"),
+        });
+    }
+    findings
+}
+
 /// Whether a hook's prefix is a registered shared vocabulary.
 fn registered(context: &Context, name: &str) -> bool {
     let bare = name.trim_start_matches("--");
@@ -552,7 +679,12 @@ fn unpublished(survey: &Survey, context: &Context) -> Vec<Finding> {
     for (sheet, owners) in &survey.composes {
         for name in survey.shared_direct.get(sheet).into_iter().flatten() {
             for (owner, path) in owners {
-                say(name, owner, path, format!("composes `shared/{sheet}`, which reads `{name}`"));
+                say(
+                    name,
+                    owner,
+                    path,
+                    format!("composes `shared/{sheet}`, which reads `{name}`"),
+                );
             }
         }
     }
@@ -563,7 +695,12 @@ fn unpublished(survey: &Survey, context: &Context) -> Vec<Finding> {
     for (private, names) in &survey.shared_alias {
         for name in names {
             for (owner, path) in survey.private_read_by.get(private).into_iter().flatten() {
-                say(name, owner, path, format!("reads `{private}`, which resolves `{name}`"));
+                say(
+                    name,
+                    owner,
+                    path,
+                    format!("reads `{private}`, which resolves `{name}`"),
+                );
             }
         }
     }
