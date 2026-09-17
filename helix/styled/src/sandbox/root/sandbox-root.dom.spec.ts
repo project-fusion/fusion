@@ -397,6 +397,21 @@ describe('sandbox dividers', () => {
     expect(sandbox.hasAttribute('orientation')).toBe(false)
   })
 
+  const heard = (sandbox: Updatable): string[] => {
+    const named: string[] = []
+    for (const name of [
+      'helix-before-collapse',
+      'helix-before-panel-resize',
+      'helix-before-resize',
+      'helix-before-split',
+    ]) {
+      sandbox.addEventListener(name, (event) => {
+        named.push(event.type)
+      })
+    }
+    return named
+  }
+
   test('the arrangement is announced once, and the splitters inside are not', async () => {
     /* A consumer stores one arrangement. What the two elements inside said to
        each other on the way there is not their business, so each divider has
@@ -404,14 +419,22 @@ describe('sandbox dividers', () => {
        because the sandbox must never send one: a splitter inside it that got
        out would land under that name. */
     const sandbox = (await mount(wired)) as Updatable & { split: number }
-    const named: string[] = []
-    for (const name of ['helix-before-panel-resize', 'helix-before-resize', 'helix-before-split']) {
-      sandbox.addEventListener(name, (event) => {
-        named.push(event.type)
-      })
-    }
+    const named = heard(sandbox)
     await press(sandbox, panes(sandbox), 'ArrowRight')
     expect(named).toEqual(['helix-before-split'])
+  })
+
+  test('and a divider driven to the end says the same one thing, the collapse never getting out', async () => {
+    /* `start` and `end` name the panes of a splitter a consumer of this element
+       is not supposed to know about, and the collapse is a second state this
+       element has nowhere to put: refused and stopped, so what a reader hears
+       is the share they already store. */
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
+    const named = heard(sandbox)
+    await press(sandbox, panes(sandbox), 'End')
+    expect(sandbox.split).toBe(100)
+    expect(named).toEqual(['helix-before-split'])
+    expect(panes(sandbox).hasAttribute('data-collapsed')).toBe(false)
   })
 
   /**
@@ -456,6 +479,38 @@ describe('sandbox dividers', () => {
     expect(proposed).not.toBe('')
     expect(Number(proposed)).not.toBe(start)
     expect(sandbox.panelSize).toBe(start)
+  })
+
+  /**
+   * **`panel-collapsed-size` is a floor, which is how this element spells
+   * "shut".**
+   *
+   * Browser only, for the reason above: the panel is pixels and the divider a
+   * share. The splitter inside reaches its collapse now rather than returning on
+   * the refusal above, and that collapse is refused here, so what is left is one
+   * number in the units a consumer stores. Measured in Chromium 17 Sep 2026 on
+   * the shipped `with-a-panel` example, which sets 36 and whose summary calls
+   * the panel collapsible: its panel box was 0px with the divider driven to the
+   * end, and 36px once the floor below held it.
+   */
+  browser('a panel driven to the end stops at the sliver it was told to leave', async () => {
+    const sandbox = (await mount(`
+      <helix-sandbox panel-collapsed-size="36">
+        <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
+        <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+        <helix-sandbox-terminal slot="panel"></helix-sandbox-terminal>
+      </helix-sandbox>`)) as Updatable & { panelSize: number }
+    const named = heard(sandbox)
+
+    await press(sandbox, body(sandbox), 'End')
+    expect(named).toEqual(['helix-before-panel-resize'])
+    expect(sandbox.panelSize).toBe(36)
+    expect(Math.round((part(sandbox, 'panel') as HTMLElement).getBoundingClientRect().height)).toBe(
+      36,
+    )
+    // The sliver is this element's, held in `panel-size`, and not a second state
+    // on the splitter that `panel-size` could not carry.
+    expect(body(sandbox).hasAttribute('data-collapsed')).toBe(false)
   })
 
   test('an unrelated key is left alone', async () => {
