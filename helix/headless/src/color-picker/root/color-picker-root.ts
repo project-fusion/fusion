@@ -374,8 +374,31 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     this.finishHydration()
   }
 
+  /**
+   * Reports the color to the form.
+   *
+   * **The one thing a form-associated element owes, and this element owed it
+   * from the start without paying.** It extends `HelixFormElement`, takes
+   * `MixinControllerValue` and carries `name`, so a consumer writing
+   * `<helix-color-picker name="brand">` inside a form has every reason to
+   * expect an entry, and the form carried none: no error, nothing in the
+   * markup to look at, and a field silently missing from the submission. Its
+   * two siblings in the same composition position, Color Input and Slider,
+   * both report.
+   *
+   * `null` rather than an empty string where there is no color, which is the
+   * difference between a control that submits nothing and one that submits a
+   * blank. There is no `setValidity` beside it: this element does not take
+   * `MixinField`, and every validity member of `ElementInternals` is the
+   * consumer's to reach through the field that wraps it.
+   */
+  private sync(): void {
+    this.internals.setFormValue(this.value === '' ? null : this.value)
+  }
+
   protected override updated(changed: import('lit').PropertyValues): void {
     super.updated(changed)
+    this.sync()
     if (changed.has('value')) {
       if (parseColor(this.value)) {
         this.settled = this.value

@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, settle, slotted } from '@fusion.dev/helix-testing/dom'
+import { formValue, mount, part, registerDom, settle, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -367,5 +367,31 @@ describe('color picker', () => {
       expect(slotted(host, 'eyedropper-icon').length).toBe(0)
       expect(part(host, 'eyedropper')).not.toBeNull()
     })
+  })
+})
+
+describe('color picker in a form', () => {
+  /* It extends `HelixFormElement`, takes `MixinControllerValue` and carries
+     `name`, so a consumer writing one inside a form has every reason to expect
+     an entry. It called `setFormValue` nowhere, so the form carried none: no
+     error, nothing in the markup to look at, and a field silently missing from
+     the submission. Both of its siblings in that composition position, Color
+     Input and Slider, report. */
+  test('reports the color under its name', async () => {
+    const host = await picker('name="brand" value="#336699"')
+    expect(formValue(host)).toBe('#336699')
+  })
+
+  test('and reports nothing at all rather than a blank when it holds no color', async () => {
+    // `null` is a control that submits nothing and `''` is one that submits a
+    // blank, and a picker with no color has not answered.
+    const host = await picker('name="brand"')
+    expect(formValue(host)).toBeNull()
+  })
+
+  test('and follows the reader', async () => {
+    const host = await picker('name="brand" value="#ff0000"')
+    await axis(host, 'brightness', 50)
+    expect(formValue(host)).toBe(host.value)
   })
 })
