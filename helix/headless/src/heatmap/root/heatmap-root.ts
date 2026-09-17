@@ -6,7 +6,7 @@ import {
   HelixResizeEvent,
   hostAria,
   MixinChartSource,
-  slotFilled,
+  markRegion,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -394,26 +394,12 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * than the fill, and is false either way. Both verified in a browser.
    */
   private markEmpty(): void {
-    this.markRegion('footer', ['start', 'summary', 'end'])
-  }
-
-  /**
-   * One region, hidden when its slot holds nothing and nothing of ours fills it.
-   *
-   * `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
-   * sheet reads, and this tier ships no sheet, so an empty region left in the box
-   * tree would be a gap a headless consumer cannot close without knowing to look
-   * for it. The styled rule stays too, because that sheet sets `display` on these
-   * parts and therefore outranks the UA's `[hidden]` one.
-   */
-  private markRegion(part: string, slots: readonly string[], occupied?: string): void {
-    const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${part}"]`)
-    const empty =
-      !slots.some((name) =>
-        slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)),
-      ) && !(occupied && this.renderRoot?.querySelector(occupied))
-    region?.toggleAttribute('data-empty', empty)
-    region?.toggleAttribute('hidden', empty)
+    /* `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
+       sheet reads, and this tier ships no sheet, so an empty region left in the box
+       tree would be a gap a headless consumer cannot close without knowing to look
+       for it. The styled rule stays too, because that sheet sets `display` on these
+       parts and therefore outranks the UA's `[hidden]` one. */
+    markRegion(this.renderRoot, 'footer', ['start', 'summary', 'end'])
   }
 
   protected override updated(changed: PropertyValues): void {

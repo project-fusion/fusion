@@ -1,4 +1,4 @@
-import { customElement, HelixElement, slotFilled } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, markRegion } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -46,17 +46,12 @@ export class HelixHeadlessBlockquote extends HelixElement {
    * rendered, which React reports on hydration.
    */
   private markEmpty(): void {
-    const footer = this.partNamed('attribution')
-    const empty = !slotFilled(
-      this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="attribution"]'),
-    )
-    footer?.toggleAttribute('data-empty', empty)
     /* `hidden` beside the mirror, because `data-empty` is a hook the styled
        sheet reads and this tier has no sheet: an empty region left in the box
        tree is a gap a consumer cannot close without knowing to look for it. The
        styled rule stays, because that sheet sets `display` on this part and so
        outranks the UA one. */
-    footer?.toggleAttribute('hidden', empty)
+    markRegion(this.renderRoot, 'attribution', ['attribution'])
   }
 
   protected override updated(changed: PropertyValues): void {
