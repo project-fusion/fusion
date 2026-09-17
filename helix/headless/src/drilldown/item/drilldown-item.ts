@@ -146,6 +146,27 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
     this.partNamed('item')?.focus()
   }
 
+  /**
+   * Whether this is the row the set is on, which in a drill-down is where focus
+   * is.
+   *
+   * A radio group's selection is an answer it holds; a page of rows has no
+   * answer, only the row a reader has walked to, so focus is the whole of what
+   * "the current one" can mean here. This is `Menu.Item`'s reading word for
+   * word, and the two are one pattern: a menu that drills and a drill-down are
+   * the same rows through the same controller.
+   *
+   * Asked of the document rather than of the shadow root. `focusItem` puts
+   * focus on the control inside this row and the platform retargets it, so from
+   * outside the shadow tree `activeElement` is this element already and nothing
+   * has to walk a tree. `ShadowRoot.activeElement` is also the reading that does
+   * not survive happy-dom, which climbs `getRootNode()` to the top and then
+   * dereferences what it ran out of.
+   */
+  get selected(): boolean {
+    return this.ownerDocument.activeElement === this
+  }
+
   /** Announces that this row was chosen. */
   select(): void {
     if (this.disabled) {

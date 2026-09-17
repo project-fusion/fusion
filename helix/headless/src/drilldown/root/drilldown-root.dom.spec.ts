@@ -148,21 +148,21 @@ describe('drilldown', () => {
    inside its own shadow root: there, no press comes from any row. */
 const browser = hasLayout() ? test : (): void => {}
 
+const key = async (host: Stack, name: string): Promise<void> => {
+  host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name }))
+  await host.updateComplete
+}
+
+const onAppearance = async (): Promise<Stack> => {
+  const host = await stack()
+  ;(host.querySelector('[value="appearance"]') as HTMLElement & { focusItem(): void }).focusItem()
+  return host
+}
+
 describe('the horizontal arrows', () => {
   afterEach(() => {
     document.documentElement.removeAttribute('dir')
   })
-
-  const key = async (host: Stack, name: string): Promise<void> => {
-    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name }))
-    await host.updateComplete
-  }
-
-  const onAppearance = async (): Promise<Stack> => {
-    const host = await stack()
-    ;(host.querySelector('[value="appearance"]') as HTMLElement & { focusItem(): void }).focusItem()
-    return host
-  }
 
   browser('go in with the right arrow and back with the left', async () => {
     const host = await onAppearance()
@@ -180,6 +180,60 @@ describe('the horizontal arrows', () => {
     await key(host, 'ArrowLeft')
     expect(showing(host)).toEqual(['theme'])
     await key(host, 'ArrowRight')
+    expect(showing(host)).toEqual(['appearance', 'about'])
+  })
+})
+
+/**
+ * Moving within a page is `KeyboardNavigationController`'s, reached by reserving
+ * the horizontal pair the drill uses.
+ *
+ * Asserted here rather than taken on trust, because reserving is a claim about
+ * the keys this component binds and nothing else holds the two halves together:
+ * the vertical pair and Home and End have to still move, and the horizontal
+ * pair has to still drill.
+ */
+describe('moving within a page', () => {
+  const current = (): string => (document.activeElement as Item | null)?.value ?? ''
+
+  browser('down and up walk the rows, and the ends join up', async () => {
+    const host = await onAppearance()
+    await key(host, 'ArrowDown')
+    expect(current()).toBe('about')
+    await key(host, 'ArrowDown')
+    expect(current()).toBe('appearance')
+    await key(host, 'ArrowUp')
+    expect(current()).toBe('about')
+  })
+
+  /* Backward from nothing is the last row, which is the controller's reading
+     and `Menu`'s: a reader arrowing up into a page they have not entered wants
+     the end of it. */
+  browser('up from nothing lands on the last row', async () => {
+    const host = await stack()
+    await key(host, 'ArrowUp')
+    expect(current()).toBe('about')
+  })
+
+  browser('Home and End go to the ends', async () => {
+    const host = await onAppearance()
+    await key(host, 'End')
+    expect(current()).toBe('about')
+    await key(host, 'Home')
+    expect(current()).toBe('appearance')
+  })
+
+  /* Arriving is not choosing here, which is why the controller is given
+     `selects: false`: a row that followed itself on the way past would take the
+     reader somewhere they were only passing through. */
+  browser('arriving at a row does not follow it', async () => {
+    const host = await onAppearance()
+    let heard = ''
+    host.addEventListener('helix-select', (event: Event) => {
+      heard = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    await key(host, 'ArrowDown')
+    expect(heard).toBe('')
     expect(showing(host)).toEqual(['appearance', 'about'])
   })
 })
