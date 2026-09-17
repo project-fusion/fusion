@@ -21,11 +21,13 @@ import { styles } from './toggle-group.css.js'
  * corner radius, which is worse than the exception.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases SegmentedControl, Segmented, Navigation, Switcher
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The group's items.
+ * @slot end - Whatever sits after the track on its own line, such as a count or a reset.
+ * @slot start - Whatever sits before the track on its own line, such as an icon or a caption.
  *
  * @csspart indicator - The moving marker behind the selected item.
  *

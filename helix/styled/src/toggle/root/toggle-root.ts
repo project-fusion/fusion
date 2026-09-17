@@ -12,14 +12,14 @@ import { styles } from './toggle-root.css.js'
  * one fill appearing as another disappears.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases Segment, NavItem, Option
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The item's label.
  *
- * @csspart item - The button or anchor.
+ * @csspart item - The radio button.
  */
 @customElement('helix-toggle')
 export class HelixToggle extends HelixHeadlessToggle {

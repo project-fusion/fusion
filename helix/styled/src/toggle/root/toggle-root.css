@@ -1,8 +1,10 @@
-/* The item's own look lives in the base layer, paired across both forms: the
-   radio this renders and the link a consumer slots. It has to, because the
-   outer tree styles slotted content and a `::slotted()` rule here would lose to
-   it. What stays is the host box and the focus ring, which a document rule
-   cannot reach into a shadow root to declare. */
+/* The item's own look lives in the base layer, beside the `data-navigation-item`
+   recipe it is paired with: this renders a radio and never a link, and a nav bar
+   wants the same look without radio semantics announcing destinations as
+   choices. It has to be there, because the outer tree styles the label a
+   consumer slots and a `::slotted()` rule here would lose to it. What stays is
+   the host box and the focus ring, which a document rule cannot reach into a
+   shadow root to declare. */
 :host {
   block-size: 100%;
   display: inline-flex;

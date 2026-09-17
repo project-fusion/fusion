@@ -107,7 +107,7 @@ const addMonths = (date: Date, months: number): Date => {
  * write the same comma-separated `value`.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Calendar, Date grid, Month view
  * @documentation https://fusion.dev/helix/components/date-picker

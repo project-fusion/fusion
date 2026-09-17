@@ -16,7 +16,7 @@ import { styles } from './format-date-root.css.js'
  * date is written once and should sit in the text like the text.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category typography
  * @documentation https://fusion.dev/helix/components/format-date
  */

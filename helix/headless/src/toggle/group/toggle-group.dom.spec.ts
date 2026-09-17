@@ -60,6 +60,80 @@ describe('toggle group', () => {
     ).toEqual(['dark'])
   })
 
+  /* The markup's own answer, which is the half a server can state.
+   *
+   * The fault these hold: `sync` matched items against a `value` of `''`,
+   * matched none, and wrote `selected = false` onto every one of them, so a
+   * group served with its answer on the item lost it one frame after paint and
+   * submitted nothing. `Tabs` had the same fault and `Steps` guards it. Both
+   * halves are asserted, because marking the item without taking the value
+   * would leave a `required` group reporting empty while showing an answer. */
+  test('an item the markup declared chosen stays chosen', async () => {
+    const group = await mount(`<helix-headless-toggle-group label="View" name="view">
+        <helix-headless-toggle value="list" selected>List</helix-headless-toggle>
+        <helix-headless-toggle value="grid">Grid</helix-headless-toggle>
+      </helix-headless-toggle-group>`)
+    expect(
+      items(group)
+        .filter((item) => item.selected)
+        .map((item) => item.value),
+    ).toEqual(['list'])
+    expect(formValue(group as unknown as Updatable)).toBe('list')
+  })
+
+  test('a declaration written as a property is one too, which is what JSX writes', async () => {
+    /* React assigns a JSX prop as a property where the custom element has one
+       and writes no attribute, so a group keying on the attribute drew the
+       shipped `disabled` example one way in HTML and another in TSX. Measured
+       by the parity check at 192 pixels before the group read the property. */
+    document.body.innerHTML = `<helix-headless-toggle-group label="View">
+        <helix-headless-toggle value="list">List</helix-headless-toggle>
+        <helix-headless-toggle value="grid">Grid</helix-headless-toggle>
+      </helix-headless-toggle-group>`
+    const group = document.body.firstElementChild as HTMLElement & Updatable
+    const [first] = items(group)
+    if (first) {
+      first.selected = true
+    }
+    await group.updateComplete
+    expect(
+      items(group)
+        .filter((item) => item.selected)
+        .map((item) => item.value),
+    ).toEqual(['list'])
+    expect(first?.hasAttribute('selected')).toBe(false)
+  })
+
+  test('a written value still wins over the markup on the item', async () => {
+    const group = await mount(`<helix-headless-toggle-group label="View" value="grid">
+        <helix-headless-toggle value="list" selected>List</helix-headless-toggle>
+        <helix-headless-toggle value="grid">Grid</helix-headless-toggle>
+      </helix-headless-toggle-group>`)
+    expect(
+      items(group)
+        .filter((item) => item.selected)
+        .map((item) => item.value),
+    ).toEqual(['grid'])
+  })
+
+  test('nothing declared marks nothing, rather than falling back to the first', async () => {
+    const group = await mount(`<helix-headless-toggle-group label="View">
+        <helix-headless-toggle value="list">List</helix-headless-toggle>
+        <helix-headless-toggle value="grid">Grid</helix-headless-toggle>
+      </helix-headless-toggle-group>`)
+    expect(items(group).filter((item) => item.selected)).toEqual([])
+  })
+
+  test('the declaration is the attribute, which the parser sets after the constructor', async () => {
+    // A field initializer reading `hasAttribute` runs before the parser has set
+    // one, so it answered `false` for every element written in markup.
+    const group = await mount(`<helix-headless-toggle-group label="View">
+        <helix-headless-toggle value="list" selected>List</helix-headless-toggle>
+      </helix-headless-toggle-group>`)
+    const item = items(group)[0] as unknown as { defaultSelected: boolean }
+    expect(item.defaultSelected).toBe(true)
+  })
+
   test('the indicator is hidden from assistive technology', async () => {
     // It repeats the selection a radio group already announces.
     const group = await mount(markup)

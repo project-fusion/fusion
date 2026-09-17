@@ -31,8 +31,15 @@ import { property } from 'lit/decorators.js'
  * **A range is two of them.** There is no native two-thumb range, so two are
  * stacked on one track and each thumb keeps its own.
  *
+ * **`required` arrives with the field mixin and cannot fail here**, which is
+ * worth saying rather than leaving a reader to find. A range is never empty:
+ * the platform shows its own midpoint whatever is set, and `willUpdate` seeds
+ * that midpoint into `defaultValue` so the value agrees with the handle from the
+ * first render. HTML does not apply `required` to a range either, so it stays
+ * off the control and the marker beside the label is all it does.
+ *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Range, Range input
  * @documentation https://fusion.dev/helix/components/slider
@@ -52,9 +59,9 @@ import { property } from 'lit/decorators.js'
  * @csspart output - The current value, shown beside it.
  *
  * @cssproperty --slider-fraction - The value as a fraction of the range, 0 to 1.
- * @cssproperty --slider-from - Where the filled span starts, as a percentage of the track.
+ * @cssproperty --slider-from - Where a range's filled span starts, as a fraction of the track, 0 to 1.
  * @cssproperty --slider-marker-at - Where one marker sits, as a percentage of the track.
- * @cssproperty --slider-to - Where the filled span ends, as a percentage of the track.
+ * @cssproperty --slider-to - Where a range's filled span ends, as a fraction of the track, 0 to 1.
  *
  * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */

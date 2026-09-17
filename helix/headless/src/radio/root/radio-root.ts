@@ -56,9 +56,22 @@ export class HelixHeadlessRadio extends HelixElement {
    *
    * `<option selected>` reflects to `defaultSelected` and `option.selected` is
    * live state that does not reflect, and those are two different facts. This
-   * element has one `selected` doing both jobs, so what is captured here is what
-   * the markup said at upgrade, before anything could overwrite it: read the
-   * attribute later and the listbox's own writes answer instead.
+   * element has one `selected` doing both jobs, so the declaration is the
+   * attribute and the state is the property.
+   *
+   * **The attribute, read when it is asked for, and never a snapshot taken in
+   * the constructor.** A field initializer runs there, and an element the HTML
+   * parser created has none of its attributes yet at that moment: measured on
+   * this element, on `Option` and on `Toggle`, `<helix-radio value="a"
+   * selected>` reported `defaultSelected` as `false` both from parsed markup
+   * and from `createElement` followed by `setAttribute`, which is every way a
+   * consumer writes one. The snapshot could only ever be true for an element
+   * already in the document when `customElements.define` ran.
+   *
+   * Nothing overwrites it either, which is what makes reading it late correct
+   * rather than merely later: `selected` does not reflect, for the reason
+   * `willUpdate` records, so the group's writes never reach the attribute and
+   * what it says is what the markup said.
    *
    * **The deeper half is not this.** State reflecting under the declaration's
    * name is the fault `TreeItem` avoids by mirroring to `data-selected`.
@@ -66,15 +79,12 @@ export class HelixHeadlessRadio extends HelixElement {
    * change of its own rather than a property being added.
    */
   get defaultSelected(): boolean {
-    return this.seeded
+    return this.hasAttribute('selected')
   }
 
   set defaultSelected(next: boolean) {
-    this.seeded = next
+    this.toggleAttribute('selected', next)
   }
-
-  /** What the markup said, read once at construction for the reason above. */
-  private seeded = this.hasAttribute('selected')
 
   /**
    * Whether this is the current choice.

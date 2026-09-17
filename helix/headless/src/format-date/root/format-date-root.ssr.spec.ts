@@ -3,6 +3,8 @@ import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testin
 import { html } from 'lit'
 import '../index.js'
 
+const TAG = 'helix-headless-format-date'
+
 /**
  * A timestamp, served.
  *
@@ -52,7 +54,9 @@ describe('format-date server output', () => {
         year="numeric"
       ></helix-headless-format-date>`,
     )
-    expect(rendered(markup, 'helix-headless-format-date')).toContain('Jan 1, 2020')
+    // `rendered` rather than the whole document: the reading is what this drew,
+    // and the host tag beside it is the consumer's own markup.
+    expect(rendered(markup, TAG)).toContain('Jan 1, 2020')
   })
 
   /**

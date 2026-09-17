@@ -45,7 +45,7 @@ interface Absolute {
  * "yesterday".
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category typography
  * @aliases RelativeTime, Timestamp, TimeAgo
  * @documentation https://fusion.dev/helix/components/format-date
