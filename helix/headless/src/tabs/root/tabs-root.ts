@@ -25,7 +25,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * showing a panel is cheap; a set where it is not should use `manual`.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases TabList, Segmented control
  * @documentation https://fusion.dev/helix/components/tabs

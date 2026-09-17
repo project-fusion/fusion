@@ -18,7 +18,7 @@ import { styles } from './outline-root.css.js'
  * and the document is not always where the headings are.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Table of contents, On this page, Outline
  * @documentation https://fusion.dev/helix/components/outline

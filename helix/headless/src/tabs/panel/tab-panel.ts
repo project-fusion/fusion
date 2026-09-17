@@ -11,7 +11,7 @@ import { property } from 'lit/decorators.js'
  * server's markup for a crawler regardless of which tab is open.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases TabPanel
  * @documentation https://fusion.dev/helix/components/tabs
  *

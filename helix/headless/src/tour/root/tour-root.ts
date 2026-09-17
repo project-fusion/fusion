@@ -31,7 +31,7 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * nothing needs to be: a tour starts when a reader asks for it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @aliases Coachmark, Product tour, Walkthrough, Onboarding
  * @documentation https://fusion.dev/helix/components/tour
@@ -49,8 +49,8 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
 /*
  * **There is no `toggle` here, and this element declared one for months.**
  *
- * `toggle` is announced by `MixinControllerOpen`, once, for the sixteen families
- * whose open state that mixin owns. A tour does not apply it: `open` is a plain
+ * `toggle` is announced by `MixinControllerOpen`, once, for the families whose
+ * open state that mixin owns. A tour does not apply it: `open` is a plain
  * reflected property a consumer sets to start the run, and the two ways it comes
  * back down each announce themselves already, `helix-before-close` for leaving
  * early and `helix-complete` for reaching the end. So the declaration was a
