@@ -55,7 +55,7 @@ const COUNT_OR_AUTO = {
  * performs, and it is first in the tab order.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Slider, Gallery, Slideshow
  * @documentation https://fusion.dev/helix/components/carousel

@@ -60,7 +60,7 @@ const STACK_BELOW = 512
  * are for.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases SplitPane, Resizable, SplitView
  * @documentation https://fusion.dev/helix/components/splitter

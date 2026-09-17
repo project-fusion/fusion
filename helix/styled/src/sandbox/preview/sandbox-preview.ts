@@ -88,7 +88,7 @@ export type PreviewMessage =
  * reach up and remove the attribute.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Result, Output
  * @documentation https://fusion.dev/helix/components/sandbox
  *
