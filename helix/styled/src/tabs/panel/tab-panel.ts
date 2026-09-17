@@ -12,7 +12,7 @@ import { styles } from './tab-panel.css.js'
  * quarter of it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The panel's content.

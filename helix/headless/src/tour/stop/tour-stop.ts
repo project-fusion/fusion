@@ -46,7 +46,7 @@ import '../../button/index.js'
  * tree points at a target in that tree.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @documentation https://fusion.dev/helix/components/tour
  *

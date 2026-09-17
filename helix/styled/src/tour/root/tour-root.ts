@@ -7,10 +7,12 @@ import { styles } from './tour-root.css.js'
  * @summary A guided run through an interface, one stop at a time.
  *
  * @description
- * The styled tier of `BaseTour`. It draws the light and nothing else.
+ * It draws the light and nothing else: the scrim's color and the lit box's
+ * corners are this tier's, and the order, the stops and the measuring stay
+ * below.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @documentation https://fusion.dev/helix/components/tour
  *

@@ -14,7 +14,7 @@ import { property } from 'lit/decorators.js'
  * `aria-controls` pointing at nothing is worse than not being there.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Tab
  * @documentation https://fusion.dev/helix/components/tabs
  *

@@ -13,7 +13,7 @@ import { styles } from './tab.css.js'
  * when it becomes current.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tab's label.
