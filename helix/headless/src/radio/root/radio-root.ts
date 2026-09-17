@@ -1,5 +1,5 @@
 import { customElement, HelixElement, MixinSelectableItem } from '@fusion.dev/helix-core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
