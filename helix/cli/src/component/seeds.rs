@@ -184,16 +184,29 @@ pub fn run(context: &Context) -> Report {
     /* Comments hold seed names too: one sheet explains the whole scheme in prose
     directly above the block. Reading those in makes the rule pass on the exact
     bug it was written for. */
-    let sheets: Vec<String> = settings
-        .sheets
-        .iter()
-        .map(|path| {
-            let source = fs::read_to_string(context.root.join(path)).unwrap_or_default();
+    /* **A sheet that is not there is not a sheet with nothing in it.** One of
+    these is generated and neither is tracked, so a run that reaches here before
+    the writer has one of two honest answers and "the stylesheet declares none of
+    them" is not either: read as empty, every name the engine emits is reported
+    undeclared at once, which is 191 findings about a file nobody has written.
+    Measured on a runner 17 Sep 2026, where four of them reached a pull request
+    that had touched no stylesheet, no token and no rule. So the rule says which
+    sheet is missing and what writes it, and answers nothing else. */
+    let mut sheets: Vec<String> = Vec::new();
+    for path in &settings.sheets {
+        let Ok(source) = fs::read_to_string(context.root.join(path)) else {
+            return nothing(vec![said(
+                format!("{path} is not there, so what the stylesheet declares cannot be read"),
+                "`turbo run token-layer` writes it, and nothing here is judged until it has.",
+                path,
+            )]);
+        };
+        sheets.push(
             SLASHED
                 .replace_all(&COMMENT.replace_all(&source, " "), " ")
-                .into_owned()
-        })
-        .collect();
+                .into_owned(),
+        );
+    }
     let named = settings.sheets.join(" or ");
 
     let mut consumed = BTreeSet::new();

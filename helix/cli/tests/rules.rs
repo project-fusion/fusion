@@ -252,7 +252,7 @@ fn applied_gates_the_family_on_bubbling() {
     let tree = Tree::new("applied-bubbles");
     tree.write("helix.json", TIERS);
     /* An event class, because the rule refuses to judge a tree it can see none
-       in: with no names every construction resolves to nothing. */
+    in: with no names every construction resolves to nothing. */
     tree.write("src/core/events.ts", DISMISS_EVENT);
     tree.write("src/core/mixin-controller-open.ts", "export const MixinControllerOpen = (Base) => {\n  class Open extends Base {\n    announce() {\n      this.dispatchEvent(new Event('toggle', { bubbles: false, cancelable: false, composed: false }))\n    }\n  }\n  return Open\n}\n");
     tree.write("src/tour/stop/tour-stop.ts", "@customElement('helix-tour-stop')\nexport class HelixTourStop extends MixinControllerOpen(HelixElement) {}\n");
@@ -2007,6 +2007,51 @@ fn seeds() {
             );
         },
         "the stylesheet reads the seed `tint` and the engine never emits it",
+        "styles/tokens.css",
+    );
+}
+
+/// A sheet the rule is told to read and cannot find is an answer of its own.
+///
+/// The read was `unwrap_or_default`, so a run that reached this rule before the
+/// generator had written `tokens.css` compared the engine's names against an
+/// empty string and reported every one of them undeclared. That is 191 findings
+/// about a file nobody has written, and four of them reached a pull request on
+/// 17 Sep 2026 that had touched no stylesheet, no token and no rule.
+#[test]
+fn seeds_without_the_sheet() {
+    const TOKENS: &str = ":root {\n  --helix-seed-hue: 250;\n  --helix-color-foreground: #000;\n  --helix-color-background: #fff;\n}\n";
+    plant_in(
+        "seeds-missing-sheet",
+        "seeds",
+        &[
+            (
+                "helix.json",
+                r#"{
+  "tiers": ["src"],
+  "oracle": "oracle.json",
+  "seeds": { "pinned": [], "planned": {}, "sheets": ["styles/tokens.css"] }
+}"#,
+            ),
+            (
+                "oracle.json",
+                r#"{ "themes": [ {
+  "label": "default",
+  "pairings": [ { "foreground": "color-foreground", "background": "color-background" } ],
+  "seeds": { "seed-hue": 250 },
+  "css": ":root {\n  --helix-seed-hue: 250;\n  --helix-color-foreground: #000;\n  --helix-color-background: #fff;\n}"
+} ] }"#,
+            ),
+            ("styles/tokens.css", TOKENS),
+            (
+                "src/card/card.ts",
+                "export class Card extends HTMLElement {}\n",
+            ),
+        ],
+        |tree| {
+            tree.remove("styles/tokens.css");
+        },
+        "styles/tokens.css is not there, so what the stylesheet declares cannot be read",
         "styles/tokens.css",
     );
 }
