@@ -63,7 +63,7 @@ const PANEL_MAX = 0.8
  * @slot toolbar - A bar across the top, spanning both panes.
  *
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited, by the source pane and heard here. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforePanelResizeEvent} helix-before-panel-resize - Fired before the panel's divider is let go, with its height in pixels. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforePanelResizeEvent} helix-before-panel-resize - Fired before the panel's divider is let go, with its height in pixels, and a panel driven shut arrives as `panel-collapsed-size`, which is the least it goes to. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixBeforeSplitEvent} helix-before-split - Fired before the panes' divider is let go, with the lead pane's share. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves in the source, by the source pane and heard here.
  * @event {HelixConsoleEvent} helix-console - Relayed from the frame by the preview pane, one per console call.
@@ -149,6 +149,13 @@ export class HelixSandbox extends HelixElement {
    * Zero closes it outright. A panel whose contents include the control that
    * reopens it, a row of tabs being the usual one, wants that row left showing,
    * and only whoever slotted it knows how tall that is.
+   *
+   * **A floor rather than a second state**, which is what keeps `panel-size` the
+   * whole truth about the panel: a divider driven to the end lands here and
+   * `panel-size` reads this number, so "closed" is something a consumer already
+   * stores rather than a property they have to learn. The splitter inside has a
+   * `collapsed` of its own and it is refused, for the reason `handleCollapse`
+   * gives.
    */
   @property({ attribute: 'panel-collapsed-size', type: Number })
   panelCollapsedSize = 0
@@ -257,6 +264,21 @@ export class HelixSandbox extends HelixElement {
       return 0
     }
     return Math.min(100, Math.max(0, (this.panelCollapsedSize / this.bodyHeight) * 100))
+  }
+
+  /**
+   * The least the panel goes to, in the pixels this element holds it in.
+   *
+   * The same number as `panelSliver` and not the same arithmetic, which is the
+   * point of having both: bounding the splitter at `100 - panelSliver` instead
+   * would ask a percentage to come back through a string and compare equal to
+   * the one the splitter derives, and the collapse it is meant to land on is an
+   * `>=` on those two floats. Held here, in whole pixels a consumer stated, it
+   * is exact.
+   */
+  private get panelFloor(): number {
+    const size = Number.isFinite(this.panelCollapsedSize) ? this.panelCollapsedSize : 0
+    return Math.min(this.bodyHeight, Math.max(0, size))
   }
 
   /**
@@ -481,12 +503,54 @@ export class HelixSandbox extends HelixElement {
     event.stopPropagation()
     event.preventDefault()
     if (this.bodyHeight > 0) {
-      // Back into pixels, which is what this element promises and what a
-      // consumer stored. The divider's position is the panes' share, so the
-      // panel is the rest of it.
-      this.requestPanelSize(Math.max(0, ((100 - Number(value)) / 100) * this.bodyHeight))
+      /* Back into pixels, which is what this element promises and what a
+         consumer stored. The divider's position is the panes' share, so the
+         panel is the rest of it, and `panelFloor` is where the rest of it stops:
+         a drag past the end asks for a panel of nothing and gets the sliver
+         `panel-collapsed-size` says to leave showing. */
+      this.requestPanelSize(
+        Math.max(this.panelFloor, ((100 - Number(value)) / 100) * this.bodyHeight),
+      )
     }
     this.answer(event.currentTarget, this.panelPosition)
+  }
+
+  /**
+   * Refuses a pane of either splitter declaring itself shut.
+   *
+   * **The collapse is a second state, and this element has nowhere to put
+   * one.** A splitter's `collapsed` overrides its `position` and remembers what
+   * it was open at, and it answers to neither `split` nor `panel-size`. Allowed
+   * in here, it would leave the arrangement in a state nothing outside this
+   * element can see or set: assigning `panel-size` back moves nothing while
+   * `collapsed` stands, and a consumer who stored the two numbers this element
+   * publishes and restored a sandbox from them would get it open. That is one
+   * element holding the arrangement and the other showing it, which is the state
+   * the two requests above were rewritten to end.
+   *
+   * **So "shut" is spelled in pixels here.** `panel-collapsed-size` is the floor
+   * `handlePanelChange` holds the panel to, `panel-size` reads it when the
+   * divider is at the end, and `helix-before-panel-resize` is where a consumer
+   * hears about it, in the units they already store. That is the same trade the
+   * other two make: the sandbox is the single decision point because it refuses
+   * what the splitter asks and re-announces the move in its own vocabulary.
+   *
+   * **Stopped as well as refused**, because `start` and `end` name the panes of
+   * a splitter a consumer of this element is not supposed to know about, and the
+   * two events above already say which divider moved. A collapse from something
+   * slotted into a pane is somebody else's and passes through untouched, which
+   * is what `target` against `currentTarget` is asking.
+   *
+   * Reached at all only since Splitter stopped returning on a refused
+   * `helix-before-resize`. While it did, every collapse in here was unreachable
+   * and `panel-collapsed-size` was inert with it.
+   */
+  private readonly handleCollapse = (event: Event): void => {
+    if (event.target !== event.currentTarget) {
+      return
+    }
+    event.stopPropagation()
+    event.preventDefault()
   }
 
   /**
@@ -591,6 +655,7 @@ export class HelixSandbox extends HelixElement {
         default-position=${this.homePanelPosition}
         min=${100 - PANEL_MAX * 100}
         .position=${this.panelPosition}
+        @helix-before-collapse=${this.handleCollapse}
         @helix-before-resize=${this.handlePanelChange}
       >
         <helix-splitter
@@ -601,6 +666,7 @@ export class HelixSandbox extends HelixElement {
           label=${this.separatorLabel}
           orientation=${vertical ? 'vertical' : 'horizontal'}
           .position=${split}
+          @helix-before-collapse=${this.handleCollapse}
           @helix-before-resize=${this.handlePanesChange}
         >
           ${
