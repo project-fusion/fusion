@@ -379,7 +379,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
             ? nothing
             : html`<input
           part="control"
-          id="control"
+          id=${this.controlId}
           type="text"
           .value=${this.value}
           name=${this.name || nothing}

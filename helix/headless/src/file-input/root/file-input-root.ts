@@ -479,7 +479,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
       >
         <input
           part="control"
-          id="control"
+          id=${this.controlId}
           type="file"
           accept=${this.accept || nothing}
           capture=${this.capture ?? nothing}
@@ -491,7 +491,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
           @change=${this.handleChange}
           @input=${this.stopInner}
         />
-        <label part="trigger" for="control">
+        <label part="trigger" for=${this.controlId}>
           <slot name="trigger">${this.triggerLabel}</slot>
         </label>
       </div>

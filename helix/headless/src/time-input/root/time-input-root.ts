@@ -484,7 +484,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
         }
         <input
           part="control"
-          id="control"
+          id=${this.controlId}
           type="text"
           .value=${this.display}
           name=${this.name || nothing}
@@ -521,8 +521,9 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       ${this.renderHint()}${this.renderFeedback()}`
   }
 
-  /* Date Input has this pair over a different conversion, and each is
-     documented on its own page, so the pair stays with the family. */
+  /* Time Picker holds this pair identically and Date Input holds it over a
+     different conversion. Why all four write it out rather than sharing a
+     mixin is argued once, on `value-as.ts`. */
   /**
    * The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
    *

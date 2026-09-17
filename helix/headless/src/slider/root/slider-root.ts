@@ -445,7 +445,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
           ? nothing
           : html`<input
               part="control"
-              id="control"
+              id=${this.controlId}
               type="range"
               style="--slider-fraction: ${this.fraction}"
               min=${this.min}
