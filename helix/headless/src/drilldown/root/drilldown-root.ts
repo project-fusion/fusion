@@ -4,6 +4,7 @@ import {
   HelixElement,
   hostAria,
   inlineStep,
+  KeyboardNavigationController,
   MixinCollection,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
@@ -104,6 +105,30 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   }
 
   /**
+   * Moving between rows, which is `Menu`'s arrangement and not a second one.
+   *
+   * The horizontal pair is reserved rather than released: in a drill-down they
+   * are the platform's own bindings for drilling, along the line to go in and
+   * back along it to come out, so they are spoken for here rather than
+   * unhandled. `handleKeydown` below owes them a binding, which is what
+   * reserving one means, and it has them.
+   *
+   * `selects` false, because arriving at a row must not follow it. Moving and
+   * choosing are one act in a radio group and two here, which is the same
+   * reading `Menu` takes over the same rows.
+   *
+   * The origin is the selection, which for these rows is where focus is. `focus`
+   * is the wrong reading however right it looks: it also carries a rule that a
+   * press which did not come from the set moves nothing, and Down on a page a
+   * reader has just tabbed to is how they get onto the first row at all.
+   */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () => this.items,
+    reserved: () => ['ArrowLeft', 'ArrowRight'],
+    selects: () => false,
+  })
+
+  /**
    * Puts the region's one tab stop on the first row of the page showing.
    *
    * One row holds the stop and the arrows move within, which is the roving
@@ -190,22 +215,12 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     }
   }
 
+  /* Only the keys that drill. Moving within a page belongs to the controller
+     declared above, which reserves the horizontal pair for exactly this. */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const items = this.items
     const current = items.findIndex((item) => item.matches(':focus-within'))
 
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault()
-      const step = event.key === 'ArrowDown' ? 1 : -1
-      const next = (current + step + items.length) % Math.max(items.length, 1)
-      items[current === -1 ? 0 : next]?.focusItem()
-      return
-    }
-    if (event.key === 'Home' || event.key === 'End') {
-      event.preventDefault()
-      ;(event.key === 'Home' ? items[0] : items[items.length - 1])?.focusItem()
-      return
-    }
     /* Back along the line and Escape both go back, and neither closes
        anything: this is a region rather than an overlay, so there is nothing
        above it to close. On a right-to-left page back is the right arrow and in
