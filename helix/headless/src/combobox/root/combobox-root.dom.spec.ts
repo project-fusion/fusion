@@ -274,6 +274,23 @@ describe('combobox holding several', () => {
     expect((host as unknown as { open: boolean }).open).toBe(true)
   })
 
+  test('a press on a tag is the tag`s, so the panel does not open under it', async () => {
+    /* A tag is its own control: its dismiss takes a choice away, and opening
+       the list on the way past leaves the reader looking at a panel they did
+       not ask for.
+
+       The tag is found by identity. Asked by tag name it was one tier's
+       element, so on this tier every press fell through to the open and the
+       fault was invisible on the other one. */
+    const host = await many('default-value="rs"')
+    expect((host as unknown as { open: boolean }).open).toBe(false)
+    const tag = tags(host)[0]
+    expect(tag).toBeDefined()
+    tag?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    await settle(host)
+    expect((host as unknown as { open: boolean }).open).toBe(false)
+  })
+
   test('the list is told it takes more than one, since a reader must be told', async () => {
     /* Asserted on the property rather than on `aria-multiselectable`, which is
        not an attribute: the listbox sets it through `ElementInternals`, so it

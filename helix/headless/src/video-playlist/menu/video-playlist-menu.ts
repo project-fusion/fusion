@@ -9,11 +9,9 @@ import { list } from '@fusion.dev/helix-icons'
 import { nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
-import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
+import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
 import { HelixHeadlessVideoPlaylist } from '../root/video-playlist-root.js'
 import '../../menu/index.js'
-
-const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
 
 /**
  * @summary The playlist's entries, as a menu inside the player's control bar.
@@ -107,10 +105,21 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
     return this.foundPlaylist
   }
 
-  /** The playlist's entries, in the order it holds them. */
+  /**
+   * The playlist's entries, in the order it holds them.
+   *
+   * By identity rather than by tag, the same reason the playlist itself reads
+   * them that way: a tag list names one tier's element from the other's package
+   * and misses any third one.
+   */
   private get entries(): HelixHeadlessVideoPlaylistItem[] {
     const playlist = this.playlist
-    return playlist ? [...playlist.querySelectorAll<HelixHeadlessVideoPlaylistItem>(ITEMS)] : []
+    return playlist
+      ? [...playlist.querySelectorAll('*')].filter(
+          (one): one is HelixHeadlessVideoPlaylistItem =>
+            one instanceof HelixHeadlessVideoPlaylistItem,
+        )
+      : []
   }
 
   /**

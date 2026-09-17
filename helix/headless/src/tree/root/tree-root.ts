@@ -103,17 +103,18 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   /**
    * Every item, in the order a reader moving down would meet them.
    *
-   * Selected by tag, never by `'*'` and a filter: this is the array a single
-   * arrow press rebuilds, and `'*'` makes it every descendant element in the
-   * tree, labels and icons and whatever a consumer slotted into a row included.
+   * **By identity rather than by tag**, which is the same reason Splitter
+   * writes out at `findOuter`: a tag list names one tier's element from the
+   * other's package, and misses any third tag, which is exactly what
+   * subclassing an item produces. The item then never enters the array a single
+   * arrow press rebuilds, so it is silently unreachable from the keyboard.
    *
-   * The two tag names rather than `instanceof` on everything: a styled
-   * `helix-tree-item` extends the base, so both names are needed, and the
-   * `instanceof` stays as the type guard because a consumer can write either
-   * tag and neither selector proves what the element is.
+   * `'*'` and a filter rather than a tag: the walk is one native pass and the
+   * `instanceof` is what narrows it, so the labels, icons and whatever a
+   * consumer slotted into a row are gone by the time the array exists.
    */
   private get items(): HelixHeadlessTreeItem[] {
-    return [...this.querySelectorAll('helix-tree-item, helix-headless-tree-item')].filter(
+    return [...this.querySelectorAll('*')].filter(
       (node): node is HelixHeadlessTreeItem => node instanceof HelixHeadlessTreeItem,
     )
   }
