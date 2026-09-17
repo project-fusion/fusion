@@ -8,6 +8,8 @@ import {
   linear,
   linePath,
   MixinChartSource,
+  PLOT_HEIGHT,
+  PLOT_WIDTH,
   type Point,
   type Series,
   seriesIndex,
@@ -16,10 +18,6 @@ import {
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-
-/** The drawing's own coordinates. */
-const WIDTH = 100
-const HEIGHT = 100
 
 /**
  * @summary A series over time as a line, read from a table.
@@ -247,8 +245,8 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       return [
         {
           index: seriesIndex(depth),
-          x: (x(one.points.length - 1) / WIDTH) * 100,
-          y: (y(last.value) / HEIGHT) * 100,
+          x: (x(one.points.length - 1) / PLOT_WIDTH) * 100,
+          y: (y(last.value) / PLOT_HEIGHT) * 100,
         },
       ]
     })
@@ -262,7 +260,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     }
 
     const domain = this.range(series)
-    const y = linear(domain, [HEIGHT, 0])
+    const y = linear(domain, [PLOT_HEIGHT, 0])
     /* **A reading sits in the middle of its own slot, not at the edge of the
        box**, which is what makes the names underneath line up with it.
      *
@@ -277,8 +275,8 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
      * from the same table stack, which is the arrangement anybody comparing a
      * total to its parts wants. The cost is that the line stops short of both
      * edges, and that is the smaller thing to give up. */
-    const slot = WIDTH / readings.length
-    const x = linear([0, Math.max(readings.length - 1, 1)], [slot / 2, WIDTH - slot / 2])
+    const slot = PLOT_WIDTH / readings.length
+    const x = linear([0, Math.max(readings.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
 
     return html`${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}`
   }
@@ -324,14 +322,14 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       <svg part="svg"
         data-mirror
         preserveAspectRatio="none"
-        viewBox="0 0 ${WIDTH} ${HEIGHT}"
+        viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
         ${this.renderGridlines(x, y, domain, series[0]?.points.length ?? 0)}
         ${
           floor === undefined
             ? nothing
-            : svg`<line part="baseline" x1="0" x2=${WIDTH} y1=${floor} y2=${floor} />`
+            : svg`<line part="baseline" x1="0" x2=${PLOT_WIDTH} y1=${floor} y2=${floor} />`
         }
         ${this.renderBand(series[0]?.points.length ?? 0)}
         ${this.renderGuide(x)}
@@ -367,12 +365,13 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       ? Array.from(
           { length: count },
           (_, index) =>
-            svg`<line part="gridline" x1=${x(index)} x2=${x(index)} y1="0" y2=${HEIGHT} />`,
+            svg`<line part="gridline" x1=${x(index)} x2=${x(index)} y1="0" y2=${PLOT_HEIGHT} />`,
         )
       : []
     const across = this.rulesValue
       ? ticks(domain).map(
-          (level) => svg`<line part="gridline" x1="0" x2=${WIDTH} y1=${y(level)} y2=${y(level)} />`,
+          (level) =>
+            svg`<line part="gridline" x1="0" x2=${PLOT_WIDTH} y1=${y(level)} y2=${y(level)} />`,
         )
       : []
     return svg`${down}${across}`
@@ -396,8 +395,8 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     if (at < 0 || count === 0) {
       return nothing
     }
-    const slot = WIDTH / count
-    return svg`<rect height=${HEIGHT} part="band" width=${slot} x=${at * slot} y="0" />`
+    const slot = PLOT_WIDTH / count
+    return svg`<rect height=${PLOT_HEIGHT} part="band" width=${slot} x=${at * slot} y="0" />`
   }
 
   /**
@@ -416,7 +415,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     if (at < 0) {
       return nothing
     }
-    return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${HEIGHT} />`
+    return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${PLOT_HEIGHT} />`
   }
 
   /**
@@ -460,7 +459,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
        first point to its last. */
     const first = points[0] as Point
     const last = points.at(-1) as Point
-    const wash = `${path}L${last[0]},${HEIGHT}L${first[0]},${HEIGHT}Z`
+    const wash = `${path}L${last[0]},${PLOT_HEIGHT}L${first[0]},${PLOT_HEIGHT}Z`
     return svg`${
       this.area
         ? svg`<path
@@ -508,7 +507,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
        the highest, and no readings at all would make `Math.min` return
        Infinity. */
     const domain = this.range(series)
-    const scale = linear(domain, [HEIGHT, 0])
+    const scale = linear(domain, [PLOT_HEIGHT, 0])
     const tops = series
       .map((one) => one.points[at]?.value)
       .filter((one): one is number => one !== undefined)

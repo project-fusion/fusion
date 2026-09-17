@@ -7,16 +7,14 @@ import {
   HelixElement,
   linear,
   MixinChartSource,
+  PLOT_HEIGHT,
+  PLOT_WIDTH,
   seriesIndex,
   ticks,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-
-/** The drawing's own coordinates. */
-const WIDTH = 100
-const HEIGHT = 100
 
 /** How near a pointer has to be to a point to be asking about it, in pixels. */
 const REACH = 24
@@ -265,8 +263,8 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     const all = pairs.flat()
     const x = nice(extent(all.length > 0 ? all.map(([one]) => one) : [0]))
     const y = nice(extent(all.length > 0 ? all.map(([, one]) => one) : [0]))
-    const along = linear(x, [0, WIDTH])
-    const up = linear(y, [HEIGHT, 0])
+    const along = linear(x, [0, PLOT_WIDTH])
+    const up = linear(y, [PLOT_HEIGHT, 0])
     return {
       pairs: pairs.map((series) => series.map(([one, two]) => [one, two] as [number, number])),
       points: pairs.flatMap((series, depth) =>
@@ -288,8 +286,8 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
       </div>`
     }
     const format = formatNumbers('')
-    const along = linear(field.x, [0, WIDTH])
-    const up = linear(field.y, [HEIGHT, 0])
+    const along = linear(field.x, [0, PLOT_WIDTH])
+    const up = linear(field.y, [PLOT_HEIGHT, 0])
     return html`<div dir="ltr" part="plane">
         ${this.renderPlot(field, along, up)}
         <div aria-hidden="true" part="x-axis">
@@ -320,14 +318,14 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     return html`<div aria-hidden="true" id=${CHART_PLOT} part="plot">
       <svg part="svg"
         preserveAspectRatio="none"
-        viewBox="0 0 ${WIDTH} ${HEIGHT}"
+        viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
         ${
           this.rulesX
             ? ticks(field.x).map(
                 (level) =>
-                  svg`<line part="gridline" x1=${along(level)} x2=${along(level)} y1="0" y2=${HEIGHT} />`,
+                  svg`<line part="gridline" x1=${along(level)} x2=${along(level)} y1="0" y2=${PLOT_HEIGHT} />`,
               )
             : nothing
         }
@@ -335,7 +333,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
           this.rulesY
             ? ticks(field.y).map(
                 (level) =>
-                  svg`<line part="gridline" x1="0" x2=${WIDTH} y1=${up(level)} y2=${up(level)} />`,
+                  svg`<line part="gridline" x1="0" x2=${PLOT_WIDTH} y1=${up(level)} y2=${up(level)} />`,
               )
             : nothing
         }
@@ -417,7 +415,8 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     let best = REACH ** 2
     for (const point of this.drawn) {
       const distance =
-        ((point.x / WIDTH) * box.width - across) ** 2 + ((point.y / HEIGHT) * box.height - up) ** 2
+        ((point.x / PLOT_WIDTH) * box.width - across) ** 2 +
+        ((point.y / PLOT_HEIGHT) * box.height - up) ** 2
       if (distance <= best) {
         best = distance
         found = point
