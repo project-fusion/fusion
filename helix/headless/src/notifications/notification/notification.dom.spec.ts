@@ -236,4 +236,24 @@ describe('structure', () => {
     ;(part(element, 'dismiss') as HTMLElement).click()
     expect(element.isConnected).toBe(false)
   })
+
+  /**
+   * The label is what a consumer matches on to take the row out of their own
+   * list, so it has to be the row and not the row plus its buttons.
+   * `this.textContent` is every light-DOM descendant, the ones assigned
+   * elsewhere included, which is the case `MixinDismissible` exists for and
+   * the case this element is: the actions slot always holds a control.
+   */
+  test('the dismiss label is the message, not the message and its actions', async () => {
+    const element = (await mount(
+      `<helix-headless-notification dismissible>Could not reach the server<button slot="actions">Retry</button></helix-headless-notification>`,
+    )) as Item
+    let label = ''
+    element.addEventListener('helix-dismiss', (event) => {
+      label = (event as CustomEvent<{ label: string }>).detail.label
+      event.preventDefault()
+    })
+    ;(part(element, 'dismiss') as HTMLElement).click()
+    expect(label).toBe('Could not reach the server')
+  })
 })
