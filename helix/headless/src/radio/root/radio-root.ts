@@ -22,7 +22,7 @@ import { property } from 'lit/decorators.js'
  * be a second source of truth for which one is on.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Option, Choice
  * @documentation https://fusion.dev/helix/components/radio
@@ -87,6 +87,25 @@ export class HelixHeadlessRadio extends HelixElement {
   }
 
   /**
+   * Whether this choice holds the group's tab stop while nothing is chosen.
+   *
+   * The stop rides on the selection, and an unanswered group has no selection,
+   * so without this every choice is `tabindex="-1"` and the keyboard cannot
+   * enter the set at all.
+   *
+   * **Written by the group, with no attribute, and it reaches the control
+   * rather than the host.** A `tabindex` on the host is two faults at once: it
+   * is markup a consumer rendered and their server never sent, which React
+   * reports as a mismatch and does not patch up, and it puts the tab stop on
+   * the element rather than on the `<button role="radio">` inside it, so a
+   * screen reader meets an unnamed box where a native group would have given
+   * them an unchecked radio. `Toggle.Root` carries the same property for the
+   * same reason.
+   */
+  @property({ attribute: false })
+  focusable = false
+
+  /**
    * Whether this is the current choice.
    *
    * Written by the group.
@@ -136,14 +155,17 @@ export class HelixHeadlessRadio extends HelixElement {
   protected override render(): TemplateResult {
     /* Roving `tabindex`: one stop for the whole set, which is what a radio
        group is in the tab order, and the arrow keys move within it. The group
-       owns the keys, because moving between items is a fact about the set. */
+       owns the keys, because moving between items is a fact about the set.
+
+       `focusable` is the unanswered set's entry stop, and it is on the button
+       rather than on the host so that what a reader tabs to is the radio. */
     return html`<button
       part="item"
       type="button"
       role="radio"
       aria-checked=${this.selected ? 'true' : 'false'}
       ?disabled=${this.disabled}
-      tabindex=${this.selected ? '0' : '-1'}
+      tabindex=${this.selected || this.focusable ? '0' : '-1'}
       @click=${() => this.select()}
     >
       <span part="box"><span part="mark" aria-hidden="true"></span></span>

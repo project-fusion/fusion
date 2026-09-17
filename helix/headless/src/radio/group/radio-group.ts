@@ -36,7 +36,7 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * anything is chosen.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases RadioButtons, Choice group
  * @documentation https://fusion.dev/helix/components/radio
  *
@@ -112,25 +112,27 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
   /** Writes the answer onto the items, and nothing onto the host. */
   private place(): void {
     const items = this.items
+    const answer = items.find((item) => item.value === this.value)
     for (const item of items) {
-      item.selected = item.value === this.value
+      item.selected = item === answer
     }
-    /* Nothing chosen yet, so the first item is the tab stop. A group where
-       every item is `tabindex="-1"` is a group the keyboard cannot enter, and
-       an answered group that keeps the entry stop carries two, so tabbing
-       through a form stops twice on one question and the first stop is on an
-       item that is not the answer.
+    /* Nothing chosen, so the first choice that can be made is the tab stop. A
+       group where every item is `tabindex="-1"` is a group the keyboard cannot
+       enter, and an answered group that keeps the entry stop carries two, so
+       tabbing through a form stops twice on one question and the first stop is
+       on an item that is not the answer.
 
-       `entered` rather than a bare toggle, because this also runs when the
-       group is answered and the attribute has to go whether or not this call is
-       the one that put it there. */
-    const entered = this.value === '' && items.length > 0 ? items[0] : undefined
+       **Asked of the answer and not of `value`.** `value === ''` reads a group
+       whose value matches no item as answered, so a `value` nobody declared an
+       item for left every choice at `-1` and the set unreachable, which is the
+       exact failure this exists to prevent.
+
+       **And the entry skips a disabled choice**, whose control is not focusable
+       at all, so a group whose first option is disabled would be unreachable
+       the same way. `Toggle.Group` picks its entry the same two ways. */
+    const entry = answer ? undefined : items.find((item) => !item.disabled)
     for (const item of items) {
-      if (item === entered) {
-        item.setAttribute('tabindex', '0')
-      } else {
-        item.removeAttribute('tabindex')
-      }
+      item.focusable = item === entry
     }
   }
 

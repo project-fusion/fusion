@@ -17,7 +17,7 @@ import { styles } from './filter-field.css.js'
  * away from its neighbors.
  *
  * @since 0.23.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Facet, Dimension
  * @documentation https://fusion.dev/helix/components/filter-input

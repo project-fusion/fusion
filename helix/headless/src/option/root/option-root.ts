@@ -50,7 +50,7 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * question and differs between a select and a command palette.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Item, Choice
  * @documentation https://fusion.dev/helix/components/option

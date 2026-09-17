@@ -119,8 +119,13 @@ export class HelixSandboxPreview extends HelixElement {
 
   /**
    * Writing direction inside the frame.
+   *
+   * Not reflected. It is payload for the render message and nothing selects on
+   * it, here or anywhere: a frame is a document of its own and what is written
+   * on this host reaches nothing inside it, which is the same reason
+   * `colorMode` has to be sent rather than set.
    */
-  @property({ reflect: true })
+  @property()
   direction?: 'rtl'
 
   /**
@@ -131,8 +136,18 @@ export class HelixSandboxPreview extends HelixElement {
 
   /**
    * How the example is placed in the frame.
+   *
+   * `padded` insets it and leaves it at the top, which is the resting case and
+   * what an absent value sends. `centered` gives it a measure and centers that
+   * box in the frame. `hug` shrinks the example to its own content and centers
+   * what is left, which is the difference that matters for a component whose
+   * root is a full-width block. `fullscreen` is the whole frame with no inset.
+   *
+   * Not reflected, for `direction`'s reason: the placement is applied by the
+   * document inside the frame, against its own root, so no rule on this side
+   * could read it.
    */
-  @property({ reflect: true })
+  @property()
   layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
 
   /**

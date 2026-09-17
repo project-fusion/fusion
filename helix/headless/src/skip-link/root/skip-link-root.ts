@@ -34,7 +34,7 @@ import { property } from 'lit/decorators.js'
  * broken.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Skip navigation, Skip to content
  * @documentation https://fusion.dev/helix/components/skip-link

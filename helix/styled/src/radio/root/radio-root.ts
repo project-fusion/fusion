@@ -18,7 +18,7 @@ import { styles } from './radio-root.css.js'
  * and being chosen is an answer rather than a state.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Option, Choice
  * @documentation https://fusion.dev/helix/components/radio

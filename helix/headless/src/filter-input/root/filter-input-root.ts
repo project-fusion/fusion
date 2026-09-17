@@ -127,7 +127,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * and the chip goes because the filter went.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases SearchField, FacetInput, TokenInput
  * @documentation https://fusion.dev/helix/components/filter-input

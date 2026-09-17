@@ -16,7 +16,7 @@ import { styles } from './filter-chip.css.js'
  * common chip free of jargon. See the headless note, which records the rule.
  *
  * @since 0.23.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases FilterToken, FacetChip
  * @documentation https://fusion.dev/helix/components/filter-input

@@ -25,7 +25,7 @@ import { property } from 'lit/decorators.js'
  * consumer bug and the field reports it rather than guessing.
  *
  * @since 0.23.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Comparator, Predicate
  * @documentation https://fusion.dev/helix/components/filter-input
