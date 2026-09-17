@@ -20,13 +20,13 @@ const cubic = (a: number, b: number, c: number, d: number, t: number): number =>
 
 describe('a straight line', () => {
   test('joins the readings and claims nothing between them', () => {
-    expect(linePath(points)).toBe('M0,20L25,4L50,24L75,12L100,16')
+    expect(linePath(points, 'straight')).toBe('M0,20L25,4L50,24L75,12L100,16')
   })
 
   test('fewer than two points is nothing, rather than a path that draws nothing', () => {
     // `M0,0` alone is a path element that looks like it should be drawing.
-    expect(linePath([[0, 0]])).toBe('')
-    expect(linePath([])).toBe('')
+    expect(linePath([[0, 0]], 'straight')).toBe('')
+    expect(linePath([], 'straight')).toBe('')
   })
 })
 

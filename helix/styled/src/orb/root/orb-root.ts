@@ -122,7 +122,7 @@ export class HelixOrb extends HelixElement {
    *
    * Reflected because the stylesheet selects on it. The mesh is chosen from the
    * rendered box rather than from this, so `--orb-size` and a consumer's own
-   * `inline-size` get the same treatment as the three named steps.
+   * `inline-size` get the same treatment as the named steps.
    */
   @property({ reflect: true })
   size?: 'lg' | 'sm'

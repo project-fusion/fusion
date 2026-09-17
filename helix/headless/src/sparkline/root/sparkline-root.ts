@@ -96,6 +96,12 @@ export class HelixHeadlessSparkline extends HelixElement {
    *
    * `step` claims the opposite of both, that a reading holds until the next.
    * Bars ignore it, having no between to interpolate.
+   *
+   * **`AreaChart` rests at `straight` and is not disagreeing.** A line claims a
+   * position and a stacked band claims an amount: a curve fitted through one
+   * sum can pass under the curve fitted through the sum beneath it, so a
+   * smoothed stack can draw a part as less than nothing. There is no such edge
+   * here, which is what lets a line take the reading aid.
    */
   @property({ reflect: true })
   curve?: Curve

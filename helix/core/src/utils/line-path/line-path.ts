@@ -69,18 +69,34 @@ const tangents = (xs: readonly number[], ys: readonly number[]): number[] => {
  * implementation rather than one per chart. Pure: it takes points and returns a
  * string, and knows nothing about elements or lifecycles.
  *
- * `straight` joins the readings and claims nothing between them, which is why
- * it is the default. `smooth` is easier to follow across a long series and
- * invents the values in between, so it is a reading aid rather than a neutral
- * one. `step` claims the opposite, that a reading holds until the next one, and
- * changes at the midpoint rather than at either end, since a chart's x axis is
- * an order and neither neighbor has a better claim on the moment it moved.
+ * `straight` joins the readings and claims nothing between them. `smooth` is
+ * easier to follow across a long series and invents the values in between, so
+ * it is a reading aid rather than a neutral one. `step` claims the opposite,
+ * that a reading holds until the next one, and changes at the midpoint rather
+ * than at either end, since a chart's x axis is an order and neither neighbor
+ * has a better claim on the moment it moved.
+ *
+ * **Two resting curves in this library, and what separates them is what the
+ * mark claims.** A line claims a position, so `LineChart` and `Sparkline` rest
+ * at `smooth`: the invention is bounded, the interpolation never leaves the
+ * band the data sets, and the smoothed line is the easier one to follow. A
+ * stacked band claims an amount, and a curve fitted through one sum can pass
+ * under the curve fitted through the sum beneath it, so `AreaChart` rests at
+ * `straight`, where readings that are ordered stay ordered everywhere between.
+ * Each family publishes its own resting value on its own `curve`, because the
+ * reference page is generated from those blocks and a consumer does not read
+ * this file; this is the one place that holds both halves side by side.
+ *
+ * **No default here, which is the point.** A default would be a third resting
+ * curve, silently right for one caller and silently wrong for the other, and
+ * the two above are already an argument somebody has to have read to pick a
+ * side. Every caller passes the value.
  *
  * Fewer than two points is an empty string rather than a partial path: one
  * reading is not a line, and `M0,0` alone draws nothing while still being a
  * path element that looks like it should.
  */
-export const linePath = (points: readonly Point[], curve: Curve = 'straight'): string => {
+export const linePath = (points: readonly Point[], curve: Curve): string => {
   if (points.length < 2) {
     return ''
   }
