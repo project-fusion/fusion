@@ -573,7 +573,7 @@ pub fn all() -> Vec<Rule> {
             fix: None,
             name: "example-values",
             run: Runner::Source(example_values::run),
-            summary: "every attribute value in an example is one its component states",
+            summary: "every attribute an example writes is one its component has",
         },
         Rule {
             fix: None,

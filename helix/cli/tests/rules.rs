@@ -143,7 +143,25 @@ fn assert_found(rule: &str, verdict: &Verdict, message: &str, file: &str) {
 /// fails on the first assertion rather than passing on the second for a reason
 /// nobody planted. `message` and `file` are substrings of one finding.
 fn plant(rule: &str, clean: &[(&str, &str)], fault: impl FnOnce(&Tree), message: &str, file: &str) {
-    let tree = Tree::new(rule);
+    plant_in(rule, rule, clean, fault, message, file);
+}
+
+/// The same, in a tree named for the test rather than for the rule.
+///
+/// **A rule proved more than once needs a directory per proof.** `Tree` is keyed
+/// on the name it is given and the tests run in parallel, so two `plant` calls
+/// naming one rule write each other's fixtures and fail on whichever finding
+/// arrives. Every sibling test in this file built its tree by hand to sidestep
+/// that; this is the same sidestep, said once.
+fn plant_in(
+    named: &str,
+    rule: &str,
+    clean: &[(&str, &str)],
+    fault: impl FnOnce(&Tree),
+    message: &str,
+    file: &str,
+) {
+    let tree = Tree::new(named);
     for (at, content) in clean {
         tree.write(at, content);
     }
@@ -577,6 +595,14 @@ fn example_specs() {
     );
 }
 
+/// A badge with one union, and a source pane that carries a document as an
+/// attribute, which is the shape the quoting tests read.
+const BADGE: &str = r#"{ "modules": [ { "path": "src/badge/badge.ts", "declarations": [
+  { "tagName": "helix-badge", "attributes": [ { "name": "tone", "type": { "text": "'primary' | 'neutral'" } } ] },
+  { "tagName": "helix-source", "attributes": [ { "name": "value", "type": { "text": "string" } } ] } ] } ] }"#;
+
+const BADGE_SOURCE: &str = "export class HelixBadge extends LitElement {}\n";
+
 /// Keyed on `tiers` rather than `layers`, unlike its example-rule siblings.
 #[test]
 fn example_values() {
@@ -584,15 +610,8 @@ fn example_values() {
         "example-values",
         &[
             ("helix.json", TIERS),
-            (
-                "src/badge/badge.ts",
-                "export class HelixBadge extends LitElement {}\n",
-            ),
-            (
-                "custom-elements.json",
-                r#"{ "modules": [ { "path": "src/badge/badge.ts", "declarations": [
-  { "tagName": "helix-badge", "attributes": [ { "name": "tone", "type": { "text": "'primary' | 'neutral'" } } ] } ] } ] }"#,
-            ),
+            ("src/badge/badge.ts", BADGE_SOURCE),
+            ("custom-elements.json", BADGE),
             (
                 "src/badge/.examples/preview.html",
                 "<helix-badge tone=\"primary\">New</helix-badge>\n",
@@ -605,6 +624,127 @@ fn example_values() {
             );
         },
         "`<helix-badge tone=\"loud\">` is not one of `primary`, `neutral`",
+        "src/badge/.examples/preview.html",
+    );
+}
+
+/// The React half is authored by hand rather than derived, so a wrong value
+/// lives there on its own. The clean tree carries the framework's own spelling
+/// beside the attributes, since an unanchored pattern reads the tail of
+/// `className` as an attribute called `ame`.
+#[test]
+fn example_values_in_react() {
+    plant_in(
+        "example-values-in-react",
+        "example-values",
+        &[
+            ("helix.json", TIERS),
+            ("src/badge/badge.ts", BADGE_SOURCE),
+            ("custom-elements.json", BADGE),
+            (
+                "src/badge/.examples/preview.html",
+                "<helix-badge tone=\"primary\">New</helix-badge>\n",
+            ),
+            (
+                "src/badge/.examples/preview.tsx",
+                "export function Example() {
+  return <helix-badge className=\"tight\" tone=\"primary\">New</helix-badge>
+}
+",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "src/badge/.examples/preview.tsx",
+                "export function Example() {
+  return <helix-badge className=\"tight\" tone=\"loud\">New</helix-badge>
+}
+",
+            );
+        },
+        "`<helix-badge tone=\"loud\">` is not one of `primary`, `neutral`",
+        "src/badge/.examples/preview.tsx",
+    );
+}
+
+/// A code sample sits in the text a block renders, escaped so the page shows it
+/// rather than running it, and it is the markup a consumer copies.
+#[test]
+fn example_values_quoted() {
+    plant_in(
+        "example-values-quoted",
+        "example-values",
+        &[
+            ("helix.json", TIERS),
+            ("src/badge/badge.ts", BADGE_SOURCE),
+            ("custom-elements.json", BADGE),
+            (
+                "src/badge/.examples/preview.html",
+                "<helix-badge tone=\"primary\">&lt;helix-badge tone=\"neutral\"&gt;New&lt;/helix-badge&gt;</helix-badge>\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "src/badge/.examples/preview.html",
+                "<helix-badge tone=\"primary\">&lt;helix-badge tone=\"loud\"&gt;New&lt;/helix-badge&gt;</helix-badge>\n",
+            );
+        },
+        "`<helix-badge tone=\"loud\">` is not one of `primary`, `neutral`",
+        "src/badge/.examples/preview.html",
+    );
+}
+
+/// A source pane takes its document as an attribute and spells its own quotes
+/// `&quot;`, so the clean tree is the regression: decoding the file whole frees
+/// them, ends the pane's attribute early, and reports the sample's attributes
+/// against the pane, which declares none of them.
+#[test]
+fn example_values_quoted_in_an_attribute() {
+    let pane = |inner: &str| {
+        format!("<helix-source value=\"&lt;helix-badge {inner}=&quot;primary&quot;&gt;New&lt;/helix-badge&gt;\"></helix-source>\n")
+    };
+    let tree = Tree::new("example-values-quoted-in-an-attribute");
+    tree.write("helix.json", TIERS)
+        .write("src/badge/badge.ts", BADGE_SOURCE)
+        .write("custom-elements.json", BADGE)
+        .write("src/badge/.examples/preview.html", &pane("tone"));
+    assert_clean(
+        "example-values",
+        &judge(&tree, "example-values", "example-values"),
+    );
+    tree.write("src/badge/.examples/preview.html", &pane("appearance"));
+    assert_found(
+        "example-values",
+        &judge(&tree, "example-values", "example-values"),
+        "`<helix-badge appearance=\"primary\">` writes the word this library retired",
+        "src/badge/.examples/preview.html",
+    );
+}
+
+/// An axis the element does not carry is as silent as a wrong value, and a
+/// `data-` hook and a framework prop are neither. The clean tree carries both,
+/// so a rule reporting every undeclared name fails here rather than in a sweep.
+#[test]
+fn example_values_undeclared_axis() {
+    plant_in(
+        "example-values-undeclared-axis",
+        "example-values",
+        &[
+            ("helix.json", TIERS),
+            ("src/badge/badge.ts", BADGE_SOURCE),
+            ("custom-elements.json", BADGE),
+            (
+                "src/badge/.examples/preview.html",
+                "<helix-badge data-probe=\"1\" tone=\"primary\">New</helix-badge>\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "src/badge/.examples/preview.html",
+                "<helix-badge data-probe=\"1\" emphasis=\"solid\" tone=\"primary\">New</helix-badge>\n",
+            );
+        },
+        "`<helix-badge emphasis=\"solid\">` asks for an axis `helix-badge` does not declare",
         "src/badge/.examples/preview.html",
     );
 }
