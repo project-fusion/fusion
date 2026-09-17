@@ -77,10 +77,11 @@ const KNOBS = [
 /**
  * Which shapes read `variance`, so the bench can say so rather than offering a
  * control that silently does nothing. The shapes made of many similar things,
- * counted or continuous: lanes, motes, a fan, bands. The ones left out have a
- * single subject, and `threads`, which is even on purpose.
+ * counted or continuous: lanes, motes, a fan, bands, folds, territories. The
+ * ones left out have a single subject, and `threads` and `lattice`, which are
+ * even on purpose.
  */
-const VARIES = new Set(['aurora', 'particles', 'rays', 'streaks'])
+const VARIES = new Set(['aurora', 'caustics', 'fracture', 'particles', 'rays', 'streaks'])
 
 type Knob = (typeof KNOBS)[number]['key']
 
