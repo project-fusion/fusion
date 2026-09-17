@@ -126,6 +126,8 @@ export {
   MixinChartSource,
   type MixinChartSourceInterface,
   PALETTE,
+  PLOT_HEIGHT,
+  PLOT_WIDTH,
   seriesIndex,
   seriesNames,
 } from './mixins/mixin-chart-source/mixin-chart-source.js'
@@ -162,6 +164,10 @@ export {
   MixinPickerField,
   type MixinPickerFieldInterface,
 } from './mixins/mixin-picker-field/mixin-picker-field.js'
+export {
+  MixinSelectableItem,
+  type MixinSelectableItemInterface,
+} from './mixins/mixin-selectable-item/mixin-selectable-item.js'
 export { MixinTokens, type MixinTokensInterface } from './mixins/mixin-tokens/mixin-tokens.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
@@ -189,6 +195,7 @@ export {
 } from './utils/inherit-disabled/inherit-disabled.js'
 export { inlineStep } from './utils/inline-step/inline-step.js'
 export { type Curve, linePath, type Point } from './utils/line-path/line-path.js'
+export { markRegion, type RegionOptions } from './utils/mark-region/mark-region.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export {
   type Row,
@@ -234,3 +241,4 @@ export {
   valueAsNumber,
   valueAsTime,
 } from './utils/value-as/value-as.js'
+export { writtenList } from './utils/written-list/written-list.js'

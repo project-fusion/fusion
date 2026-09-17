@@ -4,6 +4,7 @@ import { ChartPointerController } from '../../controllers/chart-pointer-controll
 import { SourceController } from '../../controllers/source-controller/source-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import type { Row, Series } from '../../utils/read-series/read-series.js'
+import { writtenList } from '../../utils/written-list/written-list.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -22,6 +23,27 @@ export const PALETTE = 24
 export const seriesIndex = (depth: number): number => (depth % PALETTE) + 1
 
 /**
+ * The drawing's own coordinates, which a `viewBox` maps onto whatever box CSS
+ * gives it.
+ *
+ * Here for the reason `PALETTE` is here, one paragraph up: six families drew
+ * into the same square and declared it six times under three names, and one of
+ * them wrote the same number as a literal on one axis and as its own constant
+ * on the other, in one attribute. A round hundred so a `d` attribute is
+ * readable in the inspector.
+ *
+ * **Two names for one number, because the axes are two facts.** `x2=${PLOT_WIDTH}`
+ * and `y2=${PLOT_HEIGHT}` say which edge they reach; one name used twice says
+ * nothing, and the day a chart is not square the call sites are already right.
+ * `Sparkline` is that day already: it is a strip rather than a plot, so it takes
+ * this width and states its own height beside it.
+ */
+export const PLOT_WIDTH = 100
+
+/** The drawing's own coordinates. See `PLOT_WIDTH`. */
+export const PLOT_HEIGHT = 100
+
+/**
  * A list of series names, as the attributes that take one are written.
  *
  * **Here because five properties across two tiers read the same list and two of
@@ -31,19 +53,14 @@ export const seriesIndex = (depth: number): number => (depth % PALETTE) + 1
  * "the way `lines` and `secondary` are". So `lines="Gateway, Billing"` looked
  * exactly like `outlined="Gateway, Billing"` and matched nothing, because
  * `gateway,` is not a column heading: no column drawn as a line, no error, and
- * nothing to read off the page that says why. That is the undebuggable case
- * `gridlines` names in its own docblock, arrived at from the other direction.
+ * nothing to read off the page that says why.
  *
- * A comma is accepted rather than refused because a reader writing a list of
- * words puts commas between them, and the widest of the spellings already
- * shipped. Lowercased and trimmed, since the headings are matched
+ * `writtenList` is the split, and carries the argument for accepting a comma.
+ * What this adds is the lowercase, the headings being matched
  * case-insensitively.
  */
 export const seriesNames = (list: string | undefined): string[] =>
-  (list ?? '')
-    .split(/[\s,]+/)
-    .map((name) => name.trim().toLowerCase())
-    .filter(Boolean)
+  writtenList(list).map((name) => name.toLowerCase())
 
 /**
  * The public surface `MixinChartSource` adds.
