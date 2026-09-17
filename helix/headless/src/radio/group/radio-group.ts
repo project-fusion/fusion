@@ -99,9 +99,27 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
    *
    * The item has not moved by the time this runs, unlike a native input, so
    * refusing is simply not writing the value: there is nothing to put back.
+   *
+   * **The radio's own `helix-select` is a request, and the argument that it was
+   * a notification is the one this settles.** That argument ran: the group's
+   * veto is `helix-before-change` a step later, so the item could be read as
+   * announcing a choice the group then decides about. What it leaves out is who
+   * can reach which event. `helix-before-change` is dispatched on the group, so
+   * refusing it needs a listener on the group, and a consumer ruling out one
+   * answer binds to that answer. Two gates in two positions is the shape, and
+   * the item's is the one that was doing nothing.
    */
   private readonly handleSelection = (event: HelixSelectEvent): void => {
     event.stopPropagation()
+    /* **And only if the item's own choice stood.** `Radio` documents
+       `helix-select` as refusable and this group is the only thing that acts on
+       it, so a refusal nothing read was a veto that did nothing anywhere. Read
+       inline rather than a microtask later: this is a bubble listener for an
+       event from a child, so every listener on the item has already run.
+       `Toggle.Group` and `Listbox` hold the same pair for the same event. */
+    if (event.defaultPrevented) {
+      return
+    }
     const next = event.detail.value
     if (next === this.value) {
       return
