@@ -20,6 +20,19 @@
  * keystrokes a reader makes in one: a control that threw on the way to a valid
  * value would be unusable, and one that guessed would submit a date nobody
  * chose.
+ *
+ * **What stays with each family is the accessor pair, and that is deliberate.**
+ * Date Input and Date Picker write an identical `valueAsDate` and
+ * `valueAsNumber` over `valueAsDate`/`dateAsValue`, and Time Input and Time
+ * Picker an identical pair over the time ones. Each body is a single line; the
+ * rest of the pair is its published docblock, which says different things about
+ * a date and about a time and is read off each family's own reference page. A
+ * mixin holding them would save four one-line bodies and cost two exported
+ * mixins in a published package, and it would not save the prose: a mixin here
+ * declares its surface twice, once on the inner class the analyzer reads and
+ * once on the `declare class` TypeScript consumers see, which is the same two
+ * copies the four families carry now. So the conversion is shared and the API
+ * is each family's own, and the four say so where they write it.
  */
 
 /** `YYYY-MM-DD`, and nothing that merely starts like it. */

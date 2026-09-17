@@ -19,6 +19,14 @@ const FEEDBACK_ID = 'helix-feedback'
  */
 export declare class MixinFieldInterface {
   /**
+   * Id the field's label points at, written by the control this wraps.
+   *
+   * The third fixed id and the only one this mixin does not render, the
+   * control being the family's. See the note on the class member.
+   */
+  protected controlId: string
+
+  /**
    * Help under the control, shown while there is nothing wrong.
    *
    * Fallback content for the `hint` slot, so anything richer replaces it.
@@ -167,6 +175,26 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
   // what TypeScript consumers see; this class is what the manifest analyzer
   // reads when resolving inherited members into dependent packages.
   class FieldElement extends Base {
+    /**
+     * Id the field's label points at, written by the control this wraps.
+     *
+     * `renderLabel` emits the `for` and the family renders the `id`, so the
+     * two ends of one IDREF sat in two packages as a pair of literals with
+     * nothing holding them together: eleven templates wrote `id="control"`,
+     * two wrote a second `for="control"` of their own, and a family that
+     * spelled either differently got a `<label for>` resolving to nothing.
+     * That failure is silent in the way the area rules describe for a
+     * `[part=]` naming a part nobody renders: no error, no warning, and a
+     * label that has stopped focusing its field.
+     *
+     * A member rather than a module constant, which is what the anchor
+     * argument for `reportRequired` already settled one level down: the name
+     * belongs to the control the family renders, so the family has to be able
+     * to read it, and `HINT_ID` and `FEEDBACK_ID` stay private because this
+     * mixin renders both of those itself.
+     */
+    protected controlId = 'control'
+
     /**
      * What is wrong, in the reader's words rather than the browser's.
      */
@@ -331,7 +359,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       if (this.label === '' && !hidden) {
         return nothing
       }
-      return html`<label part="label" for="control" ?data-hidden=${hidden !== null}
+      return html`<label part="label" for=${this.controlId} ?data-hidden=${hidden !== null}
         ><slot name="label">${this.label || hidden}</slot></label
       >`
     }

@@ -159,7 +159,7 @@ export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) =>
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
-      if (this.children === undefined || this.hydrating) {
+      if (!this.childrenKnown) {
         return
       }
       const rows = this.slotted.length
