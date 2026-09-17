@@ -262,6 +262,81 @@
   display: none;
 }
 
+/* ===================================================== fitting what it holds ==
+   **`per-view="auto"` is the count worked out here rather than handed over**,
+   and it is the one number in this component CSS can have for itself: how many
+   boxes of at least `--carousel-slide-min`, with a gap between each pair, fit
+   the room this track was given. Everything it takes is a length this sheet
+   already has, so the first rule that runs lays the panes out at their final
+   width, on a server's markup as on the client's, with no script and no frame
+   to wait for. A carousel that measured its container could only do it on the
+   client, which is why a count was consumer API in the first place.
+
+   **A gap belongs to every pane but the last, which is why both sides carry
+   one.** `n` panes take `n * (pane + gap) - gap`, so a gap added to the room
+   and divided by a pane and a gap comes out as `n` with no correction to get
+   wrong. 660 of room, 16 of gap and a 200 minimum is 676 over 216, which is
+   three and an eighth and so three across.
+
+   **`cqi` and not `100%`, because a percentage cannot be divided.** A
+   percentage resolves at used-value time and CSS refuses it as a divisor; a
+   container unit is a length at computed-value time and divides like one. It
+   asks the nearest ancestor container, which `container-type` makes this track,
+   and containment is also what keeps the arithmetic from circling: the
+   container's inline size is settled without reference to what is in it. The
+   declaration is substituted where it is used, on the pane, so the unit and the
+   `100%` beside it are the same box.
+
+   **Which costs a fitted track its own intrinsic width, and that is the trade.**
+   Inline-size containment means the track contributes nothing to a shrink-to-fit
+   parent: measured 16 Sep 2026 in Chromium 151.0.7922.34, eight cards in an
+   `inline-size: fit-content` box came out 140 wide against 736 for the same
+   carousel at a declared three. In ordinary flow the host is a grid and fills
+   its column, which is every place a carousel is put; a parent that sizes to its
+   contents is asking the carousel how wide it should be, which is the one
+   question a carousel fitting what it can hold cannot answer. Give it a width
+   there, or declare a count.
+
+   **`max(1, …)` is the clamp, and it is load-bearing.** A minimum wider than
+   the track floors to zero, and dividing by zero is invalid at computed-value
+   time: the pane's whole `flex` would be dropped and the panes would size to
+   their content. One across is what a track with no room for two asked for. The
+   unset minimum reads as the whole track by the same arithmetic, one across.
+
+   **On the mode and not on a count.** The five enumerated `per-view` rules went
+   because a sheet naming numbers has a last one; `auto` is one named value, the
+   way `orientation="vertical"` is, and there is nothing here to run out of.
+   Declared on the track, where the component declares a count, so it beats
+   whatever a consumer inherits in exactly as that one does.
+
+   **The inline axis only, and the component agrees in the same words.** A
+   vertical track's room is a height the consumer chose with
+   `--carousel-block-size`, so there is nothing to fit against that they did not
+   already decide, and the block axis would want `container-type: size`, which
+   lays a track out as empty wherever its height is not definite. A vertical
+   `auto` reads as one across, and the component writes that count onto the
+   track the way it writes every other one: were this rule to answer there as
+   well, the sheet would divide by one number while the positions were counted
+   from another, which is the disagreement the count is published to prevent.
+
+   Measured 16 Sep 2026 in Chromium 151.0.7922.34 and WebKit 26.5, 200px slides
+   in tracks from 340 to 1281: the same count and the same pane in both, and the
+   count the panes come back as is the count the dots are drawn from. */
+:host([per-view="auto"]:not([orientation="vertical"])) [part="track"] {
+  --carousel-per-view: max(
+    1,
+    round(
+      down,
+      calc(
+        (100cqi + var(--_carousel-gap)) /
+        (var(--carousel-slide-min, 100cqi) + var(--_carousel-gap))
+      ),
+      1
+    )
+  );
+  container-type: inline-size;
+}
+
 /* Vertical: the same track turned, and the one thing it needs that the
    horizontal one does not is a height. `--carousel-block-size` is that number,
    and 20rem is a starting point rather than a claim about anyone's slides. */
@@ -316,6 +391,24 @@
   flex: 0 0 var(--carousel-pane);
   margin-inline-end: var(--carousel-run-end, 0px);
   scroll-snap-align: start;
+}
+
+/* A fitted track holding everything it has fills itself, which is the other
+   half of fitting what it can hold.
+
+   The share is how wide a pane is where the track has more slides than room:
+   four across of a minimum that eight slides overflow. A track holding fewer
+   than it fits would otherwise lay three cards out at a sixth of itself each
+   and leave half the row empty, so the panes take the slack. Growth is free
+   exactly where it is wanted and inert everywhere else: a run that overflows
+   has no slack to distribute and a run that ends level has none either, so only
+   the short run moves and the share stays the width of every pane that scrolls.
+
+   Not under a declared count, where six across four slides is four panes at a
+   sixth of the track and the one place to stand, which is what was asked for as
+   nearly as it can be had. */
+:host([per-view="auto"]:not([orientation="vertical"])) [part="slide"] {
+  flex-grow: 1;
 }
 
 /* The slide fills the pane, and has to be told to. */

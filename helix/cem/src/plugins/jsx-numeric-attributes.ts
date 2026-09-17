@@ -132,10 +132,24 @@ const numericAttributes = (manifest: HelixManifest): Set<string> => {
   return found
 }
 
-/** Whether a type is `number`, allowing for the `| undefined` an optional one carries. */
+/** A string literal in a declared type, whichever quote it was written with. */
+const LITERAL = /^'[^']*'$|^"[^"]*"$/
+
+/**
+ * Whether a type is `number`, allowing for the `| undefined` an optional one
+ * carries and for the keywords a count can be asked for instead of a count.
+ *
+ * **A keyword beside a number is still an attribute carrying a number's
+ * spelling.** `per-view` takes a count or `auto`, and typed `number | 'auto'`
+ * alone it refused `per-view="3"`, which is what every example in this
+ * repository writes and what the converter exists to read. The keywords are
+ * already in the type, so widening adds the numeric string and takes nothing
+ * away: `per-view="auto"` still passes and `per-view="abc"` still does not.
+ */
 const numeric = (type: string): boolean => {
   const parts = type.split('|').map((part) => part.trim())
   return (
-    parts.includes('number') && parts.every((part) => part === 'number' || part === 'undefined')
+    parts.includes('number') &&
+    parts.every((part) => part === 'number' || part === 'undefined' || LITERAL.test(part))
   )
 }

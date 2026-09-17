@@ -603,6 +603,11 @@ describe('carousel chrome placement', () => {
   })
 })
 
+/** The count the track was handed, which is what both tiers divide by. */
+const handed = (host: HTMLElement): string =>
+  (part(host, 'track') as HTMLElement | undefined)?.style.getPropertyValue('--carousel-per-view') ??
+  ''
+
 describe('carousel across several slides at once', () => {
   /* Six slides four across stop three times: 0 to 3, 1 to 4, 2 to 5. Everything
      here is that one number, and counting slides instead is the fault. */
@@ -631,12 +636,6 @@ describe('carousel across several slides at once', () => {
     </helix-headless-carousel>`)
     expect(part(host, 'indicators')?.querySelectorAll('[part~="indicator"]')).toHaveLength(3)
   })
-
-  /** The count the track was handed, which is what both tiers divide by. */
-  const handed = (host: HTMLElement): string =>
-    (part(host, 'track') as HTMLElement | undefined)?.style.getPropertyValue(
-      '--carousel-per-view',
-    ) ?? ''
 
   test('the styles are handed the number the positions were counted from', async () => {
     // The whole of what keeps a width and a count from disagreeing. A sheet
@@ -681,6 +680,61 @@ describe('carousel across several slides at once', () => {
    stylesheet and reports `''` for every side of the track's padding, so the
    number under test does not exist on that harness and neither does the
    scrolling it has to survive. */
+
+describe('a carousel fitting what it can hold', () => {
+  const fitted = async (attrs = ''): Promise<HTMLElement> =>
+    mount(`<helix-headless-carousel label="Shelf" per-view="auto" ${attrs}>
+      <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+    </helix-headless-carousel>`)
+
+  test('hands the track no count at all, the sheet having one', async () => {
+    /* An inline declaration outranks every rule short of `!important`, so a
+       track told `1` here could never be told three by the rule that fits it.
+       The absence is not a gap: that rule declares the same name on the same
+       element, so it beats an inherited one exactly as this write does. */
+    expect(handed(await fitted())).toBe('')
+  })
+
+  test('and a declared count is still a count', async () => {
+    expect(
+      handed(
+        await mount(`<helix-headless-carousel label="Shelf" per-view="3">
+      <div>1</div><div>2</div><div>3</div><div>4</div>
+    </helix-headless-carousel>`),
+      ),
+    ).toBe('3')
+  })
+
+  /* A vertical track's room is a height the consumer chose, so there is nothing
+     to fit against that they did not already decide, and the block axis would
+     want a size container a headless consumer has no reason to have given it.
+     It reads as one across, through the clamp every other value it cannot
+     honor goes through. */
+  test('a vertical track takes the word as one across', async () => {
+    expect(handed(await fitted('orientation="vertical"'))).toBe('1')
+  })
+
+  /* **The served state, and the reason it is coherent rather than briefly
+     false.** A fitted carousel's dot count is whatever its box resolved to, so
+     nothing knows it until there is a box: not a server, and not the render
+     that draws the panes, layout being what follows a render. Drawn from a
+     guess and corrected, the run would change length under the reader, which is
+     the jump fitting in the sheet exists to avoid. happy-dom lays nothing out,
+     so this is that state held still. A declared count is unaffected, being an
+     answer nobody has to measure for. */
+  const unlaid = hasLayout() ? (): void => {} : test
+
+  unlaid('serves no dots at all until its box has been laid out', async () => {
+    expect(part(await fitted(), 'indicators')).toBe(null)
+  })
+
+  unlaid('while a declared count draws its dots with nothing measured', async () => {
+    const host = await mount(`<helix-headless-carousel label="Shelf" per-view="3">
+      <div>1</div><div>2</div><div>3</div><div>4</div>
+    </helix-headless-carousel>`)
+    expect(part(host, 'indicators')?.querySelectorAll('[part~="indicator"]')).toHaveLength(2)
+  })
+})
 
 /* A caret means previous or next, so it points where that slide is: toward the
    start and toward the end of the line, which on a right-to-left page are the
