@@ -84,6 +84,33 @@ describe('input file', () => {
     expect(said).toEqual([{ value: 'one.txt, two.txt' }])
   })
 
+  test('and refusing that says nothing moves, in either direction', async () => {
+    /* The `@event` line promised a request fired before the files change and
+       refusable. It was dispatched from `announce`, after the input had taken
+       them and after `setFormValue` had reported them, and what the dispatch
+       returned was thrown away: a veto with no reader.
+
+       Two directions, because the four paths in split that way. A pick is the
+       browser writing the input before this element hears anything, so a
+       refusal has to put the previous list back; a removal is this element's
+       own write, so a refusal is it never happening. */
+    const host = await field('multiple')
+    await choose(host, 'one.txt', 'two.txt')
+    const refuse = (event: Event): void => event.preventDefault()
+    host.addEventListener('helix-before-change', refuse)
+
+    await choose(host, 'three.txt')
+    expect(host.files.map((file) => file.name)).toEqual(['one.txt', 'two.txt'])
+
+    host.removeAt(0)
+    await host.updateComplete
+    expect(host.files.map((file) => file.name)).toEqual(['one.txt', 'two.txt'])
+
+    host.clear()
+    await host.updateComplete
+    expect(host.files.map((file) => file.name)).toEqual(['one.txt', 'two.txt'])
+  })
+
   test('each file carries its size and its kind', async () => {
     const host = await field('multiple')
     control(host).files = (() => {

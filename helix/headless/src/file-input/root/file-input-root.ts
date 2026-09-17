@@ -5,6 +5,7 @@ import {
   HelixBeforeChangeEvent,
   HelixFormElement,
   MixinField,
+  requestChange,
   restoreValue,
 } from '@fusion.dev/helix-core'
 import { trash } from '@fusion.dev/helix-icons'
@@ -86,7 +87,7 @@ const kind = (file: File): string => {
  * @slot trigger - What the reader presses to open the picker.
  *
  * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and the field keeps the files it had, a pick the browser has already written included.
  * @event {Event} input - Announced once the value has moved.
  *
  * @csspart control - The file input itself, which carries the label and validity.
@@ -204,12 +205,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * about the page learns anything it did not already have.
    */
   clear(): void {
-    const control = this.control
-    if (!control) {
-      return
-    }
-    control.value = ''
-    this.announce()
+    this.commit([])
   }
 
   /**
@@ -224,30 +220,85 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * picker come back out the same way.
    */
   removeAt(at: number): void {
+    this.commit(this.files.filter((_, index) => index !== at))
+  }
+
+  /**
+   * The files this element last stood behind, so a refusal has somewhere to go.
+   *
+   * The picker and a drop both write the input before anything here runs, so
+   * the list being replaced is gone by the time the request is announced.
+   * Nothing else records it: `files` reads the control, which is already the
+   * new answer.
+   */
+  private committed: File[] = []
+
+  /**
+   * Asks for a set of files, and puts them in unless a listener refuses.
+   *
+   * **The request was announced after the fact and nothing read it.** This
+   * element dispatched `helix-before-change` from `announce`, after the input
+   * had taken the files and after `setFormValue` had reported them, and
+   * discarded what the dispatch returned: an `@event` line promising that
+   * refusing it left nothing moved, over a veto with no reader. The other
+   * direction of that same fault is what `requestChange` exists to prevent, so
+   * this goes through it like every other value control.
+   *
+   * **A refusal puts the input back rather than stopping an assignment**, which
+   * is the shape a file input forces. Two of the four paths in are the browser
+   * writing `control.files` before this element hears anything, so there is no
+   * assignment left to skip and the honest answer is to restore the list the
+   * element last stood behind.
+   */
+  private commit(next: File[]): void {
     const control = this.control
-    if (!control || typeof DataTransfer === 'undefined') {
+    if (!control) {
       return
     }
-    const keeping = new DataTransfer()
-    for (const [index, file] of this.files.entries()) {
-      if (index !== at) {
-        keeping.items.add(file)
-      }
+    const previous = this.committed
+    const applied = requestChange({
+      apply: (files) => {
+        this.put(control, files)
+        this.settle()
+      },
+      event: (files) =>
+        new HelixBeforeChangeEvent({ value: files.map((file) => file.name).join(', ') }),
+      host: this,
+      next,
+    })
+    if (!applied) {
+      this.put(control, previous)
     }
-    control.files = keeping.files
-    this.announce()
+  }
+
+  /**
+   * Writes a list onto the input, which is the only way a `FileList` is built.
+   *
+   * `value = ''` for the empty case rather than an empty `DataTransfer`,
+   * because emptying is the one write a control accepts everywhere and a
+   * harness without `DataTransfer` still has to be able to clear.
+   */
+  private put(control: HTMLInputElement, files: File[]): void {
+    if (files.length === 0) {
+      control.value = ''
+      return
+    }
+    if (typeof DataTransfer === 'undefined') {
+      return
+    }
+    const holding = new DataTransfer()
+    for (const file of files) {
+      holding.items.add(file)
+    }
+    control.files = holding.files
   }
 
   /** Says what is now chosen, by name, and puts it in the form. */
-  private announce(): void {
+  private settle(): void {
+    this.committed = this.files
     this.sync()
     this.requestUpdate()
-    this.dispatchEvent(
-      new HelixBeforeChangeEvent({
-        value: this.files.map((file) => file.name).join(', '),
-      }),
-    )
-    /* And under the platform's own names, which is what `onChange` and `onInput`
+    /* Under the platform's own names, which is what `onChange` and `onInput`
        bind and what a native file input sends when the chosen files move: both,
        in that order, the way every other control here does.
 
@@ -299,7 +350,9 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     // The native `change` is relayed under this element's own name, so a
     // consumer hears one event from one element rather than two from two.
     event.stopPropagation()
-    this.announce()
+    /* The browser has already written the input, so the request is announced
+       for what it holds and a refusal is what puts the previous list back. */
+    this.commit(this.files)
   }
 
   /*
@@ -335,14 +388,9 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     if (dropped.length === 0) {
       return
     }
-    const keeping = new DataTransfer()
     // A single-file control takes the last thing dropped, the way choosing
     // again in the picker replaces rather than adds.
-    for (const file of this.multiple ? [...this.files, ...dropped] : dropped.slice(-1)) {
-      keeping.items.add(file)
-    }
-    control.files = keeping.files
-    this.announce()
+    this.commit(this.multiple ? [...this.files, ...dropped] : dropped.slice(-1))
   }
 
   private readonly handleRemove = (event: Event): void => {
@@ -356,6 +404,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     super.firstUpdated(changed)
     // Whatever the markup arrived with, so a form knows before anything is
     // touched. `willUpdate` is too early: there is no control to read yet.
+    this.committed = this.files
     this.sync()
   }
 
@@ -364,12 +413,19 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     this.control?.focus(options)
   }
 
-  /** Empties it, which is what a form reset means for a file input. */
+  /**
+   * Empties it, which is what a form reset means for a file input.
+   *
+   * Not through `commit`, and that is the point of the split: a reset is the
+   * form's decision and there is nothing here for a listener to refuse. What it
+   * owes is the report and the platform's own announcement, which is what
+   * `settle` is.
+   */
   formResetCallback(): void {
     if (this.control) {
       restoreValue(this.control, '')
     }
-    this.announce()
+    this.settle()
   }
 
   /*
