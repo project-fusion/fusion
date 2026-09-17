@@ -5,23 +5,26 @@ import {
   HelixElement,
   linear,
   linePath,
+  PLOT_WIDTH,
   type Point,
   SourceController,
+  writtenList,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * The drawing's own coordinates, which the `viewBox` maps onto whatever box CSS
- * gives it. Round numbers so a `d` attribute is readable in the inspector.
+ * How tall the strip is drawn, which is the one coordinate this family states.
+ *
+ * A sparkline is a line beside a number rather than a plot, so it is the one
+ * drawing here that is not square: the width is `PLOT_WIDTH` like every other
+ * chart's, and this is a third of it.
  */
-const BOX = { height: 32, width: 100 } as const
+const STRIP_HEIGHT = 32
 
-/** Splits on whitespace or commas, and keeps only what is a number. */
+/** The consumer's list, keeping only what is a number. */
 const readValues = (input: string): number[] =>
-  input
-    .split(/[\s,]+/)
-    .filter((one) => one !== '')
+  writtenList(input)
     .map(Number)
     .filter((one) => Number.isFinite(one))
 
@@ -196,7 +199,7 @@ export class HelixHeadlessSparkline extends HelixElement {
     /* Two points minimum, because one is not a trend and zero is not a line.
        An `<svg>` given a `d` of `M NaN,NaN` draws nothing and reports nothing,
        so the empty case is stated here rather than left to look like a bug. */
-    const x = linear([0, Math.max(points.length - 1, 1)], [0, BOX.width])
+    const x = linear([0, Math.max(points.length - 1, 1)], [0, PLOT_WIDTH])
     /* **A bar measures from zero and a line measures from its own range**, and
        that is a correctness difference rather than a preference. A bar's
        *length* is the value, so a baseline anywhere but zero makes the lengths
@@ -211,8 +214,8 @@ export class HelixHeadlessSparkline extends HelixElement {
     const [low, high] = extent(points.length > 0 ? points : [0])
     const y =
       this.plot === 'bar'
-        ? linear([Math.min(0, low), Math.max(0, high)], [BOX.height, 0])
-        : linear([low, high], [BOX.height, 0])
+        ? linear([Math.min(0, low), Math.max(0, high)], [STRIP_HEIGHT, 0])
+        : linear([low, high], [STRIP_HEIGHT, 0])
     const coordinates: Point[] = points.map((value, index) => [x(index), y(value)])
     const path = this.plot === 'bar' ? '' : linePath(coordinates, this.curve ?? 'smooth')
 
@@ -229,7 +232,7 @@ export class HelixHeadlessSparkline extends HelixElement {
        the value nobody set, and `=== 'area'` would answer false. */
     const area =
       this.plot !== 'bar' && this.plot !== 'line' && path !== ''
-        ? `${path}L${BOX.width},${BOX.height}L0,${BOX.height}Z`
+        ? `${path}L${PLOT_WIDTH},${STRIP_HEIGHT}L0,${STRIP_HEIGHT}Z`
         : ''
 
     /* One column per reading, inset so neighbors do not touch.
@@ -243,7 +246,7 @@ export class HelixHeadlessSparkline extends HelixElement {
      * gap is the smallest separation that still reads as separate columns at
      * the sizes a sparkline is drawn at, and it comes off the slot rather than
      * off the bar so a two-reading series does not get two enormous slabs. */
-    const slot = BOX.width / Math.max(points.length, 1)
+    const slot = PLOT_WIDTH / Math.max(points.length, 1)
     const floor = y(0)
     const bars =
       this.plot === 'bar'
@@ -272,7 +275,7 @@ export class HelixHeadlessSparkline extends HelixElement {
       points.length < 2
         ? undefined
         : `--chart-terminus-x: 100%; --chart-terminus-y: ${
-            (y(points[points.length - 1] as number) / BOX.height) * 100
+            (y(points[points.length - 1] as number) / STRIP_HEIGHT) * 100
           }%`
 
     return html`<svg
@@ -283,7 +286,7 @@ export class HelixHeadlessSparkline extends HelixElement {
         preserveAspectRatio="none"
         role=${this.label === '' ? nothing : 'img'}
         style=${end ?? nothing}
-        viewBox="0 0 ${BOX.width} ${BOX.height}"
+        viewBox="0 0 ${PLOT_WIDTH} ${STRIP_HEIGHT}"
       >
         ${
           /* The ramp the area is poured with, drawn here because a gradient is

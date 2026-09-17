@@ -10,9 +10,10 @@ import {
   hostAria,
   inlineStep,
   MixinCollection,
+  markRegion,
   requestChange,
-  slotFilled,
   VirtualizeController,
+  writtenList,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -590,7 +591,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   get orderedColumns(): HelixHeadlessTableColumn[] {
     const columns = this.tableColumns
-    const wanted = this.dragOrder ?? this.order.split(/[\s,]+/).filter(Boolean)
+    const wanted = this.dragOrder ?? writtenList(this.order)
     if (wanted.length === 0) {
       return columns
     }
@@ -1098,29 +1099,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * assigned nodes are not a slot's DOM children. Both verified in a browser.
    */
   private markEmpty(): void {
-    this.markRegion('toolbar', ['toolbar'])
+    /* `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
+       sheet reads, and this tier ships no sheet, so an empty region left in the box
+       tree would be a gap a headless consumer cannot close without knowing to look
+       for it. The styled rule stays too, because that sheet sets `display` on these
+       parts and therefore outranks the UA's `[hidden]` one. */
+    markRegion(this.renderRoot, 'toolbar', ['toolbar'])
     /* The footer is not empty while this element is drawing its own pagination
        into it. */
-    this.markRegion('footer', ['footer'], '[part="pagination"]')
-  }
-
-  /**
-   * One region, hidden when its slot holds nothing and nothing of ours fills it.
-   *
-   * `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
-   * sheet reads, and this tier ships no sheet, so an empty region left in the box
-   * tree would be a gap a headless consumer cannot close without knowing to look
-   * for it. The styled rule stays too, because that sheet sets `display` on these
-   * parts and therefore outranks the UA's `[hidden]` one.
-   */
-  private markRegion(part: string, slots: readonly string[], occupied?: string): void {
-    const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${part}"]`)
-    const empty =
-      !slots.some((name) =>
-        slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)),
-      ) && !(occupied && this.renderRoot?.querySelector(occupied))
-    region?.toggleAttribute('data-empty', empty)
-    region?.toggleAttribute('hidden', empty)
+    markRegion(this.renderRoot, 'footer', ['footer'], { occupied: '[part="pagination"]' })
   }
 
   protected override updated(changed: PropertyValues): void {

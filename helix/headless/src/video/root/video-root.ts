@@ -5,6 +5,7 @@ import {
   HelixNextEvent,
   HelixPreviousEvent,
   onUnlessFalse,
+  writtenList,
 } from '@fusion.dev/helix-core'
 import {
   airplay,
@@ -573,10 +574,7 @@ export class HelixHeadlessVideo extends HelixElement {
 
   /** The extras asked for, in order, and only the ones this platform can do. */
   private get extras(): string[] {
-    return this.extraControls
-      .split(/\s+/)
-      .filter(Boolean)
-      .filter((one) => this.offers(one))
+    return writtenList(this.extraControls).filter((one) => this.offers(one))
   }
 
   /**
@@ -587,10 +585,7 @@ export class HelixHeadlessVideo extends HelixElement {
    */
   private get overflow(): string[] {
     const onBar = new Set(this.extras)
-    return this.overflowControls
-      .split(/\s+/)
-      .filter(Boolean)
-      .filter((one) => !onBar.has(one) && this.offers(one))
+    return writtenList(this.overflowControls).filter((one) => !onBar.has(one) && this.offers(one))
   }
 
   /**
@@ -968,7 +963,7 @@ export class HelixHeadlessVideo extends HelixElement {
    * keys are offered only where the consumer named something to skip to.
    */
   private claimSession(): void {
-    const skips = `${this.extraControls} ${this.overflowControls}`.split(/\s+/)
+    const skips = writtenList(`${this.extraControls} ${this.overflowControls}`)
     this.session.claim(
       { artwork: this.poster, title: this.label },
       {
@@ -1061,8 +1056,7 @@ export class HelixHeadlessVideo extends HelixElement {
 
   /** Steps through the speeds offered, which is what one button can do. */
   private cycleSpeed(): void {
-    const speeds = this.speeds
-      .split(/\s+/)
+    const speeds = writtenList(this.speeds)
       .map(Number)
       .filter((one) => one > 0)
     const video = this.video
@@ -1205,9 +1199,9 @@ export class HelixHeadlessVideo extends HelixElement {
        none: a declarative shadow root reports its slot's contents before any
        listener is there to hear it, so the update after hydration reads them
        here instead. `slotchange` keeps them in step after that. */
-    if (!this.mediaRead && this.children !== undefined && !this.hydrating) {
+    if (!this.mediaRead && this.childrenKnown) {
       this.mediaRead = true
-      this.media = this.copiesOf([...this.children].filter((child) => child.slot === ''))
+      this.media = this.copiesOf(this.knownChildren.filter((child) => child.slot === ''))
     }
     if (changed.has('media')) {
       this.captions = captionsAmong(this.media)
