@@ -62,6 +62,21 @@ describe('radio group', () => {
     expect(options(host).every((item) => !item.selected)).toBe(true)
   })
 
+  test('and refusing the choice`s own event leaves the answer alone too', async () => {
+    /* `helix-select` is cancelable and `Radio` documents it as refusable. The
+       group is the one thing that acts on it, so a refusal it ignored was a
+       veto that did nothing anywhere: valid code, no error, and the answer
+       moving regardless. Bound on the choice, which is the position a consumer
+       ruling out one answer has and `helix-before-change` does not reach. */
+    const host = await group()
+    const second = options(host)[1] as unknown as HTMLElement & { select: () => void }
+    second.addEventListener('helix-select', (event) => event.preventDefault())
+    second.select()
+    await settle(host)
+    expect((host as Updatable & { value: string }).value).toBe('')
+    expect(options(host).every((item) => !item.selected)).toBe(true)
+  })
+
   test('the keyboard moves and chooses in one go', async () => {
     /* Which is what a radio group does, and is the difference from a listbox:
        moving without choosing leaves a keyboard reader on an item they have not
