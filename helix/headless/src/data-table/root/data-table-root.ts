@@ -85,6 +85,15 @@ import {
  * in the order on screen, in the columns on screen. Saving it is the page's
  * business, the same as any other file.
  *
+ * **There is no `columns` attribute here, and `helix-table` has one.** The
+ * difference is what a column is in each: here it is the schema, so a table
+ * without one has nothing to read a row with, and every column is a place to
+ * write a `width`. A `helix-table` holds cells a consumer wrote and can be
+ * written with no column at all, so its `columns` is where such a table is
+ * sized from. Written on this element the attribute is inert, which is the trap
+ * worth knowing when moving between the two. What both take is the CSS hook,
+ * `--data-table-columns` here and `--table-columns` there.
+ *
  * @since 0.1.0
  * @status stable
  * @category data

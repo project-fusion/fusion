@@ -12,7 +12,7 @@ import { styles } from './table-column.css.js'
  * table.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Column header, Th
  * @documentation https://fusion.dev/helix/components/table
  */

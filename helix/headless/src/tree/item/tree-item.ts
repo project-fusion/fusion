@@ -32,7 +32,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * click, no status bar. Given an `href` the row *is* an `<a>`.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases TreeNode, Branch, Leaf
  * @documentation https://fusion.dev/helix/components/tree
  *
@@ -70,14 +70,25 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   href = ''
 
   /**
-   * Depth from the root, set by the tree so indentation needs no CSS nesting.
+   * Depth from the root, counted by the tree so indentation needs no CSS nesting.
    *
-   * Not reflected. The tree assigns this after it upgrades, so an attribute
-   * here would be a change to markup the consumer rendered and hydration would
-   * report it. The indent it drives is written onto the row instead, inside the
-   * shadow root, which is not part of the tree React hydrates.
+   * **Read rather than written, and no attribute at all.** The tree counts the
+   * items a row sits inside and assigns this on every sync, so a value declared
+   * here is overwritten before the first paint: measured at `level="2"` on three
+   * rows of a flat list, all three back to 1 with `--tree-level: 1` on every
+   * row. It carried an attribute and a shipped example setting it for as long as
+   * both existed, which is a depth a consumer could state and nothing would
+   * honor. Depth in this tree is where a row is, not what it claims: a branch's
+   * children go in its `children` slot, and that nesting is also what decides
+   * which rows a shut branch hides and which row the outward arrow moves to.
+   *
+   * Not reflected either. The tree assigns this after it upgrades, so an
+   * attribute here would be a change to markup the consumer rendered and
+   * hydration would report it. The indent it drives is written onto the row
+   * instead, inside the shadow root, which is not part of the tree React
+   * hydrates.
    */
-  @property({ attribute: 'level', type: Number })
+  @property({ attribute: false, type: Number })
   level?: number
 
   /**
@@ -94,7 +105,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   /**
    * Whether this item is the current one.
    *
-   * Not reflected, for the reason `level` below gives in full: the tree assigns
+   * Not reflected, for the reason `level` above gives in full: the tree assigns
    * this after it upgrades, so the attribute would be a change to markup the
    * consumer rendered and hydration would report it. Mirroring to
    * `data-selected` on the host instead is the same fault under another name.
@@ -144,9 +155,11 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   }
 
   /**
-   * @internal Read by the tree to identify a branch across the light DOM,
-   * which is cheaper than `instanceof` and is why this is public rather than
-   * protected. A consumer asks `branch`, which is the property they set.
+   * @internal Whether this row holds children, read by the tree, which moves
+   * and opens differently for a branch. Public rather than protected because
+   * the tree is another element and there is no other way across; not a
+   * consumer's to read, and there is nothing to set: it is what the `children`
+   * slot was given, which is the markup they already wrote.
    */
   get isBranch(): boolean {
     return this.branch

@@ -68,11 +68,29 @@ describe('table column server output', () => {
     expect(rendered(markup, 'helix-headless-table-column')).toContain('<slot></slot>')
   })
 
-  test('the track list is not served, because it is read from children', () => {
+  test('the track list a server can send is the one that needs no children', () => {
+    /* `columns` is an attribute, so the grid is laid out in the first paint.
+       The assertion this replaces read `--table-columns`, which is the hook the
+       styled sheet offers and a name this element has never written: it could
+       not have failed, and the claim it carried, that no track list is served,
+       stopped being true when `columns` began sizing a declared column. */
+    expect(
+      partTag(
+        ssr(html`<helix-headless-table columns="10rem 1fr" label="T"></helix-headless-table>`),
+        'table',
+      ),
+    ).toContain('--table-template: 10rem 1fr')
+  })
+
+  test('and the one worked out from the columns is not', () => {
     // The server has no tree to walk, so the table cannot know its columns. The
     // grid falls back to one track until it upgrades, which is the same trade
     // the docs describe for anything that inspects the DOM.
-    const markup = ssr(html`<helix-headless-table label="T"></helix-headless-table>`)
-    expect(withoutStyles(markup)).not.toContain('--table-columns')
+    const markup = ssr(
+      html`<helix-headless-table label="T">
+        <helix-headless-table-column width="12rem">Service</helix-headless-table-column>
+      </helix-headless-table>`,
+    )
+    expect(withoutStyles(markup)).not.toContain('--table-template')
   })
 })

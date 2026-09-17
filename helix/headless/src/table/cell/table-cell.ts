@@ -15,7 +15,7 @@ import { property } from 'lit/decorators.js'
  * to hold together.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Cell, TableCell
  * @documentation https://fusion.dev/helix/components/table
  *

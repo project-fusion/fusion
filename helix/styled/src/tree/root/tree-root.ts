@@ -14,7 +14,7 @@ import { styles } from './tree-root.css.js'
  * to it is one more thing between the reader and the label.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases FileTree, Navigation tree
  * @documentation https://fusion.dev/helix/components/tree

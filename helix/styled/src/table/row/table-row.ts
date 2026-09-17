@@ -13,7 +13,7 @@ import { styles } from './table-row.css.js'
  * columns.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The row's cells.
