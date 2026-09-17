@@ -18,7 +18,7 @@ import { property } from 'lit/decorators.js'
  *
  * A sparkline is a line beside a number rather than a plot, so it is the one
  * drawing here that is not square: the width is `PLOT_WIDTH` like every other
- * chart's, and this is a third of it.
+ * chart's, and this is 32 against that 100.
  */
 const STRIP_HEIGHT = 32
 
