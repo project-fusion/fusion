@@ -69,8 +69,10 @@ export class HelixMeter extends HelixHeadlessMeter {
    * where one is the number being watched and the rest are context, which is a
    * fact about the region rather than about any one of them.
    *
-   * **One value and not the four.** `ghost` would leave a track with nothing in
-   * it, which is not a quiet reading but an absent one. `outlined` earns its
+   * **One value of the five.** `ghost` would leave a track with nothing in
+   * it, which is not a quiet reading but an absent one. `muted` is the quiet
+   * ink `Text` takes and a reading draws a fill rather than ink, so `subtle` is
+   * the whole of what quiet means here. `outlined` earns its
    * place in `BarChart`, which keeps the area and fades it toward the page, only
    * because a chart has other series for the outlined one to be a *different
    * kind of fact from* (a forecast, a target, a budget). A meter reports one

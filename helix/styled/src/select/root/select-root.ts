@@ -72,9 +72,12 @@ export class HelixSelect extends HelixHeadlessSelect {
    * **`emphasis` and not `separation`, which the registry decides rather than
    * taste.** Emphasis is asked of controls, how loud this one is; separation is
    * asked of containers, where the surface ends. A trigger is a control, and a
-   * family may not declare both. Two of the four values are refused: `solid` and
-   * `subtle` are a button's way of being the one thing to press, which is not a
-   * thing an answer should ever be.
+   * family may not declare both. Three of the five values are refused: `solid`
+   * and `subtle` are a button's way of being the one thing to press, which is
+   * not a thing an answer should ever be, and `muted` is the quiet ink `Text`
+   * takes, where a trigger's loudness is its frame rather than its ink.
+   * `outlined` is what the unset frame already draws, so writing it would be
+   * writing the resting state out.
    *
    * **The other three fields want this too and do not have it yet.** `Input`,
    * `Textarea` and `Combobox` wear the same frame from the same shared

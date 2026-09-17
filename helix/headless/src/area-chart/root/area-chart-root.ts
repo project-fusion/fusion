@@ -138,6 +138,13 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
    *
    * Absent rather than defaulted because a reflecting property with a default
    * writes its attribute onto every host, including the ones nobody configured.
+   * The resting value therefore lives in the render, as `curve ?? 'straight'`.
+   *
+   * **`LineChart` and `Sparkline` rest at `smooth` and are not disagreeing.** A
+   * line claims a position, so the bounded invention a monotone cubic makes is
+   * a reading aid and costs nothing. A band claims an amount, and two sums
+   * smoothed independently can cross, so the same aid here draws a part as less
+   * than nothing. Same axis, different mark, different resting value.
    */
   @property({ reflect: true })
   curve?: Curve

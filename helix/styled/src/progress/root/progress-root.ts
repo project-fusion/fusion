@@ -38,8 +38,10 @@ export class HelixProgress extends HelixHeadlessProgress {
    * the loudest thing in the region. The case is a background task, which has to
    * be visible and must not compete with what the reader is actually looking at.
    *
-   * **One value and not the four.** `ghost` would leave a track with nothing in
-   * it, which is not a quiet reading but an absent one. `outlined` is the
+   * **One value of the five.** `ghost` would leave a track with nothing in
+   * it, which is not a quiet reading but an absent one. `muted` is the quiet
+   * ink `Text` takes and a bar draws a fill rather than ink, so `subtle` is the
+   * whole of what quiet means here. `outlined` is the
    * interesting refusal: `BarChart` earns it by keeping the area and fading it
    * toward the page, so an outlined column still encodes its value and stands as
    * a *different kind of fact* from the series beside it (a forecast, a target,
