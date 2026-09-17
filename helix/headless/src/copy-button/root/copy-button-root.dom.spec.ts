@@ -110,17 +110,22 @@ describe('what it says and shows', () => {
      spoken one. Letting them disagree tells a sighted reader it worked and
      leaves a screen reader user on a button that never acknowledges the press. */
   test('moves its name and its tooltip together', async () => {
+    /* Words neither property defaults to. Read against `Copy` and `Copied` this
+       passes just as well against a template holding those two literals, which
+       is the assertion-that-cannot-fail this repository keeps finding: nothing
+       in it is about `label` or `copiedLabel` at all, and a consumer's own
+       wording could stop reaching either place with the test still green. */
     clipboard('accept')
     const el = (await mount(
-      '<helix-headless-copy-button value="one"></helix-headless-copy-button>',
+      '<helix-headless-copy-button label="Take it" copied-label="Taken" value="one"></helix-headless-copy-button>',
     )) as Updatable
     const tip = el.shadowRoot?.querySelector('helix-headless-tooltip') as HTMLElement & {
       content: string
     }
     const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
-    expect([tip.content, button.getAttribute('aria-label')]).toEqual(['Copy', 'Copy'])
+    expect([tip.content, button.getAttribute('aria-label')]).toEqual(['Take it', 'Take it'])
     await press(el)
-    expect([tip.content, button.getAttribute('aria-label')]).toEqual(['Copied', 'Copied'])
+    expect([tip.content, button.getAttribute('aria-label')]).toEqual(['Taken', 'Taken'])
   })
 })
 
@@ -176,5 +181,24 @@ describe('a context that refuses the modern clipboard', () => {
     await press(el)
     expect([button.hasAttribute('data-copied'), heard]).toEqual([false, 0])
     delete (document as unknown as Record<string, unknown>).execCommand
+  })
+})
+
+describe('a copy button in a row of controls', () => {
+  test('gives up its tab stop when the row moves it, the way every other control does', async () => {
+    /* This render replaces `Button`'s rather than extending it, so the stop had
+       to be carried over by hand and was not: a toolbar wrote `focusable` here,
+       the property took the value, and the control went on holding a tab stop
+       nothing could move. Two landing places in a row that promises one, with
+       the property reading back exactly what the toolbar set. */
+    const el = (await mount(
+      '<helix-headless-copy-button value="one"></helix-headless-copy-button>',
+    )) as Updatable & { focusable: boolean }
+    const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
+    expect(button.hasAttribute('tabindex')).toBe(false)
+
+    el.focusable = false
+    await el.updateComplete
+    expect(button.getAttribute('tabindex')).toBe('-1')
   })
 })

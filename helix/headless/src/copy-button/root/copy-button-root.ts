@@ -141,12 +141,24 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   }
 
   protected override render(): TemplateResult {
+    /* `tabindex` is carried over from `Button`'s render, which this one
+       replaces. A toolbar keeps one tab stop across its children by writing
+       `focusable` onto each of them, and it writes onto whatever it holds: a
+       copy button that rendered no stop stayed at its own, so a row containing
+       one had two places the keyboard could land and the arrow keys moved
+       between the others. Nothing said so, the property reading back false
+       either way.
+
+       The rest of what `Button` renders is deliberately not carried over.
+       `aria-expanded` describes a disclosure and this is not one, and `command`
+       is sent from a click handler this component replaces with the copy. */
     return this.renderTooltip(
       html`<button
       part="button"
       type="button"
       aria-label=${this.says}
       data-copied=${this.copied ? '' : nothing}
+      tabindex=${this.focusable ? nothing : '-1'}
       ?disabled=${this.isDisabled}
       @click=${this.handleCopy}
     >
