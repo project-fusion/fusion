@@ -339,12 +339,35 @@
 
 /* Vertical: the same track turned, and the one thing it needs that the
    horizontal one does not is a height. `--carousel-block-size` is that number,
-   and 20rem is a starting point rather than a claim about anyone's slides. */
+   and 20rem is a starting point rather than a claim about anyone's slides.
+
+   **The bleed turns with it, because the axis that scrolls is the axis that
+   clips.** Above, the block padding is ordinary breathing room and the bleed is
+   inline; here the panes run down the block axis, so that is the side a slide's
+   shadow or focus ring is shaved on and the side the scroller's room has to be
+   kept on. The component agrees in the same words: `bleed` reads `paddingTop`
+   on a vertical track and `paddingLeft` on a horizontal one, and its own note
+   that the two are one length holds only while `--carousel-bleed` is unset.
+   Identical at the default, `--_carousel-bleed` falling back to the same
+   `space-md` this row was already written at.
+
+   **And `scroll-padding-block`, or snapping takes the room straight back**,
+   which is the fault the inline axis has a rule and a measurement for and this
+   one did not. A snap position aligns to the snapport, which with no
+   `scroll-padding` is the padding box, so the leading pane snaps its own edge
+   onto the clip edge. Measured in Chromium 151 on the shipped `vertical`
+   example, three slides in a 9rem track: the component scrolled to 0 and the
+   track came to rest at 16 on every position, which is the whole of the leading
+   room spent, no room above the first slide and 16px left below the last. Every
+   index change on that axis therefore issued a scroll the snap undid, and the
+   already-there arm of `scrollToIndex` could never be reached. */
 :host([orientation="vertical"]) [part="track"] {
   block-size: var(--carousel-block-size, 20rem);
   flex-direction: column;
   overflow-x: hidden;
   overflow-y: auto;
+  padding-block: var(--_carousel-bleed);
+  scroll-padding-block: var(--_carousel-bleed);
   scroll-snap-type: y mandatory;
 }
 
