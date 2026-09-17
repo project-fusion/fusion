@@ -67,7 +67,7 @@ const STACK_BELOW = 512
  * @slot start - The pane before the divider.
  *
  * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, and only where the position it is derived from stood. Cancelable: refusing it leaves the pane as it was and the divider where the gesture put it.
- * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles. Cancelable: refusing it takes the whole of where the gesture ended, so no collapse follows from it either. A drag has already drawn itself by then and holds where it was dropped until the consumer assigns their own.
+ * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and only where the gesture moved it: a press that moved nothing, a drag that came back, an arrow with nowhere left to go and a corner that moved the other divider are all silent on this one. Cancelable: refusing it takes the whole of where the gesture ended, so no collapse follows from it either. A drag has already drawn itself by then and holds where it was dropped until the consumer assigns their own.
  *
  * @csspart corner - The handle where two dividers cross, added on the client.
  * @csspart end - The box holding the second.
@@ -323,6 +323,18 @@ export class HelixHeadlessSplitter extends HelixElement {
   private opened: number | undefined = undefined
 
   /**
+   * Where the divider was when the gesture now under way began.
+   *
+   * Taken on the press, read once by `settle` and cleared there. `undefined`
+   * between gestures and for every discrete path, where nothing has been
+   * applied yet and so the position it has *is* the position it began at.
+   *
+   * Beside `opened` rather than folded into it: that one is `undefined` for a
+   * pane that starts shut, which is a different question and a real answer.
+   */
+  private began: number | undefined = undefined
+
+  /**
    * Where the gesture has moved to, whether or not it was applied. See `move`.
    *
    * `@state`, because the divider is drawn from it while a drag is under way.
@@ -565,10 +577,51 @@ export class HelixHeadlessSplitter extends HelixElement {
    * round and is coherent: the divider goes where the drag put it and the pane
    * is not declared shut. What a consumer cannot have is a pane that collapses
    * out from under a position they said no to.
+   *
+   * **A gesture that moved nothing announces nothing, and this is the one place
+   * that can say so.** A change carrying the position the divider already had
+   * rewrites a consumer's stored value from a gesture that moved nothing:
+   * harmless where the value round-trips exactly, and not where it does not,
+   * which is any consumer storing pixels and dividing by a box. The separator's
+   * `pointerup` held that as an early return of its own and was the only door
+   * with one. There are five: the separator's pointer and arrows, the corner's
+   * pointer and arrows, and a double click through `reset`, and `moveTo` is a
+   * sixth a consumer can open. Measured in Chromium 17 Sep 2026 on the built
+   * bundle, every door but the guarded one announced a move of zero: a corner
+   * press with nothing between announced on both splitters, `Home` on a divider
+   * already at its minimum announced, and a double click on one already at its
+   * default announced.
+   *
+   * **Measured against where the gesture began, and not against `position`.**
+   * `move` applies as it goes, so by the time a drag settles the position is
+   * already the number about to be announced, and comparing those two would
+   * silence every drag there is. `began` is the press; a discrete path takes
+   * none and compares against the position, which for it is the same thing.
+   *
+   * **Per divider rather than per gesture, which is the corner's question.** The
+   * corner drives two at once, so "moved nothing" cannot mean "neither moved":
+   * a drag along one axis moves one of them, and the other would be announcing
+   * a number nobody asked to change. Each settles on its own and guards on its
+   * own, so the one that moved still announces while the one that did not stays
+   * quiet. That is also why the guard cannot live in `handleCornerUp`, which
+   * only ever sees the pair.
+   *
+   * **The collapse counts as movement, because a refusal can leave the two
+   * disagreeing.** A consumer who refuses `helix-before-collapse` has a pane at
+   * the edge that is not declared shut, and a guard reading the position alone
+   * would then never offer the collapse again: `Home` is already at the
+   * minimum, so every later press is a move of zero.
    */
   private settle(next: number): void {
     const wanted = this.clamp(next)
     const shut = this.shutAt(wanted)
+    /* Cleared before anything can return, or a number left standing measures
+       the next gesture against the last one's press. */
+    const began = this.began ?? this.position
+    this.began = undefined
+    if (wanted === began && shut === this.collapsed) {
+      return
+    }
     const moved = requestChange({
       apply: (value) => {
         const previous = this.position
@@ -615,6 +668,8 @@ export class HelixHeadlessSplitter extends HelixElement {
        which on a fast gesture is immediately. */
     capturePointer(separator, event.pointerId)
     this.opened = this.collapsed ? undefined : this.position
+    // Where this gesture starts from, which is what says whether it moved. See `settle`.
+    this.began = this.position
     // Cleared, so a number from the last gesture cannot settle this one.
     this.reached = undefined
     // On the press rather than the first move, so holding it still says so too.
@@ -646,17 +701,16 @@ export class HelixHeadlessSplitter extends HelixElement {
     }
     this.origin = null
     this.dragging = false
-    /* Nothing moved, so nothing is announced. Settling on every press would
-       dispatch a change carrying the position it already had, so a plain click
-       rewrites a consumer's stored value from a gesture that moved nothing:
-       harmless where the value round-trips exactly, and not where it does not,
-       which is any consumer storing pixels and dividing by a box. */
-    if (this.reached === undefined) {
-      return
-    }
     /* `reached` is deliberately left standing. It is what the divider is drawn
-       from until the consumer answers, and the setter is what clears it. */
-    this.settle(this.reached)
+       from until the consumer answers, and the setter is what clears it.
+
+       A press with no move between has none, and a drag that came back to where
+       it started has one equal to where it started: `settle` refuses both, on
+       the one rule its docblock carries, and the corner's own release is the
+       same line for the same reason. This asked `reached === undefined` here
+       instead, which is a narrower question than the one worth asking and was
+       the only door that asked it at all. */
+    this.settle(this.reached ?? this.position)
   }
 
   /**
@@ -837,6 +891,10 @@ export class HelixHeadlessSplitter extends HelixElement {
     capturePointer(handle, event.pointerId)
     this.opened = this.collapsed ? undefined : this.position
     crossing.by.opened = crossing.by.collapsed ? undefined : crossing.by.position
+    /* One apiece, because the corner moves two dividers and either of them can
+       be the one this gesture leaves where it found it. See `settle`. */
+    this.began = this.position
+    crossing.by.began = crossing.by.position
     this.reached = undefined
     crossing.by.reached = undefined
     /* Both of them, on the press. The nested one is reachable here because it is
@@ -890,6 +948,11 @@ export class HelixHeadlessSplitter extends HelixElement {
       handle.releasePointerCapture(event.pointerId)
     }
     this.cornerOrigin = null
+    /* Both, unconditionally, and each one silent if it did not move: the corner
+       feeds `move` on every step whether or not the pointer traveled along that
+       divider's axis, so the one the gesture left alone has a `reached` too,
+       equal to the position it already had. What separates them is where each
+       began, which only `settle` is holding. */
     this.moveTo(this.reached ?? this.position, true)
     origin.by.moveTo(origin.by.reached ?? origin.by.position, true)
     this.leaveSeparator(event)
