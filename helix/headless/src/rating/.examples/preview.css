@@ -28,6 +28,12 @@ helix-headless-icon::part(svg) {
 }
 
 helix-headless-rating {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+helix-headless-rating::part(field) {
   align-items: center;
   display: inline-flex;
   gap: 0.5rem;

@@ -183,6 +183,171 @@ describe('rating', () => {
   })
 })
 
+describe('the lowest score a rating offers', () => {
+  const scoreOf = (host: HTMLElement): number => (host as HTMLElement & { score: number }).score
+
+  const scores = (host: HTMLElement): (string | undefined)[] =>
+    options(host).map((option) => option.dataset.score)
+
+  test('is where an unanswered row sits, the way an empty slider sits at its own', async () => {
+    expect(scoreOf(await rating('min="2"'))).toBe(2)
+    expect(fill(await rating('min="2"'))).toContain('--rating-full: 2')
+  })
+
+  test('and the value is still empty there, so a required rating is still missing', async () => {
+    /* The row drawing `min` is the bottom of the scale rather than an answer.
+       Reading the picture instead would call every `min="2"` rating answered
+       the moment it rendered. */
+    const host = await rating('min="2" name="score" required')
+    expect((host as HTMLElement & { value: string }).value).toBe('')
+    expect(
+      (host as unknown as { internals: ElementInternals }).internals.validity.valueMissing,
+    ).toBe(true)
+    expect(formValue(host)).toBe('')
+  })
+
+  test('is what clearing returns to, which is what the property always meant', async () => {
+    const host = (await rating('min="2" value="4"')) as HTMLElement & {
+      formResetCallback: () => void
+      updateComplete: Promise<unknown>
+    }
+    host.formResetCallback()
+    await host.updateComplete
+    expect(scoreOf(host)).toBe(2)
+  })
+
+  test('drops the steps below it and leaves the rest where they were', async () => {
+    const host = await rating('min="2"')
+    expect(scores(host)).toEqual(['2', '3', '4', '5'])
+  })
+
+  test('without moving one of them along the row, which is the stylesheet’s arithmetic', async () => {
+    /* The pitch is the whole row divided by every step, and a target sits at
+       its own place in that row. Counted off the steps left instead, dropping
+       two would widen every target and slide the row left. */
+    const host = await rating('min="2"')
+    expect(fill(host)).toContain('--rating-steps: 5')
+    expect(options(host)[0]?.getAttribute('style')).toContain('--rating-step: 2')
+  })
+
+  test('pulls a value under it up, the same clamp the top of the scale has', async () => {
+    expect(scoreOf(await rating('min="2" value="1"'))).toBe(2)
+    expect(scoreOf(await rating('min="2" value="soon"'))).toBe(2)
+  })
+
+  test('takes the tab stop with it, so the way in is a score that can be given', async () => {
+    const host = await rating('min="3"')
+    const stops = options(host).filter((option) => option.getAttribute('tabindex') === '0')
+    expect(stops.map((option) => option.dataset.score)).toEqual(['3'])
+  })
+
+  test('between two marks is a floor rather than a step', async () => {
+    /* `min="1.5"` on whole marks is a real thing to ask for: it holds the value
+       at 1.5 and offers 2 upward, 1.5 being nowhere the row can be pressed. */
+    const host = await rating('min="1.5" value="1.2"')
+    expect(scoreOf(host)).toBe(1.5)
+    expect(scores(host)).toEqual(['2', '3', '4', '5'])
+  })
+
+  describe('off the scale is refused rather than obeyed, and says so', () => {
+    const warnings = async (attrs: string): Promise<string[]> => {
+      const said: string[] = []
+      const before = console.warn
+      console.warn = (...parts: unknown[]): void => {
+        said.push(parts.join(' '))
+      }
+      try {
+        await rating(attrs)
+      } finally {
+        console.warn = before
+      }
+      return said
+    }
+
+    test('above max, which collapses the scale to its top score', async () => {
+      const host = await rating('min="9"')
+      expect(scoreOf(host)).toBe(5)
+      expect(scores(host)).toEqual(['5'])
+    })
+
+    test('below zero, there being no mark to draw for a negative score', async () => {
+      const host = await rating('min="-2"')
+      expect(scoreOf(host)).toBe(0)
+      expect(scores(host)).toEqual(['1', '2', '3', '4', '5'])
+    })
+
+    test('and anything that is not a number at all', async () => {
+      expect(scoreOf(await rating('min="soon"'))).toBe(0)
+    })
+
+    test('each of them named on the console, since the row cannot show it', async () => {
+      /* A floor above `max` leaves one score to press and a negative one draws
+         exactly like zero, so nothing on screen tells a consumer their number
+         was not taken. */
+      expect((await warnings('min="9"'))[0]).toContain('min="9"')
+      expect((await warnings('min="9"'))[0]).toContain('the lowest score it offers is 5')
+      expect((await warnings('min="-2"'))[0]).toContain('the lowest score it offers is 0')
+    })
+
+    test('and a min the marks can show says nothing at all', async () => {
+      expect(await warnings('min="2"')).toEqual([])
+      expect(await warnings('')).toEqual([])
+    })
+  })
+})
+
+describe('a rating as a field', () => {
+  /* It applies `MixinField` and called none of its render seams, so `label`,
+     `hint` and `feedback` were four rows of documented API a consumer could set
+     and never see, and a required rating computed a message with nowhere to put
+     it. */
+  test('draws the question over the marks, a row of buttons having no `for` to take', async () => {
+    const host = await rating('value="3"')
+    expect(part(host, 'label')?.textContent?.trim()).toBe('Rate this')
+  })
+
+  test('draws the help under them', async () => {
+    const host = await rating('hint="Five is best" value="3"')
+    expect(part(host, 'hint')?.textContent?.trim()).toBe('Five is best')
+  })
+
+  test('and the message in the hint’s place rather than beside it', async () => {
+    const host = await rating('feedback="Pick one" hint="Five is best" value="3"')
+    expect(part(host, 'feedback')?.textContent?.trim()).toBe('Pick one')
+    expect(part(host, 'hint')).toBeNull()
+  })
+
+  test('points the group at whichever of the two is showing', async () => {
+    // One at a time: naming both would point a screen reader at an id that
+    // renders nothing, which it reads as a description it cannot find.
+    const hinted = await rating('hint="Five is best"')
+    expect(part(hinted, 'marks')?.getAttribute('aria-describedby')).toBe('helix-hint')
+    const wrong = await rating('feedback="Pick one" hint="Five is best"')
+    expect(part(wrong, 'marks')?.getAttribute('aria-describedby')).toBe('helix-feedback')
+    expect(part(await rating(''), 'marks')?.getAttribute('aria-describedby')).toBeNull()
+  })
+
+  test('says the group is required, and not only paints the mark beside the label', async () => {
+    expect(part(await rating('required'), 'marks')?.getAttribute('aria-required')).toBe('true')
+    expect(part(await rating(''), 'marks')?.getAttribute('aria-required')).toBeNull()
+  })
+
+  test('and a readout claims none of it, an image being neither required nor described', async () => {
+    const host = await rating('readonly required value="4"')
+    expect(part(host, 'marks')?.getAttribute('aria-required')).toBeNull()
+  })
+
+  test('keeps the marks and the readout in a row of their own', async () => {
+    /* The host is the column, so a hint does not land in the middle of a line
+       of stars and a row does not stretch to hold one. */
+    const host = await rating('show-value value="3"')
+    const field = part(host, 'field') as HTMLElement
+    expect(field.contains(part(host, 'marks'))).toBe(true)
+    expect(field.contains(part(host, 'value'))).toBe(true)
+    expect(field.contains(part(host, 'label'))).toBe(false)
+  })
+})
+
 if (hasLayout()) {
   /* In a browser only. happy-dom does not assign slotted content, so
      `assignedElements` comes back empty there and `slotchange` never fires:
@@ -324,6 +489,17 @@ if (hasLayout()) {
       await send(host, 'pointerdown', center(host, 4))
       await send(host, 'pointerup', center(host, 4))
       expect(host.value).toBe('1')
+    })
+
+    /* Where a floor leaves the targets it does not drop is the styled tier's
+       question, this one having no stylesheet to lay them out with. Its own
+       spec measures it. */
+    test('a drag under the floor pins to the lowest score offered', async () => {
+      const host = (await rating('min="3" value="5"')) as Rating
+      const before = host.getBoundingClientRect().left - 200
+      await send(host, 'pointerdown', center(host, 0))
+      await send(host, 'pointerup', before)
+      expect(host.value).toBe('3')
     })
 
     test('a readout cannot be dragged, having nothing to choose', async () => {

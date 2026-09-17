@@ -39,6 +39,7 @@ import { property, state } from 'lit/decorators.js'
  * @event {Event} input - Announced once the value has moved.
  *
  * @csspart feedback - What is wrong with it.
+ * @csspart field - The row: the marks, and the score beside them.
  * @csspart fill - The filled marks, clipped to the score.
  * @csspart hint - Help under the marks, while nothing is wrong.
  * @csspart label - The question, over the marks.
@@ -50,8 +51,8 @@ import { property, state } from 'lit/decorators.js'
  *
  * @cssproperty --rating-full - How many marks are wholly filled.
  * @cssproperty --rating-part - How much of the next mark is filled, 0 to 1.
- * @cssproperty --rating-step - The width of one step, as a fraction of a mark.
- * @cssproperty --rating-steps - How many steps one mark is divided into.
+ * @cssproperty --rating-step - Which step along the row a target is, counting from one, whatever `min` leaves open.
+ * @cssproperty --rating-steps - How many steps the whole row holds, which is `max` over `step`.
  *
  * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
@@ -81,6 +82,40 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * different answers and a control that cannot express the first has to
    * pretend the second. A survey that requires an answer says so with
    * `required`, not by making one unreachable.
+   *
+   * **It is the floor of the scale, and every edge follows from that.**
+   *
+   * *Clearing* returns the row to it. An empty rating, a value nothing can
+   * parse, and a form reset with nothing declared are all the same situation,
+   * and all three draw `min` filled: at the default of zero that is the empty
+   * row this always drew, and at `min="2"` it is two marks, the way an empty
+   * `Slider` sits at its own minimum rather than at zero. The value is still
+   * `""` through all of it, so `required` still refuses it and `valueAsNumber`
+   * is still `NaN`: what the row shows is the bottom of the scale, not an
+   * answer somebody gave.
+   *
+   * *The steps* are the scores from `step` up to `max` that are not below it,
+   * so `min="2"` on five marks offers 2 to 5 and leaves the first two marks
+   * filled and unpressable. At zero nothing is dropped, which is why the
+   * default row is unchanged.
+   *
+   * *The keyboard* moves through those steps and no others. `wrap` is already
+   * false here, so arrowing down from the lowest one holds its ground rather
+   * than reaching a score this property forbids, and the tab stop an unrated
+   * rating carries sits on the lowest score offered rather than on the first
+   * mark.
+   *
+   * *A `min` between two steps* is a floor and not a step: `min="1.5"` with
+   * whole marks clamps the value at 1.5 and offers 2 upward, since 1.5 is not
+   * somewhere the row can be pressed. That is a real thing to ask for and is
+   * left to mean what it says.
+   *
+   * *A `min` outside the marks is refused rather than obeyed*, and says so
+   * once on the console. Below zero and anything that is not a number are read
+   * as zero, there being no mark to draw for a negative score; above `max` is
+   * read as `max`, which collapses the scale to its top score rather than
+   * leaving a rating with nothing to press. A property that silently accepts
+   * nonsense is the fault this pays off, so neither case is quietly ignored.
    */
   @property({ type: Number })
   min = 0
@@ -167,19 +202,47 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     wrap: false,
   })
 
+  /**
+   * The floor the row actually uses, which is `min` where `min` is one.
+   *
+   * Between zero and `max`, and zero for anything that is not a number, per
+   * the note on `min`. Derived on read rather than corrected into the property,
+   * so `rating.min` still reports what the consumer set and the warning below
+   * can tell the two apart.
+   */
+  private get floor(): number {
+    if (!Number.isFinite(this.min)) {
+      return 0
+    }
+    return Math.min(Math.max(this.min, 0), Math.max(this.max, 0))
+  }
+
   /** The score, as a number, clamped to what the marks can show. */
   get score(): number {
     const parsed = Number.parseFloat(this.value)
     if (!Number.isFinite(parsed)) {
-      return 0
+      return this.floor
     }
-    return Math.min(Math.max(parsed, 0), this.max)
+    return Math.min(Math.max(parsed, this.floor), this.max)
   }
 
-  /** Every score a reader can choose, which is `max / step` of them. */
-  private get steps(): number[] {
+  /**
+   * Every score the marks can show, which is `max / step` of them.
+   *
+   * The whole row rather than the part `min` leaves open, because this is what
+   * the stylesheet lays the targets out against: `--rating-steps` is the pitch
+   * and a step's own place in this list is where it sits along the row. Counted
+   * from the part a reader can press instead, a floor above zero would widen
+   * every target and slide the row left.
+   */
+  private get positions(): number[] {
     const count = Math.max(1, Math.round(this.max / this.step))
     return Array.from({ length: count }, (_, index) => Number(((index + 1) * this.step).toFixed(2)))
+  }
+
+  /** Every score a reader can choose, which is the positions `min` leaves open. */
+  private get steps(): number[] {
+    return this.positions.filter((score) => score >= this.floor)
   }
 
   /**
@@ -334,10 +397,12 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * form holding an unrated required rating submits, `:valid` true and the
    * entry present but empty. `reportRequired` is what makes the property real.
    *
-   * **Empty is `value === ''` rather than a score of zero**, because zero is a
-   * rating a reader can deliberately give when `min` allows it, and refusing to
-   * submit it would be the control disagreeing with the property that permits
-   * it. What `required` asks is whether they answered at all.
+   * **Empty is `value === ''` rather than a score at the floor**, and the two
+   * are not the same thing: an unanswered row draws `min`, per the note on that
+   * property, so a control that read its own picture would call every rating
+   * with `min="2"` answered the moment it rendered. What `required` asks is
+   * whether the reader answered at all, which only the value knows. A consumer
+   * who writes `value="0"` has answered, and is not refused.
    *
    * `Slider` is deliberately not given the same treatment: a native
    * `<input type="range" required>` is always valid, because a range always
@@ -375,11 +440,27 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     this.removeEventListener('pointerleave', this.handleLeave)
   }
 
+  /** Whether the console has already been told about a `min` off the scale. */
+  private warned = false
+
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     // Every update, not only the ones that name `value`: see the note on
     // `ColorInput.updated`.
     this.sync()
+    /* Said once, and said because the alternative is a property that quietly
+       does something other than what it says. Both refusals are recoverable and
+       neither is guessable from the row: a floor above `max` leaves one score
+       to press and a negative one draws exactly like zero, so nothing on screen
+       tells the consumer their number was not taken. */
+    if (this.floor !== this.min && !this.warned) {
+      this.warned = true
+      console.warn(
+        `<${this.localName}> has min="${this.min}", which is not a score between 0 and its max of ` +
+          `${this.max}, so the lowest score it offers is ${this.floor}. Put min inside the marks, ` +
+          'or move max.',
+      )
+    }
   }
 
   /* The first shape from the children, before the render that clones it. The
@@ -419,12 +500,31 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     const marksIn = (layer: string): unknown =>
       Array.from({ length: count }, (_, index) => mark(layer, index))
 
-    return html`<div
+    /* A group label and not `renderLabel`, which writes `<label for="control">`
+       and would name an id nothing here renders: the control is a row of
+       buttons rather than one field. `Radio.Group` is the same shape and takes
+       the same seam.
+
+       **The row is wrapped, and the host is the stack.** This is the one field
+       in the library whose control is genuinely inline, so the layout question
+       is where the question and the message go: beside the marks would put a
+       hint in the middle of a line of stars, and a row that stretched to hold
+       one would stop a rating sitting in a sentence. So the marks and the
+       readout keep their row, in `field`, and the host becomes the column every
+       other field already is, which is what `field-stacked.css` in the styled
+       tier dresses. `inline-flex` on that column, not `flex`: a rating goes in
+       a product card and a table cell, and a block one would take the width of
+       whatever holds it. */
+    return html`${this.renderGroupLabel()}
+    <div part="field">
+    <div
       part="marks"
       role=${this.readOnly ? 'img' : 'radiogroup'}
       aria-label=${this.readOnly ? said : this.label || nothing}
+      aria-describedby=${this.describedBy ?? nothing}
+      aria-required=${this.required && !this.readOnly ? 'true' : nothing}
       data-slotted=${this.markSource ? '' : nothing}
-      style=${`--rating-full: ${Math.floor(showing)}; --rating-part: ${showing - Math.floor(showing)}; --rating-steps: ${this.steps.length}`}
+      style=${`--rating-full: ${Math.floor(showing)}; --rating-part: ${showing - Math.floor(showing)}; --rating-steps: ${this.positions.length}`}
       @pointercancel=${this.handleDragCancel}
       @pointerdown=${this.handleDragStart}
       @pointermove=${this.handleDragMove}
@@ -450,8 +550,14 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
       ${
         this.readOnly
           ? nothing
-          : this.steps.map(
-              (score, index) => html`<button
+          : /* Walked over every position and skipped below the floor, rather
+               than mapped over the open ones: the index is the step's place
+               along the whole row, and `min` must drop a target without moving
+               the ones left. See `positions`. */
+            this.positions.map((score, index) =>
+              score < this.floor
+                ? nothing
+                : html`<button
                 part="option"
                 role="radio"
                 type="button"
@@ -461,7 +567,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
                 style=${`--rating-step: ${index + 1}`}
                 ?disabled=${this.isDisabled}
                 tabindex=${
-                  this.score === score || (this.score === 0 && score === first) ? '0' : '-1'
+                  this.score === score || (this.score === this.floor && score === first)
+                    ? '0'
+                    : '-1'
                 }
                 @click=${this.handleOptionClick}
                 @pointerenter=${this.handleOptionEnter}
@@ -477,7 +585,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
           >${showing}</span
         >`
         : nothing
-    }`
+    }
+    </div>
+    ${this.renderHint()}${this.renderFeedback()}`
   }
 
   /**

@@ -2,6 +2,8 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessRating } from '@fusion.dev/helix-headless/rating'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './rating-root.css.js'
 
 /**
@@ -28,7 +30,7 @@ import { styles } from './rating-root.css.js'
  */
 @customElement('helix-rating')
 export class HelixRating extends HelixHeadlessRating {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 
   /**
    * Which mark the row is drawn with.

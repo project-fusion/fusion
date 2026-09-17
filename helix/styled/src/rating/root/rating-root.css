@@ -6,6 +6,19 @@
   --_rating-mark-size: var(--rating-size, var(--helix-size-icon-md));
   --_rating-mark-gap: var(--rating-gap, var(--helix-space-2xs));
 
+  /* The stack every other field is, and `inline-flex` rather than `flex`: a
+     rating goes in a product card, a table cell and a line of prose, and a
+     block one would take the width of whatever holds it. The row it used to be
+     is `field` below. */
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+/* The control itself: the marks, and the score beside them when there is one.
+   The gap here is the one that was on the host, so a row with no label and no
+   hint draws exactly as it did. */
+[part="field"] {
   align-items: center;
   display: inline-flex;
   gap: var(--rating-gap, var(--helix-space-xs));
@@ -104,6 +117,13 @@
  * early so it is centered on its mark rather than drifting right along the row.
  * The two half-gaps hanging off the ends are deliberate: the alternative is
  * dead pixels between the marks, and a rating that ignores a press.
+ *
+ * **Both numbers are about the whole row, not about the steps on offer.**
+ * `--rating-steps` counts every step `max` and `step` produce and
+ * `--rating-step` is a target's own place among them, so a `min` that drops the
+ * low ones takes those targets away and leaves the rest exactly where they
+ * were. Counted off what is left instead, a floor would widen every target and
+ * slide the row left.
  */
 [part="option"] {
   --_rating-pitch: calc((100% + var(--_rating-mark-gap)) / var(--rating-steps, 1));
