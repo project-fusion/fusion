@@ -328,6 +328,39 @@ fn axes() {
     );
 }
 
+/// The manifest carries the annotation the author wrote, so a union behind a
+/// name reaches the rule as one identifier and the values are in the source.
+/// The alias is planted rather than the manifest: the point is that editing the
+/// union alone, with nothing in the manifest moving, is what has to be seen.
+#[test]
+fn axes_behind_an_alias() {
+    let alias = |values: &str| format!("export type BadgeTone = {values}\n");
+    plant_in(
+        "axes-alias",
+        "axes",
+        &[
+            ("helix.json", STYLED),
+            (
+                "packages/styled/src/badge/badge.ts",
+                &alias("'primary' | 'neutral'"),
+            ),
+            (
+                "packages/styled/custom-elements.json",
+                r#"{ "modules": [ { "path": "src/badge/badge.ts", "declarations": [
+  { "tagName": "helix-badge", "attributes": [ { "name": "tone", "type": { "text": "BadgeTone" } } ] } ] } ] }"#,
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "packages/styled/src/badge/badge.ts",
+                &alias("'primary' | 'loud'"),
+            );
+        },
+        "`helix-badge` gives `tone` the value `loud`, which the axis does not have",
+        "badge",
+    );
+}
+
 /// The event class's closing brace has to sit in column 0, which is what the
 /// class pattern keys on.
 #[test]

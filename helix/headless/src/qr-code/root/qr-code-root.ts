@@ -163,18 +163,20 @@ export class HelixHeadlessQrCode extends HelixElement {
   /**
    * How the modules are drawn.
    *
-   * `square` is the default and the only one that joins runs of adjacent
-   * modules into a single subpath, which is what keeps a thousand modules to a
-   * handful of nodes. `rounded` and `dots` draw each module on its own, because
-   * the corners are the thing being drawn and a joined run has none in the
-   * middle. That cost is paid only by a code that asks for them.
+   * `square` is the resting state and is written by not writing it, per the
+   * rule that a reflected property takes no default. It is also the only one
+   * that joins runs of adjacent modules into a single subpath, which is what
+   * keeps a thousand modules to a handful of nodes. `rounded` and `dots` draw
+   * each module on its own, because the corners are the thing being drawn and a
+   * joined run has none in the middle. That cost is paid only by a code that
+   * asks for them.
    *
    * A scanner reads contrast between cells, not their shape, so all three
    * scan. `dots` sits a little under half a module so neighbors do not touch,
    * which is what makes it read as dots rather than as a softened square code.
    */
-  @property()
-  shape: QrStyle = 'square'
+  @property({ reflect: true })
+  shape?: QrStyle
 
   /**
    * What the code encodes, which is usually a URL.
@@ -239,7 +241,7 @@ export class HelixHeadlessQrCode extends HelixElement {
     >
       <path
         part="modules"
-        d=${pathFor(result.data, this.shape, 'body')}
+        d=${pathFor(result.data, this.shape ?? 'square', 'body')}
         transform="translate(${quiet} ${quiet})"
         fill="currentColor"
       />

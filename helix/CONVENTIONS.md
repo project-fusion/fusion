@@ -670,8 +670,8 @@ declared in `helix/cli/src/component/axes.rs`, which is the registry:
 | `nesting` | `heading` `peer` `subordinate` |
 | `separation` | `elevated` `filled` `outlined` `plain` |
 | `shape` | `arc` `circle` `dots` `ring` `rounded` `square` `text` |
-| `tone` | `accent` `danger` `info` `neutral` `primary` `success` `surface` `warning` |
-| `width` | `auto` `full` `standard` |
+| `tone` | `accent` `danger` `info` `neutral` `primary` `success` `warning` |
+| `width` | `auto` `full` |
 
 **Weight is emphasis and meaning is tone**, and `Text` was the last to mix them:
 `muted` and `subtle` were tones there, which made a quiet danger unsayable. On

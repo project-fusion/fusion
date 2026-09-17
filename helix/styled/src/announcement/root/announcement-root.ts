@@ -30,10 +30,9 @@ export class HelixAnnouncement extends HelixHeadlessAnnouncement {
    * it up to the surface step, for a band that reads as part of the furniture
    * rather than as a slot cut into it.
    *
-   * **This was `tone="surface"`**, which put an elevation on the axis that says
-   * what a thing means. The band's own doc admitted it, calling `surface` the
-   * one value that was not a color. A band can be `info` and elevated at the
-   * same time, and two values that can both be true are two axes.
+   * **`separation` and not `tone`, because a rung is not a meaning.** A band
+   * can be `info` and elevated at the same time, and two values that can both
+   * be true are two axes, which is the test the registry answers to.
    *
    * Styled and not headless, because a rung of a ladder is paint: the headless
    * tier has no stylesheet to sit a band on. `tone` crosses because meaning
