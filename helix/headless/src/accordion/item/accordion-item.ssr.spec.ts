@@ -42,8 +42,8 @@ describe('accordion server output', () => {
        accessibility tree and off the tab order while leaving every pixel of it
        on screen. Without it a consumer bringing their own CSS gets two sections
        permanently open under a trigger reporting `aria-expanded="false"`: the
-       collapse lives in the styled tier's `grid-template-rows`, which hides
-       things as a side effect of an animation.
+       collapse lives in a sheet's `grid-template-rows`, which hides things as a
+       side effect of an animation.
 
        Asserted on the part's own tag rather than on the markup, because the
        inlined stylesheet names both attributes and `toContain` would pass on a

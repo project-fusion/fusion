@@ -195,25 +195,25 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * pixel of it on the screen, so a consumer taking this tier gets sections of
    * text permanently open under a trigger saying `aria-expanded="false"`, and a
    * sighted reader sees content a screen reader is told is not there. Leaving
-   * the collapse to the styled tier's `grid-template-rows: 0fr` puts the state
-   * in a stylesheet, where only one of the two tiers has it.
+   * the collapse to a `grid-template-rows: 0fr` puts the state in a stylesheet,
+   * where only the consumers who load that sheet have it.
    *
-   * **`hidden` costs the styled tier nothing**, which is what makes this the
-   * cheap fix rather than a trade. The UA sheet hides `[hidden]` from the UA
-   * origin, and `accordion-item.css` already sets `display: grid` on this part
-   * unconditionally, so the author rule wins and the 0fr transition runs
-   * exactly as before. Measured on both tiers.
+   * **`hidden` costs a sheet that animates this region nothing**, which is what
+   * makes this the cheap fix rather than a trade. The UA sheet hides `[hidden]`
+   * from the UA origin, so any author rule already setting `display` on this
+   * part outranks it and the transition runs exactly as before. Measured on
+   * both tiers.
    *
    * **Not `hidden="until-found"`**, which would be the better accordion and is
    * a different piece of work. It hides through `content-visibility` rather
-   * than `display`, so the styled tier's `display: grid` would no longer
-   * override it and a collapsed section would animate open to nothing. It also
-   * needs a `beforematch` handler to set `open`, or find-in-page reveals text
-   * while the trigger still reports collapsed.
+   * than `display`, which an author `display` does not override, so a collapsed
+   * section a sheet animates would open to nothing. It also needs a
+   * `beforematch` handler to set `open`, or find-in-page reveals text while the
+   * trigger still reports collapsed.
    *
    * `inert` stays. `hidden` answers the reader who can see and `inert` answers
-   * the one tabbing through, and in the styled tier, where `display` is
-   * overridden, `inert` is the only one of the two still in force.
+   * the one tabbing through, and wherever a sheet overrides `display`, `inert`
+   * is the only one of the two still in force.
    */
   protected override render(): TemplateResult {
     const open = this.open

@@ -54,10 +54,10 @@ export class HelixHeadlessList extends HelixElement {
   /**
    * Which markers an ordered list draws, in `<ol type>`'s own five values.
    *
-   * Reflected, because this is one of the things a stylesheet selects on and
-   * the styled tier maps each to a `list-style-type`. The platform's spellings
-   * rather than the CSS ones, so `<helix-list kind="ordered" type="i">` is what
-   * a consumer would have written on an `<ol>`.
+   * Reflected, because this is one of the things a stylesheet selects on, each
+   * value mapping to a `list-style-type`. The platform's spellings rather than
+   * the CSS ones, so `<helix-headless-list kind="ordered" type="i">` is what a
+   * consumer would have written on an `<ol>`.
    *
    * **`start` and `reversed` are both absent and neither can be done here.**
    * This renders no `<ol>`: the rows are slotted and numbered by the CSS

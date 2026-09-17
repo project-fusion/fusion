@@ -70,10 +70,9 @@ describe('table column server output', () => {
 
   test('the track list a server can send is the one that needs no children', () => {
     /* `columns` is an attribute, so the grid is laid out in the first paint.
-       The assertion this replaces read `--table-columns`, which is the hook the
-       styled sheet offers and a name this element has never written: it could
-       not have failed, and the claim it carried, that no track list is served,
-       stopped being true when `columns` began sizing a declared column. */
+       The assertion names `--table-template`, which is what this element
+       writes: a name it never writes could not fail here whatever the render
+       held. */
     expect(
       partTag(
         ssr(html`<helix-headless-table columns="10rem 1fr" label="T"></helix-headless-table>`),

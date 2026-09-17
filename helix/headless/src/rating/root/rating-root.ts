@@ -511,8 +511,8 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
        hint in the middle of a line of stars, and a row that stretched to hold
        one would stop a rating sitting in a sentence. So the marks and the
        readout keep their row, in `field`, and the host becomes the column every
-       other field already is, which is what `field-stacked.css` in the styled
-       tier dresses. `inline-flex` on that column, not `flex`: a rating goes in
+       other field already is, so a sheet dresses it the way it dresses
+       them. `inline-flex` on that column, not `flex`: a rating goes in
        a product card and a table cell, and a block one would take the width of
        whatever holds it. */
     return html`${this.renderGroupLabel()}

@@ -5,10 +5,10 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @summary One row of a table.
  *
  * @description
- * `display: contents` in the styled tier, so the row's cells become items of
- * the table's own grid and every column lines up across every row. The row
- * still exists as an element, which is what a `<table>` gives away when its
- * cells are laid out by the table algorithm.
+ * The row renders its cells straight through and lays out none of them, so a
+ * sheet can take them into the table's own grid and every column lines up
+ * across every row. The row still exists as an element, which is what a
+ * `<table>` gives away when its cells are laid out by the table algorithm.
  *
  * @since 0.1.0
  * @status stable

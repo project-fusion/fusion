@@ -68,8 +68,8 @@ export class HelixHeadlessNavigation extends HelixElement {
      * arrive unstyled and restyle itself a frame later, and a React consumer
      * who wrote the attribute themselves gets `data-navigation-item="true"`
      * from JSX, which overwriting reports as a hydration mismatch. The base
-     * layer selects `helix-navigation a`, so the styling is true the moment the
-     * markup is parsed, on the server and on the client. */
+     * layer selects the links through the host instead, so the styling is true
+     * the moment the markup is parsed, on the server and on the client. */
     this.indicator.place()
 
     // Client-side routing changes `aria-current` in place rather than

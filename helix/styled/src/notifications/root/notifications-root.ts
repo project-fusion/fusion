@@ -24,7 +24,7 @@ import '../notification/notification.js'
  * @category feedback
  * @documentation https://fusion.dev/helix/components/notifications
  *
- * @slot - The notifications, as `helix-notification` children.
+ * @slot - The notifications.
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
  *

@@ -949,11 +949,11 @@ export class HelixHeadlessVideo extends HelixElement {
      * every call.
      *
      * So these three were sending `bubbles: true` into the one branch that
-     * refuses to bind, and `onPlay`, `onPause` and `onEnded` on `<helix-video>`
-     * were silent in React. The comment beside `reactPropFor` named this exact
-     * trio as fixed while this line kept it broken. Matching the platform's own
-     * propagation fixes it and is what `Image` already does with `load` and
-     * `error`. */
+     * refuses to bind, and `onPlay`, `onPause` and `onEnded` on
+     * `<helix-headless-video>` were silent in React. The comment beside
+     * `reactPropFor` named this exact trio as fixed while this line kept it
+     * broken. Matching the platform's own propagation fixes it and is what
+     * `Image` already does with `load` and `error`. */
     this.dispatchEvent(new Event(event.type, { bubbles: false, composed: false }))
   }
 
@@ -1587,7 +1587,7 @@ export class HelixHeadlessVideo extends HelixElement {
       ${
         /* Whatever else belongs on this bar, put here by whoever knows.
            A playlist's dropdown is the case this was written for and the video
-           deliberately knows nothing about it: `helix-video-playlist` renders a
+           deliberately knows nothing about it: `VideoPlaylist` renders a
            menu of its own entries into this slot, so the popover machinery and
            the notion of a set of clips both stay in the component that is about
            a set of clips. Before fullscreen, which is always the last thing on

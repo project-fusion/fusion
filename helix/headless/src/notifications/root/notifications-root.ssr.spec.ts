@@ -13,9 +13,9 @@ import '../index.js'
 /**
  * The server output.
  *
- * **The items are markup, so unlike `helix-data-table` this family serves its
- * content in full**, which is the compensation for not being able to window it:
- * a consumer writes the notifications out and a crawler and a reader on a slow
+ * **The items are markup, so unlike `DataTable` this family serves its content
+ * in full**, which is the compensation for not being able to window it: a
+ * consumer writes the notifications out and a crawler and a reader on a slow
  * connection both get them.
  *
  * What the server cannot do is count them. `children` is undefined under Lit's
@@ -62,7 +62,7 @@ describe('notifications server output', () => {
     /* Asserting the two sentences against the whole document said nothing: they
        are the consumer's own children, in the markup whether this element
        projects them or drops them on the floor. The difference between markup
-       children and `helix-data-table`'s rows is the slot inside the list, which
+       children and `DataTable`'s rows is the slot inside the list, which
        is what a render with no children shows. */
     expect(
       rendered(

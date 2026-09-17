@@ -46,11 +46,11 @@ export class HelixHeadlessBlockquote extends HelixElement {
    * rendered, which React reports on hydration.
    */
   private markEmpty(): void {
-    /* `hidden` beside the mirror, because `data-empty` is a hook the styled
-       sheet reads and this tier has no sheet: an empty region left in the box
-       tree is a gap a consumer cannot close without knowing to look for it. The
-       styled rule stays, because that sheet sets `display` on this part and so
-       outranks the UA one. */
+    /* `hidden` beside the mirror, because `data-empty` is the hook a sheet
+       selects on and this tier ships none: an empty region left in the box tree
+       is a gap a consumer cannot close without knowing to look for it. Both
+       stay, since `[hidden]` is a UA rule and a sheet setting `display` on this
+       part outranks it. */
     markRegion(this.renderRoot, 'attribution', ['attribution'])
   }
 

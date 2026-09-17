@@ -788,7 +788,7 @@ export class HelixHeadlessListbox extends MixinCollection(
        Both halves fail: focus on the list means moving chooses, so a single
        press commits a value the reader was arrowing past, and the original
        press goes on bubbling to the same host handler the re-dispatch already
-       reached. Measured on a bare `<helix-listbox filterable>`, one Down
+       reached. Measured on a bare `<helix-headless-listbox filterable>`, one Down
        produced two `helix-change` events and a highlight two rows down.
 
        `stopPropagation` is what closes the second half: the field handled the

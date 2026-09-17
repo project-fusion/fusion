@@ -62,12 +62,12 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   /**
    * Where the crumb goes, and nothing where it is the current page.
    *
-   * **Optional and reflected, because a stylesheet does select on it.**
-   * `breadcrumb.css` writes `:host(:not([href])) [part="link"]` to take the
-   * block padding off a crumb that is not a link, so the attribute is what
-   * decides how tall a crumb is. Unreflected, an `href` set from script reached
-   * the property, rendered the anchor, and left the host looking unlinked: the
-   * crumb drew at 20px where a markup twin drew at 28.
+   * **Optional and reflected, because a stylesheet does select on it.** A sheet
+   * writes `:host(:not([href])) [part="link"]` to take the block padding off a
+   * crumb that is not a link, so the attribute is what decides how tall a crumb
+   * is. Unreflected, an `href` set from script reached the property, rendered
+   * the anchor, and left the host looking unlinked: the crumb drew at 20px
+   * where a markup twin drew at 28.
    *
    * Optional rather than defaulted, which is the general rule that a reflected
    * property takes no default: an `href` written onto every host would be a link

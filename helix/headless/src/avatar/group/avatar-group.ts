@@ -3,13 +3,13 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * The largest `max` the styled tier can hide past.
+ * The largest `max` a stylesheet can hide past.
  *
  * The fold is `:host([max="N"]) ::slotted(:nth-child(n + N+1))`, one selector
  * per value, because `An+B` takes a literal and no custom property can be read
- * into it. So the range is finite and this is where it is written down, in the
- * tier that has to agree with it: a count that folds and a stylesheet that does
- * not would put a "+5" beside five avatars that are still on screen.
+ * into it. So the range is finite, and it is written down beside the count that
+ * has to agree with it: a count that folds and a stylesheet that does not would
+ * put a "+5" beside five avatars that are still on screen.
  */
 export const FOLDS_UP_TO = 12
 
@@ -51,13 +51,13 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
    * Unset shows all of them, which is what no limit means and is more useful
    * than refusing to render.
    *
-   * **Reflected, because the fold is a stylesheet rule and nothing else.** The
-   * styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
-   * so the attribute *is* the mechanism: a `max` that reaches this property and
-   * never reaches the host matches no rule, and every avatar is drawn beside a
-   * count claiming some are hidden. Markup is the safe path and hides the fault;
-   * a script is the broken one, and React takes it for everyone, assigning a
-   * matching property rather than an attribute.
+   * **Reflected, because the fold is a stylesheet rule and nothing else.** A
+   * sheet hides past the limit one selector per value, as `FOLDS_UP_TO`
+   * describes, so the attribute *is* the mechanism: a `max` that reaches this
+   * property and never reaches the host matches no rule, and every avatar is
+   * drawn beside a count claiming some are hidden. Markup is the safe path and
+   * hides the fault; a script is the broken one, and React takes it for
+   * everyone, assigning a matching property rather than an attribute.
    *
    * **Optional rather than defaulted, per the rule that a reflected property
    * takes no default**: `max = 0` would stamp `max="0"` onto every host that

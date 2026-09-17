@@ -13,9 +13,9 @@ import '../../button/index.js'
  *
  * @description
  * **The name is a button, and only the name.** The marker is `aria-hidden`
- * decoration, so wrapping it would add hit area and no meaning. It is
- * `helix-button` rather than a `<button>` this element resets: the hover wash,
- * the focus ring and the disabled treatment are decisions the button carries.
+ * decoration, so wrapping it would add hit area and no meaning. It is `Button`
+ * rather than a `<button>` this element resets: the hover wash, the focus ring
+ * and the disabled treatment are decisions the button carries.
  *
  * **It says nothing about where a reader may go.** Every step is pressable and
  * announces itself with `helix-select`; refusing the ones ahead is `disabled`,
@@ -34,7 +34,7 @@ import '../../button/index.js'
  * @documentation https://fusion.dev/helix/components/steps
  *
  * @slot - The step's name.
- * @slot content - What the stage holds. Always rendered here, a tier with no stylesheet having nothing to fold it with; the styled tier opens it on the current step down a column, and a row has no space under a step to open it into.
+ * @slot content - What the stage holds. Always rendered here, a tier with no stylesheet having nothing to fold it with, so whether it is folded away is the sheet's answer and not this tier's.
  * @slot description - A line under the name, for what the stage is for.
  * @slot marker - Replaces the number, or the check a complete step shows.
  *
@@ -43,7 +43,7 @@ import '../../button/index.js'
  * @csspart body - The name and its description.
  * @csspart content - What the stage holds, while it is open.
  * @csspart description - The line under it.
- * @csspart label - The step's name, which is a `helix-button`.
+ * @csspart label - The step's name, which is a control.
  * @csspart label-button - The inner control.
  * @csspart lead - The half line arriving from the step before.
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.

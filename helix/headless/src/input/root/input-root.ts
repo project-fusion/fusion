@@ -136,10 +136,10 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * **The attribute is `readonly`, which is the platform's spelling.** A
    * camelCase property needs an explicit `attribute`, and dash-casing a word
    * HTML writes as one costs what an attribute always costs here: nothing
-   * warns. `<helix-input readonly>` is what anybody who has written HTML types;
-   * against `read-only` it parses to no property at all, and the field stays
-   * editable with no error anywhere. Measured on the dash-cased form, `readOnly`
-   * came back `false`.
+   * warns. `<helix-headless-input readonly>` is what anybody who has written
+   * HTML types; against `read-only` it parses to no property at all, and the
+   * field stays editable with no error anywhere. Measured on the dash-cased
+   * form, `readOnly` came back `false`.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
@@ -378,9 +378,9 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    *
    * **Not reflected.** Reflection exists so a selector can reach a value, and
    * no stylesheet in this repository selects on `type`. Reflecting it writes
-   * `type="text"` onto every `<helix-input>` ever rendered, an attribute no
-   * consumer's markup has, which is the fault the area rules write up under
-   * `Button`'s `href`, `target` and `rel`.
+   * `type="text"` onto every `<helix-headless-input>` ever rendered, an
+   * attribute no consumer's markup has, which is the fault the area rules write
+   * up under `Button`'s `href`, `target` and `rel`.
    *
    * Nothing reads it from the attribute either. The real `<input>` inside takes
    * it as a property binding, which is what makes the keyboard and the

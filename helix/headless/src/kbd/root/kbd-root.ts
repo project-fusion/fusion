@@ -228,7 +228,7 @@ export class HelixHeadlessKbd extends HelixElement {
        inside the control the badge sits in, and the guard would make a bare
        printable chord unreachable there by construction: the two are mutually
        exclusive. `.examples/events.html` is exactly that shape, a `keys="/"`
-       slotted into a `helix-input` telling the reader to put the cursor in the
+       slotted into a `Input` telling the reader to put the cursor in the
        field and press slash, and it would have shipped to the docs site doing
        nothing. What is ambiguous is `/` competing with every field on the page,
        which is the `document` case and the only one this refuses. */

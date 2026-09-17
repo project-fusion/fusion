@@ -114,11 +114,11 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * round. The platform already writes booleans like this for the same reason,
    * `novalidate` and `nomodule` and `noreferrer` among them.
    *
-   * **Reflected, because the gutter is a stylesheet rule.** `code-block.css`
-   * reserves the copy button's width with `:host(:not([no-copy]))`, so the
-   * attribute is what decides whether the block pays for a control. Unreflected,
-   * setting it from script takes the button away (`render` reads the property)
-   * and leaves the 40px it stood in reserved.
+   * **Reflected, because the gutter is a stylesheet rule.** A sheet reserves
+   * the copy button's width with `:host(:not([no-copy]))`, so the attribute is
+   * what decides whether the block pays for a control. Unreflected, setting it
+   * from script takes the button away (`render` reads the property) and leaves
+   * the 40px it stood in reserved.
    *
    * A false boolean reflects as the attribute's absence, so this costs no
    * `no-copy=""` on hosts that never asked for one, and the rule about a

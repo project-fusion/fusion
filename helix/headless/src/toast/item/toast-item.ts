@@ -213,7 +213,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
        from. `data-closed` can never be mistaken for a declaration. */
     /* **`data-closed`, because open is the resting state.** A toast opens by
        default, so a `data-open` would appear on a consumer's server-rendered
-       `<helix-toast-item>` without React having sent it. Inverting keeps the
+       `<helix-headless-toast-item>` without React having sent it. Inverting keeps the
        `data-` hook for the headless consumer this publishes it for, and moves
        the write to the side that only happens after somebody dismisses the
        message, which is long past hydration. */

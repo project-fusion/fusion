@@ -141,10 +141,10 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * marked letters wants `text`, which judges nothing.
    *
    * **Not reflected**: nothing selects on it, so reflecting only writes
-   * `type="numeric"` onto every `<helix-pin-input>` ever rendered, an attribute
-   * no consumer's markup had. The area rules carry the sentence "reflect only
-   * what CSS selects on". The real inputs take it as a binding, which is what
-   * makes the keyboard follow.
+   * `type="numeric"` onto every `<helix-headless-pin-input>` ever rendered, an
+   * attribute no consumer's markup had. The area rules carry the sentence
+   * "reflect only what CSS selects on". The real inputs take it as a binding,
+   * which is what makes the keyboard follow.
    */
   @property()
   type: PinType = 'numeric'

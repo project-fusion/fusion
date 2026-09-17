@@ -138,8 +138,8 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
    * pixels of nothing after it. The input answers this by not rendering the
    * element, which cannot work here, because a checkbox is named by its own
    * content and the property is only that slot's fallback. Gating on the
-   * property would unlabel every `<helix-checkbox>Text</helix-checkbox>` ever
-   * written.
+   * property would unlabel every
+   * `<helix-headless-checkbox>Text</helix-headless-checkbox>` ever written.
    *
    * So the slot is asked instead, the same way `Tooltip` asks its own: with
    * `flatten`, because here the fallback counts, being where the property

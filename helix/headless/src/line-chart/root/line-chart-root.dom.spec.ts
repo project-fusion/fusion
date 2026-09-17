@@ -79,8 +79,8 @@ const termini = (host: HTMLElement): Element[] => [
  *
  * **One per series rather than one per chart**, which is the difference from
  * `Sparkline` and the whole of why the shared sheet needed a second reader: the
- * shapes are `chart/terminus.css` either way, and only the count and the color
- * are this component's.
+ * shapes are the same sheet's either way, and only the count and the color are
+ * this component's.
  */
 describe('termini', () => {
   test('one per series, absent meaning a dot', async () => {

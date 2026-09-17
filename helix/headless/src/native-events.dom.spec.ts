@@ -5,13 +5,13 @@ import { mount, registerDom, settle } from '@fusion.dev/helix-testing/dom'
  * One change, one pair of native announcements, however many elements are inside.
  *
  * **A composed control announces twice unless it stops its child.** A
- * `<helix-select>` renders a `<helix-listbox>`: the listbox dispatches `input`
- * and `change` from its own host, `input` is composed by specification, and the
- * pair crosses the select's shadow boundary to arrive beside the select's own.
- * Measured on the styled tier before the fix, one choice made on the inner
- * listbox produced `input` twice and `change` three times. The prefixed request
- * never had this, every one of those components already stopping the child's
- * `helix-before-change` and speaking for itself.
+ * `<helix-headless-select>` renders a `<helix-headless-listbox>`: the listbox
+ * dispatches `input` and `change` from its own host, `input` is composed by
+ * specification, and the pair crosses the select's shadow boundary to arrive
+ * beside the select's own. Measured on the styled tier before the fix, one
+ * choice made on the inner listbox produced `input` twice and `change` three
+ * times. The prefixed request never had this, every one of those components
+ * already stopping the child's `helix-before-change` and speaking for itself.
  *
  * Across families rather than in each family's own file, because what is being
  * asserted is a property of the composition and the bug was invisible from
@@ -203,7 +203,7 @@ describe('a control that renders a native control', () => {
      leaves the shadow root.** Every form control here renders a real `<input>`
      or `<textarea>` and announces `input` from the host beside it, so one
      keystroke reaches a consumer twice and one of the two carries the value from
-     before the change. Measured in Chrome 148 on `<helix-checkbox>`: `input`
+     before the change. Measured in Chrome 148 on `<helix-headless-checkbox>`: `input`
      from the inner control with `checked` still false, then
      `helix-before-toggle`, then `input` from the host with it true. Stopping the
      inner `change` and not the inner `input` is half the pair. */

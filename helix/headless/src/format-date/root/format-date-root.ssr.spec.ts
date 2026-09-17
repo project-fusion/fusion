@@ -63,9 +63,10 @@ describe('format-date server output', () => {
    * The consequence of the light-DOM spelling, asserted rather than left to be
    * discovered.
    *
-   * `<helix-format-date elapsed>2020-01-01…</helix-format-date>` is the nicest
-   * way to write one and it cannot reach a server: measured against Lit's own
-   * shim, `textContent`, `children`, `firstChild` and `querySelector` are all
+   * `<helix-headless-format-date
+   * elapsed>2020-01-01…</helix-headless-format-date>` is the nicest way to
+   * write one and it cannot reach a server: measured against Lit's own shim,
+   * `textContent`, `children`, `firstChild` and `querySelector` are all
    * `undefined` there. So the element renders nothing rather than guessing, and
    * fills in on the client. Anything that has to be right in the served HTML
    * carries the attribute.

@@ -27,7 +27,7 @@ import '../message/chat-message.js'
  * @category feedback
  * @documentation https://fusion.dev/helix/components/chat
  *
- * @slot - The turns, as `helix-chat-message` children.
+ * @slot - The turns.
  * @slot composer - Below the transcript, where the reader writes.
  * @slot header - Above the transcript.
  * @slot resume - The way back to the bottom.

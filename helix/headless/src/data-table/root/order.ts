@@ -135,9 +135,9 @@ export const sort = (
  * One page of rows, clamped.
  *
  * A page past the end returns the last page rather than nothing, because the
- * usual way to be past the end is a bookmarked link after the result shrank, and
- * an empty table is a worse answer than the last page of a smaller one. The
- * same clamp `helix-pagination` already applies to what it reports.
+ * usual way to be past the end is a bookmarked link after the result shrank,
+ * and an empty table is a worse answer than the last page of a smaller one. The
+ * same clamp `Pagination` already applies to what it reports.
  */
 export const window_ = (rows: readonly DataRow[], page: number, size: number): DataRow[] => {
   if (size <= 0) {

@@ -17,9 +17,9 @@ type Reel = HTMLElement & { index: number; updateComplete: Promise<unknown> }
    **The correction is the component's, and this is the tier that proves it.**
    A sheet reaching the panes through `::part()` can neither count them nor
    select the last of them, so the arithmetic that ends the run on a whole pixel
-   cannot be written out here at all. Measured in Chromium before the component
-   published it: three across, the styled tier rested on one number both ways
-   and this tier rested at 451 against -450.
+   cannot be written out here at all. Measured in Chromium against a sheet that
+   corrects its own run: three across, that one rested on one number both ways
+   and an uncorrected track rested at 451 against -450.
 
    692 is the width the fault was measured at. Three across makes the pane
    209.33 and the run 450.66 longer than the track, and the width belongs to the

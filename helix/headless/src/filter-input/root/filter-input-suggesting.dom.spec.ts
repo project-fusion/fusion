@@ -89,7 +89,7 @@ describe('a filter field that suggests', () => {
   })
 
   test('the panel is a listbox region of its own', async () => {
-    /* Not a `helix-listbox`, which would hear the option's `helix-select` and
+    /* Not a `Listbox`, which would hear the option's `helix-select` and
        write `selected` back onto it. A suggestion is not a persistent choice. */
     const host = await mount(['absent'])
 

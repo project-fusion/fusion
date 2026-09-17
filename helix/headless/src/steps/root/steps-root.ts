@@ -30,7 +30,7 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * @aliases Stepper, Wizard, Progress steps
  * @documentation https://fusion.dev/helix/components/steps
  *
- * @slot - The steps, which are `helix-step` elements.
+ * @slot - The steps.
  *
  * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active step changes. Cancelable: refusing it takes the decision and nothing moves.

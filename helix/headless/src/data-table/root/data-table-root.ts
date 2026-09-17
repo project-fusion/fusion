@@ -44,19 +44,19 @@ import {
  *
  * @description
  * **The schema is markup and the data is a property.** Columns are declared as
- * `helix-table-column` children, because a schema is small and something a
- * reader should see in the HTML; rows are handed over as an array, because a
- * table that draws ten thousand elements cannot window them.
+ * `TableColumn` children, because a schema is small and something a reader
+ * should see in the HTML; rows are handed over as an array, because a table
+ * that draws ten thousand elements cannot window them.
  *
  * ```html
- * <helix-data-table .rows=${rows} sort="name:asc" page-size="20">
- *   <helix-table-column field="name" sortable>Name</helix-table-column>
- *   <helix-table-column field="size" align="end" sortable .cell=${bytes}>Size</helix-table-column>
- * </helix-data-table>
+ * <helix-headless-data-table .rows=${rows} sort="name:asc" page-size="20">
+ *   <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
+ *   <helix-headless-table-column field="size" align="end" sortable .cell=${bytes}>Size</helix-headless-table-column>
+ * </helix-headless-data-table>
  * ```
  *
- * `helix-table` takes rows as markup and is the right component for a table of
- * twelve things a person wrote out.
+ * `Table` takes rows as markup and is the right component for a table of twelve
+ * things a person wrote out.
  *
  * **Sort and filter apply to the whole set, never the page.** Sorting the drawn
  * window is correct on the first screen and wrong on every other one.
@@ -65,7 +65,7 @@ import {
  * elements do, but reading a cell needs the columns, and the columns are markup
  * children Lit SSR does not hand this element. So a crawler sees a table of the
  * right shape with nothing in it. That is the cost of the first paragraph: use
- * `helix-table` where the served HTML has to carry the values.
+ * `Table` where the served HTML has to carry the values.
  *
  * **`selectable` adds a column of checkboxes, keyed on `row-key`.** A row is
  * selected by its identity rather than its position, so a selection survives a
@@ -86,14 +86,13 @@ import {
  * in the order on screen, in the columns on screen. Saving it is the page's
  * business, the same as any other file.
  *
- * **There is no `columns` attribute here, and `helix-table` has one.** The
- * difference is what a column is in each: here it is the schema, so a table
- * without one has nothing to read a row with, and every column is a place to
- * write a `width`. A `helix-table` holds cells a consumer wrote and can be
- * written with no column at all, so its `columns` is where such a table is
- * sized from. Written on this element the attribute is inert, which is the trap
- * worth knowing when moving between the two. What both take is the CSS hook,
- * `--data-table-columns` here and `--table-columns` there.
+ * **There is no `columns` attribute here, and Table has one.** The difference
+ * is what a column is in each: here it is the schema, so a table without one
+ * has nothing to read a row with, and every column is a place to write a
+ * `width`. A Table holds cells a consumer wrote and can be written with no
+ * column at all, so its `columns` is where such a table is sized from. Written
+ * on this element the attribute is inert, which is the trap worth knowing when
+ * moving between the two.
  *
  * @since 0.1.0
  * @status stable
@@ -101,7 +100,7 @@ import {
  * @aliases Grid, Result table, Data grid
  * @documentation https://fusion.dev/helix/components/data-table
  *
- * @slot - The columns, declared as `helix-table-column` children.
+ * @slot - The columns, declared rather than drawn.
  * @slot footer - Below the grid, replacing the pagination this would otherwise draw.
  * @slot toolbar - Above the grid, for a search field or actions.
  *
@@ -149,19 +148,20 @@ import {
  * @csspart table - The grid.
  * @csspart toolbar - The region above the grid.
  *
- * @cssproperty --data-table-cell-align - The edge the column a cell sits under is set to, `start`, `center` or `end`, and unset under a column that sets none. Written by the component onto each cell it draws, read by the sheet that paints one; `helix-table` publishes `--table-cell-align` for the same attribute on the cells a consumer wrote, under its own family's name.
- * @cssproperty --data-table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set.
+ * @cssproperty --data-table-cell-align - The edge the column a cell sits under is set to, `start`, `center` or `end`, and unset under a column that sets none. Written by the component onto each cell it draws, read by the sheet that paints one; Table publishes `--table-cell-align` for the same attribute on the cells a consumer wrote, under its own family's name.
+ * @cssproperty --data-table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. A column's `width` is the one to set.
  */
 @customElement('helix-headless-data-table')
 export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * Nothing is assigned by name, so the columns can be put in a header row.
    *
-   * `role="columnheader"` under `role="grid"` with no owning row is invalid, and
-   * the columns are ordinary children a consumer writes with no `slot`. Manual
-   * assignment is the only way to wrap them without editing the consumer's
-   * markup, which is a change a React consumer's hydration reports and does not
-   * patch up. The same arrangement `helix-table` arrived at, for the same reason.
+   * `role="columnheader"` under `role="grid"` with no owning row is invalid,
+   * and the columns are ordinary children a consumer writes with no `slot`.
+   * Manual assignment is the only way to wrap them without editing the
+   * consumer's markup, which is a change a React consumer's hydration reports
+   * and does not patch up. The same arrangement `Table` arrived at, for the
+   * same reason.
    */
   static override shadowRootOptions: ShadowRootInit = {
     ...HelixElement.shadowRootOptions,
@@ -384,9 +384,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    *
    * **It announces nothing, and that is not an omission.** Nothing in this
    * element ever asks for a different page size: a size selector is
-   * `helix-pagination-size`, which a consumer puts in the `footer` slot and
-   * answers themselves. Routing this through `requestChange` would announce an
-   * event the element never has cause to fire.
+   * `PaginationSize`, which a consumer puts in the `footer` slot and answers
+   * themselves. Routing this through `requestChange` would announce an event
+   * the element never has cause to fire.
    */
   @property({ attribute: 'page-size', type: Number })
   get pageSize(): number {
@@ -1125,11 +1125,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * assigned nodes are not a slot's DOM children. Both verified in a browser.
    */
   private markEmpty(): void {
-    /* `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
-       sheet reads, and this tier ships no sheet, so an empty region left in the box
-       tree would be a gap a headless consumer cannot close without knowing to look
-       for it. The styled rule stays too, because that sheet sets `display` on these
-       parts and therefore outranks the UA's `[hidden]` one. */
+    /* `hidden` beside the `data-empty` mirror: `data-empty` is the hook a sheet
+       selects on, and this tier ships none, so an empty region left in the box
+       tree would be a gap a consumer cannot close without knowing to look for
+       it. Both stay, since `[hidden]` is a UA rule and a sheet setting `display`
+       on these parts outranks it. */
     markRegion(this.renderRoot, 'toolbar', ['toolbar'])
     /* The footer is not empty while this element is drawing its own pagination
        into it. */
@@ -1186,17 +1186,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * One cell, carrying its column's edge as a fact rather than as a decision.
    *
-   * **A fact published rather than a property chosen**, which is what
-   * `helix-table` does with the same attribute: what lining up *means*, a
-   * `justify-content` for a value that fits or a `text-align` for one that
-   * wraps, belongs to whoever draws the cell. Written here as an inline
-   * `text-align` it was this tier choosing, in the tier that ships no CSS, and a
-   * consumer could not overrule it either, an inline declaration beating any
-   * `::part(cell)` rule they wrote.
+   * **A fact published rather than a property chosen**, which is what `Table`
+   * does with the same attribute: what lining up *means*, a `justify-content`
+   * for a value that fits or a `text-align` for one that wraps, belongs to
+   * whoever draws the cell. Written here as an inline `text-align` it was this
+   * tier choosing, in the tier that ships no CSS, and a consumer could not
+   * overrule it either, an inline declaration beating any `::part(cell)` rule
+   * they wrote.
    *
    * Only the three edges reach it, `align` being a string anybody can write and
-   * this being a style attribute: `edgeOf` is that guard, and `helix-table`
-   * holds the same value to the same three.
+   * this being a style attribute: `edgeOf` is that guard, and `Table` holds the
+   * same value to the same three.
    */
   private renderCell(
     column: HelixHeadlessTableColumn,

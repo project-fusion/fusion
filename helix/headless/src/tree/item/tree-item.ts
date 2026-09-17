@@ -312,8 +312,8 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    * holds it instead, where it is not in the DOM at all.
    *
    * Reading `selected` is unaffected and so is writing it: the attribute still
-   * seeds the property, which is what `<helix-tree-item selected>` in a consumer's
-   * markup means. What stops is the write back.
+   * seeds the property, which is what `<helix-headless-tree-item selected>` in
+   * a consumer's markup means. What stops is the write back.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

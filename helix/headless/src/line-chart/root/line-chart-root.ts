@@ -186,8 +186,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    * over something busy. `triangle` points along the axis and reads as "and
    * onward" rather than as a second claim about the data.
    *
-   * The shapes come from
-   * `helix/styled/src/shared/chart/terminus.css`, the same sheet `Sparkline` takes, so
+   * The shapes come from one shared sheet, the same one `Sparkline` takes, so
    * the set is identical wherever one appears. **Which is why every value is
    * named here.** `Sparkline` shipped `square` implemented, drawn, asserted and
    * undocumented until the cohort before this one; this family reads the same

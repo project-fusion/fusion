@@ -39,11 +39,11 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
    * **The attribute, read when it is asked for, and never a snapshot taken in
    * the constructor.** A field initializer runs there, and an element the HTML
    * parser created has none of its attributes yet at that moment: measured on
-   * this element, on `Option` and on `Radio`, `<helix-toggle value="light"
-   * selected>` reported `defaultSelected` as `false` both from parsed markup
-   * and from `createElement` followed by `setAttribute`, which is every way a
-   * consumer writes one. The snapshot could only ever be true for an element
-   * already in the document when `customElements.define` ran.
+   * this element, on `Option` and on `Radio`, `<helix-headless-toggle
+   * value="light" selected>` reported `defaultSelected` as `false` both from
+   * parsed markup and from `createElement` followed by `setAttribute`, which is
+   * every way a consumer writes one. The snapshot could only ever be true for
+   * an element already in the document when `customElements.define` ran.
    *
    * Nothing overwrites it either, which is what makes reading it late correct
    * rather than merely later: `selected` does not reflect, for the reason

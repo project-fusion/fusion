@@ -61,8 +61,8 @@ export class HelixHeadlessTabPanel extends HelixElement {
    * a choice nobody made. `ElementInternals` holds it instead.
    *
    * The attribute still seeds the property, which is what
-   * `<helix-tab-panel selected>` in a consumer's markup means. Only the write
-   * back is gone.
+   * `<helix-headless-tab-panel selected>` in a consumer's markup means. Only
+   * the write back is gone.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

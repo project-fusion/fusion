@@ -56,9 +56,9 @@ const EDGES = new Set(['center', 'end', 'start'])
  *
  * **`align` is a string anybody can write**, the union on the property being a
  * compile-time claim and nothing else, and both tables put the value straight
- * into CSS: `helix-table` into a rule in each row's shadow root, `helix-data-table`
- * into the cell it draws. One guard, here with the property, rather than one in
- * each table and only one of them written.
+ * into CSS: `Table` into a rule in each row's shadow root, `DataTable` into the
+ * cell it draws. One guard, here with the property, rather than one in each
+ * table and only one of them written.
  */
 export const edgeOf = (align: string | undefined): string | undefined =>
   align && EDGES.has(align) ? align : undefined
@@ -71,23 +71,23 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  * the table has another track; remove one and it does not. That is what ties
  * the two together, and a table-level track list on its own does not: a list
  * that is accidentally the headings is invalid CSS a grid ignores in silence,
- * drawing the whole table as one column. `helix-table`'s `columns` is dealt out
- * a track at a time against the columns declared under it, so a heading among
- * the widths costs its own column a width and no more, and a list longer or
- * shorter than the columns is trimmed or shared rather than being a second
- * count of them. A column's own `width` wins over the track in its place.
+ * drawing the whole table as one column. `Table`'s `columns` is dealt out a
+ * track at a time against the columns declared under it, so a heading among the
+ * widths costs its own column a width and no more, and a list longer or shorter
+ * than the columns is trimmed or shared rather than being a second count of
+ * them. A column's own `width` wins over the track in its place.
  *
  * **It is also where every per-column fact goes**, which is the reason
- * `helix-data-table` needs no column config object. `field` names the key the
- * cell reads, `sortable` says a reader may reorder by it, `align` says which
- * edge the values line up against, and `cell` takes a function for anything the
+ * `DataTable` needs no column config object. `field` names the key the cell
+ * reads, `sortable` says a reader may reorder by it, `align` says which edge
+ * the values line up against, and `cell` takes a function for anything the
  * field alone cannot express. The schema is markup and the data is a property:
  * a schema is small, declarative, and something a reader should be able to see
  * in the HTML, and data is large and windowed.
  *
  * **The same element serves both tables**, the markup one and the data one. It
- * is identified by a flag rather than by `instanceof`, so a `helix-table-column`
- * works inside either without the two roots sharing anything else.
+ * is identified by a flag rather than by `instanceof`, so a `TableColumn` works
+ * inside either without the two roots sharing anything else.
  *
  * **It generates no box of its own**, the same as a row: the heading is a grid
  * item of the table, so it lines up with the cells under it rather than sitting
@@ -97,10 +97,10 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  * both, so the columns after it keep their own widths and every row keeps its
  * cells under their headings. `hidden="until-found"` keeps its track, the
  * heading being left drawn, as every Helix element leaves one with that value.
- * `helix-data-table` draws the cells, so it leaves out the ones under a hidden
- * column. A `helix-table`'s cells are markup the consumer wrote, so hide them
- * with the column, as removing a column means removing its cells: a row with a
- * cell more than the table has tracks wraps into the next.
+ * `DataTable` draws the cells, so it leaves out the ones under a hidden column.
+ * A `Table`'s cells are markup the consumer wrote, so hide them with the
+ * column, as removing a column means removing its cells: a row with a cell more
+ * than the table has tracks wraps into the next.
  *
  * **A heading that does something holds a control that does it.** The host is
  * the column header, and a header is not focusable, so a sortable heading is a
@@ -133,15 +133,15 @@ export class HelixHeadlessTableColumn extends HelixElement {
   /**
    * Which edge the values line up against.
    *
-   * `end` is what a column of numbers wants, so digits of the same magnitude sit
-   * above each other. Left unset the cell inherits the table's own alignment,
-   * which is `start` for text in either writing direction. `helix-data-table`
-   * aligns the cells it draws. A `helix-table`'s cells are markup the consumer
-   * wrote, so the table writes nothing onto them: it publishes the edge to each
-   * cell under this column as `--table-cell-align`, which `@fusion.dev/helix`
-   * reads. The heading is this element's own, and `@fusion.dev/helix` sets it to
-   * the same edge in either table. `end` is the inline end, so in a
-   * right-to-left table it is the left.
+   * `end` is what a column of numbers wants, so digits of the same magnitude
+   * sit above each other. Left unset the cell inherits the table's own
+   * alignment, which is `start` for text in either writing direction.
+   * `DataTable` aligns the cells it draws. A `Table`'s cells are markup the
+   * consumer wrote, so the table writes nothing onto them: it publishes the
+   * edge to each cell under this column as `--table-cell-align`, which
+   * `@fusion.dev/helix` reads. The heading is this element's own, and
+   * `@fusion.dev/helix` sets it to the same edge in either table. `end` is the
+   * inline end, so in a right-to-left table it is the left.
    *
    * **Reflected, because the heading is drawn by a stylesheet and has no other
    * way to learn it.** Set as a property, which is how React sets it, an
@@ -227,8 +227,8 @@ export class HelixHeadlessTableColumn extends HelixElement {
    * The track this column takes, as CSS.
    *
    * A single track value, so anything valid in `grid-template-columns` works:
-   * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column takes the track
-   * in its place in a `helix-table`'s `columns`, where that table sets one, and
+   * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column takes the track in
+   * its place in a `Table`'s `columns`, where that table sets one, and
    * otherwise shares what is left over equally, as `minmax(max-content, 1fr)`.
    * Set here, it wins over that list, which is what lets a reader resize a
    * column in a table that set one.
@@ -419,7 +419,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     /* **The table reads this column in its own render, and a property changing
-       here is nothing the table hears.** A resize in a `helix-table` moved the
+       here is nothing the table hears.** A resize in a `Table` moved the
        separator and left the track where it was, the track list being composed
        from every column's width once and never again, and the cells under a
        column take their edge from the same render. Asked of whatever holds

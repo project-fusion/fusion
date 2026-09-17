@@ -20,11 +20,11 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @summary A color, typed in any syntax or picked from a panel.
  *
  * @description
- * **The picker is `helix-color-picker`, not a second one written here.** It owns the
+ * **The picker is `ColorPicker`, not a second one written here.** It owns the
  * square, the ramps, the eyedropper and the syntax toggle, and it is worth
  * having on its own: a settings pane wants a picker flat on the page with
  * nothing to open. This element is the field, the overlay, and the form.
- * Exactly the arrangement Date Input has with `helix-date-picker`.
+ * Exactly the arrangement Date Input has with `DatePicker`.
  *
  * **Typed as well as picked, and the typing is the reason this is not
  * `<input type="color">`.** The native control gives a free picker and takes
@@ -251,7 +251,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
    * The picker is about to take the pointer over, so the panel gets out of the
    * way and comes back after.
    *
-   * `helix-color-picker` says what it is doing rather than reaching for a panel it
+   * `ColorPicker` says what it is doing rather than reaching for a panel it
    * cannot know it is in. A floating panel left up during an eyedropper is one
    * the reader cannot dismiss and may well be trying to sample from underneath.
    */

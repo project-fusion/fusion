@@ -72,7 +72,7 @@ describe('checkbox', () => {
     expect(control(box).checked).toBe(false)
   })
 
-  /* The reason `helix-toggle` exists: reported through `helix-change` the
+  /* The reason `Toggle` exists: reported through `helix-change` the
      payload was `String(checked)`, and the string "false" is truthy. A test
      asserting the value passes on that bug, so this asserts the type. */
   test('announces a boolean, and not a word that reads like one', async () => {

@@ -58,7 +58,7 @@ describe('data table server output', () => {
    * property. The **cell values are not**, because reading them needs the
    * columns and the columns are markup children that Lit SSR does not give this
    * element. So a crawler sees a table of the right shape with nothing in it,
-   * which is strictly less than `helix-table` serves for a table whose rows are
+   * which is strictly less than `Table` serves for a table whose rows are
    * markup.
    *
    * That is the cost of "the schema is markup and the data is a property", and

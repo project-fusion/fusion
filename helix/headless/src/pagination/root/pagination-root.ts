@@ -71,8 +71,8 @@ const fill = (
  * @description
  * **The component is the truncation.** Given a page and a total it works out
  * which numbers to show and where the runs break, so this is data-driven rather
- * than composed: `<helix-pagination page="4" pages="12">` rather than twelve
- * slotted children a consumer keeps in step with their own query.
+ * than composed: `<helix-headless-pagination page="4" pages="12">` rather than
+ * twelve slotted children a consumer keeps in step with their own query.
  *
  * **The width does not change as you page.** The run around the current page is
  * `siblings` either side, and grows to absorb a gap slot at a boundary, so the
