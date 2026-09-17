@@ -284,6 +284,21 @@ describe('splitter crossings', () => {
     expect(corner(within)).toBeNull()
   })
 
+  test('the corner is named, and named for what it does rather than what it is', async () => {
+    /* It moves both dividers at once, which no other control here does, and it
+       is a bare box with a `role="separator"`: a reader arrowing onto it is
+       told "separator" twice over unless this says which one it is.
+
+       It cannot be asserted on the server, because a crossing only exists once
+       a nested splitter has registered itself with the one outside it, and that
+       is a client-side pass over a tree the server does not have.
+
+       A phrase the component does not default to, `cornerLabel` holding "Resize
+       both", so a template writing that literal would not satisfy this. */
+    const [host] = await nested('corner-label="Move both edges"')
+    expect(corner(host)?.getAttribute('aria-label')).toBe('Move both edges')
+  })
+
   test('it sits where the two dividers cross, on both their numbers', async () => {
     const [host] = await nested('default-position="30"', 'orientation="vertical" position="65"')
     const handle = corner(host) as HTMLElement

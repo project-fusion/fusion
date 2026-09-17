@@ -401,3 +401,34 @@ describe('Escape with more than one overlay open', () => {
     expect([popover.open, tip.open]).toEqual([false, true])
   })
 })
+
+describe('a tooltip that markup declared open', () => {
+  /* `defaultOpen` is the uncontrolled half of `open`, and what the tooltip adds
+     to the mixin's own contract is raising the bubble from it: a hint declared
+     open in markup has to be showing at rest rather than waiting for a pointer
+     that may never arrive.
+   *
+     It is asserted here rather than on the server, because nothing about being
+     open reaches the render: the bubble is always drawn and the top layer is
+     what shows it, so the served markup is the same either way and a spec
+     against it would pass whatever `defaultOpen` did. */
+  test('is open at rest, with no pointer and no focus', async () => {
+    const tip = await tooltip('content="Saved" default-open')
+    expect(tip.open).toBe(true)
+  })
+
+  test('and a tooltip nobody declared is shut, which is the resting state', async () => {
+    const tip = await tooltip('content="Saved"')
+    expect(tip.open).toBe(false)
+  })
+
+  test('the seed is a starting point, not a claim the tooltip returns to', async () => {
+    // Control is an action rather than a mode: the element applies its own
+    // changes from wherever markup started it, and a consumer who wants the
+    // decision refuses the event instead.
+    const tip = await tooltip('content="Saved" default-open')
+    tip.hide()
+    await tip.updateComplete
+    expect(tip.open).toBe(false)
+  })
+})

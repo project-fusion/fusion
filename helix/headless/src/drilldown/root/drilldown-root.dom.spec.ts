@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, hasState, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason: an
    element registered against the `customElements` happy-dom then replaces never
@@ -235,5 +235,61 @@ describe('moving within a page', () => {
     await key(host, 'ArrowDown')
     expect(heard).toBe('')
     expect(showing(host)).toEqual(['appearance', 'about'])
+  })
+})
+
+describe('the way back out of a page', () => {
+  /* The header's control is a caret and nothing else, so `backLabel` is its
+     whole accessible name: unnamed, a reader two pages in hears "button" and
+     has to press it to find out what it does.
+
+     It cannot be asserted on the server. Whether there is anywhere to go back
+     to is a fact about children, and Lit SSR gives this element no tree to read
+     them from, so a served drilldown is always at its root.
+
+     A phrase the component does not default to, `backLabel` holding "Back", so
+     a template writing the literal would not satisfy this. */
+  test('is named, and exists only once there is somewhere to go back to', async () => {
+    const host = await stack()
+    host.setAttribute('back-label', 'Up one')
+    await host.updateComplete
+    expect(part(host, 'back')).toBeNull()
+
+    await press(host, host.querySelector('[value="appearance"]') as Element)
+    expect(part(host, 'back')?.getAttribute('aria-label')).toBe('Up one')
+  })
+})
+
+/* What this family says where there is nothing in it, and while it is fetching.
+ *
+ * **The words, the moment they appear and which of the two beats the other
+ * belong to `MixinCollection`**, which has its own spec beside it in
+ * `helix/core`. What belongs here is the one thing the mixin cannot decide,
+ * which is what *this* family counts as having rows: every host passes a
+ * different expression, so one that got it wrong says "Nothing to show" over a
+ * full set, or says nothing at all over an empty one, with the mixin behaving
+ * perfectly either way.
+ *
+ * Words the mixin does not default to, since it holds "Nothing to show" and
+ * "Loading": read against those, the assertion is satisfied by the mixin alone
+ * and says nothing about the string reaching it from here. */
+describe('an empty page of a drilldown', () => {
+  test('says the consumer’s words where there is nothing in it', async () => {
+    const host = await mount(
+      '<helix-headless-drilldown label="Settings" empty-text="Nothing here yet"></helix-headless-drilldown>',
+    )
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Nothing here yet')
+  })
+
+  test('and says it is fetching instead, which beats being empty', async () => {
+    /* A set that has not arrived is not a set that is empty, so a reader is
+       never told there is nothing while a request is still in flight. */
+    const host = await mount(
+      '<helix-headless-drilldown label="Settings" loading loading-text="Still fetching"></helix-headless-drilldown>',
+    )
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(host, 'loading')?.textContent?.trim()).toBe('Still fetching')
+    expect(part(host, 'empty')).toBeNull()
   })
 })

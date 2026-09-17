@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { at, hasState, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { at, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason:
    `@customElement` runs on import, static imports are hoisted, and an element
@@ -477,6 +477,28 @@ describe('menu submenus, coming and going', () => {
      reach. Structural rather than measured, so it reads the same here as in a
      browser: the slot a row keeps while its own page is showing is inside a
      hidden box, and the one it renders *as* the page is not. */
+  test('the way back is named, and exists only once there is somewhere to go back to', async () => {
+    /* The header's control is a caret and nothing else, so `backLabel` is its
+       whole accessible name: unnamed, a reader drilled two pages in hears
+       "button" and has to press it to find out what it does.
+
+       It cannot be asserted on the server, since a menu at its root has no way
+       back and whether it is at the root is a fact about children Lit SSR gives
+       this element no tree to read.
+
+       A word the component does not default to, `backLabel` holding "Back", so
+       that a template writing the literal would not satisfy this. */
+    const host = await deep()
+    host.setAttribute('back-label', 'Up one')
+    host.open = true
+    await host.updateComplete
+    expect(part(host, 'back')).toBeNull()
+
+    at(host, 'field').select()
+    await host.updateComplete
+    expect(part(host, 'back')?.getAttribute('aria-label')).toBe('Up one')
+  })
+
   test('a submenu keeps its slot on the page above, and paints nothing there', async () => {
     const host = await deep()
     host.open = true
@@ -532,5 +554,40 @@ describe('the columns either side of a label', () => {
         <helix-headless-menu-item slot="submenu" value="deep">Deep</helix-headless-menu-item>
       </helix-headless-menu-item>`)
     expect(hasState(el, 'mark')).toBe(true)
+  })
+})
+
+/* What a menu says where there is nothing on the page, and while it is
+ * fetching.
+ *
+ * **The words, the moment they appear and which of the two beats the other
+ * belong to `MixinCollection`**, which has its own spec beside it in
+ * `helix/core`. What belongs here is the one thing the mixin cannot decide,
+ * which is what a menu counts as having rows: every host passes a different
+ * expression, so one that got it wrong says "Nothing to show" over a full page,
+ * or says nothing at all over an empty one, with the mixin behaving perfectly
+ * either way.
+ *
+ * Words the mixin does not default to, since it holds "Nothing to show" and
+ * "Loading": read against those, the assertion is satisfied by the mixin alone
+ * and says nothing about the string reaching it from here. */
+describe('a menu with nothing on its page', () => {
+  test('says the consumer’s words once it has looked', async () => {
+    const host = (await mount(
+      '<helix-headless-menu label="Actions" empty-text="Nothing here yet"><button slot="trigger">Open</button></helix-headless-menu>',
+    )) as Menu
+    host.open = true
+    await host.updateComplete
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Nothing here yet')
+  })
+
+  test('and says it is fetching instead, which beats being empty', async () => {
+    const host = (await mount(
+      '<helix-headless-menu label="Actions" loading loading-text="Still fetching"><button slot="trigger">Open</button></helix-headless-menu>',
+    )) as Menu
+    host.open = true
+    await host.updateComplete
+    expect(part(host, 'loading')?.textContent?.trim()).toBe('Still fetching')
+    expect(part(host, 'empty')).toBeNull()
   })
 })

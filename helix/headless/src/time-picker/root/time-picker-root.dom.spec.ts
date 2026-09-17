@@ -430,3 +430,49 @@ describe('a time picker opens on its answer', () => {
     }
   })
 })
+
+describe('a grid of times that refuses or insists', () => {
+  /* The two form-control properties this class writes out rather than taking
+     from `MixinField`, because it is composed into a field that already has a
+     label and a feedback region.
+   *
+   * **Neither changes the render, which is the thing to know about them.** A
+   * read-only grid draws the same rows with the same tab stops, and a required
+   * one carries no `aria-required`, so the fact reaches a reader only through
+   * the validity the surrounding field reports. What is asserted is therefore
+   * the behavior each has, since that is the whole of what each does. */
+  test('read-only refuses a press and keeps the time it was given', async () => {
+    const host = await picker('readonly default-value="09:00"')
+    expect((host as Time & { requestValue: (next: string) => boolean }).requestValue('10:30')).toBe(
+      false,
+    )
+    await host.updateComplete
+    expect(host.value).toBe('09:00')
+  })
+
+  test('and the same request moves an ordinary grid, which is the control', async () => {
+    const host = await picker('default-value="09:00"')
+    expect((host as Time & { requestValue: (next: string) => boolean }).requestValue('10:30')).toBe(
+      true,
+    )
+    await host.updateComplete
+    expect(host.value).toBe('10:30')
+  })
+
+  test('required and empty is reported as missing, and a chosen time clears it', async () => {
+    /* The message and the anchor are what a form's own report shows, so the
+       verdict has to be on this element rather than on the field around it. */
+    const host = await picker('required')
+    const internals = (host as Time & { internals: ElementInternals }).internals
+    expect(internals.validity.valid).toBe(false)
+    expect(internals.validationMessage).toBe('Choose a time.')
+    ;(host as Time & { requestValue: (next: string) => boolean }).requestValue('10:30')
+    await host.updateComplete
+    expect(internals.validity.valid).toBe(true)
+  })
+
+  test('and a grid nobody insisted on is valid while empty', async () => {
+    const host = await picker('')
+    expect((host as Time & { internals: ElementInternals }).internals.validity.valid).toBe(true)
+  })
+})

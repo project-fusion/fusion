@@ -55,4 +55,22 @@ describe('drawer server output', () => {
     // The controllers attach on open, which the server never reaches.
     expect(() => ssr(html`<helix-headless-drawer>x</helix-headless-drawer>`)).not.toThrow()
   })
+
+  test('the light-dismiss policy reaches the real dialog, which is what acts on it', () => {
+    /* `closedby` is the platform's and is read off the `<dialog>` itself.
+       Nothing here interprets it, so a binding that stopped forwarding leaves a
+       drawer at the browser's own default with the property still reading what
+       the consumer set. */
+    expect(
+      partTag(ssr(html`<helix-headless-drawer closedby="any">x</helix-headless-drawer>`), 'panel'),
+    ).toContain('closedby="any"')
+  })
+
+  test('and a drawer that named no policy carries none', () => {
+    // Absent rather than written at a default: `closedby="none"` refuses the
+    // Escape key, so a drawer that had merely not been told would trap a reader.
+    expect(
+      partTag(ssr(html`<helix-headless-drawer>x</helix-headless-drawer>`), 'panel'),
+    ).not.toContain('closedby')
+  })
 })

@@ -104,4 +104,81 @@ describe('input server output', () => {
     const markup = ssr(html`<helix-headless-input label="Search" name="q"></helix-headless-input>`)
     expect(hostAttributes(markup, TAG)).toEqual(['label', 'name'])
   })
+
+  test('the constraint attributes reach the real input', () => {
+    /* **The whole job of these three is to cross the shadow boundary**, and
+       nothing else observes them: the component never reads `pattern` itself,
+       it hands it to the platform, which anchors it at both ends and reports
+       `patternMismatch`. A binding that stopped forwarding would leave a field
+       that accepts anything, with no error anywhere and the property still
+       reading back the value the consumer set. */
+    const markup = partTag(
+      ssr(
+        html`<helix-headless-input
+          label="Code"
+          maxlength="8"
+          minlength="4"
+          pattern="[A-Z]+"
+        ></helix-headless-input>`,
+      ),
+      'control',
+    )
+    expect(markup).toContain('pattern="[A-Z]+"')
+    expect(markup).toContain('minlength="4"')
+    expect(markup).toContain('maxlength="8"')
+  })
+
+  test('a field with no constraints serves none', () => {
+    // `nothing` rather than an empty string. `pattern=""` matches only the empty
+    // string, so a field that had merely not been given one would refuse
+    // everything a reader typed.
+    const markup = partTag(
+      ssr(html`<helix-headless-input label="A"></helix-headless-input>`),
+      'control',
+    )
+    expect(markup).not.toContain('pattern=')
+    expect(markup).not.toContain('minlength=')
+    expect(markup).not.toContain('maxlength=')
+  })
+
+  test('autocomplete is served, which is the only moment it is read', () => {
+    /* A password manager and the browser's own autofill read this off the
+       parsed markup, before anything upgrades, and they read it on the real
+       `<input>` rather than on the custom element wrapping it. Forwarded at
+       hydration it would arrive after the one pass that uses it. */
+    const markup = ssr(
+      html`<helix-headless-input label="Email" autocomplete="email"></helix-headless-input>`,
+    )
+    expect(partTag(markup, 'control')).toContain('autocomplete="email"')
+  })
+
+  test('the clear control is named, since its only content is a glyph', () => {
+    /* A word the component does not already hold. `clearLabel` defaults to
+       "Clear", so asserting that is an assertion a template writing the literal
+       would satisfy, which is the shape this repository has found three times. */
+    const markup = ssr(
+      html`<helix-headless-input
+        label="Search"
+        clearable
+        clear-label="Empty it"
+        default-value="jam"
+      ></helix-headless-input>`,
+    )
+    expect(partTag(markup, 'clear')).toContain('aria-label="Empty it"')
+  })
+
+  test('the reveal toggle is named, and says what it does rather than what it is', () => {
+    // The pressed state is `aria-pressed` and the name does not move with it, so
+    // a reader is told "Show password" and then told it is pressed.
+    const markup = ssr(
+      html`<helix-headless-input
+        label="Password"
+        type="password"
+        reveal
+        reveal-label="Reveal"
+      ></helix-headless-input>`,
+    )
+    expect(partTag(markup, 'reveal')).toContain('aria-label="Reveal"')
+    expect(partTag(markup, 'reveal')).toContain('aria-pressed="false"')
+  })
 })

@@ -86,6 +86,31 @@ const SCHEMA = `
  * assertion is about what this element wrote and holds in a double with no
  * cascade.
  */
+describe('a table seeded from markup and still owning what it was seeded with', () => {
+  /* `defaultFilter` is the uncontrolled half of `filter`, the way
+     `defaultValue` is of `value`: markup states where the table starts and the
+     table goes on applying its own changes from there. Seeded and then never
+     read, the narrowed table would come up whole; read as a claim of ownership,
+     the reader's own search would be undone on every update. */
+  test('`default-filter` narrows the first render', async () => {
+    const { element } = await mount(
+      SCHEMA.replace('label="Files"', 'label="Files" default-filter="bravo"'),
+    )
+    expect(element.filter).toBe('bravo')
+    expect(cells(element)).toEqual(['bravo', '4'])
+  })
+
+  test('and the seed is a starting point, not a claim the table keeps returning to', async () => {
+    const { element } = await mount(
+      SCHEMA.replace('label="Files"', 'label="Files" default-filter="bravo"'),
+    )
+    element.search('alpha')
+    await settled(element)
+    expect(element.filter).toBe('alpha')
+    expect(cells(element)).toEqual(['alpha', '30'])
+  })
+})
+
 describe("a data table publishing each column's edge to its cells", () => {
   const edges = (element: HTMLElement): (string | null)[] =>
     [...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? [])]
@@ -712,5 +737,39 @@ describe('a hidden column', () => {
     expect(cells(element).slice(0, 2)).toEqual(['alpha', '30'])
     expect(part(element, 'table')?.getAttribute('aria-colcount')).toBe('2')
     remove()
+  })
+})
+
+/* What this family says where there is nothing in it, and while it is fetching.
+ *
+ * **The words, the moment they appear and which of the two beats the other
+ * belong to `MixinCollection`**, which has its own spec beside it in
+ * `helix/core`. What belongs here is the one thing the mixin cannot decide,
+ * which is what *this* family counts as having rows: every host passes a
+ * different expression, so one that got it wrong says "Nothing to show" over a
+ * full set, or says nothing at all over an empty one, with the mixin behaving
+ * perfectly either way.
+ *
+ * Words the mixin does not default to, since it holds "Nothing to show" and
+ * "Loading": read against those, the assertion is satisfied by the mixin alone
+ * and says nothing about the string reaching it from here. */
+describe('an empty data table', () => {
+  test('says the consumer’s words where there is nothing in it', async () => {
+    const { element } = await mount(
+      '<helix-headless-data-table label="Files" empty-text="Nothing here yet"></helix-headless-data-table>',
+      [],
+    )
+    expect(part(element, 'empty')?.textContent?.trim()).toBe('Nothing here yet')
+  })
+
+  test('and says it is fetching instead, which beats being empty', async () => {
+    /* A set that has not arrived is not a set that is empty, so a reader is
+       never told there is nothing while a request is still in flight. */
+    const { element } = await mount(
+      '<helix-headless-data-table label="Files" loading loading-text="Still fetching"></helix-headless-data-table>',
+      [],
+    )
+    expect(part(element, 'loading')?.textContent?.trim()).toBe('Still fetching')
+    expect(part(element, 'empty')).toBeNull()
   })
 })

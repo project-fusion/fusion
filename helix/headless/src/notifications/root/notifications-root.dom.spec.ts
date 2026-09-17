@@ -177,6 +177,21 @@ describe('marking everything read', () => {
     await element.updateComplete
     expect(part(element, 'mark-all')).toBeNull()
   })
+
+  test('and it says what it does in the consumer’s words', async () => {
+    /* The words are the whole of the control: it has no glyph, so this is both
+       what a reader sees and what one hears. It cannot be asserted on the
+       server, since the control is drawn from the unread count and counting
+       items means reading children Lit SSR gives this element no tree for.
+
+       A phrase the component does not default to, `markAllLabel` holding "Mark
+       all as read", so a template writing that literal would not satisfy it. */
+    const element = await feed(`
+      <helix-headless-notifications label="Activity" mark-all mark-all-label="Clear the badge">
+        <helix-headless-notification>One</helix-headless-notification>
+      </helix-headless-notifications>`)
+    expect(part(element, 'mark-all')?.textContent?.trim()).toBe('Clear the badge')
+  })
 })
 
 /* Whether anything in the feed has media is the feed's to answer, because no
@@ -298,5 +313,39 @@ describe('folding every group', () => {
     element.groups[0]?.addEventListener('helix-before-close', (event) => event.preventDefault())
     expect(element.foldEveryGroup()).toBe(1)
     expect(element.groups.slice(0, 2).map((group) => group.open)).toEqual([true, false])
+  })
+})
+
+/* What this family says where there is nothing in it, and while it is fetching.
+ *
+ * **The words, the moment they appear and which of the two beats the other
+ * belong to `MixinCollection`**, which has its own spec beside it in
+ * `helix/core`. What belongs here is the one thing the mixin cannot decide,
+ * which is what *this* family counts as having rows: every host passes a
+ * different expression, so one that got it wrong says "Nothing to show" over a
+ * full set, or says nothing at all over an empty one, with the mixin behaving
+ * perfectly either way.
+ *
+ * Words the mixin does not default to, since it holds "Nothing to show" and
+ * "Loading": read against those, the assertion is satisfied by the mixin alone
+ * and says nothing about the string reaching it from here. */
+describe('an empty feed', () => {
+  test('says the consumer’s words where there is nothing in it', async () => {
+    const host = await mount(
+      '<helix-headless-notifications label="Activity" empty-text="Nothing here yet"></helix-headless-notifications>',
+    )
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Nothing here yet')
+  })
+
+  test('and says it is fetching instead, which beats being empty', async () => {
+    /* A set that has not arrived is not a set that is empty, so a reader is
+       never told there is nothing while a request is still in flight. */
+    const host = await mount(
+      '<helix-headless-notifications label="Activity" loading loading-text="Still fetching"></helix-headless-notifications>',
+    )
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(host, 'loading')?.textContent?.trim()).toBe('Still fetching')
+    expect(part(host, 'empty')).toBeNull()
   })
 })

@@ -59,6 +59,46 @@ describe('format-date server output', () => {
     expect(rendered(markup, TAG)).toContain('Jan 1, 2020')
   })
 
+  test('the two options a time of day adds reach the formatter as well', () => {
+    /* Every option here is handed to `Intl.DateTimeFormat` and read nowhere
+       else, so the only way to tell one that is wired from one that is not is
+       to look at the words that come out. `second` and `timeZoneName` are the
+       pair a date alone never shows, which is why they are the ones nothing
+       else in this file would exercise.
+
+       `UTC` for the zone, so the reading does not move with the machine the
+       suite runs on. */
+    const markup = ssr(
+      html`<helix-headless-format-date
+        date=${at}
+        hour="numeric"
+        locale="en-US"
+        minute="2-digit"
+        second="2-digit"
+        time-zone="UTC"
+        time-zone-name="short"
+      ></helix-headless-format-date>`,
+    )
+    expect(rendered(markup, TAG)).toContain('12:00:00 AM UTC')
+  })
+
+  test('and a reading nobody asked those of carries neither', () => {
+    /* Both are absent by default, and `Intl` writes nothing for an option it
+       was not given. A default written through would put seconds on every
+       timestamp in the library. */
+    const markup = ssr(
+      html`<helix-headless-format-date
+        date=${at}
+        hour="numeric"
+        locale="en-US"
+        minute="2-digit"
+        time-zone="UTC"
+      ></helix-headless-format-date>`,
+    )
+    expect(rendered(markup, TAG)).toContain('12:00 AM')
+    expect(rendered(markup, TAG)).not.toContain('UTC')
+  })
+
   /**
    * The consequence of the light-DOM spelling, asserted rather than left to be
    * discovered.

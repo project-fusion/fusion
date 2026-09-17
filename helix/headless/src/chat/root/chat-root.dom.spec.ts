@@ -244,3 +244,35 @@ describe('the pin', () => {
     expect(element.pinned).toBe(true)
   })
 })
+
+/* What a transcript says where there is nothing in it, and while it is
+ * fetching.
+ *
+ * **The words, the moment they appear and which of the two beats the other
+ * belong to `MixinCollection`**, which has its own spec beside it in
+ * `helix/core`. What belongs here is the one thing the mixin cannot decide,
+ * which is what a chat counts as having rows: it is fed either by a `turns`
+ * property or by slotted messages, and the expression takes both, so a chat
+ * that got it wrong says "Nothing to show" over a full conversation.
+ *
+ * Words the mixin does not default to, since it holds "Nothing to show" and
+ * "Loading": read against those, the assertion is satisfied by the mixin alone
+ * and says nothing about the string reaching it from here. */
+describe('a transcript with nothing in it', () => {
+  test('says the consumer’s words once it has looked', async () => {
+    const host = await mount(
+      '<helix-headless-chat label="Support" empty-text="Nothing here yet"></helix-headless-chat>',
+    )
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Nothing here yet')
+  })
+
+  test('and says it is fetching instead, which beats being empty', async () => {
+    const host = await mount(
+      '<helix-headless-chat label="Support" loading loading-text="Still fetching"></helix-headless-chat>',
+    )
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(host, 'loading')?.textContent?.trim()).toBe('Still fetching')
+    expect(part(host, 'empty')).toBeNull()
+  })
+})

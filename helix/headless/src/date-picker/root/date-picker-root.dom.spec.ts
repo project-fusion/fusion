@@ -555,3 +555,31 @@ describe('a date picker drawn from outside', () => {
     expect(today).toHaveLength(1)
   })
 })
+
+describe('a read-only calendar', () => {
+  /* Read-only is a value a reader may take and may not change, which for a grid
+     of days means every press is refused and the value stands.
+   *
+   * **The refusal is the whole of it, and that is worth stating.** Nothing in
+   * the render changes: the days keep their tab stops, no cell is
+   * `aria-disabled`, and the grid carries no `aria-readonly`, so a reader using
+   * the keyboard is told nothing and finds out by pressing. The behavior is
+   * asserted here because it is what exists; the silence is recorded rather
+   * than asserted, since a spec cannot hold a component to something it does
+   * not do. */
+  test('refuses a press and keeps the value it was given', async () => {
+    const cal = await calendar('default-month="2026-08" default-value="2026-08-14" readonly')
+    const day = days(cal).find((one) => one.textContent?.trim() === '20') as HTMLElement
+    day.click()
+    await (cal as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(cal.value).toBe('2026-08-14')
+  })
+
+  test('and the same press moves an ordinary calendar, which is the control', async () => {
+    const cal = await calendar('default-month="2026-08" default-value="2026-08-14"')
+    const day = days(cal).find((one) => one.textContent?.trim() === '20') as HTMLElement
+    day.click()
+    await (cal as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(cal.value).toBe('2026-08-20')
+  })
+})

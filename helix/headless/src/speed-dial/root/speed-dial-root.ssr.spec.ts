@@ -52,4 +52,18 @@ describe('speed dial server output', () => {
       '<span part="label"><slot></slot></span>',
     )
   })
+
+  test('`default-open` serves the actions showing and the trigger saying so', () => {
+    /* Two bindings have to agree and either could stop without the other: the
+       row of actions is hidden from `open`, and the trigger reports the same
+       fact with `aria-expanded`. Resolved on the first client update instead,
+       they disagree with each other for exactly that window. */
+    const open = ssr(html`<helix-headless-speed-dial default-open></helix-headless-speed-dial>`)
+    expect(partTag(open, 'actions')).not.toMatch(/\shidden[\s=>]/)
+    expect(partTag(open, 'trigger')).toContain('aria-expanded="true"')
+
+    const shut = ssr(html`<helix-headless-speed-dial></helix-headless-speed-dial>`)
+    expect(partTag(shut, 'actions')).toMatch(/\shidden[\s=>]/)
+    expect(partTag(shut, 'trigger')).toContain('aria-expanded="false"')
+  })
 })

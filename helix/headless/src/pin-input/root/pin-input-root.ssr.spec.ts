@@ -32,8 +32,36 @@ describe('input pin server output', () => {
   })
 
   test('the row is a group, and the boxes are named', () => {
+    /* Words the component does not default to. `cellLabel` holds
+       `Character {index} of {length}`, so reading the filled-in default back
+       passes just as well against a template writing that sentence itself, and
+       nothing in the assertion would then be about the property. */
+    const named = html`<helix-headless-pin-input
+      label="Code"
+      length="4"
+      cell-label="Digit {index} of {length}"
+    ></helix-headless-pin-input>`
     expect(partTag(ssr(code), 'field')).toContain('role="group"')
-    expect(partTag(ssr(code), 'cell')).toContain('aria-label="Character 1 of 4"')
+    expect(partTag(ssr(named), 'cell')).toContain('aria-label="Digit 1 of 4"')
+  })
+
+  test('the placeholder reaches every box, since the field is a row of them', () => {
+    /* One property and as many boxes as there are characters, which is the
+       thing worth holding: the platform paints it into each empty cell before
+       anything upgrades, so a row where only the first carried it would come up
+       looking half-filled. */
+    const dotted = html`<helix-headless-pin-input
+      label="Code"
+      length="4"
+      placeholder="0"
+    ></helix-headless-pin-input>`
+    const cells = [
+      ...rendered(ssr(dotted), 'helix-headless-pin-input').matchAll(
+        /<input[^>]*part="cell"[^>]*>/g,
+      ),
+    ]
+    expect(cells).toHaveLength(4)
+    expect(cells.every(([tag]) => tag.includes('placeholder="0"'))).toBe(true)
   })
 
   test('the host carries only what the consumer wrote', () => {

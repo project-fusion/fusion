@@ -39,4 +39,27 @@ describe('dialog server output', () => {
       ),
     ).toEqual(['label'])
   })
+
+  test('the light-dismiss policy reaches the real dialog, which is what acts on it', () => {
+    /* `closedby` is the platform's, and the platform reads it off the `<dialog>`
+       rather than off anything around it. Nothing in this component interprets
+       it, so a binding that stopped forwarding leaves a dialog at the browser's
+       own default with the property still reading what the consumer set: a
+       backdrop press that was supposed to dismiss, and does not. */
+    expect(
+      partTag(
+        ssr(html`<helix-headless-dialog closedby="any" label="Delete">x</helix-headless-dialog>`),
+        'dialog',
+      ),
+    ).toContain('closedby="any"')
+  })
+
+  test('and a dialog that named no policy carries none', () => {
+    /* Absent rather than written at a default: `closedby="none"` refuses the
+       Escape key, so a dialog that had merely not been told would trap a reader
+       in it. */
+    expect(
+      partTag(ssr(html`<helix-headless-dialog label="Delete">x</helix-headless-dialog>`), 'dialog'),
+    ).not.toContain('closedby')
+  })
 })

@@ -255,4 +255,44 @@ describe('input file', () => {
     const scope = control(host).getRootNode() as ShadowRoot
     expect(scope.getElementById(described as string)?.textContent).toContain('Up to 10MB')
   })
+
+  test('each remove control is named for the file it removes', async () => {
+    /* One row per file and a glyph-only control on each, so the name has to
+       carry the file as well as the verb: three buttons all announcing "Remove"
+       is a list a reader cannot choose from by ear.
+
+       A word the component does not default to, since `removeLabel` holds
+       "Remove" and asserting that would pass against a template writing it. */
+    const host = await field('remove-label="Take off"')
+    await choose(host, 'one.txt', 'two.txt')
+    const names = [...(host.shadowRoot?.querySelectorAll('[part~="remove"]') ?? [])].map((one) =>
+      one.getAttribute('aria-label'),
+    )
+    expect(names).toEqual(['Take off one.txt', 'Take off two.txt'])
+  })
+
+  test('the size beside a file is written in the locale the consumer named', async () => {
+    /* A file size is a number with a unit, and the decimal separator is not the
+       same everywhere: a French reader is owed `1,5 ko` and an English one
+       `1.5 kB`. Read off the page instead of this property, a list served from
+       a shared renderer comes back in whatever that machine defaults to. */
+    const kilobyte = (host: InputFile): void => {
+      const carrier = new DataTransfer()
+      carrier.items.add(new File(['x'.repeat(1500)], 'one.txt', { type: 'text/plain' }))
+      control(host).files = carrier.files
+      control(host).dispatchEvent(new Event('change', { bubbles: true }))
+    }
+    const size = (host: InputFile): string =>
+      host.shadowRoot?.querySelector('[part~="size"]')?.textContent?.trim() ?? ''
+
+    const french = await field('locale="fr-FR"')
+    kilobyte(french)
+    await french.updateComplete
+    const english = await field('locale="en-US"')
+    kilobyte(english)
+    await english.updateComplete
+
+    expect(size(english)).toBe('1.5 KB')
+    expect(size(french)).not.toBe(size(english))
+  })
 })

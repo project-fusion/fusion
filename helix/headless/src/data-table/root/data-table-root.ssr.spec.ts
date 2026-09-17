@@ -141,3 +141,62 @@ describe('data table server output', () => {
        are counted there. */
   })
 })
+
+describe('the uncontrolled defaults a table takes from markup', () => {
+  /* Each is the seed half of a property the table goes on owning, and each is
+     resolved into the render rather than read back on its own: `defaultFilter`
+     is what `filter` answers until somebody types, `defaultPageSize` is what
+     `pageSize` answers until somebody chooses, and `paginated` answers from the
+     page size unless a consumer says otherwise.
+   *
+   * Resolved by the server's render, because the row of pages is under the
+   * table: filled in on the first client update it appears after the table has
+   * been painted and moves whatever is beneath it. */
+  const many = [
+    { name: 'alpha', size: 1 },
+    { name: 'bravo', size: 2 },
+    { name: 'charlie', size: 3 },
+  ]
+  test('`paginated` is what puts the row of pages in the served markup at all', () => {
+    /* It is not a style on a control that is always there: switched off, the
+       element is not rendered, so a table that turned it on at hydration grows
+       a whole row of controls under itself after the first paint. */
+    const off = ssr(
+      html`<helix-headless-data-table .rows=${many} label="Files"></helix-headless-data-table>`,
+    )
+    expect(partTag(off, 'pagination')).toBe('')
+
+    const on = ssr(
+      html`<helix-headless-data-table
+        .rows=${many}
+        label="Files"
+        paginated
+      ></helix-headless-data-table>`,
+    )
+    expect(partTag(on, 'pagination')).not.toBe('')
+  })
+
+  test('`default-page-size` is the size the served pagination is drawn at', () => {
+    /* The seed rather than the state: `pageSize` answers from it until somebody
+       chooses, and the row of pages under the table is laid out from the
+       answer. Resolved on the first client update instead, the page count
+       changes under the reader once. */
+    const table = ssr(
+      html`<helix-headless-data-table
+        .rows=${many}
+        default-page-size="2"
+        label="Files"
+      ></helix-headless-data-table>`,
+    )
+    /* `paginated` is not written here, which is half the point: it answers from
+       the page size, so a size alone is enough to serve the control. */
+    expect(partTag(table, 'pagination')).toContain('page-size="2"')
+  })
+
+  /* `default-filter` is not asserted here and cannot be. The filter matches on
+     each column's ordering value, the columns are markup children, and Lit SSR
+     gives this element no tree to read them from, so every row matches nothing
+     and the served count is zero whatever the seed says. It is the same
+     limitation the note above pins for the cell values, and the seed is
+     asserted in the DOM spec instead. */
+})
