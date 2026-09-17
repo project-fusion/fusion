@@ -3,9 +3,9 @@ import {
   HelixElement,
   HelixSendEvent,
   hostAria,
+  markRegion,
   relativeTime,
   requestChange,
-  slotFilled,
   TONE_MARKS,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -255,19 +255,12 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * is exactly this question.
    */
   private markEmpty(): void {
-    for (const name of ['content', 'sources', 'actions'] as const) {
-      const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${name}"]`)
-      const slot =
-        name === 'content'
-          ? this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
-          : this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
-      const empty = !slotFilled(slot)
-      region?.toggleAttribute('data-empty', empty)
-      /* `content` keeps its box when empty, because the typing indicator is
-         painted into it. The other two are gaps nobody asked for. */
-      if (name !== 'content') {
-        region?.toggleAttribute('hidden', empty)
-      }
+    /* `content` keeps its box when empty, because the typing indicator is
+       painted into it. The other two are gaps nobody asked for, and the default
+       slot is the one the content region holds. */
+    markRegion(this.renderRoot, 'content', [''], { hide: false })
+    for (const name of ['sources', 'actions'] as const) {
+      markRegion(this.renderRoot, name, [name])
     }
   }
 

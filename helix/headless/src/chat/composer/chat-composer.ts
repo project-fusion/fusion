@@ -3,7 +3,7 @@ import {
   HelixElement,
   HelixSendEvent,
   hostAria,
-  slotFilled,
+  markRegion,
 } from '@fusion.dev/helix-core'
 import { arrowElbowDownLeft } from '@fusion.dev/helix-icons'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -145,12 +145,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
    */
   private markEmpty(): void {
     for (const name of ['start', 'end'] as const) {
-      const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${name}"]`)
-      const empty = !slotFilled(
-        this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`),
-      )
-      region?.toggleAttribute('data-empty', empty)
-      region?.toggleAttribute('hidden', empty)
+      markRegion(this.renderRoot, name, [name])
     }
   }
 

@@ -4,7 +4,7 @@ import {
   HelixReadEvent,
   hostAria,
   MixinCollection,
-  slotFilled,
+  markRegion,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -319,29 +319,15 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * which React reports on hydration and does not patch up.
    */
   private markEmpty(): void {
+    /* `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
+       sheet reads, and this tier ships no sheet, so an empty region left in the box
+       tree would be a gap a headless consumer cannot close without knowing to look
+       for it. The styled rule stays too, because that sheet sets `display` on these
+       parts and therefore outranks the UA's `[hidden]` one. */
     /* The header is not empty while this element is drawing its own control into
        it. */
-    this.markRegion('header', ['header'], '[part="mark-all"]')
-    this.markRegion('footer', ['footer'])
-  }
-
-  /**
-   * One region, hidden when its slot holds nothing and nothing of ours fills it.
-   *
-   * `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
-   * sheet reads, and this tier ships no sheet, so an empty region left in the box
-   * tree would be a gap a headless consumer cannot close without knowing to look
-   * for it. The styled rule stays too, because that sheet sets `display` on these
-   * parts and therefore outranks the UA's `[hidden]` one.
-   */
-  private markRegion(part: string, slots: readonly string[], occupied?: string): void {
-    const region = this.renderRoot?.querySelector<HTMLElement>(`[part="${part}"]`)
-    const empty =
-      !slots.some((name) =>
-        slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)),
-      ) && !(occupied && this.renderRoot?.querySelector(occupied))
-    region?.toggleAttribute('data-empty', empty)
-    region?.toggleAttribute('hidden', empty)
+    markRegion(this.renderRoot, 'header', ['header'], { occupied: '[part="mark-all"]' })
+    markRegion(this.renderRoot, 'footer', ['footer'])
   }
 
   protected override updated(changed: PropertyValues): void {

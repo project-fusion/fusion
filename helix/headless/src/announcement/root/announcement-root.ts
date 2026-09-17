@@ -3,7 +3,7 @@ import {
   HelixElement,
   hostAria,
   MixinDismissible,
-  slotFilled,
+  markRegion,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -101,17 +101,12 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
    * rendered, which React reports on hydration and does not patch up.
    */
   private markEmpty(): void {
-    const region = this.partNamed('actions')
-    const empty = !slotFilled(
-      this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="actions"]'),
-    )
-    region?.toggleAttribute('data-empty', empty)
     /* `hidden` beside the mirror, because `data-empty` is a hook the styled
        sheet reads and this tier has no sheet: an empty region left in the box
        tree is a gap a consumer cannot close without knowing to look for it. The
        styled rule stays, because that sheet sets `display` on this part and
        therefore outranks the UA one. */
-    region?.toggleAttribute('hidden', empty)
+    markRegion(this.renderRoot, 'actions', ['actions'])
   }
 
   /**
