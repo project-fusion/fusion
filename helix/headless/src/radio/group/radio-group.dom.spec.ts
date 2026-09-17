@@ -76,13 +76,50 @@ describe('radio group', () => {
     expect((host as Updatable & { value: string }).value).toBe('three')
   })
 
-  test('an empty group is still reachable by tab', async () => {
-    // Every item at `tabindex="-1"` is a group the keyboard cannot enter, which
-    // is what a roving index does when nothing has been chosen yet.
+  test('an empty group is still reachable by tab, on the radio and not on its host', async () => {
+    /* Every item at `tabindex="-1"` is a group the keyboard cannot enter, which
+       is what a roving index does when nothing has been chosen yet.
+
+       The stop is the `<button role="radio">` rather than the element around
+       it. Written on the host it was markup a consumer rendered and their
+       server never sent, and it put the tab stop on an unnamed box where a
+       native group gives a reader an unchecked radio. */
     const host = await group()
-    const first = part(options(host)[0] as HTMLElement, 'item') as HTMLElement
-    expect(options(host)[0]?.getAttribute('tabindex')).toBe('0')
-    expect(first).not.toBeNull()
+    const [first, second] = options(host)
+    expect(first?.hasAttribute('tabindex')).toBe(false)
+    expect(part(first as HTMLElement, 'item')?.getAttribute('tabindex')).toBe('0')
+    expect(part(second as HTMLElement, 'item')?.getAttribute('tabindex')).toBe('-1')
+  })
+
+  test('and the stop moves to the answer once there is one', async () => {
+    // An answered group carrying the entry stop as well has two tab stops, so
+    // a form stops twice on one question and stops first on a wrong answer.
+    const host = await group('', 'two')
+    const stops = options(host).map((item) => part(item, 'item')?.getAttribute('tabindex'))
+    expect(stops).toEqual(['-1', '0', '-1'])
+  })
+
+  test('a value naming no choice is still a group the keyboard can enter', async () => {
+    /* `value === ''` read this as answered, so a group seeded with a value no
+       item carries left every choice at `-1` and the set unreachable: the exact
+       failure the entry stop exists to prevent, arrived at through the test
+       for it. */
+    const host = await group('', 'nobody')
+    expect(options(host).every((item) => !item.selected)).toBe(true)
+    expect(part(options(host)[0] as HTMLElement, 'item')?.getAttribute('tabindex')).toBe('0')
+  })
+
+  test('and the entry skips a choice that cannot be made', async () => {
+    // A disabled `<button>` takes no focus at all, so a group whose first
+    // option is disabled would be unreachable with the stop parked on it.
+    document.body.innerHTML = `<helix-headless-radio-group label="Label" name="choice">
+      <helix-headless-radio disabled value="one">One</helix-headless-radio>
+      <helix-headless-radio value="two">Two</helix-headless-radio>
+    </helix-headless-radio-group>`
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    const stops = options(host).map((item) => part(item, 'item')?.getAttribute('tabindex'))
+    expect(stops).toEqual(['-1', '0'])
   })
 })
 

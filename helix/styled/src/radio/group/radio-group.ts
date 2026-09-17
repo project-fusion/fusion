@@ -15,7 +15,7 @@ import { styles } from './radio-group.css.js'
  * group keeps its question above the row rather than beside the first choice.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases RadioButtons, Choice group
  * @documentation https://fusion.dev/helix/components/radio
  *

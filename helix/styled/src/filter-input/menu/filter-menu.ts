@@ -18,7 +18,7 @@ import '../../menu/index.js'
  * immediately and why the operator is decided here rather than on the chip.
  *
  * @since 0.25.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases FacetPicker, FilterBuilder
  * @documentation https://fusion.dev/helix/components/filter-input

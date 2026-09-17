@@ -40,7 +40,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * gives: what the words mean is the domain's.
  *
  * @since 0.23.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases FilterToken, FacetChip
  * @documentation https://fusion.dev/helix/components/filter-input

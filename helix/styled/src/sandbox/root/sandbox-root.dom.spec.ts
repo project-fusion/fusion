@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -179,6 +179,12 @@ describe('sandbox coordination', () => {
     const last = sent.at(-1)
     expect(last?.layout).toBe('centered')
     expect(last?.direction).toBe('rtl')
+    /* And the second half of the sentence, which nothing here used to check:
+       both reflected, so a script setting either wrote an attribute onto markup
+       the consumer's server never sent, for a value no rule on this side of the
+       frame can read. */
+    expect(preview.hasAttribute('layout')).toBe(false)
+    expect(preview.hasAttribute('direction')).toBe(false)
   })
 
   test('the frame is answered at a wildcard, because a sandbox has no origin to name', async () => {
@@ -235,6 +241,9 @@ const panes = (host: HTMLElement): Splitter => part(host, 'panes') as Splitter
 const body = (host: HTMLElement): Splitter => part(host, 'body') as Splitter
 const bar = (splitter: Splitter): HTMLElement =>
   splitter.shadowRoot?.querySelector('[part="separator"]') as HTMLElement
+
+/** For what only a measured box can answer. See its one use below. */
+const browser = hasLayout() ? test : (): void => {}
 
 describe('sandbox dividers', () => {
   const press = async (
@@ -376,6 +385,18 @@ describe('sandbox dividers', () => {
     expect(body(sandbox).shadowRoot?.querySelector('[part="corner"]')).toBeNull()
   })
 
+  test('the axis reaches the splitter and writes nothing on the host', async () => {
+    /* `lead` says in its own docblock that nothing selects on it and so it does
+       not reflect; `orientation` reflected anyway, for a value this sheet names
+       in no rule. The axis is the inner splitter's, which is where the panes
+       are laid out. */
+    const sandbox = (await mount(wired)) as Updatable & { orientation: string }
+    sandbox.orientation = 'vertical'
+    await sandbox.updateComplete
+    expect(panes(sandbox).getAttribute('orientation')).toBe('vertical')
+    expect(sandbox.hasAttribute('orientation')).toBe(false)
+  })
+
   test('the arrangement is announced once, and the splitters inside are not', async () => {
     /* A consumer stores one arrangement. What the two elements inside said to
        each other on the way there is not their business, so each divider has
@@ -391,6 +412,50 @@ describe('sandbox dividers', () => {
     }
     await press(sandbox, panes(sandbox), 'ArrowRight')
     expect(named).toEqual(['helix-before-split'])
+  })
+
+  /**
+   * Announced before it is applied, which is what `before` has to mean.
+   *
+   * Both of these were dispatched after `split` and `panelSize` had been
+   * written, with the answer dropped, so `preventDefault()` on an event whose
+   * own line says refusing it takes the decision did nothing at all: the
+   * divider stayed where the drag left it and the handler read a value it had
+   * just declined. `SandboxSource.edit` carries the argument in this same
+   * family, and `Splitter` has always announced through the audited path.
+   */
+  test('a refused split leaves the divider where it was', async () => {
+    const sandbox = (await mount(wired)) as Updatable & { split: number }
+    const start = sandbox.split
+    let proposed = ''
+    sandbox.addEventListener('helix-before-split', (event) => {
+      proposed = (event as CustomEvent<{ value: string }>).detail.value
+      event.preventDefault()
+    })
+
+    await press(sandbox, panes(sandbox), 'ArrowRight')
+    expect(Number(proposed)).toBeGreaterThan(start)
+    expect(sandbox.split).toBe(start)
+    expect(panes(sandbox).position).toBe(start)
+  })
+
+  /* Browser only: the panel is pixels and the divider is a share, so the
+     conversion between them needs a measured body and happy-dom has none. With
+     no height the handler returns before it proposes anything, which is a test
+     that passes whatever this element does. */
+  browser('and a refused panel resize leaves the panel its height', async () => {
+    const sandbox = (await mount(withPanel)) as Updatable & { panelSize: number }
+    const start = sandbox.panelSize
+    let proposed = ''
+    sandbox.addEventListener('helix-before-panel-resize', (event) => {
+      proposed = (event as CustomEvent<{ value: string }>).detail.value
+      event.preventDefault()
+    })
+
+    await press(sandbox, body(sandbox), 'ArrowUp')
+    expect(proposed).not.toBe('')
+    expect(Number(proposed)).not.toBe(start)
+    expect(sandbox.panelSize).toBe(start)
   })
 
   test('an unrelated key is left alone', async () => {

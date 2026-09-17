@@ -56,7 +56,7 @@ import '../../menu/index.js'
  * rather than inventing one. Refusing `helix-facet` refuses the change.
  *
  * @since 0.25.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases FacetPicker, FilterBuilder
  * @documentation https://fusion.dev/helix/components/filter-input

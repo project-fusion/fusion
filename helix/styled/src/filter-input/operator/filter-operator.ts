@@ -15,7 +15,7 @@ import { styles } from './filter-operator.css.js'
  * reason `FilterField`'s note gives.
  *
  * @since 0.23.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Comparator, Predicate
  * @documentation https://fusion.dev/helix/components/filter-input

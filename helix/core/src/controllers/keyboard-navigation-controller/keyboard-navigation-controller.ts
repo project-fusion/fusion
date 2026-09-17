@@ -66,7 +66,22 @@ export interface KeyboardNavigationOptions {
    */
   reserved?: () => string[]
   /**
-   * Whether the ends join up. Radio groups wrap; a list of commands does not.
+   * Whether the ends join up, which they do unless a set says otherwise.
+   *
+   * **A ring wraps and a scale does not**, and every set here is a ring but
+   * one. A radio group, a tab strip, a toggle group and a menu are all sets of
+   * peers with no first and no last worth stopping at, so arriving past the end
+   * is arriving at the beginning, which is what a native radio group does and
+   * what the practice for a menu says. `Rating` is the exception and the only
+   * `wrap: false` in the library: its marks are a quantity, so a press past
+   * five stars would land on one, and a reader holding the key would rate the
+   * thing worst at the moment they meant best.
+   *
+   * **`false` clamps both ends rather than one.** Backward from the first is
+   * `items[-1]`, which is nothing focused and nothing chosen on a press
+   * `preventDefault` has already swallowed, so the reader holding Left on the
+   * first star gets silence where holding Right on the last one holds its
+   * ground.
    */
   wrap?: boolean
 }

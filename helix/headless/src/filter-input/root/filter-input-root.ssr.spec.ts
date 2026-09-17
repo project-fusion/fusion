@@ -14,7 +14,7 @@ describe('filter input server output', () => {
       <helix-headless-filter-menu slot="start">
         <helix-headless-filter-field field="status" label="Status"></helix-headless-filter-field>
       </helix-headless-filter-menu>
-      <helix-headless-filter-chip label="Status" slot="tokens">
+      <helix-headless-filter-chip label="Status" slot="tags">
         <span slot="operator">is</span>
         Open
       </helix-headless-filter-chip>

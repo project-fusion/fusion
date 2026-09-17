@@ -42,6 +42,16 @@ describe('the sandbox status bar', () => {
     expect(part(await bar(), 'language')).toBeNull()
   })
 
+  /* And a name the map inherits is not a name the map has. `LABELS[language]`
+     reached `Object.prototype`, so every inherited key came back truthy and the
+     fallback never fired: the bar painted the whole source of `Object` where
+     the word should have been passed through unchanged. `language` is any
+     string a consumer writes, not a union, so this is ordinary input. */
+  test('and a language named after something every object has is still passed through', async () => {
+    expect(part(await bar('language="constructor"'), 'language')?.textContent).toBe('constructor')
+    expect(part(await bar('language="toString"'), 'language')?.textContent).toBe('toString')
+  })
+
   /* Two slots, and the readouts sit between them: what a consumer puts at the
      start stays at the start and what they put at the end stays after the
      readouts, which is the arrangement the bar exists to provide. */

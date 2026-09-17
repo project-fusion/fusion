@@ -7,6 +7,7 @@ import {
   type HelixCaretEvent,
   type HelixConsoleEvent,
   HelixElement,
+  requestChange,
 } from '@fusion.dev/helix-core'
 import '../../splitter/index.js'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
@@ -133,8 +134,13 @@ export class HelixSandbox extends HelixElement {
 
   /**
    * Whether the panes sit side by side or stacked.
+   *
+   * Not reflected, for `lead`'s reason above: no rule selects on it. The axis
+   * reaches the stylesheet as the inner splitter's own `orientation`, which is
+   * where the panes are laid out, and this element's sheet names no host
+   * attribute at all.
    */
-  @property({ reflect: true })
+  @property()
   orientation?: 'horizontal' | 'vertical'
 
   /**
@@ -377,7 +383,7 @@ export class HelixSandbox extends HelixElement {
   }
 
   /**
-   * Says the panes' divider has settled, so a consumer can keep it.
+   * Asks for the panes' divider to settle here, and moves it unless refused.
    *
    * When it settles, not while it moves. A drag is a stream of positions and
    * only the one it ends at is a preference; announcing each would ask whoever
@@ -388,17 +394,43 @@ export class HelixSandbox extends HelixElement {
    * wrote to storage on its own would be deciding for all of them under a key
    * it chose.
    *
+   * **Through `requestChange`, and never the other way round.** Both of these
+   * fired after `split` and `panelSize` had already been written, with the
+   * answer dropped, so a consumer calling `preventDefault()` on an event whose
+   * own line says refusing it takes the decision changed nothing whatever: the
+   * divider stayed where the drag left it and their handler read a value they
+   * had just declined. `SandboxSource.edit` two files away already carries the
+   * argument, that assigning first turns a `before` event into one that has
+   * already happened, and `Splitter`, whose `helix-before-resize` these two were
+   * split out of, has always announced through the audited path. Refusing one
+   * now leaves `.position` bound to the value this element still holds, so the
+   * divider goes back where it was.
+   *
    * **A verb each, rather than one `helix-before-resize` naming which of the two
    * moved.** Both dividers are this element's, so `composedPath()[0]` is the same
    * host for either and the event name is the only thing that can separate them.
    */
-  private splitSettled(): void {
-    this.dispatchEvent(new HelixBeforeSplitEvent({ value: String(this.split) }))
+  private requestSplit(next: number): boolean {
+    return requestChange({
+      apply: (value) => {
+        this.split = value
+      },
+      event: (value) => new HelixBeforeSplitEvent({ value: String(value) }),
+      host: this,
+      next,
+    })
   }
 
-  /** As `splitSettled`, for the panel, whose value is pixels rather than a share. */
-  private panelSettled(): void {
-    this.dispatchEvent(new HelixBeforePanelResizeEvent({ value: String(this.panelSize) }))
+  /** As `requestSplit`, for the panel, whose value is pixels rather than a share. */
+  private requestPanelSize(next: number): boolean {
+    return requestChange({
+      apply: (value) => {
+        this.panelSize = value
+      },
+      event: (value) => new HelixBeforePanelResizeEvent({ value: String(value) }),
+      host: this,
+      next,
+    })
   }
 
   /**
@@ -414,6 +446,21 @@ export class HelixSandbox extends HelixElement {
    * speaking for itself is one of ours, and only those are stopped: the sandbox
    * announces `helix-before-split` and `helix-before-panel-resize` in their
    * place, and a consumer never sees the two splitters inside it.
+   *
+   * **Refused as well as stopped, which is what "controlled from here" costs.**
+   * A splitter nobody refuses applies the move itself and says so in its own
+   * docblock, so the sentence above was true only while nothing downstream ever
+   * declined: refusing `helix-before-split` left `split` at fifty and the
+   * divider drawn at fifty-two, one element holding the arrangement and the
+   * other showing it. Refusing the inner request first makes this element the
+   * single answer.
+   *
+   * **And the divider is written back, because a refusal writes nothing.** A
+   * splitter draws itself from where the gesture reached until its `position` is
+   * assigned, which is the setter's stated job, and a bound property Lit did not
+   * change is a property Lit does not write. So the answer is assigned either
+   * way, which for an accepted move is the number the binding is about to carry
+   * anyway.
    */
   private readonly handlePanesChange = (event: Event): void => {
     if (event.target !== event.currentTarget) {
@@ -421,8 +468,9 @@ export class HelixSandbox extends HelixElement {
     }
     const { value } = (event as HelixBeforeResizeEvent).detail
     event.stopPropagation()
-    this.split = Number(value)
-    this.splitSettled()
+    event.preventDefault()
+    this.requestSplit(Number(value))
+    this.answer(event.currentTarget, this.split)
   }
 
   private readonly handlePanelChange = (event: Event): void => {
@@ -431,14 +479,27 @@ export class HelixSandbox extends HelixElement {
     }
     const { value } = (event as HelixBeforeResizeEvent).detail
     event.stopPropagation()
-    if (this.bodyHeight <= 0) {
-      return
+    event.preventDefault()
+    if (this.bodyHeight > 0) {
+      // Back into pixels, which is what this element promises and what a
+      // consumer stored. The divider's position is the panes' share, so the
+      // panel is the rest of it.
+      this.requestPanelSize(Math.max(0, ((100 - Number(value)) / 100) * this.bodyHeight))
     }
-    // Back into pixels, which is what this element promises and what a consumer
-    // stored. The divider's position is the panes' share, so the panel is the
-    // rest of it.
-    this.panelSize = Math.max(0, ((100 - Number(value)) / 100) * this.bodyHeight)
-    this.panelSettled()
+    this.answer(event.currentTarget, this.panelPosition)
+  }
+
+  /**
+   * Puts a divider where this element says it is.
+   *
+   * Typed by what is used rather than by the class, which is the whole of the
+   * coupling: a splitter this does not import is one that can be replaced.
+   */
+  private answer(divider: EventTarget | null, position: number): void {
+    const target = divider as { position?: number } | null
+    if (target && Number.isFinite(position)) {
+      target.position = position
+    }
   }
 
   override connectedCallback(): void {

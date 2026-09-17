@@ -45,7 +45,7 @@ import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js
  * what fills a chip then is whatever the consumer types.
  *
  * @since 0.23.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Facet, Dimension
  * @documentation https://fusion.dev/helix/components/filter-input

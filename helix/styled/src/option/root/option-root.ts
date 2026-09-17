@@ -13,7 +13,7 @@ import { styles } from './option-root.css.js'
  * picked from what they are looking at.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Item, Choice
  * @documentation https://fusion.dev/helix/components/option

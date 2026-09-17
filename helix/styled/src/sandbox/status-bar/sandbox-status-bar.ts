@@ -89,7 +89,16 @@ export class HelixSandboxStatusBar extends HelixElement {
       ${
         language === undefined
           ? nothing
-          : html`<span part="language">${LABELS[language] ?? language}</span>`
+          : html`<span part="language">${
+              /* `Object.hasOwn`, not a truthy index. `LABELS[language]` reaches
+                 `Object.prototype`, and every inherited key comes back truthy,
+                 so `language="constructor"` painted the whole source of
+                 `Object` into the bar where the fallback should have put the
+                 word back unchanged. This is any string a consumer writes, not
+                 a union, which is what makes the reach ordinary rather than
+                 contrived. `Text` records the same trap over its tag map. */
+              Object.hasOwn(LABELS, language) ? LABELS[language] : language
+            }</span>`
       }
       <slot name="end"></slot>`
   }

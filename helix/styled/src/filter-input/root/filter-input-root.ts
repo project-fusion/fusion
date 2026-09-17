@@ -42,7 +42,7 @@ import { styles } from './filter-input-root.css.js'
  * whatever holds it, not a `size` here.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases SearchField, FacetInput, TokenInput
  * @documentation https://fusion.dev/helix/components/filter-input

@@ -12,7 +12,7 @@ import { styles } from './option-group.css.js'
  * tells you which list, not something to read on its own.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases OptGroup, Section
  * @documentation https://fusion.dev/helix/components/option
  */

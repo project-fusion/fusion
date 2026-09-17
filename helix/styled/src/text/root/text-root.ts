@@ -53,7 +53,7 @@ const TAGS: Record<string, StaticValue> = {
  * cross product, which is the explosion a named ramp exists to prevent.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category typography
  * @aliases Paragraph, Copy, Label, Caption, Heading, Title
  * @documentation https://fusion.dev/helix/components/text
