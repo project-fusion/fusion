@@ -29,7 +29,7 @@ import { property, state } from 'lit/decorators.js'
  * input, and it is announced as one.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Stars, Score, Review score
  * @documentation https://fusion.dev/helix/components/rating

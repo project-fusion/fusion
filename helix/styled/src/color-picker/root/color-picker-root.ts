@@ -37,7 +37,7 @@ import { styles } from './color-picker-root.css.js'
  * brought its own card would be a card inside a card there.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://fusion.dev/helix/components/color-picker

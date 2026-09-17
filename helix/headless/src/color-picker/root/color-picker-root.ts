@@ -65,7 +65,7 @@ interface EyeDropperConstructor {
  * model once.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://fusion.dev/helix/components/color-picker
@@ -202,6 +202,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * value is requested. Gating only the request would leave the square under
    * the reader's pointer and the value where it was, which is a control that
    * refuses and looks like it accepted.
+   *
+   * **Two controls are refused whole rather than at either seam**, because
+   * both do something before they ask. The syntax toggle rewrites the value, so
+   * letting it move would show `rgb` over a hex it is no longer allowed to
+   * restate. The eyedropper clears the screen and runs a system sampler, so
+   * letting it open would take a color from the reader and drop it.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
@@ -393,6 +399,15 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * whatever does know decide.
    */
   private readonly handleEyeDropper = async (): Promise<void> => {
+    /* Refused whole, the way the syntax toggle is, and for a sharper version of
+       the same reason. The two events below are a request to whatever is
+       holding this picker to get off the screen, and `EyeDropper` takes the
+       pointer over the whole page: gating this at `move` alone would clear a
+       panel, run a system sampler, take a color from the reader and drop it,
+       which is the control that refuses and looks like it accepted. */
+    if (this.readOnly) {
+      return
+    }
     const Dropper = (globalThis as { EyeDropper?: EyeDropperConstructor }).EyeDropper
     if (!Dropper) {
       return

@@ -82,6 +82,23 @@ if (hasLayout()) {
       expect(hint.top).toBeGreaterThanOrEqual(field.bottom)
     })
 
+    test('and the hook between the marks is not the one beside the score', async () => {
+      /* `--rating-gap` is documented as the space between marks. The distance
+         from the last mark to the readout is a different measurement, and while
+         one name covered both it covered them with two defaults, so a consumer
+         closing the marks up to touch also jammed the number against them. */
+      const host = await rating('show-value value="3"')
+      const between = (): number =>
+        (part(host, 'value') as HTMLElement).getBoundingClientRect().left -
+        (part(host, 'marks') as HTMLElement).getBoundingClientRect().right
+      const beside = between()
+      const wide = (part(host, 'marks') as HTMLElement).getBoundingClientRect().width
+      host.style.setProperty('--rating-gap', '0px')
+      await host.updateComplete
+      expect((part(host, 'marks') as HTMLElement).getBoundingClientRect().width).toBeLessThan(wide)
+      expect(between()).toBeCloseTo(beside, 1)
+    })
+
     test('and a rating with nothing around it is still a row on a line of text', async () => {
       /* `inline-flex` and not `flex`: a rating goes in a product card and a
          table cell, and a block one would take the width of whatever holds it. */

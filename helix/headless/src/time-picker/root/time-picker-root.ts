@@ -108,7 +108,7 @@ const isTwelveHour = (locale?: string): boolean =>
  * wheels, a wheel being a listbox like the list is.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Time, TimeList
  * @documentation https://fusion.dev/helix/components/time-picker

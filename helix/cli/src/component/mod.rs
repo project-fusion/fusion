@@ -60,6 +60,7 @@ pub mod fallbacks;
 pub mod floors;
 pub mod focus_ring;
 pub mod glyphs;
+pub mod grafted;
 pub mod grounds;
 pub mod hook_names;
 pub mod hooks;
@@ -604,6 +605,12 @@ pub fn all() -> Vec<Rule> {
             name: "glyphs",
             run: Runner::Source(glyphs::run),
             summary: "no component renders the icon element for itself",
+        },
+        Rule {
+            fix: None,
+            name: "grafted",
+            run: Runner::Source(grafted::run),
+            summary: "a component applying `MixinField` draws at least one of its seams",
         },
         Rule {
             fix: None,

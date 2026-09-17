@@ -21,7 +21,7 @@ import { styles } from './time-picker-root.css.js'
  * card would be a card inside a card there.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Time, TimeList
  * @documentation https://fusion.dev/helix/components/time-picker

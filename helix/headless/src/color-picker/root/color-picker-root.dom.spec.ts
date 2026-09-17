@@ -481,6 +481,37 @@ describe('a read-only color picker', () => {
     expect(host.value).toBe('#ff0000')
   })
 
+  test('refuses the eyedropper whole, rather than running one that cannot land', async () => {
+    /* `helix-sample-start` is a request to whatever is holding this picker to
+       get off the screen, and the sampler takes the pointer over the whole
+       page. Gated at `move` alone, a read-only picker cleared the panel, ran
+       the sampler, took a color from the reader and dropped it. */
+    let opened = 0
+    ;(globalThis as { EyeDropper?: unknown }).EyeDropper = class {
+      open(): Promise<{ sRGBHex: string }> {
+        opened += 1
+        return Promise.resolve({ sRGBHex: '#00ff00' })
+      }
+    }
+    try {
+      const host = await picker('readonly value="#ff0000"')
+      /* The control is offered only where the platform has an `EyeDropper`, and
+         the read that decides is a second pass rather than the first. */
+      await settle(host as Parameters<typeof settle>[0])
+      let started = 0
+      host.addEventListener('helix-sample-start', () => {
+        started += 1
+      })
+      ;(part(host, 'eyedropper') as HTMLElement).click()
+      await settle(host as Parameters<typeof settle>[0])
+      expect(opened).toBe(0)
+      expect(started).toBe(0)
+      expect(host.value).toBe('#ff0000')
+    } finally {
+      ;(globalThis as { EyeDropper?: unknown }).EyeDropper = undefined
+    }
+  })
+
   test('refuses a value asked for in script, which is the one seam every path comes through', async () => {
     const host = await picker('readonly value="#ff0000"')
     const asked = (host as unknown as { requestValue: (next: string) => boolean }).requestValue(

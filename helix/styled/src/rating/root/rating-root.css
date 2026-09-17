@@ -17,11 +17,19 @@
 
 /* The control itself: the marks, and the score beside them when there is one.
    The gap here is the one that was on the host, so a row with no label and no
-   hint draws exactly as it did. */
+   hint draws exactly as it did.
+ *
+ * **Not `--rating-gap`, which is the space between marks and says so.** The
+ * distance from the last mark to the readout is a different measurement, and
+ * one name over both took two defaults, `2xs` between the marks and `xs`
+ * beside the score: a consumer closing the marks up to touch also jammed the
+ * number against them, and the one sentence on the page described the half
+ * they asked for. `Slider` draws the same row, the control and its readout,
+ * from a token for the same reason. */
 [part="field"] {
   align-items: center;
   display: inline-flex;
-  gap: var(--rating-gap, var(--helix-space-xs));
+  gap: var(--helix-space-xs);
 }
 
 /*
