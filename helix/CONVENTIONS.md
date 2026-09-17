@@ -1464,13 +1464,21 @@ form. Four things follow, and the ones a mixin does not do are the component's.
   consumer can set and never see. Take the mixin for what you render, and reach
   for `ElementInternals` directly for the rest.
 
-  **Three families are not there yet**, measured across the twenty-two that
-  apply the mixin on 16 Sep 2026: Rating, Date Picker and Time Picker each call
+  **Two families are not there yet**, measured across the twenty-two that apply
+  the mixin on 16 Sep 2026: Date Picker and Time Picker each call
   `reportRequired` and none of the render seams, so each of them computes a
-  message and drops it. Rating is a row, and the other two are a panel; giving
-  them the label and the message is a layout decision in the styled tier rather
-  than a line in the base, which is why it is written here as owed rather than
-  quietly left out.
+  message and drops it. Both are a panel; giving them the label and the message
+  is a layout decision in the styled tier rather than a line in the base, which
+  is why it is written here as owed rather than quietly left out.
+
+  **Rating was the third and is the worked example.** It is the one control here
+  whose control is genuinely inline, so the seams could not simply be stacked
+  around it: what it does is keep the marks and the readout in a `field` row and
+  make the host the column every other field already is, `inline-flex` so a
+  rating still sits in a product card or a line of prose. The label is
+  `renderGroupLabel` rather than `renderLabel`, a row of radio buttons having no
+  single control for a `<label for>` to name, which is the same reading
+  `Radio.Group` takes.
 
 ## Use the elements directly
 

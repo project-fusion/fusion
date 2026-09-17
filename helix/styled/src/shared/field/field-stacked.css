@@ -1,6 +1,8 @@
 /* A label above its control, which is every field whose control is a box: the
    input, the textarea, the select, the listbox, the slider, and the three
-   groups. Compose with `field.css`, never instead of it. */
+   groups. Rating takes it too, and is the one whose control is a row rather
+   than a box: it keeps the row in a `field` of its own and stacks the label
+   over it. Compose with `field.css`, never instead of it. */
 
 [part="label"] {
   display: block;
