@@ -215,6 +215,22 @@ describe('asking for another item in a set', () => {
       '<helix-headless-video extra-controls="previous next" label="A clip" src="/clip.mp4"></helix-headless-video>',
     )
 
+  /**
+   * A reader listing words puts commas between them, and this list used to be
+   * split on whitespace alone: `previous,` is not a control name, so the first
+   * of the pair was dropped, nothing was logged, and the property's own
+   * docblock says unrecognized values are skipped, which is what the behavior
+   * then looked like. `writtenList` is the split every consumer-written list
+   * takes now.
+   */
+  test('and a list written with commas offers the same two', async () => {
+    const host = await player(
+      '<helix-headless-video extra-controls="previous, next" label="A clip" src="/clip.mp4"></helix-headless-video>',
+    )
+    expect(part(host, 'previous')).not.toBeNull()
+    expect(part(host, 'next')).not.toBeNull()
+  })
+
   test('both controls are offered without anything being checked', async () => {
     /* Neither does anything to the video, so there is nothing to feature-test.
        A player that hid them until it could prove a set existed would be a
