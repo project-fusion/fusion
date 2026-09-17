@@ -25,7 +25,7 @@ import { styles } from './sandbox-source.css.js'
  * is the documented escape hatch for exactly this trade.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Editor, Code pane
  * @documentation https://fusion.dev/helix/components/sandbox
  *

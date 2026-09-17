@@ -20,7 +20,7 @@ import { styles } from './carousel-root.css.js'
  * draws one across.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Slider, Gallery, Slideshow
  * @documentation https://fusion.dev/helix/components/carousel

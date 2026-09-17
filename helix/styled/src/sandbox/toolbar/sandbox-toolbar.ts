@@ -19,7 +19,7 @@ import { styles } from './sandbox-toolbar.css.js'
  * Both slots are bare, so an unfilled one generates no box and costs no gap.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Action bar
  * @documentation https://fusion.dev/helix/components/sandbox
  *

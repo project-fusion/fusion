@@ -51,7 +51,7 @@ const PANEL_MAX = 0.8
  * outer one, which is the order that makes the panel span the full width.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category tooling
  * @aliases Playground, REPL, Editor
  * @documentation https://fusion.dev/helix/components/sandbox

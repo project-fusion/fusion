@@ -31,7 +31,7 @@ const LIMIT = 200
  * the whole panel being re-announced each time.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Console, Output
  * @documentation https://fusion.dev/helix/components/sandbox
  *

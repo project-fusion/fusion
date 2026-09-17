@@ -36,7 +36,7 @@ const LABELS: Record<string, string> = {
  * empty, or the bar keeps a gap where a value is not.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Status line
  * @documentation https://fusion.dev/helix/components/sandbox
  *
