@@ -230,6 +230,10 @@
  *    add for it: the headless tier draws the window and the spacers, and neither
  *    means anything in a box with no height to overflow.
  *
+ *    **So this box is a scrollport the headless tier reads and does not mark**,
+ *    which is a departure from `data-scroller` recorded in `HelixElement` and in
+ *    CONVENTIONS. Taking the height away here takes the windowing with it.
+ *
  *    **`block-size` and not `max-block-size`**, which would fit a short result and
  *    is the more considerate looking of the two. A maximum leaves the height a
  *    function of the rows drawn while the rows drawn are a function of the height,

@@ -1138,6 +1138,10 @@ export class HelixHeadlessVideo extends HelixElement {
     if (!video) {
       return
     }
+    /* Five seconds an arrow, the distance a native `<video controls>` moves by,
+       and ten with shift held, which is `SKIP_SECONDS` reached from the keyboard
+       rather than from a button: `j` and shift-left have to agree or the player
+       skips two distances under one name. */
     const step = event.shiftKey ? 10 : 5
     switch (event.key) {
       case ' ':
@@ -1154,6 +1158,10 @@ export class HelixHeadlessVideo extends HelixElement {
         break
       }
       case 'ArrowUp': {
+        /* A tenth of the range a press, so the whole of it is ten presses
+           either way. Clamped here rather than left to the platform, which
+           throws on a volume outside zero to one instead of taking the nearest
+           legal one. */
         video.volume = Math.min(video.volume + 0.1, 1)
         break
       }

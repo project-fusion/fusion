@@ -169,7 +169,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    * **A chart-domain axis and deliberately not a library one.** It lives on this
    * family alone, and here it is a way of encoding data rather than a way of
    * expressing a theme: promoted to the registry it would put an attribute on
-   * eighty-eight components that means nothing on eighty-seven. `wash` because
+   * every component in the library and mean something on one. `wash` because
    * that is what the tier below already calls it, in `--chart-bar-wash` and in
    * the `bar-wash-start` and `bar-wash-end` stops.
    */

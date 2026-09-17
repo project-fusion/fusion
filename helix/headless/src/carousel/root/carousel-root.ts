@@ -111,12 +111,11 @@ export class HelixHeadlessCarousel extends HelixElement {
   /**
    * The slide in view, counted from zero.
    *
-   * Reading gives the real slide, in either mode. Writing sets it, the way a
-   * script assigning to a native control does. Which mode the carousel is in is
-   * read once, at the first update, from whether anything had declared an
-   * `index` by then: declared, and the consumer owns it and the carousel only
-   * announces where it would have gone; not declared, and the carousel owns it
-   * and `default-index` says where it starts.
+   * Reading gives the real slide. Writing always applies, the way a script
+   * assigning to a native control does, and is a seed and a correction rather
+   * than a claim of ownership: a consumer who wants the decision refuses the
+   * `helix-select`. `default-index` is where the carousel starts until
+   * something moves it.
    *
    * The same contract the four mixins carry, written out here rather than
    * extracted, because a slide is addressed by position and every one of those
@@ -972,9 +971,9 @@ export class HelixHeadlessCarousel extends HelixElement {
     super.updated(changed)
     /* The track follows `index`, whoever moved it.
      *
-     * Not from inside `goTo`'s apply callback: that returns early in controlled
-     * mode, so the dots update and the slides sit still, and it is not the only
-     * path in either, a plain `carousel.index = 2` reaching no apply at all. */
+     * Not from inside `goTo`'s apply callback, which is not the only path here:
+     * a plain `carousel.index = 2` reaches no apply at all, and a refused
+     * `helix-select` reaches none either. */
     /* And the first time there are panes to follow it to: a carousel whose
        slides arrived after its first render, which is every carousel that
        hydrated a server's markup, had an `index` and nothing to scroll to, and

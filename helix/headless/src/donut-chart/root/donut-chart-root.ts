@@ -152,7 +152,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * `--donut-chart-stroke`, which is a number a rule can do sums with where the
    * word is not. Reflected, it wrote a value onto every host a script had set
    * it on for nothing to read. `sweep` beside it is the converse and reflects,
-   * because three rules select on it.
+   * because the styled sheet selects on it.
    */
   @property()
   hole?: 'large' | 'none' | 'small'

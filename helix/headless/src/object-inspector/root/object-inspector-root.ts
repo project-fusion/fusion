@@ -196,10 +196,21 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   /** Set by a keyboard move, so the next render brings the active row into view. */
   private revealing = false
 
+  /**
+   * How tall a row is taken to be before it has been drawn, in pixels.
+   *
+   * A constant rather than the property `VirtualList` and `DataTable` carry:
+   * every row here is one line of the same text at this family's own leading,
+   * so there is nothing for a consumer to tell it. `reveal` falls back to this
+   * when a drawn row measures zero, and the two have to be the same number or a
+   * keyboard move scrolls by a different row than the window counted with.
+   */
+  static readonly ESTIMATE = 24
+
   private readonly virtualize = new VirtualizeController(this, {
     container: () => (this.windowed ? this.partNamed('tree') : null),
     count: () => this.rows.length,
-    estimate: () => 24,
+    estimate: () => HelixHeadlessObjectInspector.ESTIMATE,
     measured: () => this.windowed,
     rows: () =>
       [...(this.renderRoot?.querySelectorAll<HTMLElement>('[part~="row"]') ?? [])].map(
@@ -352,7 +363,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     if (!tree || !this.windowed || !first || !last || attempts === 0) {
       return
     }
-    const height = first.offsetHeight || 24
+    const height = first.offsetHeight || HelixHeadlessObjectInspector.ESTIMATE
     const from = Number(
       this.active > Number(last.dataset.index) ? last.dataset.index : first.dataset.index,
     )

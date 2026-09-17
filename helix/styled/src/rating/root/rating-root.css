@@ -8,16 +8,13 @@
 
   /* The stack every other field is, and `inline-flex` rather than `flex`: a
      rating goes in a product card, a table cell and a line of prose, and a
-     block one would take the width of whatever holds it. The row it used to be
-     is `field` below. */
+     block one would take the width of whatever holds it. */
   display: inline-flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
 }
 
 /* The control itself: the marks, and the score beside them when there is one.
-   The gap here is the one that was on the host, so a row with no label and no
-   hint draws exactly as it did.
  *
  * **Not `--rating-gap`, which is the space between marks and says so.** The
  * distance from the last mark to the readout is a different measurement, and

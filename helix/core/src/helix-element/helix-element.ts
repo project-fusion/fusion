@@ -99,8 +99,16 @@ const HIDDEN = css`
  * and margins that had been collapsing stopped. A mechanism with a layout
  * consequence is one to apply exactly where it is needed.
  *
- * Three qualify: `ScrollArea`, `VirtualList` and `Carousel`, each of which
- * reads `scrollTop` or `scrollLeft` and acts on the answer.
+ * `ScrollArea`, `VirtualList`, `Carousel` and `ObjectInspector` mark theirs,
+ * each reading `scrollTop` or `scrollLeft` and acting on the answer.
+ *
+ * **`Chat` and `DataTable` read one and do not mark it, which is a departure
+ * and not a second exception.** Both read `scrollTop` on this tier, through
+ * `VirtualizeController` and, for `Chat`, directly as well, and both take the
+ * `overflow` that makes the reading mean anything from their styled sheet. So
+ * the window each of them draws is inert on a page that loads only
+ * `helix/headless`, which is the case this rule exists for. Marking them is the
+ * fix, and `Megamenu` above is why it is measured rather than assumed.
  */
 const SCROLLER = css`
   [data-scroller] {

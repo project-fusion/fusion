@@ -139,7 +139,7 @@
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Hover on the mark rather than the row, since the row no longer carries one. */
+/* Hover on the mark rather than the row, which has no ground of its own. */
 [part="column"] [part~="option"]:not([disabled]):hover::part(label),
 [part="column"] [part~="option"][data-active]::part(label) {
   background-color: var(--helix-color-surface-sunken);

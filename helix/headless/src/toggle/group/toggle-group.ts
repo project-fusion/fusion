@@ -198,7 +198,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`. The mark is not placed from here: the indicator
+    // `MixinPickerField.updated`. The mark is not placed from here: the indicator
     // controller already places on every update of its own host.
     this.sync()
     this.validate()

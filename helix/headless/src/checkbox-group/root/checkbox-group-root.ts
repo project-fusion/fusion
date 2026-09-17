@@ -136,10 +136,10 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
    * because the group is what it is dispatched from: without the guard the
    * group answers itself until the stack gives out.
    *
-   * The requested state comes from the event rather than from the box. Driving
-   * the boxes from `value` makes them controlled, so a controlled box applies
-   * nothing on its own and reports what it was asked for. Reading `checked`
-   * here would read the state it still holds and nothing would ever change.
+   * The requested state comes from the event rather than from the box.
+   * `helix-before-toggle` is dispatched before the box applies, so reading
+   * `checked` here would read the state it still holds and nothing would ever
+   * change.
    */
   private readonly handleToggle = (event: Event): void => {
     const target = event.target
@@ -171,8 +171,9 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
        the boxes rather than state it owns, so there is nothing for the mixin to
        control.
 
-       The boxes have already moved either way. Each answered the reader before
-       this ran, so refusing here stops only the group's value from following. */
+       The box moves either way. It applies once this listener returns, the
+       request above having stood, so refusing here stops only the group's value
+       from following. */
     const next = this.boxes
       .filter((box) => (box === changed ? wanted : box.checked))
       .map((box) => box.value)

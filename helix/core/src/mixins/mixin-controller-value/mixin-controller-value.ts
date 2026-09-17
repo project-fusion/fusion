@@ -35,8 +35,8 @@ export declare class MixinControllerValueInterface {
    *
    * A control the reader types or drags in moves continuously, and the platform
    * calls that `input`: `<input type="text">` fires one per keystroke and fires
-   * `change` once, on commit. Five controls here are that shape, and the rest
-   * change in discrete steps where a step *is* the change.
+   * `change` once, on commit. A few of the controls here are that shape, and
+   * the rest change in discrete steps where a step *is* the change.
    *
    * It selects the event rather than the timing. `requestValue` is called
    * whenever the value moves either way; this decides whether the control sends

@@ -24,7 +24,7 @@ export declare class MixinControllerCheckedInterface {
    */
   checked: boolean
 
-  /** Initial checked state for uncontrolled use. Ignored once `checked` is set. */
+  /** Whether the markup declared it checked, which is where a reset returns to. */
   defaultChecked: boolean
 
   /**
@@ -88,7 +88,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     }
 
     /**
-     * Initial checked state for uncontrolled use, where nothing declared one.
+     * Whether the markup declared it checked, which is where a reset returns to.
      */
     @property({ attribute: 'default-checked', type: Boolean })
     defaultChecked = false

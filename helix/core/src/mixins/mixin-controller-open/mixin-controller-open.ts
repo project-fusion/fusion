@@ -15,7 +15,7 @@ type Constructor<T> = new (...args: any[]) => T
  * to this interface keeps the internals private and the build working.
  */
 export declare class MixinControllerOpenInterface {
-  /** Initial open state for uncontrolled use. Ignored once `open` is set. */
+  /** Whether the markup declared it open. Ignored once `open` is written. */
   defaultOpen: boolean
 
   /**
@@ -90,7 +90,7 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
     }
 
     /**
-     * Initial open state for uncontrolled use, where nothing declared one.
+     * Whether the markup declared it open. Ignored once `open` is written.
      */
     @property({ attribute: 'default-open', type: Boolean })
     defaultOpen = false

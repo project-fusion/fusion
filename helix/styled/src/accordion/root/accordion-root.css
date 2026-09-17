@@ -25,8 +25,7 @@
   border: var(--helix-border-thin) solid var(--accordion-border-color, var(--helix-color-border));
   /* The house radius. */
   border-radius: var(--accordion-radius, var(--helix-radii-sm));
-  /* Clips the trigger's own hover fill to the item's corners, which is what the
-     stack's frame used to do for all of them at once. */
+  /* Clips the trigger's own hover fill to the item's corners. */
   overflow: hidden;
 }
 

@@ -380,6 +380,10 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       const at = scale(value)
       const along = Math.min(floor, at)
       const size = Math.abs(floor - at)
+      /* `0.14` is half of what the group leaves over, `(1 - 0.72) / 2` from the
+         stride above, and it is what centers the group in its slot. The two
+         numbers are one decision written twice: move the 0.72 alone and every
+         group slides off center with nothing on screen to say so. */
       const across = index * slot + slot * 0.14 + depth * stride + gap / 2
       return sideways
         ? svg`<rect
