@@ -195,6 +195,76 @@ const READONLY: &str = r"export class HelixInput extends LitElement {
 }
 ";
 
+/// The event class, wherever a library keeps it: found by `eventName`.
+const DISMISS_EVENT: &str = "export class HelixDismissEvent extends CustomEvent {\n  static readonly eventName = 'helix-dismiss'\n\n  constructor(detail) {\n    super(HelixDismissEvent.eventName, { bubbles: true, cancelable: true, composed: true, detail })\n  }\n}\n";
+
+/// The mixin every fixture below is built on. It is the only thing in the tree
+/// that builds the event, which is what puts the event in this rule's corpus.
+const DISMISSIBLE: &str = "export const MixinDismissible = (Base) => {\n  class Dismissible extends Base {\n    dismiss() {\n      this.dispatchEvent(new HelixDismissEvent({ label: '' }))\n    }\n  }\n  return Dismissible\n}\n";
+
+#[test]
+fn applied() {
+    plant(
+        "applied",
+        &[
+            ("helix.json", TIERS),
+            ("src/core/events.ts", DISMISS_EVENT),
+            ("src/core/mixin-dismissible.ts", DISMISSIBLE),
+            ("src/toast/item/toast-item.ts", "/**\n * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go.\n */\n@customElement('helix-toast-item')\nexport class HelixToastItem extends MixinDismissible(HelixElement) {}\n"),
+        ],
+        |tree| {
+            tree.write("src/card/root/card-root.ts", "/**\n * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go.\n */\n@customElement('helix-card')\nexport class HelixCard extends HelixElement {}\n");
+        },
+        "HelixCard declares `helix-dismiss` and applies nothing that sends it",
+        "src/card/root/card-root.ts",
+    );
+}
+
+/// A root declaring the bubbling event its own rows send is the one legitimate
+/// shape this rule's first argument excluded by mistake: "no child to relay it
+/// from" holds only while no element applies the mixin, and the row does.
+#[test]
+fn applied_allows_a_root_whose_own_row_sends_it() {
+    let tree = Tree::new("applied-kin");
+    tree.write("helix.json", TIERS);
+    tree.write("src/core/events.ts", DISMISS_EVENT);
+    tree.write("src/core/mixin-dismissible.ts", DISMISSIBLE);
+    tree.write("src/toast/item/toast-item.ts", "@customElement('helix-toast-item')\nexport class HelixToastItem extends MixinDismissible(HelixElement) {}\n");
+    tree.write("src/toast/root/toast-root.ts", "/**\n * @event {HelixDismissEvent} helix-dismiss - Fired when a toast asks to go.\n */\n@customElement('helix-toast')\nexport class HelixToast extends HelixElement {}\n");
+    let verdict = judge(&tree, "applied", "applied");
+    assert!(
+        verdict.checked > 0,
+        "`applied` counted nothing, so the fixture is not what it reads"
+    );
+    assert!(
+        verdict.findings.is_empty(),
+        "`applied` reported a root whose own row sends the event: {:?}",
+        verdict.findings
+    );
+}
+
+/// And only for an event that can reach the root. `toggle` carries the
+/// platform's own `bubbles: false`, so a sibling applying the controller that
+/// sends it says nothing about what the root may promise. Without the gate the
+/// fault this rule was written for would come back.
+#[test]
+fn applied_gates_the_family_on_bubbling() {
+    let tree = Tree::new("applied-bubbles");
+    tree.write("helix.json", TIERS);
+    /* An event class, because the rule refuses to judge a tree it can see none
+       in: with no names every construction resolves to nothing. */
+    tree.write("src/core/events.ts", DISMISS_EVENT);
+    tree.write("src/core/mixin-controller-open.ts", "export const MixinControllerOpen = (Base) => {\n  class Open extends Base {\n    announce() {\n      this.dispatchEvent(new Event('toggle', { bubbles: false, cancelable: false, composed: false }))\n    }\n  }\n  return Open\n}\n");
+    tree.write("src/tour/stop/tour-stop.ts", "@customElement('helix-tour-stop')\nexport class HelixTourStop extends MixinControllerOpen(HelixElement) {}\n");
+    tree.write("src/tour/root/tour-root.ts", "/**\n * @event {Event} toggle - Fired when the tour opens or closes.\n */\n@customElement('helix-tour')\nexport class HelixTour extends HelixElement {}\n");
+    assert_found(
+        "applied",
+        &judge(&tree, "applied", "applied"),
+        "HelixTour declares `toggle` and applies nothing that sends it",
+        "src/tour/root/tour-root.ts",
+    );
+}
+
 #[test]
 fn attribute_names() {
     plant(
