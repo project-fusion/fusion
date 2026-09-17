@@ -38,7 +38,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @aliases Notification feed, Inbox, Activity
  * @documentation https://fusion.dev/helix/components/notifications
  *
- * @slot - The notifications, as `helix-notification` children.
+ * @slot - The notifications.
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
  *
@@ -319,11 +319,11 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * which React reports on hydration and does not patch up.
    */
   private markEmpty(): void {
-    /* `hidden` beside the `data-empty` mirror: `data-empty` is the hook the styled
-       sheet reads, and this tier ships no sheet, so an empty region left in the box
-       tree would be a gap a headless consumer cannot close without knowing to look
-       for it. The styled rule stays too, because that sheet sets `display` on these
-       parts and therefore outranks the UA's `[hidden]` one. */
+    /* `hidden` beside the `data-empty` mirror: `data-empty` is the hook a sheet
+       selects on, and this tier ships none, so an empty region left in the box
+       tree would be a gap a consumer cannot close without knowing to look for
+       it. Both stay, since `[hidden]` is a UA rule and a sheet setting `display`
+       on these parts outranks it. */
     /* The header is not empty while this element is drawing its own control into
        it. */
     markRegion(this.renderRoot, 'header', ['header'], { occupied: '[part="mark-all"]' })

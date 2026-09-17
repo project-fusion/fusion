@@ -86,10 +86,10 @@ describe('where the copy button stands', () => {
  * `no-copy` reaches the host, because the gutter is a rule and not code.
  *
  * **The property alone is half the feature.** `render` reads it and leaves the
- * copy button off, which is visible and looks like the whole job done; the
- * styled tier reserves that button's width with `:host(:not([no-copy]))`, so
- * without the reflection a block told from script to drop the button still pays
- * 40px for it.
+ * copy button off, which is visible and looks like the whole job done; a sheet
+ * reserves that button's width with `:host(:not([no-copy]))`, so without the
+ * reflection a block told from script to drop the button still pays 40px for
+ * it.
  */
 describe('the no-copy attribute follows the property', () => {
   test('a property write reflects, which is the only way the gutter rule hears it', async () => {

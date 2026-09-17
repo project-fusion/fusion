@@ -64,7 +64,7 @@ export class HelixHeadlessButton extends HelixFormElement {
    * the same way `label` becomes `aria-label` in there.
    *
    * ```html
-   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * <helix-headless-button commandfor="confirm" command="--show">Delete…</helix-headless-button>
    * ```
    *
    * `commandFor` spells its attribute out, because Lit lowercases a property

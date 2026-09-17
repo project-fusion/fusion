@@ -76,8 +76,8 @@ const isTwelveHour = (locale?: string): boolean =>
  *
  * @description
  * **A list rather than three wheels**, and the reason is what a list already
- * is. `helix-listbox` brings the keyboard, the typeahead, the scroll into view
- * and the announcement of a set of options, and a time at a step is a set of
+ * is. `Listbox` brings the keyboard, the typeahead, the scroll into view and
+ * the announcement of a set of options, and a time at a step is a set of
  * options. Three little wheels for hours, minutes and a meridiem are three
  * controls to build, three to test, and a tab stop each for something a reader
  * answers once.
@@ -209,7 +209,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    *
    * Absent is one. `range` holds a start and an end with everything between
    * them shown as part of the answer, `multiple` holds any number, and both are
-   * carried as one comma-separated value: the same shape `helix-date-picker` uses,
+   * carried as one comma-separated value: the same shape `DatePicker` uses,
    * because it is the same question asked of a different unit.
    *
    * **A range is two picks, and a third starts over.** That is the calendar's
@@ -585,11 +585,11 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   /**
    * Reveals once the wheels, or the list and its rows, have rendered themselves.
    *
-   * `updated` is this element's own moment, and each wheel is a `helix-listbox`
-   * that was created during this very render: its first update has been
-   * scheduled and has not run, so it has no rows and no height and `reveal`
-   * measures zero and gives up. Measured on a standalone picker, every column
-   * sat at `scrollTop: 0` with the answer nine rows down, which reads as a wheel
+   * `updated` is this element's own moment, and each wheel is a `Listbox` that
+   * was created during this very render: its first update has been scheduled
+   * and has not run, so it has no rows and no height and `reveal` measures zero
+   * and gives up. Measured on a standalone picker, every column sat at
+   * `scrollTop: 0` with the answer nine rows down, which reads as a wheel
    * showing the wrong time rather than as one that failed to scroll.
    *
    * Whatever opens a panel calls `reveal` again afterwards, for the separate

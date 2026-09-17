@@ -34,8 +34,8 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * the ordinary way:
  *
  * ```html
- * <helix-button id="save" aria-describedby="save-tip">Save</helix-button>
- * <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip>
+ * <helix-headless-button id="save" aria-describedby="save-tip">Save</helix-headless-button>
+ * <helix-headless-tooltip id="save-tip" for="save" content="Save your work"></helix-headless-tooltip>
  * ```
  *
  * The reference points at *this host*, not at the bubble in its shadow root:
@@ -385,9 +385,10 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        *
        * Not children-or-text for every element, which reads as careful and
        * refuses the exact case this getter's own paragraph calls the whole
-       * point of slotting: `<helix-icon slot="content">` has no children and no
-       * text, so `hasContent` would be false, `show()` would return early, and
-       * a tooltip whose bubble is an icon could not be opened at all.
+       * point of slotting: `<helix-headless-icon slot="content">` has no
+       * children and no text, so `hasContent` would be false, `show()` would
+       * return early, and a tooltip whose bubble is an icon could not be opened
+       * at all.
        *
        * The spec beside this one is the other half, and it is why the answer is
        * not simply "an element is content": `<span slot="content">   </span>`
@@ -633,7 +634,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        the single form that could never be reported.
 
        Measured in Chrome's accessibility tree,
-       `<helix-tooltip content="..."><helix-button>Save</helix-button></helix-tooltip>`
+       `<helix-headless-tooltip content="..."><helix-headless-button>Save</helix-headless-button></helix-headless-tooltip>`
        exposes `button name="Save" desc=""`. All three routes to fixing it are
        closed: an `aria-describedby` IDREF resolves only within one tree,
        `ariaDescribedByElements` is valid outward and this points inward, and

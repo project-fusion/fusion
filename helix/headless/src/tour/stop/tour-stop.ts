@@ -31,9 +31,9 @@ import '../../button/index.js'
  * - **When it shows.** Which is `current`, and which the root decides.
  *
  * What it does not own is the heading, the paragraph, the picture and the
- * layout. Slot a `helix-card`, or a heading and a line of prose, or anything
- * else. Fixed `title` and `body` parts would be a component deciding what a
- * tour is allowed to say.
+ * layout. Slot a `Card`, or a heading and a line of prose, or anything else.
+ * Fixed `title` and `body` parts would be a component deciding what a tour is
+ * allowed to say.
  *
  * **The buttons are slot fallback, so the common case costs nothing and the
  * uncommon one is possible.** Write nothing and get Back, Next and Skip already

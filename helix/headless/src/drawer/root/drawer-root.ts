@@ -31,8 +31,8 @@ import { property } from 'lit/decorators.js'
  * Opened declaratively with the platform's invoker attributes:
  *
  * ```html
- * <helix-button commandfor="nav" command="--toggle">Menu</helix-button>
- * <helix-drawer id="nav">…</helix-drawer>
+ * <helix-headless-button commandfor="nav" command="--toggle">Menu</helix-headless-button>
+ * <helix-headless-drawer id="nav">…</helix-headless-drawer>
  * ```
  *
  * @since 0.1.0
@@ -58,7 +58,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-drawer')
 export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   /* Opened and closed from anywhere on the page, without a line of script:
-     `<helix-button commandfor="…" command="--show">`. The same three commands
+     `<helix-headless-button commandfor="…" command="--show">`. The same three commands
      the dialog answers, because they are the same act: a drawer and a dialog
      differ in where they sit, not in what opening one means. */
   protected readonly commands = new CommandController(this, {
@@ -109,10 +109,10 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   /**
    * Which edge the drawer comes from.
    *
-   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
-   * beside `:host([placement="end"])` rather than as a value written here: a
+   * Unset is `end`, and it stays unset rather than being written down: a
    * default assigned to the property would reflect onto every host and put a
-   * `placement="end"` into markup no consumer wrote.
+   * `placement="end"` into markup no consumer wrote. So what this tier
+   * guarantees is the absence, and a sheet selects on it.
    */
   @property({ reflect: true })
   placement?: 'start' | 'end' | 'top' | 'bottom'

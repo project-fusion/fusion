@@ -114,10 +114,10 @@ export class HelixHeadlessImage extends HelixElement {
    * **Mirrored to `data-status`, and not reflected as `status`.** It is element
    * state, so reflecting it puts the element's own bookkeeping into the markup
    * a consumer rendered: React reads the attribute appearing at upgrade as a
-   * hydration mismatch, and a serialized `<helix-image status="loaded">` pasted
-   * back declares that a picture has arrived which this element has never
-   * fetched. The `data-` name is the library's answer to both, being a name a
-   * re-parse cannot mistake for a declaration, and it is what `data-closed` on
+   * hydration mismatch, and a host pasted back carrying `status="loaded"`
+   * declares that a picture has arrived which this element has never fetched.
+   * The `data-` name is the library's answer to both, being a name a re-parse
+   * cannot mistake for a declaration, and it is what `data-closed` on
    * `Toast.Item` already does. A picture arrives after somebody fetched it,
    * which puts this on the safe side of hydration: a fact that can be true on
    * the *first* update mirrors to a custom state instead, which is what

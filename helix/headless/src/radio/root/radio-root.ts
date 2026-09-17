@@ -56,7 +56,7 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
    * **The attribute, read when it is asked for, and never a snapshot taken in
    * the constructor.** A field initializer runs there, and an element the HTML
    * parser created has none of its attributes yet at that moment: measured on
-   * this element, on `Option` and on `Toggle`, `<helix-radio value="a"
+   * this element, on `Option` and on `Toggle`, `<helix-headless-radio value="a"
    * selected>` reported `defaultSelected` as `false` both from parsed markup
    * and from `createElement` followed by `setAttribute`, which is every way a
    * consumer writes one. The snapshot could only ever be true for an element

@@ -33,7 +33,7 @@ import '../../table/index.js'
  * @category data
  * @documentation https://fusion.dev/helix/components/data-table
  *
- * @slot - The columns, declared as `helix-table-column` children.
+ * @slot - The columns, declared rather than drawn.
  * @slot footer - Below the grid, replacing the pagination this would otherwise draw.
  * @slot toolbar - Above the grid, for a search field or actions.
  *

@@ -22,9 +22,9 @@ import '../../format-date/index.js'
  * @summary One thing that happened, which a reader may not have seen yet.
  *
  * @description
- * A notification is a toast that did not go away. `helix-toast` is deliberately
- * the opposite of this: a live region whose items carry a `duration` and whose
- * root never creates or destroys anything. What makes this its own family is the
+ * A notification is a toast that did not go away. `Toast` is deliberately the
+ * opposite of this: a live region whose items carry a `duration` and whose root
+ * never creates or destroys anything. What makes this its own family is the
  * state each item carries rather than the arrangement it sits in: read and
  * unread, a timestamp that has to stay correct, and an action a reader can take
  * later.
@@ -36,9 +36,9 @@ import '../../format-date/index.js'
  * reader wants exactly one of them at a time: the time while they are scanning,
  * and what they can do about it once they have stopped on a row.
  *
- * **The timestamp is `helix-format-date`**, which is where the reading, the
- * `<time datetime>` and the shared timer now live. It was implemented here, and
- * a component that formats a date is not a fact about notifications: Chat wanted
+ * **The timestamp is `FormatDate`**, which is where the reading, the `<time
+ * datetime>` and the shared timer now live. It was implemented here, and a
+ * component that formats a date is not a fact about notifications: Chat wanted
  * the same thing and had its own copy of half of it.
  *
  * **Read state is reported, not invented.** Marking something read is usually a
@@ -105,10 +105,10 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
    *
    * **Not reflected.** Unread is a visual state, which is why the four mixins
    * mirror theirs, but the mirror may not be the property's own attribute:
-   * `<helix-notification default-read>` comes back from a server without `read`
-   * and would gain it on the first update, which React reports as a hydration
-   * mismatch, and which a copy of the serialized element re-parses as a
-   * declaration. `:state(read)` is what the stylesheet reads.
+   * `<helix-headless-notification default-read>` comes back from a server
+   * without `read` and would gain it on the first update, which React reports
+   * as a hydration mismatch, and which a copy of the serialized element
+   * re-parses as a declaration. `:state(read)` is what the stylesheet reads.
    * `hydration.dom.spec.ts` holds it.
    */
   @property({ type: Boolean })

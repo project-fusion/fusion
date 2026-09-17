@@ -68,7 +68,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   label = ''
 
   /* Opened and closed from anywhere on the page, without a line of script:
-     `<helix-button commandfor="…" command="--show">`. See `CommandController`
+     `<helix-headless-button commandfor="…" command="--show">`. See `CommandController`
      for why this is the platform's invoker rather than a `data-` recipe. */
   protected readonly commands = new CommandController(this, {
     commands: {
@@ -282,10 +282,10 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    * restarts it: without that, pressing twice does nothing the second time,
    * which is the impression the whole thing exists to avoid.
    *
-   * **`once: true` is not a release when the event cannot arrive.** Under
-   * `prefers-reduced-motion: reduce` the styled tier sets `animation: none`, so
-   * no animation runs, `animationend` never fires, and every refused press left
-   * a listener that could not be removed and an attribute that stayed on. The
+   * **`once: true` is not a release when the event cannot arrive.** A sheet
+   * that sets `animation: none` under `prefers-reduced-motion: reduce` runs
+   * none, so `animationend` never fires, and every refused press left a
+   * listener that could not be removed and an attribute that stayed on. The
    * controller bounds it to one listener, aborted before the next is added.
    *
    * **And the attribute is cleared at once when no animation is running**, asked

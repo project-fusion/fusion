@@ -229,12 +229,12 @@ export class HelixHeadlessChatComposer extends HelixElement {
   /**
    * Records the draft, and stops the textarea speaking in this element's name.
    *
-   * **The stop is not incidental.** `input` is composed by specification, so the
-   * `<textarea>` in this shadow root sent its own past this host and on through
-   * whatever `<helix-chat>` it is slotted into, and neither element declares an
-   * `input`: a consumer binding one on either received an undeclared event whose
-   * target was a control they cannot reach. What a composer offers is
-   * `helix-send`, once, when the reader is done.
+   * **The stop is not incidental.** `input` is composed by specification, so
+   * the `<textarea>` in this shadow root sent its own past this host and on
+   * through whatever `<helix-headless-chat>` it is slotted into, and neither
+   * element declares an `input`: a consumer binding one on either received an
+   * undeclared event whose target was a control they cannot reach. What a
+   * composer offers is `helix-send`, once, when the reader is done.
    */
   private readonly handleInput = (event: Event): void => {
     event.stopPropagation()

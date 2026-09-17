@@ -86,9 +86,9 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   private readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
     /* The host *and* whatever invoked it, never the panel alone. An outside
-       press is measured against this, and the styled host is
-       `display: contents` with no box of its own, so a boundary of the panel
-       alone would close on the very press that opened it. A `--toggle` button
+       press is measured against this, and the host is not a box to rely on, a
+       sheet being free to give it none, so a boundary of the panel alone would
+       close on the very press that opened it. A `--toggle` button
        outside the host is part of the control by any reading a reader would
        give it: pressing it while the panel is open should close it once, not
        close it on `pointerdown` and reopen it on the `click` that follows. */
@@ -104,12 +104,13 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    * The invoker that last opened the panel, when a command did.
    *
    * Kept because the `source` a command hands the handlers is needed twice
-   * over. It is the anchor: the styled host is a boxless `display: contents`
-   * element, so a popover opened by a command outside it would otherwise open
-   * against the window origin. And the outside-press dismissal has to know the
-   * invoker is part of the control, the press firing on `pointerdown` and the
-   * command arriving on the `click` after it, or a `--toggle` button outside
-   * the host closes the panel and immediately reopens it, for ever.
+   * over. It is the anchor: the host is not a box to position against, a sheet
+   * being free to give it none, so a popover opened by a command outside it
+   * would otherwise open against the window origin. And the outside-press
+   * dismissal has to know the invoker is part of the control, the press firing
+   * on `pointerdown` and the command arriving on the `click` after it, or a
+   * `--toggle` button outside the host closes the panel and immediately reopens
+   * it, for ever.
    */
   private invoker: HTMLElement | undefined
 

@@ -28,10 +28,10 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @summary A time, typed or picked from a list.
  *
  * @description
- * **The list is `helix-time-picker`, not a second one written here.** It is worth
+ * **The list is `TimePicker`, not a second one written here.** It is worth
  * having on its own, flat in a settings pane with nothing to open, and this
  * element is the field, the overlay and the form. Exactly the arrangement Input
- * Date has with `helix-date-picker` and Color Input with `helix-color-picker`.
+ * Date has with `DatePicker` and Color Input with `ColorPicker`.
  *
  * **Typed as well as picked, and that is the division the list depends on.** A
  * list at a step offers the times a product actually has, and the field is how a
@@ -161,8 +161,8 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
    *
    * Absent is one. `range` holds a start and an end, `multiple` holds any
    * number, and both are carried as one comma-separated value, which is what a
-   * form submits. `helix-time-picker` carries the longer note on the interaction and on
-   * why a wheel cannot do either.
+   * form submits. `TimePicker` carries the longer note on the interaction and
+   * on why a wheel cannot do either.
    */
   @property({ reflect: true })
   mode?: 'multiple' | 'range'
@@ -359,7 +359,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
    * `list` offers whole times, which is what a product with slots or opening
    * hours has. `wheels` splits them into an hour, a minute and a meridiem where
    * the locale uses one, which is the only way to reach `23:45` without
-   * scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
+   * scrolling most of a day. `TimePicker` carries the longer note on the trade.
    *
    * **Optional rather than defaulted, which is not a style preference.** A
    * reflecting property with a default writes its attribute onto every host the
@@ -456,14 +456,14 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
    * tier above replaces it by overriding.
    *
-   * **A named import rather than `<helix-icon>`**, on three counts.
-   * `helix-icon` indexes the whole icon map at runtime, `icons[this.name]`, and
-   * no bundler can shake a runtime lookup, so every consumer of any component
-   * that renders one ships all 50kB of path data; a named import ships one
-   * path. The import is checked when the package compiles, where a `name`
-   * string is checked only by a later name lookup. And `helix-icon` is not
-   * registered on the headless tier at all, which registers `helix-headless-icon`,
-   * so a headless consumer gets an inert unknown element and no mark whatsoever.
+   * **A named import rather than `<helix-headless-icon>`**, on three counts.
+   * `Icon` indexes the whole icon map at runtime, `icons[this.name]`, and no
+   * bundler can shake a runtime lookup, so every consumer of any component that
+   * renders one ships all 50kB of path data; a named import ships one path. The
+   * import is checked when the package compiles, where a `name` string is
+   * checked only by a later name lookup. And `Icon` is not registered on the
+   * headless tier at all, which registers `helix-headless-icon`, so a headless
+   * consumer gets an inert unknown element and no mark whatsoever.
    */
   protected renderTrigger(): TemplateResult {
     return html`<slot name="trigger"><svg aria-hidden="true" fill="currentColor" part="trigger-icon" viewBox=${clock.viewBox}>

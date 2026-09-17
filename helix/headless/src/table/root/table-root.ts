@@ -102,22 +102,21 @@ const tracksOf = (list: string, wanted: number): string[] => {
  * @csspart loading - Shown while the rows are still on their way.
  * @csspart table - The grid.
  *
- * @cssproperty --table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--table-columns` is the one to set.
+ * @cssproperty --table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `columns` is the one to set.
  */
 @customElement('helix-headless-table')
 export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   /**
    * The column widths as one track list, written once on the table.
    *
-   * With `helix-table-column` children, each track sizes the column in its
-   * place, a hidden column counted, so hiding one takes its track with it and
-   * the rest keep theirs. The columns decide how many tracks there are and this
-   * list only how wide: a track past the last column is dropped, and a column
-   * past the last track shares what is left. With no columns declared it is
-   * the whole track list. Tracks count as the grid counts them, so
-   * `minmax(0, 1fr)` is one and `repeat(2, 8rem)` is two, and one the grid
-   * would refuse leaves its column at the default rather than taking the table
-   * down to one column.
+   * With `TableColumn` children, each track sizes the column in its place, a
+   * hidden column counted, so hiding one takes its track with it and the rest
+   * keep theirs. The columns decide how many tracks there are and this list
+   * only how wide: a track past the last column is dropped, and a column past
+   * the last track shares what is left. With no columns declared it is the
+   * whole track list. Tracks count as the grid counts them, so `minmax(0, 1fr)`
+   * is one and `repeat(2, 8rem)` is two, and one the grid would refuse leaves
+   * its column at the default rather than taking the table down to one column.
    *
    * **A column's own `width` wins over its track here.** The width is written
    * on the column it sizes, which is the more particular statement, and it is
@@ -131,13 +130,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * whole answer: a table given one lays its grid out in the first paint, and a
    * table sized only by its columns is one track wide until it upgrades.
    *
-   * **`helix-data-table` has none of this, and should not.** Its columns are
-   * its schema rather than an option, so there is always a column to write a
-   * `width` on and a list here would be a second way to say what that says.
-   * This table's cells are markup, and a table written as rows of cells with no
-   * `helix-table-column` in it has nowhere else to be sized from. Both families
-   * take the same CSS hook, `--table-columns` and `--data-table-columns`, which
-   * wins over whichever list the element worked out.
+   * **Data Table has none of this, and should not.** Its columns are its schema
+   * rather than an option, so there is always a column to write a `width` on
+   * and a list here would be a second way to say what that says. This table's
+   * cells are markup, and a table written as rows of cells with no column
+   * declared in it has nowhere else to be sized from.
    */
   @property()
   columns = ''
@@ -307,7 +304,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     }
     /* The attribute is a string anybody can write and this is a stylesheet, so
        only the three edges reach it. `edgeOf` is that guard, shared with
-       `helix-data-table`, which puts the same attribute into the cells it
+       `DataTable`, which puts the same attribute into the cells it
        draws. */
     const rules = this.tableColumns.flatMap((column, index) => {
       const edge = edgeOf(column.align)

@@ -7,7 +7,7 @@ import '../index.js'
  * The server output.
  *
  * **The turns are markup, so a conversation serves whole**, which is the
- * compensation for not windowing it and is the same trade `helix-notifications`
+ * compensation for not windowing it and is the same trade `Notifications`
  * makes. A crawler and a reader on a slow connection both get the transcript.
  *
  * What the server cannot do is scroll. `pinned` describes where a reader is in a

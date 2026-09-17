@@ -36,7 +36,7 @@ import { property } from 'lit/decorators.js'
  * @aliases Toaster, Snackbar
  * @documentation https://fusion.dev/helix/components/toast
  *
- * @slot - The messages, as `helix-toast-item` elements.
+ * @slot - The messages.
  *
  * @event {HelixDismissEvent} helix-dismiss - A message asking to go, by its control or by its timer, dispatched by the message and heard here because the stack is what a consumer holds. Cancelable: refusing it takes the decision and the message stays.
  *
@@ -60,7 +60,7 @@ export class HelixHeadlessToast extends HelixElement {
    * **Optional, and bottom-end is the absence of it.** Reflecting *and*
    * defaulting is the pair that writes onto a host: every toast region anybody
    * rendered would gain a `placement="bottom-end"` nobody typed, which a React
-   * consumer's server markup does not have. The styled sheet carries the resting
+   * consumer's server markup does not have. A sheet carries the resting
    * arrangement in its own `:host` rule and the selectors describe only the
    * departures, which is what `orientation` does.
    */

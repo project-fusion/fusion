@@ -48,7 +48,7 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
  * item added a second after render coordinates on its first click.
  *
  * Items are matched with `instanceof HelixHeadlessAccordionItem`, never by tag
- * name. Matching `helix-accordion-item` would tie this tier to the styled one.
+ * name, so this tier does not learn about the styled one.
  *
  * The keyboard listener is the controller's and is attached on connect, so
  * none of it runs on the server, where there is no tree to walk and no events

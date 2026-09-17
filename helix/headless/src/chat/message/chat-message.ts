@@ -163,7 +163,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
        **Through internals, like the role beside it, and this was an attribute.**
        `toggleAttribute('aria-busy', …)` put a flag on the host that a consumer
        never wrote, so a React page server-rendering a streaming turn sent
-       `<helix-chat-message state="streaming">` and got `aria-busy` added the
+       `<helix-headless-chat-message state="streaming">` and got `aria-busy` added the
        moment the element upgraded: the mismatch React reports and does not patch
        up, which `Tree.chevronPlacement`, `Toast.placement` and `Image.status`
        were each caught by. Internals carry it to the accessibility tree and

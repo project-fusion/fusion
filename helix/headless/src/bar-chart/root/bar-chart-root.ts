@@ -82,7 +82,7 @@ import '../../tooltip/index.js'
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --bar-chart-axis - How wide an axis column is drawn, in `ch`, from the widest number on it. Written on the axis itself, and only where the categories run along the bottom: turned sideways an axis is a row and takes a line's height instead.
- * @cssproperty --bar-chart-secondary - The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138.
+ * @cssproperty --bar-chart-secondary - The color of the secondary axis, where one series owns it. Written by the component from that series' `--chart-series-*`, so it promises the series color and nothing more: whatever that hook resolves to is what the axis is drawn in.
  * @cssproperty --chart-bar-wash - The gradient a bar would take, named per bar so the
  *   styled tier can point `fill` at it. Drawn whatever the treatment and used only where
  *   `wash="gradient"` asks for it.

@@ -234,13 +234,13 @@ export class HelixHeadlessCarousel extends HelixElement {
    * **The number is published to the styles rather than enumerated by them**,
    * as `--carousel-per-view` on the track, which is what keeps a width and a
    * count from disagreeing. A sheet can only name a value it wrote a rule for,
-   * so the styled tier enumerated `per-view="2"` through `5` and called five a
-   * judgment; above it the pane fell back to one across while this file went on
-   * counting positions. Measured in Chromium over eight slides, six across gave
-   * three dots, a pane taking the whole track and five slides reachable only by
-   * dragging. Written from here there is no ceiling to exceed, and a consumer's
-   * own sheet reads the same declaration the styled one does. `runEnd` publishes
-   * its correction the same way and for the same reason.
+   * so a sheet enumerating `per-view="2"` through `5` is a ceiling of five, and
+   * above it the pane falls back to one across while this file goes on counting
+   * positions. Measured in Chromium over eight slides against such a sheet, six
+   * across gave three dots, a pane taking the whole track and five slides
+   * reachable only by dragging. Published from here there is no ceiling to
+   * exceed, and every sheet reads the same declaration. `runEnd` publishes its
+   * correction the same way and for the same reason.
    *
    * **On the track and not on the host.** A custom property on the host is a
    * reflected attribute by another name: it would arrive on upgrade, and a
@@ -265,8 +265,8 @@ export class HelixHeadlessCarousel extends HelixElement {
    * `auto` track is handed nothing. A count stays for the design that calls for
    * exactly three.
    *
-   * The styled sheet says how it divides, and the headless `auto` example
-   * carries the same three lines for a consumer writing their own.
+   * A sheet says how it divides, and the `auto` example here carries the same
+   * three lines for a consumer writing their own.
    *
    * **A value rather than the resting behavior**, which is what the
    * responsiveness policy asks of every axis that a box decides: a splitter
@@ -1077,11 +1077,11 @@ export class HelixHeadlessCarousel extends HelixElement {
    * The arithmetic wants how many slides there are, and CSS can only ask
    * `sibling-count()`, which is Chromium-only, evaluates to 0 through
    * `::part()`, and needs a `:last-child` that `::part()` cannot carry either.
-   * So the styled tier could correct its run and a consumer writing their own
-   * several-across sheet could not: measured in Chromium at three across, the
-   * headless tier rested at 451 against -450 while the styled tier rested at
-   * one number both ways. Published from here, one declaration reading this
-   * gets both tiers and any consumer to the same place.
+   * So a sheet shipped beside the component could correct its own run and a
+   * consumer writing their own several-across sheet could not: measured in
+   * Chromium at three across, an uncorrected track rested at 451 against -450
+   * where a corrected one rested on one number both ways. Published from here,
+   * one declaration reading this gets every sheet to the same place.
    *
    * **WebKit takes the margin and does not need it**, which is the reason a
    * correction written in CSS looked like enough. It has no `sibling-count()`

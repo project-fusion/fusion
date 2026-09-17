@@ -46,9 +46,9 @@ const dates = (value: string): string[] =>
  * @summary A date, typed or picked from a calendar.
  *
  * @description
- * **The calendar is `helix-date-picker`, not a second one written here.** It
- * already knows about months, ranges, disabled days, the first day of the week
- * and every keyboard rule a grid owes a reader. This element is the field, the
+ * **The calendar is `DatePicker`, not a second one written here.** It already
+ * knows about months, ranges, disabled days, the first day of the week and
+ * every keyboard rule a grid owes a reader. This element is the field, the
  * overlay, and the translation between them.
  *
  * **Typed as well as picked, and the typing is why it is not
@@ -563,14 +563,15 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
    * tier above replaces it by overriding.
    *
-   * **A named import rather than `<helix-icon>`**, which loses on three counts.
-   * `helix-icon` indexes the whole icon map at runtime, `icons[this.name]`, and
-   * no bundler can shake a runtime lookup, so every consumer of any component
-   * that renders one ships all 50kB of path data; a named import ships one
-   * path. The import is checked when the package compiles, where a `name`
-   * string is checked only by a later name lookup. And `helix-icon` is not
-   * registered on the headless tier at all, which registers `helix-headless-icon`,
-   * so a headless consumer gets an inert unknown element and no mark whatsoever.
+   * **A named import rather than `<helix-headless-icon>`**, which loses on
+   * three counts. `Icon` indexes the whole icon map at runtime,
+   * `icons[this.name]`, and no bundler can shake a runtime lookup, so every
+   * consumer of any component that renders one ships all 50kB of path data; a
+   * named import ships one path. The import is checked when the package
+   * compiles, where a `name` string is checked only by a later name lookup. And
+   * `Icon` is not registered on the headless tier at all, which registers
+   * `helix-headless-icon`, so a headless consumer gets an inert unknown element
+   * and no mark whatsoever.
    */
   protected renderTrigger(): TemplateResult {
     return html`<slot name="trigger"><svg aria-hidden="true" fill="currentColor" part="trigger-icon" viewBox=${calendarBlank.viewBox}>

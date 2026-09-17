@@ -63,11 +63,12 @@ export class HelixHeadlessFormatDate extends HelixElement {
    * would give.
    *
    * **The element's own text is read as a fallback, and only in a browser.**
-   * `<helix-format-date elapsed>2026-08-27T01:00:00Z</helix-format-date>` is the
-   * spelling that reads best in markup, and it cannot be the only one: measured
-   * against Lit's server shim, `textContent`, `children`, `firstChild` and
-   * `querySelector` are all `undefined` there, so a server has no way to see it.
-   * An element rendered on a server needs the attribute; one rendered in a
+   * `<helix-headless-format-date
+   * elapsed>2026-08-27T01:00:00Z</helix-headless-format-date>` is the spelling
+   * that reads best in markup, and it cannot be the only one: measured against
+   * Lit's server shim, `textContent`, `children`, `firstChild` and
+   * `querySelector` are all `undefined` there, so a server has no way to see
+   * it. An element rendered on a server needs the attribute; one rendered in a
    * browser may use either.
    */
   @property()

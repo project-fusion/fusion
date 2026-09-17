@@ -38,9 +38,9 @@ export class HelixHeadlessStat extends HelixElement {
    * The row directions set them side by side, for a figure in a line of text or
    * a narrow strip where a stacked pair would be two lines of almost nothing.
    *
-   * A property rather than a `helix-flex` around it, because the unit has to
-   * stay on the value's baseline whichever way the pair goes, and only this
-   * element knows which of its children the unit belongs to.
+   * A property rather than a `Flex` around it, because the unit has to stay on
+   * the value's baseline whichever way the pair goes, and only this element
+   * knows which of its children the unit belongs to.
    *
    * **Optional rather than defaulted to `column`, which is not a style
    * preference.** A reflecting property with a default writes its attribute onto

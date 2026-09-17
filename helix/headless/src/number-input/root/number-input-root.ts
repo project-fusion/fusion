@@ -366,7 +366,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     const next = String(this.clamp(this.scrubValue + steps * unit))
     /* Compared before it is sent. A drag produces a move event per frame and
        most of them land on the step the value is already on, and announcing
-       those would be `helix-input` firing sixty times a second saying nothing
+       those would be `Input` firing sixty times a second saying nothing
        changed. */
     if (next === this.value) {
       return

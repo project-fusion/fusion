@@ -217,10 +217,10 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    *
    * **A color is exactly as requirable as a date**, which is the comparison
    * that settles it: this element extends `HelixFormElement`, carries `name`
-   * and reports its value, so a consumer writing
-   * `<helix-color-picker name="brand" required>` inside a form has every reason
-   * to expect the form to refuse an empty one. Its two siblings in the same
-   * composition position, Date Picker and Time Picker, both check it.
+   * and reports its value, so a consumer writing `<helix-headless-color-picker
+   * name="brand" required>` inside a form has every reason to expect the form
+   * to refuse an empty one. Its two siblings in the same composition position,
+   * Date Picker and Time Picker, both check it.
    *
    * Written out rather than taken from `MixinField`, for the reason those two
    * record: the mixin brings a label, a hint and a feedback region, and this is
@@ -470,11 +470,11 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * **The one thing a form-associated element owes, and this element owed it
    * from the start without paying.** It extends `HelixFormElement`, takes
    * `MixinControllerValue` and carries `name`, so a consumer writing
-   * `<helix-color-picker name="brand">` inside a form has every reason to
-   * expect an entry, and the form carried none: no error, nothing in the
+   * `<helix-headless-color-picker name="brand">` inside a form has every reason
+   * to expect an entry, and the form carried none: no error, nothing in the
    * markup to look at, and a field silently missing from the submission. Its
-   * two siblings in the same composition position, Color Input and Slider,
-   * both report.
+   * two siblings in the same composition position, Color Input and Slider, both
+   * report.
    *
    * `null` rather than an empty string where there is no color, which is the
    * difference between a control that submits nothing and one that submits a
@@ -607,12 +607,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * ends. Listening only for the commit leaves the picker deaf while a handle
    * moves, and the hue and alpha handles do not move at all.
    *
-   * **Read off the target rather than out of a detail.** Do not bind
-   * `helix-input` and `helix-change` and take the proposed value out of the
-   * event: those are requests, announcing what the slider is *about* to do,
-   * before anything has moved and while a listener may still refuse it. The
-   * native pair fires after the slider applied, so the value is on the element
-   * and cannot disagree with it.
+   * **Read off the target rather than out of a detail.** Do not bind `Input`
+   * and `helix-change` and take the proposed value out of the event: those are
+   * requests, announcing what the slider is *about* to do, before anything has
+   * moved and while a listener may still refuse it. The native pair fires after
+   * the slider applied, so the value is on the element and cannot disagree with
+   * it.
    *
    * Idempotent, so taking both costs nothing: the same value applied twice is
    * the same color.

@@ -39,10 +39,10 @@ type SuggestionOption = HTMLElement & {
 /**
  * Whether a slotted node is an option.
  *
- * **By shape rather than by tag name, and that is not laziness.** The tag
- * differs by tier, `helix-option` against `helix-headless-option`, and a
- * consumer is free to subclass either; a name test would answer no to two of the
- * three. What the panel needs of a suggestion is exactly what is checked here.
+ * **By shape rather than by tag name, and that is not laziness.** Each tier
+ * registers its own option under its own name, and a consumer is free to
+ * subclass either; a name test would answer no to two of the three. What the
+ * panel needs of a suggestion is exactly what is checked here.
  */
 const isOption = (node: Element): node is SuggestionOption => 'active' in node && 'value' in node
 
@@ -87,12 +87,12 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * `FilterField` already plays on its own children.
  *
  * **It can suggest what to type next, and deciding what to suggest is still the
- * consumer's.** Slot `helix-option` elements into `suggestions` and the field
- * shows them, moves through them with the arrows, and lets Enter press one; the
- * option fires its own `helix-select` and the consumer decides what choosing
- * meant. Keys before a colon and values after it are the same panel with
- * different contents, and `readFilterText` is exported for a consumer narrowing
- * that panel against what a reader has half typed.
+ * consumer's.** Slot options into `suggestions` and the field shows them, moves
+ * through them with the arrows, and lets Enter press one; the option fires its
+ * own `helix-select` and the consumer decides what choosing meant. Keys before
+ * a colon and values after it are the same panel with different contents, and
+ * `readFilterText` is exported for a consumer narrowing that panel against what
+ * a reader has half typed.
  *
  * **The panel opens when there is something in it and closes when there is
  * not**, rather than on a choice. A reader who picks a key wants its values

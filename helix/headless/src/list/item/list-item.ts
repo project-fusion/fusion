@@ -78,13 +78,12 @@ export class HelixHeadlessListItem extends HelixElement {
    * beside the words rather than at the edge of the block. A number that has to
    * sit in a track has to be a box in that track.
    *
-   * **The box belongs to the styled tier, which is why this returns `nothing`.**
-   * Rendering it here puts an unstyled empty box in front of every headless row,
-   * and a row styled with `display: flex` and a `gap` draws that gap beside the
-   * empty child: measured on this tier's own example, which is exactly such a
-   * row, 1384 pixels moved and every label sat half a rem further in. The styled
-   * row's own comment records the same fault about a column gap beside a
-   * zero-width column.
+   * **The box belongs to the styled tier, which is why this returns
+   * `nothing`.** Rendering it here puts an unstyled empty box in front of every
+   * headless row, and a row styled with `display: flex` and a `gap` draws that
+   * gap beside the empty child: measured on this tier's own example, which is
+   * exactly such a row, 1384 pixels moved and every label sat half a rem
+   * further in.
    *
    * A tier that ships no CSS cannot make a box it renders cost nothing, so it
    * does not render one. `marker="rail"` is a styled-tier attribute for the same

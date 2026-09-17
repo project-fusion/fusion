@@ -76,8 +76,8 @@ const SCHEMA = `
 /**
  * A column's edge, handed to the cells this element draws.
  *
- * **Published and not drawn**, which is the same side of it `helix-table` takes:
- * a cell carries its column's `align` as `--data-table-cell-align` and a sheet
+ * **Published and not drawn**, which is the same side of it `Table` takes: a
+ * cell carries its column's `align` as `--data-table-cell-align` and a sheet
  * decides what lining up means. Written here as an inline `text-align` it was
  * the tier that ships no CSS deciding, and it beat any `::part(cell)` rule a
  * consumer wrote, an inline declaration outranking a stylesheet.
@@ -98,7 +98,7 @@ describe("a data table publishing each column's edge to its cells", () => {
   })
 
   /* `align` is a string anybody can write, and this goes into a style
-     attribute, so only the three edges reach it. `helix-table` holds the same
+     attribute, so only the three edges reach it. `Table` holds the same
      value to the same three and said so first. */
   test('an edge it does not know is left out rather than written into a style', async () => {
     const { element } = await mount(SCHEMA)

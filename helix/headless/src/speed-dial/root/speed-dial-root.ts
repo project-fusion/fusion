@@ -28,11 +28,10 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * mean defining what a dial with a submenu in it does.
  *
  * **The trigger is a control the consumer slots**, and the floating action
- * button is the usual one: `helix-icon-button` with `shape="circle"` and
- * `raised`. There is no `helix-fab`, because it would re-declare `emphasis`,
- * `tone`, `label` and a size around a control that already has all four. A
- * round raised button is a shape, and where it sits is `data-dock` in the base
- * layer.
+ * button is the usual one: `IconButton` with `shape="circle"` and `raised`.
+ * There is no `helix-fab`, because it would re-declare `emphasis`, `tone`,
+ * `label` and a size around a control that already has all four. A round raised
+ * button is a shape, and where it sits is `data-dock` in the base layer.
  *
  * **Nothing is reserved from the keyboard.** A menu that drills has to keep the
  * horizontal pair for going in and coming back; a dial goes nowhere, so all four
@@ -232,10 +231,10 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    *
    * **This is the case the tier rule blocks and a render method unblocks.** A
    * bare `<button>` is what the headless tier can write: it must not reach for
-   * `helix-button`, which lives a tier above and would make `headless` depend
-   * on `styled`. So the base draws the plain control and a tier that has buttons
-   * of its own overrides this to use one. Written inline, the only way
-   * to change it would be to reimplement the template, panel and all.
+   * `Button`, which lives a tier above and would make `headless` depend on
+   * `styled`. So the base draws the plain control and a tier that has buttons
+   * of its own overrides this to use one. Written inline, the only way to
+   * change it would be to reimplement the template, panel and all.
    */
   protected renderTrigger(): TemplateResult {
     return html`<slot name="trigger" @click=${this.handleTriggerClick}>

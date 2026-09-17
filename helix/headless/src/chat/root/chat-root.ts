@@ -41,7 +41,7 @@ export interface ChatTurn {
    * response: history then loads under the reader rather than above them.
    */
   key?: string
-  /** What has happened to it, as on `helix-chat-message`. */
+  /** What has happened to it, as on `ChatMessage`. */
   state?: 'failed' | 'sending' | 'sent' | 'streaming'
   /** What was said, as text. */
   text: string
@@ -162,7 +162,7 @@ const spoken = (message: Element): string =>
  * @aliases Conversation, Transcript, Thread, Messages
  * @documentation https://fusion.dev/helix/components/chat
  *
- * @slot - The turns, as `helix-chat-message` children.
+ * @slot - The turns.
  * @slot actions - Beside the header: what can be done to the conversation itself.
  * @slot composer - Below the transcript, where the reader writes.
  * @slot header - Above the transcript: what this conversation is.
@@ -265,13 +265,13 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    *
    * **Not reflected, and the default is why.** A reflected property that
    * defaults to true writes its attribute on upgrade whether or not the
-   * consumer wrote one, so the server serves `<helix-chat label="x">` and the
-   * client turns it into `<helix-chat label="x" pinned>`: a hydration mismatch a
-   * React consumer reports and does not patch up. Nothing needs the attribute
-   * either, because the one thing that changes with the pin is the way back, and
-   * that is a part inside the shadow tree where a stylesheet can already reach
-   * it. Measured rather than assumed: `label, pinned` after upgrade against
-   * `label` from the server.
+   * consumer wrote one, so the server serves `<helix-headless-chat label="x">`
+   * and the client turns it into `<helix-headless-chat label="x" pinned>`: a
+   * hydration mismatch a React consumer reports and does not patch up. Nothing
+   * needs the attribute either, because the one thing that changes with the pin
+   * is the way back, and that is a part inside the shadow tree where a
+   * stylesheet can already reach it. Measured rather than assumed: `label,
+   * pinned` after upgrade against `label` from the server.
    */
   @property({ type: Boolean })
   get pinned(): boolean {

@@ -3,9 +3,9 @@ import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-test
 
 /* One notification.
  *
- * What this element owns is read state, the dismiss, and which of the two things
- * the trailing column is showing. The reading of the timestamp is not its any
- * more: it hands the instant to `helix-format-date` and that family's specs
+ * What this element owns is read state, the dismiss, and which of the two
+ * things the trailing column is showing. The reading of the timestamp is not
+ * its any more: it hands the instant to `FormatDate` and that family's specs
  * carry the rest. */
 
 beforeAll(async () => {
@@ -93,7 +93,7 @@ describe('read state', () => {
  * The timestamp is delegated whole, so what is asserted here is the delegation.
  *
  * **Read the child, never a `time` part.** `part(element, 'time')` answers null
- * for every item since the timestamp moved into `helix-format-date`, so a spec
+ * for every item since the timestamp moved into `FormatDate`, so a spec
  * asserting null there cannot fail. What the reading itself does, and when it
  * expires, is `format-date-root.dom.spec.ts` and `elapsed-time.pure.spec.ts`.
  */

@@ -16,8 +16,8 @@ import { property, state } from 'lit/decorators.js'
  * still down while Solutions opens is a nav bar with two panels over the page.
  * Module scope rather than a coordinating parent, because there is nothing to
  * coordinate through: these sit in whatever container the consumer used, which
- * is usually `helix-navigation` and is not required to be. `Video` holds the
- * media session the same way and for the same reason.
+ * is usually `Navigation` and is not required to be. `Video` holds the media
+ * session the same way and for the same reason.
  */
 let showing: HelixHeadlessMegamenu | undefined
 
@@ -235,8 +235,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    *
    * **The first ancestor as wide as the window, which is a fact and not a tag
    * name.** A band spans the viewport, so what it should hang from is whatever
-   * else does: that is what makes something a bar. Asking for `helix-app-header`
-   * by name would make this element know about that one, which is the coupling
+   * else does: that is what makes something a bar. Asking for `AppHeader` by
+   * name would make this element know about that one, which is the coupling
    * `Menu` is careful not to have with `Drilldown`, and would leave a consumer
    * who wrote their own header with a band across it.
    *
@@ -520,8 +520,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    * The control that opens it, behind a seam the styled tier can move.
    *
    * The same case `SpeedDial` records: a bare `<button>` is what this tier can
-   * write, `helix-button` lives a tier above, and a render method is how a tier
-   * that has one reaches this without reimplementing the panel below it.
+   * write, `Button` lives a tier above, and a render method is how a tier that
+   * has one reaches this without reimplementing the panel below it.
    */
   protected renderTrigger(): TemplateResult {
     return html`<slot name="trigger" @click=${this.handleTriggerClick}>

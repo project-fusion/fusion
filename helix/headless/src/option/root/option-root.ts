@@ -123,7 +123,7 @@ export class HelixHeadlessOption extends HelixElement {
    * **The attribute, read when it is asked for, and never a snapshot taken in
    * the constructor.** A field initializer runs there, and an element the HTML
    * parser created has none of its attributes yet at that moment: measured on
-   * this element, on `Radio` and on `Toggle`, `<helix-option value="a"
+   * this element, on `Radio` and on `Toggle`, `<helix-headless-option value="a"
    * selected>` reported `defaultSelected` as `false` both from parsed markup
    * and from `createElement` followed by `setAttribute`, which is every way a
    * consumer writes one. The snapshot could only ever be true for an element
@@ -270,8 +270,8 @@ export class HelixHeadlessOption extends HelixElement {
    * where it is not in the DOM at all.
    *
    * Reading `selected` is unaffected and so is writing it: the attribute still
-   * seeds the property, which is what `<helix-option selected>` in a consumer's
-   * markup means. What stops is the write back.
+   * seeds the property, which is what `<helix-headless-option selected>` in a
+   * consumer's markup means. What stops is the write back.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

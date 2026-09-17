@@ -35,12 +35,11 @@ const parse = (hotkey: string) => {
  * @summary A list of commands, opened from anywhere and filtered by typing.
  *
  * @description
- * **The list is `helix-listbox`, filtering and all.** Listbox already owns
- * narrowing, the empty state, the highlight over what matched,
- * `aria-activedescendant`, scrolling an option into view and the keyboard that
- * moves between them. Its own note says a command palette is that list again
- * with something different opening it, and this is that something: a dialog,
- * and a key that summons it.
+ * **The list is `Listbox`, filtering and all.** Listbox already owns narrowing,
+ * the empty state, the highlight over what matched, `aria-activedescendant`,
+ * scrolling an option into view and the keyboard that moves between them. Its
+ * own note says a command palette is that list again with something different
+ * opening it, and this is that something: a dialog, and a key that summons it.
  *
  * **The value is not kept.** A palette runs a command and forgets it: nothing
  * here is a form control and nothing is submitted, so what it reports is that
@@ -64,7 +63,7 @@ const parse = (hotkey: string) => {
  * @aliases Command palette, Quick open, Spotlight
  * @documentation https://fusion.dev/helix/components/command
  *
- * @slot - The commands, which are `helix-option` elements and their groups.
+ * @slot - The commands, and any groups of them.
  * @slot footer - Under the list, for the keys a reader can press.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.

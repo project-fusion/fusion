@@ -13,7 +13,7 @@ import { property } from 'lit/decorators.js'
  *
  * The host is the surface. A wrapper `<div part="container">` would be a second
  * box doing nothing the host cannot: the element itself takes the border, the
- * radius, and the grid, and a consumer styles `helix-card` rather than reaching
+ * radius, and the grid, and a consumer styles `Card` rather than reaching
  * through `::part`. One node instead of two, on every card on the page.
  *
  * Name the card with `aria-label` or `aria-labelledby`. That is the only
