@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, rendered, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -34,5 +34,50 @@ describe('time server output', () => {
        value whether or not anything was formatted. `en-US` writes a twelve hour
        clock, which is a form nothing else in the document holds. */
     expect(served('en-US')).toContain('9:15 AM')
+  })
+
+  /** Every time the served markup marks as chosen, read off the options. */
+  const marked = (markup: string): string[] =>
+    [...markup.matchAll(/value="([^"]*)"\s+selected/g)].map(([, at]) => at as string)
+
+  test('the chosen time is marked in the served list, not worked out on upgrade', () => {
+    /* The question this cohort settled, asked of a list rather than a grid.
+       The listbox is handed the answer as `.value` and lit-ssr serializes no
+       property binding, so this served ninety-six rows with nothing on any of
+       them saying which one the value named. `selected` is an attribute
+       binding and does serve. */
+    expect(marked(served('en-GB'))).toEqual(['09:15'])
+  })
+
+  test('and the mark reaches the row, which is what a reader sees', () => {
+    /* Through the part as well as through the attribute, since a stylesheet
+       outside cannot follow `::part()` with an attribute and reads the part
+       name instead. `item-selected` is the option's own, exported as
+       `option-item-selected`, and `servedParts` reads rendered parts rather
+       than forwarded ones. */
+    expect(servedParts(served('en-GB'))).toContain('item-selected')
+  })
+
+  test('the wheels serve their mark too, a wheel being a listbox like the list', () => {
+    const markup = rendered(
+      ssr(
+        html`<helix-time-picker locale="en-GB" value="09:15" variant="wheels"></helix-time-picker>`,
+      ),
+      'helix-time-picker',
+    )
+    // The hour and the minute, each in its own column, which is the whole answer.
+    expect(marked(markup)).toEqual(['9', '15'])
+    expect(servedParts(markup)).toContain('item-selected')
+  })
+
+  test('and an unset picker marks nothing, there being no answer to mark', () => {
+    expect(
+      marked(
+        rendered(
+          ssr(html`<helix-time-picker max="09:30" min="09:00"></helix-time-picker>`),
+          'helix-time-picker',
+        ),
+      ),
+    ).toEqual([])
   })
 })

@@ -94,6 +94,19 @@ const isTwelveHour = (locale?: string): boolean =>
  * string, which is the whole reason the shape is that one. What each row *says*
  * is the reader's own convention, from `Intl`.
  *
+ * **The chosen row is marked in the markup, not worked out on upgrade.** The
+ * listbox is handed the answer as `.value`, and lit-ssr serializes no property
+ * binding, so a served `value="09:30"` shipped ninety-six rows with nothing on
+ * any of them saying which one it was: the mark arrived when the listbox
+ * upgraded and ran `place`. So each option is given `selected` as well, which
+ * is an attribute binding and does serve, and which the listbox then agrees
+ * with rather than fights, `place` writing the same answer from the same value.
+ * `selected` is the declaration a consumer writes on `Option` anywhere else in
+ * the library, and Date Picker expresses its own choice as markup for the same
+ * reason: a picker whose answer is invisible until a script runs is a picker
+ * whose answer is not served at all. Both readings do it, the list and the
+ * wheels, a wheel being a listbox like the list is.
+ *
  * @since 0.1.0
  * @status experimental
  * @category forms
@@ -679,6 +692,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
               label: option-label, text: option-text"
             value=${one}
             ?disabled=${barred(one)}
+            ?selected=${one === value}
             >${written(one)}</${this.tag('option')}
           >`,
       )}
@@ -763,6 +777,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
             label: option-label, text: option-text"
           value=${at}
           ?disabled=${this.barred(at)}
+          ?selected=${this.held.includes(at)}
           data-between=${between ? '' : nothing}
           >${writeTime(at, this.locale)}</${this.tag('option')}
         >`
