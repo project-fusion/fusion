@@ -1,0 +1,46 @@
+export function Example() {
+  return (
+    <>
+      {/* Preview frame: the submit is swallowed. */}
+      <form onSubmit={(event) => event.preventDefault()}>
+        <helix-flex
+          direction="column"
+          gap="md"
+        >
+          <helix-input
+            autocomplete="name"
+            label="Full name"
+            name="name"
+          ></helix-input>
+
+          <helix-input
+            autocomplete="email"
+            label="Email"
+            name="email"
+            type="email"
+          ></helix-input>
+
+          <helix-input
+            autocomplete="street-address"
+            label="Street address"
+            name="address"
+          ></helix-input>
+
+          <helix-input
+            autocomplete="postal-code"
+            label="Postal code"
+            name="postcode"
+          ></helix-input>
+
+          <helix-input
+            autocomplete="off"
+            label="Delivery note"
+            name="note"
+          ></helix-input>
+
+          <helix-button type="submit">Continue</helix-button>
+        </helix-flex>
+      </form>
+    </>
+  )
+}

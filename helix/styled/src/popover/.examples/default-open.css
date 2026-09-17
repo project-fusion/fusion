@@ -1,0 +1,5 @@
+/* A width, because the panel's default is `max-content` and this one holds
+   prose. `--popover-inline-size` is the hook the component publishes for it. */
+.hint {
+  --popover-inline-size: 20rem;
+}

@@ -1,0 +1,5 @@
+.metric {
+  --card-media-block-size: 3rem;
+
+  inline-size: 16rem;
+}

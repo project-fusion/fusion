@@ -1,0 +1,42 @@
+<!-- @summary The run's four controls named in the page's own words, once, on the tour itself. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-flex gap="sm">
+    <helix-button id="library">Library</helix-button>
+    <helix-button id="shelves">New shelf</helix-button>
+    <helix-button id="share">Share</helix-button>
+  </helix-flex>
+
+  <helix-tour
+    back-label="Go back"
+    done-label="Got it"
+    label="Around the library"
+    next-label="Keep going"
+    open
+    skip-label="Not now"
+  >
+    <helix-tour-stop
+      for="library"
+      placement="bottom-start"
+    >
+      Everything you have saved is here, newest first.
+    </helix-tour-stop>
+
+    <helix-tour-stop
+      for="shelves"
+      placement="bottom"
+    >
+      A shelf is a pile you name, and a book can sit on more than one.
+    </helix-tour-stop>
+
+    <helix-tour-stop
+      for="share"
+      placement="bottom-end"
+    >
+      Sharing a shelf sends the shelf, so anything you add to it later goes too.
+    </helix-tour-stop>
+  </helix-tour>
+</helix-flex>
