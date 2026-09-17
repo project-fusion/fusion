@@ -219,10 +219,10 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    if (this.children === undefined || this.hydrating) {
+    if (!this.childrenKnown) {
       return
     }
-    const named = (name: string): boolean => [...this.children].some((child) => child.slot === name)
+    const named = (name: string): boolean => this.knownChildren.some((child) => child.slot === name)
     this.submenu = named('submenu')
     this.start = named('start')
   }

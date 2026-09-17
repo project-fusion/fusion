@@ -650,7 +650,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     /* Before the render, so the empty state and the matches it draws are this
        update's rather than the last one's. Not on the server, whose element
        shim has no `children`, nor while hydrating what one sent. */
-    if (this.children !== undefined && !this.hydrating) {
+    if (this.childrenKnown) {
       this.place()
     }
   }

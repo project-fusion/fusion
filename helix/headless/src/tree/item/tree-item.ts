@@ -318,8 +318,8 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('selected', this.selected)
-    if (this.children !== undefined && !this.hydrating) {
-      this.branch = [...this.children].some((child) => child.slot === 'children')
+    if (this.childrenKnown) {
+      this.branch = this.knownChildren.some((child) => child.slot === 'children')
     }
   }
 
