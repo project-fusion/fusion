@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -45,5 +45,18 @@ describe('tree item server output', () => {
       'helix-headless-tree-item',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
+  })
+
+  /**
+   * **A server's tree is reachable**, for the reason `Radio.Root`'s own server
+   * spec writes out: `focusable` is the tree's word, the tree says it by
+   * reading its rows, and a server has none to read. A `-1` on every row is a
+   * claim about a stop that does not exist yet, and it left the whole tree out
+   * of the tab order.
+   */
+  test('a row nothing has answered for is in the tab order rather than out of it', () => {
+    expect(
+      partTag(ssr(html`<helix-headless-tree-item></helix-headless-tree-item>`), 'item'),
+    ).toContain('tabindex="0"')
   })
 })

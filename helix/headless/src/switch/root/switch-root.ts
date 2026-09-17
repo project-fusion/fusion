@@ -131,14 +131,22 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
 
   protected override render(): TemplateResult {
     /* A real `<label>` around both, so pressing the words works with no click
-       handler: the browser does the forwarding. */
+       handler: the browser does the forwarding.
+
+       **`.checked` falls back to `nothing`, where `?disabled` and `?required`
+       below are plain booleans**, for the reason `Checkbox` writes out at the
+       same line: `checked` is the control's default rather than its state, so
+       the property is what moves a switch a reader has touched, and a property
+       binding is what a server stringifies into `checked="false"`, which a
+       boolean attribute reads as on. `nothing` serves no attribute and sets the
+       property to `undefined`. */
     return html`<label part="field">
       <span part="track">
         <input
           part="control"
           type="checkbox"
           role="switch"
-          .checked=${this.checked}
+          .checked=${this.checked || nothing}
           ?disabled=${this.isDisabled}
           ?required=${this.required}
           aria-describedby=${this.describedBy ?? nothing}

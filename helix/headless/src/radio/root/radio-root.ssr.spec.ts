@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -43,5 +43,21 @@ describe('radio server output', () => {
       'helix-headless-radio',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
+  })
+
+  /**
+   * **A server's set is reachable, because a `-1` there is a claim about a stop
+   * that does not exist yet.**
+   *
+   * `selected` and `focusable` are both the group's word and the group writes
+   * them by reading its children, which a server has none of. Served as `-1`
+   * that left every choice out of the tab order and the set impossible to enter,
+   * which is the fault `focusable` was added to prevent, arriving through the
+   * one render `focusable` cannot be written in.
+   */
+  test('a choice nothing has answered for is in the tab order rather than out of it', () => {
+    expect(partTag(ssr(html`<helix-headless-radio></helix-headless-radio>`), 'item')).toContain(
+      'tabindex="0"',
+    )
   })
 })

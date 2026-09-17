@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  partTag,
+  servedParts,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -34,5 +40,19 @@ describe('tree server output', () => {
 
   test('the host carries only what the consumer wrote', () => {
     expect(hostAttributes(ssr(tree), 'helix-headless-tree')).toEqual(['label'])
+  })
+
+  /**
+   * **A depth is a claim, and a server has no tree to walk to make it.**
+   *
+   * The root counts a row's ancestors to assign `level`, which is a read of the
+   * light DOM, so every row served `aria-level="1"` and a three-deep tree
+   * arrived flat: a screen reader told a list where the markup holds a nesting.
+   * Absent is "unknown", which is the answer `Data Table`'s own server spec
+   * argues for `aria-colcount` in the same words, and the structure is still
+   * right underneath it, each nested row sitting inside its parent's `group`.
+   */
+  test('no row claims a depth, because a server cannot count ancestors', () => {
+    expect(withoutStyles(ssr(tree))).not.toContain('aria-level')
   })
 })

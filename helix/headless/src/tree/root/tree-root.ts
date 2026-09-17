@@ -6,6 +6,7 @@ import {
   MixinCollection,
   MixinControllerActive,
   scrollItemIntoView,
+  whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -168,8 +169,8 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     const stop = held ?? chosen
 
     for (const item of this.items) {
-      item.selected = item.value !== '' && item.value === this.active
-      item.focusable = item === stop
+      const selected = item.value !== '' && item.value === this.active
+      const focusable = item === stop
       let level = 1
       let parent = item.parentElement
       while (parent && parent !== this) {
@@ -178,7 +179,18 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
         }
         parent = parent.parentElement
       }
-      item.level = level
+      /* Not into a row still hydrating what a server sent: see `whenHydrated`.
+         `Steps` writes into its children the same way, and here the write is
+         load-bearing rather than tidy. A row serves no `aria-level` at all,
+         because a server cannot count ancestors it has no tree to walk; landed
+         in the hydrating render, the depth is primed as the committed value and
+         never written, so the attribute would be missing for the life of the
+         page. Waiting for that render lets the one after it write the depth. */
+      whenHydrated(item, () => {
+        item.selected = selected
+        item.focusable = focusable
+        item.level = level
+      })
     }
   }
 
