@@ -3,11 +3,17 @@ import './with-a-panel.css'
 export function Example() {
   return (
     <div className="stage">
+      {/* `panel-size` beside `default-panel-size`, because the panel opens at
+               the first and goes back to the second on a double click. Stated alone,
+               the 120 below was where a reset put the panel and never where it
+               started, so the panel this example calls sized opened at the
+               component's own 160. */}
       <helix-sandbox
         corner-label="Resize both"
-        default-panel-size="220"
+        default-panel-size="120"
         panel-collapsed-size="36"
         panel-label="Files"
+        panel-size="120"
         separator-label="Resize the source pane"
       >
         <helix-sandbox-toolbar slot="toolbar">

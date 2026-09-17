@@ -3,10 +3,16 @@ import './preview-leading.css'
 export function Example() {
   return (
     <div className="stage">
+      {/* `split` and not `default-split` alone, which is only where a double
+               click puts it back to: the panes open at the component default until
+               the live property says otherwise, and the share this example is about
+               would show up for the first time on a reset. `sized-panes` is where
+               the pair is the subject. */}
       <helix-sandbox
         default-split={60}
         lead="preview"
         orientation="vertical"
+        split={60}
       >
         <helix-sandbox-toolbar slot="toolbar">
           <helix-tag>card.html</helix-tag>
