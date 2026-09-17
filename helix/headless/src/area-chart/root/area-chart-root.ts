@@ -8,6 +8,8 @@ import {
   linear,
   linePath,
   MixinChartSource,
+  PLOT_HEIGHT,
+  PLOT_WIDTH,
   type Point,
   type Row,
   seriesIndex,
@@ -16,10 +18,6 @@ import {
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-
-/** The drawing's own coordinates. */
-const WIDTH = 100
-const HEIGHT = 100
 
 const percent = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0, style: 'percent' })
 
@@ -267,12 +265,12 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     }
     const top = this.share ? 1 : Math.max(0, ...stack.totals)
     const domain: [number, number] = [0, top > 0 ? top : 1]
-    const y = linear(domain, [HEIGHT, 0])
+    const y = linear(domain, [PLOT_HEIGHT, 0])
     /* In the middle of each reading's slot, for the reason `LineChart` gives:
        the names underneath are a row of equal columns, and a reading at the
        edge of the box sits half a slot away from its own name. */
-    const slot = WIDTH / rows.length
-    const x = linear([0, Math.max(rows.length - 1, 1)], [slot / 2, WIDTH - slot / 2])
+    const slot = PLOT_WIDTH / rows.length
+    const x = linear([0, Math.max(rows.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
     return html`${this.renderPlot(stack, rows.length, x, y, domain)}
       ${this.renderLabels(rows.map((row) => row.label))} ${this.renderSummary(stack, rows)}`
   }
@@ -299,12 +297,12 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
       <svg part="svg"
         data-mirror
         preserveAspectRatio="none"
-        viewBox="0 0 ${WIDTH} ${HEIGHT}"
+        viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
         ${order.map((depth) => this.renderLayer(stack.layers[depth] ?? [], depth, x, y))}
         ${this.renderGridlines(x, y, domain, count)}
-        <line part="baseline" x1="0" x2=${WIDTH} y1=${HEIGHT} y2=${HEIGHT} />
+        <line part="baseline" x1="0" x2=${PLOT_WIDTH} y1=${PLOT_HEIGHT} y2=${PLOT_HEIGHT} />
         ${this.renderGuide(x)}
       </svg>
       ${this.renderTooltip(stack, y)}
@@ -326,7 +324,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     const index = seriesIndex(depth)
     const first = points[0] as Point
     const last = points.at(-1) as Point
-    const wash = `${path}L${last[0]},${HEIGHT}L${first[0]},${HEIGHT}Z`
+    const wash = `${path}L${last[0]},${PLOT_HEIGHT}L${first[0]},${PLOT_HEIGHT}Z`
     return svg`<path
         d=${wash}
         data-series=${index}
@@ -355,7 +353,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
       ? Array.from(
           { length: count },
           (_, index) =>
-            svg`<line part="gridline" x1=${x(index)} x2=${x(index)} y1="0" y2=${HEIGHT} />`,
+            svg`<line part="gridline" x1=${x(index)} x2=${x(index)} y1="0" y2=${PLOT_HEIGHT} />`,
         )
       : []
     /* The floor is the baseline's, and a gridline drawn on top of it is the
@@ -365,7 +363,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
           .filter((level) => level > domain[0])
           .map(
             (level) =>
-              svg`<line part="gridline" x1="0" x2=${WIDTH} y1=${y(level)} y2=${y(level)} />`,
+              svg`<line part="gridline" x1="0" x2=${PLOT_WIDTH} y1=${y(level)} y2=${y(level)} />`,
           )
       : []
     return svg`${down}${across}`
@@ -382,7 +380,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     if (at < 0) {
       return nothing
     }
-    return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${HEIGHT} />`
+    return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${PLOT_HEIGHT} />`
   }
 
   /** The reading names, as HTML beside the drawing so they do not scale with it. */

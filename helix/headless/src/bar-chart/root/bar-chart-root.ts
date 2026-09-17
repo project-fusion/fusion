@@ -7,6 +7,8 @@ import {
   linear,
   linePath,
   MixinChartSource,
+  PLOT_HEIGHT,
+  PLOT_WIDTH,
   type Series,
   seriesIndex,
   seriesNames,
@@ -15,9 +17,6 @@ import {
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-
-/** The drawing's own coordinates. Height only: the width is the element's. */
-const HEIGHT = 100
 
 /**
  * @summary Categories as columns, read from a table.
@@ -252,14 +251,15 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     /* **The range is inverted for columns and not for bars**, which is the
        whole of what makes the two directions different arithmetic rather than
        one drawing turned on its side. SVG counts down from the top, so a column
-       growing upward needs `[HEIGHT, 0]`; a bar growing rightward is already
-       going the way x counts, so it takes `[0, HEIGHT]`.
+       growing upward needs `[PLOT_HEIGHT, 0]`; a bar growing rightward is already
+       going the way x counts, so it takes `[0, PLOT_HEIGHT]`.
      *
      * Reusing the inverted scale for both puts the longest bar at x=0 and every
        shorter one hard against the right edge, growing away from the baseline
        instead of out of it. */
     const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
-    const range: [number, number] = this.direction === 'horizontal' ? [0, HEIGHT] : [HEIGHT, 0]
+    const range: [number, number] =
+      this.direction === 'horizontal' ? [0, PLOT_HEIGHT] : [PLOT_HEIGHT, 0]
     const y = linear(domain, range)
     const floor = y(0)
 
@@ -410,7 +410,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       <svg part="svg"
         data-mirror
         preserveAspectRatio="none"
-        viewBox="0 0 100 ${HEIGHT}"
+        viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
         ${
@@ -663,7 +663,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     const [low, high] = extent(all.length > 0 ? all : [0])
     const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
     const sideways = this.direction === 'horizontal'
-    const scale = sideways ? linear(domain, [0, HEIGHT]) : linear(domain, [HEIGHT, 0])
+    const scale = sideways ? linear(domain, [0, PLOT_HEIGHT]) : linear(domain, [PLOT_HEIGHT, 0])
     const ends = values.map((one) => scale(one))
     const far = sideways ? Math.max(...ends) : Math.min(...ends)
     const slot = 100 / this.readings

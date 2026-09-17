@@ -4,15 +4,17 @@ import {
   drawTooltip,
   HelixElement,
   MixinChartSource,
+  PLOT_HEIGHT,
+  PLOT_WIDTH,
   seriesIndex,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 
-/** The drawing's own coordinates, square because the shape has to stay round. */
-const BOX = 100
-const CENTER = BOX / 2
+/* Square, because the shape has to stay round: the plot box is already one and
+   this is the center of it. */
+const CENTER = PLOT_WIDTH / 2
 
 /** The outer edge of the ring, whatever its thickness. */
 const EDGE = 40
@@ -285,9 +287,9 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    */
   private get frame(): string {
     if (this.sweep !== 'half') {
-      return `0 0 ${BOX} ${BOX}`
+      return `0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}`
     }
-    return `0 ${CENTER - EDGE} ${BOX} ${EDGE + this.thickness / 2}`
+    return `0 ${CENTER - EDGE} ${PLOT_WIDTH} ${EDGE + this.thickness / 2}`
   }
 
   /** One slice, as a dash the length of its share. */
@@ -435,7 +437,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     const edge = EDGE
     const x = CENTER + Math.cos(angle) * edge
     const top = this.sweep === 'half' ? CENTER - EDGE : 0
-    const tall = this.sweep === 'half' ? EDGE + this.thickness / 2 : BOX
+    const tall = this.sweep === 'half' ? EDGE + this.thickness / 2 : PLOT_HEIGHT
     const y = ((CENTER + Math.sin(angle) * edge - top) / tall) * 100
     /* **A whole ring stays as drawn on a right-to-left page, and a half ring
        turns.** Clockwise from twelve is a clock's convention, and a clock does
