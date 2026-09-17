@@ -754,6 +754,62 @@ describe('a press that moves nothing', () => {
     expect(said).toEqual([])
   })
 
+  test('and neither does a drag that came back to where it started', async () => {
+    /* `reached === undefined` was the question asked here, which is whether the
+       pointer ever moved rather than whether the divider ended anywhere new. A
+       gesture out and back is the second one, and it announced. */
+    const host = await splitter('default-position="40"')
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
+    })
+    const said: string[] = []
+    host.addEventListener('helix-before-resize', (event) => {
+      said.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    const bar = separator(host)
+    const at = (type: string, fraction: number) =>
+      bar.dispatchEvent(
+        new (globalThis as unknown as { PointerEvent: typeof MouseEvent }).PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          clientX: 200 * fraction,
+          clientY: 50,
+        }) as PointerEvent,
+      )
+    at('pointerdown', 0.4)
+    at('pointermove', 0.8)
+    at('pointermove', 0.4)
+    at('pointerup', 0.4)
+    await host.updateComplete
+    expect(said).toEqual([])
+  })
+
+  test('and neither does a key that had nowhere left to go', async () => {
+    // Home on a divider already at its minimum is the same announcement of a
+    // number nobody changed, reached by the other door.
+    const host = await splitter('default-position="40"')
+    const said: string[] = []
+    host.addEventListener('helix-before-resize', (event) => {
+      said.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    await press(host, 'Home')
+    expect(said).toEqual(['0'])
+    await press(host, 'Home')
+    await press(host, 'ArrowLeft')
+    expect(said).toEqual(['0'])
+  })
+
+  test('and neither does a double click on a divider already where it goes back to', async () => {
+    const host = await splitter('default-position="40"')
+    const said: string[] = []
+    host.addEventListener('helix-before-resize', (event) => {
+      said.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    separator(host).dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }))
+    await host.updateComplete
+    expect(said).toEqual([])
+  })
+
   test('and the panes go inert only while it is actually moving', async () => {
     /* A pane holds whatever a consumer slotted, and a cross-origin iframe is its
        own hit-testing world: a drag whose path crosses one can be lost to it.
@@ -771,6 +827,124 @@ describe('a press that moves nothing', () => {
     separator(host).dispatchEvent(pointer('pointerup', 100))
     await host.updateComplete
     expect(pane.hasAttribute('data-dragging')).toBe(false)
+  })
+})
+
+/**
+ * The same rule at the handle that moves two dividers at once.
+ *
+ * The separator held it and the corner did not, so a press and a release on the
+ * crossing with nothing between announced on both splitters, each carrying the
+ * position it already had. Measured in Chromium 17 Sep 2026.
+ *
+ * **"Moved nothing" is asked of each divider and never of the gesture**, which
+ * is what a handle on two axes costs: a drag along one of them moves one and
+ * leaves the other exactly where it was, and the one that moved still has
+ * something to say.
+ */
+describe('a corner gesture that moves nothing', () => {
+  /** Both boxes stated, since happy-dom lays nothing out and the corner divides by them. */
+  const crossing = async (): Promise<[Splitter, Splitter, HTMLElement, string[]]> => {
+    const [host, within] = await nested(
+      'default-position="50"',
+      'orientation="vertical" default-position="50"',
+    )
+    for (const one of [host, within]) {
+      Object.defineProperty(one, 'getBoundingClientRect', {
+        value: () => ({ bottom: 400, height: 400, left: 0, right: 400, top: 0, width: 400 }),
+      })
+    }
+    const said: string[] = []
+    /* One listener, on the outer, labeled by what announced: the nested one is a
+       child in the light DOM, so its events reach here by bubbling and a
+       listener on each would record those twice. */
+    host.addEventListener('helix-before-resize', (event) => {
+      const value = (event as CustomEvent<{ value: string }>).detail.value
+      said.push(`${event.target === host ? 'outer' : 'inner'} ${value}`)
+    })
+    return [host, within, corner(host) as HTMLElement, said]
+  }
+
+  const trace = async (
+    host: Splitter,
+    within: Splitter,
+    handle: HTMLElement,
+    path: [string, number, number][],
+  ): Promise<void> => {
+    for (const [type, x, y] of path) {
+      handle.dispatchEvent(
+        new (globalThis as unknown as { PointerEvent: typeof MouseEvent }).PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          clientX: x,
+          clientY: y,
+        }) as PointerEvent,
+      )
+    }
+    await host.updateComplete
+    await within.updateComplete
+  }
+
+  test('announces on neither divider, because neither moved', async () => {
+    const [host, within, handle, said] = await crossing()
+    await trace(host, within, handle, [
+      ['pointerdown', 200, 200],
+      ['pointerup', 200, 200],
+    ])
+    expect(said).toEqual([])
+    expect([host.position, within.position]).toEqual([50, 50])
+  })
+
+  test('and on one of them where the gesture moved one of them', async () => {
+    /* Along the outer divider's axis only. The corner feeds both on every step,
+       so the nested one has a number from this gesture too: the one it already
+       had. */
+    const [host, within, handle, said] = await crossing()
+    await trace(host, within, handle, [
+      ['pointerdown', 200, 200],
+      ['pointermove', 300, 200],
+      ['pointerup', 300, 200],
+    ])
+    expect(said).toEqual(['outer 75'])
+    expect([host.position, within.position]).toEqual([75, 50])
+  })
+
+  test('and on the nested one where that is the one that moved', async () => {
+    const [host, within, handle, said] = await crossing()
+    await trace(host, within, handle, [
+      ['pointerdown', 200, 200],
+      ['pointermove', 200, 300],
+      ['pointerup', 200, 300],
+    ])
+    expect(said).toEqual(['inner 75'])
+    expect([host.position, within.position]).toEqual([50, 75])
+  })
+
+  test('and on both where both moved', async () => {
+    const [host, within, handle, said] = await crossing()
+    await trace(host, within, handle, [
+      ['pointerdown', 200, 200],
+      ['pointermove', 300, 100],
+      ['pointerup', 300, 100],
+    ])
+    expect(said).toEqual(['outer 75', 'inner 25'])
+  })
+
+  test('and a double click on it announces only what it actually puts back', async () => {
+    /* `reset` goes straight to the settling, so a divider already sitting on its
+       `default-position` is a move of zero arriving by a fourth door. The two
+       presses a double click is made of are two more. */
+    const [host, within, handle, said] = await crossing()
+    await trace(host, within, handle, [
+      ['pointerdown', 200, 200],
+      ['pointermove', 200, 300],
+      ['pointerup', 200, 300],
+    ])
+    said.length = 0
+    handle.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true }))
+    await host.updateComplete
+    await within.updateComplete
+    expect(said).toEqual(['inner 50'])
   })
 })
 
