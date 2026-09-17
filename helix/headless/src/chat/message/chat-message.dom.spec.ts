@@ -84,6 +84,35 @@ describe('the states', () => {
   })
 
   /**
+   * A retry that stands is a turn on its way, which is what `sending` means.
+   * Without it the reader pressed the control and the turn sat at "Not sent"
+   * with the same control still on it.
+   */
+  test('a retry nobody refused puts the turn back on its way', async () => {
+    const element = await message('state="failed"')
+    ;(part(element, 'retry') as HTMLElement).click()
+    await element.updateComplete
+    expect(element.state).toBe('sending')
+    expect(part(element, 'retry')).toBeNull()
+    expect(part(element, 'state')?.textContent).toContain('Sending')
+  })
+
+  /**
+   * And the half that makes the veto real. `helix-send` is cancelable because
+   * the composer clears only when nobody refused; this dispatch read nothing
+   * back, so `preventDefault()` here was valid code, raised no error, and took
+   * a decision nobody was about to make.
+   */
+  test('and refusing it leaves the failure and its control where they were', async () => {
+    const element = await message('state="failed"')
+    element.addEventListener('helix-send', (event) => event.preventDefault())
+    ;(part(element, 'retry') as HTMLElement).click()
+    await element.updateComplete
+    expect(element.state).toBe('failed')
+    expect(part(element, 'retry')).not.toBeNull()
+  })
+
+  /**
    * The whole of the streaming contract on this side. The live region above
    * holds its announcement until the flag clears, so a screen reader reads the
    * turn once and whole rather than token by token.

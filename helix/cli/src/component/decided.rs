@@ -47,23 +47,18 @@
 //! reading `defaultPrevented` off an event that cannot be canceled is harmless,
 //! it always answers false, and the same handler often serves both.
 //!
-//! **Not in the rule list yet, and that is the one thing about this file worth
-//! reading twice.** Two dispatches still answer to nothing, in two families
-//! being changed on branches of their own: `Chat.Message` re-announces
-//! `helix-send` for a retry and drops what the dispatch returned, and
-//! `Radio.Group` calls `requestValue` from a member's `helix-select` without
-//! reading whether that choice stood. Registering it today would land a red
-//! `check` naming work somebody else is mid-way through, and the alternative,
-//! an allowlist of the two, is the thing this repository keeps deleting: a list
-//! that goes stale silently and reads as a pass. The line that registers it is
-//! one entry in `rules`, beside `corners`, and it goes in the commit that
-//! clears the second of the two.
-
-/* Nothing calls this until the entry above goes into `rules`, and every item in
-it is then reachable at once. Allowed here rather than at each of the twelve,
-which would be twelve copies of one sentence, and deleted in the same edit as
-the registration. */
-#![allow(dead_code)]
+//! **In the rule list, and it holds every tier with no exemption.** It was
+//! written and left unregistered for one reason, which is worth keeping because
+//! it is what the entry cost: two dispatches still answered to nothing, in two
+//! families being changed on branches of their own. `Chat.Message` re-announced
+//! `helix-send` for a retry and dropped what the dispatch returned, and
+//! `Radio.Group` called `requestValue` from a member's `helix-select` without
+//! reading whether that choice stood. The alternative to waiting was an
+//! allowlist of the two, which is the thing this repository keeps deleting: a
+//! list that goes stale silently and reads as a pass. Both turned out to be
+//! repairs rather than design changes, and the registration went in with the
+//! second of them, so what this reports now is a regression rather than a
+//! backlog.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;

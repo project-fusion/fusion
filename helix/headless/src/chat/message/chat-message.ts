@@ -4,6 +4,7 @@ import {
   HelixSendEvent,
   hostAria,
   relativeTime,
+  requestChange,
   slotFilled,
   TONE_MARKS,
 } from '@fusion.dev/helix-core'
@@ -47,7 +48,7 @@ export const FAILED_LABEL = 'Not sent'
  * indicator, so slotting nothing is what this has always done.
  * @slot sources - What it was said from: citations, documents, a retrieved page.
  *
- * @event {HelixSendEvent} helix-send - Fired when the reader asks to send a failed message again, and cancelable.
+ * @event {HelixSendEvent} helix-send - Fired when the reader asks to send a failed message again. Cancelable: a retry that stands puts the turn back on its way, and refusing it leaves the failure and the control offering it exactly where they were.
  *
  * @csspart actions - The controls offered on the turn, beside its time.
  * @csspart avatar - The leading slot's box.
@@ -121,6 +122,9 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * report, which is what most of a transcript is, and it is the absence of the
    * attribute rather than a value of it: there is no initializer, so nothing is
    * reflected until something happens.
+   *
+   * **The turn writes this once, on a retry nobody refused**, and `handleRetry`
+   * holds the reason. Everything else that moves it is the consumer's.
    */
   @property({ reflect: true })
   state?: 'failed' | 'sending' | 'sent' | 'streaming'
@@ -325,10 +329,27 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * offering it. A listener that wants to tell them apart has `event.target`,
    * which is the message on a retry and the composer on a first send, and that
    * is a distinction the DOM already makes without a second name for it.
+   *
+   * **Through `requestChange`, and the turn is what moves.** `helix-send` is
+   * cancelable because the composer clears only when nobody refused, and this
+   * dispatch had nothing behind it: the reader pressed the control, the turn sat
+   * at "Not sent" with the same control still on it, and `preventDefault()`
+   * refused a decision nobody here was about to take. A retry that stands is a
+   * turn on its way, which is what `sending` means, so that is the default
+   * action and refusing it leaves the failure exactly where it was. A consumer
+   * who wants something else refuses and assigns `state` themselves, which is
+   * how control is taken from every other stateful element in the library.
    */
   private readonly handleRetry = (event: Event): void => {
     event.stopPropagation()
-    this.dispatchEvent(new HelixSendEvent({ value: this.textContent?.trim() ?? '' }))
+    requestChange<'sending'>({
+      apply: (next) => {
+        this.state = next
+      },
+      event: () => new HelixSendEvent({ value: this.textContent?.trim() ?? '' }),
+      host: this,
+      next: 'sending',
+    })
   }
 }
 
