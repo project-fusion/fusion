@@ -309,7 +309,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     }
     return html`<label
       part="label"
-      for="control"
+      for=${this.controlId}
       ?data-hidden=${hidden !== null}
       @pointercancel=${this.handleScrubEnd}
       @pointerdown=${this.handleScrubDown}
@@ -591,7 +591,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         }
         <input
           part="control"
-          id="control"
+          id=${this.controlId}
           .value=${this.value}
           type="text"
           role="spinbutton"

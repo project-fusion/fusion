@@ -784,7 +784,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
         }
         <input
           part="control"
-          id="control"
+          id=${this.controlId}
           type="text"
           role="combobox"
           autocomplete=${this.autocomplete || nothing}

@@ -393,7 +393,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     return html`${this.renderLabel()}
       <button
         part="trigger"
-        id="control"
+        id=${this.controlId}
         type="button"
         aria-haspopup="listbox"
         aria-expanded=${this.open ? 'true' : 'false'}

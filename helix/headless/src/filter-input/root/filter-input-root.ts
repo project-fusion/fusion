@@ -862,7 +862,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
       )}
       <input
         part="control"
-        id="control"
+        id=${this.controlId}
         type="text"
         .value=${this.value}
         name=${this.name || nothing}

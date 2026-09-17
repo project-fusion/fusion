@@ -413,7 +413,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     <div part="field">
       <textarea
         part="control"
-        id="control"
+        id=${this.controlId}
         .value=${this.value}
         rows=${this.rows}
         cols=${this.cols ?? nothing}

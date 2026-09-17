@@ -399,7 +399,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
       <slot name="start"></slot>
       <input
         part="control"
-        id="control"
+        id=${this.controlId}
         .value=${this.value}
         type=${this.effectiveType}
         name=${this.name || nothing}
