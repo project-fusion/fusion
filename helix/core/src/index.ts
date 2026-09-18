@@ -193,6 +193,14 @@ export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export {
+  type Color,
+  type ColorFormat,
+  formatColor,
+  parseColor,
+  splitColors,
+  toCss,
+} from './utils/css-color/css-color.js'
+export {
   customElement,
   definedTags,
   duplicateRegistrations,
@@ -221,6 +229,7 @@ export {
   sameCopies,
 } from './utils/media-copy/media-copy.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
+export { type ColorBytes, readColor } from './utils/read-color/read-color.js'
 export {
   type Row,
   type RowCell,

@@ -1,12 +1,18 @@
 import {
+  type Color,
+  type ColorFormat,
   CopyController,
   capturePointer,
   customElement,
   drawIcon,
+  formatColor,
   HelixFormElement,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   MixinControllerValue,
+  parseColor,
+  splitColors,
+  toCss,
 } from '@fusion.dev/helix-core'
 import { eyedropper } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -17,14 +23,6 @@ import { html } from 'lit/static-html.js'
 import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../slider/index.js'
-import {
-  type Color,
-  type ColorFormat,
-  formatColor,
-  parseColor,
-  splitColors,
-  toCss,
-} from '../color.js'
 
 /** The formats the toggle walks through, in the order it walks them. */
 const FORMATS: ColorFormat[] = ['hex', 'rgb', 'hsl']
