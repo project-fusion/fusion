@@ -9,7 +9,7 @@ export interface RemoteReport {
 }
 
 /**
- * Watches for something to play the video on, and stops on the way out.
+ * Watches for something to play the media on, and stops on the way out.
  *
  * The Remote Playback API is the standard one, and it is what Safari
  * implements for AirPlay and Chrome for Cast: one call covers both, where the
@@ -22,7 +22,7 @@ export interface RemoteReport {
  * leak with a `@state` write on the end.
  */
 export class RemotePlaybackController implements ReactiveController {
-  private video: HTMLVideoElement | undefined
+  private media: HTMLMediaElement | undefined
 
   /** Cancels the availability watch, since it outlives a single render. */
   private watch: number | undefined
@@ -34,12 +34,12 @@ export class RemotePlaybackController implements ReactiveController {
     host.addController(this)
   }
 
-  /** Starts watching the video, once there is one. */
-  async attach(video: HTMLVideoElement): Promise<void> {
-    this.video = video
-    video.remote?.addEventListener?.('connect', this.handleState)
-    video.remote?.addEventListener?.('disconnect', this.handleState)
-    const remote = video.remote
+  /** Starts watching the media element, once there is one. */
+  async attach(media: HTMLMediaElement): Promise<void> {
+    this.media = media
+    media.remote?.addEventListener?.('connect', this.handleState)
+    media.remote?.addEventListener?.('disconnect', this.handleState)
+    const remote = media.remote
     if (!remote?.watchAvailability) {
       return
     }
@@ -56,7 +56,7 @@ export class RemotePlaybackController implements ReactiveController {
   /** Opens the platform's own device picker. It has no list of its own. */
   async prompt(): Promise<void> {
     try {
-      await this.video?.remote?.prompt()
+      await this.media?.remote?.prompt()
     } catch {
       /* Dismissing the picker rejects, which is a reader saying no rather than
          anything going wrong. */
@@ -65,12 +65,12 @@ export class RemotePlaybackController implements ReactiveController {
 
   hostDisconnected(): void {
     if (this.watch !== undefined) {
-      void this.video?.remote?.cancelWatchAvailability?.(this.watch)
+      void this.media?.remote?.cancelWatchAvailability?.(this.watch)
       this.watch = undefined
     }
   }
 
   private readonly handleState = (): void => {
-    this.report.connected(this.video?.remote?.state === 'connected')
+    this.report.connected(this.media?.remote?.state === 'connected')
   }
 }

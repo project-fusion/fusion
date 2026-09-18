@@ -1,4 +1,11 @@
 import {
+  activeCue,
+  adoptTrack,
+  type Caption,
+  CueController,
+  captionsAmong,
+  captionTracks,
+  copiesOf,
   customElement,
   drawIcon,
   FullscreenController,
@@ -6,7 +13,13 @@ import {
   HelixNextEvent,
   HelixPreviousEvent,
   IdleController,
+  type MediaCopy,
+  MediaSessionController,
   onUnlessFalse,
+  RemotePlaybackController,
+  SKIP_SECONDS,
+  sameCopies,
+  showCaption,
   writtenList,
 } from '@fusion.dev/helix-core'
 import {
@@ -34,20 +47,8 @@ import { html } from 'lit/static-html.js'
    this tier writes the template and the styled tier inherits it without having
    a copy of its own to remind anyone. */
 import '../../menu/index.js'
-import {
-  activeCue,
-  adoptTrack,
-  type Caption,
-  CueController,
-  captionsAmong,
-  captionTracks,
-  showCaption,
-} from './captions.js'
 import { barControls, type Conditions, menuControls, ownFile } from './extra-controls.js'
 import { takeKey } from './keys.js'
-import { copiesOf, type MediaCopy, sameCopies } from './media-copy.js'
-import { MediaSessionController, SKIP_SECONDS } from './media-session.js'
-import { RemotePlaybackController } from './remote-playback.js'
 
 /**
  * Seconds as a clock, with an hour only when there is one.

@@ -9,7 +9,7 @@
  * bound at all, and what a taken press does to the event, stay with the element.
  */
 
-import { SKIP_SECONDS } from './media-session.js'
+import { SKIP_SECONDS } from '@fusion.dev/helix-core'
 
 /** What a press asks the player for, which is all a key can do. */
 export interface KeyActions {
