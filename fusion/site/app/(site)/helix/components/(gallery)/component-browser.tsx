@@ -185,13 +185,13 @@ export function ComponentBrowser({
          * immediately above it is spaced as the next unrelated thing on the
          * page.
          */}
-        <helix-flex align="center" data-density="sm" direction="column" gap="sm">
+        <helix-flex align-items="center" data-density="sm" direction="column" gap="sm">
           {/* Two marks, not one. The stage is the one label on this page that
                 has to stay legible: `Building` means real work with nothing
                 shipped, and folding it into an eyebrow that also names the
                 vertical would soften it by omission. So the vertical names
                 itself and the stage sits beside it, still in its own tone. */}
-          <helix-flex align="center" gap="xs">
+          <helix-flex align-items="center" gap="xs">
             <helix-tag>{eyebrow}</helix-tag>
             <helix-tag tone={stageTone}>{stage}</helix-tag>
           </helix-flex>
@@ -225,7 +225,7 @@ export function ComponentBrowser({
           </span>
           <helix-icon name="magnifying-glass" slot="start"></helix-icon>
         </helix-input>
-        <helix-flex align="center" className="pageHeroActions" direction="column" gap="lg">
+        <helix-flex align-items="center" className="pageHeroActions" direction="column" gap="lg">
           {/*
            *  One control, not two buttons next to each other. The group
            *                 flattens the inner corners and pulls the pair together by the
@@ -309,7 +309,7 @@ export function ComponentBrowser({
             </helix-select>
           )}
         </helix-flex>
-        <helix-flex align="center" className={filterBar.filterSort} gap="sm">
+        <helix-flex align-items="center" className={filterBar.filterSort} gap="sm">
           {/* The count is announced and not shown. Filtering is a change
                 nothing else reports, so a reader who cannot see the grid shrink
                 needs to be told; a reader who can see it is being told twice.

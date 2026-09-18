@@ -52,7 +52,7 @@ export function Example() {
           <strong>Josh Krajcik</strong> changed the status of <strong>Design Project</strong>
         </span>
         <helix-flex
-          align="center"
+          align-items="center"
           gap="xs"
           slot="detail"
         >

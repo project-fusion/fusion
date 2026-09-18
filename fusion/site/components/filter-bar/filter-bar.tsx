@@ -12,12 +12,12 @@ export function FilterBar({ children }: { children: ReactNode }) {
   return (
     <div className={styles.filterBar}>
       <helix-flex
-        align="center"
+        align-items="center"
         className={styles.filterBarInner}
         data-density="sm"
         data-shell
         gap="md"
-        justify="between"
+        justify-content="between"
         wrap
       >
         {children}

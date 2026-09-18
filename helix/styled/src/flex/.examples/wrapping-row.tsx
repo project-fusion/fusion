@@ -6,7 +6,7 @@ export function Example() {
     >
       <helix-flex
         gap="sm"
-        justify="between"
+        justify-content="between"
         wrap
       >
         <helix-tag>Design</helix-tag>

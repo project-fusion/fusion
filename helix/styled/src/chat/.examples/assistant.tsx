@@ -102,7 +102,7 @@ export function Example() {
             a person, so they are tags rather than avatars: initials in a circle
             read as people, and at the small step they came to one letter each. */}
         <helix-flex
-          align="center"
+          align-items="center"
           className="assistant-sources"
           gap="2xs"
           slot="sources"

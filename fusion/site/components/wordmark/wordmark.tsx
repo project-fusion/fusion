@@ -5,7 +5,7 @@ import styles from './wordmark.module.css'
  */
 export function Wordmark({ size = '1.5rem' }: { size?: string }) {
   return (
-    <helix-flex align="center" gap="xs" inline>
+    <helix-flex align-items="center" gap="xs" inline>
       <FusionMark size={size} />
       <helix-text class={styles.wordmark}>Fusion</helix-text>
     </helix-flex>

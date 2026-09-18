@@ -16,7 +16,7 @@ export function Example() {
         <helix-text variant="body">
           Shelves can be shared now. Anything you add to one later goes with it.
         </helix-text>
-        <helix-flex justify="end">
+        <helix-flex justify-content="end">
           <helix-button
             command="--close"
             commandfor="whats-new"

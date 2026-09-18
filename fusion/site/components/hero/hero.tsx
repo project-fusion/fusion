@@ -15,7 +15,13 @@ import styles from './hero.module.css'
 export function Hero({ announcement }: { announcement?: SitePage | undefined }) {
   return (
     <section className={styles.hero}>
-      <helix-flex align="center" class={styles.heroShell} data-shell direction="column" gap="lg">
+      <helix-flex
+        align-items="center"
+        class={styles.heroShell}
+        data-shell
+        direction="column"
+        gap="lg"
+      >
         {/*
          *  What is coming, which is what a chip under a heading about the
          *             company should say. It pointed at the newest essay, so the first
@@ -33,7 +39,7 @@ export function Hero({ announcement }: { announcement?: SitePage | undefined }) 
         <Lede>{HERO.lede}</Lede>
 
         <helix-flex class={styles.heroActions} direction="column" gap="md">
-          <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
+          <helix-flex align-items="center" data-density="lg" gap="sm" justify-content="center" wrap>
             <Link data-button="solid" data-button-tone="primary" href="/helix">
               Open Helix
             </Link>
@@ -41,7 +47,12 @@ export function Hero({ announcement }: { announcement?: SitePage | undefined }) 
               Work with us
             </Link>
           </helix-flex>
-          <helix-flex align="center" class={styles.heroInstall} gap="2xs" justify="between">
+          <helix-flex
+            align-items="center"
+            class={styles.heroInstall}
+            gap="2xs"
+            justify-content="between"
+          >
             <code>{HERO.install}</code>
             <helix-copy-button
               copied-label="Copied"

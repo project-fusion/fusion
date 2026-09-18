@@ -17,7 +17,7 @@ export function Example() {
       >
         <span slot="header">Drawer Title</span>
         <helix-flex
-          align="start"
+          align-items="start"
           direction="column"
           gap="md"
         >

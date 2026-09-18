@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-flex
-      align="center"
+      align-items="center"
       gap="md"
     >
       {/* `accent` renders as `primary` here, and that is the default rather than

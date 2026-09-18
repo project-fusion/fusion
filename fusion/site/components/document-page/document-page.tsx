@@ -56,7 +56,7 @@ export function DocumentPage({
      they are given its title; in the plain head the title leads, because a
      reader who came to a policy already knows. */
   const head = (
-    <helix-flex align="start" direction="column" gap="md">
+    <helix-flex align-items="start" direction="column" gap="md">
       {kicker && (
         <helix-text class={styles.documentKicker} emphasis="subtle" variant="label">
           {kicker}
@@ -89,7 +89,12 @@ export function DocumentPage({
     <div className={styles.document}>
       {hero && (
         <section className={styles.documentHero}>
-          <helix-flex align="start" class={styles.documentHeroInner} direction="column" gap="lg">
+          <helix-flex
+            align-items="start"
+            class={styles.documentHeroInner}
+            direction="column"
+            gap="lg"
+          >
             {trail}
             {meta}
             {head}
@@ -100,7 +105,7 @@ export function DocumentPage({
       <helix-flex class={styles.documentShell} direction="column" gap="xl">
         {!hero && (
           <helix-flex
-            align={centered ? 'center' : 'start'}
+            align-items={centered ? 'center' : 'start'}
             class={`${styles.documentHead} ${centered ? styles.documentHeadCentred : ''}`}
             direction="column"
             gap="lg"

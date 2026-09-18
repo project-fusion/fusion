@@ -47,43 +47,31 @@
   gap: var(--helix-space-3xl);
 }
 
-/*
- *  `align` is a legacy HTML presentational attribute, and the browser applies it
- *    to any element that carries one, including this one.
- *
- * `<helix-flex align="center">` therefore also set `text-align: center` on
- * everything inside it, through a hint no rule here declares and none can see.
- * Measured: an invented tag with `align="center"` computes centered text too, so
- * it is nothing to do with being a known element. It centered the placeholder in
- * every field put in a centered row.
- */
-:host([align]) {
-  text-align: inherit;
-}
-
-:host([align="start"]) {
+/* The attribute is named for the property, so the rule is the value with the
+   flex spelling where CSS has one. */
+:host([align-items="start"]) {
   align-items: flex-start;
 }
-:host([align="center"]) {
+:host([align-items="center"]) {
   align-items: center;
 }
-:host([align="end"]) {
+:host([align-items="end"]) {
   align-items: flex-end;
 }
-:host([align="baseline"]) {
+:host([align-items="baseline"]) {
   align-items: baseline;
 }
 
-:host([justify="center"]) {
+:host([justify-content="center"]) {
   justify-content: center;
 }
-:host([justify="end"]) {
+:host([justify-content="end"]) {
   justify-content: flex-end;
 }
-:host([justify="between"]) {
+:host([justify-content="between"]) {
   justify-content: space-between;
 }
-:host([justify="around"]) {
+:host([justify-content="around"]) {
   justify-content: space-around;
 }
 
