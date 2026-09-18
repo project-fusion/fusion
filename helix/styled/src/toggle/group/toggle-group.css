@@ -9,6 +9,10 @@
 :host([label-placement="start"]) [part="label"] {
   align-self: center;
   margin-block: 0;
+  /* Ahead of the rule, which is ahead of the segments. The rule is the track's
+     `::before` and a pseudo-element comes before every child of it, so the three
+     are ordered rather than left where the box tree put them. */
+  order: -2;
   /* *The padding is what was holding the word up, not the margin.** A field
      label carries four pixels under it as its gap to the control below, and
      centering the label's *box* against the track then leaves its text half that
@@ -19,13 +23,26 @@
   white-space: nowrap;
 }
 
-[part="divider"] {
+/* The rule itself, on the track rather than in a box between the label and the
+ * first segment: there was nothing about it for a box to carry.
+ *
+ * **Sixty percent of the row rather than of the track, and the difference is
+ * whether it draws at all.** `block-size: 60%` on a flex item resolves against
+ * the flex container's block size only where that is definite, and this track's
+ * is not: it wraps, and its height comes from its content and a
+ * `min-block-size`. Measured on `label-first` at 640px, the box came out 1 by 0
+ * and the rule the note above calls for has never been on screen.
+ * `--_toggle-height` is the row the segments fill, which is the number the
+ * percentage was reaching for, and it is a length. */
+:host([label-placement="start"]) [part="track"]::before {
   align-self: center;
   background-color: var(--helix-color-border);
-  block-size: 60%;
+  block-size: calc(var(--_toggle-height) * 0.6);
+  content: "";
   flex: none;
   inline-size: var(--helix-border-thin);
   margin-inline: var(--helix-space-xs);
+  order: -1;
 }
 
 /* The label on the track's line rather than over it. The row gap is `sm` rather

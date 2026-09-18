@@ -40,13 +40,16 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} input - Announced once the value has moved.
  *
- * @csspart divider - The rule after an inline label, separating it from the items.
  * @csspart feedback - What is wrong with it.
  * @csspart hint - Help under the row, while nothing is wrong.
  * @csspart indicator - The moving marker behind the selected item.
  * @csspart label - The question, over the row.
  * @csspart row - The line the track sits on, with whatever flanks it.
- * @csspart track - The bar the items sit in.
+ * @csspart track - The bar the items sit in. The rule after an inline label,
+ * separating it from the items, is drawn on the bar, which is
+ * `::part(track)::before` from a consumer's sheet: this tier ships no CSS, so a
+ * box it renders for one to paint is an empty child costing whatever the
+ * consumer's own layout charges for a child. `ListItem` measured that.
  *
  * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
@@ -284,8 +287,10 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     /* **Inside the track when it is placed at the start, not beside it.** A
        label sitting outside reads as a field's label that happens to be on one
        line; inside, with a rule after it, the group reads as one control that
-       says what it is for. The divider is what makes that legible: without it
-       the word is a first segment that cannot be pressed. */
+       says what it is for. A rule after the word is what makes that legible:
+       without it the word is a first segment that cannot be pressed. The rule is
+       the sheet's, drawn on the track, there being nothing about it for a box to
+       carry. */
     const inside = this.labelPlacement === 'start'
     const label = this.renderGroupLabel()
 
@@ -293,7 +298,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
       <div part="row">
         <slot name="start"></slot>
         <div part="track">
-        ${inside ? html`${label}<div part="divider" aria-hidden="true"></div>` : nothing}
+        ${inside ? label : nothing}
         <div part="indicator" aria-hidden="true"></div>
         <slot
           @slotchange=${() => {
