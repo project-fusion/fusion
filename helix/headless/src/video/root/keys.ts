@@ -38,7 +38,7 @@ export const takeKey = (
      and ten with shift held, which is `SKIP_SECONDS` reached from the keyboard
      rather than from a button: `j` and shift-left have to agree or the player
      skips two distances under one name. */
-  const step = event.shiftKey ? 10 : 5
+  const step = event.shiftKey ? SKIP_SECONDS : 5
   switch (event.key) {
     case ' ':
     case 'k': {
