@@ -1342,6 +1342,35 @@ fn hooks() {
     );
 }
 
+/// The analyzer reads the block the element is declared on, so the decorator
+/// under it is where a documented hook stops being collected.
+#[test]
+fn hooks_below_the_class_block() {
+    plant_in(
+        "hooks-misplaced",
+        "hooks",
+        &[
+            ("helix.json", r#"{ "tiers": ["pkg/styled/src"] }"#),
+            (
+                "pkg/styled/src/button/button.ts",
+                "/**\n * @cssproperty --button-background-color - The fill.\n */\n@customElement('x-button')\nexport class Button extends HTMLElement {}\n",
+            ),
+            (
+                "pkg/styled/src/button/button.css",
+                ":host {\n  background-color: var(--button-background-color, white);\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "pkg/styled/src/button/button.ts",
+                "@customElement('x-button')\nexport class Button extends HTMLElement {\n  /**\n   * @cssproperty --button-background-color - The fill.\n   */\n  emphasis?: string\n}\n",
+            );
+        },
+        "documents `--button-background-color` below the class block, where nothing collects it",
+        "pkg/styled/src/button/button.ts",
+    );
+}
+
 #[test]
 fn leaks() {
     plant(
