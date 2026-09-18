@@ -17,12 +17,12 @@ interface TrackCopy {
  *
  * Filtered by kind, because `textTracks` also carries `chapters`, `metadata`
  * and `descriptions`, and a menu offering "Chapters" as a subtitle language
- * would be offering something that draws no words. Read off the video rather
- * than off the slot: a `<track>` added later is in one and not the other, and
- * the video is the one that has resolved them.
+ * would be offering something that draws no words. Read off the media element
+ * rather than off the slot: a `<track>` added later is in one and not the
+ * other, and the element is the one that has resolved them.
  */
-export const captionTracks = (video: HTMLVideoElement | null): TextTrack[] => {
-  const tracks = video?.textTracks
+export const captionTracks = (media: HTMLMediaElement | null): TextTrack[] => {
+  const tracks = media?.textTracks
   if (!tracks) {
     return []
   }

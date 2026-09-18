@@ -1,13 +1,15 @@
 /**
- * What the consumer slotted, as the plain data a `<video>` can be given.
+ * What the consumer slotted, as the plain data a media element can be given.
  *
- * Separable because it is a read of light DOM and nothing else: no media
- * element, no playback state, nothing drawn. A media element runs resource
- * selection over its own child nodes and a slot is one node, so the element
- * copies rather than slots, and the two questions the copying asks are answered
+ * A media element runs resource selection over its own child nodes and a slot
+ * is one node, so anything wrapping `<video>` or `<audio>` in a shadow root has
+ * to copy rather than slot. The two questions that copying asks are answered
  * here: which attributes come across, and whether a fresh read differs from the
  * set already held. When to read, and what to do with the answer, stay with the
  * element.
+ *
+ * A read of light DOM and nothing else: no media element, no playback state,
+ * nothing drawn, which is what makes it a utility rather than a controller.
  */
 
 /** A `<source>` or `<track>` as the consumer wrote it, reduced to what the copy carries. */

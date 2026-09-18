@@ -17,6 +17,15 @@ export {
   type CopyOptions,
 } from './controllers/copy-controller/copy-controller.js'
 export {
+  activeCue,
+  adoptTrack,
+  type Caption,
+  CueController,
+  captionsAmong,
+  captionTracks,
+  showCaption,
+} from './controllers/cue-controller/cue-controller.js'
+export {
   DisabledCascadeController,
   type DisabledCascadeOptions,
 } from './controllers/disabled-cascade-controller/disabled-cascade-controller.js'
@@ -46,9 +55,18 @@ export {
   type NavigableItem,
 } from './controllers/keyboard-navigation-controller/keyboard-navigation-controller.js'
 export {
+  MediaSessionController,
+  type SessionHandlers,
+  SKIP_SECONDS,
+} from './controllers/media-session-controller/media-session-controller.js'
+export {
   PopoverController,
   type PopoverOptions,
 } from './controllers/popover-controller/popover-controller.js'
+export {
+  RemotePlaybackController,
+  type RemoteReport,
+} from './controllers/remote-playback-controller/remote-playback-controller.js'
 export {
   SourceController,
   type SourceHost,
@@ -197,6 +215,11 @@ export {
 export { inlineStep } from './utils/inline-step/inline-step.js'
 export { type Curve, linePath, type Point } from './utils/line-path/line-path.js'
 export { markRegion, type RegionOptions } from './utils/mark-region/mark-region.js'
+export {
+  copiesOf,
+  type MediaCopy,
+  sameCopies,
+} from './utils/media-copy/media-copy.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export {
   type Row,
