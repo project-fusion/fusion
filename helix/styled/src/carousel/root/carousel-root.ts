@@ -47,9 +47,9 @@ export class HelixCarousel extends HelixHeadlessCarousel {
    * Which side of the slides the arrows sit on.
    *
    * The same four sides as `indicatorPlacement` and the same default, so a
-   * carousel that moves only one of them keeps the other where it was.
-   * `inline-start` or `inline-end` stacks the arrows into a column, which is
-   * what a vertical track usually wants.
+   * carousel that moves only one of them keeps the other where it was. `start`
+   * or `end` stacks the arrows into a column, which is what a vertical track
+   * usually wants.
    *
    * `overlay` puts them on the slides, at the track's own edges, which is what a
    * full-bleed carousel wants: the slide is the page and the controls are on it
@@ -64,7 +64,7 @@ export class HelixCarousel extends HelixHeadlessCarousel {
    * chrome can go.
    */
   @property({ attribute: 'controls-placement', reflect: true })
-  controlsPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay'
+  controlsPlacement?: 'start' | 'end' | 'top' | 'bottom' | 'overlay'
 
   /**
    * Where along that side the dots sit.
@@ -81,8 +81,9 @@ export class HelixCarousel extends HelixHeadlessCarousel {
    * is a column and the same question is `align-self`. A consumer should not
    * have to know which of those two words their edge wanted.
    *
-   * Logical, like the placement: `start` is the left in English and the right in
-   * Arabic on a horizontal run, and the top on a vertical one.
+   * Logical, like the placement's own `start` and `end`: `start` is the left in
+   * English and the right in Arabic on a horizontal run, and the top on a
+   * vertical one.
    *
    * Unset splits the row, dots to the start and arrows to the end, which is
    * what keeps two items in one grid cell from landing on each other. Beside the
@@ -97,21 +98,27 @@ export class HelixCarousel extends HelixHeadlessCarousel {
   /**
    * Which side of the slides the dots sit on.
    *
-   * Unset is `block-end`, under them. `block-start` puts them above,
-   * `inline-start` and `inline-end` beside, where a run of dots becomes a
-   * column.
+   * Unset is `bottom`, under them. `top` puts them above, `start` and `end`
+   * beside, where a run of dots becomes a column.
    *
-   * **The sides of the content, not positions along a bar**, and logical names
-   * rather than `top`/`left`: an `inline-start` carousel should put its dots on
-   * the right in Arabic without being told.
+   * **The sides of the content, not positions along a bar.** `start` and `end`
+   * are the logical ones and they are logical because that axis flips: a
+   * carousel with its dots at the start should put them on the right in Arabic
+   * without being told. `top` and `bottom` are the block edges, which flip in
+   * no writing mode this library draws for, so the plain word is the honest one
+   * and `block-start` would be jargon standing in for it.
    *
-   * Independent of `controlsPlacement`. Both default to the block end, where
-   * they share the row and split it, dots to the start and arrows to the end,
+   * **`Drawer` and `Toast` say it in exactly these four words**, and one
+   * vocabulary across the three is worth more than each family's own: a
+   * consumer who has placed a drawer knows where a carousel's dots go.
+   *
+   * Independent of `controlsPlacement`. Both default to the bottom, where they
+   * share the row and split it, dots to the start and arrows to the end,
    * arrived at by two defaults rather than by a rule about the pair, so moving
    * one leaves the other alone.
    */
   @property({ attribute: 'indicator-placement', reflect: true })
-  indicatorPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start'
+  indicatorPlacement?: 'start' | 'end' | 'top' | 'bottom'
 
   static override styles: CSSResultGroup = styles
 }

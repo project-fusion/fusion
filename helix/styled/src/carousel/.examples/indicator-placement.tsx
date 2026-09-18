@@ -5,7 +5,7 @@ export function Example() {
       gap="xl"
     >
       <helix-carousel
-        indicator-placement="block-start"
+        indicator-placement="top"
         label="Above"
       >
         <helix-callout tone="info">Slide One</helix-callout>
@@ -14,7 +14,7 @@ export function Example() {
       </helix-carousel>
 
       <helix-carousel
-        indicator-placement="inline-start"
+        indicator-placement="start"
         label="Beside, near"
       >
         <helix-callout tone="info">Slide One</helix-callout>
@@ -23,7 +23,7 @@ export function Example() {
       </helix-carousel>
 
       <helix-carousel
-        indicator-placement="inline-end"
+        indicator-placement="end"
         label="Beside, far"
       >
         <helix-callout tone="info">Slide One</helix-callout>

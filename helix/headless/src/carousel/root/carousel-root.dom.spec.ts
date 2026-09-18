@@ -581,9 +581,9 @@ describe('carousel chrome placement', () => {
     (part(host, name) as HTMLElement).style.getPropertyValue(`--_carousel-${name}-along`)
 
   test('the two attributes are independent, so moving one leaves the other', async () => {
-    const host = await carousel('controls-placement="block-start" indicator-placement="block-end"')
-    expect(host.getAttribute('indicator-placement')).toBe('block-end')
-    expect(host.getAttribute('controls-placement')).toBe('block-start')
+    const host = await carousel('controls-placement="top" indicator-placement="bottom"')
+    expect(host.getAttribute('indicator-placement')).toBe('bottom')
+    expect(host.getAttribute('controls-placement')).toBe('top')
   })
 
   test('both alignments reflect, so a stylesheet can select on them', async () => {
