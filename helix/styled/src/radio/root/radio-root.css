@@ -111,7 +111,7 @@
  *  A card is the same radio in a bounded surface, for a set of options that need
  * room: a description, an icon, a price.
  */
-:host([variant="card"]) {
+:host(:is([separation="filled"], [separation="outlined"])) {
   display: block;
 }
 
@@ -120,7 +120,7 @@
    Not duplication of `Card`: the two rules share exactly two declarations,
    `gap` and `transition`, and everything that looks copied is four token
    references doing what tokens are for. */
-:host([variant="card"]) [part="item"] {
+:host(:is([separation="filled"], [separation="outlined"])) [part="item"] {
   align-items: start;
   background-color: var(--radio-card-background-color, var(--helix-color-surface));
   border: var(--helix-border-thin) solid var(--radio-card-border-color, var(--helix-color-border));
@@ -134,7 +134,16 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host(:not([disabled])[variant="card"]) [part="item"]:hover {
+/* The ground carries it and the edge goes, which is exactly what `Card` does
+   for the same value: the surface is told apart by its own color, so a column
+   of choices is a set of grounds rather than a grid of hairlines. The border is
+   kept and made transparent rather than removed, so the box is the same size in
+   both and a set mixing them does not step. */
+:host([separation="filled"]) [part="item"] {
+  border-color: transparent;
+}
+
+:host(:not([disabled]):is([separation="filled"], [separation="outlined"])) [part="item"]:hover {
   border-color: var(--helix-color-foreground-muted);
 }
 
@@ -147,8 +156,12 @@
  * more outside it. Drawn rather than widened, so nothing about the card's box
  * moves when it is chosen and a column of them does not jump as the answer
  * changes. `--helix-border-thick` is the ring, so a theme that thickens its
- * rules thickens this with them. */
-:host([variant="card"]:state(selected)) [part="item"] {
+ * rules thickens this with them.
+ *
+ * The chosen card takes its edge back under `filled` as well, and that is the
+ * point of the pair: an unanswered column is grounds alone and the answer is
+ * the one with a line around it. */
+:host(:is([separation="filled"], [separation="outlined"]):state(selected)) [part="item"] {
   background-color: var(--helix-color-surface-raised);
   border-color: var(--helix-color-primary);
   box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
@@ -157,35 +170,48 @@
 /* On the whole card, because in this appearance the card is the target. The
    default row rings the circle instead, since there the circle is all there is
    to ring. */
-:host([variant="card"]) [part="item"]:focus-visible {
+:host(:is([separation="filled"], [separation="outlined"])) [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
-:host([variant="card"]) [part="item"]:focus-visible [part="box"] {
+:host(:is([separation="filled"], [separation="outlined"]))
+  [part="item"]:focus-visible
+  [part="box"] {
   outline: none;
 }
 
-/* The circle sits on the first line of the label rather than centered against a
- * block of text, which is where a native control sits beside a paragraph.
+/* A card states its own line, and the words in it are body text rather than the
+   small label a bare row carries: a card has room to explain itself and its
+   first line is a sentence somebody reads. Declared here so a consumer who
+   slots nothing but words gets the same line the library's own cards get from a
+   `Text` at `body-strong`. */
+:host(:is([separation="filled"], [separation="outlined"])) [part="label"] {
+  font-size: var(--helix-text-md);
+  line-height: var(--helix-leading-normal);
+}
+
+/* **The circle centers on the label's first line, not on the top of the text
+ * block.** `align-items: start` puts it at the row's top edge, which is where
+ * the card's padding is rather than where its words are: measured on the cards
+ * example, the circle's center sat at 341.1 and the first line's at 343.8, so
+ * every circle floated 2.7 pixels above the answer it belonged to. The font and
+ * leading are restated because `1lh` resolves against this box's own
+ * line-height, and the card sets the line above. Measured after: 343.8 against
+ * 343.8.
  *
- * Half the difference between the line and the circle, derived rather than
- * picked: a flat `space-2xs` put the circle's center 6.5px below the center of
- * the text beside it, measured on a one-line card, where a nudge chosen for a
- * paragraph is simply wrong. The line is the font size times its line height,
- * and the circle is taller than that, so the offset comes out negative and
- * lifts it slightly rather than dropping it. */
-:host([variant="card"]) [part="box"] {
-  margin-block-start: calc(
-    (var(--helix-text-sm) * var(--helix-leading-tight) - var(--_radio-size)) /
-    2
-  );
+ * A margin rather than the band `Chat` and `Checkbox` use, because this box is
+ * the circle itself and a `min-block-size` on it would draw an oval. */
+:host(:is([separation="filled"], [separation="outlined"])) [part="box"] {
+  font-size: var(--helix-text-md);
+  line-height: var(--helix-leading-normal);
+  margin-block-start: calc((1lh - var(--_radio-size)) / 2);
 }
 
 /*
  *  The card is the control, so the circle can go.
  */
-:host([variant="card"][hide-control]) [part="box"] {
+:host(:is([separation="filled"], [separation="outlined"])[hide-control]) [part="box"] {
   display: none;
 }
 

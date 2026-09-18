@@ -7,8 +7,8 @@ export function Example() {
       name="plan"
     >
       <helix-radio
+        separation="outlined"
         value="solo"
-        variant="card"
       >
         <helix-flex
           direction="column"
@@ -30,8 +30,8 @@ export function Example() {
         </helix-flex>
       </helix-radio>
       <helix-radio
+        separation="outlined"
         value="team"
-        variant="card"
       >
         <helix-flex
           direction="column"
