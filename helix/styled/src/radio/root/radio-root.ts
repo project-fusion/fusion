@@ -42,9 +42,9 @@ export class HelixRadio extends HelixHeadlessRadio {
    * Unnecessary under `chip`, which has no room for a circle beside its mark
    * and hides it already.
    *
-   * `card` only, and it is a graphic that goes rather than a radio: the control
-   * in the shadow root is untouched, so the row is still focusable, still
-   * reported to a screen reader, and still the thing a form submits.
+   * A separated choice only, and it is a graphic that goes rather than a radio:
+   * the control in the shadow root is untouched, so the row is still focusable,
+   * still reported to a screen reader, and still the thing a form submits.
    *
    * Safe because the card already carries the answer in its surface, a raised
    * fill inside a primary edge and a three-pixel ring of it. Without that ring
@@ -58,24 +58,48 @@ export class HelixRadio extends HelixHeadlessRadio {
   hideControl = false
 
   /**
-   * How the choice presents itself.
+   * Where the choice's own surface ends.
    *
-   * - `plain` is the default and is never written: a circle beside its words,
-   *   which is what a list of choices should be almost always.
-   * - `card` puts it in a bounded surface, for options that need room to
+   * The question `separation` asks everywhere else, asked of one option, so it
+   * is that word: what these values pick is a surface, and `plain` is already
+   * the registry's own word for the answer this family used it for.
+   *
+   * - `plain` is the resting one and is never written: a circle beside its
+   *   words, which is what a list of choices should be almost always.
+   * - `outlined` puts it in a bounded surface, for options that need room to
    *   explain themselves: a description, an icon, a price. It is the half a
    *   `data-card` link cannot do, because a link reports no value and belongs
    *   to no group, so a card that is genuinely an answer has to be this.
-   * - `chip` is the answer as its own small surface, for a row of short
-   *   choices read at a glance. It hides the circle, the surface being the
-   *   whole mark, which is why `hide-control` says it is unnecessary here.
+   * - `filled` is that same card on a ground of its own with no edge, which is
+   *   what a column of choices wants where a hairline around every one of them
+   *   is a grid of lines rather than a set of answers.
    *
-   * The circle stays in both. A card whose only marker was its own border would
-   * ask a reader to compare surfaces across a row to find the answer, and would
-   * leave nothing for a high-contrast display.
+   * **`elevated` is the one value of the axis this family does not take.** A
+   * raised choice competes with a dialog: the top layer is where a thing that
+   * interrupts you lives, and an option in a form is not one of those, so a
+   * column of lifted cards reads as a stack of floating things none of which is
+   * settled.
+   *
+   * The circle stays in all of them. A card whose only marker was its own
+   * border would ask a reader to compare surfaces across a row to find the
+   * answer, and would leave nothing for a high-contrast display.
    */
   @property({ reflect: true })
-  variant?: 'chip' | 'plain' | 'card'
+  separation?: 'filled' | 'outlined' | 'plain'
+
+  /**
+   * The answer as its own small surface, for a row of short choices read at a
+   * glance.
+   *
+   * **Not a separation, which is why it is still `variant`.** The other values
+   * pick where a surface ends around a row that keeps its circle and its words;
+   * a chip has neither. It hides the circle, the surface being the whole mark,
+   * which is why `hide-control` says it is unnecessary here, and it takes the
+   * words out of the flow to be the accessible name. That removes the
+   * distinction `separation` exists to make rather than answering it.
+   */
+  @property({ reflect: true })
+  variant?: 'chip'
 }
 
 declare global {

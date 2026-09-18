@@ -6,8 +6,8 @@ export function Example() {
     >
       <helix-checkbox
         default-checked
+        separation="outlined"
         value="backups"
-        variant="card"
       >
         <helix-flex
           direction="column"
@@ -29,8 +29,8 @@ export function Example() {
         </helix-flex>
       </helix-checkbox>
       <helix-checkbox
+        separation="outlined"
         value="audit"
-        variant="card"
       >
         <helix-flex
           direction="column"

@@ -38,21 +38,33 @@ export class HelixCheckbox extends HelixHeadlessCheckbox {
   static override styles: CSSResultGroup = [fieldStyles, fieldInlineStyles, styles]
 
   /**
-   * How the choice presents itself.
+   * Where the choice's own surface ends.
    *
-   * - `plain` is the default and is never written: a box beside its words,
+   * The question `separation` asks everywhere else, asked of one option, so it
+   * is that word: what these values pick is a surface, and `plain` is already
+   * the registry's own word for the answer this family used it for. `Radio`
+   * takes the same three for the same reason.
+   *
+   * - `plain` is the resting one and is never written: a box beside its words,
    *   which is what a list of choices should be almost always.
-   * - `card` puts it in a bounded surface, for options that need room to
+   * - `outlined` puts it in a bounded surface, for options that need room to
    *   explain themselves: a description, an icon, a price. It is the half a
    *   `data-card` link cannot do, because a link reports no value and belongs
    *   to no group, so a card that is genuinely an answer has to be this.
+   * - `filled` is that same card on a ground of its own with no edge, which is
+   *   what a column of options wants where a hairline around every one of them
+   *   is a grid of lines rather than a set of answers.
    *
-   * The box stays in both. A card whose only marker was its own border would
-   * ask a reader to compare surfaces across a row to find the answer, and would
-   * leave nothing for a high-contrast display.
+   * **`elevated` is the one value of the axis this family does not take.** A
+   * raised choice competes with a dialog: the top layer is where a thing that
+   * interrupts you lives, and an option in a form is not one of those.
+   *
+   * The box stays in all of them. A card whose only marker was its own border
+   * would ask a reader to compare surfaces across a row to find the answer, and
+   * would leave nothing for a high-contrast display.
    */
   @property({ reflect: true })
-  variant?: 'plain' | 'card'
+  separation?: 'filled' | 'outlined' | 'plain'
 }
 
 declare global {
