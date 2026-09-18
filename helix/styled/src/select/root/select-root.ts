@@ -79,11 +79,11 @@ export class HelixSelect extends HelixHeadlessSelect {
    * `outlined` is what the unset frame already draws, so writing it would be
    * writing the resting state out.
    *
-   * **The other three fields want this too and do not have it yet.** `Input`,
-   * `Textarea` and `Combobox` wear the same frame from the same shared
-   * stylesheet, and an inline one of each is as reasonable as an inline select.
-   * They are left alone rather than swept, because each has a different thing
-   * inside the frame and guessing at three is how an axis ends up meaning four
+   * **Every field wearing `field-frame.css` wants this too and does not have it
+   * yet**, which this trigger is not one of: it draws its own frame below. An
+   * inline number input in a toolbar is as reasonable as an inline select. They
+   * are left alone rather than swept, because each has a different thing inside
+   * the frame and guessing at a set of them is how an axis ends up meaning four
    * things, which is the fault `appearance` was retired for.
    */
   @property({ reflect: true })
