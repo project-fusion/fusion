@@ -36,10 +36,12 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.
  *
- * @csspart box - The circle.
+ * @csspart box - The circle. The dot inside it is drawn on the box itself,
+ * which is `::part(box)::after` from a consumer's sheet: this tier ships no CSS,
+ * so a box it renders for one to paint is an empty child costing whatever the
+ * consumer's own layout charges for a child. `ListItem` measured that.
  * @csspart item - The button, which is the whole row.
  * @csspart label - The words beside it.
- * @csspart mark - The dot inside it.
  *
  * @cssstate selected - While it is the one chosen.
  */
@@ -140,7 +142,7 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
       tabindex=${this.selected || this.focusable || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
     >
-      <span part="box"><span part="mark" aria-hidden="true"></span></span>
+      <span part="box"></span>
       <slot name="icon"></slot>
       <span part="label"><slot></slot></span>
     </button>`

@@ -68,11 +68,16 @@
    stencil. Sized as a fraction of the circle so the two stay in proportion at
    any `--radio-size`, and the fraction is under half: at half, the dot and the
    ring around it were near enough the same weight that the pair read as a
-   target rather than as a mark sitting in a circle. */
-[part="mark"] {
+   target rather than as a mark sitting in a circle.
+
+   On the circle rather than inside it, because the dot is paint and this is the
+   tier that paints. The box is one grid cell centering whatever is in it, so the
+   pseudo-element sits exactly where the child sat. */
+[part="box"]::after {
   background-color: var(--radio-mark-color, var(--helix-color-foreground));
   block-size: calc(var(--_radio-size) * 0.4);
   border-radius: var(--helix-radii-full);
+  content: "";
   inline-size: calc(var(--_radio-size) * 0.4);
   /* Nothing to see until this is the answer. Scaled from the center rather than
      faded, so the dot arrives with the weight of a thing being put there. */
@@ -80,7 +85,7 @@
   transition: scale var(--helix-duration-fast) var(--helix-easing-emphasized);
 }
 
-:host(:state(selected)) [part="mark"] {
+:host(:state(selected)) [part="box"]::after {
   scale: 1;
 }
 
