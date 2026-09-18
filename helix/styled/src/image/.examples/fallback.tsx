@@ -4,7 +4,7 @@ export function Example() {
   return (
     <helix-image
       alt="A road winding below highland cliffs at sunset"
-      rounded
+      shape="rounded"
       src="/does-not-exist.jpg"
     >
       <helix-icon

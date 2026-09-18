@@ -31,9 +31,13 @@ import { styles } from './avatar-root.css.js'
 export class HelixAvatar extends HelixHeadlessAvatar {
   /**
    * Whether the avatar is a circle or a rounded square.
+   *
+   * `rounded` and not `square`, which is the sharp-cornered pole of the same
+   * axis and what `QrCode` draws with it. This corner is `radii-md`, so the word
+   * for it is the one the registry already has.
    */
   @property({ reflect: true })
-  shape?: 'circle' | 'square'
+  shape?: 'circle' | 'rounded'
 
   /**
    * Edge length of the avatar.

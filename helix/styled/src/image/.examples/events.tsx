@@ -39,14 +39,14 @@ export function Example() {
           alt="A road winding below highland cliffs at sunset"
           onError={failed}
           onLoad={arrived}
-          rounded
+          shape="rounded"
           src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400"
         />
         <helix-image
           alt="Nothing, because this one cannot arrive"
           onError={failed}
           onLoad={arrived}
-          rounded
+          shape="rounded"
           src="https://example.invalid/missing.png"
         />
       </helix-flex>

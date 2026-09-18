@@ -6,7 +6,7 @@
   position: relative;
 }
 
-:host([rounded]) {
+:host([shape="rounded"]) {
   border-radius: var(--image-radius, var(--helix-radii-md));
 }
 

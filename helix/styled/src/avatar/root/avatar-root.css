@@ -26,7 +26,7 @@
   --_avatar-size: var(--avatar-size, var(--helix-size-avatar-lg));
 }
 
-:host([shape="square"]) {
+:host([shape="rounded"]) {
   border-radius: var(--helix-radii-md);
 }
 
