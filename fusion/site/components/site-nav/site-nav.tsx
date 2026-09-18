@@ -329,7 +329,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
             onhelix-before-open={() => setPanelDown(true)}
             ref={panelRef}
             suppressHydrationWarning
-            variant="full"
+            variant="band"
           >
             {/*
              *  The trigger is slotted, and it has to be.

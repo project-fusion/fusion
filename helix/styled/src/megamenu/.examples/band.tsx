@@ -5,7 +5,7 @@ export function Example() {
       <helix-navigation label="Main">
         <helix-megamenu
           label="Products"
-          variant="full"
+          variant="band"
         >
           <div data-megamenu-group>
             <h3 data-megamenu-heading>Design</h3>
