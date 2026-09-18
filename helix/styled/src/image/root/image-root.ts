@@ -22,7 +22,7 @@ import { styles } from './image-root.css.js'
  * @cssproperty --image-fit - How the picture fills it.
  * @cssproperty --image-placeholder-color - The resting surface behind both stand-ins.
  * @cssproperty --image-position - Which part survives a crop.
- * @cssproperty --image-radius - Corner radius, under `rounded`.
+ * @cssproperty --image-radius - Corner radius, under `shape="rounded"`.
  */
 @customElement('helix-image')
 export class HelixImage extends HelixHeadlessImage {
@@ -31,13 +31,14 @@ export class HelixImage extends HelixHeadlessImage {
   /**
    * Whether the corners are cut.
    *
-   * A boolean rather than a radius, because the radius is a token and the
-   * question a consumer is answering is whether this picture is a card's
-   * surface or a page's. `--image-radius` moves it for the case that is
-   * neither.
+   * The axis and not a boolean, because `rounded` is a registered word and a
+   * private spelling of a registry question is what `appearance` was retired
+   * for. Not a radius either: the radius is a token and the question a consumer
+   * is answering is whether this picture is a card's surface or a page's.
+   * `--image-radius` moves it for the case that is neither.
    */
-  @property({ reflect: true, type: Boolean })
-  rounded = false
+  @property({ reflect: true })
+  shape?: 'rounded'
 }
 
 declare global {

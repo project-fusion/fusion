@@ -10,7 +10,7 @@ export function Example() {
       ></helix-avatar>
       <helix-avatar
         name="Radia Perlman"
-        shape="square"
+        shape="rounded"
         size="lg"
       ></helix-avatar>
     </helix-flex>
