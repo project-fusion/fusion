@@ -41,8 +41,11 @@ import {
   captionTracks,
   showCaption,
 } from './captions.js'
+import { barControls, type Conditions, menuControls, ownFile } from './extra-controls.js'
 import { FullscreenController } from './fullscreen.js'
 import { IdleController } from './idle.js'
+import { takeKey } from './keys.js'
+import { copiesOf, type MediaCopy, sameCopies } from './media-copy.js'
 import { MediaSessionController, SKIP_SECONDS } from './media-session.js'
 import { RemotePlaybackController } from './remote-playback.js'
 
@@ -330,32 +333,6 @@ export class HelixHeadlessVideo extends HelixElement {
   playLabel = 'Play'
 
   /**
-   * Whether the file this points at is ours to hand over.
-   *
-   * `blob:` and `data:` named rather than compared, because the rule `download`
-   * actually follows is same-origin *or one of those two*: a clip a consumer
-   * generated in the page has no origin to match and is theirs to save by
-   * definition. Comparing origins alone called both foreign, so the one case
-   * where a download certainly works was the one case it was not offered.
-   */
-  private get localFile(): boolean {
-    if (this.src === '') {
-      return false
-    }
-    if (this.src.startsWith('blob:') || this.src.startsWith('data:')) {
-      return true
-    }
-    if (typeof location === 'undefined') {
-      return false
-    }
-    try {
-      return new URL(this.src, location.href).origin === location.origin
-    } catch {
-      return false
-    }
-  }
-
-  /**
    * Whether it plays where it sits rather than taking over the screen.
    */
   @property({ attribute: 'playsinline', converter: onUnlessFalse })
@@ -537,58 +514,19 @@ export class HelixHeadlessVideo extends HelixElement {
 
   private readonly session = new MediaSessionController(this)
 
-  /** Whether this platform can do a named control at all. */
-  private offers(one: string): boolean {
-    /* As a server answers while hydrating what it sent: it has no document to
-       ask, so it offered none, and a render that differs is a template Lit
-       throws on. The update after hydration asks. */
-    if (one === 'pip') {
-      return !this.hydrating && typeof document !== 'undefined' && document.pictureInPictureEnabled
-    }
-    /* Availability, not support. A device that can play this has to exist for
-       the button to mean anything: an AirPlay control with nothing to send to
-       is a control that opens an empty list, which is worse than no control.
-       `watchAvailability` is what answers that, and it answers late, so this
-       reads a flag the watch keeps rather than asking. */
-    if (one === 'remote') {
-      return this.remoteAvailable
-    }
-    /* A download needs something to download. `src` and not a slotted
-       `<source>`: the element chose one of those and which one is the
-       browser's business, so offering a specific file would be a guess about a
-       decision already made. */
-    if (one === 'download') {
-      return this.src !== ''
-    }
-    /* Always offered, because there is nothing to check. Neither of these does
-       anything to the video: they say the reader asked, and whatever holds the
-       set answers. A player that hid them until it could prove a set existed
-       would be a player that cannot know. */
-    if (one === 'next' || one === 'previous') {
-      return true
-    }
-    /* A skip needs only a timeline, and a video that has none cannot be played
-       at all, so there is nothing here to check either. */
-    if (one === 'forward' || one === 'rewind') {
-      return true
-    }
-    return one === 'speed'
+  /** What the roster asks about this player, which is the whole of what it reads. */
+  private get conditions(): Conditions {
+    return { hydrating: this.hydrating, remote: this.remoteAvailable, source: this.src !== '' }
   }
 
   /** The extras asked for, in order, and only the ones this platform can do. */
   private get extras(): string[] {
-    return writtenList(this.extraControls).filter((one) => this.offers(one))
+    return barControls(this.extraControls, this.conditions)
   }
 
-  /**
-   * The controls asked for behind the overflow button, in order.
-   *
-   * A name in both lists is on the bar and not here. Drawing it twice is worse
-   * than either placement, and the bar is the one a reader can see.
-   */
+  /** The controls asked for behind the overflow button, in order. */
   private get overflow(): string[] {
-    const onBar = new Set(this.extras)
-    return writtenList(this.overflowControls).filter((one) => !onBar.has(one) && this.offers(one))
+    return menuControls(this.overflowControls, this.extras, this.conditions)
   }
 
   /**
@@ -596,7 +534,7 @@ export class HelixHeadlessVideo extends HelixElement {
    * wrote them.
    */
   @state()
-  private media: { attrs: Record<string, string>; tag: 'source' | 'track' }[] = []
+  private media: MediaCopy[] = []
 
   /**
    * The media's own state, under the platform's own names.
@@ -812,48 +750,10 @@ export class HelixHeadlessVideo extends HelixElement {
   /** Whether the first set of copies has been read from the children. */
   private mediaRead = false
 
-  /**
-   * The copies to make of what the default slot is given.
-   *
-   * The attribute list is explicit rather than a blind copy of every attribute:
-   * these are two elements with a known and small surface, and copying anything
-   * a consumer happened to put on one would carry their framework's own markers
-   * into a shadow root that has no use for them.
-   */
-  private copiesOf(
-    elements: Element[],
-  ): { attrs: Record<string, string>; tag: 'source' | 'track' }[] {
-    return elements
-      .filter(
-        (node): node is HTMLSourceElement | HTMLTrackElement =>
-          node instanceof HTMLSourceElement || node instanceof HTMLTrackElement,
-      )
-      .map((node) => {
-        const tag = node instanceof HTMLTrackElement ? ('track' as const) : ('source' as const)
-        const names =
-          tag === 'track'
-            ? ['default', 'kind', 'label', 'src', 'srclang']
-            : ['media', 'sizes', 'src', 'srcset', 'type']
-        const attrs: Record<string, string> = {}
-        for (const name of names) {
-          const value = node.getAttribute(name)
-          if (value !== null) {
-            attrs[name] = value
-          }
-        }
-        return { attrs, tag }
-      })
-  }
-
-  /**
-   * Rebuilds the copies when what is slotted changes after the first read.
-   *
-   * The same set again is not a change. A video reloads for every new list, and
-   * the first `slotchange` reports the children this element already read.
-   */
+  /** Rebuilds the copies when what is slotted changes after the first read. */
   private readonly handleMedia = (event: Event): void => {
-    const next = this.copiesOf((event.target as HTMLSlotElement).assignedElements())
-    if (JSON.stringify(next) !== JSON.stringify(this.media)) {
+    const next = copiesOf((event.target as HTMLSlotElement).assignedElements())
+    if (!sameCopies(next, this.media)) {
       this.media = next
     }
   }
@@ -1122,9 +1022,9 @@ export class HelixHeadlessVideo extends HelixElement {
    * on it, and a page with two videos on it would otherwise have both answering
    * the same press.
    *
-   * Nothing is taken while focus is in a range. The scrubber and the volume are
-   * real inputs and the arrows are already theirs, so intercepting would mean
-   * seeking twice for one press.
+   * A taken press is stopped here rather than in the table, because what the
+   * default would have been is the element's business: the table says what the
+   * key means and this says that nothing else gets it.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     /* Nothing at all where the browser draws the controls. Its own bar owns
@@ -1134,65 +1034,19 @@ export class HelixHeadlessVideo extends HelixElement {
     if (this.controls) {
       return
     }
-    if ((event.target as HTMLElement)?.tagName === 'INPUT') {
-      return
-    }
     const video = this.video
     if (!video) {
       return
     }
-    /* Five seconds an arrow, the distance a native `<video controls>` moves by,
-       and ten with shift held, which is `SKIP_SECONDS` reached from the keyboard
-       rather than from a button: `j` and shift-left have to agree or the player
-       skips two distances under one name. */
-    const step = event.shiftKey ? 10 : 5
-    switch (event.key) {
-      case ' ':
-      case 'k': {
-        this.toggle()
-        break
-      }
-      case 'ArrowRight': {
-        this.seek(video.currentTime + step)
-        break
-      }
-      case 'ArrowLeft': {
-        this.seek(video.currentTime - step)
-        break
-      }
-      case 'ArrowUp': {
-        /* A tenth of the range a press, so the whole of it is ten presses
-           either way. Clamped here rather than left to the platform, which
-           throws on a volume outside zero to one instead of taking the nearest
-           legal one. */
-        video.volume = Math.min(video.volume + 0.1, 1)
-        break
-      }
-      case 'ArrowDown': {
-        video.volume = Math.max(video.volume - 0.1, 0)
-        break
-      }
-      case 'j': {
-        this.skipBy(-SKIP_SECONDS)
-        break
-      }
-      case 'l': {
-        this.skipBy(SKIP_SECONDS)
-        break
-      }
-      case 'm': {
-        video.muted = !video.muted
-        break
-      }
-      case 'f': {
-        void this.fullscreen.toggle()
-        break
-      }
-      default: {
-        return
-      }
+    const taken = takeKey(event, video, {
+      fullscreen: () => void this.fullscreen.toggle(),
+      seek: (seconds) => this.seek(seconds),
+      skipBy: (seconds) => this.skipBy(seconds),
+      toggle: () => this.toggle(),
+    })
+    if (taken) {
+      event.preventDefault()
     }
-    event.preventDefault()
   }
 
   /** The caption tracks among the copies, named as the menu names them. */
@@ -1212,7 +1066,7 @@ export class HelixHeadlessVideo extends HelixElement {
        here instead. `slotchange` keeps them in step after that. */
     if (!this.mediaRead && this.childrenKnown) {
       this.mediaRead = true
-      this.media = this.copiesOf(this.knownChildren.filter((child) => child.slot === ''))
+      this.media = copiesOf(this.knownChildren.filter((child) => child.slot === ''))
     }
     if (changed.has('media')) {
       this.captions = captionsAmong(this.media)
@@ -1364,7 +1218,7 @@ export class HelixHeadlessVideo extends HelixElement {
        * A new tab where it does not. That is the best a page can do with someone
        * else's file, and it is the difference between handing the reader the
        * video and taking away the one they were watching. */
-      const local = this.localFile
+      const local = ownFile(this.src)
       return html`<a
         part="download"
         ?download=${local}
@@ -1501,7 +1355,7 @@ export class HelixHeadlessVideo extends HelixElement {
       </${this.tag('menu-item')}>`
     }
     if (one === 'download') {
-      const local = this.localFile
+      const local = ownFile(this.src)
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="item: entry-item, mark: entry-mark, start: entry-start"
         ?download=${local}
