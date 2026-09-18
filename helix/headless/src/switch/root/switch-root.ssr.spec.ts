@@ -4,12 +4,14 @@ import { html } from 'lit'
 import '../index.js'
 
 describe('switch server output', () => {
-  test('the track and the thumb are both in the served markup', () => {
-    // The picture is the whole point of shipping it: a switch that arrives as
-    // a bare checkbox and becomes a switch on hydration is a visible flip.
+  test('the track is in the served markup, and no box for the thumb', () => {
+    /* The picture is the whole point of shipping it: a switch that arrives as a
+       bare checkbox and becomes a switch on hydration is a visible flip. The
+       thumb is a consumer's `::part(track)::after`: this tier ships no sheet, so
+       a box for it would be an empty child in their layout and nothing else. */
     const markup = ssr(html`<helix-headless-switch>Dark mode</helix-headless-switch>`)
     expect(hasPart(markup, 'track')).toBe(true)
-    expect(hasPart(markup, 'thumb')).toBe(true)
+    expect(hasPart(markup, 'thumb')).toBe(false)
   })
 
   test("the label arrives as the slot's fallback, so the words are in the HTML", () => {

@@ -85,12 +85,16 @@ helix-headless-switch::part(control) {
   position: absolute;
 }
 
-helix-headless-switch::part(thumb) {
+/* The thumb, drawn on the groove rather than slotted into it. The tier renders
+   no box for this: a consumer who wants one writes it, and a pseudo-element is
+   the cheapest way to write it. */
+helix-headless-switch::part(track)::after {
   background-color: light-dark(var(--_gray-surface), var(--_gray-fill));
   block-size: 1.25rem;
   border: 1px solid var(--_gray-edge);
   border-radius: 50%;
   box-sizing: border-box;
+  content: "";
   inline-size: 1.25rem;
   inset-block-start: 50%;
   inset-inline-start: calc(0.125rem - 1px);
@@ -109,7 +113,7 @@ helix-headless-switch:state(checked)::part(track) {
   border-color: var(--_gray-strong);
 }
 
-helix-headless-switch:state(checked)::part(thumb) {
+helix-headless-switch:state(checked)::part(track)::after {
   border-color: transparent;
   translate: 1.125rem -50%;
 }
