@@ -1,5 +1,7 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 
+import { readColor } from '../../utils/read-color/read-color.js'
+
 /** A color as the three channels in `0..1` that a shader or a canvas takes. */
 export type TokenColor = [number, number, number]
 
@@ -9,7 +11,9 @@ export type TokenColor = [number, number, number]
  *
  * **Two hops, and both are load-bearing.** A custom property's own value is the
  * unevaluated function text, so `getComputedStyle` on a probe is the only way
- * to see what it resolves to. And what it resolves to is not `rgb()`: the
+ * to see what it resolves to. The second hop is `readColor`, which is shared
+ * with every other caller that has a resolved color and needs channels: what it
+ * resolves to is not `rgb()`, the
  * palette derives from an `oklch()` seed, and Chrome answers `lab(100 0 0)` for
  * white. Parsing that with a regular expression for numbers reads the three
  * channels as 100, 0 and 0, which divided by 255 is a dark red.
@@ -33,10 +37,6 @@ export type TokenColor = [number, number, number]
  * not exist on a server either.
  */
 export class TokenColorController implements ReactiveController {
-  /** Where a resolved color is converted, one pixel at a time. */
-  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: read in three places below, and this rule's own automatic fix removed it, which failed `typecheck` immediately. The suppression has to sit under the doc comment rather than over it, being directional.
-  private context: CanvasRenderingContext2D | null = null
-
   /** Watches the document for `data-color-mode`. */
   private modes: MutationObserver | undefined
 
@@ -70,11 +70,6 @@ export class TokenColorController implements ReactiveController {
     this.probe.style.display = 'none'
     document.body.appendChild(this.probe)
 
-    const swatch = document.createElement('canvas')
-    swatch.width = 1
-    swatch.height = 1
-    this.context = swatch.getContext('2d', { willReadFrequently: true })
-
     /* The color mode is an attribute, and the system's answer is a media query.
        Watching only the first leaves a reader on system light with the dark
        palette, which is the half that is easy to miss because a developer
@@ -95,7 +90,6 @@ export class TokenColorController implements ReactiveController {
     this.scheme = undefined
     this.probe?.remove()
     this.probe = undefined
-    this.context = null
   }
 
   /**
@@ -105,18 +99,17 @@ export class TokenColorController implements ReactiveController {
    * @param fallback What to answer on a server, or where the token is unset.
    */
   read(token: string, fallback: TokenColor): TokenColor {
-    const { context, probe } = this
-    if (!context || !probe) {
+    const { probe } = this
+    if (!probe) {
       return [...fallback]
     }
     probe.style.color = `var(${token})`
-    /* Reset first. An unparseable value leaves `fillStyle` where it was, which
-       would silently hand back the previous token's color. */
-    context.fillStyle = '#000000'
-    context.fillStyle = getComputedStyle(probe).color
-    context.fillRect(0, 0, 1, 1)
-    const [r, g, b] = context.getImageData(0, 0, 1, 1).data
-    return [(r ?? 0) / 255, (g ?? 0) / 255, (b ?? 0) / 255]
+    const read = readColor(getComputedStyle(probe).color)
+    if (!read) {
+      return [...fallback]
+    }
+    const [r, g, b] = read
+    return [r / 255, g / 255, b / 255]
   }
 
   private readonly announce = (): void => {

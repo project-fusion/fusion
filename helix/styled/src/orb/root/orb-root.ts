@@ -1,8 +1,13 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import {
+  type ColorBytes,
+  customElement,
+  HelixElement,
+  hostAria,
+  readColor,
+} from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
-import { readColor } from '../color.js'
 import {
   blendStaged,
   evenSphere,
@@ -50,6 +55,9 @@ interface Dot {
   y: number
   z: number
 }
+
+/** What an unreadable color answers with, mid gray in both modes. */
+const GRAY: ColorBytes = [128, 128, 128]
 
 /**
  * @summary Says what an agent is doing, as a shape rather than a word.
@@ -483,10 +491,11 @@ export class HelixOrb extends HelixElement {
 
     /* Read off the canvas rather than the host: the stylesheet resolves both
        ends of the ramp onto color-typed properties there, for the reason its
-       comment gives. */
+       comment gives. A mid gray is what an unreadable value answers, which is
+       visible against either mode's ground rather than disappearing into one. */
     const painted = getComputedStyle(ctx.canvas)
-    const ink = readColor(painted.color)
-    const ground = readColor(painted.textDecorationColor)
+    const ink = readColor(painted.color) ?? GRAY
+    const ground = readColor(painted.textDecorationColor) ?? GRAY
 
     const mesh = meshFor(size)
     const even = evenSphere(mesh.lanes, mesh.segs)

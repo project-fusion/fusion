@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  type ColorFormat,
   customElement,
   type HelixBeforeChangeEvent,
   HelixFormElement,
@@ -7,6 +8,8 @@ import {
   MixinControllerValue,
   MixinField,
   MixinPickerField,
+  parseColor,
+  toCss,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -14,7 +17,6 @@ import { html } from 'lit/static-html.js'
 /* Relative, so this registers the base picker and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../color-picker/index.js'
-import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js'
 
 /**
  * @summary A color, typed in any syntax or picked from a panel.

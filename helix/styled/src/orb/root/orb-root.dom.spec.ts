@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { readColor } from '@fusion.dev/helix-core'
 import {
   at,
   framesBooked,
@@ -10,7 +11,6 @@ import {
   registerDom,
   role,
 } from '@fusion.dev/helix-testing/dom'
-import { readColor } from '../color.js'
 import {
   blendParams,
   blendStaged,
@@ -390,10 +390,18 @@ describe('orb shapes', () => {
   })
 })
 
+/**
+ * The conversion the orb's ramp depends on, asserted where a browser runs it.
+ *
+ * **A core utility with its spec in a family, deliberately.** The browser suite
+ * walks the two element tiers, so a `.dom.spec.ts` under `helix/core` only ever
+ * runs against happy-dom, which refuses a 2D context and would skip every one
+ * of these. The orb is the caller that goes wrong when the conversion does, and
+ * this is the only place the assertion is worth anything.
+ */
 describe('reading a color the engine resolved but did not convert', () => {
   /* Registered only where there is a real 2D context, rather than skipped:
-     happy-dom refuses one and the browser runner has no `test.if`. The reader
-     answers gray without a context by design, which the element spec covers. */
+     happy-dom refuses one and the browser runner has no `test.if`. */
   const painting =
     typeof document !== 'undefined' && !!document.createElement('canvas').getContext('2d')
 
@@ -407,8 +415,16 @@ describe('reading a color the engine resolved but did not convert', () => {
       expect(readColor('rgb(12, 34, 56)')).toEqual([12, 34, 56])
     })
 
-    test('answers gray for a value no engine will parse', () => {
-      expect(readColor('not-a-color')).toEqual([128, 128, 128])
+    test('refuses a value no engine will parse, rather than guessing', () => {
+      expect(readColor('not-a-color')).toBeUndefined()
+    })
+
+    /* Painting over two grounds is what makes that refusal honest, and these
+       are the two: black over black reports the same three bytes whether the
+       value landed or was thrown away. */
+    test('and still answers the grounds it paints over', () => {
+      expect(readColor('#000000')).toEqual([0, 0, 0])
+      expect(readColor('#ffffff')).toEqual([255, 255, 255])
     })
   }
 })

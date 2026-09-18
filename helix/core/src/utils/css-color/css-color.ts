@@ -20,8 +20,17 @@
  * the place to be early. `rgba` and `hsla` come with them, since a comma form
  * with a fourth argument is spelled that way.
  *
- * Its own module rather than sitting in the element, because it is arithmetic
- * with no DOM in it: this is the half worth testing directly.
+ * **Core's rather than a field's, because the CSS color grammar is the
+ * platform's.** Nothing here needs a color picker to make sense, and two
+ * families read it already. It is arithmetic with no DOM in it, so it runs on a
+ * server, which is also why named colors are refused below: resolving
+ * `rebeccapurple` means asking a browser that is not there.
+ *
+ * **One decision in here is a default rather than a capability.** What
+ * `formatColor` writes back, the comma form and an alpha only where one was
+ * asked for, is a choice about what a value looks like when it is handed out.
+ * It is core's choice now instead of the picker's, and a caller wanting another
+ * shape formats it itself.
  */
 
 /** A color as the panel holds it. Alpha and the two percentages are 0 to 100. */
@@ -84,7 +93,7 @@ const rgbToHsb = (red: number, green: number, blue: number, alpha: number): Colo
 }
 
 /** HSB to bytes, which is the road every written syntax goes down. */
-export const toRgb = (color: Color): { blue: number; green: number; red: number } => {
+const toRgb = (color: Color): { blue: number; green: number; red: number } => {
   const hue = (((color.hue % 360) + 360) % 360) / 60
   const saturation = color.saturation / 100
   const brightness = color.brightness / 100
