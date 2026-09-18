@@ -15,18 +15,22 @@ const radio = async (extra = ''): Promise<Choice> =>
 const checkbox = async (extra = ''): Promise<Choice> =>
   (await mount(`<helix-checkbox value="one" ${extra}>Backups</helix-checkbox>`)) as Choice
 
-describe('the card appearance', () => {
-  test('reflects, because that is what the stylesheet selects on', async () => {
-    expect((await radio('variant="card"')).getAttribute('variant')).toBe('card')
-    expect((await checkbox('variant="card"')).getAttribute('variant')).toBe('card')
+describe('the card separations', () => {
+  test('reflect, because that is what the stylesheet selects on', async () => {
+    for (const value of ['filled', 'outlined']) {
+      expect((await radio(`separation="${value}"`)).getAttribute('separation')).toBe(value)
+      expect((await checkbox(`separation="${value}"`)).getAttribute('separation')).toBe(value)
+    }
   })
 
   test('the mark is still rendered, which is the whole point of it staying', async () => {
     /* A card whose only marker was its own border would ask a reader to compare
        surfaces across a row to find the answer, and would leave nothing at all
        for a high-contrast display. */
-    expect(part(await radio('variant="card"'), 'box')).toBeTruthy()
-    expect(part(await checkbox('variant="card"'), 'box')).toBeTruthy()
+    for (const value of ['filled', 'outlined']) {
+      expect(part(await radio(`separation="${value}"`), 'box')).toBeTruthy()
+      expect(part(await checkbox(`separation="${value}"`), 'box')).toBeTruthy()
+    }
   })
 })
 
@@ -59,11 +63,11 @@ if (hasLayout()) {
     /* Browser-only, and the reason is the fault this is written against: a rule
        whose selector matches nothing is valid CSS that silently does nothing.
        A static rule catches a `[part=]` naming a part nothing renders, and
-       cannot catch a `:host([variant="card"])` that never matches because
-       the property was never reflected. Only a computed style can. */
+       cannot catch a `:host([separation="outlined"])` that never matches
+       because the property was never reflected. Only a computed style can. */
     test('the row becomes a bounded surface, and the plain one does not', async () => {
       const find = await board(
-        `<helix-radio id="card" variant="card" value="one">Solo</helix-radio>
+        `<helix-radio id="card" separation="outlined" value="one">Solo</helix-radio>
          <helix-radio id="plain" value="two">Team</helix-radio>`,
       )
       expect(Number.parseFloat(edge(find('card'), 'item').borderTopWidth)).toBeGreaterThan(0)
@@ -75,7 +79,7 @@ if (hasLayout()) {
       // forwards a press to the real input. Same appearance, so it has to look
       // the same beside a card set of radios.
       const find = await board(
-        `<helix-checkbox id="card" variant="card" value="one">Backups</helix-checkbox>
+        `<helix-checkbox id="card" separation="outlined" value="one">Backups</helix-checkbox>
          <helix-checkbox id="plain" value="two">Audit</helix-checkbox>`,
       )
       expect(Number.parseFloat(edge(find('card'), 'field').borderTopWidth)).toBeGreaterThan(0)
@@ -88,14 +92,68 @@ if (hasLayout()) {
          a state. If someone reaches for an accent border here later, this is
          the decision they are changing. */
       const find = await board(
-        `<helix-radio id="chosen" variant="card" selected value="one">Solo</helix-radio>
-         <helix-radio id="rest" variant="card" value="two">Team</helix-radio>`,
+        `<helix-radio id="chosen" separation="outlined" selected value="one">Solo</helix-radio>
+         <helix-radio id="rest" separation="outlined" value="two">Team</helix-radio>`,
       )
       const chosen = edge(find('chosen'), 'item')
       const rest = edge(find('rest'), 'item')
 
       expect(chosen.backgroundColor).not.toBe(rest.backgroundColor)
       expect(chosen.borderTopColor).not.toBe(rest.borderTopColor)
+    })
+
+    test('a filled card keeps its ground and loses its edge', async () => {
+      /* The value's whole content, and the one thing a static rule cannot see:
+         the border is kept and made transparent, so a set mixing the two does
+         not step, and a reader tells the cards apart by their ground. */
+      const find = await board(
+        `<helix-radio id="filled" separation="filled" value="one">Solo</helix-radio>
+         <helix-radio id="outlined" separation="outlined" value="two">Team</helix-radio>`,
+      )
+      const filled = edge(find('filled'), 'item')
+      const outlined = edge(find('outlined'), 'item')
+
+      expect(filled.backgroundColor).toBe(outlined.backgroundColor)
+      expect(filled.borderTopWidth).toBe(outlined.borderTopWidth)
+      expect(filled.borderTopColor).toBe('rgba(0, 0, 0, 0)')
+      expect(outlined.borderTopColor).not.toBe('rgba(0, 0, 0, 0)')
+    })
+
+    /* Invisible to every static rule and to a one-line card: with
+       `align-items: start` and a band derived from the row's own small label,
+       the circle sat 2.7px above the sentence it belonged to, measured on the
+       cards example, and only a card with a description shows it. Half a pixel
+       of slack, the band being centered against a line box that is a token
+       times a unitless leading. */
+    const offBy = (host: Choice): number => {
+      const box = (part(host, 'box') as HTMLElement).getBoundingClientRect()
+      const line = (host.querySelector('div') as HTMLElement).getBoundingClientRect()
+      return Math.abs(box.y + box.height / 2 - (line.y + line.height / 2))
+    }
+
+    const described = (id: string): string =>
+      `<helix-radio id="${id}" separation="outlined" value="one"
+         ><div>Solo</div><div>One seat, and everything on it.</div
+       ></helix-radio>`
+
+    test('the control centers on the first line, not on the top of the text block', async () => {
+      expect(offBy((await board(described('card')))('card'))).toBeLessThan(0.5)
+    })
+
+    test('and it stays there under a page whose own leading is nothing like the card', async () => {
+      /* What the restated font and leading on the box buy, and the only way to
+         see them: `1lh` resolves against whatever line-height the box has, so
+         an unrestated one reads the page's and the circle leaves the sentence
+         the moment a consumer sets one. Both the label and the box state the
+         card's line, so neither moves. */
+      const find = await board(described('card'))
+      const host = find('card')
+      const holder = host.parentElement as HTMLElement
+      holder.style.lineHeight = '4'
+      holder.style.fontSize = '32px'
+      await host.updateComplete
+
+      expect(offBy(host)).toBeLessThan(0.5)
     })
   })
 }

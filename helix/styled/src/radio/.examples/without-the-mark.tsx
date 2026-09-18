@@ -7,15 +7,15 @@ export function Example() {
     >
       <helix-radio
         hide-control
+        separation="outlined"
         value="monthly"
-        variant="card"
       >
         Monthly
       </helix-radio>
       <helix-radio
         hide-control
+        separation="outlined"
         value="yearly"
-        variant="card"
       >
         Yearly
       </helix-radio>
