@@ -85,12 +85,15 @@ helix-headless-video::part(failure) {
   translate: -50% -50%;
 }
 
-helix-headless-video::part(loading-mark) {
+/* The ring that turns, drawn on the message rather than slotted into it. The
+   tier renders no box for this: a consumer who wants one writes it. */
+helix-headless-video::part(loading)::before {
   block-size: 1rem;
   border: 2px solid var(--_gray-muted);
   border-block-start-color: var(--_gray-surface);
   border-radius: 50%;
   box-sizing: border-box;
+  content: "";
   flex: none;
   inline-size: 1rem;
   rotate: var(--_spin);

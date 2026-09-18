@@ -135,7 +135,10 @@ const clock = (seconds: number): string => {
  * @csspart forward - The control that goes on ten seconds.
  * @csspart fullscreen - The whole screen, and back.
  * @csspart loading - What is said while the picture waits for more of itself.
- * @csspart loading-mark - The part of that which spins.
+ * The part of that which spins is drawn on it, which is `::part(loading)::before`
+ * from a consumer's sheet: this tier ships no CSS, so a box it renders for one to
+ * paint is an empty child costing whatever the consumer's own layout charges for
+ * a child. `ListItem` measured that.
  * @csspart more - The button that opens it.
  * @csspart mute - Sound on and off.
  * @csspart next - Asks for the next item, where it was asked for.
@@ -1706,7 +1709,6 @@ export class HelixHeadlessVideo extends HelixElement {
               role="status"
               aria-live="polite"
             >
-              <span part="loading-mark" aria-hidden="true"></span>
               ${this.loadingLabel}
             </div>`
           : nothing
