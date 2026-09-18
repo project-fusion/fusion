@@ -54,11 +54,11 @@ export function Example() {
         Region
       </helix-table-column>
       <helix-table-column
-        align="end"
         cell={(row) => bytes(row.size as number)}
         compare={(row) => row.size}
         field="size"
         sortable
+        text-align="end"
         width="6rem"
       >
         Size

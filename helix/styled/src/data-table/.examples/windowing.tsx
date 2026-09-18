@@ -29,9 +29,9 @@ export function Example() {
         File
       </helix-table-column>
       <helix-table-column
-        align="end"
         field="size"
         sortable
+        text-align="end"
       >
         Size
       </helix-table-column>

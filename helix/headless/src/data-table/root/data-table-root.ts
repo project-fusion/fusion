@@ -51,7 +51,7 @@ import {
  * ```html
  * <helix-headless-data-table .rows=${rows} sort="name:asc" page-size="20">
  *   <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
- *   <helix-headless-table-column field="size" align="end" sortable .cell=${bytes}>Size</helix-headless-table-column>
+ *   <helix-headless-table-column field="size" text-align="end" sortable .cell=${bytes}>Size</helix-headless-table-column>
  * </helix-headless-data-table>
  * ```
  *
@@ -1202,7 +1202,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * overrule it either, an inline declaration beating any `::part(cell)` rule
    * they wrote.
    *
-   * Only the three edges reach it, `align` being a string anybody can write and
+   * Only the three edges reach it, `text-align` being a string anybody can write and
    * this being a style attribute: `edgeOf` is that guard, and `Table` holds the
    * same value to the same three.
    */
@@ -1211,7 +1211,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     row: DataRow,
     picked: boolean,
   ): TemplateResult {
-    const edge = edgeOf(column.align)
+    const edge = edgeOf(column.textAlign)
     return html`<span
       part="cell${picked ? ' cell-selected' : ''}"
       role="gridcell"

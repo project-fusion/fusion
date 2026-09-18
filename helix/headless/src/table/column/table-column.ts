@@ -48,13 +48,13 @@ export const at = (row: Readonly<Record<string, unknown>>, path: string): unknow
   return cursor
 }
 
-/** The edges a column's `align` may name. */
+/** The edges a column's `text-align` may name. */
 const EDGES = new Set(['center', 'end', 'start'])
 
 /**
  * The edge a column names, where it names one of the three.
  *
- * **`align` is a string anybody can write**, the union on the property being a
+ * **`text-align` is a string anybody can write**, the union on the property being a
  * compile-time claim and nothing else, and both tables put the value straight
  * into CSS: `Table` into a rule in each row's shadow root, `DataTable` into the
  * cell it draws. One guard, here with the property, rather than one in each
@@ -79,7 +79,7 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  *
  * **It is also where every per-column fact goes**, which is the reason
  * `DataTable` needs no column config object. `field` names the key the cell
- * reads, `sortable` says a reader may reorder by it, `align` says which edge
+ * reads, `sortable` says a reader may reorder by it, `text-align` says which edge
  * the values line up against, and `cell` takes a function for anything the
  * field alone cannot express. The schema is markup and the data is a property:
  * a schema is small, declarative, and something a reader should be able to see
@@ -130,30 +130,6 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  */
 @customElement('helix-headless-table-column')
 export class HelixHeadlessTableColumn extends HelixElement {
-  /**
-   * Which edge the values line up against.
-   *
-   * `end` is what a column of numbers wants, so digits of the same magnitude
-   * sit above each other. Left unset the cell inherits the table's own
-   * alignment, which is `start` for text in either writing direction.
-   * `DataTable` aligns the cells it draws. A `Table`'s cells are markup the
-   * consumer wrote, so the table writes nothing onto them: it publishes the
-   * edge to each cell under this column as `--table-cell-align`, which
-   * `@fusion.dev/helix` reads. The heading is this element's own, and
-   * `@fusion.dev/helix` sets it to the same edge in either table. `end` is the
-   * inline end, so in a right-to-left table it is the left.
-   *
-   * **Reflected, because the heading is drawn by a stylesheet and has no other
-   * way to learn it.** Set as a property, which is how React sets it, an
-   * unreflected `align` left no attribute to select on, so the heading stayed at
-   * the start over a column of digits set to the end. It is the author's
-   * declaration and nothing moves it afterwards, so an attribute cannot come to
-   * disagree with the element, which is the reason `open` records a custom
-   * state instead. No default, so an unset column writes nothing onto its host.
-   */
-  @property({ reflect: true })
-  align?: 'center' | 'end' | 'start'
-
   /**
    * How to read the cell, where the field alone will not do.
    *
@@ -222,6 +198,38 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   sortable = false
+
+  /**
+   * Which edge the values line up against.
+   *
+   * **Text alignment, and the name says so.** `Flex` and `Grid` ask the CSS
+   * box-alignment question, where a thing sits in a container, and they are
+   * named for the properties they mirror; this is `text-align` down a column of
+   * values, and `Dialog` answers the same question under the same name. One
+   * word for both questions is how a consumer who learned it on a layout writes
+   * it here and gets no error, a value a component does not have leaving the
+   * default in place and looking deliberate.
+   *
+   * `end` is what a column of numbers wants, so digits of the same magnitude
+   * sit above each other. Left unset the cell inherits the table's own
+   * alignment, which is `start` for text in either writing direction.
+   * `DataTable` aligns the cells it draws. A `Table`'s cells are markup the
+   * consumer wrote, so the table writes nothing onto them: it publishes the
+   * edge to each cell under this column as `--table-cell-align`, which
+   * `@fusion.dev/helix` reads. The heading is this element's own, and
+   * `@fusion.dev/helix` sets it to the same edge in either table. `end` is the
+   * inline end, so in a right-to-left table it is the left.
+   *
+   * **Reflected, because the heading is drawn by a stylesheet and has no other
+   * way to learn it.** Set as a property, which is how React sets it, an
+   * unreflected edge left no attribute to select on, so the heading stayed at
+   * the start over a column of digits set to the end. It is the author's
+   * declaration and nothing moves it afterwards, so an attribute cannot come to
+   * disagree with the element, which is the reason `open` records a custom
+   * state instead. No default, so an unset column writes nothing onto its host.
+   */
+  @property({ attribute: 'text-align', reflect: true })
+  textAlign?: 'center' | 'end' | 'start'
 
   /**
    * The track this column takes, as CSS.
@@ -390,7 +398,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
     }
     /* `hidden` changes which tracks the table lays out, and nothing here
        renders differently for it, so no property of this element's carries it
-       to `updated`. Watched the way `align` and `width` are passed on. */
+       to `updated`. Watched the way `text-align` and `width` are passed on. */
     if (typeof MutationObserver !== 'undefined') {
       this.hiding = new MutationObserver(() => this.tellHolder())
       this.hiding.observe(this, { attributeFilter: ['hidden'] })
@@ -426,7 +434,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
        the column rather than of a table by name: both tables are Lit elements
        that read it when they render, and a column held by anything else has
        nobody to tell. */
-    if (changed.has('align') || changed.has('width')) {
+    if (changed.has('textAlign') || changed.has('width')) {
       this.tellHolder()
     }
   }

@@ -70,7 +70,7 @@ const heading = (element: HTMLElement) =>
 const SCHEMA = `
   <helix-headless-data-table label="Files">
     <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
-    <helix-headless-table-column field="size" sortable align="end">Size</helix-headless-table-column>
+    <helix-headless-table-column field="size" sortable text-align="end">Size</helix-headless-table-column>
   </helix-headless-data-table>`
 
 /**

@@ -27,7 +27,7 @@ type Column = HTMLElement & { updateComplete: Promise<unknown>; width: string }
 const table = async (attrs = ''): Promise<Table> => {
   const element = (await mount(`<helix-data-table label="Objects" row-key="id" ${attrs}>
     <helix-table-column field="name" resizable sortable width="10rem">Name</helix-table-column>
-    <helix-table-column field="size" align="end" resizable>Size</helix-table-column>
+    <helix-table-column field="size" text-align="end" resizable>Size</helix-table-column>
     <helix-table-column field="kind">Kind</helix-table-column>
   </helix-data-table>`)) as Table
   element.rows = [

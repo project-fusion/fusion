@@ -141,10 +141,10 @@ describe('a heading, where there is layout to place it', () => {
       : { end: box.right - inset - text.right, start: text.left - box.left }
   }
 
-  geometry('follows `align` to the edge it names, in either direction', async () => {
+  geometry('follows `text-align` to the edge it names, in either direction', async () => {
     expect(Math.abs(gap(await heading('')).start)).toBeLessThan(2)
-    expect(Math.abs(gap(await heading('align="end"')).end)).toBeLessThan(2)
-    expect(Math.abs(gap(await heading('align="end" dir="rtl"')).end)).toBeLessThan(2)
+    expect(Math.abs(gap(await heading('text-align="end"')).end)).toBeLessThan(2)
+    expect(Math.abs(gap(await heading('text-align="end" dir="rtl"')).end)).toBeLessThan(2)
   })
 
   /* Data Table's hooks reach a heading by being relayed onto its columns, and
@@ -170,7 +170,7 @@ describe('the cells under a column set to an edge, where there is layout to plac
     await host.updateComplete
   }
 
-  const table = async (dir: 'ltr' | 'rtl', count = 'align="end"'): Promise<Updating> => {
+  const table = async (dir: 'ltr' | 'rtl', count = 'text-align="end"'): Promise<Updating> => {
     const host = (await mount(
       `<helix-table dir="${dir}" label="Deploys">
         <helix-table-column width="10rem">Service</helix-table-column>
@@ -241,8 +241,10 @@ describe('the cells under a column set to an edge, where there is layout to plac
      its own render, and the column asks for one. */
   geometry('follow an edge the column is given after the table drew', async () => {
     const host = await table('ltr', '')
-    const count = host.querySelectorAll('helix-table-column')[1] as Updating & { align?: string }
-    count.align = 'end'
+    const count = host.querySelectorAll('helix-table-column')[1] as Updating & {
+      textAlign?: string
+    }
+    count.textAlign = 'end'
     await count.updateComplete
     await settle(host)
     expect(off(column(host, 'Count'), 'right')).toBeLessThan(2)
@@ -298,7 +300,7 @@ describe('the tracks, where there is layout to measure them', () => {
       <div style="inline-size: 640px"><helix-table columns="10rem 1fr 5rem" label="Deploys">
         <helix-table-column>Service</helix-table-column>
         <helix-table-column>Last change</helix-table-column>
-        <helix-table-column align="end">Count</helix-table-column>
+        <helix-table-column text-align="end">Count</helix-table-column>
       </helix-table></div>`)) as HTMLElement
     const table = host.querySelector('helix-table') as Updating
     await settle(table)
@@ -324,7 +326,7 @@ describe('the tracks, where there is layout to measure them', () => {
       <helix-table dir="${dir}" label="Deploys">
         <helix-table-column hidden width="12rem">Service</helix-table-column>
         <helix-table-column>Region</helix-table-column>
-        <helix-table-column align="end" width="6rem">Count</helix-table-column>
+        <helix-table-column text-align="end" width="6rem">Count</helix-table-column>
         <helix-table-row>
           <helix-table-cell header hidden>Gateway</helix-table-cell>
           <helix-table-cell>us-east-1</helix-table-cell>
