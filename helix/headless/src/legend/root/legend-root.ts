@@ -30,10 +30,12 @@ import { property } from 'lit/decorators.js'
  * @aliases Key, Series Key
  * @documentation https://fusion.dev/helix/components/legend
  *
- * @csspart entry - One name and its swatch.
+ * @csspart entry - One name and its swatch. The swatch is drawn on the entry,
+ * which is `::part(entry)::before` from a consumer's sheet: the series is
+ * already on the entry as `--chart-series`, so a box would have carried nothing,
+ * and this tier ships no CSS.
  * @csspart list - The list itself.
  * @csspart name - One series name.
- * @csspart swatch - The color a series is drawn in.
  */
 @customElement('helix-headless-legend')
 export class HelixHeadlessLegend extends HelixElement {
@@ -119,7 +121,6 @@ export class HelixHeadlessLegend extends HelixElement {
           style="--chart-series: var(--chart-series-${seriesIndex(index)})"
           role="listitem"
         >
-          <span aria-hidden="true" part="swatch"></span>
           <span part="name">${name}</span>
         </li>`,
       )}
