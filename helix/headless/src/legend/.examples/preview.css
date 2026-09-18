@@ -61,10 +61,14 @@ helix-headless-legend::part(entry) {
   line-height: 1.2;
 }
 
-helix-headless-legend::part(swatch) {
+/* The mark, drawn on the entry rather than slotted into it. The entry already
+   carries its series, so the tier renders no box for this: a consumer who wants
+   one writes it, and reads the same property. */
+helix-headless-legend::part(entry)::before {
   background-color: var(--chart-series, var(--chart-series-1));
   block-size: 0.75rem;
   border-radius: var(--_radius-control);
+  content: "";
   flex: none;
   inline-size: 0.75rem;
 }

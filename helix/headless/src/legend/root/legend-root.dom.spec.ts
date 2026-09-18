@@ -94,8 +94,10 @@ describe('chart legend', () => {
   test('a list is a list, so a screen reader counts the series', async () => {
     const host = await legend(TRAFFIC, 'for="traffic"')
     expect(part(host, 'list')?.getAttribute('role')).toBe('list')
-    // The swatch is the color and the color is the one thing it cannot say.
-    expect(part(host, 'swatch')?.getAttribute('aria-hidden')).toBe('true')
+    /* And the mark is not in the tree at all, being paint: the entry carries its
+       series and a sheet draws the swatch on it, so there is nothing here whose
+       one fact, the color, is the one thing it could not have said. */
+    expect(part(host, 'swatch')).toBeNull()
   })
 
   test('naming nothing, or naming something that is not a table, is an empty list', async () => {

@@ -50,13 +50,16 @@ const entries = (host: HTMLElement): Element[] => [
 ]
 
 describe('legend', () => {
-  test('one entry per series, each a swatch beside its name', async () => {
+  test('one entry per series, each a name with a mark drawn on the entry', async () => {
     const host = await legend()
     expect(entries(host)).toHaveLength(3)
     for (const entry of entries(host)) {
-      expect(entry.querySelector('[part="swatch"]')).not.toBeNull()
       expect(entry.querySelector('[part="name"]')).not.toBeNull()
+      /* The mark is the entry's `::before` rather than a box in it: the entry
+         already carries its series, so there was nothing for a box to hold. */
+      expect(entry.querySelector('[part="swatch"]')).toBeNull()
     }
+    expect(rule('[part="entry"]::before')).toContain('content: ""')
   })
 
   test('emphasis, material and placement reflect, and rest on nothing', async () => {
@@ -113,7 +116,7 @@ describe('legend', () => {
     // What `outlined` means on a mark whose area encodes a value, rather than
     // on a control whose fill is the loud part.
     const outlined = rule(
-      ':host([emphasis="outlined"]) [part="entry"]:not([data-emphasis]) [part="swatch"]',
+      ':host([emphasis="outlined"]) [part="entry"]:not([data-emphasis])::before',
     )
     expect(outlined).toContain('background-color: color-mix(')
     expect(outlined).toMatch(
