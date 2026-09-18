@@ -51,10 +51,9 @@ export class HelixDialog extends HelixHeadlessDialog {
    * rule's own test is whether two of them sitting together could legitimately
    * differ, and it is answering "a ragged row is unwritable". Two dialogs never
    * sit together. One is on screen at a time, in the top layer, and it is the
-   * region rather than a control in one, which is the other half of the reason
-   * `Avatar`, `Loader` and `Orb` keep theirs: those are pictures rather than
-   * controls. Not `appearance`, which says how a thing reads rather than how
-   * wide it is.
+   * region rather than a control in one, which is the other half of the axis's
+   * domain: the rest of it is pictures, which are not controls either. Not
+   * `appearance`, which says how a thing reads rather than how wide it is.
    */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg' | 'full'
