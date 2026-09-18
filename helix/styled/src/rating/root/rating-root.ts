@@ -33,25 +33,30 @@ export class HelixRating extends HelixHeadlessRating {
   static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 
   /**
-   * Which mark the row is drawn with.
+   * The geometry one mark is drawn to.
    *
-   * `marks` is the star, and is what a rating means to most readers. `dots`
-   * drops the glyph for a plain circle, which says how much rather than how
-   * good: a star carries a judgment that a level of spice, a difficulty or a
-   * confidence has not earned.
+   * The registry's word, because the question is the registry's: `Avatar`,
+   * `Skeleton`, `IconButton`, `Meter` and `Progress` each ask what geometry
+   * their own thing is cut to under this name, and `dots` is already a value
+   * the axis holds. What is picked here is the outline of one mark and nothing
+   * else, which is a shape and not a component-specific choice.
    *
-   * Both are one shape repeated and clipped to the score, so halves work in
-   * either, and both are only a choice of drawing. A scale whose marks are
+   * `dots` drops the glyph for a plain circle, which says how much rather than
+   * how good: a star carries a judgment that a level of spice, a difficulty or
+   * a confidence has not earned. Either way it is one shape repeated and
+   * clipped to the score, so halves work in both. A scale whose marks are
    * *different* drawings is a set of choices rather than a quantity: that is
    * `Radio.Group`, whose options already carry a value and a name each.
    *
-   * **Undefaulted, because it reflects.** A default of `marks` writes
-   * `variant="marks"` onto every server-rendered rating, which React holds no
-   * prop for and reports as a hydration mismatch. The stylesheet names only
-   * `dots`, so an unset one draws marks anyway.
+   * **The star is the resting one and has no word**, which is the rule every
+   * axis follows and is also what this family needed anyway: it reflects, so a
+   * default would write the resting value onto every server-rendered rating,
+   * an attribute React holds no prop for and so a hydration mismatch for each
+   * one. The stylesheet names only `dots`, so an unset one draws the star by
+   * landing on the base rule.
    */
   @property({ reflect: true })
-  variant?: 'dots' | 'marks'
+  shape?: 'dots'
 }
 
 declare global {
