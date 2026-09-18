@@ -68,8 +68,12 @@
    the thumb and leaves the one above it empty: measured, the thumb is centered
    to the pixel, two above and two below, and it still read as sitting high. At
    this size the shadow was only ever doing the separating a border does
-   honestly. */
-[part="thumb"] {
+   honestly.
+
+   On the groove rather than in it, because the thumb is paint and this is the
+   tier that paints. It was already out of flow, so the groove's one grid cell
+   still holds the input alone and nothing about the track moved. */
+[part="track"]::after {
   /*
  *  Over the groove rather than on it, which is `overlay` and is the same token
  *      the segmented control's thumb takes for the same reason. `raised` is the
@@ -82,6 +86,7 @@
   block-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-full);
+  content: "";
   inline-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   inset-block-start: 50%;
   /*
@@ -103,7 +108,7 @@
 /* No hairline once it is on: the thumb is white on the accent, which separates
    it further than a border would, and a border there reads as an outline drawn
    around something already distinct. */
-:host(:state(checked)) [part="thumb"] {
+:host(:state(checked)) [part="track"]::after {
   border-color: transparent;
 }
 
@@ -128,7 +133,7 @@
   opacity: 0;
 }
 
-:host(:state(checked)) [part="thumb"] {
+:host(:state(checked)) [part="track"]::after {
   /* On the accent now rather than on the groove, so it takes the color meant
      to sit on it. `raised` against the brand is a dark thumb on a mid blue in
      dark mode, which is the same disappearing act the other way round. */
@@ -138,7 +143,9 @@
   translate: calc(var(--_switch-width) - var(--_switch-height)) -50%;
 }
 
-[part="control"]:focus-visible + [part="thumb"] {
+/* `:has()` rather than the adjacent combinator the element took: the thumb is
+   no longer a sibling of anything, and the input is the groove's only child. */
+[part="track"]:has([part="control"]:focus-visible)::after {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }

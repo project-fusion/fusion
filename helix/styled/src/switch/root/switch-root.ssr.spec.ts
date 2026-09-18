@@ -1,15 +1,18 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, ssr, styles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('switch server output', () => {
-  test('the track and the thumb both ship, so the picture is not a bare checkbox', () => {
-    // A switch that arrives as a checkbox and becomes a switch on hydration is
-    // a visible flip, which is the whole reason the parts are served.
+  test('the track ships with the thumb drawn on it, so the picture is not a bare checkbox', () => {
+    /* A switch that arrives as a checkbox and becomes a switch on hydration is
+       a visible flip, which is the whole reason the groove is served. The thumb
+       is `[part="track"]::after` rather than a box, and the sheet is in the
+       served markup beside it, so the picture is complete either way. */
     const markup = ssr(html`<helix-switch>Dark mode</helix-switch>`)
     expect(hasPart(markup, 'track')).toBe(true)
-    expect(hasPart(markup, 'thumb')).toBe(true)
+    expect(hasPart(markup, 'thumb')).toBe(false)
+    expect(styles(markup)).toContain('[part="track"]::after')
     expect(partTag(markup, 'control')).toContain('role="switch"')
   })
 

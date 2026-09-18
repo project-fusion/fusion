@@ -46,8 +46,11 @@ import { property } from 'lit/decorators.js'
  * @csspart field - The row: the track and its label.
  * @csspart hint - Help under the control, while nothing is wrong.
  * @csspart label - The words beside it.
- * @csspart thumb - The part that moves.
- * @csspart track - The groove the thumb travels in.
+ * @csspart track - The groove. The thumb that travels in it is drawn on the
+ * groove itself, which is `::part(track)::after` from a consumer's sheet: this
+ * tier ships no CSS, so a box it renders for one to paint is an empty child
+ * costing whatever the consumer's own layout charges for a child. `ListItem`
+ * measured that.
  *
  * @cssstate checked - While it is on.
  * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
@@ -153,7 +156,6 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
           @change=${this.handleChange}
           @input=${this.stopInner}
         />
-        <span part="thumb" aria-hidden="true"></span>
       </span>
       <span part="label"><slot>${this.label}</slot></span>
     </label>
