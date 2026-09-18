@@ -33,9 +33,9 @@ export function Example() {
       </table>
 
       <helix-bar-chart
-        direction="horizontal"
         for="barchartgrid"
         gridlines="both"
+        orientation="horizontal"
       ></helix-bar-chart>
     </>
   )

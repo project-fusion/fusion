@@ -54,7 +54,7 @@
   fill: var(--_bar-chart-series);
 }
 
-:host([direction="horizontal"]) [part="bar"] {
+:host([orientation="horizontal"]) [part="bar"] {
   --_bar-chart-corners: 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0;
   --_bar-chart-base: 0 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2);
 }
@@ -83,19 +83,19 @@
  * the geometry along the other axis instead, and all this does is put the names
  * on the left and stack them.
  */
-:host([direction="horizontal"]) {
+:host([orientation="horizontal"]) {
   grid-template-columns: auto 1fr;
 }
 
 /*
  *  Placed by column rather than reordered.
  */
-:host([direction="horizontal"]) [part="labels"] {
+:host([orientation="horizontal"]) [part="labels"] {
   grid-column: 1;
   grid-row: 1;
 }
 
-:host([direction="horizontal"]) [part="plot"] {
+:host([orientation="horizontal"]) [part="plot"] {
   grid-column: 2;
   grid-row: 1;
 }
@@ -103,13 +103,13 @@
 /* Each name sits against its own bar, which takes a grid of the same rows
    rather than a guess: the plot is one column of the outer grid and the labels
    are the other, so the two share a height and divide it the same way. */
-:host([direction="horizontal"]) [part="labels"] {
+:host([orientation="horizontal"]) [part="labels"] {
   grid-auto-columns: auto;
   grid-auto-flow: row;
   grid-auto-rows: 1fr;
 }
 
-:host([direction="horizontal"]) [part="label"] {
+:host([orientation="horizontal"]) [part="label"] {
   align-self: center;
   text-align: end;
 }
@@ -161,12 +161,12 @@
 }
 
 @starting-style {
-  :host(:not([direction="horizontal"])) [part="bar"] {
+  :host(:not([orientation="horizontal"])) [part="bar"] {
     height: 0;
     y: 100;
   }
 
-  :host([direction="horizontal"]) [part="bar"] {
+  :host([orientation="horizontal"]) [part="bar"] {
     width: 0;
   }
 }
@@ -258,27 +258,27 @@
 /* Turned sideways the value axis is horizontal, so the two scales are rows
    rather than columns: the primary under the bars where a reader looks for it,
    the secondary above them, and the names still in their own column beside. */
-:host([direction="horizontal"][secondary]) {
+:host([orientation="horizontal"][secondary]) {
   grid-template-columns: auto 1fr;
   grid-template-rows: auto 1fr auto;
 }
 
-:host([direction="horizontal"][secondary]) [part="axis"][data-axis="secondary"] {
+:host([orientation="horizontal"][secondary]) [part="axis"][data-axis="secondary"] {
   grid-column: 2;
   grid-row: 1;
 }
 
-:host([direction="horizontal"][secondary]) [part="labels"] {
+:host([orientation="horizontal"][secondary]) [part="labels"] {
   grid-column: 1;
   grid-row: 2;
 }
 
-:host([direction="horizontal"][secondary]) [part="plot"] {
+:host([orientation="horizontal"][secondary]) [part="plot"] {
   grid-column: 2;
   grid-row: 2;
 }
 
-:host([direction="horizontal"][secondary]) [part="axis"][data-axis="primary"] {
+:host([orientation="horizontal"][secondary]) [part="axis"][data-axis="primary"] {
   grid-column: 2;
   grid-row: 3;
 }
@@ -293,11 +293,11 @@
   position: relative;
 }
 
-:host(:not([direction="horizontal"])) [part="axis"] {
+:host(:not([orientation="horizontal"])) [part="axis"] {
   inline-size: var(--bar-chart-axis, 3ch);
 }
 
-:host([direction="horizontal"]) [part="axis"] {
+:host([orientation="horizontal"]) [part="axis"] {
   block-size: 1lh;
 }
 
@@ -308,22 +308,22 @@
   position: absolute;
 }
 
-:host(:not([direction="horizontal"])) [part="tick"] {
+:host(:not([orientation="horizontal"])) [part="tick"] {
   inset-inline-end: 0;
   translate: 0 -50%;
 }
 
-:host([direction="horizontal"]) [part="tick"] {
+:host([orientation="horizontal"]) [part="tick"] {
   translate: -50% 0;
 }
 
 /* Placed from the inline start, which is the right on a right-to-left page, so
    centered the other way: `translate` is physical. */
-:host([direction="horizontal"]:dir(rtl)) [part="tick"] {
+:host([orientation="horizontal"]:dir(rtl)) [part="tick"] {
   translate: 50% 0;
 }
 
-:host(:not([direction="horizontal"])) [part="axis"][data-axis="secondary"] [part="tick"] {
+:host(:not([orientation="horizontal"])) [part="axis"][data-axis="secondary"] [part="tick"] {
   inset-inline-end: auto;
   inset-inline-start: 0;
 }
