@@ -67,7 +67,7 @@ if (hasLayout()) {
         await settled(part(host, 'surface'))
         expect(host.open).toBe(false)
         /* The band was 1280 by 267 here, and `open` was already false.
-           `:host([variant="full"]) [part="surface"]` is (0,3,0) and the guard
+           `:host([variant="band"]) [part="surface"]` is (0,3,0) and the guard
            was a bare `[part="surface"][hidden]` at (0,2,0), so it lost. */
         expect(panelBox(host).height).toBe(0)
         expect(panelBox(host).width).toBe(0)
@@ -141,7 +141,7 @@ if (hasLayout()) {
     test('and the band spans the page and starts under the bar, not the trigger', async () => {
       const bar = (await mount(
         `<nav style="padding:40px">
-          <helix-megamenu variant="full" label="Products">
+          <helix-megamenu variant="band" label="Products">
             <div data-megamenu-group>
               <a data-megamenu-item href="/one"><strong>One</strong><span>First.</span></a>
             </div>
@@ -210,13 +210,13 @@ if (hasLayout()) {
     })
 
     test('a screen too narrow for columns gets the band, and they stack', async () => {
-      /* Driven by `full-below` rather than by the viewport, because the runner
+      /* Driven by `band-below` rather than by the viewport, because the runner
          gives every spec in a file the same window: a threshold above any
          plausible width is the same question asked in a way a spec can answer,
          and it is the property a consumer would move anyway. */
       const bar = (await mount(
         `<nav style="padding:40px">
-          <helix-megamenu full-below="99999" label="Products">
+          <helix-megamenu band-below="99999" label="Products">
             <div data-megamenu-group>
               <a data-megamenu-item href="/one"><strong>One</strong><span>First.</span></a>
             </div>
@@ -257,7 +257,7 @@ if (hasLayout()) {
     test('and a threshold of zero leaves the card a card', async () => {
       const bar = (await mount(
         `<nav style="padding:40px">
-          <helix-megamenu full-below="0" label="Products">
+          <helix-megamenu band-below="0" label="Products">
             <div data-megamenu-group>
               <a data-megamenu-item href="/one"><strong>One</strong><span>First.</span></a>
             </div>
@@ -381,7 +381,7 @@ if (hasLayout()) {
          the same question asked in a way a spec can answer. */
       const bar = (await mount(
         `<helix-navigation label="Main" style="padding:0">
-          <helix-megamenu variant="full" label="Products" style="--megamenu-column-size: 26rem">
+          <helix-megamenu variant="band" label="Products" style="--megamenu-column-size: 26rem">
             ${['One', 'Two', 'Three', 'Four']
               .map(
                 (name) =>
@@ -425,7 +425,7 @@ if (hasLayout()) {
          with it. */
       const bar = (await mount(
         `<nav style="padding:20px">
-          <helix-megamenu variant="full" label="Products">
+          <helix-megamenu variant="band" label="Products">
             <div data-megamenu-group>
               <a data-megamenu-item href="#one"><strong>One</strong><span>First.</span></a>
             </div>
