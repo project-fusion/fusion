@@ -5,7 +5,7 @@ export function Example() {
       gap="sm"
     >
       <helix-flex
-        align="center"
+        align-items="center"
         gap="sm"
       >
         <helix-rating
