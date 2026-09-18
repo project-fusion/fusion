@@ -16,9 +16,13 @@ describe('steps server output', () => {
     expect(hasPart(markup, 'body')).toBe(true)
   })
 
-  test('both halves of the rule ship, since the line is the step’s own', () => {
-    expect(hasPart(markup, 'lead')).toBe(true)
-    expect(hasPart(markup, 'trail')).toBe(true)
+  test('neither half of the rule is markup, both being drawn by the sheet', () => {
+    /* The line is the step's own and is placed entirely from properties the list
+       hands down, so it is `:host::before` and `:host::after` rather than two
+       boxes: nothing ships for it and nothing needs to, the sheet arriving with
+       the definition. `step-geometry.dom.spec.ts` is where it is drawn. */
+    expect(hasPart(markup, 'lead')).toBe(false)
+    expect(hasPart(markup, 'trail')).toBe(false)
   })
 
   test('the host carries no role attribute, having said it through internals', () => {

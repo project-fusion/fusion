@@ -28,6 +28,13 @@ import '../../button/index.js'
  * with two hidden in CSS: the accessibility tree would otherwise carry marks
  * that are not there.
  *
+ * **The two half lines either side of the mark are a sheet's, on `::before` and
+ * `::after` of the step.** Both are placed entirely from properties the list
+ * hands down, so there was nothing about them for a box to carry, and this tier
+ * ships no CSS: a box it rendered for one to paint would be an empty child
+ * costing whatever the consumer's own layout charges for a child. `ListItem`
+ * measured that.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Stage
@@ -45,10 +52,8 @@ import '../../button/index.js'
  * @csspart description - The line under it.
  * @csspart label - The step's name, which is a control.
  * @csspart label-button - The inner control.
- * @csspart lead - The half line arriving from the step before.
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
  * @csspart marker - The shape carrying the number or the check.
- * @csspart trail - The half line running on to the next.
  */
 @customElement('helix-headless-step')
 export class HelixHeadlessStep extends HelixElement {
@@ -142,21 +147,20 @@ export class HelixHeadlessStep extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* Two half lines, one either side of the mark, rather than one line running
-       the whole way to the next step.
+    /* The two half lines either side of the mark are the sheet's, on `::before`
+       and `::after` of the step, which is why nothing here renders them.
        A single line drawn to the next marker has to know how far away that is,
        which is the next step's size, and a step knows only its own; drawn
        across the gap alone it is a stub. Two halves need neither: each reaches
        from the mark to its own step's edge and half the gap beyond, so it meets
        the one coming the other way in the middle of the gap and the rule reads
        as continuous however wide the steps are or how differently they are
-       filled.
+       filled. Both are placed against this element's own box, which is the one
+       box a sheet has whether or not this tier renders anything to hang them on.
        The first has nothing on its leading side and the last nothing on its
-       trailing one, which `:host(:first-child)` and `:host(:last-child)` say
-       with no index and no parent counting its children. */
-    return html`<span part="lead" aria-hidden="true"></span>
-      <span part="trail" aria-hidden="true"></span>
-      <span part="marker" aria-hidden="true">
+       trailing one, which `:first-child` and `:last-child` say with no index and
+       no parent counting its children. */
+    return html`<span part="marker" aria-hidden="true">
         ${this.renderMarker()}
       </span>
       <span part="body">

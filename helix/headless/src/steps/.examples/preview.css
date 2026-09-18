@@ -29,25 +29,29 @@ helix-headless-step {
   row-gap: 0.5rem;
 }
 
-helix-headless-step::part(lead),
-helix-headless-step::part(trail) {
+/* The two half lines either side of the mark, drawn on the step rather than
+   slotted into it. The tier renders no box for these: a consumer who wants them
+   writes them, and a pseudo-element is the cheapest way to write them. */
+helix-headless-step::before,
+helix-headless-step::after {
   background-color: var(--_gray-line);
   block-size: 1px;
+  content: "";
   inline-size: calc(50% - 0.375rem);
   inset-block-start: 0.625rem;
   position: absolute;
 }
 
-helix-headless-step::part(lead) {
+helix-headless-step::before {
   inset-inline-start: -0.5rem;
 }
 
-helix-headless-step::part(trail) {
+helix-headless-step::after {
   inset-inline-start: calc(50% + 0.875rem);
 }
 
-helix-headless-step:first-child::part(lead),
-helix-headless-step:last-child::part(trail) {
+helix-headless-step:first-child::before,
+helix-headless-step:last-child::after {
   display: none;
 }
 

@@ -74,14 +74,19 @@ describe('steps', () => {
     )
   })
 
-  test('both halves of the rule are drawn, and the ends drop one each', async () => {
+  test('the rule is the sheet’s, so a step renders no box for either half', async () => {
     /* Two halves rather than one line, because a line to the next mark has to
-       know how far away it is and a step knows only its own size. */
+       know how far away it is and a step knows only its own size. Both are
+       placed entirely from properties the list hands down, so there is nothing
+       for a box to carry and this tier renders none: the styled sheet draws them
+       on the step's own `::before` and `::after`, and `step-geometry.dom.spec.ts`
+       holds it to that. */
     const host = await steps()
     for (const step of [...host.querySelectorAll('helix-headless-step')] as HTMLElement[]) {
       await (step as unknown as Steps).updateComplete
-      expect(step.shadowRoot?.querySelector('[part="lead"]')).not.toBeNull()
-      expect(step.shadowRoot?.querySelector('[part="trail"]')).not.toBeNull()
+      expect(step.shadowRoot?.querySelector('[part="marker"]')).not.toBeNull()
+      expect(step.shadowRoot?.querySelector('[part="lead"]')).toBeNull()
+      expect(step.shadowRoot?.querySelector('[part="trail"]')).toBeNull()
     }
   })
 
