@@ -504,8 +504,9 @@ draws come out identical.
 value. `href`, `target`, and `rel` reflected on Button until they were told not
 to, which wrote a destination onto a host that is not a link and put a bare
 `target rel` pair into every button ever rendered. The visual axes reflect, and so do
-`variant`, `orientation`, `disabled`, and the `size` that survives on avatar and
-loader; the rest do not.
+`variant`, `orientation`, `disabled`, and the `size` that survives under
+[Size and density](#size-and-density), which is where the families keeping it
+are named; the rest do not.
 
 **Read it the other way as well, which nothing did for months.** The sentence is
 a biconditional and only one side of it was ever enforced: a property a
@@ -697,8 +698,8 @@ text, `emphasis` picks the quiet ink, and a tone with an emphasis is that tone's
 own quiet ink, the one step the readable range holds.
 
 `variant` is the escape hatch and takes no registry, being component-specific by
-definition: `segmented` against `underlined`, `list` against `wheels`, `dots`
-against `marks`. It lives on either tier, because a choice between two widgets is
+definition: `segmented` against `underlined`, `list` against `wheels`, `grip`
+against `line`. It lives on either tier, because a choice between two widgets is
 structural wherever it is made. What it may not be is a place to put something
 that *is* on an axis.
 
@@ -774,7 +775,15 @@ to get wrong, and one question to ask per region rather than one per element.
   and is never written.
 - **Containers that are dense by nature declare it themselves**: app header,
   toolbar and announcement do, so a control put in one is already right.
-- **`size` survives only on avatar and loader**, which are pictures.
+- **`size` survives on avatar, loader and orb**, which are pictures, and on
+  dialog, which is a region. The test is the one above, whether two of these
+  sitting together could legitimately differ in height, and a picture is not a
+  control: an avatar at 24 in a list and 96 on a profile is a different graphic.
+  Dialog argues the other half at its own property and the argument is the same
+  test read from the other end: two dialogs never sit together, one being on
+  screen at a time in the top layer, so it is the region rather than a control
+  in one. A family taking `size` owes an argument of that shape, and anything
+  that cannot make one takes its height from `data-density`.
 
 It works through custom properties (`--helix-size-control`,
 `--helix-size-checkbox`, `--helix-size-tag`), which is why it costs no component

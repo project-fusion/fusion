@@ -31,8 +31,8 @@ does not know which it is in; the region does.
 
 **Optical role.** Real, and only for things that are not controls. An avatar at
 24 in a list and 96 on a profile is a different graphic, not a taller control.
-That is why `size` survives on `Avatar` and `Spinner` and nowhere else: those
-are pictures.
+That is why `size` survives on `Avatar`, `Loader` and `Orb`: those are
+pictures.
 
 ## The test that settles it
 
@@ -45,6 +45,10 @@ So a per-instance size is only ever used to say something about the **region**,
 one element at a time, which is exactly how a row ends up with one member the
 wrong height. Said once on the region, a ragged row is not discouraged. It is
 unwritable.
+
+`Dialog` keeps a `size` by the same test read from the other end. Two dialogs
+never sit together: one is on screen at a time, in the top layer, so it *is* the
+region rather than a control in one.
 
 That is also what makes this safe for anything generating code, whether that is
 a person or a model: there is no size to get wrong, and one question to ask per
