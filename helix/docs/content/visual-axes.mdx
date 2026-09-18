@@ -14,8 +14,10 @@ vocabularies. You cannot invent a value, and a component may take a subset.
 | `emphasis` | `ghost`, `muted`, `outlined`, `solid`, `subtle` |
 | `material` | `frosted`, `glass`, `transparent` |
 | `nesting` | `heading`, `peer`, `subordinate` |
+| `orientation` | `auto`, `horizontal`, `vertical` |
 | `separation` | `elevated`, `filled`, `outlined`, `plain` |
 | `shape` | `arc`, `circle`, `dots`, `ring`, `rounded`, `square`, `text` |
+| `size` | `sm`, `md`, `lg`, `full` |
 | `tone` | The status and intent words: `primary`, `accent`, `neutral`, `danger`, and so on |
 | `width` | `auto`, `full` |
 
@@ -47,8 +49,8 @@ and a component reintroducing it fails the build.
 ## Two axes, not one
 
 This is the test. `Megamenu` is the worked example: a consumer can make the panel
-glass, which is not an appearance, because `full` already occupies that axis with
-a layout. A panel can be glass *and* outlined. Two axes.
+glass, which is not an appearance, because `band` already occupies that axis
+with a layout. A panel can be glass *and* outlined. Two axes.
 
 If you are adding a property and cannot decide which axis it belongs to, that is
 usually the answer: it is two properties.
@@ -77,7 +79,33 @@ what gets *rendered*: a meter at `ring` emits an arc rather than a bar, so the
 markup differs before any rule is written. `nesting` says what depth *is*: a
 tree at `subordinate` ranks its rows, a tree at `heading` makes each branch the
 name of the list under it, a file explorer does neither, and that is true of a
-tree nobody has styled.
+tree nobody has styled. `orientation` is `shape`'s reason again: `aria-orientation`
+is markup, and the toolbar, the splitter, the divider and the table column all
+write it with nothing painted.
+
+`size` is the axis that goes the other way. It is asked of pictures and regions
+and never of controls, which take their height from the region they sit in
+through `data-density`, so it lives only where something is painted.
+
+## What each shape is
+
+`shape` is the axis whose values are geometries that look alike in a table and
+not on a page, so it is worth saying what each one draws.
+
+| Value | What it draws |
+|---|---|
+| `arc` | An open curve, a gauge that stops short of a full turn |
+| `circle` | A full round, the whole edge at `radii-full` |
+| `dots` | Separate marks rather than one joined figure |
+| `ring` | A closed curve, the whole turn drawn as a band |
+| `rounded` | Corners cut to `radii-md`, still a rectangle |
+| `square` | Sharp corners, the pole `rounded` departs from |
+| `text` | A line of type's shape, as wide as a line and as tall |
+
+**`square` is not `rounded`.** They were one word for a while: an avatar drawing
+`radii-md` called it `square` while a QR code drawing sharp modules called it
+`square` too, in the same registered axis. Membership is what a check can see,
+so nothing could have caught that, and a table is what stops it happening again.
 
 ## What a step inward means
 

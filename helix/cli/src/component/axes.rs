@@ -25,16 +25,37 @@
 //! a consumer's markup and may quote anything, a code block's sample included,
 //! which is the same line the `slots` rule draws and for the same reason.
 //!
-//! **A visual axis belongs to the layer that paints.** `tone`, `shape` and
-//! `nesting` are the exceptions and each is principled: `tone` says what a thing
-//! *means*, and meaning survives having no stylesheet; `shape` says what gets
-//! *rendered*, a meter at `ring` emitting an arc rather than a bar, so the
-//! markup differs before any rule is written; and `nesting` says what depth
-//! *is*, a row one step in being the same kind of thing as the row above it, a
-//! subordinate kind, or a row the one above it is a heading for, which is as
-//! true of a tree nobody has styled.
-//! `emphasis`, `material` and `separation` say how a thing is painted, so on a
-//! base layer they are a promise nobody keeps.
+//! **A visual axis belongs to the layer that paints.** `tone`, `shape`,
+//! `nesting` and `orientation` are the exceptions and each is principled: `tone`
+//! says what a thing *means*, and meaning survives having no stylesheet; `shape`
+//! says what gets *rendered*, a meter at `ring` emitting an arc rather than a
+//! bar, so the markup differs before any rule is written; `nesting` says what
+//! depth *is*, a row one step in being the same kind of thing as the row above
+//! it, a subordinate kind, or a row the one above it is a heading for, which is
+//! as true of a tree nobody has styled; and `orientation` is `shape`'s principle
+//! again, `aria-orientation` being markup that differs before any rule is
+//! written, which is why the toolbar, the splitter, the divider and the table
+//! column all write it from the base layer. Turning is behavior as well: the
+//! drag axis and the arrow keys turn with it, so a CSS-only version looks
+//! stacked and behaves side by side.
+//! `emphasis`, `material`, `separation` and `size` say how a thing is painted,
+//! so on a base layer they are a promise nobody keeps.
+//!
+//! **`size` is asked of pictures and regions, never of controls.** A control
+//! takes its height from the region it is in, through `data-density`, because
+//! the question a per-instance size answers is how tight this region is and a
+//! row whose members each answer it is a ragged row. An avatar at 24 in a list
+//! and at 96 on a profile is a different graphic rather than a taller control,
+//! and a dialog is the region rather than something in one, which is the test
+//! its own block applies. The domain is the entry; who is in it is derivable,
+//! and every sentence that enumerated them rotted.
+//!
+//! **`auto` is in two vocabularies and means the same thing in both.** It is in
+//! `width` and in `orientation`, and unlike the pair below there is nothing
+//! keeping the two apart: a button group may reasonably want to fill its row
+//! and to turn when the row is too narrow. That is fine, because both say the
+//! component decides from what it is in rather than from what was written, so a
+//! family carrying both is answering one question twice about two properties.
 //!
 //! **`outlined` is in two vocabularies and no component may be asked both.** It
 //! is in `emphasis` and in `separation` verbatim, which looks like a collision
@@ -104,18 +125,20 @@ static NAMED: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"[A-Za-z_$][\w$]*").expect("a literal pattern compiles"));
 
 /// The vocabulary. A component takes a subset; nobody invents a value.
-pub const AXES: [(&str, &[&str]); 7] = [
+pub const AXES: [(&str, &[&str]); 9] = [
     (
         "emphasis",
         &["ghost", "muted", "outlined", "solid", "subtle"],
     ),
     ("material", &["frosted", "glass", "transparent"]),
     ("nesting", &["heading", "peer", "subordinate"]),
+    ("orientation", &["auto", "horizontal", "vertical"]),
     ("separation", &["elevated", "filled", "outlined", "plain"]),
     (
         "shape",
         &["arc", "circle", "dots", "ring", "rounded", "square", "text"],
     ),
+    ("size", &["full", "lg", "md", "sm"]),
     (
         "tone",
         &[
@@ -126,7 +149,7 @@ pub const AXES: [(&str, &[&str]); 7] = [
 ];
 
 /// The axes a base layer may carry, because none of them is about paint.
-const UNPAINTED: [&str; 3] = ["nesting", "shape", "tone"];
+const UNPAINTED: [&str; 4] = ["nesting", "orientation", "shape", "tone"];
 
 /// Every named union the tiers declare, by the name a property reaches it by.
 ///
