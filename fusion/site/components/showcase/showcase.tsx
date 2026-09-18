@@ -323,14 +323,14 @@ export function Showcase(): React.ReactElement {
 
           <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="md">
-              <helix-flex align="center" gap="sm" wrap>
+              <helix-flex align-items="center" gap="sm" wrap>
                 <helix-button emphasis="solid" tone="primary">
                   Primary
                 </helix-button>
                 <helix-button>Secondary</helix-button>
                 <helix-button emphasis="subtle">Subtle</helix-button>
               </helix-flex>
-              <helix-flex align="center" gap="sm" wrap>
+              <helix-flex align-items="center" gap="sm" wrap>
                 <helix-kbd>Cmd K</helix-kbd>
                 <helix-tag tone="primary">Tag</helix-tag>
                 <helix-badge label="3 unread" value="3">
@@ -424,7 +424,7 @@ export function Showcase(): React.ReactElement {
                 readings. A card of its own would be a fifth in a view the panel
                 shows four of. */}
             <helix-meter label="Bundle budget" max={100} value={78}></helix-meter>
-            <helix-flex align="center" gap="sm" wrap>
+            <helix-flex align-items="center" gap="sm" wrap>
               <helix-tag tone="success">Passing</helix-tag>
               <helix-tag tone="warning">Near budget</helix-tag>
             </helix-flex>
@@ -573,7 +573,7 @@ export function Showcase(): React.ReactElement {
                   columns, which is what a line or a bar chart draws. Left at
                   the default it produced a single entry reading "Downloads",
                   the value column's own header. */}
-              <helix-flex align="center" gap="lg">
+              <helix-flex align-items="center" gap="lg">
                 <helix-donut-chart
                   class={styles.showcaseRing}
                   for="showcase-sources"
@@ -609,7 +609,7 @@ export function Showcase(): React.ReactElement {
 
           <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="md">
-              <helix-flex align="center" gap="sm" justify="between" wrap>
+              <helix-flex align-items="center" gap="sm" justify-content="between" wrap>
                 <helix-avatar-group>
                   <helix-avatar name="Ada Whitfield"></helix-avatar>
                   <helix-avatar name="Grace Nakamura"></helix-avatar>
@@ -621,7 +621,7 @@ export function Showcase(): React.ReactElement {
                   </helix-icon-button>
                 </helix-badge>
               </helix-flex>
-              <helix-flex align="center" gap="sm" wrap>
+              <helix-flex align-items="center" gap="sm" wrap>
                 <helix-tag tone="primary">Primary</helix-tag>
                 <helix-tag tone="success">Success</helix-tag>
                 <helix-tag tone="warning">Warning</helix-tag>
@@ -674,7 +674,7 @@ export function Showcase(): React.ReactElement {
                   reader compares their lengths, which means nothing, so they
                   live in different views. Progress is with the actions and the
                   meter is with the figures. */}
-              <helix-flex align="center" gap="sm" wrap>
+              <helix-flex align-items="center" gap="sm" wrap>
                 <helix-tag>Building</helix-tag>
                 <helix-tag tone="success">Active</helix-tag>
               </helix-flex>

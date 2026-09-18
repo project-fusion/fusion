@@ -2,7 +2,7 @@ export function Example() {
   return (
     <div id="tooltipbounds">
       <helix-flex
-        align="center"
+        align-items="center"
         gap="sm"
       >
         <helix-button

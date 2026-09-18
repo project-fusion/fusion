@@ -36,7 +36,7 @@ export default function Page() {
         <helix-grid columns={3} gap="lg" min="18rem">
           {CORTEX_MODULES.map((module) => (
             <helix-card key={module.title} separation="outlined">
-              <helix-flex align="center" gap="sm" justify="between" slot="header">
+              <helix-flex align-items="center" gap="sm" justify-content="between" slot="header">
                 <helix-text as="h3" variant="title">
                   {module.title}
                 </helix-text>

@@ -57,19 +57,14 @@
   gap: var(--helix-space-3xl);
 }
 
-/* `align` is a legacy HTML presentational attribute, and the browser applies it
-   to any element that carries one, including this one. */
-:host([align]) {
-  text-align: inherit;
-}
-
-:host([align="start"]) {
+/* The attribute is named for the property, so the rule is the value. */
+:host([align-items="start"]) {
   align-items: start;
 }
-:host([align="center"]) {
+:host([align-items="center"]) {
   align-items: center;
 }
-:host([align="end"]) {
+:host([align-items="end"]) {
   align-items: end;
 }
 

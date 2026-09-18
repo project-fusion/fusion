@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-flex
-      align="start"
+      align-items="start"
       direction="column"
       gap="sm"
     >

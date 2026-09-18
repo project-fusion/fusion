@@ -43,9 +43,12 @@ export class HelixDescriptionList extends HelixHeadlessDescriptionList {
    * width so a column of numbers lines up by its digits. Only with
    * `direction="row"`: stacked, a label and its value share one edge already.
    *
-   * Flex's word for the same thing, and a grid rather than a flex row
-   * underneath, so the labels still share one column while the values share an
-   * end.
+   * Flex's value for the same idea, under a shorter name than Flex's own:
+   * there it is `justify-content`, the CSS property it sets, and here the
+   * underlying layout is a grid handing an edge down to each item as a custom
+   * property, so the labels still share one column while the values share an
+   * end. Naming a property this does not set after it would be the wrong kind
+   * of precision.
    */
   @property({ reflect: true })
   justify?: 'between'

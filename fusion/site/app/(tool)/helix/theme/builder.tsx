@@ -626,7 +626,7 @@ export function ThemeBuilder({
             tool's header is full of the tool, so it carries one way back to the
             site rather than the four destinations the site's own header lists,
             and the menu sits outside the mark because it is outside the page. */}
-        <helix-flex align="center" gap="2xs" slot="start">
+        <helix-flex align-items="center" gap="2xs" slot="start">
           <helix-tooltip content="Menu" placement="bottom">
             <helix-icon-button label="Menu" onClick={() => setMenuOpen(true)}>
               <helix-icon name="list"></helix-icon>
@@ -636,7 +636,7 @@ export function ThemeBuilder({
             <Wordmark />
           </a>
         </helix-flex>
-        <helix-flex align="center" gap="2xs" slot="end">
+        <helix-flex align-items="center" gap="2xs" slot="end">
           <SiteFind findable={findable} />
           <helix-tooltip content="Preferences" placement="bottom">
             <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
@@ -662,7 +662,7 @@ export function ThemeBuilder({
         <section className="themeControls" ref={controls} slot="start">
           <helix-flex direction="column" gap="lg">
             <helix-flex direction="column" gap="xs">
-              <helix-flex align="center" gap="sm" justify="between">
+              <helix-flex align-items="center" gap="sm" justify-content="between">
                 <helix-text as="h1" variant="subheading">
                   Theme builder
                 </helix-text>
@@ -1088,7 +1088,7 @@ export function ThemeBuilder({
                 </helix-icon-button>
               </helix-tooltip>
 
-              <helix-flex align="center" gap="xs">
+              <helix-flex align-items="center" gap="xs">
                 {/* **The tone belongs to what the tag counts, not to the run.**
                     Painted `danger` whenever anything failed, "65 pass" is the
                     same red as "2 fail": two identical tags side by side, one of

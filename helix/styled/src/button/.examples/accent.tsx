@@ -7,7 +7,7 @@ export function Example() {
       gap="lg"
     >
       <helix-flex
-        align="center"
+        align-items="center"
         gap="sm"
       >
         <helix-button
@@ -27,7 +27,7 @@ export function Example() {
 
       {/* Preview frame: the angle is a token, so this section rethemes on its own. */}
       <helix-flex
-        align="center"
+        align-items="center"
         className="rethemed"
         data-helix-theme
         gap="sm"

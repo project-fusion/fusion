@@ -152,11 +152,11 @@ export function AuraLab(): React.ReactElement {
           way so the light still reads through the strip. */}
       <div className="auraBar" data-open={open ? '' : undefined}>
         <helix-flex
-          align="center"
+          align-items="center"
           class="auraHandle"
           data-density="sm"
           gap="lg"
-          justify="between"
+          justify-content="between"
           wrap
         >
           {/* Wrapping the row, not the pair. Measured at 1184 of bar: Shape is
@@ -164,7 +164,7 @@ export function AuraLab(): React.ReactElement {
               pixels, and Aim's 177 does not. A third group dropping to a line of
               its own reads as a third group; splitting the pair so each half
               sits beside a gap reads as a mistake. */}
-          <helix-flex align="center" gap="lg" wrap>
+          <helix-flex align-items="center" gap="lg" wrap>
             {/* Shape and pointer share a line. Nine toggles and five are two
                 short rows rather than one long one, and the shape group is
                 sized to its content instead of the full width so the pointer
@@ -233,7 +233,7 @@ export function AuraLab(): React.ReactElement {
             </helix-toggle-group>
           </helix-flex>
 
-          <helix-flex align="center" class="auraActions" data-density="sm" gap="lg">
+          <helix-flex align-items="center" class="auraActions" data-density="sm" gap="lg">
             <helix-switch
               checked={interactive}
               label="Follow"

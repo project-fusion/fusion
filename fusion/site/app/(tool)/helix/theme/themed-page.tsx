@@ -33,8 +33,8 @@ function Footer(context: Context) {
           row at 320: measured, the pair wanted 287 in a 272 box and the links
           were clipped rather than pushed, so nothing overflowed the page and
           only looking at it found them. */}
-      <helix-flex align="center" gap="md" justify="between" wrap>
-        <helix-flex align="center" gap="xs">
+      <helix-flex align-items="center" gap="md" justify-content="between" wrap>
+        <helix-flex align-items="center" gap="xs">
           <Mark mark={context.mark} />
           <helix-text variant="caption">
             &copy; {company} {new Date().getFullYear()}
@@ -195,7 +195,7 @@ function MarketingPage(context: Context) {
             page as text. `--helix-color-brand-mark` answers to the 3:1 a graphic
             owes rather than the 4.5 a word does, so a reader who picks a color
             can find it here even when every button has moved away from it. */}
-        <helix-flex align="center" gap="xs" slot="start">
+        <helix-flex align-items="center" gap="xs" slot="start">
           <Mark mark={context.mark} />
           <helix-text variant="label">{company}</helix-text>
         </helix-flex>
@@ -220,7 +220,7 @@ function MarketingPage(context: Context) {
             calls to action in one scroll, reading as a page that could not
             decide. Repeating the conversion action in the header is what a
             landing page does, and it leaves the softer one said once. */}
-        <helix-flex align="center" gap="xs" slot="end">
+        <helix-flex align-items="center" gap="xs" slot="end">
           <helix-button emphasis="ghost">Sign in</helix-button>
           <helix-button emphasis="solid" tone="primary">
             {hero.primary}
@@ -230,7 +230,7 @@ function MarketingPage(context: Context) {
 
       <section className="themedHero">
         <helix-flex direction="column" gap="md">
-          <helix-flex align="center" gap="xs">
+          <helix-flex align-items="center" gap="xs">
             <helix-tag emphasis="subtle" tone="accent">
               {hero.badge}
             </helix-tag>
@@ -262,7 +262,7 @@ function MarketingPage(context: Context) {
               punctuation glyph under the calls to action: it read as a bullet
               rather than as a tick. Sized to the text and taking the primary,
               it belongs to the sentence and matches the feature icons below. */}
-          <helix-flex align="center" className="themedAssurance" gap="xs">
+          <helix-flex align-items="center" className="themedAssurance" gap="xs">
             <helix-icon name="check-circle-fill"></helix-icon>
             <helix-text variant="caption">{hero.assurance}</helix-text>
           </helix-flex>
@@ -301,7 +301,7 @@ function MarketingPage(context: Context) {
       <section className="themedSplit">
         <helix-card>
           <helix-flex direction="column" gap="md">
-            <helix-flex align="center" gap="sm" justify="between">
+            <helix-flex align-items="center" gap="sm" justify-content="between">
               <helix-text as="h2" variant="subheading">
                 {table.heading}
               </helix-text>
@@ -338,8 +338,8 @@ function MarketingPage(context: Context) {
                 </helix-table-row>
               ))}
             </helix-table>
-            <helix-flex align="center" gap="sm" justify="between" wrap>
-              <helix-flex align="center" gap="sm">
+            <helix-flex align-items="center" gap="sm" justify-content="between" wrap>
+              <helix-flex align-items="center" gap="sm">
                 <helix-progress value={68}></helix-progress>
                 <helix-text variant="caption">{context.progress}</helix-text>
               </helix-flex>
@@ -387,7 +387,7 @@ function MarketingPage(context: Context) {
           `primary-surface` on the page and therefore the one place
           `foreground-on-accent` is doing real work. */}
       <section className="themedClose">
-        <helix-flex align="center" gap="md" justify="between" wrap>
+        <helix-flex align-items="center" gap="md" justify-content="between" wrap>
           <helix-flex direction="column" gap="2xs">
             <helix-text as="h2" variant="subheading">
               {close.heading}
@@ -416,12 +416,12 @@ function MinimalPage(context: Context) {
   return (
     <div className="themedMinimal">
       <helix-app-header className="themedHeader">
-        <helix-flex align="center" gap="xs" slot="start">
+        <helix-flex align-items="center" gap="xs" slot="start">
           <Mark mark={context.mark} />
           <helix-text variant="label">{company}</helix-text>
         </helix-flex>
 
-        <helix-flex align="center" gap="xs" slot="end">
+        <helix-flex align-items="center" gap="xs" slot="end">
           <helix-button emphasis="ghost">Sign in</helix-button>
         </helix-flex>
       </helix-app-header>
@@ -458,7 +458,7 @@ function MinimalPage(context: Context) {
               punctuation glyph under the calls to action: it read as a bullet
               rather than as a tick. Sized to the text and taking the primary,
               it belongs to the sentence and matches the feature icons below. */}
-          <helix-flex align="center" className="themedAssurance" gap="xs">
+          <helix-flex align-items="center" className="themedAssurance" gap="xs">
             <helix-icon name="check-circle-fill"></helix-icon>
             <helix-text variant="caption">{hero.assurance}</helix-text>
           </helix-flex>
@@ -492,7 +492,7 @@ function WorkspacePage(context: Context) {
   return (
     <div className="themedApp">
       <aside className="themedAppRail">
-        <helix-flex align="center" gap="xs">
+        <helix-flex align-items="center" gap="xs">
           <Mark mark={context.mark} />
           <helix-text variant="label">{company}</helix-text>
         </helix-flex>
@@ -520,7 +520,7 @@ function WorkspacePage(context: Context) {
             only layout with somewhere a signed-in person belongs. It falls back
             to initials from `name`, which is the component's own slot fallback
             rather than anything arranged here. */}
-        <helix-flex align="center" className="themedAppUser" gap="xs">
+        <helix-flex align-items="center" className="themedAppUser" gap="xs">
           <helix-avatar name="Ada Lovelace" size="sm"></helix-avatar>
           <helix-text variant="caption">Ada Lovelace</helix-text>
         </helix-flex>
@@ -533,11 +533,17 @@ function WorkspacePage(context: Context) {
             at 320 the title, the menu and the action ran five pixels past the
             pane, and the actions dropping under the title is what an
             application does at that width. */}
-        <helix-flex align="center" className="themedAppBar" gap="sm" justify="between" wrap>
+        <helix-flex
+          align-items="center"
+          className="themedAppBar"
+          gap="sm"
+          justify-content="between"
+          wrap
+        >
           <helix-text as="h1" variant="subheading">
             {table.heading}
           </helix-text>
-          <helix-flex align="center" gap="xs">
+          <helix-flex align-items="center" gap="xs">
             <helix-menu label="Table actions" placement="bottom-end">
               <helix-icon-button label="Table actions" slot="trigger">
                 <helix-icon name="dots-three"></helix-icon>
@@ -590,8 +596,8 @@ function WorkspacePage(context: Context) {
                   </helix-table-row>
                 ))}
               </helix-table>
-              <helix-flex align="center" gap="sm" justify="between" wrap>
-                <helix-flex align="center" gap="sm">
+              <helix-flex align-items="center" gap="sm" justify-content="between" wrap>
+                <helix-flex align-items="center" gap="sm">
                   <helix-progress value={68}></helix-progress>
                   <helix-text variant="caption">{context.progress}</helix-text>
                 </helix-flex>

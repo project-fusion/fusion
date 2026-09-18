@@ -118,7 +118,7 @@ export function Example() {
           state={done ? 'sent' : 'streaming'}
         >
           <helix-flex
-            align="center"
+            align-items="center"
             gap="xs"
             slot="indicator"
           >

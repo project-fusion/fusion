@@ -1,9 +1,9 @@
 export function Example() {
   return (
     <helix-flex
-      align="center"
+      align-items="center"
       gap="md"
-      justify="between"
+      justify-content="between"
     >
       <helix-pagination-summary
         page={4}

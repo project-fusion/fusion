@@ -25,7 +25,7 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
         {/* Both facts as tags, and toned the way the post's own page tones them:
             the subject carries the brand and the kind of writing stays neutral
             beside it. */}
-        <helix-flex align="center" data-density="sm" gap="sm" slot="header" wrap>
+        <helix-flex align-items="center" data-density="sm" gap="sm" slot="header" wrap>
           <helix-tag tone="primary">{insight.topic}</helix-tag>
           <helix-tag>{insight.kind}</helix-tag>
         </helix-flex>
@@ -42,7 +42,7 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
         {/* A machine-readable date beside the readable one. The card is the only
             place the date appears in a list, so this is where a crawler finds
             it. */}
-        <helix-flex align="center" gap="sm" justify="between" slot="footer">
+        <helix-flex align-items="center" gap="sm" justify-content="between" slot="footer">
           <helix-text emphasis="subtle" variant="caption">
             <time dateTime={insight.date}>{formatDate(insight.date)}</time>
           </helix-text>

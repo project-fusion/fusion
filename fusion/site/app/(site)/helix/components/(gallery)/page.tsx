@@ -106,7 +106,7 @@ export default async function Page({
           >
             <helix-card separation="outlined">
               <ComponentArt slug={family.slug} />
-              <helix-flex align="center" gap="sm" justify="between" slot="header">
+              <helix-flex align-items="center" gap="sm" justify-content="between" slot="header">
                 <helix-text as="h3" variant="title">
                   {family.label}
                 </helix-text>

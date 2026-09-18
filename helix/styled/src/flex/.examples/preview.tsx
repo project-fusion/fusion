@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-flex
-      align="center"
+      align-items="center"
       gap="md"
     >
       <helix-avatar name="Jane Doe"></helix-avatar>

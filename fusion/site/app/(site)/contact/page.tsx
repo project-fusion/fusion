@@ -85,7 +85,7 @@ export default function Page() {
           </helix-text>
           <helix-flex direction="column">
             {NEXT.map((item, index) => (
-              <helix-flex align="start" data-row gap="lg" key={item.name} wrap>
+              <helix-flex align-items="start" data-row gap="lg" key={item.name} wrap>
                 <helix-text emphasis="subtle" variant="label">
                   {String(index + 1).padStart(2, '0')}
                 </helix-text>

@@ -108,7 +108,7 @@ export const ThemeFab = () => {
               than hovered. Each row is `display: contents` above the
               breakpoint, so the bar is unchanged there. */}
           <helix-flex
-            align="center"
+            align-items="center"
             class={styles.fabStack}
             data-density="sm"
             gap="md"

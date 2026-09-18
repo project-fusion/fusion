@@ -25,7 +25,7 @@ export default function DocsIndex() {
        does not line up with its siblings reads as a different kind of page. */
     <main className={docsShell.docsMain}>
       <helix-flex class={styles.head} direction="column" gap="sm">
-        <helix-flex align="center" data-density="sm" gap="xs">
+        <helix-flex align-items="center" data-density="sm" gap="xs">
           <helix-tag>Helix</helix-tag>
         </helix-flex>
         <helix-text as="h1">Docs</helix-text>

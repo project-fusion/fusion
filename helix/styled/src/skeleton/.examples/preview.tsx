@@ -3,7 +3,7 @@ import './preview.css'
 export function Example() {
   return (
     <helix-flex
-      align="center"
+      align-items="center"
       gap="md"
     >
       <helix-skeleton

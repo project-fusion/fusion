@@ -22,7 +22,12 @@ export function PageHero({
       {shell === 'plain' ? (
         children
       ) : (
-        <helix-flex align="center" className={styles.pageHeroInner} direction="column" gap="lg">
+        <helix-flex
+          align-items="center"
+          className={styles.pageHeroInner}
+          direction="column"
+          gap="lg"
+        >
           {children}
         </helix-flex>
       )}

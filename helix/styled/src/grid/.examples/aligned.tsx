@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-grid
-      align="center"
+      align-items="center"
       columns={3}
       gap="md"
     >

@@ -16,7 +16,7 @@ export function Example() {
           Anything can go in here. The panel is in the top layer, so it clears a scrolling parent
           without a z-index.
         </helix-text>
-        <helix-flex justify="end">
+        <helix-flex justify-content="end">
           <helix-button
             command="--close"
             commandfor="details"

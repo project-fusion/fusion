@@ -74,13 +74,13 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
            *               component's default is already for, and restating that default here
            *               would be a number to keep in step with the scale for no gain.
            */}
-          <helix-flex align="center" gap="sm">
+          <helix-flex align-items="center" gap="sm">
             <helix-avatar name={insight.author}></helix-avatar>
             <helix-text variant="caption">{insight.author}</helix-text>
           </helix-flex>
 
           <helix-divider></helix-divider>
-          <helix-flex align="center" gap="md" justify="between" wrap>
+          <helix-flex align-items="center" gap="md" justify-content="between" wrap>
             <helix-text as="h2" variant="title">
               Keep reading
             </helix-text>
@@ -106,9 +106,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
                 href={`/insights/${other.slug}`}
                 key={other.slug}
               >
-                <helix-flex align="center" class={styles.insightNextRow} gap="md" justify="between">
+                <helix-flex
+                  align-items="center"
+                  class={styles.insightNextRow}
+                  gap="md"
+                  justify-content="between"
+                >
                   <helix-flex direction="column" gap="2xs">
-                    <helix-flex align="center" data-density="sm" gap="xs">
+                    <helix-flex align-items="center" data-density="sm" gap="xs">
                       <helix-tag>{other.topic}</helix-tag>
                       <helix-text emphasis="subtle" variant="caption">
                         {other.minutes} min
@@ -144,7 +149,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
          * somewhere is the one that looks like it does, and the date beside it
          * is text rather than a second chip: two chips read as a set of filters
          * and this is one filter and one fact. */
-        <helix-flex align="center" class={styles.insightFiling} gap="sm" wrap>
+        <helix-flex align-items="center" class={styles.insightFiling} gap="sm" wrap>
           <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
             <helix-tag tone="primary">{insight.topic}</helix-tag>
           </Link>

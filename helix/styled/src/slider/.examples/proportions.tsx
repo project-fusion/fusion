@@ -38,7 +38,7 @@ export function Example() {
       </helix-flex>
 
       <helix-flex
-        align="end"
+        align-items="end"
         className="thick"
         gap="2xl"
       >
