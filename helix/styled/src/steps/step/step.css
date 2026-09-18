@@ -24,22 +24,29 @@
  *    its own step's edge and half the gap beyond, so it meets the one coming the
  *    other way in the middle of the gap and the rule reads as continuous without
  *    any step knowing the size of its neighbor.
+ *
+ *    On the step itself rather than in boxes it renders. Every number below is
+ *    a hook the list hands down and none of them is a fact about an element, so
+ *    there was nothing for a box to carry: `Scroll Area` draws its fades the
+ *    same way and for the same reason. Out of flow, so the host's grid still has
+ *    the two items it had.
  */
-[part="lead"],
-[part="trail"] {
+:host::before,
+:host::after {
   background-color: var(--steps-connector-color, var(--helix-color-border));
+  content: "";
   position: absolute;
   z-index: 0;
 }
 
-[part="lead"] {
+:host::before {
   block-size: var(--_steps-lead-block-size, var(--helix-border-thin));
   inline-size: var(--_steps-lead-inline-size, 0);
   inset-block-start: var(--_steps-lead-block-start, 50%);
   inset-inline-start: var(--_steps-lead-inline-start, 0);
 }
 
-[part="trail"] {
+:host::after {
   block-size: var(--_steps-trail-block-size, var(--helix-border-thin));
   inline-size: var(--_steps-trail-inline-size, 0);
   inset-block-start: var(--_steps-trail-block-start, 50%);
@@ -48,8 +55,8 @@
 
 /* Nothing arrives at the first and nothing leaves the last, which a structural
    pseudo-class says with no index and no parent counting its children. */
-:host(:first-child) [part="lead"],
-:host(:last-child) [part="trail"] {
+:host(:first-child)::before,
+:host(:last-child)::after {
   display: none;
 }
 
