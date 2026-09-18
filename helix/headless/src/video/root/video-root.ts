@@ -797,17 +797,6 @@ export class HelixHeadlessVideo extends HelixElement {
     this.position = this.video?.currentTime ?? 0
   }
 
-  /* Relayed, because none of these cross a shadow boundary on their own. The
-     video is inside this element's shadow root, so a consumer listening on the
-     element they wrote hears nothing at all without this. Input relays `change`
-     for the same reason. */
-  /* `emptied` is in the list for a reason worth keeping. Assigning `src` runs
-     the media load algorithm, which stops playback and sets `paused` without
-     firing `pause`: the only events are `emptied` and `loadstart`. Listening for
-     `play` and `pause` alone, this element went on believing it was playing
-     after a playlist pointed it at the next entry, so the start control it draws
-     only when paused stayed hidden and there was nothing at all to press.
-     Measured: `paused` true, `playing` true, no `pause` event in the log. */
   private readonly handleWaiting = (): void => {
     this.buffering = true
   }
@@ -828,6 +817,17 @@ export class HelixHeadlessVideo extends HelixElement {
     this.failed = true
   }
 
+  /* Relayed, because none of these cross a shadow boundary on their own. The
+     video is inside this element's shadow root, so a consumer listening on the
+     element they wrote hears nothing at all without this. Input relays `change`
+     for the same reason. */
+  /* `emptied` is in the list for a reason worth keeping. Assigning `src` runs
+     the media load algorithm, which stops playback and sets `paused` without
+     firing `pause`: the only events are `emptied` and `loadstart`. Listening for
+     `play` and `pause` alone, this element went on believing it was playing
+     after a playlist pointed it at the next entry, so the start control it draws
+     only when paused stayed hidden and there was nothing at all to press.
+     Measured: `paused` true, `playing` true, no `pause` event in the log. */
   private readonly handleState = (event: Event): void => {
     const video = this.video
     this.playing = video ? !video.paused : false
