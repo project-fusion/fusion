@@ -79,6 +79,7 @@ pub mod recipes;
 pub mod redeclared;
 pub mod reflected;
 pub mod reflected_defaults;
+pub mod registry;
 pub mod restated;
 pub mod run;
 pub mod seams;
@@ -715,6 +716,12 @@ pub fn all() -> Vec<Rule> {
             name: "reflected-defaults",
             run: Runner::Source(reflected_defaults::run),
             summary: "a reflected property is silent until something sets it",
+        },
+        Rule {
+            fix: None,
+            name: "registry",
+            run: Runner::Source(registry::run),
+            summary: "every prose copy of the axis registry says what the registry says",
         },
         Rule {
             fix: None,
