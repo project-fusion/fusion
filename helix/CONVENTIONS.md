@@ -1792,6 +1792,42 @@ The naming, which was never about wrappers:
 
   A container holding mixed content is a family for the older reason as well:
   `Toolbar` holds buttons, dropdowns and inputs, and is about none of them.
+- **Two headless bodies that differ by a role string stay two bodies.**
+  `Stat.Group` and `Timeline` are the pair: a `label` property, one `hostAria`
+  call and a bare slot, alike to the line except that one says `group` and the
+  other says `list`. The factoring that removes the duplication is a base class
+  whose only variation point is that string, which buys four lines and costs
+  every reader of either family a second file to open before they know what the
+  element does. A handful of families render a slot and announce themselves, and
+  that they resemble each other is what a tier with nothing to paint looks like
+  rather than a seam waiting to be pulled.
+- **`selected`, `current` and `active` are three states and not three spellings
+  of one.** The platform already tells them apart, and every one of them lands
+  on a different attribute, so a member reaching for the wrong word says
+  something untrue to a screen reader while looking right in the markup.
+
+  `selected` is chosen out of a set, where choosing is the interaction.
+  `Tabs.Tab`, `Tree.Item` and `Radio` carry it and it is `aria-selected`, which
+  is why it needs an owning role that admits selection.
+
+  `current` is where the reader *is*, in a set that has an order or a place,
+  which is true whether or not anybody chose it. `Steps.Step` and
+  `VideoPlaylist.Item` carry it and it is `aria-current`, whose value is a token
+  naming which kind of currency: a step writes `step`, a link in a navigation
+  writes `page`. A tab is chosen and a step is arrived at, which is the whole of
+  the difference.
+
+  `active` on a member is neither. It is the row the keyboard is on, which is
+  the platform's `aria-activedescendant` and a fact about focus rather than
+  about the set: `Option` carries it as `data-active` and the listbox writes it.
+  An option can be active and not selected on every keypress that moves through
+  a list without choosing anything.
+
+  `active` on a root is a fourth thing and a different part of speech.
+  `Tabs.Root` and `Tree.Root` take a string naming which member is chosen, by
+  value, where the three above are booleans on the member. The pair is the
+  library's usual shape, a set's answer named on the set and mirrored onto the
+  one that holds it.
 - **`ref` is typed to the element class**, not `HTMLElement`, or a component's
   imperative methods are unreachable through it. That is the `jsxReactRef`
   plugin's whole job, and it is the one thing `@wc-toolkit/jsx-types` does not do
