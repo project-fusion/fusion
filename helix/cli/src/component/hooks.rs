@@ -101,6 +101,13 @@ static DOCUMENTED: LazyLock<Regex> = LazyLock::new(|| {
 static READS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"var\(\s*(--[a-z0-9-]+)").expect("a literal pattern compiles"));
 
+/// Where a family's class block ends, which is the decorator under it.
+///
+/// One per source file across both tiers, so the first match is the boundary
+/// and nothing after it is read by the analyzer as the element's own.
+static DECLARED: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"@customElement\s*\(").expect("a literal pattern compiles"));
+
 /// A public hook set by a stylesheet, which is a declaration at the start of a
 /// line rather than a `var()` anywhere in one.
 static WRITES: LazyLock<Regex> = LazyLock::new(|| {
@@ -216,6 +223,12 @@ struct Survey {
     /// be read only from another's sheet. This is the same pairing held to one
     /// package.
     touched_in: BTreeMap<String, BTreeSet<String>>,
+    /// Hooks documented below the class block, each with the file saying it.
+    ///
+    /// The analyzer collects `@cssproperty` from the block the element is
+    /// declared on, so one written on a member reaches no reader while this
+    /// rule, which reads the source text, counts it as documented.
+    misplaced: BTreeMap<String, String>,
     /// Public hooks a stylesheet sets, and the first file to do it.
     written: BTreeMap<String, String>,
 }
@@ -258,8 +271,13 @@ fn survey(context: &Context) -> Survey {
             let stylesheet = file.extension().is_some_and(|one| one == "css");
 
             if typescript {
+                let boundary = DECLARED.find(&text).map(|one| one.start());
                 for found in DOCUMENTED.captures_iter(&text) {
                     let name = found[1].to_owned();
+                    let whole = found.get(0).expect("group zero always matches");
+                    if boundary.is_some_and(|at| whole.start() > at) {
+                        survey.misplaced.insert(name.clone(), where_.clone());
+                    }
                     survey.declared.insert(name.clone(), where_.clone());
                     *survey
                         .declared_at
@@ -508,6 +526,15 @@ fn judge(survey: &Survey, context: &Context) -> Vec<Finding> {
                 .to_owned(),
             file: path.clone(),
             message: format!("`{name}` is declared {count} times in one doc block"),
+        });
+    }
+
+    for (name, path) in &survey.misplaced {
+        findings.push(Finding {
+            detail: "The analyzer reads the block the element is declared on, so a hook                      documented on a property is API the reference page never lists, while                      this rule reads the source and pairs it happily."
+                .to_owned(),
+            file: path.clone(),
+            message: format!("documents `{name}` below the class block, where nothing collects it"),
         });
     }
 

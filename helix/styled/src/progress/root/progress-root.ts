@@ -28,6 +28,8 @@ import { styles } from './progress-root.css.js'
  * @cssproperty --progress-color - Fill of the part that is done.
  * @cssproperty --progress-ring-size - Diameter of the ring appearance.
  * @cssproperty --progress-ring-width - Thickness of its stroke.
+ * @cssproperty --progress-size - Thickness of the bar.
+ * @cssproperty --progress-track-color - Fill of the part that is not.
  */
 @customElement('helix-progress')
 export class HelixProgress extends HelixHeadlessProgress {
@@ -49,8 +51,6 @@ export class HelixProgress extends HelixHeadlessProgress {
    * from, so an outline there costs legibility and buys no distinction. `solid`
    * is the resting state and is written by not writing it, per the rule that a
    * reflected property takes no default.
-   * @cssproperty --progress-size - Thickness of the bar.
-   * @cssproperty --progress-track-color - Fill of the part that is not.
    */
   @property({ reflect: true })
   emphasis?: 'subtle'
