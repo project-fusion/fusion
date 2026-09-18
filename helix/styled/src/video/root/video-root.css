@@ -534,16 +534,18 @@
   translate: -50% -50%;
 }
 
-/* The ring that turns. Drawn here rather than by slotting `Loader`, because the
-   headless tier renders this and cannot reach for a styled element without
-   depending on the tier above it. */
-[part="loading-mark"] {
+/* The ring that turns, on the message rather than in it. Drawn here rather than
+   by slotting `Loader`, because a headless page has no styled element to reach
+   for, and drawn on the message because the message is a flex row with a gap:
+   a box rendered for the ring costs that gap on the tier that never paints it. */
+[part="loading"]::before {
   animation: video-spin var(--_video-spin) linear infinite;
   block-size: var(--helix-size-icon-tight);
   border: var(--helix-border-thick) solid
     color-mix(in oklab, var(--helix-color-foreground-media) 30%, transparent);
   border-block-start-color: var(--helix-color-foreground-media);
   border-radius: var(--helix-radii-full);
+  content: "";
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
 }
@@ -558,7 +560,7 @@
    needs to know the picture is waiting, so the words stay and the ring holds
    still: the message was never the spinning. */
 @media (prefers-reduced-motion: reduce) {
-  [part="loading-mark"] {
+  [part="loading"]::before {
     animation: none;
   }
 }
