@@ -97,9 +97,12 @@ interface EyeDropperConstructor {
  * @csspart footer - The row holding the value and the tools.
  * @csspart format - The control that changes the syntax the value is written in.
  * @csspart format-button - The inner control.
- * @csspart grid - The saturation and brightness square.
+ * @csspart grid - The saturation and brightness square. The mark showing where
+ * in the square the color sits is drawn on the square itself, which is
+ * `::part(grid)::after` from a consumer's sheet: the two channels are already
+ * on the square as `--color-picker-saturation` and `--color-picker-brightness`,
+ * so a box would have carried nothing, and this tier ships no CSS.
  * @csspart grid-brightness - The range input for its vertical axis.
- * @csspart grid-handle - The mark showing where in the square the color sits.
  * @csspart grid-saturation - The range input for the square's horizontal axis.
  * @csspart sample - The chip of the current color, which copies it when pressed.
  * @csspart swatch - One preset.
@@ -688,7 +691,6 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
         @pointerdown=${this.handleGridPointer}
         @pointermove=${this.handleGridPointer}
       >
-        <span part="grid-handle" aria-hidden="true"></span>
         <input
           part="grid-saturation"
           type="range"

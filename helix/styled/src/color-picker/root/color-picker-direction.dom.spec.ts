@@ -31,11 +31,21 @@ if (hasLayout()) {
       return host
     }
 
+    /* Where the mark's center sits, in page coordinates. It is the square's own
+       `::after` rather than a box, so there is no rect to read: the computed
+       `left` is used pixels against the square's padding box, and the flip is a
+       percentage of the mark's own width. */
+    const center = (square: HTMLElement): number => {
+      const drawn = getComputedStyle(square, '::after')
+      const width = Number.parseFloat(drawn.width)
+      const flip = drawn.translate.startsWith('50%') ? width / 2 : -width / 2
+      return square.getBoundingClientRect().left + Number.parseFloat(drawn.left) + width / 2 + flip
+    }
+
     test('puts a full color at the left, where the square is saturated', async () => {
       const host = await picker()
-      const grid = (part(host, 'grid') as HTMLElement).getBoundingClientRect()
-      const handle = (part(host, 'grid-handle') as HTMLElement).getBoundingClientRect()
-      expect(Math.abs(handle.left + handle.width / 2 - grid.left)).toBeLessThanOrEqual(1)
+      const square = part(host, 'grid') as HTMLElement
+      expect(Math.abs(center(square) - square.getBoundingClientRect().left)).toBeLessThanOrEqual(1)
     })
 
     test('and a press at the right edge takes the color out', async () => {

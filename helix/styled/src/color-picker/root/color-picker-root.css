@@ -59,12 +59,18 @@
 }
 
 /* Where the color is. Positioned from the two channels, which is the same pair
-   of numbers the two ranges hold: nothing here measures anything. */
-[part="grid-handle"] {
+   of numbers the two ranges hold: nothing here measures anything.
+
+   On the square rather than in it, and that is the whole argument for the mark
+   being paint. Both channels are already properties on the square, so a box
+   rendered to hold the mark would have read them off its own parent and carried
+   nothing of its own. */
+[part="grid"]::after {
   block-size: var(--helix-size-icon-tight);
   border: var(--helix-border-thick) solid var(--helix-color-surface);
   border-radius: var(--helix-radii-full);
   box-shadow: var(--helix-shadow-sm);
+  content: "";
   inline-size: var(--helix-size-icon-tight);
   inset-block-start: calc(100% - var(--color-picker-brightness, 100%));
   inset-inline-start: var(--color-picker-saturation, 100%);
@@ -74,7 +80,7 @@
 }
 
 /* Centered on its point from the other side, the inline start being the right. */
-:host(:dir(rtl)) [part="grid-handle"] {
+:host(:dir(rtl)) [part="grid"]::after {
   translate: 50% -50%;
 }
 
