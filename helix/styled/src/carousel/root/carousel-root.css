@@ -22,7 +22,7 @@
   gap: var(--helix-space-2xs);
 }
 
-/* The block end is the default for both, so they share the row under the slides. */
+/* The bottom is the default for both, so they share the row under the slides. */
 [part="indicators"] {
   grid-area: 3 / 2;
   justify-self: var(--_carousel-indicators-along);
@@ -65,19 +65,19 @@
 }
 
 /* Above the slides. */
-:host([indicator-placement="block-start"]) [part="indicators"] {
+:host([indicator-placement="top"]) [part="indicators"] {
   grid-area: 1 / 2;
   padding-block: var(--helix-space-none) var(--helix-space-sm);
 }
 
-:host([controls-placement="block-start"]) [part="controls"] {
+:host([controls-placement="top"]) [part="controls"] {
   grid-area: 1 / 2;
   padding-block: var(--helix-space-none) var(--helix-space-sm);
 }
 
 /* Beside the slides, where a run of dots becomes a column and the arrows stack. */
-:host([indicator-placement="inline-start"]) [part="indicators"],
-:host([indicator-placement="inline-end"]) [part="indicators"] {
+:host([indicator-placement="start"]) [part="indicators"],
+:host([indicator-placement="end"]) [part="indicators"] {
   align-self: var(--_carousel-indicators-along);
   flex-direction: column;
   justify-self: center;
@@ -85,8 +85,8 @@
   padding-inline: var(--helix-space-none);
 }
 
-:host([controls-placement="inline-start"]) [part="controls"],
-:host([controls-placement="inline-end"]) [part="controls"] {
+:host([controls-placement="start"]) [part="controls"],
+:host([controls-placement="end"]) [part="controls"] {
   align-self: var(--_carousel-controls-along);
   flex-direction: column;
   justify-self: center;
@@ -96,15 +96,15 @@
 
 /* A column beside the slides has nothing to split the edge with, so both center
    there rather than keeping the row's start-and-end pairing. */
-:host([indicator-placement="inline-start"]) [part="indicators"],
-:host([indicator-placement="inline-end"]) [part="indicators"] {
+:host([indicator-placement="start"]) [part="indicators"],
+:host([indicator-placement="end"]) [part="indicators"] {
   --_carousel-indicators-along: center;
 }
 
 /* And over them, for the same reason: an arrow on a photograph belongs at its
    middle unless somebody says otherwise. */
-:host([controls-placement="inline-start"]) [part="controls"],
-:host([controls-placement="inline-end"]) [part="controls"],
+:host([controls-placement="start"]) [part="controls"],
+:host([controls-placement="end"]) [part="controls"],
 :host([controls-placement="overlay"]) [part="controls"] {
   --_carousel-controls-along: center;
 }
@@ -135,22 +135,22 @@
   --_carousel-controls-along: end;
 }
 
-:host([indicator-placement="inline-start"]) [part="indicators"] {
+:host([indicator-placement="start"]) [part="indicators"] {
   grid-area: 2 / 1;
   padding-inline-end: var(--helix-space-sm);
 }
 
-:host([controls-placement="inline-start"]) [part="controls"] {
+:host([controls-placement="start"]) [part="controls"] {
   grid-area: 2 / 1;
   padding-inline-end: var(--helix-space-sm);
 }
 
-:host([indicator-placement="inline-end"]) [part="indicators"] {
+:host([indicator-placement="end"]) [part="indicators"] {
   grid-area: 2 / 3;
   padding-inline-start: var(--helix-space-sm);
 }
 
-:host([controls-placement="inline-end"]) [part="controls"] {
+:host([controls-placement="end"]) [part="controls"] {
   grid-area: 2 / 3;
   padding-inline-start: var(--helix-space-sm);
 }
@@ -486,15 +486,15 @@
 }
 
 /* The current dot stretches along the run, whichever way the run goes. */
-:host([indicator-placement="inline-start"]) [part~="indicator"],
-:host([indicator-placement="inline-end"]) [part~="indicator"] {
+:host([indicator-placement="start"]) [part~="indicator"],
+:host([indicator-placement="end"]) [part~="indicator"] {
   transition:
     background-color var(--_carousel-indicator-motion),
     block-size var(--_carousel-indicator-motion);
 }
 
-:host([indicator-placement="inline-start"]) [part~="indicator"][data-current],
-:host([indicator-placement="inline-end"]) [part~="indicator"][data-current] {
+:host([indicator-placement="start"]) [part~="indicator"][data-current],
+:host([indicator-placement="end"]) [part~="indicator"][data-current] {
   block-size: var(--helix-space-lg);
   inline-size: var(--helix-space-xs);
 }
@@ -578,7 +578,7 @@
  *
  * `:not([*-placement])` on every selector, so a consumer who names an edge
  * still gets it. The two axes are guarded separately because they are set
- * separately: a vertical carousel with `indicator-placement="block-end"` and no
+ * separately: a vertical carousel with `indicator-placement="bottom"` and no
  * `controls-placement` is a real thing to ask for.
  */
 :host([orientation="vertical"]:not([indicator-placement])) [part="indicators"] {
