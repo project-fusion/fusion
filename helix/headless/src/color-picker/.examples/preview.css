@@ -43,12 +43,16 @@ helix-headless-color-picker::part(grid) {
   touch-action: none;
 }
 
-helix-headless-color-picker::part(grid-handle) {
+/* Where the color is, drawn on the square rather than slotted into it. Both
+   channels are already properties on the square, so the tier renders no box for
+   this: a consumer who wants one writes it, and reads the same two numbers. */
+helix-headless-color-picker::part(grid)::after {
   block-size: 1rem;
   border: 2px solid var(--_gray-surface);
   border-radius: 9999px;
   box-shadow: 0 0 0 1px var(--_gray-strong);
   box-sizing: border-box;
+  content: "";
   inline-size: 1rem;
   inset-block-start: calc(100% - var(--color-picker-brightness, 100%));
   inset-inline-start: var(--color-picker-saturation, 100%);
@@ -57,7 +61,7 @@ helix-headless-color-picker::part(grid-handle) {
   translate: -50% -50%;
 }
 
-helix-headless-color-picker:dir(rtl)::part(grid-handle) {
+helix-headless-color-picker:dir(rtl)::part(grid)::after {
   translate: 50% -50%;
 }
 

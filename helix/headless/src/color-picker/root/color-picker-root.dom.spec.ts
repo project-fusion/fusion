@@ -125,9 +125,14 @@ describe('color picker', () => {
     expect(part(host, 'grid')?.getAttribute('role')).toBeNull()
   })
 
-  test('the handle is hidden from the tree, because the ranges are the control', async () => {
+  test('the handle is no box of ours, the square already carrying both channels', async () => {
+    /* Nothing was ever written onto it and nothing read back off it: it sat at
+       the pair of properties the square declares, so a sheet draws it on the
+       square and this tier renders nothing to hide from a reader. */
     const host = await picker()
-    expect(part(host, 'grid-handle')?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(host, 'grid-handle')).toBeNull()
+    expect(part(host, 'grid')?.getAttribute('style')).toContain('--color-picker-saturation')
+    expect(part(host, 'grid')?.getAttribute('style')).toContain('--color-picker-brightness')
   })
 
   test('moving an axis moves the color', async () => {
