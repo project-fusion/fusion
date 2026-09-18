@@ -1895,6 +1895,79 @@ fn reflected_defaults() {
 /// Comments are read rather than blanked, which is the one thing that could
 /// make this report nothing at all, so the fixture's declarations sit where a
 /// component's do, inside a doc block.
+/// The whole registry, which a fixture has to carry because the rule holds a
+/// table to all of it: a copy short of an axis is the fault, so a clean tree
+/// cannot be short of one either. Registering an axis edits this too, which is
+/// the rule proving itself on the way past.
+const REGISTERED: &str = "| Axis | Values |
+|---|---|
+| `emphasis` | `ghost` `muted` `outlined` `solid` `subtle` |
+| `material` | `frosted` `glass` `transparent` |
+| `nesting` | `heading` `peer` `subordinate` |
+| `orientation` | `auto` `horizontal` `vertical` |
+| `separation` | `elevated` `filled` `outlined` `plain` |
+| `shape` | `arc` `circle` `dots` `ring` `rounded` `square` `text` |
+| `size` | `full` `lg` `md` `sm` |
+| `tone` | `accent` `danger` `info` `neutral` `primary` `success` `warning` |
+| `width` | `auto` `full` |
+";
+
+/// The domain is the first segment of a tier path, so the fixture puts its
+/// conventions where a domain's live: the rule finds the prose the way the
+/// `documented` rule does rather than being told about it.
+#[test]
+fn registry() {
+    plant_in(
+        "registry-value",
+        "registry",
+        &[
+            ("helix.json", r#"{ "tiers": ["pkg/styled/src"] }"#),
+            (
+                "pkg/styled/src/card/card.ts",
+                "export class Card extends HTMLElement {}\n",
+            ),
+            ("pkg/CONVENTIONS.md", REGISTERED),
+        ],
+        |tree| {
+            tree.write(
+                "pkg/CONVENTIONS.md",
+                &REGISTERED.replace(
+                    "| `material` | `frosted` `glass` `transparent` |",
+                    "| `material` | `frosted` `glass` `transparent` `matte` |",
+                ),
+            );
+        },
+        "gives `material` the value `matte`, which the axis does not have",
+        "pkg/CONVENTIONS.md",
+    );
+}
+
+/// The other direction, which is the one registering an axis walks into: three
+/// files by hand, and the copy nobody edited says nothing at all.
+#[test]
+fn registry_by_omission() {
+    plant_in(
+        "registry-omission",
+        "registry",
+        &[
+            ("helix.json", r#"{ "tiers": ["pkg/styled/src"] }"#),
+            (
+                "pkg/styled/src/card/card.ts",
+                "export class Card extends HTMLElement {}\n",
+            ),
+            ("pkg/docs/content/axes.mdx", REGISTERED),
+        ],
+        |tree| {
+            tree.write(
+                "pkg/docs/content/axes.mdx",
+                &REGISTERED.replace("| `width` | `auto` `full` |\n", ""),
+            );
+        },
+        "tabulates the axes and leaves out `width`",
+        "pkg/docs/content/axes.mdx",
+    );
+}
+
 #[test]
 fn restated() {
     let card = |parts: &str, slots: &str, events: &str| {
