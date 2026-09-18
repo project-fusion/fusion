@@ -4,8 +4,8 @@ export function Example() {
       default-value="2"
       label="Spice"
       max={4}
+      shape="dots"
       show-value
-      variant="dots"
     ></helix-rating>
   )
 }
