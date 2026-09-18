@@ -69,10 +69,9 @@ describe('deepContains', () => {
  *
  * Document order is the contract. Two lists concatenated, every native element
  * and then every delegating host, is not document order, and the difference is
- * invisible in a set that is all one kind. `FocusTrapController` reads the ends
- * of this list as the boundaries it wraps at, so a surface whose last control
- * is a plain `<button>` has a last that is not last and leaks focus out of the
- * dialog on forward Tab.
+ * invisible in a set that is all one kind. A caller reading the ends of this
+ * list as the boundaries of a surface gets a last that is not last wherever
+ * that surface's final control is a plain `<button>`.
  *
  * **`delegatesFocus` is declared rather than requested.** happy-dom accepts the
  * option to `attachShadow` and reports the flag as false, so a delegating host
@@ -143,7 +142,7 @@ describe('focusableElements', () => {
   /* Visibility is `getClientRects()` rather than `offsetParent`, which is null
      for anything inside a `position: fixed` container. A drawer is exactly
      that, so the `offsetParent` test excluded every control in the thing being
-     trapped. */
+     raised. */
   test('and anything that draws nothing, tested by its boxes rather than its offset parent', () => {
     document.body.innerHTML = '<div id="t"><button id="a">a</button><button id="b">b</button></div>'
     const root = document.getElementById('t') as HTMLElement
