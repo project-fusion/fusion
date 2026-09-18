@@ -64,7 +64,7 @@ export function Overview() {
               a number column is a different thing from a text one. `max-content`
               because a column of numerals has one right width and no reason to
               take a share of anything. */}
-          <helix-table-column align="end" field="reviews" sortable width="max-content">
+          <helix-table-column field="reviews" sortable text-align="end" width="max-content">
             Reviews
           </helix-table-column>
 
