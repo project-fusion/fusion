@@ -504,9 +504,7 @@ draws come out identical.
 value. `href`, `target`, and `rel` reflected on Button until they were told not
 to, which wrote a destination onto a host that is not a link and put a bare
 `target rel` pair into every button ever rendered. The visual axes reflect, and so do
-`variant`, `orientation`, `disabled`, and the `size` that survives under
-[Size and density](#size-and-density), which is where the families keeping it
-are named; the rest do not.
+`variant` and `disabled`; the rest do not.
 
 **Read it the other way as well, which nothing did for months.** The sentence is
 a biconditional and only one side of it was ever enforced: a property a
@@ -687,8 +685,10 @@ declared in `helix/cli/src/component/axes.rs`, which is the registry:
 | `emphasis` | `ghost` `muted` `outlined` `solid` `subtle` |
 | `material` | `frosted` `glass` `transparent` |
 | `nesting` | `heading` `peer` `subordinate` |
+| `orientation` | `auto` `horizontal` `vertical` |
 | `separation` | `elevated` `filled` `outlined` `plain` |
 | `shape` | `arc` `circle` `dots` `ring` `rounded` `square` `text` |
+| `size` | `sm` `md` `lg` `full` |
 | `tone` | `accent` `danger` `info` `neutral` `primary` `success` `warning` |
 | `width` | `auto` `full` |
 
@@ -775,15 +775,18 @@ to get wrong, and one question to ask per region rather than one per element.
   and is never written.
 - **Containers that are dense by nature declare it themselves**: app header,
   toolbar and announcement do, so a control put in one is already right.
-- **`size` survives on avatar, loader and orb**, which are pictures, and on
-  dialog, which is a region. The test is the one above, whether two of these
-  sitting together could legitimately differ in height, and a picture is not a
-  control: an avatar at 24 in a list and 96 on a profile is a different graphic.
-  Dialog argues the other half at its own property and the argument is the same
-  test read from the other end: two dialogs never sit together, one being on
-  screen at a time in the top layer, so it is the region rather than a control
-  in one. A family taking `size` owes an argument of that shape, and anything
-  that cannot make one takes its height from `data-density`.
+- **`size` is the axis for pictures and regions**, never for controls, and the
+  registry holds it so nobody has to remember who is in it. The test is the one
+  above, whether two of these sitting together could legitimately differ in
+  height, and a picture is not a control: an avatar at 24 in a list and 96 on a
+  profile is a different graphic. Dialog argues the other half at its own
+  property and the argument is the same test read from the other end: two
+  dialogs never sit together, one being on screen at a time in the top layer, so
+  it is the region rather than a control in one. A family taking `size` owes an
+  argument of that shape, and anything that cannot make one takes its height
+  from `data-density`. **The list of who carries it is not written down
+  anywhere**, because the three sentences that once enumerated it were wrong
+  about two families each and one of them shipped.
 
 It works through custom properties (`--helix-size-control`,
 `--helix-size-checkbox`, `--helix-size-tag`), which is why it costs no component
@@ -1832,10 +1835,14 @@ viewport. Everything else in here is `@media print` or
   cannot come from a media query. It is a component decision driven by a
   `ResizeObserver`, and it is opted into rather than defaulted on: an
   `orientation="auto"` value keeps the resting state explicit, which is the rule
-  the reflected properties already follow. Splitter and Button Group carry it,
-  and Carousel now carries the same shape under its own name, `per-view="auto"`
-  fitting as many slides as the track holds where a declared four was a bug on a
-  narrow container rather than a style.
+  the reflected properties already follow. Splitter carries it, and Carousel
+  carries the same shape under its own name, `per-view="auto"` fitting as many
+  slides as the track holds where a declared four was a bug on a narrow
+  container rather than a style. **Button Group does not**, and its own block
+  says why: turning a group of buttons is paint, so there is no state to resolve
+  and nothing to observe, and what it needs is a consumer who knows the column
+  is narrow being able to say so. An `auto` is earned by what turning *changes*,
+  not by turning.
 
   **Carousel is also where the third category can be answered in CSS alone**,
   which is worth saying because the rest of this bullet is about why it usually
@@ -1855,8 +1862,8 @@ viewport. Everything else in here is `@media print` or
 **What narrow looks like now, measured rather than asserted.** Every styled
 family was rendered at 390 and at 320 on 25 Aug 2026. At 390 the library is
 clean. At 320 exactly two families overflowed, Button Group by 26 pixels and
-Pagination by 24, and both are fixed: Button Group gained `orientation="auto"`
-and the per-corner Button hooks a stacked group needs to say what it means, and
+Pagination by 24, and both are fixed: Button Group gained `orientation` and the
+per-corner Button hooks a stacked group needs to say what it means, and
 Pagination needed no new API at all, because `siblings` and `boundaries` already
 existed and the default simply asked for one slot more than a 272 pixel row
 holds.
