@@ -268,6 +268,7 @@ export {
 } from './utils/tone-marks/tone-marks.js'
 export {
   dateAsValue,
+  isDateValue,
   numberAsValue,
   timeAsValue,
   valueAsDate,

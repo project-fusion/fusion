@@ -11,6 +11,7 @@ type InputDate = HTMLElement & {
   toggleOpen(): boolean
   updateComplete: Promise<unknown>
   value: string
+  valueAsDate: Date | null
 }
 
 const field = async (attrs = ''): Promise<InputDate> => {
@@ -64,6 +65,18 @@ describe('input date', () => {
     const host = await field()
     await type(host, '2026-08-18')
     expect(picker(host).value).toBe('2026-08-18')
+  })
+
+  /* The shape is not the test. `2026-02-31` matches `YYYY-MM-DD`, and a field
+     that stopped there reported it as whole and handed it to a form while its
+     own `valueAsDate` answered `null`: one element disagreeing with itself
+     about one string. */
+  test('a day the calendar does not have is not a whole date', async () => {
+    const host = await field()
+    await type(host, '2026-02-31')
+    expect(host.value).toBe('2026-02-31')
+    expect(host.valueAsDate).toBeNull()
+    expect(picker(host).value).toBe('')
   })
 
   test('picking a date takes it and shuts the panel', async () => {

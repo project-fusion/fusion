@@ -29,30 +29,11 @@ const KEYS = new Set([
 ])
 
 /**
- * Dates are held as `YYYY-MM-DD` and computed in UTC.
- *
- * A local-time `Date` shifts across a timezone or a daylight-saving boundary,
- * so the same calendar renders a different grid depending on where it is read.
- * Parsing and formatting both in UTC makes the string the source of truth and
- * the arithmetic total.
- */
-const toUtc = (iso: string): Date | null => {
-  const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
-  if (!parts) {
-    return null
-  }
-  const date = new Date(Date.UTC(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3])))
-  return Number.isNaN(date.getTime()) ? null : date
-}
-
-const toIso = (date: Date): string => date.toISOString().slice(0, 10)
-
-/**
  * Today, in the reader's own timezone.
  *
  * **`toISOString` converts to UTC first, which makes "today" a different day
  * for most of the planet.** Anywhere west of UTC, from late afternoon onward,
- * `toIso(new Date())` names tomorrow. The parts are read locally instead and
+ * `fromDate(new Date())` names tomorrow. The parts are read locally instead and
  * pasted together, which is the only way to get a calendar date out of a `Date`
  * without a conversion happening on the way.
  */
@@ -196,7 +177,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
      * getter returning `''` while a month is on display leaves that guard dead:
      * the first arrow key writes `monthState` and from then on the grid stops
      * following `value`. */
-    return this.monthState ?? (this.defaultMonth || toIso(this.derivedMonth).slice(0, 7))
+    return this.monthState ?? (this.defaultMonth || fromDate(this.derivedMonth).slice(0, 7))
   }
 
   set month(next: string) {
@@ -321,7 +302,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * is a stack overflow.
    */
   private get derivedMonth(): Date {
-    const from = toUtc(this.selected[0] ?? '') ?? new Date()
+    const from = asDate(this.selected[0] ?? '') ?? new Date()
     return new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), 1))
   }
 
@@ -340,7 +321,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    */
   private get anchor(): Date {
     const shown = this.shown
-    for (const candidate of [toUtc(this.focused), toUtc(this.selected[0] ?? '')]) {
+    for (const candidate of [asDate(this.focused), asDate(this.selected[0] ?? '')]) {
       if (candidate && sameMonth(candidate, shown)) {
         return candidate
       }
@@ -366,7 +347,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * one that moves.
    */
   private barred(date: Date): boolean {
-    const iso = toIso(date)
+    const iso = fromDate(date)
     if (this.min !== '' && iso < this.min) {
       return true
     }
@@ -419,7 +400,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   private moveTo(date: Date): void {
-    this.focused = toIso(date)
+    this.focused = fromDate(date)
     this.show(date)
     this.updateComplete.then(() => {
       this.renderRoot.querySelector<HTMLElement>('[part~="cell"][tabindex="0"]')?.focus()
@@ -442,7 +423,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     if (this.barred(date)) {
       return
     }
-    const iso = toIso(date)
+    const iso = fromDate(date)
     const held = this.selected
 
     let next: string[]
@@ -725,7 +706,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   private renderMonth(month: Date, index: number): TemplateResult {
     const { full, heading, weekday } = this.formats
     const weeks = this.weeksOf(month)
-    const anchor = toIso(this.anchor)
+    const anchor = fromDate(this.anchor)
     /* Today, marked with `aria-current="date"` in the accessibility tree and as
        `day-today` on the day, so a consumer can add a mark from CSS. Computed
        once per month rather than per cell. */
@@ -780,7 +761,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
         ${weeks.map(
           (week) => html`<div part="week" role="row">
             ${week.map((date) => {
-              const iso = toIso(date)
+              const iso = fromDate(date)
               const disabled = this.barred(date)
               const selected = this.isSelected(iso)
               /* A day from a neighboring month is filler, so the grid is a

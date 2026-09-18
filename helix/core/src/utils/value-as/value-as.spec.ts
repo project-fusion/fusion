@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import {
   dateAsValue,
+  isDateValue,
   numberAsValue,
   timeAsValue,
   valueAsDate,
@@ -27,6 +28,18 @@ describe('a date value', () => {
      exists and a form would submit it. */
   test('is refused where the calendar has no such day, rather than rolled forward', () => {
     expect(valueAsDate('2026-02-31')).toBeNull()
+  })
+
+  /* The predicate exists because the two families that wrote their own got the
+     shape right and the range wrong, in two different ways. */
+  test('and the predicate answers the same, which is why it is derived from it', () => {
+    expect(isDateValue('2026-02-31')).toBe(false)
+    expect(isDateValue('2026-02-28')).toBe(true)
+    expect(isDateValue('2024-02-29')).toBe(true)
+    expect(isDateValue('2026-02-29')).toBe(false)
+    expect(isDateValue('2026-13-01')).toBe(false)
+    expect(isDateValue('2026-8-26')).toBe(false)
+    expect(isDateValue('')).toBe(false)
   })
 
   test('is refused while it is still being typed', () => {

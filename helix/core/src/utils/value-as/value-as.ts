@@ -63,6 +63,18 @@ export const valueAsDate = (value: string): Date | null => {
   return rolled ? null : date
 }
 
+/**
+ * Whether a value names a real day, which is the shape *and* the range.
+ *
+ * The predicate form of the conversion above, here rather than in a family
+ * because a family writing its own gets the shape right and the range wrong.
+ * Two did: one tested `\d{4}-\d{2}-\d{2}` and reported `2026-02-31` as whole
+ * while its own `valueAsDate` answered `null`, and the other guarded
+ * `Number.isNaN(date.getTime())`, which never fires, `Date.UTC(2026, 1, 31)`
+ * being a perfectly good third of March.
+ */
+export const isDateValue = (value: string): boolean => valueAsDate(value) !== null
+
 /** The `YYYY-MM-DD` value for a date, or the empty string, which is how a control says nothing. */
 export const dateAsValue = (date: Date | null): string => {
   if (!date || Number.isNaN(date.getTime())) {

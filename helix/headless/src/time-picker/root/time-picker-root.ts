@@ -15,7 +15,17 @@ import { html } from 'lit/static-html.js'
 import '../../listbox/index.js'
 import '../../option/index.js'
 
-/** Whether a string is a time the rest of this component can reason about. */
+/**
+ * Whether a string is a time the rest of this component can reason about.
+ *
+ * **Narrower than core's `valueAsTime` on purpose, and the difference is
+ * seconds.** That one takes them because `<input type="time">` does, at a step
+ * below a minute. This library has no such step: `step` here is minutes and is
+ * floored at one, so nothing it offers or writes ever carries a second, and
+ * `toMinutes` below would drop one silently if this let it through. Widening
+ * this to the platform's shape would let a value in that the rest of the family
+ * cannot hold.
+ */
 export const isTime = (value: string): boolean => /^([01]\d|2[0-3]):[0-5]\d$/.test(value)
 
 /** Minutes since midnight, or `null` where it is not a time. */
