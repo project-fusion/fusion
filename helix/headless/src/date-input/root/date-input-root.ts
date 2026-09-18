@@ -5,6 +5,7 @@ import {
   dateAsValue as fromDate,
   type HelixBeforeChangeEvent,
   HelixFormElement,
+  isDateValue,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -19,9 +20,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import '../../date-picker/index.js'
 import '../../tag/index.js'
-
-/** Whether a string is a date the rest of this component can reason about. */
-const isIso = (value: string): boolean => /^\d{4}-\d{2}-\d{2}$/.test(value)
 
 /**
  * The dates in a value, which may hold more than one.
@@ -307,12 +305,12 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
    */
   private get picked(): string {
     const held = dates(this.value)
-    return held.length > 0 && held.every(isIso) ? held.join(',') : ''
+    return held.length > 0 && held.every(isDateValue) ? held.join(',') : ''
   }
 
   /** One date, written the way `dateStyle` asks for. */
   private written(date: string): string {
-    if (this.dateStyle === 'iso' || !isIso(date)) {
+    if (this.dateStyle === 'iso' || !isDateValue(date)) {
       return date
     }
     /* UTC, because the dates are UTC throughout: a date parsed in a zone behind
@@ -384,7 +382,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
        gives about a document being edited: normalizing `2026-08-0` would take
        the caret away mid-date. */
     const held = dates(typed)
-    const whole = held.length > 0 && held.every(isIso)
+    const whole = held.length > 0 && held.every(isDateValue)
     this.requestValue(whole ? held.join(',') : typed)
     this.restore()
   }
@@ -395,7 +393,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
       return
     }
     const held = dates(this.value)
-    if (event.key === 'Enter' && isIso(this.draft)) {
+    if (event.key === 'Enter' && isDateValue(this.draft)) {
       event.preventDefault()
       if (!held.includes(this.draft)) {
         this.requestValue([...held, this.draft].join(','))
@@ -458,7 +456,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
        a multiple is any number, so a string comparison against `min` would be
        comparing a bound to a list. */
     const held = dates(this.value)
-    if (held.length > 0 && !held.every(isIso)) {
+    if (held.length > 0 && !held.every(isDateValue)) {
       return this.mode === undefined
         ? 'Enter a date as YYYY-MM-DD.'
         : 'Enter dates as YYYY-MM-DD, separated by commas.'
