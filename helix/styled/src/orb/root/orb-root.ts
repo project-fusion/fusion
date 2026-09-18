@@ -120,12 +120,19 @@ export class HelixOrb extends HelixElement {
   /**
    * Diameter relative to the surrounding text.
    *
+   * **`Loader`'s three steps, because the two are swapped for each other.** An
+   * orb and a spinner are the same job drawn differently, a wait a reader is
+   * looking at, and a product that replaces one with the other should not find
+   * that a step it was writing has stopped existing. `md` is the resting one
+   * and selects nothing, landing on the base rule the way a written resting
+   * value does everywhere else.
+   *
    * Reflected because the stylesheet selects on it. The mesh is chosen from the
    * rendered box rather than from this, so `--orb-size` and a consumer's own
    * `inline-size` get the same treatment as the named steps.
    */
   @property({ reflect: true })
-  size?: 'lg' | 'sm'
+  size?: 'sm' | 'md' | 'lg'
 
   /**
    * What the agent is doing.
