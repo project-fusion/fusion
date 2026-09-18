@@ -90,10 +90,14 @@ helix-headless-radio::part(box) {
   place-items: center;
 }
 
-helix-headless-radio::part(mark) {
+/* The dot, drawn on the circle rather than slotted into it. The tier renders no
+   box for this: a consumer who wants one writes it, and a pseudo-element is the
+   cheapest way to write it. */
+helix-headless-radio::part(box)::after {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
   border-radius: 50%;
+  content: "";
   inline-size: 0.5rem;
   scale: 0;
 }
@@ -106,7 +110,7 @@ helix-headless-radio:state(selected)::part(box) {
   border-color: var(--_gray-strong);
 }
 
-helix-headless-radio:state(selected)::part(mark) {
+helix-headless-radio:state(selected)::part(box)::after {
   scale: 1;
 }
 
