@@ -47,14 +47,18 @@ helix-headless-timeline-item::part(rail) {
   justify-items: center;
 }
 
-helix-headless-timeline-item::part(connector) {
+/* The half of the line above the mark, drawn on the rail like the half below it.
+   The tier renders no box for either: a consumer who wants them writes them. */
+helix-headless-timeline-item::part(rail)::before {
   background-color: var(--_gray-line);
   block-size: 100%;
+  content: "";
+  grid-column: 1;
   grid-row: 1;
   inline-size: 1px;
 }
 
-helix-headless-timeline-item:first-child::part(connector) {
+helix-headless-timeline-item:first-child::part(rail)::before {
   visibility: hidden;
 }
 

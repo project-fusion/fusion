@@ -48,13 +48,14 @@ describe('one timeline entry', () => {
     expect(time?.parentElement).toBe(content?.parentElement as HTMLElement)
   })
 
-  /* The rail is drawn rather than slotted, and it is decoration: a reader being
-     read this entry should hear what happened and when, not that there is a line
-     behind it. */
-  test('hides the line it draws from anyone reading it', async () => {
+  /* The rail is the column the line is drawn in, and the line itself is the
+     sheet's: both halves are `::part(rail)::before` and `::after`, so a reader
+     being read this entry hears what happened and when with nothing in the tree
+     to hide from them. */
+  test('renders the column the line is drawn in, and no box for the line', async () => {
     const host = await entry()
-    expect(part(host, 'connector')?.getAttribute('aria-hidden')).toBe('true')
     expect(part(host, 'rail')).not.toBeNull()
     expect(part(host, 'marker')).not.toBeNull()
+    expect(part(host, 'connector')).toBeNull()
   })
 })

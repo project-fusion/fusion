@@ -25,15 +25,22 @@
    The first entry has nothing above it, and `:host(:first-child)` is the whole
    of knowing that: no index, no counting parent, no script, and true in the
    server's own markup. Hidden rather than removed, so the mark stays on the same
-   line as every other one. */
-[part="connector"] {
+   line as every other one.
+
+   On the rail rather than in it, matching the half below, which has been a
+   pseudo-element all along: the line is paint and this is the tier that paints,
+   and the rail's first row is a cell whether or not anything is rendered into
+   it. */
+[part="rail"]::before {
   background-color: var(--helix-color-border);
   block-size: 100%;
+  content: "";
+  grid-column: 1;
   grid-row: 1;
   inline-size: var(--timeline-rail-size, var(--helix-border-thin));
 }
 
-:host(:first-child) [part="connector"] {
+:host(:first-child) [part="rail"]::before {
   visibility: hidden;
 }
 
@@ -78,7 +85,7 @@
  * pixel.
  *
  * No `background-color` either. One was here to knock the rail out behind the
- * mark, which the split rail already does: the connector is `grid-row: 1`,
+ * mark, which the split rail already does: the half above is `grid-row: 1`,
  * above the mark, and the rail below is offset by the mark's own size, so
  * neither is ever drawn where the mark is. It masked nothing and painted the
  * page's color onto a component that cannot know it is on a page: on a card it
