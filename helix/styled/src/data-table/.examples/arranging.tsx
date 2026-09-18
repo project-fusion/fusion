@@ -32,10 +32,10 @@ export function Example() {
           File
         </helix-table-column>
         <helix-table-column
-          align="end"
           field="size"
           resizable
           sortable
+          text-align="end"
         >
           Size
         </helix-table-column>

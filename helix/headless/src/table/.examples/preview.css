@@ -77,10 +77,10 @@ helix-headless-table-column::part(column) {
   padding-inline-end: 1rem;
 }
 
-helix-headless-table-column[align="center"]::part(column) {
+helix-headless-table-column[text-align="center"]::part(column) {
   justify-content: center;
 }
 
-helix-headless-table-column[align="end"]::part(column) {
+helix-headless-table-column[text-align="end"]::part(column) {
   justify-content: flex-end;
 }

@@ -37,7 +37,7 @@ const markup = ssr(html`<helix-headless-data-table
   sort="name:asc"
 >
   <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
-  <helix-headless-table-column field="size" align="end">Size</helix-headless-table-column>
+  <helix-headless-table-column field="size" text-align="end">Size</helix-headless-table-column>
 </helix-headless-data-table>`)
 
 describe('data table server output', () => {

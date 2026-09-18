@@ -259,7 +259,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The rules handing each column's `align` to the cells under it. One sheet for
+   * The rules handing each column's `text-align` to the cells under it. One sheet for
    * every row this table holds, rewritten in place, so a column changing its
    * edge reaches every row in one write.
    */
@@ -307,7 +307,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
        `DataTable`, which puts the same attribute into the cells it
        draws. */
     const rules = this.tableColumns.flatMap((column, index) => {
-      const edge = edgeOf(column.align)
+      const edge = edgeOf(column.textAlign)
       return edge ? [`::slotted(:nth-child(${index + 1})) { --table-cell-align: ${edge}; }`] : []
     })
     const text = ['::slotted(*) { --table-cell-align: initial; }', ...rules].join('\n')

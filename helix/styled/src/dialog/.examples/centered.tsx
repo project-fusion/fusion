@@ -13,10 +13,10 @@ export function Example() {
       </helix-button>
 
       <helix-dialog
-        align="center"
         id="discard"
         label="Discard changes"
         size="sm"
+        text-align="center"
       >
         <helix-icon
           name="x-circle-fill"

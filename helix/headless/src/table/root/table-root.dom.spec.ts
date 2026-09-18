@@ -81,7 +81,7 @@ describe('a table told about what changed after it drew', () => {
  * A column's edge, handed to the cells under it.
  *
  * **Published and not drawn**, which is this tier's side of it: each cell
- * carries its column's `align` as `--table-cell-align`, and what lining up
+ * carries its column's `text-align` as `--table-cell-align`, and what lining up
  * means is the sheet's that draws the cell. Browser only, since it arrives
  * through a `::slotted()` rule and happy-dom computes no custom property from
  * one.
@@ -96,7 +96,7 @@ describe("a table publishing each column's edge to its cells", () => {
     const host = (await mount(`
       <helix-headless-table label="Deployments">
         <helix-headless-table-column>Service</helix-headless-table-column>
-        <helix-headless-table-column align="end">Count</helix-headless-table-column>
+        <helix-headless-table-column text-align="end">Count</helix-headless-table-column>
         <helix-headless-table-row>
           <helix-headless-table-cell>helix-web</helix-headless-table-cell>
           <helix-headless-table-cell>34${inner}</helix-headless-table-cell>
@@ -142,9 +142,9 @@ describe("a table publishing each column's edge to its cells", () => {
   browser('only as one of the three edges', async () => {
     const host = await aligned()
     const count = host.querySelectorAll('helix-headless-table-column')[1] as Updating & {
-      align?: string
+      textAlign?: string
     }
-    count.setAttribute('align', 'end; } ::slotted(*) { display: none')
+    count.setAttribute('text-align', 'end; } ::slotted(*) { display: none')
     await count.updateComplete
     await settle(host)
     const cells = [...host.querySelectorAll('helix-headless-table-cell')]

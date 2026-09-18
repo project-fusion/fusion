@@ -35,21 +35,6 @@ import { styles } from './dialog-root.css.js'
 @customElement('helix-dialog')
 export class HelixDialog extends HelixHeadlessDialog {
   /**
-   * Which way the panel's contents read.
-   *
-   * One property for the whole panel rather than one per region. The regions are
-   * never mixed in practice: a dialog that asks a short question centers its
-   * mark, its title, its sentence and its buttons together, and a dialog holding
-   * a form runs all four from the start. Three properties would be three ways to
-   * write the same two arrangements, and a fourth way to get one of them wrong.
-   *
-   * Unset is `start` and stays unset, so a reflected default cannot appear on a
-   * host whose server output never had it.
-   */
-  @property({ reflect: true })
-  align?: 'center' | 'start'
-
-  /**
    * How wide the panel is allowed to be.
    *
    * Steps rather than a number, because a dialog's width is a fact about what is
@@ -66,12 +51,36 @@ export class HelixDialog extends HelixHeadlessDialog {
    * rule's own test is whether two of them sitting together could legitimately
    * differ, and it is answering "a ragged row is unwritable". Two dialogs never
    * sit together. One is on screen at a time, in the top layer, and it is the
-   * region rather than a control in one, which is the same reason `Avatar` and
-   * `Spinner` keep theirs. Not `appearance`, which says how a thing reads
-   * rather than how wide it is.
+   * region rather than a control in one, which is the other half of the reason
+   * `Avatar`, `Loader` and `Orb` keep theirs: those are pictures rather than
+   * controls. Not `appearance`, which says how a thing reads rather than how
+   * wide it is.
    */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg' | 'full'
+
+  /**
+   * Which way the panel's contents read.
+   *
+   * **Text alignment, and the name says so.** `Flex` and `Grid` ask the CSS
+   * box-alignment question, where things sit in a container, and they are named
+   * for the properties they mirror; this one is `text-align` on a panel of
+   * prose, and `Table.Column` answers the same question under the same name.
+   * One word for both questions is how a consumer who learned it on a layout
+   * writes it here and gets no error, a value a component does not have leaving
+   * the default in place and looking deliberate.
+   *
+   * One property for the whole panel rather than one per region. The regions are
+   * never mixed in practice: a dialog that asks a short question centers its
+   * mark, its title, its sentence and its buttons together, and a dialog holding
+   * a form runs all four from the start. Three properties would be three ways to
+   * write the same two arrangements, and a fourth way to get one of them wrong.
+   *
+   * Unset is `start` and stays unset, so a reflected default cannot appear on a
+   * host whose server output never had it.
+   */
+  @property({ attribute: 'text-align', reflect: true })
+  textAlign?: 'center' | 'start'
 
   static override styles: CSSResultGroup = styles
 }
