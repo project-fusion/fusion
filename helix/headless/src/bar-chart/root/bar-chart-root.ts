@@ -90,23 +90,12 @@ import '../../tooltip/index.js'
 @customElement('helix-headless-bar-chart')
 export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   /**
-   * Whether the categories run down the side rather than along the bottom.
-   *
-   * Absent is columns. `horizontal` is the one to reach for when the category
-   * names are words rather than dates: a row of long names either overlaps or
-   * turns on its side, and neither is as readable as putting them down the left
-   * where they read normally.
-   */
-  @property({ reflect: true })
-  direction?: 'horizontal'
-
-  /**
    * Which rules are drawn across the plot, if any.
    *
    * Absent draws none. `value` rules the axis the columns are *measured* on,
    * `category` rules the axis they are *arranged* on with one through each
    * group, and `both` draws both. Which of those is horizontal turns with
-   * `direction`, because a rule belongs to an axis and not to a screen edge.
+   * `orientation`, because a rule belongs to an axis and not to a screen edge.
    *
    * **A bare `gridlines` means `value`**, and so does anything unrecognized: an
    * unrecognized value that draws nothing is indistinguishable from the
@@ -148,6 +137,20 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    */
   @property()
   lines?: string
+
+  /**
+   * Whether the categories run down the side rather than along the bottom.
+   *
+   * Absent is columns. `horizontal` is the one to reach for when the category
+   * names are words rather than dates: a row of long names either overlaps or
+   * turns on its side, and neither is as readable as putting them down the left
+   * where they read normally.
+   *
+   * `orientation` and not `orientation`, which `Trend` uses in the same group for
+   * which way a number moved.
+   */
+  @property({ reflect: true })
+  orientation?: 'horizontal'
 
   /**
    * Which series are measured against a scale of their own, by name.
@@ -209,7 +212,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   /**
    * Tells the pointer which way the categories run.
    *
-   * In `willUpdate` because `direction` is a property a consumer can change at
+   * In `willUpdate` because `orientation` is a property a consumer can change at
    * any time, and the controller resolves a reading from whichever axis it was
    * last told about: set once at connect, a chart turned sideways after that
    * goes on reading x and answers with the same row wherever the pointer goes.
@@ -220,7 +223,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    */
   protected override willUpdate(changed: PropertyValues<this>): void {
     super.willUpdate(changed)
-    this.pointer.axis = this.direction === 'horizontal' ? 'block' : 'inline'
+    this.pointer.axis = this.orientation === 'horizontal' ? 'block' : 'inline'
   }
 
   protected override render(): TemplateResult {
@@ -259,11 +262,11 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        instead of out of it. */
     const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
     const range: [number, number] =
-      this.direction === 'horizontal' ? [0, PLOT_HEIGHT] : [PLOT_HEIGHT, 0]
+      this.orientation === 'horizontal' ? [0, PLOT_HEIGHT] : [PLOT_HEIGHT, 0]
     const y = linear(domain, range)
     const floor = y(0)
 
-    const sideways = this.direction === 'horizontal'
+    const sideways = this.orientation === 'horizontal'
     const [second, top] = extent(scaled.size > 0 ? on(own) : [0])
     const other: [number, number] = [Math.min(0, second), Math.max(0, top)]
     const z = scaled.size > 0 ? linear(other, range) : undefined
@@ -319,7 +322,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     floor: number,
     z?: (value: number) => number,
   ): TemplateResult {
-    const sideways = this.direction === 'horizontal'
+    const sideways = this.orientation === 'horizontal'
     const slot = 100 / categories.length
     /* Split first, because the columns share the slot between themselves and a
        line takes none of it. Sized by every series instead, a chart of two
@@ -535,7 +538,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   /**
    * The grid, behind everything, or nothing at all.
    *
-   * Across the measured axis, which turns with `direction`: a rule belongs to
+   * Across the measured axis, which turns with `orientation`: a rule belongs to
    * the axis the bars are measured on and not the one they are arranged on, so
    * columns get horizontal rules and rows get vertical ones. Getting that
    * backwards draws a grid that divides the categories, which are already
@@ -666,7 +669,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     const all = series.flatMap((one) => one.points.map((point) => point.value))
     const [low, high] = extent(all.length > 0 ? all : [0])
     const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
-    const sideways = this.direction === 'horizontal'
+    const sideways = this.orientation === 'horizontal'
     const scale = sideways ? linear(domain, [0, PLOT_HEIGHT]) : linear(domain, [PLOT_HEIGHT, 0])
     const ends = values.map((one) => scale(one))
     const far = sideways ? Math.max(...ends) : Math.min(...ends)

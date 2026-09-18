@@ -25,8 +25,8 @@ export function Example() {
         </tbody>
       </table>
       <helix-bar-chart
-        direction="horizontal"
         for="plans"
+        orientation="horizontal"
       ></helix-bar-chart>
     </helix-flex>
   )
