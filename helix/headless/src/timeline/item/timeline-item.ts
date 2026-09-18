@@ -35,11 +35,14 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * platform can answer, and it answers it at assignment time.
  * @slot time - When it happened, as a reader should see it written.
  *
- * @csspart connector - The line arriving at this entry.
  * @csspart content - What happened, and the time above it.
  * @csspart dot - The mark drawn where nothing was slotted for one.
  * @csspart marker - The mark on the line.
- * @csspart rail - The column holding the mark and the line.
+ * @csspart rail - The column holding the mark and the line. Both halves of the
+ * line are drawn on the rail, which is `::part(rail)::before` and `::after` from
+ * a consumer's sheet: this tier ships no CSS, so a box it renders for one to
+ * paint is an empty child costing whatever the consumer's own layout charges for
+ * a child. `ListItem` measured that.
  * @csspart time - When it happened.
  */
 @customElement('helix-headless-timeline-item')
@@ -100,10 +103,6 @@ export class HelixHeadlessTimelineItem extends HelixElement {
        the top of the entry, which is the time's height on a good day and wrong
        the moment a consumer writes two lines of it. */
     return html`<div part="rail">
-        <div
-          part="connector"
-          aria-hidden="true"
-        ></div>
         ${this.renderMarker()}
       </div>
       ${

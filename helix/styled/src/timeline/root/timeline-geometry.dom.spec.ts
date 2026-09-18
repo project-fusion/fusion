@@ -37,10 +37,9 @@ describe('a timeline, as the stylesheet draws it', () => {
          true in the server's markup before any script runs. */
       const host = await timeline(three)
       const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
-      const seen = entries.map((one) => {
-        const connector = part(one, 'connector') as HTMLElement
-        return getComputedStyle(connector).visibility
-      })
+      const seen = entries.map(
+        (one) => getComputedStyle(part(one, 'rail') as HTMLElement, '::before').visibility,
+      )
       expect(seen).toEqual(['hidden', 'visible', 'visible'])
     })
 
