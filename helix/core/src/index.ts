@@ -34,7 +34,8 @@ export {
   type Placement,
   type Side,
 } from './controllers/floating-controller/floating-controller.js'
-export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
+export { FullscreenController } from './controllers/fullscreen-controller/fullscreen-controller.js'
+export { IdleController } from './controllers/idle-controller/idle-controller.js'
 export {
   IndicatorController,
   type IndicatorOptions,

@@ -1,9 +1,11 @@
 import {
   customElement,
   drawIcon,
+  FullscreenController,
   HelixElement,
   HelixNextEvent,
   HelixPreviousEvent,
+  IdleController,
   onUnlessFalse,
   writtenList,
 } from '@fusion.dev/helix-core'
@@ -42,8 +44,6 @@ import {
   showCaption,
 } from './captions.js'
 import { barControls, type Conditions, menuControls, ownFile } from './extra-controls.js'
-import { FullscreenController } from './fullscreen.js'
-import { IdleController } from './idle.js'
 import { takeKey } from './keys.js'
 import { copiesOf, type MediaCopy, sameCopies } from './media-copy.js'
 import { MediaSessionController, SKIP_SECONDS } from './media-session.js'

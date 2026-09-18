@@ -19,24 +19,22 @@ const NATIVE_FOCUSABLE = [
 /**
  * Everything inside `root` the reader can reach with Tab, in document order.
  *
- * Separate from the focus trap because finding is the half most callers want:
- * roving tabindex, arrow-key navigation and "focus the first thing" all need
- * this list and none of them traps anything.
+ * Roving tabindex, arrow-key navigation and "focus the first thing" all need
+ * this list, which is why it is a utility rather than part of anything that
+ * asks for it.
  *
  * Visibility is tested with `getClientRects()` rather than `offsetParent`,
- * which is null for anything inside a `position: fixed` container. A drawer is
- * exactly that, so the `offsetParent` test excluded every control in the thing
- * being trapped.
+ * which is null for anything inside a `position: fixed` container, so the
+ * `offsetParent` test excluded every control on a raised surface.
  */
 export const focusableElements = (root: HTMLElement): HTMLElement[] =>
   /* One pass asking both questions, rather than two passes concatenated.
    *
    * Two lists joined end to end is not document order: every native element
    * followed by every delegating host comes out `b d a c` for a tree holding
-   * `a b c d`, measured. The trap reads `items[0]` and `items.at(-1)` as its
-   * boundaries, so a surface whose last control is a plain `<button>` and whose
-   * first is a Helix component has a last that is not last, forward Tab off the
-   * real end does not wrap, and focus leaves the dialog.
+   * `a b c d`, measured. A caller reading `items[0]` and `items.at(-1)` as the
+   * ends of a surface gets a last that is not last wherever that surface's
+   * final control is a plain `<button>` and its first is a Helix component.
    *
    * It is invisible in a set that is all one kind, which is what every example
    * and every spec had. A single filtered walk cannot express the fault, and
@@ -67,13 +65,13 @@ export const deepActiveElement = (): Element | null => {
  *
  * `Node.contains` walks `parentNode` and a shadow root's `parentNode` is null,
  * so it answers false for anything inside a component. Paired with
- * `deepActiveElement`, which returns exactly such a node, that pairing is a trap
- * of its own: the two look like they belong together and one of them crosses.
+ * `deepActiveElement`, which returns exactly such a node, the pair is a hazard of
+ * its own: the two look like they belong together and one of them crosses.
  *
  * `contains(deepActiveElement())` is the shape to avoid: focus on a
  * `helix-button` reports as the `<button>` in its shadow root, which is in no
- * light-DOM container anywhere, so a trap written that way reads every reader
- * as already outside it.
+ * light-DOM container anywhere, so a containment test written that way reads
+ * every reader as already outside.
  *
  * `host` is reached without naming `ShadowRoot`, which the server has no global
  * for. This runs from a keydown handler and would never execute there, but a

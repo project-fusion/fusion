@@ -1,12 +1,13 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 
 /**
- * How long the reader has been still, which decides when the bar goes.
+ * How long the reader has been still, which is what an overlay hides itself on.
  *
- * A wait rather than leaving with the pointer, or a reader moving across the
- * picture to reach a control watches the bar vanish under them. The wait is
- * only ever about *idling*: whether a paused video keeps its bar is the
- * element's decision, and this only says when the reader stopped.
+ * A wait rather than leaving with the pointer, or a reader moving across a
+ * surface to reach a control watches the control vanish under them. The wait is
+ * only ever about *idling*: whether anything else keeps the overlay up, a
+ * paused player or an open menu, is the host's decision, and this only says
+ * when the reader stopped.
  *
  * The delay is asked for on every restart rather than taken once, because it
  * is a property the consumer can change while the video plays.

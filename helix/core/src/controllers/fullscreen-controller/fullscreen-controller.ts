@@ -5,6 +5,10 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit'
  *
  * The state follows `fullscreenchange` rather than the request, so a refused
  * request leaves a button that correctly reports "not fullscreen".
+ *
+ * The document, rather than the host, is what the event is read from: the
+ * platform fires it at the document whichever element went full, so a host that
+ * asked and was overruled by another one still hears about it.
  */
 export class FullscreenController implements ReactiveController {
   constructor(
