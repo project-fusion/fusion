@@ -1790,8 +1790,29 @@ The naming, which was never about wrappers:
   same kind of thing, which is why "homogeneous" is not the test: that is a fact
   about the members rather than about the group.
 
+  **That test decides the controls and says nothing about the rest**, which is
+  six of the eight groups in this library, so there are two clauses before it.
+
+  **A group that can only ever hold one family's members is a part of that
+  family. A group that arranges several is nobody's part.** That is `Option`'s
+  own argument for existing, a radio having one kind of owner where an option
+  has many, asked of the group instead of the member. `Button Group` is the one
+  that answers yes: every rule in its sheet is `::slotted(*)` and it works by
+  writing `--button-radius-start` and `--button-radius-end` onto whatever is
+  slotted, which is why `IconButton` documents its own radius as the one a group
+  flattens through that pair. `Avatar.Group`, `Stat.Group`, `Option.Group` and
+  `Notifications.Group` each hold one family's members and nothing else, so each
+  is a part however much API it carries: `Notifications.Group` has a count and a
+  collapsible state and is still a fact about a feed.
+
   A container holding mixed content is a family for the older reason as well:
   `Toolbar` holds buttons, dropdowns and inputs, and is about none of them.
+
+  **What is not the test is how much there is to document.** A facepile is a
+  named pattern with real API and other systems give it a page; it holds
+  avatars, so it is a part, and Avatar's page is where somebody searching for
+  one should land. Systems that page an arrangement helper page all of them,
+  which is a fact about their index rather than about what a component is.
 - **Two headless bodies that differ by a role string stay two bodies.**
   `Stat.Group` and `Timeline` are the pair: a `label` property, one `hostAria`
   call and a bare slot, alike to the line except that one says `group` and the
