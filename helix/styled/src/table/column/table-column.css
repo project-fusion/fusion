@@ -72,13 +72,13 @@
    `text-align`: the words are a flex item as wide as they are, so there is no
    room inside them to align in. `flex-end` is the inline end, so a right-to-left
    table needs nothing more. */
-:host([align="center"]) [part="column"],
-:host([align="center"]) [part="sort"] {
+:host([text-align="center"]) [part="column"],
+:host([text-align="center"]) [part="sort"] {
   justify-content: center;
 }
 
-:host([align="end"]) [part="column"],
-:host([align="end"]) [part="sort"] {
+:host([text-align="end"]) [part="column"],
+:host([text-align="end"]) [part="sort"] {
   justify-content: flex-end;
 }
 

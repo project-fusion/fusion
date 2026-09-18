@@ -24,7 +24,7 @@ beforeAll(async () => {
 const markup = `
   <helix-data-table label="Objects" page-size="2">
     <helix-table-column field="name" sortable>Name</helix-table-column>
-    <helix-table-column field="size" align="end">Size</helix-table-column>
+    <helix-table-column field="size" text-align="end">Size</helix-table-column>
   </helix-data-table>`
 
 const table = async () => {
@@ -89,7 +89,7 @@ describe('a windowed table, where there is layout to window', () => {
   const windowedMarkup = `
     <helix-data-table label="Assets" windowed>
       <helix-table-column field="name" sortable width="14rem">File</helix-table-column>
-      <helix-table-column field="size" align="end">Size</helix-table-column>
+      <helix-table-column field="size" text-align="end">Size</helix-table-column>
     </helix-data-table>`
 
   /* Several cycles rather than one. A measured placement reads the rows it just
@@ -207,7 +207,7 @@ describe('a heading, where there is layout to place it', () => {
     const element = (await mount(`
       <helix-data-table dir="${dir}" label="Objects" style="${style}">
         <helix-table-column field="name" width="12rem">Name</helix-table-column>
-        <helix-table-column field="size" align="end" width="8rem">Size</helix-table-column>
+        <helix-table-column field="size" text-align="end" width="8rem">Size</helix-table-column>
       </helix-data-table>`)) as HTMLElement & {
       rows: readonly Record<string, unknown>[]
       updateComplete: Promise<unknown>
@@ -278,7 +278,7 @@ describe('a hidden column, where there is layout to place the rest', () => {
       <helix-data-table dir="${dir}" label="Objects">
         <helix-table-column field="name" hidden width="12rem">Name</helix-table-column>
         <helix-table-column field="region">Region</helix-table-column>
-        <helix-table-column field="size" align="end" width="6rem">Size</helix-table-column>
+        <helix-table-column field="size" text-align="end" width="6rem">Size</helix-table-column>
       </helix-data-table>`)) as HTMLElement & {
       rows: readonly Record<string, unknown>[]
       updateComplete: Promise<unknown>

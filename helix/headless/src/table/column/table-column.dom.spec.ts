@@ -7,9 +7,9 @@ beforeAll(async () => {
 })
 
 type Column = HTMLElement & {
-  align?: string
   isTableColumn: boolean
   sortable: boolean
+  textAlign?: string
   track: string
   updateComplete: Promise<boolean>
   width: string
@@ -67,16 +67,16 @@ describe('one table column', () => {
   })
 
   /* The heading is placed by whatever sheet draws it, and a sheet reads an
-     attribute. Set as a property, which is how React sets it, an `align` that
-     did not reflect left nothing to select on, so the heading sat at the start
-     over a column of digits at the end. Unset, it writes nothing: a column
-     nobody aligned carries no attribute a server did not send. */
+     attribute. Set as a property, which is how React sets it, an edge that did
+     not reflect left nothing to select on, so the heading sat at the start over
+     a column of digits at the end. Unset, it writes nothing: a column nobody
+     aligned carries no attribute a server did not send. */
   test('says which edge it is set to on its host, however that was set', async () => {
     const host = await column()
-    expect(host.hasAttribute('align')).toBe(false)
-    host.align = 'end'
+    expect(host.hasAttribute('text-align')).toBe(false)
+    host.textAlign = 'end'
     await host.updateComplete
-    expect(host.getAttribute('align')).toBe('end')
+    expect(host.getAttribute('text-align')).toBe('end')
   })
 
   /* The same fault on the next property: a data table's sheet gives a sortable

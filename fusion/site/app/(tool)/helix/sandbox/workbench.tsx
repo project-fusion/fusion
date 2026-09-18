@@ -1073,7 +1073,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
   const examplesPane = (
     <>
-      <helix-flex align="center" class={styles.examplesHeader} data-density="sm" gap="2xs">
+      <helix-flex align-items="center" class={styles.examplesHeader} data-density="sm" gap="2xs">
         <helix-input
           aria-label="Filter examples"
           class={styles.examplesFilter}
@@ -1195,7 +1195,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
          *             breadcrumb repeating it is a second answer to a question nobody
          *             asked twice.
          */}
-        <helix-flex align="center" gap="2xs" slot="start">
+        <helix-flex align-items="center" gap="2xs" slot="start">
           <helix-tooltip content="Menu" placement="bottom">
             <helix-icon-button label="Menu" onClick={() => setMenuOpen(true)}>
               <helix-icon name="list"></helix-icon>
@@ -1209,7 +1209,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
         {/* What is about the site rather than the sandbox: how the whole thing
             looks, and on a phone, the way to the examples. The sandbox's own
             settings are in its toolbar. */}
-        <helix-flex align="center" gap="2xs" slot="end">
+        <helix-flex align-items="center" gap="2xs" slot="end">
           {/* **The palette, which this header did not have and the site's did.**
               A reader in the sandbox could reach nothing without going back to
               the site first, which is the request that opened #128.
@@ -1530,12 +1530,12 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
            *             silent.
            */}
           <helix-dialog
-            align="center"
             label="Change environment"
             onhelix-before-close={confirmClosed}
             open={pendingSyntax !== null}
             ref={confirmSyntax}
             size="sm"
+            text-align="center"
           >
             <helix-icon
               className={styles.dialogWarning}

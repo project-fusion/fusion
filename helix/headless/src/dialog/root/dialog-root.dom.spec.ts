@@ -256,13 +256,13 @@ describe('dialog framing', () => {
   test('centering is one property for the panel, not one per region', async () => {
     // The regions are never mixed: a dialog that asks a short question centers
     // all four together, and one holding a form runs all four from the start.
-    const host = await framed('align="center"')
-    expect(host.getAttribute('align')).toBe('center')
+    const host = await framed('text-align="center"')
+    expect(host.getAttribute('text-align')).toBe('center')
   })
 
   test('unset stays unset, so no default is reflected onto the host', async () => {
     const host = await framed()
-    expect(host.hasAttribute('align')).toBe(false)
+    expect(host.hasAttribute('text-align')).toBe(false)
   })
 })
 

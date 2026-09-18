@@ -213,17 +213,17 @@
 }
 
 /* Centered, and it has to be on the panel rather than on each region. */
-:host([align="center"]) [part="dialog"] {
+:host([text-align="center"]) [part="dialog"] {
   text-align: center;
 }
 
-:host([align="center"]) ::slotted([slot="footer"]) {
+:host([text-align="center"]) ::slotted([slot="footer"]) {
   justify-content: center;
 }
 
 /* A block box is not centered by `text-align`, so the mark is placed rather than
    aligned. */
-:host([align="center"]) ::slotted([slot="icon"]) {
+:host([text-align="center"]) ::slotted([slot="icon"]) {
   margin-inline: auto;
 }
 

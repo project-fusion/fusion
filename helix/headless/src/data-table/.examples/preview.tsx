@@ -45,11 +45,11 @@ export function Example() {
         Region
       </helix-headless-table-column>
       <helix-headless-table-column
-        align="end"
         cell={(row) => bytes(row.size as number)}
         compare={(row) => row.size}
         field="size"
         sortable
+        text-align="end"
         width="6rem"
       >
         Size
