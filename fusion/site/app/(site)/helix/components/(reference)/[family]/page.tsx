@@ -382,7 +382,7 @@ function ElementApi({ element }: { element: Element }) {
        *  The part, not the family and the part: the page has already said the
        *           family name twice above.
        */}
-      <helix-flex align="center" data-density="sm" gap="sm" wrap>
+      <helix-flex align-items="center" data-density="sm" gap="sm" wrap>
         <SectionHeading as="h3" label={element.part || element.label} target={element.tagName}>
           {element.part || element.label}
         </SectionHeading>
@@ -539,9 +539,14 @@ export default async function FamilyDocs({
             {/* Title and its actions on one line. The ellipsis holds everything
                 that is about the *document* rather than about the component, so
                 the one button worth a word of its own keeps it. */}
-            <helix-flex align="center" class={api.docsTitle} gap="md" justify="between">
+            <helix-flex
+              align-items="center"
+              class={api.docsTitle}
+              gap="md"
+              justify-content="between"
+            >
               <helix-text as="h1">{family.label}</helix-text>
-              <helix-flex align="center" data-density="sm" gap="xs">
+              <helix-flex align-items="center" data-density="sm" gap="xs">
                 {/* An anchor, because it leaves the site. The URL is composed
                     here rather than stored: the manifest holds the path and the
                     ref is this site's to choose, which is what lets a versioned
@@ -561,7 +566,7 @@ export default async function FamilyDocs({
             {/* Three facts about the component, in the same register: a tag
                 each, so none of the three reads as a different kind of thing
                 from the other two. */}
-            <helix-flex align="center" data-density="sm" gap="xs" wrap>
+            <helix-flex align-items="center" data-density="sm" gap="xs" wrap>
               {family.status && <helix-tag>{startCase(family.status)}</helix-tag>}
               {family.since && <helix-tag>Since {family.since}</helix-tag>}
               {family.category && <helix-tag>{startCase(family.category)}</helix-tag>}

@@ -151,7 +151,7 @@ export function Landing() {
                   into the header the two sit on one baseline, and a row of
                   cards stretched to a common height has nothing left floating
                   in the middle of it. */}
-              <helix-flex align="baseline" gap="sm" justify="between" slot="header">
+              <helix-flex align-items="baseline" gap="sm" justify-content="between" slot="header">
                 <helix-text as="h3" variant="title">
                   The data view
                 </helix-text>
@@ -169,7 +169,7 @@ export function Landing() {
 
           <Link data-card href="/join">
             <helix-card separation="outlined">
-              <helix-flex align="baseline" gap="sm" justify="between" slot="header">
+              <helix-flex align-items="baseline" gap="sm" justify-content="between" slot="header">
                 <helix-text as="h3" variant="title">
                   The form
                 </helix-text>

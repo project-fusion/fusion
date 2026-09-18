@@ -28,10 +28,22 @@ import { styles } from './grid-root.css.js'
 @customElement('helix-grid')
 export class HelixGrid extends HelixElement {
   /**
-   * Alignment of each cell within its row.
+   * Alignment of each cell within its row, which is `align-items`.
+   *
+   * **Named for the CSS property it sets**, the way `Flex` is, and the same
+   * property on a grid: it places every cell in its row's track rather than
+   * placing the tracks. No `baseline`, which `Flex` offers, because cells in a
+   * row of a grid are boxes of unrelated content and lining their first lines
+   * up is a thing a reader asks for between siblings in a row, not between
+   * cells in a table of them.
+   *
+   * There is no `justifyContent` here for the same reason: the tracks are
+   * `1fr`, so they already fill the row and there is nothing left over to
+   * distribute. `columns`, `min` and `--grid-columns` are how a grid says how
+   * wide its tracks are.
    */
-  @property({ reflect: true })
-  align?: 'start' | 'center' | 'end' | 'stretch'
+  @property({ attribute: 'align-items', reflect: true })
+  alignItems?: 'start' | 'center' | 'end' | 'stretch'
 
   /**
    * Fixed number of equal columns.

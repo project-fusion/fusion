@@ -27,12 +27,12 @@ export function Example() {
           than named: "hold the modifier" is a sentence about a key whose glyph
           differs per reader, and `keys` is what knows which. */}
       <helix-flex
-        align="center"
+        align-items="center"
         gap="sm"
         slot="footer"
       >
         <helix-flex
-          align="center"
+          align-items="center"
           gap="2xs"
         >
           <helix-kbd keys="enter"></helix-kbd>
@@ -44,7 +44,7 @@ export function Example() {
           </helix-text>
         </helix-flex>
         <helix-flex
-          align="center"
+          align-items="center"
           gap="2xs"
         >
           <helix-kbd keys="mod+enter"></helix-kbd>

@@ -7,7 +7,7 @@ export function Example() {
       gap="2xl"
     >
       <helix-flex
-        align="end"
+        align-items="end"
         gap="2xl"
       >
         <helix-slider
@@ -47,7 +47,7 @@ export function Example() {
              that no amount of aligning the row fixes. The hook is the fix, put where
              a length actually belongs. */}
       <helix-flex
-        align="end"
+        align-items="end"
         className="tall"
         gap="2xl"
       >

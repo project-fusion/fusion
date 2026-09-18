@@ -175,7 +175,7 @@ export function InsightBrowser({
         }
         className={styles.insightsHero}
       >
-        <helix-flex align="center" data-density="sm" direction="column" gap="sm">
+        <helix-flex align-items="center" data-density="sm" direction="column" gap="sm">
           <helix-text as="h1">Insights</helix-text>
           <helix-text as="p" className={pageHero.pageHeroLede}>
             The arguments behind what we build, written where they can be checked.
@@ -251,7 +251,7 @@ export function InsightBrowser({
             </helix-select>
           )}
         </helix-flex>
-        <helix-flex align="center" className={filterBar.filterSort} gap="sm">
+        <helix-flex align-items="center" className={filterBar.filterSort} gap="sm">
           {/* The count is announced and not shown. Filtering is a change
                 nothing else reports, so a reader who cannot see the grid shrink
                 needs to be told; a reader who can see it is being told twice. */}

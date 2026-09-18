@@ -64,7 +64,7 @@ export function Example() {
           <helix-text as="h3">Start something</helix-text>
           <helix-text emphasis="muted">The only control here that makes anything new.</helix-text>
           <helix-flex
-            align="center"
+            align-items="center"
             gap="xs"
             slot="actions"
           >
@@ -92,7 +92,7 @@ export function Example() {
           <helix-text as="h3">Narrow it down</helix-text>
           <helix-text emphasis="muted">Filters stack, and the set says how many are on.</helix-text>
           <helix-flex
-            align="center"
+            align-items="center"
             gap="xs"
             slot="actions"
           >
@@ -128,7 +128,7 @@ export function Example() {
             It refreshes itself, but not while you are reading.
           </helix-text>
           <helix-flex
-            align="center"
+            align-items="center"
             gap="xs"
             slot="actions"
           >

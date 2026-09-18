@@ -33,10 +33,25 @@ import { styles } from './flex-root.css.js'
 @customElement('helix-flex')
 export class HelixFlex extends HelixElement {
   /**
-   * Alignment across the direction.
+   * Alignment across the direction, which is `align-items`.
+   *
+   * **Named for the CSS property it sets, because it is that property.** A flex
+   * container is the one place where the box-alignment words are already the
+   * reader's, so a shorter name would be a second vocabulary for something they
+   * can already say, and `align` alone is the word four other families use for
+   * four other questions: `Dialog` and `Table.Column` mean `text-align` by it.
+   *
+   * **It also keeps the name out of the browser's way.** `align` is a legacy
+   * HTML presentational attribute mapped to `text-align` on any element that
+   * carries one, this one included: measured, an invented tag with
+   * `align="center"` computes centered text too, so it is nothing to do with
+   * being a known element. A row that carried it therefore centered the text
+   * inside every field in it, through a hint no rule here declares and none can
+   * see, and the fix is a name the platform has no opinion about rather than a
+   * guard against the hint.
    */
-  @property({ reflect: true })
-  align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
+  @property({ attribute: 'align-items', reflect: true })
+  alignItems?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
 
   /**
    * Whether items run across or down.
@@ -57,10 +72,14 @@ export class HelixFlex extends HelixElement {
   inline = false
 
   /**
-   * Distribution along the direction.
+   * Distribution along the direction, which is `justify-content`.
+   *
+   * Named for the property it sets, the way `alignItems` is. `between` and
+   * `around` drop the `space-` prefix and nothing else does, because those two
+   * are the only values whose CSS spelling is two words.
    */
-  @property({ reflect: true })
-  justify?: 'start' | 'center' | 'end' | 'between' | 'around'
+  @property({ attribute: 'justify-content', reflect: true })
+  justifyContent?: 'start' | 'center' | 'end' | 'between' | 'around'
 
   /**
    * Whether items wrap onto more lines.

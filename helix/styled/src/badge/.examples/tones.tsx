@@ -3,7 +3,7 @@
 export function Example() {
   return (
     <helix-flex
-      align="center"
+      align-items="center"
       gap="lg"
       wrap
     >

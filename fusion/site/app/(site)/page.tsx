@@ -255,7 +255,7 @@ export default function Home() {
          */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <helix-flex align="center" gap="md" justify="between" wrap>
+            <helix-flex align-items="center" gap="md" justify-content="between" wrap>
               <helix-flex direction="column" gap="sm">
                 <Eyebrow>Insights</Eyebrow>
                 <SectionTitle>The arguments, written down</SectionTitle>
@@ -284,7 +284,7 @@ export default function Home() {
                 href={`/insights/${insight.slug}`}
                 key={insight.slug}
               >
-                <helix-flex align="center" data-density="sm" gap="sm" wrap>
+                <helix-flex align-items="center" data-density="sm" gap="sm" wrap>
                   <helix-tag tone="primary">{insight.topic}</helix-tag>
                   <helix-tag>{insight.kind}</helix-tag>
                 </helix-flex>
@@ -300,7 +300,7 @@ export default function Home() {
         </Band>
 
         <section className={styles.closingCard} data-band data-closing data-material="glass">
-          <helix-flex align="center" data-shell direction="column" gap="lg">
+          <helix-flex align-items="center" data-shell direction="column" gap="lg">
             <SectionTitle>Take on the work</SectionTitle>
             <Lede>
               Tell us what you need built. We will say plainly if we are not the right people.
