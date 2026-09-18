@@ -58,7 +58,7 @@ let showing: HelixHeadlessMegamenu | undefined
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  *
- * @cssstate narrow - While the page is under `full-below`, so the panel is a band whether or not one was asked for.
+ * @cssstate narrow - While the page is under `band-below`, so the panel is a band whether or not one was asked for.
  * @cssstate open - While the panel is open, which is when the trigger reads as current.
  */
 @customElement('helix-headless-megamenu')
@@ -88,8 +88,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    * become true long after hydration, and a viewport measured before the first
    * paint is the opposite case. See `MixinControllerOpen` on `open`.
    */
-  @property({ attribute: 'full-below', type: Number })
-  fullBelow = 640
+  @property({ attribute: 'band-below', type: Number })
+  bandBelow = 640
 
   /**
    * The section's name, which names the default trigger and the panel.
@@ -116,19 +116,26 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    * Whether the panel is a card under the trigger or a band across the page.
    *
    * The resting one is the card, hanging off the trigger and as wide as it
-   * needs to be. `full` is the other shape navigations use: a band from edge to
+   * needs to be. `band` is the other shape navigations use: a run from edge to
    * edge under the header, with its contents held to the page's own measure, so
    * a set of destinations too wide to sit under one word gets the whole width
    * to lay out in.
    *
-   * It changes where the panel goes as well as how it looks, which is why this
-   * tier knows about it at all: a band spans the viewport, so there is nothing
-   * to measure it against and nothing to flip or shift to, and the placing pass
-   * is told not to run. Everything else the popover gives, the top layer and
-   * the dismissal, is exactly what such a band needs.
+   * **A band and not a width, which is why the word is not `full`.** It changes
+   * where the panel goes as well as how wide it is, which is why this tier
+   * knows about it at all: a band spans the viewport, so there is nothing to
+   * measure it against and nothing to flip or shift to, and the placing pass is
+   * told not to run. Everything else the popover gives, the top layer and the
+   * dismissal, is exactly what such a band needs. `full` is the registry's word
+   * for a width, and `Button` and `Dialog` are the two families answering that
+   * question; borrowing it here would put a third meaning on it.
+   *
+   * `variant` and not an axis, for the reason the registry gives: a card under
+   * a word and a band under a header are two arrangements this family has, and
+   * no other family is being asked the same question.
    */
   @property({ reflect: true })
-  variant?: 'full'
+  variant?: 'band'
 
   @state()
   private narrow = false
@@ -137,7 +144,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
 
   /** A band, whether because it was asked for or because there is no room. */
   private get banded(): boolean {
-    return this.variant === 'full' || this.narrow
+    return this.variant === 'band' || this.narrow
   }
 
   private readonly handleWidth = (event: MediaQueryListEvent | MediaQueryList): void => {
@@ -149,11 +156,11 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   private watchWidth(): void {
     this.query?.removeEventListener('change', this.handleWidth)
     this.query = undefined
-    if (!(this.fullBelow > 0) || typeof matchMedia !== 'function') {
+    if (!(this.bandBelow > 0) || typeof matchMedia !== 'function') {
       this.narrow = false
       return
     }
-    this.query = matchMedia(`(max-width: ${this.fullBelow - 0.02}px)`)
+    this.query = matchMedia(`(max-width: ${this.bandBelow - 0.02}px)`)
     this.query.addEventListener('change', this.handleWidth)
     this.handleWidth(this.query)
   }
@@ -465,12 +472,12 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
-    if (changed.has('fullBelow')) {
+    if (changed.has('bandBelow')) {
       this.watchWidth()
     }
     /* The one thing the stylesheet cannot work out for itself, since the
        breakpoint is declared up here. In `ElementInternals.states` rather than
-       an attribute, for the reason `full-below` records: this is true on the
+       an attribute, for the reason `band-below` records: this is true on the
        first update on a phone, and the mirror would be a hydration mismatch. */
     this.toggleState('narrow', this.narrow)
     /* A slotted trigger is told the disclosure state, by property.

@@ -104,7 +104,7 @@ helix-megamenu {
 }
 
 /* **The band runs the width of the window and its contents do not.**
-   `variant="full"` is a sheet the whole masthead sits on rather than a card
+   `variant="band"` is a sheet the whole masthead sits on rather than a card
    hanging off one word. It holds two columns, and a grid with room for four
    spreads them to opposite edges with the middle empty.
 
