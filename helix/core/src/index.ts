@@ -279,4 +279,4 @@ export {
   valueAsTime,
 } from './utils/value-as/value-as.js'
 export { writeTime } from './utils/write-time/write-time.js'
-export { writtenList } from './utils/written-list/written-list.js'
+export { writtenList, writtenNumbers } from './utils/written-list/written-list.js'

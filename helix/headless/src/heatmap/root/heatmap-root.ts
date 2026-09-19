@@ -7,11 +7,13 @@ import {
   hostAria,
   MixinChartSource,
   markRegion,
+  writtenList,
+  writtenNumbers,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { fits, numbers, toneOf, words } from './buckets.js'
+import { fits, toneOf } from './buckets.js'
 
 /**
  * @summary A strip of cells colored by how each one went: uptime, contributions, activity.
@@ -425,8 +427,8 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    const bounds = numbers(this.thresholds)
-    const palette = words(this.tones)
+    const bounds = writtenNumbers(this.thresholds)
+    const palette = writtenList(this.tones)
     const cells = this.drawn
 
     return html`<div

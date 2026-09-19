@@ -8,7 +8,7 @@ import {
   PLOT_WIDTH,
   type Point,
   SourceController,
-  writtenList,
+  writtenNumbers,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -21,12 +21,6 @@ import { property } from 'lit/decorators.js'
  * chart's, and this is 32 against that 100.
  */
 const STRIP_HEIGHT = 32
-
-/** The consumer's list, keeping only what is a number. */
-const readValues = (input: string): number[] =>
-  writtenList(input)
-    .map(Number)
-    .filter((one) => Number.isFinite(one))
 
 /**
  * @summary A line with no axes, for the shape of a series beside the number it belongs to.
@@ -191,7 +185,7 @@ export class HelixHeadlessSparkline extends HelixElement {
     const series = this.source.series
     return series.length > 0
       ? (series[0]?.points.map((point) => point.value) ?? [])
-      : readValues(this.values)
+      : writtenNumbers(this.values)
   }
 
   protected override render(): TemplateResult {

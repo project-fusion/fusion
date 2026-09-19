@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { fits, numbers, toneOf, words } from './buckets.js'
+import { fits, toneOf } from './buckets.js'
 
 /**
  * The two calculations a picture cannot check.
@@ -49,22 +49,6 @@ describe('toneOf', () => {
 
   test('fewer tones than bounds keeps the last tone rather than losing the cell', () => {
     expect(toneOf({ value: 900 }, BOUNDS, ['muted', 'info'])).toBe('info')
-  })
-})
-
-describe('parsing', () => {
-  test('commas or spaces, either way', () => {
-    expect(numbers('0, 1,3  6')).toEqual([0, 1, 3, 6])
-    expect(words('muted info,accent')).toEqual(['muted', 'info', 'accent'])
-  })
-
-  test('nonsense is dropped rather than becoming NaN in a comparison', () => {
-    expect(numbers('0, x, 3')).toEqual([0, 3])
-  })
-
-  test('an empty list is empty rather than one empty string', () => {
-    expect(numbers('')).toEqual([])
-    expect(words('  ')).toEqual([])
   })
 })
 
