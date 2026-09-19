@@ -7,6 +7,7 @@ import {
   hostAria,
   MixinChartSource,
   markRegion,
+  searchableById,
   writtenList,
   writtenNumbers,
 } from '@fusion.dev/helix-core'
@@ -251,9 +252,11 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * `MixinCollection` names for a slotted collection, arriving through the one
    * channel that mixin cannot see.
    *
-   * The same shape as `childrenKnown`, asked of a document rather than of a
-   * tree. An id that resolves to nothing in a browser is still known, and still
-   * empty: a `for` naming no table should say so rather than sit blank.
+   * The same shape as `childrenKnown`, asked of a tree that can answer about
+   * ids rather than of one that holds children. An id that resolves to nothing
+   * in a browser is still known, and still empty: a `for` naming no table
+   * should say so rather than sit blank, which is why this asks
+   * `searchableById` and not `elementById`.
    */
   private get sourceKnown(): boolean {
     if (this.for === '') {
@@ -262,8 +265,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     if (this.hydrating) {
       return false
     }
-    const root = this.getRootNode() as Document | ShadowRoot
-    return typeof root.getElementById === 'function'
+    return searchableById(this)
   }
 
   /**

@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { elementById } from '../../utils/element-by-id/element-by-id.js'
 
 /** What the controller needs to know: which element inside is the control. */
 export interface AriaForwardOptions {
@@ -130,7 +131,6 @@ export class AriaForwardController implements ReactiveController {
       this.forwarded.clear()
       this.recorded = target
     }
-    const root = this.host.getRootNode() as Document | ShadowRoot
     for (const [attribute, property] of RELATIONSHIPS) {
       if (!(property in target)) {
         // An engine without element reflection. Nothing to do, and nothing that
@@ -140,7 +140,7 @@ export class AriaForwardController implements ReactiveController {
       }
       const ids = (this.host.getAttribute(attribute) ?? '').split(/\s+/).filter(Boolean)
       const elements = ids
-        .map((id) => root.getElementById?.(id) ?? null)
+        .map((id) => elementById(this.host, id))
         .filter((element): element is HTMLElement => element !== null)
       const reflect = target as unknown as Record<string, Element[] | null>
       if (elements.length > 0) {

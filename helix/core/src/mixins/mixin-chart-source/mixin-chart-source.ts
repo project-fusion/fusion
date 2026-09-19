@@ -126,8 +126,8 @@ export declare class MixinChartSourceInterface {
   /**
    * The id of the table to read.
    *
-   * Resolved through `getRootNode()`, so a chart inside another component's
-   * shadow root names a table in that root rather than in the document. A
+   * Names a table in the same tree, so a chart inside another component's
+   * shadow root reads a table in that root rather than one in the document. A
    * `<table>` or anything built from grid roles, including `helix-table`.
    *
    * **In React this arrives as a property and not as an attribute**, the way
@@ -204,8 +204,8 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     /**
      * The id of the table to read.
      *
-     * Resolved through `getRootNode()`, so a chart inside another component's
-     * shadow root names a table in that root rather than in the document. A
+     * Names a table in the same tree, so a chart inside another component's
+     * shadow root reads a table in that root rather than one in the document. A
      * `<table>` or anything built from grid roles, including `helix-table`.
      *
      * **In React this arrives as a property and not as an attribute**, the way

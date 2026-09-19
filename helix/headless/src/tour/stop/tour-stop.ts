@@ -1,5 +1,6 @@
 import {
   customElement,
+  elementById,
   HelixElement,
   HelixTourAskEvent,
   hostAria,
@@ -147,8 +148,7 @@ export class HelixHeadlessTourStop extends HelixElement {
 
   /** The element this stop is about, or null where the id resolves to nothing. */
   get target(): HTMLElement | null {
-    const scope = this.getRootNode() as Document | ShadowRoot
-    return this.for === '' ? null : (scope.getElementById?.(this.for) ?? null)
+    return this.for === '' ? null : elementById(this, this.for)
   }
 
   private readonly floating = new PopoverController(this, {

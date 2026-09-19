@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { elementById } from '../../utils/element-by-id/element-by-id.js'
 import { type Row, readRows, readSeries, type Series } from '../../utils/read-series/read-series.js'
 
 /** A parse, and the table and edit it was made from. */
@@ -100,8 +101,7 @@ export class SourceController implements ReactiveController {
     if (host.for === '') {
       return null
     }
-    const root = host.getRootNode() as Document | ShadowRoot
-    const found = root.getElementById?.(host.for)
+    const found = elementById(host, host.for)
     if (!found) {
       return null
     }

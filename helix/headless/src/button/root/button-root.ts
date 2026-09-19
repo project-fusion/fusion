@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   customElement,
+  elementById,
   HelixFallbackCommandEvent,
   HelixFormElement,
   supportsInvokers,
@@ -359,16 +360,9 @@ export class HelixHeadlessButton extends HelixFormElement {
       this.commandTarget()
   }
 
-  /**
-   * The element this button commands, or nothing.
-   *
-   * Looked up in the button's own root rather than in the document, so a button
-   * inside somebody else's shadow root finds a target in that same root and not
-   * a coincidence in the page.
-   */
+  /** The element this button commands, or nothing. */
   private commandTarget(): HTMLElement | null {
-    const root = this.getRootNode() as Document | ShadowRoot
-    return this.commandFor ? (root.getElementById?.(this.commandFor) ?? null) : null
+    return this.commandFor ? elementById(this, this.commandFor) : null
   }
 
   /**
