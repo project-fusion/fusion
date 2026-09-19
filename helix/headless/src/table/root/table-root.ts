@@ -1,4 +1,4 @@
-import { customElement, HelixElement, MixinCollection } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, MixinCollection, splitValues } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { edgeOf, type HelixHeadlessTableColumn } from '../column/table-column.js'
@@ -13,6 +13,9 @@ import type { HelixHeadlessTableRow } from '../row/table-row.js'
  * tracks, written out; an automatic one names no count and yields none. Line
  * names go with the track after them.
  *
+ * Everything above the split is a fact about a grid track list rather than
+ * about a value list, which is why only the split itself is shared.
+ *
  * **A track the grid would refuse yields nothing either**, where the platform
  * can say. One invalid track makes the whole `grid-template-columns` invalid,
  * which a grid ignores in silence and draws as one column. That is the failure
@@ -21,27 +24,7 @@ import type { HelixHeadlessTableRow } from '../row/table-row.js'
  * more.
  */
 const tracksOf = (list: string, wanted: number): string[] => {
-  const words: string[] = []
-  let depth = 0
-  let word = ''
-  for (const char of list.trim()) {
-    if (char === '(' || char === '[') {
-      depth += 1
-    } else if (char === ')' || char === ']') {
-      depth -= 1
-    }
-    if (depth === 0 && /\s/.test(char)) {
-      if (word) {
-        words.push(word)
-      }
-      word = ''
-    } else {
-      word += char
-    }
-  }
-  if (word) {
-    words.push(word)
-  }
+  const words = splitValues(list, ' ')
   const valid = (track: string): boolean =>
     typeof CSS === 'undefined' || CSS.supports('grid-template-columns', track)
   const tracks: string[] = []
