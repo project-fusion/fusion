@@ -3,6 +3,7 @@ import {
   customElement,
   HelixElement,
   hostAria,
+  PaintGateController,
   readColor,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
@@ -159,13 +160,33 @@ export class HelixOrb extends HelixElement {
 
   private canvas: HTMLCanvasElement | undefined
   private context: CanvasRenderingContext2D | null = null
-  private motion: MediaQueryList | undefined
-  private visible: IntersectionObserver | undefined
-  private sized: ResizeObserver | undefined
 
-  private frame = 0
-  private running = false
-  private onScreen = false
+  /**
+   * Whether anybody is looking, and the loop that draws for them.
+   *
+   * A context it has not been given and one the browser has taken are both
+   * reasons to draw nothing that the gate cannot see, so they are said here.
+   *
+   * Every frame paints: a settled orb has movement of its own in every state,
+   * and only the gate's own three answers stop it.
+   */
+  private readonly gate = new PaintGateController(this, {
+    canRun: () => !!this.context && !this.lost,
+    onFrame: (delta) => {
+      this.paint(delta)
+    },
+    onMotion: (reduced) => {
+      if (reduced) {
+        this.phase = STILL_PHASE
+        this.morphAt = 0
+        this.paint(0)
+      }
+    },
+    onResize: () => {
+      this.measure()
+      this.paint(0)
+    },
+  })
 
   /** Whether the browser has taken the canvas, as its own two events say. */
   private lost = false
@@ -198,7 +219,6 @@ export class HelixOrb extends HelixElement {
    * rate has no such term.
    */
   private phase = STILL_PHASE
-  private last = 0
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -244,26 +264,16 @@ export class HelixOrb extends HelixElement {
   }
 
   override disconnectedCallback(): void {
+    /* The gate goes down in here, which is what stops the loop and forgets
+       that the orb was ever on screen: a change of state after a removal calls
+       `turn`, which is the one path to `play` that no observer gates. */
     super.disconnectedCallback()
-    this.stop()
-    /* **A detached orb is not on screen**, and the observer that would say so
-       is disconnected on the next line, so it is said here. Left standing, a
-       change of state after the removal played, `turn` being the one path to
-       `play` that no observer gates: a loop with nothing left to stop it. */
-    this.onScreen = false
-    /* Nor has it a box, so a return measures again: a context lost and given
-       back while it was away comes back in its default state, and `measure` is
-       what sets the transform. */
+    /* A detached orb has no box, so a return measures again: a context lost and
+       given back while it was away comes back in its default state, and
+       `measure` is what sets the transform. */
     this.box = 0
     this.canvas?.removeEventListener('contextlost', this.handleLost)
     this.canvas?.removeEventListener('contextrestored', this.handleRestored)
-    this.visible?.disconnect()
-    this.visible = undefined
-    this.sized?.disconnect()
-    this.sized = undefined
-    this.motion?.removeEventListener('change', this.handleMotion)
-    this.motion = undefined
-    document.removeEventListener('visibilitychange', this.handleVisibility)
   }
 
   /* Everything the canvas needs, in one place both lifecycles can reach.
@@ -305,26 +315,7 @@ export class HelixOrb extends HelixElement {
       canvas.toggleAttribute('hidden', false)
     }
 
-    this.motion ??= window.matchMedia('(prefers-reduced-motion: reduce)')
-    this.motion.addEventListener('change', this.handleMotion)
-
-    this.visible ??= new IntersectionObserver(([entry]) => {
-      this.onScreen = entry?.isIntersecting ?? false
-      if (this.onScreen && document.visibilityState !== 'hidden') {
-        this.play()
-      } else {
-        this.stop()
-      }
-    })
-    this.visible.observe(this)
-
-    document.addEventListener('visibilitychange', this.handleVisibility)
-
-    this.sized ??= new ResizeObserver(() => {
-      this.measure()
-      this.paint(0)
-    })
-    this.sized.observe(this)
+    this.gate.watch()
 
     this.measure()
     this.paint(0)
@@ -358,9 +349,9 @@ export class HelixOrb extends HelixElement {
     this.from = this.paramsNow()
     this.reach = stateDistance(this.from, paramsFor(this.state))
     this.morphAt = performance.now()
-    if (!this.running) {
+    if (!this.gate.running) {
       this.paint(0)
-      this.play()
+      this.gate.play()
     }
   }
 
@@ -390,43 +381,6 @@ export class HelixOrb extends HelixElement {
     return blendStaged(this.from, to, smoother(k), smoother(Math.max(0, k - TRAIL) / (1 - TRAIL)))
   }
 
-  private play(): void {
-    if (this.running || this.motion?.matches || !this.onScreen || this.lost) {
-      return
-    }
-    this.running = true
-    this.last = performance.now()
-    this.frame = requestAnimationFrame(this.tick)
-  }
-
-  private stop(): void {
-    this.running = false
-    cancelAnimationFrame(this.frame)
-  }
-
-  private readonly tick = (): void => {
-    if (!this.running) {
-      return
-    }
-    const now = performance.now()
-    /* Clamped, because a tab that was throttled and came back hands the first
-       frame a delta of several seconds, and the wave would jump. */
-    const dt = Math.min(0.05, (now - this.last) / 1000 || 0.016)
-    this.last = now
-    this.paint(dt)
-    /* A settled orb still draws: every state has movement of its own, and only
-       `prefers-reduced-motion` and leaving the screen stop it. */
-    this.frame = requestAnimationFrame(this.tick)
-  }
-
-  private readonly handleVisibility = (): void => {
-    if (document.visibilityState === 'hidden') {
-      this.stop()
-    } else {
-      this.play()
-    }
-  }
-
   /**
    * Stops for a canvas the browser has taken, on a GPU reset, until it is
    * given back.
@@ -439,7 +393,7 @@ export class HelixOrb extends HelixElement {
    */
   private readonly handleLost = (): void => {
     this.lost = true
-    this.stop()
+    this.gate.stop()
     this.canvas?.toggleAttribute('hidden', true)
   }
 
@@ -458,18 +412,7 @@ export class HelixOrb extends HelixElement {
     this.box = 0
     this.measure()
     this.paint(0)
-    this.play()
-  }
-
-  private readonly handleMotion = (): void => {
-    if (this.motion?.matches) {
-      this.stop()
-      this.phase = STILL_PHASE
-      this.morphAt = 0
-      this.paint(0)
-    } else {
-      this.play()
-    }
+    this.gate.play()
   }
 
   /**
@@ -485,7 +428,7 @@ export class HelixOrb extends HelixElement {
     if (!ctx || size <= 0) {
       return
     }
-    const still = this.motion?.matches ?? false
+    const still = this.gate.reduced
     const params = still ? paramsFor(this.state) : this.paramsNow()
     this.phase += dt * params.rate
 
