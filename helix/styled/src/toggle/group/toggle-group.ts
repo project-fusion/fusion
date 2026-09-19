@@ -44,6 +44,12 @@ export class HelixToggleGroup extends HelixHeadlessToggleGroup {
    * group's own ground, exactly as a Card's is; the track's sunken fill stays
    * either way, being a groove for the thumb to sit in rather than a way of
    * being seen.
+   *
+   * **The track itself is not on this axis, and `Tabs` reaches the same one
+   * from the other side.** There it is `variant="segmented"`, opted into,
+   * because a row of tabs is a row until asked; here it is the resting state,
+   * because a group of toggles is one control. Same groove, opposite polarity,
+   * and what decides the polarity is which reading is ordinary for the family.
    */
   @property({ reflect: true })
   separation?: 'outlined' | 'plain'

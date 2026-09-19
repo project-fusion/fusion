@@ -57,6 +57,18 @@ export class HelixHeadlessToast extends HelixElement {
    * toasts is a fact about the page: a stack whose members disagreed about
    * where they were would not be a stack.
    *
+   * **Six corners in one word, where `Carousel` splits the same question in
+   * two.** That family takes a placement and an alignment, and argues at its own
+   * declaration that one attribute naming both facts multiplies rather than
+   * composing. It is right there and wrong here, and the difference is the
+   * shape of the product. A carousel's is ragged: its `overlay` belongs to no
+   * edge at all, and its two groups of chrome move independently, shipping
+   * different defaults so they do not land on each other, which is what makes
+   * rewriting one to move the other a real cost. A stack's is two edges by
+   * three alignments, every pair real and every pair named this way by every
+   * toast a reader has already met. Fusing spells the domain out and loses
+   * nothing; a stack has one position and takes it once.
+   *
    * **Optional, and bottom-end is the absence of it.** Reflecting *and*
    * defaulting is the pair that writes onto a host: every toast region anybody
    * rendered would gain a `placement="bottom-end"` nobody typed, which a React
