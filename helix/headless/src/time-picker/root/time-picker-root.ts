@@ -5,6 +5,9 @@ import {
   type HelixBeforeChangeEvent,
   HelixFormElement,
   MixinControllerValue,
+  minutesAsValue,
+  valueAsMinutes,
+  writeTime,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -14,61 +17,6 @@ import { html } from 'lit/static-html.js'
    asks for. */
 import '../../listbox/index.js'
 import '../../option/index.js'
-
-/**
- * Whether a string is a time the rest of this component can reason about.
- *
- * **Narrower than core's `valueAsTime` on purpose, and the difference is
- * seconds.** That one takes them because `<input type="time">` does, at a step
- * below a minute. This library has no such step: `step` here is minutes and is
- * floored at one, so nothing it offers or writes ever carries a second, and
- * `toMinutes` below would drop one silently if this let it through. Widening
- * this to the platform's shape would let a value in that the rest of the family
- * cannot hold.
- */
-export const isTime = (value: string): boolean => /^([01]\d|2[0-3]):[0-5]\d$/.test(value)
-
-/** Minutes since midnight, or `null` where it is not a time. */
-export const toMinutes = (value: string): number | null => {
-  if (!isTime(value)) {
-    return null
-  }
-  const [hours = '0', minutes = '0'] = value.split(':')
-  return Number(hours) * 60 + Number(minutes)
-}
-
-/** Minutes since midnight back to `HH:mm`, which is the value shape throughout. */
-export const fromMinutes = (minutes: number): string => {
-  const whole = ((Math.round(minutes) % 1440) + 1440) % 1440
-  return `${String(Math.floor(whole / 60)).padStart(2, '0')}:${String(whole % 60).padStart(2, '0')}`
-}
-
-/**
- * A time written the way the reader's locale writes one.
- *
- * `Intl` decides between a twelve and a twenty-four hour clock, because that is
- * a property of the locale rather than of this component: `en-US` gets
- * `2:30 PM` and `en-GB` gets `14:30` without either being configured. There is
- * no flag to force one, deliberately. A product that needs to override its
- * reader's own convention has a locale problem rather than a component one, and
- * the value is 24 hour regardless.
- */
-export const writeTime = (value: string, locale?: string): string => {
-  const minutes = toMinutes(value)
-  if (minutes === null) {
-    return value
-  }
-  const at = new Date(Date.UTC(2000, 0, 1, Math.floor(minutes / 60), minutes % 60))
-  /* `timeStyle` rather than `hour` and `minute` assembled by hand. Measured in
-     Chrome: `hour: 'numeric'` gives `9:00` for `en-GB`, unpadded, which is not
-     how a twenty-four hour clock is written, while `hour: '2-digit'` gives
-     `09:00 AM` for `en-US`, which is not how a twelve hour one is. `short` is
-     each locale's own answer: `09:00` and `9:00 AM`. */
-  return new Intl.DateTimeFormat(locale || undefined, {
-    timeStyle: 'short',
-    timeZone: 'UTC',
-  }).format(at)
-}
 
 /**
  * Whether the reader's locale writes times on a twelve hour clock.
@@ -268,8 +216,8 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * this is the reading that makes it behave.
    */
   private get times(): number[] {
-    const from = toMinutes(this.min) ?? 0
-    const to = toMinutes(this.max) ?? 1439
+    const from = valueAsMinutes(this.min) ?? 0
+    const to = valueAsMinutes(this.max) ?? 1439
     const step = Math.max(1, Math.round(this.step))
     const found: number[] = []
     for (let at = from; at <= to; at += step) {
@@ -306,13 +254,13 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   private wholeHourBarred(shown: number, half?: 'AM' | 'PM'): boolean {
     const whole = half === undefined ? shown : (shown % 12) + (half === 'PM' ? 12 : 0)
     const within = this.times.filter((at) => Math.floor(at / 60) === whole)
-    return within.length > 0 && within.every((at) => this.barred(fromMinutes(at)))
+    return within.length > 0 && within.every((at) => this.barred(minutesAsValue(at)))
   }
 
   /** Whether every offered time in a half of the clock is barred. */
   private halfBarred(half: 'AM' | 'PM'): boolean {
     const within = this.times.filter((at) => (half === 'PM') === at >= 720)
-    return within.length > 0 && within.every((at) => this.barred(fromMinutes(at)))
+    return within.length > 0 && within.every((at) => this.barred(minutesAsValue(at)))
   }
 
   /** The times held, which is a list whether or not a mode is set. */
@@ -391,7 +339,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   /** The three readings a wheel shows, from the value or from `min`. */
   private get parts(): { hour: number; meridiem: 'AM' | 'PM'; minute: number } {
-    const at = toMinutes(this.value) ?? toMinutes(this.min) ?? 0
+    const at = valueAsMinutes(this.value) ?? valueAsMinutes(this.min) ?? 0
     const hour = Math.floor(at / 60)
     return { hour, meridiem: hour < 12 ? 'AM' : 'PM', minute: at % 60 }
   }
@@ -422,7 +370,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
        options is not enough on its own: a reader on 09:00 who moves the hour to
        10 lands on 10:00, and 10:00 can be barred while nothing in the hour
        column was. */
-    const whole = fromMinutes(next)
+    const whole = minutesAsValue(next)
     if (this.barred(whole)) {
       return
     }
@@ -736,7 +684,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
         this.minutes.map(String),
         (one) => one.padStart(2, '0'),
         String(minute),
-        (one) => this.barred(fromMinutes(hour * 60 + Number(one))),
+        (one) => this.barred(minutesAsValue(hour * 60 + Number(one))),
       )}
       ${
         twelve
@@ -778,7 +726,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       @input=${this.handleListInput}
     >
       ${this.times.map((minutes) => {
-        const at = fromMinutes(minutes)
+        const at = minutesAsValue(minutes)
         const between = this.between(at)
         return html`<${this.tag('option')}
           part="option${between ? ' option-between' : ''}"

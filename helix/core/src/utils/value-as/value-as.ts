@@ -123,6 +123,38 @@ export const timeAsValue = (date: Date | null): string => {
 }
 
 /**
+ * The minutes since midnight an `HH:mm` value names, or `null`.
+ *
+ * **Minute precision, which is narrower than `valueAsTime` above and is meant
+ * to be.** That one takes seconds because `<input type="time">` does at a step
+ * below a minute. This library's time controls have no such step: theirs is in
+ * minutes and floored at one, so nothing they offer or write ever carries a
+ * second, and a value that did would lose it here silently. Two readings of one
+ * string, and a control picks the one it can hold.
+ */
+export const valueAsMinutes = (value: string): number | null => {
+  const parts = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value)
+  if (!parts) {
+    return null
+  }
+  return Number(parts[1]) * 60 + Number(parts[2])
+}
+
+/**
+ * Minutes since midnight as `HH:mm`, wrapping rather than running off the day.
+ *
+ * A step past midnight is the next morning, which is what a list of offered
+ * times does at its end and what an arrow key does at either.
+ */
+export const minutesAsValue = (minutes: number): string => {
+  const whole = ((Math.round(minutes) % 1440) + 1440) % 1440
+  return `${String(Math.floor(whole / 60)).padStart(2, '0')}:${String(whole % 60).padStart(2, '0')}`
+}
+
+/** Whether a value is a time these controls can hold, which is minute precision. */
+export const isTimeValue = (value: string): boolean => valueAsMinutes(value) !== null
+
+/**
  * The number a value holds, or `NaN`.
  *
  * `Number('')` is zero, which is the trap: an empty control would report a
