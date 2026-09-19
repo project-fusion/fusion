@@ -22,3 +22,20 @@
  */
 export const writtenList = (source: string | undefined): string[] =>
   (source ?? '').split(/[\s,]+/).filter((one) => one !== '')
+
+/**
+ * The same list read as numbers, with everything that is not one dropped.
+ *
+ * **A stray entry leaves rather than becoming `NaN`.** A comparison against
+ * `NaN` is false in both directions and a `NaN` drawn is nothing at all, so one
+ * mistyped bound in `thresholds="0, 1, x, 6"` would color cells by a rule no
+ * reader can see. Dropped, the rest of the list still means what it says.
+ *
+ * **Which numbers count is the caller's question.** Finiteness is all this can
+ * answer, because a number that makes sense here is a bound, a reading and a
+ * playback rate, and only the caller knows that a rate of zero is not a rate.
+ */
+export const writtenNumbers = (source: string | undefined): number[] =>
+  writtenList(source)
+    .map(Number)
+    .filter((one) => Number.isFinite(one))

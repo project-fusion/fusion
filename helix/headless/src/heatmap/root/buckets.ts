@@ -8,8 +8,6 @@
  * screenshot of a strip.
  */
 
-import { writtenList } from '@fusion.dev/helix-core'
-
 /** A reading, reduced to what the bucketing needs. */
 export interface Reading {
   tone?: string | undefined
@@ -51,15 +49,6 @@ export const toneOf = (
   }
   return chosen
 }
-
-/** A consumer's list of numbers, in the order written, with the rest dropped. */
-export const numbers = (source: string): number[] =>
-  writtenList(source)
-    .map(Number)
-    .filter((one) => Number.isFinite(one))
-
-/** A consumer's list of names, in the order written. */
-export const words = (source: string): string[] => writtenList(source)
 
 /**
  * How many readings fit across a given width, and which ones they are.

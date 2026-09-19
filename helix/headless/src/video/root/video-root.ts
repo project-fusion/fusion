@@ -21,6 +21,7 @@ import {
   sameCopies,
   showCaption,
   writtenList,
+  writtenNumbers,
 } from '@fusion.dev/helix-core'
 import {
   airplay,
@@ -960,9 +961,9 @@ export class HelixHeadlessVideo extends HelixElement {
 
   /** Steps through the speeds offered, which is what one button can do. */
   private cycleSpeed(): void {
-    const speeds = writtenList(this.speeds)
-      .map(Number)
-      .filter((one) => one > 0)
+    /* A playback rate of zero is not a rate, which is video's own fact and not
+       the utility's. */
+    const speeds = writtenNumbers(this.speeds).filter((one) => one > 0)
     const video = this.video
     if (!video || speeds.length === 0) {
       return
