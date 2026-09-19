@@ -16,6 +16,8 @@ export interface Conditions {
   hydrating: boolean
   /** Whether anything on the network has offered to play this. */
   remote: boolean
+  /** Whether the consumer has refused picture in picture on the element. */
+  refusedPip: boolean
   /** Whether a file is named, which is what a download needs. */
   source: boolean
 }
@@ -26,7 +28,17 @@ export const offers = (one: string, player: Conditions): boolean => {
      ask, so it offered none, and a render that differs is a template Lit
      throws on. The update after hydration asks. */
   if (one === 'pip') {
-    return !player.hydrating && typeof document !== 'undefined' && document.pictureInPictureEnabled
+    /* `disablePictureInPicture` is asked as well as the platform's own flag,
+       because the two refuse from opposite ends and only one of them was read.
+       A player carrying the attribute draws a button whose every press is
+       rejected: the platform says no, the control is there anyway, and nothing
+       tells the reader. */
+    return (
+      !player.hydrating &&
+      !player.refusedPip &&
+      typeof document !== 'undefined' &&
+      document.pictureInPictureEnabled
+    )
   }
   /* Availability, not support. A device that can play this has to exist for
      the button to mean anything: an AirPlay control with nothing to send to
