@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { isRtl } from '../../utils/is-rtl/is-rtl.js'
 
 /**
  * What an indicator needs to know, asked for rather than assumed.
@@ -169,7 +170,7 @@ export class IndicatorController implements ReactiveController {
     /* `clientLeft` and `clientTop` are the resolved border widths, which is the
        difference between the border box the measurement gives and the padding
        box the mark is placed against. */
-    const rtl = getComputedStyle(surface).direction === 'rtl'
+    const rtl = isRtl(surface)
     const inline = rtl
       ? own.right - box.right - surface.clientLeft
       : box.left - own.left - surface.clientLeft

@@ -9,6 +9,7 @@ import {
   HelixFormElement,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
+  isRtl,
   MixinControllerValue,
   parseColor,
   splitValues,
@@ -461,7 +462,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
        left. The pointer is physical, so it is turned here, where the handle and
        the saturation range are logical already. */
     const fromLeft = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width))
-    const across = getComputedStyle(grid).direction === 'rtl' ? 1 - fromLeft : fromLeft
+    const across = isRtl(grid) ? 1 - fromLeft : fromLeft
     const down = Math.min(1, Math.max(0, (event.clientY - box.top) / box.height))
     this.move({ brightness: Math.round((1 - down) * 100), saturation: Math.round(across * 100) })
   }

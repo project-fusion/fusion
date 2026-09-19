@@ -3,6 +3,7 @@ import {
   customElement,
   HelixFormElement,
   holdCaret,
+  isRtl,
   MixinControllerValue,
   MixinField,
   restoreValue,
@@ -235,7 +236,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     }
     const data = new FormData()
     data.append(this.name, this.value)
-    data.append(this.dirName, getComputedStyle(control).direction === 'rtl' ? 'rtl' : 'ltr')
+    data.append(this.dirName, isRtl(control) ? 'rtl' : 'ltr')
     return data
   }
 
