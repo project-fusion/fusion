@@ -60,6 +60,11 @@ export {
   SKIP_SECONDS,
 } from './controllers/media-session-controller/media-session-controller.js'
 export {
+  MAX_FRAME_STEP,
+  PaintGateController,
+  type PaintGateOptions,
+} from './controllers/paint-gate-controller/paint-gate-controller.js'
+export {
   PopoverController,
   type PopoverOptions,
 } from './controllers/popover-controller/popover-controller.js'

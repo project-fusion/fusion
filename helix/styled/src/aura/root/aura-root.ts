@@ -1,6 +1,8 @@
 import {
   customElement,
   HelixElement,
+  MAX_FRAME_STEP,
+  PaintGateController,
   type TokenColor,
   TokenColorController,
 } from '@fusion.dev/helix-core'
@@ -329,9 +331,7 @@ export class HelixAura extends HelixElement {
     stencil: false,
   }
 
-  private frame = 0
   private elapsed = 0
-  private last = 0
   private width = 0
   private height = 0
 
@@ -374,14 +374,32 @@ export class HelixAura extends HelixElement {
   private readonly target = { presence: 0, x: 0, y: 0 }
   private readonly eased = { presence: 0, x: 0, y: 0 }
 
-  private motion: MediaQueryList | undefined
-  private visible: IntersectionObserver | undefined
-
   /**
-   * What the intersection observer last said, kept because it says so only on
-   * a change: every other path to `play` has to ask it.
+   * Whether anybody is looking, and the loop that draws for them.
+   *
+   * **Four reasons to refuse a frame that the gate cannot know**: a context it
+   * was never given, one the browser has taken, a drawing buffer no measurement
+   * has sized, and an opening frame still owed. The first two draw nothing at
+   * all and the last two draw at the wrong scale, which `measure` and `opened`
+   * each have their own note about.
    */
-  private onScreen = false
+  private readonly gate = new PaintGateController(this, {
+    canRun: () => !!this.gl && !this.gl.isContextLost() && this.width > 0 && this.opened,
+    onFrame: (delta) => {
+      this.advance(delta)
+    },
+    onMotion: (reduced) => {
+      /* The still frame is drawn rather than assumed, because the canvas holds
+         whatever was on it when the loop stopped and mid-drift is not the
+         opening shape. `Orb` does the same, on the same two arms. */
+      if (reduced) {
+        this.paintOnce()
+      }
+    },
+    onResize: () => {
+      this.resized()
+    },
+  })
 
   /**
    * The element's box, cached.
@@ -394,9 +412,6 @@ export class HelixAura extends HelixElement {
    * from the handler that reads it.
    */
   private box = { height: 1, left: 0, top: 0, width: 1 }
-
-  /** Watches the element's own size, so no frame has to ask for it. */
-  private sized: ResizeObserver | undefined
 
   /**
    * Whether the field has drawn its opening frame yet.
@@ -452,8 +467,8 @@ export class HelixAura extends HelixElement {
   /* Everything the canvas needs, in one place both lifecycles can reach.
    *
    * `firstUpdated` runs once for the life of the element, while
-   * `disconnectedCallback` deletes the program, drops the context and
-   * disconnects both observers, and runs every time the element moves. Setup
+   * `disconnectedCallback` deletes the program, drops the context and takes
+   * the gate down with them, and runs every time the element moves. Setup
    * that lives only in `firstUpdated` therefore leaves an aura reordered by a
    * framework with `this.gl` null and nothing to rebuild it: a live component
    * painting nothing, for the rest of the page's life, with no error anywhere.
@@ -494,47 +509,14 @@ export class HelixAura extends HelixElement {
     this.canvas?.addEventListener('webglcontextlost', this.handleLost)
     this.canvas?.addEventListener('webglcontextrestored', this.handleRestored)
 
-    this.motion ??= window.matchMedia('(prefers-reduced-motion: reduce)')
-    this.motion.addEventListener('change', this.handleMotion)
     this.addEventListener('pointermove', this.handlePointer)
     this.addEventListener('pointerleave', this.handleLeave)
 
-    this.visible = new IntersectionObserver(([entry]) => {
-      this.onScreen = entry?.isIntersecting ?? false
-      if (this.onScreen) {
-        this.play()
-      } else {
-        this.stop()
-      }
-    })
-    this.visible.observe(this)
+    this.gate.watch()
 
-    document.addEventListener('visibilitychange', this.handleVisibility)
     /* Scroll moves the box without resizing it, and the cached origin is what
        the pointer is measured against. Passive, because nothing here cancels. */
     window.addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
-
-    this.sized = new ResizeObserver(() => {
-      /* **A resize repaints unconditionally rather than asking.**
-         `measure` clears the drawing buffer whenever it resizes it, because
-         assigning `canvas.width` is a reset and not a hint. `paintOnce` declines
-         while the loop holds a frame handle, which is right for a property
-         change the loop is about to draw anyway and wrong here: the canvas is
-         already transparent by the time it declines, so the fallback gradient
-         underneath showed through until the next tick landed. One frame, on
-         every reflow that changed the box. */
-      if (!this.measure()) {
-        this.paintOnce()
-        return
-      }
-      if (this.opened) {
-        this.paint()
-        this.play()
-        return
-      }
-      this.open()
-    })
-    this.sized.observe(this)
 
     this.readPalette()
     /* The second half is a return before the first frame. The removal canceled
@@ -739,35 +721,27 @@ export class HelixAura extends HelixElement {
   }
 
   override disconnectedCallback(): void {
+    /* The gate goes down in here, which is what stops the loop and forgets
+       that the aura was ever on screen. */
     super.disconnectedCallback()
-    this.stop()
-    /* **The opening frame as well, which `stop` does not own**, and cannot:
-       `stop` is also what going off screen calls, and an aura that lost its
+    /* **The opening frame as well, which the gate does not own**, and cannot:
+       the gate also stops on going off screen, and an aura that lost its
        opening there would never open. Left booked here, it drew into a
        detached canvas whenever it ran before the release, and then started a
-       loop after `stop` had already run: `tick` books its own next frame, so
-       nothing ever ended it, and it went on ticking after the context was gone.
-       `openBy` goes with it, so a return waits for its own box to settle. */
+       loop nothing was left to end, after the context was gone. `openBy` goes
+       with it, so a return waits for its own box to settle. */
     if (this.opening) {
       cancelAnimationFrame(this.opening)
       this.opening = 0
       this.openBy = 0
     }
-    this.visible?.disconnect()
-    this.visible = undefined
-    this.onScreen = false
     /* Before the release below, which loses the context itself and must not be
        answered by asking for it back. */
     this.canvas?.removeEventListener('webglcontextlost', this.handleLost)
     this.canvas?.removeEventListener('webglcontextrestored', this.handleRestored)
     this.removeEventListener('pointermove', this.handlePointer)
     this.removeEventListener('pointerleave', this.handleLeave)
-    this.motion?.removeEventListener('change', this.handleMotion)
-    this.motion = undefined
-    document.removeEventListener('visibilitychange', this.handleVisibility)
     window.removeEventListener('scroll', this.handleScroll, { capture: true })
-    this.sized?.disconnect()
-    this.sized = undefined
     /* **Deferred by a task, and canceled by a reconnection.**
      *
      * The DOM has no signal for a move: a framework reordering its children
@@ -813,9 +787,9 @@ export class HelixAura extends HelixElement {
    *
    * **Taken on a GPU reset, and past the cap** of about sixteen, where the
    * browser drops the oldest context for the newest while its aura is still on
-   * screen. `tick` books its own next frame, so the loop went on at 30 frames a
-   * second against a context that draws nothing, and nothing made the program
-   * again once the context came back: the aura never recovered.
+   * screen. Unstopped, the loop runs at 30 frames a second against a context
+   * that draws nothing, and nothing makes the program again once the context
+   * comes back: the aura never recovers.
    *
    * **The canvas is hidden until then, because a lost one is not reliably
    * transparent.** Measured 15 Sep 2026: headless Chromium painted a plain
@@ -830,7 +804,7 @@ export class HelixAura extends HelixElement {
    */
   private readonly handleLost = (event: Event): void => {
     event.preventDefault()
-    this.stop()
+    this.gate.stop()
     if (this.opening) {
       cancelAnimationFrame(this.opening)
       this.opening = 0
@@ -855,7 +829,7 @@ export class HelixAura extends HelixElement {
     this.measure()
     if (this.opened) {
       this.paint()
-      this.play()
+      this.gate.play()
     } else if (this.width) {
       this.open()
     }
@@ -920,9 +894,9 @@ export class HelixAura extends HelixElement {
    * Re-reads the box and resizes the drawing buffer to match.
    *
    * **Called from the observer, never from the frame.** `clientWidth` is a
-   * layout read, and doing it in `tick` meant a forced synchronous layout on
+   * layout read, and doing it per frame meant a forced synchronous layout on
    * every single frame to learn a number that changes when the box changes and
-   * at no other time. A `ResizeObserver` is told when that is.
+   * at no other time. The gate's `ResizeObserver` is told when that is.
    *
    * Returns whether the drawing buffer was resized, which is the same question
    * as whether it was cleared, and so whether the caller owes it a frame.
@@ -1025,9 +999,9 @@ export class HelixAura extends HelixElement {
     const { gl, uniforms } = this
     /* `width` is zero until a measurement succeeded, and a paint before that is
        a paint into the degenerate buffer described on `measure`. Guarded here
-       rather than at each caller because `play` is started from the
-       intersection observer and from `visibilitychange` as well as from setup,
-       and one of those running early is the whole fault. */
+       rather than at each caller because the gate plays from its own observers
+       as well as from setup, and one of those running early is the whole
+       fault. */
     if (!gl || !this.program || !this.width) {
       return
     }
@@ -1072,6 +1046,30 @@ export class HelixAura extends HelixElement {
   }
 
   /**
+   * The box changed, which is the one moment the buffer is re-measured.
+   *
+   * **A resize repaints unconditionally rather than asking.** `measure` clears
+   * the drawing buffer whenever it resizes it, because assigning `canvas.width`
+   * is a reset and not a hint. `paintOnce` declines while the loop holds a
+   * frame, which is right for a property change the loop is about to draw
+   * anyway and wrong here: the canvas is already transparent by the time it
+   * declines, so the fallback gradient underneath showed through until the next
+   * frame landed. One frame, on every reflow that changed the box.
+   */
+  private resized(): void {
+    if (!this.measure()) {
+      this.paintOnce()
+      return
+    }
+    if (this.opened) {
+      this.paint()
+      this.gate.play()
+      return
+    }
+    this.open()
+  }
+
+  /**
    * The opening frame, one animation frame after the box last changed.
    *
    * Each new measurement cancels the pending frame and books another, so a run
@@ -1090,7 +1088,7 @@ export class HelixAura extends HelixElement {
       this.opening = 0
       this.opened = true
       this.paint()
-      this.play()
+      this.gate.play()
     }
     if (performance.now() >= this.openBy) {
       draw()
@@ -1105,19 +1103,20 @@ export class HelixAura extends HelixElement {
        promises. `updated` runs straight after `firstUpdated`, so without this
        the first box measured was painted at once: the frame the settle exists
        to hold back, drawn a frame early. Nor detached, where nobody sees it. */
-    if (this.frame || !this.opened || !this.isConnected) {
+    if (this.gate.running || !this.opened || !this.isConnected) {
       return
     }
     this.paint()
   }
 
   /**
-   * The shortest gap between two painted frames, for a field nobody points at.
+   * The shortest gap between two painted frames, in seconds, for a field nobody
+   * points at.
    *
    * **A drifting field does not need the display's rate and a pointer does.**
-   * `tick` advances on `(now - this.last) / 1000`, so motion is wall-clock: at
-   * half the frames the field moves the same distance in the same time, sampled
-   * more coarsely. `delta` is already clamped at 0.05, which is a floor of 20
+   * The field advances on the gate's own step, so motion is wall-clock: at half
+   * the frames it moves the same distance in the same time, sampled more
+   * coarsely. That step is clamped at `MAX_FRAME_STEP`, which is a floor of 20
    * frames a second, and 30 sits inside that with room. A cap at 15 would land
    * on the clamp and the field would genuinely drag, which is the failure that
    * would be misdiagnosed as choppiness.
@@ -1135,28 +1134,35 @@ export class HelixAura extends HelixElement {
    * times in three seconds against 1,276 for one: each instance draws once per
    * callback. Capping the two that nobody points at is most of that back.
    */
-  private static readonly CAPPED = 1000 / 30
+  private static readonly CAPPED = 1 / 30
 
-  private readonly tick = (now: number): void => {
-    if (!this.last) {
-      this.last = now
-    }
+  /**
+   * What the skipped frames were worth, in seconds, spent on the next one drawn.
+   *
+   * Dropping it instead would make the field move at a fraction of wall-clock
+   * speed, which is the thing the cap is written not to do: a capped frame is
+   * the same motion sampled more coarsely and not less motion. Held rather than
+   * measured from a stamp, because the gate owns the clock.
+   */
+  private held = 0
+
+  private advance(delta: number): void {
+    this.held += delta
     /* Skipped rather than rescheduled on a timer: `requestAnimationFrame` is
        what pauses in a background tab and what matches the display, and a
        `setTimeout` loop would give up both to save the same work. */
-    if (!this.interactive && now - this.last < HelixAura.CAPPED) {
-      this.frame = requestAnimationFrame(this.tick)
+    if (!this.interactive && this.held < HelixAura.CAPPED) {
       return
     }
-    /* Clamped: a tab returning from the background delivers one enormous delta,
-       and the field would teleport to wherever the pointer had gone. */
-    const delta = Math.min((now - this.last) / 1000, 0.05)
-    this.last = now
+    /* Clamped again on the way out, because a collected step is several of the
+       gate's and the ceiling is on what a single frame advances. */
+    const step = Math.min(this.held, MAX_FRAME_STEP)
+    this.held = 0
     /* Accumulated rather than measured from a start stamp. A stamp reset on
        every pause means a reader who switched tabs and came back finds the
        field snapped to its opening frame, which is the one thing a background
        must never do. */
-    this.elapsed += delta * Math.max(0, this.drifted(this.speed, 0.4, 0.043))
+    this.elapsed += step * Math.max(0, this.drifted(this.speed, 0.4, 0.043))
 
     /* Two time constants, because position and presence are two different jobs
        and one number serves both badly.
@@ -1185,7 +1191,7 @@ export class HelixAura extends HelixElement {
        per-frame factor: a factor ties the feel to the refresh rate, so a 120Hz
        display would chase twice as eagerly as a 60Hz one. */
     const drift = Math.hypot(this.target.x - this.eased.x, this.target.y - this.eased.y)
-    const follow = 1 - Math.exp(-delta / (0.028 / (1 + drift * 2.4)))
+    const follow = 1 - Math.exp(-step / (0.028 / (1 + drift * 2.4)))
     if (!this.interactive) {
       this.target.presence = 0
     }
@@ -1200,54 +1206,12 @@ export class HelixAura extends HelixElement {
        Rising in 115 milliseconds it answers immediately; falling over half a
        second it lets go without the field flinching as the cursor crosses out. */
     const rising = this.target.presence > this.eased.presence
-    const fade = 1 - Math.exp(-delta / (rising ? 0.05 : 0.22))
+    const fade = 1 - Math.exp(-step / (rising ? 0.05 : 0.22))
     this.eased.presence += (this.target.presence - this.eased.presence) * fade
-    this.age(delta)
+    this.age(step)
     this.advanceWake()
 
     this.paint()
-    this.frame = requestAnimationFrame(this.tick)
-  }
-
-  /**
-   * Starts the loop, where it is wanted and can be ended.
-   *
-   * **Never while detached.** `tick` books its own next frame, so the only
-   * thing that ends the loop is `stop`, and a disconnection is the last time
-   * `stop` is called. Everything that plays is canceled or disconnected there,
-   * and this holds for whatever callback was already on its way.
-   *
-   * **Nor off screen, whoever asks.** The observer is the one caller that
-   * knows, and a tab coming back, a resize and a restored context all play
-   * too. An aura 2600 pixels below the fold booked no frame at rest and one on
-   * every frame after its tab came back, until it had been scrolled in and out
-   * again. Nor on a lost context, which draws nothing.
-   */
-  private play(): void {
-    if (
-      this.frame ||
-      !this.isConnected ||
-      !this.onScreen ||
-      this.motion?.matches ||
-      document.hidden ||
-      !this.gl ||
-      this.gl.isContextLost() ||
-      !this.width ||
-      !this.opened
-    ) {
-      return
-    }
-    this.frame = requestAnimationFrame(this.tick)
-  }
-
-  private stop(): void {
-    if (this.frame) {
-      cancelAnimationFrame(this.frame)
-      this.frame = 0
-    }
-    /* `last` alone is cleared, so the next frame measures no delta against a
-       stale stamp. `elapsed` is deliberately kept. */
-    this.last = 0
   }
 
   /**
@@ -1297,7 +1261,7 @@ export class HelixAura extends HelixElement {
   }
 
   private readonly handlePointer = (event: PointerEvent): void => {
-    if (this.motion?.matches) {
+    if (this.gate.reduced) {
       return
     }
     const { height, left, top, width } = this.box
@@ -1371,38 +1335,6 @@ export class HelixAura extends HelixElement {
 
   private readonly handleLeave = (): void => {
     this.target.presence = 0
-  }
-
-  /**
-   * Answers the preference changing, rather than only its value at setup.
-   *
-   * **The query was created and never listened to**, so the preference was read
-   * at `play` and at the pointer and nowhere else. `tick` books its own next
-   * frame with no check of its own, which means a reader who turned reduce-motion
-   * on while the page was open kept a full-page shader running for the rest of
-   * it: the one reader the promise at the top of this file is about, and the one
-   * it was broken for. The other direction failed the quieter way, a field frozen
-   * on its opening frame until a scroll or a tab switch happened to ask again.
-   *
-   * The still frame is drawn rather than assumed, because the canvas holds
-   * whatever was on it when the loop stopped and mid-drift is not the opening
-   * shape. `Orb` does the same, on the same two arms.
-   */
-  private readonly handleMotion = (): void => {
-    if (this.motion?.matches) {
-      this.stop()
-      this.paintOnce()
-    } else {
-      this.play()
-    }
-  }
-
-  private readonly handleVisibility = (): void => {
-    if (document.hidden) {
-      this.stop()
-    } else {
-      this.play()
-    }
   }
 
   private readonly handleScroll = (): void => {
