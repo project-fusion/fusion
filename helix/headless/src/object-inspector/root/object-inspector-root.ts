@@ -1,9 +1,11 @@
 import {
   CopyController,
   customElement,
+  elementById,
   HelixElement,
   inlineStep,
   scrollItemIntoView,
+  searchableById,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
 import { caretDown, caretRight } from '@fusion.dev/helix-icons'
@@ -284,13 +286,12 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     /* First, so a value read from `for` is in the rows this update works out,
-       and so in the first render. Not on the server, whose shim has attributes
-       and no document to look an id up in, nor while hydrating what one sent. */
-    if (
-      this.loadedFor !== this.for &&
-      typeof this.ownerDocument?.getElementById === 'function' &&
-      !this.hydrating
-    ) {
+       and so in the first render. Resolved through `getRootNode()`, so an
+       inspector inside another component's shadow root names a script in that
+       root rather than in the page. Not on the server, whose shim has
+       attributes and no tree to look an id up in, nor while hydrating what one
+       sent. */
+    if (this.loadedFor !== this.for && searchableById(this) && !this.hydrating) {
       this.loadedFor = this.for
       this.load()
     }
@@ -328,8 +329,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   }
 
   private load(): void {
-    const text =
-      this.for === '' ? '' : (this.ownerDocument.getElementById(this.for)?.textContent ?? '')
+    const text = this.for === '' ? '' : (elementById(this, this.for)?.textContent ?? '')
     try {
       this.read = text.trim() === '' ? undefined : (JSON.parse(text) as unknown)
     } catch {

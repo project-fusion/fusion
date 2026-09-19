@@ -1,4 +1,10 @@
-import { customElement, HelixElement, VirtualizeController } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  elementById,
+  HelixElement,
+  searchableById,
+  VirtualizeController,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -116,20 +122,22 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /**
    * Reads the source named by `for`, before the render that draws it.
    *
+   * **Resolved through `getRootNode()`, so a list inside another component's
+   * shadow root names a source in that root rather than in the page.** Read
+   * against `ownerDocument` it looked in the document whatever tree it was in,
+   * and found nothing from inside an app shell or a sandbox, which is
+   * indistinguishable here from the miss this tolerates on purpose.
+   *
    * Not on the server, per the server rules: the shim has attributes and no
-   * tree, so `getElementById` is undefined there. Nor while hydrating what a
-   * server sent, which it drew with nothing read. A source that is missing or
+   * tree to look an id up in. Nor while hydrating what a server sent, which it
+   * drew with nothing read. A source that is missing or
    * not an array leaves the list empty rather than throwing, because a consumer
    * whose data has not arrived yet is the ordinary case and an empty list says
    * so by itself.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    if (
-      this.readFor !== this.for &&
-      typeof this.ownerDocument?.getElementById === 'function' &&
-      !this.hydrating
-    ) {
+    if (this.readFor !== this.for && searchableById(this) && !this.hydrating) {
       this.readFor = this.for
       this.read()
     }
@@ -147,7 +155,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
   }
 
   private read(): void {
-    const source = this.for === '' ? null : this.ownerDocument.getElementById(this.for)
+    const source = this.for === '' ? null : elementById(this, this.for)
     const text = source?.textContent ?? ''
     if (text.trim() === '') {
       this.rows = []

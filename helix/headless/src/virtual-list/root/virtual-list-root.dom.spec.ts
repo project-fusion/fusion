@@ -64,6 +64,24 @@ describe('virtual list', () => {
     expect(drawn(host)[0]?.textContent?.trim()).toBe('Row 1')
   })
 
+  /* Resolved through `getRootNode()`, not `ownerDocument`. Read against the
+     document, a list inside another component's shadow root looked in the page,
+     found nothing, and drew the empty state this tolerates on purpose when data
+     has not arrived, so the wrong tree and the ordinary miss looked the same. */
+  test('finds its source in the tree it sits in, not the page', async () => {
+    const holder = document.createElement('div')
+    document.body.append(holder)
+    const root = holder.attachShadow({ mode: 'open' })
+    root.innerHTML = `<helix-headless-virtual-list for="rows" estimate="32" label="Rows">
+        <template><div>Row</div></template>
+      </helix-headless-virtual-list>
+      <script id="rows" type="application/json">${JSON.stringify([{ name: 'Inside' }])}</script>`
+    const host = root.querySelector('helix-headless-virtual-list') as HTMLElement & Updatable
+    await settle(host)
+    expect(drawn(host).length).toBe(1)
+    holder.remove()
+  })
+
   test('draws a window rather than the set, which is the entire claim', async () => {
     const host = await list(2000)
     expect(drawn(host).length).toBeLessThan(100)
