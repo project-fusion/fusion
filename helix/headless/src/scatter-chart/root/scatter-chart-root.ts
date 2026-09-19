@@ -5,6 +5,7 @@ import {
   extent,
   formatNumbers,
   HelixElement,
+  isRtl,
   linear,
   MixinChartSource,
   PLOT_HEIGHT,
@@ -383,7 +384,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
       {
         /* The host's, which the plane's `dir` does not reach: a bubble of names
            and values is words, and reads the way the page does. */
-        dir: getComputedStyle(this).direction === 'rtl' ? 'rtl' : 'ltr',
+        dir: isRtl(this) ? 'rtl' : 'ltr',
         fixed: true,
         placement: 'top',
         x: `${point.x}%`,

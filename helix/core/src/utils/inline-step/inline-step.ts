@@ -1,3 +1,5 @@
+import { isRtl } from '../is-rtl/is-rtl.js'
+
 /**
  * Which way along the line of text a horizontal arrow key moves.
  *
@@ -23,6 +25,5 @@ export const inlineStep = (element: Element, key: string): -1 | 0 | 1 => {
   if (key !== 'ArrowLeft' && key !== 'ArrowRight') {
     return 0
   }
-  const rtl = getComputedStyle(element).direction === 'rtl'
-  return (key === 'ArrowRight') !== rtl ? 1 : -1
+  return (key === 'ArrowRight') !== isRtl(element) ? 1 : -1
 }

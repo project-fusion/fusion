@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { isRtl } from '../../utils/is-rtl/is-rtl.js'
 
 /** What the controller needs of its host, which is a Lit element and a count. */
 export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
@@ -134,8 +135,8 @@ export class ChartPointerController implements ReactiveController {
    * drawn at 10% of the plot's width stands 10% in from its right edge. What is
    * read against the drawing has to be read the same way: the pointer from the
    * plot's right, and a bubble beside a bar's far end on its left. Asked of the
-   * host's computed `direction`, which is what the table and the splitter read
-   * for their own arrow keys.
+   * host through `isRtl`, which is the one question the table and the splitter
+   * ask for their own arrow keys.
    *
    * On the controller because it is what reads the pointer against the drawing,
    * and a chart deciding which side a bubble goes asks here rather than
@@ -143,7 +144,7 @@ export class ChartPointerController implements ReactiveController {
    * can change its direction without the chart updating.
    */
   get mirrored(): boolean {
-    return typeof getComputedStyle === 'function' && getComputedStyle(this.host).direction === 'rtl'
+    return isRtl(this.host)
   }
 
   /** Puts the pointer on a reading, for a chart that resolves it some other way. */

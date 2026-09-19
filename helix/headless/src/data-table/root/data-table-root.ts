@@ -9,6 +9,7 @@ import {
   HelixSortEvent,
   hostAria,
   inlineStep,
+  isRtl,
   MixinCollection,
   markRegion,
   requestChange,
@@ -1531,7 +1532,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (!dragging || event.pointerId !== dragging.pointer || !this.dragOrder) {
       return
     }
-    const rtl = getComputedStyle(this).direction === 'rtl'
+    const rtl = isRtl(this)
     /* Only the drawn ones: a hidden heading has no box, and its zero rect sat
        left of every pointer, so it counted as passed wherever it was. */
     const others = this.shownColumns.filter(

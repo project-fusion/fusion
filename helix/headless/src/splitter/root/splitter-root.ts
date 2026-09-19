@@ -6,6 +6,7 @@ import {
   HelixBeforeResizeEvent,
   HelixElement,
   inlineStep,
+  isRtl,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -732,7 +733,7 @@ export class HelixHeadlessSplitter extends HelixElement {
        the panes are not: in a right-to-left document the start pane is on the
        right, so dragging right makes it *larger*. */
     const raw = ((along - origin.start) / origin.length) * 100
-    const rtl = !this.vertical && getComputedStyle(this).direction === 'rtl'
+    const rtl = !this.vertical && isRtl(this)
     this.move(rtl ? 100 - raw : raw)
   }
 
@@ -956,7 +957,7 @@ export class HelixHeadlessSplitter extends HelixElement {
     if (!origin) {
       return
     }
-    const rtl = getComputedStyle(this).direction === 'rtl'
+    const rtl = isRtl(this)
     const along = (
       box: { length: number; start: number },
       at: number,

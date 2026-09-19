@@ -4,6 +4,7 @@ import {
   HelixElement,
   hostAria,
   inlineStep,
+  isRtl,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { dotsThreeVertical } from '@fusion.dev/helix-icons'
@@ -467,7 +468,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
 
   /** Which way a drag grows the column, in this writing direction. */
   private get forward(): number {
-    return getComputedStyle(this).direction === 'rtl' ? -1 : 1
+    return isRtl(this) ? -1 : 1
   }
 
   private readonly handleResizeStart = (event: PointerEvent): void => {

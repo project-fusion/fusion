@@ -4,6 +4,7 @@ import {
   HelixSelectEvent,
   hostAria,
   inlineStep,
+  isRtl,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight, play, stop } from '@fusion.dev/helix-icons'
@@ -627,7 +628,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (this.orientation === 'vertical') {
       return slide.offsetTop - track.offsetTop - bleed
     }
-    if (getComputedStyle(track).direction === 'rtl') {
+    if (isRtl(track)) {
       return slide.offsetLeft + slide.offsetWidth - (track.offsetLeft + track.offsetWidth) + bleed
     }
     return slide.offsetLeft - track.offsetLeft - bleed
