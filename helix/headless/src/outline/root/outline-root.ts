@@ -1,5 +1,6 @@
 import {
   customElement,
+  elementById,
   HelixActivateEvent,
   HelixElement,
   IndicatorController,
@@ -119,12 +120,18 @@ export class HelixHeadlessOutline extends HelixElement {
     )
   }
 
-  /** What each link points at, paired with the link, skipping anything missing. */
+  /**
+   * What each link points at, paired with the link, skipping anything missing.
+   *
+   * The fragment is decoded first because these are `href`s and not ids. The
+   * lookup is the tree's alone: this intercepts no press, so it has no
+   * navigation to agree with, and a section it cannot see is one it is not
+   * describing.
+   */
   private get sections(): { link: HTMLAnchorElement; target: Element }[] {
-    const root = this.getRootNode() as Document | ShadowRoot
     return this.links.flatMap((link) => {
       const id = decodeURIComponent(link.getAttribute('href')?.slice(1) ?? '')
-      const target = id ? root.getElementById?.(id) : null
+      const target = elementById(this, id)
       /* A section that is not rendered is not one that can be read.
        *
        * `display: none` reports a zero rect, and zero is above the reading line,

@@ -162,9 +162,9 @@ describe('where the bubble points', () => {
 
   /* The id is fixed rather than generated: it is scoped to this chart's shadow
      root, where it is the only one, so nothing can collide with it and nothing
-     has to be threaded through a render to stay in step. `for` resolves through
-     `getRootNode().getElementById()`, and a chart's shadow root is a
-     `ShadowRoot`, so this is the whole anchoring mechanism. */
+     has to be threaded through a render to stay in step. `for` resolves in the
+     tree the tooltip sits in, which is that same root, so this is the whole
+     anchoring mechanism. */
   test('by naming a mark the tooltip can resolve inside the chart', () => {
     const into = drawn(0)
     const named = into.querySelector('helix-tooltip')?.getAttribute('for')

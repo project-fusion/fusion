@@ -34,8 +34,8 @@ import type { Row } from '../read-series/read-series.js'
  *
  * **A name six templates and this file have to agree on is a name that will
  * stop agreeing**, which is `PALETTE`'s argument and it holds harder here: the
- * failure is silent. `within` resolves through `getElementById`, so a plot
- * renamed on one side returns null, the boundary falls back to the viewport,
+ * failure is silent. `within` resolves by id, so a plot renamed on one side
+ * returns null, the boundary falls back to the viewport,
  * and the bubble goes back to hanging past the drawing with nothing reported
  * anywhere.
  *
@@ -94,10 +94,10 @@ export interface TooltipAt {
  * chart. Escaping that means reimplementing `PopoverController`, which is
  * `Tooltip` with extra steps and a second copy of the hard part.
  *
- * **`for` was already the anchor and needed nothing added.** It resolves through
- * `getRootNode().getElementById()`, and a chart's shadow root *is* a
- * `ShadowRoot`, so a chart names an element inside itself and `Tooltip` finds
- * it. What the chart provides is an invisible mark at the reading's point.
+ * **`for` was already the anchor and needed nothing added.** It resolves in the
+ * tree the tooltip sits in, and the mark is in the same shadow root, so a chart
+ * names an element inside itself and `Tooltip` finds it. What the chart
+ * provides is an invisible mark at the reading's point.
  *
  * **An HTML mark rather than the `<rect>` or `<circle>` already there.**
  * `FloatingController` types its anchor as `HTMLElement` and an SVG element is

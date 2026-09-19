@@ -1,6 +1,7 @@
 import {
   anchorElement,
   customElement,
+  elementById,
   HelixElement,
   hostAria,
   MixinControllerOpen,
@@ -122,8 +123,8 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * the element it names, and points its bubble there. Leave it unset and the
    * default slot is the trigger, which is the older form.
    *
-   * Resolved through `getRootNode()`, so a tooltip inside another component's
-   * shadow root names an element in that root rather than in the document.
+   * Names an element in the same tree, so a tooltip inside another component's
+   * shadow root points at one in that root rather than one in the document.
    *
    * **In React this arrives as a property and not as an attribute**, which is
    * worth knowing before someone reads the DOM and thinks it did not take.
@@ -251,20 +252,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     this.bubbleLayer.reposition()
   }
 
-  /**
-   * The element `for` names, or null.
-   *
-   * `getRootNode()` rather than `document`, which is what makes this work inside
-   * another component: an id is unique to a tree, and a tooltip in a shadow root
-   * names an element in that root. Client only, since the server has no tree to
-   * search.
-   */
+  /** The element `for` names, or null. */
   private get named(): HTMLElement | null {
-    if (this.for === '') {
-      return null
-    }
-    const root = this.getRootNode() as Document | ShadowRoot
-    return root.getElementById?.(this.for) ?? null
+    return this.for === '' ? null : elementById(this, this.for)
   }
 
   /* The boundary is the host and not the bubble, for the reason `Popover` gives:
@@ -343,13 +333,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * it must stay inside, and a component often has one and not the other.
    */
   private get enclosure(): Element | null {
-    if (this.within === '') {
-      return null
-    }
-    const root = this.getRootNode()
-    return root instanceof Document || root instanceof ShadowRoot
-      ? root.getElementById(this.within)
-      : null
+    return this.within === '' ? null : elementById(this, this.within)
   }
 
   private get bubble(): HTMLElement | null {

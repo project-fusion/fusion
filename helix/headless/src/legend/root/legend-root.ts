@@ -64,8 +64,8 @@ export class HelixHeadlessLegend extends HelixElement {
   /**
    * The id of the table to take the names from.
    *
-   * Resolved through `getRootNode()`, so a legend inside another component's
-   * shadow root names a table in that root rather than in the document.
+   * Names a table in the same tree, so a legend inside another component's
+   * shadow root reads a table in that root rather than one in the document.
    *
    * **In React this arrives as a property and not as an attribute**, the way
    * `Tooltip.for` does, so it does not reflect and nothing styles on it.

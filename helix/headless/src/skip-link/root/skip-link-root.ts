@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, elementById, HelixElement } from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -71,14 +71,22 @@ export class HelixHeadlessSkipLink extends HelixElement {
   @property()
   label = 'Skip to content'
 
-  /** The element `href` names, looked up in the tree this link sits in. */
+  /**
+   * The element `href` names, looked up the way the browser would.
+   *
+   * `orDocument`, which no other caller of `elementById` passes and which that
+   * option is written for: a press handled here has to land where following the
+   * anchor would, and the platform resolves a fragment against the document
+   * whatever tree the anchor is in. A skip link inside an app shell's shadow
+   * root pointing at the page's `#main` is the arrangement that needs it.
+   *
+   * The fragment is decoded first because this is an `href` and not an id.
+   */
   private get target(): HTMLElement | null {
     if (!this.href.startsWith('#') || this.href.length < 2) {
       return null
     }
-    const id = decodeURIComponent(this.href.slice(1))
-    const root = this.getRootNode() as Document | ShadowRoot
-    return (root.getElementById?.(id) ?? document.getElementById(id)) as HTMLElement | null
+    return elementById(this, decodeURIComponent(this.href.slice(1)), { orDocument: true })
   }
 
   /**
