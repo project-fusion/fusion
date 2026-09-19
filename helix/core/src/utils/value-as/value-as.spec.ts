@@ -2,9 +2,12 @@ import { describe, expect, test } from 'bun:test'
 import {
   dateAsValue,
   isDateValue,
+  isTimeValue,
+  minutesAsValue,
   numberAsValue,
   timeAsValue,
   valueAsDate,
+  valueAsMinutes,
   valueAsNumber,
   valueAsTime,
 } from './value-as.js'
@@ -112,5 +115,45 @@ describe('a number value', () => {
   test('writes an empty control back as empty, rather than as the word', () => {
     expect(numberAsValue(Number.NaN)).toBe('')
     expect(numberAsValue(0)).toBe('0')
+  })
+})
+
+/**
+ * The third reading of a time value, which is the one these controls hold.
+ *
+ * Minute precision, narrower than `valueAsTime` on purpose: `step` here is in
+ * minutes and floored at one, so a second that got through would be dropped
+ * silently by the conversion below.
+ */
+describe('a time as minutes since midnight', () => {
+  test('reads the clock, which is the coordinate a list of times steps through', () => {
+    expect(valueAsMinutes('00:00')).toBe(0)
+    expect(valueAsMinutes('09:30')).toBe(570)
+    expect(valueAsMinutes('23:59')).toBe(1439)
+  })
+
+  test('refuses seconds, which `valueAsTime` takes and nothing here can hold', () => {
+    expect(valueAsMinutes('10:30:00')).toBeNull()
+    expect(valueAsTime('10:30:00')).not.toBeNull()
+  })
+
+  test('refuses a clock that does not exist, and a half-typed one', () => {
+    expect(valueAsMinutes('24:00')).toBeNull()
+    expect(valueAsMinutes('10:60')).toBeNull()
+    expect(valueAsMinutes('9:30')).toBeNull()
+    expect(valueAsMinutes('')).toBeNull()
+  })
+
+  test('wraps rather than running off the day, which is what an arrow key does', () => {
+    expect(minutesAsValue(0)).toBe('00:00')
+    expect(minutesAsValue(1439)).toBe('23:59')
+    expect(minutesAsValue(1440)).toBe('00:00')
+    expect(minutesAsValue(-15)).toBe('23:45')
+  })
+
+  test('and the predicate is the conversion, the way the date one is', () => {
+    expect(isTimeValue('09:30')).toBe(true)
+    expect(isTimeValue('10:30:00')).toBe(false)
+    expect(isTimeValue('')).toBe(false)
   })
 })

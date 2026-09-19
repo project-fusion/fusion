@@ -5,12 +5,15 @@ import {
   timeAsValue as fromTime,
   type HelixBeforeChangeEvent,
   HelixFormElement,
+  isTimeValue,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
   MixinPickerEditing,
   MixinPickerField,
   MixinTokens,
+  valueAsMinutes,
+  writeTime,
 } from '@fusion.dev/helix-core'
 import { clock } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -22,7 +25,6 @@ import { html } from 'lit/static-html.js'
 import '../../icon/index.js'
 import '../../tag/index.js'
 import '../../time-picker/index.js'
-import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker-root.js'
 
 /**
  * @summary A time, typed or picked from a list.
@@ -211,7 +213,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
 
   /** One time, written the way `time-style` asks for. */
   private written(at: string): string {
-    return this.timeStyle === 'iso' || !isTime(at) ? at : writeTime(at, this.locale)
+    return this.timeStyle === 'iso' || !isTimeValue(at) ? at : writeTime(at, this.locale)
   }
 
   /** What the field shows: the value while it is being edited, a reading when not. */
@@ -257,7 +259,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       return
     }
     const held = this.held
-    if (event.key === 'Enter' && isTime(this.draft)) {
+    if (event.key === 'Enter' && isTimeValue(this.draft)) {
       event.preventDefault()
       if (!held.includes(this.draft)) {
         this.requestValue([...held, this.draft].sort().join(','))
@@ -282,7 +284,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
    */
   private get picked(): string {
     const held = this.held
-    return held.length > 0 && held.every(isTime) ? held.join(',') : ''
+    return held.length > 0 && held.every(isTimeValue) ? held.join(',') : ''
   }
 
   private readonly handleInput = (event: Event): void => {
@@ -304,7 +306,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       .split(',')
       .map((one) => one.trim())
       .filter(Boolean)
-    const whole = held.length > 0 && held.every(isTime)
+    const whole = held.length > 0 && held.every(isTimeValue)
     this.requestValue(whole ? held.join(',') : typed)
     this.restore()
   }
@@ -329,22 +331,22 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
 
        **Every time in the value, not the value itself**, which is what Date
        Input's own note says and what this was missing. A range holds two and a
-       multiple holds any number, joined by commas, so `isTime` on the whole
+       multiple holds any number, joined by commas, so `isTimeValue` on the whole
        string answered false for every range that had been filled in: two times
        chosen from the picker reported "Enter a time as HH:mm" and the field went
        invalid on being used correctly. */
     const held = this.held
-    const floor = toMinutes(this.min) ?? 0
-    const ceiling = toMinutes(this.max) ?? 1439
-    if (held.length > 0 && !held.every(isTime)) {
+    const floor = valueAsMinutes(this.min) ?? 0
+    const ceiling = valueAsMinutes(this.max) ?? 1439
+    if (held.length > 0 && !held.every(isTimeValue)) {
       return this.mode === undefined
         ? 'Enter a time as HH:mm.'
         : 'Enter times as HH:mm, separated by commas.'
     }
-    if (held.some((one) => (toMinutes(one) ?? 0) < floor)) {
+    if (held.some((one) => (valueAsMinutes(one) ?? 0) < floor)) {
       return `Choose a time at or after ${writeTime(this.min, this.locale)}.`
     }
-    if (held.some((one) => (toMinutes(one) ?? 0) > ceiling)) {
+    if (held.some((one) => (valueAsMinutes(one) ?? 0) > ceiling)) {
       return `Choose a time at or before ${writeTime(this.max, this.locale)}.`
     }
     if (this.mode === 'range' && held.length > 2) {

@@ -269,10 +269,14 @@ export {
 export {
   dateAsValue,
   isDateValue,
+  isTimeValue,
+  minutesAsValue,
   numberAsValue,
   timeAsValue,
   valueAsDate,
+  valueAsMinutes,
   valueAsNumber,
   valueAsTime,
 } from './utils/value-as/value-as.js'
+export { writeTime } from './utils/write-time/write-time.js'
 export { writtenList } from './utils/written-list/written-list.js'
