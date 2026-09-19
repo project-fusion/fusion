@@ -105,16 +105,38 @@ if (absent.length > 0) {
 /**
  * The bundle has to be newer than the components, or a fix looks like a failure.
  *
+ * **Measured against what a person edits, not against what a build writes.**
+ * An mtime answers "was this written later", and a cache hit writes a file whose
+ * content did not change, so anything generated has to stay out of the walk or
+ * the question is asked of the wrong clock.
+ *
  * **Both sides render from `frame.js`**, so a change to a component reaches
  * neither of them until `turbo run frame` has rebuilt it. That is not a stale
  * picture, it is a stale *library*, and it reads as the fix not having worked:
  * a repaired example re-run against an older bundle still reports its full pixel
  * count. Checked rather than remembered.
  */
+const authored = (name) => {
+  if (name.includes('.spec.')) {
+    return false
+  }
+  /* **Authored files only, and `.css.ts` is not one.** Those are the `styles`
+     task's outputs, which a turbo cache hit restores with today's mtime after
+     the bundle was written: 151 of them, every time, on any branch. The bundle
+     was then correct and looked stale, and the message sent a reader looking
+     for a change that was not there. The `.css` each is generated from is an
+     input rather than an output, so it is never restored and a hand edit to it
+     still moves this. */
+  if (name.endsWith('.css.ts')) {
+    return false
+  }
+  return name.endsWith('.ts') || name.endsWith('.css')
+}
+
 const newest = (dir) => {
   let latest = 0
   for (const entry of readdirSync(dir, { recursive: true, withFileTypes: true })) {
-    if (!entry.isFile() || !entry.name.endsWith('.ts') || entry.name.includes('.spec.')) {
+    if (!entry.isFile() || !authored(entry.name)) {
       continue
     }
     latest = Math.max(latest, statSync(join(entry.parentPath ?? entry.path, entry.name)).mtimeMs)
