@@ -11,7 +11,7 @@ import {
   HelixSampleStartEvent,
   MixinControllerValue,
   parseColor,
-  splitColors,
+  splitValues,
   toCss,
 } from '@fusion.dev/helix-core'
 import { eyedropper } from '@fusion.dev/helix-icons'
@@ -296,9 +296,15 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     return (this.sampling && !this.noEyedropper) || !this.noFormat
   }
 
-  /** The presets, as written, with anything that is not a color dropped. */
+  /**
+   * The presets, as written, with anything that is not a color dropped.
+   *
+   * Split on the commas between colors and never inside one, so
+   * `rgba(34,197,94,.5)` stays one swatch rather than four fragments none of
+   * which parses.
+   */
   private get presets(): string[] {
-    return splitColors(this.swatches).filter((one) => parseColor(one) !== null)
+    return splitValues(this.swatches, ',').filter((one) => parseColor(one) !== null)
   }
 
   /**

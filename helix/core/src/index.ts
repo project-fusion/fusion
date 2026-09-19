@@ -197,7 +197,6 @@ export {
   type ColorFormat,
   formatColor,
   parseColor,
-  splitColors,
   toCss,
 } from './utils/css-color/css-color.js'
 export {
@@ -258,6 +257,7 @@ export {
   scrollItemIntoView,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
 export { slotFilled } from './utils/slot-filled/slot-filled.js'
+export { splitValues } from './utils/split-values/split-values.js'
 export { tellDisclosure } from './utils/tell-disclosure/tell-disclosure.js'
 export { subscribe } from './utils/ticker/ticker.js'
 export {
