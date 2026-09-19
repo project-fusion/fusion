@@ -209,6 +209,19 @@ describe('the download control', () => {
   })
 })
 
+describe('a control the platform has already refused', () => {
+  /* The button was drawn from `document.pictureInPictureEnabled` alone, so a
+     player carrying `disablepictureinpicture` offered a control whose every
+     press rejected: the platform says no, the affordance is there anyway, and
+     nothing tells the reader. */
+  test('is not drawn, because a press on it could only ever be refused', async () => {
+    const refused = await player(
+      '<helix-headless-video disablepictureinpicture extra-controls="pip" label="A clip" src="/clip.mp4"></helix-headless-video>',
+    )
+    expect(refused.shadowRoot?.querySelector('[part~="pip"]')).toBeNull()
+  })
+})
+
 describe('asking for another item in a set', () => {
   const skipper = async () =>
     player(

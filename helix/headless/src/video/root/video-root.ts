@@ -518,7 +518,12 @@ export class HelixHeadlessVideo extends HelixElement {
 
   /** What the roster asks about this player, which is the whole of what it reads. */
   private get conditions(): Conditions {
-    return { hydrating: this.hydrating, remote: this.remoteAvailable, source: this.src !== '' }
+    return {
+      hydrating: this.hydrating,
+      refusedPip: this.disablePictureInPicture,
+      remote: this.remoteAvailable,
+      source: this.src !== '',
+    }
   }
 
   /** The extras asked for, in order, and only the ones this platform can do. */
@@ -974,16 +979,34 @@ export class HelixHeadlessVideo extends HelixElement {
     this.rate = next
   }
 
+  /**
+   * Into picture in picture and back, and quiet about being refused.
+   *
+   * Caught rather than `void`ed, the way `FullscreenController` catches its
+   * own: this is called from a click handler that discards the promise, so a
+   * refusal is otherwise an unhandled rejection naming neither the element nor
+   * the reason. The roster already declines to draw the button where the
+   * consumer refused the feature, which leaves the refusals nothing can see
+   * coming, a request without user activation and a window another document is
+   * already using.
+   */
   private async togglePip(): Promise<void> {
     const video = this.video
     if (!video) {
       return
     }
-    if (document.pictureInPictureElement === video) {
-      await document.exitPictureInPicture()
-      return
+    try {
+      if (document.pictureInPictureElement === video) {
+        await document.exitPictureInPicture()
+        return
+      }
+      await video.requestPictureInPicture()
+    } catch (error) {
+      console.warn(
+        `<${this.localName}> could not enter picture in picture. A press has to come from the reader, and one window holds it at a time.`,
+        error,
+      )
     }
-    await video.requestPictureInPicture()
   }
 
   /**
