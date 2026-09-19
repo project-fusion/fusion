@@ -93,6 +93,14 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    * and `underlined` are participles reading as a pair, the way `outlined` on
    * Accordion does.
    *
+   * **`segmented` is `ToggleGroup`'s track, opted into.** The two draw the same
+   * groove, token for token, and the sheets already say so where the height is
+   * fixed. What differs is polarity, and both are right: a group of toggles is
+   * one control, so its track is the resting state and its `separation` decides
+   * only the frame around it, while a row of tabs is a row until something says
+   * otherwise, so the track is a value here rather than the thing a value takes
+   * away.
+   *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
    */
