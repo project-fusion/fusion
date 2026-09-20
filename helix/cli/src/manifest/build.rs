@@ -163,6 +163,61 @@ fn beside(path: &str, specifier: &str) -> Option<String> {
     Some(format!("/{}", parts.join("/")))
 }
 
+/// The `@summary` an example opens with, which is what the manifest records.
+///
+/// A comment on the first line rather than a tag in a doc block: an example is
+/// markup, and markup has no doc blocks.
+fn summary_of(text: &str) -> Option<String> {
+    let line = text.lines().next()?.trim();
+    let inner = line.strip_prefix("<!--")?.strip_suffix("-->")?.trim();
+    let said = inner.strip_prefix("@summary")?.trim();
+    if said.is_empty() {
+        None
+    } else {
+        Some(said.to_owned())
+    }
+}
+
+/// A family's examples, by the slug each is filed under.
+///
+/// **`preview` first and the rest alphabetically**, which is the order the
+/// reference page reads them in: the preview is the picture at the top and the
+/// others are a list beneath it, so it is not one of them.
+///
+/// Only the `.html`. Each has a `.tsx` beside it saying the same thing for a
+/// framework consumer, and counting both would list every example twice.
+fn examples_in(directory: &Path) -> Vec<Value> {
+    let Ok(entries) = fs::read_dir(directory) else {
+        return Vec::new();
+    };
+    let mut found: Vec<(String, Option<String>)> = entries
+        .flatten()
+        .filter_map(|one| {
+            let path = one.path();
+            let slug = path
+                .file_name()?
+                .to_str()?
+                .strip_suffix(".html")?
+                .to_owned();
+            let text = fs::read_to_string(&path).ok()?;
+            Some((slug, summary_of(&text)))
+        })
+        .collect();
+    found.sort_by(|left, right| {
+        let rank = |name: &str| u8::from(name != "preview");
+        rank(&left.0)
+            .cmp(&rank(&right.0))
+            .then_with(|| left.0.cmp(&right.0))
+    });
+    found
+        .into_iter()
+        .map(|(slug, description)| match description {
+            Some(said) => json!({ "description": said, "slug": slug }),
+            None => json!({ "slug": slug }),
+        })
+        .collect()
+}
+
 /// A kebab name in the `PascalCase` a group and a part are written in.
 fn pascal(value: &str) -> String {
     value
@@ -187,7 +242,14 @@ fn pascal(value: &str) -> String {
 /// `helix-composition`, which takes the two directories under `src` and writes
 /// them `PascalCase`, prefixing a headless group with `Base` because that tier is
 /// a parallel family rather than a variant.
-fn helix(documented: &Documented, path: &str, tier: &str, is_component: bool) -> Option<Value> {
+fn helix(
+    documented: &Documented,
+    path: &str,
+    tier: &str,
+    is_component: bool,
+    package: &Path,
+    given: &str,
+) -> Option<Value> {
     let mut block = serde_json::Map::new();
     let single = |name: &str| {
         documented
@@ -231,6 +293,29 @@ fn helix(documented: &Documented, path: &str, tier: &str, is_component: bool) ->
         /* The file itself is not examined: `sources` yields nothing but `.ts`,
         so a fourth segment here is one by construction. */
         if let ["src", family, part, _] = parts.as_slice() {
+            /* **The root's, and not every part's.** A family has one directory
+            and one set of examples, and an accordion item is not a second
+            family: `Accordion` carries six examples and `Accordion.Item`
+            carries none, which is the reference page's own shape, one page per
+            family with the parts described inside it. */
+            if *part == "root" {
+                /* From the repository root rather than the package, because a
+                reader following this opens a path in a checkout, and the
+                package argument is what says where the package sits. */
+                let at = package.join("src").join(family);
+                /* **Written as the caller wrote it, not as it resolved.** The
+                path is read by a person opening a checkout, so an absolute one
+                from whichever machine ran the build is no use to them: `given`
+                is the argument as typed and the manifest speaks in those. */
+                block.insert(
+                    "source".to_owned(),
+                    json!(format!("{}/src/{family}", given.trim_end_matches('/'))),
+                );
+                let examples = examples_in(&at.join(".examples"));
+                if !examples.is_empty() {
+                    block.insert("examples".to_owned(), json!(examples));
+                }
+            }
             let prefix = if tier == "headless" { "Base" } else { "" };
             block.insert(
                 "group".to_owned(),
@@ -316,7 +401,13 @@ fn heritage(superclass: Superclass, path: &str) -> Value {
 }
 
 /// One declaration, as the manifest carries it.
-fn declaration_of(one: Declared, path: &str, tier: &str) -> (Value, Vec<(String, Option<String>)>) {
+fn declaration_of(
+    one: Declared,
+    path: &str,
+    tier: &str,
+    package: &Path,
+    given: &str,
+) -> (Value, Vec<(String, Option<String>)>) {
     let mut fields = serde_json::Map::new();
     fields.insert("kind".to_owned(), json!(one.kind));
     fields.insert("name".to_owned(), json!(one.name));
@@ -333,7 +424,14 @@ fn declaration_of(one: Declared, path: &str, tier: &str) -> (Value, Vec<(String,
     {
         fields.insert("summary".to_owned(), json!(summary));
     }
-    if let Some(block) = helix(&one.documented, path, tier, one.tag_name.is_some()) {
+    if let Some(block) = helix(
+        &one.documented,
+        path,
+        tier,
+        one.tag_name.is_some(),
+        package,
+        given,
+    ) {
         fields.insert("helix".to_owned(), block);
     }
     for (field, entries) in tagged(&one.documented) {
@@ -361,7 +459,7 @@ fn declaration_of(one: Declared, path: &str, tier: &str) -> (Value, Vec<(String,
 }
 
 /// The manifest as far as this generator has been taken.
-pub fn build(package: &Path, tier: &str, dependencies: &Dependencies) -> Value {
+pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencies) -> Value {
     let modules: Vec<Value> = sources(package)
         .into_iter()
         .map(|path| {
@@ -369,7 +467,8 @@ pub fn build(package: &Path, tier: &str, dependencies: &Dependencies) -> Value {
             let declared: Vec<Value> = declarations(&text, &path)
                 .into_iter()
                 .map(|one| {
-                    let (mut declaration, heritage) = declaration_of(one, &path, tier);
+                    let (mut declaration, heritage) =
+                        declaration_of(one, &path, tier, package, given);
                     inherit::apply(&mut declaration, &heritage, dependencies);
                     declaration
                 })

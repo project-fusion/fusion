@@ -419,6 +419,10 @@ pub fn generate(args: &ManifestBuild, from: &Path, _json: bool) -> Result<Code, 
     /* Always the pretty form. This exists to be read by `manifest diff` and by
     a person looking at what a layer produced, and neither is served by one
     line of six megabytes. */
-    println!("{:#}", build::build(&package, &args.tier, &dependencies));
+    let given = args.package.to_string_lossy().replace('\\', "/");
+    println!(
+        "{:#}",
+        build::build(&package, &given, &args.tier, &dependencies)
+    );
     Ok(Code::Ok)
 }

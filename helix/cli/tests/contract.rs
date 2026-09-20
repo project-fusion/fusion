@@ -1121,3 +1121,73 @@ fn every_link_above_a_class_contributes() {
     assert!(!said.contains("\"render\""), "an instance override: {said}");
     assert!(said.contains("shadowRootOptions"), "a static one: {said}");
 }
+
+/// A family's examples, which come off the disk rather than out of a parse.
+///
+/// `preview` first and the rest alphabetically, which is the reference page's
+/// own order: the preview is the picture at the top and the others are the list
+/// beneath it. Only on the root, because a family has one set of examples and a
+/// part is not a second family.
+#[test]
+fn a_family_carries_its_examples_and_its_root_alone_does() {
+    let sandbox = Sandbox::new("manifest-examples", None);
+    let root = sandbox.0.join("src/badge/root");
+    let item = sandbox.0.join("src/badge/item");
+    let shown = sandbox.0.join("src/badge/.examples");
+    for at in [&root, &item, &shown] {
+        std::fs::create_dir_all(at).expect("a source tree");
+    }
+    /* Components, because the block these fields sit in is a component's: a
+    plain class has no family and no examples to carry. */
+    std::fs::write(
+        root.join("badge-root.ts"),
+        "@customElement('helix-badge')\nexport class HelixBadge {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        item.join("badge-item.ts"),
+        "@customElement('helix-badge-item')\nexport class HelixBadgeItem {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        shown.join("tones.html"),
+        "<!-- @summary Each tone. -->\n<helix-badge></helix-badge>\n",
+    )
+    .expect("an example");
+    std::fs::write(
+        shown.join("preview.html"),
+        "<!-- @summary The picture. -->\n<helix-badge></helix-badge>\n",
+    )
+    .expect("an example");
+    /* The `.tsx` beside it says the same thing for a framework consumer, and
+    counting both would list every example twice. */
+    std::fs::write(shown.join("preview.tsx"), "export function Example() {}\n").expect("a twin");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let at = |needle: &str| said.find(needle).expect(needle);
+
+    assert!(said.contains("The picture."), "the summary is read: {said}");
+    assert!(at("preview") < at("tones"), "preview leads: {said}");
+    assert_eq!(
+        said.matches("\"slug\": \"preview\"").count(),
+        1,
+        "not twice"
+    );
+    /* The path as the caller wrote it, since a reader opens a checkout. */
+    assert!(
+        said.contains("\"source\": \"./src/badge\""),
+        "as given: {said}"
+    );
+    /* And the item carries none of it. **Counted rather than read positionally**:
+    the modules are sorted, `item` comes before `root`, and looking at
+    everything after the item's name finds the root's examples and calls them
+    the item's. One family, one set. */
+    assert_eq!(
+        said.matches("\"examples\"").count(),
+        1,
+        "a part is not a family: {said}"
+    );
+    assert_eq!(said.matches("\"source\"").count(), 1, "nor a second source");
+}
