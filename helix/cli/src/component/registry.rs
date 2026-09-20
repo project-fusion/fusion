@@ -21,12 +21,20 @@
 //! word it does name is real. The fault this rule exists to catch, a value on a
 //! page the registry does not have, is caught either way.
 //!
-//! **The per-value tables are read as well**, which is the other half. `shape`
-//! and `nesting` each carry a table saying what their values mean, because
-//! membership is what the `axes` rule can see and meaning is what it cannot, and
-//! a table of meanings rots exactly as a table of values does. One is recognized
-//! by its first column being `Value`, and its rows have to be a subset of a
-//! single axis: a table mixing two axes' words is a table about nothing.
+//! **The per-value tables are read as well**, which is the other half. Each axis
+//! carries a table saying what its values mean, because membership is what the
+//! `axes` rule can see and meaning is what it cannot, and a table of meanings
+//! rots exactly as a table of values does. One is recognized by its first column
+//! being `Value`.
+//!
+//! **Its rows are one axis's words, all of them.** A table mixing two axes is a
+//! table about nothing, and a table naming four of an axis's five is the stale
+//! copy this rule exists to catch, arriving by omission the way the axis names
+//! above do: the next value registered is one nine tables have to gain by hand,
+//! and the one that does not gain it says the value does not exist. Held to
+//! equality for that reason rather than to membership. Every complete table
+//! names its own axis unambiguously, so nothing is guessed: `auto` alone sits in
+//! two vocabularies, `auto` beside `full` in one.
 
 use std::collections::BTreeSet;
 use std::fs;
@@ -234,10 +242,38 @@ fn table_of_values(text: &str, where_: &str, findings: &mut Vec<Finding>) -> usi
         if said.is_empty() {
             continue;
         }
-        if AXES
+        if AXES.iter().any(|(_, values)| {
+            said.len() == values.len() && said.iter().all(|one| values.contains(&one.as_str()))
+        }) {
+            continue;
+        }
+        /* Inside one axis and short of it, which is the omission case and worth
+           naming what is missing: a reader who has to diff two tables by eye is
+           being asked to do what this rule is for. */
+        if let Some((axis, values)) = AXES
             .iter()
-            .any(|(_, values)| said.iter().all(|one| values.contains(&one.as_str())))
+            .filter(|(_, values)| said.iter().all(|one| values.contains(&one.as_str())))
+            /* The nearest axis, not the first one listed. A table left holding
+               `auto` alone sits inside `orientation` and inside `width`, and the
+               one it is missing least of is the one it was. */
+            .min_by_key(|(_, values)| values.len() - said.len())
         {
+            findings.push(Finding {
+                detail: "A table of what values mean is a copy of the registry, so it goes stale \
+                         by omission as much as by outliving a value. A value with no row reads \
+                         as a value that does not exist."
+                    .to_owned(),
+                file: where_.to_owned(),
+                message: format!(
+                    "explains `{axis}` and omits {}",
+                    values
+                        .iter()
+                        .filter(|one| !said.contains(**one))
+                        .map(|one| format!("`{one}`"))
+                        .collect::<Vec<String>>()
+                        .join(", ")
+                ),
+            });
             continue;
         }
         findings.push(Finding {
