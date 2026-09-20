@@ -22,6 +22,7 @@
 //! it does not is that something sorts them.
 
 pub mod build;
+pub mod jsdoc;
 pub mod parse;
 
 use std::collections::{BTreeMap, BTreeSet};

@@ -13,7 +13,7 @@
 //! resolve. Nothing was holding that true before, which is how three arrived
 //! that a parser could not have followed.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use oxc_allocator::Allocator;
 use oxc_ast::ast::{
@@ -22,6 +22,8 @@ use oxc_ast::ast::{
 };
 use oxc_parser::Parser;
 use oxc_span::{GetSpan, SourceType};
+
+use crate::manifest::jsdoc::{self, Documented};
 
 /// One thing a module declares, as far as this layer reads it.
 #[derive(Debug, Default)]
@@ -33,6 +35,8 @@ pub struct Declared {
     pub superclass: Option<String>,
     /// What the class body declares, in the order it is written.
     pub members: Vec<Member>,
+    /// The doc block above it, read the way the manifest reads one.
+    pub documented: Documented,
 }
 
 /// One entry in a class body.
@@ -55,7 +59,16 @@ pub struct Member {
     /// has `type`, and giving a method both would invent a field it never had.
     pub returns: Option<String>,
     pub parameters: Vec<(String, Option<String>)>,
+    /// The doc block above it.
+    pub documented: Documented,
 }
+
+/// Every doc block in a source, by the offset of what it is written above.
+///
+/// **oxc says what a comment attaches to**, which saves guessing from distance:
+/// a block above a decorated property attaches to the property whatever sits
+/// between them, and a block separated by a blank line attaches to nothing.
+type Attached = BTreeMap<u32, Documented>;
 
 /// The source a span covers, which is how the manifest's text fields are made.
 fn slice(source: &str, start: u32, end: u32) -> String {
@@ -138,15 +151,19 @@ fn privacy_of(
 }
 
 /// What a class body declares, in the order it is written.
-fn members_of(class: &Class<'_>, source: &str) -> Vec<Member> {
+fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
     let mut found = Vec::new();
     for element in &class.body.body {
+        /* A decorated member's block sits above the decorator, so the offset to
+        ask about is the whole element's rather than the name's. */
+        let at = element.span().start;
         match element {
             ClassElement::PropertyDefinition(property) => {
                 let Some(name) = key_of(&property.key, source) else {
                     continue;
                 };
                 found.push(Member {
+                    documented: docs.get(&at).cloned().unwrap_or_default(),
                     parameters: Vec::new(),
                     returns: None,
                     default: property
@@ -194,6 +211,7 @@ fn members_of(class: &Class<'_>, source: &str) -> Vec<Member> {
                 );
                 let reading = matches!(method.kind, MethodDefinitionKind::Get);
                 found.push(Member {
+                    documented: docs.get(&at).cloned().unwrap_or_default(),
                     is_static: method.r#static,
                     kind: if accessor { "field" } else { "method" },
                     name,
@@ -239,14 +257,15 @@ fn members_of(class: &Class<'_>, source: &str) -> Vec<Member> {
 }
 
 /// The name and kind of a declaration, where it has a name to give.
-fn named(declaration: &Declaration<'_>, source: &str) -> Vec<Declared> {
+fn named(declaration: &Declaration<'_>, source: &str, docs: &Attached) -> Vec<Declared> {
     match declaration {
         Declaration::ClassDeclaration(class) => class
             .id
             .as_ref()
             .map(|id| Declared {
+                documented: Documented::default(),
                 kind: "class",
-                members: members_of(class, source),
+                members: members_of(class, source, docs),
                 name: id.name.to_string(),
                 superclass: class
                     .super_class
@@ -285,6 +304,37 @@ fn named(declaration: &Declaration<'_>, source: &str) -> Vec<Declared> {
     }
 }
 
+/// The block above a statement, given to the one declaration it describes.
+///
+/// A statement declaring several names has one block above it and it belongs to
+/// none of them in particular, so it is given only where there is one to give
+/// it to.
+///
+/// **Two offsets are tried, because a decorator moves the anchor.** A block
+/// above `@customElement(…)` attaches to the decorator rather than to the
+/// `export` below it, so every component class in the library read as having no
+/// description at all until the decorator's own offset was asked for too.
+fn carrying(mut declared: Vec<Declared>, docs: &Attached, at: &[u32]) -> Vec<Declared> {
+    let found = at.iter().find_map(|one| docs.get(one));
+    if let ([one], Some(block)) = (declared.as_mut_slice(), found) {
+        one.documented = block.clone();
+    }
+    declared
+}
+
+/// Where a declaration's doc block may be anchored, nearest first.
+fn anchors(statement: &Statement<'_>, declaration: Option<&Declaration<'_>>) -> Vec<u32> {
+    let mut at = Vec::new();
+    if let Some(Declaration::ClassDeclaration(class)) = declaration {
+        if let Some(first) = class.decorators.first() {
+            at.push(first.span.start);
+        }
+        at.push(class.span.start);
+    }
+    at.push(statement.span().start);
+    at
+}
+
 /// Everything a source exports, in the order it is written.
 ///
 /// **Exported only.** A manifest speaks for a package's surface, so a helper a
@@ -317,12 +367,27 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
         }
     }
 
+    /* Read once, keyed by what oxc says each block sits above. */
+    let mut docs: Attached = BTreeMap::new();
+    for comment in &parsed.program.comments {
+        let text = slice(source, comment.span.start, comment.span.end);
+        /* Only a doc block. A plain block comment is a note to a maintainer
+        rather than API, and the analyzer publishes neither. */
+        if text.starts_with("/**") {
+            docs.insert(comment.attached_to, jsdoc::read(&text));
+        }
+    }
+
     let mut found = Vec::new();
     for statement in &parsed.program.body {
         match statement {
             Statement::ExportNamedDeclaration(export) => {
                 if let Some(declaration) = &export.declaration {
-                    found.extend(named(declaration, source));
+                    found.extend(carrying(
+                        named(declaration, source, &docs),
+                        &docs,
+                        &anchors(statement, Some(declaration)),
+                    ));
                 }
             }
             /* A declaration standing on its own, kept only where something
@@ -330,9 +395,13 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
             other => {
                 if let Some(declaration) = other.as_declaration() {
                     found.extend(
-                        named(declaration, source)
-                            .into_iter()
-                            .filter(|one| exported.contains(&one.name)),
+                        carrying(
+                            named(declaration, source, &docs),
+                            &docs,
+                            &anchors(statement, Some(declaration)),
+                        )
+                        .into_iter()
+                        .filter(|one| exported.contains(&one.name)),
                     );
                 }
             }
