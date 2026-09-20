@@ -786,3 +786,79 @@ fn a_wrong_templates_override_says_so_rather_than_blaming_node_modules() {
         "the node_modules walk never ran, so it must not be blamed"
     );
 }
+
+/// A manifest against itself is the case the oracle has to get right first.
+///
+/// **A differ that reports nothing is a differ that passes this test**, so it is
+/// planted against three shapes below rather than trusted on a clean run alone:
+/// a field that changed, a member that left, and an order that moved.
+#[test]
+fn a_manifest_agrees_with_itself() {
+    let sandbox = Sandbox::new("manifest-same", None);
+    let manifest = r#"{"modules":[{"path":"src/chip.ts","declarations":[
+      {"name":"HelixChip","tagName":"helix-chip","members":[
+        {"name":"label","default":"''"},{"name":"tone"}]}]}]}"#;
+    std::fs::write(sandbox.0.join("a.json"), manifest).expect("a manifest");
+    std::fs::write(sandbox.0.join("b.json"), manifest).expect("a manifest");
+    let output = run(&sandbox.0, &["manifest", "diff", "a.json", "b.json"]);
+    assert_eq!(code(&output), 0);
+    assert!(
+        out(&output).contains("say the same thing"),
+        "{}",
+        out(&output)
+    );
+}
+
+#[test]
+fn a_manifest_is_held_to_the_field_the_member_and_the_order() {
+    let sandbox = Sandbox::new("manifest-differs", None);
+    let before = r#"{"modules":[{"path":"src/chip.ts","declarations":[
+      {"name":"HelixChip","tagName":"helix-chip","members":[
+        {"name":"label","default":"''"},{"name":"tone"},{"name":"size"}]}]}]}"#;
+    /* `label` keeps its name and loses its default, `size` is gone, and `tone`
+    has moved ahead of `label`: three kinds of change at once, because a differ
+    that finds one of them and stops is the failure worth catching. */
+    let after = r#"{"modules":[{"path":"src/chip.ts","declarations":[
+      {"name":"HelixChip","tagName":"helix-chip","members":[
+        {"name":"tone"},{"name":"label"}]}]}]}"#;
+    std::fs::write(sandbox.0.join("a.json"), before).expect("a manifest");
+    std::fs::write(sandbox.0.join("b.json"), after).expect("a manifest");
+    let output = run(&sandbox.0, &["manifest", "diff", "a.json", "b.json"]);
+    assert_eq!(code(&output), 1);
+    let said = out(&output);
+    assert!(said.contains("members size"), "the departed member: {said}");
+    assert!(
+        said.contains("members.label › default"),
+        "the field: {said}"
+    );
+    /* The order report is suppressed where the names differ, which they do here,
+    so what this asserts is that the reader is told once and accurately. */
+    assert!(
+        !said.contains("in a different order"),
+        "order is not reported beside a membership change: {said}"
+    );
+}
+
+/// The manifest's own top-level lists are addressed to the file, not to nothing.
+#[test]
+fn a_difference_above_any_module_is_addressed_to_the_manifest() {
+    let sandbox = Sandbox::new("manifest-top", None);
+    std::fs::write(
+        sandbox.0.join("a.json"),
+        r#"{"modules":[{"path":"src/one.ts"},{"path":"src/two.ts"}]}"#,
+    )
+    .expect("a manifest");
+    std::fs::write(
+        sandbox.0.join("b.json"),
+        r#"{"modules":[{"path":"src/two.ts"},{"path":"src/one.ts"}]}"#,
+    )
+    .expect("a manifest");
+    let output = run(&sandbox.0, &["manifest", "diff", "a.json", "b.json"]);
+    assert_eq!(code(&output), 1);
+    let said = out(&output);
+    assert!(
+        said.contains("the manifest › modules in a different order"),
+        "{said}"
+    );
+    assert!(said.contains("from position 0"), "{said}");
+}

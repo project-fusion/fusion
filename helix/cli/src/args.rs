@@ -79,6 +79,16 @@ pub enum Noun {
     does one thing to one subject and there is no second verb it could take:
     `helix new list` would be a word for what an omitted `--template` already
     prints. */
+    /* **A noun for the artifact rather than a verb on the component noun.**
+    `component` holds a design system to its conventions; a manifest is a file,
+    and what is asked of a file is whether two of them say the same thing. */
+    /// Read and compare custom elements manifests.
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    Manifest {
+        #[command(subcommand)]
+        verb: Manifest,
+    },
+
     /// Scaffold a project from a Helix template.
     ///
     /// Reads `@fusion.dev/helix-templates` from `node_modules`. Omit
@@ -176,6 +186,38 @@ pub struct Init {
     /// Overwrite an existing file.
     #[arg(long)]
     pub force: bool,
+}
+
+/// What can be asked of a manifest.
+#[derive(Debug, Subcommand)]
+pub enum Manifest {
+    /* **The instrument a second generator is held to.** Replacing the analyzer
+    is only safe if the thing replacing it can be shown to produce what the
+    thing it replaces produced, and the manifest is the most-checked artifact
+    here: the reference pages, the framework typings and sixty component rules
+    all read it. */
+    /// Say what two manifests disagree about, in the manifest's own terms.
+    ///
+    /// Exits 1 on any difference, so a generator that claims to match can be
+    /// made to prove it in a pipeline.
+    Diff(ManifestDiff),
+}
+
+/// What `manifest diff` takes.
+#[derive(Args, Debug)]
+pub struct ManifestDiff {
+    /// The manifest to treat as what is expected.
+    pub before: PathBuf,
+
+    /// The manifest to hold against it.
+    pub after: PathBuf,
+
+    /* A cap rather than a page, because the question this answers first is
+    "did anything move", and a generator part way through its first tier
+    answers it with tens of thousands of lines. */
+    /// How many differences to print before stopping. Zero for all of them.
+    #[arg(default_value_t = 40, long)]
+    pub limit: usize,
 }
 
 /// What can be asked of the component rules.
