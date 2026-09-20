@@ -18,6 +18,7 @@
 mod args;
 mod component;
 mod config;
+mod manifest;
 mod mcp;
 mod new;
 mod theme;
@@ -29,7 +30,7 @@ use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 use fusion_rules::style::Paint;
 
-use crate::args::{Cli, Component, Noun, Theme};
+use crate::args::{Cli, Component, Manifest, Noun, Theme};
 
 /// The word every printed failure opens with, and the corner of every screen.
 const PRODUCT: &str = "helix";
@@ -62,6 +63,9 @@ fn main() {
             Component::Audit(args) => component::run::audit(args, &from, cli.json, paint),
             Component::Check(args) => component::run::check(args, &from, cli.json, paint),
             Component::Fix(args) => component::run::fix(args, &from, cli.json, paint),
+        },
+        Noun::Manifest { verb } => match verb {
+            Manifest::Diff(args) => manifest::diff(args, &from, cli.json),
         },
         Noun::New(args) => new::run(args, &from, cli.json, paint),
         Noun::Theme { verb } => match verb {
