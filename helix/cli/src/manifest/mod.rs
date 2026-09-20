@@ -22,12 +22,13 @@
 //! it does not is that something sorts them.
 
 pub mod build;
+pub mod inherit;
 pub mod jsdoc;
 pub mod parse;
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
@@ -393,9 +394,31 @@ pub fn generate(args: &ManifestBuild, from: &Path, _json: bool) -> Result<Code, 
         )
         .hint("pass the directory that holds the package's `src`, such as helix/styled"));
     }
+    /* Read once, by the package name a superclass will name them by. A path
+    that cannot be read is a failure rather than a silence: a manifest asked
+    for and not found would leave every class in it looking as though it
+    inherited nothing. */
+    let mut dependencies = build::Dependencies::new();
+    for given in &args.dependencies {
+        let Some((name, at)) = given.split_once('=') else {
+            return Err(Failure::input(
+                "a dependency is written `<package>=<path>`",
+                format!("`{given}` has no `=` in it"),
+            ));
+        };
+        let at = if Path::new(at).is_absolute() {
+            PathBuf::from(at)
+        } else {
+            from.join(at)
+        };
+        let manifest = read(&at)
+            .map_err(|why| Failure::input("a dependency's manifest could not be read", why))?;
+        dependencies.insert(name.to_owned(), manifest);
+    }
+
     /* Always the pretty form. This exists to be read by `manifest diff` and by
     a person looking at what a layer produced, and neither is served by one
     line of six megabytes. */
-    println!("{:#}", build::build(&package, &args.tier));
+    println!("{:#}", build::build(&package, &args.tier, &dependencies));
     Ok(Code::Ok)
 }

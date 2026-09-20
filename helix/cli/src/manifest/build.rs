@@ -23,7 +23,10 @@ use std::path::{Path, PathBuf};
 
 use serde_json::{json, Value};
 
+pub use crate::manifest::inherit::Dependencies;
 use crate::manifest::jsdoc::{entry, Documented};
+
+use crate::manifest::inherit;
 use crate::manifest::parse::{declarations, Declared, Superclass};
 
 /// Files the analyzer is told to skip, by the suffix that names them.
@@ -350,14 +353,18 @@ fn declaration_of(one: Declared, path: &str, tier: &str) -> Value {
 }
 
 /// The manifest as far as this generator has been taken.
-pub fn build(package: &Path, tier: &str) -> Value {
+pub fn build(package: &Path, tier: &str, dependencies: &Dependencies) -> Value {
     let modules: Vec<Value> = sources(package)
         .into_iter()
         .map(|path| {
             let text = fs::read_to_string(package.join(&path)).unwrap_or_default();
             let declared: Vec<Value> = declarations(&text, &path)
                 .into_iter()
-                .map(|one| declaration_of(one, &path, tier))
+                .map(|one| {
+                    let mut declaration = declaration_of(one, &path, tier);
+                    inherit::apply(&mut declaration, dependencies);
+                    declaration
+                })
                 .collect();
             json!({
                 "declarations": declared,

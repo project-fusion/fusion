@@ -225,6 +225,17 @@ pub struct ManifestBuild {
     /// The design-system tier the package belongs to.
     #[arg(default_value = "styled", long)]
     pub tier: String,
+
+    /* **Given rather than resolved**, for the reason `--tier` is: a generator
+    that walked `node_modules` would be re-implementing package resolution,
+    which is the subsystem this exists to avoid depending on, and it would stop
+    being a function of its inputs. A build script knows its own graph; each
+    package's `package.json` already writes it down. */
+    /// A dependency's manifest, as `<package>=<path>`. Repeat for each.
+    ///
+    /// Needed to resolve what a class inherits from a base in another package.
+    #[arg(long = "dependency", value_name = "PACKAGE=PATH")]
+    pub dependencies: Vec<String>,
 }
 
 /// What `manifest diff` takes.
