@@ -217,6 +217,14 @@ pub enum Manifest {
 pub struct ManifestBuild {
     /// The package to read, which is the directory holding its `src`.
     pub package: PathBuf,
+
+    /* **Given rather than discovered.** The analyzer takes it from a
+    TypeScript config, and a Rust binary that executed one to find out would be
+    doing the thing this exists to stop doing. Sandbox declares `styled`, which
+    is why it cannot be guessed from the directory either. */
+    /// The design-system tier the package belongs to.
+    #[arg(default_value = "styled", long)]
+    pub tier: String,
 }
 
 /// What `manifest diff` takes.

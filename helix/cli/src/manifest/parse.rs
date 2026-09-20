@@ -37,6 +37,12 @@ pub struct Declared {
     pub members: Vec<Member>,
     /// The doc block above it, read the way the manifest reads one.
     pub documented: Documented,
+    /// The tag it registers, where it registers one.
+    ///
+    /// **What makes a class a component.** Several of the library's plugins ask
+    /// only about declarations that have one, so a controller and an element
+    /// are told apart by this and not by being classes.
+    pub tag_name: Option<String>,
 }
 
 /// One entry in a class body.
@@ -148,6 +154,31 @@ fn privacy_of(
         Some(TSAccessibility::Public) => Some("public"),
         None => None,
     }
+}
+
+/// The tag a class registers, read from its `@customElement` decorator.
+///
+/// The one string argument, as written. A decorator called with anything else
+/// is left alone: what it registers would be a runtime question, and the
+/// analyzer does not answer those either.
+fn tag_of(class: &Class<'_>) -> Option<String> {
+    for decorator in &class.decorators {
+        let Expression::CallExpression(call) = &decorator.expression else {
+            continue;
+        };
+        let Expression::Identifier(name) = &call.callee else {
+            continue;
+        };
+        if name.name != "customElement" {
+            continue;
+        }
+        if let [argument] = call.arguments.as_slice() {
+            if let Some(Expression::StringLiteral(tag)) = argument.as_expression() {
+                return Some(tag.value.to_string());
+            }
+        }
+    }
+    None
 }
 
 /// What a class body declares, in the order it is written.
@@ -265,6 +296,7 @@ fn named(declaration: &Declaration<'_>, source: &str, docs: &Attached) -> Vec<De
             .map(|id| Declared {
                 documented: Documented::default(),
                 kind: "class",
+                tag_name: tag_of(class),
                 members: members_of(class, source, docs),
                 name: id.name.to_string(),
                 superclass: class
@@ -279,6 +311,7 @@ fn named(declaration: &Declaration<'_>, source: &str, docs: &Attached) -> Vec<De
             .as_ref()
             .map(|id| Declared {
                 kind: "function",
+                tag_name: None,
                 name: id.name.to_string(),
                 ..Declared::default()
             })
@@ -292,6 +325,7 @@ fn named(declaration: &Declaration<'_>, source: &str, docs: &Attached) -> Vec<De
             .filter_map(|one| {
                 one.id.get_binding_identifier().map(|id| Declared {
                     kind: "variable",
+                    tag_name: None,
                     name: id.name.to_string(),
                     ..Declared::default()
                 })
