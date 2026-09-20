@@ -99,6 +99,18 @@ pub fn build(package: &Path) -> Value {
                     let Some(fields) = entry.as_object_mut() else {
                         return entry;
                     };
+                    if let Some(summary) = one
+                        .documented
+                        .tags
+                        .iter()
+                        .find(|(name, _)| name == "summary")
+                        .map(|(_, text)| text.trim().to_owned())
+                    {
+                        fields.insert("summary".to_owned(), json!(summary));
+                    }
+                    if let Some(description) = one.documented.description {
+                        fields.insert("description".to_owned(), json!(description));
+                    }
                     if let Some(superclass) = one.superclass {
                         /* The analyzer records where a superclass came from as
                         well as its name. Which module and package is a
@@ -115,6 +127,9 @@ pub fn build(package: &Path) -> Value {
                                 let Some(at) = said.as_object_mut() else {
                                     return said;
                                 };
+                                if let Some(description) = member.documented.description {
+                                    at.insert("description".to_owned(), json!(description));
+                                }
                                 if let Some(text) = member.type_text {
                                     at.insert("type".to_owned(), json!({ "text": text }));
                                 }
