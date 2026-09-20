@@ -862,3 +862,33 @@ fn a_difference_above_any_module_is_addressed_to_the_manifest() {
     );
     assert!(said.contains("from position 0"), "{said}");
 }
+
+/// The generator reads both routes out of a module, and keeps source order.
+///
+/// `ScrollArea` is the case in the real tiers: `EDGES` is declared privately on
+/// line 6 and exported on line 241, and reading only the inline route dropped
+/// it. One declaration missing from two hundred and twenty-nine modules, which
+/// the diff found and a reader would not have.
+#[test]
+fn a_declaration_exported_below_is_still_declared_above() {
+    let sandbox = Sandbox::new("manifest-build", None);
+    let src = sandbox.0.join("src/area");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("area.ts"),
+        "const EDGES = ['start'] as const\nexport class HelixArea {}\nexport { EDGES }\n",
+    )
+    .expect("a source");
+    /* A spec beside it, which the manifest does not speak for. */
+    std::fs::write(src.join("area.spec.ts"), "export const nope = 1\n").expect("a spec");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let at = |needle: &str| said.find(needle).expect(needle);
+    assert!(said.contains("src/area/area.ts"), "{said}");
+    assert!(!said.contains("area.spec.ts"), "a spec is not API: {said}");
+    assert!(said.contains("EDGES"), "exported below: {said}");
+    /* Where it is written rather than where it is exported. */
+    assert!(at("EDGES") < at("HelixArea"), "source order: {said}");
+}

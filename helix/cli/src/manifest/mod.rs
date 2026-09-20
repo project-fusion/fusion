@@ -21,6 +21,9 @@
 //! the same manifest: it would churn every diff that touched it and the reason
 //! it does not is that something sorts them.
 
+pub mod build;
+pub mod parse;
+
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::Path;
@@ -29,7 +32,7 @@ use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 use serde_json::Value;
 
-use crate::args::ManifestDiff;
+use crate::args::{ManifestBuild, ManifestDiff};
 
 /// One disagreement, addressed the way a reader would go looking for it.
 #[derive(Debug)]
@@ -373,4 +376,25 @@ pub fn diff(args: &ManifestDiff, from: &Path, json: bool) -> Result<Code, Failur
         args.after.display()
     );
     Ok(Code::Failed)
+}
+
+/// Generate a manifest and write it out.
+pub fn generate(args: &ManifestBuild, from: &Path, _json: bool) -> Result<Code, Failure> {
+    let package = if args.package.is_absolute() {
+        args.package.clone()
+    } else {
+        from.join(&args.package)
+    };
+    if !package.join("src").is_dir() {
+        return Err(Failure::input(
+            "the package has no sources",
+            format!("{} holds no `src`", package.display()),
+        )
+        .hint("pass the directory that holds the package's `src`, such as helix/styled"));
+    }
+    /* Always the pretty form. This exists to be read by `manifest diff` and by
+    a person looking at what a layer produced, and neither is served by one
+    line of six megabytes. */
+    println!("{:#}", build::build(&package));
+    Ok(Code::Ok)
 }

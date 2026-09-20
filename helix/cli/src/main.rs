@@ -65,6 +65,7 @@ fn main() {
             Component::Fix(args) => component::run::fix(args, &from, cli.json, paint),
         },
         Noun::Manifest { verb } => match verb {
+            Manifest::Build(args) => manifest::generate(args, &from, cli.json),
             Manifest::Diff(args) => manifest::diff(args, &from, cli.json),
         },
         Noun::New(args) => new::run(args, &from, cli.json, paint),

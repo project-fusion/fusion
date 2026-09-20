@@ -201,6 +201,22 @@ pub enum Manifest {
     /// Exits 1 on any difference, so a generator that claims to match can be
     /// made to prove it in a pipeline.
     Diff(ManifestDiff),
+
+    /* **Not wired into any build.** Held to the analyzer's output by `diff`
+    until it matches, and only then does anything read it. Until that day this
+    is a generator being measured rather than one being used. */
+    /// Generate a manifest from a package's sources.
+    ///
+    /// Writes to stdout. Incomplete: the layers it has been taken through are
+    /// the ones `diff` reports no difference in.
+    Build(ManifestBuild),
+}
+
+/// What `manifest build` takes.
+#[derive(Args, Debug)]
+pub struct ManifestBuild {
+    /// The package to read, which is the directory holding its `src`.
+    pub package: PathBuf,
 }
 
 /// What `manifest diff` takes.
