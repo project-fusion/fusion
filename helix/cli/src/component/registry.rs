@@ -248,14 +248,14 @@ fn table_of_values(text: &str, where_: &str, findings: &mut Vec<Finding>) -> usi
             continue;
         }
         /* Inside one axis and short of it, which is the omission case and worth
-           naming what is missing: a reader who has to diff two tables by eye is
-           being asked to do what this rule is for. */
+        naming what is missing: a reader who has to diff two tables by eye is
+        being asked to do what this rule is for. */
         if let Some((axis, values)) = AXES
             .iter()
             .filter(|(_, values)| said.iter().all(|one| values.contains(&one.as_str())))
             /* The nearest axis, not the first one listed. A table left holding
-               `auto` alone sits inside `orientation` and inside `width`, and the
-               one it is missing least of is the one it was. */
+            `auto` alone sits inside `orientation` and inside `width`, and the
+            one it is missing least of is the one it was. */
             .min_by_key(|(_, values)| values.len() - said.len())
         {
             findings.push(Finding {

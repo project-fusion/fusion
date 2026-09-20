@@ -1,21 +1,52 @@
 /**
- * The states an orb can be in, in the order a task tends to pass through them.
+ * What the agent is doing.
  *
- * Exported so the component can validate an attribute against the same list the
- * generator reads, rather than keeping a second copy that drifts.
+ * **Written out rather than derived from the array below**, which is the other
+ * way round from where this started. The manifest records a property's type as
+ * the text somebody wrote, so `(typeof ORB_STATES)[number]` reached it as a name
+ * with no values in it and the reference page listed none: a reader was told the
+ * attribute takes an `OrbState` and left to find out what one is. A union on one
+ * line is what every reader of this repository's sources can resolve, the `axes`
+ * rule included, and no type system is needed to do it.
  */
-export const ORB_STATES = [
-  'waiting',
-  'connecting',
-  'thinking',
-  'fetching',
-  'listening',
-  'working',
-  'done',
-] as const
+export type OrbState =
+  | 'waiting'
+  | 'connecting'
+  | 'thinking'
+  | 'fetching'
+  | 'listening'
+  | 'working'
+  | 'done'
 
-/** What the agent is doing. */
-export type OrbState = (typeof ORB_STATES)[number]
+/**
+ * Each state and where it sits in the order a task tends to pass through them.
+ *
+ * **A record rather than an array, because a record is exhaustive in both
+ * directions.** `Record<OrbState, number>` refuses to compile while a state has
+ * no entry, and `satisfies` refuses an entry that is not a state, so the union
+ * above and the list below cannot drift apart in either direction. An array
+ * typed `readonly OrbState[]` catches only the second: a state added to the
+ * union and forgotten here would leave the component refusing an attribute its
+ * own type accepts, silently, which is the half that matters.
+ */
+const ORDER = {
+  connecting: 1,
+  done: 6,
+  fetching: 3,
+  listening: 4,
+  thinking: 2,
+  waiting: 0,
+  working: 5,
+} as const satisfies Record<OrbState, number>
+
+/**
+ * The same states as a list, in that order.
+ *
+ * Exported so the component can validate an attribute against one list rather
+ * than a second copy that drifts. String keys come back in insertion order,
+ * which the object above is written in.
+ */
+export const ORB_STATES = Object.keys(ORDER) as readonly OrbState[]
 
 /**
  * The numbers one state is made of.
