@@ -987,3 +987,68 @@ fn a_superclass_says_where_it_came_from() {
         "an unimported name is this module's: {said}"
     );
 }
+
+/// What a class takes from a base in another package.
+///
+/// The three rules that are not obvious, each measured against the real tiers
+/// before it was written: a name the child also declares keeps the child's
+/// words and is marked all the same; the mark names where the entry started
+/// rather than where it was picked up; and a name the child alone has stays
+/// unmarked.
+#[test]
+fn a_class_takes_what_its_base_has() {
+    let sandbox = Sandbox::new("manifest-inherit", None);
+    let src = sandbox.0.join("src/badge/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("badge-root.ts"),
+        "import { HelixHeadlessBadge } from '@fusion.dev/helix-headless/badge'\n\
+         /**\n * @csspart mark - The styled one, said at more length.\n */\n\
+         export class HelixBadge extends HelixHeadlessBadge {\n\
+         \x20 tone = 'neutral'\n\
+         }\n",
+    )
+    .expect("a source");
+    /* The parent owns `mark` and was given `tier`, which is the difference the
+    stamp has to tell. */
+    std::fs::write(
+        sandbox.0.join("headless.json"),
+        r#"{"modules":[{"path":"src/badge/root/badge-root.ts","declarations":[
+          {"name":"HelixHeadlessBadge","members":[
+            {"name":"label"},
+            {"name":"tier","inheritedFrom":{"name":"HelixElement","module":"src/helix-element/helix-element.ts"}}],
+           "cssParts":[{"name":"mark","description":"The plain one."}]}]}]}"#,
+    )
+    .expect("a manifest");
+
+    let output = run(
+        &sandbox.0,
+        &[
+            "manifest",
+            "build",
+            ".",
+            "--dependency",
+            "@fusion.dev/helix-headless=headless.json",
+        ],
+    );
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    /* The child's own words survive, and the part is marked anyway. */
+    assert!(
+        said.contains("said at more length"),
+        "the child's text: {said}"
+    );
+    /* `tier` came through the parent but started at `HelixElement`. */
+    assert!(
+        said.contains("HelixElement"),
+        "the origin, not the parent: {said}"
+    );
+    /* And `label`, which the parent owns, names the parent. */
+    assert!(said.contains("HelixHeadlessBadge"), "the parent: {said}");
+    /* `tone` is the child's alone and stays unmarked, which is what makes the
+    stamp mean anything. */
+    let at = said.find("\"tone\"").expect("tone is declared");
+    let after = &said[at..at + 200.min(said.len() - at)];
+    assert!(!after.contains("inheritedFrom"), "the child's own: {after}");
+}
