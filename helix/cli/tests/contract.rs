@@ -892,3 +892,50 @@ fn a_declaration_exported_below_is_still_declared_above() {
     /* Where it is written rather than where it is exported. */
     assert!(at("EDGES") < at("HelixArea"), "source order: {said}");
 }
+
+/// What a class body says, in the four shapes that are not one-to-one.
+///
+/// Each was found by the diff rather than by reading the schema, and each is a
+/// rule about what the manifest describes: the surface a consumer reaches,
+/// rather than how the class is written.
+#[test]
+fn a_class_body_is_read_as_the_surface_it_publishes() {
+    let sandbox = Sandbox::new("manifest-members", None);
+    let src = sandbox.0.join("src/editor");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("editor.ts"),
+        "export class HelixEditor extends HelixElement {\n\
+         \x20 label = 'Source'\n\
+         \x20 private view: string | undefined\n\
+         \x20 get caret(): CaretDetail { return this.at }\n\
+         \x20 focus(mode: string): void {}\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    /* A field with no annotation takes its type from the literal, which is the
+    only inference here and one a parser can do. */
+    assert!(said.contains("\"text\": \"string\""), "inferred: {said}");
+    /* A getter is a readonly field, not a method: what a consumer reaches is a
+    value, and its type is the return annotation. */
+    assert!(
+        said.contains("\"CaretDetail\""),
+        "the getter's type: {said}"
+    );
+    /* A method carries `return` and `parameters` and no `type` of its own. */
+    assert!(
+        said.contains("\"parameters\""),
+        "the method's parameters: {said}"
+    );
+    assert!(
+        said.contains("\"privacy\": \"private\""),
+        "the keyword: {said}"
+    );
+    /* And the class says what it extends. */
+    assert!(said.contains("HelixElement"), "the superclass: {said}");
+}
