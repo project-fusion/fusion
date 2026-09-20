@@ -1,6 +1,12 @@
 //! What a class takes from the class it extends.
 //!
-//! **The parent's list is copied whole, and that is the whole algorithm.** A
+//! **Each link above the class in turn, nearest first.** A mixin is a link and
+//! not a wrapper to see past: `MixinControllerChecked(MixinField(
+//! HelixFormElement))` gives Checkbox members from all three, in that order,
+//! which is the prototype chain written down.
+//!
+//! **The parent's list is copied whole, and that is the rest of the
+//! algorithm.** A
 //! parent's own list is already itself own-then-inherited, so copying it in
 //! order reproduces the chain without walking it: `helix-badge` carries one
 //! member of its own and twenty-four from above, six from the headless badge
@@ -147,46 +153,48 @@ fn joined(mine: Option<&Value>, theirs: Option<&Value>, from: &Value) -> Option<
     }
 }
 
-/// Give a declaration what the class it extends has, where that class is found.
+/// Give a declaration what each link above it has, nearest link first.
 ///
-/// Silent where it is not. A base in a package nobody named is a question this
-/// cannot answer, and inventing an empty parent would publish a class as having
-/// nothing rather than as having something unread.
-pub fn apply(declaration: &mut Value, dependencies: &Dependencies) {
-    let Some(superclass) = declaration.get("superclass").cloned() else {
-        return;
-    };
-    let Some(name) = superclass.get("name").and_then(Value::as_str) else {
-        return;
-    };
-    let Some(specifier) = superclass.get("package").and_then(Value::as_str) else {
-        /* A base in this same package. Resolving it means the package's other
-        modules, which this pass does not hold: it is given the manifests of
-        other packages and its own declarations one at a time. */
-        return;
-    };
-    let Some(manifest) = dependencies.get(&package_of(specifier)) else {
-        return;
-    };
-    let Some((parent, module)) = find(manifest, name) else {
-        return;
-    };
-    let from = json!({ "module": module, "name": name });
+/// **Every link, not only the base.** `MixinControllerChecked(MixinField(
+/// HelixFormElement))` gives Checkbox seven members from the outer mixin,
+/// fifteen from the inner and nine from the base, and the manifest lists them
+/// in that order, which is the prototype chain. Unwrapping to the base alone
+/// dropped twenty-two members and an event from one element.
+///
+/// Silent where a link is not found. A mixin from a package nobody named is a
+/// question this cannot answer, and inventing an empty one would publish a
+/// class as having nothing rather than as having something unread.
+pub fn apply(declaration: &mut Value, heritage: &[(String, Option<String>)], deps: &Dependencies) {
+    for (name, specifier) in heritage {
+        let Some(specifier) = specifier else {
+            /* Declared in the package being built. Resolving it means that
+            package's other modules, which this pass is not given: it works a
+            declaration at a time against manifests of packages already
+            built. */
+            continue;
+        };
+        let Some(manifest) = deps.get(&package_of(specifier)) else {
+            continue;
+        };
+        let Some((above, module)) = find(manifest, name) else {
+            continue;
+        };
+        let from = json!({ "module": module, "name": name });
 
-    let mut lists: Vec<(&str, Option<Value>)> = Vec::new();
-    lists.push((
-        "members",
-        joined(declaration.get("members"), parent.get("members"), &from),
-    ));
-    for list in INHERITS {
-        lists.push((list, joined(declaration.get(list), parent.get(list), &from)));
-    }
-    let Some(fields) = declaration.as_object_mut() else {
-        return;
-    };
-    for (list, value) in lists {
-        if let Some(entries) = value {
-            fields.insert(list.to_owned(), entries);
+        let mut lists: Vec<(&str, Option<Value>)> = vec![(
+            "members",
+            joined(declaration.get("members"), above.get("members"), &from),
+        )];
+        for list in INHERITS {
+            lists.push((list, joined(declaration.get(list), above.get(list), &from)));
+        }
+        let Some(fields) = declaration.as_object_mut() else {
+            return;
+        };
+        for (list, value) in lists {
+            if let Some(entries) = value {
+                fields.insert(list.to_owned(), entries);
+            }
         }
     }
 }

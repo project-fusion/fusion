@@ -31,8 +31,9 @@ pub struct Declared {
     /// `class`, `function` or `variable`, which is the manifest's vocabulary.
     pub kind: &'static str,
     pub name: String,
-    /// The class this one extends, and where that name was imported from.
-    pub superclass: Option<Superclass>,
+    /// What this class extends, nearest first: each mixin wrapping it, then the
+    /// base class at the end.
+    pub heritage: Vec<Superclass>,
     /// What the class body declares, in the order it is written.
     pub members: Vec<Member>,
     /// The doc block above it, read the way the manifest reads one.
@@ -165,21 +166,29 @@ fn privacy_of(
     }
 }
 
-/// The class a heritage clause names, with any mixins taken off.
+/// The heritage clause read as a chain, nearest link first.
 ///
-/// **A mixin is a call and the class is its argument.** `extends
-/// MixinDismissible(HelixElement)` extends `HelixElement`: what the mixin adds
-/// is a shape rather than a base, and the analyzer records the innermost name.
-/// Unwrapped rather than matched, so a second mixin around the first is read
-/// the same way as the first.
-fn base_of(expression: &Expression<'_>) -> Option<String> {
+/// **A mixin is a link rather than a wrapper to see past.** `extends
+/// MixinControllerChecked(MixinField(HelixFormElement))` gives Checkbox members
+/// from all three, and the manifest lists them in that order: the outermost
+/// mixin is the nearest thing to the class, the base class is the furthest, and
+/// that is the prototype chain written down.
+///
+/// Read from the outside in, so the call's callee comes before its argument.
+fn chain_of(expression: &Expression<'_>, into: &mut Vec<String>) {
     match expression {
-        Expression::Identifier(name) => Some(name.name.to_string()),
-        Expression::CallExpression(call) => call
-            .arguments
-            .iter()
-            .find_map(|one| one.as_expression().and_then(base_of)),
-        _ => None,
+        Expression::Identifier(name) => into.push(name.name.to_string()),
+        Expression::CallExpression(call) => {
+            if let Expression::Identifier(name) = &call.callee {
+                into.push(name.name.to_string());
+            }
+            for argument in &call.arguments {
+                if let Some(inner) = argument.as_expression() {
+                    chain_of(inner, into);
+                }
+            }
+        }
+        _ => {}
     }
 }
 
@@ -223,6 +232,21 @@ fn tag_of(class: &Class<'_>) -> Option<String> {
     None
 }
 
+/// Whether a member is a reimplementation rather than an addition.
+///
+/// **An instance member written `override` is not API and the analyzer drops
+/// it.** `protected override willUpdate` reimplements what the class was given;
+/// it adds nothing a consumer can reach that was not reachable already, and
+/// `willUpdate` appears nowhere in a tier of two hundred and twenty-nine
+/// modules that declare it constantly.
+///
+/// **A static one is kept**, because it is not a reimplementation of anything
+/// an instance has: `static override shadowRootOptions` is configuration on the
+/// class, and all twenty-six in the headless tier are in the manifest.
+fn reimplements(is_override: bool, is_static: bool) -> bool {
+    is_override && !is_static
+}
+
 /// What a class body declares, in the order it is written.
 fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
     let mut found = Vec::new();
@@ -235,6 +259,9 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
                 let Some(name) = key_of(&property.key, source) else {
                     continue;
                 };
+                if reimplements(property.r#override, property.r#static) {
+                    continue;
+                }
                 found.push(Member {
                     documented: docs.get(&at).cloned().unwrap_or_default(),
                     parameters: Vec::new(),
@@ -271,6 +298,9 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
                 let Some(name) = key_of(&method.key, source) else {
                     continue;
                 };
+                if reimplements(method.r#override, method.r#static) {
+                    continue;
+                }
                 /* **A getter is a readonly field, not a method.** What a
                 consumer reaches through `element.caret` is a value, and the
                 manifest describes the surface rather than how it is
@@ -337,30 +367,34 @@ fn named(
     imported: &BTreeMap<String, String>,
 ) -> Vec<Declared> {
     match declaration {
-        Declaration::ClassDeclaration(class) => {
-            class
-                .id
-                .as_ref()
-                .map(|id| Declared {
-                    documented: Documented::default(),
-                    kind: "class",
-                    tag_name: tag_of(class),
-                    members: members_of(class, source, docs),
-                    name: id.name.to_string(),
-                    superclass: class.super_class.as_ref().and_then(base_of).map(|name| {
-                        Superclass {
+        Declaration::ClassDeclaration(class) => class
+            .id
+            .as_ref()
+            .map(|id| Declared {
+                documented: Documented::default(),
+                kind: "class",
+                tag_name: tag_of(class),
+                members: members_of(class, source, docs),
+                name: id.name.to_string(),
+                heritage: class.super_class.as_ref().map_or_else(Vec::new, |one| {
+                    let mut names = Vec::new();
+                    chain_of(one, &mut names);
+                    names
+                        .into_iter()
+                        .map(|name| Superclass {
                             from: imported.get(&name).cloned(),
                             name,
-                        }
-                    }),
-                })
-                .into_iter()
-                .collect()
-        }
+                        })
+                        .collect()
+                }),
+            })
+            .into_iter()
+            .collect(),
         Declaration::FunctionDeclaration(function) => function
             .id
             .as_ref()
             .map(|id| Declared {
+                heritage: Vec::new(),
                 kind: "function",
                 tag_name: None,
                 name: id.name.to_string(),
@@ -375,6 +409,7 @@ fn named(
             .iter()
             .filter_map(|one| {
                 one.id.get_binding_identifier().map(|id| Declared {
+                    heritage: Vec::new(),
                     kind: "variable",
                     tag_name: None,
                     name: id.name.to_string(),

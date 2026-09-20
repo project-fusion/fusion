@@ -316,7 +316,7 @@ fn heritage(superclass: Superclass, path: &str) -> Value {
 }
 
 /// One declaration, as the manifest carries it.
-fn declaration_of(one: Declared, path: &str, tier: &str) -> Value {
+fn declaration_of(one: Declared, path: &str, tier: &str) -> (Value, Vec<(String, Option<String>)>) {
     let mut fields = serde_json::Map::new();
     fields.insert("kind".to_owned(), json!(one.kind));
     fields.insert("name".to_owned(), json!(one.name));
@@ -342,14 +342,22 @@ fn declaration_of(one: Declared, path: &str, tier: &str) -> Value {
     if let Some(description) = one.documented.description {
         fields.insert("description".to_owned(), json!(description));
     }
-    if let Some(superclass) = one.superclass {
-        fields.insert("superclass".to_owned(), heritage(superclass, path));
+    /* **The base class is the last link and the only one the manifest names
+    here.** A mixin between the class and its base contributes members, which is
+    the inheritance pass's business, and is not a superclass. */
+    if let Some(base) = one.heritage.last() {
+        fields.insert("superclass".to_owned(), heritage(base.clone(), path));
     }
     if !one.members.is_empty() {
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
         fields.insert("members".to_owned(), json!(members));
     }
-    Value::Object(fields)
+    let heritage = one
+        .heritage
+        .iter()
+        .map(|link| (link.name.clone(), link.from.clone()))
+        .collect();
+    (Value::Object(fields), heritage)
 }
 
 /// The manifest as far as this generator has been taken.
@@ -361,8 +369,8 @@ pub fn build(package: &Path, tier: &str, dependencies: &Dependencies) -> Value {
             let declared: Vec<Value> = declarations(&text, &path)
                 .into_iter()
                 .map(|one| {
-                    let mut declaration = declaration_of(one, &path, tier);
-                    inherit::apply(&mut declaration, dependencies);
+                    let (mut declaration, heritage) = declaration_of(one, &path, tier);
+                    inherit::apply(&mut declaration, &heritage, dependencies);
                     declaration
                 })
                 .collect();
