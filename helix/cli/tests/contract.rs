@@ -939,3 +939,51 @@ fn a_class_body_is_read_as_the_surface_it_publishes() {
     /* And the class says what it extends. */
     assert!(said.contains("HelixElement"), "the superclass: {said}");
 }
+
+/// Where a base class came from, which the manifest records three ways.
+///
+/// A mixin is unwrapped, a bare import names a package, a relative one names a
+/// rooted module keeping the `.js` the source wrote, and a name with no import
+/// at all is taken to be this module's own. The last two are the analyzer's own
+/// shapes rather than tidy ones, and are reproduced because this is measured
+/// against it.
+#[test]
+fn a_superclass_says_where_it_came_from() {
+    let sandbox = Sandbox::new("manifest-heritage", None);
+    let src = sandbox.0.join("src/badge/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("badge-root.ts"),
+        "import { HelixHeadlessBadge } from '@fusion.dev/helix-headless/badge'\n\
+         export class HelixBadge extends HelixHeadlessBadge {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        src.join("near.ts"),
+        "import { Mixin } from './mixin.js'\n\
+         import { Base } from '../../base/base.js'\n\
+         export class Near extends Mixin(Base) {}\n\
+         export class Alone extends CustomEvent {}\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    assert!(
+        said.contains("\"package\": \"@fusion.dev/helix-headless/badge\""),
+        "a bare import is a package: {said}"
+    );
+    /* The mixin is taken off and the class inside it is the base. */
+    assert!(said.contains("\"name\": \"Base\""), "unwrapped: {said}");
+    assert!(
+        said.contains("\"module\": \"/src/base/base.js\""),
+        "rooted, and the `.js` as written: {said}"
+    );
+    /* No import, so the analyzer calls it this module's own, even though
+    `CustomEvent` is the platform's. */
+    assert!(
+        said.contains("\"module\": \"src/badge/root/near.ts\""),
+        "an unimported name is this module's: {said}"
+    );
+}

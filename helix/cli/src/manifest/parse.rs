@@ -31,8 +31,8 @@ pub struct Declared {
     /// `class`, `function` or `variable`, which is the manifest's vocabulary.
     pub kind: &'static str,
     pub name: String,
-    /// The class this one extends, where it extends one by name.
-    pub superclass: Option<String>,
+    /// The class this one extends, and where that name was imported from.
+    pub superclass: Option<Superclass>,
     /// What the class body declares, in the order it is written.
     pub members: Vec<Member>,
     /// The doc block above it, read the way the manifest reads one.
@@ -43,6 +43,15 @@ pub struct Declared {
     /// only about declarations that have one, so a controller and an element
     /// are told apart by this and not by being classes.
     pub tag_name: Option<String>,
+}
+
+/// A base class, and where the name binding it came from.
+#[derive(Clone, Debug)]
+pub struct Superclass {
+    pub name: String,
+    /// The specifier the name was imported by, absent where it was declared in
+    /// the same file and so needs no saying.
+    pub from: Option<String>,
 }
 
 /// One entry in a class body.
@@ -154,6 +163,39 @@ fn privacy_of(
         Some(TSAccessibility::Public) => Some("public"),
         None => None,
     }
+}
+
+/// The class a heritage clause names, with any mixins taken off.
+///
+/// **A mixin is a call and the class is its argument.** `extends
+/// MixinDismissible(HelixElement)` extends `HelixElement`: what the mixin adds
+/// is a shape rather than a base, and the analyzer records the innermost name.
+/// Unwrapped rather than matched, so a second mixin around the first is read
+/// the same way as the first.
+fn base_of(expression: &Expression<'_>) -> Option<String> {
+    match expression {
+        Expression::Identifier(name) => Some(name.name.to_string()),
+        Expression::CallExpression(call) => call
+            .arguments
+            .iter()
+            .find_map(|one| one.as_expression().and_then(base_of)),
+        _ => None,
+    }
+}
+
+/// Where each imported name came from, by the specifier that brought it in.
+fn imports(program: &oxc_ast::ast::Program<'_>) -> BTreeMap<String, String> {
+    let mut found = BTreeMap::new();
+    for statement in &program.body {
+        let Statement::ImportDeclaration(import) = statement else {
+            continue;
+        };
+        let from = import.source.value.to_string();
+        for specifier in import.specifiers.iter().flatten() {
+            found.insert(specifier.local().name.to_string(), from.clone());
+        }
+    }
+    found
 }
 
 /// The tag a class registers, read from its `@customElement` decorator.
@@ -288,24 +330,33 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
 }
 
 /// The name and kind of a declaration, where it has a name to give.
-fn named(declaration: &Declaration<'_>, source: &str, docs: &Attached) -> Vec<Declared> {
+fn named(
+    declaration: &Declaration<'_>,
+    source: &str,
+    docs: &Attached,
+    imported: &BTreeMap<String, String>,
+) -> Vec<Declared> {
     match declaration {
-        Declaration::ClassDeclaration(class) => class
-            .id
-            .as_ref()
-            .map(|id| Declared {
-                documented: Documented::default(),
-                kind: "class",
-                tag_name: tag_of(class),
-                members: members_of(class, source, docs),
-                name: id.name.to_string(),
-                superclass: class
-                    .super_class
-                    .as_ref()
-                    .map(|one| slice(source, one.span().start, one.span().end)),
-            })
-            .into_iter()
-            .collect(),
+        Declaration::ClassDeclaration(class) => {
+            class
+                .id
+                .as_ref()
+                .map(|id| Declared {
+                    documented: Documented::default(),
+                    kind: "class",
+                    tag_name: tag_of(class),
+                    members: members_of(class, source, docs),
+                    name: id.name.to_string(),
+                    superclass: class.super_class.as_ref().and_then(base_of).map(|name| {
+                        Superclass {
+                            from: imported.get(&name).cloned(),
+                            name,
+                        }
+                    }),
+                })
+                .into_iter()
+                .collect()
+        }
         Declaration::FunctionDeclaration(function) => function
             .id
             .as_ref()
@@ -412,13 +463,14 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
         }
     }
 
+    let imported = imports(&parsed.program);
     let mut found = Vec::new();
     for statement in &parsed.program.body {
         match statement {
             Statement::ExportNamedDeclaration(export) => {
                 if let Some(declaration) = &export.declaration {
                     found.extend(carrying(
-                        named(declaration, source, &docs),
+                        named(declaration, source, &docs, &imported),
                         &docs,
                         &anchors(statement, Some(declaration)),
                     ));
@@ -430,7 +482,7 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
                 if let Some(declaration) = other.as_declaration() {
                     found.extend(
                         carrying(
-                            named(declaration, source, &docs),
+                            named(declaration, source, &docs, &imported),
                             &docs,
                             &anchors(statement, Some(declaration)),
                         )

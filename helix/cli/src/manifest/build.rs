@@ -24,7 +24,7 @@ use std::path::{Path, PathBuf};
 use serde_json::{json, Value};
 
 use crate::manifest::jsdoc::{entry, Documented};
-use crate::manifest::parse::declarations;
+use crate::manifest::parse::{declarations, Declared, Superclass};
 
 /// Files the analyzer is told to skip, by the suffix that names them.
 ///
@@ -133,6 +133,33 @@ fn tagged(documented: &Documented) -> Vec<(&'static str, Value)> {
     found
 }
 
+/// A relative specifier resolved against the module that wrote it.
+///
+/// **Kept as written, and rooted.** `../helix-element/helix-element.js` from
+/// `src/helix-form-element/…` is recorded as
+/// `/src/helix-element/helix-element.js`: the `.js` the source wrote rather
+/// than the `.ts` it is, and a leading slash the manifest's own module paths do
+/// not carry.
+///
+/// **Which makes two formats for one field**, since a superclass with no import
+/// takes the module's path verbatim, unrooted and with its real extension. Both
+/// are the analyzer's and both are reproduced: this is measured against it, and
+/// tidying either would be a difference to defend.
+fn beside(path: &str, specifier: &str) -> Option<String> {
+    let mut parts: Vec<String> = path.split('/').map(ToOwned::to_owned).collect();
+    parts.pop();
+    for step in specifier.split('/') {
+        match step {
+            "." => {}
+            ".." => {
+                parts.pop()?;
+            }
+            other => parts.push(other.to_owned()),
+        }
+    }
+    Some(format!("/{}", parts.join("/")))
+}
+
 /// A kebab name in the `PascalCase` a group and a part are written in.
 fn pascal(value: &str) -> String {
     value
@@ -216,6 +243,112 @@ fn helix(documented: &Documented, path: &str, tier: &str, is_component: bool) ->
     }
 }
 
+/// One class member, as the manifest carries it.
+fn member_of(member: crate::manifest::parse::Member) -> Value {
+    let mut at = serde_json::Map::new();
+    at.insert("kind".to_owned(), json!(member.kind));
+    at.insert("name".to_owned(), json!(member.name));
+    if let Some(description) = member.documented.description {
+        at.insert("description".to_owned(), json!(description));
+    }
+    if let Some(text) = member.type_text {
+        at.insert("type".to_owned(), json!({ "text": text }));
+    }
+    if let Some(default) = member.default {
+        at.insert("default".to_owned(), json!(default));
+    }
+    if member.is_static {
+        at.insert("static".to_owned(), json!(true));
+    }
+    if member.readonly {
+        at.insert("readonly".to_owned(), json!(true));
+    }
+    if let Some(privacy) = member.privacy {
+        at.insert("privacy".to_owned(), json!(privacy));
+    }
+    if let Some(returns) = member.returns {
+        at.insert("return".to_owned(), json!({ "type": { "text": returns } }));
+    }
+    if !member.parameters.is_empty() {
+        let taken: Vec<Value> = member
+            .parameters
+            .into_iter()
+            .map(|(name, written)| match written {
+                Some(text) => json!({ "name": name, "type": { "text": text } }),
+                None => json!({ "name": name }),
+            })
+            .collect();
+        at.insert("parameters".to_owned(), json!(taken));
+    }
+    Value::Object(at)
+}
+
+/// Where a base class came from, in the shape the manifest records it.
+fn heritage(superclass: Superclass, path: &str) -> Value {
+    let mut said = serde_json::Map::new();
+    said.insert("name".to_owned(), json!(superclass.name));
+    /* **A relative import names a module and a bare one names a package.**
+    `../x/x.js` is resolved against the module importing it and kept as written,
+    rooted with a slash; anything else is a package, carried verbatim.
+
+    **A name with no import at all is this module's own**, which is the
+    analyzer's rule and is reproduced rather than corrected: `HelixActivateEvent
+    extends CustomEvent` is recorded as extending something in
+    `src/events/events.ts`, and `CustomEvent` is the platform's. Arguably wrong,
+    certainly not ours to change while this is measured against it. */
+    match superclass.from {
+        Some(from) if from.starts_with('.') => {
+            if let Some(module) = beside(path, &from) {
+                said.insert("module".to_owned(), json!(module));
+            }
+        }
+        Some(from) => {
+            said.insert("package".to_owned(), json!(from));
+        }
+        None => {
+            said.insert("module".to_owned(), json!(path));
+        }
+    }
+    Value::Object(said)
+}
+
+/// One declaration, as the manifest carries it.
+fn declaration_of(one: Declared, path: &str, tier: &str) -> Value {
+    let mut fields = serde_json::Map::new();
+    fields.insert("kind".to_owned(), json!(one.kind));
+    fields.insert("name".to_owned(), json!(one.name));
+    if let Some(tag) = &one.tag_name {
+        fields.insert("tagName".to_owned(), json!(tag));
+        fields.insert("customElement".to_owned(), json!(true));
+    }
+    if let Some(summary) = one
+        .documented
+        .tags
+        .iter()
+        .find(|(name, _)| name == "summary")
+        .map(|(_, text)| text.trim().to_owned())
+    {
+        fields.insert("summary".to_owned(), json!(summary));
+    }
+    if let Some(block) = helix(&one.documented, path, tier, one.tag_name.is_some()) {
+        fields.insert("helix".to_owned(), block);
+    }
+    for (field, entries) in tagged(&one.documented) {
+        fields.insert(field.to_owned(), entries);
+    }
+    if let Some(description) = one.documented.description {
+        fields.insert("description".to_owned(), json!(description));
+    }
+    if let Some(superclass) = one.superclass {
+        fields.insert("superclass".to_owned(), heritage(superclass, path));
+    }
+    if !one.members.is_empty() {
+        let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
+        fields.insert("members".to_owned(), json!(members));
+    }
+    Value::Object(fields)
+}
+
 /// The manifest as far as this generator has been taken.
 pub fn build(package: &Path, tier: &str) -> Value {
     let modules: Vec<Value> = sources(package)
@@ -224,94 +357,7 @@ pub fn build(package: &Path, tier: &str) -> Value {
             let text = fs::read_to_string(package.join(&path)).unwrap_or_default();
             let declared: Vec<Value> = declarations(&text, &path)
                 .into_iter()
-                .map(|one| {
-                    let mut entry = json!({ "kind": one.kind, "name": one.name });
-                    let Some(fields) = entry.as_object_mut() else {
-                        return entry;
-                    };
-                    if let Some(summary) = one
-                        .documented
-                        .tags
-                        .iter()
-                        .find(|(name, _)| name == "summary")
-                        .map(|(_, text)| text.trim().to_owned())
-                    {
-                        fields.insert("summary".to_owned(), json!(summary));
-                    }
-                    if let Some(tag) = &one.tag_name {
-                        fields.insert("tagName".to_owned(), json!(tag));
-                        fields.insert("customElement".to_owned(), json!(true));
-                    }
-                    if let Some(block) = helix(&one.documented, &path, tier, one.tag_name.is_some())
-                    {
-                        fields.insert("helix".to_owned(), block);
-                    }
-                    for (field, entries) in tagged(&one.documented) {
-                        fields.insert(field.to_owned(), entries);
-                    }
-                    if let Some(description) = one.documented.description {
-                        fields.insert("description".to_owned(), json!(description));
-                    }
-                    if let Some(superclass) = one.superclass {
-                        /* The analyzer records where a superclass came from as
-                        well as its name. Which module and package is a
-                        resolution question, and this layer answers only the
-                        part the text holds. */
-                        fields.insert("superclass".to_owned(), json!({ "name": superclass }));
-                    }
-                    if !one.members.is_empty() {
-                        let members: Vec<Value> = one
-                            .members
-                            .into_iter()
-                            .map(|member| {
-                                let mut said = json!({ "kind": member.kind, "name": member.name });
-                                let Some(at) = said.as_object_mut() else {
-                                    return said;
-                                };
-                                if let Some(description) = member.documented.description {
-                                    at.insert("description".to_owned(), json!(description));
-                                }
-                                if let Some(text) = member.type_text {
-                                    at.insert("type".to_owned(), json!({ "text": text }));
-                                }
-                                if let Some(default) = member.default {
-                                    at.insert("default".to_owned(), json!(default));
-                                }
-                                if member.is_static {
-                                    at.insert("static".to_owned(), json!(true));
-                                }
-                                if member.readonly {
-                                    at.insert("readonly".to_owned(), json!(true));
-                                }
-                                if let Some(privacy) = member.privacy {
-                                    at.insert("privacy".to_owned(), json!(privacy));
-                                }
-                                if let Some(returns) = member.returns {
-                                    at.insert(
-                                        "return".to_owned(),
-                                        json!({ "type": { "text": returns } }),
-                                    );
-                                }
-                                if !member.parameters.is_empty() {
-                                    let taken: Vec<Value> = member
-                                        .parameters
-                                        .into_iter()
-                                        .map(|(name, written)| match written {
-                                            Some(text) => {
-                                                json!({ "name": name, "type": { "text": text } })
-                                            }
-                                            None => json!({ "name": name }),
-                                        })
-                                        .collect();
-                                    at.insert("parameters".to_owned(), json!(taken));
-                                }
-                                said
-                            })
-                            .collect();
-                        fields.insert("members".to_owned(), json!(members));
-                    }
-                    entry
-                })
+                .map(|one| declaration_of(one, &path, tier))
                 .collect();
             json!({
                 "declarations": declared,
