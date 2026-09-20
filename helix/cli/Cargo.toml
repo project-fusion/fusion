@@ -31,6 +31,10 @@ regex = { workspace = true }
 ratatui = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["float_roundtrip"] }
+oxc_parser = "0.110.0"
+oxc_allocator = "0.110.0"
+oxc_span = "0.110.0"
+oxc_ast = "0.110.0"
 
 [lints]
 workspace = true
