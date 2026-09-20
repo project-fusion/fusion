@@ -23,6 +23,7 @@ use std::path::{Path, PathBuf};
 
 use serde_json::{json, Value};
 
+use crate::manifest::jsdoc::{entry, Documented};
 use crate::manifest::parse::declarations;
 
 /// Files the analyzer is told to skip, by the suffix that names them.
@@ -86,8 +87,137 @@ pub fn sources(package: &Path) -> Vec<String> {
     found
 }
 
+/// The tags a declaration carries, by the field each one fills.
+///
+/// **The tag's own name, not a guess from its shape.** `@cssproperty` fills
+/// `cssProperties` and `@cssstate` fills `cssStates`, which are two words apart
+/// and four characters, so they are written down rather than derived.
+const LISTS: [(&str, &str); 5] = [
+    ("csspart", "cssParts"),
+    ("cssproperty", "cssProperties"),
+    ("cssstate", "cssStates"),
+    ("event", "events"),
+    ("slot", "slots"),
+];
+
+/// What a doc block's tags say, as the lists the manifest carries.
+///
+/// In the order they are written. The analyzer sorts the modules of a manifest
+/// and nothing inside a declaration, and every list in these sources is written
+/// alphabetically already, so source order is both what it does and what the
+/// sources want.
+fn tagged(documented: &Documented) -> Vec<(&'static str, Value)> {
+    let mut found = Vec::new();
+    for (tag, field) in LISTS {
+        let entries: Vec<Value> = documented
+            .tags
+            .iter()
+            .filter(|(name, _)| name == tag)
+            .map(|(_, text)| {
+                let one = entry(text);
+                let mut said = serde_json::Map::new();
+                if let Some(written) = one.type_text {
+                    said.insert("type".to_owned(), json!({ "text": written }));
+                }
+                if let Some(description) = one.description {
+                    said.insert("description".to_owned(), json!(description));
+                }
+                said.insert("name".to_owned(), json!(one.name));
+                Value::Object(said)
+            })
+            .collect();
+        if !entries.is_empty() {
+            found.push((field, json!(entries)));
+        }
+    }
+    found
+}
+
+/// A kebab name in the `PascalCase` a group and a part are written in.
+fn pascal(value: &str) -> String {
+    value
+        .split('-')
+        .filter(|one| !one.is_empty())
+        .map(|one| {
+            let mut chars = one.chars();
+            match chars.next() {
+                Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+                None => String::new(),
+            }
+        })
+        .collect()
+}
+
+/// The `helix` block: what the library records about a component beyond the
+/// custom elements schema.
+///
+/// **Its own plugins put this there and the schema says nothing about it**, so
+/// the rules are read from those plugins rather than inferred: the tag-derived
+/// half from `helix-metadata`, and the family's place in the library from
+/// `helix-composition`, which takes the two directories under `src` and writes
+/// them `PascalCase`, prefixing a headless group with `Base` because that tier is
+/// a parallel family rather than a variant.
+fn helix(documented: &Documented, path: &str, tier: &str, is_component: bool) -> Option<Value> {
+    let mut block = serde_json::Map::new();
+    let single = |name: &str| {
+        documented
+            .tags
+            .iter()
+            .find(|(tag, _)| tag == name)
+            .map(|(_, text)| text.trim().to_owned())
+            .filter(|one| !one.is_empty())
+    };
+    if let Some(category) = single("category") {
+        block.insert("category".to_owned(), json!(category));
+    }
+    if let Some(since) = single("since") {
+        block.insert("since".to_owned(), json!(since));
+    }
+    /* Anything but the three is ignored rather than trusted, which is the
+    plugin's own rule: a typo would otherwise publish a badge nobody meant. */
+    if let Some(status) = single("status")
+        .filter(|one| matches!(one.as_str(), "deprecated" | "experimental" | "stable"))
+    {
+        block.insert("status".to_owned(), json!(status));
+    }
+    if let Some(documentation) = single("documentation") {
+        block.insert("documentation".to_owned(), json!(documentation));
+    }
+    let aliases: Vec<String> = single("aliases")
+        .unwrap_or_default()
+        .split(',')
+        .map(|one| one.trim().to_owned())
+        .filter(|one| !one.is_empty())
+        .collect();
+    if !aliases.is_empty() {
+        block.insert("aliases".to_owned(), json!(aliases));
+    }
+    if is_component {
+        block.insert("tier".to_owned(), json!(tier));
+        let parts: Vec<&str> = path.split('/').collect();
+        /* `src/<family>/<part>/<file>.ts` and nothing else: a file directly
+        under a family has no part to name, so the pair is left off rather
+        than half written. */
+        /* The file itself is not examined: `sources` yields nothing but `.ts`,
+        so a fourth segment here is one by construction. */
+        if let ["src", family, part, _] = parts.as_slice() {
+            let prefix = if tier == "headless" { "Base" } else { "" };
+            block.insert(
+                "group".to_owned(),
+                json!(format!("{prefix}{}", pascal(family))),
+            );
+            block.insert("part".to_owned(), json!(pascal(part)));
+        }
+    }
+    if block.is_empty() {
+        None
+    } else {
+        Some(Value::Object(block))
+    }
+}
+
 /// The manifest as far as this generator has been taken.
-pub fn build(package: &Path) -> Value {
+pub fn build(package: &Path, tier: &str) -> Value {
     let modules: Vec<Value> = sources(package)
         .into_iter()
         .map(|path| {
@@ -107,6 +237,17 @@ pub fn build(package: &Path) -> Value {
                         .map(|(_, text)| text.trim().to_owned())
                     {
                         fields.insert("summary".to_owned(), json!(summary));
+                    }
+                    if let Some(tag) = &one.tag_name {
+                        fields.insert("tagName".to_owned(), json!(tag));
+                        fields.insert("customElement".to_owned(), json!(true));
+                    }
+                    if let Some(block) = helix(&one.documented, &path, tier, one.tag_name.is_some())
+                    {
+                        fields.insert("helix".to_owned(), block);
+                    }
+                    for (field, entries) in tagged(&one.documented) {
+                        fields.insert(field.to_owned(), entries);
                     }
                     if let Some(description) = one.documented.description {
                         fields.insert("description".to_owned(), json!(description));

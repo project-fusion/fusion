@@ -97,7 +97,7 @@ pub fn read(comment: &str) -> Documented {
         .find(|(name, _)| name == "description")
         .map(|(_, text)| text.trim().to_owned())
         .filter(|one| !one.is_empty());
-        let above = if description.is_empty() {
+    let above = if description.is_empty() {
         None
     } else {
         Some(description.join("\n"))
@@ -113,9 +113,56 @@ pub fn read(comment: &str) -> Documented {
     }
 }
 
+/// One entry a tag declares: a part, a slot, a state, a property or an event.
+#[derive(Debug, Default)]
+pub struct Entry {
+    pub name: String,
+    pub description: Option<String>,
+    /// The braced type an `@event` carries, which no other tag has.
+    pub type_text: Option<String>,
+}
+
+/// Read a tag's text as `name - description`, with an optional braced type.
+///
+/// **The dash is the separator and only the first one is.** A description
+/// reading "Fired before the source is edited - and not after" keeps its own
+/// dash, so splitting on every one would cut a sentence in half.
+///
+/// **A name is optional, because the default slot has none.** `@slot - The
+/// messages.` describes the unnamed slot, which the manifest carries with an
+/// empty name rather than leaving out.
+pub fn entry(text: &str) -> Entry {
+    let text = text.trim();
+    let (type_text, rest) = match text.strip_prefix('{') {
+        Some(after) => match after.split_once('}') {
+            Some((written, rest)) => (Some(written.trim().to_owned()), rest.trim()),
+            None => (None, text),
+        },
+        None => (None, text),
+    };
+    /* A leading dash is the unnamed slot, whose text opens with the separator
+    because there is no name in front of it to separate from. The manifest
+    carries that slot with an empty name rather than leaving it out. */
+    let (name, description) = if let Some(description) = rest.strip_prefix("- ") {
+        ("", Some(description.trim()))
+    } else {
+        match rest.split_once(" - ") {
+            Some((name, description)) => (name.trim(), Some(description.trim())),
+            /* No dash at all: the whole of it is the name, which is how a part
+            with nothing to say about it is written. */
+            None => (rest, None),
+        }
+    };
+    Entry {
+        description: description.map(str::to_owned).filter(|one| !one.is_empty()),
+        name: name.trim().to_owned(),
+        type_text,
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::read;
+    use super::{entry, read};
 
     /// The frame comes off and nothing else moves.
     ///
@@ -159,5 +206,33 @@ mod tests {
         assert_eq!(read.description.as_deref(), Some("One.\n\nTwo."));
         /* And the blank line before the next tag leaves nothing behind. */
         assert_eq!(read.tags.last().map(|one| one.1.as_str()), Some("0.1.0"));
+    }
+
+    /// The dash is the separator and only the first one is.
+    #[test]
+    fn a_description_keeps_its_own_dashes() {
+        let one = entry("editor - The pane - and not the frame.");
+        assert_eq!(one.name, "editor");
+        assert_eq!(
+            one.description.as_deref(),
+            Some("The pane - and not the frame.")
+        );
+    }
+
+    /// An event carries a braced type and nothing else does.
+    #[test]
+    fn an_event_reads_its_type_from_the_braces() {
+        let one = entry("{HelixCaretEvent} helix-caret - Fired when the cursor moves.");
+        assert_eq!(one.type_text.as_deref(), Some("HelixCaretEvent"));
+        assert_eq!(one.name, "helix-caret");
+    }
+
+    /// The default slot has no name, and the manifest carries it with an empty
+    /// one rather than leaving it out.
+    #[test]
+    fn the_default_slot_has_no_name() {
+        let one = entry("- The messages.");
+        assert_eq!(one.name, "");
+        assert_eq!(one.description.as_deref(), Some("The messages."));
     }
 }
