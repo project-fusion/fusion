@@ -1052,3 +1052,72 @@ fn a_class_takes_what_its_base_has() {
     let after = &said[at..at + 200.min(said.len() - at)];
     assert!(!after.contains("inheritedFrom"), "the child's own: {after}");
 }
+
+/// A mixin is a link in the chain, not a wrapper to see past.
+///
+/// `MixinControllerChecked(MixinField(HelixFormElement))` gives Checkbox
+/// members from all three, and the manifest lists them nearest first, which is
+/// the prototype chain. Unwrapping to the base alone dropped twenty-two members
+/// and an event from that one element.
+#[test]
+fn every_link_above_a_class_contributes() {
+    let sandbox = Sandbox::new("manifest-mixins", None);
+    let src = sandbox.0.join("src/checkbox/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("checkbox-root.ts"),
+        "import { Outer, Inner, Base } from '@fusion.dev/helix-core'\n\
+         export class HelixCheckbox extends Outer(Inner(Base)) {\n\
+         \x20 checked = false\n\
+         \x20 protected override render(): void {}\n\
+         \x20 static override shadowRootOptions = {}\n\
+         }\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        sandbox.0.join("core.json"),
+        r#"{"modules":[{"path":"src/m.ts","declarations":[
+          {"name":"Outer","kind":"mixin","members":[{"name":"fromOuter"}]},
+          {"name":"Inner","kind":"mixin","members":[{"name":"fromInner"}]},
+          {"name":"Base","members":[{"name":"fromBase"}]}]}]}"#,
+    )
+    .expect("a manifest");
+
+    let output = run(
+        &sandbox.0,
+        &[
+            "manifest",
+            "build",
+            ".",
+            "--dependency",
+            "@fusion.dev/helix-core=core.json",
+        ],
+    );
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let at = |needle: &str| said.find(needle).expect(needle);
+
+    for name in ["fromOuter", "fromInner", "fromBase"] {
+        assert!(said.contains(name), "every link contributes: {name}");
+    }
+    /* Nearest first, which is the prototype chain and not the writing order. */
+    assert!(
+        at("fromOuter") < at("fromInner"),
+        "outer before inner: {said}"
+    );
+    assert!(
+        at("fromInner") < at("fromBase"),
+        "inner before base: {said}"
+    );
+    /* The base is the superclass; the mixins are not. */
+    assert!(said.contains("\"superclass\""), "{said}");
+    assert!(
+        !said.contains("\"name\": \"Outer\"\n        }"),
+        "a mixin is not a superclass: {said}"
+    );
+
+    /* An instance `override` reimplements what was given and is not API. A
+    static one is configuration on the class and is kept. */
+    assert!(!said.contains("\"render\""), "an instance override: {said}");
+    assert!(said.contains("shadowRootOptions"), "a static one: {said}");
+}
