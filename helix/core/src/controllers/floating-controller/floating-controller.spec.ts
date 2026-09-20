@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { FloatingController } from './floating-controller.js'
+import type { Placement as FloatingPlacement } from '@floating-ui/dom'
+import { FloatingController, type Placement } from './floating-controller.js'
 
 /** A host standing in for a Lit element, which only has to collect controllers. */
 const host = () => {
@@ -52,5 +53,43 @@ describe('FloatingController', () => {
       floating: () => null,
     })
     expect(controller.placement).toBe('bottom-start')
+  })
+})
+
+/**
+ * Our `Placement` and Floating UI's name the same twelve.
+ *
+ * **A type assertion, because that is what this claim is**, and specs are
+ * typechecked, so it fails the build the day it stops holding. `Placement` is
+ * written out here rather than re-exported from `@floating-ui/dom` so the twelve
+ * reach the manifest as values a reader can see; the cost of writing them is a
+ * second copy, and this is what keeps the two equal.
+ *
+ * Only one direction needs saying. Ours being a subset of theirs is already
+ * enforced by use: this controller hands `placement` to `computePosition`, so a
+ * word of ours they do not have fails there. This is the other way, theirs
+ * gaining one we never listed, which nothing would otherwise notice.
+ */
+describe('the placements this controller takes', () => {
+  test('are every one Floating UI has, so a widening there fails here', () => {
+    /* Keyed by theirs and valued by ours, so one object holds both halves: a
+       placement they gain has no key here, and a placement we drop has no value
+       to write. A `true` on the right with a cast below would have let the
+       second slip past, which it did until this was planted. */
+    const EVERY: Record<FloatingPlacement, Placement> = {
+      bottom: 'bottom',
+      'bottom-end': 'bottom-end',
+      'bottom-start': 'bottom-start',
+      left: 'left',
+      'left-end': 'left-end',
+      'left-start': 'left-start',
+      right: 'right',
+      'right-end': 'right-end',
+      'right-start': 'right-start',
+      top: 'top',
+      'top-end': 'top-end',
+      'top-start': 'top-start',
+    }
+    expect(Object.keys(EVERY)).toHaveLength(12)
   })
 })

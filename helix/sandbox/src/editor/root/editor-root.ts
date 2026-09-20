@@ -18,15 +18,36 @@ import { property } from 'lit/decorators.js'
 import { styles } from './editor-root.css.js'
 import { highlightStyle } from './highlight.js'
 
-/** Languages the editor knows, keyed by the name a file carries. */
+/**
+ * A language the editor knows, by the name a file carries.
+ *
+ * **Written out rather than taken from the record's keys.** The manifest records
+ * a property's type as the text somebody wrote, so `keyof typeof LANGUAGES`
+ * reached it as a name with nothing in it and the reference page listed no
+ * values: a reader was told the attribute takes an `EditorLanguage` and left to
+ * guess which. A union on one line resolves for every reader of these sources
+ * without a type system, the `axes` rule included.
+ */
+export type EditorLanguage = 'css' | 'html' | 'javascript' | 'tsx'
+
+/**
+ * What each one turns on, keyed by that name.
+ *
+ * `satisfies Record<EditorLanguage, unknown>` rather than the bare object this
+ * derived from, so the two cannot drift: a language added above with nothing to
+ * configure fails here for the missing key, and a key here that is not a
+ * language fails where it is written. `unknown` because what each turns on is
+ * CodeMirror's business and naming its types here would be a second claim to
+ * keep true; `satisfies` leaves every value's own type intact for the call
+ * below. `keyof typeof` enforced neither direction, having no opinion of its
+ * own.
+ */
 const LANGUAGES = {
   css: cssLanguage,
   html: htmlLanguage,
   javascript: javascriptLanguage,
   tsx: () => javascriptLanguage({ jsx: true, typescript: true }),
-} as const
-
-export type EditorLanguage = keyof typeof LANGUAGES
+} as const satisfies Record<EditorLanguage, unknown>
 
 /**
  * @summary An editable pane of source, with highlighting and line numbers.

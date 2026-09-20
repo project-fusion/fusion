@@ -5,14 +5,47 @@ import {
   flip,
   type Middleware,
   offset,
-  type Placement,
   type Side,
   shift,
   size,
 } from '@floating-ui/dom'
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 
-export type { Placement, Side }
+export type { Side }
+
+/**
+ * Where a panel lands against its anchor: a side, optionally aligned to an end
+ * of it.
+ *
+ * **Ours, written out, rather than Floating UI's under a re-export.** Theirs is
+ * `Prettify<Side | AlignedPlacement>` where `AlignedPlacement` is the template
+ * literal `` `${Side}-${Alignment}` ``, and a template literal is not something a
+ * reader of this source can expand: the manifest records a property's type as
+ * the text somebody wrote, so five families published `placement` as the bare
+ * word `Placement` and their reference pages listed no values at all. Written
+ * here the twelve are in the text, which every reader of these sources resolves
+ * without a type system.
+ *
+ * **And a public attribute should not be defined by a dependency.** Floating UI
+ * adding a placement would widen five components' published API with nobody
+ * deciding to, which is the same argument that keeps a `variant` union out of a
+ * shared type. The two are held equal in this controller's spec, where a type
+ * assertion is a test and is typechecked like one, so the day theirs widens is
+ * a failed build rather than a quiet change out there.
+ */
+export type Placement =
+  | 'bottom'
+  | 'bottom-end'
+  | 'bottom-start'
+  | 'left'
+  | 'left-end'
+  | 'left-start'
+  | 'right'
+  | 'right-end'
+  | 'right-start'
+  | 'top'
+  | 'top-end'
+  | 'top-start'
 
 /** The panel's edge facing its anchor, for each side of it the panel can land on. */
 const FACING: Record<Side, Side> = { bottom: 'top', left: 'right', right: 'left', top: 'bottom' }

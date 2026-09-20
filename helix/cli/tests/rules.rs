@@ -2018,6 +2018,42 @@ fn registry_value_table_by_omission() {
     );
 }
 
+/// An attribute whose type is a name the sources do not define as literals.
+///
+/// The fixture's union wraps onto the lines below its `=`, which is the shape
+/// the resolver had to learn: at `lineWidth` 100 a union of any length wraps,
+/// and a pattern anchored to one line reads the first member as the whole of it.
+#[test]
+fn resolved() {
+    let manifest = |text: &str| {
+        format!(
+            r#"{{ "modules": [ {{ "path": "src/chip/chip.ts", "declarations": [
+  {{ "tagName": "helix-chip", "members": [ {{ "name": "tone", "attribute": "tone", "type": {{ "text": "{text}" }} }} ] }} ] }} ] }}"#
+        )
+    };
+    let union = "export type ChipTone =\n  | 'danger'\n  | 'info'\n  | 'success'\n";
+    plant_in(
+        "resolved",
+        "resolved",
+        &[
+            ("helix.json", r#"{ "tiers": ["src"] }"#),
+            (
+                "src/chip/chip.ts",
+                &format!("{union}export class HelixChip extends LitElement {{}}\n"),
+            ),
+            ("custom-elements.json", &manifest("ChipTone")),
+        ],
+        |tree| {
+            tree.write(
+                "src/chip/chip.ts",
+                "export type ChipTone = (typeof CHIP_TONES)[number]\nexport class HelixChip extends LitElement {}\n",
+            );
+        },
+        "`helix-chip` publishes `tone` as the bare name `ChipTone`",
+        "src/chip/chip.ts",
+    );
+}
+
 #[test]
 fn restated() {
     let card = |parts: &str, slots: &str, events: &str| {

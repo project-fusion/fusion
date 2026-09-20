@@ -80,6 +80,7 @@ pub mod redeclared;
 pub mod reflected;
 pub mod reflected_defaults;
 pub mod registry;
+pub mod resolved;
 pub mod restated;
 pub mod run;
 pub mod seams;
@@ -722,6 +723,12 @@ pub fn all() -> Vec<Rule> {
             name: "registry",
             run: Runner::Source(registry::run),
             summary: "every prose copy of the axis registry says what the registry says",
+        },
+        Rule {
+            fix: None,
+            name: "resolved",
+            run: Runner::Source(resolved::run),
+            summary: "an attribute's values are in its type, not behind a name",
         },
         Rule {
             fix: None,
