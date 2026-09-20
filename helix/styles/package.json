@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-styles",
   "description": "Design tokens and base layer. Pure CSS, no JavaScript.",
-  "version": "0.65.1",
+  "version": "0.66.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
