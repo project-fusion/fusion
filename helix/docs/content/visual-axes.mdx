@@ -167,3 +167,112 @@ depth and quiets the child; `heading` keys on holding children and relabels the
 parent, which is why a branch at any depth is a heading while the step below
 stops after one, and why a top-level leaf sitting beside a branch is left alone
 by both for opposite reasons.
+
+## What each emphasis claims
+
+`emphasis` is how loud a control is, and its values are one ladder with a rung
+that changes meaning halfway along, so it is worth saying what each draws.
+
+| Value | What it draws |
+|---|---|
+| `solid` | The tone as a full ground, with the ink flipped to read on it |
+| `subtle` | A wash of the tone and no edge, the quietest thing that still has a surface |
+| `outlined` | An edge in the tone |
+| `ghost` | Nothing at rest, the tone carried by the ink alone |
+| `muted` | Quieter ink, where there is no surface to quiet |
+
+**`outlined` is the rung that changes.** On a control the edge arrives and the
+fill leaves, which is what makes it quieter than `solid`. On a chart mark the
+fill stays under the edge, because there the area encodes a value and dropping
+it would drop the reading. Both are the same question, how much ink this claims,
+answered by what the thing has to spend it on.
+
+**`muted` is for a thing whose only ink is its letterform.** Text carries it and
+nothing else does, because everything else has a surface to quiet first. That is
+a fact about the value, not a gap.
+
+## What each material is made of
+
+`material` is one pair of declarations at three strengths, and the pair is the
+point: a translucent ground without a backdrop filter is a smear, and a filter
+behind an opaque ground is invisible. Absent is opaque.
+
+| Value | What it draws |
+|---|---|
+| `glass` | A translucent ground and the backdrop filter that makes it read |
+| `frosted` | The same pair turned up, a heavier ground under a heavier blur |
+| `transparent` | Neither, so the page shows through structure and spacing |
+
+`frosted` is for a surface that has to stay readable over a busy page. It is not
+"more glass than `glass`" in a theme's sense: a theme owns how strong the pair
+is, and these three are which pair.
+
+## What each orientation turns
+
+`orientation` is not paint, which is why it is a value a component reads rather
+than a rule a stylesheet applies: the drag axis, the arrow keys and
+`aria-orientation` all turn with it, and a CSS-only version would look stacked
+while behaving side by side, with the keyboard moving the wrong way.
+
+| Value | What it does |
+|---|---|
+| `horizontal` | Lays along the inline axis and says so in `aria-orientation` |
+| `vertical` | Along the block axis, and says that |
+| `auto` | Lets the component decide from the room it has, and turn again when that changes |
+
+**`auto` asks the component's own width and never the viewport.** A splitter in a
+300px panel of a 1400px window has no room for two panes side by side, and a
+media query would hand it the desktop branch, so a `ResizeObserver` on the host
+asks the only question with an honest answer.
+
+## What each size step is
+
+`size` is asked of pictures and regions and never of controls, which is the
+domain and not a list of who carries it. The table is worth having because one
+of the four is not a rung of the same kind.
+
+| Value | What it draws |
+|---|---|
+| `sm` | The small rung |
+| `md` | The middle one, and the resting case where a family has one |
+| `lg` | The large one |
+| `full` | The region less the same inset every rung already stops short by |
+
+**`full` is one more rung and not a second property.** A takeover dialog is the
+same question answered further along, so it belongs on this axis rather than in
+a `fullscreen` boolean beside it, which would be a private spelling of a
+registry question.
+
+## What each tone means
+
+`tone` is the one axis whose cell in the table above is prose rather than a
+list, because a page naming four of the seven reads better than a page reciting
+all of them. The seven are still fixed, and this is where they are said.
+
+| Value | What it means |
+|---|---|
+| `primary` | The main action, or the brand speaking in its own voice |
+| `accent` | The second brand voice, for a thing that must not read as primary |
+| `neutral` | A tone that reports no status |
+| `info` | Worth knowing, with nothing to do about it |
+| `success` | Finished, or correct |
+| `warning` | May go wrong, or needs attention before it does |
+| `danger` | Destructive, or already wrong |
+
+The first three are intent and the last four are status, which is the split a
+family is really choosing between when it takes a subset. See above for when
+`neutral` is worth taking.
+
+## What each width policy is
+
+`width` here is a policy, not a measurement: two buttons sitting together may
+legitimately differ, which is the test that keeps this off `size`.
+
+| Value | What it draws |
+|---|---|
+| `auto` | As wide as its content, the resting behavior said out loud |
+| `full` | The whole of the inline space its parent offers |
+
+**A `width` taking a number is a different property wearing the same name.** A
+canvas and a table column are measured rather than given a policy, so they take
+a length and are not on this axis. The name is shared and the question is not.
