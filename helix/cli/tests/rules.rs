@@ -1968,6 +1968,56 @@ fn registry_by_omission() {
     );
 }
 
+/// A value table short of its axis, which is the same staleness one level down.
+///
+/// Nine of these now restate the registry, so registering a value is nine
+/// tables to edit by hand and the one nobody edits says the value is not real.
+/// The fixture's table is `width`, whose two words make the omission unambiguous
+/// while `auto` alone would sit in `orientation` too.
+#[test]
+fn registry_value_table_by_omission() {
+    plant_in(
+        "registry-value-omission",
+        "registry",
+        &[
+            ("helix.json", r#"{ "tiers": ["pkg/styled/src"] }"#),
+            (
+                "pkg/styled/src/card/card.ts",
+                "export class Card extends HTMLElement {}\n",
+            ),
+            (
+                "pkg/docs/content/axes.mdx",
+                &format!(
+                    "{REGISTERED}
+## What each width policy is
+
+| Value | What it draws |
+|---|---|
+| `auto` | As wide as its content |
+| `full` | The whole of the inline space its parent offers |
+"
+                ),
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "pkg/docs/content/axes.mdx",
+                &format!(
+                    "{REGISTERED}
+## What each width policy is
+
+| Value | What it draws |
+|---|---|
+| `auto` | As wide as its content |
+"
+                ),
+            );
+        },
+        "explains `width` and omits `full`",
+        "pkg/docs/content/axes.mdx",
+    );
+}
+
 #[test]
 fn restated() {
     let card = |parts: &str, slots: &str, events: &str| {
