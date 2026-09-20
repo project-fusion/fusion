@@ -52,9 +52,9 @@ fn walk(at: &Path, package: &Path, into: &mut Vec<String>) {
             continue;
         };
         /* The extension through `Path`, which compares the one segment rather
-           than the tail of the name, and the three exclusions as suffixes,
-           because `.spec.ts` and `.d.ts` are not extensions: the extension of
-           `area.spec.ts` is `ts`, and what marks it is the segment before. */
+        than the tail of the name, and the three exclusions as suffixes,
+        because `.spec.ts` and `.d.ts` are not extensions: the extension of
+        `area.spec.ts` is `ts`, and what marks it is the segment before. */
         if path.extension().is_none_or(|one| one != "ts") {
             continue;
         }
@@ -94,7 +94,68 @@ pub fn build(package: &Path) -> Value {
             let text = fs::read_to_string(package.join(&path)).unwrap_or_default();
             let declared: Vec<Value> = declarations(&text, &path)
                 .into_iter()
-                .map(|one| json!({ "kind": one.kind, "name": one.name }))
+                .map(|one| {
+                    let mut entry = json!({ "kind": one.kind, "name": one.name });
+                    let Some(fields) = entry.as_object_mut() else {
+                        return entry;
+                    };
+                    if let Some(superclass) = one.superclass {
+                        /* The analyzer records where a superclass came from as
+                        well as its name. Which module and package is a
+                        resolution question, and this layer answers only the
+                        part the text holds. */
+                        fields.insert("superclass".to_owned(), json!({ "name": superclass }));
+                    }
+                    if !one.members.is_empty() {
+                        let members: Vec<Value> = one
+                            .members
+                            .into_iter()
+                            .map(|member| {
+                                let mut said = json!({ "kind": member.kind, "name": member.name });
+                                let Some(at) = said.as_object_mut() else {
+                                    return said;
+                                };
+                                if let Some(text) = member.type_text {
+                                    at.insert("type".to_owned(), json!({ "text": text }));
+                                }
+                                if let Some(default) = member.default {
+                                    at.insert("default".to_owned(), json!(default));
+                                }
+                                if member.is_static {
+                                    at.insert("static".to_owned(), json!(true));
+                                }
+                                if member.readonly {
+                                    at.insert("readonly".to_owned(), json!(true));
+                                }
+                                if let Some(privacy) = member.privacy {
+                                    at.insert("privacy".to_owned(), json!(privacy));
+                                }
+                                if let Some(returns) = member.returns {
+                                    at.insert(
+                                        "return".to_owned(),
+                                        json!({ "type": { "text": returns } }),
+                                    );
+                                }
+                                if !member.parameters.is_empty() {
+                                    let taken: Vec<Value> = member
+                                        .parameters
+                                        .into_iter()
+                                        .map(|(name, written)| match written {
+                                            Some(text) => {
+                                                json!({ "name": name, "type": { "text": text } })
+                                            }
+                                            None => json!({ "name": name }),
+                                        })
+                                        .collect();
+                                    at.insert("parameters".to_owned(), json!(taken));
+                                }
+                                said
+                            })
+                            .collect();
+                        fields.insert("members".to_owned(), json!(members));
+                    }
+                    entry
+                })
                 .collect();
             json!({
                 "declarations": declared,
