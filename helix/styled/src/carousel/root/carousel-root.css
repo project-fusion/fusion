@@ -109,6 +109,12 @@
   --_carousel-controls-along: center;
 }
 
+/* A run of dots on a picture centers too, and for a plainer reason than the
+   arrows: there is nothing on that edge to split it with. */
+:host([indicator-placement="overlay"]) [part="indicators"] {
+  --_carousel-indicators-along: center;
+}
+
 /* And the attribute, last, so it beats every default above whichever edge it is
    asked for on. */
 :host([indicator-align="start"]) [part="indicators"] {
@@ -548,6 +554,50 @@
   border-color: transparent;
   box-shadow: var(--helix-shadow-md);
   pointer-events: auto;
+}
+
+/* The dots on the slides, at their foot, which is the fifth place for this run
+   as the middle is for the arrows. `end` rather than centered: a run of dots
+   over a picture sits on it, and one floating at its middle reads as a control
+   that lost its bar. */
+:host([indicator-placement="overlay"]) [part="indicators"] {
+  align-self: end;
+  grid-area: 2 / 2;
+  z-index: var(--helix-layer-raised);
+}
+
+/* **One ground under the run, where the arrows take one each.** A dot on a
+   photograph is legible against about half of it, the same measurement that put
+   a surface under each arrow. The difference is what the two are: the arrows sit
+   at opposite edges with the slide showing between them, so a shared ground
+   would be a band across the picture, while the dots are one object whose gaps
+   are too small to be edges.
+
+   The bleed and then a gap, as the arrows do, so the run clears the picture's
+   corner by what the eye reads as one step rather than by whatever is left after
+   the track's own inset. */
+:host([indicator-placement="overlay"]) [part="indicators"] {
+  background-color: var(--helix-color-surface-overlay);
+  border-radius: var(--helix-radii-full);
+  box-shadow: var(--helix-shadow-md);
+  margin-block-end: calc(var(--_carousel-bleed) + var(--helix-space-md));
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+}
+
+/* **The resting dot is re-inked on that ground, because `border` was never for
+   this.** That token is the quiet mark against the *page*, and on the overlay
+   surface the two land on top of each other: measured in dark mode, the dot came
+   out at lightness 0.246 on a pill at 0.21, a difference of four hundredths and
+   a run of dots nobody can count. `foreground-muted` is the token for ink that
+   is quiet and still has to be read, which is the whole of what a dot waiting
+   its turn is. The current one keeps `primary`, which reads on either ground. */
+:host([indicator-placement="overlay"]) [part~="indicator"] {
+  background-color: var(--helix-color-foreground-muted);
+}
+
+:host([indicator-placement="overlay"]) [part~="indicator"][data-current] {
+  background-color: var(--helix-color-primary);
 }
 
 /* The forward arrow goes to the trailing edge, `previous` staying at the near

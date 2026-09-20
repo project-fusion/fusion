@@ -46,7 +46,7 @@ export class HelixCarousel extends HelixHeadlessCarousel {
   /**
    * Which side of the slides the arrows sit on.
    *
-   * The same four sides as `indicatorPlacement` and the same default, so a
+   * The same five places as `indicatorPlacement` and the same default, so a
    * carousel that moves only one of them keeps the other where it was. `start`
    * or `end` stacks the arrows into a column, which is what a vertical track
    * usually wants.
@@ -60,8 +60,10 @@ export class HelixCarousel extends HelixHeadlessCarousel {
    * **It is a value here rather than an axis of its own.** "The controls are
    * over the content" is the whole of what a `hero` appearance would say, and
    * the surface, the edge-to-edge arrows and the bar that catches no presses all
-   * follow from it. These two placements are the whole of where a carousel's
-   * chrome can go.
+   * follow from it. The four edges and the slides are the whole of where a
+   * carousel's chrome can go, and `indicatorPlacement` names the same five: the
+   * dots were short of this one until #389, which is how a hero ended up with
+   * its arrows on the picture and its dots in a band below.
    */
   @property({ attribute: 'controls-placement', reflect: true })
   controlsPlacement?: 'start' | 'end' | 'top' | 'bottom' | 'overlay'
@@ -112,13 +114,35 @@ export class HelixCarousel extends HelixHeadlessCarousel {
    * vocabulary across the three is worth more than each family's own: a
    * consumer who has placed a drawer knows where a carousel's dots go.
    *
+   * **`overlay` is the fifth place, and it is the slides themselves**, which is
+   * where a run of dots belongs on a full-bleed carousel: the picture is the
+   * page and the chrome is on it rather than in a band beneath it. The arrows
+   * have always had this and the dots did not, so a hero carousel put its
+   * controls over the picture and left its dots stranded in a bar under it,
+   * which is the one arrangement nobody designs on purpose.
+   *
+   * **The run takes a surface, where the arrows take one each.** Over a
+   * photograph a gray dot and a primary one are both legible against about half
+   * of it, which is the reason the arrows already carry a ground and a shadow.
+   * One ground under the whole run rather than one per dot, because the dots are
+   * a single object with gaps too small to be edges, where the arrows are two
+   * targets at opposite ends of the picture with the slide showing between them.
+   * Inside it the dots keep the colors they have everywhere else, so what a
+   * reader learned from a carousel in a card still reads on one over a picture.
+   *
+   * **`indicatorAlign` still says where along the edge**, unchanged, because
+   * this placement puts the run on the block-end edge like the other four.
+   * `controlsPlacement`'s own `overlay` reinterprets its alignment, that bar
+   * being stretched across the middle of the picture rather than sitting on an
+   * edge, and the two differ for that reason rather than by oversight.
+   *
    * Independent of `controlsPlacement`. Both default to the bottom, where they
    * share the row and split it, dots to the start and arrows to the end,
    * arrived at by two defaults rather than by a rule about the pair, so moving
    * one leaves the other alone.
    */
   @property({ attribute: 'indicator-placement', reflect: true })
-  indicatorPlacement?: 'start' | 'end' | 'top' | 'bottom'
+  indicatorPlacement?: 'start' | 'end' | 'top' | 'bottom' | 'overlay'
 
   static override styles: CSSResultGroup = styles
 }
