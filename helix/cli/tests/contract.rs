@@ -1191,3 +1191,60 @@ fn a_family_carries_its_examples_and_its_root_alone_does() {
     );
     assert_eq!(said.matches("\"source\"").count(), 1, "nor a second source");
 }
+
+/// What `@property` says about the attribute behind a field.
+///
+/// The field's own name unless the decorator says otherwise, `false` for a
+/// property that is not an attribute at all, and the attributes list written
+/// from the members so the two cannot disagree.
+#[test]
+fn a_property_decorator_names_its_attribute() {
+    let sandbox = Sandbox::new("manifest-attributes", None);
+    let src = sandbox.0.join("src/badge/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("badge-root.ts"),
+        "@customElement('helix-badge')\n\
+         export class HelixBadge {\n\
+         \x20 @property()\n\
+         \x20 label = ''\n\
+         \x20 @property({ attribute: 'default-open', type: Boolean })\n\
+         \x20 defaultOpen = false\n\
+         \x20 @property({ reflect: true })\n\
+         \x20 tone?: string\n\
+         \x20 @property({ attribute: false })\n\
+         \x20 rows: string[] = []\n\
+         \x20 plain = 1\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    assert!(
+        said.contains("\"attribute\": \"label\""),
+        "the field's own name"
+    );
+    /* Kebab is written, not derived: the library says it rather than leaving it
+    to the framework's lowercasing. */
+    assert!(
+        said.contains("\"attribute\": \"default-open\""),
+        "as written"
+    );
+    assert!(said.contains("\"reflects\": true"), "reflect is carried");
+    /* `attribute: false` is a property a consumer sets in JavaScript and
+    cannot write in markup, and a field with no decorator is not one either. */
+    assert!(!said.contains("\"rows\"\n"), "{said}");
+    assert_eq!(
+        said.matches("\"fieldName\"").count(),
+        3,
+        "three attributes, not five: {said}"
+    );
+    /* The join, because the two names differ whenever the attribute is kebab. */
+    assert!(
+        said.contains("\"fieldName\": \"defaultOpen\""),
+        "the attribute says which field it writes to: {said}"
+    );
+}

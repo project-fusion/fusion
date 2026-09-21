@@ -17,8 +17,8 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use oxc_allocator::Allocator;
 use oxc_ast::ast::{
-    Class, ClassElement, Declaration, Expression, Function, MethodDefinitionKind, PropertyKey,
-    Statement, TSAccessibility,
+    Class, ClassElement, Declaration, Decorator, Expression, Function, MethodDefinitionKind,
+    ObjectPropertyKind, PropertyKey, Statement, TSAccessibility,
 };
 use oxc_parser::Parser;
 use oxc_span::{GetSpan, SourceType};
@@ -77,6 +77,10 @@ pub struct Member {
     pub parameters: Vec<(String, Option<String>)>,
     /// The doc block above it.
     pub documented: Documented,
+    /// The attribute this field is backed by, where `@property` gives it one.
+    pub attribute: Option<String>,
+    /// Whether the property writes itself back onto the host.
+    pub reflects: bool,
 }
 
 /// Every doc block in a source, by the offset of what it is written above.
@@ -207,6 +211,148 @@ fn imports(program: &oxc_ast::ast::Program<'_>) -> BTreeMap<String, String> {
     found
 }
 
+/// One field, as far as its own syntax says.
+fn field_of(
+    property: &oxc_ast::ast::PropertyDefinition<'_>,
+    name: String,
+    source: &str,
+    documented: Documented,
+) -> Member {
+    let (attribute, reflects) = attribute_of(&property.decorators, &name);
+    Member {
+        attribute,
+        default: property
+            .value
+            .as_ref()
+            .map(|one| slice(source, one.span().start, one.span().end)),
+        documented,
+        is_static: property.r#static,
+        kind: "field",
+        name,
+        parameters: Vec::new(),
+        privacy: privacy_of(property.accessibility, &property.key),
+        readonly: property.readonly,
+        reflects,
+        returns: None,
+        type_text: property
+            .type_annotation
+            .as_ref()
+            .map(|one| {
+                slice(
+                    source,
+                    one.type_annotation.span().start,
+                    one.type_annotation.span().end,
+                )
+            })
+            .or_else(|| {
+                property
+                    .value
+                    .as_ref()
+                    .and_then(inferred)
+                    .map(ToOwned::to_owned)
+            }),
+    }
+}
+
+/// One method or accessor, as far as its own syntax says.
+fn method_of(
+    method: &oxc_ast::ast::MethodDefinition<'_>,
+    name: String,
+    source: &str,
+    documented: Documented,
+) -> Member {
+    /* **A getter is a readonly field, not a method.** What a consumer reaches
+    through `element.caret` is a value, and the manifest describes the
+    surface rather than how it is implemented. A setter is the same field
+    from the other side, so it carries no `readonly`. */
+    let accessor = matches!(
+        method.kind,
+        MethodDefinitionKind::Get | MethodDefinitionKind::Set
+    );
+    let reading = matches!(method.kind, MethodDefinitionKind::Get);
+    let annotation = |one: &oxc_ast::ast::TSTypeAnnotation<'_>| {
+        slice(
+            source,
+            one.type_annotation.span().start,
+            one.type_annotation.span().end,
+        )
+    };
+    Member {
+        attribute: None,
+        default: None,
+        documented,
+        is_static: method.r#static,
+        kind: if accessor { "field" } else { "method" },
+        name,
+        parameters: if accessor {
+            Vec::new()
+        } else {
+            parameters_of(&method.value, source)
+        },
+        privacy: privacy_of(method.accessibility, &method.key),
+        readonly: reading,
+        reflects: false,
+        returns: if accessor {
+            None
+        } else {
+            Some(
+                method
+                    .value
+                    .return_type
+                    .as_ref()
+                    .map_or_else(|| "void".to_owned(), |one| annotation(one)),
+            )
+        },
+        type_text: if reading {
+            method.value.return_type.as_ref().map(|one| annotation(one))
+        } else {
+            None
+        },
+    }
+}
+
+/// What a class body declares, in the order it is written.
+fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
+    let mut found = Vec::new();
+    for element in &class.body.body {
+        /* A decorated member's block sits above the decorator, so the offset to
+        ask about is the whole element's rather than the name's. */
+        let at = element.span().start;
+        let documented = docs.get(&at).cloned().unwrap_or_default();
+        match element {
+            ClassElement::PropertyDefinition(property) => {
+                let Some(name) = key_of(&property.key, source) else {
+                    continue;
+                };
+                if reimplements(property.r#override, property.r#static)
+                    || FRAMEWORK.contains(&name.as_str())
+                {
+                    continue;
+                }
+                found.push(field_of(property, name, source, documented));
+            }
+            ClassElement::MethodDefinition(method) => {
+                let Some(name) = key_of(&method.key, source) else {
+                    continue;
+                };
+                /* **A constructor is not a member.** It is how an instance comes
+                to exist rather than something on one, and a consumer of a
+                custom element never calls it: the platform does, from
+                markup. The analyzer publishes none. */
+                if matches!(method.kind, MethodDefinitionKind::Constructor)
+                    || reimplements(method.r#override, method.r#static)
+                    || FRAMEWORK.contains(&name.as_str())
+                {
+                    continue;
+                }
+                found.push(method_of(method, name, source, documented));
+            }
+            _ => {}
+        }
+    }
+    found
+}
+
 /// The tag a class registers, read from its `@customElement` decorator.
 ///
 /// The one string argument, as written. A decorator called with anything else
@@ -232,6 +378,56 @@ fn tag_of(class: &Class<'_>) -> Option<String> {
     None
 }
 
+/// What a `@property` decorator says about the attribute behind a field.
+///
+/// **The field's own name unless the decorator says otherwise.** `@property()`
+/// on `label` is the `label` attribute; a camel-cased field is given its
+/// kebab-cased attribute explicitly here rather than left to the framework's
+/// lowercasing, so this reads what was written and invents nothing.
+///
+/// `attribute: false` is a field that is not an attribute at all: a property a
+/// consumer sets in JavaScript and cannot write in markup.
+fn attribute_of(
+    decorators: &oxc_allocator::Vec<'_, Decorator<'_>>,
+    field: &str,
+) -> (Option<String>, bool) {
+    for decorator in decorators {
+        let Expression::CallExpression(call) = &decorator.expression else {
+            continue;
+        };
+        let Expression::Identifier(name) = &call.callee else {
+            continue;
+        };
+        if name.name != "property" {
+            continue;
+        }
+        let mut attribute = Some(field.to_owned());
+        let mut reflects = false;
+        if let Some(Expression::ObjectExpression(options)) =
+            call.arguments.first().and_then(|one| one.as_expression())
+        {
+            for property in &options.properties {
+                let ObjectPropertyKind::ObjectProperty(property) = property else {
+                    continue;
+                };
+                let key = property.key.static_name().unwrap_or_default().to_string();
+                match (key.as_str(), &property.value) {
+                    ("attribute", Expression::StringLiteral(written)) => {
+                        attribute = Some(written.value.to_string());
+                    }
+                    ("attribute", Expression::BooleanLiteral(said)) if !said.value => {
+                        attribute = None;
+                    }
+                    ("reflect", Expression::BooleanLiteral(said)) => reflects = said.value,
+                    _ => {}
+                }
+            }
+        }
+        return (attribute, reflects);
+    }
+    (None, false)
+}
+
 /// Whether a member is a reimplementation rather than an addition.
 ///
 /// **An instance member written `override` is not API and the analyzer drops
@@ -247,117 +443,16 @@ fn reimplements(is_override: bool, is_static: bool) -> bool {
     is_override && !is_static
 }
 
-/// What a class body declares, in the order it is written.
-fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
-    let mut found = Vec::new();
-    for element in &class.body.body {
-        /* A decorated member's block sits above the decorator, so the offset to
-        ask about is the whole element's rather than the name's. */
-        let at = element.span().start;
-        match element {
-            ClassElement::PropertyDefinition(property) => {
-                let Some(name) = key_of(&property.key, source) else {
-                    continue;
-                };
-                if reimplements(property.r#override, property.r#static) {
-                    continue;
-                }
-                found.push(Member {
-                    documented: docs.get(&at).cloned().unwrap_or_default(),
-                    parameters: Vec::new(),
-                    returns: None,
-                    default: property
-                        .value
-                        .as_ref()
-                        .map(|one| slice(source, one.span().start, one.span().end)),
-                    is_static: property.r#static,
-                    kind: "field",
-                    name,
-                    privacy: privacy_of(property.accessibility, &property.key),
-                    readonly: property.readonly,
-                    type_text: property
-                        .type_annotation
-                        .as_ref()
-                        .map(|one| {
-                            slice(
-                                source,
-                                one.type_annotation.span().start,
-                                one.type_annotation.span().end,
-                            )
-                        })
-                        .or_else(|| {
-                            property
-                                .value
-                                .as_ref()
-                                .and_then(inferred)
-                                .map(ToOwned::to_owned)
-                        }),
-                });
-            }
-            ClassElement::MethodDefinition(method) => {
-                let Some(name) = key_of(&method.key, source) else {
-                    continue;
-                };
-                if reimplements(method.r#override, method.r#static) {
-                    continue;
-                }
-                /* **A getter is a readonly field, not a method.** What a
-                consumer reaches through `element.caret` is a value, and the
-                manifest describes the surface rather than how it is
-                implemented: the analyzer records `kind: field`, `readonly`,
-                and the type from the return annotation. A setter is the same
-                field from the other side, so it carries no `readonly` and
-                takes its type from the parameter. */
-                let accessor = matches!(
-                    method.kind,
-                    MethodDefinitionKind::Get | MethodDefinitionKind::Set
-                );
-                let reading = matches!(method.kind, MethodDefinitionKind::Get);
-                found.push(Member {
-                    documented: docs.get(&at).cloned().unwrap_or_default(),
-                    is_static: method.r#static,
-                    kind: if accessor { "field" } else { "method" },
-                    name,
-                    privacy: privacy_of(method.accessibility, &method.key),
-                    parameters: if accessor {
-                        Vec::new()
-                    } else {
-                        parameters_of(&method.value, source)
-                    },
-                    readonly: reading,
-                    returns: if accessor {
-                        None
-                    } else {
-                        Some(method.value.return_type.as_ref().map_or_else(
-                            || "void".to_owned(),
-                            |one| {
-                                slice(
-                                    source,
-                                    one.type_annotation.span().start,
-                                    one.type_annotation.span().end,
-                                )
-                            },
-                        ))
-                    },
-                    type_text: if reading {
-                        method.value.return_type.as_ref().map(|one| {
-                            slice(
-                                source,
-                                one.type_annotation.span().start,
-                                one.type_annotation.span().end,
-                            )
-                        })
-                    } else {
-                        None
-                    },
-                    ..Member::default()
-                });
-            }
-            _ => {}
-        }
-    }
-    found
-}
+/// Members that belong to Lit rather than to the component.
+///
+/// **`styles` is the framework's static, not published API.** A consumer
+/// reaches a component's appearance through its parts and custom properties,
+/// never by reading `HelixBadge.styles`, and the analyzer runs in `LitElement`
+/// mode and drops it: 139 classes declare `static override styles` and not one
+/// of them has it in the manifest. `shadowRootOptions` and `tier` are static
+/// and overridden too and are both kept, so this is about the name rather than
+/// about being static.
+const FRAMEWORK: [&str; 1] = ["styles"];
 
 /// The name and kind of a declaration, where it has a name to give.
 fn named(

@@ -357,6 +357,12 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
     if let Some(returns) = member.returns {
         at.insert("return".to_owned(), json!({ "type": { "text": returns } }));
     }
+    if let Some(attribute) = &member.attribute {
+        at.insert("attribute".to_owned(), json!(attribute));
+    }
+    if member.reflects {
+        at.insert("reflects".to_owned(), json!(true));
+    }
     if !member.parameters.is_empty() {
         let taken: Vec<Value> = member
             .parameters
@@ -369,6 +375,35 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
         at.insert("parameters".to_owned(), json!(taken));
     }
     Value::Object(at)
+}
+
+/// The attributes a class's own fields stand behind.
+///
+/// **Written from the members rather than beside them.** An attribute is a
+/// field with a name in markup, so the two carry the same type, default and
+/// description, and generating one from the other is what keeps them from
+/// disagreeing. `fieldName` is the join: the attribute says which field it
+/// writes to, because the two names differ whenever a camel-cased field takes
+/// a kebab-cased attribute.
+fn attributes_of(members: &[Value]) -> Vec<Value> {
+    members
+        .iter()
+        .filter_map(|member| {
+            let name = member.get("attribute")?.as_str()?;
+            let mut said = serde_json::Map::new();
+            said.insert("name".to_owned(), json!(name));
+            for carried in ["type", "default", "description"] {
+                if let Some(value) = member.get(carried) {
+                    said.insert(carried.to_owned(), value.clone());
+                }
+            }
+            said.insert(
+                "fieldName".to_owned(),
+                member.get("name").cloned().unwrap_or_default(),
+            );
+            Some(Value::Object(said))
+        })
+        .collect()
 }
 
 /// Where a base class came from, in the shape the manifest records it.
@@ -414,6 +449,14 @@ fn declaration_of(
     if let Some(tag) = &one.tag_name {
         fields.insert("tagName".to_owned(), json!(tag));
         fields.insert("customElement".to_owned(), json!(true));
+        /* **Both the module this is written in, and both said twice.** The
+        schema has one field for where a class lives and another for where its
+        tag is registered, and in this library those are the same file: a
+        component's `@customElement` sits on the class it registers. Two fields
+        with one answer, which is the schema's shape rather than a duplication
+        to tidy. */
+        fields.insert("definitionPath".to_owned(), json!(path));
+        fields.insert("modulePath".to_owned(), json!(path));
     }
     if let Some(summary) = one
         .documented
@@ -448,6 +491,10 @@ fn declaration_of(
     }
     if !one.members.is_empty() {
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
+        let attributes = attributes_of(&members);
+        if !attributes.is_empty() {
+            fields.insert("attributes".to_owned(), json!(attributes));
+        }
         fields.insert("members".to_owned(), json!(members));
     }
     let heritage = one
