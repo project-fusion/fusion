@@ -271,14 +271,7 @@ struct Link<'a> {
 }
 
 fn joined(mine: Option<&Value>, theirs: Option<&Value>, link: &Link<'_>) -> Option<Value> {
-    let Link {
-        declaration: above,
-        from,
-        list,
-        deps,
-        ours,
-        ..
-    } = *link;
+    let Link { from, .. } = *link;
     let theirs: Vec<Value> = theirs
         .and_then(Value::as_array)
         .into_iter()
@@ -343,31 +336,11 @@ fn joined(mine: Option<&Value>, theirs: Option<&Value>, link: &Link<'_>) -> Opti
     }
     /* **The parent's list is regrouped, not appended whole.** A parent writes
     its own entries first and what its mixins gave it after; a child reading
-    that parent takes the mixins' first and the parent's own after them.
-    `AccordionItem` is the plain case: the headless item lists seven of its own
-    and then six from `MixinControllerOpen`, and the styled item lists the six
-    first. Measured, not guessed, and three models were tried before this one.
-
-    Deeper entries, from further up than the parent, keep their place at the
-    end: the order is one pass per ancestor, nearest first, and within each the
-    mixins come before the class. */
-    let mixins: BTreeSet<&str> = above
-        .get("mixins")
-        .and_then(Value::as_array)
-        .into_iter()
-        .flatten()
-        .filter_map(|one| one.get("name")?.as_str())
-        .collect();
-    /* **Only what a mixin gave the parent moves.** What the parent was given by
-    a class above it keeps the place the parent had it in: the styled copy
-    button lists `button`, which came from the headless button, first, exactly
-    where the headless copy button lists it, and putting the parent's own
-    entries ahead of it moved all twelve of its parts. A mixin's are the
-    exception the accordion measured. */
-    let rank = |entry: &Value| match entry.get("inheritedFrom").and_then(|one| one.get("name")) {
-        Some(Value::String(from)) if mixins.contains(from.as_str()) => 0,
-        _ => 1,
-    };
+    that parent takes the mixins' first, in the order the parent applied them,
+    and everything else after. `AccordionItem` is the plain case: the headless
+    item lists seven of its own and then six from `MixinControllerOpen`, and
+    the styled item lists the six first. See `regroup`, which says which mixin
+    a given entry counts as coming from and why that is not its stamp. */
     let mut rest: Vec<Value> = theirs
         .into_iter()
         .filter(|entry| {
@@ -379,7 +352,7 @@ fn joined(mine: Option<&Value>, theirs: Option<&Value>, link: &Link<'_>) -> Opti
             )
         })
         .collect();
-    regroup(&mut rest, &rank, list, deps, ours);
+    regroup(&mut rest, link);
     for entry in rest {
         let mut copy = entry;
         if let Some(fields) = copy.as_object_mut() {
@@ -554,69 +527,46 @@ pub fn apply(
 
 /// A parent's inherited entries put in the order a child reads them.
 ///
-/// **Which group first is the rank's business; this settles the rest.** The
-/// groups keep the order they first appear in, and within one group the order
-/// is the origin's own: the styled date picker lists `MixinControllerValue`'s
-/// eight members in the mixin's order, where `requestValue` sits sixth, rather
-/// than in the headless picker's, where it sits thirtieth among that class's
-/// own. Twenty-one of styled's twenty-four regrouped lists say so and none of
-/// the other three contradicts it on its own terms.
-fn regroup(
-    rest: &mut [Value],
-    rank: &dyn Fn(&Value) -> u8,
-    list: &str,
-    deps: &Dependencies,
-    ours: &Value,
-) {
-    let group = |entry: &Value| {
-        entry
-            .get("inheritedFrom")
-            .map(|one| {
-                format!(
-                    "{} {}",
-                    one.get("module")
-                        .and_then(Value::as_str)
-                        .unwrap_or_default(),
-                    one.get("name").and_then(Value::as_str).unwrap_or_default(),
-                )
-            })
-            .unwrap_or_default()
-    };
-    let mut seen: Vec<String> = Vec::new();
-    for entry in rest.iter() {
-        let key = group(entry);
-        if !seen.contains(&key) {
-            seen.push(key);
-        }
-    }
-    rest.sort_by_key(|entry| {
-        /* Only what a mixin gave is regrouped. Everything else keeps the place
-        the parent had it in, and a constant key leaves a stable sort to do
-        that: the styled copy button's `copied` is its parent's own entry and
-        stays between the two the button above it gave. */
-        if rank(entry) != 0 {
-            return (1, 0, usize::MAX);
-        }
-        let key = group(entry);
-        let first = seen.iter().position(|one| *one == key).unwrap_or(0);
-        let name = entry
-            .get("name")
-            .and_then(Value::as_str)
-            .unwrap_or_default();
-        let at = entry
-            .get("inheritedFrom")
-            .and_then(|stamp| {
-                let module = stamp.get("module").and_then(Value::as_str)?;
-                let named = stamp.get("name").and_then(Value::as_str)?;
-                deps.values()
-                    .chain(std::iter::once(ours))
-                    .find_map(|manifest| declared_at(manifest, module, named))?
-                    .get(list)?
-                    .as_array()?
-                    .iter()
-                    .position(|one| one.get("name").and_then(Value::as_str) == Some(name))
-            })
-            .unwrap_or(usize::MAX);
-        (rank(entry), first, at)
+/// **By the mixin that wrote each entry, in the order the parent applied
+/// them.** The styled date input lists `MixinPickerEditing`'s five first, in
+/// that mixin's own order, then `MixinPickerField`'s twelve, and so on down
+/// the parent's list; what no mixin of the parent's wrote follows, keeping the
+/// place the parent had it in.
+///
+/// Which mixin wrote an entry is not what its stamp says. `requestValue` is
+/// stamped `MixinControllerValue`, which is where it started, and sits third
+/// among `MixinPickerEditing`'s, which is where it was last written. Grouping
+/// by the stamp put it at the head of a group of its own and moved forty-two
+/// of the date input's hundred and fourteen members.
+fn regroup(rest: &mut [Value], link: &Link<'_>) {
+    rest.sort_by_key(|entry| match wrote(entry, link) {
+        Some(at) => (0, at),
+        /* A constant key, so a stable sort leaves these where the parent had
+        them. */
+        None => (1, (usize::MAX, usize::MAX)),
     });
+}
+
+/// Which of the parent's mixins last wrote an entry, and where in its list.
+fn wrote(entry: &Value, link: &Link<'_>) -> Option<(usize, usize)> {
+    let wanted = entry.get("name").and_then(Value::as_str)?;
+    link.declaration
+        .get("mixins")
+        .and_then(Value::as_array)?
+        .iter()
+        .enumerate()
+        .find_map(|(which, one)| {
+            let name = one.get("name")?.as_str()?;
+            let found = link
+                .deps
+                .values()
+                .chain(std::iter::once(link.ours))
+                .find_map(|manifest| named_in(manifest, name))?;
+            let at = found
+                .get(link.list)?
+                .as_array()?
+                .iter()
+                .position(|two| two.get("name").and_then(Value::as_str) == Some(wanted))?;
+            Some((which, at))
+        })
 }

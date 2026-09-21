@@ -1547,10 +1547,14 @@ fn a_lit_base_is_an_element_without_registering_one() {
 
 /// A parent's list is regrouped when a child takes it, not appended whole.
 ///
-/// A parent writes its own entries first and what its mixins gave it after; a
-/// child reading that parent takes the mixins' first and the parent's own after
-/// them. Measured against the real tiers, and three models were tried before
-/// this one fitted.
+/// **By the mixin that wrote each entry, in the order the parent applied
+/// them**, and what no mixin of the parent's wrote keeps the place the parent
+/// had it in. Which mixin wrote an entry is not what its stamp says: the date
+/// input's `requestValue` is stamped `MixinControllerValue`, where it started,
+/// and sits third among `MixinPickerEditing`'s, where it was last written.
+///
+/// Four models were tried before this one fitted. Grouping by the stamp moved
+/// forty-two of that class's hundred and fourteen members.
 #[test]
 fn a_child_takes_the_mixins_before_the_parents_own() {
     let sandbox = Sandbox::new("manifest-regroup", None);
@@ -1563,14 +1567,28 @@ fn a_child_takes_the_mixins_before_the_parents_own() {
          export class HelixItem extends HeadlessItem {\n  separation = 'plain'\n}\n",
     )
     .expect("a source");
-    /* The parent's own comes first in its own manifest and the mixin's after,
-    which is the order a child inverts. */
+    /* The parent's own comes first in its own manifest and its mixins' after,
+    which is the order a child inverts. `shut` is stamped from further up and
+    written by `MixinOpen`, so it sits where that mixin has it rather than at
+    the head of a group of its own. */
+    std::fs::write(
+        sandbox.0.join("core.json"),
+        r#"{"modules":[
+          {"path":"src/m.ts","declarations":[{"name":"MixinOpen","members":[
+            {"name":"open"},{"name":"shut"}]}]},
+          {"path":"src/n.ts","declarations":[{"name":"MixinNamed","members":[
+            {"name":"label"}]}]}]}"#,
+    )
+    .expect("a manifest");
     std::fs::write(
         sandbox.0.join("headless.json"),
         r#"{"modules":[{"path":"src/item/root/item-root.ts","declarations":[
-          {"name":"HeadlessItem","mixins":[{"name":"MixinOpen"}],"members":[
+          {"name":"HeadlessItem","mixins":[{"name":"MixinOpen"},{"name":"MixinNamed"}],
+           "members":[
             {"name":"chevron"},
+            {"name":"label","inheritedFrom":{"name":"MixinNamed","module":"src/n.ts"}},
             {"name":"open","inheritedFrom":{"name":"MixinOpen","module":"src/m.ts"}},
+            {"name":"shut","inheritedFrom":{"name":"Base","module":"src/b.ts"}},
             {"name":"fromAbove","inheritedFrom":{"name":"Base","module":"src/b.ts"}}]}]}]}"#,
     )
     .expect("a manifest");
@@ -1582,23 +1600,36 @@ fn a_child_takes_the_mixins_before_the_parents_own() {
             "build",
             ".",
             "--dependency",
+            "@fusion.dev/helix-core=core.json",
+            "--dependency",
             "@fusion.dev/helix-headless=headless.json",
         ],
     );
     assert_eq!(code(&output), 0);
     let said = out(&output);
-    let at = |needle: &str| said.find(needle).expect(needle);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let names: Vec<&str> = parsed["modules"][0]["declarations"][0]["members"]
+        .as_array()
+        .expect("the members")
+        .iter()
+        .map(|one| one["name"].as_str().unwrap_or_default())
+        .collect();
 
-    /* The child's own leads, then the mixin's, then the parent's own, then what
-    came from further up. */
-    assert!(at("separation") < at("\"open\""), "own first: {said}");
-    assert!(at("\"open\"") < at("chevron"), "the mixin's next: {said}");
-    /* Named distinctly on purpose: `tier` appears in the `helix` block above
-    the members, so asserting on it finds that one and compares the wrong two
-    positions. */
-    assert!(
-        at("chevron") < at("fromAbove"),
-        "then the parent's own: {said}"
+    /* The child's own leads. Then `MixinOpen`'s pair in that mixin's order,
+    `shut` among them despite its stamp naming something else, then
+    `MixinNamed`'s, then what no mixin of the parent's wrote, in the order the
+    parent had it. */
+    assert_eq!(
+        names,
+        vec![
+            "separation",
+            "open",
+            "shut",
+            "label",
+            "chevron",
+            "fromAbove"
+        ],
+        "{said}"
     );
 }
 
