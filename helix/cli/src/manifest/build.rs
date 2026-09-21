@@ -21,7 +21,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use serde_json::{json, Value};
 
@@ -172,6 +172,121 @@ fn beside(path: &str, specifier: &str) -> Option<String> {
         }
     }
     Some(format!("/{}", parts.join("/")))
+}
+
+/// Hooks a class answers because it took another's stylesheet outright.
+///
+/// **Borrowing a stylesheet is not inheritance and no field has a name for
+/// it.** `HelixCopyButton` writes `static override styles = [
+/// HelixIconButton.styles, styles]`, so it really does answer
+/// `--icon-button-radius`, `--icon-button-shadow` and `--icon-button-size`:
+/// the rules reading them are in its shadow root because it put them there.
+/// Nothing in the class relationship says so, and without this the three are
+/// missing from its page.
+///
+/// The borrower's own `@cssproperty` wins, documenting the hook against the
+/// component a reader is actually reading about, and a second entry under one
+/// name would print the row twice. The rest are appended rather than merged:
+/// what the component owns is what a reader came for, and the borrowed ones
+/// follow in the order the lender declared them.
+///
+/// `inheritedFrom` names the lender, because the hook still belongs to it.
+fn lend(
+    written: &[(String, Vec<Pending>, Vec<Value>)],
+    finished: &mut [Vec<Value>],
+    deps: &Dependencies,
+) {
+    /* Every class by name, with the module it sits in, taken after inheritance
+    has run so a lender's own inherited hooks are lent on too. */
+    let mut index: BTreeMap<String, (Value, String)> = BTreeMap::new();
+    for manifest in deps.values() {
+        for module in manifest
+            .get("modules")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+        {
+            let path = module
+                .get("path")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            for one in module
+                .get("declarations")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+            {
+                if let Some(name) = one.get("name").and_then(Value::as_str) {
+                    index
+                        .entry(name.to_owned())
+                        .or_insert_with(|| (one.clone(), path.to_owned()));
+                }
+            }
+        }
+    }
+    for ((path, _, _), declared) in written.iter().zip(finished.iter()) {
+        for one in declared {
+            if let Some(name) = one.get("name").and_then(Value::as_str) {
+                index
+                    .entry(name.to_owned())
+                    .or_insert_with(|| (one.clone(), path.clone()));
+            }
+        }
+    }
+
+    for ((_, pending, _), declared) in written.iter().zip(finished.iter_mut()) {
+        for ((_, _, _, borrows), one) in pending.iter().zip(declared.iter_mut()) {
+            if borrows.is_empty() {
+                continue;
+            }
+            let mut held: BTreeSet<String> = one
+                .get("cssProperties")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+                .filter_map(|two| Some(two.get("name")?.as_str()?.to_owned()))
+                .collect();
+            let mut gained: Vec<Value> = Vec::new();
+            for source in borrows {
+                let Some((lender, module)) = index.get(source) else {
+                    continue;
+                };
+                for hook in lender
+                    .get("cssProperties")
+                    .and_then(Value::as_array)
+                    .into_iter()
+                    .flatten()
+                {
+                    let Some(name) = hook.get("name").and_then(Value::as_str) else {
+                        continue;
+                    };
+                    if !held.insert(name.to_owned()) {
+                        continue;
+                    }
+                    let mut copy = hook.clone();
+                    if let Some(fields) = copy.as_object_mut() {
+                        fields.insert(
+                            "inheritedFrom".to_owned(),
+                            json!({ "name": source, "module": module }),
+                        );
+                    }
+                    gained.push(copy);
+                }
+            }
+            if gained.is_empty() {
+                continue;
+            }
+            if let Some(fields) = one.as_object_mut() {
+                let mut all = fields
+                    .get("cssProperties")
+                    .and_then(Value::as_array)
+                    .cloned()
+                    .unwrap_or_default();
+                all.extend(gained);
+                fields.insert("cssProperties".to_owned(), json!(all));
+            }
+        }
+    }
 }
 
 /// A list of parameters as the manifest writes them.
@@ -689,7 +804,7 @@ fn declaration_of(
 /// The manifest as far as this generator has been taken.
 /// A declaration as the first pass leaves it: what it says, what it extends,
 /// and whether it is an element.
-type Pending = (Value, Vec<(String, Option<String>)>, bool);
+type Pending = (Value, Vec<(String, Option<String>)>, bool, Vec<String>);
 
 pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencies) -> Value {
     /* **Two passes, because a class may extend one in its own package.**
@@ -707,8 +822,9 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
                 .into_iter()
                 .map(|one| {
                     let is_element = one.is_element;
+                    let borrows = one.borrows.clone();
                     let (declaration, heritage) = declaration_of(one, &path, tier, package, given);
-                    (declaration, heritage, is_element)
+                    (declaration, heritage, is_element, borrows)
                 })
                 .collect();
             (path, declared, published)
@@ -735,7 +851,7 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
                 .map(|(path, declared, _)| json!({
                     "declarations": declared
                         .iter()
-                        .map(|(one, _, _)| one.clone())
+                        .map(|(one, _, _, _)| one.clone())
                         .collect::<Vec<Value>>(),
                     "path": path,
                 }))
@@ -748,7 +864,7 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
             .map(|(_, declared, _)| {
                 declared
                     .iter()
-                    .map(|(one, heritage, is_element)| {
+                    .map(|(one, heritage, is_element, _)| {
                         let mut copy = one.clone();
                         inherit::apply(&mut copy, heritage, dependencies, against, *is_element);
                         copy
@@ -777,6 +893,8 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
         }
         mine = next;
     }
+
+    lend(&written, &mut finished, dependencies);
 
     let modules: Vec<Value> = written
         .into_iter()

@@ -60,6 +60,20 @@ pub struct Declared {
     /// only about declarations that have one, so a controller and an element
     /// are told apart by this and not by being classes.
     pub tag_name: Option<String>,
+    /// Classes whose stylesheet this one took outright.
+    ///
+    /// **Borrowing a stylesheet is not inheritance, not a mixin and not a
+    /// part, and no manifest field has a name for it.** `HelixCopyButton`
+    /// writes `static override styles = [HelixIconButton.styles, styles]`, so
+    /// the rules reading `--icon-button-size` really are in its shadow root,
+    /// because it put them there. Nothing in the class relationship says so,
+    /// and the three hooks would be missing from its page.
+    ///
+    /// Only a direct `X.styles` reads as one. Anything computed is left alone
+    /// rather than guessed at: a hook wrongly attributed reads as API and is
+    /// worse than one that is missing, because a consumer sets it and nothing
+    /// happens.
+    pub borrows: Vec<String>,
 }
 
 /// A base class, and where the name binding it came from.
@@ -414,6 +428,52 @@ fn is_a_value(expression: &Expression<'_>) -> bool {
 /// …` with `this.host = host` in the constructor reads as having no default
 /// until the constructor is read, and the analyzer records `host`: the
 /// expression as written, which is what every other default here is.
+/// The classes whose stylesheet a class took, by the name each is bound to.
+fn borrowed(class: &Class<'_>, mine: &str) -> Vec<String> {
+    fn walk(value: &Expression<'_>, mine: &str, into: &mut Vec<String>) {
+        match value {
+            Expression::StaticMemberExpression(access) => {
+                match (access.property.name.as_str(), &access.object) {
+                    ("styles", Expression::Identifier(named)) => {
+                        let name = named.name.to_string();
+                        /* A class naming itself is `super.styles` written the
+                        long way, and real inheritance is resolved elsewhere. */
+                        if name != mine && !into.contains(&name) {
+                            into.push(name);
+                        }
+                    }
+                    /* `[X.styles, styles].flat()` reaches here as the `.flat`,
+                    whose object is the list the borrow is written in. */
+                    _ => walk(&access.object, mine, into),
+                }
+            }
+            Expression::ArrayExpression(items) => {
+                for one in &items.elements {
+                    if let Some(one) = one.as_expression() {
+                        walk(one, mine, into);
+                    }
+                }
+            }
+            Expression::CallExpression(call) => walk(&call.callee, mine, into),
+            Expression::TSAsExpression(said) => walk(&said.expression, mine, into),
+            _ => {}
+        }
+    }
+    let mut found = Vec::new();
+    for element in &class.body.body {
+        let ClassElement::PropertyDefinition(property) = element else {
+            continue;
+        };
+        if !property.r#static || key_of(&property.key, "").as_deref() != Some("styles") {
+            continue;
+        }
+        if let Some(value) = &property.value {
+            walk(value, mine, &mut found);
+        }
+    }
+    found
+}
+
 fn assigned(class: &Class<'_>, source: &str) -> BTreeMap<String, String> {
     let mut found = BTreeMap::new();
     for element in &class.body.body {
@@ -862,6 +922,7 @@ fn variables_of(
                     (None, None) => "variable",
                 },
                 tag_name: None,
+                borrows: Vec::new(),
                 name: id.name.to_string(),
                 parameters: arrow.map_or_else(Vec::new, |two| parameters_of_arrow(two, source)),
                 /* A mixin has no return: what it hands back is the class whose
@@ -980,6 +1041,7 @@ fn named(
                 returns: None,
                 type_text: None,
                 tag_name: tag_of(class),
+                borrows: borrowed(class, &id.name),
                 members: members_of(class, source, docs, tag_of(class).is_some()),
                 name: id.name.to_string(),
                 heritage: class.super_class.as_ref().map_or_else(Vec::new, |one| {
@@ -1017,6 +1079,7 @@ fn named(
                 )),
                 type_text: None,
                 tag_name: None,
+                borrows: Vec::new(),
                 name: id.name.to_string(),
                 ..Declared::default()
             })

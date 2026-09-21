@@ -2199,3 +2199,62 @@ fn a_tag_and_a_file_name_are_read_the_way_the_analyzer_reads_them() {
         .collect();
     assert_eq!(slugs, vec!["preview", "compact-counts", "compact"]);
 }
+
+/// A class that took another's stylesheet answers its hooks.
+///
+/// Borrowing a stylesheet is not inheritance, not a mixin and not a part, and
+/// no manifest field has a name for it: the rules reading the lender's hooks
+/// are in the borrower's shadow root because it put them there.
+#[test]
+fn a_class_that_borrowed_a_stylesheet_answers_its_hooks() {
+    let sandbox = Sandbox::new("manifest-borrowed", None);
+    let src = sandbox.0.join("src");
+    std::fs::create_dir_all(src.join("copy-button")).expect("a source tree");
+    std::fs::create_dir_all(src.join("icon-button")).expect("a source tree");
+    std::fs::write(
+        src.join("icon-button/icon-button.ts"),
+        "/**\n\
+         \x20* @cssproperty --icon-button-size - Edge length of the control.\n\
+         \x20* @cssproperty --icon-button-shadow - What it casts.\n\
+         \x20*/\n\
+         @customElement('helix-icon-button')\n\
+         export class HelixIconButton extends HelixElement {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        src.join("copy-button/copy-button.ts"),
+        "import { HelixIconButton } from '../icon-button/icon-button.js'\n\
+         /**\n\
+         \x20* @cssproperty --icon-button-size - Said here, and said first.\n\
+         \x20*/\n\
+         @customElement('helix-copy-button')\n\
+         export class HelixCopyButton extends HelixElement {\n\
+         \x20 static override styles = [HelixIconButton.styles, styles].flat()\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let borrower = parsed["modules"]
+        .as_array()
+        .expect("the modules")
+        .iter()
+        .flat_map(|one| one["declarations"].as_array().expect("the declarations"))
+        .find(|one| one["name"] == "HelixCopyButton")
+        .expect("the borrower")
+        .clone();
+    let hooks = borrower["cssProperties"].as_array().expect("the hooks");
+
+    /* The borrower's own wins and is first: it documents the hook against the
+    component a reader is reading about, and two entries would print the row
+    twice. The rest follow, naming the lender. */
+    assert_eq!(hooks.len(), 2, "one of each: {said}");
+    assert_eq!(hooks[0]["name"], "--icon-button-size");
+    assert_eq!(hooks[0]["description"], "Said here, and said first.");
+    assert!(hooks[0].get("inheritedFrom").is_none(), "its own: {said}");
+    assert_eq!(hooks[1]["name"], "--icon-button-shadow");
+    assert_eq!(hooks[1]["inheritedFrom"]["name"], "HelixIconButton");
+}
