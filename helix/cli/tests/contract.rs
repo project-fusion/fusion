@@ -1726,3 +1726,28 @@ fn a_redeclared_member_keeps_what_it_says_and_gains_what_it_left_out() {
     has without a decorator saying so. */
     assert!(said.contains("\"tier\": \"styled\""), "{said}");
 }
+
+/// `as const` is a note to the type checker, not part of the value.
+///
+/// `['native', 'light'] as const` is that list, and the manifest prints the
+/// list. Reading the assertion as the expression left eleven shapes and five
+/// interactions with no default at all.
+#[test]
+fn a_type_assertion_is_not_part_of_the_value() {
+    let sandbox = Sandbox::new("manifest-as-const", None);
+    let src = sandbox.0.join("src/aura");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("shader.ts"),
+        "export const INTERACTIONS = ['native', 'light'] as const\n\
+         export const COUNT = 5 as number\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    assert!(said.contains("['native', 'light']"), "the list: {said}");
+    assert!(!said.contains("as const"), "not the assertion: {said}");
+    assert!(said.contains("\"default\": \"5\""), "nor any other: {said}");
+}

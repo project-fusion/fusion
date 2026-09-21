@@ -127,6 +127,14 @@ fn slice(source: &str, start: u32, end: u32) -> String {
         .to_owned()
 }
 
+/// The expression a type assertion wraps, which is the value itself.
+fn unwrapped<'a>(expression: &'a Expression<'a>) -> &'a Expression<'a> {
+    match expression {
+        Expression::TSAsExpression(said) => unwrapped(&said.expression),
+        other => other,
+    }
+}
+
 /// The same, on one line whatever the source did.
 ///
 /// **For a default and for nothing else.** A default spanning six lines of an
@@ -332,6 +340,13 @@ pub fn signature(name: &str, parameters: &[String], returns: &str) -> String {
 /// one `new`, and they stay unfitted rather than have the rule bent to reach
 /// them.
 fn is_a_value(expression: &Expression<'_>) -> bool {
+    /* **`as const` is a note to the type checker, not part of the value.**
+    `['native', 'light', …] as const` is that list, and the manifest prints
+    the list: reading the assertion as the expression left eleven shapes and
+    five interactions with no default at all. */
+    if let Expression::TSAsExpression(said) = expression {
+        return is_a_value(&said.expression);
+    }
     matches!(
         expression,
         Expression::StringLiteral(_)
@@ -442,7 +457,10 @@ fn field_of(
             .value
             .as_ref()
             .filter(|one| is_a_value(one))
-            .map(|one| one_line(source, one.span().start, one.span().end))
+            .map(|one| {
+                let value = unwrapped(one);
+                one_line(source, value.span().start, value.span().end)
+            })
             .or_else(|| assigned.get(&name).cloned()),
         documented,
         is_static: property.r#static,
@@ -809,11 +827,10 @@ fn variables_of(
                    printing; `styles = createSheet(\`…\`)` is a call, and
                    printing it put a whole stylesheet into a reference page for
                    four of sandbox's modules before this. */
-                default: one
-                    .init
-                    .as_ref()
-                    .filter(|two| is_a_value(two))
-                    .map(|two| one_line(source, two.span().start, two.span().end)),
+                default: one.init.as_ref().filter(|two| is_a_value(two)).map(|two| {
+                    let value = unwrapped(two);
+                    one_line(source, value.span().start, value.span().end)
+                }),
                 type_text: one
                     .type_annotation
                     .as_ref()
