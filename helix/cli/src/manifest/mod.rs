@@ -120,6 +120,50 @@ fn by_name(declaration: &Value, list: &str) -> (BTreeMap<String, Value>, Vec<Str
     (found, order)
 }
 
+/// The exports of a module, by what names one, with the order they came in.
+///
+/// **Not by name alone**, which the declarations above can be: a module that
+/// re-exports two others has two entries both called `*`, and keying on the
+/// name would report one of them and hide the other. What tells them apart is
+/// where each points, so the key says that too.
+fn exports(module: &Value) -> (BTreeMap<String, Value>, Vec<String>) {
+    let mut found = BTreeMap::new();
+    let mut order = Vec::new();
+    for entry in module
+        .get("exports")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+    {
+        let said = |at: &str, key: &str| {
+            entry
+                .get(at)
+                .and_then(|one| one.get(key))
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned()
+        };
+        let kind = entry
+            .get("kind")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let name = entry
+            .get("name")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let from = said("declaration", "module");
+        let from = if from.is_empty() {
+            said("declaration", "package")
+        } else {
+            from
+        };
+        let key = format!("{kind} {name} from {from}");
+        order.push(key.clone());
+        found.insert(key, entry.clone());
+    }
+    (found, order)
+}
+
 /// The declarations of a module, by name, with the order they came in.
 fn declarations(module: &Value) -> (BTreeMap<String, Value>, Vec<String>) {
     let mut found = BTreeMap::new();
@@ -263,10 +307,37 @@ pub fn compare(before: &Value, after: &Value) -> Vec<Difference> {
     missing("", "module", &left, &right, &mut found);
     ordering("", "modules", &left_order, &right_order, &mut found);
 
+    /* The document's own fields, which are two and easily forgotten. The first
+    pass compared modules and nothing else, and so had nothing to say about a
+    `schemaVersion` that was wrong in all four tiers. */
+    let alone = |one: &Value| {
+        let mut copy = one.clone();
+        if let Some(fields) = copy.as_object_mut() {
+            fields.remove("modules");
+        }
+        copy
+    };
+    fields("", &alone(before), &alone(after), &mut found);
+
     for (path, module) in &left {
         let Some(other) = right.get(path) else {
             continue;
         };
+        let (sent, sent_order) = exports(module);
+        let (theirs_sent, theirs_sent_order) = exports(other);
+        missing(path, "export", &sent, &theirs_sent, &mut found);
+        ordering(path, "exports", &sent_order, &theirs_sent_order, &mut found);
+        for (key, value) in &sent {
+            if let Some(against) = theirs_sent.get(key) {
+                fields(
+                    &format!("{path} › exports.{key}"),
+                    value,
+                    against,
+                    &mut found,
+                );
+            }
+        }
+
         let (mine, mine_order) = declarations(module);
         let (theirs, theirs_order) = declarations(other);
         missing(path, "declaration", &mine, &theirs, &mut found);

@@ -1086,3 +1086,127 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
     }
     found
 }
+
+/// Where an export's declaration lives, which is said three different ways.
+#[derive(Clone, Debug)]
+pub enum Origin {
+    /// This module, for a name it declares itself.
+    Own,
+    /// The specifier as the source wrote it, for `export { one } from '…'`.
+    ///
+    /// **Not resolved, which is the odd half of the pair.** A named re-export
+    /// keeps `./controllers/aria-forward-controller/aria-forward-controller.js`
+    /// and a star re-export beside it in the same file becomes
+    /// `src/accordion/item/accordion-item.js`. Two hundred and sixty-five of
+    /// the one and four hundred and forty-two of the other, with no case going
+    /// the other way, so the split is the analyzer's and is kept.
+    Written(String),
+    /// The specifier resolved against this module, for `export * from '…'`.
+    Resolved(String),
+}
+
+/// One entry of a module's `exports`.
+#[derive(Clone, Debug)]
+pub struct Exported {
+    /// `js`, or `custom-element-definition` for the tag a class registers.
+    pub kind: &'static str,
+    /// The name the module publishes, which is the tag for a definition.
+    pub name: String,
+    /// The name at the other end, which differs where an export renames.
+    pub declaration: String,
+    pub origin: Origin,
+}
+
+/// What a module publishes, in the order its statements are written.
+///
+/// **Statements rather than declarations**, which is the whole of the ordering
+/// rule: `const EDGES` at the head of a file and `export { EDGES }` at its foot
+/// put the export last, after the element declared between them, and reading
+/// declarations instead would have put it first.
+///
+/// A type is not an export. `export interface Options` and `export type Side`
+/// are absent from all four tiers, a hundred and seven of them, while
+/// `export type { Side }` as a clause is present: what counts is the statement
+/// being an export clause rather than the thing being a value.
+///
+/// A class that registers a tag publishes twice, the class and then the tag,
+/// which holds for two hundred and sixty-nine of the two hundred and seventy
+/// definitions in the library. The odd one is the decorator's own source, where
+/// the analyzer reads the call inside `customElement` as a registration and
+/// publishes `tagName`; that is its bug rather than its rule, and is left.
+pub fn exports(source: &str, path: &str) -> Vec<Exported> {
+    let allocator = Allocator::default();
+    let kind = SourceType::from_path(path).unwrap_or_else(|_| SourceType::ts());
+    let parsed = Parser::new(&allocator, source, kind).parse();
+
+    let mut found = Vec::new();
+    for statement in &parsed.program.body {
+        match statement {
+            Statement::ExportAllDeclaration(export) => found.push(Exported {
+                kind: "js",
+                name: "*".to_owned(),
+                declaration: "*".to_owned(),
+                origin: Origin::Resolved(export.source.value.to_string()),
+            }),
+            Statement::ExportNamedDeclaration(export) => match &export.declaration {
+                Some(declaration) => found.extend(published(declaration)),
+                None => {
+                    for specifier in &export.specifiers {
+                        found.push(Exported {
+                            kind: "js",
+                            name: specifier.exported.name().to_string(),
+                            declaration: specifier.local.name().to_string(),
+                            origin: match &export.source {
+                                Some(from) => Origin::Written(from.value.to_string()),
+                                None => Origin::Own,
+                            },
+                        });
+                    }
+                }
+            },
+            _ => {}
+        }
+    }
+    found
+}
+
+/// The entries one `export <declaration>` statement makes.
+fn published(declaration: &Declaration<'_>) -> Vec<Exported> {
+    let one = |name: String| Exported {
+        kind: "js",
+        name: name.clone(),
+        declaration: name,
+        origin: Origin::Own,
+    };
+    match declaration {
+        Declaration::ClassDeclaration(class) => {
+            let Some(name) = class.id.as_ref().map(|id| id.name.to_string()) else {
+                return Vec::new();
+            };
+            let mut found = vec![one(name.clone())];
+            if let Some(tag) = tag_of(class) {
+                found.push(Exported {
+                    kind: "custom-element-definition",
+                    name: tag,
+                    declaration: name,
+                    origin: Origin::Own,
+                });
+            }
+            found
+        }
+        Declaration::FunctionDeclaration(function) => function
+            .id
+            .as_ref()
+            .map(|id| vec![one(id.name.to_string())])
+            .unwrap_or_default(),
+        Declaration::VariableDeclaration(variables) => variables
+            .declarations
+            .iter()
+            .filter_map(|two| two.id.get_binding_identifier())
+            .map(|id| one(id.name.to_string()))
+            .collect(),
+        /* An interface and a type alias are not exports, which the tiers say
+        without exception: a hundred and seven declared and none published. */
+        _ => Vec::new(),
+    }
+}
