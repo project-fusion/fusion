@@ -68,7 +68,7 @@ fn package_of(specifier: &str) -> String {
 /// was picked up.
 ///
 /// **An entry the parent was given is taken from whoever gave it.** The styled
-/// colour input inherits `anchor` through the headless one, which declares
+/// color input inherits `anchor` through the headless one, which declares
 /// `anchor` itself at some length and carries a stamp saying `MixinPickerField`
 /// all the same. The manifest gives the styled class the mixin's words, not the
 /// headless class's: a stamp names the origin, and the origin is where the

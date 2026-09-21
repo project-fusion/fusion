@@ -249,7 +249,7 @@ fn parameters_of_arrow(
 ///
 /// **A pattern is named by its own text.** `arranged(…, { query, spec })`
 /// destructures, and there is no identifier to report, so the manifest gives
-/// the pattern as written — line breaks and all, where the source wrapped it.
+/// the pattern as written, line breaks and all, where the source wrapped it.
 /// Reading only identifiers dropped those parameters entirely.
 ///
 /// **A default is the initializer's text**, whatever shape it is: `{}`,
