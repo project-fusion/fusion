@@ -391,6 +391,23 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
     if let Some(returns) = member.returns {
         at.insert("return".to_owned(), json!({ "type": { "text": returns } }));
     }
+    /* **`@reference` is a url and then what to call it.** The tag opens with
+    the link because that is the fact; the words after it are how a page says it
+    to a reader, and a reference with no words is a bare url nobody would click
+    on purpose. */
+    let references: Vec<Value> = member
+        .documented
+        .tags
+        .iter()
+        .filter(|(tag, _)| tag == "reference")
+        .filter_map(|(_, text)| {
+            let (url, label) = text.trim().split_once(char::is_whitespace)?;
+            Some(json!({ "label": label.trim(), "url": url }))
+        })
+        .collect();
+    if !references.is_empty() {
+        at.insert("helix".to_owned(), json!({ "references": references }));
+    }
     if let Some(attribute) = &member.attribute {
         at.insert("attribute".to_owned(), json!(attribute));
     }
@@ -501,9 +518,14 @@ fn declaration_of(
     let mut fields = serde_json::Map::new();
     fields.insert("kind".to_owned(), json!(one.kind));
     fields.insert("name".to_owned(), json!(one.name));
+    /* Being an element and registering a tag are two facts, and one class has
+    the first without the second: `HelixElement` is Lit's base wearing this
+    library's name, and it registers nothing. */
+    if one.is_element {
+        fields.insert("customElement".to_owned(), json!(true));
+    }
     if let Some(tag) = &one.tag_name {
         fields.insert("tagName".to_owned(), json!(tag));
-        fields.insert("customElement".to_owned(), json!(true));
         /* **Both the module this is written in, and both said twice.** The
         schema has one field for where a class lives and another for where its
         tag is registered, and in this library those are the same file: a
@@ -610,7 +632,7 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
             let declared = declarations(&text, &path)
                 .into_iter()
                 .map(|one| {
-                    let is_element = one.tag_name.is_some();
+                    let is_element = one.is_element;
                     let (declaration, heritage) = declaration_of(one, &path, tier, package, given);
                     (declaration, heritage, is_element)
                 })

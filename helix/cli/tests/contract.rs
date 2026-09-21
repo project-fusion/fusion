@@ -1478,3 +1478,41 @@ fn a_base_in_the_same_package_is_found() {
     );
     assert!(said.contains("\"inheritedFrom\""), "and is marked: {said}");
 }
+
+/// Being an element and registering a tag are two facts.
+///
+/// `HelixElement extends LitElement` registers nothing and the analyzer counts
+/// it as an element anyway, reading Lit's own base as the mark. One case in the
+/// library, so the rule is as narrow as the evidence.
+#[test]
+fn a_lit_base_is_an_element_without_registering_one() {
+    let sandbox = Sandbox::new("manifest-lit-base", None);
+    let src = sandbox.0.join("src/element");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("element.ts"),
+        "export class HelixElement extends LitElement {}\n\
+         export class Controller extends Object {}\n\
+         /** @reference https://example.test/spec the specification */\n\
+         export class Other extends LitElement {\n\
+         \x20 form = null\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    /* Two classes extend Lit's base and neither registers anything. */
+    assert_eq!(said.matches("\"customElement\": true").count(), 2, "{said}");
+    assert!(
+        !said.contains("\"tagName\""),
+        "none registers a tag: {said}"
+    );
+    /* And extending anything else is not it. */
+    let at = said.find("Controller").expect("the controller");
+    assert!(
+        !said[at..].starts_with("Controller\",\n          \"customElement\""),
+        "a plain class is not an element: {said}"
+    );
+}
