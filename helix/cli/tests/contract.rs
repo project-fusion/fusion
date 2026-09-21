@@ -1960,3 +1960,54 @@ fn a_chain_inside_one_package_reaches_the_bottom_of_it() {
         assert_eq!(label["inheritedFrom"]["name"], "HelixButton", "{name}");
     }
 }
+
+/// What a parameter carries beyond its name and its type.
+#[test]
+fn a_parameter_says_its_default_and_names_a_pattern_by_its_text() {
+    let sandbox = Sandbox::new("manifest-parameters", None);
+    let src = sandbox.0.join("src/note");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("note.ts"),
+        "@customElement('helix-note')\n\
+         export class HelixNote extends HelixElement {\n\
+         \x20 markRead(next = true): boolean { return next }\n\
+         \x20 moveTo(next: number, settled = false): void {}\n\
+         \x20 arranged({ query, spec }: { query: string; spec: string }): void {}\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let of = |name: &str| {
+        parsed["modules"][0]["declarations"][0]["members"]
+            .as_array()
+            .expect("the members")
+            .iter()
+            .find(|one| one["name"] == name)
+            .unwrap_or_else(|| panic!("{name} is declared: {said}"))
+            .clone()
+    };
+
+    /* A default is the initializer's text, and it stands in the signature too:
+    a caller reading the signature is told what it may leave out. */
+    let read = of("markRead");
+    assert_eq!(read["parameters"][0]["default"], "true");
+    assert_eq!(read["type"]["text"], "markRead(next = true) => boolean");
+    /* A typed parameter keeps its type and a defaulted one its default. */
+    assert_eq!(
+        of("moveTo")["type"]["text"],
+        "moveTo(next: number, settled = false) => void"
+    );
+    /* A pattern has no identifier to report, so it is named by its own text.
+    Reading only identifiers dropped these parameters entirely. */
+    let arranged = of("arranged");
+    assert_eq!(arranged["parameters"][0]["name"], "{ query, spec }");
+    assert_eq!(
+        arranged["parameters"][0]["type"]["text"],
+        "{ query: string; spec: string }"
+    );
+}
