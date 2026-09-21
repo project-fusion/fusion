@@ -1291,3 +1291,63 @@ fn the_framework_and_the_implementation_are_not_api() {
     assert!(!said.contains("this.focus()"), "not a default: {said}");
     assert!(said.contains("\"default\": \"''\""), "a real one: {said}");
 }
+
+/// Four things about a type, each measured rather than reasoned.
+#[test]
+fn a_type_says_what_a_reader_may_find() {
+    let sandbox = Sandbox::new("manifest-types", None);
+    let src = sandbox.0.join("src/item/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("item-root.ts"),
+        "import { Open, Base } from '@fusion.dev/helix-core'\n\
+         @customElement('helix-item')\n\
+         export class HelixItem extends Open(Base) {\n\
+         \x20 name?: string\n\
+         \x20 keys = new Controller(this, {\n\
+         \x20   origin: 'focus',\n\
+         \x20 })\n\
+         }\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        sandbox.0.join("core.json"),
+        r#"{"modules":[{"path":"src/m.ts","declarations":[
+          {"name":"Open","kind":"mixin","members":[
+            {"kind":"method","name":"requestOpen",
+             "parameters":[{"name":"next","type":{"text":"boolean"}}],
+             "return":{"type":{"text":"boolean"}}}]},
+          {"name":"Base","members":[]}]}]}"#,
+    )
+    .expect("a manifest");
+
+    let output = run(
+        &sandbox.0,
+        &[
+            "manifest",
+            "build",
+            ".",
+            "--dependency",
+            "@fusion.dev/helix-core=core.json",
+        ],
+    );
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    /* An optional property says `| undefined` out loud, because the manifest
+    describes what a reader may find rather than how it was written. */
+    assert!(said.contains("string | undefined"), "the optional: {said}");
+    /* A default is one value on one line, whatever the source's formatting. */
+    assert!(
+        said.contains("new Controller(this, { origin: 'focus', })"),
+        "one line: {said}"
+    );
+    /* The mixin is listed beside the superclass, not as one. */
+    assert!(said.contains("\"mixins\""), "{said}");
+    /* And an inherited method is signed where it lands: the mixin carries no
+    type for it, being a plain class, and this element publishes one. */
+    assert!(
+        said.contains("requestOpen(next: boolean) => boolean"),
+        "signed on arrival: {said}"
+    );
+}

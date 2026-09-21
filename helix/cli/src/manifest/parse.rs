@@ -105,6 +105,32 @@ fn slice(source: &str, start: u32, end: u32) -> String {
         .to_owned()
 }
 
+/// The same, on one line whatever the source did.
+///
+/// **For a default and for nothing else.** A default spanning six lines of an
+/// options object is one value and the manifest writes it as one: the breaks
+/// and the indentation are the file's formatting rather than anything about the
+/// value. Applying it to every sliced field instead, which was the first try,
+/// took sandbox from exact to thirty-eight differences in one run: a wrapped
+/// union's type text keeps its shape, and so does a description.
+fn one_line(source: &str, start: u32, end: u32) -> String {
+    let text = slice(source, start, end);
+    let mut said = String::with_capacity(text.len());
+    let mut spaced = false;
+    for one in text.chars() {
+        if one.is_whitespace() {
+            spaced = true;
+            continue;
+        }
+        if spaced && !said.is_empty() {
+            said.push(' ');
+        }
+        spaced = false;
+        said.push(one);
+    }
+    said
+}
+
 /// The name a class element is keyed by, where it is a plain one.
 fn key_of(key: &PropertyKey<'_>, source: &str) -> Option<String> {
     match key {
@@ -276,7 +302,7 @@ fn assigned(class: &Class<'_>, source: &str) -> BTreeMap<String, String> {
             };
             found.insert(
                 field.to_string(),
-                slice(
+                one_line(
                     source,
                     assignment.right.span().start,
                     assignment.right.span().end,
@@ -312,7 +338,7 @@ fn field_of(
                     Expression::ArrowFunctionExpression(_) | Expression::FunctionExpression(_)
                 )
             })
-            .map(|one| slice(source, one.span().start, one.span().end))
+            .map(|one| one_line(source, one.span().start, one.span().end))
             .or_else(|| assigned.get(&name).cloned()),
         documented,
         is_static: property.r#static,
@@ -323,15 +349,24 @@ fn field_of(
         readonly: property.readonly,
         reflects,
         returns: None,
+        /* **An optional property says `| undefined` out loud.** `name?: string`
+        can hold one, and the manifest describes what a reader may find there
+        rather than what the declaration looks like, so the `?` is written
+        into the type it stands for. */
         type_text: property
             .type_annotation
             .as_ref()
             .map(|one| {
-                slice(
+                let written = slice(
                     source,
                     one.type_annotation.span().start,
                     one.type_annotation.span().end,
-                )
+                );
+                if property.optional {
+                    format!("{written} | undefined")
+                } else {
+                    written
+                }
             })
             .or_else(|| {
                 property

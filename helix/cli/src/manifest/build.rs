@@ -512,6 +512,17 @@ fn declaration_of(
     if let Some(base) = one.heritage.last() {
         fields.insert("superclass".to_owned(), heritage(base.clone(), path));
     }
+    /* **The mixins beside the superclass, and every link but the last is one.**
+    A heritage clause is read outermost first with the base class at the end, so
+    what remains is exactly what wrapped it, each resolved the same way: a bare
+    import names a package and a relative one names a module. */
+    if one.heritage.len() > 1 {
+        let wrapped: Vec<Value> = one.heritage[..one.heritage.len() - 1]
+            .iter()
+            .map(|link| heritage(link.clone(), path))
+            .collect();
+        fields.insert("mixins".to_owned(), json!(wrapped));
+    }
     if !one.members.is_empty() {
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
         let attributes = attributes_of(&members);
@@ -537,9 +548,10 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
             let declared: Vec<Value> = declarations(&text, &path)
                 .into_iter()
                 .map(|one| {
+                    let is_element = one.tag_name.is_some();
                     let (mut declaration, heritage) =
                         declaration_of(one, &path, tier, package, given);
-                    inherit::apply(&mut declaration, &heritage, dependencies);
+                    inherit::apply(&mut declaration, &heritage, dependencies, is_element);
                     declaration
                 })
                 .collect();
