@@ -1618,3 +1618,46 @@ fn an_accessor_pair_is_one_field() {
         "alone it cannot"
     );
 }
+
+/// A default is what a field starts as, not the sum that reaches it.
+#[test]
+fn a_field_default_is_a_value_and_not_a_calculation() {
+    let sandbox = Sandbox::new("manifest-field-defaults", None);
+    let src = sandbox.0.join("src/aura/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("aura-root.ts"),
+        "@customElement('helix-aura')\n\
+         export class HelixAura {\n\
+         \x20 label = ''\n\
+         \x20 stuckAt = -1\n\
+         \x20 failedLabel = FAILED_LABEL\n\
+         \x20 watcher = undefined\n\
+         \x20 keys = new Controller(this)\n\
+         \x20 capped = 1 / 30\n\
+         \x20 trail = new Float32Array(9).fill(1)\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    /* A literal, a negative number, a name, and a thing constructed. */
+    for value in [
+        "\"''\"",
+        "\"-1\"",
+        "FAILED_LABEL",
+        "undefined",
+        "new Controller(this)",
+    ] {
+        assert!(said.contains(value), "a value: {value} in {said}");
+    }
+    /* Arithmetic and a call over a construction are steps, not values. */
+    assert!(
+        !said.contains("1 / 30"),
+        "arithmetic is not a default: {said}"
+    );
+    assert!(!said.contains(".fill(1)"), "nor a call: {said}");
+}
