@@ -46,6 +46,14 @@ pub struct Declared {
     pub type_text: Option<String>,
     /// A variable's value, which is its default.
     pub default: Option<String>,
+    /// Whether the analyzer counts this class as a custom element.
+    ///
+    /// **A tag is the usual answer and not the only one.** `HelixElement
+    /// extends LitElement` registers nothing and is still an element to the
+    /// analyzer, which reads Lit's own base as the mark of one. It is the
+    /// single case in the library, and the rule is kept as narrow as the
+    /// evidence: extending that class by name, and nothing further down.
+    pub is_element: bool,
     /// The tag it registers, where it registers one.
     ///
     /// **What makes a class a component.** Several of the library's plugins ask
@@ -249,6 +257,13 @@ fn privacy_of(
         Some(TSAccessibility::Public) => Some("public"),
         None => None,
     }
+}
+
+/// The name a heritage clause ends at, which is the base class.
+fn base_name(expression: &Expression<'_>) -> Option<String> {
+    let mut chain = Vec::new();
+    chain_of(expression, &mut chain);
+    chain.pop()
 }
 
 /// The heritage clause read as a chain, nearest link first.
@@ -792,6 +807,14 @@ fn named(
             .map(|id| Declared {
                 default: None,
                 documented: Documented::default(),
+                /* **A tag is the usual mark of an element and not the only
+                one.** `HelixElement extends LitElement` registers nothing and
+                the analyzer counts it as one anyway, reading Lit's own base as
+                the mark. One case in the library, so the rule is as narrow as
+                the evidence: that class by name and nothing further down. */
+                is_element: tag_of(class).is_some()
+                    || class.super_class.as_ref().and_then(base_name).as_deref()
+                        == Some("LitElement"),
                 kind: "class",
                 parameters: Vec::new(),
                 returns: None,
@@ -819,6 +842,7 @@ fn named(
             .map(|id| Declared {
                 default: None,
                 heritage: Vec::new(),
+                is_element: false,
                 kind: "function",
                 parameters: parameters_of(function, source),
                 returns: Some(function.return_type.as_ref().map_or_else(
