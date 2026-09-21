@@ -481,8 +481,14 @@ fn method_of(
         )
     };
     let name_for_type = name.clone();
+    let (attribute, reflects) = if accessor {
+        attribute_of(&method.decorators, &name)
+    } else {
+        (None, false)
+    };
     Member {
-        attribute: None,
+        attribute,
+        reflects,
         default: None,
         documented,
         is_static: method.r#static,
@@ -495,7 +501,6 @@ fn method_of(
         },
         privacy: privacy_of(method.accessibility, &method.key),
         readonly: reading,
-        reflects: false,
         returns: if accessor {
             None
         } else {
@@ -509,6 +514,20 @@ fn method_of(
         },
         type_text: if reading {
             method.value.return_type.as_ref().map(|one| annotation(one))
+        } else if accessor {
+            /* **A setter's type is what it takes**, which is the same value the
+            getter beside it returns: `set index(next: number)` makes `index`
+            a `number`, and what a consumer assigns is the whole of what the
+            field is. Falling through to the signature branch instead
+            published `index(next: number) => void` as the type of a field,
+            which is the method a consumer never calls. */
+            method
+                .value
+                .params
+                .items
+                .first()
+                .and_then(|one| one.type_annotation.as_ref())
+                .map(|one| annotation(one))
         } else if is_element && privacy_of(method.accessibility, &method.key).is_none() {
             /* **A public method carries its signature and a hidden one does
             not.** Measured across the four tiers: 3,287 private and
@@ -570,7 +589,34 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached, is_element: bool
                 {
                     continue;
                 }
-                found.push(method_of(method, name, source, documented, is_element));
+                let read = method_of(method, name, source, documented, is_element);
+                /* **A getter and its setter are one field.** What a consumer
+                reaches is a value they can read and write, not two members
+                with one name, and the manifest carries one: the pair is
+                merged into whichever arrived first, each half contributing
+                what it alone knows. A setter is also the only half that can
+                be assigned, so the field stops being readonly the moment one
+                exists. */
+                if read.kind == "field" {
+                    if let Some(already) = found
+                        .iter_mut()
+                        .find(|one| one.name == read.name && one.kind == "field")
+                    {
+                        already.readonly = already.readonly && read.readonly;
+                        if already.type_text.is_none() {
+                            already.type_text = read.type_text;
+                        }
+                        if already.documented.description.is_none() {
+                            already.documented = read.documented;
+                        }
+                        if already.attribute.is_none() {
+                            already.attribute = read.attribute;
+                            already.reflects = read.reflects;
+                        }
+                        continue;
+                    }
+                }
+                found.push(read);
             }
             _ => {}
         }
