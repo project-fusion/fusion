@@ -544,14 +544,7 @@ fn declaration_of(
     {
         fields.insert("summary".to_owned(), json!(summary));
     }
-    if let Some(block) = helix(
-        &one.documented,
-        path,
-        tier,
-        one.tag_name.is_some(),
-        package,
-        given,
-    ) {
+    if let Some(block) = helix(&one.documented, path, tier, one.is_element, package, given) {
         fields.insert("helix".to_owned(), block);
     }
     for (field, entries) in tagged(&one.documented) {

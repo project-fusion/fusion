@@ -266,6 +266,25 @@ pub fn apply(
         let Some((above, module)) = find(manifest, name) else {
             continue;
         };
+        /* **Descending from `HelixElement` is what makes a component**, and
+        that is a different test from carrying a tag. The analyzer marks
+        `customElement` for a class with the decorator or Lit's own base, and
+        stamps the `helix` block on anything descending from this library's
+        root: `HelixFormElement` has the second and not the first, which is
+        why the two cannot be read off one another. Taken from the parent so
+        a chain of any length reaches the same answer. */
+        if let Some(tier) = above
+            .get("helix")
+            .and_then(|one| one.get("tier"))
+            .and_then(Value::as_str)
+        {
+            if let Some(fields) = declaration.as_object_mut() {
+                let block = fields.entry("helix").or_insert_with(|| json!({}));
+                if let Some(inside) = block.as_object_mut() {
+                    inside.entry("tier").or_insert_with(|| json!(tier));
+                }
+            }
+        }
         let from = json!({ "module": module, "name": name });
 
         let mut lists: Vec<(&str, Option<Value>)> = vec![(
