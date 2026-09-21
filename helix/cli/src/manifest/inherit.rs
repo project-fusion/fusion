@@ -254,7 +254,7 @@ fn joined(
             )
         })
         .collect();
-    rest.sort_by_key(rank);
+    regroup(&mut rest, &rank, list, deps, ours);
     for entry in rest {
         let mut copy = entry;
         if let Some(fields) = copy.as_object_mut() {
@@ -425,4 +425,66 @@ pub fn apply(
             signed(member);
         }
     }
+}
+
+/// A parent's inherited entries put in the order a child reads them.
+///
+/// **Which group first is the rank's business; this settles the rest.** The
+/// groups keep the order they first appear in, and within one group the order
+/// is the origin's own: the styled date picker lists `MixinControllerValue`'s
+/// eight members in the mixin's order, where `requestValue` sits sixth, rather
+/// than in the headless picker's, where it sits thirtieth among that class's
+/// own. Twenty-one of styled's twenty-four regrouped lists say so and none of
+/// the other three contradicts it on its own terms.
+fn regroup(
+    rest: &mut [Value],
+    rank: &dyn Fn(&Value) -> u8,
+    list: &str,
+    deps: &Dependencies,
+    ours: &Value,
+) {
+    let group = |entry: &Value| {
+        entry
+            .get("inheritedFrom")
+            .map(|one| {
+                format!(
+                    "{} {}",
+                    one.get("module")
+                        .and_then(Value::as_str)
+                        .unwrap_or_default(),
+                    one.get("name").and_then(Value::as_str).unwrap_or_default(),
+                )
+            })
+            .unwrap_or_default()
+    };
+    let mut seen: Vec<String> = Vec::new();
+    for entry in rest.iter() {
+        let key = group(entry);
+        if !seen.contains(&key) {
+            seen.push(key);
+        }
+    }
+    rest.sort_by_key(|entry| {
+        let key = group(entry);
+        let first = seen.iter().position(|one| *one == key).unwrap_or(0);
+        let name = entry
+            .get("name")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let at = entry
+            .get("inheritedFrom")
+            .and_then(|stamp| {
+                let module = stamp.get("module").and_then(Value::as_str)?;
+                let named = stamp.get("name").and_then(Value::as_str)?;
+                deps.values()
+                    .chain(std::iter::once(ours))
+                    .find_map(|manifest| declared_at(manifest, module, named))?
+                    .get(list)?
+                    .as_array()?
+                    .iter()
+                    .position(|one| one.get("name").and_then(Value::as_str) == Some(name))
+            })
+            .unwrap_or(usize::MAX);
+        (rank(entry), first, at)
+    });
 }
