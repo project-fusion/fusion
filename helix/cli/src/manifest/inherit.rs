@@ -164,7 +164,57 @@ fn joined(mine: Option<&Value>, theirs: Option<&Value>, from: &Value) -> Option<
 /// Silent where a link is not found. A mixin from a package nobody named is a
 /// question this cannot answer, and inventing an empty one would publish a
 /// class as having nothing rather than as having something unread.
-pub fn apply(declaration: &mut Value, heritage: &[(String, Option<String>)], deps: &Dependencies) {
+/// A method's signature, written where the member lands rather than where it
+/// was declared.
+///
+/// **The analyzer computes this at the consuming class.** `MixinControllerOpen`
+/// declares `requestOpen` and carries no type for it, being a plain class; the
+/// element that inherits it has `requestOpen(next: boolean) => boolean`. So a
+/// signature is not copied along with a member, it is written when the member
+/// arrives somewhere that publishes one.
+fn signed(entry: &mut Value) {
+    let Some(fields) = entry.as_object_mut() else {
+        return;
+    };
+    if fields.get("kind").and_then(Value::as_str) != Some("method")
+        || fields.contains_key("type")
+        || fields.contains_key("privacy")
+    {
+        return;
+    }
+    let Some(name) = fields.get("name").and_then(Value::as_str) else {
+        return;
+    };
+    let taken: Vec<String> = fields
+        .get("parameters")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|one| {
+            let said = one.get("name")?.as_str()?;
+            Some(match one.get("type").and_then(|two| two.get("text")) {
+                Some(Value::String(text)) => format!("{said}: {text}"),
+                _ => said.to_owned(),
+            })
+        })
+        .collect();
+    let returns = fields
+        .get("return")
+        .and_then(|one| one.get("type"))
+        .and_then(|one| one.get("text"))
+        .and_then(Value::as_str)
+        .unwrap_or("void")
+        .to_owned();
+    let written = format!("{name}({}) => {returns}", taken.join(", "));
+    fields.insert("type".to_owned(), json!({ "text": written }));
+}
+
+pub fn apply(
+    declaration: &mut Value,
+    heritage: &[(String, Option<String>)],
+    deps: &Dependencies,
+    is_element: bool,
+) {
     for (name, specifier) in heritage {
         let Some(specifier) = specifier else {
             /* Declared in the package being built. Resolving it means that
@@ -195,6 +245,14 @@ pub fn apply(declaration: &mut Value, heritage: &[(String, Option<String>)], dep
             if let Some(entries) = value {
                 fields.insert(list.to_owned(), entries);
             }
+        }
+    }
+    if !is_element {
+        return;
+    }
+    if let Some(members) = declaration.get_mut("members").and_then(Value::as_array_mut) {
+        for member in members {
+            signed(member);
         }
     }
 }
