@@ -76,6 +76,15 @@ fn package_of(specifier: &str) -> String {
 /// every one of them matches the origin's, with none matching the parent's.
 ///
 /// The stamp itself is kept, because it is already the origin's.
+///
+/// **Seven of twenty-seven go the other way and this does not explain them.**
+/// `HelixCopyButton`'s `label` keeps the headless copy button's `'Copy'` where
+/// this gives it the button's `''`, and the sharpest case is a pair: the
+/// styled date input and the styled date picker both inherit `requestValue`
+/// from parents whose entries are identical, from the same origin, and the
+/// analyzer gives one the parent's words and the other the origin's. Three
+/// discriminators were measured and none held. Twenty right and seven wrong is
+/// where this stands; the reverse rule was seven right and twenty wrong.
 fn at_origin(entry: &Value, list: &str, deps: &Dependencies, mine: &Value) -> Value {
     let Some(stamp) = entry.get("inheritedFrom") else {
         return entry.clone();
