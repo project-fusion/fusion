@@ -54,6 +54,28 @@ fn is_a_tag(line: &str) -> bool {
     line.starts_with('@') && line.len() > 1
 }
 
+/// Where a tag opens in the middle of a line, which is a tag all the same.
+///
+/// **An `@` after a space opens one wherever it sits.** `parsePatch` writes
+/// ``​`@@ -12,7 +12,8 @@`​`` in its prose, and the analyzer's description ends
+/// at the second `@@`: the first follows a backtick and the second a space, and
+/// a space is what a tag opens after. What follows is read as a tag called `@`,
+/// which nothing publishes, so the rest of the block goes with it.
+///
+/// Nothing in the library survives this: not one string in the four manifests
+/// holds a space followed by an `@`, so cutting here can only agree with the
+/// analyzer.
+fn tag_opens_at(line: &str) -> Option<usize> {
+    let bytes = line.as_bytes();
+    line.char_indices().find_map(|(at, one)| {
+        (one == '@'
+            && at > 0
+            && bytes[at - 1].is_ascii_whitespace()
+            && line[at + 1..].starts_with(|two: char| !two.is_whitespace()))
+        .then_some(at)
+    })
+}
+
 /// What a doc block says, split into its description and its tags.
 #[derive(Clone, Debug, Default)]
 pub struct Documented {
@@ -69,6 +91,12 @@ pub fn read(comment: &str) -> Documented {
     let mut description: Vec<&str> = Vec::new();
     let mut tags: Vec<(String, String)> = Vec::new();
     for line in body.lines() {
+        /* A line whose tag opens part way along is two: the prose before it,
+        and the tag. */
+        let (line, opened) = match tag_opens_at(line) {
+            Some(at) => (line[..at].trim_end(), Some(&line[at..])),
+            None => (line, None),
+        };
         if is_a_tag(line) {
             let mut parts = line[1..].splitn(2, char::is_whitespace);
             let name = parts.next().unwrap_or_default().to_owned();
@@ -106,6 +134,11 @@ pub fn read(comment: &str) -> Documented {
             continue;
         }
         description.push(line);
+        if let Some(rest) = opened {
+            let mut parts = rest[1..].splitn(2, char::is_whitespace);
+            let name = parts.next().unwrap_or_default().to_owned();
+            tags.push((name, parts.next().unwrap_or_default().trim().to_owned()));
+        }
     }
     while description.last().is_some_and(|one| one.trim().is_empty()) {
         description.pop();
@@ -274,5 +307,44 @@ mod tests {
                 "{E} e - Fired when the page crosses the threshold, with the new state.",
             ]
         );
+    }
+
+    /// **An `@` after a space opens a tag wherever it sits.** `parsePatch`
+    /// writes a `@@` hunk header in its prose, and the description ends at the
+    /// one that follows a space rather than at the one that follows a
+    /// backtick. Not one string in the library's four manifests holds a space
+    /// followed by an `@`, so this can only agree with the analyzer.
+    #[test]
+    fn a_tag_opens_part_way_along_a_line() {
+        let said = read(
+            "/**\n\
+             \x20* A hunk is read to the counts its header states, `@@ -12,7 +12,8 @@` being\n\
+             \x20* seven lines of the old file and eight of the new.\n\
+             \x20*/",
+        );
+        assert_eq!(
+            said.description.as_deref(),
+            Some("A hunk is read to the counts its header states, `@@ -12,7 +12,8")
+        );
+        /* What follows is read as a tag whose name begins with the second
+        `@`, which nothing publishes, so the rest of the block goes with it. */
+        assert!(
+            said.tags
+                .first()
+                .is_some_and(|(name, _)| name.starts_with('@')),
+            "{:?}",
+            said.tags
+        );
+    }
+
+    /// An email address in prose is not a tag, having no space before the `@`.
+    #[test]
+    fn an_at_inside_a_word_is_not_a_tag() {
+        let said = read("/**\n * Write to helix@example.com about it.\n */");
+        assert_eq!(
+            said.description.as_deref(),
+            Some("Write to helix@example.com about it.")
+        );
+        assert!(said.tags.is_empty(), "{:?}", said.tags);
     }
 }
