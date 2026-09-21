@@ -1516,3 +1516,60 @@ fn a_lit_base_is_an_element_without_registering_one() {
         "a plain class is not an element: {said}"
     );
 }
+
+/// A parent's list is regrouped when a child takes it, not appended whole.
+///
+/// A parent writes its own entries first and what its mixins gave it after; a
+/// child reading that parent takes the mixins' first and the parent's own after
+/// them. Measured against the real tiers, and three models were tried before
+/// this one fitted.
+#[test]
+fn a_child_takes_the_mixins_before_the_parents_own() {
+    let sandbox = Sandbox::new("manifest-regroup", None);
+    let src = sandbox.0.join("src/item/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("item-root.ts"),
+        "import { HeadlessItem } from '@fusion.dev/helix-headless/item'\n\
+         @customElement('helix-item')\n\
+         export class HelixItem extends HeadlessItem {\n  separation = 'plain'\n}\n",
+    )
+    .expect("a source");
+    /* The parent's own comes first in its own manifest and the mixin's after,
+    which is the order a child inverts. */
+    std::fs::write(
+        sandbox.0.join("headless.json"),
+        r#"{"modules":[{"path":"src/item/root/item-root.ts","declarations":[
+          {"name":"HeadlessItem","mixins":[{"name":"MixinOpen"}],"members":[
+            {"name":"chevron"},
+            {"name":"open","inheritedFrom":{"name":"MixinOpen","module":"src/m.ts"}},
+            {"name":"fromAbove","inheritedFrom":{"name":"Base","module":"src/b.ts"}}]}]}]}"#,
+    )
+    .expect("a manifest");
+
+    let output = run(
+        &sandbox.0,
+        &[
+            "manifest",
+            "build",
+            ".",
+            "--dependency",
+            "@fusion.dev/helix-headless=headless.json",
+        ],
+    );
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let at = |needle: &str| said.find(needle).expect(needle);
+
+    /* The child's own leads, then the mixin's, then the parent's own, then what
+    came from further up. */
+    assert!(at("separation") < at("\"open\""), "own first: {said}");
+    assert!(at("\"open\"") < at("chevron"), "the mixin's next: {said}");
+    /* Named distinctly on purpose: `tier` appears in the `helix` block above
+    the members, so asserting on it finds that one and compares the wrong two
+    positions. */
+    assert!(
+        at("chevron") < at("fromAbove"),
+        "then the parent's own: {said}"
+    );
+}
