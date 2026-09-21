@@ -1661,3 +1661,68 @@ fn a_field_default_is_a_value_and_not_a_calculation() {
     );
     assert!(!said.contains(".fill(1)"), "nor a call: {said}");
 }
+
+/// A redeclared member is filled in from the one above it.
+///
+/// A styled component writes `static override tier = 'helix-'` and says
+/// nothing else about it. The manifest carries that default beside the
+/// description and the type the base wrote: a consumer reading the child is
+/// owed what the field means, and the child only changed what it is.
+#[test]
+fn a_redeclared_member_keeps_what_it_says_and_gains_what_it_left_out() {
+    let sandbox = Sandbox::new("manifest-fill-in", None);
+    let src = sandbox.0.join("src/chat/composer");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("chat-composer.ts"),
+        "import { HelixElement } from '@fusion.dev/helix-core'\n\
+         @customElement('helix-chat-composer')\n\
+         export class HelixChatComposer extends HelixElement {\n\
+         \x20 static override tier = 'helix-'\n\
+         }\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        sandbox.0.join("core.json"),
+        r#"{"modules":[{"path":"src/e.ts","declarations":[
+          {"name":"HelixElement","customElement":true,"helix":{"tier":"core"},"members":[
+            {"kind":"field","name":"tier","static":true,"type":{"text":"string"},
+             "default":"'helix-headless-'","description":"The prefix this tier registers under."}]}]}]}"#,
+    )
+    .expect("a manifest");
+
+    let output = run(
+        &sandbox.0,
+        &[
+            "manifest",
+            "build",
+            ".",
+            "--dependency",
+            "@fusion.dev/helix-core=core.json",
+        ],
+    );
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    /* What the child said stands. */
+    assert!(
+        said.contains("\"'helix-'\""),
+        "the child's own default: {said}"
+    );
+    assert!(
+        !said.contains("helix-headless-"),
+        "not the parent's: {said}"
+    );
+    /* What it left out is filled. */
+    assert!(
+        said.contains("The prefix this tier registers under."),
+        "{said}"
+    );
+    assert!(
+        said.contains("\"text\": \"string\""),
+        "the type too: {said}"
+    );
+    /* And descending from the root is what carries the tier, which the child
+    has without a decorator saying so. */
+    assert!(said.contains("\"tier\": \"styled\""), "{said}");
+}

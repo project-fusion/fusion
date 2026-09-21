@@ -102,19 +102,11 @@ fn joined(
         .and_then(Value::as_array)
         .cloned()
         .unwrap_or_default();
-    /* Where each of the parent's entries came from, which is the parent itself
-    unless the parent was given it too. */
-    let origin: BTreeMap<&str, Value> = theirs
+    /* The parent's entries by name, for filling in a member the child
+    redeclared and for saying where each came from. */
+    let above_by_name: BTreeMap<&str, &Value> = theirs
         .iter()
-        .filter_map(|one| {
-            let name = one.get("name").and_then(Value::as_str)?;
-            Some((
-                name,
-                one.get("inheritedFrom")
-                    .cloned()
-                    .unwrap_or_else(|| from.clone()),
-            ))
-        })
+        .filter_map(|one| Some((one.get("name")?.as_str()?, one)))
         .collect();
 
     let mut all: Vec<Value> = Vec::new();
@@ -126,11 +118,28 @@ fn joined(
             .unwrap_or_default();
         taken.insert(name.to_owned());
         let mut copy = entry.clone();
-        if let Some(source) = origin.get(name) {
+        if let Some(parent) = above_by_name.get(name) {
             if let Some(fields) = copy.as_object_mut() {
-                fields
-                    .entry("inheritedFrom")
-                    .or_insert_with(|| source.clone());
+                /* **A redeclared member is filled in from the one above it.**
+                A styled component writes `static override tier = 'helix-'` and
+                says nothing else about it; the manifest carries that default
+                beside the description and the type the base wrote, because a
+                consumer reading the child is owed what the field means and the
+                child only changed what it is. Everything the child does say
+                stands: only what it left out is filled. */
+                if let Some(said) = parent.as_object() {
+                    for (key, value) in said {
+                        if key != "name" {
+                            fields.entry(key.clone()).or_insert_with(|| value.clone());
+                        }
+                    }
+                }
+                fields.entry("inheritedFrom").or_insert_with(|| {
+                    parent
+                        .get("inheritedFrom")
+                        .cloned()
+                        .unwrap_or_else(|| from.clone())
+                });
             }
         }
         all.push(copy);
