@@ -30,9 +30,20 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use serde_json::{json, Value};
 
-/// The lists that inherit. `attributes` among them: a styled badge carries four
-/// and three came from above.
-const INHERITS: [&str; 5] = ["attributes", "cssParts", "cssStates", "events", "slots"];
+/// The lists that inherit, which is every list a declaration carries.
+///
+/// `attributes` among them, a styled badge carrying four of which three came
+/// from above; and `cssProperties`, which a styled heatmap takes from the
+/// headless one so a consumer setting `--heatmap-tone-1` finds it documented on
+/// the element they are actually using.
+const INHERITS: [&str; 6] = [
+    "attributes",
+    "cssParts",
+    "cssProperties",
+    "cssStates",
+    "events",
+    "slots",
+];
 
 /// Manifests of other packages, by the package name a specifier names them by.
 pub type Dependencies = BTreeMap<String, Value>;
@@ -233,9 +244,16 @@ fn signed(entry: &mut Value) {
         .flatten()
         .filter_map(|one| {
             let said = one.get("name")?.as_str()?;
+            /* The mark travels with the parameter, the same way it does when a
+            signature is written where the method is declared. */
+            let mark = if one.get("optional").and_then(Value::as_bool) == Some(true) {
+                "?"
+            } else {
+                ""
+            };
             Some(match one.get("type").and_then(|two| two.get("text")) {
-                Some(Value::String(text)) => format!("{said}: {text}"),
-                _ => said.to_owned(),
+                Some(Value::String(text)) => format!("{said}{mark}: {text}"),
+                _ => format!("{said}{mark}"),
             })
         })
         .collect();
