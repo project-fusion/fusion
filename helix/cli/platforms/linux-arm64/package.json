@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-cli-linux-arm64",
   "description": "The `helix` binary for Linux on 64-bit Arm, statically linked. Installed by `@fusion.dev/helix-cli`, which runs it.",
-  "version": "0.70.0",
+  "version": "0.71.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
