@@ -81,6 +81,9 @@ pub struct Parameter {
     /// same reason an optional property does: it describes what a caller may
     /// pass rather than how the signature is punctuated.
     pub optional: bool,
+    /// The initializer written on it, which stands in a signature too:
+    /// `markRead(next = true) => boolean`.
+    pub default: Option<String>,
 }
 
 /// One entry in a class body.
@@ -222,21 +225,39 @@ fn parameters_of_arrow(
         .params
         .items
         .iter()
-        .filter_map(|one| {
-            let name = one.pattern.get_binding_identifier()?.name.to_string();
-            Some(Parameter {
-                name,
-                optional: one.optional,
-                type_text: one.type_annotation.as_ref().map(|two| {
-                    slice(
-                        source,
-                        two.type_annotation.span().start,
-                        two.type_annotation.span().end,
-                    )
-                }),
-            })
-        })
+        .map(|one| parameter(one, source))
         .collect()
+}
+
+/// One formal parameter, read the same way wherever it is written.
+///
+/// **A pattern is named by its own text.** `arranged(…, { query, spec })`
+/// destructures, and there is no identifier to report, so the manifest gives
+/// the pattern as written — line breaks and all, where the source wrapped it.
+/// Reading only identifiers dropped those parameters entirely.
+///
+/// **A default is the initializer's text**, whatever shape it is: `{}`,
+/// `this.text`, `true`. Not the value-only rule a field's default follows,
+/// which would have dropped `this.text`.
+fn parameter(one: &oxc_ast::ast::FormalParameter<'_>, source: &str) -> Parameter {
+    Parameter {
+        name: one.pattern.get_binding_identifier().map_or_else(
+            || slice(source, one.pattern.span().start, one.pattern.span().end),
+            |id| id.name.to_string(),
+        ),
+        type_text: one.type_annotation.as_ref().map(|two| {
+            slice(
+                source,
+                two.type_annotation.span().start,
+                two.type_annotation.span().end,
+            )
+        }),
+        optional: one.optional,
+        default: one
+            .initializer
+            .as_ref()
+            .map(|two| one_line(source, two.span().start, two.span().end)),
+    }
 }
 
 /// A parameter as the manifest carries it: its name and the type written on it.
@@ -245,20 +266,7 @@ fn parameters_of(method: &Function<'_>, source: &str) -> Vec<Parameter> {
         .params
         .items
         .iter()
-        .filter_map(|one| {
-            let name = one.pattern.get_binding_identifier()?.name.to_string();
-            Some(Parameter {
-                name,
-                optional: one.optional,
-                type_text: one.type_annotation.as_ref().map(|two| {
-                    slice(
-                        source,
-                        two.type_annotation.span().start,
-                        two.type_annotation.span().end,
-                    )
-                }),
-            })
-        })
+        .map(|one| parameter(one, source))
         .collect()
 }
 
@@ -600,9 +608,16 @@ fn method_of(
                 read as requiring what is optional. */
                 .map(|one| {
                     let mark = if one.optional { "?" } else { "" };
-                    match one.type_text {
+                    let said = match one.type_text {
                         Some(text) => format!("{}{mark}: {text}", one.name),
                         None => format!("{}{mark}", one.name),
+                    };
+                    /* **A default stands in the signature too.** `markRead`
+                    reads `markRead(next = true) => boolean`, which is how a
+                    caller would write the call it may leave out. */
+                    match one.default {
+                        Some(value) => format!("{said} = {value}"),
+                        None => said,
                     }
                 })
                 .collect();

@@ -446,6 +446,9 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
             .map(|one| {
                 let mut said = serde_json::Map::new();
                 said.insert("name".to_owned(), json!(one.name));
+                if let Some(value) = one.default {
+                    said.insert("default".to_owned(), json!(value));
+                }
                 if let Some(text) = one.type_text {
                     said.insert("type".to_owned(), json!({ "text": text }));
                 }
