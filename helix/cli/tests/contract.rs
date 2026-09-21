@@ -1351,3 +1351,53 @@ fn a_type_says_what_a_reader_may_find() {
         "signed on arrival: {said}"
     );
 }
+
+/// A mixin is a function that makes a class, and the manifest says so.
+#[test]
+fn a_mixin_publishes_the_class_it_makes() {
+    let sandbox = Sandbox::new("manifest-mixin-kind", None);
+    let src = sandbox.0.join("src/mixins");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("mixin-open.ts"),
+        "export const MixinOpen = <T>(Base: T): Opened => {\n\
+         \x20 class OpenElement extends Base {\n\
+         \x20   open = false\n\
+         \x20   /** @param next Where to move it to. */\n\
+         \x20   requestOpen(next: boolean, why?: string): boolean { return next }\n\
+         \x20 }\n\
+         \x20 return OpenElement\n\
+         }\n\
+         export const plain = (at: string): number => 1\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    assert!(said.contains("\"kind\": \"mixin\""), "a mixin: {said}");
+    /* What a consumer gets is the inner class's members, not the call. */
+    assert!(said.contains("\"requestOpen\""), "its members: {said}");
+    /* And no return: the class whose members are listed is what it hands back,
+    so naming the type again would say it twice. */
+    /* Asserted on the mixin's own return type, annotated with a name used
+    nowhere else so the parameter `Base: T` cannot be mistaken for it. The word
+    `return` alone will not do: `requestOpen` has one. */
+    assert!(
+        !said.contains("Opened"),
+        "a mixin has no return of its own: {said}"
+    );
+    /* An arrow that makes no class is an ordinary function and keeps one. */
+    assert!(
+        said.contains("\"kind\": \"function\""),
+        "a function: {said}"
+    );
+
+    /* `@param` says which parameter it describes, and an optional one says so. */
+    assert!(said.contains("Where to move it to."), "the tag: {said}");
+    assert!(
+        said.contains("\"optional\": true"),
+        "the question mark: {said}"
+    );
+}
