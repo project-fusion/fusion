@@ -407,14 +407,25 @@ fn field_of(
         default value puts thirty lines of implementation into a reference
         page where a reader expected `''` or `0`. The analyzer prints none,
         and neither does this. */
+        /* **A field's default is a value, on the same terms a variable's is.**
+           A literal, a list, an object, a thing constructed, or a name: `=
+           undefined` and `= FAILED_LABEL` are both values a reader can follow,
+           and a negative number is a number however it is spelled.
+           `1 / 30` is arithmetic and `new Float32Array(27).fill(1)` is a call
+           over a construction, and the analyzer prints neither: what a reader
+           wants beside a name is what it starts as, not the sum that reaches
+           it. */
         default: property
             .value
             .as_ref()
             .filter(|one| {
-                !matches!(
-                    one,
-                    Expression::ArrowFunctionExpression(_) | Expression::FunctionExpression(_)
-                )
+                is_a_value(one)
+                    || matches!(
+                        one,
+                        Expression::NewExpression(_)
+                            | Expression::Identifier(_)
+                            | Expression::UnaryExpression(_)
+                    )
             })
             .map(|one| one_line(source, one.span().start, one.span().end))
             .or_else(|| assigned.get(&name).cloned()),
