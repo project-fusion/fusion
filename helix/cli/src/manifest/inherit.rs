@@ -92,7 +92,12 @@ fn find<'a>(manifest: &'a Value, name: &str) -> Option<(&'a Value, String)> {
 /// the manifest marks the styled one `HelixElement`: the parent was given it
 /// too, so the parent is not the answer. An entry the parent owns names the
 /// parent; an entry the parent inherited names whatever the parent named.
-fn joined(mine: Option<&Value>, theirs: Option<&Value>, from: &Value) -> Option<Value> {
+fn joined(
+    mine: Option<&Value>,
+    theirs: Option<&Value>,
+    above: &Value,
+    from: &Value,
+) -> Option<Value> {
     let theirs: Vec<Value> = theirs
         .and_then(Value::as_array)
         .cloned()
@@ -130,15 +135,42 @@ fn joined(mine: Option<&Value>, theirs: Option<&Value>, from: &Value) -> Option<
         }
         all.push(copy);
     }
-    for entry in theirs {
-        let name = entry
-            .get("name")
-            .and_then(Value::as_str)
-            .unwrap_or_default();
-        if taken.contains(name) {
-            continue;
-        }
-        let mut copy = entry.clone();
+    /* **The parent's list is regrouped, not appended whole.** A parent writes
+    its own entries first and what its mixins gave it after; a child reading
+    that parent takes the mixins' first and the parent's own after them.
+    `AccordionItem` is the plain case: the headless item lists seven of its own
+    and then six from `MixinControllerOpen`, and the styled item lists the six
+    first. Measured, not guessed, and three models were tried before this one.
+
+    Deeper entries, from further up than the parent, keep their place at the
+    end: the order is one pass per ancestor, nearest first, and within each the
+    mixins come before the class. */
+    let mixins: BTreeSet<&str> = above
+        .get("mixins")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|one| one.get("name")?.as_str())
+        .collect();
+    let rank = |entry: &Value| match entry.get("inheritedFrom").and_then(|one| one.get("name")) {
+        None => 1,
+        Some(Value::String(from)) if mixins.contains(from.as_str()) => 0,
+        _ => 2,
+    };
+    let mut rest: Vec<Value> = theirs
+        .into_iter()
+        .filter(|entry| {
+            !taken.contains(
+                entry
+                    .get("name")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default(),
+            )
+        })
+        .collect();
+    rest.sort_by_key(rank);
+    for entry in rest {
+        let mut copy = entry;
         if let Some(fields) = copy.as_object_mut() {
             fields
                 .entry("inheritedFrom")
@@ -238,10 +270,18 @@ pub fn apply(
 
         let mut lists: Vec<(&str, Option<Value>)> = vec![(
             "members",
-            joined(declaration.get("members"), above.get("members"), &from),
+            joined(
+                declaration.get("members"),
+                above.get("members"),
+                above,
+                &from,
+            ),
         )];
         for list in INHERITS {
-            lists.push((list, joined(declaration.get(list), above.get(list), &from)));
+            lists.push((
+                list,
+                joined(declaration.get(list), above.get(list), above, &from),
+            ));
         }
         let Some(fields) = declaration.as_object_mut() else {
             return;
