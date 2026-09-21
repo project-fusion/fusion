@@ -122,6 +122,12 @@ fn tagged(documented: &Documented) -> Vec<(&'static str, Value)> {
                 if let Some(written) = one.type_text {
                     said.insert("type".to_owned(), json!({ "text": written }));
                 }
+                /* **The React prop, which is a convention written down.** It is
+                the event name with `on` in front, and recording it makes a
+                mapping inspectable that is otherwise only in a reader's head. */
+                if field == "events" {
+                    said.insert("reactProp".to_owned(), json!(format!("on{}", one.name)));
+                }
                 if let Some(description) = one.description {
                     said.insert("description".to_owned(), json!(description));
                 }
@@ -482,6 +488,23 @@ fn declaration_of(
     }
     if let Some(description) = one.documented.description {
         fields.insert("description".to_owned(), json!(description));
+    }
+    if let Some(text) = &one.type_text {
+        fields.insert("type".to_owned(), json!({ "text": text }));
+    }
+    if let Some(returns) = &one.returns {
+        fields.insert("return".to_owned(), json!({ "type": { "text": returns } }));
+    }
+    if !one.parameters.is_empty() {
+        let taken: Vec<Value> = one
+            .parameters
+            .iter()
+            .map(|(name, written)| match written {
+                Some(text) => json!({ "name": name, "type": { "text": text } }),
+                None => json!({ "name": name }),
+            })
+            .collect();
+        fields.insert("parameters".to_owned(), json!(taken));
     }
     /* **The base class is the last link and the only one the manifest names
     here.** A mixin between the class and its base contributes members, which is

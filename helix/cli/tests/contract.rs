@@ -1248,3 +1248,46 @@ fn a_property_decorator_names_its_attribute() {
         "the attribute says which field it writes to: {said}"
     );
 }
+
+/// What the framework owns, and what a value is not.
+///
+/// Three rules, each measured across the four tiers rather than reasoned from
+/// one example: the framework's lifecycle goes by name, a hidden method carries
+/// no signature, and a field holding a function has no default.
+#[test]
+fn the_framework_and_the_implementation_are_not_api() {
+    let sandbox = Sandbox::new("manifest-framework", None);
+    let src = sandbox.0.join("src/editor/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("editor-root.ts"),
+        "@customElement('helix-editor')\n\
+         export class HelixEditor {\n\
+         \x20 protected override render(): void {}\n\
+         \x20 override focus(): void {}\n\
+         \x20 private hidden(at: string): void {}\n\
+         \x20 handle = (event: Event): void => { this.focus() }\n\
+         \x20 label = ''\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    /* Lit's lifecycle is the framework's, by name and not by `override`:
+    `focus` is overridden too and is a thing a consumer calls. */
+    assert!(!said.contains("\"render\""), "the framework's: {said}");
+    assert!(said.contains("\"focus\""), "the consumer's: {said}");
+    /* A public method says how it is called; a hidden one is merely listed. */
+    assert!(said.contains("focus() => void"), "the signature: {said}");
+    assert!(
+        !said.contains("hidden(at: string)"),
+        "not a hidden one: {said}"
+    );
+    /* A field holding a function has no default: printing the body would put
+    the implementation into a reference page. */
+    assert!(!said.contains("this.focus()"), "not a default: {said}");
+    assert!(said.contains("\"default\": \"''\""), "a real one: {said}");
+}

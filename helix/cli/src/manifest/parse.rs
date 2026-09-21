@@ -38,6 +38,12 @@ pub struct Declared {
     pub members: Vec<Member>,
     /// The doc block above it, read the way the manifest reads one.
     pub documented: Documented,
+    /// A function's parameters, for a declaration that is one.
+    pub parameters: Vec<(String, Option<String>)>,
+    /// Its return annotation.
+    pub returns: Option<String>,
+    /// The annotation on a variable, which the manifest carries as written.
+    pub type_text: Option<String>,
     /// The tag it registers, where it registers one.
     ///
     /// **What makes a class a component.** Several of the library's plugins ask
@@ -128,6 +134,29 @@ fn inferred(value: &Expression<'_>) -> Option<&'static str> {
         Expression::BooleanLiteral(_) => Some("boolean"),
         _ => None,
     }
+}
+
+/// An arrow's parameters, which read the same way a method's do.
+fn parameters_of_arrow(
+    arrow: &oxc_ast::ast::ArrowFunctionExpression<'_>,
+    source: &str,
+) -> Vec<(String, Option<String>)> {
+    arrow
+        .params
+        .items
+        .iter()
+        .filter_map(|one| {
+            let name = one.pattern.get_binding_identifier()?.name.to_string();
+            let written = one.type_annotation.as_ref().map(|two| {
+                slice(
+                    source,
+                    two.type_annotation.span().start,
+                    two.type_annotation.span().end,
+                )
+            });
+            Some((name, written))
+        })
+        .collect()
 }
 
 /// A parameter as the manifest carries it: its name and the type written on it.
@@ -221,9 +250,20 @@ fn field_of(
     let (attribute, reflects) = attribute_of(&property.decorators, &name);
     Member {
         attribute,
+        /* **A function is not a default.** A field holding an arrow is a
+        handler bound to the instance, and printing its body as the field's
+        default value puts thirty lines of implementation into a reference
+        page where a reader expected `''` or `0`. The analyzer prints none,
+        and neither does this. */
         default: property
             .value
             .as_ref()
+            .filter(|one| {
+                !matches!(
+                    one,
+                    Expression::ArrowFunctionExpression(_) | Expression::FunctionExpression(_)
+                )
+            })
             .map(|one| slice(source, one.span().start, one.span().end)),
         documented,
         is_static: property.r#static,
@@ -277,6 +317,7 @@ fn method_of(
             one.type_annotation.span().end,
         )
     };
+    let name_for_type = name.clone();
     Member {
         attribute: None,
         default: None,
@@ -305,6 +346,29 @@ fn method_of(
         },
         type_text: if reading {
             method.value.return_type.as_ref().map(|one| annotation(one))
+        } else if privacy_of(method.accessibility, &method.key).is_none() {
+            /* **A public method carries its signature and a hidden one does
+            not.** Measured across the four tiers: 3,287 private and
+            protected methods and not one with a type, against 445 public
+            ones that have it. What a consumer can call is described; what
+            they cannot is merely listed. */
+            let taken: Vec<String> = parameters_of(&method.value, source)
+                .into_iter()
+                .map(|(name, written)| match written {
+                    Some(text) => format!("{name}: {text}"),
+                    None => name,
+                })
+                .collect();
+            let returns = method
+                .value
+                .return_type
+                .as_ref()
+                .map_or_else(|| "void".to_owned(), |one| annotation(one));
+            Some(format!(
+                "{}({}) => {returns}",
+                name_for_type,
+                taken.join(", ")
+            ))
         } else {
             None
         },
@@ -324,9 +388,7 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
                 let Some(name) = key_of(&property.key, source) else {
                     continue;
                 };
-                if reimplements(property.r#override, property.r#static)
-                    || FRAMEWORK.contains(&name.as_str())
-                {
+                if FRAMEWORK.contains(&name.as_str()) {
                     continue;
                 }
                 found.push(field_of(property, name, source, documented));
@@ -340,7 +402,6 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
                 custom element never calls it: the platform does, from
                 markup. The analyzer publishes none. */
                 if matches!(method.kind, MethodDefinitionKind::Constructor)
-                    || reimplements(method.r#override, method.r#static)
                     || FRAMEWORK.contains(&name.as_str())
                 {
                     continue;
@@ -428,31 +489,35 @@ fn attribute_of(
     (None, false)
 }
 
-/// Whether a member is a reimplementation rather than an addition.
+/// Members the framework owns, which the analyzer drops and this drops with it.
 ///
-/// **An instance member written `override` is not API and the analyzer drops
-/// it.** `protected override willUpdate` reimplements what the class was given;
-/// it adds nothing a consumer can reach that was not reachable already, and
-/// `willUpdate` appears nowhere in a tier of two hundred and twenty-nine
-/// modules that declare it constantly.
+/// **Measured by name, because the rule is by name.** An earlier reading of
+/// this had it as "an instance member written `override` is not API", which
+/// fitted the evidence to hand and was wrong twice over: `override focus` is
+/// kept twelve times and `static override styles` is dropped a hundred and
+/// forty-one, so neither `override` nor `static` decides anything. Reading
+/// every override in the four tiers against the manifests separates them
+/// cleanly by name and by nothing else.
 ///
-/// **A static one is kept**, because it is not a reimplementation of anything
-/// an instance has: `static override shadowRootOptions` is configuration on the
-/// class, and all twenty-six in the headless tier are in the manifest.
-fn reimplements(is_override: bool, is_static: bool) -> bool {
-    is_override && !is_static
-}
-
-/// Members that belong to Lit rather than to the component.
+/// Dropped: the Lit lifecycle and the platform callbacks a component
+/// reimplements to do its work. Kept, and deliberately not here: `focus`, which
+/// is a thing a consumer calls; `tier` and `shadowRootOptions`, which say
+/// something about the element rather than run it.
 ///
-/// **`styles` is the framework's static, not published API.** A consumer
-/// reaches a component's appearance through its parts and custom properties,
-/// never by reading `HelixBadge.styles`, and the analyzer runs in `LitElement`
-/// mode and drops it: 139 classes declare `static override styles` and not one
-/// of them has it in the manifest. `shadowRootOptions` and `tier` are static
-/// and overridden too and are both kept, so this is about the name rather than
-/// about being static.
-const FRAMEWORK: [&str; 1] = ["styles"];
+/// **Only names measured as dropped are listed.** Lit has more lifecycle than
+/// this and no component here overrides it, so adding those would be a guess,
+/// and the diff is what will say if one ever does.
+const FRAMEWORK: [&str; 9] = [
+    "connectedCallback",
+    "createRenderRoot",
+    "disconnectedCallback",
+    "dispatchEvent",
+    "firstUpdated",
+    "render",
+    "styles",
+    "updated",
+    "willUpdate",
+];
 
 /// The name and kind of a declaration, where it has a name to give.
 fn named(
@@ -468,6 +533,9 @@ fn named(
             .map(|id| Declared {
                 documented: Documented::default(),
                 kind: "class",
+                parameters: Vec::new(),
+                returns: None,
+                type_text: None,
                 tag_name: tag_of(class),
                 members: members_of(class, source, docs),
                 name: id.name.to_string(),
@@ -491,6 +559,18 @@ fn named(
             .map(|id| Declared {
                 heritage: Vec::new(),
                 kind: "function",
+                parameters: parameters_of(function, source),
+                returns: Some(function.return_type.as_ref().map_or_else(
+                    || "void".to_owned(),
+                    |one| {
+                        slice(
+                            source,
+                            one.type_annotation.span().start,
+                            one.type_annotation.span().end,
+                        )
+                    },
+                )),
+                type_text: None,
                 tag_name: None,
                 name: id.name.to_string(),
                 ..Declared::default()
@@ -503,11 +583,45 @@ fn named(
             .declarations
             .iter()
             .filter_map(|one| {
-                one.id.get_binding_identifier().map(|id| Declared {
+                let id = one.id.get_binding_identifier()?;
+                /* **A const holding an arrow is a function.** `export const
+                highlight = (code: string) => …` is called like one and the
+                manifest says so, with its parameters and its return: how it
+                was bound is the author's business rather than the
+                consumer's. */
+                let arrow = match one.init.as_ref() {
+                    Some(Expression::ArrowFunctionExpression(arrow)) => Some(arrow),
+                    _ => None,
+                };
+                Some(Declared {
                     heritage: Vec::new(),
-                    kind: "variable",
+                    kind: if arrow.is_some() {
+                        "function"
+                    } else {
+                        "variable"
+                    },
                     tag_name: None,
                     name: id.name.to_string(),
+                    parameters: arrow.map_or_else(Vec::new, |two| parameters_of_arrow(two, source)),
+                    returns: arrow.map(|two| {
+                        two.return_type.as_ref().map_or_else(
+                            || "void".to_owned(),
+                            |three| {
+                                slice(
+                                    source,
+                                    three.type_annotation.span().start,
+                                    three.type_annotation.span().end,
+                                )
+                            },
+                        )
+                    }),
+                    type_text: one.type_annotation.as_ref().map(|two| {
+                        slice(
+                            source,
+                            two.type_annotation.span().start,
+                            two.type_annotation.span().end,
+                        )
+                    }),
                     ..Declared::default()
                 })
             })
