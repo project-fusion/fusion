@@ -391,10 +391,13 @@ pub fn signature(name: &str, parameters: &[String], returns: &str) -> String {
 /// createSheet(…)` printed its whole stylesheet into the manifest before this,
 /// and `HighlightStyle.define([…])` printed eighty lines of theme.
 ///
-/// Measured across the four tiers: 11 literals, 4 arrays and 3 objects carry a
-/// default, against 155 variables that carry none. Two do not fit, one call and
-/// one `new`, and they stay unfitted rather than have the rule bent to reach
-/// them.
+/// Measured across the four tiers, and one variable in the library does not
+/// fit: `ORB_STATES = Object.keys(ORDER)` carries its call as a default where
+/// the other hundred and fifty-four call-initialized variables carry none.
+/// What tells it apart is that `Object` is not something the module imported,
+/// which is a rule with one case supporting it, so it stays unfitted rather
+/// than have this bent to reach it. It is the last thing the four tiers
+/// disagree about.
 fn is_a_value(expression: &Expression<'_>) -> bool {
     /* **`as const` is a note to the type checker, not part of the value.**
     `['native', 'light', …] as const` is that list, and the manifest prints
@@ -431,6 +434,46 @@ fn is_a_value(expression: &Expression<'_>) -> bool {
 /// …` with `this.host = host` in the constructor reads as having no default
 /// until the constructor is read, and the analyzer records `host`: the
 /// expression as written, which is what every other default here is.
+/// The same text with every comment blanked, byte for byte.
+///
+/// Spaces rather than nothing, so every span still reaches the same place.
+/// Blanking by character shortened the text wherever a comment held a byte
+/// that was not ASCII, and the next span past it read off the end.
+fn blanked(source: &str, comments: &[oxc_ast::Comment]) -> String {
+    let mut plain: Vec<u8> = source.as_bytes().to_vec();
+    for comment in comments {
+        let (start, end) = (comment.span.start as usize, comment.span.end as usize);
+        for one in plain.get_mut(start..end).unwrap_or_default() {
+            if *one != b'\n' {
+                *one = b' ';
+            }
+        }
+    }
+    String::from_utf8(plain).unwrap_or_else(|_| source.to_owned())
+}
+
+/// A tag registered by a call rather than by the decorator.
+fn defined(text: &str) -> Vec<Exported> {
+    const CALL: &str = "customElements.define(";
+    let mut found = Vec::new();
+    let mut rest = text;
+    while let Some(start) = rest.find(CALL) {
+        rest = &rest[start + CALL.len()..];
+        let mut said = rest.splitn(3, ',');
+        let (Some(tag), Some(target)) = (said.next(), said.next()) else {
+            continue;
+        };
+        let target = target.split(')').next().unwrap_or(target);
+        found.push(Exported {
+            kind: "custom-element-definition",
+            name: tag.trim().to_owned(),
+            declaration: target.trim().to_owned(),
+            origin: Origin::Own,
+        });
+    }
+    found
+}
+
 /// The events a class is seen to dispatch, in the order the calls are written.
 ///
 /// **What the analyzer infers, which is neither what a component declares nor
@@ -1237,19 +1280,7 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
     /* The same text with every comment blanked, for the one reader that works
     on characters rather than on nodes. Spaces rather than nothing, so every
     span still lines up with the source it came from. */
-    let mut plain: Vec<u8> = source.as_bytes().to_vec();
-    for comment in &parsed.program.comments {
-        let (start, end) = (comment.span.start as usize, comment.span.end as usize);
-        for one in plain.get_mut(start..end).unwrap_or_default() {
-            if *one != b'\n' {
-                *one = b' ';
-            }
-        }
-    }
-    /* Byte for byte, so every span still reaches the same place. Blanking by
-    character instead shortened the text wherever a comment held one that was
-    not ASCII, and the first class body past it read off the end. */
-    let plain = String::from_utf8(plain).unwrap_or_else(|_| source.to_owned());
+    let plain = blanked(source, &parsed.program.comments);
 
     let imported = imports(&parsed.program);
     let mut found = Vec::new();
@@ -1384,6 +1415,7 @@ pub fn exports(source: &str, path: &str) -> Vec<Exported> {
     let allocator = Allocator::default();
     let kind = SourceType::from_path(path).unwrap_or_else(|_| SourceType::ts());
     let parsed = Parser::new(&allocator, source, kind).parse();
+    let plain = blanked(source, &parsed.program.comments);
 
     let mut found = Vec::new();
     for statement in &parsed.program.body {
@@ -1412,6 +1444,17 @@ pub fn exports(source: &str, path: &str) -> Vec<Exported> {
             },
             _ => {}
         }
+        /* **A tag registered by hand is a definition too**, and the analyzer
+        reads the call wherever it sits, after whatever the statement itself
+        publishes. There is one in the library and it is inside the decorator
+        every other component registers through, so what it publishes is
+        `tagName` defining `target`: the identifiers as written rather than
+        anything they stand for at run time. Its own bug rather than its rule,
+        reproduced because this is held to its output. The two other mentions
+        of the call in that file are prose, which is why the text read here has
+        its comments blanked. */
+        let at = statement.span();
+        found.extend(defined(&plain[at.start as usize..at.end as usize]));
     }
     found
 }
