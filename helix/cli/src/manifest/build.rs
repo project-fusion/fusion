@@ -189,7 +189,11 @@ fn parameters(taken: &[Parameter], tags: &[(String, String)]) -> Vec<Value> {
         .iter()
         .filter(|(tag, _)| tag == "param")
         .filter_map(|(_, text)| text.split_once(char::is_whitespace))
-        .map(|(name, said)| (name.trim(), said.trim()))
+        /* **A dash between the name and the sentence is punctuation.** The
+        library writes `@param tilt - The angle handed to the shader`, and the
+        description is the sentence rather than the sentence with a dash in
+        front of it. */
+        .map(|(name, said)| (name.trim(), said.trim().trim_start_matches("- ").trim()))
         .collect();
     taken
         .iter()
@@ -243,7 +247,7 @@ fn directives(text: &str) -> BTreeMap<String, String> {
 
 /// A family's examples, by the slug each is filed under.
 ///
-/// **`preview` first and the rest alphabetically**, which is the order the
+/// **`preview` first and the rest by file name**, which is the order the
 /// reference page reads them in: the preview is the picture at the top and the
 /// others are a list beneath it, so it is not one of them.
 ///
@@ -266,11 +270,17 @@ fn examples_in(directory: &Path) -> Vec<Value> {
             Some((slug, directives(&text)))
         })
         .collect();
+    /* **By the file name, which is not the same as by the slug.** A directory
+    holding `compact.html` and `compact-counts.html` reads the second first,
+    because the dash sorts before the dot that follows `compact`. All hundred
+    and ninety-four families with examples order this way and none orders by
+    the slug alone. */
     found.sort_by(|left, right| {
         let rank = |name: &str| u8::from(name != "preview");
+        let file = |name: &str| format!("{name}.html");
         rank(&left.0)
             .cmp(&rank(&right.0))
-            .then_with(|| left.0.cmp(&right.0))
+            .then_with(|| file(&left.0).cmp(&file(&right.0)))
     });
     found
         .into_iter()
@@ -600,7 +610,17 @@ fn declaration_of(
         fields.insert("default".to_owned(), json!(default));
     }
     if let Some(returns) = &one.returns {
-        fields.insert("return".to_owned(), json!({ "type": { "text": returns } }));
+        /* **`@returns` takes the annotation's place, and says nothing.** The
+        tag carries a sentence and no type, and the analyzer writes the tag's
+        type rather than the one the signature states: both declarations in
+        the library that carry the tag have an empty return, and all hundred
+        and eight without it have the annotation. */
+        let said = if one.documented.tags.iter().any(|(tag, _)| tag == "returns") {
+            ""
+        } else {
+            returns.as_str()
+        };
+        fields.insert("return".to_owned(), json!({ "type": { "text": said } }));
     }
     if !one.parameters.is_empty() {
         fields.insert(
