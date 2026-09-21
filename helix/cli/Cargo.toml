@@ -30,7 +30,14 @@ regex = { workspace = true }
 # library that pulled a terminal backend in would carry it into the WASM build.
 ratatui = { workspace = true }
 serde = { workspace = true }
-serde_json = { workspace = true, features = ["float_roundtrip"] }
+# `preserve_order` is not optional here either. The manifest this crate writes
+# is held byte for byte to the analyzer's, whose keys are in the order it wrote
+# them rather than in alphabetical order, and a `BTreeMap` cannot say that. It
+# also removes a hazard: another crate in the workspace asks for the feature, so
+# without this the key order depended on what else was being built, and a test
+# that read the printed text passed in `cargo test --workspace` and failed in
+# `cargo test -p fusion-helix-cli`.
+serde_json = { workspace = true, features = ["float_roundtrip", "preserve_order"] }
 oxc_parser = "0.110.0"
 oxc_allocator = "0.110.0"
 oxc_span = "0.110.0"

@@ -991,17 +991,21 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
         .into_iter()
         .zip(finished)
         .map(|((path, _, published), declared)| {
+            /* The analyzer's own order, which is what it wrote rather than
+            what sorts: every object here is built in the sequence the
+            analyzer builds it, so the two files agree byte for byte and the
+            switch is a diff of nothing. */
             json!({
-                "declarations": declared,
-                "exports": published,
                 "kind": "javascript-module",
                 "path": path,
+                "declarations": declared,
+                "exports": published,
             })
         })
         .collect();
     /* The version the analyzer writes, which is not the newest one: it is
     pinned to what the tool emits, and the four tiers all say `1.0.0`. */
-    json!({ "modules": modules, "readme": "", "schemaVersion": "1.0.0" })
+    json!({ "schemaVersion": "1.0.0", "readme": "", "modules": modules })
 }
 
 /// A module's `exports`, with each declaration's module said the way the
