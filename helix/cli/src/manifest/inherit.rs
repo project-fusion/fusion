@@ -112,8 +112,19 @@ fn at_origin(entry: &Value, list: &str, deps: &Dependencies, mine: &Value) -> Va
         else {
             continue;
         };
+        /* **What the origin says, filled in from what came through.** The
+        origin's entry is the one to read, and it is not always the fuller of
+        the two: the analyzer infers `input` on `MixinControllerChecked` as a
+        bare name and a type, while the checkbox below it carries the sentence
+        an `@event` tag wrote and the React prop. Replacing outright lost
+        those; only what the origin does not say is taken from the parent. */
         let mut copy = found.clone();
         if let Some(fields) = copy.as_object_mut() {
+            if let Some(said) = entry.as_object() {
+                for (key, value) in said {
+                    fields.entry(key.clone()).or_insert_with(|| value.clone());
+                }
+            }
             fields.insert("inheritedFrom".to_owned(), stamp.clone());
         }
         return copy;

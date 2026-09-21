@@ -2116,3 +2116,74 @@ fn a_summary_keeps_the_wrap_the_author_wrote() {
         "One part, whose sentence runs past the margin and continues here."
     );
 }
+
+/// Four rules about how a doc block and a directory are read.
+#[test]
+fn a_tag_and_a_file_name_are_read_the_way_the_analyzer_reads_them() {
+    let sandbox = Sandbox::new("manifest-tags", None);
+    let src = sandbox.0.join("src/axis");
+    std::fs::create_dir_all(src.join(".examples")).expect("a source tree");
+    std::fs::write(
+        src.join("axis.ts"),
+        "/**\n\
+         \x20* Where the axis crosses.\n\
+         \x20*\n\
+         \x20* @param tilt - The angle, in degrees.\n\
+         \x20* @returns The crossing, as a fraction.\n\
+         \x20*/\n\
+         export const exitOf = (tilt: number): number => tilt\n\
+         /** Plain, with no tag about what it hands back. */\n\
+         export const twice = (tilt: number): number => tilt * 2\n",
+    )
+    .expect("a source");
+    for slug in ["preview", "compact", "compact-counts"] {
+        std::fs::write(
+            src.join(format!(".examples/{slug}.html")),
+            format!("<!-- @summary The {slug} one. -->\n<helix-axis></helix-axis>\n"),
+        )
+        .expect("an example");
+    }
+    std::fs::create_dir_all(src.join("root")).expect("a root directory");
+    std::fs::write(
+        src.join("root/axis-root.ts"),
+        "@customElement('helix-axis')\nexport class HelixAxis extends HelixElement {}\n",
+    )
+    .expect("a root");
+
+    let output = run(&sandbox.0, &["manifest", "build", ".", "--tier", "styled"]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let all: Vec<serde_json::Value> = parsed["modules"]
+        .as_array()
+        .expect("the modules")
+        .iter()
+        .flat_map(|one| one["declarations"].as_array().expect("the declarations"))
+        .cloned()
+        .collect();
+    let of = |name: &str| {
+        all.iter()
+            .find(|one| one["name"] == name)
+            .unwrap_or_else(|| panic!("{name} is declared: {said}"))
+            .clone()
+    };
+
+    /* The dash between a `@param`'s name and its sentence is punctuation. */
+    assert_eq!(
+        of("exitOf")["parameters"][0]["description"],
+        "The angle, in degrees."
+    );
+    /* `@returns` takes the annotation's place and says nothing, where a
+    declaration without the tag keeps what the signature states. */
+    assert_eq!(of("exitOf")["return"]["type"]["text"], "");
+    assert_eq!(of("twice")["return"]["type"]["text"], "number");
+    /* Examples read by file name, so the dash sorts before the dot. */
+    let axis = of("HelixAxis");
+    let slugs: Vec<&str> = axis["helix"]["examples"]
+        .as_array()
+        .expect("the examples")
+        .iter()
+        .map(|one| one["slug"].as_str().unwrap_or_default())
+        .collect();
+    assert_eq!(slugs, vec!["preview", "compact-counts", "compact"]);
+}
