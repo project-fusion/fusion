@@ -794,7 +794,7 @@ fn variables_of(
                 default: one
                     .init
                     .as_ref()
-                    .filter(|two| is_a_value(two))
+                    .filter(|two| is_a_value(two) || matches!(two, Expression::NewExpression(_)))
                     .map(|two| one_line(source, two.span().start, two.span().end)),
                 type_text: one
                     .type_annotation
