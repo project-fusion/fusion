@@ -547,9 +547,16 @@ fn method_of(
             they cannot is merely listed. */
             let taken: Vec<String> = parameters_of(&method.value, source)
                 .into_iter()
-                .map(|one| match one.type_text {
-                    Some(text) => format!("{}: {text}", one.name),
-                    None => one.name,
+                /* **The question mark is part of the signature.** A method
+                written `focus(options?: FocusOptions)` says a caller may
+                leave it out, and a signature that dropped the mark would
+                read as requiring what is optional. */
+                .map(|one| {
+                    let mark = if one.optional { "?" } else { "" };
+                    match one.type_text {
+                        Some(text) => format!("{}{mark}: {text}", one.name),
+                        None => format!("{}{mark}", one.name),
+                    }
                 })
                 .collect();
             let returns = method
