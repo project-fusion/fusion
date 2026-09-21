@@ -39,7 +39,7 @@ pub struct Declared {
     /// The doc block above it, read the way the manifest reads one.
     pub documented: Documented,
     /// A function's parameters, for a declaration that is one.
-    pub parameters: Vec<(String, Option<String>)>,
+    pub parameters: Vec<Parameter>,
     /// Its return annotation.
     pub returns: Option<String>,
     /// The annotation on a variable, which the manifest carries as written.
@@ -63,6 +63,18 @@ pub struct Superclass {
     pub from: Option<String>,
 }
 
+/// One parameter, as the manifest carries it.
+#[derive(Clone, Debug)]
+pub struct Parameter {
+    pub name: String,
+    /// The annotation written on it.
+    pub type_text: Option<String>,
+    /// **Whether it may be left out**, which the manifest says out loud for the
+    /// same reason an optional property does: it describes what a caller may
+    /// pass rather than how the signature is punctuated.
+    pub optional: bool,
+}
+
 /// One entry in a class body.
 #[derive(Debug, Default)]
 pub struct Member {
@@ -82,7 +94,7 @@ pub struct Member {
     /// any type of its own: a method has `return` and `parameters` where a field
     /// has `type`, and giving a method both would invent a field it never had.
     pub returns: Option<String>,
-    pub parameters: Vec<(String, Option<String>)>,
+    pub parameters: Vec<Parameter>,
     /// The doc block above it.
     pub documented: Documented,
     /// The attribute this field is backed by, where `@property` gives it one.
@@ -168,41 +180,47 @@ fn inferred(value: &Expression<'_>) -> Option<&'static str> {
 fn parameters_of_arrow(
     arrow: &oxc_ast::ast::ArrowFunctionExpression<'_>,
     source: &str,
-) -> Vec<(String, Option<String>)> {
+) -> Vec<Parameter> {
     arrow
         .params
         .items
         .iter()
         .filter_map(|one| {
             let name = one.pattern.get_binding_identifier()?.name.to_string();
-            let written = one.type_annotation.as_ref().map(|two| {
-                slice(
-                    source,
-                    two.type_annotation.span().start,
-                    two.type_annotation.span().end,
-                )
-            });
-            Some((name, written))
+            Some(Parameter {
+                name,
+                optional: one.optional,
+                type_text: one.type_annotation.as_ref().map(|two| {
+                    slice(
+                        source,
+                        two.type_annotation.span().start,
+                        two.type_annotation.span().end,
+                    )
+                }),
+            })
         })
         .collect()
 }
 
 /// A parameter as the manifest carries it: its name and the type written on it.
-fn parameters_of(method: &Function<'_>, source: &str) -> Vec<(String, Option<String>)> {
+fn parameters_of(method: &Function<'_>, source: &str) -> Vec<Parameter> {
     method
         .params
         .items
         .iter()
         .filter_map(|one| {
             let name = one.pattern.get_binding_identifier()?.name.to_string();
-            let written = one.type_annotation.as_ref().map(|two| {
-                slice(
-                    source,
-                    two.type_annotation.span().start,
-                    two.type_annotation.span().end,
-                )
-            });
-            Some((name, written))
+            Some(Parameter {
+                name,
+                optional: one.optional,
+                type_text: one.type_annotation.as_ref().map(|two| {
+                    slice(
+                        source,
+                        two.type_annotation.span().start,
+                        two.type_annotation.span().end,
+                    )
+                }),
+            })
         })
         .collect()
 }
@@ -478,9 +496,9 @@ fn method_of(
             they cannot is merely listed. */
             let taken: Vec<String> = parameters_of(&method.value, source)
                 .into_iter()
-                .map(|(name, written)| match written {
-                    Some(text) => format!("{name}: {text}"),
-                    None => name,
+                .map(|one| match one.type_text {
+                    Some(text) => format!("{}: {text}", one.name),
+                    None => one.name,
                 })
                 .collect();
             let returns = method
@@ -614,11 +632,33 @@ fn attribute_of(
     (None, false)
 }
 
+/// The class a mixin's body declares, where the arrow given is one.
+///
+/// **A mixin is a function that makes a class.** `export const MixinChartSource
+/// = <T>(Base: T) => { class ChartSourceElement extends Base { … } return … }`
+/// publishes what that inner class has, and the manifest calls the whole thing
+/// a `mixin` rather than a function: what a consumer gets is the members, not
+/// the call.
+fn mixin_class<'a>(arrow: &'a oxc_ast::ast::ArrowFunctionExpression<'a>) -> Option<&'a Class<'a>> {
+    arrow
+        .body
+        .statements
+        .iter()
+        .find_map(|statement| match statement {
+            Statement::ClassDeclaration(class) => Some(&**class),
+            _ => None,
+        })
+}
+
 /// The declarations one `const`, `let` or `var` statement makes.
 ///
 /// One statement, several names: `export const a = 1, b = 2` is two entries in
 /// the manifest and one node here.
-fn variables_of(variable: &oxc_ast::ast::VariableDeclaration<'_>, source: &str) -> Vec<Declared> {
+fn variables_of(
+    variable: &oxc_ast::ast::VariableDeclaration<'_>,
+    source: &str,
+    docs: &Attached,
+) -> Vec<Declared> {
     variable
         .declarations
         .iter()
@@ -633,17 +673,26 @@ fn variables_of(variable: &oxc_ast::ast::VariableDeclaration<'_>, source: &str) 
                 Some(Expression::ArrowFunctionExpression(arrow)) => Some(arrow),
                 _ => None,
             };
+            /* **A mixin is a function that makes a class**, and what a
+            consumer gets from it is that class's members rather than the call.
+            The manifest names the whole thing a `mixin` for that reason. */
+            let makes = arrow.and_then(|two| mixin_class(two));
             Some(Declared {
                 heritage: Vec::new(),
-                kind: if arrow.is_some() {
-                    "function"
-                } else {
-                    "variable"
+                members: makes
+                    .map_or_else(Vec::new, |class| members_of(class, source, docs, false)),
+                kind: match (arrow, makes) {
+                    (_, Some(_)) => "mixin",
+                    (Some(_), None) => "function",
+                    (None, None) => "variable",
                 },
                 tag_name: None,
                 name: id.name.to_string(),
                 parameters: arrow.map_or_else(Vec::new, |two| parameters_of_arrow(two, source)),
-                returns: arrow.map(|two| {
+                /* A mixin has no return: what it hands back is the class whose
+                members are listed above, and naming its type again would be
+                saying the same thing twice. */
+                returns: arrow.filter(|_| makes.is_none()).map(|two| {
                     two.return_type.as_ref().map_or_else(
                         || "void".to_owned(),
                         |three| {
@@ -784,7 +833,7 @@ fn named(
             .collect(),
         /* One statement, several declarations: `export const a = 1, b = 2` is
         two entries in the manifest and one node here. */
-        Declaration::VariableDeclaration(variable) => variables_of(variable, source),
+        Declaration::VariableDeclaration(variable) => variables_of(variable, source, docs),
         /* A type alias and an interface declare nothing at runtime, and the
         manifest is a description of what a consumer can reach through the
         platform. The analyzer emits neither, and neither does this. */

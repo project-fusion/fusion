@@ -21,6 +21,8 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use std::collections::BTreeMap;
+
 use serde_json::{json, Value};
 
 pub use crate::manifest::inherit::Dependencies;
@@ -370,12 +372,33 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
         at.insert("reflects".to_owned(), json!(true));
     }
     if !member.parameters.is_empty() {
+        /* **`@param` says which parameter it describes.** The tag opens with
+        the name, so its text is the rest, and a parameter nobody wrote a tag
+        for carries no description rather than an empty one. */
+        let described: BTreeMap<&str, &str> = member
+            .documented
+            .tags
+            .iter()
+            .filter(|(tag, _)| tag == "param")
+            .filter_map(|(_, text)| text.split_once(char::is_whitespace))
+            .map(|(name, said)| (name.trim(), said.trim()))
+            .collect();
         let taken: Vec<Value> = member
             .parameters
             .into_iter()
-            .map(|(name, written)| match written {
-                Some(text) => json!({ "name": name, "type": { "text": text } }),
-                None => json!({ "name": name }),
+            .map(|one| {
+                let mut said = serde_json::Map::new();
+                said.insert("name".to_owned(), json!(one.name));
+                if let Some(text) = one.type_text {
+                    said.insert("type".to_owned(), json!({ "text": text }));
+                }
+                if let Some(about) = described.get(one.name.as_str()) {
+                    said.insert("description".to_owned(), json!(about));
+                }
+                if one.optional {
+                    said.insert("optional".to_owned(), json!(true));
+                }
+                Value::Object(said)
             })
             .collect();
         at.insert("parameters".to_owned(), json!(taken));
@@ -502,9 +525,9 @@ fn declaration_of(
         let taken: Vec<Value> = one
             .parameters
             .iter()
-            .map(|(name, written)| match written {
-                Some(text) => json!({ "name": name, "type": { "text": text } }),
-                None => json!({ "name": name }),
+            .map(|one| match &one.type_text {
+                Some(text) => json!({ "name": one.name, "type": { "text": text } }),
+                None => json!({ "name": one.name }),
             })
             .collect();
         fields.insert("parameters".to_owned(), json!(taken));
