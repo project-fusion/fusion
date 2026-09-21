@@ -2486,3 +2486,44 @@ fn an_inferred_event_stands_on_a_mixin_and_not_on_a_component() {
     assert_eq!(events.len(), 1, "{said}");
     assert_eq!(events[0]["name"], "helix-select");
 }
+
+/// A tag registered by a call is a definition too.
+///
+/// There is one such call in the library and it is inside the decorator every
+/// other component registers through, so what it publishes is the identifiers
+/// as written rather than anything they stand for at run time: the analyzer's
+/// own bug rather than its rule, reproduced because this is held to its
+/// output.
+#[test]
+fn a_tag_registered_by_a_call_is_a_definition() {
+    let sandbox = Sandbox::new("manifest-define", None);
+    let src = sandbox.0.join("src/utils");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("custom-element.ts"),
+        "/* Prose mentioning customElements.define(one, two) and no more. */\n\
+         export const customElement =\n\
+         \x20 (tagName: string) =>\n\
+         \x20 (target: CustomElementConstructor): void => {\n\
+         \x20   customElements.define(tagName, target)\n\
+         \x20 }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let exports = parsed["modules"][0]["exports"]
+        .as_array()
+        .expect("the exports");
+
+    /* The definition follows whatever the statement itself publishes, and the
+    call written in prose above is not one: the text is read with its comments
+    blanked. */
+    assert_eq!(exports.len(), 2, "{said}");
+    assert_eq!(exports[0]["name"], "customElement");
+    assert_eq!(exports[1]["kind"], "custom-element-definition");
+    assert_eq!(exports[1]["name"], "tagName");
+    assert_eq!(exports[1]["declaration"]["name"], "target");
+}
