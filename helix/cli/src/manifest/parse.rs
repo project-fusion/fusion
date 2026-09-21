@@ -168,6 +168,12 @@ fn key_of(key: &PropertyKey<'_>, source: &str) -> Option<String> {
 /// code, a call or an identifier, is left without one, which is what the
 /// analyzer does too.
 fn inferred(value: &Expression<'_>) -> Option<&'static str> {
+    /* **A negative number is a number.** `at = -1` is a unary minus over a
+    literal rather than a literal, and reading only the literal left six
+    fields in the library with no type at all. */
+    if let Expression::UnaryExpression(unary) = value {
+        return inferred(&unary.argument);
+    }
     match value {
         Expression::StringLiteral(_) | Expression::TemplateLiteral(_) => Some("string"),
         Expression::NumericLiteral(_) => Some("number"),
@@ -759,7 +765,7 @@ fn variables_of(
 /// **Only names measured as dropped are listed.** Lit has more lifecycle than
 /// this and no component here overrides it, so adding those would be a guess,
 /// and the diff is what will say if one ever does.
-const FRAMEWORK: [&str; 9] = [
+const FRAMEWORK: [&str; 10] = [
     "connectedCallback",
     "createRenderRoot",
     "disconnectedCallback",
@@ -767,6 +773,7 @@ const FRAMEWORK: [&str; 9] = [
     "firstUpdated",
     "render",
     "styles",
+    "update",
     "updated",
     "willUpdate",
 ];

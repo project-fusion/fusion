@@ -1439,3 +1439,42 @@ fn an_example_opens_with_what_it_needs_said() {
     example: the second `@min` is not read. */
     assert!(!said.contains("999"), "only the opening lines: {said}");
 }
+
+/// A class may extend one in its own package, which takes two passes.
+///
+/// `HelixFormElement extends HelixElement` through a relative import, and until
+/// every module has been read there is nothing to resolve it in. So the first
+/// pass writes the declarations and the second gives each what its heritage
+/// has, with this package's own manifest standing among the dependencies.
+#[test]
+fn a_base_in_the_same_package_is_found() {
+    let sandbox = Sandbox::new("manifest-same-package", None);
+    let base = sandbox.0.join("src/element");
+    let form = sandbox.0.join("src/form");
+    for at in [&base, &form] {
+        std::fs::create_dir_all(at).expect("a source tree");
+    }
+    /* The base is written second alphabetically and read second, so the class
+    extending it is finished before its parent exists: that ordering is the
+    whole reason one pass will not do. */
+    std::fs::write(
+        base.join("element.ts"),
+        "export class HelixElement {\n  assignsByName = true\n}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        form.join("form.ts"),
+        "import { HelixElement } from '../element/element.js'\n\
+         export class HelixFormElement extends HelixElement {\n  name = ''\n}\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    assert!(
+        said.matches("assignsByName").count() == 2,
+        "the base has it and the class inherits it: {said}"
+    );
+    assert!(said.contains("\"inheritedFrom\""), "and is marked: {said}");
+}

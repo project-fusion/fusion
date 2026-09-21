@@ -592,23 +592,55 @@ fn declaration_of(
 }
 
 /// The manifest as far as this generator has been taken.
+/// A declaration as the first pass leaves it: what it says, what it extends,
+/// and whether it is an element.
+type Pending = (Value, Vec<(String, Option<String>)>, bool);
+
 pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencies) -> Value {
-    let modules: Vec<Value> = sources(package)
+    /* **Two passes, because a class may extend one in its own package.**
+    `HelixFormElement extends HelixElement` through a relative import, and
+    resolving it means this package's other modules, which nothing has read
+    until every module has been read. So the first pass writes the declarations
+    and the second gives each what its heritage has, with this package's own
+    manifest standing among the dependencies by the name nothing imports it by. */
+    let written: Vec<(String, Vec<Pending>)> = sources(package)
         .into_iter()
         .map(|path| {
             let text = fs::read_to_string(package.join(&path)).unwrap_or_default();
-            let declared: Vec<Value> = declarations(&text, &path)
+            let declared = declarations(&text, &path)
                 .into_iter()
                 .map(|one| {
                     let is_element = one.tag_name.is_some();
-                    let (mut declaration, heritage) =
-                        declaration_of(one, &path, tier, package, given);
-                    inherit::apply(&mut declaration, &heritage, dependencies, is_element);
+                    let (declaration, heritage) = declaration_of(one, &path, tier, package, given);
+                    (declaration, heritage, is_element)
+                })
+                .collect();
+            (path, declared)
+        })
+        .collect();
+
+    let mine = json!({
+        "modules": written
+            .iter()
+            .map(|(path, declared)| json!({
+                "declarations": declared.iter().map(|(one, _, _)| one.clone()).collect::<Vec<Value>>(),
+                "path": path,
+            }))
+            .collect::<Vec<Value>>()
+    });
+
+    let modules: Vec<Value> = written
+        .into_iter()
+        .map(|(path, declared)| {
+            let finished: Vec<Value> = declared
+                .into_iter()
+                .map(|(mut declaration, heritage, is_element)| {
+                    inherit::apply(&mut declaration, &heritage, dependencies, &mine, is_element);
                     declaration
                 })
                 .collect();
             json!({
-                "declarations": declared,
+                "declarations": finished,
                 "exports": [],
                 "kind": "javascript-module",
                 "path": path,
