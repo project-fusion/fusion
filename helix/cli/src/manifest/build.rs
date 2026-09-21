@@ -649,28 +649,75 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
         })
         .collect();
 
-    let mine = json!({
-        "modules": written
+    /* **Resolved again until it stops changing, because a chain has links.**
+    `HelixHeadlessIconButton extends HelixHeadlessButton` and the copy button
+    extends the icon button, all three in one package. One pass gives the icon
+    button what the button *declares* — twenty members — where the analyzer
+    gives it what the button *has*, which is forty-seven, and the copy button
+    inherits the shortfall. A dependency's manifest arrives already resolved
+    and needs none of this; a package's own does not, so each round resolves
+    against the last one's answer and a chain of any length settles. Ninety-
+    nine of headless's differences were this, across ten modules.
+
+    Each round starts from the declarations as parsed rather than from the
+    round before, so nothing is merged twice. The cap is a guard against a
+    cycle in the source, which would not compile but should not hang this. */
+    let raw = |written: &Vec<(String, Vec<Pending>, Vec<Value>)>| {
+        json!({
+            "modules": written
+                .iter()
+                .map(|(path, declared, _)| json!({
+                    "declarations": declared
+                        .iter()
+                        .map(|(one, _, _)| one.clone())
+                        .collect::<Vec<Value>>(),
+                    "path": path,
+                }))
+                .collect::<Vec<Value>>()
+        })
+    };
+    let resolve = |against: &Value| -> Vec<Vec<Value>> {
+        written
             .iter()
-            .map(|(path, declared, _)| json!({
-                "declarations": declared.iter().map(|(one, _, _)| one.clone()).collect::<Vec<Value>>(),
-                "path": path,
-            }))
-            .collect::<Vec<Value>>()
-    });
+            .map(|(_, declared, _)| {
+                declared
+                    .iter()
+                    .map(|(one, heritage, is_element)| {
+                        let mut copy = one.clone();
+                        inherit::apply(&mut copy, heritage, dependencies, against, *is_element);
+                        copy
+                    })
+                    .collect()
+            })
+            .collect()
+    };
+
+    let mut mine = raw(&written);
+    let mut finished = Vec::new();
+    for _ in 0..16 {
+        finished = resolve(&mine);
+        let next = json!({
+            "modules": written
+                .iter()
+                .zip(&finished)
+                .map(|((path, _, _), declared)| json!({
+                    "declarations": declared,
+                    "path": path,
+                }))
+                .collect::<Vec<Value>>()
+        });
+        if next == mine {
+            break;
+        }
+        mine = next;
+    }
 
     let modules: Vec<Value> = written
         .into_iter()
-        .map(|(path, declared, published)| {
-            let finished: Vec<Value> = declared
-                .into_iter()
-                .map(|(mut declaration, heritage, is_element)| {
-                    inherit::apply(&mut declaration, &heritage, dependencies, &mine, is_element);
-                    declaration
-                })
-                .collect();
+        .zip(finished)
+        .map(|((path, _, published), declared)| {
             json!({
-                "declarations": finished,
+                "declarations": declared,
                 "exports": published,
                 "kind": "javascript-module",
                 "path": path,
