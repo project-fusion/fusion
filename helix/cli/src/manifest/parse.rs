@@ -642,6 +642,17 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached, is_element: bool
         ask about is the whole element's rather than the name's. */
         let at = element.span().start;
         let documented = docs.get(&at).cloned().unwrap_or_default();
+        /* **`@internal` takes a member out.** `isDisabled` is what a component
+        binds to and what a consumer has no use for, and saying so prints a row
+        on forty-eight reference pages. Seventeen members in the library carry
+        the tag and none of them is published; the two that looked published
+        are the separate `…Interface` declaration's copies, which carry no tag
+        of their own. This is also what took `describedBy` and
+        `resolvedFeedback` off `MixinField`, which had been measured as two
+        dropped getters with no rule to state. */
+        if documented.tags.iter().any(|(tag, _)| tag == "internal") {
+            continue;
+        }
         match element {
             ClassElement::PropertyDefinition(property) => {
                 let Some(name) = key_of(&property.key, source) else {

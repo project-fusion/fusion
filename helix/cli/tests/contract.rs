@@ -2011,3 +2011,31 @@ fn a_parameter_says_its_default_and_names_a_pattern_by_its_text() {
         "{ query: string; spec: string }"
     );
 }
+
+/// `@internal` takes a member out of the manifest.
+#[test]
+fn a_member_marked_internal_is_not_published() {
+    let sandbox = Sandbox::new("manifest-internal", None);
+    let src = sandbox.0.join("src/field");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("field.ts"),
+        "export class HelixField extends HelixElement {\n\
+         \x20 /** What a consumer binds to. */\n\
+         \x20 disabled = false\n\
+         \x20 /**\n\
+         \x20  * The same question, answered for the component itself.\n\
+         \x20  *\n\
+         \x20  * @internal Read here and nowhere outside.\n\
+         \x20  */\n\
+         \x20 get isDisabled(): boolean { return this.disabled }\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    assert!(said.contains("\"disabled\""), "the public one: {said}");
+    assert!(!said.contains("isDisabled"), "the internal one: {said}");
+}
