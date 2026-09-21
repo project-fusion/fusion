@@ -258,10 +258,15 @@ fn joined(
         .flatten()
         .filter_map(|one| one.get("name")?.as_str())
         .collect();
+    /* **Only what a mixin gave the parent moves.** What the parent was given by
+    a class above it keeps the place the parent had it in: the styled copy
+    button lists `button`, which came from the headless button, first, exactly
+    where the headless copy button lists it, and putting the parent's own
+    entries ahead of it moved all twelve of its parts. A mixin's are the
+    exception the accordion measured. */
     let rank = |entry: &Value| match entry.get("inheritedFrom").and_then(|one| one.get("name")) {
-        None => 1,
         Some(Value::String(from)) if mixins.contains(from.as_str()) => 0,
-        _ => 2,
+        _ => 1,
     };
     let mut rest: Vec<Value> = theirs
         .into_iter()
@@ -485,6 +490,13 @@ fn regroup(
         }
     }
     rest.sort_by_key(|entry| {
+        /* Only what a mixin gave is regrouped. Everything else keeps the place
+        the parent had it in, and a constant key leaves a stable sort to do
+        that: the styled copy button's `copied` is its parent's own entry and
+        stays between the two the button above it gave. */
+        if rank(entry) != 0 {
+            return (1, 0, usize::MAX);
+        }
         let key = group(entry);
         let first = seen.iter().position(|one| *one == key).unwrap_or(0);
         let name = entry
