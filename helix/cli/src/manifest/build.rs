@@ -29,7 +29,9 @@ pub use crate::manifest::inherit::Dependencies;
 use crate::manifest::jsdoc::{entry, Documented};
 
 use crate::manifest::inherit;
-use crate::manifest::parse::{declarations, exports, Declared, Exported, Origin, Superclass};
+use crate::manifest::parse::{
+    declarations, exports, Declared, Exported, Origin, Parameter, Superclass,
+};
 
 /// Files the analyzer is told to skip, by the suffix that names them.
 ///
@@ -169,6 +171,46 @@ fn beside(path: &str, specifier: &str) -> Option<String> {
         }
     }
     Some(format!("/{}", parts.join("/")))
+}
+
+/// A list of parameters as the manifest writes them.
+///
+/// **One writer, because it is written from two.** A method's parameters and a
+/// plain function's are the same thing said in the same way, and they were
+/// written by two pieces of code that had drifted: the second knew nothing of
+/// defaults, of optionality or of `@param`, so `drawIcon`, `ticks` and seven
+/// others lost what they say about their own arguments.
+///
+/// `@param` opens with the name it describes, so its text is the rest, and a
+/// parameter nobody wrote a tag for carries no description rather than an
+/// empty one.
+fn parameters(taken: &[Parameter], tags: &[(String, String)]) -> Vec<Value> {
+    let described: BTreeMap<&str, &str> = tags
+        .iter()
+        .filter(|(tag, _)| tag == "param")
+        .filter_map(|(_, text)| text.split_once(char::is_whitespace))
+        .map(|(name, said)| (name.trim(), said.trim()))
+        .collect();
+    taken
+        .iter()
+        .map(|one| {
+            let mut said = serde_json::Map::new();
+            said.insert("name".to_owned(), json!(one.name));
+            if let Some(value) = &one.default {
+                said.insert("default".to_owned(), json!(value));
+            }
+            if let Some(text) = &one.type_text {
+                said.insert("type".to_owned(), json!({ "text": text }));
+            }
+            if let Some(about) = described.get(one.name.as_str()) {
+                said.insert("description".to_owned(), json!(about));
+            }
+            if one.optional {
+                said.insert("optional".to_owned(), json!(true));
+            }
+            Value::Object(said)
+        })
+        .collect()
 }
 
 /// The directives an example opens with, by the word each carries.
@@ -429,39 +471,10 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
         at.insert("reflects".to_owned(), json!(true));
     }
     if !member.parameters.is_empty() {
-        /* **`@param` says which parameter it describes.** The tag opens with
-        the name, so its text is the rest, and a parameter nobody wrote a tag
-        for carries no description rather than an empty one. */
-        let described: BTreeMap<&str, &str> = member
-            .documented
-            .tags
-            .iter()
-            .filter(|(tag, _)| tag == "param")
-            .filter_map(|(_, text)| text.split_once(char::is_whitespace))
-            .map(|(name, said)| (name.trim(), said.trim()))
-            .collect();
-        let taken: Vec<Value> = member
-            .parameters
-            .into_iter()
-            .map(|one| {
-                let mut said = serde_json::Map::new();
-                said.insert("name".to_owned(), json!(one.name));
-                if let Some(value) = one.default {
-                    said.insert("default".to_owned(), json!(value));
-                }
-                if let Some(text) = one.type_text {
-                    said.insert("type".to_owned(), json!({ "text": text }));
-                }
-                if let Some(about) = described.get(one.name.as_str()) {
-                    said.insert("description".to_owned(), json!(about));
-                }
-                if one.optional {
-                    said.insert("optional".to_owned(), json!(true));
-                }
-                Value::Object(said)
-            })
-            .collect();
-        at.insert("parameters".to_owned(), json!(taken));
+        at.insert(
+            "parameters".to_owned(),
+            json!(parameters(&member.parameters, &member.documented.tags)),
+        );
     }
     Value::Object(at)
 }
@@ -580,15 +593,10 @@ fn declaration_of(
         fields.insert("return".to_owned(), json!({ "type": { "text": returns } }));
     }
     if !one.parameters.is_empty() {
-        let taken: Vec<Value> = one
-            .parameters
-            .iter()
-            .map(|one| match &one.type_text {
-                Some(text) => json!({ "name": one.name, "type": { "text": text } }),
-                None => json!({ "name": one.name }),
-            })
-            .collect();
-        fields.insert("parameters".to_owned(), json!(taken));
+        fields.insert(
+            "parameters".to_owned(),
+            json!(parameters(&one.parameters, &one.documented.tags)),
+        );
     }
     /* **The base class is the last link and the only one the manifest names
     here.** A mixin between the class and its base contributes members, which is
