@@ -103,6 +103,17 @@ pub struct Parameter {
     pub default: Option<String>,
 }
 
+/// Whether a field may be assigned, and what said so.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum Readonly {
+    #[default]
+    No,
+    /// The `readonly` keyword, read before the description.
+    Modifier,
+    /// A getter with no setter, read after it.
+    Accessor,
+}
+
 /// A field's default and type as the source wrote them.
 ///
 /// **Kept because the attribute is generated from the field as written.** A
@@ -133,7 +144,16 @@ pub struct Member {
     pub default: Option<String>,
     pub privacy: Option<&'static str>,
     pub is_static: bool,
-    pub readonly: bool,
+    /// Whether the default came from the constructor rather than the field.
+    pub assigned: bool,
+    /// Whether the field may be assigned, and what says so.
+    ///
+    /// **The two are not interchangeable, because they are read at different
+    /// moments.** A `readonly` modifier is read with the other modifiers,
+    /// before the field's description; a getter is called readonly by the pass
+    /// over accessors, after it. Seventy fields in core say so and not one goes
+    /// the other way.
+    pub readonly: Readonly,
     /// The return annotation of a method, which the manifest carries apart from
     /// any type of its own: a method has `return` and `parameters` where a field
     /// has `type`, and giving a method both would invent a field it never had.
@@ -402,9 +422,16 @@ fn is_a_value(expression: &Expression<'_>) -> bool {
     /* **`as const` is a note to the type checker, not part of the value.**
     `['native', 'light', …] as const` is that list, and the manifest prints
     the list: reading the assertion as the expression left eleven shapes and
-    five interactions with no default at all. */
-    if let Expression::TSAsExpression(said) = expression {
-        return is_a_value(&said.expression);
+    five interactions with no default at all.
+    *
+    **And the assertion is where the analyzer stops looking.** It asks what
+    kind the initializer is and takes the text from inside the assertion
+    afterwards, so an assertion always passes whatever it wraps: `ORB_STATES =
+    Object.keys(ORDER) as readonly OrbState[]` publishes the call that a bare
+    `Object.keys(ORDER)` would not. One variable in the library is written that
+    way, and it was the last thing the four manifests disagreed about. */
+    if matches!(expression, Expression::TSAsExpression(_)) {
+        return true;
     }
     matches!(
         expression,
@@ -632,6 +659,14 @@ fn field_of(
     assigned: &BTreeMap<String, String>,
 ) -> Member {
     let (attribute, reflects) = attribute_of(&property.decorators, &name);
+    let written = property
+        .value
+        .as_ref()
+        .filter(|one| is_a_value(one))
+        .map(|one| {
+            let value = unwrapped(one);
+            one_line(source, value.span().start, value.span().end)
+        });
     Member {
         written: None,
         attribute,
@@ -648,22 +683,23 @@ fn field_of(
            over a construction, and the analyzer prints neither: what a reader
            wants beside a name is what it starts as, not the sum that reaches
            it. */
-        default: property
-            .value
-            .as_ref()
-            .filter(|one| is_a_value(one))
-            .map(|one| {
-                let value = unwrapped(one);
-                one_line(source, value.span().start, value.span().end)
-            })
-            .or_else(|| assigned.get(&name).cloned()),
+        default: written.clone().or_else(|| assigned.get(&name).cloned()),
+        /* **Where the value came from, which decides where it is written.** A
+        default the field wrote is read before its description and one the
+        constructor assigns after it, because the analyzer reads the body first
+        and the constructor later. */
+        assigned: written.is_none(),
         documented,
         is_static: property.r#static,
         kind: "field",
         name,
         parameters: Vec::new(),
         privacy: privacy_of(property.accessibility, &property.key),
-        readonly: property.readonly,
+        readonly: if property.readonly {
+            Readonly::Modifier
+        } else {
+            Readonly::No
+        },
         reflects,
         returns: None,
         /* **An optional property says `| undefined` out loud.** `name?: string`
@@ -700,7 +736,6 @@ fn method_of(
     name: String,
     source: &str,
     documented: Documented,
-    is_element: bool,
 ) -> Member {
     /* **A getter is a readonly field, not a method.** What a consumer reaches
     through `element.caret` is a value, and the manifest describes the
@@ -718,7 +753,6 @@ fn method_of(
             one.type_annotation.span().end,
         )
     };
-    let name_for_type = name.clone();
     let (attribute, reflects) = if accessor {
         attribute_of(&method.decorators, &name)
     } else {
@@ -726,6 +760,7 @@ fn method_of(
     };
     Member {
         written: None,
+        assigned: false,
         attribute,
         reflects,
         default: None,
@@ -739,7 +774,11 @@ fn method_of(
             parameters_of(&method.value, source)
         },
         privacy: privacy_of(method.accessibility, &method.key),
-        readonly: reading,
+        readonly: if reading {
+            Readonly::Accessor
+        } else {
+            Readonly::No
+        },
         returns: if accessor {
             None
         } else {
@@ -767,47 +806,27 @@ fn method_of(
                 .first()
                 .and_then(|one| one.type_annotation.as_ref())
                 .map(|one| annotation(one))
-        } else if is_element && privacy_of(method.accessibility, &method.key).is_none() {
-            /* **A public method carries its signature and a hidden one does
-            not.** Measured across the four tiers: 3,287 private and
-            protected methods and not one with a type, against 445 public
-            ones that have it. What a consumer can call is described; what
-            they cannot is merely listed. */
-            let taken: Vec<String> = parameters_of(&method.value, source)
-                .into_iter()
-                /* **The question mark is part of the signature.** A method
-                written `focus(options?: FocusOptions)` says a caller may
-                leave it out, and a signature that dropped the mark would
-                read as requiring what is optional. */
-                .map(|one| {
-                    let mark = if one.optional { "?" } else { "" };
-                    let said = match one.type_text {
-                        Some(text) => format!("{}{mark}: {text}", one.name),
-                        None => format!("{}{mark}", one.name),
-                    };
-                    /* **A default stands in the signature too.** `markRead`
-                    reads `markRead(next = true) => boolean`, which is how a
-                    caller would write the call it may leave out. */
-                    match one.default {
-                        Some(value) => format!("{said} = {value}"),
-                        None => said,
-                    }
-                })
-                .collect();
-            let returns = method
-                .value
-                .return_type
-                .as_ref()
-                .map_or_else(|| "void".to_owned(), |one| annotation(one));
-            Some(signature(&name_for_type, &taken, &returns))
         } else {
+            /* **A public method carries its signature and a hidden one does
+            not**, and it is written after everything else about the method,
+            including after inheritance has stamped it. `sign` writes it, as
+            the analyzer writes it in a plugin that runs last: a method taken
+            from a class that already had a signature arrives with it, ahead of
+            the stamp, and one taken from a mixin gains it afterwards. Written
+            here instead, both came out the same way and four of headless's
+            methods said so.
+
+            Measured across the four tiers: 3,287 private and protected
+            methods and not one with a type, against 445 public ones that have
+            it. What a consumer can call is described; what they cannot is
+            merely listed. */
             None
         },
     }
 }
 
 /// What a class body declares, in the order it is written.
-fn members_of(class: &Class<'_>, source: &str, docs: &Attached, is_element: bool) -> Vec<Member> {
+fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
     let filled = assigned(class, source);
     let mut found = Vec::new();
     for element in &class.body.body {
@@ -815,17 +834,10 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached, is_element: bool
         ask about is the whole element's rather than the name's. */
         let at = element.span().start;
         let documented = docs.get(&at).cloned().unwrap_or_default();
-        /* **`@internal` takes a member out.** `isDisabled` is what a component
-        binds to and what a consumer has no use for, and saying so prints a row
-        on forty-eight reference pages. Seventeen members in the library carry
-        the tag and none of them is published; the two that looked published
-        are the separate `…Interface` declaration's copies, which carry no tag
-        of their own. This is also what took `describedBy` and
-        `resolvedFeedback` off `MixinField`, which had been measured as two
-        dropped getters with no rule to state. */
-        if documented.tags.iter().any(|(tag, _)| tag == "internal") {
-            continue;
-        }
+        /* **`@internal` takes a member out**, which `declaration_of` does once
+        the list it belongs to exists: seventeen members in the library carry
+        the tag and none is published, `isDisabled` among them, which saying
+        out loud would print a row on forty-eight reference pages. */
         match element {
             ClassElement::PropertyDefinition(property) => {
                 let Some(name) = key_of(&property.key, source) else {
@@ -847,12 +859,14 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached, is_element: bool
                 to exist rather than something on one, and a consumer of a
                 custom element never calls it: the platform does, from
                 markup. The analyzer publishes none. */
-                if matches!(method.kind, MethodDefinitionKind::Constructor)
-                    || FRAMEWORK.contains(&name.as_str())
-                {
+                /* A framework name is kept here and dropped later, for the
+                same reason a field's is: the list it belongs to exists before
+                the plugin that removes it runs, and a class whose body holds
+                only `willUpdate` and `render` still has one. */
+                if matches!(method.kind, MethodDefinitionKind::Constructor) {
                     continue;
                 }
-                let read = method_of(method, name, source, documented, is_element);
+                let read = method_of(method, name, source, documented);
                 /* **A getter and its setter are one field.** What a consumer
                 reaches is a value they can read and write, not two members
                 with one name, and the manifest carries one: the pair is
@@ -865,7 +879,9 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached, is_element: bool
                         .iter_mut()
                         .find(|one| one.name == read.name && one.kind == "field")
                     {
-                        already.readonly = already.readonly && read.readonly;
+                        if read.readonly == Readonly::No {
+                            already.readonly = Readonly::No;
+                        }
                         if already.type_text.is_none() {
                             already.type_text = read.type_text;
                         }
@@ -1015,8 +1031,7 @@ fn variables_of(
                 only components. */
                 dispatched: makes
                     .map_or_else(Vec::new, |class| dispatched(plain, class.body.span())),
-                members: makes
-                    .map_or_else(Vec::new, |class| members_of(class, source, docs, false)),
+                members: makes.map_or_else(Vec::new, |class| members_of(class, source, docs)),
                 kind: match (arrow, makes) {
                     (_, Some(_)) => "mixin",
                     (Some(_), None) => "function",
@@ -1149,7 +1164,7 @@ fn named(
                 tag_name: tag_of(class),
                 borrows: borrowed(class, &id.name),
                 dispatched: dispatched(plain, class.body.span()),
-                members: members_of(class, source, docs, tag_of(class).is_some()),
+                members: members_of(class, source, docs),
                 name: id.name.to_string(),
                 heritage: class.super_class.as_ref().map_or_else(Vec::new, |one| {
                     let mut names = Vec::new();

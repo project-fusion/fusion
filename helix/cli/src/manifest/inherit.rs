@@ -41,13 +41,19 @@ use serde_json::{json, Value};
 /// from above; and `cssProperties`, which a styled heatmap takes from the
 /// headless one so a consumer setting `--heatmap-tone-1` finds it documented on
 /// the element they are actually using.
-const INHERITS: [&str; 6] = [
-    "attributes",
+///
+/// **In `apply-inheritance`'s own order, which is not alphabetical.** A list
+/// the class itself never filled is created here, and where a class is given
+/// two of them the one this reaches first leads: a headless class given both
+/// `attributes` and `members` says `attributes` first.
+pub const INHERITS: [&str; 7] = [
+    "slots",
     "cssParts",
     "cssProperties",
-    "cssStates",
+    "attributes",
+    "members",
     "events",
-    "slots",
+    "cssStates",
 ];
 
 /// Manifests of other packages, by the package name a specifier names them by.
@@ -302,21 +308,26 @@ fn joined(mine: Option<&Value>, theirs: Option<&Value>, link: &Link<'_>) -> Opti
         taken.insert(name.to_owned());
         let mut copy = entry.clone();
         if let Some(parent) = above_by_name.get(name) {
-            if let Some(fields) = copy.as_object_mut() {
-                /* **A redeclared member is filled in from the one above it.**
-                A styled component writes `static override tier = 'helix-'` and
-                says nothing else about it; the manifest carries that default
-                beside the description and the type the base wrote, because a
-                consumer reading the child is owed what the field means and the
-                child only changed what it is. Everything the child does say
-                stands: only what it left out is filled. */
-                if let Some(said) = parent.as_object() {
-                    for (key, value) in said {
-                        if key != "name" {
-                            fields.entry(key.clone()).or_insert_with(|| value.clone());
-                        }
-                    }
+            /* **A redeclared member is filled in from the one above it, and
+            laid over it.** A styled component writes `static override tier =
+            'helix-'` and says nothing else about it; the manifest carries that
+            default beside the description and the type the base wrote, because
+            a consumer reading the child is owed what the field means and the
+            child only changed what it is. Everything the child does say
+            stands: only what it left out is filled.
+            *
+            The one above goes first, which is what decides the order rather
+            than the content: an `input` event a checkbox declares and the
+            mixin under it dispatches comes out named before it is typed,
+            because that is how the mixin has it. */
+            let mut merged = (*parent).clone();
+            if let (Some(fields), Some(said)) = (merged.as_object_mut(), entry.as_object()) {
+                for (key, value) in said {
+                    fields.insert(key.clone(), value.clone());
                 }
+            }
+            copy = merged;
+            if let Some(fields) = copy.as_object_mut() {
                 /* **The furthest link wins, because a stamp names where an
                 entry started.** `requestValue` is declared by
                 `MixinPickerEditing` and again by `MixinControllerValue`
@@ -388,7 +399,7 @@ fn joined(mine: Option<&Value>, theirs: Option<&Value>, link: &Link<'_>) -> Opti
 /// element that inherits it has `requestOpen(next: boolean) => boolean`. So a
 /// signature is not copied along with a member, it is written when the member
 /// arrives somewhere that publishes one.
-fn signed(entry: &mut Value) {
+pub fn sign(entry: &mut Value) {
     let Some(fields) = entry.as_object_mut() else {
         return;
     };
@@ -415,9 +426,16 @@ fn signed(entry: &mut Value) {
             } else {
                 ""
             };
-            Some(match one.get("type").and_then(|two| two.get("text")) {
+            let written = match one.get("type").and_then(|two| two.get("text")) {
                 Some(Value::String(text)) => format!("{said}{mark}: {text}"),
                 _ => format!("{said}{mark}"),
+            };
+            /* A default stands in the signature, the same way it does where a
+            method is declared: `markRead(next = true) => boolean` is how a
+            caller would write the call it may leave out. */
+            Some(match one.get("default").and_then(Value::as_str) {
+                Some(value) => format!("{written} = {value}"),
+                None => written,
             })
         })
         .collect();
@@ -492,20 +510,15 @@ pub fn apply(
             ours: mine,
             wrapped,
         };
-        let mut lists: Vec<(&str, Option<Value>)> = vec![(
-            "members",
-            joined(
-                declaration.get("members"),
-                above.get("members"),
-                &link("members"),
-            ),
-        )];
-        for list in INHERITS {
-            lists.push((
-                list,
-                joined(declaration.get(list), above.get(list), &link(list)),
-            ));
-        }
+        let lists: Vec<(&str, Option<Value>)> = INHERITS
+            .into_iter()
+            .map(|list| {
+                (
+                    list,
+                    joined(declaration.get(list), above.get(list), &link(list)),
+                )
+            })
+            .collect();
         let Some(fields) = declaration.as_object_mut() else {
             return;
         };
@@ -520,7 +533,7 @@ pub fn apply(
     }
     if let Some(members) = declaration.get_mut("members").and_then(Value::as_array_mut) {
         for member in members {
-            signed(member);
+            sign(member);
         }
     }
 }

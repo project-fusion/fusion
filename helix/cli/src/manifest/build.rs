@@ -29,9 +29,10 @@ pub use crate::manifest::inherit::Dependencies;
 use crate::manifest::jsdoc::{entry, Documented};
 
 use crate::manifest::inherit;
+use crate::manifest::inherit::INHERITS;
 use crate::manifest::parse;
 use crate::manifest::parse::{
-    declarations, exports, Declared, Exported, Origin, Parameter, Superclass, Written,
+    declarations, exports, Declared, Exported, Origin, Parameter, Readonly, Superclass, Written,
 };
 
 /// Files the analyzer is told to skip, by the suffix that names them.
@@ -127,12 +128,6 @@ fn tagged(documented: &Documented) -> Vec<(&'static str, Value)> {
                 if let Some(written) = one.type_text {
                     said.insert("type".to_owned(), json!({ "text": written }));
                 }
-                /* **The React prop, which is a convention written down.** It is
-                the event name with `on` in front, and recording it makes a
-                mapping inspectable that is otherwise only in a reader's head. */
-                if field == "events" {
-                    said.insert("reactProp".to_owned(), json!(format!("on{}", one.name)));
-                }
                 if let Some(description) = one.description {
                     said.insert("description".to_owned(), json!(description));
                 }
@@ -195,14 +190,260 @@ fn seen(dispatched: &[(String, Option<String>)], declared: Option<&Value>) -> Va
         if name.as_ref().is_some_and(|two| held.contains(two)) {
             continue;
         }
+        /* Named before it is typed, which is the order the pass over the class
+        body reads a dispatch in and the reverse of an `@event` tag's. */
         let mut said = serde_json::Map::new();
-        said.insert("type".to_owned(), json!({ "text": kind }));
         if let Some(name) = name {
             said.insert("name".to_owned(), json!(name));
         }
+        said.insert("type".to_owned(), json!({ "text": kind }));
         events.push(Value::Object(said));
     }
     json!(events)
+}
+
+/// The lists a class was given, in the order the inheritance walk creates
+/// them.
+///
+/// **A key is made where an entry is first added to it, and the walk reaches a
+/// parent's mixins before the parent.** The styled checkbox is given `events`
+/// before `slots` because `MixinControllerChecked`, which the headless
+/// checkbox applies, comes before the headless checkbox itself; reading the
+/// parent's own lists in order instead put `slots` first, which is twenty-five
+/// of styled's classes.
+///
+/// The chain is the analyzer's `getInheritanceTree`: the class, then its own
+/// mixins, then for each step up the superclass chain that class's mixins and
+/// the class. Only the order is taken from it, what each list holds having
+/// been settled already.
+fn chained(finished: &mut [Vec<Value>], deps: &Dependencies) {
+    let mut index: BTreeMap<String, Value> = BTreeMap::new();
+    for manifest in deps.values() {
+        for module in manifest
+            .get("modules")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+        {
+            for one in module
+                .get("declarations")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+            {
+                if let Some(name) = one.get("name").and_then(Value::as_str) {
+                    index.entry(name.to_owned()).or_insert_with(|| one.clone());
+                }
+            }
+        }
+    }
+    for declared in finished.iter() {
+        for one in declared {
+            if let Some(name) = one.get("name").and_then(Value::as_str) {
+                index.entry(name.to_owned()).or_insert_with(|| one.clone());
+            }
+        }
+    }
+
+    for declared in finished.iter_mut() {
+        for one in declared.iter_mut() {
+            let order = creation(one, &index);
+            if let Some(fields) = one.as_object_mut() {
+                regrouped(fields, &order);
+            }
+        }
+    }
+}
+
+/// The names a class inherits from, in the order the walk reaches them.
+fn ancestry(one: &Value, index: &BTreeMap<String, Value>) -> Vec<String> {
+    let names = |at: &Value, key: &str| -> Vec<String> {
+        at.get(key)
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .filter_map(|two| Some(two.get("name")?.as_str()?.to_owned()))
+            .collect()
+    };
+    let mut tree: Vec<String> = names(one, "mixins");
+    let mut at = one.clone();
+    let mut guard = 0;
+    while let Some(above) = at
+        .get("superclass")
+        .and_then(|two| two.get("name"))
+        .and_then(Value::as_str)
+        .and_then(|two| index.get(two))
+        .cloned()
+    {
+        guard += 1;
+        if guard > 32 {
+            break;
+        }
+        tree.extend(names(&at, "mixins"));
+        tree.extend(names(&above, "mixins"));
+        tree.push(
+            above
+                .get("name")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned(),
+        );
+        at = above;
+    }
+    tree
+}
+
+/// The list keys the walk creates, in the order it creates them.
+fn creation(one: &Value, index: &BTreeMap<String, Value>) -> Vec<&'static str> {
+    let mut order: Vec<&'static str> = Vec::new();
+    for name in ancestry(one, index) {
+        let Some(above) = index.get(&name) else {
+            continue;
+        };
+        for list in INHERITS {
+            if above.get(list).is_some() && !order.contains(&list) {
+                order.push(list);
+            }
+        }
+    }
+    order
+}
+
+/// The lists a class was given put in that order, the rest left alone.
+///
+/// A list the class filled itself sits ahead of the heritage and the plugins
+/// and is not touched; one it was given trails them, and those are the ones
+/// this puts in order.
+fn regrouped(fields: &mut serde_json::Map<String, Value>, order: &[&'static str]) {
+    let divides = [
+        "mixins",
+        "superclass",
+        "summary",
+        "helix",
+        "tagName",
+        "customElement",
+    ]
+    .iter()
+    .filter_map(|key| fields.keys().position(|one| one == key))
+    .min();
+    let Some(divides) = divides else {
+        return;
+    };
+    let given: Vec<String> = fields
+        .keys()
+        .enumerate()
+        .filter(|(at, one)| *at > divides && INHERITS.contains(&one.as_str()))
+        .map(|(_, one)| one.clone())
+        .collect();
+    if given.len() < 2 {
+        return;
+    }
+    let mut wanted: Vec<String> = fields
+        .keys()
+        .filter(|one| !given.contains(one))
+        .cloned()
+        .collect();
+    wanted.extend(
+        order
+            .iter()
+            .filter(|list| given.iter().any(|one| one == *list))
+            .map(|list| (*list).to_owned()),
+    );
+    let mut held: Vec<(String, Value)> = std::mem::take(fields).into_iter().collect();
+    for key in wanted {
+        if let Some(at) = held.iter().position(|(name, _)| *name == key) {
+            let (name, value) = held.remove(at);
+            fields.insert(name, value);
+        }
+    }
+    for (name, value) in held {
+        fields.insert(name, value);
+    }
+}
+
+/// The React prop an event answers to, which is a convention written down.
+///
+/// It is the event name with `on` in front, and recording it makes a mapping
+/// inspectable that is otherwise only in a reader's head.
+///
+/// **Written after inheritance, which is where it shows.** An event a mixin
+/// was seen to dispatch reaches a component as a name and a type, gains the
+/// sentence the component's `@event` tag wrote and the stamp saying where it
+/// came from, and only then this: `name, type, description, inheritedFrom,
+/// reactProp`. Written where the tag is read instead, it came third and the
+/// order said the wrong thing about which of them the entry began as.
+///
+/// Only on a component, which is why the two events inferred on mixins in
+/// core carry none.
+fn reacted(finished: &mut [Vec<Value>]) {
+    for declared in finished.iter_mut() {
+        for one in declared.iter_mut() {
+            if one.get("kind").and_then(Value::as_str) != Some("class")
+                || one.get("helix").and_then(|two| two.get("tier")).is_none()
+            {
+                continue;
+            }
+            let Some(events) = one.get_mut("events").and_then(Value::as_array_mut) else {
+                continue;
+            };
+            for event in events {
+                let Some(name) = event.get("name").and_then(Value::as_str) else {
+                    continue;
+                };
+                let prop = json!(format!("on{name}"));
+                if let Some(fields) = event.as_object_mut() {
+                    fields.insert("reactProp".to_owned(), prop);
+                }
+            }
+        }
+    }
+}
+
+/// A public method's signature, written once everything else about it is.
+///
+/// **Last of all, because where it sits says who wrote it.** A method taken
+/// from a class that already had a signature arrives with it, ahead of the
+/// stamp naming where it came from; one taken from a mixin, which has none,
+/// gains it after. Written where the method is read instead, both came out the
+/// same way.
+fn signatures(finished: &mut [Vec<Value>]) {
+    for declared in finished.iter_mut() {
+        for one in declared.iter_mut() {
+            if one.get("customElement").and_then(Value::as_bool) != Some(true) {
+                continue;
+            }
+            let Some(members) = one.get_mut("members").and_then(Value::as_array_mut) else {
+                continue;
+            };
+            for member in members {
+                inherit::sign(member);
+            }
+        }
+    }
+}
+
+/// Where a class lives and where its tag is registered, which are the same
+/// file and are said twice.
+///
+/// The schema has one field for each, and in this library a component's
+/// `@customElement` sits on the class it registers, so both answer the same
+/// thing: the schema's shape rather than a duplication to tidy.
+///
+/// **Written after everything else**, because the analyzer writes them in a
+/// plugin that runs once inheritance has finished, so they trail the lists it
+/// added rather than leading them.
+fn registered(written: &[(String, Vec<Pending>, Vec<Value>)], finished: &mut [Vec<Value>]) {
+    for ((path, _, _), declared) in written.iter().zip(finished.iter_mut()) {
+        for one in declared.iter_mut() {
+            if one.get("tagName").is_none() {
+                continue;
+            }
+            if let Some(fields) = one.as_object_mut() {
+                fields.insert("modulePath".to_owned(), json!(path));
+                fields.insert("definitionPath".to_owned(), json!(path));
+            }
+        }
+    }
 }
 
 /// An event a component publishes is one it declared, and no other.
@@ -225,15 +466,18 @@ fn seen(dispatched: &[(String, Option<String>)], declared: Option<&Value>) -> Va
 fn declared(finished: &mut [Vec<Value>]) {
     for declared in finished.iter_mut() {
         for one in declared.iter_mut() {
+            /* A component is a class descending from `HelixElement`, which is
+            what the tier in its block says. Every class has a block now, so
+            the block alone no longer tells them apart. */
             if one.get("kind").and_then(Value::as_str) != Some("class")
-                || one.get("helix").is_none()
+                || one.get("helix").and_then(|two| two.get("tier")).is_none()
             {
                 continue;
             }
             let Some(events) = one.get("events").and_then(Value::as_array) else {
                 continue;
             };
-            let kept: Vec<Value> = events
+            let mut kept: Vec<Value> = events
                 .iter()
                 .filter(|two| {
                     two.get("description")
@@ -242,6 +486,22 @@ fn declared(finished: &mut [Vec<Value>]) {
                 })
                 .cloned()
                 .collect();
+            /* **The React prop, which is a convention written down.** It is
+            the event name with `on` in front, and recording it makes a mapping
+            inspectable that is otherwise only in a reader's head. Written here
+            rather than where the `@event` tag is read, because the analyzer
+            writes it in a plugin that runs once inheritance has finished: an
+            event a component declares and a mixin below it also dispatches
+            comes out in the mixin's order, with the prop last of all. */
+            for two in &mut kept {
+                let Some(name) = two.get("name").and_then(Value::as_str) else {
+                    continue;
+                };
+                let prop = format!("on{name}");
+                if let Some(said) = two.as_object_mut() {
+                    said.insert("reactProp".to_owned(), json!(prop));
+                }
+            }
             if let Some(fields) = one.as_object_mut() {
                 fields.insert("events".to_owned(), json!(kept));
             }
@@ -637,24 +897,45 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
     let mut at = serde_json::Map::new();
     at.insert("kind".to_owned(), json!(member.kind));
     at.insert("name".to_owned(), json!(member.name));
-    if let Some(description) = member.documented.description {
-        at.insert("description".to_owned(), json!(description));
-    }
-    if let Some(text) = member.type_text {
-        at.insert("type".to_owned(), json!({ "text": text }));
-    }
-    if let Some(default) = member.default {
-        at.insert("default".to_owned(), json!(default));
-    }
-    if member.is_static {
-        at.insert("static".to_owned(), json!(true));
-    }
-    if member.readonly {
-        at.insert("readonly".to_owned(), json!(true));
+    /* A type the field wrote is read with the field; one taken from a constant
+    beside it is written later, by the pass that resolves initializers. */
+    let resolved = member
+        .written
+        .as_ref()
+        .is_some_and(|one| one.type_text.is_none());
+    let text = member.type_text.map(|one| (one, resolved));
+    if let Some((one, false)) = &text {
+        at.insert("type".to_owned(), json!({ "text": one }));
     }
     if let Some(privacy) = member.privacy {
         at.insert("privacy".to_owned(), json!(privacy));
     }
+    if member.is_static {
+        at.insert("static".to_owned(), json!(true));
+    }
+    /* **These four go in the order the analyzer reads them, because that is
+    the order they are written in.** A `readonly` modifier is read with the
+    other modifiers and a getter is called readonly by a later pass; a default
+    the field wrote is read before the description and one assigned in the
+    constructor after it. `order` leaves these where they are put and places
+    what sits around them. */
+    if member.readonly == Readonly::Modifier {
+        at.insert("readonly".to_owned(), json!(true));
+    }
+    let default = member.default.map(|one| (one, member.assigned));
+    if let Some((one, false)) = &default {
+        at.insert("default".to_owned(), json!(one));
+    }
+    if let Some(description) = member.documented.description {
+        at.insert("description".to_owned(), json!(description));
+    }
+    if member.readonly == Readonly::Accessor {
+        at.insert("readonly".to_owned(), json!(true));
+    }
+    if let Some((one, true)) = &default {
+        at.insert("default".to_owned(), json!(one));
+    }
+
     if let Some(returns) = member.returns {
         at.insert("return".to_owned(), json!({ "type": { "text": returns } }));
     }
@@ -672,20 +953,26 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
             Some(json!({ "label": label.trim(), "url": url }))
         })
         .collect();
-    if !references.is_empty() {
-        at.insert("helix".to_owned(), json!({ "references": references }));
-    }
     if let Some(attribute) = &member.attribute {
         at.insert("attribute".to_owned(), json!(attribute));
     }
     if member.reflects {
         at.insert("reflects".to_owned(), json!(true));
     }
+    if !references.is_empty() {
+        at.insert("helix".to_owned(), json!({ "references": references }));
+    }
     if !member.parameters.is_empty() {
         at.insert(
             "parameters".to_owned(),
             json!(parameters(&member.parameters, &member.documented.tags)),
         );
+    }
+
+    /* Last of all, the resolving pass running after everything that reads the
+    field itself, the attribute it declares included. */
+    if let Some((one, true)) = &text {
+        at.insert("type".to_owned(), json!({ "text": one }));
     }
     Value::Object(at)
 }
@@ -777,14 +1064,6 @@ fn declaration_of(
     }
     if let Some(tag) = &one.tag_name {
         fields.insert("tagName".to_owned(), json!(tag));
-        /* **Both the module this is written in, and both said twice.** The
-        schema has one field for where a class lives and another for where its
-        tag is registered, and in this library those are the same file: a
-        component's `@customElement` sits on the class it registers. Two fields
-        with one answer, which is the schema's shape rather than a duplication
-        to tidy. */
-        fields.insert("definitionPath".to_owned(), json!(path));
-        fields.insert("modulePath".to_owned(), json!(path));
     }
     if let Some(summary) = one
         .documented
@@ -795,7 +1074,13 @@ fn declaration_of(
     {
         fields.insert("summary".to_owned(), json!(summary));
     }
-    if let Some(block) = helix(&one.documented, path, tier, one.is_element, package, given) {
+    /* **A class always carries the block, empty where it has nothing to say.**
+    All three hundred and forty-one in the library do and no mixin, function or
+    variable does: a controller with no tier and no group still says `{}`. The
+    comparison could not see this either, an empty object holding no leaf to
+    compare. */
+    let block = helix(&one.documented, path, tier, one.is_element, package, given);
+    if let Some(block) = block.or_else(|| (one.kind == "class").then(|| json!({}))) {
         fields.insert("helix".to_owned(), block);
     }
     for (field, entries) in tagged(&one.documented) {
@@ -862,6 +1147,16 @@ fn declaration_of(
         fields.insert("mixins".to_owned(), json!(wrapped));
     }
     if !one.members.is_empty() {
+        /* **A name the library keeps to itself, dropped where the framework's
+        are.** The analyzer publishes it and a plugin of ours removes it, which
+        is after the list exists: a class whose body holds nothing else still
+        has the key, and it leads rather than trailing what inheritance adds. */
+        let hidden: BTreeSet<String> = one
+            .members
+            .iter()
+            .filter(|two| two.documented.tags.iter().any(|(tag, _)| tag == "internal"))
+            .map(|two| two.name.clone())
+            .collect();
         let written: Vec<Option<Written>> =
             one.members.iter().map(|two| two.written.clone()).collect();
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
@@ -874,20 +1169,26 @@ fn declaration_of(
         let members: Vec<Value> = members
             .into_iter()
             .filter(|one| {
-                !one.get("name")
-                    .and_then(Value::as_str)
-                    .is_some_and(parse::framework)
+                let name = one.get("name").and_then(Value::as_str).unwrap_or_default();
+                !parse::framework(name) && !hidden.contains(name)
             })
             .collect();
-        if !members.is_empty() {
-            fields.insert("members".to_owned(), json!(members));
-        }
+        /* **The list is written even where nothing survived the filter.** The
+        analyzer deletes an empty `members` before that filter runs, not after:
+        a styled class whose body holds only `styles` and `render` still has
+        the key, and it leads rather than trailing what inheritance adds. */
+        fields.insert("members".to_owned(), json!(members));
     }
     let heritage = one
         .heritage
         .iter()
         .map(|link| (link.name.clone(), link.from.clone()))
         .collect();
+    /* **In the analyzer's order, while this function still knows what it
+    wrote.** Every list here is one the class itself filled, which is what
+    decides whether it leads or trails: the inheritance step appends whatever
+    it adds after all of this, and `order` leaves both where they fall. */
+    crate::manifest::order::declaration(&mut fields);
     (Value::Object(fields), heritage)
 }
 
@@ -986,6 +1287,10 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
 
     lend(&written, &mut finished, dependencies);
     declared(&mut finished);
+    chained(&mut finished, dependencies);
+    registered(&written, &mut finished);
+    signatures(&mut finished);
+    reacted(&mut finished);
 
     let modules: Vec<Value> = written
         .into_iter()
@@ -1005,7 +1310,12 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
         .collect();
     /* The version the analyzer writes, which is not the newest one: it is
     pinned to what the tool emits, and the four tiers all say `1.0.0`. */
-    json!({ "schemaVersion": "1.0.0", "readme": "", "modules": modules })
+    let mut said = json!({ "schemaVersion": "1.0.0", "readme": "", "modules": modules });
+    /* The keys go in the analyzer's order last of all, so the builders above
+    can write each field where it reads best and one place holds the sequence
+    the file is actually in. */
+    crate::manifest::order::apply(&mut said);
+    said
 }
 
 /// A module's `exports`, with each declaration's module said the way the

@@ -24,6 +24,7 @@
 pub mod build;
 pub mod inherit;
 pub mod jsdoc;
+pub mod order;
 pub mod parse;
 
 use std::collections::{BTreeMap, BTreeSet};
