@@ -307,6 +307,19 @@ fn imports(program: &oxc_ast::ast::Program<'_>) -> BTreeMap<String, String> {
     found
 }
 
+/// A method's signature as the manifest writes it.
+///
+/// **One place, because it is written from two.** A signature is made where a
+/// method is declared and again where an inherited one lands on an element, and
+/// the two have to agree character for character: when the question mark for an
+/// optional parameter went in, it had to go into both, and the next such change
+/// would have to as well. The parameters arrive already rendered because the
+/// two callers hold different things, a parsed member on one side and a value
+/// read back out of a manifest on the other.
+pub fn signature(name: &str, parameters: &[String], returns: &str) -> String {
+    format!("{name}({}) => {returns}", parameters.join(", "))
+}
+
 /// Whether an initializer is a value to print rather than work to do.
 ///
 /// **A literal, a list or an object.** Those are what a reader wants to see
@@ -328,6 +341,16 @@ fn is_a_value(expression: &Expression<'_>) -> bool {
             | Expression::NullLiteral(_)
             | Expression::ArrayExpression(_)
             | Expression::ObjectExpression(_)
+            /* A thing constructed, a name, and a negative number. Measured on
+               fields, where `new Controller(this)`, `= undefined` and `= -1`
+               all reach the manifest, and applied to variables as well: the
+               analyzer does not distinguish the two and no variable in this
+               library is written with a bare name to say whether it would. One
+               rule until something says otherwise, rather than two that differ
+               where nothing tested them. */
+            | Expression::NewExpression(_)
+            | Expression::Identifier(_)
+            | Expression::UnaryExpression(_)
     )
 }
 
@@ -418,15 +441,7 @@ fn field_of(
         default: property
             .value
             .as_ref()
-            .filter(|one| {
-                is_a_value(one)
-                    || matches!(
-                        one,
-                        Expression::NewExpression(_)
-                            | Expression::Identifier(_)
-                            | Expression::UnaryExpression(_)
-                    )
-            })
+            .filter(|one| is_a_value(one))
             .map(|one| one_line(source, one.span().start, one.span().end))
             .or_else(|| assigned.get(&name).cloned()),
         documented,
@@ -564,11 +579,7 @@ fn method_of(
                 .return_type
                 .as_ref()
                 .map_or_else(|| "void".to_owned(), |one| annotation(one));
-            Some(format!(
-                "{}({}) => {returns}",
-                name_for_type,
-                taken.join(", ")
-            ))
+            Some(signature(&name_for_type, &taken, &returns))
         } else {
             None
         },
@@ -793,15 +804,15 @@ fn variables_of(
                    annotation or, failing that, what the literal is. The
                    same reading a field gets, for the same reason: a value
                    written `0.05` has a type without anyone saying so. */
-                /* **Only a literal is a default here.** `MAX_FRAME_STEP =
-                   0.05` has a value worth printing; `styles =
-                   createSheet(\`…\`)` has a call, and printing it puts a
-                   whole stylesheet into a reference page, which is what it
-                   did for four of sandbox's modules before this. */
+                /* **A value and not a call**, on the same terms a field's
+                   default is held to. `MAX_FRAME_STEP = 0.05` is worth
+                   printing; `styles = createSheet(\`…\`)` is a call, and
+                   printing it put a whole stylesheet into a reference page for
+                   four of sandbox's modules before this. */
                 default: one
                     .init
                     .as_ref()
-                    .filter(|two| is_a_value(two) || matches!(two, Expression::NewExpression(_)))
+                    .filter(|two| is_a_value(two))
                     .map(|two| one_line(source, two.span().start, two.span().end)),
                 type_text: one
                     .type_annotation
