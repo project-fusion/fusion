@@ -29,7 +29,7 @@ pub use crate::manifest::inherit::Dependencies;
 use crate::manifest::jsdoc::{entry, Documented};
 
 use crate::manifest::inherit;
-use crate::manifest::parse::{declarations, Declared, Superclass};
+use crate::manifest::parse::{declarations, exports, Declared, Exported, Origin, Superclass};
 
 /// Files the analyzer is told to skip, by the suffix that names them.
 ///
@@ -632,10 +632,11 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
     until every module has been read. So the first pass writes the declarations
     and the second gives each what its heritage has, with this package's own
     manifest standing among the dependencies by the name nothing imports it by. */
-    let written: Vec<(String, Vec<Pending>)> = sources(package)
+    let written: Vec<(String, Vec<Pending>, Vec<Value>)> = sources(package)
         .into_iter()
         .map(|path| {
             let text = fs::read_to_string(package.join(&path)).unwrap_or_default();
+            let published = published_by(&text, &path);
             let declared = declarations(&text, &path)
                 .into_iter()
                 .map(|one| {
@@ -644,14 +645,14 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
                     (declaration, heritage, is_element)
                 })
                 .collect();
-            (path, declared)
+            (path, declared, published)
         })
         .collect();
 
     let mine = json!({
         "modules": written
             .iter()
-            .map(|(path, declared)| json!({
+            .map(|(path, declared, _)| json!({
                 "declarations": declared.iter().map(|(one, _, _)| one.clone()).collect::<Vec<Value>>(),
                 "path": path,
             }))
@@ -660,7 +661,7 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
 
     let modules: Vec<Value> = written
         .into_iter()
-        .map(|(path, declared)| {
+        .map(|(path, declared, published)| {
             let finished: Vec<Value> = declared
                 .into_iter()
                 .map(|(mut declaration, heritage, is_element)| {
@@ -670,11 +671,55 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
                 .collect();
             json!({
                 "declarations": finished,
-                "exports": [],
+                "exports": published,
                 "kind": "javascript-module",
                 "path": path,
             })
         })
         .collect();
-    json!({ "modules": modules, "readme": "", "schemaVersion": "2.1.0" })
+    /* The version the analyzer writes, which is not the newest one: it is
+    pinned to what the tool emits, and the four tiers all say `1.0.0`. */
+    json!({ "modules": modules, "readme": "", "schemaVersion": "1.0.0" })
+}
+
+/// A module's `exports`, with each declaration's module said the way the
+/// analyzer says it.
+fn published_by(text: &str, path: &str) -> Vec<Value> {
+    exports(text, path)
+        .into_iter()
+        .map(|one| {
+            let Exported {
+                kind,
+                name,
+                declaration,
+                origin,
+            } = one;
+            let mut points = serde_json::Map::new();
+            points.insert("name".to_owned(), json!(declaration));
+            match origin {
+                Origin::Own => {
+                    points.insert("module".to_owned(), json!(path));
+                }
+                /* A specifier that does not start with a dot is a package, and
+                the manifest says so with a different key rather than writing a
+                path that would not resolve. */
+                Origin::Written(from) | Origin::Resolved(from) if !from.starts_with('.') => {
+                    points.insert("package".to_owned(), json!(from));
+                }
+                Origin::Written(from) => {
+                    points.insert("module".to_owned(), json!(from));
+                }
+                /* Resolved and then unrooted. A superclass's module is
+                written with a leading slash and an export's is not, which is
+                the analyzer's inconsistency rather than a choice here. */
+                Origin::Resolved(from) => {
+                    let at = beside(path, &from)
+                        .map(|one| one.trim_start_matches('/').to_owned())
+                        .unwrap_or(from);
+                    points.insert("module".to_owned(), json!(at));
+                }
+            }
+            json!({ "kind": kind, "name": name, "declaration": points })
+        })
+        .collect()
 }

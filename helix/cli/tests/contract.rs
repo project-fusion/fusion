@@ -1816,3 +1816,85 @@ fn a_literal_says_its_own_type_and_a_template_says_none() {
     assert!(shader.get("type").is_none(), "no type: {shader}");
     assert_eq!(shader["default"], "`#version 300 es void main() {}`");
 }
+
+/// What a module publishes, which is five rules and one of them a quirk.
+///
+/// Measured over the four tiers: sixteen hundred entries, all but one of which
+/// these rules account for.
+#[test]
+fn a_module_publishes_its_statements_in_the_order_it_writes_them() {
+    let sandbox = Sandbox::new("manifest-exports", None);
+    let src = sandbox.0.join("src/badge");
+    std::fs::create_dir_all(src.join("root")).expect("a source tree");
+    std::fs::write(
+        src.join("index.ts"),
+        "export * from './root/badge-root.js'\n\
+         export * from '@fusion.dev/helix-core'\n\
+         export { hue, type Tone } from './root/badge-root.js'\n",
+    )
+    .expect("an index");
+    std::fs::write(
+        src.join("root/badge-root.ts"),
+        "const hue = 'plum'\n\
+         export type Tone = 'plain'\n\
+         export interface Options { at: number }\n\
+         @customElement('helix-badge')\n\
+         export class HelixBadge extends HelixElement {}\n\
+         export { hue }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let of = |path: &str| {
+        parsed["modules"]
+            .as_array()
+            .expect("the modules")
+            .iter()
+            .find(|one| one["path"] == path)
+            .unwrap_or_else(|| panic!("{path} is a module: {said}"))["exports"]
+            .clone()
+    };
+
+    /* A star re-export resolves its specifier against this module and drops the
+    leading slash a superclass's module keeps; a bare package is said as one;
+    and a named re-export keeps the specifier exactly as written. */
+    let index = of("src/badge/index.ts");
+    assert_eq!(
+        index[0]["declaration"]["module"],
+        "src/badge/root/badge-root.js"
+    );
+    assert_eq!(index[1]["declaration"]["package"], "@fusion.dev/helix-core");
+    assert_eq!(index[2]["name"], "hue");
+    assert_eq!(index[2]["declaration"]["module"], "./root/badge-root.js");
+    /* A type in a clause is published; a type declaration is not. */
+    assert_eq!(index[3]["name"], "Tone");
+    assert_eq!(index.as_array().expect("the exports").len(), 4);
+
+    /* The class, then the tag it registers, then the clause at the foot of the
+    file: statements in the order they are written, so the name declared first
+    is published last. */
+    let root = of("src/badge/root/badge-root.ts");
+    let said_by: Vec<(&str, &str)> = root
+        .as_array()
+        .expect("the exports")
+        .iter()
+        .map(|one| {
+            (
+                one["kind"].as_str().unwrap_or_default(),
+                one["name"].as_str().unwrap_or_default(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        said_by,
+        vec![
+            ("js", "HelixBadge"),
+            ("custom-element-definition", "helix-badge"),
+            ("js", "hue"),
+        ],
+        "in statement order: {said}"
+    );
+}
