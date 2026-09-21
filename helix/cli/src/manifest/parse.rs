@@ -1100,6 +1100,8 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
 
     let imported = imports(&parsed.program);
     let mut found = Vec::new();
+    /* Declarations this module keeps to itself, read for their values alone. */
+    let mut beside: Vec<Declared> = Vec::new();
     for statement in &parsed.program.body {
         match statement {
             Statement::ExportNamedDeclaration(export) => {
@@ -1112,23 +1114,27 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
                 }
             }
             /* A declaration standing on its own, kept only where something
-            below exports it by name. */
+            below exports it by name. The ones nothing exports are still read,
+            because a field may be initialized from one: `const STILL_PHASE =
+            1.4` is nobody's API and is `phase`'s default all the same. */
             other => {
                 if let Some(declaration) = other.as_declaration() {
-                    found.extend(
-                        carrying(
-                            named(declaration, source, &docs, &imported),
-                            &docs,
-                            &anchors(statement, Some(declaration)),
-                        )
-                        .into_iter()
-                        .filter(|one| exported.contains(&one.name)),
-                    );
+                    for one in carrying(
+                        named(declaration, source, &docs, &imported),
+                        &docs,
+                        &anchors(statement, Some(declaration)),
+                    ) {
+                        if exported.contains(&one.name) {
+                            found.push(one);
+                        } else {
+                            beside.push(one);
+                        }
+                    }
                 }
             }
         }
     }
-    resolve(&mut found);
+    resolve(&mut found, &beside);
     found
 }
 
@@ -1142,9 +1148,10 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
 ///
 /// Only a constant in the same module, which is as far as a parser can see.
 /// The type follows the value, and only where the field wrote none of its own.
-fn resolve(found: &mut [Declared]) {
+fn resolve(found: &mut [Declared], beside: &[Declared]) {
     let known: BTreeMap<String, (Option<String>, Option<String>)> = found
         .iter()
+        .chain(beside)
         .filter(|one| one.kind == "variable")
         .map(|one| {
             (
