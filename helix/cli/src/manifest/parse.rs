@@ -44,6 +44,8 @@ pub struct Declared {
     pub returns: Option<String>,
     /// The annotation on a variable, which the manifest carries as written.
     pub type_text: Option<String>,
+    /// A variable's value, which is its default.
+    pub default: Option<String>,
     /// The tag it registers, where it registers one.
     ///
     /// **What makes a class a component.** Several of the library's plugins ask
@@ -266,6 +268,30 @@ fn imports(program: &oxc_ast::ast::Program<'_>) -> BTreeMap<String, String> {
     found
 }
 
+/// Whether an initializer is a value to print rather than work to do.
+///
+/// **A literal, a list or an object.** Those are what a reader wants to see
+/// beside a name, and the analyzer records them. A call is not: `styles =
+/// createSheet(…)` printed its whole stylesheet into the manifest before this,
+/// and `HighlightStyle.define([…])` printed eighty lines of theme.
+///
+/// Measured across the four tiers: 11 literals, 4 arrays and 3 objects carry a
+/// default, against 155 variables that carry none. Two do not fit, one call and
+/// one `new`, and they stay unfitted rather than have the rule bent to reach
+/// them.
+fn is_a_value(expression: &Expression<'_>) -> bool {
+    matches!(
+        expression,
+        Expression::StringLiteral(_)
+            | Expression::TemplateLiteral(_)
+            | Expression::NumericLiteral(_)
+            | Expression::BooleanLiteral(_)
+            | Expression::NullLiteral(_)
+            | Expression::ArrayExpression(_)
+            | Expression::ObjectExpression(_)
+    )
+}
+
 /// What a constructor assigns to each field it fills.
 ///
 /// **A field declared without a value still has one.** `private readonly host:
@@ -300,6 +326,19 @@ fn assigned(class: &Class<'_>, source: &str) -> BTreeMap<String, String> {
             let Some(field) = target.static_property_name() else {
                 continue;
             };
+            /* **A name or a thing constructed, and nothing else.** `this.host
+            = host` records `host`, the parameter a reader sees in the
+            signature above, and `this.dismisser = new DismissController(…)`
+            records what was built. `this.target = options.target` and
+            `this.internals = this.attachInternals()` are work rather than
+            values, and the analyzer records neither: reaching into an
+            argument and calling a method are steps, not defaults. */
+            if !matches!(
+                assignment.right,
+                Expression::Identifier(_) | Expression::NewExpression(_)
+            ) {
+                continue;
+            }
             found.insert(
                 field.to_string(),
                 one_line(
@@ -575,6 +614,84 @@ fn attribute_of(
     (None, false)
 }
 
+/// The declarations one `const`, `let` or `var` statement makes.
+///
+/// One statement, several names: `export const a = 1, b = 2` is two entries in
+/// the manifest and one node here.
+fn variables_of(variable: &oxc_ast::ast::VariableDeclaration<'_>, source: &str) -> Vec<Declared> {
+    variable
+        .declarations
+        .iter()
+        .filter_map(|one| {
+            let id = one.id.get_binding_identifier()?;
+            /* **A const holding an arrow is a function.** `export const
+            highlight = (code: string) => …` is called like one and the
+            manifest says so, with its parameters and its return: how it
+            was bound is the author's business rather than the
+            consumer's. */
+            let arrow = match one.init.as_ref() {
+                Some(Expression::ArrowFunctionExpression(arrow)) => Some(arrow),
+                _ => None,
+            };
+            Some(Declared {
+                heritage: Vec::new(),
+                kind: if arrow.is_some() {
+                    "function"
+                } else {
+                    "variable"
+                },
+                tag_name: None,
+                name: id.name.to_string(),
+                parameters: arrow.map_or_else(Vec::new, |two| parameters_of_arrow(two, source)),
+                returns: arrow.map(|two| {
+                    two.return_type.as_ref().map_or_else(
+                        || "void".to_owned(),
+                        |three| {
+                            slice(
+                                source,
+                                three.type_annotation.span().start,
+                                three.type_annotation.span().end,
+                            )
+                        },
+                    )
+                }),
+                /* A const's value is its default, and its type is the
+                   annotation or, failing that, what the literal is. The
+                   same reading a field gets, for the same reason: a value
+                   written `0.05` has a type without anyone saying so. */
+                /* **Only a literal is a default here.** `MAX_FRAME_STEP =
+                   0.05` has a value worth printing; `styles =
+                   createSheet(\`…\`)` has a call, and printing it puts a
+                   whole stylesheet into a reference page, which is what it
+                   did for four of sandbox's modules before this. */
+                default: one
+                    .init
+                    .as_ref()
+                    .filter(|two| is_a_value(two))
+                    .map(|two| one_line(source, two.span().start, two.span().end)),
+                type_text: one
+                    .type_annotation
+                    .as_ref()
+                    .map(|two| {
+                        slice(
+                            source,
+                            two.type_annotation.span().start,
+                            two.type_annotation.span().end,
+                        )
+                    })
+                    .or_else(|| {
+                        if arrow.is_some() {
+                            None
+                        } else {
+                            one.init.as_ref().and_then(inferred).map(ToOwned::to_owned)
+                        }
+                    }),
+                ..Declared::default()
+            })
+        })
+        .collect()
+}
+
 /// Members the framework owns, which the analyzer drops and this drops with it.
 ///
 /// **Measured by name, because the rule is by name.** An earlier reading of
@@ -617,6 +734,7 @@ fn named(
             .id
             .as_ref()
             .map(|id| Declared {
+                default: None,
                 documented: Documented::default(),
                 kind: "class",
                 parameters: Vec::new(),
@@ -643,6 +761,7 @@ fn named(
             .id
             .as_ref()
             .map(|id| Declared {
+                default: None,
                 heritage: Vec::new(),
                 kind: "function",
                 parameters: parameters_of(function, source),
@@ -665,53 +784,7 @@ fn named(
             .collect(),
         /* One statement, several declarations: `export const a = 1, b = 2` is
         two entries in the manifest and one node here. */
-        Declaration::VariableDeclaration(variable) => variable
-            .declarations
-            .iter()
-            .filter_map(|one| {
-                let id = one.id.get_binding_identifier()?;
-                /* **A const holding an arrow is a function.** `export const
-                highlight = (code: string) => …` is called like one and the
-                manifest says so, with its parameters and its return: how it
-                was bound is the author's business rather than the
-                consumer's. */
-                let arrow = match one.init.as_ref() {
-                    Some(Expression::ArrowFunctionExpression(arrow)) => Some(arrow),
-                    _ => None,
-                };
-                Some(Declared {
-                    heritage: Vec::new(),
-                    kind: if arrow.is_some() {
-                        "function"
-                    } else {
-                        "variable"
-                    },
-                    tag_name: None,
-                    name: id.name.to_string(),
-                    parameters: arrow.map_or_else(Vec::new, |two| parameters_of_arrow(two, source)),
-                    returns: arrow.map(|two| {
-                        two.return_type.as_ref().map_or_else(
-                            || "void".to_owned(),
-                            |three| {
-                                slice(
-                                    source,
-                                    three.type_annotation.span().start,
-                                    three.type_annotation.span().end,
-                                )
-                            },
-                        )
-                    }),
-                    type_text: one.type_annotation.as_ref().map(|two| {
-                        slice(
-                            source,
-                            two.type_annotation.span().start,
-                            two.type_annotation.span().end,
-                        )
-                    }),
-                    ..Declared::default()
-                })
-            })
-            .collect(),
+        Declaration::VariableDeclaration(variable) => variables_of(variable, source),
         /* A type alias and an interface declare nothing at runtime, and the
         manifest is a description of what a consumer can reach through the
         platform. The analyzer emits neither, and neither does this. */

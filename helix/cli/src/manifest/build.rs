@@ -492,6 +492,9 @@ fn declaration_of(
     if let Some(text) = &one.type_text {
         fields.insert("type".to_owned(), json!({ "text": text }));
     }
+    if let Some(default) = &one.default {
+        fields.insert("default".to_owned(), json!(default));
+    }
     if let Some(returns) = &one.returns {
         fields.insert("return".to_owned(), json!({ "type": { "text": returns } }));
     }
