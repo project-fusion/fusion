@@ -726,7 +726,16 @@ fn declaration_of(
     for (field, entries) in tagged(&one.documented) {
         fields.insert(field.to_owned(), entries);
     }
-    if let Some(description) = one.documented.description {
+    /* **A class always says something, even when it says nothing.** A function
+    or a variable with no prose carries no `description` at all, and a class or
+    a mixin carries an empty one: `HelixStep`'s block opens straight at
+    `@summary` and `MixinControlSurface` has no block, the one above it
+    belonging to the interface beside it, and both publish `""`. */
+    let said = one
+        .documented
+        .description
+        .or_else(|| matches!(one.kind, "class" | "mixin").then(String::new));
+    if let Some(description) = said {
         fields.insert("description".to_owned(), json!(description));
     }
     if let Some(text) = &one.type_text {
