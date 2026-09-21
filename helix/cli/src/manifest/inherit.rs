@@ -82,18 +82,73 @@ fn package_of(specifier: &str) -> String {
 ///
 /// The stamp itself is kept, because it is already the origin's.
 ///
-/// **Seven of twenty-seven go the other way and this does not explain them.**
-/// `HelixCopyButton`'s `label` keeps the headless copy button's `'Copy'` where
-/// this gives it the button's `''`, and the sharpest case is a pair: the
-/// styled date input and the styled date picker both inherit `requestValue`
-/// from parents whose entries are identical, from the same origin, and the
-/// analyzer gives one the parent's words and the other the origin's. Three
-/// discriminators were measured and none held. Twenty right and seven wrong is
-/// where this stands; the reverse rule was seven right and twenty wrong.
-fn at_origin(entry: &Value, list: &str, deps: &Dependencies, mine: &Value) -> Value {
+/// All twenty-four entries in the library whose parent and origin disagree
+/// read correctly this way. Three earlier attempts read seven, twenty and
+/// twenty-two of them: the pair that settled it was the styled date input and
+/// the styled date picker, which inherit `requestValue` from parents whose
+/// entries are identical, from the same origin, and which the analyzer
+/// resolves differently. What tells them apart is the parent's own mixins.
+fn at_origin(entry: &Value, link: &Link<'_>) -> Value {
+    let Link {
+        declaration: above,
+        list,
+        deps,
+        ours: mine,
+        wrapped,
+        ..
+    } = *link;
+    /* **A mixin of the child's puts the class above it back in the chain.**
+    The styled copy button extends `MixinControlSurface(HelixHeadlessCopyButton)`
+    and takes the headless copy button's own `'Copy'` for `label`, where a
+    child extending its parent outright reads past the parent's own words to
+    whatever gave them to it. Two entries in the library reach a child this
+    way and both take the parent's. */
+    if wrapped {
+        return entry.clone();
+    }
     let Some(stamp) = entry.get("inheritedFrom") else {
         return entry.clone();
     };
+    /* **The nearest of the parent's mixins that names it, not the furthest.**
+    The stamp says where an entry started and the words are whoever last wrote
+    them: `requestValue` is declared by `MixinControllerValue` and again by
+    `MixinPickerEditing` above it, the date input's stamp says the first and
+    its sentence is the second's. Twenty-four entries in the library have a
+    parent and an origin that disagree and this reads all of them. */
+    let wanted = entry
+        .get("name")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    let nearest = above
+        .get("mixins")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|one| one.get("name")?.as_str())
+        .find_map(|name| {
+            let found = deps
+                .values()
+                .chain(std::iter::once(mine))
+                .find_map(|manifest| named_in(manifest, name))?;
+            found
+                .get(list)?
+                .as_array()?
+                .iter()
+                .find(|two| two.get("name").and_then(Value::as_str) == Some(wanted))
+                .cloned()
+        });
+    if let Some(found) = nearest {
+        let mut copy = found;
+        if let Some(fields) = copy.as_object_mut() {
+            if let Some(said) = entry.as_object() {
+                for (key, value) in said {
+                    fields.entry(key.clone()).or_insert_with(|| value.clone());
+                }
+            }
+            fields.insert("inheritedFrom".to_owned(), stamp.clone());
+        }
+        return copy;
+    }
     let (Some(module), Some(name)) = (
         stamp.get("module").and_then(Value::as_str),
         stamp.get("name").and_then(Value::as_str),
@@ -135,6 +190,17 @@ fn at_origin(entry: &Value, list: &str, deps: &Dependencies, mine: &Value) -> Va
         return copy;
     }
     entry.clone()
+}
+
+/// The declaration of that name, wherever in the manifest it sits.
+fn named_in<'a>(manifest: &'a Value, name: &str) -> Option<&'a Value> {
+    manifest
+        .get("modules")?
+        .as_array()?
+        .iter()
+        .filter_map(|one| one.get("declarations").and_then(Value::as_array))
+        .flatten()
+        .find(|one| one.get("name").and_then(Value::as_str) == Some(name))
 }
 
 /// The declaration of that name in that module, where the manifest holds one.
@@ -189,15 +255,30 @@ fn find<'a>(manifest: &'a Value, name: &str) -> Option<(&'a Value, String)> {
 /// the manifest marks the styled one `HelixElement`: the parent was given it
 /// too, so the parent is not the answer. An entry the parent owns names the
 /// parent; an entry the parent inherited names whatever the parent named.
-fn joined(
-    mine: Option<&Value>,
-    theirs: Option<&Value>,
-    above: &Value,
-    from: &Value,
-    list: &str,
-    deps: &Dependencies,
-    ours: &Value,
-) -> Option<Value> {
+/// What one link of a chain is, for the sake of joining its lists in.
+struct Link<'a> {
+    /// The declaration the link names.
+    declaration: &'a Value,
+    /// The stamp an entry of its own earns.
+    from: &'a Value,
+    /// Which list is being joined, the same one on both sides.
+    list: &'a str,
+    deps: &'a Dependencies,
+    /// This package's own manifest, which is a dependency to its own classes.
+    ours: &'a Value,
+    /// Whether a mixin of the child's stands between it and this link.
+    wrapped: bool,
+}
+
+fn joined(mine: Option<&Value>, theirs: Option<&Value>, link: &Link<'_>) -> Option<Value> {
+    let Link {
+        declaration: above,
+        from,
+        list,
+        deps,
+        ours,
+        ..
+    } = *link;
     let theirs: Vec<Value> = theirs
         .and_then(Value::as_array)
         .into_iter()
@@ -209,7 +290,7 @@ fn joined(
         consumer can reach. A name that is present and empty is different and
         stays, the default slot being written that way. */
         .filter(|one| one.get("name").is_some())
-        .map(|one| at_origin(one, list, deps, ours))
+        .map(|one| at_origin(one, link))
         .collect();
     /* The parent's entries by name, for filling in a member the child
     redeclared and for saying where each came from. */
@@ -387,6 +468,10 @@ pub fn apply(
     mine: &Value,
     is_element: bool,
 ) {
+    /* A mixin of the child's stands between it and everything below, which
+    changes how an entry reaching it is read. The base class is the last link
+    and anything before it is a mixin this class applied. */
+    let wrapped = heritage.len() > 1;
     for (name, specifier) in heritage {
         /* **A relative import, or none at all, is this package's own.** Both
         resolve against the manifest the first pass wrote, which holds every
@@ -426,30 +511,26 @@ pub fn apply(
         }
         let from = json!({ "module": module, "name": name });
 
+        let link = |list: &'static str| Link {
+            declaration: above,
+            from: &from,
+            list,
+            deps,
+            ours: mine,
+            wrapped,
+        };
         let mut lists: Vec<(&str, Option<Value>)> = vec![(
             "members",
             joined(
                 declaration.get("members"),
                 above.get("members"),
-                above,
-                &from,
-                "members",
-                deps,
-                mine,
+                &link("members"),
             ),
         )];
         for list in INHERITS {
             lists.push((
                 list,
-                joined(
-                    declaration.get(list),
-                    above.get(list),
-                    above,
-                    &from,
-                    list,
-                    deps,
-                    mine,
-                ),
+                joined(declaration.get(list), above.get(list), &link(list)),
             ));
         }
         let Some(fields) = declaration.as_object_mut() else {

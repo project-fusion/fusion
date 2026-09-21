@@ -2304,3 +2304,90 @@ fn a_stamp_names_the_furthest_link_and_a_nameless_entry_stays_put() {
     anything a consumer can reach, and it does not come down. */
     assert!(field.get("events").is_none(), "no events: {said}");
 }
+
+/// Which of a chain's links an inherited entry takes its words from.
+///
+/// Two rules, and between them they read all twenty-four entries in the
+/// library whose parent and origin disagree. Three earlier attempts read
+/// seven, twenty and twenty-two.
+#[test]
+fn an_inherited_entry_takes_the_words_of_the_nearest_link_that_wrote_them() {
+    let sandbox = Sandbox::new("manifest-nearest", None);
+    let src = sandbox.0.join("src");
+    std::fs::create_dir_all(src.join("input")).expect("a source tree");
+    std::fs::create_dir_all(src.join("copy")).expect("a source tree");
+    std::fs::write(
+        src.join("input/input.ts"),
+        "import { HelixHeadlessInput } from '@fusion.dev/helix-headless/input'\n\
+         export class HelixInput extends HelixHeadlessInput {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        src.join("copy/copy.ts"),
+        "import { MixinSurface } from '@fusion.dev/helix-core'\n\
+         import { HelixHeadlessCopy } from '@fusion.dev/helix-headless/copy'\n\
+         export class HelixCopy extends MixinSurface(HelixHeadlessCopy) {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        sandbox.0.join("core.json"),
+        r#"{"modules":[
+          {"path":"src/mixins/near.ts","declarations":[
+            {"name":"MixinNear","members":[{"name":"requestValue","description":"The near one."}]}]},
+          {"path":"src/mixins/far.ts","declarations":[
+            {"name":"MixinFar","members":[{"name":"requestValue","description":"The far one."}]}]},
+          {"path":"src/mixins/surface.ts","declarations":[{"name":"MixinSurface","members":[]}]}]}"#,
+    )
+    .expect("a manifest");
+    std::fs::write(
+        sandbox.0.join("headless.json"),
+        r#"{"modules":[
+          {"path":"src/input/input.ts","declarations":[
+            {"name":"HelixHeadlessInput",
+             "mixins":[{"name":"MixinNear"},{"name":"MixinFar"}],
+             "members":[{"name":"requestValue","description":"The parent's own.",
+               "inheritedFrom":{"name":"MixinFar","module":"src/mixins/far.ts"}}]}]},
+          {"path":"src/copy/copy.ts","declarations":[
+            {"name":"HelixHeadlessCopy","mixins":[],
+             "members":[{"name":"label","description":"The parent's own.",
+               "inheritedFrom":{"name":"MixinFar","module":"src/mixins/far.ts"}}]}]}]}"#,
+    )
+    .expect("a manifest");
+
+    let output = run(
+        &sandbox.0,
+        &[
+            "manifest",
+            "build",
+            ".",
+            "--dependency",
+            "@fusion.dev/helix-core=core.json",
+            "--dependency",
+            "@fusion.dev/helix-headless=headless.json",
+        ],
+    );
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let of = |name: &str| {
+        parsed["modules"]
+            .as_array()
+            .expect("the modules")
+            .iter()
+            .flat_map(|one| one["declarations"].as_array().expect("the declarations"))
+            .find(|one| one["name"] == name)
+            .unwrap_or_else(|| panic!("{name} is declared: {said}"))
+            .clone()
+    };
+
+    /* Extending outright reads past the parent's own words to whoever wrote
+    them, and takes the nearest of the parent's mixins that did: the stamp
+    says where the entry started and the words are the last to be written. */
+    let input = of("HelixInput")["members"][0].clone();
+    assert_eq!(input["description"], "The near one.");
+    assert_eq!(input["inheritedFrom"]["name"], "MixinFar");
+    /* A mixin of the child's puts the parent back in the chain, so the
+    parent's own words stand. */
+    let copy = of("HelixCopy")["members"][0].clone();
+    assert_eq!(copy["description"], "The parent's own.");
+}
