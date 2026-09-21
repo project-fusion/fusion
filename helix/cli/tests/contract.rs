@@ -2039,3 +2039,80 @@ fn a_member_marked_internal_is_not_published() {
     assert!(said.contains("\"disabled\""), "the public one: {said}");
     assert!(!said.contains("isDisabled"), "the internal one: {said}");
 }
+
+/// A field initialized from a constant beside it, and the attribute that
+/// mirrors it, which do not say the same thing.
+#[test]
+fn a_constant_is_resolved_for_the_field_and_not_for_the_attribute() {
+    let sandbox = Sandbox::new("manifest-constants", None);
+    let src = sandbox.0.join("src/chat");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("message.ts"),
+        "export const FAILED_LABEL = 'Not sent'\n\
+         @customElement('helix-message')\n\
+         export class HelixMessage extends HelixElement {\n\
+         \x20 @property({ attribute: 'failed-label' })\n\
+         \x20 failedLabel = FAILED_LABEL\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let class = parsed["modules"][0]["declarations"]
+        .as_array()
+        .expect("the declarations")
+        .iter()
+        .find(|one| one["name"] == "HelixMessage")
+        .expect("the class")
+        .clone();
+
+    /* The field publishes the value, and its type follows from it: a reader of
+    the reference page learns nothing from the name of a constant. */
+    assert_eq!(class["members"][0]["default"], "'Not sent'");
+    assert_eq!(class["members"][0]["type"]["text"], "string");
+    /* The attribute is generated from the field as written, and says the name.
+    It has no type either, the field's having come from the constant. */
+    assert_eq!(class["attributes"][0]["default"], "FAILED_LABEL");
+    assert!(
+        class["attributes"][0].get("type").is_none(),
+        "no type: {said}"
+    );
+}
+
+/// `@summary` keeps the line breaks the author wrote, as `@description` does.
+#[test]
+fn a_summary_keeps_the_wrap_the_author_wrote() {
+    let sandbox = Sandbox::new("manifest-summary", None);
+    let src = sandbox.0.join("src/list");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("list.ts"),
+        "/**\n\
+         \x20* @summary Labels and their values, read as pairs: the details panel every\n\
+         \x20* product has.\n\
+         \x20*\n\
+         \x20* @csspart mark - One part, whose sentence runs past the margin and\n\
+         \x20* continues here.\n\
+         \x20*/\n\
+         export class HelixList extends HelixElement {}\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let parsed: serde_json::Value = serde_json::from_str(&out(&output)).expect("a manifest");
+    let class = parsed["modules"][0]["declarations"][0].clone();
+    assert_eq!(
+        class["summary"],
+        "Labels and their values, read as pairs: the details panel every\nproduct has."
+    );
+    /* Every other tag is one sentence, and the wrap is the file's width. */
+    assert_eq!(
+        class["cssParts"][0]["description"],
+        "One part, whose sentence runs past the margin and continues here."
+    );
+}

@@ -30,7 +30,7 @@ use crate::manifest::jsdoc::{entry, Documented};
 
 use crate::manifest::inherit;
 use crate::manifest::parse::{
-    declarations, exports, Declared, Exported, Origin, Parameter, Superclass,
+    declarations, exports, Declared, Exported, Origin, Parameter, Superclass, Written,
 };
 
 /// Files the analyzer is told to skip, by the suffix that names them.
@@ -487,16 +487,26 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
 /// disagreeing. `fieldName` is the join: the attribute says which field it
 /// writes to, because the two names differ whenever a camel-cased field takes
 /// a kebab-cased attribute.
-fn attributes_of(members: &[Value]) -> Vec<Value> {
+fn attributes_of(members: &[Value], written: &[Option<Written>]) -> Vec<Value> {
     members
         .iter()
-        .filter_map(|member| {
+        .zip(written)
+        .filter_map(|(member, written)| {
             let name = member.get("attribute")?.as_str()?;
             let mut said = serde_json::Map::new();
             said.insert("name".to_owned(), json!(name));
             for carried in ["type", "default", "description"] {
-                if let Some(value) = member.get(carried) {
-                    said.insert(carried.to_owned(), value.clone());
+                /* **The attribute says what the field wrote.** Where a
+                constant was resolved for the field, the attribute keeps the
+                constant's name, and has no type where the field's type came
+                from the constant as well. */
+                let value = match (carried, written) {
+                    ("default", Some(one)) => one.default.as_ref().map(|two| json!(two)),
+                    ("type", Some(one)) => one.type_text.as_ref().map(|two| json!({ "text": two })),
+                    _ => member.get(carried).cloned(),
+                };
+                if let Some(value) = value {
+                    said.insert(carried.to_owned(), value);
                 }
             }
             said.insert(
@@ -616,8 +626,10 @@ fn declaration_of(
         fields.insert("mixins".to_owned(), json!(wrapped));
     }
     if !one.members.is_empty() {
+        let written: Vec<Option<Written>> =
+            one.members.iter().map(|two| two.written.clone()).collect();
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
-        let attributes = attributes_of(&members);
+        let attributes = attributes_of(&members, &written);
         if !attributes.is_empty() {
             fields.insert("attributes".to_owned(), json!(attributes));
         }
