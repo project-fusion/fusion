@@ -1419,6 +1419,10 @@ fn a_mixin_publishes_the_class_it_makes() {
 }
 
 /// What an example says about itself, which is three directives and no more.
+///
+/// Read wherever they sit in the file and joined where they wrap, both of
+/// which the library does and neither of which reading the opening lines
+/// alone could see.
 #[test]
 fn an_example_opens_with_what_it_needs_said() {
     let sandbox = Sandbox::new("manifest-directives", None);
@@ -1434,7 +1438,9 @@ fn an_example_opens_with_what_it_needs_said() {
     .expect("a source");
     std::fs::write(
         shown.join("preview.html"),
-        "<!-- @summary A month of visits. -->\n\
+        "<link\n  href=\"styles.css\"\n  rel=\"stylesheet\"\n>\n\
+         <!-- @summary A month of visits, which is a sentence\n\
+         \x20    that wrapped. -->\n\
          <!-- @min 300 -->\n\
          <!-- @layout fullscreen -->\n\
          <helix-chart></helix-chart>\n\
@@ -1446,14 +1452,20 @@ fn an_example_opens_with_what_it_needs_said() {
     assert_eq!(code(&output), 0);
     let said = out(&output);
 
-    assert!(said.contains("A month of visits."), "{said}");
+    /* The directive sits under the stylesheet and its sentence wrapped; the
+    manifest has one sentence, the breaks being the file's width. */
+    assert!(
+        said.contains("A month of visits, which is a sentence that wrapped."),
+        "{said}"
+    );
     /* A height is a number in the manifest and a word in the markup. */
     assert!(said.contains("\"min\": 300"), "read as a number: {said}");
     assert!(said.contains("\"layout\": \"fullscreen\""), "{said}");
-    /* Reading stops at the first line that is not a directive, so a comment
-    further down is markup a consumer wrote rather than something about the
-    example: the second `@min` is not read. */
-    assert!(!said.contains("999"), "only the opening lines: {said}");
+    /* A directive is read wherever it sits, because two of the slider's
+    examples open with the stylesheet they need and write theirs under it. The
+    first of a name wins, so a second `@min` further down is markup a consumer
+    wrote rather than a second answer. */
+    assert!(!said.contains("999"), "the first of a name: {said}");
 }
 
 /// A class may extend one in its own package, which takes two passes.
