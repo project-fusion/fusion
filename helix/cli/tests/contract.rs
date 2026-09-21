@@ -1048,9 +1048,25 @@ fn a_class_takes_what_its_base_has() {
     assert!(said.contains("HelixHeadlessBadge"), "the parent: {said}");
     /* `tone` is the child's alone and stays unmarked, which is what makes the
     stamp mean anything. */
-    let at = said.find("\"tone\"").expect("tone is declared");
-    let after = &said[at..at + 200.min(said.len() - at)];
-    assert!(!after.contains("inheritedFrom"), "the child's own: {after}");
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let tone = parsed["modules"][0]["declarations"][0]["members"]
+        .as_array()
+        .expect("the members")
+        .iter()
+        .find(|one| one["name"] == "tone")
+        .expect("tone is declared");
+    assert!(
+        tone.get("inheritedFrom").is_none(),
+        "the child's own: {tone}"
+    );
+    /* And it is first, which is the ordering rule: a class's own before
+    anything it was given. The assertion that stood here read a fixed two
+    hundred bytes after the name instead, which ran past the entry into the
+    member below it and so depended on where in the list `tone` fell. */
+    let members = parsed["modules"][0]["declarations"][0]["members"]
+        .as_array()
+        .expect("the members");
+    assert_eq!(members[0]["name"], "tone", "the child's own first: {said}");
 }
 
 /// A mixin is a link in the chain, not a wrapper to see past.
@@ -1750,4 +1766,53 @@ fn a_type_assertion_is_not_part_of_the_value() {
     assert!(said.contains("['native', 'light']"), "the list: {said}");
     assert!(!said.contains("as const"), "not the assertion: {said}");
     assert!(said.contains("\"default\": \"5\""), "nor any other: {said}");
+}
+
+/// What a literal initializer says its own type is, in the three shapes that
+/// are not a scalar.
+///
+/// All three were found by diffing, and all three read oddly enough that only
+/// measurement would have settled them: a list is its own type spelled out, an
+/// object is `object` however many fields it has, and a template literal is
+/// nothing at all.
+#[test]
+fn a_literal_says_its_own_type_and_a_template_says_none() {
+    let sandbox = Sandbox::new("manifest-inference", None);
+    let src = sandbox.0.join("src/aura");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("shader.ts"),
+        "export const INTERACTIONS = ['native', 'light'] as const\n\
+         export const BOX = { width: 0, height: 0 }\n\
+         export const FRAGMENT = `#version 300 es\nvoid main() {}`\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let declared = parsed["modules"][0]["declarations"]
+        .as_array()
+        .expect("the declarations")
+        .clone();
+    let of = |name: &str| {
+        declared
+            .iter()
+            .find(|one| one["name"] == name)
+            .unwrap_or_else(|| panic!("{name} is declared: {said}"))
+            .clone()
+    };
+
+    /* A list is its type, written the way the source wrote it, and `as const`
+    is not part of the value. */
+    assert_eq!(of("INTERACTIONS")["type"]["text"], "['native', 'light']");
+    /* An object is `object`: the shape of its fields is nowhere written down. */
+    assert_eq!(of("BOX")["type"]["text"], "object");
+    /* A template literal carries a default and no type beside it. Calling it
+    `string`, which was the first try, invented one. */
+    let shader = of("FRAGMENT");
+    assert!(shader.get("type").is_none(), "no type: {shader}");
+    assert_eq!(shader["default"], "`#version 300 es void main() {}`");
 }
