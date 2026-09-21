@@ -264,8 +264,10 @@ fn signed(entry: &mut Value) {
         .and_then(Value::as_str)
         .unwrap_or("void")
         .to_owned();
-    let written = format!("{name}({}) => {returns}", taken.join(", "));
-    fields.insert("type".to_owned(), json!({ "text": written }));
+    fields.insert(
+        "type".to_owned(),
+        json!({ "text": crate::manifest::parse::signature(name, &taken, &returns) }),
+    );
 }
 
 pub fn apply(
