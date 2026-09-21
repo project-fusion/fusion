@@ -13,11 +13,16 @@
 //! and eighteen from `HelixElement` beneath those, and that is exactly the
 //! headless badge's own list appended to the styled one.
 //!
-//! **A stamp is applied once and never rewritten.** An entry arriving with an
-//! `inheritedFrom` already on it keeps the one it has: `tier` reaches the
-//! styled badge saying it came from `HelixElement` in core's own module path,
-//! not from the headless badge it was copied through. Only an entry that was
-//! the parent's own gains a stamp, naming the parent.
+//! **A stamp names where an entry started, and the furthest link wins.** An
+//! entry arriving with an `inheritedFrom` already on it carries that one down:
+//! `tier` reaches the styled badge saying it came from `HelixElement` in
+//! core's own module path, not from the headless badge it was copied through.
+//! Where two links of one chain both declare a name, it is the further that
+//! the stamp names: `requestValue` is declared by `MixinPickerEditing` and
+//! again by `MixinControllerValue` beneath it, and the date input says the
+//! second. The links are walked nearest first, so the last to claim a name is
+//! the one that began it. Only an entry no link above claims gains a stamp
+//! naming the parent.
 //!
 //! **A name the child declares itself keeps its own text and is marked all the
 //! same.** A styled accordion item describes its `content-inner` part at more
@@ -197,6 +202,13 @@ fn joined(
         .and_then(Value::as_array)
         .into_iter()
         .flatten()
+        /* **An entry with no name is not passed down.** The analyzer infers an
+        event on `MixinControllerActive` from a `dispatchEvent` it could not
+        name, and the four classes below it carry no such event: a nameless
+        entry is a record of what the analyzer saw rather than anything a
+        consumer can reach. A name that is present and empty is different and
+        stays, the default slot being written that way. */
+        .filter(|one| one.get("name").is_some())
         .map(|one| at_origin(one, list, deps, ours))
         .collect();
     /* The parent's entries by name, for filling in a member the child
@@ -231,12 +243,19 @@ fn joined(
                         }
                     }
                 }
-                fields.entry("inheritedFrom").or_insert_with(|| {
+                /* **The furthest link wins, because a stamp names where an
+                entry started.** `requestValue` is declared by
+                `MixinPickerEditing` and again by `MixinControllerValue`
+                further down the same chain, and the date input's says the
+                second. The links are walked nearest first, so the last to
+                claim the name is the one that began it. */
+                fields.insert(
+                    "inheritedFrom".to_owned(),
                     parent
                         .get("inheritedFrom")
                         .cloned()
-                        .unwrap_or_else(|| from.clone())
-                });
+                        .unwrap_or_else(|| from.clone()),
+                );
             }
         }
         all.push(copy);

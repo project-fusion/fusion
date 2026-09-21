@@ -2258,3 +2258,49 @@ fn a_class_that_borrowed_a_stylesheet_answers_its_hooks() {
     assert_eq!(hooks[1]["name"], "--icon-button-shadow");
     assert_eq!(hooks[1]["inheritedFrom"]["name"], "HelixIconButton");
 }
+
+/// Two rules about what comes down a chain and what does not.
+#[test]
+fn a_stamp_names_the_furthest_link_and_a_nameless_entry_stays_put() {
+    let sandbox = Sandbox::new("manifest-furthest", None);
+    let src = sandbox.0.join("src/field");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("field.ts"),
+        "import { MixinNear, MixinFar } from '@fusion.dev/helix-core'\n\
+         export class HelixField extends MixinNear(MixinFar(HelixElement)) {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        sandbox.0.join("core.json"),
+        r#"{"modules":[{"path":"src/mixins/near.ts","declarations":[
+          {"name":"MixinNear","members":[{"name":"requestValue"}],
+           "events":[{"type":{"text":"HelixActivateEvent"}}]}]},
+          {"path":"src/mixins/far.ts","declarations":[
+          {"name":"MixinFar","members":[{"name":"requestValue"}]}]}]}"#,
+    )
+    .expect("a manifest");
+
+    let output = run(
+        &sandbox.0,
+        &[
+            "manifest",
+            "build",
+            ".",
+            "--dependency",
+            "@fusion.dev/helix-core=core.json",
+        ],
+    );
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let field = parsed["modules"][0]["declarations"][0].clone();
+
+    /* Both links declare the name and the stamp says the further one, because
+    a stamp names where an entry started rather than where it was picked up. */
+    assert_eq!(field["members"][0]["name"], "requestValue");
+    assert_eq!(field["members"][0]["inheritedFrom"]["name"], "MixinFar");
+    /* A nameless entry is a record of what the analyzer saw rather than
+    anything a consumer can reach, and it does not come down. */
+    assert!(field.get("events").is_none(), "no events: {said}");
+}
