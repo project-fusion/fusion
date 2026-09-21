@@ -213,18 +213,23 @@ pub fn apply(
     declaration: &mut Value,
     heritage: &[(String, Option<String>)],
     deps: &Dependencies,
+    mine: &Value,
     is_element: bool,
 ) {
     for (name, specifier) in heritage {
-        let Some(specifier) = specifier else {
-            /* Declared in the package being built. Resolving it means that
-            package's other modules, which this pass is not given: it works a
-            declaration at a time against manifests of packages already
-            built. */
-            continue;
-        };
-        let Some(manifest) = deps.get(&package_of(specifier)) else {
-            continue;
+        /* **A relative import, or none at all, is this package's own.** Both
+        resolve against the manifest the first pass wrote, which holds every
+        declaration this package makes and is to them exactly what a
+        dependency's manifest is to the classes that import it:
+        `HelixFormElement extends HelixElement` through
+        `../helix-element/helix-element.js`, and until every module had been
+        read there was nothing to resolve it in. */
+        let manifest = match specifier {
+            Some(one) if !one.starts_with('.') => match deps.get(&package_of(one)) {
+                Some(found) => found,
+                None => continue,
+            },
+            _ => mine,
         };
         let Some((above, module)) = find(manifest, name) else {
             continue;
