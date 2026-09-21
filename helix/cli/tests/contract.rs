@@ -1401,3 +1401,41 @@ fn a_mixin_publishes_the_class_it_makes() {
         "the question mark: {said}"
     );
 }
+
+/// What an example says about itself, which is three directives and no more.
+#[test]
+fn an_example_opens_with_what_it_needs_said() {
+    let sandbox = Sandbox::new("manifest-directives", None);
+    let src = sandbox.0.join("src/chart/root");
+    let shown = sandbox.0.join("src/chart/.examples");
+    for at in [&src, &shown] {
+        std::fs::create_dir_all(at).expect("a source tree");
+    }
+    std::fs::write(
+        src.join("chart-root.ts"),
+        "@customElement('helix-chart')\nexport class HelixChart {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        shown.join("preview.html"),
+        "<!-- @summary A month of visits. -->\n\
+         <!-- @min 300 -->\n\
+         <!-- @layout fullscreen -->\n\
+         <helix-chart></helix-chart>\n\
+         <!-- @min 999 -->\n",
+    )
+    .expect("an example");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    assert!(said.contains("A month of visits."), "{said}");
+    /* A height is a number in the manifest and a word in the markup. */
+    assert!(said.contains("\"min\": 300"), "read as a number: {said}");
+    assert!(said.contains("\"layout\": \"fullscreen\""), "{said}");
+    /* Reading stops at the first line that is not a directive, so a comment
+    further down is markup a consumer wrote rather than something about the
+    example: the second `@min` is not read. */
+    assert!(!said.contains("999"), "only the opening lines: {said}");
+}

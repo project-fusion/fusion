@@ -171,19 +171,32 @@ fn beside(path: &str, specifier: &str) -> Option<String> {
     Some(format!("/{}", parts.join("/")))
 }
 
-/// The `@summary` an example opens with, which is what the manifest records.
+/// The directives an example opens with, by the word each carries.
 ///
-/// A comment on the first line rather than a tag in a doc block: an example is
-/// markup, and markup has no doc blocks.
-fn summary_of(text: &str) -> Option<String> {
-    let line = text.lines().next()?.trim();
-    let inner = line.strip_prefix("<!--")?.strip_suffix("-->")?.trim();
-    let said = inner.strip_prefix("@summary")?.trim();
-    if said.is_empty() {
-        None
-    } else {
-        Some(said.to_owned())
+/// **Comments on the first lines rather than tags in a doc block**, because an
+/// example is markup and markup has no doc blocks. `@summary` says what it
+/// shows, `@min` the height it needs to be worth looking at, and `@layout` the
+/// frame it wants around it.
+///
+/// Read until the first line that is not one, so a comment further down is
+/// markup a consumer wrote rather than something said about the example.
+fn directives(text: &str) -> BTreeMap<String, String> {
+    let mut found = BTreeMap::new();
+    for line in text.lines() {
+        let line = line.trim();
+        let Some(inner) = line
+            .strip_prefix("<!--")
+            .and_then(|one| one.strip_suffix("-->"))
+        else {
+            break;
+        };
+        let Some(said) = inner.trim().strip_prefix('@') else {
+            break;
+        };
+        let (name, rest) = said.split_once(char::is_whitespace).unwrap_or((said, ""));
+        found.insert(name.to_owned(), rest.trim().to_owned());
     }
+    found
 }
 
 /// A family's examples, by the slug each is filed under.
@@ -198,7 +211,7 @@ fn examples_in(directory: &Path) -> Vec<Value> {
     let Ok(entries) = fs::read_dir(directory) else {
         return Vec::new();
     };
-    let mut found: Vec<(String, Option<String>)> = entries
+    let mut found: Vec<(String, BTreeMap<String, String>)> = entries
         .flatten()
         .filter_map(|one| {
             let path = one.path();
@@ -208,7 +221,7 @@ fn examples_in(directory: &Path) -> Vec<Value> {
                 .strip_suffix(".html")?
                 .to_owned();
             let text = fs::read_to_string(&path).ok()?;
-            Some((slug, summary_of(&text)))
+            Some((slug, directives(&text)))
         })
         .collect();
     found.sort_by(|left, right| {
@@ -219,9 +232,22 @@ fn examples_in(directory: &Path) -> Vec<Value> {
     });
     found
         .into_iter()
-        .map(|(slug, description)| match description {
-            Some(said) => json!({ "description": said, "slug": slug }),
-            None => json!({ "slug": slug }),
+        .map(|(slug, said)| {
+            let mut entry = serde_json::Map::new();
+            if let Some(description) = said.get("summary").filter(|one| !one.is_empty()) {
+                entry.insert("description".to_owned(), json!(description));
+            }
+            /* A height is a number in the manifest and a word in the markup, so
+            it is read as one; anything that is not becomes nothing rather than a
+            string nobody can compare. */
+            if let Some(min) = said.get("min").and_then(|one| one.parse::<i64>().ok()) {
+                entry.insert("min".to_owned(), json!(min));
+            }
+            if let Some(layout) = said.get("layout").filter(|one| !one.is_empty()) {
+                entry.insert("layout".to_owned(), json!(layout));
+            }
+            entry.insert("slug".to_owned(), json!(slug));
+            Value::Object(entry)
         })
         .collect()
 }
