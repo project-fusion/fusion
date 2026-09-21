@@ -359,6 +359,26 @@ pub fn compare(before: &Value, after: &Value) -> Vec<Difference> {
                     }
                 }
             }
+            /* **An empty list is not a missing one.** The analyzer writes
+            `"events": []` on a class whose every inferred event was dropped,
+            and writing nothing there instead is a difference the comparison
+            by name cannot see: neither side has an entry to report. Two
+            declarations in the library say so. */
+            for list in LISTS {
+                let held = |one: &Value| match one.get(list) {
+                    None => "nothing",
+                    Some(Value::Array(items)) if items.is_empty() => "an empty list",
+                    Some(_) => "entries",
+                };
+                let (was, now) = (held(declaration), held(against));
+                if was != now {
+                    found.push(Difference {
+                        at: format!("{at} › {list}"),
+                        before: Some(was.to_owned()),
+                        after: Some(now.to_owned()),
+                    });
+                }
+            }
             /* The declaration's own fields, with the lists taken out: those were
             compared by name above, and comparing them again as arrays would
             report every entry after an insertion as changed. */

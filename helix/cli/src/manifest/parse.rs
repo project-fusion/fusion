@@ -21,7 +21,7 @@ use oxc_ast::ast::{
     ObjectPropertyKind, PropertyKey, Statement, TSAccessibility,
 };
 use oxc_parser::Parser;
-use oxc_span::{GetSpan, SourceType};
+use oxc_span::{GetSpan, SourceType, Span};
 
 use crate::manifest::jsdoc::{self, Documented};
 
@@ -60,6 +60,9 @@ pub struct Declared {
     /// only about declarations that have one, so a controller and an element
     /// are told apart by this and not by being classes.
     pub tag_name: Option<String>,
+    /// Events the class is seen to dispatch, as the type and, where the call
+    /// says one, the name.
+    pub dispatched: Vec<(String, Option<String>)>,
     /// Classes whose stylesheet this one took outright.
     ///
     /// **Borrowing a stylesheet is not inheritance, not a mixin and not a
@@ -428,6 +431,55 @@ fn is_a_value(expression: &Expression<'_>) -> bool {
 /// …` with `this.host = host` in the constructor reads as having no default
 /// until the constructor is read, and the analyzer records `host`: the
 /// expression as written, which is what every other default here is.
+/// The events a class is seen to dispatch, in the order the calls are written.
+///
+/// **What the analyzer infers, which is neither what a component declares nor
+/// always something with a name.** `this.dispatchEvent(new Event('input', …))`
+/// records an event called `input` of type `Event`, and
+/// `this.dispatchEvent(new HelixActivateEvent({ value }))` records one of that
+/// type with no name at all, the first argument being no help. Only `this` is
+/// read: `this.host.dispatchEvent` in a controller records nothing, and the
+/// analyzer agrees.
+///
+/// **Read from the text, with the comments taken out.** The library has no
+/// visitor here and the alternative was a walk of every expression form in the
+/// language for one pattern. The comments are blanked first, because
+/// `helix-element.ts` writes the words inside one; a string holding the same
+/// call would be read too, and the library has none.
+fn dispatched(source: &str, at: Span) -> Vec<(String, Option<String>)> {
+    const CALL: &str = "this.dispatchEvent(";
+    let body = &source[at.start as usize..at.end as usize];
+    let mut found = Vec::new();
+    let mut rest = body;
+    while let Some(start) = rest.find(CALL) {
+        rest = &rest[start + CALL.len()..];
+        let after = rest.trim_start();
+        let Some(after) = after.strip_prefix("new") else {
+            continue;
+        };
+        let after = after.trim_start();
+        let taken: String = after
+            .chars()
+            .take_while(|one| one.is_alphanumeric() || *one == '_' || *one == '$')
+            .collect();
+        if taken.is_empty() {
+            continue;
+        }
+        let after = after[taken.len()..].trim_start();
+        let Some(after) = after.strip_prefix('(') else {
+            continue;
+        };
+        let after = after.trim_start();
+        let named = ['\'', '"'].into_iter().find_map(|quote| {
+            let inside = after.strip_prefix(quote)?;
+            let end = inside.find(quote)?;
+            Some(inside[..end].to_owned())
+        });
+        found.push((taken, named));
+    }
+    found
+}
+
 /// The classes whose stylesheet a class took, by the name each is bound to.
 fn borrowed(class: &Class<'_>, mine: &str) -> Vec<String> {
     fn walk(value: &Expression<'_>, mine: &str, into: &mut Vec<String>) {
@@ -892,6 +944,7 @@ fn mixin_class<'a>(arrow: &'a oxc_ast::ast::ArrowFunctionExpression<'a>) -> Opti
 fn variables_of(
     variable: &oxc_ast::ast::VariableDeclaration<'_>,
     source: &str,
+    plain: &str,
     docs: &Attached,
 ) -> Vec<Declared> {
     variable
@@ -914,6 +967,11 @@ fn variables_of(
             let makes = arrow.and_then(|two| mixin_class(two));
             Some(Declared {
                 heritage: Vec::new(),
+                /* A mixin's class is where the two surviving inferred events in
+                the library are dispatched, the plugin that drops them reaching
+                only components. */
+                dispatched: makes
+                    .map_or_else(Vec::new, |class| dispatched(plain, class.body.span())),
                 members: makes
                     .map_or_else(Vec::new, |class| members_of(class, source, docs, false)),
                 kind: match (arrow, makes) {
@@ -928,17 +986,21 @@ fn variables_of(
                 /* A mixin has no return: what it hands back is the class whose
                 members are listed above, and naming its type again would be
                 saying the same thing twice. */
-                returns: arrow.filter(|_| makes.is_none()).map(|two| {
-                    two.return_type.as_ref().map_or_else(
-                        || "void".to_owned(),
-                        |three| {
-                            slice(
-                                source,
-                                three.type_annotation.span().start,
-                                three.type_annotation.span().end,
-                            )
-                        },
-                    )
+                /* **A function says what it returns only where it wrote it.**
+                A method with no annotation still reads `=> void` in its
+                signature, which is the signature's grammar; a plain function
+                with none carries no `return` at all. `customElement` is the
+                one in the library: its outer arrow hands back another arrow
+                and annotates neither, and calling that `void` said the wrong
+                thing about it. */
+                returns: arrow.filter(|_| makes.is_none()).and_then(|two| {
+                    two.return_type.as_ref().map(|three| {
+                        slice(
+                            source,
+                            three.type_annotation.span().start,
+                            three.type_annotation.span().end,
+                        )
+                    })
                 }),
                 /* A const's value is its default, and its type is the
                    annotation or, failing that, what the literal is. The
@@ -1018,6 +1080,7 @@ const FRAMEWORK: [&str; 10] = [
 fn named(
     declaration: &Declaration<'_>,
     source: &str,
+    plain: &str,
     docs: &Attached,
     imported: &BTreeMap<String, String>,
 ) -> Vec<Declared> {
@@ -1042,6 +1105,7 @@ fn named(
                 type_text: None,
                 tag_name: tag_of(class),
                 borrows: borrowed(class, &id.name),
+                dispatched: dispatched(plain, class.body.span()),
                 members: members_of(class, source, docs, tag_of(class).is_some()),
                 name: id.name.to_string(),
                 heritage: class.super_class.as_ref().map_or_else(Vec::new, |one| {
@@ -1080,6 +1144,7 @@ fn named(
                 type_text: None,
                 tag_name: None,
                 borrows: Vec::new(),
+                dispatched: Vec::new(),
                 name: id.name.to_string(),
                 ..Declared::default()
             })
@@ -1087,7 +1152,7 @@ fn named(
             .collect(),
         /* One statement, several declarations: `export const a = 1, b = 2` is
         two entries in the manifest and one node here. */
-        Declaration::VariableDeclaration(variable) => variables_of(variable, source, docs),
+        Declaration::VariableDeclaration(variable) => variables_of(variable, source, plain, docs),
         /* A type alias and an interface declare nothing at runtime, and the
         manifest is a description of what a consumer can reach through the
         platform. The analyzer emits neither, and neither does this. */
@@ -1169,6 +1234,23 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
         }
     }
 
+    /* The same text with every comment blanked, for the one reader that works
+    on characters rather than on nodes. Spaces rather than nothing, so every
+    span still lines up with the source it came from. */
+    let mut plain: Vec<u8> = source.as_bytes().to_vec();
+    for comment in &parsed.program.comments {
+        let (start, end) = (comment.span.start as usize, comment.span.end as usize);
+        for one in plain.get_mut(start..end).unwrap_or_default() {
+            if *one != b'\n' {
+                *one = b' ';
+            }
+        }
+    }
+    /* Byte for byte, so every span still reaches the same place. Blanking by
+    character instead shortened the text wherever a comment held one that was
+    not ASCII, and the first class body past it read off the end. */
+    let plain = String::from_utf8(plain).unwrap_or_else(|_| source.to_owned());
+
     let imported = imports(&parsed.program);
     let mut found = Vec::new();
     /* Declarations this module keeps to itself, read for their values alone. */
@@ -1178,7 +1260,7 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
             Statement::ExportNamedDeclaration(export) => {
                 if let Some(declaration) = &export.declaration {
                     found.extend(carrying(
-                        named(declaration, source, &docs, &imported),
+                        named(declaration, source, &plain, &docs, &imported),
                         &docs,
                         &anchors(statement, Some(declaration)),
                     ));
@@ -1191,7 +1273,7 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
             other => {
                 if let Some(declaration) = other.as_declaration() {
                     for one in carrying(
-                        named(declaration, source, &docs, &imported),
+                        named(declaration, source, &plain, &docs, &imported),
                         &docs,
                         &anchors(statement, Some(declaration)),
                     ) {
