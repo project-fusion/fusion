@@ -1898,3 +1898,65 @@ fn a_module_publishes_its_statements_in_the_order_it_writes_them() {
         "in statement order: {said}"
     );
 }
+
+/// A chain inside one package is followed all the way down.
+///
+/// Three classes in a row, each extending the one before, which is the shape
+/// the first pass could not read: it resolved every class against the
+/// declarations as parsed, so the middle one was given what its parent
+/// declared rather than what its parent had, and the last one inherited the
+/// shortfall. Ninety-nine of headless's differences were this.
+#[test]
+fn a_chain_inside_one_package_reaches_the_bottom_of_it() {
+    let sandbox = Sandbox::new("manifest-chain", None);
+    let src = sandbox.0.join("src/button");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("button.ts"),
+        "export class HelixButton extends HelixElement {\n\
+         \x20 label = 'Go'\n\
+         }\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        src.join("icon-button.ts"),
+        "import { HelixButton } from './button.js'\n\
+         export class HelixIconButton extends HelixButton {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        src.join("copy-button.ts"),
+        "import { HelixIconButton } from './icon-button.js'\n\
+         export class HelixCopyButton extends HelixIconButton {}\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let members = |name: &str| {
+        parsed["modules"]
+            .as_array()
+            .expect("the modules")
+            .iter()
+            .flat_map(|one| one["declarations"].as_array().expect("the declarations"))
+            .find(|one| one["name"] == name)
+            .unwrap_or_else(|| panic!("{name} is declared: {said}"))["members"]
+            .clone()
+    };
+
+    /* The grandchild has the field, stamped with where it started rather than
+    with the class it was copied through. */
+    for name in ["HelixIconButton", "HelixCopyButton"] {
+        let label = members(name)
+            .as_array()
+            .expect("the members")
+            .iter()
+            .find(|one| one["name"] == "label")
+            .cloned()
+            .unwrap_or_else(|| panic!("{name} has label: {said}"));
+        assert_eq!(label["default"], "'Go'", "{name}: {said}");
+        assert_eq!(label["inheritedFrom"]["name"], "HelixButton", "{name}");
+    }
+}
