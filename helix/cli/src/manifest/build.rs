@@ -174,6 +174,81 @@ fn beside(path: &str, specifier: &str) -> Option<String> {
     Some(format!("/{}", parts.join("/")))
 }
 
+/// What the analyzer saw dispatched, beside what the class declared.
+///
+/// An inferred event carries a type and sometimes a name and never a
+/// description, which is what marks it: `declared` drops exactly those from a
+/// component, leaving the empty list the two roots in core carry. On a mixin
+/// they stand, which is the only place in the library they survive.
+///
+/// A name the class already declared is not added twice.
+fn seen(dispatched: &[(String, Option<String>)], declared: Option<&Value>) -> Value {
+    let mut events = declared
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    let held: BTreeSet<String> = events
+        .iter()
+        .filter_map(|one| Some(one.get("name")?.as_str()?.to_owned()))
+        .collect();
+    for (kind, name) in dispatched {
+        if name.as_ref().is_some_and(|two| held.contains(two)) {
+            continue;
+        }
+        let mut said = serde_json::Map::new();
+        said.insert("type".to_owned(), json!({ "text": kind }));
+        if let Some(name) = name {
+            said.insert("name".to_owned(), json!(name));
+        }
+        events.push(Value::Object(said));
+    }
+    json!(events)
+}
+
+/// An event a component publishes is one it declared, and no other.
+///
+/// **What the analyzer infers is not API.** It records an event for every
+/// `dispatchEvent` it can see, and a call inside a mixin or a helper is not
+/// something it can name correctly: a dispatch through `emit(name, detail)`
+/// yields a phantom event called `name` on every element that inherits it,
+/// which is why this library ships no such helper. An event with no
+/// description came from inference rather than from an `@event` tag, and that
+/// is what marks it.
+///
+/// Only on a component, which is a class descending from `HelixElement`. A
+/// mixin keeps what was inferred on it, and the two in core are the only
+/// places in the library where an inferred event survives.
+///
+/// **The empty list stays.** `HelixElement` and `HelixFormElement` dispatch
+/// between them six events and declare none, and both carry `"events": []`
+/// rather than nothing, which is a different thing to write.
+fn declared(finished: &mut [Vec<Value>]) {
+    for declared in finished.iter_mut() {
+        for one in declared.iter_mut() {
+            if one.get("kind").and_then(Value::as_str) != Some("class")
+                || one.get("helix").is_none()
+            {
+                continue;
+            }
+            let Some(events) = one.get("events").and_then(Value::as_array) else {
+                continue;
+            };
+            let kept: Vec<Value> = events
+                .iter()
+                .filter(|two| {
+                    two.get("description")
+                        .and_then(Value::as_str)
+                        .is_some_and(|said| !said.trim().is_empty())
+                })
+                .cloned()
+                .collect();
+            if let Some(fields) = one.as_object_mut() {
+                fields.insert("events".to_owned(), json!(kept));
+            }
+        }
+    }
+}
+
 /// Hooks a class answers because it took another's stylesheet outright.
 ///
 /// **Borrowing a stylesheet is not inheritance and no field has a name for
@@ -726,6 +801,12 @@ fn declaration_of(
     for (field, entries) in tagged(&one.documented) {
         fields.insert(field.to_owned(), entries);
     }
+    if !one.dispatched.is_empty() {
+        fields.insert(
+            "events".to_owned(),
+            seen(&one.dispatched, fields.get("events")),
+        );
+    }
     /* **A class always says something, even when it says nothing.** A function
     or a variable with no prose carries no `description` at all, and a class or
     a mixin carries an empty one: `HelixStep`'s block opens straight at
@@ -904,6 +985,7 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
     }
 
     lend(&written, &mut finished, dependencies);
+    declared(&mut finished);
 
     let modules: Vec<Value> = written
         .into_iter()

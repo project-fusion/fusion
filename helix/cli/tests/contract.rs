@@ -2422,3 +2422,67 @@ fn an_inherited_entry_takes_the_words_of_the_nearest_link_that_wrote_them() {
     let copy = of("HelixCopy")["members"][0].clone();
     assert_eq!(copy["description"], "The parent's own.");
 }
+
+/// What the analyzer sees dispatched, and who keeps it.
+///
+/// It records an event for every `dispatchEvent` it can see, and a call inside
+/// a mixin cannot be named correctly, so an event with no description came
+/// from inference rather than from an `@event` tag. A component publishes only
+/// what it declared; a mixin keeps what was inferred on it.
+#[test]
+fn an_inferred_event_stands_on_a_mixin_and_not_on_a_component() {
+    let sandbox = Sandbox::new("manifest-dispatch", None);
+    let src = sandbox.0.join("src/field");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("field.ts"),
+        "export const MixinChecked = <T>(Base: T) => {\n\
+         \x20 class Checked extends Base {\n\
+         \x20   toggle() {\n\
+         \x20     this.dispatchEvent(new Event('input', { bubbles: true }))\n\
+         \x20     this.dispatchEvent(new HelixActivateEvent({ value: 1 }))\n\
+         \x20   }\n\
+         \x20 }\n\
+         \x20 return Checked\n\
+         }\n\
+         /**\n\
+         \x20* @event {HelixSelectEvent} helix-select - Said out loud.\n\
+         \x20*/\n\
+         @customElement('helix-field')\n\
+         export class HelixField extends HelixElement {\n\
+         \x20 pick() {\n\
+         \x20   this.dispatchEvent(new Event('change', { bubbles: true }))\n\
+         \x20 }\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let of = |name: &str| {
+        parsed["modules"][0]["declarations"]
+            .as_array()
+            .expect("the declarations")
+            .iter()
+            .find(|one| one["name"] == name)
+            .unwrap_or_else(|| panic!("{name} is declared: {said}"))
+            .clone()
+    };
+
+    /* On a mixin both stand: the named one from its string argument, the other
+    with a type and no name, the first argument being no help. */
+    let mixin = of("MixinChecked");
+    assert_eq!(mixin["events"][0]["name"], "input");
+    assert_eq!(mixin["events"][0]["type"]["text"], "Event");
+    assert_eq!(mixin["events"][1]["type"]["text"], "HelixActivateEvent");
+    assert!(mixin["events"][1].get("name").is_none(), "{said}");
+
+    /* On a component only what it declared, and the list stays behind as an
+    empty one where everything in it was inferred. */
+    let field = of("HelixField");
+    let events = field["events"].as_array().expect("the events");
+    assert_eq!(events.len(), 1, "{said}");
+    assert_eq!(events[0]["name"], "helix-select");
+}
