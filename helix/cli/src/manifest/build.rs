@@ -29,6 +29,7 @@ pub use crate::manifest::inherit::Dependencies;
 use crate::manifest::jsdoc::{entry, Documented};
 
 use crate::manifest::inherit;
+use crate::manifest::parse;
 use crate::manifest::parse::{
     declarations, exports, Declared, Exported, Origin, Parameter, Superclass, Written,
 };
@@ -219,8 +220,10 @@ fn parameters(taken: &[Parameter], tags: &[(String, String)]) -> Vec<Value> {
 
 /// The directives an example opens with, by the word each carries.
 ///
-/// **Comments on the first lines rather than tags in a doc block**, because an
-/// example is markup and markup has no doc blocks. `@summary` says what it
+/// **Comments rather than tags in a doc block**, because an example is markup
+/// and markup has no doc blocks. Anywhere in the file, not only at its head:
+/// two of the slider's examples open with the stylesheet they need and write
+/// the directive under it, and reading only the opening lines lost those. `@summary` says what it
 /// shows, `@min` the height it needs to be worth looking at, and `@layout` the
 /// frame it wants around it.
 ///
@@ -228,19 +231,27 @@ fn parameters(taken: &[Parameter], tags: &[(String, String)]) -> Vec<Value> {
 /// markup a consumer wrote rather than something said about the example.
 fn directives(text: &str) -> BTreeMap<String, String> {
     let mut found = BTreeMap::new();
-    for line in text.lines() {
-        let line = line.trim();
-        let Some(inner) = line
-            .strip_prefix("<!--")
-            .and_then(|one| one.strip_suffix("-->"))
-        else {
+    let mut rest = text;
+    while let Some(at) = rest.find("<!--") {
+        let after = &rest[at + 4..];
+        let Some(end) = after.find("-->") else {
             break;
         };
+        let inner = &after[..end];
+        rest = &after[end + 3..];
         let Some(said) = inner.trim().strip_prefix('@') else {
-            break;
+            continue;
         };
-        let (name, rest) = said.split_once(char::is_whitespace).unwrap_or((said, ""));
-        found.insert(name.to_owned(), rest.trim().to_owned());
+        let (name, text) = said.split_once(char::is_whitespace).unwrap_or((said, ""));
+        /* **A directive may wrap, and the wrap is the file's width.** Image's
+        placeholder writes three lines of `@summary` and the manifest has one
+        sentence, so the breaks and the indent that follows them become single
+        spaces. */
+        let text = text.split_whitespace().collect::<Vec<&str>>().join(" ");
+        /* The first of a name wins, a second being a consumer's markup rather
+        than a second answer to the same question. Nothing in the library
+        writes one twice, so this is a choice rather than a measurement. */
+        found.entry(name.to_owned()).or_insert(text);
     }
     found
 }
@@ -653,7 +664,19 @@ fn declaration_of(
         if !attributes.is_empty() {
             fields.insert("attributes".to_owned(), json!(attributes));
         }
-        fields.insert("members".to_owned(), json!(members));
+        /* The attributes are drawn first, because a framework name declares one
+        and is not itself published. */
+        let members: Vec<Value> = members
+            .into_iter()
+            .filter(|one| {
+                !one.get("name")
+                    .and_then(Value::as_str)
+                    .is_some_and(parse::framework)
+            })
+            .collect();
+        if !members.is_empty() {
+            fields.insert("members".to_owned(), json!(members));
+        }
     }
     let heritage = one
         .heritage

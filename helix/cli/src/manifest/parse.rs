@@ -676,9 +676,12 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached, is_element: bool
                 let Some(name) = key_of(&property.key, source) else {
                     continue;
                 };
-                if FRAMEWORK.contains(&name.as_str()) {
-                    continue;
-                }
+                /* **A framework name is kept here and dropped later**, because
+                the attribute it declares is published even though the member
+                is not: Sandbox Preview writes `@property() styles: string`,
+                which is its own field and not Lit's static one, and the
+                analyzer lists the `styles` attribute with no `styles` member
+                beside it. Dropping it at this point lost the attribute too. */
                 found.push(field_of(property, name, source, documented, &filled));
             }
             ClassElement::MethodDefinition(method) => {
@@ -932,6 +935,11 @@ fn variables_of(
 /// **Only names measured as dropped are listed.** Lit has more lifecycle than
 /// this and no component here overrides it, so adding those would be a guess,
 /// and the diff is what will say if one ever does.
+/// Whether a name is one the framework owns rather than the library.
+pub fn framework(name: &str) -> bool {
+    FRAMEWORK.contains(&name)
+}
+
 const FRAMEWORK: [&str; 10] = [
     "connectedCallback",
     "createRenderRoot",
