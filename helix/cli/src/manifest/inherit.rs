@@ -64,6 +64,67 @@ fn package_of(specifier: &str) -> String {
 }
 
 /// A declaration by name, and the module it was found in, from one manifest.
+/// One entry of a parent's list, read where it started rather than where it
+/// was picked up.
+///
+/// **An entry the parent was given is taken from whoever gave it.** The styled
+/// colour input inherits `anchor` through the headless one, which declares
+/// `anchor` itself at some length and carries a stamp saying `MixinPickerField`
+/// all the same. The manifest gives the styled class the mixin's words, not the
+/// headless class's: a stamp names the origin, and the origin is where the
+/// entry is read from. Twenty of styled's descriptions differ this way and
+/// every one of them matches the origin's, with none matching the parent's.
+///
+/// The stamp itself is kept, because it is already the origin's.
+fn at_origin(entry: &Value, list: &str, deps: &Dependencies, mine: &Value) -> Value {
+    let Some(stamp) = entry.get("inheritedFrom") else {
+        return entry.clone();
+    };
+    let (Some(module), Some(name)) = (
+        stamp.get("module").and_then(Value::as_str),
+        stamp.get("name").and_then(Value::as_str),
+    ) else {
+        return entry.clone();
+    };
+    let wanted = entry
+        .get("name")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    for manifest in deps.values().chain(std::iter::once(mine)) {
+        let Some(declaration) = declared_at(manifest, module, name) else {
+            continue;
+        };
+        let Some(found) = declaration
+            .get(list)
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .find(|one| one.get("name").and_then(Value::as_str) == Some(wanted))
+        else {
+            continue;
+        };
+        let mut copy = found.clone();
+        if let Some(fields) = copy.as_object_mut() {
+            fields.insert("inheritedFrom".to_owned(), stamp.clone());
+        }
+        return copy;
+    }
+    entry.clone()
+}
+
+/// The declaration of that name in that module, where the manifest holds one.
+fn declared_at<'a>(manifest: &'a Value, module: &str, name: &str) -> Option<&'a Value> {
+    manifest
+        .get("modules")?
+        .as_array()?
+        .iter()
+        .find(|one| one.get("path").and_then(Value::as_str) == Some(module))?
+        .get("declarations")?
+        .as_array()?
+        .iter()
+        .find(|one| one.get("name").and_then(Value::as_str) == Some(name))
+}
+
 fn find<'a>(manifest: &'a Value, name: &str) -> Option<(&'a Value, String)> {
     for module in manifest
         .get("modules")
@@ -108,11 +169,16 @@ fn joined(
     theirs: Option<&Value>,
     above: &Value,
     from: &Value,
+    list: &str,
+    deps: &Dependencies,
+    ours: &Value,
 ) -> Option<Value> {
     let theirs: Vec<Value> = theirs
         .and_then(Value::as_array)
-        .cloned()
-        .unwrap_or_default();
+        .into_iter()
+        .flatten()
+        .map(|one| at_origin(one, list, deps, ours))
+        .collect();
     /* The parent's entries by name, for filling in a member the child
     redeclared and for saying where each came from. */
     let above_by_name: BTreeMap<&str, &Value> = theirs
@@ -323,12 +389,23 @@ pub fn apply(
                 above.get("members"),
                 above,
                 &from,
+                "members",
+                deps,
+                mine,
             ),
         )];
         for list in INHERITS {
             lists.push((
                 list,
-                joined(declaration.get(list), above.get(list), above, &from),
+                joined(
+                    declaration.get(list),
+                    above.get(list),
+                    above,
+                    &from,
+                    list,
+                    deps,
+                    mine,
+                ),
             ));
         }
         let Some(fields) = declaration.as_object_mut() else {
