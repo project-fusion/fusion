@@ -240,12 +240,60 @@ fn imports(program: &oxc_ast::ast::Program<'_>) -> BTreeMap<String, String> {
     found
 }
 
+/// What a constructor assigns to each field it fills.
+///
+/// **A field declared without a value still has one.** `private readonly host:
+/// …` with `this.host = host` in the constructor reads as having no default
+/// until the constructor is read, and the analyzer records `host`: the
+/// expression as written, which is what every other default here is.
+fn assigned(class: &Class<'_>, source: &str) -> BTreeMap<String, String> {
+    let mut found = BTreeMap::new();
+    for element in &class.body.body {
+        let ClassElement::MethodDefinition(method) = element else {
+            continue;
+        };
+        if !matches!(method.kind, MethodDefinitionKind::Constructor) {
+            continue;
+        }
+        let Some(body) = &method.value.body else {
+            continue;
+        };
+        for statement in &body.statements {
+            let Statement::ExpressionStatement(said) = statement else {
+                continue;
+            };
+            let Expression::AssignmentExpression(assignment) = &said.expression else {
+                continue;
+            };
+            let Some(target) = assignment.left.as_member_expression() else {
+                continue;
+            };
+            if !matches!(target.object(), Expression::ThisExpression(_)) {
+                continue;
+            }
+            let Some(field) = target.static_property_name() else {
+                continue;
+            };
+            found.insert(
+                field.to_string(),
+                slice(
+                    source,
+                    assignment.right.span().start,
+                    assignment.right.span().end,
+                ),
+            );
+        }
+    }
+    found
+}
+
 /// One field, as far as its own syntax says.
 fn field_of(
     property: &oxc_ast::ast::PropertyDefinition<'_>,
     name: String,
     source: &str,
     documented: Documented,
+    assigned: &BTreeMap<String, String>,
 ) -> Member {
     let (attribute, reflects) = attribute_of(&property.decorators, &name);
     Member {
@@ -264,7 +312,8 @@ fn field_of(
                     Expression::ArrowFunctionExpression(_) | Expression::FunctionExpression(_)
                 )
             })
-            .map(|one| slice(source, one.span().start, one.span().end)),
+            .map(|one| slice(source, one.span().start, one.span().end))
+            .or_else(|| assigned.get(&name).cloned()),
         documented,
         is_static: property.r#static,
         kind: "field",
@@ -300,6 +349,7 @@ fn method_of(
     name: String,
     source: &str,
     documented: Documented,
+    is_element: bool,
 ) -> Member {
     /* **A getter is a readonly field, not a method.** What a consumer reaches
     through `element.caret` is a value, and the manifest describes the
@@ -346,7 +396,7 @@ fn method_of(
         },
         type_text: if reading {
             method.value.return_type.as_ref().map(|one| annotation(one))
-        } else if privacy_of(method.accessibility, &method.key).is_none() {
+        } else if is_element && privacy_of(method.accessibility, &method.key).is_none() {
             /* **A public method carries its signature and a hidden one does
             not.** Measured across the four tiers: 3,287 private and
             protected methods and not one with a type, against 445 public
@@ -376,7 +426,8 @@ fn method_of(
 }
 
 /// What a class body declares, in the order it is written.
-fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
+fn members_of(class: &Class<'_>, source: &str, docs: &Attached, is_element: bool) -> Vec<Member> {
+    let filled = assigned(class, source);
     let mut found = Vec::new();
     for element in &class.body.body {
         /* A decorated member's block sits above the decorator, so the offset to
@@ -391,7 +442,7 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
                 if FRAMEWORK.contains(&name.as_str()) {
                     continue;
                 }
-                found.push(field_of(property, name, source, documented));
+                found.push(field_of(property, name, source, documented, &filled));
             }
             ClassElement::MethodDefinition(method) => {
                 let Some(name) = key_of(&method.key, source) else {
@@ -406,7 +457,7 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
                 {
                     continue;
                 }
-                found.push(method_of(method, name, source, documented));
+                found.push(method_of(method, name, source, documented, is_element));
             }
             _ => {}
         }
@@ -537,7 +588,7 @@ fn named(
                 returns: None,
                 type_text: None,
                 tag_name: tag_of(class),
-                members: members_of(class, source, docs),
+                members: members_of(class, source, docs, tag_of(class).is_some()),
                 name: id.name.to_string(),
                 heritage: class.super_class.as_ref().map_or_else(Vec::new, |one| {
                     let mut names = Vec::new();
