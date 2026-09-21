@@ -675,8 +675,8 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
     /* **Resolved again until it stops changing, because a chain has links.**
     `HelixHeadlessIconButton extends HelixHeadlessButton` and the copy button
     extends the icon button, all three in one package. One pass gives the icon
-    button what the button *declares* — twenty members — where the analyzer
-    gives it what the button *has*, which is forty-seven, and the copy button
+    button what the button *declares*, twenty members, where the analyzer gives
+    it what the button *has*, which is forty-seven, and the copy button
     inherits the shortfall. A dependency's manifest arrives already resolved
     and needs none of this; a package's own does not, so each round resolves
     against the last one's answer and a chain of any length settles. Ninety-
