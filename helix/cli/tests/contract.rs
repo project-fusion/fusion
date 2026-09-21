@@ -2527,3 +2527,99 @@ fn a_tag_registered_by_a_call_is_a_definition() {
     assert_eq!(exports[1]["name"], "tagName");
     assert_eq!(exports[1]["declaration"]["name"], "target");
 }
+
+/// The keys come out in the analyzer's order, which is not one anyone chose.
+///
+/// It is a trace of that tool's own execution: a class begins as a literal
+/// with ten keys in it, the empty lists among them are deleted, and what comes
+/// after lands in the order the plugin that set it ran. The four tiers' files
+/// are byte for byte what the analyzer writes, and this is the shape of it.
+#[test]
+fn a_manifest_is_written_in_the_order_the_analyzer_writes_one() {
+    let sandbox = Sandbox::new("manifest-order", None);
+    let src = sandbox.0.join("src/badge/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("badge-root.ts"),
+        "/**\n\
+         \x20* A badge.\n\
+         \x20*\n\
+         \x20* @summary Says one word.\n\
+         \x20* @csspart mark - The mark.\n\
+         \x20*/\n\
+         @customElement('helix-badge')\n\
+         export class HelixBadge extends HelixElement {\n\
+         \x20 /** What it says. */\n\
+         \x20 @property({ reflect: true })\n\
+         \x20 readonly label = 'New'\n\
+         \x20 /** Says it again. */\n\
+         \x20 announce(twice = false): boolean { return twice }\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", ".", "--tier", "styled"]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let keys = |at: &str, upto: &str| {
+        let from = said.find(at).unwrap_or_else(|| panic!("{at}: {said}"));
+        let to = said[from..].find(upto).map_or(said.len(), |one| from + one);
+        said[from..to]
+            .lines()
+            .filter_map(|line| line.trim().strip_prefix('"')?.split('"').next())
+            .filter(|one| !one.is_empty())
+            .collect::<Vec<&str>>()
+    };
+
+    /* The document, then a module: `schemaVersion` leads because the analyzer
+    writes it first, not because it sorts first. */
+    assert_eq!(
+        &keys("\"schemaVersion\"", "\"declarations\"")[..4],
+        ["schemaVersion", "readme", "modules", "kind"]
+    );
+    /* The class: the template's ten in their own order, with the lists it
+    filled kept and the empty ones gone, then the heritage, the summary, the
+    block, the tag, and the two paths a plugin writes once inheritance has
+    finished. */
+    let class = keys("\"kind\": \"class\"", "\"exports\"");
+    let shape: Vec<&str> = class
+        .into_iter()
+        .filter(|one| {
+            [
+                "kind",
+                "description",
+                "name",
+                "cssParts",
+                "members",
+                "attributes",
+                "superclass",
+                "summary",
+                "helix",
+                "tagName",
+                "customElement",
+                "modulePath",
+                "definitionPath",
+            ]
+            .contains(one)
+        })
+        .collect();
+    assert_eq!(shape.first(), Some(&"kind"), "{said}");
+    for (before, after) in [
+        ("description", "name"),
+        ("name", "cssParts"),
+        ("cssParts", "members"),
+        ("members", "superclass"),
+        ("superclass", "summary"),
+        ("summary", "helix"),
+        ("helix", "tagName"),
+        ("tagName", "customElement"),
+        ("customElement", "modulePath"),
+        ("modulePath", "definitionPath"),
+    ] {
+        let at = |one: &str| shape.iter().position(|two| *two == one);
+        assert!(
+            at(before) < at(after),
+            "{before} before {after}: {shape:?}\n{said}"
+        );
+    }
+}
