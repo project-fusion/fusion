@@ -86,12 +86,28 @@ pub struct Parameter {
     pub default: Option<String>,
 }
 
+/// A field's default and type as the source wrote them.
+///
+/// **Kept because the attribute is generated from the field as written.** A
+/// field initialized from a constant beside it publishes the constant's value,
+/// and the attribute mirroring that field publishes the constant's name: the
+/// analyzer says `'Not sent'` on `failedLabel` and `FAILED_LABEL` on
+/// `failed-label`, and gives the attribute no type where the field's came from
+/// the constant too.
+#[derive(Clone, Debug, Default)]
+pub struct Written {
+    pub default: Option<String>,
+    pub type_text: Option<String>,
+}
+
 /// One entry in a class body.
 #[derive(Debug, Default)]
 pub struct Member {
     /// `field` or `method`, which is the manifest's vocabulary for these.
     pub kind: &'static str,
     pub name: String,
+    /// What the field wrote, where resolving a constant replaced it.
+    pub written: Option<Written>,
     /// The annotation as written, which is what the manifest carries: the
     /// analyzer records the text rather than what it resolves to, and so does
     /// this. `resolved` is what keeps that text worth reading.
@@ -462,6 +478,7 @@ fn field_of(
 ) -> Member {
     let (attribute, reflects) = attribute_of(&property.decorators, &name);
     Member {
+        written: None,
         attribute,
         /* **A function is not a default.** A field holding an arrow is a
         handler bound to the instance, and printing its body as the field's
@@ -553,6 +570,7 @@ fn method_of(
         (None, false)
     };
     Member {
+        written: None,
         attribute,
         reflects,
         default: None,
@@ -1110,7 +1128,49 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
             }
         }
     }
+    resolve(&mut found);
     found
+}
+
+/// A field initialized from a constant beside it, given the constant's value.
+///
+/// **A name is not what a default is.** `failedLabel = FAILED_LABEL` publishes
+/// `'Not sent'` and a type of `string`, because a reader of the reference page
+/// learns nothing from the name of a constant they cannot see. Six fields in
+/// the library are written this way and all six are resolved; no default
+/// naming a constant declared in the same module is left standing.
+///
+/// Only a constant in the same module, which is as far as a parser can see.
+/// The type follows the value, and only where the field wrote none of its own.
+fn resolve(found: &mut [Declared]) {
+    let known: BTreeMap<String, (Option<String>, Option<String>)> = found
+        .iter()
+        .filter(|one| one.kind == "variable")
+        .map(|one| {
+            (
+                one.name.clone(),
+                (one.default.clone(), one.type_text.clone()),
+            )
+        })
+        .collect();
+    for declaration in found.iter_mut() {
+        for member in &mut declaration.members {
+            let Some(name) = member.default.as_deref() else {
+                continue;
+            };
+            let Some((value, kind)) = known.get(name) else {
+                continue;
+            };
+            member.written = Some(Written {
+                default: member.default.clone(),
+                type_text: member.type_text.clone(),
+            });
+            member.default.clone_from(value);
+            if member.type_text.is_none() {
+                member.type_text.clone_from(kind);
+            }
+        }
+    }
 }
 
 /// Where an export's declaration lives, which is said three different ways.

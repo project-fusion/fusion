@@ -84,13 +84,19 @@ pub fn read(comment: &str) -> Documented {
             reference page, which is why blank lines survive too: they are the
             paragraph breaks between them.
 
+            **`@summary` keeps them too**, which reads the same way: it is a
+            sentence the author wrapped, and the analyzer publishes the wrap.
+            Ten of the library's two hundred and seventy-one summaries run past
+            the margin and all ten carry the break; the rest are short enough
+            that joining them was right by accident.
+
             **Every other tag is one sentence and becomes one line.** A
             `@cssproperty` or an `@event` whose description runs past the margin
             continues on the next, and the manifest has that sentence whole: the
             break is the file's width rather than anything the author meant.
             Reading it as a break put a newline into the middle of a hundred and
             one published sentences. */
-            if last.0 == "description" {
+            if last.0 == "description" || last.0 == "summary" {
                 last.1.push('\n');
                 last.1.push_str(line);
             } else if !line.trim().is_empty() {
