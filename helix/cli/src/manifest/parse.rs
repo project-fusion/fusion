@@ -183,17 +183,32 @@ fn key_of(key: &PropertyKey<'_>, source: &str) -> Option<String> {
 /// reading it needs no checker. Anything whose type is a question about other
 /// code, a call or an identifier, is left without one, which is what the
 /// analyzer does too.
-fn inferred(value: &Expression<'_>) -> Option<&'static str> {
+///
+/// **A list is its own type, spelled the way it was written.** `INTERACTIONS`
+/// is `['native', 'light', 'shadow', 'ripple', 'none']` and the analyzer gives
+/// it that same text as its type, which reads oddly beside `string` and is what
+/// it does. The text is the source's own, line breaks and all: `SHAPES` runs
+/// down eleven lines and its type keeps them, while its default is the same
+/// list on one. An object is `object`, its fields being a shape nobody wrote
+/// down.
+///
+/// **A template literal is nothing at all**, which has to be said rather than
+/// assumed: `FRAGMENT` is a shader in backticks, and the analyzer gives it a
+/// default with no type beside it. Calling it `string`, which was the first
+/// try, invented one.
+fn inferred(value: &Expression<'_>, source: &str) -> Option<String> {
     /* **A negative number is a number.** `at = -1` is a unary minus over a
     literal rather than a literal, and reading only the literal left six
     fields in the library with no type at all. */
     if let Expression::UnaryExpression(unary) = value {
-        return inferred(&unary.argument);
+        return inferred(&unary.argument, source);
     }
     match value {
-        Expression::StringLiteral(_) | Expression::TemplateLiteral(_) => Some("string"),
-        Expression::NumericLiteral(_) => Some("number"),
-        Expression::BooleanLiteral(_) => Some("boolean"),
+        Expression::StringLiteral(_) => Some("string".to_owned()),
+        Expression::NumericLiteral(_) => Some("number".to_owned()),
+        Expression::BooleanLiteral(_) => Some("boolean".to_owned()),
+        Expression::ObjectExpression(_) => Some("object".to_owned()),
+        Expression::ArrayExpression(_) => Some(slice(source, value.span().start, value.span().end)),
         _ => None,
     }
 }
@@ -494,8 +509,7 @@ fn field_of(
                 property
                     .value
                     .as_ref()
-                    .and_then(inferred)
-                    .map(ToOwned::to_owned)
+                    .and_then(|two| inferred(unwrapped(two), source))
             }),
     }
 }
@@ -845,7 +859,9 @@ fn variables_of(
                         if arrow.is_some() {
                             None
                         } else {
-                            one.init.as_ref().and_then(inferred).map(ToOwned::to_owned)
+                            one.init
+                                .as_ref()
+                                .and_then(|two| inferred(unwrapped(two), source))
                         }
                     }),
                 ..Declared::default()
