@@ -318,6 +318,20 @@ fn helix(
     if !aliases.is_empty() {
         block.insert("aliases".to_owned(), json!(aliases));
     }
+    /* **`@groups` is held to a list and a typo is dropped rather than kept.**
+    The plugin's own reason: a misspelling lands a family in a group of one,
+    which is invisible, where dropping it leaves the family ungrouped and the
+    check says so. One group exists today and the list is written here because
+    it is written there. */
+    let grouped: Vec<String> = single("groups")
+        .unwrap_or_default()
+        .split(',')
+        .map(|one| one.trim().to_owned())
+        .filter(|one| one == "charts")
+        .collect();
+    if !grouped.is_empty() {
+        block.insert("groups".to_owned(), json!(grouped));
+    }
     if is_component {
         block.insert("tier".to_owned(), json!(tier));
         let parts: Vec<&str> = path.split('/').collect();
