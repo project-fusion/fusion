@@ -1573,3 +1573,48 @@ fn a_child_takes_the_mixins_before_the_parents_own() {
         "then the parent's own: {said}"
     );
 }
+
+/// A getter and its setter are one field, and each half knows something.
+#[test]
+fn an_accessor_pair_is_one_field() {
+    let sandbox = Sandbox::new("manifest-accessors", None);
+    let src = sandbox.0.join("src/carousel/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("carousel-root.ts"),
+        "@customElement('helix-carousel')\n\
+         export class HelixCarousel {\n\
+         \x20 /** Which slide is showing. */\n\
+         \x20 @property({ type: Number })\n\
+         \x20 get index(): number { return this.at }\n\
+         \x20 set index(next: number) { this.at = next }\n\
+         \x20 get reading(): string { return '' }\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+
+    /* One field, not two members with one name. Counted on the kind rather
+    than the name: `index` is also an attribute, so the name appears twice for
+    a reason that has nothing to do with the pair. */
+    assert_eq!(said.matches("\"kind\": \"field\"").count(), 2, "{said}");
+    /* The description comes from the half that carries a doc block, the type
+    from either, and the attribute from the decorator on the getter. */
+    assert!(said.contains("Which slide is showing."), "{said}");
+    assert!(said.contains("\"attribute\": \"index\""), "{said}");
+    /* And a pair is not readonly: a setter is the half that can be assigned.
+    A getter standing alone still is. */
+    let index_at = said.find("\"index\"").expect("index");
+    let reading_at = said.find("\"reading\"").expect("reading");
+    assert!(
+        !said[index_at..reading_at].contains("\"readonly\""),
+        "a pair can be written: {said}"
+    );
+    assert!(
+        said[reading_at..].contains("\"readonly\""),
+        "alone it cannot"
+    );
+}
