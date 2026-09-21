@@ -76,13 +76,27 @@ pub fn read(comment: &str) -> Documented {
             continue;
         }
         if let Some(last) = tags.last_mut() {
-            /* A tag's text runs on until the next tag, which is how a long
-            `@description` is written. **Blank lines included**: they are the
-            paragraph breaks inside it, and dropping them ran three
-            paragraphs of a component's own description together, which the
-            diff caught as a two-character difference in six hundred. */
-            last.1.push('\n');
-            last.1.push_str(line);
+            /* A tag's text runs on until the next tag, and how a continuation
+            joins depends on which tag it is.
+
+            **`@description` is prose and keeps its line breaks.** It is
+            paragraphs wrapped at ninety columns, and those breaks reach the
+            reference page, which is why blank lines survive too: they are the
+            paragraph breaks between them.
+
+            **Every other tag is one sentence and becomes one line.** A
+            `@cssproperty` or an `@event` whose description runs past the margin
+            continues on the next, and the manifest has that sentence whole: the
+            break is the file's width rather than anything the author meant.
+            Reading it as a break put a newline into the middle of a hundred and
+            one published sentences. */
+            if last.0 == "description" {
+                last.1.push('\n');
+                last.1.push_str(line);
+            } else if !line.trim().is_empty() {
+                last.1.push(' ');
+                last.1.push_str(line.trim());
+            }
             continue;
         }
         description.push(line);
@@ -234,5 +248,25 @@ mod tests {
         let one = entry("- The messages.");
         assert_eq!(one.name, "");
         assert_eq!(one.description.as_deref(), Some("The messages."));
+    }
+
+    /// **`@description` is prose and keeps its breaks; every other tag is one
+    /// sentence and becomes one line.**
+    ///
+    /// Reading a wrapped `@cssproperty` as two lines put a newline into the
+    /// middle of a hundred and one published sentences.
+    #[test]
+    fn a_tag_that_is_not_prose_is_one_line() {
+        let read = read(
+            "/**\n * @cssproperty --x - Width of the edge an `outlined`\n *   column is drawn with.\n * @event {E} e - Fired when the page crosses the\n * threshold, with the new state.\n */",
+        );
+        let said: Vec<&str> = read.tags.iter().map(|one| one.1.as_str()).collect();
+        assert_eq!(
+            said,
+            vec![
+                "--x - Width of the edge an `outlined` column is drawn with.",
+                "{E} e - Fired when the page crosses the threshold, with the new state.",
+            ]
+        );
     }
 }
