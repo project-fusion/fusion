@@ -18,6 +18,7 @@ path = "src/main.rs"
 # **What a rule is, and the runner that measures a set of them.** Shared with
 # `fusion-helix-cli` and owned by neither product, so `helix` taking it is not a
 # dependency on this domain: the crate's `lib.rs` carries the argument.
+fusion-plugins = { workspace = true }
 fusion-rules = { workspace = true }
 clap = { version = "4", features = ["derive"] }
 regex = { workspace = true }
@@ -27,6 +28,11 @@ serde = { workspace = true }
 # so `exports` conditions come back with `default` ahead of `types`, which is the
 # precise fault the `order` rule exists to prevent.
 serde_json = { workspace = true, features = ["preserve_order"] }
+
+[dev-dependencies]
+# Encodes the example plugin into a component, the way a plugin author's
+# toolchain does: the end-to-end test takes the path an author takes.
+wit-component = "0.259"
 
 [lints]
 workspace = true

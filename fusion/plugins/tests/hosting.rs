@@ -107,7 +107,7 @@ fn a_plugin_is_loaded_named_and_asked() {
             .iter()
             .map(|one| one.name.as_str())
             .collect::<Vec<&str>>(),
-        vec!["unfinished", "trailing-space"]
+        vec!["unfinished", "trailing-space", "titled"]
     );
 
     let payload = serde_json::json!({

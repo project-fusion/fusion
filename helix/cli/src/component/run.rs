@@ -69,11 +69,12 @@ fn prepare(args: &Rules, from: &Path) -> Result<Prepared, Failure> {
         settings.plugins.as_deref().unwrap_or(plugins::DIRECTORY),
     )?);
     let loaded = host.loaded();
-    let register = plugins::register(&loaded);
+    let (provided, elsewhere) = plugins::rules(&host)?;
+    let register = plugins::register(&loaded, &elsewhere);
     let listed = plugins::listed(&loaded);
 
     let mut rules = all();
-    rules.extend(plugins::rules(&host));
+    rules.extend(provided);
     only_known(NOUN, &rules, &args.only)?;
 
     /* **Every tier missing is a configuration fault, not a clean run.** Rules

@@ -805,10 +805,12 @@ name = "fusion-cli"
 version = "0.0.0-dev"
 dependencies = [
  "clap",
+ "fusion-plugins",
  "fusion-rules",
  "regex",
  "serde",
  "serde_json",
+ "wit-component 0.259.0",
 ]
 
 [[package]]

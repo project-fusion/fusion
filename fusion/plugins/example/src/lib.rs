@@ -22,6 +22,8 @@ struct Payload {
     manifests: Vec<Tier>,
     #[serde(default)]
     sheets: Vec<Sheet>,
+    #[serde(default)]
+    documents: Vec<Sheet>,
 }
 
 /// One stylesheet, as the host reads it off disk.
@@ -86,6 +88,15 @@ impl Guest for Plugin {
                 unit: "stylesheet lines".to_owned(),
                 reads: vec!["sheets".to_owned()],
             },
+            /* A rule for another noun, from the same module, which is what the
+               mechanism allows and the directory decides: this one is only ever
+               loaded by `fusion prose`, whose payload has documents in it. */
+            Rule {
+                name: "titled".to_owned(),
+                summary: "a document opens with a heading rather than with prose".to_owned(),
+                unit: "documents".to_owned(),
+                reads: vec!["documents".to_owned()],
+            },
         ]
     }
 
@@ -95,6 +106,7 @@ impl Guest for Plugin {
         match rule.as_str() {
             "unfinished" => unfinished(&read),
             "trailing-space" => trailing_space(&read),
+            "titled" => titled(&read),
             other => Err(format!("this plugin provides no rule called `{other}`")),
         }
     }
@@ -134,6 +146,32 @@ fn unfinished(read: &Payload) -> Result<String, String> {
 
     Ok(serde_json::json!({
         "checked": checked,
+        "findings": findings,
+        "notes": [],
+    })
+    .to_string())
+}
+
+/// A document that opens with prose, which is a rule for another noun.
+fn titled(read: &Payload) -> Result<String, String> {
+    let mut findings = Vec::new();
+    for document in &read.documents {
+        let Some(first) = document.text.lines().find(|line| !line.trim().is_empty()) else {
+            continue;
+        };
+        if first.starts_with('#') {
+            continue;
+        }
+        findings.push(serde_json::json!({
+            "detail": "A reader arriving from a search result sees the first line before \
+                       anything else, and a document whose first line is a sentence gives them \
+                       no title to read.",
+            "file": document.file,
+            "message": format!("`{}` opens with prose rather than a heading", document.file),
+        }));
+    }
+    Ok(serde_json::json!({
+        "checked": read.documents.len(),
         "findings": findings,
         "notes": [],
     })
