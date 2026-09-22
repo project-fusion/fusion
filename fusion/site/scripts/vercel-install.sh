@@ -24,11 +24,18 @@ set -euo pipefail
 
 bun install
 
-if ! command -v cargo >/dev/null 2>&1; then
+# **The toolchain is asked for by version, not accepted because one is there.**
+# The builder carries a rustc of its own, 1.92 when this was written, and the
+# first version of this script used whatever `cargo` it found: that cleared a
+# floor of 1.90 by luck and failed the day the floor moved to 1.96, with
+# `rustc 1.92.0 is not supported`. So rustup installs the pinned one beside
+# whatever is there, and the build names it.
+if ! command -v rustup >/dev/null 2>&1; then
   curl --proto '=https' --tlsv1.2 --retry 5 --silent --show-error --fail https://sh.rustup.rs \
-    | sh -s -- -y --profile minimal --default-toolchain 1.96 --no-modify-path
-  # shellcheck source=/dev/null
-  . "$HOME/.cargo/env"
+    | RUSTUP_INIT_SKIP_PATH_CHECK=yes sh -s -- -y --profile minimal --default-toolchain none --no-modify-path
 fi
+# shellcheck source=/dev/null
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+rustup toolchain install 1.96 --profile minimal
 
-cargo build -p fusion-helix-cli --locked
+cargo +1.96 build -p fusion-helix-cli --locked
