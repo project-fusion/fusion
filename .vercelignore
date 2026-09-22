@@ -32,6 +32,11 @@ target/
 **/dist/
 **/node_modules/
 
-# Rust, which nothing in this project builds.
-Cargo.lock
-Cargo.toml
+# **Rust is uploaded, because the build compiles it.** Every `Cargo.toml` and
+# the lockfile were excluded here, nothing in the site's build then reading
+# them. The manifests are `helix manifest build`'s now, so
+# `fusion/site/scripts/vercel-install.sh` compiles the `helix` binary, and cargo
+# needs every workspace member's manifest to resolve the one it builds, not
+# just its own: the pattern matched them at every depth, and the install died
+# with `could not find Cargo.toml`. `target/` above stays excluded, a build
+# directory being the one thing the deploy should make for itself.
