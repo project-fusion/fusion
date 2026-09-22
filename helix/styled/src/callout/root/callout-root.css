@@ -85,11 +85,11 @@ slot[name="icon"]::slotted(*) {
   min-inline-size: 0;
 }
 
-/* The title, when there is one. A bare slot, so an omitted one generates no box
-   and the content sits where it would have anyway. */
-slot[name="title"]::slotted(*) {
+/* The heading, when there is one. A bare slot, so an omitted one generates no
+   box and the content sits where it would have anyway. */
+slot[name="heading"]::slotted(*) {
   color: var(--helix-color-foreground);
-  /* Its own line. A slotted `<span>` is inline by default, so the title and the
+  /* Its own line. A slotted `<span>` is inline by default, so the heading and the
      first words of the content run together as one sentence in two weights,
      which reads as emphasis rather than as a heading. */
   display: block;

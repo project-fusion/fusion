@@ -819,7 +819,7 @@ pub fn all() -> Vec<Rule> {
             fix: None,
             name: "vocabulary",
             run: Runner::Source(vocabulary::run),
-            summary: "one spelling for each role a part name can play",
+            summary: "one spelling for each role a part name or a slot name can play",
         },
     ]
 }

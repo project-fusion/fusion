@@ -597,7 +597,7 @@ export function Showcase(): React.ReactElement {
               it is a second surface a few pixels outside the first, and the two
               edges argue about which one is the callout. */}
           <helix-callout class={styles.showcaseWide} tone="info">
-            <helix-text slot="title" variant="body-strong">
+            <helix-text slot="heading" variant="body-strong">
               Nothing here needs us to keep running
             </helix-text>
             The packages install from npm and ship as custom elements.

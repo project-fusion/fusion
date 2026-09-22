@@ -60,11 +60,11 @@ describe('callout', () => {
     expect(rule('slot[name="icon"]::slotted(*)')).toContain('--icon-size: var(--helix-size-icon)')
   })
 
-  test('a title is its own line, not the opening words of the content', () => {
-    // A slotted `<span>` is inline, so without this the title and the first
+  test('a heading is its own line, not the opening words of the content', () => {
+    // A slotted `<span>` is inline, so without this the heading and the first
     // words run together as one sentence in two weights.
-    expect(rule('slot[name="title"]::slotted(*)')).toContain('display: block')
-    expect(rule('slot[name="title"]::slotted(*)')).toContain(
+    expect(rule('slot[name="heading"]::slotted(*)')).toContain('display: block')
+    expect(rule('slot[name="heading"]::slotted(*)')).toContain(
       'font-weight: var(--helix-weight-semibold)',
     )
   })

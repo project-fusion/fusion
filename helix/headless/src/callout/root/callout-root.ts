@@ -30,8 +30,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://fusion.dev/helix/components/callout
  *
  * @slot - The callout's content.
+ * @slot heading - A heading above the content.
  * @slot icon - Replaces the icon chosen by `tone`.
- * @slot title - A heading above the content.
  *
  * @csspart content - The content region.
  * @csspart icon - The icon region.
@@ -86,7 +86,7 @@ export class HelixHeadlessCallout extends HelixElement {
 
     return html`<span part="icon">${this.renderIcon(icon, label)}</span>
       <div part="content">
-        <slot name="title"></slot>
+        <slot name="heading"></slot>
         <slot></slot>
       </div>`
   }
