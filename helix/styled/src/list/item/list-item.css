@@ -71,7 +71,7 @@ slot[name="start"]::slotted(*) {
    rather than on `::slotted(*)`.** A `<slot>` is `display: contents` in the UA
    sheet, so it generates no box and whatever is assigned to it becomes the grid
    item directly. Measured, `<helix-list-item>Bare text<span
-   slot="supporting">Caption</span>` with nothing in `start`: the label landed in
+   slot="description">Caption</span>` with nothing in `start`: the label landed in
    the first column at x=32 and the supporting text, explicitly placed, sat
    beside it at x=102 on the same line rather than under it. The identical row
    with the label wrapped in a `<span>` stacked correctly at x=44 and x=44, and
@@ -88,7 +88,7 @@ slot:not([name]) {
   grid-row: 1;
 }
 
-slot[name="supporting"] {
+slot[name="description"] {
   color: var(--helix-color-foreground-muted);
   display: block;
   font-size: var(--helix-text-xs);
@@ -98,7 +98,7 @@ slot[name="supporting"] {
 
 /* Margins only. */
 slot:not([name])::slotted(*),
-slot[name="supporting"]::slotted(*) {
+slot[name="description"]::slotted(*) {
   margin: var(--helix-space-none);
 }
 

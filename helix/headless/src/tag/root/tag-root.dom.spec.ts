@@ -59,14 +59,14 @@ describe('tag', () => {
   })
 })
 
-describe('tag prefix', () => {
+describe('tag start', () => {
   test('a category sits before the label and is weightier than it', async () => {
     // The same kind of word doing a different job, so weight rather than color:
     // `Priority: high` is one phrase, and coloring half makes it two things.
     const tag = await mount(
-      '<helix-headless-tag><span slot="prefix">Priority</span>High</helix-headless-tag>',
+      '<helix-headless-tag><span slot="start">Priority</span>High</helix-headless-tag>',
     )
-    expect(slotted(tag, 'prefix')[0]?.textContent).toBe('Priority')
+    expect(slotted(tag, 'start')[0]?.textContent).toBe('Priority')
     /* The label is read off the host rather than through `slotted`, which
        returns assigned elements: a tag's label is usually bare text between the
        tags, and a text node is not one. */
@@ -80,6 +80,6 @@ describe('tag prefix', () => {
        tag with no prefix carried nine pixels of border and padding for a slot
        with nothing in it. */
     const tag = await mount('<helix-headless-tag>Plain</helix-headless-tag>')
-    expect(slotted(tag, 'prefix')).toHaveLength(0)
+    expect(slotted(tag, 'start')).toHaveLength(0)
   })
 })

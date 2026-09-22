@@ -27,7 +27,7 @@
   >
     <helix-list-item>
       Nothing yet
-      <span slot="supporting">One picture loads and one does not</span>
+      <span slot="description">One picture loads and one does not</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -48,7 +48,7 @@
     const row = document.createElement('helix-list-item')
     row.textContent = name
     const under = document.createElement('span')
-    under.slot = 'supporting'
+    under.slot = 'description'
     under.textContent = carried
     row.append(under)
     log.append(row)

@@ -25,7 +25,7 @@
   >
     <helix-list-item>
       Nothing yet
-      <span slot="supporting">Send a message, then scroll the transcript</span>
+      <span slot="description">Send a message, then scroll the transcript</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -46,7 +46,7 @@
     const row = document.createElement('helix-list-item')
     row.textContent = name
     const under = document.createElement('span')
-    under.slot = 'supporting'
+    under.slot = 'description'
     under.textContent = carried
     row.append(under)
     log.append(row)

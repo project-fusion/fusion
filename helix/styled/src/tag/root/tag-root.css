@@ -146,7 +146,7 @@ slot:not([name])::slotted(helix-icon) {
    it `display: flex` to hold a border is what takes that away, and measured, a
    tag with no prefix carried nine pixels of border and padding for a slot with
    nothing in it. */
-slot[name="prefix"]::slotted(*) {
+slot[name="start"]::slotted(*) {
   font-weight: var(--helix-weight-semibold);
   margin-inline-end: var(--_tag-inset);
   opacity: 0.75;

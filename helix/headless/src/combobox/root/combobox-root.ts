@@ -112,7 +112,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart tag - One chosen option.
  * @csspart tag-dismiss - The remove button, when `dismissible`.
  * @csspart tag-dismiss-mark - The glyph on the dismiss control, where none is slotted.
- * @csspart tag-prefix - The category before the label.
+ * @csspart tag-start - The category before the label.
  * @csspart tags - The row of chosen options, when `multiple` is set.
  *
  * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
@@ -764,7 +764,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   protected renderTag(option: { text: string; value: string }): TemplateResult {
     return html`<${this.tag('tag')}
                     part="tag"
-      exportparts="dismiss: tag-dismiss, dismiss-mark: tag-dismiss-mark, prefix: tag-prefix"
+      exportparts="dismiss: tag-dismiss, dismiss-mark: tag-dismiss-mark, start: tag-start"
                     data-value=${option.value}
                     dismiss-label=${this.removeLabel}
                     ?dismissible=${!this.isDisabled}

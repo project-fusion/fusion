@@ -690,7 +690,7 @@ function EditorialPage(context: Context) {
               {editorial.posts.map((post) => (
                 <helix-list-item href="#writing" key={post.title}>
                   {post.title}
-                  <helix-text as="span" slot="supporting" variant="caption">
+                  <helix-text as="span" slot="description" variant="caption">
                     {post.when} &middot; {post.minutes} min
                   </helix-text>
                 </helix-list-item>

@@ -13,7 +13,7 @@ export function Example() {
         >
           Item One
         </a>
-        <span slot="supporting">Caption</span>
+        <span slot="description">Caption</span>
       </helix-list-item>
       <helix-list-item>
         <helix-icon
@@ -26,7 +26,7 @@ export function Example() {
         >
           Item Two
         </a>
-        <span slot="supporting">Caption</span>
+        <span slot="description">Caption</span>
       </helix-list-item>
     </helix-list>
   )

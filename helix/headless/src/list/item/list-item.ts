@@ -33,9 +33,9 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/list
  *
  * @slot - The label.
+ * @slot description - Secondary text under the label.
  * @slot end - Trailing content.
  * @slot start - Leading content, usually an icon or an avatar.
- * @slot supporting - Secondary text under the label.
  *
  * @csspart row - The layout, held off the host so the host can carry a marker.
  */
@@ -112,7 +112,7 @@ export class HelixHeadlessListItem extends HelixElement {
        its supporting text beside the label instead of under it. */
     const content = html`${this.renderRail()}<slot name="start"></slot>
       <slot></slot>
-      <slot name="supporting"></slot>
+      <slot name="description"></slot>
       <slot name="end"></slot>`
 
     /* An anchor where there is somewhere to go, and the same box either way.

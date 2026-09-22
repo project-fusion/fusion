@@ -37,13 +37,13 @@ const ITEMS_ID = 'items'
  * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - The notifications in this group.
- * @slot action - Beside the count, for a link to the rest of them.
+ * @slot actions - Beside the count, for a link to the rest of them.
  * @slot label - Replaces the group's name, for a heading that needs a mark in it.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the group folds, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the group unfolds. Cancelable: refusing it takes the decision and nothing moves.
  *
- * @csspart action - The trailing region of the header.
+ * @csspart actions - The trailing region of the header.
  * @csspart count - How many are in the group.
  * @csspart header - The label, the count and the action together.
  * @csspart items - The region holding the notifications.
@@ -198,9 +198,9 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
       return
     }
     slot.assign(...showing)
-    const action = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot[name="action"]')
+    const action = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot[name="actions"]')
     action?.assign?.(
-      ...[...this.children].filter((child) => child.getAttribute('slot') === 'action'),
+      ...[...this.children].filter((child) => child.getAttribute('slot') === 'actions'),
     )
     const label = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot[name="label"]')
     label?.assign?.(...[...this.children].filter((child) => child.getAttribute('slot') === 'label'))
@@ -244,7 +244,7 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
             : html`<span part="label"><slot name="label">${this.label}</slot></span>
                 ${count}`
         }
-        <span part="action"><slot name="action"></slot></span>
+        <span part="actions"><slot name="actions"></slot></span>
       </div>
       <div id=${ITEMS_ID} part="items">
         <slot></slot>

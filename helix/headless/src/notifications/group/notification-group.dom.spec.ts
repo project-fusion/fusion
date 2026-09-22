@@ -110,3 +110,13 @@ describe('folding', () => {
     expect(slot?.assignedElements().length).toBe(1)
   })
 })
+
+/* The group assigns its slots by hand, so a slot renamed in the template and
+   not in the filter would take nothing, with every stylesheet still matching. */
+describe('what sits beside the count', () => {
+  test('an element slotted into `actions` is assigned there', async () => {
+    const el = await group('', `${ROWS}<a href="#all" slot="actions">See all</a>`)
+    const slot = el.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="actions"]')
+    expect(slot?.assignedElements().map((one) => one.textContent)).toEqual(['See all'])
+  })
+})

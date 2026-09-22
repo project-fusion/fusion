@@ -16,7 +16,7 @@ export function Example() {
       >
         <helix-button
           emphasis="ghost"
-          slot="action"
+          slot="actions"
         >
           See all
         </helix-button>
@@ -56,7 +56,7 @@ export function Example() {
       >
         <helix-button
           emphasis="ghost"
-          slot="action"
+          slot="actions"
         >
           See all
         </helix-button>

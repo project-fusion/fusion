@@ -60,8 +60,9 @@ const REFUSED: [(&str, &str); 1] = [("wrapper", "container")];
 /// through.** A slot is where content lands, and every component has a leading
 /// edge and a heading somewhere, so the words for those drift the way part
 /// names did while a `poster`, a `composer` or a `swatch` names what that
-/// component has. Measured across both tiers on 22 Sep 2026: these eleven were
-/// already one word each in every family using them, and the heading was two.
+/// component has. Measured across both tiers on 22 Sep 2026: eleven of these
+/// were already one word each in every family using them, the heading was two
+/// and the line under a label was three.
 ///
 /// **`heading` and `header` are two things, and both are registered.** A
 /// header is a region, holding a heading and whatever sits beside it, which is
@@ -69,10 +70,14 @@ const REFUSED: [(&str, &str); 1] = [("wrapper", "container")];
 /// in as many words. A heading is the heading alone, which is all Callout and
 /// Empty have. A component with a heading and nothing beside it takes
 /// `heading`, and one that grows an action beside it grows a `header`.
-const SLOT_ROLES: [(&str, &str); 11] = [
+const SLOT_ROLES: [(&str, &str); 12] = [
     (
         "actions",
         "what a reader can do about the component, one control or several",
+    ),
+    (
+        "description",
+        "a quieter line under the component's label",
     ),
     ("end", "content at the trailing edge"),
     ("feedback", "what a field says about its value"),
@@ -96,7 +101,23 @@ const SLOT_ROLES: [(&str, &str); 11] = [
 /// answered in two words. `heading` survived because it names what the element
 /// is, where `title` is also the attribute every element has, whose tooltip a
 /// reader of `slot="title"` could fairly expect.
-const SLOT_REFUSED: [(&str, &str); 1] = [("title", "heading")];
+///
+/// **`supporting` and `caption` are `description`.** List Item, Notification
+/// and Step each had a quieter line under the label and named it three ways.
+/// `description` was already what Option, Step and the time pickers call that
+/// line as a part, and what a description list calls the thing a term is paired
+/// with, which is what List's `description` kind makes of the same slot.
+///
+/// **`action` is `actions` and `prefix` is `start`.** The Notifications group
+/// spelled the one word every other family plurals, and Tag named its leading
+/// slot for what a consumer usually puts there rather than where it sits.
+const SLOT_REFUSED: [(&str, &str); 5] = [
+    ("action", "actions"),
+    ("caption", "description"),
+    ("prefix", "start"),
+    ("supporting", "description"),
+    ("title", "heading"),
+];
 
 /// Every slot a component documents, with the file that documents it.
 fn slots(context: &Context) -> Vec<(String, String)> {
