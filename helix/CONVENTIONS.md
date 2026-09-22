@@ -1254,6 +1254,18 @@ for the tier and whether to publish typings, and finds everything else.
   against, which is what lets inheritance resolve across packages. Every package
   shipping extendable classes needs its own manifest, including `helix/core`,
   which ships mixins rather than components.
+- **A named union is written out, so an attribute's values are in the
+  manifest.** `format?: ColorFormat` published the word `ColorFormat` and no
+  values, in seventeen attributes across ten names, and the reference page
+  printed the name. The generator substitutes any alias these sources declare as
+  a union of literals, found through the import that brought the name in: the
+  same file, a file beside it, or the package named by the specifier, reached
+  through `node_modules` the way the runtime reaches it. The name stays where it
+  is not a union of quoted words, which is the platform's `ScrollBehavior` and
+  the shapes whose name is the honest answer, and `helix component`'s `resolved`
+  rule refuses exactly what is left. **Writing out half a union is worse than
+  the name**, because a shorter list reads as the whole of it, so a union with a
+  name in it is not substituted at all.
 - **Document mixin members on the mixin's inner class**, not only on the
   exported `declare class`. The interface is what TypeScript reads; the inner
   class is what the manifest reads.

@@ -7,11 +7,13 @@
 //! resolves to. That is the difference between a project and a research
 //! programme, and it is why a Rust parser is enough.
 //!
-//! **The policy that rests on it is now held by a rule.** `resolved` refuses an
-//! attribute whose type is a name these sources do not define as a union of
-//! literals, so the annotations this reads are ones a reader of the text can
-//! resolve. Nothing was holding that true before, which is how three arrived
-//! that a parser could not have followed.
+//! **The policy that rests on it is held by a rule, and acted on by a pass.**
+//! `resolved` refuses an attribute whose type is a name these sources do not
+//! define as a union of literals, so the annotations this reads are ones a
+//! reader of the text can resolve; `unions` then makes that substitution, so the
+//! manifest carries the values rather than the name. Nothing was holding the
+//! first true before, which is how three arrived that a parser could not have
+//! followed.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -374,6 +376,16 @@ fn chain_of(expression: &Expression<'_>, into: &mut Vec<String>) {
         }
         _ => {}
     }
+}
+
+/// Where each name one module imported came from, by its specifier.
+///
+/// **The same reading the declarations get**, so a name resolved for a type is
+/// resolved by the import a superclass would be.
+pub fn imported(text: &str) -> BTreeMap<String, String> {
+    let allocator = Allocator::default();
+    let parsed = Parser::new(&allocator, text, SourceType::ts()).parse();
+    imports(&parsed.program)
 }
 
 /// Where each imported name came from, by the specifier that brought it in.

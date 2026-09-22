@@ -1,12 +1,13 @@
 //! An attribute's values are in its type, not behind a name.
 //!
-//! **The manifest records the annotation somebody wrote, not what it means.**
-//! The analyzer parses; it does not resolve. So a property declared
-//! `type: InputType` arrives as the bare word `InputType` with no values in it,
-//! and everything downstream reads a name: the reference page prints it in the
-//! type column and lists nothing a consumer could write, and the `axes` rule
-//! goes looking for words it will not find. A reader is told the attribute takes
-//! an `InputType` and left to discover what one is.
+//! **The generator writes out every name it can follow, and this holds the
+//! rest.** `manifest::unions` substitutes an alias declared as a union of
+//! literals, in the file that uses it, a file beside it, or the package the
+//! import names, so `type: InputType` reaches the manifest as the seven words a
+//! consumer may write. What survives as a bare name is what no reader of these
+//! sources could substitute either, and that is what this reports: the
+//! reference page would print the name and list nothing, and the `axes` rule
+//! would go looking for words that are not there.
 //!
 //! **It is the attributes that matter, and only those.** An attribute is the
 //! HTML surface, a string a consumer types into markup with nothing to complete
@@ -15,13 +16,13 @@
 //! and printing it is the honest answer rather than a failure to resolve. This
 //! reads the members the manifest marks as attributes and leaves the rest alone.
 //!
-//! **A name is fine as long as it resolves here.** The point is not to inline
-//! every union at its declaration, which would put twelve placements in five
-//! files and let them drift. It is that the alias is one this repository's own
-//! sources define, as a union of literals, so any reader of those sources can
-//! substitute it: the `axes` rule already does exactly that, and a generator
-//! written against a parser can too. What fails is a name that leads somewhere a
-//! parser cannot follow.
+//! **A name is fine as long as it resolves, and a resolved one is not a name by
+//! the time it is read here.** The point is not to inline every union at its
+//! declaration, which would put twelve placements in five files and let them
+//! drift. It is that the alias is one this repository's own sources define, as a
+//! union of literals, so any reader of those sources can substitute it and so
+//! can the generator. What fails is a name that leads somewhere a parser cannot
+//! follow.
 //!
 //! **Three shapes led nowhere and each was converted rather than excused.**
 //! `(typeof ORB_STATES)[number]` and `keyof typeof LANGUAGES` are derivations a
@@ -37,11 +38,8 @@
 //! annotation that needs a checker. Nothing was holding that true, which is how
 //! these three arrived.
 
-use std::collections::BTreeMap;
-
 use serde_json::Value;
 
-use crate::component::axes::aliases;
 use crate::component::{Context, Finding, Report};
 
 /// Types whose name is the honest answer, because they are the platform's.
@@ -71,7 +69,7 @@ fn is_a_name(text: &str) -> bool {
             .all(|one| one.is_ascii_alphanumeric() || one == '_')
 }
 
-/// Every attribute-backed member that declares a bare name, by tag.
+/// Every attribute-backed member and the type it declares, by tag.
 fn named(context: &Context) -> Vec<(String, String, String, String)> {
     let mut found = Vec::new();
     for tier in context.settings.roots(&context.root) {
@@ -118,14 +116,12 @@ fn named(context: &Context) -> Vec<(String, String, String, String)> {
                         .and_then(|one| one.get("text"))
                         .and_then(Value::as_str)
                         .unwrap_or_default();
-                    if is_a_name(text) && !PLATFORM.contains(&text) {
-                        found.push((
-                            tag.to_owned(),
-                            name.to_owned(),
-                            text.to_owned(),
-                            path.clone(),
-                        ));
-                    }
+                    found.push((
+                        tag.to_owned(),
+                        name.to_owned(),
+                        text.to_owned(),
+                        path.clone(),
+                    ));
                 }
             }
         }
@@ -134,33 +130,22 @@ fn named(context: &Context) -> Vec<(String, String, String, String)> {
 }
 
 pub fn run(context: &Context) -> Report {
-    let table: BTreeMap<String, String> = aliases(context);
     let mut findings = Vec::new();
     let mut checked = 0;
 
     for (tag, member, text, where_) in named(context) {
         checked += 1;
-        let resolved = table.get(&text);
-        if resolved.is_some_and(|body| body.contains('\'') || body.contains('"')) {
+        if !is_a_name(&text) || PLATFORM.contains(&text.as_str()) {
             continue;
         }
-        let why = match resolved {
-            None => format!(
-                "`{text}` is not a union this repository's sources declare, so nothing short of a \
-                 type checker reaches its values"
-            ),
-            Some(body) => format!(
-                "`{text}` is declared as `{body}`, which is a derivation rather than a union of \
-                 literals"
-            ),
-        };
         findings.push(Finding {
             detail: format!(
                 "An attribute is the HTML surface, so its values have to be somewhere a reader \
-                 can reach, and the manifest carries the annotation rather than what it means: \
-                 {why}. Write the union out where the type is declared, and hold whatever derived \
-                 it to the union instead. A name is fine as long as these sources define it as \
-                 literals."
+                 can reach. The generator writes out any alias these sources declare as a union \
+                 of literals, wherever it is declared, so `{text}` surviving as a name means \
+                 nothing short of a type checker reaches its values: it is a derivation, a shape \
+                 with fields, or somebody else's. Write the union out where the type is declared, \
+                 and hold whatever derived it to the union instead."
             ),
             file: where_,
             message: format!("`{tag}` publishes `{member}` as the bare name `{text}`"),
@@ -171,6 +156,6 @@ pub fn run(context: &Context) -> Report {
         checked,
         findings,
         notes: Vec::new(),
-        unit: "attributes declaring a named type",
+        unit: "attribute types",
     }
 }

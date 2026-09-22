@@ -2657,3 +2657,112 @@ fn a_source_path_is_the_repository_s_wherever_it_was_asked_from() {
         "helix/tier/src/badge"
     );
 }
+
+/// A name a reader can substitute is written out; one they cannot is left.
+///
+/// The three places an alias lives, in one tree: the file that uses it, a file
+/// beside it, and the package it was imported from. What is not a union of
+/// literals stays the name it was written as, which is the platform's types and
+/// the shapes whose name is the honest answer.
+#[test]
+fn a_named_union_is_written_out_wherever_its_alias_lives() {
+    let sandbox = Sandbox::new("manifest-unions", None);
+    let src = sandbox.0.join("src/field");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    let core = sandbox.0.join("node_modules/@acme/core/src");
+    std::fs::create_dir_all(&core).expect("a dependency tree");
+    std::fs::write(
+        core.join("floating.ts"),
+        "export type Placement =\n  | 'bottom'\n  | 'top'\n",
+    )
+    .expect("a dependency source");
+    std::fs::write(
+        src.join("tone.ts"),
+        "export type Tone = 'danger' | 'info'\n",
+    )
+    .expect("a source beside it");
+    std::fs::write(
+        src.join("field.ts"),
+        "import { type Placement } from '@acme/core'\n\
+         import type { Tone } from './tone.js'\n\
+         export type FieldType = 'email' | 'text'\n\
+         @customElement('helix-field')\n\
+         export class HelixField extends HelixElement {\n\
+         \x20 @property() type: FieldType = 'text'\n\
+         \x20 @property() tone?: Tone\n\
+         \x20 @property() placement: Placement = 'top'\n\
+         \x20 @property() behavior: ScrollBehavior = 'smooth'\n\
+         \x20 watcher?: ResizeObserver\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let class = parsed["modules"]
+        .as_array()
+        .expect("the modules")
+        .iter()
+        .flat_map(|one| one["declarations"].as_array().cloned().unwrap_or_default())
+        .find(|one| one["name"] == "HelixField")
+        .expect("the class");
+    let typed = |name: &str, list: &str| -> String {
+        class[list]
+            .as_array()
+            .expect("the list")
+            .iter()
+            .find(|one| one["name"] == name)
+            .and_then(|one| one["type"]["text"].as_str().map(ToOwned::to_owned))
+            .unwrap_or_default()
+    };
+
+    /* Declared in the file that uses it, in a file beside it, and in the
+    package the import names: each is a substitution a reader can make. */
+    assert_eq!(typed("type", "members"), "'email' | 'text'");
+    assert_eq!(typed("tone", "members"), "'danger' | 'info' | undefined");
+    assert_eq!(typed("placement", "members"), "'bottom' | 'top'");
+    /* The attribute carries what the field says, which is the surface a
+    consumer types into and the reason any of this is written out. */
+    assert_eq!(typed("placement", "attributes"), "'bottom' | 'top'");
+    /* The platform's type and a class are names with no values under them, and
+    a name is the honest answer rather than a failure to resolve. */
+    assert_eq!(typed("behavior", "members"), "ScrollBehavior");
+    assert_eq!(typed("watcher", "members"), "ResizeObserver | undefined");
+}
+
+/// A union that is not all literals is left as the name it was written as.
+#[test]
+fn a_union_with_a_name_in_it_is_not_written_out() {
+    let sandbox = Sandbox::new("manifest-unions-partial", None);
+    let src = sandbox.0.join("src/stop");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("stop.ts"),
+        "export type Side = 'left' | 'right'\n\
+         export type Anchored = Side | 'center'\n\
+         export type Derived = (typeof STOPS)[number]\n\
+         @customElement('helix-stop')\n\
+         export class HelixStop extends HelixElement {\n\
+         \x20 @property() at?: Anchored\n\
+         \x20 @property() from?: Derived\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let parsed: serde_json::Value = serde_json::from_str(&out(&output)).expect("a manifest");
+    let members = parsed["modules"][0]["declarations"]
+        .as_array()
+        .expect("the declarations")
+        .iter()
+        .find(|one| one["name"] == "HelixStop")
+        .expect("the class")["members"]
+        .clone();
+    /* Half a union written out would publish a shorter list than the type
+    takes, which reads as the whole of it and is worse than the name. */
+    assert_eq!(members[0]["type"]["text"], "Anchored | undefined");
+    assert_eq!(members[1]["type"]["text"], "Derived | undefined");
+}
