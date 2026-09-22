@@ -45,6 +45,7 @@ pub mod categories;
 pub mod composed;
 pub mod compositions;
 pub mod constructed;
+pub mod conventions;
 pub mod corners;
 pub mod decided;
 pub mod derived_steps;
@@ -549,6 +550,12 @@ pub fn all() -> Vec<Rule> {
             name: "constructed",
             run: Runner::Source(constructed::run),
             summary: "no class field is initialized from the element's own DOM",
+        },
+        Rule {
+            fix: None,
+            name: "conventions",
+            run: Runner::Source(conventions::run),
+            summary: "a component says what it is for, and documents what it publishes",
         },
         Rule {
             fix: None,
