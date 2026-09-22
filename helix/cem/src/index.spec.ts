@@ -1,10 +1,14 @@
 import { describe, expect, test } from 'bun:test'
-import { createHelixCemConfig } from './index.js'
+import { join } from 'node:path'
+import { afterManifest, dependenciesOf } from './index.js'
 import { conventionLint } from './plugins/convention-lint.js'
-import { helixTier } from './plugins/helix-tier.js'
-import { reactEvents, toReactProp } from './plugins/react-events.js'
-import { stableOrder } from './plugins/stable-order.js'
-import type { HelixContext, HelixDeclaration, HelixManifest } from './types.js'
+import {
+  eachComponent,
+  type HelixContext,
+  type HelixDeclaration,
+  type HelixManifest,
+  type Plugin,
+} from './types.js'
 
 /**
  * The component root, which every real Helix class descends from.
@@ -40,67 +44,9 @@ const manifest = (declaration: Partial<HelixDeclaration>): HelixManifest => ({
   ],
 })
 
-const run = (plugin: ReturnType<typeof helixTier>, customElementsManifest: HelixManifest): void => {
-  plugin.packageLinkPhase?.({
-    context: {},
-    customElementsManifest: customElementsManifest as never,
-    ts: {} as never,
-  })
+const run = (plugin: Plugin, customElementsManifest: HelixManifest): void => {
+  plugin.packageLinkPhase?.({ context: {}, customElementsManifest })
 }
-
-const runWith = (
-  plugin: ReturnType<typeof helixTier>,
-  customElementsManifest: HelixManifest,
-  context: HelixContext,
-): void => {
-  plugin.packageLinkPhase?.({
-    context: context as never,
-    customElementsManifest: customElementsManifest as never,
-    ts: {} as never,
-  })
-}
-
-const subject = (pkg: HelixManifest): HelixDeclaration =>
-  pkg.modules?.[0]?.declarations?.find((d) => d.name === 'HelixThing') ?? { name: 'missing' }
-
-describe('toReactProp', () => {
-  // React strips `on` and listens for exactly what is left, so any transform of
-  // the name binds an event nobody dispatches.
-  test('is `on` and the event name verbatim', () => {
-    expect(toReactProp('helix-open')).toBe('onhelix-open')
-    expect(toReactProp('helix-before-change')).toBe('onhelix-before-change')
-  })
-
-  test('a relayed native event keeps its own name', () => {
-    expect(toReactProp('change')).toBe('onchange')
-  })
-})
-
-describe('helixTier', () => {
-  test('stamps registered custom elements', () => {
-    const pkg = manifest({ customElement: true, tagName: 'helix-thing' })
-    run(helixTier('styled'), pkg)
-    expect(subject(pkg).helix?.tier).toBe('styled')
-  })
-
-  // The headless tier carries no @customElement decorator, so keying on
-  // `customElement: true` would skip it entirely.
-  test('stamps unregistered classes too', () => {
-    const pkg = manifest({})
-    run(helixTier('headless'), pkg)
-    expect(subject(pkg).helix?.tier).toBe('headless')
-  })
-})
-
-describe('reactEvents', () => {
-  test('annotates each event with its generated React prop', () => {
-    const pkg = manifest({
-      events: [{ description: 'Fired on change.', name: 'OpenChange' }],
-    })
-    run(reactEvents(), pkg)
-    expect(subject(pkg).events?.[0]?.reactProp).toBe('onOpenChange')
-  })
-})
 
 describe('conventionLint', () => {
   /** The metadata @since, @status, and @documentation carry, all required. */
@@ -206,9 +152,13 @@ describe('conventionLint', () => {
   })
 })
 
+/** The names `eachComponent` yields, which is what the linter walks. */
+const components = (pkg: HelixManifest, context?: HelixContext): string[] =>
+  [...eachComponent(pkg, context)].map(({ declaration }) => declaration.name)
+
 describe('component predicate', () => {
-  // Keying on `kind === 'class'` linted and stamped every exported class,
-  // which is correct only until a package exports one that is not a component.
+  // Keying on `kind === 'class'` linted every exported class, which is correct
+  // only until a package exports one that is not a component.
   test('ignores a class that does not descend from HelixElement', () => {
     const pkg: HelixManifest = {
       modules: [
@@ -223,12 +173,7 @@ describe('component predicate', () => {
       ],
     }
 
-    run(helixTier('styled'), pkg)
-    const stamped = (pkg.modules?.[0]?.declarations ?? [])
-      .filter((d) => d.helix?.tier)
-      .map((d) => d.name)
-
-    expect(stamped).toEqual(['HelixElement'])
+    expect(components(pkg)).toEqual(['HelixElement'])
   })
 
   test('resolves the chain through a dependency manifest', () => {
@@ -248,11 +193,8 @@ describe('component predicate', () => {
 
     // Without the dependency's manifest the base is unresolvable, so the
     // component looks unrelated to HelixElement and is skipped entirely.
-    run(helixTier('styled'), pkg)
-    expect(subject(pkg).helix).toBeUndefined()
-
-    runWith(helixTier('styled'), pkg, { thirdPartyCEMs: [dependency] })
-    expect(subject(pkg).helix?.tier).toBe('styled')
+    expect(components(pkg)).toEqual([])
+    expect(components(pkg, { thirdPartyCEMs: [dependency] })).toEqual(['HelixThing'])
   })
 
   test('terminates on a superclass cycle', () => {
@@ -268,90 +210,46 @@ describe('component predicate', () => {
       ],
     }
 
-    expect(() => run(helixTier('styled'), pkg)).not.toThrow()
+    expect(() => components(pkg)).not.toThrow()
   })
 })
 
-describe('stableOrder', () => {
-  test('sorts modules by path, so an unchanged tree emits an unchanged manifest', () => {
-    // The analyzer emits modules in the order its globs resolved, which is
-    // filesystem order and not stable between runs.
-    const pkg: HelixManifest = {
-      modules: [
-        { path: 'src/toggle/root.ts' },
-        { path: 'src/accordion/root.ts' },
-        { path: 'src/badge/root.ts' },
-      ],
-    }
-    run(stableOrder(), pkg)
-    expect((pkg.modules ?? []).map((module) => module.path)).toEqual([
-      'src/accordion/root.ts',
-      'src/badge/root.ts',
-      'src/toggle/root.ts',
-    ])
+describe('afterManifest', () => {
+  const names = (steps: Plugin[]): string[] => steps.map((one) => one.name)
+
+  test('lints, and writes no typings unless asked to', () => {
+    expect(names(afterManifest({ tier: 'core' }))).toEqual(['helix-convention-lint'])
   })
 
-  test('leaves a manifest with no modules alone', () => {
-    const pkg = {} as HelixManifest
-    expect(() => run(stableOrder(), pkg)).not.toThrow()
-  })
-})
-
-describe('createHelixCemConfig', () => {
-  test('ships the Helix plugin set and enables Lit handling', () => {
-    const config = createHelixCemConfig({ tier: 'styled' })
-    const names = (config.plugins ?? []).map((p) => (p as unknown as { name: string }).name)
-
-    expect(config.litelement).toBe(true)
-    // dependencies:true is what lets applyInheritancePlugin resolve members and
-    // events across package boundaries. Without it a component that extends a
-    // base in another package documents none of its inherited API.
-    expect(config.dependencies).toBe(true)
-    expect(names).toEqual([
-      'helix-tier',
-      'helix-composition',
-      'helix-metadata',
-      // After composition, which is what decides a declaration is the root.
-      'helix-examples',
-      'helix-source',
-      'helix-declared-events',
-      'helix-references',
-      // After the analyzer has filled each declaration's own `cssProperties`,
-      // which is what it copies across, and before `helix-stable-order` so the
-      // hooks it appends are sorted with everything else.
-      'helix-borrowed-styles',
-      'helix-react-events',
-      'helix-convention-lint',
-      'helix-stable-order',
-    ])
-  })
-
-  test('inferred events are dropped before the linter sees them', () => {
-    const names = (createHelixCemConfig({ tier: 'styled' }).plugins ?? []).map(
-      (p) => (p as unknown as { name: string }).name,
+  test('lints before it writes typings, which read the manifest the linter passed', () => {
+    const steps = names(
+      afterManifest({ frameworkTypes: true, packageName: '@x/y', tier: 'styled' }),
     )
-    expect(names.indexOf('helix-declared-events')).toBeLessThan(
-      names.indexOf('helix-convention-lint'),
-    )
+    expect(steps[0]).toBe('helix-convention-lint')
+    // Last of the generators, because it rewrites what two of them wrote.
+    expect(steps.at(-1)).toBe('helix-jsx-optional-undefined')
   })
 
   test('lint can be turned off', () => {
-    const config = createHelixCemConfig({ lint: false, tier: 'styled' })
-    const names = (config.plugins ?? []).map((p) => (p as unknown as { name: string }).name)
-    expect(names).not.toContain('helix-convention-lint')
+    expect(names(afterManifest({ lint: false, tier: 'styled' }))).toEqual([])
+  })
+})
+
+describe('dependenciesOf', () => {
+  const at = (name: string) => join(import.meta.dir, '..', '..', name)
+
+  // The analyzer followed imports through the dependencies' own files, so a
+  // package naming only the styled tier was given headless and core as well,
+  // which the linter needs to see that a class descends from HelixElement.
+  test('reaches the manifests beneath the ones a package names', () => {
+    expect([...dependenciesOf(at('sandbox')).keys()]).toEqual([
+      '@fusion.dev/helix-core',
+      '@fusion.dev/helix',
+      '@fusion.dev/helix-headless',
+    ])
   })
 
-  test('extra plugins are appended after the Helix set', () => {
-    const config = createHelixCemConfig({ plugins: [{ name: 'custom' }], tier: 'styled' })
-    const names = (config.plugins ?? []).map((p) => (p as unknown as { name: string }).name)
-    expect(names.at(-1)).toBe('custom')
-  })
-
-  test('specs are excluded so they do not enter the manifest', () => {
-    expect(createHelixCemConfig({ tier: 'styled' }).exclude).toContain('src/**/*.spec.ts')
-  })
-
-  test('a module generated from the manifest is excluded from it', () => {
-    expect(createHelixCemConfig({ tier: 'styled' }).exclude).toContain('src/**/*.generated.ts')
+  test('a package that depends on no manifest is built against none', () => {
+    expect([...dependenciesOf(at('core')).keys()]).toEqual([])
   })
 })

@@ -21,6 +21,10 @@ inputs:
     description: Whether to run `bun install`. A job that only reads a script wants the runtime and nothing else.
     default: 'true'
     required: false
+  helix:
+    description: Whether to put the `helix` binary on disk, which `analyze` runs. A job that compiles the workspace itself, or builds nothing, turns it off.
+    default: 'true'
+    required: false
 
 runs:
   using: composite
@@ -50,3 +54,9 @@ runs:
       if: inputs.dependencies == 'true'
       shell: bash
       run: bun install --frozen-lockfile
+
+    # After the install, because a job without the workspace installed cannot
+    # run `analyze` and so has no use for the binary either.
+    - name: Put the helix binary on disk
+      if: inputs.dependencies == 'true' && inputs.helix == 'true'
+      uses: ./.github/actions/helix

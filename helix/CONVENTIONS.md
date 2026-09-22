@@ -10,7 +10,7 @@ styled     the styled tier. Extends headless, references tokens
 ```
 
 There is no `react` tier. The framework typings, `jsx.d.ts`, `vue.d.ts` and
-`svelte.d.ts`, are emitted by the analyzer from the two tiers above, and
+`svelte.d.ts`, are written from the manifests of the two tiers above, and
 [Framework typings](#framework-typings-and-the-names-they-carry) says what they
 carry.
 
@@ -1218,21 +1218,29 @@ turns out to be, the way `axes` names work rather than blocking on it.
 
 ## The manifest
 
-`@fusion.dev/helix-cem` owns the analyzer config and plugins. Packages call
-`createHelixCemConfig({ tier })` rather than configuring the analyzer.
+`helix manifest build` writes it, in Rust, and `@fusion.dev/helix-cem` runs
+over it afterwards: the convention linter, and the framework typings. A
+package's `analyze` is `bun --bun helix-cem`, which reads its `cem.config.ts`
+for the tier and whether to publish typings, and finds everything else.
 
-- **`dependencies: true` is set**, which is what lets inheritance resolve across
-  packages. Every package shipping extendable classes needs its own manifest,
-  including `helix/core`, which ships mixins rather than components.
+- **The generator replaced `@custom-elements-manifest/analyzer` byte for
+  byte**, across all four tiers and all nine typings files, so what the
+  analyzer did is still the rule for what the manifest says. Where the two
+  would differ, the analyzer's output is what `helix/cli/src/manifest/` was
+  held to, and each rule beside the code says which measurement settled it.
+- **A package's dependencies are found, not listed.** Every helix package
+  reachable through `dependencies` that ships a manifest is one it is built
+  against, which is what lets inheritance resolve across packages. Every package
+  shipping extendable classes needs its own manifest, including `helix/core`,
+  which ships mixins rather than components.
 - **Document mixin members on the mixin's inner class**, not only on the
   exported `declare class`. The interface is what TypeScript reads; the inner
-  class is what the analyzer reads.
-- **Plugins are objects, not factories.** The analyzer's `Config` type says
-  otherwise and is wrong; passing factories fails silently.
-- **The manifest records paths, never URLs.** `helix-source` derives a family's
-  source directory from its module path, the way `helix-composition` derives the
-  group and the part from the same string, so it cannot disagree with where the
-  file is and it survives a move. What it stores is
+  class is what the manifest reads.
+- **The manifest records paths, never URLs.** A family's source directory is
+  derived from its module path, the way its group and part are derived from the
+  same string, so it cannot disagree with where the file is and it survives a
+  move. It is the repository's path whichever directory the build ran from.
+  What it stores is
   `helix/styled/src/accordion`; the site composes
   `{repository}/tree/{ref}/{path}`.
 
@@ -1244,9 +1252,11 @@ turns out to be, the way `axes` names work rather than blocking on it.
   the repository; what is not is which commit anyone wants to read.
   `fusion/site/utils/source/source.ts` is the only file a version selector has to touch.
 
-- **Do not import `custom-elements-manifest/schema`.** The analyzer bundles its
-  own copy and two copies produce types `exactOptionalPropertyTypes` will not
-  unify.
+- **The manifest's types are this repository's own**, structural and loose, in
+  `helix/cem/src/types.ts`. They were written that way because the analyzer
+  bundled its own copy of `custom-elements-manifest/schema`, and two copies
+  produce types `exactOptionalPropertyTypes` will not unify; with the analyzer
+  gone the reason is weaker and the types are no worse for it.
 
 ## JSDoc contract
 

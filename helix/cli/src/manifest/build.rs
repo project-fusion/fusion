@@ -789,6 +789,28 @@ fn pascal(value: &str) -> String {
 /// `helix-composition`, which takes the two directories under `src` and writes
 /// them `PascalCase`, prefixing a headless group with `Base` because that tier is
 /// a parallel family rather than a variant.
+/// A package's directory as the repository names it, in forward slashes.
+///
+/// The root is the nearest directory above holding a `.git`, which is how the
+/// plugin this replaced found it. Where there is none, the path is given back
+/// as the caller wrote it, which is the most that can be said.
+fn rooted(package: &Path, given: &str) -> String {
+    let Ok(here) = package.canonicalize() else {
+        return given.trim_end_matches('/').to_owned();
+    };
+    let Some(root) = here.ancestors().find(|one| one.join(".git").exists()) else {
+        return given.trim_end_matches('/').to_owned();
+    };
+    let Ok(inside) = here.strip_prefix(root) else {
+        return given.trim_end_matches('/').to_owned();
+    };
+    inside
+        .components()
+        .map(|one| one.as_os_str().to_string_lossy().into_owned())
+        .collect::<Vec<String>>()
+        .join("/")
+}
+
 fn helix(
     documented: &Documented,
     path: &str,
@@ -860,17 +882,23 @@ fn helix(
             carries none, which is the reference page's own shape, one page per
             family with the parts described inside it. */
             if *part == "root" {
-                /* From the repository root rather than the package, because a
-                reader following this opens a path in a checkout, and the
-                package argument is what says where the package sits. */
+                /* **From the repository root, whoever asked and from wherever.**
+                A reader following this opens a path in a checkout, so an
+                absolute one from whichever machine ran the build is no use to
+                them, and neither is one relative to wherever the command
+                happened to be run: `helix/headless/src/accordion` from the root
+                and `./src/accordion` from the package are the same directory,
+                and the second is what the first build from a package's own
+                directory wrote. */
                 let at = package.join("src").join(family);
-                /* **Written as the caller wrote it, not as it resolved.** The
-                path is read by a person opening a checkout, so an absolute one
-                from whichever machine ran the build is no use to them: `given`
-                is the argument as typed and the manifest speaks in those. */
                 block.insert(
                     "source".to_owned(),
-                    json!(format!("{}/src/{family}", given.trim_end_matches('/'))),
+                    json!(match rooted(package, given).as_str() {
+                        /* The package is the repository, which the plugin this
+                        replaced wrote as `src/…` rather than `/src/…`. */
+                        "" => format!("src/{family}"),
+                        prefix => format!("{prefix}/src/{family}"),
+                    }),
                 );
                 let examples = examples_in(&at.join(".examples"));
                 if !examples.is_empty() {

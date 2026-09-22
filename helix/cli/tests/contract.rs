@@ -1191,10 +1191,11 @@ fn a_family_carries_its_examples_and_its_root_alone_does() {
         1,
         "not twice"
     );
-    /* The path as the caller wrote it, since a reader opens a checkout. */
+    /* The repository's path, since a reader opens a checkout. The package is
+    the repository here, which is written `src/…` rather than `./src/…`. */
     assert!(
-        said.contains("\"source\": \"./src/badge\""),
-        "as given: {said}"
+        said.contains("\"source\": \"src/badge\""),
+        "from the repository: {said}"
     );
     /* And the item carries none of it. **Counted rather than read positionally**:
     the modules are sorted, `item` comes before `root`, and looking at
@@ -2622,4 +2623,37 @@ fn a_manifest_is_written_in_the_order_the_analyzer_writes_one() {
             "{before} before {after}: {shape:?}\n{said}"
         );
     }
+}
+
+/// A family's source path is the repository's, however the command was run.
+///
+/// `helix/headless/src/accordion` from the root and `./src/accordion` from the
+/// package are the same directory, and the manifest is read by someone opening
+/// a checkout, so it says the first either way. Running `analyze` from each
+/// package's own directory, which is what replacing the analyzer meant, wrote
+/// the second until this.
+#[test]
+fn a_source_path_is_the_repository_s_wherever_it_was_asked_from() {
+    let sandbox = Sandbox::new("manifest-rooted", None);
+    let package = sandbox.0.join("helix/tier");
+    std::fs::create_dir_all(package.join("src/badge/root")).expect("a source tree");
+    std::fs::write(
+        package.join("src/badge/root/badge-root.ts"),
+        "@customElement('helix-badge')\nexport class HelixBadge extends HelixElement {}\n",
+    )
+    .expect("a source");
+
+    let source = |from: &std::path::Path, argument: &str| {
+        let output = run(from, &["manifest", "build", argument, "--tier", "styled"]);
+        assert_eq!(code(&output), 0, "{}", err(&output));
+        let parsed: serde_json::Value = serde_json::from_str(&out(&output)).expect("a manifest");
+        parsed["modules"][0]["declarations"][0]["helix"]["source"].clone()
+    };
+    assert_eq!(source(&sandbox.0, "helix/tier"), "helix/tier/src/badge");
+    assert_eq!(source(&package, "."), "helix/tier/src/badge");
+    /* A package at the root of its repository names its source from there. */
+    assert_eq!(
+        source(&sandbox.0.join("helix"), "../helix/tier"),
+        "helix/tier/src/badge"
+    );
 }

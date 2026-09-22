@@ -114,6 +114,9 @@ jobs:
       - name: Set up bun and the dependencies
         if: steps.dependencies.outputs.cache-hit != 'true' || steps.browser.outputs.cache-hit != 'true'
         uses: ./.github/actions/setup
+        with:
+          # It reads the lockfile and builds nothing.
+          helix: false
       # Saves the browser on its way out when it missed.
       - name: Install Chromium
         if: steps.browser.outputs.cache-hit != 'true'
@@ -378,6 +381,9 @@ jobs:
           fetch-depth: 0
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
+        with:
+          # It lints what is checked in and builds nothing.
+          helix: false
       - name: Format and lint
         run: bunx biome ci .
       # **The messages and addresses of the commits a pull request brings**,
@@ -445,6 +451,9 @@ jobs:
       # so the runtime and the dependencies are wanted here as everywhere else.
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
+        with:
+          # It compiles the workspace itself, two steps below.
+          helix: false
       - name: Install Rust
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
         with:
@@ -494,6 +503,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
+        with:
+          # It compiles the workspace itself, two steps below.
+          helix: false
       - name: Install Rust
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
         with:

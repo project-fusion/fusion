@@ -34,7 +34,7 @@
   "customElements": "custom-elements.json",
   "sideEffects": true,
   "scripts": {
-    "analyze": "bun --bun cem analyze --config cem.config.ts",
+    "analyze": "bun --bun helix-cem",
     "build": "bun run element-events && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "element-events": "build-element-events --package styled",
     "styles": "build-styles .",
@@ -52,7 +52,6 @@
     "@fusion.dev/helix-styles": "workspace:*"
   },
   "devDependencies": {
-    "@custom-elements-manifest/analyzer": "^0.11.0",
     "@fusion.dev/helix-cem": "workspace:*",
     "@fusion.dev/helix-testing": "workspace:*",
     "@fusion.dev/scripts": "workspace:*",

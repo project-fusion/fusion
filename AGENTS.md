@@ -144,24 +144,17 @@ Rust for backend and substrate cores. TypeScript for frontend.
   synchronous compiler API. An editor asked to use the workspace version wants
   `tsc --lsp --stdio` rather than a server script, and anything reaching for
   `ts.createProgram` has to take the `./unstable/*` surfaces instead.
-- **`node_modules` holds two TypeScripts and that is correct.**
-  `@custom-elements-manifest/analyzer` pins `typescript ~5.4.2` and resolves its
-  own nested 5.4.5, which is what keeps `bun run analyze` working at all: it is
-  a library consumer of the API that 7 no longer has. Upgrading the root does
-  not touch it, and nothing should try to dedupe them.
-- **A cem plugin must never import `typescript` itself.** The analyzer
-  re-exports it and hands the module to each plugin as
-  `analyzePhase({ node, ts })`, so the AST a plugin sees is 5.4's. Taking `ts`
-  off the callback is what keeps `@fusion.dev/helix-cem` compiling under 7, and an
-  import would pull 7's types onto 5.4's nodes.
+- **There is one TypeScript in `node_modules`, and nothing reads source with an
+  older one.** `@custom-elements-manifest/analyzer` pinned `typescript ~5.4.2`
+  and kept a nested 5.4.5, being a library consumer of the API that 7 no longer
+  has. The manifests come from `helix manifest build` now, which reads source
+  with `oxc` in Rust and needs no TypeScript at all; it replaced the analyzer
+  byte for byte across all four tiers, the typings included, and the pin went
+  with it. Nothing should bring a second TypeScript back to read source with.
 - Config files are TypeScript (`*.config.ts`), so they are type-checked rather
-  than failing at runtime on a typo. **`cem analyze` runs as `bun --bun`, and
-  the reason is its config.** It is a Node CLI with its own shebang, and under
-  a Node below 22.18 it cannot load a `.ts` config, falls back to a default one,
-  and writes a manifest with every Helix plugin missing while reporting
-  success: measured on 18.16, a manifest 69,081 lines shorter. Run by bun it
-  loads the config every time, and the manifests came back byte for byte the
-  same. **Node still has a floor**, because what carries a Node shebang and is
+  than failing at runtime on a typo. **`analyze` runs `helix-cem` under `bun
+  --bun`, and the reason is its config**: it imports `cem.config.ts` as it
+  stands, which Node below 22.18 cannot. **Node still has a floor**, because what carries a Node shebang and is
   not run with `--bun` runs under it: Next's `bin` in `build` and `dev`, and
   npm in the release. `engines.node` states the floor,
   `fusion workspace --only node` holds `@types/node` to it, and the release
@@ -303,8 +296,8 @@ directions, so the day the flag changes is the day the workflow has to.
   for what spans the company. Package names drop the product prefix:
   `@fusion.dev/helix`, not `@fusion.dev/helix-helix-styled`.
 - **`private` decides what ships, and the scope does not.** A package can belong
-  to Helix and still never leave: `@fusion.dev/helix-cem` is the analyzer
-  configuration and `@fusion.dev/helix-sandbox` the editor and spec runner, both
+  to Helix and still never leave: `@fusion.dev/helix-cem` is what runs over a
+  manifest once `helix` has written it and `@fusion.dev/helix-sandbox` the editor and spec runner, both
   Helix byproducts and both build tooling for this repository. Naming them
   `@fusion.dev/*` to say "does not publish" would claim they are general Fusion
   tooling, which is the one thing they are not. `fusion workspace --only publishable`

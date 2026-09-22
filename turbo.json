@@ -208,18 +208,25 @@
       "inputs": ["$TURBO_DEFAULT$", "content/faces/faces.generated.ts"],
       "outputs": []
     },
-    // `cem analyze` writes four files and this used to claim one, then three.
+    // `helix-cem` writes four files and this used to claim one, then three.
     // The manifest is the obvious output; `jsx.d.ts`, `vue.d.ts` and
-    // `svelte.d.ts` are written beside it by the framework plugins, and an
+    // `svelte.d.ts` are written beside it by the typings generators, and an
     // output a task does not declare is one a cache hit does not restore.
+    //
+    // **The generator is an input, and it is not in this package.** The
+    // manifest is `helix manifest build`'s, so an edit to the Rust that writes
+    // it changes this task's output while leaving every file the task can see
+    // alone: without these four, a cache hit would hand back the manifest the
+    // old generator wrote. `Cargo.lock` among them, because a bump to `oxc` or
+    // to `serde_json` is exactly that kind of edit.
     //
     // `svelte.d.ts` was the one still missing, and it was invisible while the
     // file was tracked: a cache hit left the working copy alone because git
     // already held it. Untracked, the same cache hit leaves nothing at all, and
     // `files` names it, so the package would ship without the typings a Svelte
     // consumer imports.
-    // Its own `build` was in `dependsOn` and did not belong: the config imports
-    // `@fusion.dev/helix-cem`, which `^build` already covers, and a manifest
+    // Its own `build` was in `dependsOn` and did not belong: `cem.config.ts`
+    // imports `@fusion.dev/helix-cem`, which `^build` already covers, and a manifest
     // built with `dist` absent is byte-identical to one built beside it,
     // measured at 75,232 lines on `helix/headless`. Removing it is what lets
     // `build` depend on `analyze` instead, so a tier can generate
@@ -233,16 +240,22 @@
     // on CI 15 Sep 2026, fourteen tasks rebuilt in 81 seconds, paid again by
     // every job that ran a second turbo command. What the default reads that
     // `src/**` did not is the package's other tracked files, `package.json`
-    // among them, which the analyzer reads for `exports`.
+    // among them, which `helix-cem` reads for the manifests it builds against.
     //
-    // The generated files it leaves out are each accounted for. The analyzer
+    // The generated files it leaves out are each accounted for. The generator
     // does not read `element-events.generated.ts`, which is written from this
     // task's output. It does read each `.css.ts`, which is `styles`' output, so
-    // `styles` is a dependency: its hash stands for them, and the analyzer no
-    // longer races it for whether they exist yet.
+    // `styles` is a dependency: its hash stands for them, and the generator
+    // does not race it for whether they exist yet.
     "analyze": {
       "dependsOn": ["^build", "styles"],
-      "inputs": ["$TURBO_DEFAULT$"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/Cargo.lock",
+        "$TURBO_ROOT$/Cargo.toml",
+        "$TURBO_ROOT$/helix/cli/Cargo.toml",
+        "$TURBO_ROOT$/helix/cli/src/**"
+      ],
       "outputs": ["custom-elements.json", "types/jsx.d.ts", "types/svelte.d.ts", "types/vue.d.ts"]
     },
     "build": {
