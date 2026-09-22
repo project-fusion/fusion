@@ -32,17 +32,17 @@ runs:
       id: restore
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
-        # `1.90` is the toolchain below, said again because a key cannot read a
+        # `1.96` is the toolchain below, said again because a key cannot read a
         # step's input. A bump there without one here would restore a binary
         # the new toolchain did not build.
-        key: helix-${{ runner.os }}-${{ runner.arch }}-1.90-${{ hashFiles('Cargo.lock', 'Cargo.toml', 'helix/cli/Cargo.toml', 'helix/cli/src/**', 'helix/theme/Cargo.toml', 'helix/theme/src/**', 'fusion/rules/Cargo.toml', 'fusion/rules/src/**') }}
+        key: helix-${{ runner.os }}-${{ runner.arch }}-1.96-${{ hashFiles('Cargo.lock', 'Cargo.toml', 'helix/cli/Cargo.toml', 'helix/cli/src/**', 'helix/theme/Cargo.toml', 'helix/theme/src/**', 'fusion/rules/Cargo.toml', 'fusion/rules/src/**') }}
         path: target/ci/helix
 
     - name: Install Rust
       if: steps.restore.outputs.cache-hit != 'true'
       uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
       with:
-        toolchain: 1.90
+        toolchain: 1.96
 
     # A miss is a change to the Rust, so most of the dependency tree is as it
     # was: restoring it is what makes this seconds rather than minutes.

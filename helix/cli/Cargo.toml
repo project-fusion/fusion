@@ -38,10 +38,10 @@ serde = { workspace = true }
 # that read the printed text passed in `cargo test --workspace` and failed in
 # `cargo test -p fusion-helix-cli`.
 serde_json = { workspace = true, features = ["float_roundtrip", "preserve_order"] }
-oxc_parser = "0.110.0"
-oxc_allocator = "0.110.0"
-oxc_span = "0.110.0"
-oxc_ast = "0.110.0"
+oxc_parser = "0.150.0"
+oxc_allocator = "0.150.0"
+oxc_span = "0.150.0"
+oxc_ast = "0.150.0"
 
 [lints]
 workspace = true

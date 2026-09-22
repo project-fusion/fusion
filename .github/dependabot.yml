@@ -27,6 +27,12 @@
 #
 # **Raising the floor is what unblocks it**, in that order, and that is a
 # decision about who can install this rather than a maintenance chore.
+#
+# **The templates carry the same ignore, and for a sharper reason.** What they
+# pin ships to every `helix new` project, so a major ahead of the floor
+# type-checks a consumer's call to an API their Node does not have. The root's
+# ignore never reached them, each being its own entry, and the same bump came
+# through one of them on 1 Sep 2026 as #101.
 version: 2
 updates:
   - directory: /
@@ -51,6 +57,9 @@ updates:
     groups:
       template:
         patterns: ['*']
+    ignore:
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
     package-ecosystem: npm
     schedule:
       interval: weekly
@@ -58,6 +67,9 @@ updates:
     groups:
       template:
         patterns: ['*']
+    ignore:
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
     package-ecosystem: npm
     schedule:
       interval: weekly

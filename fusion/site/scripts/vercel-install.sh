@@ -19,14 +19,14 @@
 # the path: the build step runs in a fresh shell, and the toolchain this puts
 # in `~/.cargo` is not on its path.
 #
-# `1.90` is the toolchain CI builds with, and the floor `rust-version` names.
+# `1.96` is the toolchain CI builds with, and the floor `rust-version` names.
 set -euo pipefail
 
 bun install
 
 if ! command -v cargo >/dev/null 2>&1; then
   curl --proto '=https' --tlsv1.2 --retry 5 --silent --show-error --fail https://sh.rustup.rs \
-    | sh -s -- -y --profile minimal --default-toolchain 1.90 --no-modify-path
+    | sh -s -- -y --profile minimal --default-toolchain 1.96 --no-modify-path
   # shellcheck source=/dev/null
   . "$HOME/.cargo/env"
 fi
