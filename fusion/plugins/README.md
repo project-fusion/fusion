@@ -24,9 +24,17 @@ cargo build --release --target wasm32-unknown-unknown
 wasm-tools component new target/wasm32-unknown-unknown/release/my_plugin.wasm -o my-plugin.wasm
 ```
 
-Drop the component into `.helix/plugins` in the workspace it should run over.
-`helix component check` walks that directory, prints what it loaded by name and
-digest, and runs each rule the modules provide beside its own.
+Drop the component into the plugin directory of the noun it is for:
+`.helix/plugins` for `helix component`, `.fusion/plugins/prose` or
+`.fusion/plugins/spec` for those. Each walks its own directory, prints what it
+loaded by name and digest, and runs the rules the modules provide beside its
+own.
+
+What a noun composes is what its rules read. `helix component` has `manifests`
+and `sheets`; `fusion prose` has `documents`; `fusion spec` has `specs`. One
+module may provide rules for several nouns: each run takes the ones whose parts
+it composes, names the others in the register so a rule that is not running is
+visible, and refuses a module with nothing for it at all.
 
 ## What a plugin may do
 

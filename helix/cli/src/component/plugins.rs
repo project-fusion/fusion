@@ -235,18 +235,43 @@ fn apply(host: &Arc<Host>, name: &'static str, reads: &[String], context: &Conte
 /// at run time; a process that loads eight plugins leaks eight names and then
 /// exits, which is the cheapest correct answer and the one that leaves the type
 /// alone for the rules that do not need it.
-#[must_use]
-pub fn rules(host: &Arc<Host>) -> Vec<Rule> {
+/// Every rule the loaded plugins provide that this noun can answer.
+///
+/// **A rule reading what this noun does not compose is another noun's**, and is
+/// left to it rather than run against a payload with nothing in it: one module
+/// may hold a component rule and a prose rule, and the directory it was found in
+/// says which of them this run is asking for. What is skipped is printed in the
+/// register, because the failure this risks is a rule nobody notices is not
+/// running.
+///
+/// **A module with nothing for this noun is refused**, being in the wrong
+/// directory, which is a mistake with no useful reading.
+///
+/// # Errors
+///
+/// [`Failure`] naming the module, what it reads and what this noun composes.
+pub fn rules(host: &Arc<Host>) -> Result<(Vec<Rule>, Vec<String>), Failure> {
     let mut found = Vec::new();
+    let mut elsewhere = Vec::new();
     for loaded in host.loaded() {
+        let mut mine = 0;
         for provided in &loaded.provides {
+            if provided
+                .reads
+                .iter()
+                .any(|one| !PARTS.contains(&one.as_str()))
+            {
+                elsewhere.push(format!("{}: {}", loaded.name, provided.name));
+                continue;
+            }
+            mine += 1;
             let name: &'static str = Box::leak(provided.name.clone().into_boxed_str());
             let summary: &'static str = Box::leak(provided.summary.clone().into_boxed_str());
             let unit: &'static str = Box::leak(provided.unit.clone().into_boxed_str());
             let reads = provided.reads.clone();
+            let wants = reads.clone();
             let host = Arc::clone(host);
             let writing = Arc::clone(&host);
-            let wants = reads.clone();
             found.push(Rule {
                 /* **Every plugin rule can write, because the world says any of
                 them may.** A rule with nothing to repair answers with no edits,
@@ -272,11 +297,34 @@ pub fn rules(host: &Arc<Host>) -> Vec<Rule> {
                 summary,
             });
         }
+        if mine == 0 {
+            return Err(Failure::input(
+                format!(
+                    "`{}` provides no rule `helix component` can run",
+                    loaded.name
+                ),
+                format!(
+                    "every rule it provides reads something this noun does not compose, which is \
+                     {}",
+                    PARTS
+                        .iter()
+                        .map(|one| format!("`{one}`"))
+                        .collect::<Vec<String>>()
+                        .join(" and ")
+                ),
+            )
+            .hint(format!(
+                "a plugin belongs to the noun whose payload it reads: move it out of {DIRECTORY}"
+            )));
+        }
     }
-    found
+    Ok((found, elsewhere))
 }
 
 /// The register, as a line per module: what was loaded, and what it hashes to.
+///
+/// `elsewhere` names the rules this noun left to another one, so a rule that is
+/// not running is visible rather than merely absent.
 ///
 /// **Printed on every run, which is what a directory costs.** Discovery by
 /// directory is a rule being a file rather than a file and an entry in a
@@ -284,20 +332,30 @@ pub fn rules(host: &Arc<Host>) -> Vec<Rule> {
 /// running anything. This is how it is bought back, so a plugin cannot arrive
 /// without anybody noticing.
 #[must_use]
-pub fn register(loaded: &[&Loaded]) -> Vec<String> {
-    loaded
+pub fn register(loaded: &[&Loaded], elsewhere: &[String]) -> Vec<String> {
+    let mut said: Vec<String> = loaded
         .iter()
         .map(|one| {
+            /* Only what this noun runs, because the line says what a run is
+            doing: a rule left to another noun is named on its own line below
+            rather than counted here as though it ran. */
             let rules = one
                 .provides
                 .iter()
                 .map(|two| two.name.as_str())
+                .filter(|two| !elsewhere.contains(&format!("{}: {two}", one.name)))
                 .collect::<Vec<&str>>()
                 .join(", ");
             let digest: String = one.digest.chars().take(23).collect();
             format!("plugin {} {digest} providing {rules}", one.name)
         })
-        .collect()
+        .collect();
+    for one in elsewhere {
+        said.push(format!(
+            "plugin {one} is another noun's, and is not run here"
+        ));
+    }
+    said
 }
 
 /// The register as JSON, for the caller that reads the run rather than watches.

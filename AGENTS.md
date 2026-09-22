@@ -186,7 +186,7 @@ fusion/    cli docs rules scripts site: what belongs to the company rather than
   package that owns what it writes, declared in that package's own manifest, so
   `helix/docs` builds the docs and `helix/styles` builds the token layer.
 
-  **A rule from outside is a WebAssembly component in `.helix/plugins`.**
+  **A rule from outside is a WebAssembly component in a plugin directory.**
   `helix component check` walks that directory, prints every module it loaded by
   name and digest, and runs the rules they provide beside its own: `--only` names
   one the way it names any other, and a finding reads the same. Each rule says
@@ -195,6 +195,13 @@ fusion/    cli docs rules scripts site: what belongs to the company rather than
   importing one is refused where it loads. A rule that repairs something hands
   back the new text of each file; `check` reports it, `fix` writes it, and an
   edit pointing outside the workspace is refused.
+
+  **A plugin belongs to the noun whose payload it reads.** `helix component`
+  looks in `.helix/plugins` and composes `manifests` and `sheets`; `fusion prose`
+  and `fusion spec` look in `.fusion/plugins/<noun>` and compose `documents` and
+  `specs`. One module may hold rules for several nouns, and each run takes the
+  ones it can answer, names the rest in the register, and refuses a module with
+  nothing for it at all.
   `fusion/plugins` is the host and its `example/` is a whole plugin; the world
   they share is `fusion/plugins/wit/rules.wit`.
 

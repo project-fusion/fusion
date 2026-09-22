@@ -22,6 +22,7 @@
 //! and `fusion helix ...` returning its child's code untouched is only honest
 //! while the two tables are one table.
 
+mod plugins;
 mod prose;
 mod route;
 mod rules;
@@ -30,6 +31,7 @@ mod workspace;
 
 use std::io::IsTerminal;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use clap::{Args, Parser, Subcommand};
 use fusion_rules::error::{Failure, Outcome};
@@ -263,9 +265,6 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
     let verb = cli.noun.verb();
     let common = verb.common();
 
-    let rules = cli.noun.rules();
-    only_known(cli.noun.name(), &rules, &common.only)?;
-
     let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
     let Some(root) = common.root.clone().or_else(|| workspace::find_root(&cwd)) else {
         return Err(Failure::input(
@@ -278,12 +277,39 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
         )));
     };
 
+    /* **The plugins are read before `--only` is judged**, because a rule a
+    plugin provides is a rule this noun has: naming one and being told there is
+    no such rule would be true of the binary and false of the run. A noun with no
+    parts to compose takes none, which is `workspace` until somebody asks. */
+    let mut rules = cli.noun.rules();
+    let noun = cli.noun.name();
+    let mut register = Vec::new();
+    let mut listed = serde_json::Value::Array(Vec::new());
+    if !plugins::parts(noun).is_empty() {
+        let host = Arc::new(plugins::read(&root, noun)?);
+        let loaded = host.loaded();
+        let (provided, elsewhere) = plugins::rules(&host, noun)?;
+        register = plugins::register(&loaded, &elsewhere);
+        listed = plugins::listed(&loaded);
+        rules.extend(provided);
+    }
+    only_known(noun, &rules, &common.only)?;
+
     let settings = Settings::read(&root)?;
     let context = Context::new(root, settings);
     let selected: Vec<rules::Rule> = rules
         .into_iter()
         .filter(|rule| common.only.is_empty() || common.only.iter().any(|one| one == rule.name))
         .collect();
+
+    /* **Every module, on every run and every verb.** Discovery by directory is
+    a rule being a file rather than a file and an entry in a manifest, and a line
+    per module is what stops one arriving without anybody noticing. */
+    if !cli.json {
+        for line in &register {
+            println!("{line}");
+        }
+    }
 
     let code = match verb {
         Verb::Fix(_) => fusion_rules::fix(&selected, &context, cli.json, paint, PRODUCT)?,
@@ -298,7 +324,7 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
             } else {
                 Form::Screen
             };
-            report(&selected, &context, &form, cli.noun.name(), paint)?
+            report(&selected, &context, &form, noun, paint, &listed)?
         }
         Verb::Check(_) => {
             let form = if cli.json {
@@ -306,7 +332,7 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
             } else {
                 Form::Printed { loud: false }
             };
-            report(&selected, &context, &form, cli.noun.name(), paint)?
+            report(&selected, &context, &form, noun, paint, &listed)?
         }
     };
     Ok(code.as_i32())
@@ -334,13 +360,18 @@ fn report(
     form: &Form,
     noun: &str,
     paint: Paint,
+    listed: &serde_json::Value,
 ) -> Outcome<Code> {
     let reports = measure(selected, context);
     let failed: Vec<&(&rules::Rule, rules::Report)> =
         reports.iter().filter(|(_, report)| !report.ok()).collect();
 
     if matches!(form, Form::Json) {
-        println!("{:#}", payload(&reports));
+        let mut said = payload(&reports);
+        if let Some(fields) = said.as_object_mut() {
+            fields.insert("plugins".to_owned(), listed.clone());
+        }
+        println!("{said:#}");
         return Ok(verdict(&reports));
     }
 
