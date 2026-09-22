@@ -123,6 +123,16 @@ pub enum Runner<C> {
     Meta(fn(&[Measured]) -> Report),
     /// Reads the workspace, whatever the product says a workspace is.
     Source(fn(&C) -> Report),
+    /// Somebody else's rule, run by a host this crate knows nothing about.
+    ///
+    /// **A closure rather than a function pointer, which is the whole
+    /// difference.** A rule written here is a `fn` because it is compiled in; a
+    /// rule loaded at run time is a module, a name and a payload, and something
+    /// has to hold those between the run being asked for and the rule being
+    /// called. It measures like any other and is reported like any other: a
+    /// plugin that judged is a rule that judged, and nothing downstream of the
+    /// measurement asks where a report came from.
+    Hosted(Box<dyn Fn(&C) -> Report + Send + Sync>),
 }
 
 /// What a rule can do, beyond judging.
@@ -210,11 +220,14 @@ pub fn measure<'a, C: Sync>(selected: &'a [Rule<C>], context: &C) -> Vec<(&'a Ru
         let running: Vec<(&Rule<C>, ScopedJoinHandle<Report>)> = source
             .into_iter()
             .map(|rule| {
-                let run = match rule.run {
-                    Runner::Source(run) => run,
-                    Runner::Meta(_) => unreachable!("partitioned above"),
-                };
-                (rule, scope.spawn(move || run(context)))
+                (
+                    rule,
+                    scope.spawn(move || match &rule.run {
+                        Runner::Source(run) => run(context),
+                        Runner::Hosted(run) => run(context),
+                        Runner::Meta(_) => unreachable!("partitioned above"),
+                    }),
+                )
             })
             .collect();
         running
@@ -240,9 +253,9 @@ pub fn measure<'a, C: Sync>(selected: &'a [Rule<C>], context: &C) -> Vec<(&'a Ru
         })
         .collect();
     for rule in meta {
-        let report = match rule.run {
+        let report = match &rule.run {
             Runner::Meta(run) => run(&measured),
-            Runner::Source(_) => unreachable!("partitioned above"),
+            Runner::Source(_) | Runner::Hosted(_) => unreachable!("partitioned above"),
         };
         reports.push((rule, report));
     }

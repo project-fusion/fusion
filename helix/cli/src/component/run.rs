@@ -13,6 +13,7 @@
 
 use std::io::IsTerminal;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
@@ -20,7 +21,7 @@ use fusion_rules::style::Paint;
 use fusion_rules::{measure, only_known, payload, tui, verdict};
 
 use crate::args::{ComponentAudit, Rules};
-use crate::component::{all, Context, Report, Rule, Settings};
+use crate::component::{all, plugins, Context, Report, Rule, Settings};
 
 /// The word the printed forms open with.
 const NOUN: &str = "component";
@@ -32,13 +33,48 @@ const _: fn() = || {
     shared::<Context>();
 };
 
-/// Resolves the rules asked for, the workspace, and its settings.
-fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
-    let rules = all();
-    only_known(NOUN, &rules, &args.only)?;
+/// What a run is made of: the rules asked for, the workspace, and the register.
+struct Prepared {
+    context: Context,
+    /// What the plugin host loaded, printed by every form before it measures.
+    register: Vec<String>,
+    /// The same, for the form that is read rather than watched.
+    listed: serde_json::Value,
+    selected: Vec<Rule>,
+}
 
+/// Resolves the rules asked for, the workspace, and its settings.
+///
+/// **The plugins are read before `--only` is judged**, because a rule a plugin
+/// provides is a rule this command line has: naming one and being told there is
+/// no such rule would be true of the binary and false of the run.
+fn prepare(args: &Rules, from: &Path) -> Result<Prepared, Failure> {
     let root: PathBuf = args.root.clone().unwrap_or_else(|| from.to_path_buf());
-    let settings = Settings::read(&root)?;
+    /* **A typo beats a missing configuration, and only when both are true.**
+    Reading the settings has to come first, because what rules a run has depends
+    on the plugins they point at. But a workspace with no configuration has no
+    plugin directory either, so the rules it could have are the ones compiled in:
+    a name none of them has is a typo, which is the more useful of the two things
+    to be told and is what `fusion workspace` says in the same position. */
+    let settings = match Settings::read(&root) {
+        Ok(settings) => settings,
+        Err(unconfigured) => {
+            only_known(NOUN, &all(), &args.only)?;
+            return Err(unconfigured);
+        }
+    };
+
+    let host = Arc::new(plugins::read(
+        &root,
+        settings.plugins.as_deref().unwrap_or(plugins::DIRECTORY),
+    )?);
+    let loaded = host.loaded();
+    let register = plugins::register(&loaded);
+    let listed = plugins::listed(&loaded);
+
+    let mut rules = all();
+    rules.extend(plugins::rules(&host));
+    only_known(NOUN, &rules, &args.only)?;
 
     /* **Every tier missing is a configuration fault, not a clean run.** Rules
     would each read nothing and report nothing, and a command that says every
@@ -73,7 +109,12 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
             }
         })
         .collect();
-    Ok((selected, Context::new(root, settings)))
+    Ok(Prepared {
+        context: Context::new(root, settings),
+        register,
+        listed,
+        selected,
+    })
 }
 
 /// Prints every rule and what it found, then the findings.
@@ -83,13 +124,19 @@ pub fn audit(
     json: bool,
     paint: Paint,
 ) -> Result<Code, Failure> {
-    let (selected, context) = prepare(&args.rules, from)?;
+    let Prepared {
+        context,
+        register,
+        listed,
+        selected,
+    } = prepare(&args.rules, from)?;
     let reports = measure(&selected, &context);
 
     if json {
-        println!("{:#}", payload(&reports));
+        println!("{:#}", said(&reports, listed));
         return Ok(verdict(&reports));
     }
+    told(&register);
 
     /* **The tty decides, and `--plain` is the only override.** A screen written
     to a pipe is escape sequences in a log file, and `check` never draws at all:
@@ -157,20 +204,51 @@ pub fn audit(
 
 /// The same measurement, silent unless something is wrong.
 pub fn check(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
-    let (selected, context) = prepare(args, from)?;
+    let Prepared {
+        context,
+        register,
+        listed,
+        selected,
+    } = prepare(args, from)?;
     let reports = measure(&selected, &context);
     if json {
-        println!("{:#}", payload(&reports));
+        println!("{:#}", said(&reports, listed));
         return Ok(verdict(&reports));
     }
+    /* **Even here, where silence is the shape of success.** What `check` is
+    quiet about is a workspace with nothing wrong in it; a module somebody
+    dropped into a directory is not that, and a plugin arriving without anybody
+    noticing is the failure discovery by directory risks. */
+    told(&register);
     speak(&reports, paint);
     Ok(verdict(&reports))
 }
 
 /// Runs the rules that can write, and says what they wrote.
 pub fn fix(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
-    let (selected, context) = prepare(args, from)?;
+    let Prepared {
+        context, selected, ..
+    } = prepare(args, from)?;
+    /* A plugin provides no `fix` in this world, so the register is not printed
+    here: nothing it loaded can write, and a line about what was loaded would be
+    the only thing a plugin contributed to the verb. */
     fusion_rules::fix(&selected, &context, json, paint, NOUN)
+}
+
+/// The register, one line per module, before anything is measured.
+fn told(register: &[String]) {
+    for line in register {
+        println!("{line}");
+    }
+}
+
+/// The measurement as JSON, with the register beside it.
+fn said(reports: &[(&Rule, Report)], listed: serde_json::Value) -> serde_json::Value {
+    let mut payload = payload(reports);
+    if let Some(fields) = payload.as_object_mut() {
+        fields.insert("plugins".to_owned(), listed);
+    }
+    payload
 }
 
 /// Findings to stderr, so a caller piping stdout keeps a clean stream.

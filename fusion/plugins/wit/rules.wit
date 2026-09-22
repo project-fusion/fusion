@@ -1,0 +1,28 @@
+package fusion:rules@1.0.0;
+
+/// What a rule written outside this repository exports.
+///
+/// One function that judges, a list of what the module provides, and the
+/// version of this world it was built against. The payload and the judgement
+/// are JSON strings: the byte protocol, declared in a schema, so widening the
+/// world into typed records later is a change rather than a rewrite.
+world plugin {
+  /// One rule the module provides, as a command line names and counts it.
+  record rule {
+    /// What `--only` names, unique across every rule the host runs.
+    name: string,
+    /// One line, in the present tense, saying what holds.
+    summary: string,
+    /// What its count counts, for a sentence that reads.
+    unit: string,
+  }
+
+  /// The version of this world the module was built against.
+  export world-version: func() -> u32;
+
+  /// Every rule this module provides.
+  export rules: func() -> list<rule>;
+
+  /// Judge one rule against one payload. JSON in, JSON out.
+  export check: func(rule: string, payload: string) -> result<string, string>;
+}

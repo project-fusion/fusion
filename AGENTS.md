@@ -186,6 +186,15 @@ fusion/    cli docs rules scripts site: what belongs to the company rather than
   package that owns what it writes, declared in that package's own manifest, so
   `helix/docs` builds the docs and `helix/styles` builds the token layer.
 
+  **A rule from outside is a WebAssembly component in `.helix/plugins`.**
+  `helix component check` walks that directory, prints every module it loaded by
+  name and digest, and runs the rules they provide beside its own: `--only` names
+  one the way it names any other, and a finding reads the same. A plugin is given
+  the manifests and the stylesheet text and nothing else: no filesystem, no
+  clock and no network, so a module importing one is refused where it loads.
+  `fusion/plugins` is the host and its `example/` is a whole plugin; the world
+  they share is `fusion/plugins/wit/rules.wit`.
+
   **What is left over is `fusion/scripts`, and it is small on purpose.** A
   script goes there when it is genuinely cross-cutting and cannot be a rule: the
   ones that drive a browser, the pair that builds and runs the eval corpus, and
