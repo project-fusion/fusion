@@ -2,6 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "bunx turbo run build --filter=@fusion.dev/site...",
   "framework": "nextjs",
-  "installCommand": "bun install",
+  "installCommand": "bash fusion/site/scripts/vercel-install.sh",
   "outputDirectory": "fusion/site/.next"
 }
