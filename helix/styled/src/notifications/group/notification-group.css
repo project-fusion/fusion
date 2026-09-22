@@ -72,7 +72,7 @@
   color: var(--helix-color-foreground);
 }
 
-[part="action"] {
+[part="actions"] {
   align-items: center;
   display: inline-flex;
   margin-inline-start: auto;

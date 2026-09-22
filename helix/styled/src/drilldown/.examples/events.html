@@ -29,7 +29,7 @@
   >
     <helix-list-item>
       Nothing yet
-      <span slot="supporting">Choose a row, then go deeper</span>
+      <span slot="description">Choose a row, then go deeper</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -50,7 +50,7 @@
     const row = document.createElement('helix-list-item')
     row.textContent = name
     const under = document.createElement('span')
-    under.slot = 'supporting'
+    under.slot = 'description'
     under.textContent = carried
     row.append(under)
     log.append(row)

@@ -55,11 +55,11 @@ import '../../format-date/index.js'
  * @slot - What happened, in the consumer's own markup.
  * @slot actions - What a reader can do about it, under the words it is about. Drawn always
  * rather than on hover, because an action is the point of the row and not chrome around it.
- * @slot caption - A second line qualifying it, quieter than the first. A bare
+ * @slot description - A second line qualifying it, quieter than the first. A bare
  * slot rather than a box, so an item without one pays nothing for it; style it
  * through `::slotted()`.
  * @slot detail - A block belonging to the row rather than a line about it: a quoted
- * comment, a status moving from one value to another, a preview. Unlike `caption` nothing
+ * comment, a status moving from one value to another, a preview. Unlike `description` nothing
  * here sets a size or an ink, because whatever fills it usually brings its own.
  * @slot dismiss - Replaces the glyph inside the dismiss control, which is drawn
  * only where the row is `dismissible`.
@@ -301,7 +301,7 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
       <span part="media"><slot name="media"></slot></span>
       <div part="body">
         <div part="label"><slot></slot></div>
-        <slot name="caption"></slot>
+        <slot name="description"></slot>
         <slot name="detail"></slot>
         <span part="actions"><slot name="actions" @slotchange=${this.handleActions}></slot></span>
       </div>

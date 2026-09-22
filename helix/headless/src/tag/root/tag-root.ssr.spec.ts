@@ -13,7 +13,7 @@ describe('tag server output', () => {
       ssr(html`<helix-headless-tag></helix-headless-tag>`),
       'helix-headless-tag',
     )
-    expect(markup).toContain('<slot name="prefix" part="prefix"></slot>')
+    expect(markup).toContain('<slot name="start" part="start"></slot>')
     expect(markup).toContain('<slot></slot>')
   })
 

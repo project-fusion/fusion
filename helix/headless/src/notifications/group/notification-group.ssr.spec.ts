@@ -29,7 +29,7 @@ describe('notification group server output', () => {
     const bare = ssr(
       html`<helix-headless-notification-group collapsible label="Earlier"></helix-headless-notification-group>`,
     )
-    expect(servedParts(bare)).toEqual(['action', 'count', 'header', 'items', 'label', 'trigger'])
+    expect(servedParts(bare)).toEqual(['actions', 'count', 'header', 'items', 'label', 'trigger'])
   })
 
   /**

@@ -99,7 +99,7 @@ const kind = (file: File): string => {
  * @csspart kind - What kind of file it is.
  * @csspart kind-dismiss - The remove button, when `dismissible`.
  * @csspart kind-dismiss-mark - The glyph on the dismiss control, where none is slotted.
- * @csspart kind-prefix - The category before the label.
+ * @csspart kind-start - The category before the label.
  * @csspart label - The question, over the field.
  * @csspart list - The chosen files.
  * @csspart meta - The row holding its size and kind.
@@ -108,7 +108,7 @@ const kind = (file: File): string => {
  * @csspart size - How big it is.
  * @csspart size-dismiss - The remove button, when `dismissible`.
  * @csspart size-dismiss-mark - The glyph on the dismiss control, where none is slotted.
- * @csspart size-prefix - The category before the label.
+ * @csspart size-start - The category before the label.
  * @csspart trigger - The label that opens the picker.
  *
  * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
@@ -461,10 +461,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    */
   protected renderMeta(file: File): TemplateResult {
     return html`<${this.tag('tag')} part="size"
-    exportparts="dismiss: size-dismiss, dismiss-mark: size-dismiss-mark, prefix: size-prefix">${size(file.size, this.locale)}</${this.tag('tag')}>
+    exportparts="dismiss: size-dismiss, dismiss-mark: size-dismiss-mark, start: size-start">${size(file.size, this.locale)}</${this.tag('tag')}>
       <${this.tag('tag')}
         part="kind"
-      exportparts="dismiss: kind-dismiss, dismiss-mark: kind-dismiss-mark, prefix: kind-prefix">${kind(file)}</${this.tag('tag')}>`
+      exportparts="dismiss: kind-dismiss, dismiss-mark: kind-dismiss-mark, start: kind-start">${kind(file)}</${this.tag('tag')}>`
   }
 
   protected override render(): TemplateResult {

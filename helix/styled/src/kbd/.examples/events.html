@@ -23,7 +23,7 @@
   >
     <helix-list-item>
       Nothing yet
-      <span slot="supporting">Put the cursor in the field and press slash</span>
+      <span slot="description">Put the cursor in the field and press slash</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -44,7 +44,7 @@
     const row = document.createElement('helix-list-item')
     row.textContent = name
     const under = document.createElement('span')
-    under.slot = 'supporting'
+    under.slot = 'description'
     under.textContent = carried
     row.append(under)
     log.append(row)

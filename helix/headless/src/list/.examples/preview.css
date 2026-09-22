@@ -40,7 +40,7 @@ helix-headless-list-item > [slot="start"] {
   margin-inline-end: 0.75rem;
 }
 
-helix-headless-list-item > [slot="supporting"] {
+helix-headless-list-item > [slot="description"] {
   color: var(--_gray-muted);
   font-size: 0.75rem;
   grid-column: 2;

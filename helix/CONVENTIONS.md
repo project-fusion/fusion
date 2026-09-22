@@ -1205,9 +1205,12 @@ used both `panel` and `content`; `accordion` used both `content` and
 **Slot names draw from a registry of their own, on the same terms.** A slot is
 where a consumer's content lands, and the words for a position drift there the
 way part names did. `helix component`'s `vocabulary` holds these to one spelling
-each: `actions`, `end`, `feedback`, `footer`, `header`, `heading`, `hint`, `icon`,
-`label`, `start`, `toolbar`. A `poster`, a `composer` or a `swatch` is the
-component's own.
+each: `actions`, `description`, `end`, `feedback`, `footer`, `header`, `heading`,
+`hint`, `icon`, `label`, `start`, `toolbar`. A `poster`, a `composer` or a
+`swatch` is the component's own. The quieter line under a label is
+`description`, which List Item called `supporting` and Notification `caption`;
+the Notifications group's `action` is `actions`, and Tag's `prefix` is `start`.
+Each old spelling is refused, naming its replacement.
 
 **`heading` and `header` are two things.** A `header` is a region, holding a
 heading and whatever sits beside it: Card, Chat, Dialog, Drawer and

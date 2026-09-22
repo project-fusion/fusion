@@ -28,7 +28,7 @@
     id="log"
     label="What arrived"
   >
-    <helix-list-item>Nothing yet<span slot="supporting">Scroll the panel, or press a heading</span>
+    <helix-list-item>Nothing yet<span slot="description">Scroll the panel, or press a heading</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -49,7 +49,7 @@
     const row = document.createElement('helix-list-item')
     row.textContent = name
     const under = document.createElement('span')
-    under.slot = 'supporting'
+    under.slot = 'description'
     under.textContent = carried
     row.append(under)
     log.append(row)

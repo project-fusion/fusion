@@ -20,7 +20,7 @@
   >
     <helix-list-item>
       Nothing yet
-      <span slot="supporting">Move between the slides</span>
+      <span slot="description">Move between the slides</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -41,7 +41,7 @@
     const row = document.createElement('helix-list-item')
     row.textContent = name
     const under = document.createElement('span')
-    under.slot = 'supporting'
+    under.slot = 'description'
     under.textContent = carried
     row.append(under)
     log.append(row)

@@ -23,13 +23,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tag's label.
- * @slot prefix - A category the label belongs to, set before it and weightier.
+ * @slot start - A category the label belongs to, set before it and weightier.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart dismiss - The control that asks to remove the tag.
  * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
- * @csspart prefix - The category before the label.
+ * @csspart start - The category before the label.
  */
 @customElement('helix-headless-tag')
 export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
@@ -39,7 +39,7 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
   override dismissLabel = 'Remove'
 
   protected override render(): TemplateResult {
-    return html`<slot name="prefix" part="prefix"></slot>
+    return html`<slot name="start" part="start"></slot>
       <slot></slot>
       ${
         this.dismissible

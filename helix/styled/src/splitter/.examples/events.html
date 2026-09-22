@@ -34,7 +34,7 @@
   >
     <helix-list-item>
       Nothing yet
-      <span slot="supporting">Drag the divider, then drag it to an edge</span>
+      <span slot="description">Drag the divider, then drag it to an edge</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -55,7 +55,7 @@
     const row = document.createElement('helix-list-item')
     row.textContent = name
     const under = document.createElement('span')
-    under.slot = 'supporting'
+    under.slot = 'description'
     under.textContent = carried
     row.append(under)
     log.append(row)

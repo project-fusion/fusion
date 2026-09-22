@@ -28,11 +28,11 @@ export function Example() {
       >
         <helix-list-item>
           Helix
-          <span slot="supporting">The design system. Tokens, components, wrappers.</span>
+          <span slot="description">The design system. Tokens, components, wrappers.</span>
         </helix-list-item>
         <helix-list-item>
           Cortex
-          <span slot="supporting">Memory, provenance and context.</span>
+          <span slot="description">Memory, provenance and context.</span>
         </helix-list-item>
       </helix-list>
     </helix-flex>

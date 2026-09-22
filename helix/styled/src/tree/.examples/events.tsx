@@ -80,7 +80,7 @@ export function Example() {
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}
-            <span slot="supporting">{one.carried}</span>
+            <span slot="description">{one.carried}</span>
           </helix-list-item>
         ))}
       </helix-list>
