@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-cem",
   "description": "What runs over a Helix manifest once `helix manifest build` has written it: the convention linter and the framework typings.",
-  "version": "0.91.0",
+  "version": "0.92.0",
   "private": true,
   "license": "MIT",
   "repository": {
