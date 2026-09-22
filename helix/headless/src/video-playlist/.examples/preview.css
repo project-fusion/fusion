@@ -145,7 +145,7 @@ helix-headless-video::part(cue) {
   translate: -50% 0;
 }
 
-helix-headless-video::part(back) {
+helix-headless-video::part(header) {
   inset-block-start: 0.75rem;
   inset-inline-start: 0.75rem;
   position: absolute;

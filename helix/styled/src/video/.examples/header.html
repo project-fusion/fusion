@@ -1,4 +1,4 @@
-<!-- @summary A way out of the set, over the picture at the top left. -->
+<!-- @summary A title over the picture at the top left, with a way out of the set beside it. -->
 <helix-video
   label="Making Of, Part Two"
   src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
@@ -6,9 +6,14 @@
   <helix-icon-button
     emphasis="solid"
     label="Back to the series"
-    slot="back"
+    slot="header"
     tone="neutral"
   >
     <helix-icon name="arrow-left"></helix-icon>
   </helix-icon-button>
+  <helix-text
+    as="h2"
+    slot="header"
+    variant="title"
+  >Making Of, Part Two</helix-text>
 </helix-video>

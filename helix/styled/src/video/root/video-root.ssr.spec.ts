@@ -38,9 +38,9 @@ describe('video server output', () => {
        the numbers in it are all zero until the metadata lands, which is a fact
        about the media rather than about the render. */
     expect(servedParts(ssr(clip))).toEqual([
-      'back',
       'controls',
       'fullscreen',
+      'header',
       'mute',
       'play',
       'poster',

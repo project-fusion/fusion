@@ -7,11 +7,18 @@ export function Example() {
       <helix-icon-button
         emphasis="solid"
         label="Back to the series"
-        slot="back"
+        slot="header"
         tone="neutral"
       >
         <helix-icon name="arrow-left"></helix-icon>
       </helix-icon-button>
+      <helix-text
+        as="h2"
+        slot="header"
+        variant="title"
+      >
+        Making Of, Part Two
+      </helix-text>
     </helix-video>
   )
 }

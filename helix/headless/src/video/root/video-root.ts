@@ -109,8 +109,8 @@ const clock = (seconds: number): string => {
  * @documentation https://fusion.dev/helix/components/video
  *
  * @slot - `<source>` and `<track>` elements, which are copied into the video.
- * @slot back - Top left over the frame, for a way out of a set.
  * @slot controls - Added to the control bar, before fullscreen.
+ * @slot header - Top left over the frame: a heading, and a way out of a set beside it.
  * @slot poster - Shown over the video until it starts.
  *
  * @event {Event} ended - Relayed, because it does not cross a shadow boundary.
@@ -119,7 +119,6 @@ const clock = (seconds: number): string => {
  * @event {Event} pause - Relayed for the same reason.
  * @event {Event} play - Relayed for the same reason.
  *
- * @csspart back - The region top left, for a way out of a set.
  * @csspart captions - Subtitles on and off.
  * @csspart captions-menu - The language menu, where there is more than one.
  * @csspart captions-menu-back - The control that returns from a submenu.
@@ -139,6 +138,7 @@ const clock = (seconds: number): string => {
  * @csspart failure - What is said when the source will not play.
  * @csspart forward - The control that goes on ten seconds.
  * @csspart fullscreen - The whole screen, and back.
+ * @csspart header - The region top left, for a heading and a way out of a set.
  * @csspart loading - What is said while the picture waits for more of itself.
  * The part of that which spins is drawn on it, which is `::part(loading)::before`
  * from a consumer's sheet: this tier ships no CSS, so a box it renders for one to
@@ -1572,10 +1572,12 @@ export class HelixHeadlessVideo extends HelixElement {
            A player inside a set has somewhere to go back to and a player on its
            own does not, so the video draws whatever it is handed and decides
            nothing: a `back` property would be this component holding an opinion
-           about navigation, which is the consumer's. */
+           about navigation, which is the consumer's. It is a header rather than a
+           back button, because what sits there is a title with the way out
+           beside it, and one region holds both. */
         ''
       }
-      <div part="back"><slot name="back"></slot></div>
+      <div part="header"><slot name="header"></slot></div>
       <slot name="poster" part="poster"></slot>
       ${
         /* A live region rather than a spinning box, because the reader who most

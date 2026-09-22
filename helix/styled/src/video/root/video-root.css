@@ -566,22 +566,30 @@
 }
 
 /*
- *  A way out of the set, over the frame at the top left.
+ *  The header, over the frame at the top left: a heading, and a way out of the
+ *  set beside it.
  *
  * It rides with the controls rather than sitting on the picture permanently:
- * a control bar that fades and a back button that does not would leave one
- * chrome element floating over a film with nothing around it. Same visibility
- * as the bar, said the same way, so the two can never disagree.
+ * a control bar that fades and a header that does not would leave one chrome
+ * element floating over a film with nothing around it. Same visibility as the
+ * bar, said the same way, so the two can never disagree. A row, so the way out
+ * and the title line up on one axis whichever order they are handed in.
  */
-[part="back"] {
+[part="header"] {
+  align-items: center;
+  /* The bar's ink, for the title here sits over the same picture. */
+  color: var(--video-controls-color, var(--helix-color-foreground));
+  display: flex;
+  gap: var(--helix-space-sm);
   inset-block-start: var(--helix-space-sm);
   inset-inline-start: var(--helix-space-sm);
+  max-inline-size: calc(100% - 2 * var(--helix-space-sm));
   opacity: inherit;
   position: absolute;
   z-index: var(--helix-layer-raised);
 }
 
-[part="back"]:not(:has(*)) {
+[part="header"]:not(:has(*)) {
   display: none;
 }
 
