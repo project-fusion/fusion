@@ -150,8 +150,14 @@ const installed = (name: string, from: string): string | undefined => {
  * named there.** The analyzer collected them by following imports through the
  * dependencies' own files, so Sandbox, which names the styled tier, was given
  * the headless and core manifests beneath it too; the linter needs them to
- * see that a class descends from `HelixElement` at all. Only a package that
- * ships a manifest is one.
+ * see that a class descends from `HelixElement` at all.
+ *
+ * **A package ships one where its `package.json` says `customElements`**, the
+ * schema's own field for where a manifest is, which the analyzer read too. Not
+ * where the file happens to exist: that depends on what has been built, and a
+ * job that ran only the specs found core's manifest and not the styled one
+ * beside it. Turbo is what makes sure the file is there by the time it is read,
+ * every `analyze` waiting on its dependencies' builds.
  *
  * In the order they are reached, which is the order the analyzer read them in
  * and the order a class name found twice is settled by.
@@ -167,10 +173,16 @@ export const dependenciesOf = (cwd: string): Map<string, string> => {
         continue
       }
       const root = installed(name, from)
-      if (root === undefined || !existsSync(join(root, MANIFEST))) {
+      if (root === undefined) {
         continue
       }
-      found.set(name, join(root, MANIFEST))
+      const declared = (
+        JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as { customElements?: string }
+      ).customElements
+      if (declared === undefined) {
+        continue
+      }
+      found.set(name, join(root, declared))
       visit(root)
     }
   }
