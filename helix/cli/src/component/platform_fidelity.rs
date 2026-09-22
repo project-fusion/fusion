@@ -155,8 +155,9 @@ struct Vocabulary {
 /// The DOM library, found wherever the toolchain put it.
 ///
 /// **Globbing the scope is what makes this run on a laptop and on a runner
-/// alike**, the package being platform-suffixed. The analyzer's own nested
-/// TypeScript is the fallback rather than the first choice: it is pinned older.
+/// alike**, the package being platform-suffixed. There is one TypeScript in the
+/// tree now: the analyzer's nested 5.4 was the fallback here, and it left with
+/// the analyzer.
 fn dom_library(root: &Path) -> Option<(String, String)> {
     let scope = root.join("node_modules/@typescript");
     if let Ok(entries) = fs::read_dir(&scope) {
@@ -169,12 +170,7 @@ fn dom_library(root: &Path) -> Option<(String, String)> {
             }
         }
     }
-    let fallback = root.join(
-        "node_modules/@custom-elements-manifest/analyzer/node_modules/typescript/lib/lib.dom.d.ts",
-    );
-    fs::read_to_string(&fallback)
-        .ok()
-        .map(|source| (fallback.to_string_lossy().to_string(), source))
+    None
 }
 
 /// Property names declared directly in an interface body, methods excluded.

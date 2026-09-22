@@ -3,8 +3,8 @@
  * Where the packages are. A module, not a script: nothing here runs alone.
  *
  * **Scope says which domain, `private` says whether it ships.** These are two
- * questions and one field cannot answer both. `@fusion.dev/helix-cem` is Helix's
- * analyzer configuration: it hardcodes Helix conventions, it belongs to Helix,
+ * questions and one field cannot answer both. `@fusion.dev/helix-cem` is what
+ * runs over Helix's manifests: it hardcodes Helix conventions, it belongs to Helix,
  * and it is of no use to anyone outside this repository. Renaming it to
  * `@fusion.dev/cem` to express "does not publish" would file it beside the
  * company-wide test helpers and claim it is general Fusion tooling, which is

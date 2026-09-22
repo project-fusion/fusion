@@ -49,7 +49,7 @@ fusion/site/content/faces/faces.generated.ts
 fusion/site/content/landing/claims.generated.ts
 fusion/scripts/eval/questions.json
 
-# What `cem analyze` writes: nine megabytes nobody reads in a diff. Untracked,
+# What `analyze` writes: nine megabytes nobody reads in a diff. Untracked,
 # it cannot go stale, because every consumer builds it. See d350fe53f.
 custom-elements.json
 jsx.d.ts

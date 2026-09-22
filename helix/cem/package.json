@@ -1,6 +1,6 @@
 {
   "name": "@fusion.dev/helix-cem",
-  "description": "Shared custom-elements-manifest analyzer configuration and Helix plugins.",
+  "description": "What runs over a Helix manifest once `helix manifest build` has written it: the convention linter and the framework typings.",
   "version": "0.91.0",
   "private": true,
   "license": "MIT",
@@ -22,19 +22,19 @@
     "dist"
   ],
   "sideEffects": false,
+  "bin": {
+    "helix-cem": "./src/cli.ts"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@fusion.dev/helix-cli": "workspace:*",
     "@wc-toolkit/jsx-types": "^1.7.1"
   },
   "devDependencies": {
-    "@custom-elements-manifest/analyzer": "^0.11.0",
     "@wc-toolkit/vuejs-types": "^1.0.1"
-  },
-  "peerDependencies": {
-    "@custom-elements-manifest/analyzer": "^0.11.0"
   }
 }

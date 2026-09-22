@@ -1,6 +1,6 @@
 # How CI is split
 
-**No Node on the runner.** `cem analyze` runs under `bun --bun` and the
+**No Node on the runner.** `helix-cem` runs under `bun --bun` and the
 repository's own scripts run under bun directly, both measured rather than
 assumed: the manifests came back byte for byte identical, and every
 `fusion/scripts/*.mjs` runs. Only the release workflows install Node, and that

@@ -14,7 +14,7 @@
 //! between them was broken.
 //!
 //! **A manifest is written by hand, with the fields the rule reads.** The real
-//! ones come from `cem analyze` and run to seventy thousand lines; a rule reads
+//! ones come from `analyze` and run to seventy thousand lines; a rule reads
 //! a handful of paths in them, and the handful is what the fixture carries.
 //! The same goes for the oracle and the DOM library: a rule reads a shape, and
 //! the shape is what is written.

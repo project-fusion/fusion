@@ -1,25 +1,18 @@
-import type { Config } from '@custom-elements-manifest/analyzer'
+import { spawnSync } from 'node:child_process'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { dirname, join, resolve } from 'node:path'
 import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { vuejsTypesPlugin } from '@wc-toolkit/vuejs-types'
-import { borrowedStyles } from './plugins/borrowed-styles.js'
-import { composition } from './plugins/composition.js'
 import { type ConventionLintOptions, conventionLint } from './plugins/convention-lint.js'
-import { declaredEvents } from './plugins/declared-events.js'
-import { examples } from './plugins/examples.js'
-import { helixTier } from './plugins/helix-tier.js'
 import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
 import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxNativeEvents } from './plugins/jsx-native-events.js'
 import { jsxNumericAttributes } from './plugins/jsx-numeric-attributes.js'
 import { jsxOptionalUndefined } from './plugins/jsx-optional-undefined.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
-import { metadata } from './plugins/metadata.js'
-import { reactEvents } from './plugins/react-events.js'
-import { references } from './plugins/references.js'
-import { source } from './plugins/source.js'
-import { stableOrder } from './plugins/stable-order.js'
 import { svelteTypes } from './plugins/svelte-types.js'
-import type { HelixMetadata, Plugin } from './types.js'
+import type { HelixContext, HelixManifest, HelixMetadata, Plugin } from './types.js'
 
 export interface HelixCemOptions {
   /**
@@ -41,12 +34,8 @@ export interface HelixCemOptions {
    */
   packageName?: string
 
-  /** Globs to analyze. Defaults to the package's own source. */
-  globs?: string[]
   /** Passed through to the convention linter. Pass `false` to skip it. */
   lint?: ConventionLintOptions | false
-  /** Extra plugins, appended after the Helix set. */
-  plugins?: Plugin[]
   /** Which design-system tier this package ships. */
   tier: NonNullable<HelixMetadata['tier']>
 }
@@ -64,136 +53,174 @@ export interface HelixCemOptions {
  */
 const TYPES = 'types'
 
+/** The file every consumer reads, and what `analyze` exists to write. */
+const MANIFEST = 'custom-elements.json'
+
 /**
- * Builds the analyzer config for a Helix package.
+ * What runs over the finished manifest, in the order it runs.
  *
- * Every package that ships custom elements uses this rather than configuring
- * the analyzer itself, so that a new plugin is added once here instead of
- * being copied into each package and drifting.
- *
- * **Each package names its config on the command line and must keep doing so.**
- * The file is `cem.config.ts`, and the analyzer discovers
- * `custom-elements-manifest.config.*` and nothing else, so an `analyze` script
- * that loses its `--config` runs with the analyzer's defaults rather than
- * failing: a manifest is still written, with none of the plugins below in it,
- * and every tier, part, example and source path silently disappears from the
- * docs built on top of it.
+ * **Two jobs, where this package used to do three.** It held eighteen plugins
+ * for `@custom-elements-manifest/analyzer`, and ten of them built the manifest:
+ * a tier, a group and a part, an example, a source path, a reference, a React
+ * prop, an order. `helix manifest build` does all of that in Rust now, as
+ * ordinary code rather than as plugins, which is why they are gone rather than
+ * moved. What is left reads a manifest that is already written: the linter,
+ * and the typings generators, which never parsed any TypeScript and so never
+ * carried the version pin that the move away from the analyzer exists to end.
  */
-export const createHelixCemConfig = ({
-  globs = ['src/**/*.ts'],
+export const afterManifest = ({
   frameworkTypes = false,
   lint = {},
   packageName,
-  plugins = [],
-  tier,
-}: HelixCemOptions): Config => {
-  const helixPlugins: Plugin[] = [
-    helixTier(tier),
-    composition(),
-    metadata(),
-    // Both after `composition`, which is what decides a declaration is the
-    // family's root: examples and a source path hang off the root rather than
-    // off every part.
-    examples(),
-    source(),
-    // Must precede the linter: it validates declared events, not inferred ones.
-    declaredEvents(),
-    references(),
-    /* After the analyzer has filled every declaration's own `cssProperties`,
-       since it copies them across, and before `stableOrder` so what it appends
-       is ordered with everything else. */
-    borrowedStyles(),
-    reactEvents(),
-    ...(lint === false ? [] : [conventionLint(lint)]),
-    // Before the JSX generator, which walks modules in order, so both the
-    // manifest and the declarations generated from it land in a stable order.
-    stableOrder(),
-    ...(frameworkTypes
-      ? [
-          jsxTypesPlugin({
-            fileName: 'jsx.d.ts',
-            ...(packageName ? { globalTypePath: packageName } : {}),
-            // Standard React handlers and attributes, so `onClick` and
-            // `className` typecheck alongside the element's own props.
-            includeDefaultDOMEvents: true,
-            outdir: TYPES,
-            // `event.target` typed as the element rather than EventTarget.
-            stronglyTypedEvents: true,
-          }) as Plugin,
-          // Must follow the generator: it references event types it does not
-          // import, and an unresolved name degrades to `any` under skipLibCheck.
-          ...(packageName ? [jsxImports({ fileName: `${TYPES}/jsx.d.ts`, packageName })] : []),
-          // Also after the generator: its `ref` type is framework-agnostic and
-          // rejects the `useRef` every React consumer reaches for.
-          jsxReactRef({ fileName: `${TYPES}/jsx.d.ts` }),
-          jsxNativeEvents({ fileName: `${TYPES}/jsx.d.ts` }),
-          // After it, which is what makes `BaseEvents` generic, and before
-          // `jsxOptionalUndefined` so these entries get the same `| undefined`.
-          jsxDeclaredEvents({ fileName: `${TYPES}/jsx.d.ts` }),
-          /* Vue reads none of the above. Its templates are not JSX, so the
+}: HelixCemOptions): Plugin[] => [
+  ...(lint === false ? [] : [conventionLint(lint)]),
+  ...(frameworkTypes
+    ? [
+        jsxTypesPlugin({
+          fileName: 'jsx.d.ts',
+          ...(packageName ? { globalTypePath: packageName } : {}),
+          // Standard React handlers and attributes, so `onClick` and
+          // `className` typecheck alongside the element's own props.
+          includeDefaultDOMEvents: true,
+          outdir: TYPES,
+          // `event.target` typed as the element rather than EventTarget.
+          stronglyTypedEvents: true,
+        }) as Plugin,
+        // Must follow the generator: it references event types it does not
+        // import, and an unresolved name degrades to `any` under skipLibCheck.
+        ...(packageName ? [jsxImports({ fileName: `${TYPES}/jsx.d.ts`, packageName })] : []),
+        // Also after the generator: its `ref` type is framework-agnostic and
+        // rejects the `useRef` every React consumer reaches for.
+        jsxReactRef({ fileName: `${TYPES}/jsx.d.ts` }),
+        jsxNativeEvents({ fileName: `${TYPES}/jsx.d.ts` }),
+        // After it, which is what makes `BaseEvents` generic, and before
+        // `jsxOptionalUndefined` so these entries get the same `| undefined`.
+        jsxDeclaredEvents({ fileName: `${TYPES}/jsx.d.ts` }),
+        /* Vue reads none of the above. Its templates are not JSX, so the
              types augment `GlobalComponents` rather than `IntrinsicElements`,
              and a handler is bound with `@helix-input` rather than a prop. Same
              manifest, same `stronglyTypedEvents`, separate file. */
-          vuejsTypesPlugin({
-            fileName: 'vue.d.ts',
-            ...(packageName ? { globalTypePath: packageName } : {}),
-            outdir: TYPES,
-            stronglyTypedEvents: true,
-          }) as Plugin,
-          /* After everything that rewrites the JSX tag map, because it reuses
+        vuejsTypesPlugin({
+          fileName: 'vue.d.ts',
+          ...(packageName ? { globalTypePath: packageName } : {}),
+          outdir: TYPES,
+          stronglyTypedEvents: true,
+        }) as Plugin,
+        /* After everything that rewrites the JSX tag map, because it reuses
              the finished one. */
-          ...(packageName
-            ? [
-                svelteTypes({
-                  fileName: `${TYPES}/jsx.d.ts`,
-                  outFile: `${TYPES}/svelte.d.ts`,
-                  packageName,
-                }),
-              ]
-            : []),
-          /* After both generators, which type an attribute as its property,
+        ...(packageName
+          ? [
+              svelteTypes({
+                fileName: `${TYPES}/jsx.d.ts`,
+                outFile: `${TYPES}/svelte.d.ts`,
+                packageName,
+              }),
+            ]
+          : []),
+        /* After both generators, which type an attribute as its property,
              and before `jsxOptionalUndefined`, so the string form it admits
              is wrapped in the same `| undefined`. */
-          jsxNumericAttributes({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
-          /* Last of the generators, because it rewrites what two of them wrote.
+        jsxNumericAttributes({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
+        /* Last of the generators, because it rewrites what two of them wrote.
              `?: T` is not the same type as `?: T | undefined` under
              `exactOptionalPropertyTypes`, and it is the one a consumer cannot
              forward an optional prop into. */
-          jsxOptionalUndefined({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
-        ]
-      : []),
-    ...plugins,
-  ]
+        jsxOptionalUndefined({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
+      ]
+    : []),
+]
 
-  return {
-    // Teaches the analyzer to read Lit's `@property`, `@customElement`, and
-    // friends. Without it every decorated field is invisible to the manifest.
-    // Pulls in dependencies' manifests so applyInheritancePlugin can resolve
-    // members, events, slots, and parts inherited across package boundaries,
-    // stamping each with `inheritedFrom`.
-    dependencies: true,
-    /* **A generated module is not read, because it is written from this
-       manifest.** `element-events.generated.ts` comes out of the manifest
-       after `analyze`, so read here it put an empty module in the manifest
-       only when a build had already run: two manifests for one source, and
-       every task hashing `src/**` after it a cache miss. Measured on CI 15 Sep
-       2026, 81 seconds of `analyze` rebuilding what `build` had just built. */
-    exclude: ['src/**/*.spec.ts', 'src/**/*.d.ts', 'src/**/*.generated.ts'],
-    globs,
-    litelement: true,
-    outdir: '.',
-    packagejson: true,
-    // Upstream types `plugins` as `Array<() => unknown>`, but the runtime
-    // destructures hooks straight off each element
-    // (`mergedPlugins.forEach(({ name, initialize }) => ...)` in
-    // analyzer/src/create.js), so it wants plugin *objects*. The analyzer's own
-    // example config passes objects too. Cast at this one boundary rather than
-    // shipping factories the analyzer would never call.
-    plugins: helixPlugins as unknown as NonNullable<Config['plugins']>,
+/** Where a dependency is installed, looked for the way node looks for one. */
+const installed = (name: string, from: string): string | undefined => {
+  for (let at = resolve(from); ; at = dirname(at)) {
+    const candidate = join(at, 'node_modules', name)
+    if (existsSync(join(candidate, 'package.json'))) {
+      return candidate
+    }
+    if (dirname(at) === at) {
+      return undefined
+    }
   }
 }
 
-export { toReactProp } from './plugins/react-events.js'
+/**
+ * The manifests this package's manifest is built against, by package name.
+ *
+ * **Every helix package reachable through `dependencies`, not only the ones
+ * named there.** The analyzer collected them by following imports through the
+ * dependencies' own files, so Sandbox, which names the styled tier, was given
+ * the headless and core manifests beneath it too; the linter needs them to
+ * see that a class descends from `HelixElement` at all. Only a package that
+ * ships a manifest is one.
+ *
+ * In the order they are reached, which is the order the analyzer read them in
+ * and the order a class name found twice is settled by.
+ */
+export const dependenciesOf = (cwd: string): Map<string, string> => {
+  const found = new Map<string, string>()
+  const visit = (from: string): void => {
+    const pkg = JSON.parse(readFileSync(join(from, 'package.json'), 'utf8')) as {
+      dependencies?: Record<string, string>
+    }
+    for (const name of Object.keys(pkg.dependencies ?? {})) {
+      if (found.has(name)) {
+        continue
+      }
+      const root = installed(name, from)
+      if (root === undefined || !existsSync(join(root, MANIFEST))) {
+        continue
+      }
+      found.set(name, join(root, MANIFEST))
+      visit(root)
+    }
+  }
+  visit(cwd)
+  return found
+}
+
+/** The `helix` command, reached through its npm package as any caller would. */
+const helix = (): string => createRequire(import.meta.url).resolve('@fusion.dev/helix-cli/bin.mjs')
+
+/**
+ * Writes a package's manifest, then lints it and writes its typings.
+ *
+ * The manifest is `helix manifest build`'s, which is byte for byte what
+ * `@custom-elements-manifest/analyzer` wrote across all four tiers when this
+ * replaced it. The rest is `afterManifest`, run over the manifest in the shape
+ * the analyzer called it with, from the package directory, because the
+ * typings generators write where they are told relative to that.
+ */
+export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixManifest => {
+  const dependencies = dependenciesOf(cwd)
+  const flags = [...dependencies].flatMap(([name, at]) => ['--dependency', `${name}=${at}`])
+  const built = spawnSync(
+    process.execPath,
+    [helix(), 'manifest', 'build', '.', '--tier', options.tier, ...flags],
+    { cwd, encoding: 'utf8', maxBuffer: 1024 * 1024 * 256, stdio: ['ignore', 'pipe', 'inherit'] },
+  )
+  if (built.status !== 0) {
+    throw new Error(`helix manifest build exited ${built.status} in ${cwd}`)
+  }
+  writeFileSync(join(cwd, MANIFEST), built.stdout)
+
+  const customElementsManifest = JSON.parse(built.stdout) as HelixManifest
+  const context: HelixContext = {
+    thirdPartyCEMs: [...dependencies.values()].map(
+      (at) => JSON.parse(readFileSync(at, 'utf8')) as HelixManifest,
+    ),
+  }
+  const back = process.cwd()
+  process.chdir(cwd)
+  try {
+    for (const step of afterManifest(options)) {
+      step.packageLinkPhase?.({ context, customElementsManifest })
+    }
+  } finally {
+    process.chdir(back)
+  }
+  return customElementsManifest
+}
+
 export type {
   Documented,
   HelixAttribute,
@@ -219,20 +246,12 @@ export {
 } from './types.js'
 export type { ConventionLintOptions }
 export {
-  borrowedStyles,
-  composition,
   conventionLint,
-  declaredEvents,
-  examples,
-  helixTier,
   jsxDeclaredEvents,
   jsxImports,
   jsxNativeEvents,
   jsxNumericAttributes,
   jsxOptionalUndefined,
-  metadata,
-  reactEvents,
-  references,
-  source,
+  jsxReactRef,
   svelteTypes,
 }

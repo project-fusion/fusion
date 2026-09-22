@@ -41,7 +41,7 @@ package beside it and says `0.0.0-dev`, which is what that build is.
 `component` reads the tiers named by a `helix` key in `fusion.json`, or by
 `helix.json` where the Fusion CLI is not in use. A rule that needs a
 manifest says so rather than reporting a clean tree it never looked at, so a
-fresh clone wants `cem analyze` before the rules that read one mean anything.
+fresh clone wants `bun run analyze` before the rules that read one mean anything.
 
 ## Two shapes, one measurement
 
