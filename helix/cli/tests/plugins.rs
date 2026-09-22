@@ -49,8 +49,20 @@ fn root() -> PathBuf {
 /// The example plugin as a component, built the way its author would build it.
 fn example() -> &'static [u8] {
     static BUILT: OnceLock<Vec<u8>> = OnceLock::new();
-    BUILT.get_or_init(|| {
+    BUILT.get_or_init(|| built(&[], "target"))
+}
+
+/// The same plugin, asking to write somewhere it may not.
+fn escaping() -> &'static [u8] {
+    static BUILT: OnceLock<Vec<u8>> = OnceLock::new();
+    BUILT.get_or_init(|| built(&["--features", "escape"], "target-escape"))
+}
+
+/// Builds the example for WebAssembly and encodes it into a component.
+fn built(extra: &[&str], into: &str) -> Vec<u8> {
+    {
         let at = root().join("fusion/plugins/example");
+        let into = at.join(into);
         let built = Command::new(env!("CARGO"))
             .args([
                 "build",
@@ -59,6 +71,9 @@ fn example() -> &'static [u8] {
                 "--target",
                 "wasm32-unknown-unknown",
             ])
+            .args(extra)
+            .arg("--target-dir")
+            .arg(&into)
             .current_dir(&at)
             .output()
             .expect("cargo runs");
@@ -67,7 +82,7 @@ fn example() -> &'static [u8] {
             "the example plugin did not build: {}",
             String::from_utf8_lossy(&built.stderr)
         );
-        let core = at.join("target/wasm32-unknown-unknown/release/fusion_plugin_example.wasm");
+        let core = into.join("wasm32-unknown-unknown/release/fusion_plugin_example.wasm");
         let bytes = std::fs::read(&core).expect("the built module");
         wit_component::ComponentEncoder::default()
             .module(&bytes)
@@ -75,13 +90,20 @@ fn example() -> &'static [u8] {
             .validate(true)
             .encode()
             .expect("a component")
-    })
+    }
 }
 
 /// A workspace with one component in it, and whatever plugins a test wants.
 struct Tree(PathBuf);
 
 impl Tree {
+    /// The same tree with a stylesheet in it, for the rule that repairs one.
+    fn sheeted(name: &str, sheet: &str, modules: &[(&str, &[u8])]) -> Self {
+        let tree = Self::new(name, "A surface.", modules);
+        std::fs::write(tree.0.join("src/card/card.css"), sheet).expect("a stylesheet");
+        tree
+    }
+
     fn new(name: &str, description: &str, modules: &[(&str, &[u8])]) -> Self {
         let at = std::env::temp_dir().join(format!("helix-cli-plugins-{name}"));
         let _ = std::fs::remove_dir_all(&at);
@@ -238,5 +260,83 @@ fn a_workspace_with_no_plugins_prints_no_register() {
         !out(&output).contains("plugin "),
         "nothing to register: {}",
         out(&output)
+    );
+}
+
+/// `check` reports what a plugin would write and writes none of it.
+///
+/// **The split every rule has**, and the one a sandbox depends on: a module
+/// that could write during a question would make `check` a verb nobody could
+/// run on somebody else's plugin.
+#[test]
+fn a_check_never_applies_what_a_plugin_would_write() {
+    let tree = Tree::sheeted(
+        "unwritten",
+        "a {\n  color: red;   \n}\n",
+        &[("unfinished.wasm", example())],
+    );
+    let output = run(&tree.0, &["component", "check", "--only", "trailing-space"]);
+    assert_eq!(output.status.code(), Some(1), "a finding: {}", err(&output));
+    assert!(
+        err(&output).contains("leaves space at the end of a line"),
+        "the finding: {}",
+        err(&output)
+    );
+    let after = std::fs::read_to_string(tree.0.join("src/card/card.css")).expect("the sheet");
+    assert!(after.contains("red;   "), "nothing was written: {after:?}");
+}
+
+/// `fix` applies them, and says which file the plugin wrote.
+#[test]
+fn a_fix_applies_what_a_plugin_asked_to_write() {
+    let tree = Tree::sheeted(
+        "written",
+        "a {\n  color: red;   \n}\n",
+        &[("unfinished.wasm", example())],
+    );
+    let output = run(&tree.0, &["component", "fix", "--only", "trailing-space"]);
+    assert_eq!(output.status.code(), Some(0), "{}", err(&output));
+    assert!(
+        out(&output).contains("plugin unfinished"),
+        "the register, in the verb where a plugin writes: {}",
+        out(&output)
+    );
+    assert!(
+        out(&output).contains("src/card/card.css"),
+        "says what was written: {}",
+        out(&output)
+    );
+    let after = std::fs::read_to_string(tree.0.join("src/card/card.css")).expect("the sheet");
+    assert_eq!(after, "a {\n  color: red;\n}\n", "the space is gone");
+}
+
+/// A plugin writing outside the workspace is stopped by the host.
+///
+/// **The other half of the sandbox.** A module cannot reach the filesystem, and
+/// an edit naming a path out of the tree is the same escape by a longer route.
+#[test]
+fn a_plugin_may_not_write_outside_the_workspace() {
+    let tree = Tree::sheeted(
+        "escape",
+        "a {\n  color: red;   \n}\n",
+        &[("escaping.wasm", escaping())],
+    );
+    let beside = tree.0.parent().expect("a directory above").join("src");
+    let _ = std::fs::remove_dir_all(&beside);
+
+    let output = run(&tree.0, &["component", "fix", "--only", "trailing-space"]);
+    assert_eq!(
+        output.status.code(),
+        Some(4),
+        "the tool refused to write it"
+    );
+    assert!(
+        err(&output).contains("outside the workspace"),
+        "says so: {}",
+        err(&output)
+    );
+    assert!(
+        !beside.join("card/card.css").exists(),
+        "nothing was written above the workspace"
     );
 }

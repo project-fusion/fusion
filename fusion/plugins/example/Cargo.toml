@@ -19,11 +19,16 @@ version = "0.0.0-dev"
 crate-type = ["cdylib"]
 
 [features]
-# **A plugin from the future, for the test that refuses one.** The refusal a
-# host owes a module built against a world it does not speak cannot be measured
+# **A plugin from world 1, for the test that refuses one.** The refusal a host
+# owes a module built against a world it does not speak cannot be measured
 # without such a module, and a second example crate to hold four lines would be
-# a worse way to have one.
-future = []
+# a worse way to have one. It answers the old version and nothing else, which is
+# what an unrebuilt plugin is.
+past = []
+# **A plugin writing where it may not, for the test that stops one.** The
+# sandbox keeps a module off the filesystem and the host keeps its edits inside
+# the workspace; the second half needs a plugin that tries.
+escape = []
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

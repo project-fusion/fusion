@@ -33,7 +33,7 @@ pub fn all() -> Vec<Rule> {
             summary: "no prose or comment in this repository uses an em dash",
         },
         Rule {
-            fix: Some(dialect::fix),
+            fix: Some(Box::new(dialect::fix)),
             name: "dialect",
             run: Runner::Source(dialect::run),
             summary: "every word this repository writes is in American spelling",
@@ -69,7 +69,7 @@ pub fn all() -> Vec<Rule> {
             summary: "every reference to this repository names the one place it lives",
         },
         Rule {
-            fix: Some(tag_order::fix),
+            fix: Some(Box::new(tag_order::fix)),
             name: "tag-order",
             run: Runner::Source(tag_order::run),
             summary: "every class doc block carries its tags in one order, with every list sorted",

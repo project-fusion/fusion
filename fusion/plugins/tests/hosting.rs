@@ -26,10 +26,10 @@ fn example() -> &'static [u8] {
     BUILT.get_or_init(|| built(&[]))
 }
 
-/// The same plugin built against a world one ahead of this host's.
-fn from_the_future() -> &'static [u8] {
+/// The same plugin built against the world this host has left behind.
+fn from_the_past() -> &'static [u8] {
     static BUILT: OnceLock<Vec<u8>> = OnceLock::new();
-    BUILT.get_or_init(|| built(&["--features", "future"]))
+    BUILT.get_or_init(|| built(&["--features", "past"]))
 }
 
 /// Builds the example for WebAssembly and encodes it into a component.
@@ -42,7 +42,7 @@ fn built(extra: &[&str]) -> Vec<u8> {
         let into = at.join(if extra.is_empty() {
             "target"
         } else {
-            "target-future"
+            "target-past"
         });
         let built = Command::new(env!("CARGO"))
             .args([
@@ -107,12 +107,11 @@ fn a_plugin_is_loaded_named_and_asked() {
             .iter()
             .map(|one| one.name.as_str())
             .collect::<Vec<&str>>(),
-        vec!["unfinished"]
+        vec!["unfinished", "trailing-space"]
     );
 
     let payload = serde_json::json!({
-        "sheets": [],
-        "tiers": [{
+        "manifests": [{
             "source": "src",
             "manifest": { "modules": [{ "path": "src/card/card.ts", "declarations": [
                 { "name": "HelixCard", "tagName": "helix-card",
@@ -134,6 +133,40 @@ fn a_plugin_is_loaded_named_and_asked() {
         "`HelixCard` publishes a description with `TODO` in it"
     );
     assert_eq!(judged.findings[0].file, "src/card/card.ts");
+}
+
+/// What each rule reads is what the host is told to compose for it.
+#[test]
+fn a_rule_says_which_parts_of_the_payload_it_reads() {
+    let at = planted("reads", &[("unfinished.wasm", example())]);
+    let host = Host::read(&at).expect("the host loads it");
+    let loaded = host.loaded();
+    let reads: Vec<(&str, &[String])> = loaded[0]
+        .provides
+        .iter()
+        .map(|one| (one.name.as_str(), one.reads.as_slice()))
+        .collect();
+    assert_eq!(reads[0].1, ["manifests".to_owned()]);
+    assert_eq!(reads[1].1, ["sheets".to_owned()]);
+}
+
+/// A rule that repairs hands back the whole text, and writes nothing itself.
+#[test]
+fn a_plugin_hands_back_the_text_it_would_write() {
+    let at = planted("edits", &[("unfinished.wasm", example())]);
+    let host = Host::read(&at).expect("the host loads it");
+    let payload = serde_json::json!({
+        "sheets": [{ "file": "src/card/card.css", "text": "a {\n  color: red;   \n}\n" }],
+    })
+    .to_string();
+
+    let judged = host.check("trailing-space", &payload).expect("it answers");
+    assert_eq!(judged.findings.len(), 1);
+    assert_eq!(judged.edits.len(), 1);
+    assert_eq!(judged.edits[0].file, "src/card/card.css");
+    assert_eq!(judged.edits[0].text, "a {\n  color: red;\n}\n");
+    /* The file on disk is the caller's business and the plugin touched
+    nothing: this payload names a file that does not exist. */
 }
 
 /// A rule nothing provides is refused by name rather than answered with nothing.
@@ -198,9 +231,34 @@ fn a_workspace_with_no_plugin_directory_loads_nothing() {
 /// The world this host speaks is the one the example was built against.
 #[test]
 fn the_world_a_module_speaks_is_read_from_the_module() {
-    assert_eq!(WORLD, 1);
+    assert_eq!(WORLD, 2);
     let at = planted("world", &[("unfinished.wasm", example())]);
     Host::read(&at).expect("the example speaks this world");
+}
+
+/// Two modules claiming one rule name are refused, with both named.
+///
+/// **Last one wins would make the run depend on how the directory sorts**,
+/// which is the thing the register exists to stop being invisible.
+#[test]
+fn two_modules_claiming_one_rule_name_are_refused() {
+    let at = planted(
+        "twice",
+        &[("first.wasm", example()), ("second.wasm", example())],
+    );
+    let Err(refused) = Host::read(&at) else {
+        panic!("two modules claiming one name loaded");
+    };
+    assert!(
+        refused.why.contains("it provides `unfinished`") && refused.why.contains("first.wasm"),
+        "names the rule and the module that had it: {}",
+        refused.why
+    );
+    assert!(
+        refused.file.ends_with("second.wasm"),
+        "names the second: {}",
+        refused.file.display()
+    );
 }
 
 /// A module from a world this host does not speak is refused, legibly.
@@ -210,14 +268,14 @@ fn the_world_a_module_speaks_is_read_from_the_module() {
 /// somewhere inside the runtime.
 #[test]
 fn a_module_built_against_another_world_is_refused_by_both_numbers() {
-    let at = planted("future", &[("ahead.wasm", from_the_future())]);
+    let at = planted("past", &[("behind.wasm", from_the_past())]);
     let Err(refused) = Host::read(&at) else {
         panic!("a module from another world loaded");
     };
-    assert!(refused.file.ends_with("ahead.wasm"), "names the module");
+    assert!(refused.file.ends_with("behind.wasm"), "names the module");
     assert!(
-        refused.why.contains("built against world 2")
-            && refused.why.contains("speaks world 1")
+        refused.why.contains("built against world 1")
+            && refused.why.contains("speaks world 2")
             && refused.why.contains("Rebuild it"),
         "names both worlds and what to do: {}",
         refused.why

@@ -1,4 +1,4 @@
-package fusion:rules@1.0.0;
+package fusion:rules@2.0.0;
 
 /// What a rule written outside this repository exports.
 ///
@@ -15,6 +15,15 @@ world plugin {
     summary: string,
     /// What its count counts, for a sentence that reads.
     unit: string,
+    /// The parts of the payload this rule reads, by the name the host gives
+    /// each one. What is not asked for is not composed and not passed: a rule
+    /// reading stylesheets is handed no manifests, and can tell that it was
+    /// handed none rather than being handed an empty list.
+    ///
+    /// A part the host does not have is not an error. It is a rule that will
+    /// find nothing, and saying so on every run of every other verb would be
+    /// noise about a payload nobody asked to be composed.
+    reads: list<string>,
   }
 
   /// The version of this world the module was built against.
