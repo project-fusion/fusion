@@ -262,7 +262,7 @@ pub fn all() -> Vec<Rule> {
             summary: "the Node on this machine, and its types, satisfy the declared floor",
         },
         Rule {
-            fix: Some(order::fix),
+            fix: Some(Box::new(order::fix)),
             name: "order",
             run: Runner::Source(order::run),
             summary: "every manifest has its keys in one order",

@@ -189,9 +189,12 @@ fusion/    cli docs rules scripts site: what belongs to the company rather than
   **A rule from outside is a WebAssembly component in `.helix/plugins`.**
   `helix component check` walks that directory, prints every module it loaded by
   name and digest, and runs the rules they provide beside its own: `--only` names
-  one the way it names any other, and a finding reads the same. A plugin is given
-  the manifests and the stylesheet text and nothing else: no filesystem, no
-  clock and no network, so a module importing one is refused where it loads.
+  one the way it names any other, and a finding reads the same. Each rule says
+  which parts of the payload it reads, `manifests` or `sheets`, and is handed
+  those and no others: no filesystem, no clock and no network, so a module
+  importing one is refused where it loads. A rule that repairs something hands
+  back the new text of each file; `check` reports it, `fix` writes it, and an
+  edit pointing outside the workspace is refused.
   `fusion/plugins` is the host and its `example/` is a whole plugin; the world
   they share is `fusion/plugins/wit/rules.wit`.
 

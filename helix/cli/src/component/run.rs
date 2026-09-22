@@ -227,11 +227,17 @@ pub fn check(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code
 /// Runs the rules that can write, and says what they wrote.
 pub fn fix(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
     let Prepared {
-        context, selected, ..
+        context,
+        register,
+        selected,
+        ..
     } = prepare(args, from)?;
-    /* A plugin provides no `fix` in this world, so the register is not printed
-    here: nothing it loaded can write, and a line about what was loaded would be
-    the only thing a plugin contributed to the verb. */
+    /* **Most of all here**, because this is the verb where a plugin writes. A
+    module that rewrote a file in a run that never said which modules it loaded
+    is the worst version of what discovery by directory risks. */
+    if !json {
+        told(&register);
+    }
     fusion_rules::fix(&selected, &context, json, paint, NOUN)
 }
 

@@ -88,6 +88,9 @@ impl Report {
 /// What a `fix` hands back: every file it wrote, relative to the root.
 pub type Written = Result<Vec<String>, Unwritten>;
 
+/// How a rule writes, which is a function here and a module's answer elsewhere.
+pub type Fixer<C> = Box<dyn Fn(&C) -> Written + Send + Sync>;
+
 /// A write that did not happen, which stops the fix where it stood.
 ///
 /// **A fix that cannot write says so, rather than reporting the files it
@@ -149,7 +152,11 @@ pub struct Rule<C> {
     /// runs, so a `fix` is never a second opinion about what is wrong: it is the
     /// same reading, applied. Only an ordering rule has one, because an order
     /// is the one kind of finding whose repair is mechanical.
-    pub fix: Option<fn(&C) -> Written>,
+    ///
+    /// **Boxed for the same reason [`Runner::Hosted`] is a closure.** A rule
+    /// compiled in writes from a `fn`, and a rule loaded at run time writes what
+    /// a module handed back, which is a value something has to hold.
+    pub fix: Option<Fixer<C>>,
     pub name: &'static str,
     pub run: Runner<C>,
     pub summary: &'static str,
@@ -320,7 +327,7 @@ pub fn fix<C>(
     let mut wrote: Vec<(&str, String)> = Vec::new();
     let mut ran = 0;
     for rule in selected {
-        let Some(apply) = rule.fix else {
+        let Some(apply) = rule.fix.as_ref() else {
             continue;
         };
         ran += 1;

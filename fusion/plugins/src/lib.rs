@@ -39,7 +39,12 @@ wasmtime::component::bindgen!({ path: "wit", world: "plugin" });
 /// **A mismatch is a message rather than a crash.** A plugin built against a
 /// world the host does not speak is the first thing that happens once anybody
 /// upgrades either side, and a legible refusal is decided now or not at all.
-pub const WORLD: u32 = 1;
+///
+/// **World 2 widened `rule` and nothing published spoke world 1.** A rule now
+/// names the parts of the payload it reads, so a host composes what was asked
+/// for rather than everything it has. One version was spent proving that the
+/// refusal works, which is cheaper than the first real plugin discovering it.
+pub const WORLD: u32 = 2;
 
 /// What a plugin says one of its rules is.
 #[derive(Clone, Debug)]
@@ -47,6 +52,8 @@ pub struct Provided {
     pub name: String,
     pub summary: String,
     pub unit: String,
+    /// The parts of the payload it reads, which is what the host composes.
+    pub reads: Vec<String>,
 }
 
 /// One module the host loaded, as the register prints it.
@@ -64,12 +71,12 @@ pub struct Loaded {
 
 /// What a plugin answered, in the shape a report is built from.
 ///
-/// **`edits` is in the schema from the first version and unread here.** Every
-/// rule in this workspace has a judging half and some have a writing one, so a
-/// reply with no shape for an edit would have to grow one, and a world that
-/// grows a capability after plugins exist breaks all of them. The host applies
-/// nothing until a run asks for fixes, which is the split `check` and `fix`
-/// already have.
+/// **`edits` is read and never applied here.** Every rule in this workspace has
+/// a judging half and some have a writing one, so a reply with no shape for an
+/// edit would have to grow one, and a world that grows a capability after
+/// plugins exist breaks all of them. What a plugin asked to write is carried
+/// back and left to the caller: the host has no workspace root and no verb, and
+/// the split between judging and writing is the caller's to enforce.
 #[derive(Debug, Deserialize)]
 pub struct Judged {
     pub checked: usize,
@@ -77,6 +84,21 @@ pub struct Judged {
     pub findings: Vec<Told>,
     #[serde(default)]
     pub notes: Vec<String>,
+    /// Files the plugin would rewrite, which nothing applies unless asked.
+    #[serde(default)]
+    pub edits: Vec<Edit>,
+}
+
+/// One file a plugin would rewrite, whole.
+///
+/// **The whole text rather than a patch.** A patch is a second format to agree
+/// on and to get wrong, and a rule that can repair a file can print it: the
+/// rules compiled in here rewrite whole files for the same reason.
+#[derive(Debug, Deserialize)]
+pub struct Edit {
+    /// Relative to the workspace root, the way a finding names a file.
+    pub file: String,
+    pub text: String,
 }
 
 /// One finding as a plugin words it, which is a finding as anything else does.
@@ -180,6 +202,28 @@ impl Host {
                 ),
             })?;
             let loaded = Self::introduce(&engine, &component, &file, &bytes)?;
+            /* **Two modules claiming one rule name is a refusal, not a
+            winner.** Last one wins makes which rule ran depend on how a
+            directory sorts, and a run whose meaning turns on a file name is the
+            thing the register exists to stop. Both modules are named, because
+            the person reading has to decide which of them to remove. */
+            for provided in &loaded.provides {
+                let taken = modules.iter().find(|(one, _): &&(Loaded, Component)| {
+                    one.provides.iter().any(|two| two.name == provided.name)
+                });
+                if let Some((first, _)) = taken {
+                    return Err(Refused {
+                        file: loaded.file.clone(),
+                        why: format!(
+                            "it provides `{}`, which `{}` already provides. Two plugins claiming \
+                             one rule name would make the run depend on how the directory sorts, \
+                             so remove one of them or rename the rule",
+                            provided.name,
+                            first.file.display()
+                        ),
+                    });
+                }
+            }
             modules.push((loaded, component));
         }
         Ok(Self { engine, modules })
@@ -234,6 +278,7 @@ impl Host {
                 name: one.name,
                 summary: one.summary,
                 unit: one.unit,
+                reads: one.reads,
             })
             .collect();
 

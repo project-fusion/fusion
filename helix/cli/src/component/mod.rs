@@ -712,7 +712,7 @@ pub fn all() -> Vec<Rule> {
             summary: "every family with a stylesheet says what it does on paper",
         },
         Rule {
-            fix: Some(properties::fix),
+            fix: Some(Box::new(properties::fix)),
             name: "properties",
             run: Runner::Source(properties::run),
             summary: "a component declares its reactive properties in one order",
