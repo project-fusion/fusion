@@ -1,4 +1,4 @@
-//! One spelling for each role a part name can play.
+//! One spelling for each role a part name or a slot name can play.
 //!
 //! **A part name is the most coupled door a consumer goes through**, and it is
 //! the last one they are told to try. Twenty vocabularies for twenty components
@@ -21,11 +21,12 @@
 //! outside it is theirs, so `unresolved` is configuration, and an entry nothing
 //! renders any more is reported so it gets deleted rather than kept.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::sync::LazyLock;
 
 use regex::Regex;
+use serde_json::Value;
 
 use crate::component::text::{flattened, uncommented};
 use crate::component::{sources, Context, Finding, Report};
@@ -52,6 +53,97 @@ const ROLES: [(&str, &str); 6] = [
 /// means `container` is that the next person reaching for it is stopped, rather
 /// than told the entry is stale once nothing renders it.
 const REFUSED: [(&str, &str); 1] = [("wrapper", "container")];
+
+/// The slot names that name a position, each with the one thing it means.
+///
+/// **The same design as the part names, for the other door a consumer goes
+/// through.** A slot is where content lands, and every component has a leading
+/// edge and a heading somewhere, so the words for those drift the way part
+/// names did while a `poster`, a `composer` or a `swatch` names what that
+/// component has. Measured across both tiers on 22 Sep 2026: these eleven were
+/// already one word each in every family using them, and the heading was two.
+///
+/// **`heading` and `header` are two things, and both are registered.** A
+/// header is a region, holding a heading and whatever sits beside it, which is
+/// what Card, Chat, Dialog, Drawer and Notifications publish; Dialog's says it
+/// in as many words. A heading is the heading alone, which is all Callout and
+/// Empty have. A component with a heading and nothing beside it takes
+/// `heading`, and one that grows an action beside it grows a `header`.
+const SLOT_ROLES: [(&str, &str); 11] = [
+    (
+        "actions",
+        "what a reader can do about the component, one control or several",
+    ),
+    ("end", "content at the trailing edge"),
+    ("feedback", "what a field says about its value"),
+    ("footer", "a region closing the component"),
+    (
+        "header",
+        "a region opening the component: its heading, and anything beside it",
+    ),
+    ("heading", "the component's heading, alone"),
+    ("hint", "what a field says before it is used"),
+    ("icon", "the component's glyph"),
+    ("label", "the component's name, where it is more than text"),
+    ("start", "content at the leading edge"),
+    ("toolbar", "a bar of controls above what they act on"),
+];
+
+/// Slot names a registered word already covers, each naming its replacement.
+///
+/// **`title` is `heading`.** Callout published `title` for "a heading above the
+/// content" while Empty published `heading` for the same thing, one question
+/// answered in two words. `heading` survived because it names what the element
+/// is, where `title` is also the attribute every element has, whose tooltip a
+/// reader of `slot="title"` could fairly expect.
+const SLOT_REFUSED: [(&str, &str); 1] = [("title", "heading")];
+
+/// Every slot a component documents, with the file that documents it.
+fn slots(context: &Context) -> Vec<(String, String)> {
+    let mut found = Vec::new();
+    for tier in context.settings.roots(&context.root) {
+        let Some(manifest) = context.manifest(&tier) else {
+            continue;
+        };
+        let package = tier.parent().unwrap_or(tier.as_path());
+        for module in manifest
+            .get("modules")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+        {
+            let path = module
+                .get("path")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            let file = context.relative(&package.join(path));
+            for declaration in module
+                .get("declarations")
+                .and_then(Value::as_array)
+                .into_iter()
+                .flatten()
+            {
+                for slot in declaration
+                    .get("slots")
+                    .and_then(Value::as_array)
+                    .into_iter()
+                    .flatten()
+                {
+                    /* Inherited entries are the base's declaration, reported
+                    once where it is written rather than on every subclass. */
+                    if slot.get("inheritedFrom").is_some() {
+                        continue;
+                    }
+                    let name = slot.get("name").and_then(Value::as_str).unwrap_or_default();
+                    if !name.is_empty() {
+                        found.push((name.to_owned(), file.clone()));
+                    }
+                }
+            }
+        }
+    }
+    found
+}
 
 static PART: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"part="([a-z0-9 -]+)""#).expect("a literal pattern compiles"));
@@ -101,6 +193,27 @@ pub fn run(context: &Context) -> Report {
         }
     }
 
+    /* The slot names, against their own registry. What a component documents
+    rather than what it renders, `slots` holding the two to one another. */
+    let slot_roles: BTreeMap<&str, &str> = SLOT_ROLES.into_iter().collect();
+    let slot_refused: BTreeMap<&str, &str> = SLOT_REFUSED.into_iter().collect();
+    let mut slots_seen: BTreeSet<String> = BTreeSet::new();
+    for (word, file) in slots(context) {
+        slots_seen.insert(word.clone());
+        let Some(instead) = slot_refused.get(word.as_str()) else {
+            continue;
+        };
+        findings.push(Finding {
+            detail: format!(
+                "One spelling per role, or a consumer filling twenty components learns twenty \
+                 vocabularies. `{instead}` is the registered word for {}.",
+                slot_roles.get(instead).unwrap_or(instead)
+            ),
+            file,
+            message: format!("documents `slot=\"{word}\"`"),
+        });
+    }
+
     /* An entry nothing renders is a note about a fix that already happened. */
     for (word, note) in &context.settings.unresolved {
         if seen.contains_key(word) {
@@ -117,9 +230,13 @@ pub fn run(context: &Context) -> Report {
         checked: ROLES
             .iter()
             .filter(|(word, _)| seen.contains_key(*word))
-            .count(),
+            .count()
+            + SLOT_ROLES
+                .iter()
+                .filter(|(word, _)| slots_seen.contains(*word))
+                .count(),
         findings,
         notes: Vec::new(),
-        unit: "registered role words in use",
+        unit: "registered part and slot words in use",
     }
 }

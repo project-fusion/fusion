@@ -2702,3 +2702,34 @@ fn vocabulary() {
         "src/card/card.ts:3",
     );
 }
+
+/// A slot name is held to its own registry, read from what the manifest
+/// documents: `heading` is the word, and `title`, which Callout published for the
+/// same thing, is refused in its favor.
+#[test]
+fn vocabulary_of_slots() {
+    let manifest = |slot: &str| {
+        format!(
+            r#"{{ "modules": [ {{ "path": "src/callout/callout.ts", "declarations": [
+  {{ "kind": "class", "name": "HelixCallout", "tagName": "helix-callout",
+     "slots": [ {{ "name": "{slot}", "description": "A heading above the content." }} ] }} ] }} ] }}"#
+        )
+    };
+    plant_in(
+        "vocabulary-slots",
+        "vocabulary",
+        &[
+            ("helix.json", TIERS),
+            (
+                "src/callout/callout.ts",
+                "export class HelixCallout extends HTMLElement {}\n",
+            ),
+            ("custom-elements.json", &manifest("heading")),
+        ],
+        |tree| {
+            tree.write("custom-elements.json", &manifest("title"));
+        },
+        "documents `slot=\"title\"`",
+        "src/callout/callout.ts",
+    );
+}

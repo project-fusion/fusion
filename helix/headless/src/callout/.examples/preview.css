@@ -53,7 +53,7 @@ helix-headless-callout::part(content) {
   min-inline-size: 0;
 }
 
-helix-headless-callout [slot="title"] {
+helix-headless-callout [slot="heading"] {
   display: block;
   font-weight: 600;
   margin: 0;

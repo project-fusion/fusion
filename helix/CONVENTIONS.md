@@ -1202,6 +1202,23 @@ to parts, nine words meaning "the box in the middle" across 204 names. `drawer`
 used both `panel` and `content`; `accordion` used both `content` and
 `container`.
 
+**Slot names draw from a registry of their own, on the same terms.** A slot is
+where a consumer's content lands, and the words for a position drift there the
+way part names did. `helix component`'s `vocabulary` holds these to one spelling
+each: `actions`, `end`, `feedback`, `footer`, `header`, `heading`, `hint`, `icon`,
+`label`, `start`, `toolbar`. A `poster`, a `composer` or a `swatch` is the
+component's own.
+
+**`heading` and `header` are two things.** A `header` is a region, holding a
+heading and whatever sits beside it: Card, Chat, Dialog, Drawer and
+Notifications publish one, and Dialog's describes itself as "the title, and
+anything beside it". A `heading` is the heading alone, which is all Callout and
+Empty have. A component with a heading and nothing beside it takes `heading`,
+and one that grows an action there grows a `header` instead. Callout published
+`title` for the same thing Empty called `heading` until 22 Sep 2026; `title` is
+refused now, being also the attribute every element has, whose tooltip a reader
+of `slot="title"` could fairly expect.
+
 **Two renames were the component telling on itself**, which is the kind worth
 trusting. `Menu` published its floating panel as `menu` and described it in its
 own JSDoc as "the floating panel the menu is drawn on", which is the sentence
