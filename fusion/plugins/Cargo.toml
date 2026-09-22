@@ -1,0 +1,40 @@
+[package]
+name = "fusion-plugins"
+description = "The WASM host that runs a rule written outside this repository."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`: a version is a fact about a domain and this
+# workspace holds two. A crate that inherits one fails the build.
+version = "0.0.0-dev"
+
+[dependencies]
+fusion-rules.workspace = true
+serde = { workspace = true }
+serde_json = { workspace = true }
+# **The digest the register prints.** A hash is a primitive with one right
+# answer, and the crate that implements it is reviewed by more people than a
+# copy in this file would be.
+sha2 = "0.10"
+# **The runtime, with a compiler and the interpreter rather than a JIT backend.**
+# `cranelift` translates a module once per run and `pulley` executes the result
+# without generating native code, which is the trade a check wants: a rule runs
+# for milliseconds, so compiling to native buys nothing a portable interpreter
+# does not already give, and the artifact stays the same on every platform.
+wasmtime = { version = "49", default-features = false, features = [
+  "component-model",
+  "cranelift",
+  "pulley",
+  "runtime",
+  "std",
+] }
+
+[dev-dependencies]
+# Encodes a core module into a component, which is what a plugin author's
+# toolchain does for them. The tests build the example plugin the long way
+# round so the path an author takes is the path that is measured.
+wit-component = "0.259"
+
+[lints]
+workspace = true

@@ -73,6 +73,7 @@ pub mod overruled;
 pub mod pairings;
 pub mod parts;
 pub mod platform_fidelity;
+pub mod plugins;
 pub mod print;
 pub mod properties;
 pub mod reachable;
@@ -192,6 +193,15 @@ pub struct Settings {
 
     /// Directories holding component source, relative to the root.
     pub tiers: Vec<String>,
+
+    /// Where rules written outside this repository are looked for.
+    ///
+    /// **A directory rather than a list, and settable rather than fixed.** A
+    /// rule is a file, and the default is `.helix/plugins` under the root; a
+    /// consumer vendoring somebody's plugins into their own tree says where
+    /// rather than laying their repository out like this one.
+    #[serde(default)]
+    pub plugins: Option<String>,
 
     /// Places a consumer writes `::part()` from outside a component.
     ///

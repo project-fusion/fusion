@@ -20,6 +20,10 @@ path = "src/main.rs"
 # and keeps its WASM wrapper buildable without dragging the command surface into
 # `@fusion.dev/helix-theme`.
 fusion-helix-theme = { path = "../theme", features = ["serde"] }
+# **The host that runs a rule somebody else wrote.** It knows what a module is
+# and not what a component is, so the payload a plugin receives is composed here
+# and the sandbox is enforced there.
+fusion-plugins = { workspace = true }
 # **What a rule is, and the runner that measures a set of them.** Shared with
 # `fusion-cli` and owned by neither product, so this is not a dependency on the
 # fusion domain: the crate's `lib.rs` carries the argument.
@@ -42,6 +46,12 @@ oxc_parser = "0.150.0"
 oxc_allocator = "0.150.0"
 oxc_span = "0.150.0"
 oxc_ast = "0.150.0"
+
+[dev-dependencies]
+# Encodes the example plugin into a component, which is what a plugin author's
+# toolchain does for them: the end-to-end test takes the path an author takes
+# rather than reading an artifact somebody committed.
+wit-component = "0.259"
 
 [lints]
 workspace = true

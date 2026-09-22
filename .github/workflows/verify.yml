@@ -458,6 +458,11 @@ jobs:
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
         with:
           components: clippy
+          # **WebAssembly, for the example plugin the host's tests build.** They
+          # compile it the way its author would rather than reading a committed
+          # artifact, so the target is a dependency of the tests and not of the
+          # workspace: nothing here is shipped as WASM by this job.
+          targets: wasm32-unknown-unknown
           # The floor rather than stable, so `rust-version` in `Cargo.toml` is
           # exercised by the jobs that compile: a crate reaching past it fails
           # here rather than on the first machine that is behind.
