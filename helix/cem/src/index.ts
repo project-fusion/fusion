@@ -4,7 +4,6 @@ import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { vuejsTypesPlugin } from '@wc-toolkit/vuejs-types'
-import { type ConventionLintOptions, conventionLint } from './plugins/convention-lint.js'
 import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
 import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxNativeEvents } from './plugins/jsx-native-events.js'
@@ -34,8 +33,6 @@ export interface HelixCemOptions {
    */
   packageName?: string
 
-  /** Passed through to the convention linter. Pass `false` to skip it. */
-  lint?: ConventionLintOptions | false
   /** Which design-system tier this package ships. */
   tier: NonNullable<HelixMetadata['tier']>
 }
@@ -59,21 +56,20 @@ const MANIFEST = 'custom-elements.json'
 /**
  * What runs over the finished manifest, in the order it runs.
  *
- * **Two jobs, where this package used to do three.** It held eighteen plugins
+ * **One job, where this package used to do three.** It held eighteen plugins
  * for `@custom-elements-manifest/analyzer`, and ten of them built the manifest:
  * a tier, a group and a part, an example, a source path, a reference, a React
  * prop, an order. `helix manifest build` does all of that in Rust now, as
  * ordinary code rather than as plugins, which is why they are gone rather than
- * moved. What is left reads a manifest that is already written: the linter,
- * and the typings generators, which never parsed any TypeScript and so never
- * carried the version pin that the move away from the analyzer exists to end.
+ * moved. The linter went the same way, to `helix component`'s `conventions`
+ * rule, it being a rule over a finished manifest and nothing else. What is
+ * left is the typings generators, which never parsed any TypeScript and so
+ * never carried the version pin that the move away from the analyzer ended.
  */
 export const afterManifest = ({
   frameworkTypes = false,
-  lint = {},
   packageName,
 }: HelixCemOptions): Plugin[] => [
-  ...(lint === false ? [] : [conventionLint(lint)]),
   ...(frameworkTypes
     ? [
         jsxTypesPlugin({
@@ -149,8 +145,9 @@ const installed = (name: string, from: string): string | undefined => {
  * **Every helix package reachable through `dependencies`, not only the ones
  * named there.** The analyzer collected them by following imports through the
  * dependencies' own files, so Sandbox, which names the styled tier, was given
- * the headless and core manifests beneath it too; the linter needs them to
- * see that a class descends from `HelixElement` at all.
+ * the headless and core manifests beneath it too. The generator resolves
+ * inheritance across them, and the output came out byte for byte the analyzer's
+ * with this set and with the narrower one a package names.
  *
  * **A package ships one where its `package.json` says `customElements`**, the
  * schema's own field for where a manifest is, which the analyzer read too. Not
@@ -194,7 +191,7 @@ export const dependenciesOf = (cwd: string): Map<string, string> => {
 const helix = (): string => createRequire(import.meta.url).resolve('@fusion.dev/helix-cli/bin.mjs')
 
 /**
- * Writes a package's manifest, then lints it and writes its typings.
+ * Writes a package's manifest, then its typings.
  *
  * The manifest is `helix manifest build`'s, which is byte for byte what
  * `@custom-elements-manifest/analyzer` wrote across all four tiers when this
@@ -247,18 +244,8 @@ export type {
   InheritedFrom,
   Plugin,
   TypeText,
-  Violation,
 } from './types.js'
 export {
-  COMPONENT_ROOT,
-  classIndex,
-  descendsFrom,
-  eachComponent,
-  isCustomElement,
-} from './types.js'
-export type { ConventionLintOptions }
-export {
-  conventionLint,
   jsxDeclaredEvents,
   jsxImports,
   jsxNativeEvents,

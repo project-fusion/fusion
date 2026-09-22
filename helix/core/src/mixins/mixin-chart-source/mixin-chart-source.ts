@@ -71,8 +71,8 @@ export const seriesNames = (list: string | undefined): string[] =>
  * Returning the class directly was tried and refused for exactly that.
  *
  * **Every member here is documented twice, and that is the convention rather
- * than an oversight.** TypeScript reads this interface; the analyzer reads the
- * inner class. Documented only here, `helix-convention-lint` failed the build
+ * than an oversight.** TypeScript reads this interface; the manifest reads the
+ * inner class. Documented only here, the convention linter failed the build
  * with six `Public member has no description` on three charts that had just
  * been given a shared, fully documented property.
  *

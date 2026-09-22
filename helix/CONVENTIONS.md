@@ -1218,8 +1218,9 @@ turns out to be, the way `axes` names work rather than blocking on it.
 
 ## The manifest
 
-`helix manifest build` writes it, in Rust, and `@fusion.dev/helix-cem` runs
-over it afterwards: the convention linter, and the framework typings. A
+`helix manifest build` writes it, in Rust, and `@fusion.dev/helix-cem` writes
+the framework typings from it; `helix component`'s `conventions` rule holds what
+it publishes to the contract below. A
 package's `analyze` is `bun --bun helix-cem`, which reads its `cem.config.ts`
 for the tier and whether to publish typings, and finds everything else.
 
@@ -1262,9 +1263,11 @@ for the tier and whether to publish typings, and finds everything else.
 
 Every component's class JSDoc carries `@summary`, `@description`, `@since`,
 `@status`, `@category`, `@documentation`, plus `@aliases` where a component is
-known by other names. `helix-convention-lint` **fails the build** without
-`@since`, `@status`, `@documentation`, or a description, which `@summary` alone
-satisfies.
+known by other names. `helix component`'s `conventions` rule **fails
+`check:cli`**, and so `verify` and CI, without `@since`, `@status`,
+`@documentation`, or a description, which `@summary` alone satisfies. It was
+`helix-convention-lint`, which failed `analyze` instead; it is a rule over a
+finished manifest, and it runs where the other rules do.
 
 **`@description` is published prose.** It renders on the family's reference
 page, so it is read by consumers rather than by contributors, and it takes the
@@ -1323,8 +1326,9 @@ and prefixed**:
 @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
 ```
 
-*`helix component`'s `events` and `helix-convention-lint` both enforce
-`/^helix-[a-z][a-z0-9-]*$/`, which is what every shipped event answers to.*
+*`helix component`'s `conventions` rule holds every declared event to
+`/^helix-[a-z][a-z0-9-]*$/`, or to a native name being relayed, which is what
+every shipped event answers to.*
 
 **The prefix is what stops a collision with a native name.** An event dispatched
 inside a shadow root is retargeted to look like it came from the host, so a bare

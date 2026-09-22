@@ -18,14 +18,11 @@ const config: HelixCemOptions = {
 export default config
 ```
 
-Then it does three things in order:
+Then it does two things in order:
 
 1. **Writes `custom-elements.json`** with `helix manifest build`, against the
    manifests of every helix package reachable through `dependencies`.
-2. **Lints it.** `helix-convention-lint` fails the build on a component
-   missing `@since`, `@status`, `@documentation` or a description, among other
-   conventions: see [the JSDoc contract](../CONVENTIONS.md#jsdoc-contract).
-3. **Writes the framework typings**, where `frameworkTypes` is set:
+2. **Writes the framework typings**, where `frameworkTypes` is set:
    `types/jsx.d.ts`, `types/vue.d.ts` and `types/svelte.d.ts`, with
    `@wc-toolkit/jsx-types` and `@wc-toolkit/vuejs-types` and the `jsx-*`
    passes that correct what those write.
@@ -35,4 +32,6 @@ and eighteen plugins for it. Ten of those built the manifest, and the Rust
 generator does that work as ordinary code now, byte for byte what the analyzer
 wrote. What is left here is what reads a finished manifest, which never parsed
 any TypeScript and so never carried the version pin that replacing the
-analyzer ended.
+analyzer ended. The linter it also held is `helix component`'s `conventions`
+rule now, which is what [the JSDoc contract](../CONVENTIONS.md#jsdoc-contract)
+is checked by.
