@@ -75,10 +75,7 @@ const SLOT_ROLES: [(&str, &str); 12] = [
         "actions",
         "what a reader can do about the component, one control or several",
     ),
-    (
-        "description",
-        "a quieter line under the component's label",
-    ),
+    ("description", "a quieter line under the component's label"),
     ("end", "content at the trailing edge"),
     ("feedback", "what a field says about its value"),
     ("footer", "a region closing the component"),

@@ -93,6 +93,7 @@ use regex::Regex;
 use serde_json::Value;
 
 use crate::component::{sources, walk_outside, Context, Finding, Report};
+use crate::manifest::unions::aliases_in;
 
 /// `appearance` written as an attribute, wherever a component says it.
 ///
@@ -108,51 +109,6 @@ static WRITTEN: LazyLock<Regex> =
 /// from an attribute a component simply does not have, and the registry of what
 /// the library calls things belongs beside the rule that holds it.
 pub const REFUSED: &str = "appearance";
-
-/// The head of a type alias, up to and including its `=`.
-///
-/// **The value is read by the scanner below rather than by this pattern**, which
-/// stops at the `=` for a reason. A union is written on one line until it does
-/// not fit on one: at `lineWidth` 100 a seven-word union already wraps, so
-/// `OrbState` and `Placement` both continue onto the lines beneath them, and a
-/// pattern anchored to a single line reads the first member as the whole union.
-/// `\s*` before the `=` must not cross a newline either, or the pattern finds a
-/// value on the next line and half-matches exactly what it meant to skip.
-static ALIAS_HEAD: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?m)^[^\S\n]*(?:export[^\S\n]+)?type[^\S\n]+(\w+)[^\S\n]*=")
-        .expect("a literal pattern compiles")
-});
-
-/// What a type alias is equal to, gathered across the lines it is written on.
-///
-/// The first line after the `=` if there is anything on it, and then every line
-/// below that opens with a `|`, which is how a wrapped union is written and is
-/// not how an object type's members are. A line that opens with anything else
-/// ends the value, so a multi-line object stops at its first field instead of
-/// contributing its names to a union.
-fn value_of(rest: &str) -> String {
-    let mut body = String::new();
-    for (at, line) in rest.lines().enumerate() {
-        let line = line.trim();
-        if at == 0 {
-            if let Some(head) = line.split(';').next() {
-                body.push_str(head);
-            }
-            if !body.is_empty() && !body.ends_with('|') {
-                break;
-            }
-            continue;
-        }
-        if !line.starts_with('|') {
-            break;
-        }
-        if !body.is_empty() {
-            body.push(' ');
-        }
-        body.push_str(line.split(';').next().unwrap_or(line));
-    }
-    body
-}
 
 /// An identifier in a type annotation, which is what an alias is reached by.
 static NAMED: LazyLock<Regex> =
@@ -200,15 +156,8 @@ pub(crate) fn aliases(context: &Context) -> BTreeMap<String, String> {
             let Ok(text) = fs::read_to_string(&file) else {
                 continue;
             };
-            for capture in ALIAS_HEAD.captures_iter(&text) {
-                let (Some(name), Some(whole)) = (capture.get(1), capture.get(0)) else {
-                    continue;
-                };
-                let body = value_of(&text[whole.end()..]);
-                if body.is_empty() {
-                    continue;
-                }
-                found.entry(name.as_str().to_owned()).or_insert(body);
+            for (name, body) in aliases_in(&text) {
+                found.entry(name).or_insert(body);
             }
         }
     }

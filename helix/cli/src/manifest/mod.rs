@@ -26,6 +26,7 @@ pub mod inherit;
 pub mod jsdoc;
 pub mod order;
 pub mod parse;
+pub mod unions;
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;

@@ -34,6 +34,7 @@ use crate::manifest::parse;
 use crate::manifest::parse::{
     declarations, exports, Declared, Exported, Origin, Parameter, Readonly, Superclass, Written,
 };
+use crate::manifest::unions;
 
 /// Files the analyzer is told to skip, by the suffix that names them.
 ///
@@ -1232,21 +1233,34 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
     until every module has been read. So the first pass writes the declarations
     and the second gives each what its heritage has, with this package's own
     manifest standing among the dependencies by the name nothing imports it by. */
-    let written: Vec<(String, Vec<Pending>, Vec<Value>)> = sources(package)
+    let read: Vec<(String, String)> = sources(package)
         .into_iter()
         .map(|path| {
             let text = fs::read_to_string(package.join(&path)).unwrap_or_default();
-            let published = published_by(&text, &path);
-            let declared = declarations(&text, &path)
+            (path, text)
+        })
+        .collect();
+    /* **The names are written out before anything inherits them.** A subclass
+    is given what its parent declares, so resolving `Placement` once where the
+    parent writes it puts the words on every family that inherits the property,
+    and doing it afterwards would mean doing it twice. */
+    let mut unions = unions::Unions::read(package, &read);
+    let written: Vec<(String, Vec<Pending>, Vec<Value>)> = read
+        .iter()
+        .map(|(path, text)| {
+            let published = published_by(text, path);
+            let declared = declarations(text, path)
                 .into_iter()
                 .map(|one| {
                     let is_element = one.is_element;
                     let borrows = one.borrows.clone();
-                    let (declaration, heritage) = declaration_of(one, &path, tier, package, given);
+                    let (mut declaration, heritage) =
+                        declaration_of(one, path, tier, package, given);
+                    unions.apply(path, &mut declaration);
                     (declaration, heritage, is_element, borrows)
                 })
                 .collect();
-            (path, declared, published)
+            (path.clone(), declared, published)
         })
         .collect();
 
