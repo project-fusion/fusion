@@ -79,7 +79,7 @@ order, why it is load-bearing and fails silently, and a page for each framework.
 |---|---|---|
 | **bun** | `>=1.1.0`, pinned at `1.1.43` | The package manager. Not npm, pnpm, or yarn |
 | **Node** | `>=22.18` | Not bun's job, despite bun being the package manager. What carries a `#!/usr/bin/env node` shebang and is not run with `bun --bun` runs under whatever Node is on `PATH`: Next's `bin` in `build` and `dev`, and npm in the release. `cem analyze` is run with `--bun` for the reason [AGENTS.md](AGENTS.md#stack) gives |
-| **Rust** | `>=1.90` | The Cortex crates, both CLIs, and the theme derivation engine |
+| **Rust** | `>=1.96` | The Cortex crates, both CLIs, and the theme derivation engine |
 
 ### Setup
 

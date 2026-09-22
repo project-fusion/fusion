@@ -17,8 +17,8 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use oxc_allocator::Allocator;
 use oxc_ast::ast::{
-    Class, ClassElement, Declaration, Decorator, Expression, Function, MethodDefinitionKind,
-    ObjectPropertyKind, PropertyKey, Statement, TSAccessibility,
+    ArrowFunctionBody, Class, ClassElement, Declaration, Decorator, Expression, Function,
+    MethodDefinitionKind, ObjectPropertyKind, PropertyKey, Statement, TSAccessibility,
 };
 use oxc_parser::Parser;
 use oxc_span::{GetSpan, SourceType, Span};
@@ -986,9 +986,12 @@ fn attribute_of(
 /// a `mixin` rather than a function: what a consumer gets is the members, not
 /// the call.
 fn mixin_class<'a>(arrow: &'a oxc_ast::ast::ArrowFunctionExpression<'a>) -> Option<&'a Class<'a>> {
-    arrow
-        .body
-        .statements
+    /* A block body, since a concise one returns an expression and declares
+    nothing. */
+    let ArrowFunctionBody::FunctionBody(body) = &arrow.body else {
+        return None;
+    };
+    body.statements
         .iter()
         .find_map(|statement| match statement {
             Statement::ClassDeclaration(class) => Some(&**class),
@@ -1155,7 +1158,11 @@ fn named(
                 the mark. One case in the library, so the rule is as narrow as
                 the evidence: that class by name and nothing further down. */
                 is_element: tag_of(class).is_some()
-                    || class.super_class.as_ref().and_then(base_name).as_deref()
+                    || class
+                        .heritage
+                        .as_ref()
+                        .and_then(|one| base_name(&one.expression))
+                        .as_deref()
                         == Some("LitElement"),
                 kind: "class",
                 parameters: Vec::new(),
@@ -1166,9 +1173,9 @@ fn named(
                 dispatched: dispatched(plain, class.body.span()),
                 members: members_of(class, source, docs),
                 name: id.name.to_string(),
-                heritage: class.super_class.as_ref().map_or_else(Vec::new, |one| {
+                heritage: class.heritage.as_ref().map_or_else(Vec::new, |one| {
                     let mut names = Vec::new();
-                    chain_of(one, &mut names);
+                    chain_of(&one.expression, &mut names);
                     names
                         .into_iter()
                         .map(|name| Superclass {
@@ -1272,11 +1279,12 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
     foot of the file speaks for a declaration at its head. */
     let mut exported: BTreeSet<String> = BTreeSet::new();
     for statement in &parsed.program.body {
+        /* A clause naming this module's own, and not one re-exporting another
+        module's: `export { hue } from './root.js'` publishes that module's
+        `hue`, and a `hue` declared here is still this module's private one. */
         if let Statement::ExportNamedDeclaration(export) = statement {
-            if export.declaration.is_none() {
-                for specifier in &export.specifiers {
-                    exported.insert(specifier.local.name().to_string());
-                }
+            for specifier in &export.specifiers {
+                exported.insert(specifier.local.name().to_string());
             }
         }
     }
@@ -1303,14 +1311,13 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
     let mut beside: Vec<Declared> = Vec::new();
     for statement in &parsed.program.body {
         match statement {
-            Statement::ExportNamedDeclaration(export) => {
-                if let Some(declaration) = &export.declaration {
-                    found.extend(carrying(
-                        named(declaration, source, &plain, &docs, &imported),
-                        &docs,
-                        &anchors(statement, Some(declaration)),
-                    ));
-                }
+            Statement::ExportDeclaration(export) => {
+                let declaration = &export.declaration;
+                found.extend(carrying(
+                    named(declaration, source, &plain, &docs, &imported),
+                    &docs,
+                    &anchors(statement, Some(declaration)),
+                ));
             }
             /* A declaration standing on its own, kept only where something
             below exports it by name. The ones nothing exports are still read,
@@ -1441,22 +1448,27 @@ pub fn exports(source: &str, path: &str) -> Vec<Exported> {
                 declaration: "*".to_owned(),
                 origin: Origin::Resolved(export.source.value.to_string()),
             }),
-            Statement::ExportNamedDeclaration(export) => match &export.declaration {
-                Some(declaration) => found.extend(published(declaration)),
-                None => {
-                    for specifier in &export.specifiers {
-                        found.push(Exported {
-                            kind: "js",
-                            name: specifier.exported.name().to_string(),
-                            declaration: specifier.local.name().to_string(),
-                            origin: match &export.source {
-                                Some(from) => Origin::Written(from.value.to_string()),
-                                None => Origin::Own,
-                            },
-                        });
-                    }
+            Statement::ExportDeclaration(export) => found.extend(published(&export.declaration)),
+            Statement::ExportNamedDeclaration(export) => {
+                for specifier in &export.specifiers {
+                    found.push(Exported {
+                        kind: "js",
+                        name: specifier.exported.name().to_string(),
+                        declaration: specifier.local.name().to_string(),
+                        origin: Origin::Own,
+                    });
                 }
-            },
+            }
+            Statement::ExportFromDeclaration(export) => {
+                for specifier in &export.specifiers {
+                    found.push(Exported {
+                        kind: "js",
+                        name: specifier.exported.name().to_string(),
+                        declaration: specifier.local.name().to_string(),
+                        origin: Origin::Written(export.source.value.to_string()),
+                    });
+                }
+            }
             _ => {}
         }
         /* **A tag registered by hand is a definition too**, and the analyzer
