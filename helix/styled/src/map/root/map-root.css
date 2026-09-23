@@ -15,15 +15,6 @@
   position: relative;
 }
 
-/* **A focus ring on the frame, because the frame is what takes focus.** A
-   reader arriving by keyboard lands on a control inside it, and a region that
-   showed nothing at all while one of its buttons was focused would leave them
-   with a ring floating over somebody else's canvas. */
-[part="region"]:focus-within {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: calc(var(--helix-size-focus-offset) * -1);
-}
-
 [part="viewport"] {
   min-block-size: 0;
   overflow: hidden;
@@ -45,7 +36,7 @@
      put the right arrow directly under the up arrow, which reads as a stack
      rather than a pad: a reader looking for "right" found it where "down"
      belongs. The center stays empty, because the thing that belongs there is a
-     recentre control and this frame does not know where center is. */
+     recenter control and this frame does not know where center is. */
   grid-template-areas:
     ".      up    .      zoomin"
     "start  .     end    zoomout"
@@ -143,6 +134,16 @@
   padding: 0;
 }
 
+/* **The ring goes where the focus is, which is the button.** The frame wore one
+   on `:focus-within` and it was two lines that never met: the region carries its
+   own border, so an inset ring drew a second edge inside the first with a gap
+   between them, and it was drawn for a focus that was never on the frame. A
+   reader tabs to a control, so the control says so. */
+[part="controls"] button:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 [part="controls"] button:hover {
   background-color: var(--helix-color-surface-raised);
 }
@@ -160,6 +161,13 @@
 /* Whoever the tiles belong to, small and legible and never hidden: most tile
    licenses require the credit to be visible, so no state here takes it away. */
 ::slotted([slot="attribution"]) {
+  /* **A hairline above it, the way `Command`'s footer and the sandbox status bar
+     mark a chrome strip at the foot of a bounded region.** It earns one here
+     twice over: the credit sits directly under tile imagery that can be any
+     color, and subtle text on a busy map reads as part of the map it is
+     crediting. The header takes none, because what a consumer slots there is
+     theirs and a rule we drew would fight their own. */
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   color: var(--helix-color-foreground-subtle);
   font-size: var(--helix-text-xs);
   padding: var(--helix-space-2xs) var(--helix-space-xs);

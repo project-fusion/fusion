@@ -1,0 +1,22 @@
+<!-- @summary No controls at all, for a map whose own are already findable: what is left is the name, the chrome and the credit. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-map
+  controls="none"
+  label="Edinburgh city center"
+>
+  <helix-text
+    slot="header"
+    variant="caption"
+  >Edinburgh city center</helix-text>
+
+  <!-- What this frame is still doing is the part that matters: a slotted map is
+       a canvas with no name and no node in the accessibility tree, and a named
+       region is the difference between a reader meeting it and never finding it. -->
+  <div class="stand-in">Your map, with the controls it already has</div>
+
+  <helix-text slot="attribution">© OpenStreetMap contributors</helix-text>
+</helix-map>

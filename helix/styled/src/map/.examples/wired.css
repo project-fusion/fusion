@@ -1,0 +1,22 @@
+/* Standing in for the consumer's map, because this library ships no tiles and
+   an example that fetched some would be teaching a dependency rather than the
+   component. The grid moves on the custom properties the script writes, which
+   is how a real map would move itself: the frame asks, the map answers. */
+.stand-in {
+  --_shift-x: 0px;
+  --_shift-y: 0px;
+  --_zoom: 1;
+
+  align-items: center;
+  background-image:
+    linear-gradient(var(--helix-color-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--helix-color-border) 1px, transparent 1px);
+  background-position: var(--_shift-x) var(--_shift-y);
+  background-size: calc(32px * var(--_zoom)) calc(32px * var(--_zoom));
+  block-size: 100%;
+  color: var(--helix-color-foreground-subtle);
+  display: flex;
+  font-size: var(--helix-text-sm);
+  justify-content: center;
+  transition: background-position var(--helix-duration-fast) var(--helix-easing-standard);
+}
