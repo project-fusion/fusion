@@ -21,6 +21,10 @@
       "types": "./dist/bold.d.ts",
       "default": "./dist/bold.js"
     },
+    "./build": {
+      "types": "./dist/build.d.ts",
+      "default": "./dist/build.js"
+    },
     "./regular": {
       "types": "./dist/regular.d.ts",
       "default": "./dist/regular.js"
@@ -31,15 +35,21 @@
     "raw"
   ],
   "sideEffects": false,
+  "bin": {
+    "helix-icons": "./dist/cli.js"
+  },
   "scripts": {
     "build": "bun run icons && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "icons": "bun scripts/build-icons.mjs",
+    "test": "bun test src",
     "typecheck": "bun run icons && tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
-  "devDependencies": {
-    "@phosphor-icons/core": "^2.1.1",
+  "dependencies": {
     "svgo": "^4.1.0"
+  },
+  "devDependencies": {
+    "@phosphor-icons/core": "^2.1.1"
   },
   "homepage": "https://fusion.dev",
   "keywords": [

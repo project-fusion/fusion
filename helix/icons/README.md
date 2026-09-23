@@ -38,6 +38,35 @@ an attribute would put every weight in the lookup `<helix-icon name>` reads.
 Every Helix component that draws a mark also offers a slot over it, so you can
 put your own drawing in one place without replacing the package.
 
+## Your own set
+
+The generator that builds this set is the package's own command, so a folder of
+SVG files becomes a module the element draws from:
+
+```sh
+npx helix-icons build --source ./brand-icons --out src/icons.ts
+```
+
+```tsx
+import { peak } from './icons'
+
+<helix-icon icon={peak} />
+```
+
+Any set, not only ours. A subset of Phosphor larger than the 108 here is the
+same command against the package it resolves from, and `--suffix` is for a set
+that spells a weight into the file name:
+
+```sh
+npx helix-icons build \
+  --source node_modules/@phosphor-icons/core/assets/bold --suffix -bold \
+  --list mine.txt --out src/icons.ts
+```
+
+`--index` also writes the record `<helix-icon name>` reads. It names every glyph,
+so nothing can drop any of it: ask for it when you want names in markup, and
+leave it off when you import.
+
 Phosphor is MIT and its notice travels in `LICENSE` beside ours.
 
 [Documentation](https://fusion.dev/helix)

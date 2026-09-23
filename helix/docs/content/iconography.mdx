@@ -119,7 +119,41 @@ consumer's 15 kB to about 90.
 Only the default weight carries that index, so `name` draws bold. A consumer who
 wants the set in another weight imports the values and hands them over.
 
-## Adding one
+## A set of your own
+
+The generator that builds this set is the package's own command, so you are not
+waiting on us to carry a glyph:
+
+```sh
+npx helix-icons build --source ./brand-icons --out src/icons.ts
+```
+
+```tsx
+import { peak } from './icons'
+
+<helix-icon icon={peak} />
+```
+
+It reads a directory of SVG files and writes the module the element draws from,
+which is the same job whether the drawings are yours, another library's, or the
+1,404 Phosphor glyphs this set does not carry:
+
+```sh
+npx helix-icons build \
+  --source node_modules/@phosphor-icons/core/assets/regular \
+  --list mine.txt --out src/icons.ts
+```
+
+`--suffix` is for a set that spells the weight into the file name, Phosphor's
+bold being `caret-down-bold.svg`. `--index` also writes the record `name` reads,
+which you want if your own elements take a name in markup and do not want
+otherwise, since it is the part nothing can drop.
+
+**A name in two sources is refused rather than decided.** A precedence decides
+silently, and the glyph on the page would be whichever directory sat higher with
+nothing looking wrong afterwards.
+
+## Adding one to this set
 
 Add the name to `helix/icons/icons.txt` and run `turbo run icons`. Phosphor names
 resolve from `@phosphor-icons/core` at build time, so adding a glyph is adding a
