@@ -1,0 +1,111 @@
+/* **A lightbox is a dark region, and says so once**, which is the answer `Video`
+   gives for the same problem and for the same reason. The chrome over the
+   picture is the consumer's own components, slotted, and they resolve their own
+   tokens: without a scheme on the region they draw page-colored ink on a black
+   room and vanish into it. `color-scheme` inherits down the flattened tree, so
+   saying it here answers for everything put inside.
+
+   And the chrome takes `foreground` rather than `foreground-inverse`, which is
+   the trap `Video` documents: the inverse token turns over with the theme, so on
+   a dark page it is dark ink, which is the one thing it must never be here. */
+:host {
+  color-scheme: dark;
+  display: contents;
+}
+
+/* **A takeover rather than a panel, which is the whole difference from
+   `Dialog`.** A dialog is a thing over the page and stops short of the edges to
+   say so. A lightbox is the page for as long as it is open: the picture wants
+   every pixel, and the chrome is drawn over it rather than beside it. */
+[part="dialog"] {
+  background-color: transparent;
+  block-size: 100dvh;
+  border: none;
+  box-sizing: border-box;
+  color: var(--lightbox-foreground, var(--helix-color-foreground));
+  display: grid;
+  gap: var(--lightbox-gap, var(--helix-space-sm));
+  grid-template-rows: auto 1fr auto;
+  inline-size: 100vw;
+  max-block-size: 100dvh;
+  max-inline-size: 100vw;
+  padding: var(--lightbox-padding, var(--helix-space-md));
+}
+
+/* The UA hides a closed dialog with `dialog:not([open]) { display: none }`, and
+   the `display: grid` above silently took that away. */
+[part="dialog"]:not([open]) {
+  display: none;
+}
+
+/* **Opaque where a dialog's scrim is a wash**, because what is behind a lightbox
+   is not meant to be read: this is a room with the lights off rather than a
+   panel over a page somebody is still in. `--helix-color-overlay` is the same
+   token `Dialog` and `Drawer` reach for, drawn over a solid backstop so the page
+   under it is gone rather than dimmed.
+
+   Set on the host, where a token resolves, which is the note `Dialog` carries:
+   `::backdrop` inherits from its originating element, and a `var()` written
+   inside it against nothing would be dropped in silence. */
+:host {
+  --_lightbox-scrim: var(--helix-color-background);
+}
+
+[part="dialog"]::backdrop {
+  background-color: var(--lightbox-scrim, var(--_lightbox-scrim));
+}
+
+[part="viewport"] {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  /* A grid row that is allowed to be smaller than its content, which is what
+     keeps a tall picture from pushing the chrome off the screen. */
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+/* **The chrome fades rather than leaves.** `visibility` and not `display`,
+   because a bar that is removed from the layout takes the picture's size with
+   it and the reader watches it jump every time they stop moving. */
+::slotted([slot="header"]),
+::slotted([slot="footer"]) {
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    visibility var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:state(idle)) ::slotted([slot="header"]),
+:host(:state(idle)) ::slotted([slot="footer"]) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* The reading that says where the reader is, for a screen reader and not for
+   the page. */
+[part="live"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::slotted([slot="header"]),
+  ::slotted([slot="footer"]) {
+    transition: none;
+  }
+}
+
+/* **Hidden on paper, the same answer `Dialog` gives.** A lightbox is a thing
+   over the page for as long as a reader is looking at it, and a print is the
+   page rather than the moment: what was open when somebody pressed print is not
+   what they asked to keep, and a viewer that printed would put a full-bleed
+   picture over the document they wanted. */
+@media print {
+  :host {
+    display: none;
+  }
+}
