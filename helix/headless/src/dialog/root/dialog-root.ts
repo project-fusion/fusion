@@ -27,7 +27,7 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status stable
  * @category overlays
- * @aliases Modal, Lightbox, Sheet
+ * @aliases Modal, Sheet
  * @documentation https://fusion.dev/helix/components/dialog
  *
  * @slot - The dialog's content.
