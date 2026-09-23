@@ -1,0 +1,57 @@
+<!-- @summary Answering the frame: it asks with `helix-map-pan` and `helix-map-zoom`, and your map does the moving. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-map
+  id="wired"
+  label="A map that answers its own controls"
+>
+  <div
+    class="stand-in"
+    id="ground"
+  >Pan and zoom with the controls, or the arrow keys</div>
+
+  <helix-text slot="attribution">© OpenStreetMap contributors</helix-text>
+</helix-map>
+
+<script type="module">
+  /* Nothing in Helix moves a map: the frame asks and this answers. A real map
+     would call its own library here, `map.panBy` or `map.zoomIn`; the stand-in
+     moves a grid, which is the same shape of answer with nothing to install. */
+  const frame = document.getElementById('wired')
+  const ground = document.getElementById('ground')
+  const at = { x: 0, y: 0, zoom: 1 }
+
+  const draw = () => {
+    ground.style.setProperty('--_shift-x', `${at.x}px`)
+    ground.style.setProperty('--_shift-y', `${at.y}px`)
+    ground.style.setProperty('--_zoom', `${at.zoom}`)
+  }
+
+  frame.addEventListener('helix-map-pan', (event) => {
+    // `by` is a fraction of the viewport, so the step is the same gesture at
+    // any scale. A real map multiplies it by whatever it measures in.
+    const step = ground.clientWidth * event.detail.by
+    if (event.detail.to === 'up') {
+      at.y += step
+    }
+    if (event.detail.to === 'down') {
+      at.y -= step
+    }
+    if (event.detail.to === 'start') {
+      at.x += step
+    }
+    if (event.detail.to === 'end') {
+      at.x -= step
+    }
+    draw()
+  })
+
+  frame.addEventListener('helix-map-zoom', (event) => {
+    // A direction rather than a level, because the scale is yours.
+    at.zoom = Math.min(Math.max(at.zoom * (event.detail.by > 0 ? 1.25 : 0.8), 0.5), 4)
+    draw()
+  })
+</script>

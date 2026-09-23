@@ -59,8 +59,11 @@ export type MapControlsPlacement = 'top-start' | 'top-end' | 'bottom-start' | 'b
  * @event {HelixMapPanEvent} helix-map-pan - The reader asked the map to move. Answer it against your own map.
  * @event {HelixMapZoomEvent} helix-map-zoom - The reader asked the map to zoom, by a direction rather than to a level.
  *
+ * @csspart attribution - The strip the credit sits in, under the map.
  * @csspart controls - The group the pan and zoom buttons sit in.
+ * @csspart footer - The strip below the map, for what a consumer slots there.
  * @csspart fullscreen - The button that fills the screen.
+ * @csspart header - The strip above the map, for what a consumer slots there.
  * @csspart pan-down - The button that moves the map down.
  * @csspart pan-end - The button that moves the map the way the text ends, which is right on an English page.
  * @csspart pan-start - The button that moves the map the way the text starts, which is left on an English page.
@@ -330,6 +333,18 @@ export class HelixHeadlessMap extends HelixElement {
     </div>`
   }
 
+  /**
+   * The frame, with each region in a box of its own.
+   *
+   * **The boxes are load-bearing rather than tidiness.** A `<slot>` is
+   * `display: contents`, so what lands in the grid is whatever a consumer
+   * assigned rather than the slot itself: with no header slotted, the viewport
+   * took the first row and the attribution took the `1fr`, and the map collapsed
+   * to the height of one line of text. Which slots a consumer fills is not
+   * something the layout may depend on, so each region is a box that holds its
+   * row whether or not anything is in it, and an empty one is a row of no
+   * height.
+   */
   protected override render(): TemplateResult {
     return html`<div
       part="region"
@@ -340,13 +355,19 @@ export class HelixHeadlessMap extends HelixElement {
       @pointerleave=${this.idle.leave}
       @pointermove=${this.idle.stir}
     >
-      <slot name="header"></slot>
+      <div part="header">
+        <slot name="header"></slot>
+      </div>
       <div part="viewport">
         <slot></slot>
       </div>
       ${this.renderControls()}
-      <slot name="footer"></slot>
-      <slot name="attribution"></slot>
+      <div part="footer">
+        <slot name="footer"></slot>
+      </div>
+      <div part="attribution">
+        <slot name="attribution"></slot>
+      </div>
     </div>`
   }
 }
