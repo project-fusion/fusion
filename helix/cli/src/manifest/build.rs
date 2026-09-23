@@ -812,14 +812,9 @@ fn rooted(package: &Path, given: &str) -> String {
         .join("/")
 }
 
-fn helix(
-    documented: &Documented,
-    path: &str,
-    tier: &str,
-    is_component: bool,
-    package: &Path,
-    given: &str,
-) -> Option<Value> {
+fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) -> Option<Value> {
+    let documented = &one.documented;
+    let is_component = one.is_element;
     let mut block = serde_json::Map::new();
     let single = |name: &str| {
         documented
@@ -870,6 +865,15 @@ fn helix(
     }
     if is_component {
         block.insert("tier".to_owned(), json!(tier));
+        /* **The render graph, published rather than derived and dropped.** A
+        component that renders another gives a consumer two things to register
+        and shows them only one: an unregistered element is an inert inline box,
+        so the second is invisible until somebody's combobox will not open. The
+        `composed` rule computed this for itself and kept nothing, and a page
+        documenting the tier carried the list by hand. */
+        if !one.renders.is_empty() {
+            block.insert("renders".to_owned(), json!(one.renders));
+        }
         let parts: Vec<&str> = path.split('/').collect();
         /* `src/<family>/<part>/<file>.ts` and nothing else: a file directly
         under a family has no part to name, so the pair is left off rather
@@ -1108,7 +1112,7 @@ fn declaration_of(
     variable does: a controller with no tier and no group still says `{}`. The
     comparison could not see this either, an empty object holding no leaf to
     compare. */
-    let block = helix(&one.documented, path, tier, one.is_element, package, given);
+    let block = helix(&one, path, tier, package, given);
     if let Some(block) = block.or_else(|| (one.kind == "class").then(|| json!({}))) {
         fields.insert("helix".to_owned(), block);
     }

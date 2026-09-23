@@ -35,6 +35,7 @@ const CONTENT = join(ROOT, 'helix/docs/content')
 const OUT = join(ROOT, 'helix/docs/src/pages.generated.ts')
 const SOURCES = join(ROOT, 'helix/docs/src/sources.generated.ts')
 const REGISTRY = join(ROOT, 'helix/styles/dist/tokens.json')
+const HEADLESS = join(ROOT, 'helix/headless/custom-elements.json')
 const PRIMITIVES = join(ROOT, 'helix/styles/src/primitives.css')
 
 /**
@@ -55,6 +56,101 @@ const PRIMITIVES = join(ROOT, 'helix/styles/src/primitives.css')
  * braces in the `.md`.
  */
 const OPEN = /^\[\/\/\]: # \(tokens:([a-z-]+)\)$/
+
+/**
+ * The render graph, as the page documenting the headless tier carries it.
+ *
+ * **Read from the manifest rather than kept by hand.** A component that renders
+ * another gives a consumer two things to register and shows them one: an
+ * unregistered element is an inert inline box, so a combobox whose listbox was
+ * never defined looks like a combobox that will not open. The table was written
+ * by hand until 22 Sep 2026 and was already wrong by four families, which is the
+ * argument for generating it rather than a hazard of having done so.
+ *
+ * A family is its group with `Base` off the front, because that is the noun the
+ * page and the consumer both use, and a part renders on the family's behalf:
+ * `Tour.Stop` renders a button and a reader registering `acme-tour` needs to
+ * know it.
+ */
+const RENDERS = /^\[\/\/\]: # \(renders\)$/
+
+const graph = () => {
+  const manifest = JSON.parse(readFileSync(HEADLESS, 'utf8'))
+  const found = new Map()
+  const families = new Set()
+  for (const module of manifest.modules ?? []) {
+    for (const declaration of module.declarations ?? []) {
+      const group = declaration.helix?.group
+      if (declaration.helix?.tier === 'headless' && group) {
+        families.add(group)
+      }
+      const renders = declaration.helix?.renders
+      if (!renders || !group) {
+        continue
+      }
+      const family = kebab(group.replace(/^Base/, ''))
+      const mine = found.get(family) ?? new Set()
+      for (const one of renders) {
+        mine.add(one)
+      }
+      found.set(family, mine)
+    }
+  }
+
+  /* Families that render the same set are one row, which is how the table read
+     when a person kept it and is what stops eight chart families spelling out
+     `tooltip` eight times. */
+  const rows = new Map()
+  for (const [family, renders] of [...found].sort(([one], [two]) => one.localeCompare(two))) {
+    const key = [...renders].sort().join(', ')
+    rows.set(key, [...(rows.get(key) ?? []), family])
+  }
+
+  const said = [...rows]
+    .sort(([, one], [, two]) => one[0].localeCompare(two[0]))
+    .map(([renders, families]) => {
+      const named = families.map((one) => `\`${one}\``).join(', ')
+      const children = renders
+        .split(', ')
+        .map((one) => `\`${one}\``)
+        .join(', ')
+      return `| ${named} | ${children} |`
+    })
+  const children = new Set([...found.values()].flatMap((one) => [...one]))
+  return [
+    `**${found.size} of the ${families.size} headless families interpolate ` +
+      `another family's tag**, across ${count(children.size)} distinct children.`,
+    '',
+    '| Family | Renders |',
+    '|---|---|',
+    ...said,
+  ].join('\n')
+}
+
+/** `BaseDataTable` is the `data-table` family, which is what a page calls it. */
+const kebab = (name) =>
+  name
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase()
+
+/** A small number as a word, which is how the pages write one. */
+const count = (many) =>
+  [
+    'no',
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'eleven',
+    'twelve',
+  ][many] ?? String(many)
 
 /**
  * A token's value with the primitives resolved out of it.
@@ -200,7 +296,12 @@ const filled = (source) => {
       inside = true
       continue
     }
-    if (line === '[//]: # (/tokens)') {
+    if (RENDERS.test(line)) {
+      out.push(line, '', graph(), '')
+      inside = true
+      continue
+    }
+    if (line === '[//]: # (/tokens)' || line === '[//]: # (/renders)') {
       out.push(line)
       inside = false
       continue
@@ -210,7 +311,7 @@ const filled = (source) => {
     }
   }
   if (inside) {
-    throw new Error('a `tokens:` region is never closed by `[//]: # (/tokens)`')
+    throw new Error('a generated region is never closed by its own `[//]: # (/…)`')
   }
   return out.join('\n')
 }

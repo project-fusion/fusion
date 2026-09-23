@@ -65,6 +65,15 @@ pub struct Declared {
     /// Events the class is seen to dispatch, as the type and, where the call
     /// says one, the name.
     pub dispatched: Vec<(String, Option<String>)>,
+    /// The families this class's template interpolates a tag for.
+    ///
+    /// **The render graph, which was derived and thrown away.** A component
+    /// rendering another gives a consumer two things to register, and the second
+    /// one is invisible: an unregistered element is an inert inline box, so a
+    /// combobox whose listbox is missing looks like a combobox that will not
+    /// open. `helix component`'s `composed` rule computed this to do its job and
+    /// kept nothing, and a documentation page carried the copy by hand.
+    pub renders: Vec<String>,
     /// Classes whose stylesheet this one took outright.
     ///
     /// **Borrowing a stylesheet is not inheritance, not a mixin and not a
@@ -528,6 +537,33 @@ fn defined(text: &str) -> Vec<Exported> {
 /// language for one pattern. The comments are blanked first, because
 /// `helix-element.ts` writes the words inside one; a string holding the same
 /// call would be read too, and the library has none.
+/// Every family a class renders, by the tag call that names one.
+///
+/// **`this.tag('name')` and nothing else**, which is the same call the
+/// `composed` rule reads and the only form this library uses: a tag written out
+/// as a literal is what that rule refuses, and a tag computed some other way is
+/// not something a parser should guess at. Read from the text with the comments
+/// blanked, for the reason [`dispatched`] is.
+fn renders(source: &str, at: Span) -> Vec<String> {
+    const CALL: &str = "this.tag(";
+    let body = &source[at.start as usize..at.end as usize];
+    let mut found: BTreeSet<String> = BTreeSet::new();
+    let mut rest = body;
+    while let Some(start) = rest.find(CALL) {
+        rest = &rest[start + CALL.len()..];
+        let after = rest.trim_start();
+        let named = ['\'', '"'].into_iter().find_map(|quote| {
+            let inside = after.strip_prefix(quote)?;
+            let end = inside.find(quote)?;
+            Some(inside[..end].to_owned())
+        });
+        if let Some(name) = named {
+            found.insert(name);
+        }
+    }
+    found.into_iter().collect()
+}
+
 fn dispatched(source: &str, at: Span) -> Vec<(String, Option<String>)> {
     const CALL: &str = "this.dispatchEvent(";
     let body = &source[at.start as usize..at.end as usize];
@@ -1046,6 +1082,7 @@ fn variables_of(
                 only components. */
                 dispatched: makes
                     .map_or_else(Vec::new, |class| dispatched(plain, class.body.span())),
+                renders: makes.map_or_else(Vec::new, |class| renders(plain, class.body.span())),
                 members: makes.map_or_else(Vec::new, |class| members_of(class, source, docs)),
                 kind: match (arrow, makes) {
                     (_, Some(_)) => "mixin",
@@ -1183,6 +1220,7 @@ fn named(
                 tag_name: tag_of(class),
                 borrows: borrowed(class, &id.name),
                 dispatched: dispatched(plain, class.body.span()),
+                renders: renders(plain, class.body.span()),
                 members: members_of(class, source, docs),
                 name: id.name.to_string(),
                 heritage: class.heritage.as_ref().map_or_else(Vec::new, |one| {

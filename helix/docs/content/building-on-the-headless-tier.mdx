@@ -37,26 +37,30 @@ times in the headless manifest, so it is discoverable rather than folklore.
 ## The render graph is the part that will catch you
 
 **A component that renders another gives you two things to register, and only
-one of them is obvious.** Twenty-two of the 88 headless families interpolate
-another family's tag, across 89 call sites and seventeen distinct children.
+one of them is obvious.**
 
 Register `acme-combobox` without also registering `acme-listbox` and the panel
 renders a tag nobody defined. That is not an error and not a warning: an
 unregistered custom element is an inert, unstyled inline box, so what you see is
 a combobox that appears not to open.
 
+[//]: # (renders)
+
+**27 of the 94 headless families interpolate another family's tag**, across 20 distinct children.
+
 | Family | Renders |
 |---|---|
-| `bar-chart`, `donut-chart`, `heatmap`, `line-chart` | `tooltip` |
-| `code-block` | `copy-button` |
+| `area-chart`, `bar-chart`, `copy-button`, `donut-chart`, `heatmap`, `line-chart`, `scatter-chart` | `tooltip` |
+| `chat` | `chat-message` |
+| `code-block`, `object-inspector` | `copy-button` |
 | `color-input` | `color-picker` |
 | `color-picker` | `button`, `button-group`, `slider` |
 | `combobox` | `listbox`, `tag` |
 | `command` | `dialog`, `listbox` |
-| `copy-button` | `tooltip` |
-| `data-table` | `pagination` |
+| `data-table` | `checkbox`, `pagination` |
 | `date-input` | `date-picker`, `tag` |
 | `file-input` | `tag` |
+| `filter-input` | `divider`, `menu`, `menu-item` |
 | `notifications` | `format-date` |
 | `pagination` | `option`, `select` |
 | `select` | `listbox` |
@@ -65,14 +69,16 @@ a combobox that appears not to open.
 | `time-picker` | `listbox`, `option` |
 | `video`, `video-playlist` | `menu`, `menu-item` |
 
+[//]: # (/renders)
+
 The safe rule is to subclass and register a family together with everything it
 renders, transitively: `command` reaches `dialog` and `listbox`, and `listbox`
 reaches `option`.
 
-**This table is maintained by hand today and should not be.** The graph is
-already computed inside this repository, by the check that stops us shipping the
-same fault, and it is thrown away afterward rather than written to the manifest.
-Until it is published, treat the table above as the version that can go stale.
+**This table is generated from the manifest**, which publishes the graph as
+`helix.renders` on every element that interpolates a tag. It was kept by hand
+until 22 September 2026 and was wrong by four families when it stopped being, so
+read it as current rather than as maintained.
 
 ## What you have to supply yourself
 
@@ -92,8 +98,26 @@ acme-listbox:not(:defined) {
 Visibility rather than `display`, so the page does not reflow when the
 definitions arrive.
 
-**Your own typings.** The generated `jsx.d.ts`, `vue.d.ts` and `svelte.d.ts`
-carry our tag names. For yours, merge each element into the tag map:
+**Your own typings, from the same generator we use.** `@fusion.dev/helix-cem`
+reads your package and writes `jsx.d.ts`, `vue.d.ts` and `svelte.d.ts` for your
+tags, with every member your subclass inherited from ours. Add a `cem.config.ts`
+beside your `package.json`:
+
+```ts
+import type { HelixCemOptions } from '@fusion.dev/helix-cem'
+
+export default {
+  frameworkTypes: true,
+  packageName: 'acme-system',
+  tier: 'styled',
+} satisfies HelixCemOptions
+```
+
+and run `bun --bun helix-cem`. It finds what you extend through your
+`dependencies`, so `acme-combobox` arrives with the hundred-odd members it
+inherited rather than the two you wrote.
+
+**The tag map is still yours to write**, one line per element, beside the class:
 
 ```ts
 declare global {
@@ -103,7 +127,9 @@ declare global {
 }
 ```
 
-Per element, by hand. There is no generated version of this for consumer names.
+That is TypeScript's own convention for a custom element rather than a gap in
+this: the interface merges from your source, and nothing generated can name a
+class it is not in the same program as.
 
 ## What you get without asking
 
