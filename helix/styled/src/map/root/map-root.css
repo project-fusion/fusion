@@ -50,10 +50,59 @@
     ".      up    .      zoomin"
     "start  .     end    zoomout"
     ".      down  .      full";
+  position: absolute;
+  /* The corner, which the host says and this reads. Logical insets, so a
+     right-to-left page moves them without a consumer writing a second rule. */
   inset-block-start: var(--helix-space-sm);
   inset-inline-end: var(--helix-space-sm);
-  position: absolute;
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* **The cluster is laid out for the controls that are there.** `controls` is a
+   list, so `~=` asks it the same way the attribute is written: with the zoom
+   column gone, a fullscreen button left in its track floats a cell away from
+   the pad with nothing between them, and with the pad gone three empty columns
+   hold the zoom stack out from the corner it is supposed to sit in. */
+:host([controls]:not([controls~="zoom"])) [part="controls"] {
+  grid-template-areas:
+    ".      up    ."
+    "start  .     end"
+    ".      down  full";
+}
+
+:host([controls]:not([controls~="pan"])) [part="controls"] {
+  grid-template-areas:
+    "zoomin"
+    "zoomout"
+    "full";
+}
+
+/* Said as well as defaulted, so a consumer can put the controls back in the
+   resting corner from markup rather than by removing an attribute. */
+:host([controls-placement="top-end"]) [part="controls"] {
+  inset-block: var(--helix-space-sm) auto;
+  inset-inline: auto var(--helix-space-sm);
+}
+
+/* **A corner each, because there is no safe default.** MapLibre puts its own
+   controls at the top end, Leaflet and OpenLayers at the top start, Google's
+   zoom at the bottom end: whichever corner this frame took would land on
+   somebody's, which is why every one of those libraries made it a setting too.
+   The shorthand rather than the two longhands, so one rule replaces both edges
+   and a corner cannot be left half-set. */
+:host([controls-placement="top-start"]) [part="controls"] {
+  inset-block: var(--helix-space-sm) auto;
+  inset-inline: var(--helix-space-sm) auto;
+}
+
+:host([controls-placement="bottom-end"]) [part="controls"] {
+  inset-block: auto var(--helix-space-sm);
+  inset-inline: auto var(--helix-space-sm);
+}
+
+:host([controls-placement="bottom-start"]) [part="controls"] {
+  inset-block: auto var(--helix-space-sm);
+  inset-inline: var(--helix-space-sm) auto;
 }
 
 [part="pan-up"] {

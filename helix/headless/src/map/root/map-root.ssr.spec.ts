@@ -41,4 +41,22 @@ describe('map server output', () => {
     expect(inside).toContain('name="header"')
     expect(inside).toContain('name="footer"')
   })
+
+  test('a frame that keeps no controls ships none, rather than shipping them hidden', () => {
+    const markup = withoutStyles(
+      ssr(html`<helix-headless-map label="Edinburgh" controls="none"></helix-headless-map>`),
+    )
+    expect(hasPart(markup, 'controls')).toBe(false)
+    /* And the part that is the whole argument is still there: the frame without
+       its buttons is still a named region, which is what a consumer keeping
+       their own controls is keeping this for. */
+    expect(partTag(markup, 'region')).toContain('aria-label="Edinburgh"')
+  })
+
+  test('the resting corner is the attribute being absent', () => {
+    const markup = withoutStyles(
+      ssr(html`<helix-headless-map label="Edinburgh"></helix-headless-map>`),
+    )
+    expect(hostAttributes(markup, 'helix-headless-map')).not.toContain('controls-placement')
+  })
 })
