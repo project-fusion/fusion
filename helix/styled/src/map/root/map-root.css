@@ -1,0 +1,132 @@
+/* The host draws nothing: the region inside it is the frame. */
+:host {
+  display: contents;
+}
+
+[part="region"] {
+  background-color: var(--map-background-color, var(--helix-color-surface-sunken));
+  block-size: var(--map-block-size, 24rem);
+  border: var(--helix-border-thin) solid var(--map-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  overflow: hidden;
+  position: relative;
+}
+
+/* **A focus ring on the frame, because the frame is what takes focus.** A
+   reader arriving by keyboard lands on a control inside it, and a region that
+   showed nothing at all while one of its buttons was focused would leave them
+   with a ring floating over somebody else's canvas. */
+[part="region"]:focus-within {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="viewport"] {
+  min-block-size: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Whatever was slotted fills the box it was given. */
+[part="viewport"] ::slotted(*) {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+/* **Over the map rather than beside it**, which is where every map puts its
+   controls and what keeps the viewport the size the consumer asked for. */
+[part="controls"] {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  /* **Three columns for the pad and a fourth for the rest.** Sharing a column
+     put the right arrow directly under the up arrow, which reads as a stack
+     rather than a pad: a reader looking for "right" found it where "down"
+     belongs. The center stays empty, because the thing that belongs there is a
+     recentre control and this frame does not know where center is. */
+  grid-template-areas:
+    ".      up    .      zoomin"
+    "start  .     end    zoomout"
+    ".      down  .      full";
+  inset-block-start: var(--helix-space-sm);
+  inset-inline-end: var(--helix-space-sm);
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="pan-up"] {
+  grid-area: up;
+}
+[part="pan-down"] {
+  grid-area: down;
+}
+[part="pan-start"] {
+  grid-area: start;
+}
+[part="pan-end"] {
+  grid-area: end;
+}
+[part="zoom-in"] {
+  grid-area: zoomin;
+}
+[part="zoom-out"] {
+  grid-area: zoomout;
+}
+[part="fullscreen"] {
+  grid-area: full;
+}
+
+[part="controls"] button {
+  align-items: center;
+  background-color: var(--map-control-background-color, var(--helix-color-surface-overlay));
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  block-size: var(--helix-size-control-sm);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inline-size: var(--helix-size-control-sm);
+  justify-content: center;
+  padding: 0;
+}
+
+[part="controls"] button:hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
+/* **The chrome fades and the controls do not.** A reader who has gone still has
+   not stopped needing the only controls this frame offers, and a map whose zoom
+   buttons vanish under an idle timer is a map a keyboard reader has to wake up
+   before operating. The idle state is for what a consumer slotted around it. */
+:host(:state(idle)) ::slotted([slot="header"]),
+:host(:state(idle)) ::slotted([slot="footer"]) {
+  opacity: 0;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Whoever the tiles belong to, small and legible and never hidden: most tile
+   licenses require the credit to be visible, so no state here takes it away. */
+::slotted([slot="attribution"]) {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+:host(:state(fullscreen)) [part="region"] {
+  block-size: 100dvh;
+  border: none;
+  border-radius: 0;
+}
+
+/* **Printed as it stands rather than hidden.** A map is the content of the page
+   it is on often enough that dropping it would be the surprising answer, and
+   the controls are the part that means nothing on paper. */
+@media print {
+  [part="controls"] {
+    display: none;
+  }
+}

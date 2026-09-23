@@ -146,6 +146,20 @@ export interface SkipDetail {
   to: 'next' | 'previous'
 }
 
+/** Detail carried by `helix-map-pan`. */
+export interface MapPanDetail {
+  /** Which way the reader asked to go, in reading order rather than compass order. */
+  to: 'up' | 'down' | 'start' | 'end'
+  /** How far, as a fraction of the viewport the map is drawn in. */
+  by: number
+}
+
+/** Detail carried by `helix-map-zoom`. */
+export interface MapZoomDetail {
+  /** Which way, `1` in and `-1` out, so a consumer can multiply by their own step. */
+  by: number
+}
+
 /** Detail carried by `helix-navigate`. */
 export interface NavigateDetail {
   /** Where the view is moving to, in whatever the component pages by. */
@@ -416,6 +430,53 @@ export class HelixActivateEvent extends CustomEvent<ChangeDetail> {
 
   constructor(detail: ChangeDetail) {
     super(HelixActivateEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * The reader asked the map to move, which is as far as this library goes.
+ *
+ * **Helix draws no map and moves nobody's.** A tile renderer is a library and
+ * the frame around it is what this adds, so panning is a request the consumer
+ * answers against whatever they slotted: MapLibre, Leaflet, Google, or their
+ * own. The direction is in reading order rather than compass order, because the
+ * control that sent it is a button a reader pressed and `start` on a
+ * right-to-left page is east.
+ *
+ * Not cancelable. Nothing here moves on its own, and an event whose
+ * `preventDefault` means nothing is an event that lies about what it offers.
+ */
+export class HelixMapPanEvent extends CustomEvent<MapPanDetail> {
+  static readonly eventName = 'helix-map-pan'
+
+  constructor(detail: MapPanDetail) {
+    super(HelixMapPanEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * The reader asked the map to zoom, and for the same reason it is a request.
+ *
+ * `by` is a direction rather than a level: a scale a consumer's map understands
+ * is the consumer's to decide, and a frame that said "go to zoom 14" would be
+ * asserting a numbering that Leaflet, MapLibre and a static tile server do not
+ * agree on.
+ */
+export class HelixMapZoomEvent extends CustomEvent<MapZoomDetail> {
+  static readonly eventName = 'helix-map-zoom'
+
+  constructor(detail: MapZoomDetail) {
+    super(HelixMapZoomEvent.eventName, {
       bubbles: true,
       cancelable: false,
       composed: true,
@@ -1139,6 +1200,8 @@ const registry = {
   HelixFacetEvent,
   HelixFilterEvent,
   HelixHistoryEvent,
+  HelixMapPanEvent,
+  HelixMapZoomEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixPreviousEvent,
