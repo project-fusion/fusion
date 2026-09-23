@@ -10,7 +10,7 @@ title: Iconography
 <helix-icon name="trash"></helix-icon>
 ```
 
-105 glyphs, from Phosphor, drawn on a 256 box at Phosphor's bold weight. That is
+108 glyphs, from Phosphor, drawn on a 256 box at Phosphor's bold weight. That is
 Phosphor's own geometry and it is kept rather than rescaled: normalizing to a 24
 box would change the optical weight of every glyph and stop the set matching
 anything upstream. Bold rather than regular, because Phosphor's regular is a
@@ -72,10 +72,52 @@ page, which every caret the library draws already does.
 import { trash } from '@fusion.dev/helix-icons'
 ```
 
-Each glyph is an exported string, so you can put one in your own markup, in a
-canvas, or anywhere an element is not what you want. Every `name` the library
-uses is held to the set of glyphs that actually exist, so a typo is a build
-failure rather than an empty box.
+Each glyph is data, `{ content, name, viewBox }`, so you can put one in your own
+markup, in a canvas, or anywhere an element is not what you want. Every `name`
+the library uses is held to the set of glyphs that actually exist, so a typo is a
+build failure rather than an empty box.
+
+**Hand one to the element and it draws it**, whatever set it came from:
+
+```tsx
+import { trash } from '@fusion.dev/helix-icons'
+
+<helix-icon icon={trash} />
+```
+
+A property rather than an attribute, because an object is not a string: the
+frameworks set properties and plain HTML cannot, which is what `name` is for.
+Both set, the value wins.
+
+**This is the door that scales.** `name` resolves through an index of the whole
+set, which no bundler can shake, so a consumer who renders one named icon ships
+all of it: 15 kB gzipped for 108 glyphs. A value ships the one glyph you
+imported. It is also the door out of this set entirely, since anything exporting
+that shape works, whether it is Phosphor at another weight, another library, or
+your own drawings:
+
+```ts
+const dot = { content: '<circle cx="12" cy="12" r="10" fill="currentColor" />', name: 'dot', viewBox: '0 0 24 24' }
+```
+
+## Weight is a subpath
+
+```ts
+import { caretDown } from '@fusion.dev/helix-icons/regular'
+import { trash } from '@fusion.dev/helix-icons/bold'
+```
+
+The default is bold, and `/bold` is the same set under a name that says so.
+
+**A subpath rather than an attribute, because a weight is data rather than a
+dial.** Phosphor's weights are outlined filled paths: `caret-down` is `a12,12`
+at bold and `a8,8` at regular, so there is nothing for CSS to turn and every
+weight offered is bytes shipped. A subpath is shaken per import site; a `weight`
+attribute would put every weight into the index that `name` reads, taking one
+consumer's 15 kB to about 90.
+
+Only the default weight carries that index, so `name` draws bold. A consumer who
+wants the set in another weight imports the values and hands them over.
 
 ## Adding one
 

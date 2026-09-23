@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import { icons } from '@fusion.dev/helix-icons'
+import { type HelixIcon, icons } from '@fusion.dev/helix-icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -42,6 +42,23 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-icon')
 export class HelixHeadlessIcon extends HelixElement {
   /**
+   * The icon itself, for a consumer who imported one.
+   *
+   * **The scalable door, and the one this library uses internally.** An icon is
+   * data, `{ content, name, viewBox }`, so a value imported by name ships one
+   * glyph rather than the set, a weight is a subpath rather than an index of
+   * every weight, and the supply stops being ours: anything exporting that
+   * shape works, whether it is Phosphor at another weight, Lucide, or a
+   * consumer's own drawings.
+   *
+   * **A property and not an attribute**, because an object is not a string. The
+   * frameworks set properties and plain markup cannot, which is what `name` is
+   * for. Set both and this wins, the value being the more specific statement.
+   */
+  @property({ attribute: false })
+  icon?: HelixIcon
+
+  /**
    * Accessible name, for an icon that is not decorative.
    */
   @property()
@@ -59,6 +76,13 @@ export class HelixHeadlessIcon extends HelixElement {
 
   /**
    * Name of the icon in the Helix set.
+   *
+   * **A lookup, and the reason both this and `icon` exist.** A name is a string,
+   * so it is what markup can carry, and resolving one means an index of the
+   * whole set that no bundler can shake: 15 kB for a consumer who renders one
+   * mark. An attribute is the only thing an HTML author can write, and that is
+   * worth the index; a consumer who would rather not pay it hands over the
+   * value instead.
    */
   @property()
   name = ''
@@ -67,7 +91,8 @@ export class HelixHeadlessIcon extends HelixElement {
     /* Own keys only. A truthiness check on a plain-object index lets an
        inherited `Object.prototype` key through, and the component renders a
        sized, empty `<svg viewBox="">` rather than nothing at all. */
-    const icon = Object.hasOwn(icons, this.name) ? icons[this.name] : undefined
+    const named = Object.hasOwn(icons, this.name) ? icons[this.name] : undefined
+    const icon = this.icon ?? named
     if (!icon) {
       return nothing
     }
