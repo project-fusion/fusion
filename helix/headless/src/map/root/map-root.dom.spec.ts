@@ -120,3 +120,55 @@ describe('map frame', () => {
     expect(host.shadowRoot?.querySelector('slot[name="attribution"]')).not.toBeNull()
   })
 })
+
+/**
+ * Which controls this frame draws, which is a list rather than a switch.
+ *
+ * **The overlap with a consumer's map is not symmetric.** Every map library
+ * draws zoom controls and none draws pan buttons, so a single switch would make
+ * a MapLibre consumer choose between two zoom controls and no pan pad.
+ */
+describe('map controls a consumer keeps or drops', () => {
+  test('all three by default', async () => {
+    const host = await map()
+    for (const name of ['pan-up', 'zoom-in', 'fullscreen']) {
+      expect(control(host, name)).not.toBeNull()
+    }
+  })
+
+  test('the pan pad without the zoom, which is the MapLibre case', async () => {
+    const host = await map('controls="pan fullscreen"')
+    expect(control(host, 'pan-up')).not.toBeNull()
+    expect(control(host, 'zoom-in')).toBeNull()
+    expect(control(host, 'zoom-out')).toBeNull()
+    expect(control(host, 'fullscreen')).not.toBeNull()
+  })
+
+  test('none at all, for a map that already has controls a reader can find', async () => {
+    /* What this family argues for is that *a* findable control exists, never
+       that it is ours, so a consumer whose map is already operable should be
+       able to keep the frame and drop the buttons. */
+    const host = await map('controls="none"')
+    expect(control(host, 'controls')).toBeNull()
+    expect(part(host, 'region')?.getAttribute('aria-label')).toBe('Edinburgh')
+  })
+
+  test('the methods stay public when the buttons are gone', async () => {
+    // A consumer drawing their own chrome still drives the frame.
+    const host = (await map('controls="none"')) as Map & { pan(to: string): void }
+    const asked: string[] = []
+    host.addEventListener('helix-map-pan', (event) => {
+      asked.push((event as CustomEvent<{ to: string }>).detail.to)
+    })
+    host.pan('up')
+    expect(asked).toEqual(['up'])
+  })
+
+  test('the corner is the attribute’s absence at rest, and written when asked', async () => {
+    const resting = await map()
+    expect(resting.hasAttribute('controls-placement')).toBe(false)
+
+    const placed = await map('controls-placement="bottom-start"')
+    expect(placed.getAttribute('controls-placement')).toBe('bottom-start')
+  })
+})

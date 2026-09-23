@@ -1,10 +1,12 @@
-<!-- @summary A map the consumer brings, in a frame that names it and can be driven from the keyboard. -->
+<!-- @summary A map the consumer brings, keeping the pan pad their own library does not draw and dropping the zoom it does. -->
 <link
   href="styles.css"
   rel="stylesheet"
 />
 
 <helix-map
+  controls="pan fullscreen"
+  controls-placement="bottom-end"
   id="city"
   label="Edinburgh city center"
 >

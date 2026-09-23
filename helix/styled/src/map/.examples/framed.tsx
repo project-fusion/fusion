@@ -3,6 +3,8 @@ import './framed.css'
 export function Example() {
   return (
     <helix-map
+      controls="pan fullscreen"
+      controls-placement="bottom-end"
       id="city"
       label="Edinburgh city center"
     >
