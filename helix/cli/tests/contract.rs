@@ -2766,3 +2766,76 @@ fn a_union_with_a_name_in_it_is_not_written_out() {
     assert_eq!(members[0]["type"]["text"], "Anchored | undefined");
     assert_eq!(members[1]["type"]["text"], "Derived | undefined");
 }
+
+/// The render graph is published rather than derived and thrown away.
+///
+/// **What a consumer has to register, and cannot see.** A component that
+/// interpolates another family's tag gives them two things to define; an
+/// unregistered element is an inert inline box, so the second one is invisible
+/// until something looks like it failed to open.
+#[test]
+fn a_component_publishes_the_families_its_template_renders() {
+    let sandbox = Sandbox::new("manifest-renders", None);
+    let src = sandbox.0.join("src/combobox/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("combobox-root.ts"),
+        "@customElement('helix-combobox')\n\
+         export class HelixCombobox extends HelixElement {\n\
+         \x20 override render() {\n\
+         \x20   /* this.tag('commented') is not read */\n\
+         \x20   const listbox = this.tag('listbox')\n\
+         \x20   return html`<${listbox}><${this.tag('tag')}></${this.tag('tag')}></${listbox}>`\n\
+         \x20 }\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let parsed: serde_json::Value = serde_json::from_str(&out(&output)).expect("a manifest");
+    let class = parsed["modules"][0]["declarations"]
+        .as_array()
+        .expect("the declarations")
+        .iter()
+        .find(|one| one["name"] == "HelixCombobox")
+        .expect("the class");
+
+    /* Sorted and said once, whatever order a template renders them in and
+    however many call sites name the same family. */
+    assert_eq!(class["helix"]["renders"][0], "listbox");
+    assert_eq!(class["helix"]["renders"][1], "tag");
+    assert_eq!(
+        class["helix"]["renders"].as_array().map(Vec::len),
+        Some(2),
+        "a comment names a third and is not one"
+    );
+}
+
+/// A class that renders nothing carries no list at all.
+#[test]
+fn a_component_that_renders_no_family_says_nothing() {
+    let sandbox = Sandbox::new("manifest-renders-none", None);
+    let src = sandbox.0.join("src/badge/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("badge-root.ts"),
+        "@customElement('helix-badge')\n\
+         export class HelixBadge extends HelixElement {}\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    let parsed: serde_json::Value = serde_json::from_str(&out(&output)).expect("a manifest");
+    let class = parsed["modules"][0]["declarations"]
+        .as_array()
+        .expect("the declarations")
+        .iter()
+        .find(|one| one["name"] == "HelixBadge")
+        .expect("the class");
+    assert!(
+        class["helix"].get("renders").is_none(),
+        "no empty list: {}",
+        class["helix"]
+    );
+}

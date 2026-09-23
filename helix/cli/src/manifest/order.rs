@@ -122,6 +122,7 @@ fn shape(fields: &Map<String, Value>, under: &str) -> Vec<&'static str> {
             "aliases",
             "groups",
             "tier",
+            "renders",
             "group",
             "part",
             "examples",
