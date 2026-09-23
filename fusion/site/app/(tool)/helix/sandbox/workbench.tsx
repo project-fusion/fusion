@@ -1097,17 +1097,20 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             within="document"
           ></helix-kbd>
         </helix-input>
-        {/* Filled, so it and the field beside it are one piece of chrome rather
-            than a box with a button floating after it. The tooltip repeats the
-            label rather than adding to it: a lone glyph is only guessable, and
-            the name a screen reader already reads is the thing a pointer user
-            is missing. */}
+        {/* **At rest, like every other icon button on the page.** It was
+            `outlined` to tie it to the field beside it, and what that actually
+            does is take the ink from `foreground-muted` to the full
+            `foreground` and add a wash and a hairline: beside a rail of ghosts
+            it read as the one control somebody had emphasized, and the glyph
+            makes that worse, `arrows-out-line-vertical` being two arrowheads
+            and a bar 188 units wide where its neighbors are chevrons. The
+            field does not need a box beside it to look like one piece.
+
+            The tooltip repeats the label rather than adding to it: a lone glyph
+            is only guessable, and the name a screen reader already reads is the
+            thing a pointer user is missing. */}
         <helix-tooltip content={allOpen ? 'Collapse all' : 'Expand all'} placement="bottom">
-          <helix-icon-button
-            emphasis="outlined"
-            label={allOpen ? 'Collapse all' : 'Expand all'}
-            onClick={toggleAll}
-          >
+          <helix-icon-button label={allOpen ? 'Collapse all' : 'Expand all'} onClick={toggleAll}>
             {/* The arrows say what the button does. A caret is what a thing to
               open looks like, not what opening everything looks like, and two of
               them stacked in a rail full of chevrons said nothing at all. */}
