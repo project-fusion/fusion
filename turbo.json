@@ -406,9 +406,14 @@
       ],
       "outputs": ["public/sandbox/**"]
     },
+    // **Every weight, because a cache restores what it was told to keep.** The
+    // generator writes one module per weight and `src/generated.ts` was the only
+    // one declared, so a hit restored `dist/regular.generated.js` over a `src`
+    // that no longer held its source, which `shipped` reports as compiled output
+    // with nothing behind it.
     "icons": {
       "inputs": ["icons.txt", "raw/**", "$TURBO_ROOT$/helix/icons/scripts/build-icons.mjs"],
-      "outputs": ["src/generated.ts"]
+      "outputs": ["src/generated.ts", "src/*.generated.ts"]
     },
     // **The three tiers by name, because no dependency edge reaches them.**
     // `helix/docs` devDepends on the manifest reader and the shared scripts and
