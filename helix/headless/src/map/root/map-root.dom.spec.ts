@@ -172,3 +172,44 @@ describe('map controls a consumer keeps or drops', () => {
     expect(placed.getAttribute('controls-placement')).toBe('bottom-start')
   })
 })
+
+/**
+ * Whose keys these are, which is the question a slotted map makes sharp.
+ */
+describe('map keys', () => {
+  test('the region is a tab stop, so the keys are reachable with no controls', async () => {
+    /* The listener is on the region. Without a stop of its own, a frame at
+       `controls="none"` around a map with nothing focusable had arrow keys no
+       reader could press. */
+    const host = await map('controls="none"')
+    const region = part(host, 'region') as HTMLElement
+    expect(region.getAttribute('tabindex')).toBe('0')
+    expect(region.getAttribute('aria-keyshortcuts')).toContain('ArrowUp')
+  })
+
+  test('a press that started in the slotted map is the map’s, not ours', async () => {
+    /* MapLibre and Leaflet both answer the arrow keys themselves, so relaying a
+       press that came from inside one moves the consumer's map twice. */
+    const host = await map()
+    const asked: string[] = []
+    host.addEventListener('helix-map-pan', (event) => {
+      asked.push((event as CustomEvent<{ to: string }>).detail.to)
+    })
+    const slotted = host.querySelector('canvas') as HTMLElement
+    slotted.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowUp' }),
+    )
+    expect(asked).toEqual([])
+  })
+
+  test('and a press on the frame itself still asks', async () => {
+    const host = await map()
+    const asked: string[] = []
+    host.addEventListener('helix-map-pan', (event) => {
+      asked.push((event as CustomEvent<{ to: string }>).detail.to)
+    })
+    const region = part(host, 'region') as HTMLElement
+    region.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowUp' }))
+    expect(asked).toEqual(['up'])
+  })
+})
