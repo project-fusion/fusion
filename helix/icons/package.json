@@ -16,6 +16,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./bold": {
+      "types": "./dist/bold.d.ts",
+      "default": "./dist/bold.js"
+    },
+    "./regular": {
+      "types": "./dist/regular.d.ts",
+      "default": "./dist/regular.js"
     }
   },
   "files": [

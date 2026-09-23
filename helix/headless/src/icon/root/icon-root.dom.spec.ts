@@ -83,3 +83,48 @@ describe('an icon that points along the line', () => {
     expect(await scale(plain)).toBe('none')
   })
 })
+
+/**
+ * The value door, which is what a consumer importing an icon uses.
+ *
+ * **The point of it is what is not here.** A value ships one glyph and the set
+ * it came from is the consumer's, so these assert that the element draws what it
+ * was handed rather than anything it knows about.
+ */
+describe('an icon handed over as data', () => {
+  const drawn = {
+    content: '<circle cx="12" cy="12" r="10" fill="currentColor"></circle>',
+    name: 'acme-dot',
+    viewBox: '0 0 24 24',
+  }
+
+  test('draws a glyph the set has never heard of', async () => {
+    const icon = (await mount('<helix-headless-icon></helix-headless-icon>')) as HTMLElement & {
+      icon?: typeof drawn
+      updateComplete: Promise<boolean>
+    }
+    icon.icon = drawn
+    await icon.updateComplete
+    expect(svg(icon)?.getAttribute('viewBox')).toBe('0 0 24 24')
+    expect(svg(icon)?.querySelector('circle')).not.toBeNull()
+  })
+
+  test('the value wins over a name, being the more specific statement', async () => {
+    const icon = (await mount(
+      '<helix-headless-icon name="check"></helix-headless-icon>',
+    )) as HTMLElement & { icon?: typeof drawn; updateComplete: Promise<boolean> }
+    icon.icon = drawn
+    await icon.updateComplete
+    expect(svg(icon)?.getAttribute('viewBox')).toBe('0 0 24 24')
+  })
+
+  test('is decoration and takes a label the same way a named one does', async () => {
+    const icon = (await mount(
+      '<helix-headless-icon label="Status"></helix-headless-icon>',
+    )) as HTMLElement & { icon?: typeof drawn; updateComplete: Promise<boolean> }
+    icon.icon = drawn
+    await icon.updateComplete
+    expect(svg(icon)?.getAttribute('role')).toBe('img')
+    expect(svg(icon)?.getAttribute('aria-label')).toBe('Status')
+  })
+})
