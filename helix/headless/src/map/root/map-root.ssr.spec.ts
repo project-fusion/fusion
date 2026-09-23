@@ -24,6 +24,12 @@ describe('map server output', () => {
     expect(partTag(markup, 'region')).toContain('role="group"')
   })
 
+  test('the tab stop is served, so the keys work before hydration finishes', () => {
+    /* The frame's keyboard route is the region: a stop added on the client is a
+       map no keyboard reader can move until the JavaScript lands. */
+    expect(partTag(served(), 'region')).toContain('tabindex="0"')
+  })
+
   test('the controls ship with it, named', () => {
     const markup = served()
     expect(partTag(markup, 'zoom-in')).toContain('aria-label="Zoom in"')

@@ -142,6 +142,13 @@ export class HelixHeadlessMap extends HelixElement {
    * There is no sensible default. "Map" names the widget rather than the place,
    * and a reader meeting three of them on a page learns nothing from hearing the
    * same word three times.
+   *
+   * **The region is a tab stop**, so the keys are reachable however the controls
+   * are configured: the listener is on the region, and without a stop of its own
+   * a frame at `controls="none"` around a map with nothing focusable in it had
+   * arrow keys no reader could ever press. `aria-keyshortcuts` says which keys
+   * rather than spelling them into the name, which would otherwise be read out
+   * at every encounter.
    */
   @property()
   label = ''
@@ -217,8 +224,19 @@ export class HelixHeadlessMap extends HelixElement {
    * `inlineStep` rather than a test against `ArrowLeft`, so the reader on a
    * right-to-left page gets `end` from the key that points the way their text
    * runs, which is what the pan buttons say too.
+   *
+   * **Only from this frame's own chrome, and that is the difference between one
+   * move and two.** MapLibre and Leaflet both answer the arrow keys themselves,
+   * so a press inside a slotted map moves it once on its own and once more on
+   * the event this would have sent: every press moving twice, and the consumer
+   * with no way to tell which half to turn off. A press that started in the
+   * shadow root is this frame's to relay; anything from the map belongs to the
+   * map.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (!this.renderRoot.contains(event.target as Node)) {
+      return
+    }
     const along = inlineStep(this, event.key)
     if (along === 1) {
       event.preventDefault()
@@ -350,6 +368,8 @@ export class HelixHeadlessMap extends HelixElement {
       part="region"
       role="group"
       aria-label=${this.label || 'Map'}
+      aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Plus Minus"
+      tabindex="0"
       @focusin=${this.idle.stir}
       @keydown=${this.handleKeydown}
       @pointerleave=${this.idle.leave}
