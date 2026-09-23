@@ -166,10 +166,11 @@ Rust for backend and substrate cores. TypeScript for frontend.
 helix/     styles core headless styled icons theme cem docs diagnostics
            gallery sandbox testing cli templates create-app
 cortex/    core trace engram docs
-fusion/    cli docs rules scripts site: what belongs to the company rather than
-           to a product. `docs/insights` is the published writing; `rules` is
-           the crate both command lines take, which is what a rule is and not
-           what either product's rules read
+fusion/    cli docs plugins rules scripts site: what belongs to the company
+           rather than to a product. `docs/insights` is the published writing;
+           `rules` is the crate both command lines take, which is what a rule is
+           and not what either product's rules read; `plugins` is the host that
+           runs one somebody else wrote
 .local/    per-machine scratch, gitignored
 ```
 
@@ -179,6 +180,16 @@ fusion/    cli docs rules scripts site: what belongs to the company rather than
   that owns it.
 - **Product domains at root, packages flat inside.** A new product gets a new
   top-level folder.
+- **A crate exists when something outside the binary consumes it**, and not to
+  make a large one smaller. Three do: `fusion-rules` because both command lines
+  take it and neither product may depend on the other, `fusion-helix-theme`
+  because the site needs it as WASM and a crate pulling in a terminal backend
+  would carry that into the build, and `fusion-plugins` because both command
+  lines host it. **Compile time is not the reason it looks like.** Measured 22
+  Sep 2026 on `fusion-helix-cli`, 24,429 lines across 85 files in four nouns: a
+  one-file change rebuilds the binary in 2.3 seconds and the test targets in
+  3.7, so splitting it would trade a real boundary for a saving that does not
+  exist.
 - **A check belongs to a CLI noun; a script belongs where its output belongs.**
   Everything that judges the workspace is a rule under `fusion workspace`,
   `fusion prose`, `fusion spec` or `helix component`, reached from the root by
