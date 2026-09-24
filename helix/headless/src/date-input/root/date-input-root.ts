@@ -479,6 +479,11 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
     }
   }
 
+  /** Each date, where `mode` holds several, sent one entry each. */
+  protected override get answers(): readonly string[] | undefined {
+    return this.mode === undefined ? undefined : dates(this.value)
+  }
+
   /** What is wrong with the dates, which the text input cannot say. */
   protected override validate(): string {
     /* Bounds are checked here rather than left to the input, which is `text`

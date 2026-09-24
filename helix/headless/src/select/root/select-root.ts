@@ -7,6 +7,7 @@ import {
   MixinControllerValue,
   MixinField,
   PopoverController,
+  reportValues,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -324,7 +325,14 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
 
   /** Reports the answer and the verdict on it. */
   private sync(): void {
-    this.internals.setFormValue(this.value === '' ? null : this.value)
+    /* Several answers as several entries, the way a native `<select multiple>`
+       sends them; see `reportValues`. One answer as the string it is, since
+       a single option's value may hold a comma. */
+    if (this.multiple) {
+      reportValues(this.internals, this.name, this.value === '' ? [] : this.value.split(','))
+    } else {
+      this.internals.setFormValue(this.value === '' ? null : this.value)
+    }
     this.reportRequired(this.value === '', 'Choose one to continue.', 'trigger')
   }
 

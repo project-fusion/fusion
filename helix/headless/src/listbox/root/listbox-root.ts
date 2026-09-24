@@ -9,6 +9,7 @@ import {
   MixinCollection,
   MixinControllerValue,
   MixinField,
+  reportValues,
   requestChange,
   scrollItemIntoView,
 } from '@fusion.dev/helix-core'
@@ -122,8 +123,9 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * what filters it, not in what the list is.
  *
  * **`value` is comma separated when `multiple` is set**, the way
- * `Checkbox.Group`'s is. It stays a string because that is what a form submits
- * and what `MixinControllerValue` holds.
+ * `Checkbox.Group`'s is, and a string because that is what `MixinControllerValue`
+ * holds. The form is sent one entry per answer, as a native `<select multiple>`
+ * sends it, so a server never has to know to split on a comma.
  *
  * **Chosen and active are two different things.** Chosen is the answer; active
  * is where the keyboard is. Only the second moves with the arrows, and
@@ -623,7 +625,14 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /** Reports the answer and the verdict on it. */
   private sync(): void {
-    this.internals.setFormValue(this.value === '' ? null : this.value)
+    /* Several answers as several entries, the way a native `<select multiple>`
+       sends them; see `reportValues`. One answer as the string it is, since
+       a single option's value may hold a comma. */
+    if (this.multiple) {
+      reportValues(this.internals, this.name, this.value === '' ? [] : this.value.split(','))
+    } else {
+      this.internals.setFormValue(this.value === '' ? null : this.value)
+    }
     this.reportRequired(this.value === '', 'Choose one to continue.', 'items')
   }
 

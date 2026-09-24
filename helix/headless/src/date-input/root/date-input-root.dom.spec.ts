@@ -1,5 +1,12 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -681,3 +688,15 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('input date holding several, in its form', () => {
+  test('sends one entry per date, the way the calendar beside it does', async () => {
+    const host = await field('default-value="2026-08-04,2026-08-11" mode="multiple" name="d"')
+    expect((formValue(host) as FormData).getAll('d')).toEqual(['2026-08-04', '2026-08-11'])
+  })
+
+  test('and nothing without a name, which a form would send as empty-named dates', async () => {
+    const host = await field('default-value="2026-08-04,2026-08-11" mode="multiple"')
+    expect(formValue(host)).toBeNull()
+  })
+})

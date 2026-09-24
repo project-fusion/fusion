@@ -80,9 +80,13 @@ describe('listbox', () => {
     expect(host.value).toBe('one')
   })
 
-  test('the value is comma separated, and is what the form submits', async () => {
-    const host = await list('multiple default-value="one,three"')
-    expect(formValue(host)).toBe('one,three')
+  test('the value is comma separated, and the form is sent one entry per answer', async () => {
+    /* One entry each, as a native `<select multiple>` sends them: a server
+       reading `c=one,three` has to know to split it on a comma this library
+       chose, and Date Picker already sent its dates the other way. */
+    const host = (await list('multiple default-value="one,three"')) as Updatable & { value: string }
+    expect(host.value).toBe('one,three')
+    expect((formValue(host) as FormData).getAll('c')).toEqual(['one', 'three'])
     expect(options(host).map((option) => option.selected)).toEqual([true, false, true])
   })
 

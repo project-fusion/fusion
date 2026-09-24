@@ -360,6 +360,10 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
     }
   }
 
+  /** Each time, where `mode` holds several, sent one entry each. */
+  protected override get answers(): readonly string[] | undefined {
+    return this.mode === undefined ? undefined : this.held
+  }
   /** What is wrong with the times, which the text input cannot say. */
   protected override validate(): string {
     /* Checked here rather than left to the input, which is `text` and has no
