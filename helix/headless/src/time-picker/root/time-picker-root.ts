@@ -6,6 +6,7 @@ import {
   HelixFormElement,
   MixinControllerValue,
   minutesAsValue,
+  reportValues,
   valueAsMinutes,
   writeTime,
 } from '@fusion.dev/helix-core'
@@ -551,18 +552,11 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * reason, that the calendar's own note spells out.
    */
   private report(): void {
-    const times = this.held
-    if (this.name === '' || this.disabled || times.length === 0) {
+    if (this.disabled) {
       this.internals.setFormValue(null)
       return
     }
-    const data = new FormData()
-    for (const time of times) {
-      data.append(this.name, time)
-    }
-    /* The value as the state, or the browser keeps the form data as it and
-       hands that back on a restore, where the value is read as a string. */
-    this.internals.setFormValue(data, this.value)
+    reportValues(this.internals, this.name, this.held)
   }
 
   /**

@@ -7,6 +7,7 @@ import {
   hostAria,
   inlineStep,
   MixinControllerValue,
+  reportValues,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight } from '@fusion.dev/helix-icons'
@@ -624,25 +625,18 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    *
    * **Nothing at all without a `name`, and that is the mechanism rather than a
    * detail.** It is what lets a calendar sit inside something that owns the
-   * form value, which is how `DatePicker` will hold one. The guard has to be
-   * explicit here in a way it does not for `Listbox`: a control reporting a
-   * plain string is skipped by the form when it has no name, but a `FormData`
-   * carries its own names and its entries are appended whatever the element is
-   * called, so an unnamed calendar would submit empty-named dates.
+   * form value, which is how `Date Input` holds one. `reportValues` keeps the
+   * guard, for every control that sends several answers: a plain string is
+   * skipped by the form when its control has no name, but a `FormData` carries
+   * its own names and its entries are appended whatever the element is called,
+   * so an unnamed calendar would submit empty-named dates.
    */
   private report(): void {
-    const dates = this.selected
-    if (this.name === '' || this.disabled || dates.length === 0) {
+    if (this.disabled) {
       this.internals.setFormValue(null)
       return
     }
-    const data = new FormData()
-    for (const date of dates) {
-      data.append(this.name, date)
-    }
-    /* The value as the state, or the browser keeps the form data as it and
-       hands that back on a restore, where the value is read as a string. */
-    this.internals.setFormValue(data, this.value)
+    reportValues(this.internals, this.name, this.selected)
   }
 
   /**

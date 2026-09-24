@@ -267,14 +267,14 @@ describe('combobox holding several', () => {
     expect(control(host).value).toBe('')
   })
 
-  test('the form is given the set, comma joined, and nothing when it is empty', async () => {
+  test('the form is given the set one entry each, and nothing when it is empty', async () => {
     const host = await many()
     expect(formValue(host as HTMLElement)).toBe(null)
     await type(host, 'ru')
     await press(host, 'Enter')
     await type(host, 'go')
     await press(host, 'Enter')
-    expect(formValue(host as HTMLElement)).toBe('rs,go')
+    expect((formValue(host as HTMLElement) as FormData).getAll('c')).toEqual(['rs', 'go'])
   })
 
   test('a refused choice leaves the control exactly where it was', async () => {

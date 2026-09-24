@@ -11,6 +11,7 @@ import {
   MixinField,
   MixinTokens,
   PopoverController,
+  reportValues,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -688,7 +689,14 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * component: a form that received "jav" got the filter, not an option.
    */
   private sync(): void {
-    this.internals.setFormValue(this.value === '' ? null : this.value)
+    /* Several answers as several entries, the way a native `<select multiple>`
+       sends them; see `reportValues`. One answer as the string it is, since
+       a single option's value may hold a comma. */
+    if (this.multiple) {
+      reportValues(this.internals, this.name, this.value === '' ? [] : this.value.split(','))
+    } else {
+      this.internals.setFormValue(this.value === '' ? null : this.value)
+    }
     this.reportRequired(this.value === '', 'Choose one to continue.', 'control')
   }
 

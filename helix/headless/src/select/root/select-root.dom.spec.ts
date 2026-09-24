@@ -279,3 +279,18 @@ describe('the trigger closes the panel it opened', () => {
     expect(host.open).toBe(false)
   })
 })
+
+describe('select holding several, in its form', () => {
+  test('sends one entry per answer, and one answer as the string it is', async () => {
+    /* A server read `c=one,two` from this and `c=one&c=two` from Date
+       Picker for the same shape of answer. One entry each is what a native
+       `<select multiple>` sends. */
+    const several = await select('multiple default-value="one,two"')
+    expect((formValue(several as unknown as HTMLElement) as FormData).getAll('c')).toEqual([
+      'one',
+      'two',
+    ])
+    const one = await select('default-value="two"')
+    expect(formValue(one as unknown as HTMLElement)).toBe('two')
+  })
+})

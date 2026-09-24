@@ -2,6 +2,7 @@ import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { PopoverController } from '../../controllers/popover-controller/popover-controller.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
+import { reportValues } from '../../utils/report-values/report-values.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
 import type { MixinControllerValueInterface } from '../mixin-controller-value/mixin-controller-value.js'
 import type { MixinFieldInterface } from '../mixin-field/mixin-field.js'
@@ -37,6 +38,13 @@ export declare class MixinPickerFieldInterface {
    * can name.
    */
   protected get anchor(): HTMLElement | null
+
+  /**
+   * Each answer the field holds, where it holds several, or `undefined` where
+   * its value is one answer. Several are sent one entry each; see
+   * `reportValues`.
+   */
+  protected get answers(): readonly string[] | undefined
 
   /** The text input, or `null` where there is no DOM to hold one. */
   protected get control(): HTMLInputElement | null
@@ -228,6 +236,16 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
     }
 
     /**
+     * Each answer the field holds, where it holds several.
+     *
+     * One answer by default, the value itself. Date Input and Time Input hold
+     * several in `multiple` and `range`, and say so.
+     */
+    protected get answers(): readonly string[] | undefined {
+      return undefined
+    }
+
+    /**
      * What is wrong with the value, in the reader's words, or nothing.
      */
     protected validate(): string {
@@ -262,7 +280,12 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
      * the text and not at the host.
      */
     protected sync(): void {
-      this.internals.setFormValue(this.value)
+      const answers = this.answers
+      if (answers === undefined) {
+        this.internals.setFormValue(this.value)
+      } else {
+        reportValues(this.internals, this.name, answers)
+      }
       const control = this.control
       if (!control) {
         return
