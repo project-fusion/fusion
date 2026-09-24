@@ -31,6 +31,7 @@ import { styles } from './canvas-root.css.js'
  * @cssproperty --canvas-edge-color - Color of a connector with no tone. Written in an edge's own `style`, it colors that edge alone.
  * @cssproperty --canvas-edge-target-width - How wide a connector is to a pointer, which is wider than it is drawn.
  * @cssproperty --canvas-grid-size - How far apart the ruling is, in the document's own units, so it scales with the zoom.
+ * @cssproperty --canvas-handle-size - How large the ends of a selected connection are, one name with a card's points.
  * @cssproperty --canvas-label-editor-inline-size - How wide the field a label is edited in is.
  * @cssproperty --viewport-control-background-color - The ground under the pan and zoom buttons, one name with `Map`.
  */
