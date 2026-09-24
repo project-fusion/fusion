@@ -170,6 +170,15 @@ type Stop = { kind: 'node'; key: string } | { kind: 'edge'; key: string; edge: C
 const custom = (element: HTMLElement | undefined, name: string): string =>
   element?.style.getPropertyValue(name).trim() ?? ''
 
+/** Writes a length onto an element, or takes it away where there is none. */
+const size = (element: HTMLElement, name: string, value: number): void => {
+  if (value > 0) {
+    element.style.setProperty(name, `${value}px`)
+  } else {
+    element.style.removeProperty(name)
+  }
+}
+
 /**
  * @summary A board of cards and the connections between them, which a reader can walk, rearrange and connect.
  *
@@ -515,6 +524,20 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** The element the observer is on, so a render does not observe it again. */
   private watched: Element | undefined
 
+  /**
+   * Hears what the cards and connections change that no property of theirs
+   * says: the words in a card, and a color written into an element's `style`.
+   *
+   * Both are read into what is drawn, a card's words into every connection's
+   * name and the sentence saying where it leads, and neither reaches the board
+   * otherwise: a card whose text a page rewrote was read out under its old
+   * words for the life of the board.
+   */
+  private words?: MutationObserver
+
+  /** The custom color each card and connection was last drawn in. */
+  private readonly painted = new WeakMap<Element, string>()
+
   /** The box as the observer last measured it, so a resize knows what it gained. */
   private measured?: { width: number; height: number }
 
@@ -603,7 +626,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   private readNodes(): CanvasNode[] {
     return this.cards.map((card) => ({
-      color: colorOf(card.tone, custom(card, '--canvas-node-color')),
+      color: colorOf(card.tone, this.paint(card, '--canvas-node-color')),
       height: card.height,
       id: card.name,
       /* An empty label is no label: `??` falls through on nothing at all, and a
@@ -615,6 +638,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       x: card.x,
       y: card.y,
     }))
+  }
+
+  /** A custom color written on an element, remembered as the one drawn. */
+  private paint(element: HTMLElement, name: string): string {
+    const value = custom(element, name)
+    this.painted.set(element, value)
+    return value
   }
 
   /** The connectors a consumer declared, which draw nothing themselves. */
@@ -641,7 +671,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       .filter((child): child is HelixHeadlessCanvasEdge => child instanceof HelixHeadlessCanvasEdge)
       .map((element) => {
         const edge: CanvasEdge = {
-          color: colorOf(element.tone, custom(element, '--canvas-edge-color')),
+          color: colorOf(element.tone, this.paint(element, '--canvas-edge-color')),
           fromEnd: element.fromEnd,
           fromNode: element.from,
           fromSide: element.fromSide,
@@ -2387,10 +2417,24 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * is theirs to write back, which `fromJsonCanvas` handed them on the way in.
    */
   toJsonCanvas(): CanvasDocument {
-    return {
-      edges: this.edges,
-      nodes: this.nodes,
-    }
+    /* **Every edge gets an id**, which the format requires and makes unique,
+       and which a connection declared without a `name` does not have. The
+       cards it joins, and a count where two join the same pair. Copies, so a
+       consumer editing what came back is not editing what the board draws. */
+    const taken = new Set(this.edges.map((edge) => edge.id).filter(Boolean))
+    const edges = this.edges.map((edge) => {
+      if (edge.id) {
+        return { ...edge }
+      }
+      const base = `${edge.fromNode}->${edge.toNode}`
+      let id = base
+      for (let count = 2; taken.has(id); count++) {
+        id = `${base}-${count}`
+      }
+      taken.add(id)
+      return { ...edge, id }
+    })
+    return { edges, nodes: this.nodes.map((node) => ({ ...node })) }
   }
 
   /**
@@ -2499,6 +2543,47 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /**
+   * Watches the cards' words and the colors written onto the elements.
+   *
+   * A `style` change redraws only where the color it carries moved, because
+   * the board writes each card's place into the same attribute on every
+   * render, and answering that would be a render asking for the next one.
+   */
+  private watchWords(): void {
+    if (typeof MutationObserver === 'undefined') {
+      return
+    }
+    this.words ??= new MutationObserver((records) => {
+      if (records.some((record) => this.redraws(record))) {
+        this.requestUpdate()
+      }
+    })
+    this.words.observe(this, {
+      attributeFilter: ['style'],
+      characterData: true,
+      childList: true,
+      subtree: true,
+    })
+  }
+
+  private redraws(record: MutationRecord): boolean {
+    if (record.type !== 'attributes') {
+      return true
+    }
+    const target = record.target
+    const name =
+      target instanceof HelixHeadlessCanvasNode
+        ? '--canvas-node-color'
+        : target instanceof HelixHeadlessCanvasEdge
+          ? '--canvas-edge-color'
+          : undefined
+    return (
+      name !== undefined &&
+      custom(target as HTMLElement, name) !== (this.painted.get(target as Element) ?? '')
+    )
+  }
+
+  /**
    * Keeps one observer on the box, so a fit follows a resize that has not
    * happened yet.
    *
@@ -2552,6 +2637,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.watchBox()
+    this.watchWords()
     this.addEventListener('dblclick', this.handleDoubleClick)
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('keydown', this.handleStopKeydown)
@@ -2570,6 +2656,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.sizes?.disconnect()
     this.watched = undefined
+    this.words?.disconnect()
     this.removeEventListener('dblclick', this.handleDoubleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('keydown', this.handleStopKeydown)
@@ -2637,8 +2724,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           )
       card.style.setProperty('--_canvas-card-x', `${card.x - origin.x}px`)
       card.style.setProperty('--_canvas-card-y', `${card.y - origin.y}px`)
-      card.style.setProperty('--_canvas-card-inline-size', `${card.width}px`)
-      card.style.setProperty('--_canvas-card-block-size', `${card.height}px`)
+      /* A card with no size of its own is as large as what it says, the
+         sheet's own default, rather than a zero box hiding its words. */
+      size(card, '--_canvas-card-inline-size', card.width)
+      size(card, '--_canvas-card-block-size', card.height)
       if (group) {
         card.setAttribute('data-group', group.id)
       } else {

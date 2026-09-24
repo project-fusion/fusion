@@ -358,6 +358,10 @@
    gives up its ground and its edge and the outline the card renders draws
    both, over the border box so its points are the middles of the sides. */
 :host([shape="diamond"]:not([group])) {
+  /* And its filter, which the box would otherwise keep: a glass diamond
+     blurred the whole square around it. The material is the outline's fill
+     below, since a filter behind an SVG shape cannot follow the shape. */
+  backdrop-filter: none;
   background-color: transparent;
   border-color: transparent;
   --canvas-node-shadow: none;
@@ -377,6 +381,18 @@
   fill: var(--canvas-node-background-color, var(--helix-color-surface));
   stroke: var(--_canvas-card-color);
   stroke-width: var(--helix-border-thin);
+}
+
+:host([shape="diamond"][material="glass"]) [part="outline"] polygon {
+  fill: var(--helix-material-translucent);
+}
+
+:host([shape="diamond"][material="frosted"]) [part="outline"] polygon {
+  fill: var(--helix-material-translucent-strong);
+}
+
+:host([shape="diamond"][material="transparent"]) [part="outline"] polygon {
+  fill: transparent;
 }
 
 :host([shape="diamond"][separation="filled"]) [part="outline"] polygon {

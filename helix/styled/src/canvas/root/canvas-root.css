@@ -157,13 +157,6 @@
   stroke-width: calc(var(--helix-border-thick) * 2);
 }
 
-/* **Selected stays drawn after the pointer and the focus have gone**, in the
-   accent at twice the weight, until the reader selects something else. */
-[part="edge"][data-selected] {
-  stroke: var(--helix-color-accent);
-  stroke-width: calc(var(--helix-border-thick) * 2);
-}
-
 /* **The ends of a selected connection**, which a press picks up, a click as
    well as a drag. Over the cards, since each sits on the point of the card it
    arrives at, and filled, so it reads as the connection's rather than the
@@ -286,6 +279,15 @@
 }
 [part="edge"][data-tone="warning"] {
   stroke: var(--helix-color-warning);
+}
+
+/* **Selected stays drawn after the pointer and the focus have gone**, in the
+   accent at twice the weight, until the reader selects something else. After
+   the tones, which match as closely: before them, a connection with a tone
+   kept it when selected and only grew heavier. */
+[part="edge"][data-selected] {
+  stroke: var(--helix-color-accent);
+  stroke-width: calc(var(--helix-border-thick) * 2);
 }
 
 /* A weaker or optional connection, drawn broken. Dotted is a dash of nothing

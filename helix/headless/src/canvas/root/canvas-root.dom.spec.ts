@@ -1729,3 +1729,133 @@ describe('canvas without dragging', () => {
     expect(host.shadowRoot?.querySelector('[part="edge-end"]')).toBeNull()
   })
 })
+
+/**
+ * What the board draws from that no property of a card or a connection says,
+ * and the document it writes back out.
+ */
+describe('canvas beyond the properties', () => {
+  /** Lets a `MutationObserver` deliver, then the render it asked for. */
+  const heard = async (host: Canvas): Promise<void> => {
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+  }
+
+  test('a card whose words change is read out by its new ones', async () => {
+    const host = await canvas()
+    card(host, 'b').textContent = 'Renamed'
+    await heard(host)
+    expect(connection(host, 'edge:e1').getAttribute('aria-label')).toBe('From First to Renamed')
+    expect(card(host, 'a').links).toBe('leads to Renamed')
+  })
+
+  test('a color written onto a connection after the first paint is drawn', async () => {
+    const host = await canvas(
+      '',
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="80" height="40">A</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="120" y="0" width="80" height="40">B</helix-headless-canvas-node>
+       <helix-headless-canvas-edge name="e" from="a" to="b" style="--canvas-edge-color: red"></helix-headless-canvas-edge>`,
+    )
+    const edge = host.querySelector('helix-headless-canvas-edge') as HTMLElement
+    edge.style.setProperty('--canvas-edge-color', 'blue')
+    await heard(host)
+    const painted = host.shadowRoot?.querySelector('[part="edge"]') as SVGPathElement
+    expect(painted.getAttribute('style')).toContain('--_canvas-edge-color: blue')
+  })
+
+  test('a group is read where it sits on the board, and what it holds straight after it', async () => {
+    const { reading } = await import('./canvas-document.js')
+    const order = reading(
+      [
+        { height: 300, id: 'later', type: 'group', width: 400, x: 0, y: 600 },
+        { height: 40, id: 'title', type: 'text', width: 200, x: 0, y: 0 },
+        { height: 40, id: 'inner', type: 'text', width: 100, x: 20, y: 640 },
+        { height: 40, id: 'after', type: 'text', width: 100, x: 500, y: 600 },
+      ],
+      [],
+      'spatial',
+    )
+    expect(order.map((one) => one.id)).toEqual(['title', 'later', 'inner', 'after'])
+  })
+
+  test('two groups drawn as the same box are both still read', async () => {
+    const { reading } = await import('./canvas-document.js')
+    const box = { height: 100, type: 'group' as const, width: 100, x: 0, y: 0 }
+    const order = reading(
+      [
+        { ...box, id: 'one' },
+        { ...box, id: 'two' },
+      ],
+      [],
+      'spatial',
+    )
+    expect(order.map((one) => one.id).sort()).toEqual(['one', 'two'])
+  })
+
+  test('a step that turns back on itself keeps the stub out of each side', async () => {
+    const { connector } = await import('./canvas-document.js')
+    const { d } = connector(
+      { fromNode: 'a', fromSide: 'right', id: 'e', toNode: 'b', toSide: 'left' },
+      { height: 50, id: 'a', type: 'text', width: 100, x: 300, y: 0 },
+      { height: 50, id: 'b', type: 'text', width: 100, x: 0, y: 0 },
+      'step',
+    )
+    // Out to the right of the first card before anything turns back.
+    expect(d.startsWith('M 400 25 L')).toBe(true)
+    expect(d).not.toBe('M 400 25 L 0 25')
+    expect(d).toContain('Q')
+  })
+
+  test('every connection goes out with an id of its own, named or not', async () => {
+    const host = (await canvas(
+      '',
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="80" height="40">A</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="120" y="0" width="80" height="40">B</helix-headless-canvas-node>
+       <helix-headless-canvas-edge from="a" to="b"></helix-headless-canvas-edge>
+       <helix-headless-canvas-edge from="a" to="b" label="again"></helix-headless-canvas-edge>
+       <helix-headless-canvas-edge name="named" from="b" to="a"></helix-headless-canvas-edge>`,
+    )) as Canvas & { toJsonCanvas(): { edges: Array<{ id: string }> } }
+    const ids = host.toJsonCanvas().edges.map((edge) => edge.id)
+    expect(ids).toEqual(['a->b', 'a->b-2', 'named'])
+  })
+
+  test('a card with no size of its own is as large as what it says', async () => {
+    const host = await canvas(
+      '',
+      '<helix-headless-canvas-node name="loose" x="0" y="0">Loose</helix-headless-canvas-node>',
+    )
+    const loose = card(host, 'loose')
+    expect(loose.style.getPropertyValue('--_canvas-card-inline-size')).toBe('')
+    expect(loose.style.getPropertyValue('--_canvas-card-block-size')).toBe('')
+  })
+
+  test('a file’s subpath and a group’s picture come through the import', async () => {
+    const { fromJsonCanvas } = await import('../index.js')
+    const props = fromJsonCanvas({
+      nodes: [
+        {
+          file: 'a.md',
+          height: 10,
+          id: 'f',
+          subpath: '#Intro',
+          type: 'file',
+          width: 10,
+          x: 0,
+          y: 0,
+        },
+        {
+          background: 'bg.png',
+          backgroundStyle: 'cover',
+          height: 10,
+          id: 'g',
+          type: 'group',
+          width: 10,
+          x: 0,
+          y: 0,
+        },
+      ],
+    })
+    expect(props.nodes[0]?.subpath).toBe('#Intro')
+    expect(props.nodes[1]).toMatchObject({ background: 'bg.png', backgroundStyle: 'cover' })
+  })
+})

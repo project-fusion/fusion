@@ -32,6 +32,12 @@ export interface CanvasNode {
   url?: string | undefined
   /** What the group is called. */
   label?: string | undefined
+  /** Where in the file it points, a heading or a block, starting with `#`. */
+  subpath?: string | undefined
+  /** The picture behind a group, where it has one. */
+  background?: string | undefined
+  /** How that picture fills the group: `cover`, `ratio` or `repeat`. */
+  backgroundStyle?: 'cover' | 'ratio' | 'repeat' | undefined
 }
 
 /** What a connector carries at an end: an arrowhead, or nothing. */
@@ -266,8 +272,13 @@ const steps = (start: Point, fromSide: CanvasSide, end: Point, toSide: CanvasSid
     const before = all[at - 1] ?? point
     const after = all[at + 1] ?? point
     const same = point.x === before.x && point.y === before.y
-    const straight =
-      (before.x === point.x && point.x === after.x) || (before.y === point.y && point.y === after.y)
+    /* Straight means carrying on the same way, not merely staying on one
+       line: a connection leaving the right of a card for the left of one
+       behind it turns back on itself, and dropping that point lost the stub
+       out of each side and ran the line straight through both cards. */
+    const into = { x: Math.sign(point.x - before.x), y: Math.sign(point.y - before.y) }
+    const onward = { x: Math.sign(after.x - point.x), y: Math.sign(after.y - point.y) }
+    const straight = into.x === onward.x && into.y === onward.y
     return !same && !straight
   })
 }
@@ -381,14 +392,40 @@ export const reading = (
   order: 'spatial' | 'edges',
 ): CanvasNode[] => {
   const band = 80
-  const spatial = [...nodes].sort((a, b) => {
-    if (a.type !== b.type) {
-      return a.type === 'group' ? -1 : b.type === 'group' ? 1 : 0
-    }
+  const byPlace = (a: CanvasNode, b: CanvasNode): number => {
     const rowA = Math.round(a.y / band)
     const rowB = Math.round(b.y / band)
     return rowA === rowB ? a.x - b.x : rowA - rowB
-  })
+  }
+  /* **A group is read where it sits, and what it holds straight after it.**
+     Sorting every group ahead of every card read a group at the foot of the
+     board before the title at its head, and then the title between the group
+     and its own cards. */
+  const holder = new Map(nodes.map((node) => [node.id, groupOf(node, nodes)?.id]))
+  const held = (id: string | undefined): CanvasNode[] =>
+    nodes.filter((node) => holder.get(node.id) === id).sort(byPlace)
+  const spatial: CanvasNode[] = []
+  const placed = new Set<string>()
+  const visit = (node: CanvasNode): void => {
+    if (placed.has(node.id)) {
+      return
+    }
+    placed.add(node.id)
+    spatial.push(node)
+    if (node.type === 'group') {
+      for (const inner of held(node.id)) {
+        visit(inner)
+      }
+    }
+  }
+  for (const node of held(undefined)) {
+    visit(node)
+  }
+  /* Two groups drawn as the same box each hold the other, so neither is at
+     the top: they are read in place rather than lost. */
+  for (const node of [...nodes].sort(byPlace)) {
+    visit(node)
+  }
   if (order === 'spatial') {
     return spatial
   }
@@ -441,6 +478,11 @@ export interface CanvasNodeProps {
   file?: string | undefined
   /** The address it points at, for a card that is a link. */
   url?: string | undefined
+  /** Where in the file it points, for a card that is one. */
+  subpath?: string | undefined
+  /** The picture behind a group, and how it fills it. */
+  background?: string | undefined
+  backgroundStyle?: 'cover' | 'ratio' | 'repeat' | undefined
 }
 
 /** A connection as the elements take it. */
@@ -484,12 +526,15 @@ export const fromJsonCanvas = (
     toSide: edge.toSide,
   })),
   nodes: (document.nodes ?? []).map((node) => ({
+    background: node.background,
+    backgroundStyle: node.backgroundStyle,
     color: toneOf(node.color) === undefined ? node.color : undefined,
     file: node.file,
     group: node.type === 'group',
     height: node.height,
     label: node.label,
     name: node.id,
+    subpath: node.subpath,
     text: node.text,
     tone: toneOf(node.color),
     url: node.url,
