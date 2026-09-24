@@ -277,6 +277,39 @@ describe('canvas', () => {
     expect(d('edge:e2')).toContain(' Q ')
   })
 
+  test('a connection keeps the points it was drawn at while its cards move', async () => {
+    /* One that names no side takes the sides facing the other card, and that
+       was asked on every draw: a card dragged past the diagonal between the two
+       flipped the answer, and the line jumped to another point under the
+       reader's hand. Here the second card moves from beside the first to under
+       it, and the line still leaves the first card's right side. */
+    const host = await canvas()
+    const start = () =>
+      (connection(host, 'edge:e1').getAttribute('d') ?? '')
+        .match(/^M ([-\d.]+) ([-\d.]+)/)
+        ?.slice(1)
+    const before = start()
+    const second = card(host, 'b')
+    second.x = 0
+    second.y = 300
+    await host.updateComplete
+    await host.updateComplete
+    expect(start()).toEqual(before)
+  })
+
+  test('and a side the page writes still wins', async () => {
+    const host = await canvas()
+    const start = () =>
+      (connection(host, 'edge:e1').getAttribute('d') ?? '')
+        .match(/^M ([-\d.]+) ([-\d.]+)/)
+        ?.slice(1)
+    const before = start()
+    host.querySelector('[name="e1"]')?.setAttribute('from-side', 'bottom')
+    await host.updateComplete
+    await host.updateComplete
+    expect(start()).not.toEqual(before)
+  })
+
   test('a board rests with zoom and fullscreen, and the pad is there when asked for', async () => {
     /* A board is dragged and its cards walked by key, so the pad was a third way
        to pan that took a third of the corner. */
