@@ -106,7 +106,14 @@ describe('the pin', () => {
     expect((await chat()).pinned).toBe(true)
   })
 
-  test('`default-pinned="false"` is not a thing, so opening unpinned is a property', async () => {
+  test('`default-pinned="false"` opens away from the bottom, as written', async () => {
+    /* A boolean attribute is true by being there, so a default of true had no
+       attribute that turned it off, and this markup opened pinned. */
+    const element = await chat('default-pinned="false"')
+    expect(element.pinned).toBe(false)
+  })
+
+  test('and opening unpinned is a property too', async () => {
     const element = await chat()
     element.pinned = false
     await element.updateComplete

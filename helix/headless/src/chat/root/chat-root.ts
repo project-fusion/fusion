@@ -5,6 +5,7 @@ import {
   HelixHistoryEvent,
   hostAria,
   MixinCollection,
+  onUnlessFalse,
   type Rendered,
   requestChange,
   VirtualizeController,
@@ -228,8 +229,12 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   /**
    * Whether to open pinned, where nothing declared it.
+   *
+   * `default-pinned="false"` opens away from the bottom. A plain boolean
+   * attribute could not say that: it is true by being there, whatever it holds,
+   * so a default of true had no attribute that turned it off.
    */
-  @property({ attribute: 'default-pinned', type: Boolean })
+  @property({ attribute: 'default-pinned', converter: onUnlessFalse })
   defaultPinned = true
 
   /**
