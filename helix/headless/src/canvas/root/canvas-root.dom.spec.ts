@@ -58,6 +58,26 @@ const press = (on: Card, key: string, shiftKey = false): KeyboardEvent => {
   return event
 }
 
+/**
+ * A point in the document's own units, where it is on the screen.
+ *
+ * **Worked out rather than written down**, because these specs run twice: in
+ * happy-dom, which measures nothing, so the board sits unfitted at the corner
+ * and a point on screen is the document's plus the plane's margin; and in a
+ * browser, which measures the box and fits the board into it. A coordinate
+ * written for one lands somewhere else in the other.
+ */
+const onScreen = (host: Canvas, x: number, y: number): [number, number] => {
+  const viewport = part(host, 'viewport') as HTMLElement
+  const box = viewport.getBoundingClientRect()
+  const style = viewport.getAttribute('style') ?? ''
+  const read = (name: string): number =>
+    Number(new RegExp(`--_canvas-${name}: (-?[0-9.e+-]+)`).exec(style)?.[1] ?? 0)
+  const origin = (host as unknown as { origin: { x: number; y: number } }).origin
+  const zoom = read('zoom') || 1
+  return [box.left + read('x') + (x - origin.x) * zoom, box.top + read('y') + (y - origin.y) * zoom]
+}
+
 /** A connection's focusable line, by the key the board gives it. */
 const connection = (host: Canvas, key: string): SVGElement =>
   host.shadowRoot?.querySelector(`[data-edge="${key}"]`) as SVGElement
@@ -309,16 +329,14 @@ describe('canvas', () => {
     expect(style()).toContain('--_canvas-rule-zoom: 0.8')
   })
 
-  test('a label is centered on its line rather than sitting on it', async () => {
+  test('a label is text on the plane at its line\u2019s middle, not SVG text', async () => {
+    /* SVG text on a filtered ground lost its words to a stale filter picture
+       when the font arrived after it was drawn. */
     const host = await canvas()
-    const label = host.shadowRoot?.querySelector('[part="label"]')
-    expect(label?.getAttribute('dominant-baseline')).toBe('central')
-    /* On a ground as wide as its words, which a stroke around the letters was
-       not: the line showed through every space. Resolved, not compared. */
-    const ground = (label?.getAttribute('filter') ?? '').replace(/^url\(#|\)$/g, '')
-    expect(
-      host.shadowRoot?.getElementById(ground)?.querySelector('[part="label-ground"]'),
-    ).not.toBeNull()
+    const label = host.shadowRoot?.querySelector('[part="label"]') as HTMLElement
+    expect(label.namespaceURI).toBe('http://www.w3.org/1999/xhtml')
+    expect(label.textContent).toBe('then')
+    expect(label.getAttribute('style')).toContain('--_canvas-label-x:')
   })
 
   test('an empty document says so rather than drawing an empty plane', async () => {
@@ -505,10 +523,10 @@ describe('canvas connections and removal', () => {
     /* happy-dom measures nothing, so the view is unzoomed at its corner and the
        plane starts a margin above and left of the group at -20: a point on the
        screen is the document's point plus 52. Third is at 130..330, 300..400. */
-    host.dispatchEvent(pointer('pointermove', 282, 360))
+    host.dispatchEvent(pointer('pointermove', ...onScreen(host, 230, 308)))
     await host.updateComplete
     expect(part(host, 'draft')).not.toBeNull()
-    host.dispatchEvent(pointer('pointerup', 282, 360))
+    host.dispatchEvent(pointer('pointerup', ...onScreen(host, 230, 308)))
     await host.updateComplete
     /* Near Third's top edge, so it arrives at the top: the side nearest the
        pointer, not the one facing the card it came from. */
@@ -531,13 +549,13 @@ describe('canvas connections and removal', () => {
       })
     /* e1 runs from First's right side (200, 50) to Second's left (260, 50): on
        screen, plus 52. Pressed near its arriving end, so that end is in hand. */
-    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', ...onScreen(host, 253, 50)))
     // Over Third, near its top.
-    host.dispatchEvent(pointer('pointermove', 282, 360))
+    host.dispatchEvent(pointer('pointermove', ...onScreen(host, 230, 308)))
     await host.updateComplete
     await host.updateComplete
     expect(hasState(card(host, 'c'), 'target')).toBe(true)
-    host.dispatchEvent(pointer('pointerup', 282, 360))
+    host.dispatchEvent(pointer('pointerup', ...onScreen(host, 230, 308)))
     await host.updateComplete
     /* The end that stayed keeps the side it was drawn on, First's right,
        and says so, so what lands is what the reader was shown. */
@@ -567,18 +585,18 @@ describe('canvas connections and removal', () => {
         pointerId: 7,
       })
     host.addEventListener('helix-before-reconnect', (event) => event.preventDefault())
-    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
-    host.dispatchEvent(pointer('pointermove', 282, 360))
-    host.dispatchEvent(pointer('pointerup', 282, 360))
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', ...onScreen(host, 253, 50)))
+    host.dispatchEvent(pointer('pointermove', ...onScreen(host, 230, 308)))
+    host.dispatchEvent(pointer('pointerup', ...onScreen(host, 230, 308)))
     await host.updateComplete
     expect((host.querySelector('[name="e1"]') as HTMLElement & { to: string }).to).toBe('b')
 
     const removed: unknown[] = []
     host.addEventListener('helix-remove', (event) => removed.push((event as CustomEvent).detail))
-    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', ...onScreen(host, 253, 50)))
     // Out over empty board, below everything.
-    host.dispatchEvent(pointer('pointermove', 600, 600))
-    host.dispatchEvent(pointer('pointerup', 600, 600))
+    host.dispatchEvent(pointer('pointermove', ...onScreen(host, 548, 548)))
+    host.dispatchEvent(pointer('pointerup', ...onScreen(host, 548, 548)))
     expect(removed).toEqual([{ edges: [{ from: 'a', name: 'e1', to: 'b' }], nodes: [] }])
   })
 
@@ -597,12 +615,12 @@ describe('canvas connections and removal', () => {
        plane. Its arriving end is dragged down and to the left, where First's
        bottom side is nearer the pointer than its right: a side worked out
        again on every move would jump there. */
-    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
-    host.dispatchEvent(pointer('pointermove', 40, 600))
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', ...onScreen(host, 253, 50)))
+    host.dispatchEvent(pointer('pointermove', ...onScreen(host, -12, 548)))
     await host.updateComplete
     await host.updateComplete
     expect(part(host, 'draft')?.getAttribute('d')).toMatch(/^M 252 102 /)
-    host.dispatchEvent(pointer('pointercancel', 40, 600))
+    host.dispatchEvent(pointer('pointercancel', ...onScreen(host, -12, 548)))
   })
 
   test('a press on a connection lights no cards until it becomes a drag', async () => {
@@ -616,16 +634,16 @@ describe('canvas connections and removal', () => {
         composed: true,
         pointerId: 13,
       })
-    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', ...onScreen(host, 253, 50)))
     await host.updateComplete
     await host.updateComplete
     expect(hasState(card(host, 'c'), 'candidate')).toBe(false)
     expect(hasState(host, 'connecting')).toBe(false)
-    host.dispatchEvent(pointer('pointermove', 282, 360))
+    host.dispatchEvent(pointer('pointermove', ...onScreen(host, 230, 308)))
     await host.updateComplete
     await host.updateComplete
     expect(hasState(card(host, 'c'), 'candidate')).toBe(true)
-    host.dispatchEvent(pointer('pointerup', 282, 360))
+    host.dispatchEvent(pointer('pointerup', ...onScreen(host, 230, 308)))
   })
 
   test('a press on a connection that does not move is a click, and picks nothing up', async () => {
@@ -698,8 +716,12 @@ describe('canvas connections and removal', () => {
       }
     })
     press(card(host, 'b'), 'Delete')
-    await host.updateComplete
-    await host.updateComplete
+    /* The page removed them inside the listener; the slot hears it on a later
+       turn, and the board moves focus on the update after that. */
+    for (let turn = 0; turn < 4; turn++) {
+      await new Promise((settle) => setTimeout(settle, 0))
+      await host.updateComplete
+    }
     expect(card(host, 'c').current).toBe(true)
   })
 
@@ -844,7 +866,7 @@ describe('canvas api', () => {
     const handle = card(host, 'a').shadowRoot?.querySelector('[part~="handle-right"]') as Element
     handle.dispatchEvent(pointer('pointerdown', 0, 0))
     // Over Third, as in the drawing spec: the document's point plus 52.
-    host.dispatchEvent(pointer('pointermove', 280, 402))
+    host.dispatchEvent(pointer('pointermove', ...onScreen(host, 228, 350)))
     await host.updateComplete
     await host.updateComplete
     expect(hasState(card(host, 'c'), 'target')).toBe(true)
@@ -853,7 +875,7 @@ describe('canvas api', () => {
     expect(hasState(card(host, 'a'), 'candidate')).toBe(false)
     // The preview is the connection it would make, arrowhead and all.
     expect(part(host, 'draft')?.getAttribute('marker-end')).toBe('url(#canvas-arrow)')
-    host.dispatchEvent(pointer('pointerup', 280, 402))
+    host.dispatchEvent(pointer('pointerup', ...onScreen(host, 228, 350)))
     await host.updateComplete
     await host.updateComplete
     expect(hasState(card(host, 'c'), 'target')).toBe(false)
@@ -1120,11 +1142,11 @@ describe('canvas selections, sizes and shapes', () => {
     id += 1
     /* The document's point plus 52, happy-dom measuring nothing. From above
        Third's top left to inside it, touching only Third. */
-    viewport.dispatchEvent(pointer('pointerdown', 150, 330, { shiftKey: true }))
-    host.dispatchEvent(pointer('pointermove', 250, 400, { shiftKey: true }))
+    viewport.dispatchEvent(pointer('pointerdown', ...onScreen(host, 98, 278), { shiftKey: true }))
+    host.dispatchEvent(pointer('pointermove', ...onScreen(host, 198, 348), { shiftKey: true }))
     await host.updateComplete
     expect(part(host, 'marquee')).not.toBeNull()
-    host.dispatchEvent(pointer('pointerup', 250, 400, { shiftKey: true }))
+    host.dispatchEvent(pointer('pointerup', ...onScreen(host, 198, 348), { shiftKey: true }))
     await host.updateComplete
     expect(host.selected).toBe('c')
     expect(part(host, 'marquee')).toBeNull()
@@ -1204,7 +1226,7 @@ describe('canvas selections, sizes and shapes', () => {
     card(host, 'c').setAttribute('shape', 'diamond')
     card(host, 'b').setAttribute('shape', 'circle')
     await host.updateComplete
-    await (card(host, 'c') as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    await (card(host, 'c') as unknown as { updateComplete: Promise<boolean> }).updateComplete
     expect(card(host, 'c').shadowRoot?.querySelector('[part="outline"] polygon')).not.toBeNull()
     expect(card(host, 'b').shadowRoot?.querySelector('[part="outline"]')).toBeNull()
   })

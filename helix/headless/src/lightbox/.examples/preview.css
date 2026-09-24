@@ -120,3 +120,7 @@ helix-headless-lightbox-item [slot="description"] {
   font-size: 0.875rem;
   text-align: center;
 }
+
+helix-headless-lightbox::part(dialog):focus-visible {
+  outline: none;
+}

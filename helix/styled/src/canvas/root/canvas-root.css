@@ -277,17 +277,22 @@
   stroke-linecap: round;
 }
 
-/* **On a box of the board's own ground**, so a label written over its line
-   reads as sitting on it rather than crossing it out: the flood is as wide as
-   the words, spaces and all. */
+/* **Text on a box of the board's own ground**, as wide as the words, so a
+   label written over its line reads as sitting on it rather than crossing it
+   out. Centered on the line's middle, on the plane, under the cards. */
 [part="label"] {
-  fill: var(--helix-color-foreground-subtle);
+  background-color: var(--canvas-background-color, var(--helix-color-surface-sunken));
+  color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
-}
-
-[part="label-ground"] {
-  flood-color: var(--canvas-background-color, var(--helix-color-surface-sunken));
+  left: var(--_canvas-label-x);
+  line-height: 1;
+  padding: var(--helix-space-2xs);
+  pointer-events: none;
+  position: absolute;
+  top: var(--_canvas-label-y);
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
 }
 
 /* **Grab to move it**, which is the gesture a board is reached for with, and
