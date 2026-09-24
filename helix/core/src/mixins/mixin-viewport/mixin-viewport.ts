@@ -414,6 +414,12 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       if (!own || !this.renderRoot.contains(own)) {
         return
       }
+      /* The region itself, not whatever the family drew inside it. A canvas
+         draws its connections there and walks them with the same keys, so a
+         press on one panned the board as well as moving on. */
+      if (target !== own && !own.matches('[part~="controls"]')) {
+        return
+      }
       const along = inlineStep(this, event.key)
       if (along === 1) {
         event.preventDefault()
