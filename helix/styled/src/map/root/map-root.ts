@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMap } from '@fusion.dev/helix-headless/map'
 import type { CSSResultGroup } from 'lit'
+import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './map-root.css.js'
 
 /**
@@ -28,7 +29,9 @@ import { styles } from './map-root.css.js'
  */
 @customElement('helix-map')
 export class HelixMap extends HelixHeadlessMap {
-  static override styles: CSSResultGroup = styles
+  /* The surface's sheet first, this family's after, so a map's own rules win
+     where the two speak about the same box. */
+  static override styles: CSSResultGroup = [viewportStyles, styles]
 }
 
 declare global {

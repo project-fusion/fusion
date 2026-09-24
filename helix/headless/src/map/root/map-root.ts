@@ -1,9 +1,13 @@
 import {
   customElement,
   HelixElement,
+  HelixMapPanEvent,
+  HelixMapZoomEvent,
   hostAria,
   MixinViewport,
   type ViewportControlsPlacement,
+  type ViewportPanDetail,
+  type ViewportZoomDetail,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -93,6 +97,15 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   @property()
   label = ''
+
+  /** The events this family names, the surface naming none of its own. */
+  protected override panEvent(detail: ViewportPanDetail): Event {
+    return new HelixMapPanEvent(detail)
+  }
+
+  protected override zoomEvent(detail: ViewportZoomDetail): Event {
+    return new HelixMapZoomEvent(detail)
+  }
 
   /**
    * What the group of controls is called.

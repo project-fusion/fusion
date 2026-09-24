@@ -1,0 +1,206 @@
+/* The host draws nothing: the region inside it is the board's frame. */
+:host {
+  display: contents;
+
+  /* **The six presets the format names, pointed at tokens.** JSON Canvas writes
+     a color as `1` to `6` and says what each means by convention rather than
+     by value, which is what lets a board drawn in one application be read in
+     another. Pointing them at semantic tokens is what makes a board follow the
+     page into dark mode instead of carrying somebody else's hex into it. */
+  --canvas-color-1: var(--helix-color-danger);
+  --canvas-color-2: var(--helix-color-warning);
+  --canvas-color-3: var(--helix-color-accent);
+  --canvas-color-4: var(--helix-color-success);
+  --canvas-color-5: var(--helix-color-info);
+  --canvas-color-6: var(--helix-color-primary);
+}
+
+[part="region"] {
+  background-color: var(--canvas-background-color, var(--helix-color-surface-sunken));
+  block-size: var(--canvas-block-size, 30rem);
+  border: var(--helix-border-thin) solid var(--canvas-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  overflow: hidden;
+  position: relative;
+}
+
+[part="viewport"] {
+  min-block-size: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* **The plane, and the one thing that moves.** Panning and zooming write three
+   custom properties and this reads them, so a press moves one transform rather
+   than every card: the cards are placed once, in the document's own
+   coordinates, and never re-laid-out. */
+[part="board"] {
+  block-size: var(--_canvas-plane-block-size);
+  inline-size: var(--_canvas-plane-inline-size);
+  inset: 0;
+  position: absolute;
+  transform: translate(var(--_canvas-x), var(--_canvas-y)) scale(var(--_canvas-zoom));
+  transform-origin: 0 0;
+}
+
+/* Under the cards, and the size of the whole plane. */
+[part="edges"] {
+  inset: 0;
+  overflow: visible;
+  position: absolute;
+}
+
+[part="edge"] {
+  stroke: var(--canvas-edge-color, var(--helix-color-border));
+  stroke-width: var(--helix-border-thick);
+}
+
+[part="edge"][data-color="1"] {
+  stroke: var(--canvas-color-1);
+}
+[part="edge"][data-color="2"] {
+  stroke: var(--canvas-color-2);
+}
+[part="edge"][data-color="3"] {
+  stroke: var(--canvas-color-3);
+}
+[part="edge"][data-color="4"] {
+  stroke: var(--canvas-color-4);
+}
+[part="edge"][data-color="5"] {
+  stroke: var(--canvas-color-5);
+}
+[part="edge"][data-color="6"] {
+  stroke: var(--canvas-color-6);
+}
+
+[part="label"] {
+  fill: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+}
+
+/* Placed where the document put it, in the document's own units. */
+[part="card"] {
+  background-color: var(--helix-color-surface);
+  block-size: var(--_canvas-card-block-size);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inline-size: var(--_canvas-card-inline-size);
+  inset-block-start: var(--_canvas-card-y);
+  inset-inline-start: var(--_canvas-card-x);
+  overflow: hidden;
+  padding: var(--helix-space-sm);
+  position: absolute;
+}
+
+/* **A group is a box behind its cards, not a card.** It carries a label and a
+   wash and nothing else: the cards inside it are placed in the same
+   coordinates, so a group that painted itself opaque would cover them. */
+[part="card"][data-type="group"] {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+  border-style: dashed;
+  z-index: 0;
+}
+
+[part="card"]:not([data-type="group"]) {
+  z-index: 1;
+}
+
+[part="card"][data-color="1"] {
+  border-color: var(--canvas-color-1);
+}
+[part="card"][data-color="2"] {
+  border-color: var(--canvas-color-2);
+}
+[part="card"][data-color="3"] {
+  border-color: var(--canvas-color-3);
+}
+[part="card"][data-color="4"] {
+  border-color: var(--canvas-color-4);
+}
+[part="card"][data-color="5"] {
+  border-color: var(--canvas-color-5);
+}
+[part="card"][data-color="6"] {
+  border-color: var(--canvas-color-6);
+}
+
+[part="card"] p {
+  margin: 0;
+}
+
+/* **A group's name sits above its box, not inside it.** Inside, it is behind
+   whatever card the author placed at the top of the group, which is usually
+   one: the cards are placed in the same coordinates and a group is drawn under
+   them. */
+[part="card"][data-type="group"] p {
+  /* `muted` rather than `subtle`: measured at 4.31:1 against the board's own
+     well in light mode, which is under the 4.5 a group's name has to clear like
+     any other text. */
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  inset-block-end: 100%;
+  inset-inline-start: 0;
+  padding-block-end: var(--helix-space-2xs);
+  position: absolute;
+}
+
+/* **The reading list, which is the family's accessibility argument made
+   visible.** It is not hidden, because a list only a screen reader can reach is
+   one a sighted keyboard reader cannot use to get around a board they also
+   cannot drag. */
+[part="index"] {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-2xs);
+  list-style: none;
+  margin: 0;
+  max-block-size: var(--canvas-index-block-size, 6rem);
+  overflow: auto;
+  padding: var(--helix-space-2xs);
+  flex-wrap: wrap;
+}
+
+[part="index-item"] {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  text-align: start;
+}
+
+[part="index-item"]:hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
+[part="index-item"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* What a card's links say, quieter than the card's own name. */
+[part="index-item"] span {
+  color: var(--helix-color-foreground-subtle);
+  display: block;
+}
+
+/* **Printed as it stands, controls aside.** A board is the content of the page
+   it is on, and the buttons are the part that means nothing on paper. */
+@media print {
+  [part="controls"],
+  [part="index"] {
+    display: none;
+  }
+}

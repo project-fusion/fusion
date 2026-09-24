@@ -109,6 +109,8 @@ export {
   HelixBeforeResizeEvent,
   HelixBeforeSplitEvent,
   HelixBeforeToggleEvent,
+  HelixCanvasPanEvent,
+  HelixCanvasZoomEvent,
   HelixCaretEvent,
   HelixCompleteEvent,
   HelixConsoleEvent,
