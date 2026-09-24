@@ -178,23 +178,14 @@ fn package_of(path: &str) -> String {
     path.split('/').take(2).collect::<Vec<&str>>().join("/")
 }
 
-/// The family a hook belongs to, which is the directory the component sits in.
-///
-/// A controller is its own owner, and a package grouping by kind first puts it
-/// one level deeper than a tier does.
-fn owner_of(path: &str) -> String {
-    let parts: Vec<&str> = path.split('/').collect();
-    if parts.first() == Some(&"helix") && parts.get(1) == Some(&"core") {
-        return parts.get(4).map_or(String::new(), |one| {
-            one.trim_end_matches("-controller").to_owned()
-        });
-    }
-    parts.get(3).map_or(String::new(), |one| (*one).to_owned())
-}
-
 /// Everything read out of the source before anything is judged.
 #[derive(Default)]
 struct Survey {
+    /// The tiers, relative to the root, which is where an owner is read from.
+    tiers: Vec<String>,
+    /// The tiers every family draws on and none owns, grouped by kind: this
+    /// repository's `helix/core/src`.
+    foundations: Vec<String>,
     /// Which families compose each shared stylesheet, by `group/name`.
     composes: BTreeMap<String, BTreeMap<String, String>>,
     declared: BTreeMap<String, String>,
@@ -240,9 +231,43 @@ fn is_source(path: &Path) -> bool {
     !name.ends_with(".css.ts") && !name.contains(".spec.")
 }
 
+impl Survey {
+    /// The family a hook belongs to, read from the tier the file is in.
+    ///
+    /// **From the configured tier, not from a segment count.** This read the
+    /// fourth segment of the path, which is the family only where a tier is
+    /// three deep: under `src/components` it named every hook's owner after its
+    /// file, and under `src` it named nobody and the check skipped in silence.
+    /// A family's tier puts the family first. A foundation groups by kind
+    /// first, `controllers/<name>-controller`, so its owner is one down, and a
+    /// controller owns under its own name.
+    fn owner_of(&self, path: &str) -> String {
+        let Some((tier, rest)) = self.tiers.iter().find_map(|tier| {
+            path.strip_prefix(&format!("{tier}/"))
+                .map(|rest| (tier, rest))
+        }) else {
+            return String::new();
+        };
+        let parts: Vec<&str> = rest.split('/').collect();
+        if self.foundations.contains(tier) {
+            let owner = if parts.len() >= 3 { parts[1] } else { parts[0] };
+            return owner.trim_end_matches("-controller").to_owned();
+        }
+        if parts.len() >= 2 {
+            parts[0].to_owned()
+        } else {
+            String::new()
+        }
+    }
+}
+
 /// Everything the source says about hooks, gathered before anything is judged.
 fn survey(context: &Context) -> Survey {
-    let mut survey = Survey::default();
+    let mut survey = Survey {
+        tiers: context.settings.tiers.clone(),
+        foundations: context.settings.foundations(&context.root),
+        ..Survey::default()
+    };
     /* The component source, and the package holding the token layer.
     **That package reads hooks without declaring any**, and that split is how one
     goes missing: the declaration stays in one place while the rule moves to
@@ -283,7 +308,7 @@ fn survey(context: &Context) -> Survey {
                         .declared_at
                         .entry((where_.clone(), name.clone()))
                         .or_default() += 1;
-                    let owner = owner_of(&where_);
+                    let owner = survey.owner_of(&where_);
                     if !owner.is_empty() {
                         survey
                             .declared_by
@@ -401,7 +426,7 @@ fn borrowed(survey: &mut Survey, text: &str, where_: &str, stylesheet: bool) {
     let source = COMMENT.replace_all(text, "");
     let Some(rest) = where_.split_once("/shared/").map(|(_, one)| one) else {
         /* A composer, and a reader of whatever privates a sheet gave it. */
-        let owner = owner_of(where_);
+        let owner = survey.owner_of(where_);
         if owner.is_empty() {
             return;
         }
@@ -679,10 +704,12 @@ fn registered(context: &Context, name: &str) -> bool {
 /// takes, so the manifest already resolves it onto that family's page and a
 /// restatement would be the duplicate the check above refuses.
 fn from_core(survey: &Survey, name: &str) -> bool {
-    survey
-        .declared
-        .get(name)
-        .is_some_and(|path| path.starts_with("helix/core/"))
+    survey.declared.get(name).is_some_and(|path| {
+        survey
+            .foundations
+            .iter()
+            .any(|tier| path.starts_with(&format!("{tier}/")))
+    })
 }
 
 /// A shared sheet's hook that a family reads and does not publish.

@@ -1342,6 +1342,33 @@ fn hooks() {
     );
 }
 
+/// The owner of a hook is read from the tier, wherever the tier is: a layout
+/// one directory shallower than this repository's named every hook's owner
+/// after its file.
+#[test]
+fn hooks_in_a_shallower_tier() {
+    plant_in(
+        "hooks-shallow",
+        "hooks",
+        &[
+            ("helix.json", r#"{ "tiers": ["src/components"] }"#),
+            (
+                "src/components/button/button.ts",
+                "/**\n * @cssproperty --button-background-color - The fill.\n */\nexport class Button extends HTMLElement {}\n",
+            ),
+            (
+                "src/components/button/button.css",
+                ":host {\n  background-color: var(--button-background-color, white);\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write("src/components/button/button.css", ":host {\n  color: red;\n}\n");
+        },
+        "documents `--button-background-color` and no rule reads it",
+        "src/components/button/button.ts",
+    );
+}
+
 /// The analyzer reads the block the element is declared on, so the decorator
 /// under it is where a documented hook stops being collected.
 #[test]
@@ -2484,7 +2511,41 @@ fn slots() {
             tree.write("pkg/custom-elements.json", &manifest("footer"));
         },
         "`Card` documents `@slot footer` and nothing in `card` renders it",
-        "helix/*/src/card",
+        "pkg/src/card",
+    );
+}
+
+/// A slot a shared mixin renders counts for every family, wherever the shared
+/// tier is: this read `helix/core/src` by name, so elsewhere every slot a mixin
+/// rendered was reported as rendered by nothing.
+#[test]
+fn slots_from_a_shared_tier() {
+    let manifest = |slot: &str| {
+        format!(
+            r#"{{ "modules": [ {{ "path": "src/card/card.ts", "declarations": [
+  {{ "name": "Card", "slots": [ {{ "name": "label" }}, {{ "name": "{slot}" }} ] }} ] }} ] }}"#
+        )
+    };
+    plant_in(
+        "slots-shared",
+        "slots",
+        &[
+            ("helix.json", r#"{ "tiers": ["pkg/core", "pkg/src"] }"#),
+            ("pkg/custom-elements.json", &manifest("header")),
+            (
+                "pkg/core/mixins/mixin-field/mixin-field.ts",
+                "export const MixinField = (Base) => class extends Base {\n  renderLabel() {\n    return `<slot name=\"label\"></slot>`;\n  }\n}\n",
+            ),
+            (
+                "pkg/src/card/card.ts",
+                "export class Card extends MixinField(HTMLElement) {\n  render() {\n    return `<slot name=\"header\"></slot>`;\n  }\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write("pkg/custom-elements.json", &manifest("footer"));
+        },
+        "`Card` documents `@slot footer` and nothing in `card` renders it",
+        "pkg/src/card",
     );
 }
 
