@@ -18,6 +18,11 @@
      writes, because no stylesheet can enumerate a hex. */
   --_canvas-card-tone: var(--helix-color-border);
   --_canvas-card-color: var(--canvas-node-color, var(--_canvas-card-tone));
+  /* **The handles are the card's edge, so they take its color**: its tone at
+     rest, and the accent when the edge turns accent, selected or about to
+     take a connection. Accent always, they read as a selection the card did
+     not have. */
+  --_canvas-handle-color: var(--_canvas-card-color);
 
   background-color: var(--canvas-node-background-color, var(--helix-color-surface));
   block-size: var(--_canvas-card-block-size);
@@ -67,6 +72,18 @@
 }
 :host([tone="warning"]) {
   --_canvas-card-tone: var(--helix-color-warning);
+}
+
+/* A card with no tone has a border too faint for something a reader grabs,
+   so its handles take the muted ink instead. */
+:host(:not([tone])),
+:host([tone="neutral"]) {
+  --_canvas-handle-color: var(--canvas-node-color, var(--helix-color-foreground-muted));
+}
+
+:host(:state(selected)),
+:host(:state(target)) {
+  --_canvas-handle-color: var(--helix-color-accent);
 }
 
 /* **Separation says how a card stands off the board**, the axis `Card` takes,
@@ -158,7 +175,7 @@
 [part~="handle"] {
   background-color: var(--helix-color-surface);
   block-size: var(--canvas-handle-size, 0.625rem);
-  border: var(--helix-border-thick) solid var(--helix-color-accent);
+  border: var(--helix-border-thick) solid var(--_canvas-handle-color);
   border-radius: var(--helix-radii-full);
   box-sizing: border-box;
   cursor: crosshair;
@@ -203,7 +220,7 @@
 }
 
 :host(:state(target)) [part~="handle"] {
-  background-color: var(--helix-color-accent);
+  background-color: var(--_canvas-handle-color);
 }
 
 @media (prefers-reduced-motion: reduce) {
