@@ -44,7 +44,7 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
 
   /** What the connector says, drawn at its middle. */
   @property()
-  label?: string
+  label?: string | undefined
 
   /**
    * What a request calls this connection, unique on its board.

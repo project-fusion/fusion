@@ -64,6 +64,7 @@ const DRAWN = ['group', 'height', 'label', 'name', 'readOnly', 'tone', 'width', 
  *
  * @cssstate candidate - While a connection is being drawn and this card is somewhere it could arrive.
  * @cssstate current - While this is the card a reader lands on when they tab into the board.
+ * @cssstate selected - While this is the card the reader selected, until they select something else or nothing.
  * @cssstate target - While a connection being drawn would arrive here if it were let go.
  */
 @customElement('helix-headless-canvas-node')
@@ -159,6 +160,14 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   /**
+   * @internal Whether this is the card the reader selected, written by the
+   * board. Kept apart from focus, so a reader who clicks a button beside the
+   * board to act on the selection has not cleared it by clicking.
+   */
+  @state()
+  selected = false
+
+  /**
    * @internal Whether a connection being drawn would arrive here if it were
    * let go, written by the board.
    */
@@ -181,6 +190,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
     super.willUpdate(changed)
     this.toggleState('candidate', this.candidate)
     this.toggleState('current', this.current)
+    this.toggleState('selected', this.selected)
     this.toggleState('target', this.target)
   }
 
@@ -225,7 +235,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
       part="node"
       aria-describedby=${this.links ? 'links' : nothing}
       aria-label=${this.group ? this.label || nothing : nothing}
-      aria-keyshortcuts=${this.connectable ? 'Shift+ArrowRight Shift+ArrowDown C Delete' : nothing}
+      aria-keyshortcuts=${this.connectable ? 'Enter F2 Shift+ArrowRight Shift+ArrowDown C Delete' : nothing}
       role=${this.group ? 'group' : 'article'}
       tabindex=${this.current ? '0' : '-1'}
     >
