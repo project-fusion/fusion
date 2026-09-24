@@ -10,7 +10,7 @@ type Edge = HTMLElement & { from: string; to: string; updateComplete: Promise<bo
 
 const edge = async (extra = ''): Promise<Edge> =>
   (await mount(
-    `<helix-headless-canvas-edge id="e1" from="a" to="b" ${extra}></helix-headless-canvas-edge>`,
+    `<helix-headless-canvas-edge name="e1" from="a" to="b" ${extra}></helix-headless-canvas-edge>`,
   )) as Edge
 
 describe('canvas edge', () => {
@@ -42,6 +42,6 @@ describe('canvas edge', () => {
 
   test('nothing is written onto the host that the consumer did not write', async () => {
     const host = await edge()
-    expect([...host.attributes].map((one) => one.name).sort()).toEqual(['from', 'id', 'to'])
+    expect([...host.attributes].map((one) => one.name).sort()).toEqual(['from', 'name', 'to'])
   })
 })

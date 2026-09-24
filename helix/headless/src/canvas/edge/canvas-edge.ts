@@ -51,6 +51,16 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   label?: string
 
   /**
+   * What a request calls this connection, unique on its board.
+   *
+   * Optional, unlike a card's: a connection is also known by its two ends,
+   * which `helix-remove` carries beside this, so a page that names none of its
+   * connections can still find the one a reader asked to take away.
+   */
+  @property()
+  name = ''
+
+  /**
    * How it travels: `straight`, or `step` for right angles.
    *
    * Absent is whatever the board says, and a curve where the board says
@@ -64,6 +74,16 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
    */
   @property()
   path?: 'straight' | 'step'
+
+  /**
+   * Keeps this connection: a reader cannot remove it.
+   *
+   * The board's `readonly` still wins. A connection is still removed with a
+   * card at either end of it, since a line to a card that has gone is not one
+   * the board can draw.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /** The card it arrives at. */
   @property()

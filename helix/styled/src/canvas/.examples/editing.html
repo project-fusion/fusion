@@ -5,7 +5,7 @@
 >
   <helix-canvas-node
     height="64"
-    id="post"
+    name="post"
     width="160"
     x="0"
     y="0"
@@ -14,7 +14,7 @@
   <helix-canvas-node
     color="3"
     height="64"
-    id="demo"
+    name="demo"
     width="160"
     x="256"
     y="0"
@@ -23,7 +23,7 @@
   <helix-canvas-node
     color="4"
     height="64"
-    id="ship"
+    name="ship"
     width="160"
     x="128"
     y="160"
@@ -31,7 +31,7 @@
 
   <helix-canvas-edge
     from="post"
-    id="post-ship"
+    name="post-ship"
     to="ship"
   ></helix-canvas-edge>
 </helix-canvas>
@@ -45,7 +45,7 @@
     const { from, fromSide, to } = event.detail
     made += 1
     const edge = document.createElement('helix-canvas-edge')
-    edge.id = `made-${made}`
+    edge.setAttribute('name', `made-${made}`)
     edge.setAttribute('from', from)
     edge.setAttribute('to', to)
     if (fromSide) {
@@ -55,12 +55,13 @@
   })
 
   // The same for removal, which names every connection a removed card would strand.
+  // Names are only unique on their board, so they are looked up inside it.
   launch.addEventListener('helix-remove', (event) => {
-    for (const id of event.detail.nodes) {
-      document.getElementById(id)?.remove()
+    for (const name of event.detail.nodes) {
+      launch.querySelector(`helix-canvas-node[name="${name}"]`)?.remove()
     }
-    for (const { id } of event.detail.edges) {
-      document.getElementById(id)?.remove()
+    for (const { name } of event.detail.edges) {
+      launch.querySelector(`helix-canvas-edge[name="${name}"]`)?.remove()
     }
   })
 </script>

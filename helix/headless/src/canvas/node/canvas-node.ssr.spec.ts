@@ -13,7 +13,7 @@ const served = (extra = {}) =>
   withoutStyles(
     ssr(
       html`<helix-headless-canvas-node
-        id="one"
+        name="one"
         x=${10}
         y=${20}
         width=${150}

@@ -5,7 +5,7 @@ export function Example() {
     <helix-headless-canvas label="How a release happens">
       <helix-headless-canvas-node
         height={64}
-        id="write"
+        name="write"
         width={160}
         x={0}
         y={0}
@@ -15,7 +15,7 @@ export function Example() {
 
       <helix-headless-canvas-node
         height={64}
-        id="review"
+        name="review"
         width={160}
         x={320}
         y={0}
@@ -25,7 +25,7 @@ export function Example() {
 
       <helix-headless-canvas-node
         height={64}
-        id="ship"
+        name="ship"
         width={160}
         x={160}
         y={192}

@@ -28,9 +28,9 @@ import '../index.js'
 const served = () =>
   withoutStyles(
     ssr(html`<helix-headless-canvas label="A board">
-      <helix-headless-canvas-node id="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
-      <helix-headless-canvas-node id="b" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
-      <helix-headless-canvas-edge id="e1" from="a" to="b"></helix-headless-canvas-edge>
+      <helix-headless-canvas-node name="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
+      <helix-headless-canvas-node name="b" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
+      <helix-headless-canvas-edge name="e1" from="a" to="b"></helix-headless-canvas-edge>
     </helix-headless-canvas>`),
   )
 
@@ -75,7 +75,7 @@ describe('canvas server output', () => {
        asserted, the host being its own to answer for. */
     expect(hostAttributes(served(), 'helix-headless-canvas-edge').sort()).toEqual([
       'from',
-      'id',
+      'name',
       'to',
     ])
   })

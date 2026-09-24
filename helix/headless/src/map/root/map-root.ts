@@ -114,7 +114,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * the group hears what it drives rather than "view controls", which names the
    * mechanism.
    */
-  protected override get controlsLabel(): string {
+  protected override get restingControlsLabel(): string {
     return 'Map controls'
   }
 

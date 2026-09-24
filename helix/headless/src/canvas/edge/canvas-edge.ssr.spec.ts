@@ -15,11 +15,13 @@ describe('canvas edge server output', () => {
        cannot draw one on a server where it cannot see them. What ships is which
        cards this joins, for the board to read on hydration. */
     const markup = withoutStyles(
-      ssr(html`<helix-headless-canvas-edge id="e1" from="a" to="b"></helix-headless-canvas-edge>`),
+      ssr(
+        html`<helix-headless-canvas-edge name="e1" from="a" to="b"></helix-headless-canvas-edge>`,
+      ),
     )
     expect(hostAttributes(markup, 'helix-headless-canvas-edge').sort()).toEqual([
       'from',
-      'id',
+      'name',
       'to',
     ])
     expect(hostTag(markup, 'helix-headless-canvas-edge')).toContain('from="a"')

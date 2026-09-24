@@ -1,4 +1,13 @@
 export { HelixHeadlessCanvasEdge } from './edge/canvas-edge.js'
 export { HelixHeadlessCanvasNode } from './node/canvas-node.js'
-export type { CanvasEdge, CanvasEnd, CanvasNode, CanvasSide } from './root/canvas-root.js'
-export { HelixHeadlessCanvas } from './root/canvas-root.js'
+export type {
+  CanvasDocument,
+  CanvasEdge,
+  CanvasEdgeProps,
+  CanvasEnd,
+  CanvasNode,
+  CanvasNodeProps,
+  CanvasPath,
+  CanvasSide,
+} from './root/canvas-root.js'
+export { fromJsonCanvas, HelixHeadlessCanvas } from './root/canvas-root.js'
