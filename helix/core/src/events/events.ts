@@ -202,7 +202,15 @@ export class HelixCanvasZoomEvent extends CustomEvent<ViewportZoomDetail> {
   }
 }
 
-/** Where a move puts each card it carries, in the board's own units. */
+/**
+ * Where a move or a resize puts each card it carries, in the board's own
+ * units.
+ *
+ * **One contract for both**, because what a controlled page does with either
+ * is the same: write the geometry the detail says onto the cards it renders. A
+ * resize says `width` and `height` as well, and moves `x` and `y` too when it
+ * is dragged from a corner other than the bottom right.
+ */
 export interface MoveDetail {
   /**
    * Every card the gesture moves, the one the reader took hold of first.
@@ -212,7 +220,7 @@ export interface MoveDetail {
    * consumer who refuses the move has to write every position it would have
    * written, not only the one the pointer was on.
    */
-  nodes: Array<{ name: string; x: number; y: number }>
+  nodes: Array<{ name: string; x: number; y: number; width?: number; height?: number }>
 }
 
 /**

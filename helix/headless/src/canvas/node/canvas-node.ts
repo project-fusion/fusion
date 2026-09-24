@@ -7,7 +7,18 @@ import { property, state } from 'lit/decorators.js'
  * `current` and `links` are the board's own, and listing them here would have
  * every card the board touched ask it to draw again.
  */
-const DRAWN = ['group', 'height', 'label', 'name', 'readOnly', 'tone', 'width', 'x', 'y'] as const
+const DRAWN = [
+  'group',
+  'height',
+  'label',
+  'name',
+  'readOnly',
+  'shape',
+  'tone',
+  'width',
+  'x',
+  'y',
+] as const
 
 /**
  * @summary One card or group on a canvas.
@@ -55,12 +66,18 @@ const DRAWN = ['group', 'height', 'label', 'name', 'readOnly', 'tone', 'width', 
  * @slot - What the card holds, which is anything: text, a picture, a chart.
  * @slot description - A quieter line under it.
  *
+ * @csspart grip - A corner a selected card is resized from, on every one of the four.
+ * @csspart grip-bottom-left - The bottom left corner.
+ * @csspart grip-bottom-right - The bottom right corner.
+ * @csspart grip-top-left - The top left corner.
+ * @csspart grip-top-right - The top right corner.
  * @csspart handle - A point on a side a connection is drawn from, on every one of the four.
  * @csspart handle-bottom - The point on the bottom side.
  * @csspart handle-left - The point on the left side.
  * @csspart handle-right - The point on the right side.
  * @csspart handle-top - The point on the top side.
  * @csspart node - The box the content sits in.
+ * @csspart outline - The drawn outline of a card whose shape a box cannot draw, a diamond.
  *
  * @cssstate candidate - While a connection is being drawn and this card is somewhere it could arrive.
  * @cssstate current - While this is the card a reader lands on when they tab into the board.
@@ -145,6 +162,35 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   readOnly = false
 
   /**
+   * The card's outline: `circle`, `diamond`, `pill` or `square`, and a rounded
+   * box where it says none.
+   *
+   * **A flowchart's vocabulary, and the reason it is on this tier**: a diamond
+   * is drawn as an outline the card renders, because a border follows a box
+   * and a diamond is not one, so the markup differs before any rule is
+   * written. Every shape here meets the middle of each side of its box, which
+   * is where a connection arrives, so a connection to a diamond lands on its
+   * point and one to a circle on its curve without the board knowing which.
+   */
+  @property({ reflect: true })
+  shape?: 'circle' | 'diamond' | 'pill' | 'square'
+
+  /**
+   * @internal Whether this is the card the reader selected, written by the
+   * board. Kept apart from focus, so a reader who clicks a button beside the
+   * board to act on the selection has not cleared it by clicking.
+   */
+  @state()
+  selected = false
+
+  /**
+   * @internal Whether the board lets a reader resize this card now, written by
+   * the board: the card is the one selected, and nothing holds it.
+   */
+  @state()
+  resizable = false
+
+  /**
    * What the card means, in the words every Helix component uses for it.
    *
    * **`tone` rather than the format's `color`**, which was a second word for
@@ -158,14 +204,6 @@ export class HelixHeadlessCanvasNode extends HelixElement {
    */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
-
-  /**
-   * @internal Whether this is the card the reader selected, written by the
-   * board. Kept apart from focus, so a reader who clicks a button beside the
-   * board to act on the selection has not cleared it by clicking.
-   */
-  @state()
-  selected = false
 
   /**
    * @internal Whether a connection being drawn would arrive here if it were
@@ -231,11 +269,17 @@ export class HelixHeadlessCanvasNode extends HelixElement {
    * arrows already draw them.
    */
   protected override render(): TemplateResult {
-    return html`<div
+    return html`${
+      this.shape === 'diamond' && !this.group
+        ? html`<svg part="outline" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 100 100">
+            <polygon points="50,0 100,50 50,100 0,50" vector-effect="non-scaling-stroke" />
+          </svg>`
+        : nothing
+    }<div
       part="node"
       aria-describedby=${this.links ? 'links' : nothing}
       aria-label=${this.group ? this.label || nothing : nothing}
-      aria-keyshortcuts=${this.connectable ? 'Enter F2 Shift+ArrowRight Shift+ArrowDown C Delete' : nothing}
+      aria-keyshortcuts=${this.connectable ? 'Enter F2 Space Shift+ArrowRight Shift+ArrowDown Alt+ArrowRight Alt+ArrowDown C Delete' : nothing}
       role=${this.group ? 'group' : 'article'}
       tabindex=${this.current ? '0' : '-1'}
     >
@@ -254,6 +298,15 @@ export class HelixHeadlessCanvasNode extends HelixElement {
             <span part="handle handle-right" aria-hidden="true" data-side="right"></span>
             <span part="handle handle-bottom" aria-hidden="true" data-side="bottom"></span>
             <span part="handle handle-left" aria-hidden="true" data-side="left"></span>`
+        : nothing
+    }
+    ${
+      /* The corners, for a selected card, written out for the same reason. */
+      this.resizable
+        ? html`<span part="grip grip-top-left" aria-hidden="true" data-corner="top-left"></span>
+            <span part="grip grip-top-right" aria-hidden="true" data-corner="top-right"></span>
+            <span part="grip grip-bottom-right" aria-hidden="true" data-corner="bottom-right"></span>
+            <span part="grip grip-bottom-left" aria-hidden="true" data-corner="bottom-left"></span>`
         : nothing
     }`
   }

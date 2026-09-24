@@ -258,3 +258,126 @@
 :host(:not([style*="--_canvas-card-x"])) {
   position: static;
 }
+
+/* **The corners a selected card is resized from**, small squares where the
+   handles are circles, so a reader can tell the two apart before touching
+   either: a circle draws a line, a square pulls a corner. */
+[part~="grip"] {
+  background-color: var(--helix-color-surface);
+  block-size: var(--canvas-grip-size, 0.5rem);
+  border: var(--helix-border-thin) solid var(--helix-color-accent);
+  box-sizing: border-box;
+  inline-size: var(--canvas-grip-size, 0.5rem);
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+/* A reach larger than the square, for the reason the handles have one. */
+[part~="grip"]::after {
+  content: "";
+  inset: calc(var(--helix-space-2xs) * -1);
+  position: absolute;
+}
+
+/* Physical, as the handles are: a corner is where it is on every page. */
+[part~="grip-top-left"] {
+  cursor: nwse-resize;
+  left: 0;
+  top: 0;
+}
+[part~="grip-top-right"] {
+  cursor: nesw-resize;
+  left: 100%;
+  top: 0;
+}
+[part~="grip-bottom-right"] {
+  cursor: nwse-resize;
+  left: 100%;
+  top: 100%;
+}
+[part~="grip-bottom-left"] {
+  cursor: nesw-resize;
+  left: 0;
+  top: 100%;
+}
+
+/* **Shapes a box can draw are a radius**: square has none, pill is round at
+   the ends, and a circle is the box's own ellipse. Each meets the middle of
+   every side, which is where connections arrive. */
+:host([shape="square"]:not([group])) {
+  border-radius: 0;
+}
+
+:host([shape="pill"]:not([group])) {
+  border-radius: var(--helix-radii-full);
+}
+
+:host([shape="circle"]:not([group])) {
+  border-radius: 50%;
+}
+
+/* Rounder shapes lose their corners to the curve, so the words keep clear of
+   where the curve cuts in. */
+:host([shape="pill"]:not([group])) [part="node"],
+:host([shape="circle"]:not([group])) [part="node"] {
+  align-items: center;
+  padding-inline: 15%;
+  text-align: center;
+}
+
+/* **A diamond is drawn, not bordered.** A border follows a box, so the box
+   gives up its ground and its edge and the outline the card renders draws
+   both, over the border box so its points are the middles of the sides. */
+:host([shape="diamond"]:not([group])) {
+  background-color: transparent;
+  border-color: transparent;
+  --canvas-node-shadow: none;
+}
+
+[part="outline"] {
+  block-size: calc(100% + var(--helix-border-thin) * 2);
+  inline-size: calc(100% + var(--helix-border-thin) * 2);
+  left: calc(var(--helix-border-thin) * -1);
+  overflow: visible;
+  pointer-events: none;
+  position: absolute;
+  top: calc(var(--helix-border-thin) * -1);
+}
+
+[part="outline"] polygon {
+  fill: var(--canvas-node-background-color, var(--helix-color-surface));
+  stroke: var(--_canvas-card-color);
+  stroke-width: var(--helix-border-thin);
+}
+
+:host([shape="diamond"][separation="filled"]) [part="outline"] polygon {
+  fill: color-mix(in oklab, var(--_canvas-card-color) 16%, var(--helix-color-surface));
+  stroke: transparent;
+}
+
+:host([shape="diamond"][separation="plain"]) [part="outline"] polygon {
+  fill: transparent;
+  stroke: transparent;
+}
+
+/* Selected or about to take a connection, the outline says so rather than a
+   box around it, which would draw the square the diamond is not. */
+:host([shape="diamond"]:state(selected)),
+:host([shape="diamond"]:state(target)) {
+  box-shadow: none;
+  outline: none;
+}
+
+:host([shape="diamond"]:state(selected)) [part="outline"] polygon,
+:host([shape="diamond"]:state(target)) [part="outline"] polygon {
+  stroke: var(--helix-color-accent);
+  stroke-width: var(--helix-border-thick);
+}
+
+/* Above the outline, and inside the middle half, where a diamond has room. */
+:host([shape="diamond"]:not([group])) [part="node"] {
+  align-items: center;
+  padding-inline: 22%;
+  position: relative;
+  text-align: center;
+}
