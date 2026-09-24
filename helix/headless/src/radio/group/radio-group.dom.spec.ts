@@ -282,3 +282,12 @@ describe('radio group after a reset', () => {
     expect(host.internals.ariaInvalid).toBeNull()
   })
 })
+
+describe("radio group in the page's words", () => {
+  test("a required group says what the page wrote, in the browser's bubble too", async () => {
+    const host = (await group('required value-missing-message="Choisissez-en un."')) as unknown as {
+      internals: ElementInternals
+    }
+    expect(host.internals.validationMessage).toBe('Choisissez-en un.')
+  })
+})

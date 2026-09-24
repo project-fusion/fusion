@@ -318,6 +318,16 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   valueLabel = 'Color'
 
   /**
+   * What a reader is told when a color is required and none is chosen.
+   *
+   * **Every sentence a control raises in the browser's bubble is a property**,
+   * named for the validity flag it reports, so a form in another language
+   * speaks it. Absent is the control's own sentence, in English.
+   */
+  @property({ attribute: 'value-missing-message' })
+  valueMissingMessage?: string
+
+  /**
    * The color the reader has moved to, or nothing while they have moved none.
    *
    * Held rather than re-read, which is the whole point: see the class
@@ -581,7 +591,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     if (this.required && this.value === '') {
       this.internals.setValidity(
         { valueMissing: true },
-        'Choose a color.',
+        this.valueMissingMessage ?? 'Choose a color.',
         this.partNamed('grid') ?? undefined,
       )
       return

@@ -1,4 +1,5 @@
 import type { PropertyValues } from 'lit'
+import { property } from 'lit/decorators.js'
 import { PopoverController } from '../../controllers/popover-controller/popover-controller.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
@@ -25,6 +26,9 @@ type PickerBase = HelixFormElement &
  * to this interface keeps the internals private and the build working.
  */
 export declare class MixinPickerFieldInterface {
+  /** What a reader is told when the field holds something the picker cannot read. */
+  badInputMessage: string | undefined
+
   /**
    * What the label points at and focus lands on.
    *
@@ -147,6 +151,18 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
   // analyzer reads when resolving inherited members into dependent packages.
   class PickerFieldElement extends Base {
     /**
+     * What a reader is told when the field holds something the picker cannot
+     * read: a date that is not one, a time, a color.
+     *
+     * **Every sentence a control raises in the browser's bubble is a
+     * property**, named for the validity flag it reports, so a form in another
+     * language speaks it. Absent is the family's own sentence, in English,
+     * which says what the value should look like.
+     */
+    @property({ attribute: 'bad-input-message' })
+    badInputMessage?: string
+
+    /**
      * The overlay, placed against the field rather than the trigger.
      *
      * Against the field because that is the box a reader sees as the control: a
@@ -253,7 +269,7 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
       }
       const message = this.validate()
       if (message === '') {
-        this.internals.setValidity(control.validity, control.validationMessage, control)
+        this.copyValidity(control)
       } else {
         this.internals.setValidity({ badInput: true }, message, control)
       }

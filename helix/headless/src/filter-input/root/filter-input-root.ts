@@ -800,7 +800,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
        `required` on it alone let an empty filter submit. */
     const control = this.control
     if (control) {
-      this.internals.setValidity(control.validity, control.validationMessage, control)
+      this.copyValidity(control)
       this.refreshFeedback()
     }
     this.markActive()

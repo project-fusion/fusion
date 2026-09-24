@@ -126,6 +126,13 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   readOnly = false
 
   /**
+   * What a reader is told when the code is started and not finished, with
+   * `{length}` filled in. Absent is the control's own sentence, in English.
+   */
+  @property({ attribute: 'too-short-message' })
+  tooShortMessage?: string
+
+  /**
    * What a box accepts, which decides the keyboard a phone offers.
    *
    * `numeric` and `alphanumeric` also refuse anything else on the way in,
@@ -475,11 +482,17 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
       return
     }
     if (this.required && this.value === '') {
-      this.internals.setValidity({ valueMissing: true }, 'Please fill in this field.', first)
+      this.internals.setValidity(
+        { valueMissing: true },
+        this.valueMissingMessage ?? 'Please fill in this field.',
+        first,
+      )
     } else if (this.value !== '' && this.value.length < this.count) {
       this.internals.setValidity(
         { tooShort: true },
-        `Please enter all ${this.count} characters.`,
+        fillTemplate(this.tooShortMessage ?? 'Please enter all {length} characters.', {
+          length: this.count,
+        }),
         first,
       )
     } else {

@@ -325,7 +325,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     }
     // The platform's verdict, copied rather than recomputed, with the control as
     // the anchor so a validity bubble points at the text and not at the host.
-    this.internals.setValidity(control.validity, control.validationMessage, control)
+    this.copyValidity(control)
     this.refreshFeedback()
   }
 

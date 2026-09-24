@@ -287,18 +287,18 @@ export class HelixHeadlessColorInput extends MixinPickerField(
     if (this.value !== '' && parseColor(this.value) === null) {
       this.internals.setValidity(
         { badInput: true },
-        'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
+        this.badInputMessage ?? 'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
         anchor,
       )
     } else if (control) {
-      this.internals.setValidity(control.validity, control.validationMessage, control)
+      this.copyValidity(control)
     } else {
       /* A swatch has no native validity of its own, so `required` is the only
          thing left to check and this element has to check it: an empty value on
          a required field is the one state a block of color can be wrong in. */
       this.internals.setValidity(
         this.required && this.value === '' ? { valueMissing: true } : {},
-        this.required && this.value === '' ? 'Choose a color.' : '',
+        this.required && this.value === '' ? (this.valueMissingMessage ?? 'Choose a color.') : '',
         anchor,
       )
     }
