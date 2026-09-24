@@ -50,6 +50,21 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   @property()
   label?: string
 
+  /**
+   * How it travels: `straight`, or `step` for right angles.
+   *
+   * Absent is whatever the board says, and a curve where the board says
+   * nothing. Not part of JSON Canvas, which draws every edge one way; a
+   * document read from one keeps its curves.
+   *
+   * **`path` rather than `shape`**, which is a word this library already
+   * spends on how an element looks in the styled tier: this changes the line
+   * the connector is drawn along, which the board computes. Nor `route`, which
+   * every element here already has, as the method that sends a child to a slot.
+   */
+  @property()
+  path?: 'straight' | 'step'
+
   /** The card it arrives at. */
   @property()
   to = ''

@@ -2,6 +2,7 @@ export function Example() {
   return (
     <helix-canvas
       label="How a request reaches the database"
+      path="step"
       readonly
     >
       <helix-canvas-node

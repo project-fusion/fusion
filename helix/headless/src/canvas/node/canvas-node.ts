@@ -43,6 +43,11 @@ const DRAWN = ['color', 'height', 'label', 'type', 'url', 'width', 'x', 'y'] as 
  * @slot - What the card holds, which is anything: text, a picture, a chart.
  * @slot description - A quieter line under it.
  *
+ * @csspart handle - A point on a side a connection is drawn from, on every one of the four.
+ * @csspart handle-bottom - The point on the bottom side.
+ * @csspart handle-left - The point on the left side.
+ * @csspart handle-right - The point on the right side.
+ * @csspart handle-top - The point on the top side.
  * @csspart node - The box the content sits in.
  *
  * @cssstate current - While this is the card a reader lands on when they tab into the board.
@@ -58,6 +63,15 @@ export class HelixHeadlessCanvasNode extends HelixElement {
    */
   @property({ reflect: true })
   color?: string
+
+  /**
+   * Whether the board lets a reader draw a connection from this card.
+   *
+   * Written by the board, which knows whether it is read-only: a handle a card
+   * drew for itself would promise a gesture the board was about to refuse.
+   */
+  @property({ attribute: false })
+  connectable = false
 
   /**
    * Whether this card holds the board's one tab stop.
@@ -169,6 +183,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
       part="node"
       aria-describedby=${this.links ? 'links' : nothing}
       aria-label=${this.type === 'group' ? this.label || nothing : nothing}
+      aria-keyshortcuts=${this.connectable ? 'Shift+ArrowRight Shift+ArrowDown C Delete' : nothing}
       role=${this.type === 'group' ? 'group' : 'article'}
       tabindex=${this.current ? '0' : '-1'}
     >
@@ -176,7 +191,20 @@ export class HelixHeadlessCanvasNode extends HelixElement {
       <slot name="description"></slot>
       ${this.type === 'link' && this.url ? html`<a href=${this.url}>${this.url}</a>` : nothing}
       <span id="links" hidden>${this.links}</span>
-    </div>`
+    </div>
+    ${
+      /* **Written out, four times, because a part name behind an interpolation
+         is one the manifest cannot see.** Hidden from assistive technology: a
+         pointer draws from a handle and a keyboard presses C on the card, so
+         the handle is the pointer's half of one action rather than a control
+         of its own. */
+      this.connectable
+        ? html`<span part="handle handle-top" aria-hidden="true" data-side="top"></span>
+            <span part="handle handle-right" aria-hidden="true" data-side="right"></span>
+            <span part="handle handle-bottom" aria-hidden="true" data-side="bottom"></span>
+            <span part="handle handle-left" aria-hidden="true" data-side="left"></span>`
+        : nothing
+    }`
   }
 }
 

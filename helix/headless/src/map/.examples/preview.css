@@ -1,0 +1,114 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_radius-control: 0.25rem;
+  --_radius-surface: 0.5rem;
+  --_radius-panel: 0.75rem;
+}
+
+/* The frame. The board writes where it sits onto the viewport as three custom
+
+/* The frame, with each region in a row of its own so the map takes what is
+   left whichever strips a consumer fills. */
+helix-headless-map::part(region) {
+  background-color: var(--_gray-subtle);
+  block-size: 20rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-surface);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  overflow: hidden;
+  position: relative;
+}
+
+helix-headless-map::part(viewport) {
+  min-block-size: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+helix-headless-map::part(attribution) {
+  border-block-start: 1px solid var(--_gray-edge);
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+helix-headless-map::part(attribution):empty {
+  display: none;
+}
+
+/* The pad in three columns and the zoom and fullscreen in a fourth. */
+helix-headless-map::part(controls) {
+  display: grid;
+  gap: 0.25rem;
+  grid-template-areas:
+    ".      up    .      zoomin"
+    "start  .     end    zoomout"
+    ".      down  .      full";
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  position: absolute;
+}
+
+helix-headless-map::part(pan-up) {
+  grid-area: up;
+}
+
+helix-headless-map::part(pan-start) {
+  grid-area: start;
+}
+
+helix-headless-map::part(pan-end) {
+  grid-area: end;
+}
+
+helix-headless-map::part(pan-down) {
+  grid-area: down;
+}
+
+helix-headless-map::part(zoom-in) {
+  grid-area: zoomin;
+}
+
+helix-headless-map::part(zoom-out) {
+  grid-area: zoomout;
+}
+
+helix-headless-map::part(fullscreen) {
+  grid-area: full;
+}
+
+helix-headless-map::part(pan-up),
+helix-headless-map::part(pan-start),
+helix-headless-map::part(pan-end),
+helix-headless-map::part(pan-down),
+helix-headless-map::part(zoom-in),
+helix-headless-map::part(zoom-out),
+helix-headless-map::part(fullscreen) {
+  background-color: var(--_gray-surface);
+  block-size: 2rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  color: var(--_gray-strong);
+  cursor: pointer;
+  inline-size: 2rem;
+}
+
+/* What stands in for somebody else's map in a preview. */
+.stand-in {
+  align-items: center;
+  block-size: 100%;
+  color: var(--_gray-muted);
+  display: flex;
+  justify-content: center;
+}
