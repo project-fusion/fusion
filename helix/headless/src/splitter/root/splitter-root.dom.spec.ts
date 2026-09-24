@@ -1082,3 +1082,22 @@ describe('a splitter a consumer has subclassed', () => {
     expect(corner(within)).toBeNull()
   })
 })
+
+describe('a divider beside a shut pane', () => {
+  test('reports a value inside its own range, and says the pane is shut', async () => {
+    /* A shut pane is off the scale the divider reports, `min` to `max`, and
+       the divider said 0 against a minimum of 20, which reads as broken. */
+    const host = await splitter('default-collapsed="start" min="20" collapsed-label="Replié"')
+    const divider = separator(host)
+    const now = Number(divider.getAttribute('aria-valuenow'))
+    expect(now).toBeGreaterThanOrEqual(Number(divider.getAttribute('aria-valuemin')))
+    expect(now).toBeLessThanOrEqual(Number(divider.getAttribute('aria-valuemax')))
+    expect(divider.getAttribute('aria-valuetext')).toBe('Replié')
+  })
+
+  test('and an open one reports its own bounds and no words', async () => {
+    const host = await splitter('min="20"')
+    expect(separator(host).getAttribute('aria-valuemin')).toBe('20')
+    expect(separator(host).hasAttribute('aria-valuetext')).toBe(false)
+  })
+})

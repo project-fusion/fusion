@@ -5,6 +5,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
 
 const TRIGGER_ID = 'trigger'
 const ITEMS_ID = 'items'
+const LABEL_ID = 'label'
 
 /**
  * @summary A named set of notifications, which can be collapsed to the first of
@@ -148,13 +149,13 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    /* A group of rows in a feed, named. `group` rather than `region`, which is a
-       landmark: a feed cut into five days would put five landmarks on the page,
-       and a landmark per day is a page whose landmark list is a calendar. */
-    hostAria(
-      this.internals,
-      this.label === '' ? { role: 'group' } : { label: this.label, role: 'group' },
-    )
+    /* **An item of the feed, holding a list of its own.** The feed is a
+       `list`, and the group was a `group` inside it, so the notifications in it
+       were list items with no list above them and every count and position a
+       reader heard was wrong. The name is the nested list's, from the label in
+       its own tree. Not `region`, which is a landmark: a feed cut into five
+       days would put five landmarks on the page. */
+    hostAria(this.internals, { role: 'listitem' })
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -238,15 +239,15 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
                 type="button"
                 @click=${this.handleToggle}
               >
-                <span part="label"><slot name="label">${this.label}</slot></span>
+                <span part="label" id=${LABEL_ID}><slot name="label">${this.label}</slot></span>
                 ${count}
               </button>`
-            : html`<span part="label"><slot name="label">${this.label}</slot></span>
+            : html`<span part="label" id=${LABEL_ID}><slot name="label">${this.label}</slot></span>
                 ${count}`
         }
         <span part="actions"><slot name="actions"></slot></span>
       </div>
-      <div id=${ITEMS_ID} part="items">
+      <div id=${ITEMS_ID} part="items" role="list" aria-labelledby=${LABEL_ID}>
         <slot></slot>
       </div>`
   }

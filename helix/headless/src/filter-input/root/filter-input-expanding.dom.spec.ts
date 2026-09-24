@@ -42,7 +42,8 @@ describe('the count as a control', () => {
     expect(rest?.tagName).toBe('BUTTON')
     // A real button, so Enter and Space work with no key handler.
     expect(rest?.getAttribute('type')).toBe('button')
-    expect(rest?.getAttribute('aria-expanded')).toBe('false')
+    expect(rest?.getAttribute('aria-label')).toBe('Show all')
+    expect(rest?.hasAttribute('aria-expanded')).toBe(false)
     // `+2` names a number rather than what pressing it does.
     expect(rest?.getAttribute('aria-label')).toBe('Show all')
   })
@@ -66,7 +67,7 @@ describe('the count as a control', () => {
 
     const rest = part(filter, 'rest')
     expect(rest).not.toBeNull()
-    expect(rest?.getAttribute('aria-expanded')).toBe('true')
+    expect(rest?.getAttribute('aria-label')).toBe('Show fewer')
     /* The name rather than the words on it: expanded the control draws a caret,
        which needs no translating and does not change width as it is pressed. */
     expect(rest?.getAttribute('aria-label')).toBe('Show fewer')
@@ -114,6 +115,6 @@ describe('the count as a control', () => {
     const filter = await mount(FIVE('expandable expanded max-tags="3"'))
 
     expect(showing(filter)).toBe(3)
-    expect(part(filter, 'rest')?.getAttribute('aria-expanded')).toBe('false')
+    expect(part(filter, 'rest')?.getAttribute('aria-label')).toBe('Show all')
   })
 })

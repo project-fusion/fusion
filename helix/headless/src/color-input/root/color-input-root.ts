@@ -402,7 +402,14 @@ export class HelixHeadlessColorInput extends MixinPickerField(
           aria-controls="surface"
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-haspopup="dialog"
-          aria-label=${this.triggerLabel}
+          aria-label=${this.variant === 'swatch' ? nothing : this.triggerLabel}
+          aria-labelledby=${
+            this.variant === 'swatch'
+              ? this.labeled
+                ? `${this.labelId} swatch-value`
+                : 'swatch-value'
+              : nothing
+          }
           ?disabled=${this.isDisabled}
           @click=${() => this.toggleOpen()}
         >
@@ -411,10 +418,33 @@ export class HelixHeadlessColorInput extends MixinPickerField(
             style="--color-input-swatch: ${this.value === '' ? 'transparent' : this.painted}"
           ></span>
           <slot name="trigger"></slot>
+          ${
+            /* **The swatch is the field, so it is named as one.** The field's
+               label points here, and the trigger's own words overrode it, so
+               "Brand color" was read as "Choose a color" and the color itself
+               was never said. The label, then the value, or the trigger's words
+               where there is no value yet. */
+            this.variant === 'swatch'
+              ? html`<span id="swatch-value" hidden>${this.value || this.triggerLabel}</span>`
+              : nothing
+          }
         </button>
       </div>
 
-      <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
+      ${
+        /* A dialog, which is what the trigger's `aria-haspopup` promised: the
+           surface had no role, so the promise named something that was not
+           there. Named by the trigger's words, which say what it is for. */
+        ''
+      }
+      <div
+        part="surface"
+        id="surface"
+        role="dialog"
+        aria-label=${this.triggerLabel}
+        popover="manual"
+        ?hidden=${!this.open}
+      >
         ${this.renderPicker()}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`

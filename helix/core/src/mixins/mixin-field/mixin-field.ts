@@ -26,11 +26,11 @@ export declare class MixinFieldInterface {
    */
   protected controlId: string
 
-  /** The id a group's label carries, for a set inside the template to be named by. */
-  protected groupLabelId: string
+  /** The id the label carries, for an element in the template to be named by. */
+  protected labelId: string
 
-  /** Whether `renderGroupLabel` draws a label at all. */
-  protected get groupLabelled(): boolean
+  /** Whether a label is drawn at all, in either shape. */
+  protected get labeled(): boolean
 
   /**
    * Help under the control, shown while there is nothing wrong.
@@ -211,20 +211,20 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     protected controlId = 'control'
 
     /**
-     * The id a group's label carries, for a set inside the template to be
-     * named by.
+     * The id the label carries, for an element in the template to be named by.
      *
-     * **A set drawn inside the template is not the host**, which is what
-     * `hostAria` names: a rating's radiogroup and a pin input's row of cells
-     * are elements of their own, and they had no name but a `label` string,
-     * or none at all. In the same tree as the label, so a plain
-     * `aria-labelledby` resolves, and it names them by whatever the label
-     * holds, a slotted one included.
+     * **What a template draws is not the host**, which is what `hostAria`
+     * names: a rating's radiogroup, a pin input's row of cells, a listbox's
+     * list and a range slider's two thumbs are elements of their own, and they
+     * had no name but a `label` string, or none at all. In the same tree as
+     * the label, so a plain `aria-labelledby` resolves, and it names them by
+     * whatever the label holds, a slotted one included. One id for both shapes,
+     * since a family draws one or the other.
      */
-    protected groupLabelId = 'group-label'
+    protected labelId = 'label'
 
-    /** Whether `renderGroupLabel` draws a label at all. */
-    protected get groupLabelled(): boolean {
+    /** Whether a label is drawn at all, in either shape. */
+    protected get labeled(): boolean {
       return this.label !== '' || Boolean(this.getAttribute('aria-label'))
     }
 
@@ -371,7 +371,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       if (this.label === '' && !hidden) {
         return nothing
       }
-      return html`<span part="label" id=${this.groupLabelId} ?data-hidden=${hidden !== null}
+      return html`<span part="label" id=${this.labelId} ?data-hidden=${hidden !== null}
         ><slot name="label">${this.label || hidden}</slot></span
       >`
     }
@@ -406,7 +406,11 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       if (this.label === '' && !hidden) {
         return nothing
       }
-      return html`<label part="label" for=${this.controlId} ?data-hidden=${hidden !== null}
+      return html`<label
+        part="label"
+        for=${this.controlId}
+        id=${this.labelId}
+        ?data-hidden=${hidden !== null}
         ><slot name="label">${this.label || hidden}</slot></label
       >`
     }

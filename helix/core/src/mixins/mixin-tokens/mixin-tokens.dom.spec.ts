@@ -88,7 +88,8 @@ describe('a row whose count opens', () => {
     expect(rest(host)?.tagName).toBe('BUTTON')
     expect(rest(host)?.textContent?.trim()).toBe('+2')
     expect(rest(host)?.getAttribute('aria-label')).toBe('See them all')
-    expect(rest(host)?.getAttribute('aria-expanded')).toBe('false')
+    // The name says what pressing it does, so no state is said beside it.
+    expect(rest(host)?.hasAttribute('aria-expanded')).toBe(false)
   })
 
   test('pressing it shows the rest and the name becomes `collapseLabel`', async () => {
@@ -105,7 +106,6 @@ describe('a row whose count opens', () => {
     await host.updateComplete
 
     expect(rest(host)?.getAttribute('aria-label')).toBe('Fold them back')
-    expect(rest(host)?.getAttribute('aria-expanded')).toBe('true')
     expect(rest(host)?.textContent?.trim()).not.toContain('+')
   })
 

@@ -31,9 +31,18 @@ const group = async (attributes = '', rows = ROWS): Promise<Group> =>
  * rows rather than hiding them.
  */
 describe('what a group is called and how many it stands for', () => {
-  test('it is a group and takes its name, not a landmark per day', async () => {
+  test('it is an item of the feed holding a named list, not a landmark per day', async () => {
+    /* The feed is a list, so a group inside it has to be one of its items, and
+       its notifications a list of their own: as a `group` they were list items
+       with no list above them, and a reader's counts and positions were wrong. */
     const el = await group()
-    expect(role(el)).toBe('group')
+    expect(role(el)).toBe('listitem')
+    const items = part(el, 'items') as HTMLElement
+    expect(items.getAttribute('role')).toBe('list')
+    const scope = items.getRootNode() as ShadowRoot
+    expect(
+      scope.getElementById(items.getAttribute('aria-labelledby') ?? '')?.textContent?.trim(),
+    ).not.toBe('')
   })
 
   test('with no count, it stands for the rows it holds', async () => {

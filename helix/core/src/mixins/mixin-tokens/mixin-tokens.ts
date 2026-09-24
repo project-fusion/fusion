@@ -215,11 +215,15 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
          `collapseLabel` did not go: it is the accessible name now, so what a
          screen reader hears is still a phrase and still the consumer's to
          translate. Both states carry a name for the same reason: `+3` says a
-         number and not what pressing it does. */
+         number and not what pressing it does.
+
+         **No `aria-expanded` beside a name that changes.** The name already
+         says what pressing it does, the way the play control does, and a state
+         on top of it was the same fact said twice and heard as "Show fewer,
+         expanded". */
       return html`<button
         part="rest"
         type="button"
-        aria-expanded=${this.expanded ? 'true' : 'false'}
         aria-label=${this.expanded ? this.collapseLabel : this.expandLabel}
         @click=${this.toggleExpanded}
         >${this.expanded ? drawIcon(caretUp) : `+${over}`}</button

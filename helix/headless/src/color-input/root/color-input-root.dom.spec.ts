@@ -209,3 +209,29 @@ describe('input color', () => {
     expect(scope.getElementById(described as string)?.textContent).toContain('Any syntax')
   })
 })
+
+describe('the swatch as the field', () => {
+  test("is named by the field's label and says the color it holds", async () => {
+    /* The field's label points at the swatch, and the trigger's own words
+       overrode it, so "Brand color" was read as "Choose a color" and the color
+       itself was never said. */
+    const host = await field('variant="swatch" default-value="#ff0000"')
+    const trigger = part(host, 'trigger') as HTMLElement
+    const scope = trigger.getRootNode() as ShadowRoot
+    const name = (trigger.getAttribute('aria-labelledby') ?? '')
+      .split(/\s+/)
+      .map((id) => scope.getElementById(id)?.textContent?.trim())
+      .join(' ')
+    expect(name).toBe('Brand #ff0000')
+    expect(trigger.hasAttribute('aria-label')).toBe(false)
+  })
+
+  test('and opens what it says it opens: a dialog, named for what it is for', async () => {
+    const host = await field('variant="swatch"')
+    const trigger = part(host, 'trigger') as HTMLElement
+    expect(trigger.getAttribute('aria-haspopup')).toBe('dialog')
+    const surface = part(host, 'surface') as HTMLElement
+    expect(surface.getAttribute('role')).toBe('dialog')
+    expect(surface.getAttribute('aria-label')).not.toBe('')
+  })
+})

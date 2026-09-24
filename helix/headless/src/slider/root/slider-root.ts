@@ -110,10 +110,26 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   max = 100
 
   /**
+   * What the upper thumb of a range is called, after the slider's own label.
+   *
+   * **Named with the label rather than instead of it.** Each thumb was
+   * `aria-label="${label} maximum"`, which overrode the `<label>` and read the
+   * `label` string only, so a slider named by a slotted label or `aria-label`
+   * had thumbs called "minimum" and "maximum" and nothing else. The word is a
+   * property, like every other word a control speaks.
+   */
+  @property({ attribute: 'maximum-label' })
+  maximumLabel = 'maximum'
+
+  /**
    * The smallest value the reader can choose.
    */
   @property({ type: Number })
   min = 0
+
+  /** What the lower thumb of a range is called, after the slider's own label. */
+  @property({ attribute: 'minimum-label' })
+  minimumLabel = 'minimum'
 
   /**
    * Which way the track runs, `vertical` standing it on end.
@@ -405,7 +421,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         max=${this.max}
         step=${this.step}
         .value=${String(at)}
-        aria-label=${`${this.label} ${which === 'start' ? 'minimum' : 'maximum'}`}
+        aria-labelledby=${this.labeled ? `${this.labelId} ${which}-name` : `${which}-name`}
         aria-describedby=${this.describedBy ?? nothing}
         ?disabled=${this.isDisabled}
         @input=${this.handleInput}
@@ -432,6 +448,14 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
      * so a `/**` that swallows the member below it ships as that member's
      * description. */
     return html`${this.renderLabel()}
+    ${
+      /* What each thumb adds to the label, read through `aria-labelledby` and
+         never drawn: a reference reads a hidden element's text all the same. */
+      this.range
+        ? html`<span id="start-name" hidden>${this.minimumLabel}</span
+            ><span id="end-name" hidden>${this.maximumLabel}</span>`
+        : nothing
+    }
     <div
       part="field"
       data-markers=${this.markerValues.length > 0 ? '' : nothing}

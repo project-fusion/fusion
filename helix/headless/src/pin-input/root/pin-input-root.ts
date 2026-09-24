@@ -543,7 +543,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         part="field"
         role="group"
         aria-describedby=${this.describedBy ?? nothing}
-        aria-labelledby=${this.groupLabelled ? this.groupLabelId : nothing}
+        aria-labelledby=${this.labeled ? this.labelId : nothing}
         @focusin=${this.handleFocusIn}
         @focusout=${this.handleFocusOut}
       >

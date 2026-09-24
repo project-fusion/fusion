@@ -9,7 +9,7 @@ import {
   isRtl,
   requestChange,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /**
@@ -139,6 +139,17 @@ export class HelixHeadlessSplitter extends HelixElement {
     this.collapsedState = next ?? 'none'
     this.requestUpdate('collapsed', previous)
   }
+
+  /**
+   * What the divider says while a pane is shut, in place of a number.
+   *
+   * **A shut pane is off the scale the divider reports**, which is `min` to
+   * `max`, the sliver a drag keeps. The divider said a value outside its own
+   * range, 0 against a minimum of 20, which reads as broken rather than as
+   * shut. While shut it reports the whole 0 to 100 it sits on and says this.
+   */
+  @property({ attribute: 'collapsed-label' })
+  collapsedLabel = 'Collapsed'
 
   /**
    * How much of a shut pane is still shown, as a percentage.
@@ -1142,9 +1153,10 @@ export class HelixHeadlessSplitter extends HelixElement {
         tabindex="0"
         aria-label=${this.label}
         aria-orientation=${this.vertical ? 'horizontal' : 'vertical'}
-        aria-valuemax=${this.clamp(this.maxPercent)}
-        aria-valuemin=${this.clamp(this.minPercent)}
+        aria-valuemax=${this.collapsed ? 100 : this.clamp(this.maxPercent)}
+        aria-valuemin=${this.collapsed ? 0 : this.clamp(this.minPercent)}
         aria-valuenow=${Math.round(position)}
+        aria-valuetext=${this.collapsed ? this.collapsedLabel : nothing}
         ?data-dragging=${this.dragging}
         ?data-flush=${this.flush}
         @dblclick=${this.handleDoubleClick}

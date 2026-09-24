@@ -44,17 +44,15 @@ describe('listbox server output', () => {
     expect(rendered(markup, TAG)).toContain('Owner')
   })
 
-  test('and does not point at the list, because a group has nothing to point at', () => {
-    /* The one place this cohort's frame differs, and it is said rather than
-       skipped. A field's label is a `<label for>` naming the control beside it;
-       a list is a set, so `MixinField` renders a plain `<span>` and the name
-       reaches the host through `ElementInternals`, which no server writes. So
-       the served list carries the words and no accessible name until it
-       upgrades, and a spec asserting one would be asserting something no server
-       output has. */
+  test('and the served list is the listbox, named by the words beside it', () => {
+    /* The name reached the host through `ElementInternals`, which no server
+       writes, so the served list carried the words and no accessible name
+       until it upgraded. The listbox is the list now, in the same tree as the
+       label, so a plain `aria-labelledby` names it in the served markup. */
     const markup = ssr(html`<helix-headless-listbox label="Owner"></helix-headless-listbox>`)
     expect(namesControl(markup)).toBe(false)
-    expect(partTag(markup, 'items')).not.toContain('aria-label')
+    expect(partTag(markup, 'items')).toContain('role="listbox"')
+    expect(partTag(markup, 'items')).toContain('aria-labelledby="label"')
   })
 
   test('the filter ships with the list, not after it', () => {

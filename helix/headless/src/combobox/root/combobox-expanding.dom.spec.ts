@@ -79,7 +79,8 @@ describe('a combobox whose count expands', () => {
     await settle(host)
 
     expect(tags(host)).toBe(4)
-    expect(rest(host)?.getAttribute('aria-expanded')).toBe('true')
+    expect(rest(host)?.getAttribute('aria-label')).toBe('Show fewer')
+    expect(rest(host)?.hasAttribute('aria-expanded')).toBe(false)
   })
 
   test('and puts them back', async () => {
