@@ -7,6 +7,7 @@ import {
   hostAria,
   IdleController,
   inlineStep,
+  keyClaimed,
   MixinControllerActive,
   MixinControllerOpen,
   resolveActiveItem,
@@ -248,6 +249,12 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    * a reader having no way to know which one this component thinks it is.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    /* Not a press the viewer's content answers, or one that is a chord. A
+       caption field or a slider in the chrome keeps its own arrows, Home and
+       End, and Alt with an arrow is the browser's back and forward. */
+    if (keyClaimed(event) || event.altKey || event.ctrlKey || event.metaKey) {
+      return
+    }
     const along = inlineStep(this, event.key)
     if (along === 1 || event.key === 'ArrowDown') {
       event.preventDefault()

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, inlineStep } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, inlineStep, keyClaimed } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -14,44 +14,6 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
  */
 const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: boolean } =>
   'focusable' in node
-
-/**
- * Input types with no text to move a caret through and no value an arrow moves.
- *
- * Everything else claims the arrows for itself: a caret in a text field, a
- * spinner on `number`, a value on `range`, a group on `radio`.
- */
-const CARETLESS = new Set(['button', 'checkbox', 'color', 'file', 'image', 'reset', 'submit'])
-
-/**
- * Whether the press was already the business of whatever it landed on.
- *
- * A toolbar holds anything, and some of what it holds uses the arrow keys for
- * itself. Moving the toolbar regardless makes an input in a toolbar
- * uneditable: ArrowRight moves focus to the next control, and `preventDefault`
- * means the caret never moves at all.
- *
- * `composedPath()[0]` rather than `event.target`, which is retargeted to the
- * control's host at the shadow boundary and cannot tell a text field inside a
- * component from the component itself.
- *
- * `defaultPrevented` first, because a control that has already answered the
- * press has said so in the way the platform provides, and a foreign control
- * this package has never heard of has no other way to say it.
- */
-const claimed = (event: KeyboardEvent): boolean => {
-  if (event.defaultPrevented) {
-    return true
-  }
-  const inner = event.composedPath()[0]
-  if (!(inner instanceof HTMLElement)) {
-    return false
-  }
-  if (inner.isContentEditable || inner.localName === 'textarea' || inner.localName === 'select') {
-    return true
-  }
-  return inner.localName === 'input' && !CARETLESS.has((inner as HTMLInputElement).type)
-}
 
 /**
  * @summary A group of controls that share one tab stop.
@@ -197,7 +159,7 @@ export class HelixHeadlessToolbar extends HelixElement {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!KEYS.has(event.key) || claimed(event)) {
+    if (!KEYS.has(event.key) || keyClaimed(event)) {
       return
     }
     /* Along the line on a horizontal toolbar, so the forward key is the left on

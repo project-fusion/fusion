@@ -1,5 +1,6 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
+import { keyClaimed } from '../../utils/key-claimed/key-claimed.js'
 
 /** What a controller needs of an item to move to it and choose it. */
 export interface NavigableItem {
@@ -152,6 +153,12 @@ export class KeyboardNavigationController implements ReactiveController {
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     if (!KEYS.has(event.key) || this.reserved().includes(event.key)) {
+      return
+    }
+    /* Not a press the host's content answers. A set holds more than its items
+       often enough, a radio group's "Other" with a field beside it, and an
+       arrow moving the caret there moved the answer as well. */
+    if (keyClaimed(event)) {
       return
     }
     const items = this.items().filter((item) => !item.disabled)
