@@ -146,19 +146,32 @@ export interface SkipDetail {
   to: 'next' | 'previous'
 }
 
-/** Detail carried by `helix-map-pan`. */
-export interface MapPanDetail {
+/**
+ * Detail carried by a pan request, `helix-map-pan` being the one Map sends.
+ *
+ * Named for the surface rather than for the map, because the surface is shared:
+ * `MixinViewport` is what asks, and a canvas or a graph asking the same question
+ * should not be importing a type with `Map` in its name. `MapPanDetail` stays as
+ * an alias, that being what a consumer of Map wrote before this was split.
+ */
+export interface ViewportPanDetail {
   /** Which way the reader asked to go, in reading order rather than compass order. */
   to: 'up' | 'down' | 'start' | 'end'
   /** How far, as a fraction of the viewport the map is drawn in. */
   by: number
 }
 
-/** Detail carried by `helix-map-zoom`. */
-export interface MapZoomDetail {
+/** Detail carried by a zoom request, named for the surface for the same reason. */
+export interface ViewportZoomDetail {
   /** Which way, `1` in and `-1` out, so a consumer can multiply by their own step. */
   by: number
 }
+
+/** What `ViewportPanDetail` was called when only Map had one. */
+export type MapPanDetail = ViewportPanDetail
+
+/** What `ViewportZoomDetail` was called when only Map had one. */
+export type MapZoomDetail = ViewportZoomDetail
 
 /** Detail carried by `helix-navigate`. */
 export interface NavigateDetail {
@@ -451,7 +464,7 @@ export class HelixActivateEvent extends CustomEvent<ChangeDetail> {
  * Not cancelable. Nothing here moves on its own, and an event whose
  * `preventDefault` means nothing is an event that lies about what it offers.
  */
-export class HelixMapPanEvent extends CustomEvent<MapPanDetail> {
+export class HelixMapPanEvent extends CustomEvent<ViewportPanDetail> {
   static readonly eventName = 'helix-map-pan'
 
   constructor(detail: MapPanDetail) {
@@ -472,7 +485,7 @@ export class HelixMapPanEvent extends CustomEvent<MapPanDetail> {
  * asserting a numbering that Leaflet, MapLibre and a static tile server do not
  * agree on.
  */
-export class HelixMapZoomEvent extends CustomEvent<MapZoomDetail> {
+export class HelixMapZoomEvent extends CustomEvent<ViewportZoomDetail> {
   static readonly eventName = 'helix-map-zoom'
 
   constructor(detail: MapZoomDetail) {

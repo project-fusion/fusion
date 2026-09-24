@@ -147,6 +147,8 @@ export {
   type SkipDetail,
   type SortDetail,
   type ToggleDetail,
+  type ViewportPanDetail,
+  type ViewportZoomDetail,
 } from './events/events.js'
 export { HelixElement, whenHydrated } from './helix-element/helix-element.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
@@ -197,6 +199,12 @@ export {
   type MixinSelectableItemInterface,
 } from './mixins/mixin-selectable-item/mixin-selectable-item.js'
 export { MixinTokens, type MixinTokensInterface } from './mixins/mixin-tokens/mixin-tokens.js'
+export {
+  MixinViewport,
+  type ViewportControlsPlacement,
+  type ViewportElement,
+  type ViewportWay,
+} from './mixins/mixin-viewport/mixin-viewport.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
