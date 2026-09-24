@@ -93,3 +93,16 @@ describe('one table column', () => {
     expect(host.hasAttribute('sortable')).toBe(false)
   })
 })
+
+describe('table column with no heading words', () => {
+  test('its grip and its separator still say what they move', async () => {
+    const host = (await mount(
+      '<helix-headless-table-column resizable></helix-headless-table-column>',
+    )) as Column & { movable: boolean }
+    // Written by the table that lets its columns move.
+    host.movable = true
+    await host.updateComplete
+    expect(part(host, 'grip')?.getAttribute('aria-label')).toBe('Move column')
+    expect(part(host, 'resizer')?.getAttribute('aria-label')).toBe('Resize column')
+  })
+})

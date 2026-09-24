@@ -29,6 +29,25 @@ describe('empty view', () => {
     expect(live.textContent?.trim()).toBe('Nothing here No results.')
   })
 
+  test('one that came with the page as it loaded is not announced', async () => {
+    /* A framework that serves no declarative shadow DOM sends an empty state
+       that was always there, and this cannot tell it from one that arrived by
+       asking `serverRendered`: the page still loading is what says so. */
+    Object.defineProperty(document, 'readyState', { configurable: true, get: () => 'loading' })
+    try {
+      document.body.innerHTML = '<helix-headless-empty><p>No results.</p></helix-headless-empty>'
+      const empty = document.body.firstElementChild as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      await empty.updateComplete
+      await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+      await empty.updateComplete
+      expect(part(empty, 'live')?.textContent?.trim()).toBe('')
+    } finally {
+      delete (document as unknown as { readyState?: string }).readyState
+    }
+  })
+
   test('a state that was always there announces nothing, because nothing changed', async () => {
     const empty = await mount('<helix-headless-empty no-announce><p>x</p></helix-headless-empty>')
     expect(part(empty, 'live')).toBeNull()

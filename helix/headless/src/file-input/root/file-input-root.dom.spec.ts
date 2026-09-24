@@ -272,6 +272,14 @@ describe('input file', () => {
     expect(names).toEqual(['Take one.txt off', 'Take two.txt off'])
   })
 
+  test('a remove label with no place for the name has the name after it', async () => {
+    // How one written before `{name}` existed was always read.
+    const host = await field('remove-label="Delete"')
+    await choose(host, 'one.txt')
+    const remove = host.shadowRoot?.querySelector('[part~="remove"]')
+    expect(remove?.getAttribute('aria-label')).toBe('Delete one.txt')
+  })
+
   test('the size beside a file is written in the locale the consumer named', async () => {
     /* A file size is a number with a unit, and the decimal separator is not the
        same everywhere: a French reader is owed `1,5 ko` and an English one

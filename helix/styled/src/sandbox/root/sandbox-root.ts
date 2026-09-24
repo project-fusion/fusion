@@ -611,8 +611,12 @@ export class HelixSandbox extends HelixElement {
     super.willUpdate(changed)
     /* Whether there is a panel is known before the first render, from the
        light DOM, so the first render draws the dividers it needs rather than
-       a second one being asked for from `firstUpdated`. */
-    if (!this.hasUpdated && typeof this.querySelector === 'function') {
+       a second one being asked for from `firstUpdated`. **Not while
+       hydrating**, whose render has to be the server's: Lit takes the
+       server's attributes as already written, so a panel read here was never
+       drawn, and the divider stayed hidden for good. That case reads it after,
+       in `firstUpdated`. */
+    if (!this.hasUpdated && this.childrenKnown) {
       this.readPanel()
     }
     if (!this.hasUpdated || typeof this.renderRoot?.querySelector !== 'function') {
@@ -635,6 +639,10 @@ export class HelixSandbox extends HelixElement {
    */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    if (this.serverRendered) {
+      this.readPanel()
+      this.finishHydration()
+    }
     this.watchBody(this.watch === undefined)
   }
 
