@@ -29,6 +29,7 @@ describe('filter input server output', () => {
       'field',
       'label',
       'lead',
+      'live',
       'menu',
       'surface',
       'tags',

@@ -16,9 +16,29 @@ describe('announcement', () => {
     )) as HTMLElement & {
       internals?: ElementInternals
     }
-    expect(role(announcement)).toBe('status')
-    expect(announcement.internals?.ariaLive).toBe('polite')
+    const live = part(announcement, 'live') as HTMLElement
+    expect(live.getAttribute('role')).toBe('status')
+    expect(role(announcement)).toBeNull()
     expect(announcement.hasAttribute('role')).toBe(false)
+  })
+
+  test('raised mid-session, its message is said by a region that was there first', async () => {
+    /* The host was the region, and a banner inserted with its message in it
+       is a region arriving with its words, read inconsistently at best. After
+       the page has loaded, the region arrives empty and fills a frame later. */
+    /* Inserted by hand and read after the first render, before a frame has
+       passed: a harness that waits for frames would read the filled region. */
+    document.body.innerHTML =
+      '<helix-headless-announcement>Service degraded</helix-headless-announcement>'
+    const announcement = document.body.firstElementChild as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await announcement.updateComplete
+    const live = part(announcement, 'live') as HTMLElement
+    expect(live.textContent?.trim()).toBe('')
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    await announcement.updateComplete
+    expect(live.textContent?.trim()).toBe('Service degraded')
   })
 
   test('no dismiss control unless it can be dismissed', async () => {

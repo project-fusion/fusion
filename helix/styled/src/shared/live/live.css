@@ -1,0 +1,19 @@
+/* **A region a screen reader hears and a page does not draw.** Every family that
+   says something as it changes, a page turned, a list emptied, a picture
+   waiting, keeps one region that is always there and changes only its words,
+   because a region arriving with its words is read inconsistently at best.
+   The words are on screen elsewhere, or are about what is on screen, so the
+   region is clipped out of the picture.
+
+   The standard clip rather than `display: none` or `visibility: hidden`, both of
+   which take the region out of the accessibility tree along with the picture,
+   which is the one thing it is here to stay in. Compose it first, so a
+   family's own sheet can still place its region. */
+[part="live"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

@@ -57,6 +57,7 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @csspart back-mark - The glyph on the back control of a submenu.
  * @csspart empty - Shown when there are no items to show.
  * @csspart header - The bar above a submenu, holding the way back and its name.
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the items are still on their way.
  * @csspart surface - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
@@ -458,7 +459,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
         }
         <slot @slotchange=${(event: Event) => this.countRows(event)}></slot>
         ${this.renderStatus(this.hasRows)}
-      </div>`
+      </div>${this.renderLive(this.hasRows)}`
   }
 }
 

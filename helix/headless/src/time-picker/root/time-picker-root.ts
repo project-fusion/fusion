@@ -83,6 +83,7 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart column-hint - Help under the list.
  * @csspart column-items - The list itself.
  * @csspart column-label - The question, over the list.
+ * @csspart column-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
  * @csspart column-loading - Shown while the options are still on their way.
  * @csspart column-search - The region holding the field that narrows the list.
  * @csspart column-search-field - The field itself.
@@ -95,6 +96,7 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart list-hint - Help under the list.
  * @csspart list-items - The list itself.
  * @csspart list-label - The question, over the list.
+ * @csspart list-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
  * @csspart list-loading - Shown while the options are still on their way.
  * @csspart list-search - The region holding the field that narrows the list.
  * @csspart list-search-field - The field itself.
@@ -654,7 +656,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       data-column=${part}
       exportparts="empty: column-empty, feedback: column-feedback, filter-icon: column-filter-icon,
         filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
-        loading: column-loading, search: column-search, search-field: column-search-field"
+        live: column-live, loading: column-loading, search: column-search, search-field: column-search-field"
       aria-label=${label}
       ?disabled=${this.isDisabled}
       .value=${value}
@@ -739,7 +741,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       part="list"
       exportparts="empty: list-empty, feedback: list-feedback, filter-icon: list-filter-icon,
         filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,
-        loading: list-loading, search: list-search, search-field: list-search-field"
+        live: list-live, loading: list-loading, search: list-search, search-field: list-search-field"
       aria-label=${this.label}
       data-unset=${this.value === '' ? '' : nothing}
       ?disabled=${this.isDisabled}

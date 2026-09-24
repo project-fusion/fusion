@@ -5,6 +5,7 @@ import { property } from 'lit/decorators.js'
 import '../../icon/index.js'
 import '../../menu/index.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './video-root.css.js'
 
 /**
@@ -80,7 +81,7 @@ export class HelixVideo extends HelixHeadlessVideo {
 
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [glyphStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, glyphStyles, styles]
 }
 
 declare global {

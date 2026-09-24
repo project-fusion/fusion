@@ -3,6 +3,10 @@ export {
   type AriaForwardOptions,
 } from './controllers/aria-forward-controller/aria-forward-controller.js'
 export {
+  ArrivalController,
+  type ArrivalOptions,
+} from './controllers/arrival-controller/arrival-controller.js'
+export {
   ChartPointerController,
   type ChartPointerHost,
 } from './controllers/chart-pointer-controller/chart-pointer-controller.js'
@@ -300,6 +304,7 @@ export {
   scrollItemIntoView,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
 export { slotFilled } from './utils/slot-filled/slot-filled.js'
+export { slottedWords } from './utils/slotted-words/slotted-words.js'
 export { splitValues } from './utils/split-values/split-values.js'
 export { tellDisclosure } from './utils/tell-disclosure/tell-disclosure.js'
 export { subscribe } from './utils/ticker/ticker.js'

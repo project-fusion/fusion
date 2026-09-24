@@ -64,6 +64,7 @@ import '../../select/index.js'
  * @csspart control-listbox-hint - Help under the list.
  * @csspart control-listbox-items - The list itself.
  * @csspart control-listbox-label - The question, over the list.
+ * @csspart control-listbox-live - The inner listbox's `live`, the region a screen reader hears its empty and loading lines from.
  * @csspart control-listbox-loading - Shown while the options are still on their way.
  * @csspart control-listbox-search - The region holding the field that narrows the list.
  * @csspart control-listbox-search-field - The field itself.
@@ -219,7 +220,7 @@ export class HelixHeadlessPaginationSize extends HelixElement {
         listbox-feedback: control-listbox-feedback, listbox-filter-icon: control-listbox-filter-icon,
         listbox-filter-mark: control-listbox-filter-mark, listbox-hint: control-listbox-hint,
         listbox-items: control-listbox-items, listbox-label: control-listbox-label,
-        listbox-loading: control-listbox-loading, listbox-search: control-listbox-search,
+        listbox-live: control-listbox-live, listbox-loading: control-listbox-loading, listbox-search: control-listbox-search,
         listbox-search-field: control-listbox-search-field, surface: control-surface,
         trigger: control-trigger, value: control-value"
       label=${this.label}

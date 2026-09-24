@@ -1,9 +1,10 @@
 import {
+  ArrivalController,
   customElement,
   HelixElement,
-  hostAria,
   MixinDismissible,
   markRegion,
+  slottedWords,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -28,6 +29,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * does not change that, because an error that was always there is still not an
  * interruption.
  *
+ * **The region is its own, and there before its words.** The host was the
+ * region, and a banner raised mid-session arrives with its message already in
+ * it, which a screen reader reads inconsistently at best. So the message is said
+ * from a region filled a frame after the banner appears, and one that came with
+ * the page is filled at once and says nothing, being no news.
+ *
  * Dismissing is a request. The announcement does not remove itself, because the
  * consumer owns the markup and taking the node out from under them would put
  * their state and the document out of step. `preventDefault()` on the
@@ -49,6 +56,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart content - The message region.
  * @csspart dismiss - The control that asks to close.
  * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart live - The message again, in a region a screen reader hears when the band appears mid-session. Visually hidden in the styled tier.
  */
 @customElement('helix-headless-announcement')
 export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
@@ -78,12 +86,12 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    // On the host, and always polite. See the note above on `role="alert"`.
-    hostAria(this.internals, { role: 'status' })
-    this.internals.ariaLive = 'polite'
-  }
+  /* Filled a frame after the band appears, when it appears after the page has
+     loaded; at once, and silently, when it came with the page. */
+  protected readonly arrival = new ArrivalController(this, {
+    arriving: () => !this.serverRendered && document.readyState === 'complete',
+    text: () => slottedWords(this, ['']),
+  })
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
@@ -130,7 +138,8 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="content"><slot></slot></div>
+    return html`<div part="content"><slot @slotchange=${() => this.arrival.say()}></slot></div>
+      <span part="live" role="status">${this.arrival.said}</span>
       <div part="actions"><slot name="actions"></slot></div>
       ${
         /* A plain `<button>`, the way `Menu` renders its way back and every

@@ -129,6 +129,7 @@ import {
  * @csspart empty - Shown when the result has nothing in it, whether it arrived empty or a filter emptied it. A result still on its way is `loading` instead, which wins over this.
  * @csspart footer - The region below the grid.
  * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the rows are still on their way.
  * @csspart pagination - The pagination, where this draws one.
  * @csspart pagination-first - The pagination's control that jumps to the first page, under `ends`.
@@ -1416,6 +1417,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         ${this.renderSpacer('before')}${this.renderRows(rows)}${this.renderSpacer('after')}
         ${this.renderStatus(filled)}
       </div>
+      ${this.renderLive(filled)}
       <div part="footer">
         <slot name="footer"></slot>
         ${

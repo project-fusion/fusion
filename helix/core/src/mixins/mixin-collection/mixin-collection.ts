@@ -25,6 +25,13 @@ export declare class CollectionElement {
    */
   protected renderStatus(hasContent: boolean): TemplateResult | typeof nothing
 
+  /**
+   * The same words for a screen reader, in a region that is always there.
+   *
+   * Rendered by the component outside its rows, where a status is allowed.
+   */
+  protected renderLive(hasContent: boolean): TemplateResult
+
   /** Binds to a rows slot's `slotchange`, and answers `hasRows` from it. */
   protected countRows(event: Event): void
 
@@ -183,12 +190,32 @@ export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) =>
      */
     protected renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
       if (this.loading) {
-        return html`<p part="loading" role="status">${this.loadingText}</p>`
+        return html`<p part="loading">${this.loadingText}</p>`
       }
       if (hasContent) {
         return nothing
       }
       return html`<p part="empty">${this.emptyText}</p>`
+    }
+
+    /**
+     * The same words for a screen reader, in a region that is always there.
+     *
+     * **A region is heard when what it holds changes, not when it arrives.**
+     * The loading line was a `role="status"` inserted with its words already
+     * in it, which is read inconsistently at best, and the empty line was no
+     * region at all, so a filter that emptied a list said nothing. This one is
+     * rendered on every pass and only its words move: "Loading", then
+     * "No matches", then nothing once there are rows.
+     *
+     * **Outside the rows, which is the component's to place.** A status is not
+     * a child a `listbox`, a `table` or a `tree` may hold, so the component
+     * renders this beside its container rather than inside it. The styled
+     * tier clips it; the visible lines are `renderStatus`.
+     */
+    protected renderLive(hasContent: boolean): TemplateResult {
+      const said = this.loading ? this.loadingText : hasContent ? '' : this.emptyText
+      return html`<span part="live" role="status">${said}</span>`
     }
   }
 

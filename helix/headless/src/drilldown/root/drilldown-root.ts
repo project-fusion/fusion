@@ -53,6 +53,7 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @csspart back-mark - The glyph on the back control.
  * @csspart empty - Shown when there are no entries to show.
  * @csspart header - The bar above a page, holding the way back and its name.
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the entries are still on their way.
  * @csspart page - The region the rows are in.
  * @csspart title - The name of the page showing.
@@ -332,7 +333,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
       <div aria-busy=${this.loading ? 'true' : nothing} part="page">
         <slot @slotchange=${(event: Event) => this.countRows(event)}></slot>
         ${this.renderStatus(this.hasRows)}
-      </div>`
+      </div>${this.renderLive(this.hasRows)}`
   }
 }
 

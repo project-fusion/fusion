@@ -105,6 +105,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart listbox-hint - Help under the list.
  * @csspart listbox-items - The list itself.
  * @csspart listbox-label - The question, over the list.
+ * @csspart listbox-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
  * @csspart listbox-loading - Shown while the options are still on their way.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The field itself.
@@ -765,7 +766,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       id="listbox"
       exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
         filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
-        label: listbox-label, loading: listbox-loading, search: listbox-search,
+        label: listbox-label, live: listbox-live, loading: listbox-loading, search: listbox-search,
         search-field: listbox-search-field"
       aria-label=${this.listLabel}
       empty-text=${this.emptyText}

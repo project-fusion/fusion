@@ -222,16 +222,6 @@
   cursor: crosshair;
 }
 
-/* Read out and never drawn: a sighted reader sees the dashed line. */
-[part="live"] {
-  block-size: 1px;
-  clip-path: inset(50%);
-  inline-size: 1px;
-  overflow: hidden;
-  position: absolute;
-  white-space: nowrap;
-}
-
 /* **The head takes the line's own color where the browser can say what that
    is.** `context-stroke` resolves to the stroke of the element the marker is
    drawn on, so a colored edge arrives with a matching head and nothing has to

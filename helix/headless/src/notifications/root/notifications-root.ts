@@ -49,6 +49,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @csspart footer - The region below the list.
  * @csspart header - The region above the list.
  * @csspart list - The list itself.
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the feed is still on its way.
  * @csspart mark-all - The control that marks everything read.
  *
@@ -374,6 +375,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
         <slot name="items" @slotchange=${this.handleSlotChange}></slot>
         ${this.renderStatus(hasItems)}
       </div>
+      ${this.renderLive(hasItems)}
       <div part="footer"><slot name="footer"></slot></div>`
   }
 

@@ -56,12 +56,25 @@ describe('a collection that is empty or still arriving', () => {
     expect((part(host, 'tree') as HTMLElement).hasAttribute('aria-busy')).toBe(false)
   })
 
-  test('the message is a status, so it is announced once and politely', async () => {
+  test('the words are said by a region that is there before they are', async () => {
+    /* A region is heard when its words change, not when it arrives. The
+       loading line was a status inserted with its words in it, and the empty
+       line was no region at all, so a filter that emptied a list said nothing.
+       The region is outside the rows too, where a tree may hold it. */
     const host = (await mount(
       '<helix-headless-tree label="Files" loading></helix-headless-tree>',
-    )) as Collection
+    )) as Collection & { loading: boolean }
     await settle(host)
-    expect((part(host, 'loading') as HTMLElement).getAttribute('role')).toBe('status')
+    const live = part(host, 'live') as HTMLElement
+    expect(live.getAttribute('role')).toBe('status')
+    expect(live.textContent?.trim()).toBe('Loading')
+    expect(live.closest('[role="tree"]')).toBeNull()
+    expect((part(host, 'loading') as HTMLElement).hasAttribute('role')).toBe(false)
+
+    host.loading = false
+    await settle(host)
+    expect(part(host, 'live')).toBe(live)
+    expect(live.textContent?.trim()).toBe('Nothing to show')
   })
 
   test("both messages are the consumer's words", async () => {

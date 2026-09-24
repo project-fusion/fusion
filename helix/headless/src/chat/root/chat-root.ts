@@ -803,6 +803,13 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.countRegions()
     if (changed.has('history')) {
       this.asked = false
+      /* Said through the region that is always there. The line itself was a
+         status inserted with its words already in it, which a screen reader
+         reads inconsistently at best. */
+      if (this.history === 'loading' && changed.get('history') !== undefined) {
+        this.announcement = this.historyText
+        this.said += 1
+      }
     }
     if (changed.has('turns')) {
       this.follow(changed.get('turns') as readonly ChatTurn[] | undefined)
@@ -945,11 +952,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         ?data-windowed=${fed}
         @scroll=${this.handleScroll}
       >
-        ${
-          this.history === 'loading'
-            ? html`<p part="history" role="status">${this.historyText}</p>`
-            : nothing
-        }
+        ${this.history === 'loading' ? html`<p part="history">${this.historyText}</p>` : nothing}
         ${fed ? this.renderTurns() : nothing}
         <slot name="messages" @slotchange=${this.handleSlotChange}></slot>
         ${
@@ -962,7 +965,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       <div part="resume" ?hidden=${!away || !this.has('resume')} @click=${this.handleResume}>
         <slot name="resume"></slot>
       </div>
-      <div part="status" role="status" ?hidden=${!this.has('status')}>
+      <div part="status" role="status" ?data-empty=${!this.has('status')}>
         <slot name="status"></slot>
       </div>
       <div part="composer" ?hidden=${!this.has('composer')}>

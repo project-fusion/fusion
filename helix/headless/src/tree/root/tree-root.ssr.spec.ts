@@ -35,7 +35,7 @@ describe('tree server output', () => {
        per item with a label slot in it, and the group a branch holds its
        children in. Asserted whole rather than searched for one name at a time,
        so a part added to a template nobody meant to change fails here. */
-    expect(servedParts(ssr(tree))).toEqual(['group', 'item', 'label', 'row', 'tree'])
+    expect(servedParts(ssr(tree))).toEqual(['group', 'item', 'label', 'live', 'row', 'tree'])
   })
 
   test('the host carries only what the consumer wrote', () => {

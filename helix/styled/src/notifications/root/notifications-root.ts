@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNotifications } from '@fusion.dev/helix-headless/notifications'
 import type { CSSResultGroup } from 'lit'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './notifications-root.css.js'
 import '../notification/notification.js'
 
@@ -29,6 +30,7 @@ import '../notification/notification.js'
  * @slot header - Above the list, for a title and the mark-all control.
  *
  * @csspart list - The list itself.
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart mark-all - The control that marks everything read.
  *
  * @cssproperty --notifications-max-block-size - How tall the feed may get before the list scrolls.
@@ -40,7 +42,7 @@ import '../notification/notification.js'
 export class HelixNotifications extends HelixHeadlessNotifications {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [collectionStateStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
 }
 
 declare global {

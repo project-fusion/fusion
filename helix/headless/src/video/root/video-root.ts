@@ -126,6 +126,7 @@ const clock = (seconds: number): string => {
  * @csspart captions-menu-back-mark - The glyph on the back control of a submenu.
  * @csspart captions-menu-empty - Shown when there are no items to show.
  * @csspart captions-menu-header - The bar above a submenu, holding the way back and its name.
+ * @csspart captions-menu-live - The inner menu's `live`, the region a screen reader hears its empty and loading lines from.
  * @csspart captions-menu-loading - Shown while the items are still on their way.
  * @csspart captions-menu-surface - The floating panel the menu is drawn on.
  * @csspart captions-menu-title - The name of the submenu that is showing.
@@ -140,6 +141,7 @@ const clock = (seconds: number): string => {
  * @csspart forward - The control that goes on ten seconds.
  * @csspart fullscreen - The whole screen, and back.
  * @csspart header - The region top left, for a heading and a way out of a set.
+ * @csspart live - What the loading line says, in a region a screen reader hears when it changes. Visually hidden in the styled tier.
  * @csspart loading - What is said while the picture waits for more of itself.
  * The part of that which spins is drawn on it, which is `::part(loading)::before`
  * from a consumer's sheet: this tier ships no CSS, so a box it renders for one to
@@ -153,6 +155,7 @@ const clock = (seconds: number): string => {
  * @csspart overflow-back-mark - The glyph on the back control of a submenu.
  * @csspart overflow-empty - Shown when there are no items to show.
  * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
+ * @csspart overflow-live - The inner menu's `live`, the region a screen reader hears its empty and loading lines from.
  * @csspart overflow-loading - Shown while the items are still on their way.
  * @csspart overflow-surface - The floating panel the menu is drawn on.
  * @csspart overflow-title - The name of the submenu that is showing.
@@ -1417,7 +1420,7 @@ export class HelixHeadlessVideo extends HelixElement {
     }
     return html`<${this.tag('menu')} part="captions-menu"
     exportparts="back: captions-menu-back, back-mark: captions-menu-back-mark, empty: captions-menu-empty,
-      header: captions-menu-header, loading: captions-menu-loading, surface: captions-menu-surface,
+      header: captions-menu-header, live: captions-menu-live, loading: captions-menu-loading, surface: captions-menu-surface,
       title: captions-menu-title" label=${this.subtitlesLabel} placement="top-end">
       <button part="captions" slot="trigger" type="button" aria-label=${this.subtitlesLabel}>
         ${drawIcon(closedCaptioning)}
@@ -1591,7 +1594,7 @@ export class HelixHeadlessVideo extends HelixElement {
           ? nothing
           : html`<${this.tag('menu')} part="overflow"
           exportparts="back: overflow-back, back-mark: overflow-back-mark, empty: overflow-empty,
-            header: overflow-header, loading: overflow-loading, surface: overflow-surface,
+            header: overflow-header, live: overflow-live, loading: overflow-loading, surface: overflow-surface,
             title: overflow-title" label=${this.moreLabel} placement="top-end">
               <button part="more" slot="trigger" type="button" aria-label=${this.moreLabel}>
                 ${drawIcon(dotsThreeVertical)}
@@ -1710,15 +1713,17 @@ export class HelixHeadlessVideo extends HelixElement {
            spin. `polite`, so it waits its turn, and it goes when the frame moves
            again. */
         this.buffering && !this.failed
-          ? html`<div
-              part="loading"
-              role="status"
-              aria-live="polite"
-            >
-              ${this.loadingLabel}
-            </div>`
+          ? html`<div part="loading">${this.loadingLabel}</div>`
           : nothing
       }
+      ${
+        /* And said by a region that is always there, whose words are the only
+           thing that moves. The box above was the region, inserted with its
+           words already in it, which a screen reader reads inconsistently at
+           best. */
+        ''
+      }
+      <span part="live" role="status">${this.buffering && !this.failed ? this.loadingLabel : ''}</span>
       ${
         /* And the other thing a frozen frame can mean. `alert`, because nothing
            further is going to happen and a reader waiting politely for a video

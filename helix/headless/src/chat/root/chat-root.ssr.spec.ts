@@ -80,10 +80,11 @@ describe('chat server output', () => {
        a reader who was served without it and given it at hydration watches the
        conversation jump once on every load that was still fetching.
 
-       `role="status"` rather than a bare line: the arrival of older turns is
-       the thing a reader cannot see happening. A phrase the component does not
-       default to, `historyText` holding "Loading earlier messages", so a
-       template writing that literal would not satisfy this. */
+       A bare line, and said through the region that is always there when the
+       fetch starts: a `role="status"` served or inserted with its words in it
+       is a region a screen reader reads inconsistently at best. A phrase the
+       component does not default to, `historyText` holding "Loading earlier
+       messages", so a template writing that literal would not satisfy this. */
     const fetching = ssr(
       html`<helix-headless-chat
         history="loading"
@@ -91,7 +92,7 @@ describe('chat server output', () => {
         label="Support"
       ></helix-headless-chat>`,
     )
-    expect(partTag(fetching, 'history')).toContain('role="status"')
+    expect(partTag(fetching, 'history')).not.toContain('role=')
     expect(rendered(fetching, 'helix-headless-chat')).toContain('Fetching what came before')
   })
 

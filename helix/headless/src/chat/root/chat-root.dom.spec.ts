@@ -94,6 +94,24 @@ describe('the transcript', () => {
     expect(part(element, 'log')?.querySelector('[part="status"]')).toBeNull()
   })
 
+  test('and it is there before anything is said in it', async () => {
+    /* Hidden while empty, it was out of the accessibility tree, and the first
+       "is typing" arrived in a region appearing with it, which a screen reader
+       may not read. */
+    const element = await chat()
+    expect(part(element, 'status')?.hasAttribute('hidden')).toBe(false)
+    expect(part(element, 'status')?.hasAttribute('data-empty')).toBe(true)
+  })
+
+  test('fetching older turns is said through the region that is always there', async () => {
+    const element = await chat()
+    ;(element as unknown as { history: string; historyText: string }).historyText = 'Fetching'
+    ;(element as unknown as { history: string }).history = 'loading'
+    await element.updateComplete
+    expect(part(element, 'live')?.textContent?.trim()).toBe('Fetching')
+    expect(part(element, 'history')?.hasAttribute('role')).toBe(false)
+  })
+
   test('an empty conversation says so rather than showing a blank box', async () => {
     const element = (await mount('<helix-headless-chat></helix-headless-chat>')) as Chat
     await element.updateComplete
