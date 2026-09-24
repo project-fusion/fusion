@@ -1,0 +1,21 @@
+/* **The field takes the card's own text**, so editing reads as the text
+   becoming editable rather than a form appearing inside the card: no ground,
+   no box, the card's font and color. The card's selection outline already
+   says where the reader is, so the field marks itself with a line under the
+   text rather than a second ring inside the first. */
+helix-canvas-node input {
+  background-color: transparent;
+  border: none;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-accent);
+  border-radius: 0;
+  box-sizing: border-box;
+  color: inherit;
+  font: inherit;
+  inline-size: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+helix-canvas-node input:focus-visible {
+  outline: none;
+}
