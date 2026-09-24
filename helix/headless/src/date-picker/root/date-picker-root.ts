@@ -619,7 +619,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     for (const date of dates) {
       data.append(this.name, date)
     }
-    this.internals.setFormValue(data)
+    /* The value as the state, or the browser keeps the form data as it and
+       hands that back on a restore, where the value is read as a string. */
+    this.internals.setFormValue(data, this.value)
   }
 
   /**

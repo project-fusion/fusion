@@ -499,7 +499,11 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
       return
     }
     const parsed = this.numeric
-    if (this.required && this.value.trim() === '') {
+    /* Not while read-only, which the platform exempts from validation: the
+       reader cannot fill it, so the form could never be sent. */
+    if (this.readOnly) {
+      this.internals.setValidity({})
+    } else if (this.required && this.value.trim() === '') {
       this.internals.setValidity({ valueMissing: true }, 'Please fill in this field.', control)
     } else if (this.value.trim() !== '' && parsed === null) {
       this.internals.setValidity({ badInput: true }, 'Please enter a number.', control)

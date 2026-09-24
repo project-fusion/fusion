@@ -409,7 +409,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * holds a number, and matching the platform there is the point.
    */
   private sync(): void {
-    this.internals.setFormValue(this.value)
+    /* Nothing where nothing is chosen, which is what a radio group submits:
+       an empty entry reads on the server as a rating somebody gave. */
+    this.internals.setFormValue(this.value === '' ? null : this.value)
     this.reportRequired(this.value === '', 'Choose a rating to continue.', 'marks')
   }
 

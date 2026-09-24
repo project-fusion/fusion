@@ -264,6 +264,21 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
   }
 
   /**
+   * Goes back to the set the markup started with.
+   *
+   * **Seeded again rather than cleared.** The form resets each box too, in the
+   * same task and after this, so by the next update the boxes are back to
+   * what they declared and the seed reads them. Without this the group kept
+   * the reader's set, reported valid over boxes the reset had emptied, and
+   * ticked them again the next time anything updated it.
+   */
+  override formResetCallback(): void {
+    super.formResetCallback()
+    this.value = this.getAttribute('value') ?? ''
+    this.seeded = false
+  }
+
+  /**
    * Refuses an empty set where one was required.
    *
    * **The group is form-associated, and submits nothing.** Nothing here calls

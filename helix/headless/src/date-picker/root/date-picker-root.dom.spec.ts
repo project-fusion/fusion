@@ -583,3 +583,23 @@ describe('a read-only calendar', () => {
     expect(cal.value).toBe('2026-08-20')
   })
 })
+
+describe('a date picker brought back by the browser', () => {
+  test('restores from the value it saved, not from its form data', async () => {
+    /* Several dates submit as several entries, and without a state beside
+       them the browser saved the form data as the state and handed it back,
+       where the value is split as a string and threw. */
+    const form = await mount(
+      '<form><helix-headless-date-picker name="d" value="2026-08-04"></helix-headless-date-picker></form>',
+    )
+    const picker = form.firstElementChild as HTMLElement & {
+      formStateRestoreCallback(state: unknown, mode: string): void
+      updateComplete: Promise<boolean>
+      value: string
+    }
+    await picker.updateComplete
+    picker.formStateRestoreCallback(formValue(picker), 'restore')
+    await picker.updateComplete
+    expect(typeof picker.value).toBe('string')
+  })
+})

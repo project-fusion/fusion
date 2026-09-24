@@ -795,6 +795,14 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     this.releaseCaret?.()
     this.releaseCaret = undefined
     this.internals.setFormValue(this.value)
+    /* The control's own validity, anchored on it, the way `Input` takes it.
+       The control is in this shadow root and takes no part in the form, so
+       `required` on it alone let an empty filter submit. */
+    const control = this.control
+    if (control) {
+      this.internals.setValidity(control.validity, control.validationMessage, control)
+      this.refreshFeedback()
+    }
     this.markActive()
     /* **After the render, because opening is an announcement.** `requestOpen`
        fires `helix-before-open` and `toggle`, and an element that dispatched

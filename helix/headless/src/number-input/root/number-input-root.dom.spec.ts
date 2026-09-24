@@ -230,6 +230,15 @@ describe('input number keyboard', () => {
 })
 
 describe('input number validity', () => {
+  test('a read-only field is not missing, however empty and however required', async () => {
+    /* The platform exempts a read-only control from validation, and the
+       reader could not fill this one, so a form holding it could never send. */
+    const host = await field('readonly required')
+    expect(
+      (host as unknown as { internals: ElementInternals }).internals.validity.valueMissing,
+    ).not.toBe(true)
+  })
+
   test('reports its value to the form', async () => {
     const host = await field('default-value="7" name="guests"')
     expect(formValue(host)).toBe('7')

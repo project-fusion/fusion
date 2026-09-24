@@ -52,7 +52,7 @@ export declare class MixinControllerValueInterface {
   formResetCallback(): void
 
   /** Restores the value when the browser brings a form back. */
-  formStateRestoreCallback(state: string | null): void
+  formStateRestoreCallback(state: string | File | FormData | null): void
 }
 
 /**
@@ -182,7 +182,8 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * reset means the form is as it was served. Clearing only the internal one
      * would leave a control that had been written to stuck at that value.
      */
-    formResetCallback(): void {
+    override formResetCallback(): void {
+      super.formResetCallback()
       const previous = this.value
       this.valueState = undefined
       this.requestUpdate('value', previous)
@@ -195,9 +196,12 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * with no state is a form the browser has nothing recorded for, which is
      * the same situation as a fresh one.
      */
-    formStateRestoreCallback(state: string | null): void {
+    formStateRestoreCallback(state: string | File | FormData | null): void {
       const previous = this.value
-      this.valueState = state ?? undefined
+      /* A string or nothing. A control that submits several entries saves its
+         form data as the state unless it names one, and a value that is not a
+         string throws the first time anything splits it. */
+      this.valueState = typeof state === 'string' ? state : undefined
       this.requestUpdate('value', previous)
     }
   }

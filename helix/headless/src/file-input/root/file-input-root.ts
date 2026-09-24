@@ -425,7 +425,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * owes is the report and the platform's own announcement, which is what
    * `settle` is.
    */
-  formResetCallback(): void {
+  override formResetCallback(): void {
+    super.formResetCallback()
     if (this.control) {
       restoreValue(this.control, '')
     }
