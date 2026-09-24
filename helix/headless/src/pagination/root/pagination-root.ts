@@ -1,5 +1,6 @@
 import {
   customElement,
+  fillTemplate,
   formatNumbers,
   HelixElement,
   HelixNavigateEvent,
@@ -63,7 +64,7 @@ const fill = (
   page: number,
   pages: number,
   format: (value: number) => string = String,
-): string => template.replaceAll('{page}', format(page)).replaceAll('{pages}', format(pages))
+): string => fillTemplate(template, { page: format(page), pages: format(pages) })
 
 /**
  * @summary Moves between pages of a longer result.

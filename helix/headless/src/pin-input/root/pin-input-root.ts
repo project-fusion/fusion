@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   customElement,
+  fillTemplate,
   HelixCompleteEvent,
   HelixFormElement,
   MixinControllerValue,
@@ -540,9 +541,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
             placeholder=${this.placeholder || nothing}
             inputmode=${this.type === 'numeric' ? 'numeric' : 'text'}
             autocomplete=${at === 0 ? this.autocomplete || nothing : 'off'}
-            aria-label=${this.cellLabel
-              .replaceAll('{index}', String(at + 1))
-              .replaceAll('{length}', String(this.count))}
+            aria-label=${fillTemplate(this.cellLabel, { index: at + 1, length: this.count })}
             ?disabled=${this.isDisabled}
             ?readonly=${this.readOnly}
             @focus=${this.handleFocus}

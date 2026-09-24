@@ -2,6 +2,7 @@ import {
   type CanvasView,
   capturePointer,
   customElement,
+  fillTemplate,
   HelixBeforeMoveEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
@@ -138,10 +139,6 @@ const heads = (edge: CanvasEdge): { start: boolean; end: boolean } => ({
  * page that writes edges without ids still gets one stop per connection.
  */
 const keyOf = (edge: CanvasEdge): string => `edge:${edge.id || `${edge.fromNode}->${edge.toNode}`}`
-
-/** A template with its `{placeholders}` filled in. */
-const fill = (template: string, values: Record<string, string>): string =>
-  Object.entries(values).reduce((out, [key, value]) => out.replaceAll(`{${key}}`, value), template)
 
 /** A card moved onto the plane, whose corner is `origin` in the document's units. */
 const onPlane = (node: CanvasNode, origin: { x: number; y: number }): CanvasNode => ({
@@ -296,7 +293,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * filled in.
    *
    * **Every sentence this board speaks is a property**, the rule the pan
-   * controls already kept with `pan-label`: a board on a page in another
+   * controls already kept with `pan-up-label` and its three: a board on a page in another
    * language otherwise read its connections out in English.
    */
   @property({ attribute: 'connecting-label' })
@@ -875,7 +872,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** Starts a connection from a card, from the keyboard. */
   private startLinking(from: string): void {
     this.linking = { from }
-    this.said = fill(this.connectingLabel, { from: this.nameOf(from) })
+    this.said = fillTemplate(this.connectingLabel, { from: this.nameOf(from) })
   }
 
   /**
@@ -913,7 +910,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       this.said = linking ? this.stoppedLabel : ''
       return
     }
-    this.said = fill(this.connectedLabel, {
+    this.said = fillTemplate(this.connectedLabel, {
       from: this.nameOf(linking.from),
       to: this.nameOf(arriving),
     })
@@ -959,7 +956,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.said = pointer
       ? ''
-      : fill(this.reconnectingLabel, {
+      : fillTemplate(this.reconnectingLabel, {
           from: this.nameOf(edge.fromNode),
           to: this.nameOf(edge.toNode),
         })
@@ -1936,7 +1933,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       const drawn = edge ? this.geometryOf(edge, origin) : undefined
       if (drawn) {
         at = drawn.mid
-        named = fill(this.connectionLabel, {
+        named = fillTemplate(this.connectionLabel, {
           from: this.textOf(drawn.from),
           to: this.textOf(drawn.to),
         })
@@ -1953,7 +1950,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     return html`<input
       part="label-editor"
-      aria-label=${fill(this.labelEditorLabel, { name: named })}
+      aria-label=${fillTemplate(this.labelEditorLabel, { name: named })}
       data-target=${editing.target}
       style=${`--_canvas-editor-x: ${at.x}px; --_canvas-editor-y: ${at.y}px`}
       type="text"
@@ -2004,8 +2001,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     const lang = this.closest('[lang]')?.getAttribute('lang') || undefined
     const list = new Intl.ListFormat(lang, { type: 'conjunction' })
     return [
-      leads.length > 0 ? fill(this.leadsToLabel, { cards: list.format(leads) }) : '',
-      from.length > 0 ? fill(this.comesFromLabel, { cards: list.format(from) }) : '',
+      leads.length > 0 ? fillTemplate(this.leadsToLabel, { cards: list.format(leads) }) : '',
+      from.length > 0 ? fillTemplate(this.comesFromLabel, { cards: list.format(from) }) : '',
     ]
       .filter(Boolean)
       .join('; ')
@@ -2446,7 +2443,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         return svg`<path
             part="edge-target"
             aria-description=${edge.label || nothing}
-            aria-label=${fill(this.connectionLabel, { from: this.textOf(from), to: this.textOf(to) })}
+            aria-label=${fillTemplate(this.connectionLabel, { from: this.textOf(from), to: this.textOf(to) })}
             d=${drawn.d}
             data-edge=${key}
             fill="none"

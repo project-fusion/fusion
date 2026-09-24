@@ -1,4 +1,4 @@
-import { customElement, formatNumbers, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, fillTemplate, formatNumbers, HelixElement } from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -101,10 +101,11 @@ export class HelixHeadlessPaginationSummary extends HelixElement {
     /* And the end is clamped to the total, because the last page is rarely
        full: 248 items at 25 a page end at 248, not at 250. */
     const to = Math.min(this.total, from + size - 1)
-    return html`${this.format
-      .replaceAll('{from}', this.numbers(from))
-      .replaceAll('{to}', this.numbers(to))
-      .replaceAll('{total}', this.numbers(this.total))}`
+    return html`${fillTemplate(this.format, {
+      from: this.numbers(from),
+      to: this.numbers(to),
+      total: this.numbers(this.total),
+    })}`
   }
 }
 

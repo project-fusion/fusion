@@ -31,11 +31,20 @@ export declare class ViewportElement {
   /** How long the reader may be still before the chrome hides, in milliseconds. */
   idleDelay: number
 
-  /** What one pan control is called, with `{way}` filled in. */
-  panLabel: string
+  /** What the control that pans down is called. */
+  panDownLabel: string
+
+  /** What the control that pans left is called. */
+  panLeftLabel: string
+
+  /** What the control that pans right is called. */
+  panRightLabel: string
 
   /** How far one press moves the view, as a fraction of what is on screen. */
   panStep: number
+
+  /** What the control that pans up is called. */
+  panUpLabel: string
 
   /** What the control that zooms in is called. */
   zoomInLabel: string
@@ -187,10 +196,24 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     idleDelay = 0
 
     /**
-     * What one pan control is called, with `{way}` filled in.
+     * What the control that pans down is called.
+     *
+     * **A label for each way rather than one with the way filled in**, which is
+     * what this was: `Pan {way}` filled in with `left`, so a page that said it
+     * in French read out "Déplacer left". The word for a direction is as much
+     * the translator's as the word for panning, and a language can put it
+     * anywhere in the phrase.
      */
-    @property({ attribute: 'pan-label' })
-    panLabel = 'Pan {way}'
+    @property({ attribute: 'pan-down-label' })
+    panDownLabel = 'Pan down'
+
+    /** What the control that pans left is called, on screen. */
+    @property({ attribute: 'pan-left-label' })
+    panLeftLabel = 'Pan left'
+
+    /** What the control that pans right is called, on screen. */
+    @property({ attribute: 'pan-right-label' })
+    panRightLabel = 'Pan right'
 
     /**
      * How far one press moves the view, as a fraction of what is on screen.
@@ -201,6 +224,10 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
      */
     @property({ attribute: 'pan-step', type: Number })
     panStep = 0.25
+
+    /** What the control that pans up is called. */
+    @property({ attribute: 'pan-up-label' })
+    panUpLabel = 'Pan up'
 
     /** What the control that zooms in is called. */
     @property({ attribute: 'zoom-in-label' })
@@ -331,7 +358,14 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
      * name, which is the one a right-to-left page needs.
      */
     private named(way: ViewportWay): string {
-      return this.panLabel.replace('{way}', this.sideOf(way))
+      const side = this.sideOf(way)
+      return side === 'up'
+        ? this.panUpLabel
+        : side === 'down'
+          ? this.panDownLabel
+          : side === 'left'
+            ? this.panLeftLabel
+            : this.panRightLabel
     }
 
     /** The arrow drawn on a pan control, pointing the way it goes on screen. */
