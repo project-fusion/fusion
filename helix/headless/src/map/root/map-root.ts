@@ -1,21 +1,20 @@
 import {
   customElement,
-  FullscreenController,
   HelixElement,
-  HelixMapPanEvent,
-  HelixMapZoomEvent,
   hostAria,
-  IdleController,
-  inlineStep,
+  MixinViewport,
+  type ViewportControlsPlacement,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 
-/** Which way a press or a key asked the map to go. */
-type Way = 'up' | 'down' | 'start' | 'end'
-
-/** Where the controls sit, in the corner words the rest of the library uses. */
-export type MapControlsPlacement = 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end'
+/**
+ * What `ViewportControlsPlacement` is called for a map.
+ *
+ * The corners are the surface's and the name is the family's, so a consumer who
+ * imported this before the surface was shared still has it.
+ */
+export type MapControlsPlacement = ViewportControlsPlacement
 
 /**
  * @summary A frame around somebody else's map.
@@ -77,65 +76,7 @@ export type MapControlsPlacement = 'top-start' | 'top-end' | 'bottom-start' | 'b
  * @cssstate idle - While the reader has been still long enough to hide the chrome.
  */
 @customElement('helix-headless-map')
-export class HelixHeadlessMap extends HelixElement {
-  /**
-   * Which of the controls this frame draws, as a list of what to keep.
-   *
-   * **A list rather than a switch, because the overlap is not symmetric.**
-   * Every map library draws zoom controls and none of them draws pan buttons:
-   * MapLibre's navigation control is zoom and a compass, Leaflet's is zoom,
-   * Google's is zoom. So a consumer slotting one of those has our zoom twice
-   * over and our pan pad not at all, and a single switch would make them choose
-   * between a duplicate and nothing.
-   *
-   * `none` draws none of them, which is the right answer where the slotted map
-   * already has controls a reader can find: what this family argues for is that
-   * *a* findable control exists, never that it is ours. The methods stay public
-   * either way, so a consumer drawing their own chrome can still drive the
-   * frame.
-   *
-   * Absent is all three, which is this library's rule that a resting value is an
-   * attribute's absence, and it is what the stylesheet asks about: the layout
-   * rules are written against `[controls]:not([controls~="zoom"])` rather than
-   * the bare negation, or a frame that named no list at all would be laid out as
-   * though it had dropped everything.
-   */
-  @property({ reflect: true })
-  controls?: string
-
-  /**
-   * Which corner the controls sit in.
-   *
-   * **Configurable because there is no safe default**, and this is a collision
-   * rather than a taste: MapLibre puts its own controls at the top end, Leaflet
-   * and OpenLayers at the top start, Google's zoom at the bottom end. Whichever
-   * corner this took would land on somebody's, which is why every one of those
-   * libraries made it a setting too.
-   *
-   * Logical corners rather than left and right, so a right-to-left page moves
-   * them without a consumer writing a second rule.
-   *
-   * Absent is the top end, which is this library's rule that a resting value is
-   * an attribute's absence: a default that reflected would write an attribute
-   * onto every host that no server sent and nobody asked for.
-   */
-  @property({ attribute: 'controls-placement', reflect: true })
-  controlsPlacement?: MapControlsPlacement
-
-  /** What the control that fills the screen is called. */
-  @property({ attribute: 'fullscreen-label' })
-  fullscreenLabel = 'Fill the screen'
-
-  /**
-   * How long the reader may be still before the chrome hides, in milliseconds.
-   *
-   * Zero keeps it up, which is the default: a map's controls are how a keyboard
-   * reader operates it, and chrome that hides itself by default would be this
-   * component undoing its own argument. Set it for a display map nobody drives.
-   */
-  @property({ attribute: 'idle-delay', type: Number })
-  idleDelay = 0
-
+export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   /**
    * Accessible name for the map, which is the one thing a consumer must write.
    *
@@ -154,122 +95,14 @@ export class HelixHeadlessMap extends HelixElement {
   label = ''
 
   /**
-   * What the controls are called, for a page not in English.
-   */
-  @property({ attribute: 'pan-label' })
-  panLabel = 'Pan {way}'
-
-  /**
-   * How far one press moves the map, as a fraction of what is on screen.
+   * What the group of controls is called.
    *
-   * A fraction rather than a distance, because this frame does not know the
-   * scale of what is inside it: a quarter of the viewport is the same gesture at
-   * street level and at country level, and a consumer who wants metres can
-   * multiply by their own.
+   * The surface is shared and this is the half that is a map: a reader meeting
+   * the group hears what it drives rather than "view controls", which names the
+   * mechanism.
    */
-  @property({ attribute: 'pan-step', type: Number })
-  panStep = 0.25
-
-  /** What the zoom controls are called. */
-  @property({ attribute: 'zoom-in-label' })
-  zoomInLabel = 'Zoom in'
-
-  /** What the zoom control that goes the other way is called. */
-  @property({ attribute: 'zoom-out-label' })
-  zoomOutLabel = 'Zoom out'
-
-  /** Whether the reader has been still long enough to hide the chrome. */
-  @state()
-  private resting = false
-
-  /** Whether the frame is filling the screen. */
-  @state()
-  private filled = false
-
-  private readonly fullscreen = new FullscreenController(this, (full) => {
-    this.filled = full
-  })
-
-  private readonly idle = new IdleController(
-    this,
-    () => this.idleDelay,
-    (resting) => {
-      this.resting = resting
-    },
-  )
-
-  /** Whether a named group of controls is one this frame draws. */
-  private draws(group: 'pan' | 'zoom' | 'fullscreen'): boolean {
-    return this.controls === undefined ? true : this.controls.split(/\s+/).includes(group)
-  }
-
-  /** Fills the screen with the frame, or comes back. */
-  toggleFullscreen(): void {
-    void this.fullscreen.toggle()
-  }
-
-  /** Asks for the map to move, which the consumer answers. */
-  pan(to: Way): void {
-    this.dispatchEvent(new HelixMapPanEvent({ by: this.panStep, to }))
-  }
-
-  /** Asks for the map to zoom, `1` in and `-1` out. */
-  zoom(by: number): void {
-    this.dispatchEvent(new HelixMapZoomEvent({ by }))
-  }
-
-  /**
-   * The arrow keys, which are the second way rather than the only one.
-   *
-   * `inlineStep` rather than a test against `ArrowLeft`, so the reader on a
-   * right-to-left page gets `end` from the key that points the way their text
-   * runs, which is what the pan buttons say too.
-   *
-   * **Only from this frame's own chrome, and that is the difference between one
-   * move and two.** MapLibre and Leaflet both answer the arrow keys themselves,
-   * so a press inside a slotted map moves it once on its own and once more on
-   * the event this would have sent: every press moving twice, and the consumer
-   * with no way to tell which half to turn off. A press that started in the
-   * shadow root is this frame's to relay; anything from the map belongs to the
-   * map.
-   */
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!this.renderRoot.contains(event.target as Node)) {
-      return
-    }
-    const along = inlineStep(this, event.key)
-    if (along === 1) {
-      event.preventDefault()
-      this.pan('end')
-    } else if (along === -1) {
-      event.preventDefault()
-      this.pan('start')
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault()
-      this.pan('up')
-    } else if (event.key === 'ArrowDown') {
-      event.preventDefault()
-      this.pan('down')
-    } else if (event.key === '+' || event.key === '=') {
-      event.preventDefault()
-      this.zoom(1)
-    } else if (event.key === '-' || event.key === '_') {
-      event.preventDefault()
-      this.zoom(-1)
-    }
-  }
-
-  /**
-   * Starts the wait, so a map nobody has touched counts as still.
-   *
-   * Without this the timer only ever starts on a pointer or a focus, and a frame
-   * rendered on a page the reader never reaches stays awake for as long as the
-   * page is open: the chrome a consumer asked to hide would hide only after
-   * being used once, which is the opposite of what an idle delay is for.
-   */
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    this.idle.stir()
+  protected override get controlsLabel(): string {
+    return 'Map controls'
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -279,76 +112,6 @@ export class HelixHeadlessMap extends HelixElement {
     hostAria(this.internals, { label: this.label })
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
-  }
-
-  /**
-   * What one pan button is called, with the way it goes filled in.
-   *
-   * Left and right rather than start and end, because the label is read aloud
-   * and a reader knows which way left is. The event keeps the reading-order
-   * name, which is the one a right-to-left page needs.
-   */
-  private named(way: Way): string {
-    const spoken = way === 'start' ? 'left' : way === 'end' ? 'right' : way
-    return this.panLabel.replace('{way}', spoken)
-  }
-
-  /**
-   * The controls, or nothing where a consumer kept none of them.
-   *
-   * **Written out rather than generated**, because a part name behind an
-   * interpolation is a part the manifest cannot see: it would publish `pan-`
-   * and a consumer's `::part(pan-up)` would match nothing. The same cost
-   * `drawIcon` names for `Trend`.
-   */
-  private renderControls(): TemplateResult | typeof nothing {
-    const pan = this.draws('pan')
-    const zoom = this.draws('zoom')
-    const fullscreen = this.draws('fullscreen')
-    if (!pan && !zoom && !fullscreen) {
-      return nothing
-    }
-    return html`<div part="controls" role="group" aria-label="Map controls">
-      ${
-        pan
-          ? html`<button part="pan-up" aria-label=${this.named('up')} type="button" @click=${() => this.pan('up')}>
-                ↑
-              </button>
-              <button part="pan-start" aria-label=${this.named('start')} type="button" @click=${() => this.pan('start')}>
-                ←
-              </button>
-              <button part="pan-end" aria-label=${this.named('end')} type="button" @click=${() => this.pan('end')}>
-                →
-              </button>
-              <button part="pan-down" aria-label=${this.named('down')} type="button" @click=${() => this.pan('down')}>
-                ↓
-              </button>`
-          : nothing
-      }
-      ${
-        zoom
-          ? html`<button part="zoom-in" aria-label=${this.zoomInLabel} type="button" @click=${() => this.zoom(1)}>
-                +
-              </button>
-              <button part="zoom-out" aria-label=${this.zoomOutLabel} type="button" @click=${() => this.zoom(-1)}>
-                −
-              </button>`
-          : nothing
-      }
-      ${
-        fullscreen
-          ? html`<button
-              part="fullscreen"
-              aria-label=${this.fullscreenLabel}
-              aria-pressed=${this.filled ? 'true' : 'false'}
-              type="button"
-              @click=${this.toggleFullscreen}
-            >
-              ⤢
-            </button>`
-          : nothing
-      }
-    </div>`
   }
 
   /**
