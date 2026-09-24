@@ -1426,8 +1426,9 @@ export class HelixHeadlessVideo extends HelixElement {
         part="entry"
       exportparts="item: entry-item, mark: entry-mark, start: entry-start"
         value="off"
-        aria-checked=${this.captionIndex < 0 ? 'true' : 'false'}
-        role="menuitemradio"
+        checkable
+        exclusive
+        ?checked=${this.captionIndex < 0}
         @helix-select=${() => this.showCaption(-1)}
       >
         ${this.captionsOffLabel}
@@ -1436,8 +1437,9 @@ export class HelixHeadlessVideo extends HelixElement {
         (track, at) => html`<${this.tag('menu-item')} part="entry"
         exportparts="item: entry-item, mark: entry-mark, start: entry-start"
           value=${track.language || String(at)}
-          aria-checked=${this.captionIndex === at ? 'true' : 'false'}
-          role="menuitemradio"
+          checkable
+          exclusive
+          ?checked=${this.captionIndex === at}
           @helix-select=${() => this.showCaption(at)}
         >
           ${track.label || track.language}

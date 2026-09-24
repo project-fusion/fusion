@@ -483,6 +483,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        the filter has run. */
     if (this.dispatchEvent(narrowing)) {
       this.listbox?.requestFilter(typed)
+      void this.listbox?.updateComplete.then(() => this.linkActive())
     }
     this.suggestion = this.suggest && isInsertion(event) ? this.completionFor(typed) : ''
     if (!this.open) {
@@ -562,6 +563,35 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       this.requestOpen(true)
     }
     this.listbox?.navigate(event)
+    void this.listbox?.updateComplete.then(() => this.linkActive())
+  }
+
+  /**
+   * Tells the input which option is highlighted.
+   *
+   * **The input is where focus stays**, so it is what a screen reader asks.
+   * The listbox points its own list at the option, which is right for a
+   * listbox a reader is in and says nothing here: arrowing through a combobox
+   * moved the highlight in silence. The list's highlight is its own state, so
+   * this runs once the list has drawn the move, after an arrow and after a
+   * keystroke narrows it, as well as on every update of this element.
+   *
+   * Through `ariaActiveDescendantElement`, as `FilterInput` does, because the
+   * option is in the light DOM and the input in this shadow root, which an id
+   * cannot cross. Feature-tested, the assignment being a silent no-op where it
+   * is missing.
+   */
+  private linkActive(): void {
+    const control = this.partNamed('control')
+    if (!control || !('ariaActiveDescendantElement' in control)) {
+      return
+    }
+    const active = this.open
+      ? (this.listbox?.options ?? []).find((option) => option.active && !option.hidden)
+      : undefined
+    ;(
+      control as Element & { ariaActiveDescendantElement: Element | null }
+    ).ariaActiveDescendantElement = active ?? null
   }
 
   /**
@@ -674,6 +704,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     this.sync()
+    this.linkActive()
     /* After the render, not during it: the input's value is a binding, so
        selecting a range of it before Lit has written it selects a range of the
        previous value.

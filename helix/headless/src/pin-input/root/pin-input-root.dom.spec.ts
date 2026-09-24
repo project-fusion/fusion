@@ -433,3 +433,15 @@ describe('input pin validity', () => {
     expect(internals(host).validationMessage).not.toBe('')
   })
 })
+
+describe('the row of cells', () => {
+  test('is named by the label, resolved in its own tree', async () => {
+    /* The row is a group of its own inside the template, and it had no name:
+       each cell said "Character 1 of 6" and nothing said of what. */
+    const host = await pin()
+    const row = host.shadowRoot?.querySelector('[part="field"]')
+    const named = row?.getAttribute('aria-labelledby') ?? ''
+    const scope = row?.getRootNode() as ShadowRoot
+    expect(scope.getElementById(named)?.textContent?.trim()).toBe('Code')
+  })
+})

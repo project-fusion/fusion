@@ -187,9 +187,10 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
           part="entry"
       exportparts="item: entry-item, mark: entry-mark, start: entry-start"
           value=${entry.value}
-          aria-checked=${entry.value === active ? 'true' : 'false'}
+          checkable
+          ?checked=${entry.value === active}
           ?disabled=${entry.disabled}
-          role="menuitemradio"
+          exclusive
           @helix-select=${(event: Event) => {
             /* Stopped and re-announced from the host rather than let through.
                What travels up is then this element's own event, so a consumer
