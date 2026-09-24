@@ -324,6 +324,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** Watches the box, because the fit is a fraction of a measurement. */
   private sizes?: ResizeObserver
 
+  /** The element the observer is on, so a render does not observe it again. */
+  private watched: Element | undefined
+
   /** The box as the observer last measured it, so a resize knows what it gained. */
   private measured?: { width: number; height: number }
 
@@ -1188,12 +1191,24 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
   }
 
-  /** Keeps one observer on the box, so a fit follows a resize that has not happened yet. */
+  /**
+   * Keeps one observer on the box, so a fit follows a resize that has not
+   * happened yet.
+   *
+   * **Observed once, not on every render**, which is what threw "ResizeObserver
+   * loop completed with undelivered notifications" in every example that
+   * resized. A resize fits the board, the fit renders, and the render ran inside
+   * the browser's pass over the observers: re-observing there queues a first
+   * notification for the viewport at a depth the pass has already delivered,
+   * so the browser gives up on it and says so. The viewport is the same element
+   * from the first render on, so there is nothing to re-observe.
+   */
   private watchBox(): void {
     const viewport = this.renderRoot?.querySelector('[part="viewport"]')
-    if (typeof ResizeObserver === 'undefined' || !viewport) {
+    if (typeof ResizeObserver === 'undefined' || !viewport || viewport === this.watched) {
       return
     }
+    this.watched = viewport
     this.sizes ??= new ResizeObserver(() => {
       const box = this.box
       const was = this.measured
@@ -1241,6 +1256,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.sizes?.disconnect()
+    this.watched = undefined
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('keydown', this.handleStopKeydown)
     this.removeEventListener('pointercancel', this.handlePointerUp)
