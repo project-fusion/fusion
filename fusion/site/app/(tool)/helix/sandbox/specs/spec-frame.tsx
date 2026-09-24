@@ -12,6 +12,35 @@ interface RunMessage {
 }
 
 /**
+ * Runs `work` against a body of its own, and gives React's back afterwards.
+ *
+ * **The specs own `document.body`, and so does React.** Every spec mounts by
+ * writing the body's `innerHTML`, which throws away the nodes the root layout
+ * rendered there. Nothing notices until React next commits to them, which in
+ * development is the next compile: the router refreshes, React removes a node
+ * that is no longer where it left it, and the frame falls over into the global
+ * error page with "The node to be removed is not a child of this node."
+ *
+ * An empty body swapped in for the run keeps both honest. The specs see a
+ * document whose body is theirs to overwrite, and React keeps a reference to a
+ * body whose children are exactly the ones it made, so a refresh during a run
+ * lands on it harmlessly and one after lands on it back in place. The copy
+ * keeps the attributes the layout wrote, since a spec's page is still that page.
+ */
+const aside = async <T,>(work: () => Promise<T>): Promise<T> => {
+  const owned = document.body
+  const stage = owned.cloneNode(false) as HTMLElement
+  owned.replaceWith(stage)
+  try {
+    return await work()
+  } finally {
+    if (stage.isConnected) {
+      stage.replaceWith(owned)
+    }
+  }
+}
+
+/**
  * Runs a component's own DOM specs, in a real browser.
  */
 export function SpecFrame() {
@@ -40,7 +69,7 @@ export function SpecFrame() {
           loaded.set(family, bundle)
         }
         const started = performance.now()
-        const results = await (await bundle).run()
+        const results = await aside(async () => (await bundle).run())
         post({
           duration: performance.now() - started,
           family,
