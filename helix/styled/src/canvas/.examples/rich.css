@@ -1,0 +1,9 @@
+/* **A card is a box the consumer fills**, so what is in one is sized by them:
+   the picture takes the room above the line under it, and the reading below is
+   the card's own description slot. Nothing here is the board's business, which
+   is the point of a card being an element. */
+helix-canvas-node helix-image {
+  block-size: 96px;
+  display: block;
+  inline-size: 100%;
+}

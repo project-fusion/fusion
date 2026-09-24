@@ -25,7 +25,7 @@ import { styles } from './map-root.css.js'
  * @cssproperty --map-background-color - The well behind the map, seen while tiles are on their way.
  * @cssproperty --map-block-size - How tall the frame is. A length, since the map fills it.
  * @cssproperty --map-border-color - Color of the frame's edge.
- * @cssproperty --map-control-background-color - The ground under the pan and zoom buttons.
+ * @cssproperty --viewport-control-background-color - The ground under the pan and zoom buttons, one name with `Canvas`.
  */
 @customElement('helix-map')
 export class HelixMap extends HelixHeadlessMap {

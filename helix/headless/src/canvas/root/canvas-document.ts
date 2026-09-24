@@ -70,7 +70,7 @@ interface Box {
 }
 
 /** Whether the inner box sits inside the outer one. */
-const inside = (inner: Box, outer: Box): boolean =>
+export const inside = (inner: Box, outer: Box): boolean =>
   inner.x >= outer.x &&
   inner.y >= outer.y &&
   inner.x + inner.width <= outer.x + outer.width &&

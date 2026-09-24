@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { CanvasEnd, CanvasSide } from '../root/canvas-document.js'
 
@@ -61,6 +61,19 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   /** Which side of that card it arrives at, where the document says. */
   @property({ attribute: 'to-side' })
   toSide?: CanvasSide
+
+  /**
+   * Tells the board the connector changed, since the board is what draws it.
+   *
+   * Every property here is one the line is drawn from, so any change is one
+   * the board has to hear: a label written after the first paint otherwise
+   * never appeared.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    const board = this.parentElement as (HTMLElement & { requestUpdate?: () => void }) | null
+    board?.requestUpdate?.()
+  }
 
   /**
    * Nothing, and deliberately so.

@@ -40,6 +40,8 @@
 :host([type="group"]) {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
   border-style: dashed;
+  /* Its name is drawn above the box, and a card's clipping cut it off. */
+  overflow: visible;
   z-index: 0;
 }
 
@@ -62,18 +64,36 @@
   border-color: var(--canvas-color-6);
 }
 
+/* **Centered down the card, and still read from the start across it.** The
+   height is the author's, so a single line sat in the top corner of a box
+   drawn for three and the card read as empty; a column centered on its own
+   axis puts one line in the middle and lets three fill it. */
 [part="node"] {
   block-size: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  justify-content: center;
   padding: var(--canvas-node-padding, var(--helix-space-sm));
+}
+
+/* The ring is drawn by the card, since the card is what a reader walks to.
+   Inside it, because the card clips what overflows it and a ring outside
+   would be cut off by the box it marks. */
+[part="node"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* **A group's name sits above its box, not inside it.** Inside, it is behind
    whatever card the author placed at the top of the group, which is usually
-   one. */
+   one. Read from `aria-label` on the part, because `attr()` reads the element
+   the pseudo belongs to: `label` is on the host, the part never carries it, and
+   the name drew as nothing on every board. */
 :host([type="group"]) [part="node"]::before {
   color: var(--helix-color-foreground-muted);
-  content: attr(label);
+  content: attr(aria-label);
   font-size: var(--helix-text-xs);
   inset-block-end: 100%;
   inset-inline-start: 0;
@@ -82,6 +102,7 @@
 }
 
 :host([type="group"]) [part="node"] {
+  display: block;
   position: relative;
 }
 

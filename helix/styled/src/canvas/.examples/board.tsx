@@ -1,20 +1,23 @@
 export function Example() {
   return (
-    <helix-canvas label="How a release happens">
+    <helix-canvas
+      grid="dots"
+      label="How a release happens"
+    >
       <helix-canvas-node
-        height={130}
+        height={112}
         id="flow"
         label="Before the tag"
         type="group"
-        width={360}
-        x={-16}
-        y={-16}
+        width={528}
+        x={-24}
+        y={-24}
       ></helix-canvas-node>
 
       <helix-canvas-node
-        height={90}
+        height={64}
         id="write"
-        width={150}
+        width={160}
         x={0}
         y={0}
       >
@@ -23,10 +26,10 @@ export function Example() {
 
       <helix-canvas-node
         color="3"
-        height={90}
+        height={64}
         id="review"
-        width={150}
-        x={194}
+        width={160}
+        x={320}
         y={0}
       >
         Review it
@@ -34,11 +37,11 @@ export function Example() {
 
       <helix-canvas-node
         color="4"
-        height={90}
+        height={64}
         id="ship"
-        width={150}
-        x={97}
-        y={180}
+        width={160}
+        x={160}
+        y={200}
       >
         Tag and publish
       </helix-canvas-node>
