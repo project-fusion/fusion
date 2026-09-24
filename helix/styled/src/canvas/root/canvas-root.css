@@ -196,6 +196,20 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* **The box a Shift-drag draws**, on the plane with the cards it selects. */
+[part="marquee"] {
+  background-color: color-mix(in oklab, var(--helix-color-accent) 10%, transparent);
+  block-size: var(--_canvas-marquee-block-size);
+  border: var(--helix-border-thin) dashed var(--helix-color-accent);
+  box-sizing: border-box;
+  inline-size: var(--_canvas-marquee-inline-size);
+  left: var(--_canvas-marquee-x);
+  pointer-events: none;
+  position: absolute;
+  top: var(--_canvas-marquee-y);
+  z-index: 1;
+}
+
 /* The connection being drawn, dashed until it is asked for. */
 [part="draft"] {
   pointer-events: none;

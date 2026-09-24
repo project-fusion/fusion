@@ -1906,7 +1906,7 @@ const REGISTERED: &str = "| Axis | Values |
 | `nesting` | `heading` `peer` `subordinate` |
 | `orientation` | `auto` `horizontal` `vertical` |
 | `separation` | `elevated` `filled` `outlined` `plain` |
-| `shape` | `arc` `circle` `dots` `ring` `rounded` `square` `text` |
+| `shape` | `arc` `circle` `diamond` `dots` `pill` `ring` `rounded` `square` `text` |
 | `size` | `full` `lg` `md` `sm` |
 | `tone` | `accent` `danger` `info` `neutral` `primary` `success` `warning` |
 | `width` | `auto` `full` |
@@ -2267,7 +2267,10 @@ fn selectors() {
 /// A mixin may look up a part its own template renders, whichever host applies it.
 #[test]
 fn selectors_in_a_mixin() {
-    plant(
+    /* Its own fixture directory: sharing `selectors`'s raced it under the
+       parallel runner, each test planting over the other's tree. */
+    plant_in(
+        "selectors-mixin",
         "selectors",
         &[
             ("helix.json", TIERS),
@@ -2279,6 +2282,7 @@ fn selectors_in_a_mixin() {
                 "src/board/board.ts",
                 "export class Board extends MixinPad(HTMLElement) {\n  render() {\n    return `<div part=\"plane\"></div>`;\n  }\n}\n",
             ),
+            ("src/board/board.css", "[part=\"plane\"] {\n  color: red;\n}\n"),
         ],
         |tree| {
             tree.write(

@@ -22,6 +22,7 @@ import { styles } from './canvas-node.css.js'
  * @aliases CanvasCard, BoardNode
  * @documentation https://fusion.dev/helix/components/canvas
  *
+ * @cssproperty --canvas-grip-size - How large the corners a selected card is resized from are.
  * @cssproperty --canvas-handle-size - How large the points a connection is drawn from are.
  * @cssproperty --canvas-node-background-color - The ground the card is drawn on.
  * @cssproperty --canvas-node-color - A color with no meaning, where a tone will not do: a hex a document chose.

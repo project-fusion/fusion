@@ -1060,6 +1060,157 @@ describe('canvas selection and editing', () => {
 })
 
 /**
+ * Several at once, resizing, and shapes: what a board a reader works on needs
+ * beyond one card at a time.
+ */
+describe('canvas selections, sizes and shapes', () => {
+  type Board = Canvas & { selected: string }
+  let id = 40
+  const pointer = (type: string, x: number, y: number, init: PointerEventInit = {}) =>
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: x,
+      clientY: y,
+      composed: true,
+      pointerId: id,
+      ...init,
+    })
+  const box = (host: Canvas, name: string) =>
+    card(host, name).shadowRoot?.querySelector('[part="node"]') as HTMLElement
+  const click = (host: Canvas, name: string, init: PointerEventInit = {}) => {
+    id += 1
+    box(host, name).dispatchEvent(pointer('pointerdown', 10, 10, init))
+    host.dispatchEvent(pointer('pointerup', 10, 10, init))
+  }
+
+  test('a click selects one, and a modified click adds and takes away', async () => {
+    const host = (await canvas()) as Board
+    click(host, 'a')
+    expect(host.selected).toBe('a')
+    click(host, 'c', { shiftKey: true })
+    expect(host.selected).toBe('a,c')
+    click(host, 'a', { metaKey: true })
+    expect(host.selected).toBe('c')
+    click(host, 'b')
+    expect(host.selected).toBe('b')
+  })
+
+  test('Space adds and takes away, and Command with A selects everything', async () => {
+    const host = (await canvas()) as Board
+    host.selected = 'a'
+    press(card(host, 'c'), ' ')
+    expect(host.selected).toBe('a,c')
+    press(card(host, 'a'), ' ')
+    expect(host.selected).toBe('c')
+    const all = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'a',
+      metaKey: true,
+    })
+    box(host, 'a').dispatchEvent(all)
+    expect(host.selected.split(',').sort()).toEqual(['a', 'b', 'c', 'e1', 'e2', 'pair'])
+  })
+
+  test('Shift and a drag across the empty board selects the cards it touches', async () => {
+    const host = (await canvas()) as Board
+    const viewport = part(host, 'viewport') as HTMLElement
+    id += 1
+    /* The document's point plus 52, happy-dom measuring nothing. From above
+       Third's top left to inside it, touching only Third. */
+    viewport.dispatchEvent(pointer('pointerdown', 150, 330, { shiftKey: true }))
+    host.dispatchEvent(pointer('pointermove', 250, 400, { shiftKey: true }))
+    await host.updateComplete
+    expect(part(host, 'marquee')).not.toBeNull()
+    host.dispatchEvent(pointer('pointerup', 250, 400, { shiftKey: true }))
+    await host.updateComplete
+    expect(host.selected).toBe('c')
+    expect(part(host, 'marquee')).toBeNull()
+  })
+
+  test('a drag and Shift with an arrow move the whole selection', async () => {
+    const host = (await canvas()) as Board
+    host.selected = 'a,c'
+    await host.updateComplete
+    press(card(host, 'c'), 'ArrowRight', true)
+    await host.updateComplete
+    expect([card(host, 'a').x, card(host, 'c').x, card(host, 'b').x]).toEqual([16, 146, 260])
+
+    id += 1
+    box(host, 'a').dispatchEvent(pointer('pointerdown', 10, 10))
+    host.dispatchEvent(pointer('pointermove', 30, 10))
+    host.dispatchEvent(pointer('pointerup', 30, 10))
+    await host.updateComplete
+    expect([card(host, 'a').x, card(host, 'c').x, card(host, 'b').x]).toEqual([36, 166, 260])
+  })
+
+  test('Delete takes the whole selection, and the connections it strands', async () => {
+    const host = (await canvas()) as Board
+    host.selected = 'a,c'
+    await host.updateComplete
+    const asked: Array<{ nodes: string[]; edges: Array<{ name: string }> }> = []
+    host.addEventListener('helix-remove', (event) => asked.push((event as CustomEvent).detail))
+    press(card(host, 'a'), 'Delete')
+    expect(asked[0]?.nodes).toEqual(['a', 'c'])
+    expect(asked[0]?.edges.map((one) => one.name)).toEqual(['e1', 'e2'])
+  })
+
+  test('a selected card is resized from a corner, and says so as a move', async () => {
+    const host = (await canvas()) as Board
+    host.selected = 'c'
+    await host.updateComplete
+    await host.updateComplete
+    const grip = card(host, 'c').shadowRoot?.querySelector('[part~="grip-top-left"]') as Element
+    expect(grip).not.toBeNull()
+    const said: unknown[] = []
+    host.addEventListener('helix-move', (event) => said.push((event as CustomEvent).detail))
+    id += 1
+    grip.dispatchEvent(pointer('pointerdown', 0, 0))
+    host.dispatchEvent(pointer('pointermove', -20, 10))
+    host.dispatchEvent(pointer('pointerup', -20, 10))
+    // Dragged up-left from the top left: wider by 20, shorter by 10, and moved.
+    expect(said).toEqual([{ nodes: [{ height: 90, name: 'c', width: 220, x: 110, y: 310 }] }])
+    // Only the one selected card has grips.
+    expect(card(host, 'a').shadowRoot?.querySelector('[part~="grip"]')).toBeNull()
+  })
+
+  test('Alt with an arrow resizes from the bottom right, never below the least size', async () => {
+    const host = await canvas()
+    const c = card(host, 'c') as Card & { width: number; height: number }
+    press(c, 'ArrowRight')
+    const alt = (key: string) =>
+      c.shadowRoot?.querySelector('[part="node"]')?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          altKey: true,
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key,
+        }),
+      )
+    alt('ArrowRight')
+    alt('ArrowDown')
+    expect([c.width, c.height]).toEqual([216, 116])
+    for (let at = 0; at < 20; at++) {
+      alt('ArrowUp')
+    }
+    expect(c.height).toBe(32)
+  })
+
+  test('a diamond draws its own outline, and a circle needs none', async () => {
+    const host = await canvas()
+    card(host, 'c').setAttribute('shape', 'diamond')
+    card(host, 'b').setAttribute('shape', 'circle')
+    await host.updateComplete
+    await (card(host, 'c') as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(card(host, 'c').shadowRoot?.querySelector('[part="outline"] polygon')).not.toBeNull()
+    expect(card(host, 'b').shadowRoot?.querySelector('[part="outline"]')).toBeNull()
+  })
+})
+
+/**
  * The gestures a board is reached for with, which are this family's rather than
  * the surface's: what `Map` frames drags its own view.
  */
