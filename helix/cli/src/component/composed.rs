@@ -164,7 +164,8 @@ fn unlayered(
                     ),
                     file: context.relative(&file),
                     message: format!(
-                        "writes `<{tag}>` into a template and is on no layer, so it picks one for                          every caller"
+                        "writes `<{tag}>` into a template and is on no layer, so it picks one for \
+                         every caller"
                     ),
                 });
             }

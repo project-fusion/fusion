@@ -44,7 +44,7 @@ use regex::Regex;
 
 use crate::component::compositions::forwards_in;
 use crate::component::text::{blanked, flattened, line_of, uncommented};
-use crate::component::{sources, stylesheets, Context, Finding, Report};
+use crate::component::{decorator, sources, stylesheets, Context, Finding, Report};
 
 static CLASS: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?s)export class (\w+)(?:\s+extends\s+([\w<>(),\s]+?))?\s*\{")
@@ -58,8 +58,12 @@ static EXPORTED: LazyLock<Regex> = LazyLock::new(|| {
 static PART: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"part="([a-z0-9 -]+)""#).expect("a literal pattern compiles"));
 
-static SELECTS: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"\[part~?="([a-z-]+)"\]"#).expect("a literal pattern compiles"));
+/// A selector naming one part exactly, in either quote. Digits too, which a
+/// part name may carry and this missed: `[part="step-2"]` was never checked.
+/// Not `^=` or `*=`, which name a prefix or a fragment rather than a part.
+static SELECTS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"\[part~?=["']([a-z0-9-]+)["']\s*\]"#).expect("a literal pattern compiles")
+});
 
 static HELPER: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"export const (draw[A-Z]\w*)").expect("a literal pattern compiles")
@@ -100,15 +104,18 @@ static DECLARED_PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
         .expect("a literal pattern compiles")
 });
 
+/// An attribute a `:host()` argument selects on, with any operator.
+///
+/// **Every one in the argument, read from [`host_arguments`]**: a pattern over
+/// the sheet caught only the first, so `:host([variant][size])` never asked
+/// about `size`, and it wanted `]` or `=` straight after the name, so
+/// `:host([tone~="warm"])` was not read at all.
 static ON_HOST: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?s):host\([^)]*?\[([a-z-]+)[\]=]").expect("a literal pattern compiles")
+    Regex::new(r"\[\s*([a-z][a-z0-9-]*)\s*(?:[~|^$*]?=|\])").expect("a literal pattern compiles")
 });
 
 static WORD: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\w+").expect("a literal pattern compiles"));
-
-static EXPLICIT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"attribute:\s*'([^']+)'").expect("a literal pattern compiles"));
 
 static PROPERTY_NAME: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"([a-z-]+)\s*:").expect("a literal pattern compiles"));
@@ -154,7 +161,9 @@ const INHERITED: [&str; 15] = [
 
 /// Written imperatively rather than declared, plus what the platform owns.
 static NOT_A_PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"^(?:data-|aria-)|^(?:dir|disabled|hidden|id|lang|slot|part|popover)$")
+    Regex::new(
+        r"^(?:data-|aria-)|^(?:class|dir|disabled|hidden|id|inert|lang|part|popover|role|slot|style|tabindex|title)$",
+    )
         .expect("a literal pattern compiles")
 });
 
@@ -293,10 +302,10 @@ fn survey(context: &Context) -> Survey {
                 let declared = survey.attributes.entry(last).or_default();
                 for found in DECLARED_PROPERTY.captures_iter(&text) {
                     let options = found[1].to_owned();
-                    if options.contains("attribute: false") {
+                    if decorator::unattributed(&options) {
                         continue;
                     }
-                    let explicit = EXPLICIT.captures(&options).map(|one| one[1].to_owned());
+                    let explicit = decorator::attribute(&options);
                     declared.insert(explicit.unwrap_or_else(|| found[2].to_lowercase()));
                 }
             }
@@ -367,7 +376,7 @@ pub fn run(context: &Context) -> Report {
                 continue;
             };
             /* `blanked`, a sheet's `//` being the middle of a URL rather than
-               a comment: read as one, it hid every part after it on the line. */
+            a comment: read as one, it hid every part after it on the line. */
             let css = blanked(&raw);
             let where_ = context.relative(&sheet);
             checked += judge_sheet(&survey, &css, &where_, &sheet, &mut findings);
@@ -450,9 +459,14 @@ fn judge_sheet(
             &mut BTreeSet::new(),
             &mut available,
         );
-        let used: BTreeSet<String> = ON_HOST
-            .captures_iter(css)
-            .map(|one| one[1].to_owned())
+        let used: BTreeSet<String> = host_arguments(css)
+            .iter()
+            .flat_map(|argument| {
+                ON_HOST
+                    .captures_iter(argument)
+                    .map(|one| one[1].to_owned())
+                    .collect::<Vec<_>>()
+            })
             .collect();
         for attribute in used {
             if NOT_A_PROPERTY.is_match(&attribute) || available.contains(&attribute) {
@@ -593,8 +607,7 @@ fn lookups(context: &Context, survey: &Survey, findings: &mut Vec<Finding>) {
                     survey.in_family.get(family).cloned().unwrap_or_default(),
                 )
             } else {
-                let mut union: BTreeSet<String> =
-                    written(&flattened(&code)).into_iter().collect();
+                let mut union: BTreeSet<String> = written(&flattened(&code)).into_iter().collect();
                 for (class, bases) in &survey.bases {
                     if bases.iter().any(|base| mixins.contains(base)) {
                         if let Some(host) = survey.family_of.get(class) {

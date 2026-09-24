@@ -241,7 +241,9 @@ fn sorted(source: &str) -> Option<String> {
     let mut classes: Vec<usize> = all.iter().map(|one| one.class).collect();
     classes.dedup();
     for class in classes {
-        let slots: Vec<usize> = (0..all.len()).filter(|&at| all[at].class == class).collect();
+        let slots: Vec<usize> = (0..all.len())
+            .filter(|&at| all[at].class == class)
+            .collect();
         let mut names = slots.clone();
         names.sort_by_key(|&at| all[at].name.to_lowercase());
         for (slot, taken) in slots.into_iter().zip(names) {

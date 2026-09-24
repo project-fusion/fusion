@@ -22,7 +22,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::{sources, Context, Finding, Report};
+use crate::component::{decorator, sources, Context, Finding, Report};
 
 /// Properties that mirror a platform attribute, and how HTML spells each.
 const PLATFORM: [(&str, &str); 18] = [
@@ -62,10 +62,6 @@ static DECLARATION: LazyLock<Regex> = LazyLock::new(|| {
         .expect("the declaration pattern is a literal and compiles")
 });
 
-static DECLARED: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"attribute:\s*'([^']+)'").expect("the attribute pattern is a literal and compiles")
-});
-
 pub fn run(context: &Context) -> Report {
     let platform: BTreeMap<&str, &str> = PLATFORM.into_iter().collect();
     let excused: BTreeMap<&str, &str> = EXCUSED.into_iter().collect();
@@ -88,12 +84,9 @@ pub fn run(context: &Context) -> Report {
                 };
                 checked += 1;
                 let options = capture.get(1).map_or("", |one| one.as_str());
-                let declared = DECLARED
-                    .captures(options)
-                    .and_then(|one| one.get(1))
-                    .map(|one| one.as_str());
+                let declared = decorator::attribute(options);
 
-                if excused.get(member) == declared.as_ref() {
+                if excused.get(member).copied() == declared.as_deref() {
                     continue;
                 }
 
@@ -112,7 +105,7 @@ pub fn run(context: &Context) -> Report {
                             ),
                         });
                     }
-                    Some(declared) if declared != *expected => findings.push(Finding {
+                    Some(declared) if declared != **expected => findings.push(Finding {
                         detail: "A consumer who knows the platform writes the platform's name, \
                                  and a wrong one parses to no property and warns about nothing."
                             .to_owned(),

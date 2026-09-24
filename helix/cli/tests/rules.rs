@@ -1863,6 +1863,61 @@ fn reflected() {
     );
 }
 
+/// The empty string is a default, which Lit writes as `name=""`, and the two
+/// rules about reflection say so together.
+#[test]
+fn reflected_empty() {
+    let card = |member: &str| {
+        format!(
+            "export class Card extends HTMLElement {{
+  @property({{ reflect: true }})
+  {member}
+}}
+"
+        )
+    };
+    plant_in(
+        "reflected-empty",
+        "reflected",
+        &[
+            ("helix.json", TIERS),
+            ("src/card/card.ts", &card("tone: string | null = null")),
+        ],
+        |tree| {
+            tree.write("src/card/card.ts", &card("tone = ''"));
+        },
+        "`tone` reflects and defaults to ''",
+        "src/card/card.ts:3",
+    );
+}
+
+/// `null` writes nothing when reflected, so it is no default.
+#[test]
+fn reflected_defaults_null() {
+    let card = |member: &str| {
+        format!(
+            "export class Card extends HTMLElement {{
+  @property({{ reflect: true }})
+  {member}
+}}
+"
+        )
+    };
+    plant_in(
+        "reflected-defaults-null",
+        "reflected-defaults",
+        &[
+            ("helix.json", TIERS),
+            ("src/card/card.ts", &card("tone: string | null = null")),
+        ],
+        |tree| {
+            tree.write("src/card/card.ts", &card("tone = ''"));
+        },
+        "`tone` reflects and defaults to `''`",
+        "src/card/card.ts:2",
+    );
+}
+
 #[test]
 fn reflected_defaults() {
     let card = |member: &str| {
@@ -2264,11 +2319,64 @@ fn selectors() {
     );
 }
 
+/// Every attribute in a `:host()` argument is read, with any operator, and a
+/// declaration in double quotes declares it.
+#[test]
+fn selectors_on_the_host() {
+    let button = "export class Button extends HTMLElement {\n  @property({ attribute: \"tone-name\", reflect: true })\n  toneName = ''\n\n  @property({ reflect: true })\n  variant = ''\n\n  render() {\n    return `<span part=\"step-2\"></span>`;\n  }\n}\n";
+    plant_in(
+        "selectors-host",
+        "selectors",
+        &[
+            ("helix.json", TIERS),
+            ("src/button/button.ts", button),
+            (
+                "src/button/button.css",
+                ":host([tone-name~=\"warm\"][variant]) [part=\"step-2\"] {\n  color: red;\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "src/button/button.css",
+                ":host([variant][size]) [part=\"step-2\"] {\n  color: red;\n}\n",
+            );
+        },
+        "`:host([size])` selects an attribute",
+        "src/button/button.css",
+    );
+}
+
+/// A part name with a digit in it is checked like any other.
+#[test]
+fn selectors_with_a_digit() {
+    let button = "export class Button extends HTMLElement {\n  render() {\n    return `<span part=\"step-2\"></span>`;\n  }\n}\n";
+    plant_in(
+        "selectors-digit",
+        "selectors",
+        &[
+            ("helix.json", TIERS),
+            ("src/button/button.ts", button),
+            (
+                "src/button/button.css",
+                "[part=\"step-2\"] {\n  color: red;\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "src/button/button.css",
+                "[part=\"step-3\"] {\n  color: red;\n}\n",
+            );
+        },
+        "`[part=\"step-3\"]` matches nothing",
+        "src/button/button.css",
+    );
+}
+
 /// A mixin may look up a part its own template renders, whichever host applies it.
 #[test]
 fn selectors_in_a_mixin() {
     /* Its own fixture directory: sharing `selectors`'s raced it under the
-       parallel runner, each test planting over the other's tree. */
+    parallel runner, each test planting over the other's tree. */
     plant_in(
         "selectors-mixin",
         "selectors",

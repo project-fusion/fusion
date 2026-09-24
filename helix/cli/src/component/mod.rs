@@ -48,6 +48,7 @@ pub mod constructed;
 pub mod conventions;
 pub mod corners;
 pub mod decided;
+pub mod decorator;
 pub mod derived_steps;
 pub mod disabled;
 pub mod displaced;
