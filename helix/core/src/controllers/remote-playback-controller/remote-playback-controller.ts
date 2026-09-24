@@ -48,7 +48,7 @@ export class RemotePlaybackController implements ReactiveController {
   /**
    * Asks to hear when a device turns up or goes, for the media attached.
    *
-   * **A watch that arrives after the host has gone is cancelled on arrival.**
+   * **A watch that arrives after the host has gone is canceled on arrival.**
    * The platform answers asynchronously, and a video removed while it did kept
    * a watch nothing would cancel.
    */
@@ -83,7 +83,7 @@ export class RemotePlaybackController implements ReactiveController {
   }
 
   /**
-   * Watches again after a move. The disconnect cancelled it, and `attach` is
+   * Watches again after a move. The disconnect canceled it, and `attach` is
    * called once, so the control kept whatever it last knew about devices.
    */
   hostConnected(): void {

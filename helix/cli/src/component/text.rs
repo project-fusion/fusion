@@ -330,7 +330,7 @@ mod tests {
 
     #[test]
     fn a_comment_holding_non_ascii_blanks_to_its_length_in_bytes() {
-        let code = "/* — “quoted” — */\nx";
+        let code = "/* \u{2014} \u{201c}quoted\u{201d} \u{2014} */\nx";
         assert_eq!(blanked(code).len(), code.len());
         assert_eq!(uncommented(code).len(), code.len());
         assert!(uncommented(code).ends_with("\nx"));

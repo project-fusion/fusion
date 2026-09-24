@@ -38,9 +38,9 @@ const media = () => {
 }
 
 describe('the availability watch across a move', () => {
-  test('is cancelled on the way out and opened again on the way back', async () => {
+  test('is canceled on the way out and opened again on the way back', async () => {
     /* `attach` is called once, from the video's first render, so a watch the
-       disconnect cancelled never came back: the control kept whatever it last
+       disconnect canceled never came back: the control kept whatever it last
        knew about devices. */
     const element = host()
     const remote = new RemotePlaybackController(element, {
@@ -61,7 +61,7 @@ describe('the availability watch across a move', () => {
     expect(open.size).toBe(1)
   })
 
-  test('a watch that arrives after the host has gone is cancelled on arrival', async () => {
+  test('a watch that arrives after the host has gone is canceled on arrival', async () => {
     const element = host()
     const remote = new RemotePlaybackController(element, {
       available: () => {},
