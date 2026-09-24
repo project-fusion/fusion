@@ -82,6 +82,28 @@ const ARROW = 'canvas-arrow'
 const NUDGE = 16
 
 /**
+ * How far out and how far in the board zooms.
+ *
+ * **A tenth to eight times.** A quarter was too near to see a large board
+ * whole, and four times too far to read what a small card holds, a chart or a
+ * picture, at the size it was worth drawing.
+ */
+const ZOOM_MIN = 0.1
+const ZOOM_MAX = 8
+
+/**
+ * The zoom the ruling is drawn at, which steps by doubling as the board zooms
+ * out so the lines stay far enough apart to be lines.
+ *
+ * At a tenth, a ruling every 32 units is a line every three pixels, which reads
+ * as a gray wash rather than a grid. Doubling the spacing each time it would
+ * fall below half keeps every line the coarser ruling draws on one the finer
+ * ruling drew, so a card on a line stays on a line.
+ */
+const ruling = (zoom: number): number =>
+  zoom >= 0.5 ? zoom : zoom * 2 ** Math.ceil(Math.log2(0.5 / zoom))
+
+/**
  * How far a pointer travels on a card before a press becomes a drag.
  *
  * A card is also something a reader clicks to focus, or clicks through to a
@@ -544,8 +566,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * center point still is two lines of arithmetic and it is what every canvas
    * does.
    *
-   * Held between a quarter and four times, which is far enough out to see a
-   * large board whole and far enough in to read a card that was drawn small.
+   * Held between a tenth and eight times, which is far enough out to see a
+   * large board whole and far enough in to read what a small card holds.
    */
   override zoom(by: number): void {
     this.direct = false
@@ -1292,7 +1314,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** Scales about a point in the box, which is what both the buttons and a pinch want. */
   private zoomAbout(by: number, about: { x: number; y: number }): void {
     const from = this.at.zoom
-    const to = Math.min(Math.max(from * by, 0.25), 4)
+    const to = Math.min(Math.max(from * by, ZOOM_MIN), ZOOM_MAX)
     this.at = {
       x: about.x - ((about.x - this.at.x) * to) / from,
       y: about.y - ((about.y - this.at.y) * to) / from,
@@ -1404,7 +1426,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   set view(next: CanvasView) {
     const origin = this.origin ?? { x: 0, y: 0 }
     const { height, width } = this.box
-    const zoom = Math.min(Math.max(next.zoom, 0.25), 4)
+    const zoom = Math.min(Math.max(next.zoom, ZOOM_MIN), ZOOM_MAX)
     this.touched = true
     this.direct = false
     this.at = {
@@ -1777,7 +1799,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           />
           ${
             edge.label
-              ? svg`<text part="label" aria-hidden="true" x=${drawn.mid.x} y=${drawn.mid.y} text-anchor="middle">
+              ? svg`<text part="label" aria-hidden="true" x=${drawn.mid.x} y=${drawn.mid.y} dominant-baseline="central" text-anchor="middle">
                   ${edge.label}
                 </text>`
               : nothing
@@ -1860,7 +1882,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       </div>
       <div
         part="viewport"
-        style=${`--_canvas-x: ${this.at.x}px; --_canvas-y: ${this.at.y}px; --_canvas-zoom: ${this.at.zoom}; --_canvas-rule-x: ${this.at.x - origin.x * this.at.zoom}px; --_canvas-rule-y: ${this.at.y - origin.y * this.at.zoom}px`}
+        style=${`--_canvas-x: ${this.at.x}px; --_canvas-y: ${this.at.y}px; --_canvas-zoom: ${this.at.zoom}; --_canvas-rule-x: ${this.at.x - origin.x * this.at.zoom}px; --_canvas-rule-y: ${this.at.y - origin.y * this.at.zoom}px; --_canvas-rule-zoom: ${ruling(this.at.zoom)}`}
         @wheel=${this.handleWheel}
       >
         <!-- **One shape, whatever the board holds**, which is what hydration
