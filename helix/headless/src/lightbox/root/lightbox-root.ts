@@ -200,16 +200,18 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     if (items.length === 0) {
       return
     }
-    const current = items.findIndex((item) => item.value === this.active)
-    /* `-1` is a set whose `active` names nothing, where a step in either
-       direction starts at the beginning rather than off the end. */
+    /* From the picture on screen, which is the first where `active` names
+       nothing, and compared against it too: against `active`, a step that
+       went nowhere asked to show the picture already showing, and said so. */
+    const shown = this.shown
+    const current = shown ? items.indexOf(shown) : -1
     const from = current === -1 ? 0 : current
     const last = items.length - 1
     const next = this.loop
       ? (from + by + items.length) % items.length
       : Math.min(Math.max(from + by, 0), last)
     const target = items[next]
-    if (target && target.value !== this.active) {
+    if (target && target !== shown) {
       this.requestActive(target.value)
     }
   }
@@ -274,9 +276,14 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   /** Home and End, which are an index rather than a step. */
   private toEnd(at: number): void {
     const target = this.items[at]
-    if (target && target.value !== this.active) {
+    if (target && target !== this.shown) {
       this.requestActive(target.value)
     }
+  }
+
+  /** The item on screen: the one `active` names, or the first where it names none. */
+  private get shown() {
+    return resolveActiveItem(this.active ?? '', this.items)
   }
 
   /**

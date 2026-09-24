@@ -12,6 +12,8 @@
  */
 export const fillTemplate = (template: string, values: Record<string, string | number>): string =>
   Object.entries(values).reduce(
-    (out, [key, value]) => out.replaceAll(`{${key}}`, String(value)),
+    /* A function rather than the value itself, which `replaceAll` would read
+       as a pattern: an option called "Tier $$" was removed as "Tier $". */
+    (out, [key, value]) => out.replaceAll(`{${key}}`, () => String(value)),
     template,
   )

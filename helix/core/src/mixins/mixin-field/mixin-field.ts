@@ -256,7 +256,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * What a reader is told when the field is required and empty, where the
      * page says.
      *
-     * **Absent is the control's own sentence**, "Choose one to continue." on a
+     * **Absent, or empty, is the control's own sentence**, "Choose one to continue." on a
      * set and the browser's own on a text field, which the browser writes in
      * the reader's language. Every other word a control speaks is a property,
      * and this one was the English a form in another language still spoke in
@@ -515,7 +515,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       if (this.required && empty) {
         this.internals.setValidity(
           { valueMissing: true },
-          this.valueMissingMessage ?? message,
+          this.valueMissingMessage || message,
           this.partNamed(anchor) ?? undefined,
         )
       } else {
@@ -537,8 +537,10 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     protected copyValidity(
       control: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     ): void {
+      /* An empty sentence is no sentence: the page has not said anything, and
+         a verdict with a flag and no words is one `setValidity` refuses. */
       const message =
-        control.validity.valueMissing && this.valueMissingMessage !== undefined
+        control.validity.valueMissing && this.valueMissingMessage
           ? this.valueMissingMessage
           : control.validationMessage
       this.internals.setValidity(control.validity, message, control)

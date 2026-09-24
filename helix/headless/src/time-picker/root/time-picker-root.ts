@@ -511,7 +511,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     if (this.required && this.value === '') {
       this.internals.setValidity(
         { valueMissing: true },
-        this.valueMissingMessage ?? 'Choose a time.',
+        this.valueMissingMessage || 'Choose a time.',
         anchor,
       )
       return
@@ -525,7 +525,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     if (held.length > 0 && held.some((one) => asTime(one) === null)) {
       this.internals.setValidity(
         { badInput: true },
-        this.badInputMessage ??
+        this.badInputMessage ||
           (this.mode === undefined
             ? 'Enter a time as HH:mm.'
             : 'Enter times as HH:mm, separated by commas.'),
