@@ -1,3 +1,4 @@
+import './editing.css'
 import { useRef, useState } from 'react'
 
 type Side = 'top' | 'right' | 'bottom' | 'left'
