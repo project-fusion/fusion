@@ -44,7 +44,7 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
 
   /** Which side of that card it leaves, where the document says. */
   @property({ attribute: 'from-side' })
-  fromSide?: CanvasSide
+  fromSide?: CanvasSide | undefined
 
   /** What the connector says, drawn at its middle. */
   @property()
@@ -95,7 +95,7 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
 
   /** Which side of that card it arrives at, where the document says. */
   @property({ attribute: 'to-side' })
-  toSide?: CanvasSide
+  toSide?: CanvasSide | undefined
 
   /**
    * Tells the board the connector changed, since the board is what draws it.

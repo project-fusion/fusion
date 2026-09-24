@@ -134,8 +134,9 @@
   pointer-events: none;
 }
 
+/* A connection is picked up by its end and dragged, so it says grab. */
 [part="edge-target"] {
-  cursor: pointer;
+  cursor: grab;
   pointer-events: stroke;
   stroke: transparent;
   stroke-width: var(--canvas-edge-target-width, 12px);
@@ -145,10 +146,15 @@
   outline: none;
 }
 
-/* **Focus thickens the line it is on**, since a ring around a curve is a box
-   around empty space. The target comes first in the drawing for this, so the
-   painted line after it can answer. */
-[part="edge-target"]:hover + [part="edge"],
+/* **Hover recolors the line and focus thickens it**, since a ring around a
+   curve is a box around empty space. Hover thickened it too, and a line that
+   swelled under every passing pointer read as a second line drawn over the
+   first. The target comes first in the drawing for this, so the painted line
+   after it can answer. */
+[part="edge-target"]:hover + [part="edge"] {
+  stroke: var(--helix-color-focus-ring);
+}
+
 [part="edge-target"]:focus-visible + [part="edge"] {
   stroke: var(--helix-color-focus-ring);
   stroke-width: calc(var(--helix-border-thick) * 2);

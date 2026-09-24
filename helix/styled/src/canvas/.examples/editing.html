@@ -1,4 +1,4 @@
-<!-- @summary A board a reader rearranges: draw from a card's edge to another to join them, or press C on one and Enter on another, and Delete takes a card or a connection away. -->
+<!-- @summary A board a reader rearranges: draw from a card's edge to another to join them, drag a connection's end to move it, and Delete takes a card or a connection away. -->
 <helix-canvas
   id="launch"
   label="Ideas for the launch"
@@ -42,7 +42,7 @@
 
   // Asked rather than done: the board never adds to the page's markup, so the page does.
   launch.addEventListener('helix-connect', (event) => {
-    const { from, fromSide, to } = event.detail
+    const { from, fromSide, to, toSide } = event.detail
     made += 1
     const edge = document.createElement('helix-canvas-edge')
     edge.setAttribute('name', `made-${made}`)
@@ -50,6 +50,9 @@
     edge.setAttribute('to', to)
     if (fromSide) {
       edge.setAttribute('from-side', fromSide)
+    }
+    if (toSide) {
+      edge.setAttribute('to-side', toSide)
     }
     launch.append(edge)
   })

@@ -265,6 +265,8 @@ export interface ConnectDetail {
   to: string
   /** The side the reader drew from, where they drew from one. */
   fromSide?: 'top' | 'right' | 'bottom' | 'left' | undefined
+  /** The side nearest where they let go, where they let go over a card. */
+  toSide?: 'top' | 'right' | 'bottom' | 'left' | undefined
 }
 
 /**
@@ -281,6 +283,54 @@ export class HelixConnectEvent extends CustomEvent<ConnectDetail> {
 
   constructor(detail: ConnectDetail) {
     super(HelixConnectEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** Where a connection's ends are going, and where they were. */
+export interface ReconnectDetail {
+  /** The connection's name, where it has one. */
+  name: string
+  /** Its ends before, so a page that named none of its connections can find it. */
+  was: { from: string; to: string }
+  from: string
+  to: string
+  fromSide?: 'top' | 'right' | 'bottom' | 'left' | undefined
+  toSide?: 'top' | 'right' | 'bottom' | 'left' | undefined
+}
+
+/**
+ * A connection's end is about to move to another card or another side, and can
+ * be refused.
+ *
+ * **A move, not a request, and that is the difference from `helix-connect`.**
+ * The connection is already an element on the page, so the board rewrites its
+ * ends itself, the way it writes a card's position onto the card; a page that
+ * holds its connections in state refuses this and writes them there.
+ */
+export class HelixBeforeReconnectEvent extends CustomEvent<ReconnectDetail> {
+  static readonly eventName = 'helix-before-reconnect'
+
+  constructor(detail: ReconnectDetail) {
+    super(HelixBeforeReconnectEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** A connection's end moved, and the move is finished. */
+export class HelixReconnectEvent extends CustomEvent<ReconnectDetail> {
+  static readonly eventName = 'helix-reconnect'
+
+  constructor(detail: ReconnectDetail) {
+    super(HelixReconnectEvent.eventName, {
       bubbles: true,
       cancelable: false,
       composed: true,
@@ -1392,6 +1442,7 @@ const registry = {
   HelixBeforeOpenEvent,
   HelixBeforePanelResizeEvent,
   HelixBeforePinEvent,
+  HelixBeforeReconnectEvent,
   HelixBeforeResizeEvent,
   HelixBeforeSplitEvent,
   HelixBeforeToggleEvent,
@@ -1415,6 +1466,7 @@ const registry = {
   HelixNextEvent,
   HelixPreviousEvent,
   HelixReadEvent,
+  HelixReconnectEvent,
   HelixRemoveEvent,
   HelixReorderEvent,
   HelixResizeEvent,

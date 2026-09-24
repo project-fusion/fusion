@@ -9,6 +9,7 @@ beforeAll(async () => {
 type Canvas = HTMLElement & {
   order?: 'spatial' | 'edges'
   readOnly: boolean
+  requestUpdate(): void
   show(id: string): void
   updateComplete: Promise<boolean>
 }
@@ -486,13 +487,107 @@ describe('canvas connections and removal', () => {
     /* happy-dom measures nothing, so the view is unzoomed at its corner and the
        plane starts a margin above and left of the group at -20: a point on the
        screen is the document's point plus 52. Third is at 130..330, 300..400. */
-    host.dispatchEvent(pointer('pointermove', 280, 402))
+    host.dispatchEvent(pointer('pointermove', 282, 360))
     await host.updateComplete
     expect(part(host, 'draft')).not.toBeNull()
-    host.dispatchEvent(pointer('pointerup', 280, 402))
+    host.dispatchEvent(pointer('pointerup', 282, 360))
     await host.updateComplete
-    expect(asked).toEqual([{ from: 'a', fromSide: 'right', to: 'c' }])
+    /* Near Third's top edge, so it arrives at the top: the side nearest the
+       pointer, not the one facing the card it came from. */
+    expect(asked).toEqual([{ from: 'a', fromSide: 'right', to: 'c', toSide: 'top' }])
     expect(part(host, 'draft')).toBeNull()
+  })
+
+  test('dragging a connection by its end moves that end, and the board rewrites it', async () => {
+    const host = await canvas()
+    const said: unknown[] = []
+    host.addEventListener('helix-reconnect', (event) => said.push((event as CustomEvent).detail))
+    const pointer = (type: string, x: number, y: number) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: y,
+        composed: true,
+        pointerId: 6,
+      })
+    /* e1 runs from First's right side (200, 50) to Second's left (260, 50): on
+       screen, plus 52. Pressed near its arriving end, so that end is in hand. */
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
+    // Over Third, near its top.
+    host.dispatchEvent(pointer('pointermove', 282, 360))
+    await host.updateComplete
+    await host.updateComplete
+    expect(hasState(card(host, 'c'), 'target')).toBe(true)
+    host.dispatchEvent(pointer('pointerup', 282, 360))
+    await host.updateComplete
+    expect(said).toEqual([
+      { from: 'a', name: 'e1', to: 'c', toSide: 'top', was: { from: 'a', to: 'b' } },
+    ])
+    const moved = host.querySelector('[name="e1"]') as HTMLElement & { to: string; toSide?: string }
+    expect([moved.to, moved.toSide]).toEqual(['c', 'top'])
+  })
+
+  test('a connection end refused stays where it was, and one dropped on nothing asks to go', async () => {
+    const host = await canvas()
+    const pointer = (type: string, x: number, y: number) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: y,
+        composed: true,
+        pointerId: 7,
+      })
+    host.addEventListener('helix-before-reconnect', (event) => event.preventDefault())
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
+    host.dispatchEvent(pointer('pointermove', 282, 360))
+    host.dispatchEvent(pointer('pointerup', 282, 360))
+    await host.updateComplete
+    expect((host.querySelector('[name="e1"]') as HTMLElement & { to: string }).to).toBe('b')
+
+    const removed: unknown[] = []
+    host.addEventListener('helix-remove', (event) => removed.push((event as CustomEvent).detail))
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
+    // Out over empty board, below everything.
+    host.dispatchEvent(pointer('pointermove', 600, 600))
+    host.dispatchEvent(pointer('pointerup', 600, 600))
+    expect(removed).toEqual([{ edges: [{ from: 'a', name: 'e1', to: 'b' }], nodes: [] }])
+  })
+
+  test('a press on a connection that does not move is a click, and picks nothing up', async () => {
+    const host = await canvas()
+    let asked = 0
+    for (const name of ['helix-before-reconnect', 'helix-remove']) {
+      host.addEventListener(name, () => {
+        asked += 1
+      })
+    }
+    const pointer = (type: string) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: 305,
+        clientY: 102,
+        composed: true,
+        pointerId: 8,
+      })
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown'))
+    host.dispatchEvent(pointer('pointerup'))
+    expect(asked).toBe(0)
+  })
+
+  test('C on a connection picks up its arriving end, and Enter on a card puts it there', async () => {
+    const host = await canvas()
+    const said: unknown[] = []
+    host.addEventListener('helix-reconnect', (event) => said.push((event as CustomEvent).detail))
+    pressOn(connection(host, 'edge:e1'), 'c')
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toContain(
+      'Moving the end of the connection from First to Second',
+    )
+    press(card(host, 'c'), 'Enter')
+    expect(said).toEqual([{ from: 'a', name: 'e1', to: 'c', was: { from: 'a', to: 'b' } }])
   })
 
   test('Delete on a card asks for it and every connection it would strand', async () => {
