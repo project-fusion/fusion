@@ -16,7 +16,7 @@ import { styles } from './canvas-node.css.js'
  * rather than a heap at the origin.
  *
  * @since 0.100.0
- * @status stable
+ * @status experimental
  * @category media
  * @aliases CanvasCard, BoardNode
  * @documentation https://fusion.dev/helix/components/canvas

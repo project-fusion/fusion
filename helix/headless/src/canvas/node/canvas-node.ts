@@ -21,7 +21,7 @@ import { property } from 'lit/decorators.js'
  * the honest half of what a board can promise before it hydrates.
  *
  * @since 0.100.0
- * @status stable
+ * @status experimental
  * @category media
  * @aliases CanvasCard, BoardNode
  * @documentation https://fusion.dev/helix/components/canvas

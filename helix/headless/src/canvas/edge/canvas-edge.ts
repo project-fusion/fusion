@@ -18,7 +18,7 @@ import type { CanvasEnd, CanvasSide } from '../root/canvas-document.js'
  * can write is one they can also put a condition around.
  *
  * @since 0.100.0
- * @status stable
+ * @status experimental
  * @category media
  * @aliases CanvasConnector, BoardEdge
  * @documentation https://fusion.dev/helix/components/canvas

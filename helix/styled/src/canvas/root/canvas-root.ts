@@ -19,7 +19,7 @@ import { styles } from './canvas-root.css.js'
  * document's own coordinates and never laid out again.
  *
  * @since 0.100.0
- * @status stable
+ * @status experimental
  * @category media
  * @aliases Board, JSON Canvas, Whiteboard
  * @documentation https://fusion.dev/helix/components/canvas

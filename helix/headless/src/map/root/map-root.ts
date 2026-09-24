@@ -49,7 +49,7 @@ export type MapControlsPlacement = ViewportControlsPlacement
  * A frame that moved the map would have to know whose map it was.
  *
  * @since 0.100.0
- * @status stable
+ * @status experimental
  * @category media
  * @aliases Map frame, Map container, Geo
  * @documentation https://fusion.dev/helix/components/map
