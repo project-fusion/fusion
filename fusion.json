@@ -112,6 +112,7 @@
       "icon": "A leaf that takes a name and draws it, in fourteen families, and no consumer wants a different icon element that their own plus --icon-size does not already give them."
     },
     "lengths": {
+      "canvas": "A card answers with the size the document gave it, in the document's own units, because position and extent are data on a board rather than a policy this library chooses between.",
       "table": "A column answers with a CSS grid track, 16rem or minmax(0, 2fr), because the question is not which of three behaviors but exactly how wide."
     },
     "oracle": "helix/theme/rust/oracle.json",

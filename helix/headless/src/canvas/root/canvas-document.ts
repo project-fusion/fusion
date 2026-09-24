@@ -16,6 +16,8 @@ export type CanvasSide = 'top' | 'right' | 'bottom' | 'left'
 export interface CanvasNode {
   /** What identifies it, and what an edge names. */
   id: string
+  /** Whatever the card says, where it says anything. */
+  text?: string | undefined
   /** What it is: a card of text, a file, a link, or a box around others. */
   type: 'text' | 'file' | 'link' | 'group'
   x: number
@@ -23,15 +25,13 @@ export interface CanvasNode {
   width: number
   height: number
   /** A preset from `1` to `6`, or a hex color the document chose itself. */
-  color?: string
-  /** The card's text, where it is one. */
-  text?: string
+  color?: string | undefined
   /** The file it stands for, where it is one. */
-  file?: string
+  file?: string | undefined
   /** The address it points at, where it is one. */
-  url?: string
+  url?: string | undefined
   /** What the group is called. */
-  label?: string
+  label?: string | undefined
 }
 
 /** What a connector carries at an end: an arrowhead, or nothing. */
@@ -42,17 +42,17 @@ export interface CanvasEdge {
   id: string
   fromNode: string
   toNode: string
-  fromSide?: CanvasSide
-  toSide?: CanvasSide
+  fromSide?: CanvasSide | undefined
+  toSide?: CanvasSide | undefined
   /**
    * What sits at the end it leaves from. Absent is nothing, which is the
    * format's own default and what makes an ordinary edge a one-way arrow.
    */
-  fromEnd?: CanvasEnd
+  fromEnd?: CanvasEnd | undefined
   /** What sits at the end it arrives at. Absent is an arrow, as the format says. */
-  toEnd?: CanvasEnd
-  color?: string
-  label?: string
+  toEnd?: CanvasEnd | undefined
+  color?: string | undefined
+  label?: string | undefined
 }
 
 /** A whole board. */

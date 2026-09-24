@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import {
   hasPart,
   hostAttributes,
+  hostTag,
   partTag,
   rendered,
   ssr,
@@ -10,58 +11,75 @@ import {
 import { html } from 'lit'
 import '../index.js'
 
-const BOARD = {
-  edges: [{ fromNode: 'a', id: 'e1', toNode: 'b' }],
-  nodes: [
-    { height: 100, id: 'a', text: 'First', type: 'text' as const, width: 200, x: 0, y: 0 },
-    { height: 100, id: 'b', text: 'Second', type: 'text' as const, width: 200, x: 260, y: 0 },
-  ],
-}
-
-const served = (extra = {}) =>
+/**
+ * What a board is on the server, which is less than it is on the client and
+ * more than it was.
+ *
+ * **A parent cannot see its children while it is being rendered**, which `Tabs`
+ * states in as many words: `children` is undefined there, so there is nothing to
+ * count. So the plane, the connectors and the reading list are assembled on
+ * hydration, and what the served markup carries is the cards themselves, with
+ * their text and their coordinates, because the consumer wrote them and every
+ * renderer emits what was written.
+ *
+ * That is the trade this family took when it stopped taking a document as a
+ * property: a property is rendered by Lit's server and skipped by React's, so
+ * the old shape served everything in one renderer and nothing in the other.
+ */
+const served = () =>
   withoutStyles(
-    ssr(
-      html`<helix-headless-canvas label="A board" .data=${{ ...BOARD, ...extra }}></helix-headless-canvas>`,
-    ),
+    ssr(html`<helix-headless-canvas label="A board">
+      <helix-headless-canvas-node id="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
+      <helix-headless-canvas-node id="b" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
+      <helix-headless-canvas-edge id="e1" from="a" to="b"></helix-headless-canvas-edge>
+    </helix-headless-canvas>`),
   )
 
 describe('canvas server output', () => {
-  test('the whole board is in the served markup, not drawn after hydration', () => {
-    /* This is why the document is a property rather than a URL: what a fetch
-       returns cannot be server-rendered, and a board that arrived only with the
-       JavaScript would be empty to a crawler and to a reader before it lands. */
-    const markup = served()
-    expect(rendered(markup, 'helix-headless-canvas')).toContain('First')
-    expect(rendered(markup, 'helix-headless-canvas')).toContain('Second')
-    expect(hasPart(markup, 'board')).toBe(true)
+  test('a card renders its own text on the server, rather than being echoed', () => {
+    /* `rendered` takes the host tag off, so this asks what the card's own shadow
+       output carries rather than reading the consumer's markup back. */
+    expect(rendered(served(), 'helix-headless-canvas-node')).toContain('First')
   })
 
-  test('the cards ship placed, so nothing jumps when the JavaScript lands', () => {
-    expect(partTag(markup(), 'card')).toContain('--_canvas-card-x')
+  test('and its coordinates are on the host where the board will read them', () => {
+    const attributes = hostAttributes(served(), 'helix-headless-canvas-node')
+    expect(attributes).toContain('x')
+    expect(attributes).toContain('y')
+    expect(hostTag(served(), 'helix-headless-canvas-node')).toContain('x="0"')
   })
 
-  test('the connectors ship drawn', () => {
-    expect(hasPart(served(), 'edges')).toBe(true)
-    expect(partTag(served(), 'edge')).toContain('d="M')
+  test('a card is an article on the server too, which is what a reader meets first', () => {
+    expect(partTag(served(), 'node')).toContain('role="article"')
   })
 
-  test('the reading list ships with the board, which is the point of it', () => {
-    /* A list built on the client is a way around the board that a reader without
-       JavaScript does not have. */
-    const markup = served()
-    expect(hasPart(markup, 'index')).toBe(true)
-    expect(partTag(markup, 'index')).toContain('aria-label="Cards on this board"')
-  })
-
-  test('the name is on the host through internals rather than as an attribute', () => {
-    expect(hostAttributes(served(), 'helix-headless-canvas')).not.toContain('aria-label')
+  test('the frame is named where the server can be read', () => {
     expect(partTag(served(), 'region')).toContain('aria-label="A board"')
+    expect(hostAttributes(served(), 'helix-headless-canvas')).not.toContain('aria-label')
   })
 
   test('the tab stop is served, so the keys work before hydration finishes', () => {
     expect(partTag(served(), 'region')).toContain('tabindex="0"')
   })
-})
 
-/** The served markup, for the assertions that read one part of it. */
-const markup = () => served()
+  test('the reading list is empty on the server, and says so by being empty', () => {
+    /* Not a failure: a board cannot count cards it cannot see. What matters is
+       that the list is not *wrong* on the server, which a fabricated one would
+       be, and that the cards are readable without it. */
+    const markup = served()
+    expect(hasPart(markup, 'index')).toBe(true)
+    expect(rendered(markup, 'helix-headless-canvas')).not.toContain('part="index-item"')
+  })
+
+  test('an edge is served carrying what it joins', () => {
+    /* The line between two cards is the board's to draw, and it cannot draw one
+       on a server where it cannot see them. What an edge ships is the
+       declaration, and `canvas-edge.ssr.spec.ts` is where what it draws is
+       asserted, the host being its own to answer for. */
+    expect(hostAttributes(served(), 'helix-headless-canvas-edge').sort()).toEqual([
+      'from',
+      'id',
+      'to',
+    ])
+  })
+})
