@@ -182,9 +182,19 @@ export class HelixSandboxSpecs extends HelixElement {
     if (this.family === '') {
       return
     }
+    this.clear()
+    this.send()
+  }
+
+  /** Forgets the last answer and says a new one is coming. */
+  private clear(): void {
     this.results = []
     this.failure = ''
     this.running = true
+  }
+
+  /** Asks the frame, or leaves the question for when it is listening. */
+  private send(): void {
     if (this.ready) {
       this.request(this.family)
     } else {
@@ -210,14 +220,29 @@ export class HelixSandboxSpecs extends HelixElement {
     this.makeFrame()
   }
 
+  /**
+   * A new family clears the old one's results before the render, not after.
+   *
+   * Cleared from `updated`, the render for a new family drew the previous
+   * family's results under it, and then the clearing asked for a second
+   * render to take them away.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (changed.has('family') && this.family !== '') {
+      this.clear()
+    }
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     if (changed.has('src') && this.frame && this.frame.src !== this.src) {
       this.ready = false
       this.frame.src = this.src
     }
-    if (changed.has('family')) {
-      this.run()
+    // The question goes after the render, which is what made the frame.
+    if (changed.has('family') && this.family !== '') {
+      this.send()
     }
   }
 

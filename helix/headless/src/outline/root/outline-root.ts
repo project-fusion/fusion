@@ -6,7 +6,7 @@ import {
   IndicatorController,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 
 /**
  * @summary Links to the headings on this page, marking the one being read.
@@ -104,8 +104,12 @@ export class HelixHeadlessOutline extends HelixElement {
 
   /**
    * What `current` reports, which only `mark` writes.
+   *
+   * **A field, not state.** Nothing renders it: the links carry `aria-current`
+   * and the mark is placed by measuring them, so a render on its change drew
+   * the same template again. It also made the first measurement, which can only
+   * happen after the first render, schedule a second one from `firstUpdated`.
    */
-  @state()
   private reading = ''
 
   private observer: IntersectionObserver | undefined
@@ -230,6 +234,11 @@ export class HelixHeadlessOutline extends HelixElement {
     const next = active?.target.id ?? ''
     if (next !== this.reading) {
       this.reading = next
+      /* And move the mark to it. Measured straight after the write, which is
+       * after the style lands: a bounding box is read from a resolved style,
+       * so a current link set in heavier weight and rewrapped onto a second
+       * line is measured at the height it now has. */
+      this.indicator.place()
       this.dispatchEvent(new HelixActivateEvent({ value: next }))
     }
   }
@@ -561,10 +570,8 @@ export class HelixHeadlessOutline extends HelixElement {
     if (!this.observer) {
       this.watch()
     }
-    /* After the render that applied the new `aria-current`, not inside `mark()`
-       beside the attribute write. The current link is styled differently, and
-       on a narrow column the extra weight is enough to rewrap it, so measuring
-       before the style lands measures the wrong height. */
+    /* A new `offset` or `label` can move or rewrap the links without changing
+       which one is current, so the mark is measured again after any render. */
     this.indicator.place()
   }
 

@@ -577,19 +577,27 @@ export class HelixSandbox extends HelixElement {
        until something calls `observe` again. Left to `firstUpdated` alone, a
        sandbox moved in the DOM comes back with its panel sizes frozen. */
     if (this.hasUpdated) {
-      this.watchBody()
+      this.watchBody(true)
     }
   }
 
-  /** Watches the body, whose height is what the pane sizes are computed from. */
-  private watchBody(): void {
+  /**
+   * Watches the body, whose height is what the pane sizes are computed from.
+   *
+   * `render` asks for the render that height is for. The observer asks too, in
+   * the report it gives every box it starts watching, so only a caller that
+   * cannot wait for it passes true.
+   */
+  private watchBody(render: boolean): void {
     const body = this.renderRoot.querySelector<HTMLElement>('[part="body"]')
     if (!body) {
       return
     }
     this.bodyHeight = body.getBoundingClientRect().height
     this.watch?.observe(body)
-    this.requestUpdate()
+    if (render) {
+      this.requestUpdate()
+    }
   }
 
   /**
@@ -601,6 +609,12 @@ export class HelixSandbox extends HelixElement {
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* Whether there is a panel is known before the first render, from the
+       light DOM, so the first render draws the dividers it needs rather than
+       a second one being asked for from `firstUpdated`. */
+    if (!this.hasUpdated && typeof this.querySelector === 'function') {
+      this.readPanel()
+    }
     if (!this.hasUpdated || typeof this.renderRoot?.querySelector !== 'function') {
       return
     }
@@ -610,10 +624,18 @@ export class HelixSandbox extends HelixElement {
     }
   }
 
+  /**
+   * Starts watching the body, now there is one.
+   *
+   * **The render its height is for is the observer's to ask for**, in the
+   * report every newly watched box gets, which arrives after layout and before
+   * the first paint. Asking here as well rendered once from inside this update
+   * and again when the report came. Where there is no observer, nothing else
+   * will ask.
+   */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    this.readPanel()
-    this.watchBody()
+    this.watchBody(this.watch === undefined)
   }
 
   override disconnectedCallback(): void {
