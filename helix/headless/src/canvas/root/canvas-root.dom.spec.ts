@@ -14,7 +14,7 @@ type Canvas = HTMLElement & {
   updateComplete: Promise<boolean>
 }
 
-type Card = HTMLElement & { current: boolean; links: string; x: number; y: number }
+type Card = HTMLElement & { current: boolean; label: string; links: string; x: number; y: number }
 
 /**
  * A small board, written the way a consumer writes one: two cards side by side,
@@ -800,6 +800,205 @@ describe('canvas api', () => {
     await host.updateComplete
     await host.updateComplete
     expect(hasState(card(host, 'c'), 'target')).toBe(false)
+  })
+})
+
+/**
+ * Selecting, and editing what is selected: labels the board draws are edited
+ * in place, and a card is edited by the page, which the board asks.
+ */
+describe('canvas selection and editing', () => {
+  type Selectable = Canvas & { selected: string }
+
+  test('landing on a card or a connection selects it, and says so', async () => {
+    const host = (await canvas()) as Selectable
+    const told: string[] = []
+    host.addEventListener('helix-select', (event) => told.push((event as CustomEvent).detail.value))
+    card(host, 'b').focus()
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.selected).toBe('b')
+    expect(hasState(card(host, 'b'), 'selected')).toBe(true)
+    connection(host, 'edge:e2').focus()
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.selected).toBe('e2')
+    expect(hasState(card(host, 'b'), 'selected')).toBe(false)
+    expect(host.shadowRoot?.querySelector('[part="edge"][data-selected]')).not.toBeNull()
+    expect(told).toEqual(['b', 'e2'])
+  })
+
+  test('Escape selects nothing, and so does a click on the empty board', async () => {
+    const host = (await canvas()) as Selectable
+    host.selected = 'a'
+    await host.updateComplete
+    press(card(host, 'a'), 'Escape')
+    expect(host.selected).toBe('')
+
+    host.selected = 'a'
+    const viewport = part(host, 'viewport') as HTMLElement
+    const pointer = (type: string) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: 5,
+        clientY: 5,
+        composed: true,
+        pointerId: 11,
+      })
+    viewport.dispatchEvent(pointer('pointerdown'))
+    viewport.dispatchEvent(pointer('pointerup'))
+    expect(host.selected).toBe('')
+  })
+
+  test('selection stays when focus leaves the board', async () => {
+    const host = (await canvas()) as Selectable
+    card(host, 'c').focus()
+    await host.updateComplete
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    outside.focus()
+    await host.updateComplete
+    expect(host.selected).toBe('c')
+    outside.remove()
+  })
+
+  test('F2 on a connection edits its label in place, and the board writes it back', async () => {
+    const host = await canvas()
+    const said: unknown[] = []
+    host.addEventListener('helix-relabel', (event) => said.push((event as CustomEvent).detail))
+    pressOn(connection(host, 'edge:e2'), 'F2')
+    await host.updateComplete
+    const field = part(host, 'label-editor') as HTMLInputElement
+    expect(field.value).toBe('then')
+    field.value = 'and then'
+    field.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Enter',
+      }),
+    )
+    await host.updateComplete
+    expect(part(host, 'label-editor')).toBeNull()
+    expect((host.querySelector('[name="e2"]') as HTMLElement & { label?: string }).label).toBe(
+      'and then',
+    )
+    expect(said).toEqual([
+      { from: 'b', label: 'and then', name: 'e2', target: 'edge', to: 'c', was: 'then' },
+    ])
+  })
+
+  test('Escape puts a label back, a refused one stays, and the arrows stay in the field', async () => {
+    const host = await canvas()
+    pressOn(connection(host, 'edge:e2'), 'F2')
+    await host.updateComplete
+    let field = part(host, 'label-editor') as HTMLInputElement
+    const before = (part(host, 'viewport') as HTMLElement).getAttribute('style')
+    field.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'ArrowRight',
+      }),
+    )
+    // An arrow in the field moves the caret, not the board.
+    expect((part(host, 'viewport') as HTMLElement).getAttribute('style')).toBe(before)
+    field.value = 'nope'
+    field.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Escape',
+      }),
+    )
+    await host.updateComplete
+    expect((host.querySelector('[name="e2"]') as HTMLElement & { label?: string }).label).toBe(
+      'then',
+    )
+
+    host.addEventListener('helix-before-relabel', (event) => event.preventDefault())
+    pressOn(connection(host, 'edge:e2'), 'F2')
+    await host.updateComplete
+    field = part(host, 'label-editor') as HTMLInputElement
+    field.value = 'refused'
+    field.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Enter',
+      }),
+    )
+    await host.updateComplete
+    expect((host.querySelector('[name="e2"]') as HTMLElement & { label?: string }).label).toBe(
+      'then',
+    )
+  })
+
+  test('a group is renamed in place, and a card asks the page to edit it', async () => {
+    const host = await canvas()
+    press(card(host, 'pair'), 'Enter')
+    await host.updateComplete
+    const field = part(host, 'label-editor') as HTMLInputElement
+    expect(field.value).toBe('The pair')
+    field.value = 'The two'
+    field.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Enter',
+      }),
+    )
+    await host.updateComplete
+    expect(card(host, 'pair').label).toBe('The two')
+
+    const asked: unknown[] = []
+    host.addEventListener('helix-canvas-edit', (event) => asked.push((event as CustomEvent).detail))
+    press(card(host, 'a'), 'Enter')
+    card(host, 'b').dispatchEvent(new MouseEvent('dblclick', { bubbles: true, composed: true }))
+    expect(asked).toEqual([{ name: 'a' }, { name: 'b' }])
+  })
+
+  test('a read-only board edits nothing', async () => {
+    const host = await canvas('readonly')
+    let asked = 0
+    host.addEventListener('helix-canvas-edit', () => {
+      asked += 1
+    })
+    press(card(host, 'a'), 'Enter')
+    pressOn(connection(host, 'edge:e2'), 'F2')
+    await host.updateComplete
+    expect(asked).toBe(0)
+    expect(part(host, 'label-editor')).toBeNull()
+  })
+
+  test('a press on a button inside a card is the button\u2019s, not a drag', async () => {
+    const host = await canvas(
+      '',
+      '<helix-headless-canvas-node name="a" x="0" y="0" width="80" height="40"><button>Go</button></helix-headless-canvas-node>',
+    )
+    let moved = false
+    host.addEventListener('helix-before-move', () => {
+      moved = true
+    })
+    const pointer = (type: string, x: number) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: 5,
+        composed: true,
+        pointerId: 12,
+      })
+    host.querySelector('button')?.dispatchEvent(pointer('pointerdown', 5))
+    host.dispatchEvent(pointer('pointermove', 60))
+    host.dispatchEvent(pointer('pointerup', 60))
+    expect(moved).toBe(false)
   })
 })
 

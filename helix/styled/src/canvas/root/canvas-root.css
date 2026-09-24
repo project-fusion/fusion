@@ -157,6 +157,45 @@
   stroke-width: calc(var(--helix-border-thick) * 2);
 }
 
+/* **Selected stays drawn after the pointer and the focus have gone**, in the
+   accent at twice the weight, until the reader selects something else. */
+[part="edge"][data-selected] {
+  stroke: var(--helix-color-accent);
+  stroke-width: calc(var(--helix-border-thick) * 2);
+}
+
+/* **The field sits where the label does**, on the plane, so it scales and
+   moves with the board and a reader types where they were looking. Over the
+   cards, which it is placed after. A group's name is above its box, so its
+   field is too. */
+[part="label-editor"] {
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-accent);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  inline-size: var(--canvas-label-editor-inline-size, 12rem);
+  left: var(--_canvas-editor-x);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  position: absolute;
+  text-align: center;
+  top: var(--_canvas-editor-y);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+[part="label-editor"][data-target="group"] {
+  text-align: start;
+  transform: translate(0, -100%);
+}
+
+[part="label-editor"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 /* The connection being drawn, dashed until it is asked for. */
 [part="draft"] {
   pointer-events: none;
@@ -242,8 +281,12 @@
 [part="viewport"] {
   cursor: grab;
   touch-action: none;
-  /* A drag across a card is a move, not a selection: without this every drag
-     that crossed some text left it highlighted when the hand let go. */
+}
+
+/* **A drag across a card is a move, not a selection**, but only while the
+   press lasts: on the viewport for good, it also stopped a reader copying a
+   card's text, and a page's own editor typing into one. */
+:host(:state(pressing)) [part="viewport"] {
   user-select: none;
 }
 

@@ -4,6 +4,8 @@ import {
   customElement,
   HelixBeforeMoveEvent,
   HelixBeforeReconnectEvent,
+  HelixBeforeRelabelEvent,
+  HelixCanvasEditEvent,
   HelixCanvasPanEvent,
   HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
@@ -11,12 +13,15 @@ import {
   HelixElement,
   HelixMoveEvent,
   HelixReconnectEvent,
+  HelixRelabelEvent,
   HelixRemoveEvent,
+  HelixSelectEvent,
   hostAria,
   inlineStep,
   MixinViewport,
   type MoveDetail,
   type ReconnectDetail,
+  type RelabelDetail,
   type ViewportPanDetail,
   type ViewportWay,
   type ViewportZoomDetail,
@@ -136,6 +141,17 @@ const keyOf = (edge: CanvasEdge): string => `edge:${edge.id || `${edge.fromNode}
 const fill = (template: string, values: Record<string, string>): string =>
   Object.entries(values).reduce((out, [key, value]) => out.replaceAll(`{${key}}`, value), template)
 
+/**
+ * Whether an event began on something inside a card that answers a press
+ * itself: a field, a button, a link, text being edited.
+ *
+ * **Those are the card's, not the board's.** A press on a button in a card
+ * dragged the card, and a page editing a card's text in place could not put a
+ * caret in it, because every press became a move.
+ */
+const INTERACTIVE =
+  'input, textarea, select, button, a[href], [contenteditable]:not([contenteditable="false"])'
+
 /** One stop in the walk: a card, or a connection leaving one. */
 type Stop = { kind: 'node'; key: string } | { kind: 'edge'; key: string; edge: CanvasEdge }
 
@@ -212,13 +228,17 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  *
  * @event {HelixBeforeMoveEvent} helix-before-move - Cards are about to move. Refuse it to keep the positions in your own state.
  * @event {HelixBeforeReconnectEvent} helix-before-reconnect - A connection's end is about to move to another card or side. Refuse it to keep connections in your own state.
+ * @event {HelixBeforeRelabelEvent} helix-before-relabel - A connection's label or a group's name is about to change. Refuse it to keep labels in your own state.
+ * @event {HelixCanvasEditEvent} helix-canvas-edit - The reader asked to edit a card: a double-click, or Enter or F2. Open your own editor for it.
  * @event {HelixCanvasPanEvent} helix-canvas-pan - The board moved, which on a canvas is a fact rather than a request.
  * @event {HelixCanvasViewEvent} helix-canvas-view - Where the board is looking changed, however it changed. The detail is the new view.
  * @event {HelixCanvasZoomEvent} helix-canvas-zoom - The board zoomed, and said so.
  * @event {HelixConnectEvent} helix-connect - A reader asked for two cards to be joined. Add the `helix-canvas-edge` to do it.
  * @event {HelixMoveEvent} helix-move - Cards moved and the move is finished: a drag let go, or a key pressed.
  * @event {HelixReconnectEvent} helix-reconnect - A connection's end moved, and the move is finished.
+ * @event {HelixRelabelEvent} helix-relabel - A connection's label or a group's name changed.
  * @event {HelixRemoveEvent} helix-remove - A reader asked for cards or connections to go. Remove the elements it names.
+ * @event {HelixSelectEvent} helix-select - The reader selected a card or a connection, or nothing. The detail's `value` is its name, empty for none. Cancelable: refusing it keeps the selection where it was.
  *
  * @csspart arrow - The head an edge carries at an end that has one.
  * @csspart board - The plane the cards are placed on, which is what pans and zooms.
@@ -231,6 +251,7 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  * @csspart fullscreen - The button that fills the screen.
  * @csspart header - The strip above the board.
  * @csspart label - The label on a connector.
+ * @csspart label-editor - The field a connection's label or a group's name is edited in, where it sits.
  * @csspart label-ground - The flood behind a connector's label, whose `flood-color` is the board's own ground.
  * @csspart live - What the board says while a connection is being made, for a screen reader.
  * @csspart pan-down - The button that moves the board down.
@@ -247,6 +268,7 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  * @cssstate empty - While the document has no nodes.
  * @cssstate fullscreen - While the board fills the screen.
  * @cssstate idle - While the reader has been still long enough to hide the chrome.
+ * @cssstate pressing - While a press on the board, its cards or its connections is under way.
  */
 @customElement('helix-headless-canvas')
 export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
@@ -287,6 +309,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   @property()
   label = ''
+
+  /**
+   * What the field a label is edited in is called, with `{name}` for what it
+   * labels.
+   */
+  @property({ attribute: 'label-editor-label' })
+  labelEditorLabel = 'Label for {name}'
 
   /**
    * How a card says where its connections go, with `{cards}` as the list.
@@ -341,6 +370,28 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @property({ attribute: 'reconnecting-label' })
   reconnectingLabel =
     'Moving the end of the connection from {from} to {to}. Move to a card and press Enter, or Escape to stop.'
+
+  /**
+   * The card or connection the reader selected, by name, and empty for none.
+   *
+   * **Kept apart from focus**, so it stays when focus leaves: a reader who
+   * selects a card and clicks a button beside the board to act on it has not
+   * cleared what the button acts on by clicking. A click or a key that lands
+   * on a card or a connection selects it; a click on the empty board or Escape
+   * selects nothing. A connection with no name is called by its ends,
+   * `from->to`, which is also why a name has to be unique on its board across
+   * cards and connections both.
+   *
+   * Written to select one from outside, and read to act on it.
+   */
+  @property()
+  selected = ''
+
+  /**
+   * A label being edited in place: whose, and what it said before.
+   */
+  @state()
+  private editing: { target: 'edge' | 'group'; key: string; was: string } | undefined
 
   /** What it says when a reader stops connecting without asking. */
   @property({ attribute: 'stopped-label' })
@@ -608,6 +659,15 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       y: this.box.height / 2 - middle.y,
     }
   }
+
+  /**
+   * Whether a press on the board is under way, a drag of the board, a card or
+   * a connection, so a stylesheet can stop the press selecting text while it
+   * lasts and only then: a board that never let its text be selected also
+   * never let a page's own editor type into a card.
+   */
+  @state()
+  private pressing = false
 
   /** Where a drag started, and where the board was when it did. */
   private dragging:
@@ -907,6 +967,33 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     )
   }
 
+  /** A stop's key as the name a page sees: a card's name, a connection's name or ends. */
+  private publicName(key: string | undefined): string {
+    return key === undefined ? '' : key.startsWith('edge:') ? key.slice(5) : key
+  }
+
+  /** The stop a public name means, where it means one. */
+  private keyNamed(name: string): string | undefined {
+    if (name === '') {
+      return undefined
+    }
+    return this.walk.find((one) => one.key === name || one.key === `edge:${name}`)?.key
+  }
+
+  /**
+   * Selects a stop, or nothing, and says so: `helix-select`, which a page can
+   * refuse, with the name as its value.
+   */
+  private choose(key: string | undefined): void {
+    const value = this.publicName(key)
+    if (value === this.selected) {
+      return
+    }
+    if (this.dispatchEvent(new HelixSelectEvent({ value }))) {
+      this.selected = value
+    }
+  }
+
   /** A card by name. */
   private cardNamed(name: string | undefined): HelixHeadlessCanvasNode | undefined {
     return name === undefined ? undefined : this.cards.find((one) => one.name === name)
@@ -969,6 +1056,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (event.button !== 0 || on('controls') || !(card || on('viewport'))) {
       return
     }
+    if (path.some((one) => one instanceof Element && one.matches(INTERACTIVE))) {
+      return
+    }
+    this.pressing = true
     /* **A press on a connection picks up its nearer end**, once the hand has
        moved far enough to be a drag rather than a click that focuses it. */
     const pressedEdge = this.edgeOf(event)
@@ -988,7 +1079,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         if (this.linking) {
           this.linking = { ...this.linking, pressed: { x: event.clientX, y: event.clientY } }
         }
-        capturePointer(this, event.pointerId)
         return
       }
     }
@@ -1015,7 +1105,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         pointer: event.pointerId,
         started: false,
       }
-      capturePointer(this, event.pointerId)
+      /* **Captured once it is a drag, not on the press.** A captured pointer's
+         click and double-click are sent to the board rather than the card,
+         so capturing on every press made a double-click on a card a
+         double-click on nothing, and a card could not be opened to edit. */
       return
     }
     this.touched = true
@@ -1035,6 +1128,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       if (pressed && Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) < SLOP) {
         return
       }
+      if (pressed) {
+        capturePointer(this, event.pointerId)
+      }
       const at = this.toDocument(event)
       const over = this.cardAt(at)
       const to = this.arrival(over?.id)
@@ -1053,6 +1149,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       const down = event.clientY - carry.from.y
       if (!carry.started && Math.hypot(across, down) < SLOP) {
         return
+      }
+      if (!carry.started) {
+        capturePointer(this, event.pointerId)
       }
       carry.started = true
       this.touched = true
@@ -1083,6 +1182,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   private readonly handlePointerUp = (event: PointerEvent): void => {
+    this.pressing = false
     if (this.linking?.pointer === event.pointerId) {
       /* A press on a connection that never became a drag was a click, which
          focused it; nothing is picked up and nothing is asked for. */
@@ -1111,6 +1211,12 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     if (this.dragging?.pointer === event.pointerId) {
+      /* A press on the empty board that never became a drag was a click on
+         nothing, which selects nothing. */
+      const drag = this.dragging
+      if (Math.hypot(event.clientX - drag.from.x, event.clientY - drag.from.y) < SLOP) {
+        this.choose(undefined)
+      }
       this.dragging = undefined
       /* The hand is off it, so the next press glides again. Cleared here rather
          than left standing, or a board dragged once would never ease a press on
@@ -1214,7 +1320,15 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         this.focusStop(back)
         return
       }
+      this.choose(undefined)
       this.partNamed('region')?.focus()
+      return
+    }
+    /* F2 edits a label the board draws, the platform's key for renaming; on
+       a card, Enter does too, a card having no other use for it. */
+    if (!this.linking && (event.key === 'F2' || (card && event.key === 'Enter'))) {
+      event.preventDefault()
+      this.editStop(key)
       return
     }
     if (event.key === 'Enter' || event.key === ' ') {
@@ -1288,6 +1402,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.refocus = undefined
     this.stop = edge ?? card?.name
+    this.choose(this.stop)
     if (card) {
       /* A keyboard reader connecting arrives wherever they land, and the
          preview follows them there. */
@@ -1316,6 +1431,151 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (!seen) {
       this.show(id)
     }
+  }
+
+  /**
+   * Edits a stop: a connection's label or a group's name in place, which the
+   * board draws; a card's content by asking, which the board does not.
+   */
+  private editStop(key: string): void {
+    if (this.readOnly) {
+      return
+    }
+    if (key.startsWith('edge:')) {
+      const edge = this.edgeElement(key)
+      if (edge && !edge.readOnly) {
+        this.editing = { key, target: 'edge', was: edge.label ?? '' }
+      }
+      return
+    }
+    const card = this.cardNamed(key)
+    if (!card || this.fixed(card)) {
+      return
+    }
+    if (card.group) {
+      this.editing = { key, target: 'group', was: card.label }
+      return
+    }
+    this.dispatchEvent(new HelixCanvasEditEvent({ name: card.name }))
+  }
+
+  /** A double-click on a card or a connection edits it, the pointer's F2. */
+  private readonly handleDoubleClick = (event: MouseEvent): void => {
+    const path = event.composedPath()
+    if (path.some((one) => one instanceof Element && one.matches(INTERACTIVE))) {
+      return
+    }
+    const edge = this.edgeOf(event)
+    const key = edge ?? this.cardOf(event)?.name
+    if (key !== undefined) {
+      event.preventDefault()
+      this.editStop(key)
+    }
+  }
+
+  /**
+   * Finishes editing a label: asks, writes it where the page did not refuse,
+   * and says it did. The same value is no change and asks nothing.
+   */
+  private finishEditing(field: HTMLInputElement | undefined, keep: boolean): void {
+    const editing = this.editing
+    if (!editing) {
+      return
+    }
+    this.editing = undefined
+    const label = (field?.value ?? '').trim()
+    const back = (): void => {
+      void this.updateComplete.then(() => this.focusStop(editing.key))
+    }
+    if (!keep || label === editing.was) {
+      back()
+      return
+    }
+    const edge = editing.target === 'edge' ? this.edgeElement(editing.key) : undefined
+    const card = editing.target === 'group' ? this.cardNamed(editing.key) : undefined
+    const detail: RelabelDetail = {
+      label,
+      name: edge ? edge.name : (card?.name ?? ''),
+      target: editing.target,
+      was: editing.was,
+      ...(edge ? { from: edge.from, to: edge.to } : {}),
+    }
+    if (this.dispatchEvent(new HelixBeforeRelabelEvent(detail))) {
+      if (edge) {
+        edge.label = label || undefined
+      } else if (card) {
+        card.label = label
+      }
+      this.dispatchEvent(new HelixRelabelEvent(detail))
+    }
+    back()
+  }
+
+  /**
+   * The keys in a label being edited, which are the field's: Enter keeps,
+   * Escape puts it back, and nothing reaches the board, whose arrows would
+   * otherwise pan it out from under the caret.
+   */
+  private readonly handleEditorKeydown = (event: KeyboardEvent): void => {
+    event.stopPropagation()
+    if (event.key === 'Enter' || event.key === 'Escape') {
+      event.preventDefault()
+      this.finishEditing(event.currentTarget as HTMLInputElement, event.key === 'Enter')
+    }
+  }
+
+  private readonly handleEditorBlur = (event: FocusEvent): void => {
+    this.finishEditing(event.currentTarget as HTMLInputElement, true)
+  }
+
+  /** The field a label is edited in, where the label is, while one is. */
+  private renderEditor(origin: { x: number; y: number }) {
+    const editing = this.editing
+    if (!editing) {
+      return nothing
+    }
+    const byId = new Map(this.nodes.map((one) => [one.id, one]))
+    let at: { x: number; y: number } | undefined
+    let named = ''
+    if (editing.target === 'edge') {
+      const edge = this.edges.find((one) => keyOf(one) === editing.key)
+      const from = edge ? byId.get(edge.fromNode) : undefined
+      const to = edge ? byId.get(edge.toNode) : undefined
+      if (edge && from && to) {
+        const shifted = (node: CanvasNode) => ({
+          ...node,
+          x: node.x - origin.x,
+          y: node.y - origin.y,
+        })
+        at = connector(
+          edge,
+          shifted(from),
+          shifted(to),
+          edge.path ?? this.path ?? 'curve',
+          heads(edge),
+        ).mid
+        named = fill(this.connectionLabel, { from: this.textOf(from), to: this.textOf(to) })
+      }
+    } else {
+      const group = byId.get(editing.key)
+      if (group) {
+        at = { x: group.x - origin.x, y: group.y - origin.y }
+        named = this.textOf(group)
+      }
+    }
+    if (!at) {
+      return nothing
+    }
+    return html`<input
+      part="label-editor"
+      aria-label=${fill(this.labelEditorLabel, { name: named })}
+      data-target=${editing.target}
+      style=${`--_canvas-editor-x: ${at.x}px; --_canvas-editor-y: ${at.y}px`}
+      type="text"
+      .value=${editing.was}
+      @blur=${this.handleEditorBlur}
+      @keydown=${this.handleEditorKeydown}
+    />`
   }
 
   /** Scales about a point in the box, which is what both the buttons and a pinch want. */
@@ -1530,6 +1790,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* A field just opened takes the caret with what it says selected, so
+       typing replaces it and an arrow key keeps it. */
+    if (changed.has('editing') && this.editing) {
+      const field = this.partNamed<HTMLInputElement>('label-editor')
+      field?.focus()
+      field?.select()
+    }
     this.place({ x: extent(this.nodes).x - MARGIN, y: extent(this.nodes).y - MARGIN })
     /* Said once per change of view, whatever changed it, and not for a render
        that left it where it was. */
@@ -1612,6 +1879,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.watchBox()
+    this.addEventListener('dblclick', this.handleDoubleClick)
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('keydown', this.handleStopKeydown)
     this.addEventListener('pointercancel', this.handlePointerUp)
@@ -1624,6 +1892,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     super.disconnectedCallback()
     this.sizes?.disconnect()
     this.watched = undefined
+    this.removeEventListener('dblclick', this.handleDoubleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('keydown', this.handleStopKeydown)
     this.removeEventListener('pointercancel', this.handlePointerUp)
@@ -1649,6 +1918,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     hostAria(this.internals, { label: this.label })
     this.toggleState('connecting', this.linking !== undefined)
     this.toggleState('direct', this.direct)
+    this.toggleState('pressing', this.pressing)
     this.toggleState('empty', this.nodes.length === 0)
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
@@ -1667,6 +1937,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     const all = this.nodes
     /* The first card in reading order until a reader has landed on one, and
        again if the one they were on is taken away. */
+    const selected = this.keyNamed(this.selected)
     const stop = this.walk.some((one) => one.key === this.stop)
       ? this.stop
       : reading(all, this.edges, this.order ?? 'spatial')[0]?.id
@@ -1696,6 +1967,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       const node = all.find((one) => one.id === card.name)
       card.links = node ? this.linksOf(node) : ''
       card.current = card.name === stop
+      card.selected = selected === card.name
       card.connectable = !this.fixed(card)
       /* While a connection is being drawn, every card it could arrive at says
          so and the one under the pointer says it most: a line dragged across a
@@ -1726,6 +1998,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         .map((child) => [keyOf({ fromNode: child.from, id: child.name, toNode: child.to }), child]),
     )
     const stop = this.walk.some((one) => one.key === this.stop) ? this.stop : undefined
+    const selectedKey = this.keyNamed(this.selected)
     const shifted = (node: CanvasNode) => ({
       ...node,
       x: node.x - origin.x,
@@ -1810,6 +2083,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
             d=${drawn.d}
             data-edge=${key}
             fill="none"
+            aria-keyshortcuts="Enter F2 C Delete"
             role="button"
             tabindex=${key === stop ? '0' : '-1'}
           />
@@ -1817,6 +2091,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
             part="edge"
             aria-hidden="true"
             d=${drawn.d}
+            data-selected=${selectedKey === key ? '' : nothing}
             data-tone=${element?.tone ?? nothing}
             data-variant=${element?.variant ?? nothing}
             fill="none"
@@ -1931,6 +2206,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         >
           ${this.renderEdges(origin, box)}
           <slot @slotchange=${this.handleSlotChange}></slot>
+          ${this.renderEditor(origin)}
         </div>
         <slot name="empty"></slot>
       </div>

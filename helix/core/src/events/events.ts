@@ -339,6 +339,79 @@ export class HelixReconnectEvent extends CustomEvent<ReconnectDetail> {
   }
 }
 
+/** A label a reader rewrote on a board, and what it said before. */
+export interface RelabelDetail {
+  /** What was relabelled: a connection, or a group, whose name the board draws. */
+  target: 'edge' | 'group'
+  /** Its name on the board. */
+  name: string
+  /** A connection's ends, so a page that named none of its connections can find it. */
+  from?: string | undefined
+  to?: string | undefined
+  /** The new label, empty for none. */
+  label: string
+  /** The label before. */
+  was: string
+}
+
+/**
+ * A label the board draws is about to change, and can be refused.
+ *
+ * **The board edits what it draws and asks for what it does not.** A
+ * connection's label and a group's name are drawn by the board from an
+ * attribute, so the board edits them in place and writes the attribute back,
+ * the way it writes a card's position; a page holding them in state refuses
+ * this and writes them there. A card's own content is the page's, which is why
+ * that is `helix-canvas-edit`, a request, rather than this.
+ */
+export class HelixBeforeRelabelEvent extends CustomEvent<RelabelDetail> {
+  static readonly eventName = 'helix-before-relabel'
+
+  constructor(detail: RelabelDetail) {
+    super(HelixBeforeRelabelEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** A label the board draws changed. */
+export class HelixRelabelEvent extends CustomEvent<RelabelDetail> {
+  static readonly eventName = 'helix-relabel'
+
+  constructor(detail: RelabelDetail) {
+    super(HelixRelabelEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A reader asked to edit a card: a double-click, or Enter or F2 on it.
+ *
+ * **A request, because what a card holds is the page's.** Text, a picture, a
+ * chart: the board cannot know what editing any of those means, so it says
+ * which card and the page opens its own editor, in place, in a dialog, or in a
+ * panel beside the board.
+ */
+export class HelixCanvasEditEvent extends CustomEvent<{ name: string }> {
+  static readonly eventName = 'helix-canvas-edit'
+
+  constructor(detail: { name: string }) {
+    super(HelixCanvasEditEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** What a reader asked to take off the board. */
 export interface RemoveDetail {
   /** The cards, by name. */
@@ -1443,9 +1516,11 @@ const registry = {
   HelixBeforePanelResizeEvent,
   HelixBeforePinEvent,
   HelixBeforeReconnectEvent,
+  HelixBeforeRelabelEvent,
   HelixBeforeResizeEvent,
   HelixBeforeSplitEvent,
   HelixBeforeToggleEvent,
+  HelixCanvasEditEvent,
   HelixCanvasPanEvent,
   HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
@@ -1467,6 +1542,7 @@ const registry = {
   HelixPreviousEvent,
   HelixReadEvent,
   HelixReconnectEvent,
+  HelixRelabelEvent,
   HelixRemoveEvent,
   HelixReorderEvent,
   HelixResizeEvent,

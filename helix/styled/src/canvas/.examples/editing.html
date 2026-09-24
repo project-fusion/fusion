@@ -1,4 +1,4 @@
-<!-- @summary A board a reader rearranges: draw from a card's edge to another to join them, drag a connection's end to move it, and Delete takes a card or a connection away. -->
+<!-- @summary A board a reader rearranges: draw from a card's edge to another to join them, drag a connection's end to move it, double-click to edit, and Delete takes a card or a connection away. -->
 <helix-canvas
   id="launch"
   label="Ideas for the launch"
@@ -9,7 +9,7 @@
     width="160"
     x="0"
     y="0"
-  >Write the post</helix-canvas-node>
+  ><span>Write the post</span></helix-canvas-node>
 
   <helix-canvas-node
     height="64"
@@ -18,7 +18,7 @@
     width="160"
     x="256"
     y="0"
-  >Record a demo</helix-canvas-node>
+  ><span>Record a demo</span></helix-canvas-node>
 
   <helix-canvas-node
     height="64"
@@ -27,7 +27,7 @@
     width="160"
     x="128"
     y="160"
-  >Ship it</helix-canvas-node>
+  ><span>Ship it</span></helix-canvas-node>
 
   <helix-canvas-edge
     from="post"
@@ -55,6 +55,38 @@
       edge.setAttribute('to-side', toSide)
     }
     launch.append(edge)
+  })
+
+  // A card holds what the page put in it, so the page edits it: here, its text, in place.
+  launch.addEventListener('helix-canvas-edit', (event) => {
+    const card = launch.querySelector(`helix-canvas-node[name="${event.detail.name}"]`)
+    const text = card?.querySelector('span')
+    if (!text) {
+      return
+    }
+    const field = document.createElement('input')
+    field.setAttribute('aria-label', 'Card text')
+    field.value = text.textContent
+    const done = (keep) => {
+      if (!field.isConnected) {
+        return
+      }
+      if (keep && field.value.trim()) {
+        text.textContent = field.value.trim()
+      }
+      field.replaceWith(text)
+      card.focus()
+    }
+    field.addEventListener('blur', () => done(true))
+    field.addEventListener('keydown', (key) => {
+      if (key.key === 'Enter' || key.key === 'Escape') {
+        key.preventDefault()
+        done(key.key === 'Enter')
+      }
+    })
+    text.replaceWith(field)
+    field.focus()
+    field.select()
   })
 
   // The same for removal, which names every connection a removed card would strand.

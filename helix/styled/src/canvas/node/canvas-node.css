@@ -183,6 +183,14 @@
   opacity: 1;
 }
 
+/* **Selected, until the reader selects something else or nothing.** An
+   outline outside the box in the accent, where the focus ring is drawn inside
+   it, so a card that is both says both. */
+:host(:state(selected)) {
+  outline: var(--helix-border-thick) solid var(--helix-color-accent);
+  outline-offset: var(--helix-border-thick);
+}
+
 /* **Where a connection being drawn can land, and where it will.** Every card it
    could arrive at shows its points, and the one under the pointer takes the
    accent: a line dragged over cards that all looked the same gave no way to

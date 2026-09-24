@@ -66,6 +66,15 @@ describe('the editing example', () => {
     expect(made?.getAttribute('to')).toBe('ship')
   })
 
+  run('Enter on a card, and the page opens its text for editing in place', async () => {
+    await example(editing)
+    const launch = document.getElementById('launch') as Updatable
+    press(launch, 'demo', 'Enter')
+    await settle(launch)
+    const field = named(launch, 'demo')?.querySelector('input')
+    expect(field?.value).toBe('Record a demo')
+  })
+
   run('Delete on a card, and the page takes it and the connection it stranded', async () => {
     await example(editing)
     const launch = document.getElementById('launch') as Updatable
