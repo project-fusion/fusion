@@ -209,6 +209,14 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  * connections leaving a card are stops of their own, straight after it, and
  * Enter on one goes to the card it arrives at.
  *
+ * **Every drag can be done with clicks instead**, which WCAG 2.5.7 asks of a
+ * pointer that cannot hold a button down. A click on a selected card's move
+ * handle, a corner, a card's connection point or the end of a selected
+ * connection picks the thing up; it follows the pointer with no button held,
+ * and the next click puts it down wherever a drag let go there would have. On
+ * touch, the next tap is where it lands. Escape, or a press off the board,
+ * puts it back.
+ *
  * **Connecting and removing are requests, and the page acts on them.** Drawing
  * from a card's handle to another card, or pressing C on one and Enter on
  * another, sends `helix-connect`; Delete on a card or a connection sends
@@ -242,7 +250,7 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  * @event {HelixCanvasViewEvent} helix-canvas-view - Where the board is looking changed, however it changed. The detail is the new view.
  * @event {HelixCanvasZoomEvent} helix-canvas-zoom - The board zoomed, and said so.
  * @event {HelixConnectEvent} helix-connect - A reader asked for two cards to be joined. Add the `helix-canvas-edge` to do it.
- * @event {HelixMoveEvent} helix-move - Cards moved and the move is finished: a drag let go, or a key pressed.
+ * @event {HelixMoveEvent} helix-move - Cards moved and the move is finished: a drag let go, a click that put a card down, or a key pressed.
  * @event {HelixReconnectEvent} helix-reconnect - A connection's end moved, and the move is finished.
  * @event {HelixRelabelEvent} helix-relabel - A connection's label or a group's name changed.
  * @event {HelixRemoveEvent} helix-remove - A reader asked for cards or connections to go. Remove the elements it names.
@@ -253,6 +261,7 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  * @csspart controls - The group the pan and zoom buttons sit in.
  * @csspart draft - The connection being drawn, before it is asked for.
  * @csspart edge - One connector between two cards.
+ * @csspart edge-end - An end of a selected connection, which a press picks up, a click as well as a drag.
  * @csspart edge-target - The wider, unpainted line over a connector that a reader focuses and presses.
  * @csspart edges - The layer the connectors are drawn in.
  * @csspart footer - The strip below the board.
@@ -275,6 +284,7 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  * @cssstate direct - While the board moves without easing: under the reader's hand, or settling into its box.
  * @cssstate empty - While the document has no nodes.
  * @cssstate fullscreen - While the board fills the screen.
+ * @cssstate holding - While something a click picked up follows the pointer, until the next press puts it down.
  * @cssstate idle - While the reader has been still long enough to hide the chrome.
  * @cssstate pressing - While a press on the board, its cards or its connections is under way.
  */
@@ -440,6 +450,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         moving?: 'from' | 'to' | undefined
         /** Where a press on a connection began, until it has moved far enough to be a drag. */
         pressed?: { x: number; y: number } | undefined
+        /** Where a press on a handle or an end began, to tell a click from a drag. */
+        origin?: { x: number; y: number } | undefined
+        /** Whether it was picked up by a click and is carried until the next one. */
+        held?: boolean
       }
     | undefined
 
@@ -799,6 +813,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         from: { x: number; y: number }
         start: { x: number; y: number; width: number; height: number }
         moved?: MoveDetail
+        /** Whether it was picked up by a click and is carried until the next one. */
+        held?: boolean
       }
     | undefined
 
@@ -828,6 +844,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         started: boolean
         cards: Array<{ card: HelixHeadlessCanvasNode; x: number; y: number }>
         moved?: MoveDetail
+        /** Whether the press was on the card's move handle, which only ever carries. */
+        handle?: boolean
+        /** Whether it was picked up by a click and is carried until the next one. */
+        held?: boolean
       }
     | undefined
 
@@ -1046,8 +1066,39 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       element.to = detail.to
       element.fromSide = detail.fromSide
       element.toSide = detail.toSide
+      this.rekey(
+        linking.edge,
+        keyOf({ fromNode: detail.from, id: element.name, toNode: detail.to }),
+      )
     }
     this.dispatchEvent(new HelixReconnectEvent(detail))
+  }
+
+  /**
+   * Carries the selection and the tab stop from a connection's old key to its
+   * new one.
+   *
+   * **A connection with no `name` is known by its two cards**, so moving an end
+   * gives it a new key: the selection went on naming one that no longer
+   * existed, so the connection just moved was selected and drawn as not, and
+   * the tab stop pointed at nothing. A named connection keeps its key, and
+   * nothing moves.
+   */
+  private rekey(was: string, now: string): void {
+    if (was === now) {
+      return
+    }
+    if (this.stop === was) {
+      this.stop = now
+    }
+    const old = this.publicName(was)
+    const names = this.selected
+      .split(',')
+      .map((one) => one.trim())
+      .filter(Boolean)
+    if (names.includes(old)) {
+      this.selected = names.map((one) => (one === old ? this.publicName(now) : one)).join(',')
+    }
   }
 
   /**
@@ -1341,6 +1392,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (event.button !== 0 || on('controls') || !(card || on('viewport'))) {
       return
     }
+    /* **The press that puts down what a click picked up.** Wherever it lands
+       is where the drag would have been let go, card, corner or line alike. */
+    if (this.held) {
+      /* And it moves nothing else: without this the press focused the card it
+         landed on, which the board reads as a keyboard arriving there, and a
+         connection put down by a click selected the card it arrived at. */
+      event.preventDefault()
+      this.putDown(event)
+      return
+    }
     if (path.some((one) => one instanceof Element && one.matches(INTERACTIVE))) {
       return
     }
@@ -1378,6 +1439,20 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       capturePointer(this, event.pointerId)
       return
     }
+    /* **A press on the end of a selected connection picks that end up**, drag
+       or click alike: it is only ever pressed to move the end. */
+    const end = path.find(
+      (one): one is Element => one instanceof Element && one.hasAttribute('data-end'),
+    )
+    const ended = end?.getAttribute('data-edge') ?? undefined
+    if (end && ended !== undefined && !this.readOnly && !this.edgeElement(ended)?.readOnly) {
+      this.startReconnect(ended, end.getAttribute('data-end') === 'from' ? 'from' : 'to', event)
+      if (this.linking) {
+        this.linking = { ...this.linking, origin: { x: event.clientX, y: event.clientY } }
+      }
+      capturePointer(this, event.pointerId)
+      return
+    }
     /* **A press on a connection picks up its nearer end**, once the hand has
        moved far enough to be a drag rather than a click that focuses it. */
     const pressedEdge = this.edgeOf(event)
@@ -1408,8 +1483,26 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       this.linking = {
         at: this.toDocument(event),
         from: card.name,
+        origin: { x: event.clientX, y: event.clientY },
         pointer: event.pointerId,
         side: handle.getAttribute('data-side') as CanvasSide,
+      }
+      capturePointer(this, event.pointerId)
+      return
+    }
+    /* **A press on a selected card's move handle carries it**, drag or click
+       alike, since the handle is there for nothing else: a click on the card
+       itself selects it, which is why moving without dragging needs one. */
+    const mover = path.some((one) => one instanceof Element && one.hasAttribute('data-move'))
+    if (card && mover && !this.fixed(card)) {
+      this.carrying = {
+        adding: false,
+        cards: this.carriedAll(card).map((one) => ({ card: one, x: one.x, y: one.y })),
+        from: { x: event.clientX, y: event.clientY },
+        handle: true,
+        pointer: event.pointerId,
+        pressed: card.name,
+        started: true,
       }
       capturePointer(this, event.pointerId)
       return
@@ -1449,14 +1542,21 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
        to be a drag, so one flicked off the board and released outside it sent
        its release to nothing, and the card followed the mouse around from then
        on with no button held. */
-    const held =
+    const pressed =
       this.carrying ?? this.dragging ?? this.sizing ?? this.marquee ?? this.linking?.pointer
-    if (event.pointerType === 'mouse' && event.buttons === 0 && held !== undefined) {
+    /* Not one a click picked up, which follows a mouse with no button down on
+       purpose until the next click puts it down. */
+    if (
+      event.pointerType === 'mouse' &&
+      event.buttons === 0 &&
+      pressed !== undefined &&
+      !this.held
+    ) {
       this.handlePointerUp(new PointerEvent('pointercancel', { pointerId: event.pointerId }))
       return
     }
     const sizing = this.sizing
-    if (sizing?.pointer === event.pointerId) {
+    if (sizing && (sizing.held || sizing.pointer === event.pointerId)) {
       const box = this.resized(
         sizing.start,
         sizing.corner,
@@ -1474,7 +1574,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       this.marquee = { ...this.marquee, to: this.toDocument(event) }
       return
     }
-    if (this.linking?.pointer === event.pointerId) {
+    if (this.linking && (this.linking.held || this.linking.pointer === event.pointerId)) {
       const pressed = this.linking.pressed
       if (pressed && Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) < SLOP) {
         return
@@ -1495,7 +1595,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     const carry = this.carrying
-    if (carry && carry.pointer === event.pointerId) {
+    if (carry && (carry.held || carry.pointer === event.pointerId)) {
       const across = event.clientX - carry.from.x
       const down = event.clientY - carry.from.y
       if (!carry.started && Math.hypot(across, down) < SLOP) {
@@ -1538,6 +1638,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.pointing = false
     const sizing = this.sizing
     if (sizing?.pointer === event.pointerId) {
+      if (this.picksUp(sizing, event, sizing.from)) {
+        this.sizing = { ...sizing, held: true }
+        return
+      }
       this.sizing = undefined
       if (sizing.moved) {
         this.dispatchEvent(new HelixMoveEvent(sizing.moved))
@@ -1564,6 +1668,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         }
         return
       }
+      const origin = this.linking.origin
+      if (origin && this.picksUp(this.linking, event, origin)) {
+        this.linking = { ...this.linking, held: true }
+        return
+      }
       /* Where the preview said it would land, so what is asked for is what
          the reader was shown. A canceled pointer lands nowhere and asks
          nothing, even for a connection's end, which dropped on nothing would
@@ -1578,6 +1687,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     const carry = this.carrying
     if (carry?.pointer === event.pointerId) {
+      if (carry.handle && this.picksUp(carry, event, carry.from)) {
+        this.carrying = { ...carry, held: true }
+        return
+      }
       this.carrying = undefined
       if (!carry.started && pointing) {
         this.clicked(carry.pressed, event)
@@ -1605,6 +1718,131 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
          than left standing, or a board dragged once would never ease a press on
          the pad for the rest of the page's life. */
       this.direct = false
+    }
+  }
+
+  /**
+   * Whether a release picks up what its press took hold of, rather than
+   * putting it down.
+   *
+   * **Moving without dragging, which WCAG 2.5.7 asks every drag to offer.** A
+   * press on a corner, a handle, a connection's end or a card's move handle
+   * that is let go where it was pressed is a click, and a click picks the thing
+   * up: the box, the line or the card then follows the pointer with no button
+   * held, and the next press puts it down wherever a drag let go there would
+   * have. On touch, where nothing follows a finger that is not down, the next
+   * tap is where it lands. Escape, or a press off the board, puts it back.
+   *
+   * Not while putting down, or the press that puts a thing down where it was
+   * picked up would pick it up again.
+   */
+  private picksUp(
+    gesture: { held?: boolean },
+    event: PointerEvent,
+    from: { x: number; y: number },
+  ): boolean {
+    if (gesture.held || this.putting || event.type === 'pointercancel') {
+      return false
+    }
+    if (Math.hypot(event.clientX - from.x, event.clientY - from.y) >= SLOP) {
+      return false
+    }
+    this.toggleState('holding', true)
+    document.addEventListener('keydown', this.handleHeldKey, true)
+    document.addEventListener('pointerdown', this.handleHeldOutside, true)
+    return true
+  }
+
+  /** Whether something a click picked up is being carried to the next press. */
+  private get held(): boolean {
+    return Boolean(this.sizing?.held || this.linking?.held || this.carrying?.held)
+  }
+
+  /** Whether the press putting something down is being handled, which picks nothing up. */
+  private putting = false
+
+  /** When something was last put down, which a double click that follows is not. */
+  private putAt = Number.NEGATIVE_INFINITY
+
+  /**
+   * Puts down what a click picked up, where this press is: the step a drag
+   * would take to here, then its release.
+   */
+  private putDown(event: PointerEvent): void {
+    const pointer = event.pointerId
+    if (this.sizing) {
+      this.sizing = { ...this.sizing, pointer }
+    }
+    if (this.linking) {
+      this.linking = { ...this.linking, pointer }
+    }
+    if (this.carrying) {
+      this.carrying = { ...this.carrying, pointer }
+    }
+    this.handlePointerMove(event)
+    this.putting = true
+    try {
+      this.handlePointerUp(event)
+    } finally {
+      this.putting = false
+    }
+    this.putAt = event.timeStamp
+    this.letGo()
+  }
+
+  /**
+   * Puts back what a click picked up, as though it had never been.
+   *
+   * A card and a corner go back to where they started, asked for like any
+   * move so a board whose page holds the positions is told; a line is dropped.
+   * Nothing is announced as moved, because nothing did.
+   */
+  private putBack(): void {
+    const sizing = this.sizing
+    if (sizing?.held) {
+      this.sizing = undefined
+      if (sizing.moved) {
+        this.requestMove({ nodes: [{ name: sizing.card.name, ...sizing.start }] })
+      }
+    }
+    const carry = this.carrying
+    if (carry?.held) {
+      this.carrying = undefined
+      if (carry.moved) {
+        this.requestMove({
+          nodes: carry.cards.map(({ card, x, y }) => ({ name: card.name, x, y })),
+        })
+      }
+    }
+    if (this.linking?.held) {
+      this.linking = undefined
+      this.said = this.stoppedLabel
+    }
+    this.letGo()
+  }
+
+  /** Stops listening for the press or the key that ends a hold. */
+  private letGo(): void {
+    this.toggleState('holding', false)
+    document.removeEventListener('keydown', this.handleHeldKey, true)
+    document.removeEventListener('pointerdown', this.handleHeldOutside, true)
+  }
+
+  /* On the document while something is held, because nothing on the board
+     need have focus: a click on a handle focuses nothing, and Escape has to
+     reach the board all the same. */
+  private readonly handleHeldKey = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape' && this.held) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.putBack()
+    }
+  }
+
+  /** A press off the board while something is held, which puts it back. */
+  private readonly handleHeldOutside = (event: PointerEvent): void => {
+    if (this.held && !event.composedPath().includes(this)) {
+      this.putBack()
     }
   }
 
@@ -1888,6 +2126,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   private readonly handleDoubleClick = (event: MouseEvent): void => {
     const path = event.composedPath()
     if (path.some((one) => one instanceof Element && one.matches(INTERACTIVE))) {
+      return
+    }
+    /* Not the click that picked something up and the one that put it down,
+       which land close enough together to read as a double click on a card. */
+    if (this.held || event.timeStamp - this.putAt < 500) {
       return
     }
     const edge = this.edgeOf(event)
@@ -2320,6 +2563,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    /* What a click picked up is put back, and the document stops being
+       listened to on its behalf. */
+    if (this.held) {
+      this.putBack()
+    }
     this.sizes?.disconnect()
     this.watched = undefined
     this.removeEventListener('dblclick', this.handleDoubleClick)
@@ -2401,6 +2649,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       card.current = card.name === stop
       card.selected = picked.has(card.name)
       card.resizable = alone === card.name && !this.fixed(card)
+      card.movable = picked.has(card.name) && !this.fixed(card)
       card.connectable = !this.fixed(card)
       /* While a connection is being drawn, every card it could arrive at says
          so and the one under the pointer says it most: a line dragged across a
@@ -2409,6 +2658,44 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       card.candidate = this.drawing && this.arrival(card.name) !== undefined
       card.target = this.linking?.to === card.name
     }
+  }
+
+  /**
+   * The two ends of each selected connection, which a press picks up.
+   *
+   * **The pointer's way to move an end without dragging**: a click on one
+   * picks it up and the next puts it down, where pressing the line and
+   * dragging picks up the nearer end as before. Only on a connection the
+   * reader selected, so a board is not dotted with them, and never on one the
+   * board or the connection holds. Hidden from assistive technology, which
+   * moves an end with the keyboard.
+   *
+   * **Over the cards, not with the lines.** An end sits exactly on the point
+   * of the card it arrives at, and the cards are drawn over the lines, so an
+   * end drawn with them was always under that point: a click on it drew a new
+   * connection from the card instead.
+   */
+  private renderEnds(origin: { x: number; y: number }): unknown {
+    if (this.readOnly) {
+      return nothing
+    }
+    const picked = new Set(this.picked)
+    const byId = new Map(this.nodes.map((one) => [one.id, one]))
+    return this.edges.map((edge) => {
+      const key = keyOf(edge)
+      const from = byId.get(edge.fromNode)
+      const to = byId.get(edge.toNode)
+      /* Nor on the one in hand, whose ends are where the draft says. */
+      const lifted = this.linking?.edge === key && !this.linking.pressed
+      if (!picked.has(key) || lifted || this.edgeElement(key)?.readOnly || !from || !to) {
+        return nothing
+      }
+      const { end, start } = ends(edge, onPlane(from, origin), onPlane(to, origin))
+      const at = (point: { x: number; y: number }) =>
+        `--_canvas-end-x: ${point.x}px; --_canvas-end-y: ${point.y}px`
+      return html`<span part="edge-end" aria-hidden="true" data-edge=${key} data-end="from" style=${at(start)}></span
+        ><span part="edge-end" aria-hidden="true" data-edge=${key} data-end="to" style=${at(end)}></span>`
+    })
   }
 
   /**
@@ -2626,6 +2913,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         >
           ${this.renderEdges(origin, box)} ${this.renderLabels(origin)}
           <slot @slotchange=${this.handleSlotChange}></slot>
+          ${this.renderEnds(origin)}
           ${this.renderEditor(origin)}
           ${this.renderMarquee(origin)}
         </div>

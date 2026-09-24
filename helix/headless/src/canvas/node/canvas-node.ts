@@ -76,6 +76,7 @@ const DRAWN = [
  * @csspart handle-left - The point on the left side.
  * @csspart handle-right - The point on the right side.
  * @csspart handle-top - The point on the top side.
+ * @csspart move - The handle a selected card is moved by, a click to pick it up and another to put it down, as well as a drag.
  * @csspart node - The box the content sits in.
  * @csspart outline - The drawn outline of a card whose shape a box cannot draw, a diamond.
  *
@@ -182,6 +183,13 @@ export class HelixHeadlessCanvasNode extends HelixElement {
    */
   @state()
   selected = false
+
+  /**
+   * @internal Whether the board lets a reader move this card with its handle,
+   * written by the board: the card is selected, and nothing holds it.
+   */
+  @state()
+  movable = false
 
   /**
    * @internal Whether the board lets a reader resize this card now, written by
@@ -299,6 +307,14 @@ export class HelixHeadlessCanvasNode extends HelixElement {
             <span part="handle handle-bottom" aria-hidden="true" data-side="bottom"></span>
             <span part="handle handle-left" aria-hidden="true" data-side="left"></span>`
         : nothing
+    }
+    ${
+      /* **The handle that moves a card without dragging it**, on a selected
+         one: a click on the card selects it, so a pointer with no drag had no
+         way to move one. A click here picks the card up and the next puts it
+         down; a drag carries it the way a drag on the card does. Hidden, the
+         keyboard moving a card with Shift and an arrow. */
+      this.movable ? html`<span part="move" aria-hidden="true" data-move></span>` : nothing
     }
     ${
       /* The corners, for a selected card, written out for the same reason. */

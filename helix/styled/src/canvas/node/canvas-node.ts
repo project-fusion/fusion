@@ -24,6 +24,9 @@ import { styles } from './canvas-node.css.js'
  *
  * @cssproperty --canvas-grip-size - How large the corners a selected card is resized from are.
  * @cssproperty --canvas-handle-size - How large the points a connection is drawn from are.
+ * @cssproperty --canvas-move-block-size - How tall the handle a selected card is moved by is.
+ * @cssproperty --canvas-move-inline-size - How wide the handle a selected card is moved by is.
+ * @cssproperty --canvas-move-offset - How far above the card's top edge that handle stands.
  * @cssproperty --canvas-node-background-color - The ground the card is drawn on.
  * @cssproperty --canvas-node-color - A color with no meaning, where a tone will not do: a hex a document chose.
  * @cssproperty --canvas-node-padding - Space between the card's edge and what it holds.
