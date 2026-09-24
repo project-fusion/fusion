@@ -573,6 +573,29 @@ describe('canvas connections and removal', () => {
     expect(removed).toEqual([{ edges: [{ from: 'a', name: 'e1', to: 'b' }], nodes: [] }])
   })
 
+  test('a press on a connection lights no cards until it becomes a drag', async () => {
+    const host = await canvas()
+    const pointer = (type: string, x: number, y: number) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: y,
+        composed: true,
+        pointerId: 13,
+      })
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
+    await host.updateComplete
+    await host.updateComplete
+    expect(hasState(card(host, 'c'), 'candidate')).toBe(false)
+    expect(hasState(host, 'connecting')).toBe(false)
+    host.dispatchEvent(pointer('pointermove', 282, 360))
+    await host.updateComplete
+    await host.updateComplete
+    expect(hasState(card(host, 'c'), 'candidate')).toBe(true)
+    host.dispatchEvent(pointer('pointerup', 282, 360))
+  })
+
   test('a press on a connection that does not move is a click, and picks nothing up', async () => {
     const host = await canvas()
     let asked = 0
