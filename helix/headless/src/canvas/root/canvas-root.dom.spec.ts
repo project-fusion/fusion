@@ -1816,7 +1816,7 @@ describe('canvas beyond the properties', () => {
        <helix-headless-canvas-edge name="named" from="b" to="a"></helix-headless-canvas-edge>`,
     )) as Canvas & { toJsonCanvas(): { edges: Array<{ id: string }> } }
     const ids = host.toJsonCanvas().edges.map((edge) => edge.id)
-    expect(ids).toEqual(['a->b', 'a->b-2', 'named'])
+    expect(ids).toEqual(['a->b', 'a->b#2', 'named'])
   })
 
   test('a card with no size of its own is as large as what it says', async () => {
@@ -1857,5 +1857,134 @@ describe('canvas beyond the properties', () => {
     })
     expect(props.nodes[0]?.subpath).toBe('#Intro')
     expect(props.nodes[1]).toMatchObject({ background: 'bg.png', backgroundStyle: 'cover' })
+  })
+})
+
+/**
+ * The board's own review: a gesture that ends early, a document that is not
+ * quite well formed, and keys that answered twice.
+ */
+describe('canvas at its edges', () => {
+  const pointer = (type: string, x: number, y: number, id: number): PointerEvent =>
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      buttons: type === 'pointerdown' ? 1 : 0,
+      cancelable: true,
+      clientX: x,
+      clientY: y,
+      composed: true,
+      pointerId: id,
+      pointerType: 'mouse',
+    })
+
+  test('an arrow on a connection walks on, and does not pan the board as well', async () => {
+    const host = await canvas()
+    const pans: Event[] = []
+    host.addEventListener('helix-canvas-pan', (event) => pans.push(event))
+    pressOn(connection(host, 'edge:e1'), 'ArrowRight')
+    await host.updateComplete
+    expect(pans).toHaveLength(0)
+    expect(card(host, 'b').current).toBe(true)
+  })
+
+  test('an end let go on a held card, or on its own other card, stays connected', async () => {
+    const host = await canvas('', BOARD.replace('name="c" x', 'name="c" readonly x'))
+    const removed: Event[] = []
+    host.addEventListener('helix-remove', (event) => removed.push(event))
+    await host.updateComplete
+    /* A press with no buttons held, as a pen or a synthetic one arrives. */
+    const drop = async (x: number, y: number, pointerId: number): Promise<void> => {
+      const at = (type: string, [clientX, clientY]: [number, number]): PointerEvent =>
+        new PointerEvent(type, {
+          bubbles: true,
+          button: 0,
+          clientX,
+          clientY,
+          composed: true,
+          pointerId,
+        })
+      connection(host, 'edge:e1').dispatchEvent(at('pointerdown', onScreen(host, 253, 50)))
+      host.dispatchEvent(at('pointermove', onScreen(host, x, y)))
+      await host.updateComplete
+      host.dispatchEvent(at('pointerup', onScreen(host, x, y)))
+      await host.updateComplete
+    }
+    // On the held card, and then on the card the connection comes from.
+    await drop(230, 350, 61)
+    await drop(100, 50, 62)
+    expect(removed).toHaveLength(0)
+  })
+
+  test('a connection to a card that is not there is not a stop the walk sticks on', async () => {
+    const host = await canvas(
+      '',
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
+       <helix-headless-canvas-edge name="gone" from="a" to="nowhere"></helix-headless-canvas-edge>`,
+    )
+    expect(await walk(host)).toEqual(['a', 'b'])
+  })
+
+  test('two unnamed connections between the same cards are two stops', async () => {
+    const host = await canvas(
+      '',
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
+       <helix-headless-canvas-edge from="a" to="b" from-side="right" to-side="left"></helix-headless-canvas-edge>
+       <helix-headless-canvas-edge from="a" to="b" from-side="top" to-side="top"></helix-headless-canvas-edge>`,
+    )
+    expect(await walk(host)).toEqual(['a', 'edge:a->b', 'edge:a->b#2', 'b'])
+  })
+
+  test('a card picked up by a click on a board the page holds is asked back on Escape', async () => {
+    const host = (await canvas()) as Canvas & { selected: string }
+    host.selected = 'c'
+    await host.updateComplete
+    const asked: Array<{ nodes: Array<{ name: string; x: number; y: number }> }> = []
+    host.addEventListener('helix-before-move', (event) => {
+      event.preventDefault()
+      const detail = (event as CustomEvent).detail as (typeof asked)[number]
+      asked.push(detail)
+      for (const { name, x, y } of detail.nodes) {
+        Object.assign(card(host, name), { x, y })
+      }
+    })
+    const handle = card(host, 'c').shadowRoot?.querySelector('[part="move"]') as Element
+    handle.dispatchEvent(pointer('pointerdown', 10, 10, 50))
+    handle.dispatchEvent(pointer('pointerup', 10, 10, 50))
+    host.dispatchEvent(pointer('pointermove', 50, 30, 50))
+    await host.updateComplete
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+    await host.updateComplete
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([130, 300])
+  })
+
+  test('a connection made from a click and finished with Enter lets go of the board', async () => {
+    const host = await canvas()
+    const handle = card(host, 'a').shadowRoot?.querySelector('[part~="handle-right"]') as Element
+    handle.dispatchEvent(pointer('pointerdown', 0, 0, 77))
+    handle.dispatchEvent(pointer('pointerup', 0, 0, 77))
+    await host.updateComplete
+    expect(hasState(host, 'holding')).toBe(true)
+    press(card(host, 'c'), 'Enter')
+    await host.updateComplete
+    expect(hasState(host, 'holding')).toBe(false)
+  })
+
+  test('a card whose place is not a number is placed at nothing, and the board settles', async () => {
+    const host = await canvas(
+      '',
+      '<helix-headless-canvas-node name="a" x="oops" y="0" width="200" height="100">First</helix-headless-canvas-node>',
+    )
+    for (let turn = 0; turn < 5; turn++) {
+      await host.updateComplete
+    }
+    const at = (host as unknown as { at: { x: number; y: number; zoom: number } }).at
+    expect([at.x, at.y, at.zoom].every(Number.isFinite)).toBe(true)
+    const saved = (
+      host as unknown as { toJsonCanvas(): { nodes: Array<{ x: number }> } }
+    ).toJsonCanvas()
+    expect(saved.nodes[0]?.x).toBe(0)
   })
 })
