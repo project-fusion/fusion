@@ -608,21 +608,54 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return this.remember('edges', () => this.readEdges())
   }
 
+  /**
+   * The sides each connection was first drawn from and to, where it names none.
+   *
+   * **Chosen once, and kept while the cards move.** A connection that names no
+   * side takes the ones facing the other card, and that was asked on every
+   * draw: a card dragged past the diagonal between the two flipped the answer,
+   * and the connection jumped from one point to another under the reader's
+   * hand. So the first answer is remembered for as long as the connection joins
+   * the same two cards, and a side the page writes still wins. Keyed on the two
+   * cards as well as the connection, so a reconnected one chooses again.
+   */
+  private readonly sides = new Map<string, { cards: string; from: CanvasSide; to: CanvasSide }>()
+
   private readEdges(): CanvasEdge[] {
+    const byName = new Map(this.nodes.map((node) => [node.id, node]))
     return this.knownChildren
       .filter((child): child is HelixHeadlessCanvasEdge => child instanceof HelixHeadlessCanvasEdge)
-      .map((edge) => ({
-        color: colorOf(edge.tone, custom(edge, '--canvas-edge-color')),
-        fromEnd: edge.fromEnd,
-        fromNode: edge.from,
-        fromSide: edge.fromSide,
-        id: edge.name,
-        label: edge.label,
-        path: edge.path,
-        toEnd: edge.toEnd,
-        toNode: edge.to,
-        toSide: edge.toSide,
-      }))
+      .map((element) => {
+        const edge: CanvasEdge = {
+          color: colorOf(element.tone, custom(element, '--canvas-edge-color')),
+          fromEnd: element.fromEnd,
+          fromNode: element.from,
+          fromSide: element.fromSide,
+          id: element.name,
+          label: element.label,
+          path: element.path,
+          toEnd: element.toEnd,
+          toNode: element.to,
+          toSide: element.toSide,
+        }
+        if (edge.fromSide !== undefined && edge.toSide !== undefined) {
+          return edge
+        }
+        const from = byName.get(edge.fromNode)
+        const to = byName.get(edge.toNode)
+        if (!from || !to) {
+          return edge
+        }
+        const key = keyOf(edge)
+        const cards = `${edge.fromNode}->${edge.toNode}`
+        let kept = this.sides.get(key)
+        if (kept?.cards !== cards) {
+          const drawn = ends(edge, from, to)
+          kept = { cards, from: drawn.fromSide, to: drawn.toSide }
+          this.sides.set(key, kept)
+        }
+        return { ...edge, fromSide: edge.fromSide ?? kept.from, toSide: edge.toSide ?? kept.to }
+      })
   }
 
   /** The events this family names for itself, the surface being shared. */
