@@ -291,16 +291,28 @@ describe('canvas', () => {
     expect((part(host, 'viewport') as HTMLElement).getAttribute('style')).not.toBe(before)
   })
 
-  test('zoom is held between a quarter and four times', async () => {
+  test('zoom is held between a tenth and eight times', async () => {
     const host = await canvas()
-    const zoomIn = host.shadowRoot?.querySelector('[part="zoom-in"]') as HTMLElement | null
-    for (let press = 0; press < 12; press++) {
-      zoomIn?.click()
+    const press = async (name: string, times: number) => {
+      const button = host.shadowRoot?.querySelector(`[part="${name}"]`) as HTMLElement | null
+      for (let at = 0; at < times; at++) {
+        button?.click()
+      }
+      await host.updateComplete
     }
-    await host.updateComplete
-    expect((part(host, 'viewport') as HTMLElement).getAttribute('style')).toContain(
-      '--_canvas-zoom: 4',
-    )
+    const style = () => (part(host, 'viewport') as HTMLElement).getAttribute('style') ?? ''
+    await press('zoom-in', 30)
+    expect(style()).toContain('--_canvas-zoom: 8;')
+    await press('zoom-out', 60)
+    expect(style()).toContain('--_canvas-zoom: 0.1;')
+    // Out that far, the ruling is drawn coarser so its lines stay lines.
+    expect(style()).toContain('--_canvas-rule-zoom: 0.8')
+  })
+
+  test('a label is centered on its line rather than sitting on it', async () => {
+    const host = await canvas()
+    const label = host.shadowRoot?.querySelector('[part="label"]')
+    expect(label?.getAttribute('dominant-baseline')).toBe('central')
   })
 
   test('an empty document says so rather than drawing an empty plane', async () => {

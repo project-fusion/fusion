@@ -64,8 +64,8 @@
    the board slid over it, which reads as the board standing still. */
 :host([grid]) [part="viewport"] {
   background-position: var(--_canvas-rule-x) var(--_canvas-rule-y);
-  background-size: calc(var(--canvas-grid-size, 32px) * var(--_canvas-zoom))
-    calc(var(--canvas-grid-size, 32px) * var(--_canvas-zoom));
+  background-size: calc(var(--canvas-grid-size, 32px) * var(--_canvas-rule-zoom))
+    calc(var(--canvas-grid-size, 32px) * var(--_canvas-rule-zoom));
   /* The same glide the plane takes, so a press moves the ruling and the cards
      together: both are linear in the offset and the zoom, so the two
      interpolate onto the same frames. */
