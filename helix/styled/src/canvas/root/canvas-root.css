@@ -33,6 +33,13 @@
   position: relative;
 }
 
+/* What a consumer slots for an empty board, shown only when it is one: the
+   markup is always there, because the shape of the template cannot depend on
+   what the server could not count. */
+:host(:not(:state(empty))) ::slotted([slot="empty"]) {
+  display: none;
+}
+
 /* **The plane, and the one thing that moves.** Panning and zooming write three
    custom properties and this reads them, so a press moves one transform rather
    than every card: the cards are placed once, in the document's own
@@ -83,11 +90,6 @@
   }
 }
 
-/* A color the document chose for itself, which no stylesheet can enumerate. */
-[part="card"][style*="--_canvas-card-color"] {
-  border-color: var(--_canvas-card-color);
-}
-
 [part="edge"][data-color="1"] {
   stroke: var(--canvas-color-1);
 }
@@ -122,76 +124,6 @@
 
 [part="viewport"]:active {
   cursor: grabbing;
-}
-
-/* Placed where the document put it, in the document's own units. */
-[part="card"] {
-  background-color: var(--helix-color-surface);
-  block-size: var(--_canvas-card-block-size);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  box-sizing: border-box;
-  color: var(--helix-color-foreground);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  inline-size: var(--_canvas-card-inline-size);
-  inset-block-start: var(--_canvas-card-y);
-  inset-inline-start: var(--_canvas-card-x);
-  overflow: hidden;
-  padding: var(--helix-space-sm);
-  position: absolute;
-}
-
-/* **A group is a box behind its cards, not a card.** It carries a label and a
-   wash and nothing else: the cards inside it are placed in the same
-   coordinates, so a group that painted itself opaque would cover them. */
-[part="card"][data-type="group"] {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
-  border-style: dashed;
-  z-index: 0;
-}
-
-[part="card"]:not([data-type="group"]) {
-  z-index: 1;
-}
-
-[part="card"][data-color="1"] {
-  border-color: var(--canvas-color-1);
-}
-[part="card"][data-color="2"] {
-  border-color: var(--canvas-color-2);
-}
-[part="card"][data-color="3"] {
-  border-color: var(--canvas-color-3);
-}
-[part="card"][data-color="4"] {
-  border-color: var(--canvas-color-4);
-}
-[part="card"][data-color="5"] {
-  border-color: var(--canvas-color-5);
-}
-[part="card"][data-color="6"] {
-  border-color: var(--canvas-color-6);
-}
-
-[part="card"] p {
-  margin: 0;
-}
-
-/* **A group's name sits above its box, not inside it.** Inside, it is behind
-   whatever card the author placed at the top of the group, which is usually
-   one: the cards are placed in the same coordinates and a group is drawn under
-   them. */
-[part="card"][data-type="group"] p {
-  /* `muted` rather than `subtle`: measured at 4.31:1 against the board's own
-     well in light mode, which is under the 4.5 a group's name has to clear like
-     any other text. */
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-xs);
-  inset-block-end: 100%;
-  inset-inline-start: 0;
-  padding-block-end: var(--helix-space-2xs);
-  position: absolute;
 }
 
 /* **The reading list, which is the family's accessibility argument made

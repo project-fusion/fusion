@@ -12,8 +12,9 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { HelixHeadlessCanvasEdge } from '../edge/canvas-edge.js'
+import { HelixHeadlessCanvasNode } from '../node/canvas-node.js'
 import {
-  type CanvasDocument,
   type CanvasEdge,
   type CanvasNode,
   connector,
@@ -22,13 +23,7 @@ import {
   reading,
 } from './canvas-document.js'
 
-export type {
-  CanvasDocument,
-  CanvasEdge,
-  CanvasEnd,
-  CanvasNode,
-  CanvasSide,
-} from './canvas-document.js'
+export type { CanvasEdge, CanvasEnd, CanvasNode, CanvasSide } from './canvas-document.js'
 
 /**
  * The breathing room the plane keeps around the document's own extent.
@@ -68,17 +63,6 @@ const preset = (color: string | undefined): string | undefined =>
 
 const own = (color: string | undefined): string | undefined =>
   color !== undefined && preset(color) === undefined ? color : undefined
-
-/**
- * What a consumer may draw a card's body with, where plain text is not enough.
- *
- * **A string is text and a template is markup, and the split is the safety.** A
- * card's text comes from a document this component did not write, so a string
- * comes back escaped; a consumer who wants Markdown builds a template and the
- * `unsafeHTML` that entails sits in their file, beside the sanitiser they chose,
- * rather than in this one where neither is visible.
- */
-export type CanvasCardRenderer = (node: CanvasNode) => string | TemplateResult
 
 /**
  * @summary Draws a JSON Canvas document, read-only.
@@ -129,7 +113,6 @@ export type CanvasCardRenderer = (node: CanvasNode) => string | TemplateResult
  *
  * @csspart arrow - The head an edge carries at an end that has one.
  * @csspart board - The plane the cards are placed on, which is what pans and zooms.
- * @csspart card - One card, group or link.
  * @csspart controls - The group the pan and zoom buttons sit in.
  * @csspart edge - One connector between two cards.
  * @csspart edges - The layer the connectors are drawn in.
@@ -154,16 +137,6 @@ export type CanvasCardRenderer = (node: CanvasNode) => string | TemplateResult
  */
 @customElement('helix-headless-canvas')
 export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
-  /**
-   * The document to draw.
-   *
-   * A property and not an attribute, an object being no kind of string. React
-   * applies it once the element upgrades, which is the route `react.mdx`
-   * describes for every object property in this library.
-   */
-  @property({ attribute: false })
-  data?: CanvasDocument
-
   /**
    * What the reading list is called.
    */
@@ -192,19 +165,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   @property({ reflect: true })
   order?: 'spatial' | 'edges'
-
-  /**
-   * Draws a card's body, for a consumer whose cards are not plain text.
-   *
-   * **Plain text by default, and the default is the safe one.** A card's text
-   * comes from a document this component did not write, so it is set as text
-   * and not as markup. A consumer who wants Markdown returns a template, which
-   * puts the `unsafeHTML` and the sanitiser they chose in their file rather than
-   * this one. What comes back is placed under `data-prose` either way, so a
-   * stylesheet can tell a drawn card from a plain one.
-   */
-  @property({ attribute: false })
-  renderCard?: CanvasCardRenderer
 
   /** Where the board sits, in board coordinates, and how far it is zoomed. */
   @state()
@@ -239,14 +199,58 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
   }
 
-  /** The nodes, which is the document's own list or nothing. */
-  private get nodes(): CanvasNode[] {
-    return this.data?.nodes ?? []
+  /**
+   * The cards, read from the light DOM.
+   *
+   * **`children` and not a slot**, which is what every family here that reads
+   * its own contents does, and it is undefined on the server: a board cannot
+   * count its cards while it is being rendered, so the plane, the connectors and
+   * the reading list are assembled on hydration and the cards themselves are in
+   * the served markup because the consumer wrote them there.
+   */
+  private get cards(): HelixHeadlessCanvasNode[] {
+    /* **`knownChildren`, which is the base class's answer to the whole hazard.**
+       A server has no children and a hydrating render must not read them, or it
+       renders something other than what it is hydrating and Lit throws at the
+       part where the two disagree. So the cards are read on the update after
+       hydration, which `finishHydration` asks for. */
+    return this.knownChildren.filter(
+      (child): child is HelixHeadlessCanvasNode => child instanceof HelixHeadlessCanvasNode,
+    )
   }
 
-  /** The edges, the same way. */
+  /** The same, as the shape the geometry works in. */
+  private get nodes(): CanvasNode[] {
+    return this.cards.map((card) => ({
+      color: card.color,
+      height: card.height,
+      id: card.id,
+      /* An empty label is no label: `??` falls through on nothing at all, and a
+         card that named itself with the empty string would be read out as one. */
+      label: card.label || undefined,
+      text: card.textContent?.trim() || undefined,
+      type: card.type ?? 'text',
+      width: card.width,
+      x: card.x,
+      y: card.y,
+    }))
+  }
+
+  /** The connectors a consumer declared, which draw nothing themselves. */
   private get edges(): CanvasEdge[] {
-    return this.data?.edges ?? []
+    return this.knownChildren
+      .filter((child): child is HelixHeadlessCanvasEdge => child instanceof HelixHeadlessCanvasEdge)
+      .map((edge) => ({
+        color: edge.color,
+        fromEnd: edge.fromEnd,
+        fromNode: edge.from,
+        fromSide: edge.fromSide,
+        id: edge.id,
+        label: edge.label,
+        toEnd: edge.toEnd,
+        toNode: edge.to,
+        toSide: edge.toSide,
+      }))
   }
 
   /** The events this family names for itself, the surface being shared. */
@@ -487,13 +491,26 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.at = next
   }
 
+  /**
+   * Asks for the render a hydration put off, so the cards get read.
+   *
+   * The mixin starts the idle wait here, and this adds the half a board needs:
+   * the update that hydrated the server's markup could not look at the children,
+   * so the one after it does.
+   */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
+  /** A card added or taken away is a board of a different size. */
+  private readonly handleSlotChange = (): void => {
+    this.requestUpdate()
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('data')) {
-      /* A new document is a new board, and the view a reader chose belonged to
-         the old one. */
-      this.touched = false
-    }
+    this.place({ x: extent(this.nodes).x - MARGIN, y: extent(this.nodes).y - MARGIN })
     this.watchBox()
     if (!this.touched) {
       this.fit()
@@ -540,30 +557,48 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.toggleState('idle', this.resting)
   }
 
-  /** One card, group or link, placed where the document put it. */
-  private renderNode(node: CanvasNode, origin: { x: number; y: number }): TemplateResult {
-    const body = this.renderCard?.(node)
-    const group = node.type === 'group' ? undefined : groupOf(node, this.nodes)
-    return html`<article
-      part="card"
-      aria-label=${node.type === 'group' ? this.textOf(node) : nothing}
-      data-type=${node.type}
-      data-color=${preset(node.color) ?? nothing}
-      data-group=${group?.id ?? nothing}
-      id=${`card-${node.id}`}
-      role=${node.type === 'group' ? 'group' : 'article'}
-      style=${`--_canvas-card-x: ${node.x - origin.x}px; --_canvas-card-y: ${node.y - origin.y}px; --_canvas-card-inline-size: ${node.width}px; --_canvas-card-block-size: ${node.height}px${own(node.color) === undefined ? '' : `; --_canvas-card-color: ${own(node.color)}`}`}
-    >
-      ${
-        body === undefined
-          ? html`<p>${this.textOf(node)}</p>`
-          : /* Under a name a stylesheet can find. A string arrives escaped and a
-               template arrives as the consumer built it, which is where the
-               decision to render markup belongs. */
-            html`<div data-prose>${body}</div>`
+  /**
+   * Places the cards, which is writing onto elements somebody else wrote.
+   *
+   * **The board positions its children rather than drawing them**, the way
+   * `Tabs` marks its panels: the card is the consumer's element, holding the
+   * consumer's DOM, and what this knows that they do not is where the extent
+   * starts and therefore what their coordinates come to on this plane. Written
+   * as custom properties so the styled tier decides what placement looks like.
+   */
+  private place(origin: { x: number; y: number }): void {
+    const all = this.nodes
+    for (const card of this.cards) {
+      const group =
+        card.type === 'group'
+          ? undefined
+          : groupOf(
+              {
+                height: card.height,
+                id: card.id,
+                type: card.type ?? 'text',
+                width: card.width,
+                x: card.x,
+                y: card.y,
+              },
+              all,
+            )
+      card.style.setProperty('--_canvas-card-x', `${card.x - origin.x}px`)
+      card.style.setProperty('--_canvas-card-y', `${card.y - origin.y}px`)
+      card.style.setProperty('--_canvas-card-inline-size', `${card.width}px`)
+      card.style.setProperty('--_canvas-card-block-size', `${card.height}px`)
+      const chosen = own(card.color)
+      if (chosen === undefined) {
+        card.style.removeProperty('--_canvas-card-color')
+      } else {
+        card.style.setProperty('--_canvas-card-color', chosen)
       }
-      ${node.type === 'link' && node.url ? html`<a href=${node.url}>${node.url}</a>` : nothing}
-    </article>`
+      if (group) {
+        card.setAttribute('data-group', group.id)
+      } else {
+        card.removeAttribute('data-group')
+      }
+    }
   }
 
   /** The connectors, in one layer under the cards. */
@@ -656,17 +691,21 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         @pointerup=${this.handlePointerUp}
         @wheel=${this.handleWheel}
       >
-        ${
-          nodes.length === 0
-            ? html`<slot name="empty"></slot>`
-            : html`<div
-                part="board"
-                style=${`--_canvas-x: ${this.at.x}px; --_canvas-y: ${this.at.y}px; --_canvas-zoom: ${this.at.zoom}; --_canvas-plane-inline-size: ${box.width}px; --_canvas-plane-block-size: ${box.height}px`}
-              >
-                ${this.renderEdges(origin, box)}
-                ${nodes.map((node) => this.renderNode(node, origin))}
-              </div>`
-        }
+        <!-- **One shape, whatever the board holds**, which is what hydration
+             needs: the server cannot see the cards, so a template that drew
+             something else while there were none rendered one thing on the
+             server and another on the client, and Lit reported a value mismatch
+             at the part where the two disagreed. Emptiness is a state on the
+             host instead, which is a fact about the board rather than a
+             different board. -->
+        <div
+          part="board"
+          style=${`--_canvas-x: ${this.at.x}px; --_canvas-y: ${this.at.y}px; --_canvas-zoom: ${this.at.zoom}; --_canvas-plane-inline-size: ${box.width}px; --_canvas-plane-block-size: ${box.height}px`}
+        >
+          ${this.renderEdges(origin, box)}
+          <slot @slotchange=${this.handleSlotChange}></slot>
+        </div>
+        <slot name="empty"></slot>
       </div>
       ${this.renderControls()}
       <ol part="index" aria-label=${this.indexLabel}>

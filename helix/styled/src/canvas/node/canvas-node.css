@@ -1,0 +1,97 @@
+/* **The card is the host, because the board places the host.** Its coordinates
+   are written onto this element by the board, so the element itself is what is
+   positioned: a wrapper inside would have to be told the same things twice. */
+:host {
+  /* **Declared here and written by the board**, which is what makes them
+     readable above: the board sets each card's coordinates onto the card at run
+     time, and a private read with nothing declaring it is a value fixed at its
+     fallback as far as anything reading this sheet can tell. Zero is where an
+     unplaced card sits, which is what a card is before a board has counted
+     them. */
+  --_canvas-card-x: 0px;
+  --_canvas-card-y: 0px;
+  --_canvas-card-inline-size: auto;
+  --_canvas-card-block-size: auto;
+  /* The color a card named for itself, which the board writes on where there is
+     one: the six presets are attributes this sheet matches below, and a value a
+     document chose can only arrive as a property. */
+  --_canvas-card-color: var(--helix-color-border);
+
+  background-color: var(--canvas-node-background-color, var(--helix-color-surface));
+  block-size: var(--_canvas-card-block-size);
+  border: var(--helix-border-thin) solid var(--_canvas-card-color);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inline-size: var(--_canvas-card-inline-size);
+  inset-block-start: var(--_canvas-card-y);
+  inset-inline-start: var(--_canvas-card-x);
+  overflow: hidden;
+  position: absolute;
+  z-index: 1;
+}
+
+/* **A group is a box behind its cards, not a card.** The cards inside it are
+   placed in the same coordinates, so a group that painted itself opaque would
+   cover them. */
+:host([type="group"]) {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+  border-style: dashed;
+  z-index: 0;
+}
+
+:host([color="1"]) {
+  border-color: var(--canvas-color-1);
+}
+:host([color="2"]) {
+  border-color: var(--canvas-color-2);
+}
+:host([color="3"]) {
+  border-color: var(--canvas-color-3);
+}
+:host([color="4"]) {
+  border-color: var(--canvas-color-4);
+}
+:host([color="5"]) {
+  border-color: var(--canvas-color-5);
+}
+:host([color="6"]) {
+  border-color: var(--canvas-color-6);
+}
+
+[part="node"] {
+  block-size: 100%;
+  box-sizing: border-box;
+  padding: var(--canvas-node-padding, var(--helix-space-sm));
+}
+
+/* **A group's name sits above its box, not inside it.** Inside, it is behind
+   whatever card the author placed at the top of the group, which is usually
+   one. */
+:host([type="group"]) [part="node"]::before {
+  color: var(--helix-color-foreground-muted);
+  content: attr(label);
+  font-size: var(--helix-text-xs);
+  inset-block-end: 100%;
+  inset-inline-start: 0;
+  padding-block-end: var(--helix-space-2xs);
+  position: absolute;
+}
+
+:host([type="group"]) [part="node"] {
+  position: relative;
+}
+
+::slotted([slot="description"]) {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+}
+
+/* Before it is placed, a card is a card in the flow: what a page without
+   JavaScript has is the text somebody wrote, in the order they wrote it. */
+:host(:not([style*="--_canvas-card-x"])) {
+  position: static;
+}
