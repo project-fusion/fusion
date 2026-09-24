@@ -266,6 +266,15 @@ describe('input date holds more than one', () => {
     )
   })
 
+  test('an empty message is no message, and the control says its own', async () => {
+    /* A page passing a translation before it has loaded passes the empty
+       string, which read as the page's own words and waved the date through. */
+    const wrong = await many('default-value="not-a-date" mode="multiple" bad-input-message=""')
+    const internals = (wrong as unknown as { internals: ElementInternals }).internals
+    expect(internals.validity.valid).toBe(false)
+    expect(internals.validationMessage).not.toBe('')
+  })
+
   test('and a range refuses a third date', async () => {
     const host = await many('default-value="2026-08-04,2026-08-11,2026-08-18" mode="range"')
     const internals = (host as unknown as { internals: ElementInternals }).internals

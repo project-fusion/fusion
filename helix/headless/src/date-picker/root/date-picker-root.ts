@@ -559,7 +559,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     if (this.required && this.value === '') {
       this.internals.setValidity(
         { valueMissing: true },
-        this.valueMissingMessage ?? 'Choose a date.',
+        this.valueMissingMessage || 'Choose a date.',
         anchor,
       )
       return
@@ -575,7 +575,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     if (held.length > 0 && held.some((one) => asDate(one) === null)) {
       this.internals.setValidity(
         { badInput: true },
-        this.badInputMessage ??
+        this.badInputMessage ||
           (this.mode === undefined
             ? 'Enter a date as YYYY-MM-DD.'
             : 'Enter dates as YYYY-MM-DD, separated by commas.'),

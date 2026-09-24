@@ -87,6 +87,19 @@ describe('lightbox', () => {
     expect(shown(host)).toBe('three')
   })
 
+  test('a step that goes nowhere asks for nothing, before anything was chosen too', async () => {
+    // The first picture is shown with `active` naming none, and is still shown.
+    const host = await lightbox('open')
+    await host.updateComplete
+    const asked: Event[] = []
+    host.addEventListener('helix-before-activate', (event) => asked.push(event))
+    host.previous()
+    const dialog = part(host, 'dialog') as HTMLElement
+    dialog.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Home' }))
+    await host.updateComplete
+    expect(asked).toHaveLength(0)
+  })
+
   test('Home and End are an index rather than a step', async () => {
     const host = await lightbox('open active="two"')
     await host.updateComplete

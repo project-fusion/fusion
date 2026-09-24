@@ -484,13 +484,13 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     if (this.required && this.value === '') {
       this.internals.setValidity(
         { valueMissing: true },
-        this.valueMissingMessage ?? 'Please fill in this field.',
+        this.valueMissingMessage || 'Please fill in this field.',
         first,
       )
     } else if (this.value !== '' && this.value.length < this.count) {
       this.internals.setValidity(
         { tooShort: true },
-        fillTemplate(this.tooShortMessage ?? 'Please enter all {length} characters.', {
+        fillTemplate(this.tooShortMessage || 'Please enter all {length} characters.', {
           length: this.count,
         }),
         first,

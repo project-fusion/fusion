@@ -591,7 +591,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     if (this.required && this.value === '') {
       this.internals.setValidity(
         { valueMissing: true },
-        this.valueMissingMessage ?? 'Choose a color.',
+        this.valueMissingMessage || 'Choose a color.',
         this.partNamed('grid') ?? undefined,
       )
       return

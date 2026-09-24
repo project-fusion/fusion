@@ -380,24 +380,24 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
     const ceiling = valueAsMinutes(this.max) ?? 1439
     if (held.length > 0 && !held.every(isTimeValue)) {
       return (
-        this.badInputMessage ??
+        this.badInputMessage ||
         (this.mode === undefined
           ? 'Enter a time as HH:mm.'
           : 'Enter times as HH:mm, separated by commas.')
       )
     }
     if (held.some((one) => (valueAsMinutes(one) ?? 0) < floor)) {
-      return fillTemplate(this.rangeUnderflowMessage ?? 'Choose a time at or after {min}.', {
+      return fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
         min: writeTime(this.min, this.locale),
       })
     }
     if (held.some((one) => (valueAsMinutes(one) ?? 0) > ceiling)) {
-      return fillTemplate(this.rangeOverflowMessage ?? 'Choose a time at or before {max}.', {
+      return fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
         max: writeTime(this.max, this.locale),
       })
     }
     if (this.mode === 'range' && held.length > 2) {
-      return this.rangeLengthMessage ?? 'A range is two times.'
+      return this.rangeLengthMessage || 'A range is two times.'
     }
     return ''
   }

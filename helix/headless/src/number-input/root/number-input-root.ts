@@ -530,19 +530,19 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     } else if (this.required && this.value.trim() === '') {
       this.internals.setValidity(
         { valueMissing: true },
-        this.valueMissingMessage ?? 'Please fill in this field.',
+        this.valueMissingMessage || 'Please fill in this field.',
         control,
       )
     } else if (this.value.trim() !== '' && parsed === null) {
       this.internals.setValidity(
         { badInput: true },
-        this.badInputMessage ?? 'Please enter a number.',
+        this.badInputMessage || 'Please enter a number.',
         control,
       )
     } else if (parsed !== null && this.min !== undefined && parsed < this.min) {
       this.internals.setValidity(
         { rangeUnderflow: true },
-        fillTemplate(this.rangeUnderflowMessage ?? 'Value must be {min} or more.', {
+        fillTemplate(this.rangeUnderflowMessage || 'Value must be {min} or more.', {
           min: this.min,
         }),
         control,
@@ -550,7 +550,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     } else if (parsed !== null && this.max !== undefined && parsed > this.max) {
       this.internals.setValidity(
         { rangeOverflow: true },
-        fillTemplate(this.rangeOverflowMessage ?? 'Value must be {max} or less.', {
+        fillTemplate(this.rangeOverflowMessage || 'Value must be {max} or less.', {
           max: this.max,
         }),
         control,

@@ -10,6 +10,11 @@ describe('a label with its placeholders filled in', () => {
     expect(fillTemplate('{name}, then {name}', { name: 'Plan' })).toBe('Plan, then Plan')
   })
 
+  test('a value is put in as written, dollar signs and all', () => {
+    // Read as a pattern, `$$` came out as one dollar and `$&` as the placeholder.
+    expect(fillTemplate('Remove {name}', { name: 'Tier $$ and $&' })).toBe('Remove Tier $$ and $&')
+  })
+
   test('a placeholder with no value is left as written, so the gap shows', () => {
     expect(fillTemplate('{from} to {to}', { from: 'Plan' })).toBe('Plan to {to}')
   })

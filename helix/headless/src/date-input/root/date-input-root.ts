@@ -497,7 +497,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
     const held = dates(this.value)
     if (held.length > 0 && !held.every(isDateValue)) {
       return (
-        this.badInputMessage ??
+        this.badInputMessage ||
         (this.mode === undefined
           ? 'Enter a date as YYYY-MM-DD.'
           : 'Enter dates as YYYY-MM-DD, separated by commas.')
@@ -507,17 +507,17 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
        own: a reader who sees "4 Aug 2026" in the field is told about the same
        day in the same words. */
     if (this.min !== '' && held.some((one) => one < this.min)) {
-      return fillTemplate(this.rangeUnderflowMessage ?? 'Choose a date on or after {min}.', {
+      return fillTemplate(this.rangeUnderflowMessage || 'Choose a date on or after {min}.', {
         min: this.written(this.min),
       })
     }
     if (this.max !== '' && held.some((one) => one > this.max)) {
-      return fillTemplate(this.rangeOverflowMessage ?? 'Choose a date on or before {max}.', {
+      return fillTemplate(this.rangeOverflowMessage || 'Choose a date on or before {max}.', {
         max: this.written(this.max),
       })
     }
     if (this.mode === 'range' && held.length > 2) {
-      return this.rangeLengthMessage ?? 'A range is two dates.'
+      return this.rangeLengthMessage || 'A range is two dates.'
     }
     return ''
   }
