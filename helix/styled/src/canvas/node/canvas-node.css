@@ -183,12 +183,15 @@
   opacity: 1;
 }
 
-/* **Selected, until the reader selects something else or nothing.** An
-   outline outside the box in the accent, where the focus ring is drawn inside
-   it, so a card that is both says both. */
+/* **Selected, until the reader selects something else or nothing.** Drawn on
+   the card's own edge, over its border, rather than beside it: an outline
+   standing off the box drew a second edge around the card with a gap between
+   the two, and the handles, which sit across the card's edge, floated in the
+   gap rather than on a line. The focus ring is inside the box, so a card that
+   is both still says both. */
 :host(:state(selected)) {
   outline: var(--helix-border-thick) solid var(--helix-color-accent);
-  outline-offset: var(--helix-border-thick);
+  outline-offset: calc(var(--helix-border-thin) * -1);
 }
 
 /* **Where a connection being drawn can land, and where it will.** Every card it
