@@ -202,6 +202,63 @@ export class HelixCanvasZoomEvent extends CustomEvent<ViewportZoomDetail> {
   }
 }
 
+/** Where a move puts each card it carries, in the board's own units. */
+export interface MoveDetail {
+  /**
+   * Every card the gesture moves, the one the reader took hold of first.
+   *
+   * **A list, because a group carries what is inside it.** Dragging a group
+   * moves its cards with it, which is what every board does, and a controlled
+   * consumer who refuses the move has to write every position it would have
+   * written, not only the one the pointer was on.
+   */
+  nodes: Array<{ id: string; x: number; y: number }>
+}
+
+/**
+ * Cards are about to move, and can be refused.
+ *
+ * **This is the controlled half, the way `helix-before-open` is for a
+ * dialog.** A board moves its own cards by default, writing `x` and `y` onto
+ * each one the way an input writes its own value. A consumer who keeps the
+ * positions in their own state calls `preventDefault()` here, writes what the
+ * detail says into that state, and renders the cards where it puts them.
+ *
+ * Sent for every step of a drag, so a controlled board follows the pointer
+ * rather than jumping on the drop.
+ */
+export class HelixBeforeMoveEvent extends CustomEvent<MoveDetail> {
+  static readonly eventName = 'helix-before-move'
+
+  constructor(detail: MoveDetail) {
+    super(HelixBeforeMoveEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * Cards moved, and the move is finished: a drag let go, or a key press.
+ *
+ * The `change` to `helix-before-move`'s `input`: what a consumer binds who
+ * only wants to save a board once somebody has finished rearranging it.
+ */
+export class HelixMoveEvent extends CustomEvent<MoveDetail> {
+  static readonly eventName = 'helix-move'
+
+  constructor(detail: MoveDetail) {
+    super(HelixMoveEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** What `ViewportPanDetail` was called when only Map had one. */
 export type MapPanDetail = ViewportPanDetail
 
@@ -1233,6 +1290,7 @@ const registry = {
   HelixBeforeCloseEvent,
   HelixBeforeCollapseEvent,
   HelixBeforeEditEvent,
+  HelixBeforeMoveEvent,
   HelixBeforeOpenEvent,
   HelixBeforePanelResizeEvent,
   HelixBeforePinEvent,
@@ -1252,6 +1310,7 @@ const registry = {
   HelixHistoryEvent,
   HelixMapPanEvent,
   HelixMapZoomEvent,
+  HelixMoveEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixPreviousEvent,

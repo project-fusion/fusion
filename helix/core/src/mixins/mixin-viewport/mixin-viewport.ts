@@ -77,6 +77,12 @@ export declare class ViewportElement {
 
   /** The controls, or nothing where the surface keeps none of them. */
   protected renderControls(): TemplateResult | typeof nothing
+
+  /** The drawn group of controls, where there is one, for a family that measures it. */
+  protected get controlsElement(): Element | null
+
+  /** Which controls the surface draws while `controls` is absent. */
+  protected get restingControls(): string
 }
 
 /**
@@ -124,11 +130,12 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
      * public either way, so a consumer drawing their own chrome can still drive
      * the surface.
      *
-     * Absent is all three, which is this library's rule that a resting value is
-     * an attribute's absence, and it is what the stylesheet asks about: the
-     * layout rules are written against `[controls]:not([controls~="zoom"])`
-     * rather than the bare negation, or a surface that named no list at all
-     * would be laid out as though it had dropped everything.
+     * Absent is whatever the family rests at, which is this library's rule that
+     * a resting value is an attribute's absence: all three for a map, whose
+     * reader may have no other way to move it, and zoom and fullscreen for a
+     * board, which a reader drags and whose pad took a third of the frame. The
+     * stylesheet lays the cluster out by which buttons are in it rather than by
+     * this attribute, so the two defaults need no rule each.
      */
     @property({ reflect: true })
     controls?: string
@@ -260,9 +267,19 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       void this.fullscreen.toggle()
     }
 
+    /**
+     * Which controls the surface draws while `controls` is absent.
+     *
+     * All three here, and a family overrides it where its reader has a better
+     * way to do one of them already.
+     */
+    protected get restingControls(): string {
+      return 'pan zoom fullscreen'
+    }
+
     /** Whether a named group of controls is one this surface draws. */
     private draws(group: 'pan' | 'zoom' | 'fullscreen'): boolean {
-      return this.controls === undefined ? true : this.controls.split(/\s+/).includes(group)
+      return (this.controls ?? this.restingControls).split(/\s+/).includes(group)
     }
 
     /**
@@ -332,6 +349,18 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
         event.preventDefault()
         this.zoom(-1)
       }
+    }
+
+    /**
+     * The group of controls as drawn, or nothing where none are.
+     *
+     * **Here, because this is what renders it.** A family that measures the
+     * cluster, as a board does to keep its fit clear of the buttons, would
+     * otherwise look up a part its own template never writes, and a lookup
+     * like that is one a later edit to this template breaks without a word.
+     */
+    protected get controlsElement(): Element | null {
+      return this.renderRoot?.querySelector('[part="controls"]') ?? null
     }
 
     /**

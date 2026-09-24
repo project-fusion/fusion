@@ -31,19 +31,21 @@
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* **The cluster is laid out for the controls that are there.** `controls` is a
-   list, so `~=` asks it the same way the attribute is written: with the zoom
+/* **The cluster is laid out for the controls that are there.** With the zoom
    column gone, a fullscreen button left in its track floats a cell away from
    the pad with nothing between them, and with the pad gone three empty columns
-   hold the zoom stack out from the corner it is supposed to sit in. */
-:host([controls]:not([controls~="zoom"])) [part="controls"] {
+   hold the zoom stack out from the corner it is supposed to sit in. Asked of
+   the buttons rather than of `controls`, because a family decides what an
+   absent list means and a board rests without the pad: a rule reading the
+   attribute laid a board's two buttons out in a map's four columns. */
+[part="controls"]:not(:has([part="zoom-in"])) {
   grid-template-areas:
     ".      up    ."
     "start  .     end"
     ".      down  full";
 }
 
-:host([controls]:not([controls~="pan"])) [part="controls"] {
+[part="controls"]:not(:has([part="pan-up"])) {
   grid-template-areas:
     "zoomin"
     "zoomout"
@@ -102,7 +104,7 @@
 
 [part="controls"] button {
   align-items: center;
-  background-color: var(--map-control-background-color, var(--helix-color-surface-overlay));
+  background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   block-size: var(--helix-size-control-sm);

@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'bun:test'
 import {
-  hasPart,
   hostAttributes,
   hostTag,
   partTag,
@@ -17,7 +16,7 @@ import '../index.js'
  *
  * **A parent cannot see its children while it is being rendered**, which `Tabs`
  * states in as many words: `children` is undefined there, so there is nothing to
- * count. So the plane, the connectors and the reading list are assembled on
+ * count. So the plane, the connectors and the tab stop are assembled on
  * hydration, and what the served markup carries is the cards themselves, with
  * their text and their coordinates, because the consumer wrote them and every
  * renderer emits what was written.
@@ -62,13 +61,11 @@ describe('canvas server output', () => {
     expect(partTag(served(), 'region')).toContain('tabindex="0"')
   })
 
-  test('the reading list is empty on the server, and says so by being empty', () => {
-    /* Not a failure: a board cannot count cards it cannot see. What matters is
-       that the list is not *wrong* on the server, which a fabricated one would
-       be, and that the cards are readable without it. */
-    const markup = served()
-    expect(hasPart(markup, 'index')).toBe(true)
-    expect(rendered(markup, 'helix-headless-canvas')).not.toContain('part="index-item"')
+  test('no card holds the tab stop on the server, the board not having counted them', () => {
+    /* Not a failure: which card is first in reading order is arithmetic over
+       cards a server cannot see, so the stop is given on hydration and the
+       region's own stop is what a reader has until then. */
+    expect(partTag(served(), 'node')).toContain('tabindex="-1"')
   })
 
   test('an edge is served carrying what it joins', () => {

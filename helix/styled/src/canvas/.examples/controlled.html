@@ -1,0 +1,59 @@
+<!-- @summary A board whose page holds the positions: it refuses each move and places the card itself, here on the ruling. -->
+<helix-canvas
+  grid="lines"
+  id="plan"
+  label="This sprint"
+>
+  <helix-canvas-node
+    height="64"
+    id="todo"
+    width="160"
+    x="0"
+    y="0"
+  >To do</helix-canvas-node>
+
+  <helix-canvas-node
+    color="3"
+    height="64"
+    id="doing"
+    width="160"
+    x="256"
+    y="0"
+  >Doing</helix-canvas-node>
+
+  <helix-canvas-node
+    color="4"
+    height="64"
+    id="done"
+    width="160"
+    x="512"
+    y="0"
+  >Done</helix-canvas-node>
+
+  <helix-canvas-edge
+    from="todo"
+    to="doing"
+  ></helix-canvas-edge>
+
+  <helix-canvas-edge
+    from="doing"
+    to="done"
+  ></helix-canvas-edge>
+</helix-canvas>
+
+<script>
+  const plan = document.getElementById('plan')
+
+  // The ruling's own spacing, so a card lands on a line rather than between two.
+  const STEP = 32
+
+  // Refused, so nothing moves on its own; the page decides where each card goes.
+  plan.addEventListener('helix-before-move', (event) => {
+    event.preventDefault()
+    for (const { id, x, y } of event.detail.nodes) {
+      const card = document.getElementById(id)
+      card.x = Math.round(x / STEP) * STEP
+      card.y = Math.round(y / STEP) * STEP
+    }
+  })
+</script>

@@ -8,9 +8,12 @@ beforeAll(async () => {
 
 type Canvas = HTMLElement & {
   order?: 'spatial' | 'edges'
+  readOnly: boolean
   show(id: string): void
   updateComplete: Promise<boolean>
 }
+
+type Card = HTMLElement & { current: boolean; links: string; x: number; y: number }
 
 /**
  * A small board, written the way a consumer writes one: two cards side by side,
@@ -38,11 +41,42 @@ const canvas = async (extra = '', cards = BOARD): Promise<Canvas> => {
 const cards = (host: Canvas): HTMLElement[] =>
   [...host.querySelectorAll('helix-headless-canvas-node')] as HTMLElement[]
 
-/** The reading list's entries, as text. */
-const index = (host: Canvas): string[] =>
-  [...(host.shadowRoot?.querySelectorAll('[part="index-item"]') ?? [])].map((one) =>
-    (one.textContent ?? '').replace(/\s+/g, ' ').trim(),
-  )
+/** One card, by id. */
+const card = (host: Canvas, id: string): Card => host.querySelector(`#${id}`) as Card
+
+/** A key pressed on a card, from the box a reader focuses rather than the host. */
+const press = (on: Card, key: string, shiftKey = false): KeyboardEvent => {
+  const event = new KeyboardEvent('keydown', {
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    key,
+    shiftKey,
+  })
+  on.shadowRoot?.querySelector('[part="node"]')?.dispatchEvent(event)
+  return event
+}
+
+/**
+ * The cards in the order the arrow keys walk them, from the tab stop on.
+ *
+ * Read off the stop as it moves rather than off focus, which happy-dom tracks
+ * across shadow roots less faithfully than a browser: the stop is what a reader
+ * tabbing back into the board lands on, so it is the thing worth asserting.
+ */
+const walk = async (host: Canvas): Promise<string[]> => {
+  const seen: string[] = []
+  for (let step = 0; step < cards(host).length; step++) {
+    const at = (cards(host) as Card[]).find((one) => one.current)
+    if (!at) {
+      break
+    }
+    seen.push(at.id)
+    press(at, 'ArrowRight')
+    await host.updateComplete
+  }
+  return seen
+}
 
 describe('canvas', () => {
   test('a card is placed where the document put it, in the document’s own units', async () => {
@@ -99,75 +133,90 @@ describe('canvas', () => {
     expect(path?.namespaceURI).toBe('http://www.w3.org/2000/svg')
   })
 
-  test('the connectors are hidden from assistive technology, the list saying it instead', async () => {
-    // A path is a shape. What a reader needs is the link as words, which is what
-    // the reading list carries.
+  test('the connectors are hidden from assistive technology, the cards saying it instead', async () => {
+    // A path is a shape. What a reader needs is the link as words, which each
+    // card carries as its description.
     const host = await canvas()
     expect((part(host, 'edges') as HTMLElement).getAttribute('aria-hidden')).toBe('true')
   })
 
-  test('the reading list says every card and where its arrows go', async () => {
+  test('every card says where its arrows go, and is described by it rather than named', async () => {
     const host = await canvas()
-    const entries = index(host)
-    expect(entries.some((one) => one.includes('First') && one.includes('leads to Second'))).toBe(
-      true,
+    expect(card(host, 'a').links).toBe('leads to Second')
+    expect(card(host, 'b').links).toBe('leads to Third; from First')
+    /* The description is resolved, not compared: a reference to an id that is
+       not in the card's own root would read out nothing. */
+    const box = card(host, 'b').shadowRoot?.querySelector('[part="node"]') as HTMLElement
+    const said = card(host, 'b').shadowRoot?.getElementById(
+      box.getAttribute('aria-describedby') ?? '',
     )
-    expect(entries.some((one) => one.includes('Second') && one.includes('from First'))).toBe(true)
+    expect(said?.textContent).toBe('leads to Third; from First')
+    expect(said?.hasAttribute('hidden')).toBe(true)
   })
 
-  test('spatial order reads the groups first, then across each row', async () => {
+  test('the board is one tab stop among its cards, however many there are', async () => {
+    const host = await canvas()
+    const stops = cards(host).filter(
+      (one) => one.shadowRoot?.querySelector('[part="node"]')?.getAttribute('tabindex') === '0',
+    )
+    expect(stops.map((one) => one.id)).toEqual(['pair'])
+  })
+
+  test('spatial order walks the groups first, then across each row', async () => {
     const host = await canvas('order="spatial"')
-    const entries = index(host)
-    expect(entries[0]).toContain('The pair')
-    expect(entries[1]).toContain('First')
-    expect(entries[2]).toContain('Second')
-    expect(entries[3]).toContain('Third')
+    expect(await walk(host)).toEqual(['pair', 'a', 'b', 'c'])
   })
 
   test('edge order follows the arrows from the card nothing points to', async () => {
     const host = await canvas('order="edges"')
-    const entries = index(host)
-    /* `startsWith`, because an entry names the cards it links to as well as
-       itself: "First leads to Second" contains both. */
-    const first = entries.findIndex((one) => one.startsWith('First'))
-    const second = entries.findIndex((one) => one.startsWith('Second'))
-    const third = entries.findIndex((one) => one.startsWith('Third'))
-    expect(first).toBeLessThan(second)
-    expect(second).toBeLessThan(third)
+    const walked = await walk(host)
+    expect(walked.indexOf('a')).toBeLessThan(walked.indexOf('b'))
+    expect(walked.indexOf('b')).toBeLessThan(walked.indexOf('c'))
   })
 
-  test('a card nothing points at and points nowhere is still in the list', async () => {
-    /* A board with no edges is every card an island, and a list that dropped
+  test('a card nothing points at and points nowhere is still walked to', async () => {
+    /* A board with no edges is every card an island, and a walk that skipped
        them would be a way around that leads nowhere. */
     const host = await canvas(
       'order="edges"',
       `<helix-headless-canvas-node id="a" x="0" y="0" width="10" height="10">First</helix-headless-canvas-node>
        <helix-headless-canvas-node id="b" x="40" y="0" width="10" height="10">Second</helix-headless-canvas-node>`,
     )
-    expect(index(host)).toHaveLength(2)
+    expect(await walk(host)).toEqual(['a', 'b'])
+  })
+
+  test('a board rests with zoom and fullscreen, and the pad is there when asked for', async () => {
+    /* A board is dragged and its cards walked by key, so the pad was a third way
+       to pan that took a third of the corner. */
+    const host = await canvas()
+    expect(host.shadowRoot?.querySelector('[part="pan-up"]')).toBeNull()
+    expect(host.shadowRoot?.querySelector('[part="zoom-in"]')).not.toBeNull()
+    const padded = await canvas('controls="pan zoom fullscreen"')
+    expect(padded.shadowRoot?.querySelector('[part="pan-up"]')).not.toBeNull()
   })
 
   test('choosing a card brings the board to it', async () => {
     const host = await canvas()
-    const before = (part(host, 'board') as HTMLElement).getAttribute('style')
+    const before = (part(host, 'viewport') as HTMLElement).getAttribute('style')
     host.show('c')
     await host.updateComplete
-    expect((part(host, 'board') as HTMLElement).getAttribute('style')).not.toBe(before)
+    expect((part(host, 'viewport') as HTMLElement).getAttribute('style')).not.toBe(before)
   })
 
   test('a press moves the board and says that it did, rather than asking', async () => {
     /* `Map` asks and this tells, the difference being who draws. */
-    const host = await canvas()
+    const host = await canvas('controls="pan zoom fullscreen"')
     const told: string[] = []
     host.addEventListener('helix-canvas-pan', (event) => {
       told.push((event as CustomEvent<{ to: string }>).detail.to)
     })
-    const before = (part(host, 'board') as HTMLElement).getAttribute('style')
+    const before = (part(host, 'viewport') as HTMLElement).getAttribute('style')
     const pad = host.shadowRoot?.querySelector('[part="pan-end"]') as HTMLElement | null
+    expect(pad).not.toBeNull()
     pad?.click()
     await host.updateComplete
     expect(told).toEqual(['end'])
-    expect((part(host, 'board') as HTMLElement).getAttribute('style')).not.toBe(before)
+    expect((part(host, 'viewport') as HTMLElement).getAttribute('style')).not.toBe(before)
   })
 
   test('zoom is held between a quarter and four times', async () => {
@@ -177,7 +226,7 @@ describe('canvas', () => {
       zoomIn?.click()
     }
     await host.updateComplete
-    expect((part(host, 'board') as HTMLElement).getAttribute('style')).toContain(
+    expect((part(host, 'viewport') as HTMLElement).getAttribute('style')).toContain(
       '--_canvas-zoom: 4',
     )
   })
@@ -188,15 +237,129 @@ describe('canvas', () => {
     expect(host.shadowRoot?.querySelector('slot[name="empty"]')).not.toBeNull()
   })
 
-  test('a card holds the consumer\u2019s own DOM, which the list reads as text', async () => {
+  test('a card holds the consumer\u2019s own DOM, which another card names as text', async () => {
     /* The card is their element now, so what is in it is theirs. What this
-       asserts is that the board reads it for the reading list rather than
-       parsing it into anything. */
+       asserts is that the board reads it for another card's connections rather
+       than parsing it into anything. */
     const host = await canvas(
       '',
-      '<helix-headless-canvas-node id="x" x="0" y="0" width="80" height="40">&lt;img src=x&gt;</helix-headless-canvas-node>',
+      `<helix-headless-canvas-node id="x" x="0" y="0" width="80" height="40">&lt;img src=x&gt;</helix-headless-canvas-node>
+       <helix-headless-canvas-node id="y" x="120" y="0" width="80" height="40">After</helix-headless-canvas-node>
+       <helix-headless-canvas-edge id="e" from="x" to="y"></helix-headless-canvas-edge>`,
     )
-    expect(index(host)[0]).toContain('<img')
+    expect(card(host, 'y').links).toBe('from <img src=x>')
+    expect(host.querySelector('img')).toBeNull()
+  })
+})
+
+/**
+ * Moving cards, which a board does unless it is read-only, and which a consumer
+ * holding the positions takes over by refusing the request.
+ */
+describe('canvas moves', () => {
+  const pointer = (type: string, at: { x: number; y: number }): PointerEvent =>
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: at.x,
+      clientY: at.y,
+      composed: true,
+      pointerId: 2,
+    })
+
+  /** A drag that starts on a card and is let go somewhere else. */
+  const drag = async (host: Canvas, id: string, by: { x: number; y: number }): Promise<void> => {
+    const box = card(host, id).shadowRoot?.querySelector('[part="node"]') as HTMLElement
+    const viewport = part(host, 'viewport') as HTMLElement
+    box.dispatchEvent(pointer('pointerdown', { x: 10, y: 10 }))
+    viewport.dispatchEvent(pointer('pointermove', { x: 10 + by.x, y: 10 + by.y }))
+    await host.updateComplete
+    viewport.dispatchEvent(pointer('pointerup', { x: 10 + by.x, y: 10 + by.y }))
+    await host.updateComplete
+  }
+
+  test('a card dragged moves by the distance, asked for and then reported', async () => {
+    const host = await canvas()
+    const said: string[] = []
+    host.addEventListener('helix-before-move', () => said.push('before'))
+    host.addEventListener('helix-move', (event) => {
+      said.push(`move ${JSON.stringify((event as CustomEvent).detail.nodes)}`)
+    })
+    await drag(host, 'c', { x: 40, y: 20 })
+    // Unzoomed in happy-dom, which measures nothing, so a pixel is a unit.
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([170, 320])
+    expect(said).toEqual(['before', 'move [{"id":"c","x":170,"y":320}]'])
+  })
+
+  test('a move refused is not made, which is how a consumer holds the positions', async () => {
+    const host = await canvas()
+    host.addEventListener('helix-before-move', (event) => event.preventDefault())
+    let finished = false
+    host.addEventListener('helix-move', () => {
+      finished = true
+    })
+    await drag(host, 'c', { x: 40, y: 20 })
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([130, 300])
+    expect(finished).toBe(false)
+  })
+
+  test('a hand that barely moves is a click, not a move', async () => {
+    const host = await canvas()
+    await drag(host, 'c', { x: 1, y: 1 })
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([130, 300])
+  })
+
+  test('a group carries the cards inside it', async () => {
+    const host = await canvas()
+    await drag(host, 'pair', { x: 10, y: 0 })
+    expect(card(host, 'pair').x).toBe(-10)
+    expect(card(host, 'a').x).toBe(10)
+    expect(card(host, 'b').x).toBe(270)
+    // Outside the group's bounds, so left where it was.
+    expect(card(host, 'c').x).toBe(130)
+  })
+
+  test('a read-only board keeps its cards, and a drag on one pans instead', async () => {
+    const host = await canvas('readonly')
+    const before = (part(host, 'viewport') as HTMLElement).getAttribute('style')
+    await drag(host, 'c', { x: 40, y: 20 })
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([130, 300])
+    expect((part(host, 'viewport') as HTMLElement).getAttribute('style')).not.toBe(before)
+  })
+
+  test('shift and an arrow moves the card by a step, which is the keyboard\u2019s drag', async () => {
+    const host = await canvas()
+    let finished = 0
+    host.addEventListener('helix-move', () => {
+      finished += 1
+    })
+    press(card(host, 'c'), 'ArrowRight', true)
+    press(card(host, 'c'), 'ArrowDown', true)
+    await host.updateComplete
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([146, 316])
+    expect(finished).toBe(2)
+
+    const still = await canvas('readonly')
+    press(card(still, 'c'), 'ArrowRight', true)
+    expect(card(still, 'c').x).toBe(130)
+  })
+
+  test('the arrows are the card\u2019s only when pressed on the card, not inside it', async () => {
+    /* A card may hold a chart or a field that answers the arrows itself. */
+    const host = await canvas(
+      '',
+      '<helix-headless-canvas-node id="a" x="0" y="0" width="80" height="40"><input></helix-headless-canvas-node>',
+    )
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'ArrowRight',
+      shiftKey: true,
+    })
+    host.querySelector('input')?.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(false)
+    expect(card(host, 'a').x).toBe(0)
   })
 })
 
@@ -207,10 +370,17 @@ describe('canvas', () => {
 describe('canvas gestures', () => {
   /** A pointer event happy-dom will carry, with the fields the handler reads. */
   const pointer = (type: string, at: { x: number; y: number }): PointerEvent =>
-    new PointerEvent(type, { bubbles: true, button: 0, clientX: at.x, clientY: at.y, pointerId: 1 })
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: at.x,
+      clientY: at.y,
+      composed: true,
+      pointerId: 1,
+    })
 
   const board = (host: Canvas): string =>
-    (part(host, 'board') as HTMLElement).getAttribute('style') ?? ''
+    (part(host, 'viewport') as HTMLElement).getAttribute('style') ?? ''
 
   /**
    * Where the board sits, read back out of the style.
@@ -248,6 +418,20 @@ describe('canvas gestures', () => {
     expect(at(host)).toEqual(released)
   })
 
+  test('a drag is direct while the hand is on it, and a press glides again after', async () => {
+    /* The plane eases a press on the pad, and easing every pointer move left
+       the board chasing the finger and arriving in steps. The drag never set
+       the state that turns the easing off, which is the bug this pins. */
+    const host = await canvas()
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.dispatchEvent(pointer('pointerdown', { x: 100, y: 100 }))
+    await host.updateComplete
+    expect(hasState(host, 'direct')).toBe(true)
+    viewport.dispatchEvent(pointer('pointerup', { x: 100, y: 100 }))
+    await host.updateComplete
+    expect(hasState(host, 'direct')).toBe(false)
+  })
+
   test('a press that began on a control is not a drag', async () => {
     /* The buttons sit inside the region this listens on, and a press on one is
        an ask rather than the start of a gesture. */
@@ -261,21 +445,31 @@ describe('canvas gestures', () => {
     expect(at(host)).toEqual(before)
   })
 
-  test('the wheel pans, and the page does not scroll instead', async () => {
+  test('a plain wheel scrolls the page, and a pinch zooms the board', async () => {
+    /* A board is most of a screen tall, and one that took the wheel stopped a
+       reader scrolling past it. A pinch arrives as a wheel with `ctrlKey`. */
     const host = await canvas()
     const viewport = part(host, 'viewport') as HTMLElement
     const before = at(host)
-    const wheel = new WheelEvent('wheel', {
-      bubbles: true,
-      cancelable: true,
-      deltaX: 20,
-      deltaY: 40,
-    })
+    const wheel = new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: 40 })
     viewport.dispatchEvent(wheel)
     await host.updateComplete
-    expect(wheel.defaultPrevented).toBe(true)
-    expect(at(host).x - before.x).toBe(-20)
-    expect(at(host).y - before.y).toBe(-40)
+    expect(wheel.defaultPrevented).toBe(false)
+    expect(at(host)).toEqual(before)
+
+    const pinch = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      deltaY: -10,
+    })
+    /* happy-dom's `WheelEvent` drops the modifier keys its init was given, so
+       the one this test is about is put back by hand. A browser carries it. */
+    Object.defineProperty(pinch, 'ctrlKey', { value: true })
+    viewport.dispatchEvent(pinch)
+    await host.updateComplete
+    expect(pinch.defaultPrevented).toBe(true)
+    expect(at(host).zoom).toBeGreaterThan(before.zoom)
   })
 
   test('zoom holds the middle of the view rather than the corner', async () => {

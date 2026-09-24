@@ -1,11 +1,15 @@
 import {
   capturePointer,
   customElement,
+  HelixBeforeMoveEvent,
   HelixCanvasPanEvent,
   HelixCanvasZoomEvent,
   HelixElement,
+  HelixMoveEvent,
   hostAria,
+  inlineStep,
   MixinViewport,
+  type MoveDetail,
   type ViewportPanDetail,
   type ViewportWay,
   type ViewportZoomDetail,
@@ -20,6 +24,7 @@ import {
   connector,
   extent,
   groupOf,
+  inside,
   reading,
 } from './canvas-document.js'
 
@@ -43,6 +48,23 @@ const MARGIN = 32
  * collide and a constant is safe where a generated one would only be noise.
  */
 const ARROW = 'canvas-arrow'
+
+/**
+ * How far a key press moves a card, in the document's own units.
+ *
+ * Half the ruling's default spacing, so two presses cross one square and a card
+ * moved by keys lands where one moved by hand could.
+ */
+const NUDGE = 16
+
+/**
+ * How far a pointer travels on a card before a press becomes a drag.
+ *
+ * A card is also something a reader clicks to focus, or clicks through to a
+ * link it holds, and a hand is never perfectly still: without a threshold every
+ * click nudged the card it landed on by a pixel or two.
+ */
+const SLOP = 3
 
 /** Whether an end carries an arrowhead, the format defaulting the two differently. */
 const heads = (edge: CanvasEdge): { start: boolean; end: boolean } => ({
@@ -82,15 +104,23 @@ const own = (color: string | undefined): string | undefined =>
  *
  * **Accessibility is the design work, not the drawing.** The cards are text in
  * the DOM, so they are readable already; what space does not supply is an order
- * and the connections. So the family chooses an order, says every card's links
- * as text, and lets a reader choose one and bring the board to it. `order`
- * takes `spatial`, which bands the cards into rows, and `edges`, which follows
- * the arrows from the cards nothing points to.
+ * and the connections. So the family chooses an order, walks the cards in it,
+ * and says every card's links as text. `order` takes `spatial`, which bands the
+ * cards into rows, and `edges`, which follows the arrows from the cards nothing
+ * points to.
  *
- * **Read-only, and that is the scope rather than a stage.** Dragging,
- * connecting and resizing are what tldraw and React Flow are for; a canvas that
- * only draws is already useful for publishing somebody's thinking, and it is
- * the half that has an open format behind it.
+ * **Cards move by default, the way a form control takes input by default.**
+ * The board writes the new `x` and `y` onto the card itself, as an input writes
+ * its own value, and says so twice: `helix-before-move` for every step, which a
+ * consumer holding the positions in their own state refuses and applies
+ * themselves, and `helix-move` once the move is finished. `readonly` keeps every
+ * card where it is, for a board that is published rather than worked on.
+ * Connecting and resizing are what tldraw and React Flow are for.
+ *
+ * **The cards are the way around it.** One of them holds the board's tab stop,
+ * arrow keys walk them in reading order, and the one a reader lands on is
+ * brought into view with what it connects to read out beside it. Shift with an
+ * arrow moves it, which is the keyboard's way to do what a drag does.
  *
  * **A document rather than a `src`.** Nothing in this library fetches, and what
  * a fetch returns cannot be server-rendered: the board would be empty in the
@@ -108,8 +138,10 @@ const own = (color: string | undefined): string | undefined =>
  * @slot footer - Chrome below the board.
  * @slot header - Chrome above the board.
  *
+ * @event {HelixBeforeMoveEvent} helix-before-move - Cards are about to move. Refuse it to keep the positions in your own state.
  * @event {HelixCanvasPanEvent} helix-canvas-pan - The board moved, which on a canvas is a fact rather than a request.
  * @event {HelixCanvasZoomEvent} helix-canvas-zoom - The board zoomed, and said so.
+ * @event {HelixMoveEvent} helix-move - Cards moved and the move is finished: a drag let go, or a key pressed.
  *
  * @csspart arrow - The head an edge carries at an end that has one.
  * @csspart board - The plane the cards are placed on, which is what pans and zooms.
@@ -119,8 +151,6 @@ const own = (color: string | undefined): string | undefined =>
  * @csspart footer - The strip below the board.
  * @csspart fullscreen - The button that fills the screen.
  * @csspart header - The strip above the board.
- * @csspart index - The list that gives the board a reading order.
- * @csspart index-item - One card's entry in that list.
  * @csspart label - The label on a connector.
  * @csspart pan-down - The button that moves the board down.
  * @csspart pan-end - The button that moves the board the way the text ends.
@@ -131,18 +161,13 @@ const own = (color: string | undefined): string | undefined =>
  * @csspart zoom-in - The button that zooms in.
  * @csspart zoom-out - The button that zooms out.
  *
+ * @cssstate direct - While the board moves without easing: under the reader's hand, or settling into its box.
  * @cssstate empty - While the document has no nodes.
  * @cssstate fullscreen - While the board fills the screen.
  * @cssstate idle - While the reader has been still long enough to hide the chrome.
  */
 @customElement('helix-headless-canvas')
 export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
-  /**
-   * What the reading list is called.
-   */
-  @property({ attribute: 'index-label' })
-  indexLabel = 'Cards on this board'
-
   /**
    * Accessible name for the board, which is the one thing a consumer must write.
    *
@@ -166,9 +191,49 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @property({ reflect: true })
   order?: 'spatial' | 'edges'
 
+  /**
+   * Keeps every card where its author put it.
+   *
+   * **The attribute is `readonly`, which is the platform's spelling**, and the
+   * reverse of an `editable` switch on purpose: a form control takes input
+   * unless it is told not to, and a board a reader can rearrange is the same
+   * kind of thing. A drag on a card pans the board instead, and the keys still
+   * walk the cards.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /** The card that holds the board's one tab stop, by id. */
+  @state()
+  private stop?: string
+
+  /**
+   * Where the plane's corner was on the last render, in the document's units.
+   *
+   * **A card moved past the edge of the board moves the corner**, since the
+   * plane is sized to what it holds, and every card is placed from that corner:
+   * without holding the view against it, dragging one card left slid every
+   * other card right by the same distance.
+   */
+  private origin?: { x: number; y: number }
+
   /** Where the board sits, in board coordinates, and how far it is zoomed. */
   @state()
   private at = { x: 0, y: 0, zoom: 1 }
+
+  /**
+   * Whether the move under way should land rather than glide: the reader's own
+   * hand, or the board settling into its box.
+   *
+   * **A drag must not be eased, and that is what made it feel like it snapped.**
+   * The plane carries a transition so a press on the pad glides rather than
+   * jumping, and a drag writes a new transform on every pointer move: each one
+   * was then animated toward the last, so the board chased the pointer a
+   * fraction behind and arrived in steps. Continuous input is direct and
+   * discrete input is eased, which is the rule a map or an editor follows.
+   */
+  @state()
+  private direct = false
 
   /**
    * Whether the reader has moved the board, which is what stops it re-fitting.
@@ -267,6 +332,18 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /**
+   * Zoom and fullscreen, without the pad.
+   *
+   * A board is dragged, and its cards walked with the arrow keys, so the four
+   * pan buttons were a third way to do what two others already did, and they
+   * took a third of the frame's corner. `controls="pan zoom fullscreen"` puts
+   * them back.
+   */
+  protected override get restingControls(): string {
+    return 'zoom fullscreen'
+  }
+
+  /**
    * Moves the board, and says so.
    *
    * **`Map` asks and this tells.** The mixin's `pan` announces a request, which
@@ -277,6 +354,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * reports rather than asks.
    */
   override pan(to: ViewportWay): void {
+    this.direct = false
     /* **The board's own width where the box has not been measured.** `panStep`
        is a fraction of what is on screen, and before the first layout, or in a
        test with no boxes, that is zero: every press would move the board by
@@ -309,6 +387,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * large board whole and far enough in to read a card that was drawn small.
    */
   override zoom(by: number): void {
+    this.direct = false
     this.touched = true
     this.zoomAbout(by > 0 ? 1.25 : 1 / 1.25, { x: this.box.width / 2, y: this.box.height / 2 })
     super.zoom(by)
@@ -322,11 +401,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * rather than a second copy of the text.
    */
   show(id: string): void {
+    this.direct = false
     const node = this.nodes.find((one) => one.id === id)
     if (!node) {
       return
     }
     this.touched = true
+    this.stop = id
     const board = extent(this.nodes)
     const middle = {
       x: (node.x - board.x + MARGIN + node.width / 2) * this.at.zoom,
@@ -345,6 +426,71 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     | undefined
 
   /**
+   * A press on a card that may become a move, with where everything it carries
+   * started. `moved` is what the last step settled on, which the drop reports.
+   */
+  private carrying:
+    | {
+        pointer: number
+        from: { x: number; y: number }
+        started: boolean
+        cards: Array<{ card: HelixHeadlessCanvasNode; x: number; y: number }>
+        moved?: MoveDetail
+      }
+    | undefined
+
+  /** The card an event came from, wherever inside it the event began. */
+  private cardOf(event: Event): HelixHeadlessCanvasNode | undefined {
+    return event
+      .composedPath()
+      .find((one): one is HelixHeadlessCanvasNode => one instanceof HelixHeadlessCanvasNode)
+  }
+
+  /**
+   * The card and everything a move of it carries.
+   *
+   * A group carries every card inside its bounds, groups inside it included,
+   * which is what the format means by a group and what every board does.
+   */
+  private carried(card: HelixHeadlessCanvasNode): HelixHeadlessCanvasNode[] {
+    if (card.type !== 'group') {
+      return [card]
+    }
+    const box = { height: card.height, width: card.width, x: card.x, y: card.y }
+    return [
+      card,
+      ...this.cards.filter(
+        (one) =>
+          one !== card && inside({ height: one.height, width: one.width, x: one.x, y: one.y }, box),
+      ),
+    ]
+  }
+
+  /**
+   * Moves cards, having asked first.
+   *
+   * **The same contract as `open` on a dialog.** The request goes out before
+   * anything moves; refused, nothing does, because the consumer is holding the
+   * positions and will render them. Unrefused, the board writes them onto the
+   * cards, which is the uncontrolled board a consumer gets by doing nothing.
+   * Returns whether it applied, so a caller knows whether to report a finish.
+   */
+  private requestMove(detail: MoveDetail): boolean {
+    if (!this.dispatchEvent(new HelixBeforeMoveEvent(detail))) {
+      return false
+    }
+    for (const { id, x, y } of detail.nodes) {
+      const card = this.cards.find((one) => one.id === id)
+      if (card) {
+        card.x = x
+        card.y = y
+      }
+    }
+    this.requestUpdate()
+    return true
+  }
+
+  /**
    * Drag to move the board, which is the gesture a canvas is reached for with.
    *
    * **Here rather than in the surface, because a map handles its own.** What
@@ -355,30 +501,80 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * The capture is an enhancement and the drag survives losing it, which is what
    * `capturePointer` is for: a pointer that leaves the box mid-drag keeps
    * moving the board rather than sticking.
+   *
+   * **Heard on the host rather than on the viewport**, and the cards are why.
+   * A card is the consumer's element, slotted in, so what happens on one
+   * reaches the host whatever else it passes on the way; a listener in the
+   * shadow root depends on the event being routed through the slot, which a
+   * browser does and a DOM implementation a consumer's tests run in need not.
+   * So the host listens, and the path says what was pressed.
    */
   private readonly handlePointerDown = (event: PointerEvent): void => {
+    const path = event.composedPath()
     /* The primary button only, and never a press that began on a control: the
-       buttons are inside this region and a press on one is not a drag. */
-    if (event.button !== 0 || (event.target as Element | null)?.closest('[part~="controls"]')) {
+       buttons are inside this region and a press on one is not a drag. Nor one
+       in the header or footer, which are the consumer's chrome. */
+    const on = (name: string): boolean =>
+      path.some(
+        (one) =>
+          one instanceof Element && (one.getAttribute('part') ?? '').split(' ').includes(name),
+      )
+    const card = this.cardOf(event)
+    if (event.button !== 0 || on('controls') || !(card || on('viewport'))) {
+      return
+    }
+    /* A press on a card carries the card, unless the board is read-only, where
+       it pans like a press anywhere else. */
+    if (card && !this.readOnly) {
+      this.carrying = {
+        cards: this.carried(card).map((one) => ({ card: one, x: one.x, y: one.y })),
+        from: { x: event.clientX, y: event.clientY },
+        pointer: event.pointerId,
+        started: false,
+      }
+      capturePointer(this, event.pointerId)
       return
     }
     this.touched = true
+    this.direct = true
     this.dragging = {
       at: { x: this.at.x, y: this.at.y },
       from: { x: event.clientX, y: event.clientY },
       pointer: event.pointerId,
     }
-    capturePointer(event.currentTarget as Element, event.pointerId)
+    capturePointer(this, event.pointerId)
   }
 
   private readonly handlePointerMove = (event: PointerEvent): void => {
     this.idle.stir()
+    const carry = this.carrying
+    if (carry && carry.pointer === event.pointerId) {
+      const across = event.clientX - carry.from.x
+      const down = event.clientY - carry.from.y
+      if (!carry.started && Math.hypot(across, down) < SLOP) {
+        return
+      }
+      carry.started = true
+      this.touched = true
+      /* The pointer moves in screen pixels and the card in the document's
+         units, which differ by the zoom: unscaled, a card on a board zoomed
+         out ran ahead of the hand that was holding it. */
+      const detail: MoveDetail = {
+        nodes: carry.cards.map(({ card, x, y }) => ({
+          id: card.id,
+          x: Math.round(x + across / this.at.zoom),
+          y: Math.round(y + down / this.at.zoom),
+        })),
+      }
+      if (this.requestMove(detail)) {
+        carry.moved = detail
+      }
+      return
+    }
     const drag = this.dragging
     if (!drag || drag.pointer !== event.pointerId) {
       return
     }
-    /* No easing while a finger is down: a transition here would drag the board
-       along behind the pointer rather than under it. */
     this.at = {
       ...this.at,
       x: drag.at.x + (event.clientX - drag.from.x),
@@ -387,38 +583,158 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   private readonly handlePointerUp = (event: PointerEvent): void => {
+    const carry = this.carrying
+    if (carry?.pointer === event.pointerId) {
+      this.carrying = undefined
+      if (carry.moved) {
+        this.dispatchEvent(new HelixMoveEvent(carry.moved))
+      }
+      return
+    }
     if (this.dragging?.pointer === event.pointerId) {
       this.dragging = undefined
+      /* The hand is off it, so the next press glides again. Cleared here rather
+         than left standing, or a board dragged once would never ease a press on
+         the pad for the rest of the page's life. */
+      this.direct = false
     }
   }
 
   /**
-   * The wheel, which pans, and the wheel with a modifier, which zooms.
+   * A pinch, which zooms, and the wheel, which pans only once the board fills
+   * the screen.
    *
    * **`ctrlKey` is a pinch as well as a control press**, which is the platform's
    * own convention rather than this component's: a trackpad pinch arrives as a
    * wheel event with `ctrlKey` set, on every browser, and a component that
    * ignored it would be the one thing on the page a pinch does not work on.
    *
-   * Prevented, because the alternative is the page scrolling out from under a
-   * reader who meant to move the board. A wheel over a board is about the board.
+   * **A plain wheel belongs to the page while the board is part of one.** Taking
+   * it trapped the reader: a board is most of a screen tall, so scrolling down a
+   * page stopped the moment the pointer crossed one and panned it instead, with
+   * no way on but to move the pointer off it first. Measured on the examples
+   * page, where the second board could not be scrolled to. A drag is how an
+   * embedded board moves, which is the bargain an embedded map makes too; once
+   * the reader has filled the screen with it there is no page left to scroll, so
+   * the wheel is the board's.
    */
   private readonly handleWheel = (event: WheelEvent): void => {
+    if (!event.ctrlKey && !this.filled) {
+      return
+    }
     event.preventDefault()
     this.touched = true
+    this.direct = true
     if (event.ctrlKey) {
-      /* About the pointer where the platform says where that is, and about the
-         middle where it does not: `offsetX` is absent in more places than a
-         component should assume, and a pinch that scaled about `NaN` would send
-         the board somewhere nobody asked for. */
-      const about = {
-        x: Number.isFinite(event.offsetX) ? event.offsetX : this.box.width / 2,
-        y: Number.isFinite(event.offsetY) ? event.offsetY : this.box.height / 2,
-      }
+      /* **About the pointer, measured against the box rather than the target.**
+         `offsetX` is relative to whatever the pointer is over, and over a board
+         that is usually a card: a pinch on one scaled about a point a card's
+         width from where the fingers were. The box is the listener, so the
+         pointer less the box's corner is the point in it. */
+      const box = (event.currentTarget as Element).getBoundingClientRect()
+      const about = { x: event.clientX - box.left, y: event.clientY - box.top }
       this.zoomAbout(event.deltaY < 0 ? 1.1 : 1 / 1.1, about)
       return
     }
     this.at = { ...this.at, x: this.at.x - event.deltaX, y: this.at.y - event.deltaY }
+  }
+
+  /**
+   * The keys on a card: arrows walk the cards, and Shift with an arrow moves one.
+   *
+   * **Only from the card itself**, not from inside what it holds: a card may
+   * hold a link, a field or a chart that answers the arrows itself, and a press
+   * taken from under one of those walked the board instead of the chart.
+   *
+   * **Arrows walk in reading order rather than in space.** The next card in the
+   * order is the one a reader who cannot see the board needs, and the spatial
+   * neighbor is a guess about where they think they are. Right and down go on,
+   * left and up go back, Home and End go to the ends, and Escape goes back out
+   * to the board, where the arrows pan it again.
+   */
+  private readonly handleCardKeydown = (event: KeyboardEvent): void => {
+    const card = this.cardOf(event)
+    const origin = event.composedPath()[0] as Element | undefined
+    if (!card || origin?.getAttribute?.('part') !== 'node') {
+      return
+    }
+    const along = inlineStep(this, event.key)
+    const down = event.key === 'ArrowDown' ? 1 : event.key === 'ArrowUp' ? -1 : 0
+    if (event.shiftKey && (along !== 0 || down !== 0)) {
+      event.preventDefault()
+      if (this.readOnly) {
+        return
+      }
+      const detail: MoveDetail = {
+        nodes: this.carried(card).map((one) => ({
+          id: one.id,
+          x: one.x + along * NUDGE,
+          y: one.y + down * NUDGE,
+        })),
+      }
+      if (this.requestMove(detail)) {
+        this.dispatchEvent(new HelixMoveEvent(detail))
+      }
+      void this.updateComplete.then(() => this.reveal(card.id))
+      return
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      this.partNamed('region')?.focus()
+      return
+    }
+    const ordered = reading(this.nodes, this.edges, this.order ?? 'spatial')
+    const at = ordered.findIndex((one) => one.id === card.id)
+    const to =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? ordered.length - 1
+          : along + down !== 0
+            ? Math.min(Math.max(at + Math.sign(along + down), 0), ordered.length - 1)
+            : undefined
+    if (to === undefined) {
+      return
+    }
+    event.preventDefault()
+    const next = this.cards.find((one) => one.id === ordered[to]?.id)
+    next?.focus()
+  }
+
+  /**
+   * A card a reader landed on becomes the tab stop, and comes into view.
+   *
+   * Into view rather than to the middle: a reader walking a row of cards that
+   * are all on screen should see the focus ring move along it, not the board
+   * lurch under every press.
+   */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const card = this.cardOf(event)
+    if (!card) {
+      return
+    }
+    this.stop = card.id
+    this.reveal(card.id)
+  }
+
+  /** Brings a card into view, where it is not already whole in it. */
+  private reveal(id: string): void {
+    const node = this.nodes.find((one) => one.id === id)
+    const origin = this.origin
+    if (!node || !origin) {
+      return
+    }
+    const free = this.free
+    const left = this.at.x + (node.x - origin.x) * this.at.zoom
+    const top = this.at.y + (node.y - origin.y) * this.at.zoom
+    const seen =
+      left >= free.x &&
+      top >= free.y &&
+      left + node.width * this.at.zoom <= free.x + free.width &&
+      top + node.height * this.at.zoom <= free.y + free.height
+    if (!seen) {
+      this.show(id)
+    }
   }
 
   /** Scales about a point in the box, which is what both the buttons and a pinch want. */
@@ -458,6 +774,58 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /**
+   * The part of the box a fit may use, which is the box less the controls.
+   *
+   * **The controls are chrome, not free space.** They float over the board in
+   * a corner, and a fit that used the whole box put the nearest card under
+   * them: the opening view of a board hid part of the board behind the buttons
+   * that move it. A map can let its controls sit over the tiles because a map
+   * is continuous; a card is not, and one half-covered reads as a broken layout.
+   *
+   * **A band or a column, whichever costs less.** The cluster sits in a corner,
+   * so keeping the board clear of it takes either a band across the edge it sits
+   * on or a column down the side it sits on, and either alone is enough. The
+   * cheaper wins, measured rather than guessed from the shape: a wide short box
+   * loses less to a column and a tall narrow one less to a band. Never more than
+   * half the box, or a small frame would fit its board into nothing.
+   *
+   * Measured rather than computed from `controls` and `controls-placement`, so
+   * a consumer who restyles the cluster, moves it with a part rule, or hides it
+   * with `controls="none"` gets a fit that follows what is actually there.
+   */
+  private get free(): { x: number; y: number; width: number; height: number } {
+    const { height, width } = this.box
+    const whole = { height, width, x: 0, y: 0 }
+    const viewport = this.renderRoot?.querySelector('[part="viewport"]')
+    const controls = this.controlsElement
+    if (!viewport || !controls) {
+      return whole
+    }
+    const box = viewport.getBoundingClientRect()
+    const cluster = controls.getBoundingClientRect()
+    if (cluster.width === 0 || cluster.height === 0) {
+      return whole
+    }
+    const atTop = cluster.top - box.top <= box.bottom - cluster.bottom
+    const atLeft = cluster.left - box.left <= box.right - cluster.right
+    /* From the near edge to the far side of the cluster, plus the same gap
+       again, so a card clears the buttons by what they clear the frame by. */
+    const band = atTop
+      ? cluster.bottom - box.top + (cluster.top - box.top)
+      : box.bottom - cluster.top + (box.bottom - cluster.bottom)
+    const column = atLeft
+      ? cluster.right - box.left + (cluster.left - box.left)
+      : box.right - cluster.left + (box.right - cluster.right)
+    if (band / height <= column / width && band <= height / 2) {
+      return { height: height - band, width, x: 0, y: atTop ? band : 0 }
+    }
+    if (column <= width / 2) {
+      return { height, width: width - column, x: atLeft ? column : 0, y: 0 }
+    }
+    return whole
+  }
+
+  /**
    * Fits the whole board into the box, centered, and never magnified past its
    * own size.
    *
@@ -469,16 +837,32 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * middle.
    */
   fit(): void {
+    this.fitInto(false)
+  }
+
+  /**
+   * The fit, gliding or landing.
+   *
+   * **A fit the board makes for itself lands; one a consumer asks for glides.**
+   * The automatic fit runs as the page loads and whenever the box resizes, and
+   * easing it made the board visibly drift into place after everything else had
+   * settled, and trail a container being resized by a fraction of a second.
+   * It also left Chrome's screenshot of the SVG labels rastered at the scale the
+   * glide started from, which is how it was found: the two twins of an example
+   * matched to the attribute and differed on every label. A consumer's own
+   * `fit()` is a press on a button of theirs, and glides like the pad.
+   */
+  private fitInto(direct: boolean): void {
     const board = extent(this.nodes)
-    const { height: down, width: across } = this.box
-    if (board.width === 0 || across === 0 || down === 0) {
+    const free = this.free
+    if (board.width === 0 || free.width === 0 || free.height === 0) {
       return
     }
     const whole = { height: board.height + MARGIN * 2, width: board.width + MARGIN * 2 }
-    const zoom = Math.min(1, across / whole.width, down / whole.height)
+    const zoom = Math.min(1, free.width / whole.width, free.height / whole.height)
     const next = {
-      x: (across - whole.width * zoom) / 2,
-      y: (down - whole.height * zoom) / 2,
+      x: free.x + (free.width - whole.width * zoom) / 2,
+      y: free.y + (free.height - whole.height * zoom) / 2,
       zoom,
     }
     /* **Only where it moved**, or this never stops. A fit runs after every
@@ -488,6 +872,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (next.x === this.at.x && next.y === this.at.y && next.zoom === this.at.zoom) {
       return
     }
+    this.direct = direct
     this.at = next
   }
 
@@ -513,7 +898,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.place({ x: extent(this.nodes).x - MARGIN, y: extent(this.nodes).y - MARGIN })
     this.watchBox()
     if (!this.touched) {
-      this.fit()
+      this.fitInto(true)
     }
   }
 
@@ -525,7 +910,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.sizes ??= new ResizeObserver(() => {
       if (!this.touched) {
-        this.fit()
+        this.fitInto(true)
       }
     })
     this.sizes.disconnect()
@@ -542,16 +927,41 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.watchBox()
+    this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('keydown', this.handleCardKeydown)
+    this.addEventListener('pointercancel', this.handlePointerUp)
+    this.addEventListener('pointerdown', this.handlePointerDown)
+    this.addEventListener('pointermove', this.handlePointerMove)
+    this.addEventListener('pointerup', this.handlePointerUp)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.sizes?.disconnect()
+    this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('keydown', this.handleCardKeydown)
+    this.removeEventListener('pointercancel', this.handlePointerUp)
+    this.removeEventListener('pointerdown', this.handlePointerDown)
+    this.removeEventListener('pointermove', this.handlePointerMove)
+    this.removeEventListener('pointerup', this.handlePointerUp)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    const drawn = extent(this.nodes)
+    const origin = { x: drawn.x - MARGIN, y: drawn.y - MARGIN }
+    /* Held where the plane's corner moved, so the cards stay where they are on
+       screen. Assigned here, before the render, so it costs no second one. */
+    if (this.origin && (origin.x !== this.origin.x || origin.y !== this.origin.y)) {
+      this.at = {
+        ...this.at,
+        x: this.at.x + (origin.x - this.origin.x) * this.at.zoom,
+        y: this.at.y + (origin.y - this.origin.y) * this.at.zoom,
+      }
+    }
+    this.origin = origin
     hostAria(this.internals, { label: this.label })
+    this.toggleState('direct', this.direct)
     this.toggleState('empty', this.nodes.length === 0)
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
@@ -568,6 +978,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   private place(origin: { x: number; y: number }): void {
     const all = this.nodes
+    /* The first card in reading order until a reader has landed on one, and
+       again if the one they were on is taken away. */
+    const stop = all.some((one) => one.id === this.stop)
+      ? this.stop
+      : reading(all, this.edges, this.order ?? 'spatial')[0]?.id
     for (const card of this.cards) {
       const group =
         card.type === 'group'
@@ -598,6 +1013,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       } else {
         card.removeAttribute('data-group')
       }
+      const node = all.find((one) => one.id === card.id)
+      card.links = node ? this.linksOf(node) : ''
+      card.current = card.id === stop
     }
   }
 
@@ -676,8 +1094,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     const drawn = extent(nodes)
     const box = { height: drawn.height + MARGIN * 2, width: drawn.width + MARGIN * 2 }
     const origin = { x: drawn.x - MARGIN, y: drawn.y - MARGIN }
-    const ordered = reading(nodes, this.edges, this.order ?? 'spatial')
-
     return html`<div
       part="region"
       role="group"
@@ -694,10 +1110,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       </div>
       <div
         part="viewport"
-        @pointercancel=${this.handlePointerUp}
-        @pointerdown=${this.handlePointerDown}
-        @pointermove=${this.handlePointerMove}
-        @pointerup=${this.handlePointerUp}
+        style=${`--_canvas-x: ${this.at.x}px; --_canvas-y: ${this.at.y}px; --_canvas-zoom: ${this.at.zoom}; --_canvas-rule-x: ${this.at.x - origin.x * this.at.zoom}px; --_canvas-rule-y: ${this.at.y - origin.y * this.at.zoom}px`}
         @wheel=${this.handleWheel}
       >
         <!-- **One shape, whatever the board holds**, which is what hydration
@@ -707,9 +1120,15 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
              at the part where the two disagreed. Emptiness is a state on the
              host instead, which is a fact about the board rather than a
              different board. -->
+        <!-- Where the board sits is written on the viewport rather than the
+             plane, so the box can read it too: a ruling drawn behind the plane
+             has to move with it, and the plane only covers the cards. The
+             ruling's own offset is where the document's zero lands, so a line
+             falls on every multiple of its spacing in the document's units and
+             a card placed on one sits on a line. -->
         <div
           part="board"
-          style=${`--_canvas-x: ${this.at.x}px; --_canvas-y: ${this.at.y}px; --_canvas-zoom: ${this.at.zoom}; --_canvas-plane-inline-size: ${box.width}px; --_canvas-plane-block-size: ${box.height}px`}
+          style=${`--_canvas-plane-inline-size: ${box.width}px; --_canvas-plane-block-size: ${box.height}px`}
         >
           ${this.renderEdges(origin, box)}
           <slot @slotchange=${this.handleSlotChange}></slot>
@@ -717,16 +1136,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         <slot name="empty"></slot>
       </div>
       ${this.renderControls()}
-      <ol part="index" aria-label=${this.indexLabel}>
-        ${ordered.map(
-          (node) => html`<li>
-            <button part="index-item" type="button" @click=${() => this.show(node.id)}>
-              ${this.textOf(node)}
-              ${this.linksOf(node) === '' ? nothing : html`<span>${this.linksOf(node)}</span>`}
-            </button>
-          </li>`,
-        )}
-      </ol>
       <div part="footer">
         <slot name="footer"></slot>
       </div>
