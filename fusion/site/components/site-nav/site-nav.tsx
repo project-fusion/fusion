@@ -344,8 +344,14 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
              *                   it drew a filled pill around nothing. With JavaScript off it
              *                   never arrived at all.
              */}
+            {/* And it says it opens something, which only this markup can:
+                 the component has no shadow root of the button's to write
+                 `aria-expanded` into, and writing it onto the button after
+                 hydration would be a mismatch. `panelDown` is the panel's own
+                 state, heard from its events. */}
             <button
               aria-current={onProducts ? 'page' : undefined}
+              aria-expanded={panelDown}
               data-navigation-item
               slot="trigger"
               suppressHydrationWarning

@@ -46,7 +46,9 @@ const warned = new WeakSet<Element>()
  * `<button slot="trigger">` has no shadow root to keep the state out of the
  * markup and no property to take it, and a consumer cannot mirror it themselves
  * because the open state belongs to the component. Saying so once is the same
- * answer `Tooltip` gives about the link it will not write for them.
+ * answer `Tooltip` gives about the link it will not write for them, and not at
+ * all to a trigger that already carries `aria-expanded`, which is a consumer
+ * mirroring the state from the component's `toggle` event.
  */
 export const tellDisclosure = (trigger: Element | null | undefined, open: boolean): void => {
   if (!trigger) {
@@ -61,7 +63,9 @@ export const tellDisclosure = (trigger: Element | null | undefined, open: boolea
     ;(trigger as unknown as Record<string, unknown>).expanded = open
     return
   }
-  if (warned.has(trigger)) {
+  /* A consumer who took the warning's advice has already said it, and a
+     warning that fires either way cannot tell them they have. */
+  if (warned.has(trigger) || trigger.hasAttribute('aria-expanded')) {
     return
   }
   warned.add(trigger)
