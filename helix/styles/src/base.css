@@ -1451,10 +1451,12 @@ helix-toast:not([data-color-mode]) {
 /* What a filtered list marks, painted rather than wrapped. **Turbopack warns on
    this rule and the warning is wrong.** Its CSS parser does not know
    `::highlight()`, the Custom Highlight API's pseudo-element, and reports
-   "'highlight' is not recognized as a valid pseudo-element. **And it is not ours
-   to silence.** `@supports selector(::highlight(x))` was tried and does not
-   help, the parser validating the inner selector regardless and the gate then
-   risking a browser that supports the feature and not the query. */
+   "'highlight' is not recognized as a valid pseudo-element". **The rule stays
+   as written and the site ignores that one warning**, in its Next config.
+   `@supports selector(::highlight(x))` was tried and does not help, the parser
+   validating the inner selector regardless and the gate then risking a browser
+   that supports the feature and not the query. A consumer on Turbopack will
+   see the same warning, and `turbopack.ignoreIssue` is the answer there too. */
 ::highlight(helix-filter-match) {
   background-color: light-dark(
     color-mix(in oklab, var(--helix-color-primary) 22%, transparent),

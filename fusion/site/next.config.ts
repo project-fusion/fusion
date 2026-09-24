@@ -103,8 +103,22 @@ const config: NextConfig = {
    * back to `.ts` is `resolve.extensionAlias`, which is webpack only. Turbopack
    * has no equivalent, so source resolution and Turbopack cannot both be had
    * here. `bun run watch` rebuilds `dist` on change instead.
+   *
+   * **One warning is ignored, and it is Turbopack's mistake rather than ours.**
+   * Its CSS parser does not know `::highlight()`, the Custom Highlight API's
+   * pseudo-element, which every browser Helix supports does, and it says so on
+   * every compile of the one rule in Helix's base layer that uses it. Matched
+   * on that file and that sentence, so a real parse failure anywhere else, or a
+   * different one in the same file, is still reported.
    */
-  turbopack: {},
+  turbopack: {
+    ignoreIssue: [
+      {
+        description: /'highlight' is not recognized as a valid pseudo-element/,
+        path: /helix\/styles\/dist\/base\.css$/,
+      },
+    ],
+  },
 }
 
 export default config
