@@ -85,9 +85,9 @@ to keep up to date.
 
 ## Translatable strings
 
-Seventy properties across the headless tier are strings a reader sees, and every
-one is a property rather than a hardcoded word. The ones that combine
-values are format templates:
+Over a hundred properties across the headless tier are strings a reader sees,
+from `pan-up-label` on a map to `remove-label` on a combobox's chosen tags. The
+ones that combine values are format templates:
 
 ```html
 <helix-pagination-summary
@@ -101,6 +101,12 @@ values are format templates:
 
 The placeholders are named rather than positional, so a translation can reorder
 them, which some languages require and a positional format cannot express.
+
+**Validation messages are the exception.** The sentence a control hands the
+browser when it refuses to submit is English, and `feedback` replaces the one a
+reader sees under the field but not the one in the browser's own bubble. A text
+input and a textarea pass the browser's own message, which is already in the
+reader's language.
 
 **Pass these from your own translation system.** Helix ships English defaults
 and no translation machinery: a design system that owned the string catalog

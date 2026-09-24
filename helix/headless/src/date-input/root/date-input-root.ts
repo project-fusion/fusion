@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   valueAsDate as asDate,
   customElement,
+  fillTemplate,
   dateAsValue as fromDate,
   type HelixBeforeChangeEvent,
   HelixFormElement,
@@ -285,6 +286,15 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   placeholder = 'YYYY-MM-DD'
 
   /**
+   * What the control removing one date is called, with `{name}` filled in.
+   *
+   * **The name goes in**, so a row of them is heard as which one each
+   * removes rather than as "Remove" said once per date.
+   */
+  @property({ attribute: 'remove-label' })
+  removeLabel = 'Remove {name}'
+
+  /**
    * How far apart the selectable dates are, in days.
    *
    * `<input type="date" step>`'s own unit, handed to the calendar this renders
@@ -542,7 +552,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
                   part="date"
       exportparts="dismiss: date-dismiss, dismiss-mark: date-dismiss-mark, start: date-start"
                   dismissible
-                  dismiss-label=${`Remove ${date}`}
+                  dismiss-label=${fillTemplate(this.removeLabel, { name: this.written(date) })}
                   ?disabled=${this.isDisabled}
                   @helix-dismiss=${(event: Event) => {
                     event.stopPropagation()

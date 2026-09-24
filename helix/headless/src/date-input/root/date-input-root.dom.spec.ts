@@ -375,6 +375,19 @@ describe('input date shows what it holds', () => {
     await host.updateComplete
     expect(host.value).toBe('2026-08-04,2026-08-18')
   })
+
+  test('each tag is removed by a control named for the date it shows', async () => {
+    /* The date as written on the tag rather than as stored: a reader who sees
+       "4 Aug 2026" and hears "Remove 2026-08-04" is left matching the two. And
+       the name goes where the sentence puts it, so another language can put it
+       first. */
+    const host = await field(
+      'date-style="medium" default-value="2026-08-04" locale="en-GB" mode="multiple" remove-label="Take {name} off"',
+    )
+    const tag = host.shadowRoot?.querySelector('[part="date"]')
+    expect(tag?.getAttribute('dismiss-label')).toBe(`Take ${tag?.textContent?.trim()} off`)
+    expect(tag?.getAttribute('dismiss-label')).not.toContain('2026-08-04')
+  })
 })
 
 describe('input date can be written out', () => {

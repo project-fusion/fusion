@@ -261,14 +261,15 @@ describe('input file', () => {
        carry the file as well as the verb: three buttons all announcing "Remove"
        is a list a reader cannot choose from by ear.
 
-       A word the component does not default to, since `removeLabel` holds
-       "Remove" and asserting that would pass against a template writing it. */
-    const host = await field('remove-label="Take off"')
+       A sentence the component does not default to, since `removeLabel` holds
+       "Remove {name}" and asserting that would pass against a template writing
+       it. The name goes where the sentence puts it, not after it. */
+    const host = await field('remove-label="Take {name} off"')
     await choose(host, 'one.txt', 'two.txt')
     const names = [...(host.shadowRoot?.querySelectorAll('[part~="remove"]') ?? [])].map((one) =>
       one.getAttribute('aria-label'),
     )
-    expect(names).toEqual(['Take off one.txt', 'Take off two.txt'])
+    expect(names).toEqual(['Take one.txt off', 'Take two.txt off'])
   })
 
   test('the size beside a file is written in the locale the consumer named', async () => {

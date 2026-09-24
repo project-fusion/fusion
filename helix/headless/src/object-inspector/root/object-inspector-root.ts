@@ -2,6 +2,7 @@ import {
   CopyController,
   customElement,
   elementById,
+  fillTemplate,
   HelixElement,
   inlineStep,
   scrollItemIntoView,
@@ -119,6 +120,20 @@ const child = (path: string, key: string): string =>
  */
 @customElement('helix-headless-object-inspector')
 export class HelixHeadlessObjectInspector extends HelixElement {
+  /**
+   * What the copy control is called on a row with a key, with the key as
+   * `{name}`.
+   *
+   * **Every word the inspector speaks is a property**, so a page in another
+   * language hears its own rather than English around its own keys.
+   */
+  @property({ attribute: 'copy-label' })
+  copyLabel = 'Copy {name}'
+
+  /** What the copy control is called where there is no key, on the value itself. */
+  @property({ attribute: 'copy-value-label' })
+  copyValueLabel = 'Copy value'
+
   /**
    * How many levels start open.
    *
@@ -549,7 +564,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,
         tooltip-left: copy-tooltip-left, tooltip-right: copy-tooltip-right, tooltip-top: copy-tooltip-top"
-      label=${row?.key === undefined ? 'Copy value' : `Copy ${row.key}`}
+      label=${row?.key === undefined ? this.copyValueLabel : fillTemplate(this.copyLabel, { name: row.key })}
       .value=${this.copyable(row)}
     ></${this.tag('copy-button')}>`
   }
