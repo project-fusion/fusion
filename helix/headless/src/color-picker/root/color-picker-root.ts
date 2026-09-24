@@ -5,6 +5,7 @@ import {
   capturePointer,
   customElement,
   drawIcon,
+  fillTemplate,
   formatColor,
   HelixFormElement,
   HelixSampleEndEvent,
@@ -136,6 +137,33 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   autocomplete = 'off'
 
   /**
+   * What the square's vertical ramp is called.
+   *
+   * **Every word the picker speaks is a property**, so a page in another
+   * language hears its own rather than English between its own labels.
+   */
+  @property({ attribute: 'brightness-label' })
+  brightnessLabel = 'Brightness'
+
+  /**
+   * What the sample says for a moment after it copied the value.
+   */
+  @property({ attribute: 'copied-label' })
+  copiedLabel = 'Copied'
+
+  /**
+   * What the sample is called, which copies the value, with `{value}` filled in.
+   */
+  @property({ attribute: 'copy-label' })
+  copyLabel = 'Copy {value}'
+
+  /**
+   * What the eyedropper is called.
+   */
+  @property({ attribute: 'eyedropper-label' })
+  eyedropperLabel = 'Sample a color from the screen'
+
+  /**
    * The syntax the value is written in: `hex`, `rgb` or `hsl`.
    *
    * Only what is written. Everything is read whatever this says, so a picker on
@@ -143,6 +171,18 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ reflect: true })
   format?: ColorFormat
+
+  /**
+   * What the syntax toggle is called, with `{format}` filled in.
+   */
+  @property({ attribute: 'format-label' })
+  formatLabel = 'Syntax: {format}. Change it.'
+
+  /**
+   * What the hue channel is called.
+   */
+  @property({ attribute: 'hue-label' })
+  hueLabel = 'Hue'
 
   /**
    * Whether the current selection fails validation.
@@ -184,6 +224,18 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ attribute: 'no-value', type: Boolean })
   noValue = false
+
+  /**
+   * What the opacity channel is called, where `alpha` offers one.
+   */
+  @property({ attribute: 'opacity-label' })
+  opacityLabel = 'Opacity'
+
+  /**
+   * What the row of `swatches` is called.
+   */
+  @property({ attribute: 'presets-label' })
+  presetsLabel = 'Presets'
 
   /**
    * Whether the control refuses changes while still submitting its value.
@@ -242,10 +294,28 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   required = false
 
   /**
+   * What the square's horizontal ramp is called.
+   */
+  @property({ attribute: 'saturation-label' })
+  saturationLabel = 'Saturation'
+
+  /**
    * Colors offered under the picker, as a comma-separated list.
    */
   @property()
   swatches = ''
+
+  /**
+   * What the group holding the eyedropper and the syntax toggle is called.
+   */
+  @property({ attribute: 'tools-label' })
+  toolsLabel = 'Color tools'
+
+  /**
+   * What the text field holding the value is called.
+   */
+  @property({ attribute: 'value-label' })
+  valueLabel = 'Color'
 
   /**
    * The color the reader has moved to, or nothing while they have moved none.
@@ -657,13 +727,13 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * tiers.
    */
   protected renderTools(): TemplateResult {
-    return html`<${this.tag('button-group')} part="actions" label="Color tools">
+    return html`<${this.tag('button-group')} part="actions" label=${this.toolsLabel}>
                 ${
                   this.sampling && !this.noEyedropper
                     ? html`<${this.tag('button')}
                         part="eyedropper"
       exportparts="button: eyedropper-button"
-                        aria-label="Sample a color from the screen"
+                        aria-label=${this.eyedropperLabel}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
                       >
@@ -677,7 +747,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                     : html`<${this.tag('button')}
                         part="format"
       exportparts="button: format-button"
-                        aria-label=${`Syntax: ${this.format ?? 'hex'}. Change it.`}
+                        aria-label=${fillTemplate(this.formatLabel, { format: this.format ?? 'hex' })}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}
                       >
@@ -701,7 +771,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           type="range"
           min="0"
           max="100"
-          aria-label="Saturation"
+          aria-label=${this.saturationLabel}
           .value=${String(color.saturation)}
           ?disabled=${this.isDisabled}
           @input=${(event: Event) => this.takeArea('saturation', event)}
@@ -711,7 +781,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           type="range"
           min="0"
           max="100"
-          aria-label="Brightness"
+          aria-label=${this.brightnessLabel}
           .value=${String(color.brightness)}
           ?disabled=${this.isDisabled}
           @input=${(event: Event) => this.takeArea('brightness', event)}
@@ -722,14 +792,18 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
         <button
           part="sample"
           type="button"
-          aria-label=${this.copier.copied ? 'Copied' : `Copy ${this.value || 'the color'}`}
+          aria-label=${
+            this.copier.copied
+              ? this.copiedLabel
+              : fillTemplate(this.copyLabel, { value: this.value }).trim()
+          }
           data-copied=${this.copier.copied ? '' : nothing}
           ?disabled=${this.isDisabled || this.value === ''}
           @click=${() => this.copier.copy(this.value)}
         ></button>
         <div part="channels">
-          ${this.renderChannel('hue', 'Hue', 360, color.hue)}
-          ${this.alpha ? this.renderChannel('alpha', 'Opacity', 100, color.alpha) : nothing}
+          ${this.renderChannel('hue', this.hueLabel, 360, color.hue)}
+          ${this.alpha ? this.renderChannel('alpha', this.opacityLabel, 100, color.alpha) : nothing}
         </div>
       </div>
 
@@ -744,7 +818,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
             : html`<input
                 part="value"
                 type="text"
-                aria-label="Color"
+                aria-label=${this.valueLabel}
                 autocomplete=${this.autocomplete || nothing}
                 spellcheck="false"
                 .value=${this.value}
@@ -759,7 +833,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       ${
         this.presets.length === 0
           ? nothing
-          : html`<div part="swatches" role="group" aria-label="Presets">
+          : html`<div part="swatches" role="group" aria-label=${this.presetsLabel}>
                 ${this.presets.map((preset) => {
                   const parsed = parseColor(preset)
                   return html`<button

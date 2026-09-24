@@ -2,6 +2,7 @@ import {
   CommandController,
   customElement,
   FullscreenController,
+  fillTemplate,
   HelixElement,
   hostAria,
   IdleController,
@@ -13,10 +14,6 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
-
-/** The reading that says where in the set the reader is. */
-const fill = (template: string, index: number, count: number): string =>
-  template.replaceAll('{index}', String(index)).replaceAll('{count}', String(count))
 
 /**
  * @summary A viewer that opens one thing over the page.
@@ -368,7 +365,8 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     const items = this.items
     const current = resolveActiveItem(this.active, items)
     const at = current ? items.indexOf(current) : -1
-    this.announcement = at === -1 ? '' : fill(this.statusLabel, at + 1, items.length)
+    this.announcement =
+      at === -1 ? '' : fillTemplate(this.statusLabel, { count: items.length, index: at + 1 })
   }
 
   protected override render(): TemplateResult {

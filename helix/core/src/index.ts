@@ -247,6 +247,7 @@ export {
   elementById,
   searchableById,
 } from './utils/element-by-id/element-by-id.js'
+export { fillTemplate } from './utils/fill-template/fill-template.js'
 export {
   deepActiveElement,
   deepContains,
