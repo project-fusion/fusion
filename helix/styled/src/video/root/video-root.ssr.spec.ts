@@ -41,6 +41,7 @@ describe('video server output', () => {
       'controls',
       'fullscreen',
       'header',
+      'live',
       'mute',
       'play',
       'poster',

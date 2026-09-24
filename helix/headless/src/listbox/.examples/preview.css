@@ -160,3 +160,14 @@ helix-headless-option[disabled]::part(item) {
   cursor: default;
   opacity: 0.5;
 }
+
+/* The region a screen reader hears, clipped out of the picture: this tier
+   draws nothing, so the page hides it the way the styled tier does. */
+helix-headless-listbox::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

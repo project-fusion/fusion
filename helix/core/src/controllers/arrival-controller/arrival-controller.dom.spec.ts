@@ -40,14 +40,17 @@ describe('an element announced when it appears', () => {
     expect(element.asked).toBe(1)
   })
 
-  test('one that came with the page has its words at once, and is not news', () => {
+  test('one that came with the page says nothing, its words being no news', () => {
+    /* And a region filled at once drew the words twice on the headless tier,
+       which has no sheet to clip it, so a served page changed on hydrating. */
     const element = host()
     const words = new ArrivalController(element, {
       arriving: () => false,
       text: () => 'Trial ends',
     })
     element.connect()
-    expect(words.said).toBe('Trial ends')
+    words.say()
+    expect(words.said).toBe('')
     expect(element.asked).toBe(0)
   })
 
@@ -57,6 +60,7 @@ describe('an element announced when it appears', () => {
     const words = new ArrivalController(element, { arriving: () => false, text: () => text })
     element.connect()
     words.say()
+    expect(words.said).toBe('')
     expect(element.asked).toBe(0)
     text = 'Two'
     words.say()
