@@ -212,7 +212,7 @@ export interface MoveDetail {
    * consumer who refuses the move has to write every position it would have
    * written, not only the one the pointer was on.
    */
-  nodes: Array<{ id: string; x: number; y: number }>
+  nodes: Array<{ name: string; x: number; y: number }>
 }
 
 /**
@@ -259,7 +259,7 @@ export class HelixMoveEvent extends CustomEvent<MoveDetail> {
   }
 }
 
-/** Which two cards a reader asked to join, and the side they started from. */
+/** Which two cards a reader asked to join, by name, and the side they started from. */
 export interface ConnectDetail {
   from: string
   to: string
@@ -291,15 +291,15 @@ export class HelixConnectEvent extends CustomEvent<ConnectDetail> {
 
 /** What a reader asked to take off the board. */
 export interface RemoveDetail {
-  /** The cards, by id. */
+  /** The cards, by name. */
   nodes: string[]
   /**
    * The connections, including every one attached to a card being removed,
    * since a line to nothing is not drawn but its element would stay behind.
-   * Each carries its ends as well as its id, so a page that gave its edges no
-   * ids can still find them.
+   * Each carries its ends as well as its name, so a page that named none of
+   * its connections can still find them.
    */
-  edges: Array<{ id: string; from: string; to: string }>
+  edges: Array<{ name: string; from: string; to: string }>
 }
 
 /**
@@ -314,6 +314,41 @@ export class HelixRemoveEvent extends CustomEvent<RemoveDetail> {
 
   constructor(detail: RemoveDetail) {
     super(HelixRemoveEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * Where a board is looking: the point at the middle of the view, in the
+ * document's own units, and how far it is zoomed.
+ *
+ * The middle rather than a corner, so a view saved in one box and restored in
+ * a box of another size shows the same thing in the middle of it.
+ */
+export interface CanvasView {
+  x: number
+  y: number
+  zoom: number
+}
+
+/**
+ * The board's view changed, however it changed: a drag, the wheel, a press on
+ * a control, a card brought into view, or the board fitting itself.
+ *
+ * **One event for all of them**, because what a consumer keeping a minimap or a
+ * saved position in step needs is where the board is now, not which of six
+ * gestures put it there; `helix-canvas-pan` and `helix-canvas-zoom` still say
+ * which control was pressed. Sent for every step of a drag, the way `input` is.
+ */
+export class HelixCanvasViewEvent extends CustomEvent<CanvasView> {
+  static readonly eventName = 'helix-canvas-view'
+
+  constructor(detail: CanvasView) {
+    super(HelixCanvasViewEvent.eventName, {
       bubbles: true,
       cancelable: false,
       composed: true,
@@ -1361,6 +1396,7 @@ const registry = {
   HelixBeforeSplitEvent,
   HelixBeforeToggleEvent,
   HelixCanvasPanEvent,
+  HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
   HelixCaretEvent,
   HelixCompleteEvent,

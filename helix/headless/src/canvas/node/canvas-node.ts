@@ -1,16 +1,16 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /**
  * What the board draws from a card, as distinct from what it writes onto one:
  * `current` and `links` are the board's own, and listing them here would have
  * every card the board touched ask it to draw again.
  */
-const DRAWN = ['color', 'height', 'label', 'type', 'url', 'width', 'x', 'y'] as const
+const DRAWN = ['color', 'group', 'height', 'label', 'name', 'readOnly', 'width', 'x', 'y'] as const
 
 /**
- * @summary One card, group or link on a canvas.
+ * @summary One card or group on a canvas.
  *
  * @description
  * **Markup rather than an entry in an array**, which is the rule
@@ -26,6 +26,18 @@ const DRAWN = ['color', 'height', 'label', 'type', 'url', 'width', 'x', 'y'] as 
  * rather than computed. The board reads them and places the card; a page with
  * no JavaScript has the cards and their text and not the arrangement, which is
  * the honest half of what a board can promise before it hydrates.
+ *
+ * **Named by `name`, which only has to be unique on its board**, the way a
+ * form control's is in its form. An `id` has to be unique on the whole page,
+ * and two boards written from one template, or one board shown twice, would
+ * each have a card called `write` with no way to say which one a connection
+ * meant. `id` is left for the page, which can still use it.
+ *
+ * **What it holds is the consumer's**, which is why there is no card type any
+ * more: a card of text is text, a link is a link they put inside it, a file is
+ * whatever they show for one. The one kind the board treats differently is a
+ * group, a box drawn behind the cards inside it, and `group` says so. JSON
+ * Canvas's four types are mapped by `fromJsonCanvas` on the way in.
  *
  * **The card is the way around the board, for a reader who cannot see it.** The
  * board keeps one tab stop among its cards, arrow keys walk them in reading
@@ -50,7 +62,9 @@ const DRAWN = ['color', 'height', 'label', 'type', 'url', 'width', 'x', 'y'] as 
  * @csspart handle-top - The point on the top side.
  * @csspart node - The box the content sits in.
  *
+ * @cssstate candidate - While a connection is being drawn and this card is somewhere it could arrive.
  * @cssstate current - While this is the card a reader lands on when they tab into the board.
+ * @cssstate target - While a connection being drawn would arrive here if it were let go.
  */
 @customElement('helix-headless-canvas-node')
 export class HelixHeadlessCanvasNode extends HelixElement {
@@ -65,24 +79,37 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   color?: string
 
   /**
-   * Whether the board lets a reader draw a connection from this card.
-   *
-   * Written by the board, which knows whether it is read-only: a handle a card
-   * drew for itself would promise a gesture the board was about to refuse.
+   * @internal Whether a connection being drawn could arrive here, written by
+   * the board. Not a consumer's to set: whether a card can take one is the
+   * board's arithmetic over its own read-only switches and this card's.
    */
-  @property({ attribute: false })
+  @state()
+  candidate = false
+
+  /**
+   * @internal Whether the board lets a reader move, connect or remove this
+   * card, written by the board. Not a consumer's to set: `readonly` is theirs,
+   * and this is what the board makes of it and of its own.
+   */
+  @state()
   connectable = false
 
   /**
-   * Whether this card holds the board's one tab stop.
-   *
-   * Written by the board, so it is a custom state rather than a reflected
-   * attribute: the parent's bookkeeping does not belong in a consumer's markup.
-   * One card at a time, so a board of forty cards is one press of Tab to get
-   * past rather than forty.
+   * @internal Whether this card holds the board's one tab stop, written by the
+   * board. One card at a time, so a board of forty cards is one press of Tab to
+   * get past rather than forty.
    */
-  @property({ attribute: false })
+  @state()
   current = false
+
+  /**
+   * A box drawn behind the cards inside it rather than a card.
+   *
+   * The board works out what is inside it from the geometry, which is what the
+   * format does too, and moves them with it. Its `label` is drawn above it.
+   */
+  @property({ reflect: true, type: Boolean })
+  group = false
 
   /** How tall the card is, in the document's own units. */
   @property({ type: Number })
@@ -99,31 +126,39 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   label = ''
 
   /**
-   * What the card connects to, as a sentence, which the board writes.
-   *
+   * @internal What the card connects to, as a sentence, written by the board.
    * Read out after the card's own content rather than as its name, so a reader
    * hears what the card says first and where it leads second.
    */
-  @property({ attribute: false })
+  @state()
   links = ''
 
   /**
-   * What kind of thing it is.
+   * What connections and requests call this card, unique on its board.
    *
-   * A `group` is a box drawn behind the cards inside it rather than a card, and
-   * the board works out what is inside it from the geometry.
-   *
-   * Absent is a card of text, a resting value being an attribute's absence: a
-   * default that reflected would write `type="text"` onto every card a consumer
-   * wrote without one, which their server never sent and React reports as a
-   * mismatch it will not patch up.
+   * Required: a card with no name is drawn but nothing can connect to it, and
+   * the board has nothing to say when a reader asks for it to go.
    */
-  @property({ reflect: true })
-  type?: 'text' | 'file' | 'link' | 'group'
-
-  /** Where it points, for a link. */
   @property()
-  url?: string
+  name = ''
+
+  /**
+   * Keeps this card where it is: not moved, not connected, not removed.
+   *
+   * **The board's own word, meaning the same thing one card at a time.** A
+   * board of cards a reader rearranges often has one that anchors it, a start
+   * or a title, and this is that card. The board's `readonly` still wins, so a
+   * read-only board is read-only whatever its cards say.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /**
+   * @internal Whether a connection being drawn would arrive here if it were
+   * let go, written by the board.
+   */
+  @state()
+  target = false
 
   /** How wide the card is, in the document's own units. */
   @property({ type: Number })
@@ -139,7 +174,9 @@ export class HelixHeadlessCanvasNode extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.toggleState('candidate', this.candidate)
     this.toggleState('current', this.current)
+    this.toggleState('target', this.target)
   }
 
   /**
@@ -182,14 +219,13 @@ export class HelixHeadlessCanvasNode extends HelixElement {
     return html`<div
       part="node"
       aria-describedby=${this.links ? 'links' : nothing}
-      aria-label=${this.type === 'group' ? this.label || nothing : nothing}
+      aria-label=${this.group ? this.label || nothing : nothing}
       aria-keyshortcuts=${this.connectable ? 'Shift+ArrowRight Shift+ArrowDown C Delete' : nothing}
-      role=${this.type === 'group' ? 'group' : 'article'}
+      role=${this.group ? 'group' : 'article'}
       tabindex=${this.current ? '0' : '-1'}
     >
       <slot></slot>
       <slot name="description"></slot>
-      ${this.type === 'link' && this.url ? html`<a href=${this.url}>${this.url}</a>` : nothing}
       <span id="links" hidden>${this.links}</span>
     </div>
     ${

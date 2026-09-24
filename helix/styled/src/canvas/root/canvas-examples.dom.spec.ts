@@ -19,48 +19,49 @@ const run = hasLayout() ? test : (): void => {}
 
 type Card = Updatable & { x: number; y: number }
 
-describe('the controlled example', () => {
-  run('a move asks, and the page puts the card on the ruling itself', async () => {
-    await example(controlled)
-    const plan = document.getElementById('plan') as Updatable
-    const doing = document.getElementById('doing') as Card
-    /* Shift and an arrow asks for sixteen units, half a square. The page
-       refuses it and rounds to the square, so the card lands one square on
-       rather than between two lines. */
-    doing.shadowRoot?.querySelector('[part="node"]')?.dispatchEvent(
+/** A card or a connection on a board, by the name the board knows it by. */
+const named = (board: Element, name: string): HTMLElement | null =>
+  board.querySelector(`[name="${name}"]`)
+
+/** A key pressed on a card, from the box a reader focuses. */
+const press = (board: Element, name: string, key: string, shiftKey = false): void => {
+  named(board, name)
+    ?.shadowRoot?.querySelector('[part="node"]')
+    ?.dispatchEvent(
       new KeyboardEvent('keydown', {
         bubbles: true,
         cancelable: true,
         composed: true,
-        key: 'ArrowRight',
-        shiftKey: true,
+        key,
+        shiftKey,
       }),
     )
+}
+
+describe('the controlled example', () => {
+  run('a move asks, and the page puts the card on the ruling itself', async () => {
+    await example(controlled)
+    const plan = document.getElementById('plan') as Updatable
+    /* Shift and an arrow asks for sixteen units, half a square. The page
+       refuses it and rounds to the square, so the card lands one square on
+       rather than between two lines. */
+    press(plan, 'doing', 'ArrowRight', true)
     await settle(plan)
+    const doing = named(plan, 'doing') as Card
     expect(doing.x).toBe(288)
     expect(doing.y).toBe(0)
   })
 })
 
 describe('the editing example', () => {
-  /** A key pressed on a card, from the box a reader focuses. */
-  const press = (id: string, key: string): void => {
-    document
-      .getElementById(id)
-      ?.shadowRoot?.querySelector('[part="node"]')
-      ?.dispatchEvent(
-        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
-      )
-  }
-
   run('C on one card and Enter on another, and the page adds the connection', async () => {
     await example(editing)
     const launch = document.getElementById('launch') as Updatable
-    press('demo', 'c')
+    press(launch, 'demo', 'c')
     await settle(launch)
-    press('ship', 'Enter')
+    press(launch, 'ship', 'Enter')
     await settle(launch)
-    const made = launch.querySelector('#made-1')
+    const made = named(launch, 'made-1')
     expect(made?.getAttribute('from')).toBe('demo')
     expect(made?.getAttribute('to')).toBe('ship')
   })
@@ -68,9 +69,26 @@ describe('the editing example', () => {
   run('Delete on a card, and the page takes it and the connection it stranded', async () => {
     await example(editing)
     const launch = document.getElementById('launch') as Updatable
-    press('post', 'Delete')
+    press(launch, 'post', 'Delete')
     await settle(launch)
-    expect(document.getElementById('post')).toBeNull()
-    expect(document.getElementById('post-ship')).toBeNull()
+    expect(named(launch, 'post')).toBeNull()
+    expect(named(launch, 'post-ship')).toBeNull()
+  })
+
+  run('Delete on a connection, and the page takes that connection alone', async () => {
+    await example(editing)
+    const launch = document.getElementById('launch') as Updatable
+    launch.shadowRoot?.querySelector('[data-edge="edge:post-ship"]')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Delete',
+      }),
+    )
+    await settle(launch)
+    expect(named(launch, 'post-ship')).toBeNull()
+    expect(named(launch, 'post')).not.toBeNull()
+    expect(named(launch, 'ship')).not.toBeNull()
   })
 })

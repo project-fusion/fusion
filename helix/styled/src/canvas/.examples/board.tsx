@@ -5,10 +5,10 @@ export function Example() {
       label="How a release happens"
     >
       <helix-canvas-node
+        group
         height={112}
-        id="flow"
         label="Before the tag"
-        type="group"
+        name="flow"
         width={528}
         x={-24}
         y={-24}
@@ -16,7 +16,7 @@ export function Example() {
 
       <helix-canvas-node
         height={64}
-        id="write"
+        name="write"
         width={160}
         x={0}
         y={0}
@@ -27,7 +27,7 @@ export function Example() {
       <helix-canvas-node
         color="3"
         height={64}
-        id="review"
+        name="review"
         width={160}
         x={320}
         y={0}
@@ -38,7 +38,7 @@ export function Example() {
       <helix-canvas-node
         color="4"
         height={64}
-        id="ship"
+        name="ship"
         width={160}
         x={160}
         y={200}

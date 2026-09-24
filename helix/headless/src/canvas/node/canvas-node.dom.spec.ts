@@ -10,7 +10,7 @@ type Node = HTMLElement & { current: boolean; updateComplete: Promise<boolean> }
 
 const node = async (extra = '', inner = 'A card'): Promise<Node> =>
   (await mount(
-    `<helix-headless-canvas-node id="one" x="10" y="20" width="150" height="90" ${extra}>${inner}</helix-headless-canvas-node>`,
+    `<helix-headless-canvas-node name="one" x="10" y="20" width="150" height="90" ${extra}>${inner}</helix-headless-canvas-node>`,
   )) as Node
 
 describe('canvas node', () => {
@@ -23,7 +23,7 @@ describe('canvas node', () => {
 
   test('a card is an article and a group is a group', async () => {
     expect((part(await node(), 'node') as HTMLElement).getAttribute('role')).toBe('article')
-    const group = await node('type="group" label="A group"')
+    const group = await node('group label="A group"')
     expect((part(group, 'node') as HTMLElement).getAttribute('role')).toBe('group')
     expect((part(group, 'node') as HTMLElement).getAttribute('aria-label')).toBe('A group')
   })
@@ -44,8 +44,10 @@ describe('canvas node', () => {
     expect(host.hasAttribute('current')).toBe(false)
   })
 
-  test('a link card offers the address it points at', async () => {
-    const host = await node('type="link" url="https://fusion.dev"')
-    expect(host.shadowRoot?.querySelector('a')?.getAttribute('href')).toBe('https://fusion.dev')
+  test('a link is the consumer\u2019s to put inside, and the card draws none of its own', async () => {
+    /* The card types are gone: what a card holds is theirs. */
+    const host = await node('', '<a href="https://fusion.dev">Fusion</a>')
+    expect(host.shadowRoot?.querySelector('a')).toBeNull()
+    expect(host.querySelector('a')?.getAttribute('href')).toBe('https://fusion.dev')
   })
 })

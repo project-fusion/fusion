@@ -372,3 +372,72 @@ export const reading = (
      edges at all and the islands on one with some. */
   return [...walked, ...spatial.filter((one) => !seen.has(one.id))]
 }
+
+/** A card as the elements take it: attributes, and the text to put inside. */
+export interface CanvasNodeProps {
+  name: string
+  x: number
+  y: number
+  width: number
+  height: number
+  color?: string | undefined
+  label?: string | undefined
+  group: boolean
+  /** What the card says, for a card of text. */
+  text?: string | undefined
+  /** The file it stands for, for a card that is one. */
+  file?: string | undefined
+  /** The address it points at, for a card that is a link. */
+  url?: string | undefined
+}
+
+/** A connection as the elements take it. */
+export interface CanvasEdgeProps {
+  name: string
+  from: string
+  to: string
+  fromSide?: CanvasSide | undefined
+  toSide?: CanvasSide | undefined
+  fromEnd?: CanvasEnd | undefined
+  toEnd?: CanvasEnd | undefined
+  color?: string | undefined
+  label?: string | undefined
+}
+
+/**
+ * A JSON Canvas document as the props of the elements that draw it.
+ *
+ * **Props rather than elements**, because what a card holds is the consumer's
+ * to render: a text card is text, a file card is whatever they show for that
+ * file, a link card is the link as they want it drawn. So this does the half
+ * that is mapping, ids to names and types to `group`, and hands back the
+ * content for the consumer to put inside, in whichever renderer they use.
+ */
+export const fromJsonCanvas = (
+  document: CanvasDocument,
+): { nodes: CanvasNodeProps[]; edges: CanvasEdgeProps[] } => ({
+  edges: (document.edges ?? []).map((edge) => ({
+    color: edge.color,
+    from: edge.fromNode,
+    fromEnd: edge.fromEnd,
+    fromSide: edge.fromSide,
+    label: edge.label,
+    name: edge.id,
+    to: edge.toNode,
+    toEnd: edge.toEnd,
+    toSide: edge.toSide,
+  })),
+  nodes: (document.nodes ?? []).map((node) => ({
+    color: node.color,
+    file: node.file,
+    group: node.type === 'group',
+    height: node.height,
+    label: node.label,
+    name: node.id,
+    text: node.text,
+    url: node.url,
+    width: node.width,
+    x: node.x,
+    y: node.y,
+  })),
+})

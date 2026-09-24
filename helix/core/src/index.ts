@@ -88,6 +88,7 @@ export {
 } from './controllers/virtualize-controller/virtualize-controller.js'
 export { eventsForTag, registerElementEvents } from './events/element-events.js'
 export {
+  type CanvasView,
   type CaretDetail,
   type ChangeDetail,
   type CompleteDetail,
@@ -112,6 +113,7 @@ export {
   HelixBeforeSplitEvent,
   HelixBeforeToggleEvent,
   HelixCanvasPanEvent,
+  HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
   HelixCaretEvent,
   HelixCompleteEvent,

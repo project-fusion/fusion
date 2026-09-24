@@ -66,8 +66,11 @@ export declare class ViewportElement {
   /** The key relay, bound by the family's own frame. */
   protected handleKeydown: (event: KeyboardEvent) => void
 
-  /** What the group of controls is called, for a family that is not a map. */
-  protected get controlsLabel(): string
+  /** What the group of controls is called, where the page says. */
+  controlsLabel: string | undefined
+
+  /** What the group of controls is called where the page does not say, which each family says for itself. */
+  protected get restingControlsLabel(): string
 
   /** The pan event, built and not dispatched, for a family that names its own. */
   protected panEvent(detail: ViewportPanDetail): Event
@@ -141,6 +144,17 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     controls?: string
 
     /**
+     * What the group of controls is called, for a reader who meets it.
+     *
+     * Absent is the family's own name for it, "Map controls" or "Board
+     * controls", which names what the controls drive rather than the
+     * mechanism. Written here to say it in another language, which every other
+     * string this surface speaks already allowed and this one did not.
+     */
+    @property({ attribute: 'controls-label' })
+    controlsLabel?: string
+
+    /**
      * Which corner the controls sit in.
      *
      * **Configurable because there is no safe default**, which is a collision
@@ -191,10 +205,6 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     @property({ attribute: 'zoom-in-label' })
     zoomInLabel = 'Zoom in'
 
-    /** What the control that zooms out is called. */
-    @property({ attribute: 'zoom-out-label' })
-    zoomOutLabel = 'Zoom out'
-
     /** Whether the reader has been still long enough to hide the chrome. */
     @state()
     protected resting = false
@@ -215,16 +225,18 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       },
     )
 
+    /** What the control that zooms out is called. */
+    @property({ attribute: 'zoom-out-label' })
+    zoomOutLabel = 'Zoom out'
+
     /**
-     * What the group of controls is called.
+     * What the group of controls is called where the page does not say.
      *
-     * A getter rather than a string in the template, so a family that is not a
-     * map does not announce one. Not a property: what this group is called is a
-     * fact about the family rather than a choice a consumer makes per instance,
-     * and the labels a consumer does set are the ones on the controls
-     * themselves.
+     * A getter a family overrides rather than a default on the property, the
+     * way `restingControls` is: a default would reflect nothing and still be
+     * one value for every family composing this.
      */
-    protected get controlsLabel(): string {
+    protected get restingControlsLabel(): string {
       return 'View controls'
     }
 
@@ -377,7 +389,7 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       if (!pan && !zoom && !fullscreen) {
         return nothing
       }
-      return html`<div part="controls" role="group" aria-label=${this.controlsLabel}>
+      return html`<div part="controls" role="group" aria-label=${this.controlsLabel ?? this.restingControlsLabel}>
         ${
           pan
             ? html`<button part="pan-up" aria-label=${this.named('up')} type="button" @click=${() => this.pan('up')}>

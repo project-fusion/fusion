@@ -7,7 +7,7 @@ export function Example() {
     >
       <helix-canvas-node
         height={64}
-        id="edge"
+        name="edge"
         width={160}
         x={0}
         y={0}
@@ -18,7 +18,7 @@ export function Example() {
       <helix-canvas-node
         color="5"
         height={64}
-        id="cache"
+        name="cache"
         width={160}
         x={320}
         y={0}
@@ -29,7 +29,7 @@ export function Example() {
       <helix-canvas-node
         color="6"
         height={64}
-        id="db"
+        name="db"
         width={160}
         x={320}
         y={160}

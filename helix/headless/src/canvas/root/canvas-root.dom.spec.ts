@@ -21,12 +21,12 @@ type Card = HTMLElement & { current: boolean; links: string; x: number; y: numbe
  * the last.
  */
 const BOARD = `
-  <helix-headless-canvas-node id="pair" type="group" label="The pair" x="-20" y="-20" width="500" height="200"></helix-headless-canvas-node>
-  <helix-headless-canvas-node id="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
-  <helix-headless-canvas-node id="b" color="3" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
-  <helix-headless-canvas-node id="c" x="130" y="300" width="200" height="100">Third</helix-headless-canvas-node>
-  <helix-headless-canvas-edge id="e1" from="a" to="b"></helix-headless-canvas-edge>
-  <helix-headless-canvas-edge id="e2" from="b" to="c" label="then"></helix-headless-canvas-edge>
+  <helix-headless-canvas-node name="pair" group label="The pair" x="-20" y="-20" width="500" height="200"></helix-headless-canvas-node>
+  <helix-headless-canvas-node name="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
+  <helix-headless-canvas-node name="b" color="3" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
+  <helix-headless-canvas-node name="c" x="130" y="300" width="200" height="100">Third</helix-headless-canvas-node>
+  <helix-headless-canvas-edge name="e1" from="a" to="b"></helix-headless-canvas-edge>
+  <helix-headless-canvas-edge name="e2" from="b" to="c" label="then"></helix-headless-canvas-edge>
 `
 
 const canvas = async (extra = '', cards = BOARD): Promise<Canvas> => {
@@ -42,7 +42,7 @@ const cards = (host: Canvas): HTMLElement[] =>
   [...host.querySelectorAll('helix-headless-canvas-node')] as HTMLElement[]
 
 /** One card, by id. */
-const card = (host: Canvas, id: string): Card => host.querySelector(`#${id}`) as Card
+const card = (host: Canvas, id: string): Card => host.querySelector(`[name="${id}"]`) as Card
 
 /** A key pressed on a card, from the box a reader focuses rather than the host. */
 const press = (on: Card, key: string, shiftKey = false): KeyboardEvent => {
@@ -78,7 +78,10 @@ const pressOn = (on: Element, key: string, shiftKey = false): KeyboardEvent => {
 const stopOf = (host: Canvas): { at: Element; name: string } | undefined => {
   const card = (cards(host) as Card[]).find((one) => one.current)
   if (card) {
-    return { at: card.shadowRoot?.querySelector('[part="node"]') as Element, name: card.id }
+    return {
+      at: card.shadowRoot?.querySelector('[part="node"]') as Element,
+      name: card.getAttribute('name') ?? '',
+    }
   }
   const line = host.shadowRoot?.querySelector('[part="edge-target"][tabindex="0"]')
   return line ? { at: line, name: line.getAttribute('data-edge') ?? '' } : undefined
@@ -113,7 +116,7 @@ describe('canvas', () => {
     /* Position is data here, which is the whole reason this family draws: there
        is no layout to compute, only arithmetic against the board's extent. */
     const host = await canvas()
-    const second = cards(host).find((one) => one.id === 'b') as HTMLElement
+    const second = cards(host).find((one) => one.getAttribute('name') === 'b') as HTMLElement
     const style = second.getAttribute('style') ?? ''
     /* The extent starts at the group, at -20, and the plane keeps a margin of
        32 around it so a group's name and a bowing connector are not clipped. So
@@ -125,8 +128,8 @@ describe('canvas', () => {
 
   test('a card belongs to the smallest group that contains it', async () => {
     const host = await canvas()
-    const first = cards(host).find((one) => one.id === 'a') as HTMLElement
-    const loose = cards(host).find((one) => one.id === 'c') as HTMLElement
+    const first = cards(host).find((one) => one.getAttribute('name') === 'a') as HTMLElement
+    const loose = cards(host).find((one) => one.getAttribute('name') === 'c') as HTMLElement
     expect(first.getAttribute('data-group')).toBe('pair')
     expect(loose.hasAttribute('data-group')).toBe(false)
   })
@@ -134,8 +137,9 @@ describe('canvas', () => {
   test('a group is a group to a screen reader, and a card is an article', async () => {
     const host = await canvas()
     const inside = (id: string, part: string): Element | null =>
-      (host.querySelector(`#${id}`)?.shadowRoot?.querySelector(`[part="${part}"]`) as Element) ??
-      null
+      (host
+        .querySelector(`[name="${id}"]`)
+        ?.shadowRoot?.querySelector(`[part="${part}"]`) as Element) ?? null
     expect(inside('pair', 'node')?.getAttribute('role')).toBe('group')
     expect(inside('pair', 'node')?.getAttribute('aria-label')).toBe('The pair')
     expect(inside('a', 'node')?.getAttribute('role')).toBe('article')
@@ -147,8 +151,8 @@ describe('canvas', () => {
 
     const orphaned = await canvas(
       '',
-      `<helix-headless-canvas-node id="a" x="0" y="0" width="10" height="10">First</helix-headless-canvas-node>
-       <helix-headless-canvas-edge id="e1" from="a" to="nowhere"></helix-headless-canvas-edge>`,
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="10" height="10">First</helix-headless-canvas-node>
+       <helix-headless-canvas-edge name="e1" from="a" to="nowhere"></helix-headless-canvas-edge>`,
     )
     expect(orphaned.shadowRoot?.querySelectorAll('[part="edge"]')).toHaveLength(0)
   })
@@ -168,7 +172,9 @@ describe('canvas', () => {
     const host = await canvas()
     const line = connection(host, 'edge:e2')
     expect(line.getAttribute('role')).toBe('button')
-    expect(line.getAttribute('aria-label')).toBe('From Second to Third: then')
+    expect(line.getAttribute('aria-label')).toBe('From Second to Third')
+    // What the line says is its description, heard after its ends.
+    expect(line.getAttribute('aria-description')).toBe('then')
     for (const painted of host.shadowRoot?.querySelectorAll('[part="edge"], [part="label"]') ??
       []) {
       expect(painted.getAttribute('aria-hidden')).toBe('true')
@@ -194,7 +200,7 @@ describe('canvas', () => {
     const stops = cards(host).filter(
       (one) => one.shadowRoot?.querySelector('[part="node"]')?.getAttribute('tabindex') === '0',
     )
-    expect(stops.map((one) => one.id)).toEqual(['pair'])
+    expect(stops.map((one) => one.getAttribute('name'))).toEqual(['pair'])
   })
 
   test('spatial order walks the groups first, then across each row', async () => {
@@ -214,8 +220,8 @@ describe('canvas', () => {
        them would be a way around that leads nowhere. */
     const host = await canvas(
       'order="edges"',
-      `<helix-headless-canvas-node id="a" x="0" y="0" width="10" height="10">First</helix-headless-canvas-node>
-       <helix-headless-canvas-node id="b" x="40" y="0" width="10" height="10">Second</helix-headless-canvas-node>`,
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="10" height="10">First</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="40" y="0" width="10" height="10">Second</helix-headless-canvas-node>`,
     )
     expect(await walk(host)).toEqual(['a', 'b'])
   })
@@ -238,7 +244,7 @@ describe('canvas', () => {
     const d = (key: string) => connection(host, key).getAttribute('d') ?? ''
     expect(d('edge:e1')).toContain(' C ')
 
-    host.querySelector('#e1')?.setAttribute('path', 'straight')
+    host.querySelector('[name="e1"]')?.setAttribute('path', 'straight')
     await host.updateComplete
     await host.updateComplete
     expect(d('edge:e1')).toMatch(/^M [-\d.]+ [-\d.]+ L [-\d.]+ [-\d.]+$/)
@@ -308,9 +314,9 @@ describe('canvas', () => {
        than parsing it into anything. */
     const host = await canvas(
       '',
-      `<helix-headless-canvas-node id="x" x="0" y="0" width="80" height="40">&lt;img src=x&gt;</helix-headless-canvas-node>
-       <helix-headless-canvas-node id="y" x="120" y="0" width="80" height="40">After</helix-headless-canvas-node>
-       <helix-headless-canvas-edge id="e" from="x" to="y"></helix-headless-canvas-edge>`,
+      `<helix-headless-canvas-node name="x" x="0" y="0" width="80" height="40">&lt;img src=x&gt;</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="y" x="120" y="0" width="80" height="40">After</helix-headless-canvas-node>
+       <helix-headless-canvas-edge name="e" from="x" to="y"></helix-headless-canvas-edge>`,
     )
     expect(card(host, 'y').links).toBe('from <img src=x>')
     expect(host.querySelector('img')).toBeNull()
@@ -353,7 +359,7 @@ describe('canvas moves', () => {
     await drag(host, 'c', { x: 40, y: 20 })
     // Unzoomed in happy-dom, which measures nothing, so a pixel is a unit.
     expect([card(host, 'c').x, card(host, 'c').y]).toEqual([170, 320])
-    expect(said).toEqual(['before', 'move [{"id":"c","x":170,"y":320}]'])
+    expect(said).toEqual(['before', 'move [{"name":"c","x":170,"y":320}]'])
   })
 
   test('a move refused is not made, which is how a consumer holds the positions', async () => {
@@ -413,7 +419,7 @@ describe('canvas moves', () => {
     /* A card may hold a chart or a field that answers the arrows itself. */
     const host = await canvas(
       '',
-      '<helix-headless-canvas-node id="a" x="0" y="0" width="80" height="40"><input></helix-headless-canvas-node>',
+      '<helix-headless-canvas-node name="a" x="0" y="0" width="80" height="40"><input></helix-headless-canvas-node>',
     )
     const event = new KeyboardEvent('keydown', {
       bubbles: true,
@@ -497,8 +503,8 @@ describe('canvas connections and removal', () => {
     expect(asked).toEqual([
       {
         edges: [
-          { from: 'a', id: 'e1', to: 'b' },
-          { from: 'b', id: 'e2', to: 'c' },
+          { from: 'a', name: 'e1', to: 'b' },
+          { from: 'b', name: 'e2', to: 'c' },
         ],
         nodes: ['b'],
       },
@@ -510,15 +516,15 @@ describe('canvas connections and removal', () => {
     const asked: unknown[] = []
     host.addEventListener('helix-remove', (event) => asked.push((event as CustomEvent).detail))
     pressOn(connection(host, 'edge:e2'), 'Delete')
-    expect(asked).toEqual([{ edges: [{ from: 'b', id: 'e2', to: 'c' }], nodes: [] }])
+    expect(asked).toEqual([{ edges: [{ from: 'b', name: 'e2', to: 'c' }], nodes: [] }])
   })
 
   test('once the page removes what was asked, the stop moves on to what was next', async () => {
     const host = await canvas()
     host.addEventListener('helix-remove', (event) => {
       const { edges, nodes } = (event as CustomEvent).detail
-      for (const id of [...nodes, ...edges.map((one: { id: string }) => one.id)]) {
-        host.querySelector(`#${id}`)?.remove()
+      for (const id of [...nodes, ...edges.map((one: { name: string }) => one.name)]) {
+        host.querySelector(`[name="${id}"]`)?.remove()
       }
     })
     press(card(host, 'b'), 'Delete')
@@ -542,6 +548,145 @@ describe('canvas connections and removal', () => {
     await host.updateComplete
     expect(asked).toBe(0)
     expect(card(host, 'a').shadowRoot?.querySelector('[part~="handle"]')).toBeNull()
+  })
+})
+
+/**
+ * The API a page works the board through: holding single cards and connections,
+ * the words it speaks, where it is looking, and the document it round-trips.
+ */
+describe('canvas api', () => {
+  const pointer = (type: string, x: number, y: number) =>
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: x,
+      clientY: y,
+      composed: true,
+      pointerId: 4,
+    })
+
+  test('a read-only card is not moved, connected, or removed, and the rest still are', async () => {
+    const host = await canvas()
+    card(host, 'a').setAttribute('readonly', '')
+    await host.updateComplete
+    await host.updateComplete
+    const asked: string[] = []
+    for (const name of ['helix-before-move', 'helix-connect', 'helix-remove']) {
+      host.addEventListener(name, () => asked.push(name))
+    }
+    press(card(host, 'a'), 'ArrowRight', true)
+    press(card(host, 'a'), 'c')
+    press(card(host, 'a'), 'Delete')
+    expect(asked).toEqual([])
+    expect(card(host, 'a').shadowRoot?.querySelector('[part~="handle"]')).toBeNull()
+
+    // Nor is it somewhere a connection from another card can arrive.
+    press(card(host, 'b'), 'c')
+    press(card(host, 'a'), 'Enter')
+    expect(asked).toEqual([])
+
+    press(card(host, 'c'), 'ArrowRight', true)
+    expect(asked).toEqual(['helix-before-move'])
+  })
+
+  test('a group leaves a read-only card inside it where it is', async () => {
+    const host = await canvas()
+    card(host, 'a').setAttribute('readonly', '')
+    await host.updateComplete
+    press(card(host, 'pair'), 'ArrowRight', true)
+    await host.updateComplete
+    expect(card(host, 'a').x).toBe(0)
+    expect(card(host, 'b').x).toBe(276)
+  })
+
+  test('a read-only connection is not removed on its own, and is with its card', async () => {
+    const host = await canvas()
+    host.querySelector('[name="e2"]')?.setAttribute('readonly', '')
+    await host.updateComplete
+    const asked: unknown[] = []
+    host.addEventListener('helix-remove', (event) => asked.push((event as CustomEvent).detail))
+    pressOn(connection(host, 'edge:e2'), 'Delete')
+    expect(asked).toEqual([])
+    press(card(host, 'c'), 'Delete')
+    expect(asked).toEqual([{ edges: [{ from: 'b', name: 'e2', to: 'c' }], nodes: ['c'] }])
+  })
+
+  test('every sentence the board speaks can be said in another language', async () => {
+    const host = await canvas(
+      'lang="fr" connection-label="De {from} à {to}" leads-to-label="mène à {cards}" connecting-label="Connexion depuis {from}"',
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="80" height="40">Un</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="120" y="0" width="80" height="40">Deux</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="c" x="240" y="0" width="80" height="40">Trois</helix-headless-canvas-node>
+       <helix-headless-canvas-edge from="a" to="b"></helix-headless-canvas-edge>
+       <helix-headless-canvas-edge from="a" to="c"></helix-headless-canvas-edge>`,
+    )
+    expect(connection(host, 'edge:a->b').getAttribute('aria-label')).toBe('De Un à Deux')
+    // Joined the way the page's language joins a list.
+    expect(card(host, 'a').links).toBe('mène à Deux et Trois')
+    press(card(host, 'a'), 'c')
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('Connexion depuis Un')
+  })
+
+  test('the controls are named by the family, or by the page', async () => {
+    const host = await canvas()
+    expect(part(host, 'controls')?.getAttribute('aria-label')).toBe('Board controls')
+    host.setAttribute('controls-label', 'Commandes')
+    await host.updateComplete
+    expect(part(host, 'controls')?.getAttribute('aria-label')).toBe('Commandes')
+  })
+
+  test('the view is read, written, and reported when it changes', async () => {
+    const host = (await canvas()) as Canvas & { view: { x: number; y: number; zoom: number } }
+    const told: unknown[] = []
+    host.addEventListener('helix-canvas-view', (event) => told.push((event as CustomEvent).detail))
+    host.view = { x: 100, y: 50, zoom: 2 }
+    await host.updateComplete
+    expect(host.view).toEqual({ x: 100, y: 50, zoom: 2 })
+    expect(told).toEqual([{ x: 100, y: 50, zoom: 2 }])
+    // A render that leaves the view where it was says nothing.
+    host.requestUpdate()
+    await host.updateComplete
+    expect(told).toHaveLength(1)
+  })
+
+  test('a board goes out as JSON Canvas, and comes back as props', async () => {
+    const { fromJsonCanvas } = await import('../index.js')
+    const host = (await canvas()) as Canvas & {
+      toJsonCanvas(): { nodes: unknown[]; edges: unknown[] }
+    }
+    const saved = host.toJsonCanvas() as {
+      nodes: Array<{ id: string; type: string; text?: string }>
+      edges: Array<{ id: string; fromNode: string; toNode: string }>
+    }
+    expect(saved.nodes.find((one) => one.id === 'pair')?.type).toBe('group')
+    expect(saved.nodes.find((one) => one.id === 'a')).toMatchObject({ text: 'First', type: 'text' })
+    expect(saved.edges[0]).toMatchObject({ fromNode: 'a', id: 'e1', toNode: 'b' })
+
+    const props = fromJsonCanvas(saved as never)
+    expect(props.nodes.find((one) => one.name === 'pair')?.group).toBe(true)
+    expect(props.edges[0]).toMatchObject({ from: 'a', name: 'e1', to: 'b' })
+  })
+
+  test('while a connection is drawn, where it can land and where it will are shown', async () => {
+    const host = await canvas()
+    const handle = card(host, 'a').shadowRoot?.querySelector('[part~="handle-right"]') as Element
+    handle.dispatchEvent(pointer('pointerdown', 0, 0))
+    // Over Third, as in the drawing spec: the document's point plus 52.
+    host.dispatchEvent(pointer('pointermove', 280, 402))
+    await host.updateComplete
+    await host.updateComplete
+    expect(hasState(card(host, 'c'), 'target')).toBe(true)
+    expect(hasState(card(host, 'b'), 'candidate')).toBe(true)
+    // Not the card it started from.
+    expect(hasState(card(host, 'a'), 'candidate')).toBe(false)
+    // The preview is the connection it would make, arrowhead and all.
+    expect(part(host, 'draft')?.getAttribute('marker-end')).toBe('url(#canvas-arrow)')
+    host.dispatchEvent(pointer('pointerup', 280, 402))
+    await host.updateComplete
+    await host.updateComplete
+    expect(hasState(card(host, 'c'), 'target')).toBe(false)
   })
 })
 
@@ -680,10 +825,10 @@ describe('canvas document detail', () => {
        two arrive by different routes. */
     const host = await canvas(
       '',
-      `<helix-headless-canvas-node id="preset" color="3" x="0" y="0" width="80" height="40">Preset</helix-headless-canvas-node>
-       <helix-headless-canvas-node id="own" color="#ff8800" x="120" y="0" width="80" height="40">Own</helix-headless-canvas-node>`,
+      `<helix-headless-canvas-node name="preset" color="3" x="0" y="0" width="80" height="40">Preset</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="own" color="#ff8800" x="120" y="0" width="80" height="40">Own</helix-headless-canvas-node>`,
     )
-    const card = (id: string) => host.querySelector(`#${id}`) as HTMLElement
+    const card = (id: string) => host.querySelector(`[name="${id}"]`) as HTMLElement
     expect(card('preset').getAttribute('color')).toBe('3')
     expect(card('own').getAttribute('style')).toContain('--_canvas-card-color: #ff8800')
   })
@@ -698,11 +843,11 @@ describe('canvas document detail', () => {
   test('and a document that asks for both ends, or neither, gets what it asked', async () => {
     const host = await canvas(
       '',
-      `<helix-headless-canvas-node id="a" x="0" y="0" width="80" height="40">A</helix-headless-canvas-node>
-       <helix-headless-canvas-node id="b" x="120" y="0" width="80" height="40">B</helix-headless-canvas-node>
-       <helix-headless-canvas-node id="c" x="240" y="0" width="80" height="40">C</helix-headless-canvas-node>
-       <helix-headless-canvas-edge id="both" from="a" to="b" from-end="arrow"></helix-headless-canvas-edge>
-       <helix-headless-canvas-edge id="bare" from="b" to="c" to-end="none"></helix-headless-canvas-edge>`,
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="80" height="40">A</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="120" y="0" width="80" height="40">B</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="c" x="240" y="0" width="80" height="40">C</helix-headless-canvas-node>
+       <helix-headless-canvas-edge name="both" from="a" to="b" from-end="arrow"></helix-headless-canvas-edge>
+       <helix-headless-canvas-edge name="bare" from="b" to="c" to-end="none"></helix-headless-canvas-edge>`,
     )
     const edges = [
       ...(host.shadowRoot?.querySelectorAll('[part="edge"]') ?? []),

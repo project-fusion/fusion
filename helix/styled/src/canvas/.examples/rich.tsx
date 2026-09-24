@@ -8,8 +8,8 @@ export function Example() {
     >
       <helix-canvas-node
         height={150}
-        id="shot"
         label="The new media treatment"
+        name="shot"
         width={220}
         x={0}
         y={0}
@@ -24,8 +24,8 @@ export function Example() {
 
       <helix-canvas-node
         height={150}
-        id="numbers"
         label="Weekly readers"
+        name="numbers"
         width={220}
         x={320}
         y={0}
