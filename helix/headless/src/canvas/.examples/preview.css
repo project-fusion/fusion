@@ -1,0 +1,181 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_radius-control: 0.25rem;
+  --_radius-surface: 0.5rem;
+  --_radius-panel: 0.75rem;
+}
+
+/* The frame. The board writes where it sits onto the viewport as three custom
+   properties, and each card's place onto the card, so positioning is a read. */
+helix-headless-canvas::part(region) {
+  background-color: var(--_gray-subtle);
+  block-size: 20rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-surface);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  position: relative;
+}
+
+helix-headless-canvas::part(viewport) {
+  cursor: grab;
+  min-block-size: 0;
+  overflow: hidden;
+  position: relative;
+  touch-action: none;
+  user-select: none;
+}
+
+helix-headless-canvas::part(board) {
+  block-size: var(--_canvas-plane-block-size);
+  inline-size: var(--_canvas-plane-inline-size);
+  inset: 0;
+  position: absolute;
+  transform: translate(var(--_canvas-x), var(--_canvas-y)) scale(var(--_canvas-zoom));
+  transform-origin: 0 0;
+}
+
+helix-headless-canvas::part(edges) {
+  inset: 0;
+  overflow: visible;
+  position: absolute;
+}
+
+helix-headless-canvas::part(edge) {
+  pointer-events: none;
+  stroke: var(--_gray-line);
+  stroke-width: 2px;
+}
+
+helix-headless-canvas::part(edge-target) {
+  cursor: pointer;
+  pointer-events: stroke;
+  stroke: transparent;
+  stroke-width: 12px;
+}
+
+helix-headless-canvas::part(arrow) {
+  fill: var(--_gray-line);
+}
+
+helix-headless-canvas::part(label) {
+  fill: var(--_gray-muted);
+  font-size: 0.75rem;
+  paint-order: stroke;
+  stroke: var(--_gray-subtle);
+  stroke-width: 4px;
+}
+
+helix-headless-canvas::part(draft) {
+  stroke: var(--_gray-mark);
+  stroke-dasharray: 6 4;
+  stroke-width: 2px;
+}
+
+helix-headless-canvas::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-canvas::part(controls) {
+  display: grid;
+  gap: 0.25rem;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  position: absolute;
+}
+
+helix-headless-canvas::part(zoom-in),
+helix-headless-canvas::part(zoom-out),
+helix-headless-canvas::part(fullscreen) {
+  background-color: var(--_gray-surface);
+  block-size: 2rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  color: var(--_gray-strong);
+  cursor: pointer;
+  inline-size: 2rem;
+}
+
+/* A card is placed from the coordinates the board wrote onto it. */
+helix-headless-canvas-node {
+  background-color: var(--_gray-surface);
+  block-size: var(--_canvas-card-block-size);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  font-size: 0.875rem;
+  inline-size: var(--_canvas-card-inline-size);
+  left: var(--_canvas-card-x);
+  position: absolute;
+  top: var(--_canvas-card-y);
+}
+
+helix-headless-canvas-node::part(node) {
+  block-size: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0.75rem;
+}
+
+helix-headless-canvas-node::part(node):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+helix-headless-canvas-node::part(handle) {
+  background-color: var(--_gray-surface);
+  block-size: 0.625rem;
+  border: 2px solid var(--_gray-mark);
+  border-radius: 50%;
+  box-sizing: border-box;
+  cursor: crosshair;
+  inline-size: 0.625rem;
+  opacity: 0;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+helix-headless-canvas-node:hover::part(handle),
+helix-headless-canvas-node:focus-within::part(handle) {
+  opacity: 1;
+}
+
+helix-headless-canvas-node::part(handle-top) {
+  left: 50%;
+  top: 0;
+}
+
+helix-headless-canvas-node::part(handle-right) {
+  left: 100%;
+  top: 50%;
+}
+
+helix-headless-canvas-node::part(handle-bottom) {
+  left: 50%;
+  top: 100%;
+}
+
+helix-headless-canvas-node::part(handle-left) {
+  left: 0;
+  top: 50%;
+}

@@ -1,0 +1,122 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_radius-control: 0.25rem;
+  --_radius-surface: 0.5rem;
+  --_radius-panel: 0.75rem;
+}
+
+/* The frame. The board writes where it sits onto the viewport as three custom
+
+helix-headless-button::part(button) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  border-radius: var(--_radius-control);
+  color: var(--_gray-strong);
+  cursor: pointer;
+  font: inherit;
+  padding: 0.375rem 0.75rem;
+}
+
+/* A takeover rather than a panel: the picture wants every pixel, and the
+   chrome is drawn over the dark rather than beside it. */
+helix-headless-lightbox::part(dialog) {
+  background-color: transparent;
+  block-size: 100dvh;
+  border: none;
+  box-sizing: border-box;
+  color: #e9e9ec;
+  color-scheme: dark;
+  gap: 0.5rem;
+  grid-template-rows: auto 1fr auto;
+  inline-size: 100vw;
+  max-block-size: 100dvh;
+  max-inline-size: 100vw;
+  padding: 1rem;
+}
+
+helix-headless-lightbox::part(dialog):modal {
+  display: grid;
+}
+
+helix-headless-lightbox::part(dialog)::backdrop {
+  background-color: #111113;
+}
+
+helix-headless-lightbox::part(viewport) {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+helix-headless-lightbox::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-icon-button::part(button) {
+  align-items: center;
+  background-color: transparent;
+  block-size: 2rem;
+  border: 1px solid #45454b;
+  border-radius: var(--_radius-control);
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 2rem;
+  justify-content: center;
+}
+
+helix-headless-icon {
+  block-size: 1em;
+  display: inline-flex;
+  inline-size: 1em;
+}
+
+helix-headless-lightbox [slot="header"] {
+  display: flex;
+  justify-content: flex-end;
+}
+
+helix-headless-lightbox-item::part(item) {
+  align-items: center;
+  block-size: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  inline-size: 100%;
+  justify-content: center;
+  min-block-size: 0;
+}
+
+/* The flex above outranks the UA's [hidden], so the items not shown say so. */
+helix-headless-lightbox-item::part(item)[hidden] {
+  display: none;
+}
+
+helix-headless-lightbox-item img {
+  max-block-size: 100%;
+  max-inline-size: 100%;
+  min-block-size: 0;
+  object-fit: contain;
+}
+
+helix-headless-lightbox-item [slot="description"] {
+  color: #a1a1aa;
+  font-size: 0.875rem;
+  text-align: center;
+}

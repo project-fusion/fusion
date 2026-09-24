@@ -29,7 +29,9 @@
   inline-size: var(--_canvas-card-inline-size);
   inset-block-start: var(--_canvas-card-y);
   inset-inline-start: var(--_canvas-card-x);
-  overflow: hidden;
+  /* Visible, so the handles can sit across the edge; the box inside clips
+     what the card holds instead. */
+  overflow: visible;
   position: absolute;
   z-index: 1;
 }
@@ -70,11 +72,13 @@
    axis puts one line in the middle and lets three fill it. */
 [part="node"] {
   block-size: 100%;
+  border-radius: inherit;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
   justify-content: center;
+  overflow: hidden;
   padding: var(--canvas-node-padding, var(--helix-space-sm));
 }
 
@@ -103,7 +107,63 @@
 
 :host([type="group"]) [part="node"] {
   display: block;
+  overflow: visible;
   position: relative;
+}
+
+/* **A point on each side, shown where the hand or the focus is.** Drawn across
+   the edge so half of it is outside the card, which is what says a line leaves
+   from here, and hidden otherwise, or every card on a board wears four dots. */
+[part~="handle"] {
+  background-color: var(--helix-color-surface);
+  block-size: var(--canvas-handle-size, 0.625rem);
+  border: var(--helix-border-thick) solid var(--helix-color-accent);
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  cursor: crosshair;
+  inline-size: var(--canvas-handle-size, 0.625rem);
+  opacity: 0;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* A larger reach than the dot, since the dot shrinks with the board's zoom
+   and a target a few pixels across is one a hand misses. */
+[part~="handle"]::after {
+  content: "";
+  inset: calc(var(--helix-space-sm) * -1);
+  position: absolute;
+}
+
+:host(:hover) [part~="handle"],
+:host(:focus-within) [part~="handle"] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part~="handle"] {
+    transition: none;
+  }
+}
+
+/* Physical rather than logical, because the sides are: the format's `right`
+   is the right side on every page, and an edge drawn from it leaves there. */
+[part~="handle-top"] {
+  left: 50%;
+  top: 0;
+}
+[part~="handle-right"] {
+  left: 100%;
+  top: 50%;
+}
+[part~="handle-bottom"] {
+  left: 50%;
+  top: 100%;
+}
+[part~="handle-left"] {
+  left: 0;
+  top: 50%;
 }
 
 ::slotted([slot="description"]) {

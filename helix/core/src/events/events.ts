@@ -259,6 +259,69 @@ export class HelixMoveEvent extends CustomEvent<MoveDetail> {
   }
 }
 
+/** Which two cards a reader asked to join, and the side they started from. */
+export interface ConnectDetail {
+  from: string
+  to: string
+  /** The side the reader drew from, where they drew from one. */
+  fromSide?: 'top' | 'right' | 'bottom' | 'left' | undefined
+}
+
+/**
+ * A reader asked for two cards to be joined.
+ *
+ * **A request with no default, which is the difference from a move.** A board
+ * writes a card's position onto the card, because the card is already there.
+ * A connection is a new element, and a board that added one to markup React
+ * renders would have it put back or thrown away on the next render. So the board
+ * asks and the page adds the `helix-canvas-edge`, the way `Map` asks to be panned.
+ */
+export class HelixConnectEvent extends CustomEvent<ConnectDetail> {
+  static readonly eventName = 'helix-connect'
+
+  constructor(detail: ConnectDetail) {
+    super(HelixConnectEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** What a reader asked to take off the board. */
+export interface RemoveDetail {
+  /** The cards, by id. */
+  nodes: string[]
+  /**
+   * The connections, including every one attached to a card being removed,
+   * since a line to nothing is not drawn but its element would stay behind.
+   * Each carries its ends as well as its id, so a page that gave its edges no
+   * ids can still find them.
+   */
+  edges: Array<{ id: string; from: string; to: string }>
+}
+
+/**
+ * A reader asked for cards or connections to be taken away.
+ *
+ * A request for the reason `helix-connect` is one: the elements are the page's,
+ * so the page removes them. Nothing to refuse, because nothing happens unless
+ * the page acts.
+ */
+export class HelixRemoveEvent extends CustomEvent<RemoveDetail> {
+  static readonly eventName = 'helix-remove'
+
+  constructor(detail: RemoveDetail) {
+    super(HelixRemoveEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** What `ViewportPanDetail` was called when only Map had one. */
 export type MapPanDetail = ViewportPanDetail
 
@@ -1301,6 +1364,7 @@ const registry = {
   HelixCanvasZoomEvent,
   HelixCaretEvent,
   HelixCompleteEvent,
+  HelixConnectEvent,
   HelixConsoleEvent,
   HelixCopyEvent,
   HelixCreateEvent,
@@ -1315,6 +1379,7 @@ const registry = {
   HelixNextEvent,
   HelixPreviousEvent,
   HelixReadEvent,
+  HelixRemoveEvent,
   HelixReorderEvent,
   HelixResizeEvent,
   HelixSampleEndEvent,

@@ -1,0 +1,11 @@
+/* The trigger is all this example draws on the page: the viewer itself is over
+   it, and only once a reader asks. */
+helix-button {
+  margin-block: var(--helix-space-sm);
+}
+
+/* The chrome sits at the top right, where a reader's hand already is on a
+   phone and where every viewer they have used before puts the way out. */
+helix-button-group[slot="header"] {
+  justify-content: flex-end;
+}

@@ -1,0 +1,62 @@
+export function Example() {
+  return (
+    <helix-canvas
+      grid="dots"
+      label="How a release happens"
+    >
+      <helix-canvas-node
+        height={112}
+        id="flow"
+        label="Before the tag"
+        type="group"
+        width={528}
+        x={-24}
+        y={-24}
+      ></helix-canvas-node>
+
+      <helix-canvas-node
+        height={64}
+        id="write"
+        width={160}
+        x={0}
+        y={0}
+      >
+        Write the change
+      </helix-canvas-node>
+
+      <helix-canvas-node
+        color="3"
+        height={64}
+        id="review"
+        width={160}
+        x={320}
+        y={0}
+      >
+        Review it
+      </helix-canvas-node>
+
+      <helix-canvas-node
+        color="4"
+        height={64}
+        id="ship"
+        width={160}
+        x={160}
+        y={200}
+      >
+        Tag and publish
+      </helix-canvas-node>
+
+      <helix-canvas-edge
+        from="write"
+        label="when it builds"
+        to="review"
+      ></helix-canvas-edge>
+
+      <helix-canvas-edge
+        from="review"
+        label="when it is approved"
+        to="ship"
+      ></helix-canvas-edge>
+    </helix-canvas>
+  )
+}

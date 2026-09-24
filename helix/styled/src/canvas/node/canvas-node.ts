@@ -21,6 +21,7 @@ import { styles } from './canvas-node.css.js'
  * @aliases CanvasCard, BoardNode
  * @documentation https://fusion.dev/helix/components/canvas
  *
+ * @cssproperty --canvas-handle-size - How large the points a connection is drawn from are.
  * @cssproperty --canvas-node-background-color - The ground the card is drawn on.
  * @cssproperty --canvas-node-padding - Space between the card's edge and what it holds.
  */

@@ -53,6 +53,8 @@ export interface CanvasEdge {
   toEnd?: CanvasEnd | undefined
   color?: string | undefined
   label?: string | undefined
+  /** How it travels, where it says; the board's own default where it does not. */
+  path?: CanvasPath | undefined
 }
 
 /** A whole board. */
@@ -111,7 +113,7 @@ export const extent = (nodes: CanvasNode[]): Box => {
 }
 
 /** The point an edge leaves from or arrives at, on a named side. */
-const port = (node: CanvasNode, side: CanvasSide): { x: number; y: number } => {
+export const port = (node: CanvasNode, side: CanvasSide): { x: number; y: number } => {
   const midX = node.x + node.width / 2
   const midY = node.y + node.height / 2
   if (side === 'top') {
@@ -142,31 +144,167 @@ const nearestSides = (from: CanvasNode, to: CanvasNode): [CanvasSide, CanvasSide
   return acrossY >= 0 ? ['bottom', 'top'] : ['top', 'bottom']
 }
 
+/** How a connector travels between the two cards it joins. */
+export type CanvasPath = 'curve' | 'straight' | 'step'
+
+/** The unit step out of a side, which is where a connector leaves it. */
+const normal = (side: CanvasSide): { x: number; y: number } => ({
+  x: side === 'left' ? -1 : side === 'right' ? 1 : 0,
+  y: side === 'top' ? -1 : side === 'bottom' ? 1 : 0,
+})
+
+/**
+ * How far a stepped connector runs straight out of a side before it turns.
+ *
+ * Enough that the first corner is clear of the card and the arrowhead at the
+ * far end sits on a straight run rather than on a bend.
+ */
+const STUB = 20
+
+/** How round a stepped connector's corners are. */
+const RADIUS = 8
+
+/** A point in the document's own units. */
+type Point = { x: number; y: number }
+
+/** Each segment of a run of points, as its two ends. */
+const segments = (points: Point[]): Array<[Point, Point]> =>
+  points.slice(1).map((point, index) => [points[index] ?? point, point])
+
+/** The point partway along a run of straight segments, by length. */
+const along = (points: Point[], share: number): Point => {
+  const runs = segments(points).map(([from, to]) => ({
+    from,
+    length: Math.hypot(to.x - from.x, to.y - from.y),
+    to,
+  }))
+  let left = runs.reduce((sum, one) => sum + one.length, 0) * share
+  for (const { from, length, to } of runs) {
+    if (left <= length && length > 0) {
+      return {
+        x: from.x + ((to.x - from.x) * left) / length,
+        y: from.y + ((to.y - from.y) * left) / length,
+      }
+    }
+    left -= length
+  }
+  return points[points.length - 1] ?? { x: 0, y: 0 }
+}
+
+/**
+ * A run of right angles, each corner rounded.
+ *
+ * **Rounded because a square corner reads as a circuit diagram**, which a
+ * board is not, and the radius shrinks to fit a short segment so a corner never
+ * overshoots the run it is turning out of.
+ */
+const rounded = (points: Point[]): string => {
+  const first = points[0] ?? { x: 0, y: 0 }
+  const last = points[points.length - 1] ?? first
+  const corners = points
+    .slice(1, -1)
+    .map((corner, index) => {
+      const before = points[index] ?? corner
+      const after = points[index + 2] ?? corner
+      const inLength = Math.hypot(corner.x - before.x, corner.y - before.y)
+      const outLength = Math.hypot(after.x - corner.x, after.y - corner.y)
+      const radius = Math.min(RADIUS, inLength / 2, outLength / 2)
+      const enter = {
+        x: corner.x - ((corner.x - before.x) / (inLength || 1)) * radius,
+        y: corner.y - ((corner.y - before.y) / (inLength || 1)) * radius,
+      }
+      const leave = {
+        x: corner.x + ((after.x - corner.x) / (outLength || 1)) * radius,
+        y: corner.y + ((after.y - corner.y) / (outLength || 1)) * radius,
+      }
+      return ` L ${enter.x} ${enter.y} Q ${corner.x} ${corner.y} ${leave.x} ${leave.y}`
+    })
+    .join('')
+  return `M ${first.x} ${first.y}${corners} L ${last.x} ${last.y}`
+}
+
+/**
+ * The corners of a stepped connector, from one side to the other.
+ *
+ * Out of each side by a stub, then joined with right angles: a turn halfway
+ * between the two where both run the same way, one corner where they cross.
+ * **No path-finding**, which is a decision: a step that turns halfway can cross
+ * a card between the two it joins, and routing around every card is a layout
+ * engine rather than a line.
+ */
+const steps = (start: Point, fromSide: CanvasSide, end: Point, toSide: CanvasSide): Point[] => {
+  const out = normal(fromSide)
+  const into = normal(toSide)
+  const a = { x: start.x + out.x * STUB, y: start.y + out.y * STUB }
+  const b = { x: end.x + into.x * STUB, y: end.y + into.y * STUB }
+  const across = (side: CanvasSide) => side === 'left' || side === 'right'
+  let middle: Point[]
+  if (across(fromSide) && across(toSide)) {
+    const x = (a.x + b.x) / 2
+    middle = [
+      { x, y: a.y },
+      { x, y: b.y },
+    ]
+  } else if (!across(fromSide) && !across(toSide)) {
+    const y = (a.y + b.y) / 2
+    middle = [
+      { x: a.x, y },
+      { x: b.x, y },
+    ]
+  } else if (across(fromSide)) {
+    middle = [{ x: b.x, y: a.y }]
+  } else {
+    middle = [{ x: a.x, y: b.y }]
+  }
+  /* Consecutive points that coincide, or that sit on one line, are not
+     corners: rounding one draws a kink in a straight run. */
+  const all = [start, a, ...middle, b, end]
+  return all.filter((point, at) => {
+    if (at === 0 || at === all.length - 1) {
+      return true
+    }
+    const before = all[at - 1] ?? point
+    const after = all[at + 1] ?? point
+    const same = point.x === before.x && point.y === before.y
+    const straight =
+      (before.x === point.x && point.x === after.x) || (before.y === point.y && point.y === after.y)
+    return !same && !straight
+  })
+}
+
 /**
  * The path one connector is drawn along, in board coordinates.
  *
- * A cubic curve rather than a straight line or an elbow: the control points sit
- * out along the normal of each side, so a connector leaves a card square to the
- * edge it named and arrives the same way, which is what makes the two ends read
- * as attached rather than aimed.
+ * **A curve by default**: the control points sit out along the normal of each
+ * side, so a connector leaves a card square to the edge it named and arrives
+ * the same way, which is what makes the two ends read as attached rather than
+ * aimed. `straight` is the shortest line between the two sides, and `step`
+ * turns in right angles, which is what a flowchart reads as.
  */
 export const connector = (
   edge: CanvasEdge,
   from: CanvasNode,
   to: CanvasNode,
+  path: CanvasPath = 'curve',
 ): { d: string; mid: { x: number; y: number } } => {
   const [fallbackFrom, fallbackTo] = nearestSides(from, to)
   const fromSide = edge.fromSide ?? fallbackFrom
   const toSide = edge.toSide ?? fallbackTo
   const start = port(from, fromSide)
   const end = port(to, toSide)
+  if (path === 'straight') {
+    return {
+      d: `M ${start.x} ${start.y} L ${end.x} ${end.y}`,
+      mid: { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 },
+    }
+  }
+  if (path === 'step') {
+    const points = steps(start, fromSide, end, toSide)
+    return { d: rounded(points), mid: along(points, 0.5) }
+  }
   const reach = Math.max(40, Math.hypot(end.x - start.x, end.y - start.y) / 3)
-  const out = (side: CanvasSide, point: { x: number; y: number }) => ({
-    x: point.x + (side === 'left' ? -reach : side === 'right' ? reach : 0),
-    y: point.y + (side === 'top' ? -reach : side === 'bottom' ? reach : 0),
-  })
-  const c1 = out(fromSide, start)
-  const c2 = out(toSide, end)
+  const c1 = { x: start.x + normal(fromSide).x * reach, y: start.y + normal(fromSide).y * reach }
+  const c2 = { x: end.x + normal(toSide).x * reach, y: end.y + normal(toSide).y * reach }
   return {
     d: `M ${start.x} ${start.y} C ${c1.x} ${c1.y} ${c2.x} ${c2.y} ${end.x} ${end.y}`,
     /* The label sits at the curve's midpoint, which for a symmetric cubic is

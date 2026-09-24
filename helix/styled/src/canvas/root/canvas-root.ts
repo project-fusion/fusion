@@ -35,6 +35,7 @@ import { styles } from './canvas-root.css.js'
  * @cssproperty --canvas-color-5 - What the fifth preset means here.
  * @cssproperty --canvas-color-6 - What the sixth preset means here.
  * @cssproperty --canvas-edge-color - Color of a connector that names no color of its own.
+ * @cssproperty --canvas-edge-target-width - How wide a connector is to a pointer, which is wider than it is drawn.
  * @cssproperty --canvas-grid-size - How far apart the ruling is, in the document's own units, so it scales with the zoom.
  * @cssproperty --viewport-control-background-color - The ground under the pan and zoom buttons, one name with `Map`.
  */

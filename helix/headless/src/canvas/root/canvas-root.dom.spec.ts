@@ -57,8 +57,35 @@ const press = (on: Card, key: string, shiftKey = false): KeyboardEvent => {
   return event
 }
 
+/** A connection's focusable line, by the key the board gives it. */
+const connection = (host: Canvas, key: string): SVGElement =>
+  host.shadowRoot?.querySelector(`[data-edge="${key}"]`) as SVGElement
+
+/** A key pressed on whatever element holds the stop, card or connection. */
+const pressOn = (on: Element, key: string, shiftKey = false): KeyboardEvent => {
+  const event = new KeyboardEvent('keydown', {
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    key,
+    shiftKey,
+  })
+  on.dispatchEvent(event)
+  return event
+}
+
+/** The element holding the board's one tab stop, and what the walk calls it. */
+const stopOf = (host: Canvas): { at: Element; name: string } | undefined => {
+  const card = (cards(host) as Card[]).find((one) => one.current)
+  if (card) {
+    return { at: card.shadowRoot?.querySelector('[part="node"]') as Element, name: card.id }
+  }
+  const line = host.shadowRoot?.querySelector('[part="edge-target"][tabindex="0"]')
+  return line ? { at: line, name: line.getAttribute('data-edge') ?? '' } : undefined
+}
+
 /**
- * The cards in the order the arrow keys walk them, from the tab stop on.
+ * Every stop in the order the arrow keys walk them, from the tab stop on.
  *
  * Read off the stop as it moves rather than off focus, which happy-dom tracks
  * across shadow roots less faithfully than a browser: the stop is what a reader
@@ -66,17 +93,20 @@ const press = (on: Card, key: string, shiftKey = false): KeyboardEvent => {
  */
 const walk = async (host: Canvas): Promise<string[]> => {
   const seen: string[] = []
-  for (let step = 0; step < cards(host).length; step++) {
-    const at = (cards(host) as Card[]).find((one) => one.current)
-    if (!at) {
+  for (let step = 0; step < 20; step++) {
+    const stop = stopOf(host)
+    if (!stop || seen.includes(stop.name)) {
       break
     }
-    seen.push(at.id)
-    press(at, 'ArrowRight')
+    seen.push(stop.name)
+    pressOn(stop.at, 'ArrowRight')
     await host.updateComplete
   }
   return seen
 }
+
+/** Only the cards in a walk, for the specs that are about reading order. */
+const cardsIn = (walked: string[]): string[] => walked.filter((one) => !one.startsWith('edge:'))
 
 describe('canvas', () => {
   test('a card is placed where the document put it, in the document’s own units', async () => {
@@ -133,11 +163,16 @@ describe('canvas', () => {
     expect(path?.namespaceURI).toBe('http://www.w3.org/2000/svg')
   })
 
-  test('the connectors are hidden from assistive technology, the cards saying it instead', async () => {
-    // A path is a shape. What a reader needs is the link as words, which each
-    // card carries as its description.
+  test('a connection is a named button, and what is painted is hidden', async () => {
+    // A path is a shape. What a reader needs is the link as words.
     const host = await canvas()
-    expect((part(host, 'edges') as HTMLElement).getAttribute('aria-hidden')).toBe('true')
+    const line = connection(host, 'edge:e2')
+    expect(line.getAttribute('role')).toBe('button')
+    expect(line.getAttribute('aria-label')).toBe('From Second to Third: then')
+    for (const painted of host.shadowRoot?.querySelectorAll('[part="edge"], [part="label"]') ??
+      []) {
+      expect(painted.getAttribute('aria-hidden')).toBe('true')
+    }
   })
 
   test('every card says where its arrows go, and is described by it rather than named', async () => {
@@ -164,12 +199,12 @@ describe('canvas', () => {
 
   test('spatial order walks the groups first, then across each row', async () => {
     const host = await canvas('order="spatial"')
-    expect(await walk(host)).toEqual(['pair', 'a', 'b', 'c'])
+    expect(cardsIn(await walk(host))).toEqual(['pair', 'a', 'b', 'c'])
   })
 
   test('edge order follows the arrows from the card nothing points to', async () => {
     const host = await canvas('order="edges"')
-    const walked = await walk(host)
+    const walked = cardsIn(await walk(host))
     expect(walked.indexOf('a')).toBeLessThan(walked.indexOf('b'))
     expect(walked.indexOf('b')).toBeLessThan(walked.indexOf('c'))
   })
@@ -183,6 +218,36 @@ describe('canvas', () => {
        <helix-headless-canvas-node id="b" x="40" y="0" width="10" height="10">Second</helix-headless-canvas-node>`,
     )
     expect(await walk(host)).toEqual(['a', 'b'])
+  })
+
+  test('the connections leaving a card are walked straight after it', async () => {
+    const host = await canvas()
+    expect(await walk(host)).toEqual(['pair', 'a', 'edge:e1', 'b', 'edge:e2', 'c'])
+  })
+
+  test('Enter on a connection goes to the card it arrives at', async () => {
+    const host = await canvas()
+    host.show('a')
+    pressOn(connection(host, 'edge:e1'), 'Enter')
+    await host.updateComplete
+    expect(card(host, 'b').current).toBe(true)
+  })
+
+  test('a connection travels the way it says, or the way the board does', async () => {
+    const host = await canvas()
+    const d = (key: string) => connection(host, key).getAttribute('d') ?? ''
+    expect(d('edge:e1')).toContain(' C ')
+
+    host.querySelector('#e1')?.setAttribute('path', 'straight')
+    await host.updateComplete
+    await host.updateComplete
+    expect(d('edge:e1')).toMatch(/^M [-\d.]+ [-\d.]+ L [-\d.]+ [-\d.]+$/)
+
+    host.setAttribute('path', 'step')
+    await host.updateComplete
+    // The edge's own word wins, and the board's reaches the one that says none.
+    expect(d('edge:e1')).not.toContain(' Q ')
+    expect(d('edge:e2')).toContain(' Q ')
   })
 
   test('a board rests with zoom and fullscreen, and the pad is there when asked for', async () => {
@@ -360,6 +425,123 @@ describe('canvas moves', () => {
     host.querySelector('input')?.dispatchEvent(event)
     expect(event.defaultPrevented).toBe(false)
     expect(card(host, 'a').x).toBe(0)
+  })
+})
+
+/**
+ * Connecting and removing, which the board asks for and the page does, because
+ * the elements are the page's.
+ */
+describe('canvas connections and removal', () => {
+  test('C on a card, then Enter on another, asks for the two to be joined', async () => {
+    const host = await canvas()
+    const asked: unknown[] = []
+    host.addEventListener('helix-connect', (event) => asked.push((event as CustomEvent).detail))
+    press(card(host, 'a'), 'c')
+    await host.updateComplete
+    expect(hasState(host, 'connecting')).toBe(true)
+    expect(part(host, 'live')?.textContent).toContain('Connecting from First')
+    press(card(host, 'c'), 'Enter')
+    await host.updateComplete
+    expect(asked).toEqual([{ from: 'a', to: 'c' }])
+    expect(hasState(host, 'connecting')).toBe(false)
+    // Asked rather than done: nothing was added to the page's markup.
+    expect(host.querySelectorAll('helix-headless-canvas-edge')).toHaveLength(2)
+  })
+
+  test('Escape stops a connection without asking for one', async () => {
+    const host = await canvas()
+    let asked = false
+    host.addEventListener('helix-connect', () => {
+      asked = true
+    })
+    press(card(host, 'a'), 'c')
+    press(card(host, 'a'), 'Escape')
+    await host.updateComplete
+    expect(asked).toBe(false)
+    expect(part(host, 'live')?.textContent).toBe('Stopped connecting.')
+  })
+
+  test('drawing from a handle to another card asks for them to be joined', async () => {
+    const host = await canvas()
+    const asked: unknown[] = []
+    host.addEventListener('helix-connect', (event) => asked.push((event as CustomEvent).detail))
+    const handle = card(host, 'a').shadowRoot?.querySelector('[part~="handle-right"]') as Element
+    const pointer = (type: string, x: number, y: number) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: y,
+        composed: true,
+        pointerId: 3,
+      })
+    handle.dispatchEvent(pointer('pointerdown', 0, 0))
+    /* happy-dom measures nothing, so the view is unzoomed at its corner and the
+       plane starts a margin above and left of the group at -20: a point on the
+       screen is the document's point plus 52. Third is at 130..330, 300..400. */
+    host.dispatchEvent(pointer('pointermove', 280, 402))
+    await host.updateComplete
+    expect(part(host, 'draft')).not.toBeNull()
+    host.dispatchEvent(pointer('pointerup', 280, 402))
+    await host.updateComplete
+    expect(asked).toEqual([{ from: 'a', fromSide: 'right', to: 'c' }])
+    expect(part(host, 'draft')).toBeNull()
+  })
+
+  test('Delete on a card asks for it and every connection it would strand', async () => {
+    const host = await canvas()
+    const asked: unknown[] = []
+    host.addEventListener('helix-remove', (event) => asked.push((event as CustomEvent).detail))
+    press(card(host, 'b'), 'Delete')
+    expect(asked).toEqual([
+      {
+        edges: [
+          { from: 'a', id: 'e1', to: 'b' },
+          { from: 'b', id: 'e2', to: 'c' },
+        ],
+        nodes: ['b'],
+      },
+    ])
+  })
+
+  test('Delete on a connection asks for that connection alone', async () => {
+    const host = await canvas()
+    const asked: unknown[] = []
+    host.addEventListener('helix-remove', (event) => asked.push((event as CustomEvent).detail))
+    pressOn(connection(host, 'edge:e2'), 'Delete')
+    expect(asked).toEqual([{ edges: [{ from: 'b', id: 'e2', to: 'c' }], nodes: [] }])
+  })
+
+  test('once the page removes what was asked, the stop moves on to what was next', async () => {
+    const host = await canvas()
+    host.addEventListener('helix-remove', (event) => {
+      const { edges, nodes } = (event as CustomEvent).detail
+      for (const id of [...nodes, ...edges.map((one: { id: string }) => one.id)]) {
+        host.querySelector(`#${id}`)?.remove()
+      }
+    })
+    press(card(host, 'b'), 'Delete')
+    await host.updateComplete
+    await host.updateComplete
+    expect(card(host, 'c').current).toBe(true)
+  })
+
+  test('a read-only board asks for nothing and draws no handles', async () => {
+    const host = await canvas('readonly')
+    let asked = 0
+    host.addEventListener('helix-connect', () => {
+      asked += 1
+    })
+    host.addEventListener('helix-remove', () => {
+      asked += 1
+    })
+    press(card(host, 'a'), 'c')
+    press(card(host, 'b'), 'Enter')
+    press(card(host, 'b'), 'Delete')
+    await host.updateComplete
+    expect(asked).toBe(0)
+    expect(card(host, 'a').shadowRoot?.querySelector('[part~="handle"]')).toBeNull()
   })
 })
 

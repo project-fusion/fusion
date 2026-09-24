@@ -1,0 +1,53 @@
+import './preview.css'
+
+export function Example() {
+  return (
+    <>
+      <helix-headless-button
+        command="--show"
+        commandfor="base-gallery"
+      >
+        Open the gallery
+      </helix-headless-button>
+
+      {/* Open, so the picture is of a lightbox. */}
+      <helix-headless-lightbox
+        id="base-gallery"
+        label="Coastline"
+        open
+      >
+        <div slot="header">
+          <helix-headless-icon-button
+            command="--close"
+            commandfor="base-gallery"
+            label="Close"
+          >
+            <helix-headless-icon name="x"></helix-headless-icon>
+          </helix-headless-icon-button>
+        </div>
+
+        <helix-headless-lightbox-item
+          label="Seawater over pale sand"
+          value="seawater"
+        >
+          <img
+            alt="Seawater over pale sand"
+            src="/media/scale/seawater-800.jpg"
+          />
+          <span slot="description">Seawater, shallow enough to read the sand through.</span>
+        </helix-headless-lightbox-item>
+
+        <helix-headless-lightbox-item
+          label="The sun low over open water"
+          value="ocean-sun"
+        >
+          <img
+            alt="The sun low over open water"
+            src="/media/scale/ocean-sun.jpg"
+          />
+          <span slot="description">The same coast an hour later.</span>
+        </helix-headless-lightbox-item>
+      </helix-headless-lightbox>
+    </>
+  )
+}
