@@ -1,7 +1,7 @@
 'use client'
 
-import type { HelixColorPicker } from '@fusion.dev/helix'
-import { useEffect, useRef } from 'react'
+import type { HelixColorPicker, HelixPopover } from '@fusion.dev/helix'
+import { useEffect, useRef, useState } from 'react'
 import { useThemeControls } from '@/components/theme-context/theme-context'
 import styles from './brand-picker.module.css'
 
@@ -11,6 +11,7 @@ import styles from './brand-picker.module.css'
 export const BrandPicker = () => {
   const c = useThemeControls()
   const picker = useRef<HelixColorPicker | null>(null)
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     const el = picker.current
@@ -37,8 +38,15 @@ export const BrandPicker = () => {
   }, [c.brand])
 
   return (
-    <helix-popover placement="bottom-start">
+    /* The swatch says whether the picker is open, which the popover cannot say
+       for a plain button: it reads it off the popover when `toggle` says it moved. */
+    <helix-popover
+      ontoggle={(event) => setOpen((event.currentTarget as HelixPopover).open)}
+      placement="bottom-start"
+    >
       <button
+        aria-expanded={open}
+        aria-haspopup="dialog"
         aria-label={`Brand color, currently ${c.brand}`}
         className={styles.brandSwatch}
         slot="trigger"
