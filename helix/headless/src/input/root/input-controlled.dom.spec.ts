@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -69,3 +69,24 @@ describe('a control whose markup declared a value', () => {
    whether or not the code works reads as coverage. What holds this honest is
    the measurement in the commit and the note on `holdCaret`. If someone finds
    the harness that reproduces it, this is the place for it. */
+
+/* Only in a real engine: happy-dom keeps no flags from a `ValidityState`, so
+   the copied verdict is valid there whatever the control says. */
+if (hasLayout()) {
+  describe("input in the page's words", () => {
+    test("a required, empty field raises the page's sentence, and the browser's otherwise", async () => {
+      const worded = (await mount(
+        '<helix-headless-input label="Nom" required value-missing-message="Obligatoire."></helix-headless-input>',
+      )) as HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
+      await worded.updateComplete
+      expect(worded.internals.validationMessage).toBe('Obligatoire.')
+
+      const plain = (await mount(
+        '<helix-headless-input label="Nom" required></helix-headless-input>',
+      )) as HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
+      await plain.updateComplete
+      expect(plain.internals.validationMessage).not.toBe('')
+      expect(plain.internals.validationMessage).not.toBe('Obligatoire.')
+    })
+  })
+}

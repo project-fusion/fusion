@@ -603,3 +603,18 @@ describe('a date picker brought back by the browser', () => {
     expect(typeof picker.value).toBe('string')
   })
 })
+
+describe("a date picker in the page's words", () => {
+  test('its required and unreadable sentences are properties', async () => {
+    const empty = (await mount(
+      '<helix-headless-date-picker required value-missing-message="Choisissez une date."></helix-headless-date-picker>',
+    )) as HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
+    await empty.updateComplete
+    expect(empty.internals.validationMessage).toBe('Choisissez une date.')
+    const wrong = (await mount(
+      '<helix-headless-date-picker value="not-a-date" bad-input-message="Pas une date."></helix-headless-date-picker>',
+    )) as HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
+    await wrong.updateComplete
+    expect(wrong.internals.validationMessage).toBe('Pas une date.')
+  })
+})

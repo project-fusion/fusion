@@ -286,6 +286,30 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   placeholder = 'YYYY-MM-DD'
 
   /**
+   * What a reader is told when a range holds more than two dates.
+   *
+   * **Every sentence a control raises in the browser's bubble is a property**,
+   * so a form in another language speaks it. Absent is the control's own
+   * sentence, in English.
+   */
+  @property({ attribute: 'range-length-message' })
+  rangeLengthMessage?: string
+
+  /**
+   * What a reader is told when a date is after `max`, with `{max}` filled in
+   * as the field writes it.
+   */
+  @property({ attribute: 'range-overflow-message' })
+  rangeOverflowMessage?: string
+
+  /**
+   * What a reader is told when a date is before `min`, with `{min}` filled
+   * in as the field writes it.
+   */
+  @property({ attribute: 'range-underflow-message' })
+  rangeUnderflowMessage?: string
+
+  /**
    * What the control removing one date is called, with `{name}` filled in.
    *
    * **The name goes in**, so a row of them is heard as which one each
@@ -467,18 +491,28 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
        comparing a bound to a list. */
     const held = dates(this.value)
     if (held.length > 0 && !held.every(isDateValue)) {
-      return this.mode === undefined
-        ? 'Enter a date as YYYY-MM-DD.'
-        : 'Enter dates as YYYY-MM-DD, separated by commas.'
+      return (
+        this.badInputMessage ??
+        (this.mode === undefined
+          ? 'Enter a date as YYYY-MM-DD.'
+          : 'Enter dates as YYYY-MM-DD, separated by commas.')
+      )
     }
+    /* The bound as the field writes a date, the way Time Input writes its
+       own: a reader who sees "4 Aug 2026" in the field is told about the same
+       day in the same words. */
     if (this.min !== '' && held.some((one) => one < this.min)) {
-      return `Choose a date on or after ${this.min}.`
+      return fillTemplate(this.rangeUnderflowMessage ?? 'Choose a date on or after {min}.', {
+        min: this.written(this.min),
+      })
     }
     if (this.max !== '' && held.some((one) => one > this.max)) {
-      return `Choose a date on or before ${this.max}.`
+      return fillTemplate(this.rangeOverflowMessage ?? 'Choose a date on or before {max}.', {
+        max: this.written(this.max),
+      })
     }
     if (this.mode === 'range' && held.length > 2) {
-      return 'A range is two dates.'
+      return this.rangeLengthMessage ?? 'A range is two dates.'
     }
     return ''
   }

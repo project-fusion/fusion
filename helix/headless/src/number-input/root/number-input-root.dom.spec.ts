@@ -365,3 +365,18 @@ describe('number input scrub', () => {
     expect((host as HTMLElement & { value: string }).value).toBe('10')
   })
 })
+
+describe("input number in the page's words", () => {
+  test('the sentences the bubble raises are properties, with the bound filled in', async () => {
+    /* `feedback` replaces the message under the field and never reached the
+       browser's own bubble, which a form in another language raised in English. */
+    const low = await field('default-value="1" min="2" range-underflow-message="Au moins {min}."')
+    expect((low as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
+      'Au moins 2.',
+    )
+    const empty = await field('required value-missing-message="Obligatoire."')
+    expect((empty as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
+      'Obligatoire.',
+    )
+  })
+})

@@ -346,7 +346,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     if (!control) {
       return
     }
-    this.internals.setValidity(control.validity, control.validationMessage, control)
+    this.copyValidity(control)
     this.refreshFeedback()
   }
 

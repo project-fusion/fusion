@@ -177,6 +177,30 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   placeholder = 'HH:mm'
 
   /**
+   * What a reader is told when a range holds more than two times.
+   *
+   * **Every sentence a control raises in the browser's bubble is a property**,
+   * so a form in another language speaks it. Absent is the control's own
+   * sentence, in English.
+   */
+  @property({ attribute: 'range-length-message' })
+  rangeLengthMessage?: string
+
+  /**
+   * What a reader is told when a time is after `max`, with `{max}` filled in
+   * as the field writes it.
+   */
+  @property({ attribute: 'range-overflow-message' })
+  rangeOverflowMessage?: string
+
+  /**
+   * What a reader is told when a time is before `min`, with `{min}` filled
+   * in as the field writes it.
+   */
+  @property({ attribute: 'range-underflow-message' })
+  rangeUnderflowMessage?: string
+
+  /**
    * What the control removing one time is called, with `{name}` filled in.
    *
    * **The name goes in**, so a row of them is heard as which one each
@@ -349,18 +373,25 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
     const floor = valueAsMinutes(this.min) ?? 0
     const ceiling = valueAsMinutes(this.max) ?? 1439
     if (held.length > 0 && !held.every(isTimeValue)) {
-      return this.mode === undefined
-        ? 'Enter a time as HH:mm.'
-        : 'Enter times as HH:mm, separated by commas.'
+      return (
+        this.badInputMessage ??
+        (this.mode === undefined
+          ? 'Enter a time as HH:mm.'
+          : 'Enter times as HH:mm, separated by commas.')
+      )
     }
     if (held.some((one) => (valueAsMinutes(one) ?? 0) < floor)) {
-      return `Choose a time at or after ${writeTime(this.min, this.locale)}.`
+      return fillTemplate(this.rangeUnderflowMessage ?? 'Choose a time at or after {min}.', {
+        min: writeTime(this.min, this.locale),
+      })
     }
     if (held.some((one) => (valueAsMinutes(one) ?? 0) > ceiling)) {
-      return `Choose a time at or before ${writeTime(this.max, this.locale)}.`
+      return fillTemplate(this.rangeOverflowMessage ?? 'Choose a time at or before {max}.', {
+        max: writeTime(this.max, this.locale),
+      })
     }
     if (this.mode === 'range' && held.length > 2) {
-      return 'A range is two times.'
+      return this.rangeLengthMessage ?? 'A range is two times.'
     }
     return ''
   }

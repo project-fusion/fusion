@@ -106,8 +106,17 @@ export declare class MixinFieldInterface {
    */
   protected reportRequired(empty: boolean, message: string, anchor: string): void
 
+  /**
+   * Hands on the verdict of a native control this renders, with the page's own
+   * words where it gave some.
+   */
+  protected copyValidity(control: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): void
+
   /** The message actually shown: the consumer's, or the platform's, or none. */
   readonly resolvedFeedback: string
+
+  /** What a reader is told when the field is required and empty, where the page says. */
+  valueMissingMessage: string | undefined
 }
 
 /**
@@ -242,6 +251,20 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      */
     @property({ reflect: true, type: Boolean })
     required = false
+
+    /**
+     * What a reader is told when the field is required and empty, where the
+     * page says.
+     *
+     * **Absent is the control's own sentence**, "Choose one to continue." on a
+     * set and the browser's own on a text field, which the browser writes in
+     * the reader's language. Every other word a control speaks is a property,
+     * and this one was the English a form in another language still spoke in
+     * the bubble it raises on submit: `feedback` replaces the message under
+     * the field and does not reach that one.
+     */
+    @property({ attribute: 'value-missing-message' })
+    valueMissingMessage?: string
 
     /**
      * Whether the reader has had a go at the field yet.
@@ -488,7 +511,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       if (this.required && empty) {
         this.internals.setValidity(
           { valueMissing: true },
-          message,
+          this.valueMissingMessage ?? message,
           this.partNamed(anchor) ?? undefined,
         )
       } else {
@@ -496,6 +519,25 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       }
       // Straight after, because validity moved without any property moving.
       this.refreshFeedback()
+    }
+
+    /**
+     * Hands on the verdict of a native control this renders, with the page's
+     * own words where it gave some.
+     *
+     * The browser's message otherwise, which is already in the reader's
+     * language, anchored on the control so the bubble points at the text and
+     * not at the host. The seven families that copy a native verdict each
+     * wrote this line, and none of them could be told what to say.
+     */
+    protected copyValidity(
+      control: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
+    ): void {
+      const message =
+        control.validity.valueMissing && this.valueMissingMessage !== undefined
+          ? this.valueMissingMessage
+          : control.validationMessage
+      this.internals.setValidity(control.validity, message, control)
     }
 
     /**

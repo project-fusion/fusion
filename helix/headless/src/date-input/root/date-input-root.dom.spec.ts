@@ -233,9 +233,30 @@ describe('input date holds more than one', () => {
   test('bounds are checked against every date, not against the list', async () => {
     /* A string comparison of `2026-08-04,2026-09-01` against a `max` would be
        comparing a bound to a list and would pass whatever the second date was. */
-    const host = await many('default-value="2026-08-04,2026-09-01" max="2026-08-31" mode="range"')
+    const host = await many(
+      'date-style="medium" default-value="2026-08-04,2026-09-01" locale="en-GB" max="2026-08-31" mode="range"',
+    )
     const internals = (host as unknown as { internals: ElementInternals }).internals
-    expect(internals.validationMessage).toContain('2026-08-31')
+    // The bound as the field writes a date, so the reader is told about the day they can see.
+    expect(internals.validationMessage).toContain('31 Aug 2026')
+  })
+
+  test("each sentence the bubble raises is the page's to write, with its bound filled in", async () => {
+    /* `feedback` replaces the message under the field and never reached the
+       browser's own bubble, so a form in another language still raised these
+       in English. */
+    const late = await many(
+      'date-style="iso" default-value="2026-09-01" max="2026-08-31" mode="multiple" range-overflow-message="Au plus tard le {max}."',
+    )
+    expect((late as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
+      'Au plus tard le 2026-08-31.',
+    )
+    const wrong = await many(
+      'default-value="not-a-date" mode="multiple" bad-input-message="Pas une date."',
+    )
+    expect((wrong as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
+      'Pas une date.',
+    )
   })
 
   test('and a range refuses a third date', async () => {

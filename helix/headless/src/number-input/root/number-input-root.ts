@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   valueAsNumber as asNumber,
   customElement,
+  fillTemplate,
   numberAsValue as fromNumber,
   HelixFormElement,
   holdCaret,
@@ -116,6 +117,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   autocomplete = ''
 
   /**
+   * What a reader is told when the field holds something that is not a number.
+   *
+   * **Every sentence a control raises in the browser's bubble is a property**,
+   * named for the validity flag it reports, so a form in another language
+   * speaks it: `feedback` replaces the message under the field and does not
+   * reach the bubble. Absent is the control's own sentence, in English.
+   */
+  @property({ attribute: 'bad-input-message' })
+  badInputMessage?: string
+
+  /**
    * Accessible name for the control that steps down.
    */
   @property({ attribute: 'decrement-label' })
@@ -160,6 +172,18 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    */
   @property()
   placeholder = ''
+
+  /**
+   * What a reader is told when the number is above `max`, with `{max}` filled in.
+   */
+  @property({ attribute: 'range-overflow-message' })
+  rangeOverflowMessage?: string
+
+  /**
+   * What a reader is told when the number is below `min`, with `{min}` filled in.
+   */
+  @property({ attribute: 'range-underflow-message' })
+  rangeUnderflowMessage?: string
 
   /**
    * Whether the field refuses input while still submitting its value.
@@ -504,19 +528,31 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     if (this.readOnly) {
       this.internals.setValidity({})
     } else if (this.required && this.value.trim() === '') {
-      this.internals.setValidity({ valueMissing: true }, 'Please fill in this field.', control)
+      this.internals.setValidity(
+        { valueMissing: true },
+        this.valueMissingMessage ?? 'Please fill in this field.',
+        control,
+      )
     } else if (this.value.trim() !== '' && parsed === null) {
-      this.internals.setValidity({ badInput: true }, 'Please enter a number.', control)
+      this.internals.setValidity(
+        { badInput: true },
+        this.badInputMessage ?? 'Please enter a number.',
+        control,
+      )
     } else if (parsed !== null && this.min !== undefined && parsed < this.min) {
       this.internals.setValidity(
         { rangeUnderflow: true },
-        `Value must be ${this.min} or more.`,
+        fillTemplate(this.rangeUnderflowMessage ?? 'Value must be {min} or more.', {
+          min: this.min,
+        }),
         control,
       )
     } else if (parsed !== null && this.max !== undefined && parsed > this.max) {
       this.internals.setValidity(
         { rangeOverflow: true },
-        `Value must be ${this.max} or less.`,
+        fillTemplate(this.rangeOverflowMessage ?? 'Value must be {max} or less.', {
+          max: this.max,
+        }),
         control,
       )
     } else {

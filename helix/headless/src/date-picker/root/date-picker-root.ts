@@ -127,6 +127,16 @@ const addMonths = (date: Date, months: number): Date => {
 @customElement('helix-headless-date-picker')
 export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormElement) {
   /**
+   * What a reader is told when the value holds something that is not a date.
+   *
+   * **Every sentence a control raises in the browser's bubble is a property**,
+   * named for the validity flag it reports, so a form in another language
+   * speaks it. Absent is the control's own sentence, in English.
+   */
+  @property({ attribute: 'bad-input-message' })
+  badInputMessage?: string
+
+  /**
    * Month to open on, where nothing declared one.
    */
   @property({ attribute: 'default-month' })
@@ -528,6 +538,12 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   step = 1
 
   /**
+   * What a reader is told when a date is required and none is chosen.
+   */
+  @property({ attribute: 'value-missing-message' })
+  valueMissingMessage?: string
+
+  /**
    * Reports "required and empty", or clears it.
    *
    * Written out rather than taken from `MixinField`, which is where the seven
@@ -540,7 +556,11 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   private reportRequired(): void {
     const anchor = this.partNamed('grid') ?? undefined
     if (this.required && this.value === '') {
-      this.internals.setValidity({ valueMissing: true }, 'Choose a date.', anchor)
+      this.internals.setValidity(
+        { valueMissing: true },
+        this.valueMissingMessage ?? 'Choose a date.',
+        anchor,
+      )
       return
     }
     /* **A value the calendar cannot read is bad input.** The grid draws only
@@ -554,9 +574,10 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     if (held.length > 0 && held.some((one) => asDate(one) === null)) {
       this.internals.setValidity(
         { badInput: true },
-        this.mode === undefined
-          ? 'Enter a date as YYYY-MM-DD.'
-          : 'Enter dates as YYYY-MM-DD, separated by commas.',
+        this.badInputMessage ??
+          (this.mode === undefined
+            ? 'Enter a date as YYYY-MM-DD.'
+            : 'Enter dates as YYYY-MM-DD, separated by commas.'),
         anchor,
       )
       return

@@ -110,6 +110,16 @@ const isTwelveHour = (locale?: string): boolean =>
 @customElement('helix-headless-time-picker')
 export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormElement) {
   /**
+   * What a reader is told when the value holds something that is not a time.
+   *
+   * **Every sentence a control raises in the browser's bubble is a property**,
+   * named for the validity flag it reports, so a form in another language
+   * speaks it. Absent is the control's own sentence, in English.
+   */
+  @property({ attribute: 'bad-input-message' })
+  badInputMessage?: string
+
+  /**
    * Times that cannot be chosen, comma separated, as `HH:mm`.
    *
    * The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -449,6 +459,12 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
+   * What a reader is told when a time is required and none is chosen.
+   */
+  @property({ attribute: 'value-missing-message' })
+  valueMissingMessage?: string
+
+  /**
    * Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
@@ -490,7 +506,11 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   private reportRequired(): void {
     const anchor = this.partNamed('list') ?? undefined
     if (this.required && this.value === '') {
-      this.internals.setValidity({ valueMissing: true }, 'Choose a time.', anchor)
+      this.internals.setValidity(
+        { valueMissing: true },
+        this.valueMissingMessage ?? 'Choose a time.',
+        anchor,
+      )
       return
     }
     /* A value the wheels cannot read is bad input, the same as on the calendar:
@@ -502,9 +522,10 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     if (held.length > 0 && held.some((one) => asTime(one) === null)) {
       this.internals.setValidity(
         { badInput: true },
-        this.mode === undefined
-          ? 'Enter a time as HH:mm.'
-          : 'Enter times as HH:mm, separated by commas.',
+        this.badInputMessage ??
+          (this.mode === undefined
+            ? 'Enter a time as HH:mm.'
+            : 'Enter times as HH:mm, separated by commas.'),
         anchor,
       )
       return
