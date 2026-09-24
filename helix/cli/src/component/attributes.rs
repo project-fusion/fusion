@@ -46,7 +46,7 @@ use std::sync::LazyLock;
 use regex::Regex;
 use serde_json::Value;
 
-use crate::component::text::uncommented;
+use crate::component::text::blanked;
 use crate::component::{walk_outside, Context, Finding, Report};
 
 /// Attributes the platform reflects itself, whoever writes them.
@@ -147,7 +147,8 @@ fn sides(context: &Context, declared: &BTreeMap<String, BTreeMap<String, bool>>)
             if extension == "css" {
                 /* Attribute selectors only: a bare `[foo]` and `[foo="bar"]`
                 fail the same way. */
-                let source = uncommented(&raw);
+                // A sheet's comments, which are block comments and nothing else.
+                let source = blanked(&raw);
                 for found in SELECTS.captures_iter(&source) {
                     let name = found[2].to_lowercase();
                     if name.starts_with("data-")

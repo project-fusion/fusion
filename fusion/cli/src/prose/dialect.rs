@@ -188,10 +188,13 @@ fn like(source: &str, replacement: &str) -> String {
 
 /// An address in a line, which names a thing rather than saying a word.
 static ADDRESS: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"[a-z][a-z0-9+.-]*://\S+|\]\([^)\s]*\)").expect("a literal pattern compiles")
+    Regex::new(r"[a-z][a-z0-9+.-]*://\S+|\]\(<[^>]*>|\]\([^)\s]*|^\s*\[[^\]]+\]:\s*\S+")
+        .expect("a literal pattern compiles")
 });
 
-/// The spans of a line that are addresses: a URL, or a Markdown link's target.
+/// The spans of a line that are addresses: a URL, or a Markdown link's target,
+/// whether bare, in angle brackets or followed by a title, or a reference
+/// definition's.
 ///
 /// **A word inside one is somebody's path, not prose.** Rewriting the file
 /// name in an image link broke the picture it named, and a word in a URL the

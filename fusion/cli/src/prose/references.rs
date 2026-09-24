@@ -47,7 +47,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::LazyLock;
 
-use fusion_rules::source::comments;
+use fusion_rules::source::{comments, sheet_comments};
 use fusion_rules::walk::crawl;
 use regex::Regex;
 use serde_json::Value;
@@ -228,7 +228,12 @@ pub fn run(context: &Context) -> Report {
         let scripts = scripts_for(&context.root, file);
         /* The lexer's comments, so a `//` in a string or a URL is not one,
         and a glob's opening star does not swallow the code after it. */
-        for comment in comments(&source).into_iter().map(|span| &source[span]) {
+        let spans = if file.extension().is_some_and(|one| one == "css") {
+            sheet_comments(&source)
+        } else {
+            comments(&source)
+        };
+        for comment in spans.into_iter().map(|span| &source[span]) {
             for caught in PATH.captures_iter(comment) {
                 let path = caught[1].to_owned();
                 /* Rooted at the repository, so an illustrative path is left

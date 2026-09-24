@@ -64,12 +64,14 @@ struct Declared {
     to: usize,
 }
 
-/// How many brackets a line opens past the ones it closes, strings skipped.
+/// How many brackets a line opens past the ones it closes, strings and a
+/// trailing comment skipped: `// plain, loud (or quiet` opens nothing.
 fn balance(line: &str) -> i32 {
     let mut depth = 0;
     let mut quote: Option<char> = None;
     let mut escaped = false;
-    for one in line.chars() {
+    let mut chars = line.chars().peekable();
+    while let Some(one) = chars.next() {
         if let Some(open) = quote {
             if escaped {
                 escaped = false;
@@ -79,6 +81,9 @@ fn balance(line: &str) -> i32 {
                 quote = None;
             }
             continue;
+        }
+        if one == '/' && chars.peek() == Some(&'/') {
+            break;
         }
         match one {
             '\'' | '"' | '`' => quote = Some(one),
@@ -102,12 +107,19 @@ fn indent(line: &str) -> usize {
 /// indentation: a union of string literals continues deeper at depth zero, and
 /// a getter's body or an array closes at the member's own indentation, which
 /// indentation alone read as the next thing in the class and left behind.
+///
+/// **And never past a line indented less than the member**, whatever the depth
+/// says: that line is the class closing, and a bracket counted wrongly, one in
+/// a regular expression, carried a property out past it.
 fn end_of(lines: &[&str], start: usize) -> usize {
     let mut depth = balance(lines[start]);
     let mut to = start;
     while to + 1 < lines.len() {
         let next = lines[to + 1];
-        if depth <= 0 && (next.trim().is_empty() || indent(next) <= indent(lines[start])) {
+        let outside = !next.trim().is_empty() && indent(next) < indent(lines[start]);
+        if outside
+            || (depth <= 0 && (next.trim().is_empty() || indent(next) <= indent(lines[start])))
+        {
             break;
         }
         to += 1;
@@ -427,6 +439,28 @@ mod tests {
             after.find("What alpha is.").expect("kept") < described,
             "alpha still sorts first:\n{after}"
         );
+    }
+
+    /// A bracket in a trailing comment or a pattern opens nothing, and nothing
+    /// sorts out past the end of its class.
+    #[test]
+    fn a_bracket_that_is_not_code_keeps_the_class_whole() {
+        for tail in ["'plain' // plain, loud (or quiet", "/[(]/"] {
+            let before = format!(
+                "export class Card extends HTMLElement {{\n  @property()\n  tone?: string\n\n  \
+                 @property()\n  emphasis = {tail}\n}}\n"
+            );
+            let after = sorted(&before).expect("out of order");
+            let close = after.rfind('}').expect("the class closes");
+            assert!(
+                after.find("tone?").expect("kept") < close,
+                "tone stays inside the class:\n{after}"
+            );
+            assert!(
+                after.find("emphasis").expect("kept") < after.find("tone?").expect("kept"),
+                "and still sorts:\n{after}"
+            );
+        }
     }
 
     /// A decorator written over several lines is the decorator, not a member.

@@ -38,17 +38,23 @@ use serde_json::Value;
 use crate::component::text::uncommented;
 use crate::component::{Context, Finding, Report};
 
+/// What may come before a slot's name: attributes, and bindings stepped over
+/// whole, since the `>` of an arrow, `@slotchange=${() => this.place()}`,
+/// ended the tag for a pattern that only knew attributes.
+const BEFORE_NAME: &str = r"<slot\b(?:\$\{[^}]*\}|[^>$]|\$)*?\sname=";
+
 /// A `<slot>` with a written name, wherever among its attributes the name
 /// sits: `<slot part="a" name="b">` and one with a listener first are as
 /// rendered as one that leads with it, which this read as never rendered.
 static RENDERED: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r#"<slot\b[^>]*?\sname=["']([a-z][a-z0-9-]*)["']"#)
+    Regex::new(&format!(r#"{BEFORE_NAME}["']([a-z][a-z0-9-]*)["']"#))
         .expect("a literal pattern compiles")
 });
 
 /// A slot whose name is worked out at run time rather than written down.
-static COMPUTED: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"<slot\b[^>]*?\sname=\$\{").expect("a literal pattern compiles"));
+static COMPUTED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(&format!(r"{BEFORE_NAME}\$\{{")).expect("a literal pattern compiles")
+});
 
 /// Every `<slot name>` written anywhere under a directory, and whether any of
 /// them was assembled rather than written.
@@ -360,5 +366,27 @@ pub fn run(context: &Context) -> Report {
         findings,
         notes,
         unit: "documented slot names checked against the ones their family renders",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{COMPUTED, RENDERED};
+
+    /// A listener written as an arrow comes before the name and is not the end
+    /// of the tag.
+    #[test]
+    fn a_name_after_an_arrow_listener_is_read() {
+        let named = |source: &str| RENDERED.captures(source).map(|found| found[1].to_owned());
+        assert_eq!(
+            named(r#"<slot @slotchange=${() => this.place()} name="end"></slot>"#).as_deref(),
+            Some("end")
+        );
+        assert_eq!(
+            named(r#"<slot @slotchange=${this.place} name="end"></slot>"#).as_deref(),
+            Some("end")
+        );
+        assert!(COMPUTED.is_match(r"<slot @slotchange=${() => go()} name=${this.which}></slot>"));
+        assert_eq!(named(r"<slot></slot><b name='x'>").as_deref(), None);
     }
 }
