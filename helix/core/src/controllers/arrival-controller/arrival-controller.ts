@@ -18,10 +18,13 @@ export interface ArrivalOptions {
  * an empty state after a search, a banner raised mid-session. So the element
  * renders its region empty and this fills it a frame later, which is a change.
  *
- * **Filled at once when the element came with the page**, served or parsed in
- * the first pass, because a message that was always there is content rather
- * than news, and a region that spoke on every page load would interrupt a
- * reader before they had read anything.
+ * **Left empty when the element came with the page**, served or parsed in the
+ * first pass, because a message that was always there is content rather than
+ * news, and a region that spoke on every page load would interrupt a reader
+ * before they had read anything. Its words are the baseline instead, and the
+ * region speaks only when they change. Filling it at once also drew the words a
+ * second time on the headless tier, which has no sheet to clip the region, and
+ * a served page changed its picture on hydrating.
  *
  * The component renders `said` into its region and calls `say` when what it
  * holds changes, from a `slotchange`.
@@ -29,6 +32,9 @@ export interface ArrivalOptions {
 export class ArrivalController implements ReactiveController {
   /** What the region says now. */
   said = ''
+
+  /** The words last accounted for, said or not. */
+  private heard = ''
 
   private frame = 0
 
@@ -42,10 +48,10 @@ export class ArrivalController implements ReactiveController {
   hostConnected(): void {
     cancelAnimationFrame(this.frame)
     if (!this.options.arriving()) {
-      this.said = this.options.text()
+      this.heard = this.options.text()
       return
     }
-    this.said = ''
+    this.heard = ''
     this.frame = requestAnimationFrame(() => {
       this.frame = 0
       this.say()
@@ -60,9 +66,11 @@ export class ArrivalController implements ReactiveController {
   /** Reads the words again, and says them if they moved. */
   say(): void {
     const next = this.options.text()
-    if (next !== this.said) {
-      this.said = next
-      this.host.requestUpdate()
+    if (next === this.heard) {
+      return
     }
+    this.heard = next
+    this.said = next
+    this.host.requestUpdate()
   }
 }
