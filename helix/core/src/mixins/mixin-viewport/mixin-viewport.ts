@@ -4,6 +4,7 @@ import { FullscreenController } from '../../controllers/fullscreen-controller/fu
 import { IdleController } from '../../controllers/idle-controller/idle-controller.js'
 import type { ViewportPanDetail, ViewportZoomDetail } from '../../events/events.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
+import { isRtl } from '../../utils/is-rtl/is-rtl.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -295,6 +296,34 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     }
 
     /**
+     * The side of the screen a reading-order way is on, left or right.
+     *
+     * **Start is left only where the text runs that way.** The pad's grid is
+     * laid out in reading order, so on a right-to-left page the start button
+     * sits on the right, and it said "left" and pointed left from there.
+     */
+    private sideOf(way: ViewportWay): string {
+      if (way !== 'start' && way !== 'end') {
+        return way
+      }
+      return (way === 'start') !== this.rightToLeft ? 'left' : 'right'
+    }
+
+    /**
+     * Whether the page runs right to left, as far as this render may say.
+     *
+     * **Not while hydrating.** A server cannot measure direction, so it drew
+     * the left-to-right pad; Lit hydrates by keeping what the server drew and
+     * recording the client's value unwritten, so a right-to-left answer in the
+     * hydrating render would never reach the page. It answers once hydration
+     * is over, and `firstUpdated` asks for that render.
+     */
+    private get rightToLeft(): boolean {
+      const element = this as unknown as { hydrating?: boolean }
+      return !element.hydrating && isRtl(this)
+    }
+
+    /**
      * What one pan control is called, with the way it goes filled in.
      *
      * Left and right rather than start and end, because the label is read aloud
@@ -302,8 +331,12 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
      * name, which is the one a right-to-left page needs.
      */
     private named(way: ViewportWay): string {
-      const spoken = way === 'start' ? 'left' : way === 'end' ? 'right' : way
-      return this.panLabel.replace('{way}', spoken)
+      return this.panLabel.replace('{way}', this.sideOf(way))
+    }
+
+    /** The arrow drawn on a pan control, pointing the way it goes on screen. */
+    private glyph(way: ViewportWay): string {
+      return { down: '↓', left: '←', right: '→', up: '↑' }[this.sideOf(way)] ?? ''
     }
 
     /**
@@ -317,6 +350,12 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     protected override firstUpdated(changed: Parameters<LitElement['firstUpdated']>[0]): void {
       super.firstUpdated(changed)
       this.idle.stir()
+      /* The render hydration put off, for a right-to-left page whose pad the
+         server drew the other way round. */
+      const element = this as unknown as { serverRendered?: boolean }
+      if (element.serverRendered && isRtl(this)) {
+        this.requestUpdate()
+      }
     }
 
     /**
@@ -393,16 +432,16 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
         ${
           pan
             ? html`<button part="pan-up" aria-label=${this.named('up')} type="button" @click=${() => this.pan('up')}>
-                  ↑
+                  ${this.glyph('up')}
                 </button>
                 <button part="pan-start" aria-label=${this.named('start')} type="button" @click=${() => this.pan('start')}>
-                  ←
+                  ${this.glyph('start')}
                 </button>
                 <button part="pan-end" aria-label=${this.named('end')} type="button" @click=${() => this.pan('end')}>
-                  →
+                  ${this.glyph('end')}
                 </button>
                 <button part="pan-down" aria-label=${this.named('down')} type="button" @click=${() => this.pan('down')}>
-                  ↓
+                  ${this.glyph('down')}
                 </button>`
             : nothing
         }

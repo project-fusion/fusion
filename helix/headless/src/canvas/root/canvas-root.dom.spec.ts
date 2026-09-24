@@ -1232,6 +1232,107 @@ describe('canvas selections, sizes and shapes', () => {
   })
 })
 
+/** What a review of the family found, each held here so it stays found. */
+describe('canvas review fixes', () => {
+  type Board = Canvas & { selected: string; pan(to: string): void }
+
+  test('pan moves the way the text runs, so a right-to-left page reverses it', async () => {
+    const ltr = (await canvas()) as Board
+    const rtl = (await canvas('dir="rtl"')) as Board
+    const x = (host: Canvas) =>
+      Number(
+        /--_canvas-x: (-?[0-9.]+)/.exec(
+          (part(host, 'viewport') as HTMLElement).getAttribute('style') ?? '',
+        )?.[1],
+      )
+    const before = [x(ltr), x(rtl)]
+    ltr.pan('end')
+    rtl.pan('end')
+    await ltr.updateComplete
+    await rtl.updateComplete
+    expect(Math.sign(x(ltr) - (before[0] ?? 0))).toBe(-1)
+    expect(Math.sign(x(rtl) - (before[1] ?? 0))).toBe(1)
+  })
+
+  test('a click on a card of a read-only board selects it rather than clearing', async () => {
+    const host = (await canvas('readonly')) as Board
+    const box = card(host, 'c').shadowRoot?.querySelector('[part="node"]') as HTMLElement
+    const pointer = (type: string) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: 5,
+        clientY: 5,
+        composed: true,
+        pointerId: 70,
+      })
+    box.dispatchEvent(pointer('pointerdown'))
+    host.dispatchEvent(pointer('pointerup'))
+    expect(host.selected).toBe('c')
+  })
+
+  test('a box inside a group selects the cards it touches, not the group', async () => {
+    const host = (await canvas()) as Board
+    const viewport = part(host, 'viewport') as HTMLElement
+    const pointer = (type: string, at: [number, number]) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: at[0],
+        clientY: at[1],
+        composed: true,
+        pointerId: 71,
+        shiftKey: true,
+      })
+    // Inside The pair, across First only.
+    viewport.dispatchEvent(pointer('pointerdown', onScreen(host, 10, 10)))
+    host.dispatchEvent(pointer('pointermove', onScreen(host, 50, 50)))
+    host.dispatchEvent(pointer('pointerup', onScreen(host, 50, 50)))
+    expect(host.selected).toBe('a')
+  })
+
+  test('a mouse that let go outside the board does not keep carrying a card', async () => {
+    const host = await canvas()
+    const box = card(host, 'c').shadowRoot?.querySelector('[part="node"]') as HTMLElement
+    box.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        button: 0,
+        clientX: 5,
+        clientY: 5,
+        composed: true,
+        pointerId: 72,
+      }),
+    )
+    // The release happened elsewhere; the next move has no button down.
+    host.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        buttons: 0,
+        clientX: 90,
+        clientY: 90,
+        composed: true,
+        pointerId: 72,
+        pointerType: 'mouse',
+      }),
+    )
+    host.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        buttons: 0,
+        clientX: 190,
+        clientY: 190,
+        composed: true,
+        pointerId: 72,
+        pointerType: 'mouse',
+      }),
+    )
+    await host.updateComplete
+    expect(card(host, 'c').x).toBe(130)
+    expect(hasState(host, 'pressing')).toBe(false)
+  })
+})
+
 /**
  * The gestures a board is reached for with, which are this family's rather than
  * the surface's: what `Map` frames drags its own view.

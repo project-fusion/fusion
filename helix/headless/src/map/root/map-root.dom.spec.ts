@@ -213,3 +213,16 @@ describe('map keys', () => {
     expect(asked).toEqual(['up'])
   })
 })
+
+describe('map controls on a right-to-left page', () => {
+  test('the start control says and points the way it sits, which is right', async () => {
+    /* The pad is laid out in reading order, so on a right-to-left page the
+       start control is on the right: it said "left" and pointed left from there. */
+    const host = await map('dir="rtl"')
+    const start = control(host, 'pan-start')
+    expect(start?.getAttribute('aria-label')).toBe('Pan right')
+    expect(start?.textContent?.trim()).toBe('→')
+    const ltr = await map()
+    expect(control(ltr, 'pan-start')?.getAttribute('aria-label')).toBe('Pan left')
+  })
+})
