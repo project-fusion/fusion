@@ -171,3 +171,32 @@ describe('checkbox group as a field', () => {
     expect(items.contains(label)).toBe(false)
   })
 })
+
+describe('checkbox group after a reset', () => {
+  test('goes back to what its boxes declared, and stays there', async () => {
+    /* The form resets every control in one task, the group before its boxes.
+       Without its own reset the group kept the reader's set, reported valid
+       over emptied boxes, and ticked them again on its next update. */
+    const form = await mount(`<form><helix-headless-checkbox-group label="L" name="c" required>
+      <helix-headless-checkbox value="a">A</helix-headless-checkbox>
+      <helix-headless-checkbox value="b" default-checked>B</helix-headless-checkbox>
+    </helix-headless-checkbox-group></form>`)
+    type Reset = Updatable & { formResetCallback(): void }
+    const group = form.firstElementChild as Reset & {
+      boxes: (Reset & { checked: boolean })[]
+      hint: string
+      value: string
+    }
+    await settle(group)
+    group.value = 'a'
+    await settle(group)
+    for (const one of [group, ...group.boxes]) {
+      one.formResetCallback()
+    }
+    await settle(group)
+    expect(group.value).toBe('b')
+    group.hint = 'Anything that updates the group'
+    await settle(group)
+    expect(group.boxes.map((box) => box.checked)).toEqual([false, true])
+  })
+})

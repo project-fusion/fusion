@@ -101,7 +101,8 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
   }
 
   /** Returns the switch to the state its markup declared. */
-  formResetCallback(): void {
+  override formResetCallback(): void {
+    super.formResetCallback()
     // `resetChecked` drops both halves, the consumer's and the element's, so
     // there is nothing to clear before it.
     this.resetChecked()

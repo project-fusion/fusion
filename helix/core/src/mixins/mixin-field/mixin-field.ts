@@ -501,6 +501,18 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     }
 
     /**
+     * Forgets the reader's attempts along with the value, so an emptied field
+     * is not wrong until they try again.
+     *
+     * Through the base's prototype rather than `super`, because the base this
+     * grafts onto is any element and only a form element has the hook.
+     */
+    formResetCallback(): void {
+      ;(Base.prototype as { formResetCallback?: () => void }).formResetCallback?.call(this)
+      this.touched = false
+    }
+
+    /**
      * The two moments a field becomes wrong, neither of which is a property
      * change, so nothing else would schedule an update for them.
      *

@@ -112,7 +112,8 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   }
 
   /** Returns the box to the state its markup declared. */
-  formResetCallback(): void {
+  override formResetCallback(): void {
+    super.formResetCallback()
     this.indeterminate = false
     // `resetChecked` drops both halves, the consumer's and the element's, so
     // there is nothing to clear before it.

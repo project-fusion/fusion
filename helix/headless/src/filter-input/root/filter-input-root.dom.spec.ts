@@ -150,3 +150,31 @@ describe('filter input', () => {
     expect(slotted(filter, 'tags')).toHaveLength(3)
   })
 })
+
+describe('a required filter input', () => {
+  test('left empty, it keeps its form from submitting', async () => {
+    /* `required` reached only the control in the shadow root, which takes no
+       part in the form, so an empty filter submitted. */
+    const form = await mount(
+      '<form><helix-headless-filter-input label="Filter" name="f" required></helix-headless-filter-input></form>',
+    )
+    const filter = form.firstElementChild as HTMLElement & {
+      internals: ElementInternals
+      label: string
+      updateComplete: Promise<boolean>
+    }
+    await filter.updateComplete
+    /* Read off the call rather than off `validity`: happy-dom's shim keeps
+       only what it is handed as own properties, and a `ValidityState` holds
+       its flags as getters, so the shim reports valid whatever it was told. */
+    const said: ValidityStateFlags[] = []
+    const set = filter.internals.setValidity.bind(filter.internals)
+    filter.internals.setValidity = (flags, ...rest) => {
+      said.push(flags ?? {})
+      set(flags, ...rest)
+    }
+    filter.label = 'Filter again'
+    await filter.updateComplete
+    expect(said.at(-1)?.valueMissing).toBe(true)
+  })
+})

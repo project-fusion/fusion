@@ -258,3 +258,27 @@ describe('radio group disabled cascades', () => {
     expect(first.disabled).toBe(true)
   })
 })
+
+describe('radio group after a reset', () => {
+  test('a reset forgets the failed attempt along with the answer', async () => {
+    /* Submitting empty marks the field touched, which is what shows the
+       message. A reset that kept the mark put "Choose one to continue." over
+       the emptied group at once, before the reader had tried anything. */
+    document.body.innerHTML = `<form><helix-headless-radio-group label="Label" name="r" required>
+      <helix-headless-radio value="a">A</helix-headless-radio>
+    </helix-headless-radio-group></form>`
+    const host = document.querySelector('helix-headless-radio-group') as unknown as Updatable & {
+      formResetCallback(): void
+      internals: ElementInternals
+      value: string
+    }
+    await settle(host)
+    host.dispatchEvent(new Event('invalid'))
+    host.value = 'a'
+    await settle(host)
+    host.formResetCallback()
+    await settle(host)
+    expect(host.value).toBe('')
+    expect(host.internals.ariaInvalid).toBeNull()
+  })
+})

@@ -537,7 +537,9 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     for (const time of times) {
       data.append(this.name, time)
     }
-    this.internals.setFormValue(data)
+    /* The value as the state, or the browser keeps the form data as it and
+       hands that back on a restore, where the value is read as a string. */
+    this.internals.setFormValue(data, this.value)
   }
 
   /**

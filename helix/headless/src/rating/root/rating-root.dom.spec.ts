@@ -203,7 +203,8 @@ describe('the lowest score a rating offers', () => {
     expect(
       (host as unknown as { internals: ElementInternals }).internals.validity.valueMissing,
     ).toBe(true)
-    expect(formValue(host)).toBe('')
+    // Nothing submitted, as a radio group submits nothing: an empty entry reads as an answer.
+    expect(formValue(host)).toBeNull()
   })
 
   test('is what clearing returns to, which is what the property always meant', async () => {
