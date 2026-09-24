@@ -164,6 +164,38 @@
   stroke-width: calc(var(--helix-border-thick) * 2);
 }
 
+/* **The ends of a selected connection**, which a press picks up, a click as
+   well as a drag. Over the cards, since each sits on the point of the card it
+   arrives at, and filled, so it reads as the connection's rather than the
+   card's hollow point under it. */
+[part="edge-end"] {
+  background-color: var(--helix-color-accent);
+  block-size: var(--canvas-handle-size, 0.625rem);
+  border: var(--helix-border-thick) solid var(--helix-color-surface);
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  cursor: grab;
+  inline-size: var(--canvas-handle-size, 0.625rem);
+  left: var(--_canvas-end-x);
+  position: absolute;
+  top: var(--_canvas-end-y);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+/* A reach larger than the dot, for the reason a card's points have one. */
+[part="edge-end"]::after {
+  content: "";
+  inset: calc(var(--helix-space-sm) * -1);
+  position: absolute;
+}
+
+/* While something a click picked up follows the pointer, the board says it is
+   in hand until the next press puts it down. */
+:host(:state(holding)) [part="viewport"] {
+  cursor: grabbing;
+}
+
 /* **The field sits where the label does**, on the plane, so it scales and
    moves with the board and a reader types where they were looking. Over the
    cards, which it is placed after. A group's name is above its box, so its

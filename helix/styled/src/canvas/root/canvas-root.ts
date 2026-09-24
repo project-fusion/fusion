@@ -7,7 +7,7 @@ import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './canvas-root.css.js'
 
 /**
- * @summary Draws a JSON Canvas document, read-only.
+ * @summary A board of cards and the connections between them, which a reader can walk, rearrange and connect.
  *
  * @description
  * **Cards and connections say what they mean with `tone`**, the word every

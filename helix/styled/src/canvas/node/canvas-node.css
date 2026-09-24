@@ -301,6 +301,35 @@
   top: 100%;
 }
 
+/* **The handle a selected card is moved by without dragging it**: a click
+   picks the card up and the next puts it down. A pill of grip dots above the
+   top edge, near its start and clear of the corner grip. Not over the middle,
+   which is where a connection arriving from above lands: there a line ran
+   through it. */
+[part~="move"] {
+  background-color: var(--helix-color-surface);
+  background-image: radial-gradient(circle, var(--helix-color-accent) 1px, transparent 1.5px);
+  background-position: center;
+  background-size: 0.375rem 0.3125rem;
+  block-size: var(--canvas-move-block-size, 0.75rem);
+  border: var(--helix-border-thin) solid var(--helix-color-accent);
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  cursor: move;
+  inline-size: var(--canvas-move-inline-size, 1.5rem);
+  left: calc(var(--canvas-move-inline-size, 1.5rem) / 2 + var(--helix-space-sm));
+  position: absolute;
+  top: calc(var(--canvas-move-offset, 1rem) * -1);
+  transform: translate(-50%, -50%);
+}
+
+/* A reach larger than the pill, for the reason the handles have one. */
+[part~="move"]::after {
+  content: "";
+  inset: calc(var(--helix-space-2xs) * -1);
+  position: absolute;
+}
+
 /* **Shapes a box can draw are a radius**: square has none, pill is round at
    the ends, and a circle is the box's own ellipse. Each meets the middle of
    every side, which is where connections arrive. */

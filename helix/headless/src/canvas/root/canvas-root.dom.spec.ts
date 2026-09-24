@@ -1555,3 +1555,177 @@ describe('canvas document detail', () => {
     expect(edges[1]?.hasAttribute('marker-end')).toBe(false)
   })
 })
+
+/**
+ * Every drag, done with clicks instead, which WCAG 2.5.7 asks of it: a click on
+ * a card's move handle, a corner, a connection point or a connection's end
+ * picks the thing up, it follows a pointer with no button down, and the next
+ * press puts it down where a drag let go there would have.
+ */
+describe('canvas without dragging', () => {
+  let id = 40
+  const pointer = (type: string, x: number, y: number): PointerEvent =>
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      buttons: type === 'pointermove' || type === 'pointerup' ? 0 : 1,
+      cancelable: true,
+      clientX: x,
+      clientY: y,
+      composed: true,
+      pointerId: id,
+      pointerType: 'mouse',
+    })
+  /** The board a press lands on, where a card is not under it. */
+  const plane = (host: Canvas): HTMLElement => part(host, 'viewport') as HTMLElement
+  /** A press and a release in one place, which is a click and picks up. */
+  const click = (on: Element, x: number, y: number): void => {
+    on.dispatchEvent(pointer('pointerdown', x, y))
+    on.dispatchEvent(pointer('pointerup', x, y))
+  }
+  const selected = async (key: string): Promise<Canvas> => {
+    const host = (await canvas()) as Canvas & { selected: string }
+    host.selected = key
+    await host.updateComplete
+    await host.updateComplete
+    return host
+  }
+
+  test("a click on a selected card's handle picks it up, and the next click puts it down", async () => {
+    const host = await selected('c')
+    const said: unknown[] = []
+    host.addEventListener('helix-move', (event) => said.push((event as CustomEvent).detail))
+    const handle = card(host, 'c').shadowRoot?.querySelector('[part="move"]') as Element
+    expect(handle).not.toBeNull()
+    id += 1
+    click(handle, 10, 10)
+    await host.updateComplete
+    expect(hasState(host, 'holding')).toBe(true)
+    // It follows a pointer with no button down, and nothing is said until it lands.
+    host.dispatchEvent(pointer('pointermove', 30, 20))
+    await host.updateComplete
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([150, 310])
+    expect(said).toEqual([])
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.dispatchEvent(pointer('pointerdown', 50, 30))
+    viewport.dispatchEvent(pointer('pointerup', 50, 30))
+    await host.updateComplete
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([170, 320])
+    expect(said).toEqual([{ nodes: [{ name: 'c', x: 170, y: 320 }] }])
+    expect(hasState(host, 'holding')).toBe(false)
+  })
+
+  test('Escape puts back what a click picked up, and says nothing moved', async () => {
+    const host = await selected('c')
+    let moved = false
+    host.addEventListener('helix-move', () => {
+      moved = true
+    })
+    id += 1
+    click(card(host, 'c').shadowRoot?.querySelector('[part="move"]') as Element, 10, 10)
+    host.dispatchEvent(pointer('pointermove', 50, 30))
+    await host.updateComplete
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+    await host.updateComplete
+    expect([card(host, 'c').x, card(host, 'c').y]).toEqual([130, 300])
+    expect(moved).toBe(false)
+    expect(hasState(host, 'holding')).toBe(false)
+  })
+
+  test('a click on a connection point starts a connection, and a click on a card ends it', async () => {
+    const host = await canvas()
+    const asked: unknown[] = []
+    host.addEventListener('helix-connect', (event) => asked.push((event as CustomEvent).detail))
+    const handle = card(host, 'a').shadowRoot?.querySelector('[part~="handle-right"]') as Element
+    id += 1
+    click(handle, 0, 0)
+    await host.updateComplete
+    expect(asked).toEqual([])
+    host.dispatchEvent(pointer('pointermove', ...onScreen(host, 230, 308)))
+    await host.updateComplete
+    expect(part(host, 'draft')).not.toBeNull()
+    const putDown = pointer('pointerdown', ...onScreen(host, 230, 308))
+    plane(host).dispatchEvent(putDown)
+    await host.updateComplete
+    expect(asked).toEqual([{ from: 'a', fromSide: 'right', to: 'c', toSide: 'top' }])
+    // It moves nothing else: no focus to the card it landed on, and so no selection.
+    expect(putDown.defaultPrevented).toBe(true)
+  })
+
+  test('on touch, where nothing follows, the next tap is where it lands', async () => {
+    const host = await canvas()
+    const asked: unknown[] = []
+    host.addEventListener('helix-connect', (event) => asked.push((event as CustomEvent).detail))
+    const handle = card(host, 'a').shadowRoot?.querySelector('[part~="handle-right"]') as Element
+    id += 1
+    click(handle, 0, 0)
+    // A second finger, a new pointer, and no move between the two taps.
+    id += 1
+    plane(host).dispatchEvent(pointer('pointerdown', ...onScreen(host, 230, 308)))
+    await host.updateComplete
+    expect(asked).toEqual([{ from: 'a', fromSide: 'right', to: 'c', toSide: 'top' }])
+  })
+
+  test('a click on a corner picks it up, and the next click sets the size', async () => {
+    const host = await selected('c')
+    const said: unknown[] = []
+    host.addEventListener('helix-move', (event) => said.push((event as CustomEvent).detail))
+    id += 1
+    click(card(host, 'c').shadowRoot?.querySelector('[part~="grip-top-left"]') as Element, 0, 0)
+    plane(host).dispatchEvent(pointer('pointerdown', -20, 10))
+    // The same box a drag from the top left to there draws.
+    expect(said).toEqual([{ nodes: [{ height: 90, name: 'c', width: 220, x: 110, y: 310 }] }])
+  })
+
+  test('a selected connection has ends, and a click on one moves it', async () => {
+    const host = await selected('edge:e1')
+    const said: unknown[] = []
+    host.addEventListener('helix-reconnect', (event) => said.push((event as CustomEvent).detail))
+    const ends = host.shadowRoot?.querySelectorAll('[part="edge-end"]') ?? []
+    expect(ends).toHaveLength(2)
+    const arriving = host.shadowRoot?.querySelector('[part="edge-end"][data-end="to"]') as Element
+    id += 1
+    click(arriving, ...onScreen(host, 260, 50))
+    plane(host).dispatchEvent(pointer('pointerdown', ...onScreen(host, 230, 308)))
+    await host.updateComplete
+    expect(said).toEqual([
+      {
+        from: 'a',
+        fromSide: 'right',
+        name: 'e1',
+        to: 'c',
+        toSide: 'top',
+        was: { from: 'a', to: 'b' },
+      },
+    ])
+  })
+
+  test('a connection with no name stays selected when its end moves', async () => {
+    /* One is known by its two cards, so a moved end gives it a new key, and
+       the selection went on naming the old one: the connection just moved was
+       drawn as unselected. */
+    const unnamed = BOARD.replace('name="e1" from="a" to="b"', 'from="a" to="b"')
+    const host = (await canvas('', unnamed)) as Canvas & { selected: string }
+    host.selected = 'a->b'
+    await host.updateComplete
+    await host.updateComplete
+    const arriving = host.shadowRoot?.querySelector('[part="edge-end"][data-end="to"]') as Element
+    expect(arriving).not.toBeNull()
+    id += 1
+    click(arriving, ...onScreen(host, 260, 50))
+    plane(host).dispatchEvent(pointer('pointerdown', ...onScreen(host, 230, 308)))
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.selected).toBe('a->c')
+    expect(host.shadowRoot?.querySelector('[part="edge"][data-selected]')).not.toBeNull()
+  })
+
+  test('a read-only board has no handle and no ends to pick up', async () => {
+    const host = (await canvas('readonly')) as Canvas & { selected: string }
+    host.selected = 'c,edge:e1'
+    await host.updateComplete
+    await host.updateComplete
+    expect(card(host, 'c').shadowRoot?.querySelector('[part="move"]')).toBeNull()
+    expect(host.shadowRoot?.querySelector('[part="edge-end"]')).toBeNull()
+  })
+})
