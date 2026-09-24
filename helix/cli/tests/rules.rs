@@ -2264,6 +2264,33 @@ fn selectors() {
     );
 }
 
+/// A mixin may look up a part its own template renders, whichever host applies it.
+#[test]
+fn selectors_in_a_mixin() {
+    plant(
+        "selectors",
+        &[
+            ("helix.json", TIERS),
+            (
+                "src/mixins/mixin-pad.ts",
+                "export const MixinPad = (Base) => class extends Base {\n  get pad() {\n    return this.renderRoot?.querySelector('[part=\"pad\"]');\n  }\n  renderPad() {\n    return `<div part=\"pad\"></div>`;\n  }\n}\n",
+            ),
+            (
+                "src/board/board.ts",
+                "export class Board extends MixinPad(HTMLElement) {\n  render() {\n    return `<div part=\"plane\"></div>`;\n  }\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "src/mixins/mixin-pad.ts",
+                "export const MixinPad = (Base) => class extends Base {\n  get pad() {\n    return this.renderRoot?.querySelector('[part=\"pad\"]');\n  }\n}\n",
+            );
+        },
+        "looks up `[part=\"pad\"]`",
+        "src/mixins/mixin-pad.ts",
+    );
+}
+
 #[test]
 fn separation() {
     let sheet = |lift: &str| {

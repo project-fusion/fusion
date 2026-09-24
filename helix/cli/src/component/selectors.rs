@@ -574,7 +574,13 @@ fn lookups(context: &Context, survey: &Survey, findings: &mut Vec<Finding>) {
             `parts` credits what a mixin renders to every host in its chain. So
             its lookups are read against the union of what its hosts render, and
             reported only when no host renders the name. A family's own lookups
-            are read against the family, as before. */
+            are read against the family, as before.
+
+            **And against what the mixin renders itself**, which the union left
+            out: `MixinViewport` draws the controls from its own template, so a
+            lookup of them there was reported as reading a part nothing renders,
+            and the only way to measure the cluster was a lookup in the host
+            that this rule then reported instead. */
             let mixins: Vec<String> = MIXIN
                 .captures_iter(&text)
                 .map(|one| one[1].to_owned())
@@ -585,7 +591,8 @@ fn lookups(context: &Context, survey: &Survey, findings: &mut Vec<Finding>) {
                     survey.in_family.get(family).cloned().unwrap_or_default(),
                 )
             } else {
-                let mut union = BTreeSet::new();
+                let mut union: BTreeSet<String> =
+                    written(&flattened(&code)).into_iter().collect();
                 for (class, bases) in &survey.bases {
                     if bases.iter().any(|base| mixins.contains(base)) {
                         if let Some(host) = survey.family_of.get(class) {
