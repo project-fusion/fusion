@@ -539,8 +539,17 @@ describe('canvas connections and removal', () => {
     expect(hasState(card(host, 'c'), 'target')).toBe(true)
     host.dispatchEvent(pointer('pointerup', 282, 360))
     await host.updateComplete
+    /* The end that stayed keeps the side it was drawn on, First's right,
+       and says so, so what lands is what the reader was shown. */
     expect(said).toEqual([
-      { from: 'a', name: 'e1', to: 'c', toSide: 'top', was: { from: 'a', to: 'b' } },
+      {
+        from: 'a',
+        fromSide: 'right',
+        name: 'e1',
+        to: 'c',
+        toSide: 'top',
+        was: { from: 'a', to: 'b' },
+      },
     ])
     const moved = host.querySelector('[name="e1"]') as HTMLElement & { to: string; toSide?: string }
     expect([moved.to, moved.toSide]).toEqual(['c', 'top'])
@@ -571,6 +580,29 @@ describe('canvas connections and removal', () => {
     host.dispatchEvent(pointer('pointermove', 600, 600))
     host.dispatchEvent(pointer('pointerup', 600, 600))
     expect(removed).toEqual([{ edges: [{ from: 'a', name: 'e1', to: 'b' }], nodes: [] }])
+  })
+
+  test('the end that stays does not move while the other is dragged', async () => {
+    const host = await canvas()
+    const pointer = (type: string, x: number, y: number) =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: y,
+        composed: true,
+        pointerId: 14,
+      })
+    /* e1 leaves First's right side, at (200, 50), which is (252, 102) on the
+       plane. Its arriving end is dragged down and to the left, where First's
+       bottom side is nearer the pointer than its right: a side worked out
+       again on every move would jump there. */
+    connection(host, 'edge:e1').dispatchEvent(pointer('pointerdown', 305, 102))
+    host.dispatchEvent(pointer('pointermove', 40, 600))
+    await host.updateComplete
+    await host.updateComplete
+    expect(part(host, 'draft')?.getAttribute('d')).toMatch(/^M 252 102 /)
+    host.dispatchEvent(pointer('pointercancel', 40, 600))
   })
 
   test('a press on a connection lights no cards until it becomes a drag', async () => {
@@ -628,7 +660,9 @@ describe('canvas connections and removal', () => {
       'Moving the end of the connection from First to Second',
     )
     press(card(host, 'c'), 'Enter')
-    expect(said).toEqual([{ from: 'a', name: 'e1', to: 'c', was: { from: 'a', to: 'b' } }])
+    expect(said).toEqual([
+      { from: 'a', fromSide: 'right', name: 'e1', to: 'c', was: { from: 'a', to: 'b' } },
+    ])
   })
 
   test('Delete on a card asks for it and every connection it would strand', async () => {

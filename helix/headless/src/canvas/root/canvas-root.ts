@@ -823,11 +823,21 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     const stays = moving === 'to' ? edge.fromNode : edge.toNode
+    /* **The end that stays keeps the side it is drawn on**, named or not. An
+       end with no side named is drawn at whichever faces the other card, and
+       the other card is what the reader is moving: left to work it out again,
+       the end that was meant to stay slid round its card with the pointer and
+       jumped again over every card it passed, and read as a different
+       connection being picked up. */
+    const byId = new Map(this.nodes.map((one) => [one.id, one]))
+    const fromNode = byId.get(edge.fromNode)
+    const toNode = byId.get(edge.toNode)
+    const drawn = fromNode && toNode ? ends(edge, fromNode, toNode) : undefined
     this.linking = {
       edge: key,
       from: stays,
       moving,
-      side: moving === 'to' ? edge.fromSide : edge.toSide,
+      side: moving === 'to' ? drawn?.fromSide : drawn?.toSide,
       ...(pointer ? { at: this.toDocument(pointer), pointer: pointer.pointerId } : {}),
     }
     this.said = pointer
@@ -869,14 +879,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
             to: edge.toNode,
             was: { from: edge.fromNode, to: edge.toNode },
             ...(toSide === undefined ? {} : { fromSide: toSide }),
-            ...(edge.toSide === undefined ? {} : { toSide: edge.toSide }),
+            ...(linking.side === undefined ? {} : { toSide: linking.side }),
           }
         : {
             from: edge.fromNode,
             name: edge.id,
             to: arriving,
             was: { from: edge.fromNode, to: edge.toNode },
-            ...(edge.fromSide === undefined ? {} : { fromSide: edge.fromSide }),
+            ...(linking.side === undefined ? {} : { fromSide: linking.side }),
             ...(toSide === undefined ? {} : { toSide }),
           }
     this.said = ''
