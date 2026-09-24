@@ -964,6 +964,13 @@ export class HelixHeadlessCarousel extends HelixElement {
        the way out is only rebuilt here. The panes outlive the move, being in the
        shadow root, so there is one to watch already. */
     this.watchPane()
+    /* And the rotation, which the disconnect cleared and only `updated`
+       restarts: a carousel moved in the DOM kept showing pause over slides that
+       had stopped. From the state, so rotation the reader stopped stays
+       stopped. */
+    if (this.hasUpdated) {
+      this.runTimer()
+    }
   }
 
   override disconnectedCallback(): void {

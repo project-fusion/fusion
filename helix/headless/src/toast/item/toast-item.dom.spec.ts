@@ -88,4 +88,17 @@ describe('one toast message', () => {
     expect(timed?.getAttribute('aria-hidden')).toBe('true')
     expect(part(await message(), 'timer')).toBeNull()
   })
+
+  test('a message moved in the page still goes when its time is up', async () => {
+    /* A framework moves nodes for ordinary reasons, and the clock started once,
+       in `firstUpdated`: the disconnect stopped it and nothing started it
+       again, so a moved message stayed on screen for good. */
+    const item = await message('duration="40"')
+    const elsewhere = document.createElement('div')
+    document.body.append(elsewhere)
+    elsewhere.append(item)
+    await new Promise((resolve) => setTimeout(resolve, 120))
+    await item.updateComplete
+    expect(item.open).toBe(false)
+  })
 })

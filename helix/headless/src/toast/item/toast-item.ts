@@ -197,12 +197,24 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     }
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback()
+    /* The clock again after a move, from what was left of it: the disconnect
+       paused it, and `firstUpdated` happens once, so a message a framework
+       moved stayed on screen for good. */
+    if (this.hasUpdated && this.open) {
+      this.resume()
+    }
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    // A message removed while its timer is running would otherwise fire into
-    // nothing, and hold the item alive until it did.
-    clearTimeout(this.timer)
-    this.timer = undefined
+    /* Paused rather than cleared, so a move keeps the time already spent: a
+       message removed while its timer is running would otherwise fire into
+       nothing, and hold the item alive until it did. The holds go with it,
+       since a pointer or focus on a detached message never leaves it. */
+    this.pause()
+    this.holds = 0
   }
 
   protected override willUpdate(changed: PropertyValues): void {

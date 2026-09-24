@@ -34,19 +34,38 @@ export class RemotePlaybackController implements ReactiveController {
     host.addController(this)
   }
 
+  /** Whether the host is in the document, which a watch is only kept while. */
+  private connected = false
+
   /** Starts watching the media element, once there is one. */
   async attach(media: HTMLMediaElement): Promise<void> {
     this.media = media
     media.remote?.addEventListener?.('connect', this.handleState)
     media.remote?.addEventListener?.('disconnect', this.handleState)
-    const remote = media.remote
-    if (!remote?.watchAvailability) {
+    await this.start()
+  }
+
+  /**
+   * Asks to hear when a device turns up or goes, for the media attached.
+   *
+   * **A watch that arrives after the host has gone is cancelled on arrival.**
+   * The platform answers asynchronously, and a video removed while it did kept
+   * a watch nothing would cancel.
+   */
+  private async start(): Promise<void> {
+    const remote = this.media?.remote
+    if (!remote?.watchAvailability || this.watch !== undefined) {
       return
     }
     try {
-      this.watch = await remote.watchAvailability((available) => {
+      const watch = await remote.watchAvailability((available) => {
         this.report.available(available)
       })
+      if (!this.connected || this.watch !== undefined) {
+        void remote.cancelWatchAvailability?.(watch)
+        return
+      }
+      this.watch = watch
     } catch {
       /* Refused where the media is not remotable, which is a fact about the
          source rather than an error to report: the control stays off. */
@@ -63,7 +82,19 @@ export class RemotePlaybackController implements ReactiveController {
     }
   }
 
+  /**
+   * Watches again after a move. The disconnect cancelled it, and `attach` is
+   * called once, so the control kept whatever it last knew about devices.
+   */
+  hostConnected(): void {
+    this.connected = true
+    if (this.media) {
+      void this.start()
+    }
+  }
+
   hostDisconnected(): void {
+    this.connected = false
     if (this.watch !== undefined) {
       void this.media?.remote?.cancelWatchAvailability?.(this.watch)
       this.watch = undefined

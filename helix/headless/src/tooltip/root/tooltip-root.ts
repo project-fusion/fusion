@@ -659,6 +659,16 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     )
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback()
+    /* Bound again on a move, since the disconnect unbinds and `firstUpdated`
+       happens once: a tooltip in a list a framework reordered stopped opening.
+       Only on a re-connect, the first waiting for `firstUpdated`. */
+    if (this.hasUpdated) {
+      this.bind()
+    }
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.unbind()

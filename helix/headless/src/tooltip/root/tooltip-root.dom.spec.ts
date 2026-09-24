@@ -181,6 +181,17 @@ describe('tooltip', () => {
     await tip.updateComplete
     expect(part(tip, 'tooltip')?.matches(':popover-open') ?? false).toBe(false)
   })
+
+  test('a tooltip moved in the page still opens', async () => {
+    /* Its trigger is bound in `firstUpdated` and unbound on the way out, so a
+       tooltip in a list a framework reordered never opened again. */
+    const tip = await tooltip()
+    const elsewhere = document.createElement('div')
+    document.body.append(elsewhere)
+    elsewhere.append(tip)
+    await focusTrigger(tip)
+    expect(tip.open).toBe(true)
+  })
 })
 
 describe('tooltip for', () => {

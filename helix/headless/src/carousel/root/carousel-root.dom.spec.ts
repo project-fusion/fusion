@@ -149,6 +149,19 @@ describe('carousel', () => {
     const buttons = [...(cal.shadowRoot?.querySelectorAll('[part="controls"] button') ?? [])]
     expect(buttons[0]?.getAttribute('part')).toBe('rotation')
   })
+
+  test('rotation carries on after the carousel is moved in the page', async () => {
+    /* The disconnect clears the interval and only `updated` starts it, which
+       a move does not ask for: the control said pause over slides that had
+       stopped. Read straight after the move, because happy-dom renders again
+       on a reconnect for reasons of its own and a browser does not, so waiting
+       for a slide to turn passes here against the bug. */
+    const cal = await carousel('autoplay interval="30"')
+    const elsewhere = document.createElement('div')
+    document.body.append(elsewhere)
+    elsewhere.append(cal)
+    expect((cal as unknown as { timer: unknown }).timer).toBeDefined()
+  })
 })
 
 describe('carousel naming', () => {

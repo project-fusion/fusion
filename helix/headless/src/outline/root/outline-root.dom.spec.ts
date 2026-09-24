@@ -110,4 +110,44 @@ describe('outline scrolling', () => {
     stale.dispatchEvent(event)
     expect(event.defaultPrevented).toBe(false)
   })
+
+  test('an outline removed before its scroll lands leaves nothing on the document', async () => {
+    /* A route change a moment after a click is the case: the `scrollend`
+       listener held the outline until the next page scrolled, and ran on it
+       then. Two clicks before the first landed left two. */
+    const waiting = new Set<EventListenerOrEventListenerObject>()
+    const add = document.addEventListener.bind(document)
+    const remove = document.removeEventListener.bind(document)
+    document.addEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions,
+    ) => {
+      if (type === 'scrollend') {
+        waiting.add(listener)
+      }
+      add(type, listener, options)
+    }) as typeof document.addEventListener
+    document.removeEventListener = ((
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | EventListenerOptions,
+    ) => {
+      if (type === 'scrollend') {
+        waiting.delete(listener)
+      }
+      remove(type, listener, options)
+    }) as typeof document.removeEventListener
+    try {
+      const { outline, root } = await page()
+      press(root, '#one')
+      press(root, '#two')
+      expect(waiting.size).toBe(1)
+      outline.remove()
+      expect(waiting.size).toBe(0)
+    } finally {
+      document.addEventListener = add
+      document.removeEventListener = remove
+    }
+  })
 })
