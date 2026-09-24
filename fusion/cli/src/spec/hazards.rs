@@ -179,6 +179,10 @@ pub fn run(context: &Context) -> Report {
             for form in [
                 format!("from '{name}'"),
                 format!("from \"{name}\""),
+                /* And for its side effect alone, which is the form that most
+                plainly registers a second copy. */
+                format!("import '{name}'"),
+                format!("import \"{name}\""),
                 format!("import('{name}')"),
                 format!("import(\"{name}\")"),
             ] {

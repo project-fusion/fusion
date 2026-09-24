@@ -30,6 +30,7 @@
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 
 use fusion_rules::walk::crawl;
 use regex::{Regex, RegexBuilder};
@@ -124,7 +125,16 @@ fn inflected(pairs: &BTreeMap<String, String>) -> Dialect {
         american.insert(british.clone(), wanted.clone());
     }
     for (british, wanted) in pairs {
+        /* A British stem ending in `e` that the American one drops takes its
+        `d` and `r` from that `e`, so the American form cannot be the stem plus
+        the same letter: `catalogued` made `catalogd`. Which spelling it wants
+        instead is a fact about the word, `cataloged` but `programmed`, so those
+        are for a written pair, and none is manufactured. */
+        let drops_e = british.ends_with('e') && !wanted.ends_with('e');
         for suffix in SUFFIXES {
+            if drops_e && matches!(suffix, "d" | "r" | "rs") {
+                continue;
+            }
             let from = format!("{british}{suffix}");
             if COLLISIONS.contains(&from.as_str()) {
                 continue;
@@ -176,15 +186,34 @@ fn like(source: &str, replacement: &str) -> String {
     replacement.to_owned()
 }
 
+/// An address in a line, which names a thing rather than saying a word.
+static ADDRESS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"[a-z][a-z0-9+.-]*://\S+|\]\([^)\s]*\)").expect("a literal pattern compiles")
+});
+
+/// The spans of a line that are addresses: a URL, or a Markdown link's target.
+///
+/// **A word inside one is somebody's path, not prose.** Rewriting the file
+/// name in an image link broke the picture it named, and a word in a URL the
+/// page it led to, and neither is anything a reader was taught a spelling by.
+fn addresses(line: &str) -> Vec<std::ops::Range<usize>> {
+    ADDRESS.find_iter(line).map(|found| found.range()).collect()
+}
+
 /// One line, every pair applied. No pattern spans a newline, so this is whole.
 fn sweep(line: &str, dialect: &Dialect) -> String {
     if !dialect.british.is_match(line) {
         return line.to_owned();
     }
+    let spared = addresses(line);
     dialect
         .british
         .replace_all(line, |caught: &regex::Captures| {
             let word = &caught[0];
+            let at = caught.get(0).map_or(0, |one| one.start());
+            if spared.iter().any(|span| span.contains(&at)) {
+                return word.to_owned();
+            }
             dialect.wanted(word).unwrap_or_else(|| word.to_owned())
         })
         .into_owned()
@@ -268,9 +297,11 @@ pub fn run(context: &Context) -> Report {
             sweep decides what gets written; this decides what gets said, and
             the two have to agree, so both ask the same question of the same
             word. One finding per line, because a line is what a person opens. */
+            let spared = addresses(line);
             let Some((word, fixed)) = dialect
                 .british
                 .find_iter(line)
+                .filter(|found| !spared.iter().any(|span| span.contains(&found.start())))
                 .find_map(|found| Some((found.as_str(), dialect.wanted(found.as_str())?)))
             else {
                 continue;

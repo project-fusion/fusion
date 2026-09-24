@@ -367,7 +367,7 @@ pub fn run(context: &Context) -> Report {
         Regex::new(r"onhelix-([a-z][a-z0-9-]*)").expect("a literal pattern compiles")
     });
     static LISTENED: LazyLock<Regex> = LazyLock::new(|| {
-        Regex::new(r"addEventListener\(\s*'(helix-[a-z0-9-]+)'")
+        Regex::new(r#"addEventListener\(\s*['"](helix-[a-z0-9-]+)['"]"#)
             .expect("a literal pattern compiles")
     });
     static DISPATCHED: LazyLock<Regex> = LazyLock::new(|| {

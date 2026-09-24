@@ -112,7 +112,8 @@ fn address(tail: &str) -> String {
         .split(['?', '#'])
         .next()
         .unwrap_or_default()
-        .trim_end_matches(['.', ',', ';', ':', '!']);
+        /* Emphasis around a bare URL too, `**` or `_`, which sticks to it. */
+        .trim_end_matches(['.', ',', ';', ':', '!', '*', '_']);
     if path.is_empty() || path == "/" {
         return "/".to_owned();
     }

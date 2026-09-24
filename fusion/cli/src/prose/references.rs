@@ -47,16 +47,13 @@ use std::fs;
 use std::path::Path;
 use std::sync::LazyLock;
 
+use fusion_rules::source::comments;
 use fusion_rules::walk::crawl;
 use regex::Regex;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
 
-static BLOCK: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
-static LINE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"//[^\n]*").expect("a literal pattern compiles"));
 static PATH: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?i)`([a-z][\w./-]*/[\w.-]+)`").expect("a literal pattern compiles")
 });
@@ -229,11 +226,9 @@ pub fn run(context: &Context) -> Report {
             continue;
         };
         let scripts = scripts_for(&context.root, file);
-        for comment in BLOCK
-            .find_iter(&source)
-            .chain(LINE.find_iter(&source))
-            .map(|one| one.as_str())
-        {
+        /* The lexer's comments, so a `//` in a string or a URL is not one,
+        and a glob's opening star does not swallow the code after it. */
+        for comment in comments(&source).into_iter().map(|span| &source[span]) {
             for caught in PATH.captures_iter(comment) {
                 let path = caught[1].to_owned();
                 /* Rooted at the repository, so an illustrative path is left
