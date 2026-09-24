@@ -52,12 +52,6 @@
   padding: var(--helix-space-2xs) var(--helix-space-xs);
 }
 
-:host(:state(fullscreen)) [part="region"] {
-  block-size: 100dvh;
-  border: none;
-  border-radius: 0;
-}
-
 /* **Printed as it stands rather than hidden.** A map is the content of the page
    it is on often enough that dropping it would be the surprising answer, and
    the controls are the part that means nothing on paper. */
