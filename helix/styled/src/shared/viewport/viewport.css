@@ -1,0 +1,131 @@
+/*
+ *  The controls a pan-and-zoom surface draws, and the corner they sit in.
+ *
+ * **Shared now that a second family composes it**, which is the bar `shared`
+ * holds: `Map` had these alone and they stayed in its own sheet, and `Canvas`
+ * arriving is what makes them a shared thing rather than one family's. Nothing
+ * in here is geographic or documentary: the cluster, its corners and the rules
+ * that lay it out for whichever controls are present are the same for a frame
+ * around somebody else's tiles and a board drawn from a document. What differs
+ * is the well behind them, which each family keeps.
+ */
+/* **Over the map rather than beside it**, which is where every map puts its
+   controls and what keeps the viewport the size the consumer asked for. */
+[part="controls"] {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  /* **Three columns for the pad and a fourth for the rest.** Sharing a column
+     put the right arrow directly under the up arrow, which reads as a stack
+     rather than a pad: a reader looking for "right" found it where "down"
+     belongs. The center stays empty, because the thing that belongs there is a
+     recenter control and this frame does not know where center is. */
+  grid-template-areas:
+    ".      up    .      zoomin"
+    "start  .     end    zoomout"
+    ".      down  .      full";
+  position: absolute;
+  /* The corner, which the host says and this reads. Logical insets, so a
+     right-to-left page moves them without a consumer writing a second rule. */
+  inset-block-start: var(--helix-space-sm);
+  inset-inline-end: var(--helix-space-sm);
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* **The cluster is laid out for the controls that are there.** `controls` is a
+   list, so `~=` asks it the same way the attribute is written: with the zoom
+   column gone, a fullscreen button left in its track floats a cell away from
+   the pad with nothing between them, and with the pad gone three empty columns
+   hold the zoom stack out from the corner it is supposed to sit in. */
+:host([controls]:not([controls~="zoom"])) [part="controls"] {
+  grid-template-areas:
+    ".      up    ."
+    "start  .     end"
+    ".      down  full";
+}
+
+:host([controls]:not([controls~="pan"])) [part="controls"] {
+  grid-template-areas:
+    "zoomin"
+    "zoomout"
+    "full";
+}
+
+/* Said as well as defaulted, so a consumer can put the controls back in the
+   resting corner from markup rather than by removing an attribute. */
+:host([controls-placement="top-end"]) [part="controls"] {
+  inset-block: var(--helix-space-sm) auto;
+  inset-inline: auto var(--helix-space-sm);
+}
+
+/* **A corner each, because there is no safe default.** MapLibre puts its own
+   controls at the top end, Leaflet and OpenLayers at the top start, Google's
+   zoom at the bottom end: whichever corner this frame took would land on
+   somebody's, which is why every one of those libraries made it a setting too.
+   The shorthand rather than the two longhands, so one rule replaces both edges
+   and a corner cannot be left half-set. */
+:host([controls-placement="top-start"]) [part="controls"] {
+  inset-block: var(--helix-space-sm) auto;
+  inset-inline: var(--helix-space-sm) auto;
+}
+
+:host([controls-placement="bottom-end"]) [part="controls"] {
+  inset-block: auto var(--helix-space-sm);
+  inset-inline: auto var(--helix-space-sm);
+}
+
+:host([controls-placement="bottom-start"]) [part="controls"] {
+  inset-block: auto var(--helix-space-sm);
+  inset-inline: var(--helix-space-sm) auto;
+}
+
+[part="pan-up"] {
+  grid-area: up;
+}
+[part="pan-down"] {
+  grid-area: down;
+}
+[part="pan-start"] {
+  grid-area: start;
+}
+[part="pan-end"] {
+  grid-area: end;
+}
+[part="zoom-in"] {
+  grid-area: zoomin;
+}
+[part="zoom-out"] {
+  grid-area: zoomout;
+}
+[part="fullscreen"] {
+  grid-area: full;
+}
+
+[part="controls"] button {
+  align-items: center;
+  background-color: var(--map-control-background-color, var(--helix-color-surface-overlay));
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  block-size: var(--helix-size-control-sm);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inline-size: var(--helix-size-control-sm);
+  justify-content: center;
+  padding: 0;
+}
+
+/* **The ring goes where the focus is, which is the button.** The frame wore one
+   on `:focus-within` and it was two lines that never met: the region carries its
+   own border, so an inset ring drew a second edge inside the first with a gap
+   between them, and it was drawn for a focus that was never on the frame. A
+   reader tabs to a control, so the control says so. */
+[part="controls"] button:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="controls"] button:hover {
+  background-color: var(--helix-color-surface-raised);
+}

@@ -2,12 +2,7 @@ import { html, type LitElement, nothing, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { FullscreenController } from '../../controllers/fullscreen-controller/fullscreen-controller.js'
 import { IdleController } from '../../controllers/idle-controller/idle-controller.js'
-import {
-  HelixMapPanEvent,
-  HelixMapZoomEvent,
-  type ViewportPanDetail,
-  type ViewportZoomDetail,
-} from '../../events/events.js'
+import type { ViewportPanDetail, ViewportZoomDetail } from '../../events/events.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -227,19 +222,27 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     }
 
     /**
-     * The pan event, built and not dispatched.
+     * The pan event, which the family names and this one does not.
      *
-     * A factory for the reason `MixinDismissible` has one: the surface is
-     * shared and the name is not. `Map` sends `helix-map-pan` because that is
-     * what a consumer of a map listens for, and the next family names its own.
+     * **No default, and the analyzer is why as much as the taste is.** A mixin
+     * that built a `helix-map-pan` would put it in the manifest of every family
+     * that composed the surface, since a mixin's code is resolved into its
+     * users: a canvas would be documented as dispatching a map's event, and a
+     * consumer reading the reference page would believe it. So the surface
+     * carries no event name at all, and a family that forgets to name one hears
+     * about it the first time a reader presses an arrow.
      */
-    protected panEvent(detail: ViewportPanDetail): Event {
-      return new HelixMapPanEvent(detail)
+    protected panEvent(_detail: ViewportPanDetail): Event {
+      throw new Error(
+        `<${this.localName}> composes MixinViewport and must implement panEvent(), the surface naming no event of its own.`,
+      )
     }
 
-    /** The zoom event, built and not dispatched, for the same reason. */
-    protected zoomEvent(detail: ViewportZoomDetail): Event {
-      return new HelixMapZoomEvent(detail)
+    /** The zoom event, which the family names, for the same reason. */
+    protected zoomEvent(_detail: ViewportZoomDetail): Event {
+      throw new Error(
+        `<${this.localName}> composes MixinViewport and must implement zoomEvent(), the surface naming no event of its own.`,
+      )
     }
 
     /** Asks for the view to move, which the consumer answers. */

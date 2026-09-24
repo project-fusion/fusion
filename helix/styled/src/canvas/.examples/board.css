@@ -1,0 +1,9 @@
+/* **A pinned box, because what a board opens showing is a fraction of one.** A
+   page a few pixels wider would otherwise crop a different edge, which is true
+   of any consumer's layout and in an example makes one document render two ways.
+   Sizing the region here is also the honest demonstration of `::part`, which is
+   how a consumer reaches inside. */
+helix-canvas::part(region) {
+  block-size: 26rem;
+  inline-size: 28rem;
+}
