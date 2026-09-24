@@ -72,9 +72,10 @@ helix-headless-canvas::part(arrow) {
 helix-headless-canvas::part(label) {
   fill: var(--_gray-muted);
   font-size: 0.75rem;
-  paint-order: stroke;
-  stroke: var(--_gray-subtle);
-  stroke-width: 4px;
+}
+
+helix-headless-canvas::part(label-ground) {
+  flood-color: var(--_gray-subtle);
 }
 
 helix-headless-canvas::part(draft) {
