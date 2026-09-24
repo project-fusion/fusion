@@ -312,6 +312,10 @@ fn survey(context: &Context) -> Survey {
                 }
             }
             if stylesheet {
+                /* Comments blanked, or a `var()` in a sentence explaining a
+                hook answered for it as a read, and the hook no rule reads was
+                never reported. */
+                let text = blanked(&text);
                 for found in WRITES.captures_iter(&text) {
                     if ours(&found[1]) {
                         survey
@@ -531,7 +535,9 @@ fn judge(survey: &Survey, context: &Context) -> Vec<Finding> {
 
     for (name, path) in &survey.misplaced {
         findings.push(Finding {
-            detail: "The analyzer reads the block the element is declared on, so a hook                      documented on a property is API the reference page never lists, while                      this rule reads the source and pairs it happily."
+            detail: "The analyzer reads the block the element is declared on, so a hook \
+                     documented on a property is API the reference page never lists, while \
+                     this rule reads the source and pairs it happily."
                 .to_owned(),
             file: path.clone(),
             message: format!("documents `{name}` below the class block, where nothing collects it"),

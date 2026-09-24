@@ -6,9 +6,9 @@
 //! upgrades, and the attribute appears, so the served HTML and the live DOM
 //! disagree from the first frame, and nothing anywhere says so.
 //!
-//! **Three initializers are genuinely silent**: an absent one, an explicit
-//! `undefined`, and `false`, because a reflected boolean removes the attribute
-//! rather than writing it. `''` is not one of them: Lit reflects the empty
+//! **Four initializers are genuinely silent**: an absent one, an explicit
+//! `undefined`, `null`, and `false`, because Lit removes the attribute for
+//! each rather than writing it. `''` is not one of them: Lit reflects the empty
 //! string as `name=""`, which is an attribute a consumer's server never sent.
 //!
 //! **A getter with no setter is refused outright**, for a different reason worth
@@ -54,7 +54,7 @@ static BACKING: LazyLock<Regex> =
 fn silent(initializer: Option<&str>) -> bool {
     match initializer.map(str::trim) {
         None => true,
-        Some(one) => matches!(one.trim_end_matches(','), "false" | "undefined"),
+        Some(one) => matches!(one.trim_end_matches(','), "false" | "null" | "undefined"),
     }
 }
 

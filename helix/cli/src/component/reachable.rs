@@ -43,7 +43,7 @@ use std::sync::LazyLock;
 use regex::Regex;
 
 use crate::component::text::COMMENT;
-use crate::component::{family, sources, stylesheets, Context, Finding, Report};
+use crate::component::{decorator, family, sources, stylesheets, Context, Finding, Report};
 
 /// Written by the component itself or by the platform, not by a property.
 static NOT_A_PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
@@ -77,10 +77,6 @@ static ELEMENT: LazyLock<Regex> = LazyLock::new(|| {
 /// An attribute name opening a bracket inside a selector.
 static ATTRIBUTE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\[\s*([a-zA-Z][\w-]*)").expect("a literal pattern compiles"));
-
-/// The attribute a declaration names, when it names one.
-static DECLARED: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"attribute:\s*'([^']+)'").expect("a literal pattern compiles"));
 
 /// A property declaration, its options and the member it sits on.
 static DECLARATION: LazyLock<Regex> = LazyLock::new(|| {
@@ -169,18 +165,16 @@ pub fn run(context: &Context) -> Report {
             for capture in DECLARATION.captures_iter(&text) {
                 let options = capture.get(1).map_or("", |one| one.as_str());
                 let name = capture.get(2).map_or("", |one| one.as_str());
-                if options.contains("attribute: false") {
+                if decorator::unattributed(options) {
                     continue;
                 }
-                let attribute = DECLARED
-                    .captures(options)
-                    .and_then(|one| one.get(1))
-                    .map_or_else(|| name.to_lowercase(), |one| one.as_str().to_owned());
+                let attribute =
+                    decorator::attribute(options).unwrap_or_else(|| name.to_lowercase());
                 let held = declared.entry(family.to_owned()).or_default();
                 /* A getter and a setter are two matches for one property, so
                 either of them carrying `reflect` settles it. */
                 let reflects = held.get(&attribute).is_some_and(|one| one.reflect)
-                    || options.contains("reflect: true");
+                    || decorator::reflects(options);
                 held.insert(
                     attribute,
                     Declared {

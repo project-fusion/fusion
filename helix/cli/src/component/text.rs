@@ -46,12 +46,12 @@ pub fn uncommented(text: &str) -> String {
         }
     };
     /* The brace depth each open `${` was entered at, so the `}` that closes
-       it goes back into its template rather than being counted as code. */
+    it goes back into its template rather than being counted as code. */
     let mut interpolations: Vec<usize> = Vec::new();
     let mut depth = 0usize;
     let mut in_template = false;
     /* Where the last byte that was not space sits, which is what decides
-       whether a `/` divides or opens a regex. */
+    whether a `/` divides or opens a regex. */
     let mut last: Option<usize> = None;
     let mut at = 0;
     while at < bytes.len() {
@@ -78,13 +78,17 @@ pub fn uncommented(text: &str) -> String {
         }
         match one {
             b'/' if next == Some(b'/') => {
-                let end = text[at..].find('\n').map_or(bytes.len(), |found| at + found);
+                let end = text[at..]
+                    .find('\n')
+                    .map_or(bytes.len(), |found| at + found);
                 blank(&mut out, at, end);
                 at = end;
                 continue;
             }
             b'/' if next == Some(b'*') => {
-                let end = text[at + 2..].find("*/").map_or(bytes.len(), |found| at + 2 + found + 2);
+                let end = text[at + 2..]
+                    .find("*/")
+                    .map_or(bytes.len(), |found| at + 2 + found + 2);
                 blank(&mut out, at, end);
                 at = end;
                 continue;
@@ -352,7 +356,8 @@ mod tests {
 
     #[test]
     fn a_regex_literal_is_stepped_over_and_a_division_is_not_one() {
-        let code = "x.match(/['\"]\\/\\*[/]/g) // a\nconst half = w / 2 // b\nreturn /'/.test(y) // c";
+        let code =
+            "x.match(/['\"]\\/\\*[/]/g) // a\nconst half = w / 2 // b\nreturn /'/.test(y) // c";
         let out = uncommented(code);
         assert!(!out.contains("// a") && !out.contains("// b") && !out.contains("// c"));
         assert!(out.contains("w / 2"));

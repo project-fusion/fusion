@@ -15,8 +15,11 @@
 //! default the resting arrangement is the attribute's absence, so a rule only
 //! has to name the departure.
 //!
-//! **`false`, the empty string, `undefined` and `null` are not defaults**, they
-//! are the absence of one written out. Reflecting any of them writes nothing.
+//! **`false`, `undefined` and `null` are not defaults**, they are the absence
+//! of one written out, and reflecting any of them writes nothing: Lit removes
+//! the attribute. The empty string is a default, and was listed here as one of
+//! them: Lit reflects it as `name=""`, which is an attribute the server never
+//! sent, and `reflected-defaults` said so while this said the opposite.
 //!
 //! **A type annotation may sit between the name and the `=`.** A pattern
 //! assuming the simple form sees nothing in
@@ -27,10 +30,11 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::line_of;
 use crate::component::{sources, Context, Finding, Report};
 
 /// Values meaning "nothing was said", rather than a choice made for a consumer.
-const RESTING: [&str; 5] = ["false", "''", "\"\"", "undefined", "null"];
+const RESTING: [&str; 3] = ["false", "undefined", "null"];
 
 static DECLARATION: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
@@ -60,10 +64,9 @@ pub fn run(context: &Context) -> Report {
                     continue;
                 }
                 let name = capture.get(1).map_or("", |one| one.as_str());
-                let line = text[..capture.get(0).map_or(0, |one| one.start())]
-                    .lines()
-                    .count()
-                    + 1;
+                /* The member's own line, which a decorator over two lines or a
+                blank line under it put somewhere other than one below. */
+                let line = line_of(&text, capture.get(1).map_or(0, |one| one.start()));
                 findings.push(Finding {
                     detail: "Declare it optional and let the resting arrangement be the \
                              attribute's absence, which is what the stylesheet should be asking \

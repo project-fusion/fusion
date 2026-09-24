@@ -35,15 +35,20 @@ use std::sync::LazyLock;
 use regex::Regex;
 use serde_json::Value;
 
+use crate::component::text::uncommented;
 use crate::component::{Context, Finding, Report};
 
+/// A `<slot>` with a written name, wherever among its attributes the name
+/// sits: `<slot part="a" name="b">` and one with a listener first are as
+/// rendered as one that leads with it, which this read as never rendered.
 static RENDERED: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r#"<slot\s+name=["']([a-z][a-z0-9-]*)["']"#).expect("a literal pattern compiles")
+    Regex::new(r#"<slot\b[^>]*?\sname=["']([a-z][a-z0-9-]*)["']"#)
+        .expect("a literal pattern compiles")
 });
 
 /// A slot whose name is worked out at run time rather than written down.
 static COMPUTED: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"<slot\s+name=\$\{").expect("a literal pattern compiles"));
+    LazyLock::new(|| Regex::new(r"<slot\b[^>]*?\sname=\$\{").expect("a literal pattern compiles"));
 
 /// Every `<slot name>` written anywhere under a directory, and whether any of
 /// them was assembled rather than written.
@@ -67,12 +72,19 @@ fn rendered(root: &Path) -> (BTreeSet<String>, bool) {
                 stack.push(path);
                 continue;
             }
-            if path.extension().is_none_or(|one| one != "ts") {
+            /* Not a spec, whose markup is what it asserts about rather than
+            what anything renders. */
+            if path.extension().is_none_or(|one| one != "ts")
+                || path.to_string_lossy().contains(".spec.")
+            {
                 continue;
             }
-            let Ok(source) = fs::read_to_string(&path) else {
+            let Ok(raw) = fs::read_to_string(&path) else {
                 continue;
             };
+            /* Comments blanked, or a slot written in a sentence about one
+            counted as rendered. */
+            let source = uncommented(&raw);
             for hit in RENDERED.captures_iter(&source) {
                 found.insert(hit[1].to_owned());
             }

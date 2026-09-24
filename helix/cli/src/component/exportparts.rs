@@ -39,7 +39,7 @@ use regex::Regex;
 use crate::component::compositions::{
     compositions, exposed_as, part_docs_by_tag, second_name_of, Site,
 };
-use crate::component::text::{flattened, line_of, uncommented};
+use crate::component::text::{blanked, flattened, line_of, uncommented};
 use crate::component::{sources, walk_outside, Context, Finding, Report};
 
 /// Every tag's parts and their descriptions, keyed by tag suffix.
@@ -49,9 +49,17 @@ static PART: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"part="([a-z0-9 -]+)""#).expect("a literal pattern compiles"));
 
 /// A `::part()` written at a tag from outside it.
+///
+/// **The tag may carry a compound before the pseudo-element**, which is how it
+/// is usually written: `helix-button:hover::part(x)` and
+/// `helix-button[variant]::part(x)` slipped past a pattern wanting the tag
+/// against the colons. And `::part(a b)` names two parts, each checked. The
+/// tag starts a word, or a class named `.card-helix-button` read as one.
 static REACHES: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"([a-z][a-z0-9]*(?:-[a-z0-9]+)+)::part\(\s*([a-z0-9-]+)\s*\)")
-        .expect("a literal pattern compiles")
+    Regex::new(
+        r"(?:^|[^\w.#-])([a-z][a-z0-9]*(?:-[a-z0-9]+)+)(?:\[[^\]]*\]|:[a-z-]+(?:\([^()]*\))?|\.[\w-]+|#[\w-]+)*::part\(\s*([a-z0-9 -]+?)\s*\)",
+    )
+    .expect("a literal pattern compiles")
 });
 
 /// What each file renders in its own right, for the collision rule.
@@ -242,44 +250,48 @@ fn outside(context: &Context, docs: &PartDocs, findings: &mut Vec<Finding>) -> u
         let mut files = Vec::new();
         walk_outside(&context.root.join(root), &mut files);
         for file in files {
-            let Ok(text) = fs::read_to_string(&file) else {
+            let Ok(raw) = fs::read_to_string(&file) else {
                 continue;
             };
+            /* Block comments blanked, a `::part()` in a sentence about one
+            being no selector. */
+            let text = blanked(&raw);
             let where_ = context.relative(&file);
             for found in REACHES.captures_iter(&text) {
                 let tag = &found[1];
-                let part = &found[2];
-                let suffix = context
-                    .settings
-                    .layers
-                    .iter()
-                    .filter_map(|one| tag.strip_prefix(&one.prefix))
-                    .min_by_key(|one| one.len())
-                    .unwrap_or(tag);
-                /* A tag this library does not declare is not ours to judge. */
-                let Some(publishes) = docs.get(suffix) else {
-                    continue;
-                };
-                checked += 1;
-                if publishes.contains_key(part) {
-                    continue;
-                }
-                let at = found.get(0).expect("group zero always matches").start();
-                findings.push(Finding {
-                    detail: format!(
-                        "It publishes: {}. A `::part()` matching nothing is valid CSS with no \
+                for part in found[2].split_whitespace() {
+                    let suffix = context
+                        .settings
+                        .layers
+                        .iter()
+                        .filter_map(|one| tag.strip_prefix(&one.prefix))
+                        .min_by_key(|one| one.len())
+                        .unwrap_or(tag);
+                    /* A tag this library does not declare is not ours to judge. */
+                    let Some(publishes) = docs.get(suffix) else {
+                        continue;
+                    };
+                    checked += 1;
+                    if publishes.contains_key(part) {
+                        continue;
+                    }
+                    let at = found.get(1).expect("the tag always matches").start();
+                    findings.push(Finding {
+                        detail: format!(
+                            "It publishes: {}. A `::part()` matching nothing is valid CSS with no \
                          error and no effect.",
-                        publishes
-                            .keys()
-                            .cloned()
-                            .collect::<Vec<String>>()
-                            .join(", ")
-                    ),
-                    file: format!("{where_}:{}", line_of(&text, at)),
-                    message: format!(
-                        "`{tag}::part({part})` names a part that element does not publish"
-                    ),
-                });
+                            publishes
+                                .keys()
+                                .cloned()
+                                .collect::<Vec<String>>()
+                                .join(", ")
+                        ),
+                        file: format!("{where_}:{}", line_of(&text, at)),
+                        message: format!(
+                            "`{tag}::part({part})` names a part that element does not publish"
+                        ),
+                    });
+                }
             }
         }
     }
