@@ -697,11 +697,6 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     this.finishHydration()
   }
 
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    this.internals.ariaExpanded = this.open ? 'true' : 'false'
-  }
-
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     this.sync()

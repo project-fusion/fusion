@@ -646,8 +646,12 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: 'listbox' })
-    this.internals.ariaMultiSelectable = this.multiple ? 'true' : null
+    /* **The list is the listbox, and the host is only what holds it.** The
+       role, the name and `aria-multiselectable` were the host's, and the host
+       holds the label, the filter, the hint and the feedback, none of which a
+       listbox may contain, while the element that took focus and held the
+       active descendant had no role at all. They are `[part="items"]`'s now. */
+    hostAria(this.internals, { role: '' })
     /* Before the render, so the empty state and the matches it draws are this
        update's rather than the last one's. Not on the server, whose element
        shim has no `children`, nor while hydrating what one sent. */
@@ -711,7 +715,6 @@ export class HelixHeadlessListbox extends MixinCollection(
     super.updated(changed)
     this.followActive()
     this.sync()
-    this.linkHost()
     this.linkActive()
   }
 
@@ -870,7 +873,12 @@ export class HelixHeadlessListbox extends MixinCollection(
       <div
         part="items"
         id="items"
+        role="listbox"
         aria-busy=${this.loading ? 'true' : nothing}
+        aria-describedby=${this.describedBy ?? nothing}
+        aria-labelledby=${this.labeled ? this.labelId : nothing}
+        aria-multiselectable=${this.multiple ? 'true' : nothing}
+        aria-required=${this.required ? 'true' : nothing}
         ${
           /* `isDisabled`, matching the filter input above it: on `disabled`
              alone, a listbox in a disabled fieldset keeps its tab stop and

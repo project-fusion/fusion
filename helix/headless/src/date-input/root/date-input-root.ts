@@ -668,7 +668,20 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
         </button>
       </div>
 
-      <div part="surface" id="surface" popover="manual" ?hidden=${!this.open}>
+      ${
+        /* A dialog, which is what the trigger's `aria-haspopup` promised: the
+           surface had no role, so the promise named something that was not
+           there. Named by the trigger's words, which say what it is for. */
+        ''
+      }
+      <div
+        part="surface"
+        id="surface"
+        role="dialog"
+        aria-label=${this.triggerLabel}
+        popover="manual"
+        ?hidden=${!this.open}
+      >
         ${this.renderPicker()}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`

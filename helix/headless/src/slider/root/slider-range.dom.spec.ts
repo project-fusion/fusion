@@ -54,12 +54,29 @@ describe('a slider with two thumbs', () => {
     }
   })
 
-  test('each thumb says which end it is', async () => {
+  /** A thumb's name as a reader hears it: every element it points at, in order. */
+  const named = (control: HTMLInputElement): string => {
+    const scope = control.getRootNode() as ShadowRoot
+    return (control.getAttribute('aria-labelledby') ?? '')
+      .split(/\s+/)
+      .map((id) => scope.getElementById(id)?.textContent?.trim() ?? '')
+      .join(' ')
+  }
+
+  test("each thumb says which end it is, after the slider's own name", async () => {
     const host = await slider('range default-value="20,70"')
-    expect(thumbs(host).map((one) => one.getAttribute('aria-label'))).toEqual([
-      'Price minimum',
-      'Price maximum',
-    ])
+    expect(thumbs(host).map(named)).toEqual(['Price minimum', 'Price maximum'])
+  })
+
+  test("and the words are the page's, the name included however it was given", async () => {
+    /* `aria-label` on each thumb read the `label` string alone, so a slider
+       named by the host's `aria-label` had thumbs called "minimum" and
+       "maximum", and it overrode the label element besides. */
+    document.body.innerHTML =
+      '<helix-headless-slider aria-label="Prix" range default-value="20,70" minimum-label="plancher" maximum-label="plafond"></helix-headless-slider>'
+    const host = document.body.firstElementChild as Slider
+    await host.updateComplete
+    expect(thumbs(host).map(named)).toEqual(['Prix plancher', 'Prix plafond'])
   })
 
   test('the lower thumb stops at the upper rather than crossing it', async () => {

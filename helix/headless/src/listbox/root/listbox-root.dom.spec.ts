@@ -37,9 +37,18 @@ const press = async (host: Updatable, key: string): Promise<void> => {
 }
 
 describe('listbox', () => {
-  test('is a listbox, named on internals rather than on the host', async () => {
-    const host = (await list()) as Updatable & { internals: ElementInternals }
-    expect(host.internals.role).toBe('listbox')
+  test('the list that takes focus is the listbox, named by the label in its own tree', async () => {
+    /* The host was the listbox, and it holds the label, the filter, the hint
+       and the feedback, none of which a listbox may contain, while the element
+       that took focus and held the active descendant had no role at all. */
+    const host = (await list('multiple')) as Updatable & { internals: ElementInternals }
+    const items = part(host as HTMLElement, 'items') as HTMLElement
+    expect(items.getAttribute('role')).toBe('listbox')
+    expect(items.getAttribute('aria-multiselectable')).toBe('true')
+    const named = items.getAttribute('aria-labelledby') ?? ''
+    const scope = items.getRootNode() as ShadowRoot
+    expect(scope.getElementById(named)?.textContent?.trim()).not.toBe('')
+    expect(host.internals.role).toBeFalsy()
     expect(host.getAttribute('role')).toBeNull()
   })
 
