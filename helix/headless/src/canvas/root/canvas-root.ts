@@ -770,6 +770,19 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return card && name !== this.linking?.from && !this.fixed(card) ? name : undefined
   }
 
+  /**
+   * Whether a connection is being drawn, which a press on a connection is not
+   * until it moves.
+   *
+   * **A click on a connection is a click.** The press picks up the nearer end
+   * so a drag can start from it, and every card lit up its handles for as long
+   * as the button was down: a reader selecting a line watched the whole board
+   * flash as though they had started connecting.
+   */
+  private get drawing(): boolean {
+    return this.linking !== undefined && this.linking.pressed === undefined
+  }
+
   /** Ends a connection, asking for it where it has somewhere to go. */
   private finishLinking(to: string | undefined, toSide?: CanvasSide): void {
     const linking = this.linking
@@ -1916,7 +1929,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     this.origin = origin
     hostAria(this.internals, { label: this.label })
-    this.toggleState('connecting', this.linking !== undefined)
+    this.toggleState('connecting', this.drawing)
     this.toggleState('direct', this.direct)
     this.toggleState('pressing', this.pressing)
     this.toggleState('empty', this.nodes.length === 0)
@@ -1973,7 +1986,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
          so and the one under the pointer says it most: a line dragged across a
          board of cards that looked the same everywhere gave no way to tell
          where letting go would land. */
-      card.candidate = this.linking !== undefined && this.arrival(card.name) !== undefined
+      card.candidate = this.drawing && this.arrival(card.name) !== undefined
       card.target = this.linking?.to === card.name
     }
   }
