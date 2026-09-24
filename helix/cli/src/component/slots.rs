@@ -190,16 +190,67 @@ fn declared(context: &Context) -> BTreeMap<String, Declared> {
     found
 }
 
+/// Every slot the shared tiers render, which every family that takes them has.
+///
+/// Read once. Every field in the library shares `MixinField`'s `label`, `hint`
+/// and `feedback`, and re-walking the base for each of ninety-odd components is
+/// the same answer ninety times.
+fn shared(context: &Context) -> BTreeSet<String> {
+    context
+        .settings
+        .foundations(&context.root)
+        .into_iter()
+        .flat_map(|foundation| rendered(&context.root.join(foundation)).0)
+        .collect()
+}
+
+/// A documented slot the family renders nowhere.
+fn unrendered(
+    file: String,
+    tag: &str,
+    name: &str,
+    family: &str,
+    available: &BTreeSet<String>,
+) -> Finding {
+    Finding {
+        detail: "A child assigned to a slot that does not exist is assigned to no slot and is \
+                 not rendered, which looks like a component with a piece missing rather than an \
+                 error. Rename the tag to the slot the family renders, or render the slot the \
+                 tag promises."
+            .to_owned(),
+        file,
+        message: format!(
+            "`{tag}` documents `@slot {name}` and nothing in `{family}` renders it. Rendered: {}",
+            available
+                .iter()
+                .map(|one| format!("`{one}`"))
+                .collect::<Vec<String>>()
+                .join(", ")
+        ),
+    }
+}
+
+/// Where a family's folders are, in every tier that has one.
+///
+/// Read off the tiers rather than written as `helix/*/src`, which is this
+/// repository's layout and a location nowhere else.
+fn located(context: &Context, tiers: &[std::path::PathBuf], family: &str) -> String {
+    tiers
+        .iter()
+        .map(|tier| tier.join(family))
+        .filter(|path| path.is_dir())
+        .map(|path| context.relative(&path))
+        .collect::<Vec<String>>()
+        .join(", ")
+}
+
 pub fn run(context: &Context) -> Report {
     let declared = declared(context);
     let tiers: Vec<std::path::PathBuf> = context.settings.roots(&context.root);
     let mut findings = Vec::new();
     let mut checked = 0;
 
-    /* Read once. Every field in the library shares `MixinField`'s `label`,
-    `hint` and `feedback`, and re-walking core for each of ninety-odd
-    components is the same answer ninety times. */
-    let (shared, _) = rendered(&context.root.join("helix/core/src"));
+    let shared = shared(context);
 
     /* Read once per family, since both tiers of a family and every subclass of
     it ask the same question. */
@@ -277,23 +328,13 @@ pub fn run(context: &Context) -> Report {
             if available.contains(name) {
                 continue;
             }
-            findings.push(Finding {
-                detail: "A child assigned to a slot that does not exist is assigned to no slot \
-                         and is not rendered, which looks like a component with a piece missing \
-                         rather than an error. Rename the tag to the slot the family renders, or \
-                         render the slot the tag promises."
-                    .to_owned(),
-                file: format!("helix/*/src/{family}"),
-                message: format!(
-                    "`{tag}` documents `@slot {name}` and nothing in `{family}` renders it. \
-                     Rendered: {}",
-                    available
-                        .iter()
-                        .map(|one| format!("`{one}`"))
-                        .collect::<Vec<String>>()
-                        .join(", ")
-                ),
-            });
+            findings.push(unrendered(
+                located(context, &tiers, family),
+                tag,
+                name,
+                family,
+                &available,
+            ));
         }
     }
 

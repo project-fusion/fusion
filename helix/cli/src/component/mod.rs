@@ -440,6 +440,25 @@ impl Settings {
             .collect()
     }
 
+    /// The tiers that hold what families take rather than families.
+    ///
+    /// **Known by what is in them, not by name or by what is missing.** Rules
+    /// read this repository's `helix/core/src` by its path, which is nobody
+    /// else's. Nor is it a tier no layer builds from, which is the obvious
+    /// reading and a wrong one: this repository's sandbox is such a tier and is
+    /// a family of its own. What marks the shared base is that it groups by
+    /// kind, with `controllers` or `mixins` directly inside it.
+    pub fn foundations(&self, root: &Path) -> Vec<String> {
+        self.tiers
+            .iter()
+            .filter(|tier| {
+                let at = root.join(tier);
+                at.join("controllers").is_dir() || at.join("mixins").is_dir()
+            })
+            .cloned()
+            .collect()
+    }
+
     /// The configured tiers that are not directories, for the caller to refuse.
     pub fn missing(&self, root: &Path) -> Vec<&str> {
         self.tiers
