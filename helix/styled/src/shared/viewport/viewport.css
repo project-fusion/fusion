@@ -52,6 +52,23 @@
     "full";
 }
 
+/* **Full screen is the whole screen, for every family that offers it.** The
+   host is `display: contents`, drawing no box, and the host is what fills the
+   screen: given a box of its own it takes the screen, and the region inside it
+   drops the height the page gave it. This lived in `Map`'s sheet alone, so a
+   board filled the screen with a frame still thirty rems tall across the top of
+   it and black below. Written here, a third family gets it by composing the
+   sheet. */
+:host(:fullscreen) {
+  display: block;
+}
+
+:host(:state(fullscreen)) [part="region"] {
+  block-size: 100dvh;
+  border: none;
+  border-radius: 0;
+}
+
 /* Said as well as defaulted, so a consumer can put the controls back in the
    resting corner from markup rather than by removing an attribute. */
 :host([controls-placement="top-end"]) [part="controls"] {

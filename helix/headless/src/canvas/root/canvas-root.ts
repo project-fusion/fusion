@@ -248,6 +248,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** Watches the box, because the fit is a fraction of a measurement. */
   private sizes?: ResizeObserver
 
+  /** The box as the observer last measured it, so a resize knows what it gained. */
+  private measured?: { width: number; height: number }
+
   /**
    * The box the board is drawn in, which is not the host.
    *
@@ -909,8 +912,25 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     this.sizes ??= new ResizeObserver(() => {
+      const box = this.box
+      const was = this.measured
+      this.measured = box
       if (!this.touched) {
         this.fitInto(true)
+        return
+      }
+      /* **A reader who has chosen a view keeps its middle.** Filling the screen
+         is the common resize, and the board sat at the corner it had been
+         pinned to while the frame grew away from it down and to the right.
+         Moving by half of what the box gained holds the point in the middle
+         of the view in the middle. */
+      if (was && (was.width !== box.width || was.height !== box.height)) {
+        this.direct = true
+        this.at = {
+          ...this.at,
+          x: this.at.x + (box.width - was.width) / 2,
+          y: this.at.y + (box.height - was.height) / 2,
+        }
       }
     })
     this.sizes.disconnect()
