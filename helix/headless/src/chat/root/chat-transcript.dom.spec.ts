@@ -182,7 +182,8 @@ describe('history', () => {
     const log = part(element, 'log') as HTMLElement
     const notice = part(element, 'history')
     expect(notice?.textContent?.trim()).toBe('Loading earlier messages')
-    expect(notice?.getAttribute('role')).toBe('status')
+    // A line to see, and not a region: it is said through the one that is always there.
+    expect(notice?.hasAttribute('role')).toBe(false)
     expect(log.firstElementChild).toBe(notice)
     expect(log.getAttribute('aria-busy')).toBe('true')
   })

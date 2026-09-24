@@ -152,6 +152,7 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @csspart hint - Help under the list.
  * @csspart items - The list itself.
  * @csspart label - The question, over the list.
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the options are still on their way.
  * @csspart search - The region holding the field that narrows the list.
  * @csspart search-field - The field itself.
@@ -831,6 +832,15 @@ export class HelixHeadlessListbox extends MixinCollection(
   }
 
   protected override render(): TemplateResult {
+    /* Showing nothing is not the same as empty. A filter that hides every
+       option is empty, and one with no filter and no options is empty too,
+       but a list still waiting on its options is neither. */
+    const shown =
+      this.counted && !this.loading
+        ? this.filter === ''
+          ? this.options.length > 0
+          : this.hasMatches
+        : true
     /* One tab stop for the whole list, which is what a listbox is in the tab
        order: the arrows move within it. `tabindex` on the wrapper rather than
        the host so the host stays as the consumer wrote it. */
@@ -875,16 +885,10 @@ export class HelixHeadlessListbox extends MixinCollection(
              counts as content. A list with a filter that matched nothing is
              empty, and one with no filter and no options is empty too, but a
              list still waiting on its options is neither. */
-          this.renderStatus(
-            this.counted && !this.loading
-              ? this.filter === ''
-                ? this.options.length > 0
-                : this.hasMatches
-              : true,
-          )
+          this.renderStatus(shown)
         }
       </div>
-      ${this.renderHint()}${this.renderFeedback()}`
+      ${this.renderLive(shown)}${this.renderHint()}${this.renderFeedback()}`
   }
 }
 

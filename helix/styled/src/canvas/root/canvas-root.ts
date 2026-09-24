@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCanvas } from '@fusion.dev/helix-headless/canvas'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './canvas-root.css.js'
 
@@ -64,7 +65,7 @@ export class HelixCanvas extends HelixHeadlessCanvas {
   separation?: 'outlined' | 'plain'
   /* The surface's sheet first, this family's after, so a board's own rules win
      where the two speak about the same box. */
-  static override styles: CSSResultGroup = [viewportStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, viewportStyles, styles]
 }
 
 declare global {

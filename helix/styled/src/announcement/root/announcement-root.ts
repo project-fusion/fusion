@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessAnnouncement } from '@fusion.dev/helix-headless/announcement'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './announcement-root.css.js'
 
 /**
@@ -41,7 +42,7 @@ export class HelixAnnouncement extends HelixHeadlessAnnouncement {
   @property({ reflect: true })
   separation?: 'elevated' | 'filled'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

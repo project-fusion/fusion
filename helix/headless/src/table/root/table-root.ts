@@ -82,6 +82,7 @@ const tracksOf = (list: string, wanted: number): string[] => {
  *
  * @csspart empty - Shown when there are no rows to show.
  * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the rows are still on their way.
  * @csspart table - The grid.
  *
@@ -329,7 +330,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         }}
       ></slot>
       ${this.renderStatus(this.hasRows)}
-    </div>`
+    </div>${this.renderLive(this.hasRows)}`
   }
 }
 

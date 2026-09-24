@@ -3,6 +3,7 @@ import { HelixHeadlessTree } from '@fusion.dev/helix-headless/tree'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './tree-root.css.js'
 
 /**
@@ -23,6 +24,7 @@ import { styles } from './tree-root.css.js'
  *
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves.
  *
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart tree - The tree container.
  *
  * @cssproperty --tree-chevron-gap - Set from `chevron-placement`; the space before the chevron.
@@ -60,7 +62,7 @@ export class HelixTree extends HelixHeadlessTree {
   @property({ attribute: 'chevron-placement', reflect: true })
   chevronPlacement?: 'start' | 'end'
 
-  static override styles: CSSResultGroup = [collectionStateStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
 }
 
 declare global {

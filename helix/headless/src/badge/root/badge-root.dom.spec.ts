@@ -31,7 +31,8 @@ describe('badge', () => {
     )
     const indicator = part(badge, 'indicator')
     expect(indicator?.hasAttribute('data-blank')).toBe(true)
-    expect(indicator?.getAttribute('aria-hidden')).toBe('true')
+    // Its `0` is kept to fade out with and not read: clearing a count says nothing.
+    expect(indicator?.querySelector('[aria-hidden="true"]')?.textContent).toBe('0')
     expect(badge.getAttributeNames()).toEqual(['value'])
   })
 
@@ -75,8 +76,23 @@ describe('badge', () => {
       '<helix-headless-badge value="0" label="unread"><span>x</span></helix-headless-badge>',
     )
     const indicator = part(badge, 'indicator')
-    expect(indicator?.getAttribute('role')).toBeNull()
-    expect(indicator?.getAttribute('aria-hidden')).toBe('true')
+    expect(indicator?.hasAttribute('aria-label')).toBe(false)
+    expect(indicator?.querySelector('[aria-hidden="true"]')).not.toBeNull()
+  })
+
+  test('the region is there before the first count is, so the count is heard', async () => {
+    /* The role arrived with the first count, so the count arrived in a region
+       appearing with it, which a screen reader could miss. */
+    const badge = (await mount(
+      '<helix-headless-badge value="0"><span>x</span></helix-headless-badge>',
+    )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
+    const indicator = part(badge, 'indicator')
+    expect(indicator?.getAttribute('role')).toBe('status')
+    badge.value = '1'
+    await badge.updateComplete
+    expect(part(badge, 'indicator')).toBe(indicator)
+    expect(indicator?.getAttribute('role')).toBe('status')
+    expect(indicator?.textContent).toBe('1')
   })
 
   test('no value leaves the indicator with no text, which is what draws it as a dot', async () => {
@@ -100,8 +116,10 @@ describe('badge', () => {
     expect(part(named, 'indicator')?.getAttribute('aria-label')).toBe('3 unread')
     expect(part(named, 'indicator')?.getAttribute('role')).toBe('status')
 
+    // A bare dot is an empty region, which has nothing to say and says nothing.
     const bare = await mount('<helix-headless-badge><span>x</span></helix-headless-badge>')
-    expect(part(bare, 'indicator')?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(bare, 'indicator')?.textContent).toBe('')
+    expect(part(bare, 'indicator')?.hasAttribute('aria-label')).toBe(false)
   })
 
   test('a count set as a number shows the number', async () => {

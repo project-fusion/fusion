@@ -49,6 +49,7 @@ const KEYS = new Set([
  * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart empty - Shown when there are no rows to show.
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the rows are still on their way.
  * @csspart tree - The tree container.
  */
@@ -344,7 +345,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
         }}
       ></slot>
       ${this.renderStatus(this.hasRows)}
-    </div>`
+    </div>${this.renderLive(this.hasRows)}`
   }
 }
 

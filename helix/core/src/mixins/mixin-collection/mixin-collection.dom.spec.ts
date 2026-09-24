@@ -28,7 +28,7 @@ beforeAll(async () => {
     tag,
     class extends MixinCollection(HelixElement) {
       protected override render() {
-        return html`${this.renderStatus(this.hasRows)}<slot @slotchange=${this.countRows}></slot>`
+        return html`${this.renderStatus(this.hasRows)}<slot @slotchange=${this.countRows}></slot>${this.renderLive(this.hasRows)}`
       }
     },
   )
@@ -75,12 +75,16 @@ describe('a set that is loading', () => {
     expect(part(host, 'empty')).toBeNull()
   })
 
-  /* `role="status"` so the arrival is announced. A spinner nobody is told about
-     is a spinner only sighted readers know is there. */
+  /* Said by a region that is always there, so the arrival is announced. A
+     spinner nobody is told about is a spinner only sighted readers know is
+     there, and a status inserted with its words in it is one a screen reader
+     reads inconsistently at best. */
   test('and announces it, rather than only drawing it', async () => {
     const host = await set('', 'loading')
     await host.updateComplete
-    expect(part(host, 'loading')?.getAttribute('role')).toBe('status')
+    expect(part(host, 'live')?.getAttribute('role')).toBe('status')
+    expect(part(host, 'live')?.textContent).toBe('Loading')
+    expect(part(host, 'loading')?.hasAttribute('role')).toBe(false)
   })
 
   test('even when it does have rows, since they may be the old ones', async () => {

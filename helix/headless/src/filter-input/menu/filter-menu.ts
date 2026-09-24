@@ -78,6 +78,7 @@ import '../../menu/index.js'
  * @csspart menu-back-mark - The glyph on the back control.
  * @csspart menu-empty - Shown when there are no fields to offer.
  * @csspart menu-header - The bar above a field's page, holding the way back and its name.
+ * @csspart menu-live - The inner menu's `live`, the region a screen reader hears its empty and loading lines from.
  * @csspart menu-loading - Shown while the fields are still on their way.
  * @csspart menu-surface - The floating panel the menu is drawn on.
  * @csspart menu-title - The name of the field whose page is showing.
@@ -296,7 +297,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
     return html`<${menu}
       part="menu"
       exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
-        loading: menu-loading, surface: menu-surface, title: menu-title"
+        live: menu-live, loading: menu-loading, surface: menu-surface, title: menu-title"
       label=${this.label}
       @helix-select=${this.handleSelect}
     >

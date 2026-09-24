@@ -9,8 +9,8 @@ describe('announcement server output', () => {
        of the render, so it passed with the announcement rendering no slot at
        all. Read off one with no children: the only shadow root is its own. */
     const markup = ssr(html`<helix-headless-announcement></helix-headless-announcement>`)
-    expect(rendered(markup, 'helix-headless-announcement')).toContain(
-      '<div part="content"><slot></slot></div>',
+    expect(rendered(markup, 'helix-headless-announcement')).toMatch(
+      /<div part="content">(?:<!--lit-node \d+-->)?<slot\s*><\/slot><\/div>/,
     )
   })
 

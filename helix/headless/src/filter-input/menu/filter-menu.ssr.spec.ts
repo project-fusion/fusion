@@ -39,7 +39,7 @@ describe('filter menu server output', () => {
        the consumer's markup rendering itself and is asserted where it lives.
        What is absent is every `entry`: no field row, no comparison, no value,
        and no divider between the two runs. */
-    expect(servedParts(markup)).toEqual(['item', 'label', 'menu', 'surface', 'text'])
+    expect(servedParts(markup)).toEqual(['item', 'label', 'live', 'menu', 'surface', 'text'])
   })
 
   test('the trigger is served, so the control a reader presses exists before any script', () => {

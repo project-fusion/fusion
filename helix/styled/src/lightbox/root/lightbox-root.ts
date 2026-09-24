@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessLightbox } from '@fusion.dev/helix-headless/lightbox'
 import type { CSSResultGroup } from 'lit'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './lightbox-root.css.js'
 
 /**
@@ -36,7 +37,7 @@ import { styles } from './lightbox-root.css.js'
  */
 @customElement('helix-lightbox')
 export class HelixLightbox extends HelixHeadlessLightbox {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

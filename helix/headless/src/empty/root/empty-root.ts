@@ -1,5 +1,10 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import {
+  ArrivalController,
+  customElement,
+  HelixElement,
+  slottedWords,
+} from '@fusion.dev/helix-core'
+import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -10,10 +15,13 @@ import { property } from 'lit/decorators.js'
  * to load, so this exists to tell the difference: what would be here, and the
  * one action that would put something here.
  *
- * `role="status"` on a polite live region, because an empty view usually
- * arrives in place of content that was being fetched. Announcing it is the only
- * way a screen-reader user learns the search returned nothing, rather than
- * being left waiting.
+ * Announced, because an empty view usually arrives in place of content that was
+ * being fetched: saying so is the only way a screen-reader user learns the
+ * search returned nothing, rather than being left waiting. **From a region of
+ * its own that is there before its words are**, filled a frame after the view
+ * appears. The host was the region, and a page inserts an empty state with its
+ * message already in it, which is a region arriving with its words: read
+ * inconsistently at best.
  *
  * Every region is a bare slot. The reference ships an `empty-state-heading` and
  * an `empty-state-actions` whose only job is to assign themselves a slot on
@@ -29,6 +37,8 @@ import { property } from 'lit/decorators.js'
  * @slot actions - The way out.
  * @slot heading - What is missing.
  * @slot icon - A mark above the heading.
+ *
+ * @csspart live - The heading and the message again, in a region a screen reader hears when the view appears. Visually hidden in the styled tier.
  */
 @customElement('helix-headless-empty')
 export class HelixHeadlessEmpty extends HelixElement {
@@ -42,17 +52,24 @@ export class HelixHeadlessEmpty extends HelixElement {
   @property({ attribute: 'no-announce', reflect: true, type: Boolean })
   noAnnounce = false
 
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    hostAria(this.internals, { role: this.noAnnounce ? '' : 'status' })
-    this.internals.ariaLive = this.noAnnounce ? null : 'polite'
-  }
+  /* Filled a frame after the view appears, unless it came with the served page,
+     which is the one case this knows was always there. */
+  protected readonly arrival = new ArrivalController(this, {
+    arriving: () => !this.serverRendered,
+    text: () => slottedWords(this, ['heading', '']),
+  })
 
   protected override render(): TemplateResult {
+    const say = () => this.arrival.say()
     return html`<slot name="icon"></slot>
-      <slot name="heading"></slot>
-      <slot></slot>
-      <slot name="actions"></slot>`
+      <slot name="heading" @slotchange=${say}></slot>
+      <slot @slotchange=${say}></slot>
+      <slot name="actions"></slot>
+      ${
+        this.noAnnounce
+          ? nothing
+          : html`<span part="live" role="status">${this.arrival.said}</span>`
+      }`
   }
 }
 

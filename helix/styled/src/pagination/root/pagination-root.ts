@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessPagination } from '@fusion.dev/helix-headless/pagination'
 import type { CSSResultGroup } from 'lit'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './pagination-root.css.js'
 
 /**
@@ -55,7 +56,7 @@ import { styles } from './pagination-root.css.js'
  */
 @customElement('helix-pagination')
 export class HelixPagination extends HelixHeadlessPagination {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

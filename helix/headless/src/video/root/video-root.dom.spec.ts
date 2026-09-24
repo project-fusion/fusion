@@ -40,14 +40,17 @@ describe('waiting for the picture', () => {
     expect(part(host, 'start')).toBeNull()
   })
 
-  test('and it is a live region, for the reader who cannot see it spin', async () => {
+  test('and it is said, for the reader who cannot see it spin', async () => {
+    /* By a region that was there before the words were: the box was the region,
+       inserted with its words in it, which a screen reader reads inconsistently. */
     const { host, video } = await media()
+    const live = part(host, 'live') as HTMLElement
+    expect(live.getAttribute('role')).toBe('status')
+    expect(live.textContent?.trim()).toBe('')
     video.dispatchEvent(new Event('waiting'))
     await host.updateComplete
-    const said = part(host, 'loading') as HTMLElement
-    expect(said.getAttribute('role')).toBe('status')
-    expect(said.getAttribute('aria-live')).toBe('polite')
-    expect(said.textContent?.trim()).toContain('Loading')
+    expect(part(host, 'live')).toBe(live)
+    expect(live.textContent?.trim()).toContain('Loading')
   })
 
   test('the frame moving again takes it away', async () => {

@@ -109,6 +109,12 @@ export class HelixHeadlessBadge extends HelixElement {
     // marker comments do not affect `:empty`, but a whitespace text node does,
     // which is why the tags close the way they do.
     //
+    // **A status from the start, whatever it shows.** It gained the role only
+    // once there was something to say, so the first count arrived in a region
+    // appearing with it and a screen reader could miss it. A blank mark keeps
+    // its text to fade out with, hidden, so clearing a count says nothing, and
+    // a dot with no label is an empty region, which says nothing either.
+    //
     // It stays mounted when there is nothing to show, so the styled tier can
     // transition it out rather than having it vanish between frames. Both
     // markers are on the shadow content, not the host, so they cost no
@@ -122,10 +128,9 @@ export class HelixHeadlessBadge extends HelixElement {
         part="indicator"
         data-blank=${blank ? '' : nothing}
         data-single=${text.length <= 1 ? '' : nothing}
-        role=${announced ? 'status' : nothing}
+        role="status"
         aria-label=${this.label !== '' && announced ? this.label : nothing}
-        aria-hidden=${announced ? nothing : 'true'}
-        >${text}</span
+        >${blank ? html`<span aria-hidden="true">${text}</span>` : text}</span
       >`
   }
 }

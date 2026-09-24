@@ -4,6 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './listbox-root.css.js'
 
 /**
@@ -31,6 +32,7 @@ import { styles } from './listbox-root.css.js'
 @customElement('helix-listbox')
 export class HelixListbox extends HelixHeadlessListbox {
   static override styles: CSSResultGroup = [
+    liveStyles,
     collectionStateStyles,
     fieldStyles,
     fieldStackedStyles,

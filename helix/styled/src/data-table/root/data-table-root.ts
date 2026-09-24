@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDataTable } from '@fusion.dev/helix-headless/data-table'
 import type { CSSResultGroup } from 'lit'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './data-table-root.css.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
@@ -39,6 +40,7 @@ import '../../table/index.js'
  *
  * @csspart cell - One cell.
  * @csspart cell-selected - A cell of a selected row, beside `cell`.
+ * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
  * @csspart table - The grid.
  *
  * @cssproperty --data-table-block-size - How tall the scrolling box is while `windowed`.
@@ -65,7 +67,7 @@ import '../../table/index.js'
 export class HelixDataTable extends HelixHeadlessDataTable {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [collectionStateStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
 }
 
 declare global {

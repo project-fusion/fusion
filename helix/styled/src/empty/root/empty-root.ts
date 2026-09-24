@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessEmpty } from '@fusion.dev/helix-headless/empty'
 import type { CSSResultGroup } from 'lit'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './empty-root.css.js'
 
 /**
@@ -21,7 +22,7 @@ import { styles } from './empty-root.css.js'
  */
 @customElement('helix-empty')
 export class HelixEmpty extends HelixHeadlessEmpty {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

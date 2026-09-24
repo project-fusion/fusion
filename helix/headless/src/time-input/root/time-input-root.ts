@@ -79,6 +79,7 @@ import '../../time-picker/index.js'
  * @csspart picker-column-hint - Help under the list.
  * @csspart picker-column-items - The list itself.
  * @csspart picker-column-label - The question, over the list.
+ * @csspart picker-column-live - The inner column's `live`, the region a screen reader hears its empty and loading lines from.
  * @csspart picker-column-loading - Shown while the options are still on their way.
  * @csspart picker-column-search - The region holding the field that narrows the list.
  * @csspart picker-column-search-field - The field itself.
@@ -91,6 +92,7 @@ import '../../time-picker/index.js'
  * @csspart picker-list-hint - Help under the list.
  * @csspart picker-list-items - The list itself.
  * @csspart picker-list-label - The question, over the list.
+ * @csspart picker-list-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
  * @csspart picker-list-loading - Shown while the options are still on their way.
  * @csspart picker-list-search - The region holding the field that narrows the list.
  * @csspart picker-list-search-field - The field itself.
@@ -440,12 +442,12 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
         column-feedback: picker-column-feedback, column-filter-icon: picker-column-filter-icon,
         column-filter-mark: picker-column-filter-mark, column-hint: picker-column-hint,
         column-items: picker-column-items, column-label: picker-column-label,
-        column-loading: picker-column-loading, column-search: picker-column-search,
+        column-live: picker-column-live, column-loading: picker-column-loading, column-search: picker-column-search,
         column-search-field: picker-column-search-field, columns: picker-columns, list: picker-list,
         list-empty: picker-list-empty, list-feedback: picker-list-feedback,
         list-filter-icon: picker-list-filter-icon, list-filter-mark: picker-list-filter-mark,
         list-hint: picker-list-hint, list-items: picker-list-items, list-label: picker-list-label,
-        list-loading: picker-list-loading, list-search: picker-list-search,
+        list-live: picker-list-live, list-loading: picker-list-loading, list-search: picker-list-search,
         list-search-field: picker-list-search-field, option: picker-option,
         option-between: picker-option-between, option-item-active: picker-option-item-active,
         option-item-selected: picker-option-item-selected,

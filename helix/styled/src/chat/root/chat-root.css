@@ -78,9 +78,17 @@
  */
 [part="header"][hidden],
 [part="resume"][hidden],
-[part="status"][hidden],
 [part="composer"][hidden] {
   display: none;
+}
+
+/* **The status band is emptied rather than hidden**, because it is a live
+   region and one that is `display: none` is out of the accessibility tree: the
+   first "is typing" arrived in a region appearing with it, which a screen
+   reader may not read. Empty, it keeps its place and gives up its padding, so
+   the track it sits on is no height at all. */
+[part="status"][data-empty] {
+  padding-block: 0;
 }
 
 /* What the conversation is, and what can be done to it, on one line. The same
@@ -211,18 +219,6 @@
   margin: var(--helix-space-none);
   padding-block: var(--helix-space-lg);
   text-align: center;
-}
-
-/* Where each settled turn is said: out of sight and still in the tree, which is
-   the one thing it is here to stay in. `display: none` would take the region out
-   of the accessibility tree with it. The recipe Pagination uses for its own. */
-[part="live"] {
-  block-size: 1px;
-  clip-path: inset(50%);
-  inline-size: 1px;
-  overflow: hidden;
-  position: absolute;
-  white-space: nowrap;
 }
 
 /* **Turns fed as data carry the space between them inside themselves.** They
