@@ -7,7 +7,7 @@ import { property, state } from 'lit/decorators.js'
  * `current` and `links` are the board's own, and listing them here would have
  * every card the board touched ask it to draw again.
  */
-const DRAWN = ['color', 'group', 'height', 'label', 'name', 'readOnly', 'width', 'x', 'y'] as const
+const DRAWN = ['group', 'height', 'label', 'name', 'readOnly', 'tone', 'width', 'x', 'y'] as const
 
 /**
  * @summary One card or group on a canvas.
@@ -69,14 +69,13 @@ const DRAWN = ['color', 'group', 'height', 'label', 'name', 'readOnly', 'width',
 @customElement('helix-headless-canvas-node')
 export class HelixHeadlessCanvasNode extends HelixElement {
   /**
-   * A color, as one of the format's six presets or as a value of its own.
+   * A box drawn behind the cards inside it rather than a card.
    *
-   * A preset is a number from `1` to `6` and means whatever the application
-   * says, which is what lets a board drawn in one be read in another. Anything
-   * else is taken as a color and set as one.
+   * The board works out what is inside it from the geometry, which is what the
+   * format does too, and moves them with it. Its `label` is drawn above it.
    */
-  @property({ reflect: true })
-  color?: string
+  @property({ reflect: true, type: Boolean })
+  group = false
 
   /**
    * @internal Whether a connection being drawn could arrive here, written by
@@ -102,15 +101,6 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   @state()
   current = false
 
-  /**
-   * A box drawn behind the cards inside it rather than a card.
-   *
-   * The board works out what is inside it from the geometry, which is what the
-   * format does too, and moves them with it. Its `label` is drawn above it.
-   */
-  @property({ reflect: true, type: Boolean })
-  group = false
-
   /** How tall the card is, in the document's own units. */
   @property({ type: Number })
   height = 0
@@ -126,14 +116,6 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   label = ''
 
   /**
-   * @internal What the card connects to, as a sentence, written by the board.
-   * Read out after the card's own content rather than as its name, so a reader
-   * hears what the card says first and where it leads second.
-   */
-  @state()
-  links = ''
-
-  /**
    * What connections and requests call this card, unique on its board.
    *
    * Required: a card with no name is drawn but nothing can connect to it, and
@@ -141,6 +123,14 @@ export class HelixHeadlessCanvasNode extends HelixElement {
    */
   @property()
   name = ''
+
+  /**
+   * @internal What the card connects to, as a sentence, written by the board.
+   * Read out after the card's own content rather than as its name, so a reader
+   * hears what the card says first and where it leads second.
+   */
+  @state()
+  links = ''
 
   /**
    * Keeps this card where it is: not moved, not connected, not removed.
@@ -152,6 +142,21 @@ export class HelixHeadlessCanvasNode extends HelixElement {
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
+
+  /**
+   * What the card means, in the words every Helix component uses for it.
+   *
+   * **`tone` rather than the format's `color`**, which was a second word for
+   * the same thing on this family alone: JSON Canvas writes `1` to `6` and
+   * leaves the meaning to the application, and this board had already pinned
+   * each to a tone. `fromJsonCanvas` maps the six to tones on the way in. A
+   * color with no meaning, a hex a document chose, is a custom property on the
+   * card, `--canvas-node-color`, which is a style rather than a statement.
+   *
+   * On the headless tier because meaning survives having no stylesheet.
+   */
+  @property({ reflect: true })
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   /**
    * @internal Whether a connection being drawn would arrive here if it were

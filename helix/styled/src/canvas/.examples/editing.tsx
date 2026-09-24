@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 
-type Card = { color?: string; name: string; text: string; x: number; y: number }
+type Card = { tone?: 'accent' | 'success'; name: string; text: string; x: number; y: number }
 type Link = {
   from: string
   fromSide?: 'top' | 'right' | 'bottom' | 'left'
@@ -10,8 +10,8 @@ type Link = {
 
 const CARDS: Card[] = [
   { name: 'post', text: 'Write the post', x: 0, y: 0 },
-  { color: '3', name: 'demo', text: 'Record a demo', x: 256, y: 0 },
-  { color: '4', name: 'ship', text: 'Ship it', x: 128, y: 160 },
+  { name: 'demo', text: 'Record a demo', tone: 'accent', x: 256, y: 0 },
+  { name: 'ship', text: 'Ship it', tone: 'success', x: 128, y: 160 },
 ]
 
 const LINKS: Link[] = [{ from: 'post', name: 'post-ship', to: 'ship' }]
@@ -44,10 +44,10 @@ export function Example() {
     >
       {cards.map((card) => (
         <helix-canvas-node
-          color={card.color}
           height={64}
           key={card.name}
           name={card.name}
+          tone={card.tone}
           width={160}
           x={card.x}
           y={card.y}

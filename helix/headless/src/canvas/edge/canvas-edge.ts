@@ -25,10 +25,6 @@ import type { CanvasEnd, CanvasSide } from '../root/canvas-document.js'
  */
 @customElement('helix-headless-canvas-edge')
 export class HelixHeadlessCanvasEdge extends HelixElement {
-  /** A color, as one of the six presets or as a value of its own. */
-  @property()
-  color?: string
-
   /** The card it leaves. */
   @property()
   from = ''
@@ -93,9 +89,31 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   @property({ attribute: 'to-end' })
   toEnd?: CanvasEnd
 
+  /**
+   * What the connection means, in the words every Helix component uses.
+   *
+   * A color with no meaning is `--canvas-edge-color`, written in the edge's own
+   * `style`: the line is drawn by the board rather than by this element, so the
+   * board carries the value across from where it was written.
+   */
+  @property({ reflect: true })
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
+
   /** Which side of that card it arrives at, where the document says. */
   @property({ attribute: 'to-side' })
   toSide?: CanvasSide | undefined
+
+  /**
+   * How the line is drawn: `dashed` or `dotted`, and solid where it says
+   * neither.
+   *
+   * **A variant rather than an axis**, which is what the registry keeps it for:
+   * no other family draws a line whose stroke says something, and a dashed
+   * connection is the ordinary way to draw a weaker or an optional one. On the
+   * headless tier because the board that draws the line is.
+   */
+  @property({ reflect: true })
+  variant?: 'dashed' | 'dotted'
 
   /**
    * Tells the board the connector changed, since the board is what draws it.

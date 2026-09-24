@@ -9,11 +9,10 @@ import { styles } from './canvas-root.css.js'
  * @summary Draws a JSON Canvas document, read-only.
  *
  * @description
- * **The six color presets are the interesting part.** JSON Canvas writes a
- * color as `1` to `6` and leaves the values to the application, which is what
- * lets a board drawn in one be read in another. This sheet points them at
- * semantic tokens, so a board follows the page into dark mode rather than
- * carrying somebody else's hex into it.
+ * **Cards and connections say what they mean with `tone`**, the word every
+ * other family uses, and the tones resolve to semantic tokens, so a board
+ * follows the page into dark mode rather than carrying somebody else's hex into
+ * it. JSON Canvas's six color presets arrive as tones through `fromJsonCanvas`.
  *
  * The plane is the one thing that moves: panning and zooming write three custom
  * properties and one transform reads them, so the cards are placed once in the
@@ -28,13 +27,7 @@ import { styles } from './canvas-root.css.js'
  * @cssproperty --canvas-background-color - The well behind the board.
  * @cssproperty --canvas-block-size - How tall the frame is.
  * @cssproperty --canvas-border-color - Color of the frame's edge.
- * @cssproperty --canvas-color-1 - What the format's first color preset means here.
- * @cssproperty --canvas-color-2 - What the second preset means here.
- * @cssproperty --canvas-color-3 - What the third preset means here.
- * @cssproperty --canvas-color-4 - What the fourth preset means here.
- * @cssproperty --canvas-color-5 - What the fifth preset means here.
- * @cssproperty --canvas-color-6 - What the sixth preset means here.
- * @cssproperty --canvas-edge-color - Color of a connector that names no color of its own.
+ * @cssproperty --canvas-edge-color - Color of a connector with no tone. Written in an edge's own `style`, it colors that edge alone.
  * @cssproperty --canvas-edge-target-width - How wide a connector is to a pointer, which is wider than it is drawn.
  * @cssproperty --canvas-grid-size - How far apart the ruling is, in the document's own units, so it scales with the zoom.
  * @cssproperty --viewport-control-background-color - The ground under the pan and zoom buttons, one name with `Map`.
@@ -59,6 +52,15 @@ export class HelixCanvas extends HelixHeadlessCanvas {
    */
   @property({ reflect: true })
   grid?: 'lines' | 'dots'
+
+  /**
+   * How the board stands off the page: `plain` for no frame at all.
+   *
+   * Framed is where it rests. Plain is for a board that fills a panel or an
+   * app's working area, where the container is already the frame.
+   */
+  @property({ reflect: true })
+  separation?: 'outlined' | 'plain'
   /* The surface's sheet first, this family's after, so a board's own rules win
      where the two speak about the same box. */
   static override styles: CSSResultGroup = [viewportStyles, styles]

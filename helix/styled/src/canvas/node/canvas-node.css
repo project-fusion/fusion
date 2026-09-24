@@ -12,13 +12,16 @@
   --_canvas-card-y: 0px;
   --_canvas-card-inline-size: auto;
   --_canvas-card-block-size: auto;
-  /* The color a card named for itself, which the board writes on where there is
-     one: the six presets are attributes this sheet matches below, and a value a
-     document chose can only arrive as a property. */
-  --_canvas-card-color: var(--helix-color-border);
+  /* **The card's color: a custom one where the page wrote it, its tone where
+     it has one, and the border where it has neither.** A tone is an attribute
+     this sheet matches below; a color with no meaning is a hook the page
+     writes, because no stylesheet can enumerate a hex. */
+  --_canvas-card-tone: var(--helix-color-border);
+  --_canvas-card-color: var(--canvas-node-color, var(--_canvas-card-tone));
 
   background-color: var(--canvas-node-background-color, var(--helix-color-surface));
   block-size: var(--_canvas-card-block-size);
+  box-shadow: var(--canvas-node-shadow, none);
   border: var(--helix-border-thin) solid var(--_canvas-card-color);
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
@@ -47,23 +50,61 @@
   z-index: 0;
 }
 
-:host([color="1"]) {
-  border-color: var(--canvas-color-1);
+:host([tone="accent"]) {
+  --_canvas-card-tone: var(--helix-color-accent);
 }
-:host([color="2"]) {
-  border-color: var(--canvas-color-2);
+:host([tone="danger"]) {
+  --_canvas-card-tone: var(--helix-color-danger);
 }
-:host([color="3"]) {
-  border-color: var(--canvas-color-3);
+:host([tone="info"]) {
+  --_canvas-card-tone: var(--helix-color-info);
 }
-:host([color="4"]) {
-  border-color: var(--canvas-color-4);
+:host([tone="primary"]) {
+  --_canvas-card-tone: var(--helix-color-primary);
 }
-:host([color="5"]) {
-  border-color: var(--canvas-color-5);
+:host([tone="success"]) {
+  --_canvas-card-tone: var(--helix-color-success);
 }
-:host([color="6"]) {
-  border-color: var(--canvas-color-6);
+:host([tone="warning"]) {
+  --_canvas-card-tone: var(--helix-color-warning);
+}
+
+/* **Separation says how a card stands off the board**, the axis `Card` takes,
+   and outlined is where it rests: a surface with its color as the edge.
+   Filled puts the color into the ground instead, which is how a board of
+   colored cards reads at a glance. Elevated lifts it, keeping the color's edge,
+   since on a board the color is what the card means. Plain is text on the
+   board, with no box at all. */
+:host([separation="filled"]:not([group])) {
+  background-color: color-mix(in oklab, var(--_canvas-card-color) 16%, var(--helix-color-surface));
+  border-color: transparent;
+}
+
+:host([separation="elevated"]:not([group])) {
+  --canvas-node-shadow: var(--helix-shadow-md);
+}
+
+:host([separation="plain"]:not([group])) {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+/* **Glass is a pair**, the note `Card` carries: a filter behind an opaque
+   ground is invisible and a translucent ground over an unfiltered board is a
+   smear, so the card owns both. What shows through is the ruling. */
+:host([material="glass"]:not([group])) {
+  backdrop-filter: var(--helix-material-backdrop);
+  background-color: var(--helix-material-translucent);
+}
+
+:host([material="frosted"]:not([group])) {
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+  background-color: var(--helix-material-translucent-strong);
+}
+
+:host([material="transparent"]:not([group])) {
+  backdrop-filter: none;
+  background-color: transparent;
 }
 
 /* **Centered down the card, and still read from the start across it.** The

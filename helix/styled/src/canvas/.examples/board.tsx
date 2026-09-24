@@ -25,9 +25,9 @@ export function Example() {
       </helix-canvas-node>
 
       <helix-canvas-node
-        color="3"
         height={64}
         name="review"
+        tone="accent"
         width={160}
         x={320}
         y={0}
@@ -36,9 +36,9 @@ export function Example() {
       </helix-canvas-node>
 
       <helix-canvas-node
-        color="4"
         height={64}
         name="ship"
+        tone="success"
         width={160}
         x={160}
         y={200}

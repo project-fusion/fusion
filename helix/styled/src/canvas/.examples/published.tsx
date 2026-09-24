@@ -16,9 +16,9 @@ export function Example() {
       </helix-canvas-node>
 
       <helix-canvas-node
-        color="5"
         height={64}
         name="cache"
+        tone="info"
         width={160}
         x={320}
         y={0}
@@ -27,9 +27,9 @@ export function Example() {
       </helix-canvas-node>
 
       <helix-canvas-node
-        color="6"
         height={64}
         name="db"
+        tone="primary"
         width={160}
         x={320}
         y={160}

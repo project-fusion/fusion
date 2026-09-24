@@ -6,9 +6,9 @@ const STEP = 32
 const snap = (value: number) => Math.round(value / STEP) * STEP
 
 const START = [
-  { color: undefined, name: 'todo', text: 'To do', x: 0, y: 0 },
-  { color: '3', name: 'doing', text: 'Doing', x: 256, y: 0 },
-  { color: '4', name: 'done', text: 'Done', x: 512, y: 0 },
+  { name: 'todo', text: 'To do', x: 0, y: 0 },
+  { name: 'doing', text: 'Doing', tone: 'accent', x: 256, y: 0 },
+  { name: 'done', text: 'Done', tone: 'success', x: 512, y: 0 },
 ]
 
 export function Example() {
@@ -32,10 +32,10 @@ export function Example() {
     >
       {cards.map((card) => (
         <helix-canvas-node
-          color={card.color}
           height={64}
           key={card.name}
           name={card.name}
+          tone={card.tone}
           width={160}
           x={card.x}
           y={card.y}

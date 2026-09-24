@@ -30,6 +30,7 @@ import {
   type CanvasEdge,
   type CanvasNode,
   type CanvasSide,
+  colorOf,
   connector,
   ends,
   extent,
@@ -49,6 +50,7 @@ export type {
   CanvasNodeProps,
   CanvasPath,
   CanvasSide,
+  CanvasTone,
 } from './canvas-document.js'
 export { fromJsonCanvas } from './canvas-document.js'
 
@@ -110,18 +112,13 @@ const fill = (template: string, values: Record<string, string>): string =>
 type Stop = { kind: 'node'; key: string } | { kind: 'edge'; key: string; edge: CanvasEdge }
 
 /**
- * A color the document named, as a preset number or as its own value.
- *
- * JSON Canvas writes either: `1` to `6`, which mean whatever the application
- * says and here point at semantic tokens, or a hex a document chose for itself.
- * A preset becomes an attribute a stylesheet can match and a hex becomes a
- * property it can read, because no stylesheet can enumerate the second.
+ * A color the page wrote in an element's own `style`, which is where a color
+ * with no meaning goes: a tone is a statement and an attribute, a hex is a
+ * style. Read from the inline style, because the line is drawn by the board and
+ * not by the element, so nothing inherits the value across on its own.
  */
-const preset = (color: string | undefined): string | undefined =>
-  color !== undefined && /^[1-6]$/.test(color) ? color : undefined
-
-const own = (color: string | undefined): string | undefined =>
-  color !== undefined && preset(color) === undefined ? color : undefined
+const custom = (element: HTMLElement | undefined, name: string): string =>
+  element?.style.getPropertyValue(name).trim() ?? ''
 
 /**
  * @summary Draws a JSON Canvas document, read-only.
@@ -450,7 +447,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** The same, as the shape the geometry works in. */
   private get nodes(): CanvasNode[] {
     return this.cards.map((card) => ({
-      color: card.color,
+      color: colorOf(card.tone, custom(card, '--canvas-node-color')),
       height: card.height,
       id: card.name,
       /* An empty label is no label: `??` falls through on nothing at all, and a
@@ -469,7 +466,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     return this.knownChildren
       .filter((child): child is HelixHeadlessCanvasEdge => child instanceof HelixHeadlessCanvasEdge)
       .map((edge) => ({
-        color: edge.color,
+        color: colorOf(edge.tone, custom(edge, '--canvas-edge-color')),
         fromEnd: edge.fromEnd,
         fromNode: edge.from,
         fromSide: edge.fromSide,
@@ -1662,12 +1659,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       card.style.setProperty('--_canvas-card-y', `${card.y - origin.y}px`)
       card.style.setProperty('--_canvas-card-inline-size', `${card.width}px`)
       card.style.setProperty('--_canvas-card-block-size', `${card.height}px`)
-      const chosen = own(card.color)
-      if (chosen === undefined) {
-        card.style.removeProperty('--_canvas-card-color')
-      } else {
-        card.style.setProperty('--_canvas-card-color', chosen)
-      }
       if (group) {
         card.setAttribute('data-group', group.id)
       } else {
@@ -1698,6 +1689,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   private renderEdges(origin: { x: number; y: number }, box: { width: number; height: number }) {
     const byId = new Map(this.nodes.map((one) => [one.id, one]))
+    const elements = new Map(
+      this.knownChildren
+        .filter(
+          (child): child is HelixHeadlessCanvasEdge => child instanceof HelixHeadlessCanvasEdge,
+        )
+        .map((child) => [keyOf({ fromNode: child.from, id: child.name, toNode: child.to }), child]),
+    )
     const stop = this.walk.some((one) => one.key === this.stop) ? this.stop : undefined
     const shifted = (node: CanvasNode) => ({
       ...node,
@@ -1734,6 +1732,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           return nothing
         }
         const key = keyOf(edge)
+        const element = elements.get(key)
         /* The connection whose end is in hand is drawn by the draft instead,
            so a reader sees it lifted rather than drawn twice. */
         if (this.linking?.edge === key && !this.linking.pressed) {
@@ -1769,11 +1768,12 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
             part="edge"
             aria-hidden="true"
             d=${drawn.d}
-            data-color=${preset(edge.color) ?? nothing}
+            data-tone=${element?.tone ?? nothing}
+            data-variant=${element?.variant ?? nothing}
             fill="none"
             marker-end=${ends.end ? `url(#${ARROW})` : nothing}
             marker-start=${ends.start ? `url(#${ARROW})` : nothing}
-            style=${own(edge.color) === undefined ? nothing : `--_canvas-edge-color: ${own(edge.color)}`}
+            style=${custom(element, '--canvas-edge-color') ? `--_canvas-edge-color: ${custom(element, '--canvas-edge-color')}` : nothing}
           />
           ${
             edge.label

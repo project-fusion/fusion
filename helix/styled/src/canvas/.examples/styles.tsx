@@ -1,0 +1,73 @@
+export function Example() {
+  return (
+    <helix-canvas
+      grid="dots"
+      label="Ways a card and a line can look"
+    >
+      <helix-canvas-node
+        height={64}
+        name="outlined"
+        width={160}
+        x={0}
+        y={0}
+      >
+        Outlined, at rest
+      </helix-canvas-node>
+
+      <helix-canvas-node
+        height={64}
+        name="filled"
+        separation="filled"
+        tone="success"
+        width={160}
+        x={256}
+        y={0}
+      >
+        Filled with its tone
+      </helix-canvas-node>
+
+      <helix-canvas-node
+        height={64}
+        name="elevated"
+        separation="elevated"
+        tone="accent"
+        width={160}
+        x={0}
+        y={160}
+      >
+        Elevated
+      </helix-canvas-node>
+
+      <helix-canvas-node
+        height={64}
+        name="plain"
+        separation="plain"
+        width={160}
+        x={256}
+        y={160}
+      >
+        Plain, a label on the board
+      </helix-canvas-node>
+
+      <helix-canvas-edge
+        from="outlined"
+        to="filled"
+      ></helix-canvas-edge>
+
+      <helix-canvas-edge
+        from="filled"
+        label="optional"
+        to="plain"
+        variant="dashed"
+      ></helix-canvas-edge>
+
+      <helix-canvas-edge
+        from="outlined"
+        label="later"
+        to="elevated"
+        tone="warning"
+        variant="dotted"
+      ></helix-canvas-edge>
+    </helix-canvas>
+  )
+}

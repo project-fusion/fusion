@@ -24,7 +24,7 @@ type Card = HTMLElement & { current: boolean; links: string; x: number; y: numbe
 const BOARD = `
   <helix-headless-canvas-node name="pair" group label="The pair" x="-20" y="-20" width="500" height="200"></helix-headless-canvas-node>
   <helix-headless-canvas-node name="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
-  <helix-headless-canvas-node name="b" color="3" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
+  <helix-headless-canvas-node name="b" tone="accent" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
   <helix-headless-canvas-node name="c" x="130" y="300" width="200" height="100">Third</helix-headless-canvas-node>
   <helix-headless-canvas-edge name="e1" from="a" to="b"></helix-headless-canvas-edge>
   <helix-headless-canvas-edge name="e2" from="b" to="c" label="then"></helix-headless-canvas-edge>
@@ -915,17 +915,40 @@ describe('canvas gestures', () => {
  * allows in two shapes each.
  */
 describe('canvas document detail', () => {
-  test('a preset color is an attribute and a card\u2019s own is a property', async () => {
-    /* A stylesheet can match `1` to `6` and cannot enumerate every hex, so the
-       two arrive by different routes. */
-    const host = await canvas(
+  test('a tone is what a card and a line mean, and goes out as the format\u2019s preset', async () => {
+    const host = (await canvas(
       '',
-      `<helix-headless-canvas-node name="preset" color="3" x="0" y="0" width="80" height="40">Preset</helix-headless-canvas-node>
-       <helix-headless-canvas-node name="own" color="#ff8800" x="120" y="0" width="80" height="40">Own</helix-headless-canvas-node>`,
-    )
-    const card = (id: string) => host.querySelector(`[name="${id}"]`) as HTMLElement
-    expect(card('preset').getAttribute('color')).toBe('3')
-    expect(card('own').getAttribute('style')).toContain('--_canvas-card-color: #ff8800')
+      `<helix-headless-canvas-node name="toned" tone="accent" x="0" y="0" width="80" height="40">Toned</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="own" style="--canvas-node-color: #ff8800" x="120" y="0" width="80" height="40">Own</helix-headless-canvas-node>
+       <helix-headless-canvas-edge name="line" from="toned" to="own" tone="danger" variant="dashed" style="--canvas-edge-color: #00aa88"></helix-headless-canvas-edge>`,
+    )) as Canvas & {
+      toJsonCanvas(): {
+        nodes: Array<{ id: string; color?: string }>
+        edges: Array<{ color?: string }>
+      }
+    }
+    const painted = host.shadowRoot?.querySelector('[part="edge"]') as SVGPathElement
+    // The stylesheet matches the tone and the variant; a custom color is carried across.
+    expect(painted.getAttribute('data-tone')).toBe('danger')
+    expect(painted.getAttribute('data-variant')).toBe('dashed')
+    expect(painted.getAttribute('style')).toContain('--_canvas-edge-color: #00aa88')
+    // The tone goes out as its preset, and a custom color as itself.
+    const saved = host.toJsonCanvas()
+    expect(saved.nodes.find((one) => one.id === 'toned')?.color).toBe('3')
+    expect(saved.nodes.find((one) => one.id === 'own')?.color).toBe('#ff8800')
+    expect(saved.edges[0]?.color).toBe('1')
+  })
+
+  test('a JSON Canvas preset comes in as a tone, and a hex as a custom color', async () => {
+    const { fromJsonCanvas } = await import('../index.js')
+    const props = fromJsonCanvas({
+      nodes: [
+        { color: '4', height: 10, id: 'a', type: 'text', width: 10, x: 0, y: 0 },
+        { color: '#123456', height: 10, id: 'b', type: 'text', width: 10, x: 0, y: 0 },
+      ],
+    })
+    expect(props.nodes[0]).toMatchObject({ color: undefined, tone: 'success' })
+    expect(props.nodes[1]).toMatchObject({ color: '#123456', tone: undefined })
   })
 
   test('an edge arrives with an arrowhead and leaves without one, as the format says', async () => {
