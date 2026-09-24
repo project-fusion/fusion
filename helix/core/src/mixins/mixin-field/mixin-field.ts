@@ -26,6 +26,12 @@ export declare class MixinFieldInterface {
    */
   protected controlId: string
 
+  /** The id a group's label carries, for a set inside the template to be named by. */
+  protected groupLabelId: string
+
+  /** Whether `renderGroupLabel` draws a label at all. */
+  protected get groupLabelled(): boolean
+
   /**
    * Help under the control, shown while there is nothing wrong.
    *
@@ -196,6 +202,24 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     protected controlId = 'control'
 
     /**
+     * The id a group's label carries, for a set inside the template to be
+     * named by.
+     *
+     * **A set drawn inside the template is not the host**, which is what
+     * `hostAria` names: a rating's radiogroup and a pin input's row of cells
+     * are elements of their own, and they had no name but a `label` string,
+     * or none at all. In the same tree as the label, so a plain
+     * `aria-labelledby` resolves, and it names them by whatever the label
+     * holds, a slotted one included.
+     */
+    protected groupLabelId = 'group-label'
+
+    /** Whether `renderGroupLabel` draws a label at all. */
+    protected get groupLabelled(): boolean {
+      return this.label !== '' || Boolean(this.getAttribute('aria-label'))
+    }
+
+    /**
      * What is wrong, in the reader's words rather than the browser's.
      */
     @property()
@@ -324,7 +348,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       if (this.label === '' && !hidden) {
         return nothing
       }
-      return html`<span part="label" ?data-hidden=${hidden !== null}
+      return html`<span part="label" id=${this.groupLabelId} ?data-hidden=${hidden !== null}
         ><slot name="label">${this.label || hidden}</slot></span
       >`
     }

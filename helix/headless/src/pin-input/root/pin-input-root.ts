@@ -523,13 +523,14 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
        element in this template carries that id, because a pin input is a row of
        cells and not one control: the visible label pointed at nothing, so
        pressing it focused nothing and the group had no accessible name at all.
-       The set names itself through `hostAria` instead. */
+       The row is named by the group label instead, which is in this tree. */
     return html`${this.renderGroupLabel()}
       <div
         dir="ltr"
         part="field"
         role="group"
         aria-describedby=${this.describedBy ?? nothing}
+        aria-labelledby=${this.groupLabelled ? this.groupLabelId : nothing}
         @focusin=${this.handleFocusIn}
         @focusout=${this.handleFocusOut}
       >

@@ -561,3 +561,29 @@ if (hasLayout()) {
     })
   })
 }
+
+/* Only in a real engine, as the listbox's own: `ariaActiveDescendantElement`
+   is an element reference, which happy-dom does not implement, and the
+   component feature-tests it. */
+if (hasLayout()) {
+  describe('combobox active descendant', () => {
+    test('the input points at the option the arrows are on', async () => {
+      /* Focus stays in the input, which is what a screen reader asks, and
+         the list pointed only itself at the option: arrowing moved the
+         highlight in silence. */
+      const host = await combobox()
+      await press(host, 'ArrowDown')
+      const input = control(host) as HTMLInputElement & {
+        ariaActiveDescendantElement?: Element | null
+      }
+      const first = input.ariaActiveDescendantElement
+      expect(first).toBe(options(host).find((option) => option.active) ?? null)
+      expect(first).not.toBeNull()
+      await press(host, 'ArrowDown')
+      expect(input.ariaActiveDescendantElement).not.toBe(first)
+      expect(input.ariaActiveDescendantElement).toBe(
+        options(host).find((option) => option.active) ?? null,
+      )
+    })
+  })
+}

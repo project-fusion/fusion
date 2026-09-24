@@ -519,3 +519,20 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('the name of the set', () => {
+  test("is the label wherever it came from, the host's aria-label included", async () => {
+    /* The radiogroup took its name from `label` alone, so a rating named by
+       `aria-label` on the host, as a table cell's often is, was a nameless
+       group of stars. */
+    document.body.innerHTML = '<helix-headless-rating aria-label="Service"></helix-headless-rating>'
+    const host = document.body.firstElementChild as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await host.updateComplete
+    const group = part(host, 'marks')
+    const named = group?.getAttribute('aria-labelledby') ?? ''
+    const scope = group?.getRootNode() as ShadowRoot
+    expect(scope.getElementById(named)?.textContent?.trim()).toBe('Service')
+  })
+})

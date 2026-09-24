@@ -38,6 +38,19 @@ const entries = (menu: Menu): HTMLElement[] => [
   ...(menu.shadowRoot?.querySelectorAll<HTMLElement>('helix-headless-menu-item') ?? []),
 ]
 
+/**
+ * Whether each entry says it is the one on, read off the row a reader lands
+ * on. The item renders that row itself, so a role or a state written on the
+ * item's host is on a node focus never reaches, which is where this was.
+ */
+const ticked = async (menu: Menu): Promise<(string | null | undefined)[]> => {
+  const all = entries(menu) as (HTMLElement & { updateComplete: Promise<boolean> })[]
+  await Promise.all(all.map((one) => one.updateComplete))
+  return all.map((one) =>
+    one.shadowRoot?.querySelector('[role="menuitemradio"]')?.getAttribute('aria-checked'),
+  )
+}
+
 describe('video playlist menu', () => {
   test('finds its playlist upward, across the slot it was placed in', async () => {
     const { menu } = await mountMenu()
@@ -84,8 +97,7 @@ describe('video playlist menu', () => {
 
   test('marks the current entry, and only that one', async () => {
     const { menu } = await mountMenu()
-    const checked = entries(menu).map((one) => one.getAttribute('aria-checked'))
-    expect(checked).toEqual(['true', 'false', 'false'])
+    expect(await ticked(menu)).toEqual(['true', 'false', 'false'])
   })
 
   test('carries a disabled entry through, rather than dropping it', async () => {
@@ -176,11 +188,7 @@ describe('video playlist menu', () => {
     await playlist.updateComplete
     menu.dispatchEvent(new CustomEvent('helix-before-open', { bubbles: true, composed: true }))
     await menu.updateComplete
-    expect(entries(menu).map((one) => one.getAttribute('aria-checked'))).toEqual([
-      'false',
-      'true',
-      'false',
-    ])
+    expect(await ticked(menu)).toEqual(['false', 'true', 'false'])
   })
 
   test('names itself and its trigger from one property', async () => {

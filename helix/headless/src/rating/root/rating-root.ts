@@ -522,7 +522,8 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     <div
       part="marks"
       role=${this.readOnly ? 'img' : 'radiogroup'}
-      aria-label=${this.readOnly ? said : this.label || nothing}
+      aria-label=${this.readOnly ? said : nothing}
+      aria-labelledby=${!this.readOnly && this.groupLabelled ? this.groupLabelId : nothing}
       aria-describedby=${this.describedBy ?? nothing}
       aria-required=${this.required && !this.readOnly ? 'true' : nothing}
       data-slotted=${this.markSource ? '' : nothing}
