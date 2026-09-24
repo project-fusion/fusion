@@ -1,4 +1,5 @@
 import {
+  capturePointer,
   customElement,
   HelixCanvasPanEvent,
   HelixCanvasZoomEvent,
@@ -24,6 +25,7 @@ import {
 export type {
   CanvasDocument,
   CanvasEdge,
+  CanvasEnd,
   CanvasNode,
   CanvasSide,
 } from './canvas-document.js'
@@ -38,6 +40,34 @@ export type {
  * everything else.
  */
 const MARGIN = 32
+
+/**
+ * The arrowhead, named once inside this shadow root.
+ *
+ * An id is scoped to the root it is written in, so two boards on one page do not
+ * collide and a constant is safe where a generated one would only be noise.
+ */
+const ARROW = 'canvas-arrow'
+
+/** Whether an end carries an arrowhead, the format defaulting the two differently. */
+const heads = (edge: CanvasEdge): { start: boolean; end: boolean } => ({
+  end: (edge.toEnd ?? 'arrow') === 'arrow',
+  start: edge.fromEnd === 'arrow',
+})
+
+/**
+ * A color the document named, as a preset number or as its own value.
+ *
+ * JSON Canvas writes either: `1` to `6`, which mean whatever the application
+ * says and here point at semantic tokens, or a hex a document chose for itself.
+ * A preset becomes an attribute a stylesheet can match and a hex becomes a
+ * property it can read, because no stylesheet can enumerate the second.
+ */
+const preset = (color: string | undefined): string | undefined =>
+  color !== undefined && /^[1-6]$/.test(color) ? color : undefined
+
+const own = (color: string | undefined): string | undefined =>
+  color !== undefined && preset(color) === undefined ? color : undefined
 
 /**
  * What a consumer may draw a card's body with, where plain text is not enough.
@@ -97,6 +127,7 @@ export type CanvasCardRenderer = (node: CanvasNode) => string | TemplateResult
  * @event {HelixCanvasPanEvent} helix-canvas-pan - The board moved, which on a canvas is a fact rather than a request.
  * @event {HelixCanvasZoomEvent} helix-canvas-zoom - The board zoomed, and said so.
  *
+ * @csspart arrow - The head an edge carries at an end that has one.
  * @csspart board - The plane the cards are placed on, which is what pans and zooms.
  * @csspart card - One card, group or link.
  * @csspart controls - The group the pan and zoom buttons sit in.
@@ -275,14 +306,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   override zoom(by: number): void {
     this.touched = true
-    const from = this.at.zoom
-    const to = Math.min(Math.max(by > 0 ? from * 1.25 : from / 1.25, 0.25), 4)
-    const middle = { x: this.box.width / 2, y: this.box.height / 2 }
-    this.at = {
-      x: middle.x - ((middle.x - this.at.x) * to) / from,
-      y: middle.y - ((middle.y - this.at.y) * to) / from,
-      zoom: to,
-    }
+    this.zoomAbout(by > 0 ? 1.25 : 1 / 1.25, { x: this.box.width / 2, y: this.box.height / 2 })
     super.zoom(by)
   }
 
@@ -308,6 +332,99 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       ...this.at,
       x: this.box.width / 2 - middle.x,
       y: this.box.height / 2 - middle.y,
+    }
+  }
+
+  /** Where a drag started, and where the board was when it did. */
+  private dragging:
+    | { pointer: number; from: { x: number; y: number }; at: { x: number; y: number } }
+    | undefined
+
+  /**
+   * Drag to move the board, which is the gesture a canvas is reached for with.
+   *
+   * **Here rather than in the surface, because a map handles its own.** What
+   * `Map` frames is somebody else's renderer, and MapLibre and Leaflet both
+   * drag their own view: a frame that dragged too would move the map twice. A
+   * board is drawn here, so the drag is this family's.
+   *
+   * The capture is an enhancement and the drag survives losing it, which is what
+   * `capturePointer` is for: a pointer that leaves the box mid-drag keeps
+   * moving the board rather than sticking.
+   */
+  private readonly handlePointerDown = (event: PointerEvent): void => {
+    /* The primary button only, and never a press that began on a control: the
+       buttons are inside this region and a press on one is not a drag. */
+    if (event.button !== 0 || (event.target as Element | null)?.closest('[part~="controls"]')) {
+      return
+    }
+    this.touched = true
+    this.dragging = {
+      at: { x: this.at.x, y: this.at.y },
+      from: { x: event.clientX, y: event.clientY },
+      pointer: event.pointerId,
+    }
+    capturePointer(event.currentTarget as Element, event.pointerId)
+  }
+
+  private readonly handlePointerMove = (event: PointerEvent): void => {
+    this.idle.stir()
+    const drag = this.dragging
+    if (!drag || drag.pointer !== event.pointerId) {
+      return
+    }
+    /* No easing while a finger is down: a transition here would drag the board
+       along behind the pointer rather than under it. */
+    this.at = {
+      ...this.at,
+      x: drag.at.x + (event.clientX - drag.from.x),
+      y: drag.at.y + (event.clientY - drag.from.y),
+    }
+  }
+
+  private readonly handlePointerUp = (event: PointerEvent): void => {
+    if (this.dragging?.pointer === event.pointerId) {
+      this.dragging = undefined
+    }
+  }
+
+  /**
+   * The wheel, which pans, and the wheel with a modifier, which zooms.
+   *
+   * **`ctrlKey` is a pinch as well as a control press**, which is the platform's
+   * own convention rather than this component's: a trackpad pinch arrives as a
+   * wheel event with `ctrlKey` set, on every browser, and a component that
+   * ignored it would be the one thing on the page a pinch does not work on.
+   *
+   * Prevented, because the alternative is the page scrolling out from under a
+   * reader who meant to move the board. A wheel over a board is about the board.
+   */
+  private readonly handleWheel = (event: WheelEvent): void => {
+    event.preventDefault()
+    this.touched = true
+    if (event.ctrlKey) {
+      /* About the pointer where the platform says where that is, and about the
+         middle where it does not: `offsetX` is absent in more places than a
+         component should assume, and a pinch that scaled about `NaN` would send
+         the board somewhere nobody asked for. */
+      const about = {
+        x: Number.isFinite(event.offsetX) ? event.offsetX : this.box.width / 2,
+        y: Number.isFinite(event.offsetY) ? event.offsetY : this.box.height / 2,
+      }
+      this.zoomAbout(event.deltaY < 0 ? 1.1 : 1 / 1.1, about)
+      return
+    }
+    this.at = { ...this.at, x: this.at.x - event.deltaX, y: this.at.y - event.deltaY }
+  }
+
+  /** Scales about a point in the box, which is what both the buttons and a pinch want. */
+  private zoomAbout(by: number, about: { x: number; y: number }): void {
+    const from = this.at.zoom
+    const to = Math.min(Math.max(from * by, 0.25), 4)
+    this.at = {
+      x: about.x - ((about.x - this.at.x) * to) / from,
+      y: about.y - ((about.y - this.at.y) * to) / from,
+      zoom: to,
     }
   }
 
@@ -431,11 +548,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       part="card"
       aria-label=${node.type === 'group' ? this.textOf(node) : nothing}
       data-type=${node.type}
-      data-color=${node.color ?? nothing}
+      data-color=${preset(node.color) ?? nothing}
       data-group=${group?.id ?? nothing}
       id=${`card-${node.id}`}
       role=${node.type === 'group' ? 'group' : 'article'}
-      style=${`--_canvas-card-x: ${node.x - origin.x}px; --_canvas-card-y: ${node.y - origin.y}px; --_canvas-card-inline-size: ${node.width}px; --_canvas-card-block-size: ${node.height}px`}
+      style=${`--_canvas-card-x: ${node.x - origin.x}px; --_canvas-card-y: ${node.y - origin.y}px; --_canvas-card-inline-size: ${node.width}px; --_canvas-card-block-size: ${node.height}px${own(node.color) === undefined ? '' : `; --_canvas-card-color: ${own(node.color)}`}`}
     >
       ${
         body === undefined
@@ -459,6 +576,19 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       width=${box.width}
       height=${box.height}
     >
+      <defs>
+        <marker
+          id=${ARROW}
+          markerHeight="8"
+          markerUnits="strokeWidth"
+          markerWidth="8"
+          orient="auto-start-reverse"
+          refX="7"
+          refY="4"
+        >
+          <path part="arrow" d="M0 0 L8 4 L0 8 z" />
+        </marker>
+      </defs>
       ${this.edges.map((edge) => {
         const from = byId.get(edge.fromNode)
         const to = byId.get(edge.toNode)
@@ -476,7 +606,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
            built with `html` inside an `<svg>` is an unknown HTML element that
            takes the attributes, answers `querySelector` and paints nothing. It
            cost a spec that passed against a board with no lines on it. */
-        return svg`<path part="edge" d=${drawn.d} data-color=${edge.color ?? nothing} fill="none" />
+        const ends = heads(edge)
+        return svg`<path
+            part="edge"
+            d=${drawn.d}
+            data-color=${preset(edge.color) ?? nothing}
+            fill="none"
+            marker-end=${ends.end ? `url(#${ARROW})` : nothing}
+            marker-start=${ends.start ? `url(#${ARROW})` : nothing}
+            style=${own(edge.color) === undefined ? nothing : `--_canvas-edge-color: ${own(edge.color)}`}
+          />
           ${
             edge.label
               ? svg`<text part="label" x=${drawn.mid.x} y=${drawn.mid.y} text-anchor="middle">
@@ -509,7 +648,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       <div part="header">
         <slot name="header"></slot>
       </div>
-      <div part="viewport">
+      <div
+        part="viewport"
+        @pointercancel=${this.handlePointerUp}
+        @pointerdown=${this.handlePointerDown}
+        @pointermove=${this.handlePointerMove}
+        @pointerup=${this.handlePointerUp}
+        @wheel=${this.handleWheel}
+      >
         ${
           nodes.length === 0
             ? html`<slot name="empty"></slot>`

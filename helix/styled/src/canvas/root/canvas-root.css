@@ -64,8 +64,28 @@
 }
 
 [part="edge"] {
-  stroke: var(--canvas-edge-color, var(--helix-color-border));
+  stroke: var(--_canvas-edge-color, var(--canvas-edge-color, var(--helix-color-border)));
   stroke-width: var(--helix-border-thick);
+}
+
+/* **The head takes the line's own color where the browser can say what that
+   is.** `context-stroke` resolves to the stroke of the element the marker is
+   drawn on, so a colored edge arrives with a matching head and nothing has to
+   write the color twice. The plain declaration above it is what a browser
+   without it falls back to, rather than the black an unset fill would give. */
+[part="arrow"] {
+  fill: var(--canvas-edge-color, var(--helix-color-border));
+}
+
+@supports (fill: context-stroke) {
+  [part="arrow"] {
+    fill: context-stroke;
+  }
+}
+
+/* A color the document chose for itself, which no stylesheet can enumerate. */
+[part="card"][style*="--_canvas-card-color"] {
+  border-color: var(--_canvas-card-color);
 }
 
 [part="edge"][data-color="1"] {
@@ -91,6 +111,17 @@
   fill: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
+}
+
+/* **Grab to move it**, which is the gesture a board is reached for with, and
+   the only cursor that says the whole plane moves rather than one card. */
+[part="viewport"] {
+  cursor: grab;
+  touch-action: none;
+}
+
+[part="viewport"]:active {
+  cursor: grabbing;
 }
 
 /* Placed where the document put it, in the document's own units. */

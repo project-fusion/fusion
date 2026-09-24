@@ -214,3 +214,171 @@ describe('canvas', () => {
     expect(card.textContent).toContain('<img')
   })
 })
+
+/**
+ * The gestures a board is reached for with, which are this family's rather than
+ * the surface's: what `Map` frames drags its own view.
+ */
+describe('canvas gestures', () => {
+  /** A pointer event happy-dom will carry, with the fields the handler reads. */
+  const pointer = (type: string, at: { x: number; y: number }): PointerEvent =>
+    new PointerEvent(type, { bubbles: true, button: 0, clientX: at.x, clientY: at.y, pointerId: 1 })
+
+  const board = (host: Canvas): string =>
+    (part(host, 'board') as HTMLElement).getAttribute('style') ?? ''
+
+  /**
+   * Where the board sits, read back out of the style.
+   *
+   * **Read rather than asserted against a number**, because these specs run in
+   * happy-dom, where the box measures nothing and the board opens un-fitted, and
+   * again in a browser, where it measures something and the board opens fitted.
+   * What a gesture is worth is the distance it moved, and that is the same in
+   * both.
+   */
+  const at = (host: Canvas): { x: number; y: number; zoom: number } => {
+    const style = board(host)
+    const read = (name: string): number =>
+      Number(new RegExp(`--_canvas-${name}: (-?[0-9.]+)`).exec(style)?.[1] ?? 'NaN')
+    return { x: read('x'), y: read('y'), zoom: read('zoom') }
+  }
+
+  test('a drag moves the board by the distance the pointer moved', async () => {
+    const host = await canvas()
+    const viewport = part(host, 'viewport') as HTMLElement
+    const before = at(host)
+    viewport.dispatchEvent(pointer('pointerdown', { x: 100, y: 100 }))
+    viewport.dispatchEvent(pointer('pointermove', { x: 160, y: 130 }))
+    await host.updateComplete
+    /* Exactly the distance the pointer moved: a drag carries the plane under the
+       finger rather than by some fraction of it. */
+    expect(at(host).x - before.x).toBe(60)
+    expect(at(host).y - before.y).toBe(30)
+
+    viewport.dispatchEvent(pointer('pointerup', { x: 160, y: 130 }))
+    const released = at(host)
+    viewport.dispatchEvent(pointer('pointermove', { x: 400, y: 400 }))
+    await host.updateComplete
+    // Released, so the board stays where the drag left it.
+    expect(at(host)).toEqual(released)
+  })
+
+  test('a press that began on a control is not a drag', async () => {
+    /* The buttons sit inside the region this listens on, and a press on one is
+       an ask rather than the start of a gesture. */
+    const host = await canvas()
+    const viewport = part(host, 'viewport') as HTMLElement
+    const zoom = host.shadowRoot?.querySelector('[part="zoom-in"]') as HTMLElement
+    const before = at(host)
+    zoom.dispatchEvent(pointer('pointerdown', { x: 10, y: 10 }))
+    viewport.dispatchEvent(pointer('pointermove', { x: 200, y: 200 }))
+    await host.updateComplete
+    expect(at(host)).toEqual(before)
+  })
+
+  test('the wheel pans, and the page does not scroll instead', async () => {
+    const host = await canvas()
+    const viewport = part(host, 'viewport') as HTMLElement
+    const before = at(host)
+    const wheel = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaX: 20,
+      deltaY: 40,
+    })
+    viewport.dispatchEvent(wheel)
+    await host.updateComplete
+    expect(wheel.defaultPrevented).toBe(true)
+    expect(at(host).x - before.x).toBe(-20)
+    expect(at(host).y - before.y).toBe(-40)
+  })
+
+  test('zoom holds the middle of the view rather than the corner', async () => {
+    /* Scaling from the origin pushes what a reader is looking at toward the
+       corner, so every press has to be undone with a pan. */
+    const host = await canvas()
+    const zoomIn = host.shadowRoot?.querySelector('[part="zoom-in"]') as HTMLElement | null
+    const zoomOut = host.shadowRoot?.querySelector('[part="zoom-out"]') as HTMLElement | null
+    const before = at(host)
+    zoomIn?.click()
+    await host.updateComplete
+    zoomOut?.click()
+    await host.updateComplete
+    // In and back out returns the offset it started from.
+    expect(at(host)).toEqual(before)
+  })
+})
+
+/**
+ * What the document says about its colors and its arrows, which the format
+ * allows in two shapes each.
+ */
+describe('canvas document detail', () => {
+  test('a preset color is an attribute and a document’s own is a property', async () => {
+    /* A stylesheet can match `1` to `6` and cannot enumerate every hex, so the
+       two arrive by different routes. */
+    const host = await canvas()
+    host.data = {
+      edges: [],
+      nodes: [
+        {
+          color: '3',
+          height: 40,
+          id: 'preset',
+          text: 'Preset',
+          type: 'text',
+          width: 80,
+          x: 0,
+          y: 0,
+        },
+        {
+          color: '#ff8800',
+          height: 40,
+          id: 'own',
+          text: 'Own',
+          type: 'text',
+          width: 80,
+          x: 120,
+          y: 0,
+        },
+      ],
+    }
+    await host.updateComplete
+    const card = (id: string) => host.shadowRoot?.querySelector(`#card-${id}`) as HTMLElement
+    expect(card('preset').getAttribute('data-color')).toBe('3')
+    expect(card('own').hasAttribute('data-color')).toBe(false)
+    expect(card('own').getAttribute('style')).toContain('--_canvas-card-color: #ff8800')
+  })
+
+  test('an edge arrives with an arrowhead and leaves without one, as the format says', async () => {
+    const host = await canvas()
+    const edge = host.shadowRoot?.querySelector('[part="edge"]') as SVGPathElement
+    expect(edge.getAttribute('marker-end')).toContain('canvas-arrow')
+    expect(edge.hasAttribute('marker-start')).toBe(false)
+  })
+
+  test('and a document that asks for both ends, or neither, gets what it asked', async () => {
+    const host = await canvas()
+    host.data = {
+      edges: [
+        { fromEnd: 'arrow', fromNode: 'a', id: 'both', toNode: 'b' },
+        { fromNode: 'b', id: 'bare', toEnd: 'none', toNode: 'c' },
+      ],
+      nodes: BOARD.nodes,
+    }
+    await host.updateComplete
+    const edges = [
+      ...(host.shadowRoot?.querySelectorAll('[part="edge"]') ?? []),
+    ] as SVGPathElement[]
+    expect(edges[0]?.hasAttribute('marker-start')).toBe(true)
+    expect(edges[1]?.hasAttribute('marker-end')).toBe(false)
+  })
+
+  test('a consumer’s own card renderer is placed where a stylesheet can find it', async () => {
+    const host = (await canvas()) as Canvas & { renderCard?: (node: { text?: string }) => string }
+    host.renderCard = (node) => `${node.text ?? ''} (drawn)`
+    await host.updateComplete
+    const card = host.shadowRoot?.querySelector('#card-a') as HTMLElement
+    expect(card.querySelector('[data-prose]')?.textContent).toContain('(drawn)')
+  })
+})

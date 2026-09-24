@@ -34,6 +34,9 @@ export interface CanvasNode {
   label?: string
 }
 
+/** What a connector carries at an end: an arrowhead, or nothing. */
+export type CanvasEnd = 'none' | 'arrow'
+
 /** One connector between two nodes. */
 export interface CanvasEdge {
   id: string
@@ -41,6 +44,13 @@ export interface CanvasEdge {
   toNode: string
   fromSide?: CanvasSide
   toSide?: CanvasSide
+  /**
+   * What sits at the end it leaves from. Absent is nothing, which is the
+   * format's own default and what makes an ordinary edge a one-way arrow.
+   */
+  fromEnd?: CanvasEnd
+  /** What sits at the end it arrives at. Absent is an arrow, as the format says. */
+  toEnd?: CanvasEnd
   color?: string
   label?: string
 }

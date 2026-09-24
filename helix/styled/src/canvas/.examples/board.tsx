@@ -1,6 +1,5 @@
 import type { CanvasDocument, HelixCanvas } from '@fusion.dev/helix'
 import { useEffect, useRef } from 'react'
-import './board.css'
 
 /* The document is a property rather than a URL, because what a fetch returns
    cannot be server-rendered: a board that arrived only with the JavaScript
