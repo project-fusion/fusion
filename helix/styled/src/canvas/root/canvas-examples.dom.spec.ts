@@ -44,6 +44,21 @@ describe('the board example', () => {
     expect(inside('board')?.getAttribute('style')).not.toBe(before)
   })
 
+  run('a pinch zooms the board, which is what the platform sends as a modified wheel', async () => {
+    /* Browser only, and deliberately: happy-dom's wheel event carries neither
+       `ctrlKey` nor `offsetX`, so the one gesture every trackpad sends cannot be
+       tested where the rest of these are. */
+    await example(board)
+    await idle()
+    const before = inside('board')?.getAttribute('style')
+    inside('viewport')?.dispatchEvent(
+      new WheelEvent('wheel', { bubbles: true, cancelable: true, ctrlKey: true, deltaY: -120 }),
+    )
+    await idle()
+    expect(inside('board')?.getAttribute('style')).not.toBe(before)
+    expect(inside('board')?.getAttribute('style')).toContain('--_canvas-zoom: 1.1')
+  })
+
   run('a press on the pad moves the board, a canvas drawing its own', async () => {
     await example(board)
     await idle()
