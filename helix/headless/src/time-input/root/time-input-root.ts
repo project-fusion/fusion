@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   valueAsTime as asTime,
   customElement,
+  fillTemplate,
   timeAsValue as fromTime,
   type HelixBeforeChangeEvent,
   HelixFormElement,
@@ -174,6 +175,15 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
    */
   @property()
   placeholder = 'HH:mm'
+
+  /**
+   * What the control removing one time is called, with `{name}` filled in.
+   *
+   * **The name goes in**, so a row of them is heard as which one each
+   * removes rather than as "Remove" said once per time.
+   */
+  @property({ attribute: 'remove-label' })
+  removeLabel = 'Remove {name}'
 
   /**
    * How far apart the offered times are, in minutes.
@@ -439,7 +449,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
                   part="time"
       exportparts="dismiss: time-dismiss, dismiss-mark: time-dismiss-mark, start: time-start"
                   dismissible
-                  dismiss-label=${`Remove ${this.written(at)}`}
+                  dismiss-label=${fillTemplate(this.removeLabel, { name: this.written(at) })}
                   ?disabled=${this.isDisabled}
                   @helix-dismiss=${(event: Event) => {
                     event.stopPropagation()

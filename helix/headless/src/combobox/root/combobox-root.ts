@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   customElement,
+  fillTemplate,
   type HelixBeforeChangeEvent,
   HelixCreateEvent,
   HelixFilterEvent,
@@ -215,10 +216,13 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   placeholder = ''
 
   /**
-   * What a tag's remove control is called, since the mark has no name.
+   * What the control removing one chosen option is called, with `{name}` filled in.
+   *
+   * **The name goes in**, so a row of them is heard as which one each
+   * removes rather than as "Remove" said once per chosen option.
    */
   @property({ attribute: 'remove-label' })
-  removeLabel = 'Remove'
+  removeLabel = 'Remove {name}'
 
   /**
    * Whether the field finishes the word as it is typed.
@@ -766,7 +770,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
                     part="tag"
       exportparts="dismiss: tag-dismiss, dismiss-mark: tag-dismiss-mark, start: tag-start"
                     data-value=${option.value}
-                    dismiss-label=${this.removeLabel}
+                    dismiss-label=${fillTemplate(this.removeLabel, { name: option.text })}
                     ?dismissible=${!this.isDisabled}
                     @helix-dismiss=${this.handleDismiss}
                     >${option.text}</${this.tag('tag')}

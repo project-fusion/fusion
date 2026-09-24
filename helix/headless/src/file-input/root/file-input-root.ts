@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   drawIcon,
+  fillTemplate,
   HelixBeforeChangeEvent,
   HelixFormElement,
   MixinField,
@@ -151,10 +152,13 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   multiple = false
 
   /**
-   * What the control removing one file is called, per file.
+   * What the control removing one file is called, with `{name}` filled in.
+   *
+   * **The name goes in**, so a row of them is heard as which one each
+   * removes rather than as "Remove" said once per file.
    */
   @property({ attribute: 'remove-label' })
-  removeLabel = 'Remove'
+  removeLabel = 'Remove {name}'
 
   /**
    * What the trigger reads, where nothing is slotted into it.
@@ -514,7 +518,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
                   <button
                     part="remove"
                     type="button"
-                    aria-label=${`${this.removeLabel} ${file.name}`}
+                    aria-label=${fillTemplate(this.removeLabel, { name: file.name })}
                     data-at=${at}
                     ?disabled=${this.isDisabled}
                     @click=${this.handleRemove}

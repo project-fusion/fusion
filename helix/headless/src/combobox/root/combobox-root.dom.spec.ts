@@ -213,12 +213,13 @@ describe('combobox holding several', () => {
        there and nothing else reads it.
 
        A word the component does not default to, `removeLabel` holding
-       "Remove". */
-    const host = await many('remove-label="Take off"')
+       "Remove {name}". The name is the option's, so a row of tags is heard as
+       which one each removes rather than as "Remove" said once per tag. */
+    const host = await many('remove-label="Take {name} off"')
     await type(host, 'ru')
     await press(host, 'Enter')
     expect(tags(host)).toHaveLength(1)
-    expect(at(tags(host), 0).getAttribute('dismiss-label')).toBe('Take off')
+    expect(at(tags(host), 0).getAttribute('dismiss-label')).toBe('Take Rust off')
   })
 
   test('the panel stays open between picks, and the filter does not', async () => {

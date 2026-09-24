@@ -1,5 +1,6 @@
 import {
   customElement,
+  fillTemplate,
   HelixBeforeResizeEvent,
   HelixElement,
   hostAria,
@@ -173,6 +174,16 @@ export class HelixHeadlessTableColumn extends HelixElement {
   field = ''
 
   /**
+   * What the grip that moves the column is called, with the heading's words as
+   * `{name}`.
+   *
+   * **Every word a column speaks is a property**, so a table in another
+   * language hears its own rather than English around its own headings.
+   */
+  @property({ attribute: 'move-label' })
+  moveLabel = 'Move {name}'
+
+  /**
    * Whether a reader may change this column's width.
    *
    * By dragging the edge at the end of the heading, or with the arrow keys once
@@ -182,6 +193,13 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property({ type: Boolean })
   resizable = false
+
+  /**
+   * What the separator that resizes the column is called, with the heading's
+   * words as `{name}`.
+   */
+  @property({ attribute: 'resize-label' })
+  resizeLabel = 'Resize {name}'
 
   /**
    * Whether a reader may reorder the set by this column.
@@ -260,6 +278,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property()
   width = ''
+
+  /**
+   * How the separator reads out the column's width, with `{width}` filled in.
+   */
+  @property({ attribute: 'width-label' })
+  widthLabel = '{width} pixels'
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,
@@ -518,7 +542,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
     const name = this.name
     return html`<span part="column">${
       this.movable
-        ? html`<button part="grip" type="button" aria-label=${name ? `Move ${name}` : 'Move column'}>
+        ? html`<button part="grip" type="button" aria-label=${fillTemplate(this.moveLabel, { name }).trim()}>
             <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsThreeVertical.viewBox}>
               ${unsafeSVG(dotsThreeVertical.content)}
             </svg>
@@ -534,12 +558,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
             part="resizer"
             role="separator"
             tabindex="0"
-            aria-label=${name ? `Resize ${name}` : 'Resize column'}
+            aria-label=${fillTemplate(this.resizeLabel, { name }).trim()}
             aria-orientation="vertical"
             aria-valuemin=${HelixHeadlessTableColumn.NARROWEST}
             aria-valuemax="4096"
             aria-valuenow=${Math.max(HelixHeadlessTableColumn.NARROWEST, this.drawn)}
-            aria-valuetext=${`${this.drawn} pixels`}
+            aria-valuetext=${fillTemplate(this.widthLabel, { width: this.drawn })}
             @keydown=${this.handleResizeKey}
             @pointerdown=${this.handleResizeStart}
             @pointermove=${this.handleResizeMove}
