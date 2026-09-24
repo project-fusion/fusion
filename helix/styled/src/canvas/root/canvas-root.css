@@ -44,6 +44,16 @@
   position: absolute;
   transform: translate(var(--_canvas-x), var(--_canvas-y)) scale(var(--_canvas-zoom));
   transform-origin: 0 0;
+  /* The move a press asks for, eased. A board that jumped would leave a reader
+     working out what had changed; the plane is one element, so this is one
+     transition rather than one per card. */
+  transition: transform var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="board"] {
+    transition: none;
+  }
 }
 
 /* Under the cards, and the size of the whole plane. */

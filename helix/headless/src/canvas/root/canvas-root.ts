@@ -260,11 +260,29 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     super.pan(to)
   }
 
-  /** Zooms the board, and says so, between a quarter and four times. */
+  /**
+   * Zooms the board about the middle of the view, and says so.
+   *
+   * **The middle, not the corner, and the difference is whether zooming is
+   * usable.** The plane scales from its own origin, so leaving the offset alone
+   * grows the board away from the top-left: what a reader was looking at slides
+   * out of the box and they have to pan it back after every press. Holding the
+   * center point still is two lines of arithmetic and it is what every canvas
+   * does.
+   *
+   * Held between a quarter and four times, which is far enough out to see a
+   * large board whole and far enough in to read a card that was drawn small.
+   */
   override zoom(by: number): void {
     this.touched = true
-    const next = by > 0 ? this.at.zoom * 1.25 : this.at.zoom / 1.25
-    this.at = { ...this.at, zoom: Math.min(Math.max(next, 0.25), 4) }
+    const from = this.at.zoom
+    const to = Math.min(Math.max(by > 0 ? from * 1.25 : from / 1.25, 0.25), 4)
+    const middle = { x: this.box.width / 2, y: this.box.height / 2 }
+    this.at = {
+      x: middle.x - ((middle.x - this.at.x) * to) / from,
+      y: middle.y - ((middle.y - this.at.y) * to) / from,
+      zoom: to,
+    }
     super.zoom(by)
   }
 
