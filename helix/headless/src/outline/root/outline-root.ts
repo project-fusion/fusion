@@ -303,6 +303,9 @@ export class HelixHeadlessOutline extends HelixElement {
   /** The guard behind `scrollend`, in case it never comes. */
   private landed: ReturnType<typeof setTimeout> | undefined
 
+  /** What `scrollend` calls when the scroll a click started lands, while it is awaited. */
+  private arrive: (() => void) | undefined
+
   /**
    * The two things an `IntersectionObserver` cannot see, and one listener for
    * both.
@@ -404,15 +407,15 @@ export class HelixHeadlessOutline extends HelixElement {
      * interrupted by a reader grabbing the page has to hand the marker back. */
     this.landing = section
     this.markTo(section)
-    clearTimeout(this.landed)
+    this.unland()
     const arrive = (): void => {
-      clearTimeout(this.landed)
+      this.unland()
       this.landing = undefined
-      document.removeEventListener('scrollend', arrive, true)
       this.mark()
     }
     /* On the document in capture, like the scroll listener, so a panel's
        scroll ending lands here as the window's does. */
+    this.arrive = arrive
     document.addEventListener('scrollend', arrive, { capture: true, once: true })
     this.landed = setTimeout(arrive, 1200)
 
@@ -494,9 +497,25 @@ export class HelixHeadlessOutline extends HelixElement {
     this.observer = undefined
     /* The landing timer holds a closure over this element for 1.2 seconds after
        it leaves the document and then touches it, which on a route change is a
-       write to a tree nobody is looking at. */
+       write to a tree nobody is looking at. The listener beside it held it
+       until the next page scrolled, or for good where there is no `scrollend`. */
+    this.unland()
+  }
+
+  /**
+   * Stops waiting for a scroll to land, both halves of the wait.
+   *
+   * The `scrollend` listener is on the document, so it is taken off as well as
+   * the timer: left on, every click that did not wait for the last landing
+   * added one more.
+   */
+  private unland(): void {
     clearTimeout(this.landed)
     this.landed = undefined
+    if (this.arrive) {
+      document.removeEventListener('scrollend', this.arrive, true)
+      this.arrive = undefined
+    }
   }
 
   override connectedCallback(): void {

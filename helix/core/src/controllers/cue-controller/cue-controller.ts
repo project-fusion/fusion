@@ -124,8 +124,19 @@ export class CueController implements ReactiveController {
     track.addEventListener('cuechange', this.listener)
   }
 
+  /**
+   * Listens again after a move, to the track it was following.
+   *
+   * The track is kept across the disconnect for this: it is only chosen again
+   * on `loadedmetadata`, and moving a video does not reload it, so a caption
+   * froze on whatever it last said.
+   */
+  hostConnected(): void {
+    this.track?.addEventListener('cuechange', this.listener)
+  }
+
   hostDisconnected(): void {
-    this.stop()
+    this.track?.removeEventListener('cuechange', this.listener)
   }
 
   private stop(): void {

@@ -779,7 +779,11 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.opening = true
     requestAnimationFrame(() => {
       this.opening = false
-      this.reachHistory()
+      /* Not for a conversation gone within the frame: a detached log reads its
+         scroll as the top, and asked the consumer for history nobody sees. */
+      if (this.isConnected) {
+        this.reachHistory()
+      }
     })
   }
 
