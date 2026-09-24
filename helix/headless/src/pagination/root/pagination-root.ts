@@ -173,34 +173,6 @@ export class HelixHeadlessPagination extends HelixElement {
   ends = false
 
   /**
-   * The page on show, one-based.
-   *
-   * An accessor pair, the same shape as the calendar's `month`. Reading gives
-   * the page on show; writing sets it, and `default-page` seeds one the element
-   * keeps until somebody does.
-   *
-   * **Clamped on the way out, because "the page on show" is what it says it
-   * gives.** Returning whatever was written means `default-page="99"` on a
-   * ten-page result renders page 10, marks page 10 with `aria-current`, and
-   * reports 99, so a consumer syncing their query from this reads a page that
-   * does not exist while the control in front of them says otherwise. Not a
-   * far-fetched value: it is a bookmarked link after the result shrank.
-   *
-   * Rounded here too, so `2.7` reads as the 2 it renders.
-   */
-  @property({ type: Number })
-  get page(): number {
-    const asked = this.pageState ?? this.defaultPage
-    return Math.min(this.count, Math.max(1, Math.floor(asked) || 1))
-  }
-
-  set page(next: number) {
-    const previous = this.page
-    this.pageState = next
-    this.requestUpdate('page', previous)
-  }
-
-  /**
    * Accessible name for the control that jumps to the first page.
    */
   @property({ attribute: 'first-label' })
@@ -255,6 +227,34 @@ export class HelixHeadlessPagination extends HelixElement {
    */
   @property({ attribute: 'next-label' })
   nextLabel = 'Next page'
+
+  /**
+   * The page on show, one-based.
+   *
+   * An accessor pair, the same shape as the calendar's `month`. Reading gives
+   * the page on show; writing sets it, and `default-page` seeds one the element
+   * keeps until somebody does.
+   *
+   * **Clamped on the way out, because "the page on show" is what it says it
+   * gives.** Returning whatever was written means `default-page="99"` on a
+   * ten-page result renders page 10, marks page 10 with `aria-current`, and
+   * reports 99, so a consumer syncing their query from this reads a page that
+   * does not exist while the control in front of them says otherwise. Not a
+   * far-fetched value: it is a bookmarked link after the result shrank.
+   *
+   * Rounded here too, so `2.7` reads as the 2 it renders.
+   */
+  @property({ type: Number })
+  get page(): number {
+    const asked = this.pageState ?? this.defaultPage
+    return Math.min(this.count, Math.max(1, Math.floor(asked) || 1))
+  }
+
+  set page(next: number) {
+    const previous = this.page
+    this.pageState = next
+    this.requestUpdate('page', previous)
+  }
 
   /**
    * Accessible name for one page, with `{page}` and `{pages}` filled in.

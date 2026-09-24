@@ -65,6 +65,12 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
   // reads when resolving inherited members into dependent packages.
   class OpenElement extends Base {
     /**
+     * Whether the markup declared it open. Ignored once `open` is written.
+     */
+    @property({ attribute: 'default-open', type: Boolean })
+    defaultOpen = false
+
+    /**
      * Whether the element is open.
      *
      * One property, not two, so `dialog.open` answers the question anyone
@@ -88,12 +94,6 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
       this.openState = next
       this.requestUpdate('open', previous)
     }
-
-    /**
-     * Whether the markup declared it open. Ignored once `open` is written.
-     */
-    @property({ attribute: 'default-open', type: Boolean })
-    defaultOpen = false
 
     /**
      * The state, whoever set it, and `undefined` until somebody has.

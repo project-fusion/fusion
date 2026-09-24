@@ -43,7 +43,7 @@ use std::sync::LazyLock;
 use regex::Regex;
 
 use crate::component::compositions::forwards_in;
-use crate::component::text::{flattened, line_of, uncommented};
+use crate::component::text::{blanked, flattened, line_of, uncommented};
 use crate::component::{sources, stylesheets, Context, Finding, Report};
 
 static CLASS: LazyLock<Regex> = LazyLock::new(|| {
@@ -366,7 +366,9 @@ pub fn run(context: &Context) -> Report {
             let Ok(raw) = fs::read_to_string(&sheet) else {
                 continue;
             };
-            let css = uncommented(&raw);
+            /* `blanked`, a sheet's `//` being the middle of a URL rather than
+               a comment: read as one, it hid every part after it on the line. */
+            let css = blanked(&raw);
             let where_ = context.relative(&sheet);
             checked += judge_sheet(&survey, &css, &where_, &sheet, &mut findings);
         }

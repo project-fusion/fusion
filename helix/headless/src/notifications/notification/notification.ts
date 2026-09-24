@@ -97,6 +97,20 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   at = ''
 
   /**
+   * State to open with, where nothing declared one.
+   */
+  @property({ attribute: 'default-read', type: Boolean })
+  defaultRead = false
+
+  /**
+   * Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
+   */
+  @property()
+  locale = ''
+
+  /**
    * Whether the reader has seen it.
    *
    * Set it and this element defers: a reader's click fires `helix-read` and
@@ -121,20 +135,6 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
     this.readState = next
     this.requestUpdate('read', previous)
   }
-
-  /**
-   * State to open with, where nothing declared one.
-   */
-  @property({ attribute: 'default-read', type: Boolean })
-  defaultRead = false
-
-  /**
-   * Locale for the timestamp.
-   *
-   * Empty is the runtime's own.
-   */
-  @property()
-  locale = ''
 
   /**
    * @internal Read by the list to identify its children across the light DOM,

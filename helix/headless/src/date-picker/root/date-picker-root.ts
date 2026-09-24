@@ -163,6 +163,35 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   label = 'Date Picker'
 
   /**
+   * Locale for month and day names.
+   *
+   * Absent uses the runtime's own.
+   */
+  @property()
+  locale = ''
+
+  /**
+   * Latest selectable date, as `YYYY-MM-DD`.
+   */
+  @property()
+  max = ''
+
+  /**
+   * Earliest selectable date, as `YYYY-MM-DD`.
+   */
+  @property()
+  min = ''
+
+  /**
+   * How many dates can be held at once.
+   */
+  @property({ reflect: true })
+  mode?: 'range' | 'multiple'
+
+  /** The month on show, whoever set it, and `undefined` until somebody has. */
+  private monthState: string | undefined = undefined
+
+  /**
    * The month on show, as `YYYY-MM`. Follows `value`, then the current month.
    *
    * Separate from `value` on purpose, so paging selects nothing and a consumer
@@ -185,35 +214,6 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     this.monthState = next
     this.requestUpdate('month', previous)
   }
-
-  /**
-   * Locale for month and day names.
-   *
-   * Absent uses the runtime's own.
-   */
-  @property()
-  locale = ''
-
-  /**
-   * Latest selectable date, as `YYYY-MM-DD`.
-   */
-  @property()
-  max = ''
-
-  /**
-   * Earliest selectable date, as `YYYY-MM-DD`.
-   */
-  @property()
-  min = ''
-
-  /** The month on show, whoever set it, and `undefined` until somebody has. */
-  private monthState: string | undefined = undefined
-
-  /**
-   * How many dates can be held at once.
-   */
-  @property({ reflect: true })
-  mode?: 'range' | 'multiple'
 
   /**
    * How many months to show, side by side.

@@ -183,6 +183,26 @@ export class HelixHeadlessListbox extends MixinCollection(
   autocomplete = 'off'
 
   /**
+   * What to start narrowed to, where nothing declared it.
+   */
+  @property({ attribute: 'default-filter' })
+  defaultFilter = ''
+
+  /**
+   * What is shown when a filter has hidden every option.
+   *
+   * From `MixinCollection`, which every collection in the library now shares,
+   * and re-declared here only to keep this list's own wording: "No matches" is
+   * about a filter, and the mixin's "Nothing to show" is about a list that was
+   * never given anything.
+   */
+  @property({ attribute: 'empty-text' })
+  override emptyText = 'No matches'
+
+  /** What the list is narrowed to, whoever set it. */
+  private filterState: string | undefined = undefined
+
+  /**
    * What the list is narrowed to, if anything.
    *
    * Filtering hides rather than removes, so nothing about the value changes and
@@ -200,26 +220,6 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.filterState = next
     this.requestUpdate('filter', previous)
   }
-
-  /**
-   * What to start narrowed to, where nothing declared it.
-   */
-  @property({ attribute: 'default-filter' })
-  defaultFilter = ''
-
-  /** What the list is narrowed to, whoever set it. */
-  private filterState: string | undefined = undefined
-
-  /**
-   * What is shown when a filter has hidden every option.
-   *
-   * From `MixinCollection`, which every collection in the library now shares,
-   * and re-declared here only to keep this list's own wording: "No matches" is
-   * about a filter, and the mixin's "Nothing to show" is about a list that was
-   * never given anything.
-   */
-  @property({ attribute: 'empty-text' })
-  override emptyText = 'No matches'
 
   /**
    * Whether the list renders a field for narrowing itself.

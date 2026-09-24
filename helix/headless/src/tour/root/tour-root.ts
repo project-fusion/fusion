@@ -73,6 +73,21 @@ export class HelixHeadlessTour extends HelixElement {
   backLabel = ''
 
   /**
+   * Stop to start on, where nothing declared one.
+   */
+  @property({ attribute: 'default-index', type: Number })
+  defaultIndex = 0
+
+  /**
+   * Label for the control that goes on from the last stop.
+   */
+  @property({ attribute: 'done-label' })
+  doneLabel = ''
+
+  /** The stop being shown, whoever set it, and `undefined` until somebody has. */
+  private indexState: number | undefined = undefined
+
+  /**
    * Which stop the reader is on.
    *
    * **Moved through `requestChange`, never by assignment from `move`.** That
@@ -94,21 +109,6 @@ export class HelixHeadlessTour extends HelixElement {
     this.indexState = next
     this.requestUpdate('index', previous)
   }
-
-  /**
-   * Stop to start on, where nothing declared one.
-   */
-  @property({ attribute: 'default-index', type: Number })
-  defaultIndex = 0
-
-  /** The stop being shown, whoever set it, and `undefined` until somebody has. */
-  private indexState: number | undefined = undefined
-
-  /**
-   * Label for the control that goes on from the last stop.
-   */
-  @property({ attribute: 'done-label' })
-  doneLabel = ''
 
   /**
    * Accessible name for the run, such as "Getting started".

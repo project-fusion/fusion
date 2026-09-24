@@ -72,7 +72,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::text::{blanked, line_of};
+use crate::component::text::{line_of, uncommented};
 use crate::component::{specs, Context, Finding, Report};
 
 /// The helpers that narrow a rendered document to what a component rendered, or
@@ -240,8 +240,9 @@ pub fn run(context: &Context) -> Report {
             /* Blanked rather than cut, so every offset and every line number
             here is the one the file has. Cutting a block comment out took the
             newlines with it, and this rule reported a drilldown finding at line
-            9 that is at line 34. */
-            let text = blanked(&raw);
+            9 that is at line 34. Line comments too, a spec being a module: an
+            assertion commented out is not one this file makes. */
+            let text = uncommented(&raw);
             let where_ = context.relative(&file);
 
             for found in EXPECT.find_iter(&text) {

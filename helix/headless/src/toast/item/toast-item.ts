@@ -64,22 +64,6 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   duration?: number
 
   /**
-   * What kind of message it is, which picks the mark and its name.
-   *
-   * A subset of the tone axis: a toast reports a status and never a brand role.
-   */
-  @property({ reflect: true })
-  tone?: 'danger' | 'info' | 'success' | 'warning'
-
-  /** When the current run of the timer began, or nothing while it is paused. */
-  private startedAt: number | undefined
-
-  /** What is left of the duration, so resuming continues rather than restarts. */
-  private remaining: number | undefined
-
-  private timer: ReturnType<typeof setTimeout> | undefined
-
-  /**
    * Whether the message is still showing.
    *
    * The item always applies: it goes when it is asked to, having announced
@@ -102,6 +86,22 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     this.openState = next
     this.requestUpdate('open', previous)
   }
+
+  /** When the current run of the timer began, or nothing while it is paused. */
+  private startedAt: number | undefined
+
+  /** What is left of the duration, so resuming continues rather than restarts. */
+  private remaining: number | undefined
+
+  private timer: ReturnType<typeof setTimeout> | undefined
+
+  /**
+   * What kind of message it is, which picks the mark and its name.
+   *
+   * A subset of the tone axis: a toast reports a status and never a brand role.
+   */
+  @property({ reflect: true })
+  tone?: 'danger' | 'info' | 'success' | 'warning'
 
   /** Whether it is showing, whoever said so, and `undefined` until somebody has. */
   private openState: boolean | undefined = undefined
