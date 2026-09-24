@@ -24,17 +24,28 @@ use std::collections::BTreeSet;
 
 use crate::rules::{Context, Finding, Report};
 
-/// `bun run <name>`, stopping before flags and shell operators.
+/// `bun run <name>`, the whole name, stopping at a space or a shell operator.
+///
+/// **Read to the end of the word, not to the first character a name usually
+/// lacks.** Stopping there read `build_docs` as `build`, which passed where a
+/// `build` existed and faulted a script that was there, and `scripts/gen.ts`
+/// as `scripts`. A word with a slash or a dot is a file `bun run` executes,
+/// not a script, and is not asked about.
 fn called(value: &str) -> Vec<&str> {
     let mut found = Vec::new();
     let mut rest = value;
     while let Some(at) = rest.find("bun run ") {
         rest = &rest[at + "bun run ".len()..];
         let end = rest
-            .find(|c: char| !(c.is_ascii_lowercase() || c.is_ascii_digit() || c == ':' || c == '-'))
+            .find(|c: char| c.is_whitespace() || ";&|()<>`'\"".contains(c))
             .unwrap_or(rest.len());
-        if end > 0 && rest.as_bytes()[0].is_ascii_lowercase() {
-            found.push(&rest[..end]);
+        let word = &rest[..end];
+        if end > 0
+            && rest.as_bytes()[0].is_ascii_lowercase()
+            && !word.contains('/')
+            && !word.contains('.')
+        {
+            found.push(word);
         }
         rest = &rest[end..];
     }

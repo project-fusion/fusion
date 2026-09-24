@@ -72,9 +72,20 @@ const SECTIONS: [&[&str]; 8] = [
 /// is prose whose paragraphs are an argument in sequence.
 const SORTED: [&str; 5] = ["csspart", "cssproperty", "cssstate", "event", "slot"];
 
+/// A doc block on lines of its own, closed by a `*/` alone on its line.
+///
+/// **The body never crosses a `*/`.** A block that closes at the end of a line
+/// of text is not this shape, and a body free to run on read it as open until
+/// the next line-leading `*/`, which took the code between the two into the
+/// block and the fix moved it there.
 static BLOCK: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?ms)^([ \t]*)/\*\*\n(.*?)^[ \t]*\*/").expect("a literal pattern compiles")
+    Regex::new(r"(?ms)^([ \t]*)/\*\*\n((?:[^*]|\*[^/])*?)^[ \t]*\*/")
+        .expect("a literal pattern compiles")
 });
+
+/// A line opening or closing a fenced code sample inside a block.
+static FENCE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^\s*\*?\s*(?:```|~~~)").expect("a literal pattern compiles"));
 static SUMMARY: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?m)^\s*\*\s*@summary\b").expect("a literal pattern compiles"));
 static TAG: LazyLock<Regex> =
@@ -132,8 +143,15 @@ fn parse(inner: &str) -> (Vec<String>, Vec<Entry>) {
     }
     let mut lead: Vec<String> = Vec::new();
     let mut entries: Vec<Entry> = Vec::new();
+    /* Inside a fenced sample nothing is a tag: a stylesheet's `@media` there
+    read as one, sorted last, and carried the tags after it into the fence. */
+    let mut fenced = false;
     for line in lines {
-        if let Some(caught) = TAG.captures(&line) {
+        if FENCE.is_match(&line) {
+            fenced = !fenced;
+        }
+        let tag = if fenced { None } else { TAG.captures(&line) };
+        if let Some(caught) = tag {
             entries.push(Entry {
                 lines: vec![line.clone()],
                 tag: caught[1].to_owned(),

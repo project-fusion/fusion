@@ -137,7 +137,30 @@ fn plant(
     message: &str,
     file: &str,
 ) {
-    let tree = Tree::new(&format!("{noun}-{rule}"));
+    plant_in(
+        &format!("{noun}-{rule}"),
+        noun,
+        rule,
+        clean,
+        fault,
+        message,
+        file,
+    );
+}
+
+/// The same, in a tree named for the test rather than for the rule, because a
+/// rule proved more than once would otherwise have its tests write over each
+/// other's fixtures under the parallel runner.
+fn plant_in(
+    named: &str,
+    noun: &str,
+    rule: &str,
+    clean: &[(&str, &str)],
+    fault: impl FnOnce(&Tree),
+    message: &str,
+    file: &str,
+) {
+    let tree = Tree::new(named);
     for (at, content) in clean {
         tree.write(at, content);
     }
@@ -345,8 +368,8 @@ fn node() {
     );
 }
 
-/// Judged by byte equality with the rewrite, so the clean manifest is exactly
-/// what the rule would write.
+/// Judged by the order of the keys, so the clean manifest is any in that order
+/// however it is laid out.
 #[test]
 fn order() {
     plant(
@@ -357,6 +380,38 @@ fn order() {
             tree.write(
                 "package.json",
                 "{\n  \"version\": \"0.0.0\",\n  \"name\": \"sandbox\"\n}\n",
+            );
+        },
+        "keys are out of order",
+        "package.json",
+    );
+}
+
+/// A condition the list does not know keeps its place, so `default` after it
+/// is in order and `default` before it, which hides it, is not. And a manifest
+/// in order is clean however its arrays are laid out.
+#[test]
+fn order_with_a_condition_it_does_not_know() {
+    let manifest = |exports: &str| {
+        format!(
+            "{{\n  \"name\": \"sandbox\",\n  \"exports\": {{\n    \".\": {{\n      {exports}\n    }}\n  }},\n  \"files\": [\"dist\"]\n}}\n"
+        )
+    };
+    plant_in(
+        "workspace-order-conditions",
+        "workspace",
+        "order",
+        &[
+            ("fusion.json", EMPTY),
+            (
+                "package.json",
+                &manifest("\"types\": \"./a.d.ts\", \"development\": \"./src/a.ts\", \"default\": \"./a.js\""),
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "package.json",
+                &manifest("\"types\": \"./a.d.ts\", \"default\": \"./a.js\", \"development\": \"./src/a.ts\""),
             );
         },
         "keys are out of order",
@@ -536,6 +591,39 @@ fn registration() {
             (
                 "packages/elements/src/index.ts",
                 "@customElement('acme-thing')\nexport class Thing extends HTMLElement {}\n",
+            ),
+            ("app/page.tsx", &page("@acme/util", "helper")),
+        ],
+        |tree| {
+            tree.write("app/page.tsx", &page("@acme/elements", "Thing"));
+        },
+        "imports `@acme/elements` at module scope",
+        "app/page.tsx",
+    );
+}
+
+/// A glob in a string is not a comment, so the element under it is still seen.
+#[test]
+fn registration_past_a_glob() {
+    let page = |package: &str, name: &str| {
+        format!("import {{ {name} }} from '{package}'\n\nexport const Page = () => {name}\n")
+    };
+    plant_in(
+        "workspace-registration-glob",
+        "workspace",
+        "registration",
+        &[
+            ("package.json", ROOT),
+            ("fusion.json", r#"{ "hydrates": ["app"] }"#),
+            ("packages/util/package.json", r#"{ "name": "@acme/util" }"#),
+            ("packages/util/src/index.ts", "export const helper = () => 1\n"),
+            (
+                "packages/elements/package.json",
+                r#"{ "name": "@acme/elements" }"#,
+            ),
+            (
+                "packages/elements/src/index.ts",
+                "export const ICONS = 'icons/*.svg'\n\n@customElement('acme-thing')\nexport class Thing extends HTMLElement {}\n\n/** Done. */\nexport const done = true\n",
             ),
             ("app/page.tsx", &page("@acme/util", "helper")),
         ],
@@ -749,6 +837,32 @@ fn dialect() {
     );
 }
 
+/// An address is left alone, and a stem that drops its `e` manufactures no
+/// past tense the American way could not spell.
+#[test]
+fn dialect_spares_addresses() {
+    plant_in(
+        "prose-dialect-addresses",
+        "prose",
+        "dialect",
+        &[
+            (
+                "fusion.json",
+                r#"{ "dialect": { "catalogue": "catalog", "colour": "color" } }"#, // dialect:quoted
+            ),
+            (
+                "notes.md",
+                "See https://x.dev/colour-theme and ![a](img/colour.png), all catalogued.\n", // dialect:quoted
+            ),
+        ],
+        |tree| {
+            tree.write("notes.md", "The colour is red.\n"); // dialect:quoted
+        },
+        "`colour` is British. Write `color`.", // dialect:quoted
+        "notes.md:1",
+    );
+}
+
 /// The pages are `<domain>/docs/content/*.mdx`, and the tag pattern is fixed
 /// to the `helix-` prefix.
 #[test]
@@ -920,6 +1034,83 @@ export class Card {{}}
     );
 }
 
+/// A doc block closing at the end of a line of text is not the class block,
+/// and nothing between it and the class block is carried into the sort.
+#[test]
+fn tag_order_after_a_block_closed_mid_line() {
+    let card = |first: &str, second: &str| {
+        format!(
+            "/**
+ * @param x - The x. */
+export function f(x: number) {{}}
+
+/**
+ * @summary A card.
+ *
+ * @slot {first} - The {first}.
+ * @slot {second} - The {second}.
+ */
+export class Card {{}}
+"
+        )
+    };
+    plant_in(
+        "prose-tag-order-closed",
+        "prose",
+        "tag-order",
+        &[
+            ("fusion.json", EMPTY),
+            ("src/card.ts", &card("body", "header")),
+        ],
+        |tree| {
+            tree.write("src/card.ts", &card("header", "body"));
+        },
+        "`@slot body` comes after `header`, and sorts before it",
+        "src/card.ts:5",
+    );
+}
+
+/// A fenced sample in the description holds no tags, whatever it starts with.
+#[test]
+fn tag_order_with_a_fence() {
+    let card = |first: &str, second: &str| {
+        format!(
+            "/**
+ * @summary A card.
+ *
+ * @description
+ * Narrow it:
+ *
+ * ```css
+ * @media (width > 40rem) {{
+ * }}
+ * ```
+ *
+ * @since 1.0.0
+ *
+ * @slot {first} - The {first}.
+ * @slot {second} - The {second}.
+ */
+export class Card {{}}
+"
+        )
+    };
+    plant_in(
+        "prose-tag-order-fence",
+        "prose",
+        "tag-order",
+        &[
+            ("fusion.json", EMPTY),
+            ("src/card.ts", &card("body", "header")),
+        ],
+        |tree| {
+            tree.write("src/card.ts", &card("header", "body"));
+        },
+        "`@slot body` comes after `header`, and sorts before it",
+        "src/card.ts:1",
+    );
+}
+
 #[test]
 fn prose_floors() {
     let tree = Tree::new("prose-floors");
@@ -958,6 +1149,81 @@ fn hazards() {
         },
         "imports `@acme/ui`, its own package, which resolves to `dist`",
         "packages/ui/src/button.spec.ts:1",
+    );
+}
+
+/// A spec importing its own package for its side effect alone is the same fault.
+#[test]
+fn hazards_for_a_side_effect() {
+    let spec = |import: &str| format!("{import}\ntest('works', () => {{}});\n");
+    plant_in(
+        "spec-hazards-side-effect",
+        "spec",
+        "hazards",
+        &[
+            ("fusion.json", EMPTY),
+            ("packages/ui/package.json", r#"{ "name": "@acme/ui" }"#),
+            (
+                "packages/ui/src/button.spec.ts",
+                &spec("import './button.js';"),
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "packages/ui/src/button.spec.ts",
+                &spec("import '@acme/ui';"),
+            );
+        },
+        "imports `@acme/ui`, its own package, which resolves to `dist`",
+        "packages/ui/src/button.spec.ts:1",
+    );
+}
+
+/// A static import of the library is found however many lines a formatter
+/// gave its names, and an import above it is not read into it.
+#[test]
+fn isolated_across_lines() {
+    let registrar = |head: &str| {
+        format!(
+            "{head}import {{ useEffect }} from 'react'
+
+export function HelixElements() {{
+  if (window.location.pathname === '/specs') {{
+    return null;
+  }}
+  import('@acme/helix');
+  return null;
+}}
+"
+        )
+    };
+    plant_in(
+        "spec-isolated-lines",
+        "spec",
+        "isolated",
+        &[
+            (
+                "fusion.json",
+                r#"{ "scope": "@acme/", "spec": { "app": "site/app", "registrar": "site/registrar.tsx" } }"#,
+            ),
+            (
+                "site/app/layout.tsx",
+                "export default function Layout() {\n  return <HelixElements />;\n}\n",
+            ),
+            (
+                "site/app/(tools)/specs/spec-frame.tsx",
+                "export function SpecFrame() {\n  return <iframe />;\n}\n",
+            ),
+            ("site/registrar.tsx", &registrar("")),
+        ],
+        |tree| {
+            tree.write(
+                "site/registrar.tsx",
+                &registrar("import {\n  defineAll,\n} from '@acme/helix'\n"),
+            );
+        },
+        "the registrar imports the library at module scope",
+        "site/registrar.tsx",
     );
 }
 

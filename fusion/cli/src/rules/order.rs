@@ -93,12 +93,42 @@ fn sort_by_list(object: &Map<String, Value>, list: &[&str]) -> Map<String, Value
     ordered
 }
 
+/// One level of `exports`, in an order that resolves the way it was written.
+///
+/// **A condition this list does not know keeps the place its author gave it.**
+/// Conditions match top to bottom, so sorting `development` after the known
+/// ones, or `default` above it, made it unreachable, and the fix wrote that.
+/// Where every key is known, or every key is a subpath, the canonical order
+/// holds; otherwise the only moves are the two that are always right, `types`
+/// to the top and `default` to the bottom.
+fn order_conditions(object: &Map<String, Value>) -> Map<String, Value> {
+    let known = object
+        .keys()
+        .all(|key| key.starts_with('.') || CONDITIONS.contains(&key.as_str()));
+    if known {
+        return sort_by_list(object, &CONDITIONS);
+    }
+    let mut ordered = Map::new();
+    if let Some(value) = object.get("types") {
+        ordered.insert("types".to_owned(), value.clone());
+    }
+    for (key, value) in object {
+        if key != "types" && key != "default" {
+            ordered.insert(key.clone(), value.clone());
+        }
+    }
+    if let Some(value) = object.get("default") {
+        ordered.insert("default".to_owned(), value.clone());
+    }
+    ordered
+}
+
 /// Recursively orders export conditions, which nest arbitrarily deep.
 fn order_exports(node: &Value) -> Value {
     let Some(object) = node.as_object() else {
         return node.clone();
     };
-    let ordered = sort_by_list(object, &CONDITIONS);
+    let ordered = order_conditions(object);
     Value::Object(
         ordered
             .into_iter()
@@ -226,6 +256,22 @@ fn found(root: &Path) -> Vec<PathBuf> {
     all
 }
 
+/// Whether two values hold their keys in the same order, at every depth.
+fn same_order(one: &Value, other: &Value) -> bool {
+    match (one, other) {
+        (Value::Object(one), Value::Object(other)) => {
+            one.keys().eq(other.keys())
+                && one
+                    .iter()
+                    .all(|(key, value)| other.get(key).is_some_and(|them| same_order(value, them)))
+        }
+        (Value::Array(one), Value::Array(other)) => {
+            one.len() == other.len() && one.iter().zip(other).all(|(a, b)| same_order(a, b))
+        }
+        _ => true,
+    }
+}
+
 /// Reads every manifest once and reports which would change, and to what.
 fn survey(root: &Path) -> (usize, Vec<(PathBuf, String)>) {
     let mut changed = Vec::new();
@@ -238,13 +284,18 @@ fn survey(root: &Path) -> (usize, Vec<(PathBuf, String)>) {
         let Ok(value) = serde_json::from_str::<Value>(&before) else {
             continue;
         };
-        let Ok(mut after) = serde_json::to_string_pretty(&order(&value)) else {
+        let ordered = order(&value);
+        /* The order of the keys and nothing else. Comparing the text read a
+        manifest in order, with `"files": ["dist"]` on one line, as out of
+        order because the writer below would have put it on three. */
+        if same_order(&value, &ordered) {
+            continue;
+        }
+        let Ok(mut after) = serde_json::to_string_pretty(&ordered) else {
             continue;
         };
         after.push('\n');
-        if after != before {
-            changed.push((file, after));
-        }
+        changed.push((file, after));
     }
     (checked, changed)
 }

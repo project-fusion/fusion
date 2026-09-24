@@ -24,6 +24,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::LazyLock;
 
+use fusion_rules::source::uncommented;
 use fusion_rules::walk::crawl;
 
 use crate::rules::{Context, Finding, Report};
@@ -38,9 +39,6 @@ static TYPE_ONLY: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^import\s+type\b").expect("a literal pattern compiles"));
 
 /// A relative specifier a module re-exports or imports for its side effects.
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/|//[^\n]*").expect("a literal pattern compiles"));
-
 static RELATIVE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
         r#"(?m)^\s*(?:export\s+\*|export\s*\{[^}]*\}|import)\s+(?:from\s+)?['"](\.[^'"]+)['"]"#,
@@ -64,7 +62,7 @@ fn defines_here(file: &Path, raw: &str) -> bool {
     if name.ends_with(".generated.ts") {
         return false;
     }
-    COMMENT.replace_all(raw, " ").contains("@customElement")
+    uncommented(raw).contains("@customElement")
 }
 
 /// Whether a module's own graph reaches a custom element definition.
@@ -84,7 +82,7 @@ fn reaches(file: &Path, seen: &mut BTreeSet<std::path::PathBuf>) -> bool {
     if defines_here(file, &raw) {
         return true;
     }
-    let text = COMMENT.replace_all(&raw, " ");
+    let text = uncommented(&raw);
     RELATIVE.captures_iter(&text).any(|found| {
         let Some(directory) = file.parent() else {
             return false;

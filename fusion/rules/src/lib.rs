@@ -30,6 +30,7 @@
 
 pub mod error;
 pub mod exit;
+pub mod source;
 pub mod style;
 pub mod tui;
 pub mod version;

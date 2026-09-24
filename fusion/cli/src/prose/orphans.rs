@@ -137,7 +137,15 @@ pub fn run(context: &Context) -> Report {
             });
         }
 
-        for open in text.match_indices("/**").map(|(at, _)| at) {
+        // Only a block that opens its line, the way `OPENS` reads one: the
+        // opener inside a string, a glob matching every spec file, opened a
+        // block that was not there and reported one stacked on the real one.
+        for open in text.match_indices("/**").map(|(at, _)| at).filter(|&at| {
+            text[..at]
+                .rsplit('\n')
+                .next()
+                .is_some_and(|line| line.trim().is_empty())
+        }) {
             let Some(close) = text[open + 3..].find("*/").map(|at| open + 3 + at + 2) else {
                 continue;
             };

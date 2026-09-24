@@ -128,9 +128,11 @@ pub fn run(context: &Context) -> Report {
     };
 
     /* A static import outranks every guard below it, so this is checked
-    whichever mechanism is in force. */
+    whichever mechanism is in force. Over as many lines as the names take,
+    which is how a formatter writes three of them, and never past a quote, so
+    one import cannot run on into the next one's path. */
     let statically = Regex::new(&format!(
-        r#"(?m)^import\s[^\n]*['"]{}(?:helix-sandbox/specs|helix)['"]"#,
+        r#"(?m)^import\s(?:[^'"]*?\bfrom\s*)?['"]{}(?:helix-sandbox/specs|helix)['"]"#,
         regex::escape(&context.settings.scope.clone().unwrap_or_default())
     ))
     .expect("a pattern built from an escaped scope compiles");
