@@ -147,9 +147,15 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     },
   })
 
-  /** The items, read from the host so the server has them too. */
+  /**
+   * The items, read from the host.
+   *
+   * **`knownChildren` and not `children`**, which is undefined on the server:
+   * spreading it threw the first time a lightbox was rendered there open,
+   * which is the first time anything asked it for its items on a server.
+   */
   private get items(): HelixHeadlessLightboxItem[] {
-    return [...this.children].filter(
+    return this.knownChildren.filter(
       (child): child is HelixHeadlessLightboxItem => child instanceof HelixHeadlessLightboxItem,
     )
   }
@@ -317,6 +323,10 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     }
     if (this.open && !dialog.open) {
       dialog.showModal()
+      /* Said as well as marked, because `autofocus` on a dialog was honored
+         when the markup opened it and not when a framework set `open` after
+         it rendered: the first control took focus instead, ringed. */
+      dialog.focus({ preventScroll: true })
       /* The chrome starts up and the wait starts with it, or a viewer opened
          with `idle-delay` set shows nothing until the reader moves. */
       this.idle.stir()
@@ -362,9 +372,18 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   }
 
   protected override render(): TemplateResult {
+    /* **Opening focuses the viewer itself** rather than whichever of the
+       consumer's controls came first. A screen reader hears the viewer's name,
+       the arrow keys walk the pictures at once, and the first control is not
+       ringed as though somebody had tabbed to it; which one the browser
+       picked, and whether it drew a ring, also differed with how the viewer
+       was opened. Focusable with no tab stop of its own, so Tab goes on to the
+       controls. */
     return html`<dialog
       part="dialog"
       aria-label=${this.label || 'Lightbox'}
+      autofocus
+      tabindex="-1"
       @cancel=${this.handleCancel}
       @click=${this.handleBackdrop}
       @close=${this.handleClose}

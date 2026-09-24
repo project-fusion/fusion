@@ -79,12 +79,6 @@ const MARGIN = 32
 const ARROW = 'canvas-arrow'
 
 /**
- * The ground under a connection's label, named once for the reason the arrow
- * is.
- */
-const GROUND = 'canvas-label-ground'
-
-/**
  * How far a key press moves a card, in the document's own units.
  *
  * Half the ruling's default spacing, so two presses cross one square and a card
@@ -259,7 +253,6 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  * @csspart header - The strip above the board.
  * @csspart label - The label on a connector.
  * @csspart label-editor - The field a connection's label or a group's name is edited in, where it sits.
- * @csspart label-ground - The flood behind a connector's label, whose `flood-color` is the board's own ground.
  * @csspart live - What the board says while a connection is being made, for a screen reader.
  * @csspart marquee - The box a Shift-drag across the empty board draws, which selects the cards it touches.
  * @csspart pan-down - The button that moves the board down.
@@ -2321,26 +2314,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         >
           <path part="arrow" d="M0 0 L8 4 L0 8 z" />
         </marker>
-        <!-- **A box of ground behind a label, as wide as the label is**, which
-             is what a filter region is: a flood the size of the text's own
-             bounding box, a little larger on every side, with the text over
-             it. An outline stroked around the letters was the first answer and
-             only covers the letters, so the line showed through every gap
-             between them and every space between the words. -->
-        <!-- In sRGB, or the flood is mixed in linear light and comes out a
-             shade lighter than the same color painted anywhere else, which
-             drew a box around every label. -->
-        <filter
-          id=${GROUND}
-          color-interpolation-filters="sRGB"
-          x="-0.08"
-          y="-0.25"
-          width="1.16"
-          height="1.5"
-        >
-          <feFlood part="label-ground" />
-          <feComposite in="SourceGraphic" operator="over" />
-        </filter>
       </defs>
       ${this.edges.map((edge) => {
         const from = byId.get(edge.fromNode)
@@ -2394,16 +2367,47 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
             marker-start=${ends.start ? `url(#${ARROW})` : nothing}
             style=${custom(element, '--canvas-edge-color') ? `--_canvas-edge-color: ${custom(element, '--canvas-edge-color')}` : nothing}
           />
-          ${
-            edge.label
-              ? svg`<text part="label" aria-hidden="true" x=${drawn.mid.x} y=${drawn.mid.y} dominant-baseline="central" filter=${`url(#${GROUND})`} text-anchor="middle">
-                  ${edge.label}
-                </text>`
-              : nothing
-          }`
+`
       })}
       ${this.renderDraft(byId, shifted)}
     </svg>`
+  }
+
+  /**
+   * The connections' labels, as text on the plane over the lines.
+   *
+   * **HTML and not SVG text, which is the whole of the fix.** Drawn in the
+   * SVG, a label's ground was a filter flooding the text's box, and Chrome
+   * kept the filter's first picture: a label drawn before the page's font had
+   * loaded kept its ground and lost its words, on every board a server had not
+   * rendered first. Measured as a box with nothing in it on the examples page.
+   * A box of text with a background is what HTML has always done, as wide as
+   * its words, spaces and all, and drawn again whenever the font changes.
+   */
+  private renderLabels(origin: { x: number; y: number }) {
+    const byId = new Map(this.nodes.map((one) => [one.id, one]))
+    const shifted = (node: CanvasNode) => ({ ...node, x: node.x - origin.x, y: node.y - origin.y })
+    return this.edges.map((edge) => {
+      const from = byId.get(edge.fromNode)
+      const to = byId.get(edge.toNode)
+      const lifted = this.linking?.edge === keyOf(edge) && !this.linking.pressed
+      if (!edge.label || !from || !to || lifted) {
+        return nothing
+      }
+      const { mid } = connector(
+        edge,
+        shifted(from),
+        shifted(to),
+        edge.path ?? this.path ?? 'curve',
+        heads(edge),
+      )
+      return html`<span
+        part="label"
+        aria-hidden="true"
+        style=${`--_canvas-label-x: ${mid.x}px; --_canvas-label-y: ${mid.y}px`}
+        >${edge.label}</span
+      >`
+    })
   }
 
   /**
@@ -2499,7 +2503,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           part="board"
           style=${`--_canvas-plane-inline-size: ${box.width}px; --_canvas-plane-block-size: ${box.height}px`}
         >
-          ${this.renderEdges(origin, box)}
+          ${this.renderEdges(origin, box)} ${this.renderLabels(origin)}
           <slot @slotchange=${this.handleSlotChange}></slot>
           ${this.renderEditor(origin)}
           ${this.renderMarquee(origin)}

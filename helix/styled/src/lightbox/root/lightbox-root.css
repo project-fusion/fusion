@@ -32,6 +32,14 @@
   padding: var(--lightbox-padding, var(--helix-space-md));
 }
 
+/* **No ring on the viewer itself.** It takes focus when it opens, so a reader
+   is in it and the arrows work at once, and it is the whole screen: a ring
+   around the screen's own edge says nothing a reader can use. The controls
+   inside it ring as they always do when a reader tabs to them. */
+[part="dialog"]:focus-visible {
+  outline: none;
+}
+
 /* The UA hides a closed dialog with `dialog:not([open]) { display: none }`, and
    the `display: grid` above silently took that away. */
 [part="dialog"]:not([open]) {

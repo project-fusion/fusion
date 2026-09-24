@@ -73,12 +73,17 @@ helix-headless-canvas::part(arrow) {
 }
 
 helix-headless-canvas::part(label) {
-  fill: var(--_gray-muted);
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-muted);
   font-size: 0.75rem;
-}
-
-helix-headless-canvas::part(label-ground) {
-  flood-color: var(--_gray-subtle);
+  left: var(--_canvas-label-x);
+  line-height: 1;
+  padding: 0.25rem;
+  pointer-events: none;
+  position: absolute;
+  top: var(--_canvas-label-y);
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
 }
 
 helix-headless-canvas::part(draft) {
