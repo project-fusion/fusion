@@ -3,17 +3,20 @@ import {
   capturePointer,
   customElement,
   HelixBeforeMoveEvent,
+  HelixBeforeReconnectEvent,
   HelixCanvasPanEvent,
   HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
   HelixConnectEvent,
   HelixElement,
   HelixMoveEvent,
+  HelixReconnectEvent,
   HelixRemoveEvent,
   hostAria,
   inlineStep,
   MixinViewport,
   type MoveDetail,
+  type ReconnectDetail,
   type ViewportPanDetail,
   type ViewportWay,
   type ViewportZoomDetail,
@@ -28,11 +31,13 @@ import {
   type CanvasNode,
   type CanvasSide,
   connector,
+  ends,
   extent,
   groupOf,
   inside,
   port,
   reading,
+  sideNear,
 } from './canvas-document.js'
 
 export type {
@@ -181,11 +186,13 @@ const own = (color: string | undefined): string | undefined =>
  * @slot header - Chrome above the board.
  *
  * @event {HelixBeforeMoveEvent} helix-before-move - Cards are about to move. Refuse it to keep the positions in your own state.
+ * @event {HelixBeforeReconnectEvent} helix-before-reconnect - A connection's end is about to move to another card or side. Refuse it to keep connections in your own state.
  * @event {HelixCanvasPanEvent} helix-canvas-pan - The board moved, which on a canvas is a fact rather than a request.
  * @event {HelixCanvasViewEvent} helix-canvas-view - Where the board is looking changed, however it changed. The detail is the new view.
  * @event {HelixCanvasZoomEvent} helix-canvas-zoom - The board zoomed, and said so.
  * @event {HelixConnectEvent} helix-connect - A reader asked for two cards to be joined. Add the `helix-canvas-edge` to do it.
  * @event {HelixMoveEvent} helix-move - Cards moved and the move is finished: a drag let go, or a key pressed.
+ * @event {HelixReconnectEvent} helix-reconnect - A connection's end moved, and the move is finished.
  * @event {HelixRemoveEvent} helix-remove - A reader asked for cards or connections to go. Remove the elements it names.
  *
  * @csspart arrow - The head an edge carries at an end that has one.
@@ -301,6 +308,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
+  /**
+   * What the live region says when a reader picks up a connection's end, with
+   * `{from}` and `{to}`.
+   */
+  @property({ attribute: 'reconnecting-label' })
+  reconnectingLabel =
+    'Moving the end of the connection from {from} to {to}. Move to a card and press Enter, or Escape to stop.'
+
   /** What it says when a reader stops connecting without asking. */
   @property({ attribute: 'stopped-label' })
   stoppedLabel = 'Stopped connecting.'
@@ -322,6 +337,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         at?: { x: number; y: number } | undefined
         /** The card it would arrive at if it were let go now. */
         to?: string | undefined
+        /** The side of that card nearest the pointer, where there is a pointer. */
+        toSide?: CanvasSide | undefined
+        /**
+         * The connection whose end is being moved, where one is: `from` is
+         * then the end that stays, and `moving` says which end is in hand.
+         */
+        edge?: string | undefined
+        moving?: 'from' | 'to' | undefined
+        /** Where a press on a connection began, until it has moved far enough to be a drag. */
+        pressed?: { x: number; y: number } | undefined
       }
     | undefined
 
@@ -660,8 +685,12 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /** Ends a connection, asking for it where it has somewhere to go. */
-  private finishLinking(to: string | undefined): void {
+  private finishLinking(to: string | undefined, toSide?: CanvasSide): void {
     const linking = this.linking
+    if (linking?.edge !== undefined) {
+      this.finishReconnect(to, toSide)
+      return
+    }
     const arriving = this.arrival(to)
     this.linking = undefined
     if (!linking || arriving === undefined) {
@@ -673,12 +702,96 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       to: this.nameOf(arriving),
     })
     this.dispatchEvent(
-      new HelixConnectEvent(
-        linking.side === undefined
-          ? { from: linking.from, to: arriving }
-          : { from: linking.from, fromSide: linking.side, to: arriving },
-      ),
+      new HelixConnectEvent({
+        from: linking.from,
+        to: arriving,
+        ...(linking.side === undefined ? {} : { fromSide: linking.side }),
+        ...(toSide === undefined ? {} : { toSide }),
+      }),
     )
+  }
+
+  /**
+   * Picks up one end of a connection, from the keyboard or a drag.
+   *
+   * The end in hand is the one a drag started nearer, and `to` from the
+   * keyboard, where there is no nearer; the other end stays where it is,
+   * side and all.
+   */
+  private startReconnect(key: string, moving: 'from' | 'to', pointer?: PointerEvent): void {
+    const edge = this.edges.find((one) => keyOf(one) === key)
+    if (!edge) {
+      return
+    }
+    const stays = moving === 'to' ? edge.fromNode : edge.toNode
+    this.linking = {
+      edge: key,
+      from: stays,
+      moving,
+      side: moving === 'to' ? edge.fromSide : edge.toSide,
+      ...(pointer ? { at: this.toDocument(pointer), pointer: pointer.pointerId } : {}),
+    }
+    this.said = pointer
+      ? ''
+      : fill(this.reconnectingLabel, {
+          from: this.nameOf(edge.fromNode),
+          to: this.nameOf(edge.toNode),
+        })
+  }
+
+  /**
+   * Lets go of a connection's end: onto a card, which moves it there; or onto
+   * nothing, which asks for the connection to go.
+   *
+   * **Dropped on nothing is a disconnect**, which is what a reader pulling a
+   * line off a card means, and what every editor with draggable ends does. It
+   * is a request like Delete, because the element is the page's to remove.
+   */
+  private finishReconnect(to: string | undefined, toSide?: CanvasSide): void {
+    const linking = this.linking
+    this.linking = undefined
+    const edge = linking ? this.edges.find((one) => keyOf(one) === linking.edge) : undefined
+    if (!linking || !edge || linking.edge === undefined) {
+      return
+    }
+    const arriving = to === undefined || to === linking.from ? undefined : to
+    if (arriving === undefined || this.fixed(this.cardNamed(arriving))) {
+      this.said = linking.pointer === undefined ? this.stoppedLabel : ''
+      if (linking.pointer !== undefined && to === undefined) {
+        this.requestRemove(linking.edge)
+      }
+      return
+    }
+    const detail: ReconnectDetail =
+      linking.moving === 'from'
+        ? {
+            from: arriving,
+            name: edge.id,
+            to: edge.toNode,
+            was: { from: edge.fromNode, to: edge.toNode },
+            ...(toSide === undefined ? {} : { fromSide: toSide }),
+            ...(edge.toSide === undefined ? {} : { toSide: edge.toSide }),
+          }
+        : {
+            from: edge.fromNode,
+            name: edge.id,
+            to: arriving,
+            was: { from: edge.fromNode, to: edge.toNode },
+            ...(edge.fromSide === undefined ? {} : { fromSide: edge.fromSide }),
+            ...(toSide === undefined ? {} : { toSide }),
+          }
+    this.said = ''
+    if (!this.dispatchEvent(new HelixBeforeReconnectEvent(detail))) {
+      return
+    }
+    const element = this.edgeElement(linking.edge)
+    if (element) {
+      element.from = detail.from
+      element.to = detail.to
+      element.fromSide = detail.fromSide
+      element.toSide = detail.toSide
+    }
+    this.dispatchEvent(new HelixReconnectEvent(detail))
   }
 
   /**
@@ -830,6 +943,29 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (event.button !== 0 || on('controls') || !(card || on('viewport'))) {
       return
     }
+    /* **A press on a connection picks up its nearer end**, once the hand has
+       moved far enough to be a drag rather than a click that focuses it. */
+    const pressedEdge = this.edgeOf(event)
+    if (pressedEdge !== undefined && !this.readOnly && !this.edgeElement(pressedEdge)?.readOnly) {
+      const edge = this.edges.find((one) => keyOf(one) === pressedEdge)
+      const byId = new Map(this.nodes.map((one) => [one.id, one]))
+      const from = edge ? byId.get(edge.fromNode) : undefined
+      const to = edge ? byId.get(edge.toNode) : undefined
+      if (edge && from && to) {
+        const at = this.toDocument(event)
+        const { end, start } = ends(edge, from, to)
+        const moving =
+          Math.hypot(at.x - start.x, at.y - start.y) < Math.hypot(at.x - end.x, at.y - end.y)
+            ? 'from'
+            : 'to'
+        this.startReconnect(pressedEdge, moving, event)
+        if (this.linking) {
+          this.linking = { ...this.linking, pressed: { x: event.clientX, y: event.clientY } }
+        }
+        capturePointer(this, event.pointerId)
+        return
+      }
+    }
     /* A press on a card's handle draws a connection from that side. */
     const handle = path.find(
       (one): one is Element => one instanceof Element && one.hasAttribute('data-side'),
@@ -869,8 +1005,20 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   private readonly handlePointerMove = (event: PointerEvent): void => {
     this.idle.stir()
     if (this.linking?.pointer === event.pointerId) {
+      const pressed = this.linking.pressed
+      if (pressed && Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) < SLOP) {
+        return
+      }
       const at = this.toDocument(event)
-      this.linking = { ...this.linking, at, to: this.arrival(this.cardAt(at)?.id) }
+      const over = this.cardAt(at)
+      const to = this.arrival(over?.id)
+      this.linking = {
+        ...this.linking,
+        at,
+        pressed: undefined,
+        to,
+        toSide: to !== undefined && over ? sideNear(over, at) : undefined,
+      }
       return
     }
     const carry = this.carrying
@@ -910,9 +1058,22 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   private readonly handlePointerUp = (event: PointerEvent): void => {
     if (this.linking?.pointer === event.pointerId) {
+      /* A press on a connection that never became a drag was a click, which
+         focused it; nothing is picked up and nothing is asked for. */
+      if (this.linking.pressed) {
+        this.linking = undefined
+        return
+      }
       /* Where the preview said it would land, so what is asked for is what
-         the reader was shown. */
-      this.finishLinking(event.type === 'pointercancel' ? undefined : this.linking.to)
+         the reader was shown. A canceled pointer lands nowhere and asks
+         nothing, even for a connection's end, which dropped on nothing would
+         otherwise be a disconnect. */
+      if (event.type === 'pointercancel') {
+        this.linking = undefined
+        this.said = ''
+        return
+      }
+      this.finishLinking(this.linking.to, this.linking.toSide)
       return
     }
     const carry = this.carrying
@@ -1021,9 +1182,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (event.key === 'Escape') {
       event.preventDefault()
       if (this.linking) {
-        const from = this.linking.from
-        this.finishLinking(undefined)
-        this.focusStop(from)
+        const back = this.linking.edge ?? this.linking.from
+        this.linking = undefined
+        this.said = this.stoppedLabel
+        this.focusStop(back)
         return
       }
       this.partNamed('region')?.focus()
@@ -1045,6 +1207,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (card && !this.fixed(card) && !this.linking && (event.key === 'c' || event.key === 'C')) {
       event.preventDefault()
       this.startLinking(card.name)
+      return
+    }
+    if (
+      edge !== undefined &&
+      !this.linking &&
+      !this.readOnly &&
+      !this.edgeElement(edge)?.readOnly &&
+      (event.key === 'c' || event.key === 'C')
+    ) {
+      event.preventDefault()
+      this.startReconnect(edge, 'to')
       return
     }
     if (event.key === 'Delete' || event.key === 'Backspace') {
@@ -1548,7 +1721,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           markerUnits="userSpaceOnUse"
           markerWidth="8"
           orient="auto-start-reverse"
-          refX="7"
+          refX="0"
           refY="4"
         >
           <path part="arrow" d="M0 0 L8 4 L0 8 z" />
@@ -1560,8 +1733,19 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         if (!from || !to) {
           return nothing
         }
-        const drawn = connector(edge, shifted(from), shifted(to), edge.path ?? this.path ?? 'curve')
         const key = keyOf(edge)
+        /* The connection whose end is in hand is drawn by the draft instead,
+           so a reader sees it lifted rather than drawn twice. */
+        if (this.linking?.edge === key && !this.linking.pressed) {
+          return nothing
+        }
+        const drawn = connector(
+          edge,
+          shifted(from),
+          shifted(to),
+          edge.path ?? this.path ?? 'curve',
+          heads(edge),
+        )
         /* **`svg` and not `html`, which is the whole of whether this draws.** A
            nested template is parsed in the namespace its tag names, so a `<path>`
            built with `html` inside an `<svg>` is an unknown HTML element that
@@ -1609,28 +1793,47 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   private renderDraft(byId: Map<string, CanvasNode>, shifted: (node: CanvasNode) => CanvasNode) {
     const linking = this.linking
-    const from = linking ? byId.get(linking.from) : undefined
-    if (!linking || !from) {
+    const anchor = linking ? byId.get(linking.from) : undefined
+    if (!linking || !anchor || linking.pressed) {
       return nothing
     }
     const origin = this.origin ?? { x: 0, y: 0 }
+    const moved = linking.edge ? this.edges.find((one) => keyOf(one) === linking.edge) : undefined
+    const path = moved?.path ?? this.path ?? 'curve'
+    const drawnHeads = moved ? heads(moved) : { end: true, start: false }
     /* **Over a card it could arrive at, the connection it would make**, drawn
        the way it will be drawn: its path, its sides, its arrowhead. A line to
        the pointer only says the hand is moving; this says what letting go
-       will do. */
-    const to = linking.to === undefined ? undefined : byId.get(linking.to)
-    if (to) {
+       will do. The end in hand arrives at the side nearest the pointer. */
+    const target = linking.to === undefined ? undefined : byId.get(linking.to)
+    if (target) {
+      const reversed = linking.moving === 'from'
+      const [from, to] = reversed ? [target, anchor] : [anchor, target]
       const drawn = connector(
-        { fromNode: from.id, fromSide: linking.side, id: '', toNode: to.id },
+        {
+          fromNode: from.id,
+          fromSide: reversed ? linking.toSide : linking.side,
+          id: '',
+          toNode: to.id,
+          toSide: reversed ? linking.side : linking.toSide,
+        },
         shifted(from),
         shifted(to),
-        this.path ?? 'curve',
+        path,
+        drawnHeads,
       )
-      return svg`<path part="draft" aria-hidden="true" d=${drawn.d} fill="none" marker-end=${`url(#${ARROW})`} />`
+      return svg`<path
+        part="draft"
+        aria-hidden="true"
+        d=${drawn.d}
+        fill="none"
+        marker-end=${drawnHeads.end ? `url(#${ARROW})` : nothing}
+        marker-start=${drawnHeads.start ? `url(#${ARROW})` : nothing}
+      />`
     }
-    if (linking.at && linking.side) {
-      const start = port(shifted(from), linking.side)
+    if (linking.at) {
       const end = { x: linking.at.x - origin.x, y: linking.at.y - origin.y }
+      const start = port(shifted(anchor), linking.side ?? sideNear(anchor, linking.at))
       return svg`<path part="draft" aria-hidden="true" d=${`M ${start.x} ${start.y} L ${end.x} ${end.y}`} fill="none" />`
     }
     return nothing

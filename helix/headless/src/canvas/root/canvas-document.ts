@@ -286,12 +286,27 @@ export const connector = (
   from: CanvasNode,
   to: CanvasNode,
   path: CanvasPath = 'curve',
+  heads: { start: boolean; end: boolean } = { end: false, start: false },
 ): { d: string; mid: { x: number; y: number } } => {
-  const [fallbackFrom, fallbackTo] = nearestSides(from, to)
-  const fromSide = edge.fromSide ?? fallbackFrom
-  const toSide = edge.toSide ?? fallbackTo
-  const start = port(from, fromSide)
-  const end = port(to, toSide)
+  const { end: port2, fromSide, start: port1, toSide } = ends(edge, from, to)
+  /* **The line stops where the head starts.** Drawn to the card and capped with
+     a head, the stroke ran on under the head to its tip, and where the head
+     narrowed to its point the line was the wider of the two: a line thickened
+     on hover poked out either side of its own arrow. So an end with a head is
+     drawn to the head's base, a head's length out along the way it arrives,
+     and the head covers the rest. */
+  const inward = (point: Point, side: CanvasSide, other: Point): Point => {
+    if (path === 'straight') {
+      const length = Math.hypot(other.x - point.x, other.y - point.y) || 1
+      return {
+        x: point.x + ((other.x - point.x) / length) * HEAD,
+        y: point.y + ((other.y - point.y) / length) * HEAD,
+      }
+    }
+    return { x: point.x + normal(side).x * HEAD, y: point.y + normal(side).y * HEAD }
+  }
+  const start = heads.start ? inward(port1, fromSide, port2) : port1
+  const end = heads.end ? inward(port2, toSide, port1) : port2
   if (path === 'straight') {
     return {
       d: `M ${start.x} ${start.y} L ${end.x} ${end.y}`,
@@ -312,6 +327,40 @@ export const connector = (
     mid: { x: (start.x + end.x + c1.x + c2.x) / 4, y: (start.y + end.y + c1.y + c2.y) / 4 },
   }
 }
+
+/** How long an arrowhead is, in the document's own units. */
+export const HEAD = 8
+
+/**
+ * Where a connection meets each card, and on which side: the sides it names,
+ * and the nearest where it names none.
+ */
+export const ends = (
+  edge: CanvasEdge,
+  from: CanvasNode,
+  to: CanvasNode,
+): { start: Point; end: Point; fromSide: CanvasSide; toSide: CanvasSide } => {
+  const [fallbackFrom, fallbackTo] = nearestSides(from, to)
+  const fromSide = edge.fromSide ?? fallbackFrom
+  const toSide = edge.toSide ?? fallbackTo
+  return { end: port(to, toSide), fromSide, start: port(from, fromSide), toSide }
+}
+
+/**
+ * The side of a card nearest a point, which is where a connection a reader is
+ * holding arrives.
+ *
+ * **The reader's point, not the card's middle.** A connection dropped on a card
+ * arrived at whichever side faced the card it came from, so a reader aiming for
+ * the top of a card watched it land on the left.
+ */
+export const sideNear = (node: CanvasNode, point: Point): CanvasSide =>
+  (['top', 'right', 'bottom', 'left'] as const)
+    .map((side) => {
+      const at = port(node, side)
+      return { distance: Math.hypot(at.x - point.x, at.y - point.y), side }
+    })
+    .sort((a, b) => a.distance - b.distance)[0]?.side ?? 'top'
 
 /**
  * The order a screen reader meets the cards in, which space does not supply.

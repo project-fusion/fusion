@@ -63,6 +63,7 @@ export function Example() {
           key={link.name}
           name={link.name}
           to={link.to}
+          to-side={link.toSide}
         ></helix-canvas-edge>
       ))}
     </helix-canvas>
