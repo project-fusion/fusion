@@ -52,7 +52,13 @@ export function SpecFrame() {
     // test again, and the element definitions with them.
     const loaded = new Map<string, Promise<{ run: () => Promise<unknown[]> }>>()
 
-    const onMessage = async (event: MessageEvent<RunMessage>) => {
+    /* **One run at a time.** Every run owns the one document body, so two at
+       once would each mount over the other's fixtures, and the second would
+       set aside the first's stand-in body rather than React's and put that
+       back. A reader picking another family mid-run queues it. */
+    let queue = Promise.resolve()
+
+    const onMessage = (event: MessageEvent<RunMessage>) => {
       if (event.data?.type !== 'helix-specs-run' || event.source !== window.parent) {
         return
       }
@@ -62,6 +68,10 @@ export function SpecFrame() {
         return
       }
 
+      queue = queue.then(() => runFamily(family))
+    }
+
+    const runFamily = async (family: string): Promise<void> => {
       try {
         let bundle = loaded.get(family)
         if (!bundle) {

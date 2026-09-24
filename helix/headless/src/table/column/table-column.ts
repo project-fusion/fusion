@@ -542,7 +542,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
     const name = this.name
     return html`<span part="column">${
       this.movable
-        ? html`<button part="grip" type="button" aria-label=${fillTemplate(this.moveLabel, { name }).trim()}>
+        ? html`<button part="grip" type="button" aria-label=${fillTemplate(this.moveLabel, { name: name || 'column' })}>
             <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsThreeVertical.viewBox}>
               ${unsafeSVG(dotsThreeVertical.content)}
             </svg>
@@ -558,7 +558,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
             part="resizer"
             role="separator"
             tabindex="0"
-            aria-label=${fillTemplate(this.resizeLabel, { name }).trim()}
+            aria-label=${fillTemplate(this.resizeLabel, { name: name || 'column' })}
             aria-orientation="vertical"
             aria-valuemin=${HelixHeadlessTableColumn.NARROWEST}
             aria-valuemax="4096"

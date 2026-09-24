@@ -52,10 +52,13 @@ export class HelixHeadlessEmpty extends HelixElement {
   @property({ attribute: 'no-announce', reflect: true, type: Boolean })
   noAnnounce = false
 
-  /* Filled a frame after the view appears, unless it came with the served page,
-     which is the one case this knows was always there. */
+  /* Filled a frame after the view appears, when it appears after the page has
+     loaded, as `Announcement`'s band is; at once, and silently, when it came
+     with the page. A page a framework served without declarative shadow DOM is
+     not `serverRendered`, so without the load test every empty state in it
+     spoke over the page as it opened. */
   protected readonly arrival = new ArrivalController(this, {
-    arriving: () => !this.serverRendered,
+    arriving: () => !this.serverRendered && document.readyState === 'complete',
     text: () => slottedWords(this, ['heading', '']),
   })
 

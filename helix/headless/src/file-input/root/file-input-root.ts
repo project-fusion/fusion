@@ -16,6 +16,14 @@ import { html } from 'lit/static-html.js'
 import '../../tag/index.js'
 
 /**
+ * A label with the file's name in it: where `{name}` says, or after the label
+ * where it says nothing, which is how a `remove-label` written before the
+ * placeholder existed was always read.
+ */
+const named = (label: string, name: string): string =>
+  label.includes('{name}') ? fillTemplate(label, { name }) : `${label} ${name}`
+
+/**
  * A file's size, at the largest unit that leaves a number worth reading.
  *
  * Binary steps, because that is what a file system reports and what the number
@@ -155,7 +163,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * What the control removing one file is called, with `{name}` filled in.
    *
    * **The name goes in**, so a row of them is heard as which one each
-   * removes rather than as "Remove" said once per file.
+   * removes rather than as "Remove" said once per file. A label with no
+   * `{name}` has it added after it.
    */
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove {name}'
@@ -519,7 +528,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
                   <button
                     part="remove"
                     type="button"
-                    aria-label=${fillTemplate(this.removeLabel, { name: file.name })}
+                    aria-label=${named(this.removeLabel, file.name)}
                     data-at=${at}
                     ?disabled=${this.isDisabled}
                     @click=${this.handleRemove}
