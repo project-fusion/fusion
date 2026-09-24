@@ -5,7 +5,9 @@ const STEP = 32
 
 const snap = (value: number) => Math.round(value / STEP) * STEP
 
-const START = [
+type Card = { name: string; text: string; tone?: 'accent' | 'success'; x: number; y: number }
+
+const START: Card[] = [
   { name: 'todo', text: 'To do', x: 0, y: 0 },
   { name: 'doing', text: 'Doing', tone: 'accent', x: 256, y: 0 },
   { name: 'done', text: 'Done', tone: 'success', x: 512, y: 0 },
