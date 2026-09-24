@@ -852,7 +852,11 @@ fn dialect_spares_addresses() {
             ),
             (
                 "notes.md",
-                "See https://x.dev/colour-theme and ![a](img/colour.png), all catalogued.\n", // dialect:quoted
+                concat!(
+                    "See https://x.dev/colour-theme and ![a](img/colour.png), all catalogued.\n", // dialect:quoted
+                    "[The page](./colour-picker.md \"Picker\") and ![A swatch](<img/colour swatch.png>).\n", // dialect:quoted
+                    "[ref]: ./colour-ref.md\n", // dialect:quoted
+                ),
             ),
         ],
         |tree| {

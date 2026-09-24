@@ -140,6 +140,33 @@ fn past_string(bytes: &[u8], from: usize) -> usize {
     bytes.len()
 }
 
+/// Where each comment in a stylesheet is, in order.
+///
+/// **A sheet is not a module**, and reading it as one found regexes in it: CSS
+/// has no regex literals and no line comments, so `hsl(0 0% 0% / 0.5)` read as
+/// a pattern opening at the `/` and ran past the comment after it, and a
+/// `url(//cdn…)` would read as a line comment. Only block comments, with the
+/// sheet's strings stepped over.
+pub fn sheet_comments(text: &str) -> Vec<std::ops::Range<usize>> {
+    let bytes = text.as_bytes();
+    let mut found = Vec::new();
+    let mut at = 0;
+    while at < bytes.len() {
+        match bytes[at] {
+            b'"' | b'\'' => at = past_string(bytes, at),
+            b'/' if bytes.get(at + 1) == Some(&b'*') => {
+                let end = text[at + 2..]
+                    .find("*/")
+                    .map_or(bytes.len(), |close| at + 2 + close + 2);
+                found.push(at..end);
+                at = end;
+            }
+            _ => at += 1,
+        }
+    }
+    found
+}
+
 /// Whether a `/` after the byte at `last` opens a regex rather than divides.
 ///
 /// A regex follows an operator, an opening bracket, a comma or a keyword like
@@ -152,6 +179,11 @@ fn opens_regex(bytes: &[u8], last: Option<usize>) -> bool {
         return true;
     };
     let one = bytes[last];
+    /* `a++ / 2`: an increment or a decrement ends a value, so what follows
+    divides it. */
+    if (one == b'+' || one == b'-') && last > 0 && bytes[last - 1] == one {
+        return false;
+    }
     if one.is_ascii_alphanumeric() || one == b'_' || one == b'$' {
         let start = bytes[..=last]
             .iter()
@@ -194,7 +226,7 @@ fn past_regex(bytes: &[u8], from: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::uncommented;
+    use super::{comments, sheet_comments, uncommented};
 
     #[test]
     fn a_comment_holding_non_ascii_blanks_to_its_length_in_bytes() {
@@ -229,5 +261,23 @@ mod tests {
         assert!(!out.contains("// a") && !out.contains("// b") && !out.contains("// c"));
         assert!(out.contains("w / 2"));
         assert!(out.contains("/['\"]\\/\\*[/]/g"));
+    }
+
+    #[test]
+    fn an_increment_ends_a_value_so_what_follows_divides() {
+        let code = "x = a++ / 2 // gone\ny = b-- / 2 // also";
+        let found: Vec<&str> = comments(code).into_iter().map(|span| &code[span]).collect();
+        assert_eq!(found, ["// gone", "// also"]);
+    }
+
+    #[test]
+    fn a_sheet_has_block_comments_only() {
+        let sheet = ".a { color: hsl(0 0% 0% / 0.5); background: url(//cdn.x/a.png); \
+                     content: '/* not */'; } /* moved */";
+        let found: Vec<&str> = sheet_comments(sheet)
+            .into_iter()
+            .map(|span| &sheet[span])
+            .collect();
+        assert_eq!(found, ["/* moved */"]);
     }
 }
