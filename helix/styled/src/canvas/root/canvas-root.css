@@ -1,18 +1,6 @@
 /* The host draws nothing: the region inside it is the board's frame. */
 :host {
   display: contents;
-
-  /* **The six presets the format names, pointed at tokens.** JSON Canvas writes
-     a color as `1` to `6` and says what each means by convention rather than
-     by value, which is what lets a board drawn in one application be read in
-     another. Pointing them at semantic tokens is what makes a board follow the
-     page into dark mode instead of carrying somebody else's hex into it. */
-  --canvas-color-1: var(--helix-color-danger);
-  --canvas-color-2: var(--helix-color-warning);
-  --canvas-color-3: var(--helix-color-accent);
-  --canvas-color-4: var(--helix-color-success);
-  --canvas-color-5: var(--helix-color-info);
-  --canvas-color-6: var(--helix-color-primary);
 }
 
 [part="region"] {
@@ -25,6 +13,15 @@
   grid-template-rows: auto 1fr auto;
   overflow: hidden;
   position: relative;
+}
+
+/* **A board with no frame**, for one that fills a panel or an app's working
+   area, where a border and a rounded corner inside another frame are two
+   edges saying the same thing. */
+:host([separation="plain"]) [part="region"] {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
 }
 
 [part="viewport"] {
@@ -197,23 +194,34 @@
   }
 }
 
-[part="edge"][data-color="1"] {
-  stroke: var(--canvas-color-1);
+[part="edge"][data-tone="accent"] {
+  stroke: var(--helix-color-accent);
 }
-[part="edge"][data-color="2"] {
-  stroke: var(--canvas-color-2);
+[part="edge"][data-tone="danger"] {
+  stroke: var(--helix-color-danger);
 }
-[part="edge"][data-color="3"] {
-  stroke: var(--canvas-color-3);
+[part="edge"][data-tone="info"] {
+  stroke: var(--helix-color-info);
 }
-[part="edge"][data-color="4"] {
-  stroke: var(--canvas-color-4);
+[part="edge"][data-tone="primary"] {
+  stroke: var(--helix-color-primary);
 }
-[part="edge"][data-color="5"] {
-  stroke: var(--canvas-color-5);
+[part="edge"][data-tone="success"] {
+  stroke: var(--helix-color-success);
 }
-[part="edge"][data-color="6"] {
-  stroke: var(--canvas-color-6);
+[part="edge"][data-tone="warning"] {
+  stroke: var(--helix-color-warning);
+}
+
+/* A weaker or optional connection, drawn broken. Dotted is a dash of nothing
+   with a round cap, which is how a stroke draws a row of dots. */
+[part="edge"][data-variant="dashed"] {
+  stroke-dasharray: 6 4;
+}
+
+[part="edge"][data-variant="dotted"] {
+  stroke-dasharray: 0 5;
+  stroke-linecap: round;
 }
 
 /* **Haloed in the well's own color**, so a label written over its line reads

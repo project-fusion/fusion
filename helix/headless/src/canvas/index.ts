@@ -9,5 +9,6 @@ export type {
   CanvasNodeProps,
   CanvasPath,
   CanvasSide,
+  CanvasTone,
 } from './root/canvas-root.js'
 export { fromJsonCanvas, HelixHeadlessCanvas } from './root/canvas-root.js'

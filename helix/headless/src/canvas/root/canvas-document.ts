@@ -429,6 +429,9 @@ export interface CanvasNodeProps {
   y: number
   width: number
   height: number
+  /** What it means, from the format's six presets. */
+  tone?: CanvasTone | undefined
+  /** A color the document chose that is none of the six, to set as `--canvas-node-color`. */
   color?: string | undefined
   label?: string | undefined
   group: boolean
@@ -449,6 +452,9 @@ export interface CanvasEdgeProps {
   toSide?: CanvasSide | undefined
   fromEnd?: CanvasEnd | undefined
   toEnd?: CanvasEnd | undefined
+  /** What it means, from the format's six presets. */
+  tone?: CanvasTone | undefined
+  /** A color the document chose that is none of the six, to set as `--canvas-edge-color`. */
   color?: string | undefined
   label?: string | undefined
 }
@@ -466,7 +472,7 @@ export const fromJsonCanvas = (
   document: CanvasDocument,
 ): { nodes: CanvasNodeProps[]; edges: CanvasEdgeProps[] } => ({
   edges: (document.edges ?? []).map((edge) => ({
-    color: edge.color,
+    color: toneOf(edge.color) === undefined ? edge.color : undefined,
     from: edge.fromNode,
     fromEnd: edge.fromEnd,
     fromSide: edge.fromSide,
@@ -474,19 +480,53 @@ export const fromJsonCanvas = (
     name: edge.id,
     to: edge.toNode,
     toEnd: edge.toEnd,
+    tone: toneOf(edge.color),
     toSide: edge.toSide,
   })),
   nodes: (document.nodes ?? []).map((node) => ({
-    color: node.color,
+    color: toneOf(node.color) === undefined ? node.color : undefined,
     file: node.file,
     group: node.type === 'group',
     height: node.height,
     label: node.label,
     name: node.id,
     text: node.text,
+    tone: toneOf(node.color),
     url: node.url,
     width: node.width,
     x: node.x,
     y: node.y,
   })),
 })
+
+/** What every Helix component calls a meaning. */
+export type CanvasTone =
+  | 'accent'
+  | 'danger'
+  | 'info'
+  | 'neutral'
+  | 'primary'
+  | 'success'
+  | 'warning'
+
+/**
+ * The format's six presets, in order, as the tones they have always meant here.
+ *
+ * JSON Canvas leaves what `1` to `6` mean to the application, and this board
+ * pointed them at these from the start; the mapping is written once, so the way
+ * in and the way out cannot disagree.
+ */
+const PRESETS: readonly CanvasTone[] = ['danger', 'warning', 'accent', 'success', 'info', 'primary']
+
+/** The tone a JSON Canvas color means, where it is one of the six presets. */
+export const toneOf = (color: string | undefined): CanvasTone | undefined =>
+  color !== undefined && /^[1-6]$/.test(color) ? PRESETS[Number(color) - 1] : undefined
+
+/**
+ * The JSON Canvas color a card or connection writes back out: its tone as a
+ * preset, or the custom color it was given, or nothing.
+ */
+export const colorOf = (tone: CanvasTone | undefined, custom: string): string | undefined => {
+  const at = tone === undefined ? -1 : PRESETS.indexOf(tone)
+  return at >= 0 ? String(at + 1) : custom.trim() || undefined
+}

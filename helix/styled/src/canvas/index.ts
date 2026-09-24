@@ -7,6 +7,7 @@ export type {
   CanvasNodeProps,
   CanvasPath,
   CanvasSide,
+  CanvasTone,
 } from '@fusion.dev/helix-headless/canvas'
 export { fromJsonCanvas } from '@fusion.dev/helix-headless/canvas'
 export { HelixCanvasEdge } from './edge/canvas-edge.js'
