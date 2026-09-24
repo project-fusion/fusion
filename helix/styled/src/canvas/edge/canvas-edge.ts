@@ -11,7 +11,7 @@ import { type CSSResultGroup, css } from 'lit'
  * be drawn. What this element carries is which cards and which sides.
  *
  * @since 0.100.0
- * @status stable
+ * @status experimental
  * @category media
  * @aliases CanvasConnector, BoardEdge
  * @documentation https://fusion.dev/helix/components/canvas

@@ -17,7 +17,7 @@ import { styles } from './map-root.css.js'
  * takes the header and footer a consumer slotted and leaves the buttons alone.
  *
  * @since 0.100.0
- * @status stable
+ * @status experimental
  * @category media
  * @aliases Map frame, Map container, Geo
  * @documentation https://fusion.dev/helix/components/map

@@ -99,7 +99,7 @@ const own = (color: string | undefined): string | undefined =>
  * and sets `data`.
  *
  * @since 0.100.0
- * @status stable
+ * @status experimental
  * @category media
  * @aliases Board, JSON Canvas, Whiteboard
  * @documentation https://fusion.dev/helix/components/canvas
@@ -601,7 +601,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
   }
 
-  /** The connectors, in one layer under the cards. */
+  /**
+   * The connectors, in one layer under the cards.
+   *
+   * **The arrowhead is measured in the board's own units, not in multiples of
+   * the line's width.** `markerUnits="strokeWidth"` multiplies by the stroke, so
+   * an eight-unit head on a two-pixel line drew a sixteen-pixel triangle that
+   * read as a shape of its own rather than as a direction. In user space it is
+   * eight units of the document, which is what the cards are measured in, and it
+   * grows with the zoom like everything else.
+   */
   private renderEdges(origin: { x: number; y: number }, box: { width: number; height: number }) {
     const byId = new Map(this.nodes.map((one) => [one.id, one]))
     return html`<svg
@@ -615,7 +624,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         <marker
           id=${ARROW}
           markerHeight="8"
-          markerUnits="strokeWidth"
+          markerUnits="userSpaceOnUse"
           markerWidth="8"
           orient="auto-start-reverse"
           refX="7"
