@@ -89,24 +89,6 @@ export class HelixHeadlessPaginationSize extends HelixElement {
   defaultValue = 0
 
   /**
-   * The size in force.
-   *
-   * Reading gives the real one; writing declares it the consumer's, and
-   * `default-value` seeds one this element owns. Same accessor pair as
-   * `Pagination.page` and the calendar's `month`.
-   */
-  @property({ type: Number })
-  get value(): number {
-    return this.valueState ?? this.defaultValue
-  }
-
-  set value(next: number) {
-    const previous = this.value
-    this.valueState = next
-    this.requestUpdate('value', previous)
-  }
-
-  /**
    * The words beside the control.
    */
   @property()
@@ -129,6 +111,24 @@ export class HelixHeadlessPaginationSize extends HelixElement {
    */
   @property()
   sizes = '10,25,50,100'
+
+  /**
+   * The size in force.
+   *
+   * Reading gives the real one; writing declares it the consumer's, and
+   * `default-value` seeds one this element owns. Same accessor pair as
+   * `Pagination.page` and the calendar's `month`.
+   */
+  @property({ type: Number })
+  get value(): number {
+    return this.valueState ?? this.defaultValue
+  }
+
+  set value(next: number) {
+    const previous = this.value
+    this.valueState = next
+    this.requestUpdate('value', previous)
+  }
 
   /** The size, whoever set it, and `undefined` until somebody has. */
   private valueState: number | undefined = undefined

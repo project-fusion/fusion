@@ -111,31 +111,6 @@ export class HelixHeadlessCarousel extends HelixElement {
   autoplay = false
 
   /**
-   * The slide in view, counted from zero.
-   *
-   * Reading gives the real slide. Writing always applies, the way a script
-   * assigning to a native control does, and is a seed and a correction rather
-   * than a claim of ownership: a consumer who wants the decision refuses the
-   * `helix-select`. `default-index` is where the carousel starts until
-   * something moves it.
-   *
-   * The same contract the four mixins carry, written out here rather than
-   * extracted, because a slide is addressed by position and every one of those
-   * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
-   * state turns up, this is what it is extracted from.
-   */
-  @property({ type: Number })
-  get index(): number {
-    return this.indexState ?? this.defaultIndex
-  }
-
-  set index(next: number) {
-    const previous = this.index
-    this.indexState = next
-    this.requestUpdate('index', previous)
-  }
-
-  /**
    * Whether the previous and next controls are shown.
    *
    * `auto`, which is the resting behavior and what an absent attribute means,
@@ -168,6 +143,31 @@ export class HelixHeadlessCarousel extends HelixElement {
    */
   @property({ attribute: 'default-index', type: Number })
   defaultIndex = 0
+
+  /**
+   * The slide in view, counted from zero.
+   *
+   * Reading gives the real slide. Writing always applies, the way a script
+   * assigning to a native control does, and is a seed and a correction rather
+   * than a claim of ownership: a consumer who wants the decision refuses the
+   * `helix-select`. `default-index` is where the carousel starts until
+   * something moves it.
+   *
+   * The same contract the four mixins carry, written out here rather than
+   * extracted, because a slide is addressed by position and every one of those
+   * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
+   * state turns up, this is what it is extracted from.
+   */
+  @property({ type: Number })
+  get index(): number {
+    return this.indexState ?? this.defaultIndex
+  }
+
+  set index(next: number) {
+    const previous = this.index
+    this.indexState = next
+    this.requestUpdate('index', previous)
+  }
 
   /**
    * What one indicator is called, with `{index}` filled in.

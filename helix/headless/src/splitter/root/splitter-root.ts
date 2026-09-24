@@ -109,51 +109,6 @@ const STACK_BELOW = 512
 @customElement('helix-headless-splitter')
 export class HelixHeadlessSplitter extends HelixElement {
   /**
-   * How much of a shut pane is still shown, as a percentage.
-   *
-   * Zero by default, which is a pane fully gone. A tab strip or a title bar
-   * that should survive its own collapse says how much of itself to keep, and
-   * only whoever put it there knows that, which is the same reason `min` is a
-   * consumer's to set.
-   */
-  @property({ attribute: 'collapsed-size', type: Number })
-  collapsedSize = 0
-
-  /**
-   * Where the divider sits, as a percentage of the whole.
-   *
-   * Reading gives where it is; writing declares it the consumer's, and
-   * `default-position` seeds one this element owns. The same accessor pair
-   * `Pagination.page` and the calendar's `month` carry.
-   */
-  @property({ type: Number })
-  get position(): number {
-    const shut = this.collapsed
-    if (shut) {
-      return shut === 'start' ? this.sliver : 100 - this.sliver
-    }
-    return this.clamp(this.positionState ?? this.defaultPosition)
-  }
-
-  set position(next: number) {
-    const previous = this.position
-    this.positionState = next
-    /* The consumer has spoken, so the drag stops standing in for them. Without
-       this the divider flashes back: `showing` falls to the position set before
-       the gesture and is drawn there for the frame it takes them to answer the
-       announcement, snapping to where the drag started and then jumping to
-       where it was dropped. */
-    this.reached = undefined
-    this.requestUpdate('position', previous)
-  }
-
-  /**
-   * Accessible name for the handle where two dividers cross.
-   */
-  @property({ attribute: 'corner-label' })
-  cornerLabel = 'Resize both'
-
-  /**
    * Which pane is shut, if either.
    *
    * The same accessor pair as `position`, and deliberately a second state
@@ -186,6 +141,23 @@ export class HelixHeadlessSplitter extends HelixElement {
   }
 
   /**
+   * How much of a shut pane is still shown, as a percentage.
+   *
+   * Zero by default, which is a pane fully gone. A tab strip or a title bar
+   * that should survive its own collapse says how much of itself to keep, and
+   * only whoever put it there knows that, which is the same reason `min` is a
+   * consumer's to set.
+   */
+  @property({ attribute: 'collapsed-size', type: Number })
+  collapsedSize = 0
+
+  /**
+   * Accessible name for the handle where two dividers cross.
+   */
+  @property({ attribute: 'corner-label' })
+  cornerLabel = 'Resize both'
+
+  /**
    * Which pane starts shut, where nothing declared it.
    */
   @property({ attribute: 'default-collapsed' })
@@ -208,6 +180,28 @@ export class HelixHeadlessSplitter extends HelixElement {
    */
   @property()
   max: number | string = 100
+
+  /**
+   * Nearest the divider may come to the start.
+   *
+   * A bare number is a percentage, which is what this always took. A CSS length
+   * is resolved against the splitter's own box along its axis, so `min="15rem"`
+   * means fifteen rem of pane whatever the container is doing.
+   *
+   * **The length is the one that holds.** A percentage minimum does not: twenty
+   * per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
+   * number a consumer picked was almost certainly about how much text fits
+   * rather than about a ratio. The pane that a percentage protects at desk
+   * width is squeezed past reading at half of it.
+   *
+   * **It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
+   * the class docstring says, so a pane can still be shut and reopened. What a
+   * minimum forbids is the space between shut and usable: a pane wide enough to
+   * be there and too narrow to read is the state nobody wants and every drag
+   * passes through.
+   */
+  @property()
+  min: number | string = 0
 
   /**
    * Either kind of bound as a percentage of the box.
@@ -253,28 +247,6 @@ export class HelixHeadlessSplitter extends HelixElement {
   }
 
   /**
-   * Nearest the divider may come to the start.
-   *
-   * A bare number is a percentage, which is what this always took. A CSS length
-   * is resolved against the splitter's own box along its axis, so `min="15rem"`
-   * means fifteen rem of pane whatever the container is doing.
-   *
-   * **The length is the one that holds.** A percentage minimum does not: twenty
-   * per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
-   * number a consumer picked was almost certainly about how much text fits
-   * rather than about a ratio. The pane that a percentage protects at desk
-   * width is squeezed past reading at half of it.
-   *
-   * **It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
-   * the class docstring says, so a pane can still be shut and reopened. What a
-   * minimum forbids is the space between shut and usable: a pane wide enough to
-   * be there and too narrow to read is the state nobody wants and every drag
-   * passes through.
-   */
-  @property()
-  min: number | string = 0
-
-  /**
    * Which way the panes are laid out.
    *
    * `horizontal` is side by side with an upright divider between them, and
@@ -302,6 +274,34 @@ export class HelixHeadlessSplitter extends HelixElement {
    */
   @property({ reflect: true })
   orientation?: 'auto' | 'horizontal' | 'vertical'
+
+  /**
+   * Where the divider sits, as a percentage of the whole.
+   *
+   * Reading gives where it is; writing declares it the consumer's, and
+   * `default-position` seeds one this element owns. The same accessor pair
+   * `Pagination.page` and the calendar's `month` carry.
+   */
+  @property({ type: Number })
+  get position(): number {
+    const shut = this.collapsed
+    if (shut) {
+      return shut === 'start' ? this.sliver : 100 - this.sliver
+    }
+    return this.clamp(this.positionState ?? this.defaultPosition)
+  }
+
+  set position(next: number) {
+    const previous = this.position
+    this.positionState = next
+    /* The consumer has spoken, so the drag stops standing in for them. Without
+       this the divider flashes back: `showing` falls to the position set before
+       the gesture and is drawn there for the frame it takes them to answer the
+       announcement, snapping to where the drag started and then jumping to
+       where it was dropped. */
+    this.reached = undefined
+    this.requestUpdate('position', previous)
+  }
 
   /**
    * How far one arrow press moves it, as a percentage.

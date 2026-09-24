@@ -219,30 +219,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   estimate = 32
 
   /**
-   * The order, as `field:direction`.
-   *
-   * Set it and this element defers: a reader's click fires `helix-sort` and
-   * changes nothing until a new value arrives. `default-sort` seeds an order this
-   * element then owns.
-   */
-  @property()
-  get sort(): string {
-    return this.sortState ?? this.defaultSort
-  }
-
-  set sort(next: string) {
-    const previous = this.sort
-    this.sortState = next
-    this.requestUpdate('sort', previous)
-  }
-
-  /**
-   * Accessible name for the grid.
-   */
-  @property()
-  label = ''
-
-  /**
    * What the rows are narrowed to, as one query across every column.
    *
    * One query rather than a predicate per column, which is what a reader means
@@ -261,6 +237,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * Accessible name for the grid.
+   */
+  @property()
+  label = ''
+
+  /**
    * Whether this element does the work or asks the consumer to.
    *
    * `client` filters, sorts and pages `rows` itself. `server` applies none of
@@ -272,6 +254,26 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property()
   mode: 'client' | 'server' = 'client'
+
+  /**
+   * The columns' order, as their fields separated by spaces.
+   *
+   * A reader's move fires `helix-reorder` first, and refusing it leaves the
+   * columns where they were, which is how a consumer who stores the order takes
+   * the decision. `default-order` seeds an order this element then owns. A field not named
+   * keeps its place after the named ones, and a column with no field never
+   * moves.
+   */
+  @property()
+  get order(): string {
+    return this.orderState ?? this.defaultOrder
+  }
+
+  set order(next: string) {
+    const previous = this.order
+    this.orderState = next
+    this.requestUpdate('order', previous)
+  }
 
   /**
    * The page on show, from 1.
@@ -293,6 +295,45 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * How many rows a page holds. Zero is every row, which is what "no paging" means.
+   *
+   * **It announces nothing, and that is not an omission.** Nothing in this
+   * element ever asks for a different page size: a size selector is
+   * `PaginationSize`, which a consumer puts in the `footer` slot and answers
+   * themselves. Routing this through `requestChange` would announce an event
+   * the element never has cause to fire.
+   */
+  @property({ attribute: 'page-size', type: Number })
+  get pageSize(): number {
+    return Math.max(0, Math.floor(this.pageSizeState ?? this.defaultPageSize) || 0)
+  }
+
+  set pageSize(next: number) {
+    const previous = this.pageSize
+    this.pageSizeState = next
+    this.requestUpdate('pageSize', previous)
+  }
+
+  /**
+   * Whether to draw a pagination under the grid.
+   *
+   * On by default once a page size is set, because a paged table with no way to
+   * change pages shows a reader the first twenty rows and no way to know there
+   * are more. Off for a consumer supplying their own through the `footer` slot,
+   * which is why the slot replaces this rather than sitting beside it.
+   */
+  @property({ type: Boolean })
+  get paginated(): boolean {
+    return this.paginatedState ?? this.pageSize > 0
+  }
+
+  set paginated(next: boolean) {
+    const previous = this.paginated
+    this.paginatedState = next
+    this.requestUpdate('paginated', previous)
+  }
+
+  /**
    * Whether a reader may move the columns.
    *
    * Each heading with a `field` gets a grip, dragged along the header or moved a
@@ -300,26 +341,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ type: Boolean })
   reorderable = false
-
-  /**
-   * The columns' order, as their fields separated by spaces.
-   *
-   * A reader's move fires `helix-reorder` first, and refusing it leaves the
-   * columns where they were, which is how a consumer who stores the order takes
-   * the decision. `default-order` seeds an order this element then owns. A field not named
-   * keeps its place after the named ones, and a column with no field never
-   * moves.
-   */
-  @property()
-  get order(): string {
-    return this.orderState ?? this.defaultOrder
-  }
-
-  set order(next: string) {
-    const previous = this.order
-    this.orderState = next
-    this.requestUpdate('order', previous)
-  }
 
   /**
    * The field naming a row's stable identity.
@@ -382,23 +403,21 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * How many rows a page holds. Zero is every row, which is what "no paging" means.
+   * The order, as `field:direction`.
    *
-   * **It announces nothing, and that is not an omission.** Nothing in this
-   * element ever asks for a different page size: a size selector is
-   * `PaginationSize`, which a consumer puts in the `footer` slot and answers
-   * themselves. Routing this through `requestChange` would announce an event
-   * the element never has cause to fire.
+   * Set it and this element defers: a reader's click fires `helix-sort` and
+   * changes nothing until a new value arrives. `default-sort` seeds an order this
+   * element then owns.
    */
-  @property({ attribute: 'page-size', type: Number })
-  get pageSize(): number {
-    return Math.max(0, Math.floor(this.pageSizeState ?? this.defaultPageSize) || 0)
+  @property()
+  get sort(): string {
+    return this.sortState ?? this.defaultSort
   }
 
-  set pageSize(next: number) {
-    const previous = this.pageSize
-    this.pageSizeState = next
-    this.requestUpdate('pageSize', previous)
+  set sort(next: string) {
+    const previous = this.sort
+    this.sortState = next
+    this.requestUpdate('sort', previous)
   }
 
   /**
@@ -433,25 +452,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ reflect: true, type: Boolean })
   windowed = false
-
-  /**
-   * Whether to draw a pagination under the grid.
-   *
-   * On by default once a page size is set, because a paged table with no way to
-   * change pages shows a reader the first twenty rows and no way to know there
-   * are more. Off for a consumer supplying their own through the `footer` slot,
-   * which is why the slot replaces this rather than sitting beside it.
-   */
-  @property({ type: Boolean })
-  get paginated(): boolean {
-    return this.paginatedState ?? this.pageSize > 0
-  }
-
-  set paginated(next: boolean) {
-    const previous = this.paginated
-    this.paginatedState = next
-    this.requestUpdate('paginated', previous)
-  }
 
   @state()
   private sortState: string | undefined = undefined

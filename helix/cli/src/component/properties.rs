@@ -40,19 +40,80 @@ use regex::Regex;
 
 use crate::component::{sources, Context, Finding, Report, Unwritten, Written};
 
-/// The member a decorator sits on, past any further decorators.
+/// The member a decorator sits on, past any further decorators. A getter is
+/// one: a property whose value is worked out is declared on its `get`.
 static MEMBER: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
-        r"^\s*(?:accessor\s+|declare\s+|override\s+|readonly\s+)*([A-Za-z_$][\w$]*)\s*[?!:=(]",
+        r"^\s*(?:accessor\s+|declare\s+|override\s+|readonly\s+)*(get\s+)?([A-Za-z_$][\w$]*)\s*[?!:=(]",
     )
     .expect("a literal pattern compiles")
 });
 
-/// One property: where its run starts, where it ends, and what it is called.
+/// Where a class opens, which is as far as one sort reaches.
+static CLASS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^\s*(?:export\s+)?(?:default\s+)?(?:declare\s+)?(?:abstract\s+)?class\b")
+        .expect("a literal pattern compiles")
+});
+
+/// One property: where its run starts, where it ends, what it is called, and
+/// the line of the class it belongs to.
 struct Declared {
+    class: usize,
     from: usize,
     name: String,
     to: usize,
+}
+
+/// How many brackets a line opens past the ones it closes, strings skipped.
+fn balance(line: &str) -> i32 {
+    let mut depth = 0;
+    let mut quote: Option<char> = None;
+    let mut escaped = false;
+    for one in line.chars() {
+        if let Some(open) = quote {
+            if escaped {
+                escaped = false;
+            } else if one == '\\' {
+                escaped = true;
+            } else if one == open {
+                quote = None;
+            }
+            continue;
+        }
+        match one {
+            '\'' | '"' | '`' => quote = Some(one),
+            '(' | '[' | '{' => depth += 1,
+            ')' | ']' | '}' => depth -= 1,
+            _ => {}
+        }
+    }
+    depth
+}
+
+/// How far a line is indented.
+fn indent(line: &str) -> usize {
+    line.len() - line.trim_start().len()
+}
+
+/// The last line of a declaration starting at `start`.
+///
+/// **By bracket depth first and indentation second.** A declaration is over
+/// when everything it opened is closed and the next line is back at its own
+/// indentation: a union of string literals continues deeper at depth zero, and
+/// a getter's body or an array closes at the member's own indentation, which
+/// indentation alone read as the next thing in the class and left behind.
+fn end_of(lines: &[&str], start: usize) -> usize {
+    let mut depth = balance(lines[start]);
+    let mut to = start;
+    while to + 1 < lines.len() {
+        let next = lines[to + 1];
+        if depth <= 0 && (next.trim().is_empty() || indent(next) <= indent(lines[start])) {
+            break;
+        }
+        to += 1;
+        depth += balance(next);
+    }
+    to
 }
 
 /// Every `@property` in a file, as the run of lines that belongs to it.
@@ -112,37 +173,55 @@ fn declared(lines: &[&str]) -> Vec<Declared> {
             break;
         }
 
-        /* Forward to the member, then to the end of its declaration. A
-        declaration can run over many lines: a union of eleven string literals
-        is one, and it ends where the indentation returns to the member's. */
-        let mut cursor = at + 1;
+        /* Forward past every decorator, each to where its parentheses close:
+        a decorator written over several lines has `attribute: 'x',` on the
+        next one, which read as a member called `attribute`, and the fix moved
+        half a decorator. */
+        let mut cursor = at;
         while cursor < lines.len() && lines[cursor].trim_start().starts_with('@') {
-            cursor += 1;
+            let mut depth = 0;
+            loop {
+                depth += balance(lines[cursor]);
+                cursor += 1;
+                if depth <= 0 || cursor >= lines.len() {
+                    break;
+                }
+            }
         }
         let Some(caught) = lines.get(cursor).and_then(|line| MEMBER.captures(line)) else {
             at += 1;
             continue;
         };
-        let name = caught[1].to_owned();
+        let name = caught[2].to_owned();
+        let mut to = end_of(lines, cursor);
 
-        let mut to = cursor;
-        while to + 1 < lines.len() {
-            let next = lines[to + 1];
-            if next.trim().is_empty() {
-                break;
+        /* A getter's setter is the same property and moves with it, blank
+        line and all, or the pair is split across the sort. */
+        if caught.get(1).is_some() {
+            let mut next = to + 1;
+            while next < lines.len() && lines[next].trim().is_empty() {
+                next += 1;
             }
-            /* A continuation is indented past the member, or closes something
-            the member opened. Anything at the member's own indentation is the
-            next thing in the class. */
-            let deeper = next.len() - next.trim_start().len()
-                > lines[cursor].len() - lines[cursor].trim_start().len();
-            if !deeper {
-                break;
+            let setter = Regex::new(&format!(
+                r"^\s*(?:override\s+)?set\s+{}\s*\(",
+                regex::escape(&name)
+            ))
+            .expect("an escaped name compiles");
+            if next < lines.len() && setter.is_match(lines[next]) {
+                to = end_of(lines, next);
             }
-            to += 1;
         }
 
-        found.push(Declared { from, name, to });
+        let class = lines[..=from]
+            .iter()
+            .rposition(|line| CLASS.is_match(line))
+            .unwrap_or(0);
+        found.push(Declared {
+            class,
+            from,
+            name,
+            to,
+        });
         at = to + 1;
     }
     found
@@ -155,8 +234,20 @@ fn sorted(source: &str) -> Option<String> {
     if all.len() < 2 {
         return None;
     }
+    /* Sorted within each class, never across two: a file holding a mixin and
+    the class it grafts onto swapped properties between them. Each slot a
+    class's properties occupy is filled from that class's own, in order. */
     let mut order: Vec<usize> = (0..all.len()).collect();
-    order.sort_by_key(|&at| all[at].name.to_lowercase());
+    let mut classes: Vec<usize> = all.iter().map(|one| one.class).collect();
+    classes.dedup();
+    for class in classes {
+        let slots: Vec<usize> = (0..all.len()).filter(|&at| all[at].class == class).collect();
+        let mut names = slots.clone();
+        names.sort_by_key(|&at| all[at].name.to_lowercase());
+        for (slot, taken) in slots.into_iter().zip(names) {
+            order[slot] = taken;
+        }
+    }
     if order.iter().enumerate().all(|(want, &got)| want == got) {
         return None;
     }
@@ -334,6 +425,91 @@ mod tests {
             after.find("What alpha is.").expect("kept") < described,
             "alpha still sorts first:\n{after}"
         );
+    }
+
+    /// A decorator written over several lines is the decorator, not a member.
+    #[test]
+    fn a_decorator_over_several_lines_moves_whole() {
+        let before = concat!(
+            "class X {\n",
+            "  @property({\n",
+            "    attribute: 'zeta-value',\n",
+            "    reflect: true,\n",
+            "  })\n",
+            "  zeta = ''\n\n",
+            "  @property()\n",
+            "  alpha = ''\n}\n",
+        );
+        let after = sorted(before).expect("out of order");
+        assert_eq!(
+            after,
+            concat!(
+                "class X {\n",
+                "  @property()\n",
+                "  alpha = ''\n\n",
+                "  @property({\n",
+                "    attribute: 'zeta-value',\n",
+                "    reflect: true,\n",
+                "  })\n",
+                "  zeta = ''\n}\n",
+            )
+        );
+    }
+
+    /// A getter is a property, and its body and its setter go with it.
+    #[test]
+    fn a_getter_moves_with_its_body_and_its_setter() {
+        let before = concat!(
+            "class X {\n",
+            "  @property({ type: Number })\n",
+            "  get zeta(): number {\n",
+            "    return 1\n",
+            "  }\n\n",
+            "  set zeta(next: number) {\n",
+            "    this.z = next\n",
+            "  }\n\n",
+            "  @property()\n",
+            "  alpha = [\n",
+            "    1,\n",
+            "  ]\n}\n",
+        );
+        let after = sorted(before).expect("out of order");
+        assert_eq!(
+            after,
+            concat!(
+                "class X {\n",
+                "  @property()\n",
+                "  alpha = [\n",
+                "    1,\n",
+                "  ]\n\n",
+                "  @property({ type: Number })\n",
+                "  get zeta(): number {\n",
+                "    return 1\n",
+                "  }\n\n",
+                "  set zeta(next: number) {\n",
+                "    this.z = next\n",
+                "  }\n}\n",
+            )
+        );
+    }
+
+    /// Two classes in one file are sorted apart.
+    #[test]
+    fn two_classes_never_trade_properties() {
+        let before = concat!(
+            "class A {\n",
+            "  @property()\n  zeta = ''\n\n",
+            "  @property()\n  mid = ''\n}\n",
+            "class B {\n",
+            "  @property()\n  alpha = ''\n}\n",
+        );
+        let after = sorted(before).expect("out of order");
+        let a = after.find("class A").expect("kept");
+        let b = after.find("class B").expect("kept");
+        let alpha = after.find("alpha").expect("kept");
+        assert!(alpha > b, "alpha stays in B:\n{after}");
+        assert!(after.find("mid").expect("kept") < after.find("zeta").expect("kept"));
+        assert!(after.find("mid").expect("kept") > a);
     }
 
     /// What sits between two properties is not a property.
