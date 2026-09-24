@@ -74,6 +74,12 @@ const MARGIN = 32
 const ARROW = 'canvas-arrow'
 
 /**
+ * The ground under a connection's label, named once for the reason the arrow
+ * is.
+ */
+const GROUND = 'canvas-label-ground'
+
+/**
  * How far a key press moves a card, in the document's own units.
  *
  * Half the ruling's default spacing, so two presses cross one square and a card
@@ -225,6 +231,7 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  * @csspart fullscreen - The button that fills the screen.
  * @csspart header - The strip above the board.
  * @csspart label - The label on a connector.
+ * @csspart label-ground - The flood behind a connector's label, whose `flood-color` is the board's own ground.
  * @csspart live - What the board says while a connection is being made, for a screen reader.
  * @csspart pan-down - The button that moves the board down.
  * @csspart pan-end - The button that moves the board the way the text ends.
@@ -1746,6 +1753,26 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         >
           <path part="arrow" d="M0 0 L8 4 L0 8 z" />
         </marker>
+        <!-- **A box of ground behind a label, as wide as the label is**, which
+             is what a filter region is: a flood the size of the text's own
+             bounding box, a little larger on every side, with the text over
+             it. An outline stroked around the letters was the first answer and
+             only covers the letters, so the line showed through every gap
+             between them and every space between the words. -->
+        <!-- In sRGB, or the flood is mixed in linear light and comes out a
+             shade lighter than the same color painted anywhere else, which
+             drew a box around every label. -->
+        <filter
+          id=${GROUND}
+          color-interpolation-filters="sRGB"
+          x="-0.08"
+          y="-0.25"
+          width="1.16"
+          height="1.5"
+        >
+          <feFlood part="label-ground" />
+          <feComposite in="SourceGraphic" operator="over" />
+        </filter>
       </defs>
       ${this.edges.map((edge) => {
         const from = byId.get(edge.fromNode)
@@ -1799,7 +1826,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           />
           ${
             edge.label
-              ? svg`<text part="label" aria-hidden="true" x=${drawn.mid.x} y=${drawn.mid.y} dominant-baseline="central" text-anchor="middle">
+              ? svg`<text part="label" aria-hidden="true" x=${drawn.mid.x} y=${drawn.mid.y} dominant-baseline="central" filter=${`url(#${GROUND})`} text-anchor="middle">
                   ${edge.label}
                 </text>`
               : nothing

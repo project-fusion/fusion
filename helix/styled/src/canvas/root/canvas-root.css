@@ -224,17 +224,17 @@
   stroke-linecap: round;
 }
 
-/* **Haloed in the well's own color**, so a label written over its line reads
-   as sitting on it rather than crossing it out. Painted stroke first, which is
-   what leaves the letters whole on top of it. */
+/* **On a box of the board's own ground**, so a label written over its line
+   reads as sitting on it rather than crossing it out: the flood is as wide as
+   the words, spaces and all. */
 [part="label"] {
   fill: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
-  paint-order: stroke;
-  stroke: var(--canvas-background-color, var(--helix-color-surface-sunken));
-  stroke-linejoin: round;
-  stroke-width: calc(var(--helix-border-thick) * 2);
+}
+
+[part="label-ground"] {
+  flood-color: var(--canvas-background-color, var(--helix-color-surface-sunken));
 }
 
 /* **Grab to move it**, which is the gesture a board is reached for with, and

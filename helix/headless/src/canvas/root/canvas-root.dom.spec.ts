@@ -313,6 +313,12 @@ describe('canvas', () => {
     const host = await canvas()
     const label = host.shadowRoot?.querySelector('[part="label"]')
     expect(label?.getAttribute('dominant-baseline')).toBe('central')
+    /* On a ground as wide as its words, which a stroke around the letters was
+       not: the line showed through every space. Resolved, not compared. */
+    const ground = (label?.getAttribute('filter') ?? '').replace(/^url\(#|\)$/g, '')
+    expect(
+      host.shadowRoot?.getElementById(ground)?.querySelector('[part="label-ground"]'),
+    ).not.toBeNull()
   })
 
   test('an empty document says so rather than drawing an empty plane', async () => {
