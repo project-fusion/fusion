@@ -136,6 +136,18 @@ describe('radio group', () => {
     const stops = options(host).map((item) => part(item, 'item')?.getAttribute('tabindex'))
     expect(stops).toEqual(['-1', '0'])
   })
+
+  test('an arrow in a field inside the group moves its caret, not the answer', async () => {
+    /* A group holds more than its items often enough: "Other" with a field
+       beside it. The arrows there are the field's, and the answer moved with
+       the caret. */
+    const host = await group('', 'two')
+    const field = document.createElement('input')
+    host.append(field)
+    field.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
+    await settle(host)
+    expect((host as Updatable & { value: string }).value).toBe('two')
+  })
 })
 
 describe('radio group in a form', () => {

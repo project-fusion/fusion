@@ -163,4 +163,26 @@ describe('lightbox', () => {
     await new Promise((resolve) => setTimeout(resolve, 20))
     expect(hasState(host, 'idle')).toBe(false)
   })
+
+  test("a field in the chrome keeps its arrows, and a chord is the browser's", async () => {
+    /* A caption being edited in the footer is the case, and Alt with an arrow
+       is back and forward. Said through `composedPath`, which is what a
+       browser reports for a press from slotted content: happy-dom does not
+       carry one through the shadow root to the dialog. */
+    const host = await lightbox('open')
+    await host.updateComplete
+    const dialog = part(host, 'dialog') as HTMLElement
+    const field = document.createElement('input')
+    const typed = new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' })
+    Object.defineProperty(typed, 'composedPath', { value: () => [field, dialog] })
+    dialog.dispatchEvent(typed)
+    await host.updateComplete
+    expect(shown(host)).toBe('one')
+
+    dialog.dispatchEvent(
+      new KeyboardEvent('keydown', { altKey: true, bubbles: true, key: 'ArrowRight' }),
+    )
+    await host.updateComplete
+    expect(shown(host)).toBe('one')
+  })
 })

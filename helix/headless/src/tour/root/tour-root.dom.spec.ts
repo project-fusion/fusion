@@ -64,6 +64,26 @@ describe('a tour', () => {
       [false, true],
     ])
   })
+
+  test('Escape leaves, unless something inside a stop already answered it', async () => {
+    /* A select or a menu in a stop closes itself on Escape, and the tour ending
+       with it was two things shut by one key. */
+    const tour = await run()
+    const inside = document.createElement('button')
+    tour.append(inside)
+    inside.addEventListener('keydown', (event) => event.preventDefault())
+    inside.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
+    )
+    await tour.updateComplete
+    expect(tour.open).toBe(true)
+
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
+    )
+    await tour.updateComplete
+    expect(tour.open).toBe(false)
+  })
 })
 
 describe('moving through it', () => {

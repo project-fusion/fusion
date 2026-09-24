@@ -258,6 +258,26 @@ describe('the way back out of a page', () => {
     await press(host, host.querySelector('[value="appearance"]') as Element)
     expect(part(host, 'back')?.getAttribute('aria-label')).toBe('Up one')
   })
+
+  test('an arrow in a field on the page moves its caret, and Escape still goes back', async () => {
+    /* A filter above the rows is the case: ArrowLeft there went back a page,
+       out from under a reader who was only editing what they had typed. */
+    const host = await stack()
+    await press(host, host.querySelector('[value="appearance"]') as Element)
+    const field = document.createElement('input')
+    host.append(field)
+    field.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowLeft' }),
+    )
+    await host.updateComplete
+    expect(showing(host)).toContain('theme')
+
+    field.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
+    )
+    await host.updateComplete
+    expect(showing(host)).not.toContain('theme')
+  })
 })
 
 /* What this family says where there is nothing in it, and while it is fetching.

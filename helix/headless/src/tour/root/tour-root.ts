@@ -240,7 +240,10 @@ export class HelixHeadlessTour extends HelixElement {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (this.open && event.key === 'Escape') {
+    /* Not an Escape something inside a stop already answered: a menu or a
+       select closing itself is the press, and the tour ending with it was two
+       things shut by one key. */
+    if (this.open && event.key === 'Escape' && !event.defaultPrevented) {
       event.preventDefault()
       this.skip()
     }

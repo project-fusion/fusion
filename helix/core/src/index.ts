@@ -262,6 +262,7 @@ export {
 } from './utils/inherit-disabled/inherit-disabled.js'
 export { inlineStep } from './utils/inline-step/inline-step.js'
 export { isRtl } from './utils/is-rtl/is-rtl.js'
+export { keyClaimed } from './utils/key-claimed/key-claimed.js'
 export { type Curve, linePath, type Point } from './utils/line-path/line-path.js'
 export { markRegion, type RegionOptions } from './utils/mark-region/mark-region.js'
 export {

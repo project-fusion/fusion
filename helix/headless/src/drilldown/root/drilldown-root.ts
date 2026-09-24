@@ -5,6 +5,7 @@ import {
   hostAria,
   inlineStep,
   KeyboardNavigationController,
+  keyClaimed,
   MixinCollection,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
@@ -218,6 +219,13 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   /* Only the keys that drill. Moving within a page belongs to the controller
      declared above, which reserves the horizontal pair for exactly this. */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    /* Not a press a field on the page answers: a filter above a list moves its
+       caret with the arrows, and going back on one took the page away from a
+       reader who was only editing what they had typed. Escape is no field's, so
+       it still goes back unless something answered it. */
+    if (event.defaultPrevented || (event.key !== 'Escape' && keyClaimed(event))) {
+      return
+    }
     const items = this.items
     const current = items.findIndex((item) => item.matches(':focus-within'))
 
