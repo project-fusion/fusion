@@ -12,6 +12,8 @@ describe('map marker server output', () => {
     )
     expect(hasPart(markup, 'marker')).toBe(true)
     expect(partTag(markup, 'marker')).toContain('role="button"')
-    expect(rendered(markup, 'helix-headless-map-marker')).toMatch(/part="label"[^>]*>(<!--[^>]*-->)*Depot/)
+    expect(rendered(markup, 'helix-headless-map-marker')).toMatch(
+      /part="label"[^>]*>(<!--[^>]*-->)*Depot/,
+    )
   })
 })
