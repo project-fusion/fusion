@@ -456,10 +456,6 @@ export function ThemeBuilder({
      memo miss every time, and a derivation is the expensive thing on this page. */
   const intent = useMemo(() => intentFrom(settings), [settings])
 
-  /* The theme alone, for the Maps page: which preview is showing is this
-     page's business and not a map's. */
-  const mapQuery = useMemo(() => queryFrom(settings), [settings])
-
   /* **The engine is loaded once and held**, because every keystroke derives
      against it. `initTheme` caches its own promise, so the effect running twice
      under Strict Mode costs one instantiation. */
@@ -738,7 +734,7 @@ export function ThemeBuilder({
              *                 two facts they are choosing.
              */}
             <helix-select
-              hint="How much page there is. Minimal has no chart and nothing that floats."
+              hint="How much page there is. Minimal has no chart and nothing that floats; Map is a live map with a panel over it."
               label="Layout"
               name="layout"
               onChange={(event) => setLayout(event.currentTarget.value)}
@@ -751,16 +747,6 @@ export function ThemeBuilder({
                 </helix-option>
               ))}
             </helix-select>
-
-            {/* **The theme on a map, which the preview does not draw.** The link
-                carries the same query this page keeps in its own address, and
-                the Maps page reads it with the same `settingsFrom`, so what
-                arrives there is this theme rather than its brand alone. */}
-            <helix-text variant="caption">
-              <a data-link="true" href={`/helix/maps${mapQuery ? `?${mapQuery}` : ''}`}>
-                See this theme on a map
-              </a>
-            </helix-text>
 
             <helix-color-input
               hint="The one color you own. Everything else is derived from it."
