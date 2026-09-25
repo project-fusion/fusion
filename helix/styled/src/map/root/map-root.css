@@ -48,6 +48,10 @@
      theirs and a rule we drew would fight their own. */
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   color: var(--helix-color-foreground-subtle);
+  /* **A block, whatever was slotted**, so the hairline is the strip's width.
+     A credit is written in a `helix-text` or a `<small>`, both inline, and
+     an inline box's border ran under the words and stopped. */
+  display: block;
   font-size: var(--helix-text-xs);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
 }
