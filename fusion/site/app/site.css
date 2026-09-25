@@ -118,7 +118,9 @@ helix-megamenu {
   cursor: default;
 }
 
-[data-megamenu-item][data-soon] > strong {
+/* Any row carrying its stage, followed or not: Maps is a link and still has
+   its tag beside its name. */
+[data-megamenu-item] > strong:has(> helix-tag) {
   align-items: center;
   /* *One line box, whatever is standing in it.** A tag is taller than the text
      beside it, 24px against a 19.5px line, and a flex line grows to its tallest
@@ -129,9 +131,12 @@ helix-megamenu {
      line box this text would have had on its own, so the name keeps the pitch of
      every other row and the tag is centered against it and allowed to be taller. */
   block-size: 1lh;
-  color: var(--helix-color-foreground-muted);
   display: flex;
   gap: var(--helix-space-sm);
+}
+
+[data-megamenu-item][data-soon] > strong {
+  color: var(--helix-color-foreground-muted);
 }
 
 [data-megamenu-item][data-soon] > span {
