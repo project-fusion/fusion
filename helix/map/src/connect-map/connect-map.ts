@@ -69,9 +69,17 @@ export interface MapPlace {
 
 /** What the connector reads off a marker, which is all it needs of one. */
 interface Marker extends HTMLElement {
+  /**
+   * How far the marker reaches from its point along the line, name included,
+   * in CSS pixels. Where it says, the connector turns the name to whichever
+   * side of the point has the room.
+   */
+  extent?(): number
   isMapMarker: true
   lat?: number | undefined
   lng?: number | undefined
+  /** Which side of its point the name sits on, in reading order. */
+  side?: 'end' | 'start'
 }
 
 const isMarker = (node: unknown): node is Marker =>
@@ -215,6 +223,8 @@ export const connectMap = (
     if (!driver.project) {
       return
     }
+    const { width } = viewportOf(frame)
+    const rtl = isRtl(frame)
     for (const marker of markers()) {
       if (typeof marker.lat !== 'number' || typeof marker.lng !== 'number') {
         continue
@@ -222,6 +232,18 @@ export const connectMap = (
       const at = driver.project({ lat: marker.lat, lng: marker.lng })
       marker.style.setProperty('--_map-marker-x', `${at.x}px`)
       marker.style.setProperty('--_map-marker-y', `${at.y}px`)
+      /* **The name goes where there is room for it.** It sits after the
+         point in reading order, and a place near that edge of the view had
+         its name cut off by it: shown on focus, which is exactly when a reader
+         walking the markers needs to read it. Turned to the other side only
+         where the name does not fit and the other side has more room, so a
+         marker in the open keeps its place in the reading order. */
+      if (typeof marker.extent === 'function') {
+        const reach = marker.extent()
+        const ahead = rtl ? at.x : width - at.x
+        const behind = rtl ? width - at.x : at.x
+        marker.side = reach <= ahead || ahead >= behind ? 'end' : 'start'
+      }
     }
   }
   const stopViewing = driver.onView?.(place)

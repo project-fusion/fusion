@@ -39,6 +39,25 @@
   transform: translate(calc(var(--map-marker-size, 0.875rem) / -2), -50%);
 }
 
+/* **The point stands on the place, at whichever end of the button it is.**
+   The button is the point then the name, in reading order, so the point is
+   its first box on a left-to-right page and its last on a right-to-left one,
+   and turned to the start the two swap. Anchored by a fixed offset, a
+   right-to-left page stood every place a name's width off its point. */
+:host(:dir(rtl)) [part="marker"],
+:host(:state(start)) [part="marker"] {
+  transform: translate(calc(-100% + var(--map-marker-size, 0.875rem) / 2), -50%);
+}
+
+:host(:dir(rtl):state(start)) [part="marker"] {
+  transform: translate(calc(var(--map-marker-size, 0.875rem) / -2), -50%);
+}
+
+/* The name before the point, where the connector found no room after it. */
+:host(:state(start)) [part="marker"] {
+  flex-direction: row-reverse;
+}
+
 [part="point"] {
   background: var(--_map-marker-color);
   block-size: var(--map-marker-size, 0.875rem);
