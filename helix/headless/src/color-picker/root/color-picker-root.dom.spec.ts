@@ -538,3 +538,35 @@ describe('a read-only color picker', () => {
     expect(formValue(host)).toBe('#ff0000')
   })
 })
+
+/**
+ * Drags a channel the way a reader does, on the slider's own range: the slider
+ * asks with its `helix-before-change` first, and applies only if nobody refused.
+ * `ramp` above starts after that request, which is how a slider's request
+ * escaping the picker went unseen.
+ */
+const drag = async (host: Color, channel: string, to: number): Promise<void> => {
+  const slider = host.shadowRoot?.querySelector(`[data-channel="${channel}"]`) as
+    | (HTMLElement & { updateComplete: Promise<unknown> })
+    | null
+  await slider?.updateComplete
+  const range = slider ? (part(slider, 'control') as HTMLInputElement) : null
+  if (range) {
+    range.value = String(to)
+    range.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+  }
+  await host.updateComplete
+}
+
+describe('color picker channels', () => {
+  test('a slider’s own request stays inside, so a consumer hears only colors', async () => {
+    const host = await picker('value="#ff0000"')
+    const said: string[] = []
+    host.addEventListener('helix-before-change', (event) => {
+      said.push(String((event as CustomEvent<{ value: unknown }>).detail.value))
+    })
+    await drag(host, 'hue', 120)
+    expect(said.length).toBeGreaterThan(0)
+    expect(said.every((value) => value.startsWith('#'))).toBe(true)
+  })
+})

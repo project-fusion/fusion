@@ -235,3 +235,31 @@ describe('the swatch as the field', () => {
     expect(surface.getAttribute('aria-label')).not.toBe('')
   })
 })
+
+describe('input color, dragged', () => {
+  test('dragging the hue lands a color, never the slider’s own number', async () => {
+    const host = await field('default-value="#ff0000"')
+    /* Every value it announces, not only the last: a page derives on each one,
+       and a number announced first and a color after is still a page that
+       tried to read a number as a color. */
+    const announced: string[] = []
+    for (const type of ['helix-before-change', 'input', 'change']) {
+      host.addEventListener(type, () => announced.push(`${type} ${host.value}`))
+    }
+    const picker = part(host, 'picker') as HTMLElement & { updateComplete: Promise<unknown> }
+    await picker.updateComplete
+    const slider = picker.shadowRoot?.querySelector('[data-channel="hue"]') as
+      | (HTMLElement & { updateComplete: Promise<unknown> })
+      | null
+    await slider?.updateComplete
+    const range = slider ? (part(slider, 'control') as HTMLInputElement) : null
+    if (range) {
+      range.value = '120'
+      range.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    }
+    await host.updateComplete
+    expect(host.value).toMatch(/^#[0-9a-f]{6}$/)
+    expect(host.value).not.toBe('#ff0000')
+    expect(announced.filter((line) => !/ #[0-9a-f]{6}$/.test(line))).toEqual([])
+  })
+})
