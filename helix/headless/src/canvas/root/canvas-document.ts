@@ -401,9 +401,14 @@ export const reading = (
      Sorting every group ahead of every card read a group at the foot of the
      board before the title at its head, and then the title between the group
      and its own cards. */
-  const holder = new Map(nodes.map((node) => [node.id, groupOf(node, nodes)?.id]))
-  const held = (id: string | undefined): CanvasNode[] =>
-    nodes.filter((node) => holder.get(node.id) === id).sort(byPlace)
+  const groups = nodes.filter((node) => node.type === 'group')
+  const holder = new Map(nodes.map((node) => [node.id, groupOf(node, groups)?.id]))
+  const members = new Map<string | undefined, CanvasNode[]>()
+  for (const node of nodes) {
+    const id = holder.get(node.id)
+    members.set(id, [...(members.get(id) ?? []), node])
+  }
+  const held = (id: string | undefined): CanvasNode[] => (members.get(id) ?? []).sort(byPlace)
   const spatial: CanvasNode[] = []
   const placed = new Set<string>()
   const visit = (node: CanvasNode): void => {

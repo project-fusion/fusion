@@ -1749,6 +1749,60 @@ describe('canvas beyond the properties', () => {
     expect(card(host, 'a').links).toBe('leads to Renamed')
   })
 
+  test('a drag rewrites the cards that move and leaves the rest alone', async () => {
+    /* Every card's place was written on every step, which on a large board
+       was most of what a step cost. */
+    let cards = ''
+    for (let at = 0; at < 30; at++) {
+      cards += `<helix-headless-canvas-node name="n${at}" x="${at * 250}" y="0" width="200" height="100">C${at}</helix-headless-canvas-node>`
+    }
+    const host = (await canvas('', cards)) as Canvas & { selected: string }
+    host.selected = 'n15'
+    await host.updateComplete
+    /* One in the middle, since the plane's corner follows the board's edge
+       and a card moved at the edge moves every card with it. */
+    const others = [...host.querySelectorAll('helix-headless-canvas-node')].filter(
+      (one) => one.getAttribute('name') !== 'n15',
+    ) as HTMLElement[]
+    let written = 0
+    for (const one of others) {
+      const set = one.style.setProperty.bind(one.style)
+      one.style.setProperty = (...args: Parameters<CSSStyleDeclaration['setProperty']>) => {
+        written += 1
+        set(...args)
+      }
+    }
+    const box = card(host, 'n15').shadowRoot?.querySelector('[part="node"]') as Element
+    const at = (type: string, clientX: number): PointerEvent =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        buttons: 1,
+        clientX,
+        clientY: 10,
+        composed: true,
+        pointerId: 5,
+        pointerType: 'mouse',
+      })
+    box.dispatchEvent(at('pointerdown', 10))
+    for (let step = 1; step <= 3; step++) {
+      host.dispatchEvent(at('pointermove', 10 + step * 20))
+      await host.updateComplete
+    }
+    expect(card(host, 'n15').x).toBeGreaterThan(15 * 250)
+    expect(written).toBe(0)
+  })
+
+  test('a card whose style a page rewrote whole is put back in its place', async () => {
+    const host = await canvas()
+    const a = card(host, 'a')
+    const was = a.style.getPropertyValue('--_canvas-card-x')
+    expect(was).not.toBe('')
+    a.setAttribute('style', '--canvas-node-color: red')
+    await heard(host)
+    expect(a.style.getPropertyValue('--_canvas-card-x')).toBe(was)
+  })
+
   test('a color written onto a connection after the first paint is drawn', async () => {
     const host = await canvas(
       '',
