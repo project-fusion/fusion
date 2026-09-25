@@ -24,6 +24,14 @@ import { styles } from './map-marker.css.js'
  */
 @customElement('helix-map-marker')
 export class HelixMapMarker extends HelixHeadlessMapMarker {
+  /**
+   * The ground under the name. Absent is opaque; `glass` lets the map through
+   * under a blur and `frosted` turns that up, `transparent` leaves the name
+   * on the map. How see-through each is, is the theme's.
+   */
+  @property({ reflect: true })
+  material?: 'frosted' | 'glass' | 'transparent'
+
   /** What the place means: the brand where this says nothing. */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'

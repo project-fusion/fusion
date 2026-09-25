@@ -57,6 +57,38 @@
   padding: var(--helix-space-2xs) var(--helix-space-xs);
 }
 
+/* **Material is the controls' ground**, the one part of the frame that lies
+   over the map: glass lets the map through under a blur, so a reader keeps
+   their place under the buttons rather than losing a corner of it to nine
+   opaque squares. The filter and the translucent ground go together, for the
+   reason `Card` gives: either alone does nothing a reader can see. */
+:host([material="glass"]) [part="controls"] button {
+  backdrop-filter: var(--helix-material-backdrop);
+  background-color: var(--viewport-control-background-color, var(--helix-material-translucent));
+}
+
+/* The same pair turned up, for a map busy enough that glass is not legible. */
+:host([material="frosted"]) [part="controls"] button {
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+  background-color: var(
+    --viewport-control-background-color,
+    var(--helix-material-translucent-strong)
+  );
+}
+
+/* No ground at all: the glyphs over the map, for a map quiet enough to hold
+   them. */
+:host([material="transparent"]) [part="controls"] button {
+  backdrop-filter: none;
+  background-color: var(--viewport-control-background-color, transparent);
+}
+
+/* Pointed at, whatever the ground: the raised surface, so a button a reader is
+   on reads as the one they are on over glass as well as over nothing. */
+:host([material]) [part="controls"] button:hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
 /* **Printed as it stands rather than hidden.** A map is the content of the page
    it is on often enough that dropping it would be the surprising answer, and
    the controls are the part that means nothing on paper. */

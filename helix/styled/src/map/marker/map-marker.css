@@ -55,9 +55,12 @@
    **Hidden by opacity and never by `display`**: it is the button's name, and a
    name taken out of the tree is a button a screen reader calls "button". */
 [part="label"] {
-  background: var(--helix-color-surface);
+  /* **A floating surface**, lying over the map the way the frame's controls
+     do, so it answers to the same separation they do. */
+  background: var(--helix-color-surface-overlay);
+  border: var(--helix-border-floating) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
-  box-shadow: var(--helix-shadow-sm);
+  box-shadow: var(--helix-shadow-floating);
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
@@ -67,6 +70,24 @@
   pointer-events: none;
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   white-space: nowrap;
+}
+
+/* **Material is the name's ground**, as it is the controls' on the frame:
+   glass lets the map through under a blur, frosted turns the pair up, and
+   transparent leaves the name on the map with its halo of nothing. */
+:host([material="glass"]) [part="label"] {
+  backdrop-filter: var(--helix-material-backdrop);
+  background: var(--helix-material-translucent);
+}
+
+:host([material="frosted"]) [part="label"] {
+  backdrop-filter: blur(var(--helix-material-blur-lg));
+  background: var(--helix-material-translucent-strong);
+}
+
+:host([material="transparent"]) [part="label"] {
+  backdrop-filter: none;
+  background: transparent;
 }
 
 :host(:hover) [part="label"],
