@@ -550,6 +550,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** The custom color each card and connection was last drawn in. */
   private readonly painted = new WeakMap<Element, string>()
 
+  /** Where each card was last written to be, so one that did not move is left alone. */
+  private readonly placed = new WeakMap<Element, string>()
+
   /** The box as the observer last measured it, so a resize knows what it gained. */
   private measured?: { width: number; height: number }
 
@@ -584,9 +587,26 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
        renders something other than what it is hydrating and Lit throws at the
        part where the two disagree. So the cards are read on the update after
        hydration, which `finishHydration` asks for. */
-    return this.knownChildren.filter(
-      (child): child is HelixHeadlessCanvasNode => child instanceof HelixHeadlessCanvasNode,
+    return this.remember('cards', () =>
+      this.knownChildren.filter(
+        (child): child is HelixHeadlessCanvasNode => child instanceof HelixHeadlessCanvasNode,
+      ),
     )
+  }
+
+  /** A card by its name, looked up rather than searched for. */
+  private get byName(): Map<string, HelixHeadlessCanvasNode> {
+    return this.remember('byName', () => new Map(this.cards.map((card) => [card.name, card])))
+  }
+
+  /** A card's geometry by its name. */
+  private get byId(): Map<string, CanvasNode> {
+    return this.remember('byId', () => new Map(this.nodes.map((node) => [node.id, node])))
+  }
+
+  /** The groups alone, which is all a card's group is chosen from. */
+  private get groups(): CanvasNode[] {
+    return this.remember('groups', () => this.nodes.filter((node) => node.type === 'group'))
   }
 
   /**
@@ -599,9 +619,23 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * update is asked for, which every change the board makes or hears about
    * does, and at the end of the turn, so a question asked later reads again.
    */
-  private cache: { nodes?: CanvasNode[]; edges?: CanvasEdge[]; walk?: Stop[] } = {}
+  private cache: {
+    nodes?: CanvasNode[]
+    edges?: CanvasEdge[]
+    walk?: Stop[]
+    /* **And the indexes into them**, because a board asked "which card is
+       this" once per card, and each answer was a search of every card: a
+       drag of 400 selected cards took 50ms a step and of 800, 174ms. */
+    cards?: HelixHeadlessCanvasNode[]
+    byName?: Map<string, HelixHeadlessCanvasNode>
+    byId?: Map<string, CanvasNode>
+    groups?: CanvasNode[]
+    stops?: Set<string>
+    picked?: string[]
+    links?: Map<string, string>
+  } = {}
 
-  private remember<K extends 'nodes' | 'edges' | 'walk'>(
+  private remember<K extends keyof HelixHeadlessCanvas['cache']>(
     key: K,
     compute: () => NonNullable<HelixHeadlessCanvas['cache'][K]>,
   ): NonNullable<HelixHeadlessCanvas['cache'][K]> {
@@ -808,7 +842,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   show(name: string): void {
     this.direct = false
-    const node = this.nodes.find((one) => one.id === name)
+    const node = this.byId.get(name)
     if (!node) {
       return
     }
@@ -918,11 +952,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
        there: a stop with nothing to focus held the arrow keys on the card
        before it for good. */
     const ids = new Set(this.nodes.map((node) => node.id))
+    const leaving = new Map<string, Stop[]>()
+    for (const edge of edges) {
+      if (ids.has(edge.toNode)) {
+        const stop: Stop = { edge, key: this.keyOf(edge), kind: 'edge' }
+        leaving.set(edge.fromNode, [...(leaving.get(edge.fromNode) ?? []), stop])
+      }
+    }
     return reading(this.nodes, edges, this.order ?? 'spatial').flatMap((node): Stop[] => [
       { key: node.id, kind: 'node' },
-      ...edges
-        .filter((edge) => edge.fromNode === node.id && ids.has(edge.toNode))
-        .map((edge): Stop => ({ edge, key: this.keyOf(edge), kind: 'edge' })),
+      ...(leaving.get(node.id) ?? []),
     ])
   }
 
@@ -938,7 +977,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       ;(target as SVGElement | undefined)?.focus()
       return
     }
-    this.cards.find((one) => one.name === key)?.focus()
+    this.byName.get(key)?.focus()
   }
 
   /** The connection an event came from, where it came from one. */
@@ -975,7 +1014,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   /** What a card is called, by id, for what the live region says. */
   private nameOf(id: string): string {
-    const node = this.nodes.find((one) => one.id === id)
+    const node = this.byId.get(id)
     return node ? this.textOf(node) : id
   }
 
@@ -1232,8 +1271,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     edge: CanvasEdge,
     origin: { x: number; y: number },
   ): { d: string; mid: { x: number; y: number }; from: CanvasNode; to: CanvasNode } | undefined {
-    const from = this.nodes.find((one) => one.id === edge.fromNode)
-    const to = this.nodes.find((one) => one.id === edge.toNode)
+    const from = this.byId.get(edge.fromNode)
+    const to = this.byId.get(edge.toNode)
     if (!from || !to) {
       return undefined
     }
@@ -1369,15 +1408,18 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (name === '') {
       return undefined
     }
-    return this.walk.find((one) => one.key === name || one.key === `edge:${name}`)?.key
+    const stops = this.remember('stops', () => new Set(this.walk.map((one) => one.key)))
+    return stops.has(name) ? name : stops.has(`edge:${name}`) ? `edge:${name}` : undefined
   }
 
   /** The selection, as the keys of the stops in it. */
   private get picked(): string[] {
-    return this.selected
-      .split(',')
-      .map((one) => this.keyNamed(one.trim()))
-      .filter((one): one is string => one !== undefined)
+    return this.remember('picked', () =>
+      this.selected
+        .split(',')
+        .map((one) => this.keyNamed(one.trim()))
+        .filter((one): one is string => one !== undefined),
+    )
   }
 
   /**
@@ -1409,7 +1451,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   /** A card by name. */
   private cardNamed(name: string | undefined): HelixHeadlessCanvasNode | undefined {
-    return name === undefined ? undefined : this.cards.find((one) => one.name === name)
+    return name === undefined ? undefined : this.byName.get(name)
   }
 
   /**
@@ -1426,7 +1468,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return false
     }
     for (const { height, name, width, x, y } of detail.nodes) {
-      const card = this.cards.find((one) => one.name === name)
+      const card = this.byName.get(name)
       if (card) {
         card.x = x
         card.y = y
@@ -2170,7 +2212,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   /** Brings a card into view, where it is not already whole in it. */
   private reveal(id: string): void {
-    const node = this.nodes.find((one) => one.id === id)
+    const node = this.byId.get(id)
     const origin = this.origin
     if (!node || !origin) {
       return
@@ -2307,7 +2349,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         })
       }
     } else {
-      const group = this.nodes.find((one) => one.id === editing.key)
+      const group = this.byId.get(editing.key)
       if (group) {
         at = { x: group.x - origin.x, y: group.y - origin.y }
         named = this.textOf(group)
@@ -2356,24 +2398,41 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   /** What one card says in the reading list, its links included. */
   private linksOf(node: CanvasNode): string {
+    return this.remember('links', () => this.readLinks()).get(node.id) ?? ''
+  }
+
+  /**
+   * Every card's sentence at once: one pass over the connections, and one
+   * list formatter, rather than both again for every card.
+   */
+  private readLinks(): Map<string, string> {
     const named = (id: string): string => {
-      const other = this.nodes.find((one) => one.id === id)
+      const other = this.byId.get(id)
       return other ? this.textOf(other) : id
     }
-    const leads = this.edges
-      .filter((one) => one.fromNode === node.id)
-      .map((one) => named(one.toNode))
-    const from = this.edges
-      .filter((one) => one.toNode === node.id)
-      .map((one) => named(one.fromNode))
+    const leads = new Map<string, string[]>()
+    const from = new Map<string, string[]>()
+    for (const edge of this.edges) {
+      leads.set(edge.fromNode, [...(leads.get(edge.fromNode) ?? []), named(edge.toNode)])
+      from.set(edge.toNode, [...(from.get(edge.toNode) ?? []), named(edge.fromNode)])
+    }
     const lang = this.closest('[lang]')?.getAttribute('lang') || undefined
     const list = new Intl.ListFormat(lang, { type: 'conjunction' })
-    return [
-      leads.length > 0 ? fillTemplate(this.leadsToLabel, { cards: list.format(leads) }) : '',
-      from.length > 0 ? fillTemplate(this.comesFromLabel, { cards: list.format(from) }) : '',
-    ]
-      .filter(Boolean)
-      .join('; ')
+    return new Map(
+      this.nodes.map((one) => {
+        const out = leads.get(one.id) ?? []
+        const into = from.get(one.id) ?? []
+        return [
+          one.id,
+          [
+            out.length > 0 ? fillTemplate(this.leadsToLabel, { cards: list.format(out) }) : '',
+            into.length > 0 ? fillTemplate(this.comesFromLabel, { cards: list.format(into) }) : '',
+          ]
+            .filter(Boolean)
+            .join('; '),
+        ]
+      }),
+    )
   }
 
   /** What a node is called, whichever kind it is. */
@@ -2625,7 +2684,19 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     this.words ??= new MutationObserver((records) => {
-      if (records.some((record) => this.redraws(record))) {
+      /* Each element once, however many of its style writes are in the batch. */
+      const seen = new Set<Node>()
+      const heard = records.filter((record) => {
+        if (record.type !== 'attributes') {
+          return true
+        }
+        if (seen.has(record.target)) {
+          return false
+        }
+        seen.add(record.target)
+        return true
+      })
+      if (heard.some((record) => this.redraws(record))) {
         this.requestUpdate()
       }
     })
@@ -2642,6 +2713,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return true
     }
     const target = record.target
+    /* A page that wrote a card's whole `style` took its place with it, which
+       the board puts back rather than taking the card to be where it was. */
+    if (
+      target instanceof HelixHeadlessCanvasNode &&
+      this.placed.has(target) &&
+      custom(target, '--_canvas-card-x') === ''
+    ) {
+      this.placed.delete(target)
+      return true
+    }
     const name =
       target instanceof HelixHeadlessCanvasNode
         ? '--canvas-node-color'
@@ -2776,9 +2857,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     const alone = this.picked.length === 1 ? this.picked[0] : undefined
     /* The first card in reading order until a reader has landed on one, and
        again if the one they were on is taken away. */
-    const stop = this.walk.some((one) => one.key === this.stop)
-      ? this.stop
-      : reading(all, this.edges, this.order ?? 'spatial')[0]?.id
+    const stop =
+      this.stop !== undefined && this.keyNamed(this.stop) === this.stop
+        ? this.stop
+        : reading(all, this.edges, this.order ?? 'spatial')[0]?.id
+    const groups = this.groups
     for (const card of this.cards) {
       const group = card.group
         ? undefined
@@ -2791,20 +2874,29 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
               x: card.x,
               y: card.y,
             },
-            all,
+            groups,
           )
-      card.style.setProperty('--_canvas-card-x', `${finite(card.x) - origin.x}px`)
-      card.style.setProperty('--_canvas-card-y', `${finite(card.y) - origin.y}px`)
-      /* A card with no size of its own is as large as what it says, the
-         sheet's own default, rather than a zero box hiding its words. */
-      size(card, '--_canvas-card-inline-size', finite(card.width))
-      size(card, '--_canvas-card-block-size', finite(card.height))
+      /* Written only where it moved: a style write is a mutation the words
+         observer hears, and a drag of three cards on a board of eight hundred
+         rewrote every card's place on every step. */
+      const x = finite(card.x) - origin.x
+      const y = finite(card.y) - origin.y
+      const placed = `${x} ${y} ${finite(card.width)} ${finite(card.height)}`
+      if (this.placed.get(card) !== placed) {
+        this.placed.set(card, placed)
+        card.style.setProperty('--_canvas-card-x', `${x}px`)
+        card.style.setProperty('--_canvas-card-y', `${y}px`)
+        /* A card with no size of its own is as large as what it says, the
+           sheet's own default, rather than a zero box hiding its words. */
+        size(card, '--_canvas-card-inline-size', finite(card.width))
+        size(card, '--_canvas-card-block-size', finite(card.height))
+      }
       if (group) {
         card.setAttribute('data-group', group.id)
       } else {
         card.removeAttribute('data-group')
       }
-      const node = all.find((one) => one.id === card.name)
+      const node = this.byId.get(card.name)
       card.links = node ? this.linksOf(node) : ''
       card.current = card.name === stop
       card.selected = picked.has(card.name)
@@ -2870,7 +2962,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   private renderEdges(origin: { x: number; y: number }, box: { width: number; height: number }) {
     const elements = new Map(this.edgeElements.map((child) => [this.keyOfElement(child), child]))
-    const stop = this.walk.some((one) => one.key === this.stop) ? this.stop : undefined
+    const stop =
+      this.stop !== undefined && this.keyNamed(this.stop) === this.stop ? this.stop : undefined
     const pickedKeys = new Set(this.picked)
     /* **Not hidden as a whole any more**, because a connection is now something
        a reader focuses. What is drawn is hidden, piece by piece: the painted
