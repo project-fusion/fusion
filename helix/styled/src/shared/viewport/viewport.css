@@ -119,11 +119,17 @@
   grid-area: full;
 }
 
+/* **Floating, so they answer to the theme's floating separation.** The
+   controls lie over the map or the board the way a popover lies over a page,
+   and a theme that separates what floats by a shadow, a border or a fill
+   says so here too: a hairline of their own was the one floating surface in
+   the library that ignored it, over the busiest ground any of them sit on. */
 [part="controls"] button {
   align-items: center;
   background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border: var(--helix-border-floating) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
   block-size: var(--helix-size-control-sm);
   color: var(--helix-color-foreground);
   cursor: pointer;
