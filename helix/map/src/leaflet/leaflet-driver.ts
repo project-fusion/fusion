@@ -1,4 +1,11 @@
 import type { MapDriver } from '../connect-map/connect-map.js'
+import type { MapMotion } from '../motion/motion.js'
+
+/** How Leaflet is told to move: over a time, in seconds, or at once. */
+interface LeafletAnimation {
+  animate?: boolean
+  duration?: number
+}
 
 /** The part of a Leaflet layer the driver reads. */
 export interface LeafletLayer {
@@ -30,14 +37,23 @@ export interface LeafletMap {
   latLngToContainerPoint(latLng: [number, number]): { x: number; y: number }
   off(type: 'layeradd layerremove' | 'move zoom resize', listener: () => void): unknown
   on(type: 'layeradd layerremove' | 'move zoom resize', listener: () => void): unknown
-  panBy(offset: [number, number], options?: { animate?: boolean }): unknown
+  panBy(offset: [number, number], options?: LeafletAnimation): unknown
   /** Goes to a place, at its zoom or the one it is at. */
-  setView(center: [number, number], zoom?: number, options?: { animate?: boolean }): unknown
+  setView(center: [number, number], zoom?: number, options?: LeafletAnimation): unknown
   /** The zoom buttons Leaflet adds unless told not to. */
   zoomControl?: { remove(): unknown } | undefined
   zoomIn(delta?: number, options?: { animate?: boolean }): unknown
   zoomOut(delta?: number, options?: { animate?: boolean }): unknown
 }
+
+/**
+ * The page's motion as Leaflet takes it. **The duration and not the curve**:
+ * Leaflet eases a pan by a linearity rather than a function, so there is no
+ * curve to hand it, and it zooms with a transition of its own stylesheet's,
+ * so a zoom is animated or not and takes no duration either.
+ */
+const animation = (motion: MapMotion | null): LeafletAnimation =>
+  motion ? { animate: true, duration: motion.duration / 1000 } : { animate: false }
 
 /**
  * Drives a Leaflet map from the Map frame.
@@ -82,8 +98,8 @@ export const leafletDriver = (map: LeafletMap): MapDriver => ({
       map.off('move zoom resize', moved)
     }
   },
-  panBy: (x, y, animate) => {
-    map.panBy([x, y], { animate })
+  panBy: (x, y, motion) => {
+    map.panBy([x, y], animation(motion))
   },
   project: ({ lat, lng }) => {
     const { x, y } = map.latLngToContainerPoint([lat, lng])
@@ -98,8 +114,8 @@ export const leafletDriver = (map: LeafletMap): MapDriver => ({
       }
     }
   },
-  show: ({ lat, lng, zoom }, animate) => {
-    map.setView([lat, lng], zoom, { animate })
+  show: ({ lat, lng, zoom }, motion) => {
+    map.setView([lat, lng], zoom, animation(motion))
   },
   silenceKeyboard: () => {
     const handler = map.keyboard
@@ -111,11 +127,11 @@ export const leafletDriver = (map: LeafletMap): MapDriver => ({
       }
     }
   },
-  zoomBy: (direction, animate) => {
+  zoomBy: (direction, motion) => {
     if (direction > 0) {
-      map.zoomIn(1, { animate })
+      map.zoomIn(1, { animate: motion !== null })
     } else {
-      map.zoomOut(1, { animate })
+      map.zoomOut(1, { animate: motion !== null })
     }
   },
 })

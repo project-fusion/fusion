@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec'
 import { mapLibreStyle } from './map-style.js'
-import { parseColor } from './oklab.js'
+import { contrast, parseColor } from './oklab.js'
 
 const LIGHT = {
   foreground: '#111111',
@@ -68,6 +68,40 @@ describe('mapLibreStyle', () => {
       (id) => land - lightness(paint(style, id, key(id))),
     )
     expect([...order].sort((a, b) => a - b)).toEqual(order)
+  })
+
+  test('every label clears the contrast target against the land it is haloed in', () => {
+    /* A theme whose ink is already gray, where the designed steps toward it
+       fell short: a mid gray on near-black. */
+    const GRAY = { ...DARK, foreground: '#8c8c8c' }
+    for (const colors of [LIGHT, DARK, GRAY]) {
+      for (const target of [4.5, 7]) {
+        const style = mapLibreStyle(colors, { contrast: target })
+        const land = parseColor(String(paint(style, 'land', 'background-color')))
+        const labels = style.layers.filter((layer) => String(layer.id).startsWith('label'))
+        expect(labels.length).toBeGreaterThan(5)
+        for (const label of labels) {
+          const ink = parseColor(String(paint(style, String(label.id), 'text-color')))
+          const ratio = land && ink ? contrast(ink, land) : 0
+          const inkRatio = contrast(parseColor(colors.foreground) as never, land as never)
+          // Clears it, or is the ink itself where not even the ink can.
+          expect(ratio).toBeGreaterThanOrEqual(Math.min(target, inkRatio) - 0.01)
+        }
+      }
+    }
+  })
+
+  test('a label that clears the target already keeps its place in the order', () => {
+    const relaxed = mapLibreStyle(LIGHT, { contrast: 1 })
+    const strict = mapLibreStyle(LIGHT, { contrast: 7 })
+    const village = (style: typeof relaxed) =>
+      lightness(paint(style, 'label-village', 'text-color'))
+    // Designed as it is where nothing is asked of it, and darker where 7:1 is.
+    expect(village(strict)).toBeLessThan(village(relaxed))
+    // The city was always the darkest, and still is.
+    expect(lightness(paint(strict, 'label-city', 'text-color'))).toBeLessThanOrEqual(
+      village(strict),
+    )
   })
 
   test('the roads a reader navigates by are drawn in the brand, and the rest are not', () => {

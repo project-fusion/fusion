@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
+import type { MapMotion } from '../motion/motion.js'
 import { type LeafletLayer, type LeafletMap, leafletDriver } from './leaflet-driver.js'
 
 beforeAll(() => {
@@ -52,10 +53,10 @@ const stand = (
       listeners.add(listener)
     },
     panBy: ([x, y], panned) => {
-      asked.push(`panBy ${x} ${y} ${panned?.animate}`)
+      asked.push(`panBy ${x} ${y} ${panned?.animate} ${panned?.duration}`)
     },
     setView: ([lat, lng], zoom, viewed) => {
-      asked.push(`setView ${lat},${lng} ${zoom} ${viewed?.animate}`)
+      asked.push(`setView ${lat},${lng} ${zoom} ${viewed?.animate} ${viewed?.duration}`)
     },
     zoomControl: {
       remove: () => {
@@ -77,14 +78,23 @@ const stand = (
   return { asked, fire, layers, map }
 }
 
+/** A motion as the connector hands one over, which Leaflet takes in seconds. */
+const glide: MapMotion = { duration: 250, easing: (t) => t }
+
 describe('leafletDriver', () => {
-  test('a pan is pixels and a zoom is one level, as Leaflet’s own buttons take', () => {
+  test('a pan is pixels over the page’s duration, and a zoom is one level, as Leaflet’s own buttons take', () => {
     const { asked, map } = stand()
     const driver = leafletDriver(map)
-    driver.panBy(-100, 50, true)
-    driver.zoomBy(1, true)
-    driver.zoomBy(-1, false)
-    expect(asked).toEqual(['panBy -100 50 true', 'zoomIn 1 true', 'zoomOut 1 false'])
+    driver.panBy(-100, 50, glide)
+    driver.panBy(-100, 50, null)
+    driver.zoomBy(1, glide)
+    driver.zoomBy(-1, null)
+    expect(asked).toEqual([
+      'panBy -100 50 true 0.25',
+      'panBy -100 50 false undefined',
+      'zoomIn 1 true',
+      'zoomOut 1 false',
+    ])
   })
 
   test('its keys go quiet and come back, and a map made without them is left alone', () => {
@@ -111,12 +121,12 @@ describe('leafletDriver', () => {
     expect(leafletDriver(map).project?.({ lat: 2, lng: 3 })).toEqual({ x: 30, y: -20 })
   })
 
-  test('showing a place is setView, animated or not as the reader asked', () => {
+  test('showing a place is setView, over the page’s duration or at once', () => {
     const { asked, map } = stand()
     const driver = leafletDriver(map)
-    driver.show?.({ lat: 2, lng: 3, zoom: 14 }, true)
-    driver.show?.({ lat: 2, lng: 3 }, false)
-    expect(asked).toEqual(['setView 2,3 14 true', 'setView 2,3 undefined false'])
+    driver.show?.({ lat: 2, lng: 3, zoom: 14 }, glide)
+    driver.show?.({ lat: 2, lng: 3 }, null)
+    expect(asked).toEqual(['setView 2,3 14 true 0.25', 'setView 2,3 undefined false undefined'])
   })
 
   test('the view moving is heard until it is told to stop', () => {

@@ -24,7 +24,11 @@ that differs and nothing else:
 - a pan in pixels on screen, with `start` and `end` resolved by the frame's
   direction, so a right-to-left page moves the right way without a driver
   knowing it is one;
-- no motion where the reader asked for less;
+- **the page's motion rather than the renderer's**: a pan or a zoom takes the
+  theme's standard duration and curve, and a trip to a place its slow duration
+  and emphasized curve, read off the page each time so a new theme moves the
+  next pan; no motion at all where the reader asked for less or the theme's
+  durations are zero;
 - **one tab stop and one set of keys**: the renderer's keyboard handler off and
   its canvas out of the tab order, so a reader meets the frame's named region
   rather than an unnamed canvas beside it that answers the arrows differently;
@@ -84,6 +88,12 @@ a light map on a light theme and a dark one on a dark theme, and a new brand
 moves the roads with it. Redraw it with `map.setStyle(style, { diff: true })`
 when the theme changes.
 
+**Every label clears a contrast target against the land it is haloed in**, 4.5
+by default and `contrast` to change it: a label that would fall short is drawn
+nearer the ink until it does not, so a theme whose ink is already gray still
+gets legible place names, and one that clears it already keeps its place in
+the order.
+
 The tiles are OpenFreeMap's until Helix serves its own in the same schema, and
 `tiles` and `glyphs` point it at yours. Every style it writes is checked by
 MapLibre's own validator.
@@ -100,15 +110,21 @@ calls it makes on it, so a page brings whichever version it has, and nobody
 installs MapLibre to use Leaflet. A spec holds those shapes to the real `Map`
 classes, so a renamed method fails a typecheck here rather than a page.
 
+Leaflet takes the page's duration for a pan and a trip but not its curve, which
+it eases by a linearity rather than a function, and zooms on a transition of
+its own stylesheet's, so a Leaflet zoom is animated or not and nothing more.
+
 MapLibre gives no public way to remove the credit control it was made with, so
 its driver hides it while connected; make the map with
 `attributionControl: false` and there is nothing to hide.
 
-A driver of your own is an object with `panBy(x, y, animate)` in pixels and
-`zoomBy(direction, animate)`, and optionally `silenceKeyboard`, `focusTarget`,
+A driver of your own is an object with `panBy(x, y, motion)` in pixels and
+`zoomBy(direction, motion)`, where `motion` is the page's `{ duration, easing }`
+or `null` for a jump, and optionally `silenceKeyboard`, `focusTarget`,
 `replaceZoom` and `credits`: see `MapDriver`. Markers need three more:
 `project(place)` to a point in the map's container, `onView(moved)` to hear the
-view change, and `show(place, animate)` to bring a place into view. A driver
+view change, and `show(place, motion)` to bring a place into view. `motionOf`
+reads the same motion for a move a page makes itself. A driver
 without `project` leaves its markers hidden.
 
 ## Working on it
