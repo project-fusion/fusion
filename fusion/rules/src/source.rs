@@ -191,7 +191,41 @@ fn opens_regex(bytes: &[u8], last: Option<usize>) -> bool {
             .map_or(0, |found| found + 1);
         return KEYWORDS.contains(&&bytes[start..=last]);
     }
-    !matches!(one, b')' | b']' | b'}' | b'\'' | b'"' | b'`')
+    if one == b')' {
+        return closes_condition(bytes, last);
+    }
+    !matches!(one, b']' | b'}' | b'\'' | b'"' | b'`')
+}
+
+/// Whether the `)` at `close` ends the condition of an `if`, `while`, `for` or
+/// `with`, after which a statement starts and a `/` opens a regex:
+/// `if (ok) /x/.test(s)`. Any other `)` ends a value, which a `/` divides.
+fn closes_condition(bytes: &[u8], close: usize) -> bool {
+    const HEADS: [&[u8]; 4] = [b"if", b"while", b"for", b"with"];
+    let mut depth = 0usize;
+    let mut at = close;
+    loop {
+        match bytes[at] {
+            b')' => depth += 1,
+            b'(' => {
+                depth -= 1;
+                if depth == 0 {
+                    break;
+                }
+            }
+            _ => {}
+        }
+        if at == 0 {
+            return false;
+        }
+        at -= 1;
+    }
+    let before = bytes[..at].trim_ascii_end();
+    let start = before
+        .iter()
+        .rposition(|byte| !(byte.is_ascii_alphanumeric() || *byte == b'_' || *byte == b'$'))
+        .map_or(0, |found| found + 1);
+    HEADS.contains(&&before[start..])
 }
 
 /// Where a regex literal opening at `from` ends, past its flags. A `/` inside
@@ -268,6 +302,13 @@ mod tests {
         let code = "x = a++ / 2 // gone\ny = b-- / 2 // also";
         let found: Vec<&str> = comments(code).into_iter().map(|span| &code[span]).collect();
         assert_eq!(found, ["// gone", "// also"]);
+    }
+
+    #[test]
+    fn a_regex_after_a_condition_is_a_regex_and_a_call_divides() {
+        let code = "if (ok) /\\/*/.test(s)\nconst keep = [part]\n/* end */\nx = f(a) / 2 // half";
+        let found: Vec<&str> = comments(code).into_iter().map(|span| &code[span]).collect();
+        assert_eq!(found, ["/* end */", "// half"]);
     }
 
     #[test]
