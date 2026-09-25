@@ -513,9 +513,14 @@ export const THEMED_PAGE_STYLES = css`
      panel lies over the map the way a popover lies over a page, and a theme
      that separates what floats by a shadow, a border or a fill should be seen
      doing it here, over the busiest ground in the preview, rather than only
-     over a flat one. */
+     over a flat one.
+
+     **And glass, for the same reason**: the theme's translucency and blur,
+     the pair \`Card\` takes for \`material="glass"\`, so the sliders for both
+     are seen doing something over ground that shows it. */
   .themedMapPanel {
-    background-color: var(--helix-color-surface-overlay);
+    backdrop-filter: var(--helix-material-backdrop);
+    background-color: var(--helix-material-translucent);
     border: var(--helix-border-floating) solid var(--helix-color-border);
     border-radius: var(--helix-radii-md);
     box-shadow: var(--helix-shadow-floating);
