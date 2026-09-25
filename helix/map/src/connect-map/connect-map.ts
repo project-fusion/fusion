@@ -156,12 +156,19 @@ export const connectMap = (
       return link
     })
     credit.replaceChildren(...nodes)
+    /* Slotted only while it says something: the strip draws its hairline on
+       what is slotted, so an empty credit was an empty strip with a line
+       over it, and `hidden` loses to the strip's own `display`. */
+    if (nodes.length === 0) {
+      credit.remove()
+    } else if (credit.parentNode !== frame) {
+      frame.append(credit)
+    }
   }
   if (options.credit !== false && !owned && driver.credits) {
     credit = document.createElement('span')
     credit.setAttribute('slot', 'attribution')
     credit.setAttribute(CREDIT, '')
-    frame.append(credit)
     listening = driver.credits(writeCredit)
     writeCredit()
   }
