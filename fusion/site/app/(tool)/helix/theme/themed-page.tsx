@@ -744,6 +744,81 @@ function EditorialPage(context: Context) {
 }
 
 /**
+ * A product whose page is a map, with what it is about in a panel over it.
+ *
+ * **The map is live and nothing here makes it so.** This markup is a string
+ * like every other layout's; the frame sees `data-preview-map` and loads the
+ * renderer and the connector beside it, and redraws the map's colors whenever
+ * the theme moves. So what is previewed is the map a consumer would get from
+ * the same tokens, not a picture of one.
+ *
+ * **The table's rows, where they happen.** The four markers carry the rows'
+ * states as their tones, which is the one place in the preview the status
+ * colors sit on ground that is not a flat surface: land, water and roads,
+ * each already drawn from the palette.
+ */
+function MapPage(context: Context) {
+  const { action, company, map } = context
+
+  return (
+    <div className="themedMapPage">
+      <helix-flex align-items="center" className="themedMapBar" gap="sm" justify-content="between">
+        <helix-flex align-items="center" gap="xs">
+          <Mark mark={context.mark} />
+          <helix-text variant="label">{company}</helix-text>
+        </helix-flex>
+        <helix-button emphasis="solid" tone="primary">
+          {action}
+        </helix-button>
+      </helix-flex>
+
+      <div className="themedMapStage">
+        <helix-map className="themedMapFrame" data-preview-map label={map.label}>
+          <div className="themedMapCanvas" data-preview-map-canvas></div>
+          {map.places.map((place) => (
+            <helix-map-marker
+              key={place.label}
+              label={place.label}
+              lat={place.lat}
+              lng={place.lng}
+              name={place.detail}
+              tone={place.state}
+            ></helix-map-marker>
+          ))}
+        </helix-map>
+
+        {/* **Named as what the camera keeps clear**, so the frame's script
+            frames the places beside the panel rather than under it, where a
+            marker could take focus with nobody able to see it. */}
+        <aside className="themedMapPanel" data-preview-map-clear>
+          <helix-flex direction="column" gap="2xs">
+            <helix-text as="h1" variant="subheading">
+              {map.heading}
+            </helix-text>
+            <helix-text emphasis="muted" variant="caption">
+              {map.lead}
+            </helix-text>
+          </helix-flex>
+          <helix-list divided label={map.heading}>
+            {map.places.map((place) => (
+              <helix-list-item key={place.label}>
+                {place.detail}
+                <helix-text as="span" slot="description" variant="caption">
+                  {place.label}
+                </helix-text>
+                <helix-tag emphasis="subtle" slot="end" tone={place.state}>
+                  {place.status}
+                </helix-tag>
+              </helix-list-item>
+            ))}
+          </helix-list>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+/**
  * The layouts, in the order the builder offers them, resting one first.
  *
  * Same convention as `CONTEXTS`, so neither axis has a default stated anywhere
@@ -758,4 +833,5 @@ export const LAYOUTS: readonly {
   { label: 'Minimal', render: MinimalPage, value: 'minimal' },
   { label: 'Editorial', render: EditorialPage, value: 'editorial' },
   { label: 'Application', render: WorkspacePage, value: 'workspace' },
+  { label: 'Map', render: MapPage, value: 'map' },
 ]

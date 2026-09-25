@@ -474,6 +474,63 @@ export const THEMED_PAGE_STYLES = css`
     padding-block-start: var(--helix-space-xl);
   }
 
+  /* **The map layout: a bar, and the map under it filling what is left.**
+     The frame is the page's height, so the map takes the rest of it rather
+     than a height of its own, which is what a product whose page is a map
+     looks like. */
+  .themedMapPage {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    min-block-size: 100dvh;
+  }
+
+  .themedMapBar {
+    border-block-end: var(--helix-border-surface) solid var(--helix-color-border);
+    box-shadow: var(--helix-shadow-surface);
+    padding: var(--helix-space-sm) var(--helix-space-lg);
+  }
+
+  .themedMapStage {
+    min-block-size: 0;
+    position: relative;
+  }
+
+  /* Edge to edge, so no frame of its own: the page is the frame. */
+  .themedMapFrame {
+    --map-block-size: 100%;
+  }
+
+  .themedMapFrame::part(region) {
+    border: 0;
+    border-radius: 0;
+  }
+
+  .themedMapCanvas {
+    block-size: 100%;
+  }
+
+  /* **A floating surface, so it answers to the floating separation.** The
+     panel lies over the map the way a popover lies over a page, and a theme
+     that separates what floats by a shadow, a border or a fill should be seen
+     doing it here, over the busiest ground in the preview, rather than only
+     over a flat one. */
+  .themedMapPanel {
+    background-color: var(--helix-color-surface-overlay);
+    border: var(--helix-border-floating) solid var(--helix-color-border);
+    border-radius: var(--helix-radii-md);
+    box-shadow: var(--helix-shadow-floating);
+    display: flex;
+    flex-direction: column;
+    gap: var(--helix-space-md);
+    inline-size: min(22rem, calc(100% - var(--helix-space-lg) * 2));
+    inset-block-start: var(--helix-space-lg);
+    inset-inline-start: var(--helix-space-lg);
+    max-block-size: calc(100% - var(--helix-space-lg) * 2);
+    overflow: auto;
+    padding: var(--helix-space-lg);
+    position: absolute;
+  }
+
   @container (width < 52rem) {
     .themedSplit,
     .themedAppGrid {
@@ -509,6 +566,32 @@ export const THEMED_PAGE_STYLES = css`
 
   /* The hero is set for a page, so it needs stepping down for a pane. */
   @container (width < 40rem) {
+    /* The panel under the map rather than over it: at this width a panel
+       over the map would cover most of it, and the map is what the page is.
+       Stated as a height the map keeps, so the panel does not push it out of
+       the frame. */
+    .themedMapPage {
+      grid-template-rows: auto auto auto;
+    }
+
+    .themedMapStage {
+      display: contents;
+    }
+
+    .themedMapFrame {
+      --map-block-size: 60dvh;
+    }
+
+    .themedMapPanel {
+      border: 0;
+      border-block-start: var(--helix-border-surface) solid var(--helix-color-border);
+      border-radius: 0;
+      box-shadow: none;
+      inline-size: auto;
+      max-block-size: none;
+      position: static;
+    }
+
     .themedHero,
     .themedFeatures,
     .themedChart,

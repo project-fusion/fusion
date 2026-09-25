@@ -2,12 +2,13 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { HelixActivateEvent, HelixMap } from '@fusion.dev/helix'
-import { connectMap, type MapColors, mapColorsFrom } from '@fusion.dev/helix-map'
+import { connectMap, mapColorsFrom } from '@fusion.dev/helix-map'
 import { mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { useEffect, useRef, useState } from 'react'
 import { MAPS } from '@/content/maps/maps'
 import { stageAppearance } from '@/content/verticals/verticals'
+import { boundsOf, clearOf, sameColors } from '@/utils/map-view/map-view'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './maps.module.css'
 import { mapIntent, propertiesOf, type SentTheme } from './maps-theme'
@@ -47,48 +48,8 @@ type Mode = 'site' | 'light' | 'dark'
 /** The brand choice that is a whole theme from the builder rather than a color. */
 const YOURS = 'yours'
 
-/** The places' corners, west-south then east-north, as MapLibre takes a bounds. */
-const BOUNDS: [[number, number], [number, number]] = [
-  [Math.min(...PLACES.map((one) => one.lng)), Math.min(...PLACES.map((one) => one.lat))],
-  [Math.max(...PLACES.map((one) => one.lng)), Math.max(...PLACES.map((one) => one.lat))],
-]
-
-/**
- * The part of the map a reader can see, as camera padding: where the panel
- * lies over it, the camera frames the places beside the panel rather than
- * under it, where a marker could take focus with nobody able to see it. The
- * top is deeper for the frame's own controls: they sit in its top corner, and
- * a band over them costs a phone much less of the map than a column beside
- * them would.
- */
-const clearOf = (
-  frame: Element,
-  panel: Element | null,
-): { bottom: number; left: number; right: number; top: number } => {
-  const edge = 48
-  const room = frame.getBoundingClientRect()
-  const over = panel?.getBoundingClientRect()
-  const covers =
-    over !== undefined &&
-    over.left < room.right &&
-    over.right > room.left &&
-    over.top < room.bottom &&
-    over.bottom > room.top
-  return {
-    bottom: edge,
-    left: covers ? over.right - room.left + edge : edge,
-    right: edge,
-    top: edge * 3,
-  }
-}
-
-/** The same four colors, which is when a restyle would draw nothing new. */
-const same = (a: MapColors | undefined, b: MapColors): boolean =>
-  a !== undefined &&
-  a.foreground === b.foreground &&
-  a.info === b.info &&
-  a.success === b.success &&
-  a.surface === b.surface
+/** The places' corners, as the camera frames them. */
+const BOUNDS = boundsOf(PLACES)
 
 /**
  * The site's own brand, as the browser settles it at the root, for the swatch
@@ -195,7 +156,7 @@ export function MapsHero({
         cancelAnimationFrame(pending)
         pending = requestAnimationFrame(() => {
           const next = mapColorsFrom(host)
-          if (!same(colors, next)) {
+          if (!sameColors(colors, next)) {
             colors = next
             map.setStyle(mapLibreStyle(colors, { language }) as never, { diff: true })
           }

@@ -78,6 +78,28 @@ export interface Context {
   }
   /** What a reader picks this context by. */
   label: string
+  /**
+   * What the map layout needs: a panel over a map, and the places on it.
+   *
+   * **The table's four rows, put where they happen**, each keeping its state,
+   * so the three status colors meet the map's ground the way they meet a card
+   * everywhere else in the preview. Coordinates are OpenStreetMap's.
+   */
+  map: {
+    heading: string
+    /** What the map region is called, which a screen reader announces. */
+    label: string
+    lead: string
+    places: readonly {
+      /** The row the place stands for. */
+      detail: string
+      label: string
+      lat: number
+      lng: number
+      state: State
+      status: string
+    }[]
+  }
   /** Which mark `Mark` draws. */
   mark: 'brand' | 'deckle' | 'strata' | 'weft'
   /** The three menu items, which exist to be opened rather than read. */
@@ -215,6 +237,45 @@ export const CONTEXTS: readonly Context[] = [
       secondary: 'Book a walkthrough',
     },
     label: 'Logistics platform',
+    map: {
+      heading: 'Arrivals today',
+      label: 'Where today’s shipments arrive',
+      lead: 'Four lanes land today. The one into Aarhus missed its window, and there is still time to move the booking.',
+      places: [
+        {
+          detail: 'Rotterdam to Felixstowe',
+          label: 'Felixstowe',
+          lat: 51.9643,
+          lng: 1.329,
+          state: 'success',
+          status: 'On time',
+        },
+        {
+          detail: 'Algeciras to Genoa',
+          label: 'Genoa',
+          lat: 44.4073,
+          lng: 8.9339,
+          state: 'warning',
+          status: 'Delayed 40m',
+        },
+        {
+          detail: 'Gdansk to Aarhus',
+          label: 'Aarhus',
+          lat: 56.1496,
+          lng: 10.2134,
+          state: 'danger',
+          status: 'Missed window',
+        },
+        {
+          detail: 'Bilbao to Cork',
+          label: 'Cork',
+          lat: 51.8985,
+          lng: -8.4726,
+          state: 'success',
+          status: 'On time',
+        },
+      ],
+    },
     mark: 'strata',
     menu: ['Export today', 'Subscribe to changes', 'Open in the planner'],
     nav: [
@@ -354,6 +415,45 @@ export const CONTEXTS: readonly Context[] = [
       secondary: 'Read a sample',
     },
     label: 'Publication',
+    map: {
+      heading: 'Filed this week',
+      label: 'Where this week’s pieces were filed',
+      lead: 'Four pieces from four places. The one from Kiruna is held while the desk checks a source.',
+      places: [
+        {
+          detail: 'The last ferry from Durres',
+          label: 'Durrës',
+          lat: 41.3133,
+          lng: 19.4462,
+          state: 'success',
+          status: 'Published',
+        },
+        {
+          detail: 'What the copper price knows',
+          label: 'Lubin',
+          lat: 51.3997,
+          lng: 16.1993,
+          state: 'warning',
+          status: 'With the editor',
+        },
+        {
+          detail: 'A winter in Kiruna',
+          label: 'Kiruna',
+          lat: 67.8496,
+          lng: 20.3062,
+          state: 'danger',
+          status: 'Held',
+        },
+        {
+          detail: 'The river that moved',
+          label: 'Tulcea',
+          lat: 45.1775,
+          lng: 28.8016,
+          state: 'success',
+          status: 'Published',
+        },
+      ],
+    },
     mark: 'deckle',
     menu: ['Export this week', 'Follow this section', 'Open in the desk'],
     nav: [
@@ -498,6 +598,45 @@ export const CONTEXTS: readonly Context[] = [
       secondary: 'Order swatches',
     },
     label: 'Storefront',
+    map: {
+      heading: 'Orders today',
+      label: 'Where today’s orders are going',
+      lead: 'Four orders, four addresses. The scarf is on its way back from Manchester.',
+      places: [
+        {
+          detail: 'Herringbone throw, oat',
+          label: 'Edinburgh',
+          lat: 55.9533,
+          lng: -3.1884,
+          state: 'success',
+          status: 'Packed',
+        },
+        {
+          detail: 'Waffle blanket, indigo',
+          label: 'Bristol',
+          lat: 51.443,
+          lng: -2.5817,
+          state: 'warning',
+          status: 'Waiting on yarn',
+        },
+        {
+          detail: 'Fine wool scarf, rust',
+          label: 'Manchester',
+          lat: 53.4425,
+          lng: -2.2325,
+          state: 'danger',
+          status: 'Return opened',
+        },
+        {
+          detail: 'Linen sheet set, chalk',
+          label: 'London',
+          lat: 51.5074,
+          lng: -0.1278,
+          state: 'success',
+          status: 'Packed',
+        },
+      ],
+    },
     mark: 'weft',
     menu: ['Export today', 'Subscribe to changes', 'Open in the workroom'],
     nav: [
@@ -641,6 +780,45 @@ export const CONTEXTS: readonly Context[] = [
       secondary: 'Secondary',
     },
     label: 'Generic',
+    map: {
+      heading: 'A map',
+      label: 'A map with four places',
+      lead: 'Four markers, one in each state, on a map drawn from the theme.',
+      places: [
+        {
+          detail: 'The first row',
+          label: 'The first place',
+          lat: 38.7078,
+          lng: -9.1366,
+          state: 'success',
+          status: 'Success',
+        },
+        {
+          detail: 'The second row',
+          label: 'The second place',
+          lat: 48.8535,
+          lng: 2.3484,
+          state: 'warning',
+          status: 'Warning',
+        },
+        {
+          detail: 'The third row',
+          label: 'The third place',
+          lat: 48.2084,
+          lng: 16.3725,
+          state: 'danger',
+          status: 'Danger',
+        },
+        {
+          detail: 'The fourth row',
+          label: 'The fourth place',
+          lat: 55.6867,
+          lng: 12.5701,
+          state: 'success',
+          status: 'Success',
+        },
+      ],
+    },
     mark: 'brand',
     menu: ['A menu item', 'A second item', 'A third item'],
     nav: [
