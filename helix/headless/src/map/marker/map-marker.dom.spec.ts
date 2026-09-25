@@ -97,4 +97,15 @@ describe('map marker', () => {
     press(markers(host)[0] as Marker, 'ArrowDown')
     expect(pans).toHaveLength(0)
   })
+
+  test('a name turned to the start says so, so the styled tier can put it there', async () => {
+    const host = await frame()
+    const [depot] = markers(host) as [Marker & { side: 'end' | 'start' }]
+    expect(hasState(depot, 'start')).toBe(false)
+    depot.side = 'start'
+    await depot.updateComplete
+    expect(hasState(depot, 'start')).toBe(true)
+    // What the connector measures with: the button, which is laid out even while its name is faded.
+    expect(typeof (depot as unknown as { extent(): number }).extent()).toBe('number')
+  })
 })

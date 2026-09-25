@@ -352,6 +352,41 @@ describe('connectMap with markers', () => {
     expect(shown).toEqual(['1,90 320ms'])
   })
 
+  test('a name that would run off the view’s end is turned to the side with the room', async () => {
+    const host = await frame(
+      `<helix-headless-map-marker label="Open water" lat="1" lng="1"></helix-headless-map-marker>
+       <helix-headless-map-marker label="Right by the edge" lat="1" lng="35"></helix-headless-map-marker>`,
+    )
+    const [open, edge] = [...host.querySelectorAll('helix-headless-map-marker')] as (HTMLElement & {
+      extent(): number
+      side: 'end' | 'start'
+    })[]
+    // Eighty pixels of button each, which happy-dom cannot lay out to measure.
+    for (const one of [open, edge]) {
+      if (one) {
+        one.extent = () => 80
+      }
+    }
+    const { driver } = projecting()
+    connectMap(host, driver)
+    // Ten pixels a degree on a 400-pixel view: 10 has the room, 350 has 50.
+    expect([open?.side, edge?.side]).toEqual(['end', 'start'])
+  })
+
+  test('and on a right-to-left page the end is the left, so the same place keeps its name after it', async () => {
+    const host = await frame(
+      '<helix-headless-map-marker label="Right by the edge" lat="1" lng="35"></helix-headless-map-marker>',
+    )
+    host.style.direction = 'rtl'
+    const edge = host.querySelector('helix-headless-map-marker') as HTMLElement & {
+      extent(): number
+      side: 'end' | 'start'
+    }
+    edge.extent = () => 80
+    connectMap(host, projecting().driver)
+    expect(edge.side).toBe('end')
+  })
+
   test('disconnecting takes the places off the markers and stops listening', async () => {
     const host = await frame(
       '<helix-headless-map-marker label="Depot" lat="2" lng="3"></helix-headless-map-marker>',

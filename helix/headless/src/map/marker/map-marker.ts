@@ -34,6 +34,7 @@ import { property, state } from 'lit/decorators.js'
  * @csspart point - The dot that stands on the place.
  *
  * @cssstate current - While this is the marker the map's tab stop is on.
+ * @cssstate start - While the name sits before the point in reading order, turned there by the connector because the other side of the view had no room for it.
  */
 @customElement('helix-headless-map-marker')
 export class HelixHeadlessMapMarker extends HelixElement {
@@ -68,6 +69,14 @@ export class HelixHeadlessMapMarker extends HelixElement {
   lng?: number
 
   /**
+   * @internal Which side of the point the name sits on, in reading order,
+   * written by the connector from the room either side of the place. After
+   * the point unless the view's edge would cut the name off there.
+   */
+  @state()
+  side: 'end' | 'start' = 'end'
+
+  /**
    * What `helix-activate` reports when this is pressed. Its `label` where it
    * has none, which is enough until two places share a name.
    */
@@ -77,6 +86,16 @@ export class HelixHeadlessMapMarker extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('current', this.current)
+    this.toggleState('start', this.side === 'start')
+  }
+
+  /**
+   * How far the marker reaches from its point along the line, name included,
+   * in CSS pixels: the button's width, which is laid out even while its name is
+   * faded, so the connector can ask before the name is ever shown.
+   */
+  extent(): number {
+    return this.partNamed('marker')?.getBoundingClientRect().width ?? 0
   }
 
   /** Focuses the button rather than the host, which draws no box of its own. */
