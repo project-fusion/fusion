@@ -93,6 +93,17 @@
   position: sticky;
 }
 
+/* **The scrollbar `helix-scroll-area` draws**, thin with a thumb in the
+   border color and no track, rather than the platform's, whose gray track stood
+   down the edge in dark mode. The recipe and not the component: the nav's own
+   tree is its tab stop, and a scroll area that overflows adds one of its own in
+   front of it that does nothing a reader wants. */
+.docsNav,
+.docsRail {
+  scrollbar-color: var(--helix-color-border) transparent;
+  scrollbar-width: thin;
+}
+
 .docsRailTitle {
   display: block;
   padding-block-end: var(--helix-space-xs);
