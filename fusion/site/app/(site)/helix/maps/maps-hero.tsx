@@ -11,8 +11,13 @@ import { stageAppearance } from '@/content/verticals/verticals'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './maps.module.css'
 
-/** Brands to try, picked to be far apart on the wheel rather than pretty together. */
+/**
+ * Brands to try, picked to be far apart on the wheel rather than pretty
+ * together, and a gray first: the map with no brand in it at all, which is
+ * the one a reader comparing the others needs to compare them against.
+ */
 const BRANDS = [
+  { hex: '#71717a', name: 'Neutral' },
   { hex: '#0d9488', name: 'Teal' },
   { hex: '#7c3aed', name: 'Violet' },
   { hex: '#e4572e', name: 'Coral' },
