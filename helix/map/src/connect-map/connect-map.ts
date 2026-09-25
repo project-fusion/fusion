@@ -29,8 +29,18 @@ export interface MapDriver {
    * the tab order while connected so the frame's region is the one stop.
    */
   focusTarget?(): HTMLElement | null
+  /**
+   * Hears the view move, every frame it moves, and returns what stops it. What
+   * lets markers keep up with the map; without it they are placed once.
+   */
+  onView?(moved: () => void): () => void
   /** Moves the view by this many CSS pixels, right and down positive. */
   panBy(x: number, y: number, animate: boolean): void
+  /**
+   * Where a place falls in the map's box, in CSS pixels from its top left.
+   * Without it markers cannot be placed, and the connector leaves them hidden.
+   */
+  project?(place: MapPlace): { x: number; y: number }
   /**
    * Takes off the renderer's own zoom buttons, which the frame's replace, and
    * returns what puts them back. Asked only where the frame draws its own.
@@ -41,9 +51,27 @@ export interface MapDriver {
    * back to how it was.
    */
   silenceKeyboard?(): () => void
+  /** Brings a place to the middle of the view, at its zoom where it has one. */
+  show?(place: MapPlace & { zoom?: number | undefined }, animate: boolean): void
   /** Zooms one step in, `1`, or out, `-1`, by whatever a step is to this renderer. */
   zoomBy(direction: 1 | -1, animate: boolean): void
 }
+
+/** A place, in degrees. */
+export interface MapPlace {
+  lat: number
+  lng: number
+}
+
+/** What the connector reads off a marker, which is all it needs of one. */
+interface Marker extends HTMLElement {
+  isMapMarker: true
+  lat?: number | undefined
+  lng?: number | undefined
+}
+
+const isMarker = (node: unknown): node is Marker =>
+  (node as Partial<Marker> | null)?.isMapMarker === true
 
 /** How a connection is made, where the defaults are not wanted. */
 export interface ConnectOptions {
@@ -90,7 +118,9 @@ const viewportOf = (frame: HTMLElement): { width: number; height: number } => {
  * silenced and its canvas taken out of the tab order, so a reader meets one
  * named stop and one set of keys rather than the frame and an unnamed canvas
  * that answers differently; the renderer's own zoom buttons taken off where
- * the frame draws its own; and the renderer's credit written into the frame's
+ * the frame draws its own; the frame's markers stood on their places as the
+ * view moves, and brought into view as the keyboard reaches them; and the
+ * renderer's credit written into the frame's
  * `attribution` slot as text and links, kept current as its sources change.
  *
  * The frame is `helix-map` or `helix-headless-map`, and the driver is
@@ -176,8 +206,67 @@ export const connectMap = (
     writeCredit()
   }
 
+  /* **Markers, stood on their places every time the view moves.** Written as
+     custom properties on each marker, which its stylesheet reads, the way a
+     canvas places its cards. A marker off the edge is still placed and the
+     viewport clips it, so one scrolled back into view is already there. */
+  const markers = (): Marker[] => [...frame.children].filter(isMarker)
+  const place = (): void => {
+    if (!driver.project) {
+      return
+    }
+    for (const marker of markers()) {
+      if (typeof marker.lat !== 'number' || typeof marker.lng !== 'number') {
+        continue
+      }
+      const at = driver.project({ lat: marker.lat, lng: marker.lng })
+      marker.style.setProperty('--_map-marker-x', `${at.x}px`)
+      marker.style.setProperty('--_map-marker-y', `${at.y}px`)
+    }
+  }
+  const stopViewing = driver.onView?.(place)
+  /* A marker added, taken away or moved, which only the attributes say: a
+     marker reflects its coordinates for this reason. Two observers, because
+     one option set covers both: the frame's own children for markers coming
+     and going, and every descendant for a coordinate, which only a marker
+     has. `childList` over the whole subtree would hear the renderer rebuild
+     its own controls inside the map and place every marker for it. */
+  const layers = new MutationObserver(place)
+  layers.observe(frame, { childList: true })
+  const coordinates = new MutationObserver(place)
+  coordinates.observe(frame, { attributeFilter: ['lat', 'lng'], attributes: true, subtree: true })
+  place()
+
+  /* **A marker the keyboard reaches is a marker in view.** The walk goes in
+     the order the page wrote, which is not the order of the screen, so the
+     next place is often off the edge; a reader arriving at a place they
+     cannot see is a reader told where they are and shown somewhere else. */
+  const reveal = (event: FocusEvent): void => {
+    const marker = event.composedPath().find(isMarker)
+    if (!marker || !driver.project || !driver.show) {
+      return
+    }
+    if (typeof marker.lat !== 'number' || typeof marker.lng !== 'number') {
+      return
+    }
+    const at = driver.project({ lat: marker.lat, lng: marker.lng })
+    const { height, width } = viewportOf(frame)
+    if (at.x < 0 || at.y < 0 || at.x > width || at.y > height) {
+      driver.show({ lat: marker.lat, lng: marker.lng }, !still())
+    }
+  }
+  frame.addEventListener('focusin', reveal)
+
   return {
     disconnect(): void {
+      stopViewing?.()
+      layers.disconnect()
+      coordinates.disconnect()
+      frame.removeEventListener('focusin', reveal)
+      for (const marker of markers()) {
+        marker.style.removeProperty('--_map-marker-x')
+        marker.style.removeProperty('--_map-marker-y')
+      }
       frame.removeEventListener(HelixMapPanEvent.eventName, handlePan)
       frame.removeEventListener(HelixMapZoomEvent.eventName, handleZoom)
       restoreKeyboard?.()

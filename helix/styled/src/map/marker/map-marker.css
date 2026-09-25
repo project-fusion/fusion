@@ -1,0 +1,111 @@
+/* **A point with no box of its own**, stood on the place by the connector,
+   which writes where that is as `--_map-marker-x` and `--_map-marker-y` every
+   time the view moves. Zero by zero, so the frame lays nothing out for it and
+   the button is centered on the point it names. **`left` and not
+   `inset-inline-start`**: the renderer measures from the left whatever the
+   page's direction, so a right-to-left page would put every place in its
+   mirror image. */
+:host {
+  --_map-marker-color: var(--map-marker-color, var(--helix-color-primary));
+  /* **Declared here and written by the connector**, onto the host, which is
+     what makes them readable below: the connector lives in another package
+     and writes the place's screen position every time the view moves. Zero is
+     where an unplaced marker would sit, which the rule after this hides. */
+  --_map-marker-x: 0px;
+  --_map-marker-y: 0px;
+  block-size: 0;
+  display: block;
+  inline-size: 0;
+  inset-block-start: var(--_map-marker-y);
+  left: var(--_map-marker-x);
+  position: absolute;
+}
+
+/* Not yet placed, which is a marker the connector has not reached: drawn at
+   the corner it would be a place in the wrong place. */
+:host(:not([style*="--_map-marker-x"])) {
+  visibility: hidden;
+}
+
+[part="marker"] {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: var(--helix-space-xs);
+  left: 0;
+  outline: none;
+  position: absolute;
+  top: 0;
+  transform: translate(calc(var(--map-marker-size, 0.875rem) / -2), -50%);
+}
+
+[part="point"] {
+  background: var(--_map-marker-color);
+  block-size: var(--map-marker-size, 0.875rem);
+  border: var(--helix-border-thick) solid var(--helix-color-surface);
+  border-radius: var(--helix-radii-full);
+  box-shadow: var(--helix-shadow-sm);
+  box-sizing: border-box;
+  flex: none;
+  inline-size: var(--map-marker-size, 0.875rem);
+  transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* The name beside the point, shown while the marker is pointed at or focused.
+   **Hidden by opacity and never by `display`**: it is the button's name, and a
+   name taken out of the tree is a button a screen reader calls "button". */
+[part="label"] {
+  background: var(--helix-color-surface);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-sm);
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  opacity: 0;
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  pointer-events: none;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  white-space: nowrap;
+}
+
+:host(:hover) [part="label"],
+[part="marker"]:focus-visible [part="label"] {
+  opacity: 1;
+}
+
+:host(:hover) [part="point"],
+[part="marker"]:focus-visible [part="point"] {
+  transform: scale(1.25);
+}
+
+[part="marker"]:focus-visible [part="point"] {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+:host([tone="accent"]) {
+  --_map-marker-color: var(--helix-color-accent);
+}
+:host([tone="danger"]) {
+  --_map-marker-color: var(--helix-color-danger);
+}
+:host([tone="info"]) {
+  --_map-marker-color: var(--helix-color-info);
+}
+:host([tone="neutral"]) {
+  --_map-marker-color: var(--helix-color-foreground-muted);
+}
+:host([tone="success"]) {
+  --_map-marker-color: var(--helix-color-success);
+}
+:host([tone="warning"]) {
+  --_map-marker-color: var(--helix-color-warning);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="label"],
+  [part="point"] {
+    transition: none;
+  }
+}

@@ -243,3 +243,103 @@ describe('connectMap', () => {
     expect(credit(host)).toBeNull()
   })
 })
+
+/** A driver that projects a degree to ten pixels and can be told the view moved. */
+const projecting = (): {
+  driver: MapDriver
+  moved: () => void
+  shown: string[]
+} => {
+  const shown: string[] = []
+  let heard = (): void => undefined
+  let offset = 0
+  const driver: MapDriver = {
+    onView: (moved) => {
+      heard = moved
+      return () => {
+        heard = () => undefined
+      }
+    },
+    panBy: () => {},
+    project: ({ lat, lng }) => ({ x: lng * 10 + offset, y: lat * 10 }),
+    show: ({ lat, lng }, animate) => {
+      shown.push(`${lat},${lng} ${animate}`)
+    },
+    zoomBy: () => {},
+  }
+  return {
+    driver,
+    moved: () => {
+      offset += 5
+      heard()
+    },
+    shown,
+  }
+}
+
+const settle = (): Promise<void> => new Promise((done) => setTimeout(done, 0))
+
+describe('connectMap with markers', () => {
+  test('each marker is stood on its place, and moves with the view', async () => {
+    const host = await frame(
+      '<helix-headless-map-marker label="Depot" lat="2" lng="3"></helix-headless-map-marker>',
+    )
+    const marker = host.querySelector('helix-headless-map-marker') as HTMLElement
+    const { driver, moved } = projecting()
+    connectMap(host, driver)
+    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('30px')
+    expect(marker.style.getPropertyValue('--_map-marker-y')).toBe('20px')
+    moved()
+    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('35px')
+  })
+
+  test('a marker added or moved later is placed too', async () => {
+    const host = await frame()
+    const { driver } = projecting()
+    connectMap(host, driver)
+    const marker = document.createElement('helix-headless-map-marker')
+    marker.setAttribute('lat', '1')
+    marker.setAttribute('lng', '1')
+    host.append(marker)
+    await settle()
+    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('10px')
+    marker.setAttribute('lng', '4')
+    await settle()
+    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('40px')
+  })
+
+  test('a marker with no place is left unplaced, which its sheet hides', async () => {
+    const host = await frame(
+      '<helix-headless-map-marker label="Nowhere"></helix-headless-map-marker>',
+    )
+    const { driver } = projecting()
+    connectMap(host, driver)
+    const marker = host.querySelector('helix-headless-map-marker') as HTMLElement
+    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('')
+  })
+
+  test('a marker the keyboard reaches off the edge is brought into view, and one in view is not', async () => {
+    const host = await frame(
+      `<helix-headless-map-marker label="Near" lat="1" lng="1"></helix-headless-map-marker>
+       <helix-headless-map-marker label="Far" lat="1" lng="90"></helix-headless-map-marker>`,
+    )
+    const { driver, shown } = projecting()
+    connectMap(host, driver)
+    const [near, far] = [...host.querySelectorAll('helix-headless-map-marker')] as HTMLElement[]
+    near?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    far?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    expect(shown).toEqual(['1,90 true'])
+  })
+
+  test('disconnecting takes the places off the markers and stops listening', async () => {
+    const host = await frame(
+      '<helix-headless-map-marker label="Depot" lat="2" lng="3"></helix-headless-map-marker>',
+    )
+    const marker = host.querySelector('helix-headless-map-marker') as HTMLElement
+    const { driver, moved } = projecting()
+    connectMap(host, driver).disconnect()
+    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('')
+    moved()
+    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('')
+  })
+})
