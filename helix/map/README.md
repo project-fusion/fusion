@@ -42,6 +42,29 @@ that differs and nothing else:
 | `credit` | `true` | `false` leaves the slot to the page |
 | `keyboard` | `'frame'` | `'renderer'` keeps the renderer's keys and tab stop, for a 3D view that wants its rotate and pitch |
 
+## Places on the map
+
+```html
+<helix-map label="Deliveries today">
+  <div id="map"></div>
+  <helix-map-marker label="Depot" lat="37.7955" lng="-122.3937"></helix-map-marker>
+  <helix-map-marker label="Mission Dolores" lat="37.7644" lng="-122.427"></helix-map-marker>
+</helix-map>
+```
+
+A `helix-map-marker` is a named button in the frame, drawn by Helix in the
+page's theme rather than by the renderer. **Only the renderer knows where a
+place falls on the screen**, so `connectMap` asks the driver to project each
+marker and stands it there, again every time the view moves and whenever a
+page adds a marker or changes its `lat` or `lng`. A marker the connector has
+not placed stays hidden rather than drawn in the corner.
+
+The markers share one tab stop, and the arrow keys walk them in the order they
+are written. A marker that takes focus outside the view is brought into it, so
+a reader walking the places never lands on one they cannot see. Pressing one
+sends `helix-activate` from the frame with its `name`, or its `label` where it
+has none, and what happens then is the page's.
+
 ## A style in the page's theme
 
 ```js
@@ -83,7 +106,10 @@ its driver hides it while connected; make the map with
 
 A driver of your own is an object with `panBy(x, y, animate)` in pixels and
 `zoomBy(direction, animate)`, and optionally `silenceKeyboard`, `focusTarget`,
-`replaceZoom` and `credits`: see `MapDriver`.
+`replaceZoom` and `credits`: see `MapDriver`. Markers need three more:
+`project(place)` to a point in the map's container, `onView(moved)` to hear the
+view change, and `show(place, animate)` to bring a place into view. A driver
+without `project` leaves its markers hidden.
 
 ## Working on it
 

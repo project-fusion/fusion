@@ -21,8 +21,9 @@
   position: relative;
 }
 
-/* Whatever was slotted fills the box it was given. */
-[part="viewport"] ::slotted(*) {
+/* Whatever was slotted fills the box it was given, but for the markers, which
+   stand on their places over it and take no box at all. */
+[part="viewport"] ::slotted(:not(helix-map-marker)) {
   block-size: 100%;
   inline-size: 100%;
 }

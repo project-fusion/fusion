@@ -12,7 +12,7 @@ beforeAll(() => {
  */
 const stand = (): {
   asked: string[]
-  fire(type: 'sourcedata' | 'styledata'): void
+  fire(type: 'move' | 'resize' | 'sourcedata' | 'styledata'): void
   map: MapLibreMap
   sources: Record<string, { attribution?: string }>
 } => {
@@ -24,10 +24,16 @@ const stand = (): {
   const sources: Record<string, { attribution?: string }> = {}
   let keys = true
   const map: MapLibreMap = {
+    easeTo: ({ center, zoom }) => {
+      asked.push(`easeTo ${center.join(',')} ${zoom}`)
+    },
     getCanvas: () => canvas,
     getContainer: () => container,
     getSource: (id) => sources[id],
     getStyle: () => ({ sources }),
+    jumpTo: ({ center, zoom }) => {
+      asked.push(`jumpTo ${center.join(',')} ${zoom}`)
+    },
     keyboard: {
       disable: () => {
         keys = false
@@ -44,6 +50,8 @@ const stand = (): {
     panBy: ([x, y], options) => {
       asked.push(`panBy ${x} ${y} ${options?.animate}`)
     },
+    // Ten pixels a degree from the origin, which is enough to tell the axes apart.
+    project: ([lng, lat]) => ({ x: lng * 10, y: -lat * 10 }),
     zoomIn: (options) => {
       asked.push(`zoomIn ${options?.animate}`)
     },
@@ -51,7 +59,7 @@ const stand = (): {
       asked.push(`zoomOut ${options?.animate}`)
     },
   }
-  const fire = (type: 'sourcedata' | 'styledata'): void => {
+  const fire = (type: 'move' | 'resize' | 'sourcedata' | 'styledata'): void => {
     for (const listener of listeners.get(type) ?? []) {
       listener()
     }
@@ -79,6 +87,32 @@ describe('mapLibreDriver', () => {
     map.keyboard.disable()
     mapLibreDriver(map).silenceKeyboard?.()?.()
     expect(map.keyboard.isEnabled()).toBe(false)
+  })
+
+  test('a place is where MapLibre projects it, longitude first as MapLibre takes it', () => {
+    const { map } = stand()
+    expect(mapLibreDriver(map).project?.({ lat: 2, lng: 3 })).toEqual({ x: 30, y: -20 })
+  })
+
+  test('showing a place glides, or jumps where the reader asked for less motion', () => {
+    const { asked, map } = stand()
+    const driver = mapLibreDriver(map)
+    driver.show?.({ lat: 2, lng: 3, zoom: 14 }, true)
+    driver.show?.({ lat: 2, lng: 3 }, false)
+    expect(asked).toEqual(['easeTo 3,2 14', 'jumpTo 3,2 undefined'])
+  })
+
+  test('the view moving is heard until it is told to stop', () => {
+    const { fire, map } = stand()
+    let heard = 0
+    const stop = mapLibreDriver(map).onView?.(() => {
+      heard += 1
+    })
+    fire('move')
+    fire('resize')
+    stop?.()
+    fire('move')
+    expect(heard).toBe(2)
   })
 
   test('the canvas is what it takes out of the tab order', () => {

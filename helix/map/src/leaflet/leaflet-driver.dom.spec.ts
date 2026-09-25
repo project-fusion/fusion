@@ -46,12 +46,16 @@ const stand = (
             },
             enabled: () => keys,
           },
+    latLngToContainerPoint: ([lat, lng]) => ({ x: lng * 10, y: -lat * 10 }),
     off: (_type, listener) => listeners.delete(listener),
     on: (_type, listener) => {
       listeners.add(listener)
     },
     panBy: ([x, y], panned) => {
       asked.push(`panBy ${x} ${y} ${panned?.animate}`)
+    },
+    setView: ([lat, lng], zoom, viewed) => {
+      asked.push(`setView ${lat},${lng} ${zoom} ${viewed?.animate}`)
     },
     zoomControl: {
       remove: () => {
@@ -100,6 +104,31 @@ describe('leafletDriver', () => {
     expect(asked).toEqual(['remove zoom'])
     restore?.()
     expect(asked).toEqual(['remove zoom', 'addControl'])
+  })
+
+  test('a place is where Leaflet puts it, latitude first as Leaflet takes it', () => {
+    const { map } = stand()
+    expect(leafletDriver(map).project?.({ lat: 2, lng: 3 })).toEqual({ x: 30, y: -20 })
+  })
+
+  test('showing a place is setView, animated or not as the reader asked', () => {
+    const { asked, map } = stand()
+    const driver = leafletDriver(map)
+    driver.show?.({ lat: 2, lng: 3, zoom: 14 }, true)
+    driver.show?.({ lat: 2, lng: 3 }, false)
+    expect(asked).toEqual(['setView 2,3 14 true', 'setView 2,3 undefined false'])
+  })
+
+  test('the view moving is heard until it is told to stop', () => {
+    const { fire, map } = stand()
+    let heard = 0
+    const stop = leafletDriver(map).onView?.(() => {
+      heard += 1
+    })
+    fire()
+    stop?.()
+    fire()
+    expect(heard).toBe(1)
   })
 
   test('the container is what it takes out of the tab order', () => {
