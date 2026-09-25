@@ -1,0 +1,22 @@
+/* The Maps page: the same band of air as a vertical's page, and a map the
+   width of the column rather than a thumbnail of one. */
+
+.mapsShell {
+  padding-block: var(--site-band);
+}
+
+.mapsLede {
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  max-inline-size: 68ch;
+}
+
+/* Tall enough to read a city at, and never taller than the window: a map
+   that runs past the fold is one a reader scrolls rather than pans. */
+.mapsFrame {
+  --map-block-size: min(36rem, 70svh);
+}
+
+.mapsCanvas {
+  block-size: 100%;
+  inline-size: 100%;
+}

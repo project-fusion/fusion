@@ -26,13 +26,15 @@
     "wasm-copy": "bun scripts/copy-wasm.mjs"
   },
   "dependencies": {
-    "@fusion.dev/insights": "workspace:*",
+    "@fusion.dev/helix": "workspace:*",
     "@fusion.dev/helix-docs": "workspace:*",
     "@fusion.dev/helix-gallery": "workspace:*",
+    "@fusion.dev/helix-map": "workspace:*",
     "@fusion.dev/helix-sandbox": "workspace:*",
     "@fusion.dev/helix-styles": "workspace:*",
     "@fusion.dev/helix-theme": "workspace:*",
-    "@fusion.dev/helix": "workspace:*",
+    "@fusion.dev/insights": "workspace:*",
+    "maplibre-gl": "^5.6.0",
     "next": "^16.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
