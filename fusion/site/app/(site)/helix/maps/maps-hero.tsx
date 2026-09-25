@@ -27,15 +27,18 @@ const BRANDS = [
 
 /**
  * Places on the opening view, in the order a reader walks them with the arrow
- * keys: along the waterfront and back through the middle of the city, which is
- * an order someone could follow on foot rather than one sorted by name.
+ * keys: down from the university through downtown to the river, then west
+ * along it to the springs, which is an order someone could follow on foot
+ * rather than one sorted by name. Coordinates are OpenStreetMap's.
  */
 const PLACES = [
-  { label: 'Palace of Fine Arts', lat: 37.8029, lng: -122.4484 },
-  { label: 'Coit Tower', lat: 37.8024, lng: -122.4058 },
-  { label: 'Ferry Building', lat: 37.7955, lng: -122.3937 },
-  { label: 'Mission Dolores', lat: 37.7644, lng: -122.427 },
-  { label: 'Twin Peaks', lat: 37.7544, lng: -122.4477 },
+  { label: 'UT Tower', lat: 30.28607, lng: -97.73935 },
+  { label: 'Texas Capitol', lat: 30.27469, lng: -97.74051 },
+  { label: 'Franklin Barbecue', lat: 30.27014, lng: -97.73128 },
+  { label: 'Rainey Street', lat: 30.259, lng: -97.73869 },
+  { label: 'Congress Avenue Bridge', lat: 30.26139, lng: -97.74529 },
+  { label: 'Terry Black’s Barbecue', lat: 30.25976, lng: -97.75487 },
+  { label: 'Barton Springs Pool', lat: 30.26384, lng: -97.77014 },
 ] as const
 
 type Mode = 'site' | 'light' | 'dark'
@@ -50,7 +53,9 @@ const BOUNDS: [[number, number], [number, number]] = [
  * The part of the map a reader can see, as camera padding: where the panel
  * lies over it, the camera frames the places beside the panel rather than
  * under it, where a marker could take focus with nobody able to see it. The
- * right is wider for the frame's own controls in that corner.
+ * top is deeper for the frame's own controls: they sit in its top corner, and
+ * a band over them costs a phone much less of the map than a column beside
+ * them would.
  */
 const clearOf = (
   frame: Element,
@@ -68,8 +73,8 @@ const clearOf = (
   return {
     bottom: edge,
     left: covers ? over.right - room.left + edge : edge,
-    right: edge * 3,
-    top: edge,
+    right: edge,
+    top: edge * 3,
   }
 }
 
@@ -152,6 +157,11 @@ export function MapsHero() {
         container: box,
         fitBoundsOptions: { padding: clearOf(box, panel.current) },
         style: mapLibreStyle(colors, { language }) as never,
+      })
+      /* Framed again once it has drawn: the page is still settling the map's
+         height when it is made, and a resize keeps the center, not the fit. */
+      map.once('load', () => {
+        map.fitBounds(BOUNDS, { animate: false, padding: clearOf(box, panel.current) })
       })
       const connection = connectMap(host, mapLibreDriver(map))
       /* Pressing a place is the page's to answer, and this one goes there.
@@ -243,11 +253,7 @@ export function MapsHero() {
 
   return (
     <div className={styles.mapsHero} ref={scope}>
-      <helix-map
-        class={styles.mapsHeroFrame}
-        label="San Francisco, drawn in this theme"
-        ref={frame}
-      >
+      <helix-map class={styles.mapsHeroFrame} label="Austin, drawn in this theme" ref={frame}>
         <div className={styles.mapsCanvas} ref={container} />
         {PLACES.map((place) => (
           <helix-map-marker key={place.label} label={place.label} lat={place.lat} lng={place.lng} />
