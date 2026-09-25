@@ -773,7 +773,12 @@ function MapPage(context: Context) {
       </helix-flex>
 
       <div className="themedMapStage">
-        <helix-map className="themedMapFrame" data-preview-map label={map.label}>
+        {/* **Glass wherever something lies over the map**: the controls, the
+            names and the panel. The map is the one busy ground in the
+            preview, so it is where a theme's blur and translucency can be
+            judged rather than seen over a flat page, where glass is only a
+            slightly different gray. */}
+        <helix-map className="themedMapFrame" data-preview-map label={map.label} material="glass">
           <div className="themedMapCanvas" data-preview-map-canvas></div>
           {map.places.map((place) => (
             <helix-map-marker
@@ -781,6 +786,7 @@ function MapPage(context: Context) {
               label={place.label}
               lat={place.lat}
               lng={place.lng}
+              material="glass"
               name={place.detail}
               tone={place.state}
             ></helix-map-marker>

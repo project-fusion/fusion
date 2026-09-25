@@ -2,7 +2,7 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { HelixActivateEvent, HelixMap } from '@fusion.dev/helix'
-import { connectMap, mapColorsFrom } from '@fusion.dev/helix-map'
+import { connectMap, mapColorsFrom, motionOf } from '@fusion.dev/helix-map'
 import { mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { useEffect, useRef, useState } from 'react'
@@ -99,6 +99,11 @@ export function MapsHero({
   const container = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const engine = useRef<Promise<ThemeEngine> | null>(null)
+  /* **The contrast the labels are held to**: a sent theme's own target while
+     it is the one chosen, and the compiler's default otherwise. A ref rather
+     than state, because the map reads it when it restyles and a render would
+     only rebuild a map that restyles itself. */
+  const labels = useRef<number | undefined>(sent?.settings.contrastTarget)
   const [brand, setBrand] = useState<string | null>(sent ? YOURS : null)
   const [mode, setMode] = useState<Mode>(sent?.settings.scheme ?? 'site')
   const [home, setHome] = useState<string>('')
@@ -124,12 +129,13 @@ export function MapsHero({
       }
       const language = document.documentElement.lang || 'en'
       let colors = mapColorsFrom(host)
+      let contrast = labels.current
       const map = new maplibregl.Map({
         attributionControl: false,
         bounds: BOUNDS,
         container: box,
         fitBoundsOptions: { padding: clearOf(box, panel.current) },
-        style: mapLibreStyle(colors, { language }) as never,
+        style: mapLibreStyle(colors, { contrast: labels.current, language }) as never,
       })
       /* Framed again once it has drawn: the page is still settling the map's
          height when it is made, and a resize keeps the center, not the fit. */
@@ -137,16 +143,19 @@ export function MapsHero({
         map.fitBounds(BOUNDS, { animate: false, padding: clearOf(box, panel.current) })
       })
       const connection = connectMap(host, mapLibreDriver(map))
-      /* Pressing a place is the page's to answer, and this one goes there.
-         MapLibre already skips the glide for a reader who asked for less
-         motion, since the move is not marked essential. */
+      /* Pressing a place is the page's to answer, and this one goes there, at
+         the theme's own pace for a travel: its slow duration and emphasized
+         curve, and a jump where the reader asked for less motion or the
+         theme's durations are zero. */
       const visit = (event: HelixActivateEvent): void => {
         const place = PLACES.find((one) => one.label === event.detail.value)
         if (place) {
+          const motion = motionOf(host, 'travel')
           map.easeTo({
             center: [place.lng, place.lat],
             padding: clearOf(box, panel.current),
             zoom: 15,
+            ...(motion ? { duration: motion.duration, easing: motion.easing } : { duration: 0 }),
           })
         }
       }
@@ -156,9 +165,10 @@ export function MapsHero({
         cancelAnimationFrame(pending)
         pending = requestAnimationFrame(() => {
           const next = mapColorsFrom(host)
-          if (!sameColors(colors, next)) {
+          if (!sameColors(colors, next) || contrast !== labels.current) {
             colors = next
-            map.setStyle(mapLibreStyle(colors, { language }) as never, { diff: true })
+            contrast = labels.current
+            map.setStyle(mapLibreStyle(colors, { contrast, language }) as never, { diff: true })
           }
         })
       }
@@ -218,6 +228,7 @@ export function MapsHero({
          at the root a re-derivation here would override. */
       node.toggleAttribute('data-helix-theme', Object.keys(values).length > 0)
     }
+    labels.current = brand === YOURS && sent ? sent.settings.contrastTarget : undefined
     const intent =
       brand === YOURS && sent ? mapIntent(sent.settings, scheme) : brand ? { brand, scheme } : null
     if (!intent) {
