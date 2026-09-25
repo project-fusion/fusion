@@ -124,9 +124,14 @@ fieldset.mapsControl {
     flex-direction: column-reverse;
   }
 
+  /* The scope's own page rather than none: with none, a scope in the other
+     scheme from the site drew its text over the site's page, dark ink on a
+     dark page or light on light. Following the site, this is the same color
+     as the page around it. */
   .mapsPanel {
-    background: none;
+    background: var(--helix-color-background);
     border: 0;
+    border-radius: 0;
     box-shadow: none;
     inline-size: auto;
     padding: var(--site-band) var(--site-inset) var(--helix-space-lg);

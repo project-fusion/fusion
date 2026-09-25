@@ -10,6 +10,7 @@ import { MAPS } from '@/content/maps/maps'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './maps.module.css'
+import { mapIntent, propertiesOf, type SentTheme } from './maps-theme'
 
 /**
  * Brands to try, picked to be far apart on the wheel rather than pretty
@@ -42,6 +43,9 @@ const PLACES = [
 ] as const
 
 type Mode = 'site' | 'light' | 'dark'
+
+/** The brand choice that is a whole theme from the builder rather than a color. */
+const YOURS = 'yours'
 
 /** The places' corners, west-south then east-north, as MapLibre takes a bounds. */
 const BOUNDS: [[number, number], [number, number]] = [
@@ -120,14 +124,22 @@ const siteScheme = (): 'dark' | 'light' => {
  * site's colors around a map in someone else's. The map hears it the way it
  * hears the site's own theme change: its ancestors' styles moved.
  */
-export function MapsHero() {
+export function MapsHero({
+  painted,
+  sent,
+}: {
+  /** The sent theme as the server derived it, so it is in the first paint. */
+  painted?: Record<string, string>
+  /** A theme the builder sent, which the page opens in. */
+  sent?: SentTheme
+}) {
   const scope = useRef<HTMLDivElement>(null)
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const engine = useRef<Promise<ThemeEngine> | null>(null)
-  const [brand, setBrand] = useState<string | null>(null)
-  const [mode, setMode] = useState<Mode>('site')
+  const [brand, setBrand] = useState<string | null>(sent ? YOURS : null)
+  const [mode, setMode] = useState<Mode>(sent?.settings.scheme ?? 'site')
   const [home, setHome] = useState<string>('')
 
   useEffect(() => {
@@ -216,43 +228,64 @@ export function MapsHero() {
     }
   }, [])
 
-  /* The scope, painted from the controls: nothing where both follow the site. */
+  /* The scope, painted from the controls: nothing where both follow the site.
+     **Swapped in one step, once the new values exist**, rather than cleared and
+     repainted: the engine loads asynchronously, and clearing first showed the
+     site's theme for a moment between any two choices, and on arrival between
+     the server's paint of a sent theme and the same values derived again. */
   useEffect(() => {
     const node = scope.current
     if (!node) {
       return
     }
-    for (const name of [...node.style]) {
-      if (name.startsWith('--helix-')) {
-        node.style.removeProperty(name)
-      }
-    }
     const scheme = mode === 'site' ? siteScheme() : mode
     node.style.colorScheme = mode === 'site' ? '' : scheme
-    if (!brand) {
+    const paint = (values: Record<string, string>): void => {
+      for (const name of [...node.style]) {
+        if (name.startsWith('--helix-') && !(name in values)) {
+          node.style.removeProperty(name)
+        }
+      }
+      for (const [name, value] of Object.entries(values)) {
+        node.style.setProperty(name, value)
+      }
+      /* **Marked as a theme, or the seeds are read by nothing.** The radii,
+         the spacing and the series colors are derived from the seeds by
+         `helix/styles` wherever `data-helix-theme` is, and only there: painted
+         on an unmarked scope they sat unread and a sent radius of 90 still
+         drew 4px corners. Unmarked when following the site, whose own values
+         at the root a re-derivation here would override. */
+      node.toggleAttribute('data-helix-theme', Object.keys(values).length > 0)
+    }
+    const intent =
+      brand === YOURS && sent ? mapIntent(sent.settings, scheme) : brand ? { brand, scheme } : null
+    if (!intent) {
+      paint({})
       return
     }
     let live = true
     engine.current ??= initTheme(THEME_ENGINE)
     void engine.current.then((loaded) => {
-      if (!live) {
-        return
-      }
-      const theme = loaded.derive({ brand, scheme })
-      for (const token of theme.tokens) {
-        node.style.setProperty(`--helix-${token.name}`, token.hex)
-      }
-      for (const [name, value] of Object.entries(theme.seeds)) {
-        node.style.setProperty(`--helix-${name}`, value)
+      if (live) {
+        paint(propertiesOf(loaded.derive(intent)))
       }
     })
     return () => {
       live = false
     }
-  }, [brand, mode])
+  }, [brand, mode, sent])
 
   return (
-    <div className={styles.mapsHero} ref={scope}>
+    <div
+      className={styles.mapsHero}
+      data-helix-theme={painted && sent ? '' : undefined}
+      ref={scope}
+      style={
+        painted && sent
+          ? ({ ...painted, colorScheme: sent.settings.scheme } as React.CSSProperties)
+          : undefined
+      }
+    >
       <helix-map class={styles.mapsHeroFrame} label="Austin, drawn in this theme" ref={frame}>
         <div className={styles.mapsCanvas} ref={container} />
         {PLACES.map((place) => (
@@ -272,6 +305,16 @@ export function MapsHero() {
           <fieldset className={styles.mapsControl}>
             <legend className={styles.mapsLegend}>Brand</legend>
             <div className={styles.mapsSwatches}>
+              {sent ? (
+                <button
+                  aria-label="Your theme, from the theme builder"
+                  aria-pressed={brand === YOURS}
+                  className={styles.mapsSwatch}
+                  onClick={() => setBrand(YOURS)}
+                  style={{ '--swatch': sent.settings.brand } as React.CSSProperties}
+                  type="button"
+                />
+              ) : null}
               <button
                 aria-label="This site's brand"
                 aria-pressed={brand === null}
@@ -305,6 +348,16 @@ export function MapsHero() {
             </helix-toggle-group>
           </div>
         </div>
+        {/* What the first swatch is, in words: a color alone does not say it is
+            a whole theme, or where it came from, or that there is a way back. */}
+        {sent ? (
+          <helix-text variant="caption">
+            Opened with your theme from the builder.{' '}
+            <a data-link="true" href={`/helix/theme?${sent.query}`}>
+              Back to the theme builder
+            </a>
+          </helix-text>
+        ) : null}
         {MAPS.blocks[0]?.body?.map((line) => (
           <helix-text emphasis="subtle" key={line} variant="caption">
             {line}
