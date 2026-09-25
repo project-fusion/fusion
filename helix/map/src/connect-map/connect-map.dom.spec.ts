@@ -1,5 +1,6 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import type { MapMotion } from '../motion/motion.js'
 import type { MapDriver } from './connect-map.js'
 
 /* Imported after the DOM is registered, like the elements: the connector
@@ -25,12 +26,17 @@ interface Recording {
   credits: string[]
   changed?: () => void
   keyboard: boolean
+  /** Every motion a pan was handed, for a spec that reads the curve. */
+  motions: (MapMotion | null)[]
   stopped: boolean
 }
 
+/** A motion as a word: its duration, or a jump where there is none. */
+const paced = (motion: MapMotion | null): string => (motion ? `${motion.duration}ms` : 'jump')
+
 /** A driver that writes down what it is asked rather than moving anything. */
 const recorder = (target?: HTMLElement): { driver: MapDriver; seen: Recording } => {
-  const seen: Recording = { calls: [], credits: [], keyboard: true, stopped: false }
+  const seen: Recording = { calls: [], credits: [], keyboard: true, motions: [], stopped: false }
   const driver: MapDriver = {
     credits(changed) {
       seen.changed = changed
@@ -42,8 +48,9 @@ const recorder = (target?: HTMLElement): { driver: MapDriver; seen: Recording } 
       }
     },
     focusTarget: () => target ?? null,
-    panBy: (x, y, animate) => {
-      seen.calls.push(`pan ${x} ${y} ${animate}`)
+    panBy: (x, y, motion) => {
+      seen.calls.push(`pan ${x} ${y} ${paced(motion)}`)
+      seen.motions.push(motion)
     },
     replaceZoom: () => {
       seen.calls.push('replace zoom')
@@ -57,8 +64,8 @@ const recorder = (target?: HTMLElement): { driver: MapDriver; seen: Recording } 
         seen.keyboard = true
       }
     },
-    zoomBy: (direction, animate) => {
-      seen.calls.push(`zoom ${direction} ${animate}`)
+    zoomBy: (direction, motion) => {
+      seen.calls.push(`zoom ${direction} ${paced(motion)}`)
     },
   }
   return { driver, seen }
@@ -92,10 +99,10 @@ describe('connectMap', () => {
     // A quarter of the viewport: of its width across, of its height down.
     expect(seen.calls).toEqual([
       'replace zoom',
-      'pan 100 0 true',
-      'pan -100 0 true',
-      'pan 0 -50 true',
-      'pan 0 50 true',
+      'pan 100 0 200ms',
+      'pan -100 0 200ms',
+      'pan 0 -50 200ms',
+      'pan 0 50 200ms',
     ])
   })
 
@@ -106,7 +113,7 @@ describe('connectMap', () => {
     connectMap(host, driver)
     host.pan('end')
     host.pan('start')
-    expect(seen.calls).toEqual(['replace zoom', 'pan -100 0 true', 'pan 100 0 true'])
+    expect(seen.calls).toEqual(['replace zoom', 'pan -100 0 200ms', 'pan 100 0 200ms'])
   })
 
   test('a zoom reaches the driver as a direction', async () => {
@@ -116,7 +123,21 @@ describe('connectMap', () => {
     host.zoom(1)
     host.zoom(-1)
     host.zoom(0)
-    expect(seen.calls).toEqual(['replace zoom', 'zoom 1 true', 'zoom -1 true'])
+    expect(seen.calls).toEqual(['replace zoom', 'zoom 1 200ms', 'zoom -1 200ms'])
+  })
+
+  test('a step takes the page’s own duration and curve, and a theme with none jumps', async () => {
+    const host = await frame()
+    const { driver, seen } = recorder()
+    connectMap(host, driver)
+    host.style.setProperty('--helix-duration-normal', '90ms')
+    host.style.setProperty('--helix-easing-standard', 'linear')
+    host.pan('end')
+    host.style.setProperty('--helix-duration-normal', '0ms')
+    host.pan('end')
+    expect(seen.calls).toEqual(['replace zoom', 'pan 100 0 90ms', 'pan 100 0 jump'])
+    // The curve that arrived is the page's: linear is halfway at halfway.
+    expect(seen.motions[0]?.easing(0.5)).toBe(0.5)
   })
 
   test('a reader who asked for less motion gets none', async () => {
@@ -128,7 +149,7 @@ describe('connectMap', () => {
     connectMap(host, driver)
     host.pan('end')
     host.zoom(1)
-    expect(seen.calls).toEqual(['replace zoom', 'pan 100 0 false', 'zoom 1 false'])
+    expect(seen.calls).toEqual(['replace zoom', 'pan 100 0 jump', 'zoom 1 jump'])
   })
 
   test('the frame is the one tab stop and the one set of keys, until it lets go', async () => {
@@ -262,8 +283,8 @@ const projecting = (): {
     },
     panBy: () => {},
     project: ({ lat, lng }) => ({ x: lng * 10 + offset, y: lat * 10 }),
-    show: ({ lat, lng }, animate) => {
-      shown.push(`${lat},${lng} ${animate}`)
+    show: ({ lat, lng }, motion) => {
+      shown.push(`${lat},${lng} ${paced(motion)}`)
     },
     zoomBy: () => {},
   }
@@ -328,7 +349,7 @@ describe('connectMap with markers', () => {
     const [near, far] = [...host.querySelectorAll('helix-headless-map-marker')] as HTMLElement[]
     near?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
     far?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
-    expect(shown).toEqual(['1,90 true'])
+    expect(shown).toEqual(['1,90 320ms'])
   })
 
   test('disconnecting takes the places off the markers and stops listening', async () => {

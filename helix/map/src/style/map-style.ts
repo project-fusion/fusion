@@ -1,8 +1,15 @@
 import type { MapColors } from './map-colors.js'
-import { cssColor, mix, parseColor, type Rgb } from './oklab.js'
+import { contrast, cssColor, mix, parseColor, type Rgb } from './oklab.js'
 
-/** Where the tiles and the type come from, where not OpenFreeMap. */
+/** Where the tiles and the type come from, where not OpenFreeMap, and how legible the type is. */
 export interface MapStyleOptions {
+  /**
+   * The contrast ratio every label clears against the land it is haloed in.
+   * 4.5 by default, WCAG's AA for text, and what a theme's contrast target
+   * sets: a label that would fall short is drawn nearer the ink until it
+   * does not, and one that clears it already keeps its place in the order.
+   */
+  contrast?: number | undefined
   /** The font glyphs, a URL with `{fontstack}` and `{range}` in it. */
   glyphs?: string | undefined
   /**
@@ -92,6 +99,35 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
   const language = options.language ?? 'en'
   const name = ['coalesce', ['get', `name:${language}`], ['get', 'name:latin'], ['get', 'name']]
   const halo = cssColor(land)
+  const target = options.contrast ?? 4.5
+  /* **A label as quiet as it was designed, and no quieter than the target.**
+     Each is a step toward the ink, and the step is what orders them, a
+     country name quieter than a city's; on a theme whose ink is already
+     gray, the designed step fell short of AA against the halo. So each is
+     taken further toward the ink only as far as it has to go, and a theme
+     whose ink cannot clear the target at all gets the ink. */
+  const legible = (from: Rgb, amount: number): string => {
+    /* Measured as it will be drawn, rounded to eight bits a channel: the
+       unrounded color cleared 7:1 and the one written out read 6.96. */
+    const at = (step: number): Rgb => parseColor(cssColor(mix(from, ink, step))) as Rgb
+    if (contrast(at(amount), land) >= target) {
+      return cssColor(at(amount))
+    }
+    if (contrast(ink, land) < target) {
+      return cssColor(ink)
+    }
+    let low = amount
+    let high = 1
+    for (let round = 0; round < 20; round++) {
+      const middle = (low + high) / 2
+      if (contrast(at(middle), land) >= target) {
+        high = middle
+      } else {
+        low = middle
+      }
+    }
+    return cssColor(at(high))
+  }
 
   const road = (
     id: string,
@@ -127,7 +163,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
       'text-size': ['interpolate', ['linear'], ['zoom'], ...size[0], ...size[1]],
     },
     minzoom,
-    paint: { 'text-color': toward(amount), 'text-halo-color': halo, 'text-halo-width': 1.5 },
+    paint: { 'text-color': legible(land, amount), 'text-halo-color': halo, 'text-halo-width': 1.5 },
     source: 'openmaptiles',
     'source-layer': 'place',
     type: 'symbol',
@@ -292,7 +328,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         },
         minzoom: 12,
         paint: {
-          'text-color': cssColor(mix(water, ink, 0.55)),
+          'text-color': legible(water, 0.55),
           'text-halo-color': halo,
           'text-halo-width': 1.5,
         },
@@ -304,7 +340,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         id: 'label-sea',
         layout: { 'text-field': name, 'text-font': ITALIC, 'text-max-width': 8, 'text-size': 13 },
         paint: {
-          'text-color': cssColor(mix(water, ink, 0.55)),
+          'text-color': legible(water, 0.55),
           'text-halo-color': halo,
           'text-halo-width': 1.5,
         },
@@ -321,7 +357,11 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
           'text-size': ['interpolate', ['linear'], ['zoom'], 13, 10, 18, 13],
         },
         minzoom: 13,
-        paint: { 'text-color': toward(0.6), 'text-halo-color': halo, 'text-halo-width': 1.5 },
+        paint: {
+          'text-color': legible(land, 0.6),
+          'text-halo-color': halo,
+          'text-halo-width': 1.5,
+        },
         source: 'openmaptiles',
         'source-layer': 'transportation_name',
         type: 'symbol',
