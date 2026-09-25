@@ -243,8 +243,21 @@ export class HelixHeadlessColorInput extends MixinPickerField(
     this.restore()
   }
 
+  /**
+   * The picker's request, taken as this element's own.
+   *
+   * **Only the picker's.** A request from anything inside it arrives here
+   * retargeted to the picker, and a slider's carried its number: a hue of 120
+   * became this field's value and every page listening heard it. The picker
+   * keeps its sliders' requests now, and this checks where the event started
+   * as well, so a picker a tier above renders cannot say for it what it did
+   * not mean.
+   */
   private readonly handlePickerChange = (event: Event): void => {
     event.stopPropagation()
+    if (event.composedPath()[0] !== event.currentTarget) {
+      return
+    }
     this.requestValue((event as HelixBeforeChangeEvent).detail.value)
     this.restore()
   }
