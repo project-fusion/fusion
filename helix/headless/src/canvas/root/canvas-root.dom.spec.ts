@@ -1980,6 +1980,18 @@ describe('canvas at its edges', () => {
     expect(await walk(host)).toEqual(['a', 'b'])
   })
 
+  test('two connections leaving one card are walked one after the other', async () => {
+    const host = await canvas(
+      '',
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="c" x="260" y="200" width="200" height="100">Third</helix-headless-canvas-node>
+       <helix-headless-canvas-edge name="up" from="a" to="b"></helix-headless-canvas-edge>
+       <helix-headless-canvas-edge name="down" from="a" to="c"></helix-headless-canvas-edge>`,
+    )
+    expect(await walk(host)).toEqual(['a', 'edge:up', 'edge:down', 'b', 'c'])
+  })
+
   test('two unnamed connections between the same cards are two stops', async () => {
     const host = await canvas(
       '',
