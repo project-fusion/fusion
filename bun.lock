@@ -200,7 +200,7 @@
     },
     "helix/map": {
       "name": "@fusion.dev/helix-map",
-      "version": "0.104.0",
+      "version": "0.104.1",
       "dependencies": {
         "@fusion.dev/helix-core": "helix/core",
       },
