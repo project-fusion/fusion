@@ -21,6 +21,11 @@
  */
 
 import '@fusion.dev/helix'
+import { RESTYLED } from './preview-events'
+
+/** Where the map chunk and MapLibre are, stamped at build time. */
+declare const __PREVIEW_MAP_URL__: string
+declare const __PREVIEW_MAPLIBRE_URL__: string
 
 interface RenderMessage {
   colorMode?: 'dark' | 'light'
@@ -32,6 +37,60 @@ interface RenderMessage {
 }
 
 const host = document.getElementById('preview-root')
+
+/**
+ * The markup last rendered, so a render that only restyles keeps the tree.
+ *
+ * **Rebuilt only when the markup changed.** Every render used to replace the
+ * whole tree, which was invisible while everything in it was a component that
+ * came back the same: a live map is a renderer, a worker and a second of tiles,
+ * and the theme builder posts a render for every keystroke on every control. A
+ * restyle that tore the map down and built it again would be a map nobody
+ * could watch change. It keeps a sandbox example's own state through a CSS
+ * edit for the same reason, where it used to start over.
+ */
+let rendered: string | undefined
+
+/** Takes down whatever the last markup mounted, before it is replaced. */
+let unmount: (() => void) | undefined
+
+/** Counts renders, so a map chunk that lands late mounts only on the latest. */
+let generation = 0
+
+/** A classic script, once per URL: the one request an opaque origin may make freely. */
+const loaded = new Map<string, Promise<void>>()
+const load = (src: string): Promise<void> => {
+  let pending = loaded.get(src)
+  if (!pending) {
+    pending = new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = src
+      script.onload = () => resolve()
+      script.onerror = () => reject(new Error(`${src} did not load`))
+      document.head.append(script)
+    })
+    loaded.set(src, pending)
+  }
+  return pending
+}
+
+/**
+ * A live map for any `helix-map[data-preview-map]` the markup carries, with
+ * MapLibre and the connector loaded the first time one does and never before.
+ */
+const mountMaps = (root: HTMLElement, at: number): void => {
+  if (!root.querySelector('helix-map[data-preview-map]')) {
+    return
+  }
+  void load(__PREVIEW_MAPLIBRE_URL__)
+    .then(() => load(__PREVIEW_MAP_URL__))
+    .then(() => {
+      if (at === generation && window.helixPreviewMap) {
+        unmount = window.helixPreviewMap.mount(root)
+      }
+    })
+    .catch((error: unknown) => console.error(String(error)))
+}
 
 /**
  * Answered at `*`, which is the only thing an opaque origin can do.
@@ -97,8 +156,15 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
      would do is log a failed request into the terminal on every render, which
      is a console the reader is meant to trust. The stylesheet arrives in the
      same message instead, already read from disk. */
-  host.innerHTML = source.replace(/<link\b[^>]*\brel=(["'])stylesheet\1[^>]*>\s*/gi, '')
-  runScripts(host)
+  const fresh = source !== rendered
+  if (fresh) {
+    generation += 1
+    unmount?.()
+    unmount = undefined
+    host.innerHTML = source.replace(/<link\b[^>]*\brel=(["'])stylesheet\1[^>]*>\s*/gi, '')
+    runScripts(host)
+    rendered = source
+  }
 
   let sheet = document.getElementById('preview-styles')
   if (!sheet) {
@@ -107,6 +173,12 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
     document.head.append(sheet)
   }
   sheet.textContent = styles
+  /* After the styles, so a map mounted by this render reads the theme it was
+     sent with, and one already mounted hears that its colors may have moved. */
+  if (fresh) {
+    mountMaps(host, generation)
+  }
+  window.dispatchEvent(new Event(RESTYLED))
   measure()
 })
 

@@ -385,7 +385,7 @@
     // its whole token layer, could sit a build behind the components it is
     // meant to paint.
     //
-    // **The two packages it bundles, and not the site's every dependency.**
+    // **The packages it bundles, and not the site's every dependency.**
     // `^build` waited for all of them, `helix-docs` among them, whose build
     // waits on `docs` and `metrics`: 45 seconds of measuring bundle sizes on a
     // two-core runner, measured 15 Sep 2026, that nothing in the frame reads.
@@ -393,11 +393,19 @@
     // site, so this is what lets `warm-browser` finish while `warm` is still
     // measuring. The entry imports `@fusion.dev/helix`, whose own `^build`
     // brings the core, the headless tier and the icons, and the stylesheets
-    // are `@fusion.dev/helix-styles`' output.
+    // are `@fusion.dev/helix-styles`' output. The map chunk beside it imports
+    // `@fusion.dev/helix-map`, the connector and the style compiler.
     "frame": {
-      "dependsOn": ["@fusion.dev/helix#build", "@fusion.dev/helix-styles#build"],
+      "dependsOn": [
+        "@fusion.dev/helix#build",
+        "@fusion.dev/helix-map#build",
+        "@fusion.dev/helix-styles#build"
+      ],
       "inputs": [
+        "preview/preview-events.ts",
         "preview/preview-frame-entry.ts",
+        "preview/preview-map-entry.ts",
+        "utils/map-view/map-view.ts",
         "preview/preview-frame.css",
         "public/fonts/**",
         "$TURBO_ROOT$/helix/styles/src/*.css",

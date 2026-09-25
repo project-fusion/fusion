@@ -24,6 +24,7 @@ import { fileURLToPath } from 'node:url'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const out = join(root, 'fusion/site/public/sandbox')
 const entry = join(root, 'fusion/site/preview/preview-frame-entry.ts')
+const mapEntry = join(root, 'fusion/site/preview/preview-map-entry.ts')
 
 /* The layers, in the order a consumer is told to import them. `elements.css` is
    generated from the element sources and hides each tag until it upgrades.
@@ -45,7 +46,63 @@ const layers = [
 await rm(out, { force: true, recursive: true })
 await mkdir(out, { recursive: true })
 
+/* What the frame asks for, stamped with what it got.
+ *
+ * The frame loads its bundle with a plain `<script src="./frame.js">`, and a
+ * static file under `public/` is served with caching headers, so a browser that
+ * has seen one build keeps it. The failure that causes is nasty because it does
+ * not look like caching: an element added since the cached bundle is simply not
+ * defined, so it never upgrades, and an unknown element renders its children
+ * inline. A dialog looks permanently open with buttons that do nothing, which
+ * reads as a broken component rather than a stale file.
+ *
+ * The content decides the token, so a rebuild that changes nothing changes no
+ * URL and the cache still does its job. */
+const stamp = (contents) => createHash('sha256').update(contents).digest('hex').slice(0, 8)
+
+/* **A live map, in two files the frame loads only when a render carries one.**
+ *
+ * MapLibre as it ships, copied rather than bundled: its default build makes its
+ * worker from a blob at run time, which is the one worker an opaque origin may
+ * start, and running that build through a second minifier buys nothing. Then
+ * the map chunk, which is the connector and the style compiler, with
+ * MapLibre's stylesheet inlined because the chunk is what knows it needs one.
+ * Both are classic scripts for the reason the frame is one.
+ *
+ * `frame.js` learns both stamped URLs at build time, so a new MapLibre or a
+ * new chunk is a new URL the moment it is built. */
+const maplibre = await readFile(
+  fileURLToPath(import.meta.resolve('maplibre-gl/dist/maplibre-gl.js')),
+)
+await writeFile(join(out, 'maplibre-gl.js'), maplibre)
+const mapBuilt = await Bun.build({
+  define: {
+    __MAPLIBRE_CSS__: JSON.stringify(
+      await readFile(
+        fileURLToPath(import.meta.resolve('maplibre-gl/dist/maplibre-gl.css')),
+        'utf8',
+      ),
+    ),
+  },
+  entrypoints: [mapEntry],
+  format: 'iife',
+  minify: true,
+  target: 'browser',
+})
+if (!mapBuilt.success) {
+  for (const log of mapBuilt.logs) {
+    console.error(log)
+  }
+  process.exit(1)
+}
+const mapScript = await mapBuilt.outputs[0].text()
+await writeFile(join(out, 'map.js'), mapScript)
+
 const built = await Bun.build({
+  define: {
+    __PREVIEW_MAP_URL__: JSON.stringify(`./map.js?v=${stamp(mapScript)}`),
+    __PREVIEW_MAPLIBRE_URL__: JSON.stringify(`./maplibre-gl.js?v=${stamp(maplibre)}`),
+  },
   entrypoints: [entry],
   format: 'iife',
   minify: true,
@@ -61,20 +118,6 @@ if (!built.success) {
 
 const script = await built.outputs[0].text()
 await writeFile(join(out, 'frame.js'), script)
-
-/* What the frame asks for, stamped with what it got.
- *
- * The frame loads its bundle with a plain `<script src="./frame.js">`, and a
- * static file under `public/` is served with caching headers, so a browser that
- * has seen one build keeps it. The failure that causes is nasty because it does
- * not look like caching: an element added since the cached bundle is simply not
- * defined, so it never upgrades, and an unknown element renders its children
- * inline. A dialog looks permanently open with buttons that do nothing, which
- * reads as a broken component rather than a stale file.
- *
- * The content decides the token, so a rebuild that changes nothing changes no
- * URL and the cache still does its job. */
-const stamp = (contents) => createHash('sha256').update(contents).digest('hex').slice(0, 8)
 
 const css = await Promise.all(layers.map((layer) => readFile(layer, 'utf8')))
 
@@ -153,4 +196,7 @@ await writeFile(
 )
 
 const size = Math.round((script.length + css.join('').length) / 1024)
-console.log(`frame: ${size} KB, ${layers.length} style layers, one classic script`)
+const mapSize = Math.round((maplibre.length + mapScript.length) / 1024)
+console.log(
+  `frame: ${size} KB, ${layers.length} style layers, one classic script, and ${mapSize} KB of map loaded only when a render carries one`,
+)
