@@ -16,7 +16,9 @@ const lightness = (value: unknown): number => {
 }
 
 const paint = (style: ReturnType<typeof mapLibreStyle>, id: string, key: string): unknown =>
-  (style.layers.find((layer) => layer.id === id)?.paint as Record<string, unknown>)[key]
+  (style.layers.find((layer) => layer.id === id)?.paint as Record<string, unknown> | undefined)?.[
+    key
+  ]
 
 describe('mapLibreStyle', () => {
   test('writes a style MapLibre accepts, in either theme', () => {

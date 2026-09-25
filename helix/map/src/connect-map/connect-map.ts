@@ -152,6 +152,9 @@ export const connectMap = (
       link.href = part.href
       link.rel = 'noopener noreferrer'
       link.target = '_blank'
+      /* Helix's own helper for a link that reads as the text around it, so a
+         credit is not the browser's default blue in a strip set subtle. */
+      link.dataset.link = 'subtle'
       link.textContent = part.text
       return link
     })
