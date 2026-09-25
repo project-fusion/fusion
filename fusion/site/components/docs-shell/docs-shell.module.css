@@ -100,8 +100,21 @@
    front of it that does nothing a reader wants. */
 .docsNav,
 .docsRail {
-  scrollbar-color: var(--helix-color-border) transparent;
+  scrollbar-color: transparent transparent;
   scrollbar-width: thin;
+  transition: scrollbar-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* **Drawn only while it is being used.** macOS shows a scrollbar the whole
+   time wherever "Show scroll bars" is Always, or Automatic with a mouse
+   plugged in, and styling one does not change that: a thin bar standing
+   down the side of a rail read by glancing at it is noise. So the thumb is
+   transparent at rest and takes the border color under the pointer or while
+   focus is inside, which is when a reader is about to scroll. The track is
+   the same width either way, so nothing moves when it appears. */
+.docsNav:is(:hover, :focus-within),
+.docsRail:is(:hover, :focus-within) {
+  scrollbar-color: var(--helix-color-border) transparent;
 }
 
 .docsRailTitle {

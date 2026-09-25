@@ -1,22 +1,190 @@
-/* The Maps page: the same band of air as a vertical's page, and a map the
-   width of the column rather than a thumbnail of one. */
+/* The Maps page: the map the width of the page, what it is on a panel over
+   it, and the stack it is built from under it. */
 
 .mapsShell {
-  padding-block: var(--site-band);
-}
-
-.mapsLede {
-  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
-  max-inline-size: 68ch;
-}
-
-/* Tall enough to read a city at, and never taller than the window: a map
-   that runs past the fold is one a reader scrolls rather than pans. */
-.mapsFrame {
-  --map-block-size: min(36rem, 70svh);
+  padding-block: var(--helix-space-2xl) var(--site-band);
 }
 
 .mapsCanvas {
   block-size: 100%;
   inline-size: 100%;
+}
+
+/* =============================================================== hero === */
+
+/* The map the whole width of the page, and the scope the controls paint. */
+.mapsHero {
+  /* Declared here rather than inherited: the page's text color was settled
+     at the root, in the site's scheme, and a heading inside a scope painted
+     dark inherited that black. Declared on the scope, the token resolves in
+     the scope's own. */
+  color: var(--helix-color-foreground);
+  position: relative;
+}
+
+.mapsHeroFrame {
+  --map-block-size: min(80svh, 48rem);
+}
+
+/* Edge to edge, so no frame of its own: the page is the frame. */
+.mapsHeroFrame::part(region) {
+  border-inline: 0;
+  border-radius: 0;
+}
+
+/* Over the map at the start, clear of the pan and zoom buttons at the end and
+   of the credit at the foot, which a tile license requires stay visible.
+   Solid rather than glass: over a street grid, glass put the heading on a
+   texture and it was the least legible thing on the page. */
+.mapsPanel {
+  background: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+  inline-size: min(28rem, calc(100% - var(--site-inset) * 2));
+  inset-block-start: var(--helix-space-lg);
+  inset-inline-start: var(--site-inset);
+  padding: var(--helix-space-lg);
+  position: absolute;
+}
+
+.mapsControls {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-md) var(--helix-space-lg);
+  margin-block-start: var(--helix-space-xs);
+  padding-block-start: var(--helix-space-md);
+}
+
+.mapsControl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+}
+
+/* A fieldset for its legend, which names the swatches as a group, with none
+   of a fieldset's own frame. */
+fieldset.mapsControl {
+  border: 0;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+
+/* Brand's legend and Mode's own label drawn the same, so the two controls
+   read as a pair: the toggle group keeps its label, visible and named, and
+   takes the caption's voice through its part. */
+.mapsLegend,
+.mapsControl helix-toggle-group::part(label) {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-regular);
+  padding: 0;
+}
+
+.mapsSwatches {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-xs);
+  min-block-size: 2.25rem;
+}
+
+/* A swatch is its color and nothing else, ringed when it is the one chosen. */
+.mapsSwatch {
+  background: var(--swatch, var(--helix-color-primary));
+  block-size: 1.5rem;
+  border: var(--helix-border-thin) solid
+    color-mix(in oklab, var(--helix-color-foreground) 15%, transparent);
+  border-radius: var(--helix-radii-full);
+  cursor: pointer;
+  inline-size: 1.5rem;
+  padding: 0;
+}
+
+.mapsSwatch[aria-pressed="true"] {
+  outline: var(--helix-border-thick) solid var(--helix-color-foreground);
+  outline-offset: var(--helix-space-2xs);
+}
+
+.mapsSwatch:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-space-2xs);
+}
+
+/* A phone reads the name before the map: the panel above it, in the page's
+   own flow and without the chrome it needs to float. */
+@media (max-width: 48rem) {
+  .mapsHero {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .mapsPanel {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    inline-size: auto;
+    padding: var(--site-band) var(--site-inset) var(--helix-space-lg);
+    position: static;
+  }
+}
+
+/* ============================================================== stack === */
+
+/* The parts as layers, each resting on the one under it: what a reader
+   touches at the top, the data at the bottom. A list, because the order is
+   the point. */
+.mapsStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+  list-style: none;
+  margin: 0;
+  max-inline-size: 60rem;
+  padding: 0;
+}
+
+.mapsLayer {
+  align-items: center;
+  background: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  display: grid;
+  gap: var(--helix-space-xs) var(--helix-space-lg);
+  grid-template-columns: 7rem minmax(0, 1fr) auto;
+  padding: var(--helix-space-md) var(--helix-space-lg);
+}
+
+/* The one layer that is not ours: drawn as a place in the stack rather than
+   a plate of it, so the eye reads it as somebody else's. */
+.mapsLayer[data-owned="false"] {
+  background: none;
+  border-style: dashed;
+}
+
+.mapsLayerText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+.mapsLayerStage {
+  justify-self: end;
+}
+
+/* On a phone the role sits over the name and the stage under the words. */
+@media (max-width: 40rem) {
+  .mapsLayer {
+    align-items: start;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mapsLayerStage {
+    justify-self: start;
+  }
 }
