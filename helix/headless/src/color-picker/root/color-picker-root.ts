@@ -647,7 +647,23 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       ?disabled=${this.isDisabled}
       @input=${(event: Event) => this.takeChannel(channel, event)}
       @change=${(event: Event) => this.takeChannel(channel, event)}
+      @helix-before-change=${this.keepChannelRequest}
     ></${this.tag('slider')}>`
+  }
+
+  /**
+   * A slider's own request, kept inside.
+   *
+   * **The slider is a Helix control, so it asks before it moves**, with
+   * `helix-before-change` carrying its number, and that event is composed. Let
+   * out, it reached a consumer listening on this element as though the picker
+   * had asked for a hue of 120 or an alpha of 0 as its color, which Color
+   * Input took for its value and the theme builder then failed to read as a
+   * brand. What this element asks for is a color, and it asks through `move`.
+   * Not refused, only kept: the slider applies, and `takeChannel` reads it.
+   */
+  private readonly keepChannelRequest = (event: Event): void => {
+    event.stopPropagation()
   }
 
   /**
