@@ -22,9 +22,9 @@ export interface MapLayer {
  */
 export const MAP_STACK: readonly MapLayer[] = [
   {
-    body: 'Places, routes and positions as elements inside the frame, rather than calls against a renderer’s API.',
+    body: 'Places as elements inside the frame, named buttons a reader can tab to and walk with the arrow keys, rather than calls against a renderer’s API. Routes, areas and a live position come next.',
     role: 'Elements',
-    stage: 'Declared',
+    stage: 'Building',
     title: 'Layers',
   },
   {

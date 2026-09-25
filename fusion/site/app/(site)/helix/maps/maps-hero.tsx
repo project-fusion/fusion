@@ -1,7 +1,7 @@
 'use client'
 
 import 'maplibre-gl/dist/maplibre-gl.css'
-import type { HelixMap } from '@fusion.dev/helix'
+import type { HelixActivateEvent, HelixMap } from '@fusion.dev/helix'
 import { connectMap, type MapColors, mapColorsFrom } from '@fusion.dev/helix-map'
 import { mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
@@ -25,7 +25,53 @@ const BRANDS = [
   { hex: '#db2777', name: 'Pink' },
 ] as const
 
+/**
+ * Places on the opening view, in the order a reader walks them with the arrow
+ * keys: along the waterfront and back through the middle of the city, which is
+ * an order someone could follow on foot rather than one sorted by name.
+ */
+const PLACES = [
+  { label: 'Palace of Fine Arts', lat: 37.8029, lng: -122.4484 },
+  { label: 'Coit Tower', lat: 37.8024, lng: -122.4058 },
+  { label: 'Ferry Building', lat: 37.7955, lng: -122.3937 },
+  { label: 'Mission Dolores', lat: 37.7644, lng: -122.427 },
+  { label: 'Twin Peaks', lat: 37.7544, lng: -122.4477 },
+] as const
+
 type Mode = 'site' | 'light' | 'dark'
+
+/** The places' corners, west-south then east-north, as MapLibre takes a bounds. */
+const BOUNDS: [[number, number], [number, number]] = [
+  [Math.min(...PLACES.map((one) => one.lng)), Math.min(...PLACES.map((one) => one.lat))],
+  [Math.max(...PLACES.map((one) => one.lng)), Math.max(...PLACES.map((one) => one.lat))],
+]
+
+/**
+ * The part of the map a reader can see, as camera padding: where the panel
+ * lies over it, the camera frames the places beside the panel rather than
+ * under it, where a marker could take focus with nobody able to see it. The
+ * right is wider for the frame's own controls in that corner.
+ */
+const clearOf = (
+  frame: Element,
+  panel: Element | null,
+): { bottom: number; left: number; right: number; top: number } => {
+  const edge = 48
+  const room = frame.getBoundingClientRect()
+  const over = panel?.getBoundingClientRect()
+  const covers =
+    over !== undefined &&
+    over.left < room.right &&
+    over.right > room.left &&
+    over.top < room.bottom &&
+    over.bottom > room.top
+  return {
+    bottom: edge,
+    left: covers ? over.right - room.left + edge : edge,
+    right: edge * 3,
+    top: edge,
+  }
+}
 
 /** The same four colors, which is when a restyle would draw nothing new. */
 const same = (a: MapColors | undefined, b: MapColors): boolean =>
@@ -73,6 +119,7 @@ export function MapsHero() {
   const scope = useRef<HTMLDivElement>(null)
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
+  const panel = useRef<HTMLDivElement>(null)
   const engine = useRef<Promise<ThemeEngine> | null>(null)
   const [brand, setBrand] = useState<string | null>(null)
   const [mode, setMode] = useState<Mode>('site')
@@ -101,12 +148,26 @@ export function MapsHero() {
       let colors = mapColorsFrom(host)
       const map = new maplibregl.Map({
         attributionControl: false,
-        center: [-122.4194, 37.7749],
+        bounds: BOUNDS,
         container: box,
+        fitBoundsOptions: { padding: clearOf(box, panel.current) },
         style: mapLibreStyle(colors, { language }) as never,
-        zoom: 12.5,
       })
       const connection = connectMap(host, mapLibreDriver(map))
+      /* Pressing a place is the page's to answer, and this one goes there.
+         MapLibre already skips the glide for a reader who asked for less
+         motion, since the move is not marked essential. */
+      const visit = (event: HelixActivateEvent): void => {
+        const place = PLACES.find((one) => one.label === event.detail.value)
+        if (place) {
+          map.easeTo({
+            center: [place.lng, place.lat],
+            padding: clearOf(box, panel.current),
+            zoom: 15,
+          })
+        }
+      }
+      host.addEventListener('helix-activate', visit)
       let pending = 0
       const restyle = (): void => {
         cancelAnimationFrame(pending)
@@ -134,6 +195,7 @@ export function MapsHero() {
         cancelAnimationFrame(pending)
         watch.disconnect()
         scheme.removeEventListener('change', restyle)
+        host.removeEventListener('helix-activate', visit)
         connection.disconnect()
         map.remove()
       }
@@ -187,8 +249,11 @@ export function MapsHero() {
         ref={frame}
       >
         <div className={styles.mapsCanvas} ref={container} />
+        {PLACES.map((place) => (
+          <helix-map-marker key={place.label} label={place.label} lat={place.lat} lng={place.lng} />
+        ))}
       </helix-map>
-      <div className={styles.mapsPanel}>
+      <div className={styles.mapsPanel} ref={panel}>
         <helix-flex align-items="center" data-density="sm" gap="xs">
           <helix-tag>Helix</helix-tag>
           <helix-tag tone={stageAppearance('Building')}>Building</helix-tag>
