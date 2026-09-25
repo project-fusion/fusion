@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMap } from '@fusion.dev/helix-headless/map'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './map-root.css.js'
 
@@ -29,6 +30,16 @@ import { styles } from './map-root.css.js'
  */
 @customElement('helix-map')
 export class HelixMap extends HelixHeadlessMap {
+  /**
+   * The ground under the controls, the one part of the frame that lies over
+   * the map. Absent is opaque; `glass` lets the map through under a blur,
+   * `frosted` is the same pair turned up for a busier map, and `transparent`
+   * leaves the glyphs over the map with nothing under them. How see-through
+   * each is, is the theme's.
+   */
+  @property({ reflect: true })
+  material?: 'frosted' | 'glass' | 'transparent'
+
   /* The surface's sheet first, this family's after, so a map's own rules win
      where the two speak about the same box. */
   static override styles: CSSResultGroup = [viewportStyles, styles]
