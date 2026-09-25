@@ -1,40 +1,63 @@
 import type { PageCopy } from '@/content/copy/copy'
 
+/** A layer of the stack, and the stage it is at, or whose it is where it is not ours. */
+export interface MapLayer {
+  body: string
+  /** Where a layer is somebody else's, which is said instead of a stage. */
+  owner?: string
+  /** What the layer is, in a word, over its name. */
+  role: string
+  stage?: 'Active' | 'Building' | 'Declared'
+  title: string
+}
+
 /**
- * What Maps is made of, each with the stage it is actually at.
+ * How Maps is built, from what a reader touches down to the data under it.
  *
  * **The stage is the real one**, as it is for Cortex's modules: a reader
- * deciding whether to build on this needs to know which parts exist, and a
- * page that lists only what ships describes a smaller idea than the one this
- * is.
+ * deciding whether to build on this needs to know which parts exist. **And the
+ * renderer is in the stack and said not to be ours**, because it is the one
+ * part Helix does not draw, and a stack that left it out would describe a map
+ * Helix renders itself, which is the claim this is careful not to make.
  */
-export const MAP_PARTS = [
+export const MAP_STACK: readonly MapLayer[] = [
   {
-    body: 'A named region around any map, with pan and zoom as buttons a screen reader can find. An embedded map is otherwise a canvas with no node in the accessibility tree at all.',
+    body: 'Places, routes and positions as elements inside the frame, rather than calls against a renderer’s API.',
+    role: 'Elements',
+    stage: 'Declared',
+    title: 'Layers',
+  },
+  {
+    body: 'A named region around the map, with pan and zoom as buttons a screen reader can find. An embedded map is otherwise a canvas with no node in the accessibility tree at all.',
+    role: 'Accessibility',
     stage: 'Active',
     title: 'The frame',
   },
   {
-    body: 'One connection between the frame and a renderer, MapLibre or Leaflet or one of your own: one tab stop, one set of keys, and the credit where the frame keeps it.',
+    body: 'One connection between the frame and the renderer: one tab stop, one set of keys, one set of zoom buttons, and the credit where the frame keeps it.',
+    role: 'Integration',
     stage: 'Building',
     title: 'The connector',
   },
   {
-    body: 'A MapLibre style drawn from your tokens, light and dark from the same ones.',
+    body: 'What draws the map. The connector takes either, or a driver of your own for anything else.',
+    owner: 'MapLibre or Leaflet',
+    role: 'Rendering',
+    title: 'The renderer',
+  },
+  {
+    body: 'A style drawn from your tokens: the brand for the roads you navigate by, the ink for the rest, light and dark from the same ones.',
+    role: 'Theme',
     stage: 'Building',
     title: 'The style',
   },
   {
     body: 'Vector tiles built from OpenStreetMap and served without a key or a per-view bill. Until then the map draws OpenFreeMap’s, which are in the same schema.',
+    role: 'Data',
     stage: 'Declared',
     title: 'Tiles',
   },
-  {
-    body: 'Places, routes and positions as elements inside the frame, rather than calls against a renderer’s API.',
-    stage: 'Declared',
-    title: 'Layers',
-  },
-] as const
+]
 
 /**
  * The Maps page's words, which the page renders and its document serves.
@@ -43,23 +66,19 @@ export const MAPS: PageCopy = {
   blocks: [
     {
       body: [
-        'The map on this page is drawn in this site’s theme. Switch between light and dark, or change the brand color, and it follows: every color in it is mixed from the page’s own tokens.',
+        'Pick a brand or a mode and only the map changes. It starts in this site’s theme, and every color in it is mixed from the page’s own tokens.',
       ],
       title: 'The map',
     },
     {
-      items: MAP_PARTS.filter((part) => part.stage !== 'Declared').map((part) => ({
-        body: `${part.stage}. ${part.body}`,
-        name: part.title,
+      body: [
+        'From what a reader touches down to the data underneath. The renderer is the one part that is not ours.',
+      ],
+      items: MAP_STACK.map((layer) => ({
+        body: `${layer.stage ?? layer.owner}. ${layer.body}`,
+        name: layer.title,
       })),
-      title: 'What is built',
-    },
-    {
-      items: MAP_PARTS.filter((part) => part.stage === 'Declared').map((part) => ({
-        body: `${part.stage}. ${part.body}`,
-        name: part.title,
-      })),
-      title: 'What comes next',
+      title: 'How it is built',
     },
   ],
   lede: 'Maps in your theme. A frame a screen reader can find, one connector for whichever renderer draws the map, and a style made from the same tokens as the rest of the page.',

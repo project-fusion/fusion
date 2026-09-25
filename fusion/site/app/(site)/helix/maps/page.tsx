@@ -1,38 +1,14 @@
-import { MAP_PARTS, MAPS } from '@/content/maps/maps'
+import { MAP_STACK, MAPS } from '@/content/maps/maps'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import styles from './maps.module.css'
-import { MapsDemo } from './maps-demo'
+import { MapsHero } from './maps-hero'
 
 export const metadata = pageMetadata({
   description: MAPS.lede,
   path: '/helix/maps',
   title: MAPS.title,
 })
-
-/** The parts in a band, each with the stage it is at. */
-function Parts({ declared, title }: { declared: boolean; title: string | undefined }) {
-  return (
-    <helix-flex direction="column" gap="md">
-      <helix-text as="h2" variant="title">
-        {title}
-      </helix-text>
-      <helix-grid columns={3} gap="lg" min="18rem">
-        {MAP_PARTS.filter((part) => (part.stage === 'Declared') === declared).map((part) => (
-          <helix-card key={part.title} separation="outlined">
-            <helix-flex align-items="center" gap="sm" justify-content="between" slot="header">
-              <helix-text as="h3" variant="title">
-                {part.title}
-              </helix-text>
-              <helix-tag tone={stageAppearance(part.stage)}>{part.stage}</helix-tag>
-            </helix-flex>
-            <helix-text emphasis="muted">{part.body}</helix-text>
-          </helix-card>
-        ))}
-      </helix-grid>
-    </helix-flex>
-  )
-}
 
 /**
  * Maps, a part of Helix at a real address under it.
@@ -41,34 +17,52 @@ function Parts({ declared, title }: { declared: boolean; title: string | undefin
  * is more than a component: a frame, a connector, a style and, later, tiles
  * and layers. `/helix/components/map` stays the frame's reference.
  *
- * **Built and next are two bands rather than one grid of five**, which at
- * three columns left the last two on a row of their own and read the two
- * that are not started as the same kind of thing as the three that are.
+ * **The parts are a stack, not a grid of cards.** They are layers, each
+ * resting on the one under it, and a grid read them as five features of equal
+ * standing, with the one part that is somebody else's missing altogether.
  */
 export default function Page() {
-  const [map, built, next] = MAPS.blocks
+  const [, stack] = MAPS.blocks
   return (
-    <helix-flex class={styles.mapsShell} data-shell direction="column" gap="xl">
-      <helix-flex direction="column" gap="sm">
-        <helix-flex align-items="center" data-density="sm" gap="xs">
-          <helix-tag>Helix</helix-tag>
-          <helix-tag tone={stageAppearance('Building')}>Building</helix-tag>
-        </helix-flex>
-        <helix-text as="h1">{MAPS.title}</helix-text>
-        <helix-text as="p" class={styles.mapsLede} emphasis="muted">
-          {MAPS.lede}
-        </helix-text>
-      </helix-flex>
-      <helix-flex direction="column" gap="sm">
-        <MapsDemo />
-        {map?.body?.map((line) => (
-          <helix-text emphasis="subtle" key={line} variant="caption">
-            {line}
+    <>
+      <MapsHero />
+      <helix-flex class={styles.mapsShell} data-shell direction="column" gap="lg">
+        <helix-flex direction="column" gap="xs">
+          <helix-text as="h2" variant="title">
+            {stack?.title}
           </helix-text>
-        ))}
+          {stack?.body?.map((line) => (
+            <helix-text emphasis="muted" key={line}>
+              {line}
+            </helix-text>
+          ))}
+        </helix-flex>
+        <ol className={styles.mapsStack}>
+          {MAP_STACK.map((layer) => (
+            <li
+              className={styles.mapsLayer}
+              data-owned={layer.owner ? 'false' : 'true'}
+              key={layer.title}
+            >
+              <helix-text class={styles.mapsLayerRole} emphasis="subtle" variant="caption">
+                {layer.role}
+              </helix-text>
+              <div className={styles.mapsLayerText}>
+                <helix-text as="h3" variant="title">
+                  {layer.title}
+                </helix-text>
+                <helix-text emphasis="muted">{layer.body}</helix-text>
+              </div>
+              <helix-tag
+                class={styles.mapsLayerStage}
+                tone={layer.stage ? stageAppearance(layer.stage) : 'neutral'}
+              >
+                {layer.stage ?? layer.owner}
+              </helix-tag>
+            </li>
+          ))}
+        </ol>
       </helix-flex>
-      <Parts declared={false} title={built?.title} />
-      <Parts declared title={next?.title} />
-    </helix-flex>
+    </>
   )
 }
