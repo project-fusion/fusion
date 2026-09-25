@@ -40,6 +40,17 @@ const ensureStyles = (): void => {
   document.head.append(sheet)
 }
 
+/**
+ * The contrast target the builder sent, which its labels are held to. The
+ * compiler's own where none was sent, which is the sandbox's case.
+ */
+const contrastOf = (frame: Element): number | undefined => {
+  const value = Number.parseFloat(
+    getComputedStyle(frame).getPropertyValue('--themed-contrast-target'),
+  )
+  return Number.isFinite(value) ? value : undefined
+}
+
 /** Where a marker stands, read from its attributes as the markup wrote them. */
 const placeOf = (marker: Element): { lat: number; lng: number } | null => {
   const lat = Number(marker.getAttribute('lat'))
@@ -63,10 +74,11 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   const bounds = places.length > 0 ? boundsOf(places) : undefined
   const language = document.documentElement.lang || 'en'
   let colors: MapColors = mapColorsFrom(frame)
+  let contrast = contrastOf(frame)
   const map = new maplibregl.Map({
     attributionControl: false,
     container: box,
-    style: mapLibreStyle(colors, { language }) as never,
+    style: mapLibreStyle(colors, { contrast, language }) as never,
     ...(bounds ? { bounds, fitBoundsOptions: { padding: clearOf(box, panel) } } : {}),
   })
   /* Framed again once it has drawn, and whenever the pane is resized: the
@@ -96,9 +108,11 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
     cancelAnimationFrame(pending)
     pending = requestAnimationFrame(() => {
       const next = mapColorsFrom(frame)
-      if (!sameColors(colors, next)) {
+      const target = contrastOf(frame)
+      if (!sameColors(colors, next) || target !== contrast) {
         colors = next
-        map.setStyle(mapLibreStyle(colors, { language }) as never, { diff: true })
+        contrast = target
+        map.setStyle(mapLibreStyle(colors, { contrast, language }) as never, { diff: true })
       }
     })
   }

@@ -593,8 +593,13 @@ export function ThemeBuilder({
       fontsHref ? `@import url("${fontsHref}");` : '',
       THEMED_PAGE_STYLES,
       framed,
+      /* **The contrast target, which no token carries**, for the one thing in
+         the preview drawn outside CSS: a map's labels are painted by its
+         renderer, so the frame's map reads the target from here and holds
+         every label to it, the way the palette holds every text pair. */
+      `:root { --themed-contrast-target: ${contrastTarget}; }`,
     ].join('\n')
-  }, [fontsHref, framed, source])
+  }, [contrastTarget, fontsHref, framed, source])
 
   /* **Lightness only, and in whichever direction reaches the target.** The
      solver moves one component: a brand keeps its hue and its chroma and gives
