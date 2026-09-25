@@ -2038,6 +2038,54 @@ describe('canvas at its edges', () => {
     expect(hasState(host, 'holding')).toBe(false)
   })
 
+  test('a connection made from the keyboard ends when focus leaves the board', async () => {
+    const host = await canvas()
+    const outside = document.createElement('button')
+    host.after(outside)
+    card(host, 'a').focus()
+    press(card(host, 'a'), 'c')
+    await host.updateComplete
+    expect(hasState(host, 'connecting')).toBe(true)
+    outside.focus()
+    await host.updateComplete
+    expect(hasState(host, 'connecting')).toBe(false)
+    outside.remove()
+  })
+
+  test('a canceled press is not a click, on a card or on the board', async () => {
+    /* On touch the browser cancels the pointer when it takes the gesture for
+       a scroll, and neither a selection nor its loss was what the reader did. */
+    const host = (await canvas()) as Canvas & { selected: string }
+    host.selected = 'a'
+    await host.updateComplete
+    const on = (target: Element, type: string, shiftKey = false): void => {
+      target.dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          button: 0,
+          clientX: 5,
+          clientY: 5,
+          composed: true,
+          pointerId: 71,
+          pointerType: 'touch',
+          shiftKey,
+        }),
+      )
+    }
+    const viewport = part(host, 'viewport') as Element
+    on(viewport, 'pointerdown')
+    on(host, 'pointercancel')
+    await host.updateComplete
+    expect(host.selected).toBe('a')
+    /* With a modifier, since a plain press selects at once for the drag that
+       may follow, and a modified one leaves adding to the release. */
+    const b = card(host, 'b').shadowRoot?.querySelector('[part="node"]') as Element
+    on(b, 'pointerdown', true)
+    on(host, 'pointercancel')
+    await host.updateComplete
+    expect(host.selected).toBe('a')
+  })
+
   test('a card whose place is not a number is placed at nothing, and the board settles', async () => {
     const host = await canvas(
       '',

@@ -1789,7 +1789,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       if (this.linking.pressed) {
         const clicked = this.linking.edge
         this.linking = undefined
-        if (clicked !== undefined && pointing) {
+        if (clicked !== undefined && pointing && event.type !== 'pointercancel') {
           this.clicked(clicked, event)
         }
         return
@@ -1818,7 +1818,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         return
       }
       this.carrying = undefined
-      if (!carry.started && pointing) {
+      /* A canceled press is not a click: on touch the browser cancels the
+         pointer when it takes the gesture for a scroll or a zoom. */
+      if (!carry.started && pointing && event.type !== 'pointercancel') {
         this.clicked(carry.pressed, event)
       }
       if (carry.moved) {
@@ -1832,7 +1834,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
          so panned rather than moved, which selects it. Treating the second as
          the first cleared every selection a read-only board was given. */
       const drag = this.dragging
-      if (Math.hypot(event.clientX - drag.from.x, event.clientY - drag.from.y) < SLOP) {
+      if (
+        event.type !== 'pointercancel' &&
+        Math.hypot(event.clientX - drag.from.x, event.clientY - drag.from.y) < SLOP
+      ) {
         if (drag.pressed !== undefined && pointing) {
           this.clicked(drag.pressed, event)
         } else {
@@ -2208,6 +2213,34 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       }
       this.reveal(card.name)
     }
+  }
+
+  /**
+   * A connection being made from the keyboard ends when the reader leaves
+   * the board, as Escape ends it.
+   *
+   * Otherwise the board went on showing every card as somewhere to land, and
+   * a reader who came back and pressed Enter on a card connected something
+   * they had long since walked away from. Only for somewhere else on the
+   * page: a window losing focus names nothing, and the reader switching away
+   * and back is still in the middle of it. A pointer's connection is its
+   * own, ended by its release.
+   */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    const next = event.relatedTarget
+    const linking = this.linking
+    if (
+      !linking ||
+      linking.pointer !== undefined ||
+      linking.held ||
+      !(next instanceof Node) ||
+      this.contains(next) ||
+      this.renderRoot.contains(next)
+    ) {
+      return
+    }
+    this.linking = undefined
+    this.said = this.stoppedLabel
   }
 
   /** Brings a card into view, where it is not already whole in it. */
@@ -2792,6 +2825,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.watchWords()
     this.addEventListener('dblclick', this.handleDoubleClick)
     this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('keydown', this.handleStopKeydown)
     this.addEventListener('pointercancel', this.handlePointerUp)
     this.addEventListener('pointerdown', this.handlePointerDown)
@@ -2811,6 +2845,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.words?.disconnect()
     this.removeEventListener('dblclick', this.handleDoubleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('keydown', this.handleStopKeydown)
     this.removeEventListener('pointercancel', this.handlePointerUp)
     this.removeEventListener('pointerdown', this.handlePointerDown)
