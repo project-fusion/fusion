@@ -1,16 +1,20 @@
 import {
   customElement,
+  HelixActivateEvent,
   HelixElement,
   HelixMapPanEvent,
   HelixMapZoomEvent,
   hostAria,
+  KeyboardNavigationController,
   MixinViewport,
+  type NavigableItem,
   type ViewportControlsPlacement,
   type ViewportPanDetail,
   type ViewportZoomDetail,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
+import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
 
 /**
  * What `ViewportControlsPlacement` is called for a map.
@@ -54,11 +58,12 @@ export type MapControlsPlacement = ViewportControlsPlacement
  * @aliases Map frame, Map container, Geo
  * @documentation https://fusion.dev/helix/components/map
  *
- * @slot - The map, which is the consumer's own.
+ * @slot - The map, which is the consumer's own, and the markers over it.
  * @slot attribution - Whoever the tiles belong to, which most licenses require you to say.
  * @slot footer - Chrome below the map, such as a legend or a scale.
  * @slot header - Chrome above the map, such as a title or a search field.
  *
+ * @event {HelixActivateEvent} helix-activate - A reader pressed a marker. The value is its `name`, or its `label` where it has none.
  * @event {HelixMapPanEvent} helix-map-pan - The reader asked the map to move. Answer it against your own map.
  * @event {HelixMapZoomEvent} helix-map-zoom - The reader asked the map to zoom, by a direction rather than to a level.
  *
@@ -97,6 +102,127 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   @property()
   label = ''
+
+  /**
+   * The markers among the frame's children, in the order they are written,
+   * which is the order the arrow keys walk them in.
+   */
+  private get markers(): HelixHeadlessMapMarker[] {
+    return this.knownChildren.filter(
+      (child): child is HelixHeadlessMapMarker =>
+        (child as Partial<HelixHeadlessMapMarker>).isMapMarker === true,
+    )
+  }
+
+  /**
+   * The marker the map's one tab stop is on, by position among the markers:
+   * the one a reader last reached, and the first before they have reached any.
+   */
+  @state()
+  private stop = 0
+
+  /* Arrow keys, Home and End between the markers, wrapping, the controller the
+     accordion and the tabs use: `origin: 'focus'` because the press says which
+     marker it came from, and `selects` off because arriving on a place does
+     nothing but arrive. The frame's own arrows pan the map, and only from the
+     frame's region, so a press on a marker walks rather than pans. */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () =>
+      this.markers.map(
+        (marker, at): NavigableItem => ({
+          /* The marker itself, as a browser retargets a press from its
+             shadow root to it, or a node inside that root, as an engine that
+             does not retarget reports it. */
+          contains: (node) =>
+            node !== null && (marker.contains(node) || marker.shadowRoot?.contains(node) === true),
+          disabled: false,
+          /* The stop moves with the walk rather than waiting to hear focus
+             arrive: a focus event from inside a marker's own shadow root is
+             one an engine can fail to carry out to the frame, and the stop
+             is the walk's to keep. */
+          focusItem: () => {
+            this.stop = at
+            marker.focus()
+          },
+          select: () => {},
+          selected: false,
+        }),
+      ),
+    origin: 'focus',
+    selects: () => false,
+  })
+
+  /** The marker a press or a click came from, where it came from one. */
+  private markerOf(event: Event): HelixHeadlessMapMarker | undefined {
+    return event
+      .composedPath()
+      .find(
+        (one): one is HelixHeadlessMapMarker =>
+          (one as Partial<HelixHeadlessMapMarker>).isMapMarker === true,
+      )
+  }
+
+  /** Moves the tab stop to the marker focus arrived at. */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const marker = this.markerOf(event)
+    const at = marker ? this.markers.indexOf(marker) : -1
+    if (at !== -1) {
+      this.stop = at
+    }
+  }
+
+  /** Says a marker was pressed, by click, Enter or Space. */
+  private activate(marker: HelixHeadlessMapMarker): void {
+    this.dispatchEvent(new HelixActivateEvent({ value: marker.name || marker.label || '' }))
+  }
+
+  private readonly handleClick = (event: MouseEvent): void => {
+    const marker = this.markerOf(event)
+    if (marker) {
+      this.activate(marker)
+    }
+  }
+
+  private readonly handleMarkerKeydown = (event: KeyboardEvent): void => {
+    const marker = this.markerOf(event)
+    if (marker && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault()
+      this.activate(marker)
+    }
+  }
+
+  /** A marker added or taken away is a walk of a different length. */
+  private readonly handleSlotChange = (): void => {
+    this.requestUpdate()
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('click', this.handleClick)
+    this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('keydown', this.handleMarkerKeydown)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('click', this.handleClick)
+    this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('keydown', this.handleMarkerKeydown)
+  }
+
+  /**
+   * Puts the tab stop on one marker and takes it off the rest, the roving
+   * pattern the toolbar uses: every marker at `-1` is a map whose places the
+   * keyboard cannot reach, and every one at `0` is a Tab press per place.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    const markers = this.markers
+    const stop = Math.min(this.stop, markers.length - 1)
+    markers.forEach((marker, at) => {
+      marker.current = at === stop
+    })
+  }
 
   /** The events this family names, the surface naming none of its own. */
   protected override panEvent(detail: ViewportPanDetail): Event {
@@ -155,7 +281,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         <slot name="header"></slot>
       </div>
       <div part="viewport">
-        <slot></slot>
+        <slot @slotchange=${this.handleSlotChange}></slot>
       </div>
       ${this.renderControls()}
       <div part="footer">

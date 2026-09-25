@@ -13,11 +13,17 @@ export interface MapLibreMap {
   getSource(id: string): { attribution?: string | undefined } | undefined
   /** The style as it stands, whose sources are the ones to credit. */
   getStyle(): { sources?: Record<string, unknown> | undefined } | undefined
+  /** Goes to a place, gliding. */
+  easeTo(options: { center: [number, number]; duration?: number; zoom?: number }): unknown
+  /** Goes to a place at once. */
+  jumpTo(options: { center: [number, number]; zoom?: number }): unknown
   /** The arrow-key handler MapLibre adds unless told not to. */
   keyboard: { disable(): void; enable(): void; isEnabled(): boolean }
-  off(type: 'sourcedata' | 'styledata', listener: () => void): unknown
-  on(type: 'sourcedata' | 'styledata', listener: () => void): unknown
+  off(type: 'move' | 'resize' | 'sourcedata' | 'styledata', listener: () => void): unknown
+  on(type: 'move' | 'resize' | 'sourcedata' | 'styledata', listener: () => void): unknown
   panBy(offset: [number, number], options?: { animate?: boolean }): unknown
+  /** Where a place falls in the map's box, in pixels. */
+  project(lngLat: [number, number]): { x: number; y: number }
   zoomIn(options?: { animate?: boolean }): unknown
   zoomOut(options?: { animate?: boolean }): unknown
 }
@@ -59,8 +65,31 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     }
   },
   focusTarget: () => map.getCanvas(),
+  onView: (moved) => {
+    map.on('move', moved)
+    map.on('resize', moved)
+    return () => {
+      map.off('move', moved)
+      map.off('resize', moved)
+    }
+  },
   panBy: (x, y, animate) => {
     map.panBy([x, y], { animate })
+  },
+  project: ({ lat, lng }) => {
+    const { x, y } = map.project([lng, lat])
+    return { x, y }
+  },
+  show: ({ lat, lng, zoom }, animate) => {
+    const options = {
+      center: [lng, lat] as [number, number],
+      ...(zoom === undefined ? {} : { zoom }),
+    }
+    if (animate) {
+      map.easeTo(options)
+    } else {
+      map.jumpTo(options)
+    }
   },
   silenceKeyboard: () => {
     const was = map.keyboard.isEnabled()

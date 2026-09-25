@@ -26,9 +26,13 @@ export interface LeafletMap {
   getContainer(): HTMLElement
   /** The arrow-key handler, absent where the map was made with `keyboard: false`. */
   keyboard?: { disable(): unknown; enable(): unknown; enabled(): boolean } | undefined
-  off(type: 'layeradd layerremove', listener: () => void): unknown
-  on(type: 'layeradd layerremove', listener: () => void): unknown
+  /** Where a place falls in the map's box, in pixels. */
+  latLngToContainerPoint(latLng: [number, number]): { x: number; y: number }
+  off(type: 'layeradd layerremove' | 'move zoom resize', listener: () => void): unknown
+  on(type: 'layeradd layerremove' | 'move zoom resize', listener: () => void): unknown
   panBy(offset: [number, number], options?: { animate?: boolean }): unknown
+  /** Goes to a place, at its zoom or the one it is at. */
+  setView(center: [number, number], zoom?: number, options?: { animate?: boolean }): unknown
   /** The zoom buttons Leaflet adds unless told not to. */
   zoomControl?: { remove(): unknown } | undefined
   zoomIn(delta?: number, options?: { animate?: boolean }): unknown
@@ -72,8 +76,18 @@ export const leafletDriver = (map: LeafletMap): MapDriver => ({
     }
   },
   focusTarget: () => map.getContainer(),
+  onView: (moved) => {
+    map.on('move zoom resize', moved)
+    return () => {
+      map.off('move zoom resize', moved)
+    }
+  },
   panBy: (x, y, animate) => {
     map.panBy([x, y], { animate })
+  },
+  project: ({ lat, lng }) => {
+    const { x, y } = map.latLngToContainerPoint([lat, lng])
+    return { x, y }
   },
   replaceZoom: () => {
     const control = map.zoomControl
@@ -83,6 +97,9 @@ export const leafletDriver = (map: LeafletMap): MapDriver => ({
         map.addControl(control as never)
       }
     }
+  },
+  show: ({ lat, lng, zoom }, animate) => {
+    map.setView([lat, lng], zoom, { animate })
   },
   silenceKeyboard: () => {
     const handler = map.keyboard
