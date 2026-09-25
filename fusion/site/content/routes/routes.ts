@@ -155,6 +155,14 @@ const PROSE: Route[] = [
     title: 'Aura',
   },
   {
+    description: 'Maps in your theme, and one connector for any renderer.',
+    kind: 'page',
+    path: '/helix/maps',
+    priority: 0.5,
+    section: 'Helix',
+    title: 'Maps',
+  },
+  {
     description:
       'An editable source pane beside a live preview. Link a specific example with `?e=<family>.<slug>`.',
     kind: 'page',

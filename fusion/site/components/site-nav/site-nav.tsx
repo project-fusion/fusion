@@ -111,17 +111,20 @@ export function SiteMenu({
                 /* A module named and not yet built takes no `href`, so the row
                    renders as a `div` and is not a link to nowhere. It keeps its
                    place in the tree because the shape of the product is the
-                   point. */
-                destination.stage ? (
+                   point. One being built that has a page is a link and still
+                   says its stage. */
+                destination.href === undefined ? (
                   <helix-tree-item key={destination.title} slot="children">
                     {destination.title}
-                    <helix-tag
-                      data-density="sm"
-                      slot="end"
-                      tone={stageAppearance(destination.stage)}
-                    >
-                      {destination.stage}
-                    </helix-tag>
+                    {destination.stage && (
+                      <helix-tag
+                        data-density="sm"
+                        slot="end"
+                        tone={stageAppearance(destination.stage)}
+                      >
+                        {destination.stage}
+                      </helix-tag>
+                    )}
                   </helix-tree-item>
                 ) : (
                   <helix-tree-item
@@ -131,6 +134,15 @@ export function SiteMenu({
                     value={destination.href}
                   >
                     {destination.title}
+                    {destination.stage && (
+                      <helix-tag
+                        data-density="sm"
+                        slot="end"
+                        tone={stageAppearance(destination.stage)}
+                      >
+                        {destination.stage}
+                      </helix-tag>
+                    )}
                   </helix-tree-item>
                 ),
               )}
@@ -377,13 +389,15 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                        `aria-disabled` on a real link leaves it in the tab order
                        announcing itself as somewhere you cannot follow. A row
                        that is not interactive simply is not one. */
-                  destination.stage ? (
+                  destination.href === undefined ? (
                     <div data-megamenu-item data-soon key={destination.title}>
                       <strong>
                         {destination.title}
-                        <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
-                          {destination.stage}
-                        </helix-tag>
+                        {destination.stage && (
+                          <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
+                            {destination.stage}
+                          </helix-tag>
+                        )}
                       </strong>
                       <span>{destination.summary}</span>
                     </div>
@@ -400,7 +414,14 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                        *                           paragraph to read before choosing, so a narrow panel
                        *                           truncates rather than reflows.
                        */}
-                      <strong>{destination.title}</strong>
+                      <strong>
+                        {destination.title}
+                        {destination.stage && (
+                          <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
+                            {destination.stage}
+                          </helix-tag>
+                        )}
+                      </strong>
                       <span>{destination.summary}</span>
                     </Link>
                   ),

@@ -2,6 +2,7 @@ import { navigation } from '@fusion.dev/helix-docs'
 import { CONTACT } from '@/content/contact/contact'
 import type { CopyBlock, PageCopy } from '@/content/copy/copy'
 import { LANDING } from '@/content/landing/landing'
+import { MAPS } from '@/content/maps/maps'
 import { PRODUCTS } from '@/content/products/products'
 import { SERVICES } from '@/content/services/services'
 import { AURA, SANDBOX, THEME_BUILDER } from '@/content/tools/tools'
@@ -56,6 +57,7 @@ const COPY: Record<string, PageCopy> = {
   '/': LANDING,
   '/contact': CONTACT,
   '/helix/aura': AURA,
+  '/helix/maps': MAPS,
   '/helix/sandbox': SANDBOX,
   '/helix/theme': THEME_BUILDER,
 }
