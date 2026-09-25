@@ -42,6 +42,29 @@ that differs and nothing else:
 | `credit` | `true` | `false` leaves the slot to the page |
 | `keyboard` | `'frame'` | `'renderer'` keeps the renderer's keys and tab stop, for a 3D view that wants its rotate and pitch |
 
+## A style in the page's theme
+
+```js
+import { mapColorsFrom } from '@fusion.dev/helix-map'
+import { mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
+
+const style = mapLibreStyle(mapColorsFrom(frame), { language: 'en' })
+```
+
+`mapColorsFrom(element)` reads the page's tokens where the map is and settles
+them to colors a style can take; `mapLibreStyle(colors)` writes a MapLibre style
+from them, against the OpenMapTiles schema. **The land is `surface`, and
+everything else is the land moved toward something**: water toward `info`,
+parks toward `success`, the motorways and main roads toward the brand, and the
+smaller roads, buildings, borders and labels toward the ink. So one call draws
+a light map on a light theme and a dark one on a dark theme, and a new brand
+moves the roads with it. Redraw it with `map.setStyle(style, { diff: true })`
+when the theme changes.
+
+The tiles are OpenFreeMap's until Helix serves its own in the same schema, and
+`tiles` and `glyphs` point it at yours. Every style it writes is checked by
+MapLibre's own validator.
+
 ## Drivers
 
 | Import | Renderer |

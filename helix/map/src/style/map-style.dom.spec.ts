@@ -3,8 +3,20 @@ import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec'
 import { mapLibreStyle } from './map-style.js'
 import { parseColor } from './oklab.js'
 
-const LIGHT = { foreground: '#111111', info: '#1d6fd8', success: '#2f8a3b', surface: '#f7f7f7' }
-const DARK = { foreground: '#f2f2f2', info: '#5aa0f2', success: '#5fbf6c', surface: '#161616' }
+const LIGHT = {
+  foreground: '#111111',
+  info: '#1d6fd8',
+  primary: '#7c3aed',
+  success: '#2f8a3b',
+  surface: '#f7f7f7',
+}
+const DARK = {
+  foreground: '#f2f2f2',
+  info: '#5aa0f2',
+  primary: '#a78bfa',
+  success: '#5fbf6c',
+  surface: '#161616',
+}
 
 /** How light a paint is, which is all the direction of a mix needs. */
 const lightness = (value: unknown): number => {
@@ -38,10 +50,10 @@ describe('mapLibreStyle', () => {
     expect(style.glyphs).toContain('tiles.openfreemap.org/fonts/{fontstack}/{range}')
   })
 
-  test('a light theme draws darker roads, and a dark one lighter, from the same four roles', () => {
+  test('a light theme draws darker roads, and a dark one lighter, from the same roles', () => {
     const light = mapLibreStyle(LIGHT)
     const dark = mapLibreStyle(DARK)
-    const road = (style: typeof light) => lightness(paint(style, 'road-major', 'line-color'))
+    const road = (style: typeof light) => lightness(paint(style, 'road-minor', 'line-color'))
     const land = (style: typeof light) => lightness(paint(style, 'land', 'background-color'))
     expect(road(light)).toBeLessThan(land(light))
     expect(road(dark)).toBeGreaterThan(land(dark))
@@ -50,12 +62,28 @@ describe('mapLibreStyle', () => {
   test('the more a thing has to be seen, the further it is toward the ink', () => {
     const style = mapLibreStyle(LIGHT)
     const land = lightness(paint(style, 'land', 'background-color'))
-    const order = ['building', 'road-minor', 'road-major', 'road-motorway'].map(
-      (id) => land - lightness(paint(style, id, id === 'building' ? 'fill-color' : 'line-color')),
+    const key = (id: string): string =>
+      id === 'building' ? 'fill-color' : id.startsWith('label') ? 'text-color' : 'line-color'
+    const order = ['building', 'road-minor', 'label-village', 'label-city'].map(
+      (id) => land - lightness(paint(style, id, key(id))),
     )
     expect([...order].sort((a, b) => a - b)).toEqual(order)
-    const city = lightness(paint(style, 'label-city', 'text-color'))
-    expect(land - city).toBeGreaterThan(order.at(-1) ?? 0)
+  })
+
+  test('the roads a reader navigates by are drawn in the brand, and the rest are not', () => {
+    // How much blue is in a paint beyond its green, which violet has and gray has not.
+    const violet = (value: unknown): number => {
+      const rgb = parseColor(String(value))
+      if (!rgb) {
+        throw new Error(`not a color: ${String(value)}`)
+      }
+      return rgb.blue - rgb.green
+    }
+    const style = mapLibreStyle(LIGHT)
+    expect(violet(paint(style, 'road-motorway', 'line-color'))).toBeGreaterThan(0.1)
+    expect(violet(paint(style, 'road-major', 'line-color'))).toBeGreaterThan(0.05)
+    expect(Math.abs(violet(paint(style, 'road-secondary', 'line-color')))).toBeLessThan(0.02)
+    expect(Math.abs(violet(paint(style, 'road-minor', 'line-color')))).toBeLessThan(0.02)
   })
 
   test('a heritage district is not drawn as a park', () => {
