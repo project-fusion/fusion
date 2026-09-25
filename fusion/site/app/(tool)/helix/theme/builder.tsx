@@ -1,6 +1,7 @@
 'use client'
 
 import type { HelixBeforeResizeEvent, HelixSandboxPreview } from '@fusion.dev/helix'
+import { formatColor, parseColor } from '@fusion.dev/helix-core'
 import { type DerivedTheme, initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
@@ -272,6 +273,30 @@ export function ThemeBuilder({
     }
   }
   const [brand, setBrand] = useState(initialSettings.brand)
+  /* **What the field holds, apart from the brand the theme is derived from.**
+     A color input announces what is typed as it is typed, and `#`, `#1` and
+     `#12` are all on the way to a color without being one: handed to the
+     engine, the first keystroke threw and took the page down with it. The
+     field keeps the text, and the brand moves only when the text reads as a
+     color, written as the hex the engine and the link both take. */
+  const [brandText, setBrandText] = useState(initialSettings.brand)
+  const brandTyped = (typed: string): void => {
+    setBrandText(typed)
+    /* A whole hex as typed: the picker's model is hue, saturation and
+       brightness in whole numbers, and a trip through it moved `#123abc` to
+       `#133abd`. Any other syntax the field reads goes through it, since there
+       is no other way to a hex from `rgb()` or `hsl()`. */
+    const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(typed.trim())?.[1]
+    if (hex) {
+      const whole = hex.length === 3 ? [...hex].map((one) => one + one).join('') : hex
+      setBrand(`#${whole.toLowerCase()}`)
+      return
+    }
+    const read = parseColor(typed)
+    if (read) {
+      setBrand(formatColor(read, 'hex', false))
+    }
+  }
   const [scheme, setScheme] = useState(initialSettings.scheme)
   const [contrastTarget, setContrastTarget] = useState(initialSettings.contrastTarget)
   const [chromaScale, setChromaScale] = useState(initialSettings.chromaScale)
@@ -405,6 +430,7 @@ export function ThemeBuilder({
     setBlur(INITIAL.blur)
     setBodyFace(INITIAL.bodyFace)
     setBrand(INITIAL.brand)
+    setBrandText(INITIAL.brand)
     setChromaScale(INITIAL.chromaScale)
     setContrastTarget(INITIAL.contrastTarget)
     setDensity(INITIAL.density)
@@ -740,8 +766,8 @@ export function ThemeBuilder({
               hint="The one color you own. Everything else is derived from it."
               label="Brand"
               name="brand"
-              onChange={(event) => setBrand(event.currentTarget.value)}
-              value={brand}
+              onChange={(event) => brandTyped(event.currentTarget.value)}
+              value={brandText}
             ></helix-color-input>
 
             {/* **What the brand became, and why, because the gap surprises
