@@ -6,6 +6,7 @@ import {
   type ViewportZoomDetail,
 } from '@fusion.dev/helix-core'
 import { creditParts } from '../credit/credit.js'
+import { type MapMotion, motionOf } from '../motion/motion.js'
 
 /**
  * What a renderer has to answer for the frame to drive it, and nothing that is
@@ -34,8 +35,11 @@ export interface MapDriver {
    * lets markers keep up with the map; without it they are placed once.
    */
   onView?(moved: () => void): () => void
-  /** Moves the view by this many CSS pixels, right and down positive. */
-  panBy(x: number, y: number, animate: boolean): void
+  /**
+   * Moves the view by this many CSS pixels, right and down positive, over the
+   * page's own motion, or at once where it is `null`.
+   */
+  panBy(x: number, y: number, motion: MapMotion | null): void
   /**
    * Where a place falls in the map's box, in CSS pixels from its top left.
    * Without it markers cannot be placed, and the connector leaves them hidden.
@@ -52,9 +56,9 @@ export interface MapDriver {
    */
   silenceKeyboard?(): () => void
   /** Brings a place to the middle of the view, at its zoom where it has one. */
-  show?(place: MapPlace & { zoom?: number | undefined }, animate: boolean): void
+  show?(place: MapPlace & { zoom?: number | undefined }, motion: MapMotion | null): void
   /** Zooms one step in, `1`, or out, `-1`, by whatever a step is to this renderer. */
-  zoomBy(direction: 1 | -1, animate: boolean): void
+  zoomBy(direction: 1 | -1, motion: MapMotion | null): void
 }
 
 /** A place, in degrees. */
@@ -97,10 +101,6 @@ export interface MapConnection {
 /** Where the connector writes the renderer's credit, so it can find its own. */
 const CREDIT = 'data-helix-map-credit'
 
-/** Whether the reader asked for less motion, read when it is needed. */
-const still = (): boolean =>
-  typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
-
 /** The box the map is drawn in, which a pan is a fraction of. */
 const viewportOf = (frame: HTMLElement): { width: number; height: number } => {
   const box = (
@@ -138,12 +138,12 @@ export const connectMap = (
        reverses, and a renderer only knows left and right. */
     const inline = (to === 'end' ? 1 : to === 'start' ? -1 : 0) * (isRtl(frame) ? -1 : 1)
     const block = to === 'down' ? 1 : to === 'up' ? -1 : 0
-    driver.panBy(inline * width * by, block * height * by, !still())
+    driver.panBy(inline * width * by, block * height * by, motionOf(frame, 'step'))
   }
   const handleZoom = (event: Event): void => {
     const { by } = (event as CustomEvent<ViewportZoomDetail>).detail
     if (by !== 0) {
-      driver.zoomBy(by > 0 ? 1 : -1, !still())
+      driver.zoomBy(by > 0 ? 1 : -1, motionOf(frame, 'step'))
     }
   }
   frame.addEventListener(HelixMapPanEvent.eventName, handlePan)
@@ -252,7 +252,7 @@ export const connectMap = (
     const at = driver.project({ lat: marker.lat, lng: marker.lng })
     const { height, width } = viewportOf(frame)
     if (at.x < 0 || at.y < 0 || at.x > width || at.y > height) {
-      driver.show({ lat: marker.lat, lng: marker.lng }, !still())
+      driver.show({ lat: marker.lat, lng: marker.lng }, motionOf(frame, 'travel'))
     }
   }
   frame.addEventListener('focusin', reveal)

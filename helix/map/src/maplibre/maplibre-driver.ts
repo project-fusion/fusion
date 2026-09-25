@@ -1,4 +1,12 @@
 import type { MapDriver } from '../connect-map/connect-map.js'
+import type { MapMotion } from '../motion/motion.js'
+
+/** How MapLibre is told to move: over a time and a curve, or at once. */
+interface MapLibreAnimation {
+  animate?: boolean
+  duration?: number
+  easing?: (t: number) => number
+}
 
 /**
  * The part of a MapLibre `Map` the driver uses, so this package imports no
@@ -14,22 +22,29 @@ export interface MapLibreMap {
   /** The style as it stands, whose sources are the ones to credit. */
   getStyle(): { sources?: Record<string, unknown> | undefined } | undefined
   /** Goes to a place, gliding. */
-  easeTo(options: { center: [number, number]; duration?: number; zoom?: number }): unknown
+  easeTo(options: MapLibreAnimation & { center: [number, number]; zoom?: number }): unknown
   /** Goes to a place at once. */
   jumpTo(options: { center: [number, number]; zoom?: number }): unknown
   /** The arrow-key handler MapLibre adds unless told not to. */
   keyboard: { disable(): void; enable(): void; isEnabled(): boolean }
   off(type: 'move' | 'resize' | 'sourcedata' | 'styledata', listener: () => void): unknown
   on(type: 'move' | 'resize' | 'sourcedata' | 'styledata', listener: () => void): unknown
-  panBy(offset: [number, number], options?: { animate?: boolean }): unknown
+  panBy(offset: [number, number], options?: MapLibreAnimation): unknown
   /** Where a place falls in the map's box, in pixels. */
   project(lngLat: [number, number]): { x: number; y: number }
-  zoomIn(options?: { animate?: boolean }): unknown
-  zoomOut(options?: { animate?: boolean }): unknown
+  zoomIn(options?: MapLibreAnimation): unknown
+  zoomOut(options?: MapLibreAnimation): unknown
 }
 
 /** The class MapLibre's own credit control draws, by its documented name. */
 const CONTROL = '.maplibregl-ctrl-attrib'
+
+/**
+ * The page's motion as MapLibre takes it: its own duration and curve rather
+ * than MapLibre's, so a map pans the way the page's panels slide.
+ */
+const animation = (motion: MapMotion | null): MapLibreAnimation =>
+  motion ? { duration: motion.duration, easing: motion.easing } : { animate: false }
 
 /**
  * Drives a MapLibre map from the Map frame.
@@ -73,20 +88,20 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       map.off('resize', moved)
     }
   },
-  panBy: (x, y, animate) => {
-    map.panBy([x, y], { animate })
+  panBy: (x, y, motion) => {
+    map.panBy([x, y], animation(motion))
   },
   project: ({ lat, lng }) => {
     const { x, y } = map.project([lng, lat])
     return { x, y }
   },
-  show: ({ lat, lng, zoom }, animate) => {
+  show: ({ lat, lng, zoom }, motion) => {
     const options = {
       center: [lng, lat] as [number, number],
       ...(zoom === undefined ? {} : { zoom }),
     }
-    if (animate) {
-      map.easeTo(options)
+    if (motion) {
+      map.easeTo({ ...options, ...animation(motion) })
     } else {
       map.jumpTo(options)
     }
@@ -100,11 +115,11 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       }
     }
   },
-  zoomBy: (direction, animate) => {
+  zoomBy: (direction, motion) => {
     if (direction > 0) {
-      map.zoomIn({ animate })
+      map.zoomIn(animation(motion))
     } else {
-      map.zoomOut({ animate })
+      map.zoomOut(animation(motion))
     }
   },
 })

@@ -95,3 +95,13 @@ export const cssColor = ({ alpha, blue, green, red }: Rgb): string => {
     ? `rgb(${r}, ${g}, ${b})`
     : `rgba(${r}, ${g}, ${b}, ${Number(alpha.toFixed(3))})`
 }
+
+/** How bright a color is to the eye, as WCAG measures it. Its opacity is not counted. */
+const luminance = ({ blue, green, red }: Rgb): number =>
+  0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue)
+
+/** The WCAG contrast ratio between two colors, from 1 to 21. */
+export const contrast = (one: Rgb, other: Rgb): number => {
+  const [light, dark] = [luminance(one), luminance(other)].sort((a, b) => b - a) as [number, number]
+  return (light + 0.05) / (dark + 0.05)
+}
