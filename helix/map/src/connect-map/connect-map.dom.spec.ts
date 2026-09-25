@@ -184,7 +184,7 @@ describe('connectMap', () => {
     expect(slotted.querySelector('a')?.getAttribute('href')).toBe(
       'https://www.openstreetmap.org/copyright',
     )
-    expect(slotted.querySelector('a')?.dataset.link).toBe('subtle')
+    expect(slotted.querySelector('a')?.dataset.link).toBe('quiet')
     seen.credits = ['Weather by Rain Co']
     seen.changed?.()
     expect(slotted.textContent).toBe('Weather by Rain Co')

@@ -20,7 +20,7 @@ export const MAP_PARTS = [
     title: 'The connector',
   },
   {
-    body: 'A MapLibre style drawn from four of your tokens, light and dark from the same four.',
+    body: 'A MapLibre style drawn from your tokens, light and dark from the same ones.',
     stage: 'Building',
     title: 'The style',
   },
@@ -43,7 +43,7 @@ export const MAPS: PageCopy = {
   blocks: [
     {
       body: [
-        'The map on this page is drawn in this site’s theme. Switch between light and dark, or change the brand color, and it follows: every color in it is mixed from four of the page’s own tokens.',
+        'The map on this page is drawn in this site’s theme. Switch between light and dark, or change the brand color, and it follows: every color in it is mixed from the page’s own tokens.',
       ],
       title: 'The map',
     },
