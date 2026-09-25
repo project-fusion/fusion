@@ -66,7 +66,7 @@ export const MAPS: PageCopy = {
   blocks: [
     {
       body: [
-        'Pick a brand or a mode and only the map changes. It starts in this site’s theme, and every color in it is mixed from the page’s own tokens.',
+        'Pick a brand or a mode and only the map changes. Every color in it is mixed from the page’s own tokens.',
       ],
       title: 'The map',
     },
