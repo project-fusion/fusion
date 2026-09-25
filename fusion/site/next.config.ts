@@ -85,6 +85,7 @@ const config: NextConfig = {
   transpilePackages: [
     '@fusion.dev/helix-core',
     '@fusion.dev/helix-headless',
+    '@fusion.dev/helix-map',
     '@fusion.dev/helix-sandbox',
     '@fusion.dev/helix',
   ],

@@ -9,19 +9,23 @@ import type { Stage } from '@/content/verticals/verticals'
  */
 export interface Destination {
   /**
-   * Where it goes.
+   * Where it goes, and absent while it has nowhere to go yet: a row without
+   * one is not a link, whatever its stage.
    */
-  href: string
+  href?: string
   /**
    * The sentence under the name, which is what the panel is for.
    */
   summary: string
   /**
-   * The stage it is at, where it is named and not yet there.
+   * The stage it is at, where it is named and not yet finished.
    *
-   * A row with this set says where the work stands and does not pretend to be a
-   * link: nothing is followed and it leaves the tab order, rather than being
-   * focusable and inert. Naming the modules before they exist is the point,
+   * **The stage says where the work stands; the `href` says whether there is
+   * anywhere to go**, and the two are separate. A row named before it exists
+   * has a stage and no `href`, and does not pretend to be a link: nothing is
+   * followed and it leaves the tab order, rather than being focusable and
+   * inert. A row that is still being built and already has a page, as Maps
+   * does, is a link that carries its stage. Naming the modules before they exist is the point,
    * since the division of the product is the argument; letting one be pressed
    * would be the part that lied.
    *
@@ -143,7 +147,8 @@ export interface Product {
  *
  * Engram, Trace and Recall are rows carrying their stage rather than a link,
  * because the division of Cortex is the argument even before the modules are
- * built. A row gains an `href` on the day it has somewhere to go.
+ * built. A row gains an `href` on the day it has somewhere to go, and keeps its
+ * stage until it is finished: Maps is both.
  */
 export const PRODUCTS: Product[] = [
   {
@@ -186,6 +191,16 @@ export const PRODUCTS: Product[] = [
         summary: 'Derive a palette and see every pair measured.',
         title: 'Theme builder',
       },
+      /* A part of Helix rather than a third product: its argument is Helix's,
+         a map in the page's theme that a screen reader can find, and without
+         Helix it is MapLibre and somebody's tiles. Last, because the four
+         above are how Helix is used and this is a thing built with it. */
+      {
+        href: '/helix/maps',
+        stage: 'Building',
+        summary: 'Maps in your theme, and one connector for any renderer.',
+        title: 'Maps',
+      },
     ],
     href: '/helix',
     install: 'bun add @fusion.dev/helix',
@@ -211,19 +226,16 @@ export const PRODUCTS: Product[] = [
         title: 'Docs',
       },
       {
-        href: '/cortex',
         stage: 'Building',
         summary: 'Memory. What the system holds on to, and for how long.',
         title: 'Engram',
       },
       {
-        href: '/cortex',
         stage: 'Building',
         summary: 'Provenance. Where a fact came from, all the way back.',
         title: 'Trace',
       },
       {
-        href: '/cortex',
         stage: 'Declared',
         summary: 'Context. What to put in front of a model, and why that.',
         title: 'Recall',

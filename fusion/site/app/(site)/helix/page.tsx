@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { VerticalPage } from '@/components/vertical-page/vertical-page'
 import { PRODUCTS } from '@/content/products/products'
-import { findVertical } from '@/content/verticals/verticals'
+import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { getFamilies } from '../../../content/catalog/catalog'
 
@@ -42,26 +42,48 @@ export default function Page() {
           Where to go
         </helix-text>
         {/*
-         *  The same four rows the megamenu shows, from the same array. A panel
+         *  The same rows the megamenu shows, from the same array. A panel
          *             and an overview disagreeing about what a product contains is the
          *             fault two lists of it would eventually produce.
          *
-         *             Two columns for four rows: at `18rem` this fits three at desktop
-         *             width and orphans the fourth onto a row with two empty columns beside
-         *             it.
+         *             Two columns for the four ways Helix is used: at `18rem` this fits
+         *             three at desktop width and orphans the fourth onto a row with two
+         *             empty columns beside it. A part still being built, Maps, gets a row
+         *             of its own under them rather than a fifth card in the grid, which
+         *             would orphan it the same way and say it was a fifth door into
+         *             Helix rather than a thing built with it.
          */}
         <helix-grid gap="lg" min="26rem">
-          {product.destinations.map((destination) => (
-            <Link data-card href={destination.href} key={destination.href}>
+          {product.destinations
+            .filter((destination) => destination.href && !destination.stage)
+            .map((destination) => (
+              <Link data-card href={destination.href ?? ''} key={destination.href}>
+                <helix-card separation="outlined">
+                  <helix-text as="h3" slot="header" variant="title">
+                    {destination.title}
+                  </helix-text>
+                  <helix-text emphasis="muted">{destination.summary}</helix-text>
+                </helix-card>
+              </Link>
+            ))}
+        </helix-grid>
+        {product.destinations
+          .filter((destination) => destination.href && destination.stage)
+          .map((destination) => (
+            <Link data-card href={destination.href ?? ''} key={destination.href}>
               <helix-card separation="outlined">
-                <helix-text as="h3" slot="header" variant="title">
-                  {destination.title}
-                </helix-text>
+                <helix-flex align-items="center" gap="sm" justify-content="between" slot="header">
+                  <helix-text as="h3" variant="title">
+                    {destination.title}
+                  </helix-text>
+                  <helix-tag tone={stageAppearance(destination.stage ?? '')}>
+                    {destination.stage}
+                  </helix-tag>
+                </helix-flex>
                 <helix-text emphasis="muted">{destination.summary}</helix-text>
               </helix-card>
             </Link>
           ))}
-        </helix-grid>
       </helix-flex>
     </VerticalPage>
   )
