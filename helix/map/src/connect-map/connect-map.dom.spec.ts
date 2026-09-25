@@ -189,6 +189,19 @@ describe('connectMap', () => {
     expect(slotted.textContent).toBe('Weather by Rain Co')
   })
 
+  test('a renderer with nothing to credit slots nothing, until it has something', async () => {
+    const host = await frame()
+    const { driver, seen } = recorder()
+    connectMap(host, driver)
+    expect(credit(host)).toBeNull()
+    seen.credits = ['Tiles']
+    seen.changed?.()
+    expect(credit(host)?.textContent).toBe('Tiles')
+    seen.credits = []
+    seen.changed?.()
+    expect(credit(host)).toBeNull()
+  })
+
   test('a credit that is markup is never run as markup', async () => {
     const host = await frame()
     const { driver, seen } = recorder()
