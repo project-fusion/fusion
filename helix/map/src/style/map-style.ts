@@ -53,13 +53,14 @@ const shapes = ['match', ['geometry-type'], ['Polygon', 'MultiPolygon'], true, f
 const notTunnel = ['!=', ['get', 'brunnel'], 'tunnel']
 
 /**
- * A MapLibre style in the page's theme, from four colors.
+ * A MapLibre style in the page's theme.
  *
  * **Everything is the land moved toward something else**, in OKLab: the
- * water toward `info`, the parks toward `success`, and roads, buildings,
- * borders and labels toward the ink by how much each has to be seen. So the
- * same four colors draw a light map on a light theme and a dark map on a dark
- * one, and a brand that moves the palette moves the map with it. Only the
+ * water toward `info`, the parks toward `success`, the motorways and major
+ * roads toward the brand, and the smaller roads, buildings, borders and labels
+ * toward the ink by how much each has to be seen. So the same colors draw a
+ * light map on a light theme and a dark map on a dark one, and a brand that
+ * moves the palette moves the map with it. Only the
  * labels reach most of the way to the ink, since a place name is the one thing
  * on a map somebody reads, and every one is haloed in the land.
  *
@@ -81,6 +82,11 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
   const land = need('surface')
   const ink = need('foreground')
   const toward = (amount: number): string => cssColor(mix(land, ink, amount))
+  const brand = need('primary')
+  /* The brand for the roads a reader navigates by, motorways, trunks and
+     primaries, and the ink for the rest: branded down to the tertiaries, a
+     city's whole grid was the brand, and a blue brand ran into the water. */
+  const branded = (amount: number): string => cssColor(mix(land, brand, amount))
   const water = mix(land, need('info'), 0.3)
   const green = mix(land, need('success'), 0.16)
   const language = options.language ?? 'en'
@@ -90,7 +96,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
   const road = (
     id: string,
     classes: string[],
-    amount: number,
+    color: string,
     width: [[number, number], [number, number]],
     minzoom: number,
   ) => ({
@@ -98,7 +104,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
     id,
     layout: { 'line-cap': 'round', 'line-join': 'round' },
     minzoom,
-    paint: { 'line-color': toward(amount), 'line-width': widen(...width) },
+    paint: { 'line-color': color, 'line-width': widen(...width) },
     source: 'openmaptiles',
     'source-layer': 'transportation',
     type: 'line',
@@ -196,7 +202,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         ...road(
           'path',
           ['path', 'track'],
-          0.14,
+          toward(0.14),
           [
             [14, 0.5],
             [18, 2],
@@ -212,7 +218,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
       road(
         'road-minor',
         ['minor', 'service'],
-        0.1,
+        toward(0.1),
         [
           [12, 0.5],
           [18, 10],
@@ -220,9 +226,19 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         12,
       ),
       road(
+        'road-secondary',
+        ['secondary', 'tertiary'],
+        toward(0.16),
+        [
+          [10, 0.5],
+          [18, 14],
+        ],
+        10,
+      ),
+      road(
         'road-major',
-        ['primary', 'secondary', 'tertiary', 'trunk'],
-        0.18,
+        ['primary', 'trunk'],
+        branded(0.4),
         [
           [8, 0.5],
           [18, 16],
@@ -232,7 +248,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
       road(
         'road-motorway',
         ['motorway'],
-        0.26,
+        branded(0.6),
         [
           [5, 0.5],
           [18, 18],
