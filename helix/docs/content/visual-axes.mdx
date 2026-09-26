@@ -52,9 +52,9 @@ build.
 ## When a property needs two axes
 
 **If two values can apply at the same time, they belong on two axes.**
-`Megamenu` is the example. You can make its panel glass. Glass cannot share an
-attribute with `band`, which already uses that attribute for a layout. A panel
-can also be glass and outlined at once, so these are two axes.
+`Megamenu` is the example. `variant="band"` sets the layout of its panel, and
+glass is a `material`. A panel can be a band and glass at once, so the two
+values sit on two axes. A panel can also be glass and outlined at once.
 
 If you are adding a property and cannot decide which axis it belongs on, it is
 usually two properties.
