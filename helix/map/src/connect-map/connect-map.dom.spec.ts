@@ -665,3 +665,99 @@ describe('connectMap with a position', () => {
     expect(fitted).toEqual(['{"northEast":{"lat":5,"lng":6},"southWest":{"lat":0,"lng":0}}'])
   })
 })
+
+describe('connectMap with a frame that gathers its markers', () => {
+  type Gathered = HTMLElement & {
+    gathered: string[]
+    gatheredBy: HTMLElement | undefined
+    updateComplete: Promise<boolean>
+  }
+
+  /** Ten pixels a degree at first, and as many as a spec zooms it to after. */
+  const zooming = (): { driver: MapDriver; fitted: string[]; zoom: (scale: number) => void } => {
+    let scale = 10
+    let heard = (): void => undefined
+    const fitted: string[] = []
+    return {
+      driver: {
+        fit: (bounds, padding) => {
+          fitted.push(`${JSON.stringify(bounds)} ${padding}`)
+        },
+        onView: (moved) => {
+          heard = moved
+          return () => undefined
+        },
+        panBy: () => {},
+        project: ({ lat, lng }) => ({ x: lng * scale, y: lat * scale }),
+        zoomBy: () => {},
+      },
+      fitted,
+      zoom: (next) => {
+        scale = next
+        heard()
+      },
+    }
+  }
+
+  const gathering = async (): Promise<{ host: Frame; places: Gathered[] }> => {
+    const host = await frame(
+      `<helix-headless-map-marker label="Depot" lat="1" lng="1"></helix-headless-map-marker>
+       <helix-headless-map-marker label="Ferry" lat="1" lng="2"></helix-headless-map-marker>
+       <helix-headless-map-marker label="Mission" lat="10" lng="10"></helix-headless-map-marker>`,
+    )
+    ;(host as Frame & { cluster: boolean }).cluster = true
+    await host.updateComplete
+    return { host, places: [...host.querySelectorAll('helix-headless-map-marker')] as Gathered[] }
+  }
+
+  test('markers whose points would meet are drawn as one, at their middle, and come apart zoomed in', async () => {
+    const { host, places } = await gathering()
+    const [depot, ferry, mission] = places as [Gathered, Gathered, Gathered]
+    const { driver, zoom } = zooming()
+    connectMap(host, driver)
+    expect(depot.gathered).toEqual(['Depot', 'Ferry'])
+    expect(ferry.gatheredBy).toBe(depot)
+    expect([mission.gathered, mission.gatheredBy]).toEqual([[], undefined])
+    expect(depot.style.getPropertyValue('--_map-marker-x')).toBe('15px')
+
+    zoom(100)
+    expect(depot.gathered).toEqual([])
+    expect(ferry.gatheredBy).toBeUndefined()
+    expect(depot.style.getPropertyValue('--_map-marker-x')).toBe('100px')
+  })
+
+  test('a cluster pressed is framed, unless the page answers it itself', async () => {
+    const { host, places } = await gathering()
+    const [depot] = places as [Gathered]
+    const { driver, fitted } = zooming()
+    const connection = connectMap(host, driver)
+    await depot.updateComplete
+    const press = (): void => {
+      depot.shadowRoot
+        ?.querySelector('[part="marker"]')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    }
+    press()
+    await settle()
+    expect(fitted).toEqual(['{"northEast":{"lat":1,"lng":2},"southWest":{"lat":1,"lng":1}} 96'])
+    connection.disconnect()
+    connectMap(host, driver, { clusterZoom: false })
+    await depot.updateComplete
+    const heard: string[][] = []
+    host.addEventListener('helix-map-cluster', (event) => heard.push(event.detail.labels))
+    press()
+    await settle()
+    expect(fitted).toHaveLength(1)
+    expect(heard).toEqual([['Depot', 'Ferry']])
+  })
+
+  test('a frame that does not gather draws every marker on its own', async () => {
+    const host = await frame(
+      `<helix-headless-map-marker label="Depot" lat="1" lng="1"></helix-headless-map-marker>
+       <helix-headless-map-marker label="Ferry" lat="1" lng="1"></helix-headless-map-marker>`,
+    )
+    connectMap(host, zooming().driver)
+    const [depot] = [...host.querySelectorAll('helix-headless-map-marker')] as Gathered[]
+    expect(depot?.gathered).toEqual([])
+  })
+})

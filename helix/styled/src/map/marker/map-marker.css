@@ -57,6 +57,11 @@
   gap: var(--helix-space-xs);
   left: 0;
   outline: none;
+  /* **Only the point is pressed.** The button's box runs the width of its
+     name, which is invisible until the marker is pointed at, and that box
+     took presses and drags meant for the map, and for the marker beside it,
+     across a name nobody could see. */
+  pointer-events: none;
   position: absolute;
   top: 0;
   transform: translate(calc(var(--_map-marker-size) / -2), calc(-50% - var(--_map-marker-lift)));
@@ -102,6 +107,7 @@
   isolation: isolate;
   justify-items: center;
   line-height: 1;
+  pointer-events: auto;
   position: relative;
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -196,6 +202,45 @@
   z-index: calc(var(--helix-layer-beneath) - 1);
 }
 
+/* **A cluster: the count of the places it stands for**, in a circle whatever
+   shape its first place takes, filled with the brand's fill that carries
+   white and haloed in the brand, which says there is more than one here
+   before the number is read. Larger than a lettered point, the count being up
+   to three figures. */
+:host(:state(cluster)) {
+  --_map-marker-lift: 0px;
+  --_map-marker-size: var(--map-marker-cluster-size, 1.75rem);
+}
+
+:host(:state(cluster)) [part="point"] {
+  background: var(--map-marker-cluster-color, var(--helix-color-primary-surface));
+  border: var(--helix-border-thick) solid var(--_map-marker-edge);
+  border-radius: var(--helix-radii-full);
+  box-shadow:
+    0 0 0 calc(var(--_map-marker-size) * 0.18)
+    color-mix(
+      in oklab,
+      var(--map-marker-cluster-color, var(--helix-color-primary-surface)) 28%,
+      transparent
+    ),
+    var(--_map-marker-shadow);
+  color: var(--helix-color-foreground-on-accent);
+  font-size: calc(var(--_map-marker-size) * 0.42);
+  font-variant-numeric: tabular-nums;
+  rotate: none;
+  scale: none;
+}
+
+:host(:state(cluster)) [part="point"]::before,
+:host(:state(cluster)) [part="point"]::after {
+  content: none;
+}
+
+/* Out of the way while another marker stands for it. */
+:host(:state(clustered)) {
+  display: none;
+}
+
 /* **Separation: how the point stands off the map.** Absent is an edge in the
    surface and a little lift. `outlined` is the edge alone, `elevated` the
    edge lifted, as an elevated card is, `filled` a wash of its own color
@@ -239,6 +284,16 @@
   pointer-events: none;
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   white-space: nowrap;
+}
+
+/* **Its names wrap**, a cluster's being a list: a line as long as twelve
+   places' names ran off the map. */
+:host(:state(cluster)) [part="label"] {
+  /* As wide as the names, up to a measure, and only then wrapped: left to
+     shrink, a label beside the point wrapped at every word. */
+  inline-size: max-content;
+  max-inline-size: 16rem;
+  white-space: normal;
 }
 
 /* **Material is the name's ground**, as it is the controls' on the frame:

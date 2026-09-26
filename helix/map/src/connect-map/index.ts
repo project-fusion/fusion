@@ -7,4 +7,4 @@ export type {
   MapPadding,
   MapPlace,
 } from './connect-map.js'
-export { connectMap } from './connect-map.js'
+export { connectMap, distancesAlong } from './connect-map.js'
