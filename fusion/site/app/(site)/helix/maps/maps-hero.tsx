@@ -435,19 +435,26 @@ export function MapsHero({
           points={WALK.path.map(([lat, lng]) => ({ lat, lng }))}
         />
         {/* **Lettered in the order they are walked**, the letter seen and the
-            place's name read; the start a ring and the end a pin, the way
-            directions draw where a journey begins and where it ends. */}
-        {PLACES.map((place, at) => (
-          <helix-map-marker
-            key={place.label}
-            label={place.label}
-            lat={place.lat}
-            lng={place.lng}
-            shape={at === 0 ? 'ring' : at === PLACES.length - 1 ? 'pin' : undefined}
-          >
-            <span slot="icon">{letter(at)}</span>
-          </helix-map-marker>
-        ))}
+            place's name read: the stops rings in the walker's ink, and the
+            end a red pin, the way directions draw where a journey ends. Red
+            is the danger tone, chosen here for a destination as map apps
+            choose it, and not a meaning the marker gives it. */}
+        {PLACES.map((place, at) => {
+          const last = at === PLACES.length - 1
+          return (
+            <helix-map-marker
+              class={last ? undefined : styles.mapsStop}
+              key={place.label}
+              label={place.label}
+              lat={place.lat}
+              lng={place.lng}
+              shape={last ? 'pin' : 'ring'}
+              tone={last ? 'danger' : undefined}
+            >
+              <span slot="icon">{letter(at)}</span>
+            </helix-map-marker>
+          )
+        })}
       </helix-map>
       <div className={styles.mapsPanel} ref={panel}>
         <helix-flex align-items="center" data-density="sm" gap="xs">
