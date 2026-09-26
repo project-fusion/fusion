@@ -23,8 +23,8 @@ export function Example() {
             Install
           </helix-text>
           <helix-text as="p">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+            Install the package with your package manager, then import it in the entry file of your
+            app.
           </helix-text>
         </section>
         <section id="usage">
@@ -35,8 +35,7 @@ export function Example() {
             Usage
           </helix-text>
           <helix-text as="p">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+            Create a client with your API key, then call its methods to read and write your data.
           </helix-text>
         </section>
         <section id="api">
@@ -47,8 +46,8 @@ export function Example() {
             API
           </helix-text>
           <helix-text as="p">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+            Each method returns a promise. Errors include a code and a message you can show to your
+            users.
           </helix-text>
         </section>
       </div>

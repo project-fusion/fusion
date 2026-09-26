@@ -21,19 +21,16 @@
   const filter = document.getElementById('filter')
   const query = document.getElementById('query')
 
-  /* **The grammar is this page's, and the field never learns it.** Keys, and
-     what each one accepts. A real console reads the values from its own data;
-     what matters here is that the element is handed a list and asked to show
-     it, never asked what a key is. */
+  /* The page defines the keys and the values each one accepts. The field shows
+     the list it is given. */
   const VOCABULARY = {
     area: ['billing', 'infra', 'docs'],
     owner: ['ada', 'grace', 'linus'],
     status: ['open', 'closed', 'draft'],
   }
 
-  /* Everything after the last space is what is being typed now. A term with no
-     colon in it is a key being named; one with a colon is a value being chosen
-     for the key before it. */
+  /* Everything after the last space is the term being typed. A term with no
+     colon is a key, and a term with a colon is a value for that key. */
   const termAt = (text) => {
     const term = text.slice(0, filter.selectionStart).split(/\s+/).at(-1) ?? ''
     const colon = term.indexOf(':')
@@ -50,9 +47,8 @@
     return (VOCABULARY[term.key] ?? []).filter((value) => value.startsWith(term.text))
   }
 
-  /* The panel is whatever is slotted, so offering something is rendering it and
-     offering nothing is rendering nothing. The field opens and closes itself
-     around that. */
+  /* The panel shows the options that are slotted. The field opens and closes it
+     as the list changes. */
   const offer = () => {
     const values = suggestionsFor(filter.value)
     filter.replaceChildren(
@@ -69,24 +65,19 @@
 
   filter.addEventListener('input', offer)
 
-  /* **One handler for both ways of choosing**, since the option announces its
-     own `helix-select` whether it was pressed or reached with Enter. */
+  /* The option sends `helix-select` when it is pressed or chosen with Enter, so
+     one handler covers both. */
   filter.addEventListener('helix-select', async (event) => {
     const term = termAt(filter.value)
-    /* A key completes to `owner:` and the panel carries straight on into its
-       values. A value completes to `owner:ada ` and the panel closes, because
-       the next term is empty and every key still matches. */
+    /* A key completes to `owner:` and the panel shows its values. A value
+       completes to `owner:ada ` and the panel closes. */
     const insert = term.key === null ? `${event.detail.value}:` : `${event.detail.value} `
     const head = filter.value.slice(0, filter.selectionStart)
     const kept = head.slice(0, head.length - (term.key === null ? term.text.length : term.text.length + term.key.length + 1))
     const tail = filter.value.slice(filter.selectionStart)
     filter.value = kept + insert + tail
-    /* **Awaited, because the caret cannot be put into text that is not there
-       yet.** Setting `value` schedules a render; the `<input>` still holds the
-       old string until it lands, so a `setSelectionRange` before it clamps to
-       the old length and the render then moves the caret again. That is what
-       stopped the second level appearing: the next parse read the term the
-       reader had already finished with. */
+    /* Wait for the render before moving the caret. Until then, the input holds
+       the old text, and `setSelectionRange` would clamp to its length. */
     await filter.updateComplete
     const at = kept.length + insert.length
     filter.setSelectionRange(at, at)

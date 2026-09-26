@@ -3,7 +3,7 @@ export function Example() {
     <helix-time-input
       default-value="08:30"
       feedback="Choose a time at or after 9:00 AM"
-      hint="Between nine and five"
+      hint="Between 9:00 AM and 5:00 PM"
       label="Appointment"
       max="17:00"
       min="09:00"

@@ -3,11 +3,7 @@ export function Example() {
     <helix-breadcrumbs aria-label="Breadcrumb">
       <helix-breadcrumb href="#acme">acme</helix-breadcrumb>
 
-      {/* Two targets, not one. The label is an ordinary crumb and navigates like
-          every other crumb in the trail; the trigger sits in `end`, outside the
-          anchor, and opens the list of what this step could be instead. A single
-          control that did both would navigate whichever half the reader aimed
-          at. */}
+      {/* The label is a link. The button in the `end` slot opens a menu of projects. */}
       <helix-breadcrumb href="#design-system">
         design-system
         <helix-menu
@@ -27,7 +23,7 @@ export function Example() {
         </helix-menu>
       </helix-breadcrumb>
 
-      <helix-breadcrumb current>Components</helix-breadcrumb>
+      <helix-breadcrumb current>Settings</helix-breadcrumb>
     </helix-breadcrumbs>
   )
 }

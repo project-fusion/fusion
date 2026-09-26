@@ -3,23 +3,23 @@ import './nesting.css'
 export function Example() {
   return (
     <div className="stack">
-      <helix-headless-tree label="Repository">
+      <helix-headless-tree label="Project files">
         <helix-headless-tree-item
           default-open
           value="helix"
         >
-          helix
+          src
           <helix-headless-tree-item
             slot="children"
             value="headless"
           >
-            headless
+            components
           </helix-headless-tree-item>
           <helix-headless-tree-item
             slot="children"
             value="styled"
           >
-            styled
+            styles
           </helix-headless-tree-item>
         </helix-headless-tree-item>
         <helix-headless-tree-item value="readme">README.md</helix-headless-tree-item>
@@ -69,20 +69,20 @@ export function Example() {
               slot="children"
               value="any-framework"
             >
-              Any framework
+              Windows
             </helix-headless-tree-item>
             <helix-headless-tree-item
               slot="children"
               value="react"
             >
-              React
+              macOS
             </helix-headless-tree-item>
           </helix-headless-tree-item>
           <helix-headless-tree-item
             slot="children"
             value="theming"
           >
-            Theming
+            Configuration
           </helix-headless-tree-item>
         </helix-headless-tree-item>
         <helix-headless-tree-item value="changelog">Changelog</helix-headless-tree-item>

@@ -7,10 +7,10 @@ export function Example() {
         aria-describedby="save-tip"
         id="save"
       >
-        Save
+        Save changes
       </helix-button>
       <helix-tooltip
-        content="Writes the file to disk"
+        content="Save your changes to the file"
         for="save"
         id="save-tip"
       ></helix-tooltip>
@@ -23,7 +23,7 @@ export function Example() {
         <helix-icon name="archive"></helix-icon>
       </helix-icon-button>
       <helix-tooltip
-        content="Moves it out of the inbox"
+        content="Move the message out of your inbox"
         for="archive"
         id="archive-tip"
         placement="bottom"

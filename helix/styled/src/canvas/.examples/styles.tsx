@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-canvas
       grid="dots"
-      label="Ways a card and a line can look"
+      label="Project plan"
     >
       <helix-canvas-node
         height={64}
@@ -11,7 +11,7 @@ export function Example() {
         x={0}
         y={0}
       >
-        Outlined, at rest
+        Research
       </helix-canvas-node>
 
       <helix-canvas-node
@@ -23,7 +23,7 @@ export function Example() {
         x={256}
         y={0}
       >
-        Filled with its tone
+        Design
       </helix-canvas-node>
 
       <helix-canvas-node
@@ -35,7 +35,7 @@ export function Example() {
         x={0}
         y={160}
       >
-        Elevated
+        Prototype
       </helix-canvas-node>
 
       <helix-canvas-node
@@ -46,7 +46,7 @@ export function Example() {
         x={256}
         y={160}
       >
-        Plain, a label on the board
+        Launch
       </helix-canvas-node>
 
       <helix-canvas-edge

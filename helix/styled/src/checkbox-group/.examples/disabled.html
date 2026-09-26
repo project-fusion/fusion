@@ -5,25 +5,25 @@
 >
   <helix-checkbox-group
     disabled
-    hint="Hint"
-    label="Written off"
+    hint="Contact an admin to change these."
+    label="Email notifications"
     name="a"
     value="one"
   >
-    <helix-checkbox value="one">Option One</helix-checkbox>
-    <helix-checkbox value="two">Option Two</helix-checkbox>
+    <helix-checkbox value="one">Product updates</helix-checkbox>
+    <helix-checkbox value="two">Security alerts</helix-checkbox>
   </helix-checkbox-group>
 
-  <!-- The same state, arriving from an ancestor fieldset. -->
+  <!-- The disabled fieldset disables this group. -->
   <fieldset disabled>
     <helix-checkbox-group
-      hint="Hint"
-      label="Off from the fieldset"
+      hint="Contact an admin to change these."
+      label="SMS notifications"
       name="b"
       value="two"
     >
-      <helix-checkbox value="one">Option One</helix-checkbox>
-      <helix-checkbox value="two">Option Two</helix-checkbox>
+      <helix-checkbox value="one">Product updates</helix-checkbox>
+      <helix-checkbox value="two">Security alerts</helix-checkbox>
     </helix-checkbox-group>
   </fieldset>
 </helix-flex>

@@ -13,10 +13,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Type a time, or open the wheels</span>
     </helix-list-item>
   </helix-list>
@@ -27,7 +27,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 8
 
   const say = (name, carried) => {
@@ -48,21 +48,21 @@
   }
 
   at.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'the panel is about to show, refusable')
+    say('helix-before-open', 'the panel is about to open, can be canceled')
   })
   at.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'the panel is about to go, refusable')
+    say('helix-before-close', 'the panel is about to close, can be canceled')
   })
   at.addEventListener('toggle', (event) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+    say('toggle', `${event.oldState} to ${event.newState}, after the panel opened or closed`)
   })
   at.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `about to change to "${event.detail.value}", can be canceled`)
   })
   at.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `"${event.currentTarget.value}", sent once for the whole value`)
   })
   at.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `"${event.currentTarget.value}", sent when the value is committed`)
   })
 </script>

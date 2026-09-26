@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-filter-input
       clearable
-      hint="The tokens stay: they are the consumer’s markup, and the button is the text’s"
+      hint="Clearing the search text keeps the filters"
       label="Filter rows"
       value="deploy"
     >

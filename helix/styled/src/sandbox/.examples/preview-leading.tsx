@@ -3,11 +3,8 @@ import './preview-leading.css'
 export function Example() {
   return (
     <div className="stage">
-      {/* `split` and not `default-split` alone, which is only where a double
-               click puts it back to: the panes open at the component default until
-               the live property says otherwise, and the share this example is about
-               would show up for the first time on a reset. `sized-panes` is where
-               the pair is the subject. */}
+      {/* `split` sets where the panes open. `default-split` is where a double
+          click on the divider puts them back. */}
       <helix-sandbox
         default-split={60}
         lead="preview"
@@ -18,12 +15,12 @@ export function Example() {
           <helix-tag>card.html</helix-tag>
         </helix-sandbox-toolbar>
 
-        {/* A plain element, not `Sandbox.Preview`. The preview renders an iframe
-               and an example has no document to point one at. */}
+        {/* The preview here is a plain element. `Sandbox.Preview` renders an
+            iframe, which needs a document to load. */}
         <div slot="preview">
           <helix-card>
             <h3>Quarterly review</h3>
-            <p>Due on the ninth.</p>
+            <p>Due on September 9.</p>
           </helix-card>
         </div>
 

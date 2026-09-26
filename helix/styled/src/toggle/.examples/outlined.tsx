@@ -2,13 +2,13 @@ export function Example() {
   return (
     <helix-toggle-group
       default-value="one"
-      hint="Hint"
-      label="Label"
+      hint="How the results are laid out"
+      label="View"
       separation="outlined"
     >
-      <helix-toggle value="one">Option One</helix-toggle>
-      <helix-toggle value="two">Option Two</helix-toggle>
-      <helix-toggle value="three">Option Three</helix-toggle>
+      <helix-toggle value="one">List</helix-toggle>
+      <helix-toggle value="two">Grid</helix-toggle>
+      <helix-toggle value="three">Board</helix-toggle>
     </helix-toggle-group>
   )
 }

@@ -14,7 +14,7 @@
       src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400"
     ></helix-image>
     <helix-image
-      alt="Nothing, because this one cannot arrive"
+      alt="Team photo"
       shape="rounded"
       src="https://example.invalid/missing.png"
     ></helix-image>
@@ -23,11 +23,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">One picture loads and one does not</span>
+      No events yet
+      <span slot="description">One image loads and one fails</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -37,7 +37,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -57,23 +57,22 @@
     }
   }
 
-  /* In the capture phase, because neither of these bubbles: that is the platform
-     on an `<img>` and it is deliberately the platform here too, since a bubbling
-     relay is the one shape React cannot bind on a custom element. */
+  /* Listen in the capture phase, because `load` and `error` do not bubble, as
+     on an `<img>`. */
   pictures.addEventListener('load', (event) => {
     say('load', `${event.target.naturalWidth} by ${event.target.naturalHeight}`)
   }, true)
   pictures.addEventListener('error', () => {
-    say('error', 'nothing arrived, so the fallback shows')
+    say('error', 'Could not load the image')
   }, true)
 
-  /* A picture that settled before these listeners existed fired its event to
-     nobody, so ask each one where it stands. */
+  /* An image that settled before these listeners were added sent its event to
+     no one, so check the status of each one. */
   for (const picture of pictures.querySelectorAll('helix-image')) {
     if (picture.status === 'loaded') {
       say('load', `${picture.naturalWidth} by ${picture.naturalHeight}`)
     } else if (picture.status === 'error') {
-      say('error', 'nothing arrived, so the fallback shows')
+      say('error', 'Could not load the image')
     }
   }
 

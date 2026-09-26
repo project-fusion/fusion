@@ -6,7 +6,7 @@ export function Example() {
     >
       <helix-video
         extra-controls="previous next"
-        label="One of several"
+        label="Episode player"
         slot="player"
       ></helix-video>
       <helix-video-playlist-menu
@@ -14,10 +14,10 @@ export function Example() {
         placement="top-end"
       ></helix-video-playlist-menu>
       <helix-video-playlist-item value="one">
-        Getting started <span slot="meta">4:12</span>
+        Setting up your account <span slot="meta">4:12</span>
       </helix-video-playlist-item>
       <helix-video-playlist-item value="two">
-        Tokens and themes <span slot="meta">6:40</span>
+        Inviting your team <span slot="meta">6:40</span>
       </helix-video-playlist-item>
     </helix-video-playlist>
   )

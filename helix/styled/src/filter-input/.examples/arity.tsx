@@ -12,14 +12,14 @@ export function Example() {
 
   return (
     <helix-filter-input
-      hint="Assignee offers is empty, which takes no values at all"
+      hint="Filter by disposition, created date, or assignee"
       label="Filter the queue"
       onhelix-facet={(event) => {
         const { arity, field, label, operatorLabel, values } = event.detail
         setChips((held) => {
           const rest = held.filter((chip) => chip.field !== field)
-          /* `arity` is what tells an empty filter from no filter: a comparison
-           that takes none is filtering, and will never have values to show. */
+          /* `arity` tells an empty filter from no filter. A comparison that
+             takes no values is still a filter. */
           return values.length === 0 && arity !== 'none'
             ? rest
             : [...rest, { field, label, operatorLabel, values }]
@@ -51,7 +51,7 @@ export function Example() {
           <helix-option value="settled">Settled</helix-option>
         </helix-filter-field>
 
-        {/* `one`: pressing another value replaces it rather than adding. */}
+        {/* `one`: choosing another value replaces the current one. */}
         <helix-filter-field
           label="Created"
           name="created"

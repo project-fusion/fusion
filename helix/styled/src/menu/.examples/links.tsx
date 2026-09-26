@@ -5,19 +5,19 @@ export function Example() {
         emphasis="outlined"
         slot="trigger"
       >
-        Open
+        Open menu
       </helix-button>
       <helix-menu-item
         href="#button"
         value="button"
       >
-        Button
+        Dashboard
       </helix-menu-item>
       <helix-menu-item
         href="#menu"
         value="menu"
       >
-        Menu
+        Settings
       </helix-menu-item>
       <helix-menu-item
         href="https://github.com"
@@ -25,7 +25,7 @@ export function Example() {
         target="_blank"
         value="source"
       >
-        Source on GitHub
+        Source code
       </helix-menu-item>
     </helix-menu>
   )

@@ -9,7 +9,7 @@ export function Example() {
     >
       <helix-video
         extra-controls="previous next"
-        label="One of several"
+        label="Episode player"
         slot="player"
       ></helix-video>
       <helix-video-playlist-item

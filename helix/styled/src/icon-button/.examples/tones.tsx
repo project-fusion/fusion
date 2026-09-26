@@ -4,10 +4,8 @@ export function Example() {
       align-items="center"
       gap="md"
     >
-      {/* `accent` renders as `primary` here, and that is the default rather than
-          a mistake: a palette that has not named a second color does not have
-          one. `button/accent` is where a theme names one and the pair
-          separate. */}
+      {/* `accent` looks the same as `primary` until your theme sets an accent
+          color with `button/accent`. */}
       <helix-icon-button
         label="Download"
         tone="primary"
@@ -16,7 +14,7 @@ export function Example() {
       </helix-icon-button>
 
       <helix-icon-button
-        label="Open"
+        label="Open in new tab"
         tone="accent"
       >
         <helix-icon name="arrow-square-out"></helix-icon>

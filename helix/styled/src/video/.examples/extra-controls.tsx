@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-video
       extra-controls="speed pip remote download"
-      label="A clip with more controls"
+      label="Product walkthrough"
       speeds="0.5 1 1.5 2"
       src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
     ></helix-video>

@@ -53,7 +53,7 @@ export function Example() {
           as="p"
           emphasis="muted"
         >
-          Its own range, 8 to 15. June looks like zero and March like a crisis.
+          Scale from 8 to 15
         </helix-text>
         <helix-line-chart for="incidents"></helix-line-chart>
       </helix-flex>
@@ -66,7 +66,7 @@ export function Example() {
           as="p"
           emphasis="muted"
         >
-          From zero. Eight is most of fifteen, and neither month was quiet.
+          Scale from 0 to 15
         </helix-text>
         <helix-line-chart
           for="incidents"

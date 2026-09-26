@@ -22,7 +22,7 @@
         ></helix-icon>
       </helix-speed-dial-item>
       <helix-speed-dial-item value="upload">
-        Upload
+        Upload file
         <helix-icon
           name="upload-simple"
           slot="icon"
@@ -35,10 +35,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Open the dial, then choose an action</span>
     </helix-list-item>
   </helix-list>
@@ -49,7 +49,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 7
 
   const say = (name, carried) => {
@@ -70,15 +70,15 @@
   }
 
   dial.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'about to fan out, and refusable')
+    say('helix-before-open', 'about to open, can be canceled')
   })
   dial.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'about to fold away, and refusable')
+    say('helix-before-close', 'about to close, can be canceled')
   })
   dial.addEventListener('toggle', (event) => {
     say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
   })
   dial.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was chosen, which bubbles`)
+    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   })
 </script>

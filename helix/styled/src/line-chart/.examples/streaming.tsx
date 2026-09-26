@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-/* How many readings are on screen at once, which is what makes it a window
-   rather than a line that grows until it is unreadable. */
+/* The number of readings shown at once. */
 const WINDOW = 24
 
-/* **Two sines rather than a random walk**, so the two syntaxes of this example
-   draw the same line. A photographed pair is compared pixel for pixel, and
-   `Math.random()` guarantees they never match. */
+/* Two sine waves give the HTML and React versions the same data, so their
+   screenshots match. */
 const reading = (at: number) => 220 + Math.round(Math.sin(at / 3) * 60 + Math.sin(at / 1.7) * 22)
 
 const window_ = (upto: number) =>
@@ -24,9 +22,7 @@ export function Example() {
     clearInterval(timer.current)
     at.current = WINDOW
     setRows(window_(WINDOW))
-    /* **A full window and then still**, because these pages are photographed
-       with reduced motion forced and a chart mid-tick is a different picture
-       every run. The shape is the same either way; only the marching stops. */
+    /* With reduced motion on, the chart shows one full window and stops. */
     if (globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return
     }
@@ -46,12 +42,8 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      {/* **The table is the chart, and this is the whole of what streaming means
-          here.** A reading arriving is a row appended and the oldest removed;
-          nothing calls a method on the chart, because a chart that took data
-          through an API would be a second copy of the numbers the page already
-          has. It is the same contract the other examples use, driven by a
-          clock. */}
+      {/* Each new reading adds a row to the table and removes the oldest one.
+          The chart redraws from the table. */}
       <table
         data-hidden-visually
         id="feed"
@@ -78,7 +70,7 @@ export function Example() {
         for="feed"
       ></helix-line-chart>
 
-      <helix-button onClick={run}>Restart</helix-button>
+      <helix-button onClick={run}>Restart feed</helix-button>
     </helix-flex>
   )
 }

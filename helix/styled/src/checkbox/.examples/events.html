@@ -14,11 +14,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Tick the box</span>
+      No events yet
+      <span slot="description">Select the checkbox</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -28,7 +28,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The number of rows the log keeps.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -49,12 +49,12 @@
   }
 
   box.addEventListener('helix-before-toggle', (event) => {
-    say('helix-before-toggle', `proposing ${event.detail.checked}, a real boolean and not a string`)
+    say('helix-before-toggle', `about to change to ${event.detail.checked}`)
   })
   box.addEventListener('input', (event) => {
-    say('input', `${event.currentTarget.checked}, announced as the state moves`)
+    say('input', `checked is now ${event.currentTarget.checked}`)
   })
   box.addEventListener('change', (event) => {
-    say('change', `${event.currentTarget.checked}, relayed from the control inside`)
+    say('change', `checked is now ${event.currentTarget.checked}`)
   })
 </script>

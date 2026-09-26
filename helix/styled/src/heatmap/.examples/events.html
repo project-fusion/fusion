@@ -52,11 +52,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Narrow the preview until a column drops</span>
+      No events yet
+      <span slot="description">Resize the window to change how many cells fit</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -66,7 +66,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -86,10 +86,9 @@
     }
   }
 
-  /* Not cancelable, and that is the shape rather than an omission: the grid is
-     reporting what it can show, and the number is true whether or not anybody
-     wanted it. */
+  /* `helix-resize` cannot be canceled. It reports how many cells the grid can
+     show. */
   grid.addEventListener('helix-resize', (event) => {
-    say('helix-resize', `${event.detail.size} cells fit, which is a report`)
+    say('helix-resize', `${event.detail.size} cells fit`)
   })
 </script>

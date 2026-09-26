@@ -13,11 +13,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Type a date, or open the calendar</span>
+      No events yet
+      <span slot="description">Type a date or open the calendar</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -27,7 +27,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last eight events.
   const KEEP = 8
 
   const say = (name, carried) => {
@@ -48,21 +48,21 @@
   }
 
   starts.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'the panel is about to show, refusable')
+    say('helix-before-open', 'About to open')
   })
   starts.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'the panel is about to go, refusable')
+    say('helix-before-close', 'About to close')
   })
   starts.addEventListener('toggle', (event) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
   starts.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   })
   starts.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   })
   starts.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `Chose "${event.currentTarget.value}"`)
   })
 </script>

@@ -10,7 +10,7 @@ export function Example() {
         tone="info"
       >
         Your export is ready to download.
-        <helix-button slot="actions">Undo</helix-button>
+        <helix-button slot="actions">Download export</helix-button>
       </helix-toast-item>
     </helix-toast>
   )

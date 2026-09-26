@@ -12,8 +12,7 @@ export function Example() {
         Ask the assistant
       </helix-button>
 
-      {/* The drawer's own header is left empty and the conversation carries the
-          title, so there is one header at one inset rather than two stacked. */}
+      {/* The drawer header is empty, so the chat header carries the title. */}
       <helix-drawer
         className="sidebar"
         id="sidebar-chat"
@@ -42,11 +41,6 @@ export function Example() {
             <helix-icon name="x" />
           </helix-icon-button>
 
-          {/* No avatar on the assistant's turns. This panel says whose it is twice
-              before a word is read -- the drawer is labeled `Assistant` and so is
-              the header above the log -- and a mark on every answer would be the
-              third. The slot is there for a transcript with more than one voice
-              in it. */}
           <helix-chat-message
             author="me"
             state="sent"
@@ -58,8 +52,8 @@ export function Example() {
             separation="plain"
             state="sent"
           >
-            Eleven components changed. The largest is the date picker, which now reads its own value
-            as a date rather than a string.
+            Eleven pages changed. The largest change is to checkout, which now saves your shipping
+            address for next time.
           </helix-chat-message>
           <helix-chat-message
             author="them"

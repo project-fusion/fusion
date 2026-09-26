@@ -11,7 +11,7 @@ export function Example() {
         aria-label="Results"
         id="results"
       >
-        <helix-text as="p">Twelve results.</helix-text>
+        <helix-text as="p">12 results found.</helix-text>
       </section>
     </>
   )

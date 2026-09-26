@@ -18,10 +18,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Open the menu and choose an item</span>
     </helix-list-item>
   </helix-list>
@@ -32,7 +32,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -53,15 +53,15 @@
   }
 
   actions.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'about to open, and refusable')
+    say('helix-before-open', 'About to open')
   })
   actions.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'about to close, and refusable')
+    say('helix-before-close', 'About to close')
   })
   actions.addEventListener('toggle', (event) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
   actions.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was chosen, and this one bubbles`)
+    say('helix-select', `Chose "${event.detail.value}"`)
   })
 </script>

@@ -3,15 +3,11 @@ export function Example() {
     <helix-carousel
       autoplay
       interval={4000}
-      label="Label"
+      label="Announcements"
       loop
     >
-      <helix-callout tone="info">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-      </helix-callout>
-      <helix-callout tone="success">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-      </helix-callout>
+      <helix-callout tone="info">Scheduled maintenance begins at 10 PM.</helix-callout>
+      <helix-callout tone="success">New reports are available in your dashboard.</helix-callout>
     </helix-carousel>
   )
 }

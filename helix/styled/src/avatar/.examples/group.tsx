@@ -4,12 +4,12 @@ export function Example() {
       label="Reviewers"
       max={4}
     >
-      <helix-avatar name="Ada Lovelace"></helix-avatar>
-      <helix-avatar name="Grace Hopper"></helix-avatar>
-      <helix-avatar name="Alan Turing"></helix-avatar>
-      <helix-avatar name="Katherine Johnson"></helix-avatar>
-      <helix-avatar name="Margaret Hamilton"></helix-avatar>
-      <helix-avatar name="Barbara Liskov"></helix-avatar>
+      <helix-avatar name="Alex Kim"></helix-avatar>
+      <helix-avatar name="Maria Lopez"></helix-avatar>
+      <helix-avatar name="Sam Patel"></helix-avatar>
+      <helix-avatar name="Jordan Lee"></helix-avatar>
+      <helix-avatar name="Priya Shah"></helix-avatar>
+      <helix-avatar name="Tom Walsh"></helix-avatar>
     </helix-avatar-group>
   )
 }

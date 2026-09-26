@@ -4,11 +4,11 @@ type Arrival = { carried: string; name: string }
 
 type Turn = { said: string; when: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The number of rows the log keeps.
 const KEEP = 7
 
 const RESTING: Arrival[] = [
-  { carried: 'Send a message, then scroll the transcript', name: 'Nothing yet' },
+  { carried: 'Send a message, then scroll the transcript', name: 'No events yet' },
 ]
 
 export function Example() {
@@ -23,12 +23,12 @@ export function Example() {
   }
 
   const sent = (event: CustomEvent<{ value: string }>) => {
-    say('helix-send', `"${event.detail.value}" was sent, and posting it is the page's job`)
+    say('helix-send', `"${event.detail.value}" was sent`)
     setTurns((before) => [...before, { said: event.detail.value, when: new Date().toISOString() }])
   }
 
   const pinned = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-pin', `proposing ${event.detail.value}, which follows the reader's scrolling`)
+    say('helix-before-pin', `pinning is about to change to ${event.detail.value}`)
   }
 
   return (
@@ -66,7 +66,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

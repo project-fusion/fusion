@@ -13,11 +13,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Drag the area, then try the copy and the dropper</span>
+      No events yet
+      <span slot="description">Pick a color, copy it, or use the eyedropper</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -27,7 +27,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last seven events.
   const KEEP = 7
 
   const say = (name, carried) => {
@@ -48,21 +48,21 @@
   }
 
   swatch.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing ${event.detail.value}, refusable`)
+    say('helix-before-change', `Proposed ${event.detail.value}`)
   })
   swatch.addEventListener('input', (event) => {
-    say('input', `${event.currentTarget.value} while the pointer is down`)
+    say('input', `Value is ${event.currentTarget.value}`)
   })
   swatch.addEventListener('change', (event) => {
-    say('change', `${event.currentTarget.value}, once it is let go`)
+    say('change', `Changed to ${event.currentTarget.value}`)
   })
   swatch.addEventListener('helix-copy', (event) => {
-    say('helix-copy', `${event.detail.value} is on the clipboard`)
+    say('helix-copy', `Copied ${event.detail.value}`)
   })
   swatch.addEventListener('helix-sample-start', () => {
-    say('helix-sample-start', 'the dropper is live, so the page is being read')
+    say('helix-sample-start', 'Eyedropper opened')
   })
   swatch.addEventListener('helix-sample-end', () => {
-    say('helix-sample-end', 'the dropper is done, whether or not it took one')
+    say('helix-sample-end', 'Eyedropper closed')
   })
 </script>

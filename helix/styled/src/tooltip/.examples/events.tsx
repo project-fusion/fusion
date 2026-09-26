@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Hover the button, then tab to it', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Hover the button, then tab to it', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -18,11 +18,11 @@ export function Example() {
   }
 
   const opening = () => {
-    say('helix-before-open', 'about to open, and refusable')
+    say('helix-before-open', 'about to open, can be canceled')
   }
 
   const closing = () => {
-    say('helix-before-close', 'about to close, and refusable')
+    say('helix-before-close', 'about to close, can be canceled')
   }
 
   const moved = (event: Event & { newState?: string; oldState?: string }) => {
@@ -38,10 +38,10 @@ export function Example() {
         aria-describedby="events-deploy-tip"
         id="events-deploy"
       >
-        Deploy
+        Publish page
       </helix-button>
       <helix-tooltip
-        content="Deploys the current branch"
+        content="Make the page visible to everyone"
         for="events-deploy"
         id="events-deploy-tip"
         onhelix-before-close={closing}
@@ -51,7 +51,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

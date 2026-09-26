@@ -6,30 +6,30 @@
   <helix-tree
     default-active="core"
     id="files"
-    label="Packages"
+    label="Folders"
   >
     <helix-tree-item value="helix">
-      helix
+      Projects
       <helix-tree-item
         slot="children"
         value="core"
-      >core</helix-tree-item>
+      >Website</helix-tree-item>
       <helix-tree-item
         slot="children"
         value="styled"
-      >styled</helix-tree-item>
+      >Mobile app</helix-tree-item>
     </helix-tree-item>
-    <helix-tree-item value="cortex">cortex</helix-tree-item>
+    <helix-tree-item value="cortex">Archive</helix-tree-item>
   </helix-tree>
 
 
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Open a node, then choose one</span>
     </helix-list-item>
   </helix-list>
@@ -40,7 +40,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 8
 
   const say = (name, carried) => {
@@ -60,23 +60,22 @@
     }
   }
 
-  /* Two bindings and not one, because the two halves travel differently.
-     `helix-select` and `helix-before-activate` bubble and are composed, so the
-     tree hears them from any depth; the open and close of a node do not, so a
-     listener here would never run and each node has to be asked itself. */
+  /* `helix-select` and `helix-before-activate` bubble, so one listener on the
+     tree hears them. The open and close events do not bubble, so each node has
+     its own listeners. */
   files.addEventListener('helix-before-activate', (event) => {
-    say('helix-before-activate', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-activate', `about to change to "${event.detail.value}", can be canceled`)
   })
   files.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was chosen, from whatever depth`)
+    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   })
 
   for (const node of files.querySelectorAll('helix-tree-item')) {
     node.addEventListener('helix-before-open', () => {
-      say('helix-before-open', `${node.value} is about to open, and this does not bubble`)
+      say('helix-before-open', `${node.value} is about to open, and the event does not bubble`)
     })
     node.addEventListener('helix-before-close', () => {
-      say('helix-before-close', `${node.value} is about to close, and nor does this`)
+      say('helix-before-close', `${node.value} is about to close, and the event does not bubble`)
     })
     node.addEventListener('toggle', (event) => {
       say('toggle', `${node.value} went ${event.oldState} to ${event.newState}`)

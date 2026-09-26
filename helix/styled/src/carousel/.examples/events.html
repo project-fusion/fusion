@@ -5,7 +5,7 @@
 >
   <helix-carousel
     id="slides"
-    label="Screens"
+    label="Dashboard pages"
   >
     <helix-card separation="outlined">Overview</helix-card>
     <helix-card separation="outlined">Usage</helix-card>
@@ -16,10 +16,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Move between the slides</span>
     </helix-list-item>
   </helix-list>
@@ -30,7 +30,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The number of rows the log keeps.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -51,6 +51,6 @@
   }
 
   slides.addEventListener('helix-select', (event) => {
-    say('helix-select', `slide ${event.detail.value} is the one in view`)
+    say('helix-select', `Slide ${event.detail.value} is in view`)
   })
 </script>

@@ -3,10 +3,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Type in the field', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Type in the field', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,7 +19,10 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing ${event.detail.value.length} characters, refusable`)
+    say(
+      'helix-before-change',
+      `about to change to ${event.detail.value.length} characters, can be canceled`,
+    )
   }
 
   const typed = (event: Event & { currentTarget: HelixTextarea }) => {
@@ -27,7 +30,7 @@ export function Example() {
   }
 
   const committed = (event: Event & { currentTarget: HelixTextarea }) => {
-    say('change', `${event.currentTarget.value.length} characters, the reader is done`)
+    say('change', `${event.currentTarget.value.length} characters, sent when the field loses focus`)
   }
 
   return (
@@ -40,12 +43,12 @@ export function Example() {
         onChange={committed}
         onhelix-before-change={proposed}
         onInput={typed}
-        placeholder="Type, then click away"
+        placeholder="Add a note"
       />
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

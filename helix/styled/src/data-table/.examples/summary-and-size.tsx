@@ -2,8 +2,7 @@ import { useState } from 'react'
 
 const TOTAL = 40
 
-/* Forty rows, generated rather than written out: what the example is about is
-   the footer, and thirty-two more lines of plausible file names would bury it. */
+/* Forty generated rows. */
 const rows = Array.from({ length: TOTAL }, (_, index) => ({
   kind: index % 4 === 0 ? 'font' : 'image',
   name: `asset-${String(index + 1).padStart(3, '0')}.webp`,
@@ -11,10 +10,8 @@ const rows = Array.from({ length: TOTAL }, (_, index) => ({
 }))
 
 export function Example() {
-  /* The summary takes its own `page`, `page-size` and `total` rather than
-     reading them off the table, which the component says of itself: three
-     numbers from the consumer's query, used twice. Here that query is this
-     state, so the two cannot skew. */
+  /* The summary takes its own `page`, `page-size`, and `total`. This state
+     keeps them in step with the table. */
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(8)
 

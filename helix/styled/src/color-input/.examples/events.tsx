@@ -3,11 +3,11 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The number of rows the log keeps.
 const KEEP = 8
 
 const RESTING: Arrival[] = [
-  { carried: 'Open the swatch, then choose a color', name: 'Nothing yet' },
+  { carried: 'Open the swatch, then choose a color', name: 'No events yet' },
 ]
 
 export function Example() {
@@ -21,27 +21,27 @@ export function Example() {
   }
 
   const showing = () => {
-    say('helix-before-open', 'the panel is about to show, refusable')
+    say('helix-before-open', 'the panel is about to open (cancelable)')
   }
 
   const hiding = () => {
-    say('helix-before-close', 'the panel is about to go, refusable')
+    say('helix-before-close', 'the panel is about to close (cancelable)')
   }
 
   const panelMoved = (event: Event & { newState?: string; oldState?: string }) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+    say('toggle', `${event.oldState} to ${event.newState}`)
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `about to change to "${event.detail.value}" (cancelable)`)
   }
 
   const moved = (event: Event & { currentTarget: HelixColorInput }) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `value is now "${event.currentTarget.value}"`)
   }
 
   const settled = (event: Event & { currentTarget: HelixColorInput }) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `value is now "${event.currentTarget.value}"`)
   }
 
   return (
@@ -50,7 +50,7 @@ export function Example() {
       gap="md"
     >
       <helix-color-input
-        label="Brand"
+        label="Brand color"
         name="brand"
         onChange={settled}
         onhelix-before-change={proposed}
@@ -62,7 +62,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

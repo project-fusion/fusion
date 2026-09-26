@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-rating
       default-value="3.5"
-      label="Rate this"
+      label="Your rating"
       step={0.5}
     ></helix-rating>
   )

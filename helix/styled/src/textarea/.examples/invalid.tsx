@@ -2,8 +2,8 @@ export function Example() {
   return (
     <helix-textarea
       default-value="broken"
-      feedback="Say a little more than that"
-      hint="What went wrong, in your own words"
+      feedback="Enter at least 20 characters"
+      hint="Describe the problem"
       label="Description"
     ></helix-textarea>
   )

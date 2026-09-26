@@ -13,7 +13,7 @@ const CURRENT: Turn[] = [
   ['me', 'Thanks. I will post a summary in the morning.'],
 ]
 
-/* Each load reaches further back, and the last one is the start. */
+/* Each load returns older messages. The last load reaches the start. */
 const LOADS: Turn[][] = [
   [
     ['them', 'Checkout alarms paged at 13:58.'],
@@ -39,7 +39,7 @@ export function Example() {
 
   const load = () => {
     setHistory('loading')
-    /* A fetch, standing in for one. */
+    /* A timer stands in for a network request. */
     setTimeout(() => {
       setLoaded(loaded + 1)
       setHistory(loaded + 1 < LOADS.length ? 'more' : '')

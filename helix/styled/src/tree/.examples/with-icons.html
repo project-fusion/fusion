@@ -1,7 +1,7 @@
 <!-- @summary A tree with a folder icon in the `start` slot of each branch. -->
 <helix-tree
   default-active="two"
-  label="Label"
+  label="Files"
 >
   <helix-tree-item
     default-open
@@ -11,15 +11,15 @@
       name="folder-open"
       slot="start"
     ></helix-icon>
-    Item One
+    Documents
     <helix-tree-item
       slot="children"
       value="two"
-    >Item Two</helix-tree-item>
+    >Budget.xlsx</helix-tree-item>
     <helix-tree-item
       slot="children"
       value="three"
-    >Item Three</helix-tree-item>
+    >Notes.txt</helix-tree-item>
   </helix-tree-item>
   <helix-tree-item
     default-open
@@ -29,11 +29,11 @@
       name="folder-open"
       slot="start"
     ></helix-icon>
-    Item Four
+    Photos
     <helix-tree-item
       slot="children"
       value="five"
-    >Item Five</helix-tree-item>
+    >Beach.jpg</helix-tree-item>
   </helix-tree-item>
-  <helix-tree-item value="six">Item Six</helix-tree-item>
+  <helix-tree-item value="six">Invoice-1042.pdf</helix-tree-item>
 </helix-tree>

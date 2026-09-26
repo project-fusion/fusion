@@ -6,9 +6,9 @@
   <helix-button
     aria-describedby="hint"
     id="events-deploy"
-  >Deploy</helix-button>
+  >Publish page</helix-button>
   <helix-tooltip
-    content="Deploys the current branch"
+    content="Make the page visible to everyone"
     for="events-deploy"
     id="hint"
   ></helix-tooltip>
@@ -17,10 +17,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Hover the button, then tab to it</span>
     </helix-list-item>
   </helix-list>
@@ -31,7 +31,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -52,10 +52,10 @@
   }
 
   hint.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'about to open, and refusable')
+    say('helix-before-open', 'about to open, can be canceled')
   })
   hint.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'about to close, and refusable')
+    say('helix-before-close', 'about to close, can be canceled')
   })
   hint.addEventListener('toggle', (event) => {
     say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)

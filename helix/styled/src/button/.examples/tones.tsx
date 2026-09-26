@@ -5,24 +5,21 @@ export function Example() {
         emphasis="solid"
         tone="primary"
       >
-        {/* `accent` renders as `primary` here, and that is the default rather than
-          a mistake: a palette that has not named a second color does not have
-          one. `button/accent` is where a theme names one and the pair
-          separate. */}
-        Button
+        {/* `accent` matches `primary` until the theme sets a second color. */}
+        Save
       </helix-button>
       <helix-button
         emphasis="solid"
         tone="accent"
       >
-        Button
+        Share
       </helix-button>
-      <helix-button tone="neutral">Button</helix-button>
+      <helix-button tone="neutral">Cancel</helix-button>
       <helix-button
         emphasis="solid"
         tone="danger"
       >
-        Button
+        Delete
       </helix-button>
     </helix-flex>
   )

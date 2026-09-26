@@ -3,7 +3,7 @@ export function Example() {
     <helix-heatmap
       className="day"
       for="hours"
-      label="Uptime, 21 August"
+      label="Uptime, August 21"
     >
       <table
         data-hidden-visually

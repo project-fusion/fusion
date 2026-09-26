@@ -6,12 +6,12 @@ export function Example() {
   return (
     <helix-tree
       active={active}
-      label="Packages"
+      label="Mailboxes"
       onhelix-before-activate={(event) => setActive(event.detail.value)}
     >
-      <helix-tree-item value="core">core</helix-tree-item>
-      <helix-tree-item value="engram">engram</helix-tree-item>
-      <helix-tree-item value="trace">trace</helix-tree-item>
+      <helix-tree-item value="core">Inbox</helix-tree-item>
+      <helix-tree-item value="engram">Drafts</helix-tree-item>
+      <helix-tree-item value="trace">Sent</helix-tree-item>
     </helix-tree>
   )
 }

@@ -3,7 +3,7 @@ export function Example() {
     <helix-input
       clearable
       default-value="quantum error correction"
-      hint="The button is there only while there is something to clear"
+      hint="Search by title, author, or keyword"
       label="Search"
       name="search"
       placeholder="Search papers"

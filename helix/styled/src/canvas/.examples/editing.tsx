@@ -13,9 +13,9 @@ type Link = {
 }
 
 const CARDS: Card[] = [
-  { name: 'post', text: 'Write the post', x: 0, y: 0 },
+  { name: 'post', text: 'Draft the email', x: 0, y: 0 },
   { name: 'demo', text: 'Record a demo', tone: 'accent', x: 256, y: 0 },
-  { name: 'ship', text: 'Ship it', tone: 'success', x: 128, y: 160 },
+  { name: 'ship', text: 'Publish the release', tone: 'success', x: 128, y: 160 },
 ]
 
 const LINKS: Link[] = [{ from: 'post', name: 'post-ship', to: 'ship' }]
@@ -26,7 +26,7 @@ export function Example() {
   const [editing, setEditing] = useState<string | undefined>()
   const made = useRef(0)
 
-  // A card holds what the page put in it, so the page edits it: here, its text, in place.
+  // The page edits a card's content. Here, an input replaces the text.
   const save = (name: string, text: string) => {
     const kept = text.trim()
     setCards((before) =>
@@ -37,9 +37,9 @@ export function Example() {
 
   return (
     <helix-canvas
-      label="Ideas for the launch"
+      label="Launch plan"
       onhelix-before-reconnect={(event) => {
-        // The board would rewrite the element React renders, so state takes the move instead.
+        // Cancel the move and update state, so React keeps rendering the connection.
         event.preventDefault()
         const { from, fromSide, name, to, toSide } = event.detail
         setLinks((before) =>
@@ -60,14 +60,14 @@ export function Example() {
       }}
       onhelix-canvas-edit={(event) => setEditing(event.detail.name)}
       onhelix-connect={(event) => {
-        // Asked rather than done: the board never adds to what React renders, so state does.
+        // The board does not add connections itself, so state adds each new edge.
         const { from, fromSide, to, toSide } = event.detail
         made.current += 1
         const name = `made-${made.current}`
         setLinks((before) => [...before, { from, fromSide, name, to, toSide }])
       }}
       onhelix-remove={(event) => {
-        // The same for removal, which names every connection a removed card would strand.
+        // The event names every card and connection to remove.
         const nodes = new Set(event.detail.nodes)
         const edges = new Set(event.detail.edges.map((one) => one.name))
         setCards((before) => before.filter((card) => !nodes.has(card.name)))
@@ -85,7 +85,7 @@ export function Example() {
           y={card.y}
         >
           {editing === card.name ? (
-            // While it is being edited, the text is a field.
+            // An input replaces the text while the card is edited.
             <input
               aria-label="Card text"
               defaultValue={card.text}

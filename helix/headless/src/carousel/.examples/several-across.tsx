@@ -3,14 +3,14 @@ import './several-across.css'
 export function Example() {
   return (
     <helix-headless-carousel
-      label="Label"
+      label="Folders"
       per-view="3"
     >
-      <helix-headless-card>Item One</helix-headless-card>
-      <helix-headless-card>Item Two</helix-headless-card>
-      <helix-headless-card>Item Three</helix-headless-card>
-      <helix-headless-card>Item Four</helix-headless-card>
-      <helix-headless-card>Item Five</helix-headless-card>
+      <helix-headless-card>Reports</helix-headless-card>
+      <helix-headless-card>Invoices</helix-headless-card>
+      <helix-headless-card>Contracts</helix-headless-card>
+      <helix-headless-card>Receipts</helix-headless-card>
+      <helix-headless-card>Proposals</helix-headless-card>
     </helix-headless-carousel>
   )
 }

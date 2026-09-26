@@ -13,10 +13,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Choose a time</span>
     </helix-list-item>
   </helix-list>
@@ -27,7 +27,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -48,12 +48,12 @@
   }
 
   clock.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `about to change to "${event.detail.value}", can be canceled`)
   })
   clock.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}" as it is chosen`)
+    say('input', `"${event.currentTarget.value}", sent as it is chosen`)
   })
   clock.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `"${event.currentTarget.value}", sent when the value is committed`)
   })
 </script>

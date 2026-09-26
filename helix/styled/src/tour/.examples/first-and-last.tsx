@@ -4,10 +4,10 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      <helix-button id="tourstart">Start here</helix-button>
+      <helix-button id="tourstart">Create project</helix-button>
 
       <helix-tour
-        label="Getting around"
+        label="Welcome tour"
         open
         spotlight-padding="16"
       >
@@ -15,14 +15,14 @@ export function Example() {
           first
           for="tourstart"
         >
-          The first stop. Nothing behind it, so there is no way back.
+          Create a project to get started.
         </helix-tour-stop>
 
         <helix-tour-stop
           for="tourstart"
           last
         >
-          The last. Nothing ahead, so the forward control finishes instead.
+          You can create more projects at any time.
         </helix-tour-stop>
       </helix-tour>
     </helix-flex>

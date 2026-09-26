@@ -18,14 +18,14 @@ export function Example() {
       <helix-filter-input
         hint="Try disposition:refunded, -disposition:settled, or refund assignee:ada tuesday"
         label="Filter the queue"
-        /* Typed text, a tick in the menu and the X on a chip all arrive as one
-         `helix-facet`, so nothing here knows which the reader used. */
+        /* Typed text, a checked value, and a removed chip all send
+           `helix-facet`. */
         onhelix-facet={(event) => {
           const { field, label, operatorLabel, values } = event.detail
           setChips((held) => {
             const rest = held.filter((chip) => chip.field !== field)
-            // An empty set is the filter going, which is what unticking the last
-            // value in the menu means by it.
+            // No values removes the filter, as when the last value in the menu is
+            // unchecked.
             return values.length === 0 ? rest : [...rest, { field, label, operatorLabel, values }]
           })
         }}
@@ -56,8 +56,7 @@ export function Example() {
           </helix-filter-field>
         </helix-filter-menu>
 
-        {/* A field with no values to list belongs here rather than in the
-            picker, where its page would have nothing on it to press. */}
+        {/* A field with no values to list goes here, outside the picker. */}
         <helix-filter-field
           label="Assignee"
           name="assignee"

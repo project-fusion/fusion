@@ -2,10 +2,12 @@ import { useRef, useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Open it, then try to close it twice', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [
+  { carried: 'Open the dialog, then close it twice', name: 'No events yet' },
+]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,25 +21,25 @@ export function Example() {
   }
 
   const opening = () => {
-    say('helix-before-open', 'about to open, refusable')
+    say('helix-before-open', 'About to open')
   }
 
   const closing = (event: Event) => {
     if (refused.current) {
-      say('helix-before-close', 'let through this time')
+      say('helix-before-close', 'Allowed the close')
       return
     }
     refused.current = true
     event.preventDefault()
-    say('helix-before-close', 'refused, so nothing moved')
+    say('helix-before-close', 'Canceled the close')
   }
 
   const moved = (event: Event & { newState?: string; oldState?: string }) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   }
 
   const shut = () => {
-    say('close', 'the platform name, once it is shut')
+    say('close', 'Closed')
   }
 
   return (
@@ -51,18 +53,18 @@ export function Example() {
         emphasis="solid"
         tone="primary"
       >
-        Open
+        Open dialog
       </helix-button>
 
       <helix-dialog
         id="unsaved"
-        label="Unsaved work"
+        label="Unsaved changes"
         onClose={shut}
         onhelix-before-close={closing}
         onhelix-before-open={opening}
         onToggle={moved}
       >
-        <helix-text>There are changes that have not been written yet.</helix-text>
+        <helix-text>You have changes that have not been saved.</helix-text>
         <helix-button
           command="--close"
           commandfor="unsaved"
@@ -74,7 +76,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

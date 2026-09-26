@@ -9,10 +9,10 @@ export function Example() {
         aria-describedby="timing-eager-tip"
         id="timing-eager"
       >
-        Eager
+        Copy link
       </helix-button>
       <helix-tooltip
-        content="Opens at once, and forgives a wobble"
+        content="Copy the link to your clipboard"
         delay={0}
         delay-out="600"
         for="timing-eager"
@@ -23,10 +23,10 @@ export function Example() {
         aria-describedby="timing-patient-tip"
         id="timing-patient"
       >
-        Patient
+        Share file
       </helix-button>
       <helix-tooltip
-        content="Waits, so a sweep across the row shows nothing"
+        content="Share the file with your team"
         delay={700}
         for="timing-patient"
         id="timing-patient-tip"
@@ -36,10 +36,10 @@ export function Example() {
         aria-describedby="timing-roomy-tip"
         id="timing-roomy"
       >
-        Roomy
+        Edit profile
       </helix-button>
       <helix-tooltip
-        content="Further off, for a trigger with its own outline"
+        content="Change your name and photo"
         for="timing-roomy"
         id="timing-roomy-tip"
         offset={16}

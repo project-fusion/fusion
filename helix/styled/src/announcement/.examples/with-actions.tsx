@@ -1,12 +1,12 @@
 export function Example() {
   return (
     <helix-announcement tone="warning">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Your session expires in five minutes.
       <helix-button
         emphasis="ghost"
         slot="actions"
       >
-        Action
+        Stay signed in
       </helix-button>
     </helix-announcement>
   )

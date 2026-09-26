@@ -9,11 +9,11 @@ export function Example() {
         controls-placement="top"
         indicator-align="center"
         indicator-placement="bottom"
-        label="Centered"
+        label="Announcements"
       >
-        <helix-callout tone="info">Slide One</helix-callout>
-        <helix-callout tone="success">Slide Two</helix-callout>
-        <helix-callout tone="warning">Slide Three</helix-callout>
+        <helix-callout tone="info">New features are available.</helix-callout>
+        <helix-callout tone="success">Your changes were saved.</helix-callout>
+        <helix-callout tone="warning">Your storage is almost full.</helix-callout>
       </helix-carousel>
 
       <helix-carousel
@@ -21,11 +21,11 @@ export function Example() {
         controls-placement="top"
         indicator-align="end"
         indicator-placement="top"
-        label="Top row, split"
+        label="Updates"
       >
-        <helix-callout tone="info">Slide One</helix-callout>
-        <helix-callout tone="success">Slide Two</helix-callout>
-        <helix-callout tone="warning">Slide Three</helix-callout>
+        <helix-callout tone="info">New features are available.</helix-callout>
+        <helix-callout tone="success">Your changes were saved.</helix-callout>
+        <helix-callout tone="warning">Your storage is almost full.</helix-callout>
       </helix-carousel>
 
       <helix-carousel
@@ -33,11 +33,11 @@ export function Example() {
         controls-placement="overlay"
         indicator-align="end"
         indicator-placement="bottom"
-        label="Arrows high, dots to the far end"
+        label="Tips"
       >
-        <helix-callout tone="info">Slide One</helix-callout>
-        <helix-callout tone="success">Slide Two</helix-callout>
-        <helix-callout tone="warning">Slide Three</helix-callout>
+        <helix-callout tone="info">New features are available.</helix-callout>
+        <helix-callout tone="success">Your changes were saved.</helix-callout>
+        <helix-callout tone="warning">Your storage is almost full.</helix-callout>
       </helix-carousel>
     </helix-flex>
   )

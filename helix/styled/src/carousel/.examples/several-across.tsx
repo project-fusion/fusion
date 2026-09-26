@@ -1,14 +1,14 @@
 export function Example() {
   return (
     <helix-carousel
-      label="Label"
+      label="Folders"
       per-view="3"
     >
-      <helix-card separation="outlined">Item One</helix-card>
-      <helix-card separation="outlined">Item Two</helix-card>
-      <helix-card separation="outlined">Item Three</helix-card>
-      <helix-card separation="outlined">Item Four</helix-card>
-      <helix-card separation="outlined">Item Five</helix-card>
+      <helix-card separation="outlined">Reports</helix-card>
+      <helix-card separation="outlined">Invoices</helix-card>
+      <helix-card separation="outlined">Contracts</helix-card>
+      <helix-card separation="outlined">Receipts</helix-card>
+      <helix-card separation="outlined">Proposals</helix-card>
     </helix-carousel>
   )
 }
