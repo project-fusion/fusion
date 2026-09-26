@@ -12,50 +12,166 @@
 
 /* The map the whole width of the page, and the scope the controls paint. */
 .mapsHero {
+  /* The map's height, read by the frame and by what lies over the map. */
+  --map-block-size: min(84svh, 50rem);
+  /* How tall the credit's line is, which the bar stands above. */
+  --_maps-credit: 1.75rem;
   /* Declared here rather than inherited: the page's text color was settled
      at the root, in the site's scheme, and a heading inside a scope painted
      dark inherited that black. Declared on the scope, the token resolves in
-     the scope's own. */
+     the scope's own. And the page's ground, which the wash and the seam fade
+     to, so the map ends in the page rather than on a line. */
+  background: var(--helix-color-background);
   color: var(--helix-color-foreground);
   position: relative;
 }
 
-.mapsHeroFrame {
-  --map-block-size: min(80svh, 48rem);
-}
-
 /* Edge to edge, so no frame of its own: the page is the frame. */
 .mapsHeroFrame::part(region) {
-  border-inline: 0;
+  border: 0;
   border-radius: 0;
 }
 
-/* Over the map at the start, clear of the pan and zoom buttons at the end and
-   of the credit at the foot, which a tile license requires stay visible.
-   Solid rather than glass: over a street grid, glass put the heading on a
-   texture and it was the least legible thing on the page. */
-.mapsPanel {
-  background: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
-  box-shadow: var(--helix-shadow-md);
+/* The credit on the page's own ground under the map's faded foot, rather
+   than a dark strip across it: still there, as the tile license asks, and
+   read as a line of the page, at the page's own gutter and one line tall, so
+   the bar can stand a known height above it. No hairline, which the frame
+   draws to part a credit from tiles of any color: here the map has already
+   faded into the page it sits on. */
+.mapsHeroFrame::part(attribution) {
+  background: var(--helix-color-background);
+  border: 0;
+}
+
+.mapsHeroFrame > [slot="attribution"] {
+  border-block-start-color: transparent;
+  line-height: var(--_maps-credit);
+  padding-block: 0;
+  padding-inline: var(--site-inset);
+}
+
+/* **The pitch, set on the map**: the site's hero type, the height of the map
+   and centered in it at the start, where the wash is. Only what is in it
+   takes the pointer, so the map around the words still pans. */
+.mapsIntro {
+  align-items: flex-start;
+  block-size: var(--map-block-size);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--helix-space-sm);
-  inline-size: min(28rem, calc(100% - var(--site-inset) * 2));
-  inset-block-start: var(--helix-space-lg);
-  inset-inline-start: var(--site-inset);
-  padding: var(--helix-space-lg);
+  gap: var(--helix-space-md);
+  inline-size: min(38rem, 48%);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  justify-content: center;
+  /* Clear of the bar docked under it at the foot. */
+  padding-block: var(--helix-space-2xl) calc(var(--helix-space-2xl) * 2.5);
+  /* The page's gutter at the start, where the page's text starts, and only
+     room at the end, where the map is. */
+  padding-inline: var(--site-inset) var(--helix-space-xl);
+  pointer-events: none;
+  position: absolute;
+  z-index: calc(var(--helix-layer-raised) + 1);
+}
+
+.mapsIntro > * {
+  pointer-events: auto;
+}
+
+/* The column's width for the pair, which shrunk to one button's width stacked
+   them where both fit side by side. */
+.mapsActions {
+  align-self: stretch;
+}
+
+.mapsTitle {
+  /* A column's hero rather than the landing page's full-width line, which
+     set this claim five words to a line. */
+  font-size: clamp(var(--helix-text-2xl), 4vw, calc(var(--helix-text-3xl) * 1.4));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.mapsLede {
+  font-size: clamp(var(--helix-text-lg), 1.6vw, var(--helix-text-xl));
+  line-height: var(--helix-leading-normal);
+}
+
+/* **The page's ground run in over the map**: from the start edge, solid
+   behind the words and gone by the middle, and up from the foot, so the map
+   fades into the page below it rather than ending on a line. Over the map
+   and under its places and the words; the pointer passes through to the map. */
+.mapsWash {
+  background:
+    linear-gradient(
+      to top,
+      var(--helix-color-background) 0%,
+      color-mix(in oklab, var(--helix-color-background) 70%, transparent) 9%,
+      transparent 26%
+    ),
+    linear-gradient(
+      to right,
+      var(--helix-color-background) 0%,
+      color-mix(in oklab, var(--helix-color-background) 92%, transparent) 26%,
+      color-mix(in oklab, var(--helix-color-background) 55%, transparent) 42%,
+      transparent 60%
+    );
+  inset: 0;
+  pointer-events: none;
   position: absolute;
 }
 
-.mapsControls {
-  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+.mapsWash:dir(rtl) {
+  background:
+    linear-gradient(
+      to top,
+      var(--helix-color-background) 0%,
+      color-mix(in oklab, var(--helix-color-background) 70%, transparent) 9%,
+      transparent 26%
+    ),
+    linear-gradient(
+      to left,
+      var(--helix-color-background) 0%,
+      color-mix(in oklab, var(--helix-color-background) 92%, transparent) 26%,
+      color-mix(in oklab, var(--helix-color-background) 55%, transparent) 42%,
+      transparent 60%
+    );
+}
+
+/* **Try it, docked to the map's foot**: a floating bar the way the frame's
+   own controls float, over the faded foot where the map is quietest, and at
+   the start under the words it follows. */
+.mapsTry {
+  align-items: flex-end;
+  background: var(--helix-color-surface-overlay);
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+  box-shadow: var(--helix-shadow-floating);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--helix-space-md) var(--helix-space-lg);
-  margin-block-start: var(--helix-space-xs);
-  padding-block-start: var(--helix-space-md);
+  gap: var(--helix-space-sm) var(--helix-space-lg);
+  inset-block-end: calc(var(--_maps-credit) + var(--helix-space-lg));
+  inset-inline-start: var(--site-inset);
+  max-inline-size: calc(100% - var(--site-inset) * 2);
+  padding: var(--helix-space-sm) var(--helix-space-md);
+  position: absolute;
+  z-index: calc(var(--helix-layer-raised) + 1);
+}
+
+/* The bar's name, set as the controls' own labels are and standing where
+   their controls do, so the row reads Try it, then what to try. */
+.mapsTryLabel {
+  align-self: center;
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-semibold);
+}
+
+.mapsControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-sm) var(--helix-space-lg);
 }
 
 .mapsControl {
@@ -114,25 +230,41 @@ fieldset.mapsControl {
   outline-offset: var(--helix-space-2xs);
 }
 
-/* A phone reads the name before the map: the panel above it, in the page's
-   own flow and without the chrome it needs to float. */
+/* **A phone reads it in order and on the page**: the words above the map,
+   the bar under it, each in the page's own flow and without the chrome it
+   needs to float, and the wash only at the foot, there being nothing beside
+   the words to wash. */
 @media (max-width: 48rem) {
   .mapsHero {
-    display: flex;
-    flex-direction: column-reverse;
+    --map-block-size: min(62svh, 32rem);
   }
 
-  /* The scope's own page rather than none: with none, a scope in the other
-     scheme from the site drew its text over the site's page, dark ink on a
-     dark page or light on light. Following the site, this is the same color
-     as the page around it. */
-  .mapsPanel {
-    background: var(--helix-color-background);
+  .mapsIntro {
+    block-size: auto;
+    inline-size: auto;
+    padding: var(--site-band) var(--site-inset) var(--helix-space-xl);
+    position: static;
+  }
+
+  /* The foot's fade alone: the words are above the map here, not beside it. */
+  .mapsWash,
+  .mapsWash:dir(rtl) {
+    background: linear-gradient(
+      to top,
+      var(--helix-color-background) 0%,
+      color-mix(in oklab, var(--helix-color-background) 70%, transparent) 9%,
+      transparent 26%
+    );
+  }
+
+  /* On the page's own ground under the map, as a part of the page. */
+  .mapsTry {
+    background: none;
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    inline-size: auto;
-    padding: var(--site-band) var(--site-inset) var(--helix-space-lg);
+    max-inline-size: none;
+    padding: var(--helix-space-md) var(--site-inset);
     position: static;
   }
 }
@@ -142,13 +274,7 @@ fieldset.mapsControl {
 /* The box the field is measured against, the sections in front of it in tree
    order, as the services page orders its own. */
 .mapsField {
-  padding-block-start: var(--site-band);
   position: relative;
-}
-
-/* Straight on from the first, whose own end padding is the gap between. */
-.mapsFieldLate {
-  padding-block-start: 0;
 }
 
 .mapsField > *:not([data-layer]) {
@@ -160,7 +286,9 @@ fieldset.mapsControl {
 .mapsAura {
   block-size: auto;
   inset: 0;
-  mask-image: linear-gradient(to bottom, black 0%, black 94%, transparent 100%);
+  /* Faded in at the top as well, from the ground the map fades into, so the
+     light rises under the first band rather than starting on a line. */
+  mask-image: linear-gradient(to bottom, transparent 0%, black 12rem, black 94%, transparent 100%);
   opacity: 0.5;
   pointer-events: none;
   position: absolute;
