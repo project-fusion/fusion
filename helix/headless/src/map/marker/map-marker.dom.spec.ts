@@ -29,12 +29,13 @@ const frame = async (): Promise<Frame> => {
 const markers = (host: Frame): Marker[] =>
   [...host.querySelectorAll('helix-headless-map-marker')] as Marker[]
 
-const press = (marker: Marker, key: string): KeyboardEvent => {
-  const event = new KeyboardEvent('keydown', {
+const press = (marker: Marker, key: string, type = 'keydown', repeat = false): KeyboardEvent => {
+  const event = new KeyboardEvent(type, {
     bubbles: true,
     cancelable: true,
     composed: true,
     key,
+    repeat,
   })
   part(marker, 'marker')?.dispatchEvent(event)
   return event
@@ -87,7 +88,25 @@ describe('map marker', () => {
     part(depot, 'marker')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
     press(ferry, 'Enter')
     press(ferry, ' ')
+    press(ferry, ' ', 'keyup')
     expect(said).toEqual(['Depot', 'ferry', 'ferry'])
+  })
+
+  test('a key held down presses once, and Space presses on its release as a button does', async () => {
+    const host = await frame()
+    const said: string[] = []
+    host.addEventListener('helix-activate', (event) =>
+      said.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    const [depot] = markers(host) as [Marker]
+    press(depot, 'Enter')
+    press(depot, 'Enter', 'keydown', true)
+    press(depot, 'Enter', 'keydown', true)
+    const space = press(depot, ' ')
+    expect(space.defaultPrevented).toBe(true)
+    expect(said).toEqual(['Depot'])
+    press(depot, ' ', 'keyup')
+    expect(said).toEqual(['Depot', 'Depot'])
   })
 
   test('an arrow on a marker walks and does not pan the map', async () => {

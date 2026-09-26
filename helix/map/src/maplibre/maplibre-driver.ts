@@ -1,5 +1,13 @@
 import type { MapDriver, MapLayerSpec, MapPadding } from '../connect-map/connect-map.js'
 import type { MapMotion } from '../motion/motion.js'
+import { colorsNow, type MapColors, mapColorsFrom, PATIENCE } from '../style/map-colors.js'
+import { watchTheme } from '../theme/watch-theme.js'
+
+/** What MapLibre hands a listener, as far as the driver reads it. */
+interface MapLibreEvent {
+  /** On `sourcedata`: `metadata` where a source learned its TileJSON, credit and all. */
+  sourceDataType?: string
+}
 
 /** The frame's routes and areas, as MapLibre draws GeoJSON. */
 interface GeoJson {
@@ -164,19 +172,29 @@ export interface MapLibreMap {
         sources?: Record<string, unknown> | undefined
       }
     | undefined
+  /** Which way the view is turned, in degrees clockwise from north. */
+  getBearing(): number
   /** Goes to a place, gliding. */
   easeTo(options: MapLibreAnimation & { center: [number, number]; zoom?: number }): unknown
   /** Goes to a place at once. */
   jumpTo(options: { center: [number, number]; zoom?: number }): unknown
   /** The arrow-key handler MapLibre adds unless told not to. */
   keyboard: { disable(): void; enable(): void; isEnabled(): boolean }
-  off(type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata', listener: () => void): unknown
-  on(type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata', listener: () => void): unknown
+  off(
+    type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    listener: (event?: MapLibreEvent) => void,
+  ): unknown
+  on(
+    type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    listener: (event?: MapLibreEvent) => void,
+  ): unknown
   removeLayer(id: string): unknown
   removeSource(id: string): unknown
   panBy(offset: [number, number], options?: MapLibreAnimation): unknown
   /** Where a place falls in the map's box, in pixels. */
   project(lngLat: [number, number]): { x: number; y: number }
+  /** Replaces the style, by a diff against the one it has where `diff` is set. `never` for `addLayer`'s reason. */
+  setStyle(style: never, options?: { diff?: boolean }): unknown
   zoomIn(options?: MapLibreAnimation): unknown
   zoomOut(options?: MapLibreAnimation): unknown
 }
@@ -202,14 +220,23 @@ const animation = (motion: MapMotion | null): MapLibreAnimation =>
  * `attributionControl: false` avoids it altogether, and is the better way.
  */
 export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
+  bearing: () => map.getBearing(),
   credits(changed) {
     const control = map.getContainer().querySelector<HTMLElement>(CONTROL)
     const display = control?.style.display ?? ''
     if (control) {
       control.style.display = 'none'
     }
+    /* **A source's credit arrives with its metadata**, and only then: every
+       tile it loads and every route redrawn is a `sourcedata` as well, and
+       reading every source's credit for each serialized the whole style. */
+    const learned = (event?: MapLibreEvent): void => {
+      if (event?.sourceDataType === 'metadata') {
+        changed()
+      }
+    }
     map.on('styledata', changed)
-    map.on('sourcedata', changed)
+    map.on('sourcedata', learned)
     return {
       read: () =>
         Object.keys(map.getStyle()?.sources ?? {})
@@ -217,7 +244,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           .filter((one) => one !== ''),
       stop: () => {
         map.off('styledata', changed)
-        map.off('sourcedata', changed)
+        map.off('sourcedata', learned)
         if (control) {
           control.style.display = display
         }
@@ -237,16 +264,16 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
   /* **Under the place names**, which is the one thing a page drawing its own
      canvas over the map could not do: a route crossing a city is under the
      city's name, not through it. And **drawn again whenever the style is
-     replaced**: a page re-theming its map with \`setStyle\` hands MapLibre a
+     replaced**: a page re-theming its map with `setStyle` hands MapLibre a
      style without these, and the diff takes them away, so they come back on
-     the next \`styledata\` with their colors read again, which is how a
+     the next `styledata` with their colors read again, which is how a
      route follows the theme. */
   layers: (read) => {
-    /* **Tried rather than asked about.** \`isStyleLoaded()\` waits for the
+    /* **Tried rather than asked about.** `isStyleLoaded()` waits for the
        tiles as well as the style, so on a fresh map it said no through every
-       \`styledata\` and yes only after the last one, and no route was drawn
+       `styledata` and yes only after the last one, and no route was drawn
        until something restyled the map. A style that is not ready says so by
-       refusing the source, and \`load\` comes after that. */
+       refusing the source, and `load` comes after that. */
     const draw = (): void => {
       const data = geoJson(read())
       const source = map.getSource(SOURCE)
@@ -258,7 +285,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
          along the streets, and a curve fitted through it would cut the
          corners it turns and leave the street it is on, which is why no map
          app smooths one. What they do is draw fewer points zoomed out, and
-         MapLibre does that per tile by \`tolerance\`: at its default a walk
+         MapLibre does that per tile by `tolerance`: at its default a walk
          kept every stair-step at a kink, at 2 it began cutting corners
          through blocks, and at 1 it is the streets without the jitter, with
          every turn back as the map zooms in. */
@@ -339,3 +366,76 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     }
   },
 })
+
+/** A theme followed: asked again at once where the page knows it moved, and stopped. */
+export interface FollowedTheme {
+  stop(): void
+  update(): void
+}
+
+/**
+ * Restyles `map` whenever the theme where `element` is moves, from `style`,
+ * which is the page's own call to `mapLibreStyle` with the colors read there.
+ *
+ * **Heard where it happens**: a mode, a class, a theme or an inline token
+ * on `element` or anything above it, or the reader's light or dark
+ * preference, by `watchTheme`. A page that restyles some other way, a
+ * stylesheet replaced, says so with `update()`.
+ *
+ * **Once a frame, and only where something changed.** A theme can move on
+ * every keystroke, and a restyle is a diff and a redraw: the style is built
+ * and compared with the last one set, so a move that draws the same map, or
+ * a second in the same frame, sets nothing.
+ *
+ * **Waits out a stylesheet on its way back.** A swap takes the tokens away
+ * for a frame or two, which is asked again the next frame, for a few seconds,
+ * and then reported with what is missing rather than thrown out of a frame
+ * with nobody to catch it.
+ */
+export const followTheme = (
+  map: MapLibreMap,
+  element: Element,
+  style: (colors: MapColors) => unknown,
+): FollowedTheme => {
+  const first = colorsNow(element)
+  let last = first ? JSON.stringify(style(first)) : ''
+  let pending = 0
+  let waited = 0
+  const read = (): void => {
+    pending = requestAnimationFrame(() => {
+      const colors = colorsNow(element)
+      if (!colors) {
+        if (waited++ < PATIENCE) {
+          read()
+        } else {
+          try {
+            mapColorsFrom(element)
+          } catch (error) {
+            console.error(error)
+          }
+        }
+        return
+      }
+      waited = 0
+      const next = style(colors)
+      const said = JSON.stringify(next)
+      if (said !== last) {
+        last = said
+        map.setStyle(next as never, { diff: true })
+      }
+    })
+  }
+  const update = (): void => {
+    cancelAnimationFrame(pending)
+    waited = 0
+    read()
+  }
+  const stopWatching = watchTheme(element, update)
+  return {
+    stop: () => {
+      cancelAnimationFrame(pending)
+      stopWatching()
+    },
+    update,
+  }
+}

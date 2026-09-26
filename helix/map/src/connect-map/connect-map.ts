@@ -1,5 +1,6 @@
 import {
   HelixMapPanEvent,
+  HelixMapPartChangeEvent,
   HelixMapZoomEvent,
   isRtl,
   type ViewportPanDetail,
@@ -8,6 +9,7 @@ import {
 import { creditParts } from '../credit/credit.js'
 import { type MapMotion, motionOf } from '../motion/motion.js'
 import { settledColor } from '../style/map-colors.js'
+import { watchTheme } from '../theme/watch-theme.js'
 
 /**
  * What a renderer has to answer for the frame to drive it, and nothing that is
@@ -20,6 +22,12 @@ import { settledColor } from '../style/map-colors.js'
  * `start` is on a right-to-left page, is answered once.
  */
 export interface MapDriver {
+  /**
+   * Which way the view is turned, in degrees clockwise from north, where the
+   * renderer can turn it. A position's heading is drawn against it, so an
+   * arrow pointing north still points north on a map turned east.
+   */
+  bearing?(): number
   /**
    * The renderer's credits as it writes them, which is markup, and a way to
    * hear them change. `stop` ends the listening and puts back anything the
@@ -107,7 +115,7 @@ export interface MapLayerSpec {
   color: string
   /**
    * Drawn quieter: the part of a route already traveled, which the connector
-   * cuts from the rest at the route's \`progress\`.
+   * cuts from the rest at the route's `progress`.
    */
   faded?: boolean | undefined
   /** Stable for as long as the element is in the frame, for a renderer that keys its layers. */
@@ -116,7 +124,7 @@ export interface MapLayerSpec {
   /** What the frame's list calls it. */
   label: string
   /**
-   * How a route's line is drawn where it is not solid: \`dotted\` for a leg
+   * How a route's line is drawn where it is not solid: `dotted` for a leg
    * off the network the rest is routed on, a place set back from its road.
    */
   pattern?: 'dotted' | undefined
@@ -238,10 +246,11 @@ export interface MapConnection {
   /**
    * Frames every place the frame holds, its markers and every point of its
    * routes and areas, inset by `padding`, 48 pixels by default, at the page's
-   * pace for a trip. Nothing where the frame holds no place or the driver
-   * cannot frame.
+   * pace for a trip, or at once with `animate: false`, which is what framing
+   * a map that is still settling its size wants. Nothing where the frame
+   * holds no place or the driver cannot frame.
    */
-  fit(options?: { padding?: MapPadding | undefined }): void
+  fit(options?: { animate?: boolean | undefined; padding?: MapPadding | undefined }): void
 }
 
 /** Where the connector writes the renderer's credit, so it can find its own. */
@@ -316,11 +325,22 @@ export const connectMap = (
   )
   let credit: HTMLElement | undefined
   let listening: { read(): string[]; stop(): void } | undefined
+  /* **What the credit last said, so saying it again writes nothing.** A
+     renderer reports a source changed for every tile it loads and every time
+     a route is redrawn, and rebuilding the links each time took a reader's
+     focus off the one they had tabbed to. */
+  let written: string | undefined
   const writeCredit = (): void => {
     if (!listening || !credit) {
       return
     }
-    const nodes = creditParts(listening.read()).map((part) => {
+    const parts = creditParts(listening.read())
+    const said = JSON.stringify(parts)
+    if (said === written) {
+      return
+    }
+    written = said
+    const nodes = parts.map((part) => {
       if (part.href === undefined) {
         return document.createTextNode(part.text)
       }
@@ -405,13 +425,23 @@ export const connectMap = (
     if (!driver.project) {
       return
     }
+    const project = driver.project
     const { width } = viewportOf(frame)
     const rtl = isRtl(frame)
-    for (const marker of markers()) {
-      if (typeof marker.lat !== 'number' || typeof marker.lng !== 'number') {
-        continue
-      }
-      const at = driver.project({ lat: marker.lat, lng: marker.lng })
+    const bearing = driver.bearing?.() ?? 0
+    /* **Every measure first, then every write.** A marker's reach is its
+       button's width, which asking for flushes layout, and asked between one
+       marker's move and the next it laid the page out once per marker on
+       every frame of a pan. Read together, it is laid out once, and what is
+       read does not depend on where anything stands. */
+    const standing = markers()
+      .filter((marker) => typeof marker.lat === 'number' && typeof marker.lng === 'number')
+      .map((marker) => ({
+        at: project({ lat: marker.lat as number, lng: marker.lng as number }),
+        marker,
+        reach: typeof marker.extent === 'function' ? marker.extent() : undefined,
+      }))
+    for (const { at, marker, reach } of standing) {
       marker.style.setProperty('--_map-marker-x', `${at.x}px`)
       marker.style.setProperty('--_map-marker-y', `${at.y}px`)
       /* **The name goes where there is room for it.** It sits after the
@@ -420,8 +450,7 @@ export const connectMap = (
          walking the markers needs to read it. Turned to the other side only
          where the name does not fit and the other side has more room, so a
          marker in the open keeps its place in the reading order. */
-      if (typeof marker.extent === 'function') {
-        const reach = marker.extent()
+      if (reach !== undefined) {
         const ahead = rtl ? at.x : width - at.x
         const behind = rtl ? width - at.x : at.x
         marker.side = reach <= ahead || ahead >= behind ? 'end' : 'start'
@@ -432,20 +461,25 @@ export const connectMap = (
        depends on the zoom and, in Web Mercator, the latitude: so the ring is
        the distance between the position and a point that many meters north of
        it, projected by the renderer, which is right at every zoom and on every
-       renderer without knowing which projection it uses. */
+       renderer without knowing which projection it uses. **Its heading is
+       against the view**, which a renderer can turn: on a map turned east, a
+       walker going north points up and to the left. */
     for (const position of positions()) {
       if (typeof position.lat !== 'number' || typeof position.lng !== 'number') {
         continue
       }
-      const at = driver.project({ lat: position.lat, lng: position.lng })
-      position.style.setProperty('--_map-position-x', `${at.x}px`)
-      position.style.setProperty('--_map-position-y', `${at.y}px`)
-      position.style.setProperty('--_map-position-heading', `${position.heading ?? 0}deg`)
+      const at = project({ lat: position.lat, lng: position.lng })
       const meters = position.accuracy ?? 0
       const edge =
         meters > 0
-          ? driver.project({ lat: position.lat + meters / METERS_PER_DEGREE, lng: position.lng })
+          ? project({ lat: position.lat + meters / METERS_PER_DEGREE, lng: position.lng })
           : at
+      position.style.setProperty('--_map-position-x', `${at.x}px`)
+      position.style.setProperty('--_map-position-y', `${at.y}px`)
+      position.style.setProperty(
+        '--_map-position-heading',
+        `${(position.heading ?? 0) - bearing}deg`,
+      )
       position.style.setProperty(
         '--_map-position-radius',
         `${Math.hypot(edge.x - at.x, edge.y - at.y)}px`,
@@ -453,26 +487,69 @@ export const connectMap = (
     }
   }
   const stopViewing = driver.onView?.(place)
-  /* A marker added, taken away or moved, which only the attributes say: a
-     marker reflects its coordinates for this reason. Two observers, because
-     one option set covers both: the frame's own children for markers coming
-     and going, and every descendant for a coordinate, which only a marker
-     has. `childList` over the whole subtree would hear the renderer rebuild
-     its own controls inside the map and place every marker for it. */
-  /* **What is drawn follows what is written**: a layer added, taken away or
-     moved, or given a new tone, which is its color. */
-  const changed = (): void => {
-    place()
-    drawn?.update()
+  /* **What is drawn follows what is written, once a task.** A part that
+     moves, is renamed or is retoned says so with `helix-map-part-change`,
+     and a marker or a position is placed again while a route or an area is
+     redrawn: a walker's step is not a reason to settle every route's colors
+     and hand the renderer every line again. Several in one task, a walker
+     moving and its route's progress with it, are one of each. */
+  let live = true
+  let placing = false
+  let drawing = false
+  let queued = false
+  const flush = (): void => {
+    queued = false
+    if (!live) {
+      return
+    }
+    if (placing) {
+      placing = false
+      place()
+    }
+    if (drawing) {
+      drawing = false
+      drawn?.update()
+    }
   }
-  const layers = new MutationObserver(changed)
-  layers.observe(frame, { childList: true })
-  const coordinates = new MutationObserver(changed)
-  coordinates.observe(frame, {
-    attributeFilter: ['accuracy', 'heading', 'lat', 'lng', 'points', 'progress', 'tone', 'variant'],
-    attributes: true,
-    subtree: true,
+  const soon = (what: { draw?: boolean; place?: boolean }): void => {
+    placing ||= what.place === true
+    drawing ||= what.draw === true
+    if (!queued) {
+      queued = true
+      queueMicrotask(flush)
+    }
+  }
+  const handlePartChange = (event: Event): void => {
+    const { kind } = (event as HelixMapPartChangeEvent).detail
+    soon(kind === 'layer' ? { draw: true } : { place: true })
+  }
+  frame.addEventListener(HelixMapPartChangeEvent.eventName, handlePartChange)
+  /* **A route's color is its stylesheet's**, so what restyles one is watched
+     on each route and area themselves, and not over the whole frame, where
+     the renderer rebuilds its own controls: a class, an inline token, and the
+     tone and variant axes for a part whose tier does not hear them. */
+  const styled = new MutationObserver(() => soon({ draw: true }))
+  const watchLayers = (): void => {
+    styled.disconnect()
+    for (const layer of [...frame.children].filter(isLayer)) {
+      styled.observe(layer, {
+        attributeFilter: ['class', 'style', 'tone', 'variant'],
+        attributes: true,
+      })
+    }
+  }
+  watchLayers()
+  /* A part added or taken away: the frame's own children, and not the
+     renderer's inside the map. */
+  const children = new MutationObserver(() => {
+    watchLayers()
+    soon({ draw: true, place: true })
   })
+  children.observe(frame, { childList: true })
+  /* **A theme that moves moves the routes**, whose colors are settled once
+     and handed to a renderer that cannot read a token: a mode switched or a
+     brand painted on anything above the frame draws them again. */
+  const stopTheming = drawn ? watchTheme(frame, () => drawn.update()) : undefined
   place()
 
   /* **A marker the keyboard reaches is a marker in view.** The walk goes in
@@ -497,10 +574,13 @@ export const connectMap = (
 
   return {
     disconnect(): void {
+      live = false
       drawn?.stop()
       stopViewing?.()
-      layers.disconnect()
-      coordinates.disconnect()
+      stopTheming?.()
+      styled.disconnect()
+      children.disconnect()
+      frame.removeEventListener(HelixMapPartChangeEvent.eventName, handlePartChange)
       frame.removeEventListener('focusin', reveal)
       for (const marker of markers()) {
         marker.style.removeProperty('--_map-marker-x')
@@ -529,11 +609,12 @@ export const connectMap = (
       if (!driver.fit) {
         return
       }
+      /* The points as written: framing needs where a route goes, not its color. */
       const places: MapPlace[] = [
         ...[...markers(), ...positions()]
           .filter((one) => typeof one.lat === 'number' && typeof one.lng === 'number')
           .map((one) => ({ lat: one.lat as number, lng: one.lng as number })),
-        ...readLayers().flatMap((layer) => layer.points),
+        ...[...frame.children].filter(isLayer).flatMap((layer) => layer.points ?? []),
       ]
       if (places.length === 0) {
         return
@@ -546,7 +627,7 @@ export const connectMap = (
           southWest: { lat: Math.min(...lats), lng: Math.min(...lngs) },
         },
         options.padding ?? 48,
-        motionOf(frame, 'travel'),
+        options.animate === false ? null : motionOf(frame, 'travel'),
       )
     },
   }

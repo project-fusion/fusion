@@ -30,16 +30,22 @@ const TOKENS: Record<keyof MapColors, string> = {
   surface: '--helix-color-surface',
 }
 
+/** The one pixel every color is settled on, made once rather than per color. */
+let pixel: CanvasRenderingContext2D | null | undefined
+
 /**
  * A color the browser has settled, as sRGB a renderer can parse: painted onto
  * one pixel and read back, since what the browser settles to may be
  * `oklch()`. As it was where there is no canvas to paint on.
  */
 const toSrgb = (resolved: string): string => {
-  const canvas = document.createElement('canvas')
-  canvas.width = 1
-  canvas.height = 1
-  const context = canvas.getContext('2d', { willReadFrequently: true })
+  if (pixel === undefined) {
+    const canvas = document.createElement('canvas')
+    canvas.width = 1
+    canvas.height = 1
+    pixel = canvas.getContext('2d', { willReadFrequently: true })
+  }
+  const context = pixel
   if (!context) {
     return resolved
   }
@@ -53,7 +59,7 @@ const toSrgb = (resolved: string): string => {
 }
 
 /**
- * An element's own \`color\`, settled the same way: what a route or an area
+ * An element's own `color`, settled the same way: what a route or an area
  * is drawn in, which its tone decides in the page's stylesheet and which the
  * renderer can only take as sRGB.
  */
@@ -93,4 +99,40 @@ export const mapColorsFrom = (element: Element): MapColors => {
   ) as unknown as MapColors
   probe.remove()
   return colors
+}
+
+/**
+ * The page's colors where they can be read, or `null` while they cannot.
+ *
+ * **Not yet rather than never.** A stylesheet being swapped, which
+ * development does on every edit and a page can do on its own, takes the
+ * tokens away for a moment, and a restyle that landed in that moment threw
+ * out of an animation frame with nobody to catch it. Ask again a frame later,
+ * or call `mapColorsFrom`, whose error says what is missing.
+ */
+export const colorsNow = (element: Element): MapColors | null => {
+  try {
+    return mapColorsFrom(element)
+  } catch {
+    return null
+  }
+}
+
+/** How many frames to wait for the tokens before saying they are missing: a few seconds. */
+export const PATIENCE = 180
+
+/**
+ * The page's colors once they can be read: at once where they already can,
+ * after a frame or two where the page is still settling, and the reason they
+ * cannot be where a few seconds pass without them.
+ */
+export const colorsReady = async (element: Element): Promise<MapColors> => {
+  for (let waited = 0; waited < PATIENCE; waited++) {
+    const colors = colorsNow(element)
+    if (colors) {
+      return colors
+    }
+    await new Promise((next) => requestAnimationFrame(next))
+  }
+  return mapColorsFrom(element)
 }

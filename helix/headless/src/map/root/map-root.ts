@@ -3,6 +3,7 @@ import {
   HelixActivateEvent,
   HelixElement,
   HelixMapPanEvent,
+  HelixMapPartChangeEvent,
   HelixMapZoomEvent,
   hostAria,
   KeyboardNavigationController,
@@ -133,8 +134,11 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * A route or area renamed, or its description changed, which the list says
    * and a slot change does not report.
    */
-  private readonly renamed =
-    typeof MutationObserver === 'function' ? new MutationObserver(() => this.requestUpdate()) : null
+  private readonly handlePartChange = (event: HelixMapPartChangeEvent): void => {
+    if (event.detail.kind === 'layer') {
+      this.requestUpdate()
+    }
+  }
 
   /**
    * The markers among the frame's children, in the order they are written,
@@ -216,9 +220,26 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
   }
 
+  /**
+   * **Enter on the press and Space on the release**, as a native button
+   * takes them, and a key held down says it once: auto-repeat sent a travel
+   * thirty times a second, each restarting the last.
+   */
   private readonly handleMarkerKeydown = (event: KeyboardEvent): void => {
     const marker = this.markerOf(event)
-    if (marker && (event.key === 'Enter' || event.key === ' ')) {
+    if (!marker || (event.key !== 'Enter' && event.key !== ' ')) {
+      return
+    }
+    /* Space's own default is to scroll the page, which a press on a button does not. */
+    event.preventDefault()
+    if (event.key === 'Enter' && !event.repeat) {
+      this.activate(marker)
+    }
+  }
+
+  private readonly handleMarkerKeyup = (event: KeyboardEvent): void => {
+    const marker = this.markerOf(event)
+    if (marker && event.key === ' ') {
       event.preventDefault()
       this.activate(marker)
     }
@@ -231,22 +252,20 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.renamed?.observe(this, {
-      attributeFilter: ['description', 'label'],
-      attributes: true,
-      subtree: true,
-    })
+    this.addEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)
     this.addEventListener('click', this.handleClick)
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('keydown', this.handleMarkerKeydown)
+    this.addEventListener('keyup', this.handleMarkerKeyup)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.renamed?.disconnect()
+    this.removeEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('keydown', this.handleMarkerKeydown)
+    this.removeEventListener('keyup', this.handleMarkerKeyup)
   }
 
   /**
