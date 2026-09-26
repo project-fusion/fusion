@@ -33,6 +33,8 @@ is the one copy. The three that come up on a first change:
 
 - **No em dashes**, in code, docs, comments or copy. Periods, colons, commas or
   parentheses.
+- **Anything a user reads follows [VOICE.md](VOICE.md)**: the site, the docs, the
+  reference, interface text and errors, and new code comments.
 - **American spelling** everywhere, comments and prose alike. `bun run fix:dialect`
   rewrites and `fusion prose`'s `dialect` judges. Comments are in scope because an
   unwritten convention is learned from the corpus.
