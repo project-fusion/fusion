@@ -25,6 +25,6 @@ cast would trade a real check for silence. This throws with the index and the
 length instead.
 
 It builds to `dist` like every other package. `exports` pointed at `./src/*.ts`
-until 2 Sep 2026, which every consumer here resolves because every consumer is
+until September 2, 2026, which every consumer here resolves because every consumer is
 bun; anything reading it with Node would have been handed TypeScript. `test`
 already depends on `^build`, so compiling it costs the task graph nothing.

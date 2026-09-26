@@ -58,6 +58,6 @@ bun run --filter @fusion.dev/helix-map test
 
 The specs drive stand-ins for each renderer. What they cannot show, that the
 real libraries move the way the stand-ins are told, was checked against
-MapLibre 5.24 and Leaflet 1.9.4 in Chromium on 25 Sep 2026.
+MapLibre 5.24 and Leaflet 1.9.4 in Chromium on September 25, 2026.
 
 MIT

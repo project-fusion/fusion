@@ -5,7 +5,7 @@ path: /legal/privacy
 title: What this site stores, which is almost nothing
 ---
 
-Last updated 26 August 2026. This is short because there is little to describe,
+Last updated August 26, 2026. This is short because there is little to describe,
 and it describes what the site actually does rather than reserving rights we do
 not exercise.
 

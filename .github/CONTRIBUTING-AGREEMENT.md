@@ -5,7 +5,7 @@ There is nothing to sign and no form to fill in: the agreement is the act of
 contributing, which is the lightest arrangement that still answers the question a
 contributor is entitled to have answered.
 
-Last updated 26 August 2026. **Not reviewed by a lawyer.**
+Last updated August 26, 2026. **Not reviewed by a lawyer.**
 
 ## You keep your copyright, and you license it to everyone
 
