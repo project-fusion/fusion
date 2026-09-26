@@ -5,6 +5,7 @@ import type { HelixActivateEvent, HelixMap, HelixMapRoute } from '@fusion.dev/he
 import { colorsReady, connectMap, distancesAlong, motionOf } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
+import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
@@ -125,10 +126,12 @@ export function MapsHero({
   /** A theme the builder sent, which the page opens in. */
   sent?: SentTheme
 }) {
+  const [intro] = MAPS.blocks
   const scope = useRef<HTMLDivElement>(null)
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
+  const bar = useRef<HTMLDivElement>(null)
   const engine = useRef<Promise<ThemeEngine> | null>(null)
   /* **The contrast the labels are held to**: a sent theme's own target while
      it is the one chosen, and the compiler's default otherwise. A ref rather
@@ -185,13 +188,13 @@ export function MapsHero({
         attributionControl: false,
         bounds: BOUNDS,
         container: box,
-        fitBoundsOptions: { padding: clearOf(box, panel.current) },
+        fitBoundsOptions: { padding: clearOf(box, panel.current, bar.current) },
         style: styled(colors),
       })
       /* Framed again once it has drawn: the page is still settling the map's
          height when it is made, and a resize keeps the center, not the fit. */
       map.once('load', () => {
-        map.fitBounds(BOUNDS, { animate: false, padding: clearOf(box, panel.current) })
+        map.fitBounds(BOUNDS, { animate: false, padding: clearOf(box, panel.current, bar.current) })
       })
       const connection = connectMap(host, mapLibreDriver(map))
       /* **A walker along the route, on a loop, that a reader can stop.**
@@ -339,7 +342,7 @@ export function MapsHero({
           const shared = SHARED.some((one) => one.label === place.label)
           map.easeTo({
             center: [place.lng, place.lat],
-            padding: clearOf(box, panel.current),
+            padding: clearOf(box, panel.current, bar.current),
             ...(shared ? {} : { zoom: 15 }),
             ...(motion ? { duration: motion.duration, easing: motion.easing } : { duration: 0 }),
           })
@@ -438,6 +441,41 @@ export function MapsHero({
           : undefined
       }
     >
+      {/* **The pitch, set on the map rather than in a box over it**: the
+          site's hero type on a wash of the page's own ground that runs in
+          from the start edge, which keeps it legible over the streets where
+          glass did not. First in the reading order, before the map it is
+          about; the camera frames the places beside it. */}
+      <div className={styles.mapsIntro} ref={panel}>
+        <helix-flex align-items="center" data-density="sm" gap="xs">
+          <helix-tag>Helix</helix-tag>
+          <helix-tag tone={stageAppearance('Building')}>Building</helix-tag>
+        </helix-flex>
+        <helix-text as="h1" class={styles.mapsTitle}>
+          {intro?.title}
+        </helix-text>
+        <helix-text as="p" class={styles.mapsLede} data-measure emphasis="muted">
+          {intro?.body?.[0]}
+        </helix-text>
+        <helix-flex class={`siteActions ${styles.mapsActions}`} data-density="lg" gap="sm" wrap>
+          <Link data-button="solid" data-button-tone="primary" href="#get-started">
+            Get started
+          </Link>
+          <Link data-button="subtle" href="/helix/theme?layout=map">
+            Build your theme
+          </Link>
+        </helix-flex>
+        {/* What the first swatch is, in words: a color alone does not say it is
+            a whole theme, or where it came from, or that there is a way back. */}
+        {sent ? (
+          <helix-text variant="caption">
+            Opened with your theme from the builder.{' '}
+            <a data-link="true" href={`/helix/theme?${sent.query}`}>
+              Back to the theme builder
+            </a>
+          </helix-text>
+        ) : null}
+      </div>
       {/* **Gathered as the map zooms out**, so the seven places are one
           count over the city rather than seven names drawn over each other,
           and come apart again as it zooms in. */}
@@ -448,6 +486,10 @@ export function MapsHero({
         ref={frame}
       >
         <div className={styles.mapsCanvas} ref={container} />
+        {/* **The page's ground run in over the map, inside its own box**, so
+            it washes the map and not the credit under it, and the places
+            drawn after it stand over it. */}
+        <div aria-hidden="true" className={styles.mapsWash} />
         {/* The walk the arrow keys take, drawn: the renderer's own line under
             the street names, and named in the frame's list for a reader who
             cannot see it. */}
@@ -511,15 +553,14 @@ export function MapsHero({
           <helix-map-marker key={place.label} label={place.label} lat={place.lat} lng={place.lng} />
         ))}
       </helix-map>
-      <div className={styles.mapsPanel} ref={panel}>
-        <helix-flex align-items="center" data-density="sm" gap="xs">
-          <helix-tag>Helix</helix-tag>
-          <helix-tag tone={stageAppearance('Building')}>Building</helix-tag>
-        </helix-flex>
-        <helix-text as="h1">{MAPS.title}</helix-text>
-        <helix-text as="p" emphasis="muted">
-          {MAPS.lede}
-        </helix-text>
+      {/* **Try it, on the map rather than in the pitch**: brand, mode and
+          the walker in one bar docked to the map's foot, so they read as the
+          map's own controls. Painted with the scope it re-themes, as the
+          frame's buttons are. */}
+      <div aria-label="Try it" className={styles.mapsTry} ref={bar} role="group">
+        <span aria-hidden="true" className={styles.mapsTryLabel}>
+          Try it
+        </span>
         <div className={styles.mapsControls}>
           <fieldset className={styles.mapsControl}>
             <legend className={styles.mapsLegend}>Brand</legend>
@@ -582,21 +623,6 @@ export function MapsHero({
             </div>
           )}
         </div>
-        {/* What the first swatch is, in words: a color alone does not say it is
-            a whole theme, or where it came from, or that there is a way back. */}
-        {sent ? (
-          <helix-text variant="caption">
-            Opened with your theme from the builder.{' '}
-            <a data-link="true" href={`/helix/theme?${sent.query}`}>
-              Back to the theme builder
-            </a>
-          </helix-text>
-        ) : null}
-        {MAPS.blocks[0]?.body?.map((line) => (
-          <helix-text emphasis="subtle" key={line} variant="caption">
-            {line}
-          </helix-text>
-        ))}
       </div>
     </div>
   )

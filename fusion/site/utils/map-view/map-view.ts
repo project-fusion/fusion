@@ -25,29 +25,35 @@ export const boundsOf = (places: readonly Placed[]): [[number, number], [number,
 ]
 
 /**
- * The part of the map a reader can see, as camera padding: where the panel
- * lies over it, the camera frames the places beside the panel rather than
- * under it, where a marker could take focus with nobody able to see it. The
- * top is deeper for the frame's own controls: they sit in its top corner, and
- * a band over them costs a phone much less of the map than a column beside
- * them would.
+ * The part of the map a reader can see, as camera padding: where a panel
+ * lies over the map at its start, the camera frames the places beside it
+ * rather than under it, where a marker could take focus with nobody able to
+ * see it; where a bar lies over its foot, above it. The top is deeper for the
+ * frame's own controls: they sit in its top corner, and a band over them
+ * costs a phone much less of the map than a column beside them would.
  *
  * **Measured on the map's own box**, not on `helix-map`, whose host is
  * `display: contents` and answers zero by zero.
  */
-export const clearOf = (map: Element, panel: Element | null): Clearance => {
+export const clearOf = (map: Element, panel: Element | null, bar?: Element | null): Clearance => {
   const edge = 48
   const room = map.getBoundingClientRect()
-  const over = panel?.getBoundingClientRect()
-  const covers =
-    over !== undefined &&
-    over.left < room.right &&
-    over.right > room.left &&
-    over.top < room.bottom &&
-    over.bottom > room.top
+  const over = (element: Element | null | undefined): DOMRect | undefined => {
+    const box = element?.getBoundingClientRect()
+    return box &&
+      box.width > 0 &&
+      box.left < room.right &&
+      box.right > room.left &&
+      box.top < room.bottom &&
+      box.bottom > room.top
+      ? box
+      : undefined
+  }
+  const side = over(panel)
+  const foot = over(bar)
   return {
-    bottom: edge,
-    left: covers ? over.right - room.left + edge : edge,
+    bottom: foot ? room.bottom - foot.top + edge / 2 : edge,
+    left: side ? side.right - room.left + edge : edge,
     right: edge,
     top: edge * 3,
   }
