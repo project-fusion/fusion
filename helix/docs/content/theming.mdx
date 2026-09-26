@@ -1,28 +1,26 @@
 ---
-description: Deriving an accessible token set from intent inputs.
+description: Compute a complete token set from your brand color and a few other inputs.
 section: Theming
 title: Deriving a theme
 ---
 
 # Theming
 
-**Tokens are a function, not a table.**
+Helix computes your color tokens from a few inputs, such as your brand color.
 
-A design system that ships two hundred hand-picked hex values can only offer
-override. You change one, break contrast somewhere three components away, and
-never find out. That is a config file, not a theming system.
+When a design system ships two hundred fixed color values, you theme it by
+changing them one at a time. A change to one value can break the contrast of a
+component elsewhere, and nothing tells you.
 
-`@fusion.dev/helix-theme` computes a complete token set from a handful of intent
-inputs, and every foreground and background pair meets its contrast target **by
-construction** rather than by audit.
+`@fusion.dev/helix-theme` computes a complete token set from a few intent
+inputs, and every text and background pair meets its contrast target.
 
 ## Two ways to theme
 
-They are both real and they are not the same thing, so they have different
-names.
+Helix has two ways to theme, and they give different guarantees.
 
-**Tuned** is the CSS path. Write a seed, the stylesheet re-derives, and nothing
-has to be installed or run:
+**Tuned** uses CSS only. Set a seed and the stylesheet recomputes the colors,
+with nothing to install or run:
 
 ```css
 :root {
@@ -38,13 +36,13 @@ A `var()` inside a custom property is substituted on the element the property is
 on a plain element is read by nothing. Naming the scope is what re-runs those
 declarations.
 
-**Tuned makes no contrast promise**, and cannot. CSS has no contrast function:
+**Tuned does not guarantee contrast.** CSS has no contrast function:
 `oklch(from …)` can step and rotate, and it cannot search for the lightness that
 clears a target. The figures baked into the ramp are exact for the seed that
 ships and approximate for any other.
 
-**Verified** is the engine. It solves rather than steps, measures every pair it
-emits, and hands back an artifact:
+**Verified** uses the theme engine. It searches for each color that meets its
+target, measures every pair, and returns the theme with any violations:
 
 ```ts
 import { deriveTheme, toCss } from '@fusion.dev/helix-theme'
