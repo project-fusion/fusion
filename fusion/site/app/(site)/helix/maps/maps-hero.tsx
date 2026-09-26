@@ -11,6 +11,7 @@ import { MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { boundsOf, clearOf } from '@/utils/map-view/map-view'
+import { siteScheme } from '@/utils/site-scheme/site-scheme'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './maps.module.css'
 import { mapIntent, propertiesOf, type SentTheme } from './maps-theme'
@@ -95,15 +96,6 @@ const siteBrand = (): string => {
   const color = getComputedStyle(probe).color
   probe.remove()
   return color
-}
-
-/** Which scheme the page is showing, where a mode says to follow it. */
-const siteScheme = (): 'dark' | 'light' => {
-  const chosen = document.documentElement.dataset.colorMode
-  if (chosen === 'dark' || chosen === 'light') {
-    return chosen
-  }
-  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
 /**
@@ -432,12 +424,17 @@ export function MapsHero({
   return (
     <div
       className={styles.mapsHero}
-      data-color-mode={painted && sent ? sent.settings.scheme : undefined}
+      data-color-mode={
+        painted && sent && sent.settings.scheme !== 'site' ? sent.settings.scheme : undefined
+      }
       data-helix-theme={painted && sent ? '' : undefined}
       ref={scope}
       style={
         painted && sent
-          ? ({ ...painted, colorScheme: sent.settings.scheme } as React.CSSProperties)
+          ? ({
+              ...painted,
+              ...(sent.settings.scheme === 'site' ? {} : { colorScheme: sent.settings.scheme }),
+            } as React.CSSProperties)
           : undefined
       }
     >

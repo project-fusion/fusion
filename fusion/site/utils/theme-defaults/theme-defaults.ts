@@ -30,7 +30,8 @@ export interface Settings {
   monoFace: string
   motion: Character
   radius: number
-  scheme: 'dark' | 'light'
+  /** Which half a reader sees: the site's own mode, or light or dark whatever the site shows. */
+  scheme: 'dark' | 'light' | 'site'
   surface: Mechanism
   textBase: number
   textScale: number
@@ -52,7 +53,7 @@ export const INITIAL: Settings = {
   monoFace: '',
   motion: '',
   radius: 50,
-  scheme: 'light',
+  scheme: 'site',
   surface: 'border',
   textBase: 14,
   textScale: 132,
@@ -74,8 +75,13 @@ export function accentFrom(hue: number): ThemeIntent['accent'] {
   return hue % 360 === 0 ? undefined : { from: 'brand', rotate: hue }
 }
 
-/** The intent these settings describe. */
-export function intentFrom(settings: Settings): ThemeIntent {
+/**
+ * The intent these settings describe, in `site` where they follow the site:
+ * the engine derives a light half or a dark one, so following the site is a
+ * choice between them made where the site's mode is known. Light on the
+ * server, which cannot know it.
+ */
+export function intentFrom(settings: Settings, site: 'dark' | 'light' = 'light'): ThemeIntent {
   const {
     accentHue,
     allowance,
@@ -115,7 +121,7 @@ export function intentFrom(settings: Settings): ThemeIntent {
     },
     material: { blur, opacity: translucency / 100 },
     radius: radius / 100,
-    scheme,
+    scheme: scheme === 'site' ? site : scheme,
     separation: { floating: floating as 'border' | 'fill' | 'shadow', surface },
     status: { allowance, harmony: harmony / 100 },
   }
@@ -243,7 +249,7 @@ export function settingsFrom(
     monoFace: face(params['mono-face'], true, INITIAL.monoFace, catalog),
     motion: oneOf(params.motion, CHARACTERS, INITIAL.motion),
     radius: bounded(params.radius, BOUNDS.radius, INITIAL.radius),
-    scheme: oneOf(params.scheme, ['light', 'dark'] as const, INITIAL.scheme),
+    scheme: oneOf(params.scheme, ['site', 'light', 'dark'] as const, INITIAL.scheme),
     surface: oneOf(params.surface, SURFACES, INITIAL.surface),
     textBase: bounded(params['text-base'], BOUNDS.textBase, INITIAL.textBase),
     textScale: bounded(params['text-scale'], BOUNDS.textScale, INITIAL.textScale),

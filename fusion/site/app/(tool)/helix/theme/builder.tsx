@@ -9,6 +9,7 @@ import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
 import { type FaceRow, GOOGLE_FACES } from '@/content/faces/faces.generated'
+import { useSiteScheme } from '@/utils/site-scheme/site-scheme'
 import {
   BOUNDS,
   type Character,
@@ -454,7 +455,11 @@ export function ThemeBuilder({
 
      `settings` is memoized for this: a fresh object every render would make this
      memo miss every time, and a derivation is the expensive thing on this page. */
-  const intent = useMemo(() => intentFrom(settings), [settings])
+  /* **Site is the site's mode, followed**: a reader switching the site to dark
+     sees the preview turn with it, the way every other page does. */
+  const site = useSiteScheme()
+  const shown = scheme === 'site' ? site : scheme
+  const intent = useMemo(() => intentFrom(settings, site), [settings, site])
 
   /* **The engine is loaded once and held**, because every keystroke derives
      against it. `initTheme` caches its own promise, so the effect running twice
@@ -790,13 +795,16 @@ export function ThemeBuilder({
             ) : null}
 
             <helix-select
-              hint="Which half of the palette is derived. Both are emitted; this picks the one you see."
+              hint="Which half of the palette you see. Site follows the site's own mode; both halves are emitted either way."
               label="Color scheme"
               name="scheme"
-              onChange={(event) => setScheme(event.currentTarget.value as 'dark' | 'light')}
+              onChange={(event) =>
+                setScheme(event.currentTarget.value as 'dark' | 'light' | 'site')
+              }
               value={scheme}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
+              <helix-option value="site">Site</helix-option>
               <helix-option value="light">Light</helix-option>
               <helix-option value="dark">Dark</helix-option>
             </helix-select>
@@ -1187,7 +1195,7 @@ export function ThemeBuilder({
              *                 a header that is not above it.
              */}
             <helix-sandbox-preview
-              color-mode={scheme}
+              color-mode={shown}
               label="The themed page"
               layout="fullscreen"
               ref={preview}

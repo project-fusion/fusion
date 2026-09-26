@@ -150,7 +150,7 @@ const derive = (
  */
 const readSiteScheme = (): 'dark' | 'light' => {
   if (typeof document === 'undefined') {
-    return INITIAL.scheme
+    return 'light'
   }
   const chosen = document.documentElement.dataset.colorMode
   if (chosen === 'dark' || chosen === 'light') {
@@ -239,13 +239,13 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
   const [accentHue, setAccentHue] = useState(INITIAL.accentHue)
   const [radius, setRadius] = useState(INITIAL.radius)
   const [density, setDensity] = useState(INITIAL.density)
-  /* Seeded from `INITIAL.scheme` for hydration, then moved to the site's mode
-     by the effects below. `INITIAL.scheme` is `light`, which is right for a tool
-     that opens on a blank canvas and wrong for a page inside a dark site: left
+  /* Seeded light for hydration, which is what the server rendered, then moved
+     to the site's mode by the effects below. Light is right for a blank canvas
+     and wrong for a page inside a dark site: left
      there, the scope paints itself white under dark chrome and the reel's scrim,
      which is the background color at 70%, becomes a white blob over the field. A
      draft should look like the site until a reader says otherwise. */
-  const [scheme, setScheme] = useState<'dark' | 'light'>(INITIAL.scheme)
+  const [scheme, setScheme] = useState<'dark' | 'light'>('light')
 
   useEffect(() => {
     let live = true
