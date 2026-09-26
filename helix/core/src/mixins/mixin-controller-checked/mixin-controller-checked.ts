@@ -24,11 +24,13 @@ export declare class MixinControllerCheckedInterface {
    */
   checked: boolean
 
-  /** Whether the markup declared it checked, which is where a reset returns to. */
+  /**
+   * Whether the control starts checked. A form reset returns it to this state.
+   */
   defaultChecked: boolean
 
   /**
-   * Requests a checked change, and reports whether it was applied.
+   * Requests a change to `checked`, and returns whether it was applied.
    *
    * Announces before it acts: a listener calling `preventDefault()` on the
    * `helix-before-toggle` refuses the change, and nothing moves.
@@ -88,7 +90,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     }
 
     /**
-     * Whether the markup declared it checked, which is where a reset returns to.
+     * Whether the control starts checked. A form reset returns it to this state.
      */
     @property({ attribute: 'default-checked', type: Boolean })
     defaultChecked = false
@@ -120,7 +122,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     }
 
     /**
-     * Requests a checked change, and reports whether it was applied.
+     * Requests a change to `checked`, and returns whether it was applied.
      *
      * Announces before it acts, so `preventDefault()` on the
      * `helix-before-toggle` is a refusal and nothing moves. Nobody refusing

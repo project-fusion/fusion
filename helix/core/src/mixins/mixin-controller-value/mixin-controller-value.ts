@@ -14,7 +14,7 @@ type Constructor<T> = new (...args: any[]) => T
  */
 export declare class MixinControllerValueInterface {
   /**
-   * The value the markup declared, which is where a reset returns to.
+   * The value the control starts with. A form reset returns it to this value.
    *
    * Separate from `value`, which is where the control is now, and gone from the
    * reader's view the moment they change anything.
@@ -22,7 +22,7 @@ export declare class MixinControllerValueInterface {
   defaultValue: string
 
   /**
-   * What the control holds now, and what its form submits.
+   * The control's current value, which its form submits.
    *
    * Reading gives the real value. Writing always applies, and is a seed and a
    * correction rather than a claim of ownership: a consumer who wants the
@@ -44,11 +44,11 @@ export declare class MixinControllerValueInterface {
    */
   protected readonly announcesInput: boolean
 
-  /** Requests a new value, and reports whether the request stood. */
+  /** Requests a new value, and returns whether the change was applied. */
 
   requestValue(next: string): boolean
 
-  /** Returns the control to the value its markup declared. */
+  /** Returns the control to its `defaultValue`. */
   formResetCallback(): void
 
   /** Restores the value when the browser brings a form back. */
@@ -80,13 +80,13 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
   // when resolving inherited members into dependent packages.
   class ValueElement extends Base {
     /**
-     * The value the markup declared, which is where a reset returns to.
+     * The value the control starts with. A form reset returns it to this value.
      */
     @property({ attribute: 'default-value' })
     defaultValue = ''
 
     /**
-     * What the control holds now, and what its form submits.
+     * The control's current value, which its form submits.
      *
      * One property, not two, so `input.value` answers the question anyone
      * asking it meant. Writing always applies; `<helix-input value="x">` is the
@@ -147,7 +147,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
     }
 
     /**
-     * Requests a new value, and reports whether the request stood.
+     * Requests a new value, and returns whether the change was applied.
      *
      * Announces before it acts, so `preventDefault()` on the `helix-before-change` is
      * a refusal and nothing moves. Nobody refusing means the control updates
@@ -176,7 +176,7 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
     }
 
     /**
-     * Returns the control to the value its markup declared.
+     * Returns the control to its `defaultValue`.
      *
      * Both halves are dropped, the consumer's and the control's, because a
      * reset means the form is as it was served. Clearing only the internal one

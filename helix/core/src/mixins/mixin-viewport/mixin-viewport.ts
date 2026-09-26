@@ -76,7 +76,7 @@ export declare class ViewportElement {
   /** The key relay, bound by the family's own frame. */
   protected handleKeydown: (event: KeyboardEvent) => void
 
-  /** What the group of controls is called, where the page says. */
+  /** The name of the group of controls, read by screen readers. */
   controlsLabel: string | undefined
 
   /** What the group of controls is called where the page does not say, which each family says for itself. */
