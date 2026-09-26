@@ -107,9 +107,8 @@ export default async function Page() {
           before they read the names. One panel with rules between the offers
           says the same thing the landing bands say: these are three parts of one
           answer rather than three unrelated claims that happen to be adjacent.
-          It is also what lets them be compared, which is what a page with prices
-          on it is for: the rules line the prices up on one grid instead of
-          leaving three cards to agree by luck. */}
+          The rules also line the offers up on one grid, so you can compare
+          them. */}
         <Band reveal>
           {/*
            * *A head on the card, which is what makes it the same object as
