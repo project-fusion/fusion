@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -26,6 +26,8 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Current location, Live position, Tracker, You are here
  * @documentation https://fusion.dev/helix/components/map
  *
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - It moved, turned or grew less sure, which the connector follows. Not news for a page.
+ *
  * @csspart accuracy - The ring as wide as the position is uncertain.
  * @csspart arrow - The arrow a position with a heading is drawn as, pointing the way it faces.
  * @csspart dot - The point that stands on the position.
@@ -37,7 +39,7 @@ import { property, state } from 'lit/decorators.js'
 @customElement('helix-headless-map-position')
 export class HelixHeadlessMapPosition extends HelixElement {
   /** How far off the position may be, in meters, which the ring is drawn as. */
-  @property({ reflect: true, type: Number })
+  @property({ type: Number })
   accuracy?: number
 
   /**
@@ -48,7 +50,7 @@ export class HelixHeadlessMapPosition extends HelixElement {
   announceEvery = 5000
 
   /** What is worth hearing about it, spoken as it changes: two stops away, arrived. */
-  @property({ reflect: true })
+  @property()
   description?: string
 
   /** Which way it is going, in degrees clockwise from north. None draws no cone. */
@@ -59,15 +61,15 @@ export class HelixHeadlessMapPosition extends HelixElement {
   readonly isMapPosition = true
 
   /** What it is, which is what a reader hears when they come to it. */
-  @property({ reflect: true })
+  @property()
   label?: string
 
-  /** How far north, in degrees. Reflected, so the connector hears it move. */
-  @property({ reflect: true, type: Number })
+  /** How far north, in degrees. */
+  @property({ type: Number })
   lat?: number
 
   /** How far east, in degrees. */
-  @property({ reflect: true, type: Number })
+  @property({ type: Number })
   lng?: number
 
   /** The words last spoken, which is what the status holds. */
@@ -98,6 +100,14 @@ export class HelixHeadlessMapPosition extends HelixElement {
     }
   }
 
+  /** Tells the connector it moved, turned or grew less sure: not what it said, which is its own. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if ([...changed.keys()].some((key) => key !== 'spoken' && key !== 'announceEvery')) {
+      this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'place' }))
+    }
+  }
+
   /** Puts the latest words in the status, which is what makes them heard. */
   private speak(): void {
     clearTimeout(this.waiting)
@@ -114,7 +124,7 @@ export class HelixHeadlessMapPosition extends HelixElement {
 
   protected override render(): TemplateResult {
     /* **The status beside the picture, not in it.** An image's children are
-       presentational, so a status inside \`role="img"\` was never spoken at
+       presentational, so a status inside `role="img"` was never spoken at
        all. */
     return html`<span part="position" role="img" aria-label=${this.label ?? ''}>
         <span part="accuracy"></span>

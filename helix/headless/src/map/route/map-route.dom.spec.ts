@@ -32,7 +32,7 @@ const listed = (host: Frame): string[] =>
 describe('map route and area', () => {
   test('points are lat,lng pairs as a marker reads them, and a pair that is not one is dropped', async () => {
     const host = await frame(
-      '<helix-headless-map-route label="Round" points="37.77,-122.41 nope 37.79,-122.39 1,2,3"></helix-headless-map-route>',
+      '<helix-headless-map-route label="Round" points="37.77,-122.41 nope 37.79,-122.39 1,2,3 30.1, ,-97.7"></helix-headless-map-route>',
     )
     const route = host.querySelector('helix-headless-map-route') as Layer
     expect(route.points).toEqual([
@@ -41,16 +41,19 @@ describe('map route and area', () => {
     ])
   })
 
-  test('points set as a property are reflected, so the connector hears the route move', async () => {
+  test('points set as a property say so rather than being reflected into the markup', async () => {
     const host = await frame('<helix-headless-map-area label="Zone"></helix-headless-map-area>')
     const area = host.querySelector('helix-headless-map-area') as Layer
+    const said: string[] = []
+    host.addEventListener('helix-map-part-change', (event) => said.push(event.detail.kind))
     area.points = [
       { lat: 1, lng: 2 },
       { lat: 3, lng: 4 },
       { lat: 5, lng: 2 },
     ]
     await area.updateComplete
-    expect(area.getAttribute('points')).toBe('1,2 3,4 5,2')
+    expect(said).toEqual(['layer'])
+    expect(area.hasAttribute('points')).toBe(false)
   })
 
   test('the frame names every route and area in a list, in the order they are written', async () => {

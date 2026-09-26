@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -31,6 +31,8 @@ import { property, state } from 'lit/decorators.js'
  *
  * @slot icon - What the point holds: a letter, a number or an icon, such as the order of a stop. Seen, not read: the marker's name is its label.
  *
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - The place moved or was renamed, which the connector follows. Not news for a page.
+ *
  * @csspart label - The place's name, beside the point.
  * @csspart marker - The button a reader presses, holding the point and the name.
  * @csspart point - The dot that stands on the place, and holds its `icon` where it has one.
@@ -56,19 +58,18 @@ export class HelixHeadlessMapMarker extends HelixElement {
   readonly isMapMarker = true
 
   /** What the place is called, which is what a reader hears and sees. */
-  @property({ reflect: true })
+  @property()
   label?: string
 
   /**
-   * How far north, in degrees. Reflected, as `lng` is, so the connector hears
-   * a place move whether a page set the attribute or the property; a marker
-   * with neither is not placed.
+   * How far north, in degrees. A marker without both this and `lng` is not
+   * placed.
    */
-  @property({ reflect: true, type: Number })
+  @property({ type: Number })
   lat?: number
 
   /** How far east, in degrees. */
-  @property({ reflect: true, type: Number })
+  @property({ type: Number })
   lng?: number
 
   /**
@@ -95,6 +96,18 @@ export class HelixHeadlessMapMarker extends HelixElement {
         'icon',
         this.knownChildren.some((child) => child.slot === 'icon'),
       )
+    }
+  }
+
+  /**
+   * Tells the connector the place moved or was renamed, which moves the point
+   * or changes how far the name reaches. Not for the frame's own bookkeeping,
+   * `current` and `side`, which the frame and the connector wrote.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if ([...changed.keys()].some((key) => key !== 'current' && key !== 'side')) {
+      this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'place' }))
     }
   }
 

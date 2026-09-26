@@ -251,6 +251,20 @@ describe('connectMap', () => {
     expect(credit(none)).toBeNull()
   })
 
+  test('a credit said again is left as it is, so a reader on its link stays there', async () => {
+    const host = await frame()
+    const { driver, seen } = recorder()
+    seen.credits = ['<a href="https://openstreetmap.org">OpenStreetMap</a>']
+    connectMap(host, driver)
+    const link = credit(host)?.querySelector('a') as HTMLAnchorElement
+    seen.changed?.()
+    seen.changed?.()
+    expect(credit(host)?.querySelector('a')).toBe(link)
+    seen.credits = ['<a href="https://openfreemap.org">OpenFreeMap</a>']
+    seen.changed?.()
+    expect(credit(host)?.textContent).toBe('OpenFreeMap')
+  })
+
   test('disconnecting stops answering and takes the credit away', async () => {
     const host = await frame()
     const { driver, seen } = recorder()
@@ -600,6 +614,39 @@ describe('connectMap with a position', () => {
 
     connection.disconnect()
     expect(read('x')).toBe('')
+  })
+
+  test('its heading is drawn against the view, which a renderer can turn', async () => {
+    const host = await frame(
+      '<helix-headless-map-position label="Van 12" lat="1" lng="2" heading="90"></helix-headless-map-position>',
+    )
+    const position = host.querySelector('helix-headless-map-position') as HTMLElement
+    const { driver } = projecting()
+    connectMap(host, { ...driver, bearing: () => 30 })
+    expect(position.style.getPropertyValue('--_map-position-heading')).toBe('60deg')
+  })
+
+  test('a position moving, set as a property, moves it and draws no route again', async () => {
+    const host = await frame(
+      `<helix-headless-map-route label="R" points="0,0 1,1"></helix-headless-map-route>
+       <helix-headless-map-position label="Van 12" lat="1" lng="2"></helix-headless-map-position>`,
+    )
+    const position = host.querySelector('helix-headless-map-position') as HTMLElement & {
+      lng: number
+    }
+    let draws = 0
+    const { driver } = projecting()
+    connectMap(host, {
+      ...driver,
+      layers: () => {
+        draws += 1
+        return { stop: () => {}, update: () => (draws += 1) }
+      },
+    })
+    position.lng = 4
+    await settle()
+    expect(position.style.getPropertyValue('--_map-position-x')).toBe('40px')
+    expect(draws).toBe(1)
   })
 
   test('fitting counts a position among the places to frame', async () => {
