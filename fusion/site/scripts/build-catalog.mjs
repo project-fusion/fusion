@@ -90,12 +90,21 @@ for (const source of EXAMPLES) {
          file is there, so an empty string here means that check is not running
          rather than that the example has no React form. */
       const authored = join(dir, `${slug}.tsx`)
+      /* **Named as the sandbox names the files it shows.** An example's sheet
+         is `<slug>.css` beside it on disk, and the sandbox hands a reader
+         `index.tsx` and `styles.css`, so the import the React form was
+         written with pointed at a file that is not among the ones shown.
+         Renamed here, where the example becomes something to show, rather
+         than on disk, where the slug is what tells the sheets apart. */
+      const sheet = `'./${slug}.css'`
       examples.push({
         css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
         family: family.name,
         html: readFileSync(join(dir, file), 'utf8').trim(),
         slug,
-        tsx: existsSync(authored) ? readFileSync(authored, 'utf8').trim() : '',
+        tsx: existsSync(authored)
+          ? readFileSync(authored, 'utf8').trim().replaceAll(sheet, `'./styles.css'`)
+          : '',
       })
     }
   }
