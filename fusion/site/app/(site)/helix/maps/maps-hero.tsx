@@ -2,7 +2,7 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { HelixActivateEvent, HelixMap, HelixMapRoute } from '@fusion.dev/helix'
-import { colorsReady, connectMap, motionOf } from '@fusion.dev/helix-map'
+import { colorsReady, connectMap, distancesAlong, motionOf } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { useEffect, useRef, useState } from 'react'
@@ -224,12 +224,9 @@ export function MapsHero({
         /* The places along it: the first and the last where the markers are,
            the rest one on, the first place now leading the path. */
         const stops = [0, ...WALK.stops.slice(1, -1).map((stop) => stop + 1), path.length - 1]
-        const along = path.map((_, at) =>
-          path.slice(1, at + 1).reduce((total, point, index) => {
-            const from = path[index] as readonly [number, number]
-            return total + Math.hypot(point[0] - from[0], point[1] - from[1])
-          }, 0),
-        )
+        /* Measured as the connector cuts a route, so the part behind is
+           quieter from exactly where the walker stands. */
+        const along = distancesAlong(path.map(([lat, lng]) => ({ lat, lng })))
         const total = along.at(-1) ?? 0
         /** Stands the walker so far along the path, facing its way, the route behind it quieter. */
         const standAt = (covered: number): number => {
@@ -415,7 +412,15 @@ export function MapsHero({
           : undefined
       }
     >
-      <helix-map class={styles.mapsHeroFrame} label="Austin, drawn in this theme" ref={frame}>
+      {/* **Gathered as the map zooms out**, so the seven places are one
+          count over the city rather than seven names drawn over each other,
+          and come apart again as it zooms in. */}
+      <helix-map
+        class={styles.mapsHeroFrame}
+        cluster
+        label="Austin, drawn in this theme"
+        ref={frame}
+      >
         <div className={styles.mapsCanvas} ref={container} />
         {/* The walk the arrow keys take, drawn: the renderer's own line under
             the street names, and named in the frame's list for a reader who
