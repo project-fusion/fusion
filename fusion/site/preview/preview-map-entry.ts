@@ -79,7 +79,7 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   /* Every place the map holds, a route's start among them, so a lane from a
      port off the edge of the markers' own bounds is framed whole. */
   const places = [
-    ...[...frame.querySelectorAll('helix-map-marker')].map(placeOf),
+    ...[...frame.querySelectorAll('helix-map-marker, helix-map-position')].map(placeOf),
     ...[...frame.querySelectorAll('helix-map-route, helix-map-area')].flatMap(pointsOf),
   ].filter((place) => place !== null)
   const panel = root.querySelector('[data-preview-map-clear]')

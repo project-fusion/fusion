@@ -798,6 +798,18 @@ function MapPage(context: Context) {
               ></helix-map-route>
             ) : null,
           )}
+          {/* Something on its way, moving in silence and heard by its words. */}
+          {map.position ? (
+            <helix-map-position
+              accuracy={map.position.accuracy}
+              description={map.position.description}
+              heading={map.position.heading}
+              label={map.position.label}
+              lat={map.position.lat}
+              lng={map.position.lng}
+              tone={map.position.state}
+            ></helix-map-position>
+          ) : null}
           {map.places.map((place) => (
             <helix-map-marker
               key={place.label}
