@@ -30,6 +30,7 @@ import { property, state } from 'lit/decorators.js'
  * @csspart dot - The point that stands on the position.
  * @csspart heading - The cone that points the way it is going, where a heading is known.
  * @csspart position - The picture of it, the ring, the cone and the point, named by its label.
+ * @csspart pulse - A ring that radiates from the point, which says it is live rather than a place.
  * @csspart status - Its description, spoken as it changes.
  */
 @customElement('helix-headless-map-position')
@@ -117,6 +118,7 @@ export class HelixHeadlessMapPosition extends HelixElement {
     return html`<span part="position" role="img" aria-label=${this.label ?? ''}>
         <span part="accuracy"></span>
         <span part="heading"></span>
+        <span part="pulse"></span>
         <span part="dot"></span>
       </span>
       <span part="status" role="status">${this.spoken}</span>`

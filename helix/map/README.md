@@ -80,6 +80,9 @@ has none, and what happens then is the page's.
 ```
 
 `points` are `lat,lng` pairs, in the order a marker's own `lat` and `lng` read.
+**A route draws the path it is given**, straight between each pair: a path
+along roads is a routing engine's to find, OSRM, Valhalla or GraphHopper, and a
+page passes the geometry one returns rather than the stops alone.
 **The renderer draws them, under its place names**, which a page drawing its
 own canvas over the map could not do: the connector reads each one's points and
 its color, the brand or its `tone`, and hands them to the driver as the

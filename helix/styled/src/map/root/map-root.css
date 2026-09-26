@@ -15,7 +15,11 @@
   position: relative;
 }
 
+/* **A stacking context of its own**, so what is raised over the map, a live
+   position over the places it passes, is raised within the map and never
+   over the frame's own controls beside it. */
 [part="viewport"] {
+  isolation: isolate;
   min-block-size: 0;
   overflow: hidden;
   position: relative;
