@@ -218,33 +218,31 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
             <SectionTitle>{stack?.title}</SectionTitle>
             <Lede>{stack?.body?.[0]}</Lede>
           </helix-flex>
-          <div className={band.bandSection}>
-            <ol className={styles.mapsStack}>
-              {MAP_STACK.map((layer) => (
-                <li
-                  className={styles.mapsLayer}
-                  data-owned={layer.owner ? 'false' : 'true'}
-                  key={layer.title}
+          {/* **The layers as rows, top to bottom**, ruled as the features
+              above are rather than boxed apart, since they are one stack:
+              what the layer is and its name, what it does, and where it
+              stands, or whose it is where it is not ours. */}
+          <ol className={styles.mapsStack}>
+            {MAP_STACK.map((layer) => (
+              <li
+                className={styles.mapsLayer}
+                data-owned={layer.owner ? 'false' : 'true'}
+                key={layer.title}
+              >
+                <helix-flex direction="column" gap="xs">
+                  <Eyebrow>{layer.role}</Eyebrow>
+                  <Claim>{layer.title}</Claim>
+                </helix-flex>
+                <helix-text emphasis="muted">{layer.body}</helix-text>
+                <helix-tag
+                  class={styles.mapsLayerStage}
+                  tone={layer.stage ? stageAppearance(layer.stage) : 'neutral'}
                 >
-                  <helix-text class={styles.mapsLayerRole} emphasis="subtle" variant="caption">
-                    {layer.role}
-                  </helix-text>
-                  <div className={styles.mapsLayerText}>
-                    <helix-text as="h3" variant="title">
-                      {layer.title}
-                    </helix-text>
-                    <helix-text emphasis="muted">{layer.body}</helix-text>
-                  </div>
-                  <helix-tag
-                    class={styles.mapsLayerStage}
-                    tone={layer.stage ? stageAppearance(layer.stage) : 'neutral'}
-                  >
-                    {layer.stage ?? layer.owner}
-                  </helix-tag>
-                </li>
-              ))}
-            </ol>
-          </div>
+                  {layer.stage ?? layer.owner}
+                </helix-tag>
+              </li>
+            ))}
+          </ol>
         </Band>
       </div>
     </>
