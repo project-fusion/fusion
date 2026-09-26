@@ -1,5 +1,5 @@
 ---
-description: What to install, the order the stylesheets go in, and how to check it worked.
+description: What to install, the order of the stylesheets, and how to check that the elements registered.
 order: 3
 section: Getting started
 title: Installation
@@ -11,55 +11,59 @@ title: Installation
 bun add @fusion.dev/helix
 ```
 
-`@fusion.dev/helix-styles` is not optional and not a peer dependency by accident. The
-components reference semantic tokens and paint nothing without them: a Helix
-page with the elements installed and the tokens missing renders unstyled boxes
-rather than an unthemed version of itself.
+`@fusion.dev/helix-styles` is a required dependency, on purpose. The components
+use its semantic tokens and draw nothing without them. If the elements are
+installed and the tokens are missing, your page shows unstyled boxes. There is
+no fallback theme.
 
-## The stylesheets go in this order
+## Import the stylesheets
 
 ```ts
 import '@fusion.dev/helix-styles/helix.css'
 ```
 
-One import, and it is four files in the order they have to be in:
-`primitives.css`, `tokens.css`, `base.css`, `elements.css`. The order is
-load-bearing and the failure is silent, so it is stated once inside the package
-rather than by every consumer.
+This one import loads four files in the order they must load:
 
-It resolves `@fusion.dev/helix-styles` through this package's own dependency, so
-installing `@fusion.dev/helix` is enough. A bare specifier in an `@import` is
-resolved by a bundler and never by a browser, so a page serving CSS through a
-`<link>` takes the four by path instead.
+1. `primitives.css`
+2. `tokens.css`
+3. `base.css`
+4. `elements.css`
 
-### The four, for anyone substituting a layer
+The order matters, and a wrong order fails without an error. We set the order
+once, inside the package, so you do not have to.
 
-Each file keeps its own export, so a consumer bringing their own reset or their
-own ramp imports the two they want and skips the bundle.
+The import resolves `@fusion.dev/helix-styles` through the dependency in
+`@fusion.dev/helix`, so installing `@fusion.dev/helix` is enough. Only a bundler
+resolves a bare specifier like this one. If you serve CSS through a `<link>`,
+link `helix.css` by its path, as [Without a bundler](./without-a-bundler)
+shows.
 
-- **`primitives.css`** is the raw ramp the semantic layer is derived from, and
-  it is where the seven `--helix-seed-*` knobs are read. Nothing in your own
-  code should name a primitive, and leaving the file out is not a way to
-  enforce that: `tokens.css` refers to one 297 times, so without it every
-  semantic token resolves to nothing at all. Measured on a page missing it,
+### Import the files one at a time
+
+Each file has its own export. If you bring your own reset or your own ramp,
+import the two files you want and skip `helix.css`.
+
+- **`primitives.css`** holds the raw ramp that the semantic layer is derived
+  from. The seven `--helix-seed-*` properties are read here. Your own code
+  should not name a primitive, and leaving the file out does not enforce that.
+  `tokens.css` refers to a primitive 297 times, so without `primitives.css`
+  every semantic token resolves to nothing. We measured a page without it:
   `--helix-color-background` computes to `rgba(0, 0, 0, 0)`, and so does every
-  other color. It is also the file [theming](theming.mdx) depends on, since a
-  `--helix-seed-brand` nobody reads moves nothing.
-- **`tokens.css`** declares the semantic layer, 185 custom properties in 15
-  categories, plus `color-scheme: light dark` on `:root`. Everything below reads
-  from it, and it reads primitives.
-- **`base.css`** is the element reset, the type scale on bare `h1` through
-  `h6`, and the recipes for markup this library does not render. It reads
-  tokens.
+  other color. [Theming](theming.mdx) also depends on this file, because without
+  it, setting `--helix-seed-brand` changes nothing.
+- **`tokens.css`** declares the semantic layer: 185 custom properties in 15
+  categories, plus `color-scheme: light dark` on `:root`. The files below read
+  from it, and it reads from `primitives.css`.
+- **`base.css`** holds the element reset, the type scale on bare `h1` through
+  `h6`, and the recipes for markup that Helix does not render. It reads tokens.
+- **`elements.css`** styles elements before they upgrade. It is the file most
+  often left out, because a page works without it until the page is
+  server-rendered. An element that has not upgraded has no shadow root and no
+  styles of its own, so the markup flashes unstyled and then jumps into place.
+  `elements.css` makes that interval look like the finished page.
 
-**The last one is the one people leave out**, because everything works without
-it right up until the page is server-rendered: an element that has not upgraded
-yet has no shadow root and no styles of its own, so the markup flashes unstyled
-and then snaps into place. `elements.css` is what makes that interval look like
-the finished page.
-
-Put them in a stylesheet you control rather than deep inside a component, so the
-order is visible in one place and stays that way.
+Import the files from a stylesheet you control, and keep them out of individual
+components. The order then stays visible in one place.
 
 ## Register the elements
 
@@ -67,57 +71,62 @@ order is visible in one place and stays that way.
 import '@fusion.dev/helix'
 ```
 
-A side-effect import. It calls `customElements.define` for every element, once,
-and is safe to run more than once: the helper behind it checks the registry
-first, because a second `define` for the same tag throws and takes the rest of
-the module with it.
+This import has a side effect: it calls `customElements.define` once for every
+element. You can run it more than once. A second `define` for the same tag
+throws an error and stops the rest of the module, so the helper behind the
+import checks the registry first.
 
-You can register a subset instead, from a subpath:
+To register only some elements, import them from subpaths:
 
 ```ts
 import '@fusion.dev/helix/button'
 import '@fusion.dev/helix/dialog'
 ```
 
-Worth doing when you use a handful of components. Not worth doing in the belief
-that the full import ships everything to the browser: the package is
-side-effectful by design, so a bundler keeps what you import either way, and the
-subpaths are about being explicit rather than about size.
+Subpaths are useful when you use a few components. Their purpose is to make
+your imports explicit. The package has side effects by design, so a bundler
+keeps what you import either way.
 
-## Check it worked
+## Check the installation
 
-Render one element and ask the browser whether it upgraded:
+Render one element and check whether it upgraded:
 
 ```ts
 await customElements.whenDefined('helix-button')
 console.log(document.querySelector('helix-button')?.shadowRoot !== null)
 ```
 
-`true` means the definition arrived and the element built its shadow root.
+`true` means the definition loaded and the element built its shadow root.
 `false`, or a promise that never settles, means the registration import did not
-run: usually a `'use client'` boundary the import ended up outside of, or a
-subpath import for a component you did not end up using.
+run. Usually the import is outside a `'use client'` boundary, or you imported
+the subpath of a component you did not end up using.
 
-**A styling problem looks nothing like that.** If the element upgraded and the
-page still looks wrong, the stylesheets are the thing to check, in the order
-above. The tell is which layer is missing: no color at all is `tokens.css`,
-unstyled prose and bare headings is `base.css`, and components that look right
-once JavaScript runs but flash unstyled before it is `elements.css`.
+If the element upgraded and the page still looks wrong, check the stylesheets
+in the order above. The symptom tells you which layer is missing:
 
-## Your framework
+- No color at all means `tokens.css` is missing.
+- Unstyled prose and bare headings mean `base.css` is missing.
+- Components that look right once JavaScript runs, but flash unstyled before
+  it, mean `elements.css` is missing.
 
-The elements are custom elements and every framework can render one. What
-differs is how a framework passes a non-string value, how it binds an event, and
-whether it needs telling that an unknown tag is deliberate.
+## Framework setup
+
+The elements are custom elements, and every framework can render them.
+Frameworks differ in three ways:
+
+- How they pass a value that is not a string.
+- How they bind an event.
+- Whether they need configuration to accept an unknown tag.
 
 | | |
 |---|---|
-| [React](./react) | A runtime bridge ships for it, plus `jsx.d.ts` |
+| [React](./react) | Ships a runtime bridge and `jsx.d.ts` |
 | [Vue](./vue) | Ships `vue.d.ts`, needs `compilerOptions.isCustomElement` |
-| [Svelte](./svelte) | Ships `svelte.d.ts`, and needs nothing else |
+| [Svelte](./svelte) | Ships `svelte.d.ts`, and needs no configuration |
 | [Angular](./angular) | Needs `CUSTOM_ELEMENTS_SCHEMA` |
-| [Other frameworks](./other-frameworks) | Solid, Qwik, Lit, and the three rules they all reduce to |
+| [Other frameworks](./other-frameworks) | Solid, Qwik, Lit, and the three rules they all follow |
 | [Without a bundler](./without-a-bundler) | An import map, or the stylesheets alone |
 
-A framework gets its own page when Helix ships typings for it, or when it
-refuses to compile without configuration. Everything else works with no setup.
+A framework has its own page when Helix ships typings for it, or when it does
+not compile Helix tags without configuration. Other frameworks work with no
+setup.

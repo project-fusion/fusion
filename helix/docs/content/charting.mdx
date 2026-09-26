@@ -1,37 +1,49 @@
 ---
-description: The data channel nobody expects, and why it is a real table.
+description: Which chart to use, and how charts read their data from a table in the document.
 section: Essentials
 title: Charting
 ---
 
 # Charting
 
-The chart families are `Bar Chart`, `Line Chart`, `Area Chart`,
-`Scatter Chart`, `Donut Chart`, `Heatmap`, `Sparkline`, `Trend` and the shared
-`Legend`. Each has its own API page. Here is which one answers which question,
-and how the data gets in, which is the same for all of them.
+Helix has these chart families, and each one has its own API page:
 
-## Which chart
+- `Bar Chart`
+- `Line Chart`
+- `Area Chart`
+- `Scatter Chart`
+- `Donut Chart`
+- `Heatmap`
+- `Sparkline`
+- `Trend`
+- `Legend`, which all of the charts share
 
-Pick by the question, not by the picture.
+This guide covers which chart fits which question, and how data gets into a
+chart. Data gets in the same way for every chart.
+
+## Choose a chart
+
+Choose a chart by the question it answers.
 
 - **How much, compared.** `Bar Chart`. A bar's length is its value, so it always
   starts at zero.
 - **How something moved over time.** `Line Chart`. It measures from the data's
   own range, so a small change still shows. Its `area` puts a light wash under
-  each line, each drawn from the floor on its own and overlapping the others.
+  each line. Each wash is drawn from the floor on its own and overlaps the
+  others.
 - **How a total is made up over time.** `Area Chart`. Each column is stacked on
   the one below, so the top edge is the total and a band's thickness is its
-  share. This is the one to reach for when the parts add up to something, and
-  `Line Chart` with `area` is not a substitute: that overlaps the series, this
-  adds them.
+  share. Use it when the parts add up to a total. `Line Chart` with `area`
+  overlaps the series, and `Area Chart` adds them.
 - **Parts of one whole, at one moment.** `Donut Chart`.
-- **Whether two measures relate.** `Scatter Chart`, one point per row.
-- **How each day or check went.** `Heatmap`: uptime, contributions, activity.
-- **The shape of a series beside its number.** `Sparkline`, with no axes. And
-  `Trend` for which way one measurement moved and whether that is good news.
+- **Whether two measures relate.** `Scatter Chart`, with one point per row.
+- **How each day or check went.** `Heatmap`, for uptime, contributions, or
+  activity.
+- **The shape of a series beside its number.** `Sparkline`, drawn with no axes.
+  Use `Trend` to show which way one measurement moved and whether that is good
+  news.
 
-## The data is a table in the document
+## Charts read their data from a table
 
 ```html
 <table id="revenue">
@@ -48,20 +60,19 @@ Pick by the question, not by the picture.
 <helix-bar-chart for="revenue"></helix-bar-chart>
 ```
 
-`for` points at a real `<table>` by id, and the chart reads its series from it.
-That is unlike every other component in the library, and it is not a
-convenience.
+`for` points to a real `<table>` by id, and the chart reads its series from that
+table. No other Helix component gets its data this way. There are two reasons.
 
-**A property cannot survive hydration.** A framework's server render emits
-markup, and a property is not markup: an array assigned to `items` exists only
+First, a property does not survive hydration. A framework's server render emits
+markup, and a property is not markup. An array assigned to `items` exists only
 after JavaScript has run, so the server has nothing to send and the first paint
-has nothing to draw. Text in the document is the one channel that both a server
-and a client can see.
+has nothing to draw. Text in the document is the one channel that both the
+server and the client can see.
 
-**And the table is not a workaround, it is the accessible version.** A chart is
-a picture of numbers, and a screen reader cannot read a picture. The table is
-the numbers, in the document, navigable, and the chart is the drawing of them.
-Hide the table visually if it should not be seen, and the data is still there:
+Second, the table is what a screen reader reads. A chart is a picture of
+numbers, and a screen reader cannot read a picture. The table holds the numbers
+in the document, where you can navigate them, and the chart draws them. If the
+table should not be seen, hide it visually, and the data is still there:
 
 ```html
 <table
@@ -70,67 +81,75 @@ Hide the table visually if it should not be seen, and the data is still there:
 >…</table>
 ```
 
-The caption becomes the chart's accessible name unless you set `label`, which is
-usually the right words and is already written.
+The table's caption becomes the chart's accessible name unless you set `label`.
+The caption usually has the right words already.
 
 ## Series colors
 
-Twenty-four `--helix-color-series-*` tokens, in order. A chart with three series
-uses the first three. They are ordered to stay distinguishable in that order
-rather than to look good as a full set of twenty-four.
+Helix has twenty-four series color tokens, in order, from
+`--helix-color-series-1` to `--helix-color-series-24`. A chart with three series
+uses the first three. The tokens are ordered so that each color
+stays distinguishable from the ones before it. They are not designed to look
+good as a full set of twenty-four.
 
-The palette wraps, and where it wraps is one number in one place, so a chart and
-the legend beside it can never disagree about which color a series is.
+The palette wraps after the last color. One number in one place sets where it
+wraps, so a chart and the legend beside it always agree on each series' color.
 
-**A chart's mark carries its own series color as a custom property**, because a
-chart knows which series a bar belongs to and CSS cannot count it. That is what
-lets you restyle a series from outside without knowing the drawing order.
+Each mark in a chart carries its series color as a custom property. The chart
+tracks which series each bar belongs to, and CSS cannot count that. With the
+custom property, you can restyle a series from outside the chart without knowing
+the drawing order.
 
-## Legends
+## Add a legend
 
 ```html
 <helix-legend for="revenue"></helix-legend>
 <helix-bar-chart for="revenue"></helix-bar-chart>
 ```
 
-The legend reads the same table, so the names and the colors cannot disagree
-with the chart's. Pointing them at two different tables is the only way to make
-them disagree, and it is not something to do by accident.
+The legend reads the same table as the chart, so their names and colors always
+match. They can differ only if you point them at two different tables.
 
-## Right-to-left
+## Charts on right-to-left pages
 
-On a page with `dir="rtl"`, an axis that follows reading order starts where the
-text does, on the right: categories and time. The words around a drawing are
-HTML and turn on their own, and the drawing turns with them, so the name under
-a column is that column's name in either direction. The pointer and the tooltip
-read the drawing the same way. An axis of values keeps its own direction.
+On a page with `dir="rtl"`, an axis that follows reading order starts on the
+right, where the text starts. Categories and time follow reading order. The
+words around a chart are HTML and change direction on their own. The drawing
+changes direction with them, so the name under a column belongs to that column
+in either direction. The pointer and the tooltip read the drawing the same way.
+An axis of values keeps its own direction.
 
-- **What turns.** `Bar Chart`'s columns, and its rows, which grow out of their
-  names at the right. `Line Chart`, `Area Chart` and `Sparkline`, with their
-  end marks. `Heatmap`'s weeks, which were already a grid laid out along the
-  line. A half `Donut Chart`, which is read across.
-- **What does not.** Up is more in every script, so values keep their vertical
-  sense, and numerals are text beside the drawing, so none reads backwards. A
-  whole `Donut Chart` keeps its first slice at twelve and runs clockwise, which
-  is a clock's convention rather than a script's. `Scatter Chart` is laid out as
-  on a left-to-right page, its y axis on the left and more to the right, because
-  both of its axes are measures and a number line runs that way in every
-  script. Its axis names read in their own direction, so a name in Arabic reads
-  right to left under the plot's far end, and its summary and tooltip read the
-  way the page does.
+These parts change direction:
 
-A chart that should read left to right anyway, a number line in a mathematics
-text for instance, takes `dir="ltr"` on the element, and the platform's own
-attribute is the whole of the switch.
+- `Bar Chart`'s columns, and its rows, which grow out of their names at the
+  right
+- `Line Chart`, `Area Chart`, and `Sparkline`, with their end marks
+- `Heatmap`'s weeks, which were already a grid laid out along the line
+- A half `Donut Chart`, which is read across
 
-## Reduced motion
+These parts keep their direction:
 
-Charts animate on entry and on data change, and every one of them answers
-`prefers-reduced-motion`. See [Motion](./motion).
+- Values keep their vertical direction, because up means more in every script.
+- Numerals are text beside the drawing, so none of them reads backwards.
+- A whole `Donut Chart` keeps its first slice at twelve o'clock and runs
+  clockwise. That is a clock's convention, and it does not depend on the script.
+- `Scatter Chart` is laid out as on a left-to-right page, with its y axis on the
+  left and larger values to the right. Both of its axes are measures, and a
+  number line runs that way in every script. Its axis names read in their own
+  direction, so a name in Arabic reads right to left under the far end of the
+  plot. Its summary and tooltip follow the page's direction.
 
-## What these are not
+To keep a chart left to right on a right-to-left page, such as a number line in
+a mathematics text, set `dir="ltr"` on the chart element. You need nothing else.
 
-**Not a charting library.** There is no axis configuration language, no plugin
-system, and no chart type you build by composing scales. Drawings that read a
-table, styled by the token system, with an accessible representation by
-construction. When you need a grammar of graphics, use one.
+## Chart animation and reduced motion
+
+Charts animate when they appear and when their data changes. Every chart
+responds to `prefers-reduced-motion`. See [Motion](./motion).
+
+## What Helix charts do not include
+
+Helix charts have no axis configuration language, no plugin system, and no chart
+types that you build by composing scales. Each chart is a drawing that reads a
+table and is styled by the token system, and the table is its accessible
+representation. When you need a grammar of graphics, use a charting library.

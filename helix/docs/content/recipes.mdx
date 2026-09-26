@@ -1,17 +1,22 @@
 ---
-description: Helix styling for markup this library does not render, with no JavaScript.
+description: Style your own HTML with Helix data attributes and no JavaScript.
 section: Foundations
 title: Recipes
 ---
 
 # Recipes
 
-`@fusion.dev/helix-styles` carries recipes for markup the components do not render: your
-own anchors, your own buttons, a card you built yourself, prose out of a CMS.
-They are `data-` attributes, they need no JavaScript, and they read the same
-tokens the components do.
+`@fusion.dev/helix-styles` includes recipes for markup that the components do
+not render, such as:
 
-This is what lets a page look like Helix without a single custom element on it.
+- your own anchors
+- your own buttons
+- a card you built yourself
+- prose from a CMS
+
+Recipes are `data-` attributes. They need no JavaScript, and they use the same
+tokens as the components. With recipes, your page can look like Helix without
+any custom elements.
 
 ## Buttons
 
@@ -26,14 +31,18 @@ This is what lets a page look like Helix without a single custom element on it.
 >Settings</a>
 ```
 
-Two axes: `data-button` is how much ink it claims (`solid`, `outlined`, `ghost`,
-`subtle`) and `data-button-tone` is what it means (`primary`, `accent`,
-`neutral`, `danger`). `data-button-width` takes `auto`, `standard` or `full`.
+A button recipe has two axes:
 
-**This exists for elements this library does not render**, which is the case an
-`<a>` styled as a button falls into. When you want a button, use `helix-button`:
-the recipe has no loading state, no pressed state and no `type="submit"`
-handling.
+- `data-button` sets the button's emphasis: `solid`, `outlined`, `ghost`, or
+  `subtle`.
+- `data-button-tone` sets what the button means: `primary`, `accent`,
+  `neutral`, or `danger`.
+
+`data-button-width` takes `auto`, `standard`, or `full`.
+
+**Use the button recipe only on elements that Helix does not render**, such as
+an `<a>` styled as a button. For a button, use `helix-button`. The recipe has no
+loading state, no pressed state, and no `type="submit"` handling.
 
 ## Links
 
@@ -50,8 +59,8 @@ handling.
 ```
 
 `data-link-size` and `data-link-underline` are the modifiers. `quiet` is for
-navigation, where a line under every row would be noise. A link that opens a new
-context says so on its own, rather than surprising the reader.
+navigation, where an underline on every row would distract. A link that opens a
+new context indicates that by itself, so it does not surprise your users.
 
 ## Surfaces and layout
 
@@ -61,32 +70,30 @@ context says so on its own, rather than surprising the reader.
 <div data-dock="bottom-end">…</div>
 ```
 
-`data-dock` pins something to a corner, which is a fact about the page rather
-than about the control: `data-dock-within` scopes it to the nearest positioned
-ancestor instead of the window.
+`data-dock` pins an element to a corner of the window. `data-dock-within` pins it
+to a corner of the nearest positioned ancestor.
 
 ## Surface axes
 
-Two of the [visual axes](./visual-axes) describe a surface rather than a control,
-and these are how a plain element reaches them:
+Two of the [visual axes](./visual-axes) describe a surface. Use these attributes
+to apply them to a plain element:
 
 ```html
 <section data-material="glass">…</section>
 <div data-separation="elevated">…</div>
 ```
 
-`data-material` takes `glass`, `frosted` and `transparent`, and `data-separation`
-takes `elevated`, `filled`, `outlined` and `plain`. The values are the axes' own,
-so one word means the same thing here as it does on a component: a `<section>`
-that is `glass` and a component that is `material="glass"` are asking for the
-same optical treatment. See [Elevation and
-material](./elevation-and-material).
+`data-material` takes `glass`, `frosted`, and `transparent`. `data-separation`
+takes `elevated`, `filled`, `outlined`, and `plain`. The values are the same as
+the axes' values, so each word means the same thing here as on a component. A
+`<section>` that is `glass` and a component with `material="glass"` get the same
+treatment. See [Elevation and material](./elevation-and-material).
 
-**Blur is the expensive one.** `glass` and `frosted` both carry a
-`backdrop-filter`, which makes the compositor re-read what is behind the element
-on every frame it moves, so a full-width band that stays on screen through a
-scroll pays continuously. Where the effect is about depth rather than texture,
-`data-separation` is the cheaper axis.
+**Blur costs the most to render.** `glass` and `frosted` both use a
+`backdrop-filter`. The compositor re-reads what is behind the element on every
+frame in which the element moves. A full-width band that stays on screen while
+you scroll pays that cost the whole time. To show depth, use `data-separation`,
+which costs less.
 
 ## Prose
 
@@ -97,11 +104,16 @@ scroll pays continuously. Where the effect is about depth rather than texture,
 </article>
 ```
 
-Headings take the type scale, paragraphs take the measure and leading, lists and
-links and inline code all follow. See [Typography](./typography).
+In prose:
 
-If you own the markdown renderer, map two things to components, because markup
-can't carry what they need:
+- Headings use the type scale.
+- Paragraphs use the measure and leading.
+- Lists, links, and inline code follow the same styles.
+
+See [Typography](./typography).
+
+If you control the Markdown renderer, map two elements to components, because
+HTML alone cannot hold what they need:
 
 - **Fenced code** to `helix-code-block`, with the fence's language as its `label`.
   A `<pre>` has no label or copy button.
@@ -109,21 +121,21 @@ can't carry what they need:
   tone. `NOTE` and `IMPORTANT` become `tone="info"`, `TIP` becomes `success`,
   `WARNING` becomes `warning`, and `CAUTION` becomes `danger`.
 
-Prose spaces each one the same as the element it replaces.
+Prose spaces each component the same as the element it replaces.
 
 ## Region axes
 
-These two are API rather than styling, and they are the reason the base layer is
-worth importing even in an app that uses only components:
+These two attributes are API. Import the base layer for them, even in an app
+that uses only components:
 
 ```html
 <div data-density="sm">…</div>
 <div data-color-mode="dark">…</div>
 ```
 
-`data-density` sets how big the controls in a region are, and it works through
-custom properties so it crosses every shadow boundary on its own.
-`data-color-mode` sets the color mode for a subtree. See [Size and
+`data-density` sets the size of the controls in a region. It works through
+custom properties, so it crosses every shadow boundary. `data-color-mode` sets
+the color mode for a subtree. See [Size and
 density](./size-and-density) and [Color modes](./color-modes).
 
 ## Utilities
@@ -132,11 +144,16 @@ density](./size-and-density) and [Color modes](./color-modes).
 <span data-hidden-visually>Sorting by</span>
 ```
 
-Clipped rather than `display: none`, so it stays in the accessibility tree. See
-[Accessibility](./accessibility).
+`data-hidden-visually` clips the element, so it stays in the accessibility tree.
+`display: none` would remove it. See [Accessibility](./accessibility).
 
-## When a recipe is the wrong tool
+## When to use a component
 
-A recipe has appearance and no behavior. It cannot manage state, cannot
-participate in a form, cannot trap focus and has no keyboard handling. If you
-find yourself adding script to a recipe, the component is what you wanted.
+A recipe sets appearance and has no behavior. A recipe cannot:
+
+- manage state
+- take part in a form
+- trap focus
+- handle the keyboard
+
+If you need to add a script to a recipe, use the component.

@@ -1,5 +1,5 @@
 ---
-description: The platform features this is built on, and what is actually tested.
+description: The browser features Helix uses, and the browser we test in.
 order: 5
 section: Getting started
 title: Browser support
@@ -7,21 +7,20 @@ title: Browser support
 
 # Browser support
 
-Helix is built on the platform rather than on a compatibility layer. There is no
-polyfill story, no transpiled fallback, and no configuration that trades
-features for reach: what the library needs is what your browser has to have.
+Helix uses browser features directly, with no compatibility layer. It has no
+polyfills, no transpiled fallback, and no setting that trades features for
+support in older browsers. Your browser needs every feature Helix uses.
 
-## What is tested
+## What we test
 
-**Chromium, through Playwright.** The DOM specs run in it, and 83 pixel
+We test in Chromium, through Playwright. The DOM specs run in it, and 83 pixel
 baselines are captured in it, on Linux, with the network blocked.
 
-That is the honest extent of it. Everything below is a statement about which
-platform features the library uses, not a claim that we run the suite in Firefox
-and Safari. If you ship Helix to those and find something broken, that is a bug
-report we want, and it is not one we would have caught.
+We do not run the tests in Firefox or Safari. The rest of this page lists the
+browser features Helix uses. If you ship Helix to Firefox or Safari and find
+something broken, please report it. Our tests would not have caught it.
 
-## What the library uses
+## Browser features Helix uses
 
 | Feature | Where |
 |---|---|
@@ -35,55 +34,59 @@ report we want, and it is not one we would have caught.
 | `:state()` | Every boolean state the library publishes: `open`, `checked`, `selected`, `invalid`, `read`, `has-label`, `settled`, `empty`, `controls` |
 | `CSS.highlights` | Filter-match highlighting, in `Command` and `Combobox` |
 
-Positioning is `@floating-ui/dom` rather than CSS anchor positioning, which is a
-deliberate choice and the one place the library takes a dependency instead of
-the platform: anchor positioning is not yet available everywhere the rest of
-this list is.
+Positioning uses `@floating-ui/dom`. We chose this on purpose, and it is the one
+place Helix takes a dependency for something the browser could do. CSS anchor
+positioning is not yet available in every browser that has the rest of these
+features.
 
-## What decides your floor
+## Which features set the minimum browser
 
-**`light-dark()` and the Popover API.** Everything else on that list has been
-available longer. If you need to know whether a browser can run Helix, those are
-the two to check, because they are the newest things the library assumes and
-they are load-bearing: the first is how every token expresses both color modes
-in one declaration, and the second is how every overlay is drawn in the top
-layer.
+**Check for `light-dark()` and the Popover API.** They are the newest features
+Helix requires, and everything else in the table has been available longer.
+Helix depends on both. Every token uses `light-dark()` to set both color modes
+in one declaration. Every overlay uses the Popover API to draw in the top layer.
 
-Chromium 132 has both and still misses two things a page's stylesheet can say
-through `::part()`, measured 15 Sep 2026: it ignores a range input's
-`::-webkit-slider-thumb` and `::-webkit-slider-runnable-track` after a part, and
-it looks for the `@keyframes` a `::part()` rule names inside the component's
-shadow root, so no animation starts; the headless examples use neither.
+Neither one has a useful fallback:
 
-`:state()` is the third and is deliberately not with them, because it does
-degrade: a component that cannot record a state keeps whatever its resting rule
-draws, so a checkbox is drawn unchecked rather than drawn wrong or not at all.
-It is feature-tested at the one place that records any of them.
+- A browser without `light-dark()` shows no color at all.
+- A browser without the Popover API renders overlays in the page flow.
 
-Neither degrades usefully. A browser without `light-dark()` gets no color at
-all rather than one mode; a browser without popover gets overlays that render in
-flow. This is why there is no support table with a fallback column: there is no
-partial mode to be in.
+For that reason, this page has no support table with a fallback column. Helix
+has no partial mode.
 
-## `CSS.highlights` is the one exception
+Chromium 132 has both features. We measured on September 15, 2026 that it
+does not support two things your stylesheet can do through `::part()`:
 
-`Command` and `Combobox` highlight the matched substring in their filtered
-results using the CSS Custom Highlight API. It is the least widely available
-thing here, and it is the only one that degrades gracefully: without it the
-results still filter, sort and select correctly, and the match is simply not
+- It ignores a range input's `::-webkit-slider-thumb` and
+  `::-webkit-slider-runnable-track` after a part.
+- It looks for the `@keyframes` that a `::part()` rule names inside the
+  component's shadow root, so no animation starts.
+
+The headless examples use neither.
+
+`:state()` is the third newest feature. It does not set the minimum browser,
+because components still work without it. A component that cannot record a
+state keeps the look of its resting rule, so a checkbox is drawn unchecked.
+Helix tests for `:state()` support in the one place that records states.
+
+## Browsers without `CSS.highlights`
+
+`Command` and `Combobox` use the CSS Custom Highlight API to highlight the
+matched text in their filtered results. It is the least widely available
+feature Helix uses, and it is the only one that degrades gracefully. Without it,
+the results still filter, sort, and select correctly, and the match is not
 highlighted.
 
-Nothing else in the library reads it.
+Nothing else in Helix uses it.
 
-## No IE, no polyfills, no build flag
+## Older browsers
 
-There is no `browserslist` and no transpilation target, which is a decision
-rather than an oversight. A design system whose components are
-custom elements cannot be shipped to a browser without custom elements, and
-everything else on the list above arrived in the same generation of browsers
-that shipped those.
+Helix does not support Internet Explorer and uses no polyfills. It has no
+`browserslist`, no transpilation target, and no build flag for older browsers.
+We decided this on purpose. Components that are custom elements cannot run in a
+browser without custom elements, and every other feature in the table arrived in
+the same generation of browsers.
 
-If you need to support something older, the honest answer is the base layer:
-`@fusion.dev/helix-styles` is plain CSS with no JavaScript, and a page built from its
-recipes works considerably further back than the components do.
-See [Without a bundler](./without-a-bundler).
+To support an older browser, use the base layer. `@fusion.dev/helix-styles` is
+plain CSS with no JavaScript. Markup built from its recipes works in much older
+browsers than the components do. See [Without a bundler](./without-a-bundler).

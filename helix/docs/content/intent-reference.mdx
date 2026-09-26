@@ -1,13 +1,13 @@
 ---
-description: Every input the theme engine takes, and what each one decides.
+description: Every input the theme engine takes, and what each one changes.
 section: Theming
 title: Intent reference
 ---
 
 # Intent reference
 
-[Deriving a theme](./theming) is the argument. This is the surface: everything
-`ThemeIntent` accepts, and what changes when you set it.
+[Deriving a theme](./theming) explains how the engine works. This page lists
+every field `ThemeIntent` accepts and what changes when you set it.
 
 ```ts
 import { derive } from '@fusion.dev/helix-theme'
@@ -15,93 +15,98 @@ import { derive } from '@fusion.dev/helix-theme'
 const theme = derive({ brand: '#2563eb' })
 ```
 
-**`brand` is the only required input.** Everything else has a default that is
-derived from it or from the design language, and a theme that sets one field is
-a valid theme.
+**`brand` is the only required input.** Every other field has a default,
+computed from `brand` or from the Helix design language. A theme that sets only
+`brand` is a valid theme.
 
 ## Color
 
-| Field | Decides |
+| Field | What it controls |
 |---|---|
-| `brand` | The one color most consumers care about. Required |
-| `accent` | The second emphasis. Unnamed, it is the brand; `{ from: 'brand', rotate: 180 }` asks for the complement |
+| `brand` | Your main brand color. Required |
+| `accent` | The second emphasis color. Defaults to the brand color. `{ from: 'brand', rotate: 180 }` gives the complementary color |
 | `neutral` | The gray ramp, which can be tinted toward the brand |
-| `status` | `info`, `success`, `warning`, `danger`. A color pins one; an object nudges its hue within the meaning it already carries |
+| `status` | `info`, `success`, `warning`, and `danger`. A color pins one. An object adjusts its hue while it keeps its meaning |
 | `chroma` | How saturated the palette is, independent of hue |
-| `scheme` | `'light'` or `'dark'`, for a theme that is only one |
-| `tokens` | Literal overrides, by token name, for the cases nothing else reaches |
+| `scheme` | `'light'` or `'dark'`, for a theme that has only one mode |
+| `tokens` | Literal overrides by token name, for values no other field sets |
 
-**`accent` may be a relation and `status` may not**, and the asymmetry is
-deliberate: a `danger` that rotates with the brand is a warning a reader has to
-re-learn per product.
+`accent` can be defined relative to the brand. `status` colors cannot. If
+`danger` rotated with the brand, your users would have to learn a new warning
+color for each product.
 
-**`chroma` is the axis a brand's feel lives on.** Monotone, muted, restrained
-and vivid are all chroma statements and none of them is a hue. `ceiling` clamps,
-so 0 is monotone and roughly 0.10 is muted; `scale` multiplies what the brand
-supplies. Both apply to every derived color including the brand itself, because
-a monotone theme is one where the brand is gray too. Never applied to a value
-you pinned: a pinned color is a fact.
+`chroma` sets how saturated the theme feels. Monotone, muted, restrained, and
+vivid all describe chroma, and none of them describes a hue. `chroma` has two
+settings:
 
-## The guarantee
+- `ceiling` caps chroma. 0 is monotone, and about 0.10 is muted.
+- `scale` multiplies the chroma the brand color supplies.
 
-| Field | Decides |
+Both apply to every derived color, including the brand color, because in a
+monotone theme the brand is gray too. Neither applies to a color you pinned. A
+pinned color is used exactly as you set it.
+
+## Contrast
+
+| Field | What it controls |
 |---|---|
-| `contrastTarget` | Target contrast for body text. 4.5 is WCAG AA, 7 is AAA |
-| `pairings` | Extra foreground and background pairs to solve for, beyond the model's own |
+| `contrastTarget` | Target contrast for body text. 4.5 is WCAG AA, and 7 is AAA |
+| `pairings` | Extra foreground and background pairs to solve, in addition to the pairs in the engine's surface model |
 
-4.5 is the default because the European Accessibility Act points at WCAG 2.1 AA,
-so it is the figure with legal weight.
+The default is 4.5, the WCAG 2.1 AA figure. The European Accessibility Act
+refers to WCAG 2.1 AA, so 4.5 is the figure with legal weight.
 
 ## Shape and space
 
-| Field | Decides |
+| Field | What it controls |
 |---|---|
 | `radius` | Corner rounding across the system |
-| `density` | Scales spacing and control heights. 1 is default, 0.875 is compact |
-| `separation` | Whether a surface is told apart by an edge or by a lift |
+| `density` | Scales spacing and control heights. 1 is the default, and 0.875 is compact |
+| `separation` | Whether a surface is set apart by an edge or by a lift |
 
-`separation` is the policy pair described in [Surfaces and
+`separation` chooses between the two policies described in [Surfaces and
 separation](./surfaces-and-separation).
 
 ## Type and motion
 
-| Field | Decides |
+| Field | What it controls |
 |---|---|
-| `font` | The families, and the half of the type system that is a scale |
+| `font` | The font families and the type scale |
 | `motion` | `character` and `scale` |
 
-**`motion.character` sets the curve every component reaches for and carries a
-duration multiplier with it**, because the two are one decision: a spring over
-120ms is a twitch, and a soft curve over 120ms is a fade. `scale` multiplies on
-top for a theme that wants the character and not the pace.
+`motion.character` sets the easing curve that every component uses, along with
+a duration multiplier. The curve and the duration are set together because they
+depend on each other. A spring over 120ms looks like a twitch, and a soft curve
+over 120ms looks like a fade. `scale` multiplies the durations again, so you can
+keep a character and change its speed.
 
-`instant` is not scaled. It is 0 and means "do not animate", which is a
-statement rather than a duration, and it emits no curves at all: three easings
-for transitions of zero length is a contradiction.
+The `instant` character is 0, which means "do not animate". `scale` does not
+change it. It outputs none of the three easing curves, because a transition of
+zero length has no curve to follow.
 
-`precise` is the one character that is not physical. The other three accelerate,
-settle or overshoot; linear reads as moved by a mechanism, and it is the only
-curve legible on a short travel, because constancy shows in the timing where an
-overshoot shows in the distance.
+`precise` is the only character that does not imitate physical motion. The
+other three accelerate, settle, or overshoot. `precise` is linear, so movement
+looks driven by a mechanism. It is also the only curve that is easy to see over
+a short distance. Constant speed shows in the timing, and an overshoot needs
+distance to show.
 
 ## Material
 
-| Field | Decides |
+| Field | What it controls |
 |---|---|
 | `material` | `blur` in pixels and `opacity` from 0 to 1 |
 
-**This is the one choice that can invalidate the contrast guarantee.** Contrast
-is measured against a known ground, and a translucent surface does not have one,
-so a pair over it comes back `unverifiable` rather than measured. That is
-reported rather than hidden: a theme with heavy material is making a trade and
-should be able to see it.
+**`material` is the one field that can break the contrast guarantee.** The
+engine measures contrast against a known ground. A translucent surface has no
+known ground, so a pair over it is reported as `unverifiable`. The report shows
+you the trade-off that a theme with heavy material makes.
 
 ## Output
 
-| Field | Decides |
+| Field | What it controls |
 |---|---|
 | `namespace` | The token prefix. Defaults to `helix` |
 
-`namespace` is for a product shipping its own token layer built on this engine.
-Everything else in the library reads `--helix-*`, so changing it is a decision
-about your own surface rather than about Helix's.
+Use `namespace` when your product ships its own token layer built on the
+engine. The rest of the library still reads `--helix-*`, so a new namespace
+changes only your own tokens.

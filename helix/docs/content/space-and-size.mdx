@@ -1,14 +1,14 @@
 ---
-description: One spacing scale, and why a control's height is not on it.
+description: Use the space scale for gaps and the size tokens for the height of controls.
 section: Foundations
 title: Space and size
 ---
 
 # Space and size
 
-Two scales that look similar and answer different questions. Space is the gaps
-between things. Size is how big a control is. Mixing them is how a layout ends
-up with a button that is one step of padding taller than the input beside it.
+Helix has two scales. The space scale sets the gaps between things. The size
+scale sets how big a control is. If you use one for the other, a button can end
+up one step of padding taller than the input beside it.
 
 ## Space
 
@@ -29,15 +29,16 @@ up with a button that is one step of padding taller than the input beside it.
 
 [//]: # (/tokens)
 
-Nine steps, t-shirt named rather than numbered. A numbered scale invites
-arithmetic (`space-4` is twice `space-2`) which stops being true the moment the
-scale is tuned, and invites a `space-4.5` the first time something does not fit.
+The scale has nine steps, named like t-shirt sizes. Numbered steps suggest
+arithmetic, such as `space-4` being twice `space-2`. That stops being true as
+soon as the scale is tuned, and it leads to a `space-4.5` the first time
+something does not fit.
 
-`--helix-space-control` is the tenth and is different in kind: it is the inset a
-control uses, and it follows the region's density rather than sitting on the
+`--helix-space-control` is a tenth token of a different kind. It is the inset a
+control uses, and it follows the region's density. It is not a step on the
 scale. See [Size and density](./size-and-density).
 
-Use them for gap, padding and margin:
+Use the space tokens for gap, padding, and margin:
 
 ```css
 .toolbar {
@@ -49,24 +50,31 @@ Use them for gap, padding and margin:
 
 ## Size
 
-Forty-one tokens, and almost all of them name a specific thing:
-`--helix-size-control`, `--helix-size-checkbox`, `--helix-size-switch`,
-`--helix-size-avatar`, `--helix-size-icon`, `--helix-size-tag`,
-`--helix-size-header`, `--helix-size-progress`, `--helix-size-meter`.
+The size scale has forty-one tokens, and almost all of them name a specific
+thing:
 
-Most come in a `-sm`, `-md` and `-lg` set beside the unsuffixed one. **The
-unsuffixed token is the live one** and the suffixed ones are the values the
-density axis picks between. The loader is the exception: it has `-sm`, `-md`
-and `-lg` and no unsuffixed token above them, because nothing reads a loader's
-size off the density. So a component reads `--helix-size-control` and the
-region's `[data-density]` decides which of `-sm`, `-md` or `-lg` that resolves
-to.
+- `--helix-size-control`
+- `--helix-size-checkbox`
+- `--helix-size-switch`
+- `--helix-size-avatar`
+- `--helix-size-icon`
+- `--helix-size-tag`
+- `--helix-size-header`
+- `--helix-size-progress`
+- `--helix-size-meter`
 
-That is why a component has no `size` property: the answer is the region's, and
-saying it once there means a ragged row is not merely discouraged, it is
-unwritable.
+Most come in a `-sm`, `-md`, and `-lg` set beside the unsuffixed token. **The
+unsuffixed token is the live one.** The suffixed tokens are the values the
+density axis picks between. A component reads `--helix-size-control`, and the
+region's `[data-density]` sets whether that resolves to `-sm`, `-md`, or `-lg`.
 
-## The focus ring is three tokens
+The loader is the exception. It has `-sm`, `-md`, and `-lg` and no unsuffixed
+token, because nothing reads a loader's size from the density.
+
+This is why a component has no `size` property. The region sets the size once,
+so you cannot write a row of controls with different heights.
+
+## Focus ring tokens
 
 ```
 --helix-size-focus-ring     the ring's own thickness
@@ -74,16 +82,15 @@ unwritable.
 --helix-size-focus-reach    ring plus offset, for reserving room
 ```
 
-The third exists because a ring drawn outside a control needs room, and every
-component that draws one otherwise recomputes the sum. Reserve with `reach`,
-draw with the other two.
+A ring drawn outside a control needs room. `--helix-size-focus-reach` holds that
+sum, so each component that draws a ring does not compute it again. Use `reach`
+to reserve the room, and the other two to draw the ring.
 
 ## What not to do
 
-**Do not use a size token for a gap.** `--helix-size-control` is a height, and a
-layout that uses it as a gap changes meaning the day a density changes under it.
+**Do not use a size token for a gap.** `--helix-size-control` is a height. A gap
+that uses it changes when the region's density changes.
 
-**Do not use a raw value because the scale has no step for it.** If a gap is
-genuinely between `sm` and `md`, say so rather than writing `11px`: it is
-usually a sign the two things being separated belong at different levels of the
-layout.
+**Do not use a raw value when the scale has no step for it.** If a gap really
+falls between `sm` and `md`, note it and do not write `11px`. It usually means
+the two things it separates belong at different levels of the layout.

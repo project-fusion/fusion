@@ -1,64 +1,68 @@
 ---
-description: Families, parts and groups, and which to reach for.
+description: How Helix is organized into families, parts, and groups, and which one to use.
 section: Essentials
 title: Composition
 ---
 
 # Composition
 
-Helix has families, parts and groups, and they are not stylistic choices. Each
-answers a different question, and knowing which you are looking at tells you
-what to import and what to write.
+Helix components come in families, parts, and groups. Each kind has a different
+purpose. When you know which kind you are looking at, you know what to import
+and what to write.
 
-## Namespaces mean composition
+## A namespace means one component goes inside another
 
-`Tabs.Root` contains `Tabs.Tab`. The namespace says *this goes inside that*.
+`Tabs.Root` contains `Tabs.Tab`. A namespace means the part goes inside the
+family's root.
 
-It never says *this is a version of that*. An icon-only button is not a part of
-`Button`, so `IconButton` is top-level. The rule falls out of one line:
+A namespace never marks a version of a component. An icon-only button is its
+own component, so `IconButton` is top-level. One rule decides this:
 
 > Variants are props. Alternatives are separate components.
 
-A button that is filled instead of outlined is the same component with a
-different `emphasis`. A button that holds only an icon has a different
-accessible-name requirement and a different shape, so it is its own component.
+A filled button and an outlined button are the same component with a different
+`emphasis`. A button that holds only an icon has different requirements for its
+accessible name and a different shape, so it is its own component.
 
-## When a region becomes an element
+## When a region is an element and when it is a slot
 
-When it has behavior, state or API. Otherwise it is a slot.
+A region is an element when it has behavior, state, or an API. Otherwise it is a
+slot.
 
-`Card`'s header, body and footer carried none of the three, so five elements
-became one and a title became a real `<h2>` the consumer writes. `Tabs.Tab`,
-`Select.Option` and `Accordion.Item` do carry state, so they stay elements.
+`Card`'s header, body, and footer had none of the three. Five elements became
+one, and a title became a real `<h2>` that you write. `Tabs.Tab`,
+`Select.Option`, and `Accordion.Item` have state, so they stay elements.
 
-**An empty region still costs layout.** A `<slot>` is `display: contents`, so an unassigned one generates no
-box: no grid row, no flex item, no gap. A wrapper generates one either way.
-Measured on Card with identical content: wrappers present but empty rendered
-85px against an ideal of 53px. Bare slots rendered 53px with no hiding logic at
-all.
+An empty wrapper element still takes up layout space. A `<slot>` is
+`display: contents`, so an unassigned slot generates no box. It adds no grid
+row, no flex item, and no gap. A wrapper generates a box either way. We measured
+`Card` with identical content. With empty wrappers present, it rendered at 85px,
+and the ideal is 53px. With bare slots, it rendered at 53px with no hiding logic
+at all.
 
-## When a group is a part
+## When a group is a part of a family
 
-The test is whether the group reports a form value.
+A group is a part of a family when it reports a form value.
 
-**`Radio.Group` and `Toggle.Group` do.** They own the `name`, the `value` and
-the validity, and a lone radio is not a control at all: it is an answer to one.
-The group is what the family is *about*, so it is a part of it, and the member
-has nowhere else to be.
+`Radio.Group` and `Toggle.Group` report a form value. They own the `name`, the
+`value`, and the validity. A single radio is an answer, and the group is the
+control it answers. The family is about the group, so the group is a part of the
+family, and the member belongs nowhere else.
 
-**`Checkbox Group` and `Button Group` do not.** Neither calls `setFormValue`.
-Each checkbox is form-associated and submits itself; the group adds
-`role="group"`, a shared name, and one place to read the set. A button needs no
-group at all. Both are their own families, because their members are complete
-controls that the family does not need the group to explain.
+`Checkbox Group` and `Button Group` do not report a form value. Neither calls
+`setFormValue`. Each checkbox is form-associated and submits itself. The group
+adds `role="group"`, a shared name, and one place to read the set. A button
+needs no group at all. Both groups are their own families, because their members
+are complete controls without the group.
 
-A container holding mixed content is a family for the same reason. `Toolbar`
-holds buttons, dropdowns and inputs, and is about none of them.
+A container that holds mixed content is its own family for the same reason.
+`Toolbar` holds buttons, dropdowns, and inputs, so it is not a part of any of
+their families.
 
-## A content property is its slot's fallback
+## A content property is the fallback for its slot
 
-Where a property carries content rather than configuration, it is the fallback
-content of a slot of the same name, never a second thing rendered beside it.
+A property that holds content, such as a tooltip's text, is the fallback content
+for a slot of the same name. Helix never renders both.
 
 ```html
 <!-- The property -->
@@ -70,21 +74,21 @@ content of a slot of the same name, never a second thing rendered beside it.
 </helix-tooltip>
 ```
 
-Text stays an attribute, because that is what most tooltips and most avatars
-hold. Anything richer replaces it by being slotted. Both can never show at once,
-and no component has to detect which you did.
+Text stays an attribute, because most tooltips and most avatars hold only text.
+To use richer content, put it in the slot, and it replaces the attribute. The
+two never show at once, so no component has to check which one you used.
 
-One trap: **a whitespace-only text node is assigned to the default slot and
-defeats its fallback.** A newline between the tags is enough. That is
-why some examples close on the same line they open.
+A text node that holds only whitespace is assigned to the default slot and hides
+its fallback. A newline between the tags is enough. For this reason, some
+examples put the closing tag on the same line as the opening tag.
 
-## Width comes from the layout
+## Set a button's width with the layout
 
-There is no `width` or `fill` property on a button, for the same reason there is
-no `size` one: how wide a control is says something about the region it is in.
+A button has no `width` or `fill` property, for the same reason it has no `size`
+property. How wide a control is depends on the region it is in.
 
-A button already stretches in a column flex or a grid, because that is what a
-stretch-aligned parent does to its children:
+A button already stretches in a column flex or a grid, because a stretch-aligned
+parent stretches its children:
 
 ```html
 <helix-flex direction="column">
@@ -95,7 +99,7 @@ stretch-aligned parent does to its children:
 </helix-flex>
 ```
 
-To make one hug its label instead, tell the layout:
+To make a button only as wide as its label, set that on the layout:
 
 ```css
 .hug {
@@ -107,13 +111,13 @@ To make one hug its label instead, tell the layout:
 <helix-button class="hug">Hugs its label</helix-button>
 ```
 
-The default surprises people: dropping a button into a column makes it full
-width, and the instinct is to look for a property that turns that off.
+This default can surprise you. A button in a column is full width, and you might
+look for a property to turn that off. The layout controls it.
 
-**A fixed width is a different question, and it belongs to your site.** A
-marketing page whose hero buttons are all the same width is a real and reusable
-practice, but the number is a fact about that page's design, not about buttons.
-Name it once where your other page constants live:
+**A fixed width belongs to your site's styles.** A marketing page whose hero
+buttons all share one width is a common and reusable practice. The number is
+part of that page's design, so it does not belong to the button component. Name
+it once, where your other page constants are defined:
 
 ```css
 :root {
@@ -125,12 +129,12 @@ Name it once where your other page constants live:
 }
 ```
 
-The same reasoning puts a hero's type size outside the component scale: a
-marketing hero is not a component, so its measurements are the site's own.
+For the same reason, a hero's type size is outside the component scale. A
+marketing hero is not a component, so its measurements belong to your site.
 
-## One property per intent
+## Name a field control with `label` or `aria-label`
 
-Every field control names itself the same way, and there are exactly two cases.
+Every field control is named the same way, and there are two cases:
 
 ```html
 <helix-input label="Files"></helix-input>       <!-- a visible label -->
@@ -138,34 +142,32 @@ Every field control names itself the same way, and there are exactly two cases.
 <helix-input></helix-input>                     <!-- unnamed. avoid -->
 ```
 
-`label` means a label. `aria-label` means a name. Neither means a control a
-screen reader announces as "edit text", which is almost never what you want.
-If the page already makes the purpose plain, that is the `aria-label` case, not
-the empty case.
+`label` gives the control a visible label. `aria-label` gives it a name and
+draws nothing. With neither, a screen reader announces the control as "edit
+text", which is almost never what you want. If the page already makes the
+purpose plain, use `aria-label`. Do not leave the control unnamed.
 
-**`aria-label` works here because the component forwards it**, which is not true
-of custom elements in general. A custom element
-cannot delegate a label to the control inside its shadow root: an `aria-label`
-you write on the host sits on a wrapper and never reaches the `<input>` that
-actually takes focus. Measured on this library before it was fixed, the inner
-input came back with no label and no name at all.
+`aria-label` works on a Helix field because the component forwards it. Most
+custom elements do not. A custom element cannot delegate a label to the control
+inside its shadow root. An `aria-label` you write on the host stays on a wrapper
+and never reaches the `<input>` that takes focus. We measured this in Helix
+before we fixed it: the inner input had no label and no name at all.
 
-So the field renders the label and clips it, and the name arrives through the
-same `<label for>` a visible one does.
+The field renders the label and clips it. The name then reaches the input
+through the same `<label for>` that a visible label uses.
 
-There used to be a `hide-label` boolean beside `label`. It is gone: one
-attribute supplying a label and a second saying not to show it is the absence of
-the first, spelled twice.
+`hide-label` was a boolean beside `label`, and we removed it. Setting a label
+and then a second attribute to hide it is the same as having no visible label.
 
-## Shared behavior becomes its own family
+## Shared behavior is its own family
 
-`Option`, `Listbox` and `Select` are three families rather than one because the
-keyboard, the filtering, the multi-select rules and the active-item tracking
-should be written once. `Select` renders a `Listbox` internally; a future
-combobox will; a command palette would.
+`Option`, `Listbox`, and `Select` are three families so that the keyboard
+handling, the filtering, the multi-select rules, and the active-item tracking
+are written once. `Select` renders a `Listbox` internally. A future combobox
+will too, and so would a command palette.
 
-The same reasoning made `DrilldownController`: `Menu` had held a page stack and
-derived its rows since it was written, and none of that was about menus. `Menu`
-and `Drilldown` share it now.
+For the same reason, we wrote `DrilldownController`. Since it was first written,
+`Menu` had held a page stack and derived its rows, and none of that code
+was specific to menus. `Menu` and `Drilldown` now share it.
 
-If you are about to write the second copy of something, that is the signal.
+If you are about to write a second copy of some behavior, make it shared.

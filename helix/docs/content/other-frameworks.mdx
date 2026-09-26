@@ -1,5 +1,5 @@
 ---
-description: The three rules every framework reduces to, and what they look like in each.
+description: The three rules for using Helix in any framework, and how each framework applies them.
 parent: installation
 section: Getting started
 title: Other frameworks
@@ -8,64 +8,66 @@ trailing: true
 
 # Other frameworks
 
-Solid, Qwik, Lit, Ember, Alpine, htmx, and anything else that puts elements in a
-document. All of them need the same three rules, and nothing beyond them.
+This page covers Solid, Qwik, Lit, Ember, Alpine, htmx, and any other framework
+that puts elements in a document. They all follow the same three rules and need
+nothing else.
 
 ## The three rules
 
 **Strings go through attributes. Everything else goes through properties.** An
-attribute is a string, so an array, an object or a function has to be assigned
-to the element rather than written in the markup. Most frameworks do this for
-you when the element has a matching property.
+attribute is a string, so assign an array, an object, or a function to the
+element as a property. Most frameworks do this for you when the element has a
+matching property.
 
 ```js
 element.items = tabs
 ```
 
-**Events bind with `addEventListener`, and the name is the event's own.** Helix
-events are `helix-before-open`, `helix-before-change`, `helix-select` and so on:
-lowercase,
-hyphenated, no camel-case variant. Whatever your framework's `on*` syntax is, it
-should end up passing that string through.
+**Bind events with `addEventListener`, using the event's own name.** Helix event
+names, such as `helix-before-open`, `helix-before-change`, and `helix-select`,
+are lowercase and hyphenated. They have no camel-case variant. Your framework's
+`on*` syntax needs to pass that exact name through.
 
 ```js
 element.addEventListener('helix-before-change', (event) => console.log(event.detail))
 ```
 
-**A declared `value`, `open`, `checked` or `active` is a seed.** The element
-starts there and goes on managing itself, exactly as `<input value="Ada">` does.
-To take one decision, listen for the matching `helix-before-*` event and call
-`preventDefault()`; to own the state outright, refuse and assign your own.
-`default-value`, `default-open` and their siblings are what a reset returns to.
-[State and control](./state-and-control) is the page about it.
+**A declared `value`, `open`, `checked`, or `active` is a seed.** The element
+starts with that value and then manages its own state, as `<input value="Ada">`
+does. To refuse one change, listen for the matching `helix-before-*` event and
+call `preventDefault()`. To own the state fully, refuse every change and assign
+your own value. A reset returns to `default-value`, `default-open`, and the
+similar attributes. [State and control](./state-and-control) explains the model
+in full.
 
-## What each one needs
+## Notes for each framework
 
 | Framework | Notes |
 |---|---|
 | Solid | Sets properties on custom elements by default. Use `prop:` to force one and `attr:` to force the other. `on:helix-before-change` binds the literal name |
 | Qwik | Works as JSX. Bind with `document:on…` or a ref, since a plain `on*` prop is normalized |
-| Lit | `.prop=`, `?bool=` and `@helix-before-change=` are already the right three channels |
+| Lit | `.prop=`, `?bool=`, and `@helix-before-change=` work with no setup |
 | Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |
-| Alpine, htmx | Markup and attributes only, which reaches every component. Refusing a change needs script |
+| Alpine, htmx | Markup and attributes only, which work with every component. Refusing a change needs script |
 
-Nothing here is tested by us, which is the honest reason it is one page. If your
-framework needs something the three rules above do not cover, that is worth
-telling us: it is either a gap in this page or a gap in the library.
+We do not test these frameworks, so they share one page. If your framework needs
+something the three rules do not cover, tell us. It is a gap in this page or in
+the library.
 
 ## Typings
 
-`@fusion.dev/helix/jsx` is the base for anything JSX-shaped, and Svelte's own
-typings are built from it. If your framework needs a different shape, the
-manifest ships as `@fusion.dev/helix/custom-elements.json` and describes every tag,
-prop, event and part, which is what all of ours are generated from.
+`@fusion.dev/helix/jsx` is the base for typing any framework that uses JSX, and
+the Svelte typings are built from it. If your framework needs a different
+format, use the manifest at `@fusion.dev/helix/custom-elements.json`. It
+describes every tag, prop, event, and part, and we generate all our typings from
+it.
 
-## Registration
+## Register the elements
 
 ```ts
 import '@fusion.dev/helix'
 ```
 
-Once, anywhere that runs in the browser. See [Installation](./installation) for
-the stylesheets, which are the same in every framework and are the thing most
-often left out.
+Import it once, anywhere that runs in the browser. The stylesheets are the same
+in every framework, and they are the part most often left out. See
+[Installation](./installation) for the stylesheets.

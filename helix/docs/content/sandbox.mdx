@@ -1,5 +1,5 @@
 ---
-description: The editor beside the preview, and how to build one of your own.
+description: The editable examples on each component page, and what you need to build an editor of your own.
 section: Tooling
 title: Sandbox
 ---
@@ -8,39 +8,38 @@ title: Sandbox
 
 [Open the sandbox](/helix/sandbox).
 
-Every example on a component's page is editable. Change the markup and the
-preview redraws; change the stylesheet beside it and the preview restyles.
+You can edit every example on a component's page. When you change the markup,
+the preview redraws. When you change the stylesheet beside it, the preview
+restyles.
 
-The same elements are what you would reach for to build a playground of your
-own, and the isolation below is what makes running someone else's markup safe.
+To build a playground of your own, you would use the same elements. The
+isolation described below makes it safe to run markup that someone else wrote.
 
-## The frame is sandboxed
+## How the preview is isolated
 
-The preview runs in a sandboxed iframe with an opaque origin, and the script
-that drives it is served as a static classic script rather than rendered by a
-route.
+The preview runs in a sandboxed iframe with an opaque origin. The script that
+drives it is a static classic script, served as a file. No route renders it.
 
-**What that buys:** markup typed into the sandbox runs in the frame, and an
-`<img onerror>` in it cannot read the surrounding page's cookies, its
-`localStorage`, or the editor's contents. Before the frame was isolated, it
-could. Measured.
+Markup you type into the sandbox runs in the frame. An `<img onerror>` in it
+cannot read the cookies or `localStorage` of the page around it, or the editor's
+contents. Before we isolated the frame, it could. We measured both.
 
-The classic script is the part that looks like packaging and is not: from an
-opaque origin, a module import or a `fetch` back to the site's origin is
-cross-origin and fails without CORS headers. A classic `<script src>` is not
-CORS-checked, so it is the one shape that can carry the component library into a
-document the page cannot reach into and which cannot reach back out.
+The classic script is required for the isolation to work. From an opaque origin,
+a module import or a `fetch` back to the site's origin is cross-origin, and it
+fails without CORS headers. A classic `<script src>` is not CORS-checked. It is
+the only way to load the component library into a document that the page cannot
+reach into and that cannot reach back out.
 
-## Coordination is by event
+## How the source panes and the preview communicate
 
-A source pane dispatches `helix-before-edit`, which bubbles, and the sandbox hands
-the value to whatever preview is slotted into it. Neither child knows the other
-exists, so either can be replaced or used alone.
+A source pane dispatches `helix-before-edit`, which bubbles. The sandbox passes
+the value to the preview slotted into it. The source pane and the preview do not
+reference each other, so you can replace either one or use it alone.
 
-The event carries the pane's `name`, which is what lets one sandbox hold several
-panes without the root identifying senders by reference: `html` is the preview's
-markup and `css` is its stylesheet. A pane named anything else is showing
-something rather than driving it, and is ignored.
+The event includes the pane's `name`, so one sandbox can hold several panes
+without tracking which element sent each event. A pane named `html` sets the
+preview's markup, and a pane named `css` sets its stylesheet. The sandbox
+ignores a pane with any other name, so that pane only displays its contents.
 
 ```html
 <helix-sandbox>
@@ -56,21 +55,22 @@ something rather than driving it, and is ignored.
 </helix-sandbox>
 ```
 
-## The console is patched in the frame
+## Console output from the example
 
-Logs from the example reach the page's console panel; logs from the page around
-it do not. That is deliberate and is the point of doing the patching in the
-frame rather than in the sandbox: it catches what the example itself logs and
-nothing else.
+Logs from the example appear in the console panel. Logs from the page around it
+do not. We patch the console inside the frame on purpose, so the panel shows
+what the example logs and nothing else.
 
 ## The package is private
 
-`@fusion.dev/helix-sandbox` does not publish. It is the editor and spec runner for this
-repository, and it is Helix tooling rather than a Helix product: the elements
-assume the frame, the frame assumes the build, and the build assumes this
-repository's layout.
+`@fusion.dev/helix-sandbox` is not published. It is the editor and spec runner
+for this repository, and it is Helix tooling. It depends on the repository:
 
-If you want an editable example in your own documentation, the honest answer
-today is that you would build it, and the manifest and the `.examples` files are
-what you would build it from. That is a gap rather than a policy, and worth
-telling us about.
+- The elements depend on the frame.
+- The frame depends on the build.
+- The build depends on this repository's layout.
+
+To add editable examples to your own documentation today, you would build the
+editor yourself, from the manifest and the `.examples` files. This is a gap we
+have not filled, and we have no policy against filling it. Tell us if you need
+it.

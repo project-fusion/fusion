@@ -1,71 +1,90 @@
 ---
-description: The top layer, what dismisses what, and where focus goes.
+description: How overlays use the top layer, how they close, and where focus goes.
 section: Essentials
 title: Overlays and layering
 ---
 
 # Overlays and layering
 
-`Dialog`, `Drawer`, `Popover`, `Menu`, `Select`, `Combobox`, `Tooltip`,
-`Megamenu`, `Speed Dial`, `Command` and `Tour` are all overlays, and they all
-work the same way underneath. Knowing that way saves you from most of the
-problems overlays cause.
+These components are overlays, and they all work the same way:
 
-## They render in the top layer
+- `Dialog`
+- `Drawer`
+- `Popover`
+- `Menu`
+- `Select`
+- `Combobox`
+- `Tooltip`
+- `Megamenu`
+- `Speed Dial`
+- `Command`
+- `Tour`
 
-Every one uses the popover API, so the browser draws it in the top layer: above
-everything, regardless of `z-index`, `overflow: hidden`, `transform` or a
-stacking context somewhere up the tree.
+Knowing how they work helps you avoid most overlay problems.
 
-**This is the fix for the oldest bug in the category.** A menu inside a
-scrolling panel does not get clipped. A tooltip inside a `transform`ed card does
-not get trapped in its stacking context. There is no portal to configure and no
-`appendTo` to pass, because the platform is doing it.
+## Overlays render in the top layer
 
-The consequence for your CSS: **do not try to raise an overlay with `z-index`.**
-It has no effect on a top-layer element, and reaching for it means something
-else is wrong.
+Every overlay uses the popover API, so the browser draws it in the top layer.
+The top layer is above everything on the page, and these do not affect it:
 
-## Positioning is JavaScript
+- `z-index`
+- `overflow: hidden`
+- `transform`
+- a stacking context in an ancestor
 
-Placement uses `@floating-ui/dom` rather than CSS anchor positioning: flip when
-there is no room below, move below or above when a panel placed beside its
-anchor has room on neither side, shift to stay on screen, size to the available
-space. Anchor positioning would be the platform answer and is not yet available
-everywhere the rest of the library's requirements are. See [Browser
-support](./browser-support).
+As a result, a menu inside a scrolling panel is not clipped, and a tooltip
+inside a `transform`ed card is not trapped in its stacking context. You do not
+configure a portal or pass `appendTo`, because the browser handles the layering.
 
-That means an overlay's position is recomputed while it is open, on scroll and
-resize, and stops when it closes.
+**Do not raise an overlay with `z-index`.** It has no effect on a top-layer
+element. If you want to use it, something else is wrong.
 
-## Dismissal
+## How overlays are positioned
 
-Light dismiss is the platform's: click outside, or press `Escape`. What Helix
-adds is making that correct across shadow boundaries.
+Overlays are placed with `@floating-ui/dom`, which does the following:
 
-**`document.activeElement` stops at the outermost host.** Focus inside a shadow
-tree is reported as the element containing that tree, so a naive "is focus still
-inside me" check never matches and closes the overlay the moment anything inside
-it is focused. Every dismissal path here walks through the roots instead.
+- It flips a panel to the other side of its anchor when there is no room below.
+- It moves a panel placed beside its anchor below or above when there is no room
+  on either side.
+- It shifts a panel to stay on screen.
+- It sizes a panel to the available space.
 
-**Nesting works because lifecycle events do not bubble.** `helix-before-open` and
-`helix-before-close` are neither bubbling nor composed, so a menu closing inside a
-dialog is not the dialog closing. `Escape` closes the innermost overlay and
-leaves the rest.
+CSS anchor positioning is the platform's own way to do this. We do not use it
+yet, because it is not available in every browser the rest of Helix supports.
+See [Browser support](./browser-support).
 
-## Focus
+While an overlay is open, its position is recomputed on scroll and resize. The
+recomputing stops when the overlay closes.
 
-A modal overlay traps `Tab` inside itself while open and returns focus to
-whatever opened it. `Dialog` and `Drawer` do this; `Popover` does it in its
-modal mode and not otherwise.
+## How overlays close
 
-**A tooltip never takes focus**, which is the one to remember: it is
-described-by rather than interactive, so it cannot contain a button. If you want
-something with a button in it, that is a `Popover`.
+Light dismiss comes from the platform: click outside the overlay, or press
+`Escape`. Helix makes light dismiss work correctly across shadow boundaries.
 
-## Refusing to close
+`document.activeElement` stops at the outermost host. Focus inside a shadow tree
+is reported as the element that contains the tree. A simple check for whether
+focus is still inside the overlay never matches, so the overlay would close as
+soon as anything inside it is focused. Every way of closing an overlay in Helix
+checks focus by walking through the shadow roots.
 
-The close is announced before it happens:
+Nested overlays work because lifecycle events do not bubble.
+`helix-before-open` and `helix-before-close` do not bubble and are not composed,
+so a menu that closes inside a dialog does not close the dialog. `Escape` closes
+the innermost overlay and leaves the others open.
+
+## Where focus goes
+
+A modal overlay keeps `Tab` inside itself while it is open, and it returns focus
+to the element that opened it. `Dialog` and `Drawer` always do this. `Popover`
+does it only in its modal mode.
+
+**A tooltip never takes focus.** A tooltip only describes a control, so it
+cannot contain a button. For something with a button in it, use a `Popover`.
+
+## Keep an overlay open
+
+An overlay sends `helix-before-close` before it closes. Cancel the event to keep
+the overlay open:
 
 ```ts
 dialog.addEventListener('helix-before-close', (event) => {
@@ -75,20 +94,19 @@ dialog.addEventListener('helix-before-close', (event) => {
 })
 ```
 
-That covers `Escape`, the backdrop click and the close button together, because
-all three go through the same request. See [State and
-control](./state-and-control).
+Canceling covers `Escape`, a backdrop click, and the close button, because all
+three send the same request. See [State and control](./state-and-control).
 
 ## Entry and exit animation
 
-Overlays animate in with `@starting-style` and out with a transition on the
-`overlay` and `display` properties, which is what allows an exit animation on an
-element the browser is about to remove from the top layer. Every one answers
-`prefers-reduced-motion`.
+Overlays animate in with `@starting-style`. They animate out with a transition
+on the `overlay` and `display` properties, which allows an exit animation on an
+element the browser is about to remove from the top layer. Every overlay
+responds to `prefers-reduced-motion`.
 
-## Which one to reach for
+## Choose an overlay
 
-| | |
+| Component | Use it for |
 |---|---|
 | `Dialog` | A task that blocks the page |
 | `Drawer` | The same, from an edge, usually larger |

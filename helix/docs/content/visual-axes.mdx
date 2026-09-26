@@ -1,13 +1,14 @@
 ---
-description: Registered words with fixed vocabularies, one escape hatch, and the word that is refused.
+description: The attributes that set how a component looks, the values each one accepts, and what each value draws.
 section: Theming
 title: Visual axes
 ---
 
 # Visual axes
 
-A component's visual choices come from a registry of axes with fixed
-vocabularies. You cannot invent a value, and a component may take a subset.
+A component's visual options come from a registry of axes. Each axis has a
+fixed set of values. You cannot add a value of your own, and a component can
+accept a subset of an axis's values.
 
 | Axis | Values |
 |---|---|
@@ -30,114 +31,123 @@ vocabularies. You cannot invent a value, and a component may take a subset.
 <helix-megamenu material="glass">…</helix-megamenu>
 ```
 
-## Why two axes
+## Why there is no `appearance` attribute
 
-**The library had four axes and one word for all of them.** Counted across both
-tiers, `appearance` described at least four different questions: where a surface ends (`outlined` against `plain` on a Card), how much
-ink a control claims (`ghost` against `solid` on a Button), which widget gets
-rendered (`segmented` against `underlined` on Tabs), and in one case a plain
-misfiled tone.
+Helix once used one attribute, `appearance`, for at least four different
+settings across both tiers:
 
-The tell is that `outlined` appeared in two of those groups meaning different
-things. On a Card it says where the surface ends. On a Button it says how much
-ink. Same word, two questions, and no way to ask one without answering the
+- where a surface ends, such as `outlined` or `plain` on a Card
+- how much ink a control uses, such as `ghost` or `solid` on a Button
+- which widget is rendered, such as `segmented` or `underlined` on Tabs
+- in one case, a tone filed in the wrong place
+
+`outlined` appeared in two of those groups with different meanings. On a Card,
+it set where the surface ends. On a Button, it set how much ink the button uses.
+With one attribute for both, you could not set one without also setting the
 other.
 
-**`appearance` is refused outright now.** It is not a word this library uses,
-and a component reintroducing it fails the build.
+**Helix does not accept `appearance`.** A component that adds it back fails the
+build.
 
-## Two axes, not one
+## When a property needs two axes
 
-This is the test. `Megamenu` is the worked example: a consumer can make the panel
-glass, which is not an appearance, because `band` already occupies that axis
-with a layout. A panel can be glass *and* outlined. Two axes.
+**If two values can apply at the same time, they belong on two axes.**
+`Megamenu` is the example. You can make its panel glass. Glass cannot share an
+attribute with `band`, which already uses that attribute for a layout. A panel
+can also be glass and outlined at once, so these are two axes.
 
-If you are adding a property and cannot decide which axis it belongs to, that is
-usually the answer: it is two properties.
+If you are adding a property and cannot decide which axis it belongs on, it is
+usually two properties.
 
-## `variant` is the escape hatch
+## Use `variant` for a choice between widgets
 
 ```html
 <helix-tabs variant="segmented">…</helix-tabs>
 <helix-time-picker variant="wheels">…</helix-time-picker>
 ```
 
-`variant` takes no registry, being component-specific by definition: `segmented`
-against `underlined`, `list` against `wheels`, `grip` against `line`. It is a
-choice between two widgets, which is structural wherever it is made, so it lives
-on either tier.
+`variant` has no registry, because its values belong to one component. For
+example:
 
-**What it may not be is a place to put something that is on an axis.** That is
-the failure mode `appearance` demonstrated.
+- `segmented` or `underlined`
+- `list` or `wheels`
+- `grip` or `line`
 
-## Some axes are carried by both tiers
+A variant is a choice between two widgets. That choice changes structure
+wherever it is made, so `variant` can appear on either tier.
 
-A styled axis never appears on the headless tier, which has nothing to paint and
-no box to size. The exceptions are the axes that are not about paint. `tone` says
-what a thing *means*, and meaning survives having no stylesheet. `shape` says
-what gets *rendered*: a meter at `ring` emits an arc rather than a bar, so the
-markup differs before any rule is written. `nesting` says what depth *is*: a
-tree at `subordinate` ranks its rows, a tree at `heading` makes each branch the
-name of the list under it, a file explorer does neither, and that is true of a
-tree nobody has styled. `orientation` is `shape`'s reason again: `aria-orientation`
-is markup, and the toolbar, the splitter, the divider and the table column all
-write it with nothing painted.
+**Do not use `variant` for anything an axis already covers.** That is the
+problem `appearance` had.
 
-`size` is the axis that goes the other way. It is asked of pictures and regions
-and never of controls, which take their height from the region they sit in
-through `data-density`, so it lives only where something is painted.
+## Axes on both tiers
+
+Styled axes do not appear on the headless tier, because the headless tier has
+nothing to paint and no box to size. The exceptions are the axes that are not
+about paint:
+
+- `tone` sets what a thing means, and that meaning holds without a stylesheet.
+- `shape` sets what is rendered. A meter at `ring` renders an arc where it would
+  otherwise render a bar, so the markup differs before any CSS rule is written.
+- `nesting` sets what depth means. A tree at `subordinate` ranks its rows. A
+  tree at `heading` makes each branch the name of the list under it. A file
+  explorer does neither. All of this holds for a tree with no styles.
+- `orientation` is on both tiers for the same reason as `shape`.
+  `aria-orientation` is markup, and the toolbar, the splitter, the divider, and
+  the table column all write it with nothing painted.
+
+`size` is the opposite case. Pictures and regions take a `size`. Controls do
+not, because they take their height from their region through `data-density`.
+So `size` appears only where something is painted.
 
 ## When a family takes `neutral`
 
-`tone` is the one axis whose vocabulary the table above leaves open, and
-`neutral` is the value families have kept deciding about one at a time. Three
-have argued it at their own declarations and arrived at the same rule, so it
-belongs here once instead.
+`tone` is the one axis whose values the table above does not list in full.
+Families have decided one at a time whether to accept `neutral`. Three of them
+reached the same rule in their own declarations, so the rule is stated here.
 
-**A family that reports a status takes the status words and stops.** `Callout`
-and `Toast` say it in nearly the same sentence: a callout reports a status and
-never a brand role, so it takes four of the seven. There is no neutral status,
-and a value that could not be drawn is worse than a value that cannot be named.
+**A family that reports a status accepts only the status values.** `Callout` and
+`Toast` both state this. A callout reports a status and never a brand role, so
+it accepts four of the seven tones. There is no neutral status. Accepting a
+value the family cannot draw is worse than leaving the value out.
 
-**A family whose resting state is already untoned does not need it.** `Text`
-gives that reason against its own missing `default`: a value matching no rule
-would fall through to the inherited ink and read as working while saying
-nothing. The absent attribute is the resting case and says it better.
+**A family whose resting state has no tone does not need `neutral`.** `Text`
+gives this reason for having no `default` value. A value that matches no rule
+would fall back to the inherited ink. It would look like it works and change
+nothing. Leaving the attribute off already gives the resting state.
 
-**`neutral` is for a thing that carries a tone without reporting one**: a gray
-tag beside six colored ones, a button that is a button rather than the primary
-action. `Announcement` spells its own out rather than leaving the attribute off,
-which is what makes the tone sayable rather than only reachable, and that is the
-whole of when this value is worth taking.
+**Use `neutral` for something that has a tone but reports no status.** Examples
+are a gray tag beside six colored ones, or a button that is not the primary
+action. `Announcement` accepts `neutral` as a value you write, so you can set
+the untoned look by name. Leaving the attribute off would give the same look
+without a name. That is the only reason to accept this value.
 
-## What each shape is
+## What each shape draws
 
-`shape` is the axis whose values are geometries that look alike in a table and
-not on a page, so it is worth saying what each one draws.
+Several `shape` values sound alike and draw different geometries:
 
 | Value | What it draws |
 |---|---|
 | `arc` | An open curve, a gauge that stops short of a full turn |
-| `circle` | A full round, the whole edge at `radii-full` |
-| `diamond` | A square turned on its point, its corners at the middles of the box's sides, which is where a flowchart's decision sits |
-| `dots` | Separate marks rather than one joined figure |
+| `circle` | A full circle, with the whole edge at `radii-full` |
+| `diamond` | A square turned on its point, with its corners at the middles of the box's sides, like a flowchart's decision step |
+| `dots` | Separate marks, with nothing joining them |
 | `pill` | A rectangle whose short ends are half-circles, the round of `radii-full` on a box wider than it is tall |
-| `pin` | A teardrop whose tip stands on a place, rather than its middle, which is where a journey ends on a map |
+| `pin` | A teardrop that marks a place with its tip, such as where a journey ends on a map |
 | `ring` | A closed curve, the whole turn drawn as a band |
 | `rounded` | Corners cut to `radii-md`, still a rectangle |
-| `square` | Sharp corners, the pole `rounded` departs from |
-| `text` | A line of type's shape, as wide as a line and as tall |
+| `square` | Sharp corners, the shape `rounded` softens |
+| `text` | The shape of a line of text, as wide and as tall as one line |
 
-**`square` is not `rounded`.** They were one word for a while: an avatar drawing
-`radii-md` called it `square` while a QR code drawing sharp modules called it
-`square` too, in the same registered axis. Membership is what a check can see,
-so nothing could have caught that, and a table is what stops it happening again.
+**`square` has sharp corners, and `rounded` has corners cut to `radii-md`.**
+They were once one word. An avatar drawing `radii-md` called its shape `square`,
+and a QR code drawing sharp modules also called its shape `square`, on the same
+registered axis. A check can confirm only that a value is in the registry, so no
+check could catch this. The table above keeps it from happening again.
 
 ## What each separation draws
 
-`separation` says where a box ends, and `elevated` is the value nearly every
-family leaves out, so it is worth saying what each one draws and what that
-omission is about.
+`separation` sets where a box ends. Nearly every family leaves out `elevated`,
+and this section explains why.
 
 | Value | What it draws |
 |---|---|
@@ -146,35 +156,42 @@ omission is about.
 | `outlined` | An edge over the ground it already has |
 | `plain` | Neither, so the box ends where its content does |
 
-**Leaving `elevated` out is a fact about the value rather than about the family
-that skips it.** A shadow says the box floats above the page, which is true of a
-card picked up off a grid and of an announcement laid over the content, and
-false of a row in a feed, a groove a thumb sits in, a checkbox, or a bar across
-a video. A family taking the other three and stopping is following the value,
-not departing from the axis, and owes no argument for it. A family that *does*
-take it is the one saying something, and `Card` and `Announcement` both do.
+**Most families leave out `elevated` because of what the value means.** A shadow
+shows that the box floats above the page. That is true of a card picked up off a
+grid and of an announcement laid over the content. It is false of:
 
-## What a step inward means
+- a row in a feed
+- a groove a thumb sits in
+- a checkbox
+- a bar across a video
 
-`nesting` is the one axis whose values are three readings of the same fact, so
-it is worth saying which tree each is for.
+A family that accepts only the other three values needs no reason for it. A
+family that accepts `elevated` has made a choice, and `Card` and `Announcement`
+both accept it.
+
+## What each nesting value does
+
+The three `nesting` values are three ways to show the same depth in a tree.
+Each suits a different kind of tree.
 
 | Value | The tree it suits | What moves |
 |---|---|---|
 | `heading` | A documentation sidebar, where a branch names the list it holds and is not a page | The branch, which takes the rail heading. Its children keep the row they had |
-| `peer` | A file explorer, where every row is the same kind of thing | Nothing. The indent is the whole of what depth says |
+| `peer` | A file explorer, where every row is the same kind of thing | Nothing. Only the indent shows depth |
 | `subordinate` | Side navigation, a categorization, a facet list | The nested row, one step down the type scale and no further |
 
-`heading` and `subordinate` are not one answer said twice. `subordinate` keys on
-depth and quiets the child; `heading` keys on holding children and relabels the
-parent, which is why a branch at any depth is a heading while the step below
-stops after one, and why a top-level leaf sitting beside a branch is left alone
-by both for opposite reasons.
+`heading` and `subordinate` work differently. `subordinate` depends on depth and
+makes the child quieter. `heading` depends on whether a row has children and
+turns the parent into a heading. As a result:
 
-## What each emphasis claims
+- Under `heading`, a branch at any depth is a heading.
+- Under `subordinate`, the step down stops after one level.
+- Both leave a top-level leaf beside a branch alone, for opposite reasons.
 
-`emphasis` is how loud a control is, and its values are one ladder with a rung
-that changes meaning halfway along, so it is worth saying what each draws.
+## What each emphasis draws
+
+`emphasis` sets how prominent a control is. Its values form one ladder, and one
+value changes meaning partway along.
 
 | Value | What it draws |
 |---|---|
@@ -184,21 +201,23 @@ that changes meaning halfway along, so it is worth saying what each draws.
 | `ghost` | Nothing at rest, the tone carried by the ink alone |
 | `muted` | Quieter ink, where there is no surface to quiet |
 
-**`outlined` is the rung that changes.** On a control the edge arrives and the
-fill leaves, which is what makes it quieter than `solid`. On a chart mark the
-fill stays under the edge, because there the area encodes a value and dropping
-it would drop the reading. Both are the same question, how much ink this claims,
-answered by what the thing has to spend it on.
+**`outlined` is the value that changes meaning.** On a control, it adds an edge
+and removes the fill, which makes it quieter than `solid`. On a chart mark, the
+fill stays under the edge, because the area shows a value and removing the fill
+would hide that value. In both cases, `outlined` sets how much ink the element
+uses, based on what the element needs the ink for.
 
-**`muted` is for a thing whose only ink is its letterform.** Text carries it and
-nothing else does, because everything else has a surface to quiet first. That is
-a fact about the value, not a gap.
+**`muted` is for something whose only ink is its letterforms.** Only text takes
+it, because everything else has a surface to make quieter first. Leaving it off
+other families is intentional.
 
-## What each material is made of
+## What each material draws
 
-`material` is one pair of declarations at three strengths, and the pair is the
-point: a translucent ground without a backdrop filter is a smear, and a filter
-behind an opaque ground is invisible. Absent is opaque.
+Each `material` value sets two declarations together: a translucent ground and a
+backdrop filter. The three values set that pair at different strengths. They
+work only as a pair. A translucent ground without a backdrop filter looks
+smeared, and a filter behind an opaque ground cannot be seen. With no
+`material`, a surface is opaque.
 
 | Value | What it draws |
 |---|---|
@@ -206,51 +225,53 @@ behind an opaque ground is invisible. Absent is opaque.
 | `frosted` | The same pair turned up, a heavier ground under a heavier blur |
 | `transparent` | Neither, so the page shows through structure and spacing |
 
-`frosted` is for a surface that has to stay readable over a busy page. It is not
-"more glass than `glass`" in a theme's sense: a theme owns how strong the pair
-is, and these three are which pair.
+Use `frosted` for a surface that has to stay readable over a busy page. A theme
+sets how strong each pair is. The three values choose which pair a surface uses.
 
-## What each orientation turns
+## What each orientation does
 
-`orientation` is not paint, which is why it is a value a component reads rather
-than a rule a stylesheet applies: the drag axis, the arrow keys and
-`aria-orientation` all turn with it, and a CSS-only version would look stacked
-while behaving side by side, with the keyboard moving the wrong way.
+A component reads `orientation` as a value, because it changes more than paint.
+It turns:
+
+- the drag axis
+- the arrow keys
+- `aria-orientation`
+
+A version done only in CSS would look stacked while behaving side by side, and
+the arrow keys would move the wrong way.
 
 | Value | What it does |
 |---|---|
-| `horizontal` | Lays along the inline axis and says so in `aria-orientation` |
-| `vertical` | Along the block axis, and says that |
-| `auto` | Lets the component decide from the room it has, and turn again when that changes |
+| `horizontal` | Lays out along the inline axis and sets `aria-orientation` to match |
+| `vertical` | Lays out along the block axis and sets `aria-orientation` to match |
+| `auto` | Picks a direction from the room the component has, and turns again when that changes |
 
-**`auto` asks the component's own width and never the viewport.** A splitter in a
-300px panel of a 1400px window has no room for two panes side by side, and a
-media query would hand it the desktop branch, so a `ResizeObserver` on the host
-asks the only question with an honest answer.
+**`auto` uses the component's own width, never the viewport's.** A splitter in a
+300px panel of a 1400px window has no room for two panes side by side. A media
+query would give it the desktop layout. A `ResizeObserver` on the host measures
+the width the splitter actually has.
 
-## What each size step is
+## What each size draws
 
-`size` is asked of pictures and regions and never of controls, which is the
-domain and not a list of who carries it. The table is worth having because one
-of the four is not a rung of the same kind.
+`size` applies to pictures and regions, and never to controls. That rule sets
+the scope of the axis. One of the four values is a different kind of step.
 
 | Value | What it draws |
 |---|---|
-| `sm` | The small rung |
-| `md` | The middle one, and the resting case where a family has one |
-| `lg` | The large one |
-| `full` | The region less the same inset every rung already stops short by |
+| `sm` | The small step |
+| `md` | The middle step, and the resting state for a family that has one |
+| `lg` | The large step |
+| `full` | The whole region, less the same inset every other step already leaves |
 
-**`full` is one more rung and not a second property.** A takeover dialog is the
-same question answered further along, so it belongs on this axis rather than in
-a `fullscreen` boolean beside it, which would be a private spelling of a
-registry question.
+**`full` is one more step on the `size` axis.** A takeover dialog is the same
+setting taken further, so it belongs on this axis. A separate `fullscreen`
+boolean would be one component's own way to set a value the registry already
+covers.
 
 ## What each tone means
 
-`tone` is the one axis whose cell in the table above is prose rather than a
-list, because a page naming four of the seven reads better than a page reciting
-all of them. The seven are still fixed, and this is where they are said.
+The table at the top describes `tone` in words and names four of its values.
+`tone` has seven fixed values:
 
 | Value | What it means |
 |---|---|
@@ -262,20 +283,20 @@ all of them. The seven are still fixed, and this is where they are said.
 | `warning` | May go wrong, or needs attention before it does |
 | `danger` | Destructive, or already wrong |
 
-The first three are intent and the last four are status, which is the split a
-family is really choosing between when it takes a subset. See above for when
-`neutral` is worth taking.
+The first three are intents, and the last four are statuses. A family that
+accepts a subset is choosing between these two groups. The section on `neutral`
+above says when to accept it.
 
-## What each width policy is
+## What each width value does
 
-`width` here is a policy, not a measurement: two buttons sitting together may
-legitimately differ, which is the test that keeps this off `size`.
+`width` sets a policy. Two buttons placed together can have different widths.
+By the same test that keeps height off each control, width belongs on each
+component, separate from `size`.
 
 | Value | What it draws |
 |---|---|
-| `auto` | As wide as its content, the resting behavior said out loud |
-| `full` | The whole of the inline space its parent offers |
+| `auto` | As wide as its content. This is the resting behavior, written out |
+| `full` | All the inline space its parent gives it |
 
-**A `width` taking a number is a different property wearing the same name.** A
-canvas and a table column are measured rather than given a policy, so they take
-a length and are not on this axis. The name is shared and the question is not.
+**A `width` that takes a number is a different property with the same name.** A
+canvas and a table column take a length, so they are not on this axis.

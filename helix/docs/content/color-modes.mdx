@@ -1,15 +1,16 @@
 ---
-description: One attribute, two modes, and no token restated to honor it.
+description: Switch between light and dark mode with one attribute. Each token declares both values once.
 section: Foundations
 title: Color modes
 ---
 
 # Color modes
 
-Light and dark are one attribute and no duplicated tokens. There is no second
-stylesheet, no `.dark` class to toggle, and nothing to remember to update twice.
+One attribute switches between light and dark mode. Each token declares its
+light and dark values together. You do not need a second stylesheet, a `.dark`
+class, or a second copy of any value.
 
-## How it works
+## How color modes work
 
 ```css
 :root {
@@ -18,21 +19,20 @@ stylesheet, no `.dark` class to toggle, and nothing to remember to update twice.
 }
 ```
 
-Every token is written once, with both halves in a `light-dark()`. Which half
-resolves is decided by `color-scheme` and nothing else, so the mode is a single
-inherited property and no token is restated to honor it. That is 156
-declarations across the shipped stylesheets, 71 of them in the token layer,
-expressing two modes without a second copy of anything.
+Each token is written once, with its light and dark values in `light-dark()`.
+The `color-scheme` property alone decides which value applies. `color-scheme`
+inherits, so one property sets the mode for an element and everything inside
+it. The shipped stylesheets use `light-dark()` in 156 declarations, 71 of them
+in the token layer.
 
-## Setting the mode
+## Set the mode
 
 ```html
 <html data-color-mode="dark">
 ```
 
-`[data-color-mode="light"]` and `[data-color-mode="dark"]` set `color-scheme`,
-and `color-scheme` inherits, so the attribute works **on any element** rather
-than only on the root:
+`[data-color-mode="light"]` and `[data-color-mode="dark"]` set `color-scheme`.
+Because `color-scheme` inherits, **the attribute works on any element**:
 
 ```html
 <div data-color-mode="light">
@@ -40,24 +40,24 @@ than only on the root:
 </div>
 ```
 
-That is the whole mechanism, and it is why the theme builder can show you a
-light and a dark rendering of the same component side by side without rendering
-two documents.
+The theme builder uses the same attribute to show a component in light and dark
+mode side by side in one document.
 
-## Following the system
+## Follow the operating system
 
-Unset, `:root` declares `color-scheme: light dark`, which means the operating
-system decides. That is the default and it is usually right.
+When you do not set a mode, `:root` declares `color-scheme: light dark`, and the
+operating system decides the mode. This is the default, and it is usually the
+right choice.
 
-A `prefers-color-scheme` media query still exists in the token layer for one
-narrow case rather than being the mechanism: a value that has to be *derived*
-from the mode, rather than chosen between two, cannot be expressed as
-`light-dark()` and has to ask which mode is current.
+The token layer uses a `prefers-color-scheme` media query in one case.
+`light-dark()` chooses between two values. A value that has to be *computed*
+from the mode cannot use `light-dark()`, so a media query checks which mode is
+current.
 
-## The one component that inverts
+## Toast uses the opposite mode
 
-`Toast` renders in the opposite mode to the page it is on, which is why it is
-the exception written into the base layer:
+`Toast` renders in the opposite mode to the page it is on. The base layer sets
+this with one rule:
 
 ```css
 helix-toast:not([data-color-mode]) {
@@ -65,14 +65,13 @@ helix-toast:not([data-color-mode]) {
 }
 ```
 
-A toast is chrome over the page rather than part of it, and inverting is how it
-reads as separate without a border. Opt out by putting `data-color-mode` on it,
-which then wins, because the rule only applies to a toast that has not been
-told.
+A toast sits over the page. The opposite mode sets it apart from the page
+without a border. To choose a toast's mode yourself, set `data-color-mode` on
+it. The rule applies only to a toast without that attribute.
 
-## What this means for your own CSS
+## Colors in your own CSS
 
-Write `light-dark()` for your own colors and set nothing else:
+Write your own colors with `light-dark()`. You do not need anything else:
 
 ```css
 .callout {
@@ -80,8 +79,12 @@ Write `light-dark()` for your own colors and set nothing else:
 }
 ```
 
-It will follow the page, follow a subtree that was told otherwise, and follow
-the system when nothing has said. Do not write a `prefers-color-scheme` query
-for it, and do not key off the `data-color-mode` attribute: both stop working
-the moment a subtree overrides the mode, which is the case this design exists to
-make cheap.
+The color then follows:
+
+- The page's mode
+- The mode of a subtree that sets its own
+- The operating system, when nothing sets a mode
+
+Do not write a `prefers-color-scheme` query for it, and do not select on the
+`data-color-mode` attribute. Both stop working when a subtree sets its own mode,
+and this design exists to make that easy.
