@@ -27,6 +27,8 @@
      what makes them readable below: the connector lives in another package
      and writes the place's screen position every time the view moves. Zero is
      where an unplaced marker would sit, which the rule after this hides. */
+  --_map-marker-leg: 0px;
+  --_map-marker-leg-angle: 0rad;
   --_map-marker-x: 0px;
   --_map-marker-y: 0px;
   block-size: 0;
@@ -234,6 +236,38 @@
 :host(:state(cluster)) [part="point"]::before,
 :host(:state(cluster)) [part="point"]::after {
   content: none;
+}
+
+/* **A fanned place's leg**, back to the spot it shares with the others, so
+   a ring of places pressed out of one cluster still says where they all are.
+   Drawn from the host, which stands where the place now does, under its
+   point; the connector writes how long it is and which way it points. */
+:host(:state(fanned))::before {
+  --_map-marker-leg-ink: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 55%,
+    var(--helix-color-surface)
+  );
+  --_map-marker-leg-dot: calc(var(--helix-border-thick) * 1.75);
+  /* The line, and a dot at its far end where every leg meets, which is the
+     spot itself: legs alone met in a crosshair that marked nothing. */
+  background:
+    radial-gradient(
+      circle at calc(100% - var(--_map-marker-leg-dot)) 50%,
+      var(--_map-marker-leg-ink) var(--_map-marker-leg-dot),
+      transparent calc(var(--_map-marker-leg-dot) + var(--helix-border-thin))
+    ),
+    linear-gradient(var(--_map-marker-leg-ink), var(--_map-marker-leg-ink)) 0 50% / 100%
+    var(--helix-border-thick) no-repeat;
+  block-size: calc(var(--_map-marker-leg-dot) * 2);
+  content: "";
+  inline-size: calc(var(--_map-marker-leg) + var(--_map-marker-leg-dot));
+  left: 0;
+  position: absolute;
+  rotate: var(--_map-marker-leg-angle);
+  top: 0;
+  transform-origin: 0 50%;
+  translate: 0 -50%;
 }
 
 /* Out of the way while another marker stands for it. */
