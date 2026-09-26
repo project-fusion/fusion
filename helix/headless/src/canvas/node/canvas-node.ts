@@ -63,32 +63,32 @@ const DRAWN = [
  * @aliases CanvasCard, BoardNode
  * @documentation https://fusion.dev/helix/components/canvas
  *
- * @slot - What the card holds, which is anything: text, a picture, a chart.
- * @slot description - A quieter line under it.
+ * @slot - The card's content, such as text, a picture, or a chart.
+ * @slot description - A line of secondary text under the content.
  *
- * @csspart grip - A corner a selected card is resized from, on every one of the four.
+ * @csspart grip - A corner handle that resizes a selected card, on each of the four corners.
  * @csspart grip-bottom-left - The bottom left corner.
  * @csspart grip-bottom-right - The bottom right corner.
  * @csspart grip-top-left - The top left corner.
  * @csspart grip-top-right - The top right corner.
- * @csspart handle - A point on a side a connection is drawn from, on every one of the four.
+ * @csspart handle - A point that you draw a connection from, on each of the four sides.
  * @csspart handle-bottom - The point on the bottom side.
  * @csspart handle-left - The point on the left side.
  * @csspart handle-right - The point on the right side.
  * @csspart handle-top - The point on the top side.
- * @csspart move - The handle a selected card is moved by, a click to pick it up and another to put it down, as well as a drag.
+ * @csspart move - The handle that moves a selected card. Drag it, or click once to pick the card up and again to put it down.
  * @csspart node - The box the content sits in.
- * @csspart outline - The drawn outline of a card whose shape a box cannot draw, a diamond.
+ * @csspart outline - The drawn outline of a `diamond` card, a shape a box cannot draw.
  *
  * @cssstate candidate - While a connection is being drawn and this card is somewhere it could arrive.
- * @cssstate current - While this is the card a reader lands on when they tab into the board.
- * @cssstate selected - While this is the card the reader selected, until they select something else or nothing.
- * @cssstate target - While a connection being drawn would arrive here if it were let go.
+ * @cssstate current - The card that receives focus when you tab into the board.
+ * @cssstate selected - The card is selected.
+ * @cssstate target - A connection being drawn would end here if you released it.
  */
 @customElement('helix-headless-canvas-node')
 export class HelixHeadlessCanvasNode extends HelixElement {
   /**
-   * A box drawn behind the cards inside it rather than a card.
+   * Makes this a group: a box drawn behind the cards inside it.
    *
    * The board works out what is inside it from the geometry, which is what the
    * format does too, and moves them with it. Its `label` is drawn above it.
@@ -125,7 +125,8 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   height = 0
 
   /**
-   * What the card is called, for a group and wherever another card names it.
+   * The card's name as text. A group shows it, and another card's connections
+   * read it out.
    *
    * A group needs one because it has no text of its own; a card that has text
    * is named by it, and one holding a picture or a figure is named by nothing
@@ -135,7 +136,8 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   label = ''
 
   /**
-   * What connections and requests call this card, unique on its board.
+   * The name that connections and events use for this card, unique on its
+   * board.
    *
    * Required: a card with no name is drawn but nothing can connect to it, and
    * the board has nothing to say when a reader asks for it to go.
@@ -152,7 +154,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   links = ''
 
   /**
-   * Keeps this card where it is: not moved, not connected, not removed.
+   * Prevents the card from being moved, connected, or removed.
    *
    * **The board's own word, meaning the same thing one card at a time.** A
    * board of cards a reader rearranges often has one that anchors it, a start
@@ -163,8 +165,8 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   readOnly = false
 
   /**
-   * The card's outline: `circle`, `diamond`, `pill` or `square`, and a rounded
-   * box where it says none.
+   * The card's outline: `circle`, `diamond`, `pill`, or `square`. Unset is a
+   * rounded box.
    *
    * **A flowchart's vocabulary, and the reason it is on this tier**: a diamond
    * is drawn as an outline the card renders, because a border follows a box
@@ -199,7 +201,8 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   resizable = false
 
   /**
-   * What the card means, in the words every Helix component uses for it.
+   * The meaning of the card, shown by its color, in the same tones as other
+   * Helix components.
    *
    * **`tone` rather than the format's `color`**, which was a second word for
    * the same thing on this family alone: JSON Canvas writes `1` to `6` and
@@ -259,7 +262,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   }
 
   /**
-   * Focuses the card rather than the host, which draws no box of its own.
+   * Focuses the card's `node` part. The host draws no box of its own.
    *
    * The board calls this to walk the cards, and a consumer can too: the part is
    * what holds the tab stop and what a focus ring is drawn around.

@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './tour-root.css.js'
 
 /**
- * @summary A guided run through an interface, one stop at a time.
+ * @summary A guided tour of an interface, one stop at a time.
  *
  * @description
  * It draws the light and nothing else: the scrim's color and the lit box's
@@ -16,8 +16,8 @@ import { styles } from './tour-root.css.js'
  * @category overlays
  * @documentation https://fusion.dev/helix/components/tour
  *
- * @cssproperty --tour-scrim-color - The darkness outside the lit box.
- * @cssproperty --tour-spotlight-radius - Corner radius of the lit box.
+ * @cssproperty --tour-scrim-color - The color of the dimmed area outside the spotlight.
+ * @cssproperty --tour-spotlight-radius - The corner radius of the spotlight.
  */
 @customElement('helix-tour')
 export class HelixTour extends HelixHeadlessTour {

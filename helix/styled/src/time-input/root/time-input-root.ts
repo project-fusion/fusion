@@ -15,7 +15,7 @@ import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
 import { styles } from './time-input-root.css.js'
 
 /**
- * @summary A time, typed or picked from a list.
+ * @summary A field for a time, typed or picked from a list.
  *
  * @description
  * The frame is the field rather than the input, so the trigger sits inside the
@@ -36,11 +36,11 @@ import { styles } from './time-input-root.css.js'
  *
  * @cssproperty --time-input-background-color - Fill behind the field.
  * @cssproperty --time-input-border-color - Color of the panel's edge.
- * @cssproperty --time-input-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
- * @cssproperty --time-input-shadow - Lift under the panel. Follows `--helix-shadow-floating`:
- *   a floating surface sits over content nobody can predict, so it keeps a lift by default.
+ * @cssproperty --time-input-border-width - Width of the panel's edge. Defaults to
+ *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
+ *   your theme sets a width.
+ * @cssproperty --time-input-shadow - Shadow under the panel. Defaults to
+ *   `--helix-shadow-floating`, because the panel can sit over any content.
  */
 @customElement('helix-time-input')
 export class HelixTimeInput extends HelixHeadlessTimeInput {

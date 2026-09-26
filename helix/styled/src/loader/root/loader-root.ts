@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './loader-root.css.js'
 
 /**
- * @summary Says that something indeterminate is in progress.
+ * @summary Shows that work of unknown length is in progress.
  *
  * @description
  * Sized in `em`, so it matches whatever text it sits beside without being told.
@@ -21,7 +21,7 @@ import { styles } from './loader-root.css.js'
  *
  * @cssproperty --loader-color - Color of the moving arc.
  * @cssproperty --loader-size - Diameter. Defaults to 1.5em.
- * @cssproperty --loader-track-color - Color of the circle behind it.
+ * @cssproperty --loader-track-color - Color of the circle behind the arc.
  */
 @customElement('helix-loader')
 export class HelixLoader extends HelixHeadlessLoader {
@@ -32,7 +32,7 @@ export class HelixLoader extends HelixHeadlessLoader {
   size?: 'sm' | 'md' | 'lg'
 
   /**
-   * How the waiting is drawn.
+   * How the loader is drawn. Leave it unset for a spinning arc, or set `pulse`.
    *
    * Unset is the turning arc, which is what most waits want.
    *

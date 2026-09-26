@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './progress-root.css.js'
 
 /**
- * @summary Shows how far along a task is, when that is known.
+ * @summary A bar or ring that shows how far along a task is.
  *
  * @description
  * A track and the part of it that is done. The height comes from a token rather
@@ -26,15 +26,15 @@ import { styles } from './progress-root.css.js'
  * @documentation https://fusion.dev/helix/components/progress
  *
  * @cssproperty --progress-color - Fill of the part that is done.
- * @cssproperty --progress-ring-size - Diameter of the ring appearance.
- * @cssproperty --progress-ring-width - Thickness of its stroke.
+ * @cssproperty --progress-ring-size - Diameter of the ring.
+ * @cssproperty --progress-ring-width - Thickness of the ring's stroke.
  * @cssproperty --progress-size - Thickness of the bar.
- * @cssproperty --progress-track-color - Fill of the part that is not.
+ * @cssproperty --progress-track-color - Fill of the part that is not done.
  */
 @customElement('helix-progress')
 export class HelixProgress extends HelixHeadlessProgress {
   /**
-   * How much ink the bar claims.
+   * How strongly the bar is drawn.
    *
    * `subtle` is the bar as a wash of its own color: still legible, no longer
    * the loudest thing in the region. The case is a background task, which has to

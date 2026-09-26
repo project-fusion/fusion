@@ -3,7 +3,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary The region messages arrive in, and the only thing that announces them.
+ * @summary The region that holds toast messages, and the only element that announces them.
  *
  * @description
  * **The region is why this is one family rather than two.** A live region has
@@ -38,7 +38,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The messages.
  *
- * @event {HelixDismissEvent} helix-dismiss - A message asking to go, by its control or by its timer, dispatched by the message and heard here because the stack is what a consumer holds. Cancelable: refusing it takes the decision and the message stays.
+ * @event {HelixDismissEvent} helix-dismiss - A message is being dismissed, by its control or by its timer. The message sends it, and you can listen for it on the region. Cancelable: canceling it keeps the message.
  *
  * @csspart region - The stack the messages are in.
  */

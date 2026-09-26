@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './lightbox-item.css.js'
 
 /**
- * @summary One thing a lightbox can show.
+ * @summary One item a lightbox can show, such as a picture, a video frame, or a chart.
  *
  * @description
  * Presentation only: the box centers what it was given and holds it inside the

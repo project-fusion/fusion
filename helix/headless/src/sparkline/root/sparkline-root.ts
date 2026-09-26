@@ -23,7 +23,7 @@ import { property } from 'lit/decorators.js'
 const STRIP_HEIGHT = 32
 
 /**
- * @summary A line with no axes, for the shape of a series beside the number it belongs to.
+ * @summary A small chart with no axes that shows the shape of a series beside its number.
  *
  * @description
  * The one chart here that takes its numbers from an attribute, and the reversal
@@ -60,8 +60,8 @@ const STRIP_HEIGHT = 32
  * @documentation https://fusion.dev/helix/components/sparkline
  *
  * @csspart area - The region between the line and the bottom of its range.
- * @csspart bar - One column, under `plot="bar"`.
- * @csspart line - The path itself.
+ * @csspart bar - One column, drawn when `plot="bar"`.
+ * @csspart line - The line's path.
  * @csspart svg - The drawing.
  * @csspart terminus - The mark on the last value.
  * @csspart wash-end - The far stop of the area's gradient.
@@ -73,7 +73,7 @@ const STRIP_HEIGHT = 32
 @customElement('helix-headless-sparkline')
 export class HelixHeadlessSparkline extends HelixElement {
   /**
-   * How the line gets from one reading to the next.
+   * How the line is drawn from one reading to the next.
    *
    * **`smooth` is the resting curve.** A straight segment asserts nothing about
    * the values between two readings and a curve invents them, which is why
@@ -104,7 +104,7 @@ export class HelixHeadlessSparkline extends HelixElement {
   curve?: Curve
 
   /**
-   * The id of a table to read instead, when there is one behind the line.
+   * The id of a table to read the readings from, when a table holds the data.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
    * because a table is the readable representation and a list of numbers in an
@@ -117,7 +117,7 @@ export class HelixHeadlessSparkline extends HelixElement {
   for = ''
 
   /**
-   * What the line says, in a sentence.
+   * A sentence that describes what the line shows.
    *
    * "Sessions rose from 1,240 to 1,318 and fell to 1,102 over fourteen days" is
    * the accessible representation of a sparkline, and a list of the fourteen

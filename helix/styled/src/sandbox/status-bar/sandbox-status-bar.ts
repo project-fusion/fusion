@@ -19,7 +19,7 @@ const LABELS: Record<string, string> = {
 }
 
 /**
- * @summary Reports where the cursor is and what is being edited.
+ * @summary A bar that shows the cursor position and the language being edited.
  *
  * @description
  * Slotted into a sandbox, which feeds it: the editor dispatches `helix-caret`

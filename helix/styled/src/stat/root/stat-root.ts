@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './stat-root.css.js'
 
 /**
- * @summary One measurement, with the word for what it measures.
+ * @summary One measurement, with a label that names what it measures.
  *
  * @description
  * The value is set on the display face at a size the type scale does not reach,

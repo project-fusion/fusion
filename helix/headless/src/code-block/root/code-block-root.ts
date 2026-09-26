@@ -6,7 +6,7 @@ import '../../copy-button/index.js'
 import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } from '../patch.js'
 
 /**
- * @summary A block of code, with somewhere to put its name and a way to take it.
+ * @summary A block of code with an optional name and a copy button.
  *
  * @description
  * **`<pre><code>` and nothing cleverer.** The pair is what the platform means
@@ -57,26 +57,26 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart block - The scrolling `<pre>`.
  * @csspart code - The `<code>` inside it.
  * @csspart context - In a diff, a line both versions share.
- * @csspart copy - The copy button: in the header where there is one, and otherwise beside the code.
+ * @csspart copy - The copy button. It sits in the header when there is one, and beside the code otherwise.
  * @csspart copy-button - The inner button.
- * @csspart copy-mark - The clipboard glyph, and the confirmation that replaces it.
- * @csspart copy-tooltip - The bubble, forwarded from the tooltip inside.
- * @csspart copy-tooltip-arrow - The point, resting against the trigger.
- * @csspart copy-tooltip-arrow-bottom - The point while the bubble is below the copy button, so on its top edge, beside `copy-tooltip-arrow`.
- * @csspart copy-tooltip-arrow-left - The point while the bubble is left of the copy button, so on its right edge, beside `copy-tooltip-arrow`.
- * @csspart copy-tooltip-arrow-right - The point while the bubble is right of the copy button, so on its left edge, beside `copy-tooltip-arrow`.
- * @csspart copy-tooltip-arrow-top - The point while the bubble is above the copy button, so on its bottom edge, beside `copy-tooltip-arrow`.
- * @csspart copy-tooltip-bottom - The bubble while it is below the copy button, beside `copy-tooltip`.
- * @csspart copy-tooltip-left - The bubble while it is left of the copy button, beside `copy-tooltip`.
- * @csspart copy-tooltip-right - The bubble while it is right of the copy button, beside `copy-tooltip`.
- * @csspart copy-tooltip-top - The bubble while it is above the copy button, beside `copy-tooltip`.
+ * @csspart copy-mark - The clipboard icon, and the check mark that replaces it after a copy.
+ * @csspart copy-tooltip - The copy button's tooltip.
+ * @csspart copy-tooltip-arrow - The tooltip's arrow, which points at the copy button.
+ * @csspart copy-tooltip-arrow-bottom - The arrow while the tooltip is below the copy button, on the tooltip's top edge. Applied with `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-arrow-left - The arrow while the tooltip is left of the copy button, on the tooltip's right edge. Applied with `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-arrow-right - The arrow while the tooltip is right of the copy button, on the tooltip's left edge. Applied with `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-arrow-top - The arrow while the tooltip is above the copy button, on the tooltip's bottom edge. Applied with `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-bottom - The tooltip while it is below the copy button. Applied with `copy-tooltip`.
+ * @csspart copy-tooltip-left - The tooltip while it is left of the copy button. Applied with `copy-tooltip`.
+ * @csspart copy-tooltip-right - The tooltip while it is right of the copy button. Applied with `copy-tooltip`.
+ * @csspart copy-tooltip-top - The tooltip while it is above the copy button. Applied with `copy-tooltip`.
  * @csspart file - In a diff, one file's header and block.
  * @csspart filler - In a split diff, the empty row opposite a line the other side does not have.
  * @csspart frame - The code, and the copy button beside it where there is no header.
- * @csspart header - The bar carrying the name and the copy button, where there is a name.
+ * @csspart header - The bar that holds the name and the copy button, shown when there is a name.
  * @csspart hunk - In a diff, a `@@` line saying where the lines under it are.
  * @csspart label - The file name or language, where one is given.
- * @csspart marker - In a diff, the `+`, `-` or space that opens a line.
+ * @csspart marker - In a diff, the `+`, `-`, or space that starts a line.
  * @csspart new - In a split diff, the new version's `<pre>`.
  * @csspart number - In a diff, a line number.
  * @csspart old - In a split diff, the old version's `<pre>`.
@@ -96,7 +96,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   diff = false
 
   /**
-   * What to call this block, usually a file name or a language.
+   * The block's name, usually a file name or a language.
    *
    * In a diff, each file is named from the patch, and this names a patch that
    * carries no name of its own.
@@ -129,7 +129,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   noCopy = false
 
   /**
-   * How a diff's two versions are arranged; nothing without `diff`.
+   * How a diff's two versions are arranged. It has no effect without `diff`.
    *
    * Absent is unified, each removal above its replacement, which fits any
    * width. `split` sets the old version beside the new one. Optional rather

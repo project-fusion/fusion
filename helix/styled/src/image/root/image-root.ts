@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './image-root.css.js'
 
 /**
- * @summary A picture that says whether it arrived.
+ * @summary An image that shows a placeholder while it loads and a fallback if it fails.
  *
  * @description
  * Presentation only: the box the picture is given, how it fills it, and the
@@ -18,18 +18,18 @@ import { styles } from './image-root.css.js'
  * @aliases Picture, Img, Figure
  * @documentation https://fusion.dev/helix/components/image
  *
- * @cssproperty --image-aspect - The ratio of the box, as `16 / 9`.
- * @cssproperty --image-fit - How the picture fills it.
- * @cssproperty --image-placeholder-color - The resting surface behind both stand-ins.
- * @cssproperty --image-position - Which part survives a crop.
- * @cssproperty --image-radius - Corner radius, under `shape="rounded"`.
+ * @cssproperty --image-aspect - The aspect ratio of the box, such as `16 / 9`.
+ * @cssproperty --image-fit - How the image fills the box, as an `object-fit` value.
+ * @cssproperty --image-placeholder-color - The background behind the placeholder and the fallback.
+ * @cssproperty --image-position - Which part of the image stays in view when it is cropped, as an `object-position` value.
+ * @cssproperty --image-radius - The corner radius when `shape` is `rounded`.
  */
 @customElement('helix-image')
 export class HelixImage extends HelixHeadlessImage {
   static override styles: CSSResultGroup = styles
 
   /**
-   * Whether the corners are cut.
+   * The shape of the corners. `rounded` rounds them.
    *
    * The axis and not a boolean, because `rounded` is a registered word and a
    * private spelling of a registry question is what `appearance` was retired

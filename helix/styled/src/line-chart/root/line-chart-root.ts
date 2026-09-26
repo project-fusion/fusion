@@ -9,7 +9,7 @@ import { styles } from './line-chart-root.css.js'
 import '../../tooltip/index.js'
 
 /**
- * @summary A series over time as a line, read from a table.
+ * @summary A chart that draws series over time as lines, read from a table.
  *
  * @description
  * The lines take the series palette in order, so a chart of one is series one
@@ -37,22 +37,23 @@ import '../../tooltip/index.js'
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://fusion.dev/helix/components/line-chart
  *
- * @cssproperty --chart-stroke - Thickness of a series drawn as a line, one name across this
+ * @cssproperty --chart-stroke - Thickness of a series drawn as a line. Line Chart, Area Chart's top edge, and Bar Chart's `lines` all read this one property. Each family's own width property overrides it.
  *   family, Area Chart's top edge and Bar Chart's `lines`, since the three read one shared
  *   rule. Each family's own width hook overrides it.
- * @cssproperty --chart-terminus-hole - A fill for the middle of a `ring` terminus, which is otherwise open. One name across this family and Sparkline, the two reading one shared sheet.
- * @cssproperty --chart-terminus-size - Size of the mark on each series' last reading. One name across this family and Sparkline, the two reading one shared sheet.
+ * @cssproperty --chart-terminus-hole - Fill for the middle of a `ring` terminus, which is otherwise open. Line Chart and Sparkline share this property.
+ * @cssproperty --chart-terminus-size - Size of the mark on each series' last reading. Line Chart and Sparkline share this property.
  * @cssproperty --line-chart-area-opacity - How much of a line's color its wash takes.
- * @cssproperty --line-chart-band-color - The slot the pointer is resting in.
+ * @cssproperty --line-chart-band-color - Color of the band around the reading under the pointer.
  * @cssproperty --line-chart-block-size - Height of the drawing.
  * @cssproperty --line-chart-gap - Space between the drawing and its labels.
- * @cssproperty --line-chart-gridline-color - One rule across the plot, under `gridlines`.
- * @cssproperty --line-chart-width - Thickness of a line, over `--chart-stroke`.
+ * @cssproperty --line-chart-gridline-color - Color of the rules drawn across the plot under `gridlines`.
+ * @cssproperty --line-chart-width - Thickness of a line. Overrides `--chart-stroke`.
  */
 @customElement('helix-line-chart')
 export class HelixLineChart extends HelixHeadlessLineChart {
   /**
-   * **The styled tier, so the tooltip this renders is the styled one.**
+   * The tag prefix for child elements. Set to the styled tier, so the chart
+   * renders the styled tooltip.
    *
    * `tag()` builds a child's tag name from this prefix, and the base declares
    * `helix-headless-`. Every other styled component that renders a child
@@ -71,7 +72,7 @@ export class HelixLineChart extends HelixHeadlessLineChart {
   static override tier = 'helix-'
 
   /**
-   * How much ink the lines claim.
+   * How strongly the lines and their washes are drawn.
    *
    * `subtle` mixes each series toward the page, so a chart that is context stays
    * legible without competing. Toward the page rather than translucent, because a
@@ -94,7 +95,7 @@ export class HelixLineChart extends HelixHeadlessLineChart {
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
   /**
-   * What the lines are made of.
+   * How translucent the lines are, as a material: `glass` or `frosted`.
    *
    * `glass` lets the gridlines read through them, which is what translucency is
    * for on a chart rather than decoration.

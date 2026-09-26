@@ -18,7 +18,7 @@ import { styles } from './blockquote-root.css.js'
  * @aliases Pullquote, Citation, Excerpt
  * @documentation https://fusion.dev/helix/components/blockquote
  *
- * @cssproperty --blockquote-size - Size of the quoted passage.
+ * @cssproperty --blockquote-size - The font size of the quoted passage.
  */
 @customElement('helix-blockquote')
 export class HelixBlockquote extends HelixHeadlessBlockquote {

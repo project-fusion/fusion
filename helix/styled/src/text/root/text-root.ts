@@ -21,7 +21,7 @@ const TAGS: Record<string, StaticValue> = {
 }
 
 /**
- * @summary A run of text, with the element and the look chosen separately.
+ * @summary Text, with its HTML element and its type style set separately.
  *
  * @description
  * Two properties, and they answer different questions. `as` is the element,
@@ -65,7 +65,7 @@ const TAGS: Record<string, StaticValue> = {
 @customElement('helix-text')
 export class HelixText extends HelixElement {
   /**
-   * Which element to render.
+   * The HTML element to render.
    *
    * Decides the outline and the semantics.
    */
@@ -73,7 +73,7 @@ export class HelixText extends HelixElement {
   as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label'
 
   /**
-   * How loud the text is, beside what it means.
+   * Makes the text quieter: `muted`, or the quieter `subtle`.
    *
    * `muted` is the quiet ink that still has to be read, and `subtle` the
    * quieter one below it. Two axes because the test says so: a line can be a
@@ -92,9 +92,8 @@ export class HelixText extends HelixElement {
   emphasis?: 'muted' | 'subtle'
 
   /**
-   * What the text means. A separate axis from the type ramp, because color
-   * carries state: folding it in would mean `caption-danger` and the rest of the
-   * cross product.
+   * The meaning of the text, shown by its color, such as `danger` or `success`.
+   * It is set separately from `variant`.
    *
    * **There is no `default` value**, and one must not be added: it would match
    * no rule and fall through to the inherited ink, reading as working while
@@ -107,7 +106,7 @@ export class HelixText extends HelixElement {
   tone?: 'accent' | 'danger' | 'info' | 'primary' | 'success' | 'warning'
 
   /**
-   * Type treatment.
+   * The type style, which sets the size, weight, leading, and tracking.
    *
    * Defaults to the one that matches `as`.
    */

@@ -29,7 +29,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-button-group')
 export class HelixHeadlessButtonGroup extends HelixElement {
   /**
-   * Accessible name for the group.
+   * The group's name, read by screen readers.
    *
    * On the host through internals, so an author's `aria-label` still overrides
    * it and nothing lands on the host that a consumer's markup did not have.

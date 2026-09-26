@@ -23,7 +23,7 @@ import { styles } from './stat-group.css.js'
 @customElement('helix-stat-group')
 export class HelixStatGroup extends HelixHeadlessStatGroup {
   /**
-   * Whether the figures are separated by a rule as well as by space.
+   * Draws a rule between the figures, in addition to the space.
    */
   @property({ reflect: true, type: Boolean })
   divided = false

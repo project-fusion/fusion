@@ -23,21 +23,21 @@ import { styles } from './radio-root.css.js'
  * @aliases Option, Choice
  * @documentation https://fusion.dev/helix/components/radio
  *
- * @cssproperty --radio-background-color - Fill of an unselected circle.
- * @cssproperty --radio-border-color - Edge of the circle, in every state.
- * @cssproperty --radio-card-background-color - Fill behind a card-shaped choice.
- * @cssproperty --radio-card-border-color - Edge around one.
- * @cssproperty --radio-card-padding - Inset of the card appearance.
- * @cssproperty --radio-chip-size - Diameter of the chip appearance.
- * @cssproperty --radio-mark-color - Color of the dot.
- * @cssproperty --radio-size - Diameter of the circle.
+ * @cssproperty --radio-background-color - The fill of an unselected circle.
+ * @cssproperty --radio-border-color - The border color of the circle, in every state.
+ * @cssproperty --radio-card-background-color - The fill behind a card-shaped choice.
+ * @cssproperty --radio-card-border-color - The border color of a card-shaped choice.
+ * @cssproperty --radio-card-padding - The padding inside a card-shaped choice.
+ * @cssproperty --radio-chip-size - The diameter of a chip.
+ * @cssproperty --radio-mark-color - The color of the dot.
+ * @cssproperty --radio-size - The diameter of the circle.
  */
 @customElement('helix-radio')
 export class HelixRadio extends HelixHeadlessRadio {
   static override styles: CSSResultGroup = styles
 
   /**
-   * Takes the circle away, leaving the card as the whole control.
+   * Hides the circle, so the card is the whole control.
    *
    * Unnecessary under `chip`, which has no room for a circle beside its mark
    * and hides it already.
@@ -58,7 +58,7 @@ export class HelixRadio extends HelixHeadlessRadio {
   hideControl = false
 
   /**
-   * Where the choice's own surface ends.
+   * How the choice's own surface is set apart from its surroundings.
    *
    * The question `separation` asks everywhere else, asked of one option, so it
    * is that word: what these values pick is a surface, and `plain` is already
@@ -88,8 +88,7 @@ export class HelixRadio extends HelixHeadlessRadio {
   separation?: 'filled' | 'outlined' | 'plain'
 
   /**
-   * The answer as its own small surface, for a row of short choices read at a
-   * glance.
+   * Draws the choice as a small chip, for a row of short choices.
    *
    * **Not a separation, which is why it is still `variant`.** The other values
    * pick where a surface ends around a row that keeps its circle and its words;

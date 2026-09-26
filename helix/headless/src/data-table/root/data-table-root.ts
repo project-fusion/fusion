@@ -41,7 +41,7 @@ import {
 } from './order.js'
 
 /**
- * @summary A table that owns a result: rows as data, with sort, filter and paging.
+ * @summary A table drawn from an array of rows, with sorting, filtering, and paging.
  *
  * @description
  * **The schema is markup and the data is a property.** Columns are declared as
@@ -102,57 +102,57 @@ import {
  * @aliases Grid, Result table, Data grid
  * @documentation https://fusion.dev/helix/components/data-table
  *
- * @slot - The columns, declared rather than drawn.
- * @slot footer - Below the grid, replacing the pagination this would otherwise draw.
- * @slot toolbar - Above the grid, for a search field or actions.
+ * @slot - The columns, as `TableColumn` elements.
+ * @slot footer - Content below the grid. It replaces the built-in pagination.
+ * @slot toolbar - Content above the grid, such as a search field or actions.
  *
- * @event {HelixFilterEvent} helix-filter - Fired when the query changes, and cancelable.
- * @event {HelixNavigateEvent} helix-navigate - Fired when a reader asks for another page, and cancelable.
- * @event {HelixReorderEvent} helix-reorder - Fired when a reader asks for the columns in another order, with every field in the new one, and cancelable.
- * @event {HelixSelectEvent} helix-select - Fired when a reader changes which rows are selected, with every selected key comma separated, and cancelable.
- * @event {HelixSortEvent} helix-sort - Fired when a reader asks for a different order, and cancelable.
+ * @event {HelixFilterEvent} helix-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
+ * @event {HelixNavigateEvent} helix-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
+ * @event {HelixReorderEvent} helix-reorder - The columns were moved. The event carries every field in the new order. Cancelable: cancel it to keep the current order.
+ * @event {HelixSelectEvent} helix-select - The selection changed. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
+ * @event {HelixSortEvent} helix-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
  *
- * @csspart after - The room the rows below the window would have taken. Windowed only.
- * @csspart before - The room the rows above the window would have taken. Windowed only.
+ * @csspart after - The space that stands in for the rows below the window. Only while `windowed`.
+ * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
  * @csspart cell - One cell.
- * @csspart cell-selected - A cell of a selected row, beside `cell`.
- * @csspart checkbox - A row's checkbox, or the one in the heading that selects them all.
- * @csspart checkbox-box - The frame the checkbox's input is painted as.
+ * @csspart cell-selected - Added to `cell` in a selected row.
+ * @csspart checkbox - A row's checkbox, or the checkbox in the heading that selects every row.
+ * @csspart checkbox-box - The box drawn for the checkbox's input.
  * @csspart checkbox-control - The checkbox's input.
- * @csspart checkbox-feedback - Forwarded from the checkbox, and never drawn here.
- * @csspart checkbox-field - The row the checkbox's box sits in.
- * @csspart checkbox-hint - Forwarded from the checkbox, and never drawn here.
- * @csspart checkbox-label - Forwarded from the checkbox; the label is spoken, not shown.
- * @csspart checkbox-mark - The tick, or the dash while some rows are selected.
- * @csspart checkbox-mark-checked - The mark while its box is checked, beside `checkbox-mark`.
- * @csspart checkbox-mark-indeterminate - The dash while only some rows are selected, beside `checkbox-mark`.
- * @csspart empty - Shown when the result has nothing in it, whether it arrived empty or a filter emptied it. A result still on its way is `loading` instead, which wins over this.
+ * @csspart checkbox-feedback - Forwarded from the checkbox. Not shown in the table.
+ * @csspart checkbox-field - The row that holds the checkbox's box.
+ * @csspart checkbox-hint - Forwarded from the checkbox. Not shown in the table.
+ * @csspart checkbox-label - Forwarded from the checkbox. The label is read by screen readers only.
+ * @csspart checkbox-mark - The check mark, or the dash while some rows are selected.
+ * @csspart checkbox-mark-checked - Added to `checkbox-mark` while its box is checked.
+ * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
+ * @csspart empty - Shown when there are no rows, because none arrived or the filter matches none. While rows are loading, the `loading` part is shown in its place.
  * @csspart footer - The region below the grid.
- * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
- * @csspart loading - Shown while the rows are still on their way.
- * @csspart pagination - The pagination, where this draws one.
- * @csspart pagination-first - The pagination's control that jumps to the first page, under `ends`.
- * @csspart pagination-gap - The pagination's control standing over pages not shown.
- * @csspart pagination-item - One slot in the pagination's run, holding a page or a gap.
- * @csspart pagination-last - The pagination's control that jumps to the last page, under `ends`.
- * @csspart pagination-list - The pagination's run of pages.
- * @csspart pagination-live - The region that says the page changed. Clipped, not hidden.
- * @csspart pagination-mark - The glyph on a first, previous, next or last control.
- * @csspart pagination-next - The pagination's control that moves forward one page.
- * @csspart pagination-page - The pagination's control for one page.
- * @csspart pagination-page-current - The page you are on, beside `pagination-page`.
- * @csspart pagination-previous - The pagination's control that moves back one page.
- * @csspart pagination-status - The pagination's reading of where you are, in `compact`.
+ * @csspart head - The row that holds the column headings. It is `display: contents`, so it takes no space.
+ * @csspart live - A copy of the empty and loading messages, which screen readers announce when they change. Visually hidden in the styled tier.
+ * @csspart loading - Shown while the rows are loading.
+ * @csspart pagination - The built-in pagination, when it is shown.
+ * @csspart pagination-first - The pagination's button that goes to the first page, shown with `ends`.
+ * @csspart pagination-gap - The pagination's marker for pages that are not shown.
+ * @csspart pagination-item - One item in the pagination's list, holding a page or a gap.
+ * @csspart pagination-last - The pagination's button that goes to the last page, shown with `ends`.
+ * @csspart pagination-list - The pagination's list of pages.
+ * @csspart pagination-live - The region that announces a page change. It is clipped out of sight and still read by screen readers.
+ * @csspart pagination-mark - The icon on the first, previous, next, and last buttons.
+ * @csspart pagination-next - The pagination's button that goes forward one page.
+ * @csspart pagination-page - The pagination's button for one page.
+ * @csspart pagination-page-current - Added to `pagination-page` for the current page.
+ * @csspart pagination-previous - The pagination's button that goes back one page.
+ * @csspart pagination-status - The pagination's text that says which page is shown, in `compact`.
  * @csspart row - One row of data.
- * @csspart select - The cell holding a row's checkbox.
- * @csspart select-all - The heading holding the checkbox that selects every row.
- * @csspart select-selected - The checkbox cell of a selected row, beside `select`.
+ * @csspart select - The cell that holds a row's checkbox.
+ * @csspart select-all - The heading that holds the checkbox that selects every row.
+ * @csspart select-selected - Added to `select` in a selected row.
  * @csspart table - The grid.
  * @csspart toolbar - The region above the grid.
  *
- * @cssproperty --data-table-cell-align - The edge the column a cell sits under is set to, `start`, `center` or `end`, and unset under a column that sets none. Written by the component onto each cell it draws, read by the sheet that paints one; Table publishes `--table-cell-align` for the same attribute on the cells a consumer wrote, under its own family's name.
- * @cssproperty --data-table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. A column's `width` is the one to set.
+ * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
+ * @cssproperty --data-table-template - The column track list, worked out from the columns. The component writes it inline on the element that reads it, so setting it has no effect. Set a column's `width` to change it.
  */
 @customElement('helix-headless-data-table')
 export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
@@ -172,43 +172,44 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Query to open with, where nothing declared one.
+   * The starting search query, used until `filter` is set.
    */
   @property({ attribute: 'default-filter' })
   defaultFilter = ''
 
   /**
-   * Column order to open with, where nothing declared one.
+   * The starting column order, used until `order` is set.
    */
   @property({ attribute: 'default-order' })
   defaultOrder = ''
 
   /**
-   * Page to open on, where nothing declared one.
+   * The starting page, used until `page` is set.
    */
   @property({ attribute: 'default-page', type: Number })
   defaultPage = 1
 
   /**
-   * Page size to open with, where nothing declared one.
+   * The starting page size, used until `pageSize` is set.
    */
   @property({ attribute: 'default-page-size', type: Number })
   defaultPageSize = 0
 
   /**
-   * Keys to open with selected, comma separated, where nothing declared any.
+   * The keys selected at the start, separated by commas. Used until `selected`
+   * is set.
    */
   @property({ attribute: 'default-selected' })
   defaultSelected = ''
 
   /**
-   * Order to open on, where nothing declared one.
+   * The starting sort order, used until `sort` is set.
    */
   @property({ attribute: 'default-sort' })
   defaultSort = ''
 
   /**
-   * How tall a row is taken to be before it has been drawn, in pixels.
+   * The estimated height of a row before it is drawn, in pixels.
    *
    * Only read while `windowed`, and a starting guess rather than a claim: a
    * cell that wraps makes its row taller than its neighbors, and the window
@@ -220,7 +221,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   estimate = 32
 
   /**
-   * What the rows are narrowed to, as one query across every column.
+   * The search query. A row is shown when the query matches any of its columns.
    *
    * One query rather than a predicate per column, which is what a reader means
    * by a search box above a table. It matches on each column's ordering value,
@@ -238,13 +239,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Accessible name for the grid.
+   * The grid's name, read by screen readers.
    */
   @property()
   label = ''
 
   /**
-   * Whether this element does the work or asks the consumer to.
+   * Where filtering, sorting, and paging happen. `client` does them in the
+   * table, and `server` leaves them to your code.
    *
    * `client` filters, sorts and pages `rows` itself. `server` applies none of
    * them: `rows` is the page, `total` is the size of the whole result, and the
@@ -257,7 +259,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   mode: 'client' | 'server' = 'client'
 
   /**
-   * The columns' order, as their fields separated by spaces.
+   * The column order, as field names separated by spaces.
    *
    * A reader's move fires `helix-reorder` first, and refusing it leaves the
    * columns where they were, which is how a consumer who stores the order takes
@@ -277,7 +279,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The page on show, from 1.
+   * The page shown, counting from 1.
    *
    * Clamped on the way out, so what this reports is the page it drew: a
    * bookmarked link to page 99 of a result that has since shrunk reads back as
@@ -296,7 +298,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * How many rows a page holds. Zero is every row, which is what "no paging" means.
+   * The number of rows on a page. `0` shows every row, with no paging.
    *
    * **It announces nothing, and that is not an omission.** Nothing in this
    * element ever asks for a different page size: a size selector is
@@ -316,7 +318,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Whether to draw a pagination under the grid.
+   * Shows a pagination under the grid.
    *
    * On by default once a page size is set, because a paged table with no way to
    * change pages shows a reader the first twenty rows and no way to know there
@@ -335,7 +337,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Whether a reader may move the columns.
+   * Lets users reorder the columns.
    *
    * Each heading with a `field` gets a grip, dragged along the header or moved a
    * place at a time with the arrow keys once it has focus.
@@ -344,7 +346,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   reorderable = false
 
   /**
-   * The field naming a row's stable identity.
+   * The field that identifies each row.
    *
    * **Needed before selection exists, not after.** Lit keys the rendered rows by
    * it, so a sort moves a row's element rather than rewriting every cell in
@@ -361,7 +363,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   rowKey = ''
 
   /**
-   * The whole result, in the order it arrived.
+   * Every row of the result, in the order it arrived.
    *
    * A property and not an attribute: it is an array. Left alone this element
    * filters, sorts and pages it; in `server` mode it is the page the consumer
@@ -375,7 +377,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   rows: readonly DataRow[] = []
 
   /**
-   * Whether a reader may select rows, with a column of checkboxes.
+   * Adds a column of checkboxes for selecting rows.
    *
    * Wants `row-key`: a selection is a set of identities, and without one the rows
    * are known by their place in the result, which a sort changes.
@@ -384,7 +386,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   selectable = false
 
   /**
-   * The keys of the selected rows, comma separated.
+   * The keys of the selected rows, separated by commas.
    *
    * A string rather than an array, so it is an attribute a server writes and a
    * framework's hydration keeps, and the shape a multiple Listbox already uses.
@@ -404,7 +406,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The order, as `field:direction`.
+   * The sort order, as `field:direction`.
    *
    * Set it and this element defers: a reader's click fires `helix-sort` and
    * changes nothing until a new value arrives. `default-sort` seeds an order this
@@ -422,7 +424,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * How many rows the whole result has, where this element cannot count them.
+   * The number of rows in the whole result, for when the table cannot count
+   * them.
    *
    * Only read in `server` mode, where `rows` is one page and its length says
    * nothing about the result. Ignored in `client` mode rather than trusted,
@@ -433,7 +436,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   total = 0
 
   /**
-   * Draws the rows in view and stands empty space in for the rest.
+   * Draws only the rows in view, with empty space in place of the rest.
    *
    * **Not a `mode`.** `mode` says where the rows come from and who filtered
    * them; this says how many of the ones we hold get drawn. They are
@@ -593,7 +596,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The columns in the order a reader arranged them.
+   * The columns in their current order.
    *
    * The ones with a field are put in `order`'s order, those it does not name
    * after them in the order they were written, and a column with no field stays
@@ -976,8 +979,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The result as CSV: every row the filter lets through, in the order on
-   * screen, in the columns on screen, headed by their headings.
+   * Returns the result as CSV: every row that matches the filter, in the order
+   * and columns shown, under a line of the column headings.
    *
    * **Values, not cells.** A cell may be a template, a badge or a link, so each
    * column gives its field's value, which is what a spreadsheet wants anyway.
@@ -1041,7 +1044,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Narrows the rows, from a consumer's own search field.
+   * Filters the rows by a query from your own search field.
    *
    * Public because the query lives above the table in every design that has one,
    * and a consumer wiring their own input needs somewhere to send it. Returns
@@ -1052,7 +1055,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Cycles the order by one column, which is what a click on its heading means.
+   * Cycles the sort order of one column, as a click on its heading does.
    *
    * Ascending, descending, then the order the rows arrived in. Public for the
    * same reason `search` is: a consumer's own heading UI needs a way to ask.

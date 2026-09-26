@@ -16,7 +16,7 @@ import { property, state } from 'lit/decorators.js'
 export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'
 
 /**
- * @summary A single line of text a reader types into.
+ * @summary A field for a single line of text.
  *
  * @description
  * Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the
@@ -45,20 +45,20 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @slot end - After the text, for an icon or a unit.
  * @slot start - Before the text, for an icon or a prefix.
  *
- * @event {Event} change - Relayed from the input once the reader has finished.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Sent when the user finishes changing the value. Relayed from the native input.
+ * @event {HelixBeforeChangeEvent} helix-before-change - The text is about to change. Cancelable: cancel it to keep the current text.
+ * @event {Event} input - Fired as the value changes.
  *
  * @csspart clear - The button that empties the field.
- * @csspart control - The input itself.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The box holding everything.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart label - The question, over the field.
+ * @csspart control - The native input.
+ * @csspart feedback - The message that says what is wrong with the value.
+ * @csspart field - The box around the input, its slots, and its buttons.
+ * @csspart hint - Help text under the field, shown while there is no feedback.
+ * @csspart label - The label above the field.
  * @csspart reveal - The button that shows and hides a password.
- * @csspart reveal-pressed - The reveal button while the password shows, beside `reveal`.
+ * @csspart reveal-pressed - The reveal button while the password is shown, added beside `reveal`.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-input')
 export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -75,7 +75,8 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   protected override readonly announcesInput = true
 
   /**
-   * What the browser may autofill here, as one of the platform's own tokens.
+   * What the browser may autofill in the field, as an HTML `autocomplete`
+   * token.
    *
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
@@ -84,7 +85,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   autocomplete = ''
 
   /**
-   * Whether the field offers a button that empties it.
+   * Whether the field shows a button that empties it.
    *
    * Shown only while there is something to clear, because a control that does
    * nothing is worse than no control: a reader who presses it and sees no
@@ -95,7 +96,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   clearable = false
 
   /**
-   * What the clear button is called, since an icon has no name of its own.
+   * The accessible name of the clear button, which shows only an icon.
    */
   @property({ attribute: 'clear-label' })
   clearLabel = 'Clear'
@@ -123,7 +124,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   pattern = ''
 
   /**
-   * Shown while the field is empty.
+   * The text shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
    */
@@ -131,7 +132,8 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   placeholder = ''
 
   /**
-   * Whether the field refuses input while still submitting its value.
+   * Whether the field blocks editing. A read-only field still submits its
+   * value.
    *
    * **The attribute is `readonly`, which is the platform's spelling.** A
    * camelCase property needs an explicit `attribute`, and dash-casing a word
@@ -178,7 +180,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   }
 
   /**
-   * The caret and the selection, under the platform's own names.
+   * The direction of the selection, as the native input names it.
    *
    * The `<input>` is inside this shadow root, so a consumer had no way to ask
    * where the selection is, let alone move it: `querySelector` does not cross
@@ -226,8 +228,8 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   }
 
   /**
-   * Selects a range, which is the one operation the three accessors above
-   * cannot express between them.
+   * Selects the range from `start` to `end` in one call, which setting
+   * `selectionStart` and `selectionEnd` one at a time cannot always do.
    *
    * Setting `selectionStart` past the current `selectionEnd` drags the end
    * along, so the two writes a consumer would make in sequence do not compose
@@ -314,7 +316,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
     this.refreshFeedback()
   }
 
-  /** Puts the caret in the field, the way a label pointing at one would. */
+  /** Puts the caret in the field, as clicking its label does. */
   override focus(options?: FocusOptions): void {
     this.control?.focus(options)
   }
@@ -366,7 +368,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   reveal = false
 
   /**
-   * What the reveal toggle is called.
+   * The accessible name of the reveal toggle.
    *
    * The state is `aria-pressed`, not this.
    */
@@ -374,7 +376,8 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   revealLabel = 'Show password'
 
   /**
-   * What the field accepts, which decides the keyboard and the validation.
+   * The kind of text the field accepts. It sets the on-screen keyboard and the
+   * validation.
    *
    * **Not reflected.** Reflection exists so a selector can reach a value, and
    * no stylesheet in this repository selects on `type`. Reflecting it writes

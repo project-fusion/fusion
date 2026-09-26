@@ -6,7 +6,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './drilldown-root.css.js'
 
 /**
- * @summary A stack of pages, one showing at a time, with a way back.
+ * @summary A stack of pages that shows one at a time, with a back button.
  *
  * @description
  * **The pages slide, and the direction is the point.** Both moves replace one

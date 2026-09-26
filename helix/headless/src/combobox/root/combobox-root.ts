@@ -42,7 +42,7 @@ const isInsertion = (event: Event): boolean =>
   !(event as InputEvent).inputType?.startsWith('delete')
 
 /**
- * @summary A field that filters a list as it is typed into.
+ * @summary A text field that filters a list of options as you type.
  *
  * @description
  * **The list is `Listbox`, and the filtering is its own.** It owns narrowing,
@@ -78,38 +78,38 @@ const isInsertion = (event: Event): boolean =>
  * @documentation https://fusion.dev/helix/components/combobox
  *
  * @slot - The options.
- * @slot end - After it, for a unit or a clear button.
- * @slot indicator - Replaces the caret saying the field opens.
+ * @slot end - After the text, for a unit or a clear button.
+ * @slot indicator - Replaces the caret that shows the field opens a list.
  * @slot start - Before the text, for an icon.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen option changes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixCreateEvent} helix-create - Fired when the reader asks for something the list does not hold, and cancelable.
- * @event {HelixFilterEvent} helix-filter - Fired as the reader types, carrying the text the list is being narrowed to. Cancelable: refusing it leaves the list whole, and is how a consumer takes the filtering for themselves.
- * @event {Event} input - Announced once the value has moved.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen option changes. Cancelable: cancel it to keep the current option.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the panel closes. Cancelable: cancel it to keep the panel open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens. Cancelable: cancel it to keep the panel closed.
+ * @event {HelixCreateEvent} helix-create - Fired when the user adds a value that is not in the list. Cancelable.
+ * @event {HelixFilterEvent} helix-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and do the filtering yourself.
+ * @event {Event} input - Fired after the value changes.
+ * @event {Event} toggle - Fired when the panel opens or closes, with `newState` and `oldState`.
  *
  * @csspart control - The text field itself.
  * @csspart create - The row offering to add what was typed.
- * @csspart feedback - What is wrong with it.
+ * @csspart feedback - The message that explains what is wrong with the value.
  * @csspart field - The box around the text and its marks.
- * @csspart hint - Help under the field, while nothing is wrong.
+ * @csspart hint - Help text under the field, shown while there is no error.
  * @csspart indicator - The caret.
- * @csspart label - The question, over the field.
- * @csspart listbox - The list inside it.
+ * @csspart label - The label above the field.
+ * @csspart listbox - The list inside the panel.
  * @csspart listbox-empty - Shown when a filter has hidden everything.
- * @csspart listbox-feedback - What is wrong with it.
- * @csspart listbox-filter-icon - The mark beside that field.
+ * @csspart listbox-feedback - The inner list's error message.
+ * @csspart listbox-filter-icon - The icon beside the list's filter field.
  * @csspart listbox-filter-mark - The glyph beside the filter field, where none is slotted.
  * @csspart listbox-hint - Help under the list.
- * @csspart listbox-items - The list itself.
- * @csspart listbox-label - The question, over the list.
- * @csspart listbox-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart listbox-loading - Shown while the options are still on their way.
+ * @csspart listbox-items - The element that holds the options.
+ * @csspart listbox-label - The label above the list.
+ * @csspart listbox-live - The inner list's `live` part, the region screen readers announce its empty and loading messages from.
+ * @csspart listbox-loading - Shown while the options are loading.
  * @csspart listbox-search - The region holding the field that narrows the list.
- * @csspart listbox-search-field - The field itself.
+ * @csspart listbox-search-field - The filter field inside that region.
  * @csspart rest - The count of choices held beyond `max-tags`. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart surface - The floating panel.
  * @csspart tag - One chosen option.
@@ -118,7 +118,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart tag-start - The category before the label.
  * @csspart tags - The row of chosen options, when `multiple` is set.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the list is open.
  */
 @customElement('helix-headless-combobox')
@@ -146,7 +146,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   autocomplete = 'off'
 
   /**
-   * Whether the reader may answer with something the list does not hold.
+   * Whether the user can add a value that is not in the list.
    *
    * The row appears while what is typed matches no option's words exactly, so
    * it is offered next to near misses too: a reader typing "Ruby on Rails" with
@@ -157,25 +157,25 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   creatable = false
 
   /**
-   * What the create row says, before the words it would add.
+   * The text of the create row, shown before the typed words it adds.
    */
   @property({ attribute: 'create-label' })
   createLabel = 'Add'
 
   /**
-   * Words shown where the filter has hidden everything.
+   * Text shown when the filter hides every option.
    */
   @property({ attribute: 'empty-text' })
   emptyText = 'No matches'
 
   /**
-   * Accessible name for the list, which has no visible one of its own.
+   * The list's name, read by screen readers. The list has no visible name.
    */
   @property({ attribute: 'list-label' })
   listLabel = 'Options'
 
   /**
-   * Whether the options are still on their way.
+   * Whether the options are still loading.
    *
    * Passed straight to the list, which is where the rows are and so where the
    * message belongs.
@@ -184,7 +184,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   loading = false
 
   /**
-   * What the list says while they are on their way.
+   * Text the list shows while the options load.
    */
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
@@ -218,7 +218,8 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   placeholder = ''
 
   /**
-   * What the control removing one chosen option is called, with `{name}` filled in.
+   * The name of the control that removes one chosen option, with `{name}`
+   * filled in.
    *
    * **The name goes in**, so a row of them is heard as which one each
    * removes rather than as "Remove" said once per chosen option.
@@ -227,7 +228,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   removeLabel = 'Remove {name}'
 
   /**
-   * Whether the field finishes the word as it is typed.
+   * Whether the field completes the word as the user types.
    *
    * `suggest` rather than `autocomplete`, which is a real HTML attribute this
    * element already sets on the input it renders, and two things of one name
@@ -277,7 +278,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     }
   }
 
-  /** Which kind of chooser this is, in the platform's two words. */
+  /**
+   * The control type, `select-one` or `select-multiple`, as on a native
+   * `<select>`.
+   */
   get type(): string {
     return this.multiple ? 'select-multiple' : 'select-one'
   }

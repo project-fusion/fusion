@@ -39,8 +39,8 @@ const child = (path: string, key: string): string =>
   `${path}/${key.replaceAll('~', '~0').replaceAll('/', '~1')}`
 
 /**
- * @summary A value read as a tree: collapse what you do not need, count what
- * you collapsed, copy the part you do.
+ * @summary A structured value shown as a tree, where you can close branches,
+ * see how many entries each holds, and copy any part.
  *
  * @description
  * What a developer-facing product shows constantly is a structured value: an
@@ -86,43 +86,43 @@ const child = (path: string, key: string): string =>
  *
  * @event {HelixCopyEvent} helix-copy - A value was put on the clipboard, from the copy button or the keyboard.
  *
- * @csspart after - The room the rows after the window would take, when windowed.
- * @csspart before - The room the rows before the window would take, when windowed.
+ * @csspart after - The space the rows below the drawn rows would take, when `windowed` is set.
+ * @csspart before - The space the rows above the drawn rows would take, when `windowed` is set.
  * @csspart boolean - A `true` or `false`.
  * @csspart copy - The copy button, which copies the active row.
- * @csspart copy-button - The inner button.
- * @csspart copy-mark - The clipboard glyph, and the confirmation that replaces it.
- * @csspart copy-tooltip - The bubble, forwarded from the tooltip inside.
- * @csspart copy-tooltip-arrow - The point, resting against the trigger.
- * @csspart copy-tooltip-arrow-bottom - The point while the bubble is below the copy button, so on its top edge, beside `copy-tooltip-arrow`.
- * @csspart copy-tooltip-arrow-left - The point while the bubble is left of the copy button, so on its right edge, beside `copy-tooltip-arrow`.
- * @csspart copy-tooltip-arrow-right - The point while the bubble is right of the copy button, so on its left edge, beside `copy-tooltip-arrow`.
- * @csspart copy-tooltip-arrow-top - The point while the bubble is above the copy button, so on its bottom edge, beside `copy-tooltip-arrow`.
- * @csspart copy-tooltip-bottom - The bubble while it is below the copy button, beside `copy-tooltip`.
- * @csspart copy-tooltip-left - The bubble while it is left of the copy button, beside `copy-tooltip`.
- * @csspart copy-tooltip-right - The bubble while it is right of the copy button, beside `copy-tooltip`.
- * @csspart copy-tooltip-top - The bubble while it is above the copy button, beside `copy-tooltip`.
- * @csspart count - How many entries a branch holds.
+ * @csspart copy-button - The button inside the copy control.
+ * @csspart copy-mark - The clipboard icon, and the confirmation icon that replaces it.
+ * @csspart copy-tooltip - The tooltip, forwarded from the copy button's tooltip.
+ * @csspart copy-tooltip-arrow - The tooltip's arrow, pointing at the copy button.
+ * @csspart copy-tooltip-arrow-bottom - The arrow while the tooltip is below the copy button, on the tooltip's top edge. Set alongside `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-arrow-left - The arrow while the tooltip is left of the copy button, on the tooltip's right edge. Set alongside `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-arrow-right - The arrow while the tooltip is right of the copy button, on the tooltip's left edge. Set alongside `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-arrow-top - The arrow while the tooltip is above the copy button, on the tooltip's bottom edge. Set alongside `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-bottom - The tooltip while it is below the copy button. Set alongside `copy-tooltip`.
+ * @csspart copy-tooltip-left - The tooltip while it is left of the copy button. Set alongside `copy-tooltip`.
+ * @csspart copy-tooltip-right - The tooltip while it is right of the copy button. Set alongside `copy-tooltip`.
+ * @csspart copy-tooltip-top - The tooltip while it is above the copy button. Set alongside `copy-tooltip`.
+ * @csspart count - The number of entries a branch holds.
  * @csspart frame - The tree and the copy button beside it.
- * @csspart header - The bar carrying the label, where there is one.
+ * @csspart header - The bar that holds the label, when there is one.
  * @csspart key - A property name or an array index.
  * @csspart label - The label.
  * @csspart null - A `null`.
  * @csspart number - A number.
- * @csspart row - One entry, a tree item.
- * @csspart row-active - The entry the keyboard is on, beside `row`.
+ * @csspart row - One entry, as a tree item.
+ * @csspart row-active - The entry the keyboard is on. Set alongside `row`.
  * @csspart string - A string, in quotes.
- * @csspart summary - The brackets standing for a branch's contents.
- * @csspart toggle - The caret on a branch: down when open, across when closed.
- * @csspart tree - The tree, the one thing focus lands on.
+ * @csspart summary - The brackets that stand for a branch's contents.
+ * @csspart toggle - The caret on a branch. It points down when the branch is open and sideways when it is closed.
+ * @csspart tree - The tree, which is the element that receives focus.
  *
  * @cssproperty --object-inspector-level - How deep a row is, from 0 at the root, for indenting it.
  */
 @customElement('helix-headless-object-inspector')
 export class HelixHeadlessObjectInspector extends HelixElement {
   /**
-   * What the copy control is called on a row with a key, with the key as
-   * `{name}`.
+   * The copy button's accessible name on a row with a key, with the key filled
+   * in as `{name}`.
    *
    * **Every word the inspector speaks is a property**, so a page in another
    * language hears its own rather than English around its own keys.
@@ -130,7 +130,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   @property({ attribute: 'copy-label' })
   copyLabel = 'Copy {name}'
 
-  /** What the copy control is called where there is no key, on the value itself. */
+  /** The copy button's accessible name on a row without a key, such as the root. */
   @property({ attribute: 'copy-value-label' })
   copyValueLabel = 'Copy value'
 
@@ -162,7 +162,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   label = ''
 
   /**
-   * Whether to leave the copy button off.
+   * Hides the copy button.
    *
    * Negative for the reason Code Block's is: a boolean attribute defaulting to
    * true could never be turned off from markup.
@@ -178,7 +178,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   noCopy = false
 
   /**
-   * The value itself, for a page that already holds it.
+   * The value to show, when your code already holds it as an object.
    *
    * Takes precedence over `for`. Anything JSON can say is drawn; anything else
    * is shown as its string.

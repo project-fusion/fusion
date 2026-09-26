@@ -7,7 +7,7 @@ import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.c
 import { styles } from './rating-root.css.js'
 
 /**
- * @summary A score out of a few marks, given or shown.
+ * @summary A row of marks, such as stars, for giving or showing a score.
  *
  * @description
  * Presentation only: the marks, and the clip that fills them partway.
@@ -19,21 +19,21 @@ import { styles } from './rating-root.css.js'
  * @aliases Stars, Score, Review score
  * @documentation https://fusion.dev/helix/components/rating
  *
- * @slot mark - The shape of a mark, cloned into every position. Left empty, the
- * stylesheet draws its own and `--rating-mark` swaps it.
+ * @slot mark - The shape of a mark, copied into every position. When the slot is
+ * empty, the stylesheet draws a mark, and `--rating-mark` changes its shape.
  *
  * @cssproperty --rating-color - The color of a filled mark.
- * @cssproperty --rating-empty-color - And of an unfilled one.
- * @cssproperty --rating-gap - Space between marks.
+ * @cssproperty --rating-empty-color - The color of an unfilled mark.
+ * @cssproperty --rating-gap - The space between marks.
  * @cssproperty --rating-mark - The shape of one mark, as a mask image.
- * @cssproperty --rating-size - How big one mark is.
+ * @cssproperty --rating-size - The size of one mark.
  */
 @customElement('helix-rating')
 export class HelixRating extends HelixHeadlessRating {
   static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 
   /**
-   * The geometry one mark is drawn to.
+   * The shape of each mark. `dots` draws plain circles.
    *
    * The registry's word, because the question is the registry's: `Avatar`,
    * `Skeleton`, `IconButton`, `Meter` and `Progress` each ask what geometry

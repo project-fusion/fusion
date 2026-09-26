@@ -30,25 +30,23 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://fusion.dev/helix/components/timeline
  *
  * @slot - What happened.
- * @slot marker - The mark on the line. Falls back to a dot, which is the slot's
- * own fallback content: whether a consumer slotted a mark is a question only the
- * platform can answer, and it answers it at assignment time.
- * @slot time - When it happened, as a reader should see it written.
+ * @slot marker - The mark on the line. Defaults to a dot, which is the slot's fallback
+ * content.
+ * @slot time - When it happened, written the way you want it shown.
  *
  * @csspart content - What happened, and the time above it.
- * @csspart dot - The mark drawn where nothing was slotted for one.
+ * @csspart dot - The dot drawn when no marker is slotted.
  * @csspart marker - The mark on the line.
- * @csspart rail - The column holding the mark and the line. Both halves of the
- * line are drawn on the rail, which is `::part(rail)::before` and `::after` from
- * a consumer's sheet: this tier ships no CSS, so a box it renders for one to
- * paint is an empty child costing whatever the consumer's own layout charges for
- * a child. `ListItem` measured that.
+ * @csspart rail - The column that holds the mark and the line. Draw the two halves of the
+ * line with `::part(rail)::before` and `::part(rail)::after` in your stylesheet. This
+ * tier ships no CSS and renders no extra box for the line.
  * @csspart time - When it happened.
  */
 @customElement('helix-headless-timeline-item')
 export class HelixHeadlessTimelineItem extends HelixElement {
   /**
-   * When it happened, machine-readable.
+   * When it happened, in machine-readable form. Setting it wraps the time in a
+   * `<time>` element.
    *
    * Whatever `<time>` accepts, which is a date, a time, both, a duration or a
    * week. Unset, the label is written as it was given and nothing claims to
@@ -58,7 +56,7 @@ export class HelixHeadlessTimelineItem extends HelixElement {
   datetime = ''
 
   /**
-   * What kind of event it was, which decides the mark's color and nothing else.
+   * The kind of event. It sets the color of the mark and nothing else.
    */
   @property({ reflect: true })
   tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'

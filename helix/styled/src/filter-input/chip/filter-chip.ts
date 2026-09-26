@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './filter-chip.css.js'
 
 /**
- * @summary One filter in force: a field, how it is compared, and to what.
+ * @summary One active filter: a field, a comparison, and the values it is compared to.
  *
  * @description
  * Three segments and a control, drawn so the reader's eye lands on the values.
@@ -21,9 +21,9 @@ import { styles } from './filter-chip.css.js'
  * @aliases FilterToken, FacetChip
  * @documentation https://fusion.dev/helix/components/filter-input
  *
- * @cssproperty --filter-input-chip-background-color - Fill behind the chip.
- * @cssproperty --filter-input-chip-border-color - Color of the edge.
- * @cssproperty --filter-input-chip-radius - Corner radius of the chip.
+ * @cssproperty --filter-input-chip-background-color - The fill behind the chip.
+ * @cssproperty --filter-input-chip-border-color - The color of the chip's border.
+ * @cssproperty --filter-input-chip-radius - The corner radius of the chip.
  */
 @customElement('helix-filter-chip')
 export class HelixFilterChip extends HelixHeadlessFilterChip {

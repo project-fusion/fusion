@@ -19,7 +19,7 @@ import { html } from 'lit/static-html.js'
 import '../../color-picker/index.js'
 
 /**
- * @summary A color, typed in any syntax or picked from a panel.
+ * @summary A field for a color, typed in any syntax or picked from a panel.
  *
  * @description
  * **The picker is `ColorPicker`, not a second one written here.** It owns the
@@ -54,58 +54,58 @@ import '../../color-picker/index.js'
  * @documentation https://fusion.dev/helix/components/color-input
  *
  * @slot end - Content at the trailing end, before the trigger.
- * @slot feedback - What is wrong with it.
- * @slot hint - Help under the field.
+ * @slot feedback - The message that says what is wrong with the value.
+ * @slot hint - Help text under the field.
  * @slot start - Content at the leading end of the field, inside its border.
- * @slot trigger - The mark on the field saying a panel opens.
+ * @slot trigger - The icon on the trigger, which shows that the field opens a panel.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} input - Announced once the value has moved.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {Event} change - Sent when the user finishes changing the value.
+ * @event {HelixBeforeChangeEvent} helix-before-change - The color is about to change. Cancelable: cancel it to keep the current color.
+ * @event {HelixBeforeCloseEvent} helix-before-close - The panel is about to close. Cancelable: cancel it to keep it open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - The panel is about to open. Cancelable: cancel it to keep it closed.
+ * @event {Event} input - Fired as the value changes.
+ * @event {Event} toggle - The panel opened or closed. The event carries `newState` and `oldState`.
  *
- * @csspart control - The text input carrying the value. Absent in `swatch`.
- * @csspart feedback - What is wrong with it.
+ * @csspart control - The text input that holds the value. Absent in the `swatch` variant.
+ * @csspart feedback - The message that says what is wrong with the value.
  * @csspart field - The box holding the text and the trigger.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart label - The question, over the field.
- * @csspart picker - The color picker inside it.
+ * @csspart hint - Help text under the field, shown while there is no feedback.
+ * @csspart label - The label above the field.
+ * @csspart picker - The color picker inside the panel.
  * @csspart picker-actions - The group holding the eyedropper and the syntax toggle.
- * @csspart picker-channel - One ramp.
- * @csspart picker-channel-control - The range input.
- * @csspart picker-channel-feedback - What is wrong with it.
- * @csspart picker-channel-field - The row: the control and its readout.
- * @csspart picker-channel-hint - Help under the track, while nothing is wrong.
- * @csspart picker-channel-label - The question, over the track.
- * @csspart picker-channel-marker - One mark.
+ * @csspart picker-channel - One channel slider.
+ * @csspart picker-channel-control - The range input of a channel slider.
+ * @csspart picker-channel-feedback - The error message for a channel slider.
+ * @csspart picker-channel-field - The row that holds a channel slider's control and its readout.
+ * @csspart picker-channel-hint - The help text under the track, shown while there is no error.
+ * @csspart picker-channel-label - The label above the track.
+ * @csspart picker-channel-marker - One mark on the track.
  * @csspart picker-channel-marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart picker-channel-markers - The row of marks along the track.
- * @csspart picker-channel-output - The current value, shown beside it.
- * @csspart picker-channels - The ramps beside it.
+ * @csspart picker-channel-output - The current value, shown beside the track.
+ * @csspart picker-channels - The channel sliders beside the sample.
  * @csspart picker-controls - The row under the square.
  * @csspart picker-eyedropper - The control that samples a color from the screen.
- * @csspart picker-eyedropper-button - The inner control.
+ * @csspart picker-eyedropper-button - The button inside `picker-eyedropper`.
  * @csspart picker-footer - The row holding the value and the tools.
  * @csspart picker-format - The control that changes the syntax the value is written in.
- * @csspart picker-format-button - The inner control.
+ * @csspart picker-format-button - The button inside `picker-format`.
  * @csspart picker-grid - The saturation and brightness square.
- * @csspart picker-grid-brightness - The range input for its vertical axis.
+ * @csspart picker-grid-brightness - The range input for the square's vertical axis.
  * @csspart picker-grid-handle - The mark showing where in the square the color sits.
  * @csspart picker-grid-saturation - The range input for the square's horizontal axis.
- * @csspart picker-icon - A glyph this component draws.
- * @csspart picker-sample - The chip of the current color, which copies it when pressed.
+ * @csspart picker-icon - An icon drawn by the picker.
+ * @csspart picker-sample - A chip of the current color. Pressing it copies the value.
  * @csspart picker-swatch - One preset.
  * @csspart picker-swatches - The row of presets.
- * @csspart picker-value - The color as text, which can be typed or pasted.
+ * @csspart picker-value - The text field that holds the color. It accepts a typed or pasted color.
  * @csspart preview - The chip showing the color, inside the trigger.
  * @csspart surface - The floating panel.
  * @csspart trigger - The control that opens the panel.
  *
- * @cssproperty --color-input-swatch - The chosen color, to paint over the transparency check.
+ * @cssproperty --color-input-swatch - The chosen color, painted over the checkerboard that shows transparency.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the picker is open.
  */
 @customElement('helix-headless-color-input')
@@ -139,7 +139,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   autocomplete = 'off'
 
   /**
-   * The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   * The syntax the value is written in: `hex`, `rgb`, or `hsl`.
    *
    * **Undefaulted, because it reflects.** The two together stamp an attribute
    * onto every host anybody renders, including the ones nobody configured: the
@@ -153,13 +153,13 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   format?: ColorFormat
 
   /**
-   * Whether the reader may change the format from the panel.
+   * Hides the button in the panel that changes the format.
    */
   @property({ attribute: 'no-format', type: Boolean })
   noFormat = false
 
   /**
-   * What the field says before a color is in it.
+   * The text the field shows before a color is entered.
    */
   @property()
   placeholder = '#000000'

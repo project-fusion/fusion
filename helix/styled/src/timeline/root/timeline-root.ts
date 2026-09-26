@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './timeline-root.css.js'
 
 /**
- * @summary A record of what happened, in the order it happened.
+ * @summary A list of events, in the order they happened.
  *
  * @description
  * Presentation only: the direction time runs in, and the spacing between one

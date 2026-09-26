@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './popover-root.css.js'
 
 /**
- * @summary A panel that opens against a trigger and holds anything.
+ * @summary A panel that opens next to its trigger and holds any content.
  *
  * @description
  * A surface with an inset and a shadow, and nothing about what goes in it. The
@@ -25,19 +25,19 @@ import { styles } from './popover-root.css.js'
  * @documentation https://fusion.dev/helix/components/popover
  *
  * @cssproperty --popover-border-color - Color of the panel's edge.
- * @cssproperty --popover-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
+ * @cssproperty --popover-border-width - Width of the panel's edge. Defaults to
+ *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
+ *   your theme sets a width.
  * @cssproperty --popover-inline-size - Width of the panel.
- * @cssproperty --popover-max-block-size - Tallest the panel grows before it scrolls.
+ * @cssproperty --popover-max-block-size - Maximum height of the panel before it scrolls.
  * @cssproperty --popover-padding - Space between the panel's edge and its contents.
- * @cssproperty --popover-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
- *   floating surface sits over content nobody can predict, so it keeps a lift by default.
+ * @cssproperty --popover-shadow - Shadow under the panel. Defaults to
+ *   `--helix-shadow-floating`, because the panel can sit over any content.
  */
 @customElement('helix-popover')
 export class HelixPopover extends HelixHeadlessPopover {
   /**
-   * How the panel separates itself from what it floats over.
+   * How the panel is set apart from the content under it.
    *
    * One of the axis's four values, which is all this surface has meaning for: a
    * floating panel keeps its lift by default, `ThemeIntent.separation.floating`

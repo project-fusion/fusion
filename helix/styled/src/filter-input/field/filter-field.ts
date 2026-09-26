@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './filter-field.css.js'
 
 /**
- * @summary One thing a set can be filtered by, and how.
+ * @summary A field that a filter can apply to, with its comparisons and values.
  *
  * @description
  * A declaration rather than a control: it renders nothing, and the filter input

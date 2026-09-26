@@ -55,18 +55,18 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * @aliases Item, Choice
  * @documentation https://fusion.dev/helix/components/option
  *
- * @slot - The words naming this choice.
- * @slot end - After them, for a shortcut or a count.
- * @slot start - Before the words, for an icon or an avatar.
+ * @slot - The option's label.
+ * @slot end - Content after the label, such as a shortcut or a count.
+ * @slot start - Content before the label, such as an icon or an avatar.
  *
- * @event {HelixSelectEvent} helix-select - Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - The option was chosen. Cancelable: canceling it leaves the selection as it was.
  *
- * @csspart description - The caption under the words, when there is one.
+ * @csspart description - The description under the label, when there is one.
  * @csspart item - The row.
- * @csspart item-active - The row the keyboard is on, beside `item`.
- * @csspart item-selected - The row of a chosen option, beside `item`.
- * @csspart label - The words.
- * @csspart text - The words and the caption under them, as one column.
+ * @csspart item-active - The row the keyboard is on. Set alongside `item`.
+ * @csspart item-selected - The row of a selected option. Set alongside `item`.
+ * @csspart label - The option's label.
+ * @csspart text - The label and the description under it, as one column.
  *
  * @cssstate selected - While the option is chosen.
  */
@@ -81,7 +81,8 @@ export class HelixHeadlessOption extends HelixElement {
   active = false
 
   /**
-   * A second destination for this row, taken with the modifier held.
+   * A second destination for the row, opened when you choose it with the
+   * modifier key held.
    *
    * **An attribute rather than a second row, which is the whole point.** A
    * palette that offered every component a reference page and a sandbox as
@@ -100,7 +101,7 @@ export class HelixHeadlessOption extends HelixElement {
   alternate = ''
 
   /**
-   * What the second destination is, for a reader who cannot see the footer.
+   * The name of the second destination, announced to screen reader users.
    *
    * A row with two destinations needs both said, or a screen reader is told
    * about one of them and the other is a key nobody mentioned. It goes to
@@ -112,7 +113,7 @@ export class HelixHeadlessOption extends HelixElement {
   alternateLabel = ''
 
   /**
-   * Whether the markup declared this one chosen, which is what a reset returns to.
+   * Whether the markup declares this option selected. A form reset returns to it.
    *
    * `<option selected>` reflects to `defaultSelected` and `option.selected` is
    * live state that does not reflect, and those are two different facts. This
@@ -147,7 +148,7 @@ export class HelixHeadlessOption extends HelixElement {
   }
 
   /**
-   * A second line under the words, for what the choice actually is.
+   * A second line under the label that describes the choice.
    *
    * A palette row reads better as a name and a caption than as one sentence
    * carrying both: "Helix" and "the design system" are two facts, and a comma
@@ -171,7 +172,7 @@ export class HelixHeadlessOption extends HelixElement {
   description?: string
 
   /**
-   * Whether this choice can be made.
+   * Prevents the option from being chosen.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
@@ -196,13 +197,13 @@ export class HelixHeadlessOption extends HelixElement {
   selected = false
 
   /**
-   * Identifies this choice, and is what a form submits.
+   * The value that identifies the option, and that a form submits.
    */
   @property()
   value = ''
 
   /**
-   * The words, for a listbox that has to match text against them.
+   * The option's text, which a listbox matches typed text against.
    *
    * Read from the rendered content rather than required as a property, because
    * the content is where a consumer naturally puts it and asking for both is
@@ -249,7 +250,7 @@ export class HelixHeadlessOption extends HelixElement {
       .trim()
   }
 
-  /** Makes this choice and announces it. */
+  /** Sends `helix-select` for this option. Does nothing when it is disabled. */
   select(): void {
     if (this.disabled) {
       return

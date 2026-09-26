@@ -39,15 +39,16 @@ import { styles } from './card-root.css.js'
  * @cssproperty --card-background-color - Surface behind the card.
  * @cssproperty --card-border-color - Border color of the surface.
  * @cssproperty --card-border-width - Width of the surface's edge. Follows
- *   `--helix-border-surface`, a hairline, so the surface is told apart by its edge unless a
- *   theme says otherwise.
+ *   `--helix-border-surface`, which is a hairline unless your theme sets another width.
+ *   The edge is what sets the surface apart.
  * @cssproperty --card-media-block-size - Height of the media region. Defaults to
- *   `auto`, which is an image's own shape and is not a height a chart has.
+ *   `auto`, which follows an image's own proportions. A chart has no height of its own,
+ *   so set one here for a chart.
  * @cssproperty --card-media-size - Width of the media column when horizontal.
  * @cssproperty --card-padding - Inset applied to each region.
  * @cssproperty --card-radius - Corner radius of the surface.
- * @cssproperty --card-shadow - Shadow under the surface. What `elevated` sets, and what a
- *   `data-card` link raises on hover.
+ * @cssproperty --card-shadow - Shadow under the surface. `elevated` sets it, and a
+ *   `data-card` link raises it on hover.
  */
 @customElement('helix-card')
 export class HelixCard extends HelixHeadlessCard {

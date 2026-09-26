@@ -11,7 +11,7 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
- * @summary Where the reader writes their turn.
+ * @summary A field for writing a turn in a conversation.
  *
  * @description
  * **A separate element because it is separately replaceable.** A consumer with
@@ -34,35 +34,35 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases Message box, Prompt input
  * @documentation https://fusion.dev/helix/components/chat
  *
- * @slot end - Under the field, beside the send control.
- * @slot start - Under the field, at the leading edge: attachments, a model picker.
+ * @slot end - Content under the field, beside the send button.
+ * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
- * @event {HelixSendEvent} helix-send - Fired when the reader offers their turn, and cancelable.
+ * @event {HelixSendEvent} helix-send - Fired when the user sends their turn, and cancelable.
  *
  * @csspart composer - The whole composer.
- * @csspart end - The trailing slot's box.
+ * @csspart end - The box around the `end` slot.
  * @csspart field - The text field.
- * @csspart mark - The glyph inside the send control.
- * @csspart send - The control that offers the turn.
- * @csspart start - The leading slot's box.
+ * @csspart mark - The icon inside the send button.
+ * @csspart send - The send button.
+ * @csspart start - The box around the `start` slot.
  * @csspart tools - The row under the field.
  */
 @customElement('helix-headless-chat-composer')
 export class HelixHeadlessChatComposer extends HelixElement {
   /**
-   * Whether the composer refuses input, while a turn is in flight say.
+   * Whether the composer blocks input, such as while a turn is being sent.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
   /**
-   * Accessible name for the field.
+   * The field's name, read by screen readers.
    */
   @property()
   label = 'Message'
 
   /**
-   * Shown in an empty field.
+   * Placeholder text shown in an empty field.
    */
   @property()
   placeholder = ''
@@ -76,13 +76,14 @@ export class HelixHeadlessChatComposer extends HelixElement {
   rows = 1
 
   /**
-   * Label for the control that sends.
+   * Label for the send button.
    */
   @property({ attribute: 'send-label' })
   sendLabel = 'Send'
 
   /**
-   * What sends: pressing Enter, or only the control.
+   * What sends the turn: `enter` for the Enter key, or `button` for the send
+   * button only.
    *
    * `enter` is the messaging convention and makes Shift+Enter the line break.
    * `button` is what a composer holding several paragraphs wants, where Enter
@@ -92,7 +93,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
   submitOn: 'button' | 'enter' = 'enter'
 
   /**
-   * What the reader has written.
+   * The text the user has written.
    *
    * Read it, or set it to seed a draft.
    */
@@ -113,7 +114,7 @@ export class HelixHeadlessChatComposer extends HelixElement {
   }
 
   /**
-   * Offers what is written, and reports whether it stood.
+   * Sends what is written, and returns whether the send went through.
    *
    * Public because a consumer's own send control is as likely to ask as this
    * element's is, and because a keyboard shortcut somewhere else on the page is

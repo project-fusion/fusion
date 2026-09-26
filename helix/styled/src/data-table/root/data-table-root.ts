@@ -9,7 +9,7 @@ import '../../pagination/index.js'
 import '../../table/index.js'
 
 /**
- * @summary A table that owns a result: rows as data, with sort, filter and paging.
+ * @summary A table drawn from an array of rows, with sorting, filtering, and paging.
  *
  * @description
  * Hairline rules between rows and no fill, per the rule that depth comes from a
@@ -34,34 +34,29 @@ import '../../table/index.js'
  * @category data
  * @documentation https://fusion.dev/helix/components/data-table
  *
- * @slot - The columns, declared rather than drawn.
- * @slot footer - Below the grid, replacing the pagination this would otherwise draw.
- * @slot toolbar - Above the grid, for a search field or actions.
+ * @slot - The columns, as `TableColumn` elements.
+ * @slot footer - Content below the grid. It replaces the built-in pagination.
+ * @slot toolbar - Content above the grid, such as a search field or actions.
  *
  * @csspart cell - One cell.
- * @csspart cell-selected - A cell of a selected row, beside `cell`.
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
+ * @csspart cell-selected - Added to `cell` in a selected row.
+ * @csspart live - A copy of the empty and loading messages, which screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart table - The grid.
  *
- * @cssproperty --data-table-block-size - How tall the scrolling box is while `windowed`.
- * Ignored otherwise, where the grid is as tall as its rows. A definite height rather than a
- * maximum, so a short result under `windowed` keeps the full box with space below it: a
- * maximum would leave the height a function of the rows drawn, and the rows drawn a function
- * of the height, which is the loop the window controller has to guard against rather than
- * one worth entering on purpose.
- * @cssproperty --data-table-color - Ink in a cell.
- * @cssproperty --data-table-columns - Track list for the columns, which wins over the one the columns worked out.
- * @cssproperty --data-table-heading-background-color - Fill behind a heading while `windowed`.
- * Opaque on purpose: rows scroll under a sticky heading and a transparent one lets them
- * through. Unset otherwise, so the headings stay weight rather than a band.
- * @cssproperty --data-table-heading-color - Ink in a heading.
- * @cssproperty --data-table-padding-block - Space above and below a cell's content.
- * @cssproperty --data-table-padding-inline - Space either side of a cell's content.
- * @cssproperty --data-table-rule-color - Color of the hairline between rows. A color
- * and not a border: it lands in the color slot of a shorthand, so a whole border
- * written into it produces invalid CSS and drops the rule. Drawn on the cells rather
- * than the row, which is `display: contents` and measures `0px`.
- * @cssproperty --data-table-text - Type size, headings and cells alike.
+ * @cssproperty --data-table-block-size - The height of the scrolling box while `windowed`.
+ * Ignored otherwise, where the grid is as tall as its rows. It is a fixed height, so a
+ * short result keeps the full box with space below it.
+ * @cssproperty --data-table-color - The text color of a cell.
+ * @cssproperty --data-table-columns - The grid track list for the columns. It overrides the list worked out from the columns.
+ * @cssproperty --data-table-heading-background-color - The fill behind a heading while `windowed`.
+ * It is opaque, because rows scroll under the sticky heading. Unset otherwise.
+ * @cssproperty --data-table-heading-color - The text color of a heading.
+ * @cssproperty --data-table-padding-block - The space above and below a cell's content.
+ * @cssproperty --data-table-padding-inline - The space on either side of a cell's content.
+ * @cssproperty --data-table-rule-color - The color of the line between rows. It takes a
+ * color only, because it fills the color in a border shorthand, and a full border value
+ * makes the rule invalid. It is drawn on the cells, because the row is `display: contents`.
+ * @cssproperty --data-table-text - The font size of headings and cells.
  */
 @customElement('helix-data-table')
 export class HelixDataTable extends HelixHeadlessDataTable {

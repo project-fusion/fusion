@@ -27,28 +27,26 @@ import { property } from 'lit/decorators.js'
  * @aliases Option, Choice
  * @documentation https://fusion.dev/helix/components/radio
  *
- * @slot - The words naming this choice.
- * @slot icon - A mark shown beside them, or instead of them under
- * `variant="chip"`, where the words become the accessible name and the mark
- * is what a reader picks between. Separate from the default slot because the
- * chip has to hide one and show the other, and they are both in the same place
- * otherwise.
+ * @slot - The radio's label.
+ * @slot icon - An icon shown beside the label. With `variant="chip"`, the icon
+ * replaces the visible label, and the label becomes the name read by screen
+ * readers. The icon has its own slot so the chip can hide the label and show
+ * the icon.
  *
- * @event {HelixSelectEvent} helix-select - Fired when this choice is made. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when the radio is chosen. Cancelable: call `preventDefault()` to keep the current choice.
  *
- * @csspart box - The circle. The dot inside it is drawn on the box itself,
- * which is `::part(box)::after` from a consumer's sheet: this tier ships no CSS,
- * so a box it renders for one to paint is an empty child costing whatever the
- * consumer's own layout charges for a child. `ListItem` measured that.
- * @csspart item - The button, which is the whole row.
- * @csspart label - The words beside it.
+ * @csspart box - The circle. Draw the dot inside it with `::part(box)::after` in
+ * your stylesheet. This tier ships no CSS, so it renders no separate element for
+ * the dot, which would add an empty child to your layout.
+ * @csspart item - The button, which covers the whole row.
+ * @csspart label - The label beside the circle.
  *
- * @cssstate selected - While it is the one chosen.
+ * @cssstate selected - The radio is chosen.
  */
 @customElement('helix-headless-radio')
 export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
   /**
-   * Whether the markup declared this one chosen, which is what a reset returns to.
+   * Whether the markup declares the radio chosen. A form reset returns to it.
    *
    * `<option selected>` reflects to `defaultSelected` and `option.selected` is
    * live state that does not reflect, and those are two different facts. This
@@ -83,7 +81,7 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
   }
 
   /**
-   * Whether this choice holds the group's tab stop while nothing is chosen.
+   * Whether the radio holds the group's tab stop while nothing is chosen.
    *
    * The stop rides on the selection, and an unanswered group has no selection,
    * so without this every choice is `tabindex="-1"` and the keyboard cannot
