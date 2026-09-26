@@ -199,6 +199,28 @@ if (hasLayout()) {
       expect(host.open).toBe(false)
     })
 
+    test('the same command chosen twice runs twice, the list keeping no answer between', async () => {
+      const host = await palette()
+      const heard: string[] = []
+      host.addEventListener('helix-select', (event) =>
+        heard.push((event as CustomEvent<{ value: string }>).detail.value),
+      )
+      const choose = async (): Promise<void> => {
+        press('k', { metaKey: true })
+        await settle(host)
+        ;(
+          host.querySelector('helix-headless-option[value="open"]') as HTMLElement & {
+            select: () => void
+          }
+        ).select()
+        await settle(host)
+      }
+      await choose()
+      await choose()
+      expect(heard).toEqual(['open', 'open'])
+      expect(host.open).toBe(false)
+    })
+
     test('a refused choice leaves it open and runs nothing', async () => {
       const host = await palette()
       press('k', { metaKey: true })
