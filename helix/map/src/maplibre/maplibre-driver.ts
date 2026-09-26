@@ -5,7 +5,13 @@ import type { MapMotion } from '../motion/motion.js'
 interface GeoJson {
   features: {
     geometry: { coordinates: unknown; type: 'LineString' | 'Polygon' }
-    properties: { casing?: string; color: string; kind: 'area' | 'route'; label: string }
+    properties: {
+      casing?: string
+      color: string
+      faded?: boolean
+      kind: 'area' | 'route'
+      label: string
+    }
     type: 'Feature'
   }[]
   type: 'FeatureCollection'
@@ -54,6 +60,7 @@ export const LAYERS: MapLibreLayer[] = [
     layout: { 'line-cap': 'round', 'line-join': 'round' },
     paint: {
       'line-color': ['get', 'casing'],
+      'line-opacity': ['case', ['boolean', ['get', 'faded'], false], 0.4, 1],
       'line-width': ['interpolate', ['linear'], ['zoom'], 4, 5.5, 14, 9],
     },
     source: SOURCE,
@@ -63,8 +70,10 @@ export const LAYERS: MapLibreLayer[] = [
     filter: ['==', ['get', 'kind'], 'route'],
     id: 'helix-routes',
     layout: { 'line-cap': 'round', 'line-join': 'round' },
+    /* The part of a route already traveled, quieter than the part ahead. */
     paint: {
       'line-color': ['get', 'color'],
+      'line-opacity': ['case', ['boolean', ['get', 'faded'], false], 0.4, 1],
       'line-width': ['interpolate', ['linear'], ['zoom'], 4, 2.5, 14, 5],
     },
     source: SOURCE,
@@ -84,6 +93,7 @@ export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
       properties: {
         ...(layer.casing ? { casing: layer.casing } : {}),
         color: layer.color,
+        ...(layer.faded ? { faded: true } : {}),
         kind: layer.kind,
         label: layer.label,
       },

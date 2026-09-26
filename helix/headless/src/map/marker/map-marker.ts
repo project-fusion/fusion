@@ -29,11 +29,14 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Map pin, Place, Point of interest
  * @documentation https://fusion.dev/helix/components/map
  *
+ * @slot icon - What the point holds: a letter, a number or an icon, such as the order of a stop. Seen, not read: the marker's name is its label.
+ *
  * @csspart label - The place's name, beside the point.
  * @csspart marker - The button a reader presses, holding the point and the name.
- * @csspart point - The dot that stands on the place.
+ * @csspart point - The dot that stands on the place, and holds its `icon` where it has one.
  *
  * @cssstate current - While this is the marker the map's tab stop is on.
+ * @cssstate icon - While something is slotted into the point, which the point grows to hold.
  * @cssstate start - While the name sits before the point in reading order, turned there by the connector because the other side of the view had no room for it.
  */
 @customElement('helix-headless-map-marker')
@@ -87,6 +90,12 @@ export class HelixHeadlessMapMarker extends HelixElement {
     super.willUpdate(changed)
     this.toggleState('current', this.current)
     this.toggleState('start', this.side === 'start')
+    if (this.childrenKnown) {
+      this.toggleState(
+        'icon',
+        this.knownChildren.some((child) => child.slot === 'icon'),
+      )
+    }
   }
 
   /**
@@ -108,7 +117,7 @@ export class HelixHeadlessMapMarker extends HelixElement {
        one set of words, read and seen, and a stylesheet that hides the label
        until the marker is pointed at must hide it by opacity for that reason. */
     return html`<span part="marker" role="button" tabindex=${this.current ? '0' : '-1'}>
-      <span part="point" aria-hidden="true"></span>
+      <span part="point" aria-hidden="true"><slot name="icon" @slotchange=${() => this.requestUpdate()}></slot></span>
       <span part="label">${this.label ?? ''}</span>
     </span>`
   }
