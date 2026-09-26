@@ -9,17 +9,18 @@ import styles from './proof-band.module.css'
 export const ProofBand = () => (
   <Band>
     <helix-flex class={band.bandSection} direction="column" gap="sm">
-      <Eyebrow>Measured, not claimed</Eyebrow>
+      <Eyebrow>Package size</Eyebrow>
       {/* **Not "fast" and not "small".** Both are adjectives a reader has been
           promised by every library they have ever evaluated, and neither is
           checkable. The kicker above carries the epistemics, so this heading
           names the subject rather than restating where the numbers came
           from. */}
       <helix-text as="h2" data-measure data-section-title>
-        What Helix costs a page
+        How much Helix adds to a page
       </helix-text>
       <helix-text as="p" data-measure emphasis="muted">
-        Generated from the built packages on every release. Brotli, which is what a CDN serves.
+        Measured from the built packages on every release, compressed with Brotli as a CDN serves
+        them.
       </helix-text>
     </helix-flex>
 
@@ -92,7 +93,7 @@ export const ProofBand = () => (
 
       <helix-flex class="siteActions" data-density="lg">
         <a data-button="subtle" href={METRICS_HREF}>
-          The method
+          See how we measure
         </a>
       </helix-flex>
     </helix-flex>
