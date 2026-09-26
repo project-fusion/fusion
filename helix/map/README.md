@@ -85,8 +85,16 @@ Asked again every time the view moves, so a cluster comes apart as the map
 zooms in. The walk and the tab stop go to the cluster rather than the places
 hidden in it, and pressing one sends `helix-map-cluster` from its marker with
 their names, which the connector answers by framing them; a page that lists
-them in a panel instead connects with `clusterZoom: false`. Places at the very same point never come apart, which is a
-list's job rather than a zoom's.
+them in a panel instead connects with `clusterZoom: false`.
+
+**Places no zoom draws apart fan out instead**: a cluster whose places all lie
+within two meters, the same door or one building's addresses, stands them in
+a ring round their spot when pressed, a spiral for more than eight, each with a
+leg back to a dot on the spot itself. They are markers like any other while
+fanned, walked by the arrow keys with the focus on the one pressed; Escape
+folds them back with the focus on the cluster, as does a press elsewhere on
+the map or a zoom, and a pan carries them with the map. So does every cluster
+on a driver without `fit`.
 
 ## Routes and areas
 
