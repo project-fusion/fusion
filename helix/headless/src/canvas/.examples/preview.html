@@ -5,14 +5,14 @@
   rel="stylesheet"
 />
 
-<helix-headless-canvas label="How a release happens">
+<helix-headless-canvas label="Document approval">
   <helix-headless-canvas-node
     height="64"
     name="write"
     width="160"
     x="0"
     y="0"
-  >Write the change</helix-headless-canvas-node>
+  >Write the draft</helix-headless-canvas-node>
 
   <helix-headless-canvas-node
     height="64"
@@ -20,7 +20,7 @@
     width="160"
     x="320"
     y="0"
-  >Review it</helix-headless-canvas-node>
+  >Review the draft</helix-headless-canvas-node>
 
   <helix-headless-canvas-node
     height="64"
@@ -28,11 +28,11 @@
     width="160"
     x="160"
     y="192"
-  >Tag and publish</helix-headless-canvas-node>
+  >Publish the draft</helix-headless-canvas-node>
 
   <helix-headless-canvas-edge
     from="write"
-    label="when it builds"
+    label="when it is complete"
     to="review"
   ></helix-headless-canvas-edge>
 

@@ -3,8 +3,8 @@ import './preview.css'
 
 const AGO = 42 * 60_000
 
-/* Pinned for the reason the styled twin records: only `elapsed` can be computed
-   without the picture moving, because it is always the same distance from now. */
+/* The dates are fixed and name a `time-zone`, so they look the same wherever
+   the preview renders. */
 const FIXED = '2026-03-14T15:09:00.000Z'
 
 export function Example() {

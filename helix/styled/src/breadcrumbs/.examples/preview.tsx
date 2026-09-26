@@ -14,10 +14,10 @@ export function Example() {
           data-link="quiet"
           href="#section"
         >
-          Section
+          Projects
         </a>
       </helix-breadcrumb>
-      <helix-breadcrumb current>Current Page</helix-breadcrumb>
+      <helix-breadcrumb current>Website redesign</helix-breadcrumb>
     </helix-breadcrumbs>
   )
 }

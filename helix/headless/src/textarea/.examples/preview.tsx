@@ -3,9 +3,9 @@ import './preview.css'
 export function Example() {
   return (
     <helix-headless-textarea
-      hint="Hint"
-      label="Label"
-      placeholder="Placeholder"
+      hint="Shown to everyone on the project"
+      label="Project description"
+      placeholder="What is the project about?"
     ></helix-headless-textarea>
   )
 }

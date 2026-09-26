@@ -4,8 +4,8 @@ export function Example() {
   return (
     <helix-headless-slider
       default-value="40"
-      hint="Hint"
-      label="Label"
+      hint="Applies to notification sounds"
+      label="Volume"
       show-value
     ></helix-headless-slider>
   )

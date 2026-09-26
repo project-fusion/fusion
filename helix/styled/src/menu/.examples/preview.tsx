@@ -1,24 +1,24 @@
 export function Example() {
   return (
-    <helix-menu label="Menu">
-      <helix-button slot="trigger">Menu</helix-button>
+    <helix-menu label="View options">
+      <helix-button slot="trigger">View options</helix-button>
 
       <helix-menu-item value="one">
-        Item One
+        Sort by
         <helix-menu-item
           checkable
           checked
           slot="submenu"
           value="one-a"
         >
-          Option One
+          Name
         </helix-menu-item>
         <helix-menu-item
           checkable
           slot="submenu"
           value="one-b"
         >
-          Option Two
+          Date modified
         </helix-menu-item>
       </helix-menu-item>
 
@@ -29,13 +29,13 @@ export function Example() {
         checked
         value="two"
       >
-        Item Two
+        Show hidden files
       </helix-menu-item>
       <helix-menu-item
         checkable
         value="three"
       >
-        Item Three
+        Show file extensions
       </helix-menu-item>
     </helix-menu>
   )

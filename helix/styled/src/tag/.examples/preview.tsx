@@ -1,3 +1,3 @@
 export function Example() {
-  return <helix-tag tone="success">Label</helix-tag>
+  return <helix-tag tone="success">Complete</helix-tag>
 }

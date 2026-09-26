@@ -21,14 +21,14 @@ export function Example() {
             aria-current="page"
             href="#one"
           >
-            Item One
+            Overview
           </a>
-          <a href="#two">Item Two</a>
+          <a href="#two">Projects</a>
         </helix-navigation>
       </helix-app-header>
 
       <main id="main">
-        <helix-text as="p">The content a keyboard reader came for.</helix-text>
+        <helix-text as="p">Welcome back. You have 3 new messages.</helix-text>
       </main>
     </>
   )

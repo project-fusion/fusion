@@ -2,7 +2,7 @@ import './preview.css'
 
 export function Example() {
   return (
-    <helix-headless-canvas label="How a release happens">
+    <helix-headless-canvas label="Document approval">
       <helix-headless-canvas-node
         height={64}
         name="write"
@@ -10,7 +10,7 @@ export function Example() {
         x={0}
         y={0}
       >
-        Write the change
+        Write the draft
       </helix-headless-canvas-node>
 
       <helix-headless-canvas-node
@@ -20,7 +20,7 @@ export function Example() {
         x={320}
         y={0}
       >
-        Review it
+        Review the draft
       </helix-headless-canvas-node>
 
       <helix-headless-canvas-node
@@ -30,12 +30,12 @@ export function Example() {
         x={160}
         y={192}
       >
-        Tag and publish
+        Publish the draft
       </helix-headless-canvas-node>
 
       <helix-headless-canvas-edge
         from="write"
-        label="when it builds"
+        label="when it is complete"
         to="review"
       ></helix-headless-canvas-edge>
 

@@ -3,9 +3,9 @@ import './preview.css'
 export function Example() {
   return (
     <helix-headless-input
-      hint="Hint"
-      label="Label"
-      placeholder="Placeholder"
+      hint="Visible to your team"
+      label="Project name"
+      placeholder="Website redesign"
     ></helix-headless-input>
   )
 }

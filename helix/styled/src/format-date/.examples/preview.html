@@ -46,17 +46,9 @@
 </helix-flex>
 
 <script>
-  /* **Only the elapsed reading is computed, and that is what makes this stable.**
-     A literal instant would make it read "Mar 2026" rather than "42m", which is
-     the whole point of `elapsed`, so it is still set from script. Being always
-     42 minutes ago, it always renders `42m`, so the picture never moves.
-
-     The three absolute readings are the opposite case: they are pinned, because
-     `Time:` re-rendered every minute and its baseline went stale within minutes
-     of being taken. Measured on the first retake, 42 and 45 pixels on the
-     headless tier and 182 and 192 on the styled one, against pictures that were
-     minutes old. `time-zone` is stated with them so the picture is the same
-     picture wherever it is rendered, rather than only on a UTC runner. */
+  /* The elapsed time is set from script to 42 minutes ago, so it always reads
+     "42m". The other dates are fixed and name a `time-zone`, so they look the
+     same wherever the preview renders. */
   const at = new Date(Date.now() - 42 * 60_000).toISOString()
   for (const stamp of document.querySelectorAll('.stamp')) {
     stamp.date = at

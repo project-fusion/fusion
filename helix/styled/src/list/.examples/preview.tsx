@@ -2,23 +2,23 @@ export function Example() {
   return (
     <helix-list
       divided
-      label="Label"
+      label="Recent files"
     >
       <helix-list-item>
         <helix-icon
           name="cube"
           slot="start"
         ></helix-icon>
-        Item One
-        <span slot="description">Caption</span>
+        Quarterly report
+        <span slot="description">Edited today</span>
       </helix-list-item>
       <helix-list-item>
         <helix-icon
           name="cube"
           slot="start"
         ></helix-icon>
-        Item Two
-        <span slot="description">Caption</span>
+        Team handbook
+        <span slot="description">Edited 3 days ago</span>
       </helix-list-item>
     </helix-list>
   )

@@ -5,7 +5,7 @@ export function Example() {
       gap="md"
     >
       <helix-avatar name="Jane Doe"></helix-avatar>
-      <helix-text variant="body">Item One</helix-text>
+      <helix-text variant="body">Jane Doe</helix-text>
     </helix-flex>
   )
 }
