@@ -1,0 +1,208 @@
+---
+description: A frame for somebody else's map, the places and lines inside it, and the connector that draws them in your theme.
+section: Essentials
+title: Maps
+---
+
+# Maps
+
+Helix draws no tiles. `Map` is the frame around a map a renderer draws, MapLibre
+or Leaflet or one of your own: a named region, pan and zoom as buttons, and the
+tiles' credit. What a map holds, its places, routes, areas, a live position and
+data, are elements you write inside that frame. `@fusion.dev/helix-map` is the
+connector between the two, and a style made from your tokens.
+
+## Connecting a renderer
+
+```sh
+bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl
+```
+
+```html
+<helix-map label="Our stores">
+  <div id="map"></div>
+  <helix-map-marker label="Flagship" lat="30.2672" lng="-97.7431"></helix-map-marker>
+</helix-map>
+```
+
+```js
+import '@fusion.dev/helix'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { colorsReady, connectMap } from '@fusion.dev/helix-map'
+import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
+import maplibregl from 'maplibre-gl'
+
+const frame = document.querySelector('helix-map')
+const style = (colors) => mapLibreStyle(colors)
+const map = new maplibregl.Map({
+  attributionControl: false,
+  container: 'map',
+  style: style(await colorsReady(frame)),
+})
+
+const connection = connectMap(frame, mapLibreDriver(map))
+connection.fit({ animate: false })
+followTheme(map, frame, style)
+```
+
+**`connectMap` does everything that is the same for every renderer.** The
+frame's pan and zoom answer through the renderer, over your theme's motion
+tokens and at once where the reader asked for less motion. The renderer's own
+keyboard handler is turned off and its canvas taken out of the tab order, so a
+reader meets one named stop and one set of keys. Its zoom buttons give way to
+the frame's, and its credit moves into the frame's `attribution` slot as text
+and links. `fit()` frames every place the map holds. `disconnect()` puts back
+everything it changed.
+
+**Neither renderer is a dependency.** `mapLibreDriver(map)` takes MapLibre GL
+JS 5 and `leafletDriver(map, L)` takes Leaflet 1.9, typed by the calls they make
+on it, so you bring whichever version you have. Leaflet draws routes, areas and
+points only where you hand it `L`, since the connector imports no renderer.
+
+## A style from your tokens
+
+`mapLibreStyle(colors)` writes a MapLibre style from five tokens read where the
+map is: `surface` is the land, and everything else is the land moved toward
+something. Water leans toward `info`, parks toward `success`, and the major
+roads toward `primary`. The smaller roads, buildings, borders and labels lean
+toward `foreground`. One call draws a light map on a light theme and a dark map
+on a dark one.
+
+**Every label clears a contrast target** against the land it is haloed in, 4.5
+unless you pass `contrast`, so a theme whose ink is already gray still gets
+legible place names. `language` picks which name a place is labeled with, and
+`tiles` and `glyphs` point the style at your own tile server.
+
+**`followTheme` keeps the map in the theme.** A mode, a class or an inline token
+changed on the frame or anything above it, or the reader's light or dark
+preference changing, restyles the map by a diff, once a frame, and only where
+the style it builds differs. Where your page restyles some other way, such as
+replacing a stylesheet, call `update()` on what it returns. `colorsReady` waits
+out the frame or two a stylesheet can lag behind the page. Where the tokens
+never arrive, it names the one that is missing.
+
+## What a map holds
+
+| Element | What it is |
+|---|---|
+| `helix-map-marker` | A named place: a button on its point, walked by the keyboard |
+| `helix-map-route` | A line the renderer draws under its place names |
+| `helix-map-area` | A shape the renderer fills |
+| `helix-map-position` | Something moving: a point or an arrow, with a ring as wide as its accuracy |
+| `helix-map-points` | Thousands of places as one layer, from GeoJSON |
+
+Each takes `tone`, so its color comes from the same tokens as the rest of the
+page and follows the theme with the map.
+
+### Markers
+
+```html
+<helix-map-marker label="Texas Capitol" lat="30.2747" lng="-97.7405" shape="ring">
+  <span slot="icon">B</span>
+</helix-map-marker>
+```
+
+A marker is a button named by its `label`, standing on its place. Its name shows
+on hover and focus, turning to the other side of the point near the edge of the
+view. The `icon` slot holds a letter, a number or an icon, and `shape` sets the
+point's form: `ring`, `rounded`, `square`, `diamond`, or `pin` for where a
+journey ends. Pressing one sends `helix-activate` from the frame with its `name`,
+or its `label` where it has none.
+
+**A place already passed takes `passed`**, which your page sets, since only it
+knows where its traveler is. The point turns to the muted ink, and the name says
+so too, `passed` by default and `passed-label` to change it.
+
+### Clusters
+
+Put `cluster` on the frame and markers whose points would draw over each other
+gather into one, drawn as their count and named by their names. It is asked
+again as the view moves, so a cluster comes apart as the map zooms in. Pressing
+one zooms in to its places. **Places no zoom can draw apart**, such as two
+businesses at one address, fan out around their spot instead, and Escape folds
+them back. Connect with `clusterZoom: false` to answer `helix-map-cluster`
+yourself, by listing the places in a panel, for example.
+
+### Routes and areas
+
+```html
+<helix-map-route
+  label="Depot to Mission"
+  description="4.2 km"
+  points="37.7955,-122.3937 37.7644,-122.427"
+  progress="0.4"
+></helix-map-route>
+```
+
+`points` are `lat,lng` pairs, in the order a marker's own coordinates read. A
+route draws the path it is given, straight between each pair, so a path along
+roads comes from a routing engine and a page passes its geometry. `progress`
+draws the part already traveled quieter, and `variant="dotted"` draws the last
+steps off the road network. To move something along a route and dim it behind,
+measure with `distancesAlong`, the measure the connector cuts a route with.
+
+### A live position
+
+```html
+<helix-map-position
+  label="Van 12"
+  lat="37.78"
+  lng="-122.41"
+  heading="90"
+  accuracy="30"
+  description="Two stops away"
+></helix-map-position>
+```
+
+Set `lat`, `lng` and `heading` as it moves. It moves in silence: what a screen
+reader hears is its `description`, at most once every `announce-every`
+milliseconds, so a step is not news and two stops away is. Its heading is drawn
+against the view, so it still points the way it is going on a map the renderer
+has turned.
+
+### Thousands of points
+
+```html
+<helix-map-points label="Food and drink" src="/places.geojson" cluster></helix-map-points>
+```
+
+A marker is an element, and the cafés in a city are thousands. A points layer is
+one layer the renderer draws, from a GeoJSON file in `src` or data a script sets
+as `data`. With `cluster`, MapLibre gathers them into counts, and pressing a
+count zooms in to it. Pressing a point sends `helix-activate` from the layer
+with its id, or the property `name-key` names. Leaflet draws every point,
+unclustered, which suits hundreds but not thousands.
+
+## Keyboard and screen readers
+
+- **The frame is a named region and one tab stop.** The arrow keys pan and
+  plus and minus zoom, and its controls are buttons with names.
+- **The markers are one tab stop** walked by the arrow keys in the order you
+  wrote them, and a marker reached off screen is brought into view.
+- **A points layer is one tab stop** over what the renderer drew in view, walked
+  top to bottom and along each line. Enter on a count zooms in to it, and the
+  focus goes to what then stands nearest.
+- **Routes, areas and points are named in a list** inside the frame, by `label`
+  and `description`, since a line in a canvas is otherwise nothing to a screen
+  reader.
+- **A live position speaks its `description` politely**, and never its moves.
+
+## Writing a driver
+
+A driver is an object with `panBy(x, y, motion)` in pixels and
+`zoomBy(direction, motion)`, where `motion` is your theme's `{ duration, easing }`
+or `null` for a jump. Everything else is optional, and each piece turns on a
+feature:
+
+- `project` and `onView`, so markers and positions can stand on their places;
+- `show`, to bring a focused marker into view;
+- `fit`, for `connection.fit()` and for opening clusters;
+- `layers`, to draw routes, areas and points;
+- `credits`, to fill the attribution slot;
+- `silenceKeyboard`, `focusTarget` and `replaceZoom`, to hand the keyboard and
+  the zoom buttons to the frame;
+- `bearing`, where your renderer can turn the view.
+
+A driver without `project` leaves its markers hidden rather than drawn in the
+corner. `motionOf(element, pace)` reads the same motion for a move your page
+makes itself.
