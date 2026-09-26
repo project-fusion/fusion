@@ -1,5 +1,5 @@
 ---
-description: The schema Angular needs before it will compile an unknown tag.
+description: The schema Angular needs to compile Helix tags, and how to bind properties and events.
 parent: installation
 section: Getting started
 title: Angular
@@ -7,9 +7,9 @@ title: Angular
 
 # Angular
 
-Angular refuses to compile a template containing a tag it does not recognize.
-That is a good default and it is the one thing standing between you and working
-Helix components.
+Angular does not compile a template that contains a tag it does not recognize.
+To use Helix components, add `CUSTOM_ELEMENTS_SCHEMA` to the components that
+render them.
 
 ```ts
 import { CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core'
@@ -22,11 +22,12 @@ import { CUSTOM_ELEMENTS_SCHEMA, Component } from '@angular/core'
 export class SaveButton {}
 ```
 
-Declare it on the components that use Helix rather than globally if you can.
-`CUSTOM_ELEMENTS_SCHEMA` switches off unknown-element checking for the whole
-template it is on, so scoping it keeps the check for your own typos.
+If you can, declare the schema only on the components that use Helix.
+`CUSTOM_ELEMENTS_SCHEMA` turns off unknown-element checking for the whole
+template it is on. A narrow scope keeps that check, which catches your own
+typos, in your other components.
 
-## Binding
+## Bind properties and events
 
 ```html
 <helix-input
@@ -35,26 +36,27 @@ template it is on, so scoping it keeps the check for your own typos.
 />
 ```
 
-`[prop]` sets a property, which is what a non-string value needs, and `(event)`
-binds with `addEventListener`, so the event name is its own.
+`[prop]` sets a property, which a value that is not a string needs. `(event)`
+binds with `addEventListener`, so use the event's own name.
 
-**Do not use `attr.` for a stateful property.** `[attr.value]="name"` writes
-the attribute, which seeds the control and is then out of date the moment a
-reader types; the property is the live channel.
+**Do not use `attr.` for a stateful property.** `[attr.value]="name"` writes the
+attribute. The attribute seeds the control and is out of date as soon as someone
+types in it. The property holds the current value.
 
 ## No typings ship for Angular
 
-There is no `angular.d.ts` in the package. `CUSTOM_ELEMENTS_SCHEMA` turns off
-the checking that typings would feed, so a generated file would describe types
-Angular has already agreed not to enforce. The manifest is published as
-`@fusion.dev/helix/custom-elements.json` if you want to generate something for your
-own codebase from it.
+The package has no `angular.d.ts`. `CUSTOM_ELEMENTS_SCHEMA` turns off the
+checking that typings would feed, so Angular would not enforce a generated file.
+We publish the manifest as `@fusion.dev/helix/custom-elements.json`, so you can
+generate your own files from it.
 
-The practical consequence is that a misspelled property fails silently here
-where it is a compile error in React, Vue and Svelte. Worth a note in review.
+As a result, a misspelled property fails without an error in Angular. In React,
+Vue, and Svelte, the same mistake is a compile error. Check property names in
+code review.
 
-## Taking a decision
+## Refuse a change
 
-`value`, `open`, `checked` and `active` are seeds: the element applies its own
-changes from there. To take one decision, listen for the `helix-before-*` event
-and call `preventDefault()`. See [State and control](./state-and-control).
+`value`, `open`, `checked`, and `active` are seeds. The element starts with the
+value you set and then applies its own changes. To refuse a change, listen for
+the `helix-before-*` event and call `preventDefault()`. See
+[State and control](./state-and-control).

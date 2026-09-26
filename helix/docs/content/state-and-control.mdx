@@ -1,14 +1,15 @@
 ---
-description: Why a declared property is a seed, and how to take a decision when you want it.
+description: How a property you set becomes a starting value, and how to cancel or take over a change.
 section: Essentials
 title: State and control
 ---
 
 # State and control
 
-**A declared property is a seed and a correction.** Write `value`, `open`,
-`checked` or `active` on a Helix element and it starts there and goes on
-managing itself, exactly as `<input value="Ada">` does.
+A property you set is a starting value, and you can assign it again later to
+correct it. Set `value`, `open`, `checked`, or `active` on a Helix element. The
+element starts there and then manages its own state, as `<input value="Ada">`
+does.
 
 ```html
 <helix-input
@@ -17,20 +18,20 @@ managing itself, exactly as `<input value="Ada">` does.
 ></helix-input>
 ```
 
-That works. Type in it and the value moves. Assign to it later and the value
-moves to what you assigned. There is no mode to be in and nothing to wire before
-the control responds.
+When you type in the input, the value changes. When you assign a new value
+later, the value changes to what you assigned. The control has no modes, and you
+do not need to connect anything before it responds.
 
-*This page said the opposite until 26 Aug 2026: writing a property was a claim
-of ownership, so the element announced its changes and applied none of them
-until it was told. The mode is deleted. If you were refusing a change by
-withholding a state update rather than by calling `preventDefault()`, that is
-the one thing that has to be rewritten.*
+*Until 26 Aug 2026, this page said the opposite. Setting a property claimed
+ownership of the state, so the element announced its changes and applied none
+of them until you set the new value. That mode is removed. If you canceled
+changes by withholding a state update, rewrite that code to call
+`preventDefault()`. Nothing else has to change.*
 
-## Taking a decision
+## Cancel or take over a change
 
-Control is an action rather than a mode. Every change announces before it acts,
-and the announcement is cancelable:
+You take control one change at a time. Each change sends a cancelable event
+before it is applied:
 
 ```ts
 input.addEventListener('helix-before-change', (event) => {
@@ -40,8 +41,8 @@ input.addEventListener('helix-before-change', (event) => {
 })
 ```
 
-`preventDefault()` refuses that one change and nothing moves. To own the state
-outright, refuse and assign your own:
+`preventDefault()` cancels that one change, and nothing moves. To manage the
+state yourself, cancel the change and assign your own value:
 
 ```tsx
 <helix-input
@@ -54,22 +55,27 @@ outright, refuse and assign your own:
 />
 ```
 
-This is the same shape the platform uses everywhere else: `preventDefault()` on
-a form submit, on a link click, on `beforeinput`. Nothing is declared in advance
-and nothing is inferred from which properties you happened to set.
+The platform uses the same pattern. You call `preventDefault()` to cancel:
 
-The imperative form reports the same thing:
+- a form submit
+- a link click
+- a `beforeinput` event
+
+You do not declare anything in advance, and Helix does not infer anything from
+which properties you set.
+
+The imperative method reports the same result:
 
 ```ts
 const applied = item.requestOpen(true)
 ```
 
-`false` means something refused it.
+`false` means something canceled the change.
 
-## Mirroring the state instead
+## Follow the state with the change event
 
-Most consumers want neither of the above. Bind the notification and let the
-element apply:
+Most of the time you do not need to cancel anything. Listen for the change
+event and let the element apply the change:
 
 ```tsx
 <helix-input label="Name" onChange={(event) => setName(event.currentTarget.value)} />
@@ -82,11 +88,11 @@ element apply:
 ></helix-input>
 ```
 
-The native event carries no detail because it does not need one: the element has
-already applied the change by the time it fires, so the value is on the target
-where every handler ever written expects to find it.
+The native event carries no detail. The element has already applied the change
+when the event fires, so the value is on the target, where handlers expect to
+find it.
 
-## `default-` still means something
+## `default-value` sets the value a reset returns to
 
 ```html
 <helix-input
@@ -95,38 +101,44 @@ where every handler ever written expects to find it.
 ></helix-input>
 ```
 
-`default-value` is what a reset returns to. `value` is where the control is now.
-The pair is the platform's, where a native input reflects its `value` *content
-attribute* to `defaultValue` and carries a dirty flag that stops the attribute
-affecting the value once a reader has typed.
+`default-value` is the value a reset returns to. `value` is the control's
+current value. The pair comes from the platform. A native input reflects its
+`value` *content attribute* to `defaultValue`, and it keeps a dirty flag. Once a
+user has typed, the flag stops the attribute from changing the value.
 
-## State is a custom state, not an attribute
+## State is published as a custom state
 
 ```css
 helix-accordion-item:state(open) { … }
 ```
 
-`open` is not reflected, and neither is `value`. A payload written back as an
-attribute leaks whatever the last reader typed into the markup, so a serialized
-host comes back holding their text rather than the author's seed, with no way to
-tell the two apart. `helix-input` takes `type="password"`, which a reflected
-`value` would carry straight past every session-replay masker that knows to mask
-`.value` and `input[value]`.
+`open` is not reflected to an attribute, and neither is `value`. A value written
+back as an attribute would put whatever the last user typed into the markup. A
+serialized element would then hold the user's text, and you could not tell it
+apart from the starting value you wrote. `helix-input` takes `type="password"`.
+A reflected `value` would carry the password past every session-replay masker
+that masks `.value` and `input[value]`.
 
-So the resolved boolean is published as a custom state and the plain attribute
-stays what you wrote. `:state(open)`, `:state(checked)`, `:state(invalid)` and
-`:state(read)` are the four, and they work from your own stylesheet exactly as
-an attribute selector did:
+Helix publishes the resolved boolean as a custom state, and the attribute keeps
+the value you wrote. There are four custom states:
+
+- `:state(open)`
+- `:state(checked)`
+- `:state(invalid)`
+- `:state(read)`
+
+They work in your own stylesheet as an attribute selector did:
 
 ```css
 helix-checkbox:state(checked)::part(control) { … }
 helix-input:state(invalid)::part(field) { … }
 ```
 
-**These were `data-open` and `data-checked` until 27 Aug 2026.** An attribute is
-in the DOM, and the element writes it on its first update, so a framework that
-server-renders your markup and then hydrates it finds attributes its own render
-never produced. React reports that as a hydration mismatch and does not patch it
-up. A custom state is not in the DOM: it reaches your stylesheet and leaves the
-markup alone, so the two renders agree by construction. If you were selecting on
-the old names, the change is mechanical.
+Until 27 Aug 2026, these states were the `data-open` and `data-checked`
+attributes. An attribute is in the DOM, and the element writes it on its first
+update. A framework that renders your markup on the server and then hydrates it
+finds attributes that its own render never produced. React reports that as a
+hydration mismatch and does not fix it. A custom state is not in the DOM. It
+reaches your stylesheet and leaves the markup alone, so the server render and
+the client render always match. If you selected on the old names, replace each
+one with its custom state.

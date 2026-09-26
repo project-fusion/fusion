@@ -7,39 +7,47 @@ title: Tiers
 
 # Tiers
 
-Helix ships as four stacked packages. Each has one job, and the dependency
-direction never reverses.
+Helix is four packages stacked on each other. Each package has one job, and each
+depends only on the packages below it.
 
 | Package | Owns | Depends on |
 | --- | --- | --- |
 | `@fusion.dev/helix-styles` | Tokens and the base layer. Pure CSS | nothing |
 | `@fusion.dev/helix-core` | Element base class, mixins, decorators | Lit |
 | `@fusion.dev/helix-headless` | Structure, accessibility, state, form participation | `core` |
-| `@fusion.dev/helix` | Presentation: tokens, parts, and the visual axes | `headless`, `turbo run styles` |
+| `@fusion.dev/helix` | Presentation: tokens, parts, and the visual axes | `headless`, `styles` |
 
-`@fusion.dev/helix-theme` and `@fusion.dev/helix-icons` ship beside the stack rather than in it:
-neither is a tier, and neither is needed to render a component. **There is no
-React package.** The framework typings are generated into `@fusion.dev/helix`, and
-the bridge that repairs React's hydration of custom events is in
-`@fusion.dev/helix-core`. See [React](./react).
+`@fusion.dev/helix-theme` and `@fusion.dev/helix-icons` ship beside the stack.
+Neither is a tier, and you do not need either one to render a component.
 
-## Why the split
+There is no React package. We generate the framework typings into
+`@fusion.dev/helix`, and the bridge that repairs React's hydration of custom
+events is in `@fusion.dev/helix-core`. See [React](./react).
 
-**`headless` must never depend on `turbo run styles`.**
+## Why the tiers are separate packages
 
-That single constraint is what makes the headless tier independently
-consumable. Consume it and bring your own
-styling entirely; nothing about how Helix looks comes with it. If styling leaks
-downward, the four are one package in four files.
+**`headless` must never depend on `styles`.**
 
-## What belongs where
+This rule lets you use the headless tier on its own. You install it and write
+all of the styling yourself. Nothing about how Helix looks comes with it. If
+styling moved down into the headless tier, the four packages would be one
+package split across four files.
 
-The headless tier owns what a component **is and does**: markup structure, ARIA
-wiring, slots, events, internal state, form participation. It ships no CSS, no
-token references, and none of the visual axes.
+## What each tier contains
 
-The styled tier extends it and adds only presentation. Token references live
-here.
+The headless tier owns what a component is and does:
+
+- markup structure
+- ARIA wiring
+- slots
+- events
+- internal state
+- form participation
+
+It ships no CSS, no token references, and none of the visual axes.
+
+The styled tier extends the headless tier and adds only presentation. Token
+references live in the styled tier.
 
 ```ts
 // headless/src/accordion/item/accordion-item.ts
@@ -77,10 +85,11 @@ export class HelixAccordion extends HelixHeadlessAccordion {
 }
 ```
 
-## Styling from the outside
+## Style a component from your stylesheet
 
-Shadow DOM markup uses CSS Shadow Parts, not class names. Every structural
-element carries a `part`, which doubles as the public override API:
+Elements inside the shadow DOM carry no class names for you to select. Each
+structural element carries a `part`, and parts are the public API for overriding
+styles:
 
 ```css
 helix-accordion-item::part(trigger) {
@@ -88,9 +97,9 @@ helix-accordion-item::part(trigger) {
 }
 ```
 
-For single-knob changes, prefer the per-component custom property. It defaults
-to a system token, so overriding it restyles one component without touching
-`--helix-*` and affecting everything else:
+To change one value, set the component's own custom property. It defaults to a
+system token. Setting it restyles that one component and leaves `--helix-*` and
+every other component unchanged:
 
 ```css
 helix-accordion {
@@ -98,16 +107,16 @@ helix-accordion {
 }
 ```
 
-## The window before an element upgrades
+## Hide elements until they upgrade
 
-A custom element is an inline, unstyled box until its definition loads, and its
-light-DOM children render immediately in document order. So a card arrives as a
-run of unstyled text and then snaps into a card. The window is short and it is
-most visible on a server-rendered page, where the markup is there long before
-the JavaScript is.
+A custom element is an inline, unstyled box until its definition loads. Its
+light-DOM children render immediately, in document order. A card first appears
+as unstyled text and then changes into a card. The delay is short. It is most
+visible on a server-rendered page, where the markup arrives long before the
+JavaScript.
 
-`@fusion.dev/helix` closes it with `elements.css`, which hides every one of its
-tags until the definition lands:
+`@fusion.dev/helix` includes `elements.css`, which hides each of its tags until
+the tag's definition loads:
 
 ```css
 helix-card:not(:defined) {
@@ -115,22 +124,22 @@ helix-card:not(:defined) {
 }
 ```
 
-**The base tier ships no such file, and that is deliberate rather than
-missing.** Three reasons, and the third is the one that matters to you.
+**The base tier ships no such file on purpose.** There are three reasons, and
+the third one affects you most.
 
-It is a decision rather than a mechanism. The rules the library ships below the
-styled tier are the ones a component cannot work without: `overflow` is what
-creates a scrollport, `[hidden]` is the platform's own semantics. Hiding an
-element that has not upgraded is a preference between two imperfect frames, and
-the content is in the markup either way, so a crawler reads it regardless.
+First, hiding an element is a design choice. Below the styled tier, we ship only
+the rules a component cannot work without. For example, `overflow` creates a
+scrollport, and `[hidden]` is the platform's own semantics. Hiding an element
+that has not upgraded is a choice between two imperfect first frames. The
+content is in the markup either way, so a crawler reads it in both cases.
 
-It is a document rule, not a component one. Nothing can help from inside,
-because before the upgrade there is no shadow root to put a rule in. It has to
-live in your stylesheet, which makes it yours to decide.
+Second, the rule belongs to the document. A component cannot apply it from
+inside, because there is no shadow root before the upgrade. The rule has to
+live in your stylesheet, so the choice is yours.
 
-And a blanket file would be wrong for you anyway. You import the handful of
-base elements you use, not all of them, so a generated list would hide tags you
-never ship. Write the ones you have:
+Third, one file for every tag would not fit your project. You import only the
+base elements you use, so a generated list would include tags you never ship.
+Write the rule for the elements you have:
 
 ```css
 helix-base-accordion:not(:defined),
@@ -139,21 +148,20 @@ helix-base-dialog:not(:defined) {
 }
 ```
 
-`visibility` rather than `display`, so the element keeps its place in the
-layout and the page does not reflow when it upgrades. `display: none` collapses
-the box and the content jumps in when the definition arrives, which trades a
-flash of unstyled text for a shift of everything under it.
+Use `visibility` so the element keeps its place in the layout and the page does
+not reflow when it upgrades. `display: none` collapses the box, and the content
+jumps in when the definition arrives. That replaces a flash of unstyled text
+with a shift of everything below it.
 
-You may want neither. A page whose first paint matters more than its last
-inch, or one that has to be readable with JavaScript disabled, is better off
-letting the unstyled markup show. That choice is the reason this file is not
-made for you.
+You may want to hide nothing. If your first paint matters more than the final
+layout, or your page has to be readable with JavaScript turned off, let the
+unstyled markup show. Because of that choice, we do not write the file for you.
 
 ## Mixins and tooling
 
-`open` and `defaultOpen` come from `MixinControllerOpen` in `@fusion.dev/helix-core`.
-The manifest analyzer cannot follow a mixin into another package, so any
-mixin-provided API a component exposes has to be documented on the component
-itself with `@event`, `@property`, or similar. Undocumented mixin API is
-invisible to IDE tooltips, the React wrapper generator, and any agent reading
-the manifest.
+`open` and `defaultOpen` come from `MixinControllerOpen` in
+`@fusion.dev/helix-core`. The manifest analyzer cannot follow a mixin into
+another package. Document any API that a component gets from a mixin on the
+component itself, with `@event`, `@property`, or a similar tag. Mixin API
+without that documentation is missing from IDE tooltips, from the React wrapper
+generator, and from the manifest that agents read.

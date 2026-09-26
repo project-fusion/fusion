@@ -1,24 +1,23 @@
 ---
-description: What renders without a DOM, and what has to wait for one.
+description: How components render on a server with no DOM, and what waits for the browser.
 section: Essentials
 title: Server rendering
 ---
 
 # Server rendering
 
-Every component renders on a server with no DOM. If you are only consuming
-Helix, the practical consequence is small: components work in your server
-components and there is nothing to configure. If you are extending one, the
-rules below are the whole contract.
+Every component renders on a server with no DOM. If you only use Helix
+components, they work in your server components with no configuration. If you
+extend a component, follow the rules below. They are the complete set.
 
-## There is no DOM
+## The server has no DOM
 
-Lit's element shim carries attributes. It does not carry a tree. `querySelector`
-is undefined, `this.children` is undefined, and anything that walks the DOM
-throws while rendering.
+Lit's element shim has attributes and no element tree. `querySelector` and
+`this.children` are undefined, and any code that walks the DOM throws during
+rendering.
 
-Two real examples from this library, both found the first time their component
-was given a server spec:
+We found these two examples in Helix the first time each component got a server
+spec:
 
 ```ts
 // Select. `display` is read during render and reached the render root.
@@ -32,70 +31,71 @@ get hasSubmenu(): boolean {
 }
 ```
 
-Before those two guards, neither component could be server-rendered at all. Both
-looked correct in every browser, because the client always has a root and always
-has a tree.
+Before we added those two guards, neither component could render on a server.
+Both worked in every browser, because a browser always has a render root and an
+element tree.
 
-**Anything that inspects the tree reads it through `this.knownChildren`**, in
-`willUpdate` or in a getter the render calls. It is every child on a client and
-none on a server, so the server renders "not known yet" and the client's first
-render already has the answer. Reading after the render instead means two
-renders on every client, which Lit's dev build warns about.
+**Read the element tree through `this.knownChildren`**, in `willUpdate` or in a
+getter that the render calls. On a client it holds every child, and on a server
+it holds none. The server renders the "not known yet" state, and the client's
+first render already has the children. If you read the tree after the render,
+every client renders twice, and Lit's dev build warns about that.
 
-Not known is not empty. `this.childrenKnown` is false on a server, and a list
-there doesn't render its "Nothing to show" over items it can't see.
+`this.childrenKnown` is false on a server, where the children cannot be read. A
+list on a server therefore does not render its "Nothing to show" message over
+items it cannot see.
 
 ## Declarative shadow DOM
 
-If you render with Lit SSR, its declarative shadow DOM hydrates. Load Lit's
-hydration support before the components:
+If you render with Lit SSR, the declarative shadow DOM it writes hydrates in the
+browser. Load Lit's hydration support before the components:
 
 ```ts
 import '@lit-labs/ssr-client/lit-element-hydrate-support.js'
 import '@fusion.dev/helix'
 ```
 
-Hydration assumes the markup already shows the client's first render. A value
-that differs is never written, so the page keeps the server's, and a template
-that differs throws. So while hydrating, a component renders exactly what the
-server did, and anything it could only learn in a browser waits for the update
-after:
+Hydration assumes the markup already matches the client's first render. If a
+value differs, hydration does not write it, and the page keeps the server's
+value. If a template differs, hydration throws. While hydrating, a component
+renders exactly what the server rendered. Anything it can read only in a browser
+waits for the next update:
 
 - `this.hydrating` is true for the render that hydrates.
 - `this.knownChildren` is empty during it, as on the server.
-- `this.finishHydration()`, called from `firstUpdated`, asks for the update that
-  reads what was skipped.
+- `this.finishHydration()`, called from `firstUpdated`, requests the update
+  that reads what was skipped.
 
-Two things the platform does before any script can listen, and how components
-answer them:
+The browser does two things before any script can listen. Components handle
+them this way:
 
 - **A declarative shadow root reports its slots as it is parsed.** A component
-  never learns what's slotted from `slotchange` alone. It reads its children
-  first and uses `slotchange` for later changes.
-- **The parser fetches images.** A `load` or `error` can fire before hydration,
-  so a component asks the image what happened (`this.serverRendered`) and relays
-  the event a task later.
+  does not rely on `slotchange` alone to find what is slotted. It reads its
+  children first and uses `slotchange` for later changes.
+- **The parser fetches images.** A `load` or `error` event can fire before
+  hydration. A component checks the state of the image (`this.serverRendered`)
+  and dispatches the event again a task later.
 
-A component that assigns its slots by hand gets a root that can only assign by
-name, because HTML can't declare manual assignment. On such a root
-(`this.assignsByName`) it writes `slot` onto its children with `this.route()`,
-and only there.
+HTML cannot declare manual slot assignment. A component that assigns its slots
+by hand therefore gets a root that can assign only by name. On such a root
+(`this.assignsByName`), and only there, the component writes `slot` onto its
+children with `this.route()`.
 
-A page's own scripts should run after the definitions load. That's the order
-hydration expects: a property set before hydration is one the server never
-rendered with.
+Run your page's own scripts after the definitions load. Hydration expects that
+order. A property you set before hydration is one the server did not render
+with.
 
 `bun run check:spec:dsd` renders every example with Lit SSR, hydrates it in
 Chromium, and compares it with the same example rendered on a client.
 
-React server components don't use any of this. Their output is replayed through
-DOM APIs, and DSD doesn't activate for nodes a script inserts. See
-[React](./react).
+React server components do not use declarative shadow DOM. Their output is
+replayed through DOM APIs, and declarative shadow DOM does not activate for
+nodes that a script inserts. See [React](./react).
 
 ## Never initialize state in `connectedCallback`
 
-SSR does not call it. Derive from properties, or seed in `willUpdate`, which SSR
-does call.
+SSR does not call `connectedCallback`. Derive state from properties, or set
+initial state in `willUpdate`, which SSR calls.
 
 ## Guard generated ids
 
@@ -105,50 +105,61 @@ if (!this.id) {
 }
 ```
 
-The server writes the id into the HTML; the client sees it present and skips
-generating a new one, so both agree. Without the guard they disagree and the
-association breaks on hydration.
+The server writes the id into the HTML. On the client, the id is already
+present, so the component does not generate a new one, and both ids match.
+Without the guard, the ids differ, and the association breaks on hydration.
 
-## Semantics on the host, presentation in the shadow root
+## Put semantics on the host and presentation in the shadow root
 
 IDREFs do not cross shadow boundaries, so `aria-labelledby` inside a shadow root
-can never resolve to a light-DOM id. Use `ElementInternals`, which writes no
-attribute at all, so the host stays exactly as you wrote it and hydration has
-nothing to disagree about.
+cannot resolve to a light-DOM id. Use `ElementInternals`. It writes no
+attributes, so the host stays exactly as you wrote it, and hydration finds no
+difference.
 
-**Labels are the case that catches people.** `<label for>` cannot reach into a
-shadow root either, which is why a field's label is rendered *inside* the
-control rather than by anything wrapping it, and why a wrapping "form field"
-component cannot own the label without handing it down as a property. It is also
-why `aria-label` on a host has to be forwarded rather than left where it was
-written. See [Composition](./composition).
+Labels have the same problem. `<label for>` cannot reach into a shadow root
+either. For that reason:
 
-Where an id genuinely cannot reach, **element references can**, and they resolve
-outward: an element in a shadow root may point at one in the light DOM.
-`Listbox` uses that for `aria-activedescendant`, because its options are your
-elements and the element that takes focus is in its shadow root. Feature-test
-them: assigning to a property an engine does not implement is a no-op rather
-than an error.
+- A field's label is rendered *inside* the control, and no wrapping element
+  renders it.
+- A wrapping "form field" component can own the label only by passing it down
+  as a property.
+- `aria-label` on a host has to be forwarded from where you wrote it.
 
-## A child announces itself to its parent
+See [Composition](./composition).
+
+Where an id cannot reach, use an element reference. Element references resolve
+outward, so an element in a shadow root can point at an element in the light
+DOM. `Listbox` uses one for `aria-activedescendant`, because its options are
+your elements and the element that takes focus is in its shadow root. Test for
+support before you use element references. Assigning to a property that an
+engine does not implement does nothing and throws no error.
+
+## A child dispatches a ready event to its parent
 
 A parent cannot poll for a child that has not upgraded yet. The child dispatches
-a bubbling ready event and the parent listens.
+a bubbling ready event, and the parent listens for it.
 
-## Writing a server spec
+## Write a server spec
 
-Every component has a `*.ssr.spec.ts`, and there is one rule about them worth
-repeating, because it has produced a false pass twice:
+Every component has a `*.ssr.spec.ts` file. Breaking one rule for these specs
+has produced a false pass twice:
 
 **Never assert structure against the raw SSR string.** Declarative shadow DOM
-inlines the component's stylesheet into the very markup being asserted, and that
-stylesheet names every part, host attribute and token the component uses. So
-`toContain('part="media"')` passes on a *selector*, and
-`not.toContain('data-scrolled')` fails on a `:host([data-scrolled])` *rule*,
-both saying nothing about what rendered.
+inlines the component's stylesheet into the markup you assert against. That
+stylesheet names every part, host attribute, and token the component uses.
+`toContain('part="media"')` can pass because of a *selector*, and
+`not.toContain('data-scrolled')` can fail because of a `:host([data-scrolled])`
+*rule*. Neither result tells you what rendered.
 
-Use the helpers: `withoutStyles`, `hasPart`, `partTag`, `hostTag`. And match
-attribute bindings with a pattern, since they render across several lines:
+Use these helpers:
+
+- `withoutStyles`
+- `hasPart`
+- `partTag`
+- `hostTag`
+
+Match attribute bindings with a pattern, because they render across several
+lines:
 
 ```ts
 expect(markup).toMatch(/<a\s+part="button"/) // ✅

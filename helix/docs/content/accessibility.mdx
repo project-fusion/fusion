@@ -1,49 +1,62 @@
 ---
-description: What the library guarantees, what it cannot, and where the line is.
+description: What Helix components handle for you, what you handle, and what we do not test.
 section: Foundations
 title: Accessibility
 ---
 
 # Accessibility
 
-Some of accessibility is structural, and a component can own it. Some of it is
-about your content, and no component can. Knowing which is which is the
-difference between a page that is accessible and a page built out of accessible
-parts.
+Helix components handle the structural parts of accessibility, such as roles,
+keys, and focus. You handle the parts that depend on your content, such as
+names, heading order, and language. A page built from accessible components is
+accessible only when you also handle your parts.
 
-## What the library owns
+## What the components handle
 
-**Roles, states and keyboard interaction.** Every component implements the
-pattern its role implies: arrow keys move within a `Tabs`, a `Listbox` and a
-`Menu`, `Escape` dismisses an overlay, `Home` and `End` go to the ends, typing
-jumps to a match. None of that is yours to write.
+### Roles, states, and keyboard interaction
 
-**Focus, including trapping and restoring it.** A `Dialog` traps focus while
-open and returns it to whatever opened it. So do `Drawer` and the modal path of
-`Popover`.
+Every component implements the keyboard pattern for its role. You do not write
+any of it:
 
-**Contrast, by construction rather than by review.** The theme engine measures
-every foreground against the ground it is really painted on and solves for the
-target rather than checking afterwards. Every pairing is then re-measured on a
-laid-out page, including the great majority of rules that set an ink or a ground
-but not both, so a pairing nobody thought of is still checked. See [Surfaces and
+- Arrow keys move within `Tabs`, `Listbox`, and `Menu`.
+- `Escape` closes an overlay.
+- `Home` and `End` go to the first and last item.
+- Typing jumps to a matching item.
+
+### Focus
+
+A `Dialog` traps focus while it is open and returns focus to the element that
+opened it. `Drawer` and the modal mode of `Popover` do the same.
+
+### Contrast
+
+The theme engine measures each foreground color against the background it is
+actually drawn on. It solves for the contrast target when it computes your
+colors. Every pairing is then measured again on a laid-out page. That check
+includes the many rules that set only a text color or only a background, so a
+pairing nobody planned is still checked. See [Surfaces and
 separation](./surfaces-and-separation).
 
-**Reduced motion, per component.** Fifty-nine stylesheets answer
-`prefers-reduced-motion` individually, because they have to: the base layer's
-global rule is `*, *::before, *::after` in the document, and `*` does not cross
-a shadow boundary, so it reaches your prose and none of the components.
-A component that animates without answering fails the build.
+### Reduced motion
 
-**Disabled without disappearing.** `disabled` is mirrored to `aria-disabled`
-rather than removing the control from the accessibility tree, so a screen reader
-can still announce that the control exists and is currently off.
+Fifty-nine stylesheets respond to `prefers-reduced-motion` individually. Each
+component needs its own rule because the base layer's global rule is
+`*, *::before, *::after` in the document, and `*` does not cross a shadow
+boundary. That rule reaches your prose and none of the components. The build
+fails when a component animates without responding to `prefers-reduced-motion`.
 
-## What you own
+### Disabled controls
 
-**Names.** A component can render a label; it cannot know what to call your
-thing. Every control takes `label`, and an icon-only control has nothing else to
-go on:
+`disabled` is mirrored to `aria-disabled`, and the control stays in the
+accessibility tree. A screen reader can still announce that the control exists
+and is turned off.
+
+## What you handle
+
+### Names
+
+Every control takes `label`. A component renders the label you give it, and the
+words are yours to choose. An icon-only control has no other text to name it:
 
 ```html
 <helix-icon-button
@@ -52,66 +65,74 @@ go on:
 ></helix-icon-button>
 ```
 
-**`label` means a label and `aria-label` means a name.** They are not synonyms
-here. `label` renders visible text and names the control through it;
-`aria-label` names the control with nothing on screen. Reach for the second only
-when the page already makes the purpose plain, which is rarer than it feels.
+### `label` and `aria-label`
 
-**Heading order.** Components render the heading levels you give them, not
-levels they guess. A `Card` does not emit an `h2` on your behalf, because it
-cannot know what is above it.
+`label` renders visible text and names the control through that text.
+`aria-label` names the control and shows nothing on screen. Use `aria-label`
+only when the page already makes the control's purpose plain. That case is less
+common than it seems.
 
-**Language and direction.** Set `lang` and `dir` on the document. Components use
-logical properties throughout, so a right-to-left document lays out correctly,
-but nothing infers the direction for you.
-See [Localization and RTL](./localization).
+### Heading order
 
-**Live regions for your own updates.** The components announce their own state
-changes. A message from your application needs somewhere to be announced:
+Components render the heading levels you give them. A `Card` does not add an
+`h2` for you, because the right level depends on the headings above the card.
+
+### Language and direction
+
+Set `lang` and `dir` on the document. Components use logical properties
+throughout, so a right-to-left document lays out correctly. Helix does not
+detect the direction for you. See [Localization and RTL](./localization).
+
+### Live regions for your own updates
+
+Components announce their own state changes. To announce a message from your
+application, put it in an `Announcement`:
 
 ```html
 <helix-announcement tone="warning">Your trial ends on Friday.</helix-announcement>
 ```
 
-`Announcement` is always a polite live region, never assertive. `role="alert"`
-interrupts whatever is being read, which is right for something that appears
-mid-session and wrong for something that was in the served HTML: an assertive
-announcement would cut across a screen-reader user on every page load, before
-they had read anything. Politeness costs a moment and is never wrong.
+`Announcement` is always a polite live region. An assertive region, such as
+`role="alert"`, interrupts whatever the screen reader is reading. That suits a
+message that appears during a session. It does not suit a message in the served
+HTML, because an assertive announcement would interrupt a screen-reader user on
+every page load, before they had read anything. A polite announcement can arrive
+a moment later, and it is always safe to use.
 
-Note the distinction from `Callout`, which is a passage that interrupts a
-document and is read where it sits. Neither is a variant of the other.
+`Callout` is a different component. It is a passage that interrupts a document
+and is read where it sits. Neither component is a variant of the other.
 
 ## Two things the shadow boundary changes
 
-**IDREFs do not cross it.** `aria-labelledby` and `aria-describedby` inside a
-shadow root cannot resolve to an id in your document, and the reference is
-dropped silently rather than erroring. This is why every control renders its own
-label instead of being wrapped by one, and why wiring two components together by
-id does not work. See [Forms and validation](./forms).
+`aria-labelledby` and `aria-describedby` inside a shadow root cannot point to an
+id in your document. The browser drops the reference silently and reports no
+error. For this reason, every control renders its own label, and connecting two
+components by id does not work. See [Forms and validation](./forms).
 
-**`<label for>` cannot reach in either.** A `<label>` in your markup will not
-name a Helix control. Use the control's own `label`.
+A `<label for>` in your markup cannot reach into a shadow root either, so it
+does not name a Helix control. Use the control's own `label`.
 
-Where a relationship genuinely has to cross the boundary, the components use
-`ElementInternals` and element-reference properties rather than ids, which is
-the only mechanism that works. If you need the same for your own composition,
-that is the tool.
+When a relationship has to cross the boundary, the components use
+`ElementInternals` and element-reference properties. They are the only mechanism
+that works across the boundary. Use the same tools when your own components need
+such a relationship.
 
-## Hiding things correctly
+## Hide text visually
+
+To hide text on screen and keep it for screen readers, add
+`data-hidden-visually`:
 
 ```html
 <span data-hidden-visually>Sorting by</span>
 ```
 
-The base layer's `[data-hidden-visually]` clips rather than using
-`display: none` or `visibility: hidden`, both of which take the element out of
-the accessibility tree entirely, which is the opposite of what visually-hidden
-text is for.
+The base layer's `[data-hidden-visually]` rule clips the element.
+`display: none` and `visibility: hidden` both remove the element from the
+accessibility tree, so they hide the text from screen readers too.
 
-## What is not covered
+## What we do not test
 
-The library is tested in Chromium, by automated specs and by pixel baselines. It
-is not run through a screen reader on every release, and the components'
-patterns follow the ARIA authoring practices rather than being certified against
-them. Where you find a real failure, it is a bug: report it.
+We test Helix in Chromium with automated specs and pixel baselines. We do not
+run it through a screen reader on every release. The component patterns follow
+the ARIA authoring practices, and they have not been certified against them. If
+you find a real failure, report it as a bug.

@@ -1,5 +1,5 @@
 ---
-description: Typed tags, and the framework that needs the least said about it.
+description: The Svelte typings, and how Svelte passes props and binds events.
 parent: installation
 section: Getting started
 title: Svelte
@@ -11,35 +11,36 @@ title: Svelte
 import '@fusion.dev/helix/svelte'
 ```
 
-A types-only import, once. It augments `SvelteHTMLElements` so every Helix tag
-is typed in a component, and it does so by re-exporting the JSX types rather
-than emitting a second copy: Svelte binds a handler as `onhelix-before-change={…}`,
-which is the shape those types already describe, and two generated copies of one
-thing are two things that can disagree.
+Add this types-only import once. It augments `SvelteHTMLElements`, so every
+Helix tag is typed in a component. The import re-exports the JSX types. Svelte
+binds a handler as `onhelix-before-change={…}`, which is the shape those types
+already describe. With one shared copy of the types, the Svelte and JSX typings
+cannot disagree.
 
-## Nothing else to configure
+## Pass props and bind events
 
 ```svelte
 <helix-input label="Name" onchange={(event) => (name = event.target.value)} value={name} />
 ```
 
-Svelte sets a property when the element has one and an attribute otherwise, and
-binds `on*` with `addEventListener`. There is no unknown-element warning to
-silence and no compiler flag to set. That is the whole page, and it is short
-because Svelte was already right about custom elements.
+Svelte sets a property when the element has one, and an attribute otherwise. It
+binds `on*` with `addEventListener`. Svelte shows no unknown-element warning,
+and you do not need a compiler flag.
 
-**Pass objects and arrays as properties**, which Svelte does on its own:
+Svelte passes objects and arrays as properties on its own:
 
 ```svelte
 <helix-tabs items={tabs} />
 ```
 
-## Two things that are not framework-specific
+## Read values and refuse changes
 
-`bind:` does not work on a Helix control, because there is no two-way binding
-convention a custom element can opt into. Read the value off the event.
+These two rules apply in every framework.
 
-And a declared `value`, `open`, `checked` or `active` is a seed: the element
-starts there and goes on applying its own changes. To refuse one, cancel the
-matching `helix-before-*` event; withholding a state update refuses nothing.
-See [State and control](./state-and-control).
+`bind:` does not work on a Helix control, because custom elements have no
+two-way binding convention to opt into. Read the value from the event.
+
+A declared `value`, `open`, `checked`, or `active` is a seed. The element starts
+with that value and then applies its own changes. To refuse a change, cancel the
+matching `helix-before-*` event. Skipping a state update does not refuse it. See
+[State and control](./state-and-control).

@@ -1,5 +1,5 @@
 ---
-description: The typings, the hydration bridge, and how state moves.
+description: The React typings, the hydration bridge, and how state moves between React and the elements.
 parent: installation
 section: Getting started
 title: React
@@ -7,17 +7,17 @@ title: React
 
 # React
 
-There is no React package. The elements are custom elements and React renders
-them directly. What ships for React is a `jsx.d.ts` that types every tag and a
-runtime bridge in `@fusion.dev/helix-core` that repairs two React behaviors.
+The elements are custom elements, and React renders them directly, so there is
+no React package. For React, we ship a `jsx.d.ts` file that types every tag, and
+a runtime bridge in `@fusion.dev/helix-core` that repairs two React behaviors.
 
 ```ts
 import '@fusion.dev/helix/jsx'
 ```
 
-A types-only import, once, anywhere TypeScript will see it. After that
-`<helix-button>` is a typed element with its real props, and a value the
-component does not accept is a compile error rather than a runtime shrug.
+Add this types-only import once, anywhere TypeScript sees it. `<helix-button>`
+then has typed props, and a value the component does not accept is a compile
+error.
 
 ## Bind events with `onhelix-*`
 
@@ -25,25 +25,30 @@ component does not accept is a compile error rather than a runtime shrug.
 <helix-accordion-item onhelix-before-open={(event) => track(event.detail.open)} />
 ```
 
-The prop is `on` and the event name, verbatim. Not `onHelixOpen`, not `onOpen`.
-React 19 forwards an unknown `on*` prop to `addEventListener` using the name as
-written, so the casing is the event's own.
+The prop is `on` followed by the exact event name. `onHelixOpen` and `onOpen` do
+not work. React 19 passes an unknown `on*` prop to `addEventListener` with the
+name as written, so use the event's own casing.
 
-## The bridge
+## The hydration bridge
 
-React skips everything it would have to apply imperatively while hydrating. That
-is two things, and `HelixElement` repairs both.
+While React hydrates, it skips everything it would have to apply imperatively.
+That affects two things, and `HelixElement` repairs both.
 
-**Event handlers** attached during hydration are stashed on the DOM node but
-never bound, so an event fired before the next render finds nothing listening.
-The element reads React's own stash off the node and binds what it finds, so a
-handler works from the first paint rather than from the first re-render.
+### Event handlers
 
-**Object and function properties** are dropped on both sides: React's server
-renderer writes nothing for a prop whose value is an object, and the hydrate path
-never applies one. An array prop therefore arrives by no route at all, and
-because both halves agree, nothing warns. The element assigns them itself once it
-upgrades, which is what lets a data table take its rows as a plain prop:
+React stores the event handlers it sees during hydration on the DOM node, but it
+does not bind them. An event fired before the next render reaches no listener.
+The element reads the handlers React stored on the node and binds them, so a
+handler works from the first paint.
+
+### Object and function properties
+
+React drops object and function properties on both sides. The server renderer
+writes nothing for a prop whose value is an object, and hydration never applies
+one. An array prop therefore never reaches the element, and because the server
+and the client agree, React shows no warning. The element assigns these
+properties itself once it upgrades, so a data table can take its rows as a plain
+prop:
 
 ```tsx
 <helix-data-table label="People" rows={rows}>
@@ -53,41 +58,43 @@ upgrades, which is what lets a data table take its rows as a plain prop:
 </helix-data-table>
 ```
 
-Only properties the component declares, and only values an attribute could not
-have carried, so a string is left to the channel that already works. A `null` is
-left alone too, and the component's own default stands.
+The element assigns only properties the component declares, and only values an
+attribute cannot carry. Strings still go through attributes, which already work.
+The element also leaves a `null` alone, so the component keeps its default.
 
-The columns are elements rather than a config array for the same reason: `field`,
-`sortable` and `width` are strings and booleans, so they cross to the server
-intact, and `cell` and `compare` are functions on an element that can repair its
-own props. Nested inside a `columns` array they would be unreachable.
+The columns are elements for the same reason. `field`, `sortable`, and `width`
+are strings and booleans, so they pass through server rendering intact. `cell`
+and `compare` are functions, set on an element that repairs its own props.
+Inside a `columns` array, the bridge could not reach them.
 
-**The cell values still do not server-render**, which is a separate limit and not
-this one. Reading a cell needs the columns, and the columns are markup children
-the server render does not hand the table, so the first paint is a labeled shell
-either way. Use `helix-table` where the content has to be in the served HTML.
+The cell values still do not render on the server. That is a separate limit.
+Reading a cell needs the columns, and the server render does not pass the table
+its markup children. The first paint shows a labeled table with no data in
+either case. Use `helix-table` when the content must be in the served HTML.
 
-That is runtime code you already have, in `@fusion.dev/helix-core`, and nothing to
-configure. One thing to know about it: it reads a React
-internal, the per-page key React stores props under. If a React release renames
-that key the bridge stops repairing and your handlers go back to needing a
-commit before they fire. Helix pins the React version it was measured against
-and fails its own build when React moves past it, so this cannot go unnoticed.
+### The React version
 
-## A declared property is a claim of ownership
+The bridge is runtime code in `@fusion.dev/helix-core`, which you already have,
+and it needs no configuration. It reads a React internal: the per-page key that
+React stores props under. If a React release renames that key, the bridge stops
+repairing, and your handlers again need a commit before they fire. We pin the
+React version we measured the bridge against, and our build fails when React
+moves past it, so a rename cannot go unnoticed.
 
-This is the one thing about Helix that surprises people coming from React, and
-it is a compile error rather than a surprise at runtime:
+## Seed, mirror, or refuse a value
+
+Helix differs from React in one way that surprises people. This markup
+compiles, and the field stays editable:
 
 ```tsx
-// Does not compile.
+// Compiles, and the field stays editable.
 <helix-input label="Name" value="Ada" />
 ```
 
 In React, `value` on a native `<input>` without `onChange` renders a read-only
-field and warns. **A Helix element is not read-only**: `value` is a seed and the
-element goes on applying its own changes, so the markup below works and needs no
-handler beside it.
+field and logs a warning. On a Helix element, `value` is a seed. The element
+starts with that value and keeps applying its own changes, so the markup below
+works without a handler.
 
 ```tsx
 // Seeded: the element owns it from there.
@@ -107,17 +114,18 @@ handler beside it.
 />
 ```
 
-**The one habit to unlearn is refusing by not answering.** React force-restores
-a native `<input>` whose state did not move and does not do this for a custom
-element, so a handler that declines to call `setState` leaves the element
-holding the new value. `preventDefault()` is the refusal.
+**To refuse a change, call `preventDefault()`.** Skipping `setState` does not
+refuse it. React restores a native `<input>` whose state did not change, and it
+does not do this for a custom element. A handler that does not call `setState`
+leaves the element with the new value.
 
-*Until 26 Aug 2026 this page described the opposite, and the typings enforced
-it: writing `value` was a claim of ownership, the element applied nothing until
-told, and `<helix-input value="Ada" />` was a compile error without an answering
-handler. The constraint is deleted along with the mode.*
+*Until 26 Aug 2026, this page described the opposite behavior, and the typings
+enforced it. Writing `value` made you the owner of the state. The element
+applied no change until you set the value, and `<helix-input value="Ada" />`
+without a handler was a compile error. We removed that mode and its
+constraint.*
 
-See [State and control](./state-and-control) for the whole of it.
+See [State and control](./state-and-control) for the full model.
 
 ## Register in a client component
 
@@ -129,16 +137,16 @@ export const HelixElements = () => null
 ```
 
 Render it once in your layout. **Your pages stay server components.** An
-unregistered tag is an unknown element in the HTML that upgrades when the
-definition lands, so nothing about a server component needs to change.
+unregistered tag is an unknown element in the HTML, and it upgrades when the
+definition loads. Your server components need no changes.
 
 ## Server components get no declarative shadow DOM
 
-A server component's output is replayed from the flight payload through DOM APIs
-rather than parsed as HTML, and declarative shadow DOM cannot activate for
-script-inserted nodes. This is why `elements.css` exists: it styles the
-un-upgraded markup so the interval before hydration looks like the finished page
-rather than like unstyled boxes.
+React inserts a server component's output by replaying the flight payload
+through DOM APIs. The browser does not parse that output as HTML, and
+declarative shadow DOM cannot activate for nodes inserted by script.
+`elements.css` exists for this case. It styles the markup before the elements
+upgrade, so the page looks finished before hydration.
 
-[Server rendering](./server-rendering) has the whole contract, and
-[Using the elements](./using-the-elements) has the rest of the binding rules.
+[Server rendering](./server-rendering) covers server rendering in full, and
+[Using the elements](./using-the-elements) covers the other binding rules.

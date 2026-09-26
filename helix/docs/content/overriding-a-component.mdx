@@ -1,5 +1,5 @@
 ---
-description: The three ways in past a shadow root, and which one to reach for.
+description: Change a component's styles with tokens, per-component hooks, or parts, and choose which one to use.
 section: Theming
 title: Overriding a component
 ---
@@ -7,11 +7,10 @@ title: Overriding a component
 # Overriding a component
 
 Every Helix component draws inside a shadow root, so your stylesheet cannot
-reach in. That is the point: a rule you write can never accidentally break a
-component's internals, and a component can be rewritten without breaking your
-page.
+reach the elements inside it. Your rules cannot break a component's internals
+by accident, and we can rewrite a component without breaking your page.
 
-Three doors are open, and they are in the order you should try them.
+You can change a component's styles in three ways. Try them in the order below.
 
 ## 1. Tokens
 
@@ -21,15 +20,17 @@ Three doors are open, and they are in the order you should try them.
 }
 ```
 
-If every card, dialog and button should be squarer, that is a token change and
-you are done. The seed rather than `--helix-radii-md`, because the four rungs
-are derived from it: `md` on its own is one step of four, and the buttons and
-dialogs are on a different one. See [Shape and borders](./shape-and-borders). Tokens cross shadow boundaries on their own, because custom
-properties inherit, so one declaration reaches every component at once.
+To make every card, dialog, and button squarer, change a token. Set the seed.
+The four radius steps, such as `--helix-radii-md`, are derived from it. `md` is
+one step of the four, and buttons and dialogs use a different step. See
+[Shape and borders](./shape-and-borders).
 
-Reach for this first. Most requests that arrive as "can I restyle the button"
-are really "our brand has less rounding than yours", and the token is both the
-smaller change and the one that stays consistent.
+Custom properties inherit, so tokens cross shadow boundaries. One declaration
+reaches every component at once.
+
+Try tokens first. A request to restyle the button is often a brand difference,
+such as less rounding. A token is the smaller change, and it keeps every
+component consistent.
 
 See [Tokens](./tokens) and [Deriving a theme](./theming).
 
@@ -45,15 +46,19 @@ helix-accordion {
 }
 ```
 
-A hook is a custom property a component publishes and reads. It defaults to a
-semantic token, so leaving it alone gets you the themed value, and setting it
-changes that component and nothing else.
+A hook is a custom property that a component publishes and reads. It defaults
+to a semantic token, so a hook you leave unset uses the themed value. Setting a
+hook changes that one component.
 
-**They are API, not tokens**, and the distinction is enforced. A hook is named
-after the component (`--card-padding`, `--drawer-radius`) and a token is named
-`--helix-*`. Every documented hook is held to a rule that actually reads it, in
-both directions: declared and never read is a promise with nothing behind it,
-and read and never declared is a working feature nobody is told about.
+**Hooks are component API.** We check that they stay separate from tokens. A
+hook is named after its component, such as `--card-padding` or
+`--drawer-radius`. A token is named `--helix-*`. We also check each hook in both
+directions:
+
+- A rule in the component reads every documented hook. A hook that is declared
+  and never read would do nothing.
+- Every hook that a rule reads is documented. Otherwise you would not know the
+  hook exists.
 
 Each component's page lists its hooks under Custom properties.
 
@@ -69,23 +74,23 @@ helix-dialog::part(dialog) {
 }
 ```
 
-`::part()` reaches a named element inside the shadow root and lets you write any
-declaration you like on it. It is the most powerful door and the one to try
-last, because it is the one that couples your stylesheet to a component's
-internal structure.
+`::part()` selects a named element inside the shadow root, and you can write any
+declaration on it. Parts give you the most control. Try them last, because they
+tie your stylesheet to a component's internal structure.
 
-**A published part is a promise**, held both ways:
-a documented part that nothing renders, and a rendered part nobody was told
-about. The first is the worse of the two for you, because a `::part()` that
-resolves to nothing is valid CSS that matches nothing and reports nothing.
+**Every documented part is rendered.** We check parts in both directions. A
+documented part must be rendered, and a rendered part must be documented. A
+documented part that nothing renders would be the worse failure for you. A
+`::part()` that matches nothing is still valid CSS, so you get no error.
 
 Each component's page lists its parts.
 
-### A composed component forwards what it renders
+### Parts of a component inside another component
 
-`::part()` reaches one shadow boundary and stops, so a component that renders
-another would hide that child's whole part surface. Every one of them forwards
-it instead, and the forwarded name is prefixed with the role the child plays:
+`::part()` crosses only one shadow boundary. When a component renders another
+component, the child's parts would be out of reach. Every such component
+forwards its child's parts, and each forwarded name starts with the role the
+child plays:
 
 ```css
 helix-date-input::part(picker-cell) { … }
@@ -93,34 +98,39 @@ helix-select::part(listbox-items) { … }
 helix-video::part(overflow-header) { … }
 ```
 
-`<helix-date-input>` renders a date picker as its `picker`, so the picker's
-`cell` is `picker-cell` here. Where the child's part is already the role, the
-role stands alone: the tooltip inside `<helix-copy-button>` is `tooltip`, and
-its arrow is `tooltip-arrow`.
+`<helix-date-input>` renders a date picker in the `picker` role, so the picker's
+`cell` part is `picker-cell`. When the child's part is the role itself, the
+forwarded name is the role alone. The tooltip inside `<helix-copy-button>` is
+`tooltip`, and its arrow is `tooltip-arrow`.
 
-A part that changes with a state takes a second name while the state holds, and
-that name is forwarded too. A tooltip that landed below its button is also
-`tooltip-bottom`, and its arrow `tooltip-arrow-bottom`, which is how a sheet out
-here draws by a side it cannot otherwise see. The arrow already faces the button
-whichever side that is; the name is for what you draw on top.
+A part that changes with a state has a second name while the state is active,
+and that name is forwarded too. A tooltip placed below its button is also
+`tooltip-bottom`, and its arrow is also `tooltip-arrow-bottom`. Your stylesheet
+can use these names to style each side, which it cannot detect any other way.
+The arrow already faces the button on every side. Use the names for styles you
+add on top.
 
-**The prefix is not decoration.** Two levels can agree on a word, and did:
-`Command` forwarded the listbox's `search-field` under a name it also rendered
-itself, so `::part(search-field)` matched two elements at once.
+**The prefix keeps part names unique.** A component and its child can use the
+same word. This happened once: `Command` forwarded the listbox's `search-field`
+under a name it also rendered itself, so `::part(search-field)` matched two
+elements at once.
 
-This is checked in both directions. `helix component`'s `parts` holds a published part and a
-rendered one to each other, and `helix component`'s `exportparts` holds a composition to
-forwarding everything its child publishes, under one prefix, colliding with
-nothing. So every part the color picker publishes is reachable from inside a
+We check forwarding in two ways:
+
+- `helix component`'s `parts` matches every published part with a rendered one,
+  and every rendered part with a published one.
+- `helix component`'s `exportparts` requires a composed component to forward
+  every part its child publishes, under one prefix, with no collisions.
+
+As a result, you can reach every part the color picker publishes from inside a
 color input, and every part the date picker publishes from inside a date input.
 
-If you still find a part you cannot reach, that is worth reporting rather than
-working around: the missing part is the bug.
+If you find a part you cannot reach, report it to us. The missing part is a bug.
 
-### Words that name a position mean one thing
+### Part names shared by every component
 
-A part that names a *role* rather than a thing draws from a fixed vocabulary, so
-you learn it once instead of per component:
+Some parts name a role. Every component uses the same fixed set of role names,
+so you learn each name once:
 
 | Part | What it is |
 |---|---|
@@ -131,32 +141,33 @@ you learn it once instead of per component:
 | `surface` | A floating panel drawn over the page. |
 | `viewport` | A scrollport the component reads the position of. |
 
-Anything naming a thing the component actually has, a `thumb`, a `swatch`, a
-`weekday`, is that component's own word and is on its page.
+A part that names something specific to one component, such as `thumb`,
+`swatch`, or `weekday`, is listed on that component's page.
 
 ## What not to do
 
-**Do not raise specificity to fight a component.** `helix-button.thing.thing` is
-still outside the shadow root, so it wins nothing it was not already winning.
-Selector weight is not what is stopping you.
+**Do not raise specificity to override a component.** `helix-button.thing.thing`
+is still outside the shadow root, so it reaches nothing that `helix-button` did
+not already reach. The shadow boundary blocks your rule, and selector weight
+cannot change that.
 
 **Do not restyle through `!important` on the host.** Some properties inherit
-into a shadow root and most do not, so this works for `color` and `font-family`
-and fails silently for everything else, which is a worse outcome than failing
-loudly.
+into a shadow root and most do not. `!important` on the host works for `color`
+and `font-family` and fails with no error for everything else. A silent failure
+is harder to find than an error.
 
-**Do not fork the component to change a color.** The headless tier exists for
-the case where you want none of our styling, and it is a different decision from
-overriding one value. See [Tiers](./tiers).
+**Do not fork the component to change a color.** The headless tier is for when
+you want none of our styling. Changing one value does not need it. See
+[Tiers](./tiers).
 
-## When you want all of it
+## Replace all of the styling
 
 ```ts
 import '@fusion.dev/helix-headless'
 ```
 
-The headless tier is structure, accessibility, state and form participation with
-no CSS at all. You write the entire appearance. That is the honest answer when
-the design is genuinely not ours, and it is a supported tier rather than an
-escape hatch: `helix-headless-select` is a registered element, not an abstract
-class.
+The headless tier provides structure, accessibility, state, and form
+participation, with no CSS. You write the entire appearance. Use it when your
+design is entirely different from ours. The headless tier is fully supported.
+For example, `helix-headless-select` is a registered element that you can use
+directly.

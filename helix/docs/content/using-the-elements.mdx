@@ -1,5 +1,5 @@
 ---
-description: Binding events, registering elements, and the traps in both.
+description: Bind events, register the elements, and import the styles in a React app.
 pinned: true
 section: Essentials
 title: Using the elements
@@ -7,8 +7,8 @@ title: Using the elements
 
 # Using the elements
 
-Write `<helix-card>` in your JSX. They are plain custom elements: no wrapper, no
-patched React, and no React package: there is not one.
+Write `<helix-card>` in your JSX. The elements are plain custom elements. There
+is no wrapper component, no patched React, and no React package.
 
 ```tsx
 export default function Page() {
@@ -21,8 +21,7 @@ export default function Page() {
 }
 ```
 
-Everything below is a trap that has actually cost time, rather than general
-advice.
+Each section below covers a problem that has cost us time in practice.
 
 ## Bind Helix events with `onhelix-*`
 
@@ -30,46 +29,48 @@ advice.
 <helix-tabs onhelix-before-activate={(event) => setPane(event.detail.value)} />
 ```
 
-There is a real bug underneath this, and the elements work around it for you.
-**React attaches no custom element listener while hydrating**, so on a
-server-rendered page every one of these props is dead until React commits an
-update for some other reason, at which point it silently starts working. Nothing
-is logged. It is
-[facebook/react#35446](https://github.com/facebook/react/issues/35446), open and
-unfixed.
+React attaches no custom element listeners while it hydrates. On a
+server-rendered page, these props do nothing until React commits an update for
+some other reason. Then they start working, and nothing is logged either way.
+The bug is [facebook/react#35446](https://github.com/facebook/react/issues/35446),
+and it is still open. The elements work around it for you.
 
-Every Helix element binds the handler itself, immediately before it announces
-anything, using the function React is already holding for it. Measured in Chrome
-against React 19.2.8: on a hydrated page the first event reaches the handler,
-and it is never delivered twice once React binds its own listener.
+Every Helix element binds the handler itself, just before it dispatches any
+event, using the function React already holds for it. We measured this in
+Chrome against React 19.2.8. On a hydrated page, the first event reaches the
+handler. After React binds its own listener, no event is delivered twice.
 
-Nothing is required of you, and nothing changes once React fixes it.
+You do not need to do anything, and nothing changes when React fixes the bug.
 
-React's own events are unaffected where they bubble. `onClick` on a
-`<helix-button>` goes through the synthetic system, which hydration does set up.
+React's own events work when they bubble. `onClick` on a `<helix-button>` goes
+through React's synthetic event system, which hydration sets up.
 
-A few of ours are native events relayed from inside the component, and the ones
-that do not bubble (`load` and `error` on Avatar, `ended`, `play` and `pause` on
-Video) reach nothing React sets up. The elements bind those for you, so
-`onError` on a `<helix-avatar>` works like the rest.
+A few Helix events are native events relayed from inside the component. The ones
+that do not bubble never reach React's listeners:
 
-## The prop is `on` plus the event name
+- `load` and `error` on Avatar
+- `ended`, `play`, and `pause` on Video
 
-React slices `on` off the prop and listens for exactly what is left, without
-inspecting it.
+The elements bind these for you, so `onError` on a `<helix-avatar>` works like
+any other handler.
+
+## Write the prop as `on` plus the event name
+
+React removes `on` from the prop name and listens for exactly the rest, as
+written.
 
 - `onhelix-before-open` reaches `helix-before-open`. ✅
 - `onhelix-sample-start` reaches `helix-sample-start`. ✅
-- `onHelixOpen` binds an event called `HelixOpen`, which nobody dispatches. ❌
+- `onHelixOpen` binds an event called `HelixOpen`, which is never dispatched. ❌
 
-The number of hyphens does not matter, measured in Chrome against React 19.2.8.
+The number of hyphens does not matter. We measured this in Chrome against React
+19.2.8.
 
-## Register once, in a client component
+## Register the elements in one client component
 
-A custom element registers as a side effect of importing its module, and that
-import has to be in the client graph to ever run. A server component's imports
-do not ship to the browser. So one client component holds every element import
-and renders `null`:
+A custom element registers when you import its module. That import runs only if
+it is in the client graph, and a server component's imports do not ship to the
+browser. Put every element import in one client component that renders `null`:
 
 ```tsx
 'use client'
@@ -82,9 +83,9 @@ export function HelixElements(): null {
 ```
 
 Render it once in your layout. **Your pages stay server components.** An
-unregistered tag is just an unknown element in the HTML that upgrades when the
-definition lands. Asking you to mark every page `'use client'` to use a button
-would not be a design system.
+unregistered tag is an unknown element in the HTML, and it upgrades when the
+definition loads. You do not need to mark any page `'use client'` to use a
+button.
 
 ## Import `elements.css` beside the base layer
 
@@ -93,13 +94,13 @@ import '@fusion.dev/helix-styles/base.css'
 import '@fusion.dev/helix-styles/helix.css'
 ```
 
-It hides each tag with `:not(:defined)` until it upgrades, using `visibility` so
-the page does not reflow. Without it a card arrives as a run of unstyled text
-and then snaps into a card.
+`elements.css` hides each tag with `:not(:defined)` until the element upgrades.
+It uses `visibility`, so the page does not reflow. Without it, a card appears as
+unstyled text and then jumps into its card layout.
 
-It is generated from the element sources and enumerates the tags, because CSS
-cannot select "any custom element" and a bare `:not(:defined)` would also catch
-your framework's dev overlay.
+We generate the file from the element sources, and it lists every tag by name.
+CSS has no selector for any custom element, and a bare `:not(:defined)` would
+also hide your framework's development overlay.
 
 ## Import from subpaths
 
@@ -108,16 +109,20 @@ import '@fusion.dev/helix/card' // ✅ one family
 import '@fusion.dev/helix' // ❌ the barrel
 ```
 
-One family per module, so you are not shipping the library to use a button.
+Import one component family per module, so you do not ship the whole library to
+use a button.
 
 ## Declarative shadow DOM is opt-in
 
-The site ships no DSD, and the shadow styles arrive with the definition rather
-than in the markup. You don't need to configure anything for that. If you render
-with Lit SSR yourself, its declarative shadow DOM hydrates: see
+The site ships no declarative shadow DOM (DSD). The shadow styles load with the
+element definition. You do not need to configure anything. If you render with
+Lit SSR yourself, its declarative shadow DOM hydrates. See
 [Server rendering](./server-rendering).
 
-The short version of why: DSD cannot activate for script-inserted nodes, a
-server component's output is replayed from the flight payload through DOM APIs
-rather than re-run, and the patch that made it work hooked webpack, which
-Turbopack ignores, silently.
+The site ships no DSD for three reasons:
+
+- DSD cannot activate for nodes inserted by script.
+- React inserts a server component's output by replaying the flight payload
+  through DOM APIs, without running the component again.
+- The patch that made DSD work hooked into webpack, and Turbopack ignores that
+  hook without an error.

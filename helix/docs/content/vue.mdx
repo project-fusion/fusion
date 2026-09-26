@@ -1,5 +1,5 @@
 ---
-description: The one compiler setting Vue needs, and why props and events already work.
+description: The compiler setting Vue needs, and how Vue passes props and binds events.
 parent: installation
 section: Getting started
 title: Vue
@@ -11,15 +11,15 @@ title: Vue
 import '@fusion.dev/helix/vue'
 ```
 
-A types-only import, once. It augments Vue's `GlobalComponents` so every Helix
-tag is typed in an SFC template, with its real props and its real events. The
-generated file declares the augmentation under both `vue` and
-`@vue/runtime-core`, because tooling disagrees about which one to read.
+Add this types-only import once. It augments Vue's `GlobalComponents`, so every
+Helix tag in an SFC template has typed props and events. The generated file
+declares the augmentation under both `vue` and `@vue/runtime-core`, because
+different tools read different ones.
 
-## Tell the compiler the tags are deliberate
+## Mark Helix tags as custom elements
 
-Without this, Vue resolves `<helix-button>` as a component it cannot find and
-warns on every render.
+Without this setting, Vue treats `<helix-button>` as a component it cannot find
+and logs a warning on every render.
 
 ```ts
 // vite.config.ts
@@ -32,37 +32,37 @@ export default defineConfig({
 })
 ```
 
-The prefix test is the whole rule. Every element in the library is `helix-`
-something, in both tiers, and nothing else is.
+The prefix test is enough. Every Helix element name starts with `helix-`, in
+both tiers, and no other name in the library does.
 
-## Props and events need no ceremony
+## Pass props and bind events
 
-Vue sets a property when the element has one and falls back to an attribute
-otherwise, which is exactly right for these: a string goes through either path
-and an array or an object goes through the property.
+Vue sets a property when the element has one, and sets an attribute otherwise.
+That works for every Helix element. A string goes through either path, and an
+array or an object goes through the property.
 
 ```vue
 <helix-tabs :items="items" @helix-before-activate="onActivate" />
 ```
 
-`@helix-before-activate` binds with `addEventListener`, so the name is the event's own.
-Vue is the framework this works most quietly in, which is why this page is
-short: there is no bridge and no wrapper, only the compiler setting above.
+`@helix-before-activate` binds with `addEventListener`, so use the event's own
+name. Vue needs no bridge and no wrapper. The compiler setting above is the only
+setup.
 
-**Force the property with `.prop` if you ever need to**, for instance where a
-string would be ambiguous:
+To force a property, use `.prop`. You may need it where a string would be
+ambiguous:
 
 ```vue
 <helix-input :value.prop="'42'" />
 ```
 
-Rarely necessary, and it exists so you do not go looking for it.
+You will rarely need `.prop`.
 
-## Seeding, mirroring and refusing
+## Seed, mirror, or refuse a value
 
-`value`, `open`, `checked` and `active` are seeds. The element applies its own
-changes from there, so all three of these work. See [State and
-control](./state-and-control).
+`value`, `open`, `checked`, and `active` are seeds. The element starts with the
+value you set and then applies its own changes, so all three of these patterns
+work. See [State and control](./state-and-control).
 
 ```vue
 <!-- Seeded: the element owns it from there. -->

@@ -1,14 +1,20 @@
 ---
-description: Real form participation, labels that resolve across a shadow root, and the disabled trap.
+description: How Helix controls take part in forms, render their own labels, and handle disabled fieldsets.
 section: Essentials
 title: Forms and validation
 ---
 
 # Forms and validation
 
-Twenty-two families are form-associated custom elements, so a `<form>` collects
-them, resets them, restores them on back-navigation and validates them the way it
-does a native control. Nothing about that is simulated.
+Twenty-two component families are form-associated custom elements. A `<form>`
+treats them as it treats native controls:
+
+- It collects their values.
+- It resets them.
+- It restores them when you navigate back.
+- It validates them.
+
+None of this is simulated.
 
 ```html
 <form>
@@ -28,10 +34,10 @@ does a native control. Nothing about that is simulated.
 </form>
 ```
 
-`new FormData(form)` has `name` and `plan` in it. So does a server reading the
-POST body.
+`new FormData(form)` contains `name` and `plan`, and so does the POST body a
+server receives.
 
-## Every control carries its own label
+## Every control renders its own label
 
 ```html
 <helix-input
@@ -42,27 +48,30 @@ POST body.
 ></helix-input>
 ```
 
-There is no wrapping `Field` component, and that is not a style preference. **A
-wrapper cannot name what it wraps.** Its label would live in one shadow root and
-the control in another, and measured in Chrome 148: an `aria-labelledby` IDREF
-cannot see across a shadow boundary, and `control.ariaLabelledByElements =
-[labelInTheWrapper]` reads back as zero elements, the reference silently
-dropped. The same assignment with a label in the control's own tree is kept.
+Helix has no wrapping `Field` component, because **a wrapper cannot name the
+control inside it.** The wrapper's label would be in one shadow root and the
+control in another. We measured this in Chrome 148:
 
-That pattern works in React component libraries because they have no shadow
-boundary. Bringing it here brings the ergonomics and none of the conditions that
-made it work.
+- An `aria-labelledby` IDREF cannot see across a shadow boundary.
+- `control.ariaLabelledByElements = [labelInTheWrapper]` reads back as zero
+  elements, because the reference is silently dropped.
+- The same assignment with a label in the control's own tree is kept.
 
-So every control that wants a label has the same three properties and renders
-its own nodes:
+The wrapper pattern works in React component libraries because they have no
+shadow boundary. Copying it into Helix would copy the API without the condition
+that makes it work.
+
+Every control that takes a label has the same three properties, and it renders
+their content itself:
 
 | Property | For |
 |---|---|
 | `label` | The accessible name, and the fallback for the `label` slot |
 | `hint` | Help under the control, while there is nothing wrong |
-| `feedback` | What is wrong, in your words rather than the browser's |
+| `feedback` | What is wrong, in your own words. It replaces the browser's message |
 
-Each is a slot fallback, so anything richer than a string replaces it:
+Each property is the fallback for a slot of the same name. To use more than
+plain text, put content in the slot:
 
 ```html
 <helix-input name="email">
@@ -70,16 +79,18 @@ Each is a slot fallback, so anything richer than a string replaces it:
 </helix-input>
 ```
 
-**A whitespace-only text node defeats a default slot's fallback**, which costs a
-label and gives no warning. Measured in Chrome 148: a newline between the tags
-is enough, so `<helix-checkbox label="Accept">` closed on the next line renders
-no label at all. Named slots do not have this problem, because `slot="label"` is
-an attribute and a text node has none. It is the platform's behavior rather
-than ours, and it is true of every slot fallback in the library.
+A text node that holds only whitespace replaces a default slot's fallback. You
+lose the label, and nothing warns you. We measured this in Chrome 148. A newline
+between the tags is enough, so `<helix-checkbox label="Accept">` with its
+closing tag on the next line renders no label at all. Named slots do not have
+this problem, because `slot="label"` is an attribute and a text node cannot
+carry one. This is how the platform behaves, and it applies to every slot
+fallback in Helix.
 
 ## Validation
 
-The platform's own validation works, because these are real form participants:
+The platform's own validation works, because these controls are real form
+participants:
 
 ```html
 <helix-input
@@ -90,12 +101,13 @@ The platform's own validation works, because these are real form participants:
 ></helix-input>
 ```
 
-Submitting an empty form blocks and points at the control. `checkValidity()`,
-`reportValidity()` and `:invalid` behave.
+Submitting an empty form is blocked, and the browser points to the control.
+`checkValidity()`, `reportValidity()`, and `:invalid` work as they do for native
+controls.
 
-**`feedback` overrides the message.** Left empty, the browser's own is shown,
-which is localized and familiar; set, it says what you want in the words your
-product uses:
+`feedback` replaces the browser's message. When `feedback` is empty, the
+browser shows its own message, which is localized and familiar. When you set it,
+the control shows the message in the words your product uses:
 
 ```html
 <helix-input
@@ -106,13 +118,13 @@ product uses:
 ></helix-input>
 ```
 
-**A group is the participant, not its members.** `Radio.Group` and
-`Toggle.Group` own the `name`, the `value` and the validity: a lone radio is not
-a control at all, it is an answer to one. `Checkbox.Group` is the exception in
-the other direction, since each box in it submits itself already, so the group
-deliberately reports no value of its own.
+`Radio.Group` and `Toggle.Group` take part in the form for their members. Each
+group owns the `name`, the `value`, and the validity. A single radio is an
+answer, and the group is the control it answers. `Checkbox.Group` works the
+other way. Each checkbox in it already submits itself, so the group reports no
+value of its own.
 
-## The disabled trap
+## Disabled controls and fieldsets
 
 ```html
 <fieldset disabled>
@@ -123,13 +135,13 @@ deliberately reports no value of its own.
 </fieldset>
 ```
 
-That works. The platform tells a form-associated element it has been disabled by
-an ancestor through `formDisabledCallback`, and every Helix control implements
-it, so a control inside a disabled fieldset refuses input and announces itself
-as off rather than staying typeable and unsubmittable.
+A Helix control inside a disabled fieldset is disabled too. The platform calls
+`formDisabledCallback` to tell a form-associated element that an ancestor
+disabled it, and every Helix control implements that callback. A control inside
+a disabled fieldset does not accept input, and it announces itself as turned
+off.
 
-**For your own CSS this means one rule.** Style disabled controls with
-`:disabled`, never `[disabled]`:
+**Style disabled controls with `:disabled`.** Do not use `[disabled]`:
 
 ```css
 /* Right: matches the attribute and the ancestor fieldset. */
@@ -139,23 +151,22 @@ helix-input:disabled { … }
 helix-input[disabled] { … }
 ```
 
-The pseudo-class is true for a control carrying the attribute *and* for one
-inside a disabled fieldset, which sets no attribute on anything. A component
-styled with the attribute selector refuses interaction from the fieldset,
-because the platform disables it either way, and paints itself as live. That
-reads as a control that is simply broken, and it is invisible in every example
-that does not happen to use a fieldset. The library holds itself to this, and
-the same reasoning applies to yours.
+`:disabled` matches a control that has the attribute. It also matches a control
+inside a disabled fieldset, which sets no attribute on anything. With the
+attribute selector, the platform still disables a control inside a disabled
+fieldset, but the control is drawn as if it were active. It looks broken, and
+you will not see the problem in any example without a fieldset. Helix components
+follow this rule, and the same reasoning applies to your styles.
 
-`disabled` is mirrored to `aria-disabled` rather than removing the control from
-the accessibility tree, so a screen reader can still announce that the control
-exists and is currently off.
+`disabled` is mirrored to `aria-disabled`, and the control stays in the
+accessibility tree. A screen reader can still announce that the control exists
+and is turned off.
 
-## Seeding a form
+## Set starting values in a form
 
-A declared `value` or `checked` is a seed and the control goes on managing
-itself, so a form needs nothing wired to work. `default-value` is what a reset
-returns to, which is usually what a seed in a form means:
+A `value` or `checked` you set is a starting value, and the control then manages
+itself, so a form works without any wiring. `default-value` is the value a reset
+returns to. In a form, that is usually what you mean by a starting value:
 
 ```html
 <helix-input

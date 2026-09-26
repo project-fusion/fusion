@@ -1,24 +1,32 @@
 ---
-description: Using the headless tier as the foundation for a design system of your own.
+description: Build your own design system on the Helix headless tier, with your own tag names and styles.
 section: Essentials
 title: Building on the headless tier
 ---
 
 # Building on the headless tier
 
-The headless tier is a set of components with no stylesheet: structure, ARIA,
-keyboard behavior, state and form participation, and nothing about how any of it
-looks. That makes it usable as a foundation rather than as a library you consume
-whole. Your tags, your stylesheets, our accessibility.
+The headless tier is a set of components with no stylesheet. Each component
+provides:
 
-This is a different thing from theming Helix. Theming keeps our components and
-changes their tokens. This keeps our behavior and replaces the presentation
-layer outright, under names of your own.
+- structure
+- ARIA
+- keyboard behavior
+- state
+- form participation
 
-## One line does it
+None of it sets how the component looks. You can use the headless tier as the
+foundation of your own design system, with your own tag names and your own
+stylesheets.
 
-Every headless component renders its children by interpolating a tag rather than
-naming one, and the prefix comes from a static on the class:
+Theming Helix keeps our components and changes their tokens. Building on the
+headless tier keeps our behavior and replaces the whole presentation layer,
+under names of your own.
+
+## Set your own tag prefix
+
+Every headless component renders its children with an interpolated tag name.
+The prefix of that name comes from a static on the class:
 
 ```ts
 import { HelixHeadlessCombobox } from '@fusion.dev/helix-headless/combobox'
@@ -30,19 +38,18 @@ export class AcmeCombobox extends HelixHeadlessCombobox {
 customElements.define('acme-combobox', AcmeCombobox)
 ```
 
-That is the whole mechanism, and it is the same one the styled tier uses: it
-writes `static override tier = 'helix-'` and nothing else. The static appears 116
-times in the headless manifest, so it is discoverable rather than folklore.
+That one line sets the prefix. The styled tier sets its prefix the same way, with
+`static override tier = 'helix-'` and nothing else. The static appears 116 times
+in the headless manifest, so you can find it there.
 
-## The render graph is the part that will catch you
+## Register every component a component renders
 
-**A component that renders another gives you two things to register, and only
-one of them is obvious.**
+**When a component renders another component, register both.**
 
-Register `acme-combobox` without also registering `acme-listbox` and the panel
-renders a tag nobody defined. That is not an error and not a warning: an
-unregistered custom element is an inert, unstyled inline box, so what you see is
-a combobox that appears not to open.
+If you register `acme-combobox` without `acme-listbox`, the panel renders a tag
+that is not defined. The browser shows no error or warning. An unregistered
+custom element is an inert, unstyled inline box, so the combobox appears not to
+open.
 
 [//]: # (renders)
 
@@ -71,22 +78,24 @@ a combobox that appears not to open.
 
 [//]: # (/renders)
 
-The safe rule is to subclass and register a family together with everything it
-renders, transitively: `command` reaches `dialog` and `listbox`, and `listbox`
-reaches `option`.
+Subclass and register each family together with everything it renders, and
+everything those families render in turn. For example, `command` reaches
+`dialog` and `listbox`, and `listbox` reaches `option`.
 
-**This table is generated from the manifest**, which publishes the graph as
-`helix.renders` on every element that interpolates a tag. It was kept by hand
-until 22 September 2026 and was wrong by four families when it stopped being, so
-read it as current rather than as maintained.
+We generate the table from the manifest, which publishes the graph as
+`helix.renders` on every element that interpolates a tag. We kept the table by
+hand until September 22, 2026. By then, four families in it were wrong. The
+generated table is always current.
 
-## What you have to supply yourself
+## What you write yourself
 
-**A `:not(:defined)` guard.** `@fusion.dev/helix` ships an `elements.css` that
-hides each of its tags until the definition lands, so a page does not show a run
-of unstyled text and then snap. The headless package ships no such file, and
-nothing can generate one for tags you have not named yet. Write the rule for
-your own elements:
+### A `:not(:defined)` rule
+
+`@fusion.dev/helix` ships an `elements.css` that hides each of its tags until
+the tag's definition loads. Your page then does not show unstyled text that
+changes into components. The headless package ships no such file, and no tool
+can generate one for tags you have not named yet. Write the rule for your own
+elements:
 
 ```css
 acme-combobox:not(:defined),
@@ -95,12 +104,13 @@ acme-listbox:not(:defined) {
 }
 ```
 
-Visibility rather than `display`, so the page does not reflow when the
-definitions arrive.
+Use `visibility` so the page does not reflow when the definitions arrive.
 
-**Your own typings, from the same generator we use.** `@fusion.dev/helix-cem`
-reads your package and writes `jsx.d.ts`, `vue.d.ts` and `svelte.d.ts` for your
-tags, with every member your subclass inherited from ours. Add a `cem.config.ts`
+### Typings for your tags
+
+`@fusion.dev/helix-cem` is the generator we use for our own typings. It reads
+your package and writes `jsx.d.ts`, `vue.d.ts`, and `svelte.d.ts` for your tags,
+with every member your subclasses inherit from ours. Add a `cem.config.ts`
 beside your `package.json`:
 
 ```ts
@@ -113,11 +123,13 @@ export default {
 } satisfies HelixCemOptions
 ```
 
-and run `bun --bun helix-cem`. It finds what you extend through your
-`dependencies`, so `acme-combobox` arrives with the hundred-odd members it
-inherited rather than the two you wrote.
+Then run `bun --bun helix-cem`. It finds the classes you extend through your
+`dependencies`. The typings for `acme-combobox` then include the hundred or so
+members it inherits, as well as the two you wrote.
 
-**The tag map is still yours to write**, one line per element, beside the class:
+### The tag map
+
+Write the tag map yourself, with one line per element, beside the class:
 
 ```ts
 declare global {
@@ -127,43 +139,57 @@ declare global {
 }
 ```
 
-That is TypeScript's own convention for a custom element rather than a gap in
-this: the interface merges from your source, and nothing generated can name a
-class it is not in the same program as.
+TypeScript declares custom elements this way. The interface merges from your
+source, and a generated file cannot name a class that is not in the same
+program.
 
-## What you get without asking
+## What the headless tier handles for you
 
-**Tree-shaking is honest.** `@fusion.dev/helix-headless` declares
-`sideEffects: ["./dist/**/*.js"]`, which is true rather than convenient: the
-modules register elements on import, so a bundler that believed otherwise would
-drop a registration and leave you debugging a tag that does not upgrade.
+### Tree-shaking
 
-**A styling surface that is documented.** Every part carries an `@csspart`, so
-`::part()` is a published door rather than a shadow tree you have to guess at.
-That is what makes replacing the presentation layer tractable: you are writing
-against named parts, not against our internals.
+`@fusion.dev/helix-headless` declares `sideEffects: ["./dist/**/*.js"]`. The
+declaration is accurate, because the modules register elements when you import
+them. A bundler that treated them as free of side effects would drop a
+registration, and a tag would never upgrade.
 
-**Composition stays ours.** Focus management, typeahead, the roving tab stop,
-form participation and validity all live below the tier you are replacing, so
-they keep working under your names.
+### Documented parts
 
-## What is not promised yet
+Every part has an `@csspart` entry, so every `::part()` you can use is
+published. You write your presentation layer against these named parts, and it
+does not depend on our internal markup.
 
-`tier` is an implementation detail that happens to be visible in the manifest.
-Using it the way this page describes turns it into API with a stability contract
-attached, and that contract is not written. Treat this as a supported pattern
-that is not yet a versioned promise, and pin your Helix version.
+### Behavior
 
-## How this differs from white-labeling
+These features live below the tier you replace, so they keep working under your
+tag names:
 
-Two different customers get confused for each other here. This page is for the
-one building a design system on top of ours and content for our tags to sit
-beside theirs. The other wants Helix shipped under their name with ours absent,
-which is a different and more expensive mechanism: rewriting the tag literals at
-build time, a second distribution to publish, and an artifact per customer.
-Nothing on this page needs any of that.
+- focus management
+- typeahead
+- the roving tab stop
+- form participation
+- validity
 
-The ownership question answers itself in this direction. You hold the
-presentation layer, the tags and the build. If Fusion stopped tomorrow you would
-keep a working design system and lose upstream fixes to the behavior underneath
-it.
+## `tier` is not yet a versioned API
+
+`tier` is an implementation detail that is visible in the manifest. Using it to
+set your own prefix makes it an API that needs a stability contract, and we
+have not written that contract yet. The pattern is supported but not yet
+versioned, so pin your Helix version.
+
+## Building on the headless tier compared with white-labeling
+
+Building on the headless tier fits you if you are building a design system on
+top of ours and our tags can appear beside yours.
+
+White-labeling fits a customer who wants Helix shipped under their own name,
+with no Helix tags. It costs more, and it needs:
+
+- the tag literals rewritten at build time
+- a second distribution to publish
+- an artifact per customer
+
+Building on the headless tier needs none of these.
+
+You own the presentation layer, the tags, and the build. If we stopped
+tomorrow, you would keep a working design system. You would lose our fixes to
+the behavior underneath it.

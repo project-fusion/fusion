@@ -1,14 +1,14 @@
 ---
-description: Locale-aware controls, translatable strings, and a layout that already flips.
+description: Set the locale of date, time, and number controls, translate component strings, and lay out pages right to left.
 section: Essentials
 title: Localization and RTL
 ---
 
 # Localization and RTL
 
-## Right-to-left already works
+## Right-to-left layout
 
-Set `dir` and the layout flips:
+Set `dir`, and the layout flips:
 
 ```html
 <html
@@ -17,46 +17,74 @@ Set `dir` and the layout flips:
 >
 ```
 
-Every component is written in logical properties, `inline-start` rather than
-`left`, `margin-block` rather than `margin-top`. Nothing infers the direction
-for you and nothing needs to: the document says it and the components follow.
+Components are written with logical properties, such as `inline-start` for
+`left` and `margin-block` for `margin-top`. Helix does not detect the direction.
+The components follow the `dir` that your document sets.
 
-**A physical side appears only where the thing it places is physical.** A
-floating panel is placed from coordinates measured from the viewport's left
-edge, so it and its arrow are written in `left` and `top`. Everything a reader
-would expect to mirror still does.
+**Physical properties appear only where the position is physical.** A floating
+panel is placed by coordinates measured from the viewport's left edge, so the
+panel and its arrow use `left` and `top`. Everything you would expect to mirror
+still mirrors.
 
-**Charts mirror too.** A category or time axis starts where the text does, so
-on a right-to-left page the first reading is on the right and the drawing,
-its labels, its hover targets and its tooltips all turn together. Values keep
-their vertical sense and numerals are not reversed. A whole donut stays
-clockwise from twelve, which is a clock's convention rather than a script's,
-and a scatter chart keeps its left-to-right plane, both of its axes being
-measures. [Charting](./charting) has the rest.
+### Charts
 
-**Carets and arrow keys turn too.** A caret meaning next or previous, the one
-between two crumbs and a shut disclosure all point along the line, so on a
-right-to-left page they point the other way, and every arrow key moves where it
-points on screen: the left arrow moves to the next tab, the next day, the next
-control in a toolbar, and opens a tree's branch or a menu's submenu, whose caret
-points left. A slider and a splitter's divider move the way the key points.
+A category or time axis starts on the same side as the text. On a right-to-left
+page, the first value is on the right. The drawing, its labels, its hover
+targets, and its tooltips all mirror together. The vertical axis does not
+change, and numerals are not reversed. Two charts keep their direction:
 
-A media player is an exception: its timeline and its skip buttons run left to
-right in every script, a tape having one direction, so the left arrow rewinds.
-A pin input is the other. A code is read like a phone number, so its boxes run
-left to right on every page: the first character typed goes in the leftmost
-box, a pasted code fills rightward and the right arrow moves on, while its
-label, hint and error read the way the page does.
+- A whole donut runs clockwise from twelve o'clock, following the convention of
+  a clock.
+- A scatter chart keeps its left-to-right plane, because both of its axes are
+  measures.
 
-That is also how `placement` reads. The side is physical and the alignment is
-logical: `right` is the right of the anchor in either direction, and
-`bottom-start` lines a panel up with the anchor's start edge, which is its right
-edge on a right-to-left page. A panel with no room on its side still flips to
-the other one, so a `right-start` panel beside a rail at the start of a
-right-to-left page opens to its left.
+See [Charting](./charting) for the rest.
 
-The same is true of anything you write on top. Use logical properties and your
-layout flips with ours; use `left` and `right` and it will not.
+### Carets and arrow keys
+
+These carets point along the line of text:
+
+- a caret that means next or previous
+- the caret between two breadcrumbs
+- the caret on a closed disclosure
+
+On a right-to-left page, they point the other way. Every arrow key moves in the
+direction it points on screen. On a right-to-left page, the Left Arrow key:
+
+- moves to the next tab
+- moves to the next day
+- moves to the next control in a toolbar
+- opens a tree's branch or a menu's submenu, whose caret points left
+
+A slider and a splitter's divider move in the direction of the key.
+
+### Media players and pin inputs
+
+These two components run left to right on every page.
+
+A media player's timeline and skip buttons run left to right in every script,
+like a tape, so the Left Arrow key rewinds.
+
+A pin input's boxes run left to right, because a code is read like a phone
+number. The first character you type goes in the leftmost box, a pasted code
+fills to the right, and the Right Arrow key moves to the next box. The pin
+input's label, hint, and error follow the direction of the page.
+
+### Floating panel placement
+
+In `placement`, the side is physical and the alignment is logical:
+
+- `right` is the right side of the anchor in both directions.
+- `bottom-start` aligns a panel with the anchor's start edge, which is its right
+  edge on a right-to-left page.
+
+A panel with no room on its side flips to the other side. A `right-start` panel
+beside a rail at the start of a right-to-left page opens to its left.
+
+### Your own styles
+
+Use logical properties in your own styles, so your layout flips with the
+components. Styles written with `left` and `right` do not flip.
 
 ## Locale-aware controls
 
@@ -76,18 +104,18 @@ Six families format numbers or dates and take a `locale`:
 ></helix-pagination>
 ```
 
-Left unset, they use the browser's own locale, which is usually right. Set it
-when your application's language is a choice the reader made rather than the one
-their operating system is in.
+If you do not set `locale`, these controls use the browser's locale, which is
+usually correct. Set `locale` when your users choose your application's
+language separately from the language of their operating system.
 
-Formatting goes through `Intl`, so there is no locale data bundled and nothing
-to keep up to date.
+Formatting uses `Intl`, so Helix bundles no locale data, and you have nothing to
+keep up to date.
 
-## Translatable strings
+## Translate component strings
 
-Over a hundred properties across the headless tier are strings a reader sees,
-from `pan-up-label` on a map to `remove-label` on a combobox's chosen tags. The
-ones that combine values are format templates:
+More than a hundred properties in the headless tier set text that your users
+see. Examples include `pan-up-label` on a map and `remove-label` on a combobox's
+selected tags. Properties that combine values are format templates:
 
 ```html
 <helix-pagination-summary
@@ -99,16 +127,22 @@ ones that combine values are format templates:
 ></helix-pagination-summary>
 ```
 
-The placeholders are named rather than positional, so a translation can reorder
-them, which some languages require and a positional format cannot express.
+Placeholders have names, so a translation can put them in any order. Some
+languages need a different order, and a positional format cannot express it.
 
-**Validation messages are properties too**, named for the validity flag each
-one reports: `value-missing-message`, `bad-input-message`,
-`range-underflow-message`, `range-overflow-message`, `too-short-message`. They
-reach the browser's own bubble as well as the line under the field, which
-`feedback` alone does not. Left unset, a text field keeps the browser's own
-message, which is already in the reader's language, and every other control
-keeps its English sentence.
+Validation messages are properties too. Each one is named for the validity flag
+it reports:
+
+- `value-missing-message`
+- `bad-input-message`
+- `range-underflow-message`
+- `range-overflow-message`
+- `too-short-message`
+
+A message appears in the browser's own validation bubble and on the line under
+the field. `feedback` does not reach the bubble. If you do not set a message, a
+text field shows the browser's own message, which is already in your user's
+language. Every other control shows its English sentence.
 
 ```html
 <helix-number-input
@@ -118,22 +152,24 @@ keeps its English sentence.
 ></helix-number-input>
 ```
 
-**Pass these from your own translation system.** Helix ships English defaults
-and no translation machinery: a design system that owned the string catalog
-would be a second one to keep in step with yours.
+**Pass these strings from your own translation system.** Helix ships English
+defaults and no translation tools. If Helix had its own string catalog, you
+would have to keep two catalogs in step.
 
-## What to check when adding a language
+## What to check when you add a language
 
-- **Long strings.** German and Finnish will find every control that assumed a
-  short label. Controls take their width from the layout rather than carrying
-  one, which helps, but a toolbar that fitted six buttons may now fit four.
-- **The `lang` attribute, not just the strings.** Hyphenation, quotation marks
-  and font fallback all key off it.
-- **Numerals.** `Intl` handles the digits; a hardcoded `%` or a currency symbol
-  in your own markup will not move to the right side.
-- **Icons that point.** A caret a component draws turns on its own. An icon you
-  place does not unless you ask, because the names are physical: `mirror` turns
-  one on a right-to-left page, for an arrow that means forward or back.
+- **Long strings.** Labels in German and Finnish are often long. A control sized
+  for a short label may not fit them. Controls take their width from the
+  layout and set no width of their own, which helps. A toolbar that fit six
+  buttons may now fit four.
+- **The `lang` attribute.** Set it as well as translating the strings.
+  Hyphenation, quotation marks, and font fallback all depend on it.
+- **Numerals.** `Intl` formats the digits. A `%` or a currency symbol hardcoded
+  in your own markup does not move to the correct side.
+- **Icons that point.** A caret that a component draws turns by itself. An icon
+  you place turns only when you add `mirror`, because icon names are physical.
+  Use `mirror` on an arrow that means forward or back, and it turns on a
+  right-to-left page.
 
   ```html
   <helix-button>
@@ -146,9 +182,13 @@ would be a second one to keep in step with yours.
   </helix-button>
   ```
 
-## What is not covered
+## What Helix does not provide
 
-There is no message catalog, no pluralization helper and no date-range
-formatter beyond what the controls do for themselves. Those belong to your
-application's i18n layer, and every one of these properties is designed to be
-fed from it.
+Helix does not include:
+
+- a message catalog
+- a pluralization helper
+- a date-range formatter, beyond what the controls format themselves
+
+These belong to your application's i18n layer. You can set every translatable
+property from that layer.

@@ -1,19 +1,20 @@
 ---
-description: Why a component renders its own anchor, and how to keep a router.
+description: Make components navigate with real anchors, and use your framework's router with them.
 section: Essentials
 title: Routing and navigation
 ---
 
 # Routing and navigation
 
-Some components navigate. A tree used as a sidebar, a button that goes
-somewhere, a tab that is really a page. Those all want to be links, and a link
-inside a shadow root is where web components and framework routers disagree.
+Some components navigate, such as a tree used as a sidebar, a button that opens
+another page, or a tab that is a page. Each of these should be a link. A
+framework router does not handle a link inside a shadow root the way it handles
+its own links.
 
 ## A component that navigates renders its own anchor
 
-`Tree.Item` and `Button` both take an `href`, and when they have one the thing
-you press *is* an `<a>`:
+`Tree.Item` and `Button` both take an `href`. With an `href`, the element you
+press *is* an `<a>`:
 
 ```html
 <helix-tree-item
@@ -24,31 +25,31 @@ you press *is* an `<a>`:
 </helix-tree-item>
 ```
 
-That is not a detail of the implementation. What it buys is a list of things no
-amount of JavaScript reproduces:
+A real anchor gives you behavior that JavaScript cannot reproduce:
 
-- the whole row is the target, not just the words
-- Enter works, because a focused anchor is a thing Enter activates
-- middle-click and Command-click open a tab
-- the destination appears in the status bar on hover
-- right-click offers Copy Link Address
-- a crawler follows it
+- The whole row is the target, including the space around the words.
+- Enter works, because Enter activates a focused anchor.
+- Middle-click and Command-click open a new tab.
+- The destination appears in the status bar on hover.
+- Right-click offers Copy Link Address.
+- A crawler follows it.
 
-A `<Link>` inside each row buys none of it. In the docs sidebar the anchor was
-57px of a 240px row, so five sixths of every row did nothing, and Enter did
-nothing at all: the tree announced a selection and no anchor heard it.
+A `<Link>` inside each row gives you none of these. In our docs sidebar, the
+anchor was 57px of a 240px row, so about three quarters of every row did nothing. Enter
+did nothing at all, because the tree reported a selection and no anchor
+received it.
 
 ## `href` and a framework's `<Link>`
 
 You cannot give a component's internal anchor to `next/link`. `<Link>` renders
-*its own* `<a>` and attaches its own handlers to it, and there is no way to hand
-that to an element that renders one inside a shadow root.
+*its own* `<a>` and attaches its own handlers to it. An element that renders an
+anchor inside a shadow root cannot receive those handlers.
 
-So it is one or the other.
+Choose one: an `href` on the component, or a `<Link>`.
 
-## Wrapping the component in a `<Link>` is not the third option
+## Do not wrap a component in a `<Link>`
 
-It looks like it should work, and it half does:
+Wrapping a component in a `<Link>` only partly works:
 
 ```tsx
 {/* Don't. */}
@@ -58,23 +59,25 @@ It looks like it should work, and it half does:
 ```
 
 The tree still finds its items, because it collects them with a descendant
-query rather than by looking at its children. What it costs:
+query. The wrapper causes three problems:
 
-- **Two focus stops per row.** The anchor is focusable and so is the treeitem
-  inside it. A tree owns a single roving tab stop, and this adds a second one it
-  does not control.
-- **A `treeitem` nested inside a `link`.** Anything reading the semantics meets
-  both, in that order, for one thing.
-- **Nothing at all for a branch.** A branch contains its children, so wrapping
-  one puts every descendant anchor inside an ancestor anchor. That is invalid,
-  and browsers rearrange it.
+- **Two focus stops per row.** The anchor can take focus, and so can the
+  treeitem inside it. A tree has a single roving tab stop, and the anchor adds a
+  second one that the tree does not control.
+- **A `treeitem` nested inside a `link`.** Anything that reads the semantics
+  finds both roles, in that order, for one item.
+- **Invalid markup for a branch.** A branch contains its children, so wrapping a
+  branch puts every descendant anchor inside an ancestor anchor. Nested anchors
+  are invalid, and browsers rearrange them.
 
 ## Some roles cannot contain a link
 
-`treeitem` and `tab` are the two in this library. You cannot nest an anchor in
-either, and the answer is not to give up the anchor.
+In Helix, `treeitem` and `tab` are the two roles that cannot contain a link. You
+cannot nest an anchor in either role. A tree keeps the anchor and changes its
+markup.
 
-For a tree, the role moves *onto* the anchor and the group becomes its sibling:
+For a tree, the role moves *onto* the anchor, and the group becomes the
+anchor's sibling:
 
 ```html
 <!-- What Tree.Item renders when it has an href -->
@@ -95,20 +98,20 @@ For a tree, the role moves *onto* the anchor and the group becomes its sibling:
 </div>
 ```
 
-That is the navigation flavor of the tree pattern, and it is why `href` changes
-the shape of the markup rather than only adding an attribute. Without an `href`
-nothing moves: the wrapper stays the `treeitem` and holds its group, which is
-what an `<li>` holding a `<ul>` is.
+This markup is the navigation form of the tree pattern. For that reason, `href`
+changes the structure of the markup as well as adding an attribute. Without an
+`href`, nothing moves. The wrapper stays the `treeitem` and contains its group,
+the same way an `<li>` contains a `<ul>`.
 
-Tabs have no equivalent published pattern. Web Awesome hit the same wall and
-answered it the other way, telling consumers to drop the anchor and navigate in
-JavaScript. That works, and it costs every item in the list above.
+Tabs have no equivalent published pattern. Web Awesome has the same problem. Its
+answer is to drop the anchor and navigate in JavaScript. That works, and you
+lose every item in the list above.
 
-## Getting client-side routing back
+## Use client-side routing with real anchors
 
-Real anchors do a full page load, because a framework only intercepts anchors it
-rendered itself. If you want its router, put it back on top rather than giving
-up the anchors:
+A real anchor causes a full page load, because a framework intercepts only the
+anchors it rendered itself. To use the framework's router, add it on top of the
+anchors:
 
 ```tsx
 'use client'
@@ -135,14 +138,14 @@ const navigate = (event) => {
 return <nav onClick={navigate} onPointerOver={warm}>{/* … */}</nav>
 ```
 
-One listener on the container covers every row, and nothing has to be rebound as
-rows come and go.
+One listener on the container handles every row. You do not need to add
+listeners again as rows are added and removed.
 
-### Prefetch on approach, not on sight
+### Prefetch when the pointer or focus reaches a link
 
-`<Link>` prefetches when a link enters the viewport. For a sidebar of seventy
-that is seventy requests for one navigation. Prefetching on `pointerover` and
-`focus` instead costs one, and a reader points at a row well before they press
+`<Link>` prefetches when a link enters the viewport. In a sidebar of seventy
+links, that is seventy requests for one navigation. Prefetch on `pointerover`
+and `focus` to make one request. People point at a row well before they press
 it:
 
 ```tsx
@@ -156,10 +159,10 @@ const warm = (event) => {
 }
 ```
 
-Prefetching is production-only in Next, so this does nothing in development. It
-is not broken.
+Next prefetches only in production, so this code has no effect in development.
+That is expected.
 
-## Which components take an `href` today
+## Components that take an `href`
 
 | Component | Notes |
 |---|---|
@@ -167,42 +170,46 @@ is not broken.
 | `Tree.Item` | Changes the ARIA shape, as above. A linked branch navigates from its row and opens from its chevron. |
 | `Menu.Item` | The row becomes the anchor and carries `menuitem`. Takes `target`, `rel` and `download`. |
 
-Anything else that should navigate is a gap. Slot a link into it, and press the
-row rather than the words: `Tree.Item` follows a slotted anchor from anywhere in
-the row and from the keyboard, which covers the case without an `href`.
+Other components that should navigate do not take an `href` yet. To make one
+navigate, slot a link into it. `Tree.Item` follows a slotted anchor when you
+press anywhere in the row or use the keyboard, so a tree item can navigate
+without an `href`.
 
-## `Option` cannot take one
+## `Option` cannot take an `href`
 
-The obvious place to want a link in a list is a command palette, whose entries
-are usually half commands and half destinations. It is the one place this
-library cannot offer an `href`.
+A command palette is a common place to want links in a list, because its
+entries are often half commands and half destinations. It is the one place
+where Helix cannot offer an `href`.
 
-**A listbox cannot move focus to its options.** A combobox keeps focus in its
-text field while the arrows walk the list, so the pattern it is obliged to use
-is `aria-activedescendant`: focus stays put and an attribute says which option
-is current. A menu is the opposite, and that is what makes `Menu.Item` easy:
-focus really moves to the row, so the row can be an anchor with `menuitem` on
-it.
+A listbox cannot move focus to its options. A combobox keeps focus in its text
+field while the arrow keys move through the list, so it has to use
+`aria-activedescendant`. Focus stays in the field, and an attribute marks the
+current option. A menu works the other way, which makes `Menu.Item` simple.
+Focus moves to the row, so the row can be an anchor with `menuitem` on it.
 
-**That reference reaches the option's host and nothing inside it.** IDREFs do
-not cross shadow boundaries at all, so `Listbox` uses the element-reference
-form. Measured in Chromium: assigning `ariaActiveDescendantElement` an element
-inside a *sibling* shadow root reads back `null`, while assigning the option's
-host reads back the host. So `role="option"` is pinned to the host, since the
-host is the only element the listbox can point at.
+The `aria-activedescendant` reference reaches the option's host and nothing
+inside it. IDREFs do not cross shadow boundaries, so `Listbox` uses the
+element-reference form. We measured this in Chromium. Assigning
+`ariaActiveDescendantElement` an element inside a *sibling* shadow root reads
+back `null`. Assigning the option's host reads back the host. So
+`role="option"` stays on the host, because the host is the only element the
+listbox can point at.
 
-**And a `role="option"` with an anchor inside it is broken.** Measured in the
-same browser, the accessibility tree for `<div role="option"><a href>Open
-settings</a></div>` inside a listbox is an option with *no accessible name*, and
-the link exposed as a child of it. The sibling option with plain text is named
-correctly. So the maneuver that works for `treeitem` and `menuitem`, moving the
-role onto the anchor, is exactly the one thing that cannot be done here.
+A `role="option"` with an anchor inside it is also broken. In the same browser,
+the accessibility tree for `<div role="option"><a href>Open
+settings</a></div>` inside a listbox shows an option with *no accessible name*,
+with the link as its child. A sibling option with plain text has the correct
+name. Moving the role onto the anchor works for `treeitem` and `menuitem`, and
+it cannot work here.
 
-Two constraints pointing opposite ways, and no arrangement satisfies both.
+No arrangement of the markup meets both of these constraints.
 
-**So a palette routes through its event.** Listen for `helix-select` on
-`helix-command` and call the router. That is what a palette is for, entries
-being commands and "go to Settings" being a command that navigates, and it is
-what every palette a reader has used already does. What it costs is the gestures
-only a real anchor has: middle-click, a modified click, and the destination in
-the status bar.
+**In a command palette, navigate from the `helix-select` event.** Listen for
+`helix-select` on `helix-command` and call your router. A palette entry is a
+command, and "go to Settings" is a command that navigates. Command palettes in
+other applications work the same way. You lose the gestures that only a real
+anchor has:
+
+- middle-click
+- a modified click
+- the destination in the status bar

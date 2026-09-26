@@ -1,5 +1,5 @@
 ---
-description: Why no control has a size, and what to write instead.
+description: Controls take their height from the density of the region they are in. Set the density once on the region.
 section: Theming
 title: Size and density
 ---
@@ -17,47 +17,46 @@ title: Size and density
 </helix-flex>
 ```
 
-There is no `size` prop on a button, an input, a select or a checkbox. That
-looks like a restriction and is not one.
+Buttons, inputs, selects, and checkboxes have no `size` prop.
 
-## Size does three jobs
+## What size is used for
 
-**Emphasis.** The `emphasis` axis carries it. A filled primary button says "this one
-matters" far louder than eight more pixels ever will.
+Size does three jobs:
 
-**Fit.** This is a fact about the region rather than about the control. A
-toolbar is tight, a hero is spacious, a table row is tighter still. The control
-does not know which it is in; the region does.
+- Emphasis shows which control matters most. The `emphasis` axis sets it. A
+  filled primary button marks the important action much more clearly than eight
+  more pixels of height.
+- Fit depends on the region. A toolbar is tight, a hero is spacious, and a table
+  row is tighter still. The region sets the fit for every control in it.
+- Optical role applies only to things that are not controls. An avatar at 24 in
+  a list and at 96 on a profile are two different pictures. That is why
+  `Avatar`, `Loader`, and `Orb` keep a `size`.
 
-**Optical role.** Real, and only for things that are not controls. An avatar at
-24 in a list and 96 on a profile is a different graphic, not a taller control.
-That is why `size` survives on `Avatar`, `Loader` and `Orb`: those are
-pictures.
+## Can two controls differ in height?
 
-## The test that settles it
+Ask whether two controls placed together can ever differ in height:
 
-*Can two controls sitting together legitimately differ in height?*
+- Save and Cancel
+- An icon button beside a text button
+- An input and its submit button
+- The two halves of a split button
 
-Save and Cancel. An icon button beside a text button. An input and its submit.
-The two halves of a split button. In every case the answer is no.
+In every case the answer is no.
 
-So a per-instance size is only ever used to say something about the **region**,
-one element at a time, which is exactly how a row ends up with one member the
-wrong height. Said once on the region, a ragged row is not discouraged. It is
-unwritable.
+A size on each control describes the **region**, one element at a time, and
+that is how a row ends up with one control at the wrong height. When you set the
+density once on the region, you cannot write a row of mismatched heights.
 
-`Dialog` keeps a `size` by the same test read from the other end. Two dialogs
-never sit together: one is on screen at a time, in the top layer, so it *is* the
-region rather than a control in one.
+`Dialog` keeps a `size` by the same test. Two dialogs never sit together. One is
+on screen at a time, in the top layer, so the dialog is itself the region.
 
-That is also what makes this safe for anything generating code, whether that is
-a person or a model: there is no size to get wrong, and one question to ask per
-region instead of one per element.
+This also helps when you or a model generate code. There is no size to get wrong
+on each element, and you make one choice for each region.
 
-## How to use it
+## Set the density of a region
 
-Put `data-density` on any container. `sm`, `md` or `lg`. `md` is the default and
-is never written.
+Put `data-density` on any container, with a value of `sm`, `md`, or `lg`. `md`
+is the default, so you never write it.
 
 ```html
 <helix-toolbar>
@@ -67,24 +66,30 @@ is never written.
 </helix-toolbar>
 ```
 
-**Containers that are dense by nature declare it themselves.** The app header,
-the toolbar and the announcement all do, so a control put in one is already the
-right height without anybody deciding.
+Containers that are dense by design set their own density. The app header, the
+toolbar, and the announcement all do, so a control inside one of them is already
+the right height.
 
-It works through custom properties (`--helix-size-control`,
-`--helix-size-checkbox`, `--helix-size-switch`, `--helix-size-tag`), which is
-why it costs no component any API and crosses every shadow boundary on its own.
+Density works through these custom properties:
 
-The `-sm` / `-md` / `-lg` tokens are the scale and never move. The unsuffixed
-ones are the current step, and `data-density` is what moves them.
+- `--helix-size-control`
+- `--helix-size-checkbox`
+- `--helix-size-switch`
+- `--helix-size-tag`
 
-## What this is not
+Because of this, density adds no API to any component, and it passes through
+every shadow boundary.
 
-**`data-link-size` stays.** A text link has no control height: its size is
-typography, and it follows the text around it.
+The `-sm`, `-md`, and `-lg` tokens are the scale, and they never change. The
+unsuffixed tokens hold the current step, and `data-density` changes them.
 
-**A control may still declare its own scale.** `--helix-size-switch` is one step
-above `--helix-size-checkbox` at every density, because a switch is a track with
-a thumb inside it and a checkbox is a box with a mark in it. That is the
-component choosing where it sits on the scale, once, for everyone. It is not the
-same thing as a consumer setting a height per instance.
+## Exceptions
+
+`data-link-size` still exists. A text link has no control height. Its size comes
+from typography, and it follows the text around it.
+
+A component can still set its own step on the scale. `--helix-size-switch` is
+one step above `--helix-size-checkbox` at every density, because a switch is a
+track with a thumb inside it and a checkbox is a box with a mark in it. The
+component sets this once, and it applies to every instance. You do not set a
+height on each instance.

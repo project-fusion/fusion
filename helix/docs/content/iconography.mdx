@@ -1,5 +1,5 @@
 ---
-description: 105 glyphs, one geometry, and how to draw one that is not in the set.
+description: Draw icons from the Helix set, import glyphs directly, and build a set of your own.
 section: Foundations
 title: Iconography
 ---
@@ -10,14 +10,14 @@ title: Iconography
 <helix-icon name="trash"></helix-icon>
 ```
 
-108 glyphs, from Phosphor, drawn on a 256 box at Phosphor's bold weight. That is
-Phosphor's own geometry and it is kept rather than rescaled: normalizing to a 24
-box would change the optical weight of every glyph and stop the set matching
-anything upstream. Bold rather than regular, because Phosphor's regular is a
-hairline beside the medium weight this library sets its text in, and an icon
-that reads lighter than the words next to it is the opposite of a mark.
+Helix has 108 glyphs from Phosphor, drawn on a 256 box at Phosphor's bold
+weight. We keep Phosphor's own geometry. Rescaling to a 24 box would change the
+optical weight of every glyph, and the set would stop matching Phosphor. We use
+the bold weight because Phosphor's regular weight is a hairline beside the
+medium weight of Helix text. An icon that looks lighter than the words next to
+it does not work as a mark.
 
-## Size and color come from the context
+## Size and color come from the surrounding text
 
 An icon has no `size` and no `color` property. It is `1em` square and
 `currentColor`, so it takes the size and color of the text it sits in:
@@ -28,11 +28,10 @@ An icon has no `size` and no `color` property. It is `1em` square and
 </span>
 ```
 
-Inside a control, `--helix-size-icon` is what decides, and it follows the
-region's density along with everything else. That is why an icon in a small
-button is smaller without anybody saying so.
+Inside a control, `--helix-size-icon` sets the size, and it follows the region's
+density. So an icon in a small button is smaller without any extra setting.
 
-## Decorative or named
+## Decorative and named icons
 
 ```html
 <!-- Decorative: the text beside it already says what this is. -->
@@ -48,11 +47,11 @@ button is smaller without anybody saying so.
 ></helix-icon-button>
 ```
 
-An icon with no `label` is hidden from assistive technology, which is right when
-the words are beside it and wrong when they are not. `Icon.Button` takes a
-`label` because it never has words beside it.
+An icon with no `label` is hidden from assistive technology. Leave out `label`
+when text beside the icon says what it is. Add a `label` when there is no text.
+`Icon.Button` takes a `label` because it never has text beside it.
 
-## One that points along the line
+## Mirror an icon on right-to-left pages
 
 ```html
 <helix-icon
@@ -61,23 +60,23 @@ the words are beside it and wrong when they are not. `Icon.Button` takes a
 ></helix-icon>
 ```
 
-The names are physical, so `arrow-right` points right on every page. An arrow
-that means forward or back asks with `mirror` to turn round on a right-to-left
-page, which every caret the library draws already does.
+Icon names describe physical directions, so `arrow-right` points right on every
+page. When an arrow means forward or back, add `mirror` to flip it on a
+right-to-left page. Every caret Helix draws already flips.
 [Localization](./localization) has the rest.
 
-## Importing a glyph directly
+## Import a glyph
 
 ```ts
 import { trash } from '@fusion.dev/helix-icons'
 ```
 
-Each glyph is data, `{ content, name, viewBox }`, so you can put one in your own
-markup, in a canvas, or anywhere an element is not what you want. Every `name`
-the library uses is held to the set of glyphs that actually exist, so a typo is a
-build failure rather than an empty box.
+Each glyph is data in the form `{ content, name, viewBox }`. You can put one in
+your own markup, in a canvas, or anywhere you do not want an element. Every
+`name` Helix uses is checked against the glyphs that exist, so a typo fails the
+build.
 
-**Hand one to the element and it draws it**, whatever set it came from:
+**Pass a glyph to the `icon` property to draw it**, from any set:
 
 ```tsx
 import { trash } from '@fusion.dev/helix-icons'
@@ -85,44 +84,49 @@ import { trash } from '@fusion.dev/helix-icons'
 <helix-icon icon={trash} />
 ```
 
-A property rather than an attribute, because an object is not a string: the
-frameworks set properties and plain HTML cannot, which is what `name` is for.
-Both set, the value wins.
+`icon` is a property because a glyph is an object, and an attribute holds only a
+string. Frameworks can set properties. Plain HTML cannot, so it uses `name`. If
+both are set, `icon` wins.
 
-**This is the door that scales.** `name` resolves through an index of the whole
-set, which no bundler can shake, so a consumer who renders one named icon ships
-all of it: 15 kB gzipped for 108 glyphs. A value ships the one glyph you
-imported. It is also the door out of this set entirely, since anything exporting
-that shape works, whether it is Phosphor at another weight, another library, or
-your own drawings:
+`icon` also keeps your bundle small. `name` looks up glyphs in an index of the
+whole set, and no bundler can tree-shake that index. If you render one icon by
+`name`, you ship the whole set: 15 kB gzipped for 108 glyphs. With `icon`, you
+ship only the glyph you import.
+
+`icon` also draws glyphs from outside this set. Anything that exports the same
+shape works:
+
+- Phosphor at another weight
+- another icon library
+- your own drawings
 
 ```ts
 const dot = { content: '<circle cx="12" cy="12" r="10" fill="currentColor" />', name: 'dot', viewBox: '0 0 24 24' }
 ```
 
-## Weight is a subpath
+## Choose a weight with a subpath
 
 ```ts
 import { caretDown } from '@fusion.dev/helix-icons/regular'
 import { trash } from '@fusion.dev/helix-icons/bold'
 ```
 
-The default is bold, and `/bold` is the same set under a name that says so.
+The default is bold. `/bold` is the same set, with the weight in its path.
 
-**A subpath rather than an attribute, because a weight is data rather than a
-dial.** Phosphor's weights are outlined filled paths: `caret-down` is `a12,12`
-at bold and `a8,8` at regular, so there is nothing for CSS to turn and every
-weight offered is bytes shipped. A subpath is shaken per import site; a `weight`
-attribute would put every weight into the index that `name` reads, taking one
-consumer's 15 kB to about 90.
+**Each weight is a separate set of drawings, so each weight is a subpath.**
+Phosphor's weights are outlined, filled paths. `caret-down` is `a12,12` at bold
+and `a8,8` at regular, so CSS cannot turn one weight into another, and every
+weight offered adds bytes. Bundlers tree-shake a subpath at each import site. A
+`weight` attribute would put every weight into the index that `name` reads, and
+raise your bundle from 15 kB to about 90.
 
-Only the default weight carries that index, so `name` draws bold. A consumer who
-wants the set in another weight imports the values and hands them over.
+Only the default weight has that index, so `name` always draws bold. To use the
+set in another weight, import the glyphs and pass them to `icon`.
 
-## A set of your own
+## Build your own icon set
 
-The generator that builds this set is the package's own command, so you are not
-waiting on us to carry a glyph:
+The package includes the command that builds this set, so you can add any glyph
+yourself:
 
 ```sh
 npx helix-icons build --source ./brand-icons --out src/icons.ts
@@ -134,9 +138,9 @@ import { peak } from './icons'
 <helix-icon icon={peak} />
 ```
 
-It reads a directory of SVG files and writes the module the element draws from,
-which is the same job whether the drawings are yours, another library's, or the
-1,404 Phosphor glyphs this set does not carry:
+The command reads a directory of SVG files and writes the module that
+`helix-icon` draws from. It works the same way for your own drawings, another
+library's, or the 1,404 Phosphor glyphs this set does not include:
 
 ```sh
 npx helix-icons build \
@@ -144,30 +148,30 @@ npx helix-icons build \
   --list mine.txt --out src/icons.ts
 ```
 
-`--suffix` is for a set that spells the weight into the file name, Phosphor's
-bold being `caret-down-bold.svg`. `--index` also writes the record `name` reads,
-which you want if your own elements take a name in markup and do not want
-otherwise, since it is the part nothing can drop.
+Use `--suffix` for a set that puts the weight in the file name, such as
+Phosphor's bold `caret-down-bold.svg`. `--index` also writes the record that
+`name` reads. Use it only if your own elements take a name in markup, because no
+bundler can remove that record.
 
-**A name in two sources is refused rather than decided.** A precedence decides
-silently, and the glyph on the page would be whichever directory sat higher with
-nothing looking wrong afterwards.
+**A name that appears in two sources is an error.** With an order of
+precedence, the glyph on the page would come from whichever directory ranked
+higher, and nothing would look wrong.
 
-## Adding one to this set
+## Add a glyph to the Helix set
 
-Add the name to `helix/icons/icons.txt` and run `turbo run icons`. Phosphor names
-resolve from `@phosphor-icons/core` at build time, so adding a glyph is adding a
-line rather than hand-transcribing a path into a TypeScript object.
+Add the name to `helix/icons/icons.txt` and run `turbo run icons`. Phosphor
+names resolve from `@phosphor-icons/core` at build time, so adding a glyph takes
+one line. You do not copy a path into a TypeScript object by hand.
 
-A mark Phosphor does not draw goes into `helix/icons/raw` as an SVG under the
-same name, and is read from there when the package has no match. Keep it to the
-same geometry, a 256 box at the bold weight: a glyph drawn at a different weight
-is visible immediately when it sits beside one that was not.
+For a mark Phosphor does not draw, add an SVG with the same name to
+`helix/icons/raw`. The build reads it from there when Phosphor has no match.
+Draw it with the same geometry, a 256 box at the bold weight. A glyph drawn at a
+different weight stands out next to the others.
 
-## Icons this set does not have
+## Product marks
 
-Product marks. Helix and Cortex have marks and they live in the icon package,
-but a mark is not an icon: it identifies a product and does not mean an action.
-**A mark is one rounded body with material removed**, never a pictogram of a
-metaphor, because the parent it stands beside is a geometric monogram. If you
-are reaching for the icon set to draw a logo, that is the wrong drawer.
+Helix and Cortex have product marks. They are in the icon package, and they are
+not part of the icon set. A mark identifies a product. An icon stands for an
+action. **A mark is one rounded body with material removed.** It is never a
+pictogram of a metaphor, because it stands beside the parent brand's mark, a
+geometric monogram. Do not use the icon set to draw a logo.

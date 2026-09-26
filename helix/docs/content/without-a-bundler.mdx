@@ -1,5 +1,5 @@
 ---
-description: A page that uses Helix with no build step, and what that costs.
+description: Use Helix on a page with no build step, and what changes without a bundler.
 parent: installation
 section: Getting started
 title: Without a bundler
@@ -8,10 +8,10 @@ trailing: true
 
 # Without a bundler
 
-Helix ships standard ES modules and plain CSS files, so a page can use it with
-no build step at all. Two ways, and they suit different things.
+Helix ships standard ES modules and plain CSS files, so you can use it with no
+build step. There are two ways to do this, and each suits a different need.
 
-## Styles alone
+## Use the styles alone
 
 ```html
 <link
@@ -20,22 +20,26 @@ no build step at all. Two ways, and they suit different things.
 />
 ```
 
-`helix.css` carries `primitives.css`, `tokens.css`, `base.css` and
-`elements.css` in the order they have to be in, and its `@import`s are relative,
-so a browser resolves them against the stylesheet's own URL with no bundler
-involved. Copy the whole `dist` folder and link the one file. Verified in
-Chromium: one `<link>` produces five requests and every layer resolves.
+`helix.css` imports four files in the order they must load:
 
-*This page listed `tokens.css` and `base.css` and no `primitives.css` until 24
-Aug 2026. `tokens.css` refers to a primitive 297 times and imports nothing, so a
-reader who followed that got all 185 semantic tokens declared and every color
-resolving to `rgba(0, 0, 0, 0)`. If your page looks unstyled in exactly that
-way, link `helix.css` instead.*
+1. `primitives.css`
+2. `tokens.css`
+3. `base.css`
+4. `elements.css`
 
-**`elements.css` matters more here than anywhere**, and it is the fourth layer
-`helix.css` pulls in: with no bundler the module graph arrives over the network,
-so the interval where the markup exists and the definitions do not is longer
-than it is in a built app. It was a second link until it moved into this package,
-which is what let the import become relative. A bare specifier in an `@import`
-is resolved by a bundler and never by a browser, so on this page of all pages it
-could not have been one.
+Its `@import`s are relative, so a browser resolves them against the stylesheet's
+own URL. Copy the whole `dist` folder and link `helix.css`. We checked this in
+Chromium: one `<link>` makes five requests, and every layer resolves.
+
+*Until 24 Aug 2026, this page listed `tokens.css` and `base.css` without
+`primitives.css`. `tokens.css` refers to a primitive 297 times and imports
+nothing. If you followed the old instructions, all 185 semantic tokens are
+declared and every color resolves to `rgba(0, 0, 0, 0)`. If your page looks
+unstyled in that way, link `helix.css`.*
+
+`elements.css` matters most on a page with no bundler. Without a bundler, the
+module graph loads over the network, so the markup is on the page longer before
+the element definitions arrive. `elements.css` is the fourth layer that
+`helix.css` imports. It used to be a second link, and moving it into the same
+package made its import relative. Only a bundler resolves a bare specifier in an
+`@import`, so a bare specifier would not work on a page with no bundler.

@@ -1,5 +1,5 @@
 ---
-description: What a version number means here, and which packages move together.
+description: What a Helix version number means, and which packages are released together.
 order: 6
 section: Getting started
 title: Versioning
@@ -8,65 +8,72 @@ title: Versioning
 # Versioning
 
 **Every Helix package shares one version.** `@fusion.dev/helix@1.4.0` works with
-`@fusion.dev/helix-headless@1.4.0` and with `@fusion.dev/helix-styles@1.4.0`, and that is a
-guarantee rather than a coincidence: they are released together, always, from
-one tag.
+`@fusion.dev/helix-headless@1.4.0` and with `@fusion.dev/helix-styles@1.4.0`.
+This is guaranteed, because we always release them together, from one tag.
 
 ```sh
 bun add @fusion.dev/helix@1.4.0 @fusion.dev/helix-styles@1.4.0
 ```
 
-Pin them to the same number or pin none of them. A range that lets one drift
-ahead of another is the one configuration this scheme does not defend against.
+Pin every Helix package to the same version, or pin none of them. The one setup
+this versioning does not protect you from is a range that lets one package move
+ahead of another.
 
-## Why lockstep
+## Why Helix packages share one version
 
-Cortex moves independently. Full-repo lockstep would be wrong here because the
-documentation packages carry the version of what they document: publishing a
-Cortex fix would bump `@fusion.dev/helix-docs` to a version in which nothing about Helix
-changed.
+Cortex has its own version. We did not give every package in the repository one
+version, because the documentation packages carry the version of what they
+document. With one version for everything, a Cortex fix would publish a new
+version of `@fusion.dev/helix-docs` in which nothing about Helix changed.
 
-Per-domain lockstep keeps the property that matters, which is that two Helix
-packages of the same version are the pair that was tested together.
+One version for Helix keeps the property that matters. Two Helix packages with
+the same version were tested together.
 
-## The version lives in the tag
+## The version number comes from the Git tag
 
-Every manifest in the repository holds `0.0.0-dev`. The real number is stamped
-in CI, seconds before packing.
+Every manifest in the repository has the version `0.0.0-dev`. CI writes the real
+number into each manifest seconds before packing.
 
-If you read the source: a manifest saying `0.0.0-dev` is not an unreleased
-package, it is every package. Committing the number back
-would need a bot whose push access outranks branch protection, to record
-something `git tag` already holds.
+If you read the source, you will see `0.0.0-dev` on every package, including
+released ones. We do not commit the real number back. That would need a bot
+with push access that overrides branch protection, and `git tag` already records
+the number.
 
-Two tag shapes, and the second is the useful one:
+Releases use two kinds of tag:
 
 | Tag | Means |
 |---|---|
 | `helix-v1.4.0` | A release that promoted |
 | `helix-attempt-v1.4.0` | A number that was spent and did not ship |
 
-Version computation reads both, so a failed release burns a number rather than
-poisoning the next one. If you see 1.4.0 skipped, that is what happened.
+The next version is computed from both kinds of tag. A failed release uses up
+its number, and the next release gets a new one. If you see that 1.4.0 was
+skipped, a release with that number failed.
 
 ## Documentation is versioned with the code
 
-`@fusion.dev/helix-docs@1.4.0` documents Helix 1.4.0. There is no version axis inside
-the package and no version switcher in it: the package version *is* the version,
-because every package in the domain moves together.
+`@fusion.dev/helix-docs@1.4.0` documents Helix 1.4.0. The package documents one
+version and has no version switcher. Its version number is the Helix version it
+documents, because every Helix package shares one version.
 
-A site serving several versions installs several versions, which is the
-mechanism npm already provides and the only one that cannot drift.
+To serve documentation for several versions, install several versions of the
+package. npm already supports this, and it is the only approach that cannot fall
+out of step with the code.
 
 ## Stability
 
-Components carry a `status` in the manifest and on their page: `experimental`,
-`stable`, or `deprecated`. Most of the library is experimental today and says
-so. That label is the honest one and it will not be softened to make the set
-look more finished than it is.
+Each component has a `status` in the manifest and on its page. The status is
+one of:
+
+- `experimental`
+- `stable`
+- `deprecated`
+
+Most components are experimental today, and their status says so. We will not
+change a status to make the library look more finished than it is.
 
 ## Release notes
 
-On GitHub, generated from the tags. There is no changelog file in this package,
-because a second copy of the release notes is a second thing to keep in step and
-the one that goes stale is the one nobody is reading that week.
+Release notes are on GitHub, generated from the tags. This package has no
+changelog file. A second copy of the release notes would have to be kept in step
+with the first, and the copy nobody reads that week is the one that goes stale.
