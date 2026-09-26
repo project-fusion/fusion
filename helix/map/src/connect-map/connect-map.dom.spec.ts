@@ -472,6 +472,21 @@ describe('connectMap with routes and areas', () => {
     expect(drawn[0]?.map((one) => one.casing)).toEqual(['rgb(250, 250, 250)', undefined])
   })
 
+  test('a dotted route reaches the driver as dotted, and with no casing under its dots', async () => {
+    const host = await frame(
+      `<helix-headless-map-route label="The last steps" points="1,2 3,4" style="color: rgb(1, 2, 3); border-color: rgb(250, 250, 250)"></helix-headless-map-route>`,
+    )
+    const route = host.querySelector('helix-headless-map-route') as HTMLElement & {
+      variant?: string
+    }
+    route.variant = 'dotted'
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    expect(drawn[0]?.map(({ casing, pattern }) => ({ casing, pattern }))).toEqual([
+      { casing: undefined, pattern: 'dotted' },
+    ])
+  })
+
   test('a route under way is cut at its progress, the part behind drawn quieter', async () => {
     const host = await frame(
       `<helix-headless-map-route label="Quarter" points="0,0 0,2" progress="0.25"></helix-headless-map-route>

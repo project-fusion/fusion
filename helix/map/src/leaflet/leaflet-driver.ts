@@ -85,6 +85,7 @@ export interface LeafletShapes {
 /** How a shape is painted, in Leaflet's own words for it. */
 interface LeafletShapeOptions {
   color: string
+  dashArray?: string
   opacity?: number
   fillColor?: string
   fillOpacity?: number
@@ -188,6 +189,8 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
                 layer.kind === 'route'
                   ? shapes.polyline(latlngs, {
                       color: layer.color,
+                      /* Dashes of no length with round caps, which are dots. */
+                      ...(layer.pattern === 'dotted' ? { dashArray: '0 10' } : {}),
                       interactive: false,
                       lineCap: 'round',
                       lineJoin: 'round',

@@ -28,6 +28,14 @@ export class HelixMapRoute extends HelixHeadlessMapRoute {
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
+  /**
+   * A route off the network the rest is routed on, drawn dotted: the last
+   * steps from where a road ends to a place set back from it, or the first
+   * from a place to the road. Solid where this says nothing.
+   */
+  @property({ reflect: true })
+  variant?: 'dotted'
+
   static override styles: CSSResultGroup = styles
 }
 
