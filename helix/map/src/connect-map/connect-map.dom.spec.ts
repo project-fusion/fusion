@@ -751,6 +751,51 @@ describe('connectMap with a frame that gathers its markers', () => {
     expect(heard).toEqual([['Depot', 'Ferry']])
   })
 
+  test('places at the very same spot fan out when pressed, rather than zooming, and fold back on Escape or a zoom', async () => {
+    const host = await frame(
+      `<helix-headless-map-marker label="Studio 1" lat="5" lng="5"></helix-headless-map-marker>
+       <helix-headless-map-marker label="Studio 2" lat="5" lng="5"></helix-headless-map-marker>
+       <helix-headless-map-marker label="Studio 3" lat="5" lng="5"></helix-headless-map-marker>`,
+    )
+    ;(host as Frame & { cluster: boolean }).cluster = true
+    await host.updateComplete
+    const studios = [...host.querySelectorAll('helix-headless-map-marker')] as (Gathered & {
+      fanned: boolean
+    })[]
+    const [first] = studios as [Gathered & { fanned: boolean }]
+    const { driver, fitted, zoom } = zooming()
+    connectMap(host, driver)
+    await first.updateComplete
+    expect(first.gathered).toHaveLength(3)
+    const at = (one: HTMLElement): string =>
+      `${one.style.getPropertyValue('--_map-marker-x')} ${one.style.getPropertyValue('--_map-marker-y')}`
+    first.shadowRoot
+      ?.querySelector('[part="marker"]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    // Round the spot, 50,50, the first at the top, and none of them framed.
+    expect(fitted).toEqual([])
+    expect(studios.map((one) => [one.fanned, one.gatheredBy, one.gathered.length])).toEqual([
+      [true, undefined, 0],
+      [true, undefined, 0],
+      [true, undefined, 0],
+    ])
+    expect(at(first)).toBe('50px 10px')
+    expect(new Set(studios.map(at)).size).toBe(3)
+    expect(first.style.getPropertyValue('--_map-marker-leg')).toBe('40px')
+
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+    expect(studios.map((one) => one.fanned)).toEqual([false, false, false])
+    expect(first.gathered).toHaveLength(3)
+
+    first.shadowRoot
+      ?.querySelector('[part="marker"]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    expect(first.fanned).toBe(true)
+    zoom(12)
+    expect(first.fanned).toBe(false)
+    expect(first.gathered).toHaveLength(3)
+  })
+
   test('a frame that does not gather draws every marker on its own', async () => {
     const host = await frame(
       `<helix-headless-map-marker label="Depot" lat="1" lng="1"></helix-headless-map-marker>

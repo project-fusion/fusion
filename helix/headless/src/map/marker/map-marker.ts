@@ -3,7 +3,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /** What the frame and the connector write on a marker, which is not news to either. */
-const BOOKKEEPING = new Set<PropertyKey>(['current', 'gathered', 'gatheredBy', 'side'])
+const BOOKKEEPING = new Set<PropertyKey>(['current', 'fanned', 'gathered', 'gatheredBy', 'side'])
 
 /**
  * @summary A place on a map, named and reachable from the keyboard.
@@ -44,6 +44,7 @@ const BOOKKEEPING = new Set<PropertyKey>(['current', 'gathered', 'gatheredBy', '
  * @cssstate cluster - While this stands for several places the frame gathered, drawn as their count and named by their names.
  * @cssstate clustered - While another marker stands for this one, which is hidden until the view has room for it.
  * @cssstate current - While this is the marker the map's tab stop is on.
+ * @cssstate fanned - While this stands fanned out from a spot it shares with other places, a leg back to it, after its cluster was pressed.
  * @cssstate icon - While something is slotted into the point, which the point grows to hold.
  * @cssstate start - While the name sits before the point in reading order, turned there by the connector because the other side of the view had no room for it.
  */
@@ -63,6 +64,14 @@ export class HelixHeadlessMapMarker extends HelixElement {
    */
   @state()
   gathered: string[] = []
+
+  /**
+   * @internal Whether this stands fanned out from a spot it shares with
+   * other places, written by the connector when their cluster is pressed and
+   * no zoom would draw them apart.
+   */
+  @state()
+  fanned = false
 
   /**
    * @internal The marker standing for this one while they are gathered,
@@ -114,6 +123,7 @@ export class HelixHeadlessMapMarker extends HelixElement {
     this.toggleState('cluster', this.gathered.length > 1)
     this.toggleState('clustered', this.gatheredBy !== undefined)
     this.toggleState('current', this.current)
+    this.toggleState('fanned', this.fanned)
     this.toggleState('start', this.side === 'start')
     if (this.childrenKnown) {
       this.toggleState(

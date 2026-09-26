@@ -145,6 +145,8 @@ interface Marker extends HTMLElement {
   gathered?: string[]
   /** The marker standing for it while it is gathered into a cluster. */
   gatheredBy?: Marker | undefined
+  /** Whether it stands fanned out from a place it shares with others, a leg back to it. */
+  fanned?: boolean
   isMapMarker: true
   label?: string | undefined
   lat?: number | undefined
@@ -157,6 +159,40 @@ interface Marker extends HTMLElement {
 /** The frame, as far as the connector reads it: whether it gathers its markers. */
 interface Frame extends HTMLElement {
   cluster?: boolean | undefined
+}
+
+/**
+ * How close a cluster's places may all be, in meters, before pressing it
+ * fans them out where they are rather than zooming in: closer than a
+ * renderer's deepest zoom draws apart, which is the same door or the same
+ * building's addresses.
+ */
+const SAME_SPOT = 2
+
+/**
+ * Where each of `count` places fanned out from one point stands, in pixels
+ * from it, `spacing` apart: a ring from the top, clockwise, for as many as
+ * sit round one comfortably, and a spiral out from the middle for more, each
+ * turn `spacing` further out, so a hundred take no more room than they need.
+ */
+const fanOut = (count: number, spacing: number): { x: number; y: number }[] => {
+  if (count <= 8) {
+    const radius = Math.max(spacing, (count * spacing) / (2 * Math.PI))
+    return Array.from({ length: count }, (_, at) => {
+      const angle = -Math.PI / 2 + (at * 2 * Math.PI) / count
+      return { x: radius * Math.cos(angle), y: radius * Math.sin(angle) }
+    })
+  }
+  let angle = 0
+  let length = spacing
+  return Array.from({ length: count }, () => {
+    angle += spacing / length
+    length = spacing + (spacing / (2 * Math.PI)) * angle
+    return {
+      x: length * Math.cos(angle - Math.PI / 2),
+      y: length * Math.sin(angle - Math.PI / 2),
+    }
+  })
 }
 
 /** Whether a cluster's names are the ones it already has, so it is not written again every frame. */
@@ -426,6 +462,19 @@ export const connectMap = (
   const markers = (): Marker[] => [...frame.children].filter(isMarker)
   /* Each cluster by the marker drawn for it, as the last placing gathered them. */
   let clusters = new Map<Marker, Marker[]>()
+  /* **The places fanned out from one spot**, by the spot and how many pixels
+     ten meters were when they fanned: a zoom changes that, and closes them,
+     since the cluster may have come apart or grown; a pan does not, and the
+     fan moves with the map. */
+  let fanned: { members: Marker[]; place: MapPlace; scale: number } | undefined
+  const scaleOf = (place: MapPlace): number => {
+    if (!driver.project) {
+      return 0
+    }
+    const at = driver.project(place)
+    const north = driver.project({ lat: place.lat + 10 / METERS_PER_DEGREE, lng: place.lng })
+    return Math.hypot(north.x - at.x, north.y - at.y)
+  }
   const positions = (): Position[] => [...frame.children].filter(isPosition)
   /* **A route needs two points and an area three**, and one with fewer is a
      layer still being written rather than a shape to draw: MapLibre refuses a
@@ -504,10 +553,56 @@ export const connectMap = (
       }
     }
     const reach = options.clusterDistance ?? 40
-    const taken = new Set<Marker>()
+    if (fanned) {
+      const scale = scaleOf(fanned.place)
+      const members = fanned.members
+      if (
+        Math.abs(scale - fanned.scale) > fanned.scale * 0.02 ||
+        !members.every((member) => standing.some((one) => one.marker === member))
+      ) {
+        fanned = undefined
+      }
+    }
+    const fan = new Set(fanned?.members)
+    const taken = new Set<Marker>(fan)
     clusters = new Map()
     const placing: { at: { x: number; y: number }; marker: Marker; reach: number | undefined }[] =
       []
+    /* **Fanned places stand round their spot**, each a leg's length out and
+       the leg drawn back to it, visible and walked like any other marker. */
+    if (fanned) {
+      const center = project(fanned.place)
+      const offsets = fanOut(fanned.members.length, reach)
+      fanned.members.forEach((member, at) => {
+        const offset = offsets[at] as { x: number; y: number }
+        if (member.gatheredBy !== undefined) {
+          member.gatheredBy = undefined
+        }
+        if ((member.gathered?.length ?? 0) > 0) {
+          member.gathered = []
+        }
+        if (member.fanned !== true) {
+          member.fanned = true
+        }
+        member.style.setProperty('--_map-marker-leg', `${Math.hypot(offset.x, offset.y)}px`)
+        member.style.setProperty(
+          '--_map-marker-leg-angle',
+          `${Math.atan2(-offset.y, -offset.x)}rad`,
+        )
+        placing.push({
+          at: { x: center.x + offset.x, y: center.y + offset.y },
+          marker: member,
+          reach: standing.find((one) => one.marker === member)?.reach,
+        })
+      })
+    }
+    for (const marker of markers()) {
+      if (!fan.has(marker) && marker.fanned === true) {
+        marker.fanned = false
+        marker.style.removeProperty('--_map-marker-leg')
+        marker.style.removeProperty('--_map-marker-leg-angle')
+      }
+    }
     for (const one of standing) {
       if (taken.has(one.marker)) {
         continue
@@ -688,11 +783,31 @@ export const connectMap = (
      page connected to answer it itself. */
   const handleCluster = (event: Event): void => {
     const members = clusters.get(event.target as Marker)
-    if (!members || options.clusterZoom === false || !driver.fit) {
+    if (!members || options.clusterZoom === false) {
       return
     }
     const lats = members.map((one) => one.lat as number)
     const lngs = members.map((one) => one.lng as number)
+    /* **Places no zoom draws apart fan out where they are**, as does every
+       cluster on a renderer that cannot frame a stretch of the world. */
+    const middle = {
+      lat: lats.reduce((sum, lat) => sum + lat, 0) / lats.length,
+      lng: lngs.reduce((sum, lng) => sum + lng, 0) / lngs.length,
+    }
+    const spread = Math.max(
+      ...members.map(
+        (one) =>
+          Math.hypot(
+            (one.lat as number) - middle.lat,
+            ((one.lng as number) - middle.lng) * Math.cos((middle.lat * Math.PI) / 180),
+          ) * METERS_PER_DEGREE,
+      ),
+    )
+    if (spread <= SAME_SPOT || !driver.fit) {
+      fanned = { members, place: middle, scale: scaleOf(middle) }
+      place()
+      return
+    }
     driver.fit(
       {
         northEast: { lat: Math.max(...lats), lng: Math.max(...lngs) },
@@ -703,6 +818,28 @@ export const connectMap = (
     )
   }
   frame.addEventListener(HelixMapClusterEvent.eventName, handleCluster)
+
+  /* **A fan closes on Escape**, back to the cluster with the focus on it, and
+     on a press anywhere on the map that is not one of its places. */
+  const closeFan = (): Marker | undefined => {
+    const lead = fanned?.members[0]
+    fanned = undefined
+    place()
+    return lead
+  }
+  const handleFanKey = (event: KeyboardEvent): void => {
+    if (fanned && event.key === 'Escape') {
+      event.preventDefault()
+      closeFan()?.focus()
+    }
+  }
+  const handleFanPress = (event: MouseEvent): void => {
+    if (fanned && !event.composedPath().some(isMarker)) {
+      closeFan()
+    }
+  }
+  frame.addEventListener('keydown', handleFanKey)
+  frame.addEventListener('click', handleFanPress)
 
   return {
     disconnect(): void {
@@ -715,6 +852,8 @@ export const connectMap = (
       frame.removeEventListener(HelixMapPartChangeEvent.eventName, handlePartChange)
       frame.removeEventListener('focusin', reveal)
       frame.removeEventListener(HelixMapClusterEvent.eventName, handleCluster)
+      frame.removeEventListener('keydown', handleFanKey)
+      frame.removeEventListener('click', handleFanPress)
       for (const marker of markers()) {
         marker.style.removeProperty('--_map-marker-x')
         marker.style.removeProperty('--_map-marker-y')
@@ -724,6 +863,11 @@ export const connectMap = (
         if ((marker.gathered?.length ?? 0) > 0) {
           marker.gathered = []
         }
+        if (marker.fanned === true) {
+          marker.fanned = false
+        }
+        marker.style.removeProperty('--_map-marker-leg')
+        marker.style.removeProperty('--_map-marker-leg-angle')
       }
       for (const position of positions()) {
         for (const name of ['heading', 'radius', 'x', 'y']) {
