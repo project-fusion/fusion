@@ -1,9 +1,7 @@
-/* The Maps page: the map the width of the page, what it is on a panel over
-   it, and the stack it is built from under it. */
-
-.mapsShell {
-  padding-block: var(--helix-space-2xl) var(--site-band);
-}
+/* The Maps page: the map the width of the page with what it is on a panel
+   over it, and under it the landing page's bands on its field: what a map
+   gets from Helix, thousands of points running, what a map holds, how to
+   start, and the stack it is built from. */
 
 .mapsCanvas {
   block-size: 100%;
@@ -136,6 +134,164 @@ fieldset.mapsControl {
     inline-size: auto;
     padding: var(--site-band) var(--site-inset) var(--helix-space-lg);
     position: static;
+  }
+}
+
+/* ============================================================= field === */
+
+/* The box the field is measured against, the sections in front of it in tree
+   order, as the services page orders its own. */
+.mapsField {
+  padding-block-start: var(--site-band);
+  position: relative;
+}
+
+/* Straight on from the first, whose own end padding is the gap between. */
+.mapsFieldLate {
+  padding-block-start: 0;
+}
+
+.mapsField > *:not([data-layer]) {
+  position: relative;
+}
+
+/* Faded at the foot, where the footer begins, for the reason the services
+   field gives. */
+.mapsAura {
+  block-size: auto;
+  inset: 0;
+  mask-image: linear-gradient(to bottom, black 0%, black 94%, transparent 100%);
+  opacity: 0.5;
+  pointer-events: none;
+  position: absolute;
+}
+
+@media (max-width: 40rem) {
+  .mapsAura {
+    opacity: 0.78;
+  }
+}
+
+/* ============================================================ pillars === */
+
+/* The facts under each claim, at reading size and ruled in the brand, as the
+   landing page's proofs are. */
+.mapsFacts {
+  display: grid;
+  gap: var(--helix-space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mapsFacts li {
+  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-md);
+  line-height: 1.5;
+  padding-block: var(--helix-space-2xs);
+  padding-inline-start: var(--helix-space-md);
+}
+
+/* ============================================================= points === */
+
+.mapsPoints {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+}
+
+.mapsPointsFrame {
+  --map-block-size: min(70svh, 34rem);
+}
+
+/* =========================================================== features === */
+
+/* Four cells, two by two on a wide card and stacked on a narrow one, ruled
+   between as the card's rows are rather than boxed apart. */
+.mapsFeatures {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.mapsFeature {
+  padding: var(--helix-space-xl);
+}
+
+.mapsFeature + .mapsFeature {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+}
+
+@media (min-width: 48rem) {
+  .mapsFeatures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mapsFeature + .mapsFeature {
+    border-block-start: 0;
+  }
+
+  .mapsFeature:nth-child(n + 3) {
+    border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  }
+
+  .mapsFeature:nth-child(even) {
+    border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
+  }
+}
+
+/* The element a page writes, set as code, since it is what a reader types. */
+.mapsElement {
+  align-self: start;
+  background: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+/* ========================================================= get started === */
+
+/* Three steps down the card, each numbered in a circle beside its words and
+   its code, which is the order a reader follows them in. */
+.mapsSteps {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  display: grid;
+  gap: var(--helix-space-xl);
+  list-style: none;
+  margin: 0;
+  padding: var(--helix-space-xl);
+}
+
+.mapsStep {
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.mapsStepNumber {
+  align-items: center;
+  block-size: 2rem;
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground);
+  display: flex;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-semibold);
+  inline-size: 2rem;
+  justify-content: center;
+}
+
+@media (max-width: 40rem) {
+  .mapsFeature,
+  .mapsSteps {
+    padding-inline: 0;
+  }
+
+  .mapsStep {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
