@@ -74,20 +74,6 @@ const config: NextConfig = {
         ],
         source: '/fonts/:file*',
       },
-      /**
-       * The map data, fetchable by the sandbox frame for the reason the faces
-       * are: the Map reference's points example loads the Maps page's own file
-       * from an opaque origin. Public data, read without credentials, and
-       * cached for a day rather than for good, since it is fetched again by
-       * hand when the places change.
-       */
-      {
-        headers: [
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Cache-Control', value: 'public, max-age=86400' },
-        ],
-        source: '/maps/:file*',
-      },
     ]
   },
 
