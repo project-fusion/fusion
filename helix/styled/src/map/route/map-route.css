@@ -2,7 +2,12 @@
    it draws it in is read off this element by the connector, so the tone is a
    color here and a paint there. The brand where no tone says otherwise, as a
    marker's point is. */
+/* **And its edge**, drawn wider under it by the renderer, as the surface: the
+   roads a reader navigates by are drawn toward the brand too, and a route in
+   the brand with no edge read as one more of them. The border color is what
+   the connector reads it as, the element drawing no border of its own. */
 :host {
+  border-color: var(--map-route-casing-color, var(--helix-color-surface));
   color: var(--map-route-color, var(--helix-color-primary));
   display: none;
 }

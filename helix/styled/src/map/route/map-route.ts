@@ -19,6 +19,7 @@ import { styles } from './map-route.css.js'
  * @aliases Map line, Path, Polyline
  * @documentation https://fusion.dev/helix/components/map
  *
+ * @cssproperty --map-route-casing-color - The edge drawn under the route, so it reads as over the roads rather than as one.
  * @cssproperty --map-route-color - The route's color, where no tone says it.
  */
 @customElement('helix-map-route')

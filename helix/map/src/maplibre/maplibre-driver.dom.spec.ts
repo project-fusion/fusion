@@ -218,6 +218,7 @@ describe('mapLibreDriver', () => {
     let color = 'rgb(1, 2, 3)'
     const drawn = mapLibreDriver(map).layers?.(() => [
       {
+        casing: 'rgb(250, 250, 250)',
         color,
         id: 'a',
         kind: 'route',
@@ -244,12 +245,18 @@ describe('mapLibreDriver', () => {
       'road',
       'helix-areas',
       'helix-area-edges',
+      'helix-route-casings',
       'helix-routes',
       'label-city',
     ])
     const data = sources['helix-layers']?.data as {
-      features: { geometry: { coordinates: unknown } }[]
+      features: { geometry: { coordinates: unknown }; properties: { casing?: string } }[]
     }
+    // The route's edge travels with it, and an area has none.
+    expect(data.features.map((one) => one.properties.casing)).toEqual([
+      'rgb(250, 250, 250)',
+      undefined,
+    ])
     // Longitude first, and an area's ring closed, as GeoJSON has them.
     expect(data.features[0]?.geometry.coordinates).toEqual([
       [2, 1],
