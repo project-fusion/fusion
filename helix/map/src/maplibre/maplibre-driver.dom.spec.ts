@@ -246,6 +246,7 @@ describe('mapLibreDriver', () => {
       'helix-areas',
       'helix-area-edges',
       'helix-route-casings',
+      'helix-route-dots',
       'helix-routes',
       'label-city',
     ])

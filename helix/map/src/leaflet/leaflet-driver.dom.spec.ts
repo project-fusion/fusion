@@ -249,4 +249,32 @@ describe('leafletDriver', () => {
     drawn?.stop()
     expect(made).toEqual(['remove polyline', 'remove polyline', 'remove polygon'])
   })
+
+  test('a dotted route is a Leaflet polyline of dots, with nothing under it', () => {
+    const { map } = stand()
+    const made: string[] = []
+    const polyline = (
+      latlngs: [number, number][],
+      options: { color: string; dashArray?: string },
+    ) => {
+      made.push(
+        `polyline ${JSON.stringify(latlngs)} ${options.color} ${options.dashArray ?? 'solid'}`,
+      )
+      return { addTo: () => {}, remove: () => {} }
+    }
+    leafletDriver(map, { polygon: polyline, polyline }).layers?.(() => [
+      {
+        color: 'rgb(1, 2, 3)',
+        id: 'a',
+        kind: 'route',
+        label: 'The last steps',
+        pattern: 'dotted',
+        points: [
+          { lat: 1, lng: 2 },
+          { lat: 3, lng: 4 },
+        ],
+      },
+    ])
+    expect(made).toEqual(['polyline [[1,2],[3,4]] rgb(1, 2, 3) 0 10'])
+  })
 })

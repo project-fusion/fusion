@@ -115,6 +115,11 @@ export interface MapLayerSpec {
   kind: 'area' | 'route'
   /** What the frame's list calls it. */
   label: string
+  /**
+   * How a route's line is drawn where it is not solid: \`dotted\` for a leg
+   * off the network the rest is routed on, a place set back from its road.
+   */
+  pattern?: 'dotted' | undefined
   /** In order: along a route, and around an area without repeating the first. */
   points: MapPlace[]
 }
@@ -161,6 +166,8 @@ interface Layer extends HTMLElement {
   layerKind: 'area' | 'route'
   points?: MapPlace[] | undefined
   progress?: number | undefined
+  /** The styled route's line, which is dotted or solid. */
+  variant?: string | undefined
 }
 
 /**
@@ -365,12 +372,16 @@ export const connectMap = (
            route's own color, which is what an unstyled element's border is,
            there is no casing to draw. */
         const edge = layer.layerKind === 'route' ? settledColor(layer, 'border-top-color') : color
+        /* A dotted leg takes no casing: an edge under a line of dots is a
+           dashed band, not a line of dots. */
+        const dotted = layer.layerKind === 'route' && layer.variant === 'dotted'
         const spec: MapLayerSpec = {
-          ...(edge && edge !== color ? { casing: edge } : {}),
+          ...(edge && edge !== color && !dotted ? { casing: edge } : {}),
           color,
           id: idOf(layer),
           kind: layer.layerKind,
           label: layer.label ?? '',
+          ...(dotted ? { pattern: 'dotted' as const } : {}),
           points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
         }
         /* **A route under way is two lines**, the part behind drawn quieter,
@@ -458,7 +469,7 @@ export const connectMap = (
   layers.observe(frame, { childList: true })
   const coordinates = new MutationObserver(changed)
   coordinates.observe(frame, {
-    attributeFilter: ['accuracy', 'heading', 'lat', 'lng', 'points', 'progress', 'tone'],
+    attributeFilter: ['accuracy', 'heading', 'lat', 'lng', 'points', 'progress', 'tone', 'variant'],
     attributes: true,
     subtree: true,
   })
