@@ -12,9 +12,18 @@
      around it, its halo, beam and pulse, is the ink as well. A tone says
      otherwise where the position means something: its body and wash in the
      tone, its ring the surface. */
-  --_map-position-color: var(--map-position-color, var(--helix-color-foreground));
+  /* **The ink a little short of itself**: a page's foreground is black or
+     white outright, and a black mark on a near-white map read as a hole in
+     it. A step toward the surface is the charcoal and the soft white a map
+     draws its own marks in, and still the most contrast the page has. */
+  --_map-position-ink: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 84%,
+    var(--helix-color-surface)
+  );
+  --_map-position-color: var(--map-position-color, var(--_map-position-ink));
   --_map-position-edge: var(--map-position-edge, var(--helix-color-surface));
-  --_map-position-fill: var(--map-position-fill, var(--helix-color-foreground));
+  --_map-position-fill: var(--map-position-fill, var(--_map-position-ink));
   --_map-position-size: var(--map-position-size, 1.25rem);
   /* **Declared here and written by the connector**, onto the host, where the
      connector can reach and this can read. */
