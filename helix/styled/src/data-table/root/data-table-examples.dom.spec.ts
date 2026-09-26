@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
-import arranging from '../.examples/arranging.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
 import paging from '../.examples/paging.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import searching from '../.examples/searching.html' with { type: 'text' }
+import arranging from '../.examples/selecting-and-arranging.html' with { type: 'text' }
 import summary_and_size from '../.examples/summary-and-size.html' with { type: 'text' }
 import windowed_paging from '../.examples/windowed-paging.html' with { type: 'text' }
 import windowing from '../.examples/windowing.html' with { type: 'text' }

@@ -1,0 +1,111 @@
+import './built-from-components.css'
+
+export function Example() {
+  return (
+    <helix-chat
+      className="markdown"
+      label="Assistant"
+    >
+      <helix-text
+        as="strong"
+        slot="header"
+        variant="body-strong"
+      >
+        Assistant
+      </helix-text>
+
+      <helix-chat-message
+        author="me"
+        state="sent"
+      >
+        How do I roll back the migration that failed this morning?
+      </helix-chat-message>
+
+      {/* A turn holds whatever it is given, so an answer can be built from the
+          library's own parts. Markdown rendered to plain HTML is the other way
+          in, which `rendered-markdown` shows with the same answer: mark the turn
+          `data-prose` and the base layer sets its headings, lists, tables and
+          code. */}
+      <helix-chat-message
+        author="them"
+        separation="plain"
+        state="sent"
+      >
+        <helix-flex
+          direction="column"
+          gap="sm"
+        >
+          <helix-text
+            as="h3"
+            variant="body-strong"
+          >
+            Roll back 0042_add_order_status
+          </helix-text>
+          <helix-text as="p">
+            It stopped halfway, so <helix-code>orders</helix-code> has the new column and no index
+            yet. Rolling back is safe: nothing has written to the column.
+          </helix-text>
+
+          <helix-list
+            kind="ordered"
+            label="Steps"
+          >
+            <helix-list-item>
+              Pause the workers that write to <helix-code>orders</helix-code>.
+            </helix-list-item>
+            <helix-list-item>Run the down migration.</helix-list-item>
+            <helix-list-item>
+              Check the column is gone, then start the workers again.
+            </helix-list-item>
+          </helix-list>
+
+          <helix-code-block label="Terminal">
+            bun run migrate:down 0042_add_order_status
+          </helix-code-block>
+
+          <helix-table label="Ways back">
+            <helix-table-column>Option</helix-table-column>
+            <helix-table-column>Downtime</helix-table-column>
+            <helix-table-column>Keeps data</helix-table-column>
+            <helix-table-row>
+              <helix-table-cell header>Roll back</helix-table-cell>
+              <helix-table-cell>About a minute</helix-table-cell>
+              <helix-table-cell>Yes</helix-table-cell>
+            </helix-table-row>
+            <helix-table-row>
+              <helix-table-cell header>Fix forward</helix-table-cell>
+              <helix-table-cell>None</helix-table-cell>
+              <helix-table-cell>Yes</helix-table-cell>
+            </helix-table-row>
+            <helix-table-row>
+              <helix-table-cell header>Restore the snapshot</helix-table-cell>
+              <helix-table-cell>Twenty minutes</helix-table-cell>
+              <helix-table-cell>No</helix-table-cell>
+            </helix-table-row>
+          </helix-table>
+
+          <helix-callout tone="warning">
+            Restore the snapshot only if the rollback fails. It drops every order written since
+            09:00.
+          </helix-callout>
+
+          <helix-text as="p">
+            The{' '}
+            <a
+              data-link
+              href="/runbooks/migrations"
+            >
+              migration runbook
+            </a>{' '}
+            has the full checklist.
+          </helix-text>
+        </helix-flex>
+      </helix-chat-message>
+
+      <helix-chat-composer
+        placeholder="Ask a follow up"
+        slot="composer"
+      />
+    </helix-chat>
+  )
+}
