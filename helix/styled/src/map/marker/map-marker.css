@@ -77,6 +77,53 @@
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* **Shape: circle unless said otherwise**, so a page can tell kinds of place
+   apart by more than their color, which a reader who cannot tell the colors
+   apart needs: rounded or square corners, a diamond turned a quarter, or a
+   ring, the place's color as an edge around nothing. */
+:host([shape="rounded"]) [part="point"] {
+  border-radius: var(--helix-radii-sm);
+}
+
+:host([shape="square"]) [part="point"] {
+  border-radius: var(--helix-radii-none);
+}
+
+:host([shape="diamond"]) [part="point"] {
+  border-radius: var(--helix-radii-none);
+  rotate: 45deg;
+  scale: 0.85;
+}
+
+:host([shape="ring"]) [part="point"] {
+  background: var(--helix-color-surface);
+  border-color: var(--_map-marker-color);
+  border-width: calc(var(--map-marker-size, 0.875rem) * 0.28);
+}
+
+/* **Separation: how the point stands off the map.** Absent is an edge in the
+   surface and a little lift. `outlined` is the edge alone, `elevated` the
+   edge lifted, as an elevated card is, `filled` a wash of its own color
+   around it with no edge, and `plain` the bare point. */
+:host([separation="outlined"]) [part="point"] {
+  box-shadow: none;
+}
+
+:host([separation="elevated"]) [part="point"] {
+  box-shadow: var(--helix-shadow-md);
+}
+
+:host([separation="filled"]) [part="point"] {
+  border-color: transparent;
+  box-shadow: 0 0 0 calc(var(--map-marker-size, 0.875rem) * 0.3)
+    color-mix(in oklab, var(--_map-marker-color) 22%, transparent);
+}
+
+:host([separation="plain"]) [part="point"] {
+  border-color: transparent;
+  box-shadow: none;
+}
+
 /* The name beside the point, shown while the marker is pointed at or focused.
    **Hidden by opacity and never by `display`**: it is the button's name, and a
    name taken out of the tree is a button a screen reader calls "button". */
@@ -84,9 +131,10 @@
   /* **A floating surface**, lying over the map the way the frame's controls
      do, so it answers to the same separation they do. */
   background: var(--helix-color-surface-overlay);
-  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border: var(--map-marker-label-border-width, var(--helix-border-floating)) solid
+    var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
-  box-shadow: var(--helix-shadow-floating);
+  box-shadow: var(--map-marker-label-shadow, var(--helix-shadow-floating));
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);

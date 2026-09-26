@@ -20,6 +20,8 @@ import { styles } from './map-marker.css.js'
  * @documentation https://fusion.dev/helix/components/map
  *
  * @cssproperty --map-marker-color - The point's color, where no tone says it.
+ * @cssproperty --map-marker-label-border-width - The name's edge, the theme's floating edge by default.
+ * @cssproperty --map-marker-label-shadow - The name's lift, the theme's floating shadow by default.
  * @cssproperty --map-marker-size - How wide the point is.
  */
 @customElement('helix-map-marker')
@@ -31,6 +33,23 @@ export class HelixMapMarker extends HelixHeadlessMapMarker {
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass' | 'transparent'
+
+  /**
+   * How the point stands off the map: absent is an edge in the surface and a
+   * little lift; `outlined` the edge alone, `elevated` the edge lifted, as an
+   * elevated card is, `filled` a wash of its own color with no edge,
+   * `plain` the bare point.
+   */
+  @property({ reflect: true })
+  separation?: 'elevated' | 'filled' | 'outlined' | 'plain'
+
+  /**
+   * The point's shape, a circle where this says nothing: a page telling kinds
+   * of place apart by more than their color, which a reader who cannot tell
+   * the colors apart needs.
+   */
+  @property({ reflect: true })
+  shape?: 'diamond' | 'ring' | 'rounded' | 'square'
 
   /** What the place means: the brand where this says nothing. */
   @property({ reflect: true })

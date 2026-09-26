@@ -27,6 +27,7 @@ import { property, state } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/map
  *
  * @csspart accuracy - The ring as wide as the position is uncertain.
+ * @csspart arrow - The arrow a position with a heading is drawn as, pointing the way it faces.
  * @csspart dot - The point that stands on the position.
  * @csspart heading - The cone that points the way it is going, where a heading is known.
  * @csspart position - The picture of it, the ring, the cone and the point, named by its label.
@@ -120,6 +121,7 @@ export class HelixHeadlessMapPosition extends HelixElement {
         <span part="heading"></span>
         <span part="pulse"></span>
         <span part="dot"></span>
+        <svg part="arrow" viewBox="0 0 24 24"><path d="M12 2.5 20.5 20.5 12 16.5 3.5 20.5Z"></path></svg>
       </span>
       <span part="status" role="status">${this.spoken}</span>`
   }
