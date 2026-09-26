@@ -21,7 +21,7 @@ beforeAll(() => {
 const stand = (): {
   asked: string[]
   fire(
-    type: 'click' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type: 'click' | 'idle' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
     event?: { point?: { x: number; y: number }; sourceDataType?: string },
   ): void
   map: MapLibreMap
@@ -131,7 +131,7 @@ const stand = (): {
     },
   }
   const fire = (
-    type: 'click' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type: 'click' | 'idle' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
     event?: { point?: { x: number; y: number }; sourceDataType?: string },
   ): void => {
     for (const listener of listeners.get(type) ?? []) {
@@ -475,5 +475,47 @@ describe('mapLibreDriver', () => {
     await new Promise((done) => setTimeout(done, 0))
     expect(asked.at(-1)).toBe('jumpTo 2,1 14')
     expect(pressed).toHaveLength(1)
+  })
+
+  test('what is drawn in view is each point and count once, and a still map says so', () => {
+    const { fire, map } = stand()
+    const found: ReturnType<MapLibreMap['queryRenderedFeatures']> = [
+      {
+        geometry: { coordinates: [2, 1], type: 'Point' },
+        layer: { id: 'helix-points-p1-points' },
+        properties: { at: 3 },
+      },
+      {
+        geometry: { coordinates: [2, 1], type: 'Point' },
+        layer: { id: 'helix-points-p1-points' },
+        properties: { at: 3 },
+      },
+      {
+        geometry: { coordinates: [5, 6], type: 'Point' },
+        layer: { id: 'helix-points-p1-clusters' },
+        properties: { cluster_id: 9, point_count: 40 },
+      },
+    ]
+    map.queryRenderedFeatures = () => found
+    let settled = 0
+    const drawn = mapLibreDriver(map).layers?.(
+      () => [
+        {
+          cluster: true,
+          color: '#00f',
+          id: 'p1',
+          kind: 'points',
+          label: 'Cafés',
+          points: [{ lat: 1, lng: 2 }],
+        },
+      ],
+      { motion: () => null, press: () => {}, settled: () => (settled += 1) },
+    )
+    expect(drawn?.inView?.('p1')).toEqual([
+      { at: 3, place: { lat: 1, lng: 2 } },
+      { cluster: 9, count: 40, place: { lat: 6, lng: 5 } },
+    ])
+    fire('idle')
+    expect(settled).toBe(1)
   })
 })

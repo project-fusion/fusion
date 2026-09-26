@@ -43,7 +43,7 @@
 
 /* Whatever was slotted fills the box it was given, but for the markers and
    positions, which stand on their places over it and take no box at all. */
-[part="viewport"] ::slotted(:not(helix-map-marker, helix-map-position)) {
+[part="viewport"] ::slotted(:not(helix-map-marker, helix-map-points, helix-map-position)) {
   block-size: 100%;
   inline-size: 100%;
 }

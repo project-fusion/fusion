@@ -118,8 +118,14 @@ every point, unclustered, where the page hands it `L`: right for hundreds, and
 MapLibre is the renderer for thousands.
 
 The frame names the layer in its list by `label` and `description`, as a route
-is named. A reader cannot yet walk the points in view by keyboard, which is
-the next part of this.
+is named. **And a reader walks what is in view**: when the renderer goes
+still, the connector asks it which points and counts it drew in view, at most
+a hundred, and the layer stands an invisible button on each, one tab stop for
+the layer, the arrow keys and Home and End walking them top to bottom and
+along each line, the focus ringed and the name shown beside it. Enter on a
+point sends `helix-activate`; on a count it zooms in, and the focus goes to
+whatever then stands nearest. A count is named by `count-label`, `{count}
+places` by default. The pointer stays the renderer's.
 
 ## Routes and areas
 

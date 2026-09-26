@@ -855,7 +855,12 @@ export class HelixMapPartChangeEvent extends CustomEvent<MapPartChangeDetail> {
 
 /** What a cluster a reader pressed holds. */
 export interface MapClusterDetail {
-  /** The names of the places it stands for, the one it is drawn as first. */
+  /**
+   * A points layer's count, as the connector keyed it, where the cluster is
+   * one the renderer drew rather than one of markers.
+   */
+  key?: string | undefined
+  /** The names of the places it stands for, the one it is drawn as first, where they are known. */
   labels: string[]
 }
 
