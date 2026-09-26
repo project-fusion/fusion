@@ -28,14 +28,27 @@ import { formatted } from '@fusion.dev/scripts/formatted'
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'content', 'maps', 'routes.ts')
 const AGENT = { 'User-Agent': 'fusion.dev site build (https://fusion.dev)' }
 
-/** The Maps page's walk, in the order the arrow keys walk it. */
+/**
+ * The Maps page's walk, in the order the arrow keys walk it.
+ *
+ * **A place is where the router is sent, and a via is only somewhere it
+ * passes.** Sent to Terry Black's own coordinates, the router took the
+ * nearest walkable way to them, a dead-end spur off the lot's exit, in and
+ * back out the same way. The lot is a one-way U off Barton Springs Road, in at
+ * its west leg and out at its east (OpenStreetMap way 734419385), so the walk
+ * is sent in at the one, round the bottom where the building is, and out at
+ * the other: the stop is the bottom of the U, and the two legs are vias the
+ * walker does not announce.
+ */
 const WALK = [
   ['UT Tower', 30.28607, -97.73935],
   ['Texas Capitol', 30.27469, -97.74051],
   ['Franklin Barbecue', 30.27014, -97.73128],
   ['Rainey Street', 30.259, -97.73869],
   ['Congress Avenue Bridge', 30.26139, -97.74529],
-  ['Terry Black’s Barbecue', 30.25976, -97.75487],
+  ['via: into the lot', 30.26003, -97.75513],
+  ['Terry Black’s Barbecue', 30.25977, -97.75517],
+  ['via: out of the lot', 30.25996, -97.75495],
   ['Barton Springs Pool', 30.26384, -97.77014],
 ]
 
@@ -108,24 +121,36 @@ const simplify = (points, tolerance) => {
 const round = (points) =>
   points.map(([lat, lng]) => [Number(lat.toFixed(5)), Number(lng.toFixed(5))])
 
-/** Where each stop falls along the path, so a walker knows which leg it is on. */
-const stopsAlong = (path, stops) =>
-  stops.map(([lat, lng]) =>
-    path.reduce(
-      (best, point, index) =>
-        Math.hypot(point[0] - lat, point[1] - lng) <
+/**
+ * Where each stop falls along the path, so a walker knows which leg it is on.
+ * **Searched onward from the stop before**, since a path that goes into a lot
+ * and out again passes near the same point twice, and the nearest point to a
+ * stop can be on the way back.
+ */
+const stopsAlong = (path, stops) => {
+  let from = 0
+  return stops.map(([lat, lng]) => {
+    let best = from
+    for (let index = from; index < path.length; index++) {
+      if (
+        Math.hypot(path[index][0] - lat, path[index][1] - lng) <
         Math.hypot(path[best][0] - lat, path[best][1] - lng)
-          ? index
-          : best,
-      0,
-    ),
-  )
+      ) {
+        best = index
+      }
+    }
+    from = best
+    return best
+  })
+}
 
 const walked = await route(
   'https://routing.openstreetmap.de/routed-foot/route/v1/driving',
   WALK.map(([, lat, lng]) => [lat, lng]),
 )
 const walk = round(simplify(walked.path, 0.00004))
+/* The places only: a via is passed and not announced. */
+const places = walked.stops.filter((_, at) => !WALK[at][0].startsWith('via:'))
 const drives = {}
 for (const [key, places] of Object.entries(DRIVES)) {
   /* One at a time and with a pause, which is what a volunteer server asks. */
@@ -151,7 +176,7 @@ export type Path = readonly (readonly [number, number])[]
  */
 export const WALK: { path: Path; stops: readonly number[] } = ${JSON.stringify({
   path: walk,
-  stops: stopsAlong(walk, walked.stops),
+  stops: stopsAlong(walk, places),
 })}
 
 /** The theme builder's drives, by context and destination. */
