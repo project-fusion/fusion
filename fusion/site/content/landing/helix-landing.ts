@@ -129,7 +129,7 @@ export const MECHANISMS: readonly Capability[] = [
       'Custom elements that run in any framework, or in none',
       'Types for React, Vue, and Svelte from one manifest',
     ],
-    claim: 'Keep your components when you change frameworks',
+    claim: 'Switch frameworks without a rewrite',
     name: 'Components',
   },
   {
