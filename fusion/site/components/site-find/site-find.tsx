@@ -1,7 +1,7 @@
 'use client'
 
 import type { HelixCommand } from '@fusion.dev/helix'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import styles from './site-find.module.css'
 
@@ -113,6 +113,7 @@ export function SiteFind({
   trigger?: boolean
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const palette = useRef<HelixCommand>(null)
   const [open, setOpen] = useState(false)
   const [needle, setNeedle] = useState('')
@@ -183,6 +184,13 @@ export function SiteFind({
         onhelix-before-open={() => setOpen(true)}
         onhelix-select={(event: { detail: { alternate?: boolean; value: string } }) => {
           setOpen(false)
+          /* **The page a reader is on is already open**, so choosing it only
+             closes the palette: a push to the same address scrolled nothing
+             and added nothing, and a reload would throw away whatever the
+             page was holding, a theme half built or a sandbox edited. */
+          if (event.detail.value === pathname) {
+            return
+          }
           router.push(event.detail.value)
         }}
         open={open}
