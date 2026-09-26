@@ -82,7 +82,7 @@ minute off every browser job.
 
 **Everything else waits on `warm`**, `floors`, `packaging`, `types` and both
 test jobs included. They each built their own before, beside it: 139 seconds in
-`floors` and 214 in `packaging`, measured 15 Sep 2026, to make what `warm` was
+`floors` and 214 in `packaging`, measured September 15, 2026, to make what `warm` was
 making at the same time. `lint` reads files and builds nothing, so it alone
 starts at once.
 
@@ -99,7 +99,7 @@ depends on; what the file says is carried by the hash of the task that wrote it.
 pass-through argument into every task of a run, so `turbo run docs -- --check`
 wanted every package's `build` under a key with `--check` in it and missed all
 of them after a plain build: 105 seconds of rebuilding the workspace, measured
-16 Sep 2026, in whichever job asked. `docs`, `routes` and `themed-page` are the
+September 16, 2026, in whichever job asked. `docs`, `routes` and `themed-page` are the
 three whose graph is the workspace, and each is now a task of its own,
 `docs-check` and its two, uncached and depending on exactly what the generator
 depends on. The shards and `floors` restore `warm`'s build and ask their

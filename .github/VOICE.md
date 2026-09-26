@@ -35,7 +35,8 @@ comments are rewritten only when the code around them changes.
 11. **Plain words over clever ones.** A sentence that needs rereading is wrong,
     however well it sounds.
 12. **American spelling, sentence-case headings, exact names and numbers.**
-    `fusion prose` checks the spelling.
+    `fusion prose` checks the spelling. Write dates as "September 15, 2026",
+    with the month spelled out.
 13. **Use the serial comma.** Write "places, routes, and live positions", with a
     comma before the "and" or "or" that ends a list of three or more.
 
