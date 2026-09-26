@@ -78,7 +78,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
   const query = queryFrom(settings)
   const sent = query ? { query, settings } : undefined
   const painted = sent
-    ? propertiesOf((await serverTheme()).derive(mapIntent(settings, settings.scheme)))
+    ? propertiesOf(
+        (await serverTheme()).derive(
+          mapIntent(settings, settings.scheme === 'site' ? 'light' : settings.scheme),
+        ),
+      )
     : undefined
   return (
     <>
