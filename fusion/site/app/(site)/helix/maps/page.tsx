@@ -201,6 +201,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
               <Link data-button="subtle" href="/helix/theme?layout=map">
                 Try it in the theme builder
               </Link>
+              <Link data-link="quiet" href="/helix/docs/maps">
+                Read the Maps guide
+              </Link>
               <Link data-link="quiet" href="/helix/components/map">
                 The Map reference
               </Link>
