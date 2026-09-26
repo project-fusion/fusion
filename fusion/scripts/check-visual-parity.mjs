@@ -596,7 +596,7 @@ const judge = async ({ picture, said, tab }, entry) => {
    * Taken twice when they disagree, and reported only if they disagree again.
    *
    * **A real difference reproduces and a flake does not**, which is what makes
-   * this honest rather than a way of going green. `chat/command` reported 2,566
+   * this honest rather than a way of going green. `chat/command-palette` reported 2,566
    * pixels on three consecutive runs before it was fixed.
    *
    * **The case this was written for is gone, and the retry is worth keeping
