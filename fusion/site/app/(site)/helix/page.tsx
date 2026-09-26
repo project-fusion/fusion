@@ -32,7 +32,7 @@ export default function Page() {
         <helix-flex direction="column" gap="sm">
           <helix-code-block label={`Install ${product.name}`}>{product.install}</helix-code-block>
           <helix-text emphasis="subtle" variant="caption">
-            {product.license}, and {families} families ship today.
+            {product.license} license. {families} component families are available today.
           </helix-text>
         </helix-flex>
       )}

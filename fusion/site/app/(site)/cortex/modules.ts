@@ -30,17 +30,17 @@ export interface CortexModule {
 
 export const CORTEX_MODULES: CortexModule[] = [
   {
-    body: 'Memory. Episodic and semantic stores, and the consolidation between them: what a system has seen, and what it has come to know from seeing it.',
+    body: 'Memory. Engram keeps a store of what a system has seen and a store of what it has learned, and moves facts from the first to the second.',
     stage: 'Building',
     title: 'Engram',
   },
   {
-    body: 'Provenance, and the spine of the whole product. Every memory, every context assembly and every output traces to its inputs, which is what makes a claim answerable rather than merely stored.',
+    body: 'Provenance, and the core of Cortex. Trace links every memory, context, and output to its inputs, so you can check where any claim came from.',
     stage: 'Building',
     title: 'Trace',
   },
   {
-    body: 'Context. Which of what is known belongs in front of the model right now. Committed direction with no work started, and it is the one of the three with no folder yet.',
+    body: 'Context. Recall chooses which known facts to give a model for the task at hand. It is planned, and work has not started.',
     stage: 'Declared',
     title: 'Recall',
   },

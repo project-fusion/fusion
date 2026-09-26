@@ -66,46 +66,46 @@ export const SERVICES: Service[] = [
   {
     duration: 'One to two weeks, two days a week',
     includes: [
-      'A written map of where the work actually is, and where it only looks like it is',
-      'Model, tooling and cost review against what you are trying to do',
+      'A written account of where AI work would help your product, and where it would not',
+      'A review of your models, tools, and costs against your goals',
       'A ranked list of what to build, what to buy, and what to leave alone',
-      'The one thing to do first, with the reason it is first',
+      'The first thing to do, and why',
     ],
     name: 'AI capability audit',
     outcome:
-      'A document you own and can act on without us. If the honest answer is that you do not need the larger engagement, the audit says so.',
+      'A document you own and can act on without us. If you do not need a larger engagement, the audit says so.',
     price: '$12,000 to $18,000',
     summary:
-      'Two weeks to find out what is worth building. Short enough to fit around your roadmap, cheap enough to be a real question rather than a commitment.',
+      'Up to two weeks to find out which AI work is worth building. It fits around your roadmap and does not commit you to more.',
   },
   {
     duration: 'Four weeks, two days a week',
     includes: [
-      'A token layer that derives an accessible palette from your brand color',
-      'The components you actually ship, built as custom elements',
-      'Framework wrappers where you need them, and no framework lock-in where you do not',
-      'The manifest, the docs surface, and the checks that keep it honest',
+      'Color tokens computed from your brand color',
+      'The components your product uses, built as custom elements',
+      'Types for the frameworks you use',
+      'A component manifest, documentation, and build checks',
     ],
     name: 'Design system sprint',
     outcome:
-      'Your design system, in your repository, under your license. It runs whether or not we are still involved, which is the only version of this worth buying.',
+      'Your design system, in your repository, under your license. It keeps working after we leave.',
     price: '$32,000 to $45,000',
     summary:
-      'Shipped software in your repository, not a component library in a design tool. Helix applied to your product, pointed at your components and your constraints.',
+      'Helix, applied to your product. We build your components in your repository, as working code.',
   },
   {
     duration: 'Six to eight weeks, two days a week',
     includes: [
-      'Building alongside your team rather than beside it',
-      'Interface and intelligence work the substrates make faster to do well',
-      'Architecture decisions written down with their trade-offs, not just made',
-      'Handover as a condition of the work, not a phase at the end',
+      'We work in your team, in your codebase',
+      'Interface and AI work built on Helix and Cortex',
+      'Architecture decisions written down with their trade-offs',
+      'We hand the work over as we go',
     ],
     name: 'Conversational build',
     outcome:
-      'Working software and the reasoning behind it, in your hands. We leave and it keeps running.',
+      'Working software and the reasoning behind it, in your hands. It keeps running after we leave.',
     price: 'From $60,000',
     summary:
-      'Development where the specification is a conversation. For work whose shape is still moving, which is most of the work worth doing.',
+      'We build software with you while the specification is still changing, and agree the next step in each conversation.',
   },
 ]

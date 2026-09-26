@@ -20,20 +20,20 @@ export const SANDBOX: PageCopy = {
   blocks: [
     {
       body: [
-        'The editor is a source pane beside a live preview. Edit the markup and the preview redraws; edit the stylesheet beside it and the preview restyles.',
-        'The preview runs in a sandboxed frame with an opaque origin, so markup typed into it cannot read the surrounding page. See the Sandbox page in the Helix documentation for how that is put together.',
+        'The sandbox shows the source of an example beside a live preview. When you edit the markup or the stylesheet, the preview updates.',
+        'The preview runs in a sandboxed frame with an opaque origin, so the markup you type cannot read the rest of the page. The Sandbox page in the Helix documentation explains how it works.',
       ],
       title: 'What it is',
     },
     {
       body: [
-        '`/helix/sandbox?family=<slug>` opens the sandbox on a component family. The slug is the one in `/helix/components/<slug>`, and every family in the manifest has one.',
-        'A link to a family in the sandbox is the fastest way to put a working example in front of somebody, because it arrives editable rather than as a picture of itself.',
+        '`/helix/sandbox?e=<family>` opens the sandbox on a component, and `/helix/sandbox?e=<family>.<example>` opens one of its examples. The family is the slug in `/helix/components/<family>`.',
+        'Send a sandbox link to share a working example that the other person can edit.',
       ],
-      title: 'The URL contract',
+      title: 'Link to a component',
     },
   ],
-  lede: 'An editable source pane beside a live preview, for any component in the library.',
+  lede: 'Edit the source of any Helix component example and see the result beside it.',
   source: 'written for this document; the page is a tool and has no prose',
   title: 'Sandbox',
 }
@@ -42,25 +42,26 @@ export const THEME_BUILDER: PageCopy = {
   blocks: [
     {
       body: [
-        'Give it the intent inputs that `derive()` takes, a brand color first, and it runs the real derivation rather than an approximation of it. What comes back is the complete token set and the library rendered in it, light and dark at once.',
+        'Enter the inputs that `derive()` takes, starting with a brand color. The theme builder runs the same `derive()` your build does and shows the complete token set, with the components drawn in it in light and dark.',
       ],
       title: 'What it is',
     },
     {
       body: [
-        'Every pairing the engine solved, with its measured ratio against the ground it is actually painted on. Met, unverifiable where the ground is translucent and there is no known color to measure against, or pinned where you supplied the color outright and the engine did not solve for it.',
-        'A theme with a column of unverifiable is a theme making a trade, and it should be possible to see that you made it.',
+        'The contrast column lists every text and background pair, with its contrast ratio measured against the background it is drawn on. Each pair has one of three results:',
+        '- **Met**: the pair meets its contrast target.\n- **Unverifiable**: the background is translucent, so there is no single color to measure against.\n- **Pinned**: you set the color yourself, so Helix did not compute it.',
+        'Check the unverifiable pairs before you use the theme.',
       ],
-      title: 'The contrast column is the part to read',
+      title: 'Read the contrast column',
     },
     {
       body: [
-        'Keep the intent object, not the token block. The tokens are the output of a solver and the solver improves; a theme stored as its inputs picks up a better derivation, and a theme stored as 176 literal values is frozen at the version that produced it.',
+        'Save the intent object with your code. Helix computes the tokens from it, so when Helix improves how it computes them, your theme gets the improvement. A copy of the 176 token values stays as it was on the day you copied it.',
       ],
-      title: 'What to take away',
+      title: 'Save the inputs',
     },
   ],
-  lede: 'Describe a brand. Get a palette every pair of which has been measured.',
+  lede: 'Enter your brand color and get a full palette, with the contrast of every pair measured.',
   source: 'written for this document; the page is a tool and has no prose',
   title: 'Theme builder',
 }
@@ -69,13 +70,13 @@ export const AURA: PageCopy = {
   blocks: [
     {
       body: [
-        'Nine backgrounds drawn from the token layer, with the pointer response and every parameter live. The component is `helix-aura` and its API tables are at `/helix/components/aura`; this is the other half, which is the thing running at full size with the controls in reach.',
-        'It draws in WebGL. Where WebGL is refused it draws nothing and the page is the type it always was, which is the behavior to expect rather than a fallback to configure.',
+        'Aura has nine animated backgrounds colored by your tokens. The page shows each one at full size, with controls for every parameter and the response to the pointer. The component is `helix-aura`, and its reference is at `/helix/components/aura`.',
+        'Aura draws with WebGL. In a browser without WebGL, it draws nothing and the page shows its content on the plain background.',
       ],
       title: 'What it is',
     },
   ],
-  lede: 'Nine backgrounds drawn from the token layer, with every parameter live.',
+  lede: 'Nine animated backgrounds colored by your tokens, with controls for every parameter.',
   source: 'written for this document; the page is a tool and has no prose',
   title: 'Aura',
 }

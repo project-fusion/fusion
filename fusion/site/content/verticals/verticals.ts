@@ -61,31 +61,31 @@ export interface Vertical {
  */
 export const VERTICALS: Vertical[] = [
   {
-    body: 'The practice. Interface and intelligence work, delivered into your repository under your license. It is the only part of Fusion that can be bought today, and the engagements it takes are chosen for whether their deliverable feeds Helix or Cortex.',
+    body: 'Our services team. We deliver interface and AI work into your repository under your license. Studio is the part of Fusion you can hire today, and we take on work that also improves Helix or Cortex.',
     href: '/company/services',
     icon: 'briefcase',
     label: 'Studio',
     name: 'Fusion Studio',
     stage: 'Active',
-    summary: 'The work. Three offers, every price stated.',
+    summary: 'Three services, each with a published price.',
   },
   {
-    body: 'Helix is the design system: web components with a token layer that derives an accessible palette from a brand color rather than from a spreadsheet of hexes. Components ship as custom elements, so the framework above them stays a choice.',
+    body: 'Fusion Design builds Helix, a design system of web components. Helix computes its color tokens from your brand color.',
     href: '/helix',
     icon: 'palette',
     label: 'Design',
     name: 'Fusion Design',
     stage: 'Building',
-    summary: 'Interface. Helix lives here.',
+    summary: 'Home of Helix, our design system.',
   },
   {
-    body: 'Cortex is the memory and provenance layer: what a system knows, where it learned it, and how much of it to trust. Not a model wrapper. The part that remains true when the model underneath is replaced.',
+    body: 'Fusion Mind builds Cortex, a memory and provenance layer for AI systems. Cortex records what a system knows, where it learned it, and how far to trust it.',
     href: '/cortex',
     icon: 'pulse',
     label: 'Mind',
     name: 'Fusion Mind',
     stage: 'Building',
-    summary: 'Intelligence. Cortex lives here.',
+    summary: 'Home of Cortex, our memory layer.',
   },
 ]
 

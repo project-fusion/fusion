@@ -152,7 +152,7 @@ export interface Product {
  */
 export const PRODUCTS: Product[] = [
   {
-    body: 'The design system. Web components with a token layer that derives an accessible palette from one brand color, so an interface is consistent because there was nothing else to choose. Components ship as custom elements, which keeps the framework above them a choice rather than a commitment.',
+    body: 'A design system of web components. Helix computes a full color palette from your brand color, and every component uses the same tokens, so your interface stays consistent.',
     destinations: [
       /* First, because the panel is where a reader arrives rather than returns.
          What a new one needs is how to install it and the vocabulary the
@@ -173,22 +173,22 @@ export const PRODUCTS: Product[] = [
          destinations people want, not for a tidy model of the routes. */
       {
         href: '/helix/docs',
-        summary: 'Install it, theme it, and the ideas underneath.',
+        summary: 'Install Helix, build a theme, and learn how it works.',
         title: 'Docs',
       },
       {
         href: '/helix/components',
-        summary: 'Every family, with its API and a live example.',
+        summary: 'Every component, with its API and a live example.',
         title: 'Components',
       },
       {
         href: '/helix/sandbox',
-        summary: 'Edit an example with the source beside it.',
+        summary: 'Edit an example and see the result beside the code.',
         title: 'Sandbox',
       },
       {
         href: '/helix/theme',
-        summary: 'Derive a palette and see every pair measured.',
+        summary: 'Build a palette from your brand color and check its contrast.',
         title: 'Theme builder',
       },
       /* A part of Helix rather than a third product: its argument is Helix's,
@@ -209,11 +209,10 @@ export const PRODUCTS: Product[] = [
     name: 'Helix',
     role: 'The DNA',
     stage: 'Building',
-    summary:
-      'The design system. Web components over a token layer that derives its palette from one brand color.',
+    summary: 'A design system of web components, themed from your brand color.',
   },
   {
-    body: 'Memory and provenance. What a system knows, where it learned it, and how much of it to trust. Not a model wrapper: the part that remains true when the model underneath is replaced.',
+    body: 'A memory and provenance layer for AI systems. Cortex records what a system knows, where each fact came from, and how far to trust it. The record stays when you replace the model.',
     /* The three modules that have earned an evocative name, per `AGENTS.md`:
        inside Cortex that is exactly Engram, Trace and Recall, and the rest stay
        descriptive. They are named here before they are built because the
@@ -227,17 +226,17 @@ export const PRODUCTS: Product[] = [
       },
       {
         stage: 'Building',
-        summary: 'Memory. What the system holds on to, and for how long.',
+        summary: 'Memory: what a system keeps, and for how long.',
         title: 'Engram',
       },
       {
         stage: 'Building',
-        summary: 'Provenance. Where a fact came from, all the way back.',
+        summary: 'Provenance: where each fact came from.',
         title: 'Trace',
       },
       {
         stage: 'Declared',
-        summary: 'Context. What to put in front of a model, and why that.',
+        summary: 'Context: what to give a model, and why.',
         title: 'Recall',
       },
     ],
@@ -246,7 +245,6 @@ export const PRODUCTS: Product[] = [
     name: 'Cortex',
     role: 'The mind',
     stage: 'Building',
-    summary:
-      'Memory and provenance. The part that stays true when the model underneath is replaced.',
+    summary: 'Memory and provenance for AI systems, kept when you change models.',
   },
 ]
