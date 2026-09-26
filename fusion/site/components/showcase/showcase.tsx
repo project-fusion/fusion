@@ -225,14 +225,14 @@ export function Showcase(): React.ReactElement {
         <helix-flex direction="column" gap="md">
           <helix-text variant="label">Helix</helix-text>
           <helix-text as="h3" class={styles.anchorTitle}>
-            One brand color in. A whole palette out.
+            One brand color, a full palette
           </helix-text>
           <helix-text>
-            Every surface, border and text color on this page is derived from a single value, and
-            each one is checked against the ground it lands on.
+            Every surface, border, and text color on this page comes from one brand color. Each text
+            color is checked for contrast against its background.
           </helix-text>
           <helix-flex>
-            <helix-button emphasis="solid">Read the derivation</helix-button>
+            <helix-button emphasis="solid">Read about theming</helix-button>
           </helix-flex>
         </helix-flex>
       </helix-card>

@@ -687,7 +687,7 @@ const row = (label, measurement) =>
 
 const lines = [
   '---',
-  'description: What Helix costs a page, measured rather than claimed.',
+  'description: How much Helix adds to a page, measured from the built packages.',
   `order: ${lastInSection()}`,
   'section: Getting started',
   'title: Metrics',
@@ -839,22 +839,22 @@ const output = join(root, OUTPUT)
 const claims = [
   {
     label: 'Components',
-    note: 'Two tiers. Headless behavior and a styled layer over it, both shipped.',
+    note: 'Each has a headless tier with its behavior and a styled tier with its design.',
     value: String(styled.rows.length),
   },
   {
     label: 'The token layer, compressed',
-    note: `${TOKEN_COUNT} semantic tokens. Nothing on a Helix page paints without this file.`,
+    note: `${TOKEN_COUNT} semantic tokens. Every Helix page loads this file.`,
     value: kb(stylesheets.find((sheet) => sheet.path.endsWith('dist/tokens.css')).brotli),
   },
   {
     label: 'The derivation engine',
-    note: 'Build time for most consumers, runtime for a theme switcher.',
+    note: 'Most sites run it when they build. A theme switcher runs it in the browser.',
     value: kb(packages.find((one) => one.entry === '@fusion.dev/helix-theme').brotli),
   },
   {
-    label: 'Shared across the first component',
-    note: 'Ten components are one runtime plus nine additions, not ten of the first number.',
+    label: 'Of the first component is shared',
+    note: 'Most of the first component is a runtime that every later component reuses.',
     value: `${sharedShare}%`,
   },
 ]
