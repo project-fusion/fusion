@@ -1,60 +1,59 @@
 ---
-description: Helix is the first thing Fusion ships. Here's what it is.
+description: Helix is the first product Fusion ships. It is a design system built from custom elements.
 kicker: Announcements
-lede: Helix ships first. It's a design system built from custom elements, and it's close.
+lede: Helix is a design system built from custom elements. It is the first product we ship, and it is almost ready.
 path: /announcements
-title: Helix is what comes first
+title: Helix ships first
 ---
 
-Fusion has five layers, and right now only the top one is usable. So that's
-the one I'm finishing first: the interface layer. I'm shipping it as a design
-system rather than a framework, because a design system is the part of an
-interface a company can actually own.
+Fusion has five layers, and today only the top one, the interface layer, is
+ready to use. We are finishing that layer first. We ship it as a design system,
+because a design system is the part of an interface a company can own.
 
-## What it is
+## What Helix is
 
-Every component is a custom element. It isn't a React component with wrappers
-generated for everything else, and it isn't a kit of primitives you assemble
-yourself. The element is what ships, and React, Vue and Svelte all use the same
-one.
+Every component is a custom element. React, Vue, and Svelte all use the same
+element.
 
-It comes in two tiers. The headless tier is behavior with no styles at all:
-state, focus, keyboard, forms and accessibility. The styled tier is the same
-components with a visual system on top. If you need different pixels, you drop
-down a tier instead of copying a file, so a fork still has something supported
-underneath it.
+Helix comes in two tiers:
+
+- The headless tier has the behavior and no styles: state, focus, keyboard,
+  forms, and accessibility.
+- The styled tier adds a visual design to the same components.
+
+If you need a different look, you use the headless tier and keep the same
+components. You do not have to copy a file and maintain a fork.
 
 ## What you get
 
-You give it one brand color and it builds the whole palette, and it won't hand
-you a palette it can't make readable. Contrast isn't an audit someone has to
-schedule anymore. It's part of how the colors get made.
+You give Helix one brand color, and it computes the whole palette. Helix rejects
+a palette it cannot make readable, so contrast is part of how the colors are
+made.
 
-Every tag, property and event is in one manifest at a URL, and every page is
-available as Markdown. I built that for agents before it was fashionable to say
-so. A model reads the same page a person does, so there's no second, worse copy
-of the API for either of them.
+Every tag, property, and event is in one manifest at a URL, and every page is
+available as Markdown. AI agents read the same pages you do, so there is one
+copy of the API for both.
 
-It's MIT licensed, it lives in your repository, and it keeps working whether or
-not we're still involved. That's the test I hold every Fusion product to. If the
-answer were no, it wouldn't be one.
+Helix is MIT licensed. It lives in your repository and keeps working after we
+leave. We hold every Fusion product to that test.
 
 ## How we can help
 
-There are three ways to work with us, usually in this order. An audit, two
-weeks at a fixed price, to figure out what's worth building at all. A design
-system sprint, which is Helix applied to your product and shipped into your
-repository instead of left in a design tool. And a build, for work that's still
-changing shape, which is most work worth doing.
+There are three ways to work with us, usually in this order:
 
-[What each one involves](/company/services) is written up, including what you
+1. An audit of up to two weeks at a fixed price, to find out what is worth
+   building.
+2. A design system sprint, which applies Helix to your product and ships it into
+   your repository.
+3. A build, for work whose scope is still changing.
+
+[The services page](/company/services) describes each one, including what you
 keep at the end.
 
-## What's next
+## What is next
 
-Cortex is the layer under this one: memory and provenance, so what your company
-knows is something you own rather than something you rent back every quarter.
-It's real work, but nothing has shipped yet. It'll show up here when that
-changes.
+Cortex is the layer under Helix. It stores what your company knows and where
+each fact came from, and you own that record. Work on Cortex is underway, and
+nothing has shipped yet. We will announce it here when it does.
 
-I'm not putting dates on any of it.
+We are not setting dates for any of it.
