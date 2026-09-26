@@ -67,6 +67,7 @@ export const MAPS: PageCopy = {
     {
       body: [
         'Pick a brand or a mode and only the map changes. Every color in it is mixed from the page’s own tokens.',
+        'Places that would draw over each other gather into a count. The Driskill and its café share an address, so theirs fans out when pressed.',
       ],
       title: 'The map',
     },
