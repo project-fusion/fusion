@@ -24,7 +24,7 @@ export default function Page() {
     <VerticalPage product={product} vertical={vertical}>
       <helix-flex direction="column" gap="md">
         <helix-text as="h2" variant="title">
-          What is inside it
+          What Cortex includes
         </helix-text>
         {/* **`min` rather than a fixed three**, which at 375 gave three columns
             of about 130px with every word on its own line and the third clipped
