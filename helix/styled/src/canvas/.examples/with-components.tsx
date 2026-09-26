@@ -1,0 +1,47 @@
+import './with-components.css'
+
+export function Example() {
+  return (
+    <helix-canvas
+      grid="lines"
+      label="What shipped this week"
+    >
+      <helix-canvas-node
+        height={150}
+        label="The new media treatment"
+        name="shot"
+        width={220}
+        x={0}
+        y={0}
+      >
+        <helix-image
+          alt="Seawater over pale sand"
+          shape="rounded"
+          src="/media/scale/seawater-400.jpg"
+        ></helix-image>
+        <helix-text slot="description">The new media treatment</helix-text>
+      </helix-canvas-node>
+
+      <helix-canvas-node
+        height={150}
+        label="Weekly readers"
+        name="numbers"
+        width={220}
+        x={320}
+        y={0}
+      >
+        <helix-stat>
+          <helix-text slot="label">Weekly readers</helix-text>
+          12,480
+        </helix-stat>
+        <helix-text slot="description">Up a fifth since the change</helix-text>
+      </helix-canvas-node>
+
+      <helix-canvas-edge
+        from="shot"
+        label="drove"
+        to="numbers"
+      ></helix-canvas-edge>
+    </helix-canvas>
+  )
+}

@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
-import placed from '../.examples/placed.html' with { type: 'text' }
+import placed from '../.examples/placement.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()

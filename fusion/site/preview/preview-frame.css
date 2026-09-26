@@ -13,7 +13,7 @@
 
 /* Centered: a block box with a measure, centered in the frame. **Neither flex
    nor grid here, and both look right until they are measured.** Flex centers the
-   example's *children* along the inline axis, so `tour/nested` comes out as
+   example's *children* along the inline axis, so `tour/inside-a-menu-and-drawer` comes out as
    three controls on one line with the odd one dropped, and every example
    separating blocks with a `margin-block-end` is wrong in this mode alone. A
    single-column grid makes every top-level child its own row, so the Icon

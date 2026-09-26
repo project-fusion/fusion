@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import somewhere from '../.examples/custom-target.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
-import somewhere from '../.examples/somewhere-else.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()

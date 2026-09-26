@@ -9,11 +9,11 @@ import {
   settle,
   type Updatable,
 } from '@fusion.dev/helix-testing/dom'
-import agent from '../.examples/agent.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
 import historySheet from '../.examples/history.css' with { type: 'text' }
 import history from '../.examples/history.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
+import agent from '../.examples/reply-with-steps.html' with { type: 'text' }
 import streaming from '../.examples/streaming.html' with { type: 'text' }
 import transcriptSheet from '../.examples/transcript.css' with { type: 'text' }
 import transcript from '../.examples/transcript.html' with { type: 'text' }
