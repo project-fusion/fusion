@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og'
+import { plainText } from '@/components/code-text/code-text'
 import { findFamily } from '../../../../../../content/catalog/catalog'
 
 /*
@@ -58,7 +59,7 @@ export default async function Image({ params }: { params: Promise<{ family: stri
             than wrapped freely: `ImageResponse` has no overflow, so a long
             sentence would draw past the edge instead of ending. */}
         <div style={{ color: '#9aa4b2', fontSize: 34, lineHeight: 1.3, maxWidth: 900 }}>
-          {family?.summary ?? 'The Helix component reference'}
+          {family?.summary ? plainText(family.summary) : 'The Helix component reference'}
         </div>
       </div>
 
