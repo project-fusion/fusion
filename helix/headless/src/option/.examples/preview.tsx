@@ -3,9 +3,9 @@ import './preview.css'
 export function Example() {
   return (
     <>
-      {/* Hand-written owner: `role="option"` requires one. */}
+      {/* An option needs a parent with `role="listbox"`. */}
       <div
-        aria-label="Label"
+        aria-label="Assignee"
         className="listbox"
         role="listbox"
       >
@@ -13,20 +13,20 @@ export function Example() {
           selected
           value="one"
         >
-          Option One
+          Alex Kim
         </helix-headless-option>
         <helix-headless-option
           data-active
           value="two"
         >
-          Option Two
+          Sam Patel
         </helix-headless-option>
-        <helix-headless-option value="three">Option Three</helix-headless-option>
+        <helix-headless-option value="three">Jordan Lee</helix-headless-option>
         <helix-headless-option
           disabled
           value="four"
         >
-          Option Four
+          Priya Shah
         </helix-headless-option>
       </div>
     </>

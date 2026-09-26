@@ -4,27 +4,27 @@ export function Example() {
   return (
     <helix-headless-tree
       default-active="two"
-      label="Label"
+      label="Files"
     >
       <helix-headless-tree-item
         default-open
         value="one"
       >
-        Item One
+        Documents
         <helix-headless-tree-item
           slot="children"
           value="two"
         >
-          Item Two
+          Budget.xlsx
         </helix-headless-tree-item>
         <helix-headless-tree-item
           slot="children"
           value="three"
         >
-          Item Three
+          Notes.txt
         </helix-headless-tree-item>
       </helix-headless-tree-item>
-      <helix-headless-tree-item value="four">Item Four</helix-headless-tree-item>
+      <helix-headless-tree-item value="four">Invoice-1042.pdf</helix-headless-tree-item>
     </helix-headless-tree>
   )
 }

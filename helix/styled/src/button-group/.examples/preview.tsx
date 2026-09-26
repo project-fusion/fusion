@@ -1,9 +1,9 @@
 export function Example() {
   return (
-    <helix-button-group label="Label">
-      <helix-button>Option One</helix-button>
-      <helix-button>Option Two</helix-button>
-      <helix-button>Option Three</helix-button>
+    <helix-button-group label="Calendar view">
+      <helix-button>Day</helix-button>
+      <helix-button>Week</helix-button>
+      <helix-button>Month</helix-button>
     </helix-button-group>
   )
 }

@@ -45,17 +45,17 @@ export function Example() {
           emphasis="muted"
           variant="caption"
         >
-          1,089 specs across 75 families.
+          1,089 tests across 75 packages.
         </helix-text>
       </helix-timeline-item>
       <helix-timeline-item datetime="2026-08-19T08:04">
         <span slot="time">08:04</span>
-        <helix-text variant="body-strong">Opened</helix-text>
+        <helix-text variant="body-strong">Pull request opened</helix-text>
         <helix-text
           emphasis="muted"
           variant="caption"
         >
-          A branch, and the first commit on it.
+          A new branch with its first commit.
         </helix-text>
       </helix-timeline-item>
     </helix-timeline>

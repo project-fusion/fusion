@@ -2,25 +2,25 @@ import './preview.css'
 
 export function Example() {
   return (
-    <helix-headless-menu label="Menu">
-      <helix-headless-button slot="trigger">Menu</helix-headless-button>
+    <helix-headless-menu label="View options">
+      <helix-headless-button slot="trigger">View options</helix-headless-button>
 
       <helix-headless-menu-item value="one">
-        Item One
+        Sort by
         <helix-headless-menu-item
           checkable
           checked
           slot="submenu"
           value="one-a"
         >
-          Option One
+          Name
         </helix-headless-menu-item>
         <helix-headless-menu-item
           checkable
           slot="submenu"
           value="one-b"
         >
-          Option Two
+          Date modified
         </helix-headless-menu-item>
       </helix-headless-menu-item>
 
@@ -31,13 +31,13 @@ export function Example() {
         checked
         value="two"
       >
-        Item Two
+        Show hidden files
       </helix-headless-menu-item>
       <helix-headless-menu-item
         checkable
         value="three"
       >
-        Item Three
+        Show file extensions
       </helix-headless-menu-item>
     </helix-headless-menu>
   )

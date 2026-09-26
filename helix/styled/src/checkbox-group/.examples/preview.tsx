@@ -1,15 +1,15 @@
 export function Example() {
   return (
     <helix-checkbox-group
-      hint="Hint"
-      label="Label"
+      hint="Choose where you receive updates."
+      label="Notifications"
       name="group"
       value="one,two"
     >
-      <helix-checkbox value="one">Option One</helix-checkbox>
-      <helix-checkbox value="two">Option Two</helix-checkbox>
-      <helix-checkbox value="three">Option Three</helix-checkbox>
-      <helix-checkbox value="four">Option Four</helix-checkbox>
+      <helix-checkbox value="one">Email</helix-checkbox>
+      <helix-checkbox value="two">Text message</helix-checkbox>
+      <helix-checkbox value="three">Mobile app</helix-checkbox>
+      <helix-checkbox value="four">Browser</helix-checkbox>
     </helix-checkbox-group>
   )
 }

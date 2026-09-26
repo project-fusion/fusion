@@ -3,12 +3,12 @@ import './preview.css'
 export function Example() {
   return (
     <>
-      {/* Closed on the same line on purpose: a newline here costs the label. */}
+      {/* Keep the closing tag on the same line. A newline inside the element hides the label. */}
 
       <helix-headless-checkbox
         default-checked
-        hint="Hint"
-        label="Label"
+        hint="You can unsubscribe at any time."
+        label="Email me about product updates"
         name="option"
         value="accepted"
       ></helix-headless-checkbox>

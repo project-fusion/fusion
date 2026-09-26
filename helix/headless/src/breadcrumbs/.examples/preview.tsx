@@ -16,10 +16,10 @@ export function Example() {
           data-link="quiet"
           href="/section"
         >
-          Section
+          Projects
         </a>
       </helix-headless-breadcrumb>
-      <helix-headless-breadcrumb current>Current Page</helix-headless-breadcrumb>
+      <helix-headless-breadcrumb current>Website redesign</helix-headless-breadcrumb>
     </helix-headless-breadcrumbs>
   )
 }

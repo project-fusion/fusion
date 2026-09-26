@@ -6,9 +6,8 @@ const ago = (minutes: number): string => new Date(Date.now() - minutes * 60000).
 const AGES = [3, 42, 1500]
 
 export function Example() {
-  /* Set after mount rather than written into the markup, because a timestamp in
-     an example is stale the moment it is committed, and one computed during
-     render disagrees between the server and the client. */
+  /* The timestamps are set after mount, relative to now, so the server and the
+     client render the same markup. */
   const [at, setAt] = useState<string[]>([])
 
   useEffect(() => {

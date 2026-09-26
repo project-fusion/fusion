@@ -4,7 +4,7 @@ export function Example() {
       emphasis="solid"
       tone="primary"
     >
-      Button
+      Save changes
     </helix-button>
   )
 }

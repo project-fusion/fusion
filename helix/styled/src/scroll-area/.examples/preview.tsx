@@ -3,14 +3,14 @@ import './preview.css'
 export function Example() {
   return (
     <helix-scroll-area label="Release notes">
-      <p>Dialogs return focus to the control that opened them.</p>
-      <p>The date picker formats its own labels from the locale.</p>
-      <p>Tables keep their header row pinned while the body scrolls.</p>
-      <p>Toasts pause their timer while the pointer is over them.</p>
-      <p>Combobox filtering is now case and accent insensitive.</p>
-      <p>The theme builder reports every pair it measured.</p>
-      <p>Charts read their series from a slotted table.</p>
-      <p>Every icon ships as a single sprite.</p>
+      <p>You can now export reports as CSV files.</p>
+      <p>Search results load faster on large projects.</p>
+      <p>Invoices now show the tax for each line item.</p>
+      <p>Shared folders show who added each file.</p>
+      <p>You can pin projects to the top of your list.</p>
+      <p>Comments now support mentions and links.</p>
+      <p>Dark mode is available in settings.</p>
+      <p>Team admins can now remove members.</p>
     </helix-scroll-area>
   )
 }

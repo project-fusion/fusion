@@ -3,8 +3,8 @@ import './preview.css'
 import { useState } from 'react'
 
 export function Example() {
-  /* Preview frame: a real page would remember it had been taken. Opening is the
-     page's business, the way a dialog's is. */
+  /* Preview frame: the button opens the tour at its first stop. A real page
+     would also remember that the tour was taken. */
   const [index, setIndex] = useState(0)
   const [open, setOpen] = useState(false)
 
@@ -55,8 +55,8 @@ export function Example() {
           >
             <helix-text as="h2">Quarterly review</helix-text>
             <helix-text emphasis="muted">
-              A draft nobody has read yet. Everything below this line is the part you are still
-              writing.
+              A draft of the third quarter report. Add a summary and the results for each team
+              before you publish.
             </helix-text>
           </section>
         </div>
@@ -87,10 +87,10 @@ export function Example() {
               as="h3"
               slot="header"
             >
-              Everything lives here
+              Find your documents
             </helix-text>
             <helix-text emphasis="muted">
-              Drafts, published work and the archive. Nothing is ever deleted.
+              Drafts, published documents, and archived documents are listed here.
             </helix-text>
           </helix-card>
         </helix-tour-stop>
@@ -101,10 +101,10 @@ export function Example() {
               as="h3"
               slot="header"
             >
-              Write in the open
+              Write your document
             </helix-text>
             <helix-text emphasis="muted">
-              Saved as you type. There is no save button because there is nothing to press.
+              Your changes are saved as you type. You can close the page at any time.
             </helix-text>
           </helix-card>
         </helix-tour-stop>
@@ -118,10 +118,10 @@ export function Example() {
               as="h3"
               slot="header"
             >
-              See it as a reader would
+              Preview your document
             </helix-text>
             <helix-text emphasis="muted">
-              Opens the same page anybody with the link gets.
+              See the document as it looks to people with the link.
             </helix-text>
           </helix-card>
         </helix-tour-stop>
@@ -135,10 +135,10 @@ export function Example() {
               as="h3"
               slot="header"
             >
-              And when it is ready
+              Publish when you are ready
             </helix-text>
             <helix-text emphasis="muted">
-              Publishing is reversible. The archive keeps every version you ever had.
+              You can unpublish at any time. The archive keeps every earlier version.
             </helix-text>
           </helix-card>
         </helix-tour-stop>

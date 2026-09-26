@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-callout tone="info">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Invoices are sent by email on the first day of each month.
     </helix-callout>
   )
 }

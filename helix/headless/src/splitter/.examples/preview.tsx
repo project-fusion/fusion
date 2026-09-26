@@ -4,7 +4,7 @@ export function Example() {
   return (
     <helix-headless-splitter default-position="40">
       <helix-headless-card slot="start">
-        <p>Navigator</p>
+        <p>Files</p>
       </helix-headless-card>
       <helix-headless-card slot="end">
         <p>Editor</p>

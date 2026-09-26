@@ -1,8 +1,8 @@
 export function Example() {
   return (
     <helix-color-input
-      hint="Any syntax: hex, rgb() or hsl()"
-      label="Brand"
+      hint="Use hex, rgb(), or hsl()."
+      label="Brand color"
       name="brand"
     ></helix-color-input>
   )
