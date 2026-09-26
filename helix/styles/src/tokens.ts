@@ -76,23 +76,23 @@ export const TOKENS: Token[] = [
   [
     'color-background',
     'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))',
-    'The page. Told apart by nothing, because it is the ground.',
+    'The page background. Every other surface sits on it.',
   ],
   [
     'color-surface',
     'light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))',
-    'A plane on the page: a card, or a panel you own. Told apart by a fill, an edge or a lift, whichever the policy leads with.',
+    'A surface on the page, such as a card or a panel. The separation policy sets it apart with a fill, a border, or a shadow.',
   ],
   /* Two kinds of "above", and they want opposite fills in light mode. */
   [
     'color-surface-raised',
     'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))',
-    'Lifted while still lying on the page: a selected tab, a hovered row. Told apart by its fill, which goes down the ramp rather than up.',
+    'A raised surface on the page, such as a selected tab or a hovered row. Its fill is one step down the ramp.',
   ],
   [
     'color-surface-overlay',
     'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))',
-    'Over the page rather than on it: a menu, a popover, a dialog. Told apart by its shadow and by what it covers.',
+    'A surface over the page, such as a menu, a popover, or a dialog. Its shadow sets it apart.',
   ],
   /* Down in light, up in dark, because "recessed" is a direction and only one
      of the two modes has room in it. At 0.91, the step where the ramp starts
@@ -110,7 +110,7 @@ export const TOKENS: Token[] = [
   [
     'color-surface-sunken',
     'light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))',
-    'A well a value goes into: an input, a track, a groove. Told apart by its fill, inward.',
+    'A recessed surface that holds a value, such as an input, a track, or a groove. Its fill sets it apart.',
   ],
   /* *What a field is filled with, stated as a step from its ground rather than
      as a color.** A control that names an absolute surface is only correct on
@@ -487,14 +487,14 @@ export const TOKENS: Token[] = [
   ['radii-lg', 'calc(var(--_helix-seed-radii) * 1.5)'],
   ['radii-full', '9999px'],
   /* ======================================================== type ======== */
-  ['font-sans', 'var(--_helix-family-sans)', 'Everything, unless it is one of the two below.'],
-  ['font-mono', 'var(--_helix-family-mono)', 'Code, and anything that has to line up in a column.'],
+  ['font-sans', 'var(--_helix-family-sans)', 'All text except code and display headings.'],
+  ['font-mono', 'var(--_helix-family-mono)', 'Code, and text that needs to line up in columns.'],
   /* Falls back to the sans stack, so a product that never sets a display face
      still renders rather than dropping to a serif default. */
   [
     'font-display',
     'var(--_helix-family-display, var(--_helix-family-sans))',
-    'Headings meant to be looked at rather than read. Falls back to the sans face.',
+    'Large display headings. Falls back to the sans face.',
   ],
   /* The body size is `md`, and it is 14. 14 is the size a dense product
      interface is set at, and it divides. Fifteen against
@@ -509,12 +509,12 @@ export const TOKENS: Token[] = [
   ['text-xl', 'var(--_helix-size-24)'],
   ['text-2xl', 'var(--_helix-size-32)'],
   ['text-3xl', 'var(--_helix-size-44)'],
-  ['weight-regular', '400', 'Body text, and the weight most of a page is set in.'],
-  ['weight-medium', '500', 'A label, or a heading that should not shout.'],
-  ['weight-semibold', '600', 'A heading, and the heaviest this system goes.'],
-  ['leading-tight', '1.2', 'Body text set close, for a short measure.'],
-  ['leading-normal', '1.5', 'Body text, and the default a paragraph takes.'],
-  ['leading-loose', '1.7', 'Body text set open, for a long measure or a small size.'],
+  ['weight-regular', '400', 'Body text. Most of a page uses this weight.'],
+  ['weight-medium', '500', 'Labels, and quieter headings.'],
+  ['weight-semibold', '600', 'Headings. The heaviest weight in Helix.'],
+  ['leading-tight', '1.2', 'Body text set close, for short lines.'],
+  ['leading-normal', '1.5', 'Body text. The default line height for a paragraph.'],
+  ['leading-loose', '1.7', 'Body text set open, for long lines or small sizes.'],
   /* **A heading derives its leading from its size instead of picking a rung**,
      because picking is what kept getting it wrong. Every heading took `tight`,
      and measured against real ink extents rather than em boxes, four of them set
@@ -534,15 +534,11 @@ export const TOKENS: Token[] = [
   [
     'leading-heading',
     'calc(0.99em + 0.5rem)',
-    'Headings, which want less than a paragraph. Written as a length plus an em so it tightens as the type grows.',
+    'Headings, which need less line height than a paragraph. It is a length plus an em, so it tightens as the type grows.',
   ],
-  [
-    'tracking-tight',
-    '-0.01em',
-    'Large type, which needs the letters closer than a paragraph does.',
-  ],
-  ['tracking-normal', '0', 'Body text, and the default.'],
-  ['tracking-wide', '0.02em', 'Small capitals and labels, which need the room.'],
+  ['tracking-tight', '-0.01em', 'Large type, which needs tighter letter spacing than a paragraph.'],
+  ['tracking-normal', '0', 'Body text. The default letter spacing.'],
+  ['tracking-wide', '0.02em', 'Labels and small capitals, which need extra letter spacing.'],
   /* *The eyebrow step, which is a different job from `wide`.** `wide` at
      0.02em is a nudge, for a label in sentence case that wants a little air.
      An eyebrow is set in capitals, and capitals need more than a nudge:
@@ -552,7 +548,7 @@ export const TOKENS: Token[] = [
      deliberate, measured against the 0.18em on the legacy marketing site,
      which is loose enough that a four-word kicker begins to come apart, and
      `Acceptable use` is two of four. */
-  ['tracking-wider', '0.12em', 'An uppercase eyebrow, which needs more room than a label.'],
+  ['tracking-wider', '0.12em', 'Uppercase eyebrows, which need more letter spacing than a label.'],
   /* ======================================================== border ====== */
   ['border-thin', '1px'],
   ['border-thick', '2px'],
@@ -565,9 +561,9 @@ export const TOKENS: Token[] = [
   [
     'border-surface',
     'var(--helix-border-thin)',
-    'The edge a surface in the flow takes. Zero to go shadow-first.',
+    'The border of a surface in the page flow. Set it to zero to separate surfaces with shadows.',
   ],
-  ['border-floating', '0', 'The edge a surface over content takes.'],
+  ['border-floating', '0', 'The border of a surface that floats over content.'],
   /* ======================================================== shadow ====== */
   /* Used sparingly. */
   ['shadow-none', 'none'],
@@ -580,9 +576,13 @@ export const TOKENS: Token[] = [
   [
     'shadow-surface',
     'var(--helix-shadow-none)',
-    'The lift a surface in the flow takes. None to go border-first.',
+    'The shadow of a surface in the page flow. Set it to none to separate surfaces with borders.',
   ],
-  ['shadow-floating', 'var(--helix-shadow-lg)', 'The lift a surface over content takes.'],
+  [
+    'shadow-floating',
+    'var(--helix-shadow-lg)',
+    'The shadow of a surface that floats over content.',
+  ],
   /* ======================================================== material ==== */
   /* Translucency and blur: how much of what is behind a thing shows through
      it. */
@@ -591,7 +591,7 @@ export const TOKENS: Token[] = [
   [
     'material-backdrop',
     'blur(var(--helix-material-blur-md)) saturate(1.5)',
-    'The wash behind a modal.',
+    'The tint behind a modal.',
   ],
   /* *The scalar the policy moves, where the others are values it sets.** A
      line chart's area wash, a bar chart's faded group and a header's backdrop
@@ -620,19 +620,19 @@ export const TOKENS: Token[] = [
      drags two unrelated roles, and pointing the material at `neutral-800`
      makes a glass panel read as a *lifted surface* rather than as glass. */
   ['material-blur-sm', '8px', 'The lightest backdrop blur.'],
-  ['material-blur-md', '16px', 'The backdrop blur a modal takes.'],
+  ['material-blur-md', '16px', 'The backdrop blur behind a modal.'],
   ['material-blur-lg', '32px', 'The heaviest backdrop blur.'],
   [
     'material-translucent',
     'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 30%, transparent )',
 
-    'The translucent ground, for a surface that admits what is behind it.',
+    'The translucent background, for a surface that shows what is behind it.',
   ],
   [
     'material-translucent-strong',
     'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )',
 
-    'The heavier translucent ground, for one that admits less.',
+    'The stronger translucent background, for a surface that shows less of what is behind it.',
   ],
   /* Two whole colors, for both reasons the overlay above gives, and it is the
      same bug: `light-dark()` in `color-mix()`'s percentage slot, sitting two
@@ -641,7 +641,7 @@ export const TOKENS: Token[] = [
     'material-border',
     'light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )',
 
-    'The edge a translucent surface needs to have any at all.',
+    'The border a translucent surface needs to keep a visible edge.',
   ],
   /* ======================================================== motion ====== */
   ['duration-instant', '0ms'],

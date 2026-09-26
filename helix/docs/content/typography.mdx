@@ -12,9 +12,9 @@ title: Typography
 
 | Token | Value | For |
 | --- | --- | --- |
-| `--helix-font-sans` | `ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif` | Everything, unless it is one of the two below. |
-| `--helix-font-mono` | `ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace` | Code, and anything that has to line up in a column. |
-| `--helix-font-display` | `ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif` | Headings meant to be looked at rather than read. Falls back to the sans face. |
+| `--helix-font-sans` | `ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif` | All text except code and display headings. |
+| `--helix-font-mono` | `ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace` | Code, and text that needs to line up in columns. |
+| `--helix-font-display` | `ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif` | Large display headings. Falls back to the sans face. |
 
 [//]: # (/tokens)
 
@@ -83,10 +83,10 @@ For one-off text outside prose, use `[data-text]` to set the ramp:
 
 | Token | Value | For |
 | --- | --- | --- |
-| `--helix-leading-tight` | `1.2` | Body text set close, for a short measure. |
-| `--helix-leading-normal` | `1.5` | Body text, and the default a paragraph takes. |
-| `--helix-leading-loose` | `1.7` | Body text set open, for a long measure or a small size. |
-| `--helix-leading-heading` | `calc(0.99em + 0.5rem)` | Headings, which want less than a paragraph. Written as a length plus an em so it tightens as the type grows. |
+| `--helix-leading-tight` | `1.2` | Body text set close, for short lines. |
+| `--helix-leading-normal` | `1.5` | Body text. The default line height for a paragraph. |
+| `--helix-leading-loose` | `1.7` | Body text set open, for long lines or small sizes. |
+| `--helix-leading-heading` | `calc(0.99em + 0.5rem)` | Headings, which need less line height than a paragraph. It is a length plus an em, so it tightens as the type grows. |
 
 [//]: # (/tokens)
 
@@ -94,10 +94,10 @@ For one-off text outside prose, use `[data-text]` to set the ramp:
 
 | Token | Value | For |
 | --- | --- | --- |
-| `--helix-tracking-tight` | `-0.01em` | Large type, which needs the letters closer than a paragraph does. |
-| `--helix-tracking-normal` | `0` | Body text, and the default. |
-| `--helix-tracking-wide` | `0.02em` | Small capitals and labels, which need the room. |
-| `--helix-tracking-wider` | `0.12em` | An uppercase eyebrow, which needs more room than a label. |
+| `--helix-tracking-tight` | `-0.01em` | Large type, which needs tighter letter spacing than a paragraph. |
+| `--helix-tracking-normal` | `0` | Body text. The default letter spacing. |
+| `--helix-tracking-wide` | `0.02em` | Labels and small capitals, which need extra letter spacing. |
+| `--helix-tracking-wider` | `0.12em` | Uppercase eyebrows, which need more letter spacing than a label. |
 
 [//]: # (/tokens)
 
@@ -105,9 +105,9 @@ For one-off text outside prose, use `[data-text]` to set the ramp:
 
 | Token | Value | For |
 | --- | --- | --- |
-| `--helix-weight-regular` | `400` | Body text, and the weight most of a page is set in. |
-| `--helix-weight-medium` | `500` | A label, or a heading that should not shout. |
-| `--helix-weight-semibold` | `600` | A heading, and the heaviest this system goes. |
+| `--helix-weight-regular` | `400` | Body text. Most of a page uses this weight. |
+| `--helix-weight-medium` | `500` | Labels, and quieter headings. |
+| `--helix-weight-semibold` | `600` | Headings. The heaviest weight in Helix. |
 
 [//]: # (/tokens)
 
