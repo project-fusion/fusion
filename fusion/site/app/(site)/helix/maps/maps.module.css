@@ -297,56 +297,49 @@ fieldset.mapsControl {
 
 /* ============================================================== stack === */
 
-/* The parts as layers, each resting on the one under it: what a reader
-   touches at the top, the data at the bottom. A list, because the order is
-   the point. */
+/* The parts as rows of the card, what a reader touches at the top and the
+   data at the bottom, ruled between as the features are: a list, because the
+   order is the point. Each row its role and name, what it does, and its
+   stage, in three columns on a wide card and stacked on a narrow one. */
 .mapsStack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-xs);
   list-style: none;
   margin: 0;
-  max-inline-size: 60rem;
   padding: 0;
 }
 
 .mapsLayer {
-  align-items: center;
-  background: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
+  align-items: start;
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
   display: grid;
-  gap: var(--helix-space-xs) var(--helix-space-lg);
-  grid-template-columns: 7rem minmax(0, 1fr) auto;
-  padding: var(--helix-space-md) var(--helix-space-lg);
+  gap: var(--helix-space-sm) var(--helix-space-xl);
+  grid-template-columns: minmax(0, 1fr);
+  padding: var(--helix-space-xl);
 }
 
-/* The one layer that is not ours: drawn as a place in the stack rather than
-   a plate of it, so the eye reads it as somebody else's. */
-.mapsLayer[data-owned="false"] {
-  background: none;
-  border-style: dashed;
-}
-
-.mapsLayerText {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
+/* The one layer that is not ours, its rules dashed: a place in the stack
+   somebody else fills, rather than a plate of it. */
+.mapsLayer[data-owned="false"],
+.mapsLayer[data-owned="false"] + .mapsLayer {
+  border-block-start-style: dashed;
 }
 
 .mapsLayerStage {
-  justify-self: end;
+  justify-self: start;
 }
 
-/* On a phone the role sits over the name and the stage under the words. */
-@media (max-width: 40rem) {
+@media (min-width: 48rem) {
   .mapsLayer {
-    align-items: start;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr) auto;
   }
 
   .mapsLayerStage {
-    justify-self: start;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 40rem) {
+  .mapsLayer {
+    padding-inline: 0;
   }
 }
 
