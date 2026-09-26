@@ -7,6 +7,7 @@ import { mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { useEffect, useRef, useState } from 'react'
 import { MAPS } from '@/content/maps/maps'
+import { WALK } from '@/content/maps/routes'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { boundsOf, clearOf, sameColors } from '@/utils/map-view/map-view'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
@@ -48,8 +49,8 @@ type Mode = 'site' | 'light' | 'dark'
 /** The brand choice that is a whole theme from the builder rather than a color. */
 const YOURS = 'yours'
 
-/** How long the walker takes between two places, in milliseconds. */
-const LEG = 9000
+/** How long the whole walk takes, in milliseconds. */
+const WALK_TIME = 60_000
 
 /** The way from one place to the next, in degrees clockwise from north. */
 const bearing = (from: { lat: number; lng: number }, to: { lat: number; lng: number }): number => {
@@ -163,23 +164,38 @@ export function MapsHero({
       const walker = host.querySelector('helix-map-position')
       let walking = 0
       if (walker && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const legs = PLACES.slice(1).map((to, at) => ({ from: PLACES[at] ?? to, to }))
+        /* Along the streets rather than across them: the path is the foot
+           router's, and the walker keeps a steady pace by distance along it,
+           turning with each street, so a long leg takes longer than a short
+           one the way a walk does. */
+        const path = WALK.path
+        const along = path.map((_, at) =>
+          path.slice(1, at + 1).reduce((total, point, index) => {
+            const from = path[index] as readonly [number, number]
+            return total + Math.hypot(point[0] - from[0], point[1] - from[1])
+          }, 0),
+        )
+        const total = along.at(-1) ?? 0
         const started = performance.now()
         const step = (): void => {
-          const time = (performance.now() - started) / LEG
-          const at = Math.min(Math.floor(time), legs.length - 1)
-          const leg = legs[at]
-          if (!leg) {
-            return
-          }
-          const along = Math.min(time - at, 1)
-          walker.lat = leg.from.lat + (leg.to.lat - leg.from.lat) * along
-          walker.lng = leg.from.lng + (leg.to.lng - leg.from.lng) * along
-          walker.heading = bearing(leg.from, leg.to)
-          const arrived = along >= 1 && at === legs.length - 1
-          walker.description = arrived ? `Arrived at ${leg.to.label}` : `Walking to ${leg.to.label}`
+          const covered = Math.min((performance.now() - started) / WALK_TIME, 1) * total
+          const at = Math.max(along.findIndex((distance) => distance > covered) - 1, 0)
+          const [from, to] = [path[at], path[at + 1] ?? path[at]] as [
+            readonly [number, number],
+            readonly [number, number],
+          ]
+          const span = (along[at + 1] ?? covered) - (along[at] ?? 0)
+          const part = span > 0 ? (covered - (along[at] ?? 0)) / span : 1
+          walker.lat = from[0] + (to[0] - from[0]) * part
+          walker.lng = from[1] + (to[1] - from[1]) * part
+          walker.heading = bearing({ lat: from[0], lng: from[1] }, { lat: to[0], lng: to[1] })
+          const next = WALK.stops.findIndex((stop) => stop > at)
+          const arrived = covered >= total
+          walker.description = arrived
+            ? `Arrived at ${PLACES.at(-1)?.label ?? ''}`
+            : `Walking to ${PLACES[next]?.label ?? ''}`
           if (!arrived) {
-            walking = window.setTimeout(step, 200)
+            walking = window.setTimeout(step, 150)
           }
         }
         step()
@@ -315,7 +331,7 @@ export function MapsHero({
         <helix-map-route
           description="Through all seven places, in the order the arrow keys walk them"
           label="A walk from the university to the springs"
-          points={PLACES.map(({ lat, lng }) => ({ lat, lng }))}
+          points={WALK.path.map(([lat, lng]) => ({ lat, lng }))}
         />
         {PLACES.map((place) => (
           <helix-map-marker key={place.label} label={place.label} lat={place.lat} lng={place.lng} />
