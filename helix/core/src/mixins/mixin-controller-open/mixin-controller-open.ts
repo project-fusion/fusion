@@ -15,7 +15,7 @@ type Constructor<T> = new (...args: any[]) => T
  * to this interface keeps the internals private and the build working.
  */
 export declare class MixinControllerOpenInterface {
-  /** Whether the markup declared it open. Ignored once `open` is written. */
+  /** Whether the element starts open. Ignored once `open` is written. */
   defaultOpen: boolean
 
   /**
@@ -28,7 +28,8 @@ export declare class MixinControllerOpenInterface {
   open: boolean
 
   /**
-   * Requests an open-state change, and reports whether it was applied.
+   * Requests that the element open or close, and returns whether the change was
+   * applied.
    *
    * Announces before it acts: a listener calling `preventDefault()` on the
    * `helix-before-open` or `helix-before-close` refuses the change, and nothing moves.
@@ -65,7 +66,7 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
   // reads when resolving inherited members into dependent packages.
   class OpenElement extends Base {
     /**
-     * Whether the markup declared it open. Ignored once `open` is written.
+     * Whether the element starts open. Ignored once `open` is written.
      */
     @property({ attribute: 'default-open', type: Boolean })
     defaultOpen = false
@@ -128,7 +129,8 @@ export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T
     }
 
     /**
-     * Requests an open-state change, and reports whether it was applied.
+     * Requests that the element open or close, and returns whether the change
+     * was applied.
      *
      * Announces before it acts, so `preventDefault()` on the `helix-before-open` or
      * `helix-before-close` is a refusal and nothing moves. Nobody refusing means the

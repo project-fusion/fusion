@@ -27,7 +27,7 @@ export class HelixFormElement extends HelixElement {
   static readonly formAssociated = true
 
   /**
-   * Whether the control is non-interactive.
+   * Whether the control is disabled and cannot be used.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
    * `aria-disabled` rather than removing the element from the accessibility
@@ -86,7 +86,7 @@ export class HelixFormElement extends HelixElement {
   }
 
   /**
-   * The platform's notice that an ancestor fieldset changed.
+   * Called by the browser when an ancestor fieldset is disabled or enabled.
    *
    * **The argument is the effective state, and taking it whole is what latched
    * every control in the library.** The platform calls this for the element's
@@ -125,7 +125,8 @@ export class HelixFormElement extends HelixElement {
   }
 
   /**
-   * The form was reset. Nothing here, and every override calls it.
+   * Called by the browser when the form is reset. It does nothing here, and
+   * every override calls it.
    *
    * **A chain rather than a leaf**, because more than one layer owes a reset
    * something: the value mixin its default, and the field mixin beneath it the
@@ -166,7 +167,7 @@ export class HelixFormElement extends HelixElement {
   }
 
   /**
-   * Name submitted with the form.
+   * The name the control's value is submitted under.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects
    * on".** The platform builds a form's entry list from the `name` *content
@@ -199,7 +200,7 @@ export class HelixFormElement extends HelixElement {
   name = ''
 
   /**
-   * The form this control belongs to, if any.
+   * The form the control belongs to, or `null`.
    *
    * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements form-associated custom elements
    */
@@ -208,7 +209,7 @@ export class HelixFormElement extends HelixElement {
   }
 
   /**
-   * Labels associated with this control.
+   * The labels associated with the control.
    *
    * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements form-associated custom elements
    */

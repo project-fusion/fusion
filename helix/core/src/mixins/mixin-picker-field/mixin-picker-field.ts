@@ -27,7 +27,7 @@ type PickerBase = HelixFormElement &
  * to this interface keeps the internals private and the build working.
  */
 export declare class MixinPickerFieldInterface {
-  /** What a reader is told when the field holds something the picker cannot read. */
+  /** The message shown when the field holds text the picker cannot read. */
   badInputMessage: string | undefined
 
   /**
@@ -58,7 +58,7 @@ export declare class MixinPickerFieldInterface {
    */
   protected get display(): string
 
-  /** Puts the caret in the field, the way a label pointing at one would. */
+  /** Puts the caret in the field, as clicking its label does. */
   focus(options?: FocusOptions): void
 
   /** Escape shuts the panel without moving the value. */
@@ -159,8 +159,8 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
   // analyzer reads when resolving inherited members into dependent packages.
   class PickerFieldElement extends Base {
     /**
-     * What a reader is told when the field holds something the picker cannot
-     * read: a date that is not one, a time, a color.
+     * The message shown when the field holds text the picker cannot read as a
+     * date, a time, or a color.
      *
      * **Every sentence a control raises in the browser's bubble is a
      * property**, named for the validity flag it reports, so a form in another
@@ -344,7 +344,7 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
       this.returning = false
     }
 
-    /** Puts the caret in the field, the way a label pointing at one would. */
+    /** Puts the caret in the field, as clicking its label does. */
     override focus(options?: FocusOptions): void {
       this.anchor?.focus(options)
     }

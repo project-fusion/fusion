@@ -32,7 +32,7 @@ export declare class MixinTokensInterface {
   maxTags: number
 
   /**
-   * Whether the count is a control that shows the rest.
+   * Whether the count is a button that shows the hidden tokens.
    *
    * **Off by default, and that is about focus rather than caution.** The count
    * becomes a real button when this is set, which is a new stop in the tab
@@ -47,12 +47,13 @@ export declare class MixinTokensInterface {
   expandable: boolean
 
   /**
-   * What the collapsed count is called, since `+3` names nothing.
+   * The count button's label, read by screen readers. Its visible text, such
+   * as `+3`, does not say what it does.
    */
   expandLabel: string
 
   /**
-   * What the control is called once everything is showing.
+   * The button's label, read by screen readers, once every token is showing.
    *
    * **The name and not the words on it**, which are a caret: expanded there is
    * no longer a number to show, and a phrase in its place would translate badly
@@ -135,19 +136,20 @@ export declare class MixinTokensInterface {
 export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
   class TokensElement extends Base {
     /**
-     * What the control is called once everything is showing.
+     * The button's label, read by screen readers, once every token is showing.
      */
     @property({ attribute: 'collapse-label' })
     collapseLabel = 'Show fewer'
 
     /**
-     * Whether the count is a control that shows the rest.
+     * Whether the count is a button that shows the hidden tokens.
      */
     @property({ type: Boolean })
     expandable = false
 
     /**
-     * What the collapsed count is called, since `+3` names nothing.
+     * The count button's label, read by screen readers. Its visible text, such
+     * as `+3`, does not say what it does.
      */
     @property({ attribute: 'expand-label' })
     expandLabel = 'Show all'
