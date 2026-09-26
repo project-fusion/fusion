@@ -20,6 +20,7 @@ import { styles } from './map-marker.css.js'
  * @documentation https://fusion.dev/helix/components/map
  *
  * @cssproperty --map-marker-color - The point's color, where no tone says it.
+ * @cssproperty --map-marker-ink - What a point holding a letter writes it in, for a `--map-marker-color` that white does not read on.
  * @cssproperty --map-marker-label-border-width - The name's edge, the theme's floating edge by default.
  * @cssproperty --map-marker-label-shadow - The name's lift, the theme's floating shadow by default.
  * @cssproperty --map-marker-size - How wide the point is.
