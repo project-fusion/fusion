@@ -52,6 +52,12 @@ const YOURS = 'yours'
 /** How long the whole walk takes, in milliseconds. */
 const WALK_TIME = 60_000
 
+/** How long the walker rests at the springs before walking again, in milliseconds. */
+const REST = 4000
+
+/** A stop's letter, in the order the arrow keys walk them: A for the first. */
+const letter = (at: number): string => String.fromCharCode(65 + at)
+
 /** The way from one place to the next, in degrees clockwise from north. */
 const bearing = (from: { lat: number; lng: number }, to: { lat: number; lng: number }): number => {
   const [a, b] = [from.lat, to.lat].map((one) => (one * Math.PI) / 180) as [number, number]
@@ -120,6 +126,17 @@ export function MapsHero({
   const [brand, setBrand] = useState<string | null>(sent ? YOURS : null)
   const [mode, setMode] = useState<Mode>(sent?.settings.scheme ?? 'site')
   const [home, setHome] = useState<string>('')
+  /* Whether the walker is walking, which the pause control decides; read by
+     the map's own loop through a ref, so pausing does not remake the map. */
+  const [walking, setWalking] = useState(true)
+  const walkingRef = useRef(walking)
+  walkingRef.current = walking
+  /* Whether it moves at all, which a reader who asked for less motion
+     decides, and which says whether there is a walk to pause. */
+  const [still, setStill] = useState(false)
+  useEffect(() => {
+    setStill(matchMedia('(prefers-reduced-motion: reduce)').matches)
+  }, [])
 
   useEffect(() => {
     setHome(siteBrand())
@@ -134,6 +151,7 @@ export function MapsHero({
     }
     let live = true
     let teardown = (): void => undefined
+    let stopSeeing = (): void => undefined
     void (async () => {
       const { default: maplibregl } = await import('maplibre-gl')
       await customElements.whenDefined('helix-map')
@@ -166,14 +184,28 @@ export function MapsHero({
         map.fitBounds(BOUNDS, { animate: false, padding: clearOf(box, panel.current) })
       })
       const connection = connectMap(host, mapLibreDriver(map))
-      /* **A walker, once, along the route**, so the page shows a live
-         position rather than describing one: it moves in silence, and its
-         words change only as it sets off for each place, which is what a
-         screen reader hears, and says so when it arrives. Standing at the
-         start for a reader who asked for less motion. */
+      /* **A walker along the route, on a loop, that a reader can stop.**
+         Anything that moves by itself for more than five seconds beside the
+         rest of a page needs a way to pause it, and this has one in the
+         panel; it also rests while the map is off the screen or the tab is
+         hidden, and stands at the start for a reader who asked for less
+         motion. **It speaks on its first lap only**: which place it is
+         walking to as it sets off for each, and that it has arrived, then
+         once that it is going round again, and nothing after, since a loop
+         that announced every leg forever would be a page that never stopped
+         talking. The route behind it is drawn quieter than the route ahead. */
       const walker = host.querySelector('helix-map-position')
-      let walking = 0
-      if (walker && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const route = host.querySelector('helix-map-route')
+      let ticking = 0
+      let onScreen = true
+      const seen = new IntersectionObserver(([entry]) => {
+        onScreen = entry?.isIntersecting ?? true
+      })
+      if (scope.current) {
+        seen.observe(scope.current)
+      }
+      stopSeeing = () => seen.disconnect()
+      if (walker) {
         /* Along the streets rather than across them: the path is the foot
            router's, and the walker keeps a steady pace by distance along it,
            turning with each street, so a long leg takes longer than a short
@@ -186,9 +218,8 @@ export function MapsHero({
           }, 0),
         )
         const total = along.at(-1) ?? 0
-        const started = performance.now()
-        const step = (): void => {
-          const covered = Math.min((performance.now() - started) / WALK_TIME, 1) * total
+        /** Stands the walker so far along the path, facing its way, the route behind it quieter. */
+        const standAt = (covered: number): number => {
           const at = Math.max(along.findIndex((distance) => distance > covered) - 1, 0)
           const [from, to] = [path[at], path[at + 1] ?? path[at]] as [
             readonly [number, number],
@@ -198,17 +229,53 @@ export function MapsHero({
           const part = span > 0 ? (covered - (along[at] ?? 0)) / span : 1
           walker.lat = from[0] + (to[0] - from[0]) * part
           walker.lng = from[1] + (to[1] - from[1]) * part
-          walker.heading = bearing({ lat: from[0], lng: from[1] }, { lat: to[0], lng: to[1] })
-          const next = WALK.stops.findIndex((stop) => stop > at)
-          const arrived = covered >= total
-          walker.description = arrived
-            ? `Arrived at ${PLACES.at(-1)?.label ?? ''}`
-            : `Walking to ${PLACES[next]?.label ?? ''}`
-          if (!arrived) {
-            walking = window.setTimeout(step, 150)
+          if (span > 0) {
+            walker.heading = bearing({ lat: from[0], lng: from[1] }, { lat: to[0], lng: to[1] })
           }
+          if (route) {
+            route.progress = total > 0 ? covered / total : 0
+          }
+          return at
         }
-        step()
+        const walkingTo = (at: number): string =>
+          `Walking to ${PLACES[WALK.stops.findIndex((stop) => stop > at)]?.label ?? ''}`
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          /* **Still, and partway**, for a reader who asked for less motion:
+             everything a live position shows, its heading and the route behind
+             it, without it moving, and not standing on the first place, whose
+             letter it would hide for good. */
+          walker.description = walkingTo(standAt(total * 0.35))
+        } else {
+          let elapsed = 0
+          let last = performance.now()
+          let lap = 0
+          const step = (): void => {
+            const now = performance.now()
+            if (walkingRef.current && onScreen && document.visibilityState === 'visible') {
+              elapsed += now - last
+            }
+            last = now
+            if (elapsed >= WALK_TIME + REST) {
+              elapsed = 0
+              lap += 1
+              if (lap === 1) {
+                walker.description = 'Walking the route again, on a loop'
+              }
+              walker.animate([{ opacity: 0 }, { opacity: 1 }], {
+                duration: 480,
+                easing: 'ease-out',
+              })
+            }
+            const covered = Math.min(elapsed / WALK_TIME, 1) * total
+            const at = standAt(covered)
+            if (lap === 0) {
+              walker.description =
+                covered >= total ? `Arrived at ${PLACES.at(-1)?.label ?? ''}` : walkingTo(at)
+            }
+            ticking = window.setTimeout(step, 150)
+          }
+          step()
+        }
       }
       /* Pressing a place is the page's to answer, and this one goes there, at
          the theme's own pace for a travel: its slow duration and emphasized
@@ -261,7 +328,8 @@ export function MapsHero({
       const scheme = matchMedia('(prefers-color-scheme: dark)')
       scheme.addEventListener('change', restyle)
       teardown = () => {
-        clearTimeout(walking)
+        clearTimeout(ticking)
+        stopSeeing()
         cancelAnimationFrame(pending)
         watch.disconnect()
         scheme.removeEventListener('change', restyle)
@@ -366,8 +434,19 @@ export function MapsHero({
           label="A walk from the university to the springs"
           points={WALK.path.map(([lat, lng]) => ({ lat, lng }))}
         />
-        {PLACES.map((place) => (
-          <helix-map-marker key={place.label} label={place.label} lat={place.lat} lng={place.lng} />
+        {/* **Lettered in the order they are walked**, the letter seen and the
+            place's name read; the start a ring and the end a pin, the way
+            directions draw where a journey begins and where it ends. */}
+        {PLACES.map((place, at) => (
+          <helix-map-marker
+            key={place.label}
+            label={place.label}
+            lat={place.lat}
+            lng={place.lng}
+            shape={at === 0 ? 'ring' : at === PLACES.length - 1 ? 'pin' : undefined}
+          >
+            <span slot="icon">{letter(at)}</span>
+          </helix-map-marker>
         ))}
       </helix-map>
       <div className={styles.mapsPanel} ref={panel}>
@@ -425,6 +504,15 @@ export function MapsHero({
               <helix-toggle value="dark">Dark</helix-toggle>
             </helix-toggle-group>
           </div>
+          {still ? null : (
+            <div className={styles.mapsControl}>
+              <span className={styles.mapsLegend}>Walker</span>
+              <helix-button emphasis="outlined" onClick={() => setWalking((was) => !was)}>
+                <helix-icon name={walking ? 'pause' : 'play'} slot="start"></helix-icon>
+                {walking ? 'Pause the walk' : 'Play the walk'}
+              </helix-button>
+            </div>
+          )}
         </div>
         {/* What the first swatch is, in words: a color alone does not say it is
             a whole theme, or where it came from, or that there is a way back. */}
