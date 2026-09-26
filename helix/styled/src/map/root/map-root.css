@@ -21,6 +21,22 @@
   position: relative;
 }
 
+/* **The routes and areas, said rather than shown.** The renderer draws them
+   for a reader who can see the map, and this list names them for one who
+   cannot, which is the part of it a sighted reader would only read twice.
+   Off the screen and in the tree, the way a chart's summary is; a page that
+   wants it seen, as a legend, gives it a box through `::part(layers)`. */
+[part="layers"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  padding: var(--helix-space-none);
+  position: absolute;
+  white-space: nowrap;
+}
+
 /* Whatever was slotted fills the box it was given, but for the markers, which
    stand on their places over it and take no box at all. */
 [part="viewport"] ::slotted(:not(helix-map-marker)) {

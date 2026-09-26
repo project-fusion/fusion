@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test'
+import type * as L from 'leaflet'
 import type { Map as Leaflet } from 'leaflet'
 import type { Map as MapLibre } from 'maplibre-gl'
 import { leafletDriver } from './leaflet/index.js'
@@ -9,7 +10,7 @@ import { mapLibreDriver } from './maplibre/index.js'
    real ones: if either library renames what a driver calls, the typecheck
    fails here rather than at a page. */
 const fits = {
-  leaflet: (map: Leaflet) => leafletDriver(map),
+  leaflet: (map: Leaflet, shapes: typeof L) => leafletDriver(map, shapes),
   maplibre: (map: MapLibre) => mapLibreDriver(map),
 }
 

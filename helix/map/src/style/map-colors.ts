@@ -31,6 +31,35 @@ const TOKENS: Record<keyof MapColors, string> = {
 }
 
 /**
+ * A color the browser has settled, as sRGB a renderer can parse: painted onto
+ * one pixel and read back, since what the browser settles to may be
+ * `oklch()`. As it was where there is no canvas to paint on.
+ */
+const toSrgb = (resolved: string): string => {
+  const canvas = document.createElement('canvas')
+  canvas.width = 1
+  canvas.height = 1
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+  if (!context) {
+    return resolved
+  }
+  context.clearRect(0, 0, 1, 1)
+  context.fillStyle = resolved
+  context.fillRect(0, 0, 1, 1)
+  const [red = 0, green = 0, blue = 0, alpha = 255] = context.getImageData(0, 0, 1, 1).data
+  return alpha === 255
+    ? `rgb(${red}, ${green}, ${blue})`
+    : `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`
+}
+
+/**
+ * An element's own \`color\`, settled the same way: what a route or an area
+ * is drawn in, which its tone decides in the page's stylesheet and which the
+ * renderer can only take as sRGB.
+ */
+export const settledColor = (element: Element): string => toSrgb(getComputedStyle(element).color)
+
+/**
  * The page's own colors, read where the map is, as a map style can take them.
  *
  * **Resolved by the browser and then by a canvas**, because a token is not a
@@ -44,10 +73,6 @@ export const mapColorsFrom = (element: Element): MapColors => {
   const probe = document.createElement('span')
   probe.style.display = 'none'
   element.append(probe)
-  const canvas = document.createElement('canvas')
-  canvas.width = 1
-  canvas.height = 1
-  const context = canvas.getContext('2d', { willReadFrequently: true })
   const read = (token: string): string => {
     /* A token that is not there resolves to the inherited color, which drew
        a black map with nothing to say why. */
@@ -58,17 +83,7 @@ export const mapColorsFrom = (element: Element): MapColors => {
       )
     }
     probe.style.color = `var(${token})`
-    const resolved = getComputedStyle(probe).color
-    if (!context) {
-      return resolved
-    }
-    context.clearRect(0, 0, 1, 1)
-    context.fillStyle = resolved
-    context.fillRect(0, 0, 1, 1)
-    const [red = 0, green = 0, blue = 0, alpha = 255] = context.getImageData(0, 0, 1, 1).data
-    return alpha === 255
-      ? `rgb(${red}, ${green}, ${blue})`
-      : `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`
+    return toSrgb(getComputedStyle(probe).color)
   }
   const colors = Object.fromEntries(
     Object.entries(TOKENS).map(([name, token]) => [name, read(token)]),

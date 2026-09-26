@@ -1,7 +1,8 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec'
 import type { MapMotion } from '../motion/motion.js'
-import { type MapLibreMap, mapLibreDriver } from './maplibre-driver.js'
+import { geoJson, LAYERS, type MapLibreMap, mapLibreDriver } from './maplibre-driver.js'
 
 beforeAll(() => {
   registerDom()
@@ -13,25 +14,63 @@ beforeAll(() => {
  */
 const stand = (): {
   asked: string[]
-  fire(type: 'move' | 'resize' | 'sourcedata' | 'styledata'): void
+  fire(type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata'): void
   map: MapLibreMap
-  sources: Record<string, { attribution?: string }>
+  notReady(): void
+  ready(): void
+  sources: Record<string, { attribution?: string; data?: unknown }>
+  styleLayers: { id: string; type: string }[]
 } => {
   const asked: string[] = []
   const listeners = new Map<string, Set<() => void>>()
   const container = document.createElement('div')
   container.innerHTML = '<div class="maplibregl-ctrl-attrib">MapLibre credit</div>'
   const canvas = document.createElement('canvas')
-  const sources: Record<string, { attribution?: string }> = {}
+  const sources: Record<
+    string,
+    { attribution?: string; data?: unknown; setData?(data: unknown): unknown }
+  > = {}
+  const styleLayers: { id: string; type: string }[] = [
+    { id: 'land', type: 'background' },
+    { id: 'road', type: 'line' },
+    { id: 'label-city', type: 'symbol' },
+  ]
   let keys = true
+  let ready = true
   const map: MapLibreMap = {
+    addLayer: (layer, before) => {
+      const { id, type } = layer as unknown as { id: string; type: string }
+      const at = before ? styleLayers.findIndex((one) => one.id === before) : styleLayers.length
+      styleLayers.splice(at, 0, { id, type })
+      asked.push(`addLayer ${id} before ${before}`)
+    },
+    addSource: (id, source) => {
+      if (!ready) {
+        throw new Error('Style is not done loading')
+      }
+      const { data } = source as unknown as { data: unknown }
+      sources[id] = {
+        data,
+        setData(next) {
+          this.data = next
+          asked.push(`setData ${id}`)
+        },
+      }
+      asked.push(`addSource ${id}`)
+    },
     easeTo: ({ center, duration, easing, zoom }) => {
       asked.push(`easeTo ${center.join(',')} ${zoom} ${duration} ${easing?.(0.5)}`)
     },
+    fitBounds: (bounds, options) => {
+      asked.push(
+        `fitBounds ${JSON.stringify(bounds)} ${JSON.stringify(options?.padding)} ${options?.duration ?? options?.animate}`,
+      )
+    },
     getCanvas: () => canvas,
     getContainer: () => container,
+    getLayer: (id) => styleLayers.find((one) => one.id === id),
     getSource: (id) => sources[id],
-    getStyle: () => ({ sources }),
+    getStyle: () => ({ layers: styleLayers, sources }),
     jumpTo: ({ center, zoom }) => {
       asked.push(`jumpTo ${center.join(',')} ${zoom}`)
     },
@@ -55,6 +94,15 @@ const stand = (): {
     },
     // Ten pixels a degree from the origin, which is enough to tell the axes apart.
     project: ([lng, lat]) => ({ x: lng * 10, y: -lat * 10 }),
+    removeLayer: (id) => {
+      styleLayers.splice(
+        styleLayers.findIndex((one) => one.id === id),
+        1,
+      )
+    },
+    removeSource: (id) => {
+      delete sources[id]
+    },
     zoomIn: (options) => {
       asked.push(`zoomIn ${options?.animate} ${options?.duration}`)
     },
@@ -62,12 +110,24 @@ const stand = (): {
       asked.push(`zoomOut ${options?.animate} ${options?.duration}`)
     },
   }
-  const fire = (type: 'move' | 'resize' | 'sourcedata' | 'styledata'): void => {
+  const fire = (type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata'): void => {
     for (const listener of listeners.get(type) ?? []) {
       listener()
     }
   }
-  return { asked, fire, map, sources }
+  return {
+    asked,
+    fire,
+    map,
+    notReady: () => {
+      ready = false
+    },
+    ready: () => {
+      ready = true
+    },
+    sources,
+    styleLayers,
+  }
 }
 
 /**
@@ -151,5 +211,133 @@ describe('mapLibreDriver', () => {
     fire('styledata')
     expect(heard).toBe(1)
     expect(control.style.display).toBe('')
+  })
+
+  test('routes and areas are MapLibre’s own layers, under the place names', () => {
+    const { asked, map, sources, styleLayers } = stand()
+    let color = 'rgb(1, 2, 3)'
+    const drawn = mapLibreDriver(map).layers?.(() => [
+      {
+        color,
+        id: 'a',
+        kind: 'route',
+        label: 'Depot to Mission',
+        points: [
+          { lat: 1, lng: 2 },
+          { lat: 3, lng: 4 },
+        ],
+      },
+      {
+        color,
+        id: 'b',
+        kind: 'area',
+        label: 'Zone',
+        points: [
+          { lat: 0, lng: 0 },
+          { lat: 0, lng: 1 },
+          { lat: 1, lng: 1 },
+        ],
+      },
+    ])
+    expect(styleLayers.map((one) => one.id)).toEqual([
+      'land',
+      'road',
+      'helix-areas',
+      'helix-area-edges',
+      'helix-routes',
+      'label-city',
+    ])
+    const data = sources['helix-layers']?.data as {
+      features: { geometry: { coordinates: unknown } }[]
+    }
+    // Longitude first, and an area's ring closed, as GeoJSON has them.
+    expect(data.features[0]?.geometry.coordinates).toEqual([
+      [2, 1],
+      [4, 3],
+    ])
+    expect(data.features[1]?.geometry.coordinates).toEqual([
+      [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [0, 0],
+      ],
+    ])
+    color = 'rgb(9, 9, 9)'
+    drawn?.update()
+    expect(asked.at(-1)).toBe('setData helix-layers')
+    drawn?.stop()
+    expect(styleLayers.map((one) => one.id)).toEqual(['land', 'road', 'label-city'])
+    expect(sources['helix-layers']).toBeUndefined()
+  })
+
+  test('a style replaced takes the layers with it, and they come back with their colors read again', () => {
+    const { fire, map, sources, styleLayers } = stand()
+    let read = 0
+    mapLibreDriver(map).layers?.(() => {
+      read += 1
+      return [
+        {
+          color: `rgb(${read}, 0, 0)`,
+          id: 'a',
+          kind: 'route',
+          label: 'R',
+          points: [
+            { lat: 1, lng: 2 },
+            { lat: 3, lng: 4 },
+          ],
+        },
+      ]
+    })
+    // What \`setStyle(…, { diff: true })\` does to a style that did not have them.
+    for (const id of ['helix-routes', 'helix-area-edges', 'helix-areas']) {
+      map.removeLayer(id)
+    }
+    map.removeSource('helix-layers')
+    fire('styledata')
+    expect(styleLayers.map((one) => one.id)).toContain('helix-routes')
+    const data = sources['helix-layers']?.data as { features: { properties: { color: string } }[] }
+    expect(data.features[0]?.properties.color).toBe('rgb(2, 0, 0)')
+  })
+
+  test('on a map whose style is still loading, they are drawn when it has', () => {
+    const { fire, map, notReady, ready, styleLayers } = stand()
+    notReady()
+    mapLibreDriver(map).layers?.(() => [
+      {
+        color: 'rgb(1, 2, 3)',
+        id: 'a',
+        kind: 'route',
+        label: 'R',
+        points: [
+          { lat: 1, lng: 2 },
+          { lat: 3, lng: 4 },
+        ],
+      },
+    ])
+    fire('styledata')
+    expect(styleLayers.map((one) => one.id)).not.toContain('helix-routes')
+    ready()
+    fire('load')
+    expect(styleLayers.map((one) => one.id)).toContain('helix-routes')
+  })
+
+  test('the layers it adds are a style MapLibre’s own validator accepts', () => {
+    const style = {
+      layers: LAYERS,
+      sources: { 'helix-layers': { data: geoJson([]), type: 'geojson' } },
+      version: 8,
+    }
+    expect(validateStyleMin(style as never)).toEqual([])
+  })
+
+  test('fitting is MapLibre’s fitBounds, west-south first, over the page’s motion', () => {
+    const { asked, map } = stand()
+    mapLibreDriver(map).fit?.(
+      { northEast: { lat: 3, lng: 4 }, southWest: { lat: 1, lng: 2 } },
+      24,
+      glide,
+    )
+    expect(asked).toEqual(['fitBounds [[2,1],[4,3]] 24 250'])
   })
 })

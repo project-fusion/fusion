@@ -34,6 +34,11 @@ const stand = (
         visit(layer)
       }
     },
+    fitBounds: (bounds, fitted) => {
+      asked.push(
+        `fitBounds ${JSON.stringify(bounds)} ${JSON.stringify(fitted?.paddingTopLeft)} ${JSON.stringify(fitted?.paddingBottomRight)} ${fitted?.animate}`,
+      )
+    },
     getContainer: () => container,
     keyboard:
       options.keyboard === false
@@ -172,5 +177,72 @@ describe('leafletDriver', () => {
         .credits?.(() => undefined)
         .read(),
     ).toEqual(['Tiles'])
+  })
+
+  test('fitting is Leaflet’s fitBounds, latitude first, its insets as Leaflet’s two corners', () => {
+    const { asked, map } = stand()
+    leafletDriver(map).fit?.(
+      { northEast: { lat: 3, lng: 4 }, southWest: { lat: 1, lng: 2 } },
+      { bottom: 10, left: 20, right: 30, top: 40 },
+      null,
+    )
+    expect(asked).toEqual(['fitBounds [[1,2],[3,4]] [20,40] [30,10] false'])
+  })
+
+  test('routes and areas are Leaflet’s own shapes where the page handed Leaflet over, and listed only where not', () => {
+    const { map } = stand()
+    expect(leafletDriver(map).layers).toBeUndefined()
+
+    const made: string[] = []
+    const shape =
+      (kind: string) =>
+      (latlngs: [number, number][], options: { color: string; fillOpacity?: number }) => {
+        made.push(
+          `${kind} ${JSON.stringify(latlngs)} ${options.color} ${options.fillOpacity ?? '-'}`,
+        )
+        return {
+          addTo: () => {
+            made.push(`add ${kind}`)
+          },
+          remove: () => {
+            made.push(`remove ${kind}`)
+          },
+        }
+      }
+    const drawn = leafletDriver(map, {
+      polygon: shape('polygon'),
+      polyline: shape('polyline'),
+    }).layers?.(() => [
+      {
+        color: 'rgb(1, 2, 3)',
+        id: 'a',
+        kind: 'route',
+        label: 'R',
+        points: [
+          { lat: 1, lng: 2 },
+          { lat: 3, lng: 4 },
+        ],
+      },
+      {
+        color: 'rgb(4, 5, 6)',
+        id: 'b',
+        kind: 'area',
+        label: 'Z',
+        points: [
+          { lat: 0, lng: 0 },
+          { lat: 0, lng: 1 },
+          { lat: 1, lng: 1 },
+        ],
+      },
+    ])
+    expect(made).toEqual([
+      'polyline [[1,2],[3,4]] rgb(1, 2, 3) -',
+      'add polyline',
+      'polygon [[0,0],[0,1],[1,1]] rgb(4, 5, 6) 0.16',
+      'add polygon',
+    ])
+    made.length = 0
+    drawn?.stop()
+    expect(made).toEqual(['remove polyline', 'remove polygon'])
   })
 })
