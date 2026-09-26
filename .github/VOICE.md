@@ -17,7 +17,9 @@ comments are rewritten only when the code around them changes.
 4. **Baselines are not selling points.** Every component is accessible,
    themeable and works in any framework. Do not claim these in taglines,
    feature lists or product descriptions. Document how they work where the
-   reader needs instructions, such as which keys move between markers.
+   reader needs instructions, such as which keys move between markers. Helix's
+   own introduction and install lines may say once which frameworks it runs
+   in, because that is what you install.
 5. **Labels name the action and its object.** "Customize the map", "Build your
    theme". Never a bare verb such as "Try it", and avoid "this", which depends
    on where the reader thinks they are.
