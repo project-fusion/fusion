@@ -8,6 +8,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Fragment } from 'react'
+import { CodeText, plainText } from '@/components/code-text/code-text'
 import { docsShell } from '@/components/docs-shell/docs-shell'
 import { SectionHeading } from '@/components/section-heading/section-heading'
 import { pageMetadata } from '@/utils/metadata/metadata'
@@ -318,7 +319,7 @@ function Described({
   return (
     <helix-table-cell>
       <helix-text emphasis="muted" variant="caption">
-        {first(description)}
+        <CodeText>{first(description)}</CodeText>
       </helix-text>
       {references.map((reference) => (
         /* At the end of the row rather than beside the name, because it                     is secondary to both and the name is what a reader scans.                     An anchor inside the tooltip rather than the tooltip alone:                     the bubble says which feature this is and the mark goes                     there, so a touch screen, where nothing hovers, still has the                     destination. */ <helix-tooltip
@@ -393,7 +394,7 @@ function ElementApi({ element }: { element: Element }) {
 
       {element.summary && (
         <helix-text as="p" class={api.description} emphasis="muted" variant="caption">
-          {element.summary}
+          <CodeText>{element.summary}</CodeText>
         </helix-text>
       )}
 
@@ -458,7 +459,7 @@ export async function generateMetadata({
     return {}
   }
   return pageMetadata({
-    description: family.summary,
+    description: plainText(family.summary),
     /* Stands aside for `opengraph-image.tsx` beside this file. `pageMetadata`
        otherwise sets `images` to the site card, and a set `images` is what stops
        Next reading the convention at all, silently. */
@@ -560,7 +561,7 @@ export default async function FamilyDocs({
             </helix-flex>
 
             <helix-text as="p" class={api.description} emphasis="muted" variant="caption">
-              {first(prose)}
+              <CodeText>{first(prose)}</CodeText>
             </helix-text>
 
             {/* Three facts about the component, in the same register: a tag
@@ -698,7 +699,7 @@ export default async function FamilyDocs({
                         blank someone still has to fill. */}
                     <helix-table-cell>
                       <helix-text emphasis="muted" variant="caption">
-                        {example.description || '-'}
+                        {example.description ? <CodeText>{example.description}</CodeText> : '-'}
                       </helix-text>
                     </helix-table-cell>
                   </helix-table-row>
