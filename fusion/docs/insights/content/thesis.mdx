@@ -1,68 +1,68 @@
 ---
-description: An intelligent design system, intelligent tooling and intelligent services, built on one foundation rather than bolted onto three.
+description: Fusion builds an intelligent design system, intelligent tooling, and intelligent services on one foundation.
 kicker: Thesis
 path: /company/thesis
 title: Intelligence belongs in the foundation.
 ---
 
-Most software is acquiring intelligence the same way: a panel on the side that
-can be asked questions. It is the easiest place to put it and the least useful,
-because the panel knows nothing the rest of the system knows and the system
-learns nothing from the panel.
+Most software adds AI as a panel on the side that you can ask questions. The
+panel knows nothing the rest of the system knows, and the system learns nothing
+from the panel.
 
-The interesting version is underneath. A design system that can tell a model
-what it contains. Tooling that checks rather than guesses. Services delivered by
-the people who built both. Those are foundations, and a foundation is not
-somewhere you bolt a feature.
+We put the intelligence in the foundation:
+
+- a design system that can tell a model what it contains
+- tooling that checks the work and reports what it found
+- services from the people who built both
 
 ## An intelligent design system
 
-[Helix](/helix) derives an accessible palette from one brand color, so contrast
-is computed rather than reviewed, and it refuses to emit a palette that fails
-its own targets. It publishes a custom elements manifest and a token file as
-addressable endpoints, so a model reading the system gets the authoritative
-description of every component rather than a scrape of the documentation.
+[Helix](/helix) computes its palette from one brand color, so contrast is part
+of how the colors are made. Helix rejects a palette that misses its own
+contrast targets. It publishes a custom elements manifest and a token file at
+their own URLs, so a model reads the complete description of every component
+from the source.
 
-That is what intelligent means here. Not a component that calls a model, but a
-system a model can read correctly, and one that will not hand back something
-broken because the asker had no way to tell.
+That is what intelligent means here: a system a model can read correctly, and
+one that does not return a broken result the model has no way to detect.
 
 ## Intelligent tooling
 
-The tools check. `helix component` audits the library rule by rule and returns
-counts rather than opinions, and `fusion prose`, `fusion spec` and `fusion
-workspace` do the same for the writing, the specs and the packages. The MCP
-server is a subcommand of a binary you already installed, speaking over stdio to
-a client you chose.
+Our tools check the work and report numbers. `helix component` audits the
+library rule by rule and returns a count for each rule. `fusion prose`, `fusion
+spec`, and `fusion workspace` do the same for the writing, the specs, and the
+packages. The MCP server is a subcommand of the same binary, and it talks over
+stdio to the client you choose.
 
-Generation is cheap now, which makes verification the expensive half. Tooling
-that returns a number is the half worth building.
+AI makes generating code cheap, so checking the code is now the expensive part.
+We build the tools that check it.
 
 ## Intelligent services
 
-[Fusion Studio](/company/services) is the practice: interface and intelligence work,
-delivered into your repository under your license, in three offers. The
-engagements we take are the ones whose deliverable feeds Helix or
-Cortex, so the work compounds into the foundation instead of ending when the
-invoice does.
+[Fusion Studio](/company/services) is our services team. We deliver interface
+and AI work into your repository under your license, in three offers. We take on
+work that also improves Helix or Cortex, so each engagement adds to the
+foundation.
 
 ## What holds the three together
 
-[Cortex](/cortex) is the memory layer underneath them: what a system knows,
-where it learned it, and how much of it to trust. Engram holds the memory, Trace
-holds the provenance, Recall assembles the context.
+[Cortex](/cortex) is the memory layer under all three. It records what a system
+knows, where it learned it, and how far to trust it:
 
-It is one problem showing up in three places. A design system that can say what
-it contains, tooling that can say what it checked, and a memory layer that can
-say where something came from are all the same property: a system that can
-account for itself. That was optional while a person wrote every line. It stops
-being optional when most of the lines are generated.
+- Engram holds the memory.
+- Trace holds the provenance.
+- Recall assembles the context.
+
+The design system, the tooling, and the memory layer share one property: each
+can account for itself. Helix can say what it contains, the tooling can say what
+it checked, and Cortex can say where a fact came from. That mattered less when a
+person wrote every line of code. It matters now that most lines are generated.
 
 ## Where the work stands
 
-Helix is Building: real work with published packages and nothing we would call
-finished. Cortex is Building, with Engram and Trace under way and Recall
-declared and not started. Fusion Studio is Active, and is the part that can be
-bought today.
+- **Helix** is Building. Its packages are published, and it is not finished.
+- **Cortex** is Building. Work on Engram and Trace is underway, and Recall is
+  planned.
+- **Fusion Studio** is Active, and you can hire us today.
 
-We would rather write that than round it up.
+We report each stage as it is.
