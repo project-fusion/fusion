@@ -71,6 +71,11 @@ a reader walking the places never lands on one they cannot see. Pressing one
 sends `helix-activate` from the frame with its `name`, or its `label` where it
 has none, and what happens then is the page's.
 
+**A place something traveling has passed** takes `passed`, which the page
+sets, since only the page knows where its traveler is: muted as the route
+behind is, and said after its name, `passed` by default and `passed-label` to
+change it, so a reader walking the places hears which are done.
+
 ### Clusters
 
 ```html

@@ -198,4 +198,19 @@ describe('map marker', () => {
     expect(stops(host)).toEqual(['Mission Dolores'])
     expect(mission.current).toBe(true)
   })
+
+  test('a place passed says so after its name, and in a state the styled tier mutes', async () => {
+    const host = await frame()
+    const [depot] = markers(host) as [Marker & { passed: boolean; passedLabel: string }]
+    depot.passed = true
+    await depot.updateComplete
+    expect(hasState(depot, 'passed')).toBe(true)
+    expect(part(depot, 'marker')?.textContent?.trim()).toBe('Depot, passed')
+    depot.passedLabel = 'visited'
+    await depot.updateComplete
+    expect(part(depot, 'label')?.textContent).toBe('Depot, visited')
+    depot.passed = false
+    await depot.updateComplete
+    expect([hasState(depot, 'passed'), part(depot, 'label')?.textContent]).toEqual([false, 'Depot'])
+  })
 })
