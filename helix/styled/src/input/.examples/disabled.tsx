@@ -7,16 +7,16 @@ export function Example() {
       <helix-input
         default-value="Cannot be edited"
         disabled
-        hint="Hint"
-        label="Written off"
+        hint="Only admins can edit this field"
+        label="Company name"
       ></helix-input>
 
-      {/* The same state, arriving from an ancestor fieldset. */}
+      {/* A disabled `fieldset` disables the fields inside it. */}
       <fieldset disabled>
         <helix-input
           default-value="Also cannot be edited"
-          hint="Hint"
-          label="Off from the fieldset"
+          hint="Only admins can edit this field"
+          label="Billing email"
         ></helix-input>
       </fieldset>
     </helix-flex>

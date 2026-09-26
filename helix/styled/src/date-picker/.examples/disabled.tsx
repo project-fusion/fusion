@@ -4,7 +4,7 @@ export function Example() {
       default-month="2026-08"
       default-value="2026-08-14"
       disabled
-      label="Label"
+      label="Start date"
     ></helix-date-picker>
   )
 }

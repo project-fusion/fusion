@@ -6,9 +6,8 @@ export function Example() {
   const ground = useRef<HTMLDivElement>(null)
   const at = useRef({ x: 0, y: 0, zoom: 1 })
 
-  /* Nothing in Helix moves a map: the frame asks and this answers. A real map
-     would call its own library here, `map.panBy` or `map.zoomIn`; the stand-in
-     moves a grid, which is the same shape of answer with nothing to install. */
+  /* The frame sends events and your code moves the map. Call your library here,
+     such as `map.panBy` or `map.zoomIn`. The preview moves a grid. */
   const draw = () => {
     const box = ground.current
     if (!box) {
@@ -20,8 +19,7 @@ export function Example() {
   }
 
   const panned = (event: HelixMapPanEvent) => {
-    // `by` is a fraction of the viewport, so the step is the same gesture at
-    // any scale. A real map multiplies it by whatever it measures in.
+    // `by` is a fraction of the viewport width.
     const step = (ground.current?.clientWidth ?? 0) * event.detail.by
     if (event.detail.to === 'up') {
       at.current.y += step
@@ -39,7 +37,7 @@ export function Example() {
   }
 
   const zoomed = (event: HelixMapZoomEvent) => {
-    // A direction rather than a level, because the scale is yours.
+    // `by` gives the direction: above 0 zooms in, below 0 zooms out.
     at.current.zoom = Math.min(
       Math.max(at.current.zoom * (event.detail.by > 0 ? 1.25 : 0.8), 0.5),
       4,
@@ -49,7 +47,7 @@ export function Example() {
 
   return (
     <helix-map
-      label="A map that answers its own controls"
+      label="City map"
       onhelix-map-pan={panned}
       onhelix-map-zoom={zoomed}
     >
@@ -57,7 +55,7 @@ export function Example() {
         className="stand-in"
         ref={ground}
       >
-        Pan and zoom with the controls, or the arrow keys
+        Pan and zoom with the buttons or the arrow keys
       </div>
 
       <helix-text slot="attribution">© OpenStreetMap contributors</helix-text>

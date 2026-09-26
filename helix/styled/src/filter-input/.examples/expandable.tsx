@@ -4,7 +4,7 @@ export function Example() {
   return (
     <helix-filter-input
       expandable
-      hint="The count is a button here, so the two over the cap are reachable without leaving the field"
+      hint="Press the count to show every filter"
       label="Filter rows"
       max-tags="3"
       placeholder="Add a filter"

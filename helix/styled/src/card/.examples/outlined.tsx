@@ -8,15 +8,14 @@ export function Example() {
         id="outlined-title"
         slot="header"
       >
-        Outlined
+        Notifications
       </h3>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-      labore.
+      Choose which emails you receive about activity in your projects.
       <helix-button
         emphasis="ghost"
         slot="footer"
       >
-        Action
+        Edit settings
       </helix-button>
     </helix-card>
   )

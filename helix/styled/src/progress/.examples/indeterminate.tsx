@@ -10,7 +10,7 @@ export function Example() {
       ></helix-progress>
       <helix-progress
         indeterminate
-        label="Reindexing"
+        label="Indexing files"
       ></helix-progress>
     </helix-flex>
   )

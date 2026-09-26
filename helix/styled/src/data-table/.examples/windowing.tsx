@@ -1,6 +1,4 @@
-/* Five thousand rows, which is the point: this is the size at which laying out
-   every row costs more than a frame, and the size a page of eight hides rather
-   than solves. */
+/* Five thousand generated rows. */
 const rows = Array.from({ length: 5000 }, (_, index) => ({
   kind: index % 4 === 0 ? 'font' : 'image',
   name: `asset-${String(index + 1).padStart(4, '0')}.webp`,
@@ -9,13 +7,11 @@ const rows = Array.from({ length: 5000 }, (_, index) => ({
 
 export function Example() {
   return (
-    /* `windowed` draws the rows in view and stands empty space in for the rest,
-       so the scrollbar still measures five thousand rows and the headings stay
-       put while they pass under. Sorting still orders the whole result rather
-       than the part on screen, which is the bug worth knowing this avoids.
+    /* `windowed` draws only the rows in view, and the scrollbar still measures
+       all five thousand. Sorting orders every row.
 
-       `--data-table-block-size` sets how tall the scrolling box is; it defaults
-       to 24em, which is what this shows. */
+       `--data-table-block-size` sets the height of the scrolling box. It
+       defaults to 24em. */
     <helix-data-table
       label="Assets"
       rows={rows}

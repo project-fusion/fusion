@@ -20,11 +20,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">One picture loads and one does not</span>
+      No events yet
+      <span slot="description">One image loads and one fails</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -34,7 +34,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The number of rows the log keeps.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -54,23 +54,21 @@
     }
   }
 
-  /* Bound in the capture phase, and that is the whole of what these two teach.
-     `load` and `error` do not bubble, here or on a native `<img>`, so a listener
-     on the row hears nothing without it. */
+  /* `load` and `error` do not bubble, so these listeners use the capture phase. */
   people.addEventListener('load', (event) => {
-    say('load', `${event.target.name} arrived`)
+    say('load', `${event.target.name} loaded`)
   }, true)
   people.addEventListener('error', (event) => {
-    say('error', `${event.target.name} did not, so the initials stand in`)
+    say('error', `${event.target.name} failed to load, so the initials are shown`)
   }, true)
 
-  /* A picture that settled before these listeners existed fired its event to
-     nobody, so ask each one where it stands. */
+  /* An image can finish loading before these listeners are added, so check
+     each avatar's status too. */
   for (const avatar of people.querySelectorAll('helix-avatar')) {
     if (avatar.status === 'loaded') {
-      say('load', `${avatar.name} arrived`)
+      say('load', `${avatar.name} loaded`)
     } else if (avatar.status === 'error') {
-      say('error', `${avatar.name} did not, so the initials stand in`)
+      say('error', `${avatar.name} failed to load, so the initials are shown`)
     }
   }
 

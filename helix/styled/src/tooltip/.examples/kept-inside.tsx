@@ -9,10 +9,10 @@ export function Example() {
           aria-describedby="kept-inside-at-the-edge-tip"
           id="kept-inside-at-the-edge"
         >
-          At the edge
+          Rename file
         </helix-button>
         <helix-tooltip
-          content="Clamped to the row, not to the window"
+          content="Change the name of the file"
           for="kept-inside-at-the-edge"
           id="kept-inside-at-the-edge-tip"
           within="tooltipbounds"
@@ -21,10 +21,10 @@ export function Example() {
           aria-describedby="kept-inside-in-the-middle-tip"
           id="kept-inside-in-the-middle"
         >
-          In the middle
+          Move file
         </helix-button>
         <helix-tooltip
-          content="Placed the ordinary way"
+          content="Move the file to another folder"
           for="kept-inside-in-the-middle"
           id="kept-inside-in-the-middle-tip"
         ></helix-tooltip>

@@ -4,18 +4,18 @@ export function Example() {
       offset={12}
       placement="right-start"
     >
-      <helix-button slot="trigger">Export</helix-button>
+      <helix-button slot="trigger">Export report</helix-button>
       <helix-menu-item
         download
         href="#report.csv"
       >
-        Comma separated
+        CSV file
       </helix-menu-item>
       <helix-menu-item
         download
         href="#report.json"
       >
-        JSON
+        JSON file
       </helix-menu-item>
     </helix-menu>
   )

@@ -1,22 +1,22 @@
 export function Example() {
   return (
     <helix-steps
-      label="Label"
+      label="Checkout"
       variant="numeric"
     >
       <helix-step
         complete
         value="one"
       >
-        Step One
+        Cart
       </helix-step>
       <helix-step
         current
         value="two"
       >
-        Step Two
+        Shipping
       </helix-step>
-      <helix-step value="three">Step Three</helix-step>
+      <helix-step value="three">Payment</helix-step>
     </helix-steps>
   )
 }

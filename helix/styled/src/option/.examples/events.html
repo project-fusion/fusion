@@ -9,18 +9,18 @@
     label="Assignee"
   >
     <helix-option value="ada">Ada Okonjo</helix-option>
-    <helix-option value="grace">Grace Hopper</helix-option>
-    <helix-option value="alan">Alan Turing</helix-option>
+    <helix-option value="grace">Sam Patel</helix-option>
+    <helix-option value="alan">Alex Kim</helix-option>
   </helix-listbox>
 
 
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Choose an option</span>
     </helix-list-item>
   </helix-list>
@@ -31,7 +31,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -51,10 +51,8 @@
     }
   }
 
-  /* On the list rather than on each option, and that is the difference from a
-     lifecycle event: `helix-select` bubbles and is composed, so a container
-     hears it without being told which child sent it. `composedPath()[0]` is
-     which one, and survives the shadow boundary where `target` would not. */
+  /* `helix-select` bubbles, so the listbox hears it from every option.
+     `composedPath()[0]` is the option that sent it. */
   owner.addEventListener('helix-select', (event) => {
     say('helix-select', `"${event.detail.value}" from <${event.composedPath()[0].localName}>`)
   })

@@ -6,8 +6,8 @@ export function Example() {
         gap="sm"
       >
         <helix-checkbox
-          hint="Hint"
-          label="Label"
+          hint="Read the policy before you continue."
+          label="I agree to the privacy policy"
           name="option"
           required
           value="accepted"
@@ -17,7 +17,7 @@ export function Example() {
           tone="primary"
           type="submit"
         >
-          Submit
+          Create account
         </helix-button>
       </helix-flex>
     </form>

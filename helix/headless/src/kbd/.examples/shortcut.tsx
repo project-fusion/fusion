@@ -2,8 +2,7 @@ import './shortcut.css'
 
 import { useState } from 'react'
 
-const RESTING =
-  'The second one binds as well as draws. Put the cursor in the field and press it: the key is listened for within the control it sits in, so it answers there and nowhere else.'
+const RESTING = 'Click the field and press / to filter the list.'
 
 export function Example() {
   const [said, setSaid] = useState(RESTING)
@@ -11,9 +10,8 @@ export function Example() {
   return (
     <div className="stack">
       <p>
-        Press <helix-headless-kbd keys="mod+k" /> to search. Written once as <code>mod+k</code>: an
-        Apple keyboard is told the Command glyph and every other keyboard is told Ctrl, so neither
-        is asked for a key it does not have.
+        Press <helix-headless-kbd keys="mod+k" /> to search. The shortcut <code>mod+k</code> shows
+        as ⌘K on a Mac and Ctrl+K on other computers.
       </p>
 
       <helix-headless-input

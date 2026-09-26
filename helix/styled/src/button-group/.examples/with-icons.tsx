@@ -1,6 +1,6 @@
 export function Example() {
   return (
-    <helix-button-group label="Label">
+    <helix-button-group label="Page navigation">
       <helix-button>
         <helix-icon
           mirror

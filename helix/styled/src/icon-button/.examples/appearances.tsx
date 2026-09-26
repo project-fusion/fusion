@@ -25,7 +25,7 @@ export function Example() {
       <helix-flex gap="sm">
         <helix-icon-button
           emphasis="outlined"
-          label="Notes"
+          label="Open notes"
         >
           <helix-icon name="notebook"></helix-icon>
         </helix-icon-button>
@@ -47,7 +47,7 @@ export function Example() {
 
       <helix-icon-button
         disabled
-        label="Unavailable"
+        label="Close"
       >
         <helix-icon name="x"></helix-icon>
       </helix-icon-button>

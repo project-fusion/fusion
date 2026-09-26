@@ -12,10 +12,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Press the button</span>
     </helix-list-item>
   </helix-list>
@@ -26,7 +26,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -47,6 +47,6 @@
   }
 
   copier.addEventListener('helix-copy', (event) => {
-    say('helix-copy', `"${event.detail.value}" is on the clipboard`)
+    say('helix-copy', `Copied "${event.detail.value}"`)
   })
 </script>

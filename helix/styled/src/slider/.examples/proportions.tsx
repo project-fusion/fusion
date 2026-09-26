@@ -8,7 +8,7 @@ export function Example() {
     >
       <helix-slider
         default-value="60"
-        label="Default"
+        label="Volume"
         max={100}
         min={0}
         show-value
@@ -21,7 +21,7 @@ export function Example() {
       >
         <helix-slider
           default-value="60"
-          label="Thick track"
+          label="Brightness"
           max={100}
           min={0}
           show-value
@@ -29,7 +29,7 @@ export function Example() {
 
         <helix-slider
           default-value="35"
-          label="Capsule handle"
+          label="Contrast"
           markers={5}
           max={100}
           min={0}
@@ -44,7 +44,7 @@ export function Example() {
       >
         <helix-slider
           default-value="70"
-          label="Upright"
+          label="Bass"
           max={100}
           min={0}
           orientation="vertical"
@@ -53,7 +53,7 @@ export function Example() {
 
         <helix-slider
           default-value="30"
-          label="Beside it"
+          label="Treble"
           max={100}
           min={0}
           orientation="vertical"

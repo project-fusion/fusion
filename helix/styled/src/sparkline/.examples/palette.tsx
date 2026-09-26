@@ -1,15 +1,11 @@
 import { Fragment } from 'react'
 import './palette.css'
 
-/* One reading, plotted twenty-four times. The palette is what this example is
-   for, so every series draws the same numbers: a different shape per swatch
-   would put a second variable into a picture that is about one. */
+/* Every series draws the same values, so only the color changes. */
 const VALUES = '1240 1318 1102 1291 1244 1180 1408'
 
-/* The series are numbered straight through rather than per tone, because
-   `series-9` is the ninth class the stylesheet declares and not the first of the
-   bright ones. The headings are where the palette changes tone, not where the
-   numbering restarts. */
+/* Series are numbered 1 to 24 across all three tones, to match the `series-N`
+   classes. */
 const PER_TONE = 8
 const TONES = ['Balanced', 'Bright', 'Muted']
 
@@ -23,8 +19,7 @@ export function Example() {
             (series) => (
               <Fragment key={series}>
                 <span className="index">{series}</span>
-                {/* The line and the wash are the same color asked two ways, which
-                    is the pair a reader is comparing. */}
+                {/* Each series is drawn as a line and as an area. */}
                 <helix-sparkline
                   className={`series-${series}`}
                   label={`Series ${series}`}
@@ -32,7 +27,7 @@ export function Example() {
                 ></helix-sparkline>
                 <helix-sparkline
                   className={`series-${series}`}
-                  label={`Series ${series}, washed`}
+                  label={`Series ${series}, area`}
                   plot="area"
                   values={VALUES}
                 ></helix-sparkline>

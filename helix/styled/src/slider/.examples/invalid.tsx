@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-slider
       default-value="95"
-      feedback="Anything above eighty risks throttling"
+      feedback="Set a limit of 80 or lower to avoid throttling"
       hint="Requests per second"
       label="Rate limit"
       max={100}

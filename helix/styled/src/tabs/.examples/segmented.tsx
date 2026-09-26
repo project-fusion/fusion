@@ -2,22 +2,22 @@ export function Example() {
   return (
     <helix-tabs
       default-active="one"
-      label="Label"
+      label="Project"
       variant="segmented"
     >
-      <helix-tab value="one">Tab One</helix-tab>
-      <helix-tab value="two">Tab Two</helix-tab>
+      <helix-tab value="one">Overview</helix-tab>
+      <helix-tab value="two">Activity</helix-tab>
       <helix-tab-panel
         slot="panels"
         value="one"
       >
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        A summary of the project and the people on it.
       </helix-tab-panel>
       <helix-tab-panel
         slot="panels"
         value="two"
       >
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Recent changes to the project and its files.
       </helix-tab-panel>
     </helix-tabs>
   )

@@ -52,11 +52,11 @@
     emphasis="solid"
     id="shuffle"
     tone="primary"
-  >New numbers</helix-button>
+  >Refresh data</helix-button>
 </helix-flex>
 
-<!-- Preview frame: the numbers are rewritten in the table, which is the only
-     thing a chart reads. Nothing here touches the chart. -->
+<!-- The script rewrites the numbers in the table. The chart reads the table and
+     redraws. -->
 <script>
   document.getElementById('shuffle').addEventListener('click', () => {
     for (const cell of document.querySelectorAll('#live tbody td')) {

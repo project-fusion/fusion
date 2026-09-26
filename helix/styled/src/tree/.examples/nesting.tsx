@@ -4,23 +4,23 @@ export function Example() {
       direction="column"
       gap="lg"
     >
-      <helix-tree label="Repository">
+      <helix-tree label="Project files">
         <helix-tree-item
           default-open
           value="helix"
         >
-          helix
+          src
           <helix-tree-item
             slot="children"
             value="headless"
           >
-            headless
+            components
           </helix-tree-item>
           <helix-tree-item
             slot="children"
             value="styled"
           >
-            styled
+            styles
           </helix-tree-item>
         </helix-tree-item>
         <helix-tree-item value="readme">README.md</helix-tree-item>
@@ -70,20 +70,20 @@ export function Example() {
               slot="children"
               value="any-framework"
             >
-              Any framework
+              Windows
             </helix-tree-item>
             <helix-tree-item
               slot="children"
               value="react"
             >
-              React
+              macOS
             </helix-tree-item>
           </helix-tree-item>
           <helix-tree-item
             slot="children"
             value="theming"
           >
-            Theming
+            Configuration
           </helix-tree-item>
         </helix-tree-item>
         <helix-tree-item value="changelog">Changelog</helix-tree-item>

@@ -17,9 +17,8 @@ export function Example() {
       label="People"
       rows={rows}
     >
-      {/* The page owns the query and hands it back as `filter`, which is the
-          same request the table makes for itself: refuse the change and a
-          server-side search is expressible without touching the table. */}
+      {/* The page keeps the query and passes it back as `filter`. Refuse the
+          change to run the search on a server. */}
       <helix-input
         onhelix-before-change={(event) => setFilter(event.detail.value)}
         placeholder="Search"

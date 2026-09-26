@@ -12,19 +12,16 @@ export function Example() {
 
       <helix-dialog
         id="small-dialog"
-        label="Dialog Title"
+        label="Archive project?"
         size="sm"
       >
         <helix-text
           as="h2"
           slot="header"
         >
-          Dialog Title
+          Archive project?
         </helix-text>
-        <helix-text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
-        </helix-text>
+        <helix-text>The project becomes read-only for everyone on the team.</helix-text>
         <helix-button-group
           label="Dialog actions"
           slot="footer"
@@ -36,7 +33,7 @@ export function Example() {
             emphasis="solid"
             tone="primary"
           >
-            Save
+            Archive project
           </helix-button>
           <helix-button
             command="--close"

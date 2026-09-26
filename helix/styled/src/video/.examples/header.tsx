@@ -1,12 +1,12 @@
 export function Example() {
   return (
     <helix-video
-      label="Making Of, Part Two"
+      label="Getting started, part 2"
       src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
     >
       <helix-icon-button
         emphasis="solid"
-        label="Back to the series"
+        label="Back to all videos"
         slot="header"
         tone="neutral"
       >
@@ -17,7 +17,7 @@ export function Example() {
         slot="header"
         variant="title"
       >
-        Making Of, Part Two
+        Getting started, part 2
       </helix-text>
     </helix-video>
   )

@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-combobox
       default-value="rs"
-      hint="The field shows the option, not what was typed to find it"
+      hint="Used for new projects"
       label="Language"
       name="language"
     >

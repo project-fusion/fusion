@@ -8,15 +8,14 @@ export function Example() {
         id="elevated-title"
         slot="header"
       >
-        Elevated
+        Team plan
       </h3>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-      labore.
+      Invite up to 10 people and share projects with your team.
       <helix-button
         emphasis="ghost"
         slot="footer"
       >
-        Action
+        Upgrade plan
       </helix-button>
     </helix-card>
   )

@@ -6,10 +6,8 @@
 ></helix-pin-input>
 
 <script type="module">
-  /* Preview frame: a real page would post the code and act on the answer.
-     `helix-complete` is what saves a reader pressing anything: the last box is
-     the last thing they have to do, so a submit button beside it would be a
-     control that is only ever pressed after the work is already finished. */
+  /* Preview frame: your page would send the code to your server here.
+     `helix-complete` is sent when the last box is filled. */
   const code = document.querySelector('#code')
   code.addEventListener('helix-complete', (event) => {
     code.hint = `Checking ${event.detail.value}`

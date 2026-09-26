@@ -14,11 +14,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Type six characters</span>
+      No events yet
+      <span slot="description">Type the six-digit code</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -28,7 +28,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -49,15 +49,15 @@
   }
 
   code.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   })
   code.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}" so far`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   })
   code.addEventListener('helix-complete', (event) => {
-    say('helix-complete', `"${event.detail.value}", every box is filled`)
+    say('helix-complete', `Entered "${event.detail.value}"`)
   })
   code.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", filled or left, either is a commit`)
+    say('change', `Changed to "${event.currentTarget.value}"`)
   })
 </script>

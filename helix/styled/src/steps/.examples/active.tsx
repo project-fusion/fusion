@@ -2,16 +2,16 @@ export function Example() {
   return (
     <helix-steps
       default-active="two"
-      label="Label"
+      label="Checkout"
     >
       <helix-step
         complete
         value="one"
       >
-        Step One
+        Cart
       </helix-step>
-      <helix-step value="two">Step Two</helix-step>
-      <helix-step value="three">Step Three</helix-step>
+      <helix-step value="two">Shipping</helix-step>
+      <helix-step value="three">Payment</helix-step>
     </helix-steps>
   )
 }

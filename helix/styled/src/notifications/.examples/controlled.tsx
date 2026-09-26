@@ -1,22 +1,13 @@
 import { type ReactNode, useEffect, useState } from 'react'
 import './controlled.css'
 
-/** Stands in for the round trip a real page would make. */
+/** Stands in for a request to your server. */
 const acknowledge = async (): Promise<boolean> => Promise.resolve(true)
 
 /**
- * One item whose read state the page owns.
- *
- * **Refusing the event is how a page owns the state.** `read` is a boolean
- * attribute, so its presence means true and there is no way to write "the page
- * owns this and it is currently false" as markup: `read="false"` is a present
- * attribute and therefore true.
- *
- * So the page refuses instead. `preventDefault` stops the item applying
- * anything, the request goes to the server, and the property is written only
- * once the server agreed. A failed request leaves the item unread rather than
- * lying about it, which is the whole reason read state is reported here and not
- * invented.
+ * `read` is a boolean attribute, so markup cannot set it to false. To control
+ * read state, cancel `helix-read`, save the change on your server, and then set
+ * `read`.
  */
 function Owned({ at, children }: { at: string | undefined; children: ReactNode }) {
   const [read, setRead] = useState(false)
@@ -53,11 +44,11 @@ export function Example() {
       mark-all
     >
       <Owned at={at}>
-        <strong>cortex-core</strong> finished indexing.
+        <strong>Invoice #1042</strong> was paid.
       </Owned>
 
       <Owned at={at}>
-        A new version of <strong>@fusion.dev/helix</strong> is available.
+        <strong>Quarterly report</strong> is ready to download.
       </Owned>
     </helix-notifications>
   )

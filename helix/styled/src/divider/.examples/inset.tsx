@@ -11,7 +11,7 @@ export function Example() {
           name="cube"
           slot="start"
         ></helix-icon>
-        Item One
+        Documents
       </helix-list-item>
       <helix-divider className="row-rule"></helix-divider>
       <helix-list-item>
@@ -19,7 +19,7 @@ export function Example() {
           name="cube"
           slot="start"
         ></helix-icon>
-        Item Two
+        Downloads
       </helix-list-item>
     </helix-flex>
   )

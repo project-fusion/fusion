@@ -2,10 +2,12 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Choose a row, then go deeper', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [
+  { carried: 'Choose a setting, or open Appearance', name: 'No events yet' },
+]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -18,7 +20,7 @@ export function Example() {
   }
 
   const chosen = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was chosen, wherever in the stack it sits`)
+    say('helix-select', `Chose "${event.detail.value}"`)
   }
 
   return (
@@ -50,7 +52,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

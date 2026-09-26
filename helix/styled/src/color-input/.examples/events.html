@@ -5,7 +5,7 @@
 >
   <helix-color-input
     id="brand"
-    label="Brand"
+    label="Brand color"
     name="brand"
   ></helix-color-input>
 
@@ -13,10 +13,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Open the swatch, then choose a color</span>
     </helix-list-item>
   </helix-list>
@@ -27,7 +27,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The number of rows the log keeps.
   const KEEP = 8
 
   const say = (name, carried) => {
@@ -48,21 +48,21 @@
   }
 
   brand.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'the panel is about to show, refusable')
+    say('helix-before-open', 'the panel is about to open (cancelable)')
   })
   brand.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'the panel is about to go, refusable')
+    say('helix-before-close', 'the panel is about to close (cancelable)')
   })
   brand.addEventListener('toggle', (event) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+    say('toggle', `${event.oldState} to ${event.newState}`)
   })
   brand.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `about to change to "${event.detail.value}" (cancelable)`)
   })
   brand.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `value is now "${event.currentTarget.value}"`)
   })
   brand.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `value is now "${event.currentTarget.value}"`)
   })
 </script>

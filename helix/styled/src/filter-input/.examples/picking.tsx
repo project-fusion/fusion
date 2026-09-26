@@ -12,11 +12,10 @@ export function Example() {
 
   return (
     <helix-filter-input
-      hint="Open the picker, tick a value, and change the comparison under the field"
+      hint="Choose a filter, then choose one or more values"
       label="Filter the queue"
-      /* Every way a filter can change arrives here as one `helix-facet`: a
-         tick, a comparison, and the X on a chip. That is why there is no
-         `onhelix-dismiss` below. */
+      /* A checked value, a changed comparison, and a removed chip all send
+         `helix-facet`, so no `onhelix-dismiss` handler is needed. */
       onhelix-facet={(event) => {
         const { field, label, operatorLabel, values } = event.detail
         setChips((held) => {

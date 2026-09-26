@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Move between the tabs', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Move between the tabs', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -20,14 +20,14 @@ export function Example() {
   const moving = (event: CustomEvent<{ value: string }>) => {
     if (event.detail.value === 'danger') {
       event.preventDefault()
-      say('helix-before-activate', 'refused, so the strip did not move')
+      say('helix-before-activate', 'canceled, so the active tab did not change')
       return
     }
     say('helix-before-activate', `moving to "${event.detail.value}"`)
   }
 
   const chosen = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was chosen, which a container can catch`)
+    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   }
 
   return (
@@ -43,30 +43,30 @@ export function Example() {
       >
         <helix-tab value="usage">Usage</helix-tab>
         <helix-tab value="billing">Billing</helix-tab>
-        <helix-tab value="danger">Danger</helix-tab>
+        <helix-tab value="danger">Advanced</helix-tab>
         <helix-tab-panel
           slot="panels"
           value="usage"
         >
-          Requests, storage and egress.
+          Requests, storage, and bandwidth.
         </helix-tab-panel>
         <helix-tab-panel
           slot="panels"
           value="billing"
         >
-          Invoices and the card on file.
+          Invoices and the payment method on file.
         </helix-tab-panel>
         <helix-tab-panel
           slot="panels"
           value="danger"
         >
-          Nothing reaches here.
+          Transfer or delete your account.
         </helix-tab-panel>
       </helix-tabs>
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

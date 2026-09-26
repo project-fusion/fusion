@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Choose another clip', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Choose another clip', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -18,13 +18,13 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-activate', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-activate', `about to change to "${event.detail.value}", can be canceled`)
   }
 
-  /* Not the entry's `helix-select`, which the playlist stops: a page hearing
-     both would hear one press twice under two names. */
+  /* The playlist stops each entry's `helix-select`, so listen for
+     `helix-activate` on the playlist. */
   const moved = (event: CustomEvent<{ value: string }>) => {
-    say('helix-activate', `"${event.detail.value}" is playing, and the playlist already holds it`)
+    say('helix-activate', `"${event.detail.value}" is now playing`)
   }
 
   return (
@@ -40,16 +40,16 @@ export function Example() {
       >
         <helix-video
           extra-controls="previous next"
-          label="One of several"
+          label="Episode player"
           slot="player"
         />
-        <helix-video-playlist-item value="one">Getting started</helix-video-playlist-item>
-        <helix-video-playlist-item value="two">Theming</helix-video-playlist-item>
+        <helix-video-playlist-item value="one">Setting up your account</helix-video-playlist-item>
+        <helix-video-playlist-item value="two">Inviting your team</helix-video-playlist-item>
       </helix-video-playlist>
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

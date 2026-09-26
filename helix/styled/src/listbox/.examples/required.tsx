@@ -21,7 +21,7 @@ export function Example() {
             tone="primary"
             type="submit"
           >
-            Invite
+            Send invitation
           </helix-button>
         </helix-flex>
       </form>

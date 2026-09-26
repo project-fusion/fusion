@@ -3,24 +3,24 @@ import './grouped.css'
 export function Example() {
   return (
     <>
-      {/* Hand-written owner: `role="option"` requires one. */}
+      {/* An option needs a parent with `role="listbox"`. */}
       <div
-        aria-label="Label"
+        aria-label="Assignee"
         className="listbox"
         role="listbox"
       >
-        <helix-option-group label="Group One">
+        <helix-option-group label="Design">
           <helix-option
             selected
             value="one"
           >
-            Option One
+            Alex Kim
           </helix-option>
-          <helix-option value="two">Option Two</helix-option>
+          <helix-option value="two">Sam Patel</helix-option>
         </helix-option-group>
-        <helix-option-group label="Group Two">
-          <helix-option value="three">Option Three</helix-option>
-          <helix-option value="four">Option Four</helix-option>
+        <helix-option-group label="Engineering">
+          <helix-option value="three">Jordan Lee</helix-option>
+          <helix-option value="four">Priya Shah</helix-option>
         </helix-option-group>
       </div>
     </>

@@ -3,11 +3,11 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last seven events.
 const KEEP = 7
 
 const RESTING: Arrival[] = [
-  { carried: 'Drag the area, then try the copy and the dropper', name: 'Nothing yet' },
+  { carried: 'Pick a color, copy it, or use the eyedropper', name: 'No events yet' },
 ]
 
 export function Example() {
@@ -21,27 +21,27 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing ${event.detail.value}, refusable`)
+    say('helix-before-change', `Proposed ${event.detail.value}`)
   }
 
   const moved = (event: Event & { currentTarget: HelixColorPicker }) => {
-    say('input', `${event.currentTarget.value} while the pointer is down`)
+    say('input', `Value is ${event.currentTarget.value}`)
   }
 
   const settled = (event: Event & { currentTarget: HelixColorPicker }) => {
-    say('change', `${event.currentTarget.value}, once it is let go`)
+    say('change', `Changed to ${event.currentTarget.value}`)
   }
 
   const copied = (event: CustomEvent<{ value: string }>) => {
-    say('helix-copy', `${event.detail.value} is on the clipboard`)
+    say('helix-copy', `Copied ${event.detail.value}`)
   }
 
   const sampling = () => {
-    say('helix-sample-start', 'the dropper is live, so the page is being read')
+    say('helix-sample-start', 'Eyedropper opened')
   }
 
   const sampled = () => {
-    say('helix-sample-end', 'the dropper is done, whether or not it took one')
+    say('helix-sample-end', 'Eyedropper closed')
   }
 
   return (
@@ -61,7 +61,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

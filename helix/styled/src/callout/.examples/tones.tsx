@@ -18,7 +18,7 @@ export function Example() {
       </helix-callout>
       <helix-callout tone="danger">
         <span slot="heading">Error</span>
-        The deploy failed and the previous build is still live.
+        Your payment could not be processed. Update your card details.
       </helix-callout>
     </helix-flex>
   )

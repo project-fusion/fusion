@@ -3,10 +3,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Choose a score', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Choose a score', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,15 +19,15 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   }
 
   const moved = (event: Event & { currentTarget: HelixRating }) => {
-    say('input', `"${event.currentTarget.value}" as it is chosen`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   }
 
   const settled = (event: Event & { currentTarget: HelixRating }) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `Changed to "${event.currentTarget.value}"`)
   }
 
   return (
@@ -37,7 +37,7 @@ export function Example() {
     >
       <helix-rating
         default-value="3"
-        label="Rate this release"
+        label="Rate your experience"
         onChange={settled}
         onhelix-before-change={proposed}
         onInput={moved}
@@ -45,7 +45,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

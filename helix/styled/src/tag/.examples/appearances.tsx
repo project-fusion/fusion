@@ -1,11 +1,9 @@
-/* Two axes that do not cross evenly, which is why the first row is written out
-   and the other two are not. At rest a tag has a neutral with no tone at all, so
-   that row is five and names the tones; `solid` and `outlined` have nothing
-   neutral to show, so they are four and name the emphasis instead. */
+/* The first row adds a neutral tag with no tone. The `solid` and `outlined`
+   rows show the four tones in that emphasis. */
 const TONES = ['primary', 'success', 'warning', 'danger'] as const
 const EMPHASES = ['solid', 'outlined'] as const
 
-/** `primary` to `Primary`. Each row's words are its own axis, spelled for reading. */
+/** Capitalizes a word for a label, such as `primary` to `Primary`. */
 const title = (word: string) => `${word[0]?.toUpperCase()}${word.slice(1)}`
 
 export function Example() {
