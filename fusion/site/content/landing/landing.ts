@@ -22,7 +22,7 @@ export const LANDING: PageCopy = {
       from: 'products',
     },
     {
-      body: ['Work starts with a two-week audit. Each service has a published price.'],
+      body: ['Most work starts with an audit of up to two weeks.'],
       from: 'services',
       kicker: 'Services',
       title: 'The part you can buy today',
@@ -69,7 +69,7 @@ export const LANDING: PageCopy = {
    * The site's own name stays the *route* title, which is what a sitemap and a
    * search result want. This is the `h1`, and the `h1` is the heading.
    */
-  title: 'A design system built from your brand color, and the engineers behind it',
+  title: 'An intelligent design system, and the engineers behind it',
 }
 
 /** The one line the hero asks a reader to run rather than to read. */

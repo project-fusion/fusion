@@ -37,26 +37,53 @@ export const HERO = {
    */
   accent: 'and the engineers behind it',
   /**
-   * The longer form, for a search result and a link preview. The hero shows
-   * only `lede`, so the facts a search result needs go here: the license, the
-   * checks on every build, and the reference agents read (an MCP server and an
-   * `llms.txt`).
+   * **The longer form, for a search result and a link preview.**
+   *
+   * Separate from `lede` because the hero is one line, and cutting the two
+   * together leaves a forty-nine character meta description: a result page and a
+   * link card want the sentences a hero is better without. So the proofs live
+   * here, where length is a virtue.
+   *
+   * **All three are literal and checkable, which is why they are worth stating
+   * flatly.** Open source is MIT across the published packages. Machine-readable
+   * is an MCP server and an `llms.txt`, so an agent can derive a theme, audit
+   * its contrast and read the docs. Verified on every build is the contrast
+   * gate, the token checks and an agent corpus that fails when a question stops
+   * being answerable from a current artifact. That is the intelligence the
+   * heading names, said plainly enough that the phrase is a description rather
+   * than a joke.
    */
   description:
-    'Helix is an open source design system built from your brand color. It checks contrast and components on every build, publishes its reference for AI agents, and comes with the engineers who built it.',
+    'Ship faster because the system does the checking. An open source design system, machine-readable and verified on every build, and the engineers behind it.',
   install: 'bun add @fusion.dev/helix',
   /**
-   * One sentence that says what Helix does for you. It has no count in it,
-   * because a count here would go stale when a component is added. The band
-   * below prints the generated numbers.
+   * **One sentence, because the hero already says enough.** `Ship faster` is the
+   * outcome and `because the system does the checking` is the mechanism, which
+   * is the only honest way to promise speed: nothing here makes a person type
+   * faster, it removes a review step they were doing by hand.
+   *
+   * The other claims are not wrong here, they are early: the bands below
+   * evidence each one at the point a reader is asking for it, and `description`
+   * still hands all three to a search result. What is left is the whole of what
+   * someone needs before the buttons under it.
+   *
+   * **And no number in it.** A count in the hero is a fact with an owner, wrong
+   * the day a component is added, and nothing checks it. The band below prints
+   * the count from the built packages, where it is generated and cannot drift.
    */
-  lede: 'Helix checks contrast, tokens, and components on every build, so you review less by hand.',
+  lede: 'Ship faster because the system does the checking.',
   /**
-   * Reads as one sentence with `accent`. The first half says what the product
-   * is, so someone arriving cold learns it from the headline. The second half
-   * names the people, and the page paints it in the brand color.
+   * **Generic before it is clever.** A sentence about us that takes twenty words
+   * to reach what the product is loses a reader arriving cold: they want the
+   * category first and the argument second.
+   *
+   * Reads as one sentence with `accent`: "An intelligent design system, and the
+   * engineers behind it." The category is plain and the half worth painting is
+   * the people, which is the whole reason the heading is in two colors: the
+   * system is the thing being sold and the engineers are the reason to trust
+   * it.
    */
-  title: 'A design system built from your brand color,',
+  title: 'An intelligent design system,',
   /**
    * What the package actually is, for a reader deciding whether it can be used
    * at all.
@@ -129,7 +156,7 @@ export const MECHANISMS: readonly Capability[] = [
 ]
 
 export const DELIVERY = {
-  lede: 'Each service has a published price.',
+  lede: 'Every service runs two days a week, alongside your team.',
   /**
    * **Named, because `it` had nothing to point at.** The band above this one is
    * about the engineers and the one above that about the essays, so a reader
@@ -145,7 +172,7 @@ export const DELIVERY = {
  *
  * **The half of the heading the page was not answering.** "And the engineers
  * behind it" is half the hero, and the other bands are the system, the numbers
- * and a price list: everything about what you buy and nothing about what the
+ * and the services: everything about what you buy and nothing about what the
  * work is.
  *
  * Typed here and imported by the Markdown mirror, so the page and the document
