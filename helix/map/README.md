@@ -105,7 +105,7 @@ at the page's pace for a trip.
   description="Two stops away"></helix-map-position>
 ```
 
-Something moving: a point in the page's own surface ringed in its ink, which
+Something moving: a point in the page's ink ringed in its surface, which
 becomes an arrow where it has a `heading`, degrees clockwise from north, with a
 ring `accuracy` meters across. `shape` and `separation` take the same words
 they do on a marker's point, and `tone` colors it where it means something. **The connector places it and sizes its
