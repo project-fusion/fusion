@@ -5,6 +5,8 @@ import { watchTheme } from '../theme/watch-theme.js'
 
 /** What MapLibre hands a listener, as far as the driver reads it. */
 interface MapLibreEvent {
+  /** On a press or a move: where the pointer is, in the map's box. */
+  point?: { x: number; y: number }
   /** On `sourcedata`: `metadata` where a source learned its TileJSON, credit and all. */
   sourceDataType?: string
 }
@@ -106,9 +108,12 @@ export const LAYERS: MapLibreLayer[] = [
   },
 ]
 
-/** The specs as GeoJSON, longitude first, an area's ring closed as GeoJSON requires. */
+/** The routes and areas as GeoJSON, longitude first, an area's ring closed as GeoJSON requires. */
 export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
-  features: layers.map((layer) => {
+  features: layers.flatMap((layer) => {
+    if (layer.kind === 'points') {
+      return []
+    }
     const coordinates = layer.points.map(({ lat, lng }) => [lng, lat])
     return {
       geometry:
@@ -128,6 +133,90 @@ export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
   }),
   type: 'FeatureCollection',
 })
+
+/** A points layer's source, one each, since MapLibre clusters by source. */
+const pointsSource = (id: string): string => `helix-points-${id}`
+
+/**
+ * A points layer's points as GeoJSON, each carrying where it is in the list,
+ * which is how a press finds it again.
+ */
+const pointsJson = (points: MapLayerSpec['points']) => ({
+  features: points.map(({ lat, lng }, at) => ({
+    geometry: { coordinates: [lng, lat], type: 'Point' as const },
+    properties: { at },
+    type: 'Feature' as const,
+  })),
+  type: 'FeatureCollection' as const,
+})
+
+/**
+ * A points layer's style layers, bottom up: a halo round each count, the
+ * count's circle, the count, and the points on their own. **A count grows by
+ * the step**, so a hundred reads larger than ten at a glance rather than by
+ * its figures alone; **its figures take the style's own face**, the one its
+ * place names are set in, since a style carries only the faces it names.
+ */
+export const pointsLayers = (
+  id: string,
+  spec: MapLayerSpec,
+  font: unknown,
+): {
+  id: string
+  layout?: Record<string, unknown>
+  paint: Record<string, unknown>
+  type: string
+}[] => {
+  const source = pointsSource(id)
+  const clustered = ['has', 'point_count']
+  const size = ['step', ['get', 'point_count'], 14, 25, 17, 100, 21, 1000, 26]
+  return [
+    {
+      id: `${source}-halo`,
+      paint: {
+        'circle-color': spec.color,
+        'circle-opacity': 0.22,
+        'circle-radius': ['+', size, 6],
+      },
+      type: 'circle',
+    },
+    {
+      id: `${source}-clusters`,
+      paint: {
+        'circle-color': spec.color,
+        'circle-radius': size,
+        'circle-stroke-color': spec.casing ?? spec.color,
+        'circle-stroke-width': 2,
+      },
+      type: 'circle',
+    },
+    {
+      id: `${source}-count`,
+      layout: {
+        'text-allow-overlap': true,
+        'text-field': ['get', 'point_count_abbreviated'],
+        'text-font': font,
+        'text-size': 12,
+      },
+      paint: { 'text-color': spec.ink ?? '#ffffff' },
+      type: 'symbol',
+    },
+    {
+      id: `${source}-points`,
+      paint: {
+        'circle-color': spec.color,
+        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 3, 15, 6],
+        'circle-stroke-color': spec.casing ?? spec.color,
+        'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 8, 1, 15, 1.5],
+      },
+      type: 'circle',
+    },
+  ].map((layer, at) => ({
+    ...layer,
+    filter: at === 3 ? ['!', clustered] : clustered,
+    source,
+  })) as never
+}
 
 /** How MapLibre is told to move: over a time and a curve, or at once. */
 interface MapLibreAnimation {
@@ -161,14 +250,21 @@ export interface MapLibreMap {
   ): unknown
   /** A layer by its id, or nothing where there is none. */
   getLayer(id: string): unknown
-  /** A source by its id: `attribution` is its credit, `setData` what redraws a GeoJSON one. */
-  getSource(
-    id: string,
-  ): { attribution?: string | undefined; setData?(data: GeoJson): unknown } | undefined
+  /**
+   * A source by its id: `attribution` is its credit, `setData` what redraws a
+   * GeoJSON one, and `getClusterExpansionZoom` how far in a count comes apart.
+   */
+  getSource(id: string):
+    | {
+        attribution?: string | undefined
+        getClusterExpansionZoom?(clusterId: number): Promise<number>
+        setData?(data: never): unknown
+      }
+    | undefined
   /** The style as it stands: its sources are the ones to credit, and its layers what to draw under. */
   getStyle():
     | {
-        layers?: { id: string; type: string }[] | undefined
+        layers?: { id: string; layout?: unknown; type: string }[] | undefined
         sources?: Record<string, unknown> | undefined
       }
     | undefined
@@ -181,11 +277,11 @@ export interface MapLibreMap {
   /** The arrow-key handler MapLibre adds unless told not to. */
   keyboard: { disable(): void; enable(): void; isEnabled(): boolean }
   off(
-    type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type: 'click' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
     listener: (event?: MapLibreEvent) => void,
   ): unknown
   on(
-    type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type: 'click' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
     listener: (event?: MapLibreEvent) => void,
   ): unknown
   removeLayer(id: string): unknown
@@ -193,6 +289,17 @@ export interface MapLibreMap {
   panBy(offset: [number, number], options?: MapLibreAnimation): unknown
   /** Where a place falls in the map's box, in pixels. */
   project(lngLat: [number, number]): { x: number; y: number }
+  /** What is drawn in a box of the map's, of the layers named. */
+  queryRenderedFeatures(
+    box: [[number, number], [number, number]],
+    options: { layers: string[] },
+  ): {
+    geometry: { coordinates?: unknown; type: string }
+    layer: { id: string }
+    properties: Record<string, unknown> | null
+  }[]
+  /** Sets one paint property of one layer, which is how a points layer takes a new color. */
+  setPaintProperty(layer: string, name: string, value: unknown): unknown
   /** Replaces the style, by a diff against the one it has where `diff` is set. `never` for `addLayer`'s reason. */
   setStyle(style: never, options?: { diff?: boolean }): unknown
   zoomIn(options?: MapLibreAnimation): unknown
@@ -268,17 +375,85 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
      style without these, and the diff takes them away, so they come back on
      the next `styledata` with their colors read again, which is how a
      route follows the theme. */
-  layers: (read) => {
+  layers: (read, events) => {
+    /* The points layers drawn, by spec id: whether each clusters, and the
+       points it was last handed, which a redraw for a color does not resend. */
+    const drawnPoints = new Map<string, { cluster: boolean; points: MapLayerSpec['points'] }>()
+    const takeOff = (id: string): void => {
+      const source = pointsSource(id)
+      for (const suffix of ['points', 'count', 'clusters', 'halo']) {
+        if (map.getLayer(`${source}-${suffix}`)) {
+          map.removeLayer(`${source}-${suffix}`)
+        }
+      }
+      if (map.getSource(source)) {
+        map.removeSource(source)
+      }
+    }
+    /* **Points over everything the style draws**, their counts included:
+       they are the page's own data, and a place name over them hid them. */
+    const drawPoints = (specs: MapLayerSpec[]): void => {
+      const font = (
+        map.getStyle()?.layers?.find((layer) => layer.type === 'symbol')?.layout as
+          | Record<string, unknown>
+          | undefined
+      )?.['text-font'] ?? ['Noto Sans Regular']
+      const wanted = new Set(specs.map((spec) => spec.id))
+      for (const id of [...drawnPoints.keys()]) {
+        if (!wanted.has(id)) {
+          takeOff(id)
+          drawnPoints.delete(id)
+        }
+      }
+      for (const spec of specs) {
+        const id = pointsSource(spec.id)
+        const cluster = spec.cluster === true
+        const had = drawnPoints.get(spec.id)
+        /* Clustering is the source's, and a source is made clustering or not. */
+        if (had && had.cluster !== cluster) {
+          takeOff(spec.id)
+        }
+        const source = map.getSource(id)
+        if (source?.setData) {
+          if (had?.points !== spec.points) {
+            source.setData(pointsJson(spec.points) as never)
+          }
+          for (const layer of pointsLayers(spec.id, spec, font)) {
+            for (const [name, value] of Object.entries(layer.paint)) {
+              map.setPaintProperty(layer.id, name, value)
+            }
+          }
+        } else {
+          try {
+            map.addSource(id, {
+              cluster,
+              clusterMaxZoom: 16,
+              clusterRadius: 44,
+              data: pointsJson(spec.points),
+              type: 'geojson',
+            } as never)
+          } catch {
+            continue
+          }
+          for (const layer of pointsLayers(spec.id, spec, font)) {
+            map.addLayer(layer as never)
+          }
+        }
+        drawnPoints.set(spec.id, { cluster, points: spec.points })
+      }
+    }
     /* **Tried rather than asked about.** `isStyleLoaded()` waits for the
        tiles as well as the style, so on a fresh map it said no through every
        `styledata` and yes only after the last one, and no route was drawn
        until something restyled the map. A style that is not ready says so by
        refusing the source, and `load` comes after that. */
     const draw = (): void => {
-      const data = geoJson(read())
+      const specs = read()
+      drawPoints(specs.filter((spec) => spec.kind === 'points'))
+      const data = geoJson(specs)
       const source = map.getSource(SOURCE)
       if (source?.setData) {
-        source.setData(data)
+        source.setData(data as never)
         return
       }
       /* **Simplified by zoom, not smoothed.** A route is the router's path
@@ -299,18 +474,91 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         map.addLayer(layer as never, labels)
       }
     }
+    /* A replaced style takes every layer of ours with it, the points' too. */
     const restore = (): void => {
-      if (!map.getSource(SOURCE)) {
+      if (
+        !map.getSource(SOURCE) ||
+        [...drawnPoints.keys()].some((id) => !map.getSource(pointsSource(id)))
+      ) {
+        if (!map.getSource(SOURCE)) {
+          drawnPoints.clear()
+        } else {
+          for (const id of drawnPoints.keys()) {
+            if (!map.getSource(pointsSource(id))) {
+              drawnPoints.delete(id)
+            }
+          }
+        }
         draw()
       }
     }
+    /* **A press on a count zooms in to where it comes apart**, at the page's
+       pace for a trip; **a press on a point is the page's**, told through the
+       connector. What is under the pointer is asked in a box a finger wide,
+       since a point is a few pixels across. */
+    const hit = (event?: MapLibreEvent) => {
+      if (!event?.point || drawnPoints.size === 0) {
+        return undefined
+      }
+      const layers = [...drawnPoints.keys()].flatMap((id) =>
+        [`${pointsSource(id)}-clusters`, `${pointsSource(id)}-points`].filter((layer) =>
+          map.getLayer(layer),
+        ),
+      )
+      const { x, y } = event.point
+      return map.queryRenderedFeatures(
+        [
+          [x - 6, y - 6],
+          [x + 6, y + 6],
+        ],
+        { layers },
+      )[0]
+    }
+    const pressed = (event?: MapLibreEvent): void => {
+      const found = hit(event)
+      if (!found) {
+        return
+      }
+      const id = found.layer.id.replace(/^helix-points-/, '').replace(/-(clusters|points)$/, '')
+      const cluster = found.properties?.cluster_id
+      if (typeof cluster === 'number') {
+        const [lng, lat] = found.geometry.coordinates as [number, number]
+        void map
+          .getSource(pointsSource(id))
+          ?.getClusterExpansionZoom?.(cluster)
+          .then((zoom) => {
+            const motion = events?.motion() ?? null
+            if (motion) {
+              map.easeTo({ center: [lng, lat], zoom, ...animation(motion) })
+            } else {
+              map.jumpTo({ center: [lng, lat], zoom })
+            }
+          })
+        return
+      }
+      const at = found.properties?.at
+      if (typeof at === 'number') {
+        events?.press(id, at)
+      }
+    }
+    const pointing = (event?: MapLibreEvent): void => {
+      map.getCanvas().style.cursor = hit(event) ? 'pointer' : ''
+    }
     map.on('styledata', restore)
     map.on('load', restore)
+    map.on('click', pressed)
+    map.on('mousemove', pointing)
     draw()
     return {
       stop: () => {
         map.off('styledata', restore)
         map.off('load', restore)
+        map.off('click', pressed)
+        map.off('mousemove', pointing)
+        for (const id of drawnPoints.keys()) {
+          takeOff(id)
+        }
+        drawnPoints.clear()
         for (const layer of [...LAYERS].reverse()) {
           if (map.getLayer(layer.id)) {
             map.removeLayer(layer.id)

@@ -1,4 +1,4 @@
-import type { MapDriver, MapLayerSpec } from '../connect-map/connect-map.js'
+import type { MapDriver, MapLayerEvents, MapLayerSpec } from '../connect-map/connect-map.js'
 import type { MapMotion } from '../motion/motion.js'
 
 /** How Leaflet is told to move: over a time, in seconds, or at once. */
@@ -69,6 +69,8 @@ const animation = (motion: MapMotion | null): LeafletAnimation =>
  */
 export interface LeafletShape {
   addTo(map: never): unknown
+  /** Hears a press, which a point that can be pressed takes. */
+  on?(type: 'click', listener: () => void): unknown
   remove(): unknown
 }
 
@@ -78,6 +80,11 @@ export interface LeafletShape {
  * imported**, so this package still depends on no renderer.
  */
 export interface LeafletShapes {
+  /** A point drawn as a circle a fixed size on screen, which a points layer is drawn in. */
+  circleMarker?(
+    latlng: [number, number],
+    options: LeafletShapeOptions & { radius: number },
+  ): LeafletShape
   polygon(latlngs: [number, number][], options: LeafletShapeOptions): LeafletShape
   polyline(latlngs: [number, number][], options: LeafletShapeOptions): LeafletShape
 }
@@ -163,7 +170,7 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
      when the connector says one changed. */
   ...(shapes
     ? {
-        layers: (read: () => MapLayerSpec[]) => {
+        layers: (read: () => MapLayerSpec[], events?: MapLayerEvents) => {
           let drawn: LeafletShape[] = []
           const draw = (): void => {
             for (const shape of drawn) {
@@ -171,6 +178,30 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
             }
             drawn = read().flatMap((layer) => {
               const latlngs = layer.points.map(({ lat, lng }): [number, number] => [lat, lng])
+              /* **Points as circles, and unclustered**: Leaflet gathers
+                 markers only with a plugin this package does not bring, so a
+                 points layer here is every point, which is right for
+                 hundreds and slow for thousands, where MapLibre is the
+                 renderer to connect. */
+              if (layer.kind === 'points') {
+                const circle = shapes.circleMarker
+                if (!circle) {
+                  return []
+                }
+                return latlngs.map((latlng, at) => {
+                  const point = circle(latlng, {
+                    color: layer.casing ?? layer.color,
+                    fillColor: layer.color,
+                    fillOpacity: 1,
+                    interactive: true,
+                    radius: 5,
+                    weight: 1.5,
+                  })
+                  point.on?.('click', () => events?.press(layer.id, at))
+                  point.addTo(map as never)
+                  return point
+                })
+              }
               /* The casing first, so the route is drawn over it. */
               const casing =
                 layer.kind === 'route' && layer.casing

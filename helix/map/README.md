@@ -96,6 +96,31 @@ folds them back with the focus on the cluster, as does a press elsewhere on
 the map or a zoom, and a pan carries them with the map. So does every cluster
 on a driver without `fit`.
 
+## Thousands of points
+
+```html
+<helix-map label="Food and drink in Austin">
+  <div id="map"></div>
+  <helix-map-points label="Food and drink" description="3,252 places" src="/austin-food-and-drink.geojson" cluster></helix-map-points>
+</helix-map>
+```
+
+**A marker is an element, and the cafés in a city are thousands.** A points
+layer is one layer the renderer draws, as fast as it draws the roads: `src` is
+a GeoJSON file of points the connector fetches once, and `data` the same
+collection, or a list of `{ lat, lng, label, id }`, set by a script. `cluster`
+has MapLibre gather them into counts, sized by how many they hold, which a
+press zooms in to where they come apart. Pressing a point sends
+`helix-activate` from the layer with its `id`, or the property `name-key`
+names, `name` by default. Its color is the brand's fill or its `tone`'s, and
+its counts are written in white, as a lettered marker's are. Leaflet draws
+every point, unclustered, where the page hands it `L`: right for hundreds, and
+MapLibre is the renderer for thousands.
+
+The frame names the layer in its list by `label` and `description`, as a route
+is named. A reader cannot yet walk the points in view by keyboard, which is
+the next part of this.
+
 ## Routes and areas
 
 ```html
