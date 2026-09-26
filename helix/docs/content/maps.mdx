@@ -25,7 +25,11 @@ Add the map frame, an element for MapLibre to draw in, and your places:
 ```html
 <helix-map label="Our stores">
   <div id="map"></div>
-  <helix-map-marker label="Flagship" lat="30.2672" lng="-97.7431"></helix-map-marker>
+  <helix-map-marker
+    label="Flagship"
+    lat="30.2672"
+    lng="-97.7431"
+  ></helix-map-marker>
 </helix-map>
 ```
 
@@ -109,7 +113,12 @@ Each element takes `tone`, such as `primary` or `danger`, for its color.
 ### Markers
 
 ```html
-<helix-map-marker label="Texas Capitol" lat="30.2747" lng="-97.7405" shape="ring">
+<helix-map-marker
+  label="Texas Capitol"
+  lat="30.2747"
+  lng="-97.7405"
+  shape="ring"
+>
   <span slot="icon">B</span>
 </helix-map-marker>
 ```
@@ -140,8 +149,8 @@ panel, pass `clusterZoom: false` to `connectMap` and listen for
 
 ```html
 <helix-map-route
-  label="Depot to Mission"
   description="4.2 km"
+  label="Depot to Mission"
   points="37.7955,-122.3937 37.7644,-122.427"
   progress="0.4"
 ></helix-map-route>
@@ -160,12 +169,12 @@ service such as OSRM or Valhalla.
 
 ```html
 <helix-map-position
+  accuracy="30"
+  description="Two stops away"
+  heading="90"
   label="Van 12"
   lat="37.78"
   lng="-122.41"
-  heading="90"
-  accuracy="30"
-  description="Two stops away"
 ></helix-map-position>
 ```
 
@@ -177,7 +186,11 @@ readers announce its `description` when it changes, at most once every
 ### Thousands of points
 
 ```html
-<helix-map-points label="Food and drink" src="/places.geojson" cluster></helix-map-points>
+<helix-map-points
+  cluster
+  label="Food and drink"
+  src="/places.geojson"
+></helix-map-points>
 ```
 
 Use `helix-map-points` for more places than markers can handle. MapLibre draws
