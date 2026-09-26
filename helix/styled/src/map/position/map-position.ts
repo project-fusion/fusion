@@ -8,7 +8,7 @@ import { styles } from './map-position.css.js'
  * @summary Something moving on a map, drawn in the page's theme.
  *
  * @description
- * A point in the page's own surface ringed in its ink, or in its `tone`, with a ring as wide as the
+ * A point in the page's ink ringed in its surface, or in its `tone`, with a ring as wide as the
  * position is uncertain, and a beam and an arrow the way it is going. What
  * places it, and why only its description is heard, is the base class.
  *
