@@ -504,13 +504,19 @@ export function MapsHero({
               <helix-toggle value="dark">Dark</helix-toggle>
             </helix-toggle-group>
           </div>
+          {/* **The same control as the mode beside it**, since it is the same
+              kind of choice: a button of its own drew a second label style
+              and a second height in a row that had one of each. */}
           {still ? null : (
             <div className={styles.mapsControl}>
-              <span className={styles.mapsLegend}>Walker</span>
-              <helix-button emphasis="outlined" onClick={() => setWalking((was) => !was)}>
-                <helix-icon name={walking ? 'pause' : 'play'} slot="start"></helix-icon>
-                {walking ? 'Pause the walk' : 'Play the walk'}
-              </helix-button>
+              <helix-toggle-group
+                label="Walker"
+                onChange={(event) => setWalking(event.currentTarget.value === 'walking')}
+                value={walking ? 'walking' : 'paused'}
+              >
+                <helix-toggle value="walking">Walking</helix-toggle>
+                <helix-toggle value="paused">Paused</helix-toggle>
+              </helix-toggle-group>
             </div>
           )}
         </div>
