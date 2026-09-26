@@ -209,13 +209,13 @@ export default function Home() {
 
           <helix-flex class={`${band.bandSection} siteActions`} data-density="lg">
             <Link data-button="subtle" href="/company/services">
-              See the service prices
+              Compare the services
             </Link>
           </helix-flex>
         </Band>
 
         {/* **What the work is, after what it costs.** The band above is three
-          ways to buy and a link to the prices; this is the half of the heading
+          ways to buy and a link to the services; this is the half of the heading
           those cannot answer. A reader deciding whether to hire engineers wants
           to know what having them in the repository is like, and the honest
           answers are that the system is already built, that this is why it is

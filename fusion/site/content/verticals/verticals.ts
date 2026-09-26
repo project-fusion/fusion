@@ -67,7 +67,7 @@ export const VERTICALS: Vertical[] = [
     label: 'Studio',
     name: 'Fusion Studio',
     stage: 'Active',
-    summary: 'Three services, each with a published price.',
+    summary: 'Three services, from a two-week audit to a full build.',
   },
   {
     body: 'Fusion Design builds Helix, a design system of web components. Helix computes its color tokens from your brand color.',
