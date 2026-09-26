@@ -3,22 +3,17 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /**
- * @summary Something moving on a map, drawn where it is and heard when it matters.
+ * @summary A moving point on a map, such as a vehicle or a person.
  *
  * @description
- * **Where it is, which way it faces, and how sure anyone is.** `lat` and `lng`
- * place it, `heading` turns a cone the way it is going, in degrees clockwise
- * from north, and `accuracy` draws a ring that many meters across the ground.
- * The connector in `@fusion.dev/helix-map` stands it on the map and sizes the
- * ring through the renderer's own projection, so it is right at every zoom and
- * on every renderer, and writes both again every time the view moves.
+ * `lat` and `lng` set where it is, `heading` points it in a direction, in
+ * degrees clockwise from north, and `accuracy` draws a ring with a radius of
+ * that many meters. `connectMap` positions it and resizes the ring as the map
+ * zooms.
  *
- * **It moves in silence and speaks its description.** A position that
- * announced every step would say nothing a reader could use and drown the page
- * while it did, so its moves are not announced at all: its `description` is,
- * the words a page writes when something worth hearing happened, such as two
- * stops away. Politely, and at most once every `announce-every` milliseconds,
- * with the latest words once the wait is over.
+ * Screen readers announce its `description` when it changes, at most once
+ * every `announce-every` milliseconds. Its movement is not announced. Set the
+ * description when something worth hearing happens, such as "Two stops away".
  *
  * @since 0.105.0
  * @status experimental
@@ -26,49 +21,49 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Current location, Live position, Tracker, You are here
  * @documentation https://fusion.dev/helix/components/map
  *
- * @event {HelixMapPartChangeEvent} helix-map-part-change - It moved, turned or grew less sure, which the connector follows. Not news for a page.
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - It moved, turned, or its accuracy changed. Used by `connectMap`; pages do not need to listen for it.
  *
- * @csspart accuracy - The ring as wide as the position is uncertain.
- * @csspart arrow - The arrow a position with a heading is drawn as, pointing the way it faces.
- * @csspart dot - The point that stands on the position.
- * @csspart heading - The cone that points the way it is going, where a heading is known.
- * @csspart position - The picture of it, the ring, the cone and the point, named by its label.
- * @csspart pulse - A ring that radiates from the point, which says it is live rather than a place.
- * @csspart status - Its description, spoken as it changes.
+ * @csspart accuracy - The ring that shows how accurate the position is.
+ * @csspart arrow - The arrow shown when the position has a heading.
+ * @csspart dot - The point shown when the position has no heading.
+ * @csspart heading - The cone that shows its direction.
+ * @csspart position - The image of the position, named by its label.
+ * @csspart pulse - A ring that spreads out from the point, showing that the position is live.
+ * @csspart status - The description, announced when it changes.
  */
 @customElement('helix-headless-map-position')
 export class HelixHeadlessMapPosition extends HelixElement {
-  /** How far off the position may be, in meters, which the ring is drawn as. */
+  /** How accurate the position is, in meters. Drawn as a ring with this radius. */
   @property({ type: Number })
   accuracy?: number
 
   /**
-   * How often the description may be spoken, in milliseconds. The latest
-   * words wait out the rest of the interval rather than being dropped.
+   * The least time between announcements, in milliseconds. A change during the
+   * wait is announced when the wait ends.
    */
   @property({ attribute: 'announce-every', type: Number })
   announceEvery = 5000
 
-  /** What is worth hearing about it, spoken as it changes: two stops away, arrived. */
+  /** What screen readers announce when it changes, such as "Two stops away". */
   @property()
   description?: string
 
-  /** Which way it is going, in degrees clockwise from north. None draws no cone. */
+  /** The direction it faces, in degrees clockwise from north. Shows an arrow. */
   @property({ reflect: true, type: Number })
   heading?: number
 
   /** Marks this as a position for the connector, whatever its tag. */
   readonly isMapPosition = true
 
-  /** What it is, which is what a reader hears when they come to it. */
+  /** What it is, such as "Van 12". Read by screen readers. */
   @property()
   label?: string
 
-  /** How far north, in degrees. */
+  /** Latitude, in degrees. */
   @property({ type: Number })
   lat?: number
 
-  /** How far east, in degrees. */
+  /** Longitude, in degrees. */
   @property({ type: Number })
   lng?: number
 

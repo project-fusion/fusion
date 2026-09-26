@@ -49,35 +49,21 @@ export interface MapPointsCollection {
 }
 
 /**
- * @summary Many places on a map at once, drawn by the renderer from data.
+ * @summary Thousands of places on a map, loaded from data.
  *
  * @description
- * **For the thousands a marker is not for.** A marker is an element, named
- * and focusable, and a page of them is right for the dozen places a reader
- * walks; the cafés in a city are thousands, and thousands of elements are a
- * page that stops. This draws nothing itself: the connector in
- * `@fusion.dev/helix-map` hands the points to the renderer as one layer of
- * its own, which draws them as fast as it draws the roads, and gathers them
- * into counts where `cluster` asks, a count pressed zooming in to what it
- * holds.
+ * Use a points layer for more places than markers can handle, such as every
+ * café in a city. `connectMap` draws the points as one layer of the map. Set
+ * `src` to a GeoJSON file, or set `data` to a GeoJSON collection or a list of
+ * places. With `cluster`, nearby points combine into counts.
  *
- * **Written as data, from a file or a property.** `src` is a GeoJSON file of
- * points the connector fetches, and `data` the same collection, or a list of
- * places, set by a script. Each point is named by its `name` property, or
- * whichever `name-key` says, and pressing one sends `helix-activate` from
- * this element with its id where it has one and its name where it does not.
+ * Pressing a point sends `helix-activate` from this element with the point's
+ * id, or its name if it has no id. Each point is named by its `name`
+ * property, or by the property set in `name-key`.
  *
- * **Named in the frame's list**, by `label` and `description`, as a route is:
- * a reader who cannot see the points is told they are there and what they
- * are.
- *
- * **And walked where they are in view.** The connector asks the renderer
- * which points and counts it drew in view once the view settles, and this
- * stands a button on each, one tab stop for the layer, the arrow keys and Home
- * and End walking them in reading order, top to bottom and along each line.
- * Pressing a point sends `helix-activate` and pressing a count zooms in to it,
- * the focus going to whatever then stands nearest where it was. The buttons
- * take no pointer, which is the renderer's, and show nothing until focused.
+ * The points and counts in view share one tab stop. The arrow keys, Home, and
+ * End move between them from top to bottom and along each line. Enter on a
+ * count zooms in to it.
  *
  * @since 0.105.0
  * @status experimental
@@ -85,51 +71,57 @@ export interface MapPointsCollection {
  * @aliases Data layer, GeoJSON layer, Point cloud, Point layer
  * @documentation https://fusion.dev/helix/components/map
  *
- * @event {HelixActivateEvent} helix-activate - A reader pressed a point in view from the keyboard. The value is its id, or its name where it has none.
- * @event {HelixMapClusterEvent} helix-map-cluster - A reader pressed a count in view from the keyboard, which the connector answers by zooming in to it.
- * @event {HelixMapPartChangeEvent} helix-map-part-change - The points, their name or their color changed, which the frame and the connector follow. Not news for a page.
+ * @event {HelixActivateEvent} helix-activate - A point in view was pressed. The value is its id, or its name if it has no id.
+ * @event {HelixMapClusterEvent} helix-map-cluster - A count in view was pressed from the keyboard. `connectMap` zooms in to it.
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - The points, name, or color changed. Used by `connectMap`; pages do not need to listen for it.
  *
- * @csspart count - A count's button, which is a `place` as well, sized to the count it stands on.
- * @csspart label - A point's name, or a count's, shown while its button is focused.
- * @csspart place - The button standing on a point or a count in view.
+ * @csspart count - The button on a count, which is also a `place`.
+ * @csspart label - The name of the focused point or count.
+ * @csspart place - The button on a point or count in view.
  * @csspart places - The group of buttons, named by the layer's label.
  */
 @customElement('helix-headless-map-points')
 export class HelixHeadlessMapPoints extends HelixElement {
-  /**
-   * Whether the renderer gathers points that would draw over each other into
-   * their count, which pressing zooms in to.
-   */
+  /** Combines nearby points into counts. Pressing a count zooms in to it. */
   @property({ type: Boolean })
   cluster = false
 
-  /** What a count is called, `{count}` standing for how many it holds. */
+  /**
+   * The name read for a count. `{count}` is replaced by the number of places.
+   * Defaults to "{count} places".
+   */
   @property({ attribute: 'count-label' })
   countLabel = '{count} places'
 
-  /** The points as a script has them: a GeoJSON collection, or a list of places. */
+  /**
+   * The points, as a GeoJSON collection or a list of `{ lat, lng, label, id }`
+   * places.
+   */
   @property({ attribute: false })
   data?: MapPointsCollection | readonly MapPointsPlace[]
 
-  /** What the points are about, after their name in the frame's list: how many, of what. */
+  /**
+   * More about the points, such as how many there are. Read after the label in
+   * the frame's list.
+   */
   @property()
   description?: string
 
   /** Marks this as a layer for the frame and the connector, whatever its tag. */
   readonly isMapLayer = true
 
-  /** What the points are called, which is what the frame's list says. */
+  /** The layer's name, used in the frame's list. */
   @property()
   label?: string
 
   /** @internal Which kind of layer, which is how the connector draws it. */
   readonly layerKind = 'points' as const
 
-  /** The property each GeoJSON point is named by. */
+  /** The GeoJSON property each point is named by. Defaults to `name`. */
   @property({ attribute: 'name-key' })
   nameKey = 'name'
 
-  /** A GeoJSON file of points, which the connector fetches, where `data` is not set. */
+  /** A GeoJSON file of points to load. Ignored when `data` is set. */
   @property()
   src?: string
 

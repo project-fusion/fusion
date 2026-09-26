@@ -6,16 +6,11 @@ import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './map-root.css.js'
 
 /**
- * @summary A frame around somebody else's map.
+ * @summary A frame around a map drawn by another library.
  *
  * @description
- * Presentation only: a bordered well with the controls over it, at the corner
- * every map puts them. What the frame is for, and why the controls are buttons
- * rather than arrow keys, is the base class.
- *
- * **The controls do not fade with the chrome.** A reader who has gone still has
- * not stopped needing the only controls this frame offers, so the idle state
- * takes the header and footer a consumer slotted and leaves the buttons alone.
+ * The styled frame: a bordered box with the pan and zoom buttons in its top
+ * corner. The buttons stay visible when the header and footer fade.
  *
  * @since 0.100.0
  * @status experimental
@@ -23,19 +18,17 @@ import { styles } from './map-root.css.js'
  * @aliases Map frame, Map container, Geo
  * @documentation https://fusion.dev/helix/components/map
  *
- * @cssproperty --map-background-color - The well behind the map, seen while tiles are on their way.
- * @cssproperty --map-block-size - How tall the frame is. A length, since the map fills it.
- * @cssproperty --map-border-color - Color of the frame's edge.
- * @cssproperty --viewport-control-background-color - The ground under the pan and zoom buttons, one name with `Canvas`.
+ * @cssproperty --map-background-color - The color behind the map while tiles load.
+ * @cssproperty --map-block-size - The frame's height, as a length.
+ * @cssproperty --map-border-color - The frame's border color.
+ * @cssproperty --viewport-control-background-color - The background of the pan and zoom buttons. Canvas uses the same property.
  */
 @customElement('helix-map')
 export class HelixMap extends HelixHeadlessMap {
   /**
-   * The ground under the controls, the one part of the frame that lies over
-   * the map. Absent is opaque; `glass` lets the map through under a blur,
-   * `frosted` is the same pair turned up for a busier map, and `transparent`
-   * leaves the glyphs over the map with nothing under them. How see-through
-   * each is, is the theme's.
+   * The background of the pan and zoom buttons. Leave unset for solid. `glass`
+   * shows the map through a blur, `frosted` blurs more, and `transparent` has
+   * no background. Your theme sets how see-through each one is.
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass' | 'transparent'

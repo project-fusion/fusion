@@ -6,25 +6,18 @@ import { property, state } from 'lit/decorators.js'
 const BOOKKEEPING = new Set<PropertyKey>(['current', 'fanned', 'gathered', 'gatheredBy', 'side'])
 
 /**
- * @summary A place on a map, named and reachable from the keyboard.
+ * @summary A named place on a map.
  *
  * @description
- * **A place the map knows by its coordinates and a reader knows by its name.**
- * The renderer knows where `lat` and `lng` fall on the screen and the frame
- * does not, so the connector in `@fusion.dev/helix-map` writes where this
- * stands, as `--_map-marker-x` and `--_map-marker-y` on the host, every time the
- * view moves. What this draws is Helix's own: a point and the name beside it,
- * in the page's theme, rather than the renderer's marker.
+ * A button placed at a latitude and longitude. `connectMap` positions it on
+ * the map and moves it as the map moves. Its name shows beside it on hover
+ * and focus.
  *
- * **A button, because pressing it does something.** The frame sends
- * `helix-activate` with its `name`, and a page answers it: a panel of details,
- * a route to it, a selection. The name is the button's own words, so a screen
- * reader says the place and not "marker".
+ * Pressing a marker sends `helix-activate` from the frame with the marker's
+ * `name`, or its `label` if it has no name.
  *
- * **One tab stop for every marker on the map**, which the frame moves: Tab
- * reaches the one a reader was last on, and the arrow keys walk the rest in the
- * order they are written. The order is the page's, since only the page knows
- * whether the depot comes before the stops.
+ * All the markers in a map share one tab stop. The arrow keys move between
+ * them in the order they are written.
  *
  * @since 0.105.0
  * @status experimental
@@ -32,22 +25,22 @@ const BOOKKEEPING = new Set<PropertyKey>(['current', 'fanned', 'gathered', 'gath
  * @aliases Map pin, Place, Point of interest
  * @documentation https://fusion.dev/helix/components/map
  *
- * @slot icon - What the point holds: a letter, a number or an icon, such as the order of a stop. Seen, not read: the marker's name is its label.
+ * @slot icon - A letter, number, or icon shown in the point, such as a stop's order. Screen readers read the marker's label only.
  *
- * @event {HelixMapClusterEvent} helix-map-cluster - A reader pressed this while it stood for several places, which the connector answers by zooming in to its places.
- * @event {HelixMapPartChangeEvent} helix-map-part-change - The place moved or was renamed, which the connector follows. Not news for a page.
+ * @event {HelixMapClusterEvent} helix-map-cluster - This marker shows a cluster and was pressed. `connectMap` zooms in to its places.
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - The marker moved or was renamed. Used by `connectMap`; pages do not need to listen for it.
  *
- * @csspart label - The place's name, beside the point.
- * @csspart marker - The button a reader presses, holding the point and the name.
- * @csspart point - The dot that stands on the place, and holds its `icon` where it has one.
+ * @csspart label - The place's name, next to the point.
+ * @csspart marker - The button, holding the point and the name.
+ * @csspart point - The dot on the place, holding the icon if there is one.
  *
- * @cssstate cluster - While this stands for several places the frame gathered, drawn as their count and named by their names.
- * @cssstate clustered - While another marker stands for this one, which is hidden until the view has room for it.
- * @cssstate current - While this is the marker the map's tab stop is on.
- * @cssstate fanned - While this stands fanned out from a spot it shares with other places, a leg back to it, after its cluster was pressed.
- * @cssstate icon - While something is slotted into the point, which the point grows to hold.
- * @cssstate passed - While the page says something traveling the map has passed this place, which the styled tier mutes.
- * @cssstate start - While the name sits before the point in reading order, turned there by the connector because the other side of the view had no room for it.
+ * @cssstate cluster - Shows several markers as one count.
+ * @cssstate clustered - Hidden inside another marker's cluster.
+ * @cssstate current - Holds the map's tab stop.
+ * @cssstate fanned - Spread out from a location it shares with other markers, after their cluster was pressed.
+ * @cssstate icon - Has content in the icon slot.
+ * @cssstate passed - Marked as passed.
+ * @cssstate start - Shows its name before the point, because there was no room after it.
  */
 @customElement('helix-headless-map-marker')
 export class HelixHeadlessMapMarker extends HelixElement {
@@ -89,18 +82,15 @@ export class HelixHeadlessMapMarker extends HelixElement {
    */
   readonly isMapMarker = true
 
-  /** What the place is called, which is what a reader hears and sees. */
+  /** The place's name. Shown next to the marker and read by screen readers. */
   @property()
   label?: string
 
-  /**
-   * How far north, in degrees. A marker without both this and `lng` is not
-   * placed.
-   */
+  /** Latitude, in degrees. A marker without both `lat` and `lng` is not shown. */
   @property({ type: Number })
   lat?: number
 
-  /** How far east, in degrees. */
+  /** Longitude, in degrees. */
   @property({ type: Number })
   lng?: number
 
@@ -112,23 +102,18 @@ export class HelixHeadlessMapMarker extends HelixElement {
   @state()
   side: 'end' | 'start' = 'end'
 
-  /**
-   * What `helix-activate` reports when this is pressed. Its `label` where it
-   * has none, which is enough until two places share a name.
-   */
+  /** The value `helix-activate` reports. Defaults to the label. */
   @property()
   name = ''
 
   /**
-   * Whether something traveling the map has already passed this place, which
-   * the page says: a stop behind a walker or a delivery made. Drawn quieter,
-   * as the part of a route behind is, and said after the name, so a reader
-   * walking the places hears which are done.
+   * Marks the place as passed, such as a stop already visited. The marker is
+   * drawn muted, and its name is followed by `passed-label`.
    */
   @property({ type: Boolean })
   passed = false
 
-  /** What is said after a passed place's name. */
+  /** The word added after a passed place's name. Defaults to "passed". */
   @property({ attribute: 'passed-label' })
   passedLabel = 'passed'
 

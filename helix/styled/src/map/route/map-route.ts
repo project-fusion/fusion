@@ -5,13 +5,12 @@ import { property } from 'lit/decorators.js'
 import { styles } from './map-route.css.js'
 
 /**
- * @summary A line on a map, drawn by the renderer in the page's theme.
+ * @summary A line on a map, such as a route between stops.
  *
  * @description
- * The color is the whole of this tier: the brand by default, a `tone` where
- * the route means something, which the connector reads off this element and
- * hands to the renderer. What draws it, and why the frame names it in a list,
- * is the base class.
+ * Draws the route in your theme's colors, with a surface-colored casing under
+ * it so it stands out from the roads. Uses your primary color unless `tone`
+ * sets another.
  *
  * @since 0.105.0
  * @status experimental
@@ -19,20 +18,16 @@ import { styles } from './map-route.css.js'
  * @aliases Map line, Path, Polyline
  * @documentation https://fusion.dev/helix/components/map
  *
- * @cssproperty --map-route-casing-color - The edge drawn under the route, so it reads as over the roads rather than as one.
- * @cssproperty --map-route-color - The route's color, where no tone says it.
+ * @cssproperty --map-route-casing-color - The color of the casing under the route.
+ * @cssproperty --map-route-color - The route's color when no tone is set.
  */
 @customElement('helix-map-route')
 export class HelixMapRoute extends HelixHeadlessMapRoute {
-  /** What the route means: the brand where this says nothing. */
+  /** The route's color. Uses your primary color unless set. */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
-  /**
-   * A route off the network the rest is routed on, drawn dotted: the last
-   * steps from where a road ends to a place set back from it, or the first
-   * from a place to the road. Solid where this says nothing.
-   */
+  /** `dotted` draws the route as dots, for a walk off the road network. */
   @property({ reflect: true })
   variant?: 'dotted'
 

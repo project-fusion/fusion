@@ -5,13 +5,11 @@ import { property } from 'lit/decorators.js'
 import { styles } from './map-area.css.js'
 
 /**
- * @summary A region on a map, filled by the renderer in the page's theme.
+ * @summary A shape on a map, such as a delivery zone.
  *
  * @description
- * The color is the whole of this tier: the brand by default, a `tone` where
- * the area means something, which the connector reads off this element and
- * hands to the renderer. What draws it, and why the frame names it in a list,
- * is the base class.
+ * Fills the area in your theme's colors. Uses your primary color unless
+ * `tone` sets another.
  *
  * @since 0.105.0
  * @status experimental
@@ -19,11 +17,11 @@ import { styles } from './map-area.css.js'
  * @aliases Map region, Polygon, Zone
  * @documentation https://fusion.dev/helix/components/map
  *
- * @cssproperty --map-area-color - The area's color, where no tone says it.
+ * @cssproperty --map-area-color - The area's color when no tone is set.
  */
 @customElement('helix-map-area')
 export class HelixMapArea extends HelixHeadlessMapArea {
-  /** What the area means: the brand where this says nothing. */
+  /** The area's color. Uses your primary color unless set. */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 

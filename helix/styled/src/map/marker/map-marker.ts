@@ -5,13 +5,11 @@ import { property } from 'lit/decorators.js'
 import { styles } from './map-marker.css.js'
 
 /**
- * @summary A place on a map, named and reachable from the keyboard.
+ * @summary A named place on a map.
  *
  * @description
- * A point in the page's theme with its name beside it, the name shown while the
- * marker is pointed at or focused. **The brand by default**, which is what the
- * map's main roads are drawn in, so the places a page adds read as the page's
- * own; `tone` says what a place means where it means something.
+ * A point in your theme's colors with the place's name beside it. Uses your
+ * primary color unless `tone` sets another.
  *
  * @since 0.105.0
  * @status experimental
@@ -19,43 +17,41 @@ import { styles } from './map-marker.css.js'
  * @aliases Map pin, Place, Point of interest
  * @documentation https://fusion.dev/helix/components/map
  *
- * @cssproperty --map-marker-cluster-color - A cluster's fill, which its count is written on in white.
- * @cssproperty --map-marker-cluster-size - How wide a cluster is.
- * @cssproperty --map-marker-color - The point's color, where no tone says it.
- * @cssproperty --map-marker-ink - What a point holding a letter writes it in, for a `--map-marker-color` that white does not read on.
- * @cssproperty --map-marker-label-border-width - The name's edge, the theme's floating edge by default.
- * @cssproperty --map-marker-label-shadow - The name's lift, the theme's floating shadow by default.
- * @cssproperty --map-marker-size - How wide the point is.
+ * @cssproperty --map-marker-cluster-color - A cluster's fill color.
+ * @cssproperty --map-marker-cluster-size - A cluster's width.
+ * @cssproperty --map-marker-color - The point's color when no tone is set.
+ * @cssproperty --map-marker-ink - The color of a letter or icon in the point. Set it with `--map-marker-color` when white is hard to read on your color.
+ * @cssproperty --map-marker-label-border-width - The width of the name's border.
+ * @cssproperty --map-marker-label-shadow - The name's shadow.
+ * @cssproperty --map-marker-size - The point's width.
  */
 @customElement('helix-map-marker')
 export class HelixMapMarker extends HelixHeadlessMapMarker {
   /**
-   * The ground under the name. Absent is opaque; `glass` lets the map through
-   * under a blur and `frosted` turns that up, `transparent` leaves the name
-   * on the map. How see-through each is, is the theme's.
+   * The background of the name. Leave unset for solid. `glass` shows the map
+   * through a blur, `frosted` blurs more, and `transparent` has no background.
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass' | 'transparent'
 
   /**
-   * How the point stands off the map: absent is an edge in the surface and a
-   * little lift; `outlined` the edge alone, `elevated` the edge lifted, as an
-   * elevated card is, `filled` a wash of its own color with no edge,
-   * `plain` the bare point.
+   * How the point stands out from the map. Leave unset for a surface-colored
+   * edge and a small shadow. `outlined` has the edge only, `elevated` a larger
+   * shadow, `filled` a soft halo in the marker's color, and `plain` no edge or
+   * shadow.
    */
   @property({ reflect: true })
   separation?: 'elevated' | 'filled' | 'outlined' | 'plain'
 
   /**
-   * The point's shape, a circle where this says nothing: a page telling kinds
-   * of place apart by more than their color, which a reader who cannot tell
-   * the colors apart needs. `pin` is where a journey ends, its tip standing
-   * on the place rather than its middle.
+   * The point's shape. A circle unless set. Use shapes with tones to tell
+   * kinds of places apart. `pin` places the tip of a pin on the location, for
+   * a destination.
    */
   @property({ reflect: true })
   shape?: 'diamond' | 'pin' | 'ring' | 'rounded' | 'square'
 
-  /** What the place means: the brand where this says nothing. */
+  /** The point's color. Uses your primary color unless set. */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 

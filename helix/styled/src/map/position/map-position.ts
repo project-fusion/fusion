@@ -5,12 +5,11 @@ import { property } from 'lit/decorators.js'
 import { styles } from './map-position.css.js'
 
 /**
- * @summary Something moving on a map, drawn in the page's theme.
+ * @summary A moving point on a map, such as a vehicle or a person.
  *
  * @description
- * A point in the page's ink ringed in its surface, or in its `tone`, with a ring as wide as the
- * position is uncertain, and a beam and an arrow the way it is going. What
- * places it, and why only its description is heard, is the base class.
+ * Draws the position in your theme's foreground color with a surface-colored
+ * edge, or in a `tone`. A position with a heading is drawn as an arrow.
  *
  * @since 0.105.0
  * @status experimental
@@ -18,33 +17,29 @@ import { styles } from './map-position.css.js'
  * @aliases Current location, Live position, Tracker, You are here
  * @documentation https://fusion.dev/helix/components/map
  *
- * @cssproperty --map-position-color - The wash around the point, its halo, beam and pulse, where no tone says it.
- * @cssproperty --map-position-edge - The ring around the point and the outline of its arrow: the surface, whatever the tone.
- * @cssproperty --map-position-fill - The point's body and its arrow's, where no tone says it.
- * @cssproperty --map-position-size - How wide the point is.
+ * @cssproperty --map-position-color - The color of the halo, direction cone, and pulse when no tone is set.
+ * @cssproperty --map-position-edge - The edge around the point and the arrow.
+ * @cssproperty --map-position-fill - The color of the point and the arrow when no tone is set.
+ * @cssproperty --map-position-size - The point's width.
  */
 @customElement('helix-map-position')
 export class HelixMapPosition extends HelixHeadlessMapPosition {
   /**
-   * How it stands off the map: absent is its edge, a halo and a little lift;
-   * `outlined` the edge alone, `elevated` the edge lifted, as an
-   * elevated card is, `filled` the halo with no edge, `plain` the bare point.
+   * How the point stands out from the map. Leave unset for an edge, a halo,
+   * and a small shadow. `outlined` has the edge only, `elevated` a larger
+   * shadow, `filled` the halo without an edge, and `plain` none of these.
    */
   @property({ reflect: true })
   separation?: 'elevated' | 'filled' | 'outlined' | 'plain'
 
   /**
-   * The point's shape, a circle where this says nothing. A position with a
-   * heading is drawn as its arrow whatever this says.
+   * The point's shape. A circle unless set. A position with a heading is
+   * always an arrow.
    */
   @property({ reflect: true })
   shape?: 'diamond' | 'ring' | 'rounded' | 'square'
 
-  /**
-   * What it is: the page's own two colors where this says nothing, apart
-   * from the brand the places are in; its body and its wash in the tone
-   * where this says one.
-   */
+  /** The position's color. Uses your theme's foreground color unless set. */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
