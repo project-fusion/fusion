@@ -206,6 +206,8 @@ export function MapsHero({
          talking. The route behind it is drawn quieter than the route ahead. */
       const walker = host.querySelector('helix-map-position')
       const route = host.querySelector<HelixMapRoute>('helix-map-route:not([variant])')
+      /* The walk's stops, in the order they are walked, the places off it after them. */
+      const walked = [...host.querySelectorAll('helix-map-marker')].slice(0, PLACES.length)
       const [setOff, arrive] = [
         ...host.querySelectorAll<HelixMapRoute>('helix-map-route[variant="dotted"]'),
       ]
@@ -273,6 +275,15 @@ export function MapsHero({
           if (arrive) {
             arrive.progress = behind(routeEnd, total)
           }
+          /* **The stops behind the walker are passed**, muted as the route
+             behind it is, and said so to a reader walking them; not the end,
+             whose pin only changes when it is reached, and which the walker
+             says it has. A new lap passes none. */
+          walked.forEach((marker, index) => {
+            const stop = stops[index]
+            marker.passed =
+              index < walked.length - 1 && stop !== undefined && covered > (along[stop] ?? 0)
+          })
           return at
         }
         const walkingTo = (at: number): string =>
