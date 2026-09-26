@@ -46,6 +46,7 @@ const BOOKKEEPING = new Set<PropertyKey>(['current', 'fanned', 'gathered', 'gath
  * @cssstate current - While this is the marker the map's tab stop is on.
  * @cssstate fanned - While this stands fanned out from a spot it shares with other places, a leg back to it, after its cluster was pressed.
  * @cssstate icon - While something is slotted into the point, which the point grows to hold.
+ * @cssstate passed - While the page says something traveling the map has passed this place, which the styled tier mutes.
  * @cssstate start - While the name sits before the point in reading order, turned there by the connector because the other side of the view had no room for it.
  */
 @customElement('helix-headless-map-marker')
@@ -118,12 +119,26 @@ export class HelixHeadlessMapMarker extends HelixElement {
   @property()
   name = ''
 
+  /**
+   * Whether something traveling the map has already passed this place, which
+   * the page says: a stop behind a walker or a delivery made. Drawn quieter,
+   * as the part of a route behind is, and said after the name, so a reader
+   * walking the places hears which are done.
+   */
+  @property({ type: Boolean })
+  passed = false
+
+  /** What is said after a passed place's name. */
+  @property({ attribute: 'passed-label' })
+  passedLabel = 'passed'
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('cluster', this.gathered.length > 1)
     this.toggleState('clustered', this.gatheredBy !== undefined)
     this.toggleState('current', this.current)
     this.toggleState('fanned', this.fanned)
+    this.toggleState('passed', this.passed)
     this.toggleState('start', this.side === 'start')
     if (this.childrenKnown) {
       this.toggleState(
@@ -177,7 +192,7 @@ export class HelixHeadlessMapMarker extends HelixElement {
     const lang = cluster ? this.closest('[lang]')?.getAttribute('lang') || undefined : undefined
     return html`<span part="marker" role="button" tabindex=${this.current ? '0' : '-1'} ?hidden=${this.gatheredBy !== undefined}>
       <span part="point" aria-hidden="true">${cluster ? new Intl.NumberFormat(lang).format(this.gathered.length) : nothing}<slot name="icon" ?hidden=${cluster} @slotchange=${() => this.requestUpdate()}></slot></span>
-      <span part="label">${cluster ? new Intl.ListFormat(lang, { type: 'conjunction' }).format(this.gathered) : (this.label ?? '')}</span>
+      <span part="label">${cluster ? new Intl.ListFormat(lang, { type: 'conjunction' }).format(this.gathered) : this.passed ? `${this.label ?? ''}, ${this.passedLabel}` : (this.label ?? '')}</span>
     </span>`
   }
 }
