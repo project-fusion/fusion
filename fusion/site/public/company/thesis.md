@@ -41,8 +41,8 @@ that returns a number is the half worth building.
 ## Intelligent services
 
 [Fusion Studio](/company/services) is the practice: interface and intelligence work,
-delivered into your repository under your license, three offers with every price
-stated. The engagements we take are the ones whose deliverable feeds Helix or
+delivered into your repository under your license, in three offers. The
+engagements we take are the ones whose deliverable feeds Helix or
 Cortex, so the work compounds into the foundation instead of ending when the
 invoice does.
 

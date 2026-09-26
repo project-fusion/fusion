@@ -71,7 +71,7 @@ const PROSE: Route[] = [
     title: 'Thesis',
   },
   {
-    description: 'The services we offer, with their prices.',
+    description: 'The services we offer, and what you have at the end of each.',
     kind: 'page',
     path: '/company/services',
     priority: 0.7,
