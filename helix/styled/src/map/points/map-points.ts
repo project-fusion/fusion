@@ -8,7 +8,7 @@ import { styles } from './map-points.css.js'
  * @summary Many places on a map at once, drawn by the renderer in the page's theme.
  *
  * @description
- * The colors are the whole of this tier: the brand's fill by default and a
+ * The colors and the walk's ring are this tier: the brand's fill by default and a
  * `tone` where the points mean something, each a fill a count is written on
  * in white and edged in the surface, which the connector reads off this
  * element and hands to the renderer. What draws them, and why the frame names

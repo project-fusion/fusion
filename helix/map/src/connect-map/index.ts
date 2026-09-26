@@ -3,6 +3,7 @@ export type {
   MapBounds,
   MapConnection,
   MapDriver,
+  MapInView,
   MapLayerEvents,
   MapLayerSpec,
   MapPadding,

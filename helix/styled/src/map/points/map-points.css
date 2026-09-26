@@ -7,8 +7,65 @@
 :host {
   border-color: var(--map-points-casing-color, var(--helix-color-surface));
   color: var(--map-points-color, var(--helix-color-primary-surface));
-  display: none;
+  /* **A box of no size at the map's corner**, the buttons for the points in
+     view stood from it by the connector, the way a marker is stood from it.
+     `left` and not `inset-inline-start`, for the marker's reason. */
+  block-size: 0;
+  display: block;
+  inline-size: 0;
+  inset-block-start: 0;
+  left: 0;
   outline-color: var(--map-points-ink, var(--helix-color-foreground-on-accent));
+  pointer-events: none;
+  position: absolute;
+}
+
+/* **A button on each point in view, invisible until focused.** The renderer
+   draws the point and takes the pointer; this is where the keyboard stands,
+   ringed in the focus ring when it does, a count's ring as wide as a count. */
+[part~="place"] {
+  block-size: var(--helix-size-control-sm);
+  border-radius: var(--helix-radii-full);
+  inline-size: var(--helix-size-control-sm);
+  left: var(--_map-place-x);
+  outline: none;
+  position: absolute;
+  top: var(--_map-place-y);
+  translate: -50% -50%;
+}
+
+[part~="count"] {
+  block-size: var(--helix-size-control-lg);
+  inline-size: var(--helix-size-control-lg);
+}
+
+[part~="place"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* **The name, beside the ring while it is focused**, as a marker's is, and
+   hidden by opacity rather than taken out: it is the button's name. */
+[part="label"] {
+  background: var(--helix-color-surface-overlay);
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  inset-inline-start: calc(100% + var(--helix-space-sm));
+  opacity: 0;
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  white-space: nowrap;
+}
+
+[part~="place"]:focus-visible [part="label"] {
+  opacity: 1;
 }
 
 :host([tone="accent"]) {

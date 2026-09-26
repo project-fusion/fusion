@@ -1,4 +1,4 @@
-import type { MapDriver, MapLayerSpec, MapPadding } from '../connect-map/connect-map.js'
+import type { MapDriver, MapInView, MapLayerSpec, MapPadding } from '../connect-map/connect-map.js'
 import type { MapMotion } from '../motion/motion.js'
 import { colorsNow, type MapColors, mapColorsFrom, PATIENCE } from '../style/map-colors.js'
 import { watchTheme } from '../theme/watch-theme.js'
@@ -277,11 +277,11 @@ export interface MapLibreMap {
   /** The arrow-key handler MapLibre adds unless told not to. */
   keyboard: { disable(): void; enable(): void; isEnabled(): boolean }
   off(
-    type: 'click' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type: 'click' | 'idle' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
     listener: (event?: MapLibreEvent) => void,
   ): unknown
   on(
-    type: 'click' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type: 'click' | 'idle' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
     listener: (event?: MapLibreEvent) => void,
   ): unknown
   removeLayer(id: string): unknown
@@ -506,6 +506,77 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
        pace for a trip; **a press on a point is the page's**, told through the
        connector. What is under the pointer is asked in a box a finger wide,
        since a point is a few pixels across. */
+    /* **A count comes apart where it is**, zoomed in to the zoom MapLibre
+       says it does at, over the page's pace for a trip. */
+    const expand = (id: string, cluster: number, center?: [number, number]): void => {
+      const at =
+        center ??
+        (map
+          .queryRenderedFeatures(
+            [
+              [0, 0],
+              [map.getCanvas().clientWidth, map.getCanvas().clientHeight],
+            ],
+            { layers: [`${pointsSource(id)}-clusters`].filter((layer) => map.getLayer(layer)) },
+          )
+          .find((one) => one.properties?.cluster_id === cluster)?.geometry.coordinates as
+          | [number, number]
+          | undefined)
+      if (!at) {
+        return
+      }
+      void map
+        .getSource(pointsSource(id))
+        ?.getClusterExpansionZoom?.(cluster)
+        .then((zoom) => {
+          const motion = events?.motion() ?? null
+          if (motion) {
+            map.easeTo({ center: at, zoom, ...animation(motion) })
+          } else {
+            map.jumpTo({ center: at, zoom })
+          }
+        })
+    }
+    /* **What is drawn in view, each once**: a tile boundary can draw one
+       point or count twice, and the walk takes it once. */
+    const inView = (id: string): MapInView[] => {
+      const layers = [`${pointsSource(id)}-clusters`, `${pointsSource(id)}-points`].filter(
+        (layer) => map.getLayer(layer),
+      )
+      if (layers.length === 0) {
+        return []
+      }
+      const canvas = map.getCanvas()
+      const seen = new Set<string>()
+      return map
+        .queryRenderedFeatures(
+          [
+            [0, 0],
+            [canvas.clientWidth, canvas.clientHeight],
+          ],
+          { layers },
+        )
+        .flatMap((one): MapInView[] => {
+          const cluster = one.properties?.cluster_id
+          const at = one.properties?.at
+          const key =
+            typeof cluster === 'number' ? `c:${cluster}` : typeof at === 'number' ? `p:${at}` : ''
+          const coordinates = one.geometry.coordinates
+          if (key === '' || seen.has(key) || !Array.isArray(coordinates)) {
+            return []
+          }
+          seen.add(key)
+          const [lng, lat] = coordinates as [number, number]
+          return [
+            typeof cluster === 'number'
+              ? { cluster, count: Number(one.properties?.point_count ?? 0), place: { lat, lng } }
+              : { at: at as number, place: { lat, lng } },
+          ]
+        })
+    }
+    const settled = (): void => {
+      events?.settled?.()
+    }
     const hit = (event?: MapLibreEvent) => {
       if (!event?.point || drawnPoints.size === 0) {
         return undefined
@@ -533,17 +604,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       const cluster = found.properties?.cluster_id
       if (typeof cluster === 'number') {
         const [lng, lat] = found.geometry.coordinates as [number, number]
-        void map
-          .getSource(pointsSource(id))
-          ?.getClusterExpansionZoom?.(cluster)
-          .then((zoom) => {
-            const motion = events?.motion() ?? null
-            if (motion) {
-              map.easeTo({ center: [lng, lat], zoom, ...animation(motion) })
-            } else {
-              map.jumpTo({ center: [lng, lat], zoom })
-            }
-          })
+        expand(id, cluster, [lng, lat])
         return
       }
       const at = found.properties?.at
@@ -558,13 +619,17 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     map.on('load', restore)
     map.on('click', pressed)
     map.on('mousemove', pointing)
+    map.on('idle', settled)
     draw()
     return {
+      expand: (id, cluster) => expand(id, cluster),
+      inView,
       stop: () => {
         map.off('styledata', restore)
         map.off('load', restore)
         map.off('click', pressed)
         map.off('mousemove', pointing)
+        map.off('idle', settled)
         for (const id of drawnPoints.keys()) {
           takeOff(id)
         }
