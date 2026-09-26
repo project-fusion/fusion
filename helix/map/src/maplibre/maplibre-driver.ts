@@ -11,6 +11,7 @@ interface GeoJson {
       faded?: boolean
       kind: 'area' | 'route'
       label: string
+      pattern?: 'dotted'
     }
     type: 'Feature'
   }[]
@@ -66,8 +67,24 @@ export const LAYERS: MapLibreLayer[] = [
     source: SOURCE,
     type: 'line',
   },
+  /* **A dotted leg in a layer of its own**: MapLibre takes a dash pattern
+     per layer and not per line, so the dotted legs cannot share the solid
+     routes' layer. Dashes of no length with round caps are dots. */
   {
-    filter: ['==', ['get', 'kind'], 'route'],
+    filter: ['all', ['==', ['get', 'kind'], 'route'], ['==', ['get', 'pattern'], 'dotted']],
+    id: 'helix-route-dots',
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': ['get', 'color'],
+      'line-dasharray': [0, 2],
+      'line-opacity': ['case', ['boolean', ['get', 'faded'], false], 0.4, 1],
+      'line-width': ['interpolate', ['linear'], ['zoom'], 4, 2.5, 14, 5],
+    },
+    source: SOURCE,
+    type: 'line',
+  },
+  {
+    filter: ['all', ['==', ['get', 'kind'], 'route'], ['!=', ['get', 'pattern'], 'dotted']],
     id: 'helix-routes',
     layout: { 'line-cap': 'round', 'line-join': 'round' },
     /* The part of a route already traveled, quieter than the part ahead. */
@@ -94,6 +111,7 @@ export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
         ...(layer.casing ? { casing: layer.casing } : {}),
         color: layer.color,
         ...(layer.faded ? { faded: true } : {}),
+        ...(layer.pattern ? { pattern: layer.pattern } : {}),
         kind: layer.kind,
         label: layer.label,
       },
