@@ -13,7 +13,7 @@ import { property } from 'lit/decorators.js'
 import { HelixHeadlessRadio } from '../root/radio-root.js'
 
 /**
- * @summary A set of choices where exactly one is the answer.
+ * @summary A set of radios where exactly one can be chosen.
  *
  * @description
  * **The group is the control, and the radios are its options.** This is the
@@ -41,25 +41,25 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * @documentation https://fusion.dev/helix/components/radio
  *
  * @slot - The radios.
- * @slot hint - Richer than a string.
- * @slot label - Richer than a string, where the question is more than one.
+ * @slot hint - The help text under the group, for content richer than a string.
+ * @slot label - The group's label, for a question that needs more than a string.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the answer changes, and cancelable.
- * @event {HelixSelectEvent} helix-select - Fired when an answer is chosen. Dispatched by the radio and listened for here, because the group is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the choice changes. Cancelable: call `preventDefault()` to keep the current choice.
+ * @event {HelixSelectEvent} helix-select - Fired when a radio is chosen. The radio sends it, and you listen for it on the group. Cancelable: call `preventDefault()` to keep the current choice.
+ * @event {Event} input - Fired after the value changes.
  *
- * @csspart feedback - What is wrong with it.
- * @csspart hint - Help under the set.
- * @csspart items - The choices, which is what `orientation` lays out.
- * @csspart label - The question, over the set.
+ * @csspart feedback - The error message under the group.
+ * @csspart hint - The help text under the group.
+ * @csspart items - The container of the choices, laid out by `orientation`.
+ * @csspart label - The label above the group.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The group has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-radio-group')
 export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
   /**
-   * Which way the choices run. A column reads one line per answer.
+   * The direction the choices run. `vertical` puts one choice on each line.
    *
    * **Optional rather than defaulted, which is not a style preference.** A
    * reflecting property with a default writes its attribute onto every host the

@@ -3,8 +3,7 @@ import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary Labels and their values, read as pairs: the details panel every
- * product has.
+ * @summary A list of labels and their values, such as a details panel.
  *
  * @description
  * "Owner: Ada, Region: us-east, Created: 3 days ago" is the commonest panel in

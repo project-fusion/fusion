@@ -44,26 +44,26 @@ import { property } from 'lit/decorators.js'
  * @aliases Range, Range input
  * @documentation https://fusion.dev/helix/components/slider
  *
- * @event {Event} change - Relayed once the reader has let go.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes, and cancelable.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Fired when the user releases the thumb.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes. Cancelable: call `preventDefault()` to keep the current value.
+ * @event {Event} input - Fired after the value changes.
  *
  * @csspart control - The range input.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The row: the control and its readout.
- * @csspart hint - Help under the track, while nothing is wrong.
- * @csspart label - The question, over the track.
- * @csspart marker - One mark.
+ * @csspart feedback - The error message under the track.
+ * @csspart field - The row that holds the control and its readout.
+ * @csspart hint - The help text under the track, shown while there is no error.
+ * @csspart label - The label above the track.
+ * @csspart marker - One mark on the track.
  * @csspart marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart markers - The row of marks along the track.
- * @csspart output - The current value, shown beside it.
+ * @csspart output - The current value, shown beside the track.
  *
  * @cssproperty --slider-fraction - The value as a fraction of the range, 0 to 1.
  * @cssproperty --slider-from - Where a range's filled span starts, as a fraction of the track, 0 to 1.
  * @cssproperty --slider-marker-at - Where one marker sits, as a percentage of the track.
  * @cssproperty --slider-to - Where a range's filled span ends, as a fraction of the track, 0 to 1.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The slider has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-slider')
 export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -80,7 +80,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   protected override readonly announcesInput = true
 
   /**
-   * Whether each mark says which value it stands at.
+   * Shows the value at each mark.
    */
   @property({ attribute: 'marker-labels', reflect: true, type: Boolean })
   markerLabels = false
@@ -104,13 +104,13 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   markers = 0
 
   /**
-   * The largest value the reader can choose.
+   * The largest value that can be chosen.
    */
   @property({ type: Number })
   max = 100
 
   /**
-   * What the upper thumb of a range is called, after the slider's own label.
+   * The name of a range's upper thumb, read after the slider's label.
    *
    * **Named with the label rather than instead of it.** Each thumb was
    * `aria-label="${label} maximum"`, which overrode the `<label>` and read the
@@ -122,17 +122,17 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   maximumLabel = 'maximum'
 
   /**
-   * The smallest value the reader can choose.
+   * The smallest value that can be chosen.
    */
   @property({ type: Number })
   min = 0
 
-  /** What the lower thumb of a range is called, after the slider's own label. */
+  /** The name of a range's lower thumb, read after the slider's label. */
   @property({ attribute: 'minimum-label' })
   minimumLabel = 'minimum'
 
   /**
-   * Which way the track runs, `vertical` standing it on end.
+   * The direction the track runs. `vertical` stands it on end.
    *
    * For a level rather than a quantity: a fader, a channel, anything a reader
    * pictures as high and low rather than as less and more. Absent is
@@ -147,7 +147,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   orientation?: 'horizontal' | 'vertical'
 
   /**
-   * Whether there are two thumbs and the value is a pair.
+   * Adds a second thumb, so the value is a pair.
    *
    * The pair is one string, `"10,50"`, which is what a form submits and what
    * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
@@ -157,7 +157,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   range = false
 
   /**
-   * Whether the chosen value is shown beside the track.
+   * Shows the chosen value beside the track.
    */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
@@ -378,7 +378,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     this.sync()
   }
 
-  /** How far one press of an arrow key moves it. */
+  /** How far one press of an arrow key moves the thumb. */
   @property({ type: Number })
   step = 1
 

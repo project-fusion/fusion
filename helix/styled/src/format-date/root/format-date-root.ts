@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './format-date-root.css.js'
 
 /**
- * @summary A timestamp, written the way the reader's locale writes one.
+ * @summary A timestamp, formatted for the user's locale.
  *
  * @description
  * The base tier does the reading; this adds the one thing a design system has to

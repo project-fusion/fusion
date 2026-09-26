@@ -38,13 +38,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The item's label.
  * @slot children - Nested items, which make this a branch.
- * @slot end - After the label, at the row's far side. A count, or a state.
- * @slot start - Before the label, after the chevron. A mark about the item.
+ * @slot end - Content after the label, at the far side of the row, such as a count or a state.
+ * @slot start - Content before the label and after the chevron, such as a mark for the item.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before a branch closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before a branch opens, and cancelable.
- * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {HelixSelectEvent} helix-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
+ * @event {Event} toggle - Sent when the branch opens or closes, with `newState` and `oldState`.
  *
  * @csspart group - The container for nested items.
  * @csspart item - The node, and the focus target unless `href` moves it to the row.
@@ -60,7 +60,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-tree-item')
 export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   /**
-   * Where this node goes, which makes its row a real link.
+   * The URL this node links to. Setting it makes the row a link.
    *
    * Unset by default, and unreflected: a tree of choosable nodes is not a tree
    * of links, and an empty `href` written onto every row would be a link to the
@@ -70,7 +70,8 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   href = ''
 
   /**
-   * Depth from the root, counted by the tree so indentation needs no CSS nesting.
+   * The node's depth from the root. The tree counts it, so indentation needs no
+   * nested CSS.
    *
    * **Read rather than written, and no attribute at all.** The tree counts the
    * items a row sits inside and assigns this on every sync, so a value declared
@@ -92,7 +93,8 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   level?: number
 
   /**
-   * What the link declares about where it goes.
+   * The link's `rel` value, which describes how the linked page relates to this
+   * one.
    *
    * Set by the consumer rather than derived from `target`: `noreferrer` is a
    * decision about their own analytics and a component should not make it for
@@ -117,13 +119,13 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   selected = false
 
   /**
-   * Where the link opens, for the rare row that leaves the site.
+   * Where the link opens. Use it for a row that leaves the site.
    */
   @property()
   target = ''
 
   /**
-   * Identifies the item to the consumer, carried in `helix-select`.
+   * Identifies the item to your code. It is sent in `helix-select`.
    */
   @property()
   value = ''
@@ -184,13 +186,13 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
       ?.focus({ preventScroll: true })
   }
 
-  /** Selects this node and announces it. */
+  /** Selects this node and sends `helix-select`. */
   select(): void {
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
   /**
-   * Chooses this node the way a reader does, from a press or from Enter.
+   * Chooses this node, as a press or Enter does.
    *
    * Selecting and following are two things and this is where they meet, so the
    * pointer and the keyboard take one path to the same end. The tree calls this

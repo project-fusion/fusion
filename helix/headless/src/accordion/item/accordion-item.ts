@@ -41,25 +41,25 @@ const TRIGGER_ID = 'trigger'
  * @aliases Collapsible, Expander, Disclosure
  * @documentation https://fusion.dev/helix/components/accordion
  *
- * @slot - The content revealed when open.
- * @slot summary - The always-visible trigger content.
+ * @slot - The content shown when the section is open.
+ * @slot summary - The text of the button that opens and closes the section. Always shown.
  *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the section closes, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the section opens. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeCloseEvent} helix-before-close - The section is about to close. Cancelable: cancel it to keep it open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - The section is about to open. Cancelable: cancel it to keep it closed.
+ * @event {Event} toggle - The section opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart chevron - The open and close indicator.
  * @csspart container - The outer wrapper.
- * @csspart content - The revealed region.
+ * @csspart content - The region that holds the content.
  * @csspart content-inner - The clipping box inside the animated region.
- * @csspart trigger - The clickable summary row.
+ * @csspart trigger - The button that opens and closes the section, holding the summary.
  *
  * @cssstate open - While the item is open.
  */
 @customElement('helix-headless-accordion-item')
 export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement) {
   /**
-   * Where the open indicator sits, or whether there is one.
+   * Where the chevron sits, or `none` for no chevron.
    *
    * `auto` resolves to `end`, which is where a reader scanning a list of
    * summaries expects it: the label starts at the same x on every row, and the
@@ -82,7 +82,8 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
   }
 
   /**
-   * A group name, which is how `<details>` says a set is exclusive.
+   * A group name. Opening an item closes the other items with the same name,
+   * as `<details name>` does.
    *
    * **Two ways of saying the same thing, and the platform's one does not need a
    * parent.** An accordion's `mode` makes its own children exclusive, which

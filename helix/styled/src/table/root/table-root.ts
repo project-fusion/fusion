@@ -6,7 +6,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './table-root.css.js'
 
 /**
- * @summary Tabular data laid out on a grid.
+ * @summary A table of data, laid out on a grid.
  *
  * @description
  * Hairline rules between rows and no fill, per the rule that depth comes from a
@@ -20,10 +20,10 @@ import { styles } from './table-root.css.js'
  *
  * @slot - The table's rows.
  *
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
+ * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart table - The grid.
  *
- * @cssproperty --table-columns - Track list for the columns, which wins over the one the columns worked out.
+ * @cssproperty --table-columns - Track list for the columns. It overrides the track list worked out from the columns.
  */
 @customElement('helix-table')
 export class HelixTable extends HelixHeadlessTable {

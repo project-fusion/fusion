@@ -4,8 +4,8 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './skip-link-root.css.js'
 
 /**
- * @summary The first stop on a page, which moves the reader past everything
- * repeated on every page.
+ * @summary A link at the start of a page that moves keyboard focus past the
+ * header to the main content.
  *
  * @description
  * Out of sight until the keyboard reaches it, then in the corner of the
@@ -28,12 +28,12 @@ import { styles } from './skip-link-root.css.js'
  * @aliases Skip navigation, Skip to content
  * @documentation https://fusion.dev/helix/components/skip-link
  *
- * @cssproperty --skip-link-border-color - Color of the revealed link's edge.
- * @cssproperty --skip-link-border-width - Width of the revealed link's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the link is told apart by its lift unless a
- *   theme says otherwise.
- * @cssproperty --skip-link-shadow - Lift under the revealed link. Follows
- *   `--helix-shadow-floating`, since it sits over whatever the page has at its corner.
+ * @cssproperty --skip-link-border-color - The border color of the link while it is shown.
+ * @cssproperty --skip-link-border-width - The border width of the link while it is shown. Follows
+ *   `--helix-border-floating`, which is `0`, so the link is set apart by its shadow unless a
+ *   theme sets a border.
+ * @cssproperty --skip-link-shadow - The shadow under the link while it is shown. Follows
+ *   `--helix-shadow-floating`, because the link sits over the corner of the page.
  */
 @customElement('helix-skip-link')
 export class HelixSkipLink extends HelixHeadlessSkipLink {

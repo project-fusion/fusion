@@ -3,7 +3,7 @@ import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary One measurement, with the word for what it measures.
+ * @summary One measurement, with a label that names what it measures.
  *
  * @description
  * Label first in the markup and the value after it, which is the reading order
@@ -23,7 +23,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The value.
  * @slot label - What the value measures.
- * @slot unit - The unit, set beside the value.
+ * @slot unit - The unit, shown beside the value.
  */
 @customElement('helix-headless-stat')
 export class HelixHeadlessStat extends HelixElement {

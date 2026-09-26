@@ -20,7 +20,7 @@ import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 
 /**
- * @summary A series over time as a line, read from a table.
+ * @summary A chart that draws series over time as lines, read from a table.
  *
  * @description
  * The chart for a shape rather than for a quantity, which is what decides the
@@ -59,13 +59,13 @@ import '../../tooltip/index.js'
  * @documentation https://fusion.dev/helix/components/line-chart
  *
  * @csspart area - The wash under one line, where `area` is set.
- * @csspart band - The slot the pointer is resting in.
+ * @csspart band - The band around the reading under the pointer.
  * @csspart baseline - The rule at zero, where zero is inside the range.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart guide - A rule down the reading a pointer is resting on.
  * @csspart label - One reading's name.
  * @csspart labels - The row of reading names.
- * @csspart line - One series.
+ * @csspart line - The line for one series.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
  * @csspart svg - The drawing surface the lines and areas sit on.
@@ -92,8 +92,8 @@ import '../../tooltip/index.js'
 @customElement('helix-headless-line-chart')
 export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   /**
-   * Whether a wash is drawn under each line, each from the floor on its own.
-   * The washes overlap rather than add up: for parts that make a total, use
+   * Draws a wash under each line, down to the floor of the plot. The washes
+   * overlap and do not add up, so for parts that make a total, use
    * `Area Chart`, which stacks them.
    *
    * Absent is lines alone, which is what suits more than one series: washes
@@ -211,7 +211,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   }
 
   /**
-   * Whether zero is forced into the range.
+   * Whether the range always includes zero.
    *
    * Absent measures from the data's own extent, which is what a line is for.
    * Set it where the distance from nothing is the point rather than the shape,

@@ -7,7 +7,7 @@ import { styles } from './notification.css.js'
 import '../../format-date/index.js'
 
 /**
- * @summary One thing that happened, which a reader may not have seen yet.
+ * @summary A single notification about something that happened, marked read or unread.
  *
  * @description
  * A four-column grid: media, body, actions, dismiss.
@@ -37,39 +37,39 @@ import '../../format-date/index.js'
  * @category feedback
  * @documentation https://fusion.dev/helix/components/notifications
  *
- * @slot - What happened, in the consumer's own markup.
- * @slot actions - What a reader can do about it.
+ * @slot - What happened, in your own markup.
+ * @slot actions - Actions the user can take on the notification.
  * @slot media - An avatar or icon identifying who or what it came from.
  *
- * @csspart controls - The actions and the dismiss, which replace the time.
- * @csspart dismiss - The control that removes it.
- * @csspart dismiss-mark - The glyph on that control, where none is slotted.
+ * @csspart controls - The actions and the dismiss control, shown in place of the time.
+ * @csspart dismiss - The control that dismisses the notification.
+ * @csspart dismiss-mark - The icon on the dismiss control, when no icon is slotted.
  * @csspart item - The whole notification.
  * @csspart time - When it happened.
  * @csspart trailing - The column holding the time and the controls.
  *
- * @cssproperty --notifications-color - Ink in an item that has been read.
- * @cssproperty --notifications-dismiss-color - Ink on the control that removes an item, which is `danger` because removing one is the end of it.
+ * @cssproperty --notifications-color - Text color in a read item.
+ * @cssproperty --notifications-dismiss-color - Color of the dismiss control. It is `danger`, because dismissing an item removes it for good.
  * @cssproperty --notifications-item-edge - Color of a carded row's border.
  * @cssproperty --notifications-item-fill - Fill behind a `filled` row.
- * @cssproperty --notifications-item-gap - Space between carded rows, which replaces the hairline.
+ * @cssproperty --notifications-item-gap - Space between carded rows, which have no hairline.
  * @cssproperty --notifications-item-radius - Corner radius of a carded row.
  * @cssproperty --notifications-padding-block - Space above and below an item.
  * @cssproperty --notifications-padding-inline - Space either side of an item.
  * @cssproperty --notifications-rule - The hairline between items.
- * @cssproperty --notifications-unread-block-size - How long that mark is.
- * @cssproperty --notifications-unread-inline-size - How thick that mark is.
- * @cssproperty --notifications-unread-inset - How far it sits from the row's leading edge.
+ * @cssproperty --notifications-unread-block-size - Length of the unread mark.
+ * @cssproperty --notifications-unread-inline-size - Thickness of the unread mark.
+ * @cssproperty --notifications-unread-inset - Distance from the unread mark to the row's leading edge.
  * @cssproperty --notifications-unread-mark - Color of the edge mark on an unread item.
- * @cssproperty --notifications-unread-offset - How far it sits from the row's top.
- * @cssproperty --notifications-unread-radius - Its corner radius, which is what turns it into a dot.
+ * @cssproperty --notifications-unread-offset - Distance from the unread mark to the row's top edge.
+ * @cssproperty --notifications-unread-radius - Corner radius of the unread mark, which can turn it into a dot.
  */
 @customElement('helix-notification')
 export class HelixNotification extends HelixHeadlessNotification {
   static override tier = 'helix-'
 
   /**
-   * How a row is told apart from the one above it.
+   * How a row is separated from the one above it.
    *
    * `plain` is the resting one and is a hairline and nothing else: the row has
    * no box of its own, and what separates it is a line the list draws between

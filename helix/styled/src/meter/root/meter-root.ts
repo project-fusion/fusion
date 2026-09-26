@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './meter-root.css.js'
 
 /**
- * @summary A measurement in a known range, and whether it is where you want it.
+ * @summary A measurement in a known range, with optional bands that mark it good, fair, or poor.
  *
  * @description
  * The bar `Progress` draws, at twice the height and on the house corner rather
@@ -42,27 +42,27 @@ import { styles } from './meter-root.css.js'
  * @aliases Gauge, Level, Capacity
  * @documentation https://fusion.dev/helix/components/meter
  *
- * @csspart indicator - The part of it the value fills.
- * @csspart indicator-fair - The fill while the reading is in a band beside the good one, beside `indicator`.
- * @csspart indicator-good - The fill while the reading is in the good band, beside `indicator`.
- * @csspart indicator-over - The fill while the value is past the top, beside `indicator`.
- * @csspart indicator-poor - The fill while the reading is two bands from the good one, beside `indicator`.
- * @csspart indicator-under - The fill while the value is below the floor, beside `indicator`.
+ * @csspart indicator - The part of the track the value fills.
+ * @csspart indicator-fair - The fill while the reading is in a band next to the good band. Set alongside `indicator`.
+ * @csspart indicator-good - The fill while the reading is in the good band. Set alongside `indicator`.
+ * @csspart indicator-over - The fill while the value is above `max`. Set alongside `indicator`.
+ * @csspart indicator-poor - The fill while the reading is two bands from the good band. Set alongside `indicator`.
+ * @csspart indicator-under - The fill while the value is below `min`. Set alongside `indicator`.
  * @csspart tick - A mark at `low` or at `high`.
  * @csspart track - The whole range.
- * @csspart value - The reading, under `show-value`.
+ * @csspart value - The reading as text, shown when `show-value` is set.
  *
- * @cssproperty --meter-color - The fill, overriding the band's own tone.
- * @cssproperty --meter-ring-size - Edge length of the drawing, in `ring` and `arc`.
- * @cssproperty --meter-ring-width - Thickness of the stroke there.
- * @cssproperty --meter-size - How thick the bar is.
- * @cssproperty --meter-tick-color - The mark at a threshold.
- * @cssproperty --meter-track-color - The groove behind the fill.
+ * @cssproperty --meter-color - The fill color. Overrides the band's tone.
+ * @cssproperty --meter-ring-size - The width and height of the drawing in `ring` and `arc`.
+ * @cssproperty --meter-ring-width - The thickness of the stroke in `ring` and `arc`.
+ * @cssproperty --meter-size - The thickness of the bar.
+ * @cssproperty --meter-tick-color - The color of the mark at each threshold.
+ * @cssproperty --meter-track-color - The color of the groove behind the fill.
  */
 @customElement('helix-meter')
 export class HelixMeter extends HelixHeadlessMeter {
   /**
-   * How much ink the reading claims.
+   * How strongly the reading is drawn. `subtle` draws it as a wash of its color.
    *
    * `subtle` is the reading as a wash of its own color: still legible, no longer
    * the loudest thing in the region. The case is a dashboard of several meters

@@ -3,7 +3,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary A named run of options inside a listbox.
+ * @summary A labeled group of options inside a listbox.
  *
  * @description
  * A heading over a set, and nothing else: it holds no selection and no value,
@@ -19,16 +19,16 @@ import { property } from 'lit/decorators.js'
  * @aliases OptGroup, Section
  * @documentation https://fusion.dev/helix/components/option
  *
- * @slot - The options in this run.
- * @slot label - Richer than a string.
+ * @slot - The options in the group.
+ * @slot label - The group's heading, for a heading that needs more than plain text.
  *
- * @csspart items - The run itself.
+ * @csspart items - The element that holds the group's options.
  * @csspart label - The heading.
  */
 @customElement('helix-headless-option-group')
 export class HelixHeadlessOptionGroup extends HelixElement {
   /**
-   * The heading over the run.
+   * The heading above the group's options.
    */
   @property()
   label = ''

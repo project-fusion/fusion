@@ -16,7 +16,7 @@ import { property, state } from 'lit/decorators.js'
 const GENERIC = new Set(['div', 'p', 'section', 'span'])
 
 /**
- * @summary A short description that appears beside what it describes.
+ * @summary A short text that appears next to an element on hover and focus.
  *
  * @description
  * The trigger is slotted and stays the consumer's own element. The bubble is
@@ -57,24 +57,24 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @aliases Hint, Popup label
  * @documentation https://fusion.dev/helix/components/tooltip
  *
- * @slot - The trigger.
- * @slot content - The bubble's content, when `content` is not enough. Anything
- * slotted here replaces the property, which is this slot's fallback.
+ * @slot - The trigger: the element the tooltip describes.
+ * @slot content - Rich content for the bubble. It replaces the `content`
+ * property.
  *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it hides, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the bubble shows, and cancelable.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeCloseEvent} helix-before-close - The bubble is about to hide. Cancelable: cancel it to keep it shown.
+ * @event {HelixBeforeOpenEvent} helix-before-open - The bubble is about to show. Cancelable: cancel it to keep it hidden.
+ * @event {Event} toggle - The bubble opened or closed. The event carries `newState` and `oldState`.
  *
- * @csspart arrow - The point, resting against the trigger.
- * @csspart arrow-bottom - The point while the bubble is below its trigger, so on the bubble's top edge, beside `arrow`.
- * @csspart arrow-left - The point while the bubble is left of its trigger, so on the bubble's right edge, beside `arrow`.
- * @csspart arrow-right - The point while the bubble is right of its trigger, so on the bubble's left edge, beside `arrow`.
- * @csspart arrow-top - The point while the bubble is above its trigger, so on the bubble's bottom edge, beside `arrow`.
+ * @csspart arrow - The arrow that points at the trigger.
+ * @csspart arrow-bottom - Added to `arrow` while the bubble is below its trigger, with the arrow on the bubble's top edge.
+ * @csspart arrow-left - Added to `arrow` while the bubble is left of its trigger, with the arrow on the bubble's right edge.
+ * @csspart arrow-right - Added to `arrow` while the bubble is right of its trigger, with the arrow on the bubble's left edge.
+ * @csspart arrow-top - Added to `arrow` while the bubble is above its trigger, with the arrow on the bubble's bottom edge.
  * @csspart tooltip - The bubble.
- * @csspart tooltip-bottom - The bubble while it is below its trigger, beside `tooltip`.
- * @csspart tooltip-left - The bubble while it is left of its trigger, beside `tooltip`.
- * @csspart tooltip-right - The bubble while it is right of its trigger, beside `tooltip`.
- * @csspart tooltip-top - The bubble while it is above its trigger, beside `tooltip`.
+ * @csspart tooltip-bottom - Added to `tooltip` while the bubble is below its trigger.
+ * @csspart tooltip-left - Added to `tooltip` while the bubble is left of its trigger.
+ * @csspart tooltip-right - Added to `tooltip` while the bubble is right of its trigger.
+ * @csspart tooltip-top - Added to `tooltip` while the bubble is above its trigger.
  *
  * @cssstate open - While the tooltip shows.
  * @cssstate placed-bottom - While the bubble sits below its trigger.
@@ -111,13 +111,14 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   delayOut = 100
 
   /**
-   * Whether the tooltip never shows.
+   * Stops the tooltip from showing.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
   /**
-   * The id of the element this describes, in this tooltip's own tree.
+   * The id of the element the tooltip describes, in the same document or shadow
+   * root as the tooltip.
    *
    * Set it and the tooltip stops wrapping: it renders no trigger, listens on
    * the element it names, and points its bubble there. Leave it unset and the
@@ -139,7 +140,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   for = ''
 
   /**
-   * Space between the trigger and the point of the bubble, in pixels.
+   * The space between the trigger and the tip of the bubble, in pixels.
    *
    * **Measured from the point, which is what the arrow being back changed.**
    * The arrow is drawn half outside the bubble, so a gap measured to the
@@ -153,7 +154,8 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   offset = 8
 
   /**
-   * Whether the bubble survives the trigger being used.
+   * Keeps the bubble open when the trigger is used, such as a copy button whose
+   * tooltip changes to "Copied".
    *
    * **Activation takes a tooltip down, because a hint about what a control will
    * do is spent once the control has done it.** That is right for a gear that
@@ -172,7 +174,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   persist = false
 
   /**
-   * Preferred side.
+   * The side to show the bubble on.
    *
    * It moves if that side does not fit.
    */
@@ -180,7 +182,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   placement: Placement = 'top'
 
   /**
-   * The id of a box to keep the bubble inside, instead of the viewport.
+   * The id of a box to keep the bubble inside. Defaults to the viewport.
    *
    * Resolved the way `for` is, so an id in the same tree, which is what lets a
    * component name a box in its own shadow root. A chart does: its bubble is
@@ -240,7 +242,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   }
 
   /**
-   * Places the bubble again, for an anchor that moved without the page moving.
+   * Positions the bubble again, for a trigger that moved while the page did not.
    *
    * Public because a chart needs it. Its mark walks from reading to reading
    * while the page holds still, and `autoUpdate` watches scrolling, resizing
@@ -418,7 +420,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     this.requestUpdate()
   }
 
-  /** Shows the bubble, unless there is nothing to show. */
+  /** Shows the bubble, if it has content. */
   show(): void {
     clearTimeout(this.timer)
     if (this.disabled || !this.hasContent || this.open) {
@@ -432,7 +434,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   }
 
   /**
-   * Closes the bubble, and cancels a show that had not happened yet.
+   * Hides the bubble, and cancels a pending show.
    *
    * The timer matters as much as the state: a pointer that arrives and leaves
    * inside the delay left one queued, and the tooltip appeared over whatever

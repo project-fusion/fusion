@@ -12,7 +12,7 @@ import { property, state } from 'lit/decorators.js'
 type Row = Record<string, string>
 
 /**
- * @summary Renders the rows of a long set that are on screen, and no others.
+ * @summary A list that renders only the rows of a long set that are on screen.
  *
  * @description
  * **The set arrives as data, which is what makes this a virtual list rather
@@ -42,14 +42,14 @@ type Row = Record<string, string>
  * @category layout
  * @documentation https://fusion.dev/helix/components/virtual-list
  *
- * @csspart after - The space standing in for rows below the window.
- * @csspart before - The space standing in for rows above the window.
- * @csspart viewport - The scrolling box. Needs a block size on this tier, and nothing else.
+ * @csspart after - The space that stands in for the rows below the rendered ones.
+ * @csspart before - The space that stands in for the rows above the rendered ones.
+ * @csspart viewport - The scrolling box. On this tier, it needs only a block size.
  */
 @customElement('helix-headless-virtual-list')
 export class HelixHeadlessVirtualList extends HelixElement {
   /**
-   * How tall one row is, in pixels, used to map scroll offset to an index.
+   * The height of one row, in pixels, used to find the row at a scroll offset.
    *
    * An estimate rather than a measurement while `measured` is off, which is
    * right whenever the rows really are one height and is the cheaper of the two.
@@ -58,19 +58,21 @@ export class HelixHeadlessVirtualList extends HelixElement {
   estimate = 32
 
   /**
-   * Id of the element holding the rows, as JSON in a script.
+   * The id of the script element that holds the rows as JSON.
    */
   @property()
   for = ''
 
   /**
-   * What the list is called, since the rendered rows are only a window on it.
+   * The list's name, read by screen readers, because only some of its rows
+   * are rendered at a time.
    */
   @property()
   label = ''
 
   /**
-   * Places rows by what they came to rather than by `estimate`.
+   * Places rows by their measured height. Without it, every row is placed by
+   * `estimate`.
    *
    * **Off by default, because the straight line is better when it holds.** One
    * estimate makes offset and index convert by division, which can never

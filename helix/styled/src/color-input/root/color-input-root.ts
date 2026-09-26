@@ -12,7 +12,7 @@ import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.j
 import { styles } from './color-input-root.css.js'
 
 /**
- * @summary A color, typed in any syntax or picked from a panel.
+ * @summary A field for a color, typed in any syntax or picked from a panel.
  *
  * @description
  * The frame is the field rather than the input, so the trigger sits inside the
@@ -39,15 +39,15 @@ import { styles } from './color-input-root.css.js'
  *
  * @cssproperty --color-input-background-color - Fill behind the field.
  * @cssproperty --color-input-border-color - Color of the panel's edge.
- * @cssproperty --color-input-border-width - Width of the panel's edge. Follows
+ * @cssproperty --color-input-border-width - Width of the panel's edge. Defaults to `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless a theme sets a border.
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.
  * @cssproperty --color-input-panel-size - Width of the panel, and so of the square.
- * @cssproperty --color-input-shadow - Lift under the panel. Follows
+ * @cssproperty --color-input-shadow - Shadow under the panel. Defaults to `--helix-shadow-floating`, so the panel keeps a shadow over any content below it.
  *   `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it
  *   keeps a lift by default.
- * @cssproperty --color-input-swatch-radius - Corner radius of that block.
- * @cssproperty --color-input-swatch-size - Edge length of the block in `variant="swatch"`.
+ * @cssproperty --color-input-swatch-radius - Corner radius of the swatch in `variant="swatch"`.
+ * @cssproperty --color-input-swatch-size - Edge length of the swatch in `variant="swatch"`.
  */
 @customElement('helix-color-input')
 export class HelixColorInput extends HelixHeadlessColorInput {

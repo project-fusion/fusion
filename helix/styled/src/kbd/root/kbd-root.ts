@@ -20,8 +20,8 @@ import { styles } from './kbd-root.css.js'
  * @aliases Key, Shortcut, Hotkey
  * @documentation https://fusion.dev/helix/components/kbd
  *
- * @cssproperty --kbd-background-color - Fill of the key.
- * @cssproperty --kbd-border-color - Color of the hairline and the edge.
+ * @cssproperty --kbd-background-color - The fill of the key.
+ * @cssproperty --kbd-border-color - The color of the key's border and its bottom edge.
  */
 @customElement('helix-kbd')
 export class HelixKbd extends HelixHeadlessKbd {

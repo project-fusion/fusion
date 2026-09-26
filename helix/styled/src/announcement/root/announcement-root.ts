@@ -6,7 +6,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './announcement-root.css.js'
 
 /**
- * @summary A page-level message above the masthead, which can be dismissed.
+ * @summary A message for the whole page, shown above its header, that can be dismissed.
  *
  * @description
  * Full width and flat, with the severity carried by a tinted fill and a
@@ -19,13 +19,13 @@ import { styles } from './announcement-root.css.js'
  * @aliases Banner, Notification bar, Alert bar
  * @documentation https://fusion.dev/helix/components/announcement
  *
- * @cssproperty --announcement-block-size - How tall the band is at its shortest, so adding a control to it does not move the page down. A floor, not a cap: a message long enough to wrap still gets the room.
- * @cssproperty --announcement-inset - Inline padding, matched to the page.
+ * @cssproperty --announcement-block-size - The band's minimum height, so adding a control to it does not move the page down. A message long enough to wrap makes the band taller.
+ * @cssproperty --announcement-inset - The inline padding, matched to the page.
  */
 @customElement('helix-announcement')
 export class HelixAnnouncement extends HelixHeadlessAnnouncement {
   /**
-   * Which rung of the surface ladder the band rides.
+   * The surface level the band sits on.
    *
    * `filled` is the resting one, a well sunk below the page. `elevated` brings
    * it up to the surface step, for a band that reads as part of the furniture

@@ -24,7 +24,7 @@ import { styles } from './tree-item.css.js'
  * @slot - The item's label.
  * @slot children - Nested items, which make this a branch.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
  *
  * @csspart group - The container for nested items.
  * @csspart item - The node, and the focus target.
@@ -35,7 +35,7 @@ import { styles } from './tree-item.css.js'
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
  * @cssproperty --tree-gap - Space between rows.
  * @cssproperty --tree-indent - Indent added per level.
- * @cssproperty --tree-row-size - Least height of a row, so rows with and without an icon match.
+ * @cssproperty --tree-row-size - Minimum height of a row, so rows with and without an icon match.
  */
 @customElement('helix-tree-item')
 export class HelixTreeItem extends HelixHeadlessTreeItem {

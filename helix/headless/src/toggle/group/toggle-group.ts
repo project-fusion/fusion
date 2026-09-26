@@ -32,26 +32,25 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The group's items.
- * @slot end - Whatever sits after the track on its own line, such as a count or a reset.
- * @slot start - Whatever sits before the track on its own line, such as an icon or a caption.
+ * @slot end - Content after the track, on the same line, such as a count or a reset.
+ * @slot start - Content before the track, on the same line, such as an icon or a caption.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the answer moves, and cancelable. The only way to refuse one.
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the choice changes. Cancelable: call `preventDefault()` to keep the current choice. It is the only way to block a change.
+ * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you listen for it on the group. Cancelable: call `preventDefault()` to keep the current choice.
+ * @event {Event} input - Fired after the value changes.
  *
- * @csspart feedback - What is wrong with it.
- * @csspart hint - Help under the row, while nothing is wrong.
+ * @csspart feedback - The error message under the row.
+ * @csspart hint - The help text under the row, shown while there is no error.
  * @csspart indicator - The moving marker behind the selected item.
- * @csspart label - The question, over the row.
- * @csspart row - The line the track sits on, with whatever flanks it.
- * @csspart track - The bar the items sit in. The rule after an inline label,
- * separating it from the items, is drawn on the bar, which is
- * `::part(track)::before` from a consumer's sheet: this tier ships no CSS, so a
- * box it renders for one to paint is an empty child costing whatever the
- * consumer's own layout charges for a child. `ListItem` measured that.
+ * @csspart label - The label above the row.
+ * @csspart row - The line that holds the track and the content on either side of it.
+ * @csspart track - The bar the items sit in. Draw the line between an inline
+ * label and the items with `::part(track)::before` in your stylesheet. This tier
+ * ships no CSS, so it renders no separate element for the line, which would add
+ * an empty child to your layout.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The group has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-toggle-group')
 export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -247,7 +246,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   }
 
   /**
-   * Where the group's label sits, `start` putting it on the track's line.
+   * Where the group's label sits. `start` puts it on the track's line.
    *
    * Absent is above, which is what a field looks like and what almost every
    * group wants. `start` is for a row of controls that are labeled rather than

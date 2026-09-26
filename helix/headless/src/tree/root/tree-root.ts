@@ -25,7 +25,7 @@ const KEYS = new Set([
 ])
 
 /**
- * @summary A tree of items, navigable entirely from the keyboard.
+ * @summary A hierarchy of items, with branches that open and close.
  *
  * @description
  * Focus is a single tab stop, moved with the arrow keys, which is what the tree
@@ -44,13 +44,13 @@ const KEYS = new Set([
  *
  * @slot - The tree's items.
  *
- * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
- * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current node moves, and cancelable. The only way to refuse one.
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixActivateEvent} helix-activate - Fired after the current node changes, so the tree already holds the new one.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current node changes, and cancelable. Canceling it is the only way to stop the change.
+ * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
  *
  * @csspart empty - Shown when there are no rows to show.
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
- * @csspart loading - Shown while the rows are still on their way.
+ * @csspart live - A copy of the empty and loading messages, in a live region that announces them when they change. Visually hidden in the styled tier.
+ * @csspart loading - Shown while the rows load.
  * @csspart tree - The tree container.
  */
 @customElement('helix-headless-tree')
@@ -62,7 +62,8 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   label = 'Tree'
 
   /**
-   * What a step inward means: nothing, a rank, or a heading over what follows.
+   * What a deeper level means: `peer` for no change, `subordinate` for a lower
+   * rank, or `heading` for a parent that heads the items under it.
    *
    * All three answers are right, for different trees, which is why this is
    * asked rather than decided. `peer` is a file explorer: every row is the same

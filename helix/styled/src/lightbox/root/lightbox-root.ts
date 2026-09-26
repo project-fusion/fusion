@@ -5,7 +5,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './lightbox-root.css.js'
 
 /**
- * @summary A viewer that opens one thing over the page.
+ * @summary A viewer that shows one item at a time over the page.
  *
  * @description
  * **A takeover rather than a panel, which is the whole difference from
@@ -28,12 +28,12 @@ import { styles } from './lightbox-root.css.js'
  * @aliases Photo viewer, Image viewer, Gallery overlay
  * @documentation https://fusion.dev/helix/components/lightbox
  *
- * @event {HelixActivateEvent} helix-activate - Fired once the shown item has moved, so the element already holds it.
+ * @event {HelixActivateEvent} helix-activate - Fired after the shown item changes, when the element already holds the new item.
  *
- * @cssproperty --lightbox-foreground - Color of the chrome drawn over the content.
- * @cssproperty --lightbox-gap - Space between the chrome and the content.
+ * @cssproperty --lightbox-foreground - Color of the controls and text drawn over the content.
+ * @cssproperty --lightbox-gap - Space between the header or footer and the content.
  * @cssproperty --lightbox-padding - Inset from the edges of the screen.
- * @cssproperty --lightbox-scrim - The wash over the page behind the viewer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.
+ * @cssproperty --lightbox-scrim - The overlay color on the page behind the viewer. Set it on the host, because a `var()` inside `::backdrop` cannot resolve a token.
  */
 @customElement('helix-lightbox')
 export class HelixLightbox extends HelixHeadlessLightbox {

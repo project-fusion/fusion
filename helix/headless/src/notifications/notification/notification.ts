@@ -19,7 +19,7 @@ import { html } from 'lit/static-html.js'
 import '../../format-date/index.js'
 
 /**
- * @summary One thing that happened, which a reader may not have seen yet.
+ * @summary A single notification about something that happened, marked read or unread.
  *
  * @description
  * A notification is a toast that did not go away. `Toast` is deliberately the
@@ -52,35 +52,35 @@ import '../../format-date/index.js'
  * @aliases Notification item, Inbox item
  * @documentation https://fusion.dev/helix/components/notifications
  *
- * @slot - What happened, in the consumer's own markup.
- * @slot actions - What a reader can do about it, under the words it is about. Drawn always
- * rather than on hover, because an action is the point of the row and not chrome around it.
- * @slot description - A second line qualifying it, quieter than the first. A bare
- * slot rather than a box, so an item without one pays nothing for it; style it
- * through `::slotted()`.
- * @slot detail - A block belonging to the row rather than a line about it: a quoted
- * comment, a status moving from one value to another, a preview. Unlike `description` nothing
- * here sets a size or an ink, because whatever fills it usually brings its own.
- * @slot dismiss - Replaces the glyph inside the dismiss control, which is drawn
- * only where the row is `dismissible`.
+ * @slot - What happened, in your own markup.
+ * @slot actions - Actions the user can take, shown under the text. They are always visible,
+ * because acting on the notification is the purpose of the row.
+ * @slot description - A second, quieter line with more detail. It is a bare slot
+ * with no wrapping box, so an item without a description costs nothing. Style it
+ * with `::slotted()`.
+ * @slot detail - A block of content in the row, such as a quoted comment, a status
+ * change from one value to another, or a preview. It sets no text size or color, because
+ * its content usually brings its own.
+ * @slot dismiss - Replaces the icon inside the dismiss control, which is drawn
+ * only when the row is `dismissible`.
  * @slot media - An avatar or icon identifying who or what it came from.
  *
- * @event {HelixDismissEvent} helix-dismiss - Fired when a reader asks to remove it, and cancelable.
- * @event {HelixReadEvent} helix-read - Fired when the item is marked read or unread, and cancelable.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the user dismisses the notification. Cancelable.
+ * @event {HelixReadEvent} helix-read - Fired when the notification is marked read or unread. Cancelable.
  *
  * @csspart actions - The trailing slot's box.
  * @csspart body - The label and the caption together.
- * @csspart controls - The actions and the dismiss, which replace the time.
- * @csspart dismiss - The control that removes it.
- * @csspart dismiss-mark - The glyph on that control, where none is slotted.
+ * @csspart controls - The actions and the dismiss control, shown in place of the time.
+ * @csspart dismiss - The control that dismisses the notification.
+ * @csspart dismiss-mark - The icon on the dismiss control, when no icon is slotted.
  * @csspart item - The whole notification.
  * @csspart label - What happened, on the first line.
  * @csspart media - The leading slot's box.
- * @csspart time - When it happened, read the way a person reads one.
+ * @csspart time - When it happened, formatted for people to read.
  * @csspart trailing - The column holding the time and the controls.
  *
  * @cssstate actions - While the actions slot holds something, so the words above make room for it.
- * @cssstate controls - While it can be dismissed, so the time makes way for the control under a pointer.
+ * @cssstate controls - The item can be dismissed, so the time gives way to the dismiss control under a pointer.
  * @cssstate read - While it has been read.
  */
 @customElement('helix-headless-notification')
@@ -97,7 +97,7 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   at = ''
 
   /**
-   * State to open with, where nothing declared one.
+   * Whether the notification starts as read, used until `read` is set.
    */
   @property({ attribute: 'default-read', type: Boolean })
   defaultRead = false
@@ -111,7 +111,7 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   locale = ''
 
   /**
-   * Whether the reader has seen it.
+   * Whether the notification has been read.
    *
    * Set it and this element defers: a reader's click fires `helix-read` and
    * changes nothing until a new value arrives. `default-read` seeds a state
@@ -146,7 +146,8 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   private readState: boolean | undefined = undefined
 
   /**
-   * Asks to be marked read, and reports whether the request stood.
+   * Requests that the notification be marked read, and returns whether the
+   * change was applied.
    *
    * Public because a consumer's own control is as likely to ask as this
    * element's own markup is, and because a list marking everything read has to

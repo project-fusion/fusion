@@ -3,7 +3,7 @@ import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary Reads out which items of how many are on show.
+ * @summary Text that shows which items are on the current page, out of the total.
  *
  * @description
  * Its own element rather than a part of `Pagination`, so a consumer decides
@@ -28,7 +28,8 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-pagination-summary')
 export class HelixHeadlessPaginationSummary extends HelixElement {
   /**
-   * The reading, with `{from}`, `{to}` and `{total}` filled in.
+   * The text shown. `{from}`, `{to}`, and `{total}` are replaced with the first
+   * item, the last item, and the item count.
    *
    * A template rather than a prefix and a suffix, because word order is not
    * universal: `format="{total} 件中 {from}-{to} 件"` is one attribute here and
@@ -54,7 +55,7 @@ export class HelixHeadlessPaginationSummary extends HelixElement {
   locale = ''
 
   /**
-   * The page on show, one-based.
+   * The current page, counting from one.
    */
   @property({ type: Number })
   page = 1

@@ -15,7 +15,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
 
 /**
- * @summary A stack of pages, one showing at a time, with a way back.
+ * @summary A stack of pages that shows one at a time, with a back button.
  *
  * @description
  * One panel that changes rather than panels opening beside each other. That is
@@ -47,23 +47,23 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  *
  * @slot - The rows of the top page.
  *
- * @event {HelixSelectEvent} helix-select - Fired when a row with no page is chosen. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when a row with no page is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  *
- * @csspart back - The control that returns one page.
- * @csspart back-mark - The glyph on the back control.
+ * @csspart back - The button that goes back one page.
+ * @csspart back-mark - The icon on the back button.
  * @csspart empty - Shown when there are no entries to show.
- * @csspart header - The bar above a page, holding the way back and its name.
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
- * @csspart loading - Shown while the entries are still on their way.
+ * @csspart header - The bar above a page, which holds the back button and the page's name.
+ * @csspart live - A copy of the empty and loading text, in a region that screen readers announce when it changes. Visually hidden in the styled tier.
+ * @csspart loading - Shown while the entries load.
  * @csspart page - The region the rows are in.
  * @csspart title - The name of the page showing.
  *
- * @cssstate drilled - While a row's page is showing rather than the top one, so a frame around this can answer the depth it is at.
+ * @cssstate drilled - A row's page is showing, so a frame around the drilldown can style itself for that depth.
  */
 @customElement('helix-headless-drilldown')
 export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   /**
-   * Accessible name for the region.
+   * The region's name, read by screen readers.
    */
   @property()
   /* Not "Menu". This component's own description is built around not being one,
@@ -72,7 +72,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   label = 'Navigation'
 
   /**
-   * What the control returning from a page reads.
+   * The text of the back button.
    */
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
@@ -160,7 +160,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Returns one page, and reports whether there was one to return to.
+   * Goes back one page, and returns whether there was a page to go back to.
    *
    * Focus lands on the row that opened the page being left, which is why the
    * row is read before going back rather than after: a reader who drills in and

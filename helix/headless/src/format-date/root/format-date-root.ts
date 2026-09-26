@@ -16,7 +16,7 @@ interface Absolute {
 }
 
 /**
- * @summary A timestamp, written the way the reader's locale writes one.
+ * @summary A timestamp, formatted for the user's locale.
  *
  * @description
  * A date in a page is almost never wanted as an ISO string, and formatting one
@@ -50,12 +50,12 @@ interface Absolute {
  * @aliases RelativeTime, Timestamp, TimeAgo
  * @documentation https://fusion.dev/helix/components/format-date
  *
- * @csspart time - The `<time>` element carrying the reading.
+ * @csspart time - The `<time>` element that holds the formatted text.
  */
 @customElement('helix-headless-format-date')
 export class HelixHeadlessFormatDate extends HelixElement {
   /**
-   * The timestamp, as anything `Date` parses.
+   * The timestamp, in any format `Date` can parse.
    *
    * An ISO string is what an API sends and what `<time datetime>` takes, so it
    * is the shape that needs no translation at either end. Left unset this
@@ -81,7 +81,8 @@ export class HelixHeadlessFormatDate extends HelixElement {
   day?: 'numeric' | '2-digit'
 
   /**
-   * Show how long ago it was, compactly, instead of the date.
+   * Shows how long ago the timestamp was, in a compact form such as "3h", in
+   * place of the date.
    *
    * Reflected, because it is the one property that decides which of two readings
    * this is and a stylesheet has a reason to know: a compact reading is a fixed
@@ -97,7 +98,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
   hour?: 'numeric' | '2-digit'
 
   /**
-   * Locale for the reading.
+   * The locale to format the timestamp in.
    *
    * Empty is the runtime's own.
    */
@@ -131,7 +132,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
   timeZone?: string
 
   /**
-   * Whether to name the time zone, and how.
+   * Shows the name of the time zone, in its `long` or `short` form.
    */
   @property({ attribute: 'time-zone-name' })
   timeZoneName?: 'long' | 'short'

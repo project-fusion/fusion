@@ -3,7 +3,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary A record of what happened, in the order it happened.
+ * @summary A list of events, in the order they happened.
  *
  * @description
  * **Not `Steps`, and the difference is what the thing is for.** A stepper is a
@@ -40,7 +40,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-timeline')
 export class HelixHeadlessTimeline extends HelixElement {
   /**
-   * Names the record, for a reader arriving at it out of context.
+   * Accessible name for the timeline, for people who reach it out of context.
    */
   @property()
   label = ''

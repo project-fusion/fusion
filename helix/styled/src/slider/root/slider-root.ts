@@ -25,17 +25,17 @@ import { styles } from './slider-root.css.js'
  * @aliases Range, Range input
  * @documentation https://fusion.dev/helix/components/slider
  *
- * @cssproperty --slider-fill-color - The part behind the thumb.
- * @cssproperty --slider-length - How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row.
- * @cssproperty --slider-marker-color - The ticks along the track.
- * @cssproperty --slider-thumb-color - The handle.
- * @cssproperty --slider-thumb-length - The handle along the track. Follows the size unless it is told otherwise, and setting one of the two is what makes the handle an oval.
- * @cssproperty --slider-thumb-radius - The handle's corners. Fully round by default, so a handle given two dimensions is a capsule until this says otherwise.
- * @cssproperty --slider-thumb-ring-color - The fence separating the handle from the track, for a slider that is not on the page.
- * @cssproperty --slider-thumb-size - The handle across the track. Square with the length by default, which is what makes it round.
- * @cssproperty --slider-track-color - The part not yet chosen.
- * @cssproperty --slider-track-image - The whole track, for a slider whose color is the value.
- * @cssproperty --slider-track-size - How thick the track is. The progress bar's own size by default, the two being the same object.
+ * @cssproperty --slider-fill-color - The color of the filled part of the track, behind the thumb.
+ * @cssproperty --slider-length - The length of a vertical track. It defaults to nine rem and applies only when `orientation` is `vertical`. A horizontal track takes the width of its row.
+ * @cssproperty --slider-marker-color - The color of the marks along the track.
+ * @cssproperty --slider-thumb-color - The color of the thumb.
+ * @cssproperty --slider-thumb-length - The thumb's size along the track. It follows `--slider-thumb-size` unless you set it, and setting one of the two makes the thumb an oval.
+ * @cssproperty --slider-thumb-radius - The thumb's corner radius. It is fully round by default, so a thumb with two different dimensions is a capsule unless you change it.
+ * @cssproperty --slider-thumb-ring-color - The color of the ring between the thumb and the track. Set it for a slider that sits on a surface other than the page background.
+ * @cssproperty --slider-thumb-size - The thumb's size across the track. It equals the length by default, which makes the thumb round.
+ * @cssproperty --slider-track-color - The color of the unfilled part of the track.
+ * @cssproperty --slider-track-image - An image for the whole track, such as a gradient for a slider whose value is a color.
+ * @cssproperty --slider-track-size - The thickness of the track. It matches the progress bar's size by default.
  */
 @customElement('helix-slider')
 export class HelixSlider extends HelixHeadlessSlider {

@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './pagination-summary.css.js'
 
 /**
- * @summary Reads out which items of how many are on show.
+ * @summary Text that shows which items are on the current page, out of the total.
  *
  * @description
  * Prose beside the controls rather than one of them: no box and no hover, in the

@@ -29,13 +29,13 @@ import { styles } from './icon-button-root.css.js'
  * @csspart button - The inner button or anchor.
  *
  * @cssproperty --icon-button-radius - Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`.
- * @cssproperty --icon-button-shadow - What it casts, where it is raised off the page.
+ * @cssproperty --icon-button-shadow - Shadow of a raised icon button.
  * @cssproperty --icon-button-size - Edge length of the control.
  */
 @customElement('helix-icon-button')
 export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton) {
   /**
-   * Whether it is raised off the page it sits on.
+   * Raises the button off the page with a shadow.
    *
    * Separate from `shape`, because they are separate facts: a docked control is
    * raised whatever its outline, and a circle inside a toolbar is not raised at
@@ -46,7 +46,7 @@ export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton
   raised = false
 
   /**
-   * The outline it is cut to, which is an axis of its own and not a value on one.
+   * The button's shape. Leave it unset for a rounded square, or set `circle`.
    *
    * `emphasis` says how filled it is and `tone` says what it means; neither of
    * them says what shape it is, and folding a shape into either would put a

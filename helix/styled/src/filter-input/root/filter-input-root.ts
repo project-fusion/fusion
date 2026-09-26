@@ -19,7 +19,7 @@ import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
 import { styles } from './filter-input-root.css.js'
 
 /**
- * @summary A field that narrows something else, beside what is already narrowing it.
+ * @summary A text field for filters, with the active filters shown in it as tokens.
  *
  * @description
  * The frame is the field rather than the input, so the tokens sit inside the
@@ -47,17 +47,18 @@ import { styles } from './filter-input-root.css.js'
  * @aliases SearchField, FacetInput, TokenInput
  * @documentation https://fusion.dev/helix/components/filter-input
  *
- * @cssproperty --filter-input-action-padding-inline - Space either side of a slotted control's label. Follows `--helix-space-xs`, which is what a token uses.
- * @cssproperty --filter-input-action-size - Height of a control slotted at either end. Follows `--helix-size-tag`, so it matches the tokens beside it rather than the field around them.
- * @cssproperty --filter-input-background-color - Fill behind the field.
- * @cssproperty --filter-input-border-color - Color of the suggestion panel's edge.
- * @cssproperty --filter-input-border-width - Width of that edge. Follows `--helix-border-floating`.
- * @cssproperty --filter-input-control-size - Smallest the text keeps as tokens fill the line, before it wraps to its own.
- * @cssproperty --filter-input-lead-border-color - The seam between the leading box and the text.
- * @cssproperty --filter-input-panel-size - Width of the suggestion panel. Follows the field by default.
- * @cssproperty --filter-input-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
- *   floating surface sits over content nobody can predict, so it keeps a lift by default.
- * @cssproperty --filter-input-size - Height of the field with nothing in it, which it grows from.
+ * @cssproperty --filter-input-action-padding-inline - The space on either side of a slotted control's label. It follows `--helix-space-xs`, the space a token uses.
+ * @cssproperty --filter-input-action-size - The height of a control slotted at either end. It follows `--helix-size-tag`, so it matches the height of the tokens beside it.
+ * @cssproperty --filter-input-background-color - The fill behind the field.
+ * @cssproperty --filter-input-border-color - The color of the suggestion panel's border.
+ * @cssproperty --filter-input-border-width - The width of the suggestion panel's border. It follows `--helix-border-floating`.
+ * @cssproperty --filter-input-control-size - The smallest width the text keeps as tokens fill the line. Below it, the text wraps to its own line.
+ * @cssproperty --filter-input-lead-border-color - The color of the line between the leading box and the text.
+ * @cssproperty --filter-input-panel-size - The width of the suggestion panel. It matches the field by default.
+ * @cssproperty --filter-input-shadow - The shadow under the panel. It follows
+ *   `--helix-shadow-floating`. The panel can sit over any content, so it has a
+ *   shadow by default.
+ * @cssproperty --filter-input-size - The height of the empty field. The field grows from this height.
  */
 @customElement('helix-filter-input')
 export class HelixFilterInput extends HelixHeadlessFilterInput {

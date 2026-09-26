@@ -19,7 +19,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  *
  * @slot - The tab's label.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  *
  * @csspart tab - The tab itself.
  *

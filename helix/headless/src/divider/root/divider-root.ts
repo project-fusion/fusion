@@ -3,7 +3,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary Separates content into groups with a rule.
+ * @summary A line that separates content into groups.
  *
  * @description
  * The separator role lives on the rule inside the shadow root rather than on
@@ -22,15 +22,15 @@ import { property } from 'lit/decorators.js'
  * @aliases Separator, Rule
  * @documentation https://fusion.dev/helix/components/divider
  *
- * @slot - Content set into the rule, such as the word between two sections.
+ * @slot - Content set into the line, such as a word between two sections.
  *
- * @csspart content - What is set into it.
- * @csspart line - The rule itself, or each half of it where something is set in.
+ * @csspart content - The content set into the line.
+ * @csspart line - The line, or each half of it when content is set into it.
  */
 @customElement('helix-headless-divider')
 export class HelixHeadlessDivider extends HelixElement {
   /**
-   * Whether the rule is announced as a separator.
+   * Whether screen readers announce the line as a separator.
    *
    * Off by default, and out of the accessibility tree. Most rules on a page
    * separate nothing: they underline a heading or close a section that space
@@ -47,7 +47,7 @@ export class HelixHeadlessDivider extends HelixElement {
   announced = false
 
   /**
-   * Which way the rule runs.
+   * The direction the line runs: `horizontal` or `vertical`.
    */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'

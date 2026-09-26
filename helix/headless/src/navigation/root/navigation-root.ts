@@ -28,9 +28,9 @@ import { property } from 'lit/decorators.js'
  * @aliases Nav, NavList, Tabs
  * @documentation https://fusion.dev/helix/components/navigation
  *
- * @slot - The destinations, as the consumer's own links.
+ * @slot - The destinations, as your own links.
  *
- * @csspart indicator - The marker that travels to the current destination.
+ * @csspart indicator - The marker that moves to the current destination.
  * @csspart nav - The navigation landmark.
  */
 @customElement('helix-headless-navigation')
@@ -46,7 +46,7 @@ export class HelixHeadlessNavigation extends HelixElement {
   })
 
   /**
-   * Accessible name for the landmark.
+   * The landmark's name, read by screen readers.
    */
   @property()
   label = 'Main'

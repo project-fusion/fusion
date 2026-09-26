@@ -20,16 +20,16 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The item's label.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: call `preventDefault()` to keep the current choice.
  *
  * @csspart item - The radio button.
  *
- * @cssstate selected - While it is on.
+ * @cssstate selected - The item is chosen.
  */
 @customElement('helix-headless-toggle')
 export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   /**
-   * Whether the markup declared this one chosen, which is what a reset returns to.
+   * Whether the markup declares the item chosen. A form reset returns to it.
    *
    * `<option selected>` reflects to `defaultSelected` and `option.selected` is
    * live state that does not reflect, and those are two different facts. This
@@ -64,7 +64,7 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   }
 
   /**
-   * Whether this item holds the group's tab stop while nothing is chosen.
+   * Whether the item holds the group's tab stop while nothing is chosen.
    *
    * The stop normally rides on the selection, and an unanswered group has no
    * selection, so without this the keyboard cannot reach it. Written by the

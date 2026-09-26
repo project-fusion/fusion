@@ -32,7 +32,7 @@ const parse = (hotkey: string) => {
 }
 
 /**
- * @summary A list of commands, opened from anywhere and filtered by typing.
+ * @summary A command palette: a list of commands that opens from anywhere on the page and filters as you type.
  *
  * @description
  * **The list is `Listbox`, filtering and all.** Listbox already owns narrowing,
@@ -64,40 +64,40 @@ const parse = (hotkey: string) => {
  * @documentation https://fusion.dev/helix/components/command
  *
  * @slot - The commands, and any groups of them.
- * @slot footer - Under the list, for the keys a reader can press.
+ * @slot footer - Content under the list, such as the keys that work in the palette.
  *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the palette opens. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixSelectEvent} helix-select - Fired when a command is chosen. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeCloseEvent} helix-before-close - The palette is about to close. Cancelable: cancel it to keep it open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - The palette is about to open. Cancelable: cancel it to keep it closed.
+ * @event {HelixSelectEvent} helix-select - A command was chosen. Cancelable: cancel it to keep the palette open.
+ * @event {Event} toggle - The palette opened or closed. The event carries `newState` and `oldState`.
  *
- * @csspart dialog - The overlay's own box, forwarded from the dialog.
+ * @csspart dialog - The box of the dialog the palette opens in, forwarded from `Dialog`.
  * @csspart footer - The row under the list.
- * @csspart listbox - The list inside it.
- * @csspart listbox-empty - Shown when a filter has hidden everything.
- * @csspart listbox-feedback - What is wrong with it.
- * @csspart listbox-filter-icon - The mark beside that field.
- * @csspart listbox-filter-mark - The glyph beside the filter field, where none is slotted.
- * @csspart listbox-hint - Help under the list.
- * @csspart listbox-items - The list itself.
- * @csspart listbox-label - The question, over the list.
- * @csspart listbox-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart listbox-loading - Shown while the options are still on their way.
- * @csspart listbox-search - The region holding the field that narrows the list.
- * @csspart listbox-search-field - The field itself.
+ * @csspart listbox - The listbox inside the palette.
+ * @csspart listbox-empty - The text shown when the filter matches no commands.
+ * @csspart listbox-feedback - The listbox's error message.
+ * @csspart listbox-filter-icon - The icon beside the filter field.
+ * @csspart listbox-filter-mark - The default icon beside the filter field, drawn when no icon is slotted.
+ * @csspart listbox-hint - Help text under the list.
+ * @csspart listbox-items - The list of commands.
+ * @csspart listbox-label - The label above the list.
+ * @csspart listbox-live - The listbox's `live` part, a live region that holds the empty and loading text for screen readers.
+ * @csspart listbox-loading - The text shown while the commands are loading.
+ * @csspart listbox-search - The region that holds the filter field.
+ * @csspart listbox-search-field - The filter field.
  *
  * @cssstate open - While the palette is open.
  */
 @customElement('helix-headless-command')
 export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   /**
-   * Words shown where the filter has matched nothing.
+   * The text shown when the filter matches no commands.
    */
   @property({ attribute: 'empty-text' })
   emptyText = 'No commands'
 
   /**
-   * The key that opens it, as `mod+k` or `shift+p` or plain `k`.
+   * The key that opens the palette, written as `mod+k`, `shift+p`, or `k`.
    *
    * Empty turns it off, for a consumer who opens the palette from a button or
    * from their own shortcut handler. There is no list of defaults to fight
@@ -113,7 +113,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   label = 'Commands'
 
   /**
-   * Shown in the field before anything is typed.
+   * The text shown in the filter field before anything is typed.
    */
   @property()
   placeholder = 'Search commands'

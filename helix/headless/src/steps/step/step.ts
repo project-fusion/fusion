@@ -41,47 +41,47 @@ import '../../button/index.js'
  * @documentation https://fusion.dev/helix/components/steps
  *
  * @slot - The step's name.
- * @slot content - What the stage holds. Always rendered here, a tier with no stylesheet having nothing to fold it with, so whether it is folded away is the sheet's answer and not this tier's.
- * @slot description - A line under the name, for what the stage is for.
+ * @slot content - The stage's content. The headless tier always renders it, because it has no stylesheet to collapse it with. Your stylesheet decides whether it is collapsed.
+ * @slot description - A line under the name that describes the stage.
  * @slot marker - Replaces the number, or the check a complete step shows.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the step is pressed. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when the step is pressed. Cancelable: cancel it to keep the current step.
  *
  * @csspart body - The name and its description.
  * @csspart content - What the stage holds, while it is open.
- * @csspart description - The line under it.
+ * @csspart description - The line under the name.
  * @csspart label - The step's name, which is a control.
- * @csspart label-button - The inner control.
+ * @csspart label-button - The button inside the label.
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
  * @csspart marker - The shape carrying the number or the check.
  */
 @customElement('helix-headless-step')
 export class HelixHeadlessStep extends HelixElement {
   /**
-   * Whether the reader has finished this stage.
+   * Whether this stage is finished.
    */
   @property({ reflect: true, type: Boolean })
   complete = false
 
   /**
-   * Whether this is the stage the reader is in.
+   * Whether this is the current stage.
    */
   @property({ reflect: true, type: Boolean })
   current = false
 
   /**
-   * Whether the reader may go to this stage.
+   * Whether the stage is disabled, so the user cannot go to it.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
   /**
-   * What this stage is called when it announces itself.
+   * The value the step sends in `helix-select`.
    */
   @property()
   value = ''
 
-  /** Announces the step, unless it is refusing. */
+  /** Fires `helix-select` for the step, unless the step is `disabled`. */
   select(): void {
     if (this.disabled) {
       return

@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './video-playlist-root.css.js'
 
 /**
- * @summary A set of clips and the one player they take turns in.
+ * @summary A list of video clips that play one after another in a single player.
  *
  * @description
  * Presentation only: the arrangement of the two regions and the scroller the
@@ -16,8 +16,8 @@ import { styles } from './video-playlist-root.css.js'
  * @aliases Playlist, Queue, Up next
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
- * @cssproperty --video-playlist-layout - Columns for the player and the list.
- * @cssproperty --video-playlist-size - How tall the list gets before it scrolls.
+ * @cssproperty --video-playlist-layout - The grid columns for the player and the list.
+ * @cssproperty --video-playlist-size - The height the list reaches before it scrolls.
  */
 @customElement('helix-video-playlist')
 export class HelixVideoPlaylist extends HelixHeadlessVideoPlaylist {

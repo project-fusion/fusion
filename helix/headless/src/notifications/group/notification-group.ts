@@ -39,19 +39,19 @@ const LABEL_ID = 'label'
  *
  * @slot - The notifications in this group.
  * @slot actions - Beside the count, for a link to the rest of them.
- * @slot label - Replaces the group's name, for a heading that needs a mark in it.
+ * @slot label - Replaces the group's name, for a heading that includes an icon.
  *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the group folds, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the group unfolds. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the group collapses. Cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the group expands. Cancelable: cancel it to keep the group collapsed.
  *
  * @csspart actions - The trailing region of the header.
- * @csspart count - How many are in the group.
- * @csspart header - The label, the count and the action together.
+ * @csspart count - The number of notifications in the group.
+ * @csspart header - The label, the count, and the actions together.
  * @csspart items - The region holding the notifications.
- * @csspart label - What the group is called.
- * @csspart trigger - The control that collapses and expands, where collapsible.
+ * @csspart label - The group's name.
+ * @csspart trigger - The control that collapses and expands the group, when `collapsible` is set.
  *
- * @cssstate open - While the group shows every notification in it rather than the first.
+ * @cssstate open - The group shows all of its notifications.
  */
 @customElement('helix-headless-notification-group')
 export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixElement) {
@@ -85,7 +85,7 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
   collapsible = false
 
   /**
-   * How many notifications this group stands for.
+   * The number of notifications the group represents.
    *
    * **Not the number of rows, and that is the point.** A group saying five with
    * one row under it and a link to the rest is the ordinary shape of a feed that
@@ -96,7 +96,7 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
   count?: number
 
   /**
-   * What the group is called: a day, a subject, a person.
+   * The group's name, such as a day, a subject, or a person.
    *
    * The slot's fallback rather than its replacement, so a consumer who wants a
    * mark beside the name slots `label` and this goes unused.
@@ -105,7 +105,8 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
   label = ''
 
   /**
-   * What this is, for the feed above it to recognize without importing it.
+   * Marks this element as a notification group, so the feed can recognize it
+   * without importing its class.
    *
    * The same seam `Notification` uses: a root reads a child's markers rather
    * than its constructor, so the two tiers never have to agree about which class
@@ -123,7 +124,10 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
     ) as HelixHeadlessNotification[]
   }
 
-  /** How many the group says it stands for, which is the count or the rows. */
+  /**
+   * The number of notifications the group represents: `count` when it is set,
+   * or the number of rows.
+   */
   get total(): number {
     return this.count ?? this.items.length
   }

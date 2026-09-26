@@ -27,7 +27,7 @@ import { property, state } from 'lit/decorators.js'
 const STACK_BELOW = 512
 
 /**
- * @summary Two panes and a divider the reader can move.
+ * @summary Two panes and a divider that you can move.
  *
  * @description
  * **One axis, and nesting is how you get two.** A splitter inside a splitter
@@ -66,16 +66,16 @@ const STACK_BELOW = 512
  * @aliases SplitPane, Resizable, SplitView
  * @documentation https://fusion.dev/helix/components/splitter
  *
- * @slot end - The pane after it.
+ * @slot end - The pane after the divider.
  * @slot start - The pane before the divider.
  *
- * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, whether or not the resize that reached it was allowed, and carrying its own position: a shut pane sits at `collapsed-size` rather than at the number the resize named. Cancelable: refusing it leaves the pane as it was and the divider where the gesture put it.
- * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and only where the gesture moved it: a press that moved nothing, a drag that came back, an arrow with nowhere left to go and a corner that moved the other divider are all silent on this one. Cancelable: refusing it takes the position and leaves the rest of the gesture, so a collapse the gesture reached is still announced and still yours to refuse. A drag has already drawn itself by then and holds where it was dropped until the consumer assigns their own.
+ * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, whether or not the resize that caused it was allowed. It carries its own position, because a shut pane sits at `collapsed-size`. Cancelable: canceling it leaves the pane as it was and the divider where the gesture put it.
+ * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and only when the gesture moved it. A press that moved nothing, a drag that came back, an arrow key with no room left, and a corner that moved only the other divider do not fire it. Cancelable: canceling it leaves the position to you and keeps the rest of the gesture, so a collapse the gesture reached still fires `helix-before-collapse`, which you can also cancel. A dragged divider stays where it was dropped until you set your own `position`.
  *
  * @csspart corner - The handle where two dividers cross, added on the client.
- * @csspart end - The box holding the second.
+ * @csspart end - The box that holds the second pane.
  * @csspart separator - The divider itself.
- * @csspart start - The box holding the first pane.
+ * @csspart start - The box that holds the first pane.
  *
  * @cssproperty --splitter-corner-at - Where a nested splitter crosses this one, as a percentage.
  * @cssproperty --splitter-position - Where the divider sits, as a percentage of the box.
@@ -141,7 +141,7 @@ export class HelixHeadlessSplitter extends HelixElement {
   }
 
   /**
-   * What the divider says while a pane is shut, in place of a number.
+   * The divider's value while a pane is shut, as text in place of a number.
    *
    * **A shut pane is off the scale the divider reports**, which is `min` to
    * `max`, the sliver a drag keeps. The divider said a value outside its own
@@ -163,37 +163,37 @@ export class HelixHeadlessSplitter extends HelixElement {
   collapsedSize = 0
 
   /**
-   * Accessible name for the handle where two dividers cross.
+   * The name of the handle where two dividers cross, read by screen readers.
    */
   @property({ attribute: 'corner-label' })
   cornerLabel = 'Resize both'
 
   /**
-   * Which pane starts shut, where nothing declared it.
+   * Which pane starts shut, when `collapsed` is not set.
    */
   @property({ attribute: 'default-collapsed' })
   defaultCollapsed?: 'end' | 'start'
 
   /**
-   * Where the divider starts, where nothing declared it.
+   * Where the divider starts, when `position` is not set.
    */
   @property({ attribute: 'default-position', type: Number })
   defaultPosition = 50
 
   /**
-   * Accessible name for the divider.
+   * The divider's name, read by screen readers.
    */
   @property()
   label = 'Resize panes'
 
   /**
-   * Nearest it may come to the end, on the same terms as `min`.
+   * How close the divider can come to the end, in the same units as `min`.
    */
   @property()
   max: number | string = 100
 
   /**
-   * Nearest the divider may come to the start.
+   * How close the divider can come to the start.
    *
    * A bare number is a percentage, which is what this always took. A CSS length
    * is resolved against the splitter's own box along its axis, so `min="15rem"`
@@ -315,7 +315,7 @@ export class HelixHeadlessSplitter extends HelixElement {
   }
 
   /**
-   * How far one arrow press moves it, as a percentage.
+   * How far one arrow key press moves the divider, as a percentage.
    */
   @property({ type: Number })
   step = 2
@@ -429,7 +429,8 @@ export class HelixHeadlessSplitter extends HelixElement {
   private origin: { length: number; start: number } | null = null
 
   /**
-   * Moves the divider, and optionally says so.
+   * Moves the divider. With `settled` set, it also fires the events for a
+   * finished move.
    *
    * Public because a corner on a nested splitter has to drive the one it is
    * nested in, and that is the whole of what it needs: the pair are not
@@ -533,7 +534,8 @@ export class HelixHeadlessSplitter extends HelixElement {
   }
 
   /**
-   * Public because a nested splitter compares axes with the one it is in.
+   * Whether the panes are stacked. Public because a nested splitter compares
+   * its axis with the one it is in.
    *
    * The one place the axis is decided, which is why `auto` costs a single line
    * here rather than a pass over seventeen readers: the drag, the arrow keys and

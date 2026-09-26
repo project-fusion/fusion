@@ -17,7 +17,7 @@ import { property, state } from 'lit/decorators.js'
 import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
 
 /**
- * @summary A viewer that opens one thing over the page.
+ * @summary A viewer that shows one item at a time over the page.
  *
  * @description
  * **A lightbox is chrome around a picture rather than a picture.** It draws
@@ -52,22 +52,22 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
  * @documentation https://fusion.dev/helix/components/lightbox
  *
  * @slot - The items, which are `<helix-headless-lightbox-item>` elements.
- * @slot footer - Chrome below the item, such as a counter or a thumbnail strip.
- * @slot header - Chrome above the item, such as a title and a close button.
+ * @slot footer - Content below the item, such as a counter or a thumbnail strip.
+ * @slot header - Content above the item, such as a title and a close button.
  *
- * @event {Event} close - Relayed, because the platform's own does not escape.
- * @event {HelixActivateEvent} helix-activate - Fired once the shown item has moved, so the element already holds it.
- * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the shown item changes, and cancelable. The only way to refuse one.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {Event} close - Fired when the viewer closes. The component dispatches it again from the host, because the dialog's own event does not leave the shadow root.
+ * @event {HelixActivateEvent} helix-activate - Fired after the shown item changes, when the element already holds the new item.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the shown item changes. Cancelable: cancel it to keep the current item. It is the only way to stop the change.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the viewer closes. Cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the viewer opens. Cancelable.
+ * @event {Event} toggle - Fired when the viewer opens or closes, with `newState` and `oldState`.
  *
  * @csspart dialog - The native dialog element.
- * @csspart live - The region that says which item is shown.
+ * @csspart live - The live region that announces which item is shown.
  * @csspart viewport - The box the current item is shown in.
  *
  * @cssstate fullscreen - While the viewer fills the screen.
- * @cssstate idle - While the reader has been still long enough to hide the chrome.
+ * @cssstate idle - The user has been still long enough for the controls to hide.
  * @cssstate open - While the viewer is open.
  */
 @customElement('helix-headless-lightbox')
@@ -75,7 +75,8 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   MixinControllerOpen(HelixElement),
 ) {
   /**
-   * How long the reader may be still before the chrome hides, in milliseconds.
+   * How long the user can be idle before the header and footer hide, in
+   * milliseconds.
    *
    * Zero keeps it up, which is what a viewer with a caption worth reading
    * wants. The wait is only ever about idling: whether anything else should
@@ -85,20 +86,20 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   idleDelay = 0
 
   /**
-   * Accessible name for the viewer.
+   * The viewer's name, read by screen readers.
    */
   @property()
   label = ''
 
   /**
-   * Whether walking past the end comes back to the beginning.
+   * Whether moving past the last item returns to the first.
    */
   @property({ reflect: true, type: Boolean })
   loop = false
 
   /**
-   * The reading that says where in the set the reader is, with `{index}` and
-   * `{count}` filled in.
+   * The status text that says which item is shown, with `{index}` and `{count}`
+   * filled in.
    *
    * Announced rather than only drawn, because the picture changing under a
    * reader who cannot see it is otherwise silent. A consumer who has their own
@@ -168,22 +169,28 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     this.requestOpen(true)
   }
 
-  /** Asks to close, which a consumer may refuse. */
+  /** Closes the viewer, unless a `helix-before-close` listener cancels it. */
   close(): void {
     this.requestOpen(false)
   }
 
-  /** Shows the next item, or the first where it is past the end and looping. */
+  /**
+   * Shows the next item. After the last item, it shows the first when `loop`
+   * is set.
+   */
   next(): void {
     this.step(1)
   }
 
-  /** Shows the previous item, or the last where it is past the start and looping. */
+  /**
+   * Shows the previous item. Before the first item, it shows the last when
+   * `loop` is set.
+   */
   previous(): void {
     this.step(-1)
   }
 
-  /** Fills the screen with the viewer, or comes back. */
+  /** Makes the viewer fill the screen, or exits fullscreen. */
   toggleFullscreen(): void {
     void this.fullscreen.toggle()
   }

@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './speed-dial-item.css.js'
 
 /**
- * @summary One action in a speed dial: a mark, and a name beside it.
+ * @summary One action in a speed dial: an icon and a name beside it.
  *
  * @description
  * Presentation only: a round mark the size of a small control, and the name on
@@ -17,7 +17,7 @@ import { styles } from './speed-dial-item.css.js'
  * @aliases Speed dial action, FAB action, Quick action
  * @documentation https://fusion.dev/helix/components/speed-dial
  *
- * @cssproperty --speed-dial-item-size - Edge length of the mark.
+ * @cssproperty --speed-dial-item-size - Edge length of the icon.
  */
 @customElement('helix-speed-dial-item')
 export class HelixSpeedDialItem extends HelixHeadlessSpeedDialItem {

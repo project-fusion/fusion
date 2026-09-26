@@ -27,8 +27,8 @@ import { styles } from './notification-group.css.js'
  * @aliases NotificationSection, FeedGroup
  * @documentation https://fusion.dev/helix/components/notifications
  *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the group folds, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the group unfolds. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the group collapses. Cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the group expands. Cancelable: cancel it to keep the group collapsed.
  */
 @customElement('helix-notification-group')
 export class HelixNotificationGroup extends HelixHeadlessNotificationGroup {
