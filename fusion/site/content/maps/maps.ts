@@ -145,13 +145,7 @@ export interface MapStep {
   title: string
 }
 
-/**
- * Getting started, in three steps.
- *
- * **The package is named as it will be installed**, and the page says it is
- * not published yet rather than showing a command that fails: see
- * `MAPS_UNPUBLISHED`.
- */
+/** Getting started, in three steps. */
 export const MAP_STEPS: readonly MapStep[] = [
   {
     body: 'Helix, the connector, and the renderer you draw with.',
@@ -193,10 +187,6 @@ followTheme(map, frame, style)`,
   },
 ]
 
-/** Said under the steps until the package is on npm. */
-export const MAPS_UNPUBLISHED =
-  '@fusion.dev/helix-map is not on npm yet. It publishes with the next release of Helix, and these are the lines it will take.'
-
 /**
  * The Maps page's words, which the page renders and its document serves.
  */
@@ -231,7 +221,6 @@ export const MAPS: PageCopy = {
       title: 'Places, routes and a live position',
     },
     {
-      body: [MAPS_UNPUBLISHED],
       items: MAP_STEPS.map((step) => ({ body: `${step.body} ${step.code}`, name: step.title })),
       kicker: 'Get started',
       title: 'A themed map in three steps',
