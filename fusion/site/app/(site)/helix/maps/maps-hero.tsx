@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
 import { stageAppearance } from '@/content/verticals/verticals'
-import { boundsOf, clearOf, sameColors } from '@/utils/map-view/map-view'
+import { boundsOf, clearOf, colorsNow, PATIENCE, sameColors } from '@/utils/map-view/map-view'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './maps.module.css'
 import { mapIntent, propertiesOf, type SentTheme } from './maps-theme'
@@ -141,7 +141,17 @@ export function MapsHero({
         return
       }
       const language = document.documentElement.lang || 'en'
-      let colors = mapColorsFrom(host)
+      /* The tokens can be a frame or two behind the page, so the map waits for
+         them, and a page that never has them is told so by name. */
+      let first = colorsNow(host)
+      for (let waited = 0; !first && waited < PATIENCE; waited++) {
+        await new Promise((next) => requestAnimationFrame(next))
+        if (!live) {
+          return
+        }
+        first = colorsNow(host)
+      }
+      let colors = first ?? mapColorsFrom(host)
       let contrast = labels.current
       const map = new maplibregl.Map({
         attributionControl: false,
@@ -218,10 +228,19 @@ export function MapsHero({
       }
       host.addEventListener('helix-activate', visit)
       let pending = 0
+      let waited = 0
       const restyle = (): void => {
         cancelAnimationFrame(pending)
         pending = requestAnimationFrame(() => {
-          const next = mapColorsFrom(host)
+          const next = colorsNow(host)
+          /* A stylesheet on its way back: the next frame, until it lands. */
+          if (!next) {
+            if (waited++ < PATIENCE) {
+              restyle()
+            }
+            return
+          }
+          waited = 0
           if (!sameColors(colors, next) || contrast !== labels.current) {
             colors = next
             contrast = labels.current
@@ -268,7 +287,17 @@ export function MapsHero({
       return
     }
     const scheme = mode === 'site' ? siteScheme() : mode
+    /* **The mode as the token layer takes it**, which is \`data-color-mode\`:
+       the site's \`light-dark()\` is compiled into a shim that resolves
+       through it, so \`color-scheme\` alone moved the scrollbars and left
+       every token on its light arm, and the switcher did nothing a reader
+       could see unless a brand was picked, which paints its colors outright. */
     node.style.colorScheme = mode === 'site' ? '' : scheme
+    if (mode === 'site') {
+      delete node.dataset.colorMode
+    } else {
+      node.dataset.colorMode = scheme
+    }
     const paint = (values: Record<string, string>): void => {
       for (const name of [...node.style]) {
         if (name.startsWith('--helix-') && !(name in values)) {
@@ -282,9 +311,12 @@ export function MapsHero({
          the spacing and the series colors are derived from the seeds by
          `helix/styles` wherever `data-helix-theme` is, and only there: painted
          on an unmarked scope they sat unread and a sent radius of 90 still
-         drew 4px corners. Unmarked when following the site, whose own values
-         at the root a re-derivation here would override. */
-      node.toggleAttribute('data-helix-theme', Object.keys(values).length > 0)
+         drew 4px corners. **And marked for a mode of its own**, since the
+         tokens are resolved where they are declared, so a mode set on this
+         scope moves them only where they are declared again here. Unmarked
+         when following the site in everything, whose own values at the root
+         a re-derivation here would override. */
+      node.toggleAttribute('data-helix-theme', Object.keys(values).length > 0 || mode !== 'site')
     }
     labels.current = brand === YOURS && sent ? sent.settings.contrastTarget : undefined
     const intent =
@@ -308,6 +340,7 @@ export function MapsHero({
   return (
     <div
       className={styles.mapsHero}
+      data-color-mode={painted && sent ? sent.settings.scheme : undefined}
       data-helix-theme={painted && sent ? '' : undefined}
       ref={scope}
       style={
