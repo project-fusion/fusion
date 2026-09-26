@@ -236,8 +236,16 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         source.setData(data)
         return
       }
+      /* **Simplified by zoom, not smoothed.** A route is the router's path
+         along the streets, and a curve fitted through it would cut the
+         corners it turns and leave the street it is on, which is why no map
+         app smooths one. What they do is draw fewer points zoomed out, and
+         MapLibre does that per tile by \`tolerance\`: at its default a walk
+         kept every stair-step at a kink, at 2 it began cutting corners
+         through blocks, and at 1 it is the streets without the jitter, with
+         every turn back as the map zooms in. */
       try {
-        map.addSource(SOURCE, { data, type: 'geojson' } as never)
+        map.addSource(SOURCE, { data, tolerance: 1, type: 'geojson' } as never)
       } catch {
         return
       }
