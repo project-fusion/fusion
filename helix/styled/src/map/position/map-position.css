@@ -4,17 +4,17 @@
    `left` rather than `inset-inline-start` for the marker's reason: the
    renderer measures from the left whatever the page's direction. */
 :host {
-  /* **Not the brand, and the land's own color ringed in the ink.** The places
-     and the routes are the brand, so a position in it was one more of them.
-     Its body is the surface, white on a light map and black on a dark one,
-     and its edge the ink, so it is the one thing on the map in the page's
-     own two colors, at the most contrast they have. The wash around it, its
-     halo, beam and pulse, is the ink. A tone says otherwise where the
-     position means something: its body and wash in the tone, its edge the
-     surface. */
+  /* **Not the brand: the page's ink, ringed in its surface.** The places and
+     the routes are the brand, so a position in it was one more of them. Its
+     body is the ink, black on a light map and white on a dark one, the most
+     contrast the page has against its land, and its ring the surface, so it
+     is the one thing on the map in the page's own two colors. The wash
+     around it, its halo, beam and pulse, is the ink as well. A tone says
+     otherwise where the position means something: its body and wash in the
+     tone, its ring the surface. */
   --_map-position-color: var(--map-position-color, var(--helix-color-foreground));
-  --_map-position-edge: var(--map-position-edge, var(--helix-color-foreground));
-  --_map-position-fill: var(--map-position-fill, var(--helix-color-surface));
+  --_map-position-edge: var(--map-position-edge, var(--helix-color-surface));
+  --_map-position-fill: var(--map-position-fill, var(--helix-color-foreground));
   --_map-position-size: var(--map-position-size, 1.25rem);
   /* **Declared here and written by the connector**, onto the host, where the
      connector can reach and this can read. */
@@ -139,10 +139,11 @@
 /* **With a heading, the point becomes the arrow**, the mark a navigation app
    draws for where you are and where you face, turned with the heading. An
    arrow inside a dot was a few pixels across at a map's size, too small to
-   read which way it pointed. **A stroke, not a shadow, for its edge**: the
-   surface painted under the fill with rounded joins, crisp and even on every
-   side, where stacked shadows were a soft glow. Its notch is shallow, so the
-   tip is the one sharp point. */
+   read which way it pointed. **No edge of its own**, the ink alone with a
+   little lift, since an arrow is its shape and a ring around it said
+   nothing the shape did not; \`outlined\` gives it one, a stroke in the
+   surface painted under the fill with rounded joins. Its notch is shallow,
+   so the tip is the one sharp point. */
 [part="arrow"] {
   block-size: calc(var(--_map-position-size) * 1.6);
   display: none;
@@ -162,7 +163,7 @@
 [part="arrow"] path {
   fill: var(--_map-position-fill);
   paint-order: stroke;
-  stroke: var(--_map-position-edge);
+  stroke: none;
   stroke-linejoin: round;
   stroke-width: calc(var(--helix-border-thick) * 1.5);
 }
@@ -196,21 +197,17 @@
 
 :host([shape="ring"]) [part="dot"] {
   background: transparent;
+  /* The ring is all there is, so it is drawn in the body's color: in the
+     edge's, the surface, it was the land ringing the land. */
+  border-color: var(--_map-position-fill);
   border-width: calc(var(--_map-position-size) * 0.25);
 }
 
 /* **Separation: how it stands off the map.** Absent is all of it, the edge,
    the halo and a little lift. `outlined` is the edge alone, `elevated` the
    edge lifted, as an elevated card is, `filled` the halo alone with no
-   edge, and `plain` the bare point; the arrow takes the same edge and lift. */
-/* **With no edge, the body takes the ink**: a body in the land's own color
-   is only seen by its edge, so a position that has none, filled or plain,
-   was the land itself. A tone's body is seen by its color, so it keeps it. */
-:host([separation="filled"]:not([tone])),
-:host([separation="plain"]:not([tone])) {
-  --_map-position-fill: var(--_map-position-edge);
-}
-
+   edge, and `plain` the bare point. The arrow has no edge unless it is
+   `outlined`, and the lift unless it is `outlined` or `plain`. */
 :host([separation="outlined"]) [part="dot"] {
   box-shadow: none;
 }
@@ -228,9 +225,8 @@
   box-shadow: none;
 }
 
-:host([separation="filled"]) [part="arrow"] path,
-:host([separation="plain"]) [part="arrow"] path {
-  stroke: none;
+:host([separation="outlined"]) [part="arrow"] path {
+  stroke: var(--_map-position-edge);
 }
 
 :host([separation="outlined"]) [part="arrow"],
