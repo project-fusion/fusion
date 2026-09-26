@@ -1,7 +1,7 @@
 'use client'
 
 import 'maplibre-gl/dist/maplibre-gl.css'
-import type { HelixActivateEvent, HelixMap } from '@fusion.dev/helix'
+import type { HelixActivateEvent, HelixMap, HelixMapRoute } from '@fusion.dev/helix'
 import { connectMap, mapColorsFrom, motionOf } from '@fusion.dev/helix-map'
 import { mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
@@ -195,7 +195,7 @@ export function MapsHero({
          that announced every leg forever would be a page that never stopped
          talking. The route behind it is drawn quieter than the route ahead. */
       const walker = host.querySelector('helix-map-position')
-      const route = host.querySelector('helix-map-route')
+      const route = host.querySelector<HelixMapRoute>('helix-map-route:not([variant])')
       let ticking = 0
       let onScreen = true
       const seen = new IntersectionObserver(([entry]) => {
@@ -210,7 +210,19 @@ export function MapsHero({
            router's, and the walker keeps a steady pace by distance along it,
            turning with each street, so a long leg takes longer than a short
            one the way a walk does. */
-        const path = WALK.path
+        /* **The whole walk, from the first place's door to the last's**: the
+           router's path in the middle, and the two dotted legs at its ends,
+           from a place to where its path begins and from where it ends. */
+        const first = PLACES[0] as (typeof PLACES)[number]
+        const final = PLACES.at(-1) as (typeof PLACES)[number]
+        const path: (readonly [number, number])[] = [
+          [first.lat, first.lng],
+          ...WALK.path,
+          [final.lat, final.lng],
+        ]
+        /* The places along it: the first and the last where the markers are,
+           the rest one on, the first place now leading the path. */
+        const stops = [0, ...WALK.stops.slice(1, -1).map((stop) => stop + 1), path.length - 1]
         const along = path.map((_, at) =>
           path.slice(1, at + 1).reduce((total, point, index) => {
             const from = path[index] as readonly [number, number]
@@ -232,13 +244,20 @@ export function MapsHero({
           if (span > 0) {
             walker.heading = bearing({ lat: from[0], lng: from[1] }, { lat: to[0], lng: to[1] })
           }
+          /* The route behind the walker is the routed part only, so its
+             progress is how much of that part is behind, the dotted legs
+             either side of it being no part of it. */
+          const [routeStart, routeEnd] = [along[1] ?? 0, along[path.length - 2] ?? total]
           if (route) {
-            route.progress = total > 0 ? covered / total : 0
+            route.progress = Math.min(
+              Math.max((covered - routeStart) / Math.max(routeEnd - routeStart, 1e-9), 0),
+              1,
+            )
           }
           return at
         }
         const walkingTo = (at: number): string =>
-          `Walking to ${PLACES[WALK.stops.findIndex((stop) => stop > at)]?.label ?? ''}`
+          `Walking to ${PLACES[stops.findIndex((stop) => stop > at)]?.label ?? ''}`
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
           /* **Still, and partway**, for a reader who asked for less motion:
              everything a live position shows, its heading and the route behind
@@ -433,6 +452,25 @@ export function MapsHero({
           description="Through all seven places, in the order the arrow keys walk them"
           label="A walk from the university to the springs"
           points={WALK.path.map(([lat, lng]) => ({ lat, lng }))}
+        />
+        {/* **Dotted where it leaves the path**: a place set back from its
+            road is where directions draw the last steps as dots, from where
+            the route ends to the place itself, and the first steps the same. */}
+        <helix-map-route
+          label={`The first steps, from ${PLACES[0]?.label ?? ''} to the path`}
+          points={[
+            { lat: PLACES[0]?.lat ?? 0, lng: PLACES[0]?.lng ?? 0 },
+            { lat: WALK.path[0]?.[0] ?? 0, lng: WALK.path[0]?.[1] ?? 0 },
+          ]}
+          variant="dotted"
+        />
+        <helix-map-route
+          label={`The last steps, from the path to ${PLACES.at(-1)?.label ?? ''}`}
+          points={[
+            { lat: WALK.path.at(-1)?.[0] ?? 0, lng: WALK.path.at(-1)?.[1] ?? 0 },
+            { lat: PLACES.at(-1)?.lat ?? 0, lng: PLACES.at(-1)?.lng ?? 0 },
+          ]}
+          variant="dotted"
         />
         {/* **Lettered in the order they are walked**, the letter seen and the
             place's name read: the stops rings in the walker's ink, and the
