@@ -276,7 +276,7 @@ describe('dialog framing', () => {
  * element's first update. React does: it connects the dialog before a nested
  * component has rendered, and a `default-open` dialog opened with focus on the
  * dialog rather than on the field inside it. Measured against the markup twin of
- * `chat/command`, `document.activeElement` was `dialog[dialog]` where the markup
+ * `chat/command-palette`, `document.activeElement` was `dialog[dialog]` where the markup
  * one had `textarea[field]`.
  *
  * **What is asserted here is the deferral, not the focus**, and deliberately.

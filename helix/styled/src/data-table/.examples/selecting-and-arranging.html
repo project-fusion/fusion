@@ -1,0 +1,47 @@
+<!-- @summary Rows selected by their key, and columns you can reorder and resize. -->
+
+<helix-data-table
+  default-selected="asset-002.webp"
+  id="assets"
+  label="Assets"
+  page-size="6"
+  reorderable
+  row-key="name"
+  selectable
+>
+  <helix-table-column
+    field="name"
+    resizable
+    sortable
+    width="14rem"
+  >File</helix-table-column>
+  <helix-table-column
+    field="size"
+    resizable
+    sortable
+    text-align="end"
+  >Size</helix-table-column>
+  <helix-table-column
+    field="kind"
+    resizable
+  >Kind</helix-table-column>
+</helix-data-table>
+
+<helix-text
+  as="p"
+  emphasis="muted"
+  id="chosen"
+>1 selected</helix-text>
+
+<script>
+  const assets = document.getElementById('assets')
+  assets.rows = Array.from({ length: 18 }, (_, index) => ({
+    kind: index % 4 === 0 ? 'font' : 'image',
+    name: `asset-${String(index + 1).padStart(3, '0')}.webp`,
+    size: 12000 + index * 837,
+  }))
+  assets.addEventListener('helix-select', (event) => {
+    const count = event.detail.value.split(',').filter(Boolean).length
+    document.getElementById('chosen').textContent = `${count} selected`
+  })
+</script>

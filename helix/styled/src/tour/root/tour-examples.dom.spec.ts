@@ -1,9 +1,9 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
-import nested from '../.examples/nested.html' with { type: 'text' }
+import nested from '../.examples/inside-a-menu-and-drawer.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
-import progress from '../.examples/progress.html' with { type: 'text' }
+import progress from '../.examples/with-actions.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
