@@ -793,7 +793,11 @@ function MapPage(context: Context) {
                    property takes: this page is rendered to a string, where
                    React writes an attribute only for a string and drops an
                    array without a word. */
-                points={`${place.route.lat},${place.route.lng} ${place.lat},${place.lng}` as never}
+                points={
+                  (place.route.path
+                    ? place.route.path.map(([lat, lng]) => `${lat},${lng}`).join(' ')
+                    : `${place.route.lat},${place.route.lng} ${place.lat},${place.lng}`) as never
+                }
                 tone={place.state}
               ></helix-map-route>
             ) : null,
