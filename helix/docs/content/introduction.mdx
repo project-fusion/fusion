@@ -1,5 +1,5 @@
 ---
-description: What Helix is, and the four packages it stacks into.
+description: What Helix is, and the packages it includes.
 order: 1
 section: Getting started
 title: Introduction
@@ -7,22 +7,25 @@ title: Introduction
 
 # Helix
 
-A design system of web components: tokens, a headless component tier, a styled
-tier, and the framework typings generated from both. It works in any framework,
-or none, because the components are custom elements.
+Helix is a design system of web components. It includes:
 
-Two things make it different from a component library.
+- color, space, and type tokens
+- a headless tier with the structure and behavior of each component
+- a styled tier that adds the visual design
+- typings for each framework, generated from both tiers
 
-**Theming is derivation, not override.** You supply a handful of intent inputs
-and the system computes a complete token set whose every foreground and
-background pair meets its contrast target by construction. See
-[Theming](./theming).
+The components are custom elements, so you can use them in any framework or
+without one.
 
-**AI is a first-class consumer.** Components are described by a custom elements
-manifest with typed enums, documented parts, and generated React prop names. An
-agent can write correct Helix code by reading types alone. That is why
-conventions like inline literal unions and documented CSS parts are enforced at
-analysis time rather than left to review.
+**Helix computes your theme.** You enter a few inputs, such as your brand color,
+and Helix computes every token from them. Every text and background pair meets
+its contrast target. See [Theming](./theming).
+
+**AI agents can read it.** A custom elements manifest describes every component,
+with typed options, documented parts, and generated React prop names, so an
+agent can write correct Helix code from the types alone. The build checks
+conventions such as inline literal unions and documented CSS parts for that
+reason.
 
 ## Install
 
@@ -30,7 +33,7 @@ analysis time rather than left to review.
 bun add @fusion.dev/helix @fusion.dev/helix-styles
 ```
 
-Two imports at your app root, in this order, then the elements are usable
+Add two imports at your app root, in this order. Then you can use the elements
 anywhere:
 
 ```ts
@@ -42,13 +45,13 @@ import '@fusion.dev/helix'
 <helix-accordion separation="outlined">
   <helix-accordion-item default-open>
     <span slot="summary">What is Helix?</span>
-    <p>A design system that derives its own accessible palette.</p>
+    <p>A design system of web components, themed from your brand color.</p>
   </helix-accordion-item>
 </helix-accordion>
 ```
 
-[Installation](./installation) has the order those imports are in and why, and a
-page for each framework.
+[Installation](./installation) explains the import order and links to a page for
+each framework.
 
 ## Packages
 
@@ -61,9 +64,8 @@ page for each framework.
 | `@fusion.dev/helix-icons` | You are drawing an icon outside a component |
 | `@fusion.dev/helix-core` | You are building a new Helix component |
 
-**There is no React package.** The elements are custom elements and React
-renders them directly; what ships for React is a `jsx.d.ts` that types every tag
-and a runtime bridge in `@fusion.dev/helix-core` that repairs React's hydration of
-custom events. [React](./react) has both.
+**React uses the elements directly.** Helix ships a `jsx.d.ts` that types every
+tag, and a runtime bridge in `@fusion.dev/helix-core` that fixes how React
+hydrates custom events. [React](./react) covers both.
 
 See [Tiers](./tiers) for how the packages relate and which one to reach for.
