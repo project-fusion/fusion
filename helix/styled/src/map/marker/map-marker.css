@@ -165,9 +165,15 @@
   --_map-marker-size: var(--map-marker-size, 1.625rem);
 }
 
+/* **The pin's head is the point's own circle**, the fill behind what it
+   holds, which the teardrop drawn over it matches exactly: a square rounded
+   on three corners is that circle and a tip. Behind the letter as well as
+   around it, so the letter stands on its fill wherever it is measured, not
+   only where a pseudo-element is painted. */
 :host([shape="pin"]) [part="point"] {
-  background: none;
+  background: var(--_map-marker-fill);
   border: 0;
+  border-radius: var(--helix-radii-full);
   box-shadow: none;
 }
 
