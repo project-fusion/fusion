@@ -2,14 +2,14 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { HelixActivateEvent, HelixMap, HelixMapRoute } from '@fusion.dev/helix'
-import { connectMap, mapColorsFrom, motionOf } from '@fusion.dev/helix-map'
-import { mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
+import { colorsReady, connectMap, motionOf } from '@fusion.dev/helix-map'
+import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { useEffect, useRef, useState } from 'react'
 import { MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
 import { stageAppearance } from '@/content/verticals/verticals'
-import { boundsOf, clearOf, colorsNow, PATIENCE, sameColors } from '@/utils/map-view/map-view'
+import { boundsOf, clearOf } from '@/utils/map-view/map-view'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './maps.module.css'
 import { mapIntent, propertiesOf, type SentTheme } from './maps-theme'
@@ -161,22 +161,20 @@ export function MapsHero({
       const language = document.documentElement.lang || 'en'
       /* The tokens can be a frame or two behind the page, so the map waits for
          them, and a page that never has them is told so by name. */
-      let first = colorsNow(host)
-      for (let waited = 0; !first && waited < PATIENCE; waited++) {
-        await new Promise((next) => requestAnimationFrame(next))
-        if (!live) {
-          return
-        }
-        first = colorsNow(host)
+      const colors = await colorsReady(host)
+      if (!live) {
+        return
       }
-      let colors = first ?? mapColorsFrom(host)
-      let contrast = labels.current
+      /* The labels held to the contrast chosen at the moment the map is
+         styled, which a sent theme sets and a brand of the page's own clears. */
+      const styled = (from: typeof colors) =>
+        mapLibreStyle(from, { contrast: labels.current, language }) as never
       const map = new maplibregl.Map({
         attributionControl: false,
         bounds: BOUNDS,
         container: box,
         fitBoundsOptions: { padding: clearOf(box, panel.current) },
-        style: mapLibreStyle(colors, { contrast: labels.current, language }) as never,
+        style: styled(colors),
       })
       /* Framed again once it has drawn: the page is still settling the map's
          height when it is made, and a resize keeps the center, not the fit. */
@@ -196,6 +194,9 @@ export function MapsHero({
          talking. The route behind it is drawn quieter than the route ahead. */
       const walker = host.querySelector('helix-map-position')
       const route = host.querySelector<HelixMapRoute>('helix-map-route:not([variant])')
+      const [setOff, arrive] = [
+        ...host.querySelectorAll<HelixMapRoute>('helix-map-route[variant="dotted"]'),
+      ]
       let ticking = 0
       let onScreen = true
       const seen = new IntersectionObserver(([entry]) => {
@@ -232,7 +233,11 @@ export function MapsHero({
         const total = along.at(-1) ?? 0
         /** Stands the walker so far along the path, facing its way, the route behind it quieter. */
         const standAt = (covered: number): number => {
-          const at = Math.max(along.findIndex((distance) => distance > covered) - 1, 0)
+          /* The leg it is on: the last one once it has arrived, where no point
+             lies further along, rather than the first, from which it was
+             carried on past the springs and off the map for the whole rest. */
+          const ahead = along.findIndex((distance) => distance > covered)
+          const at = ahead === -1 ? path.length - 2 : Math.max(ahead - 1, 0)
           const [from, to] = [path[at], path[at + 1] ?? path[at]] as [
             readonly [number, number],
             readonly [number, number],
@@ -244,15 +249,20 @@ export function MapsHero({
           if (span > 0) {
             walker.heading = bearing({ lat: from[0], lng: from[1] }, { lat: to[0], lng: to[1] })
           }
-          /* The route behind the walker is the routed part only, so its
-             progress is how much of that part is behind, the dotted legs
-             either side of it being no part of it. */
+          /* **Everything behind the walker is quieter**, each line by how
+             much of it is behind: the dotted first steps, the routed walk, and
+             the dotted last steps, which are three lines and one journey. */
           const [routeStart, routeEnd] = [along[1] ?? 0, along[path.length - 2] ?? total]
+          const behind = (from: number, to: number): number =>
+            Math.min(Math.max((covered - from) / Math.max(to - from, 1e-9), 0), 1)
+          if (setOff) {
+            setOff.progress = behind(0, routeStart)
+          }
           if (route) {
-            route.progress = Math.min(
-              Math.max((covered - routeStart) / Math.max(routeEnd - routeStart, 1e-9), 0),
-              1,
-            )
+            route.progress = behind(routeStart, routeEnd)
+          }
+          if (arrive) {
+            arrive.progress = behind(routeEnd, total)
           }
           return at
         }
@@ -313,45 +323,14 @@ export function MapsHero({
         }
       }
       host.addEventListener('helix-activate', visit)
-      let pending = 0
-      let waited = 0
-      const restyle = (): void => {
-        cancelAnimationFrame(pending)
-        pending = requestAnimationFrame(() => {
-          const next = colorsNow(host)
-          /* A stylesheet on its way back: the next frame, until it lands. */
-          if (!next) {
-            if (waited++ < PATIENCE) {
-              restyle()
-            }
-            return
-          }
-          waited = 0
-          if (!sameColors(colors, next) || contrast !== labels.current) {
-            colors = next
-            contrast = labels.current
-            map.setStyle(mapLibreStyle(colors, { contrast, language }) as never, { diff: true })
-          }
-        })
-      }
-      const watch = new MutationObserver((records) => {
-        if (records.some((record) => (record.target as Node).contains(host))) {
-          restyle()
-        }
-      })
-      watch.observe(document.documentElement, {
-        attributeFilter: ['data-color-mode', 'style', 'class'],
-        attributes: true,
-        subtree: true,
-      })
-      const scheme = matchMedia('(prefers-color-scheme: dark)')
-      scheme.addEventListener('change', restyle)
+      /* **Restyled where its theme moves**: a brand or a mode painted on the
+         scope, the site's own mode, or the reader's preference, and held to
+         whichever contrast the labels are held to at that moment. */
+      const theme = followTheme(map, host, styled)
       teardown = () => {
         clearTimeout(ticking)
         stopSeeing()
-        cancelAnimationFrame(pending)
-        watch.disconnect()
-        scheme.removeEventListener('change', restyle)
+        theme.stop()
         host.removeEventListener('helix-activate', visit)
         connection.disconnect()
         map.remove()
@@ -374,9 +353,9 @@ export function MapsHero({
       return
     }
     const scheme = mode === 'site' ? siteScheme() : mode
-    /* **The mode as the token layer takes it**, which is \`data-color-mode\`:
-       the site's \`light-dark()\` is compiled into a shim that resolves
-       through it, so \`color-scheme\` alone moved the scrollbars and left
+    /* **The mode as the token layer takes it**, which is `data-color-mode`:
+       the site's `light-dark()` is compiled into a shim that resolves
+       through it, so `color-scheme` alone moved the scrollbars and left
        every token on its light arm, and the switcher did nothing a reader
        could see unless a brand was picked, which paints its colors outright. */
     node.style.colorScheme = mode === 'site' ? '' : scheme

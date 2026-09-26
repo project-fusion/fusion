@@ -18,9 +18,9 @@
  * MapLibre's weight for nothing.
  */
 
-import { connectMap, type MapColors, mapColorsFrom } from '@fusion.dev/helix-map'
-import { mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
-import { boundsOf, clearOf, colorsNow, sameColors } from '../utils/map-view/map-view'
+import { connectMap, mapColorsFrom } from '@fusion.dev/helix-map'
+import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
+import { clearOf } from '../utils/map-view/map-view'
 import { RESTYLED } from './preview-events'
 
 /** MapLibre, as its own script leaves it on the window. */
@@ -51,57 +51,36 @@ const contrastOf = (frame: Element): number | undefined => {
   return Number.isFinite(value) ? value : undefined
 }
 
-/** A route's or an area's points, read from the attribute as the markup wrote it. */
-const pointsOf = (layer: Element): { lat: number; lng: number }[] =>
-  (layer.getAttribute('points') ?? '')
-    .trim()
-    .split(/\s+/)
-    .map((pair) => pair.split(',').map(Number))
-    .filter((pair) => pair.length === 2 && pair.every(Number.isFinite))
-    .map(([lat, lng]) => ({ lat: lat as number, lng: lng as number }))
-
-/** Where a marker stands, read from its attributes as the markup wrote them. */
-const placeOf = (marker: Element): { lat: number; lng: number } | null => {
-  const lat = Number(marker.getAttribute('lat'))
-  const lng = Number(marker.getAttribute('lng'))
-  return marker.hasAttribute('lat') && marker.hasAttribute('lng') ? { lat, lng } : null
-}
-
 /**
- * One map: the renderer made, connected to its frame, framed around its
- * markers clear of the panel, and redrawn when the theme moves.
+ * One map: the renderer made, connected to its frame, framed around every
+ * place it holds clear of the panel, and redrawn when the theme moves.
  */
 const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   const box = frame.querySelector<HTMLElement>('[data-preview-map-canvas]')
   if (!box) {
     return () => undefined
   }
-  /* Every place the map holds, a route's start among them, so a lane from a
-     port off the edge of the markers' own bounds is framed whole. */
-  const places = [
-    ...[...frame.querySelectorAll('helix-map-marker, helix-map-position')].map(placeOf),
-    ...[...frame.querySelectorAll('helix-map-route, helix-map-area')].flatMap(pointsOf),
-  ].filter((place) => place !== null)
   const panel = root.querySelector('[data-preview-map-clear]')
-  const bounds = places.length > 0 ? boundsOf(places) : undefined
   const language = document.documentElement.lang || 'en'
-  let colors: MapColors = mapColorsFrom(frame)
-  let contrast = contrastOf(frame)
+  const styled = (colors: ReturnType<typeof mapColorsFrom>) =>
+    mapLibreStyle(colors, { contrast: contrastOf(frame), language }) as never
   const map = new maplibregl.Map({
     attributionControl: false,
     container: box,
-    style: mapLibreStyle(colors, { contrast, language }) as never,
-    ...(bounds ? { bounds, fitBoundsOptions: { padding: clearOf(box, panel) } } : {}),
+    style: styled(mapColorsFrom(frame)),
   })
-  /* Framed again once it has drawn, and whenever the pane is resized: the
-     frame is still settling its height when the map is made, and a resize
-     keeps the center rather than the fit, so a reader dragging the builder's
-     separator would push the places out of view. */
+  const connection = connectMap(frame, mapLibreDriver(map))
+  /* **Every place the map holds, framed at once**: its markers, its
+     position and every point of its routes, so a lane from a port off the
+     edge of the markers' own bounds is framed whole. Again once it has
+     drawn, and whenever the pane is resized: the frame is still settling its
+     height when the map is made, and a resize keeps the center rather than
+     the fit, so a reader dragging the builder's separator would push the
+     places out of view. */
   const frameAround = (): void => {
-    if (bounds) {
-      map.fitBounds(bounds, { animate: false, padding: clearOf(box, panel) })
-    }
+    connection.fit({ animate: false, padding: clearOf(box, panel) })
   }
+  frameAround()
   map.once('load', frameAround)
   let fitting = 0
   const resized = new ResizeObserver(() => {
@@ -109,33 +88,16 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
     fitting = requestAnimationFrame(frameAround)
   })
   resized.observe(box)
-  const connection = connectMap(frame, mapLibreDriver(map))
 
-  /* **Only the latest colors, once a frame.** The builder can post a theme on
-     every keystroke, and a restyle takes a few hundred milliseconds to settle
-     on a software renderer: one pending at a time, and a restyle that would
-     draw the same five colors is skipped. */
-  let pending = 0
-  const restyle = (): void => {
-    cancelAnimationFrame(pending)
-    pending = requestAnimationFrame(() => {
-      const next = colorsNow(frame)
-      if (!next) {
-        return
-      }
-      const target = contrastOf(frame)
-      if (!sameColors(colors, next) || target !== contrast) {
-        colors = next
-        contrast = target
-        map.setStyle(mapLibreStyle(colors, { contrast, language }) as never, { diff: true })
-      }
-    })
-  }
-  window.addEventListener(RESTYLED, restyle)
+  /* **Only the latest theme, once a frame.** The builder can post a theme on
+     every keystroke, and the frame says so after each one, which is a
+     stylesheet replaced rather than anything a watch on the page would hear. */
+  const theme = followTheme(map, frame, styled)
+  window.addEventListener(RESTYLED, theme.update)
 
   return () => {
-    window.removeEventListener(RESTYLED, restyle)
-    cancelAnimationFrame(pending)
+    window.removeEventListener(RESTYLED, theme.update)
+    theme.stop()
     cancelAnimationFrame(fitting)
     resized.disconnect()
     connection.disconnect()
