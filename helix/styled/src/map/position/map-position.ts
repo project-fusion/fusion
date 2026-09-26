@@ -19,7 +19,7 @@ import { styles } from './map-position.css.js'
  * @documentation https://fusion.dev/helix/components/map
  *
  * @cssproperty --map-position-color - The wash around the point, its halo, beam and pulse, where no tone says it.
- * @cssproperty --map-position-edge - The ring around the point and the outline of its arrow, where no tone says it.
+ * @cssproperty --map-position-edge - The ring around the point and the outline of its arrow: the surface, whatever the tone.
  * @cssproperty --map-position-fill - The point's body and its arrow's, where no tone says it.
  * @cssproperty --map-position-size - How wide the point is.
  */

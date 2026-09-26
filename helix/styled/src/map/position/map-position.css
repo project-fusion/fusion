@@ -150,7 +150,7 @@
    arrow inside a dot was a few pixels across at a map's size, too small to
    read which way it pointed. **No edge of its own**, the ink alone with a
    little lift, since an arrow is its shape and a ring around it said
-   nothing the shape did not; \`outlined\` gives it one, a stroke in the
+   nothing the shape did not; `outlined` gives it one, a stroke in the
    surface painted under the fill with rounded joins. Its notch is shallow,
    so the tip is the one sharp point. */
 [part="arrow"] {
@@ -260,38 +260,28 @@
   white-space: nowrap;
 }
 
+:host([tone]) {
+  --_map-position-color: var(--_map-position-tone);
+  --_map-position-fill: var(--_map-position-tone);
+}
 :host([tone="accent"]) {
-  --_map-position-color: var(--helix-color-accent);
-  --_map-position-edge: var(--helix-color-surface);
-  --_map-position-fill: var(--helix-color-accent);
+  --_map-position-tone: var(--helix-color-accent);
 }
 :host([tone="danger"]) {
-  --_map-position-color: var(--helix-color-danger);
-  --_map-position-edge: var(--helix-color-surface);
-  --_map-position-fill: var(--helix-color-danger);
+  --_map-position-tone: var(--helix-color-danger);
 }
 :host([tone="info"]) {
-  --_map-position-color: var(--helix-color-info);
-  --_map-position-edge: var(--helix-color-surface);
-  --_map-position-fill: var(--helix-color-info);
+  --_map-position-tone: var(--helix-color-info);
 }
 :host([tone="neutral"]) {
-  --_map-position-color: var(--helix-color-foreground-muted);
-  --_map-position-edge: var(--helix-color-surface);
-  --_map-position-fill: var(--helix-color-foreground-muted);
+  --_map-position-tone: var(--helix-color-foreground-muted);
 }
 :host([tone="primary"]) {
-  --_map-position-color: var(--helix-color-primary);
-  --_map-position-edge: var(--helix-color-surface);
-  --_map-position-fill: var(--helix-color-primary);
+  --_map-position-tone: var(--helix-color-primary);
 }
 :host([tone="success"]) {
-  --_map-position-color: var(--helix-color-success);
-  --_map-position-edge: var(--helix-color-surface);
-  --_map-position-fill: var(--helix-color-success);
+  --_map-position-tone: var(--helix-color-success);
 }
 :host([tone="warning"]) {
-  --_map-position-color: var(--helix-color-warning);
-  --_map-position-edge: var(--helix-color-surface);
-  --_map-position-fill: var(--helix-color-warning);
+  --_map-position-tone: var(--helix-color-warning);
 }
