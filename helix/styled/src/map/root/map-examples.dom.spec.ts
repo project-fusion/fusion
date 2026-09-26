@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, registerDom } from '@fusion.dev/helix-testing/dom'
+import points from '../.examples/points.html' with { type: 'text' }
 import wired from '../.examples/wired.html' with { type: 'text' }
 
 beforeAll(async () => {
@@ -59,5 +60,21 @@ describe('the wired example', () => {
     region.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowUp' }))
     await idle()
     expect(shifted().y).not.toBe('0px')
+  })
+})
+
+describe('the points example', () => {
+  run('its script hands the layer the places it draws, each named', async () => {
+    /* The renderer is what draws them, which a spec has none of: what the
+       example owes is the data, set on the layer as a page would set its own. */
+    await example(points)
+    const layer = document.getElementById('places') as HTMLElement & {
+      data?: { label: string; lat: number; lng: number }[]
+    }
+    expect(layer.data).toHaveLength(2400)
+    expect(layer.data?.[0]?.label).toBe('Place 1')
+    expect(layer.data?.every((one) => Number.isFinite(one.lat) && Number.isFinite(one.lng))).toBe(
+      true,
+    )
   })
 })
