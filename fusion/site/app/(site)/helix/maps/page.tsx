@@ -1,12 +1,50 @@
+import { highlight } from '@fusion.dev/helix-sandbox/highlight'
+import Link from 'next/link'
+import { Band, band } from '@/components/band/band'
+import { Claim } from '@/components/claim/claim'
+import { Eyebrow } from '@/components/eyebrow/eyebrow'
+import { Lede } from '@/components/lede/lede'
+import { SectionTitle } from '@/components/section-title/section-title'
 import { GOOGLE_FACES } from '@/content/faces/faces.generated'
-import { MAP_STACK, MAPS } from '@/content/maps/maps'
+import { MAP_FEATURES, MAP_PILLARS, MAP_STACK, MAP_STEPS, MAPS } from '@/content/maps/maps'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { type Params, queryFrom, settingsFrom } from '@/utils/theme-defaults/theme-defaults'
 import { serverTheme } from '@/utils/theme-engine/theme-engine.server'
 import styles from './maps.module.css'
 import { MapsHero } from './maps-hero'
+import { MapsPoints } from './maps-points'
 import { mapIntent, propertiesOf } from './maps-theme'
+
+/** A snippet as the reference pages show one, highlighted by this build from its own source. */
+function Code({
+  code,
+  label,
+  language,
+}: {
+  code: string
+  label: string
+  language: 'html' | 'js' | 'sh'
+}) {
+  return (
+    <helix-code-block label={label}>
+      <span
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: markup this build produced from its own source
+        dangerouslySetInnerHTML={{ __html: highlight(code, language) }}
+      />
+    </helix-code-block>
+  )
+}
+
+/** The points layer as a page writes it, which the demo beside it is. */
+const POINTS_MARKUP = `<helix-map label="Food and drink in Austin">
+  <div id="map"></div>
+  <helix-map-points
+    label="Food and drink"
+    src="/austin-food-and-drink.geojson"
+    cluster
+  ></helix-map-points>
+</helix-map>`
 
 export const metadata = pageMetadata({
   description: MAPS.lede,
@@ -18,15 +56,17 @@ export const metadata = pageMetadata({
  * Maps, a part of Helix at a real address under it.
  *
  * **A page rather than a component's example**, because what is being shown
- * is more than a component: a frame, a connector, a style and, later, tiles
- * and layers. `/helix/components/map` stays the frame's reference.
+ * is more than a component: a frame, a connector, a style, the layers inside
+ * it, and tiles later. `/helix/components/map` stays the frame's reference.
  *
- * **The parts are a stack, not a grid of cards.** They are layers, each
- * resting on the one under it, and a grid read them as five features of equal
- * standing, with the one part that is somebody else's missing altogether.
+ * **Sold, then shown, then handed over.** Under the live map: what a map gets
+ * from Helix, the one thing a marker cannot do shown running, what a map can
+ * hold, the three steps to one of your own, and last how it is built, the
+ * stack each of those rests on. The bands and their field are the landing
+ * page's, so Maps reads as a part of the same site rather than a tool page.
  */
 export default async function Page({ searchParams }: { searchParams: Promise<Params> }) {
-  const [, stack] = MAPS.blocks
+  const [, pillars, points, features, started, stack] = MAPS.blocks
   /* **A theme the builder sent, derived here so it is in the first paint.**
      The link carries the builder's own query, read by the builder's own
      `settingsFrom`, so every value is validated the same way and falls back
@@ -43,43 +83,170 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
   return (
     <>
       <MapsHero painted={painted} sent={sent} />
-      <helix-flex class={styles.mapsShell} data-shell direction="column" gap="lg">
-        <helix-flex direction="column" gap="xs">
-          <helix-text as="h2" variant="title">
-            {stack?.title}
-          </helix-text>
-          {stack?.body?.map((line) => (
-            <helix-text emphasis="muted" key={line}>
-              {line}
-            </helix-text>
-          ))}
-        </helix-flex>
-        <ol className={styles.mapsStack}>
-          {MAP_STACK.map((layer) => (
-            <li
-              className={styles.mapsLayer}
-              data-owned={layer.owner ? 'false' : 'true'}
-              key={layer.title}
-            >
-              <helix-text class={styles.mapsLayerRole} emphasis="subtle" variant="caption">
-                {layer.role}
-              </helix-text>
-              <div className={styles.mapsLayerText}>
-                <helix-text as="h3" variant="title">
-                  {layer.title}
-                </helix-text>
-                <helix-text emphasis="muted">{layer.body}</helix-text>
-              </div>
-              <helix-tag
-                class={styles.mapsLayerStage}
-                tone={layer.stage ? stageAppearance(layer.stage) : 'neutral'}
+      {/* **One field behind every band**, the landing page's, so the glass
+          the cards are made of has something to show through it. */}
+      <div className={styles.mapsField}>
+        <helix-aura
+          class={styles.mapsAura}
+          data-layer
+          gain={1.05}
+          scale={3}
+          speed={0.5}
+          terminus={0.5625}
+          variant="flow"
+        ></helix-aura>
+
+        <Band reveal>
+          <helix-flex class={band.bandSection} direction="column" gap="md">
+            <Eyebrow>{pillars?.kicker}</Eyebrow>
+            <SectionTitle>{pillars?.title}</SectionTitle>
+            <Lede>{pillars?.body?.[0]}</Lede>
+          </helix-flex>
+          <div className={band.bandRow}>
+            {MAP_PILLARS.map((pillar) => (
+              <helix-flex class={band.bandCell} direction="column" gap="md" key={pillar.name}>
+                <Eyebrow>{pillar.name}</Eyebrow>
+                <Claim>{pillar.claim}</Claim>
+                <ul className={styles.mapsFacts}>
+                  {pillar.facts.map((fact) => (
+                    <li key={fact}>{fact}</li>
+                  ))}
+                </ul>
+              </helix-flex>
+            ))}
+          </div>
+        </Band>
+
+        {/* **The one thing a marker cannot do, running.** Thousands of places
+            are a layer the renderer draws, and the demo is the real layer on
+            the real data beside the markup it takes. */}
+        <Band reveal shell="plain" wide>
+          <div className={band.bandSplit}>
+            <helix-flex class={band.bandSection} direction="column" gap="md">
+              <Eyebrow>{points?.kicker}</Eyebrow>
+              <SectionTitle>{points?.title}</SectionTitle>
+              <Lede>{points?.body?.[0]}</Lede>
+              <Code code={POINTS_MARKUP} label="The layer" language="html" />
+            </helix-flex>
+            <div className={band.bandSection}>
+              <MapsPoints />
+            </div>
+          </div>
+        </Band>
+
+        <Band reveal>
+          <helix-flex class={band.bandSection} direction="column" gap="md">
+            <Eyebrow>{features?.kicker}</Eyebrow>
+            <SectionTitle>{features?.title}</SectionTitle>
+            <Lede>{features?.body?.[0]}</Lede>
+          </helix-flex>
+          <div className={styles.mapsFeatures}>
+            {MAP_FEATURES.map((feature) => (
+              <helix-flex
+                class={styles.mapsFeature}
+                direction="column"
+                gap="sm"
+                key={feature.title}
               >
-                {layer.stage ?? layer.owner}
-              </helix-tag>
-            </li>
-          ))}
-        </ol>
-      </helix-flex>
+                <Claim>{feature.title}</Claim>
+                <helix-text emphasis="muted">{feature.body}</helix-text>
+                <helix-flex gap="xs" wrap>
+                  {feature.elements.map((element) => (
+                    <code className={styles.mapsElement} key={element}>
+                      {element}
+                    </code>
+                  ))}
+                </helix-flex>
+              </helix-flex>
+            ))}
+          </div>
+        </Band>
+      </div>
+      {/* **A second field for the second half**, the way the landing page
+          lights its closing bands: one canvas the length of five bands faded
+          to flat black by the fourth. */}
+      <div className={`${styles.mapsField} ${styles.mapsFieldLate}`}>
+        <helix-aura
+          class={styles.mapsAura}
+          data-layer
+          gain={1.05}
+          scale={2.5}
+          speed={0.5}
+          terminus={0.5625}
+          variant="flow"
+        ></helix-aura>
+
+        <Band id="get-started" reveal>
+          <helix-flex class={band.bandSection} direction="column" gap="md">
+            <Eyebrow>{started?.kicker}</Eyebrow>
+            <SectionTitle>{started?.title}</SectionTitle>
+          </helix-flex>
+          <ol className={styles.mapsSteps}>
+            {MAP_STEPS.map((step, at) => (
+              <li className={styles.mapsStep} key={step.title}>
+                <span aria-hidden="true" className={styles.mapsStepNumber}>
+                  {at + 1}
+                </span>
+                <helix-flex direction="column" gap="sm">
+                  <helix-text as="h3" variant="title">
+                    {step.title}
+                  </helix-text>
+                  <helix-text emphasis="muted">{step.body}</helix-text>
+                  <Code code={step.code} label={step.title} language={step.language} />
+                </helix-flex>
+              </li>
+            ))}
+          </ol>
+          <helix-flex class={band.bandSection} direction="column" gap="md">
+            {/* **Said, not hidden**: a reader copying the first line should
+                learn it will not install yet from the page, not from npm. */}
+            <helix-callout tone="info">{started?.body?.[0]}</helix-callout>
+            <helix-flex align-items="center" class="siteActions" data-density="lg" gap="lg" wrap>
+              <Link data-button="subtle" href="/helix/theme?layout=map">
+                Try it in the theme builder
+              </Link>
+              <Link data-link="quiet" href="/helix/components/map">
+                The Map reference
+              </Link>
+            </helix-flex>
+          </helix-flex>
+        </Band>
+
+        <Band reveal>
+          <helix-flex class={band.bandSection} direction="column" gap="md">
+            <Eyebrow>{stack?.kicker}</Eyebrow>
+            <SectionTitle>{stack?.title}</SectionTitle>
+            <Lede>{stack?.body?.[0]}</Lede>
+          </helix-flex>
+          <div className={band.bandSection}>
+            <ol className={styles.mapsStack}>
+              {MAP_STACK.map((layer) => (
+                <li
+                  className={styles.mapsLayer}
+                  data-owned={layer.owner ? 'false' : 'true'}
+                  key={layer.title}
+                >
+                  <helix-text class={styles.mapsLayerRole} emphasis="subtle" variant="caption">
+                    {layer.role}
+                  </helix-text>
+                  <div className={styles.mapsLayerText}>
+                    <helix-text as="h3" variant="title">
+                      {layer.title}
+                    </helix-text>
+                    <helix-text emphasis="muted">{layer.body}</helix-text>
+                  </div>
+                  <helix-tag
+                    class={styles.mapsLayerStage}
+                    tone={layer.stage ? stageAppearance(layer.stage) : 'neutral'}
+                  >
+                    {layer.stage ?? layer.owner}
+                  </helix-tag>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </Band>
+      </div>
     </>
   )
 }
