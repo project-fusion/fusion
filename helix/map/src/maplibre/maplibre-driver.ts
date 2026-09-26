@@ -393,11 +393,19 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     /* **Points over everything the style draws**, their counts included:
        they are the page's own data, and a place name over them hid them. */
     const drawPoints = (specs: MapLayerSpec[]): void => {
-      const font = (
-        map.getStyle()?.layers?.find((layer) => layer.type === 'symbol')?.layout as
-          | Record<string, unknown>
-          | undefined
-      )?.['text-font'] ?? ['Noto Sans Regular']
+      /* **An upright face from the style's own**, bold where it has one: the
+         first a style names can be its water's italic, which set every count
+         at a slant. */
+      const faces = (map.getStyle()?.layers ?? [])
+        .filter((layer) => layer.type === 'symbol')
+        .map((layer) => (layer.layout as Record<string, unknown> | undefined)?.['text-font'])
+        .filter(
+          (face): face is string[] =>
+            Array.isArray(face) && face.every((one) => typeof one === 'string'),
+        )
+        .filter((face) => !face.some((one) => /italic/i.test(one)))
+      const font = faces.find((face) => face.some((one) => /bold/i.test(one))) ??
+        faces[0] ?? ['Noto Sans Regular']
       const wanted = new Set(specs.map((spec) => spec.id))
       for (const id of [...drawnPoints.keys()]) {
         if (!wanted.has(id)) {
@@ -427,7 +435,9 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           try {
             map.addSource(id, {
               cluster,
-              clusterMaxZoom: 16,
+              /* Apart from street level on, where a block of six is six
+                 places a reader can tell apart. */
+              clusterMaxZoom: 14,
               clusterRadius: 44,
               data: pointsJson(spec.points),
               type: 'geojson',
