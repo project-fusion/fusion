@@ -25,8 +25,6 @@
     >View</helix-button>
   </helix-notification>
 
-  <!-- Not everything in a feed is a person, and the column takes either: the
-       row asks only that something is there to sit in it. -->
   <helix-notification dismissible>
     <helix-icon
       name="warning"
@@ -58,9 +56,8 @@
 </helix-notifications>
 
 <script>
-  /* Set from script rather than written into the markup, because a timestamp in
-     an example is stale the moment it is committed: written as a literal, the
-     feed reads "8 months ago" by the time anybody looks at it. */
+  /* The script sets each timestamp relative to now, so the feed always shows
+     recent times. */
   const feed = document.getElementById('feed')
   const ago = (minutes) => new Date(Date.now() - minutes * 60_000).toISOString()
 

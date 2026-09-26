@@ -4,18 +4,18 @@ export function Example() {
   return (
     <helix-headless-listbox
       default-value="two"
-      hint="Hint"
-      label="Label"
+      hint="Billed monthly"
+      label="Plan"
       name="choice"
     >
-      <helix-headless-option value="one">Option One</helix-headless-option>
-      <helix-headless-option value="two">Option Two</helix-headless-option>
-      <helix-headless-option value="three">Option Three</helix-headless-option>
+      <helix-headless-option value="one">Free</helix-headless-option>
+      <helix-headless-option value="two">Pro</helix-headless-option>
+      <helix-headless-option value="three">Team</helix-headless-option>
       <helix-headless-option
         disabled
         value="four"
       >
-        Option Four
+        Enterprise
       </helix-headless-option>
     </helix-headless-listbox>
   )

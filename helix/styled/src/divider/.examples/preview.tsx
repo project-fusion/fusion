@@ -5,13 +5,13 @@ export function Example() {
       gap="sm"
     >
       <helix-text>
-        Helix ships two tiers from one source. The headless tier carries behavior, semantics and
-        nothing else.
+        Your workspace has three projects and five members. Each project keeps its own files and
+        settings.
       </helix-text>
       <helix-divider></helix-divider>
       <helix-text>
-        The styled tier is the same components with the design system applied, which is what most
-        consumers install.
+        Members can open every project in the workspace. Only owners can invite people or change
+        billing.
       </helix-text>
     </helix-flex>
   )

@@ -2,12 +2,12 @@ export function Example() {
   return (
     <helix-canvas
       grid="dots"
-      label="How a release happens"
+      label="Document approval"
     >
       <helix-canvas-node
         group
         height={112}
-        label="Before the tag"
+        label="Before publishing"
         name="flow"
         width={528}
         x={-24}
@@ -21,7 +21,7 @@ export function Example() {
         x={0}
         y={0}
       >
-        Write the change
+        Write the draft
       </helix-canvas-node>
 
       <helix-canvas-node
@@ -32,7 +32,7 @@ export function Example() {
         x={320}
         y={0}
       >
-        Review it
+        Review the draft
       </helix-canvas-node>
 
       <helix-canvas-node
@@ -43,12 +43,12 @@ export function Example() {
         x={160}
         y={200}
       >
-        Tag and publish
+        Publish the draft
       </helix-canvas-node>
 
       <helix-canvas-edge
         from="write"
-        label="when it builds"
+        label="when it is complete"
         to="review"
       ></helix-canvas-edge>
 

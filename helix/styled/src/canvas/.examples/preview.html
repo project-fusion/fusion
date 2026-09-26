@@ -1,12 +1,12 @@
 <!-- @summary A board of cards and the arrows between them, drawn where its author placed each one. -->
 <helix-canvas
   grid="dots"
-  label="How a release happens"
+  label="Document approval"
 >
   <helix-canvas-node
     group
     height="112"
-    label="Before the tag"
+    label="Before publishing"
     name="flow"
     width="528"
     x="-24"
@@ -19,7 +19,7 @@
     width="160"
     x="0"
     y="0"
-  >Write the change</helix-canvas-node>
+  >Write the draft</helix-canvas-node>
 
   <helix-canvas-node
     height="64"
@@ -28,7 +28,7 @@
     width="160"
     x="320"
     y="0"
-  >Review it</helix-canvas-node>
+  >Review the draft</helix-canvas-node>
 
   <helix-canvas-node
     height="64"
@@ -37,11 +37,11 @@
     width="160"
     x="160"
     y="200"
-  >Tag and publish</helix-canvas-node>
+  >Publish the draft</helix-canvas-node>
 
   <helix-canvas-edge
     from="write"
-    label="when it builds"
+    label="when it is complete"
     to="review"
   ></helix-canvas-edge>
 

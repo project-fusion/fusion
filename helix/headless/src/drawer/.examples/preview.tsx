@@ -12,15 +12,12 @@ export function Example() {
 
       <helix-headless-drawer
         id="panel"
-        label="Drawer Title"
+        label="Project details"
         placement="end"
       >
-        <span slot="header">Drawer Title</span>
+        <span slot="header">Project details</span>
         <div className="stack">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore.
-          </p>
+          <p>See who owns the project, who can edit it, and when it last changed.</p>
           <helix-headless-button
             command="--close"
             commandfor="panel"

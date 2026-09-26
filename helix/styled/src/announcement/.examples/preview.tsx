@@ -4,7 +4,7 @@ export function Example() {
       dismissible
       tone="info"
     >
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Scheduled maintenance begins on Sunday at 10 PM.
     </helix-announcement>
   )
 }

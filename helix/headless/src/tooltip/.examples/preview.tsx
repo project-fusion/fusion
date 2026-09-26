@@ -2,8 +2,8 @@ import './preview.css'
 
 export function Example() {
   return (
-    <helix-headless-tooltip content="Lorem ipsum dolor sit amet">
-      <helix-headless-button>Button</helix-headless-button>
+    <helix-headless-tooltip content="Save your changes to the file">
+      <helix-headless-button>Save changes</helix-headless-button>
     </helix-headless-tooltip>
   )
 }

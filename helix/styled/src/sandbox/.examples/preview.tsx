@@ -7,7 +7,7 @@ export function Example() {
           emphasis="ghost"
           slot="end"
         >
-          Reset
+          Reset code
         </helix-button>
       </helix-sandbox-toolbar>
 
@@ -17,9 +17,8 @@ export function Example() {
         value="&lt;helix-button emphasis=&quot;solid&quot; tone=&quot;primary&quot;&gt;Save&lt;/helix-button&gt;"
       ></helix-sandbox-source>
 
-      {/* A plain element, not `Sandbox.Preview`. The preview renders an iframe and
-             an example has no document to point one at, so what would show is an
-             empty frame. */}
+      {/* The preview here is a plain element. `Sandbox.Preview` renders an
+          iframe, which needs a document to load. */}
       <div slot="preview">
         <helix-button
           emphasis="solid"

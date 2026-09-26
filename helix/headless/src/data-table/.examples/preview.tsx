@@ -1,7 +1,7 @@
 import './preview.css'
 
-/* A size a person can read in the cell, and the number under it for the sort.
-   The styled twin carries the reasoning. */
+/* The cell shows a readable size, and `compare` sorts the column by the
+   number. Each value gets its own unit, so a small file does not read "0 MB". */
 const units = ['B', 'kB', 'MB', 'GB']
 
 const bytes = (value: number): string => {
@@ -27,7 +27,7 @@ export function Example() {
   return (
     <helix-headless-data-table
       default-sort="name:asc"
-      label="Objects"
+      label="Files"
       page-size="4"
       rows={rows}
     >
