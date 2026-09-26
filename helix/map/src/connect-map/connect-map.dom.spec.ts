@@ -502,3 +502,46 @@ describe('connectMap with routes and areas', () => {
     ])
   })
 })
+
+describe('connectMap with a position', () => {
+  test('a position is stood where it is, turned its heading, and ringed as wide as its accuracy on the map', async () => {
+    const host = await frame(
+      '<helix-headless-map-position label="Van 12" lat="1" lng="2" heading="90" accuracy="111320"></helix-headless-map-position>',
+    )
+    const position = host.querySelector('helix-headless-map-position') as HTMLElement
+    const read = (name: string): string =>
+      position.style.getPropertyValue(`--_map-position-${name}`)
+    const connection = connectMap(host, projecting().driver)
+    // Ten pixels a degree, and 111,320 meters is a degree of latitude.
+    expect([read('x'), read('y'), read('heading'), read('radius')]).toEqual([
+      '20px',
+      '10px',
+      '90deg',
+      '10px',
+    ])
+
+    position.setAttribute('lng', '3')
+    position.setAttribute('heading', '180')
+    await settle()
+    expect([read('x'), read('heading')]).toEqual(['30px', '180deg'])
+
+    connection.disconnect()
+    expect(read('x')).toBe('')
+  })
+
+  test('fitting counts a position among the places to frame', async () => {
+    const host = await frame(
+      `<helix-headless-map-marker label="Depot" lat="0" lng="0"></helix-headless-map-marker>
+       <helix-headless-map-position label="Van 12" lat="5" lng="6"></helix-headless-map-position>`,
+    )
+    const fitted: string[] = []
+    connectMap(host, {
+      fit: (bounds) => {
+        fitted.push(JSON.stringify(bounds))
+      },
+      panBy: () => {},
+      zoomBy: () => {},
+    }).fit()
+    expect(fitted).toEqual(['{"northEast":{"lat":5,"lng":6},"southWest":{"lat":0,"lng":0}}'])
+  })
+})

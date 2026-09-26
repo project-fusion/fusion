@@ -1,0 +1,121 @@
+/* **A point with no box of its own**, stood on the position by the connector
+   the way a marker is, with the ring's radius and the heading written beside
+   where it stands. Zero by zero, so the frame lays nothing out for it, and
+   `left` rather than `inset-inline-start` for the marker's reason: the
+   renderer measures from the left whatever the page's direction. */
+:host {
+  --_map-position-color: var(--map-position-color, var(--helix-color-primary));
+  /* **Declared here and written by the connector**, onto the host, where the
+     connector can reach and this can read. */
+  --_map-position-heading: 0deg;
+  --_map-position-radius: 0px;
+  --_map-position-x: 0px;
+  --_map-position-y: 0px;
+  block-size: 0;
+  display: block;
+  inline-size: 0;
+  inset-block-start: var(--_map-position-y);
+  left: var(--_map-position-x);
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Not yet placed, which would draw it in the frame's corner. */
+:host(:not([style*="--_map-position-x"])) {
+  visibility: hidden;
+}
+
+[part="position"] {
+  display: block;
+}
+
+/* **As wide as the position is uncertain**, in meters on the ground, which
+   the connector turns into pixels at the zoom the map is at. A wash of the
+   point's color rather than a line, since it is a likelihood and not an edge. */
+[part="accuracy"] {
+  background: color-mix(in oklab, var(--_map-position-color) 14%, transparent);
+  block-size: calc(var(--_map-position-radius) * 2);
+  border: var(--helix-border-thin) solid
+    color-mix(in oklab, var(--_map-position-color) 40%, transparent);
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  inline-size: calc(var(--_map-position-radius) * 2);
+  left: 0;
+  position: absolute;
+  top: 0;
+  translate: -50% -50%;
+}
+
+/* **The way it is going**: a cone opening from the point, turned clockwise
+   from north by the heading, and drawn only where a heading is known. */
+[part="heading"] {
+  background: conic-gradient(
+    from -30deg,
+    color-mix(in oklab, var(--_map-position-color) 60%, transparent) 0deg 60deg,
+    transparent 60deg
+  );
+  block-size: calc(var(--map-position-size, 1rem) * 4.5);
+  border-radius: var(--helix-radii-full);
+  display: none;
+  inline-size: calc(var(--map-position-size, 1rem) * 4.5);
+  left: 0;
+  mask: radial-gradient(closest-side, black 40%, transparent);
+  position: absolute;
+  rotate: var(--_map-position-heading);
+  top: 0;
+  translate: -50% -50%;
+}
+
+:host([heading]) [part="heading"] {
+  display: block;
+}
+
+/* **A halo, so it reads as moving rather than as one more place.** A marker
+   is a point in the same color, and a position drawn the same way was one
+   more marker among them until it moved. */
+[part="dot"] {
+  background: var(--_map-position-color);
+  block-size: var(--map-position-size, 1rem);
+  border: var(--helix-border-thick) solid var(--helix-color-surface);
+  border-radius: var(--helix-radii-full);
+  box-shadow:
+    0 0 0 calc(var(--map-position-size, 1rem) * 0.4)
+    color-mix(in oklab, var(--_map-position-color) 24%, transparent),
+    var(--helix-shadow-sm);
+  box-sizing: border-box;
+  inline-size: var(--map-position-size, 1rem);
+  left: 0;
+  position: absolute;
+  top: 0;
+  translate: -50% -50%;
+}
+
+/* **Heard, not seen**: the description is for a reader who cannot see the
+   point move, and a sighted one has the page's own words for it. */
+[part="status"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+:host([tone="accent"]) {
+  --_map-position-color: var(--helix-color-accent);
+}
+:host([tone="danger"]) {
+  --_map-position-color: var(--helix-color-danger);
+}
+:host([tone="info"]) {
+  --_map-position-color: var(--helix-color-info);
+}
+:host([tone="neutral"]) {
+  --_map-position-color: var(--helix-color-foreground-muted);
+}
+:host([tone="success"]) {
+  --_map-position-color: var(--helix-color-success);
+}
+:host([tone="warning"]) {
+  --_map-position-color: var(--helix-color-warning);
+}
