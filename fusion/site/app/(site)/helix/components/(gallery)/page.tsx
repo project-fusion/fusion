@@ -1,5 +1,6 @@
 import { ComponentArt } from '@fusion.dev/helix-gallery'
 import Link from 'next/link'
+import { CodeText } from '@/components/code-text/code-text'
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
@@ -131,7 +132,7 @@ export default async function Page({
                 )}
               </helix-flex>
               <helix-text emphasis="muted" variant="caption">
-                {family.summary}
+                <CodeText>{family.summary}</CodeText>
               </helix-text>
             </helix-card>
           </Link>
