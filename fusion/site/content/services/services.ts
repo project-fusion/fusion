@@ -1,11 +1,8 @@
 /**
  * One buyable offer.
  *
- * Every field here is a commitment a reader can hold us to, which is why the
- * price and the length are on the type rather than left to prose. An offer
- * whose cost appears only after a call is an offer that cannot be compared,
- * and the constraint that forbids lock-in is hard to square with a hidden
- * number.
+ * Every field here is a commitment you can hold us to, which is why the
+ * length and the deliverables are on the type instead of in prose.
  */
 export interface Service {
   /**
@@ -26,11 +23,6 @@ export interface Service {
    */
   outcome: string
   /**
-   * The range, in whole dollars. A range rather than a number because scope
-   * moves it, and no range at all would be worse than an honest one.
-   */
-  price: string
-  /**
    * One line, for the card and the landing page's band.
    */
   summary: string
@@ -41,20 +33,17 @@ export interface Service {
  *
  * **Not alphabetized, because the order is the argument.** This is a ladder:
  * the audit is cheap enough to say yes to and is what qualifies a client for
- * the sprint, and the sprint is what makes the build engagement legible. Sorted
- * by name it would open on the largest number on the page.
+ * the sprint, and the sprint is what makes the build engagement legible.
  *
- * **Prices and durations are stated here once and read everywhere**, so the
- * pages that show them cannot drift from each other on what is actually sold or
- * for how much.
+ * **Durations are stated here once and read everywhere**, so the pages that
+ * show them cannot drift from each other on what is sold.
  *
  * **Every offer states the commitment and not only the elapsed time**, which is
  * the highest-value line in the set. Four weeks with no shape given invites a
- * full-time reading, and the price then reads as something it is not. The
- * number was never the problem: what it was divided by was.
+ * full-time reading.
  *
- * It is not a fact about the sprint alone. Every offer is costed against the
- * same part-time commitment, so a buyer reading "six to eight weeks" beside a
+ * It is not a fact about the sprint alone. Every offer runs on the same
+ * part-time commitment, so a buyer reading "six to eight weeks" beside a
  * sprint that says "two days a week" has been told the build is something else,
  * which is the one reading that is worse than saying nothing at all.
  *
@@ -74,7 +63,6 @@ export const SERVICES: Service[] = [
     name: 'AI capability audit',
     outcome:
       'A document you own and can act on without us. If you do not need a larger engagement, the audit says so.',
-    price: '$12,000 to $18,000',
     summary:
       'Up to two weeks to find out which AI work is worth building. It fits around your roadmap and does not commit you to more.',
   },
@@ -89,7 +77,6 @@ export const SERVICES: Service[] = [
     name: 'Design system sprint',
     outcome:
       'Your design system, in your repository, under your license. It keeps working after we leave.',
-    price: '$32,000 to $45,000',
     summary:
       'Helix, applied to your product. We build your components in your repository, as working code.',
   },
@@ -104,7 +91,6 @@ export const SERVICES: Service[] = [
     name: 'Conversational build',
     outcome:
       'Working software and the reasoning behind it, in your hands. It keeps running after we leave.',
-    price: 'From $60,000',
     summary:
       'We build software with you while the specification is still changing, and agree the next step in each conversation.',
   },

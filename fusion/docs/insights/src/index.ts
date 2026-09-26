@@ -60,10 +60,10 @@ export interface SitePage {
    * prose.
    *
    * `/services` is the case and the only one so far. The three offers are
-   * structured data with a price, a duration and an includes list, read by this
-   * page and by the landing page, so they stay in `services.ts` where several
-   * consumers already find them. Writing them into the MDX would be a second
-   * copy of a price list, which is the worst possible thing to have two of.
+   * structured data with a duration, an includes list, and an outcome, read by
+   * this page and by the landing page, so they stay in `services.ts` where
+   * several consumers already find them. Writing them into the MDX would make a
+   * second copy.
    */
   appends?: 'services'
   /** One-line summary, for the route registry and the document's frontmatter. */
