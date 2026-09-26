@@ -71,7 +71,7 @@ const PROSE: Route[] = [
     title: 'Thesis',
   },
   {
-    description: 'What we take on, and what it costs.',
+    description: 'The services we offer, with their prices.',
     kind: 'page',
     path: '/company/services',
     priority: 0.7,
@@ -115,7 +115,7 @@ const PROSE: Route[] = [
     title: 'Acceptable use',
   },
   {
-    description: 'The design system: tokens, two component tiers, and a theme engine.',
+    description: 'A design system of web components, themed from your brand color.',
     kind: 'page',
     path: '/helix',
     priority: 0.9,
@@ -123,7 +123,7 @@ const PROSE: Route[] = [
     title: 'Helix',
   },
   {
-    description: 'Install it, theme it, and the ideas underneath.',
+    description: 'Install Helix, build a theme, and learn how it works.',
     kind: 'page',
     path: '/helix/docs',
     priority: 0.9,
@@ -131,7 +131,7 @@ const PROSE: Route[] = [
     title: 'Docs',
   },
   {
-    description: 'Every family Helix ships, with its API and a live example.',
+    description: 'Every Helix component, with its API and a live example.',
     kind: 'page',
     path: '/helix/components',
     priority: 0.9,
@@ -139,7 +139,7 @@ const PROSE: Route[] = [
     title: 'Components',
   },
   {
-    description: 'The cognitive substrate: memory, provenance, and context.',
+    description: 'Memory, provenance, and context for AI systems.',
     kind: 'page',
     path: '/cortex',
     priority: 0.9,
@@ -147,7 +147,8 @@ const PROSE: Route[] = [
     title: 'Cortex',
   },
   {
-    description: 'A WebGL field, and the geometry behind it.',
+    description:
+      'Nine animated backgrounds colored by your tokens, with controls for every parameter.',
     kind: 'page',
     path: '/helix/aura',
     priority: 0.4,
@@ -155,7 +156,7 @@ const PROSE: Route[] = [
     title: 'Aura',
   },
   {
-    description: 'Maps in your theme, and one connector for any renderer.',
+    description: 'Interactive maps in your brand’s colors, drawn by MapLibre or Leaflet.',
     kind: 'page',
     path: '/helix/maps',
     priority: 0.5,
@@ -164,7 +165,7 @@ const PROSE: Route[] = [
   },
   {
     description:
-      'An editable source pane beside a live preview. Link a specific example with `?e=<family>.<slug>`.',
+      'Edit the source of any Helix component example and see the result beside it. Link to an example with `?e=<family>.<example>`.',
     kind: 'page',
     path: '/helix/sandbox',
     priority: 0.5,
@@ -172,7 +173,8 @@ const PROSE: Route[] = [
     title: 'Sandbox',
   },
   {
-    description: 'Intent inputs in, a complete contrast-guaranteed token set out.',
+    description:
+      'Enter your brand color and get a full palette, with the contrast of every pair measured.',
     kind: 'page',
     path: '/helix/theme',
     priority: 0.6,
@@ -215,7 +217,7 @@ const docs = (): Route[] => {
 /** Every published insight. */
 const insights = (): Route[] => [
   {
-    description: 'Short pieces on what we are building and why.',
+    description: 'Articles on what we are building and why.',
     kind: 'page',
     path: '/insights',
     priority: 0.6,

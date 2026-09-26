@@ -1,32 +1,32 @@
 ---
 appends: services
-description: The interface and intelligence work we take on now, and what you have at the end of it.
+description: The interface and AI work we take on, and what you have when it is done.
 kicker: Services
-lede: Most start with the audit, which is two weeks at a fixed price, and the rest is scoped from what it finds.
+lede: Most work starts with an audit at a fixed price. We scope the rest from what the audit finds.
 path: /company/services
-title: The work we take on now
+title: The work we take on
 ---
 
 ## What you have at the end
 
-Working software in your repository, under your license, running whether or not
-we are still involved. The architecture decisions are written down with their
-trade-offs, so the next person to touch it can see why it is shaped the way it
-is rather than guessing.
+You have working software in your repository, under your license, and it keeps
+running after we leave. We write down each architecture decision with its
+trade-offs, so the next person who works on the code can see why it is built
+that way.
 
-Handover is part of the work rather than a phase bolted on at the end of it. You
-get the code, the reasoning and the ability to keep going.
+We hand the work over as we go. You get the code, the reasoning behind it, and
+what you need to keep going.
 
 ## Start with the audit
 
-Two weeks and a fixed price, and the honest answer at the end of it may be that
-you do not need the larger engagement. Say plainly what you are trying to do and
-we will tell you whether we are the right people.
+The audit takes up to two weeks at a fixed price. At the end, it may show that
+you do not need a larger engagement. Tell us what you are trying to do, and we
+will tell you whether we are the right team for it.
 
 ## What we take on
 
 | Offer | Duration | Price | What it leaves you |
 | --- | --- | --- | --- |
-| AI capability audit | One to two weeks, two days a week | $12,000 to $18,000 | A document you own and can act on without us. If the honest answer is that you do not need the larger engagement, the audit says so. |
-| Design system sprint | Four weeks, two days a week | $32,000 to $45,000 | Your design system, in your repository, under your license. It runs whether or not we are still involved, which is the only version of this worth buying. |
-| Conversational build | Six to eight weeks, two days a week | From $60,000 | Working software and the reasoning behind it, in your hands. We leave and it keeps running. |
+| AI capability audit | One to two weeks, two days a week | $12,000 to $18,000 | A document you own and can act on without us. If you do not need a larger engagement, the audit says so. |
+| Design system sprint | Four weeks, two days a week | $32,000 to $45,000 | Your design system, in your repository, under your license. It keeps working after we leave. |
+| Conversational build | Six to eight weeks, two days a week | From $60,000 | Working software and the reasoning behind it, in your hands. It keeps running after we leave. |
