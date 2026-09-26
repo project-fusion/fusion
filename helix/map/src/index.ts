@@ -7,7 +7,7 @@ export type {
   MapPadding,
   MapPlace,
 } from './connect-map/index.js'
-export { connectMap } from './connect-map/index.js'
+export { connectMap, distancesAlong } from './connect-map/index.js'
 export type { CreditPart } from './credit/index.js'
 export { creditParts } from './credit/index.js'
 export type { MapMotion, MapPace } from './motion/index.js'

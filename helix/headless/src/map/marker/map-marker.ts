@@ -1,6 +1,9 @@
 import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+
+/** What the frame and the connector write on a marker, which is not news to either. */
+const BOOKKEEPING = new Set<PropertyKey>(['current', 'gathered', 'gatheredBy', 'side'])
 
 /**
  * @summary A place on a map, named and reachable from the keyboard.
@@ -31,12 +34,15 @@ import { property, state } from 'lit/decorators.js'
  *
  * @slot icon - What the point holds: a letter, a number or an icon, such as the order of a stop. Seen, not read: the marker's name is its label.
  *
+ * @event {HelixMapClusterEvent} helix-map-cluster - A reader pressed this while it stood for several places, which the connector answers by zooming in to its places.
  * @event {HelixMapPartChangeEvent} helix-map-part-change - The place moved or was renamed, which the connector follows. Not news for a page.
  *
  * @csspart label - The place's name, beside the point.
  * @csspart marker - The button a reader presses, holding the point and the name.
  * @csspart point - The dot that stands on the place, and holds its `icon` where it has one.
  *
+ * @cssstate cluster - While this stands for several places the frame gathered, drawn as their count and named by their names.
+ * @cssstate clustered - While another marker stands for this one, which is hidden until the view has room for it.
  * @cssstate current - While this is the marker the map's tab stop is on.
  * @cssstate icon - While something is slotted into the point, which the point grows to hold.
  * @cssstate start - While the name sits before the point in reading order, turned there by the connector because the other side of the view had no room for it.
@@ -49,6 +55,22 @@ export class HelixHeadlessMapMarker extends HelixElement {
    */
   @state()
   current = false
+
+  /**
+   * @internal The names of the places this stands for, its own first, written
+   * by the connector while it gathers markers that would draw over each other.
+   * Empty while it stands only for itself.
+   */
+  @state()
+  gathered: string[] = []
+
+  /**
+   * @internal The marker standing for this one while they are gathered,
+   * written by the connector. This one is hidden meanwhile, and the frame's
+   * walk and tab stop go to the one standing for it.
+   */
+  @state()
+  gatheredBy: HelixHeadlessMapMarker | undefined = undefined
 
   /**
    * Marks this as a map marker for the frame and the connector, which find
@@ -89,6 +111,8 @@ export class HelixHeadlessMapMarker extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.toggleState('cluster', this.gathered.length > 1)
+    this.toggleState('clustered', this.gatheredBy !== undefined)
     this.toggleState('current', this.current)
     this.toggleState('start', this.side === 'start')
     if (this.childrenKnown) {
@@ -101,12 +125,17 @@ export class HelixHeadlessMapMarker extends HelixElement {
 
   /**
    * Tells the connector the place moved or was renamed, which moves the point
-   * or changes how far the name reaches. Not for the frame's own bookkeeping,
-   * `current` and `side`, which the frame and the connector wrote.
+   * or changes how far the name reaches, and the frame that it was gathered
+   * or let go, which moves its tab stop. Not for the rest of the frame's own
+   * bookkeeping, `current` and `side`, which the frame and the connector wrote.
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if ([...changed.keys()].some((key) => key !== 'current' && key !== 'side')) {
+    const keys = [...changed.keys()]
+    if (keys.some((key) => key === 'gathered' || key === 'gatheredBy')) {
+      this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'cluster' }))
+    }
+    if (keys.some((key) => !BOOKKEEPING.has(key))) {
       this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'place' }))
     }
   }
@@ -128,10 +157,17 @@ export class HelixHeadlessMapMarker extends HelixElement {
   protected override render(): TemplateResult {
     /* The name is the button's content rather than an `aria-label` over it:
        one set of words, read and seen, and a stylesheet that hides the label
-       until the marker is pointed at must hide it by opacity for that reason. */
-    return html`<span part="marker" role="button" tabindex=${this.current ? '0' : '-1'}>
-      <span part="point" aria-hidden="true"><slot name="icon" @slotchange=${() => this.requestUpdate()}></slot></span>
-      <span part="label">${this.label ?? ''}</span>
+       until the marker is pointed at must hide it by opacity for that reason.
+       **A cluster is its count and its places' names**, the names in the
+       page's own language's list, and a marker another stands for is out of
+       the tree until the view has room for it again. */
+    const cluster = this.gathered.length > 1
+    /* Asked only of a cluster, which only the connector makes in a browser:
+       the server has no tree to find a language in. */
+    const lang = cluster ? this.closest('[lang]')?.getAttribute('lang') || undefined : undefined
+    return html`<span part="marker" role="button" tabindex=${this.current ? '0' : '-1'} ?hidden=${this.gatheredBy !== undefined}>
+      <span part="point" aria-hidden="true">${cluster ? new Intl.NumberFormat(lang).format(this.gathered.length) : nothing}<slot name="icon" ?hidden=${cluster} @slotchange=${() => this.requestUpdate()}></slot></span>
+      <span part="label">${cluster ? new Intl.ListFormat(lang, { type: 'conjunction' }).format(this.gathered) : (this.label ?? '')}</span>
     </span>`
   }
 }

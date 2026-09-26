@@ -19,6 +19,8 @@ import { styles } from './map-marker.css.js'
  * @aliases Map pin, Place, Point of interest
  * @documentation https://fusion.dev/helix/components/map
  *
+ * @cssproperty --map-marker-cluster-color - A cluster's fill, which its count is written on in white.
+ * @cssproperty --map-marker-cluster-size - How wide a cluster is.
  * @cssproperty --map-marker-color - The point's color, where no tone says it.
  * @cssproperty --map-marker-ink - What a point holding a letter writes it in, for a `--map-marker-color` that white does not read on.
  * @cssproperty --map-marker-label-border-width - The name's edge, the theme's floating edge by default.
