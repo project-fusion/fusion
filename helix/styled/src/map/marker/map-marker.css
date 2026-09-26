@@ -259,7 +259,8 @@
     ),
     linear-gradient(var(--_map-marker-leg-ink), var(--_map-marker-leg-ink)) 0 50% / 100%
     var(--helix-border-thick) no-repeat;
-  block-size: calc(var(--_map-marker-leg-dot) * 2);
+  /* Room for the dot's soft edge, which a box its own size cut square. */
+  block-size: calc((var(--_map-marker-leg-dot) + var(--helix-border-thin)) * 2);
   content: "";
   inline-size: calc(var(--_map-marker-leg) + var(--_map-marker-leg-dot));
   left: 0;
