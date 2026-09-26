@@ -17,9 +17,7 @@ export function Example() {
         <helix-toggle value="grid">Grid</helix-toggle>
       </helix-toggle-group>
 
-      {/* The second half the summary promises: the group is live and one member
-          refuses on its own, which is the case that shows a disabled toggle
-          beside a working one rather than a whole row that is out. */}
+      {/* This group is enabled, and only its Dense toggle is disabled. */}
       <helix-toggle-group label="Density">
         <helix-toggle
           selected

@@ -6,7 +6,7 @@ export function Example() {
     >
       <helix-stat direction="column-reverse">
         1,284
-        <span slot="label">The number first, the word under it</span>
+        <span slot="label">Active users</span>
       </helix-stat>
       <helix-stat direction="row">
         98.2

@@ -1,10 +1,10 @@
 const TONES = [
-  ['primary', 'Primary', 'Quiet primary'],
-  ['accent', 'Accent', 'Quiet accent'],
-  ['info', 'Info', 'Quiet info'],
-  ['success', 'Success', 'Quiet success'],
-  ['warning', 'Warning', 'Quiet warning'],
-  ['danger', 'Danger', 'Quiet danger'],
+  ['primary', 'Primary', 'Muted primary'],
+  ['accent', 'Accent', 'Muted accent'],
+  ['info', 'Info', 'Muted info'],
+  ['success', 'Success', 'Muted success'],
+  ['warning', 'Warning', 'Muted warning'],
+  ['danger', 'Danger', 'Muted danger'],
 ] as const
 
 export function Example() {
@@ -14,7 +14,7 @@ export function Example() {
       gap="sm"
     >
       <helix-flex gap="lg">
-        <helix-text as="p">Resting</helix-text>
+        <helix-text as="p">Default</helix-text>
         <helix-text
           as="p"
           emphasis="muted"

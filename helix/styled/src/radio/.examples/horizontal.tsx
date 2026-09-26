@@ -2,13 +2,13 @@ export function Example() {
   return (
     <helix-radio-group
       default-value="one"
-      hint="Hint"
-      label="Label"
+      hint="How often we email you a summary"
+      label="Email summary"
       name="group"
       orientation="horizontal"
     >
-      <helix-radio value="one">Option One</helix-radio>
-      <helix-radio value="two">Option Two</helix-radio>
+      <helix-radio value="one">Daily</helix-radio>
+      <helix-radio value="two">Weekly</helix-radio>
     </helix-radio-group>
   )
 }

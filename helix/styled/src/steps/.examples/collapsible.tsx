@@ -1,26 +1,26 @@
 export function Example() {
   return (
     <helix-steps
-      label="Label"
+      label="Account setup"
       orientation="vertical"
     >
       <helix-step
         complete
         value="one"
       >
-        Step One
-        <helix-text slot="content">Lorem ipsum dolor sit amet, consectetur.</helix-text>
+        Create account
+        <helix-text slot="content">Your email address was confirmed.</helix-text>
       </helix-step>
       <helix-step
         current
         value="two"
       >
-        Step Two
-        <helix-text slot="content">Adipiscing elit, sed do eiusmod tempor incididunt.</helix-text>
+        Add your details
+        <helix-text slot="content">Add your name, role, and time zone.</helix-text>
       </helix-step>
       <helix-step value="three">
-        Step Three
-        <helix-text slot="content">Ut labore et dolore magna aliqua.</helix-text>
+        Invite your team
+        <helix-text slot="content">Invite up to five team members.</helix-text>
       </helix-step>
     </helix-steps>
   )

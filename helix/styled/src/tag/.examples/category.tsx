@@ -6,15 +6,15 @@ export function Example() {
         High
       </helix-tag>
       <helix-tag tone="info">
-        <span slot="start">Env</span>
-        Staging
+        <span slot="start">Plan</span>
+        Pro
       </helix-tag>
       <helix-tag
         dismissible
         tone="success"
       >
         <span slot="start">Owner</span>
-        Ada
+        Alex
       </helix-tag>
     </helix-flex>
   )

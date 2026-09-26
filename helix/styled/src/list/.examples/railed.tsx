@@ -8,34 +8,32 @@ export function Example() {
     >
       <helix-list
         kind="ordered"
-        label="The constraint"
+        label="Getting started"
         marker="rail"
       >
         <helix-list-item>
-          The user holds their own keys
-          <span slot="description">
-            Not escrowed, not recoverable by us, not ours to hand to anyone who asks.
-          </span>
+          Create your account
+          <span slot="description">Use your work email address so your team can find you.</span>
         </helix-list-item>
         <helix-list-item>
-          The user holds their own data
-          <span slot="description">Including the parts they never look at.</span>
+          Set up your profile
+          <span slot="description">Add your name, photo, and time zone.</span>
         </helix-list-item>
         <helix-list-item>
-          The user holds their own hardware
-          <span slot="description">A control plane is not a chokepoint.</span>
+          Invite your team
+          <span slot="description">Send invitations to up to 10 people.</span>
         </helix-list-item>
       </helix-list>
 
       <helix-list
         className="roman"
         kind="ordered"
-        label="A narrower rail, counting differently"
+        label="Release checklist"
         marker="rail"
       >
         <helix-list-item>Draft the migration</helix-list-item>
-        <helix-list-item>Run it against a copy</helix-list-item>
-        <helix-list-item>Cut over on a Tuesday</helix-list-item>
+        <helix-list-item>Test it on a copy</helix-list-item>
+        <helix-list-item>Schedule the release</helix-list-item>
       </helix-list>
     </helix-flex>
   )

@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-input
       default-value="hunter2"
-      hint="The toggle changes what is shown, never what is submitted"
+      hint="Use at least 8 characters"
       label="Password"
       name="password"
       reveal

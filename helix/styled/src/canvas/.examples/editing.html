@@ -6,7 +6,7 @@
 
 <helix-canvas
   id="launch"
-  label="Ideas for the launch"
+  label="Launch plan"
 >
   <helix-canvas-node
     height="64"
@@ -14,7 +14,7 @@
     width="160"
     x="0"
     y="0"
-  ><span>Write the post</span></helix-canvas-node>
+  ><span>Draft the email</span></helix-canvas-node>
 
   <helix-canvas-node
     height="64"
@@ -32,7 +32,7 @@
     width="160"
     x="128"
     y="160"
-  ><span>Ship it</span></helix-canvas-node>
+  ><span>Publish the release</span></helix-canvas-node>
 
   <helix-canvas-edge
     from="post"
@@ -45,7 +45,7 @@
   const launch = document.getElementById('launch')
   let made = 0
 
-  // Asked rather than done: the board never adds to the page's markup, so the page does.
+  // The board does not add connections itself, so the page adds each new edge.
   launch.addEventListener('helix-connect', (event) => {
     const { from, fromSide, to, toSide } = event.detail
     made += 1
@@ -62,7 +62,7 @@
     launch.append(edge)
   })
 
-  // A card holds what the page put in it, so the page edits it: here, its text, in place.
+  // The page edits a card's content. Here, an input replaces the text.
   launch.addEventListener('helix-canvas-edit', (event) => {
     const card = launch.querySelector(`helix-canvas-node[name="${event.detail.name}"]`)
     const text = card?.querySelector('span')
@@ -94,8 +94,8 @@
     field.select()
   })
 
-  // The same for removal, which names every connection a removed card would strand.
-  // Names are only unique on their board, so they are looked up inside it.
+  // The event names every card and connection to remove. Names are unique only
+  // within a board, so look them up inside it.
   launch.addEventListener('helix-remove', (event) => {
     for (const name of event.detail.nodes) {
       launch.querySelector(`helix-canvas-node[name="${name}"]`)?.remove()

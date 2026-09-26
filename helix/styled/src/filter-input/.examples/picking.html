@@ -2,7 +2,7 @@
 <!-- @min 520 -->
 
 <helix-filter-input
-  hint="Open the picker, tick a value, and change the comparison under the field"
+  hint="Choose a filter, then choose one or more values"
   id="filter"
   label="Filter the queue"
   placeholder="Search, or pick a filter"
@@ -48,9 +48,8 @@
 <script type="module">
   const filter = document.getElementById('filter')
 
-  /* Every way a filter can change arrives here as one `helix-facet`: a tick, a
-     comparison, and the X on a chip, which the field turns into this field being
-     filtered by nothing. That is why there is no `helix-dismiss` handler. */
+  /* A checked value, a changed comparison, and a removed chip all send
+     `helix-facet`, so no `helix-dismiss` handler is needed. */
   filter.addEventListener('helix-facet', (event) => {
     const { field, label, operatorLabel, values } = event.detail
     const held = filter.querySelector(`helix-filter-chip[name="${field}"]`)
@@ -65,8 +64,8 @@
     chip.dismissible = true
     chip.dismissLabel = `Remove the ${label.toLowerCase()} filter`
     chip.label = label
-    /* The attribute, not the property: a reflected property lands on the next
-       update, so the lookup above would miss a chip built moments earlier. */
+    /* Set the attribute so the lookup above finds a chip made moments earlier.
+       A reflected property updates on the next render. */
     chip.setAttribute('name', field)
     chip.operatorLabel = operatorLabel
     chip.textContent = values.join(', ')

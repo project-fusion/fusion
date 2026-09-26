@@ -33,8 +33,7 @@
 
   </helix-filter-menu>
 
-  <!-- A field with no values to list belongs here rather than in the picker,
-       where its page would have nothing on it to press. -->
+  <!-- A field with no values to list goes here, outside the picker. -->
   <helix-filter-field
     label="Assignee"
     name="assignee"
@@ -44,9 +43,8 @@
 <script type="module">
   const filter = document.getElementById('filter')
 
-  /* Typed text, a tick in the menu and the X on a chip all arrive as one
-     `helix-facet`, so nothing below knows which the reader used. Typing also
-     ticks the value in the menu: there is one store, and the field writes it. */
+  /* Typed text, a checked value, and a removed chip all send `helix-facet`.
+     Typing also checks the value in the menu. */
   filter.addEventListener('helix-facet', (event) => {
     const { field, label, operatorLabel, values } = event.detail
     const held = filter.querySelector(`helix-filter-chip[name="${field}"]`)
@@ -61,8 +59,8 @@
     chip.dismissible = true
     chip.dismissLabel = `Remove the ${label.toLowerCase()} filter`
     chip.label = label
-    /* The attribute, not the property: a reflected property lands on the next
-       update, so the lookup above would miss a chip built moments earlier. */
+    /* Set the attribute so the lookup above finds a chip made moments earlier.
+       A reflected property updates on the next render. */
     chip.setAttribute('name', field)
     chip.operatorLabel = operatorLabel
     chip.textContent = values.join(', ')

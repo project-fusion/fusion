@@ -4,7 +4,7 @@
   gap="md"
 >
   <helix-filter-input
-    hint="Type to narrow, or press Backspace on an empty field to take the last one off"
+    hint="Press Backspace in the empty field to remove the last filter"
     id="filter"
     label="Filter rows"
     placeholder="Add a filter"
@@ -32,10 +32,8 @@
 
   const START = ['design', 'infra', 'docs']
 
-  /* **The consumer removes the tag, because the consumer owns it.** The field
-     asks, whether the reader pressed the close control or Backspace, and both
-     arrive here as one `helix-dismiss`: nothing below knows which of the two it
-     was, which is the point of asking rather than taking. */
+  /* Your code removes the tag. The remove button and Backspace both send
+     `helix-dismiss`. */
   filter.addEventListener('helix-dismiss', (event) => {
     event.target.remove()
   })

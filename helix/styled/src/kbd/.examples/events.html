@@ -19,10 +19,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Put the cursor in the field and press slash</span>
     </helix-list-item>
   </helix-list>
@@ -33,7 +33,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -54,6 +54,6 @@
   }
 
   key.addEventListener('helix-shortcut', (event) => {
-    say('helix-shortcut', `${event.detail.keys} was pressed inside the field it sits in`)
+    say('helix-shortcut', `Pressed ${event.detail.keys}`)
   })
 </script>

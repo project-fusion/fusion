@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-combobox
       creatable
-      hint="The row is offered beside near misses too, and announces before it takes"
+      hint="Choose a tag or type a new one"
       label="Tags"
       multiple
       name="tags"

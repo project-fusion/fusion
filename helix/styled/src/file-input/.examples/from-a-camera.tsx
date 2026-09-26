@@ -3,8 +3,8 @@ export function Example() {
     <helix-file-input
       accept="image/*"
       capture="environment"
-      hint="Photograph the meter"
-      label="Reading"
+      hint="Take a photo of your receipt"
+      label="Receipt"
     ></helix-file-input>
   )
 }

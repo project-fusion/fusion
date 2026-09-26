@@ -19,10 +19,8 @@
 </helix-data-table>
 
 <script>
-  /* No `paginated` attribute: a page size turns it on by itself, because a
-     paged table with no way to change pages shows a reader the first eight rows
-     and no way to learn there are more. Set `paginated="false"` to take the
-     control back and put your own in the `footer` slot. */
+  /* A page size turns on pagination by itself. Set `paginated="false"` to turn
+     it off and put your own control in the `footer` slot. */
   document.getElementById('assets').rows = Array.from({ length: 40 }, (_, index) => ({
     kind: index % 4 === 0 ? 'font' : 'image',
     name: `asset-${String(index + 1).padStart(3, '0')}.webp`,

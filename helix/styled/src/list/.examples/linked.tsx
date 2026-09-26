@@ -1,6 +1,6 @@
 export function Example() {
   return (
-    <helix-list label="Label">
+    <helix-list label="Projects">
       <helix-list-item>
         <helix-icon
           name="cube"
@@ -11,9 +11,9 @@ export function Example() {
           data-link="quiet"
           href="#one"
         >
-          Item One
+          Website redesign
         </a>
-        <span slot="description">Caption</span>
+        <span slot="description">Updated today</span>
       </helix-list-item>
       <helix-list-item>
         <helix-icon
@@ -24,9 +24,9 @@ export function Example() {
           data-link="quiet"
           href="#two"
         >
-          Item Two
+          Mobile app
         </a>
-        <span slot="description">Caption</span>
+        <span slot="description">Updated 3 days ago</span>
       </helix-list-item>
     </helix-list>
   )

@@ -9,13 +9,13 @@
     commandfor="unsaved"
     emphasis="solid"
     tone="primary"
-  >Open</helix-button>
+  >Open dialog</helix-button>
 
   <helix-dialog
     id="unsaved"
-    label="Unsaved work"
+    label="Unsaved changes"
   >
-    <helix-text>There are changes that have not been written yet.</helix-text>
+    <helix-text>You have changes that have not been saved.</helix-text>
     <helix-button
       command="--close"
       commandfor="unsaved"
@@ -26,11 +26,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Open it, then try to close it twice</span>
+      No events yet
+      <span slot="description">Open the dialog, then close it twice</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -40,7 +40,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
   let refused = false
 
@@ -62,21 +62,21 @@
   }
 
   unsaved.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'about to open, refusable')
+    say('helix-before-open', 'About to open')
   })
   unsaved.addEventListener('helix-before-close', (event) => {
     if (refused) {
-      say('helix-before-close', 'let through this time')
+      say('helix-before-close', 'Allowed the close')
       return
     }
     refused = true
     event.preventDefault()
-    say('helix-before-close', 'refused, so nothing moved')
+    say('helix-before-close', 'Canceled the close')
   })
   unsaved.addEventListener('toggle', (event) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
   unsaved.addEventListener('close', () => {
-    say('close', 'the platform name, once it is shut')
+    say('close', 'Closed')
   })
 </script>

@@ -8,10 +8,10 @@ export function Example() {
         aria-describedby="material-inverse-tip"
         id="material-inverse"
       >
-        Inverse
+        Copy link
       </helix-button>
       <helix-tooltip
-        content="Lorem ipsum dolor sit amet"
+        content="Copy the link to your clipboard"
         for="material-inverse"
         id="material-inverse-tip"
       ></helix-tooltip>
@@ -19,10 +19,10 @@ export function Example() {
         aria-describedby="material-glass-tip"
         id="material-glass"
       >
-        Glass
+        Download file
       </helix-button>
       <helix-tooltip
-        content="Lorem ipsum dolor sit amet"
+        content="Save a PDF copy of the file"
         for="material-glass"
         id="material-glass-tip"
         material="glass"

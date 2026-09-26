@@ -14,10 +14,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Move between pages</span>
     </helix-list-item>
   </helix-list>
@@ -28,7 +28,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -48,10 +48,8 @@
     }
   }
 
-  /* One event, and it is the request: refusing it is the only way to keep
-     the page where it is. There is no `helix-before-change` here, because the
-     page is not a value a form holds. */
+  /* `helix-navigate` is the only event. Cancel it to stay on the current page. */
   pages.addEventListener('helix-navigate', (event) => {
-    say('helix-navigate', `page ${event.detail.value}, a move and not a choice, and refusable`)
+    say('helix-navigate', `Go to page ${event.detail.value}`)
   })
 </script>

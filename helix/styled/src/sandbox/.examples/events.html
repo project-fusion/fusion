@@ -17,9 +17,9 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
-    <helix-list-item>Nothing yet<span slot="description">Type in the source, then drag either divider</span>
+    <helix-list-item>No events yet<span slot="description">Type in the source, then drag either divider</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -29,7 +29,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last seven events.
   const KEEP = 7
 
   const say = (name, carried) => {
@@ -50,19 +50,19 @@
   }
 
   pad.addEventListener('helix-before-edit', (event) => {
-    say('helix-before-edit', `the source pane proposed ${event.detail.value.length} characters`)
+    say('helix-before-edit', `Source is ${event.detail.value.length} characters`)
   })
   pad.addEventListener('helix-caret', (event) => {
     say('helix-caret', `line ${event.detail.line}, column ${event.detail.column}`)
   })
   pad.addEventListener('helix-before-split', (event) => {
-    say('helix-before-split', `the panes settling at ${event.detail.value} percent`)
+    say('helix-before-split', `Split at ${event.detail.value} percent`)
   })
   pad.addEventListener('helix-before-panel-resize', (event) => {
-    say('helix-before-panel-resize', `the panel settling at ${event.detail.value} pixels`)
+    say('helix-before-panel-resize', `Panel is ${event.detail.value} pixels`)
   })
   pad.addEventListener('helix-resize', (event) => {
-    say('helix-resize', `the frame measured itself at ${event.detail.size}`)
+    say('helix-resize', `Preview is ${event.detail.size} pixels`)
   })
   pad.addEventListener('helix-console', (event) => {
     say('helix-console', `${event.detail.level}: ${event.detail.text}`)

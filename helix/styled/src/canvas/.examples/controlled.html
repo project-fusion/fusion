@@ -2,7 +2,7 @@
 <helix-canvas
   grid="lines"
   id="plan"
-  label="This sprint"
+  label="Task board"
 >
   <helix-canvas-node
     height="64"
@@ -44,10 +44,10 @@
 <script>
   const plan = document.getElementById('plan')
 
-  // The ruling's own spacing, so a card lands on a line rather than between two.
+  // The grid spacing, so each card lands on a grid line.
   const STEP = 32
 
-  // Refused, so nothing moves on its own; the page decides where each card goes.
+  // Cancel the move, then place each card on the nearest grid line.
   plan.addEventListener('helix-before-move', (event) => {
     event.preventDefault()
     for (const { name, x, y } of event.detail.nodes) {

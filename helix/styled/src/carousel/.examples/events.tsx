@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The number of rows the log keeps.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Move between the slides', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Move between the slides', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -18,7 +18,7 @@ export function Example() {
   }
 
   const moved = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `slide ${event.detail.value} is the one in view`)
+    say('helix-select', `Slide ${event.detail.value} is in view`)
   }
 
   return (
@@ -27,7 +27,7 @@ export function Example() {
       gap="md"
     >
       <helix-carousel
-        label="Screens"
+        label="Dashboard pages"
         onhelix-select={moved}
       >
         <helix-card separation="outlined">Overview</helix-card>
@@ -37,7 +37,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

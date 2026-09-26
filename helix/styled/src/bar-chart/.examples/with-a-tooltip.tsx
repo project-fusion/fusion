@@ -22,7 +22,7 @@ export function Example() {
             <th scope="row">Jan</th>
             <td data-value="1180">1,180</td>
             <td data-value="940">940</td>
-            <td>Launch</td>
+            <td>Product launch</td>
           </tr>
           <tr>
             <th scope="row">Feb</th>
@@ -34,7 +34,7 @@ export function Example() {
             <th scope="row">Mar</th>
             <td data-value="1190">1,190</td>
             <td data-value="1080">1,080</td>
-            <td>Outage</td>
+            <td>Service outage</td>
           </tr>
           <tr>
             <th scope="row">Apr</th>
@@ -46,7 +46,7 @@ export function Example() {
             <th scope="row">May</th>
             <td data-value="1410">1,410</td>
             <td data-value="1160">1,160</td>
-            <td>Press</td>
+            <td>Email campaign</td>
           </tr>
           <tr>
             <th scope="row">Jun</th>

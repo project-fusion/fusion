@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-checkbox-group
-      label="Label"
+      label="Add-ons"
       name="addons"
     >
       <helix-checkbox
@@ -24,7 +24,7 @@ export function Example() {
             emphasis="subtle"
             variant="caption"
           >
-            Nightly, kept for thirty days.
+            Nightly backups, kept for 30 days.
           </helix-text>
         </helix-flex>
       </helix-checkbox>
@@ -47,7 +47,7 @@ export function Example() {
             emphasis="subtle"
             variant="caption"
           >
-            Every action, with who and when.
+            A record of each change and who made it.
           </helix-text>
         </helix-flex>
       </helix-checkbox>

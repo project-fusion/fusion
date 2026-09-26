@@ -12,7 +12,7 @@ export function Example() {
       ></helix-listbox>
 
       <helix-listbox
-        empty-text="No time zone matches that"
+        empty-text="No time zones match your search"
         filter="antarctica"
         filter-label="Search time zones"
         filterable

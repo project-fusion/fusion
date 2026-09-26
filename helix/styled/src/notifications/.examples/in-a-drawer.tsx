@@ -1,8 +1,6 @@
 import { useState } from 'react'
 
-/* Written as data rather than as markup, because the badge counts the ones that
-   are unread and a count taken from a list is one fact rather than two that can
-   disagree. */
+/* The notifications are data, so the badge can count the unread ones. */
 const ARRIVED = [
   { id: 'deploy', minutes: 3, read: false },
   { id: 'build', minutes: 42, read: false },
@@ -14,11 +12,8 @@ const ago = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOSt
 export function Example() {
   const [items, setItems] = useState(ARRIVED)
 
-  /* **The badge is the page's, not the feed's.** A count of what is unread is a
-     fact about the reader's account, which a page usually knows before it has
-     rendered a single notification and keeps knowing while the drawer is shut.
-     Here that account is this state, so the bell is right whether or not the
-     drawer has ever been opened. */
+  /* Your page owns the unread count. It updates the badge when the feed reports
+     a change. */
   const unread = items.filter((one) => !one.read).length
 
   const readAt = (id: string) => (event: CustomEvent<{ read: boolean }>) => {

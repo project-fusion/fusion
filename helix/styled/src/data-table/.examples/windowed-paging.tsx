@@ -1,5 +1,4 @@
-/* Five thousand rows in pages of five hundred: enough that neither mechanism
-   alone is the answer, which is the case this example exists for. */
+/* Five thousand generated rows in pages of five hundred. */
 const rows = Array.from({ length: 5000 }, (_, index) => ({
   kind: index % 4 === 0 ? 'font' : 'image',
   name: `asset-${String(index + 1).padStart(4, '0')}.webp`,
@@ -8,14 +7,11 @@ const rows = Array.from({ length: 5000 }, (_, index) => ({
 
 export function Example() {
   return (
-    /* **The two are different questions and both are answered here.** The page
-       is the slice of the result the table holds -- five hundred rows, the size
-       a request would sensibly fetch -- and the window is the part of that slice
-       it draws. A page of five hundred is a reasonable fetch and a poor render,
-       which is exactly when writing both is right.
+    /* The table holds a page of five hundred rows and draws only the rows in
+       view.
 
-       `aria-rowindex` counts through both offsets, so row one of the window on
-       page two is row 501 of the result and a screen reader says so. */
+       `aria-rowindex` counts through both offsets, so the first row on page two
+       is row 501. */
     <helix-data-table
       label="Assets"
       page-size={500}

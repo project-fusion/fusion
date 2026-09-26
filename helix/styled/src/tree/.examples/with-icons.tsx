@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-tree
       default-active="two"
-      label="Label"
+      label="Files"
     >
       <helix-tree-item
         default-open
@@ -12,18 +12,18 @@ export function Example() {
           name="folder-open"
           slot="start"
         ></helix-icon>
-        Item One
+        Documents
         <helix-tree-item
           slot="children"
           value="two"
         >
-          Item Two
+          Budget.xlsx
         </helix-tree-item>
         <helix-tree-item
           slot="children"
           value="three"
         >
-          Item Three
+          Notes.txt
         </helix-tree-item>
       </helix-tree-item>
       <helix-tree-item
@@ -34,15 +34,15 @@ export function Example() {
           name="folder-open"
           slot="start"
         ></helix-icon>
-        Item Four
+        Photos
         <helix-tree-item
           slot="children"
           value="five"
         >
-          Item Five
+          Beach.jpg
         </helix-tree-item>
       </helix-tree-item>
-      <helix-tree-item value="six">Item Six</helix-tree-item>
+      <helix-tree-item value="six">Invoice-1042.pdf</helix-tree-item>
     </helix-tree>
   )
 }

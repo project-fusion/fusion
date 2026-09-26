@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const WORDS =
-  'Three things. Button lost its width axis, the small dialog footer fits again, and nothing generated is tracked any more.'.split(
+  'Three things. The settings page loads faster, invoices export as CSV, and deleted projects are not tracked any more.'.split(
     ' ',
   )
 
@@ -22,11 +22,7 @@ export function Example() {
   useEffect(() => {
     const still = window.matchMedia('(prefers-reduced-motion: reduce)')
 
-    /* **The finished answer is the resting state, and that is what the cameras
-       get.** `check:spec:visual` and the parity check both photograph these
-       pages with reduced motion forced, so an example that is mid-stream when
-       the shutter opens is a different picture every run. Settling here means
-       the two syntaxes agree and a baseline means something. */
+    /* With reduced motion, the finished answer is shown at once. */
     const settle = () => {
       setSaid(FINISHED)
       setDone(true)
@@ -38,14 +34,12 @@ export function Example() {
         settle()
         return
       }
-      /* Empty and `streaming` is the wait: the component draws the typing
-         indicator off `[data-empty]`, so nothing here starts it. */
+      /* An empty turn with `state="streaming"` shows the typing indicator. */
       setSaid('')
       setDone(false)
       let at = 0
       const next = () => {
-        /* **The indicator stops because the text arrived, not because it was
-           told to.** Appending the first word is the whole of it. */
+        /* The indicator stops when the first word arrives. */
         at += 1
         setSaid(WORDS.slice(0, at).join(' '))
         if (at < WORDS.length) {
@@ -79,7 +73,7 @@ export function Example() {
           author="me"
           state="sent"
         >
-          What went out in the last deploy?
+          What changed in the last release?
         </helix-chat-message>
         <helix-chat-message
           author="them"

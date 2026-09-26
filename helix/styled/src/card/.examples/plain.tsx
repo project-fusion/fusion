@@ -8,15 +8,14 @@ export function Example() {
         id="plain-title"
         slot="header"
       >
-        Plain
+        Profile
       </h3>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-      labore.
+      Update your name, photo, and contact details.
       <helix-button
         emphasis="ghost"
         slot="footer"
       >
-        Action
+        Edit profile
       </helix-button>
     </helix-card>
   )

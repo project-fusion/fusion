@@ -1,6 +1,7 @@
 import './points.css'
 
-/* Stand-in data: a page sets its own collection here, or names a GeoJSON file with `src`. */
+/* Stand-in data. Set your own collection here, or name a GeoJSON file with
+   `src`. */
 const noise = (seed: number) => {
   const x = Math.sin(seed * 12.9898) * 43758.5453
   return x - Math.floor(x)

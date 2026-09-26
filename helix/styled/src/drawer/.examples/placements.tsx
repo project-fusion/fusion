@@ -30,46 +30,38 @@ export function Example() {
 
       <helix-drawer
         id="start-drawer"
-        label="Start"
+        label="Menu"
         placement="start"
       >
-        <span slot="header">Start</span>
-        <helix-text variant="body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        </helix-text>
+        <span slot="header">Menu</span>
+        <helix-text variant="body">Browse your projects, files, and settings.</helix-text>
       </helix-drawer>
 
       <helix-drawer
         id="end-drawer"
-        label="End"
+        label="Details"
         placement="end"
       >
-        <span slot="header">End</span>
-        <helix-text variant="body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        </helix-text>
+        <span slot="header">Details</span>
+        <helix-text variant="body">Review the details of the selected file.</helix-text>
       </helix-drawer>
 
       <helix-drawer
         id="top-drawer"
-        label="Top"
+        label="Search"
         placement="top"
       >
-        <span slot="header">Top</span>
-        <helix-text variant="body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        </helix-text>
+        <span slot="header">Search</span>
+        <helix-text variant="body">Search projects, files, and people.</helix-text>
       </helix-drawer>
 
       <helix-drawer
         id="bottom-drawer"
-        label="Bottom"
+        label="Share"
         placement="bottom"
       >
-        <span slot="header">Bottom</span>
-        <helix-text variant="body">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        </helix-text>
+        <span slot="header">Share</span>
+        <helix-text variant="body">Share a link to the project with your team.</helix-text>
       </helix-drawer>
     </>
   )

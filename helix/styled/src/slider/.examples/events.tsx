@@ -3,10 +3,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Drag the thumb, then let go', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Drag the thumb, then let go', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,15 +19,15 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing ${event.detail.value}, refusable`)
+    say('helix-before-change', `Proposed ${event.detail.value}`)
   }
 
   const dragging = (event: Event & { currentTarget: HelixSlider }) => {
-    say('input', `${event.currentTarget.value} while the thumb moves`)
+    say('input', `Value is ${event.currentTarget.value}`)
   }
 
   const released = (event: Event & { currentTarget: HelixSlider }) => {
-    say('change', `${event.currentTarget.value}, once it is let go`)
+    say('change', `Changed to ${event.currentTarget.value}`)
   }
 
   return (
@@ -46,7 +46,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

@@ -2,11 +2,11 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 6
 
 const RESTING: Arrival[] = [
-  { carried: 'Drag the divider, then drag it to an edge', name: 'Nothing yet' },
+  { carried: 'Drag the divider, then drag it to an edge', name: 'No events yet' },
 ]
 
 export function Example() {
@@ -20,13 +20,13 @@ export function Example() {
   }
 
   const settling = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-resize', `settling at ${event.detail.value} percent`)
+    say('helix-before-resize', `moved to ${event.detail.value} percent`)
   }
 
   const shutting = (event: CustomEvent<{ value: string }>) => {
     say(
       'helix-before-collapse',
-      event.detail.value === '' ? 'reopened' : `shut the ${event.detail.value} pane`,
+      event.detail.value === '' ? 'reopened' : `collapsed the ${event.detail.value} pane`,
     )
   }
 
@@ -58,7 +58,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

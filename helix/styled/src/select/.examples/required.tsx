@@ -8,7 +8,7 @@ export function Example() {
           gap="sm"
         >
           <helix-select
-            hint="Closest to your readers"
+            hint="Choose the region closest to your users"
             label="Region"
             name="region"
             required
@@ -25,7 +25,7 @@ export function Example() {
             tone="primary"
             type="submit"
           >
-            Create
+            Create project
           </helix-button>
         </helix-flex>
       </form>

@@ -9,7 +9,7 @@
   gap="md"
 >
   <div class="stage">
-    <helix-button id="anchor">The thing being explained</helix-button>
+    <helix-button id="anchor">Create project</helix-button>
   </div>
 
   <helix-tour
@@ -17,10 +17,10 @@
     open
   >
     <helix-tour-stop for="anchor">
-      This is where a deploy starts.
+      Create a project to get started.
     </helix-tour-stop>
     <helix-tour-stop for="anchor">
-      And this is where it is watched.
+      Name the project and invite your team.
     </helix-tour-stop>
   </helix-tour>
 
@@ -28,11 +28,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Step through it, then skip</span>
+      No events yet
+      <span slot="description">Go through the tour, then skip it</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -42,7 +42,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 8
 
   const say = (name, carried) => {
@@ -63,15 +63,15 @@
   }
 
   run.addEventListener('helix-tour-ask', (event) => {
-    say('helix-tour-ask', `a stop asked to go ${event.detail.what}, which is not the decision`)
+    say('helix-tour-ask', `a stop requested ${event.detail.what}`)
   })
   run.addEventListener('helix-before-activate', (event) => {
-    say('helix-before-activate', `proposing stop ${event.detail.value}, refusable`)
+    say('helix-before-activate', `about to change to stop ${event.detail.value}, can be canceled`)
   })
   run.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'leaving early, which is refusable')
+    say('helix-before-close', 'closing early, can be canceled')
   })
   run.addEventListener('helix-complete', () => {
-    say('helix-complete', 'the last stop was reached, which is not refusable')
+    say('helix-complete', 'the tour was finished, cannot be canceled')
   })
 </script>

@@ -15,10 +15,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Press the close control</span>
     </helix-list-item>
   </helix-list>
@@ -29,7 +29,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The number of rows the log keeps.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -50,6 +50,6 @@
   }
 
   bar.addEventListener('helix-dismiss', (event) => {
-    say('helix-dismiss', `"${event.detail.label}" was dismissed, and this decides what happens`)
+    say('helix-dismiss', `"${event.detail.label}" was dismissed`)
   })
 </script>

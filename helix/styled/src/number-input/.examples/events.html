@@ -14,11 +14,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Step it, or type and click away</span>
+      No events yet
+      <span slot="description">Use the buttons, or type a number and click away</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -28,7 +28,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -49,12 +49,12 @@
   }
 
   guests.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   })
   guests.addEventListener('input', (event) => {
-    say('input', `${event.currentTarget.valueAsNumber} so far`)
+    say('input', `Value is ${event.currentTarget.valueAsNumber}`)
   })
   guests.addEventListener('change', (event) => {
-    say('change', `${event.currentTarget.valueAsNumber}, the reader is done`)
+    say('change', `Changed to ${event.currentTarget.valueAsNumber}`)
   })
 </script>

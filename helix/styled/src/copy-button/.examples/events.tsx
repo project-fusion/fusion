@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Press the button', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Press the button', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -18,7 +18,7 @@ export function Example() {
   }
 
   const copied = (event: CustomEvent<{ value: string }>) => {
-    say('helix-copy', `"${event.detail.value}" is on the clipboard`)
+    say('helix-copy', `Copied "${event.detail.value}"`)
   }
 
   return (
@@ -33,7 +33,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

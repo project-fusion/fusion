@@ -5,15 +5,15 @@
   gap="md"
 >
   <helix-flex gap="sm">
-    <helix-button id="library">Library</helix-button>
-    <helix-button id="shelves">New shelf</helix-button>
+    <helix-button id="library">Files</helix-button>
+    <helix-button id="shelves">New folder</helix-button>
     <helix-button id="share">Share</helix-button>
   </helix-flex>
 
   <helix-tour
     back-label="Go back"
     done-label="Got it"
-    label="Around the library"
+    label="Files tour"
     next-label="Keep going"
     open
     skip-label="Not now"
@@ -29,14 +29,14 @@
       for="shelves"
       placement="bottom"
     >
-      A shelf is a pile you name, and a book can sit on more than one.
+      Create a folder to group related files.
     </helix-tour-stop>
 
     <helix-tour-stop
       for="share"
       placement="bottom-end"
     >
-      Sharing a shelf sends the shelf, so anything you add to it later goes too.
+      Sharing a folder also shares any files you add to it later.
     </helix-tour-stop>
   </helix-tour>
 </helix-flex>

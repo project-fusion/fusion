@@ -45,15 +45,15 @@
 
 <helix-tour
   id="tour"
-  label="Where things are"
+  label="Getting started"
 >
   <helix-tour-stop
     for="actions-trigger"
     placement="bottom-start"
   >
     <helix-card separation="plain">
-      <helix-text as="h3">Everything you can do to a file</helix-text>
-      <helix-text emphasis="muted">Behind one control, so the bar stays short.</helix-text>
+      <helix-text as="h3">File actions</helix-text>
+      <helix-text emphasis="muted">Duplicate, export, or delete the file.</helix-text>
     </helix-card>
   </helix-tour-stop>
 
@@ -62,10 +62,8 @@
     placement="right"
   >
     <helix-card separation="plain">
-      <helix-text as="h3">Export lives in here</helix-text>
-      <helix-text emphasis="muted">
-        The tour opened the menu to show you. It closes again on the way out.
-      </helix-text>
+      <helix-text as="h3">Export a file</helix-text>
+      <helix-text emphasis="muted">Download the file as a PDF or a spreadsheet.</helix-text>
     </helix-card>
   </helix-tour-stop>
 
@@ -74,39 +72,23 @@
     placement="left"
   >
     <helix-card separation="plain">
-      <helix-text as="h3">And this is on by default</helix-text>
-      <helix-text emphasis="muted">
-        Inside a drawer the tour opened, over a page it did not have to know
-        about.
-      </helix-text>
+      <helix-text as="h3">Autosave is on</helix-text>
+      <helix-text emphasis="muted">Your changes are saved as you work.</helix-text>
     </helix-card>
   </helix-tour-stop>
 </helix-tour>
 
 <script type="module">
-  /* Preview frame, and the point of this example.
-
-     The tour owns the order and the light. What it deliberately does not know
-     is that stop two is inside a menu and stop three is inside a drawer, which
-     is the consumer's own state and stays theirs: `helix-before-activate` says where the
-     reader now is, and this decides what has to be open for that to make sense.
-
-     Written as "what should be open at index N" rather than as a list of things
-     to do on the way. A tour can be walked backwards, so anything phrased as a
-     transition has to be written twice and one of the two is always the one
-     nobody tested. */
+  /* Stop two is inside the menu and stop three is inside the drawer.
+     `arrange` sets what is open for each index, so it stays correct when the
+     tour goes backward. */
   const tour = document.querySelector('#tour')
   const menu = document.querySelector('#actions')
   const drawer = document.querySelector('#settings')
 
-  /* Not modal, and this is the one thing a tour cannot work around.
-     `showModal()` makes everything outside the dialog's own subtree inert, so a
-     panel anywhere else, top layer or not, cannot be pressed at all. Measured:
-     with the drawer modal, `elementsFromPoint` over the Done button returned
-     the drawer, the press light-dismissed the drawer and the tour heard
-     nothing. A tour points *into* things, so anything it points into has to
-     stay reachable. Set as a property because `modal` is a boolean attribute
-     defaulting to true, so `modal="false"` in markup still reads as true. */
+  /* A modal drawer makes the rest of the page inert, so the tour could not
+     reach it. `modal` is a boolean attribute that defaults to true, so set the
+     property to `false`. */
   drawer.modal = false
 
   const arrange = (index) => {

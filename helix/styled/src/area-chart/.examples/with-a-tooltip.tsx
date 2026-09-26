@@ -47,7 +47,7 @@ export function Example() {
 
       <helix-area-chart
         for="areacharttip"
-        total-label="Bookings"
+        total-label="Total revenue"
       ></helix-area-chart>
     </helix-flex>
   )

@@ -56,19 +56,15 @@
   const feed = document.getElementById('feed')
   const count = document.getElementById('count')
 
-  /* Set from script rather than written into the markup, because a timestamp in
-     an example is stale the moment it is committed. */
+  /* The script sets the timestamps so they stay recent. */
   const ago = (minutes) => new Date(Date.now() - minutes * 60000).toISOString()
   const items = feed.querySelectorAll('helix-notification')
   items[0].at = ago(3)
   items[1].at = ago(42)
   items[2].at = ago(1500)
 
-  /* **The badge is the page's, not the feed's.** A count of what is unread is a
-     fact about the reader's account, which a page usually knows before it has
-     rendered a single notification and keeps knowing while the drawer is shut.
-     So the feed reports and this recounts, rather than the two being one
-     element that has to be open to be right. */
+  /* Your page owns the unread count. It updates the badge when the feed reports
+     a change. */
   const recount = () => {
     const unread = [...feed.querySelectorAll('helix-notification')].filter(
       (one) => !one.read,

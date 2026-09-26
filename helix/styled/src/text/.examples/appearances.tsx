@@ -1,6 +1,5 @@
-/* Every variant on the scale, in the order it steps down. Each sample says its
-   own name, so what a reader is comparing is the shape of the word rather than
-   the word. */
+/* Every variant on the scale, from largest to smallest. Each sample shows the
+   name of its variant. */
 const VARIANTS = [
   'display',
   'heading',
@@ -13,7 +12,7 @@ const VARIANTS = [
   'code',
 ] as const
 
-/** `body-strong` to `Body strong`: the variant's own name, set as a sentence. */
+/** Turns a variant name into a label, such as `body-strong` to `Body strong`. */
 const title = (variant: string) =>
   `${variant[0]?.toUpperCase()}${variant.slice(1)}`.replace('-', ' ')
 
@@ -23,8 +22,7 @@ export function Example() {
       direction="column"
       gap="sm"
     >
-      {/* `as="p"` on every one: the variant is the type it is set in and not
-          what the element means, so a page of samples is a page of paragraphs. */}
+      {/* Each sample is a paragraph. `variant` sets only the type style. */}
       {VARIANTS.map((variant) => (
         <helix-text
           as="p"

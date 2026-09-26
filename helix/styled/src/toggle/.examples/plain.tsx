@@ -2,12 +2,12 @@ export function Example() {
   return (
     <helix-toggle-group
       default-value="one"
-      hint="Hint"
-      label="Label"
+      hint="Applies to every list"
+      label="Sort order"
       separation="plain"
     >
-      <helix-toggle value="one">Option One</helix-toggle>
-      <helix-toggle value="two">Option Two</helix-toggle>
+      <helix-toggle value="one">Newest</helix-toggle>
+      <helix-toggle value="two">Oldest</helix-toggle>
     </helix-toggle-group>
   )
 }

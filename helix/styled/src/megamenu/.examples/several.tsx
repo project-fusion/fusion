@@ -10,8 +10,8 @@ export function Example() {
             href="#helix"
           >
             <helix-icon name="cube"></helix-icon>
-            <strong>Helix</strong>
-            <span>Components, tokens and the base layer.</span>
+            <strong>Projects</strong>
+            <span>Plan and track work across teams.</span>
           </a>
         </div>
         <div data-megamenu-group>
@@ -21,8 +21,8 @@ export function Example() {
             href="#trace"
           >
             <helix-icon name="pulse"></helix-icon>
-            <strong>Trace</strong>
-            <span>Where an answer came from.</span>
+            <strong>Reports</strong>
+            <span>See how your projects are doing.</span>
           </a>
         </div>
       </helix-megamenu>
@@ -35,7 +35,7 @@ export function Example() {
           >
             <helix-icon name="gear"></helix-icon>
             <strong>Engineering</strong>
-            <span>Ship the thing and know it landed.</span>
+            <span>Plan releases and track bugs.</span>
           </a>
           <a
             data-megamenu-item
@@ -43,7 +43,7 @@ export function Example() {
           >
             <helix-icon name="palette"></helix-icon>
             <strong>Design</strong>
-            <span>One vocabulary across every surface.</span>
+            <span>Share files and collect feedback.</span>
           </a>
         </div>
       </helix-megamenu>
@@ -55,8 +55,8 @@ export function Example() {
             href="#story"
           >
             <helix-icon name="building"></helix-icon>
-            <strong>Story</strong>
-            <span>Why any of this exists.</span>
+            <strong>About us</strong>
+            <span>Our team and our history.</span>
           </a>
         </div>
       </helix-megamenu>

@@ -2,11 +2,11 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last seven events.
 const KEEP = 7
 
 const RESTING: Arrival[] = [
-  { carried: 'Type in the source, then drag either divider', name: 'Nothing yet' },
+  { carried: 'Type in the source, then drag either divider', name: 'No events yet' },
 ]
 
 export function Example() {
@@ -20,7 +20,7 @@ export function Example() {
   }
 
   const edited = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-edit', `the source pane proposed ${event.detail.value.length} characters`)
+    say('helix-before-edit', `Source is ${event.detail.value.length} characters`)
   }
 
   const caret = (event: CustomEvent<{ column: number; line: number }>) => {
@@ -28,15 +28,15 @@ export function Example() {
   }
 
   const dragged = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-split', `the panes settling at ${event.detail.value} percent`)
+    say('helix-before-split', `Split at ${event.detail.value} percent`)
   }
 
   const panelDragged = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-panel-resize', `the panel settling at ${event.detail.value} pixels`)
+    say('helix-before-panel-resize', `Panel is ${event.detail.value} pixels`)
   }
 
   const measured = (event: CustomEvent<{ size: number }>) => {
-    say('helix-resize', `the frame measured itself at ${event.detail.size}`)
+    say('helix-resize', `Preview is ${event.detail.size} pixels`)
   }
 
   const logged = (event: CustomEvent<{ level: string; text: string }>) => {
@@ -67,7 +67,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

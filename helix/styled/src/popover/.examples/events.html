@@ -9,18 +9,18 @@
     label="Details"
   >
     <helix-button slot="trigger">Details</helix-button>
-    <helix-text>Built from commit 4f2a1c on 27 August.</helix-text>
+    <helix-text>Last edited by Alex Kim on August 27.</helix-text>
   </helix-popover>
 
 
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Press the trigger, then press it again</span>
+      No events yet
+      <span slot="description">Press Details, then press it again</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -30,7 +30,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -51,12 +51,12 @@
   }
 
   details.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'about to open, and refusable')
+    say('helix-before-open', 'About to open')
   })
   details.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'about to close, and refusable')
+    say('helix-before-close', 'About to close')
   })
   details.addEventListener('toggle', (event) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
 </script>

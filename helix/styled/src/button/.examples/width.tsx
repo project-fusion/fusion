@@ -11,9 +11,9 @@ export function Example() {
           emphasis="solid"
           tone="primary"
         >
-          Button
+          Save
         </helix-button>
-        <helix-button>Button</helix-button>
+        <helix-button>Cancel</helix-button>
       </helix-flex>
 
       <helix-flex
@@ -24,9 +24,9 @@ export function Example() {
           emphasis="solid"
           tone="primary"
         >
-          Button
+          Save
         </helix-button>
-        <helix-button>Button</helix-button>
+        <helix-button>Cancel</helix-button>
       </helix-flex>
 
       <helix-flex
@@ -37,13 +37,13 @@ export function Example() {
           emphasis="solid"
           tone="primary"
         >
-          Button
+          Save
         </helix-button>
         <a
           data-button=""
           href="#cancel"
         >
-          Button
+          Cancel
         </a>
       </helix-flex>
 
@@ -52,7 +52,7 @@ export function Example() {
         tone="primary"
         width="full"
       >
-        Button
+        Continue
       </helix-button>
     </helix-flex>
   )

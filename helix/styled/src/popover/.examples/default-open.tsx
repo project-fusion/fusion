@@ -14,7 +14,7 @@ export function Example() {
         gap="md"
       >
         <helix-text variant="body">
-          Shelves can be shared now. Anything you add to one later goes with it.
+          You can now share folders. Files you add to a folder later are shared too.
         </helix-text>
         <helix-flex justify-content="end">
           <helix-button

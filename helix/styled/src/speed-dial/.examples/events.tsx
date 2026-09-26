@@ -3,11 +3,11 @@ import './events.css'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 7
 
 const RESTING: Arrival[] = [
-  { carried: 'Open the dial, then choose an action', name: 'Nothing yet' },
+  { carried: 'Open the dial, then choose an action', name: 'No events yet' },
 ]
 
 export function Example() {
@@ -21,11 +21,11 @@ export function Example() {
   }
 
   const opening = () => {
-    say('helix-before-open', 'about to fan out, and refusable')
+    say('helix-before-open', 'about to open, can be canceled')
   }
 
   const closing = () => {
-    say('helix-before-close', 'about to fold away, and refusable')
+    say('helix-before-close', 'about to close, can be canceled')
   }
 
   const moved = (event: Event & { newState?: string; oldState?: string }) => {
@@ -33,7 +33,7 @@ export function Example() {
   }
 
   const chosen = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was chosen, which bubbles`)
+    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   }
 
   return (
@@ -59,7 +59,7 @@ export function Example() {
             />
           </helix-speed-dial-item>
           <helix-speed-dial-item value="upload">
-            Upload
+            Upload file
             <helix-icon
               name="upload-simple"
               slot="icon"
@@ -70,7 +70,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

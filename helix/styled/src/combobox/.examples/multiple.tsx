@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-combobox
       default-value="rs,ts"
-      hint="Each choice is a tag, and Backspace on an empty field takes the last one off"
+      hint="Choose every language the project uses"
       label="Languages"
       multiple
       name="languages"

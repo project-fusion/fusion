@@ -1,9 +1,8 @@
 import { useState } from 'react'
 
 export function Example() {
-  /* `collapsed` names a side rather than a state: `'end' | 'start' | undefined`.
-     Both events carry a string, so the collapse handler turns `''`, which is
-     neither pane, back into `undefined` before handing it over. */
+  /* `collapsed` names the collapsed side: `'end' | 'start' | undefined`. Both
+     events carry a string, so the collapse handler turns `''` into `undefined`. */
   const [collapsed, setCollapsed] = useState<'end' | 'start' | undefined>('start')
   const [position, setPosition] = useState(35)
 
@@ -17,8 +16,8 @@ export function Example() {
       onhelix-before-resize={(event) => setPosition(Number(event.detail.value))}
       position={position}
     >
-      <div slot="start">Folded until the page says otherwise.</div>
-      <div slot="end">The other side.</div>
+      <div slot="start">Inbox, Drafts, Sent, and Archive</div>
+      <div slot="end">Select a message to read it.</div>
     </helix-splitter>
   )
 }

@@ -6,7 +6,7 @@
   <helix-accordion id="sections">
     <helix-accordion-item>
       <span slot="summary">Deployment</span>
-      Every push to main builds and promotes.
+      Each push to the main branch starts a new deployment.
     </helix-accordion-item>
     <helix-accordion-item>
       <span slot="summary">Billing</span>
@@ -18,10 +18,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Open a section, then another</span>
     </helix-list-item>
   </helix-list>
@@ -32,7 +32,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The number of rows the log keeps.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -52,18 +52,14 @@
     }
   }
 
-  /* Bound to each section rather than to the accordion, and that is the point
-     rather than a detail. Lifecycle events do not bubble and are not composed,
-     so a listener on the set hears nothing at all: overlays nest, and an inner
-     one closing must never read as the outer one closing. Coordination events
-     are the opposite and would arrive here. */
+  /* Lifecycle events do not bubble, so each section gets its own listeners. */
   for (const section of sections.querySelectorAll('helix-accordion-item')) {
     const name = section.querySelector('[slot="summary"]').textContent
     section.addEventListener('helix-before-open', () => {
-      say('helix-before-open', `${name} is about to open, and this is refusable`)
+      say('helix-before-open', `${name} is about to open (cancelable)`)
     })
     section.addEventListener('helix-before-close', () => {
-      say('helix-before-close', `${name} is about to close, and this is refusable`)
+      say('helix-before-close', `${name} is about to close (cancelable)`)
     })
     section.addEventListener('toggle', (event) => {
       say('toggle', `${name} went ${event.oldState} to ${event.newState}`)

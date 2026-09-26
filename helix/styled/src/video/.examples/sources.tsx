@@ -1,6 +1,6 @@
 export function Example() {
   return (
-    <helix-video label="Whichever format the browser has">
+    <helix-video label="Product walkthrough">
       <source
         src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
         type="video/webm"

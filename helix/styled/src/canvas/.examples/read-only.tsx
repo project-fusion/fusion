@@ -39,13 +39,13 @@ export function Example() {
 
       <helix-canvas-edge
         from="edge"
-        label="asks first"
+        label="checks first"
         to="cache"
       ></helix-canvas-edge>
 
       <helix-canvas-edge
         from="cache"
-        label="on a miss"
+        label="if not cached"
         to="db"
       ></helix-canvas-edge>
     </helix-canvas>

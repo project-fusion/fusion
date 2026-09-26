@@ -4,18 +4,14 @@ type Arrival = { carried: string; name: string }
 
 const KEEP = 5
 
-const RESTING: Arrival[] = [{ carried: 'Type into the field', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Type into the field', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
   const [value, setValue] = useState('')
 
-  /* **This is the whole of it: refuse, then write.**
-     Writing `value` on its own would not have taken ownership. The property
-     applies whatever it is given and goes on applying whatever the reader
-     types, so a page that only wrote it would be corrected on the next
-     keystroke. Refusing is what stops the element applying the edit, and leaves
-     the page to say what the value is. */
+  /* Refuse the change, then write the value. Writing `value` alone does not
+     take control, because the element keeps applying what you type. */
   const changing = (event: CustomEvent<{ value: string }>) => {
     event.preventDefault()
     const next = event.detail.value.toUpperCase()
@@ -25,7 +21,7 @@ export function Example() {
       return [
         ...kept,
         {
-          carried: `refused "${event.detail.value}", wrote "${next}"`,
+          carried: `Refused "${event.detail.value}", wrote "${next}"`,
           name: 'helix-before-change',
         },
       ].slice(-KEEP)
@@ -37,11 +33,9 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      {/* **Uppercased as it is typed**, which is the smallest thing that shows
-          who won: if the element still owned the text, the reader's own case
-          would survive a keystroke. */}
+      {/* The page changes the text to uppercase as you type. */}
       <helix-filter-input
-        hint="Typed text arrives here in upper case, because the page decided so"
+        hint="Text is changed to uppercase as you type"
         label="Filter rows"
         onhelix-before-change={changing}
         value={value}
@@ -49,7 +43,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

@@ -3,7 +3,7 @@ export function Example() {
     <helix-select
       default-value="ap-south-1"
       feedback="That region is not available on your plan"
-      hint="Closest to your readers"
+      hint="Choose the region closest to your users"
       label="Region"
       name="region"
     >

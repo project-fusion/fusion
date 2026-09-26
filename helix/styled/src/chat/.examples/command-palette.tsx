@@ -33,14 +33,14 @@ export function Example() {
             author="me"
             state="sent"
           >
-            Which packages does the release touch?
+            Which invoices are overdue?
           </helix-chat-message>
           <helix-chat-message
             author="them"
             separation="plain"
             state="sent"
           >
-            Eight, and two of them publish for the first time.
+            Two, both from August. The total is $1,240.
           </helix-chat-message>
           <helix-chat-composer
             placeholder="Ask anything"

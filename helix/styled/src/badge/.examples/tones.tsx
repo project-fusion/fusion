@@ -1,5 +1,3 @@
-/* Written out rather than mapped, because a specimen row is read for what each
-   one looks like and a loop hides the values behind a variable. */
 export function Example() {
   return (
     <helix-flex
@@ -7,19 +5,13 @@ export function Example() {
       gap="lg"
       wrap
     >
-      {/* `accent` renders as `primary` here, and that is the default rather than
-          a mistake: a palette that has not named a second color does not have
-          one. `button/accent` is where a theme names one and the pair
-          separate. */}
-      {/* The resting one, named rather than left off, which is the whole reason
-          `primary` is sayable: this row would otherwise have a gap in it that
-          only an absent attribute could fill. */}
+      {/* `accent` matches `primary` until the theme sets a second color. */}
       <helix-badge
-        label="8 waiting"
+        label="8 unread"
         tone="primary"
         value="8"
       >
-        <helix-button>Queue</helix-button>
+        <helix-button>Inbox</helix-button>
       </helix-badge>
 
       <helix-badge
@@ -31,35 +23,35 @@ export function Example() {
       </helix-badge>
 
       <helix-badge
-        label="4 notices"
+        label="4 updates"
         tone="info"
         value="4"
       >
-        <helix-button>Notices</helix-button>
+        <helix-button>Updates</helix-button>
       </helix-badge>
 
       <helix-badge
-        label="12 passed"
+        label="12 completed"
         tone="success"
         value="12"
       >
-        <helix-button>Passed</helix-button>
+        <helix-button>Completed</helix-button>
       </helix-badge>
 
       <helix-badge
-        label="2 flaky"
+        label="2 pending"
         tone="warning"
         value="2"
       >
-        <helix-button>Flaky</helix-button>
+        <helix-button>Pending</helix-button>
       </helix-badge>
 
       <helix-badge
-        label="3 failures"
+        label="3 errors"
         tone="danger"
         value="3"
       >
-        <helix-button>Failures</helix-button>
+        <helix-button>Errors</helix-button>
       </helix-badge>
 
       <helix-badge

@@ -21,10 +21,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Send a message, then scroll the transcript</span>
     </helix-list-item>
   </helix-list>
@@ -35,7 +35,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The number of rows the log keeps.
   const KEEP = 7
 
   const say = (name, carried) => {
@@ -56,7 +56,7 @@
   }
 
   support.addEventListener('helix-send', (event) => {
-    say('helix-send', `"${event.detail.value}" was sent, and posting it is the page's job`)
+    say('helix-send', `"${event.detail.value}" was sent`)
     const turn = document.createElement('helix-chat-message')
     turn.setAttribute('author', 'me')
     turn.setAttribute('state', 'sent')
@@ -65,6 +65,6 @@
     support.append(turn)
   })
   support.addEventListener('helix-before-pin', (event) => {
-    say('helix-before-pin', `proposing ${event.detail.value}, which follows the reader's scrolling`)
+    say('helix-before-pin', `pinning is about to change to ${event.detail.value}`)
   })
 </script>

@@ -12,13 +12,13 @@ export function Example() {
         slot="panels"
         value="overview"
       >
-        What the account is doing this month.
+        A summary of your account activity this month.
       </helix-tab-panel>
       <helix-tab-panel
         slot="panels"
         value="usage"
       >
-        Requests, storage and egress.
+        Requests, storage, and bandwidth.
       </helix-tab-panel>
       <helix-tab-panel
         slot="panels"
