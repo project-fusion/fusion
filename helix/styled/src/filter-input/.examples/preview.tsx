@@ -11,12 +11,8 @@ export function Example() {
   const [filters, setFilters] = useState(FILTERS)
 
   return (
-    /* A token asks to go and does not go on its own, so a page that renders
-       `dismissible` tokens and binds nothing has drawn a control that answers
-       nothing. The consumer owns the markup the tokens are in, which is why the
-       field asks rather than takes. Bound on the field, since `helix-dismiss`
-       bubbles and is also what Backspace on an empty field sends: one handler,
-       both ways of asking. */
+    /* A dismissible chip does not remove itself. One listener on the field removes the chip that
+       sent `helix-dismiss`, which Backspace in an empty field also sends. */
     <helix-filter-input
       label="Filter rows"
       onhelix-dismiss={(event: CustomEvent) => {

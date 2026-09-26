@@ -10,7 +10,7 @@ export function Example() {
         Delete project
       </helix-headless-button>
 
-      {/* Open, so the picture is of a dialog. */}
+      {/* The dialog starts open, so the preview shows it. */}
       <helix-headless-dialog
         id="base-confirm"
         label="Delete project"
@@ -23,7 +23,7 @@ export function Example() {
             command="--close"
             commandfor="base-confirm"
           >
-            Delete
+            Delete project
           </helix-headless-button>
           <helix-headless-button
             command="--close"

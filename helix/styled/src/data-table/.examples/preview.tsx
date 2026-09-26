@@ -1,13 +1,5 @@
-/* The cell shows a size a person can read and the column still sorts by the
-   number, which is what `compare` is for: told only the formatted string, the
-   column would put 9.8 MB below 812 B and look broken while every value in it
-   is right.
-
-   The unit is chosen per value rather than fixed. Formatted in megabytes
-   throughout, 2,100 bytes and 812 bytes both read "0 MB": the table looks
-   broken and the values are correct, which is the failure this whole column is
-   here to demonstrate rather than commit. The symbols are written out because
-   `Intl`'s short name for a byte is "byte", which reads as a typo beside "kB". */
+/* The cell shows a readable size, and `compare` sorts the column by the
+   number. Each value gets its own unit, so a small file does not read "0 MB". */
 const units = ['B', 'kB', 'MB', 'GB']
 
 const bytes = (value: number): string => {
@@ -18,9 +10,7 @@ const bytes = (value: number): string => {
   return `${amount} ${units[step]}`
 }
 
-/* Module scope, so the identity is stable across renders. An array written
-   inline is a new array every time, which is a fresh assignment the element has
-   to answer for no reason. */
+/* Module scope keeps the array the same across renders. */
 const rows = [
   { name: 'archive.tar.gz', region: 'us-east-1', size: 4_823_100 },
   { name: 'backup.sql', region: 'eu-central-1', size: 918_400 },
@@ -36,7 +26,7 @@ export function Example() {
   return (
     <helix-data-table
       default-sort="name:asc"
-      label="Objects"
+      label="Files"
       page-size="4"
       rows={rows}
     >

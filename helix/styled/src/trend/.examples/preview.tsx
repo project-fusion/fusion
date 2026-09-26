@@ -32,7 +32,7 @@ export function Example() {
         good="down"
       >
         40ms
-        <span slot="label">p99 latency</span>
+        <span slot="label">Response time</span>
       </helix-trend>
       <helix-trend direction="neutral">
         0<span slot="label">Open incidents</span>

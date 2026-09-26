@@ -8,7 +8,7 @@ export function Example() {
     >
       <helix-headless-video
         extra-controls="previous next"
-        label="One of several"
+        label="Episode player"
         slot="player"
       ></helix-headless-video>
       <helix-headless-video-playlist-item

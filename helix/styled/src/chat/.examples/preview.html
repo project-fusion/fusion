@@ -24,7 +24,7 @@
     author="them"
     state="streaming"
   >
-    Let me look at the run now
+    I am checking the migration now
   </helix-chat-message>
 
   <helix-chat-message
@@ -43,8 +43,7 @@
 </helix-chat>
 
 <script>
-  /* Set from script rather than written into the markup, because a timestamp in
-     an example is stale the moment it is committed. */
+  /* The timestamps are set from script, so they are always a few minutes old. */
   const support = document.getElementById('support')
   const ago = (minutes) => new Date(Date.now() - minutes * 60000).toISOString()
 
@@ -53,8 +52,7 @@
   turns[1].at = ago(4)
   turns[2].at = ago(1)
 
-  /* The transcript reports and the page decides, which is the whole contract:
-     nothing here is a client. */
+  /* Each message you send is added to the end of the transcript. */
   support.addEventListener('helix-send', (event) => {
     const turn = document.createElement('helix-chat-message')
     turn.setAttribute('author', 'me')

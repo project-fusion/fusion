@@ -7,7 +7,7 @@ export function Example() {
         separation="plain"
         slot="start"
       >
-        <helix-text>Navigator</helix-text>
+        <helix-text>Files</helix-text>
       </helix-card>
       <helix-card
         separation="plain"

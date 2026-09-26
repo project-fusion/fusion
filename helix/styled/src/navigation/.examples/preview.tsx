@@ -5,10 +5,10 @@ export function Example() {
         aria-current="page"
         href="#one"
       >
-        Item One
+        Overview
       </a>
-      <a href="#two">Item Two</a>
-      <a href="#three">Item Three</a>
+      <a href="#two">Activity</a>
+      <a href="#three">Settings</a>
     </helix-navigation>
   )
 }

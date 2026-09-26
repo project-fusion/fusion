@@ -9,14 +9,12 @@ interface Turn {
 }
 
 export function Example() {
-  /* Set after mount rather than written into the markup, because a timestamp in
-     an example is stale the moment it is committed, and one computed during
-     render disagrees between the server and the client. */
+  /* The timestamps are set after mount, so they are always a few minutes old
+     and the server and the client render the same markup. */
   const [at, setAt] = useState<string[]>([])
 
-  /* The transcript reports and the page decides, which is the whole contract:
-     nothing here is a client. In React that is a list in state rather than an
-     element built and appended by hand. */
+  /* Each message you send is added to this list and rendered at the end of the
+     transcript. */
   const [sent, setSent] = useState<Turn[]>([])
 
   useEffect(() => {
@@ -53,7 +51,7 @@ export function Example() {
         author="them"
         state="streaming"
       >
-        Let me look at the run now
+        I am checking the migration now
       </helix-headless-chat-message>
 
       <helix-headless-chat-message

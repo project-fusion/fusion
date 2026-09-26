@@ -3,8 +3,8 @@ import './preview.css'
 import { useState } from 'react'
 
 export function Example() {
-  /* Preview frame: a real page would remember it had been taken. Opening is the
-     page's business, the way a dialog's is. */
+  /* Preview frame: the button opens the tour at its first stop. A real page
+     would also remember that the tour was taken. */
   const [index, setIndex] = useState(0)
   const [open, setOpen] = useState(false)
 
@@ -41,8 +41,8 @@ export function Example() {
             <h2>Quarterly review</h2>{' '}
             <p>
               {' '}
-              A draft nobody has read yet. Everything below this line is the part you are still
-              writing.{' '}
+              A draft of the third quarter report. Add a summary and the results for each team
+              before you publish.{' '}
             </p>{' '}
           </section>{' '}
         </div>{' '}
@@ -70,19 +70,16 @@ export function Example() {
           {' '}
           <helix-headless-card>
             {' '}
-            <h3 slot="header">Everything lives here</h3>{' '}
-            <p> Drafts, published work and the archive. Nothing is ever deleted. </p>{' '}
+            <h3 slot="header">Find your documents</h3>{' '}
+            <p> Drafts, published documents, and archived documents are listed here. </p>{' '}
           </helix-headless-card>{' '}
         </helix-headless-tour-stop>{' '}
         <helix-headless-tour-stop for="sheet">
           {' '}
           <helix-headless-card>
             {' '}
-            <h3 slot="header">Write in the open</h3>{' '}
-            <p>
-              {' '}
-              Saved as you type. There is no save button because there is nothing to press.{' '}
-            </p>{' '}
+            <h3 slot="header">Write your document</h3>{' '}
+            <p> Your changes are saved as you type. You can close the page at any time. </p>{' '}
           </helix-headless-card>{' '}
         </helix-headless-tour-stop>{' '}
         <helix-headless-tour-stop
@@ -92,8 +89,8 @@ export function Example() {
           {' '}
           <helix-headless-card>
             {' '}
-            <h3 slot="header">See it as a reader would</h3>{' '}
-            <p> Opens the same page anybody with the link gets. </p>{' '}
+            <h3 slot="header">Preview your document</h3>{' '}
+            <p> See the document as it looks to people with the link. </p>{' '}
           </helix-headless-card>{' '}
         </helix-headless-tour-stop>{' '}
         <helix-headless-tour-stop
@@ -103,8 +100,8 @@ export function Example() {
           {' '}
           <helix-headless-card>
             {' '}
-            <h3 slot="header">And when it is ready</h3>{' '}
-            <p> Publishing is reversible. The archive keeps every version you ever had. </p>{' '}
+            <h3 slot="header">Publish when you are ready</h3>{' '}
+            <p> You can unpublish at any time. The archive keeps every earlier version. </p>{' '}
           </helix-headless-card>{' '}
         </helix-headless-tour-stop>{' '}
       </helix-headless-tour>

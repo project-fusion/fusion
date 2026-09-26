@@ -7,9 +7,9 @@ export function Example() {
           aria-current="page"
           href="#one"
         >
-          Item One
+          Overview
         </a>
-        <a href="#two">Item Two</a>
+        <a href="#two">Projects</a>
       </helix-navigation>
 
       <helix-icon-button

@@ -2,27 +2,27 @@ export function Example() {
   return (
     <helix-tree
       default-active="two"
-      label="Label"
+      label="Files"
     >
       <helix-tree-item
         default-open
         value="one"
       >
-        Item One
+        Documents
         <helix-tree-item
           slot="children"
           value="two"
         >
-          Item Two
+          Budget.xlsx
         </helix-tree-item>
         <helix-tree-item
           slot="children"
           value="three"
         >
-          Item Three
+          Notes.txt
         </helix-tree-item>
       </helix-tree-item>
-      <helix-tree-item value="four">Item Four</helix-tree-item>
+      <helix-tree-item value="four">Invoice-1042.pdf</helix-tree-item>
     </helix-tree>
   )
 }

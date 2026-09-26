@@ -7,11 +7,10 @@ export function Example() {
         id="card-title"
         slot="header"
       >
-        Card Title
+        Storage
       </h3>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-      labore.
-      <helix-headless-button slot="footer">Action</helix-headless-button>
+      You have used 8 GB of the 10 GB in your plan. Delete old files or upgrade to add space.
+      <helix-headless-button slot="footer">Manage storage</helix-headless-button>
     </helix-headless-card>
   )
 }

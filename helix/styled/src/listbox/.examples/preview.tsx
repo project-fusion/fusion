@@ -2,18 +2,18 @@ export function Example() {
   return (
     <helix-listbox
       default-value="two"
-      hint="Hint"
-      label="Label"
+      hint="Billed monthly"
+      label="Plan"
       name="choice"
     >
-      <helix-option value="one">Option One</helix-option>
-      <helix-option value="two">Option Two</helix-option>
-      <helix-option value="three">Option Three</helix-option>
+      <helix-option value="one">Free</helix-option>
+      <helix-option value="two">Pro</helix-option>
+      <helix-option value="three">Team</helix-option>
       <helix-option
         disabled
         value="four"
       >
-        Option Four
+        Enterprise
       </helix-option>
     </helix-listbox>
   )

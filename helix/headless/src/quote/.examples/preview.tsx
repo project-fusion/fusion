@@ -3,11 +3,11 @@ import './preview.css'
 export function Example() {
   return (
     <p>
-      {' Lorem ipsum '}
+      {' Alex said '}
       <helix-headless-quote cite="https://example.com/source">
-        dolor sit amet, consectetur
+        the report will be ready on Friday
       </helix-headless-quote>
-      {' adipiscing elit. '}
+      {' during the call. '}
     </p>
   )
 }

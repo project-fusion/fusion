@@ -2,20 +2,13 @@ import { useEffect, useState } from 'react'
 
 const AGO = 42 * 60_000
 
-/* **Pinned, because a picture of a clock is stale as soon as it is taken.**
-   `Time:` re-rendered every minute, so its baseline drifted within minutes of
-   the retake that produced it: 182 and 192 pixels on this tier, 42 and 45 on
-   the headless one. Only `elapsed` stays computed, and it is stable for the
-   opposite reason, being always the same distance from now. `timeZone` is
-   stated so the reading does not depend on where it is rendered. */
+/* The dates are fixed and name a `time-zone`, so they look the same wherever
+   the preview renders. */
 const FIXED = '2026-03-14T15:09:00.000Z'
 
 export function Example() {
-  /* After mount rather than during render, for the reason the HTML example
-   gives from its script: a timestamp written as a literal reads "Mar 2026" by
-   the time anybody looks at it, and one computed during render disagrees
-   between the server and the client, which is a hydration mismatch on every
-   load. */
+  /* The elapsed time is set after mount, so the server and the client render
+     the same markup. */
   const [at, setAt] = useState('')
 
   useEffect(() => {

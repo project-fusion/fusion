@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-rating
       default-value="3"
-      label="Rate this"
+      label="Rate your order"
     ></helix-rating>
   )
 }
