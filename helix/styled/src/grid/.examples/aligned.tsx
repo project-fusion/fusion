@@ -6,14 +6,14 @@ export function Example() {
       gap="md"
     >
       <helix-card>
-        <h3>One</h3>
+        <h3>Starter</h3>
       </helix-card>
       <helix-card>
-        <h3>Two</h3>
-        <p>Taller, because it says more about itself than the others do.</p>
+        <h3>Team</h3>
+        <p>Includes shared projects, admin controls, and priority support.</p>
       </helix-card>
       <helix-card>
-        <h3>Three</h3>
+        <h3>Business</h3>
       </helix-card>
     </helix-grid>
   )

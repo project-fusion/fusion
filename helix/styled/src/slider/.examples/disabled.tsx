@@ -7,17 +7,17 @@ export function Example() {
       <helix-slider
         default-value="40"
         disabled
-        hint="Hint"
-        label="Written off"
+        hint="Managed by your admin"
+        label="Volume"
         show-value
       ></helix-slider>
 
-      {/* The same state, arriving from an ancestor fieldset. */}
+      {/* The fieldset around this slider disables it. */}
       <fieldset disabled>
         <helix-slider
           default-value="70"
-          hint="Hint"
-          label="Off from the fieldset"
+          hint="Managed by your admin"
+          label="Brightness"
           show-value
         ></helix-slider>
       </fieldset>

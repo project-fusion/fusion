@@ -2,9 +2,7 @@ import './launcher.css'
 
 export function Example() {
   return (
-    /* Nothing about the corner belongs to the chat. `helix-popover` is in the top
-       layer and anchors to whatever opened it, so the trigger is placed by this
-       example's own stylesheet and the conversation inside knows none of it. */
+    /* The example's stylesheet places the trigger in the corner. */
     <helix-popover
       className="launcher"
       id="launcher"
@@ -35,8 +33,6 @@ export function Example() {
           Support
         </helix-text>
 
-        {/* Dismissal is a control for the conversation, so it goes where the
-            conversation's controls go: the header's trailing edge. */}
         <helix-icon-button
           command="--close"
           commandfor="launcher"

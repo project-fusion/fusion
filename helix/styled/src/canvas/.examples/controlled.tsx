@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-// The ruling's own spacing, so a card lands on a line rather than between two.
+// The grid spacing, so each card lands on a grid line.
 const STEP = 32
 
 const snap = (value: number) => Math.round(value / STEP) * STEP
@@ -19,9 +19,9 @@ export function Example() {
   return (
     <helix-canvas
       grid="lines"
-      label="This sprint"
+      label="Task board"
       onhelix-before-move={(event) => {
-        // Refused, so nothing moves on its own; the state decides where each card goes.
+        // Cancel the move, then place each card on the nearest grid line.
         event.preventDefault()
         const moved = new Map(event.detail.nodes.map((one) => [one.name, one]))
         setCards((before) =>

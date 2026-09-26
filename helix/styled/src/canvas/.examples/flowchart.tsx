@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-canvas
       grid="dots"
-      label="What happens to a pull request"
+      label="Order approval"
       path="step"
     >
       <helix-canvas-node
@@ -13,7 +13,7 @@ export function Example() {
         x={0}
         y={0}
       >
-        Opened
+        Order placed
       </helix-canvas-node>
 
       <helix-canvas-node
@@ -24,7 +24,7 @@ export function Example() {
         x={0}
         y={112}
       >
-        Checks run
+        Payment check
       </helix-canvas-node>
 
       <helix-canvas-node
@@ -36,7 +36,7 @@ export function Example() {
         x={0}
         y={240}
       >
-        Green?
+        Approved?
       </helix-canvas-node>
 
       <helix-canvas-node
@@ -48,7 +48,7 @@ export function Example() {
         x={256}
         y={264}
       >
-        Fix and push
+        Update payment
       </helix-canvas-node>
 
       <helix-canvas-node
@@ -60,7 +60,7 @@ export function Example() {
         x={32}
         y={416}
       >
-        Merged
+        Shipped
       </helix-canvas-node>
 
       <helix-canvas-edge

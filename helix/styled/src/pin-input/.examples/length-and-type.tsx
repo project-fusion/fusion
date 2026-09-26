@@ -5,12 +5,12 @@ export function Example() {
       gap="lg"
     >
       <helix-pin-input
-        label="Four digits"
+        label="Four-digit PIN"
         length={4}
       ></helix-pin-input>
       <helix-pin-input
         default-value="A1B2C3"
-        label="Letters and digits"
+        label="Recovery code"
         type="text"
       ></helix-pin-input>
     </helix-flex>

@@ -12,18 +12,18 @@ export function Example() {
 
       <helix-dialog
         id="large-dialog"
-        label="Dialog Title"
+        label="Edit profile"
         size="lg"
       >
         <helix-text
           as="h2"
           slot="header"
         >
-          Dialog Title
+          Edit profile
         </helix-text>
         <helix-text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
+          Update your name, email address, and profile photo. Members of your workspace can see
+          these details.
         </helix-text>
         <helix-button-group
           label="Dialog actions"
@@ -36,7 +36,7 @@ export function Example() {
             emphasis="solid"
             tone="primary"
           >
-            Save
+            Save changes
           </helix-button>
           <helix-button
             command="--close"

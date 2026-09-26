@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-combobox
-      hint="The field finishes the word, and the list marks what matched"
+      hint="Start typing a language name"
       label="Language"
       name="language"
       placeholder="Search languages"

@@ -10,11 +10,10 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      {/* The consumer removes the tag, because the consumer owns it. The field
-          asks, whether the reader pressed the close control or Backspace, and
-          both arrive here as one `helix-dismiss`. */}
+      {/* Your code removes the tag. The remove button and Backspace both send
+          `helix-dismiss`. */}
       <helix-filter-input
-        hint="Type to narrow, or press Backspace on an empty field to take the last one off"
+        hint="Press Backspace in the empty field to remove the last filter"
         label="Filter rows"
         onhelix-dismiss={(event) => {
           setTags((held) => held.filter((label) => label !== event.detail.label))

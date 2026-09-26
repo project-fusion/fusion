@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-time-input
       default-value="14:30"
-      hint="The value itself, for a reader entering data"
+      hint="Uses the 24-hour clock"
       label="Starts"
       name="starts"
       time-style="iso"

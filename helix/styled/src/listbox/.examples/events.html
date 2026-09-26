@@ -19,11 +19,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Type to filter, then choose</span>
+      No events yet
+      <span slot="description">Type to filter, then choose a region</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -33,7 +33,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -54,15 +54,15 @@
   }
 
   regions.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   })
   regions.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   })
   regions.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", the choice is made`)
+    say('change', `Chose "${event.currentTarget.value}"`)
   })
   regions.addEventListener('helix-filter', (event) => {
-    say('helix-filter', `the query is "${event.detail.value}", which chooses nothing`)
+    say('helix-filter', `Filter text is "${event.detail.value}"`)
   })
 </script>

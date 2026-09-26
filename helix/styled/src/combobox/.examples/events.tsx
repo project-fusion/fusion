@@ -3,10 +3,12 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last nine events.
 const KEEP = 9
 
-const RESTING: Arrival[] = [{ carried: 'Type to narrow it, then choose', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [
+  { carried: 'Type to filter, then choose a language', name: 'No events yet' },
+]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,35 +21,35 @@ export function Example() {
   }
 
   const showing = () => {
-    say('helix-before-open', 'the panel is about to show, refusable')
+    say('helix-before-open', 'About to open')
   }
 
   const hiding = () => {
-    say('helix-before-close', 'the panel is about to go, refusable')
+    say('helix-before-close', 'About to close')
   }
 
   const panelMoved = (event: Event & { newState?: string; oldState?: string }) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   }
 
   const narrowing = (event: CustomEvent<{ value: string }>) => {
-    say('helix-filter', `narrowing to "${event.detail.value}" as the reader types, refusable`)
+    say('helix-filter', `Filter text is "${event.detail.value}"`)
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   }
 
   const moved = (event: Event & { currentTarget: HelixCombobox }) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   }
 
   const settled = (event: Event & { currentTarget: HelixCombobox }) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `Chose "${event.currentTarget.value}"`)
   }
 
   const made = (event: CustomEvent<{ value: string }>) => {
-    say('helix-create', `"${event.detail.value}" is not in the list and was made from the query`)
+    say('helix-create', `Created "${event.detail.value}"`)
   }
 
   return (
@@ -76,7 +78,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

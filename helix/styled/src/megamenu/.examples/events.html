@@ -12,11 +12,11 @@
       label="Products"
     >
       <div data-megamenu-group>
-        <h3 data-megamenu-heading>Design</h3>
+        <h3 data-megamenu-heading>Work</h3>
         <a
           data-megamenu-item
           href="#helix"
-        >Helix</a>
+        >Projects</a>
       </div>
     </helix-megamenu>
   </helix-navigation>
@@ -25,10 +25,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Open the panel, then close it</span>
     </helix-list-item>
   </helix-list>
@@ -39,7 +39,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -60,12 +60,12 @@
   }
 
   products.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'about to open, and refusable')
+    say('helix-before-open', 'About to open')
   })
   products.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'about to close, and refusable')
+    say('helix-before-close', 'About to close')
   })
   products.addEventListener('toggle', (event) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
 </script>

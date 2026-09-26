@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Open it, then close it', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Open the drawer, then close it', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -18,19 +18,19 @@ export function Example() {
   }
 
   const opening = () => {
-    say('helix-before-open', 'about to open, and refusable')
+    say('helix-before-open', 'About to open')
   }
 
   const closing = () => {
-    say('helix-before-close', 'about to close, and refusable')
+    say('helix-before-close', 'About to close')
   }
 
   const moved = (event: Event & { newState?: string; oldState?: string }) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   }
 
   const shut = () => {
-    say('close', 'the platform name, relayed from the dialog inside')
+    say('close', 'Closed')
   }
 
   return (
@@ -55,7 +55,7 @@ export function Example() {
         onhelix-before-open={opening}
         onToggle={moved}
       >
-        <helix-text>Everything the list is narrowed by.</helix-text>
+        <helix-text>Filter the list by status, owner, and date.</helix-text>
         <helix-button
           command="--close"
           commandfor="panel"
@@ -66,7 +66,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

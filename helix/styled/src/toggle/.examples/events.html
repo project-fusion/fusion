@@ -8,19 +8,19 @@
     label="Density"
   >
     <helix-toggle value="sm">Compact</helix-toggle>
-    <helix-toggle value="md">Cosy</helix-toggle>
-    <helix-toggle value="lg">Roomy</helix-toggle>
+    <helix-toggle value="md">Default</helix-toggle>
+    <helix-toggle value="lg">Comfortable</helix-toggle>
   </helix-toggle-group>
 
 
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Press one, then another</span>
+      No events yet
+      <span slot="description">Press one option, then another</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -30,7 +30,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -51,15 +51,15 @@
   }
 
   density.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `about to change to "${event.detail.value}", can be canceled`)
   })
   density.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `"${event.currentTarget.value}", sent once for the group`)
   })
   density.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", the choice is made`)
+    say('change', `"${event.currentTarget.value}", sent when the value is committed`)
   })
   density.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was pressed, which is the member speaking`)
+    say('helix-select', `"${event.detail.value}" was pressed`)
   })
 </script>

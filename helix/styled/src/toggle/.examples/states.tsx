@@ -6,25 +6,25 @@ export function Example() {
     >
       <helix-toggle-group
         default-value="one"
-        hint="Hint"
-        label="Label"
+        hint="Applies to the selected paragraph"
+        label="Text alignment"
       >
-        <helix-toggle value="one">Chosen</helix-toggle>
-        <helix-toggle value="two">Not chosen</helix-toggle>
+        <helix-toggle value="one">Left</helix-toggle>
+        <helix-toggle value="two">Center</helix-toggle>
         <helix-toggle
           disabled
           value="three"
         >
-          Disabled
+          Right
         </helix-toggle>
       </helix-toggle-group>
 
       <helix-toggle-group
-        aria-label="Label"
+        aria-label="Theme"
         default-value="two"
       >
-        <helix-toggle value="one">Option One</helix-toggle>
-        <helix-toggle value="two">Option Two</helix-toggle>
+        <helix-toggle value="one">Light</helix-toggle>
+        <helix-toggle value="two">Dark</helix-toggle>
       </helix-toggle-group>
     </helix-flex>
   )

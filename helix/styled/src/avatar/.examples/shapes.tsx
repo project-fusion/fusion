@@ -5,11 +5,11 @@ export function Example() {
       gap="lg"
     >
       <helix-avatar
-        name="Ada Lovelace"
+        name="Alex Kim"
         size="lg"
       ></helix-avatar>
       <helix-avatar
-        name="Radia Perlman"
+        name="Nina Berg"
         shape="rounded"
         size="lg"
       ></helix-avatar>

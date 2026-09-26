@@ -28,11 +28,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Sort a column, search, or page</span>
+      No events yet
+      <span slot="description">Sort a column, search, or change the page</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -42,7 +42,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last seven events.
   const KEEP = 7
 
   const say = (name, carried) => {
@@ -69,19 +69,19 @@
     { name: 'styles.css', size: '44 KB' },
   ]
 
-  /* `search` rather than writing `filter`, because it goes through the request
-     the component makes for itself, which is the one that announces. */
+  /* `search` sends the same request the table makes for itself, so the table
+     announces the result. */
   document.getElementById('query').addEventListener('helix-before-change', (event) => {
     objects.search(event.detail.value)
   })
 
   objects.addEventListener('helix-sort', (event) => {
-    say('helix-sort', `${event.detail.value}, which reorders and changes nothing`)
+    say('helix-sort', `Sorted by ${event.detail.value}`)
   })
   objects.addEventListener('helix-filter', (event) => {
-    say('helix-filter', `the query is "${event.detail.value}"`)
+    say('helix-filter', `Filter text is "${event.detail.value}"`)
   })
   objects.addEventListener('helix-navigate', (event) => {
-    say('helix-navigate', `page ${event.detail.value}, which is a move`)
+    say('helix-navigate', `Moved to page ${event.detail.value}`)
   })
 </script>

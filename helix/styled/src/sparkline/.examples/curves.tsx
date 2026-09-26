@@ -5,17 +5,17 @@ export function Example() {
       gap="lg"
     >
       <helix-sparkline
-        label="Straight, which joins the readings and claims nothing between them"
+        label="Daily visitors"
         values="1240 1318 1102 1291 1244 1180 1408"
       ></helix-sparkline>
       <helix-sparkline
         curve="smooth"
-        label="Smooth, which is easier to follow and invents the values in between"
+        label="Daily sessions"
         values="1240 1318 1102 1291 1244 1180 1408"
       ></helix-sparkline>
       <helix-sparkline
         curve="step"
-        label="Stepped, which says each reading held until the next one"
+        label="Daily page views"
         values="1240 1318 1102 1291 1244 1180 1408"
       ></helix-sparkline>
     </helix-flex>

@@ -16,10 +16,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Press a step</span>
     </helix-list-item>
   </helix-list>
@@ -30,7 +30,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -51,9 +51,9 @@
   }
 
   flow.addEventListener('helix-before-activate', (event) => {
-    say('helix-before-activate', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-activate', `about to change to "${event.detail.value}", can be canceled`)
   })
   flow.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was pressed, which is the step speaking`)
+    say('helix-select', `"${event.detail.value}" was pressed`)
   })
 </script>

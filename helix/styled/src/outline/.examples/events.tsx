@@ -3,11 +3,11 @@ import './events.css'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
 const RESTING: Arrival[] = [
-  { carried: 'Scroll the panel, or press a heading', name: 'Nothing yet' },
+  { carried: 'Scroll the panel, or press a heading', name: 'No events yet' },
 ]
 
 export function Example() {
@@ -21,7 +21,7 @@ export function Example() {
   }
 
   const reading = (event: CustomEvent<{ value: string }>) => {
-    say('helix-activate', `"${event.detail.value}" is the one being read`)
+    say('helix-activate', `Section "${event.detail.value}" is in view`)
   }
 
   return (
@@ -40,19 +40,19 @@ export function Example() {
 
       <div className="reading">
         <section id="install">
-          <h2>Install</h2>Add the package and import the stylesheet.
+          <h2>Install</h2>Add the package to your project.
         </section>
         <section id="usage">
-          <h2>Usage</h2>Write the tag and give it a label.
+          <h2>Usage</h2>Create a client with your API key.
         </section>
         <section id="api">
-          <h2>API</h2>Every property is on the reference page.
+          <h2>API</h2>Each method lists its parameters.
         </section>
       </div>
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

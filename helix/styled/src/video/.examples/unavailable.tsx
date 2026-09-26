@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-video
-      label="A clip that is not there"
+      label="Archived webinar"
       src="/does-not-exist.mp4"
     ></helix-video>
   )

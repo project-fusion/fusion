@@ -3,10 +3,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 8
 
-const RESTING: Arrival[] = [{ carried: 'Type a time, or open the wheels', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Type a time, or open the wheels', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,27 +19,27 @@ export function Example() {
   }
 
   const showing = () => {
-    say('helix-before-open', 'the panel is about to show, refusable')
+    say('helix-before-open', 'the panel is about to open, can be canceled')
   }
 
   const hiding = () => {
-    say('helix-before-close', 'the panel is about to go, refusable')
+    say('helix-before-close', 'the panel is about to close, can be canceled')
   }
 
   const panelMoved = (event: Event & { newState?: string; oldState?: string }) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+    say('toggle', `${event.oldState} to ${event.newState}, after the panel opened or closed`)
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `about to change to "${event.detail.value}", can be canceled`)
   }
 
   const moved = (event: Event & { currentTarget: HelixTimeInput }) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `"${event.currentTarget.value}", sent once for the whole value`)
   }
 
   const settled = (event: Event & { currentTarget: HelixTimeInput }) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `"${event.currentTarget.value}", sent when the value is committed`)
   }
 
   return (
@@ -60,7 +60,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

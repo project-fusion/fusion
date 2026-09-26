@@ -2,9 +2,8 @@ import type { HelixFilterInput } from '@fusion.dev/helix'
 import { useRef, useState } from 'react'
 
 /**
- * The grammar is this page's, and the field never learns it. A real console
- * reads the values from its own data; what matters is that the element is
- * handed a list and asked to show it, never asked what a key is.
+ * The page defines the keys and the values each one accepts. The field shows
+ * the list it is given.
  */
 const VOCABULARY: Record<string, readonly string[]> = {
   area: ['billing', 'infra', 'docs'],
@@ -13,8 +12,8 @@ const VOCABULARY: Record<string, readonly string[]> = {
 }
 
 /**
- * Everything after the last space is what is being typed now. A term with no
- * colon is a key being named; one with a colon is a value for the key before it.
+ * Everything after the last space is the term being typed. A term with no colon
+ * is a key, and a term with a colon is a value for that key.
  */
 function termAt(text: string, caret: number) {
   const term = text.slice(0, caret).split(/\s+/).at(-1) ?? ''
@@ -46,13 +45,11 @@ export function Example() {
   }
 
   /**
-   * A key completes to `owner:` and the panel carries straight on into its
-   * values; a value completes to `owner:ada ` and the panel closes, because the
-   * next term is empty and every key matches again.
+   * A key completes to `owner:` and the panel shows its values. A value
+   * completes to `owner:ada ` and the panel closes.
    *
-   * Awaited, because the caret cannot be put into text that is not there yet:
-   * setting `value` schedules a render, and a `setSelectionRange` before it
-   * lands clamps to the old length and is then moved again by the render.
+   * Wait for the render before moving the caret. Until then, the input holds
+   * the old text, and `setSelectionRange` would clamp to its length.
    */
   const choose = async (event: CustomEvent<{ value: string }>) => {
     const element = filter.current
@@ -77,8 +74,8 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      {/* One handler for both ways of choosing, since the option announces its
-          own `helix-select` whether it was pressed or reached with Enter. */}
+      {/* The option sends `helix-select` when it is pressed or chosen with
+          Enter, so one handler covers both. */}
       <helix-filter-input
         hint="Type a letter, or press Down. Choosing a key offers its values next."
         label="Filter rows"

@@ -7,13 +7,13 @@ export function Example() {
         command="--show"
         commandfor="gallery"
       >
-        Open the gallery
+        Open gallery
       </helix-button>
 
       <helix-lightbox
         id="gallery"
         idle-delay="2000"
-        label="Coastline"
+        label="Beach photos"
         loop
       >
         <helix-button-group
@@ -51,9 +51,7 @@ export function Example() {
             alt="Seawater over pale sand"
             src="/media/scale/seawater-800.jpg"
           />
-          <helix-text slot="description">
-            Seawater, shallow enough to read the sand through.
-          </helix-text>
+          <helix-text slot="description">Shallow water at the beach in the morning.</helix-text>
         </helix-lightbox-item>
 
         <helix-lightbox-item
@@ -64,7 +62,7 @@ export function Example() {
             alt="The sun low over open water"
             src="/media/scale/ocean-sun.jpg"
           />
-          <helix-text slot="description">The same coast an hour later.</helix-text>
+          <helix-text slot="description">Sunset over the ocean the same day.</helix-text>
         </helix-lightbox-item>
       </helix-lightbox>
     </>

@@ -7,24 +7,24 @@ export function Example() {
       <helix-select
         default-value="two"
         disabled
-        hint="Hint"
-        label="Written off"
+        hint="Managed by your admin"
+        label="Plan"
         name="a"
       >
-        <helix-option value="one">Option One</helix-option>
-        <helix-option value="two">Option Two</helix-option>
+        <helix-option value="one">Free</helix-option>
+        <helix-option value="two">Pro</helix-option>
       </helix-select>
 
-      {/* The same state, arriving from an ancestor fieldset. */}
+      {/* The fieldset around this select disables it. */}
       <fieldset disabled>
         <helix-select
           default-value="one"
-          hint="Hint"
-          label="Off from the fieldset"
+          hint="Managed by your admin"
+          label="Billing cycle"
           name="b"
         >
-          <helix-option value="one">Option One</helix-option>
-          <helix-option value="two">Option Two</helix-option>
+          <helix-option value="one">Monthly</helix-option>
+          <helix-option value="two">Yearly</helix-option>
         </helix-select>
       </fieldset>
     </helix-flex>

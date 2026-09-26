@@ -7,24 +7,24 @@ export function Example() {
       <helix-listbox
         default-value="two"
         disabled
-        hint="Hint"
-        label="Written off"
+        hint="Managed by your admin"
+        label="Plan"
         name="a"
       >
-        <helix-option value="one">Option One</helix-option>
-        <helix-option value="two">Option Two</helix-option>
+        <helix-option value="one">Free</helix-option>
+        <helix-option value="two">Pro</helix-option>
       </helix-listbox>
 
-      {/* The same state, arriving from an ancestor fieldset. */}
+      {/* The fieldset around this list disables it. */}
       <fieldset disabled>
         <helix-listbox
           default-value="one"
-          hint="Hint"
-          label="Off from the fieldset"
+          hint="Managed by your admin"
+          label="Billing cycle"
           name="b"
         >
-          <helix-option value="one">Option One</helix-option>
-          <helix-option value="two">Option Two</helix-option>
+          <helix-option value="one">Monthly</helix-option>
+          <helix-option value="two">Yearly</helix-option>
         </helix-listbox>
       </fieldset>
     </helix-flex>

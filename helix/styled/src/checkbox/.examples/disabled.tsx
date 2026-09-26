@@ -9,12 +9,12 @@ export function Example() {
         disabled
         name="a"
       >
-        Ticked and written off
+        Email notifications
       </helix-checkbox>
 
-      {/* The same state, arriving from an ancestor fieldset. */}
+      {/* The disabled fieldset disables this checkbox. */}
       <fieldset disabled>
-        <helix-checkbox name="b">Off from the fieldset</helix-checkbox>
+        <helix-checkbox name="b">SMS notifications</helix-checkbox>
       </fieldset>
     </helix-flex>
   )

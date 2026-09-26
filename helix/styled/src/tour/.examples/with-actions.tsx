@@ -6,10 +6,8 @@ import { useRef, useState } from 'react'
 const STOPS = 3
 
 export function Example() {
-  /* Preview frame. Slotting `actions` replaces the controls the stop draws, so
-     wiring them is the price of having written them. `next()`, `back()` and
-     `skip()` are public for exactly this, and a count of where the reader is
-     needs `index` and `length`, which are both on the root. */
+  /* Controls in the `actions` slot replace the ones the stop draws, so they call
+     `next()` and `back()` themselves. The count uses `index` and `length`. */
   const tour = useRef<HelixTour>(null)
   const [index, setIndex] = useState(0)
   const [open, setOpen] = useState(false)
@@ -51,7 +49,7 @@ export function Example() {
 
       <helix-tour
         index={index}
-        label="The three you will use"
+        label="Inbox tour"
         onhelix-before-activate={(event) => setIndex(Number(event.detail.value))}
         onhelix-before-close={() => setOpen(false)}
         open={open}
@@ -61,8 +59,8 @@ export function Example() {
           for="compose"
           placement="bottom-start"
         >
-          <helix-text as="h3">Start something</helix-text>
-          <helix-text emphasis="muted">The only control here that makes anything new.</helix-text>
+          <helix-text as="h3">Write a message</helix-text>
+          <helix-text emphasis="muted">Start a new email.</helix-text>
           <helix-flex
             align-items="center"
             gap="xs"
@@ -89,8 +87,8 @@ export function Example() {
           for="filter"
           placement="bottom"
         >
-          <helix-text as="h3">Narrow it down</helix-text>
-          <helix-text emphasis="muted">Filters stack, and the set says how many are on.</helix-text>
+          <helix-text as="h3">Filter your inbox</helix-text>
+          <helix-text emphasis="muted">Show only unread, flagged, or starred messages.</helix-text>
           <helix-flex
             align-items="center"
             gap="xs"
@@ -123,10 +121,8 @@ export function Example() {
           for="refresh"
           placement="bottom-end"
         >
-          <helix-text as="h3">And when you want it now</helix-text>
-          <helix-text emphasis="muted">
-            It refreshes itself, but not while you are reading.
-          </helix-text>
+          <helix-text as="h3">Refresh your inbox</helix-text>
+          <helix-text emphasis="muted">Check for new messages.</helix-text>
           <helix-flex
             align-items="center"
             gap="xs"

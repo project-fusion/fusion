@@ -6,20 +6,20 @@ export function Example() {
         gap="sm"
       >
         <helix-radio-group
-          hint="Hint"
-          label="Label"
+          hint="You can change this later"
+          label="Account type"
           name="choice"
           required
         >
-          <helix-radio value="one">Option One</helix-radio>
-          <helix-radio value="two">Option Two</helix-radio>
+          <helix-radio value="one">Personal</helix-radio>
+          <helix-radio value="two">Business</helix-radio>
         </helix-radio-group>
         <helix-button
           emphasis="solid"
           tone="primary"
           type="submit"
         >
-          Submit
+          Create account
         </helix-button>
       </helix-flex>
     </form>

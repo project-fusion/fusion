@@ -44,13 +44,13 @@ export function Example() {
       {/* Preview frame: data-preview-map has the frame connect MapLibre; on your page, connectMap does. */}
       <helix-map
         data-preview-map
-        label="A walk through downtown Austin"
+        label="Walking route in downtown Austin"
       >
         <div data-preview-map-canvas></div>
 
         <helix-map-route
           description="From the Capitol to the Congress Avenue Bridge"
-          label="The walk"
+          label="Walking route"
           points={WALK.map(([lat, lng]) => ({ lat, lng }))}
           progress={0.4}
         ></helix-map-route>
@@ -59,7 +59,7 @@ export function Example() {
           accuracy={25}
           description="Walking to Rainey Street"
           heading={200}
-          label="A walker on the route"
+          label="Your location"
           lat={30.26671}
           lng={-97.73373}
         ></helix-map-position>
@@ -74,7 +74,7 @@ export function Example() {
           <span slot="icon">A</span>
         </helix-map-marker>
         <helix-map-marker
-          label="Franklin Barbecue"
+          label="Barbecue restaurant"
           lat={30.27014}
           lng={-97.73128}
           passed

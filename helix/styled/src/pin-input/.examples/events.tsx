@@ -3,10 +3,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Type six characters', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Type the six-digit code', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,19 +19,19 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   }
 
   const typed = (event: Event & { currentTarget: HelixPinInput }) => {
-    say('input', `"${event.currentTarget.value}" so far`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   }
 
   const whole = (event: CustomEvent<{ value: string }>) => {
-    say('helix-complete', `"${event.detail.value}", every box is filled`)
+    say('helix-complete', `Entered "${event.detail.value}"`)
   }
 
   const committed = (event: Event & { currentTarget: HelixPinInput }) => {
-    say('change', `"${event.currentTarget.value}", filled or left, either is a commit`)
+    say('change', `Changed to "${event.currentTarget.value}"`)
   }
 
   return (
@@ -50,7 +50,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

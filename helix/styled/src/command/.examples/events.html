@@ -17,11 +17,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Open it and choose a command</span>
+      No events yet
+      <span slot="description">Open the palette and choose a command</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -31,7 +31,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -52,15 +52,15 @@
   }
 
   palette.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'about to open, and refusable')
+    say('helix-before-open', 'About to open')
   })
   palette.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'about to close, and refusable')
+    say('helix-before-close', 'About to close')
   })
   palette.addEventListener('toggle', (event) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
   palette.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" ran, and nothing here holds a value`)
+    say('helix-select', `Ran "${event.detail.value}"`)
   })
 </script>

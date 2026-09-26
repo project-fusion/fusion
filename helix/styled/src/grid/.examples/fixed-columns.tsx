@@ -4,9 +4,9 @@ export function Example() {
       columns={3}
       gap="sm"
     >
-      <helix-card separation="outlined">Item One</helix-card>
-      <helix-card separation="outlined">Item Two</helix-card>
-      <helix-card separation="outlined">Item Three</helix-card>
+      <helix-card separation="outlined">Drafts</helix-card>
+      <helix-card separation="outlined">In review</helix-card>
+      <helix-card separation="outlined">Published</helix-card>
     </helix-grid>
   )
 }

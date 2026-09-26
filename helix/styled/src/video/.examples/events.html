@@ -6,7 +6,7 @@
   <helix-video
     extra-controls="previous next"
     id="clip"
-    label="A short clip"
+    label="Welcome video"
     poster="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=960"
     src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
   ></helix-video>
@@ -14,10 +14,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Press play</span>
     </helix-list-item>
   </helix-list>
@@ -28,7 +28,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -54,9 +54,9 @@
   clip.addEventListener('pause', () => say('pause', at()))
   clip.addEventListener('ended', () => say('ended', at()))
   clip.addEventListener('helix-previous', () => {
-    say('helix-previous', 'the reader asked for the one before')
+    say('helix-previous', 'the previous button was pressed')
   })
   clip.addEventListener('helix-next', () => {
-    say('helix-next', 'the reader asked for the one after')
+    say('helix-next', 'the next button was pressed')
   })
 </script>

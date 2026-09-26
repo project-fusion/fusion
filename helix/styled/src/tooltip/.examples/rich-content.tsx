@@ -5,7 +5,7 @@ export function Example() {
         aria-describedby="rich-content-tip"
         id="rich-content-trigger"
       >
-        Button
+        Save changes
       </helix-button>
       <helix-tooltip
         for="rich-content-trigger"
@@ -13,7 +13,7 @@ export function Example() {
         placement="top"
       >
         <span slot="content">
-          Lorem ipsum dolor
+          Save
           <helix-kbd>Cmd</helix-kbd>
           <helix-kbd>S</helix-kbd>
         </span>

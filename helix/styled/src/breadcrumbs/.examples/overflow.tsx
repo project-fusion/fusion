@@ -12,13 +12,13 @@ export function Example() {
           >
             <helix-icon name="dots-three"></helix-icon>
           </helix-icon-button>
-          <helix-menu-item href="#design">Design</helix-menu-item>
-          <helix-menu-item href="#components">Components</helix-menu-item>
-          <helix-menu-item href="#navigation">Navigation</helix-menu-item>
+          <helix-menu-item href="#design">Projects</helix-menu-item>
+          <helix-menu-item href="#components">Website redesign</helix-menu-item>
+          <helix-menu-item href="#navigation">Files</helix-menu-item>
         </helix-menu>
       </helix-breadcrumb>
 
-      <helix-breadcrumb current>Breadcrumbs</helix-breadcrumb>
+      <helix-breadcrumb current>Settings</helix-breadcrumb>
     </helix-breadcrumbs>
   )
 }

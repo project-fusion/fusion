@@ -17,11 +17,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Tick a scope</span>
+      No events yet
+      <span slot="description">Select a scope</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -31,7 +31,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The number of rows the log keeps.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -52,12 +52,12 @@
   }
 
   scopes.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `about to change to "${event.detail.value}" (cancelable)`)
   })
   scopes.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value || 'nothing'}", the group and not the box`)
+    say('input', `value is now "${event.currentTarget.value || 'nothing'}"`)
   })
   scopes.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value || 'nothing'}", the whole set`)
+    say('change', `value is now "${event.currentTarget.value || 'nothing'}"`)
   })
 </script>

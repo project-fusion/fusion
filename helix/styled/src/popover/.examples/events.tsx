@@ -2,11 +2,11 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
 const RESTING: Arrival[] = [
-  { carried: 'Press the trigger, then press it again', name: 'Nothing yet' },
+  { carried: 'Press Details, then press it again', name: 'No events yet' },
 ]
 
 export function Example() {
@@ -20,15 +20,15 @@ export function Example() {
   }
 
   const opening = () => {
-    say('helix-before-open', 'about to open, and refusable')
+    say('helix-before-open', 'About to open')
   }
 
   const closing = () => {
-    say('helix-before-close', 'about to close, and refusable')
+    say('helix-before-close', 'About to close')
   }
 
   const moved = (event: Event & { newState?: string; oldState?: string }) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   }
 
   return (
@@ -43,12 +43,12 @@ export function Example() {
         onToggle={moved}
       >
         <helix-button slot="trigger">Details</helix-button>
-        <helix-text>Built from commit 4f2a1c on 27 August.</helix-text>
+        <helix-text>Last edited by Alex Kim on August 27.</helix-text>
       </helix-popover>
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

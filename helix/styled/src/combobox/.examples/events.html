@@ -19,11 +19,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Type to narrow it, then choose</span>
+      No events yet
+      <span slot="description">Type to filter, then choose a language</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -33,7 +33,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last nine events.
   const KEEP = 9
 
   const say = (name, carried) => {
@@ -54,27 +54,27 @@
   }
 
   language.addEventListener('helix-before-open', () => {
-    say('helix-before-open', 'the panel is about to show, refusable')
+    say('helix-before-open', 'About to open')
   })
   language.addEventListener('helix-before-close', () => {
-    say('helix-before-close', 'the panel is about to go, refusable')
+    say('helix-before-close', 'About to close')
   })
   language.addEventListener('toggle', (event) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
+    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
   language.addEventListener('helix-filter', (event) => {
-    say('helix-filter', `narrowing to "${event.detail.value}" as the reader types, refusable`)
+    say('helix-filter', `Filter text is "${event.detail.value}"`)
   })
   language.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   })
   language.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   })
   language.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `Chose "${event.currentTarget.value}"`)
   })
   language.addEventListener('helix-create', (event) => {
-    say('helix-create', `"${event.detail.value}" is not in the list and was made from the query`)
+    say('helix-create', `Created "${event.detail.value}"`)
   })
 </script>

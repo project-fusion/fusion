@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 export function Example() {
-  /* Preview frame: a real page would swap the source for the next one. */
-  const [label, setLabel] = useState('One of several')
+  /* The preview changes only the label. Your code loads the next video here. */
+  const [label, setLabel] = useState('Lesson 2 of 5')
 
   return (
     <helix-video

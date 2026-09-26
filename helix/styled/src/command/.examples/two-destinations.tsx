@@ -22,10 +22,8 @@ export function Example() {
         <span slot="end">Reference</span>
       </helix-option>
 
-      {/* The footer is the consumer's, because only they know what the second
-          destination is called on their own site. The keys are drawn rather
-          than named: "hold the modifier" is a sentence about a key whose glyph
-          differs per reader, and `keys` is what knows which. */}
+      {/* The footer is your own content. Name the second destination there, and
+          use `helix-kbd` to show each key. */}
       <helix-flex
         align-items="center"
         gap="sm"

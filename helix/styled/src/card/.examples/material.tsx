@@ -11,9 +11,9 @@ export function Example() {
           id="glass-title"
           slot="header"
         >
-          Glass
+          Storage
         </h3>
-        A light ground and a middling blur, so what is behind it still reads.
+        You have used 8 GB of your 10 GB of storage.
       </helix-card>
 
       <helix-card
@@ -24,9 +24,9 @@ export function Example() {
           id="frosted-title"
           slot="header"
         >
-          Frosted
+          Team members
         </h3>
-        Nearly opaque and blurred twice as hard, so what is behind it is light and not shape.
+        Six people have access to this project.
       </helix-card>
 
       <helix-card
@@ -37,9 +37,9 @@ export function Example() {
           id="transparent-title"
           slot="header"
         >
-          Transparent
+          Next invoice
         </h3>
-        No ground and no filter: structure and spacing over whatever it is on.
+        Your next invoice is due on October 1, 2026.
       </helix-card>
 
       <helix-card
@@ -50,9 +50,9 @@ export function Example() {
           id="opaque-title"
           slot="header"
         >
-          Opaque
+          Notifications
         </h3>
-        The same card with no material at all, which is what the others are being compared against.
+        You have three unread messages.
       </helix-card>
     </div>
   )

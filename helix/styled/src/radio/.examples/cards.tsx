@@ -2,8 +2,8 @@ export function Example() {
   return (
     <helix-radio-group
       default-value="team"
-      hint="Hint"
-      label="Label"
+      hint="You can change your plan at any time"
+      label="Plan"
       name="plan"
     >
       <helix-radio
@@ -18,14 +18,14 @@ export function Example() {
             as="span"
             variant="body-strong"
           >
-            Solo
+            Personal
           </helix-text>
           <helix-text
             as="span"
             emphasis="subtle"
             variant="caption"
           >
-            One seat, and everything on it.
+            One seat with every feature.
           </helix-text>
         </helix-flex>
       </helix-radio>
@@ -48,7 +48,7 @@ export function Example() {
             emphasis="subtle"
             variant="caption"
           >
-            Up to ten seats, shared billing.
+            Up to 10 seats, with shared billing.
           </helix-text>
         </helix-flex>
       </helix-radio>

@@ -21,10 +21,8 @@
     state="sent"
   >How do I roll back the migration that failed this morning?</helix-chat-message>
 
-  <!-- A turn holds whatever it is given, so an answer can be built from the
-       library's own parts. Markdown rendered to plain HTML is the other way in,
-       which `rendered-markdown` shows with the same answer: mark the turn
-       `data-prose` and the base layer sets its headings, lists, tables and code. -->
+  <!-- A turn can hold any components. To style rendered Markdown instead, mark the
+       turn `data-prose`, as the `rendered-markdown` example does. -->
   <helix-chat-message
     author="them"
     separation="plain"

@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-date-input
-      hint="A start and an end"
+      hint="Choose a start and end date"
       label="Stay"
       mode="range"
       months={2}

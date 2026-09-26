@@ -7,24 +7,24 @@ export function Example() {
       <helix-radio-group
         default-value="one"
         disabled
-        hint="Hint"
-        label="Written off"
+        hint="Managed by your admin"
+        label="Plan"
         name="a"
       >
-        <helix-radio value="one">Option One</helix-radio>
-        <helix-radio value="two">Option Two</helix-radio>
+        <helix-radio value="one">Free</helix-radio>
+        <helix-radio value="two">Pro</helix-radio>
       </helix-radio-group>
 
-      {/* The same state, arriving from an ancestor fieldset. */}
+      {/* The fieldset around this group disables it. */}
       <fieldset disabled>
         <helix-radio-group
           default-value="two"
-          hint="Hint"
-          label="Off from the fieldset"
+          hint="Managed by your admin"
+          label="Billing cycle"
           name="b"
         >
-          <helix-radio value="one">Option One</helix-radio>
-          <helix-radio value="two">Option Two</helix-radio>
+          <helix-radio value="one">Monthly</helix-radio>
+          <helix-radio value="two">Yearly</helix-radio>
         </helix-radio-group>
       </fieldset>
     </helix-flex>

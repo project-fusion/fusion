@@ -1,17 +1,17 @@
 export function Example() {
   return (
     <>
-      {/* Preview frame: the submit is swallowed. */}
+      {/* The preview cancels the submit, so the page stays in place. */}
       <form onSubmit={(event) => event.preventDefault()}>
         <helix-flex
           direction="column"
           gap="sm"
         >
           <helix-textarea
-            hint="We read every one"
+            hint="Include the steps that led to the problem"
             label="What happened"
             name="report"
-            placeholder="Start with what you expected"
+            placeholder="What did you expect to happen?"
             required
           ></helix-textarea>
           <helix-button
@@ -19,7 +19,7 @@ export function Example() {
             tone="primary"
             type="submit"
           >
-            Send
+            Send report
           </helix-button>
         </helix-flex>
       </form>

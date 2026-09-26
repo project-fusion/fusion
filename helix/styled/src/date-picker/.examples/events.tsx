@@ -3,10 +3,12 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Page the month, then choose a day', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [
+  { carried: 'Change the month, then choose a day', name: 'No events yet' },
+]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,19 +21,19 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   }
 
   const moved = (event: Event & { currentTarget: HelixDatePicker }) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   }
 
   const settled = (event: Event & { currentTarget: HelixDatePicker }) => {
-    say('change', `"${event.currentTarget.value}", the choice is made`)
+    say('change', `Chose "${event.currentTarget.value}"`)
   }
 
   const paged = (event: CustomEvent<{ value: string }>) => {
-    say('helix-navigate', `the view moved to ${event.detail.value}, and nothing was chosen`)
+    say('helix-navigate', `Showing ${event.detail.value}`)
   }
 
   return (
@@ -41,7 +43,7 @@ export function Example() {
     >
       <helix-date-picker
         default-month="2026-08"
-        label="Ship date"
+        label="Delivery date"
         onChange={settled}
         onhelix-before-change={proposed}
         onhelix-navigate={paged}
@@ -50,7 +52,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

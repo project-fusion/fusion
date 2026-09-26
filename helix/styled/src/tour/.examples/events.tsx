@@ -3,10 +3,10 @@ import './events.css'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 8
 
-const RESTING: Arrival[] = [{ carried: 'Step through it, then skip', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Go through the tour, then skip it', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,19 +19,19 @@ export function Example() {
   }
 
   const asked = (event: CustomEvent<{ what: string }>) => {
-    say('helix-tour-ask', `a stop asked to go ${event.detail.what}, which is not the decision`)
+    say('helix-tour-ask', `a stop requested ${event.detail.what}`)
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-activate', `proposing stop ${event.detail.value}, refusable`)
+    say('helix-before-activate', `about to change to stop ${event.detail.value}, can be canceled`)
   }
 
   const leaving = () => {
-    say('helix-before-close', 'leaving early, which is refusable')
+    say('helix-before-close', 'closing early, can be canceled')
   }
 
   const finished = () => {
-    say('helix-complete', 'the last stop was reached, which is not refusable')
+    say('helix-complete', 'the tour was finished, cannot be canceled')
   }
 
   return (
@@ -40,7 +40,7 @@ export function Example() {
       gap="md"
     >
       <div className="stage">
-        <helix-button id="anchor">The thing being explained</helix-button>
+        <helix-button id="anchor">Create project</helix-button>
       </div>
 
       <helix-tour
@@ -50,13 +50,13 @@ export function Example() {
         onhelix-tour-ask={asked}
         open
       >
-        <helix-tour-stop for="anchor">This is where a deploy starts.</helix-tour-stop>
-        <helix-tour-stop for="anchor">And this is where it is watched.</helix-tour-stop>
+        <helix-tour-stop for="anchor">Create a project to get started.</helix-tour-stop>
+        <helix-tour-stop for="anchor">Name the project and invite your team.</helix-tour-stop>
       </helix-tour>
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

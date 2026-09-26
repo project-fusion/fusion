@@ -15,11 +15,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Drop a file, or press to choose one</span>
+      No events yet
+      <span slot="description">Drop a file or choose one</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -29,7 +29,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -52,12 +52,12 @@
   const chosen = (field) => field.files.map((file) => file.name).join(', ') || 'nothing'
 
   files.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   })
   files.addEventListener('input', (event) => {
-    say('input', `${chosen(event.currentTarget)} chosen so far`)
+    say('input', `Value is ${chosen(event.currentTarget)}`)
   })
   files.addEventListener('change', (event) => {
-    say('change', `${chosen(event.currentTarget)}, the reader is done`)
+    say('change', `Chose ${chosen(event.currentTarget)}`)
   })
 </script>

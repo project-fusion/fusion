@@ -30,10 +30,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Drag the divider, then drag it to an edge</span>
     </helix-list-item>
   </helix-list>
@@ -44,7 +44,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -65,9 +65,9 @@
   }
 
   panes.addEventListener('helix-before-resize', (event) => {
-    say('helix-before-resize', `settling at ${event.detail.value} percent`)
+    say('helix-before-resize', `moved to ${event.detail.value} percent`)
   })
   panes.addEventListener('helix-before-collapse', (event) => {
-    say('helix-before-collapse', event.detail.value === '' ? 'reopened' : `shut the ${event.detail.value} pane`)
+    say('helix-before-collapse', event.detail.value === '' ? 'reopened' : `collapsed the ${event.detail.value} pane`)
   })
 </script>

@@ -3,10 +3,9 @@ import './sized-panes.css'
 export function Example() {
   return (
     <div className="stage">
-      {/* `split` and `panel-size` are where the dividers are, and the sandbox
-             writes both back as a reader drags them. `default-split` and
-             `default-panel-size` beside them are a different question: where a double
-             click puts them back to. */}
+      {/* `split` and `panel-size` set where the dividers are, and they update
+          as you drag. `default-split` and `default-panel-size` are where a
+          double click puts them back. */}
       <helix-sandbox
         default-panel-size="180"
         default-split={50}

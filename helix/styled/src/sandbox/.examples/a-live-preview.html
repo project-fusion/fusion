@@ -13,10 +13,9 @@
       value="&lt;p&gt;Edited here, drawn beside it.&lt;/p&gt;"
     ></helix-sandbox-source>
 
-    <!-- The frame is the security boundary: `allow-scripts` and never
-         `allow-same-origin`, so what runs in it cannot reach this page. `src`
-         is the document it loads, `turbo run styles` the sheet to put in it, and
-         `source` is what the root hands over whenever the editor changes. -->
+    <!-- The frame runs with `allow-scripts` and without `allow-same-origin`, so
+         code in it cannot reach your page. `src` is the document the frame
+         loads, `styles` is the CSS it adds, and `source` is the code it runs. -->
     <helix-sandbox-preview
       label="Live preview"
       layout="padded"

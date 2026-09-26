@@ -8,17 +8,17 @@
     id="row"
   >
     <helix-tag dismissible>design</helix-tag>
-    <helix-tag dismissible>infra</helix-tag>
-    <helix-tag dismissible>docs</helix-tag>
+    <helix-tag dismissible>billing</helix-tag>
+    <helix-tag dismissible>urgent</helix-tag>
   </helix-flex>
 
 
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
-    <helix-list-item>Nothing yet<span slot="description">Press the tag’s close control</span>
+    <helix-list-item>No events yet<span slot="description">Press the tag’s close control</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -28,7 +28,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -49,6 +49,6 @@
   }
 
   row.addEventListener('helix-dismiss', (event) => {
-    say('helix-dismiss', `"${event.detail.label}" asked to go, which is a request and not a removal`)
+    say('helix-dismiss', `the remove button on "${event.detail.label}" was pressed`)
   })
 </script>

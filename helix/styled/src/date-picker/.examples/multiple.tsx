@@ -4,7 +4,7 @@ export function Example() {
       default-month="2026-08"
       default-value="2026-08-05,2026-08-06,2026-08-20"
       first-day-of-week="1"
-      label="Label"
+      label="Meeting dates"
       locale="en-GB"
       mode="multiple"
     ></helix-date-picker>

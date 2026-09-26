@@ -13,7 +13,7 @@
       <strong>Ada Okonjo</strong> approved your deploy.
     </helix-notification>
     <helix-notification dismissible>
-      <strong>Grace Hopper</strong> left a comment.
+      <strong>Sam Patel</strong> left a comment.
     </helix-notification>
   </helix-notifications>
 
@@ -26,11 +26,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Open one, then dismiss it</span>
+      No events yet
+      <span slot="description">Open a notification, then dismiss it</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -40,7 +40,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -61,9 +61,9 @@
   }
 
   feed.addEventListener('helix-read', (event) => {
-    say('helix-read', `mark ${event.detail.read ? 'read' : 'unread'}, which is a request the feed answers`)
+    say('helix-read', `Mark as ${event.detail.read ? 'read' : 'unread'}`)
   })
   feed.addEventListener('helix-dismiss', (event) => {
-    say('helix-dismiss', `"${event.detail.label}" asked to go`)
+    say('helix-dismiss', `Dismissed "${event.detail.label}"`)
   })
 </script>

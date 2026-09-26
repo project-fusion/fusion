@@ -2,16 +2,16 @@ export function Example() {
   return (
     <>
       <helix-tag
-        dismiss-label="Remove Label"
+        dismiss-label="Remove the Open filter"
         dismissible
       >
-        Label
+        Open
       </helix-tag>{' '}
       <helix-tag
         dismissible
         tone="primary"
       >
-        Label
+        Assigned to me
       </helix-tag>
     </>
   )

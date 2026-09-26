@@ -2,11 +2,11 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
 const RESTING: Arrival[] = [
-  { carried: 'Narrow the preview until a column drops', name: 'Nothing yet' },
+  { carried: 'Resize the window to change how many cells fit', name: 'No events yet' },
 ]
 
 export function Example() {
@@ -19,10 +19,10 @@ export function Example() {
     })
   }
 
-  /* Not cancelable: the grid is reporting what it can show, and the number is
-     true whether or not anybody wanted it. */
+  /* `helix-resize` cannot be canceled. It reports how many cells the grid can
+     show. */
   const measured = (event: CustomEvent<{ size: number }>) => {
-    say('helix-resize', `${event.detail.size} cells fit, which is a report`)
+    say('helix-resize', `${event.detail.size} cells fit`)
   }
 
   return (
@@ -167,7 +167,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

@@ -21,18 +21,8 @@
     state="sent"
   >How do I roll back the migration that failed this morning?</helix-chat-message>
 
-  <!-- **`data-prose` is what styles this, and the markup is the page's own.**
-       Chat renders no markdown and takes no dependency on one: turning
-       `### Roll back` into an `<h3>` is the consumer's markdown library's job,
-       and this is what one emits. What the component owes them is a turn that
-       can hold the result. The recipe lives in the base layer, because
-       `::slotted()` reaches the turn's children and never their cells.
-
-       **Except the fence and the alert, which the renderer maps to `Code Block`
-       and `Callout`.** A `<pre>` cannot carry a label or a copy button, and a
-       `<blockquote>` cannot carry a tone, and those are what a reader of an
-       answer acts on. Each is one override in any markdown library: the fence's
-       language is the label, and `> [!WARNING]` is the tone. -->
+  <!-- `data-prose` styles the HTML that your Markdown library produces. The code
+       fence renders as a Code Block and the alert as a Callout. -->
   <helix-chat-message
     author="them"
     data-prose

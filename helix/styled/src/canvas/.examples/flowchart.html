@@ -1,7 +1,7 @@
 <!-- @summary A flowchart with a pill to start, boxes for steps, a diamond for the decision, and a circle to end, joined at right angles. -->
 <helix-canvas
   grid="dots"
-  label="What happens to a pull request"
+  label="Order approval"
   path="step"
 >
   <helix-canvas-node
@@ -11,7 +11,7 @@
     width="160"
     x="0"
     y="0"
-  >Opened</helix-canvas-node>
+  >Order placed</helix-canvas-node>
 
   <helix-canvas-node
     height="64"
@@ -20,7 +20,7 @@
     width="160"
     x="0"
     y="112"
-  >Checks run</helix-canvas-node>
+  >Payment check</helix-canvas-node>
 
   <helix-canvas-node
     height="112"
@@ -30,7 +30,7 @@
     width="160"
     x="0"
     y="240"
-  >Green?</helix-canvas-node>
+  >Approved?</helix-canvas-node>
 
   <helix-canvas-node
     height="64"
@@ -40,7 +40,7 @@
     width="160"
     x="256"
     y="264"
-  >Fix and push</helix-canvas-node>
+  >Update payment</helix-canvas-node>
 
   <helix-canvas-node
     height="96"
@@ -50,7 +50,7 @@
     width="96"
     x="32"
     y="416"
-  >Merged</helix-canvas-node>
+  >Shipped</helix-canvas-node>
 
   <helix-canvas-edge
     from="opened"

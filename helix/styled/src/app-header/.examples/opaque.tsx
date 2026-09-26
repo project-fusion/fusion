@@ -10,9 +10,9 @@ export function Example() {
             aria-current="page"
             href="#one"
           >
-            Item One
+            Overview
           </a>
-          <a href="#two">Item Two</a>
+          <a href="#two">Projects</a>
         </helix-navigation>
         <helix-icon-button
           label="Settings"
@@ -27,12 +27,9 @@ export function Example() {
           as="h1"
           variant="display"
         >
-          Scroll this page
+          Your projects
         </helix-text>
-        <helix-text as="p">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
-        </helix-text>
+        <helix-text as="p">Track progress, share files, and invite team members.</helix-text>
       </div>
 
       <div className="prose">
@@ -40,34 +37,27 @@ export function Example() {
           as="h2"
           variant="title"
         >
-          Section One
+          Recent activity
+        </helix-text>
+        <helix-text as="p">Alex Kim uploaded three files to Website redesign.</helix-text>
+
+        <helix-text
+          as="h2"
+          variant="title"
+        >
+          Team members
         </helix-text>
         <helix-text as="p">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
+          Invite people to your workspace and choose what each person can edit.
         </helix-text>
 
         <helix-text
           as="h2"
           variant="title"
         >
-          Section Two
+          Billing
         </helix-text>
-        <helix-text as="p">
-          Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-          commodo consequat.
-        </helix-text>
-
-        <helix-text
-          as="h2"
-          variant="title"
-        >
-          Section Three
-        </helix-text>
-        <helix-text as="p">
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-          nulla pariatur.
-        </helix-text>
+        <helix-text as="p">Your next invoice is due on October 1, 2026.</helix-text>
       </div>
     </div>
   )

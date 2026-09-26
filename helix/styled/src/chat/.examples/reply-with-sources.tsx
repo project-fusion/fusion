@@ -15,10 +15,6 @@ export function Example() {
       >
         Assistant
       </helix-text>
-      {/* Controls for the conversation rather than for any turn in it, which is
-             what the header's trailing edge is for. The one that gets used goes on the
-             row; the rest go behind a menu, because a header is not a toolbar and four
-             glyphs beside a title read as one. */}
       <helix-flex
         gap="2xs"
         slot="actions"
@@ -78,17 +74,6 @@ export function Example() {
         {' '}
         Why is the deploy stuck on the migration step?{' '}
       </helix-chat-message>
-      {/* `separation="plain"` because an answer is a passage rather than a remark.
-             The reader's own turns keep their bubbles, so the two sides of the
-             conversation are told apart by what they are as well as by which edge they
-             sit against.
-
-             **No avatar on the answer, and the slot is still there for one.** A mark
-             per message earns its place where a reader has to tell speakers apart,
-             and a conversation with one assistant in it has nobody to confuse it
-             with: the bubble, the edge it sits against and the header have each
-             already said who is talking. The slot is for the transcript that has
-             several agents, or several people, in it. */}
       <helix-chat-message
         author="them"
         separation="plain"
@@ -98,9 +83,6 @@ export function Example() {
         The migration is waiting on a lock. Another connection has held{' '}
         <helix-code>ACCESS EXCLUSIVE</helix-code> on <helix-code>orders</helix-code> since 09:14, so
         the deploy is queued behind it rather than failing.
-        {/* What the answer was drawn from, each named. A document or a log is not
-            a person, so they are tags rather than avatars: initials in a circle
-            read as people, and at the small step they came to one letter each. */}
         <helix-flex
           align-items="center"
           className="assistant-sources"
@@ -138,9 +120,7 @@ export function Example() {
         {' '}
         Can I clear it without dropping the deploy?{' '}
       </helix-chat-message>
-      {/* The wait before the first token. `streaming` with nothing in it yet draws
-             the typing indicator; the moment content arrives it stops, and nothing
-             decorates the text after that because the text arriving is the signal. */}
+      {/* An empty turn with `state="streaming"` shows the typing indicator. */}
       <helix-chat-message
         author="them"
         separation="plain"
@@ -170,9 +150,6 @@ export function Example() {
           {' '}
           <helix-icon name="plus"></helix-icon>{' '}
         </helix-icon-button>
-        {/* Which model answers is a choice about the turn being written, so it
-               belongs on the composer's own row rather than as a label in the header.
-               A tag beside the title said what was in use and could not be changed. */}
         <helix-select
           aria-label="Model"
           className="assistant-model"
@@ -181,9 +158,9 @@ export function Example() {
           slot="start"
         >
           {' '}
-          <helix-option value="opus-5">Opus 5</helix-option>{' '}
-          <helix-option value="sonnet-5">Sonnet 5</helix-option>{' '}
-          <helix-option value="haiku-4-5">Haiku 4.5</helix-option>{' '}
+          <helix-option value="opus-5">Fast</helix-option>{' '}
+          <helix-option value="sonnet-5">Balanced</helix-option>{' '}
+          <helix-option value="haiku-4-5">Thorough</helix-option>{' '}
         </helix-select>{' '}
         <helix-icon-button
           emphasis="ghost"
