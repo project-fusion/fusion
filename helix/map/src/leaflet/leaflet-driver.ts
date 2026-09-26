@@ -167,8 +167,21 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
             for (const shape of drawn) {
               shape.remove()
             }
-            drawn = read().map((layer) => {
+            drawn = read().flatMap((layer) => {
               const latlngs = layer.points.map(({ lat, lng }): [number, number] => [lat, lng])
+              /* The casing first, so the route is drawn over it. */
+              const casing =
+                layer.kind === 'route' && layer.casing
+                  ? [
+                      shapes.polyline(latlngs, {
+                        color: layer.casing,
+                        interactive: false,
+                        lineCap: 'round',
+                        lineJoin: 'round',
+                        weight: 7,
+                      }),
+                    ]
+                  : []
               const shape =
                 layer.kind === 'route'
                   ? shapes.polyline(latlngs, {
@@ -185,8 +198,10 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
                       interactive: false,
                       weight: 1.5,
                     })
-              shape.addTo(map as never)
-              return shape
+              for (const one of [...casing, shape]) {
+                one.addTo(map as never)
+              }
+              return [...casing, shape]
             })
           }
           draw()

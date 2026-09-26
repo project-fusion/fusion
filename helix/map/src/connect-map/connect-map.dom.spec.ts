@@ -462,6 +462,16 @@ describe('connectMap with routes and areas', () => {
     expect(typeof drawn[0]?.[0]?.color).toBe('string')
   })
 
+  test('a route carries its edge as a casing where the edge is not its own color, and none where it is', async () => {
+    const host = await frame(
+      `<helix-headless-map-route label="Cased" points="1,2 3,4" style="color: rgb(1, 2, 3); border-color: rgb(250, 250, 250)"></helix-headless-map-route>
+       <helix-headless-map-route label="Plain" points="1,2 3,4" style="color: rgb(1, 2, 3); border-color: rgb(1, 2, 3)"></helix-headless-map-route>`,
+    )
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    expect(drawn[0]?.map((one) => one.casing)).toEqual(['rgb(250, 250, 250)', undefined])
+  })
+
   test('a route moved, retoned or added is drawn again, under the same id, and disconnecting takes them off', async () => {
     const host = await frame(
       '<helix-headless-map-route label="R" points="1,2 3,4"></helix-headless-map-route>',
