@@ -222,7 +222,7 @@ export const MAPS: PageCopy = {
     },
     {
       body: [
-        `Every café, bar and restaurant OpenStreetMap has in Austin, ${AUSTIN_PLACES.toLocaleString('en-US')} of them, from one GeoJSON file. The renderer draws and counts them as fast as it draws the roads, and a count pressed zooms in to what it holds.`,
+        `Every café, bar and restaurant OpenStreetMap has in Austin, ${AUSTIN_PLACES.toLocaleString('en-US')} of them, from one GeoJSON file. The renderer draws and counts them as fast as it draws the roads, a count pressed zooms in to what it holds, and the points and counts in view are walked from the keyboard like markers.`,
       ],
       kicker: 'Thousands of points',
       title: 'One layer, not thousands of elements',
