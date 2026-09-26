@@ -392,6 +392,18 @@
   --_map-marker-fill: var(--helix-color-warning-surface);
 }
 
+/* **A place already passed is muted, not faded**, the way the route behind
+   the traveler is quieter: its point and letter in the muted ink, which still
+   reads on the map, where a see-through point let the streets through its
+   letter. After the tones, so it quiets a toned place as well, and the name
+   says it too, so the color is never the only way to tell. */
+:host(:state(passed)) {
+  --_map-marker-color: var(--helix-color-foreground-muted);
+  --_map-marker-fill: var(--helix-color-foreground-muted);
+  --_map-marker-ink: var(--helix-color-surface);
+  --_map-marker-shadow: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [part="label"],
   [part="point"] {
