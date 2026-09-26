@@ -6,7 +6,12 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-type Marker = HTMLElement & { current: boolean; updateComplete: Promise<boolean> }
+type Marker = HTMLElement & {
+  current: boolean
+  gathered: string[]
+  gatheredBy: Marker | undefined
+  updateComplete: Promise<boolean>
+}
 type Frame = HTMLElement & { updateComplete: Promise<boolean> }
 
 /** A frame with three places, written in the order a reader should walk them. */
@@ -142,5 +147,55 @@ describe('map marker', () => {
     expect([hasState(lettered, 'icon'), hasState(bare, 'icon')]).toEqual([true, false])
     // Seen and not read: the name is still the place's.
     expect(part(lettered, 'marker')?.textContent?.replace(/\s+/g, ' ').trim()).toBe('UT Tower')
+  })
+
+  test('a marker standing for others is their count and their names, and a press opens it rather than one place', async () => {
+    const host = (await mount(
+      `<helix-headless-map label="Walk" lang="en">
+        <helix-headless-map-marker label="Depot" lat="1" lng="1"></helix-headless-map-marker>
+        <helix-headless-map-marker label="Ferry Building" lat="1" lng="1"></helix-headless-map-marker>
+        <helix-headless-map-marker label="Mission Dolores" lat="1" lng="1"></helix-headless-map-marker>
+      </helix-headless-map>`,
+    )) as Frame
+    await host.updateComplete
+    const [depot, ferry, mission] = markers(host) as [Marker, Marker, Marker]
+    depot.gathered = ['Depot', 'Ferry Building', 'Mission Dolores']
+    ferry.gatheredBy = depot
+    mission.gatheredBy = depot
+    for (const one of [depot, ferry, mission]) {
+      await one.updateComplete
+    }
+    await host.updateComplete
+    expect(hasState(depot, 'cluster')).toBe(true)
+    expect(part(depot, 'point')?.textContent?.trim()).toBe('3')
+    expect(part(depot, 'label')?.textContent).toBe('Depot, Ferry Building, and Mission Dolores')
+    expect([hasState(ferry, 'clustered'), part(ferry, 'marker')?.hasAttribute('hidden')]).toEqual([
+      true,
+      true,
+    ])
+
+    const opened: string[][] = []
+    const activated: string[] = []
+    host.addEventListener('helix-map-cluster', (event) => opened.push(event.detail.labels))
+    host.addEventListener('helix-activate', (event) => activated.push(event.detail.value))
+    part(depot, 'marker')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    expect(opened).toEqual([['Depot', 'Ferry Building', 'Mission Dolores']])
+    expect(activated).toEqual([])
+  })
+
+  test('the tab stop on a gathered marker goes to the one standing for it, and the walk skips it', async () => {
+    const host = await frame()
+    const [depot, ferry, mission] = markers(host) as [Marker, Marker, Marker]
+    depot.gathered = ['Depot', 'Ferry Building']
+    ferry.gatheredBy = depot
+    await ferry.updateComplete
+    await depot.updateComplete
+    await host.updateComplete
+    expect(stops(host)).toEqual(['Depot'])
+    depot.focus()
+    press(depot, 'ArrowRight')
+    await host.updateComplete
+    expect(stops(host)).toEqual(['Mission Dolores'])
+    expect(mission.current).toBe(true)
   })
 })

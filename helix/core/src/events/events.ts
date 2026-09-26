@@ -821,8 +821,12 @@ export class HelixMapZoomEvent extends CustomEvent<ViewportZoomDetail> {
 
 /** What changed on a part of a map: a line or a shape, or something standing on a place. */
 export interface MapPartChangeDetail {
-  /** `layer` for a route or an area, which is redrawn; `place` for a marker or a position, which is moved. */
-  kind: 'layer' | 'place'
+  /**
+   * `layer` for a route or an area, which is redrawn; `place` for a marker or
+   * a position, which is moved; `cluster` for a marker gathered into another
+   * or let go, which moves the frame's tab stop.
+   */
+  kind: 'cluster' | 'layer' | 'place'
 }
 
 /**
@@ -841,6 +845,35 @@ export class HelixMapPartChangeEvent extends CustomEvent<MapPartChangeDetail> {
 
   constructor(detail: MapPartChangeDetail) {
     super(HelixMapPartChangeEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: false,
+      detail,
+    })
+  }
+}
+
+/** What a cluster a reader pressed holds. */
+export interface MapClusterDetail {
+  /** The names of the places it stands for, the one it is drawn as first. */
+  labels: string[]
+}
+
+/**
+ * A reader pressed a cluster, one marker standing for several that would have
+ * drawn over each other.
+ *
+ * **Opened by zooming in**, which the connector does, framing the places the
+ * cluster holds, as pressing one does on every map a reader has used. Told
+ * rather than asked: a page that lists them in a panel instead connects with
+ * `clusterZoom: false`. Sent from the marker the cluster is drawn as, and
+ * bubbles through the frame to the page.
+ */
+export class HelixMapClusterEvent extends CustomEvent<MapClusterDetail> {
+  static readonly eventName = 'helix-map-cluster'
+
+  constructor(detail: MapClusterDetail) {
+    super(HelixMapClusterEvent.eventName, {
       bubbles: true,
       cancelable: false,
       composed: false,
@@ -1572,6 +1605,7 @@ const registry = {
   HelixFacetEvent,
   HelixFilterEvent,
   HelixHistoryEvent,
+  HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,
   HelixMapZoomEvent,

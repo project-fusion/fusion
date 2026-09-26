@@ -71,6 +71,23 @@ a reader walking the places never lands on one they cannot see. Pressing one
 sends `helix-activate` from the frame with its `name`, or its `label` where it
 has none, and what happens then is the page's.
 
+### Clusters
+
+```html
+<helix-map label="Stores" cluster>…</helix-map>
+```
+
+**A frame with `cluster` gathers markers that would draw over each other**:
+each, in the order they are written, takes every later one whose point comes
+within 40 pixels of its own, `clusterDistance` to change it, and is drawn at
+their middle as their count, named by their names in the page's language.
+Asked again every time the view moves, so a cluster comes apart as the map
+zooms in. The walk and the tab stop go to the cluster rather than the places
+hidden in it, and pressing one sends `helix-map-cluster` from its marker with
+their names, which the connector answers by framing them; a page that lists
+them in a panel instead connects with `clusterZoom: false`. Places at the very same point never come apart, which is a
+list's job rather than a zoom's.
+
 ## Routes and areas
 
 ```html

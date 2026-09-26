@@ -2,6 +2,7 @@ import {
   customElement,
   HelixActivateEvent,
   HelixElement,
+  HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,
   HelixMapZoomEvent,
@@ -71,8 +72,10 @@ export type MapControlsPlacement = ViewportControlsPlacement
  * @slot footer - Chrome below the map, such as a legend or a scale.
  * @slot header - Chrome above the map, such as a title or a search field.
  *
- * @event {HelixActivateEvent} helix-activate - A reader pressed a marker. The value is its `name`, or its `label` where it has none.
+ * @event {HelixActivateEvent} helix-activate - A reader pressed a marker. The value is its `name`, or its `label` where it has none. A cluster sends `helix-map-cluster` from its marker instead.
+ * @event {HelixMapClusterEvent} helix-map-cluster - A reader pressed a cluster, sent from the marker it is drawn as with the names of its places.
  * @event {HelixMapPanEvent} helix-map-pan - The reader asked the map to move. Answer it against your own map.
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - The frame began or stopped gathering its markers, which the connector places again. Not news for a page.
  * @event {HelixMapZoomEvent} helix-map-zoom - The reader asked the map to zoom, by a direction rather than to a level.
  *
  * @csspart attribution - The strip the credit sits in, under the map.
@@ -96,6 +99,15 @@ export type MapControlsPlacement = ViewportControlsPlacement
  */
 @customElement('helix-headless-map')
 export class HelixHeadlessMap extends MixinViewport(HelixElement) {
+  /**
+   * Gathers markers that would draw over each other into one, drawn as their
+   * count and named by their names, which a press opens by zooming in. Asked
+   * again every time the view moves, so a cluster comes apart as the map
+   * zooms in to where its places have room.
+   */
+  @property({ type: Boolean })
+  cluster = false
+
   /**
    * Accessible name for the map, which is the one thing a consumer must write.
    *
@@ -135,7 +147,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * and a slot change does not report.
    */
   private readonly handlePartChange = (event: HelixMapPartChangeEvent): void => {
-    if (event.detail.kind === 'layer') {
+    if (event.detail.kind !== 'place') {
       this.requestUpdate()
     }
   }
@@ -172,7 +184,8 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
              does not retarget reports it. */
           contains: (node) =>
             node !== null && (marker.contains(node) || marker.shadowRoot?.contains(node) === true),
-          disabled: false,
+          /* Hidden inside a cluster, which the walk reaches instead. */
+          disabled: marker.gatheredBy !== undefined,
           /* The stop moves with the walk rather than waiting to hear focus
              arrive: a focus event from inside a marker's own shadow root is
              one an engine can fail to carry out to the frame, and the stop
@@ -208,8 +221,15 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
   }
 
-  /** Says a marker was pressed, by click, Enter or Space. */
+  /**
+   * Says a marker was pressed, by click, Enter or Space: a place by its name,
+   * and a cluster as a cluster, from the marker it is drawn as.
+   */
   private activate(marker: HelixHeadlessMapMarker): void {
+    if (marker.gathered.length > 1) {
+      marker.dispatchEvent(new HelixMapClusterEvent({ labels: [...marker.gathered] }))
+      return
+    }
     this.dispatchEvent(new HelixActivateEvent({ value: marker.name || marker.label || '' }))
   }
 
@@ -276,10 +296,17 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     const markers = this.markers
-    const stop = Math.min(this.stop, markers.length - 1)
-    markers.forEach((marker, at) => {
-      marker.current = at === stop
-    })
+    /* On the cluster standing for the marker the stop was on, while it is
+       gathered, so Tab still reaches the map's places. */
+    const on = markers[Math.min(this.stop, markers.length - 1)]
+    const stop = on?.gatheredBy ?? on
+    for (const marker of markers) {
+      marker.current = marker === stop
+    }
+    /* Asked of the connector as a place is: the next placing gathers or lets go. */
+    if (changed.has('cluster')) {
+      this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'place' }))
+    }
   }
 
   /** The events this family names, the surface naming none of its own. */

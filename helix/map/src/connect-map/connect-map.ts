@@ -1,4 +1,5 @@
 import {
+  HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,
   HelixMapZoomEvent,
@@ -140,12 +141,27 @@ interface Marker extends HTMLElement {
    * side of the point has the room.
    */
   extent?(): number
+  /** The names of the places it stands for while it leads a cluster, its own first. */
+  gathered?: string[]
+  /** The marker standing for it while it is gathered into a cluster. */
+  gatheredBy?: Marker | undefined
   isMapMarker: true
+  label?: string | undefined
   lat?: number | undefined
   lng?: number | undefined
+  name?: string | undefined
   /** Which side of its point the name sits on, in reading order. */
   side?: 'end' | 'start'
 }
+
+/** The frame, as far as the connector reads it: whether it gathers its markers. */
+interface Frame extends HTMLElement {
+  cluster?: boolean | undefined
+}
+
+/** Whether a cluster's names are the ones it already has, so it is not written again every frame. */
+const sameNames = (had: readonly string[] | undefined, names: readonly string[]): boolean =>
+  (had?.length ?? 0) === names.length && names.every((name, at) => had?.[at] === name)
 
 const isMarker = (node: unknown): node is Marker =>
   (node as Partial<Marker> | null)?.isMapMarker === true
@@ -179,16 +195,36 @@ interface Layer extends HTMLElement {
 }
 
 /**
- * A line cut at a fraction of its length, into the part behind and the part
- * ahead, the cut point on both. Measured in degrees with longitude narrowed by
- * the latitude, which is a flat map's idea of length and near enough for where
- * a line turns quieter.
+ * How far along a line each of its points is, in meters from the first:
+ * degrees with longitude narrowed by the latitude, which is a flat map's idea
+ * of length and near enough over a city.
+ *
+ * **The one measure of a route's progress.** A route is cut at its `progress`
+ * by this, so a page moving something along the route measures with it too:
+ * measured in plain degrees, a walker's share of the walk and the connector's
+ * cut disagreed by up to a hundred meters, and the line under the walker was
+ * still bright behind it.
  */
+export const distancesAlong = (points: readonly MapPlace[]): number[] => {
+  let total = 0
+  return points.map((point, at) => {
+    const from = points[at - 1]
+    if (from) {
+      total +=
+        Math.hypot(
+          point.lat - from.lat,
+          (point.lng - from.lng) * Math.cos((from.lat * Math.PI) / 180),
+        ) * METERS_PER_DEGREE
+    }
+    return total
+  })
+}
+
+/** A line cut at a fraction of its length, by `distancesAlong`, into the part behind and the part ahead, the cut point on both. */
 const cut = (points: MapPlace[], fraction: number): [MapPlace[], MapPlace[]] => {
-  const span = (a: MapPlace, b: MapPlace): number =>
-    Math.hypot(b.lat - a.lat, (b.lng - a.lng) * Math.cos((a.lat * Math.PI) / 180))
-  const legs = points.slice(1).map((point, at) => span(points[at] as MapPlace, point))
-  let left = legs.reduce((sum, leg) => sum + leg, 0) * fraction
+  const along = distancesAlong(points)
+  const legs = along.slice(1).map((distance, at) => distance - (along[at] as number))
+  let left = (along.at(-1) ?? 0) * fraction
   for (let at = 0; at < legs.length; at++) {
     const leg = legs[at] as number
     if (left <= leg) {
@@ -231,6 +267,17 @@ export interface ConnectOptions {
    * default, and left alone either way where the page slotted its own.
    */
   credit?: boolean | undefined
+  /**
+   * How close two markers' points may come on screen, in CSS pixels, before
+   * a frame that gathers its markers draws them as one. 40 by default, about
+   * where two points and their names begin to draw over each other.
+   */
+  clusterDistance?: number | undefined
+  /**
+   * Whether pressing a cluster zooms in to its places. On by default; off for
+   * a page that answers `helix-map-cluster` itself, listing them in a panel.
+   */
+  clusterZoom?: boolean | undefined
   /**
    * Who answers the arrow keys: the frame, whose region is the tab stop, or
    * the renderer's own handler, which is the way back for a view that wants
@@ -377,6 +424,8 @@ export const connectMap = (
      canvas places its cards. A marker off the edge is still placed and the
      viewport clips it, so one scrolled back into view is already there. */
   const markers = (): Marker[] => [...frame.children].filter(isMarker)
+  /* Each cluster by the marker drawn for it, as the last placing gathered them. */
+  let clusters = new Map<Marker, Marker[]>()
   const positions = (): Position[] => [...frame.children].filter(isPosition)
   /* **A route needs two points and an area three**, and one with fewer is a
      layer still being written rather than a shape to draw: MapLibre refuses a
@@ -441,7 +490,67 @@ export const connectMap = (
         marker,
         reach: typeof marker.extent === 'function' ? marker.extent() : undefined,
       }))
-    for (const { at, marker, reach } of standing) {
+    /* **Gathered where they would draw over each other**, on a frame that
+       asks for it: each marker, in the order they are written, takes every
+       later one standing near enough to its point, and is drawn at their
+       middle as their count, named by their names. Asked again every time the
+       view moves, so a cluster comes apart as the map zooms in to where its
+       places have room, and the first of each keeps the walk's order. */
+    const gathering = (frame as Frame).cluster === true
+    /* A marker with no place is in no cluster. */
+    for (const marker of markers()) {
+      if (!standing.some((one) => one.marker === marker) && marker.gatheredBy !== undefined) {
+        marker.gatheredBy = undefined
+      }
+    }
+    const reach = options.clusterDistance ?? 40
+    const taken = new Set<Marker>()
+    clusters = new Map()
+    const placing: { at: { x: number; y: number }; marker: Marker; reach: number | undefined }[] =
+      []
+    for (const one of standing) {
+      if (taken.has(one.marker)) {
+        continue
+      }
+      const group = gathering
+        ? standing.filter(
+            (other) =>
+              !taken.has(other.marker) &&
+              Math.hypot(other.at.x - one.at.x, other.at.y - one.at.y) <= reach,
+          )
+        : [one]
+      for (const member of group) {
+        taken.add(member.marker)
+      }
+      const [lead, ...rest] = group.map((member) => member.marker) as [Marker, ...Marker[]]
+      const names = rest.length > 0 ? [lead, ...rest].map((one) => one.label || one.name || '') : []
+      if (!sameNames(lead.gathered, names)) {
+        lead.gathered = names
+      }
+      if (lead.gatheredBy !== undefined) {
+        lead.gatheredBy = undefined
+      }
+      for (const member of rest) {
+        if (member.gatheredBy !== lead) {
+          member.gatheredBy = lead
+        }
+        if ((member.gathered?.length ?? 0) > 0) {
+          member.gathered = []
+        }
+      }
+      if (rest.length > 0) {
+        clusters.set(lead, [lead, ...rest])
+      }
+      placing.push({
+        at: {
+          x: group.reduce((sum, member) => sum + member.at.x, 0) / group.length,
+          y: group.reduce((sum, member) => sum + member.at.y, 0) / group.length,
+        },
+        marker: lead,
+        reach: one.reach,
+      })
+    }
+    for (const { at, marker, reach } of placing) {
       marker.style.setProperty('--_map-marker-x', `${at.x}px`)
       marker.style.setProperty('--_map-marker-y', `${at.y}px`)
       /* **The name goes where there is room for it.** It sits after the
@@ -521,7 +630,10 @@ export const connectMap = (
   }
   const handlePartChange = (event: Event): void => {
     const { kind } = (event as HelixMapPartChangeEvent).detail
-    soon(kind === 'layer' ? { draw: true } : { place: true })
+    /* A cluster gathered or let go is the connector's own doing. */
+    if (kind !== 'cluster') {
+      soon(kind === 'layer' ? { draw: true } : { place: true })
+    }
   }
   frame.addEventListener(HelixMapPartChangeEvent.eventName, handlePartChange)
   /* **A route's color is its stylesheet's**, so what restyles one is watched
@@ -572,6 +684,26 @@ export const connectMap = (
   }
   frame.addEventListener('focusin', reveal)
 
+  /* **A cluster pressed is opened by zooming in** to its places, unless the
+     page connected to answer it itself. */
+  const handleCluster = (event: Event): void => {
+    const members = clusters.get(event.target as Marker)
+    if (!members || options.clusterZoom === false || !driver.fit) {
+      return
+    }
+    const lats = members.map((one) => one.lat as number)
+    const lngs = members.map((one) => one.lng as number)
+    driver.fit(
+      {
+        northEast: { lat: Math.max(...lats), lng: Math.max(...lngs) },
+        southWest: { lat: Math.min(...lats), lng: Math.min(...lngs) },
+      },
+      96,
+      motionOf(frame, 'travel'),
+    )
+  }
+  frame.addEventListener(HelixMapClusterEvent.eventName, handleCluster)
+
   return {
     disconnect(): void {
       live = false
@@ -582,9 +714,16 @@ export const connectMap = (
       children.disconnect()
       frame.removeEventListener(HelixMapPartChangeEvent.eventName, handlePartChange)
       frame.removeEventListener('focusin', reveal)
+      frame.removeEventListener(HelixMapClusterEvent.eventName, handleCluster)
       for (const marker of markers()) {
         marker.style.removeProperty('--_map-marker-x')
         marker.style.removeProperty('--_map-marker-y')
+        if (marker.gatheredBy !== undefined) {
+          marker.gatheredBy = undefined
+        }
+        if ((marker.gathered?.length ?? 0) > 0) {
+          marker.gathered = []
+        }
       }
       for (const position of positions()) {
         for (const name of ['heading', 'radius', 'x', 'y']) {
