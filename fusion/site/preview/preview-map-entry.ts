@@ -20,7 +20,7 @@
 
 import { connectMap, type MapColors, mapColorsFrom } from '@fusion.dev/helix-map'
 import { mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
-import { boundsOf, clearOf, sameColors } from '../utils/map-view/map-view'
+import { boundsOf, clearOf, colorsNow, sameColors } from '../utils/map-view/map-view'
 import { RESTYLED } from './preview-events'
 
 /** MapLibre, as its own script leaves it on the window. */
@@ -119,7 +119,10 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   const restyle = (): void => {
     cancelAnimationFrame(pending)
     pending = requestAnimationFrame(() => {
-      const next = mapColorsFrom(frame)
+      const next = colorsNow(frame)
+      if (!next) {
+        return
+      }
       const target = contrastOf(frame)
       if (!sameColors(colors, next) || target !== contrast) {
         colors = next
