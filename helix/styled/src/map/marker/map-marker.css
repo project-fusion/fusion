@@ -21,6 +21,13 @@
   position: absolute;
 }
 
+/* **Over a live position while a reader is on it**, which otherwise stands
+   over the places it passes, so the name a reader asked for is not under it. */
+:host(:hover),
+:host(:focus-within) {
+  z-index: calc(var(--helix-layer-raised) + 1);
+}
+
 /* Not yet placed, which is a marker the connector has not reached: drawn at
    the corner it would be a place in the wrong place. */
 :host(:not([style*="--_map-marker-x"])) {
