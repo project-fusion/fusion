@@ -1988,7 +1988,7 @@ const REGISTERED: &str = "| Axis | Values |
 | `nesting` | `heading` `peer` `subordinate` |
 | `orientation` | `auto` `horizontal` `vertical` |
 | `separation` | `elevated` `filled` `outlined` `plain` |
-| `shape` | `arc` `circle` `diamond` `dots` `pill` `ring` `rounded` `square` `text` |
+| `shape` | `arc` `circle` `diamond` `dots` `pill` `pin` `ring` `rounded` `square` `text` |
 | `size` | `full` `lg` `md` `sm` |
 | `tone` | `accent` `danger` `info` `neutral` `primary` `success` `warning` |
 | `width` | `auto` `full` |
