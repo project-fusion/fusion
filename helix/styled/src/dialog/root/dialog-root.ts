@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './dialog-root.css.js'
 
 /**
- * @summary A modal window, on the platform's own dialog.
+ * @summary A modal window built on the native `<dialog>` element.
  *
  * @description
  * The panel is `surface-overlay` with a shadow, because that is what it is: a
@@ -21,16 +21,16 @@ import { styles } from './dialog-root.css.js'
  *
  * @cssproperty --dialog-border-color - Color of the panel's edge.
  * @cssproperty --dialog-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
+ *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless your
+ *   theme sets a border.
  * @cssproperty --dialog-icon-size - How big the mark above the title is.
  * @cssproperty --dialog-inline-size - Width of the panel.
  * @cssproperty --dialog-padding - Padding inside the panel.
  * @cssproperty --dialog-rise - How far the panel rises as it opens. Follows
  *   `--helix-space-lg`.
- * @cssproperty --dialog-scrim - The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.
- * @cssproperty --dialog-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
- *   floating surface sits over content nobody can predict, so it keeps a lift by default.
+ * @cssproperty --dialog-scrim - The tint over the page behind the dialog. Set it on the host, because a `var()` written inside `::backdrop` cannot read a token.
+ * @cssproperty --dialog-shadow - Shadow under the panel. Follows `--helix-shadow-floating`. A
+ *   floating surface can sit over any content, so it has a shadow by default.
  */
 @customElement('helix-dialog')
 export class HelixDialog extends HelixHeadlessDialog {

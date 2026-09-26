@@ -4,7 +4,7 @@ import { property } from 'lit/decorators.js'
 import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
 
 /**
- * @summary A set of clips and the one player they take turns in.
+ * @summary A list of video clips that play one after another in a single player.
  *
  * @description
  * **The player is slotted, never rendered here.** A consumer's player carries
@@ -37,18 +37,18 @@ import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot - The entries.
- * @slot player - The player the entries take turns in.
+ * @slot player - The player that plays the entries.
  *
- * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
- * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current entry changes, and cancelable.
+ * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change. Cancelable: cancel it to keep the current entry.
  *
  * @csspart items - The list of entries.
- * @csspart player - The region holding the player.
+ * @csspart player - The region that holds the player.
  */
 @customElement('helix-headless-video-playlist')
 export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixElement) {
   /**
-   * Accessible name for the list, which usually has no visible heading.
+   * The list's name, read by screen readers.
    */
   @property()
   label = 'Playlist'

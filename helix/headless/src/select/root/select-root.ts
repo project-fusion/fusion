@@ -19,7 +19,7 @@ import { optionsAmong } from '../../option/root/option-root.js'
 import '../../listbox/index.js'
 
 /**
- * @summary A closed list that opens to be chosen from.
+ * @summary A control that opens a list of options to choose from.
  *
  * @description
  * **A trigger and a `Listbox`, not a listbox reimplemented behind a button.**
@@ -43,40 +43,40 @@ import '../../listbox/index.js'
  * @documentation https://fusion.dev/helix/components/select
  *
  * @slot - The options, and any groups of them.
- * @slot end - After it, for a count, a unit, or a clear button.
- * @slot hint - Richer than a string.
- * @slot indicator - The mark on the trigger saying this opens, usually a caret.
- * @slot label - Richer than a string.
- * @slot start - Before the chosen value, for an icon or a prefix.
+ * @slot end - Content after the chosen value, such as a count, a unit, or a clear button.
+ * @slot hint - The hint, for content richer than plain text.
+ * @slot indicator - The icon on the trigger that shows it opens, usually a caret.
+ * @slot label - The label, for content richer than plain text.
+ * @slot start - Content before the chosen value, such as an icon or a prefix.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Relayed from the listbox when the answer changes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} input - Announced once the value has moved.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Relayed from the listbox when the value is about to change. Cancelable: canceling it stops the change and leaves the decision to you.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the list closes. Cancelable: canceling it keeps the list open and leaves the decision to you.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: canceling it keeps the list closed and leaves the decision to you.
+ * @event {Event} input - Fired after the value changes.
+ * @event {Event} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
  *
- * @csspart feedback - What is wrong with it.
+ * @csspart feedback - The message that says what is wrong with the value.
  * @csspart hint - Help under the trigger.
- * @csspart indicator - The caret saying the control opens. Replaced by slotting one.
- * @csspart label - The question, over the trigger.
- * @csspart listbox - The list inside it.
- * @csspart listbox-empty - Shown when a filter has hidden everything.
- * @csspart listbox-feedback - What is wrong with it.
- * @csspart listbox-filter-icon - The mark beside that field.
- * @csspart listbox-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart indicator - The caret that shows the control opens. Replaced by content in the `indicator` slot.
+ * @csspart label - The label above the trigger.
+ * @csspart listbox - The list inside the panel.
+ * @csspart listbox-empty - The text shown when the filter hides every option.
+ * @csspart listbox-feedback - The inner list's message that says what is wrong with the value.
+ * @csspart listbox-filter-icon - The icon beside the filter field.
+ * @csspart listbox-filter-mark - The default icon beside the filter field, shown when none is slotted.
  * @csspart listbox-hint - Help under the list.
- * @csspart listbox-items - The list itself.
- * @csspart listbox-label - The question, over the list.
- * @csspart listbox-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart listbox-loading - Shown while the options are still on their way.
- * @csspart listbox-search - The region holding the field that narrows the list.
- * @csspart listbox-search-field - The field itself.
+ * @csspart listbox-items - The list of options.
+ * @csspart listbox-label - The label above the list.
+ * @csspart listbox-live - The inner list's `live` part, the region screen readers announce its empty and loading text from.
+ * @csspart listbox-loading - The text shown while the options load.
+ * @csspart listbox-search - The region that holds the filter field.
+ * @csspart listbox-search-field - The filter field.
  * @csspart surface - The floating panel.
- * @csspart trigger - The closed control, which says what is chosen.
+ * @csspart trigger - The closed control, which shows the chosen value.
  * @csspart value - The chosen option's text inside the trigger.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the list is open.
  */
 @customElement('helix-headless-select')
@@ -93,7 +93,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   })
 
   /**
-   * What it says where there are none.
+   * The text shown when no options match the filter.
    */
   @property({ attribute: 'empty-text' })
   emptyText = 'No matches'
@@ -108,7 +108,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   filterable = false
 
   /**
-   * Whether the options are still on their way.
+   * Whether the options are still loading.
    *
    * Passed straight to the list, which is where the rows are and so where the
    * message belongs. Two components saying "Loading" about one request is a
@@ -118,13 +118,13 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   loading = false
 
   /**
-   * What the list says while they are on their way.
+   * The text shown while the options load.
    */
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
 
   /**
-   * Whether more than one option can be the answer.
+   * Whether more than one option can be chosen.
    */
   @property({ reflect: true, type: Boolean })
   multiple = false
@@ -154,7 +154,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     }
   }
 
-  /** Which kind of chooser this is, in the platform's two words. */
+  /** The kind of select, as the platform names it: `select-one` or `select-multiple`. */
   get type(): string {
     return this.multiple ? 'select-multiple' : 'select-one'
   }

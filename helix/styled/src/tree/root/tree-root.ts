@@ -7,7 +7,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './tree-root.css.js'
 
 /**
- * @summary A tree of items, navigable entirely from the keyboard.
+ * @summary A hierarchy of items, with branches that open and close.
  *
  * @description
  * Quiet by default: no rules between rows and no fill except on the selected
@@ -22,17 +22,17 @@ import { styles } from './tree-root.css.js'
  *
  * @slot - The tree's items.
  *
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Dispatched by the item and listened for here, because the tree is what a consumer holds a reference to. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
  *
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
+ * @csspart live - A copy of the empty and loading messages, in a live region that announces them when they change. Visually hidden in the styled tier.
  * @csspart tree - The tree container.
  *
- * @cssproperty --tree-chevron-gap - Set from `chevron-placement`; the space before the chevron.
- * @cssproperty --tree-chevron-order - Set from `chevron-placement`; read by each item.
+ * @cssproperty --tree-chevron-gap - The space before the chevron. Set from `chevron-placement`.
+ * @cssproperty --tree-chevron-order - The chevron's order in the row. Set from `chevron-placement` and read by each item.
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
  * @cssproperty --tree-gap - Space between rows.
  * @cssproperty --tree-indent - Indent added per level.
- * @cssproperty --tree-row-size - Least height of a row, so rows with and without an icon match.
+ * @cssproperty --tree-row-size - Minimum height of a row, so rows with and without an icon match.
  */
 @customElement('helix-tree')
 export class HelixTree extends HelixHeadlessTree {

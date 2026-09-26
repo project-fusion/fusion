@@ -4,7 +4,7 @@ import { html, nothing, type TemplateResult } from 'lit'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
- * @summary Labels content with a short piece of metadata.
+ * @summary A short label that adds metadata to content.
  *
  * @description
  * A tag is a label, and optionally a label the reader can take off.
@@ -23,12 +23,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tag's label.
- * @slot start - A category the label belongs to, set before it and weightier.
+ * @slot start - The category the label belongs to, shown before it in a heavier weight.
  *
- * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixDismissEvent} helix-dismiss - The remove button was pressed. The tag does not remove itself, so remove it in response. Cancelable.
  *
- * @csspart dismiss - The control that asks to remove the tag.
- * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart dismiss - The button that removes the tag.
+ * @csspart dismiss-mark - The icon on the remove button.
  * @csspart start - The category before the label.
  */
 @customElement('helix-headless-tag')

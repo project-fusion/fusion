@@ -7,7 +7,7 @@ import { styles } from './copy-button-root.css.js'
 import '../../tooltip/index.js'
 
 /**
- * @summary A button that puts a string on the clipboard and says it did.
+ * @summary A button that copies a string to the clipboard and confirms the copy.
  *
  * @description
  * Takes the icon button's square box, then stacks its two faces in one grid

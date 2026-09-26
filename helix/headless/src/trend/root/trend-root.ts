@@ -24,7 +24,7 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
   DIRECTIONS[value as Direction] ?? DIRECTIONS.neutral
 
 /**
- * @summary Which way a measurement moved, and whether that is good news.
+ * @summary An indicator that shows which way a measurement moved, and whether the change is good.
  *
  * @description
  * Three parts: a direction that is up, down or neutral, the metric that moved,
@@ -53,9 +53,9 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @documentation https://fusion.dev/helix/components/trend
  *
  * @slot - The metric that moved.
- * @slot label - What it moved over.
+ * @slot label - The period the metric moved over.
  *
- * @csspart direction - The direction as a word, for readers who are not looking.
+ * @csspart direction - The direction as a word, for people who cannot see the arrow.
  * @csspart icon - The arrow.
  */
 @customElement('helix-headless-trend')
@@ -74,7 +74,7 @@ export class HelixHeadlessTrend extends HelixElement {
   direction?: 'down' | 'neutral' | 'up'
 
   /**
-   * Which direction is the improvement, for this metric.
+   * Which direction counts as an improvement for this metric.
    *
    * Absent states the movement without judging it, which is the honest default:
    * revenue up is good news and latency up is bad news, and only the consumer

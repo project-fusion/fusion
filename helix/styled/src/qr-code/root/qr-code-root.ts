@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './qr-code-root.css.js'
 
 /**
- * @summary Encodes a short piece of text as a scannable square.
+ * @summary A scannable QR code for a short piece of text.
  *
  * @description
  * The picture is the headless tier's. What this adds is a size that can be set
@@ -21,13 +21,13 @@ import { styles } from './qr-code-root.css.js'
  * @category media
  * @documentation https://fusion.dev/helix/components/qr-code
  *
- * @cssproperty --qr-code-background-color - Behind them, including the quiet zone.
- * @cssproperty --qr-code-color - The dark modules. Defaults to the page's ink.
- * @cssproperty --qr-code-finder-color - The three corner squares. Defaults to
- * the same ink as the modules.
- * @cssproperty --qr-code-logo-padding - The quiet zone around that mark.
- * @cssproperty --qr-code-logo-size - How much of the middle a mark may cover.
- * Defaults to `27%`, which `H` correction carries: it can lose thirty percent.
+ * @cssproperty --qr-code-background-color - The fill behind the modules, including the quiet zone.
+ * @cssproperty --qr-code-color - Color of the dark modules. Defaults to the page's text color.
+ * @cssproperty --qr-code-finder-color - Color of the three corner squares. Defaults
+ * to the color of the modules.
+ * @cssproperty --qr-code-logo-padding - The clear space around the center logo.
+ * @cssproperty --qr-code-logo-size - How much of the center a logo can cover.
+ * Defaults to `27%`, which `H` correction allows, because it can lose thirty percent.
  * @cssproperty --qr-code-size - How wide the square is. Defaults to `12rem`.
  */
 @customElement('helix-qr-code')

@@ -5,7 +5,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './virtual-list-root.css.js'
 
 /**
- * @summary Renders the rows of a long set that are on screen, and no others.
+ * @summary A list that renders only the rows of a long set that are on screen.
  *
  * @description
  * The styled tier adds the scrolling box's own treatment and nothing else. Rows
@@ -19,8 +19,8 @@ import { styles } from './virtual-list-root.css.js'
  * @status stable
  * @documentation https://fusion.dev/helix/components/virtual-list
  *
- * @csspart after - The space standing in for rows below the window.
- * @csspart before - The space standing in for rows above the window.
+ * @csspart after - The space that stands in for the rows below the rendered ones.
+ * @csspart before - The space that stands in for the rows above the rendered ones.
  * @csspart viewport - The scrolling box.
  *
  * @cssproperty --virtual-list-block-size - How tall the scrolling box is.

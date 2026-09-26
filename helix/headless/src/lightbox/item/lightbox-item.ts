@@ -3,7 +3,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary One thing a lightbox can show.
+ * @summary One item a lightbox can show, such as a picture, a video frame, or a chart.
  *
  * @description
  * A wrapper around whatever the consumer opened, which is the whole of what it
@@ -22,17 +22,17 @@ import { property } from 'lit/decorators.js'
  * @aliases LightboxSlide, GalleryItem
  * @documentation https://fusion.dev/helix/components/lightbox
  *
- * @slot - What is being shown.
- * @slot description - A line under it saying what it is.
+ * @slot - The content to show.
+ * @slot description - A line under the content that describes it.
  *
  * @csspart item - The box the content is shown in.
  *
- * @cssstate current - While this is the item the lightbox is showing.
+ * @cssstate current - The item the lightbox is showing.
  */
 @customElement('helix-headless-lightbox-item')
 export class HelixHeadlessLightboxItem extends HelixElement {
   /**
-   * Whether this is the one being shown.
+   * Whether this item is the one shown.
    *
    * Written by the root, which is the only thing that sees the set.
    */
@@ -40,13 +40,13 @@ export class HelixHeadlessLightboxItem extends HelixElement {
   current = false
 
   /**
-   * What this item is called, for the reading that says where the reader is.
+   * The item's name, used in the status text that says which item is shown.
    */
   @property()
   label = ''
 
   /**
-   * What names this item, and what `active` on the root is compared against.
+   * The item's identifier. The root compares its `active` value against it.
    */
   @property()
   value = ''

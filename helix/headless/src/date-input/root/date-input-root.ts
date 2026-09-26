@@ -61,55 +61,55 @@ const dates = (value: string): string[] =>
  * @aliases DatePicker, DateField, InputDate
  * @documentation https://fusion.dev/helix/components/date-input
  *
- * @slot feedback - What is wrong with it.
- * @slot hint - Help under the field.
- * @slot trigger - The mark on the field saying a calendar opens.
+ * @slot feedback - The error message under the field.
+ * @slot hint - The help text under the field.
+ * @slot trigger - The icon on the button that opens the calendar.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the date changes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the calendar opens. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} input - Announced once the value has moved.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the date changes. Cancelable: call `preventDefault()` to keep the current date.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the calendar closes. Cancelable: call `preventDefault()` to keep it open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the calendar opens. Cancelable: call `preventDefault()` to keep it closed.
+ * @event {Event} input - Fired after the value changes.
+ * @event {Event} toggle - Fired when the calendar opens or closes, with `newState` and `oldState`.
  *
  * @csspart control - The text input.
  * @csspart date - One held date, as a tag, in `multiple`.
  * @csspart date-dismiss - The remove button, when `dismissible`.
- * @csspart date-dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart date-dismiss-mark - The icon on the remove button, shown when no icon is slotted.
  * @csspart date-start - The category before the label.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The box holding the text and the trigger.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart label - The question, over the field.
- * @csspart picker - The date picker inside it.
- * @csspart picker-cell - One column of a row, which is what a range paints.
- * @csspart picker-cell-range-end - The cell of a range's last day, beside `picker-cell`.
- * @csspart picker-cell-range-middle - A cell between a range's ends, beside `picker-cell`.
- * @csspart picker-cell-range-start - The cell of a range's first day, beside `picker-cell`.
- * @csspart picker-day - The shape inside a cell, which is what a single date paints.
- * @csspart picker-day-disabled - A day that cannot be chosen, beside `picker-day`.
- * @csspart picker-day-outside - A day from a neighboring month, beside `picker-day`.
- * @csspart picker-day-selected - The chosen day, or either end of a chosen range, beside `picker-day`.
- * @csspart picker-day-today - Today, beside `picker-day`.
+ * @csspart feedback - The error message under the field.
+ * @csspart field - The box that holds the text and the trigger.
+ * @csspart hint - The help text under the field, shown while there is no error.
+ * @csspart label - The label above the field.
+ * @csspart picker - The date picker inside the panel.
+ * @csspart picker-cell - One cell in a row of days. A range colors these cells.
+ * @csspart picker-cell-range-end - The cell of a range's last day. Applied with `picker-cell`.
+ * @csspart picker-cell-range-middle - A cell between a range's ends. Applied with `picker-cell`.
+ * @csspart picker-cell-range-start - The cell of a range's first day. Applied with `picker-cell`.
+ * @csspart picker-day - The shape inside a cell. A single chosen date colors the shape.
+ * @csspart picker-day-disabled - A day that cannot be chosen. Applied with `picker-day`.
+ * @csspart picker-day-outside - A day from a neighboring month. Applied with `picker-day`.
+ * @csspart picker-day-selected - The chosen day, or either end of a chosen range. Applied with `picker-day`.
+ * @csspart picker-day-today - Today. Applied with `picker-day`.
  * @csspart picker-grid - The grid of days.
  * @csspart picker-header - The month name and its controls.
  * @csspart picker-heading - The month and year being shown.
- * @csspart picker-month - One month, its header and its grid.
- * @csspart picker-months - The run of months.
+ * @csspart picker-month - One month, with its header and its grid.
+ * @csspart picker-months - The row of months.
  * @csspart picker-next - The control that moves to the next month.
- * @csspart picker-next-mark - The glyph on the next month control.
+ * @csspart picker-next-mark - The icon on the next month control.
  * @csspart picker-previous - The control that moves to the previous month.
- * @csspart picker-previous-mark - The glyph on the previous month control.
+ * @csspart picker-previous-mark - The icon on the previous month control.
  * @csspart picker-week - One row of days.
  * @csspart picker-weekday - A column header naming a day of the week.
- * @csspart rest - How many dates are held beyond the ones shown. A `<button>` with `expandable`, a `<span>` without it.
+ * @csspart rest - The count of dates beyond the ones shown. It is a `<button>` with `expandable` and a `<span>` without it.
  * @csspart surface - The floating panel.
  * @csspart tags - The row the dates sit in.
  * @csspart trigger - The control that opens the calendar.
- * @csspart trigger-icon - The mark on the button that opens the calendar.
+ * @csspart trigger-icon - The icon on the button that opens the calendar.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
- * @cssstate open - While the calendar is open.
+ * @cssstate invalid - The field has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate open - The calendar is open.
  */
 @customElement('helix-headless-date-input')
 export class HelixHeadlessDateInput extends MixinPickerEditing(
@@ -170,31 +170,33 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   disableDates = ''
 
   /**
-   * Days of the week that cannot be chosen, `0` for Sunday through `6`.
+   * Days of the week that cannot be chosen, from `0` for Sunday to `6` for
+   * Saturday.
    */
   @property({ attribute: 'disable-days' })
   disableDays = ''
 
   /**
-   * First column of the week in the calendar, `0` for Sunday through `6`.
+   * The day in the calendar's first column, from `0` for Sunday to `6` for
+   * Saturday.
    */
   @property({ attribute: 'first-day-of-week', type: Number })
   firstDayOfWeek = 0
 
   /**
-   * Language tag the calendar names its months and days in.
+   * The language tag for the names of months and days in the calendar.
    */
   @property()
   locale = ''
 
   /**
-   * Latest date that can be chosen, as `YYYY-MM-DD`.
+   * The latest date that can be chosen, as `YYYY-MM-DD`.
    */
   @property()
   max = ''
 
   /**
-   * Earliest date that can be chosen, as `YYYY-MM-DD`.
+   * The earliest date that can be chosen, as `YYYY-MM-DD`.
    */
   @property()
   min = ''
@@ -280,13 +282,13 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   }
 
   /**
-   * What the field says before a date is in it.
+   * The text the field shows before a date is entered.
    */
   @property()
   placeholder = 'YYYY-MM-DD'
 
   /**
-   * What a reader is told when a range holds more than two dates.
+   * The message shown when a range holds more than two dates.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
    * so a form in another language speaks it. Absent is the control's own
@@ -296,21 +298,22 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   rangeLengthMessage?: string
 
   /**
-   * What a reader is told when a date is after `max`, with `{max}` filled in
-   * as the field writes it.
+   * The message shown when a date is after `max`. `{max}` is replaced with
+   * `max`, written the way the field writes dates.
    */
   @property({ attribute: 'range-overflow-message' })
   rangeOverflowMessage?: string
 
   /**
-   * What a reader is told when a date is before `min`, with `{min}` filled
-   * in as the field writes it.
+   * The message shown when a date is before `min`. `{min}` is replaced with
+   * `min`, written the way the field writes dates.
    */
   @property({ attribute: 'range-underflow-message' })
   rangeUnderflowMessage?: string
 
   /**
-   * What the control removing one date is called, with `{name}` filled in.
+   * The name of the button that removes one date. `{name}` is replaced with
+   * the date.
    *
    * **The name goes in**, so a row of them is heard as which one each
    * removes rather than as "Remove" said once per date.
@@ -523,7 +526,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   }
 
   /**
-   * Accessible name for the control that opens the calendar.
+   * The name of the button that opens the calendar, read by screen readers.
    */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a date'

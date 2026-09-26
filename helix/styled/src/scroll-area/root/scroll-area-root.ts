@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './scroll-area-root.css.js'
 
 /**
- * @summary A scrolling box that says there is more.
+ * @summary A scrolling box that shows which edges have more content past them.
  *
  * @description
  * Presentation only: the fades on the edges the base class names, and a
@@ -17,15 +17,15 @@ import { styles } from './scroll-area-root.css.js'
  * @aliases Scroller, Overflow, Scroll container
  * @documentation https://fusion.dev/helix/components/scroll-area
  *
- * @cssproperty --scroll-area-fade - How deep the fades are, at both edges.
- * @cssproperty --scroll-area-fade-block-end - And the bottom one.
- * @cssproperty --scroll-area-fade-block-start - How deep the top one is, or `0` to drop it.
- * @cssproperty --scroll-area-fade-color - What they fade to, which is the ground behind.
- * @cssproperty --scroll-area-fade-inline-end - And the trailing one.
- * @cssproperty --scroll-area-fade-inline-start - How deep the leading sideways one is, or `0` to drop it.
- * @cssproperty --scroll-area-scrollbar - The scrollbar width keyword.
- * @cssproperty --scroll-area-thumb-color - The scrollbar's handle.
- * @cssproperty --scroll-area-track-color - And its track.
+ * @cssproperty --scroll-area-fade - The depth of the fades at both edges.
+ * @cssproperty --scroll-area-fade-block-end - The depth of the bottom fade, or `0` to remove it.
+ * @cssproperty --scroll-area-fade-block-start - The depth of the top fade, or `0` to remove it.
+ * @cssproperty --scroll-area-fade-color - The color the fades blend into, which is the background behind the box.
+ * @cssproperty --scroll-area-fade-inline-end - The depth of the fade at the inline end, or `0` to remove it.
+ * @cssproperty --scroll-area-fade-inline-start - The depth of the fade at the inline start, or `0` to remove it.
+ * @cssproperty --scroll-area-scrollbar - The scrollbar width, as a `scrollbar-width` keyword.
+ * @cssproperty --scroll-area-thumb-color - The color of the scrollbar's thumb.
+ * @cssproperty --scroll-area-track-color - The color of the scrollbar's track.
  */
 @customElement('helix-scroll-area')
 export class HelixScrollArea extends HelixHeadlessScrollArea {

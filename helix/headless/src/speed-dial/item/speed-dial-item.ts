@@ -3,7 +3,7 @@ import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary One action in a speed dial: a mark, and a name beside it.
+ * @summary One action in a speed dial: an icon and a name beside it.
  *
  * @description
  * **A command, which is why this is a `menuitem` and a megamenu's rows are not.**
@@ -24,24 +24,24 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/speed-dial
  *
  * @slot - The action's name.
- * @slot icon - The mark, which is what a dial is read by.
+ * @slot icon - The action's icon, the main way the action is recognized.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - The action was chosen. Cancelable: cancel it to keep the dial open.
  *
- * @csspart icon - The mark's box.
- * @csspart item - The control.
- * @csspart label - The name beside it.
+ * @csspart icon - The box that holds the icon.
+ * @csspart item - The control for the action.
+ * @csspart label - The action's name, beside the icon.
  */
 @customElement('helix-headless-speed-dial-item')
 export class HelixHeadlessSpeedDialItem extends HelixElement {
   /**
-   * Whether the action can be chosen.
+   * Whether the action is disabled, so it cannot be chosen.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
   /**
-   * What this action stands for, carried in the event when it is chosen.
+   * The action's value, sent in `helix-select` when the action is chosen.
    */
   @property()
   value = ''
@@ -53,23 +53,26 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
    */
   readonly isSpeedDialItem = true
 
-  /** Puts focus on the control inside, which is what a reader can reach. */
+  /** Puts focus on the control inside the item. */
   override focus(): void {
     this.partNamed('item')?.focus()
   }
 
-  /** `NavigableItem`, so the arrow keys are the shared controller's business. */
+  /**
+   * Moves focus to the action. Part of `NavigableItem`, which the shared
+   * keyboard controller uses for the arrow keys.
+   */
   focusItem(): void {
     this.focus()
   }
 
-  /** Chooses the action, which is the same act as pressing it. */
+  /** Chooses the action, the same as pressing it. */
   select(): void {
     this.choose()
   }
 
   /**
-   * Whether this is the row the set is on, which here is where focus is.
+   * Whether the action has focus, which is what selected means in a speed dial.
    *
    * Asked of the document rather than of the shadow root: focus lands on the
    * control inside this element and the platform retargets it, so from outside

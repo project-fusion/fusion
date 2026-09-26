@@ -7,7 +7,7 @@ import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.c
 import { styles } from './textarea-root.css.js'
 
 /**
- * @summary Several lines of text a reader types into.
+ * @summary A multi-line text field.
  *
  * @description
  * The same frame an `Input` wears, so a form of mixed fields reads as one set

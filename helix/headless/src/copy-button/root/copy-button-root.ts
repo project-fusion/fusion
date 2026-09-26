@@ -11,7 +11,7 @@ import '../../tooltip/index.js'
 const CONFIRM = 1600
 
 /**
- * @summary A button that puts a string on the clipboard and says it did.
+ * @summary A button that copies a string to the clipboard and confirms the copy.
  *
  * @description
  * **The confirmation is the component.** Writing to the clipboard is three
@@ -31,28 +31,28 @@ const CONFIRM = 1600
  * @aliases Copy, Copy to clipboard
  * @documentation https://fusion.dev/helix/components/copy-button
  *
- * @slot - The resting icon. Falls back to a clipboard.
- * @slot copied - What replaces it once the write succeeds. Falls back to a check.
+ * @slot - The icon shown before a copy. Defaults to a clipboard.
+ * @slot copied - The icon shown after a successful copy. Defaults to a check mark.
  *
  * @event {HelixCopyEvent} helix-copy - Fired after the clipboard write succeeds.
  *
  * @csspart button - The inner button.
- * @csspart mark - The clipboard glyph, and the confirmation that replaces it.
- * @csspart tooltip - The bubble, forwarded from the tooltip inside.
- * @csspart tooltip-arrow - The point, resting against the trigger.
- * @csspart tooltip-arrow-bottom - The point while the bubble is below the button, so on its top edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-left - The point while the bubble is left of the button, so on its right edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-right - The point while the bubble is right of the button, so on its left edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-top - The point while the bubble is above the button, so on its bottom edge, beside `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the button, beside `tooltip`.
- * @csspart tooltip-left - The bubble while it is left of the button, beside `tooltip`.
- * @csspart tooltip-right - The bubble while it is right of the button, beside `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the button, beside `tooltip`.
+ * @csspart mark - The clipboard icon, and the confirmation icon that replaces it.
+ * @csspart tooltip - The tooltip bubble, forwarded from the tooltip inside the button.
+ * @csspart tooltip-arrow - The tooltip's arrow, which points at the button.
+ * @csspart tooltip-arrow-bottom - The arrow while the bubble is below the button, on the bubble's top edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The arrow while the bubble is left of the button, on the bubble's right edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The arrow while the bubble is right of the button, on the bubble's left edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The arrow while the bubble is above the button, on the bubble's bottom edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-bottom - The bubble while it is below the button. Set together with `tooltip`.
+ * @csspart tooltip-left - The bubble while it is left of the button. Set together with `tooltip`.
+ * @csspart tooltip-right - The bubble while it is right of the button. Set together with `tooltip`.
+ * @csspart tooltip-top - The bubble while it is above the button. Set together with `tooltip`.
  */
 @customElement('helix-headless-copy-button')
 export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   /**
-   * What it is called, and says, after one.
+   * The button's name and tooltip text after a copy.
    *
    * `attribute` written out, because Lit lowercases a property name rather than
    * dash-casing it, and `copiedlabel` is not what anyone would type.
@@ -61,7 +61,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   copiedLabel = 'Copied'
 
   /**
-   * What it is called, and says, before a press.
+   * The button's name and tooltip text before a copy.
    *
    * Defaulted rather than left empty. An icon-only control must be named, and
    * the name of this one is not a judgment call: every copy button in the
@@ -71,7 +71,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   override label = 'Copy'
 
   /**
-   * What goes on the clipboard.
+   * The text copied to the clipboard.
    *
    * **Narrows `Button.value`, which is the submit value, and the two agree.**
    * A copy button is `type="button"` and never submits, so the inherited

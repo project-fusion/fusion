@@ -2,7 +2,7 @@ import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 
 /**
- * @summary Stands in for content that has not arrived.
+ * @summary A placeholder shown in place of content that is still loading.
  *
  * @description
  * Carries `aria-busy` and a polite live region, so a reader using a screen
@@ -19,7 +19,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @aliases Placeholder, Shimmer, Ghost
  * @documentation https://fusion.dev/helix/components/skeleton
  *
- * @csspart skeleton - The placeholder surface.
+ * @csspart skeleton - The placeholder shape.
  */
 @customElement('helix-headless-skeleton')
 export class HelixHeadlessSkeleton extends HelixElement {

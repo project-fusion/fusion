@@ -59,7 +59,7 @@ const THICKNESS: Record<string, number> = {
 }
 
 /**
- * @summary Parts of a whole as a ring, read from a table.
+ * @summary A chart that shows parts of a whole as a ring, read from a table.
  *
  * @description
  * The chart with the narrowest honest use, so the component is narrow too.
@@ -78,28 +78,28 @@ const THICKNESS: Record<string, number> = {
  * @aliases Pie Chart, Ring Chart, Share Chart
  * @documentation https://fusion.dev/helix/components/donut-chart
  *
- * @slot - Goes in the middle of the ring. A total, usually.
+ * @slot - Content in the middle of the ring, usually a total.
  *
  * @csspart center - The middle of the ring, holding whatever is slotted.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
  * @csspart segment - One slice.
- * @csspart segment-active - The slice under the pointer, beside `segment`.
- * @csspart segment-edge - One slice as a closed shape, for a boundary to trace.
+ * @csspart segment-active - The slice under the pointer. Set alongside `segment`.
+ * @csspart segment-edge - One slice as a closed shape, used to draw its outline.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
- * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, so on its top edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, so on its right edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, so on its left edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-top - The point while the bubble is above the reading, so on its bottom edge, beside `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the reading, beside `tooltip`.
+ * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, on its top edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, on its right edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, on its left edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The slice's own name inside the tooltip.
- * @csspart tooltip-left - The bubble while it is left of the reading, beside `tooltip`.
+ * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
- * @csspart tooltip-right - The bubble while it is right of the reading, beside `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the reading, beside `tooltip`.
+ * @csspart tooltip-right - The bubble while it is right of the reading. Set alongside `tooltip`.
+ * @csspart tooltip-top - The bubble while it is above the reading. Set alongside `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  * @csspart track - The ring the slices are drawn on.
  *
@@ -128,7 +128,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
   }
 
   /**
-   * How much is left open in the middle.
+   * The size of the hole in the middle of the ring.
    *
    * Absent is a ring with room for a total in it. `small` and `large` move the
    * hole without moving the outer edge, so a chart keeps its footprint.

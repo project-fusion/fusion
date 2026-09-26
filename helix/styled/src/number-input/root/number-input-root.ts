@@ -7,7 +7,7 @@ import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.c
 import { styles } from './number-input-root.css.js'
 
 /**
- * @summary A number a reader types or steps to.
+ * @summary A field for a number, typed or changed with step buttons.
  *
  * @description
  * The frame an `Input` wears, because in a form this stands in a row with them.
@@ -29,15 +29,15 @@ import { styles } from './number-input-root.css.js'
  * @aliases NumberField, Stepper, InputNumber
  * @documentation https://fusion.dev/helix/components/number-input
  *
- * @slot end - After it.
- * @slot start - Before the number, for a unit or an icon.
+ * @slot end - Content after the number, such as a unit.
+ * @slot start - Content before the number, such as a unit or an icon.
  *
- * @csspart control - The field itself.
- * @csspart decrement - The control that steps down.
- * @csspart field - The box holding everything.
- * @csspart increment - The control that steps up.
+ * @csspart control - The input that holds the number.
+ * @csspart decrement - The button that steps the value down.
+ * @csspart field - The box that holds the whole control.
+ * @csspart increment - The button that steps the value up.
  *
- * @cssproperty --number-input-background-color - Fill behind the number.
+ * @cssproperty --number-input-background-color - The fill behind the number.
  */
 @customElement('helix-number-input')
 export class HelixNumberInput extends HelixHeadlessNumberInput {

@@ -7,7 +7,7 @@ import { styles } from './scatter-chart-root.css.js'
 import '../../tooltip/index.js'
 
 /**
- * @summary Whether two measures move together, one point per row.
+ * @summary A chart that shows whether two measures move together, with one point per row.
  *
  * @description
  * The points take the series palette in order, so a table with one column
@@ -50,9 +50,9 @@ import '../../tooltip/index.js'
  *
  * @cssproperty --scatter-chart-block-size - Height of the drawing.
  * @cssproperty --scatter-chart-gap - Space between the drawing and its axes.
- * @cssproperty --scatter-chart-gridline-color - One rule across the plot, under `gridlines`.
- * @cssproperty --scatter-chart-point-opacity - How much of its color a point shows, so a cluster reads darker where it is denser.
- * @cssproperty --scatter-chart-point-ring-color - The ring around each point, which is the page's color unless the chart sits on something else.
+ * @cssproperty --scatter-chart-gridline-color - Color of the gridlines across the plot, drawn when `gridlines` is set.
+ * @cssproperty --scatter-chart-point-opacity - Opacity of a point, so a cluster looks darker where it is denser.
+ * @cssproperty --scatter-chart-point-ring-color - Color of the ring around each point. It matches the page, so change it when the chart sits on another surface.
  * @cssproperty --scatter-chart-point-size - Diameter of a point.
  */
 @customElement('helix-scatter-chart')

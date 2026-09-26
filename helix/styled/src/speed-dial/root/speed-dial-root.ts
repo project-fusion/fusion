@@ -6,7 +6,7 @@ import { styles } from './speed-dial-root.css.js'
 import '../../icon/index.js'
 
 /**
- * @summary A button that fans out the few actions a screen is for.
+ * @summary A floating button that opens a short list of the main actions on a screen.
  *
  * @description
  * Presentation only: the column the actions fan into, and which end they line

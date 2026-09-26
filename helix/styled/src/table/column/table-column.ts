@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './table-column.css.js'
 
 /**
- * @summary One column of a table: its heading, and how wide it is.
+ * @summary One column of a table: its heading and its width.
  *
  * @description
  * Styled as the header cell it is, and it carries the same rule and inset as

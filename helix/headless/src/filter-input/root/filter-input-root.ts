@@ -47,7 +47,7 @@ type SuggestionOption = HTMLElement & {
 const isOption = (node: Element): node is SuggestionOption => 'active' in node && 'value' in node
 
 /**
- * @summary A field that narrows something else, beside what is already narrowing it.
+ * @summary A text field for filters, with the active filters shown in it as tokens.
  *
  * @description
  * **The tokens are the consumer's own elements, slotted.** What a filter narrows
@@ -131,34 +131,34 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @aliases SearchField, FacetInput, TokenInput
  * @documentation https://fusion.dev/helix/components/filter-input
  *
- * @slot end - After the text, for a count or a control.
- * @slot start - Before the text, for a search icon.
- * @slot suggestions - What could be typed next, as `Option`s, and `Option.Group`s of them.
- * @slot tags - What is already narrowing the results, as `FilterChip`s or `Tag`s.
+ * @slot end - Content after the text, such as a count or a control.
+ * @slot start - Content before the text, such as a search icon.
+ * @slot suggestions - Suggestions for what to type next, as `Option`s and `Option.Group`s.
+ * @slot tags - The active filters, as `FilterChip`s or `Tag`s.
  *
- * @event {Event} change - Relayed from the input once the reader has finished.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the suggestions go, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the suggestions show, and cancelable.
- * @event {HelixDismissEvent} helix-dismiss - A token asking to go, from its close control or from Backspace on an empty field. A `FilterChip` naming a declared field is answered as `helix-facet` instead. Cancelable: refusing it takes the decision and the token stays.
- * @event {HelixFacetEvent} helix-facet - Fired when a filter changes, whether read out of the text, picked, or dismissed. Cancelable: refusing it leaves the text and the chip where they were.
- * @event {HelixSelectEvent} helix-select - A suggestion was chosen: the option's own, heard here because it bubbles out of `suggestions`. Cancelable: refusing it takes the decision from any other listener, and this field never acts on a choice itself, since what it means is the page's.
- * @event {Event} input - Announced once the text has moved.
- * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
+ * @event {Event} change - Fired from the input when the user finishes editing the text.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes. Cancelable: call `preventDefault()` to keep the current text.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the suggestions close. Cancelable: call `preventDefault()` to keep them open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the suggestions open. Cancelable: call `preventDefault()` to keep them closed.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the user removes a token with its remove button or with Backspace in an empty field. A `FilterChip` that names a declared field sends `helix-facet` instead. Cancelable: call `preventDefault()` to keep the token.
+ * @event {HelixFacetEvent} helix-facet - Fired when a filter changes, whether it was typed, picked, or removed. Cancelable: call `preventDefault()` to leave the text and the chip as they were.
+ * @event {HelixSelectEvent} helix-select - Fired by an option in `suggestions` when it is chosen, and bubbles out of the field. Cancelable: call `preventDefault()` to stop other listeners acting on it. The field takes no action on a choice; you decide what it does.
+ * @event {Event} input - Fired when the text changes.
+ * @event {Event} toggle - Fired when the suggestions panel opens or closes, with `newState` and `oldState`.
  *
  * @csspart clear - The button that empties the field.
  * @csspart control - The input itself.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The box holding everything.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart label - The question, over the field.
- * @csspart lead - The box before the text, holding whatever is slotted into `start`.
- * @csspart rest - How many tokens did not fit. A `<button>` with `expandable`, a `<span>` without it.
+ * @csspart feedback - The error message under the field.
+ * @csspart field - The box that holds everything.
+ * @csspart hint - The help text under the field, shown while there is no error.
+ * @csspart label - The label above the field.
+ * @csspart lead - The box before the text that holds the `start` slot.
+ * @csspart rest - The count of tokens that did not fit. It is a `<button>` with `expandable` and a `<span>` without it.
  * @csspart surface - The floating panel the suggestions sit in.
  * @csspart tags - The row the tokens sit in.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
- * @cssstate open - While the suggestions are open.
+ * @cssstate invalid - The field has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate open - The suggestions are open.
  */
 @customElement('helix-headless-filter-input')
 export class HelixHeadlessFilterInput extends MixinControllerOpen(
@@ -174,7 +174,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   protected override readonly announcesInput = true
 
   /**
-   * Whether the field offers a button that empties it.
+   * Shows a button that empties the field.
    *
    * The text only. The tokens are the consumer's markup and this element is not
    * entitled to take them out of the document, which is the same reason
@@ -185,13 +185,14 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   clearable = false
 
   /**
-   * What the clear button is called, since an icon has no name of its own.
+   * The name of the clear button, read by screen readers. The button shows only
+   * an icon.
    */
   @property({ attribute: 'clear-label' })
   clearLabel = 'Clear'
 
   /**
-   * Shown while the field is empty.
+   * The text shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
    */
@@ -329,7 +330,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   }
 
   /**
-   * The caret and the selection, under the platform's own names.
+   * The direction of the selection, named as on `<input>`.
    *
    * **Published for the reason `Input` publishes them, and this element needs
    * them more.** The `<input>` is inside this shadow root, so a consumer has no
@@ -346,12 +347,12 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     return this.control?.selectionDirection ?? 'none'
   }
 
-  /** Where the selection ends, which is the caret when nothing is selected. */
+  /** Where the selection ends. With nothing selected, it is the caret position. */
   get selectionEnd(): number {
     return this.control?.selectionEnd ?? 0
   }
 
-  /** Where the selection starts, which is the caret when nothing is selected. */
+  /** Where the selection starts. With nothing selected, it is the caret position. */
   get selectionStart(): number {
     return this.control?.selectionStart ?? 0
   }
@@ -388,7 +389,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   }
 
   /**
-   * The fields this can be filtered by, wherever they were written.
+   * The fields the input can filter by, declared anywhere inside it.
    *
    * Descendants rather than children, because the usual place to write them is
    * inside the `FilterMenu` slotted into `start`: the picker and the text are
@@ -848,7 +849,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     }
   }
 
-  /** Puts the caret in the field, the way a label pointing at one would. */
+  /** Puts the caret in the text field. */
   override focus(options?: FocusOptions): void {
     this.control?.focus(options)
   }

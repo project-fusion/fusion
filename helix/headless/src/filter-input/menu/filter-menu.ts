@@ -11,7 +11,7 @@ import '../../divider/index.js'
 import '../../menu/index.js'
 
 /**
- * @summary The control that builds a filter: pick a field, tick its values.
+ * @summary A menu for building a filter by picking a field and checking its values.
  *
  * @description
  * **It reads the declarations and renders a menu.** A consumer writes their
@@ -61,32 +61,32 @@ import '../../menu/index.js'
  * @aliases FacetPicker, FilterBuilder
  * @documentation https://fusion.dev/helix/components/filter-input
  *
- * @slot - The fields this can filter by, as `FilterField`s. Read rather than rendered.
- * @slot trigger - The control that opens the menu. A `Button` is the usual one.
+ * @slot - The fields the menu can filter by, as `FilterField`s. The menu reads them and does not render them.
+ * @slot trigger - The control that opens the menu, usually a `Button`.
  *
- * @event {HelixFacetEvent} helix-facet - Fired when a field's values change. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixFacetEvent} helix-facet - Fired when a field's values change. Cancelable: call `preventDefault()` to keep the previous values.
  *
- * @csspart divider - The rule between a field's comparisons and its values.
- * @csspart divider-content - What is set into the rule.
- * @csspart divider-line - The rule itself.
- * @csspart entry - One row: a field, its comparison, an operator or a value.
+ * @csspart divider - The line between a field's comparisons and its values.
+ * @csspart divider-content - The content set into the line.
+ * @csspart divider-line - The line itself.
+ * @csspart entry - One row: a field, its comparison, an operator, or a value.
  * @csspart entry-item - The row itself.
- * @csspart entry-mark - The trailing mark: a tick on a chosen value, a caret on a field.
+ * @csspart entry-mark - The mark at the end of a row: a check mark on a chosen value, and a caret on a field.
  * @csspart entry-start - The leading column.
  * @csspart menu - The menu the fields are offered in.
- * @csspart menu-back - The control that returns from a field's page.
- * @csspart menu-back-mark - The glyph on the back control.
+ * @csspart menu-back - The button that goes back from a field's page.
+ * @csspart menu-back-mark - The icon on the back button.
  * @csspart menu-empty - Shown when there are no fields to offer.
- * @csspart menu-header - The bar above a field's page, holding the way back and its name.
- * @csspart menu-live - The inner menu's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart menu-loading - Shown while the fields are still on their way.
+ * @csspart menu-header - The bar above a field's page, with the back button and the field's name.
+ * @csspart menu-live - The inner menu's `live` part: the region that screen readers announce the empty and loading messages from.
+ * @csspart menu-loading - Shown while the fields are loading.
  * @csspart menu-surface - The floating panel the menu is drawn on.
  * @csspart menu-title - The name of the field whose page is showing.
  */
 @customElement('helix-headless-filter-menu')
 export class HelixHeadlessFilterMenu extends HelixElement {
   /**
-   * Accessible name for the menu.
+   * The menu's name, read by screen readers.
    */
   @property()
   label = 'Filter'
@@ -105,7 +105,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
   private readonly comparisons = new Map<string, string>()
 
   /**
-   * The fields declared inside this, in the order they were written.
+   * The fields declared inside the menu, in source order.
    *
    * What a render may know of them: none on a server, whose shim has no tree
    * and threw here, and none while hydrating what one sent.
@@ -127,14 +127,14 @@ export class HelixHeadlessFilterMenu extends HelixElement {
     this.finishHydration()
   }
 
-  /** What is ticked for one field, as the consumer's own values. */
+  /** The values checked for one field. */
   valuesFor(field: string): readonly string[] {
     return [...(this.picked.get(field) ?? [])]
   }
 
   /**
-   * Which comparison a field is using: the reader's choice, then the one the
-   * field marked, then the first one it supports.
+   * The comparison a field uses: the one the user chose, or the field's
+   * `default`, or the first one the field supports, in that order.
    *
    * **The last of those is not a fallback for nothing, it is the scalar case.**
    * A date supports `after` and nothing else and marks no default, because there
@@ -186,7 +186,8 @@ export class HelixHeadlessFilterMenu extends HelixElement {
   }
 
   /**
-   * Filters a field by these values, announcing it the way a tick does.
+   * Filters a field by the given values and sends `helix-facet`, as checking a
+   * value does.
    *
    * **The one way this element's state changes**, whether the move came from a
    * row here, from a filter typed into the field around it, or from a chip

@@ -22,21 +22,21 @@ import { styles } from './canvas-node.css.js'
  * @aliases CanvasCard, BoardNode
  * @documentation https://fusion.dev/helix/components/canvas
  *
- * @cssproperty --canvas-grip-size - How large the corners a selected card is resized from are.
- * @cssproperty --canvas-handle-size - How large the points a connection is drawn from are.
- * @cssproperty --canvas-move-block-size - How tall the grip a selected card is moved by is.
- * @cssproperty --canvas-move-inline-size - How wide the grip a selected card is moved by is.
- * @cssproperty --canvas-move-inset - How far in from the card's corner that grip sits.
- * @cssproperty --canvas-node-background-color - The ground the card is drawn on.
- * @cssproperty --canvas-node-color - A color with no meaning, where a tone will not do: a hex a document chose.
- * @cssproperty --canvas-node-padding - Space between the card's edge and what it holds.
- * @cssproperty --canvas-node-shadow - The lift under the card, which `separation="elevated"` sets.
+ * @cssproperty --canvas-grip-size - The size of the corner handles that resize a selected card.
+ * @cssproperty --canvas-handle-size - The size of the points you draw a connection from.
+ * @cssproperty --canvas-move-block-size - The height of the handle that moves a selected card.
+ * @cssproperty --canvas-move-inline-size - The width of the handle that moves a selected card.
+ * @cssproperty --canvas-move-inset - The distance between the move handle and the card's corner.
+ * @cssproperty --canvas-node-background-color - The card's background.
+ * @cssproperty --canvas-node-color - A color for the card that carries no meaning, such as a hex color from a document. Use it when no tone fits.
+ * @cssproperty --canvas-node-padding - The space between the card's edge and its content.
+ * @cssproperty --canvas-node-shadow - The shadow under the card, set by `separation="elevated"`.
  */
 @customElement('helix-canvas-node')
 export class HelixCanvasNode extends HelixHeadlessCanvasNode {
   /**
-   * What the card's ground is made of: `glass` or `frosted`, which let the
-   * board's ruling show through, or `transparent`.
+   * The material of the card's background: `glass` or `frosted`, which let the
+   * board's grid lines show through, or `transparent`.
    *
    * Absent is an opaque surface, a resting value being an attribute's absence.
    */
@@ -44,7 +44,8 @@ export class HelixCanvasNode extends HelixHeadlessCanvasNode {
   material?: 'frosted' | 'glass' | 'transparent'
 
   /**
-   * How the card stands off the board.
+   * How the card is set apart from the board: `outlined`, `filled`,
+   * `elevated`, or `plain`.
    *
    * Outlined is where it rests, a surface with its color as the edge. `filled`
    * puts the color into the ground, `elevated` lifts it and keeps the edge, and

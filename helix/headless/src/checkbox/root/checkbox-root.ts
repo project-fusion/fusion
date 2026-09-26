@@ -9,7 +9,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary A box that is ticked, or not, or neither.
+ * @summary A box that is checked, unchecked, or indeterminate.
  *
  * @description
  * Renders a real `<input type="checkbox">`, so the space key, the focus ring,
@@ -38,23 +38,23 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The label.
  *
- * @event {Event} change - Relayed from the input once the state has changed.
- * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired before the state changes, and cancelable.
- * @event {Event} input - Announced once the state has moved.
+ * @event {Event} change - The box was checked or unchecked. Relayed from the native input.
+ * @event {HelixBeforeToggleEvent} helix-before-toggle - The box is about to be checked or unchecked. Cancelable: cancel it to keep its state.
+ * @event {Event} input - The box was checked or unchecked.
  *
- * @csspart box - The frame the input is painted as, and the mark sits over.
- * @csspart control - The input.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The row the box and its label share, and the surface the card appearance draws.
- * @csspart hint - Help under the control, while nothing is wrong.
- * @csspart label - The label beside it.
- * @csspart mark - The tick, or the dash when the box is indeterminate.
- * @csspart mark-checked - The mark while the box is checked, beside `mark`.
- * @csspart mark-indeterminate - The mark while the box is indeterminate, beside `mark`.
+ * @csspart box - The box drawn for the input, under the mark.
+ * @csspart control - The native input.
+ * @csspart feedback - The message that says what is wrong.
+ * @csspart field - The row that holds the box and its label. It is the card when `separation` is set.
+ * @csspart hint - Help text under the control, shown while there is no feedback.
+ * @csspart label - The label next to the box.
+ * @csspart mark - The check mark, or the dash when the box is indeterminate.
+ * @csspart mark-checked - Added to `mark` while the box is checked.
+ * @csspart mark-indeterminate - Added to `mark` while the box is indeterminate.
  *
  * @cssstate checked - While the box is checked.
- * @cssstate has-label - While the label slot holds something to read, which is what draws a label at all.
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate has-label - The label slot has content, so the label is drawn.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-checkbox')
 export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {
@@ -68,7 +68,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   })
 
   /**
-   * Whether the box shows as neither checked nor unchecked.
+   * Shows the box as neither checked nor unchecked.
    *
    * Presentation only. It never submits, and the first change resolves it.
    */
@@ -76,7 +76,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   indeterminate = false
 
   /**
-   * Value submitted when the box is checked.
+   * The value submitted when the box is checked.
    */
   @property()
   value = 'on'
@@ -111,7 +111,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
     this.reportRequired(!this.checked, 'Tick this box to continue.', 'control')
   }
 
-  /** Returns the box to the state its markup declared. */
+  /** Resets the box to the state set in its markup. */
   override formResetCallback(): void {
     super.formResetCallback()
     this.indeterminate = false

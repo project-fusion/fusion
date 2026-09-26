@@ -38,13 +38,14 @@ import { styles } from './date-input-root.css.js'
  * @aliases DatePicker, DateField, InputDate
  * @documentation https://fusion.dev/helix/components/date-input
  *
- * @cssproperty --date-input-background-color - Fill behind the field.
- * @cssproperty --date-input-border-color - Color of the panel's edge.
- * @cssproperty --date-input-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
- * @cssproperty --date-input-shadow - Lift under the panel. Follows `--helix-shadow-floating`:
- *   a floating surface sits over content nobody can predict, so it keeps a lift by default.
+ * @cssproperty --date-input-background-color - The fill behind the field.
+ * @cssproperty --date-input-border-color - The color of the panel's border.
+ * @cssproperty --date-input-border-width - The width of the panel's border. It
+ *   follows `--helix-border-floating`, which is `0`, so the panel stands out by its
+ *   shadow unless a theme sets a border.
+ * @cssproperty --date-input-shadow - The shadow under the panel. It follows
+ *   `--helix-shadow-floating`. The panel can sit over any content, so it has a
+ *   shadow by default.
  */
 @customElement('helix-date-input')
 export class HelixDateInput extends HelixHeadlessDateInput {

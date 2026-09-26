@@ -26,17 +26,17 @@ import { styles } from './toggle-group.css.js'
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The group's items.
- * @slot end - Whatever sits after the track on its own line, such as a count or a reset.
- * @slot start - Whatever sits before the track on its own line, such as an icon or a caption.
+ * @slot end - Content after the track, on the same line, such as a count or a reset.
+ * @slot start - Content before the track, on the same line, such as an icon or a caption.
  *
  * @csspart indicator - The moving marker behind the selected item.
  *
- * @cssproperty --toggle-group-indicator-color - Fill of the moving marker.
+ * @cssproperty --toggle-group-indicator-color - The fill of the moving marker.
  */
 @customElement('helix-toggle-group')
 export class HelixToggleGroup extends HelixHeadlessToggleGroup {
   /**
-   * How the group separates itself from the page.
+   * How the group is set apart from the page.
    *
    * Separation rather than emphasis, because what `plain` drops is the
    * background *and* the border: the question is where the group ends, not how

@@ -5,7 +5,7 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
- * @summary One row of a drill-down, which may hold a page of its own.
+ * @summary One row of a drill-down, which can open a page of its own.
  *
  * @description
  * A row that opens a page *contains* that page: its rows are this row's own
@@ -32,16 +32,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases Panel item, Drill row
  * @documentation https://fusion.dev/helix/components/drilldown
  *
- * @slot - The words naming this row.
- * @slot end - After the words, usually a mark or a count.
- * @slot page - The rows of the page this one opens.
- * @slot start - Before the words, usually an icon.
+ * @slot - The row's label.
+ * @slot end - Content after the label, usually an icon or a count.
+ * @slot page - The rows of the page this row opens.
+ * @slot start - Content before the label, usually an icon.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when the row is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  *
  * @csspart item - The row itself.
- * @csspart label - The words.
- * @csspart mark - The caret at the end of a row that opens a page, after the `end` slot. A caret points, so a sheet mirrors it in a right-to-left document.
+ * @csspart label - The row's label.
+ * @csspart mark - The caret at the end of a row that opens a page, after the `end` slot. The caret points, so a stylesheet mirrors it in a right-to-left document.
  */
 @customElement('helix-headless-drilldown-item')
 export class HelixHeadlessDrilldownItem extends HelixElement {
@@ -52,7 +52,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   disabled = false
 
   /**
-   * Whether this row holds the region's tab stop. Written by the stack.
+   * Whether this row holds the region's tab stop. Set by the drill-down.
    *
    * A drill-down keeps one stop and moves within it on the arrows, so every
    * other row is at `-1`. Leave it off every row, including the first, and
@@ -91,7 +91,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   showingPage = false
 
   /**
-   * Identifies the row to whatever is listening.
+   * Identifies the row to your event listeners.
    */
   @property()
   value = ''
@@ -147,8 +147,8 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   }
 
   /**
-   * Whether this is the row the set is on, which in a drill-down is where focus
-   * is.
+   * Whether this is the current row, which in a drill-down is the row with
+   * focus.
    *
    * A radio group's selection is an answer it holds; a page of rows has no
    * answer, only the row a reader has walked to, so focus is the whole of what
@@ -167,7 +167,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
     return this.ownerDocument.activeElement === this
   }
 
-  /** Announces that this row was chosen. */
+  /** Fires `helix-select` for this row. */
   select(): void {
     if (this.disabled) {
       return

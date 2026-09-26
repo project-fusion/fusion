@@ -27,7 +27,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-description-list-item')
 export class HelixHeadlessDescriptionListItem extends HelixElement {
   /**
-   * What the value is called, for the common case of plain text.
+   * The label, when it is plain text.
    *
    * The fallback of the `label` slot, so slotted content replaces it rather than
    * appearing beside it. The value itself is the default slot: it is the half

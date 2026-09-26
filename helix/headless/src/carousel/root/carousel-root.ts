@@ -64,12 +64,12 @@ const COUNT_OR_AUTO = {
  *
  * @slot - The slides.
  *
- * @event {HelixSelectEvent} helix-select - Fired before the slide in view changes, with the index being asked for. Cancelable: refusing it takes the decision and nothing moves, including a drag, which is put back on the slide the index still holds. See `handleScroll`.
+ * @event {HelixSelectEvent} helix-select - Fired before the slide in view changes, with the requested index. Cancelable: cancel it to keep the current slide. Nothing moves, and a drag returns to the slide the index still holds. See `handleScroll`.
  *
  * @csspart controls - The row of controls.
- * @csspart indicator - One of them, and a way to reach that slide.
- * @csspart indicator-current - The one for the slide showing, beside `indicator`.
- * @csspart indicators - The row of controls saying where the reader is.
+ * @csspart indicator - One indicator. Pressing it moves to its slide.
+ * @csspart indicator-current - The indicator for the slide in view, alongside `indicator`.
+ * @csspart indicators - The row of indicators that shows which slide is in view.
  * @csspart next - The control that moves to the next slide.
  * @csspart next-mark - The glyph on the next control.
  * @csspart previous - The control that moves to the previous slide.
@@ -79,11 +79,11 @@ const COUNT_OR_AUTO = {
  * @csspart slide - The pane one slide is shown in, and the box the track snaps to.
  * @csspart track - The scroller the slides sit in.
  *
- * @cssproperty --carousel-gap - Space between slides. A sheet sets it and the component measures the run with it.
- * @cssproperty --carousel-pane - The size one pane is laid out at. A sheet sets it and the component measures the run with it.
- * @cssproperty --carousel-per-view - How many slides go across, written onto the track by the component so a sheet divides the track by the same number the positions are counted from. Read it rather than selecting on `per-view`, which cannot be enumerated without a ceiling. Under `per-view="auto"` the component writes nothing and the sheet declares it instead, so the same name answers in both modes. See `perView`.
- * @cssproperty --carousel-run-end - How far short of a whole pixel the run ends, on the last slide alone, for a sheet to take up as `margin-inline-end`. See `runEnd`.
- * @cssproperty --carousel-slide-min - The narrowest a slide may be laid out, which is what `per-view="auto"` fits the track with. A length, since the sheet divides by it. Unset is the whole track, which is one across.
+ * @cssproperty --carousel-gap - Space between slides. Your stylesheet sets it, and the component uses it to measure the run.
+ * @cssproperty --carousel-pane - The size of one pane. Your stylesheet sets it, and the component uses it to measure the run.
+ * @cssproperty --carousel-per-view - How many slides go across. The component writes it onto the track, so your stylesheet divides the track by the same number the component counts positions from. Read this property to follow `per-view`, because attribute selectors cannot cover every possible count. Under `per-view="auto"` the component writes nothing and your stylesheet declares it, so the same name works in both modes. See `perView`.
+ * @cssproperty --carousel-run-end - How far short of a whole pixel the run ends, set on the last slide only. Your stylesheet applies it as `margin-inline-end`. See `runEnd`.
+ * @cssproperty --carousel-slide-min - The narrowest a slide may be. `per-view="auto"` uses it to fit slides into the track. It must be a length, because the stylesheet divides by it. When unset, it is the whole track, which shows one slide across.
  */
 @customElement('helix-headless-carousel')
 export class HelixHeadlessCarousel extends HelixElement {
@@ -139,7 +139,7 @@ export class HelixHeadlessCarousel extends HelixElement {
   controls?: 'always' | 'auto' | 'none'
 
   /**
-   * Slide to start on, where nothing declared one.
+   * The slide to start on, used until `index` is set.
    */
   @property({ attribute: 'default-index', type: Number })
   defaultIndex = 0
@@ -170,7 +170,7 @@ export class HelixHeadlessCarousel extends HelixElement {
   }
 
   /**
-   * What one indicator is called, with `{index}` filled in.
+   * The name of each indicator, with `{index}` filled in.
    *
    * **Every word the carousel speaks is a property**, so a page in another
    * language hears its own: only `label` was, and the controls around it
@@ -180,7 +180,7 @@ export class HelixHeadlessCarousel extends HelixElement {
   indicatorLabel = 'Slide {index}'
 
   /**
-   * What the row of indicators is called, with the carousel's `{label}` filled in.
+   * The name of the row of indicators, with the carousel's `{label}` filled in.
    */
   @property({ attribute: 'indicators-label' })
   indicatorsLabel = '{label} slides'
@@ -198,7 +198,7 @@ export class HelixHeadlessCarousel extends HelixElement {
   private scrolledFor = 0
 
   /**
-   * Accessible name for the carousel.
+   * The carousel's name, read by screen readers.
    */
   @property()
   label = 'Carousel'
@@ -210,7 +210,7 @@ export class HelixHeadlessCarousel extends HelixElement {
   loop = false
 
   /**
-   * What the control that moves forward is called.
+   * The name of the control that moves to the next slide.
    */
   @property({ attribute: 'next-label' })
   nextLabel = 'Next slide'
@@ -307,32 +307,32 @@ export class HelixHeadlessCarousel extends HelixElement {
   perView?: number | 'auto'
 
   /**
-   * What the control that moves back is called.
+   * The name of the control that moves to the previous slide.
    */
   @property({ attribute: 'previous-label' })
   previousLabel = 'Previous slide'
 
   /**
-   * What each slide is called, with `{index}` and `{count}` filled in.
+   * The name of each slide, with `{index}` and `{count}` filled in.
    */
   @property({ attribute: 'slide-label' })
   slideLabel = '{index} of {count}'
 
   /**
-   * What a slide is, read out in place of its role: `aria-roledescription`,
-   * which is a word a reader hears and so a word to translate.
+   * The word screen readers announce in place of a slide's role, set as
+   * `aria-roledescription`. Translate it with the rest of your text.
    */
   @property({ attribute: 'slide-role-label' })
   slideRoleLabel = 'slide'
 
   /**
-   * What the rotation control is called while it would start rotation.
+   * The name of the rotation control while rotation is stopped.
    */
   @property({ attribute: 'start-label' })
   startLabel = 'Start slide rotation'
 
   /**
-   * And while it would stop it.
+   * The name of the rotation control while rotation is running.
    */
   @property({ attribute: 'stop-label' })
   stopLabel = 'Stop slide rotation'
@@ -592,7 +592,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     })
   }
 
-  /** Moves to a slide, wrapping only where `loop` says to. */
+  /** Moves to a slide. It wraps past either end only when `loop` is set. */
   goTo(index: number): void {
     if (this.slides.length === 0) {
       return

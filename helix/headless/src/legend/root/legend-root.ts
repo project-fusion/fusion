@@ -9,7 +9,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary The names a chart draws, each beside the color it is drawn in.
+ * @summary A list of the series in a chart, each name beside the color it is drawn in.
  *
  * @description
  * A legend is a list, so it is a list: not part of a chart, and shared by
@@ -30,17 +30,17 @@ import { property } from 'lit/decorators.js'
  * @aliases Key, Series Key
  * @documentation https://fusion.dev/helix/components/legend
  *
- * @csspart entry - One name and its swatch. The swatch is drawn on the entry,
- * which is `::part(entry)::before` from a consumer's sheet: the series is
- * already on the entry as `--chart-series`, so a box would have carried nothing,
- * and this tier ships no CSS.
- * @csspart list - The list itself.
+ * @csspart entry - One name and its swatch. Draw the swatch with
+ * `::part(entry)::before` in your stylesheet. The entry holds its series color
+ * as `--chart-series`, and this tier ships no CSS.
+ * @csspart list - The list of entries.
  * @csspart name - One series name.
  */
 @customElement('helix-headless-legend')
 export class HelixHeadlessLegend extends HelixElement {
   /**
-   * Which way to read the table.
+   * How the entries are read from the table: `series`, `categories`, or
+   * `measures`.
    *
    * Absent is `series`, one entry per data column. `categories` reads one entry
    * per body row instead, for a donut, whose slices are the rows.

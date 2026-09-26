@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
- * @summary Renders a named icon from the Helix set.
+ * @summary A named icon from the Helix set.
  *
  * @description
  * The set is Phosphor, drawn on a 256 box at stroke-width 16, and each glyph is
@@ -42,7 +42,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-icon')
 export class HelixHeadlessIcon extends HelixElement {
   /**
-   * The icon itself, for a consumer who imported one.
+   * The icon to draw, as an object you import.
    *
    * **The scalable door, and the one this library uses internally.** An icon is
    * data, `{ content, name, viewBox }`, so a value imported by name ships one
@@ -59,13 +59,15 @@ export class HelixHeadlessIcon extends HelixElement {
   icon?: HelixIcon
 
   /**
-   * Accessible name, for an icon that is not decorative.
+   * The icon's name, read by screen readers. Set it for an icon that is not
+   * decorative.
    */
   @property()
   label = ''
 
   /**
-   * Turns the glyph round on a right-to-left page, for an arrow meaning forward or back.
+   * Flips the glyph on a right-to-left page. Use it for an arrow that means
+   * forward or back.
    *
    * Asked for rather than inferred from the name. The names are physical, and
    * `arrow-left` drawn pointing right on an Arabic page would be the icon
@@ -75,7 +77,7 @@ export class HelixHeadlessIcon extends HelixElement {
   mirror = false
 
   /**
-   * Name of the icon in the Helix set.
+   * The name of the icon in the Helix set.
    *
    * **A lookup, and the reason both this and `icon` exist.** A name is a string,
    * so it is what markup can carry, and resolving one means an index of the

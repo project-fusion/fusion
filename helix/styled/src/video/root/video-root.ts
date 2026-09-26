@@ -9,8 +9,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './video-root.css.js'
 
 /**
- * @summary Plays a video, with controls this library draws rather than the
- * browser's.
+ * @summary A video player with controls drawn by Helix.
  *
  * @description
  * The player is the headless tier's. What this adds is the bar: where it sits, when
@@ -33,15 +32,15 @@ import { styles } from './video-root.css.js'
  * @category media
  * @documentation https://fusion.dev/helix/components/video
  *
- * @cssproperty --video-accent-color - The played part of the scrubber.
+ * @cssproperty --video-accent-color - Color of the played part of the scrubber.
  * @cssproperty --video-aspect-ratio - The shape of the box. Defaults to the
  * video's own once known, and `16 / 9` until then.
- * @cssproperty --video-controls-color - The ink on the bar.
- * @cssproperty --video-radius - The corner it is cut to.
- * @cssproperty --video-speed-size - How wide the playback speed control is
- * held, so the row does not move when the number changes.
- * @cssproperty --video-start-size - Width of the mark that starts it.
- * @cssproperty --video-well-color - Behind the picture, and in the letterbox bars.
+ * @cssproperty --video-controls-color - Color of the icons and text on the control bar.
+ * @cssproperty --video-radius - Corner radius of the player.
+ * @cssproperty --video-speed-size - Width of the playback speed control, fixed so the row
+ * does not shift when the number changes.
+ * @cssproperty --video-start-size - Width of the large play button.
+ * @cssproperty --video-well-color - Color behind the picture and in the letterbox bars.
  */
 @customElement('helix-video')
 export class HelixVideo extends HelixHeadlessVideo {

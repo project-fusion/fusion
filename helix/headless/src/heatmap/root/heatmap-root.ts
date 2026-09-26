@@ -17,7 +17,7 @@ import '../../tooltip/index.js'
 import { fits, toneOf } from './buckets.js'
 
 /**
- * @summary A strip of cells colored by how each one went: uptime, contributions, activity.
+ * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
  *
  * @description
  * **One family covers both readings.** `rows="1"` is a status strip, `rows="7"`
@@ -49,12 +49,12 @@ import { fits, toneOf } from './buckets.js'
  *
  * @slot end - Below the strip, at the trailing edge: usually the newest date.
  * @slot start - Below the strip, at the leading edge: usually the oldest date.
- * @slot summary - Below the strip, in the middle: the reading over the range drawn.
+ * @slot summary - Below the strip, in the middle: a summary of the range shown.
  *
- * @event {HelixResizeEvent} helix-resize - Fired when the number of cells drawn changes, carrying that number.
+ * @event {HelixResizeEvent} helix-resize - Fired when the number of cells drawn changes, with the new number.
  *
  * @csspart cell - One reading.
- * @csspart empty - Shown when the table has no readings in it, and not before the table can be read at all: on a server, and while hydrating what one sent, there is no document to resolve `for` in and nothing is known yet.
+ * @csspart empty - Shown when the table has no readings. It stays hidden until the table can be read: on the server and during hydration, there is no document to resolve `for` in.
  * @csspart end - The trailing slot's box.
  * @csspart footer - The three-slot row under the strip.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -64,33 +64,33 @@ import { fits, toneOf } from './buckets.js'
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
- * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, so on its top edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, so on its right edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, so on its left edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-top - The point while the bubble is above the reading, so on its bottom edge, beside `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the reading, beside `tooltip`.
+ * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, on its top edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, on its right edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, on its left edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
- * @csspart tooltip-left - The bubble while it is left of the reading, beside `tooltip`.
+ * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
- * @csspart tooltip-right - The bubble while it is right of the reading, beside `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the reading, beside `tooltip`.
+ * @csspart tooltip-right - The bubble while it is right of the reading. Set alongside `tooltip`.
+ * @csspart tooltip-top - The bubble while it is above the reading. Set alongside `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
- * @cssproperty --heatmap-rows - How many rows the strip lays out. Written by the component from the data, read by the tier that draws it.
- * @cssproperty --heatmap-tone - The tone of the cell this is set on. Written by the component, read by the sheet that paints.
- * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
+ * @cssproperty --heatmap-rows - How many rows the strip lays out. The component writes it from the data, and the stylesheet that draws the strip reads it.
+ * @cssproperty --heatmap-tone - The tone of the cell it is set on. The component writes it, and the stylesheet that paints the cell reads it.
+ * @cssproperty --heatmap-tone-1 - The weakest step of the magnitude ramp, used by `tones="1 …"`.
  * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
  * @cssproperty --heatmap-tone-3 - The third step of the magnitude ramp.
  * @cssproperty --heatmap-tone-4 - The fourth step of the magnitude ramp.
- * @cssproperty --heatmap-tone-5 - The loudest step of the magnitude ramp.
- * @cssproperty --heatmap-tone-accent - What `accent` is worth.
- * @cssproperty --heatmap-tone-danger - What `danger` is worth.
- * @cssproperty --heatmap-tone-info - What `info` is worth.
- * @cssproperty --heatmap-tone-muted - What `muted` is worth: the quiet ground, for a bucket that means nothing happened.
- * @cssproperty --heatmap-tone-primary - What `primary` is worth.
- * @cssproperty --heatmap-tone-success - What `success` is worth, as a name or a `data-tone`.
- * @cssproperty --heatmap-tone-warning - What `warning` is worth.
+ * @cssproperty --heatmap-tone-5 - The strongest step of the magnitude ramp.
+ * @cssproperty --heatmap-tone-accent - The color of the `accent` tone.
+ * @cssproperty --heatmap-tone-danger - The color of the `danger` tone.
+ * @cssproperty --heatmap-tone-info - The color of the `info` tone.
+ * @cssproperty --heatmap-tone-muted - The color of the `muted` tone: a quiet background, for a bucket that means nothing happened.
+ * @cssproperty --heatmap-tone-primary - The color of the `primary` tone.
+ * @cssproperty --heatmap-tone-success - The color of the `success` tone, named in `tones` or in `data-tone`.
+ * @cssproperty --heatmap-tone-warning - The color of the `warning` tone.
  */
 @customElement('helix-headless-heatmap')
 export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
@@ -104,8 +104,8 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   emptyText = 'No readings'
 
   /**
-   * Space between cells, in CSS pixels, for the same reason `min-cell` is a
-   * number.
+   * Space between cells, in CSS pixels. It is a number for the same reason
+   * `min-cell` is.
    */
   @property({ type: Number })
   gap = 2
@@ -157,7 +157,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   thresholds = ''
 
   /**
-   * Tone per bucket, in the same order as `thresholds`.
+   * The tone for each bucket, in the same order as `thresholds`.
    *
    * A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
    * **`"1"` through `"5"` are a ramp and everything else is a category**, which

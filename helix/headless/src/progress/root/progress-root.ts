@@ -3,7 +3,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary Shows how far along a task is, when that is known.
+ * @summary A bar or ring that shows how far along a task is.
  *
  * @description
  * Determinate by default, and `indeterminate` for a task whose total is not
@@ -23,17 +23,18 @@ import { property } from 'lit/decorators.js'
  * @aliases Progress bar, Loading bar
  * @documentation https://fusion.dev/helix/components/progress
  *
- * @csspart groove - The unfilled circle, under the ring's own sweep.
- * @csspart indicator - The part of it that is done.
+ * @csspart groove - The unfilled circle under the ring's filled arc.
+ * @csspart indicator - The filled part that shows the work done.
  * @csspart track - The full length the work is measured against.
- * @csspart value - The reading beside the bar, under `show-value`.
+ * @csspart value - The value shown beside the bar when `show-value` is set.
  *
  * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Pinned to 1 while indeterminate.
  */
 @customElement('helix-headless-progress')
 export class HelixHeadlessProgress extends HelixElement {
   /**
-   * Whether the work has a knowable end.
+   * Whether the length of the task is unknown. The bar then shows activity
+   * without a value.
    *
    * On the headless tier rather than as a treatment, because it is
    * semantics before it is a picture: a progressbar with no `aria-valuenow` is
@@ -101,7 +102,8 @@ export class HelixHeadlessProgress extends HelixElement {
   value = 0
 
   /**
-   * A reading for the value, where the number alone does not say enough.
+   * Text that describes the value when the number alone is not enough, such as
+   * "3 of 8 files".
    *
    * "3 of 8 files" rather than "37". Announced instead of the percentage, and
    * never instead of the value itself: `aria-valuenow` still carries the

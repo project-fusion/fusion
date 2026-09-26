@@ -5,8 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './description-list-root.css.js'
 
 /**
- * @summary Labels and their values, read as pairs: the details panel every
- * product has.
+ * @summary A list of labels and their values, such as a details panel.
  *
  * @description
  * Each label is quiet and each value takes the text around it, so the eye goes
@@ -29,7 +28,7 @@ import { styles } from './description-list-root.css.js'
  * @aliases Data list, Key-value list, Details, Properties
  * @documentation https://fusion.dev/helix/components/description-list
  *
- * @cssproperty --description-list-gap - Space between one pair and the next. Its resting value is tighter with `direction="row"` than stacked, a row of pairs needing less air between them than a column of them does, and setting this takes both.
+ * @cssproperty --description-list-gap - Space between one pair and the next. The default is smaller with `direction="row"` than when stacked. Setting this property replaces both defaults.
  */
 @customElement('helix-description-list')
 export class HelixDescriptionList extends HelixHeadlessDescriptionList {

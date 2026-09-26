@@ -15,7 +15,7 @@ import { property } from 'lit/decorators.js'
 import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
 
 /**
- * @summary A button that fans out the few actions a screen is for.
+ * @summary A floating button that opens a short list of the main actions on a screen.
  *
  * @description
  * **A menu, and deliberately not a new one.** Its rows are commands, which is
@@ -46,22 +46,22 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * @documentation https://fusion.dev/helix/components/speed-dial
  *
  * @slot - The actions.
- * @slot trigger - The control that opens it. Falls back to a button named by `label`.
+ * @slot trigger - The control that opens the actions. Without one, a button named by `label` is drawn.
  *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {HelixSelectEvent} helix-select - Fired when an action is chosen. Dispatched by the action and listened for here, and the dial closes behind it once it has been heard. Cancelable: refusing it takes the decision and the dial stays open.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeCloseEvent} helix-before-close - The actions are about to close. Cancelable: cancel it to keep them open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - The actions are about to open. Cancelable: cancel it to keep them closed.
+ * @event {HelixSelectEvent} helix-select - An action was chosen. The action sends the event, and the dial closes after it. Cancelable: cancel it to keep the dial open.
+ * @event {Event} toggle - The dial opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart actions - The region the actions are drawn in.
- * @csspart trigger - The default trigger, where none was slotted.
+ * @csspart trigger - The default trigger, drawn when none is slotted.
  *
  * @cssstate open - While the actions are out.
  */
 @customElement('helix-headless-speed-dial')
 export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   /**
-   * Names the trigger and the set of actions it opens.
+   * Accessible name for the trigger and the set of actions it opens.
    */
   @property()
   label = 'Actions'
@@ -73,7 +73,8 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   offset = 12
 
   /**
-   * Which way the actions fan out. They move if that side does not fit.
+   * The direction the actions open in. They move to another side if that side
+   * does not fit.
    *
    * Up by default, because the control this hangs off is usually docked to the
    * bottom of the window and there is nothing below it to fan into.

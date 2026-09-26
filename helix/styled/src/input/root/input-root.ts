@@ -12,7 +12,7 @@ import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './input-root.css.js'
 
 /**
- * @summary A single line of text a reader types into.
+ * @summary A field for a single line of text.
  *
  * @description
  * The frame is the field rather than the input, so anything slotted at either

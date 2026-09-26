@@ -16,12 +16,12 @@ import { styles } from './list-item.css.js'
  * @aliases Row, Entry
  * @documentation https://fusion.dev/helix/components/list
  *
- * @csspart rail - The cell a railed list draws its number in.
+ * @csspart rail - The cell that holds the number in a railed list.
  *
- * @cssproperty --list-item-padding - Padding inside the row.
- * @cssproperty --list-item-rail-content - What the rail cell shows. Written by the list.
- * @cssproperty --list-item-rail-display - Whether there is a rail at all. Written by the list.
- * @cssproperty --list-item-term-weight - Weight of a description list's term.
+ * @cssproperty --list-item-padding - The padding inside the row.
+ * @cssproperty --list-item-rail-content - What the rail cell shows. The list sets it.
+ * @cssproperty --list-item-rail-display - Whether the row has a rail. The list sets it.
+ * @cssproperty --list-item-term-weight - The font weight of a term in a description list.
  */
 @customElement('helix-list-item')
 export class HelixListItem extends HelixHeadlessListItem {

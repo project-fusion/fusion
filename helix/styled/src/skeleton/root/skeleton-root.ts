@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './skeleton-root.css.js'
 
 /**
- * @summary Stands in for content that has not arrived.
+ * @summary A placeholder shown in place of content that is still loading.
  *
  * @description
  * A sweep rather than a pulse. A block fading in and out reads as something
@@ -18,14 +18,14 @@ import { styles } from './skeleton-root.css.js'
  * @aliases Placeholder, Shimmer, Ghost
  * @documentation https://fusion.dev/helix/components/skeleton
  *
- * @csspart skeleton - The placeholder surface.
+ * @csspart skeleton - The placeholder shape.
  *
- * @cssproperty --skeleton-size - Diameter of the circle shape.
+ * @cssproperty --skeleton-size - The diameter of the circle shape.
  */
 @customElement('helix-skeleton')
 export class HelixSkeleton extends HelixHeadlessSkeleton {
   /**
-   * What the missing content is shaped like.
+   * The shape of the placeholder: `text`, `circle`, or a block when unset.
    *
    * Unset is a block, which is what most missing things are.
    */

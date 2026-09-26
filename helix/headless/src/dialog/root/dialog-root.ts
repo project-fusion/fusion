@@ -9,7 +9,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary A modal window, on the platform's own dialog.
+ * @summary A modal window built on the native `<dialog>` element.
  *
  * @description
  * A real `<dialog>` opened with `showModal()`, not a div with a role and a
@@ -31,14 +31,14 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/dialog
  *
  * @slot - The dialog's content.
- * @slot footer - The actions.
+ * @slot footer - The dialog's actions.
  * @slot header - The title, and anything beside it.
- * @slot icon - A single mark above the title, for a dialog that warns.
+ * @slot icon - An icon above the title, for a warning dialog.
  *
- * @event {Event} close - Relayed, because the platform's own does not escape.
+ * @event {Event} close - Sent from the host after the dialog closes, because the native `close` event does not leave the shadow root.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {Event} toggle - Sent when the dialog opens or closes, with `newState` and `oldState`.
  *
  * @csspart dialog - The native dialog element.
  *
@@ -47,7 +47,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-dialog')
 export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   /**
-   * Which close requests the browser answers on its own.
+   * Which close requests the browser handles on its own.
    *
    * `<dialog closedby>`, forwarded, and safe to forward because every path it
    * opens still comes back through this element: a close request fires `cancel`
@@ -79,7 +79,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   })
 
   /**
-   * Whether Escape or a press on the backdrop can close it.
+   * Stops Escape and a press on the backdrop from closing the dialog.
    *
    * Off for a dialog that must be answered. It does not disable the close
    * control a consumer slots in: refusing to be dismissed is not the same as
@@ -124,13 +124,14 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     return this.renderRoot?.querySelector('dialog') ?? null
   }
 
-  /** Moves focus into the dialog and makes the rest of the page inert. */
+  /** Opens the dialog, moves focus into it, and makes the rest of the page inert. */
   show(): void {
     this.requestOpen(true)
   }
 
   /**
-   * Asks to close, which a consumer may refuse.
+   * Requests that the dialog close. A `helix-before-close` listener can cancel
+   * the request.
    *
    * Takes what the dialog closed with, the way `<dialog>.close(value)` does, so
    * the button that dismissed it can say which one it was. Set before the

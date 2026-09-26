@@ -21,7 +21,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 export const FAILED_LABEL = 'Not sent'
 
 /**
- * @summary One turn in a conversation, and what has happened to it.
+ * @summary One turn in a conversation, with its state, such as sending or failed.
  *
  * @description
  * **The states are the component.** Bubbles are paint; what a chat message has
@@ -41,38 +41,38 @@ export const FAILED_LABEL = 'Not sent'
  * @aliases Message, Bubble, Turn
  * @documentation https://fusion.dev/helix/components/chat
  *
- * @slot - What was said.
- * @slot actions - What can be done with it: copy, retry, react.
- * @slot avatar - Who said it.
- * @slot indicator - The wait before the first token. Falls back to the typing
- * indicator, so slotting nothing is what this has always done.
- * @slot sources - What it was said from: citations, documents, a retrieved page.
+ * @slot - The turn's content.
+ * @slot actions - Controls for the turn, such as copy, retry, or react.
+ * @slot avatar - The author's avatar.
+ * @slot indicator - The indicator shown before the first token arrives.
+ * Defaults to the typing indicator.
+ * @slot sources - The turn's sources, such as citations, documents, or a retrieved page.
  *
- * @event {HelixSendEvent} helix-send - Fired when the reader asks to send a failed message again. Cancelable: a retry that stands puts the turn back on its way, and refusing it leaves the failure and the control offering it exactly where they were.
+ * @event {HelixSendEvent} helix-send - Fired when the user retries a failed message. Cancelable: if it is not canceled, the turn is sent again. Canceling it leaves the failure and the retry button as they were.
  *
- * @csspart actions - The controls offered on the turn, beside its time.
- * @csspart avatar - The leading slot's box.
- * @csspart body - What was said, and the line under it.
- * @csspart content - The consumer's own markup.
- * @csspart indicator - The default wait, drawn only when nothing is slotted over it.
- * @csspart mark - The status glyph beside a failure.
+ * @csspart actions - The controls on the turn, beside its time.
+ * @csspart avatar - The box around the `avatar` slot.
+ * @csspart body - The content and the line under it.
+ * @csspart content - Your own markup.
+ * @csspart indicator - The default indicator, drawn only when nothing is in the `indicator` slot.
+ * @csspart mark - The status icon beside a failure.
  * @csspart message - The whole turn.
- * @csspart meta - The line under a turn: its time, its state, and its controls.
- * @csspart retry - The control offered on a failed message.
- * @csspart sources - What the turn was drawn from, under it and outside the bubble.
- * @csspart state - What has happened to it, where that is worth saying.
- * @csspart time - When it was said.
+ * @csspart meta - The line under a turn, with its time, state, and controls.
+ * @csspart retry - The retry button on a failed message.
+ * @csspart sources - The turn's sources, under it and outside the bubble.
+ * @csspart state - The text that names the turn's state, when there is one to show.
+ * @csspart time - The turn's time.
  */
 @customElement('helix-headless-chat-message')
 export class HelixHeadlessChatMessage extends HelixElement {
   /**
-   * When it was said, as anything `Date` parses.
+   * The turn's time, in any format `Date` parses.
    */
   @property()
   at = ''
 
   /**
-   * Who said it.
+   * The turn's author.
    *
    * Free text rather than a two-value union, because a conversation is not
    * always two-sided: a transcript with a system turn, a tool call and three
@@ -103,19 +103,19 @@ export class HelixHeadlessChatMessage extends HelixElement {
   locale = ''
 
   /**
-   * Label for the control offered on a failed message.
+   * Label for the retry button on a failed message.
    */
   @property({ attribute: 'retry-label' })
   retryLabel = 'Try again'
 
   /**
-   * What to call each state, for a reader who cannot see it.
+   * The name of each state, read by screen readers.
    */
   @property({ attribute: 'sending-label' })
   sendingLabel = 'Sending'
 
   /**
-   * What has happened to it.
+   * The turn's state.
    *
    * Reflected, because every one of the four is a visual state and a stylesheet
    * has no other way to know. Absent is a settled message with nothing to

@@ -21,7 +21,7 @@ export const initialsOf = (name: string): string => {
 }
 
 /**
- * @summary Represents a person or entity with an image or their initials.
+ * @summary A person or entity, shown as an image or as their initials.
  *
  * @description
  * Shows `src` until it fails to load. Without an image, or after a failure,
@@ -68,8 +68,8 @@ export class HelixHeadlessAvatar extends HelixElement {
   src = ''
 
   /**
-   * Where the image stands: still on its way, arrived, or failed and replaced
-   * by the initials.
+   * The image's state: `loading` while it is on its way, `loaded` once it
+   * arrives, or `error` when it fails and the initials replace it.
    *
    * Read-only to a consumer: it is a report rather than a setting, and the same
    * report `Image` gives, for the same reason. `load` and `error` fire once, so

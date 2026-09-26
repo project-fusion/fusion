@@ -15,13 +15,12 @@ import { styles } from './code-root.css.js'
  * @category typography
  * @documentation https://fusion.dev/helix/components/code
  *
- * @cssproperty --code-background-color - Fill behind the fragment. Defaults to a 6%
- * wash of the ink, which composites the same against a light page and a dark one.
- * @cssproperty --code-foreground-color - The fragment's ink. Defaults to the prose's
- * own, pulled back towards `foreground-muted`.
- * @cssproperty --code-padding - Space either side of the fragment. Defaults to half
- * of `space-2xs`, which is what keeps a bracket beside the chip rather than a space
- * away from it.
+ * @cssproperty --code-background-color - Fill behind the fragment. Defaults to the
+ * foreground color at 6%, which looks the same on a light page and a dark one.
+ * @cssproperty --code-foreground-color - Color of the fragment's text. Defaults to the
+ * foreground color mixed toward `foreground-muted`.
+ * @cssproperty --code-padding - Space either side of the fragment. Defaults to half of
+ * `space-2xs`, so a bracket next to the fragment sits close to it.
  * @cssproperty --code-size - The fragment's size. Defaults to `text-sm`.
  */
 @customElement('helix-code')

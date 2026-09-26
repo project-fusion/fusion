@@ -83,7 +83,7 @@ const OPENING_PATIENCE = 500
 const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software rasterizer|basic render/i
 
 /**
- * @summary A lit, drifting background, drawn from the token layer.
+ * @summary A drifting background of light, drawn in your theme's colors.
  *
  * @description
  * One fragment shader over a full-screen triangle, with the palette read from
@@ -157,7 +157,8 @@ export class HelixAura extends HelixElement {
   gain = 1
 
   /**
-   * What the pointer does, where the shape's own answer is not wanted.
+   * What the pointer does to the field. Set it to override the default for the
+   * `variant`.
    *
    * Absent is `native`, which is each shape answering in the terms it is made
    * of: braid leans, rays are occluded, threads pinch, particles scatter. The
@@ -237,11 +238,11 @@ export class HelixAura extends HelixElement {
   tilt = 14
 
   /**
-   * How much the members of a population differ from one another, `0` a set
-   * that is uniform and `1` the resting amount. Clamped to that range: these
-   * are interpolations, so a larger number extrapolates rather than
-   * exaggerating, and a streak whose length has passed through zero is drawn
-   * as a bar across the whole frame.
+   * How much the members of a population differ from one another, from `0`,
+   * where they are uniform, to `1`, the default amount. Values are clamped to
+   * that range, because they interpolate: a larger number would extrapolate,
+   * and a streak whose length passed through zero would be drawn as a bar
+   * across the whole frame.
    *
    * Read by six of the eleven shapes, the ones made of many similar things,
    * whether those are counted or continuous: `streaks`, whose lanes draw a
@@ -265,7 +266,7 @@ export class HelixAura extends HelixElement {
   variance = 1
 
   /**
-   * Which form the light takes. Absent is `braid`.
+   * The form the light takes. When it is not set, the form is `braid`.
    *
    * Reflected because the fallback gradient selects on it, and given no default
    * for the same reason every axis here has none: a default on a reflected

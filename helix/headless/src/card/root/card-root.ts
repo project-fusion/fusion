@@ -34,7 +34,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-card')
 export class HelixHeadlessCard extends HelixElement {
   /**
-   * Puts the media after the content instead of before it.
+   * Places the media after the content. By default it comes before.
    *
    * **A figure that concludes a card is the same region as one that opens it**,
    * and the only thing that differs is which edge it is flush against. Media is

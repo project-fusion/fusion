@@ -18,11 +18,11 @@ import { styles } from './toast-item.css.js'
  *
  * @cssproperty --toast-border-color - Color of the panel's edge.
  * @cssproperty --toast-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
+ *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless your
+ *   theme sets a border.
  * @cssproperty --toast-item-padding - Space between the message's edge and its contents.
- * @cssproperty --toast-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
- *   floating surface sits over content nobody can predict, so it keeps a lift by default.
+ * @cssproperty --toast-shadow - Shadow under the panel. Follows `--helix-shadow-floating`. A
+ *   floating surface can sit over any content, so it has a shadow by default.
  */
 @customElement('helix-toast-item')
 export class HelixToastItem extends HelixHeadlessToastItem {

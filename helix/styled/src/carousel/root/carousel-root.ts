@@ -25,15 +25,15 @@ import { styles } from './carousel-root.css.js'
  * @aliases Slider, Gallery, Slideshow
  * @documentation https://fusion.dev/helix/components/carousel
  *
- * @cssproperty --carousel-bleed - Room inside the scroller so a slide's own shadow, border or
- * focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches
- * 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more.
+ * @cssproperty --carousel-bleed - Room inside the scroller so it does not clip a slide's
+ * shadow, border, or focus ring. The default leaves room for `--helix-shadow-md`, which
+ * reaches 16px below its box. A slide with `--helix-shadow-lg` reaches 44px and needs more.
  * @cssproperty --carousel-block-size - Height of a vertical track.
  */
 @customElement('helix-carousel')
 export class HelixCarousel extends HelixHeadlessCarousel {
   /**
-   * Where along that side the arrows sit. See `indicatorAlign`.
+   * Where the arrows sit along their side of the slides. See `indicatorAlign`.
    *
    * `overlay` answers it too, and the edge there is the whole slide: the bar is
    * stretched across the picture, so this moves the arrows up and down within
@@ -69,7 +69,7 @@ export class HelixCarousel extends HelixHeadlessCarousel {
   controlsPlacement?: 'start' | 'end' | 'top' | 'bottom' | 'overlay'
 
   /**
-   * Where along that side the dots sit.
+   * Where the dots sit along their side of the slides.
    *
    * The second half of the answer to "where do they go". `indicatorPlacement`
    * says which edge and this says where along it, so the pair spells out the

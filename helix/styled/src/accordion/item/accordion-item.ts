@@ -19,16 +19,16 @@ import { styles } from './accordion-item.css.js'
  * @aliases Collapsible, Expander, Disclosure
  * @documentation https://fusion.dev/helix/components/accordion
  *
- * @slot - The content revealed when open.
- * @slot summary - The always-visible trigger content.
+ * @slot - The content shown when the section is open.
+ * @slot summary - The text of the button that opens and closes the section. Always shown.
  *
  * @csspart chevron - The open and close indicator.
  * @csspart container - The outer wrapper.
- * @csspart content - The revealed region.
- * @csspart content-inner - The clipping box inside the animated region. The inset is on the slot within it, not here: padding on the grid item survives a zero track, which left a shut section with a band of space under it.
- * @csspart trigger - The clickable summary row.
+ * @csspart content - The region that holds the content.
+ * @csspart content-inner - The clipping box inside the animated region. The padding is on the slot inside it, so a closed section leaves no space.
+ * @csspart trigger - The button that opens and closes the section, holding the summary.
  *
- * @cssproperty --accordion-item-padding - Inset of the trigger and content.
+ * @cssproperty --accordion-item-padding - The padding of the trigger and the content.
  */
 @customElement('helix-accordion-item')
 export class HelixAccordionItem extends HelixHeadlessAccordionItem {

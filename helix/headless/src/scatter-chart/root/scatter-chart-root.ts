@@ -84,7 +84,7 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
 }
 
 /**
- * @summary Whether two measures move together, one point per row.
+ * @summary A chart that shows whether two measures move together, with one point per row.
  *
  * @description
  * The chart for a relation rather than a series. The table's first numeric
@@ -127,50 +127,50 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * @aliases Scatter Plot, XY Chart, Correlation Chart, Dot Plot
  * @documentation https://fusion.dev/helix/components/scatter-chart
  *
- * @csspart gridline - One rule across the plot, under `gridlines`.
+ * @csspart gridline - One line across the plot, drawn when `gridlines` is set.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart plane - The plot, both axes and their names, left to right on every page. The grid they are laid out in.
+ * @csspart plane - The grid that holds the plot, both axes, and their names. It runs left to right on every page.
  * @csspart plot - The drawing.
  * @csspart point - One row, as a point.
- * @csspart point-active - A point of the row a pointer is asking about, beside `point`.
- * @csspart summary - How strongly the measures relate, for a reader who cannot see the points.
- * @csspart svg - The drawing surface the rules sit on.
+ * @csspart point-active - A point in the row under the pointer. Set alongside `point`.
+ * @csspart summary - The text that says how strongly the measures relate, for people who cannot see the points.
+ * @csspart svg - The drawing surface the gridlines sit on.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
- * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, so on its top edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, so on its right edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, so on its left edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-top - The point while the bubble is above the reading, so on its bottom edge, beside `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the reading, beside `tooltip`.
+ * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, on its top edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, on its right edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, on its left edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-label - The row's own name inside the tooltip.
- * @csspart tooltip-left - The bubble while it is left of the reading, beside `tooltip`.
+ * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
- * @csspart tooltip-right - The bubble while it is right of the reading, beside `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the reading, beside `tooltip`.
+ * @csspart tooltip-right - The bubble while it is right of the reading. Set alongside `tooltip`.
+ * @csspart tooltip-top - The bubble while it is above the reading. Set alongside `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
- * @csspart x-axis - The levels measured across, under the plot.
- * @csspart x-name - What is measured across.
- * @csspart x-tick - One labeled level across. A part of its own rather than a shared `tick`, because `::part()` cannot tell which axis a tick is on.
- * @csspart y-axis - The levels measured up, beside the plot.
- * @csspart y-name - What is measured up.
- * @csspart y-tick - One labeled level up.
+ * @csspart x-axis - The values along the horizontal axis, under the plot.
+ * @csspart x-name - The name of the horizontal measure.
+ * @csspart x-tick - One labeled value on the horizontal axis. Each axis has its own tick part, because `::part()` cannot tell which axis a tick is on.
+ * @csspart y-axis - The values along the vertical axis, beside the plot.
+ * @csspart y-name - The name of the vertical measure.
+ * @csspart y-tick - One labeled value on the vertical axis.
  *
- * @cssproperty --chart-point-x - Where a point sits across, as a percentage. Written by the component.
- * @cssproperty --chart-point-y - Where a point sits up, as a percentage from the top. Written by the component.
- * @cssproperty --chart-tick - Where a tick sits along its axis, as a percentage. Written by the component.
+ * @cssproperty --chart-point-x - A point's horizontal position, as a percentage. The component writes it.
+ * @cssproperty --chart-point-y - A point's vertical position, as a percentage from the top. The component writes it.
+ * @cssproperty --chart-tick - A tick's position along its axis, as a percentage. The component writes it.
  */
 @customElement('helix-headless-scatter-chart')
 export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
   /**
-   * What to call the strength of the relation in the summary.
+   * The word the summary uses for the strength of the relation.
    */
   @property({ attribute: 'correlation-label' })
   correlationLabel = 'correlation'
 
   /**
-   * Which rules are drawn across the plot, if any.
+   * Which gridlines are drawn across the plot, if any.
    *
    * Both axes are measured, so the values name an axis rather than a role:
    * `x` rules the levels across, `y` the levels up. A bare `gridlines`, or
@@ -181,7 +181,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
   gridlines?: 'both' | 'x' | 'y'
 
   /**
-   * What to call a row in the summary, which counts them.
+   * The word the summary uses for a row when it counts them.
    */
   @property({ attribute: 'points-label' })
   pointsLabel = 'points'

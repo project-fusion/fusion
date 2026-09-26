@@ -28,7 +28,7 @@ import '../../tag/index.js'
 import '../../time-picker/index.js'
 
 /**
- * @summary A time, typed or picked from a list.
+ * @summary A field for a time, typed or picked from a list.
  *
  * @description
  * **The list is `TimePicker`, not a second one written here.** It is worth
@@ -54,67 +54,67 @@ import '../../time-picker/index.js'
  * @aliases TimeField, InputTime
  * @documentation https://fusion.dev/helix/components/time-input
  *
- * @slot feedback - What is wrong with it.
+ * @slot feedback - The message that says what is wrong with the value.
  * @slot hint - Help under the field.
- * @slot trigger - The mark on the field saying a list opens.
+ * @slot trigger - The icon on the field that shows a list opens.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} input - Announced once the value has moved.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the time changes. Cancelable: canceling it stops the change and leaves the decision to you.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the list closes. Cancelable: canceling it keeps the list open and leaves the decision to you.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: canceling it keeps the list closed and leaves the decision to you.
+ * @event {Event} input - Fired after the value changes.
+ * @event {Event} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
  *
  * @csspart control - The text input.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The box holding the text and the trigger.
+ * @csspart feedback - The message that says what is wrong with the value.
+ * @csspart field - The box that holds the text and the trigger.
  * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart label - The question, over the field.
- * @csspart picker - The list inside it.
- * @csspart picker-column - One of them.
- * @csspart picker-column-empty - Shown when a filter has hidden everything.
- * @csspart picker-column-feedback - What is wrong with it.
- * @csspart picker-column-filter-icon - The mark beside that field.
- * @csspart picker-column-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart label - The label above the field.
+ * @csspart picker - The time picker inside the panel.
+ * @csspart picker-column - One column of the picker.
+ * @csspart picker-column-empty - The text shown when the filter hides every option.
+ * @csspart picker-column-feedback - The column's message that says what is wrong with the value.
+ * @csspart picker-column-filter-icon - The icon beside the filter field.
+ * @csspart picker-column-filter-mark - The default icon beside the filter field, shown when none is slotted.
  * @csspart picker-column-hint - Help under the list.
- * @csspart picker-column-items - The list itself.
- * @csspart picker-column-label - The question, over the list.
- * @csspart picker-column-live - The inner column's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart picker-column-loading - Shown while the options are still on their way.
- * @csspart picker-column-search - The region holding the field that narrows the list.
- * @csspart picker-column-search-field - The field itself.
+ * @csspart picker-column-items - The list of options.
+ * @csspart picker-column-label - The label above the list.
+ * @csspart picker-column-live - The inner column's `live` part, the region screen readers announce its empty and loading text from.
+ * @csspart picker-column-loading - The text shown while the options load.
+ * @csspart picker-column-search - The region that holds the filter field.
+ * @csspart picker-column-search-field - The filter field.
  * @csspart picker-columns - The row of columns, in `wheels`.
  * @csspart picker-list - The listbox holding the times, in `list`.
- * @csspart picker-list-empty - Shown when a filter has hidden everything.
- * @csspart picker-list-feedback - What is wrong with it.
- * @csspart picker-list-filter-icon - The mark beside that field.
- * @csspart picker-list-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart picker-list-empty - The text shown when the filter hides every option.
+ * @csspart picker-list-feedback - The inner list's message that says what is wrong with the value.
+ * @csspart picker-list-filter-icon - The icon beside the filter field.
+ * @csspart picker-list-filter-mark - The default icon beside the filter field, shown when none is slotted.
  * @csspart picker-list-hint - Help under the list.
- * @csspart picker-list-items - The list itself.
- * @csspart picker-list-label - The question, over the list.
- * @csspart picker-list-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart picker-list-loading - Shown while the options are still on their way.
- * @csspart picker-list-search - The region holding the field that narrows the list.
- * @csspart picker-list-search-field - The field itself.
- * @csspart picker-option - One time in it. Carries `data-between` inside a range.
- * @csspart picker-option-between - A time inside a chosen range, short of either end, beside `picker-option`.
- * @csspart picker-option-description - The caption under the words, when there is one.
+ * @csspart picker-list-items - The list of options.
+ * @csspart picker-list-label - The label above the list.
+ * @csspart picker-list-live - The inner list's `live` part, the region screen readers announce its empty and loading text from.
+ * @csspart picker-list-loading - The text shown while the options load.
+ * @csspart picker-list-search - The region that holds the filter field.
+ * @csspart picker-list-search-field - The filter field.
+ * @csspart picker-option - One time in the picker. Carries `data-between` inside a range.
+ * @csspart picker-option-between - A time inside a chosen range, between its two ends. Set together with `picker-option`.
+ * @csspart picker-option-description - The caption under the label, when there is one.
  * @csspart picker-option-item - The row.
  * @csspart picker-option-item-active - The row the keyboard is on.
  * @csspart picker-option-item-selected - The row of a chosen time: the one time, or either end of a range.
- * @csspart picker-option-label - The words.
- * @csspart picker-option-text - The words and the caption, as one column.
- * @csspart rest - How many times are held beyond the ones shown. A `<button>` with `expandable`, a `<span>` without it.
+ * @csspart picker-option-label - The option's label.
+ * @csspart picker-option-text - The label and the caption, as one column.
+ * @csspart rest - The count of times held beyond the ones shown. A `<button>` with `expandable`, and a `<span>` without it.
  * @csspart surface - The floating panel.
  * @csspart tags - The row the times sit in.
  * @csspart time - One held time, as a tag, in `multiple`.
  * @csspart time-dismiss - The remove button, when `dismissible`.
- * @csspart time-dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart time-dismiss-mark - The default icon on the remove button, shown when none is slotted.
  * @csspart time-start - The category before the label.
  * @csspart trigger - The control that opens the list.
- * @csspart trigger-icon - The mark on the button that opens the clock.
+ * @csspart trigger-icon - The icon on the button that opens the clock.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the clock is open.
  */
 @customElement('helix-headless-time-input')
@@ -162,7 +162,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   min = '00:00'
 
   /**
-   * How many times can be held at once.
+   * How many times the field holds at once.
    *
    * Absent is one. `range` holds a start and an end, `multiple` holds any
    * number, and both are carried as one comma-separated value, which is what a
@@ -173,13 +173,13 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   mode?: 'multiple' | 'range'
 
   /**
-   * What the field says before a time is in it.
+   * Placeholder text shown before a time is entered.
    */
   @property()
   placeholder = 'HH:mm'
 
   /**
-   * What a reader is told when a range holds more than two times.
+   * The message shown when a range holds more than two times.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
    * so a form in another language speaks it. Absent is the control's own
@@ -189,21 +189,21 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   rangeLengthMessage?: string
 
   /**
-   * What a reader is told when a time is after `max`, with `{max}` filled in
-   * as the field writes it.
+   * The message shown when a time is after `max`, with `{max}` filled in as
+   * the field displays it.
    */
   @property({ attribute: 'range-overflow-message' })
   rangeOverflowMessage?: string
 
   /**
-   * What a reader is told when a time is before `min`, with `{min}` filled
-   * in as the field writes it.
+   * The message shown when a time is before `min`, with `{min}` filled in as
+   * the field displays it.
    */
   @property({ attribute: 'range-underflow-message' })
   rangeUnderflowMessage?: string
 
   /**
-   * What the control removing one time is called, with `{name}` filled in.
+   * The name of the button that removes one time, with `{name}` filled in.
    *
    * **The name goes in**, so a row of them is heard as which one each
    * removes rather than as "Remove" said once per time.
@@ -218,7 +218,8 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   step = 15
 
   /**
-   * Whether the field writes the time out, or holds the value as it is.
+   * Whether the field shows the time in the local style or as the value
+   * itself.
    *
    * `local` is the reader's own convention from `Intl`, which is what a time is
    * for reading; `iso` is `HH:mm`, which is what it is for typing. The field
@@ -229,7 +230,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   timeStyle: 'iso' | 'local' = 'local'
 
   /**
-   * Accessible name for the control that opens the list.
+   * The name of the button that opens the list, read by screen readers.
    */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a time'
@@ -403,7 +404,8 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   }
 
   /**
-   * Whether the panel is one list of times or a column each.
+   * Whether the panel shows one list of times or a column for each part of the
+   * time.
    *
    * `list` offers whole times, which is what a product with slots or opening
    * hours has. `wheels` splits them into an hour, a minute and a meridiem where
@@ -574,7 +576,8 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
      different conversion. Why all four write it out rather than sharing a
      mixin is argued once, on `value-as.ts`. */
   /**
-   * The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
+   * The value as a `Date` on January 1, 1970 UTC, or `null` while there is no
+   * time.
    *
    * The platform's own pair on `<input type="time">`, epoch day included: a time
    * is an offset into a day rather than an instant, and putting it on the epoch

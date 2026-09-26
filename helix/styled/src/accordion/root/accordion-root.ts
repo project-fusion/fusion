@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './accordion-root.css.js'
 
 /**
- * @summary Groups collapsible sections, one open at a time by default.
+ * @summary A group of collapsible sections.
  *
  * @description
  * Items share one rule between neighbors rather than each drawing its own, so
@@ -21,14 +21,15 @@ import { styles } from './accordion-root.css.js'
  *
  * @slot - The accordion's items.
  *
- * @cssproperty --accordion-border-color - Color of the seams, and of each item's frame when outlined.
- * @cssproperty --accordion-gap - Space between items, when outlined. Nothing separates them otherwise: a seam is a shared edge.
- * @cssproperty --accordion-radius - Corner radius of each item, when outlined.
+ * @cssproperty --accordion-border-color - The color of the lines between items, and of each item's border when outlined.
+ * @cssproperty --accordion-gap - The space between items when outlined. Otherwise items share an edge.
+ * @cssproperty --accordion-radius - The corner radius of each item when outlined.
  */
 @customElement('helix-accordion')
 export class HelixAccordion extends HelixHeadlessAccordion {
   /**
-   * How the stack separates itself from the page.
+   * How the items are set off from the page. `plain` draws a line between
+   * items, and `outlined` draws a border around each item.
    *
    * Two of the axis's four values, which is what this surface has meaning for:
    * a stack of items is already told apart by its seams, so a lift would be a

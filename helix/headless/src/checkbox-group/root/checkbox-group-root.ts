@@ -12,7 +12,7 @@ import { property } from 'lit/decorators.js'
 import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
 
 /**
- * @summary Groups related checkboxes, and reports them as one set.
+ * @summary A group of related checkboxes under one label, with one value for the set.
  *
  * @description
  * The host is the group, so `role="group"` sits on it through internals and
@@ -39,19 +39,19 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @documentation https://fusion.dev/helix/components/checkbox-group
  *
  * @slot - The checkboxes.
- * @slot hint - Richer than a string.
- * @slot label - Richer than a string, where the label is more than one.
+ * @slot hint - Help under the checkboxes, for help that needs more than plain text.
+ * @slot label - The group's label, for a label that needs more than plain text.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before any box changes, with the whole set. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - The set of checked boxes changed.
+ * @event {HelixBeforeChangeEvent} helix-before-change - A box is about to change. Carries the whole set that would result. Cancelable: canceling it leaves every box as it was.
+ * @event {Event} input - The set of checked boxes changed.
  *
- * @csspart feedback - What is wrong with it.
- * @csspart hint - Help under the set.
- * @csspart items - The list itself, which is what `orientation` lays out.
- * @csspart label - The group's name, over the set.
+ * @csspart feedback - The message that says what is wrong with the set.
+ * @csspart hint - The help under the checkboxes.
+ * @csspart items - The element that holds the checkboxes, laid out by `orientation`.
+ * @csspart label - The group's label, above the checkboxes.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-checkbox-group')
 export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
@@ -73,7 +73,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     items: () => this.boxes,
   })
 
-  /** The boxes, in light-DOM order. Client only: the server has no tree. */
+  /** The checkboxes in the group, in the order they are written. Browser only. */
   get boxes(): HelixHeadlessCheckbox[] {
     return [...this.children].filter(
       (child): child is HelixHeadlessCheckbox => child instanceof HelixHeadlessCheckbox,

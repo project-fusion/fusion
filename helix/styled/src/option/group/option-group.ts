@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './option-group.css.js'
 
 /**
- * @summary A named run of options inside a listbox.
+ * @summary A labeled group of options inside a listbox.
  *
  * @description
  * The heading is set small and quiet, because it is a divider that happens to

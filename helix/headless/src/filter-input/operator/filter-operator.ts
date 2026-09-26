@@ -33,7 +33,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-filter-operator')
 export class HelixHeadlessFilterOperator extends HelixElement {
   /**
-   * How many values this comparison takes.
+   * How many values the comparison takes.
    *
    * `none` is a comparison that is complete on its own, which is what `is empty`
    * and `is set` are: a chip drawn for one shows no values because there are
@@ -65,8 +65,8 @@ export class HelixHeadlessFilterOperator extends HelixElement {
   arity?: 'many' | 'none' | 'one'
 
   /**
-   * Whether this is the comparison the field is filtered by unless asked
-   * otherwise.
+   * Marks the comparison as the field's usual one, used unless the user picks
+   * another.
    *
    * The chip leaves a default operator unwritten, so the common filter reads as
    * a field and its values and nothing else, and the word only appears once
@@ -76,7 +76,7 @@ export class HelixHeadlessFilterOperator extends HelixElement {
   default = false
 
   /**
-   * What a reader is shown, in the chip and in the menu that changes it.
+   * The comparison's text, shown on the chip and in the menu that changes it.
    *
    * Words rather than symbols, and the reason is that a set has more than one
    * negation: `!=` cannot tell "is none of" from "is not all of", and both are
@@ -87,7 +87,7 @@ export class HelixHeadlessFilterOperator extends HelixElement {
   label = ''
 
   /**
-   * What the consumer's own model calls this comparison.
+   * The comparison's name in your data model.
    *
    * Never shown. It is what arrives in the filter this element helps build, so
    * a consumer matches on it rather than on the words a reader sees, and

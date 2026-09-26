@@ -36,7 +36,7 @@ export interface AreaStack {
 }
 
 /**
- * @summary How a total is made up over time, as bands stacked on one another.
+ * @summary A chart that shows how a total is made up over time, as bands stacked on one another.
  *
  * @description
  * The chart for a composition: every column of the table is a part, the parts
@@ -106,7 +106,7 @@ export interface AreaStack {
  * @csspart line - The top edge of one part's band.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
- * @csspart summary - The total and the shares at the latest reading, for a reader who cannot see the bands.
+ * @csspart summary - The total and each part's share at the latest reading, written as a sentence for screen readers.
  * @csspart svg - The drawing surface the bands sit on.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -159,7 +159,8 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
   gridlines?: 'both' | 'category' | 'value'
 
   /**
-   * Whether each reading is drawn as a hundred percent.
+   * Draws each reading as a hundred percent, so each band shows its share of
+   * the total.
    *
    * Absent stacks the amounts, so the top edge is the total. Set, every reading
    * fills the height and the bands are shares of it.
@@ -168,7 +169,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
   share = false
 
   /**
-   * What to call the sum of the parts, in the tooltip and the summary.
+   * The name for the sum of the parts, shown in the tooltip and the summary.
    */
   @property({ attribute: 'total-label' })
   totalLabel = 'Total'

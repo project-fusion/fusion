@@ -22,7 +22,7 @@ import { property, state } from 'lit/decorators.js'
 let showing: HelixHeadlessMegamenu | undefined
 
 /**
- * @summary A section of a navigation that opens a panel of destinations.
+ * @summary A section of a navigation with a trigger that opens a panel of links.
  *
  * @description
  * **A disclosure, not a menu, and that is the whole design.** `role="menu"` and
@@ -46,25 +46,26 @@ let showing: HelixHeadlessMegamenu | undefined
  * @aliases Mega menu, Flyout, Nav panel
  * @documentation https://fusion.dev/helix/components/megamenu
  *
- * @slot - The panel's contents: the consumer's own lists and headings.
- * @slot trigger - The control that opens it. Falls back to a button named by `label`.
+ * @slot - The panel's contents, such as your own lists of links and their headings.
+ * @slot trigger - The control that opens the panel. When it is empty, a button named by `label` is shown.
  *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeCloseEvent} helix-before-close - The panel is about to close. Cancelable.
+ * @event {HelixBeforeOpenEvent} helix-before-open - The panel is about to open. Cancelable.
+ * @event {Event} toggle - The panel opened or closed. Carries `newState` and `oldState`.
  *
- * @csspart surface - The floating panel, which is what opens.
- * @csspart trigger - The default trigger, where none was slotted.
+ * @csspart surface - The floating panel that opens.
+ * @csspart trigger - The default trigger button, shown when the `trigger` slot is empty.
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  *
- * @cssstate narrow - While the page is under `band-below`, so the panel is a band whether or not one was asked for.
- * @cssstate open - While the panel is open, which is when the trigger reads as current.
+ * @cssstate narrow - The page is narrower than `band-below`, so the panel is shown as a band whatever its variant.
+ * @cssstate open - The panel is open, and the trigger is shown as current.
  */
 @customElement('helix-headless-megamenu')
 export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   /**
-   * The width, in pixels, under which a card becomes a band. Zero never does.
+   * The page width, in pixels, below which a card panel is shown as a band. At
+   * zero, it never is.
    *
    * A card is a panel hung off one word, and there is no room to hang anything
    * off a word on a phone: the columns do not shrink past
@@ -92,13 +93,14 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   bandBelow = 640
 
   /**
-   * The section's name, which names the default trigger and the panel.
+   * The section's name, used for the default trigger and the panel.
    */
   @property()
   label = ''
 
   /**
-   * Whether hovering the trigger opens the panel, or only a press does.
+   * Whether hovering over the trigger opens the panel (`hover`), or only a press
+   * does (`click`).
    *
    * A press always works. This says whether a mouse also opens it by resting on
    * the trigger, and it is the default because that is what a navigation bar

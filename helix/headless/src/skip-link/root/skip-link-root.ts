@@ -3,8 +3,8 @@ import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary The first stop on a page, which moves the reader past everything
- * repeated on every page.
+ * @summary A link at the start of a page that moves keyboard focus past the
+ * header to the main content.
  *
  * @description
  * A keyboard reader arriving on a page tabs through the whole header before
@@ -39,9 +39,9 @@ import { property } from 'lit/decorators.js'
  * @aliases Skip navigation, Skip to content
  * @documentation https://fusion.dev/helix/components/skip-link
  *
- * @slot - The link's words. Falls back to `label`.
+ * @slot - The link's text. Defaults to `label`.
  *
- * @csspart link - The anchor, which is what takes focus.
+ * @csspart link - The anchor. It takes the focus.
  */
 @customElement('helix-headless-skip-link')
 export class HelixHeadlessSkipLink extends HelixElement {
@@ -52,7 +52,7 @@ export class HelixHeadlessSkipLink extends HelixElement {
   }
 
   /**
-   * Where the reader is sent, as an in-page fragment.
+   * The in-page fragment the link moves focus to, such as `#main`.
    *
    * `#main` by default, because that is the id the content region almost always
    * has; a page whose content is somewhere else says so. Anything that is not a
@@ -63,7 +63,7 @@ export class HelixHeadlessSkipLink extends HelixElement {
   href = '#main'
 
   /**
-   * The link's words, for the common case of plain text.
+   * The link's text, when it is plain text.
    *
    * The fallback of the default slot, so slotted content replaces it rather than
    * appearing beside it.
