@@ -108,4 +108,20 @@ describe('map marker', () => {
     // What the connector measures with: the button, which is laid out even while its name is faded.
     expect(typeof (depot as unknown as { extent(): number }).extent()).toBe('number')
   })
+
+  test('a point holding an icon says so, so the styled tier can make room for it', async () => {
+    const host = (await mount(
+      `<helix-headless-map label="Walk">
+        <helix-headless-map-marker label="UT Tower" lat="1" lng="1"><span slot="icon">A</span></helix-headless-map-marker>
+        <helix-headless-map-marker label="Texas Capitol" lat="1" lng="2"></helix-headless-map-marker>
+      </helix-headless-map>`,
+    )) as Frame
+    await host.updateComplete
+    const [lettered, bare] = markers(host) as [Marker, Marker]
+    await lettered.updateComplete
+    await bare.updateComplete
+    expect([hasState(lettered, 'icon'), hasState(bare, 'icon')]).toEqual([true, false])
+    // Seen and not read: the name is still the place's.
+    expect(part(lettered, 'marker')?.textContent?.replace(/\s+/g, ' ').trim()).toBe('UT Tower')
+  })
 })

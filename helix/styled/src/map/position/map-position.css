@@ -182,7 +182,7 @@
    a ring, the edge alone, for a position that is only a guess. A position
    with a heading is its arrow whatever its shape. */
 :host([shape="rounded"]) [part="dot"] {
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--helix-radii-md);
 }
 
 :host([shape="square"]) [part="dot"] {

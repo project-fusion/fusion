@@ -105,6 +105,11 @@ export interface MapLayerSpec {
   casing?: string | undefined
   /** `#hex`, `rgb()` or `rgba()`, which every renderer takes. */
   color: string
+  /**
+   * Drawn quieter: the part of a route already traveled, which the connector
+   * cuts from the rest at the route's \`progress\`.
+   */
+  faded?: boolean | undefined
   /** Stable for as long as the element is in the frame, for a renderer that keys its layers. */
   id: string
   kind: 'area' | 'route'
@@ -155,6 +160,37 @@ interface Layer extends HTMLElement {
   label?: string | undefined
   layerKind: 'area' | 'route'
   points?: MapPlace[] | undefined
+  progress?: number | undefined
+}
+
+/**
+ * A line cut at a fraction of its length, into the part behind and the part
+ * ahead, the cut point on both. Measured in degrees with longitude narrowed by
+ * the latitude, which is a flat map's idea of length and near enough for where
+ * a line turns quieter.
+ */
+const cut = (points: MapPlace[], fraction: number): [MapPlace[], MapPlace[]] => {
+  const span = (a: MapPlace, b: MapPlace): number =>
+    Math.hypot(b.lat - a.lat, (b.lng - a.lng) * Math.cos((a.lat * Math.PI) / 180))
+  const legs = points.slice(1).map((point, at) => span(points[at] as MapPlace, point))
+  let left = legs.reduce((sum, leg) => sum + leg, 0) * fraction
+  for (let at = 0; at < legs.length; at++) {
+    const leg = legs[at] as number
+    if (left <= leg) {
+      const [from, to] = [points[at] as MapPlace, points[at + 1] as MapPlace]
+      const part = leg > 0 ? left / leg : 0
+      const middle = {
+        lat: from.lat + (to.lat - from.lat) * part,
+        lng: from.lng + (to.lng - from.lng) * part,
+      }
+      return [
+        [...points.slice(0, at + 1), middle],
+        [middle, ...points.slice(at + 1)],
+      ]
+    }
+    left -= leg
+  }
+  return [points, []]
 }
 
 const isLayer = (node: unknown): node is Layer =>
@@ -322,14 +358,14 @@ export const connectMap = (
     [...frame.children]
       .filter(isLayer)
       .filter((layer) => (layer.points?.length ?? 0) >= (layer.layerKind === 'area' ? 3 : 2))
-      .map((layer) => {
+      .flatMap((layer): MapLayerSpec[] => {
         const color = settledColor(layer)
         /* **The edge is the element's border color**, which the styled tier
            sets to the surface and a page can set to anything; where it is the
            route's own color, which is what an unstyled element's border is,
            there is no casing to draw. */
         const edge = layer.layerKind === 'route' ? settledColor(layer, 'border-top-color') : color
-        return {
+        const spec: MapLayerSpec = {
           ...(edge && edge !== color ? { casing: edge } : {}),
           color,
           id: idOf(layer),
@@ -337,6 +373,21 @@ export const connectMap = (
           label: layer.label ?? '',
           points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
         }
+        /* **A route under way is two lines**, the part behind drawn quieter,
+           cut at its progress: none of it behind draws it whole, and all of
+           it behind draws it all quieter. */
+        const progress = layer.layerKind === 'route' ? layer.progress : undefined
+        if (typeof progress !== 'number' || progress <= 0) {
+          return [spec]
+        }
+        if (progress >= 1) {
+          return [{ ...spec, faded: true }]
+        }
+        const [behind, ahead] = cut(spec.points, progress)
+        return [
+          { ...spec, faded: true, id: `${spec.id}-behind`, points: behind },
+          { ...spec, points: ahead },
+        ]
       })
   const drawn = driver.layers?.(readLayers)
   const place = (): void => {
@@ -407,7 +458,7 @@ export const connectMap = (
   layers.observe(frame, { childList: true })
   const coordinates = new MutationObserver(changed)
   coordinates.observe(frame, {
-    attributeFilter: ['accuracy', 'heading', 'lat', 'lng', 'points', 'tone'],
+    attributeFilter: ['accuracy', 'heading', 'lat', 'lng', 'points', 'progress', 'tone'],
     attributes: true,
     subtree: true,
   })

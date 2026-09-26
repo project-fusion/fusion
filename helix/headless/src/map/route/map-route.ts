@@ -71,6 +71,14 @@ export class HelixHeadlessMapRoute extends HelixElement {
   @property({ converter: pointsConverter, reflect: true })
   points?: MapPoint[]
 
+  /**
+   * How much of it is behind, from 0 to 1 of its length: the part traveled
+   * is drawn quieter than the part ahead, the way a navigation app draws a
+   * journey under way. Reflected, so the connector hears it move.
+   */
+  @property({ reflect: true, type: Number })
+  progress?: number
+
   protected override render(): typeof nothing {
     return nothing
   }

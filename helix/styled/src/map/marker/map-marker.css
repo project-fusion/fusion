@@ -7,6 +7,14 @@
    mirror image. */
 :host {
   --_map-marker-color: var(--map-marker-color, var(--helix-color-primary));
+  /* **The point's measures, which the axes below move together**: its size,
+     larger where it holds an icon; how far its center stands above the place,
+     which a pin raises so its tip is what stands there; and its edge and its
+     lift, which separation decides. */
+  --_map-marker-edge: var(--helix-color-surface);
+  --_map-marker-lift: 0px;
+  --_map-marker-shadow: var(--helix-shadow-sm);
+  --_map-marker-size: var(--map-marker-size, 0.875rem);
   /* **Declared here and written by the connector**, onto the host, which is
      what makes them readable below: the connector lives in another package
      and writes the place's screen position every time the view moves. Zero is
@@ -43,7 +51,7 @@
   outline: none;
   position: absolute;
   top: 0;
-  transform: translate(calc(var(--map-marker-size, 0.875rem) / -2), -50%);
+  transform: translate(calc(var(--_map-marker-size) / -2), calc(-50% - var(--_map-marker-lift)));
 }
 
 /* **The point stands on the place, at whichever end of the button it is.**
@@ -53,11 +61,14 @@
    right-to-left page stood every place a name's width off its point. */
 :host(:dir(rtl)) [part="marker"],
 :host(:state(start)) [part="marker"] {
-  transform: translate(calc(-100% + var(--map-marker-size, 0.875rem) / 2), -50%);
+  transform: translate(
+    calc(-100% + var(--_map-marker-size) / 2),
+    calc(-50% - var(--_map-marker-lift))
+  );
 }
 
 :host(:dir(rtl):state(start)) [part="marker"] {
-  transform: translate(calc(var(--map-marker-size, 0.875rem) / -2), -50%);
+  transform: translate(calc(var(--_map-marker-size) / -2), calc(-50% - var(--_map-marker-lift)));
 }
 
 /* The name before the point, where the connector found no room after it. */
@@ -66,23 +77,39 @@
 }
 
 [part="point"] {
+  align-items: center;
   background: var(--_map-marker-color);
-  block-size: var(--map-marker-size, 0.875rem);
-  border: var(--helix-border-thick) solid var(--helix-color-surface);
+  block-size: var(--_map-marker-size);
+  border: var(--helix-border-thick) solid var(--_map-marker-edge);
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-sm);
+  box-shadow: var(--_map-marker-shadow);
   box-sizing: border-box;
+  color: var(--helix-color-foreground-on-accent);
+  display: grid;
   flex: none;
-  inline-size: var(--map-marker-size, 0.875rem);
+  font-family: var(--helix-font-sans);
+  font-size: calc(var(--_map-marker-size) * 0.5);
+  font-weight: var(--helix-weight-semibold);
+  inline-size: var(--_map-marker-size);
+  isolation: isolate;
+  justify-items: center;
+  line-height: 1;
+  position: relative;
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* **A point holding something is larger**, a letter or a number needing
+   room a bare dot does not. */
+:host(:state(icon)) {
+  --_map-marker-size: var(--map-marker-size, 1.375rem);
 }
 
 /* **Shape: circle unless said otherwise**, so a page can tell kinds of place
    apart by more than their color, which a reader who cannot tell the colors
-   apart needs: rounded or square corners, a diamond turned a quarter, or a
-   ring, the place's color as an edge around nothing. */
+   apart needs: rounded or square corners, a diamond turned a quarter, a ring,
+   the place's color as an edge around the surface, or a pin. */
 :host([shape="rounded"]) [part="point"] {
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--helix-radii-md);
 }
 
 :host([shape="square"]) [part="point"] {
@@ -95,33 +122,70 @@
   scale: 0.85;
 }
 
+/* What a diamond holds stays upright. */
+:host([shape="diamond"]) ::slotted(*) {
+  rotate: -45deg;
+}
+
 :host([shape="ring"]) [part="point"] {
   background: var(--helix-color-surface);
   border-color: var(--_map-marker-color);
-  border-width: calc(var(--map-marker-size, 0.875rem) * 0.28);
+  border-width: calc(var(--_map-marker-size) * 0.18);
+  color: var(--_map-marker-color);
+}
+
+/* **A pin, where a place is where the journey ends.** A teardrop behind
+   what the point holds, its tip straight down, and the marker raised until
+   the tip, rather than the point's middle, stands on the place: the rest of
+   the pin is above what it marks, the way a pin pushed into a map is. The
+   teardrop is a square with one sharp corner turned an eighth, so its tip is
+   the corner's diagonal below the middle. */
+:host([shape="pin"]) {
+  --_map-marker-lift: calc(var(--_map-marker-size) * 0.72);
+  --_map-marker-size: var(--map-marker-size, 1.625rem);
+}
+
+:host([shape="pin"]) [part="point"] {
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+:host([shape="pin"]) [part="point"]::before {
+  background: var(--_map-marker-color);
+  border: var(--helix-border-thick) solid var(--_map-marker-edge);
+  border-radius: var(--helix-radii-full) var(--helix-radii-full) var(--helix-radii-full)
+    var(--helix-radii-none);
+  box-shadow: var(--_map-marker-shadow);
+  box-sizing: border-box;
+  content: "";
+  inset: 0;
+  position: absolute;
+  rotate: -45deg;
+  z-index: var(--helix-layer-beneath);
 }
 
 /* **Separation: how the point stands off the map.** Absent is an edge in the
    surface and a little lift. `outlined` is the edge alone, `elevated` the
    edge lifted, as an elevated card is, `filled` a wash of its own color
-   around it with no edge, and `plain` the bare point. */
-:host([separation="outlined"]) [part="point"] {
-  box-shadow: none;
+   around it with no edge, and `plain` the bare point. A pin takes the same. */
+:host([separation="outlined"]) {
+  --_map-marker-shadow: none;
 }
 
-:host([separation="elevated"]) [part="point"] {
-  box-shadow: var(--helix-shadow-md);
+:host([separation="elevated"]) {
+  --_map-marker-shadow: var(--helix-shadow-md);
 }
 
-:host([separation="filled"]) [part="point"] {
-  border-color: transparent;
-  box-shadow: 0 0 0 calc(var(--map-marker-size, 0.875rem) * 0.3)
+:host([separation="filled"]) {
+  --_map-marker-edge: transparent;
+  --_map-marker-shadow: 0 0 0 calc(var(--_map-marker-size) * 0.3)
     color-mix(in oklab, var(--_map-marker-color) 22%, transparent);
 }
 
-:host([separation="plain"]) [part="point"] {
-  border-color: transparent;
-  box-shadow: none;
+:host([separation="plain"]) {
+  --_map-marker-edge: transparent;
+  --_map-marker-shadow: none;
 }
 
 /* The name beside the point, shown while the marker is pointed at or focused.
