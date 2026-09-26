@@ -51,6 +51,15 @@ const contrastOf = (frame: Element): number | undefined => {
   return Number.isFinite(value) ? value : undefined
 }
 
+/** A route's or an area's points, read from the attribute as the markup wrote it. */
+const pointsOf = (layer: Element): { lat: number; lng: number }[] =>
+  (layer.getAttribute('points') ?? '')
+    .trim()
+    .split(/\s+/)
+    .map((pair) => pair.split(',').map(Number))
+    .filter((pair) => pair.length === 2 && pair.every(Number.isFinite))
+    .map(([lat, lng]) => ({ lat: lat as number, lng: lng as number }))
+
 /** Where a marker stands, read from its attributes as the markup wrote them. */
 const placeOf = (marker: Element): { lat: number; lng: number } | null => {
   const lat = Number(marker.getAttribute('lat'))
@@ -67,9 +76,12 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   if (!box) {
     return () => undefined
   }
-  const places = [...frame.querySelectorAll('helix-map-marker')]
-    .map(placeOf)
-    .filter((place) => place !== null)
+  /* Every place the map holds, a route's start among them, so a lane from a
+     port off the edge of the markers' own bounds is framed whole. */
+  const places = [
+    ...[...frame.querySelectorAll('helix-map-marker')].map(placeOf),
+    ...[...frame.querySelectorAll('helix-map-route, helix-map-area')].flatMap(pointsOf),
+  ].filter((place) => place !== null)
   const panel = root.querySelector('[data-preview-map-clear]')
   const bounds = places.length > 0 ? boundsOf(places) : undefined
   const language = document.documentElement.lang || 'en'
