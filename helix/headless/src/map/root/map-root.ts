@@ -12,9 +12,16 @@ import {
   type ViewportPanDetail,
   type ViewportZoomDetail,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
+
+/** What the frame reads off a route or an area, which is all its list needs. */
+interface MapLayer {
+  description?: string | undefined
+  isMapLayer: true
+  label?: string | undefined
+}
 
 /**
  * What `ViewportControlsPlacement` is called for a map.
@@ -72,6 +79,8 @@ export type MapControlsPlacement = ViewportControlsPlacement
  * @csspart footer - The strip below the map, for what a consumer slots there.
  * @csspart fullscreen - The button that fills the screen.
  * @csspart header - The strip above the map, for what a consumer slots there.
+ * @csspart layer - One route or area in the list, its name and what it is about.
+ * @csspart layers - The list of routes and areas, for a reader who cannot see what the renderer drew.
  * @csspart pan-down - The button that moves the map down.
  * @csspart pan-end - The button that moves the map the way the text ends, which is right on an English page.
  * @csspart pan-start - The button that moves the map the way the text starts, which is left on an English page.
@@ -102,6 +111,30 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   @property()
   label = ''
+
+  /**
+   * What the list of routes and areas is called, which a screen reader says
+   * before it reads them.
+   */
+  @property({ attribute: 'layers-label' })
+  layersLabel = 'Routes and areas'
+
+  /**
+   * The routes and areas among the frame's children, in the order they are
+   * written, which is the order the list names them in.
+   */
+  private get layers(): MapLayer[] {
+    return this.knownChildren.filter(
+      (child): child is MapLayer & Element => (child as Partial<MapLayer>).isMapLayer === true,
+    )
+  }
+
+  /**
+   * A route or area renamed, or its description changed, which the list says
+   * and a slot change does not report.
+   */
+  private readonly renamed =
+    typeof MutationObserver === 'function' ? new MutationObserver(() => this.requestUpdate()) : null
 
   /**
    * The markers among the frame's children, in the order they are written,
@@ -198,6 +231,11 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    this.renamed?.observe(this, {
+      attributeFilter: ['description', 'label'],
+      attributes: true,
+      subtree: true,
+    })
     this.addEventListener('click', this.handleClick)
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('keydown', this.handleMarkerKeydown)
@@ -205,6 +243,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.renamed?.disconnect()
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('keydown', this.handleMarkerKeydown)
@@ -254,6 +293,33 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   }
 
   /**
+   * The routes and areas, named, for a reader who cannot see the map.
+   *
+   * **What the renderer draws is a picture to a screen reader**, so a route
+   * from the depot or a delivery zone is not on the page at all until this
+   * says it is. A list rather than a live region, because the reader should
+   * find it when they come to the map rather than be told about it as it
+   * changes. Nothing where there are none, so a map with only markers says
+   * no more than it did.
+   *
+   * **Written once the frame knows its children**, which is in the browser:
+   * the server renders the frame before it has any, and a route is only on
+   * the page once a renderer has drawn it, which is later still.
+   */
+  protected renderLayers(): TemplateResult | typeof nothing {
+    const layers = this.layers
+    if (layers.length === 0) {
+      return nothing
+    }
+    return html`<ul part="layers" aria-label=${this.layersLabel}>
+      ${layers.map(
+        (layer) =>
+          html`<li part="layer">${layer.label ?? ''}${layer.description ? `, ${layer.description}` : ''}</li>`,
+      )}
+    </ul>`
+  }
+
+  /**
    * The frame, with each region in a box of its own.
    *
    * **The boxes are load-bearing rather than tidiness.** A `<slot>` is
@@ -283,6 +349,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       <div part="viewport">
         <slot @slotchange=${this.handleSlotChange}></slot>
       </div>
+      ${this.renderLayers()}
       ${this.renderControls()}
       <div part="footer">
         <slot name="footer"></slot>

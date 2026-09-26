@@ -7,6 +7,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { creditParts } from '../credit/credit.js'
 import { type MapMotion, motionOf } from '../motion/motion.js'
+import { settledColor } from '../style/map-colors.js'
 
 /**
  * What a renderer has to answer for the frame to drive it, and nothing that is
@@ -30,6 +31,21 @@ export interface MapDriver {
    * the tab order while connected so the frame's region is the one stop.
    */
   focusTarget?(): HTMLElement | null
+  /**
+   * Frames a stretch of the world, its two corners in degrees, inset by
+   * `padding` pixels from the view's edges, over the page's motion or at once.
+   * What `connection.fit()` asks, to show every place the frame holds.
+   */
+  fit?(bounds: MapBounds, padding: MapPadding, motion: MapMotion | null): void
+  /**
+   * Draws the frame's routes and areas as the renderer's own layers, under its
+   * place names where it has them. `read` is the whole set as it stands, its
+   * colors settled, and a driver asks it every time it draws, including after
+   * the renderer's style was replaced and took them with it. The connector
+   * calls `update` when one is added, taken away or changed; `stop` takes
+   * them off.
+   */
+  layers?(read: () => MapLayerSpec[]): { stop(): void; update(): void }
   /**
    * Hears the view move, every frame it moves, and returns what stops it. What
    * lets markers keep up with the map; without it they are placed once.
@@ -67,6 +83,31 @@ export interface MapPlace {
   lng: number
 }
 
+/** A stretch of the world by its south-west and north-east corners. */
+export interface MapBounds {
+  northEast: MapPlace
+  southWest: MapPlace
+}
+
+/** How far in from each edge of the view, in CSS pixels, or one inset for all four. */
+export type MapPadding = number | { bottom: number; left: number; right: number; top: number }
+
+/**
+ * A route or an area as a driver draws it, whatever renderer it drives: its
+ * kind, the places it passes through or around, and its color settled to sRGB.
+ */
+export interface MapLayerSpec {
+  /** `#hex`, `rgb()` or `rgba()`, which every renderer takes. */
+  color: string
+  /** Stable for as long as the element is in the frame, for a renderer that keys its layers. */
+  id: string
+  kind: 'area' | 'route'
+  /** What the frame's list calls it. */
+  label: string
+  /** In order: along a route, and around an area without repeating the first. */
+  points: MapPlace[]
+}
+
 /** What the connector reads off a marker, which is all it needs of one. */
 interface Marker extends HTMLElement {
   /**
@@ -84,6 +125,30 @@ interface Marker extends HTMLElement {
 
 const isMarker = (node: unknown): node is Marker =>
   (node as Partial<Marker> | null)?.isMapMarker === true
+
+/** What the connector reads off a route or an area. */
+interface Layer extends HTMLElement {
+  isMapLayer: true
+  label?: string | undefined
+  layerKind: 'area' | 'route'
+  points?: MapPlace[] | undefined
+}
+
+const isLayer = (node: unknown): node is Layer =>
+  (node as Partial<Layer> | null)?.isMapLayer === true
+
+/** Each layer's id, kept as long as the element is. */
+const ids = new WeakMap<Element, string>()
+let minted = 0
+const idOf = (element: Element): string => {
+  let id = ids.get(element)
+  if (!id) {
+    minted += 1
+    id = `helix-layer-${minted}`
+    ids.set(element, id)
+  }
+  return id
+}
 
 /** How a connection is made, where the defaults are not wanted. */
 export interface ConnectOptions {
@@ -104,6 +169,13 @@ export interface ConnectOptions {
 export interface MapConnection {
   /** Stops answering the frame and puts back everything connecting changed. */
   disconnect(): void
+  /**
+   * Frames every place the frame holds, its markers and every point of its
+   * routes and areas, inset by `padding`, 48 pixels by default, at the page's
+   * pace for a trip. Nothing where the frame holds no place or the driver
+   * cannot frame.
+   */
+  fit(options?: { padding?: MapPadding | undefined }): void
 }
 
 /** Where the connector writes the renderer's credit, so it can find its own. */
@@ -219,6 +291,21 @@ export const connectMap = (
      canvas places its cards. A marker off the edge is still placed and the
      viewport clips it, so one scrolled back into view is already there. */
   const markers = (): Marker[] => [...frame.children].filter(isMarker)
+  /* **A route needs two points and an area three**, and one with fewer is a
+     layer still being written rather than a shape to draw: MapLibre refuses a
+     one-point line outright. */
+  const readLayers = (): MapLayerSpec[] =>
+    [...frame.children]
+      .filter(isLayer)
+      .filter((layer) => (layer.points?.length ?? 0) >= (layer.layerKind === 'area' ? 3 : 2))
+      .map((layer) => ({
+        color: settledColor(layer),
+        id: idOf(layer),
+        kind: layer.layerKind,
+        label: layer.label ?? '',
+        points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
+      }))
+  const drawn = driver.layers?.(readLayers)
   const place = (): void => {
     if (!driver.project) {
       return
@@ -253,10 +340,20 @@ export const connectMap = (
      and going, and every descendant for a coordinate, which only a marker
      has. `childList` over the whole subtree would hear the renderer rebuild
      its own controls inside the map and place every marker for it. */
-  const layers = new MutationObserver(place)
+  /* **What is drawn follows what is written**: a layer added, taken away or
+     moved, or given a new tone, which is its color. */
+  const changed = (): void => {
+    place()
+    drawn?.update()
+  }
+  const layers = new MutationObserver(changed)
   layers.observe(frame, { childList: true })
-  const coordinates = new MutationObserver(place)
-  coordinates.observe(frame, { attributeFilter: ['lat', 'lng'], attributes: true, subtree: true })
+  const coordinates = new MutationObserver(changed)
+  coordinates.observe(frame, {
+    attributeFilter: ['lat', 'lng', 'points', 'tone'],
+    attributes: true,
+    subtree: true,
+  })
   place()
 
   /* **A marker the keyboard reaches is a marker in view.** The walk goes in
@@ -281,6 +378,7 @@ export const connectMap = (
 
   return {
     disconnect(): void {
+      drawn?.stop()
       stopViewing?.()
       layers.disconnect()
       coordinates.disconnect()
@@ -302,6 +400,30 @@ export const connectMap = (
       }
       listening?.stop()
       credit?.remove()
+    },
+    fit(options = {}): void {
+      if (!driver.fit) {
+        return
+      }
+      const places: MapPlace[] = [
+        ...markers()
+          .filter((marker) => typeof marker.lat === 'number' && typeof marker.lng === 'number')
+          .map((marker) => ({ lat: marker.lat as number, lng: marker.lng as number })),
+        ...readLayers().flatMap((layer) => layer.points),
+      ]
+      if (places.length === 0) {
+        return
+      }
+      const lats = places.map((place) => place.lat)
+      const lngs = places.map((place) => place.lng)
+      driver.fit(
+        {
+          northEast: { lat: Math.max(...lats), lng: Math.max(...lngs) },
+          southWest: { lat: Math.min(...lats), lng: Math.min(...lngs) },
+        },
+        options.padding ?? 48,
+        motionOf(frame, 'travel'),
+      )
     },
   }
 }

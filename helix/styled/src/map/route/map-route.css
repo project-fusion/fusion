@@ -1,0 +1,27 @@
+/* **Nothing drawn, one color settled.** The renderer draws the route, and what
+   it draws it in is read off this element by the connector, so the tone is a
+   color here and a paint there. The brand where no tone says otherwise, as a
+   marker's point is. */
+:host {
+  color: var(--map-route-color, var(--helix-color-primary));
+  display: none;
+}
+
+:host([tone="accent"]) {
+  color: var(--helix-color-accent);
+}
+:host([tone="danger"]) {
+  color: var(--helix-color-danger);
+}
+:host([tone="info"]) {
+  color: var(--helix-color-info);
+}
+:host([tone="neutral"]) {
+  color: var(--helix-color-foreground-muted);
+}
+:host([tone="success"]) {
+  color: var(--helix-color-success);
+}
+:host([tone="warning"]) {
+  color: var(--helix-color-warning);
+}
