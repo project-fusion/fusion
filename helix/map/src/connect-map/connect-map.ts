@@ -1,4 +1,5 @@
 import {
+  HelixActivateEvent,
   HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,
@@ -9,6 +10,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { creditParts } from '../credit/credit.js'
 import { type MapMotion, motionOf } from '../motion/motion.js'
+import { type MapPoints, pointsFrom } from '../points/points.js'
 import { settledColor } from '../style/map-colors.js'
 import { watchTheme } from '../theme/watch-theme.js'
 
@@ -54,7 +56,7 @@ export interface MapDriver {
    * calls `update` when one is added, taken away or changed; `stop` takes
    * them off.
    */
-  layers?(read: () => MapLayerSpec[]): { stop(): void; update(): void }
+  layers?(read: () => MapLayerSpec[], events?: MapLayerEvents): { stop(): void; update(): void }
   /**
    * Hears the view move, every frame it moves, and returns what stops it. What
    * lets markers keep up with the map; without it they are placed once.
@@ -86,6 +88,14 @@ export interface MapDriver {
   zoomBy(direction: 1 | -1, motion: MapMotion | null): void
 }
 
+/** What a driver drawing layers tells the connector, and asks of it. */
+export interface MapLayerEvents {
+  /** The page's motion for a trip, for a cluster of points a press zooms in to. */
+  motion(): MapMotion | null
+  /** A reader pressed a point: which points layer, by its spec's `id`, and which of its points. */
+  press(id: string, index: number): void
+}
+
 /** A place, in degrees. */
 export interface MapPlace {
   lat: number
@@ -108,10 +118,13 @@ export type MapPadding = number | { bottom: number; left: number; right: number;
 export interface MapLayerSpec {
   /**
    * A route's edge, drawn wider under it so it reads as laid over the roads
-   * rather than as one of them, where the roads are drawn in the same brand.
-   * Absent where there is none to draw.
+   * rather than as one of them, where the roads are drawn in the same brand;
+   * the ring round each point of a points layer. Absent where there is none
+   * to draw.
    */
   casing?: string | undefined
+  /** Whether a points layer's points are gathered into their counts where they would meet. */
+  cluster?: boolean | undefined
   /** `#hex`, `rgb()` or `rgba()`, which every renderer takes. */
   color: string
   /**
@@ -121,7 +134,9 @@ export interface MapLayerSpec {
   faded?: boolean | undefined
   /** Stable for as long as the element is in the frame, for a renderer that keys its layers. */
   id: string
-  kind: 'area' | 'route'
+  /** What a points layer writes its counts in. */
+  ink?: string | undefined
+  kind: 'area' | 'points' | 'route'
   /** What the frame's list calls it. */
   label: string
   /**
@@ -129,7 +144,11 @@ export interface MapLayerSpec {
    * off the network the rest is routed on, a place set back from its road.
    */
   pattern?: 'dotted' | undefined
-  /** In order: along a route, and around an area without repeating the first. */
+  /**
+   * In order: along a route, and around an area without repeating the first;
+   * a points layer's every point, the same array for as long as its data is
+   * the same, so a driver can tell a redraw that moved none of them.
+   */
   points: MapPlace[]
 }
 
@@ -221,10 +240,18 @@ const METERS_PER_DEGREE = 111_320
 
 /** What the connector reads off a route or an area. */
 interface Layer extends HTMLElement {
+  /** A points layer's: whether its points gather into counts. */
+  cluster?: boolean | undefined
+  /** A points layer's data as a script set it. */
+  data?: unknown
   isMapLayer: true
   label?: string | undefined
-  layerKind: 'area' | 'route'
+  layerKind: 'area' | 'points' | 'route'
+  /** A points layer's: the property each point is named by. */
+  nameKey?: string | undefined
   points?: MapPlace[] | undefined
+  /** A points layer's GeoJSON file, fetched where `data` is not set. */
+  src?: string | undefined
   progress?: number | undefined
   /** The styled route's line, which is dotted or solid. */
   variant?: string | undefined
@@ -479,46 +506,124 @@ export const connectMap = (
   /* **A route needs two points and an area three**, and one with fewer is a
      layer still being written rather than a shape to draw: MapLibre refuses a
      one-point line outright. */
+  /* **A points layer's data, fetched once per file and read once per set.**
+     Its file is asked for the first time it is drawn and drawn again when it
+     arrives; its places are read from the data once, and the same array
+     handed on until the data or the name key changes, so a redraw for a
+     color is not thousands of points parsed again and sent to a worker. */
+  const fetched = new WeakMap<Layer, { data?: unknown; src: string }>()
+  const read = new WeakMap<Layer, { data: unknown; nameKey: string; points: MapPoints }>()
+  const dataOf = (layer: Layer): unknown => {
+    if (layer.data !== undefined || !layer.src) {
+      return layer.data
+    }
+    const had = fetched.get(layer)
+    if (had?.src === layer.src) {
+      return had.data
+    }
+    const asked: { data?: unknown; src: string } = { src: layer.src }
+    fetched.set(layer, asked)
+    fetch(layer.src)
+      .then((response) =>
+        response.ok
+          ? response.json()
+          : Promise.reject(new Error(`${asked.src}: ${response.status}`)),
+      )
+      .then((data: unknown) => {
+        if (fetched.get(layer) === asked && live) {
+          asked.data = data
+          soon({ draw: true })
+        }
+      })
+      .catch((error: unknown) => console.error(error))
+    return undefined
+  }
+  const pointsOf = (layer: Layer): MapPoints => {
+    const data = dataOf(layer)
+    const nameKey = layer.nameKey ?? 'name'
+    const had = read.get(layer)
+    if (had && had.data === data && had.nameKey === nameKey) {
+      return had.points
+    }
+    const points = pointsFrom(data, nameKey)
+    read.set(layer, { data, nameKey, points })
+    return points
+  }
+  /* Each points layer by its spec's id, for a press to find its element. */
+  const pointLayers = new Map<string, Layer>()
   const readLayers = (): MapLayerSpec[] =>
-    [...frame.children]
-      .filter(isLayer)
-      .filter((layer) => (layer.points?.length ?? 0) >= (layer.layerKind === 'area' ? 3 : 2))
-      .flatMap((layer): MapLayerSpec[] => {
-        const color = settledColor(layer)
-        /* **The edge is the element's border color**, which the styled tier
+    [...frame.children].filter(isLayer).flatMap((layer): MapLayerSpec[] => {
+      const color = settledColor(layer)
+      /* **Points are drawn from their data**, ringed in the border's color
+           and counted in the outline's. */
+      if (layer.layerKind === 'points') {
+        const { points } = pointsOf(layer)
+        if (points.length === 0) {
+          return []
+        }
+        const id = idOf(layer)
+        pointLayers.set(id, layer)
+        return [
+          {
+            casing: settledColor(layer, 'border-top-color'),
+            cluster: layer.cluster === true,
+            color,
+            id,
+            ink: settledColor(layer, 'outline-color'),
+            kind: 'points',
+            label: layer.label ?? '',
+            points,
+          },
+        ]
+      }
+      if ((layer.points?.length ?? 0) < (layer.layerKind === 'area' ? 3 : 2)) {
+        return []
+      }
+      /* **The edge is the element's border color**, which the styled tier
            sets to the surface and a page can set to anything; where it is the
            route's own color, which is what an unstyled element's border is,
            there is no casing to draw. */
-        const edge = layer.layerKind === 'route' ? settledColor(layer, 'border-top-color') : color
-        /* A dotted leg takes no casing: an edge under a line of dots is a
+      const edge = layer.layerKind === 'route' ? settledColor(layer, 'border-top-color') : color
+      /* A dotted leg takes no casing: an edge under a line of dots is a
            dashed band, not a line of dots. */
-        const dotted = layer.layerKind === 'route' && layer.variant === 'dotted'
-        const spec: MapLayerSpec = {
-          ...(edge && edge !== color && !dotted ? { casing: edge } : {}),
-          color,
-          id: idOf(layer),
-          kind: layer.layerKind,
-          label: layer.label ?? '',
-          ...(dotted ? { pattern: 'dotted' as const } : {}),
-          points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
-        }
-        /* **A route under way is two lines**, the part behind drawn quieter,
+      const dotted = layer.layerKind === 'route' && layer.variant === 'dotted'
+      const spec: MapLayerSpec = {
+        ...(edge && edge !== color && !dotted ? { casing: edge } : {}),
+        color,
+        id: idOf(layer),
+        kind: layer.layerKind,
+        label: layer.label ?? '',
+        ...(dotted ? { pattern: 'dotted' as const } : {}),
+        points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
+      }
+      /* **A route under way is two lines**, the part behind drawn quieter,
            cut at its progress: none of it behind draws it whole, and all of
            it behind draws it all quieter. */
-        const progress = layer.layerKind === 'route' ? layer.progress : undefined
-        if (typeof progress !== 'number' || progress <= 0) {
-          return [spec]
-        }
-        if (progress >= 1) {
-          return [{ ...spec, faded: true }]
-        }
-        const [behind, ahead] = cut(spec.points, progress)
-        return [
-          { ...spec, faded: true, id: `${spec.id}-behind`, points: behind },
-          { ...spec, points: ahead },
-        ]
-      })
-  const drawn = driver.layers?.(readLayers)
+      const progress = layer.layerKind === 'route' ? layer.progress : undefined
+      if (typeof progress !== 'number' || progress <= 0) {
+        return [spec]
+      }
+      if (progress >= 1) {
+        return [{ ...spec, faded: true }]
+      }
+      const [behind, ahead] = cut(spec.points, progress)
+      return [
+        { ...spec, faded: true, id: `${spec.id}-behind`, points: behind },
+        { ...spec, points: ahead },
+      ]
+    })
+  /* **A point pressed is a place pressed**, reported as a marker's press is,
+     from the points layer it belongs to, with its id or its name. */
+  const drawn = driver.layers?.(readLayers, {
+    motion: () => motionOf(frame, 'travel'),
+    press: (id, index) => {
+      const layer = pointLayers.get(id)
+      const value = layer ? pointsOf(layer).values[index] : undefined
+      if (layer && value !== undefined) {
+        layer.dispatchEvent(new HelixActivateEvent({ value }))
+      }
+    },
+  })
   const place = (): void => {
     if (!driver.project) {
       return
@@ -897,7 +1002,11 @@ export const connectMap = (
         ...[...markers(), ...positions()]
           .filter((one) => typeof one.lat === 'number' && typeof one.lng === 'number')
           .map((one) => ({ lat: one.lat as number, lng: one.lng as number })),
-        ...[...frame.children].filter(isLayer).flatMap((layer) => layer.points ?? []),
+        ...[...frame.children]
+          .filter(isLayer)
+          .flatMap((layer) =>
+            layer.layerKind === 'points' ? pointsOf(layer).points : (layer.points ?? []),
+          ),
       ]
       if (places.length === 0) {
         return

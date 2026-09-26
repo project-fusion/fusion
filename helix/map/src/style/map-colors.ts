@@ -65,7 +65,7 @@ const toSrgb = (resolved: string): string => {
  */
 export const settledColor = (
   element: Element,
-  property: 'border-top-color' | 'color' = 'color',
+  property: 'border-top-color' | 'color' | 'outline-color' = 'color',
 ): string => toSrgb(getComputedStyle(element).getPropertyValue(property))
 
 /**
