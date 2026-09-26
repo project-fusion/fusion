@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './megamenu-root.css.js'
 
 /**
- * @summary A section of a navigation that opens a panel of destinations.
+ * @summary A section of a navigation with a trigger that opens a panel of links.
  *
  * @description
  * Presentation only: the trigger, and the panel it opens as a grid of columns.
@@ -16,17 +16,17 @@ import { styles } from './megamenu-root.css.js'
  * @aliases Mega menu, Flyout, Nav panel
  * @documentation https://fusion.dev/helix/components/megamenu
  *
- * @cssproperty --megamenu-backdrop - A filter behind the panel, which is `none` until one is
- *   asked for: this family carries no `material`, so the pair is two hooks rather than a word.
- * @cssproperty --megamenu-background-color - The panel's own fill.
- * @cssproperty --megamenu-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
- * @cssproperty --megamenu-column-size - The narrowest a column goes before the grid wraps.
- * @cssproperty --megamenu-full-size - How wide the band's contents may get, centered in it.
- * @cssproperty --megamenu-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
- *   floating surface sits over content nobody can predict, so it keeps a lift by default.
- * @cssproperty --megamenu-size - How wide the panel may get.
+ * @cssproperty --megamenu-backdrop - The filter behind the panel, `none` by default. This family
+ *   has no `material` property, so this and `--megamenu-background-color` set the panel's material.
+ * @cssproperty --megamenu-background-color - The panel's fill.
+ * @cssproperty --megamenu-border-width - The width of the panel's edge. Follows
+ *   `--helix-border-floating`, which is `0` unless a theme changes it, so the panel stands out
+ *   by its shadow.
+ * @cssproperty --megamenu-column-size - The minimum width of a column before the grid wraps.
+ * @cssproperty --megamenu-full-size - The maximum width of the band's contents, which are centered in it.
+ * @cssproperty --megamenu-shadow - The shadow under the panel. Follows `--helix-shadow-floating`,
+ *   so the panel has a shadow by default, because it sits over content you cannot predict.
+ * @cssproperty --megamenu-size - The maximum width of the panel.
  */
 @customElement('helix-megamenu')
 export class HelixMegamenu extends HelixHeadlessMegamenu {

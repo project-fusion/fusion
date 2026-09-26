@@ -8,7 +8,7 @@ import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary Says that a region has nothing in it, and what to do about it.
+ * @summary A message that a region has nothing in it, and the next step to take.
  *
  * @description
  * An empty region with no explanation is indistinguishable from one that failed
@@ -33,12 +33,12 @@ import { property } from 'lit/decorators.js'
  * @aliases Placeholder, NoResults, Blank
  * @documentation https://fusion.dev/helix/components/empty
  *
- * @slot - Why, and what to do about it.
- * @slot actions - The way out.
- * @slot heading - What is missing.
- * @slot icon - A mark above the heading.
+ * @slot - The message: why the region is empty, and what to do about it.
+ * @slot actions - The action that would put something in the region.
+ * @slot heading - The heading, which names what is missing.
+ * @slot icon - An icon above the heading.
  *
- * @csspart live - The heading and the message again, in a region a screen reader hears when the view appears. Visually hidden in the styled tier.
+ * @csspart live - A copy of the heading and the message, in a live region that screen readers announce when the view appears. Visually hidden in the styled tier.
  */
 @customElement('helix-headless-empty')
 export class HelixHeadlessEmpty extends HelixElement {

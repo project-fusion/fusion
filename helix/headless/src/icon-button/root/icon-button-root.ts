@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessButton } from '../../button/root/button-root.js'
 
 /**
- * @summary A button whose content is an icon, and which must be named.
+ * @summary A button whose content is an icon, named by its `label`.
  *
  * @description
  * Everything a button does, with one thing added and it is the reason this is

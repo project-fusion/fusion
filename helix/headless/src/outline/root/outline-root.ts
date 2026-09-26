@@ -9,7 +9,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary Links to the headings on this page, marking the one being read.
+ * @summary Links to the headings on the page, with the section in view marked.
  *
  * @description
  * A table of contents, named for the job. It sits beside `Navigation`, which is
@@ -32,9 +32,9 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The links, as anchors with fragment hrefs.
  *
- * @event {HelixActivateEvent} helix-activate - The section being read has changed, carrying its id as the value. An announcement: it is read off where the page is scrolled to, so there is no decision here to take.
+ * @event {HelixActivateEvent} helix-activate - Fired when the section in view changes, with its id as the value. It reports the scroll position and cannot be prevented.
  *
- * @csspart indicator - The mark that travels to the section being read.
+ * @csspart indicator - The mark that moves to the section in view.
  * @csspart nav - The navigation landmark.
  */
 @customElement('helix-headless-outline')
@@ -48,7 +48,7 @@ export class HelixHeadlessOutline extends HelixElement {
   })
 
   /**
-   * How a click on one of these links travels to its section.
+   * How the page scrolls to a section when its link is clicked.
    *
    * The platform's own vocabulary, because this is the platform's own option:
    * `auto` defers to whatever `scroll-behavior` the page has set on its scroll
@@ -72,14 +72,15 @@ export class HelixHeadlessOutline extends HelixElement {
   behavior: ScrollBehavior = 'auto'
 
   /**
-   * Accessible name for the navigation.
+   * The navigation's name, read by screen readers.
    */
   @property()
   label = 'On this page'
 
   /**
-   * How far below the top of what scrolls a heading counts as reached, in
-   * pixels: the window, or the panel the sections scroll in.
+   * How far below the top of the scroll container a heading counts as reached,
+   * in pixels. The scroll container is the window or the panel the sections
+   * scroll in.
    *
    * The reading line. A page with a sticky masthead sets this to its height, or
    * a little more: without it the current section changes as a heading slides
@@ -89,7 +90,7 @@ export class HelixHeadlessOutline extends HelixElement {
   offset = 0
 
   /**
-   * The id of the section being read, or empty before anything is measured.
+   * The id of the section in view, or empty before anything is measured.
    *
    * Read-only, and a getter rather than a property for that reason: it is
    * derived from where the page is scrolled to, so a consumer setting it would

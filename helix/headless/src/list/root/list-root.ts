@@ -3,7 +3,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary A set of rows, read as a set.
+ * @summary A set of rows, announced as a list.
  *
  * @description
  * `role="list"` on the host, so the rows are counted and announced as "1 of 7"
@@ -21,7 +21,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-list')
 export class HelixHeadlessList extends HelixElement {
   /**
-   * What kind of list this is, which is a fact about the content.
+   * The kind of list, which follows from the content.
    *
    * On the headless tier because it is meaning rather than decoration, the same
    * argument `severity` makes on `Callout`. A numbered list is numbered because
@@ -46,13 +46,13 @@ export class HelixHeadlessList extends HelixElement {
   kind?: 'default' | 'description' | 'ordered' | 'unordered'
 
   /**
-   * Accessible name for the set.
+   * The list's name, read by screen readers.
    */
   @property()
   label = ''
 
   /**
-   * Which markers an ordered list draws, in `<ol type>`'s own five values.
+   * The markers an ordered list draws. It takes the five values of `<ol type>`.
    *
    * Reflected, because this is one of the things a stylesheet selects on, each
    * value mapping to a `list-style-type`. The platform's spellings rather than

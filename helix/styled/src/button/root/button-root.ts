@@ -29,11 +29,11 @@ import { styles } from './button-root.css.js'
  * @csspart button - The inner control.
  *
  * @cssproperty --button-background-color - Fill behind the button, in every state.
- * @cssproperty --button-background-color-hover - Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover.
+ * @cssproperty --button-background-color-hover - Fill behind the button under the pointer. Without it, `--button-background-color` also applies on hover.
  * @cssproperty --button-foreground-color - Label and icon color.
- * @cssproperty --button-gap - Space between the label and whatever flanks it.
- * @cssproperty --button-inline-size - A width floor. Inherits, so a section can set it once for every button under it.
- * @cssproperty --button-padding-inline - Inline padding, for a container whose rhythm is not the control default.
+ * @cssproperty --button-gap - Space between the label and the content on either side of it.
+ * @cssproperty --button-inline-size - Minimum width. It inherits, so you can set it once on a section for every button inside it.
+ * @cssproperty --button-padding-inline - Inline padding, for a container with spacing of its own.
  * @cssproperty --button-radius - Corner radius of the control.
  * @cssproperty --button-radius-end - Trailing corners, which a group flattens.
  * @cssproperty --button-radius-end-end - The bottom trailing corner, for a group stacking down.
@@ -41,12 +41,12 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-radius-start - Leading corners, which a group flattens.
  * @cssproperty --button-radius-start-end - The top trailing corner, for a group stacking down.
  * @cssproperty --button-radius-start-start - The top leading corner, for a group stacking down.
- * @cssproperty --button-size - Height of the control, for a container whose row is not one of the density steps.
+ * @cssproperty --button-size - Height of the control, for a row height outside the density steps.
  */
 @customElement('helix-button')
 export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {
   /**
-   * How much of the space available to it the button takes.
+   * How much of the available width the button takes.
    *
    * - `auto` is the default and is never written: the button is as wide as its
    *   label, which is what a control in a toolbar or beside a field should be.

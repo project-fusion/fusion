@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './chat-message.css.js'
 
 /**
- * @summary One turn in a conversation, and what has happened to it.
+ * @summary One turn in a conversation, with its state, such as sending or failed.
  *
  * @description
  * **`author="me"` is the one piece of paint that says whose turn it is**, and it
@@ -21,20 +21,20 @@ import { styles } from './chat-message.css.js'
  * @category feedback
  * @documentation https://fusion.dev/helix/components/chat
  *
- * @slot - What was said.
- * @slot actions - What can be done with it.
- * @slot avatar - Who said it.
- * @slot indicator - The wait before the first token, in place of the three dots.
+ * @slot - The turn's content.
+ * @slot actions - Controls for the turn.
+ * @slot avatar - The author's avatar.
+ * @slot indicator - The indicator shown before the first token arrives. Replaces the three dots.
  *
- * @csspart content - What was said.
- * @csspart indicator - The three dots, when nothing is slotted over them.
+ * @csspart content - The turn's content.
+ * @csspart indicator - The three dots, shown when nothing is in the `indicator` slot.
  * @csspart meta - The time and the state together.
  *
- * @cssproperty --chat-indicator-background-color - Ground behind a slotted waiting indicator, which is a chip so the mark and its word read as one thing.
+ * @cssproperty --chat-indicator-background-color - Fill behind a slotted indicator, drawn as a chip so its icon and its text read as one unit.
  * @cssproperty --chat-message-background-color - Fill behind a turn.
- * @cssproperty --chat-message-background-color-me - Fill behind the reader's own turns.
- * @cssproperty --chat-message-color - Ink in a turn.
- * @cssproperty --chat-message-measure - How wide a turn may get before it wraps.
+ * @cssproperty --chat-message-background-color-me - Fill behind turns by `me`.
+ * @cssproperty --chat-message-color - Text color in a turn.
+ * @cssproperty --chat-message-measure - Maximum width of a turn before its text wraps.
  */
 @customElement('helix-chat-message')
 export class HelixChatMessage extends HelixHeadlessChatMessage {
@@ -43,7 +43,8 @@ export class HelixChatMessage extends HelixHeadlessChatMessage {
   static override styles: CSSResultGroup = styles
 
   /**
-   * Where the turn's surface ends.
+   * How the turn is set apart. `filled` draws a bubble, and `plain` draws the
+   * turn as text on the transcript.
    *
    * **A bubble is one answer and not the only one.** Two people messaging read
    * as two columns of bubbles; an assistant answering does not, the reply being

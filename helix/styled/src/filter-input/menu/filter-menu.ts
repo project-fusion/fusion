@@ -6,7 +6,7 @@ import '../../divider/index.js'
 import '../../menu/index.js'
 
 /**
- * @summary The control that builds a filter: pick a field, tick its values.
+ * @summary A menu for building a filter by picking a field and checking its values.
  *
  * @description
  * Everything drawn here is drawn by something else: the trigger is the
@@ -23,7 +23,7 @@ import '../../menu/index.js'
  * @aliases FacetPicker, FilterBuilder
  * @documentation https://fusion.dev/helix/components/filter-input
  *
- * @event {HelixFacetEvent} helix-facet - Fired when a field's values change. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixFacetEvent} helix-facet - Fired when a field's values change. Cancelable: call `preventDefault()` to keep the previous values.
  */
 @customElement('helix-filter-menu')
 export class HelixFilterMenu extends HelixHeadlessFilterMenu {

@@ -12,7 +12,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary Several lines of text a reader types into.
+ * @summary A multi-line text field.
  *
  * @description
  * A real `<textarea>`, so the caret, the selection, spellcheck, the resize
@@ -36,17 +36,17 @@ import { property } from 'lit/decorators.js'
  * @aliases Multiline, TextArea
  * @documentation https://fusion.dev/helix/components/textarea
  *
- * @event {Event} change - Relayed from the textarea once the reader has finished.
+ * @event {Event} change - Sent from the textarea when the user finishes an edit.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} input - Fired after the value changes.
  *
  * @csspart control - The textarea itself.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The box holding the control.
+ * @csspart feedback - The message that says what is wrong.
+ * @csspart field - The box that holds the textarea.
  * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart label - The question, over the field.
+ * @csspart label - The label above the field.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-textarea')
 export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -63,7 +63,8 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   protected override readonly announcesInput = true
 
   /**
-   * What the browser may autofill here, as one of the platform's own tokens.
+   * What the browser can autofill in the field, as a standard `autocomplete`
+   * token.
    *
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
@@ -72,13 +73,14 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   autocomplete = ''
 
   /**
-   * Whether the box follows its own content rather than scrolling.
+   * Grows the box to fit its content, so it does not scroll.
    */
   @property({ attribute: 'auto-grow', reflect: true, type: Boolean })
   autoGrow = false
 
   /**
-   * How many characters wide the box is, where the layout is not deciding.
+   * How many characters wide the box is, when the layout does not set its
+   * width.
    *
    * Optional and absent by default, which is the reflected-property rule: a
    * `<textarea>` left alone is 20 columns wide and a styled one is whatever its
@@ -90,7 +92,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   cols?: number
 
   /**
-   * The name a second entry carries, holding which way the text runs.
+   * The name of a second form entry that submits the direction of the text.
    *
    * **Submitted through `setFormValue`, because the inner control's own
    * `dirname` cannot reach the form.** This host is form-associated and reports
@@ -103,13 +105,13 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   dirName = ''
 
   /**
-   * Most characters the value may have.
+   * The most characters the value can have.
    */
   @property({ attribute: 'maxlength', type: Number })
   maxLength?: number
 
   /**
-   * Fewest characters the value may have.
+   * The fewest characters the value can have.
    *
    * Forwarded to the real `<textarea>` rather than checked here, which is what
    * makes the message the browser's and therefore the reader's own language.
@@ -120,7 +122,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   minLength?: number
 
   /**
-   * Shown while the field is empty.
+   * Text shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
    */
@@ -128,7 +130,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   placeholder = ''
 
   /**
-   * Whether the field refuses input while still submitting its value.
+   * Blocks typing in the field. The value is still submitted with the form.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
@@ -241,7 +243,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   }
 
   /**
-   * The caret and the selection, under the platform's own names.
+   * The direction of the selection, as a native textarea reports it.
    *
    * **The whole reason this renders a real `<textarea>` is the caret**, and the
    * control is inside this shadow root, so `querySelector` does not find it and
@@ -289,8 +291,8 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   }
 
   /**
-   * Selects a range, which is the one operation the three accessors above
-   * cannot express between them.
+   * Selects a range of text, which the three selection properties cannot do
+   * between them.
    *
    * Setting `selectionStart` past the current `selectionEnd` drags the end
    * along, so the two writes a consumer would make in sequence do not compose
@@ -306,12 +308,12 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     return this.value.length
   }
 
-  /** What kind of control this is, which for a textarea is always the one word. */
+  /** The control's type, which is always `textarea`. */
   get type(): string {
     return 'textarea'
   }
 
-  /** Puts the caret in the field, the way a label pointing at one would. */
+  /** Puts the caret in the field, as a label pointing at it would. */
   override focus(options?: FocusOptions): void {
     this.control?.focus(options)
   }

@@ -6,7 +6,7 @@ import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles } from './legend-root.css.js'
 
 /**
- * @summary The names a chart draws, each beside the color it is drawn in.
+ * @summary A list of the series in a chart, each name beside the color it is drawn in.
  *
  * @description
  * A row that wraps, because a legend sits under a chart as wide as the chart
@@ -27,10 +27,10 @@ import { styles } from './legend-root.css.js'
  * @aliases Key, Series Key
  * @documentation https://fusion.dev/helix/components/legend
  *
- * @cssproperty --legend-direction - `row`, which wraps, or `column`.
- * @cssproperty --legend-gap - Space between entries.
- * @cssproperty --legend-swatch-size - Size of the color patch.
- * @cssproperty --legend-swatch-stroke - Width of the edge an `outlined` or
+ * @cssproperty --legend-direction - The direction the entries run: `row`, which wraps, or `column`.
+ * @cssproperty --legend-gap - The space between entries.
+ * @cssproperty --legend-swatch-size - The size of the color swatch.
+ * @cssproperty --legend-swatch-stroke - The width of the edge an `outlined` or
  *   `subtle` swatch is drawn with.
  */
 @customElement('helix-legend')
@@ -38,7 +38,7 @@ export class HelixLegend extends HelixHeadlessLegend {
   static override styles: CSSResultGroup = [seriesStyles, styles]
 
   /**
-   * How much ink the swatches claim.
+   * How the swatches are drawn: `outlined`, `subtle`, or `solid`.
    *
    * **The same axis as the chart's, with the same values, because a legend that
    * does not match its chart is worse than no legend.** A key whose swatches are
@@ -59,7 +59,7 @@ export class HelixLegend extends HelixHeadlessLegend {
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
   /**
-   * Which entries are glass rather than solid, by name.
+   * The names of the entries whose swatches are drawn as glass.
    *
    * Matched as `outlined` is.
    */
@@ -67,7 +67,7 @@ export class HelixLegend extends HelixHeadlessLegend {
   glass?: string
 
   /**
-   * What the swatches are made of.
+   * The material of the swatches: `glass` or `frosted`. Unset is opaque.
    *
    * `glass` thins whatever emphasis drew, the way it does on a column, so a
    * legend beside a glass chart is in the same substance as the chart. Scaled by
@@ -90,7 +90,7 @@ export class HelixLegend extends HelixHeadlessLegend {
   material?: 'frosted' | 'glass'
 
   /**
-   * Which entries are drawn as an outline rather than a fill, by name.
+   * The names of the entries whose swatches are drawn as an outline.
    *
    * Space or comma separated and matched against the names this legend is
    * showing, which are the same names the chart matches its own `outlined`
@@ -101,7 +101,7 @@ export class HelixLegend extends HelixHeadlessLegend {
   outlined?: string
 
   /**
-   * Where the legend sits and which way its entries run.
+   * Sets which way the entries run, to suit where you place the legend.
    *
    * Absent is a wrapping row, which is what sits under a chart. `start` and
    * `end` stack the entries in a column, for a legend beside one.
@@ -121,7 +121,7 @@ export class HelixLegend extends HelixHeadlessLegend {
   placement?: 'end' | 'start'
 
   /**
-   * Which entries are drawn as a wash of their color, by name.
+   * The names of the entries whose swatches are drawn as a wash of their color.
    *
    * Matched as `outlined` is.
    */

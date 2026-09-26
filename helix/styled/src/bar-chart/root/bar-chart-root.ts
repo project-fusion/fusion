@@ -8,7 +8,7 @@ import { styles } from './bar-chart-root.css.js'
 import '../../tooltip/index.js'
 
 /**
- * @summary Categories as columns, read from a table.
+ * @summary A chart that draws a table's categories as columns.
  *
  * @description
  * The columns take the series palette in order, so a chart of one is series one
@@ -23,21 +23,21 @@ import '../../tooltip/index.js'
  * @aliases Column Chart, Categorical Chart
  * @documentation https://fusion.dev/helix/components/bar-chart
  *
- * @cssproperty --bar-chart-band-color - The slot the pointer is resting in.
+ * @cssproperty --bar-chart-band-color - Fill of the category band under the pointer.
  * @cssproperty --bar-chart-bar-radius - Corner radius at the far end of a column.
  * @cssproperty --bar-chart-bar-stroke - Width of the edge an `outlined` or `subtle`
  *   column is drawn with.
  * @cssproperty --bar-chart-block-size - Height of the drawing.
  * @cssproperty --bar-chart-gap - Space between the drawing and its labels.
- * @cssproperty --bar-chart-gridline-color - One rule across the plot, under `gridlines`.
- * @cssproperty --bar-chart-line-color - A `lines` series, overriding its series color.
- * @cssproperty --bar-chart-line-width - Thickness of a `lines` series, over `--chart-stroke`.
- * @cssproperty --chart-stroke - Thickness of a `lines` series, one name across this family, Line Chart and Area Chart's top edge, since the three read one shared rule. `--bar-chart-line-width` overrides it here.
+ * @cssproperty --bar-chart-gridline-color - Color of the gridlines drawn by `gridlines`.
+ * @cssproperty --bar-chart-line-color - Color of a `lines` series. Overrides its series color.
+ * @cssproperty --bar-chart-line-width - Thickness of a `lines` series. Overrides `--chart-stroke`.
+ * @cssproperty --chart-stroke - Thickness of a `lines` series. Bar Chart, Line Chart, and the top edge of Area Chart share this property. `--bar-chart-line-width` overrides it here.
  */
 @customElement('helix-bar-chart')
 export class HelixBarChart extends HelixHeadlessBarChart {
   /**
-   * **The styled tier, so the tooltip this renders is the styled one.**
+   * **The styled tier, so the chart renders the styled tooltip.**
    *
    * `tag()` builds a child's tag name from this prefix, and the base declares
    * `helix-headless-`. Without this override the chart puts a
@@ -49,7 +49,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   static override tier = 'helix-'
 
   /**
-   * How much ink the columns claim.
+   * How strongly the columns are drawn.
    *
    * The chart's treatment, which every series takes unless `outlined` or
    * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
@@ -73,7 +73,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
   /**
-   * Which series are glass rather than solid, by name.
+   * The names of the series drawn in glass.
    *
    * Matched the way `outlined` is, against the column headings the table gives.
    *
@@ -88,7 +88,8 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   glass?: string
 
   /**
-   * What the columns are made of.
+   * The material the columns are drawn in. Leave it unset for solid columns, or
+   * set `glass` or `frosted`.
    *
    * **A third axis on the chart, not on the bar.** A bar is a mark inside a
    * drawing and nobody writes markup for one; the chart is what a consumer
@@ -128,7 +129,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   material?: 'frosted' | 'glass'
 
   /**
-   * Which series are drawn as an outline rather than a fill, by name.
+   * The names of the series drawn as an outline.
    *
    * Separated by whitespace or commas and matched against the column headings
    * the table gives, the way `lines` and `secondary` are, so a chart says
@@ -153,7 +154,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   outlined?: string
 
   /**
-   * Which series are drawn as a wash of their color, by name.
+   * The names of the series drawn as a wash of their color.
    *
    * Matched as `outlined` is.
    */

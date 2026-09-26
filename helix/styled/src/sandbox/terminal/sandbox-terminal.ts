@@ -14,7 +14,7 @@ interface Entry extends ConsoleDetail {
 const LIMIT = 200
 
 /**
- * @summary Shows what the previewed example wrote to the console.
+ * @summary A panel that shows what the previewed example wrote to the console.
  *
  * @description
  * Fed by the sandbox, which hears `helix-console` from the preview and hands it
@@ -35,10 +35,10 @@ const LIMIT = 200
  * @aliases Console, Output
  * @documentation https://fusion.dev/helix/components/sandbox
  *
- * @csspart count - How many times a repeated line arrived.
+ * @csspart count - How many times a repeated line was written.
  * @csspart empty - Shown while nothing has been written.
  * @csspart entry - One line.
- * @csspart level - The level a line came in at.
+ * @csspart level - The console level a line was written at.
  * @csspart log - The scrolling region.
  * @csspart message - The text of a line.
  *
@@ -47,13 +47,13 @@ const LIMIT = 200
 @customElement('helix-sandbox-terminal')
 export class HelixSandboxTerminal extends HelixElement {
   /**
-   * What to show before anything has been written.
+   * Text shown before anything has been written.
    */
   @property({ attribute: 'empty-label' })
   emptyLabel = 'Nothing written to the console yet.'
 
   /**
-   * Accessible name for the log.
+   * The log's name, read by screen readers.
    */
   @property()
   label = 'Console output'

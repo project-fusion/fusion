@@ -8,7 +8,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './listbox-root.css.js'
 
 /**
- * @summary A list of options, one or several of which are the answer.
+ * @summary A list of options, from which you choose one or several.
  *
  * @description
  * A framed, scrolling list with the field's three parts around it. The frame is
@@ -25,9 +25,9 @@ import { styles } from './listbox-root.css.js'
  * @aliases Options, Select list
  * @documentation https://fusion.dev/helix/components/listbox
  *
- * @cssproperty --listbox-background-color - The panel's fill. `transparent` where the list is already inside one.
- * @cssproperty --listbox-border - The panel's border, as a shorthand. `none` where the list is already inside one.
- * @cssproperty --listbox-max-block-size - How tall it gets before it scrolls.
+ * @cssproperty --listbox-background-color - The panel's fill. Set it to `transparent` when the list is already inside a panel.
+ * @cssproperty --listbox-border - The panel's border, as a shorthand. Set it to `none` when the list is already inside a panel.
+ * @cssproperty --listbox-max-block-size - Maximum height of the list before it scrolls.
  */
 @customElement('helix-listbox')
 export class HelixListbox extends HelixHeadlessListbox {

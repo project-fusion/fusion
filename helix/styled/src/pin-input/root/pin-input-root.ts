@@ -6,7 +6,7 @@ import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.c
 import { styles } from './pin-input-root.css.js'
 
 /**
- * @summary A short code, one character to a box.
+ * @summary A field for a short code, with one box for each character.
  *
  * @description
  * Square boxes at the control height with real space between them, which is the
@@ -30,7 +30,7 @@ import { styles } from './pin-input-root.css.js'
  * @csspart cell - One box.
  * @csspart field - The row of boxes.
  *
- * @cssproperty --pin-input-gap - Space between one box and the next.
+ * @cssproperty --pin-input-gap - The space between one box and the next.
  */
 @customElement('helix-pin-input')
 export class HelixPinInput extends HelixHeadlessPinInput {

@@ -46,7 +46,7 @@ interface EyeDropperConstructor {
 }
 
 /**
- * @summary Picks a color, from a square and two ramps.
+ * @summary A color picker made of a square and two ramps.
  *
  * @description
  * **The picker itself, with no field around it.** Color Input is this element
@@ -70,49 +70,48 @@ interface EyeDropperConstructor {
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://fusion.dev/helix/components/color-picker
  *
- * @slot eyedropper-icon - The glyph on the screen-sampling control, usually a dropper.
+ * @slot eyedropper-icon - The icon on the eyedropper button, usually a dropper.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the color changes. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the color changes. Cancelable: call `preventDefault()` to keep the current color.
  * @event {HelixCopyEvent} helix-copy - Fired when the color is put on the clipboard.
- * @event {HelixSampleEndEvent} helix-sample-end - The eyedropper has closed, whether or not a color was taken.
- * @event {HelixSampleStartEvent} helix-sample-start - The eyedropper is opening, so anything covering the page should get out of the way.
- * @event {Event} input - Announced once the value has moved.
+ * @event {HelixSampleEndEvent} helix-sample-end - Fired when the eyedropper closes, whether or not a color was taken.
+ * @event {HelixSampleStartEvent} helix-sample-start - Fired as the eyedropper opens. Hide anything that covers the page.
+ * @event {Event} input - Fired after the value changes.
  *
  * @csspart actions - The group holding the eyedropper and the syntax toggle.
  * @csspart channel - One ramp.
  * @csspart channel-control - The range input.
- * @csspart channel-feedback - What is wrong with it.
- * @csspart channel-field - The row: the control and its readout.
- * @csspart channel-hint - Help under the track, while nothing is wrong.
- * @csspart channel-label - The question, over the track.
- * @csspart channel-marker - One mark.
+ * @csspart channel-feedback - The error message for a ramp.
+ * @csspart channel-field - The row that holds a ramp's control and its readout.
+ * @csspart channel-hint - The help text under the track, shown while there is no error.
+ * @csspart channel-label - The label above the track.
+ * @csspart channel-marker - One mark on the track.
  * @csspart channel-marker-label - The value a mark stands at, when `marker-labels` is set.
  * @csspart channel-markers - The row of marks along the track.
- * @csspart channel-output - The current value, shown beside it.
- * @csspart channels - The ramps beside it.
+ * @csspart channel-output - The current value, shown beside the track.
+ * @csspart channels - The ramps beside the sample.
  * @csspart controls - The row under the square.
  * @csspart eyedropper - The control that samples a color from the screen.
- * @csspart eyedropper-button - The inner control.
+ * @csspart eyedropper-button - The button inside `eyedropper`.
  * @csspart footer - The row holding the value and the tools.
  * @csspart format - The control that changes the syntax the value is written in.
- * @csspart format-button - The inner control.
- * @csspart grid - The saturation and brightness square. The mark showing where
- * in the square the color sits is drawn on the square itself, which is
- * `::part(grid)::after` from a consumer's sheet: the two channels are already
- * on the square as `--color-picker-saturation` and `--color-picker-brightness`,
- * so a box would have carried nothing, and this tier ships no CSS.
- * @csspart grid-brightness - The range input for its vertical axis.
+ * @csspart format-button - The button inside `format`.
+ * @csspart grid - The saturation and brightness square. Draw the mark that shows
+ * where the color sits with `::part(grid)::after` in your stylesheet. The
+ * square carries the two channels as `--color-picker-saturation` and
+ * `--color-picker-brightness`, and this tier ships no CSS.
+ * @csspart grid-brightness - The range input for the square's vertical axis.
  * @csspart grid-saturation - The range input for the square's horizontal axis.
- * @csspart sample - The chip of the current color, which copies it when pressed.
+ * @csspart sample - A chip of the current color. Pressing it copies the value.
  * @csspart swatch - One preset.
  * @csspart swatches - The row of presets.
- * @csspart value - The color as text, which can be typed or pasted.
+ * @csspart value - The text field that holds the color. It accepts a typed or pasted color.
  *
  * @cssproperty --color-picker-brightness - The chosen brightness, 0 to 100, as a percentage.
  * @cssproperty --color-picker-hue - The chosen hue, 0 to 360, unitless.
  * @cssproperty --color-picker-saturation - The chosen saturation, 0 to 100, as a percentage.
- * @cssproperty --color-picker-swatch - A color to paint: the current one on the sample, a preset's on each preset.
+ * @cssproperty --color-picker-swatch - The color a chip shows: the current color on the sample, and the preset's color on each preset.
  */
 @customElement('helix-headless-color-picker')
 export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElement) {
@@ -146,13 +145,14 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   brightnessLabel = 'Brightness'
 
   /**
-   * What the sample says for a moment after it copied the value.
+   * The text the sample shows for a moment after it copies the value.
    */
   @property({ attribute: 'copied-label' })
   copiedLabel = 'Copied'
 
   /**
-   * What the sample is called, which copies the value, with `{value}` filled in.
+   * The name of the sample, which copies the value. `{value}` is replaced with
+   * the color.
    */
   @property({ attribute: 'copy-label' })
   copyLabel = 'Copy {value}'
@@ -164,7 +164,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   eyedropperLabel = 'Sample a color from the screen'
 
   /**
-   * The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   * The syntax the value is written in: `hex`, `rgb`, or `hsl`.
    *
    * Only what is written. Everything is read whatever this says, so a picker on
    * `hex` still takes an `rgb()` handed to it and stores the hex for it.
@@ -197,19 +197,21 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   invalid = false
 
   /**
-   * Whether the eyedropper is offered where the browser has one.
+   * Hides the eyedropper. Without it, the eyedropper appears in browsers that
+   * support one.
    */
   @property({ attribute: 'no-eyedropper', type: Boolean })
   noEyedropper = false
 
   /**
-   * Whether the reader may change the format.
+   * Hides the syntax toggle, so the format cannot be changed.
    */
   @property({ attribute: 'no-format', type: Boolean })
   noFormat = false
 
   /**
-   * Whether to leave the value out, for a picker whose value is stated elsewhere.
+   * Hides the text field that holds the value. Use it when the value is shown
+   * elsewhere.
    *
    * The row reads the color as text and lets it be typed or pasted, which is
    * what makes this element complete standing on a page: a square and two ramps
@@ -238,7 +240,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   presetsLabel = 'Presets'
 
   /**
-   * Whether the control refuses changes while still submitting its value.
+   * Makes the color read-only. The value is still submitted with the form.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -267,7 +269,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   readOnly = false
 
   /**
-   * Whether the form refuses to submit while no color is chosen.
+   * Requires a color before the form can submit.
    *
    * **A color is exactly as requirable as a date**, which is the comparison
    * that settles it: this element extends `HelixFormElement`, carries `name`
@@ -318,7 +320,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   valueLabel = 'Color'
 
   /**
-   * What a reader is told when a color is required and none is chosen.
+   * The message shown when a color is required and none is chosen.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
@@ -357,7 +359,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   private owned = false
 
-  /** Where the picker stands: what was moved, or what the value says, or the start. */
+  /** The current color: the last one moved to, the value, or the start color. */
   get color(): Color {
     /* `settled` between the value and the start, so a half-typed value leaves
        the square where the last whole one put it rather than throwing it back to
@@ -419,7 +421,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     this.requestValue(typed)
   }
 
-  /** Refuses every change while read-only. See `readOnly`. */
+  /** Blocks every change while `readOnly` is set. */
   override requestValue(next: string): boolean {
     if (this.readOnly) {
       return false
@@ -617,7 +619,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     }
   }
 
-  /** Puts the keyboard on the square, which is the control a reader wants. */
+  /** Moves focus to the square. */
   override focus(options?: FocusOptions): void {
     this.partNamed('grid-saturation')?.focus(options)
   }

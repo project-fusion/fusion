@@ -13,7 +13,7 @@ import { property, queryAssignedElements, state } from 'lit/decorators.js'
 import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
 
 /**
- * @summary A guided run through an interface, one stop at a time.
+ * @summary A guided tour of an interface, one stop at a time.
  *
  * @description
  * The root owns the order and nothing else. Which stop is current, what Next
@@ -36,15 +36,15 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * @aliases Coachmark, Product tour, Walkthrough, Onboarding
  * @documentation https://fusion.dev/helix/components/tour
  *
- * @slot - The stops, in the order they should be visited.
+ * @slot - The stops, in the order they are shown.
  *
- * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current stop changes, with the new index. Cancelable: call `preventDefault()` to stay on the current stop.
+ * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the user ends the tour early. Cancelable: call `preventDefault()` to keep the tour open.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
- * @event {HelixTourAskEvent} helix-tour-ask - A stop's own controls asking the tour to move, dispatched by the stop and heard here because the tour is what moves.
+ * @event {HelixTourAskEvent} helix-tour-ask - Fired when a stop's control is pressed to move the tour. The stop sends it, and the tour handles it.
  *
- * @csspart spotlight - The box over the current target, which paints the scrim.
+ * @csspart spotlight - The box over the current target. It also draws the dimmed area around the target.
  */
 /*
  * **There is no `toggle` here, and this element declared one for months.**
@@ -67,13 +67,13 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
 @customElement('helix-headless-tour')
 export class HelixHeadlessTour extends HelixElement {
   /**
-   * Label for the control that goes back, handed to every stop.
+   * Label for the control that goes back, passed to every stop.
    */
   @property({ attribute: 'back-label' })
   backLabel = ''
 
   /**
-   * Stop to start on, where nothing declared one.
+   * The stop to start on, when nothing else sets one.
    */
   @property({ attribute: 'default-index', type: Number })
   defaultIndex = 0
@@ -88,7 +88,7 @@ export class HelixHeadlessTour extends HelixElement {
   private indexState: number | undefined = undefined
 
   /**
-   * Which stop the reader is on.
+   * The index of the stop being shown.
    *
    * **Moved through `requestChange`, never by assignment from `move`.** That
    * announces first and applies only if nobody refused, and refusing is how a
@@ -111,7 +111,7 @@ export class HelixHeadlessTour extends HelixElement {
   }
 
   /**
-   * Accessible name for the run, such as "Getting started".
+   * The tour's name, read by screen readers, such as "Getting started".
    */
   @property()
   label = ''
@@ -135,7 +135,7 @@ export class HelixHeadlessTour extends HelixElement {
   skipLabel = ''
 
   /**
-   * Space left around the target when it is lit, in pixels.
+   * The space around the target inside the spotlight, in pixels.
    */
   @property({ attribute: 'spotlight-padding', type: Number })
   spotlightPadding = 8
@@ -160,7 +160,7 @@ export class HelixHeadlessTour extends HelixElement {
   /** What `sizer` is watching, so a render that changed nothing re-observes nothing. */
   private sized: Element | undefined = undefined
 
-  /** The stops, in the order they were written. */
+  /** The stops, in source order. */
   get stops(): HelixHeadlessTourStop[] {
     return (this.assigned ?? []).filter(
       (one): one is HelixHeadlessTourStop => (one as HelixHeadlessTourStop).current !== undefined,
@@ -172,7 +172,7 @@ export class HelixHeadlessTour extends HelixElement {
     return this.stops.length
   }
 
-  /** Goes on, and finishes the run on the last stop. */
+  /** Goes to the next stop, and finishes the tour on the last stop. */
   next(): void {
     if (this.index >= this.length - 1) {
       this.finish()
@@ -181,7 +181,7 @@ export class HelixHeadlessTour extends HelixElement {
     this.move(this.index + 1)
   }
 
-  /** Goes back, and does nothing on the first stop. */
+  /** Goes to the previous stop. It does nothing on the first stop. */
   back(): void {
     if (this.index <= 0) {
       return
@@ -190,7 +190,7 @@ export class HelixHeadlessTour extends HelixElement {
   }
 
   /**
-   * Leaves the run early, which is a close rather than a completion.
+   * Ends the tour early, as a close. `helix-complete` is not fired.
    *
    * Announced before it is applied, and cancelable because of it: writing
    * `open` first and dispatching after leaves a consumer calling

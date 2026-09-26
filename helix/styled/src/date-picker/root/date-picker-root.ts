@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './date-picker-root.css.js'
 
 /**
- * @summary Shows a month, and takes a date from it.
+ * @summary A month calendar for choosing one or more dates.
  *
  * @description
  * Six week rows always, so the grid keeps one height and a month change does

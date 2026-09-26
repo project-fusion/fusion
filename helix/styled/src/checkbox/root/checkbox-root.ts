@@ -7,7 +7,7 @@ import { styles as fieldInlineStyles } from '../../shared/field/field-inline.css
 import { styles } from './checkbox-root.css.js'
 
 /**
- * @summary A box that is ticked, or not, or neither.
+ * @summary A box that is checked, unchecked, or indeterminate.
  *
  * @description
  * The box is the native input with its own drawing switched off, so the control
@@ -24,21 +24,22 @@ import { styles } from './checkbox-root.css.js'
  * @aliases Tickbox
  * @documentation https://fusion.dev/helix/components/checkbox
  *
- * @cssproperty --checkbox-background-color - Fill of the box, which does not change when it is ticked.
- * @cssproperty --checkbox-border-color - Edge of the box, in every state.
- * @cssproperty --checkbox-card-background-color - Fill behind a card-shaped choice.
- * @cssproperty --checkbox-card-border-color - Edge around one.
- * @cssproperty --checkbox-card-padding - Inset of the card appearance.
- * @cssproperty --checkbox-checked-color - Edge of a ticked box, where `--checkbox-border-color` is unset.
- * @cssproperty --checkbox-mark-color - Ink the tick is drawn in.
- * @cssproperty --checkbox-size - Width and height of the box.
+ * @cssproperty --checkbox-background-color - The fill of the box. It stays the same when the box is checked.
+ * @cssproperty --checkbox-border-color - The border color of the box, in every state.
+ * @cssproperty --checkbox-card-background-color - The fill of the card.
+ * @cssproperty --checkbox-card-border-color - The border color of the card.
+ * @cssproperty --checkbox-card-padding - The padding of the card.
+ * @cssproperty --checkbox-checked-color - The border color of a checked box when `--checkbox-border-color` is not set.
+ * @cssproperty --checkbox-mark-color - The color of the check mark and the dash.
+ * @cssproperty --checkbox-size - The width and height of the box.
  */
 @customElement('helix-checkbox')
 export class HelixCheckbox extends HelixHeadlessCheckbox {
   static override styles: CSSResultGroup = [fieldStyles, fieldInlineStyles, styles]
 
   /**
-   * Where the choice's own surface ends.
+   * How the option is set off from the page. `plain` shows the box next to its
+   * label, and `outlined` and `filled` draw the option as a card.
    *
    * The question `separation` asks everywhere else, asked of one option, so it
    * is that word: what these values pick is a surface, and `plain` is already

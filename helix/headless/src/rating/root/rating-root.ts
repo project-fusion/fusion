@@ -12,7 +12,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /**
- * @summary A score out of a few marks, given or shown.
+ * @summary A row of marks, such as stars, for giving or showing a score.
  *
  * @description
  * **Half marks decide the shape.** Supporting them means the value is not an
@@ -34,27 +34,27 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Stars, Score, Review score
  * @documentation https://fusion.dev/helix/components/rating
  *
- * @event {Event} change - Announced with it, the choice being the commit.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the score changes, and cancelable.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - The score was chosen. Sent together with `input`, because each choice commits the score.
+ * @event {HelixBeforeChangeEvent} helix-before-change - The score is about to change. Cancelable: cancel it to keep the current score.
+ * @event {Event} input - The score changed.
  *
- * @csspart feedback - What is wrong with it.
- * @csspart field - The row: the marks, and the score beside them.
+ * @csspart feedback - The message that says what is wrong.
+ * @csspart field - The row that holds the marks and the score next to them.
  * @csspart fill - The filled marks, clipped to the score.
- * @csspart hint - Help under the marks, while nothing is wrong.
- * @csspart label - The question, over the marks.
- * @csspart mark - One mark, in either layer.
+ * @csspart hint - Help text under the marks, shown while there is no feedback.
+ * @csspart label - The label above the marks.
+ * @csspart mark - One mark, in the fill or the track.
  * @csspart marks - The row of marks.
- * @csspart option - One place a reader can press, which is one step.
+ * @csspart option - One target you can press, for one step.
  * @csspart track - The unfilled marks.
- * @csspart value - The score written out, under `show-value`.
+ * @csspart value - The score as a number, shown with `show-value`.
  *
- * @cssproperty --rating-full - How many marks are wholly filled.
- * @cssproperty --rating-part - How much of the next mark is filled, 0 to 1.
- * @cssproperty --rating-step - Which step along the row a target is, counting from one, whatever `min` leaves open.
- * @cssproperty --rating-steps - How many steps the whole row holds, which is `max` over `step`.
+ * @cssproperty --rating-full - The number of marks that are fully filled.
+ * @cssproperty --rating-part - How much of the next mark is filled, from 0 to 1.
+ * @cssproperty --rating-step - The target's position among all the steps in the row, counting from one. Steps below `min` still count.
+ * @cssproperty --rating-steps - The number of steps in the whole row: `max` divided by `step`.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-rating')
 export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -76,7 +76,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   max = 5
 
   /**
-   * The lowest score a reader can give, which is what clearing returns to.
+   * The lowest score that can be given. A cleared rating shows this score.
    *
    * Zero rather than one, because "no rating" and "the worst rating" are
    * different answers and a control that cannot express the first has to
@@ -121,7 +121,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   min = 0
 
   /**
-   * Whether this shows a score rather than asks for one.
+   * Shows the score without letting users change it.
    *
    * A readout is not a control that has been switched off. It takes no focus,
    * answers no keys, and reads as one thing: see the note on the class.
@@ -130,7 +130,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   readOnly = false
 
   /**
-   * Whether the score is written out beside the marks.
+   * Shows the score as a number next to the marks.
    *
    * Marks say roughly, and a number says exactly. Four and a bit stars is not a
    * reading anyone can repeat, which is why a product's average is nearly always
@@ -154,7 +154,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   step = 1
 
   /**
-   * How the score is read out, where "3.5 out of 5" is not what it should say.
+   * The text screen readers read for the score, in place of "3.5 out of 5".
    *
    * A rating out of five is one of the few places a screen reader gets a worse
    * answer from the value than from a sentence: "3.5" alone is a number without

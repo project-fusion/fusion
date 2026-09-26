@@ -54,7 +54,7 @@ const tracksOf = (list: string, wanted: number): string[] => {
 }
 
 /**
- * @summary Tabular data laid out on a grid.
+ * @summary A table of data, laid out on a grid.
  *
  * @description
  * A grid rather than a `<table>`, so every column lines up across rows while
@@ -80,13 +80,13 @@ const tracksOf = (list: string, wanted: number): string[] => {
  *
  * @slot - The table's rows.
  *
- * @csspart empty - Shown when there are no rows to show.
- * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
- * @csspart loading - Shown while the rows are still on their way.
+ * @csspart empty - The text shown when there are no rows.
+ * @csspart head - The row that holds the column headings. It has `display: contents`, so it takes no space of its own.
+ * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
+ * @csspart loading - The text shown while the rows are loading.
  * @csspart table - The grid.
  *
- * @cssproperty --table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `columns` is the one to set.
+ * @cssproperty --table-template - The column track list the table works out from its columns. The component writes it inline on the element that reads it, so setting it has no effect. Set `columns` to change the tracks.
  */
 @customElement('helix-headless-table')
 export class HelixHeadlessTable extends MixinCollection(HelixElement) {

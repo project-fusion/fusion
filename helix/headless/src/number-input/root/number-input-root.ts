@@ -37,7 +37,7 @@ const SCRUB_PITCH = 4
 const SCRUB_FINE = 16
 
 /**
- * @summary A number a reader types or steps to.
+ * @summary A field for a number, typed or changed with step buttons.
  *
  * @description
  * **A family rather than `Input`'s `type="number"`.** It renders two buttons,
@@ -72,24 +72,24 @@ const SCRUB_FINE = 16
  * @aliases NumberField, Stepper, InputNumber
  * @documentation https://fusion.dev/helix/components/number-input
  *
- * @slot end - After it.
- * @slot start - Before the number, for a unit or an icon.
+ * @slot end - Content after the number, such as a unit.
+ * @slot start - Content before the number, such as a unit or an icon.
  *
- * @event {Event} change - Relayed from the field once the reader has finished.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes, and cancelable.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - The user finished changing the value. Relayed from the native field.
+ * @event {HelixBeforeChangeEvent} helix-before-change - The value is about to change. Cancelable: cancel it to keep the current value.
+ * @event {Event} input - The value changed.
  *
- * @csspart control - The field itself.
- * @csspart decrement - The control that steps down.
- * @csspart decrement-mark - The glyph on the step down control.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The box holding everything.
- * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart increment - The control that steps up.
- * @csspart increment-mark - The glyph on the step up control.
- * @csspart label - The name over the field, which is also the scrub grip.
+ * @csspart control - The input that holds the number.
+ * @csspart decrement - The button that steps the value down.
+ * @csspart decrement-mark - The icon on the step down button.
+ * @csspart feedback - The message that says what is wrong.
+ * @csspart field - The box that holds the whole control.
+ * @csspart hint - Help text under the field, shown while there is no feedback.
+ * @csspart increment - The button that steps the value up.
+ * @csspart increment-mark - The icon on the step up button.
+ * @csspart label - The label above the field. It is also the grip you drag when `scrub` is set.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-number-input')
 export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -106,7 +106,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   protected override readonly announcesInput = true
 
   /**
-   * What the browser may autofill here, as one of the platform's own tokens.
+   * What the browser may autofill, as an HTML `autocomplete` token.
    *
    * Empty leaves the attribute off, which is the browser's default and is what
    * lets autofill work at all. Hardcoding `off` here is what stops a reader
@@ -117,7 +117,8 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   autocomplete = ''
 
   /**
-   * What a reader is told when the field holds something that is not a number.
+   * The message the browser shows when the field holds something that is not a
+   * number.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
@@ -128,19 +129,19 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   badInputMessage?: string
 
   /**
-   * Accessible name for the control that steps down.
+   * The name of the step down button, read by screen readers.
    */
   @property({ attribute: 'decrement-label' })
   decrementLabel = 'Decrease'
 
   /**
-   * Accessible name for the control that steps up.
+   * The name of the step up button, read by screen readers.
    */
   @property({ attribute: 'increment-label' })
   incrementLabel = 'Increase'
 
   /**
-   * How far `PageUp` and `PageDown` move.
+   * How many steps `PageUp` and `PageDown` move.
    *
    * Ten steps, which is the convention every spinner on the platform follows,
    * and a property because ten of a step of `0.01` is a hundredth and rarely
@@ -150,7 +151,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   largeStep?: number
 
   /**
-   * Largest value the reader may reach.
+   * The largest value allowed.
    *
    * Absent has no ceiling.
    */
@@ -158,7 +159,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   max?: number
 
   /**
-   * Smallest value the reader may reach.
+   * The smallest value allowed.
    *
    * Absent has no floor.
    */
@@ -174,25 +175,27 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   placeholder = ''
 
   /**
-   * What a reader is told when the number is above `max`, with `{max}` filled in.
+   * The message the browser shows when the number is above `max`, with `{max}`
+   * filled in.
    */
   @property({ attribute: 'range-overflow-message' })
   rangeOverflowMessage?: string
 
   /**
-   * What a reader is told when the number is below `min`, with `{min}` filled in.
+   * The message the browser shows when the number is below `min`, with `{min}`
+   * filled in.
    */
   @property({ attribute: 'range-underflow-message' })
   rangeUnderflowMessage?: string
 
   /**
-   * Whether the field refuses input while still submitting its value.
+   * Prevents editing. The value is still submitted with the form.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
   /**
-   * Whether a grip is shown that changes the value when it is dragged.
+   * Makes the label a grip that changes the value when it is dragged.
    *
    * The label is what is dragged, so this adds no chrome at all. Still opt-in,
    * because it changes what a press on the label does and a reader who drags
@@ -290,13 +293,13 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     }
   }
 
-  /** One step up, or `PageUp`'s larger one. */
+  /** Steps the value up, by `largeStep` steps when `large` is set. */
   stepUp(large = false): void {
     this.nudge(large ? (this.largeStep ?? 10) : 1)
   }
 
   /**
-   * Steps the value down, by `largeStep` when `large` is set.
+   * Steps the value down, by `largeStep` steps when `large` is set.
    *
    * The same path a press of the down arrow takes, so a consumer driving this
    * from their own control gets the clamping and the announcement rather than
@@ -562,7 +565,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     this.refreshFeedback()
   }
 
-  /** Puts the caret in the field, the way a label pointing at one would. */
+  /** Puts the cursor in the field. */
   override focus(options?: FocusOptions): void {
     this.control?.focus(options)
   }

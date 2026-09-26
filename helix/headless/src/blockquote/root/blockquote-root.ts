@@ -29,7 +29,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-blockquote')
 export class HelixHeadlessBlockquote extends HelixElement {
   /**
-   * URL identifying where the passage came from.
+   * The URL of the source the passage came from.
    */
   @property()
   cite = ''

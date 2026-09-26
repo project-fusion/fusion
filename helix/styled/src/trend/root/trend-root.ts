@@ -6,7 +6,7 @@ import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './trend-root.css.js'
 
 /**
- * @summary Which way a measurement moved, and whether that is good news.
+ * @summary An indicator that shows which way a measurement moved, and whether the change is good.
  *
  * @description
  * The arrow takes the judgment color and the number does not, which is the
@@ -36,7 +36,7 @@ import { styles } from './trend-root.css.js'
  * @aliases Delta, Change, Movement
  * @documentation https://fusion.dev/helix/components/trend
  *
- * @cssproperty --trend-color - Color of the arrow, overriding the judgment.
+ * @cssproperty --trend-color - Color of the arrow. Setting it overrides the color that `good` sets.
  * @cssproperty --trend-icon-size - Size of the arrow.
  */
 @customElement('helix-trend')

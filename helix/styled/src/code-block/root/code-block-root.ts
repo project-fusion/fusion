@@ -5,7 +5,7 @@ import { styles } from './code-block-root.css.js'
 import '../../copy-button/index.js'
 
 /**
- * @summary A block of code, with somewhere to put its name and a way to take it.
+ * @summary A block of code with an optional name and a copy button.
  *
  * @description
  * The header sits above the code rather than floating on it, and the copy
@@ -25,11 +25,11 @@ import '../../copy-button/index.js'
  * @category typography
  * @documentation https://fusion.dev/helix/components/code-block
  *
- * @cssproperty --code-block-backdrop - A filter over what shows through the block and its header, for a translucent ground.
- * @cssproperty --code-block-background-color - The ground behind the code, for a block that is not on the page.
+ * @cssproperty --code-block-backdrop - A backdrop filter for the block and its header, for a translucent background.
+ * @cssproperty --code-block-background-color - The background behind the code. Set it for a block that sits on a surface other than the page background.
  * @cssproperty --code-block-border-color - The line around the block and its header.
- * @cssproperty --code-block-header-background-color - The ground behind the name, where it should not be `surface-raised`.
- * @cssproperty --code-block-radius - The corner on the header's top and the block's bottom, which are one shape.
+ * @cssproperty --code-block-header-background-color - The background behind the name. The default is `surface-raised`.
+ * @cssproperty --code-block-radius - The corner radius of the header's top and the block's bottom, which form one shape.
  */
 @customElement('helix-code-block')
 export class HelixCodeBlock extends HelixHeadlessCodeBlock {

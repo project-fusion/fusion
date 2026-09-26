@@ -21,12 +21,12 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The cell's content.
  *
- * @cssproperty --table-cell-align - The edge the column this cell sits under is set to, `start`, `center` or `end`, and unset under a column that sets none. Written by the table around it, since the cell is the consumer's markup and nothing is written onto it; read by the sheet that draws the cell, where `justify-content` and `text-align` both take it as it comes and both follow the writing direction.
+ * @cssproperty --table-cell-align - The text alignment of the column above the cell: `start`, `center`, or `end`, and unset when the column sets none. The table writes it, and the stylesheet that draws the cell reads it for `justify-content` and `text-align`, which both follow the writing direction.
  */
 @customElement('helix-headless-table-cell')
 export class HelixHeadlessTableCell extends HelixElement {
   /**
-   * Whether the cell heads its column.
+   * Whether the cell is the header cell of its column.
    */
   @property({ reflect: true, type: Boolean })
   header = false

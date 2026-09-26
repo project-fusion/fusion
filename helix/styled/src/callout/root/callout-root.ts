@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './callout-root.css.js'
 
 /**
- * @summary Sets a passage apart as information, a warning, or an error.
+ * @summary A passage set apart as information, a warning, or an error.
  *
  * @description
  * Tinted from the tone's status color with `color-mix`, and marked with a bar
@@ -26,8 +26,8 @@ import { styles } from './callout-root.css.js'
  * @csspart content - The content region.
  * @csspart icon - The icon region.
  *
- * @cssproperty --callout-background-color - Fill behind the callout.
- * @cssproperty --callout-radius - Corner radius of the callout.
+ * @cssproperty --callout-background-color - The fill behind the callout.
+ * @cssproperty --callout-radius - The corner radius of the callout.
  */
 @customElement('helix-callout')
 export class HelixCallout extends HelixHeadlessCallout {

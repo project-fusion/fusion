@@ -7,7 +7,7 @@ import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './canvas-root.css.js'
 
 /**
- * @summary A board of cards and the connections between them, which a reader can walk, rearrange and connect.
+ * @summary A board of cards and the connections between them, which can be navigated, rearranged, and connected.
  *
  * @description
  * **Cards and connections say what they mean with `tone`**, the word every
@@ -25,20 +25,20 @@ import { styles } from './canvas-root.css.js'
  * @aliases Board, JSON Canvas, Whiteboard
  * @documentation https://fusion.dev/helix/components/canvas
  *
- * @cssproperty --canvas-background-color - The well behind the board.
- * @cssproperty --canvas-block-size - How tall the frame is.
- * @cssproperty --canvas-border-color - Color of the frame's edge.
- * @cssproperty --canvas-edge-color - Color of a connector with no tone. Written in an edge's own `style`, it colors that edge alone.
- * @cssproperty --canvas-edge-target-width - How wide a connector is to a pointer, which is wider than it is drawn.
- * @cssproperty --canvas-grid-size - How far apart the ruling is, in the document's own units, so it scales with the zoom.
- * @cssproperty --canvas-handle-size - How large the ends of a selected connection are, one name with a card's points.
- * @cssproperty --canvas-label-editor-inline-size - How wide the field a label is edited in is.
- * @cssproperty --viewport-control-background-color - The ground under the pan and zoom buttons, one name with `Map`.
+ * @cssproperty --canvas-background-color - The background behind the board.
+ * @cssproperty --canvas-block-size - The height of the frame.
+ * @cssproperty --canvas-border-color - The color of the frame's edge.
+ * @cssproperty --canvas-edge-color - The color of a connection with no tone. Set it in one edge's `style` to color only that edge.
+ * @cssproperty --canvas-edge-target-width - The width of the area a pointer can press on a connection, which is wider than the drawn line.
+ * @cssproperty --canvas-grid-size - The spacing of the grid lines or dots, in the document's units, so it scales with the zoom.
+ * @cssproperty --canvas-handle-size - The size of the ends of a selected connection. A card's connection points use the same property.
+ * @cssproperty --canvas-label-editor-inline-size - The width of the field for editing a label.
+ * @cssproperty --viewport-control-background-color - The background of the pan and zoom buttons. `Map` uses the same property.
  */
 @customElement('helix-canvas')
 export class HelixCanvas extends HelixHeadlessCanvas {
   /**
-   * Rules the plane, so a reader can see it move.
+   * Draws `lines` or `dots` on the board's plane, so you can see it move.
    *
    * **Baked in rather than a family of its own**, which was the question worth
    * asking: a grid has no content, no position and nothing to slot, so an
@@ -57,7 +57,7 @@ export class HelixCanvas extends HelixHeadlessCanvas {
   grid?: 'lines' | 'dots'
 
   /**
-   * How the board stands off the page: `plain` for no frame at all.
+   * How the board is set apart from the page. `plain` draws no frame.
    *
    * Framed is where it rests. Plain is for a board that fills a panel or an
    * app's working area, where the container is already the frame.

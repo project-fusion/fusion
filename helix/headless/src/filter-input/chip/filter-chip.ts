@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
- * @summary One filter in force: a field, how it is compared, and to what.
+ * @summary One active filter: a field, a comparison, and the values it is compared to.
  *
  * @description
  * A chip is the readable form of the thing `FilterField` declares. It carries
@@ -45,20 +45,20 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases FilterToken, FacetChip
  * @documentation https://fusion.dev/helix/components/filter-input
  *
- * @slot - What the field is compared to, which is usually text and may be
- * anything a consumer wants read there.
- * @slot field - Replaces the field's name, for a chip that wants a mark beside
- * it or a shortened form.
- * @slot operator - Replaces the comparison, and is where a control that changes
- * it goes.
+ * @slot - The values the field is compared to, usually as text. It takes any
+ * content you want shown there.
+ * @slot field - Replaces the field's name. Use it to put an icon beside the name
+ * or to shorten it.
+ * @slot operator - Replaces the comparison. Put a control that changes the
+ * comparison here.
  *
- * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the filter. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the user asks to remove the filter. Cancelable: call `preventDefault()` to keep the chip.
  *
- * @csspart dismiss - The control that asks to remove the filter.
- * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
+ * @csspart dismiss - The button that removes the filter.
+ * @csspart dismiss-mark - The icon on the remove button, shown when no icon is slotted.
  * @csspart field - The name of what is being filtered.
- * @csspart operator - How it is compared, drawn only where there is one to draw.
- * @csspart values - What it is compared to.
+ * @csspart operator - The comparison, drawn only when there is one to show.
+ * @csspart values - The values the field is compared to.
  */
 @customElement('helix-headless-filter-chip')
 export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
@@ -69,7 +69,7 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
   override dismissLabel = 'Remove filter'
 
   /**
-   * The field this filter is on, as a reader sees it.
+   * The name of the field the filter is on, as shown on the chip.
    *
    * The slot's fallback rather than the slot's replacement: a consumer who wants
    * a mark beside the name slots `field` and this goes unused.
@@ -78,7 +78,7 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
   label = ''
 
   /**
-   * The field this filter is on, as the consumer's model calls it.
+   * The name of the field the filter is on, in your data model.
    *
    * Never shown. Reflected, because a consumer removing one filter from a list
    * of them selects on this, and so undefaulted for the reason `operator` gives.
@@ -96,7 +96,7 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
   name?: string
 
   /**
-   * What the consumer's own model calls the comparison in force.
+   * The name of the active comparison in your data model.
    *
    * Never shown, and it is what a consumer matches on when the chip comes back
    * to them. `label` translates; this does not.
@@ -109,7 +109,8 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
   operator?: string
 
   /**
-   * The comparison, as a reader sees it, and empty for the field's usual one.
+   * The comparison as shown on the chip. Leave it empty for the field's usual
+   * comparison.
    *
    * **Empty is the whole design and not an oversight.** A chip drawn for the
    * comparison a field is normally filtered by says the field and the values and

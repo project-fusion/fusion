@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './splitter-root.css.js'
 
 /**
- * @summary Two panes and a divider the reader can move.
+ * @summary Two panes and a divider that you can move.
  *
  * @description
  * The divider is a line to look at and a box to hit, and they are different
@@ -42,22 +42,22 @@ import { styles } from './splitter-root.css.js'
  * @documentation https://fusion.dev/helix/components/splitter
  *
  * @csspart corner - The handle where a nested splitter's divider crosses this one.
- * @csspart end - The box holding the second.
+ * @csspart end - The box that holds the second pane.
  * @csspart separator - The divider itself.
- * @csspart start - The box holding the first pane.
+ * @csspart start - The box that holds the first pane.
  *
- * @cssproperty --splitter-color - The line between the panes.
- * @cssproperty --splitter-corner - How wide the handle at a crossing is.
- * @cssproperty --splitter-drag-color - The line while it is being moved.
- * @cssproperty --splitter-grip-color - The grip beside the line, once it is shown.
+ * @cssproperty --splitter-color - Color of the line between the panes.
+ * @cssproperty --splitter-corner - Width of the handle where two dividers cross.
+ * @cssproperty --splitter-drag-color - Color of the line while it is being moved.
+ * @cssproperty --splitter-grip-color - Color of the grip beside the line, when the grip is shown.
  * @cssproperty --splitter-grip-length - How far the grip runs along the divider.
- * @cssproperty --splitter-hover-color - The target under the pointer.
- * @cssproperty --splitter-target - How wide the draggable box is.
+ * @cssproperty --splitter-hover-color - Color of the divider's target under the pointer.
+ * @cssproperty --splitter-target - Width of the area you can drag.
  */
 @customElement('helix-splitter')
 export class HelixSplitter extends HelixHeadlessSplitter {
   /**
-   * Whether the divider carries a grip.
+   * Whether the divider shows a grip.
    *
    * - `line` is the divider alone, for a splitter the reader already knows is
    *   one: an editor, a mail client, anything they open every day.

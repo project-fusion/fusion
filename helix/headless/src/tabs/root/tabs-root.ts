@@ -31,14 +31,14 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @aliases TabList, Segmented control
  * @documentation https://fusion.dev/helix/components/tabs
  *
- * @slot - The tabs, which are this element's own children.
- * @slot panels - The panels, which are this element's own children. A wrapper around them is assigned to the slot and pairs with nothing, since the pairing walks these children rather than the slot's tree.
+ * @slot - The tabs, as direct children of this element.
+ * @slot panels - The panels, as direct children of this element. Panels inside a wrapper are not paired with tabs, because pairing reads only the direct children.
  *
- * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
- * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current tab moves, and cancelable. The only way to refuse one.
- * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. Dispatched by the tab and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixActivateEvent} helix-activate - Fired after the active tab changes, so the element already holds the new value.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active tab changes, and cancelable. Canceling it is the only way to block a change.
+ * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. The tab sends it and the root handles it, so you can listen on the root. Cancelable: canceling it stops the change and leaves the decision to you.
  *
- * @csspart indicator - The mark that travels to the selected tab.
+ * @csspart indicator - The marker that moves to the selected tab.
  * @csspart panels - The panel container.
  * @csspart tabs - The tab list.
  */
@@ -65,13 +65,14 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   })
 
   /**
-   * Accessible name for the tab list.
+   * The tab list's name, read by screen readers.
    */
   @property()
   label = 'Tabs'
 
   /**
-   * Whether arrowing to a tab also selects it.
+   * Stops the arrow keys from selecting each tab they move to. By default,
+   * arrowing to a tab also selects it.
    *
    * Automatic is the default because showing a panel is usually cheap. Set this
    * where it is not, so a reader arrowing past four tabs does not load four
@@ -81,7 +82,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   manual = false
 
   /**
-   * How the row reads.
+   * How the row of tabs is drawn.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
    * which is what a set sitting inside other chrome wants. `underlined` is a

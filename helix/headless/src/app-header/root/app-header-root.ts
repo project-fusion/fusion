@@ -30,9 +30,10 @@ import { property } from 'lit/decorators.js'
  * @slot start - Leading content, usually a wordmark.
  *
  * @event {HelixScrolledEvent} helix-scrolled - Fired when the page crosses the
- * threshold, with the new state. A custom state cannot be observed the way an
- * attribute could, so the header says when it changes rather than leaving
- * consumers to run a second scroll listener and disagree about the hysteresis.
+ * scroll threshold, with the new state. A custom state cannot be observed the
+ * way an attribute can, so listen for this event to follow it. The event uses
+ * the header's own threshold and hysteresis, so you do not need a second scroll
+ * listener.
  *
  * @csspart content - The middle region.
  * @csspart end - The trailing region.

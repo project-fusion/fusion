@@ -8,7 +8,7 @@ import '../../option/index.js'
 import { styles } from './time-picker-root.css.js'
 
 /**
- * @summary Picks a time, from a list of them.
+ * @summary A control for choosing a time from a list or from wheels.
  *
  * @description
  * A bounded list on a surface of its own, because ninety-six rows is taller than
@@ -27,8 +27,8 @@ import { styles } from './time-picker-root.css.js'
  * @documentation https://fusion.dev/helix/components/time-picker
  *
  * @cssproperty --time-picker-list-block-size - How tall the list is before it scrolls.
- * @cssproperty --time-picker-range-color - Wash behind the times inside a range.
- * @cssproperty --time-picker-row-size - Height and least width of one row in a wheel.
+ * @cssproperty --time-picker-range-color - Fill behind the times inside a range.
+ * @cssproperty --time-picker-row-size - Height and minimum width of one row in a wheel.
  * @cssproperty --time-picker-selected-color - Fill on the chosen row of a wheel.
  * @cssproperty --time-picker-wheel-block-size - How tall a wheel is. Five rows by default.
  */

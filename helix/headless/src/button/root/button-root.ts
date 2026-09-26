@@ -173,7 +173,8 @@ export class HelixHeadlessButton extends HelixFormElement {
   formTarget = ''
 
   /**
-   * Accessible name, for a button whose content is not text.
+   * The button's name, read by screen readers, for a button whose content is
+   * not text.
    *
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
@@ -243,7 +244,8 @@ export class HelixHeadlessButton extends HelixFormElement {
   type: 'button' | 'submit' | 'reset' = 'button'
 
   /**
-   * What this button submits under its own `name`, the way a native submitter does.
+   * The value this button submits under its own `name`, as a native submit
+   * button does.
    *
    * **Reported for exactly the submission this button starts and not otherwise.**
    * A native submit button contributes `name=value` only when it is the one

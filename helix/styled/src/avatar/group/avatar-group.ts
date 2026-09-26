@@ -25,7 +25,7 @@ import { styles } from './avatar-group.css.js'
  * @documentation https://fusion.dev/helix/components/avatar
  *
  * @cssproperty --avatar-group-overlap - How far each avatar sits over the one before it.
- * @cssproperty --avatar-group-ring-color - The separation drawn between one avatar and the next.
+ * @cssproperty --avatar-group-ring-color - Color of the ring that separates one avatar from the next.
  */
 @customElement('helix-avatar-group')
 export class HelixAvatarGroup extends HelixHeadlessAvatarGroup {

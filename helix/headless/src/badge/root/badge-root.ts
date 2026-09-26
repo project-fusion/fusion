@@ -3,7 +3,7 @@ import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary Attaches a count or a presence mark to another element.
+ * @summary A count or a dot pinned to the corner of another element.
  *
  * @description
  * Wraps whatever it decorates and pins the indicator to its corner, so the
@@ -34,7 +34,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-badge')
 export class HelixHeadlessBadge extends HelixElement {
   /**
-   * Accessible name.
+   * The badge's name, read by screen readers.
    *
    * Required for a dot, which has no text to read.
    */
@@ -42,7 +42,7 @@ export class HelixHeadlessBadge extends HelixElement {
   label = ''
 
   /**
-   * Cap for a numeric value.
+   * The largest number the badge shows.
    *
    * Past it the indicator reads `{max}+`.
    */

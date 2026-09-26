@@ -3,7 +3,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /**
- * @summary A picture that says whether it arrived.
+ * @summary An image that shows a placeholder while it loads and a fallback if it fails.
  *
  * @description
  * **An element rather than a recipe, because of the part CSS cannot do.**
@@ -22,20 +22,20 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Picture, Img, Figure
  * @documentation https://fusion.dev/helix/components/image
  *
- * @slot fallback - Shown instead of it, if it never does.
- * @slot placeholder - Shown until the picture arrives.
+ * @slot fallback - Shown in place of the image if it fails to load.
+ * @slot placeholder - Shown until the image loads.
  *
- * @event {Event} error - Relayed for the same reason.
- * @event {Event} load - Relayed, because the platform's own does not escape.
+ * @event {Event} error - The image failed to load. Relayed from the inner image, whose own event stays inside the shadow root.
+ * @event {Event} load - The image loaded. Relayed from the inner image, whose own event stays inside the shadow root.
  *
- * @csspart fallback - What stands in when it fails.
- * @csspart image - The picture itself.
- * @csspart placeholder - What stands in until it arrives.
+ * @csspart fallback - The fallback, shown when the image fails to load.
+ * @csspart image - The image itself.
+ * @csspart placeholder - The placeholder, shown until the image loads.
  */
 @customElement('helix-headless-image')
 export class HelixHeadlessImage extends HelixElement {
   /**
-   * What it shows, for a reader who cannot see it.
+   * A text description of the image, read by screen readers.
    *
    * Empty is a real answer and means decoration. Omitting the attribute is not
    * the same thing: a reader with nothing to read announces the file name.
@@ -44,14 +44,14 @@ export class HelixHeadlessImage extends HelixElement {
   alt = ''
 
   /**
-   * How the picture is fetched across origins, which decides whether a canvas
-   * can read it.
+   * How the image is fetched across origins. It decides whether a canvas can
+   * read the image.
    */
   @property({ attribute: 'crossorigin' })
   crossOrigin: 'anonymous' | 'use-credentials' | null = null
 
   /**
-   * Whether the browser may decode off the main thread.
+   * Whether the browser may decode the image off the main thread.
    *
    * `async` is the resting value and right for a picture in a page. `sync` is
    * what a consumer reaches for when the picture is about to be composited with
@@ -61,7 +61,8 @@ export class HelixHeadlessImage extends HelixElement {
   decoding: 'async' | 'auto' | 'sync' = 'async'
 
   /**
-   * How urgently to fetch it, for the one picture that is the page.
+   * How urgently the browser fetches the image. Set `high` on the main image
+   * of a page.
    *
    * The hero of a page is usually its largest contentful paint, and the fix is
    * two attributes rather than one: `loading="eager"` stops it waiting for the
@@ -73,7 +74,8 @@ export class HelixHeadlessImage extends HelixElement {
   fetchPriority: 'auto' | 'high' | 'low' = 'auto'
 
   /**
-   * Whether to wait until it is nearly on screen.
+   * Whether the image waits to load until it is nearly on screen. Defaults to
+   * `lazy`.
    *
    * `lazy` by default, which is the opposite of the platform's, because a
    * picture worth putting in a component is usually below the fold and the one
@@ -89,25 +91,25 @@ export class HelixHeadlessImage extends HelixElement {
   referrerPolicy = ''
 
   /**
-   * How much of the line it will take, passed through to the picture.
+   * The width the image takes in the layout, passed through to the inner image.
    */
   @property()
   sizes = ''
 
   /**
-   * Where the picture is.
+   * The URL of the image.
    */
   @property()
   src = ''
 
   /**
-   * The candidate widths, passed through to the picture.
+   * The candidate files and their widths, passed through to the inner image.
    */
   @property()
   srcset = ''
 
   /**
-   * Whether the picture is on its way, here, or never coming.
+   * The loading state: `loading`, `loaded`, or `error`.
    *
    * Read-only to a consumer: it is a report rather than a setting.
    *
@@ -292,22 +294,22 @@ export class HelixHeadlessImage extends HelixElement {
     return this.renderRoot?.querySelector('img') ?? null
   }
 
-  /** Whether the picture has finished arriving, however it went. */
+  /** Whether the image has finished loading, successfully or not. */
   get complete(): boolean {
     return this.image?.complete ?? false
   }
 
-  /** Which candidate the browser actually chose out of `srcset`. */
+  /** The candidate the browser chose from `srcset`. */
   get currentSrc(): string {
     return this.image?.currentSrc ?? ''
   }
 
-  /** The picture's own height in pixels, and zero until it has arrived. */
+  /** The image's intrinsic height in pixels. Zero until the image loads. */
   get naturalHeight(): number {
     return this.image?.naturalHeight ?? 0
   }
 
-  /** The picture's own width in pixels, and zero until it has arrived. */
+  /** The image's intrinsic width in pixels. Zero until the image loads. */
   get naturalWidth(): number {
     return this.image?.naturalWidth ?? 0
   }

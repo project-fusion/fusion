@@ -42,13 +42,13 @@ const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: bool
 @customElement('helix-headless-toolbar')
 export class HelixHeadlessToolbar extends HelixElement {
   /**
-   * Accessible name for the toolbar.
+   * The toolbar's name, read by screen readers.
    */
   @property()
   label = 'Toolbar'
 
   /**
-   * Which way the arrow keys move.
+   * The direction the arrow keys move focus in.
    */
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'

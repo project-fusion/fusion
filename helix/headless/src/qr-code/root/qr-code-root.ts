@@ -99,7 +99,7 @@ const pathFor = (
 }
 
 /**
- * @summary Encodes a short piece of text as a scannable square.
+ * @summary A scannable QR code for a short piece of text.
  *
  * @description
  * **The picture is one `<path>`, not a grid of squares.** A code of any useful
@@ -130,17 +130,18 @@ const pathFor = (
  * @aliases QR, Barcode, Scan code
  * @documentation https://fusion.dev/helix/components/qr-code
  *
- * @slot logo - A mark for the center, which only reads at a high correction.
+ * @slot logo - A logo for the center. A code with a logo scans only at a high correction level.
  *
- * @csspart code - The square itself.
+ * @csspart code - The square code image.
  * @csspart finders - The three corner squares, which can take their own color.
- * @csspart logo - The box holding the center mark.
- * @csspart modules - Everything but the three corner squares.
+ * @csspart logo - The box that holds the center logo.
+ * @csspart modules - Every module except the three corner squares.
  */
 @customElement('helix-headless-qr-code')
 export class HelixHeadlessQrCode extends HelixElement {
   /**
-   * How much of the code can be lost and still read.
+   * The error correction level, which sets how much of the code can be lost
+   * and still scan.
    *
    * `M` by default, which is the level almost every code in the world uses and
    * costs about fifteen percent redundancy. `H` where a mark covers the center,
@@ -152,7 +153,7 @@ export class HelixHeadlessQrCode extends HelixElement {
   correction?: QrCorrection
 
   /**
-   * What the image is called.
+   * The image's accessible name.
    *
    * Falling back to the value is deliberate: a code almost always holds a URL,
    * and a URL is a better name than "QR code" for a reader who cannot see it.

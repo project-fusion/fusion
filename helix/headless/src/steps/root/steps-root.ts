@@ -10,7 +10,7 @@ import { property } from 'lit/decorators.js'
 import type { HelixHeadlessStep } from '../step/step.js'
 
 /**
- * @summary A sequence of stages, and where the reader is in it.
+ * @summary A sequence of stages that shows which stage the user is on.
  *
  * @description
  * **`active` names where the reader is. `complete` stays on each step.** Only
@@ -32,14 +32,14 @@ import type { HelixHeadlessStep } from '../step/step.js'
  *
  * @slot - The steps.
  *
- * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
- * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active step changes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixSelectEvent} helix-select - Fired when a step is pressed. Dispatched by the step and listened for here, because the root is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixActivateEvent} helix-activate - Fired after the current step changes, when the element already holds the new step.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active step changes. Cancelable: cancel it to keep the current step.
+ * @event {HelixSelectEvent} helix-select - Fired when a step is pressed. The step dispatches it, and you can listen for it on the sequence. Cancelable: cancel it to keep the current step.
  */
 @customElement('helix-headless-steps')
 export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   /**
-   * Accessible name for the sequence.
+   * The sequence's name, read by screen readers.
    *
    * A list of stages is a landmark a reader arrives at out of order, so it
    * needs a name of its own rather than borrowing the heading above it.

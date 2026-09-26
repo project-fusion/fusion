@@ -8,7 +8,7 @@ import '../composer/chat-composer.js'
 import '../message/chat-message.js'
 
 /**
- * @summary A conversation: the turns, and where the reader is in them.
+ * @summary A conversation's turns in a scrolling transcript that keeps the user's place.
  *
  * @description
  * Three regions stacked, and only the transcript scrolls: a composer that slid
@@ -29,20 +29,20 @@ import '../message/chat-message.js'
  * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot - The turns.
- * @slot composer - Below the transcript, where the reader writes.
- * @slot header - Above the transcript.
- * @slot resume - The way back to the bottom.
- * @slot status - Beside the composer: somebody typing, connection lost.
+ * @slot composer - The composer, below the transcript.
+ * @slot header - Content above the transcript.
+ * @slot resume - The control that returns to the bottom.
+ * @slot status - Status beside the composer, such as someone typing or a lost connection.
  *
  * @csspart composer - The region the composer sits in.
- * @csspart log - The transcript, which is the thing that scrolls.
+ * @csspart log - The transcript, which scrolls.
  *
  * @cssproperty --chat-gap - Space between turns.
  * @cssproperty --chat-max-block-size - How tall the conversation may get before the transcript scrolls.
  * @cssproperty --chat-padding-inline - Space either side of every region.
- * @cssproperty --chat-resume-border-color - The edge around the way back.
- * @cssproperty --chat-resume-border-width - How thick that edge is, for a surface over content.
- * @cssproperty --chat-resume-shadow - The lift under the way back, which floats over the transcript.
+ * @cssproperty --chat-resume-border-color - Color of the edge around the resume control.
+ * @cssproperty --chat-resume-border-width - Width of the edge around the resume control, which sits over content.
+ * @cssproperty --chat-resume-shadow - Shadow under the resume control, which floats over the transcript.
  * @cssproperty --chat-rule - The hairline under the header.
  */
 @customElement('helix-chat')

@@ -38,29 +38,29 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @aliases Crumb
  * @documentation https://fusion.dev/helix/components/breadcrumbs
  *
- * @slot - The step's label. Without an `href` this may be the consumer's own
- * anchor, styled with `data-link="quiet"`, since a slotted anchor belongs to the
- * outer tree and cannot be reached from this component's styles.
- * @slot end - After the label and outside the link, so it may be a control: this is where a
- * switcher's menu trigger goes. A count or a mark is equally at home here and is no longer
- * read into the link's accessible name.
+ * @slot - The step's label. Without an `href`, you can slot your own anchor
+ * here. Give it `data-link="quiet"`, because a slotted anchor belongs to the
+ * outer tree and the crumb's styles cannot reach it.
+ * @slot end - Content after the label and outside the link, such as a switcher's
+ * menu trigger, a count, or a mark. It can hold a control, and it is not read as
+ * part of the link's accessible name.
  * @slot separator - Replaces the chevron shown before this item.
- * @slot start - Before the label, for an icon.
+ * @slot start - Content before the label, such as an icon.
  *
  * @csspart link - The crumb itself, which is an `<a>` where `href` is set.
  * @csspart separator - The separator preceding the item.
- * @csspart separator-mark - The glyph between this crumb and the next, where none is slotted.
+ * @csspart separator-mark - The chevron between crumbs, shown when no separator is slotted.
  */
 @customElement('helix-headless-breadcrumb')
 export class HelixHeadlessBreadcrumb extends HelixElement {
   /**
-   * Whether this item is the page the reader is on.
+   * Marks this item as the page you are on.
    */
   @property({ reflect: true, type: Boolean })
   current = false
 
   /**
-   * Where the crumb goes, and nothing where it is the current page.
+   * The URL the crumb links to. The current page has none.
    *
    * **Optional and reflected, because a stylesheet does select on it.** A sheet
    * writes `:host(:not([href])) [part="link"]` to take the block padding off a
@@ -81,7 +81,8 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   href?: string
 
   /**
-   * What the link declares about where it goes.
+   * The link's `rel` value, which describes how the linked page relates to this
+   * one.
    *
    * The consumer's decision.
    */
@@ -89,7 +90,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   rel = ''
 
   /**
-   * Where the link opens, for the rare crumb that leaves the site.
+   * Where the link opens. Use it for a crumb that leaves the site.
    */
   @property()
   target = ''

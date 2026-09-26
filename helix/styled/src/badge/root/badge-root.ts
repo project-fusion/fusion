@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './badge-root.css.js'
 
 /**
- * @summary Attaches a count or a presence mark to another element.
+ * @summary A count or a dot pinned to the corner of another element.
  *
  * @description
  * The indicator carries a ring in the page's own background color, so it stays
@@ -18,15 +18,14 @@ import { styles } from './badge-root.css.js'
  * @aliases Count, Indicator, Pip
  * @documentation https://fusion.dev/helix/components/badge
  *
- * @cssproperty --badge-background-color - Fill of the indicator.
+ * @cssproperty --badge-background-color - The fill of the indicator.
  * @cssproperty --badge-offset - Pulls the mark in from the corner, along both axes.
- * @cssproperty --badge-ring-color - The ring separating it from what is behind.
+ * @cssproperty --badge-ring-color - The color of the ring between the indicator and what is behind it.
  */
 @customElement('helix-badge')
 export class HelixBadge extends HelixHeadlessBadge {
   /**
-   * What the mark means, not how loudly it is drawn: the stylesheet picks a fill
-   * from what the count *is*.
+   * What the mark means. The stylesheet picks the fill from it.
    *
    * **`Tag`'s vocabulary, because a badge is the same kind of thing.** Both are
    * a small mark carrying a meaning beside something else, and the two had

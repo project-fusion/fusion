@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './tooltip-root.css.js'
 
 /**
- * @summary A short description that appears beside what it describes.
+ * @summary A short text that appears next to an element on hover and focus.
  *
  * @description
  * The bubble is in the top layer, so it needs no `z-index` and cannot be
@@ -21,15 +21,15 @@ import { styles } from './tooltip-root.css.js'
  * @aliases Hint, Popup label
  * @documentation https://fusion.dev/helix/components/tooltip
  *
- * @cssproperty --tooltip-arrow-size - Size of the point at the bubble's edge.
- * @cssproperty --tooltip-backdrop - Blur behind a `frosted` or `glass` bubble.
- * @cssproperty --tooltip-background-color - Fill of the bubble.
- * @cssproperty --tooltip-max-inline-size - Widest the bubble grows before wrapping.
+ * @cssproperty --tooltip-arrow-size - The size of the arrow on the bubble's edge.
+ * @cssproperty --tooltip-backdrop - The blur behind a `frosted` or `glass` bubble.
+ * @cssproperty --tooltip-background-color - The fill of the bubble.
+ * @cssproperty --tooltip-max-inline-size - The widest the bubble grows before its text wraps.
  */
 @customElement('helix-tooltip')
 export class HelixTooltip extends HelixHeadlessTooltip {
   /**
-   * What the bubble is made of.
+   * The bubble's surface: `frosted` or `glass`.
    *
    * Absent is the inverse bubble, a dark surface over a light page, which is
    * what a hint over content the theme cannot know has always been here. `glass`

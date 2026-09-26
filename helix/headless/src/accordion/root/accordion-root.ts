@@ -32,7 +32,7 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
 })
 
 /**
- * @summary Groups collapsible sections, one open at a time by default.
+ * @summary A group of collapsible sections.
  *
  * @description
  * Holds the mode and nothing else. The item that was clicked is what
@@ -77,7 +77,7 @@ export class HelixHeadlessAccordion extends HelixElement {
   @property({ reflect: true })
   mode?: 'single' | 'single-collapsible'
 
-  /** Direct items, in light-DOM order. Client only: the server has no tree. */
+  /** The accordion's own items, in the order they are written. Browser only. */
   get items(): HelixHeadlessAccordionItem[] {
     return [...this.children].filter(
       (child): child is HelixHeadlessAccordionItem => child instanceof HelixHeadlessAccordionItem,

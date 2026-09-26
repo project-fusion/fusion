@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './list-root.css.js'
 
 /**
- * @summary A set of rows, read as a set.
+ * @summary A set of rows, announced as a list.
  *
  * @description
  * Rules between rows rather than around each one, so a list reads as one object
@@ -19,15 +19,15 @@ import { styles } from './list-root.css.js'
  * @aliases Rows, Stack, Menu
  * @documentation https://fusion.dev/helix/components/list
  *
- * @cssproperty --list-gap - Space between rows.
- * @cssproperty --list-marker-gutter - Room the ordered and unordered markers hang into.
+ * @cssproperty --list-gap - The space between rows.
+ * @cssproperty --list-marker-gutter - The space that the markers of ordered and unordered lists sit in.
  * @cssproperty --list-rail-inline-size - The width of the rail's track.
- * @cssproperty --list-rail-style - What a rail counts with. Any `list-style-type`.
+ * @cssproperty --list-rail-style - The counter style of the rail's numbers. Takes any `list-style-type`.
  */
 @customElement('helix-list')
 export class HelixList extends HelixHeadlessList {
   /**
-   * Whether a rule sits between rows.
+   * Draws a line between rows.
    */
   @property({ reflect: true, type: Boolean })
   divided = false

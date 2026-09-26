@@ -19,9 +19,9 @@ import { styles } from './menu-item.css.js'
  * @aliases Menu option, Menu row
  * @documentation https://fusion.dev/helix/components/menu
  *
- * @cssproperty --menu-item-end - Width of the trailing column, seam included, which holds a tick or the caret into a page.
+ * @cssproperty --menu-item-end - Width of the trailing column, including the gap before it, which holds a check mark or a submenu caret.
  * @cssproperty --menu-item-hover-color - Fill under the pointer.
- * @cssproperty --menu-item-start - Width of the leading column, seam included, for a row carrying more than a mark. The menu sets it per page and zero is no column at all.
+ * @cssproperty --menu-item-start - Width of the leading column, including the gap after it, for a row with more than a mark. The menu sets it for each page, and `0` removes the column.
  */
 @customElement('helix-menu-item')
 export class HelixMenuItem extends HelixHeadlessMenuItem {

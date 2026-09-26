@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './avatar-root.css.js'
 
 /**
- * @summary Represents a person or entity with an image or their initials.
+ * @summary A person or entity, shown as an image or as their initials.
  *
  * @description
  * Initials scale with the avatar rather than being sized per size, because the

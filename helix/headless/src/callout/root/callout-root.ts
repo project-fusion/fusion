@@ -4,7 +4,7 @@ import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
- * @summary Sets a passage apart as information, a warning, or an error.
+ * @summary A passage set apart as information, a warning, or an error.
  *
  * @description
  * `tone` lives on the headless tier rather than being a treatment on the styled
@@ -35,7 +35,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @csspart content - The content region.
  * @csspart icon - The icon region.
- * @csspart icon-mark - The tone glyph, where none is slotted.
+ * @csspart icon-mark - The icon for the tone, shown when no icon is slotted.
  */
 @customElement('helix-headless-callout')
 export class HelixHeadlessCallout extends HelixElement {

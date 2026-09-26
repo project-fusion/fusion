@@ -10,7 +10,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 
-/** A place in a points layer, where it is written as a list rather than GeoJSON. */
+/** A place in a points layer, written as an object with coordinates and an optional name. */
 export interface MapPointsPlace {
   /** What pressing it reports, where it is not its label. */
   id?: string | number | undefined
