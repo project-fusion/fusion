@@ -129,7 +129,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
               <Eyebrow>{points?.kicker}</Eyebrow>
               <SectionTitle>{points?.title}</SectionTitle>
               <Lede>{points?.body?.[0]}</Lede>
-              <Code code={POINTS_MARKUP} label="The layer" language="html" />
+              <Code code={POINTS_MARKUP} label="The markup" language="html" />
             </helix-flex>
             <div className={band.bandSection}>
               <MapsPoints />
@@ -203,13 +203,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <helix-flex align-items="center" class="siteActions" data-density="lg" gap="lg" wrap>
               <Link data-button="subtle" href="/helix/theme?layout=map">
-                Try it in the theme builder
+                Open the Map layout in the theme builder
               </Link>
               <Link data-link="quiet" href="/helix/docs/maps">
                 Read the Maps guide
               </Link>
               <Link data-link="quiet" href="/helix/components/map">
-                The Map reference
+                Map component reference
               </Link>
             </helix-flex>
           </helix-flex>

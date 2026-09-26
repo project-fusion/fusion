@@ -303,7 +303,7 @@ export function MapsHero({
               elapsed = 0
               lap += 1
               if (lap === 1) {
-                walker.description = 'Walking the route again, on a loop'
+                walker.description = 'Starting the walk again'
               }
               walker.animate([{ opacity: 0 }, { opacity: 1 }], {
                 duration: 480,
@@ -466,7 +466,7 @@ export function MapsHero({
             a whole theme, or where it came from, or that there is a way back. */}
         {sent ? (
           <helix-text variant="caption">
-            Opened with your theme from the builder.{' '}
+            Showing your theme from the theme builder.{' '}
             <a data-link="true" href={`/helix/theme?${sent.query}`}>
               Back to the theme builder
             </a>
@@ -476,12 +476,7 @@ export function MapsHero({
       {/* **Gathered as the map zooms out**, so the seven places are one
           count over the city rather than seven names drawn over each other,
           and come apart again as it zooms in. */}
-      <helix-map
-        class={styles.mapsHeroFrame}
-        cluster
-        label="Austin, drawn in this theme"
-        ref={frame}
-      >
+      <helix-map class={styles.mapsHeroFrame} cluster label="Map of Austin" ref={frame}>
         <div className={styles.mapsCanvas} ref={container} />
         {/* **The page's ground run in over the map, inside its own box**, so
             it washes the map and not the credit under it, and the places
@@ -492,21 +487,21 @@ export function MapsHero({
             cannot see it. */}
         <helix-map-position
           accuracy={25}
-          description={`Setting off for ${PLACES[1]?.label ?? ''}`}
-          label="A walker on the route"
+          description={`Walking to ${PLACES[1]?.label ?? ''}`}
+          label="Walker"
           lat={PLACES[0]?.lat}
           lng={PLACES[0]?.lng}
         />
         <helix-map-route
-          description="Through all seven places, in the order the arrow keys walk them"
-          label="A walk from the university to the springs"
+          description="Passes all seven places in order"
+          label="Walking route from UT Tower to Barton Springs Pool"
           points={WALK.path.map(([lat, lng]) => ({ lat, lng }))}
         />
         {/* **Dotted where it leaves the path**: a place set back from its
             road is where directions draw the last steps as dots, from where
             the route ends to the place itself, and the first steps the same. */}
         <helix-map-route
-          label={`The first steps, from ${PLACES[0]?.label ?? ''} to the path`}
+          label={`Walk from ${PLACES[0]?.label ?? ''} to the route`}
           points={[
             { lat: PLACES[0]?.lat ?? 0, lng: PLACES[0]?.lng ?? 0 },
             { lat: WALK.path[0]?.[0] ?? 0, lng: WALK.path[0]?.[1] ?? 0 },
@@ -514,7 +509,7 @@ export function MapsHero({
           variant="dotted"
         />
         <helix-map-route
-          label={`The last steps, from the path to ${PLACES.at(-1)?.label ?? ''}`}
+          label={`Walk from the route to ${PLACES.at(-1)?.label ?? ''}`}
           points={[
             { lat: WALK.path.at(-1)?.[0] ?? 0, lng: WALK.path.at(-1)?.[1] ?? 0 },
             { lat: PLACES.at(-1)?.lat ?? 0, lng: PLACES.at(-1)?.lng ?? 0 },
@@ -550,12 +545,11 @@ export function MapsHero({
           <helix-map-marker key={place.label} label={place.label} lat={place.lat} lng={place.lng} />
         ))}
       </helix-map>
-      {/* **Try it, on the map rather than in the pitch**: brand, mode and
-          the walker in one bar docked to the map's foot, so they read as the
-          map's own controls. Painted with the scope it re-themes, as the
-          frame's buttons are. */}
+      {/* The controls that customize the map: brand, mode, and the walker, in
+          one bar at the bottom of the map so they read as the map's own. The
+          bar is inside the scope they restyle, so it changes with the map. */}
       <fieldset className={styles.mapsTry} ref={bar}>
-        <legend className={styles.mapsTryLabel}>Try it</legend>
+        <legend className={styles.mapsTryLabel}>Customize the map</legend>
         <div className={styles.mapsControls}>
           <fieldset className={styles.mapsControl}>
             <legend className={styles.mapsLegend}>Brand</legend>
@@ -571,7 +565,7 @@ export function MapsHero({
                 />
               ) : null}
               <button
-                aria-label="This site's brand"
+                aria-label="Site brand"
                 aria-pressed={brand === null}
                 className={styles.mapsSwatch}
                 onClick={() => setBrand(null)}
