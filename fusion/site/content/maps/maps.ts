@@ -204,21 +204,18 @@ export const MAPS: PageCopy = {
   blocks: [
     {
       body: [
-        'Pick a brand or a mode and only the map changes. Every color in it is mixed from the page’s own tokens.',
-        'Places that would draw over each other gather into a count. The Driskill and its café share an address, so theirs fans out when pressed.',
+        'Maps in your theme that a screen reader can find, drawn by whichever renderer you use.',
       ],
-      title: 'The map',
+      kicker: 'Helix Maps',
+      title: 'A map that belongs to the page',
     },
     {
-      body: [
-        'An embedded map is usually a canvas in someone else’s colors that a screen reader cannot find. Helix puts it in your theme, in the accessibility tree, and on whichever renderer you use.',
-      ],
       items: MAP_PILLARS.map((pillar) => ({
         body: `${pillar.claim} ${pillar.facts.join(' ')}`,
         name: pillar.name,
       })),
-      kicker: 'Maps',
-      title: 'A map that belongs to the page',
+      kicker: 'Why Helix',
+      title: 'What Helix adds to a map',
     },
     {
       body: [

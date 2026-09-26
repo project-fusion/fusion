@@ -100,7 +100,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>{pillars?.kicker}</Eyebrow>
             <SectionTitle>{pillars?.title}</SectionTitle>
-            <Lede>{pillars?.body?.[0]}</Lede>
           </helix-flex>
           <div className={band.bandRow}>
             {MAP_PILLARS.map((pillar) => (
@@ -165,7 +164,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
       {/* **A second field for the second half**, the way the landing page
           lights its closing bands: one canvas the length of five bands faded
           to flat black by the fourth. */}
-      <div className={`${styles.mapsField} ${styles.mapsFieldLate}`}>
+      <div className={styles.mapsField}>
         <helix-aura
           class={styles.mapsAura}
           data-layer
