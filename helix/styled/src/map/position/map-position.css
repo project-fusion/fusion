@@ -5,6 +5,7 @@
    renderer measures from the left whatever the page's direction. */
 :host {
   --_map-position-color: var(--map-position-color, var(--helix-color-primary));
+  --_map-position-size: var(--map-position-size, 1.25rem);
   /* **Declared here and written by the connector**, onto the host, where the
      connector can reach and this can read. */
   --_map-position-heading: 0deg;
@@ -18,6 +19,9 @@
   left: var(--_map-position-x);
   pointer-events: none;
   position: absolute;
+  /* **Over the places it passes**, since it is the thing that moves: drawn
+     after it, a marker it stood on covered it whole. */
+  z-index: var(--helix-layer-raised);
 }
 
 /* Not yet placed, which would draw it in the frame's corner. */
@@ -33,10 +37,10 @@
    the connector turns into pixels at the zoom the map is at. A wash of the
    point's color rather than a line, since it is a likelihood and not an edge. */
 [part="accuracy"] {
-  background: color-mix(in oklab, var(--_map-position-color) 14%, transparent);
+  background: color-mix(in oklab, var(--_map-position-color) 12%, transparent);
   block-size: calc(var(--_map-position-radius) * 2);
   border: var(--helix-border-thin) solid
-    color-mix(in oklab, var(--_map-position-color) 40%, transparent);
+    color-mix(in oklab, var(--_map-position-color) 35%, transparent);
   border-radius: var(--helix-radii-full);
   box-sizing: border-box;
   inline-size: calc(var(--_map-position-radius) * 2);
@@ -46,20 +50,18 @@
   translate: -50% -50%;
 }
 
-/* **The way it is going**: a cone opening from the point, turned clockwise
-   from north by the heading, and drawn only where a heading is known. */
+/* **A beam the way it is going**, the one mark a reader finds a direction by
+   at a glance: a wedge opening from the point, strongest at the point and
+   gone by its edge, turned clockwise from north by the heading. Drawn only
+   where a heading is known. */
 [part="heading"] {
-  background: conic-gradient(
-    from -30deg,
-    color-mix(in oklab, var(--_map-position-color) 60%, transparent) 0deg 60deg,
-    transparent 60deg
-  );
-  block-size: calc(var(--map-position-size, 1rem) * 4.5);
+  background: conic-gradient(from -36deg, var(--_map-position-color) 0deg 72deg, transparent 72deg);
+  block-size: calc(var(--_map-position-size) * 5.5);
   border-radius: var(--helix-radii-full);
   display: none;
-  inline-size: calc(var(--map-position-size, 1rem) * 4.5);
+  inline-size: calc(var(--_map-position-size) * 5.5);
   left: 0;
-  mask: radial-gradient(closest-side, black 40%, transparent);
+  mask: radial-gradient(closest-side, rgb(0 0 0 / 0.55) 18%, transparent);
   position: absolute;
   rotate: var(--_map-position-heading);
   top: 0;
@@ -70,24 +72,82 @@
   display: block;
 }
 
-/* **A halo, so it reads as moving rather than as one more place.** A marker
-   is a point in the same color, and a position drawn the same way was one
-   more marker among them until it moved. */
-[part="dot"] {
+/* **A ring that radiates from the point**, which is what says live rather
+   than one more place. Paced from the theme's own slow duration, so an
+   \`instant\` theme, whose durations are zero, has none, and so does a
+   reader who asked for less motion. */
+[part="pulse"] {
+  animation: map-position-pulse calc(var(--helix-duration-slow) * 7.5)
+    var(--helix-easing-decelerate) infinite;
   background: var(--_map-position-color);
-  block-size: var(--map-position-size, 1rem);
-  border: var(--helix-border-thick) solid var(--helix-color-surface);
+  block-size: var(--_map-position-size);
   border-radius: var(--helix-radii-full);
-  box-shadow:
-    0 0 0 calc(var(--map-position-size, 1rem) * 0.4)
-    color-mix(in oklab, var(--_map-position-color) 24%, transparent),
-    var(--helix-shadow-sm);
-  box-sizing: border-box;
-  inline-size: var(--map-position-size, 1rem);
+  inline-size: var(--_map-position-size);
   left: 0;
+  opacity: 0;
   position: absolute;
   top: 0;
   translate: -50% -50%;
+}
+
+@keyframes map-position-pulse {
+  from {
+    opacity: 0.45;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 3.2;
+  }
+}
+
+/* **The point, lit from above and ringed in the surface**, so it stands off
+   any ground the map draws under it. A little larger than a marker's, and
+   with a halo a marker does not have, so it reads as moving rather than as
+   one more place. */
+[part="dot"] {
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in oklab, var(--_map-position-color), var(--helix-color-surface) 35%),
+    var(--_map-position-color) 70%
+  );
+  block-size: var(--_map-position-size);
+  border: var(--helix-border-thick) solid var(--helix-color-surface);
+  border-radius: var(--helix-radii-full);
+  box-shadow:
+    0 0 0 calc(var(--_map-position-size) * 0.3)
+    color-mix(in oklab, var(--_map-position-color) 22%, transparent),
+    var(--helix-shadow-sm);
+  box-sizing: border-box;
+  inline-size: var(--_map-position-size);
+  left: 0;
+  position: absolute;
+  rotate: var(--_map-position-heading);
+  top: 0;
+  translate: -50% -50%;
+}
+
+/* **An arrow in the point where there is a heading**, in the surface on the
+   point's color, turned with the point: the beam says roughly where, and the
+   arrow says exactly. */
+:host([heading]) [part="dot"]::after {
+  background: var(--helix-color-surface);
+  block-size: 55%;
+  /* A shallow notch, so the tip is the one sharp point: with a deep one the
+     two wings were as sharp as the tip, and an arrow turned 225 degrees read
+     as pointing the other way. */
+  clip-path: polygon(50% 0%, 100% 100%, 50% 80%, 0% 100%);
+  content: "";
+  inline-size: 50%;
+  inset: 0;
+  margin: auto;
+  position: absolute;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="pulse"] {
+    animation: none;
+  }
 }
 
 /* **Heard, not seen**: the description is for a reader who cannot see the
