@@ -14,7 +14,7 @@ There is no `react` tier. The framework typings, `jsx.d.ts`, `vue.d.ts` and
 [Framework typings](#framework-typings-and-the-names-they-carry) says what they
 carry.
 
-**`headless` must never depend on `turbo run styles`.** That constraint is what makes the
+**`headless` must never depend on `styles`.** That constraint is what makes the
 headless tier independently consumable. If styling leaks downward, we have
 shipped one package in five files.
 
