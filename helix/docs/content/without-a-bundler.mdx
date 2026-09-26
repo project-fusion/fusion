@@ -1,5 +1,5 @@
 ---
-description: Use Helix on a page with no build step, and what changes without a bundler.
+description: Use the Helix styles on a page with no build step, and why the elements need a bundler for now.
 parent: installation
 section: Getting started
 title: Without a bundler
@@ -8,8 +8,8 @@ trailing: true
 
 # Without a bundler
 
-Helix ships standard ES modules and plain CSS files, so you can use it with no
-build step. There are two ways to do this, and each suits a different need.
+Helix ships standard ES modules and plain CSS files. On a page with no build
+step, you can use the Helix styles. The elements need a bundler for now.
 
 ## Use the styles alone
 
@@ -31,7 +31,7 @@ Its `@import`s are relative, so a browser resolves them against the stylesheet's
 own URL. Copy the whole `dist` folder and link `helix.css`. We checked this in
 Chromium: one `<link>` makes five requests, and every layer resolves.
 
-*Until 24 Aug 2026, this page listed `tokens.css` and `base.css` without
+*Until August 24, 2026, this page listed `tokens.css` and `base.css` without
 `primitives.css`. `tokens.css` refers to a primitive 297 times and imports
 nothing. If you followed the old instructions, all 185 semantic tokens are
 declared and every color resolves to `rgba(0, 0, 0, 0)`. If your page looks
@@ -43,3 +43,16 @@ the element definitions arrive. `elements.css` is the fourth layer that
 `helix.css` imports. It used to be a second link, and moving it into the same
 package made its import relative. Only a bundler resolves a bare specifier in an
 `@import`, so a bare specifier would not work on a page with no bundler.
+
+## The elements need a bundler
+
+`@fusion.dev/helix` imports its dependencies by bare specifiers, such as
+`@fusion.dev/helix-core` and `lit`. A browser resolves a bare specifier only
+through an import map, and the elements import 97 separate subpaths of
+`@fusion.dev/helix-headless`. An import map would need an entry for each one,
+and for each subpath of `lit`.
+
+To use the elements, load them through a bundler, as
+[Installation](./installation) shows. A CDN that rewrites bare specifiers into
+URLs can serve the elements to a page with no build step, once the packages are
+public on npm.
