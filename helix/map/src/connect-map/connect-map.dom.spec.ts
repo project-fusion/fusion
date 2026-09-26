@@ -472,6 +472,54 @@ describe('connectMap with routes and areas', () => {
     expect(drawn[0]?.map((one) => one.casing)).toEqual(['rgb(250, 250, 250)', undefined])
   })
 
+  test('a route under way is cut at its progress, the part behind drawn quieter', async () => {
+    const host = await frame(
+      `<helix-headless-map-route label="Quarter" points="0,0 0,2" progress="0.25"></helix-headless-map-route>
+       <helix-headless-map-route label="Done" points="0,0 0,2" progress="1"></helix-headless-map-route>
+       <helix-headless-map-route label="Unstarted" points="0,0 0,2"></helix-headless-map-route>`,
+    )
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    expect(
+      drawn[0]?.map(({ faded, label, points }) => ({ faded: faded ?? false, label, points })),
+    ).toEqual([
+      {
+        faded: true,
+        label: 'Quarter',
+        points: [
+          { lat: 0, lng: 0 },
+          { lat: 0, lng: 0.5 },
+        ],
+      },
+      {
+        faded: false,
+        label: 'Quarter',
+        points: [
+          { lat: 0, lng: 0.5 },
+          { lat: 0, lng: 2 },
+        ],
+      },
+      {
+        faded: true,
+        label: 'Done',
+        points: [
+          { lat: 0, lng: 0 },
+          { lat: 0, lng: 2 },
+        ],
+      },
+      {
+        faded: false,
+        label: 'Unstarted',
+        points: [
+          { lat: 0, lng: 0 },
+          { lat: 0, lng: 2 },
+        ],
+      },
+    ])
+    // The two halves of one route are told apart by id.
+    expect(new Set(drawn[0]?.map((one) => one.id)).size).toBe(4)
+  })
+
   test('a route moved, retoned or added is drawn again, under the same id, and disconnecting takes them off', async () => {
     const host = await frame(
       '<helix-headless-map-route label="R" points="1,2 3,4"></helix-headless-map-route>',

@@ -85,6 +85,7 @@ export interface LeafletShapes {
 /** How a shape is painted, in Leaflet's own words for it. */
 interface LeafletShapeOptions {
   color: string
+  opacity?: number
   fillColor?: string
   fillOpacity?: number
   interactive: boolean
@@ -178,6 +179,7 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
                         interactive: false,
                         lineCap: 'round',
                         lineJoin: 'round',
+                        opacity: layer.faded ? 0.4 : 1,
                         weight: 7,
                       }),
                     ]
@@ -189,6 +191,7 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
                       interactive: false,
                       lineCap: 'round',
                       lineJoin: 'round',
+                      opacity: layer.faded ? 0.4 : 1,
                       weight: 4,
                     })
                   : shapes.polygon(latlngs, {

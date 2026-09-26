@@ -46,10 +46,11 @@ export class HelixMapMarker extends HelixHeadlessMapMarker {
   /**
    * The point's shape, a circle where this says nothing: a page telling kinds
    * of place apart by more than their color, which a reader who cannot tell
-   * the colors apart needs.
+   * the colors apart needs. `pin` is where a journey ends, its tip standing
+   * on the place rather than its middle.
    */
   @property({ reflect: true })
-  shape?: 'diamond' | 'ring' | 'rounded' | 'square'
+  shape?: 'diamond' | 'pin' | 'ring' | 'rounded' | 'square'
 
   /** What the place means: the brand where this says nothing. */
   @property({ reflect: true })
