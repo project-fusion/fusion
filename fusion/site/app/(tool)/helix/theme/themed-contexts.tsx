@@ -105,6 +105,19 @@ export interface Context {
       state: State
       status: string
     }[]
+    /**
+     * Something on its way, where the row's journey is under way: where it is,
+     * which way it faces, how sure the feed is, and the words a reader hears.
+     */
+    position?: {
+      accuracy: number
+      description: string
+      heading: number
+      label: string
+      lat: number
+      lng: number
+      state: State
+    }
   }
   /** Which mark `Mark` draws. */
   mark: 'brand' | 'deckle' | 'strata' | 'weft'
@@ -285,6 +298,15 @@ export const CONTEXTS: readonly Context[] = [
           status: 'On time',
         },
       ],
+      position: {
+        accuracy: 8000,
+        description: 'Forty minutes behind its window at Genoa',
+        heading: 50,
+        label: 'Corvina, Algeciras to Genoa',
+        lat: 41.0969,
+        lng: 3.1814,
+        state: 'warning',
+      },
     },
     mark: 'strata',
     menu: ['Export today', 'Subscribe to changes', 'Open in the planner'],
@@ -836,6 +858,15 @@ export const CONTEXTS: readonly Context[] = [
           status: 'Success',
         },
       ],
+      position: {
+        accuracy: 8000,
+        description: 'A description, spoken as it changes',
+        heading: 50,
+        label: 'A position',
+        lat: 41.0969,
+        lng: 3.1814,
+        state: 'warning',
+      },
     },
     mark: 'brand',
     menu: ['A menu item', 'A second item', 'A third item'],

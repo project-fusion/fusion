@@ -48,6 +48,18 @@ type Mode = 'site' | 'light' | 'dark'
 /** The brand choice that is a whole theme from the builder rather than a color. */
 const YOURS = 'yours'
 
+/** How long the walker takes between two places, in milliseconds. */
+const LEG = 9000
+
+/** The way from one place to the next, in degrees clockwise from north. */
+const bearing = (from: { lat: number; lng: number }, to: { lat: number; lng: number }): number => {
+  const [a, b] = [from.lat, to.lat].map((one) => (one * Math.PI) / 180) as [number, number]
+  const across = ((to.lng - from.lng) * Math.PI) / 180
+  const east = Math.sin(across) * Math.cos(b)
+  const north = Math.cos(a) * Math.sin(b) - Math.sin(a) * Math.cos(b) * Math.cos(across)
+  return ((Math.atan2(east, north) * 180) / Math.PI + 360) % 360
+}
+
 /** The places' corners, as the camera frames them. */
 const BOUNDS = boundsOf(PLACES)
 
@@ -143,6 +155,35 @@ export function MapsHero({
         map.fitBounds(BOUNDS, { animate: false, padding: clearOf(box, panel.current) })
       })
       const connection = connectMap(host, mapLibreDriver(map))
+      /* **A walker, once, along the route**, so the page shows a live
+         position rather than describing one: it moves in silence, and its
+         words change only as it sets off for each place, which is what a
+         screen reader hears, and says so when it arrives. Standing at the
+         start for a reader who asked for less motion. */
+      const walker = host.querySelector('helix-map-position')
+      let walking = 0
+      if (walker && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const legs = PLACES.slice(1).map((to, at) => ({ from: PLACES[at] ?? to, to }))
+        const started = performance.now()
+        const step = (): void => {
+          const time = (performance.now() - started) / LEG
+          const at = Math.min(Math.floor(time), legs.length - 1)
+          const leg = legs[at]
+          if (!leg) {
+            return
+          }
+          const along = Math.min(time - at, 1)
+          walker.lat = leg.from.lat + (leg.to.lat - leg.from.lat) * along
+          walker.lng = leg.from.lng + (leg.to.lng - leg.from.lng) * along
+          walker.heading = bearing(leg.from, leg.to)
+          const arrived = along >= 1 && at === legs.length - 1
+          walker.description = arrived ? `Arrived at ${leg.to.label}` : `Walking to ${leg.to.label}`
+          if (!arrived) {
+            walking = window.setTimeout(step, 200)
+          }
+        }
+        step()
+      }
       /* Pressing a place is the page's to answer, and this one goes there, at
          the theme's own pace for a travel: its slow duration and emphasized
          curve, and a jump where the reader asked for less motion or the
@@ -185,6 +226,7 @@ export function MapsHero({
       const scheme = matchMedia('(prefers-color-scheme: dark)')
       scheme.addEventListener('change', restyle)
       teardown = () => {
+        clearTimeout(walking)
         cancelAnimationFrame(pending)
         watch.disconnect()
         scheme.removeEventListener('change', restyle)
@@ -263,6 +305,13 @@ export function MapsHero({
         {/* The walk the arrow keys take, drawn: the renderer's own line under
             the street names, and named in the frame's list for a reader who
             cannot see it. */}
+        <helix-map-position
+          accuracy={25}
+          description={`Setting off for ${PLACES[1]?.label ?? ''}`}
+          label="A walker on the route"
+          lat={PLACES[0]?.lat}
+          lng={PLACES[0]?.lng}
+        />
         <helix-map-route
           description="Through all seven places, in the order the arrow keys walk them"
           label="A walk from the university to the springs"
