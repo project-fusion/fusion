@@ -4,7 +4,11 @@
    `left` rather than `inset-inline-start` for the marker's reason: the
    renderer measures from the left whatever the page's direction. */
 :host {
-  --_map-position-color: var(--map-position-color, var(--helix-color-primary));
+  /* **The page's ink, not the brand.** The places and the routes are the
+     brand, so a position in it was one more of them; in the ink it stands
+     apart from both, at the most contrast the page has against the land, on
+     either scheme. A tone says otherwise where the position means something. */
+  --_map-position-color: var(--map-position-color, var(--helix-color-foreground));
   --_map-position-size: var(--map-position-size, 1.25rem);
   /* **Declared here and written by the connector**, onto the host, where the
      connector can reach and this can read. */
@@ -61,7 +65,7 @@
   display: none;
   inline-size: calc(var(--_map-position-size) * 5.5);
   left: 0;
-  mask: radial-gradient(closest-side, rgb(0 0 0 / 0.55) 18%, transparent);
+  mask: radial-gradient(closest-side, rgb(0 0 0 / 0.38) 18%, transparent);
   position: absolute;
   rotate: var(--_map-position-heading);
   top: 0;
