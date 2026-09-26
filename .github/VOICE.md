@@ -34,6 +34,8 @@ comments are rewritten only when the code around them changes.
     however well it sounds.
 12. **American spelling, sentence-case headings, exact names and numbers.**
     `fusion prose` checks the spelling.
+13. **Use the serial comma.** Write "places, routes, and live positions", with a
+    comma before the "and" or "or" that ends a list of three or more.
 
 ## By surface
 
