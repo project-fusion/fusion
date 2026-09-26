@@ -131,7 +131,7 @@ export function MapsHero({
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
-  const bar = useRef<HTMLDivElement>(null)
+  const bar = useRef<HTMLFieldSetElement>(null)
   const engine = useRef<Promise<ThemeEngine> | null>(null)
   /* **The contrast the labels are held to**: a sent theme's own target while
      it is the one chosen, and the compiler's default otherwise. A ref rather
@@ -557,10 +557,8 @@ export function MapsHero({
           the walker in one bar docked to the map's foot, so they read as the
           map's own controls. Painted with the scope it re-themes, as the
           frame's buttons are. */}
-      <div aria-label="Try it" className={styles.mapsTry} ref={bar} role="group">
-        <span aria-hidden="true" className={styles.mapsTryLabel}>
-          Try it
-        </span>
+      <fieldset className={styles.mapsTry} ref={bar}>
+        <legend className={styles.mapsTryLabel}>Try it</legend>
         <div className={styles.mapsControls}>
           <fieldset className={styles.mapsControl}>
             <legend className={styles.mapsLegend}>Brand</legend>
@@ -623,7 +621,7 @@ export function MapsHero({
             </div>
           )}
         </div>
-      </div>
+      </fieldset>
     </div>
   )
 }
