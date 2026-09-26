@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <>
-      {/* Preview frame: the submit is swallowed. */}
+      {/* The preview cancels the submit, so the page stays in place. */}
       <form onSubmit={(event) => event.preventDefault()}>
         <helix-flex
           direction="column"

@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-video
       controls
-      label="The browser draws its own bar"
+      label="Product walkthrough"
       src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
     ></helix-video>
   )

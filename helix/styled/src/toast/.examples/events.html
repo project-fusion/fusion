@@ -18,7 +18,7 @@
       dismissible
       tone="danger"
     >
-      The build failed.
+      The upload failed.
     </helix-toast-item>
   </helix-toast>
 
@@ -26,10 +26,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Press a message's close control</span>
     </helix-list-item>
   </helix-list>
@@ -40,7 +40,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -61,6 +61,6 @@
   }
 
   stack.addEventListener('helix-dismiss', (event) => {
-    say('helix-dismiss', `"${event.detail.label}" asked to go, and it bubbles so the stack hears it`)
+    say('helix-dismiss', `the close button on "${event.detail.label}" was pressed, and the event bubbles`)
   })
 </script>

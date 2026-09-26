@@ -10,28 +10,28 @@
   >
     <helix-tab value="usage">Usage</helix-tab>
     <helix-tab value="billing">Billing</helix-tab>
-    <helix-tab value="danger">Danger</helix-tab>
+    <helix-tab value="danger">Advanced</helix-tab>
     <helix-tab-panel
       slot="panels"
       value="usage"
-    >Requests, storage and egress.</helix-tab-panel>
+    >Requests, storage, and bandwidth.</helix-tab-panel>
     <helix-tab-panel
       slot="panels"
       value="billing"
-    >Invoices and the card on file.</helix-tab-panel>
+    >Invoices and the payment method on file.</helix-tab-panel>
     <helix-tab-panel
       slot="panels"
       value="danger"
-    >Nothing reaches here.</helix-tab-panel>
+    >Transfer or delete your account.</helix-tab-panel>
   </helix-tabs>
 
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Move between the tabs</span>
     </helix-list-item>
   </helix-list>
@@ -42,7 +42,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -65,12 +65,12 @@
   strip.addEventListener('helix-before-activate', (event) => {
     if (event.detail.value === 'danger') {
       event.preventDefault()
-      say('helix-before-activate', 'refused, so the strip did not move')
+      say('helix-before-activate', 'canceled, so the active tab did not change')
       return
     }
     say('helix-before-activate', `moving to "${event.detail.value}"`)
   })
   strip.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was chosen, which a container can catch`)
+    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   })
 </script>

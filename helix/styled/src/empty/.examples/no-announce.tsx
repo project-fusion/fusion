@@ -6,7 +6,7 @@ export function Example() {
         slot="icon"
       ></helix-icon>
       <span slot="heading">No projects yet</span>
-      The first one will show up here.
+      Projects you create appear here.
     </helix-empty>
   )
 }

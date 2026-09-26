@@ -7,9 +7,9 @@ export function Example() {
       label="Releases"
       orientation="vertical"
     >
-      <helix-callout tone="info">Slide One</helix-callout>
-      <helix-callout tone="success">Slide Two</helix-callout>
-      <helix-callout tone="warning">Slide Three</helix-callout>
+      <helix-callout tone="info">New features are available.</helix-callout>
+      <helix-callout tone="success">Your changes were saved.</helix-callout>
+      <helix-callout tone="warning">Your storage is almost full.</helix-callout>
     </helix-carousel>
   )
 }

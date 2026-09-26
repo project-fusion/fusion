@@ -10,9 +10,9 @@ export function Example() {
             as="h3"
             slot="header"
           >
-            Item One
+            Website redesign
           </helix-text>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          <p>Updated 2 hours ago by Alex Kim.</p>
         </helix-card>
       </a>
       <a
@@ -25,9 +25,9 @@ export function Example() {
             as="h3"
             slot="header"
           >
-            Item Two
+            Mobile app
           </helix-text>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          <p>Updated yesterday by Maria Lopez.</p>
         </helix-card>
       </a>
     </helix-flex>

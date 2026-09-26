@@ -28,7 +28,7 @@ export function Example() {
         >
           Discard changes?
         </helix-text>
-        <helix-text>Nine edits have not been saved. Closing now leaves them behind.</helix-text>
+        <helix-text>You have nine unsaved changes. If you close now, they will be lost.</helix-text>
         <helix-button-group
           label="Dialog actions"
           slot="footer"
@@ -38,7 +38,7 @@ export function Example() {
             emphasis="solid"
             tone="danger"
           >
-            Discard
+            Discard changes
           </helix-button>
           <helix-button
             command="--close"

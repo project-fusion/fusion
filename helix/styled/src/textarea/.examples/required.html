@@ -1,21 +1,21 @@
 <!-- @summary A required field, marked on the label, and the browser's message when it is left empty. -->
-<!-- Preview frame: the submit is swallowed. -->
+<!-- The preview cancels the submit, so the page stays in place. -->
 <form onsubmit="event.preventDefault()">
   <helix-flex
     direction="column"
     gap="sm"
   >
     <helix-textarea
-      hint="We read every one"
+      hint="Include the steps that led to the problem"
       label="What happened"
       name="report"
-      placeholder="Start with what you expected"
+      placeholder="What did you expect to happen?"
       required
     ></helix-textarea>
     <helix-button
       emphasis="solid"
       tone="primary"
       type="submit"
-    >Send</helix-button>
+    >Send report</helix-button>
   </helix-flex>
 </form>

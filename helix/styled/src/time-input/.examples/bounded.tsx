@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-time-input
       default-value="09:30"
-      hint="Between nine and five, every half hour"
+      hint="Between 9:00 AM and 5:00 PM, every 30 minutes"
       label="Appointment"
       max="17:00"
       min="09:00"

@@ -3,10 +3,12 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Type to filter, then choose', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [
+  { carried: 'Type to filter, then choose a region', name: 'No events yet' },
+]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,19 +21,19 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   }
 
   const moved = (event: Event & { currentTarget: HelixListbox }) => {
-    say('input', `"${event.currentTarget.value}", once and not once per element`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   }
 
   const settled = (event: Event & { currentTarget: HelixListbox }) => {
-    say('change', `"${event.currentTarget.value}", the choice is made`)
+    say('change', `Chose "${event.currentTarget.value}"`)
   }
 
   const filtered = (event: CustomEvent<{ value: string }>) => {
-    say('helix-filter', `the query is "${event.detail.value}", which chooses nothing`)
+    say('helix-filter', `Filter text is "${event.detail.value}"`)
   }
 
   return (
@@ -55,7 +57,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

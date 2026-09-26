@@ -2,7 +2,7 @@
 <!-- @min 520 -->
 
 <helix-filter-input
-  hint="Assignee offers is empty, which takes no values at all"
+  hint="Filter by disposition, created date, or assignee"
   id="filter"
   label="Filter the queue"
   placeholder="Search, or pick a filter"
@@ -31,7 +31,7 @@
       <helix-option value="settled">Settled</helix-option>
     </helix-filter-field>
 
-    <!-- `one`: pressing another value replaces it rather than adding. -->
+    <!-- `one`: choosing another value replaces the current one. -->
     <helix-filter-field
       label="Created"
       name="created"
@@ -74,8 +74,8 @@
     const { arity, field, label, operatorLabel, values } = event.detail
     const held = filter.querySelector(`helix-filter-chip[name="${field}"]`)
 
-    /* `arity` is what tells an empty filter from no filter: a comparison that
-       takes none is filtering, and will never have values to show. */
+    /* `arity` tells an empty filter from no filter. A comparison that takes no
+       values is still a filter. */
     if (values.length === 0 && arity !== 'none') {
       held?.remove()
       return
@@ -86,8 +86,8 @@
     chip.dismissible = true
     chip.dismissLabel = `Remove the ${label.toLowerCase()} filter`
     chip.label = label
-    /* The attribute, not the property: a reflected property lands on the next
-       update, so the lookup above would miss a chip built moments earlier. */
+    /* Set the attribute so the lookup above finds a chip made moments earlier.
+       A reflected property updates on the next render. */
     chip.setAttribute('name', field)
     chip.operatorLabel = operatorLabel
     chip.textContent = values.join(', ')

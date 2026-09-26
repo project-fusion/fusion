@@ -8,8 +8,6 @@ export function Example() {
     >
       <h2 slot="header">Notifications</h2>
 
-      {/* A reminder, and the actions are the point of it, so they are drawn
-          rather than waiting for a pointer. */}
       <helix-notification
         at="2026-09-09T03:00:00Z"
         dismissible
@@ -37,26 +35,25 @@ export function Example() {
         </helix-button>
       </helix-notification>
 
-      {/* A status moving from one value to another, which is a block rather than
-          a line about the row, so it goes in `detail` and keeps its own type. */}
+      {/* Put a block such as a status change in the `detail` slot. */}
       <helix-notification
         at="2026-09-08T03:00:00Z"
         dismissible
         separation="filled"
       >
         <helix-avatar
-          name="Josh Krajcik"
+          name="Jordan Lee"
           slot="media"
         ></helix-avatar>
         <span>
-          <strong>Josh Krajcik</strong> changed the status of <strong>Design Project</strong>
+          <strong>Jordan Lee</strong> changed the status of <strong>Website redesign</strong>
         </span>
         <helix-flex
           align-items="center"
           gap="xs"
           slot="detail"
         >
-          <helix-tag>In Progress</helix-tag>
+          <helix-tag>In progress</helix-tag>
           <helix-icon
             mirror
             name="arrow-right"
@@ -65,9 +62,8 @@ export function Example() {
         </helix-flex>
       </helix-notification>
 
-      {/* Somebody else's words. `detail` sets no size and no ink, so this is the
-          consumer's box to dress, which is the whole difference between it and
-          `caption`. */}
+      {/* The `detail` slot sets no size or color, so style its content
+          yourself. */}
       <helix-notification
         at="2026-09-07T03:00:00Z"
         read
@@ -78,13 +74,13 @@ export function Example() {
           slot="media"
         ></helix-avatar>
         <span>
-          <strong>Santos Kling</strong> left a comment on <strong>Strategy 2022</strong>
+          <strong>Santos Kling</strong> left a comment on <strong>Q4 planning</strong>
         </span>
         <p
           className="quote"
           slot="detail"
         >
-          Where can i find the process for submitting invoices and for reviewing a contract?
+          Where can I find the process for submitting invoices and for reviewing a contract?
         </p>
       </helix-notification>
     </helix-notifications>

@@ -9,13 +9,13 @@ export function Example() {
         >
           <helix-rating
             feedback="Choose a rating before sending"
-            hint="One to five, where five is best"
-            label="How was it?"
+            hint="1 is poor and 5 is excellent"
+            label="How was your order?"
             name="score"
             required
           ></helix-rating>
 
-          <helix-button type="submit">Send</helix-button>
+          <helix-button type="submit">Send review</helix-button>
         </helix-flex>
       </form>
     </>

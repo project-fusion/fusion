@@ -3,7 +3,7 @@ export function Example() {
     <helix-time-input
       default-value="09:00,17:00"
       hint="A start and an end"
-      label="Open"
+      label="Opening hours"
       mode="range"
       name="open"
       step={30}

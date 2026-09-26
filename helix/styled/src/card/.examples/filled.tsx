@@ -8,15 +8,14 @@ export function Example() {
         id="filled-title"
         slot="header"
       >
-        Filled
+        Storage
       </h3>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-      labore.
+      You have used 8 GB of your 10 GB of storage.
       <helix-button
         emphasis="ghost"
         slot="footer"
       >
-        Action
+        Manage storage
       </helix-button>
     </helix-card>
   )

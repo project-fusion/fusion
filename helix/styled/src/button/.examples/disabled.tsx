@@ -6,13 +6,13 @@ export function Example() {
         emphasis="solid"
         tone="primary"
       >
-        Button
+        Save changes
       </helix-button>
-      <helix-button disabled>Button</helix-button>
+      <helix-button disabled>Cancel</helix-button>
 
-      {/* The same state, arriving from an ancestor fieldset. */}
+      {/* The disabled fieldset disables this button. */}
       <fieldset disabled>
-        <helix-button emphasis="ghost">Button</helix-button>
+        <helix-button emphasis="ghost">Reset</helix-button>
       </fieldset>
     </helix-flex>
   )

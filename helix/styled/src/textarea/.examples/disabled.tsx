@@ -7,16 +7,16 @@ export function Example() {
       <helix-textarea
         default-value="Cannot be edited"
         disabled
-        hint="Hint"
-        label="Written off"
+        hint="Locked after the order ships"
+        label="Order notes"
       ></helix-textarea>
 
-      {/* The same state, arriving from an ancestor fieldset. */}
+      {/* The disabled fieldset around it disables this field. */}
       <fieldset disabled>
         <helix-textarea
           default-value="Also cannot be edited"
-          hint="Hint"
-          label="Off from the fieldset"
+          hint="Locked after the order ships"
+          label="Gift message"
         ></helix-textarea>
       </fieldset>
     </helix-flex>

@@ -10,21 +10,21 @@
   >
     <helix-video
       extra-controls="previous next"
-      label="One of several"
+      label="Episode player"
       slot="player"
     ></helix-video>
-    <helix-video-playlist-item value="one">Getting started</helix-video-playlist-item>
-    <helix-video-playlist-item value="two">Theming</helix-video-playlist-item>
+    <helix-video-playlist-item value="one">Setting up your account</helix-video-playlist-item>
+    <helix-video-playlist-item value="two">Inviting your team</helix-video-playlist-item>
   </helix-video-playlist>
 
 
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Choose another clip</span>
     </helix-list-item>
   </helix-list>
@@ -35,7 +35,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -56,11 +56,11 @@
   }
 
   episodes.addEventListener('helix-before-activate', (event) => {
-    say('helix-before-activate', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-activate', `about to change to "${event.detail.value}", can be canceled`)
   })
-  /* Not the entry's `helix-select`, which the playlist stops: a page hearing
-     both would hear one press twice under two names. */
+  /* The playlist stops each entry's `helix-select`, so listen for
+     `helix-activate` on the playlist. */
   episodes.addEventListener('helix-activate', (event) => {
-    say('helix-activate', `"${event.detail.value}" is playing, and the playlist already holds it`)
+    say('helix-activate', `"${event.detail.value}" is now playing`)
   })
 </script>

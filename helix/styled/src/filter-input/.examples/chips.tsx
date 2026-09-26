@@ -5,9 +5,8 @@ export function Example() {
       direction="column"
       gap="sm"
     >
-      {/* The field's usual comparison, so nothing is written between the name
-          and the values. A reader who ticked two things in a menu gets this, and
-          there is no jargon on it to read past. */}
+      {/* The field's usual comparison, so no operator is shown between the name
+          and the values. */}
       <helix-filter-chip
         dismiss-label="Remove the disposition filter"
         dismissible
@@ -18,8 +17,7 @@ export function Example() {
         refunded, chargeback
       </helix-filter-chip>
 
-      {/* A comparison somebody chose, so it appears. This is the whole of what
-          negation costs: one more operator on the same chip. */}
+      {/* A comparison someone chose, so the operator is shown. */}
       <helix-filter-chip
         dismiss-label="Remove the category filter"
         dismissible
@@ -31,8 +29,7 @@ export function Example() {
         Services
       </helix-filter-chip>
 
-      {/* A scalar has no usual comparison, so its operator is always written:
-          there is nothing a date is filtered by often enough to leave unsaid. */}
+      {/* A date has no usual comparison, so its operator is always shown. */}
       <helix-filter-chip
         dismiss-label="Remove the created filter"
         dismissible
@@ -41,11 +38,11 @@ export function Example() {
         operator="after"
         operator-label="after"
       >
-        1 Aug
+        Aug 1
       </helix-filter-chip>
 
-      {/* Same field twice, which is what the model buys: two chips on one field
-          are two filters, and how they combine is the consumer's to decide. */}
+      {/* Two chips on the same field are two filters. Your code decides how
+          they combine. */}
       <helix-filter-chip
         dismiss-label="Remove the lower amount filter"
         dismissible

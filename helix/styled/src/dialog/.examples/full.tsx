@@ -12,18 +12,18 @@ export function Example() {
 
       <helix-dialog
         id="full-dialog"
-        label="Dialog Title"
+        label="Edit project"
         size="full"
       >
         <helix-text
           as="h2"
           slot="header"
         >
-          Dialog Title
+          Edit project
         </helix-text>
         <helix-text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua.
+          Update the project name, description, and members. Your changes apply to everyone on the
+          team.
         </helix-text>
         <helix-button-group
           label="Dialog actions"
@@ -36,7 +36,7 @@ export function Example() {
             emphasis="solid"
             tone="primary"
           >
-            Save
+            Save changes
           </helix-button>
           <helix-button
             command="--close"

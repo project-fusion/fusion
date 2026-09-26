@@ -49,7 +49,7 @@
 <script type="module">
   const thread = document.getElementById('thread')
 
-  /* Each load reaches further back, and the last one is the start. */
+  /* Each load returns older messages. The last load reaches the start. */
   const LOADS = [
     [
       ['them', 'Checkout alarms paged at 13:58.'],
@@ -72,7 +72,7 @@
 
   thread.addEventListener('helix-history', () => {
     thread.history = 'loading'
-    /* A fetch, standing in for one. */
+    /* A timer stands in for a network request. */
     setTimeout(() => {
       const older = LOADS[loaded].map(([author, text]) => {
         const turn = document.createElement('helix-chat-message')

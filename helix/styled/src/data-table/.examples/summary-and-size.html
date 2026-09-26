@@ -45,18 +45,16 @@
     size: 12000 + index * 837,
   }))
 
-  /* The summary takes its own `page`, `page-size` and `total` rather than
-     reading them off the table, which the component says of itself: three
-     numbers from the consumer's query, used twice. Keeping them in step is what
-     this listener is, and it is the whole cost of that decision. */
+  /* The summary takes its own `page`, `page-size`, and `total`. This listener
+     keeps them in step with the table. */
   const sync = () => {
     range.page = table.page
     range.pageSize = table.pageSize
   }
 
   table.addEventListener('helix-navigate', () => {
-    /* After the table has applied the move, since the event announces it ahead
-       of time and is refusable. */
+    /* The event is sent before the table changes page, so the sync waits for
+       the next microtask. */
     queueMicrotask(sync)
   })
 

@@ -5,7 +5,7 @@ export function Example() {
         slot="start"
         variant="label"
       >
-        Fusion
+        Logo
       </helix-text>
       <helix-navigation label="Main">
         <a href="#products">Products</a>

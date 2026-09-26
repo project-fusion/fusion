@@ -6,12 +6,12 @@ export function Example() {
   return (
     <helix-carousel
       index={index}
-      label="Screens"
+      label="Setup steps"
       onhelix-select={(event) => setIndex(Number(event.detail.value))}
     >
-      <div>First</div>
-      <div>Second</div>
-      <div>Third</div>
+      <div>Create an account</div>
+      <div>Invite your team</div>
+      <div>Choose a plan</div>
     </helix-carousel>
   )
 }

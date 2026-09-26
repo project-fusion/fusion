@@ -3,10 +3,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The number of rows the log keeps.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Tick a scope', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Select a scope', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -19,15 +19,15 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `about to change to "${event.detail.value}" (cancelable)`)
   }
 
   const moved = (event: Event & { currentTarget: HelixCheckboxGroup }) => {
-    say('input', `"${event.currentTarget.value || 'nothing'}", the group and not the box`)
+    say('input', `value is now "${event.currentTarget.value || 'nothing'}"`)
   }
 
   const settled = (event: Event & { currentTarget: HelixCheckboxGroup }) => {
-    say('change', `"${event.currentTarget.value || 'nothing'}", the whole set`)
+    say('change', `value is now "${event.currentTarget.value || 'nothing'}"`)
   }
 
   return (
@@ -49,7 +49,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

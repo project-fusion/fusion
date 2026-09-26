@@ -3,10 +3,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'One picture loads and one does not', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'One image loads and one fails', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -23,7 +23,7 @@ export function Example() {
   }
 
   const failed = () => {
-    say('error', 'nothing arrived, so the fallback shows')
+    say('error', 'Could not load the image')
   }
 
   return (
@@ -43,7 +43,7 @@ export function Example() {
           src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400"
         />
         <helix-image
-          alt="Nothing, because this one cannot arrive"
+          alt="Team photo"
           onError={failed}
           onLoad={arrived}
           shape="rounded"
@@ -53,7 +53,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

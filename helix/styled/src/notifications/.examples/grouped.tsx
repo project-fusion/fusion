@@ -8,8 +8,8 @@ export function Example() {
     >
       <h2 slot="header">Notifications</h2>
 
-      {/* Cut by day here. What groups with what is the consumer's: this element
-          is told what to call itself and never works it out. */}
+      {/* Notifications are grouped by day here. Your code decides the groups
+          and their labels. */}
       <helix-notification-group
         count={5}
         label="Today"
@@ -47,8 +47,8 @@ export function Example() {
         </helix-notification>
       </helix-notification-group>
 
-      {/* Folded, so the rows after the first are assigned nowhere and the pile
-          above the visible one says how many are behind it. */}
+      {/* A collapsible group shows only its first row. Press the heading to
+          show the rest. */}
       <helix-notification-group
         collapsible
         count={7}
@@ -65,18 +65,18 @@ export function Example() {
           separation="filled"
         >
           <helix-avatar
-            name="Josh Krajcik"
+            name="Jordan Lee"
             slot="media"
           ></helix-avatar>
           <span>
-            <strong>Josh Krajcik</strong> changed the status of <strong>Design Project</strong>
+            <strong>Jordan Lee</strong> changed the status of <strong>Website redesign</strong>
           </span>
           <helix-flex
             align-items="center"
             gap="xs"
             slot="detail"
           >
-            <helix-tag>In Progress</helix-tag>
+            <helix-tag>In progress</helix-tag>
             <helix-icon
               mirror
               name="arrow-right"
@@ -93,7 +93,7 @@ export function Example() {
             slot="media"
           ></helix-avatar>
           <span>
-            <strong>Ada Reyes</strong> approved <strong>Q3 Budget</strong>
+            <strong>Ada Reyes</strong> approved <strong>Q3 budget</strong>
           </span>
         </helix-notification>
         <helix-notification

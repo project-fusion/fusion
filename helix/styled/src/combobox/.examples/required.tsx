@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-combobox
-      hint="The filter is not the answer: a form gets the option or nothing"
+      hint="Choose a language to continue"
       label="Language"
       name="language"
       placeholder="Search languages"

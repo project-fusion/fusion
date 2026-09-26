@@ -6,17 +6,17 @@
   <helix-rating
     default-value="3"
     id="score"
-    label="Rate this release"
+    label="Rate your experience"
   ></helix-rating>
 
 
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Choose a score</span>
     </helix-list-item>
   </helix-list>
@@ -27,7 +27,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -48,12 +48,12 @@
   }
 
   score.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-change', `Proposed "${event.detail.value}"`)
   })
   score.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}" as it is chosen`)
+    say('input', `Value is "${event.currentTarget.value}"`)
   })
   score.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `Changed to "${event.currentTarget.value}"`)
   })
 </script>

@@ -3,7 +3,7 @@ export function Example() {
     <helix-time-input
       default-open
       default-value="22:00"
-      hint="An hour and a minute, rather than a day of rows"
+      hint="Choose an hour and a minute"
       label="Starts"
       name="starts"
       variant="wheels"

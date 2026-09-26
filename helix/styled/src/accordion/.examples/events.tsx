@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The number of rows the log keeps.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Open a section, then another', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Open a section, then another', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -17,15 +17,13 @@ export function Example() {
     })
   }
 
-  /* One handler per section, because lifecycle events do not bubble and are not
-     composed: put these on the accordion and nothing arrives. Overlays nest, and
-     an inner one closing must never read as the outer one closing. */
+  /* Lifecycle events do not bubble, so each section gets its own handlers. */
   const opening = (name: string) => () => {
-    say('helix-before-open', `${name} is about to open, and this is refusable`)
+    say('helix-before-open', `${name} is about to open (cancelable)`)
   }
 
   const closing = (name: string) => () => {
-    say('helix-before-close', `${name} is about to close, and this is refusable`)
+    say('helix-before-close', `${name} is about to close (cancelable)`)
   }
 
   const moved = (name: string) => (event: Event & { newState?: string; oldState?: string }) => {
@@ -33,7 +31,7 @@ export function Example() {
   }
 
   const SECTIONS = [
-    { body: 'Every push to main builds and promotes.', name: 'Deployment' },
+    { body: 'Each push to the main branch starts a new deployment.', name: 'Deployment' },
     { body: 'Invoices are issued on the first of the month.', name: 'Billing' },
   ]
 
@@ -58,7 +56,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

@@ -13,8 +13,8 @@ export function Example() {
             href="#helix"
           >
             <helix-icon name="cube"></helix-icon>
-            <strong>Helix</strong>
-            <span>Components, tokens and the base layer.</span>
+            <strong>Projects</strong>
+            <span>Plan and track work across teams.</span>
           </a>
         </div>
         <div data-megamenu-group>
@@ -24,8 +24,8 @@ export function Example() {
             href="#trace"
           >
             <helix-icon name="pulse"></helix-icon>
-            <strong>Trace</strong>
-            <span>Where an answer came from.</span>
+            <strong>Reports</strong>
+            <span>See how your projects are doing.</span>
           </a>
         </div>
       </helix-megamenu>

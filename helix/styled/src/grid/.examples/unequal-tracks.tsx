@@ -6,18 +6,16 @@ export function Example() {
       className="page"
       gap="lg"
     >
-      <p className="rail">26 Aug 2026</p>
+      <p className="rail">Aug 26, 2026</p>
       <p className="prose">
-        A rail of metadata beside a prose measure, the composition centered so the prose is not.
-        Neither track is a fraction of the other, so `columns` and `min` both give the wrong answer:
-        both produce equal tracks by design.
+        Reports can now be exported as CSV files. Open any report and choose Export to download it.
+        Exports include every column shown in the report, in the same order.
       </p>
 
-      <p className="rail">25 Aug 2026</p>
+      <p className="rail">Aug 25, 2026</p>
       <p className="prose">
-        Set as a custom property rather than an attribute, the track list can be redefined in a
-        media query, which is what lets the layout collapse to one column on a narrow screen with no
-        script watching a breakpoint.
+        Fixed an issue where invoices showed the wrong due date in some time zones. Invoices sent
+        before this fix show the correct date the next time you open them.
       </p>
     </helix-grid>
   )

@@ -25,11 +25,11 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
-      <span slot="description">Choose a row, then go deeper</span>
+      No events yet
+      <span slot="description">Choose a setting, or open Appearance</span>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -39,7 +39,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps the last six events.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -60,6 +60,6 @@
   }
 
   settings.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was chosen, wherever in the stack it sits`)
+    say('helix-select', `Chose "${event.detail.value}"`)
   })
 </script>

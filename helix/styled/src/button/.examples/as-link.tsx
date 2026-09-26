@@ -7,7 +7,7 @@ export function Example() {
       rel="noreferrer"
       target="_blank"
     >
-      Button
+      Visit website
     </a>
   )
 }

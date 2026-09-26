@@ -2,8 +2,8 @@ export function Example() {
   return (
     <helix-select
       default-value="one,three"
-      hint="Hint"
-      label="Label"
+      hint="Choose what the role can do"
+      label="Permissions"
       multiple
       name="choice"
     >
@@ -11,13 +11,13 @@ export function Example() {
         name="caret-down"
         slot="indicator"
       ></helix-icon>
-      <helix-option-group label="Group One">
-        <helix-option value="one">Option One</helix-option>
-        <helix-option value="two">Option Two</helix-option>
+      <helix-option-group label="Projects">
+        <helix-option value="one">View projects</helix-option>
+        <helix-option value="two">Edit projects</helix-option>
       </helix-option-group>
-      <helix-option-group label="Group Two">
-        <helix-option value="three">Option Three</helix-option>
-        <helix-option value="four">Option Four</helix-option>
+      <helix-option-group label="Billing">
+        <helix-option value="three">View invoices</helix-option>
+        <helix-option value="four">Manage payment methods</helix-option>
       </helix-option-group>
     </helix-select>
   )

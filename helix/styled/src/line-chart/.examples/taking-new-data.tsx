@@ -4,8 +4,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
 const OPENING = [1180, 1240, 1190, 1320, 1410, 1380]
 
 export function Example() {
-  /* The numbers are rewritten in the table, which is the only thing a chart
-     reads. Nothing here touches the chart. */
+  /* The numbers change in the table. The chart reads the table and redraws. */
   const [sessions, setSessions] = useState(OPENING)
 
   return (
@@ -44,7 +43,7 @@ export function Example() {
         onClick={() => setSessions(MONTHS.map(() => 900 + Math.round(Math.random() * 700)))}
         tone="primary"
       >
-        New numbers
+        Refresh data
       </helix-button>
     </helix-flex>
   )

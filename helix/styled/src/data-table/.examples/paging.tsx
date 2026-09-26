@@ -1,6 +1,4 @@
-/* Forty rows, generated rather than written out: what the example is about is
-   the page size, and thirty-two more lines of plausible file names would bury
-   it. */
+/* Forty generated rows. */
 const rows = Array.from({ length: 40 }, (_, index) => ({
   kind: index % 4 === 0 ? 'font' : 'image',
   name: `asset-${String(index + 1).padStart(3, '0')}.webp`,
@@ -9,11 +7,8 @@ const rows = Array.from({ length: 40 }, (_, index) => ({
 
 export function Example() {
   return (
-    /* `paginated` is not written here. A page size turns it on by itself,
-       because a paged table with no way to change pages shows a reader the
-       first eight rows and no way to learn there are more. Write
-       `paginated={false}` to take the control back and put your own in the
-       `footer` slot. */
+    /* A page size turns on pagination by itself. Write `paginated={false}` to
+       turn it off and put your own control in the `footer` slot. */
     <helix-data-table
       label="Assets"
       page-size={8}

@@ -8,31 +8,31 @@ export function Example() {
         kind="ordered"
         label="Steps"
       >
-        <helix-list-item>Install the package</helix-list-item>
-        <helix-list-item>Import the base layer</helix-list-item>
-        <helix-list-item>Register the elements</helix-list-item>
+        <helix-list-item>Create a project</helix-list-item>
+        <helix-list-item>Invite your team</helix-list-item>
+        <helix-list-item>Share your first file</helix-list-item>
       </helix-list>
 
       <helix-list
         kind="unordered"
-        label="What you get"
+        label="Included in your plan"
       >
-        <helix-list-item>Tokens</helix-list-item>
-        <helix-list-item>Components</helix-list-item>
-        <helix-list-item>React wrappers</helix-list-item>
+        <helix-list-item>Unlimited projects</helix-list-item>
+        <helix-list-item>10 GB of storage</helix-list-item>
+        <helix-list-item>Email support</helix-list-item>
       </helix-list>
 
       <helix-list
         kind="description"
-        label="Terms"
+        label="Account details"
       >
         <helix-list-item>
-          Helix
-          <span slot="description">The design system. Tokens, components, wrappers.</span>
+          Plan
+          <span slot="description">Team, billed yearly.</span>
         </helix-list-item>
         <helix-list-item>
-          Cortex
-          <span slot="description">Memory, provenance and context.</span>
+          Storage
+          <span slot="description">4.2 GB of 10 GB used.</span>
         </helix-list-item>
       </helix-list>
     </helix-flex>

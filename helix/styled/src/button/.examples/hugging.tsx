@@ -11,9 +11,9 @@ export function Example() {
         emphasis="solid"
         tone="primary"
       >
-        Button
+        Save changes
       </helix-button>
-      <helix-button className="hug">Button</helix-button>
+      <helix-button className="hug">Cancel</helix-button>
     </helix-flex>
   )
 }

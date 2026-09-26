@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-video
       extra-controls="speed"
-      label="A clip with a crowded bar"
+      label="Product walkthrough"
       overflow-controls="pip remote download"
       src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
     ></helix-video>

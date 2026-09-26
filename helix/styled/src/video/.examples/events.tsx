@@ -3,10 +3,10 @@ import { useRef, useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Press play', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Press play', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -49,7 +49,7 @@ export function Example() {
     >
       <helix-video
         extra-controls="previous next"
-        label="A short clip"
+        label="Welcome video"
         onEnded={finished}
         onhelix-next={on}
         onhelix-previous={back}
@@ -62,7 +62,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

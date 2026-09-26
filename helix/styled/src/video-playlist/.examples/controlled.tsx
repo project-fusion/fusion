@@ -11,12 +11,12 @@ export function Example() {
     >
       <helix-video
         extra-controls="previous next"
-        label="One of several"
+        label="Episode player"
         slot="player"
       />
 
-      <helix-video-playlist-item value="one">Getting started</helix-video-playlist-item>
-      <helix-video-playlist-item value="two">Tokens and themes</helix-video-playlist-item>
+      <helix-video-playlist-item value="one">Setting up your account</helix-video-playlist-item>
+      <helix-video-playlist-item value="two">Inviting your team</helix-video-playlist-item>
     </helix-video-playlist>
   )
 }

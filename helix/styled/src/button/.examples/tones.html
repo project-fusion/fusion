@@ -1,19 +1,17 @@
 <!-- @summary The four tones, which mark what an action means. -->
-<!-- `accent` renders as `primary` here, and that is the default rather than a
-     mistake: a palette that has not named a second color does not have one.
-     `button/accent` is where a theme names one and the pair separate. -->
+<!-- `accent` matches `primary` until the theme sets a second color. -->
 <helix-flex gap="sm">
   <helix-button
     emphasis="solid"
     tone="primary"
-  >Button</helix-button>
+  >Save</helix-button>
   <helix-button
     emphasis="solid"
     tone="accent"
-  >Button</helix-button>
-  <helix-button tone="neutral">Button</helix-button>
+  >Share</helix-button>
+  <helix-button tone="neutral">Cancel</helix-button>
   <helix-button
     emphasis="solid"
     tone="danger"
-  >Button</helix-button>
+  >Delete</helix-button>
 </helix-flex>

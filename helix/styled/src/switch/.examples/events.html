@@ -5,7 +5,7 @@
 >
   <helix-switch
     id="setting"
-    label="Deploy on push"
+    label="Automatic updates"
     name="autodeploy"
   ></helix-switch>
 
@@ -13,10 +13,10 @@
   <helix-list
     divided
     id="log"
-    label="What arrived"
+    label="Events"
   >
     <helix-list-item>
-      Nothing yet
+      No events yet
       <span slot="description">Flip the switch</span>
     </helix-list-item>
   </helix-list>
@@ -27,7 +27,7 @@
   const log = document.getElementById('log')
   let empty = true
 
-  // How many rows the log holds, which is a choice about this preview's height.
+  // The log keeps this many of the most recent rows.
   const KEEP = 6
 
   const say = (name, carried) => {
@@ -48,12 +48,12 @@
   }
 
   setting.addEventListener('helix-before-toggle', (event) => {
-    say('helix-before-toggle', `proposing ${event.detail.checked}, a real boolean and not a string`)
+    say('helix-before-toggle', `about to change to ${event.detail.checked}, can be canceled`)
   })
   setting.addEventListener('input', (event) => {
-    say('input', `${event.currentTarget.checked}, announced as the state moves`)
+    say('input', `${event.currentTarget.checked}, sent as the value changes`)
   })
   setting.addEventListener('change', (event) => {
-    say('change', `${event.currentTarget.checked}, relayed from the control inside`)
+    say('change', `${event.currentTarget.checked}, sent when the change is committed`)
   })
 </script>

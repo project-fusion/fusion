@@ -4,11 +4,11 @@ export function Example() {
   return (
     <helix-canvas
       grid="lines"
-      label="What shipped this week"
+      label="Weekly report"
     >
       <helix-canvas-node
         height={150}
-        label="The new media treatment"
+        label="New product photos"
         name="shot"
         width={220}
         x={0}
@@ -19,27 +19,27 @@ export function Example() {
           shape="rounded"
           src="/media/scale/seawater-400.jpg"
         ></helix-image>
-        <helix-text slot="description">The new media treatment</helix-text>
+        <helix-text slot="description">New product photos</helix-text>
       </helix-canvas-node>
 
       <helix-canvas-node
         height={150}
-        label="Weekly readers"
+        label="Weekly visitors"
         name="numbers"
         width={220}
         x={320}
         y={0}
       >
         <helix-stat>
-          <helix-text slot="label">Weekly readers</helix-text>
+          <helix-text slot="label">Weekly visitors</helix-text>
           12,480
         </helix-stat>
-        <helix-text slot="description">Up a fifth since the change</helix-text>
+        <helix-text slot="description">Up 20% from last week</helix-text>
       </helix-canvas-node>
 
       <helix-canvas-edge
         from="shot"
-        label="drove"
+        label="increased"
         to="numbers"
       ></helix-canvas-edge>
     </helix-canvas>

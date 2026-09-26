@@ -17,7 +17,7 @@ export function Example() {
         tone="danger"
         value="3"
       >
-        <helix-button>Failures</helix-button>
+        <helix-button>Errors</helix-button>
       </helix-badge>
     </helix-flex>
   )

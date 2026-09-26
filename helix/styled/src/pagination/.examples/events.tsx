@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps the last six events.
 const KEEP = 6
 
-const RESTING: Arrival[] = [{ carried: 'Move between pages', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Move between pages', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -17,11 +17,9 @@ export function Example() {
     })
   }
 
-  /* One event, and it is the request: refusing it is the only way to keep the
-     page where it is. There is no `helix-before-change` here, because the page
-     is not a value a form holds. */
+  /* `helix-navigate` is the only event. Cancel it to stay on the current page. */
   const moved = (event: CustomEvent<{ value: string }>) => {
-    say('helix-navigate', `page ${event.detail.value}, a move and not a choice, and refusable`)
+    say('helix-navigate', `Go to page ${event.detail.value}`)
   }
 
   return (
@@ -37,7 +35,7 @@ export function Example() {
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

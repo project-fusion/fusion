@@ -1,15 +1,15 @@
 export function Example() {
   return (
     <>
-      {/* Preview frame: the submit is swallowed. */}
+      {/* The form does not submit in the preview. */}
       <form onSubmit={(event) => event.preventDefault()}>
         <helix-flex
           direction="column"
           gap="md"
         >
           <helix-input
-            hint="Six or more, letters and digits"
-            label="Handle"
+            hint="At least 6 letters or numbers"
+            label="Username"
             minlength="6"
             name="handle"
             pattern="[a-zA-Z0-9]+"
@@ -17,7 +17,7 @@ export function Example() {
           ></helix-input>
 
           <helix-input
-            hint="Up to 140"
+            hint="Up to 140 characters"
             label="Headline"
             maxlength="140"
             name="headline"

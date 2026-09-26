@@ -11,7 +11,7 @@ export function Example() {
         separation="plain"
         slot="start"
       >
-        <helix-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</helix-text>
+        <helix-text>Project overview and recent activity for your team.</helix-text>
       </helix-card>
       <helix-card
         separation="plain"

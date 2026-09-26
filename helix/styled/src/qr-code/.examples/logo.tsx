@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-qr-code
       correction="H"
-      label="Fusion Development Group"
+      label="Company website"
       value="https://fusion.dev"
     >
       <helix-icon

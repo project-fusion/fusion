@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
 
-// How many rows the log holds, which is a choice about this preview's height.
+// The log keeps this many of the most recent rows.
 const KEEP = 8
 
-const RESTING: Arrival[] = [{ carried: 'Open a node, then choose one', name: 'Nothing yet' }]
+const RESTING: Arrival[] = [{ carried: 'Open a node, then choose one', name: 'No events yet' }]
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
@@ -18,21 +18,21 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-activate', `proposing "${event.detail.value}", refusable`)
+    say('helix-before-activate', `about to change to "${event.detail.value}", can be canceled`)
   }
 
   const chosen = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was chosen, from whatever depth`)
+    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   }
 
-  /* Per node, because the open and close of one do not bubble: put these on the
-     tree and nothing arrives. The two above do bubble and are bound once. */
+  /* The open and close events do not bubble, so each node has its own
+     listeners. The two events above bubble and are bound once. */
   const opening = (node: string) => () => {
-    say('helix-before-open', `${node} is about to open, and this does not bubble`)
+    say('helix-before-open', `${node} is about to open, and the event does not bubble`)
   }
 
   const closing = (node: string) => () => {
-    say('helix-before-close', `${node} is about to close, and nor does this`)
+    say('helix-before-close', `${node} is about to close, and the event does not bubble`)
   }
 
   const moved = (node: string) => (event: Event & { newState?: string; oldState?: string }) => {
@@ -46,7 +46,7 @@ export function Example() {
     >
       <helix-tree
         default-active="core"
-        label="Packages"
+        label="Folders"
         onhelix-before-activate={proposed}
         onhelix-select={chosen}
       >
@@ -56,26 +56,26 @@ export function Example() {
           onToggle={moved('helix')}
           value="helix"
         >
-          helix
+          Projects
           <helix-tree-item
             slot="children"
             value="core"
           >
-            core
+            Website
           </helix-tree-item>
           <helix-tree-item
             slot="children"
             value="styled"
           >
-            styled
+            Mobile app
           </helix-tree-item>
         </helix-tree-item>
-        <helix-tree-item value="cortex">cortex</helix-tree-item>
+        <helix-tree-item value="cortex">Archive</helix-tree-item>
       </helix-tree>
 
       <helix-list
         divided
-        label="What arrived"
+        label="Events"
       >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>

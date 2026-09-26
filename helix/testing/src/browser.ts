@@ -675,7 +675,7 @@ export const framesBooked = async (count: number): Promise<number> => {
  */
 export const logged = (): string[] => {
   const log = document.getElementById('log')
-  if (!log || log.textContent?.includes('Nothing yet')) {
+  if (!log || log.textContent?.includes('No events yet')) {
     return []
   }
   return [...log.children].map((row) => row.firstChild?.textContent?.trim() ?? '')

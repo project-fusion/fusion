@@ -4,47 +4,47 @@ export function Example() {
       direction="column"
       gap="lg"
     >
-      <helix-tree label="At the start">
+      <helix-tree label="Documents">
         <helix-tree-item
           default-open
           value="one"
         >
-          Components
+          Reports
           <helix-tree-item
             slot="children"
             value="two"
           >
-            Accordion
+            Budget 2026
           </helix-tree-item>
           <helix-tree-item
             slot="children"
             value="three"
           >
-            Button
+            Quarterly sales
           </helix-tree-item>
         </helix-tree-item>
       </helix-tree>
 
       <helix-tree
         chevron-placement="end"
-        label="At the end"
+        label="Shared documents"
       >
         <helix-tree-item
           default-open
           value="one"
         >
-          Components
+          Reports
           <helix-tree-item
             slot="children"
             value="two"
           >
-            Accordion
+            Budget 2026
           </helix-tree-item>
           <helix-tree-item
             slot="children"
             value="three"
           >
-            Button
+            Quarterly sales
           </helix-tree-item>
         </helix-tree-item>
       </helix-tree>
