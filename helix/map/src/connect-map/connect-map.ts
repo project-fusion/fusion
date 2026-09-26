@@ -56,7 +56,17 @@ export interface MapDriver {
    * calls `update` when one is added, taken away or changed; `stop` takes
    * them off.
    */
-  layers?(read: () => MapLayerSpec[], events?: MapLayerEvents): { stop(): void; update(): void }
+  layers?(
+    read: () => MapLayerSpec[],
+    events?: MapLayerEvents,
+  ): {
+    /** Zooms in to where a points layer's count comes apart, at the page's pace. */
+    expand?(id: string, cluster: number): void
+    /** A points layer's points and counts drawn in view, which the keyboard walks. */
+    inView?(id: string): MapInView[]
+    stop(): void
+    update(): void
+  }
   /**
    * Hears the view move, every frame it moves, and returns what stops it. What
    * lets markers keep up with the map; without it they are placed once.
@@ -94,6 +104,19 @@ export interface MapLayerEvents {
   motion(): MapMotion | null
   /** A reader pressed a point: which points layer, by its spec's `id`, and which of its points. */
   press(id: string, index: number): void
+  /** The renderer has drawn what the view shows and gone still, which is when to ask what is in view. */
+  settled?(): void
+}
+
+/** A point or a count a renderer drew in view. */
+export interface MapInView {
+  /** Which of the layer's points, where it is one. */
+  at?: number | undefined
+  /** The renderer's id for a count, where it is one. */
+  cluster?: number | undefined
+  /** How many places a count holds. */
+  count?: number | undefined
+  place: MapPlace
 }
 
 /** A place, in degrees. */
@@ -252,6 +275,8 @@ interface Layer extends HTMLElement {
   points?: MapPlace[] | undefined
   /** A points layer's GeoJSON file, fetched where `data` is not set. */
   src?: string | undefined
+  /** A points layer's points and counts in view, which the connector writes and the layer walks. */
+  walk?: Walked[] | undefined
   progress?: number | undefined
   /** The styled route's line, which is dotted or solid. */
   variant?: string | undefined
@@ -306,6 +331,33 @@ const cut = (points: MapPlace[], fraction: number): [MapPlace[], MapPlace[]] => 
   }
   return [points, []]
 }
+
+/** A point or a count in view as a points layer walks it. */
+interface Walked {
+  count?: number | undefined
+  key: string
+  label?: string | undefined
+  value?: string | undefined
+  x: number
+  y: number
+}
+
+/** The most points and counts a layer walks: past it, a reader zooms in or the layer clusters. */
+const WALKED = 100
+
+/** Whether a walk is the one a layer already has, to the pixel, so it is not written again. */
+const sameWalk = (had: readonly Walked[] | undefined, walk: readonly Walked[]): boolean =>
+  (had?.length ?? 0) === walk.length &&
+  walk.every((one, at) => {
+    const was = had?.[at]
+    return (
+      was?.key === one.key &&
+      Math.round(was.x) === Math.round(one.x) &&
+      Math.round(was.y) === Math.round(one.y) &&
+      was.label === one.label &&
+      was.count === one.count
+    )
+  })
 
 const isLayer = (node: unknown): node is Layer =>
   (node as Partial<Layer> | null)?.isMapLayer === true
@@ -551,6 +603,47 @@ export const connectMap = (
   }
   /* Each points layer by its spec's id, for a press to find its element. */
   const pointLayers = new Map<string, Layer>()
+  /* **What each points layer walks**, asked of the renderer when it goes
+     still: in reading order, top to bottom and along each line the way text
+     runs, at most `WALKED` of them, each by a key that stays its own while it
+     stays in view. */
+  let seen = new Map<Layer, (Omit<Walked, 'x' | 'y'> & { place: MapPlace })[]>()
+  const look = (): void => {
+    if (!live || !drawn?.inView || !driver.project) {
+      return
+    }
+    const project = driver.project
+    const rtl = isRtl(frame)
+    const next = new Map<Layer, (Omit<Walked, 'x' | 'y'> & { place: MapPlace })[]>()
+    for (const [id, layer] of pointLayers) {
+      if (layer.parentElement !== frame) {
+        continue
+      }
+      const { names, values } = pointsOf(layer)
+      const found = drawn.inView(id).map((one) => ({ at: project(one.place), one }))
+      found.sort((a, b) => a.at.y - b.at.y || (rtl ? b.at.x - a.at.x : a.at.x - b.at.x))
+      next.set(
+        layer,
+        found.slice(0, WALKED).map(({ one }) =>
+          one.cluster !== undefined
+            ? { count: one.count ?? 0, key: `c:${one.cluster}`, place: one.place }
+            : {
+                key: `p:${one.at}`,
+                label: names[one.at ?? -1] || undefined,
+                place: one.place,
+                value: values[one.at ?? -1],
+              },
+        ),
+      )
+    }
+    for (const layer of seen.keys()) {
+      if (!next.has(layer) && (layer.walk?.length ?? 0) > 0) {
+        layer.walk = []
+      }
+    }
+    seen = next
+    place()
+  }
   const readLayers = (): MapLayerSpec[] =>
     [...frame.children].filter(isLayer).flatMap((layer): MapLayerSpec[] => {
       const color = settledColor(layer)
@@ -623,6 +716,7 @@ export const connectMap = (
         layer.dispatchEvent(new HelixActivateEvent({ value }))
       }
     },
+    settled: () => look(),
   })
   const place = (): void => {
     if (!driver.project) {
@@ -794,6 +888,15 @@ export const connectMap = (
         `${Math.hypot(edge.x - at.x, edge.y - at.y)}px`,
       )
     }
+    /* **The points in view, stood where they are now**: which they are was
+       asked of the renderer when it last went still, and a pan in between
+       carries them rather than asking again every frame. */
+    for (const [layer, found] of seen) {
+      const walk = found.map(({ place, ...one }) => ({ ...one, ...project(place) }))
+      if (!sameWalk(layer.walk, walk)) {
+        layer.walk = walk
+      }
+    }
   }
   const stopViewing = driver.onView?.(place)
   /* **What is drawn follows what is written, once a task.** A part that
@@ -887,6 +990,14 @@ export const connectMap = (
   /* **A cluster pressed is opened by zooming in** to its places, unless the
      page connected to answer it itself. */
   const handleCluster = (event: Event): void => {
+    /* A points layer's count, pressed from the keyboard: the renderer's own
+       zoom to where it comes apart. */
+    const layer = event.target as Layer
+    const key = (event as HelixMapClusterEvent).detail.key
+    if (isLayer(layer) && layer.layerKind === 'points' && key?.startsWith('c:')) {
+      drawn?.expand?.(idOf(layer), Number(key.slice(2)))
+      return
+    }
     const members = clusters.get(event.target as Marker)
     if (!members || options.clusterZoom === false) {
       return
@@ -973,6 +1084,9 @@ export const connectMap = (
         }
         marker.style.removeProperty('--_map-marker-leg')
         marker.style.removeProperty('--_map-marker-leg-angle')
+      }
+      for (const layer of seen.keys()) {
+        layer.walk = []
       }
       for (const position of positions()) {
         for (const name of ['heading', 'radius', 'x', 'y']) {

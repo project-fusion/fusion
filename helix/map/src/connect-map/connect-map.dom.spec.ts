@@ -910,3 +910,63 @@ describe('connectMap with a points layer', () => {
     }
   })
 })
+
+describe('connectMap walking a points layer', () => {
+  test('what the renderer drew in view is walked in reading order once it settles, carried by a pan, and a count opened from the keyboard is zoomed in to', async () => {
+    const host = await frame(
+      '<helix-headless-map-points label="Cafés"></helix-headless-map-points>',
+    )
+    const points = host.querySelector('helix-headless-map-points') as HTMLElement & {
+      data?: unknown
+      updateComplete: Promise<boolean>
+      walk: { count?: number; key: string; label?: string; x: number; y: number }[]
+    }
+    points.data = [
+      { label: 'Low', lat: 9, lng: 1 },
+      { label: 'High', lat: 1, lng: 5 },
+    ]
+    await points.updateComplete
+    let events: Parameters<NonNullable<MapDriver['layers']>>[1]
+    const expanded: string[] = []
+    let offset = 0
+    let moved = (): void => undefined
+    connectMap(host, {
+      layers: (read, heard) => {
+        events = heard
+        read()
+        return {
+          expand: (id, cluster) => expanded.push(`${id} ${cluster}`),
+          inView: () => [
+            { at: 0, place: { lat: 9, lng: 1 } },
+            { cluster: 4, count: 30, place: { lat: 5, lng: 9 } },
+            { at: 1, place: { lat: 1, lng: 5 } },
+          ],
+          stop: () => {},
+          update: () => {},
+        }
+      },
+      onView: (heard) => {
+        moved = heard
+        return () => undefined
+      },
+      panBy: () => {},
+      project: ({ lat, lng }) => ({ x: lng * 10 + offset, y: lat * 10 }),
+      zoomBy: () => {},
+    })
+    events?.settled?.()
+    expect(points.walk.map((one) => [one.key, one.label ?? one.count, one.x])).toEqual([
+      ['p:1', 'High', 50],
+      ['c:4', 30, 90],
+      ['p:0', 'Low', 10],
+    ])
+    offset = 5
+    moved()
+    expect(points.walk.map((one) => one.x)).toEqual([55, 95, 15])
+
+    points.dispatchEvent(
+      new CustomEvent('helix-map-cluster', { bubbles: true, detail: { key: 'c:4', labels: [] } }),
+    )
+    expect(expanded).toHaveLength(1)
+    expect(expanded[0]).toMatch(/ 4$/)
+  })
+})

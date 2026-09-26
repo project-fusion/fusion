@@ -1,6 +1,10 @@
 export { HelixHeadlessMapArea } from './area/map-area.js'
 export { HelixHeadlessMapMarker } from './marker/map-marker.js'
-export type { MapPointsCollection, MapPointsPlace } from './points/map-points.js'
+export type {
+  MapPointsCollection,
+  MapPointsInView,
+  MapPointsPlace,
+} from './points/map-points.js'
 export { HelixHeadlessMapPoints } from './points/map-points.js'
 export { HelixHeadlessMapPosition } from './position/map-position.js'
 export { HelixHeadlessMap } from './root/map-root.js'
