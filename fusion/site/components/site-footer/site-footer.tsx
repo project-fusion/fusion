@@ -78,7 +78,7 @@ export function SiteFooter() {
               company being the caption of its own slogan. */}
           <helix-text variant="body-strong">Fusion Development Group</helix-text>
           <helix-text emphasis="subtle" variant="caption">
-            Developing for humanity.
+            Interface and AI software.
           </helix-text>
 
           {/* **Anchors, not `helix-icon-button`.** That component is a
