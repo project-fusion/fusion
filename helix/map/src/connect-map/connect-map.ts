@@ -97,6 +97,12 @@ export type MapPadding = number | { bottom: number; left: number; right: number;
  * kind, the places it passes through or around, and its color settled to sRGB.
  */
 export interface MapLayerSpec {
+  /**
+   * A route's edge, drawn wider under it so it reads as laid over the roads
+   * rather than as one of them, where the roads are drawn in the same brand.
+   * Absent where there is none to draw.
+   */
+  casing?: string | undefined
   /** `#hex`, `rgb()` or `rgba()`, which every renderer takes. */
   color: string
   /** Stable for as long as the element is in the frame, for a renderer that keys its layers. */
@@ -316,13 +322,22 @@ export const connectMap = (
     [...frame.children]
       .filter(isLayer)
       .filter((layer) => (layer.points?.length ?? 0) >= (layer.layerKind === 'area' ? 3 : 2))
-      .map((layer) => ({
-        color: settledColor(layer),
-        id: idOf(layer),
-        kind: layer.layerKind,
-        label: layer.label ?? '',
-        points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
-      }))
+      .map((layer) => {
+        const color = settledColor(layer)
+        /* **The edge is the element's border color**, which the styled tier
+           sets to the surface and a page can set to anything; where it is the
+           route's own color, which is what an unstyled element's border is,
+           there is no casing to draw. */
+        const edge = layer.layerKind === 'route' ? settledColor(layer, 'border-top-color') : color
+        return {
+          ...(edge && edge !== color ? { casing: edge } : {}),
+          color,
+          id: idOf(layer),
+          kind: layer.layerKind,
+          label: layer.label ?? '',
+          points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
+        }
+      })
   const drawn = driver.layers?.(readLayers)
   const place = (): void => {
     if (!driver.project) {

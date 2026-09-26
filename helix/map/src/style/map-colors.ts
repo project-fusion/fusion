@@ -57,7 +57,10 @@ const toSrgb = (resolved: string): string => {
  * is drawn in, which its tone decides in the page's stylesheet and which the
  * renderer can only take as sRGB.
  */
-export const settledColor = (element: Element): string => toSrgb(getComputedStyle(element).color)
+export const settledColor = (
+  element: Element,
+  property: 'border-top-color' | 'color' = 'color',
+): string => toSrgb(getComputedStyle(element).getPropertyValue(property))
 
 /**
  * The page's own colors, read where the map is, as a map style can take them.

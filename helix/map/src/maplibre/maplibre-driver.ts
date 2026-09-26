@@ -5,7 +5,7 @@ import type { MapMotion } from '../motion/motion.js'
 interface GeoJson {
   features: {
     geometry: { coordinates: unknown; type: 'LineString' | 'Polygon' }
-    properties: { color: string; kind: 'area' | 'route'; label: string }
+    properties: { casing?: string; color: string; kind: 'area' | 'route'; label: string }
     type: 'Feature'
   }[]
   type: 'FeatureCollection'
@@ -46,6 +46,19 @@ export const LAYERS: MapLibreLayer[] = [
     source: SOURCE,
     type: 'line',
   },
+  /* **A casing under each route that has one**, wider by an edge's width
+     either side, so a route in the brand is not one more brand road. */
+  {
+    filter: ['all', ['==', ['get', 'kind'], 'route'], ['has', 'casing']],
+    id: 'helix-route-casings',
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': ['get', 'casing'],
+      'line-width': ['interpolate', ['linear'], ['zoom'], 4, 5.5, 14, 9],
+    },
+    source: SOURCE,
+    type: 'line',
+  },
   {
     filter: ['==', ['get', 'kind'], 'route'],
     id: 'helix-routes',
@@ -68,7 +81,12 @@ export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
         layer.kind === 'route'
           ? { coordinates, type: 'LineString' as const }
           : { coordinates: [[...coordinates, coordinates[0]]], type: 'Polygon' as const },
-      properties: { color: layer.color, kind: layer.kind, label: layer.label },
+      properties: {
+        ...(layer.casing ? { casing: layer.casing } : {}),
+        color: layer.color,
+        kind: layer.kind,
+        label: layer.label,
+      },
       type: 'Feature' as const,
     }
   }),

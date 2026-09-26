@@ -214,6 +214,7 @@ describe('leafletDriver', () => {
       polyline: shape('polyline'),
     }).layers?.(() => [
       {
+        casing: 'rgb(9, 9, 9)',
         color: 'rgb(1, 2, 3)',
         id: 'a',
         kind: 'route',
@@ -235,14 +236,17 @@ describe('leafletDriver', () => {
         ],
       },
     ])
+    // The casing first and wider, so the route is drawn over it.
     expect(made).toEqual([
+      'polyline [[1,2],[3,4]] rgb(9, 9, 9) -',
       'polyline [[1,2],[3,4]] rgb(1, 2, 3) -',
+      'add polyline',
       'add polyline',
       'polygon [[0,0],[0,1],[1,1]] rgb(4, 5, 6) 0.16',
       'add polygon',
     ])
     made.length = 0
     drawn?.stop()
-    expect(made).toEqual(['remove polyline', 'remove polygon'])
+    expect(made).toEqual(['remove polyline', 'remove polyline', 'remove polygon'])
   })
 })
