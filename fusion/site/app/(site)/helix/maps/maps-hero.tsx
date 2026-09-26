@@ -260,6 +260,14 @@ export function MapsHero({
     >
       <helix-map class={styles.mapsHeroFrame} label="Austin, drawn in this theme" ref={frame}>
         <div className={styles.mapsCanvas} ref={container} />
+        {/* The walk the arrow keys take, drawn: the renderer's own line under
+            the street names, and named in the frame's list for a reader who
+            cannot see it. */}
+        <helix-map-route
+          description="Through all seven places, in the order the arrow keys walk them"
+          label="A walk from the university to the springs"
+          points={PLACES.map(({ lat, lng }) => ({ lat, lng }))}
+        />
         {PLACES.map((place) => (
           <helix-map-marker key={place.label} label={place.label} lat={place.lat} lng={place.lng} />
         ))}

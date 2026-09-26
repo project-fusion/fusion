@@ -96,6 +96,12 @@ export interface Context {
       label: string
       lat: number
       lng: number
+      /**
+       * Where the row starts, drawn as a route to the place in the row's
+       * tone: the lane from its port, the order from the mill. Absent where
+       * a row is a place rather than a journey.
+       */
+      route?: { from: string; lat: number; lng: number }
       state: State
       status: string
     }[]
@@ -247,6 +253,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Felixstowe',
           lat: 51.9643,
           lng: 1.329,
+          route: { from: 'Rotterdam', lat: 51.9244, lng: 4.4778 },
           state: 'success',
           status: 'On time',
         },
@@ -255,6 +262,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Genoa',
           lat: 44.4073,
           lng: 8.9339,
+          route: { from: 'Algeciras', lat: 36.1312, lng: -5.4474 },
           state: 'warning',
           status: 'Delayed 40m',
         },
@@ -263,6 +271,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Aarhus',
           lat: 56.1496,
           lng: 10.2134,
+          route: { from: 'Gdańsk', lat: 54.4288, lng: 18.7983 },
           state: 'danger',
           status: 'Missed window',
         },
@@ -271,6 +280,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Cork',
           lat: 51.8985,
           lng: -8.4726,
+          route: { from: 'Bilbao', lat: 43.263, lng: -2.935 },
           state: 'success',
           status: 'On time',
         },
@@ -608,6 +618,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Edinburgh',
           lat: 55.9533,
           lng: -3.1884,
+          route: { from: 'the mill in Huddersfield', lat: 53.6467, lng: -1.7822 },
           state: 'success',
           status: 'Packed',
         },
@@ -616,6 +627,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Bristol',
           lat: 51.443,
           lng: -2.5817,
+          route: { from: 'the mill in Huddersfield', lat: 53.6467, lng: -1.7822 },
           state: 'warning',
           status: 'Waiting on yarn',
         },
@@ -624,6 +636,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Manchester',
           lat: 53.4425,
           lng: -2.2325,
+          route: { from: 'the mill in Huddersfield', lat: 53.6467, lng: -1.7822 },
           state: 'danger',
           status: 'Return opened',
         },
@@ -632,6 +645,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'London',
           lat: 51.5074,
           lng: -0.1278,
+          route: { from: 'the mill in Huddersfield', lat: 53.6467, lng: -1.7822 },
           state: 'success',
           status: 'Packed',
         },
@@ -790,6 +804,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'The first place',
           lat: 38.7078,
           lng: -9.1366,
+          route: { from: 'the hub', lat: 50.1106, lng: 8.6821 },
           state: 'success',
           status: 'Success',
         },
@@ -798,6 +813,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'The second place',
           lat: 48.8535,
           lng: 2.3484,
+          route: { from: 'the hub', lat: 50.1106, lng: 8.6821 },
           state: 'warning',
           status: 'Warning',
         },
@@ -806,6 +822,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'The third place',
           lat: 48.2084,
           lng: 16.3725,
+          route: { from: 'the hub', lat: 50.1106, lng: 8.6821 },
           state: 'danger',
           status: 'Danger',
         },
@@ -814,6 +831,7 @@ export const CONTEXTS: readonly Context[] = [
           label: 'The fourth place',
           lat: 55.6867,
           lng: 12.5701,
+          route: { from: 'the hub', lat: 50.1106, lng: 8.6821 },
           state: 'success',
           status: 'Success',
         },
