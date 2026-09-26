@@ -37,53 +37,26 @@ export const HERO = {
    */
   accent: 'and the engineers behind it',
   /**
-   * **The longer form, for a search result and a link preview.**
-   *
-   * Separate from `lede` because the hero is one line, and cutting the two
-   * together leaves a forty-nine character meta description: a result page and a
-   * link card want the sentences a hero is better without. So the proofs live
-   * here, where length is a virtue.
-   *
-   * **All three are literal and checkable, which is why they are worth stating
-   * flatly.** Open source is MIT across the published packages. Machine-readable
-   * is an MCP server and an `llms.txt`, so an agent can derive a theme, audit
-   * its contrast and read the docs. Verified on every build is the contrast
-   * gate, the token checks and an agent corpus that fails when a question stops
-   * being answerable from a current artifact. That is the intelligence the
-   * heading names, said plainly enough that the phrase is a description rather
-   * than a joke.
+   * The longer form, for a search result and a link preview. The hero shows
+   * only `lede`, so the facts a search result needs go here: the license, the
+   * checks on every build, and the reference agents read (an MCP server and an
+   * `llms.txt`).
    */
   description:
-    'Ship faster because the system does the checking. An open source design system, machine-readable and verified on every build, and the engineers behind it.',
+    'Helix is an open source design system built from your brand color. It checks contrast and components on every build, publishes its reference for AI agents, and comes with the engineers who built it.',
   install: 'bun add @fusion.dev/helix',
   /**
-   * **One sentence, because the hero already says enough.** `Ship faster` is the
-   * outcome and `because the system does the checking` is the mechanism, which
-   * is the only honest way to promise speed: nothing here makes a person type
-   * faster, it removes a review step they were doing by hand.
-   *
-   * The other claims are not wrong here, they are early: the bands below
-   * evidence each one at the point a reader is asking for it, and `description`
-   * still hands all three to a search result. What is left is the whole of what
-   * someone needs before the buttons under it.
-   *
-   * **And no number in it.** A count in the hero is a fact with an owner, wrong
-   * the day a component is added, and nothing checks it. The band below prints
-   * the count from the built packages, where it is generated and cannot drift.
+   * One sentence that says what Helix does for you. It has no count in it,
+   * because a count here would go stale when a component is added. The band
+   * below prints the generated numbers.
    */
-  lede: 'Ship faster because the system does the checking.',
+  lede: 'Helix checks contrast, tokens, and components on every build, so you review less by hand.',
   /**
-   * **Generic before it is clever.** A sentence about us that takes twenty words
-   * to reach what the product is loses a reader arriving cold: they want the
-   * category first and the argument second.
-   *
-   * Reads as one sentence with `accent`: "An intelligent design system, and the
-   * engineers behind it." The category is plain and the half worth painting is
-   * the people, which is the whole reason the heading is in two colors: the
-   * system is the thing being sold and the engineers are the reason to trust
-   * it.
+   * Reads as one sentence with `accent`. The first half says what the product
+   * is, so someone arriving cold learns it from the headline. The second half
+   * names the people, and the page paints it in the brand color.
    */
-  title: 'An intelligent design system,',
+  title: 'A design system built from your brand color,',
   /**
    * What the package actually is, for a reader deciding whether it can be used
    * at all.
@@ -98,75 +71,47 @@ export const HERO = {
 } as const
 
 /**
- * The problem, before the answer.
- *
- * **Not "design systems are hard".** That is a sentiment, and a reader who has
- * built one does not need to be told. The specific failure is that the cost
- * arrives later than the decision does, which is the thing nobody plans for.
+ * The problem, before the answer: the cost of an interface arrives after the
+ * first screen ships.
  */
 export const PROBLEM = {
   /**
-   * **The interface, not the design system.** The hero opens on the system *and*
-   * the engineering *and* the people, so a reader who does not have a design
-   * system problem, and has an interface problem, puts the page down if the
-   * first thing under it is an argument about tokens. The cost being described
-   * was never really the palette's anyway: it is the second brand, the migration
-   * and the audit, and those arrive whether or not anyone called the thing a
-   * design system.
-   *
-   * **The last sentence exists so `It` has something to point at.**
-   *
-   * The four claims under this all begin "It survives", and read on their own
-   * the card never says what "it" is: a heading about interfaces, a paragraph
-   * about a year of work, then four promises with no subject. A reader landing
-   * on this section from anywhere but the top of the page has no way to know
-   * the answer is Helix, and the page has to say it once for the four cards to
-   * mean anything.
-   *
-   * Named here rather than in each claim, which would be `Helix survives the
-   * second brand` four times over.
+   * About the interface in general, so the section also speaks to someone who
+   * does not think of their problem as a design system. The last sentence names
+   * Helix, because the four cards under it start from that subject.
    */
-  lede: 'The first screen is a morning. The second brand, the framework migration and the accessibility audit are the rest of the year, and none of them is visible on the day you start. Helix is built for that year, not the morning.',
+  lede: 'The first screen takes a morning. A second brand, a framework migration, and an accessibility audit take the rest of the year, and none of them is visible on the day you start. Helix is built for that later work.',
   title: 'An interface is cheap to start and expensive to keep',
 } as const
 
 /**
- * The four costs the system is built to survive, each with the facts behind it.
- *
- * **Four rather than three, because the page promises intelligence.** The hero
- * calls this an intelligent design system, and the second brand, the framework
- * and the audit are all real without being the reason that word is in the
- * heading. `Readable, not scraped` is, and it is the one claim on this page an
- * agent can verify by fetching a URL.
- *
- * **Two bullets each, not three.** Twelve facts is a wall a reader skims. The
- * pair kept for each card is the mechanism and the guarantee it buys, which is
- * the argument; a third is the corollary of one of them.
+ * The four jobs Helix does for you, each with two facts you can check. The
+ * fourth, agents, is the one you can verify by fetching a URL.
  */
 export const MECHANISMS: readonly Capability[] = [
   {
     bullets: [
-      'One brand color in, a full palette out',
-      'The engine refuses a palette it cannot make readable',
+      'Enter one brand color and get a full palette',
+      'Helix rejects a palette it cannot make readable',
     ],
-    claim: 'It survives the second brand',
-    name: 'Derived, not picked',
+    claim: 'Add a second brand with one color',
+    name: 'Theming',
   },
   {
     bullets: [
-      'Custom elements, so they upgrade in any framework or none',
-      'Typed for React, Vue and Svelte from one manifest',
+      'Custom elements that run in any framework, or in none',
+      'Types for React, Vue, and Svelte from one manifest',
     ],
-    claim: 'It survives the framework',
-    name: 'Standards, not bindings',
+    claim: 'Keep your components when you change frameworks',
+    name: 'Components',
   },
   {
     bullets: [
-      'Contrast is measured on every release, not asserted once',
-      'Twelve generators judge the tree and fail it when it drifts',
+      'Contrast is measured on every release',
+      'Twelve generators check the code and fail the build when it drifts',
     ],
-    claim: 'It survives the audit',
-    name: 'Measured, not claimed',
+    claim: 'Find problems before an audit does',
+    name: 'Checks',
   },
   {
     /* Both are live URLs on this site rather than a roadmap. The manifest is
@@ -175,16 +120,16 @@ export const MECHANISMS: readonly Capability[] = [
        a description of it. The CLI serves the same derivation over MCP and is
        deliberately not cited here: it does not publish yet. */
     bullets: [
-      'Every tag, property and event as one manifest, at a URL',
-      'Every page answers as Markdown, every component family as JSON',
+      'Every tag, property, and event in one manifest at a URL',
+      'Every page as Markdown, and every component family as JSON',
     ],
-    claim: 'It survives the agent',
-    name: 'Readable, not scraped',
+    claim: 'Give AI agents the reference you read',
+    name: 'Agents',
   },
 ]
 
 export const DELIVERY = {
-  lede: 'Every price is published, because an offer you cannot compare is not an offer.',
+  lede: 'Each service has a published price.',
   /**
    * **Named, because `it` had nothing to point at.** The band above this one is
    * about the engineers and the one above that about the essays, so a reader
@@ -208,25 +153,25 @@ export const DELIVERY = {
  */
 export const ENGAGEMENT: readonly CopyItem[] = [
   {
-    body: 'A token layer, two tiers, generated framework wrappers, a sandbox and the checks that keep it honest. We are not learning this on your project.',
-    name: 'The system already exists',
+    body: 'Helix already has its token layer, components, framework types, sandbox, and build checks. Your project starts from that.',
+    name: 'The system is already built',
   },
   {
-    body: 'Four weeks, two days a week, because the hard part is behind us. Starting from nothing, the same deliverable is quoted in months.',
-    name: 'It is faster because of that',
+    body: 'A typical engagement is four weeks at two days a week. The same work started from nothing takes months.',
+    name: 'The work takes weeks',
   },
   {
-    body: 'Your repository, your license. Handover is a condition of the work rather than a phase at the end, and no engagement should leave you needing us on a retainer.',
+    body: 'The work lands in your repository under your license. We hand it over as we go, so you do not need us on a retainer afterward.',
     name: 'You keep all of it',
   },
   {
-    body: 'Active ships with users. Building is real work with nothing shipped. Declared is a direction. Nothing here is described as further along than it is.',
+    body: 'Every product shows its stage. Active means it ships to users. Building means work is underway and nothing has shipped. Declared means it is planned.',
     name: 'We tell you what is not done',
   },
 ]
 
 /** The frame above those four cards. */
 export const ENGAGEMENT_COPY = {
-  lede: 'Helix is the system. This is what it is like to have the people who built it working in your codebase.',
-  title: 'How the work goes',
+  lede: 'We built Helix, and we build with it in your codebase.',
+  title: 'What working with us is like',
 } as const

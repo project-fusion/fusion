@@ -22,9 +22,9 @@ export async function GET() {
   const lines = [
     '# Fusion Development Group',
     '',
-    '> An intelligent design system, intelligent tooling and intelligent',
-    '> services. Fusion builds the foundation underneath: Helix, a design',
-    '> system, and Cortex, a memory layer.',
+    '> Fusion Development Group builds Helix, a design system built from your',
+    '> brand color, and Cortex, a memory and provenance layer for AI systems.',
+    '> We also build products with them for clients.',
     '',
     'Every page on this site has a sibling `.md` at the same path plus the',
     'extension. The component reference and the design-system documentation are',

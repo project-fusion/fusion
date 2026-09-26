@@ -18,7 +18,7 @@ const FACES = [
 ]
 
 const DESCRIPTION =
-  'An intelligent design system, intelligent tooling and intelligent services. Fusion builds the foundation underneath: Helix, a design system, and Cortex, a memory layer.'
+  'Fusion Development Group builds Helix, a design system built from your brand color, and Cortex, a memory and provenance layer for AI systems. We also build products with them for clients.'
 
 /**
  * The defaults every page inherits, and the base every relative URL resolves on.

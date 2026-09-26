@@ -108,20 +108,14 @@ export default function Home() {
         </Band>
 
         <Band id="mechanism">
-          {/* **Labeled as the first of the three, because that is what it
-                  is.** The band above ends on three claims and this draws one of
-                  them out. A label naming the subject instead, "The derivation",
-                  reads as the page narrowing back to the theme engine one section
-                  after widening to the interface; naming the card it belongs to,
-                  with the lede saying which of the three costs is answered, tells
-                  a reader this is depth rather than a change of subject. */}
+          {/* The eyebrow repeats the name of the card above that this band
+              explains, so you can see it is the same subject in more depth. */}
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <Eyebrow>Derived, not picked</Eyebrow>
-            <SectionTitle>What happens between the color and the page</SectionTitle>
+            <Eyebrow>Theming</Eyebrow>
+            <SectionTitle>How one color becomes a full theme</SectionTitle>
             <Lede>
-              The first of those three, drawn out. One value goes in, the whole token layer comes
-              out, and every pair it produces is measured against the ground it lands on before any
-              of it reaches a page.
+              You enter one brand color. Helix computes every token from it and measures each text
+              and background pair for contrast before the theme is used.
             </Lede>
           </helix-flex>
           <div className={band.bandSection}>
@@ -139,15 +133,13 @@ export default function Home() {
         <Band shell="plain" wide>
           <div className={band.bandSplit}>
             <helix-flex class={band.bandSection} direction="column" gap="md">
-              {/* The card this band draws out, named after it, the way the
-                    other two mechanisms are: "Derived, not picked" above and
-                    "Measured, not claimed" below. A label naming the subject,
-                    "The library", leaves the pattern two-thirds visible. */}
-              <Eyebrow>Standards, not bindings</Eyebrow>
-              <SectionTitle>Every control here is the real one</SectionTitle>
+              {/* Named after the card above that this band explains, like the
+                  Theming band. */}
+              <Eyebrow>Components</Eyebrow>
+              <SectionTitle>Live Helix components, running on the page</SectionTitle>
               <Lede>
-                Not a screenshot and not a video. These are custom elements from the package,
-                upgrading in your browser on the page you are already reading.
+                Each control in the panel is a custom element from the Helix package, running in
+                your browser.
               </Lede>
               <helix-flex class="siteActions" data-density="lg" direction="column" gap="md">
                 <Link data-button="subtle" href="/helix">
@@ -199,7 +191,7 @@ export default function Home() {
           page ends in light rather than trailing off into flat ground. */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <Eyebrow>How it arrives</Eyebrow>
+            <Eyebrow>Services</Eyebrow>
             <SectionTitle>{DELIVERY.title}</SectionTitle>
             <Lede>{DELIVERY.lede}</Lede>
           </helix-flex>
@@ -217,7 +209,7 @@ export default function Home() {
 
           <helix-flex class={`${band.bandSection} siteActions`} data-density="lg">
             <Link data-button="subtle" href="/company/services">
-              See what each costs
+              See the service prices
             </Link>
           </helix-flex>
         </Band>
@@ -230,7 +222,7 @@ export default function Home() {
           quick, that they keep it, and that we say what is unfinished. */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <Eyebrow>The engagement</Eyebrow>
+            <Eyebrow>Working with us</Eyebrow>
             <SectionTitle>{ENGAGEMENT_COPY.title}</SectionTitle>
             <Lede>{ENGAGEMENT_COPY.lede}</Lede>
           </helix-flex>
@@ -258,15 +250,15 @@ export default function Home() {
             <helix-flex align-items="center" gap="md" justify-content="between" wrap>
               <helix-flex direction="column" gap="sm">
                 <Eyebrow>Insights</Eyebrow>
-                <SectionTitle>The arguments, written down</SectionTitle>
+                <SectionTitle>Articles from the team</SectionTitle>
               </helix-flex>
               <Link className="siteActions" data-button="subtle" href="/insights">
-                Read all
+                Read all articles
               </Link>
             </helix-flex>
             {/* Below the row rather than inside it, so `Read all` stays on the
                     heading's line and the sentence runs the full measure. */}
-            <Lede>Design, engineering and business decisions, with the reasoning kept in.</Lede>
+            <Lede>How we make design, engineering, and business decisions, and why.</Lede>
           </helix-flex>
 
           {/* **No card and no art, because the band is the card.**
@@ -301,9 +293,9 @@ export default function Home() {
 
         <section className={styles.closingCard} data-band data-closing data-material="glass">
           <helix-flex align-items="center" data-shell direction="column" gap="lg">
-            <SectionTitle>Take on the work</SectionTitle>
+            <SectionTitle>Work with us</SectionTitle>
             <Lede>
-              Tell us what you need built. We will say plainly if we are not the right people.
+              Tell us what you need built. If we are not the right team for it, we will tell you.
             </Lede>
             <a
               className="siteActions"

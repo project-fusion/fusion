@@ -18,25 +18,21 @@ export const LANDING: PageCopy = {
          are already legible as a choice; a heading above saying some version of
          "here are the things" is a row of chrome that names what the reader can
          already see. */
-      body: [
-        'Two substrates, both in production. They install from npm and ship as custom elements, so the framework above them stays your choice.',
-      ],
+      body: ['Two products that install from npm and ship as custom elements.'],
       from: 'products',
     },
     {
-      body: [
-        'It starts with a two week audit, and every price is published: an offer you cannot compare is not an offer.',
-      ],
+      body: ['Work starts with a two-week audit. Each service has a published price.'],
       from: 'services',
       kicker: 'Services',
       title: 'The part you can buy today',
     },
     {
       body: [
-        'Every control beside this is a custom element from the library, rendered here rather than pictured. The palette under them is derived from one brand color, which is why nothing had to be chosen twice.',
+        'Each control in the panel is a custom element from the Helix package, running in your browser. Their colors come from one brand color.',
       ],
-      kicker: 'Helix',
-      title: 'Drawn by the thing it documents',
+      kicker: 'Components',
+      title: 'Live Helix components, running on the page',
     },
     {
       /* The cards live in `helix-landing.ts`, because the page renders them
@@ -44,17 +40,17 @@ export const LANDING: PageCopy = {
          page does not have. */
       body: [ENGAGEMENT_COPY.lede],
       items: ENGAGEMENT,
-      kicker: 'The engagement',
+      kicker: 'Working with us',
       title: ENGAGEMENT_COPY.title,
     },
     {
       from: 'insights',
       kicker: 'Insights',
-      title: 'The arguments, written down',
+      title: 'Articles from the team',
     },
     {
-      body: ['Tell us what you need built. We will say plainly if we are not the right people.'],
-      title: 'Take on the work',
+      body: ['Tell us what you need built. If we are not the right team for it, we will tell you.'],
+      title: 'Work with us',
     },
   ],
   /**
@@ -62,7 +58,7 @@ export const LANDING: PageCopy = {
    * engineering is hireable. It is the route registry's description of `/` and
    * the frontmatter of `/index.md`.
    */
-  lede: 'Take Helix and go, or hire us to build with it.',
+  lede: 'Use Helix on your own, or hire us to build with it.',
   /**
    * **The hero's headline, because this document is that page.**
    *
@@ -73,7 +69,7 @@ export const LANDING: PageCopy = {
    * The site's own name stays the *route* title, which is what a sitemap and a
    * search result want. This is the `h1`, and the `h1` is the heading.
    */
-  title: 'An intelligent design system, and the engineers behind it',
+  title: 'A design system built from your brand color, and the engineers behind it',
 }
 
 /** The one line the hero asks a reader to run rather than to read. */
