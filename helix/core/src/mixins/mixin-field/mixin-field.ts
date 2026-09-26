@@ -33,7 +33,7 @@ export declare class MixinFieldInterface {
   protected get labeled(): boolean
 
   /**
-   * Help under the control, shown while there is nothing wrong.
+   * Help text shown under the control. A validation message replaces it.
    *
    * Fallback content for the `hint` slot, so anything richer replaces it.
    */
@@ -48,7 +48,8 @@ export declare class MixinFieldInterface {
   readonly describedBy: string | undefined
 
   /**
-   * What is wrong, in the reader's words rather than the browser's.
+   * The validation message shown under the control. It replaces the browser's
+   * message.
    *
    * Overrides the platform's message. Left empty, the platform's own is shown
    * once the reader has had a go at the field, never before. Either way it
@@ -57,7 +58,8 @@ export declare class MixinFieldInterface {
   feedback: string
 
   /**
-   * The accessible name, and the fallback for the `label` slot.
+   * The field's label, which is also its accessible name. Content in the
+   * `label` slot replaces it.
    *
    * Content rather than configuration, so it is the slot's fallback and never a
    * second thing rendered beside it.
@@ -85,7 +87,7 @@ export declare class MixinFieldInterface {
   /** A label above the control, pointing at it with a real `for`. */
   protected renderLabel(): TemplateResult | typeof nothing
 
-  /** Whether the form refuses to submit without it. */
+  /** Whether the field needs a value before the form can submit. */
   required: boolean
 
   /**
@@ -112,10 +114,10 @@ export declare class MixinFieldInterface {
    */
   protected copyValidity(control: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): void
 
-  /** The message actually shown: the consumer's, or the platform's, or none. */
+  /** The validation message shown: yours, the browser's, or none. */
   readonly resolvedFeedback: string
 
-  /** What a reader is told when the field is required and empty, where the page says. */
+  /** The message shown when the field is required and empty. */
   valueMissingMessage: string | undefined
 }
 
@@ -229,32 +231,33 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     }
 
     /**
-     * What is wrong, in the reader's words rather than the browser's.
+     * The validation message shown under the control. It replaces the
+     * browser's message.
      */
     @property()
     feedback = ''
 
     /**
-     * Help under the control, shown while there is nothing wrong.
+     * Help text shown under the control. A validation message replaces it.
      */
     @property()
     hint = ''
 
     /**
-     * The accessible name, and the fallback for the `label` slot.
+     * The field's label, which is also its accessible name. Content in the
+     * `label` slot replaces it.
      */
     @property()
     label = ''
 
     /**
-     * Whether the form refuses to submit without it.
+     * Whether the field needs a value before the form can submit.
      */
     @property({ reflect: true, type: Boolean })
     required = false
 
     /**
-     * What a reader is told when the field is required and empty, where the
-     * page says.
+     * The message shown when the field is required and empty.
      *
      * **Absent, or empty, is the control's own sentence**, "Choose one to continue." on a
      * set and the browser's own on a text field, which the browser writes in
@@ -573,8 +576,8 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     }
 
     /**
-     * Forgets the reader's attempts along with the value, so an emptied field
-     * is not wrong until they try again.
+     * Clears the record of the user's edits along with the value, so the field
+     * shows no error until they edit it again.
      *
      * Through the base's prototype rather than `super`, because the base this
      * grafts onto is any element and only a form element has the hook.

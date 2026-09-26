@@ -14,10 +14,10 @@ type Constructor<T> = new (...args: any[]) => T
  * to this interface keeps the internals private and the build working.
  */
 export declare class MixinSelectableItemInterface {
-  /** Whether this one can be chosen. */
+  /** Whether the item is disabled and cannot be chosen. */
   disabled: boolean
 
-  /** Moves focus to the control this renders, for the set's arrow keys. */
+  /** Moves focus to the item's control, for the set's arrow keys. */
   focusItem(): void
 
   /**
@@ -30,7 +30,8 @@ export declare class MixinSelectableItemInterface {
   protected itemPart: string
 
   /**
-   * Chooses this one and announces it, and reports whether the request stood.
+   * Selects the item and fires `helix-select`. Returns `false` if the item is
+   * disabled or a listener cancels the event.
    *
    * `MixinDismissible.dismiss` next door has the same shape and for the same
    * reason: a mixin has no family, so the answer to a cancelable event it
@@ -39,10 +40,13 @@ export declare class MixinSelectableItemInterface {
    */
   select(): boolean
 
-  /** Whether this is the current one. Written by the set. */
+  /** Whether the item is selected. The parent set updates it. */
   selected: boolean
 
-  /** Identifies this one to the set, and is what a form submits. */
+  /**
+   * The item's value, which identifies it in its set and is what a form
+   * submits.
+   */
   value: string
 }
 
@@ -80,13 +84,13 @@ export const MixinSelectableItem = <T extends Constructor<HelixElement>>(Base: T
   // analyzer reads when resolving inherited members into dependent packages.
   class SelectableItem extends Base {
     /**
-     * Whether this one can be chosen.
+     * Whether the item is disabled and cannot be chosen.
      */
     @property({ reflect: true, type: Boolean })
     disabled = false
 
     /**
-     * Whether this is the current one.
+     * Whether the item is selected.
      *
      * Written by the set rather than by a consumer, which is why it takes no
      * default from an attribute here: a family whose selection a consumer
@@ -96,7 +100,8 @@ export const MixinSelectableItem = <T extends Constructor<HelixElement>>(Base: T
     selected = false
 
     /**
-     * Identifies this one to the set, and is what a form submits.
+     * The item's value, which identifies it in its set and is what a form
+     * submits.
      */
     @property()
     value = ''
@@ -105,7 +110,7 @@ export const MixinSelectableItem = <T extends Constructor<HelixElement>>(Base: T
     protected itemPart = 'item'
 
     /**
-     * Moves focus to the control this renders, for the set's arrow keys.
+     * Moves focus to the item's control, for the set's arrow keys.
      *
      * The set drives the keys and cannot reach the control itself, which is
      * inside this shadow root, so the intent is a method and the internals stay
@@ -115,7 +120,10 @@ export const MixinSelectableItem = <T extends Constructor<HelixElement>>(Base: T
       this.partNamed(this.itemPart)?.focus()
     }
 
-    /** Chooses this one and announces it, and reports whether it stood. */
+    /**
+     * Selects the item and fires `helix-select`. Returns `false` if the item is
+     * disabled or a listener cancels the event.
+     */
     select(): boolean {
       if (this.disabled) {
         return false

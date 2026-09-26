@@ -33,11 +33,14 @@ export declare class MixinPickerEditingInterface {
   protected readonly handleFocus: (event: FocusEvent) => void
 
   /**
-   * Whether the control refuses changes while still submitting its value.
+   * Whether the value is locked. A read-only control still submits its value.
    */
   readOnly: boolean
 
-  /** Refuses every change while read-only. See `readOnly`. */
+  /**
+   * Requests a new value. While `readOnly` is set, nothing changes and it
+   * returns `false`.
+   */
   requestValue(next: string): boolean
 }
 
@@ -63,7 +66,7 @@ export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) 
   // analyzer reads when resolving inherited members into dependent packages.
   class PickerEditingElement extends Base {
     /**
-     * Whether the control refuses changes while still submitting its value.
+     * Whether the value is locked. A read-only control still submits its value.
      *
      * **Enforced by refusing every request in one place**, which is the seam this
      * component already has: `requestValue` is what every path here comes through,
@@ -84,7 +87,10 @@ export const MixinPickerEditing = <T extends Constructor<EditingBase>>(Base: T) 
     @state()
     protected editing = false
 
-    /** Refuses every change while read-only. See `readOnly`. */
+    /**
+     * Requests a new value. While `readOnly` is set, nothing changes and it
+     * returns `false`.
+     */
     override requestValue(next: string): boolean {
       if (this.readOnly) {
         return false

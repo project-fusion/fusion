@@ -96,7 +96,7 @@ export const seriesNames = (list: string | undefined): string[] =>
  * styled tier, and a consumer on `headless` sets the same names to whatever
  * they like. The headless examples set them to a ramp of grays.
  *
- * @cssproperty --chart-series - The color of the mark this is set on. Written by the component, read by the sheet that paints.
+ * @cssproperty --chart-series - The color of the mark it is set on. The component sets it, and the stylesheet reads it.
  * @cssproperty --chart-series-1 - The color of series 1. The styled tier points it at a palette token.
  * @cssproperty --chart-series-2 - The color of series 2. The styled tier points it at a palette token.
  * @cssproperty --chart-series-3 - The color of series 3. The styled tier points it at a palette token.
@@ -135,39 +135,40 @@ export declare class MixinChartSourceInterface {
    */
   for: string
   /**
-   * The drawing's name, for a pointer resting on it.
+   * The chart's name, which starts the chart's text summary.
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
    */
   label: string
   /**
-   * The columns of the table, one series each, or none if there is no table.
+   * The table's columns, one series each. Empty when there is no table.
    */
   get series(): Series[]
   /**
-   * What to call the drawing, the consumer's word or the table's own.
+   * The chart's name: `label` when it is set, and the table's caption
+   * otherwise.
    */
   get named(): string
   /**
-   * Every row of the table, with each cell's text as well as its number.
+   * Every row of the table, with each cell's text and number.
    */
   get sourceRows(): Row[]
   /**
-   * Which cells of a row hold numbers, by their place in it, in table order.
+   * The positions of the cells in a row that hold numbers, in table order.
    */
   get plottedColumns(): number[]
   /**
-   * The palette slot the cell at this place in a row is drawn in, or nothing
-   * where no series was read from that column.
+   * The palette slot for the cell at this position in a row, or `undefined`
+   * when no series was read from that column.
    */
   seriesOf(cell: number): number | undefined
   /**
-   * How many readings there are, which is what the pointer maps onto.
+   * The number of readings, which the pointer position maps onto.
    */
   get readings(): number
   /**
-   * Which reading a pointer is nearest, for a tooltip to sit on.
+   * Finds the reading nearest the pointer, so the tooltip can sit on it.
    */
   pointer: ChartPointerController
 }
@@ -192,7 +193,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     protected readonly source = new SourceController(this)
 
     /**
-     * Which reading a pointer is nearest, for a tooltip to sit on.
+     * Finds the reading nearest the pointer, so the tooltip can sit on it.
      *
      * Public for the same reason `series` and `named` are: a protected member
      * cannot be cast onto across unrelated classes, so it would be invisible to
@@ -215,7 +216,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     for = ''
 
     /**
-     * The drawing's name, for a pointer resting on it.
+     * The chart's name, which starts the chart's text summary.
      *
      * Absent falls back to the table's own caption, which is usually the right
      * words and is already written.
@@ -238,7 +239,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     }
 
     /**
-     * The columns of the table, one series each, or none if there is no table.
+     * The table's columns, one series each. Empty when there is no table.
      *
      * Held by the controller between edits, so a render reading this five
      * times parses the table once. See `SourceController.series`.
@@ -248,7 +249,8 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     }
 
     /**
-     * What to call the drawing, the consumer's word or the table's own.
+     * The chart's name: `label` when it is set, and the table's caption
+     * otherwise.
      *
      * The fallback is the reason this is shared rather than copied: a caption is
      * already written, already the right words, and already the thing a reader
@@ -260,7 +262,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     }
 
     /**
-     * Every row of the table, with each cell's text as well as its number.
+     * Every row of the table, with each cell's text and number.
      *
      * This is where a tooltip's content comes from, and it is deliberately not
      * `series`. A chart draws numbers; a reader resting a pointer on one wants
@@ -278,7 +280,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     }
 
     /**
-     * Which cells of a row hold numbers, by their place in it, in table order.
+     * The positions of the cells in a row that hold numbers, in table order.
      *
      * The same test `readSeries` applies when it drops a column of notes: a
      * column is a series where any row parses, so a series survives one blank
@@ -293,7 +295,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     }
 
     /**
-     * The palette slot the cell at this place in a row is drawn in.
+     * The palette slot for the cell at this position in a row.
      *
      * **A cell's place in its row is not its series' depth, and the tooltip
      * spent a while assuming it was.** `readSeries` drops a column nothing
@@ -312,7 +314,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
       return depth < 0 ? undefined : seriesIndex(depth)
     }
 
-    /** How many readings there are, which is what the pointer maps onto. */
+    /** The number of readings, which the pointer position maps onto. */
     get readings(): number {
       return this.sourceRows.length
     }

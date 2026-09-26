@@ -9,13 +9,13 @@ type Constructor<T> = new (...args: any[]) => T
  * The API a dismissible surface has, as TypeScript sees it.
  */
 export declare class DismissibleElement {
-  /** Whether it offers a control to take it away. */
+  /** Whether the element shows a control that dismisses it. */
   dismissible: boolean
 
-  /** Accessible name for that control. */
+  /** The dismiss control's label, read by screen readers. */
   dismissLabel: string
 
-  /** Announces that it should go, and reports whether the request stood. */
+  /** Fires `helix-dismiss`, and returns `false` if a listener cancels it. */
   dismiss(): boolean
 
   /** The event, built but not dispatched, for a caller that owns the timing. */
@@ -43,13 +43,13 @@ export declare class DismissibleElement {
 export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => {
   class Dismissible extends Base {
     /**
-     * Whether it offers a control to take it away.
+     * Whether the element shows a control that dismisses it.
      */
     @property({ reflect: true, type: Boolean })
     dismissible = false
 
     /**
-     * Accessible name for that control.
+     * The dismiss control's label, read by screen readers.
      *
      * `attribute` is spelled out because Lit lowercases a property name to
      * derive one rather than dash-casing it, so this would otherwise be
@@ -75,7 +75,7 @@ export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => 
       return new HelixDismissEvent({ label: own.trim() })
     }
 
-    /** Announces that it should go, and reports whether the request stood. */
+    /** Fires `helix-dismiss`, and returns `false` if a listener cancels it. */
     dismiss(): boolean {
       const event = this.dismissEvent()
       this.dispatchEvent(event)

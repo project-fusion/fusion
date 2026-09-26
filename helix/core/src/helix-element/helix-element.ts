@@ -276,7 +276,7 @@ const LOOK_FOR = 96
  * @status experimental
  * @documentation https://fusion.dev/helix/docs/tiers
  *
- * @cssstate settled - Set a frame after the first render. Transitions are held off until it is, so an element never animates its own arrival.
+ * @cssstate settled - Set one frame after the first render. Transitions wait for it, so an element does not animate its own arrival.
  */
 export class HelixElement extends LitElement {
   /**
@@ -535,7 +535,8 @@ export class HelixElement extends LitElement {
   }
 
   /**
-   * Announces an event, having first bound whatever React is holding for it.
+   * Dispatches an event, after binding the React handler for it, if there is
+   * one.
    *
    * Every event this library sends passes through here, the concrete classes in
    * `events.ts` and the relayed native ones alike, and `requestChange`

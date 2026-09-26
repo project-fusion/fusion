@@ -9,13 +9,15 @@ type Constructor<T> = new (...args: any[]) => T
  * The API a collection has for the two states that are not its content.
  */
 export declare class CollectionElement {
-  /** Whether the rows are still on their way. */
+  /** Whether the rows are still loading. */
   loading: boolean
 
-  /** What is said while they are. */
+  /** The text shown and announced while the rows load. */
   loadingText: string
 
-  /** What is said where there are none and none are coming. */
+  /**
+   * The text shown and announced when there are no rows and none are loading.
+   */
   emptyText: string
 
   /**
@@ -72,13 +74,13 @@ export declare class CollectionElement {
 export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) => {
   class Collection extends Base {
     /**
-     * What is said where there are none, and none are coming.
+     * The text shown and announced when there are no rows and none are loading.
      */
     @property({ attribute: 'empty-text' })
     emptyText = 'Nothing to show'
 
     /**
-     * Whether the rows are still on their way.
+     * Whether the rows are still loading.
      *
      * Reflected, because a stylesheet needs it: the rows that are already there
      * are dimmed rather than removed while a new set arrives, and only CSS can
@@ -88,7 +90,7 @@ export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) =>
     loading = false
 
     /**
-     * What is said while they are on their way.
+     * The text shown and announced while the rows load.
      */
     @property({ attribute: 'loading-text' })
     loadingText = 'Loading'

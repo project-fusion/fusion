@@ -18,7 +18,7 @@ type Constructor<T> = new (...args: any[]) => T
  */
 export declare class MixinControllerActiveInterface {
   /**
-   * Which item is current, by its `value`.
+   * The `value` of the current item.
    *
    * Reading gives the real one. Writing always applies, and is a seed and a
    * correction rather than a claim of ownership: a consumer who wants the
@@ -26,10 +26,13 @@ export declare class MixinControllerActiveInterface {
    */
   active: string
 
-  /** Which item the markup declared current. Ignored once `active` is written. */
+  /**
+   * The `value` of the item declared current in markup. Ignored once `active`
+   * is written.
+   */
   defaultActive: string
 
-  /** Requests a new current item, and reports whether the request stood. */
+  /** Requests a new current item, and returns whether the change was applied. */
   requestActive(next: string): boolean
 
   /**
@@ -67,7 +70,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
   // when resolving inherited members into dependent packages.
   class ActiveElement extends Base {
     /**
-     * Which item is current, by its `value`.
+     * The `value` of the current item.
      *
      * Not `option.active`, which is the option the keyboard is on: that is a
      * different question from which one is chosen.
@@ -88,7 +91,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
     }
 
     /**
-     * Which item the markup declared current.
+     * The `value` of the item declared current in markup.
      *
      * Ignored once `active` is written.
      */
@@ -104,7 +107,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
     private activeState: string | undefined = undefined
 
     /**
-     * Requests a new current item, and reports whether the request stood.
+     * Requests a new current item, and returns whether the change was applied.
      *
      * Announces before it acts, so `preventDefault()` on the `helix-before-activate` is
      * a refusal and nothing moves. Unlike a native control, nothing has moved

@@ -208,9 +208,9 @@ export interface FloatingOptions {
  * package and none of them is private. the `hooks` rule pairs a documented
  * hook with a rule that reads one, in both directions.
  *
- * @cssproperty --floating-anchor-inline-size - How wide the anchor is, for a panel that matches it.
- * @cssproperty --floating-arrow-x - Where the pointer meets the anchor, from the panel's left edge in either direction.
- * @cssproperty --floating-arrow-y - Where the pointer meets the anchor, from the panel's top edge.
+ * @cssproperty --floating-anchor-inline-size - The anchor's width, for a panel that matches it.
+ * @cssproperty --floating-arrow-x - Where the arrow meets the anchor, from the panel's left edge in both text directions.
+ * @cssproperty --floating-arrow-y - Where the arrow meets the anchor, from the panel's top edge.
  * @cssproperty --floating-available-block-size - How much room is left below, for a panel that scrolls.
  */
 export class FloatingController implements ReactiveController {
