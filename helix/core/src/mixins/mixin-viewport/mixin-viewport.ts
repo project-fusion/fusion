@@ -19,46 +19,46 @@ export type ViewportControlsPlacement = 'top-start' | 'top-end' | 'bottom-start'
  * The API a pan-and-zoom surface has, as TypeScript sees it.
  */
 export declare class ViewportElement {
-  /** Which of the controls the surface draws, as a list of what to keep. */
+  /** Which controls to show, as a list of `pan`, `zoom`, and `fullscreen`, or `none`. */
   controls?: string
 
   /** Which corner the controls sit in. */
   controlsPlacement?: ViewportControlsPlacement
 
-  /** What the control that fills the screen is called. */
+  /** The fullscreen button's label. */
   fullscreenLabel: string
 
-  /** How long the reader may be still before the chrome hides, in milliseconds. */
+  /** How long, in milliseconds, before the header and footer hide when the user is inactive. `0` keeps them visible. */
   idleDelay: number
 
-  /** What the control that pans down is called. */
+  /** The pan down button's label. */
   panDownLabel: string
 
-  /** What the control that pans left is called. */
+  /** The pan left button's label. */
   panLeftLabel: string
 
-  /** What the control that pans right is called. */
+  /** The pan right button's label. */
   panRightLabel: string
 
-  /** How far one press moves the view, as a fraction of what is on screen. */
+  /** How far one press pans the view, as a fraction of its size. */
   panStep: number
 
-  /** What the control that pans up is called. */
+  /** The pan up button's label. */
   panUpLabel: string
 
-  /** What the control that zooms in is called. */
+  /** The zoom in button's label. */
   zoomInLabel: string
 
-  /** What the control that zooms out is called. */
+  /** The zoom out button's label. */
   zoomOutLabel: string
 
-  /** Asks for the view to move, which the consumer answers. */
+  /** Pans the view one step in a direction. */
   pan(to: ViewportWay): void
 
-  /** Asks for the view to zoom, `1` in and `-1` out. */
+  /** Zooms the view one step: `1` zooms in and `-1` zooms out. */
   zoom(by: number): void
 
-  /** Fills the screen with the surface, or comes back. */
+  /** Turns fullscreen on or off. */
   toggleFullscreen(): void
 
   /** Whether the reader has been still long enough to hide the chrome. */
@@ -130,7 +130,7 @@ export declare class ViewportElement {
 export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
   class Viewport extends Base {
     /**
-     * Which of the controls this surface draws, as a list of what to keep.
+     * Which controls to show, as a list of `pan`, `zoom`, and `fullscreen`, or `none`.
      *
      * **A list rather than a switch, because the overlap is not symmetric.** A
      * surface a consumer brings often has zoom controls of its own and almost
@@ -154,7 +154,7 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     controls?: string
 
     /**
-     * What the group of controls is called, for a reader who meets it.
+     * The name of the group of controls, read by screen readers.
      *
      * Absent is the family's own name for it, "Map controls" or "Board
      * controls", which names what the controls drive rather than the
@@ -180,12 +180,12 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     @property({ attribute: 'controls-placement', reflect: true })
     controlsPlacement?: ViewportControlsPlacement
 
-    /** What the control that fills the screen is called. */
+    /** The fullscreen button's label. */
     @property({ attribute: 'fullscreen-label' })
     fullscreenLabel = 'Fill the screen'
 
     /**
-     * How long the reader may be still before the chrome hides, in milliseconds.
+     * How long, in milliseconds, before the header and footer hide when the user is inactive. `0` keeps them visible.
      *
      * Zero keeps it up, which is the default: these controls are how a keyboard
      * reader operates the surface, and chrome that hid itself by default would
@@ -196,7 +196,7 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     idleDelay = 0
 
     /**
-     * What the control that pans down is called.
+     * The pan down button's label.
      *
      * **A label for each way rather than one with the way filled in**, which is
      * what this was: `Pan {way}` filled in with `left`, so a page that said it
@@ -207,16 +207,16 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     @property({ attribute: 'pan-down-label' })
     panDownLabel = 'Pan down'
 
-    /** What the control that pans left is called, on screen. */
+    /** The pan left button's label. */
     @property({ attribute: 'pan-left-label' })
     panLeftLabel = 'Pan left'
 
-    /** What the control that pans right is called, on screen. */
+    /** The pan right button's label. */
     @property({ attribute: 'pan-right-label' })
     panRightLabel = 'Pan right'
 
     /**
-     * How far one press moves the view, as a fraction of what is on screen.
+     * How far one press pans the view, as a fraction of its size.
      *
      * A fraction rather than a distance, because this surface does not know the
      * scale of what is inside it: a quarter of the viewport is the same gesture
@@ -225,11 +225,11 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     @property({ attribute: 'pan-step', type: Number })
     panStep = 0.25
 
-    /** What the control that pans up is called. */
+    /** The pan up button's label. */
     @property({ attribute: 'pan-up-label' })
     panUpLabel = 'Pan up'
 
-    /** What the control that zooms in is called. */
+    /** The zoom in button's label. */
     @property({ attribute: 'zoom-in-label' })
     zoomInLabel = 'Zoom in'
 
@@ -253,7 +253,7 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       },
     )
 
-    /** What the control that zooms out is called. */
+    /** The zoom out button's label. */
     @property({ attribute: 'zoom-out-label' })
     zoomOutLabel = 'Zoom out'
 
@@ -292,17 +292,17 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       )
     }
 
-    /** Asks for the view to move, which the consumer answers. */
+    /** Pans the view one step in a direction. */
     pan(to: ViewportWay): void {
       this.dispatchEvent(this.panEvent({ by: this.panStep, to }))
     }
 
-    /** Asks for the view to zoom, `1` in and `-1` out. */
+    /** Zooms the view one step: `1` zooms in and `-1` zooms out. */
     zoom(by: number): void {
       this.dispatchEvent(this.zoomEvent({ by }))
     }
 
-    /** Fills the screen with the surface, or comes back. */
+    /** Turns fullscreen on or off. */
     toggleFullscreen(): void {
       void this.fullscreen.toggle()
     }

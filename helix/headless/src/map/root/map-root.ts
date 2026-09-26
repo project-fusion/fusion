@@ -34,32 +34,19 @@ interface MapLayer {
 export type MapControlsPlacement = ViewportControlsPlacement
 
 /**
- * @summary A frame around somebody else's map.
+ * @summary A frame around a map drawn by another library.
  *
  * @description
- * **Helix draws no map.** There are no tiles here, no projection and no
- * network, and there should not be: a tile renderer is a library, and what a
- * design system can add to MapLibre or Leaflet is the frame. The consumer slots
- * their map and this owns the box, the name, the controls and the way out,
- * which is the shape `VideoPlaylist` uses for a player it never renders.
+ * Wraps a map drawn by MapLibre, Leaflet, or another renderer. The frame adds
+ * a name for the map, pan and zoom buttons, a fullscreen button, and a strip
+ * for the map credit. Helix does not draw the map itself.
  *
- * **The accessibility argument is the reason this exists**, and it was measured
- * rather than assumed: a map embedded the ordinary way is a canvas with no role
- * and no name, and it has *no node at all* in the accessibility tree. A reader
- * using a screen reader does not walk past it so much as never meet it. A named
- * region with controls in it is the whole of the difference.
+ * The pan and zoom buttons and the arrow keys send `helix-map-pan` and
+ * `helix-map-zoom`. Move your map in response, or connect it with
+ * `connectMap` from `@fusion.dev/helix-map`, which does this for you.
  *
- * **The controls are buttons, and that is a deliberate choice against arrow
- * keys.** Arrows work here too, but what a screen reader does with them is not
- * ours to decide: macOS passes them through, Windows readers hold them for
- * their own reading mode unless a page takes `role="application"`, which costs
- * the reader their normal way of reading everything else in the frame. A button
- * is findable and operable in every screen reader on every platform without
- * that bargain, so panning and zooming are buttons first and keys second.
- *
- * **Nothing here moves the map.** Both controls ask, through `helix-map-pan`
- * and `helix-map-zoom`, and the consumer answers against whatever they slotted.
- * A frame that moved the map would have to know whose map it was.
+ * Markers, routes, areas, live positions, and points layers go inside the
+ * frame as child elements.
  *
  * @since 0.100.0
  * @status experimental
@@ -67,70 +54,58 @@ export type MapControlsPlacement = ViewportControlsPlacement
  * @aliases Map frame, Map container, Geo
  * @documentation https://fusion.dev/helix/components/map
  *
- * @slot - The map, which is the consumer's own, and the markers over it.
- * @slot attribution - Whoever the tiles belong to, which most licenses require you to say.
- * @slot footer - Chrome below the map, such as a legend or a scale.
- * @slot header - Chrome above the map, such as a title or a search field.
+ * @slot - The element your renderer draws the map in, and the map's markers, routes, areas, positions, and points layers.
+ * @slot attribution - The map credit, which most tile licenses require.
+ * @slot footer - Content below the map, such as a legend or a scale.
+ * @slot header - Content above the map, such as a title or a search field.
  *
- * @event {HelixActivateEvent} helix-activate - A reader pressed a marker. The value is its `name`, or its `label` where it has none. A cluster sends `helix-map-cluster` from its marker instead.
- * @event {HelixMapClusterEvent} helix-map-cluster - A reader pressed a cluster, sent from the marker it is drawn as with the names of its places.
- * @event {HelixMapPanEvent} helix-map-pan - The reader asked the map to move. Answer it against your own map.
- * @event {HelixMapPartChangeEvent} helix-map-part-change - The frame began or stopped gathering its markers, which the connector places again. Not news for a page.
- * @event {HelixMapZoomEvent} helix-map-zoom - The reader asked the map to zoom, by a direction rather than to a level.
+ * @event {HelixActivateEvent} helix-activate - A marker was pressed. The value is the marker's `name`, or its `label` if it has no name. A cluster sends `helix-map-cluster` instead.
+ * @event {HelixMapClusterEvent} helix-map-cluster - A cluster was pressed. Sent from the marker that shows the cluster, with the names of its places.
+ * @event {HelixMapPanEvent} helix-map-pan - A pan button or arrow key was pressed. Move your map in response.
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - Clustering was turned on or off. Used by `connectMap`; pages do not need to listen for it.
+ * @event {HelixMapZoomEvent} helix-map-zoom - A zoom button or key was pressed, with a direction. Zoom your map in response.
  *
- * @csspart attribution - The strip the credit sits in, under the map.
- * @csspart controls - The group the pan and zoom buttons sit in.
- * @csspart footer - The strip below the map, for what a consumer slots there.
- * @csspart fullscreen - The button that fills the screen.
- * @csspart header - The strip above the map, for what a consumer slots there.
- * @csspart layer - One route or area in the list, its name and what it is about.
- * @csspart layers - The list of routes and areas, for a reader who cannot see what the renderer drew.
- * @csspart pan-down - The button that moves the map down.
- * @csspart pan-end - The button that moves the map the way the text ends, which is right on an English page.
- * @csspart pan-start - The button that moves the map the way the text starts, which is left on an English page.
- * @csspart pan-up - The button that moves the map up.
- * @csspart region - The named region the map is slotted into.
+ * @csspart attribution - The strip under the map that holds the credit.
+ * @csspart controls - The group of pan and zoom buttons.
+ * @csspart footer - The strip below the map.
+ * @csspart fullscreen - The button that makes the map fill the screen.
+ * @csspart header - The strip above the map.
+ * @csspart layer - One entry in the list of routes, areas, and points layers.
+ * @csspart layers - The list of routes, areas, and points layers, read by screen readers.
+ * @csspart pan-down - The button that pans the map down.
+ * @csspart pan-end - The button that pans toward the end of a line of text: right in English.
+ * @csspart pan-start - The button that pans toward the start of a line of text: left in English.
+ * @csspart pan-up - The button that pans the map up.
+ * @csspart region - The named region the map sits in.
  * @csspart viewport - The box the map is drawn in.
  * @csspart zoom-in - The button that zooms in.
  * @csspart zoom-out - The button that zooms out.
  *
- * @cssstate fullscreen - While the frame fills the screen.
- * @cssstate idle - While the reader has been still long enough to hide the chrome.
+ * @cssstate fullscreen - The map fills the screen.
+ * @cssstate idle - The user has been still long enough for the header and footer to fade.
  */
 @customElement('helix-headless-map')
 export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   /**
-   * Gathers markers that would draw over each other into one, drawn as their
-   * count and named by their names, which a press opens by zooming in. Asked
-   * again every time the view moves, so a cluster comes apart as the map
-   * zooms in to where its places have room.
+   * Combines markers that would overlap into one count. Counts split apart as
+   * the map zooms in, and pressing one zooms in to its places.
    */
   @property({ type: Boolean })
   cluster = false
 
   /**
-   * Accessible name for the map, which is the one thing a consumer must write.
-   *
-   * There is no sensible default. "Map" names the widget rather than the place,
-   * and a reader meeting three of them on a page learns nothing from hearing the
-   * same word three times.
-   *
-   * **The region is a tab stop**, so the keys are reachable however the controls
-   * are configured: the listener is on the region, and without a stop of its own
-   * a frame at `controls="none"` around a map with nothing focusable in it had
-   * arrow keys no reader could ever press. `aria-keyshortcuts` says which keys
-   * rather than spelling them into the name, which would otherwise be read out
-   * at every encounter.
+   * The map's name, read by screen readers. Name the place, such as "Delivery
+   * area", so that several maps on one page can be told apart. Required.
    */
   @property()
   label = ''
 
   /**
-   * What the list of routes and areas is called, which a screen reader says
-   * before it reads them.
+   * The name of the list of routes, areas, and points layers, read by screen
+   * readers.
    */
   @property({ attribute: 'layers-label' })
-  layersLabel = 'Routes and areas'
+  layersLabel = 'Routes, areas, and points'
 
   /**
    * The routes and areas among the frame's children, in the order they are

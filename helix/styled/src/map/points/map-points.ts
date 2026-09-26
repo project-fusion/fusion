@@ -5,14 +5,11 @@ import { property } from 'lit/decorators.js'
 import { styles } from './map-points.css.js'
 
 /**
- * @summary Many places on a map at once, drawn by the renderer in the page's theme.
+ * @summary Thousands of places on a map, loaded from data.
  *
  * @description
- * The colors and the walk's ring are this tier: the brand's fill by default and a
- * `tone` where the points mean something, each a fill a count is written on
- * in white and edged in the surface, which the connector reads off this
- * element and hands to the renderer. What draws them, and why the frame names
- * them, is the base class.
+ * Draws the points in your theme's colors, with counts in white on your
+ * primary color unless `tone` sets another.
  *
  * @since 0.105.0
  * @status experimental
@@ -20,13 +17,13 @@ import { styles } from './map-points.css.js'
  * @aliases Data layer, GeoJSON layer, Point cloud, Point layer
  * @documentation https://fusion.dev/helix/components/map
  *
- * @cssproperty --map-points-casing-color - The edge round each point and count, so they read over the roads.
- * @cssproperty --map-points-color - The points' fill, where no tone says it.
- * @cssproperty --map-points-ink - What a count is written in.
+ * @cssproperty --map-points-casing-color - The edge around each point and count.
+ * @cssproperty --map-points-color - The points' color when no tone is set.
+ * @cssproperty --map-points-ink - The color of the numbers in counts.
  */
 @customElement('helix-map-points')
 export class HelixMapPoints extends HelixHeadlessMapPoints {
-  /** What the points mean: the brand where this says nothing. */
+  /** The points' color. Uses your primary color unless set. */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 

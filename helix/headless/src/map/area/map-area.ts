@@ -4,16 +4,12 @@ import { property } from 'lit/decorators.js'
 import { type MapPoint, pointsConverter } from '../route/map-route.js'
 
 /**
- * @summary A region on a map, drawn by the renderer and named for a reader.
+ * @summary A shape on a map, such as a delivery zone.
  *
  * @description
- * **A shape the renderer fills, under the place names**, the way a route is a
- * line it draws: this element draws nothing, and the connector in
- * `@fusion.dev/helix-map` hands its outline and color to the driver.
- *
- * **Named in the frame's list**, by `label` and `description`, for the reason
- * a route is: a delivery zone or a flood extent in a canvas is nothing to a
- * screen reader until something says it is there.
+ * `connectMap` fills the shape as a layer of the map, under its place names.
+ * The frame lists each area by its `label` and `description` for screen
+ * readers.
  *
  * @since 0.105.0
  * @status experimental
@@ -21,11 +17,11 @@ import { type MapPoint, pointsConverter } from '../route/map-route.js'
  * @aliases Map region, Polygon, Zone
  * @documentation https://fusion.dev/helix/components/map
  *
- * @event {HelixMapPartChangeEvent} helix-map-part-change - The shape moved, was renamed or was retoned, which the frame and the connector follow. Not news for a page.
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - The area's points, name, or color changed. Used by `connectMap`; pages do not need to listen for it.
  */
 @customElement('helix-headless-map-area')
 export class HelixHeadlessMapArea extends HelixElement {
-  /** What the area is about, after its name in the frame's list. */
+  /** More about the area. Read after its label in the frame's list. */
   @property()
   description?: string
 
@@ -35,13 +31,13 @@ export class HelixHeadlessMapArea extends HelixElement {
   /** @internal Which kind of layer, which is how the connector draws it. */
   readonly layerKind: 'area' | 'route' = 'area'
 
-  /** What the area is called, which is what the frame's list says. */
+  /** The area's name, used in the frame's list. */
   @property()
   label?: string
 
   /**
-   * Its outline, in order around it. The last point joins the first, so a
-   * closed ring does not have to repeat it.
+   * The corners of the shape, in order. The last point connects back to the
+   * first.
    */
   @property({ converter: pointsConverter })
   points?: MapPoint[]

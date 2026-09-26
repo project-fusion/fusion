@@ -65,7 +65,7 @@ describe('map route and area', () => {
     )
     const list = part(host, 'layers')
     expect(list?.tagName).toBe('UL')
-    expect(list?.getAttribute('aria-label')).toBe('Routes and areas')
+    expect(list?.getAttribute('aria-label')).toBe('Routes, areas, and points')
     expect(listed(host)).toEqual(['Depot to Mission, 4.2 km', 'Delivery zone'])
   })
 

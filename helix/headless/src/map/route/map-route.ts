@@ -30,19 +30,12 @@ export const pointsOf = (value: string | null): MapPoint[] =>
 export const pointsConverter = { fromAttribute: pointsOf }
 
 /**
- * @summary A line on a map, drawn by the renderer and named for a reader.
+ * @summary A line on a map, such as a route between stops.
  *
  * @description
- * **Drawn by whatever draws the map, not by this.** A route is the renderer's
- * own line, under the place names where only the renderer can put it, so this
- * element draws nothing: the connector in `@fusion.dev/helix-map` reads its
- * points and its color and hands them to the driver, and draws it again when
- * either changes or the map's style is replaced.
- *
- * **Named in the frame's list, because a line in a canvas is nothing to a
- * screen reader.** The frame lists every route and area by `label` and
- * `description`, so a reader hears there is a route from the depot and how
- * long it is, where the map only shows it.
+ * `connectMap` draws the route as a layer of the map, under its place names,
+ * and redraws it when its points, progress, or color change. The frame lists
+ * each route by its `label` and `description` for screen readers.
  *
  * @since 0.105.0
  * @status experimental
@@ -50,11 +43,14 @@ export const pointsConverter = { fromAttribute: pointsOf }
  * @aliases Map line, Path, Polyline
  * @documentation https://fusion.dev/helix/components/map
  *
- * @event {HelixMapPartChangeEvent} helix-map-part-change - The line moved, was renamed or was retoned, which the frame and the connector follow. Not news for a page.
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - The route's points, progress, name, or color changed. Used by `connectMap`; pages do not need to listen for it.
  */
 @customElement('helix-headless-map-route')
 export class HelixHeadlessMapRoute extends HelixElement {
-  /** What the route is about, after its name in the frame's list: a distance, a time. */
+  /**
+   * More about the route, such as its distance or time. Read after its label
+   * in the frame's list.
+   */
   @property()
   description?: string
 
@@ -64,22 +60,21 @@ export class HelixHeadlessMapRoute extends HelixElement {
   /** @internal Which kind of layer, which is how the connector draws it. */
   readonly layerKind: 'area' | 'route' = 'route'
 
-  /** What the route is called, which is what the frame's list says. */
+  /** The route's name, used in the frame's list. */
   @property()
   label?: string
 
   /**
-   * The places the line passes through, in order. Set as the attribute or
-   * the property, and heard by the connector either way through
-   * `helix-map-part-change`.
+   * The points the line passes through, in order. Write the attribute as
+   * `lat,lng` pairs separated by spaces, or set the property to an array of `{
+   * lat, lng }`.
    */
   @property({ converter: pointsConverter })
   points?: MapPoint[]
 
   /**
-   * How much of it is behind, from 0 to 1 of its length: the part traveled
-   * is drawn quieter than the part ahead, the way a navigation app draws a
-   * journey under way.
+   * How much of the route has been traveled, from 0 to 1. The traveled part is
+   * drawn in a lighter color.
    */
   @property({ type: Number })
   progress?: number
