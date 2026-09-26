@@ -1,12 +1,12 @@
 ---
-description: Three families, one scale, and a heading that is a real heading.
+description: The font families, the type scale, and how Helix styles headings and prose.
 section: Foundations
 title: Typography
 ---
 
 # Typography
 
-## The families
+## Font families
 
 [//]: # (tokens:font)
 
@@ -18,31 +18,32 @@ title: Typography
 
 [//]: # (/tokens)
 
-Three, not a scale of weights and widths, because a design system with more type
-families than a product has uses ends up with two that mean the same thing.
+Helix has three font families and no scale of weights and widths. A design
+system with more families than a product uses ends up with two that mean the
+same thing.
 
-## The scale
+## The type scale
 
-`--helix-text-xs` through `--helix-text-3xl`, plus `--helix-text-control`, which
-is the size a control's own text takes and follows the region's density rather
-than the type scale.
+The type scale runs from `--helix-text-xs` to `--helix-text-3xl`.
+`--helix-text-control` sets the size of a control's own text. It follows the
+region's density and is separate from the type scale.
 
-**The scale is applied to real headings by the base layer, not by a component.**
+**The base layer applies the scale to heading elements.**
 
 ```css
 :where([data-prose] h1) { font-size: var(--helix-text-3xl); }
 :where([data-prose] h2) { font-size: var(--helix-text-2xl); }
 ```
 
-Styling the element rather than a component means the markup and the appearance
-cannot disagree by default, and it reaches prose the design system never renders:
-anything out of a CMS, a markdown file, or a rich-text field lands inside
-`[data-prose]` and comes out right without being rewritten.
+Because the styles target the elements, a heading's markup and its appearance
+match by default. The styles also reach prose that Helix does not render.
+Content from a CMS, a Markdown file, or a rich-text field is styled correctly
+inside `[data-prose]`, with no changes to the content.
 
-**`Text` exists for the case where they genuinely have to come apart.** A
-section's second heading sometimes has to look smaller without lying about the
-outline, and a `<p>` sometimes has to read as a caption, so `as` chooses the
-element and `variant` chooses the ramp:
+Use `Text` when a heading's element and its appearance need to differ. A
+section's second heading may need to look smaller and keep its place in the
+outline. A `<p>` may need to look like a caption. `as` chooses the element, and
+`variant` chooses the ramp:
 
 ```html
 <helix-text
@@ -51,14 +52,14 @@ element and `variant` chooses the ramp:
 >Reads as body, outlines as a heading</helix-text>
 ```
 
-They default to matching, so `as="h2"` and nothing else is the common case, and
-the pairing is resolved in CSS rather than by writing an attribute onto the host,
-because that would be a hydration mismatch in every React consumer. Size, weight
-and leading are not properties: a ramp is a decision the system already made, and
-exposing the parts offers a few hundred combinations of which a handful are
-right. There is no separate `Heading` component, because that is `as`.
+By default the two match, so most headings need only `as="h2"`. CSS resolves
+the match. `Text` does not write an attribute onto the host element, because
+that would cause a hydration mismatch in every React app. Size, weight, and
+leading are not properties. Each ramp already sets them, and setting them one
+by one would allow a few hundred combinations, of which only a handful are
+right. There is no separate `Heading` component, because `as` does that job.
 
-## Applying it to your own text
+## Style your own text
 
 ```html
 <article data-prose>
@@ -67,16 +68,16 @@ right. There is no separate `Heading` component, because that is `as`.
 </article>
 ```
 
-`[data-prose]` is the container. Inside it, headings, paragraphs, lists, links
-and code are all styled from the token layer.
+Put `[data-prose]` on the element that contains your text. Inside it, the token
+layer styles headings, paragraphs, lists, links, and code.
 
-For one-off text outside prose, `[data-text]` carries the ramp:
+For one-off text outside prose, use `[data-text]` to set the ramp:
 
 ```html
 <span data-text="sm">Fine print</span>
 ```
 
-## The vertical metrics
+## Line height, letter spacing, and weight
 
 [//]: # (tokens:leading)
 
@@ -110,8 +111,7 @@ For one-off text outside prose, `[data-text]` carries the ramp:
 
 [//]: # (/tokens)
 
-**Headings have their own leading token rather than a smaller number of the body
-one.** A heading set at the paragraph's line height reads as loose at every
-size, and the correction is not proportional: the larger the type, the less
-leading it wants. One token expresses that once instead of a magic multiplier at
-every heading level.
+**Headings have their own leading token.** At a paragraph's line height, a
+heading looks loose at every size. The fix is not proportional, because larger
+type needs less leading. `--helix-leading-heading` expresses that once, so no
+heading level needs its own multiplier.

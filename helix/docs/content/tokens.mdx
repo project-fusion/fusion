@@ -1,5 +1,5 @@
 ---
-description: The two layers, the surface ladder, and what is enforced.
+description: The two token layers, the surface tokens, and the rules the build enforces.
 pinned: true
 section: Theming
 title: Tokens
@@ -7,45 +7,59 @@ title: Tokens
 
 # Tokens
 
-Two layers. You see the second.
+Helix has two layers of tokens. You use the second layer, the semantic tokens.
 
 | Layer | Shape | Who may use it |
 |---|---|---|
 | Primitive | `--_helix-neutral-500` | `@fusion.dev/helix-styles` only |
-| Semantic | `--helix-color-primary` | everything, including you |
+| Semantic | `--helix-color-primary` | Any code, including yours |
 
-Every semantic token answers *what is this for*, never *what value is it*. There
-are fifteen categories and every token is in exactly one: `color` `space`
-`radii` `font` `text` `weight` `leading` `tracking` `border` `shadow`
-`material` `duration` `easing` `size` `layer`.
+Each semantic token is named for its purpose. The name does not describe its
+value. Every token belongs to exactly one of fifteen categories:
 
-The leading underscore is the whole convention: `--_helix-` is private and may
-be renamed or re-spaced without notice. Reaching past the semantic layer is the
-one thing that will break under you.
+- `color`
+- `space`
+- `radii`
+- `font`
+- `text`
+- `weight`
+- `leading`
+- `tracking`
+- `border`
+- `shadow`
+- `material`
+- `duration`
+- `easing`
+- `size`
+- `layer`
 
-## The surfaces
+The leading underscore marks a token as private. We may rename or re-space any
+`--_helix-` token without notice. Code that uses a primitive token can break
+when you update Helix, so use the semantic tokens.
 
-Depth is distance from the page, in whichever direction there is room. The page
-is white in light and black in dark, so in light there is nothing above white to
-be lifted into: a raised surface goes *down* the ramp, not up.
+## Surface tokens
+
+A surface's depth is its distance from the page, in whichever direction has
+room. The page is white in light mode and black in dark mode. In light mode
+nothing is lighter than white, so a raised surface is *darker* than the page.
 
 - **`background`**: the page.
-- **`surface`**: a plane on the page. A card, a panel you own.
-- **`surface-raised`**: something lifted while still *lying on* the page: a
-  selected tab's pill, a hovered row, an option under the pointer. It has the
-  page on all sides, so it is told apart by its fill, which on white has to be a
-  step darker.
-- **`surface-overlay`**: something *over* the page rather than on it: a menu, a
-  popover, a dialog, and the thumb of a switch or a segmented control. It is
-  told apart by its shadow and by what it covers, so on white it is white.
-- **`surface-sunken`**: a well you put a value into, an input's fill, a track, a
-  groove.
+- **`surface`**: a plane on the page, such as a card or a panel you own.
+- **`surface-raised`**: something lifted that still *lies on* the page, such as
+  a selected tab's pill, a hovered row, or an option under the pointer. The page
+  surrounds it on all sides, so its fill sets it apart. On a white page, that
+  fill is one step darker.
+- **`surface-overlay`**: something *over* the page, such as a menu, a popover, a
+  dialog, or the thumb of a switch or a segmented control. Its shadow and the
+  content it covers set it apart, so on a white page it is white.
+- **`surface-sunken`**: a well that holds a value, such as an input's fill, a
+  track, or a groove.
 
-**`raised` and `overlay` are the pair worth learning.** They land on the same
-step in dark mode, so one token looks like it would do both jobs. In light they
-want opposite fills: a hovered row must be darker than a white page, and a thumb
-must be lighter than the groove it sits in. If something looks almost right in
-dark and wrong in light, this is usually why.
+**Use `raised` and `overlay` for different jobs.** They are the same color in
+dark mode, so one token can seem to do both jobs. In light mode they need
+opposite fills. A hovered row must be darker than a white page, and a thumb must
+be lighter than the groove it sits in. If a surface looks almost right in dark
+mode and wrong in light mode, it usually uses the wrong one of these two tokens.
 
 ## Per-component hooks
 
@@ -55,34 +69,39 @@ helix-card {
 }
 ```
 
-`--card-padding` is not a Helix token. It is a hook that particular component
-exposes, documented on the component, and it defaults to a semantic token. Use
-them to nudge one component; use the semantic tokens to move everything.
+`--card-padding` is a hook that the card component exposes. Hooks are separate
+from the Helix tokens. Each component documents its own hooks, and each hook
+defaults to a semantic token. Use a hook to adjust one component. Use the
+semantic tokens to change every component.
 
-## What is enforced
+## What fails the build
 
-Four things fail the build:
+The build fails on four kinds of error:
 
-1. **A raw value where a token exists.** `#e5e5e5` when a neutral is right there.
-2. **A primitive referenced from outside `@fusion.dev/helix-styles`.**
-3. **A reference to a token that does not exist.**
-4. **A component hook nothing reads**, and a primitive nothing resolves into.
+1. A raw value where a token exists, such as `#e5e5e5` where a neutral token
+   fits.
+2. A primitive token used outside `@fusion.dev/helix-styles`.
+3. A reference to a token that does not exist.
+4. A component hook that nothing reads, or a primitive token that nothing
+   resolves to.
 
-The third earns its keep on its own: a renamed token resolves to nothing, the
-property silently falls back to a browser default, and the code looks correct
-while the component is quietly unstyled.
+The third check would be worth running on its own. When a token is renamed, a
+reference to the old name resolves to nothing. The property falls back to a
+browser default without a warning. The code looks correct, and the component
+loses its styles.
 
-## Theming
+## Color modes
 
-Both modes live in one declaration:
+Each token declares its light and dark values in one declaration:
 
 ```css
 --helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
 ```
 
-Which half resolves is decided by `color-scheme` and nothing else, so the color
-mode is a single attribute and no token is restated to honor it. Set
-`data-color-mode="light"` or `"dark"` on any element to theme that subtree.
-`color-scheme` inherits, so a light preview inside a dark page is one attribute.
+The `color-scheme` property alone decides which value applies. You set the
+color mode with one attribute, and no token is declared twice. Set
+`data-color-mode="light"` or `"dark"` on any element to set the mode for that
+element and everything inside it. `color-scheme` inherits, so one attribute
+shows a light preview inside a dark page.
 
-Absent, it follows the operating system.
+Without the attribute, the mode follows the operating system.

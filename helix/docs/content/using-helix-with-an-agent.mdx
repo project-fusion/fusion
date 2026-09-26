@@ -1,5 +1,5 @@
 ---
-description: The four things that look like a library bug and are not, and where an agent should read from.
+description: Four mistakes that look like Helix bugs, and the files an agent should read.
 parent: coding-agents
 section: Getting started
 title: Using Helix with an agent
@@ -8,16 +8,21 @@ title: Using Helix with an agent
 
 # Using Helix with an agent
 
-**A page rather than a skill file, and the format is the point.** This started as
-`.claude/skills/using-helix/SKILL.md`, which is one vendor's format sitting in a
-repository, and every other vendor has its own: Cursor reads `.cursor/rules`,
-Copilot reads `.github/copilot-instructions.md`, and a consumer of the published
-packages has none of them because they have this site and no checkout.
+**We publish this guide as a web page so that every tool can read it.** It began
+as `.claude/skills/using-helix/SKILL.md`, a file format that one vendor reads in
+a repository. Every other vendor reads its own file:
 
-So the content lives once, here, at a URL that [llms.txt](https://fusion.dev/llms.txt) indexes and
-that every one of those formats can point at. Paste the link into whichever file
-your tool reads. What is vendor-neutral and executable is [the MCP
-server](./coding-agents), which Claude, Cursor, Windsurf and Zed all speak.
+- Cursor reads `.cursor/rules`.
+- Copilot reads `.github/copilot-instructions.md`.
+
+If you install the published packages, you have none of these files. You have
+this site and no checkout of our repository.
+
+So the guide lives in one place, here, at a URL that
+[llms.txt](https://fusion.dev/llms.txt) indexes and that each of those files can
+link to. Paste the link into the file your tool reads. [The MCP
+server](./coding-agents) works with any vendor and runs code, and Claude,
+Cursor, Windsurf, and Zed all support it.
 
 ## Read the manifest before writing a tag
 
@@ -26,33 +31,39 @@ https://fusion.dev/helix/custom-elements.json
 @fusion.dev/helix/custom-elements.json
 ```
 
-Every tag, every property with its literal union, every event with its class,
-every slot, part and custom property. **The vocabulary is the file**: a tag that
-is not in it does not exist, and a property value outside a declared union is one
-the component rejects. Unions are literal rather than named for exactly this
-reason, so `'ghost' | 'outlined' | 'solid' | 'subtle'` answers the question where
-`ButtonEmphasis` sends you somewhere else.
+The manifest lists:
 
-One family as data, when the whole manifest is more than the question needs:
+- every tag
+- every property, with its literal union
+- every event, with its class
+- every slot, part, and custom property
+
+**If a tag is not in the manifest, it does not exist.** A property value outside
+a declared union is invalid. Property types are literal unions for this reason.
+`'ghost' | 'outlined' | 'solid' | 'subtle'` shows you the values, and a named
+type such as `ButtonEmphasis` sends you somewhere else to find them.
+
+When you need one family, fetch it as data:
 
 ```
 https://fusion.dev/helix/components/<family>.json
 https://fusion.dev/helix/components/<family>.md
 ```
 
-The `.md` carries the API tables **and the examples**, which the HTML page
-deliberately does not. Start from `https://fusion.dev/llms.txt`, which is one
-request and names every document plus these two surfaces.
+The `.md` file has the API tables and the examples. The HTML page leaves the
+examples out on purpose. Start from `https://fusion.dev/llms.txt`. In one
+request, it names every document and these two sources.
 
-## The four things that go wrong
+## Four mistakes that look like Helix bugs
 
-These are in order of how often they look like a library bug and are not.
+Each of these looks like a bug in Helix. They are listed from the most common to
+the least common.
 
-### 1. Refusing a change by not answering
+### 1. Blocking a change without `preventDefault()`
 
-**Writing `value`, `open`, `checked` or `active` is a seed and a correction.**
-The element starts there and goes on applying its own changes, exactly as
-`<input value="Ada">` does, so this works and needs no handler beside it:
+**Setting `value`, `open`, `checked`, or `active` sets the starting state and
+corrects the current state.** The element starts in that state and then applies
+its own changes, the same as `<input value="Ada">`. This works with no handler:
 
 ```html
 <helix-input
@@ -61,10 +72,10 @@ The element starts there and goes on applying its own changes, exactly as
 ></helix-input>
 ```
 
-The trap is on the other side. React force-restores a native `<input>` whose
-state did not move and does not do this for a custom element, so a handler that
-declines to call `setState` leaves the element holding the new value. Refusal is
-`preventDefault()` on the matching `helix-before-*` event:
+The mistake happens when you block a change. React restores a native `<input>`
+whose state did not change. React does not do this for a custom element, so a
+handler that does not call `setState` leaves the element with the new value. To
+block a change, call `preventDefault()` on the matching `helix-before-*` event:
 
 ```tsx
 <helix-input
@@ -77,92 +88,109 @@ declines to call `setState` leaves the element holding the new value. Refusal is
 />
 ```
 
-`default-value` and its twins are what a reset returns to. See
-[State and control](./state-and-control).
+A form reset returns the element to `default-value` and the matching attributes
+for the other states. See [State and control](./state-and-control).
 
-### 2. The event name is the event's own
+### 2. Using the exact event name
 
-`onhelix-before-open`, not `onHelixOpen` and not `onOpen`. React slices `on` off the
-prop and listens for exactly what is left, so the casing is not negotiable. From
-anything that is not React, `addEventListener('helix-before-open', …)`.
+In React, write `onhelix-before-open`. `onHelixOpen` and `onOpen` do not work.
+React removes `on` from the prop name and listens for exactly the rest, so the
+casing must match. Outside React, use
+`addEventListener('helix-before-open', …)`.
 
-**Lifecycle does not bubble and coordination does.** `helix-before-open` and
-`helix-before-close` reach the element and stop, so a menu closing inside a dialog is
-not the dialog closing; `helix-select`, `helix-before-change` and `helix-dismiss` cross
-shadow boundaries and can be caught on a container. If a listener on a wrapper
-hears nothing, it is a lifecycle event and belongs on the element.
+**Lifecycle events do not bubble. Coordination events do.**
+`helix-before-open` and `helix-before-close` reach the element and stop there,
+so a menu closing inside a dialog does not close the dialog. `helix-select`,
+`helix-before-change`, and `helix-dismiss` cross shadow boundaries, so you can
+listen for them on a container. If a listener on a wrapper receives nothing, the
+event is a lifecycle event. Put the listener on the element.
 
-### 3. `:disabled`, never `[disabled]`
+### 3. Styling a disabled control with `:disabled`
 
 ```css
 helix-input:disabled { … }   /* right: matches a disabled fieldset too */
 helix-input[disabled] { … }  /* wrong: a fieldset sets no attribute */
 ```
 
-A control inside `<fieldset disabled>` is disabled by the platform and carries no
-attribute, so the attribute selector paints it as live while it refuses input.
+The browser disables a control inside `<fieldset disabled>` without adding an
+attribute to it. The `[disabled]` selector does not match it, so the control
+looks enabled while it does not accept input.
 
-### 4. Two stylesheets, then the elements
+### 4. Loading every style layer before the elements
 
 ```ts
 import '@fusion.dev/helix-styles/helix.css'
 import '@fusion.dev/helix'
 ```
 
-`helix.css` is `primitives.css`, `tokens.css`, `base.css` and `elements.css` in
-the order they have to be in. Write them out yourself only to substitute one.
+`helix.css` combines four files in the order they must load:
 
-`elements.css` is the one people leave out, and everything works without it
-until the page is server-rendered: an element that has not upgraded has no
-styles of its own, so the markup flashes unstyled and then snaps into place.
+1. `primitives.css`
+2. `tokens.css`
+3. `base.css`
+4. `elements.css`
 
-The tell for a missing layer is which. A flash before hydration is
-`elements.css`; bare headings are `base.css`. **No color anywhere means the
-ramp or the semantic layer, and the two are told apart by what is in the
-stylesheet rather than by what is on screen**: without `tokens.css` nothing
-declares `--helix-color-*` at all, while without `primitives.css` all 185
-semantic tokens are declared and every color resolves to `rgba(0, 0, 0, 0)`,
-since `tokens.css` refers to a primitive 297 times and to nothing else. The
-second is the one that looks like a working install, and it is the reason
-`helix.css` exists.
+Import them one by one only when you need to replace one of them.
 
-## Choosing a family
+People most often leave out `elements.css`. Everything works without it until
+you render the page on the server. An element that has not upgraded has no
+styles of its own, so the markup appears unstyled and then jumps into place.
 
-Ask the manifest, not your memory. Each family's `helix.aliases` lists the other
-names it goes by, which is usually how a request arrives: `Segment` and `NavItem`
-are `Toggle`, `Key` is `Legend`, `Hint` is `Tooltip`.
+Each missing layer has its own symptom:
 
-Two distinctions worth knowing before searching:
+- An unstyled flash before hydration means `elements.css` is missing.
+- Unstyled headings mean `base.css` is missing.
+- No color anywhere means `primitives.css` or `tokens.css` is missing.
 
-- **A group is a part when it reports a form value** and its own family when it
-  does not. `Radio.Group` and `Toggle.Group` are parts; `Checkbox Group` and
-  `Button Group` are families whose members submit themselves.
-- **A control has no `size`.** Height comes from `data-density` on the region,
-  `sm` / `md` / `lg`, which crosses shadow boundaries through custom properties.
-  If two controls in a row must differ in height, the layout is wrong rather than
-  the API.
+To tell the last two apart, look at the stylesheet. The screen looks the same.
+Without `tokens.css`, nothing declares `--helix-color-*`. Without
+`primitives.css`, all 185 semantic tokens are declared and every color resolves
+to `rgba(0, 0, 0, 0)`, because `tokens.css` refers to a primitive 297 times and
+to nothing else. A missing `primitives.css` looks like a working install, and
+`helix.css` exists to prevent it.
 
-## Styling from the outside
+## Choosing a component family
 
-Three doors, in the order to try them.
+Look up the family in the manifest. Each family's `helix.aliases` lists its
+other names, and a request often uses one of them:
+
+- `Segment` and `NavItem` are `Toggle`.
+- `Key` is `Legend`.
+- `Hint` is `Tooltip`.
+
+Know two rules before you search:
+
+- **A group that reports a form value is a part.** A group that does not is its
+  own family. `Radio.Group` and `Toggle.Group` are parts. `Checkbox Group` and
+  `Button Group` are families whose members each submit their own value.
+- **A control has no `size`.** Its height comes from `data-density` on the
+  region, `sm` / `md` / `lg`, which crosses shadow boundaries through custom
+  properties. If two controls in a row need different heights, change the
+  layout.
+
+## Styling components from outside
+
+You can style a component in three ways. Try them in this order:
 
 1. **A token.** `--helix-seed-radii: 2px` at `:root` reaches every component,
-   because custom properties inherit. Most "can I restyle the button" is really
-   "our brand has less rounding". The seed and not `--helix-radii-md`: the four
-   radii are siblings derived from it, so `md` alone moves neither the buttons
-   nor the cards.
-2. **A per-component hook.** `--card-padding` on `helix-card`. Named after the
-   component, documented on its page, defaults to a semantic token.
-3. **A part.** `helix-select::part(trigger)`. The most powerful and the one that
-   couples you to internal structure.
+   because custom properties inherit. Most requests to restyle the button are
+   really requests for less rounding across the brand. Set the seed. The four
+   radii, including `--helix-radii-md`, are computed from it, so changing `md`
+   alone changes neither the buttons nor the cards.
+2. **A per-component hook.** For example, `--card-padding` on `helix-card`. Each
+   hook is named after its component, documented on the component's page, and
+   defaults to a semantic token.
+3. **A part.** For example, `helix-select::part(trigger)`. A part gives you the
+   most control, and it ties your styles to the component's internal structure.
 
-**Never read a primitive.** `--_helix-neutral-500` and its kind belong to
-`@fusion.dev/helix-styles`; the underscore says so and the indirection is the point.
+**Never read a primitive.** `--_helix-neutral-500` and the other primitives
+belong to `@fusion.dev/helix-styles`. The underscore marks them as internal.
+Read the semantic tokens that refer to them.
 
-## No custom elements at all
+## Styling HTML without custom elements
 
-`@fusion.dev/helix-styles` is plain CSS with no JavaScript, and it carries recipes for
-markup Helix does not render:
+`@fusion.dev/helix-styles` is plain CSS with no JavaScript. It includes recipes
+for markup that Helix does not render:
 
 ```html
 <button
@@ -173,16 +201,21 @@ markup Helix does not render:
 <div data-density="sm">…</div>
 ```
 
-A recipe has appearance and no behavior: no state, no form participation, no
-focus trapping, no keyboard handling. If you are adding script to one, the
-component is what you wanted.
+A recipe sets appearance only. It has none of these:
 
-## Pointing your tool at this page
+- state
+- form participation
+- focus trapping
+- keyboard handling
 
-**A line, not a copy.** Every tool that reads project instructions reads a file
-in your repository, and they all read a different one. What goes in it is a
-pointer to this URL rather than its contents: a copy starts going stale the
-moment it is pasted, and this page changes with the library.
+If you are adding a script to a recipe, use the component.
+
+## Link your tool to this guide
+
+**Link to this page from your instructions file, and do not copy it.** Each tool
+that reads project instructions reads a file in your repository, and each tool
+reads a different one. A copy starts to go stale as soon as you paste it, and
+this page changes with the library.
 
 ```md
 Helix: read https://fusion.dev/helix/docs/using-helix-with-an-agent
@@ -197,13 +230,12 @@ for the API.
 | GitHub Copilot | `.github/copilot-instructions.md` |
 | Anything else | Whatever it reads. The line is the same |
 
-**We do not write those files for you**, and that is deliberate rather than
-lazy: a file we generate into your repository is one you then
-maintain against our changes, and a tool that rewrites it on install is a
-dependency you did not ask for in a directory you own. The line above is yours to
-paste and yours to delete.
+We do not write those files for you, and we chose this on purpose. You would
+have to maintain a file we generated in your repository against our changes. A
+tool that rewrote it on install would be a dependency you did not ask for, in a
+directory you own. You paste the line above, and you can delete it.
 
-## The one thing worth installing
+## Install the Helix MCP server
 
 ```json
 {
@@ -213,22 +245,22 @@ paste and yours to delete.
 }
 ```
 
-`helix mcp` is a subcommand of the CLI, speaking MCP over stdio, which Claude,
-Cursor, Windsurf and Zed all read. It answers the question no document can,
-which is what a given brand color derives to. It runs on your machine, talks to
-a client you chose, and has no network in it.
+`helix mcp` is a subcommand of the CLI. It serves MCP over stdio, which Claude,
+Cursor, Windsurf, and Zed all read. It computes the theme a given brand color
+produces, which no document can list. It runs on your machine, talks to a client
+you chose, and makes no network requests.
 
-## What this page will not tell you
+## What this guide does not cover
 
-**Anything the manifest answers.** Property names, unions, part names, event
-names and hooks change with the library and are in a file you can fetch; a list
-of them here would be a second copy going stale. Fetch the family.
+**Anything in the manifest.** Property names, unions, part names, event names,
+and hooks change with the library, and they are in a file you can fetch. A list
+of them here would be a second copy that goes stale. Fetch the family.
 
-**What a brand color derives to.** That is computation rather than a document,
-and `helix mcp` is where it lives: an MCP server over stdio with
-`helix_audit_theme` and `helix_derive_theme`, both taking the JSON a
-`helix.theme.json` holds. It runs on your machine and nobody hosts it.
+**The theme a brand color produces.** Helix computes it, so use `helix mcp`, an
+MCP server over stdio with `helix_audit_theme` and `helix_derive_theme`. Both
+take the same JSON that a `helix.theme.json` file holds. It runs on your
+machine, and we do not host it.
 
-**Whether a component is good for your case.** The examples are the honest
-answer to that and they are text: every family's `.md` carries them, and
-`https://fusion.dev/helix/sandbox?e=<family>.<slug>` opens one editable.
+**Whether a component fits your case.** Read the examples to decide. Every
+family's `.md` file includes them as text, and
+`https://fusion.dev/helix/sandbox?e=<family>.<slug>` opens one for editing.

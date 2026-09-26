@@ -1,5 +1,5 @@
 ---
-description: Every surface here is readable by a machine, and where each one is.
+description: The files an AI agent can read to write Helix code, and where to find each one.
 order: 4
 section: Getting started
 title: Coding agents
@@ -7,9 +7,9 @@ title: Coding agents
 
 # Coding agents
 
-An agent writing Helix code should not have to read a rendered website. Three
-surfaces give it the library as text, all generated from the sources this site
-renders from.
+We publish Helix as text for agents that write Helix code, so an agent does not
+need to read the rendered website. Three sources give it the library as text.
+We generate all three from the same sources as this site.
 
 ## The manifest
 
@@ -18,43 +18,54 @@ https://fusion.dev/helix/custom-elements.json
 @fusion.dev/helix/custom-elements.json
 ```
 
-A URL and a package path, the same file either way. **Both exist because a
-specifier is reachable from a `node_modules` and from nowhere else**, and an
-agent that found the library through `llms.txt` has this site and no checkout.
+The URL and the package path serve the same file. A package path works only
+from a `node_modules` folder. An agent that found Helix through `llms.txt` can
+reach this site and has no checkout, so it needs the URL.
 
-Every element, every property with its literal type union, every event with its
-class, every slot, every part, every custom property. It is what the framework
-typings, the reference documentation and the site's component pages are all
-generated from, so it cannot disagree with them.
+The manifest lists:
 
-**A generated manifest is what makes hallucinating a component impossible to
-sustain.** The vocabulary is the file: a tag that is not in it does not exist,
-and a prop value outside a declared union is a value the component will reject.
+- every element
+- every property, with its literal type union
+- every event, with its class
+- every slot
+- every part
+- every custom property
 
-Literal unions rather than named types are enforced at analysis time for exactly
-this reason: `'ghost' | 'outlined' | 'solid' | 'subtle'` tells a reader what to
-write, where `ButtonEmphasis` tells them to go and look somewhere else.
+We generate the framework typings, the reference documentation, and the site's
+component pages from the manifest, so they always match it.
 
-## Markdown for every family
+**If a tag is not in the manifest, it does not exist.** An agent can check every
+tag and value it writes against the file, so an invented component is caught. A
+prop value outside a declared union is invalid.
+
+For the same reason, the analyzer requires literal unions for property types.
+`'ghost' | 'outlined' | 'solid' | 'subtle'` shows you what to write. A named
+type such as `ButtonEmphasis` sends you somewhere else to look.
+
+## Markdown and JSON for each component family
 
 ```
 /components/<family>.md
 /components/<family>.json
 ```
 
-Static files. The `.md` carries the family's metadata, every element's
-description and API tables, and **the examples**, which the HTML page
-deliberately does not: that page answers what a component can do and the sandbox
-beside it answers what it looks like, and a reference that started collecting
-pictures would stop being the one place you can trust to be complete. An agent
-has no sandbox to be sent to, and to it an example is text rather than a
-picture.
+These are static files. The `.md` file has:
 
-The `.json` is the same family as structured data.
+- the family's metadata
+- every element's description and API tables
+- the examples
 
-## What is enforced
+The HTML page leaves the examples out on purpose. The page lists what a
+component can do, and the sandbox beside it shows what the component looks
+like. Keeping pictures out of the reference keeps it the one place you can trust
+to be complete. An agent cannot use the sandbox, and it reads an example as
+text, so the `.md` file includes the examples.
 
-These are the difference between code that looks right and code that passes:
+The `.json` file has the same family as structured data.
+
+## Rules the build checks
+
+Code that looks right can still fail these checks:
 
 | Rule | Check |
 |---|---|
@@ -63,11 +74,11 @@ These are the difference between code that looks right and code that passes:
 | A documented CSS hook must be read | `helix component --only hooks` |
 | A visual property draws from its axis | `helix component`'s `axes` |
 | A form control styles with `:disabled` | `helix component --only disabled` |
-| A component that animates answers reduced motion | `helix component --only motion` |
+| A component that animates supports reduced motion | `helix component --only motion` |
 | No component reads a primitive token | `helix component`'s `tokens` |
 
-If you are generating Helix code, the first two are the ones that produce
-working-looking output that is wrong.
+If you generate Helix code, watch the first two rules. Breaking them produces
+output that looks like it works and is wrong.
 
 ## The index
 
@@ -75,57 +86,64 @@ working-looking output that is wrong.
 /llms.txt
 ```
 
-Every page on the site, grouped, each one linked at its `.md` and annotated with
-a sentence. Generated from the same route registry the sitemap comes from, so a
-page cannot exist without appearing here and cannot appear here without
-existing.
+`llms.txt` lists every page on the site, in groups. Each entry links to the
+page's `.md` file and has a one-sentence summary. We generate it from the same
+route registry as the sitemap. Every page appears in it, and every entry in it
+is a page that exists.
 
-Start there rather than crawling: one request, and it names every page on the
-site plus the two machine-readable surfaces above. No count here, because a
-number typed into prose is a number that goes stale.
+Start with `llms.txt`. In one request, it names every page on the site and the
+two machine-readable sources above. This guide gives no page count, because a
+number typed into prose goes stale.
 
-## From a component's page
+## Links on each component page
 
-Every family page carries a menu beside its title with **View Markdown**, **Copy
-Markdown**, and links that hand the document's URL to Claude or to Cursor. The
-URL rather than the contents, because the URL stays current and a pasted copy
-starts going stale the moment it is pasted.
+Each family page has a menu beside its title with:
 
-## The one thing a document cannot answer
+- **View Markdown**
+- **Copy Markdown**
+- links that send the document's URL to Claude or to Cursor
+
+The links send the URL, because the URL stays current. A pasted copy starts to
+go stale as soon as you paste it.
+
+## Compute a theme with `helix mcp`
 
 ```sh
 helix mcp
 ```
 
-The three surfaces above are closed sets: every tag, every token, every example,
-all published and all fetchable. What none of them holds is what *your* brand
-color derives to, because the input is a color and the domain is infinite, so the
-answer has to be computed when it is asked.
+The three sources above are fixed sets. Every tag, token, and example is
+published, and an agent can fetch it. None of them has the theme for *your*
+brand color. The input is a color, and there are infinitely many colors, so
+Helix has to compute the theme when an agent requests it.
 
-`helix mcp` serves that over stdio as an MCP server, with two tools:
-`helix_audit_theme`, which measures every foreground against the ground it is
-really painted on and reports each pair with its ratio and target, and
-`helix_derive_theme`, which returns the CSS. Both take the same JSON a
-`helix.theme.json` holds.
+`helix mcp` runs an MCP server over stdio with two tools:
 
-**It refuses to hand back a palette that fails its own targets**, the way
-`helix theme build` does. Pasting one into a stylesheet is worse than reading a
-warning above it, and an agent does not read warnings.
+- `helix_audit_theme` measures every foreground against the background it is
+  painted on. It reports each pair with its ratio and target.
+- `helix_derive_theme` returns the CSS.
 
-**You run it and nobody hosts it.** A server we operated would be one more
-service standing between you and your own tokens; this is a subcommand of a
-binary you installed, talking to a client you chose, with no network in it.
+Both take the same JSON that a `helix.theme.json` file holds.
 
-## What is not here
+**`helix mcp` does not return a palette that fails its own targets**, the same
+as `helix theme build`. A failing palette pasted into a stylesheet is worse than
+a warning above it, and an agent does not read warnings.
 
-**`llms-full.txt`, or any other whole-library download.** Concatenating every
-page into one file is out of date the moment anything changes, where the links
-in `llms.txt` are individually cacheable and individually current.
+You run `helix mcp` yourself, and we do not host it. A server we operated would
+be one more service between you and your own tokens. `helix mcp` is a
+subcommand of a binary you installed. It talks to a client you chose and makes
+no network requests.
 
-What such a file would be for is covered better by the two surfaces already
-here. `llms.txt` is the index, one request, and each family's `.md` is the
-document. Fetch the families you are using.
+## What we do not publish for agents
 
-**A search index.** The site has one for humans; there is nothing an agent can
-query yet, and `llms.txt` plus the documents it names is a smaller thing to read
-than most search APIs are to learn.
+**`llms-full.txt`, or any other whole-library download.** A single file with
+every page goes out of date as soon as anything changes. Each link in `llms.txt`
+can be cached on its own and stays current on its own.
+
+The two sources already here cover what such a file would be for. `llms.txt` is
+the index, in one request, and each family's `.md` file is its document. Fetch
+the families you use.
+
+**A search index.** The site has a search index for people. There is nothing an
+agent can query yet. Reading `llms.txt` and the documents it names takes less
+work than learning most search APIs.

@@ -1,31 +1,32 @@
 ---
-description: The four ways a surface is told apart, and the ground a component is not.
+description: The four ways to separate a surface from what is behind it, and the tokens that choose between them.
 section: Foundations
 title: Surfaces and separation
 ---
 
 # Surfaces and separation
 
-**A surface is told apart from what is behind it by exactly one of four things:
-a fill, an edge, a lift, or space.** A design language leads with one of them.
-Helix leads with the edge on the page and with the lift above it: a card takes a
-hairline and no shadow, a menu takes a shadow and no hairline. The ladder below
-decides what a surface sits on.
+**Separate each surface from what is behind it with exactly one of four
+things.** The four are a fill, an edge, a lift, and space. A design language
+leads with one of them. Helix uses an edge for surfaces on the page and a lift
+for surfaces above it. A card has a hairline border and no shadow. A menu has a
+shadow and no hairline border. The surface ladder below sets the ground color
+for each place a surface can sit.
 
-## The four mechanisms
+## The four ways to separate a surface
 
 | | |
 |---|---|
-| **Fill** | A different ground color to what is behind it |
+| **Fill** | A ground color different from what is behind it |
 | **Edge** | A border |
 | **Lift** | A shadow |
-| **Space** | Nothing at all, and the gap does the work |
+| **Space** | Nothing at all. The gap separates it |
 
-Most systems use two or three without deciding, which is how you end up with a
-card that has a border, a shadow *and* a tint, each added by someone solving the
-same problem again.
+When a design system uses two or three of these without a plan, a card can end
+up with a border, a shadow, and a tint, each added by someone solving the same
+problem again.
 
-Helix expresses the choice in two pairs of policy tokens:
+Helix sets the choice with two pairs of policy tokens:
 
 [//]: # (tokens:separation-policy)
 
@@ -38,15 +39,15 @@ Helix expresses the choice in two pairs of policy tokens:
 
 [//]: # (/tokens)
 
-Set the border pair to zero and the shadow pair to something, and the whole
-library goes shadow-first. Reverse them and it goes border-first. Every surface
-in the library is themeable in both directions, and checked, because a
-half-converted one reads as done: hook the shadow and hardcode `border: none`
-and it themes perfectly in one direction and cannot be moved in the other.
+To make every component shadow-first, set the border pair to zero and give the
+shadow pair a value. Reverse them to go border-first. Every Helix surface reads
+both pairs, and this is checked. A surface that reads only one pair is easy to
+miss. If it reads the shadow token and sets `border: none` directly, a theme can
+change it in one direction and not in the other.
 
-## The ladder
+## The surface ladder
 
-A surface's ground says where it is, not what shade it is:
+A surface's ground color token names where the surface sits:
 
 [//]: # (tokens:surface-ladder)
 
@@ -60,40 +61,41 @@ A surface's ground says where it is, not what shade it is:
 
 [//]: # (/tokens)
 
-**`raised` goes down the ramp, not up**, which is the counterintuitive one. A
-selected tab's pill, a hovered row and an option under the pointer all have the
-page on every side, so they are told apart by their fill, and on a white page a
-fill has to be a step *darker* to be seen. `overlay` is the opposite: it is told
-apart by its shadow and by covering something, so on white it is white.
+**`raised` goes one step down the ramp.** A selected tab's pill, a hovered row,
+and an option under the pointer all have the page on every side. Only their
+fill separates them, and on a white page a fill has to be a step darker to be
+seen. `overlay` works the other way. Its shadow and what it covers separate it,
+so on a white page it is white.
 
-## The common mistake
+## Using the page color inside a component
 
-**`--helix-color-background` is the page, and your component is not the page.**
+**`--helix-color-background` is the page color. Do not use it inside a
+component.**
 
 ```css
 /* Wrong. Claims the component is sitting on the page. */
 .marker { background: var(--helix-color-background); }
 ```
 
-Every use of the page's color inside a component is a claim about what that
-component is sitting on, and the claim is right exactly as often as the
-component is put on the page and no other ground. `Timeline`'s marker made it,
-painting itself the page color to knock the rail out behind it, and came out
-darker than any surface that was not the page: on a card it showed as a black
-disc. The sparkline's ring terminus made the same mistake and looked identical.
+Using the page color inside a component assumes the component sits on the page.
+That is right only when the component is placed directly on the page.
 
-The trap is that both of those *worked*, for months, because the page is what
-anybody building a component puts it on. It fails on a card, a drawer, a toast,
-a panel or a photograph, and none of those is where a component gets built.
+`Timeline`'s marker had this mistake. It was painted the page color to hide the
+rail behind it, so it came out darker than any surface other than the page. On a
+card, it showed as a black disc. The sparkline's ring terminus had the same
+mistake and looked the same.
 
-**What to do instead:** put the color behind a hook that defaults to the page,
-so a consumer whose component is not on the page can correct it. That is what
-the library requires of itself, and the same reasoning applies to anything you
-build on top.
+Both looked correct for months, because components are usually built on the
+page. The mistake shows on a card, a drawer, a toast, a panel, or a photograph,
+and components are not built on any of those.
+
+Put the color behind a hook that defaults to the page color. When the component
+sits on another surface, the hook can be set to match. Helix requires this of
+its own components, and the same applies to anything you build with it.
 
 ## Contrast
 
-The theme engine measures an ink against the ground it is *really* painted on,
-which is why the ladder is a model rather than a naming convention: the engine
-has to know that `foreground` on `surface-overlay` is a real pair and
-`foreground-on-accent` on `surface` is not. See [Color](./color).
+The theme engine measures each ink against the ground it is actually painted
+on. The ladder records which pairs occur. For example, `foreground` on
+`surface-overlay` is a real pair, and `foreground-on-accent` on `surface` is
+not. See [Color](./color).

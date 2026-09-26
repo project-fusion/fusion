@@ -1,20 +1,22 @@
 ---
-description: The roles, the ramps, and why the palette is solved rather than picked.
+description: The color roles, why Helix uses OKLCH, and how the engine meets contrast targets.
 section: Foundations
 title: Color
 ---
 
 # Color
 
-Seventy-four of the library's 185 tokens are color, which is most of what a
-theme is. They are roles rather than values: nothing in Helix is named after
-what it looks like, because a name like `--brand-blue-500` stops being true the
-moment anybody rethemes.
+Seventy-four of the library's 185 tokens are colors, and they make up most of a
+theme. Each color token is named for its role. No token is named for how it
+looks, because a name like `--brand-blue-500` becomes wrong as soon as you change
+the theme.
 
-## The roles
+## Color roles
 
-**Grounds**, which things sit on. `background` is the page itself, and the
-surfaces above it are a ladder rather than a set:
+### Grounds
+
+Grounds are the colors that content sits on. `background` is the page itself.
+The surfaces above it form an ordered ladder:
 
 [//]: # (tokens:surface-ladder)
 
@@ -28,54 +30,66 @@ surfaces above it are a ladder rather than a set:
 
 [//]: # (/tokens)
 
-Which one to reach for is a question about the geometry rather than about the
-shade, and it is the thing people most often get wrong. See [Surfaces and
+Choose a surface by where the element sits relative to the page. This is the
+choice people most often get wrong. See [Surfaces and
 separation](./surfaces-and-separation).
 
-**Inks**, which go on grounds. `foreground`, then `foreground-muted` and
-`foreground-subtle` for text that recedes, and `foreground-on-accent` for text
-that sits on a filled accent rather than on a surface.
+### Inks
 
-**Intent**, which says what something means. `primary` and `accent` for
-emphasis, each with `-hover`, `-active` and `-subtle`; `info`, `success`,
-`warning` and `danger` for status, each with a `-surface` and a `-surface-hover`
-for the tinted box the message sits in.
+Inks are the colors that go on grounds. The base ink is `foreground`.
 
-**Series**, twenty-four of them, for charts. Ordered rather than arbitrary: a
-chart with three lines uses the first three, and they are chosen to stay
-distinguishable in that order rather than to look good as a full set.
+- `foreground-muted` and `foreground-subtle` are for text that recedes.
+- `foreground-on-accent` is for text on a filled accent color.
 
-**Syntax**, eight roles for code: `callable`, `comment`, `constant`, `invalid`,
-`keyword`, `name`, `string`, `tag`. Deliberately fewer than a full editor theme,
-because a code block in documentation is read rather than edited.
+### Intent
 
-## OKLCH
+Intent colors show what something means.
 
-Every color is authored in OKLCH. Equal numeric steps in sRGB are not equal
-perceptual steps, which makes both ramp generation and contrast arithmetic
-unreliable: a ramp that is even by the numbers looks uneven, and a contrast
-solver working in the wrong space cannot converge on a target it can measure.
+- `primary` and `accent` are for emphasis. Each has `-hover`, `-active`, and
+  `-subtle` variants.
+- `info`, `success`, `warning`, and `danger` are for status. Each has a
+  `-surface` and a `-surface-hover` variant for the tinted box that holds the
+  message.
 
-Concretely, this is what lets the theme engine take a brand color and *solve*
-for a palette rather than have someone pick one. See [Deriving a
-theme](./theming).
+### Series
 
-## Contrast is a guarantee
+Helix has twenty-four series colors for charts. They are ordered, so a chart
+with three lines uses the first three. We chose the colors so that the first
+ones in the list stay easy to tell apart, however many a chart uses.
 
-The engine measures every ink against the ground it will really be painted on
-and searches for the lightness that meets the target, rather than proposing a
-value and checking it afterwards. Every pairing it produces meets the target by
-construction.
+### Syntax
 
-That guarantee is only as good as the list of pairs somebody thought of, so two
-things are checked rather than one. The engine's declared surface model is held
-against what components actually paint, and then every pairing is measured on a
-laid-out page, which is the only way to see the ones no stylesheet states: just
-eleven rules in the library set an ink and a ground together, where 165 set only
-an ink and 112 only a ground, and a pairing the cascade assembled is still a
-pairing a reader has to be able to read.
+The eight syntax roles for code are `callable`, `comment`, `constant`,
+`invalid`, `keyword`, `name`, `string`, and `tag`. A full editor theme has more
+roles. Helix has fewer because code in documentation only needs to be read.
 
-## Do not reach past the semantic layer
+## Why colors use OKLCH
+
+Every Helix color is written in OKLCH. In sRGB, equal numeric steps do not look
+equal, which makes ramps and contrast math unreliable. A ramp with even numeric
+steps looks uneven. A contrast solver that works in sRGB cannot converge on a
+target that it can measure.
+
+OKLCH lets the theme engine *solve* for a palette from your brand color. See
+[Deriving a theme](./theming).
+
+## How the engine meets contrast targets
+
+The engine measures each ink against the ground it will be painted on. It then
+searches for the lightness that meets the target. Every pair it produces meets
+the target.
+
+The engine can solve only the pairs it knows about, so we check two things:
+
+- We compare the engine's surface model with what the components paint.
+- We measure every pair on a rendered page.
+
+The second check finds pairs that no single CSS rule states. Only eleven rules
+in the library set an ink and a ground together. Another 165 set only an ink,
+and 112 set only a ground. The cascade combines them into the rest of the
+pairs, and each of those pairs must still be readable.
+
+## Use only semantic tokens
 
 ```css
 /* Yours to read. */
@@ -85,8 +99,7 @@ color: var(--helix-color-foreground-muted);
 color: var(--_helix-neutral-500);
 ```
 
-The primitive layer underneath, `--_helix-neutral-500` and its kind, is
-`helix/styles`'s own business. The underscore marks it private and the
-indirection is the whole point: it is what lets a theme change what
-`--helix-color-primary` resolves to without every component knowing which step
-of which ramp it happened to be.
+Primitive tokens such as `--_helix-neutral-500` belong to `helix/styles`. The
+underscore marks them as private. Components use only semantic tokens, such as
+`--helix-color-primary`. A theme can change what a semantic token resolves to,
+and no component depends on which step of which ramp a color comes from.

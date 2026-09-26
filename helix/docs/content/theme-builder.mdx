@@ -1,5 +1,5 @@
 ---
-description: The tool that turns intent inputs into a token set you can see.
+description: Enter your theme inputs and see every token Helix computes from them.
 section: Tooling
 title: Theme builder
 ---
@@ -8,37 +8,47 @@ title: Theme builder
 
 [Open the theme builder](/helix/theme).
 
-Move a slider and every surface in the library resolves around it. A theme here
-is derived rather than picked, and this is where you see that happen.
+When you move a slider, every component in the preview updates. Helix computes
+a theme from a few inputs, and the theme builder shows you the result.
 
-## What it does
+## What the theme builder shows
 
-You give it the intent inputs, the same ones `derive()` takes: a brand color, a
-chroma ceiling, a radius, a density, a contrast target, a motion character. It
-runs the real derivation, not an approximation of it, and shows you the complete
-token set plus the library rendered in it.
+You enter the same inputs that `derive()` takes:
 
-Light and dark at once, because `[data-color-mode]` works on any element and the
-two previews are two subtrees of one document. See [Color modes](./color-modes).
+- a brand color
+- a chroma ceiling
+- a radius
+- a density
+- a contrast target
+- a motion character
+
+The theme builder runs the full derivation. It shows you every token, and the
+components drawn with them.
+
+It shows light and dark at the same time. `[data-color-mode]` works on any
+element, so the two previews are two subtrees of one document. See
+[Color modes](./color-modes).
 
 ## The contrast column
 
-Every pairing the engine solved is listed with its measured ratio against the
-ground it is actually painted on. Three states:
+The contrast column lists every color pair Helix computed. Each pair shows its
+ratio, measured against the background it is painted on. A pair has one of
+three states:
 
 - **Met.** The pair reaches the target.
-- **Unverifiable.** The ground is translucent, so there is no known color to
-  measure against. Not a failure, and not a pass either: it is what a material
-  choice costs you, reported rather than hidden.
-- **Pinned.** You supplied the color outright, so the engine did not solve for
-  it and cannot promise anything about it.
+- **Unverifiable.** The background is translucent, so there is no known color
+  to measure against. The pair neither passes nor fails. This is the cost of a
+  translucent material, and the theme builder reports it.
+- **Pinned.** You set the color yourself. The engine did not compute it, so its
+  contrast is not guaranteed.
 
-A theme with a column of `unverifiable` is a theme making a trade. It should be
-possible to see that you made it.
+A column of `unverifiable` pairs means your theme makes a trade. The column lets
+you see that you made it.
 
-## What comes out
+## What the theme builder exports
 
-The token block, as CSS, to paste into your own stylesheet:
+The theme builder gives you the token block as CSS, to paste into your own
+stylesheet:
 
 ```css
 :root {
@@ -47,20 +57,21 @@ The token block, as CSS, to paste into your own stylesheet:
 }
 ```
 
-Or the intent object, to keep in your repository and re-derive from:
+It also gives you the intent object, to keep in your repository and derive the
+theme from again:
 
 ```ts
 export const theme = { brand: '#2563eb', chroma: { ceiling: 0.1 }, radius: 2 }
 ```
 
-**Keep the intent, not the tokens.** The tokens are the output of a solver, and
-the solver improves: a theme stored as its inputs picks up a better derivation,
-and a theme stored as literal values is frozen at the version that produced
-it. The tokens are for pasting into a system that cannot run the engine.
+**Keep the intent object in your repository.** The tokens are the output of a
+solver, and the solver improves. A theme stored as its inputs gets each
+improvement. A theme stored as token values stays at the version that produced
+it. Use the tokens only in a system that cannot run the engine.
 
-## What it does not do
+## Limits of the theme builder
 
-It shows you numbers and swatches, not components in your product. A contrast
-matrix is a grid with three states, which a terminal or a table renders better
-than a picture does, and the components beside it are there to sanity-check the
-result rather than to be a design surface.
+The theme builder shows numbers and swatches. It does not show components in
+your product. The contrast results are a grid with three states, and a terminal
+or a table shows that grid more clearly than a picture. The components beside
+it are for checking the result. They are not a design tool.

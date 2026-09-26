@@ -30,16 +30,16 @@ with nothing to install or run:
 }
 ```
 
-It works at `:root` and on any `[data-helix-theme]` subtree, and nowhere else.
-A `var()` inside a custom property is substituted on the element the property is
-*declared* on, so the ramp has already resolved at the root and a seed written
-on a plain element is read by nothing. Naming the scope is what re-runs those
-declarations.
+Set seeds at `:root` or on an element with `[data-helix-theme]`. A seed on any
+other element has no effect. A `var()` inside a custom property is substituted
+on the element where the property is *declared*, so the ramp has already
+resolved at the root. The stylesheet declares the ramp again on each
+`[data-helix-theme]` element, so the ramp there reads the seeds you set on it.
 
-**Tuned does not guarantee contrast.** CSS has no contrast function:
-`oklch(from …)` can step and rotate, and it cannot search for the lightness that
-clears a target. The figures baked into the ramp are exact for the seed that
-ships and approximate for any other.
+Tuned does not guarantee contrast. CSS has no contrast function.
+`oklch(from …)` can step and rotate a color, but it cannot search for the
+lightness that meets a target. The contrast figures built into the ramp are
+exact for the default seed and approximate for any other.
 
 **Verified** uses the theme engine. It searches for each color that meets its
 target, measures every pair, and returns the theme with any violations:
@@ -60,42 +60,50 @@ if (theme.violations.length > 0) {
 console.log(toCss(theme))
 ```
 
-The emitted block carries the seeds as well as the tokens, so the halves the
-engine does not compute, the twenty-four series colors a chart reads, the
-spacing scale and the corner radii, re-derive from the same values the solver
-used. That is what stops the two paths disagreeing on the same page.
+The CSS from `toCss` includes the seeds as well as the tokens. The stylesheet
+computes the values the engine does not, from the same seeds the engine used:
 
-Reach for tuned to try a color. Reach for verified to ship one.
+- The twenty-four series colors for charts
+- The spacing scale
+- The corner radii
 
-## Why OKLCH
+This keeps both ways of theming in agreement on the same page.
 
-Equal numeric steps in sRGB are not equal perceptual steps, which makes both
-scale generation and contrast math unreliable. OKLCH is what makes derivation
-possible at all. Colors are authored in it and converted at the edge.
+Use tuned to try a color. Use verified for the theme you ship.
 
-The brand color keeps its hue and chroma; only lightness moves to meet the
-target. That is what preserves brand identity while guaranteeing contrast.
+## Why Helix uses OKLCH
 
-## What it protects against
+Equal numeric steps in sRGB do not look like equal steps. That makes scales and
+contrast math in sRGB unreliable. Helix computes themes in OKLCH for this
+reason. Colors are written in OKLCH and converted to other formats on output.
 
-Both of these produce a palette that passes review and fails in production.
-Both are covered by regression tests.
+The engine keeps your brand color's hue and chroma and changes only its
+lightness to meet the target. Your brand color stays recognizable, and its
+contrast is guaranteed.
 
-**Solving against colors that cannot be rendered.** A near-white surface
-carrying brand tint falls outside the sRGB gamut and gets truncated on the way
-to hex, breaking both the intended hue and the contrast just solved for. Every
-color is gamut-fitted before it is solved against, and a token reports
-`chromaReduced` when fitting changed it rather than clipping silently.
+## Errors the engine prevents
 
-**Verifying against only one surface.** Text lands on `surface` as often as on
-`background`: cards, dialogs, menus. In a dark theme `surface` is *lighter*
-than `background`, so light text loses contrast inside every card while the
-page itself passes. Foregrounds are solved against the hardest surface they
-land on, not just the page background.
+The engine prevents two errors. Each one produces a palette that passes review
+and fails in production. Regression tests cover both.
 
-## Inspecting a theme
+### Colors outside the sRGB gamut
 
-Every derived token carries the check that produced it:
+A near-white surface with a brand tint can fall outside the sRGB gamut.
+Converting it to hex then clips it, which changes its hue and breaks the
+contrast the engine solved for. The engine fits every color into the gamut
+before it solves against that color. When fitting changes a token, the token
+reports `chromaReduced`.
+
+### Text on more than one surface
+
+Text appears on `surface` as often as on `background`, for example in cards,
+dialogs, and menus. In a dark theme, `surface` is *lighter* than `background`.
+Light text that passes on the page can lose contrast inside every card. The
+engine solves each foreground color against the hardest surface it appears on.
+
+## Inspect a theme
+
+Each derived token includes the result of its contrast check:
 
 ```ts
 const theme = deriveTheme({ brand })
@@ -105,5 +113,6 @@ for (const token of theme.tokens) {
 }
 ```
 
-`violations` is empty when the theme passes. Anything that could not reach its
-target at the requested chroma is reported there rather than shipped.
+`violations` is empty when the theme passes. A color that cannot reach its
+target at the requested chroma is reported in `violations`, so you can fix it
+before you ship.

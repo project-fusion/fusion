@@ -1,12 +1,12 @@
 ---
-description: Four durations, five curves, and the rule every animating component has to answer.
+description: The duration and easing tokens, and how components handle reduced motion.
 section: Foundations
 title: Motion
 ---
 
 # Motion
 
-## The tokens
+## Duration and easing tokens
 
 [//]: # (tokens:duration)
 
@@ -31,33 +31,40 @@ title: Motion
 
 [//]: # (/tokens)
 
-Four durations and five curves. `standard` for most things, `decelerate` for
-something arriving, `accelerate` for something leaving, `emphasized` for a
-movement the reader is meant to follow, and `spring` for the few places
-overshoot reads as responsive rather than as a bug.
+Helix has four durations and five curves. Use each curve for one kind of
+movement:
 
-The theme engine takes a `motion` intent input, so a product can be uniformly
-quicker or slower without every component being retuned.
+- `standard` for most movement
+- `decelerate` for something arriving
+- `accelerate` for something leaving
+- `emphasized` for a movement you want the user to follow
+- `spring` for the few places where overshoot looks responsive and does not
+  look like a bug
 
-## Reduced motion is per component
+The theme engine takes a `motion` intent input. Use it to make every component
+faster or slower at once.
 
-The base layer has a global rule capping animation and transition duration for a
-reader who asked not to be moved. **It does not reach a single component.**
+## Each component handles reduced motion
+
+The base layer has a global rule that caps animation and transition durations
+when a user has asked for reduced motion. **The global rule does not apply
+inside any component.**
 
 ```css
 *, *::before, *::after { … }
 ```
 
-`*` does not cross a shadow boundary. So that rule reaches your prose, your
-layout and the base layer's own recipes, and none of the ninety-odd components
-that draw inside a shadow root. Each one answers `prefers-reduced-motion` in its
-own stylesheet, fifty-nine of them do because fifty-nine of them animate, and a
-component that animates without one fails the build.
+The `*` selector does not cross a shadow boundary. The rule applies to your
+prose, your layout, and the base layer's own recipes. It does not apply to the
+ninety-odd components that draw inside a shadow root. Each component that
+animates handles `prefers-reduced-motion` in its own stylesheet. Fifty-nine
+components animate, and all fifty-nine have this rule. A component that
+animates without one fails the build.
 
-**The same is true of yours.** If you write a component with a shadow root, the
-global rule will not cover it either. That is not a Helix behavior, it is how
-`*` works, and it is the single easiest accessibility regression to ship without
-noticing.
+The same applies to your own components. If you write a component with a shadow
+root, the global rule does not cover it. This comes from how `*` works in CSS,
+so it applies outside Helix too. It is the easiest accessibility regression to
+ship without noticing.
 
 ```css
 @media (prefers-reduced-motion: reduce) {
@@ -68,24 +75,25 @@ noticing.
 }
 ```
 
-## What reduced motion means here
+## What reduced motion changes
 
-Not "no movement". A transition that communicates a relationship, like a panel
-sliding out of the control that opened it, is doing work; a decorative float is
-not. The library's own policy is to remove the second and shorten the first to
-the point where it is instant but not jarring.
+Some transitions show a relationship, such as a panel that slides out of the
+control that opened it. Others are decorative, such as a floating effect. With
+reduced motion, Helix removes decorative movement. It shortens transitions that
+show a relationship until they are close to instant, without an abrupt jump.
 
-The one place this is absolute is anything that moves continuously without
-input: the aura shader, marquees, and looping loaders all stop rather than speed
-up.
+Anything that moves continuously without input stops completely:
 
-## Two things that are not motion tokens
+- The aura shader
+- Marquees
+- Looping loaders
 
-**`@starting-style`** is how overlays animate in, and it needs no duration token
-of its own: it is a starting value, and the transition that runs from it uses
-the tokens above.
+## Starting styles and view transitions
 
-**View transitions** are not used anywhere in the library. A component cannot
-own a view transition, because the transition is between two states of the
-document rather than of the component, so if you want them that is yours to
-drive.
+Overlays use `@starting-style` to animate in. It sets a starting value and needs
+no duration token of its own. The transition that runs from it uses the tokens
+above.
+
+The library does not use view transitions. A view transition runs between two
+states of the document, so a component cannot own one. If you want view
+transitions, start them from your own code.

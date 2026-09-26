@@ -1,5 +1,5 @@
 ---
-description: Five radii, two widths, and the two tokens that are a policy rather than a value.
+description: The corner radius and border width tokens, and how a theme changes them.
 section: Foundations
 title: Shape and borders
 ---
@@ -20,12 +20,11 @@ title: Shape and borders
 
 [//]: # (/tokens)
 
-`full` is `9999px` rather than `50%`, which matters for anything that is not
-square: a percentage radius on a wide element gives an ellipse, and a pill is
-what you wanted.
+`full` is `9999px`, which gives a pill shape on an element that is not square.
+A percentage radius such as `50%` gives an ellipse on a wide element.
 
-Rounding is the fastest single change to how a system feels, and it is one
-token, but it is the **seed** rather than one of the four above:
+Changing the rounding is the quickest way to change how your interface looks.
+You change it with one token, the seed:
 
 ```css
 :root {
@@ -33,25 +32,32 @@ token, but it is the **seed** rather than one of the four above:
 }
 ```
 
-That makes every card, dialog, input and button squarer at once, because `sm`,
-`md` and `lg` are all derived from it: they become 1px, 2px and 3px. The theme
-engine takes a `radius` intent input for exactly this reason. See [Deriving a
-theme](./theming).
+This makes every card, dialog, input, and button squarer at once, because `sm`,
+`md`, and `lg` are all computed from the seed. With this seed, they become 1px,
+2px, and 3px. The theme engine has a `radius` intent input for the same purpose.
+See [Deriving a theme](./theming).
 
-**Setting `--helix-radii-md` instead moves only what reads `md`**, which is
-neither the buttons, the inputs and the dialogs (`sm`) nor the cards (`lg`).
-The four rungs are siblings derived from the seed, not a chain, so overriding
-one is how you change a single step on purpose rather than how you reshape a
-system.
+Setting `--helix-radii-md` changes only what uses `md`. Buttons, inputs, and
+dialogs use `sm`, and cards use `lg`, so none of them change. Each step is
+computed from the seed on its own, so overriding one step changes only that
+step. To change the rounding everywhere, set the seed.
 
-**Every floating panel takes `sm`.** A dialog, a drawer, a menu, a popover, a
-tooltip, a toast, and the panel any field opens under itself: all the same
-corner, whatever the panel's size. A radius is read against the corner beside it
-rather than against the area behind it.
+**Every floating panel uses `sm`.** This includes:
 
-**A shape that is round rather than softened does not use these.** An avatar, a
-loader and a radio are circles because of what they are, so they say `50%`
-directly and are unaffected by a theme that squares everything else off.
+- dialogs
+- drawers
+- menus
+- popovers
+- tooltips
+- toasts
+- the panel a field opens below itself
+
+They all have the same corner, whatever their size. You compare a radius with
+the corners next to it, so the size of the panel does not matter.
+
+Circles do not use these tokens. An avatar, a loader, and a radio are circles by
+design, so they set `50%` directly. A theme that squares off everything else
+does not change them.
 
 ## Border widths
 
@@ -66,26 +72,27 @@ directly and are unaffected by a theme that squares everything else off.
 
 [//]: # (/tokens)
 
-The first two are values you pick. **The second two are a decision**, and they
-belong to [Surfaces and separation](./surfaces-and-separation): they are what a
-theme sets to zero to go shadow-first, or to a width to go border-first.
+You pick from the first two. The last two are policy tokens, described in
+[Surfaces and separation](./surfaces-and-separation). A theme sets them to zero
+to go shadow-first, or to a width to go border-first.
 
-This distinction is why a component's border width sits behind a per-component
-hook rather than being written inline. A width written inline can be recolored
-by a theme and never removed, and a hardcoded `border: none` can never have one
-added back, so a surface themes perfectly in one direction and not at all in the
-other.
+For this reason, each component reads its border width from its own hook. A
+theme can recolor a width written inline but cannot remove it. A theme also
+cannot add a border back to a component that sets `border: none`. In both
+cases, the surface can be themed in one direction only.
 
-## Corner radius on a group
+## Corners in a group of controls
 
-Adjacent controls in a group flatten the corners between them, so a button group
-reads as one shape rather than three:
+Controls next to each other in a group have flat corners where they meet, so a
+button group looks like one shape:
 
 ```css
 [data-button]:not(:first-child) { border-start-start-radius: 0; }
 ```
 
-The base layer does this for the recipes, and the components do it for
-themselves. If you build your own group: it is the inner corners that go flat,
-not the outer ones, and it is `border-start-start-radius` rather than
-`border-top-left-radius` so it follows the writing direction.
+The base layer does this for the recipes, and each component does it for
+itself. If you build your own group:
+
+- Flatten the inner corners, and keep the outer corners rounded.
+- Use `border-start-start-radius`, which follows the writing direction.
+  `border-top-left-radius` does not.
