@@ -126,6 +126,23 @@ interface Marker extends HTMLElement {
 const isMarker = (node: unknown): node is Marker =>
   (node as Partial<Marker> | null)?.isMapMarker === true
 
+/** What the connector reads off a position. */
+interface Position extends HTMLElement {
+  /** In meters, which the ring is drawn as. */
+  accuracy?: number | undefined
+  /** In degrees clockwise from north. */
+  heading?: number | undefined
+  isMapPosition: true
+  lat?: number | undefined
+  lng?: number | undefined
+}
+
+const isPosition = (node: unknown): node is Position =>
+  (node as Partial<Position> | null)?.isMapPosition === true
+
+/** Meters in a degree of latitude, which is near enough constant for a ring. */
+const METERS_PER_DEGREE = 111_320
+
 /** What the connector reads off a route or an area. */
 interface Layer extends HTMLElement {
   isMapLayer: true
@@ -291,6 +308,7 @@ export const connectMap = (
      canvas places its cards. A marker off the edge is still placed and the
      viewport clips it, so one scrolled back into view is already there. */
   const markers = (): Marker[] => [...frame.children].filter(isMarker)
+  const positions = (): Position[] => [...frame.children].filter(isPosition)
   /* **A route needs two points and an area three**, and one with fewer is a
      layer still being written rather than a shape to draw: MapLibre refuses a
      one-point line outright. */
@@ -332,6 +350,30 @@ export const connectMap = (
         marker.side = reach <= ahead || ahead >= behind ? 'end' : 'start'
       }
     }
+    /* **A position is placed as a marker is, and its ring is measured on the
+       map.** The accuracy is meters on the ground, and how many pixels that is
+       depends on the zoom and, in Web Mercator, the latitude: so the ring is
+       the distance between the position and a point that many meters north of
+       it, projected by the renderer, which is right at every zoom and on every
+       renderer without knowing which projection it uses. */
+    for (const position of positions()) {
+      if (typeof position.lat !== 'number' || typeof position.lng !== 'number') {
+        continue
+      }
+      const at = driver.project({ lat: position.lat, lng: position.lng })
+      position.style.setProperty('--_map-position-x', `${at.x}px`)
+      position.style.setProperty('--_map-position-y', `${at.y}px`)
+      position.style.setProperty('--_map-position-heading', `${position.heading ?? 0}deg`)
+      const meters = position.accuracy ?? 0
+      const edge =
+        meters > 0
+          ? driver.project({ lat: position.lat + meters / METERS_PER_DEGREE, lng: position.lng })
+          : at
+      position.style.setProperty(
+        '--_map-position-radius',
+        `${Math.hypot(edge.x - at.x, edge.y - at.y)}px`,
+      )
+    }
   }
   const stopViewing = driver.onView?.(place)
   /* A marker added, taken away or moved, which only the attributes say: a
@@ -350,7 +392,7 @@ export const connectMap = (
   layers.observe(frame, { childList: true })
   const coordinates = new MutationObserver(changed)
   coordinates.observe(frame, {
-    attributeFilter: ['lat', 'lng', 'points', 'tone'],
+    attributeFilter: ['accuracy', 'heading', 'lat', 'lng', 'points', 'tone'],
     attributes: true,
     subtree: true,
   })
@@ -387,6 +429,11 @@ export const connectMap = (
         marker.style.removeProperty('--_map-marker-x')
         marker.style.removeProperty('--_map-marker-y')
       }
+      for (const position of positions()) {
+        for (const name of ['heading', 'radius', 'x', 'y']) {
+          position.style.removeProperty(`--_map-position-${name}`)
+        }
+      }
       frame.removeEventListener(HelixMapPanEvent.eventName, handlePan)
       frame.removeEventListener(HelixMapZoomEvent.eventName, handleZoom)
       restoreKeyboard?.()
@@ -406,9 +453,9 @@ export const connectMap = (
         return
       }
       const places: MapPlace[] = [
-        ...markers()
-          .filter((marker) => typeof marker.lat === 'number' && typeof marker.lng === 'number')
-          .map((marker) => ({ lat: marker.lat as number, lng: marker.lng as number })),
+        ...[...markers(), ...positions()]
+          .filter((one) => typeof one.lat === 'number' && typeof one.lng === 'number')
+          .map((one) => ({ lat: one.lat as number, lng: one.lng as number })),
         ...readLayers().flatMap((layer) => layer.points),
       ]
       if (places.length === 0) {

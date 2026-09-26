@@ -95,6 +95,21 @@ and `description`, under the frame's `layers-label`.
 `connection.fit()` frames every marker and every point of every route and area,
 at the page's pace for a trip.
 
+## A live position
+
+```html
+<helix-map-position label="Van 12" lat="37.78" lng="-122.41" heading="90" accuracy="30"
+  description="Two stops away"></helix-map-position>
+```
+
+Something moving: a point with a ring `accuracy` meters across and a cone
+`heading` degrees clockwise from north. **The connector places it and sizes its
+ring through the renderer's projection**, so the ring is right at every zoom
+and on every renderer; a page moves it by setting `lat`, `lng` and `heading`.
+**It moves in silence and speaks its `description`**, politely and at most
+once every `announce-every` milliseconds, 5,000 by default, with the latest
+words once the wait is over: a step is not news, and two stops away is.
+
 ## A style in the page's theme
 
 ```js
