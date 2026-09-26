@@ -14,7 +14,10 @@ beforeAll(() => {
  */
 const stand = (): {
   asked: string[]
-  fire(type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata'): void
+  fire(
+    type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    event?: { sourceDataType?: string },
+  ): void
   map: MapLibreMap
   notReady(): void
   ready(): void
@@ -22,7 +25,7 @@ const stand = (): {
   styleLayers: { id: string; type: string }[]
 } => {
   const asked: string[] = []
-  const listeners = new Map<string, Set<() => void>>()
+  const listeners = new Map<string, Set<(event?: { sourceDataType?: string }) => void>>()
   const container = document.createElement('div')
   container.innerHTML = '<div class="maplibregl-ctrl-attrib">MapLibre credit</div>'
   const canvas = document.createElement('canvas')
@@ -66,6 +69,7 @@ const stand = (): {
         `fitBounds ${JSON.stringify(bounds)} ${JSON.stringify(options?.padding)} ${options?.duration ?? options?.animate}`,
       )
     },
+    getBearing: () => 0,
     getCanvas: () => canvas,
     getContainer: () => container,
     getLayer: (id) => styleLayers.find((one) => one.id === id),
@@ -103,6 +107,9 @@ const stand = (): {
     removeSource: (id) => {
       delete sources[id]
     },
+    setStyle: () => {
+      asked.push('setStyle')
+    },
     zoomIn: (options) => {
       asked.push(`zoomIn ${options?.animate} ${options?.duration}`)
     },
@@ -110,9 +117,12 @@ const stand = (): {
       asked.push(`zoomOut ${options?.animate} ${options?.duration}`)
     },
   }
-  const fire = (type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata'): void => {
+  const fire = (
+    type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    event?: { sourceDataType?: string },
+  ): void => {
     for (const listener of listeners.get(type) ?? []) {
-      listener()
+      listener(event)
     }
   }
   return {
@@ -204,7 +214,10 @@ describe('mapLibreDriver', () => {
     expect(credits?.read()).toEqual([])
     sources.base = { attribution: '© OpenStreetMap contributors' }
     sources.hills = {}
-    fire('sourcedata')
+    // A tile loading is not news for the credit; a source learning its metadata is.
+    fire('sourcedata', { sourceDataType: 'content' })
+    expect(heard).toBe(0)
+    fire('sourcedata', { sourceDataType: 'metadata' })
     expect(heard).toBe(1)
     expect(credits?.read()).toEqual(['© OpenStreetMap contributors'])
     credits?.stop()
@@ -297,7 +310,7 @@ describe('mapLibreDriver', () => {
         },
       ]
     })
-    // What \`setStyle(…, { diff: true })\` does to a style that did not have them.
+    // What `setStyle(…, { diff: true })` does to a style that did not have them.
     for (const id of ['helix-routes', 'helix-area-edges', 'helix-areas']) {
       map.removeLayer(id)
     }

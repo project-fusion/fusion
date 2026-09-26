@@ -1,5 +1,5 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import { nothing } from 'lit'
+import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
+import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { type MapPoint, pointsConverter } from '../route/map-route.js'
 
@@ -20,11 +20,13 @@ import { type MapPoint, pointsConverter } from '../route/map-route.js'
  * @category media
  * @aliases Map region, Polygon, Zone
  * @documentation https://fusion.dev/helix/components/map
+ *
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - The shape moved, was renamed or was retoned, which the frame and the connector follow. Not news for a page.
  */
 @customElement('helix-headless-map-area')
 export class HelixHeadlessMapArea extends HelixElement {
   /** What the area is about, after its name in the frame's list. */
-  @property({ reflect: true })
+  @property()
   description?: string
 
   /** Marks this as a layer for the frame and the connector, whatever its tag. */
@@ -34,15 +36,21 @@ export class HelixHeadlessMapArea extends HelixElement {
   readonly layerKind: 'area' | 'route' = 'area'
 
   /** What the area is called, which is what the frame's list says. */
-  @property({ reflect: true })
+  @property()
   label?: string
 
   /**
    * Its outline, in order around it. The last point joins the first, so a
    * closed ring does not have to repeat it.
    */
-  @property({ converter: pointsConverter, reflect: true })
+  @property({ converter: pointsConverter })
   points?: MapPoint[]
+
+  /** Tells the frame and the connector the shape moved, was renamed or was retoned. */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'layer' }))
+  }
 
   protected override render(): typeof nothing {
     return nothing

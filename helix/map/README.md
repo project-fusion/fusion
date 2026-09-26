@@ -60,7 +60,9 @@ A `helix-map-marker` is a named button in the frame, drawn by Helix in the
 page's theme rather than by the renderer. **Only the renderer knows where a
 place falls on the screen**, so `connectMap` asks the driver to project each
 marker and stands it there, again every time the view moves and whenever a
-page adds a marker or changes its `lat` or `lng`. A marker the connector has
+page adds a marker or changes its `lat` or `lng`, as the attribute or the
+property: each part says it changed with `helix-map-part-change` rather than
+reflecting its coordinates into the markup. A marker the connector has
 not placed stays hidden rather than drawn in the corner.
 
 The markers share one tab stop, and the arrow keys walk them in the order they
@@ -87,7 +89,9 @@ page passes the geometry one returns rather than the stops alone.
 own canvas over the map could not do: the connector reads each one's points and
 its color, the brand or its `tone`, and hands them to the driver as the
 renderer's own layers. A MapLibre style replaced by a theme change takes them
-with it, and they come back drawn in the new theme. Leaflet draws them where the
+with it, and they come back drawn in the new theme; a theme that moves without
+replacing the style, a mode or a brand set on anything above the frame, draws
+them again in its colors, on either renderer. Leaflet draws them where the
 page hands Leaflet over, `leafletDriver(map, L)`, since this package imports no
 renderer.
 
@@ -96,7 +100,8 @@ tree, since a line in a canvas is nothing to a screen reader: each one's `label`
 and `description`, under the frame's `layers-label`.
 
 `connection.fit()` frames every marker and every point of every route and area,
-at the page's pace for a trip.
+at the page's pace for a trip, or at once with `{ animate: false }`, which is
+what a map still settling its size wants on load and on resize.
 
 ## A live position
 
@@ -111,6 +116,8 @@ ring `accuracy` meters across. `shape` and `separation` take the same words
 they do on a marker's point, and `tone` colors it where it means something. **The connector places it and sizes its
 ring through the renderer's projection**, so the ring is right at every zoom
 and on every renderer; a page moves it by setting `lat`, `lng` and `heading`.
+Its heading is drawn against the view, so on a map the renderer has turned it
+still points the way it is going.
 **It moves in silence and speaks its `description`**, politely and at most
 once every `announce-every` milliseconds, 5,000 by default, with the latest
 words once the wait is over: a step is not news, and two stops away is.
@@ -131,8 +138,25 @@ everything else is the land moved toward something**: water toward `info`,
 parks toward `success`, the motorways and main roads toward the brand, and the
 smaller roads, buildings, borders and labels toward the ink. So one call draws
 a light map on a light theme and a dark one on a dark theme, and a new brand
-moves the roads with it. Redraw it with `map.setStyle(style, { diff: true })`
-when the theme changes.
+moves the roads with it.
+
+```js
+import { colorsReady } from '@fusion.dev/helix-map'
+import { followTheme, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
+
+const style = (colors) => mapLibreStyle(colors, { language: 'en' })
+const map = new maplibregl.Map({ container, style: style(await colorsReady(frame)) })
+const theme = followTheme(map, frame, style)
+```
+
+**`followTheme` keeps it in the theme**: a mode, a class, a theme or an inline
+token on the frame or anything above it, or the reader's light or dark
+preference, restyles the map once a frame by a diff, and only where the style
+it builds differs from the last. A page that restyles some other way, a
+stylesheet replaced, calls `theme.update()`. `colorsReady(element)` waits out
+the frame or two a stylesheet can be behind the page, and says which token is
+missing where a few seconds pass without them; `watchTheme(element, changed)`
+is the watch on its own, for a renderer of your own.
 
 **Every label clears a contrast target against the land it is haloed in**, 4.5
 by default and `contrast` to change it: a label that would fall short is drawn
@@ -169,7 +193,8 @@ A driver of your own is an object with `panBy(x, y, motion)` in pixels and
 or `null` for a jump, and optionally `silenceKeyboard`, `focusTarget`,
 `replaceZoom` and `credits`: see `MapDriver`. Markers need three more:
 `project(place)` to a point in the map's container, `onView(moved)` to hear the
-view change, and `show(place, motion)` to bring a place into view. Routes and
+view change, and `show(place, motion)` to bring a place into view, and
+`bearing()` where the renderer can turn the view. Routes and
 areas need `layers(read)`, and `connection.fit()` needs `fit(bounds, padding,
 motion)`. `motionOf`
 reads the same motion for a move a page makes itself. A driver
