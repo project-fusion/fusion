@@ -106,7 +106,7 @@ export function MapsPoints() {
       <helix-text aria-live="polite" emphasis="subtle" variant="caption">
         {pressed
           ? `Pressed: ${pressed}`
-          : 'Press a count to zoom in to it, and a point to name it.'}
+          : 'Press a count to zoom in. Press a point to see its name.'}
       </helix-text>
     </div>
   )

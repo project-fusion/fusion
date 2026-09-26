@@ -13,47 +13,43 @@ export interface MapLayer {
 }
 
 /**
- * How Maps is built, from what a reader touches down to the data under it.
- *
- * **The stage is the real one**, as it is for Cortex's modules: a reader
- * deciding whether to build on this needs to know which parts exist. **And the
- * renderer is in the stack and said not to be ours**, because it is the one
- * part Helix does not draw, and a stack that left it out would describe a map
- * Helix renders itself, which is the claim this is careful not to make.
+ * The parts of Helix Maps, from the elements you write to the map data, each
+ * at its real stage. The renderer is listed as MapLibre's or Leaflet's, since
+ * Helix does not draw the map.
  */
 export const MAP_STACK: readonly MapLayer[] = [
   {
-    body: 'Places, routes, areas, a live position and data layers as elements inside the frame, rather than calls against a renderer’s API: named, in your tones, and walked with the arrow keys.',
+    body: 'Markers, routes, areas, live positions, and data layers, written as HTML elements inside the map.',
     role: 'Elements',
     stage: 'Building',
     title: 'Layers',
   },
   {
-    body: 'A named region around the map, with pan and zoom as buttons a screen reader can find. An embedded map is otherwise a canvas with no node in the accessibility tree at all.',
-    role: 'Accessibility',
+    body: 'The box around the map, with pan and zoom buttons, keyboard controls, and a footer for the map credit.',
+    role: 'Interface',
     stage: 'Active',
     title: 'The frame',
   },
   {
-    body: 'One connection between the frame and the renderer: one tab stop, one set of keys, one set of zoom buttons, and the credit where the frame keeps it.',
+    body: 'Connects the frame to the renderer. It turns the frame’s buttons and keys into map movement and moves the renderer’s credit into the frame.',
     role: 'Integration',
     stage: 'Building',
     title: 'The connector',
   },
   {
-    body: 'What draws the map. The connector takes either, or a driver of your own for anything else.',
+    body: 'Draws the map. Use MapLibre, Leaflet, or a driver you write for another renderer.',
     owner: 'MapLibre or Leaflet',
     role: 'Rendering',
     title: 'The renderer',
   },
   {
-    body: 'A style drawn from your tokens: the brand for the roads you navigate by, the ink for the rest, light and dark from the same ones.',
+    body: 'A MapLibre style made from your theme, with your brand color on the main roads and light and dark versions from the same settings.',
     role: 'Theme',
     stage: 'Building',
     title: 'The style',
   },
   {
-    body: 'Vector tiles built from OpenStreetMap and served without a key or a per-view bill. Until then the map draws OpenFreeMap’s, which are in the same schema.',
+    body: 'Map tiles we will build from OpenStreetMap and serve with no API key or per-view cost. Until then, maps use OpenFreeMap tiles, which use the same format.',
     role: 'Data',
     stage: 'Declared',
     title: 'Tiles',
@@ -67,41 +63,35 @@ export interface MapPillar {
   name: string
 }
 
-/**
- * The three things a map gets from Helix, which are the three things an
- * embedded map is usually missing: the page's look, a reader who cannot see
- * it, and a way out of one vendor's API.
- */
+/** What Helix adds to a map, in three parts. */
 export const MAP_PILLARS: readonly MapPillar[] = [
   {
-    claim: 'Drawn from your tokens.',
+    claim: 'Styled with your theme.',
     facts: [
-      'Light and dark from the same four colors, mixed in OKLab.',
-      'Your brand on the roads a reader navigates by, your ink on the rest.',
-      'Every label held to your contrast target.',
-      'Pans and trips at your theme’s own pace.',
+      'Light and dark maps from the same theme.',
+      'Your brand color on the main roads.',
+      'Labels that meet your contrast target.',
+      'Map movement that uses your theme’s motion settings.',
     ],
-    name: 'In your theme',
+    name: 'Your brand',
   },
   {
-    claim: 'A map a screen reader can find.',
+    claim: 'Places and routes written as HTML.',
     facts: [
-      'A named region, with pan and zoom as buttons.',
-      'Places as buttons on one tab stop, walked with the arrow keys.',
-      'Routes, areas and data layers named in a list.',
-      'A live position that speaks its news, not its every step.',
+      'Add markers, routes, areas, and live positions as elements inside the map.',
+      'Set their colors with the same tones as other Helix components.',
+      'Change an attribute and the map updates.',
     ],
-    name: 'For every reader',
+    name: 'HTML elements',
   },
   {
-    claim: 'Any renderer, one set of markup.',
+    claim: 'Works with MapLibre or Leaflet.',
     facts: [
-      'MapLibre or Leaflet, or a driver of your own in an afternoon.',
-      'No renderer bundled: bring the version you already have.',
-      'The tiles’ credit kept where the frame shows it.',
-      'OpenStreetMap tiles with no API key.',
+      'Use the renderer and version you already have.',
+      'Connect another renderer by writing a small driver.',
+      'Map tiles from OpenStreetMap, with no API key.',
     ],
-    name: 'On your renderer',
+    name: 'Your renderer',
   },
 ]
 
@@ -116,22 +106,22 @@ export interface MapFeature {
 /** What a map holds, each an element a page writes inside the frame. */
 export const MAP_FEATURES: readonly MapFeature[] = [
   {
-    body: 'Named buttons standing on their places: lettered stops, pins and rings in your tones, with names that turn away from the edge of the view.',
+    body: 'Named places on the map. A marker can hold a letter or an icon, take a shape such as a ring or a pin, and be marked as passed once someone has visited it.',
     elements: ['<helix-map-marker>'],
     title: 'Markers',
   },
   {
-    body: 'Places that would draw over each other gather into a count that comes apart as the map zooms in. Places at one address fan out when pressed.',
+    body: 'Markers that would overlap combine into one count, which splits apart as you zoom in. Places at the same address spread out when you press their count.',
     elements: ['<helix-map cluster>'],
     title: 'Clusters',
   },
   {
-    body: 'Drawn by the renderer under its own place names, dotted where they leave the road, and quieter behind whoever is traveling them.',
+    body: 'Lines and shapes drawn under the map’s place names. A route can show how much of it has been traveled, and dotted sections for the walk to a place off the road.',
     elements: ['<helix-map-route>', '<helix-map-area>'],
     title: 'Routes and areas',
   },
   {
-    body: 'An arrow with a heading and a ring as wide as its accuracy, measured on the map at every zoom, and a status that speaks politely.',
+    body: 'A moving point or arrow, with a ring that shows how accurate its location is. Update its description, such as “Two stops away”, and screen readers announce it.',
     elements: ['<helix-map-position>'],
     title: 'A live position',
   },
@@ -148,13 +138,13 @@ export interface MapStep {
 /** Getting started, in three steps. */
 export const MAP_STEPS: readonly MapStep[] = [
   {
-    body: 'Helix, the connector, and the renderer you draw with.',
+    body: 'Install Helix, the map connector, and MapLibre.',
     code: 'bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl',
     language: 'sh',
     title: 'Install',
   },
   {
-    body: 'The frame, a box for the renderer, and your places as elements.',
+    body: 'Add the map frame, an element for the renderer to draw in, and your places.',
     code: `<helix-map label="Our stores">
   <div id="map"></div>
   <helix-map-marker label="Flagship" lat="30.2672" lng="-97.7431"></helix-map-marker>
@@ -163,7 +153,7 @@ export const MAP_STEPS: readonly MapStep[] = [
     title: 'Write the map',
   },
   {
-    body: 'A style from your tokens, the renderer, and one line connecting them.',
+    body: 'Create the map with a style from your theme, then connect it to the frame.',
     code: `import '@fusion.dev/helix'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { colorsReady, connectMap } from '@fusion.dev/helix-map'
@@ -194,10 +184,10 @@ export const MAPS: PageCopy = {
   blocks: [
     {
       body: [
-        'Maps in your theme that a screen reader can find, drawn by whichever renderer you use.',
+        'Add places, routes, and live positions to a map drawn by MapLibre or Leaflet, styled with your theme.',
       ],
       kicker: 'Helix Maps',
-      title: 'A map that belongs to the page',
+      title: 'Interactive maps in your brand’s colors',
     },
     {
       items: MAP_PILLARS.map((pillar) => ({
@@ -209,25 +199,27 @@ export const MAPS: PageCopy = {
     },
     {
       body: [
-        `Every café, bar and restaurant in Austin, ${AUSTIN_PLACES.toLocaleString('en-US')} of them, from one GeoJSON file.`,
+        `Every café, bar, and restaurant in Austin, ${AUSTIN_PLACES.toLocaleString('en-US')} places, loaded from one GeoJSON file.`,
       ],
       kicker: 'Thousands of points',
-      title: 'One layer, not thousands of elements',
+      title: 'Thousands of places on one map',
     },
     {
-      body: ['Each is an element you write inside the frame, and each takes your tones.'],
+      body: [
+        'Each is an HTML element you place inside the map. Each takes a tone, such as primary or danger, for its color.',
+      ],
       items: MAP_FEATURES.map((feature) => ({ body: feature.body, name: feature.title })),
-      kicker: 'What it holds',
-      title: 'Places, routes and a live position',
+      kicker: 'What you can add',
+      title: 'Markers, routes, and live positions',
     },
     {
       items: MAP_STEPS.map((step) => ({ body: `${step.body} ${step.code}`, name: step.title })),
       kicker: 'Get started',
-      title: 'A themed map in three steps',
+      title: 'Add a map in three steps',
     },
     {
       body: [
-        'From what a reader touches down to the data underneath. The renderer is the one part that is not ours.',
+        'The parts of Helix Maps, from the elements you write to the map data. MapLibre or Leaflet draws the map itself.',
       ],
       items: MAP_STACK.map((layer) => ({
         body: `${layer.stage ?? layer.owner}. ${layer.body}`,
@@ -237,7 +229,7 @@ export const MAPS: PageCopy = {
       title: 'How it is built',
     },
   ],
-  lede: 'Maps in your theme. A frame a screen reader can find, one connector for whichever renderer draws the map, and a style made from the same tokens as the rest of the page.',
+  lede: 'Interactive maps styled with your theme. Add places, routes, live positions, and thousands of data points to a map drawn by MapLibre or Leaflet.',
   source: 'rendered by the page, which reads this module',
   title: 'Maps',
 }

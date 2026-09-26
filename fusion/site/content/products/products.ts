@@ -198,7 +198,7 @@ export const PRODUCTS: Product[] = [
       {
         href: '/helix/maps',
         stage: 'Building',
-        summary: 'Maps in your theme, and one connector for any renderer.',
+        summary: 'Interactive maps in your brand’s colors.',
         title: 'Maps',
       },
     ],
