@@ -25,8 +25,8 @@ will tell you whether we are the right team for it.
 
 ## What we take on
 
-| Offer | Duration | Price | What it leaves you |
-| --- | --- | --- | --- |
-| AI capability audit | One to two weeks, two days a week | $12,000 to $18,000 | A document you own and can act on without us. If you do not need a larger engagement, the audit says so. |
-| Design system sprint | Four weeks, two days a week | $32,000 to $45,000 | Your design system, in your repository, under your license. It keeps working after we leave. |
-| Conversational build | Six to eight weeks, two days a week | From $60,000 | Working software and the reasoning behind it, in your hands. It keeps running after we leave. |
+| Offer | Duration | What it leaves you |
+| --- | --- | --- |
+| AI capability audit | One to two weeks, two days a week | A document you own and can act on without us. If you do not need a larger engagement, the audit says so. |
+| Design system sprint | Four weeks, two days a week | Your design system, in your repository, under your license. It keeps working after we leave. |
+| Conversational build | Six to eight weeks, two days a week | Working software and the reasoning behind it, in your hands. It keeps running after we leave. |

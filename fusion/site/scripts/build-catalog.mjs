@@ -263,7 +263,7 @@ for (const route of routes()) {
   const written = findSitePage(route.path) ?? (sitePageSources[slug] ? { slug } : undefined)
   if (written) {
     /* The file, and then whatever registry the page says belongs in its
-       document. `/services` is the only one: its three offers are a price list
+       document. `/services` is the only one: its three offers are a list
        several pages read, so they stay in `services.ts` and the document is the
        prose plus a table of them. Not a third way of producing markdown, but
        the two that already exist, one after the other. */
@@ -273,11 +273,10 @@ for (const route of routes()) {
             '',
             '## What we take on',
             '',
-            '| Offer | Duration | Price | What it leaves you |',
-            '| --- | --- | --- | --- |',
+            '| Offer | Duration | What it leaves you |',
+            '| --- | --- | --- |',
             ...SERVICES.map(
-              (service) =>
-                `| ${service.name} | ${service.duration} | ${service.price} | ${service.outcome} |`,
+              (service) => `| ${service.name} | ${service.duration} | ${service.outcome} |`,
             ),
             '',
           ].join('\n')
