@@ -153,16 +153,21 @@
   gap: var(--helix-space-sm) var(--helix-space-lg);
   inset-block-end: calc(var(--_maps-credit) + var(--helix-space-lg));
   inset-inline-start: var(--site-inset);
+  margin: 0;
   max-inline-size: calc(100% - var(--site-inset) * 2);
+  min-inline-size: 0;
   padding: var(--helix-space-sm) var(--helix-space-md);
   position: absolute;
   z-index: calc(var(--helix-layer-raised) + 1);
 }
 
-/* The bar's name, set as the controls' own labels are and standing where
-   their controls do, so the row reads Try it, then what to try. */
+/* The bar's name, standing where its controls do, so the row reads Try it,
+   then what to try. **Floated, which makes it an ordinary child** rather than
+   the legend a fieldset draws in its border, and so one of the row's items. */
 .mapsTryLabel {
   align-self: center;
+  float: inline-start;
+  padding: 0;
   color: var(--helix-color-foreground);
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-semibold);
