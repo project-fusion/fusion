@@ -240,7 +240,7 @@ on it.** The difference is who is writing and what is being suppressed: here it
 is one bot push whose content is known, and there it is a contributor's head
 commit suppressing the checks that were going to judge their own diff. GitHub
 honors the markers anywhere in the head commit's message, body included, so on
-2 Sep 2026 a commit whose body *explained* the hazard suppressed every `verify`
+September 2, 2026 a commit whose body *explained* the hazard suppressed every `verify`
 run on its own pull request: no run, no error, a required check that never
 reported, and BLOCKED. Four re-triggers carried the same message and failed the
 same way, which reads as broken infrastructure rather than as the diff.

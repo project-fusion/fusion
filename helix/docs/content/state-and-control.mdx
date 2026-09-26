@@ -22,7 +22,7 @@ When you type in the input, the value changes. When you assign a new value
 later, the value changes to what you assigned. The control has no modes, and you
 do not need to connect anything before it responds.
 
-*Until 26 Aug 2026, this page said the opposite. Setting a property claimed
+*Until August 26, 2026, this page said the opposite. Setting a property claimed
 ownership of the state, so the element announced its changes and applied none
 of them until you set the new value. That mode is removed. If you canceled
 changes by withholding a state update, rewrite that code to call
@@ -134,7 +134,7 @@ helix-checkbox:state(checked)::part(control) { … }
 helix-input:state(invalid)::part(field) { … }
 ```
 
-Until 27 Aug 2026, these states were the `data-open` and `data-checked`
+Until August 27, 2026, these states were the `data-open` and `data-checked`
 attributes. An attribute is in the DOM, and the element writes it on its first
 update. A framework that renders your markup on the server and then hydrates it
 finds attributes that its own render never produced. React reports that as a

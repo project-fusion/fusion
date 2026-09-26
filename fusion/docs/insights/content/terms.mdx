@@ -5,7 +5,7 @@ path: /legal/terms
 title: Terms of use
 ---
 
-Last updated 26 August 2026. These terms cover this website. They do not cover
+Last updated August 26, 2026. These terms cover this website. They do not cover
 the software: every package Fusion publishes is MIT licensed, and the `LICENSE`
 file in the repository is the whole of that agreement.
 

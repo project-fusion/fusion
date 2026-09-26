@@ -885,7 +885,7 @@ directly above the declaration that broke it, and it held for exactly as long as
 nobody had to act on it.
 
 **`helix/styles` authors in `src` and ships `dist`, and the comment is the
-difference.** The package exported `./src/*.css` until 24 Aug 2026, so every
+difference.** The package exported `./src/*.css` until August 24, 2026, so every
 consumer downloaded the reasoning: `tokens.css` is 71 percent comment,
 `primitives.css` 82, `base.css` 75, and the set was 60,944 bytes gzipped against
 8,219 of declarations. `turbo run styles-dist` strips comments into `dist` and
@@ -1166,7 +1166,7 @@ file's older note about a JSDoc that quotes markup, and worth assuming of any ne
 check that reads a template.
 
 **`helix component`'s `parts` resolves the whole render chain in both directions**, and read
-the class's own markup in one of them until 24 Aug 2026. One direction inherited
+the class's own markup in one of them until August 24, 2026. One direction inherited
 and the other did not, which leaves exactly one gap and it is the expensive one:
 a part rendered by a *base* that nobody in the chain documents is invisible to
 both halves, the subclass never rendering it and the base documenting nothing to
@@ -1218,7 +1218,7 @@ Notifications publish one, and Dialog's describes itself as "the title, and
 anything beside it". A `heading` is the heading alone, which is all Callout and
 Empty have. A component with a heading and nothing beside it takes `heading`,
 and one that grows an action there grows a `header` instead. Callout published
-`title` for the same thing Empty called `heading` until 22 Sep 2026; `title` is
+`title` for the same thing Empty called `heading` until September 22, 2026; `title` is
 refused now, being also the attribute every element has, whose tooltip a reader
 of `slot="title"` could fairly expect.
 
@@ -1333,7 +1333,7 @@ and the default slot, written with no name at all, sorts first: it is the slot a
 component has before it has any other.
 
 Most of that is the corpus stating a rule rather than a decision taken. Measured
-across all 246 blocks on 27 Aug 2026, the metadata prefix was unanimous, `@slot`
+across all 246 blocks on August 27, 2026, the metadata prefix was unanimous, `@slot`
 preceded `@csspart` 115 times against 3, and `@cssproperty` came last 17 against
 2. **`@event` against `@csspart` split 38 to 36, and was decided rather than
 derived**: slots and events are what a consumer writes markup against, parts and
@@ -1541,7 +1541,7 @@ form. Four things follow, and the ones a mixin does not do are the component's.
   consumer can set and never see. Take the mixin for what you render, and reach
   for `ElementInternals` directly for the rest.
 
-  **Nobody is in debt here, measured 17 Sep 2026**: every family that applies
+  **Nobody is in debt here, measured September 17, 2026**: every family that applies
   the mixin renders at least one of its seams. Worth saying because this
   paragraph spent two edits naming families that were never in it. It read
   "three families are not there yet ... of the twenty-two that apply the mixin:
@@ -1699,7 +1699,7 @@ JSX, and why they are gone. They were not dropped:
 `addEventListener('CheckedChange', …)` was called, for an event nothing sends.
 
 **There is one channel per fact, and it is the event.** The four callback
-properties on the controller mixins were removed 19 Aug 2026. They duplicated
+properties on the controller mixins were removed August 19, 2026. They duplicated
 `helix-before-change`, were unreachable from the JSX every React consumer writes, and
 were justified in their own comments by a generated wrapper that had already
 been deleted. A consumer who wrote one now gets a warning naming it, because
@@ -1914,7 +1914,7 @@ The naming, which was never about wrappers:
 
 **A component cannot know the viewport and must not care.** A `@media` rule
 inside a component gives the desktop branch to a 300px sidebar in a 1400px
-window. Measured 25 Aug 2026: the library has exactly one viewport-width media
+window. Measured August 25, 2026: the library has exactly one viewport-width media
 query, Dialog's, which is the defensible one because a modal's box really is the
 viewport. Everything else in here is `@media print` or
 `prefers-reduced-motion`, neither of which is responsiveness.
@@ -1923,7 +1923,7 @@ viewport. Everything else in here is `@media print` or
 
 - **Its own width.** Anything depending on how much room a component was given
   belongs inside it, through `container-type: inline-size` and `@container`.
-  Measured 14 Sep 2026: five families declare `container-type` (Code Block,
+  Measured September 14, 2026: five families declare `container-type` (Code Block,
   Description List, Donut Chart, Notification, Scatter Chart) and four of them
   carry an `@container` rule, each folding a row into a stack below a width of
   its own. Built, then, where a family asked for it, and `data-density` is
@@ -1963,7 +1963,7 @@ viewport. Everything else in here is `@media print` or
   This is the only media feature a component may read.
 
 **What narrow looks like now, measured rather than asserted.** Every styled
-family was rendered at 390 and at 320 on 25 Aug 2026. At 390 the library is
+family was rendered at 390 and at 320 on August 25, 2026. At 390 the library is
 clean. At 320 exactly two families overflowed, Button Group by 26 pixels and
 Pagination by 24, and both are fixed: Button Group gained `orientation` and the
 per-corner Button hooks a stacked group needs to say what it means, and
@@ -2001,7 +2001,7 @@ one of these, and the sheet carries the reason beside it:
 
 **The fifth is a spelling for "nothing to flatten", and it exists because the
 alternative was a lie.** Fifty sheets carried `box-shadow: none` on paper and
-named `box-shadow` nowhere else, measured 14 Sep 2026: a text run, a divider, a
+named `box-shadow` nowhere else, measured September 14, 2026: a text run, a divider, a
 list, each answering the question with a reset of a shadow it never drew, and
 each reading as a family that had thought about paper. `economy` is the
 browser's own answer restated, so it changes nothing on the page or on paper,
@@ -2273,5 +2273,5 @@ wrong is silent both ways.
 declares `true` and `headless` declares `./dist/**/*.js`, which is the same
 answer narrowed to what it ships. `core` declares `false` and means it, shipping
 mixins and controllers that register nothing. This page said `headless` had none
-until 2 Sep 2026, against 116 files calling `@customElement` and a manifest that
+until September 2, 2026, against 116 files calling `@customElement` and a manifest that
 had always been right.

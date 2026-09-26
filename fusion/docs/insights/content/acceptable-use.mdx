@@ -5,7 +5,7 @@ path: /legal/acceptable-use
 title: What you may run here
 ---
 
-Last updated 26 August 2026. This covers `/helix/sandbox` and `/helix/theme`,
+Last updated August 26, 2026. This covers `/helix/sandbox` and `/helix/theme`,
 the two pages that execute code you write. It is short because the architecture
 does most of the work that a policy would otherwise have to do in words.
 

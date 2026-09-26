@@ -119,7 +119,7 @@ refuse it. React restores a native `<input>` whose state did not change, and it
 does not do this for a custom element. A handler that does not call `setState`
 leaves the element with the new value.
 
-*Until 26 Aug 2026, this page described the opposite behavior, and the typings
+*Until August 26, 2026, this page described the opposite behavior, and the typings
 enforced it. Writing `value` made you the owner of the state. The element
 applied no change until you set the value, and `<helix-input value="Ada" />`
 without a handler was a compile error. We removed that mode and its
