@@ -806,3 +806,107 @@ describe('connectMap with a frame that gathers its markers', () => {
     expect(depot?.gathered).toEqual([])
   })
 })
+
+describe('connectMap with a points layer', () => {
+  type Points = HTMLElement & { cluster: boolean; data?: unknown; updateComplete: Promise<boolean> }
+
+  const collecting = (): {
+    driver: MapDriver
+    drawn: MapLayerSpec[][]
+    press: (index: number) => void
+    fitted: string[]
+  } => {
+    const drawn: MapLayerSpec[][] = []
+    const fitted: string[] = []
+    let events: Parameters<NonNullable<MapDriver['layers']>>[1]
+    return {
+      drawn,
+      driver: {
+        fit: (bounds) => {
+          fitted.push(JSON.stringify(bounds))
+        },
+        layers: (read, heard) => {
+          events = heard
+          drawn.push(read())
+          return { stop: () => {}, update: () => drawn.push(read()) }
+        },
+        panBy: () => {},
+        zoomBy: () => {},
+      },
+      fitted,
+      press: (index) => {
+        const id = drawn.at(-1)?.find((one) => one.kind === 'points')?.id ?? ''
+        events?.press(id, index)
+      },
+    }
+  }
+
+  test('points set as data are drawn as one layer, the same array while the data is, and a press says which', async () => {
+    const host = await frame(
+      '<helix-headless-map-points label="Cafés" cluster></helix-headless-map-points>',
+    )
+    const points = host.querySelector('helix-headless-map-points') as Points
+    points.data = [
+      { id: 'a', label: 'Cafe A', lat: 1, lng: 2 },
+      { label: 'Cafe B', lat: 3, lng: 4 },
+    ]
+    await points.updateComplete
+    const { driver, drawn, fitted, press } = collecting()
+    const connection = connectMap(host, driver)
+    const [spec] = drawn.at(-1) ?? []
+    expect([spec?.kind, spec?.cluster, spec?.label, spec?.points]).toEqual([
+      'points',
+      true,
+      'Cafés',
+      [
+        { lat: 1, lng: 2 },
+        { lat: 3, lng: 4 },
+      ],
+    ])
+    points.setAttribute('class', 'retoned')
+    await settle()
+    expect(drawn.at(-1)?.[0]?.points).toBe(spec?.points)
+
+    const said: string[] = []
+    host.addEventListener('helix-activate', (event) => said.push(event.detail.value))
+    press(0)
+    press(1)
+    expect(said).toEqual(['a', 'Cafe B'])
+
+    connection.fit()
+    expect(fitted).toEqual(['{"northEast":{"lat":3,"lng":4},"southWest":{"lat":1,"lng":2}}'])
+  })
+
+  test('points from a file are fetched once and drawn when they arrive', async () => {
+    const asked: string[] = []
+    const was = globalThis.fetch
+    globalThis.fetch = (async (url: string) => {
+      asked.push(url)
+      return new Response(
+        JSON.stringify({
+          features: [
+            {
+              geometry: { coordinates: [2, 1], type: 'Point' },
+              properties: { name: 'Cafe' },
+              type: 'Feature',
+            },
+          ],
+          type: 'FeatureCollection',
+        }),
+      )
+    }) as typeof fetch
+    try {
+      const host = await frame(
+        '<helix-headless-map-points label="Cafés" src="/cafes.geojson"></helix-headless-map-points>',
+      )
+      const { driver, drawn } = collecting()
+      connectMap(host, driver)
+      expect(drawn.at(-1)).toEqual([])
+      await new Promise((done) => setTimeout(done, 10))
+      expect(drawn.at(-1)?.[0]?.points).toEqual([{ lat: 1, lng: 2 }])
+      expect(asked).toEqual(['/cafes.geojson'])
+    } finally {
+      globalThis.fetch = was
+    }
+  })
+})

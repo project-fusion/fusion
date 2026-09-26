@@ -2,7 +2,13 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec'
 import type { MapMotion } from '../motion/motion.js'
-import { geoJson, LAYERS, type MapLibreMap, mapLibreDriver } from './maplibre-driver.js'
+import {
+  geoJson,
+  LAYERS,
+  type MapLibreMap,
+  mapLibreDriver,
+  pointsLayers,
+} from './maplibre-driver.js'
 
 beforeAll(() => {
   registerDom()
@@ -15,8 +21,8 @@ beforeAll(() => {
 const stand = (): {
   asked: string[]
   fire(
-    type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata',
-    event?: { sourceDataType?: string },
+    type: 'click' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    event?: { point?: { x: number; y: number }; sourceDataType?: string },
   ): void
   map: MapLibreMap
   notReady(): void
@@ -25,7 +31,10 @@ const stand = (): {
   styleLayers: { id: string; type: string }[]
 } => {
   const asked: string[] = []
-  const listeners = new Map<string, Set<(event?: { sourceDataType?: string }) => void>>()
+  const listeners = new Map<
+    string,
+    Set<(event?: { point?: { x: number; y: number }; sourceDataType?: string }) => void>
+  >()
   const container = document.createElement('div')
   container.innerHTML = '<div class="maplibregl-ctrl-attrib">MapLibre credit</div>'
   const canvas = document.createElement('canvas')
@@ -98,6 +107,7 @@ const stand = (): {
     },
     // Ten pixels a degree from the origin, which is enough to tell the axes apart.
     project: ([lng, lat]) => ({ x: lng * 10, y: -lat * 10 }),
+    queryRenderedFeatures: () => [],
     removeLayer: (id) => {
       styleLayers.splice(
         styleLayers.findIndex((one) => one.id === id),
@@ -106,6 +116,9 @@ const stand = (): {
     },
     removeSource: (id) => {
       delete sources[id]
+    },
+    setPaintProperty: (layer, name) => {
+      asked.push(`setPaintProperty ${layer} ${name}`)
     },
     setStyle: () => {
       asked.push('setStyle')
@@ -118,8 +131,8 @@ const stand = (): {
     },
   }
   const fire = (
-    type: 'load' | 'move' | 'resize' | 'sourcedata' | 'styledata',
-    event?: { sourceDataType?: string },
+    type: 'click' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    event?: { point?: { x: number; y: number }; sourceDataType?: string },
   ): void => {
     for (const listener of listeners.get(type) ?? []) {
       listener(event)
@@ -352,6 +365,32 @@ describe('mapLibreDriver', () => {
     expect(validateStyleMin(style as never)).toEqual([])
   })
 
+  test('so do a points layer’s, over a clustered source', () => {
+    const spec = {
+      casing: '#ffffff',
+      cluster: true,
+      color: '#0000ff',
+      id: 'p1',
+      ink: '#ffffff',
+      kind: 'points' as const,
+      label: 'Cafés',
+      points: [{ lat: 1, lng: 2 }],
+    }
+    const style = {
+      glyphs: 'https://example.com/{fontstack}/{range}.pbf',
+      layers: pointsLayers('p1', spec, ['Noto Sans Regular']),
+      sources: {
+        'helix-points-p1': {
+          cluster: true,
+          data: { features: [], type: 'FeatureCollection' },
+          type: 'geojson',
+        },
+      },
+      version: 8,
+    }
+    expect(validateStyleMin(style as never)).toEqual([])
+  })
+
   test('fitting is MapLibre’s fitBounds, west-south first, over the page’s motion', () => {
     const { asked, map } = stand()
     mapLibreDriver(map).fit?.(
@@ -360,5 +399,81 @@ describe('mapLibreDriver', () => {
       glide,
     )
     expect(asked).toEqual(['fitBounds [[2,1],[4,3]] 24 250'])
+  })
+
+  test('a points layer is a source of its own, clustered where it asks, over everything the style draws', () => {
+    const { asked, map, sources } = stand()
+    const points = [
+      { lat: 1, lng: 2 },
+      { lat: 3, lng: 4 },
+    ]
+    const spec = {
+      casing: 'rgb(255, 255, 255)',
+      cluster: true,
+      color: 'rgb(0, 0, 255)',
+      id: 'p1',
+      ink: 'rgb(255, 255, 255)',
+      kind: 'points' as const,
+      label: 'Cafés',
+      points,
+    }
+    let color = spec.color
+    const drawn = mapLibreDriver(map).layers?.(() => [{ ...spec, color }])
+    expect(asked.filter((one) => one.startsWith('addLayer helix-points'))).toEqual([
+      'addLayer helix-points-p1-halo before undefined',
+      'addLayer helix-points-p1-clusters before undefined',
+      'addLayer helix-points-p1-count before undefined',
+      'addLayer helix-points-p1-points before undefined',
+    ])
+    expect(sources['helix-points-p1']?.data).toMatchObject({
+      features: [{ geometry: { coordinates: [2, 1] }, properties: { at: 0 } }, {}],
+    })
+    // A new color is painted, and the same points are not sent again.
+    asked.length = 0
+    color = 'rgb(255, 0, 0)'
+    drawn?.update()
+    expect(asked.some((one) => one.startsWith('setData helix-points'))).toBe(false)
+    expect(asked).toContain('setPaintProperty helix-points-p1-points circle-color')
+  })
+
+  test('a point pressed is told to the connector, and a count pressed zooms in to where it comes apart', async () => {
+    const { asked, fire, map, sources } = stand()
+    const pressed: string[] = []
+    const found: ReturnType<MapLibreMap['queryRenderedFeatures']> = []
+    map.queryRenderedFeatures = () => found
+    mapLibreDriver(map).layers?.(
+      () => [
+        {
+          cluster: true,
+          color: 'rgb(0, 0, 255)',
+          id: 'p1',
+          kind: 'points',
+          label: 'Cafés',
+          points: [{ lat: 1, lng: 2 }],
+        },
+      ],
+      { motion: () => null, press: (id, at) => pressed.push(`${id} ${at}`) },
+    )
+    found.push({
+      geometry: { coordinates: [2, 1], type: 'Point' },
+      layer: { id: 'helix-points-p1-points' },
+      properties: { at: 0 },
+    })
+    fire('click', { point: { x: 10, y: 10 } })
+    expect(pressed).toEqual(['p1 0'])
+
+    found.length = 0
+    found.push({
+      geometry: { coordinates: [2, 1], type: 'Point' },
+      layer: { id: 'helix-points-p1-clusters' },
+      properties: { cluster_id: 7 },
+    })
+    ;(
+      sources['helix-points-p1'] as { getClusterExpansionZoom?(id: number): Promise<number> }
+    ).getClusterExpansionZoom = async (id) => (id === 7 ? 14 : 0)
+    fire('click', { point: { x: 10, y: 10 } })
+    await new Promise((done) => setTimeout(done, 0))
+    expect(asked.at(-1)).toBe('jumpTo 2,1 14')
+    expect(pressed).toHaveLength(1)
   })
 })
