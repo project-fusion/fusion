@@ -1,28 +1,26 @@
 ---
-description: Three preference keys, no cookies, no analytics, and nothing that identifies you.
+description: This site keeps three preferences in your browser, and uses no cookies and no analytics.
 kicker: Privacy
 path: /legal/privacy
-title: What this site stores, which is almost nothing
+title: Privacy policy
 ---
 
-Last updated August 26, 2026. This is short because there is little to describe,
-and it describes what the site actually does rather than reserving rights we do
-not exercise.
+Last updated September 26, 2026. This page describes what the site does with
+your data. The site stores very little, so the page is short.
 
-## We collect nothing you type
+## We do not collect what you type
 
-There is no form anywhere on this site. The [contact](/contact) page is a
-`mailto:` link, so writing to us opens your own mail client and the message
-travels from you to us without passing through anything of ours. Nothing you
-type into the site reaches us, because there is no path for it to take.
+The site has no forms. The [contact](/contact) page is a `mailto:` link, so
+writing to us opens your own mail client, and the message goes from you to us
+without passing through our systems. Nothing you type into the site reaches us.
 
-The sandbox is the same story from the other direction: the code you write there
-runs in your browser against an opaque origin and is never sent to a server. See
-the [terms](/legal/terms) for how that is built.
+The same is true of the sandbox. The code you write there runs in your browser
+with an opaque origin, and it is never sent to a server. The
+[terms](/legal/terms) explain how this works.
 
-## Three keys in local storage, all of them preferences
+## Three preferences in local storage
 
-The site writes three values to your browser's local storage:
+The site stores three values in your browser's local storage:
 
 | Key | What it holds |
 | --- | --- |
@@ -30,38 +28,35 @@ The site writes three values to your browser's local storage:
 | `fusion-api-tier` | Whether you prefer the styled or headless API tables |
 | `fusion-sandbox-arrangement` | How you left the sandbox panes arranged |
 
-That is the complete list. None of them identifies you, none is sent anywhere,
-and all three are readable and deletable by you in your browser's developer
-tools. Clearing site data removes them and costs you nothing but the three
-choices.
+That is the complete list. None of the keys identifies you, and none is sent
+anywhere. You can read and delete all three in your browser's developer tools.
+Clearing the site's data removes them, and you lose only these three
+preferences.
 
-**No cookies. No session storage. No analytics.** There is no tracking script on
-this site, first-party or third-party, and no pixel, tag manager, or advertising
-identifier. We do not know how many of you there are.
+**The site uses no cookies, no session storage, and no analytics.** It has no
+tracking script from us or from anyone else, and no pixel, tag manager, or
+advertising identifier. We do not know how many people visit.
 
-## What our host sees
+## What our hosting provider records
 
-The site is served by a hosting provider, and like every web server theirs
-records requests: an IP address, a URL, a user agent, a timestamp. We do not use
-those logs to build a profile and we have not turned on any product that would.
-This is worth stating rather than omitting, because "we collect nothing" would be
-a claim about somebody else's infrastructure that we are not in a position to
-make.
+A hosting provider serves the site. Like every web server, it records each
+request: an IP address, a URL, a user agent, and a timestamp. We do not use
+those logs to build profiles, and we have not turned on any product that would.
+We mention the logs because they exist on infrastructure we do not control.
 
-Fonts are served from this site rather than from a font CDN, so loading a page
-does not tell a third party that you did.
+The site serves its own fonts, so loading a page does not tell a font service
+that you visited.
 
-## Why the policy is this short
+## Why the policy is short
 
-There is almost nothing to describe. Three preference keys in your browser, no
-cookies, no analytics, and nothing that leaves your machine on our account. A
-policy claiming rights over data we do not hold would be longer than this one
-and less true, so it is short enough to check instead.
+The site holds almost no data: three preferences in your browser, no cookies, no
+analytics, and nothing sent from your device on our behalf. A longer policy
+would claim rights over data we do not hold.
 
-If that changes, this page changes with it, and the previous wording stays in the
-repository's history.
+If this changes, this page changes with it, and the previous wording stays in
+the repository's history.
 
-## Reaching us
+## Contact us
 
-Questions, or a request to remove something, go to the address on the
+Send questions, or a request to remove something, to the address on the
 [contact](/contact) page.
