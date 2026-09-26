@@ -1,0 +1,20 @@
+<!-- @summary Thousands of points from one GeoJSON file, drawn and counted by the renderer, and walked from the keyboard where they are in view. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<!-- Preview frame: data-preview-map has the frame connect MapLibre; on your page, connectMap does. -->
+<helix-map
+  data-preview-map
+  label="Food and drink in Austin"
+>
+  <div data-preview-map-canvas></div>
+
+  <helix-map-points
+    cluster
+    description="Every café, bar and restaurant OpenStreetMap has in Austin"
+    label="Food and drink"
+    src="/maps/austin-food-and-drink.geojson"
+  ></helix-map-points>
+</helix-map>
