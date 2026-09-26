@@ -197,9 +197,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
             ))}
           </ol>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            {/* **Said, not hidden**: a reader copying the first line should
-                learn it will not install yet from the page, not from npm. */}
-            <helix-callout tone="info">{started?.body?.[0]}</helix-callout>
             <helix-flex align-items="center" class="siteActions" data-density="lg" gap="lg" wrap>
               <Link data-button="subtle" href="/helix/theme?layout=map">
                 Try it in the theme builder
