@@ -1,9 +1,9 @@
 export function Example() {
   return (
     <helix-input
-      hint="Hint"
-      label="Label"
-      placeholder="Placeholder"
+      hint="Visible to your team"
+      label="Project name"
+      placeholder="Website redesign"
     ></helix-input>
   )
 }

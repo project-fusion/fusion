@@ -33,8 +33,8 @@ export function Example() {
             Install
           </helix-text>
           <helix-text as="p">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+            Install the package with your package manager, then import it once in the entry file of
+            your app before you use it.
           </helix-text>
         </section>
         <section id="requirements">
@@ -45,8 +45,8 @@ export function Example() {
             Requirements
           </helix-text>
           <helix-text as="p">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+            The package needs a current version of Node.js and a browser that supports custom
+            elements and modern JavaScript.
           </helix-text>
         </section>
         <section id="usage">
@@ -57,8 +57,8 @@ export function Example() {
             Usage
           </helix-text>
           <helix-text as="p">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+            Create a client with your API key, then call its methods to read and write the projects,
+            files, and users in your account.
           </helix-text>
         </section>
         <section id="options">
@@ -69,8 +69,8 @@ export function Example() {
             Options
           </helix-text>
           <helix-text as="p">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+            Pass options when you create the client to set the request timeout, the number of
+            retries, and the base URL to use.
           </helix-text>
         </section>
         <section id="api">
@@ -81,8 +81,8 @@ export function Example() {
             API
           </helix-text>
           <helix-text as="p">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+            Each method returns a promise. Errors include a code and a message that you can show to
+            the people who use your app.
           </helix-text>
         </section>
       </div>

@@ -48,8 +48,9 @@
 </dl>
 
 <script>
-  /* Only the elapsed reading is computed; the three absolute ones are pinned in
-     the markup above. The styled twin carries the measurement that decided it. */
+  /* The elapsed time is set from script to 42 minutes ago, so it always reads
+     "42m". The other dates are fixed and name a `time-zone`, so they look the
+     same wherever the preview renders. */
   const at = new Date(Date.now() - 42 * 60_000).toISOString()
   for (const stamp of document.querySelectorAll('.stamp')) {
     stamp.date = at

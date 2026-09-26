@@ -1,9 +1,9 @@
 export function Example() {
   return (
     <helix-blockquote cite="https://example.com/source">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-      labore et dolore magna aliqua.
-      <span slot="attribution">Attribution</span>
+      Our team moved every project into the new workspace in one afternoon. Weekly reports that took
+      a day to prepare now take a few minutes.
+      <span slot="attribution">Maria Lopez, operations manager</span>
     </helix-blockquote>
   )
 }

@@ -8,21 +8,21 @@ export function Example() {
         as="h1"
         variant="display"
       >
-        Heading
+        Account settings
       </helix-text>
       <helix-text
         as="p"
         emphasis="muted"
         variant="subheading"
       >
-        Subheading
+        Profile and preferences
       </helix-text>
       <helix-text
         as="p"
         variant="body"
       >
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-        labore et dolore magna aliqua.
+        Update your name, email address, and time zone. Your name and photo are shown to everyone in
+        your workspace.
       </helix-text>
     </helix-flex>
   )

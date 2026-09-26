@@ -7,13 +7,13 @@ export function Example() {
         command="--show"
         commandfor="base-gallery"
       >
-        Open the gallery
+        Open gallery
       </helix-headless-button>
 
-      {/* Open, so the picture is of a lightbox. */}
+      {/* The lightbox starts open, so the preview shows it. */}
       <helix-headless-lightbox
         id="base-gallery"
-        label="Coastline"
+        label="Beach photos"
         open
       >
         <div slot="header">
@@ -34,7 +34,7 @@ export function Example() {
             alt="Seawater over pale sand"
             src="/media/scale/seawater-800.jpg"
           />
-          <span slot="description">Seawater, shallow enough to read the sand through.</span>
+          <span slot="description">Shallow water at the beach in the morning.</span>
         </helix-headless-lightbox-item>
 
         <helix-headless-lightbox-item
@@ -45,7 +45,7 @@ export function Example() {
             alt="The sun low over open water"
             src="/media/scale/ocean-sun.jpg"
           />
-          <span slot="description">The same coast an hour later.</span>
+          <span slot="description">Sunset over the ocean the same day.</span>
         </helix-headless-lightbox-item>
       </helix-headless-lightbox>
     </>

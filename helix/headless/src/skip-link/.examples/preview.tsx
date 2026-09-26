@@ -21,14 +21,14 @@ export function Example() {
             aria-current="page"
             href="#one"
           >
-            Item One
+            Overview
           </a>
-          <a href="#two">Item Two</a>
+          <a href="#two">Projects</a>
         </nav>
       </header>
 
       <main id="main">
-        <p>The content a keyboard reader came for.</p>
+        <p>Welcome back. You have 3 new messages.</p>
       </main>
     </>
   )

@@ -2,9 +2,11 @@ export function Example() {
   return (
     <helix-text variant="body">
       {' '}
-      Lorem ipsum{' '}
-      <helix-quote cite="https://example.com/source">dolor sit amet, consectetur</helix-quote>{' '}
-      adipiscing elit.{' '}
+      Alex said{' '}
+      <helix-quote cite="https://example.com/source">
+        the report will be ready on Friday
+      </helix-quote>{' '}
+      during the call.{' '}
     </helix-text>
   )
 }

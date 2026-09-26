@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-video
-      label="A short clip"
+      label="Product walkthrough"
       poster="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=960"
       src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"
     ></helix-video>
