@@ -1,4 +1,4 @@
-import type { MapDriver } from '../connect-map/connect-map.js'
+import type { MapDriver, MapLayerSpec } from '../connect-map/connect-map.js'
 import type { MapMotion } from '../motion/motion.js'
 
 /** How Leaflet is told to move: over a time, in seconds, or at once. */
@@ -37,6 +37,13 @@ export interface LeafletMap {
   latLngToContainerPoint(latLng: [number, number]): { x: number; y: number }
   off(type: 'layeradd layerremove' | 'move zoom resize', listener: () => void): unknown
   on(type: 'layeradd layerremove' | 'move zoom resize', listener: () => void): unknown
+  fitBounds(
+    bounds: [[number, number], [number, number]],
+    options?: LeafletAnimation & {
+      paddingBottomRight?: [number, number]
+      paddingTopLeft?: [number, number]
+    },
+  ): unknown
   panBy(offset: [number, number], options?: LeafletAnimation): unknown
   /** Goes to a place, at its zoom or the one it is at. */
   setView(center: [number, number], zoom?: number, options?: LeafletAnimation): unknown
@@ -56,6 +63,37 @@ const animation = (motion: MapMotion | null): LeafletAnimation =>
   motion ? { animate: true, duration: motion.duration / 1000 } : { animate: false }
 
 /**
+ * A drawn shape, as far as the driver handles one: put on the map, and taken
+ * off. `addTo` takes `never` for `addControl`'s reason: Leaflet types it as its
+ * own `Map`, which this package does not import.
+ */
+export interface LeafletShape {
+  addTo(map: never): unknown
+  remove(): unknown
+}
+
+/**
+ * The two constructors a page hands over for routes and areas to be drawn,
+ * which is `L` itself: `leafletDriver(map, L)`. **Passed rather than
+ * imported**, so this package still depends on no renderer.
+ */
+export interface LeafletShapes {
+  polygon(latlngs: [number, number][], options: LeafletShapeOptions): LeafletShape
+  polyline(latlngs: [number, number][], options: LeafletShapeOptions): LeafletShape
+}
+
+/** How a shape is painted, in Leaflet's own words for it. */
+interface LeafletShapeOptions {
+  color: string
+  fillColor?: string
+  fillOpacity?: number
+  interactive: boolean
+  lineCap?: 'round'
+  lineJoin?: 'round'
+  weight: number
+}
+
+/**
  * Drives a Leaflet map from the Map frame.
  *
  * **The credit is the control's prefix and every layer's attribution**, in the
@@ -66,7 +104,7 @@ const animation = (motion: MapMotion | null): LeafletAnimation =>
  * frame draws its own. A zoom step is one level, which is what Leaflet's own
  * buttons take.
  */
-export const leafletDriver = (map: LeafletMap): MapDriver => ({
+export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDriver => ({
   credits(changed) {
     const control = map.attributionControl
     control?.remove()
@@ -91,6 +129,23 @@ export const leafletDriver = (map: LeafletMap): MapDriver => ({
       },
     }
   },
+  fit: ({ northEast, southWest }, padding, motion) => {
+    const inset =
+      typeof padding === 'number'
+        ? { bottom: padding, left: padding, right: padding, top: padding }
+        : padding
+    map.fitBounds(
+      [
+        [southWest.lat, southWest.lng],
+        [northEast.lat, northEast.lng],
+      ],
+      {
+        ...animation(motion),
+        paddingBottomRight: [inset.right, inset.bottom],
+        paddingTopLeft: [inset.left, inset.top],
+      },
+    )
+  },
   focusTarget: () => map.getContainer(),
   onView: (moved) => {
     map.on('move zoom resize', moved)
@@ -98,6 +153,55 @@ export const leafletDriver = (map: LeafletMap): MapDriver => ({
       map.off('move zoom resize', moved)
     }
   },
+  /* **Only where the page handed Leaflet over**, as `leafletDriver(map, L)`:
+     this package imports no renderer, and a Leaflet shape is made by Leaflet.
+     Without it the routes and areas are still named in the frame's list, and
+     only not drawn. Leaflet's tiles are pictures rather than a style, so
+     nothing replaces its shapes behind its back, and they are drawn again only
+     when the connector says one changed. */
+  ...(shapes
+    ? {
+        layers: (read: () => MapLayerSpec[]) => {
+          let drawn: LeafletShape[] = []
+          const draw = (): void => {
+            for (const shape of drawn) {
+              shape.remove()
+            }
+            drawn = read().map((layer) => {
+              const latlngs = layer.points.map(({ lat, lng }): [number, number] => [lat, lng])
+              const shape =
+                layer.kind === 'route'
+                  ? shapes.polyline(latlngs, {
+                      color: layer.color,
+                      interactive: false,
+                      lineCap: 'round',
+                      lineJoin: 'round',
+                      weight: 4,
+                    })
+                  : shapes.polygon(latlngs, {
+                      color: layer.color,
+                      fillColor: layer.color,
+                      fillOpacity: 0.16,
+                      interactive: false,
+                      weight: 1.5,
+                    })
+              shape.addTo(map as never)
+              return shape
+            })
+          }
+          draw()
+          return {
+            stop: () => {
+              for (const shape of drawn) {
+                shape.remove()
+              }
+              drawn = []
+            },
+            update: draw,
+          }
+        },
+      }
+    : {}),
   panBy: (x, y, motion) => {
     map.panBy([x, y], animation(motion))
   },

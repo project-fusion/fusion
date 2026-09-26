@@ -1,7 +1,7 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { MapMotion } from '../motion/motion.js'
-import type { MapDriver } from './connect-map.js'
+import type { MapDriver, MapLayerSpec } from './connect-map.js'
 
 /* Imported after the DOM is registered, like the elements: the connector
    reaches `@fusion.dev/helix-core`, which evaluates Lit, and Lit's element
@@ -397,5 +397,108 @@ describe('connectMap with markers', () => {
     expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('')
     moved()
     expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('')
+  })
+})
+
+describe('connectMap with routes and areas', () => {
+  /** A driver that keeps what it was asked to draw, and when. */
+  const layering = (): {
+    driver: MapDriver
+    drawn: MapLayerSpec[][]
+    fitted: string[]
+    stopped: boolean[]
+  } => {
+    const drawn: MapLayerSpec[][] = []
+    const fitted: string[] = []
+    const stopped: boolean[] = []
+    const driver: MapDriver = {
+      fit: (bounds, padding, motion) => {
+        fitted.push(`${JSON.stringify(bounds)} ${JSON.stringify(padding)} ${paced(motion)}`)
+      },
+      layers: (read) => {
+        drawn.push(read())
+        return {
+          stop: () => {
+            stopped.push(true)
+          },
+          update: () => {
+            drawn.push(read())
+          },
+        }
+      },
+      panBy: () => {},
+      zoomBy: () => {},
+    }
+    return { drawn, driver, fitted, stopped }
+  }
+
+  test('each route and area reaches the driver as its kind, its points and its name, and one too short to draw does not', async () => {
+    const host = await frame(
+      `<helix-headless-map-route label="Depot to Mission" points="1,2 3,4"></helix-headless-map-route>
+       <helix-headless-map-area label="Zone" points="0,0 0,1 1,1"></helix-headless-map-area>
+       <helix-headless-map-route label="Half written" points="5,5"></helix-headless-map-route>`,
+    )
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    expect(drawn[0]?.map(({ kind, label, points }) => ({ kind, label, points }))).toEqual([
+      {
+        kind: 'route',
+        label: 'Depot to Mission',
+        points: [
+          { lat: 1, lng: 2 },
+          { lat: 3, lng: 4 },
+        ],
+      },
+      {
+        kind: 'area',
+        label: 'Zone',
+        points: [
+          { lat: 0, lng: 0 },
+          { lat: 0, lng: 1 },
+          { lat: 1, lng: 1 },
+        ],
+      },
+    ])
+    expect(typeof drawn[0]?.[0]?.color).toBe('string')
+  })
+
+  test('a route moved, retoned or added is drawn again, under the same id, and disconnecting takes them off', async () => {
+    const host = await frame(
+      '<helix-headless-map-route label="R" points="1,2 3,4"></helix-headless-map-route>',
+    )
+    const { driver, drawn, stopped } = layering()
+    const connection = connectMap(host, driver)
+    const route = host.querySelector('helix-headless-map-route') as HTMLElement
+    route.setAttribute('points', '1,2 3,4 5,6')
+    await settle()
+    route.setAttribute('tone', 'danger')
+    await settle()
+    host.insertAdjacentHTML(
+      'beforeend',
+      '<helix-headless-map-area label="Z" points="0,0 0,1 1,1"></helix-headless-map-area>',
+    )
+    await settle()
+    // Drawn at first, again for the move and the tone, and again once the area arrived.
+    expect(drawn.slice(0, 3).map((set) => set.length)).toEqual([1, 1, 1])
+    expect(drawn.at(-1)?.map((one) => one.kind)).toEqual(['route', 'area'])
+    expect(drawn[1]?.[0]?.points).toHaveLength(3)
+    expect(new Set(drawn.map((set) => set[0]?.id)).size).toBe(1)
+    connection.disconnect()
+    expect(stopped).toEqual([true])
+  })
+
+  test('fitting frames every marker and every point of every route and area, at the pace of a trip', async () => {
+    const host = await frame(
+      `<helix-headless-map-marker label="Depot" lat="-1" lng="10"></helix-headless-map-marker>
+       <helix-headless-map-route label="R" points="1,2 3,4"></helix-headless-map-route>`,
+    )
+    const { driver, fitted } = layering()
+    const connection = connectMap(host, driver)
+    connection.fit()
+    connection.fit({ padding: 12 })
+    expect(fitted).toEqual([
+      '{"northEast":{"lat":3,"lng":10},"southWest":{"lat":-1,"lng":2}} 48 320ms',
+      '{"northEast":{"lat":3,"lng":10},"southWest":{"lat":-1,"lng":2}} 12 320ms',
+    ])
   })
 })

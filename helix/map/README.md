@@ -69,6 +69,32 @@ a reader walking the places never lands on one they cannot see. Pressing one
 sends `helix-activate` from the frame with its `name`, or its `label` where it
 has none, and what happens then is the page's.
 
+## Routes and areas
+
+```html
+<helix-map label="Deliveries today">
+  <div id="map"></div>
+  <helix-map-route label="Depot to Mission" description="4 stops" points="37.7955,-122.3937 37.7644,-122.427"></helix-map-route>
+  <helix-map-area label="Delivery zone" tone="info" points="37.80,-122.44 37.80,-122.39 37.75,-122.39 37.75,-122.44"></helix-map-area>
+</helix-map>
+```
+
+`points` are `lat,lng` pairs, in the order a marker's own `lat` and `lng` read.
+**The renderer draws them, under its place names**, which a page drawing its
+own canvas over the map could not do: the connector reads each one's points and
+its color, the brand or its `tone`, and hands them to the driver as the
+renderer's own layers. A MapLibre style replaced by a theme change takes them
+with it, and they come back drawn in the new theme. Leaflet draws them where the
+page hands Leaflet over, `leafletDriver(map, L)`, since this package imports no
+renderer.
+
+**The frame names them in a list**, off the screen and in the accessibility
+tree, since a line in a canvas is nothing to a screen reader: each one's `label`
+and `description`, under the frame's `layers-label`.
+
+`connection.fit()` frames every marker and every point of every route and area,
+at the page's pace for a trip.
+
 ## A style in the page's theme
 
 ```js
@@ -123,7 +149,9 @@ A driver of your own is an object with `panBy(x, y, motion)` in pixels and
 or `null` for a jump, and optionally `silenceKeyboard`, `focusTarget`,
 `replaceZoom` and `credits`: see `MapDriver`. Markers need three more:
 `project(place)` to a point in the map's container, `onView(moved)` to hear the
-view change, and `show(place, motion)` to bring a place into view. `motionOf`
+view change, and `show(place, motion)` to bring a place into view. Routes and
+areas need `layers(read)`, and `connection.fit()` needs `fit(bounds, padding,
+motion)`. `motionOf`
 reads the same motion for a move a page makes itself. A driver
 without `project` leaves its markers hidden.
 
