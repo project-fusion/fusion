@@ -83,9 +83,9 @@ import '@fusion.dev/helix/button'
 import '@fusion.dev/helix/dialog'
 ```
 
-Subpaths are useful when you use a few components. Their purpose is to make
-your imports explicit. The package has side effects by design, so a bundler
-keeps what you import either way.
+Import from subpaths when you use a few components. The package has side
+effects by design, so a bundler keeps everything you import. The whole-package
+import registers every element, and a subpath registers only its family.
 
 ## Check the installation
 
@@ -125,7 +125,7 @@ Frameworks differ in three ways:
 | [Svelte](./svelte) | Ships `svelte.d.ts`, and needs no configuration |
 | [Angular](./angular) | Needs `CUSTOM_ELEMENTS_SCHEMA` |
 | [Other frameworks](./other-frameworks) | Solid, Qwik, Lit, and the three rules they all follow |
-| [Without a bundler](./without-a-bundler) | An import map, or the stylesheets alone |
+| [Without a bundler](./without-a-bundler) | The stylesheets with no build step |
 
 A framework has its own page when Helix ships typings for it, or when it does
 not compile Helix tags without configuration. Other frameworks work with no
