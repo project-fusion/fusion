@@ -4,6 +4,7 @@ import type { HelixInput } from '@fusion.dev/helix'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useRef, useState } from 'react'
+import { plainText } from '@/components/code-text/code-text'
 import { FilterBar, filterBar } from '@/components/filter-bar/filter-bar'
 import { GridBand } from '@/components/grid-band/grid-band'
 import { HeroField } from '@/components/hero-field/hero-field'
@@ -162,7 +163,7 @@ export function ComponentBrowser({
       }
       /* Aliases are in the haystack because they are the whole reason the
          manifest carries them: someone looking for "dropdown" wants Select. */
-      return [family.label, family.summary, family.slug, ...family.aliases]
+      return [family.label, plainText(family.summary), family.slug, ...family.aliases]
         .join(' ')
         .toLowerCase()
         .includes(needle)

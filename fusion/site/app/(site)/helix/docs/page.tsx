@@ -1,5 +1,6 @@
 import { navigation } from '@fusion.dev/helix-docs'
 import Link from 'next/link'
+import { CodeText } from '@/components/code-text/code-text'
 import { docsShell } from '@/components/docs-shell/docs-shell'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import styles from './page.module.css'
@@ -55,7 +56,7 @@ export default function DocsIndex() {
                   {page.title}
                 </helix-text>
                 <helix-text as="span" class={styles.summary} variant="caption">
-                  {page.description}
+                  <CodeText>{page.description}</CodeText>
                 </helix-text>
               </Link>
             ))}
