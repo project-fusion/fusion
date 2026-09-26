@@ -175,9 +175,15 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * holds a value and the wrong one for a palette: nothing here changed, a
    * command ran. It is stopped and re-announced rather than relayed, so a
    * consumer hears one event naming the element they put on the page.
+   *
+   * **And refused, so the list keeps no answer.** A listbox holding what was
+   * chosen hears the same row chosen again as no change and says nothing, so
+   * the command a reader ran last, which on a site is the page they are on,
+   * could not be run again: Enter did nothing and the palette stayed open.
    */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
+    event.preventDefault()
     const { value } = (event as HelixBeforeChangeEvent).detail
     if (!this.dispatchEvent(new HelixSelectEvent({ value }))) {
       return
