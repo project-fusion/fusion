@@ -193,3 +193,16 @@ fieldset.mapsControl {
     justify-self: start;
   }
 }
+
+/* **The stops in the walker's ink**, rings of it around the surface, so they
+   read as stops on the route rather than as more of it, which a stop in the
+   brand did on a route in the brand. The same ink the live position is drawn
+   in, a step short of the page's foreground, which is black or white outright
+   and read as a hole in the map. */
+.mapsStop {
+  --map-marker-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 84%,
+    var(--helix-color-surface)
+  );
+}
