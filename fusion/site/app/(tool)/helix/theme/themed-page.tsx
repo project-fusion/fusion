@@ -780,6 +780,24 @@ function MapPage(context: Context) {
             slightly different gray. */}
         <helix-map className="themedMapFrame" data-preview-map label={map.label} material="glass">
           <div className="themedMapCanvas" data-preview-map-canvas></div>
+          {/* **The rows that are journeys, drawn as the renderer's own lines**
+              in the rows' tones, under the place names, and named in the
+              frame's list for a reader who cannot see them. */}
+          {map.places.map((place) =>
+            place.route ? (
+              <helix-map-route
+                description={place.status}
+                key={`route-${place.label}`}
+                label={`${place.route.from.charAt(0).toUpperCase()}${place.route.from.slice(1)} to ${place.label}`}
+                /* The attribute's own syntax rather than the array the
+                   property takes: this page is rendered to a string, where
+                   React writes an attribute only for a string and drops an
+                   array without a word. */
+                points={`${place.route.lat},${place.route.lng} ${place.lat},${place.lng}` as never}
+                tone={place.state}
+              ></helix-map-route>
+            ) : null,
+          )}
           {map.places.map((place) => (
             <helix-map-marker
               key={place.label}
