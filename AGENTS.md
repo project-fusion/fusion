@@ -15,6 +15,10 @@ for `helix/**`, [cortex/CONVENTIONS.md](cortex/CONVENTIONS.md) for `cortex/**`. 
   system, intelligent tooling and intelligent services, built on one substrate
   rather than bolted onto three.
 - **Voice:** plural ("we"), engineer-targeted, spare. No marketing bombast.
+  Everything a user reads follows [VOICE.md](VOICE.md): say what a thing is
+  and does, no "X, not Y" framing, literal headlines, no accessibility or other
+  baseline as a selling point, labels that name their object, "you" for the
+  reader, no contractions. New code comments follow it too.
 - **Stage labels are honest.** Active ships with users. Building is real work,
   nothing shipped. Declared is committed direction, no work started. Never
   soften them.
