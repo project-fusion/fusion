@@ -44,6 +44,18 @@ const PLACES = [
   { label: 'Barton Springs Pool', lat: 30.26384, lng: -97.77014 },
 ] as const
 
+/**
+ * **Two places at one address**, off the walk: the hotel and the café inside
+ * it, both 604 Brazos Street. OpenStreetMap draws the café a few meters into
+ * the building, and an address search stands everything at an address on one
+ * point, so they stand on the hotel's, which is the case no zoom draws apart:
+ * their cluster fans them out when pressed.
+ */
+const SHARED = [
+  { label: 'The Driskill', lat: 30.26811, lng: -97.74172 },
+  { label: '1886 Café & Bakery', lat: 30.26811, lng: -97.74172 },
+] as const
+
 type Mode = 'site' | 'light' | 'dark'
 
 /** The brand choice that is a whole theme from the builder rather than a color. */
@@ -308,13 +320,16 @@ export function MapsHero({
          curve, and a jump where the reader asked for less motion or the
          theme's durations are zero. */
       const visit = (event: HelixActivateEvent): void => {
-        const place = PLACES.find((one) => one.label === event.detail.value)
+        const place = [...PLACES, ...SHARED].find((one) => one.label === event.detail.value)
         if (place) {
           const motion = motionOf(host, 'travel')
+          /* A place fanned from its address is centered at the zoom it is
+             at, which keeps the fan open: a new zoom would fold it. */
+          const shared = SHARED.some((one) => one.label === place.label)
           map.easeTo({
             center: [place.lng, place.lat],
             padding: clearOf(box, panel.current),
-            zoom: 15,
+            ...(shared ? {} : { zoom: 15 }),
             ...(motion ? { duration: motion.duration, easing: motion.easing } : { duration: 0 }),
           })
         }
@@ -477,6 +492,13 @@ export function MapsHero({
             </helix-map-marker>
           )
         })}
+        {/* **Off the walk, and at one address**: after the walk in the
+            keyboard's order, and bare points in the brand, since they are
+            not stops on it. Gathered into one at every zoom, and fanned out
+            round their door when that is pressed. */}
+        {SHARED.map((place) => (
+          <helix-map-marker key={place.label} label={place.label} lat={place.lat} lng={place.lng} />
+        ))}
       </helix-map>
       <div className={styles.mapsPanel} ref={panel}>
         <helix-flex align-items="center" data-density="sm" gap="xs">
