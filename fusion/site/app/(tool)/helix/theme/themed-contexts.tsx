@@ -1,3 +1,5 @@
+import { DRIVES, type Path } from '../../../../content/maps/routes'
+
 /**
  * The words one preview says, which is every string on the page that belongs to
  * a company rather than to a browser.
@@ -101,7 +103,17 @@ export interface Context {
        * tone: the lane from its port, the order from the mill. Absent where
        * a row is a place rather than a journey.
        */
-      route?: { from: string; lat: number; lng: number }
+      route?: {
+        from: string
+        lat: number
+        lng: number
+        /**
+         * The way it goes, where it does not go straight: the lanes through
+         * the straits a ship takes, and the roads a van does. The start and
+         * the place where it is absent.
+         */
+        path?: Path
+      }
       state: State
       status: string
     }[]
@@ -266,7 +278,17 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Felixstowe',
           lat: 51.9643,
           lng: 1.329,
-          route: { from: 'Rotterdam', lat: 51.9244, lng: 4.4778 },
+          route: {
+            from: 'Rotterdam',
+            lat: 51.9244,
+            lng: 4.4778,
+            path: [
+              [51.9244, 4.4778],
+              [51.98, 4.05],
+              [51.95, 1.9],
+              [51.9643, 1.329],
+            ],
+          },
           state: 'success',
           status: 'On time',
         },
@@ -275,7 +297,20 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Genoa',
           lat: 44.4073,
           lng: 8.9339,
-          route: { from: 'Algeciras', lat: 36.1312, lng: -5.4474 },
+          route: {
+            from: 'Algeciras',
+            lat: 36.1312,
+            lng: -5.4474,
+            path: [
+              [36.1312, -5.4474],
+              [36.0, -4.5],
+              [36.6, -2.0],
+              [38.6, 0.8],
+              [41.0969, 3.1814],
+              [43.2, 7.0],
+              [44.4073, 8.9339],
+            ],
+          },
           state: 'warning',
           status: 'Delayed 40m',
         },
@@ -284,7 +319,23 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Aarhus',
           lat: 56.1496,
           lng: 10.2134,
-          route: { from: 'Gdańsk', lat: 54.4288, lng: 18.7983 },
+          route: {
+            from: 'Gdańsk',
+            lat: 54.4288,
+            lng: 18.7983,
+            path: [
+              [54.4288, 18.7983],
+              [54.75, 19.1],
+              [55.0, 17.0],
+              [54.8, 14.5],
+              [55.25, 12.7],
+              [55.62, 12.75],
+              [56.05, 12.65],
+              [56.3, 11.5],
+              [55.95, 10.75],
+              [56.1496, 10.2134],
+            ],
+          },
           state: 'danger',
           status: 'Missed window',
         },
@@ -293,7 +344,19 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Cork',
           lat: 51.8985,
           lng: -8.4726,
-          route: { from: 'Bilbao', lat: 43.263, lng: -2.935 },
+          route: {
+            from: 'Bilbao',
+            lat: 43.263,
+            lng: -2.935,
+            path: [
+              [43.263, -2.935],
+              [43.6, -3.2],
+              [45.5, -6.0],
+              [48.3, -6.2],
+              [50.5, -7.2],
+              [51.8985, -8.4726],
+            ],
+          },
           state: 'success',
           status: 'On time',
         },
@@ -301,7 +364,7 @@ export const CONTEXTS: readonly Context[] = [
       position: {
         accuracy: 8000,
         description: 'Forty minutes behind its window at Genoa',
-        heading: 50,
+        heading: 52,
         label: 'Corvina, Algeciras to Genoa',
         lat: 41.0969,
         lng: 3.1814,
@@ -640,7 +703,12 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Edinburgh',
           lat: 55.9533,
           lng: -3.1884,
-          route: { from: 'the mill in Huddersfield', lat: 53.6467, lng: -1.7822 },
+          route: {
+            from: 'the mill in Huddersfield',
+            lat: 53.6467,
+            lng: -1.7822,
+            path: DRIVES['storefront:Edinburgh'],
+          },
           state: 'success',
           status: 'Packed',
         },
@@ -649,7 +717,12 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Bristol',
           lat: 51.443,
           lng: -2.5817,
-          route: { from: 'the mill in Huddersfield', lat: 53.6467, lng: -1.7822 },
+          route: {
+            from: 'the mill in Huddersfield',
+            lat: 53.6467,
+            lng: -1.7822,
+            path: DRIVES['storefront:Bristol'],
+          },
           state: 'warning',
           status: 'Waiting on yarn',
         },
@@ -658,7 +731,12 @@ export const CONTEXTS: readonly Context[] = [
           label: 'Manchester',
           lat: 53.4425,
           lng: -2.2325,
-          route: { from: 'the mill in Huddersfield', lat: 53.6467, lng: -1.7822 },
+          route: {
+            from: 'the mill in Huddersfield',
+            lat: 53.6467,
+            lng: -1.7822,
+            path: DRIVES['storefront:Manchester'],
+          },
           state: 'danger',
           status: 'Return opened',
         },
@@ -667,7 +745,12 @@ export const CONTEXTS: readonly Context[] = [
           label: 'London',
           lat: 51.5074,
           lng: -0.1278,
-          route: { from: 'the mill in Huddersfield', lat: 53.6467, lng: -1.7822 },
+          route: {
+            from: 'the mill in Huddersfield',
+            lat: 53.6467,
+            lng: -1.7822,
+            path: DRIVES['storefront:London'],
+          },
           state: 'success',
           status: 'Packed',
         },
@@ -826,7 +909,12 @@ export const CONTEXTS: readonly Context[] = [
           label: 'The first place',
           lat: 38.7078,
           lng: -9.1366,
-          route: { from: 'the hub', lat: 50.1106, lng: 8.6821 },
+          route: {
+            from: 'the hub',
+            lat: 50.1106,
+            lng: 8.6821,
+            path: DRIVES['generic:The first place'],
+          },
           state: 'success',
           status: 'Success',
         },
@@ -835,7 +923,12 @@ export const CONTEXTS: readonly Context[] = [
           label: 'The second place',
           lat: 48.8535,
           lng: 2.3484,
-          route: { from: 'the hub', lat: 50.1106, lng: 8.6821 },
+          route: {
+            from: 'the hub',
+            lat: 50.1106,
+            lng: 8.6821,
+            path: DRIVES['generic:The second place'],
+          },
           state: 'warning',
           status: 'Warning',
         },
@@ -844,7 +937,12 @@ export const CONTEXTS: readonly Context[] = [
           label: 'The third place',
           lat: 48.2084,
           lng: 16.3725,
-          route: { from: 'the hub', lat: 50.1106, lng: 8.6821 },
+          route: {
+            from: 'the hub',
+            lat: 50.1106,
+            lng: 8.6821,
+            path: DRIVES['generic:The third place'],
+          },
           state: 'danger',
           status: 'Danger',
         },
@@ -853,7 +951,12 @@ export const CONTEXTS: readonly Context[] = [
           label: 'The fourth place',
           lat: 55.6867,
           lng: 12.5701,
-          route: { from: 'the hub', lat: 50.1106, lng: 8.6821 },
+          route: {
+            from: 'the hub',
+            lat: 50.1106,
+            lng: 8.6821,
+            path: DRIVES['generic:The fourth place'],
+          },
           state: 'success',
           status: 'Success',
         },
@@ -861,7 +964,7 @@ export const CONTEXTS: readonly Context[] = [
       position: {
         accuracy: 8000,
         description: 'A description, spoken as it changes',
-        heading: 50,
+        heading: 52,
         label: 'A position',
         lat: 41.0969,
         lng: 3.1814,
