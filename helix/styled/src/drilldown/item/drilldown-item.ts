@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './drilldown-item.css.js'
 
 /**
- * @summary One row of a drill-down, which may hold a page of its own.
+ * @summary One row of a drill-down, which can open a page of its own.
  *
  * @description
  * A row is a full-width band rather than an inset pill, for the reason the

@@ -186,7 +186,7 @@ const size = (element: HTMLElement, name: string, value: number): void => {
 }
 
 /**
- * @summary A board of cards and the connections between them, which a reader can walk, rearrange and connect.
+ * @summary A board of cards and the connections between them, which can be navigated, rearranged, and connected.
  *
  * @description
  * **The first of these surfaces Helix draws itself**, and the reason is where
@@ -253,69 +253,68 @@ const size = (element: HTMLElement, name: string, value: number): void => {
  * @aliases Board, JSON Canvas, Whiteboard
  * @documentation https://fusion.dev/helix/components/canvas
  *
- * @slot empty - What to show where the document has no nodes.
- * @slot footer - Chrome below the board.
- * @slot header - Chrome above the board.
+ * @slot empty - Content shown when the document has no nodes.
+ * @slot footer - Content below the board.
+ * @slot header - Content above the board.
  *
- * @event {HelixBeforeMoveEvent} helix-before-move - Cards are about to move. Refuse it to keep the positions in your own state.
- * @event {HelixBeforeReconnectEvent} helix-before-reconnect - A connection's end is about to move to another card or side. Refuse it to keep connections in your own state.
- * @event {HelixBeforeRelabelEvent} helix-before-relabel - A connection's label or a group's name is about to change. Refuse it to keep labels in your own state.
- * @event {HelixCanvasEditEvent} helix-canvas-edit - The reader asked to edit a card: a double-click, or Enter or F2. Open your own editor for it.
- * @event {HelixCanvasPanEvent} helix-canvas-pan - The board was moved a step, by its controls or the arrow keys: a fact rather than a request. A drag says so through `helix-canvas-view`.
- * @event {HelixCanvasViewEvent} helix-canvas-view - Where the board is looking changed, however it changed. The detail is the new view.
- * @event {HelixCanvasZoomEvent} helix-canvas-zoom - The board zoomed a step, by its controls or the keys. A wheel or a pinch says so through `helix-canvas-view`.
- * @event {HelixConnectEvent} helix-connect - A reader asked for two cards to be joined. Add the `helix-canvas-edge` to do it.
- * @event {HelixMoveEvent} helix-move - Cards moved and the move is finished: a drag let go, a click that put a card down, or a key pressed.
+ * @event {HelixBeforeMoveEvent} helix-before-move - Cards are about to move. Cancelable: cancel it to keep the positions in your own state.
+ * @event {HelixBeforeReconnectEvent} helix-before-reconnect - A connection's end is about to move to another card or side. Cancelable: cancel it to keep connections in your own state.
+ * @event {HelixBeforeRelabelEvent} helix-before-relabel - A connection's label or a group's name is about to change. Cancelable: cancel it to keep labels in your own state.
+ * @event {HelixCanvasEditEvent} helix-canvas-edit - A card was double-clicked, or Enter or F2 was pressed on it. Open your own editor for the card.
+ * @event {HelixCanvasPanEvent} helix-canvas-pan - The board moved one step, from its controls or the arrow keys. A drag sends `helix-canvas-view`.
+ * @event {HelixCanvasViewEvent} helix-canvas-view - The board's view changed, by any means. The detail is the new view.
+ * @event {HelixCanvasZoomEvent} helix-canvas-zoom - The board zoomed one step, from its controls or the keys. A wheel or a pinch sends `helix-canvas-view`.
+ * @event {HelixConnectEvent} helix-connect - Two cards were chosen to be joined. Add a `helix-canvas-edge` to join them.
+ * @event {HelixMoveEvent} helix-move - Cards moved and the move is finished: a drag was released, a click put a card down, or a key was pressed.
  * @event {HelixReconnectEvent} helix-reconnect - A connection's end moved, and the move is finished.
  * @event {HelixRelabelEvent} helix-relabel - A connection's label or a group's name changed.
- * @event {HelixRemoveEvent} helix-remove - A reader asked for cards or connections to go. Remove the elements it names.
- * @event {HelixSelectEvent} helix-select - The selection changed. The detail's `value` is the names, comma separated, empty for none. Cancelable: refusing it keeps the selection where it was.
+ * @event {HelixRemoveEvent} helix-remove - Cards or connections were chosen for removal. Remove the elements it names.
+ * @event {HelixSelectEvent} helix-select - The selection changed. The detail's `value` is the names, comma separated, empty for none. Cancelable: canceling it keeps the selection as it was.
  *
- * @csspart arrow - The head an edge carries at an end that has one.
- * @csspart board - The plane the cards are placed on, which is what pans and zooms.
+ * @csspart arrow - The arrowhead at an end of a connection that has one.
+ * @csspart board - The plane the cards are placed on, which pans and zooms.
  * @csspart controls - The group the pan and zoom buttons sit in.
- * @csspart draft - The connection being drawn, before it is asked for.
+ * @csspart draft - The connection being drawn, before `helix-connect` is sent.
  * @csspart edge - One connector between two cards.
- * @csspart edge-end - An end of a selected connection, which a press picks up, a click as well as a drag.
- * @csspart edge-target - The wider, unpainted line over a connector that a reader focuses and presses.
+ * @csspart edge-end - An end of a selected connection. Drag it, or click it to pick it up.
+ * @csspart edge-target - A wider, invisible line over a connection, which receives focus and presses.
  * @csspart edges - The layer the connectors are drawn in.
  * @csspart footer - The strip below the board.
- * @csspart fullscreen - The button that fills the screen.
+ * @csspart fullscreen - The button that makes the board fill the screen.
  * @csspart header - The strip above the board.
  * @csspart label - The label on a connector.
- * @csspart label-editor - The field a connection's label or a group's name is edited in, where it sits.
- * @csspart live - What the board says while a connection is being made, for a screen reader.
+ * @csspart label-editor - The field for editing a connection's label or a group's name, placed over that text.
+ * @csspart live - A live region that screen readers announce while a connection is being made.
  * @csspart marquee - The box a Shift-drag across the empty board draws, which selects the cards it touches.
  * @csspart pan-down - The button that moves the board down.
- * @csspart pan-end - The button that moves the board the way the text ends.
- * @csspart pan-start - The button that moves the board the way the text starts.
+ * @csspart pan-end - The button that moves the board toward the end of a line of text: right in English.
+ * @csspart pan-start - The button that moves the board toward the start of a line of text: left in English.
  * @csspart pan-up - The button that moves the board up.
  * @csspart region - The named region the board is drawn in.
  * @csspart viewport - The box the board is drawn inside.
  * @csspart zoom-in - The button that zooms in.
  * @csspart zoom-out - The button that zooms out.
  *
- * @cssstate connecting - While a reader is drawing a connection.
- * @cssstate direct - While the board moves without easing: under the reader's hand, or settling into its box.
+ * @cssstate connecting - While you draw a connection.
+ * @cssstate direct - The board moves without easing, while you drag it or while it settles into its box.
  * @cssstate empty - While the document has no nodes.
  * @cssstate fullscreen - While the board fills the screen.
- * @cssstate holding - While something a click picked up follows the pointer, until the next press puts it down.
- * @cssstate idle - While the reader has been still long enough to hide the chrome.
+ * @cssstate holding - An item picked up with a click follows the pointer until the next press puts it down.
+ * @cssstate idle - The user has been still long enough for the controls to hide.
  * @cssstate pressing - While a press on the board, its cards or its connections is under way.
  */
 @customElement('helix-headless-canvas')
 export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
-  /** How a card says where its connections come from, with `{cards}`. */
+  /** The text read with a card to say where its connections come from, with `{cards}`. */
   @property({ attribute: 'comes-from-label' })
   comesFromLabel = 'from {cards}'
 
-  /** What it says when a connection is asked for, with `{from}` and `{to}`. */
+  /** The text announced when a connection is requested, with `{from}` and `{to}`. */
   @property({ attribute: 'connected-label' })
   connectedLabel = 'Asked to connect {from} to {to}.'
 
   /**
-   * What the live region says when a reader starts a connection, with `{from}`
-   * filled in.
+   * The text announced when a connection is started, with `{from}` filled in.
    *
    * **Every sentence this board speaks is a property**, the rule the pan
    * controls already kept with `pan-up-label` and its three: a board on a page in another
@@ -326,7 +325,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     'Connecting from {from}. Move to another card and press Enter, or Escape to stop.'
 
   /**
-   * What a connection is called, with `{from}` and `{to}`.
+   * The accessible name of a connection, with `{from}` and `{to}`.
    *
    * Its own label, where it has one, is its description rather than part of
    * this, so a reader hears the ends first and what the line says after.
@@ -335,7 +334,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   connectionLabel = 'From {from} to {to}'
 
   /**
-   * Accessible name for the board, which is the one thing a consumer must write.
+   * The accessible name for the board. Required.
    *
    * A document has no name of its own in the format, and "Canvas" names the
    * widget rather than the thinking on it.
@@ -344,14 +343,15 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   label = ''
 
   /**
-   * What the field a label is edited in is called, with `{name}` for what it
-   * labels.
+   * The accessible name of the field for editing a label, with `{name}` for what
+   * the label belongs to.
    */
   @property({ attribute: 'label-editor-label' })
   labelEditorLabel = 'Label for {name}'
 
   /**
-   * How a card says where its connections go, with `{cards}` as the list.
+   * The text read with a card to say where its connections go, with `{cards}`
+   * as the list.
    *
    * The list is joined the way the page's language joins one, "Second and
    * Third", rather than with a comma this component chose.
@@ -360,7 +360,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   leadsToLabel = 'leads to {cards}'
 
   /**
-   * The order a reader meets the cards in.
+   * The order the arrow keys and screen readers move through the cards:
+   * `spatial` or `edges`.
    *
    * `spatial` bands them into rows and reads each row across, which is how a
    * person reads a board laid out on a grid and is a heuristic a loose board
@@ -374,8 +375,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   order?: 'spatial' | 'edges'
 
   /**
-   * How every connection travels, where it does not say: `straight`, or `step`
-   * for right angles.
+   * The route every connection takes when it sets no `path` of its own:
+   * `straight`, or `step` for right angles.
    *
    * Absent is a curve. A flowchart wants `step` on all of its edges, and
    * writing it once here rather than on each is the reason this exists; an
@@ -385,7 +386,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   path?: 'straight' | 'step'
 
   /**
-   * Keeps every card where its author put it.
+   * Prevents every card from being moved, connected, or removed.
    *
    * **The attribute is `readonly`, which is the platform's spelling**, and the
    * reverse of an `editable` switch on purpose: a form control takes input
@@ -397,16 +398,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   readOnly = false
 
   /**
-   * What the live region says when a reader picks up a connection's end, with
-   * `{from}` and `{to}`.
+   * The text announced when a connection's end is picked up, with `{from}` and
+   * `{to}`.
    */
   @property({ attribute: 'reconnecting-label' })
   reconnectingLabel =
     'Moving the end of the connection from {from} to {to}. Move to a card and press Enter, or Escape to stop.'
 
   /**
-   * The cards and connections the reader selected, by name, comma separated,
-   * and empty for none.
+   * The names of the selected cards and connections, comma separated. Empty
+   * when nothing is selected.
    *
    * **Comma separated, the way `Listbox` writes a multiple value**, so a page
    * reads one selection the same way wherever it comes from. A click, or a key
@@ -434,7 +435,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   @state()
   private editing: { target: 'edge' | 'group'; key: string; was: string } | undefined
 
-  /** What it says when a reader stops connecting without asking. */
+  /** The text announced when a connection is stopped before it is requested. */
   @property({ attribute: 'stopped-label' })
   stoppedLabel = 'Stopped connecting.'
 
@@ -2526,7 +2527,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /**
-   * Where the board is looking: the document's point at the middle of the view,
+   * The board's current view: the document's point at the middle of the view,
    * and the zoom.
    *
    * **Read to save a view and written to restore one**, which a consumer keeping
@@ -2593,7 +2594,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /**
-   * Fits the whole board into the box, centered, and never magnified past its
+   * Fits the whole board into its box, centered, and never zoomed in past its
    * own size.
    *
    * **Automatic while nobody has touched the board, and public for when they

@@ -25,12 +25,12 @@ import type { CanvasEnd, CanvasSide } from '../root/canvas-document.js'
  */
 @customElement('helix-headless-canvas-edge')
 export class HelixHeadlessCanvasEdge extends HelixElement {
-  /** The card it leaves. */
+  /** The name of the card the connection starts from. */
   @property()
   from = ''
 
   /**
-   * What sits at the end it leaves from.
+   * The marker at the start of the connection.
    *
    * Absent is nothing, which is the format's own default and what makes an
    * ordinary connector a one-way arrow.
@@ -38,16 +38,17 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   @property({ attribute: 'from-end' })
   fromEnd?: CanvasEnd
 
-  /** Which side of that card it leaves, where the document says. */
+  /** The side of the `from` card the connection leaves from, when the document sets one. */
   @property({ attribute: 'from-side' })
   fromSide?: CanvasSide | undefined
 
-  /** What the connector says, drawn at its middle. */
+  /** Text drawn at the middle of the connection. */
   @property()
   label?: string | undefined
 
   /**
-   * What a request calls this connection, unique on its board.
+   * The connection's name, unique on its board, which events use to refer to
+   * it.
    *
    * Optional, unlike a card's: a connection is also known by its two ends,
    * which `helix-remove` carries beside this, so a page that names none of its
@@ -57,7 +58,7 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   name = ''
 
   /**
-   * How it travels: `straight`, or `step` for right angles.
+   * The route the line takes: `straight`, or `step` for right angles.
    *
    * Absent is whatever the board says, and a curve where the board says
    * nothing. Not part of JSON Canvas, which draws every edge one way; a
@@ -72,7 +73,7 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   path?: 'straight' | 'step'
 
   /**
-   * Keeps this connection: a reader cannot remove it.
+   * Prevents the connection from being removed.
    *
    * The board's `readonly` still wins. A connection is still removed with a
    * card at either end of it, since a line to a card that has gone is not one
@@ -81,16 +82,17 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
-  /** The card it arrives at. */
+  /** The name of the card the connection ends at. */
   @property()
   to = ''
 
-  /** What sits at the end it arrives at. Absent is an arrow, as the format says. */
+  /** The marker at the end of the connection. Unset is an arrow, as JSON Canvas specifies. */
   @property({ attribute: 'to-end' })
   toEnd?: CanvasEnd
 
   /**
-   * What the connection means, in the words every Helix component uses.
+   * The meaning of the connection, shown by its color, in the same tones as
+   * other Helix components.
    *
    * A color with no meaning is `--canvas-edge-color`, written in the edge's own
    * `style`: the line is drawn by the board rather than by this element, so the
@@ -99,13 +101,12 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
-  /** Which side of that card it arrives at, where the document says. */
+  /** The side of the `to` card the connection arrives at, when the document sets one. */
   @property({ attribute: 'to-side' })
   toSide?: CanvasSide | undefined
 
   /**
-   * How the line is drawn: `dashed` or `dotted`, and solid where it says
-   * neither.
+   * How the line is drawn: `dashed` or `dotted`. Unset is solid.
    *
    * **A variant rather than an axis**, which is what the registry keeps it for:
    * no other family draws a line whose stroke says something, and a dashed

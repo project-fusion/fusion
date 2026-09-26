@@ -112,14 +112,14 @@ const onApple = (): boolean =>
  *
  * @slot - The key's label, where `keys` is not set.
  *
- * @event {HelixShortcutEvent} helix-shortcut - Fired when the chord is pressed, and cancelable.
+ * @event {HelixShortcutEvent} helix-shortcut - The chord was pressed. Cancelable: cancel it to let the key press keep its usual effect.
  *
  * @csspart kbd - The key.
  */
 @customElement('helix-headless-kbd')
 export class HelixHeadlessKbd extends HelixElement {
   /**
-   * The chord, written plainly: `mod+k`, `shift+?`, `/`.
+   * The key or chord to show, such as `mod+k`, `shift+?`, or `/`.
    *
    * `mod` is the platform's own command modifier, which is the reason to write
    * a chord here rather than a glyph: it is the one token whose right answer
@@ -129,7 +129,8 @@ export class HelixHeadlessKbd extends HelixElement {
   keys = ''
 
   /**
-   * Where the chord is listened for, and whether it is listened for at all.
+   * Where the chord is listened for. `control` listens inside the control the
+   * key sits in, and `document` listens on the whole page.
    *
    * Unset draws a key and binds nothing.
    *

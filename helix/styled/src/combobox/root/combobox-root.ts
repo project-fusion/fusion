@@ -14,7 +14,7 @@ import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
 import { styles } from './combobox-root.css.js'
 
 /**
- * @summary A field that filters a list as it is typed into.
+ * @summary A text field that filters a list of options as you type.
  *
  * @description
  * The frame is the field rather than the input, so the caret, the marks and the
@@ -30,12 +30,12 @@ import { styles } from './combobox-root.css.js'
  * @cssproperty --combobox-background-color - Fill behind the field.
  * @cssproperty --combobox-border-color - Color of the panel's edge.
  * @cssproperty --combobox-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
+ *   `--helix-border-floating`, which is `0` unless your theme sets it, so the panel's shadow
+ *   sets it apart.
  * @cssproperty --combobox-control-size - Smallest the text field shrinks to once tags share its line.
  * @cssproperty --combobox-panel-size - Width of the panel. Follows the field by default.
- * @cssproperty --combobox-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
- *   floating surface sits over content nobody can predict, so it keeps a lift by default.
+ * @cssproperty --combobox-shadow - Shadow under the panel. Follows `--helix-shadow-floating`.
+ *   A floating panel can sit over any content, so it has a shadow by default.
  */
 @customElement('helix-combobox')
 export class HelixCombobox extends HelixHeadlessCombobox {

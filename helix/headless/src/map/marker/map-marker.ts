@@ -76,9 +76,9 @@ export class HelixHeadlessMapMarker extends HelixElement {
   gatheredBy: HelixHeadlessMapMarker | undefined = undefined
 
   /**
-   * Marks this as a map marker for the frame and the connector, which find
-   * their markers among the frame's children by this rather than by tag, so a
-   * styled marker and a headless one are the same thing to them.
+   * Marks the element as a map marker. The frame and the connector find
+   * markers among the frame's children by this flag, so they treat a styled
+   * marker and a headless one the same way.
    */
   readonly isMapMarker = true
 
@@ -159,7 +159,7 @@ export class HelixHeadlessMapMarker extends HelixElement {
     return this.partNamed('marker')?.getBoundingClientRect().width ?? 0
   }
 
-  /** Focuses the button rather than the host, which draws no box of its own. */
+  /** Focuses the marker's button. The host draws no box of its own. */
   override focus(options?: FocusOptions): void {
     this.partNamed('marker')?.focus(options)
   }

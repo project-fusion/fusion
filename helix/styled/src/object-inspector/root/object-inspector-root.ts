@@ -5,8 +5,8 @@ import { styles } from './object-inspector-root.css.js'
 import '../../copy-button/index.js'
 
 /**
- * @summary A value read as a tree: collapse what you do not need, count what
- * you collapsed, copy the part you do.
+ * @summary A structured value shown as a tree, where you can close branches,
+ * see how many entries each holds, and copy any part.
  *
  * @description
  * Code Block's frame around a tree of entries. Each type takes its ink from the
@@ -21,11 +21,11 @@ import '../../copy-button/index.js'
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
  * @documentation https://fusion.dev/helix/components/object-inspector
  *
- * @cssproperty --object-inspector-background-color - Ground under the tree.
- * @cssproperty --object-inspector-block-size - Height of the scrolling box, when windowed.
- * @cssproperty --object-inspector-border-color - The edge around the tree and its header.
- * @cssproperty --object-inspector-header-background-color - The bar carrying the label.
- * @cssproperty --object-inspector-radius - Corner radius of the tree.
+ * @cssproperty --object-inspector-background-color - The background of the tree.
+ * @cssproperty --object-inspector-block-size - The height of the scrolling box when `windowed` is set.
+ * @cssproperty --object-inspector-border-color - The color of the edge around the tree and its header.
+ * @cssproperty --object-inspector-header-background-color - The background of the bar that holds the label.
+ * @cssproperty --object-inspector-radius - The corner radius of the tree.
  */
 @customElement('helix-object-inspector')
 export class HelixObjectInspector extends HelixHeadlessObjectInspector {

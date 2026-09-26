@@ -12,7 +12,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './sandbox-source.css.js'
 
 /**
- * @summary Editable source for a sandbox preview.
+ * @summary An editable source pane for a sandbox preview.
  *
  * @description
  * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
@@ -29,7 +29,7 @@ import { styles } from './sandbox-source.css.js'
  * @aliases Editor, Code pane
  * @documentation https://fusion.dev/helix/components/sandbox
  *
- * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. Cancelable: cancel it to keep the source unchanged.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.
  *
  * @csspart source - The editable region.
@@ -40,13 +40,13 @@ import { styles } from './sandbox-source.css.js'
 @customElement('helix-sandbox-source')
 export class HelixSandboxSource extends HelixElement {
   /**
-   * Accessible name for the editable region.
+   * The editable region's name, read by screen readers.
    */
   @property({ attribute: 'field-label' })
   fieldLabel = 'Example source'
 
   /**
-   * Which source this pane holds, echoed in every `helix-before-edit`.
+   * Which source this pane holds. Every `helix-before-edit` event includes it.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
    * passed through untouched for a consumer wiring their own panes.
@@ -57,7 +57,7 @@ export class HelixSandboxSource extends HelixElement {
   name = 'html'
 
   /**
-   * Whether Tab indents rather than moving focus.
+   * Whether Tab indents the source. When it is off, Tab moves focus.
    */
   @property({ attribute: 'tab-indents', converter: onUnlessFalse })
   tabIndents = true

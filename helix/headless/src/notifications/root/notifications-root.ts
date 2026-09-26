@@ -12,7 +12,7 @@ import type { HelixHeadlessNotificationGroup } from '../group/notification-group
 import type { HelixHeadlessNotification } from '../notification/notification.js'
 
 /**
- * @summary A feed a reader comes back to, made of notifications they may not have seen.
+ * @summary A feed of notifications, each marked read or unread.
  *
  * @description
  * **Slotted children rather than a data property.** A notification is a small
@@ -42,15 +42,15 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
  *
- * @event {HelixDismissEvent} helix-dismiss - A row asking to be removed, dispatched by the row and heard here because the feed is what a consumer holds. Cancelable: refusing it takes the decision and the row stays.
- * @event {HelixReadEvent} helix-read - Fired by an item, and by this element when everything is marked read. Cancelable.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the user dismisses a row. The row dispatches it, and you can listen for it on the feed. Cancelable: cancel it to keep the row.
+ * @event {HelixReadEvent} helix-read - Fired by an item when it is marked read or unread, and by the feed when everything is marked read. Cancelable.
  *
  * @csspart empty - Shown when there is nothing in the feed.
  * @csspart footer - The region below the list.
  * @csspart header - The region above the list.
  * @csspart list - The list itself.
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
- * @csspart loading - Shown while the feed is still on its way.
+ * @csspart live - A copy of the empty and loading messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
+ * @csspart loading - Shown while the feed is loading.
  * @csspart mark-all - The control that marks everything read.
  *
  * @cssstate media - While a notification in the list holds something in its media slot, so every row keeps that column.
@@ -72,7 +72,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Accessible name for the feed.
+   * The feed's name, read by screen readers.
    */
   @property()
   label = ''
@@ -84,7 +84,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   markAll = false
 
   /**
-   * Label for that control.
+   * Label for the mark-all control.
    */
   @property({ attribute: 'mark-all-label' })
   markAllLabel = 'Mark all as read'
@@ -135,7 +135,8 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   }
 
   /**
-   * What the list slot is given: the rows and the groups, as written.
+   * The content assigned to the list slot: the rows and the groups, in the
+   * order they are written.
    *
    * Not `items`, which reaches through a group to the rows inside it. Assigning
    * those would lift them out of the group that is arranging them and hand the
@@ -163,7 +164,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Folds every group that can fold, and reports how many actually moved.
+   * Collapses every collapsible group, and returns how many changed.
    *
    * **A command, not a second place the state lives.** A group owns whether it
    * is folded; this asks all of them at once. The alternative, a property on the
@@ -198,7 +199,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Marks every unread item read, and reports how many actually moved.
+   * Marks every unread item read, and returns how many changed.
    *
    * **Through each item's own request rather than by writing its property**,
    * which is what makes one refusal refuse one item: a consumer who owns some

@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './grid-root.css.js'
 
 /**
- * @summary Lays children out on a grid.
+ * @summary A layout that places its children on a grid.
  *
  * @description
  * Two ways to declare columns, and only two. `columns` is a fixed count;
@@ -23,12 +23,12 @@ import { styles } from './grid-root.css.js'
  *
  * @slot - The items to lay out.
  *
- * @cssproperty --grid-columns - An explicit track list, which wins over `min` and `columns`. For a layout of unequal tracks, which neither attribute can say.
+ * @cssproperty --grid-columns - An explicit track list. It overrides `min` and `columns`. Use it for tracks of unequal widths, which neither attribute can set.
  */
 @customElement('helix-grid')
 export class HelixGrid extends HelixElement {
   /**
-   * Alignment of each cell within its row, which is `align-items`.
+   * How each cell aligns within its row. Sets `align-items`.
    *
    * **Named for the CSS property it sets**, the way `Flex` is, and the same
    * property on a grid: it places every cell in its row's track rather than
@@ -46,19 +46,19 @@ export class HelixGrid extends HelixElement {
   alignItems?: 'start' | 'center' | 'end' | 'stretch'
 
   /**
-   * Fixed number of equal columns.
+   * A fixed number of equal columns.
    */
   @property({ reflect: true, type: Number })
   columns?: number
 
   /**
-   * Space between cells, named on the space scale.
+   * The space between cells, as a step on the space scale.
    */
   @property({ reflect: true })
   gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
   /**
-   * Minimum column width, filling as many as fit.
+   * The minimum column width. The grid fits as many columns as the width allows.
    *
    * Takes precedence over `columns`: a grid that both fixes a count and reflows
    * is two intentions in one element.

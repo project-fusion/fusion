@@ -13,7 +13,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary A panel that opens against a trigger and holds anything.
+ * @summary A panel that opens next to its trigger and holds any content.
  *
  * @description
  * The general case the specific overlays are versions of. `Menu` holds
@@ -44,11 +44,11 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/popover
  *
  * @slot - The contents of the panel.
- * @slot trigger - What opens it.
+ * @slot trigger - The element that opens the panel.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {Event} toggle - Fired after the panel opens or closes, with `newState` and `oldState`.
  *
  * @csspart content - The scrolling region inside the panel.
  * @csspart popover - The panel.
@@ -58,7 +58,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-popover')
 export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   /**
-   * Accessible name for the panel.
+   * The panel's name, read by screen readers.
    */
   @property()
   label = 'Popover'

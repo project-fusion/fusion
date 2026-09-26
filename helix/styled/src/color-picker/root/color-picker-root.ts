@@ -11,7 +11,7 @@ import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './color-picker-root.css.js'
 
 /**
- * @summary Picks a color, from a square and two ramps.
+ * @summary A color picker made of a square and two ramps.
  *
  * @description
  * **The square is painted in three layers, not composited from elements**: the
@@ -42,11 +42,11 @@ import { styles } from './color-picker-root.css.js'
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://fusion.dev/helix/components/color-picker
  *
- * @cssproperty --color-picker-grid-radius - Corner radius of the square.
- * @cssproperty --color-picker-grid-ratio - Aspect ratio of the square.
- * @cssproperty --color-picker-padding - Inset of the rows under the square, and the bottom.
- * @cssproperty --color-picker-sample-size - Edge length of the chip that copies the value.
- * @cssproperty --color-picker-swatch-size - Edge length of one preset.
+ * @cssproperty --color-picker-grid-radius - The corner radius of the square.
+ * @cssproperty --color-picker-grid-ratio - The aspect ratio of the square.
+ * @cssproperty --color-picker-padding - The inset of the rows under the square and of the picker's bottom edge.
+ * @cssproperty --color-picker-sample-size - The width and height of the chip that copies the value.
+ * @cssproperty --color-picker-swatch-size - The width and height of one preset.
  */
 @customElement('helix-color-picker')
 export class HelixColorPicker extends HelixHeadlessColorPicker {

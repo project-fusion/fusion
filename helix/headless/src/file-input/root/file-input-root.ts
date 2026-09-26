@@ -71,7 +71,7 @@ const kind = (file: File): string => {
 }
 
 /**
- * @summary A control for choosing files, by pointer or by dropping them on it.
+ * @summary A field for choosing files from a picker or by dropping them on it.
  *
  * @description
  * **A real `<input type="file">`, kept and made invisible rather than
@@ -91,36 +91,36 @@ const kind = (file: File): string => {
  * @aliases FileUpload, FilePicker, Dropzone, InputFile
  * @documentation https://fusion.dev/helix/components/file-input
  *
- * @slot feedback - What is wrong with it.
+ * @slot feedback - The message that says what is wrong with the chosen files.
  * @slot hint - Help under the field.
- * @slot trigger - What the reader presses to open the picker.
+ * @slot trigger - The content that opens the picker when pressed.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen files change, with their names. Cancelable: refusing it takes the decision and the field keeps the files it had, a pick the browser has already written included.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen files change, with their names, and cancelable. Canceling it keeps the files the field had, even when the browser has already written a new pick.
+ * @event {Event} input - Fired after the value changes.
  *
  * @csspart control - The file input itself, which carries the label and validity.
- * @csspart detail - Its name and its reading, stacked.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The box that is pressed and dropped on.
+ * @csspart detail - A file's name, with its size and type below it.
+ * @csspart feedback - The message that says what is wrong.
+ * @csspart field - The box you press or drop files on.
  * @csspart file - One chosen file.
  * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart kind - What kind of file it is.
+ * @csspart kind - A file's type.
  * @csspart kind-dismiss - The remove button, when `dismissible`.
  * @csspart kind-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart kind-start - The category before the label.
- * @csspart label - The question, over the field.
+ * @csspart label - The label above the field.
  * @csspart list - The chosen files.
- * @csspart meta - The row holding its size and kind.
- * @csspart name - Its name.
- * @csspart remove - The control that takes it back out.
- * @csspart size - How big it is.
+ * @csspart meta - The row that holds a file's size and type.
+ * @csspart name - A file's name.
+ * @csspart remove - The control that removes a file.
+ * @csspart size - A file's size.
  * @csspart size-dismiss - The remove button, when `dismissible`.
  * @csspart size-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart size-start - The category before the label.
  * @csspart trigger - The label that opens the picker.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-file-input')
 export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
@@ -160,7 +160,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   multiple = false
 
   /**
-   * What the control removing one file is called, with `{name}` filled in.
+   * The accessible name of the control that removes a file. `{name}` is
+   * replaced with the file's name.
    *
    * **The name goes in**, so a row of them is heard as which one each
    * removes rather than as "Remove" said once per file. A label with no
@@ -170,7 +171,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   removeLabel = 'Remove {name}'
 
   /**
-   * What the trigger reads, where nothing is slotted into it.
+   * The trigger's text when nothing is slotted into it.
    */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose files'
@@ -187,7 +188,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   private dropping = false
 
   /**
-   * The files chosen, which is the element's own and never assigned.
+   * The chosen files. It is read-only.
    *
    * Read from the input rather than mirrored into a field. The input is what
    * the picker filled and what a form submits, so a copy here could only ever
@@ -211,7 +212,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   }
 
   /**
-   * Takes every file back out.
+   * Removes every chosen file.
    *
    * The one change a consumer can ask for. Setting a `FileList` is refused by
    * every browser for a reason worth keeping, but emptying one is not: nothing
@@ -222,7 +223,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   }
 
   /**
-   * Drops one file, by index.
+   * Removes one file, by its index.
    *
    * `removeAt` rather than `remove`, which is `Element`'s own and takes no
    * arguments: shadowing it would break every caller who meant the node.
@@ -421,13 +422,13 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     this.sync()
   }
 
-  /** Puts focus on the input, the way a label pointing at one would. */
+  /** Moves focus to the native file input, as a label pointing at it would. */
   override focus(options?: FocusOptions): void {
     this.control?.focus(options)
   }
 
   /**
-   * Empties it, which is what a form reset means for a file input.
+   * Clears the chosen files when the form resets.
    *
    * Not through `commit`, and that is the point of the split: a reset is the
    * form's decision and there is nothing here for a listener to refuse. What it

@@ -6,7 +6,7 @@ import { property, state } from 'lit/decorators.js'
 const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as const
 
 /**
- * @summary A scrolling box that says there is more.
+ * @summary A scrolling box that shows which edges have more content past them.
  *
  * @description
  * **The whole component is one fact a stylesheet cannot work out for itself:
@@ -35,9 +35,9 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  * @aliases Scroller, Overflow, Scroll container
  * @documentation https://fusion.dev/helix/components/scroll-area
  *
- * @slot - What scrolls.
+ * @slot - The content that scrolls.
  *
- * @csspart edges - Where the sideways edge cues are drawn.
+ * @csspart edges - The layer that draws the cues on the inline start and end edges.
  * @csspart viewport - The scrolling box.
  *
  * @cssstate more-block-end - While there is more to scroll to past the block end.
@@ -49,7 +49,7 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
 @customElement('helix-headless-scroll-area')
 export class HelixHeadlessScrollArea extends HelixElement {
   /**
-   * Names the region, for a reader arriving at it out of context.
+   * The region's name, read by screen readers.
    *
    * Without one there is no region: see the note on the class.
    */
@@ -71,7 +71,7 @@ export class HelixHeadlessScrollArea extends HelixElement {
   private watcher: ResizeObserver | undefined
 
   /**
-   * The box that actually scrolls, for anything that needs to move it.
+   * The element that scrolls. Use it to scroll the content from your code.
    *
    * **Public because the alternative is silence.** The scrolling box is inside
    * this shadow root: a consumer holding a reference to this element holds the

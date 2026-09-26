@@ -14,7 +14,7 @@ import { html } from 'lit/static-html.js'
 import '../../button/index.js'
 
 /**
- * @summary One stop on a tour: what it points at, and a panel to say it in.
+ * @summary One stop on a tour: the element it points at, and a panel of content about it.
  *
  * @description
  * A stop names a target with `for` and holds whatever the consumer puts in it.
@@ -51,30 +51,30 @@ import '../../button/index.js'
  * @category overlays
  * @documentation https://fusion.dev/helix/components/tour
  *
- * @slot - What this stop says. A card, a heading and a line, anything.
- * @slot actions - Replaces the controls, which are Back, Next and Skip.
+ * @slot - The stop's content. Any content works, such as a card, or a heading and a line.
+ * @slot actions - Replaces the controls, which are Back, Next, and Skip.
  *
- * @event {HelixTourAskEvent} helix-tour-ask - A stop asking the tour to move, from its own controls.
+ * @event {HelixTourAskEvent} helix-tour-ask - Fired when one of the stop's controls is pressed, to move the tour.
  *
  * @csspart actions - The row the controls sit in.
- * @csspart arrow - The point, which the floating pass places against the target.
- * @csspart arrow-bottom - The point while the panel is below its target, so on the panel's top edge, beside `arrow`.
- * @csspart arrow-left - The point while the panel is left of its target, so on the panel's right edge, beside `arrow`.
- * @csspart arrow-right - The point while the panel is right of its target, so on the panel's left edge, beside `arrow`.
- * @csspart arrow-top - The point while the panel is above its target, so on the panel's bottom edge, beside `arrow`.
+ * @csspart arrow - The arrow that points at the target.
+ * @csspart arrow-bottom - The arrow while the panel is below its target, on the panel's top edge. Applied with `arrow`.
+ * @csspart arrow-left - The arrow while the panel is left of its target, on the panel's right edge. Applied with `arrow`.
+ * @csspart arrow-right - The arrow while the panel is right of its target, on the panel's left edge. Applied with `arrow`.
+ * @csspart arrow-top - The arrow while the panel is above its target, on the panel's bottom edge. Applied with `arrow`.
  * @csspart back - The control that goes to the previous stop.
- * @csspart back-button - The inner control.
+ * @csspart back-button - The button inside `back`.
  * @csspart bubble - The panel that points at the target.
  * @csspart content - The region holding the slotted content.
- * @csspart next - The control that goes on, and finishes on the last stop.
- * @csspart next-button - The inner control.
- * @csspart skip - The control that leaves the tour.
- * @csspart skip-button - The inner control.
+ * @csspart next - The control that goes to the next stop, and finishes the tour on the last stop.
+ * @csspart next-button - The button inside `next`.
+ * @csspart skip - The control that ends the tour early.
+ * @csspart skip-button - The button inside `skip`.
  *
- * @cssstate placed-bottom - While the panel sits below its target.
- * @cssstate placed-left - While the panel sits to the left of its target.
- * @cssstate placed-right - While the panel sits to the right of its target.
- * @cssstate placed-top - While the panel sits above its target.
+ * @cssstate placed-bottom - The panel sits below its target.
+ * @cssstate placed-left - The panel sits to the left of its target.
+ * @cssstate placed-right - The panel sits to the right of its target.
+ * @cssstate placed-top - The panel sits above its target.
  */
 @customElement('helix-headless-tour-stop')
 export class HelixHeadlessTourStop extends HelixElement {
@@ -85,7 +85,7 @@ export class HelixHeadlessTourStop extends HelixElement {
   backLabel = 'Back'
 
   /**
-   * Whether this is the stop the reader is on.
+   * Whether the stop is the one being shown.
    *
    * Written by the root rather than by a consumer, which is the one place this
    * family writes onto markup it does not own. It is acceptable here for a
@@ -103,19 +103,19 @@ export class HelixHeadlessTourStop extends HelixElement {
   doneLabel = 'Done'
 
   /**
-   * Whether this is the first stop, so there is nowhere back to.
+   * Whether the stop is the first one, with no stop before it.
    */
   @property({ reflect: true, type: Boolean })
   first = false
 
   /**
-   * The id of the element this stop is about.
+   * The id of the element the stop points at.
    */
   @property()
   for = ''
 
   /**
-   * Whether this is the last stop, so the control says Done.
+   * Whether the stop is the last one. Its next control then shows `doneLabel`.
    */
   @property({ reflect: true, type: Boolean })
   last = false
@@ -127,7 +127,7 @@ export class HelixHeadlessTourStop extends HelixElement {
   nextLabel = 'Next'
 
   /**
-   * Which side of the target the panel prefers.
+   * The side of the target the panel is placed on when there is room.
    */
   @property()
   placement: Placement = 'bottom'
@@ -146,7 +146,7 @@ export class HelixHeadlessTourStop extends HelixElement {
   @state()
   private side?: Side
 
-  /** The element this stop is about, or null where the id resolves to nothing. */
+  /** The element the stop points at, or `null` when no element has the `for` id. */
   get target(): HTMLElement | null {
     return this.for === '' ? null : elementById(this, this.for)
   }

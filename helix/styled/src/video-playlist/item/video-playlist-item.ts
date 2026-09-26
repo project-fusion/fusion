@@ -15,8 +15,8 @@ import { styles } from './video-playlist-item.css.js'
  * @category media
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
- * @cssproperty --video-playlist-item-background-color - Fill behind a row.
- * @cssproperty --video-playlist-media-size - Width of the thumbnail column.
+ * @cssproperty --video-playlist-item-background-color - The fill behind a row.
+ * @cssproperty --video-playlist-media-size - The width of the thumbnail column.
  */
 @customElement('helix-video-playlist-item')
 export class HelixVideoPlaylistItem extends HelixHeadlessVideoPlaylistItem {

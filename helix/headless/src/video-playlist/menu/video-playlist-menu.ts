@@ -35,28 +35,28 @@ import '../../menu/index.js'
  *
  * @slot trigger - Replaces the button that opens the menu.
  *
- * @event {HelixSelectEvent} helix-select - Fired with the chosen entry's value. The playlist listens for it. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - An entry was chosen. The event carries its value, and the playlist listens for it. Cancelable: cancel it to keep the current entry.
  *
  * @csspart entry - One entry in the menu.
- * @csspart entry-item - The row, which is an `<a>` where `href` is set.
- * @csspart entry-mark - The trailing mark: a tick when checked, a caret when it opens
- * @csspart entry-start - The leading column, which is a slot and is always there.
+ * @csspart entry-item - The entry's row. It is an `<a>` when `href` is set.
+ * @csspart entry-mark - The mark at the end of an entry: a check mark when it is checked, or a caret when it opens a submenu.
+ * @csspart entry-start - The column at the start of an entry. It is a slot and is always present.
  * @csspart menu - The menu that holds the entries.
- * @csspart menu-back - The control that returns from a submenu.
- * @csspart menu-back-mark - The glyph on the back control of a submenu.
+ * @csspart menu-back - The button that goes back from a submenu.
+ * @csspart menu-back-mark - The icon on a submenu's back button.
  * @csspart menu-empty - Shown when there are no items to show.
- * @csspart menu-header - The bar above a submenu, holding the way back and its name.
- * @csspart menu-live - The inner menu's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart menu-loading - Shown while the items are still on their way.
+ * @csspart menu-header - The bar above a submenu, holding the back button and the submenu's name.
+ * @csspart menu-live - The inner menu's `live` part, the region screen readers announce its empty and loading messages from.
+ * @csspart menu-loading - Shown while the items are loading.
  * @csspart menu-surface - The floating panel the menu is drawn on.
- * @csspart menu-title - The name of the submenu that is showing.
- * @csspart poster - An entry's still, where it has one.
- * @csspart trigger - The button that opens it.
+ * @csspart menu-title - The name of the submenu that is shown.
+ * @csspart poster - An entry's poster image, if it has one.
+ * @csspart trigger - The button that opens the menu.
  */
 @customElement('helix-headless-video-playlist-menu')
 export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   /**
-   * The menu's accessible name, and its trigger's.
+   * The name of the menu and its trigger, read by screen readers.
    *
    * "Episodes" suits a series and is wrong for a set of camera angles, and the
    * component cannot know which one it is in.

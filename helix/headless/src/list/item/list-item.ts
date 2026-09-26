@@ -37,12 +37,12 @@ import { property } from 'lit/decorators.js'
  * @slot end - Trailing content.
  * @slot start - Leading content, usually an icon or an avatar.
  *
- * @csspart row - The layout, held off the host so the host can carry a marker.
+ * @csspart row - The row's layout. It sits inside the host so the host can carry a list marker.
  */
 @customElement('helix-headless-list-item')
 export class HelixHeadlessListItem extends HelixElement {
   /**
-   * Where the row goes, and nothing when it goes nowhere.
+   * The URL the row links to. Leave it empty for a row that is not a link.
    *
    * Empty rather than optional, and unset by default: a list is not always a
    * list of links, and an empty `href` written onto every row would be a link
@@ -52,14 +52,14 @@ export class HelixHeadlessListItem extends HelixElement {
   href = ''
 
   /**
-   * What the link declares about where it goes. The consumer's decision rather
-   * than one derived from `target`, for the reason `Tree.Item` gives.
+   * The link's `rel` value. You set it yourself. It is not derived from
+   * `target`, for the reason `Tree.Item` gives.
    */
   @property()
   rel = ''
 
   /**
-   * Where the link opens, for the rare row that leaves the site.
+   * Where the link opens. Use it for a row that leaves the site.
    */
   @property()
   target = ''

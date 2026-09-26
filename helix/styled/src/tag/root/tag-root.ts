@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './tag-root.css.js'
 
 /**
- * @summary Labels content with a short piece of metadata.
+ * @summary A short label that adds metadata to content.
  *
  * @description
  * Seven tones. The fill is a tint of the status color, mixed with
@@ -20,19 +20,19 @@ import { styles } from './tag-root.css.js'
  *
  * @slot - The tag's label.
  *
- * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to remove the tag. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixDismissEvent} helix-dismiss - The remove button was pressed. The tag does not remove itself, so remove it in response. Cancelable.
  *
  * @csspart dismiss - The remove button, when `dismissible`.
  *
- * @cssproperty --tag-background-color - Fill behind the tag.
- * @cssproperty --tag-border-color - Color of the edge, for a chip that separates by fill alone.
- * @cssproperty --tag-foreground-color - Label color.
- * @cssproperty --tag-radius - Corner radius of the tag.
+ * @cssproperty --tag-background-color - The fill behind the tag.
+ * @cssproperty --tag-border-color - The color of the tag's edge.
+ * @cssproperty --tag-foreground-color - The label color.
+ * @cssproperty --tag-radius - The corner radius of the tag.
  */
 @customElement('helix-tag')
 export class HelixTag extends HelixHeadlessTag {
   /**
-   * How much of the tone the tag wears.
+   * How strongly the tag shows its tone: `subtle`, `solid`, or `outlined`.
    *
    * - `subtle` is the default: a wash of the tone with the label in it, for a
    *   tag that labels something rather than warning about it.
@@ -49,7 +49,7 @@ export class HelixTag extends HelixHeadlessTag {
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
   /**
-   * Which status the tag reports.
+   * The meaning the tag's color shows, such as `success` or `danger`.
    *
    * `tone` is semantic color, which is what these are and what `helix-text`
    * already calls them. `helix component`'s `axes` holds the vocabulary.

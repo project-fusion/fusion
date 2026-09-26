@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './outline-root.css.js'
 
 /**
- * @summary Links to the headings on this page, marking the one being read.
+ * @summary Links to the headings on the page, with the section in view marked.
  *
  * @description
  * A rule down the leading edge with the current section lit along it, which is
@@ -24,7 +24,7 @@ import { styles } from './outline-root.css.js'
  * @documentation https://fusion.dev/helix/components/outline
  *
  * @cssproperty --outline-indent - How far each level is inset from the one above.
- * @cssproperty --outline-rail - Width of the gutter the rule and the traveling mark share.
+ * @cssproperty --outline-rail - The width of the gutter that holds the line and the moving mark.
  */
 @customElement('helix-outline')
 export class HelixOutline extends HelixHeadlessOutline {

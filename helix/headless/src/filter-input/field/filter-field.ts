@@ -6,7 +6,7 @@ import { DEFAULT_FILTER_OPERATORS, type FilterGrammarField } from '../grammar.js
 import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js'
 
 /**
- * @summary One thing a set can be filtered by, and how.
+ * @summary A field that a filter can apply to, with its comparisons and values.
  *
  * @description
  * **A declaration, not a control.** It renders nothing and is never seen. A
@@ -50,19 +50,20 @@ import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js
  * @aliases Facet, Dimension
  * @documentation https://fusion.dev/helix/components/filter-input
  *
- * @slot - The comparisons this field supports, as `FilterOperator`s, and the
- * values it supports them on, as `Option`s. Neither is rendered: they are read.
+ * @slot - The field's comparisons, as `FilterOperator`s, and its values, as
+ * `Option`s. The filter input reads them and does not render them.
  */
 @customElement('helix-headless-filter-field')
 export class HelixHeadlessFilterField extends HelixElement {
   /**
-   * What a reader is shown, in the menu and on every chip built from this field.
+   * The field's name as shown in the menu and on every chip built from the
+   * field.
    */
   @property()
   label = ''
 
   /**
-   * What the consumer's own model calls this field.
+   * The field's name in your data model.
    *
    * Never shown, and what arrives in the filter this helps build.
    *
@@ -73,7 +74,7 @@ export class HelixHeadlessFilterField extends HelixElement {
   name?: string
 
   /**
-   * The comparisons declared under this field, in the order they were written.
+   * The comparisons declared in the field, in source order.
    *
    * Read from the light DOM rather than from a slot, because there is no slot:
    * this element renders nothing, so nothing is ever assigned. Order is the
@@ -92,8 +93,8 @@ export class HelixHeadlessFilterField extends HelixElement {
   }
 
   /**
-   * The comparison a chip leaves unwritten, or nothing where the consumer named
-   * none.
+   * The comparison a chip does not show, or `null` when no operator is marked
+   * `default`.
    *
    * **The first one marked, and a second is reported rather than resolved.** Two
    * defaults on one field is a consumer saying two different things, and picking
@@ -113,7 +114,7 @@ export class HelixHeadlessFilterField extends HelixElement {
   }
 
   /**
-   * The values declared under this field, in the order they were written.
+   * The values declared in the field, in source order.
    *
    * Empty is meaningful rather than missing: a field whose values cannot be
    * listed, a free text search or an open ended number, declares none and the
@@ -128,7 +129,7 @@ export class HelixHeadlessFilterField extends HelixElement {
   }
 
   /**
-   * This field flattened into what the menu renders and the grammar reads.
+   * The field as flat data, for the menu to render and the grammar to read.
    *
    * **The one place the defaults are applied.** A field that declares no
    * comparisons supports `is any of` and `is none of`, which is what the typed

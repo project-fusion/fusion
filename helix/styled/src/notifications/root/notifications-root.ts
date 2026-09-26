@@ -7,7 +7,7 @@ import { styles } from './notifications-root.css.js'
 import '../notification/notification.js'
 
 /**
- * @summary A feed a reader comes back to, made of notifications they may not have seen.
+ * @summary A feed of notifications, each marked read or unread.
  *
  * @description
  * Three rows: header, a list that scrolls, footer. The list scrolls and the
@@ -30,11 +30,11 @@ import '../notification/notification.js'
  * @slot header - Above the list, for a title and the mark-all control.
  *
  * @csspart list - The list itself.
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
+ * @csspart live - A copy of the empty and loading messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart mark-all - The control that marks everything read.
  *
  * @cssproperty --notifications-max-block-size - How tall the feed may get before the list scrolls.
- * @cssproperty --notifications-media-column - The gutter every item holds open where something in the feed has media.
+ * @cssproperty --notifications-media-column - Width of the media column that every item keeps when any item in the feed has media.
  * @cssproperty --notifications-padding-inline - Space either side of the header and footer.
  * @cssproperty --notifications-rule - The hairline between items and around the regions.
  */

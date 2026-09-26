@@ -32,18 +32,18 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://fusion.dev/helix/components/toast
  *
  * @slot - The message.
- * @slot actions - What to do about it, usually a button or a link.
+ * @slot actions - Actions for the message, usually a button or a link.
  * @slot dismiss-icon - Replaces the glyph inside the dismiss control.
- * @slot icon - Replaces the tone mark. Matches `Callout`, which is why the
- *   dismiss control's own glyph is `dismiss-icon` rather than this: two slots
- *   cannot share a name, assignment goes to whichever comes first in the tree,
- *   and the tone mark is the one a consumer reaches for.
+ * @slot icon - Replaces the tone mark. The name matches `Callout`. The dismiss
+ *   control's glyph uses `dismiss-icon`, because two slots cannot share a name:
+ *   content goes to whichever slot comes first in the tree, and the tone mark is
+ *   the one you are more likely to replace.
  *
- * @event {HelixDismissEvent} helix-dismiss - Fired when it asks to go, whether by the control or by its timer. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the message is dismissed, by the control or by its timer, and cancelable. Canceling it keeps the message.
  *
- * @csspart actions - The region holding what to do about it.
+ * @csspart actions - The region that holds the actions.
  * @csspart content - The message.
- * @csspart dismiss - The control that asks to close.
+ * @csspart dismiss - The control that dismisses the message.
  * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart icon - The tone mark, where the message has one.
  * @csspart icon-mark - The tone glyph, where none is slotted.
@@ -55,7 +55,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-toast-item')
 export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   /**
-   * How long it stays, in milliseconds. Absent means until it is dismissed.
+   * How long the message stays, in milliseconds. When it is not set, the
+   * message stays until it is dismissed.
    *
    * Read once when the item is first rendered. Changing it afterwards does not
    * restart a message the reader is already partway through.
@@ -96,7 +97,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   private timer: ReturnType<typeof setTimeout> | undefined
 
   /**
-   * What kind of message it is, which picks the mark and its name.
+   * The kind of message, which sets its mark and the mark's accessible name.
    *
    * A subset of the tone axis: a toast reports a status and never a brand role.
    */
@@ -107,7 +108,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
   private openState: boolean | undefined = undefined
 
   /**
-   * Asks to be taken away, and reports whether the request stood.
+   * Dismisses the message, and returns whether the dismissal went ahead.
    *
    * Announced before anything happens, so `preventDefault()` is a refusal and
    * the message stays. The event still carries the label, because a consumer
@@ -141,7 +142,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     })
   }
 
-  /** Stops the clock, leaving whatever is left of it. */
+  /** Pauses the dismiss timer and keeps the time that is left. */
   pause(): void {
     if (this.timer === undefined || this.startedAt === undefined) {
       return
@@ -157,7 +158,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     this.toggleAttribute('data-paused', true)
   }
 
-  /** Starts it again from where it stopped. */
+  /** Restarts the dismiss timer from where it paused. */
   resume(): void {
     if (this.timer !== undefined || this.remaining === undefined || this.remaining <= 0) {
       return

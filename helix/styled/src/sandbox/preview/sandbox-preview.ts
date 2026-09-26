@@ -68,7 +68,7 @@ export type PreviewMessage =
   | PreviewSize
 
 /**
- * @summary Renders sandbox source in a frame of its own.
+ * @summary A frame that renders sandbox source in a separate document.
  *
  * @description
  * A sandboxed `<iframe>` pointed at `src`, a document the consumer provides.
@@ -92,15 +92,15 @@ export type PreviewMessage =
  * @aliases Result, Output
  * @documentation https://fusion.dev/helix/components/sandbox
  *
- * @event {HelixConsoleEvent} helix-console - Relayed from the frame, one per console call.
- * @event {HelixResizeEvent} helix-resize - How tall the frame's content is, whenever it changes.
+ * @event {HelixConsoleEvent} helix-console - Fired once per console call in the frame.
+ * @event {HelixResizeEvent} helix-resize - Fired when the height of the frame's content changes, with the new height.
  *
  * @csspart frame - The iframe.
  */
 @customElement('helix-sandbox-preview')
 export class HelixSandboxPreview extends HelixElement {
   /**
-   * Which half of the palette the frame renders in.
+   * The color mode the frame renders in.
    *
    * **The frame is a document and a document has its own color mode.** Setting
    * `data-color-mode` on this element styles this element, and the contents of
@@ -129,7 +129,7 @@ export class HelixSandboxPreview extends HelixElement {
   direction?: 'rtl'
 
   /**
-   * Accessible name for the frame.
+   * The frame's name, read by screen readers.
    */
   @property()
   label = 'Preview'
@@ -157,7 +157,7 @@ export class HelixSandboxPreview extends HelixElement {
   source = ''
 
   /**
-   * Document the frame loads, which brings the styles and the elements.
+   * The document the frame loads. It provides the styles and the elements.
    */
   @property()
   src = ''

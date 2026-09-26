@@ -19,7 +19,7 @@ import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 
 /**
- * @summary Categories as columns, read from a table.
+ * @summary A chart that draws a table's categories as columns.
  *
  * @description
  * Two decisions are made here rather than left to a consumer.
@@ -49,48 +49,48 @@ import '../../tooltip/index.js'
  * @aliases Column Chart, Categorical Chart
  * @documentation https://fusion.dev/helix/components/bar-chart
  *
- * @csspart axis - One scale's numbers, drawn only when `secondary` splits them.
- * @csspart band - The slot the pointer is resting in.
+ * @csspart axis - The numbers of one scale, drawn only when `secondary` splits the chart into two scales.
+ * @csspart band - The category band under the pointer.
  * @csspart bar - One column.
  * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
  * @csspart bar-wash-start - The stop of a bar's gradient at its base.
- * @csspart baseline - The rule the columns stand on.
- * @csspart gridline - One rule across the plot, under `gridlines`.
+ * @csspart baseline - The line the columns stand on.
+ * @csspart gridline - One gridline across the plot, drawn when `gridlines` is set.
  * @csspart group - One category's columns, together.
- * @csspart group-active - The group the tooltip is about, beside `group`.
+ * @csspart group-active - The group the tooltip describes. Set together with `group`.
  * @csspart label - One category's name.
  * @csspart labels - The row of category names.
- * @csspart line - A series drawn as a line rather than as columns, under `lines`.
+ * @csspart line - A series drawn as a line, named in `lines`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
  * @csspart svg - The drawing surface the bars and lines sit on.
  * @csspart tick - One number on an axis.
- * @csspart tooltip - The bubble, forwarded from `Tooltip`.
+ * @csspart tooltip - The tooltip bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
- * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
- * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, so on its top edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, so on its right edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, so on its left edge, beside `tooltip-arrow`.
- * @csspart tooltip-arrow-top - The point while the bubble is above the reading, so on its bottom edge, beside `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the reading, beside `tooltip`.
+ * @csspart tooltip-arrow - The tooltip's arrow, forwarded from `Tooltip`.
+ * @csspart tooltip-arrow-bottom - The arrow while the bubble is below the reading, on the bubble's top edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The arrow while the bubble is left of the reading, on the bubble's right edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The arrow while the bubble is right of the reading, on the bubble's left edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The arrow while the bubble is above the reading, on the bubble's bottom edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-bottom - The bubble while it is below the reading. Set together with `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
- * @csspart tooltip-label - The reading's own name inside the tooltip.
- * @csspart tooltip-left - The bubble while it is left of the reading, beside `tooltip`.
+ * @csspart tooltip-label - The reading's category name inside the tooltip.
+ * @csspart tooltip-left - The bubble while it is left of the reading. Set together with `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
- * @csspart tooltip-right - The bubble while it is right of the reading, beside `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the reading, beside `tooltip`.
+ * @csspart tooltip-right - The bubble while it is right of the reading. Set together with `tooltip`.
+ * @csspart tooltip-top - The bubble while it is above the reading. Set together with `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
- * @cssproperty --bar-chart-axis - How wide an axis column is drawn, in `ch`, from the widest number on it. Written on the axis itself, and only where the categories run along the bottom: turned sideways an axis is a row and takes a line's height instead.
- * @cssproperty --bar-chart-secondary - The color of the secondary axis, where one series owns it. Written by the component from that series' `--chart-series-*`, so it promises the series color and nothing more: whatever that hook resolves to is what the axis is drawn in.
- * @cssproperty --chart-bar-wash - The gradient a bar would take, named per bar so the
- *   styled tier can point `fill` at it. Drawn whatever the treatment and used only where
- *   `wash="gradient"` asks for it.
+ * @cssproperty --bar-chart-axis - The width of an axis, in `ch`, set from the widest number on it. The chart sets it on the axis itself, and only when the categories run along the bottom. In a horizontal chart the axis is a row, one line high.
+ * @cssproperty --bar-chart-secondary - The color of the secondary axis, when one series is on it. The chart sets it from that series' `--chart-series-*` property, so the axis is drawn in whatever color that property resolves to.
+ * @cssproperty --chart-bar-wash - The gradient for a bar, named per bar so the styled
+ *   tier can use it as the `fill`. It is always drawn, and used only when
+ *   `wash="gradient"` is set.
  */
 @customElement('helix-headless-bar-chart')
 export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   /**
-   * Which rules are drawn across the plot, if any.
+   * Which gridlines are drawn across the plot, if any.
    *
    * Absent draws none. `value` rules the axis the columns are *measured* on,
    * `category` rules the axis they are *arranged* on with one through each
@@ -113,7 +113,8 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   gridlines?: 'both' | 'category' | 'value'
 
   /**
-   * Which series are drawn as a line instead of as columns, by name.
+   * The names of the series to draw as lines. The other series are drawn as
+   * columns.
    *
    * Separated by whitespace or commas and matched against the column headings
    * the table gives, so a chart says `lines="Margin"` rather than counting
@@ -139,7 +140,8 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   lines?: string
 
   /**
-   * Whether the categories run down the side rather than along the bottom.
+   * Where the categories run. Leave it unset for categories along the bottom,
+   * or set `horizontal` to run them down the side.
    *
    * Absent is columns. `horizontal` is the one to reach for when the category
    * names are words rather than dates: a row of long names either overlaps or
@@ -153,7 +155,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   orientation?: 'horizontal'
 
   /**
-   * Which series are measured against a scale of their own, by name.
+   * The names of the series measured against a second scale of their own.
    *
    * Separated and matched the way `lines` is, against the column headings the
    * table gives. Opt in: absent, every series shares one domain, which is what

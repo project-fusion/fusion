@@ -31,7 +31,7 @@ import { styles } from './app-header-root.css.js'
  *
  * @csspart content - The centered row inside the banner.
  *
- * @cssproperty --app-header-backdrop - The filter behind it. `none` to pair it with a panel.
+ * @cssproperty --app-header-backdrop - The filter behind the banner. Set it to `none` when you pair the header with a panel.
  * @cssproperty --app-header-background-color - Fill behind the banner.
  * @cssproperty --app-header-block-size - Height of the banner.
  * @cssproperty --app-header-border-color - The line under the bar. None by default.
@@ -41,8 +41,8 @@ import { styles } from './app-header-root.css.js'
 @customElement('helix-app-header')
 export class HelixAppHeader extends HelixHeadlessAppHeader {
   /**
-   * What the banner is made of, which is how much of what is behind it shows
-   * through.
+   * What the banner is made of, which sets how much of the page behind it
+   * shows through.
    *
    * One axis, and absent is opaque, per the rule that a reflected property
    * takes no default.

@@ -6,7 +6,7 @@ import { property } from 'lit/decorators.js'
 export type MeterBand = 'fair' | 'good' | 'poor'
 
 /**
- * @summary A measurement in a known range, and whether it is where you want it.
+ * @summary A measurement in a known range, with optional bands that mark it good, fair, or poor.
  *
  * @description
  * **Not `Progress`, and the difference is the whole component.** A progress bar
@@ -27,15 +27,15 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @documentation https://fusion.dev/helix/components/meter
  *
  * @csspart groove - The unfilled circle, in `ring` and `arc`.
- * @csspart indicator - The part of it the value fills.
- * @csspart indicator-fair - The fill while the reading is in a band beside the good one, beside `indicator`.
- * @csspart indicator-good - The fill while the reading is in the good band, beside `indicator`.
- * @csspart indicator-over - The fill while the value is past the top, beside `indicator`.
- * @csspart indicator-poor - The fill while the reading is two bands from the good one, beside `indicator`.
- * @csspart indicator-under - The fill while the value is below the floor, beside `indicator`.
+ * @csspart indicator - The part of the track the value fills.
+ * @csspart indicator-fair - The fill while the reading is in a band next to the good band. Set alongside `indicator`.
+ * @csspart indicator-good - The fill while the reading is in the good band. Set alongside `indicator`.
+ * @csspart indicator-over - The fill while the value is above `max`. Set alongside `indicator`.
+ * @csspart indicator-poor - The fill while the reading is two bands from the good band. Set alongside `indicator`.
+ * @csspart indicator-under - The fill while the value is below `min`. Set alongside `indicator`.
  * @csspart tick - A mark at `low` or at `high`.
  * @csspart track - The whole range, or the drawing in `ring` and `arc`.
- * @csspart value - The reading, under `show-value`.
+ * @csspart value - The reading as text, shown when `show-value` is set.
  *
  * @cssproperty --meter-along - Where a bound sits on the arc, as a length along it.
  * @cssproperty --meter-at - Where a bound sits on a linear track, as a percentage.
@@ -45,7 +45,8 @@ export type MeterBand = 'fair' | 'good' | 'poor'
 @customElement('helix-headless-meter')
 export class HelixHeadlessMeter extends HelixElement {
   /**
-   * The band, said outright, where the three thresholds cannot say it.
+   * Sets the band directly, for a rule that `low`, `high`, and `optimum` cannot
+   * express.
    *
    * **The specification's model has a shape, and it is worth knowing before
    * reaching for this.** Three bands and a point mean it can express a
@@ -115,7 +116,7 @@ export class HelixHeadlessMeter extends HelixElement {
   min = 0
 
   /**
-   * Where in the range it is best to be.
+   * The point in the range where the reading is best.
    *
    * Defaults to the middle of whatever bands are declared, which is the
    * platform's own default and the right one for a score. A meter where low is
@@ -126,7 +127,7 @@ export class HelixHeadlessMeter extends HelixElement {
   optimum?: number
 
   /**
-   * Whether the reading is drawn as a bar, a ring or an arc.
+   * Whether the reading is drawn as a bar, a ring, or an arc.
    *
    * A gauge and a meter are the same thing measured: a value in a range, with
    * bands saying which part of it is the good part. What differs between the two
@@ -161,7 +162,8 @@ export class HelixHeadlessMeter extends HelixElement {
   value = 0
 
   /**
-   * What the reading says, where a number is not the whole story.
+   * Text that screen readers announce and the meter shows for the reading, in
+   * place of the percentage.
    *
    * `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
    * same property `Progress` carries, for the same reason: a percentage is a

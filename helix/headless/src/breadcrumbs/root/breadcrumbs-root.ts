@@ -24,8 +24,8 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @aliases Breadcrumb, Crumbs
  * @documentation https://fusion.dev/helix/components/breadcrumbs
  *
- * @slot - The trail's items, in order from root to current page, with the
- * crumb holding the fold wherever the gap should appear.
+ * @slot - The trail's items, in order from the root to the current page. Put
+ * the crumb that holds the folded items where the gap should appear.
  *
  * @csspart list - The ordered list.
  */

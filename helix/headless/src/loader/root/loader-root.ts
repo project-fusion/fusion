@@ -3,7 +3,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * @summary Says that something indeterminate is in progress.
+ * @summary Shows that work of unknown length is in progress.
  *
  * @description
  * Two concentric circles rather than one arc: the track is what makes the
@@ -32,17 +32,18 @@ import { property } from 'lit/decorators.js'
  * @aliases Spinner, Busy, Activity
  * @documentation https://fusion.dev/helix/components/loader
  *
- * @slot - A mark to sit still at the center, usually a logo. Empty by default.
+ * @slot - An icon or logo that stays still at the center. Empty by default.
  *
  * @csspart indicator - The arc that turns.
- * @csspart mark - The region holding what was slotted at the center.
+ * @csspart mark - The region that holds the slotted content at the center.
  * @csspart svg - The rotating circle pair.
  * @csspart track - The full circle behind the indicator.
  */
 @customElement('helix-headless-loader')
 export class HelixHeadlessLoader extends HelixElement {
   /**
-   * Accessible name, announced while the work is outstanding.
+   * The loader's name, announced by screen readers while the work is in
+   * progress.
    */
   @property()
   label = 'Loading'

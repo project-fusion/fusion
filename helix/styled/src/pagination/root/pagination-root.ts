@@ -5,7 +5,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './pagination-root.css.js'
 
 /**
- * @summary Moves between pages of a longer result.
+ * @summary Controls for moving between the pages of a long set of results.
  *
  * @description
  * One box for every control in the row, arrows and numbers alike, so the run has
@@ -39,7 +39,7 @@ import { styles } from './pagination-root.css.js'
  * @documentation https://fusion.dev/helix/components/pagination
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
- * @csspart gap - The control standing over pages not shown, which jumps into them.
+ * @csspart gap - The control in place of hidden pages, which jumps into them.
  * @csspart item - One slot in the run, holding a page or a gap.
  * @csspart last - The control that jumps to the last page, under `ends`.
  * @csspart list - The run of pages.
@@ -47,7 +47,7 @@ import { styles } from './pagination-root.css.js'
  * @csspart page - The control for one page.
  * @csspart page-current - The page you are on, beside `page`.
  * @csspart previous - The control that moves back one page.
- * @csspart status - The reading of where you are, in `compact`.
+ * @csspart status - The text that says which page you are on, in `compact`.
  *
  * @cssproperty --pagination-current-color - Fill behind the page you are on.
  * @cssproperty --pagination-gap - Space between one control and the next.

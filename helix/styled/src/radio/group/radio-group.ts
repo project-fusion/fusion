@@ -6,7 +6,7 @@ import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.c
 import { styles } from './radio-group.css.js'
 
 /**
- * @summary A set of choices where exactly one is the answer.
+ * @summary A set of radios where exactly one can be chosen.
  *
  * @description
  * The field's three parts, laid out the way every other field lays them out: a
@@ -19,7 +19,7 @@ import { styles } from './radio-group.css.js'
  * @aliases RadioButtons, Choice group
  * @documentation https://fusion.dev/helix/components/radio
  *
- * @cssproperty --radio-group-gap - Space between the choices.
+ * @cssproperty --radio-group-gap - The space between the choices.
  */
 @customElement('helix-radio-group')
 export class HelixRadioGroup extends HelixHeadlessRadioGroup {

@@ -6,7 +6,7 @@ import '../../select/index.js'
 import { styles } from './pagination-size.css.js'
 
 /**
- * @summary Chooses how many items a page holds.
+ * @summary A control for choosing how many items each page shows.
  *
  * @description
  * A `Select`, laid out on one row. Every other field stacks its label because it

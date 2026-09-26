@@ -30,22 +30,22 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot - The entry's name.
- * @slot media - A thumbnail. Falls back to an image of `poster`.
- * @slot meta - After the name. A duration, or a date.
+ * @slot media - A thumbnail. Defaults to an image of `poster`.
+ * @slot meta - Content after the name, such as a duration or a date.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the entry is chosen. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - The entry was chosen. Cancelable: cancel it to keep the current entry.
  *
- * @csspart container - The `listitem`, which the button sits in.
+ * @csspart container - The list item that holds the button.
  * @csspart item - The row, which is a button.
- * @csspart item-current - The row of the entry the player is on, beside `item`.
- * @csspart label - The name and whatever follows it.
- * @csspart media - The leading column.
- * @csspart thumbnail - The image `poster` falls back to.
+ * @csspart item-current - Added to `item` for the entry that is playing.
+ * @csspart label - The name and the content after it.
+ * @csspart media - The column at the start of the row.
+ * @csspart thumbnail - The image of `poster`, shown when the `media` slot is empty.
  */
 @customElement('helix-headless-video-playlist-item')
 export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   /**
-   * Whether the player is on this entry.
+   * Whether this entry is the one playing.
    *
    * Written by the playlist rather than by the entry, the way an option's
    * selection is: an entry that made itself current would be a second answer to
@@ -55,13 +55,13 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   current = false
 
   /**
-   * Whether the entry can be chosen.
+   * Prevents the entry from being chosen.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
   /**
-   * What covers the picture before this entry plays, and the row's thumbnail.
+   * The image shown before this entry plays, also used as the row's thumbnail.
    *
    * One property doing both, because they are the same picture: the frame that
    * stands for the clip stands for it in the list too. It is the `media` slot's
@@ -79,13 +79,13 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   src = ''
 
   /**
-   * What identifies the entry, and what `active` is compared against.
+   * The entry's identifier, compared against the playlist's `active`.
    */
   @property()
   value = ''
 
   /**
-   * The entry's name, which is the words and not everything in it.
+   * The entry's name: its own text, without the content in its named slots.
    *
    * `textContent` takes the whole subtree: a row with a duration in `meta`
    * reads as "His Girl Friday0:06", and that string reaches the player and the

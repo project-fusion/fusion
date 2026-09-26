@@ -61,7 +61,7 @@ interface Dot {
 const GRAY: ColorBytes = [128, 128, 128]
 
 /**
- * @summary Says what an agent is doing, as a shape rather than a word.
+ * @summary An animated shape that shows what an agent is doing.
  *
  * @description
  * A cloud of dots, drawn to a canvas, with one shape per state. `connecting`
@@ -106,18 +106,19 @@ const GRAY: ColorBytes = [128, 128, 128]
  * @aliases Thinking, Activity, Agent, Status
  * @documentation https://fusion.dev/helix/components/orb
  *
- * @csspart canvas - The surface the cloud is drawn into.
+ * @csspart canvas - The canvas the dots are drawn on.
  *
- * @cssproperty --orb-color - Ink of the nearest dots. Defaults to `currentColor`.
- * @cssproperty --orb-ground - What the far dots are mixed toward. Defaults to the page's background.
- * @cssproperty --orb-size - Diameter. Overrides `size`.
+ * @cssproperty --orb-color - The color of the nearest dots. Defaults to `currentColor`.
+ * @cssproperty --orb-ground - The color the farthest dots fade toward. Defaults to the page's background.
+ * @cssproperty --orb-size - The diameter. Overrides `size`.
  */
 @customElement('helix-orb')
 export class HelixOrb extends HelixElement {
   static override styles: CSSResultGroup = styles
 
   /**
-   * Accessible name, where the state's own word is not the right one.
+   * The name read by screen readers. Defaults to the name of the state, such
+   * as "Thinking".
    *
    * Empty is the state's word, which is what most callers want and none of them
    * should have to write. A caller with something better to say says it here:
@@ -127,7 +128,7 @@ export class HelixOrb extends HelixElement {
   label = ''
 
   /**
-   * Diameter relative to the surrounding text.
+   * The diameter, relative to the surrounding text.
    *
    * **`Loader`'s three steps, because the two are swapped for each other.** An
    * orb and a spinner are the same job drawn differently, a wait a reader is

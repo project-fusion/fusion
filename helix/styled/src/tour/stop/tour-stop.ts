@@ -5,7 +5,7 @@ import { styles } from './tour-stop.css.js'
 import '../../button/index.js'
 
 /**
- * @summary One stop on a tour: what it points at, and a panel to say it in.
+ * @summary One stop on a tour: the element it points at, and a panel of content about it.
  *
  * @description
  * The panel is `Popover`'s panel by another name, on purpose: a surface, an
@@ -18,15 +18,16 @@ import '../../button/index.js'
  * @category overlays
  * @documentation https://fusion.dev/helix/components/tour
  *
- * @cssproperty --tour-arrow-size - The point's box, before it is rotated.
- * @cssproperty --tour-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
- * @cssproperty --tour-bubble-size - How wide the panel may grow.
- * @cssproperty --tour-padding - Inset inside the panel.
- * @cssproperty --tour-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
- *   floating surface sits over content nobody can predict, so it keeps a lift by default.
- * @cssproperty --tour-surface-color - The panel's own surface.
+ * @cssproperty --tour-arrow-size - The size of the arrow's box, before it is rotated.
+ * @cssproperty --tour-border-width - The width of the panel's border. It follows
+ *   `--helix-border-floating`, which is `0`, so the panel stands out by its
+ *   shadow unless a theme sets a border.
+ * @cssproperty --tour-bubble-size - The widest the panel can grow.
+ * @cssproperty --tour-padding - The padding inside the panel.
+ * @cssproperty --tour-shadow - The shadow under the panel. It follows
+ *   `--helix-shadow-floating`. The panel can sit over any content, so it has a
+ *   shadow by default.
+ * @cssproperty --tour-surface-color - The color of the panel's surface.
  */
 @customElement('helix-tour-stop')
 export class HelixTourStop extends HelixHeadlessTourStop {

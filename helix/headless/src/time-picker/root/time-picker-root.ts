@@ -31,7 +31,7 @@ const isTwelveHour = (locale?: string): boolean =>
   true
 
 /**
- * @summary Picks a time, from a list of them.
+ * @summary A control for choosing a time from a list or from wheels.
  *
  * @description
  * **A list rather than three wheels**, and the reason is what a list already
@@ -72,48 +72,48 @@ const isTwelveHour = (locale?: string): boolean =>
  * @aliases Time, TimeList
  * @documentation https://fusion.dev/helix/components/time-picker
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the time changes. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the time changes, and cancelable. Canceling it keeps the current time.
+ * @event {Event} input - Fired after the value changes.
  *
- * @csspart column - One of them.
+ * @csspart column - One column of the wheels.
  * @csspart column-empty - Shown when a filter has hidden everything.
- * @csspart column-feedback - What is wrong with it.
- * @csspart column-filter-icon - The mark beside that field.
+ * @csspart column-feedback - The message that says what is wrong.
+ * @csspart column-filter-icon - The icon beside the filter field.
  * @csspart column-filter-mark - The glyph beside the filter field, where none is slotted.
  * @csspart column-hint - Help under the list.
  * @csspart column-items - The list itself.
- * @csspart column-label - The question, over the list.
- * @csspart column-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart column-loading - Shown while the options are still on their way.
+ * @csspart column-label - The label above the list.
+ * @csspart column-live - The inner list's `live` part, the region that announces its empty and loading messages.
+ * @csspart column-loading - Shown while the options load.
  * @csspart column-search - The region holding the field that narrows the list.
- * @csspart column-search-field - The field itself.
+ * @csspart column-search-field - The filter field.
  * @csspart columns - The row of columns, in `wheels`.
  * @csspart list - The listbox holding the times, in `list`.
  * @csspart list-empty - Shown when a filter has hidden everything.
- * @csspart list-feedback - What is wrong with it.
- * @csspart list-filter-icon - The mark beside that field.
+ * @csspart list-feedback - The message that says what is wrong.
+ * @csspart list-filter-icon - The icon beside the filter field.
  * @csspart list-filter-mark - The glyph beside the filter field, where none is slotted.
  * @csspart list-hint - Help under the list.
  * @csspart list-items - The list itself.
- * @csspart list-label - The question, over the list.
- * @csspart list-live - The inner list's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart list-loading - Shown while the options are still on their way.
+ * @csspart list-label - The label above the list.
+ * @csspart list-live - The inner list's `live` part, the region that announces its empty and loading messages.
+ * @csspart list-loading - Shown while the options load.
  * @csspart list-search - The region holding the field that narrows the list.
- * @csspart list-search-field - The field itself.
- * @csspart option - One time in it. Carries `data-between` inside a range.
- * @csspart option-between - A time inside a chosen range, short of either end, beside `option`.
- * @csspart option-description - The caption under the words, when there is one.
+ * @csspart list-search-field - The filter field.
+ * @csspart option - One time in the list. It carries `data-between` inside a range.
+ * @csspart option-between - A time inside a chosen range, excluding its ends, beside `option`.
+ * @csspart option-description - The caption under the time's label, when there is one.
  * @csspart option-item - The row.
  * @csspart option-item-active - The row the keyboard is on.
  * @csspart option-item-selected - The row of a chosen time: the one time, or either end of a range.
- * @csspart option-label - The words.
- * @csspart option-text - The words and the caption, as one column.
+ * @csspart option-label - The time's label.
+ * @csspart option-text - The label and the caption, as one column.
  */
 @customElement('helix-headless-time-picker')
 export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormElement) {
   /**
-   * What a reader is told when the value holds something that is not a time.
+   * The validation message for a value that is not a time.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
@@ -198,7 +198,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   mode?: 'multiple' | 'range'
 
   /**
-   * Whether the control refuses changes while still submitting its value.
+   * Blocks changes to the time. The value is still submitted with the form.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -214,7 +214,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   readOnly = false
 
   /**
-   * Whether the form refuses to submit while nothing is chosen.
+   * Stops the form from submitting while no time is chosen.
    */
   @property({ reflect: true, type: Boolean })
   required = false
@@ -403,8 +403,8 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Each wheel comes to rest on its own answer, and the list on the time it
-   * holds.
+   * Scrolls each wheel to its selected value, and the list to its selected
+   * time.
    *
    * A dial that opens at midnight when it holds ten in the evening is a dial
    * showing the wrong thing, and CSS cannot fix it: `scroll-snap-type` chooses a
@@ -462,13 +462,14 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * What a reader is told when a time is required and none is chosen.
+   * The validation message for a required time picker with no time chosen.
    */
   @property({ attribute: 'value-missing-message' })
   valueMissingMessage?: string
 
   /**
-   * Whether the times are one list or a column each.
+   * Shows the times as one `list`, or as `wheels` with a column for each part
+   * of the time.
    *
    * `list` is the default and offers whole times, which is what a product with
    * opening hours or slots actually has. `wheels` splits them into an hour, a
@@ -619,7 +620,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     }
   }
 
-  /** Puts the keyboard on the list, which is the only control here. */
+  /** Moves focus to the list, which is the only control in the picker. */
   override focus(options?: FocusOptions): void {
     this.partNamed('list')?.focus(options)
   }

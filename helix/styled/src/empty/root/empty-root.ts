@@ -5,7 +5,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './empty-root.css.js'
 
 /**
- * @summary Says that a region has nothing in it, and what to do about it.
+ * @summary A message that a region has nothing in it, and the next step to take.
  *
  * @description
  * Centered and given room, because an empty view is the only thing on screen

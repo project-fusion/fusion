@@ -6,7 +6,7 @@ import '../../listbox/index.js'
 import { styles } from './command-root.css.js'
 
 /**
- * @summary A list of commands, opened from anywhere and filtered by typing.
+ * @summary A command palette: a list of commands that opens from anywhere on the page and filters as you type.
  *
  * @description
  * The palette is a dialog holding a filterable listbox, so what this tier adds

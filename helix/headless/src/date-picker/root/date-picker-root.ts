@@ -70,7 +70,7 @@ const addMonths = (date: Date, months: number): Date => {
 }
 
 /**
- * @summary Shows a month, and takes a date from it.
+ * @summary A month calendar for choosing one or more dates.
  *
  * @description
  * A grid of days, per the APG date grid: the whole grid is one tab stop, arrows
@@ -97,16 +97,16 @@ const addMonths = (date: Date, months: number): Date => {
  * @slot next-icon - The glyph on the control that moves forward a month, usually a caret.
  * @slot previous-icon - The glyph on the control that moves back a month, usually a caret.
  *
- * @event {Event} change - Announced once the value has moved.
+ * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the dates change, and cancelable.
  * @event {HelixNavigateEvent} helix-navigate - Fired before the month on show changes, and cancelable.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} input - Fired after the value changes.
  *
- * @csspart cell - One column of a row, which is what a range paints.
+ * @csspart cell - One column of a week row. A range is painted on the cells.
  * @csspart cell-range-end - The cell of a range's last day, beside `cell`.
  * @csspart cell-range-middle - A cell between a range's ends, beside `cell`.
  * @csspart cell-range-start - The cell of a range's first day, beside `cell`.
- * @csspart day - The shape inside a cell, which is what a single date paints.
+ * @csspart day - The shape inside a cell. A single chosen date is painted on it.
  * @csspart day-disabled - A day that cannot be chosen, beside `day`.
  * @csspart day-outside - A day from a neighboring month, filling the grid out, beside `day`.
  * @csspart day-selected - The chosen day, or either end of a chosen range, beside `day`.
@@ -128,7 +128,7 @@ const addMonths = (date: Date, months: number): Date => {
 @customElement('helix-headless-date-picker')
 export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormElement) {
   /**
-   * What a reader is told when the value holds something that is not a date.
+   * The validation message for a value that is not a date.
    *
    * **Every sentence a control raises in the browser's bubble is a property**,
    * named for the validity flag it reports, so a form in another language
@@ -138,7 +138,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   badInputMessage?: string
 
   /**
-   * Month to open on, where nothing declared one.
+   * The month to open on when `month` is not set.
    */
   @property({ attribute: 'default-month' })
   defaultMonth = ''
@@ -203,7 +203,8 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   private monthState: string | undefined = undefined
 
   /**
-   * The month on show, as `YYYY-MM`. Follows `value`, then the current month.
+   * The month shown, as `YYYY-MM`. When it is not set, it follows `value`,
+   * then the current month.
    *
    * Separate from `value` on purpose, so paging selects nothing and a consumer
    * can drive the view. Reading gives the month on show; writing sets it, and
@@ -250,7 +251,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   previousLabel = 'Previous month'
 
   /**
-   * Whether the control refuses changes while still submitting its value.
+   * Blocks changes to the dates. The value is still submitted with the form.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
    * component already has: `requestValue` is what every path here comes through,
@@ -509,7 +510,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Whether the form refuses to submit while nothing is chosen.
+   * Stops the form from submitting while no date is chosen.
    */
   @property({ reflect: true, type: Boolean })
   required = false
@@ -539,7 +540,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   step = 1
 
   /**
-   * What a reader is told when a date is required and none is chosen.
+   * The validation message for a required date picker with no date chosen.
    */
   @property({ attribute: 'value-missing-message' })
   valueMissingMessage?: string

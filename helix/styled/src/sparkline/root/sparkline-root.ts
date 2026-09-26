@@ -6,7 +6,7 @@ import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'
 import { styles } from './sparkline-root.css.js'
 
 /**
- * @summary A line with no axes, for the shape of a series beside the number it belongs to.
+ * @summary A small chart with no axes that shows the shape of a series beside its number.
  *
  * @description
  * Sized in `em` by default, so a sparkline set beside a figure is a figure-sized
@@ -35,20 +35,20 @@ import { styles } from './sparkline-root.css.js'
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://fusion.dev/helix/components/sparkline
  *
- * @cssproperty --chart-terminus-hole - A fill for the middle of a `ring` terminus, which is otherwise open.
+ * @cssproperty --chart-terminus-hole - A fill for the middle of a `ring` terminus. Without it, the middle is open.
  * @cssproperty --chart-terminus-size - Size of the mark on the last reading.
- * @cssproperty --sparkline-area-opacity - How much of the line's color the wash takes where it meets the line.
- * @cssproperty --sparkline-bar-radius - Corner radius on a column, under `plot="bar"`.
- * @cssproperty --sparkline-bar-stroke - Thickness of a column's edge under `outlined`.
+ * @cssproperty --sparkline-area-opacity - Opacity of the area fill where it meets the line.
+ * @cssproperty --sparkline-bar-radius - Corner radius of a column, when `plot="bar"`.
+ * @cssproperty --sparkline-bar-stroke - Thickness of a column's edge when `emphasis` is `outlined`.
  * @cssproperty --sparkline-block-size - Height of the drawing.
- * @cssproperty --sparkline-color - Color of the line, the wash, the columns and the mark.
+ * @cssproperty --sparkline-color - Color of the line, the area fill, the columns, and the mark.
  * @cssproperty --sparkline-inline-size - Width of the drawing.
  * @cssproperty --sparkline-width - Thickness of the line, overriding `weight`.
  */
 @customElement('helix-sparkline')
 export class HelixSparkline extends HelixHeadlessSparkline {
   /**
-   * How much ink the drawing claims.
+   * How strongly the line, area, or columns are drawn.
    *
    * `subtle` mixes the drawing toward the page. The case is a table where one row
    * is being read and the rest are context.
@@ -105,7 +105,7 @@ export class HelixSparkline extends HelixHeadlessSparkline {
   terminus?: 'none' | 'ring' | 'square' | 'triangle'
 
   /**
-   * How heavy the line is drawn.
+   * How thick the line is drawn.
    *
    * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
    * in a table row among many; `thick` suits one standing on its own, where a

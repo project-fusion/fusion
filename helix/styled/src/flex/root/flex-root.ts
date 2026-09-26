@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles } from './flex-root.css.js'
 
 /**
- * @summary Lays children out in a row or a column.
+ * @summary A layout that places its children in a row or a column.
  *
  * @description
  * The host is the flex container itself and the only child is a slot, so the
@@ -33,7 +33,7 @@ import { styles } from './flex-root.css.js'
 @customElement('helix-flex')
 export class HelixFlex extends HelixElement {
   /**
-   * Alignment across the direction, which is `align-items`.
+   * How items align across the direction, set as `align-items`.
    *
    * **Named for the CSS property it sets, because it is that property.** A flex
    * container is the one place where the box-alignment words are already the
@@ -66,13 +66,13 @@ export class HelixFlex extends HelixElement {
   gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
   /**
-   * Flows with surrounding text instead of taking the full width.
+   * Flows with the surrounding text, taking only the width of its items.
    */
   @property({ reflect: true, type: Boolean })
   inline = false
 
   /**
-   * Distribution along the direction, which is `justify-content`.
+   * How items are spread along the direction, set as `justify-content`.
    *
    * Named for the property it sets, the way `alignItems` is. `between` and
    * `around` drop the `space-` prefix and nothing else does, because those two

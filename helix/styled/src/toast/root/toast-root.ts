@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './toast-root.css.js'
 
 /**
- * @summary The region messages arrive in, and the only thing that announces them.
+ * @summary The region that holds toast messages, and the only element that announces them.
  *
  * @description
  * Fixed to the window, and it catches nothing: the region spans a whole edge,

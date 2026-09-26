@@ -12,7 +12,7 @@ import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './file-input-root.css.js'
 
 /**
- * @summary A control for choosing files, by pointer or by dropping them on it.
+ * @summary A field for choosing files from a picker or by dropping them on it.
  *
  * @description
  * The field is a box rather than a line, because nothing is typed into it: its

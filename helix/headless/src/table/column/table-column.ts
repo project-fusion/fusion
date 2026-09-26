@@ -66,7 +66,7 @@ export const edgeOf = (align: string | undefined): string | undefined =>
   align && EDGES.has(align) ? align : undefined
 
 /**
- * @summary One column of a table: its heading, how wide it is, and what it reads.
+ * @summary One column of a table: its heading, its width, and the field it reads from each row.
  *
  * @description
  * **The column is the source of both its heading and its track.** Add one and
@@ -119,13 +119,13 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  *
  * @slot - The heading.
  *
- * @event {HelixBeforeResizeEvent} helix-before-resize - Fired as a reader resizes the column, with the width asked for, and cancelable.
+ * @event {HelixBeforeResizeEvent} helix-before-resize - The column is about to be resized, with the requested width. Cancelable: cancel it to keep the current width.
  *
  * @csspart column - The heading cell.
- * @csspart grip - The handle a reader moves the column by, where the table allows it.
- * @csspart grip-mark - The glyph on it.
- * @csspart resizer - The edge a reader drags to change the width, where the column allows it.
- * @csspart sort - The button a sortable heading is.
+ * @csspart grip - The handle for moving the column, when the table allows it.
+ * @csspart grip-mark - The icon on the grip.
+ * @csspart resizer - The edge that is dragged to change the width, when the column is resizable.
+ * @csspart sort - The button that a sortable heading renders as.
  *
  * @cssstate sorted-ascending - While the table is sorted by this column, smallest first.
  * @cssstate sorted-descending - While the table is sorted by this column, largest first.
@@ -133,7 +133,8 @@ export const edgeOf = (align: string | undefined): string | undefined =>
 @customElement('helix-headless-table-column')
 export class HelixHeadlessTableColumn extends HelixElement {
   /**
-   * How to read the cell, where the field alone will not do.
+   * A function that reads the cell's content from a row, for cells that `field`
+   * alone cannot read.
    *
    * A property and not an attribute, because it is a function. Set it from a Lit
    * template with `.cell=${...}`, or assign it in script. A column with neither
@@ -144,7 +145,8 @@ export class HelixHeadlessTableColumn extends HelixElement {
   cell: CellReader | undefined = undefined
 
   /**
-   * How to read the value that gets sorted and filtered, where it is not the cell.
+   * A function that reads the value used for sorting and filtering, when it
+   * differs from the cell.
    *
    * **The one that is easy to leave out and expensive to add later.** A cell
    * showing `2.4 MB` sorts as a string unless something says the underlying value
@@ -174,8 +176,8 @@ export class HelixHeadlessTableColumn extends HelixElement {
   field = ''
 
   /**
-   * What the grip that moves the column is called, with the heading's words as
-   * `{name}`.
+   * The accessible name of the grip that moves the column. `{name}` is replaced
+   * with the heading text.
    *
    * **Every word a column speaks is a property**, so a table in another
    * language hears its own rather than English around its own headings.
@@ -184,7 +186,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
   moveLabel = 'Move {name}'
 
   /**
-   * Whether a reader may change this column's width.
+   * Whether the column can be resized.
    *
    * By dragging the edge at the end of the heading, or with the arrow keys once
    * it has focus, a step at a time and four with Shift. The width lands in
@@ -195,14 +197,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
   resizable = false
 
   /**
-   * What the separator that resizes the column is called, with the heading's
-   * words as `{name}`.
+   * The accessible name of the separator that resizes the column. `{name}` is
+   * replaced with the heading text.
    */
   @property({ attribute: 'resize-label' })
   resizeLabel = 'Resize {name}'
 
   /**
-   * Whether a reader may reorder the set by this column.
+   * Whether the table can be sorted by this column.
    *
    * Ignored without a `field`, and silently: a column with nothing to sort by
    * has no order to offer, and refusing loudly would mean an actions column
@@ -280,7 +282,8 @@ export class HelixHeadlessTableColumn extends HelixElement {
   width = ''
 
   /**
-   * How the separator reads out the column's width, with `{width}` filled in.
+   * The text screen readers announce for the column's width. `{width}` is
+   * replaced with the width.
    */
   @property({ attribute: 'width-label' })
   widthLabel = '{width} pixels'
@@ -323,7 +326,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
   private hiding: MutationObserver | undefined
 
   /**
-   * The narrowest a reader can drag a column, in pixels.
+   * The narrowest width a column can be dragged to, in pixels.
    *
    * Three characters and the inset around them. Narrower and the heading has
    * nothing left to be read by, and the separator is a grab target with no
@@ -350,7 +353,10 @@ export class HelixHeadlessTableColumn extends HelixElement {
     return hidden === null || hidden === 'until-found'
   }
 
-  /** Whether a reader can actually reorder by this column. */
+  /**
+   * Whether the table can be sorted by this column, which needs `sortable` and
+   * a `field`.
+   */
   get canSort(): boolean {
     return this.sortable && this.field !== ''
   }
@@ -367,7 +373,10 @@ export class HelixHeadlessTableColumn extends HelixElement {
     return rendered === undefined ? at(row, this.field) : rendered
   }
 
-  /** The value this column sorts and filters by, which is not always what it shows. */
+  /**
+   * The value this column sorts and filters by for a row, which can differ from
+   * what it shows.
+   */
   order(row: Readonly<Record<string, unknown>>): unknown {
     const compared = this.compare?.(row)
     return compared === undefined ? at(row, this.field) : compared

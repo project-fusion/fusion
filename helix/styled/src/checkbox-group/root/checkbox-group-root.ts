@@ -7,7 +7,7 @@ import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.c
 import { styles } from './checkbox-group-root.css.js'
 
 /**
- * @summary Groups related checkboxes, and reports them as one set.
+ * @summary A group of related checkboxes under one label, with one value for the set.
  *
  * @description
  * A column by default, which is what a list of choices wants: the eye scans one
@@ -19,12 +19,13 @@ import { styles } from './checkbox-group-root.css.js'
  * @aliases Checkbox list, Multi-select
  * @documentation https://fusion.dev/helix/components/checkbox-group
  *
- * @cssproperty --checkbox-group-gap - Space between the boxes.
+ * @cssproperty --checkbox-group-gap - The space between the checkboxes.
  */
 @customElement('helix-checkbox-group')
 export class HelixCheckboxGroup extends HelixHeadlessCheckboxGroup {
   /**
-   * Which way the boxes run.
+   * The direction the checkboxes run. Set `horizontal` for a row. Unset is a
+   * column.
    */
   @property({ reflect: true })
   orientation?: 'horizontal'

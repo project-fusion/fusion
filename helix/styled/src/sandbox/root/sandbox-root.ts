@@ -32,7 +32,7 @@ const DEFAULT_PANEL = 160
 const PANEL_MAX = 0.8
 
 /**
- * @summary Pairs an editable source pane with a live preview.
+ * @summary An editable source pane paired with a live preview.
  *
  * @description
  * Coordination is by event: a source pane dispatches `helix-before-edit`, which
@@ -57,22 +57,22 @@ const PANEL_MAX = 0.8
  * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @slot panel - A panel under both panes, usually a terminal.
- * @slot preview - The live preview. Second unless `lead` says otherwise.
- * @slot source - The editable source pane. First unless `lead` says otherwise.
+ * @slot preview - The live preview. It comes second unless `lead` is `preview`.
+ * @slot source - The editable source pane. It comes first unless `lead` is `preview`.
  * @slot status - A status bar, spanning both panes at the bottom.
  * @slot toolbar - A bar across the top, spanning both panes.
  *
- * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited, by the source pane and heard here. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforePanelResizeEvent} helix-before-panel-resize - Fired before the panel's divider is let go, with its height in pixels, and a panel driven shut arrives as `panel-collapsed-size`, which is the least it goes to. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixBeforeSplitEvent} helix-before-split - Fired before the panes' divider is let go, with the lead pane's share. Cancelable: refusing it takes the decision and nothing moves.
- * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves in the source, by the source pane and heard here.
- * @event {HelixConsoleEvent} helix-console - Relayed from the frame by the preview pane, one per console call.
- * @event {HelixResizeEvent} helix-resize - How tall the frame's content is, from the preview pane, whenever it changes.
+ * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. The source pane dispatches it, and you can listen for it on the sandbox. Cancelable: cancel it to keep the source unchanged.
+ * @event {HelixBeforePanelResizeEvent} helix-before-panel-resize - Fired before the panel's divider is released, with the panel's height in pixels. A panel dragged closed reports `panel-collapsed-size`, its smallest height. Cancelable: cancel it to keep the current height.
+ * @event {HelixBeforeSplitEvent} helix-before-split - Fired before the panes' divider is released, with the lead pane's share. Cancelable: cancel it to keep the current split.
+ * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves in the source. The source pane dispatches it, and you can listen for it on the sandbox.
+ * @event {HelixConsoleEvent} helix-console - Fired once per console call in the preview frame. The preview pane dispatches it.
+ * @event {HelixResizeEvent} helix-resize - Fired by the preview pane when the height of the frame's content changes, with the new height.
  *
  * @csspart body - The splitter holding the panes above the panel.
  * @csspart corner - The handle where the two dividers cross.
  * @csspart pane - Either pane.
- * @csspart panel - The box holding whatever was slotted as the panel.
+ * @csspart panel - The box that holds the slotted panel.
  * @csspart panes - The splitter holding the source and preview panes.
  * @csspart separator - Either divider.
  *
@@ -83,13 +83,14 @@ const PANEL_MAX = 0.8
 @customElement('helix-sandbox')
 export class HelixSandbox extends HelixElement {
   /**
-   * Accessible name for the divider that moves both at once.
+   * The name of the corner handle that moves both dividers at once, read by
+   * screen readers.
    */
   @property({ attribute: 'corner-label' })
   cornerLabel = 'Resize panes and panel'
 
   /**
-   * What a reset makes the panel, in pixels.
+   * The panel height a reset restores, in pixels.
    *
    * The pair to `panel-size`.
    */
@@ -97,7 +98,7 @@ export class HelixSandbox extends HelixElement {
   defaultPanelSize = DEFAULT_PANEL
 
   /**
-   * Where a reset puts the divider, where nothing declared it.
+   * Where a reset puts the divider between the panes.
    *
    * Separate from `split` for the reason `Splitter` keeps `default-position`
    * separate from `position`. Resetting to whatever `split` held on the first
@@ -144,7 +145,7 @@ export class HelixSandbox extends HelixElement {
   orientation?: 'horizontal' | 'vertical'
 
   /**
-   * What the panel's height becomes when it is closed.
+   * The panel's height when it is closed.
    *
    * Zero closes it outright. A panel whose contents include the control that
    * reopens it, a row of tabs being the usual one, wants that row left showing,
@@ -161,7 +162,7 @@ export class HelixSandbox extends HelixElement {
   panelCollapsedSize = 0
 
   /**
-   * Accessible name for the panel's divider.
+   * The name of the panel's divider, read by screen readers.
    */
   @property({ attribute: 'panel-label' })
   panelLabel = 'Resize panel'
@@ -173,7 +174,7 @@ export class HelixSandbox extends HelixElement {
   panelSize = DEFAULT_PANEL
 
   /**
-   * Accessible name for the divider.
+   * The name of the divider between the panes, read by screen readers.
    */
   @property({ attribute: 'separator-label' })
   separatorLabel = 'Resize source pane'

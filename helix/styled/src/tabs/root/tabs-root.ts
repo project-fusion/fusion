@@ -23,8 +23,8 @@ import { styles } from './tabs-root.css.js'
  * @category navigation
  * @documentation https://fusion.dev/helix/components/tabs
  *
- * @slot - The tabs, which are this element's own children.
- * @slot panels - The panels, which are this element's own children. A wrapper around them is assigned to the slot and pairs with nothing, since the pairing walks these children rather than the slot's tree.
+ * @slot - The tabs, as direct children of this element.
+ * @slot panels - The panels, as direct children of this element. Panels inside a wrapper are not paired with tabs, because pairing reads only the direct children.
  *
  * @csspart panels - The panel container.
  * @csspart tabs - The tab list.

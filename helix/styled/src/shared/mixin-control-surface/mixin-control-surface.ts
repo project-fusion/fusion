@@ -26,9 +26,15 @@ type Constructor<T> = new (...args: any[]) => T
  * three drift the first time one gains a value.
  */
 export declare class MixinControlSurfaceInterface {
-  /** How filled it is drawn. Absent is the control's own resting treatment. */
+  /**
+   * How much fill the control is drawn with. Without it, the control uses its
+   * default.
+   */
   emphasis?: 'ghost' | 'outlined' | 'solid' | 'subtle'
-  /** What it means. Absent is `neutral`, which is the resting case. */
+  /**
+   * Which color the control is drawn in, by what it means. Without it, the tone
+   * is `neutral`.
+   */
   tone?: 'accent' | 'danger' | 'neutral' | 'primary'
 }
 
@@ -38,7 +44,7 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
   // reads when resolving inherited members into dependent packages.
   class ControlSurfaceElement extends Base {
     /**
-     * How filled it is drawn.
+     * How much fill the control is drawn with.
      *
      * Not `separation`: a Card's `outlined` says where a surface ends, and this
      * one says how much ink a control claims. One word cannot say both.
@@ -53,7 +59,7 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
     emphasis?: 'ghost' | 'outlined' | 'solid' | 'subtle'
 
     /**
-     * What it means.
+     * Which color the control is drawn in, by what it means.
      *
      * Three and an accent, not the full status set. A tag reports a state and a
      * button performs an action: a success button and a warning button are not

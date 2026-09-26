@@ -20,7 +20,7 @@ import { styles } from './toolbar-root.css.js'
  *
  * @csspart toolbar - The toolbar container.
  *
- * @cssproperty --toolbar-gap - Space between controls.
+ * @cssproperty --toolbar-gap - The space between controls.
  */
 @customElement('helix-toolbar')
 export class HelixToolbar extends HelixHeadlessToolbar {

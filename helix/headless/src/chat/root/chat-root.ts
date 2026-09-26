@@ -111,7 +111,7 @@ const spoken = (message: Element): string =>
     .trim()
 
 /**
- * @summary A conversation: the turns, and where the reader is in them.
+ * @summary A conversation's turns in a scrolling transcript that keeps the user's place.
  *
  * @description
  * **It has no opinion about where it sits.** A chat is asked for as a floating
@@ -164,54 +164,54 @@ const spoken = (message: Element): string =>
  * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot - The turns.
- * @slot actions - Beside the header: what can be done to the conversation itself.
- * @slot composer - Below the transcript, where the reader writes.
- * @slot header - Above the transcript: what this conversation is.
- * @slot resume - The way back to the bottom, shown while the reader has scrolled away.
- * @slot status - Beside the composer: somebody typing, connection lost.
+ * @slot actions - Controls for the whole conversation, beside the header.
+ * @slot composer - The composer, below the transcript.
+ * @slot header - Content above the transcript that names the conversation.
+ * @slot resume - The control that returns to the bottom, shown while the user has scrolled away.
+ * @slot status - Status beside the composer, such as someone typing or a lost connection.
  *
- * @event {HelixBeforePinEvent} helix-before-pin - Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
- * @event {HelixHistoryEvent} helix-history - Fired when the reader reaches the oldest turn while `history` is `more`, reporting where they are rather than asking.
- * @event {HelixSendEvent} helix-send - A turn offered from the composer, or a failed one asked to go again, dispatched inside and heard here because the conversation is what a consumer holds. Cancelable: refusing it takes the decision and nothing is sent.
+ * @event {HelixBeforePinEvent} helix-before-pin - Fired when the user pins or unpins the transcript by scrolling. Cancelable.
+ * @event {HelixHistoryEvent} helix-history - Fired when the user reaches the oldest turn while `history` is `more`. It reports the position and cannot be canceled.
+ * @event {HelixSendEvent} helix-send - Fired when the user sends a turn from the composer or retries a failed one. It is fired inside and handled here, so you can listen for it on the conversation. Cancelable: canceling it sends nothing and leaves the decision to you.
  *
  * @csspart actions - The controls for the conversation, at the header's trailing edge.
- * @csspart after - The room the turns below the window would take. Data only.
- * @csspart before - The room the turns above the window would take. Data only.
+ * @csspart after - The space the turns below the rendered ones would take. Only for turns from `turns`.
+ * @csspart before - The space the turns above the rendered ones would take. Only for turns from `turns`.
  * @csspart composer - The region the composer sits in.
  * @csspart empty - Shown when the conversation has no turns.
  * @csspart header - The region above the transcript.
- * @csspart history - Shown at the top of the transcript while older turns are on their way.
- * @csspart live - Where each settled turn is said, for a reader who cannot see it arrive.
- * @csspart loading - Shown while the history is still on its way.
- * @csspart log - The transcript, which is the thing that scrolls.
- * @csspart message - A turn fed as data: the message drawn for it, forwarded whole.
- * @csspart message-actions - The controls offered on a fed turn, beside its time.
- * @csspart message-avatar - A fed turn's leading slot's box.
- * @csspart message-avatar-mine - The leading slot's box on a fed turn by `me`.
- * @csspart message-body - What a fed turn said, and the line under it.
- * @csspart message-body-mine - What a fed turn by `me` said, and the line under it.
- * @csspart message-content - A fed turn's text.
- * @csspart message-content-mine - The text of a fed turn by `me`.
- * @csspart message-content-sending - A fed turn's text while it is `sending`.
- * @csspart message-content-streaming - A fed turn's text while it is `streaming`.
- * @csspart message-indicator - A fed turn's default wait.
- * @csspart message-mark - The status glyph beside a fed turn's failure.
- * @csspart message-meta - The line under a fed turn: its time, its state, and its controls.
- * @csspart message-meta-failed - The line under a fed turn that `failed`, which says so.
- * @csspart message-meta-mine - The line under a fed turn by `me`.
- * @csspart message-mine - A fed turn by `me`: the message drawn for it.
- * @csspart message-retry - The control offered on a fed turn that failed.
- * @csspart message-sources - What a fed turn was drawn from.
- * @csspart message-state - What has happened to a fed turn, where that is worth saying.
- * @csspart message-time - When a fed turn was said.
- * @csspart resume - The affordance offered while the reader is away from the bottom.
- * @csspart status - The status region, which is not part of the log.
- * @csspart turn - One turn fed as data, around the message drawn for it.
+ * @csspart history - Shown at the top of the transcript while older turns load.
+ * @csspart live - The region where screen readers announce each turn once it has arrived.
+ * @csspart loading - Shown while the history loads.
+ * @csspart log - The transcript, which scrolls.
+ * @csspart message - The message drawn for a turn from `turns`, forwarded whole.
+ * @csspart message-actions - The controls on a turn from `turns`, beside its time.
+ * @csspart message-avatar - The avatar box of a turn from `turns`.
+ * @csspart message-avatar-mine - The avatar box of a turn from `turns` by `me`.
+ * @csspart message-body - The content of a turn from `turns`, and the line under it.
+ * @csspart message-body-mine - The content of a turn from `turns` by `me`, and the line under it.
+ * @csspart message-content - The text of a turn from `turns`.
+ * @csspart message-content-mine - The text of a turn from `turns` by `me`.
+ * @csspart message-content-sending - The text of a turn from `turns` while it is `sending`.
+ * @csspart message-content-streaming - The text of a turn from `turns` while it is `streaming`.
+ * @csspart message-indicator - The default indicator of a turn from `turns`.
+ * @csspart message-mark - The status icon beside a failed turn from `turns`.
+ * @csspart message-meta - The line under a turn from `turns`, with its time, state, and controls.
+ * @csspart message-meta-failed - The line under a turn from `turns` that `failed`, which shows the failure.
+ * @csspart message-meta-mine - The line under a turn from `turns` by `me`.
+ * @csspart message-mine - The message drawn for a turn from `turns` by `me`.
+ * @csspart message-retry - The retry button on a failed turn from `turns`.
+ * @csspart message-sources - The sources of a turn from `turns`.
+ * @csspart message-state - The state text of a turn from `turns`, when there is one to show.
+ * @csspart message-time - The time of a turn from `turns`.
+ * @csspart resume - The control shown while the user is scrolled away from the bottom.
+ * @csspart status - The status region, outside the log.
+ * @csspart turn - The wrapper around the message drawn for one turn from `turns`.
  */
 @customElement('helix-headless-chat')
 export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   /**
-   * Nothing is assigned by name, so the turns land in the log and the rest does not.
+   * Slots are assigned manually, so only the turns go into the log.
    *
    * The messages are ordinary children a consumer writes with no `slot`, and a
    * `role="log"` whose turns are somewhere else is a log of nothing. Manual
@@ -228,7 +228,8 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   static readonly ESTIMATE = 72
 
   /**
-   * Whether to open pinned, where nothing declared it.
+   * Whether the transcript opens pinned to the bottom, when `pinned` is not
+   * set.
    *
    * `default-pinned="false"` opens away from the bottom. A plain boolean
    * attribute could not say that: it is true by being there, whatever it holds,
@@ -238,7 +239,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   defaultPinned = true
 
   /**
-   * Whether there are older turns than the ones here, and whether they are coming.
+   * Whether there are older turns to load, and whether they are loading.
    *
    * `more` makes reaching the top fire `helix-history`, once per arrival;
    * `loading` draws `history-text` above the oldest turn and fires nothing; empty
@@ -249,13 +250,13 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   history: '' | 'loading' | 'more' = ''
 
   /**
-   * What to say while older turns are on their way.
+   * The text shown while older turns load.
    */
   @property({ attribute: 'history-text' })
   historyText = 'Loading earlier messages'
 
   /**
-   * Accessible name for the conversation.
+   * The conversation's name, read by screen readers.
    */
   @property()
   label = ''

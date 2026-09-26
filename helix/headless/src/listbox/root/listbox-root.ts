@@ -114,7 +114,7 @@ const rangeFor = (root: Element, needle: string): Range[] => {
 }
 
 /**
- * @summary A list of options, one or several of which are the answer.
+ * @summary A list of options, from which you choose one or several.
  *
  * @description
  * **The listbox is the control and the options are its vocabulary.** A Select
@@ -138,28 +138,28 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @documentation https://fusion.dev/helix/components/listbox
  *
  * @slot - The options, and any groups of them.
- * @slot filter-icon - The mark in the filter's field. Left empty, a magnifier is drawn.
- * @slot hint - Richer than a string.
- * @slot label - Richer than a string.
+ * @slot filter-icon - The icon in the filter field. Defaults to a magnifying glass.
+ * @slot hint - The hint, for content richer than plain text.
+ * @slot label - The label, for content richer than plain text.
  *
- * @event {Event} change - Announced once the value has moved.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the answer changes, and cancelable.
- * @event {HelixFilterEvent} helix-filter - Fired before the list narrows, and cancelable.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - Fired after the value changes.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the value is about to change, and cancelable.
+ * @event {HelixFilterEvent} helix-filter - Fired before the list is filtered, and cancelable.
+ * @event {Event} input - Fired after the value changes.
  *
- * @csspart empty - Shown when a filter has hidden everything.
- * @csspart feedback - What is wrong with it.
- * @csspart filter-icon - The mark beside that field.
- * @csspart filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart empty - The text shown when the filter hides every option.
+ * @csspart feedback - The message that says what is wrong with the value.
+ * @csspart filter-icon - The icon beside the filter field.
+ * @csspart filter-mark - The default icon beside the filter field, shown when none is slotted.
  * @csspart hint - Help under the list.
- * @csspart items - The list itself.
- * @csspart label - The question, over the list.
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
- * @csspart loading - Shown while the options are still on their way.
- * @csspart search - The region holding the field that narrows the list.
- * @csspart search-field - The field itself.
+ * @csspart items - The list of options.
+ * @csspart label - The label above the list.
+ * @csspart live - A copy of the empty and loading text, in a region that screen readers announce when it changes. Visually hidden in the styled tier.
+ * @csspart loading - The text shown while the options load.
+ * @csspart search - The region that holds the filter field.
+ * @csspart search-field - The filter field.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-listbox')
 export class HelixHeadlessListbox extends MixinCollection(
@@ -186,13 +186,13 @@ export class HelixHeadlessListbox extends MixinCollection(
   autocomplete = 'off'
 
   /**
-   * What to start narrowed to, where nothing declared it.
+   * The filter text the list starts with, when `filter` is not set.
    */
   @property({ attribute: 'default-filter' })
   defaultFilter = ''
 
   /**
-   * What is shown when a filter has hidden every option.
+   * The text shown when the filter hides every option.
    *
    * From `MixinCollection`, which every collection in the library now shares,
    * and re-declared here only to keep this list's own wording: "No matches" is
@@ -206,7 +206,7 @@ export class HelixHeadlessListbox extends MixinCollection(
   private filterState: string | undefined = undefined
 
   /**
-   * What the list is narrowed to, if anything.
+   * The text the list is filtered by, if any.
    *
    * Filtering hides rather than removes, so nothing about the value changes and
    * the list is still the consumer's own elements in their own order. Reading
@@ -225,7 +225,7 @@ export class HelixHeadlessListbox extends MixinCollection(
   }
 
   /**
-   * Whether the list renders a field for narrowing itself.
+   * Whether the list shows a field for filtering it.
    *
    * The field lives here rather than in whatever frames the list, because the
    * filtering already does: `filter`, the empty state and the keyboard are all
@@ -236,13 +236,13 @@ export class HelixHeadlessListbox extends MixinCollection(
   filterable = false
 
   /**
-   * Placeholder for the field that narrows the list.
+   * Placeholder text for the filter field.
    */
   @property({ attribute: 'filter-label' })
   filterLabel = 'Filter'
 
   /**
-   * Whether more than one option can be the answer.
+   * Whether more than one option can be chosen.
    */
   @property({ reflect: true, type: Boolean })
   multiple = false
@@ -315,7 +315,8 @@ export class HelixHeadlessListbox extends MixinCollection(
   }
 
   /**
-   * Which kind of chooser this is, in the platform's two words.
+   * The kind of list, as the platform names it: `select-one` or
+   * `select-multiple`.
    *
    * Derived rather than declared, because `multiple` already decides it and a
    * second property could disagree.
@@ -325,7 +326,7 @@ export class HelixHeadlessListbox extends MixinCollection(
   }
 
   /**
-   * Every option, in the order a reader meets them.
+   * Every option, in the order they appear.
    *
    * Descendants rather than children, because a group puts a level between the
    * list and its options and the keyboard has to move through a grouped list
@@ -382,7 +383,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     return this.options.filter((option) => !option.hidden)
   }
 
-  /** The chosen values, which is a list whether or not `multiple` is set. */
+  /** The chosen values, as an array whether or not `multiple` is set. */
   get values(): string[] {
     return this.value === '' ? [] : this.value.split(',')
   }
@@ -515,7 +516,7 @@ export class HelixHeadlessListbox extends MixinCollection(
   }
 
   /**
-   * Brings the chosen option to rest in the middle of the list.
+   * Scrolls the chosen option to the middle of the list.
    *
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
@@ -745,7 +746,7 @@ export class HelixHeadlessListbox extends MixinCollection(
     }
   }
 
-  /** Requests a narrowing, and reports whether the request stood. */
+  /** Requests a new filter, and returns whether the request went through. */
   requestFilter(next: string): boolean {
     if (next === this.filter) {
       return true

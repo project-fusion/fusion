@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './divider-root.css.js'
 
 /**
- * @summary Separates content into groups with a rule.
+ * @summary A line that separates content into groups.
  *
  * @description
  * A one-pixel rule in the border color, running the full inline size by
@@ -18,14 +18,14 @@ import { styles } from './divider-root.css.js'
  * @aliases Separator, Rule
  * @documentation https://fusion.dev/helix/components/divider
  *
- * @csspart line - The rule itself.
+ * @csspart line - The line.
  *
- * @cssproperty --divider-color - Color of the rule.
- * @cssproperty --divider-length - How long a vertical rule is. Horizontal takes its width.
- * @cssproperty --divider-padding - Space taken off both ends of it.
- * @cssproperty --divider-padding-end - Off the far end only.
- * @cssproperty --divider-padding-start - Off the near end only.
- * @cssproperty --divider-thickness - How heavy the rule is.
+ * @cssproperty --divider-color - The color of the line.
+ * @cssproperty --divider-length - The length of a vertical line. A horizontal line takes the divider's width.
+ * @cssproperty --divider-padding - The space removed from both ends of the line.
+ * @cssproperty --divider-padding-end - The space removed from the end of the line only.
+ * @cssproperty --divider-padding-start - The space removed from the start of the line only.
+ * @cssproperty --divider-thickness - The thickness of the line.
  */
 @customElement('helix-divider')
 export class HelixDivider extends HelixHeadlessDivider {

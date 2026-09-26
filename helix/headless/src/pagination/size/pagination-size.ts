@@ -14,7 +14,7 @@ import '../../option/index.js'
 import '../../select/index.js'
 
 /**
- * @summary Chooses how many items a page holds.
+ * @summary A control for choosing how many items each page shows.
  *
  * @description
  * Its own element beside `Pagination` rather than a slot inside it, for the
@@ -49,33 +49,33 @@ import '../../select/index.js'
  * @aliases Page size, Rows per page
  * @documentation https://fusion.dev/helix/components/pagination
  *
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the size changes, and cancelable. The only way to refuse one.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the size changes, and cancelable. Canceling it is the only way to stop a size change.
  *
  * @csspart control - The select.
- * @csspart control-feedback - What is wrong with it.
+ * @csspart control-feedback - The message that says what is wrong.
  * @csspart control-hint - Help under the trigger.
- * @csspart control-indicator - The caret saying the control opens.
- * @csspart control-label - The words beside the number.
- * @csspart control-listbox - The list inside it.
+ * @csspart control-indicator - The caret that shows the control opens.
+ * @csspart control-label - The label beside the number.
+ * @csspart control-listbox - The list inside the panel.
  * @csspart control-listbox-empty - Shown when a filter has hidden everything.
- * @csspart control-listbox-feedback - What is wrong with the list.
+ * @csspart control-listbox-feedback - The message that says what is wrong with the list.
  * @csspart control-listbox-filter-icon - The mark beside the filter field.
  * @csspart control-listbox-filter-mark - The glyph beside the filter field, where none is slotted.
  * @csspart control-listbox-hint - Help under the list.
  * @csspart control-listbox-items - The list itself.
- * @csspart control-listbox-label - The question, over the list.
- * @csspart control-listbox-live - The inner listbox's `live`, the region a screen reader hears its empty and loading lines from.
- * @csspart control-listbox-loading - Shown while the options are still on their way.
+ * @csspart control-listbox-label - The label above the list.
+ * @csspart control-listbox-live - The inner listbox's `live` part, the region that announces its empty and loading messages.
+ * @csspart control-listbox-loading - Shown while the options load.
  * @csspart control-listbox-search - The region holding the field that narrows the list.
- * @csspart control-listbox-search-field - The field itself.
+ * @csspart control-listbox-search-field - The filter field.
  * @csspart control-surface - The floating panel.
- * @csspart control-trigger - The closed control, which says what size is chosen.
+ * @csspart control-trigger - The closed control, which shows the chosen size.
  * @csspart control-value - The chosen size inside the trigger.
  * @csspart option - One size on offer.
  * @csspart option-description - The caption under the number, when there is one.
  * @csspart option-item - The row.
  * @csspart option-item-active - The row the keyboard is on.
- * @csspart option-item-selected - The row of the size chosen.
+ * @csspart option-item-selected - The row of the chosen size.
  * @csspart option-label - The number.
  * @csspart option-text - The number and the caption, as one column.
  *
@@ -84,13 +84,13 @@ import '../../select/index.js'
 @customElement('helix-headless-pagination-size')
 export class HelixHeadlessPaginationSize extends HelixElement {
   /**
-   * Size to start on, where nothing declared one.
+   * The size to start on when `value` is not set.
    */
   @property({ attribute: 'default-value', type: Number })
   defaultValue = 0
 
   /**
-   * The words beside the control.
+   * The label beside the control.
    */
   @property()
   label = 'Per page'
@@ -114,7 +114,7 @@ export class HelixHeadlessPaginationSize extends HelixElement {
   sizes = '10,25,50,100'
 
   /**
-   * The size in force.
+   * The current page size.
    *
    * Reading gives the real one; writing declares it the consumer's, and
    * `default-value` seeds one this element owns. Same accessor pair as

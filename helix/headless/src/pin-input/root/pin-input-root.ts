@@ -14,7 +14,7 @@ import { property } from 'lit/decorators.js'
 export type PinType = 'alphanumeric' | 'numeric' | 'text'
 
 /**
- * @summary A short code, one character to a box.
+ * @summary A field for a short code, with one box for each character.
  *
  * @description
  * **One `<input>` per cell, rather than one input drawn as cells.** A single
@@ -49,18 +49,18 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
  * @documentation https://fusion.dev/helix/components/pin-input
  *
- * @event {Event} change - Announced with a filled code, and when an edited one loses focus.
- * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the code changes, and cancelable.
- * @event {HelixCompleteEvent} helix-complete - Fired when the last box is filled.
- * @event {Event} input - Announced once the value has moved.
+ * @event {Event} change - The code was filled, or an edited code lost focus.
+ * @event {HelixBeforeChangeEvent} helix-before-change - The code is about to change. Cancelable.
+ * @event {HelixCompleteEvent} helix-complete - The last box was filled.
+ * @event {Event} input - The code changed.
  *
  * @csspart cell - One box.
- * @csspart feedback - What is wrong with it.
- * @csspart field - The row of boxes, left to right on every page.
- * @csspart hint - Help under the boxes, while nothing is wrong.
- * @csspart label - The question, over the boxes.
+ * @csspart feedback - The message that says what is wrong with the code.
+ * @csspart field - The row of boxes, ordered left to right in every language.
+ * @csspart hint - The help under the boxes, shown while there is no feedback.
+ * @csspart label - The label above the boxes.
  *
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-pin-input')
 export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -77,7 +77,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   protected override readonly announcesInput = true
 
   /**
-   * What the browser may autofill, reaching the first cell only.
+   * The autofill hint for the browser, set on the first box only.
    *
    * `one-time-code` is why this defaults to anything at all: it is the token
    * that lets a phone offer the code out of a message. Later cells stay `off`
@@ -120,20 +120,20 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   placeholder = ''
 
   /**
-   * Whether the boxes refuse input while still submitting their value.
+   * Whether the boxes block input. A read-only code still submits its value.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
   /**
-   * What a reader is told when the code is started and not finished, with
-   * `{length}` filled in. Absent is the control's own sentence, in English.
+   * The message shown when the code is started and not finished, with
+   * `{length}` filled in. When it is unset, an English default is shown.
    */
   @property({ attribute: 'too-short-message' })
   tooShortMessage?: string
 
   /**
-   * What a box accepts, which decides the keyboard a phone offers.
+   * The characters a box accepts, which also sets the keyboard a phone shows.
    *
    * `numeric` and `alphanumeric` also refuse anything else on the way in,
    * because a code that is digits is digits: letting a letter into a box a
@@ -502,14 +502,14 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     this.refreshFeedback()
   }
 
-  /** Puts the caret in the first empty box, which is where a reader resumes. */
+  /** Puts the caret in the first empty box. */
   override focus(options?: FocusOptions): void {
     const cells = this.cells
     const at = Math.min(this.value.length, cells.length - 1)
     cells[at]?.focus(options)
   }
 
-  /** Empties every box and returns to the first. */
+  /** Empties every box and moves focus to the first. */
   clear(): void {
     this.requestValue('')
     this.updateComplete.then(() => {

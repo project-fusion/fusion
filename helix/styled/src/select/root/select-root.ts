@@ -15,7 +15,7 @@ import '../../listbox/index.js'
 import '../../option/index.js'
 
 /**
- * @summary A closed list that opens to be chosen from.
+ * @summary A control that opens a list of options to choose from.
  *
  * @description
  * The trigger wears the same frame as an `Input`, because in a form it stands
@@ -33,12 +33,12 @@ import '../../option/index.js'
  * @documentation https://fusion.dev/helix/components/select
  *
  * @cssproperty --select-border-color - Color of the panel's edge.
- * @cssproperty --select-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
- * @cssproperty --select-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
- *   floating surface sits over content nobody can predict, so it keeps a lift by default.
- * @cssproperty --select-surface-max-block-size - How tall the panel gets.
+ * @cssproperty --select-border-width - Width of the panel's edge. Defaults to
+ *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
+ *   your theme sets a width.
+ * @cssproperty --select-shadow - Shadow under the panel. Defaults to
+ *   `--helix-shadow-floating`, because the panel can sit over any content.
+ * @cssproperty --select-surface-max-block-size - Maximum height of the panel.
  */
 @customElement('helix-select')
 export class HelixSelect extends HelixHeadlessSelect {
@@ -53,7 +53,8 @@ export class HelixSelect extends HelixHeadlessSelect {
   ]
 
   /**
-   * How much ink the trigger claims.
+   * How strongly the trigger is drawn. Leave it unset for a framed field, or
+   * set `ghost` for a trigger with no fill or edge.
    *
    * **The first field in this library to take an axis, and the case that asked
    * for it is a control in a row rather than a control on a form.** A chat's

@@ -44,10 +44,10 @@ import { property } from 'lit/decorators.js'
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.
  *
- * @event {Event} close - Relayed, because the platform's own does not escape.
+ * @event {Event} close - Sent from the host after the drawer closes, because the native `close` event does not leave the shadow root.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the panel closes, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens, and cancelable. Canceling it keeps the panel closed.
+ * @event {Event} toggle - Sent when the drawer opens or closes, with `newState` and `oldState`.
  *
  * @csspart content - The scrolling content region.
  * @csspart header - The header region.
@@ -70,7 +70,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   })
 
   /**
-   * Which close requests the browser answers on its own.
+   * Which close requests the browser handles on its own.
    *
    * `<dialog closedby>`, forwarded, and safe to forward because every path it
    * opens still comes back through this element: a close request fires `cancel`

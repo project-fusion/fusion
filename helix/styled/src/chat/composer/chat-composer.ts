@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './chat-composer.css.js'
 
 /**
- * @summary Where the reader writes their turn.
+ * @summary A field for writing a turn in a conversation.
  *
  * @description
  * One row, and the field takes the room. **It grows with the text and stops at a
@@ -18,16 +18,16 @@ import { styles } from './chat-composer.css.js'
  * @category forms
  * @documentation https://fusion.dev/helix/components/chat
  *
- * @slot end - Under the field, beside the send control.
- * @slot start - Under the field, at the leading edge: attachments, a model picker.
+ * @slot end - Content under the field, beside the send button.
+ * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
  * @csspart field - The text field.
- * @csspart send - The control that offers the turn.
+ * @csspart send - The send button.
  * @csspart tools - The row under the field.
  *
  * @cssproperty --chat-composer-background-color - Fill behind the composer.
- * @cssproperty --chat-composer-border-width - The composer's edge, so a theme can remove it.
- * @cssproperty --chat-composer-max-block-size - How tall the field may grow.
+ * @cssproperty --chat-composer-border-width - Width of the composer's edge, so your theme can remove it.
+ * @cssproperty --chat-composer-max-block-size - Maximum height the field grows to.
  */
 @customElement('helix-chat-composer')
 export class HelixChatComposer extends HelixHeadlessChatComposer {

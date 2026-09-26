@@ -7,7 +7,7 @@ import { styles } from './area-chart-root.css.js'
 import '../../tooltip/index.js'
 
 /**
- * @summary How a total is made up over time, as bands stacked on one another.
+ * @summary A chart that shows how a total is made up over time, as bands stacked on one another.
  *
  * @description
  * The bands take the series palette in order, the first column at the bottom,
@@ -52,13 +52,16 @@ import '../../tooltip/index.js'
  * @cssproperty --area-chart-block-size - Height of the drawing.
  * @cssproperty --area-chart-fill-strength - How much of its series' color a band takes, as a percentage mixed toward the page.
  * @cssproperty --area-chart-gap - Space between the drawing and its labels.
- * @cssproperty --area-chart-gridline-color - One rule across the plot, under `gridlines`.
- * @cssproperty --area-chart-width - Thickness of a band's top edge, over `--chart-stroke`.
- * @cssproperty --chart-stroke - Thickness of a band's top edge, one name across this family, Line Chart and Bar Chart's `lines`, since the three read one shared rule. `--area-chart-width` overrides it here.
+ * @cssproperty --area-chart-gridline-color - Color of the rules drawn across the plot under `gridlines`.
+ * @cssproperty --area-chart-width - Thickness of a band's top edge. Overrides `--chart-stroke`.
+ * @cssproperty --chart-stroke - Thickness of a band's top edge. Area Chart, Line Chart, and Bar Chart's `lines` all read this one property. `--area-chart-width` overrides it here.
  */
 @customElement('helix-area-chart')
 export class HelixAreaChart extends HelixHeadlessAreaChart {
-  /** The styled tier, so the tooltip this renders is the styled one. */
+  /**
+   * The tag prefix for child elements. Set to the styled tier, so the chart
+   * renders the styled tooltip.
+   */
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [seriesStyles, tooltipStyles, styles]

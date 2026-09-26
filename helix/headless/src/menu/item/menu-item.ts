@@ -30,15 +30,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The label.
- * @slot start - Before the label. A mark about the row.
- * @slot submenu - Rows this one opens, which makes it a way in.
+ * @slot start - Content before the label, such as an icon.
+ * @slot submenu - The rows of a submenu that this row opens.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - The row was chosen. Cancelable: cancel it to keep the menu open.
  *
  * @csspart item - The row, which is an `<a>` where `href` is set.
- * @csspart mark - The trailing mark: a tick when checked, a caret when it opens
- * a page. One column, because a row is never both.
- * @csspart start - The leading column, which is a slot and is always there.
+ * @csspart mark - The trailing mark: a check mark when the row is checked, or a caret
+ * when it opens a submenu. A row never shows both, so they share one column.
+ * @csspart start - The leading column that holds the `start` slot. It is always rendered.
  */
 @customElement('helix-headless-menu-item')
 export class HelixHeadlessMenuItem extends HelixElement {
@@ -57,19 +57,19 @@ export class HelixHeadlessMenuItem extends HelixElement {
   checkable = false
 
   /**
-   * Whether the row is ticked.
+   * Whether the row is checked.
    */
   @property({ reflect: true, type: Boolean })
   checked = false
 
   /**
-   * Whether the row can be chosen.
+   * Whether the row is disabled, so it cannot be chosen.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
 
   /**
-   * Whether the link saves the file rather than opening it.
+   * Whether the link downloads the file when the row is chosen.
    *
    * Only meaningful beside an `href`, and only for a file served from this
    * origin: the attribute is ignored cross-origin, which is the browser's rule
@@ -79,7 +79,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   download = false
 
   /**
-   * Whether only one row of the set it belongs to can be on.
+   * Whether only one row in its set can be checked at a time.
    *
    * Announcement and nothing else, the way `checkable` is: this element applies
    * no choice and polices no group, so what it does is tell a reader which kind
@@ -94,7 +94,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   exclusive = false
 
   /**
-   * Where the row goes, which makes it a real link.
+   * The URL the row links to. Setting it renders the row as a link.
    *
    * **The row itself becomes an `<a>`, and the role goes with it.** A
    * `menuitem` cannot contain a link: measured in Chromium, an anchor inside
@@ -117,7 +117,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   href = ''
 
   /**
-   * Whether this row is on the page currently showing.
+   * Whether the row is on the menu page that is showing.
    *
    * Set by the menu, and a property rather than an attribute for that reason.
    * Public because the menu has to reach it, and not something a consumer
@@ -127,7 +127,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   onPage = true
 
   /**
-   * The relationship, which `target="_blank"` should always set.
+   * The link's `rel`. Set it whenever you set `target="_blank"`.
    */
   @property()
   rel = ''
@@ -146,13 +146,13 @@ export class HelixHeadlessMenuItem extends HelixElement {
   showingSubmenu = false
 
   /**
-   * Where the link opens, for the rows that should leave the page.
+   * Where the link opens, for rows that should open outside the current page.
    */
   @property()
   target = ''
 
   /**
-   * What this row stands for, carried in the event when it is chosen.
+   * The row's value, sent in `helix-select` when the row is chosen.
    */
   @property()
   value = ''
@@ -276,7 +276,8 @@ export class HelixHeadlessMenuItem extends HelixElement {
   }
 
   /**
-   * `NavigableItem`, so the arrow keys can be the shared controller's business.
+   * Moves focus to the row. Part of `NavigableItem`, which the shared keyboard
+   * controller uses for the arrow keys.
    *
    * `focus()` above already puts focus on the control inside the row rather than
    * on the row, which is the whole of what moving here means.
@@ -285,13 +286,13 @@ export class HelixHeadlessMenuItem extends HelixElement {
     this.focus()
   }
 
-  /** Chooses the row, which is the same act as pressing it. */
+  /** Chooses the row, the same as pressing it. */
   select(): void {
     this.choose()
   }
 
   /**
-   * Whether this is the row the set is on, which in a menu is where focus is.
+   * Whether the row has focus, which is what selected means in a menu.
    *
    * A radio group's selection is an answer it holds; a menu has no answer, only
    * a row the reader has walked to, so focus is the whole of what "the current

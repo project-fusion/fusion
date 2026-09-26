@@ -67,7 +67,7 @@ const fill = (
 ): string => fillTemplate(template, { page: format(page), pages: format(pages) })
 
 /**
- * @summary Moves between pages of a longer result.
+ * @summary Controls for moving between the pages of a long set of results.
  *
  * @description
  * **The component is the truncation.** Given a page and a total it works out
@@ -110,22 +110,22 @@ const fill = (
  * @slot next-icon - The glyph on the forward-one-page control, usually a caret.
  * @slot previous-icon - The glyph on the back-one-page control, usually a caret.
  *
- * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. The only way to refuse one.
+ * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. Canceling it is the only way to stop a page change.
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
- * @csspart gap - The control standing over pages not shown, which jumps into them.
+ * @csspart gap - The control in place of hidden pages, which jumps into them.
  * @csspart item - One slot in the run, holding a page or a gap.
  * @csspart last - The control that jumps to the last page, under `ends`.
  * @csspart list - The run of pages.
- * @csspart live - The region that says the page changed. Clipped, not hidden.
- * @csspart mark - The glyph on a first, previous, next or last control, where none is slotted.
+ * @csspart live - The live region that announces a page change. It is clipped out of view and still read.
+ * @csspart mark - The glyph on a first, previous, next, or last control, where none is slotted.
  * @csspart next - The control that moves forward one page.
  * @csspart page - The control for one page.
  * @csspart page-current - The page you are on, beside `page`.
  * @csspart previous - The control that moves back one page.
- * @csspart status - The reading of where you are, in `compact`.
+ * @csspart status - The text that says which page you are on, in `compact`.
  *
- * @cssstate empty - While there is one page or none, which is nothing to page through.
+ * @cssstate empty - There is one page or none, so there is nothing to page through.
  */
 @customElement('helix-headless-pagination')
 export class HelixHeadlessPagination extends HelixElement {
@@ -136,7 +136,8 @@ export class HelixHeadlessPagination extends HelixElement {
   boundaries = 1
 
   /**
-   * Where the numbers are replaced by a reading of the two.
+   * Replaces the page numbers with the current page and the page count, as
+   * written by `status-label`.
    *
    * A different structure rather than a different look, which is why it is
    * here: the run of pages is gone and a single status line stands in its
@@ -150,13 +151,13 @@ export class HelixHeadlessPagination extends HelixElement {
   compact = false
 
   /**
-   * Page to open on, where nothing declared one.
+   * The page to open on when `page` is not set.
    */
   @property({ attribute: 'default-page', type: Number })
   defaultPage = 1
 
   /**
-   * Whether to offer a jump to the first and last pages.
+   * Shows controls that jump to the first and last pages.
    *
    * Off by default. The gaps already reach any page in a few presses and the
    * last page is one of the two the run always shows, so on a short set these
@@ -179,13 +180,13 @@ export class HelixHeadlessPagination extends HelixElement {
   firstLabel = 'First page'
 
   /**
-   * Accessible name for a gap, with `{page}` filled in as where it goes.
+   * Accessible name for a gap. `{page}` is replaced with the page it jumps to.
    */
   @property({ attribute: 'gap-label' })
   gapLabel = 'Skip to page {page}'
 
   /**
-   * Address for a page, with `{page}` standing in for its number.
+   * The URL for each page. `{page}` is replaced with the page number.
    *
    * Absent renders buttons. Present renders links, which is what a paged result
    * with its own URL should be: a crawler follows them, a middle click opens
@@ -229,7 +230,7 @@ export class HelixHeadlessPagination extends HelixElement {
   nextLabel = 'Next page'
 
   /**
-   * The page on show, one-based.
+   * The current page, counting from one.
    *
    * An accessor pair, the same shape as the calendar's `month`. Reading gives
    * the page on show; writing sets it, and `default-page` seeds one the element
@@ -257,7 +258,8 @@ export class HelixHeadlessPagination extends HelixElement {
   }
 
   /**
-   * Accessible name for one page, with `{page}` and `{pages}` filled in.
+   * Accessible name for one page. `{page}` and `{pages}` are replaced with the
+   * page number and the page count.
    */
   @property({ attribute: 'page-label' })
   pageLabel = 'Page {page}'
@@ -299,7 +301,8 @@ export class HelixHeadlessPagination extends HelixElement {
   siblings = 1
 
   /**
-   * The reading shown in `compact`, with `{page}` and `{pages}` filled in.
+   * The text shown in `compact`. `{page}` and `{pages}` are replaced with the
+   * current page and the page count.
    *
    * No noun: the landmark this sits in is already named "Pagination", so
    * "Page 7 of 24" says it twice to a screen reader and takes a third of the

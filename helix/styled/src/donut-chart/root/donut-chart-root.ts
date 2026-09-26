@@ -8,7 +8,7 @@ import { styles } from './donut-chart-root.css.js'
 import '../../tooltip/index.js'
 
 /**
- * @summary Parts of a whole as a ring, read from a table.
+ * @summary A chart that shows parts of a whole as a ring, read from a table.
  *
  * @description
  * The slices take the series palette in order, so a legend beside it maps the
@@ -61,7 +61,7 @@ export class HelixDonutChart extends HelixHeadlessDonutChart {
   static override tier = 'helix-'
 
   /**
-   * How much ink the slices claim.
+   * How strongly the slices are drawn.
    *
    * `solid` is the resting arrangement and selects nothing: a slice at full
    * strength is what the base rule already draws. `subtle` is the ring as a wash

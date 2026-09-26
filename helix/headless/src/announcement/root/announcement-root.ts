@@ -12,7 +12,7 @@ import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
- * @summary A page-level message above the masthead, which can be dismissed.
+ * @summary A message for the whole page, shown above its header, that can be dismissed.
  *
  * @description
  * Chrome rather than content. An announcement sits above the header and speaks
@@ -47,21 +47,21 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://fusion.dev/helix/components/announcement
  *
  * @slot - The message.
- * @slot actions - What to do about it, usually a link or a button.
- * @slot icon - Replaces the glyph inside the dismiss control.
+ * @slot actions - Actions for the message, usually a link or a button.
+ * @slot icon - Replaces the icon inside the dismiss button.
  *
- * @event {HelixDismissEvent} helix-dismiss - Fired when the reader asks to close it. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixDismissEvent} helix-dismiss - The dismiss button was pressed. The announcement does not remove itself, so remove it in response. Cancelable.
  *
- * @csspart actions - The trailing action region.
- * @csspart content - The message region.
- * @csspart dismiss - The control that asks to close.
- * @csspart dismiss-mark - The glyph on the dismiss control, where none is slotted.
- * @csspart live - The message again, in a region a screen reader hears when the band appears mid-session. Visually hidden in the styled tier.
+ * @csspart actions - The region after the message that holds the actions.
+ * @csspart content - The region that holds the message.
+ * @csspart dismiss - The button that dismisses the announcement.
+ * @csspart dismiss-mark - The icon on the dismiss button, shown when the `icon` slot is empty.
+ * @csspart live - A copy of the message in a live region, read by screen readers when the announcement appears after the page has loaded. Visually hidden in the styled tier.
  */
 @customElement('helix-headless-announcement')
 export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   /**
-   * Which color the band wears.
+   * The band's color.
    *
    * Paint only: unlike `Callout`, no value here draws a mark, changes the label,
    * or moves the live region off polite. `neutral` is the resting value, said

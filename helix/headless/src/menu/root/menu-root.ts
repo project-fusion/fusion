@@ -19,7 +19,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
 
 /**
- * @summary A menu of commands, opened from a trigger.
+ * @summary A menu of commands that opens from a trigger.
  *
  * @description
  * The trigger is slotted and stays the consumer's own element, the same way the
@@ -46,31 +46,31 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The items.
- * @slot trigger - What opens it.
+ * @slot trigger - The control that opens the menu.
  *
- * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. Cancelable: refusing it takes the decision and nothing moves.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
+ * @event {HelixBeforeCloseEvent} helix-before-close - The menu is about to close. Cancelable: cancel it to keep it open.
+ * @event {HelixBeforeOpenEvent} helix-before-open - The menu is about to open. Cancelable: cancel it to keep it closed.
+ * @event {HelixSelectEvent} helix-select - An item was chosen. Cancelable: cancel it to keep the menu open.
+ * @event {Event} toggle - The menu opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart back - The control that returns from a submenu.
  * @csspart back-mark - The glyph on the back control of a submenu.
- * @csspart empty - Shown when there are no items to show.
+ * @csspart empty - The text shown when the menu has no items.
  * @csspart header - The bar above a submenu, holding the way back and its name.
- * @csspart live - The empty and loading lines again, in a region a screen reader hears when they change. Visually hidden in the styled tier.
- * @csspart loading - Shown while the items are still on their way.
+ * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
+ * @csspart loading - The text shown while the items are loading.
  * @csspart surface - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
  *
- * @cssstate drilled - While a submenu's page is showing rather than the menu's own, so what is not a row can leave with the page it was on.
- * @cssstate mark - While a row on the page showing can be ticked or leads to a page, so the trailing column is held open for every row.
+ * @cssstate drilled - A submenu's page is showing, so content that is not a row can hide with the top page.
+ * @cssstate mark - A row on the current page has a checkbox or a link, so every row keeps the trailing column.
  * @cssstate open - While the menu is open.
- * @cssstate start - While a row on the page showing has something in its leading column, so that column is held open for every row.
+ * @cssstate start - A row on the current page has content in its leading column, so every row keeps that column.
  */
 @customElement('helix-headless-menu')
 export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {
   /**
-   * What the row returning from a submenu reads.
+   * The text of the row that returns from a submenu.
    */
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
@@ -88,7 +88,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   offset = 4
 
   /**
-   * Preferred side.
+   * The side the menu opens on, when there is room.
    *
    * It moves if that side does not fit.
    */
@@ -189,7 +189,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     })
   }
 
-  /** Closes the menu, and forgets which page was showing. */
+  /** Closes the menu and returns it to its first page. */
   hide(): void {
     if (!this.open || !this.requestOpen(false)) {
       return

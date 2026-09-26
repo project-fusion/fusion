@@ -27,7 +27,7 @@ import { styles } from './sandbox-toolbar.css.js'
  * @slot end - Items at the end, usually menus.
  *
  * @cssproperty --sandbox-toolbar-gap - Space between items.
- * @cssproperty --sandbox-toolbar-size - The bar's height. Defaults to a large control.
+ * @cssproperty --sandbox-toolbar-size - The bar's height. Defaults to the height of a large control.
  */
 @customElement('helix-sandbox-toolbar')
 export class HelixSandboxToolbar extends HelixElement {

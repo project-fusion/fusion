@@ -35,25 +35,24 @@ import { property } from 'lit/decorators.js'
  * @aliases Toggle switch, On/off
  * @documentation https://fusion.dev/helix/components/switch
  *
- * @slot - The words naming what this turns on.
+ * @slot - The label that names what the switch turns on.
  *
- * @event {Event} change - Relayed from the input once the state has changed.
+ * @event {Event} change - Sent from the input after the state changes.
  * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired before the state changes, and cancelable.
- * @event {Event} input - Announced once the state has moved.
+ * @event {Event} input - Sent after the state changes.
  *
  * @csspart control - The input.
- * @csspart feedback - What is wrong with it.
+ * @csspart feedback - The message that says what is wrong.
  * @csspart field - The row: the track and its label.
  * @csspart hint - Help under the control, while nothing is wrong.
- * @csspart label - The words beside it.
- * @csspart track - The groove. The thumb that travels in it is drawn on the
- * groove itself, which is `::part(track)::after` from a consumer's sheet: this
- * tier ships no CSS, so a box it renders for one to paint is an empty child
- * costing whatever the consumer's own layout charges for a child. `ListItem`
- * measured that.
+ * @csspart label - The label beside the track.
+ * @csspart track - The track. Draw the thumb on the track itself, with
+ * `::part(track)::after` in your stylesheet. This tier ships no CSS, so it
+ * renders no separate thumb element, which would be an empty child that costs
+ * your layout as much as any other child. `ListItem` measured that cost.
  *
  * @cssstate checked - While it is on.
- * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
 @customElement('helix-headless-switch')
 export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(HelixFormElement)) {
