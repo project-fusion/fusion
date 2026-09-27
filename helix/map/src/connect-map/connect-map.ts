@@ -135,10 +135,12 @@ export interface MapBounds {
 export type MapPadding = number | { bottom: number; left: number; right: number; top: number }
 
 /**
- * A route or an area as a driver draws it, whatever renderer it drives: its
- * kind, the places it passes through or around, and its color settled to sRGB.
+ * A layer as a driver draws it, whatever renderer it drives: its kind, the
+ * places it passes through or around, and its color settled to sRGB.
  */
 export interface MapLayerSpec {
+  /** A raster layer's credit for its tiles, which the frame shows with the map's own. */
+  attribution?: string | undefined
   /**
    * A route's edge, drawn wider under it so it reads as laid over the roads
    * rather than as one of them, where the roads are drawn in the same brand;
@@ -155,13 +157,19 @@ export interface MapLayerSpec {
    * cuts from the rest at the route's `progress`.
    */
   faded?: boolean | undefined
+  /** Which of a raster layer's `frames` shows, counting from `0`. */
+  frame?: number | undefined
+  /** A raster layer's tile URLs, one per frame, each with `{z}`, `{x}`, and `{y}` in it. */
+  frames?: readonly string[] | undefined
   /** Stable for as long as the element is in the frame, for a renderer that keys its layers. */
   id: string
   /** What a points layer writes its counts in. */
   ink?: string | undefined
-  kind: 'area' | 'points' | 'route'
+  kind: 'area' | 'buildings' | 'points' | 'raster' | 'route'
   /** What the frame's list calls it. */
   label: string
+  /** How opaque a raster layer's tiles are, from `0` to `1`. */
+  opacity?: number | undefined
   /**
    * How a route's line is drawn where it is not solid: `dotted` for a leg
    * off the network the rest is routed on, a place set back from its road.
@@ -263,17 +271,25 @@ const METERS_PER_DEGREE = 111_320
 
 /** What the connector reads off a route or an area. */
 interface Layer extends HTMLElement {
+  /** A raster layer's credit for its tiles. */
+  attribution?: string | undefined
   /** A points layer's: whether its points gather into counts. */
   cluster?: boolean | undefined
   /** A points layer's data as a script set it. */
   data?: unknown
+  /** A raster layer's frame shown, counting from `0`. */
+  frame?: number | undefined
+  /** A raster layer's tile URLs, one per frame. */
+  frames?: string[] | undefined
   isMapLayer: true
   label?: string | undefined
-  layerKind: 'area' | 'points' | 'route'
+  layerKind: 'area' | 'buildings' | 'points' | 'raster' | 'route'
   /** A points layer's: the property each point is named by. */
   nameKey?: string | undefined
+  /** A raster layer's opacity, from `0` to `1`. */
+  opacity?: number | undefined
   points?: MapPlace[] | undefined
-  /** A points layer's GeoJSON file, fetched where `data` is not set. */
+  /** A points layer's GeoJSON file, fetched where `data` is not set; a raster layer's one tile URL. */
   src?: string | undefined
   /** A points layer's points and counts in view, which the connector writes and the layer walks. */
   walk?: Walked[] | undefined
@@ -647,6 +663,33 @@ export const connectMap = (
   const readLayers = (): MapLayerSpec[] =>
     [...frame.children].filter(isLayer).flatMap((layer): MapLayerSpec[] => {
       const color = settledColor(layer)
+      /* **Buildings are the tiles' own**, raised by the renderer, so the
+           spec carries only their color. */
+      if (layer.layerKind === 'buildings') {
+        return [{ color, id: idOf(layer), kind: 'buildings', label: layer.label ?? '', points: [] }]
+      }
+      /* **A raster layer is its tile URLs and the one shown**, `src` being a
+           layer of one frame. The last frame shows until one is chosen. */
+      if (layer.layerKind === 'raster') {
+        const frames = layer.frames?.length ? [...layer.frames] : layer.src ? [layer.src] : []
+        if (frames.length === 0) {
+          return []
+        }
+        const last = frames.length - 1
+        return [
+          {
+            ...(layer.attribution ? { attribution: layer.attribution } : {}),
+            color,
+            frame: Math.min(Math.max(0, layer.frame ?? last), last),
+            frames,
+            id: idOf(layer),
+            kind: 'raster',
+            label: layer.label ?? '',
+            opacity: Math.min(Math.max(0, layer.opacity ?? 0.7), 1),
+            points: [],
+          },
+        ]
+      }
       /* **Points are drawn from their data**, ringed in the border's color
            and counted in the outline's. */
       if (layer.layerKind === 'points') {

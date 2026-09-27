@@ -1,0 +1,5 @@
+/* Nothing drawn here. The renderer draws the tiles, which carry their own
+   colors. */
+:host {
+  display: none;
+}

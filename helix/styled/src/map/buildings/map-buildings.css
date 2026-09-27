@@ -1,0 +1,30 @@
+/* Nothing drawn here. The renderer raises the buildings, and the connector
+   reads their color from this element, so a tone is a color here and a paint
+   on the map. The raised surface by default, one step off the land, so the
+   buildings read as solid in light and dark themes. */
+:host {
+  color: var(--map-buildings-color, var(--helix-color-surface-raised));
+  display: none;
+}
+
+:host([tone="accent"]) {
+  color: var(--helix-color-accent);
+}
+:host([tone="danger"]) {
+  color: var(--helix-color-danger);
+}
+:host([tone="info"]) {
+  color: var(--helix-color-info);
+}
+:host([tone="neutral"]) {
+  color: var(--helix-color-foreground-muted);
+}
+:host([tone="primary"]) {
+  color: var(--helix-color-primary);
+}
+:host([tone="success"]) {
+  color: var(--helix-color-success);
+}
+:host([tone="warning"]) {
+  color: var(--helix-color-warning);
+}
