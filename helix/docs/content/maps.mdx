@@ -112,10 +112,11 @@ await fontReady(font)
 const map = new maplibregl.Map({ container: 'map', style: mapLibreStyle(colors, { font }) })
 ```
 
-Pass `globe: true` to draw the world as a globe when the map is zoomed out. The
-globe turns into the flat map as the map zooms in. `connectMap` hides markers on
-the far side of the globe, and a keyboard user who moves to one turns the globe
-to show it.
+The style draws the world as a globe when the map is zoomed out. The globe turns
+into the flat map as the map zooms in. `connectMap` hides markers on the far side
+of the globe, and a keyboard user who moves to one turns the globe to show it.
+Pass `globe: false` for a flat map at every zoom. MapLibre 4 has no globe, so
+pass it there too.
 
 `followTheme(map, frame, style)` restyles the map when your theme changes. It
 watches for a new color mode, class, or theme value on the frame or its

@@ -181,8 +181,8 @@ export const MAP_BASICS: readonly MapFeature[] = [
     title: 'Your typeface',
   },
   {
-    body: 'Zoom out and the world is drawn as a globe. It turns into the flat map as you zoom in.',
-    elements: ['mapLibreStyle(colors, { globe: true })'],
+    body: 'Zoom out and the world is drawn as a globe. It turns into the flat map as you zoom in. Pass globe: false for a flat map at every zoom.',
+    elements: ['mapLibreStyle(colors)'],
     title: 'A globe',
   },
   {
@@ -281,7 +281,7 @@ export const MAPS: PageCopy = {
     },
     {
       body: [
-        'The style Helix makes from your theme draws landmarks and highway signs on every map. An option on the style or the frame adds each of the rest.',
+        'The style Helix makes from your theme draws landmarks, highway signs, and a globe on every map. An option on the style or the frame adds each of the rest.',
       ],
       items: MAP_BASICS.map((feature) => ({ body: feature.body, name: feature.title })),
       kicker: 'On every map',
