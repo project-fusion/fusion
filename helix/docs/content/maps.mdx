@@ -107,6 +107,8 @@ reports which one is missing.
 | `helix-map-area` | A shape, such as a delivery zone |
 | `helix-map-position` | A moving point or arrow, such as a vehicle |
 | `helix-map-points` | Thousands of places loaded from GeoJSON |
+| `helix-map-buildings` | The map's buildings, raised to their heights in 3D |
+| `helix-map-raster` | Map tiles over the map, such as weather radar |
 
 Each element takes `tone`, such as `primary` or `danger`, for its color.
 
@@ -200,6 +202,44 @@ count zooms in to it. Pressing a point sends `helix-activate` from the layer
 with the point's id, or with the property named by `name-key`. Leaflet draws
 each point on its own, which works for hundreds of points.
 
+### Buildings in 3D
+
+```html
+<helix-map-buildings></helix-map-buildings>
+```
+
+`helix-map-buildings` raises the buildings in the map's tiles to the heights the
+tiles record, in your theme's raised surface color. Set `tone` to color them by
+meaning. The buildings appear from zoom 13. To see their height, tilt the map by
+setting `pitch` when you create it:
+
+```js
+const map = new maplibregl.Map({ container: 'map', pitch: 55, style, zoom: 15.5 })
+```
+
+Leaflet draws maps flat, so a Leaflet map shows no buildings.
+
+### Weather and other tile overlays
+
+```html
+<helix-map-raster
+  attribution="Radar from Example Weather"
+  frames="https://tiles.example/radar-50m/{z}/{x}/{y}.png https://tiles.example/radar-now/{z}/{x}/{y}.png"
+  label="Weather radar"
+></helix-map-raster>
+```
+
+`helix-map-raster` draws map tiles over the land and roads, and under your
+routes, areas, and place names. Set `src` to one tile URL, or `frames` to
+several, and set `playing` to show the frames in order, `interval` milliseconds
+each. Every frame's tiles load once, so the loop plays without a blank frame.
+
+- Put the tile provider's credit in `attribution`. The frame shows it beside
+  the map's credit.
+- The frames do not play while the user has asked for reduced motion.
+- Content that moves for more than five seconds needs a way to pause it, so
+  give `playing` a control on your page.
+
 ## Keyboard and screen readers
 
 - The frame is one tab stop. Arrow keys pan the map, and the plus and minus keys
@@ -208,8 +248,8 @@ each point on its own, which works for hundreds of points.
   wrote them. The map pans to show a marker that is off screen.
 - A points layer is one tab stop over the points and counts in view. Arrow keys
   move top to bottom and along each line. Enter on a count zooms in to it.
-- Screen readers find routes, areas, and points layers in a list inside the
-  frame, named by their `label` and `description`.
+- Screen readers find the map's layers in a list inside the frame, named by
+  their `label` and `description`.
 
 ## Write a driver
 

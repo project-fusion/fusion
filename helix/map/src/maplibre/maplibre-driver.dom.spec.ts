@@ -3,6 +3,7 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec'
 import type { MapMotion } from '../motion/motion.js'
 import {
+  buildingsExtrusion,
   geoJson,
   LAYERS,
   type MapLibreMap,
@@ -517,5 +518,98 @@ describe('mapLibreDriver', () => {
     ])
     fire('idle')
     expect(settled).toBe(1)
+  })
+
+  test('buildings are raised from the style’s own building data, under the routes and areas', () => {
+    const { asked, map, styleLayers } = stand()
+    styleLayers.splice(1, 0, {
+      id: 'building',
+      source: 'openmaptiles',
+      'source-layer': 'building',
+      type: 'fill',
+    } as { id: string; type: string })
+    let color = 'rgb(40, 40, 40)'
+    const drawn = mapLibreDriver(map).layers?.(() => [
+      { color, id: 'b', kind: 'buildings', label: '3D buildings', points: [] },
+    ])
+    expect(styleLayers.map((one) => one.id)).toContain('helix-buildings-b')
+    expect(asked).toContain('addLayer helix-buildings-b before helix-areas')
+    color = 'rgb(200, 200, 200)'
+    drawn?.update()
+    expect(asked.at(-1)).toBe('setPaintProperty helix-buildings-b fill-extrusion-color')
+    drawn?.stop()
+    expect(styleLayers.map((one) => one.id)).not.toContain('helix-buildings-b')
+  })
+
+  test('a style without building data raises no buildings', () => {
+    const { map, styleLayers } = stand()
+    mapLibreDriver(map).layers?.(() => [
+      { color: 'red', id: 'b', kind: 'buildings', label: '3D buildings', points: [] },
+    ])
+    expect(styleLayers.map((one) => one.id)).not.toContain('helix-buildings-b')
+  })
+
+  test('a raster layer loads every frame once and shows one at a time by its opacity', () => {
+    const { asked, map, sources, styleLayers } = stand()
+    let frame = 1
+    const frames = ['https://tiles.test/a/{z}/{x}/{y}.png', 'https://tiles.test/b/{z}/{x}/{y}.png']
+    const drawn = mapLibreDriver(map).layers?.(() => [
+      {
+        attribution: 'Radar credit',
+        color: 'red',
+        frame,
+        frames,
+        id: 'w',
+        kind: 'raster',
+        label: 'Weather radar',
+        opacity: 0.6,
+        points: [],
+      },
+    ])
+    expect(Object.keys(sources)).toEqual(
+      expect.arrayContaining(['helix-raster-w-0', 'helix-raster-w-1']),
+    )
+    expect(styleLayers.map((one) => one.id)).toEqual(
+      expect.arrayContaining(['helix-raster-w-0', 'helix-raster-w-1']),
+    )
+    const added = asked.filter((one) => one.startsWith('addSource helix-raster')).length
+    frame = 0
+    drawn?.update()
+    // The same frames again: no source added, only the opacities set.
+    expect(asked.filter((one) => one.startsWith('addSource helix-raster')).length).toBe(added)
+    expect(asked.slice(-2)).toEqual([
+      'setPaintProperty helix-raster-w-0 raster-opacity',
+      'setPaintProperty helix-raster-w-1 raster-opacity',
+    ])
+    drawn?.stop()
+    expect(sources['helix-raster-w-0']).toBeUndefined()
+    expect(styleLayers.map((one) => one.id)).not.toContain('helix-raster-w-1')
+  })
+
+  test('the buildings and raster layers it adds are a style MapLibre’s own validator accepts', () => {
+    const style = {
+      layers: [
+        buildingsExtrusion(
+          { color: '#888888', id: 'b', kind: 'buildings', label: '', points: [] },
+          'openmaptiles',
+        ),
+        {
+          id: 'helix-raster-w-0',
+          paint: { 'raster-fade-duration': 0, 'raster-opacity': 0.7 },
+          source: 'helix-raster-w-0',
+          type: 'raster',
+        },
+      ],
+      sources: {
+        'helix-raster-w-0': {
+          tileSize: 256,
+          tiles: ['https://tiles.test/{z}/{x}/{y}.png'],
+          type: 'raster',
+        },
+        openmaptiles: { type: 'vector', url: 'https://tiles.test/planet' },
+      },
+      version: 8,
+    }
+    expect(validateStyleMin(style as never)).toEqual([])
   })
 })

@@ -111,7 +111,7 @@ export const LAYERS: MapLibreLayer[] = [
 /** The routes and areas as GeoJSON, longitude first, an area's ring closed as GeoJSON requires. */
 export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
   features: layers.flatMap((layer) => {
-    if (layer.kind === 'points') {
+    if (layer.kind !== 'area' && layer.kind !== 'route') {
       return []
     }
     const coordinates = layer.points.map(({ lat, lng }) => [lng, lat])
@@ -132,6 +132,31 @@ export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
     }
   }),
   type: 'FeatureCollection',
+})
+
+/** A buildings layer's style layer, one per element. */
+const buildingsLayer = (id: string): string => `helix-buildings-${id}`
+
+/** A raster layer's frame, one source and one style layer each, so every frame's tiles stay loaded. */
+const rasterFrame = (id: string, at: number): string => `helix-raster-${id}-${at}`
+
+/**
+ * The buildings raised to the heights the tiles record, where the tiles mark a
+ * building as one to raise.
+ */
+export const buildingsExtrusion = (spec: MapLayerSpec, source: string) => ({
+  filter: ['!=', ['get', 'hide_3d'], true],
+  id: buildingsLayer(spec.id),
+  minzoom: 13,
+  paint: {
+    'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+    'fill-extrusion-color': spec.color,
+    'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 0],
+    'fill-extrusion-opacity': 0.9,
+  },
+  source,
+  'source-layer': 'building',
+  type: 'fill-extrusion' as const,
 })
 
 /** A points layer's source, one each, since MapLibre clusters by source. */
@@ -264,7 +289,15 @@ export interface MapLibreMap {
   /** The style as it stands: its sources are the ones to credit, and its layers what to draw under. */
   getStyle():
     | {
-        layers?: { id: string; layout?: unknown; type: string }[] | undefined
+        layers?:
+          | {
+              id: string
+              layout?: unknown
+              source?: string
+              'source-layer'?: string
+              type: string
+            }[]
+          | undefined
         sources?: Record<string, unknown> | undefined
       }
     | undefined
@@ -452,6 +485,107 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         drawnPoints.set(spec.id, { cluster, points: spec.points })
       }
     }
+    /* **Buildings and raster layers**, by spec id, with what each was drawn
+       from: the buildings' color, a raster layer's tile URLs. */
+    const drawnExtras = new Map<string, { kind: 'buildings' | 'raster'; key: string }>()
+    const takeOffExtra = (id: string): void => {
+      const had = drawnExtras.get(id)
+      if (had?.kind === 'buildings') {
+        if (map.getLayer(buildingsLayer(id))) {
+          map.removeLayer(buildingsLayer(id))
+        }
+      } else if (had?.kind === 'raster') {
+        for (let at = 0; at < had.key.split(' ').length; at += 1) {
+          const name = rasterFrame(id, at)
+          if (map.getLayer(name)) {
+            map.removeLayer(name)
+          }
+          if (map.getSource(name)) {
+            map.removeSource(name)
+          }
+        }
+      }
+      drawnExtras.delete(id)
+    }
+    /* **Under the frame's routes and areas, over the land**: the first of
+       our layers where there is one, the place names where there is not. */
+    const under = (): string | undefined =>
+      map.getLayer(LAYERS[0]?.id ?? '')
+        ? LAYERS[0]?.id
+        : map.getStyle()?.layers?.find((layer) => layer.type === 'symbol')?.id
+    const drawExtras = (specs: MapLayerSpec[]): void => {
+      const wanted = new Set(specs.map((spec) => spec.id))
+      for (const id of [...drawnExtras.keys()]) {
+        if (!wanted.has(id)) {
+          takeOffExtra(id)
+        }
+      }
+      for (const spec of specs) {
+        if (spec.kind === 'buildings') {
+          /* The style's own building data, read from whichever source its
+             building layer draws, so any OpenMapTiles style works. */
+          const source = map
+            .getStyle()
+            ?.layers?.find((layer) => layer['source-layer'] === 'building')?.source
+          if (!source) {
+            continue
+          }
+          if (map.getLayer(buildingsLayer(spec.id))) {
+            map.setPaintProperty(buildingsLayer(spec.id), 'fill-extrusion-color', spec.color)
+          } else {
+            try {
+              map.addLayer(buildingsExtrusion(spec, source) as never, under())
+            } catch {
+              continue
+            }
+          }
+          drawnExtras.set(spec.id, { key: spec.color, kind: 'buildings' })
+          continue
+        }
+        const frames = spec.frames ?? []
+        const key = frames.join(' ')
+        if (drawnExtras.get(spec.id)?.key !== key) {
+          takeOffExtra(spec.id)
+        }
+        /* **Every frame loaded once and switched by opacity**, which is how
+           a radar loop plays without a blank frame while tiles load. */
+        for (const [at, url] of frames.entries()) {
+          const name = rasterFrame(spec.id, at)
+          const opacity = at === spec.frame ? (spec.opacity ?? 0.7) : 0
+          if (map.getLayer(name)) {
+            map.setPaintProperty(name, 'raster-opacity', opacity)
+            continue
+          }
+          /* Only what a replaced style took away, which can be the layer
+             and not its source. */
+          try {
+            if (!map.getSource(name)) {
+              map.addSource(name, {
+                ...(spec.attribution ? { attribution: spec.attribution } : {}),
+                tileSize: 256,
+                tiles: [url],
+                type: 'raster',
+              } as never)
+            }
+            map.addLayer(
+              {
+                id: name,
+                paint: { 'raster-fade-duration': 0, 'raster-opacity': opacity },
+                source: name,
+                type: 'raster',
+              } as never,
+              under(),
+            )
+          } catch {
+            /* A style still loading refuses both, and its `load` draws again. */
+          }
+        }
+        drawnExtras.set(spec.id, { key, kind: 'raster' })
+      }
+    }
+    /* The routes and areas as last drawn, so a redraw for a raster frame does
+       not send the same GeoJSON again. */
+    let drawnData = ''
     /* **Tried rather than asked about.** `isStyleLoaded()` waits for the
        tiles as well as the style, so on a fresh map it said no through every
        `styledata` and yes only after the last one, and no route was drawn
@@ -463,7 +597,12 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       const data = geoJson(specs)
       const source = map.getSource(SOURCE)
       if (source?.setData) {
-        source.setData(data as never)
+        const json = JSON.stringify(data)
+        if (json !== drawnData) {
+          source.setData(data as never)
+          drawnData = json
+        }
+        drawExtras(specs.filter((spec) => spec.kind === 'buildings' || spec.kind === 'raster'))
         return
       }
       /* **Simplified by zoom, not smoothed.** A route is the router's path
@@ -479,19 +618,31 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       } catch {
         return
       }
+      drawnData = JSON.stringify(data)
       const labels = map.getStyle()?.layers?.find((layer) => layer.type === 'symbol')?.id
       for (const layer of LAYERS) {
         map.addLayer(layer as never, labels)
       }
+      drawExtras(specs.filter((spec) => spec.kind === 'buildings' || spec.kind === 'raster'))
     }
     /* A replaced style takes every layer of ours with it, the points' too. */
     const restore = (): void => {
+      const lostExtras = [...drawnExtras.entries()].filter(([id, had]) =>
+        had.kind === 'buildings'
+          ? !map.getLayer(buildingsLayer(id))
+          : !map.getLayer(rasterFrame(id, 0)),
+      )
+      for (const [id] of lostExtras) {
+        drawnExtras.delete(id)
+      }
       if (
         !map.getSource(SOURCE) ||
+        lostExtras.length > 0 ||
         [...drawnPoints.keys()].some((id) => !map.getSource(pointsSource(id)))
       ) {
         if (!map.getSource(SOURCE)) {
           drawnPoints.clear()
+          drawnData = ''
         } else {
           for (const id of drawnPoints.keys()) {
             if (!map.getSource(pointsSource(id))) {
@@ -634,6 +785,9 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           takeOff(id)
         }
         drawnPoints.clear()
+        for (const id of [...drawnExtras.keys()]) {
+          takeOffExtra(id)
+        }
         for (const layer of [...LAYERS].reverse()) {
           if (map.getLayer(layer.id)) {
             map.removeLayer(layer.id)
