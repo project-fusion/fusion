@@ -123,12 +123,14 @@ describe('map layers menu', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('true')
     expect(menu.hidden).toBe(false)
     const choices = [...menu.querySelectorAll('[part="layer-choice"]')].map((one) => [
+      one.tagName,
       (one.textContent ?? '').trim(),
-      (one.querySelector('input') as HTMLInputElement).checked,
+      one.getAttribute('aria-pressed'),
+      one.querySelector('[part="layer-icon"]')?.getAttribute('aria-hidden'),
     ])
     expect(choices).toEqual([
-      ['Depot to Mission', true],
-      ['Delivery zone', false],
+      ['BUTTON', 'Depot to Mission', 'true', 'true'],
+      ['BUTTON', 'Delivery zone', 'false', 'true'],
     ])
 
     menu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
@@ -136,16 +138,18 @@ describe('map layers menu', () => {
     expect(menu.hidden).toBe(true)
   })
 
-  test('a checkbox hides or shows its layer, the list names only what is shown, and a page hiding one is followed', async () => {
+  test('a tile hides or shows its layer, the list names only what is shown, and a page hiding one is followed', async () => {
     const host = await menuFrame()
     expect(listed(host)).toEqual(['Depot to Mission'])
-    const boxes = [
-      ...(part(host, 'layers-menu')?.querySelectorAll('input') ?? []),
-    ] as HTMLInputElement[]
+    const tiles = (): HTMLButtonElement[] =>
+      [
+        ...(part(host, 'layers-menu')?.querySelectorAll('[part="layer-choice"]') ?? []),
+      ] as HTMLButtonElement[]
     const [route, area] = [...host.children] as HTMLElement[]
 
-    boxes[0]?.click()
-    boxes[1]?.click()
+    tiles()[0]?.click()
+    await settle(host)
+    tiles()[1]?.click()
     await settle(host)
     expect(route?.hidden).toBe(true)
     expect(area?.hidden).toBe(false)
@@ -153,7 +157,7 @@ describe('map layers menu', () => {
 
     route?.removeAttribute('hidden')
     await settle(host)
-    expect(boxes[0]?.checked).toBe(true)
+    expect(tiles()[0]?.getAttribute('aria-pressed')).toBe('true')
     expect(listed(host)).toEqual(['Depot to Mission', 'Delivery zone'])
   })
 
@@ -163,8 +167,8 @@ describe('map layers menu', () => {
     host.addEventListener('helix-map-pan', () => panned.push('pan'))
     ;(part(host, 'layers-toggle') as HTMLButtonElement).click()
     await host.updateComplete
-    const box = part(host, 'layers-menu')?.querySelector('input') as HTMLInputElement
-    box.dispatchEvent(
+    const tile = part(host, 'layers-menu')?.querySelector('[part="layer-choice"]') as HTMLElement
+    tile.dispatchEvent(
       new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowUp' }),
     )
     expect(panned).toEqual([])
@@ -174,7 +178,7 @@ describe('map layers menu', () => {
     expect((part(host, 'layers-menu') as HTMLElement).hidden).toBe(true)
   })
 
-  test('layers in one group are one checkbox, named by the first, that shows or hides them all', async () => {
+  test('layers in one group are one tile, named by the first, that shows or hides them all', async () => {
     const host = (await mount(
       `<helix-headless-map controls="layers" label="Walk">
         <helix-headless-map-route group="walk" label="Walking route" points="1,1 2,2"></helix-headless-map-route>
@@ -190,8 +194,7 @@ describe('map layers menu', () => {
       'Walking route',
       '3D buildings',
     ])
-    const walk = choices[0]?.querySelector('input')
-    walk?.click()
+    ;(choices[0] as HTMLButtonElement | undefined)?.click()
     await settle(host)
     const [route, buildings, leg] = [...host.children] as HTMLElement[]
     expect([route?.hidden, buildings?.hidden, leg?.hidden]).toEqual([true, false, true])
