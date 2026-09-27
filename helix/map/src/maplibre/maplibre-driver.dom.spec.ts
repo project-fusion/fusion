@@ -591,6 +591,44 @@ describe('mapLibreDriver', () => {
     expect(styleLayers.map((one) => one.id)).not.toContain('helix-raster-w-1')
   })
 
+  test('imagery drawn as the ground goes under the roads, other tiles over them, and a deepest zoom reaches the source', () => {
+    const { map, styleLayers } = stand()
+    const sent: Record<string, unknown> = {}
+    const addSource = map.addSource.bind(map)
+    map.addSource = (id, source) => {
+      sent[id] = source
+      return addSource(id, source)
+    }
+    mapLibreDriver(map).layers?.(() => [
+      {
+        color: 'red',
+        frame: 0,
+        frames: ['https://tiles.test/radar/{z}/{x}/{y}.png'],
+        id: 'w',
+        kind: 'raster',
+        label: 'Weather radar',
+        points: [],
+      },
+      {
+        color: 'red',
+        frame: 0,
+        frames: ['https://tiles.test/photo/{z}/{y}/{x}.jpg'],
+        ground: true,
+        id: 'p',
+        kind: 'raster',
+        label: 'Satellite imagery',
+        maxZoom: 16,
+        points: [],
+      },
+    ])
+    const order = styleLayers.map((one) => one.id)
+    expect(order.indexOf('helix-raster-p-0')).toBeLessThan(order.indexOf('road'))
+    expect(order.indexOf('helix-raster-w-0')).toBeGreaterThan(order.indexOf('road'))
+    expect(order.indexOf('helix-raster-w-0')).toBeLessThan(order.indexOf('label-city'))
+    expect(sent['helix-raster-p-0']).toMatchObject({ maxzoom: 16 })
+    expect(sent['helix-raster-w-0']).not.toHaveProperty('maxzoom')
+  })
+
   test('the buildings and raster layers it adds are a style MapLibre’s own validator accepts', () => {
     const style = {
       layers: [
@@ -618,20 +656,22 @@ describe('mapLibreDriver', () => {
     expect(validateStyleMin(style as never)).toEqual([])
   })
 
-  test('a rotate or tilt during a glide aims from where the glide is headed, and tilting stops at flat', () => {
+  test('a rotate or tilt during a glide aims from where the glide is headed, a tilt can go to an angle, and tilting stops at flat', () => {
     const { asked, map } = stand()
     const driver = mapLibreDriver(map)
     driver.rotate?.({ by: 15 }, glide)
     driver.rotate?.({ by: 15 }, glide)
-    driver.tilt?.(10, glide)
+    driver.tilt?.({ by: 10 }, glide)
     driver.rotate?.({ to: 0 }, null)
-    driver.tilt?.(-40, null)
+    driver.tilt?.({ by: -40 }, null)
+    driver.tilt?.({ to: 50 }, null)
     expect(asked).toEqual([
       'easeTo bearing 45 pitch 20 250',
       'easeTo bearing 60 pitch 20 250',
       'easeTo bearing 60 pitch 30 250',
       'easeTo bearing 0 pitch 30 undefined',
       'easeTo bearing 30 pitch 0 undefined',
+      'easeTo bearing 30 pitch 50 undefined',
     ])
   })
 })

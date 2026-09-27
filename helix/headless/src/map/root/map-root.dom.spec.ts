@@ -248,8 +248,8 @@ describe('map controls on a right-to-left page', () => {
       'rotate {"by":-15}',
       'rotate {"by":15}',
       'rotate {"to":0}',
-      'tilt {"by":10}',
-      'tilt {"by":-10}',
+      'tilt {"to":50}',
+      'tilt {"to":0}',
     ])
     expect(control(host, 'face-north')?.getAttribute('aria-label')).toBe('Face north')
   })

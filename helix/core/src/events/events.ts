@@ -830,7 +830,9 @@ export interface MapRotateDetail {
 /** A tilt request, in degrees. */
 export interface MapTiltDetail {
   /** Degrees to tilt the map toward the horizon. Negative tilts it back toward flat. */
-  by: number
+  by?: number
+  /** The tilt to go to, in degrees from looking straight down. `0` is flat. */
+  to?: number
 }
 
 /**

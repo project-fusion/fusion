@@ -20,9 +20,10 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
 
-/** What the frame reads off a route or an area, which is all its list needs. */
-interface MapLayer {
+/** What the frame reads off a layer, which is all its list and menu need. */
+interface MapLayer extends Element {
   description?: string | undefined
+  hidden: boolean
   isMapLayer: true
   label?: string | undefined
 }
@@ -38,8 +39,11 @@ export type MapControlsPlacement = ViewportControlsPlacement
 /** Degrees a rotate button or key turns the map. */
 const ROTATE_STEP = 15
 
-/** Degrees a tilt button or key tilts the map. */
+/** Degrees a tilt key tilts the map. */
 const TILT_STEP = 10
+
+/** The tilt the 3D button goes to, in degrees from looking straight down. */
+const TILTED = 50
 
 /**
  * @summary A frame around a map drawn by another library.
@@ -54,10 +58,16 @@ const TILT_STEP = 10
  * `connectMap` from `@fusion.dev/helix-map`, which does this for you.
  *
  * Add `rotate` and `tilt` to `controls` for buttons that turn and tilt the
- * map, which a map with 3D buildings needs. Shift with the arrow keys does the
- * same: left and right rotate, up tilts, and down flattens. They send
- * `helix-map-rotate` and `helix-map-tilt`, which `connectMap` answers on
- * MapLibre. Leaflet draws maps flat and does not rotate.
+ * map, which a map with 3D buildings needs. The 3D button tilts the map 50
+ * degrees in one press, and the 2D button makes it flat. Shift with the arrow
+ * keys turns and tilts it in steps: left and right rotate, and up and down
+ * tilt. They send `helix-map-rotate` and `helix-map-tilt`, which `connectMap`
+ * answers on MapLibre. Leaflet draws maps flat and does not rotate.
+ *
+ * Add `layers` to `controls` for a layers button. It opens a menu with a
+ * checkbox for each layer, which sets the layer's `hidden` attribute.
+ * `connectMap` does not draw a hidden layer, so a layer you write with
+ * `hidden` starts turned off.
  *
  * Markers, routes, areas, live positions, and points layers go inside the
  * frame as child elements.
@@ -78,18 +88,21 @@ const TILT_STEP = 10
  * @event {HelixMapPanEvent} helix-map-pan - A pan button or arrow key was pressed. Move your map in response.
  * @event {HelixMapPartChangeEvent} helix-map-part-change - Clustering was turned on or off. Used by `connectMap`; pages do not need to listen for it.
  * @event {HelixMapRotateEvent} helix-map-rotate - A rotate or Face north button, or Shift with Left or Right, was pressed. Turn your map in response.
- * @event {HelixMapTiltEvent} helix-map-tilt - A tilt or flatten button, or Shift with Up or Down, was pressed. Tilt your map in response.
+ * @event {HelixMapTiltEvent} helix-map-tilt - The 3D or 2D button, or Shift with Up or Down, was pressed. Tilt your map in response.
  * @event {HelixMapZoomEvent} helix-map-zoom - A zoom button or key was pressed, with a direction. Zoom your map in response.
  *
  * @csspart attribution - The strip under the map that holds the credit.
  * @csspart controls - The group of buttons that move the map.
  * @csspart face-north - The button that turns the map to face north. Its needle points north as the map turns.
- * @csspart flatten - The button that tilts the map back toward flat.
+ * @csspart flatten - The 2D button, which makes the map flat.
  * @csspart footer - The strip below the map.
  * @csspart fullscreen - The button that makes the map fill the screen.
  * @csspart header - The strip above the map.
  * @csspart layer - One entry in the list of the map's layers.
- * @csspart layers - The list of the map's layers, such as routes, areas, and points, read by screen readers.
+ * @csspart layer-choice - One layer's checkbox and name in the layers menu.
+ * @csspart layers - The list of the map's shown layers, such as routes, areas, and points, read by screen readers.
+ * @csspart layers-menu - The menu of the map's layers, which the layers button opens.
+ * @csspart layers-toggle - The button that opens and closes the layers menu.
  * @csspart needle - The arrow inside the Face north button, turned to point north.
  * @csspart pan-down - The button that pans the map down.
  * @csspart pan-end - The button that pans toward the end of a line of text: right in English.
@@ -98,7 +111,7 @@ const TILT_STEP = 10
  * @csspart region - The named region the map sits in.
  * @csspart rotate-left - The button that turns the map counterclockwise.
  * @csspart rotate-right - The button that turns the map clockwise.
- * @csspart tilt - The button that tilts the map toward the horizon.
+ * @csspart tilt - The 3D button, which tilts the map toward the horizon.
  * @csspart viewport - The box the map is drawn in.
  * @csspart zoom-in - The button that zooms in.
  * @csspart zoom-out - The button that zooms out.
@@ -140,8 +153,8 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   label = ''
 
   /**
-   * The name of the list of the map's layers, such as routes, areas, and
-   * points, read by screen readers.
+   * The name of the layers button and menu, and of the list of the map's
+   * layers, such as routes, areas, and points, read by screen readers.
    */
   @property({ attribute: 'layers-label' })
   layersLabel = 'Map layers'
@@ -164,8 +177,41 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   private get layers(): MapLayer[] {
     return this.knownChildren.filter(
-      (child): child is MapLayer & Element => (child as Partial<MapLayer>).isMapLayer === true,
+      (child): child is MapLayer => (child as Partial<MapLayer>).isMapLayer === true,
     )
+  }
+
+  /** Whether the layers menu is open. */
+  @state()
+  private layersOpen = false
+
+  /* A layer a page hides or shows itself, which its checkbox and the list
+     follow. Made on connection, so the server never builds one. */
+  private hiding?: MutationObserver
+
+  /** Closes the layers menu on a press anywhere outside the frame. */
+  private readonly handleOutside = (event: PointerEvent): void => {
+    if (!event.composedPath().includes(this)) {
+      this.layersOpen = false
+    }
+  }
+
+  /**
+   * Keys pressed in the layers menu. Escape closes it and returns to its
+   * button, and no key reaches the region, where the arrows would pan the map.
+   */
+  private readonly handleMenuKeydown = (event: KeyboardEvent): void => {
+    event.stopPropagation()
+    if (event.key === 'Escape' && this.layersOpen) {
+      this.layersOpen = false
+      this.renderRoot.querySelector<HTMLElement>('[part="layers-toggle"]')?.focus()
+    }
+  }
+
+  /** Shows or hides a layer, which `connectMap` draws or takes off the map. */
+  private showLayer(layer: MapLayer, shown: boolean): void {
+    layer.hidden = !shown
+    this.requestUpdate()
   }
 
   /**
@@ -303,10 +349,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('keydown', this.handleMarkerKeydown)
     this.addEventListener('keyup', this.handleMarkerKeyup)
+    this.hiding = new MutationObserver(() => this.requestUpdate())
+    this.hiding.observe(this, { attributeFilter: ['hidden'], attributes: true, subtree: true })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.hiding?.disconnect()
+    document.removeEventListener('pointerdown', this.handleOutside)
     this.removeEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
@@ -321,6 +371,13 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (changed.has('layersOpen')) {
+      if (this.layersOpen) {
+        document.addEventListener('pointerdown', this.handleOutside)
+      } else {
+        document.removeEventListener('pointerdown', this.handleOutside)
+      }
+    }
     const markers = this.markers
     /* On the cluster standing for the marker the stop was on, while it is
        gathered, so Tab still reaches the map's places. */
@@ -350,11 +407,64 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     this.dispatchEvent(new HelixMapTiltEvent({ by }))
   }
 
-  /** The rotate and tilt buttons, where `controls` names them. */
+  /** Tilts the map to some degrees from looking straight down. `0` makes it flat. */
+  tiltTo(to: number): void {
+    this.dispatchEvent(new HelixMapTiltEvent({ to }))
+  }
+
+  /**
+   * The layers button and its menu: a checkbox for each layer, in the order
+   * they are written, which shows or hides it.
+   */
+  private renderLayersMenu(): TemplateResult | typeof nothing {
+    const layers = this.layers
+    if (!this.drawsControls('layers') || layers.length === 0) {
+      return nothing
+    }
+    return html`<button
+        part="layers-toggle"
+        aria-controls="layers-menu"
+        aria-expanded=${this.layersOpen ? 'true' : 'false'}
+        aria-label=${this.layersLabel}
+        type="button"
+        @click=${() => {
+          this.layersOpen = !this.layersOpen
+        }}
+        @keydown=${this.handleMenuKeydown}
+      >
+        <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 16 16" width="16">
+          <path d="M8 2.5 14 6 8 9.5 2 6Z" />
+          <path d="M2 9.5 8 13 14 9.5" />
+        </svg>
+      </button>
+      <div
+        part="layers-menu"
+        id="layers-menu"
+        role="group"
+        aria-label=${this.layersLabel}
+        ?hidden=${!this.layersOpen}
+        @keydown=${this.handleMenuKeydown}
+      >
+        ${layers.map(
+          (layer) =>
+            html`<label part="layer-choice">
+              <input
+                type="checkbox"
+                .checked=${!layer.hidden}
+                @change=${(event: Event) => this.showLayer(layer, (event.target as HTMLInputElement).checked)}
+              />
+              ${layer.label ?? ''}
+            </label>`,
+        )}
+      </div>`
+  }
+
+  /** The rotate, tilt, and layers buttons, where `controls` names them. */
   protected override renderMoreControls(): TemplateResult | typeof nothing {
     const rotate = this.drawsControls('rotate')
     const tilt = this.drawsControls('tilt')
-    if (!rotate && !tilt) {
+    const menu = this.renderLayersMenu()
+    if (!rotate && !tilt && menu === nothing) {
       return nothing
     }
     return html`${
@@ -371,14 +481,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         : nothing
     }${
       tilt
-        ? html`<button part="tilt" aria-label=${this.tiltLabel} type="button" @click=${() => this.tilt(TILT_STEP)}>
+        ? html`<button part="tilt" aria-label=${this.tiltLabel} type="button" @click=${() => this.tiltTo(TILTED)}>
               3D
             </button>
-            <button part="flatten" aria-label=${this.flattenLabel} type="button" @click=${() => this.tilt(-TILT_STEP)}>
+            <button part="flatten" aria-label=${this.flattenLabel} type="button" @click=${() => this.tiltTo(0)}>
               2D
             </button>`
         : nothing
-    }`
+    }${menu}`
   }
 
   /** The keys the region answers, which `rotate` and `tilt` add to. */
@@ -393,7 +503,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     return keys.join(' ')
   }
 
-  /** Shift with the arrow keys: left and right rotate, up tilts, and down flattens. */
+  /** Shift with the arrow keys: left and right rotate, and up and down tilt in steps. */
   protected override handleMoreKeys(event: KeyboardEvent): boolean {
     if (!event.shiftKey) {
       return false
@@ -453,7 +563,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * the page once a renderer has drawn it, which is later still.
    */
   protected renderLayers(): TemplateResult | typeof nothing {
-    const layers = this.layers
+    const layers = this.layers.filter((layer) => !layer.hidden)
     if (layers.length === 0) {
       return nothing
     }
