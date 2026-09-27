@@ -86,34 +86,34 @@ const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software rasterizer|bas
  * @summary A drifting background of light, drawn in your theme's colors.
  *
  * @description
- * One fragment shader over a full-screen triangle, with the palette read from
- * the tokens rather than given as colors. A background written with hex values
- * is an asset that has to be re-cut when the brand moves; one written against
- * `--helix-color-primary` is a consequence of it.
+ * One fragment shader draws over a full-screen triangle, and its palette comes
+ * from the tokens. A background built on `--helix-color-primary` changes when
+ * your brand color changes.
  *
- * **Every shape ramps through four token stops**, and the token layer inverts
- * each: the page's background, `primary-subtle`, `primary`, then a peak. The
- * peak is the foreground on a dark page and `primary-active` on a light one,
- * because mixing a saturated hue toward near-black takes the chroma out of the
- * pixels carrying most of it. Which way the page runs is read off the ground's
- * own luminance rather than asked of the mode, which is a private token.
+ * Every shape ramps through four token stops, and the token layer inverts each
+ * one: the page background, `primary-subtle`, `primary`, and a peak. The peak
+ * is the foreground on a dark page and `primary-active` on a light one, because
+ * mixing a saturated hue toward near-black removes its chroma. The component
+ * reads which way the page runs from the background's luminance, because the
+ * mode is a private token.
  *
- * **No dependency, and no scene graph.** The geometry is three vertices derived
- * from `gl_VertexID`, so there is no attribute, no buffer and no upload.
+ * The geometry is three vertices derived from `gl_VertexID`. There is no
+ * dependency, scene graph, attribute, buffer, or upload.
  *
- * **It stops when nobody is looking**, off screen and in a background tab, and
- * `prefers-reduced-motion` gets one still frame rather than an empty box. A
- * context the browser takes back, on a GPU reset or past its cap of about
- * sixteen, stops it too, and the gradient shows until the context returns.
+ * The shader stops drawing in these cases:
+ * - The element is off screen or in a background tab.
+ * - `prefers-reduced-motion` is set. The element shows one still frame.
+ * - The browser takes back the drawing context, on a GPU reset or past its
+ *   limit of about sixteen contexts. The gradient shows until the context
+ *   returns.
  *
- * **It declines a renderer that draws on the CPU**, which is a headless browser
- * and a machine with no usable GPU, and shows the gradient instead. The shader
- * costs about 450ms of first frame per element there against 2ms on a GPU, for
- * a field drawn from the same tokens the gradient already ramps.
+ * On a renderer that draws on the CPU, such as a headless browser or a machine
+ * with no usable GPU, the element shows the gradient. There the shader costs
+ * about 450ms for the first frame of each element, against 2ms on a GPU.
  *
- * Styled only, and with behavior, which the tier split does not otherwise
- * allow: the behavior is drawing to a canvas, so there is no structure a
- * consumer could restyle and nothing for a headless twin to hold.
+ * Aura is styled only and has behavior, which the tier split does not otherwise
+ * allow. Its behavior is drawing to a canvas, so there is no structure for you
+ * to restyle and nothing for a headless version to hold.
  *
  * @since 0.1.0
  * @status stable

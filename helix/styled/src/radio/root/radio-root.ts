@@ -8,14 +8,12 @@ import { styles } from './radio-root.css.js'
  * @summary One choice in a radio group.
  *
  * @description
- * A circle with a dot in it, drawn here rather than by the browser for the
- * reason the checkbox's box is: this is a `<button role="radio">`, so there was
- * never a native control to restyle, and the weight and the motion of the mark
- * are ours either way.
+ * Draws a circle with a dot in it. The element is a `<button role="radio">`, so
+ * there is no native control to restyle, the same as the checkbox's box.
  *
- * The dot scales from nothing, like the checkbox's tick, so choosing shows
- * something happening. It has no color, because color is reserved for state
- * and being chosen is an answer rather than a state.
+ * The dot scales up from nothing when the radio is chosen, like the checkbox's
+ * tick. It has no color, because Helix reserves color for state, and a chosen
+ * radio is an answer.
  *
  * @since 0.1.0
  * @status stable

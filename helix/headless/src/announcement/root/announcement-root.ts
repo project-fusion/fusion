@@ -15,30 +15,23 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary A message for the whole page, shown above its header, that can be dismissed.
  *
  * @description
- * Chrome rather than content. An announcement sits above the header and speaks
- * for the whole page: a trial ending, a service degraded, a change of terms. A
- * passage that interrupts a document to set itself apart is a `Callout`, which
- * is read where it sits and cannot be dismissed. Neither is a variant of the
- * other.
+ * An announcement is a banner above the page header with news about the whole
+ * site or session, such as a trial ending, a degraded service, or a change of
+ * terms. For a passage inside a document, use `Callout`, which stays where it
+ * is placed and cannot be dismissed.
  *
- * **Always a polite live region.** `role="alert"` is assertive and interrupts
- * whatever is being read, which is right for something that appears mid-session
- * and wrong for something that was in the served HTML: an assertive
- * announcement would cut across a screen-reader user on every page load, before
- * they had read anything. Politeness costs a moment and is never wrong; the tone
- * does not change that, because an error that was always there is still not an
- * interruption.
+ * The announcement is always a polite live region, whatever its `tone`.
+ * `role="alert"` is assertive and interrupts a screen reader, so an
+ * announcement served with the page would interrupt on every page load.
  *
- * **The region is its own, and there before its words.** The host was the
- * region, and a banner raised mid-session arrives with its message already in
- * it, which a screen reader reads inconsistently at best. So the message is said
- * from a region filled a frame after the banner appears, and one that came with
- * the page is filled at once and says nothing, being no news.
+ * The live region is its own part. When the announcement appears after the page
+ * has loaded, the message is written into the region one frame later, so screen
+ * readers read it reliably. When the announcement is in the served HTML, the
+ * region is filled at once and nothing is read out.
  *
- * Dismissing is a request. The announcement does not remove itself, because the
- * consumer owns the markup and taking the node out from under them would put
- * their state and the document out of step. `preventDefault()` on the
- * `helix-dismiss` is a refusal.
+ * The dismiss button fires `helix-dismiss`, and the announcement stays in the
+ * document, so remove it in your listener. The event is cancelable, and
+ * `dismiss()` returns `false` when a listener calls `preventDefault()`.
  *
  * @since 0.1.0
  * @status stable

@@ -7,8 +7,8 @@ import { styles } from './timeline-root.css.js'
  * @summary A list of events, in the order they happened.
  *
  * @description
- * Presentation only: the direction time runs in, and the spacing between one
- * event and the next. Every entry draws its own mark and its own line.
+ * Sets the direction time runs in and the spacing between events. Each entry
+ * draws its own mark and line.
  *
  * @since 0.1.0
  * @status stable

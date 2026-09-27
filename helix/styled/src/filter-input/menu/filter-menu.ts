@@ -9,13 +9,12 @@ import '../../menu/index.js'
  * @summary A menu for building a filter by picking a field and checking its values.
  *
  * @description
- * Everything drawn here is drawn by something else: the trigger is the
- * consumer's, and the pages are `Menu`'s, whose reserved tick column is what
- * keeps a page of ticked and unticked values on one edge. This element's own
- * stylesheet is one rule, and it is `display: contents`.
+ * Draws nothing of its own. The trigger is yours, and the pages are `Menu`'s,
+ * whose reserved tick column keeps ticked and unticked values aligned. The
+ * element's stylesheet has one rule: `display: contents`.
  *
- * The headless note carries the model, including why a tick is a filter
- * immediately and why the operator is decided here rather than on the chip.
+ * The headless element documents the model, including why a tick applies a
+ * filter immediately and why the menu decides the operator.
  *
  * @since 0.25.0
  * @status stable

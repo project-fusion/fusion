@@ -6,9 +6,9 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  *
  * @description
  * The row renders its cells straight through and lays out none of them, so a
- * sheet can take them into the table's own grid and every column lines up
- * across every row. The row still exists as an element, which is what a
- * `<table>` gives away when its cells are laid out by the table algorithm.
+ * stylesheet can place them in the table's grid and every column lines up
+ * across rows. The row still exists as an element, so you can style it, hide
+ * it, or make it interactive.
  *
  * @since 0.1.0
  * @status stable

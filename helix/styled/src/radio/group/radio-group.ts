@@ -9,10 +9,10 @@ import { styles } from './radio-group.css.js'
  * @summary A set of radios where exactly one can be chosen.
  *
  * @description
- * The field's three parts, laid out the way every other field lays them out: a
- * question over the set, and one line under it that is help until something is
- * wrong. `orientation` lays out the choices and not the field, so a horizontal
- * group keeps its question above the row rather than beside the first choice.
+ * Lays out the field's three parts the same way as every other field: the
+ * question above the set, and one line below it that shows the hint, or the
+ * message when something is wrong. `orientation` lays out the choices only, so
+ * a horizontal group keeps its question above the row.
  *
  * @since 0.1.0
  * @status stable

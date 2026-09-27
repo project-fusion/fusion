@@ -11,10 +11,10 @@ import '../../tooltip/index.js'
  * @summary A chart that draws a table's categories as columns.
  *
  * @description
- * The columns take the series palette in order, so a chart of one is series one
- * and a chart of four is the first four. Rounded at the far end only, because a
- * column grows from the baseline and a rounded foot would lift it off the rule
- * it is measured against.
+ * The columns take the series palette in order, so a chart with one series uses
+ * the first color and a chart with four uses the first four. Only the end away
+ * from the baseline is rounded, so each column sits flat on the rule it is
+ * measured from.
  *
  * @since 0.1.0
  * @status stable

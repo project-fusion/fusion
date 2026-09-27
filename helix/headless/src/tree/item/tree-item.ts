@@ -13,23 +13,19 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One node in a tree.
  *
  * @description
- * **`open`, on `MixinControllerOpen`, rather than a bare boolean of its own.**
- * A branch showing its children is the same state a disclosure holds. A
- * hand-written toggle announces nothing, so a consumer could neither know a
- * branch opened nor own the state. `aria-expanded` is still what the row
- * renders: the property differs, not the semantics.
+ * `open` comes from `MixinControllerOpen`, the same state a disclosure holds,
+ * so you can respond to a branch opening and control the state yourself. The
+ * row renders `aria-expanded`.
  *
- * An element rather than a slot, because it owns state: whether it is open,
- * selected, and whether it holds focus.
+ * Each item is an element because it holds state: whether it is open, selected,
+ * and focused.
  *
- * A branch is any item with something slotted into `children`, detected on the
- * client because the server cannot inspect children. The server renders the
- * node as a leaf and the twisty appears on hydration, which is the harmless
- * direction.
+ * An item is a branch when something is slotted into `children`. This is
+ * detected on the client, so server-rendered markup shows a leaf and the twisty
+ * appears on hydration.
  *
- * **`href` makes the row itself the link.** With the anchor slotted into the
- * name instead, everything outside the words is dead: no Enter, no middle
- * click, no status bar. Given an `href` the row *is* an `<a>`.
+ * **`href` makes the whole row a link**, rendered as an `<a>`. Enter, middle
+ * click, and the status bar then work anywhere on the row.
  *
  * @since 0.1.0
  * @status stable

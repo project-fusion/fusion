@@ -8,13 +8,11 @@ import { styles } from './canvas-node.css.js'
  * @summary One card or group on a canvas.
  *
  * @description
- * The card is the host, because the board places the host: its coordinates are
- * written onto this element, so a wrapper inside would have to be told the same
- * things twice.
+ * The card is the host element, because the board writes the card's coordinates
+ * onto the host.
  *
- * **Before it is placed it is a card in the flow**, which is what a page
- * without JavaScript has: the text somebody wrote, in the order they wrote it,
- * rather than a heap at the origin.
+ * Before the board places it, the card sits in normal flow. Without JavaScript,
+ * the page shows the cards' text in the order it was written.
  *
  * @since 0.100.0
  * @status experimental

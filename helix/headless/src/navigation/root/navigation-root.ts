@@ -6,21 +6,18 @@ import { property } from 'lit/decorators.js'
  * @summary A set of destinations, with a marker on the current one.
  *
  * @description
- * Renders a real `<nav>`, which is the landmark a screen-reader user jumps to.
- * It exists as its own component rather than as a region of `AppHeader` because
- * a header is not inherently navigation, and navigation is not only ever in a
- * header: a footer and a sidebar hold the same thing.
+ * Renders a real `<nav>`, the landmark that screen reader users jump to.
+ * Navigation is its own component, separate from `AppHeader`, so you can use it
+ * in a header, a footer, or a sidebar.
  *
- * **It renders no links.** The consumer brings them, marked with
- * `aria-current="page"` and styled by the `data-navigation-item` recipe, for the same
- * reason nothing else here renders an anchor: a router renders its own, and
- * cannot render it inside this shadow root.
+ * **It renders no links.** Bring your own, mark the current one with
+ * `aria-current="page"`, and style them with the `data-navigation-item` recipe.
+ * A router renders its own anchors and cannot render them inside the
+ * component's shadow root.
  *
- * What this owns is the marker that travels between them, and that is the whole
- * reason it is a component. A marker that moves needs something that knows
- * where every item is, and reading `aria-current` is how it knows which: the
- * thing that makes the page announce correctly is the same thing that puts the
- * marker in the right place.
+ * The component moves a marker to the current item. It finds the current item
+ * by reading `aria-current`, so the attribute that screen readers announce also
+ * places the marker.
  *
  * @since 0.1.0
  * @status stable

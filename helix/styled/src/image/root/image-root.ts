@@ -8,9 +8,9 @@ import { styles } from './image-root.css.js'
  * @summary An image that shows a placeholder while it loads and a fallback if it fails.
  *
  * @description
- * Presentation only: the box the picture is given, how it fills it, and the
- * fade when it lands. What the three states are and when they change is the
- * base class.
+ * The styled tier adds presentation only: the box the picture is given, how the
+ * picture fills it, and the fade when it loads. The base class defines the
+ * three states and when they change.
  *
  * @since 0.1.0
  * @status stable

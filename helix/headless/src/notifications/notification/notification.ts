@@ -22,29 +22,21 @@ import '../../format-date/index.js'
  * @summary A single notification about something that happened, marked read or unread.
  *
  * @description
- * A notification is a toast that did not go away. `Toast` is deliberately the
- * opposite of this: a live region whose items carry a `duration` and whose root
- * never creates or destroys anything. What makes this its own family is the
- * state each item carries rather than the arrangement it sits in: read and
- * unread, a timestamp that has to stay correct, and an action a reader can take
- * later.
+ * A notification is a toast that stays. `Toast` is a live region whose items
+ * have a `duration`. A notification carries state instead: read or unread, a
+ * timestamp that stays correct, and an action you can take later.
  *
- * **The row is a label, a caption under it, and one trailing column that holds
- * either the time or the controls.** A feed is scanned rather than read, so the
- * thing that happened gets the first line on its own and everything qualifying
- * it goes under. The time and the controls occupy the same place because a
- * reader wants exactly one of them at a time: the time while they are scanning,
- * and what they can do about it once they have stopped on a row.
+ * The row has a label, a caption under it, and one trailing column. The label
+ * gets the first line on its own, so a feed is quick to scan. The trailing
+ * column shows either the time or the controls: the time while you scan, and
+ * the controls once you stop on a row.
  *
- * **The timestamp is `FormatDate`**, which is where the reading, the `<time
- * datetime>` and the shared timer now live. It was implemented here, and a
- * component that formats a date is not a fact about notifications: Chat wanted
- * the same thing and had its own copy of half of it.
+ * `FormatDate` renders the timestamp, including the readable text, the
+ * `<time datetime>` element, and the shared timer that keeps it current.
  *
- * **Read state is reported, not invented.** Marking something read is usually a
- * round trip, and a component that flips its own state and then hears the
- * request failed has told the reader something untrue. `helix-read` is
- * cancelable, and a `read` set by the consumer makes this element defer entirely.
+ * Read state is reported to you. Marking a notification read is usually a round
+ * trip to a server, so `helix-read` is cancelable, and when you set `read`
+ * yourself the element leaves it to you.
  *
  * @since 0.1.0
  * @status stable

@@ -6,9 +6,9 @@ import { property } from 'lit/decorators.js'
  * @summary A row of related measurements.
  *
  * @description
- * A group rather than a list, because the figures are read together and their
- * order carries no meaning: a list would announce "1 of 4" for a set where the
- * position is not information.
+ * Screen readers announce the stats as a group. The figures are read together
+ * and their order has no meaning, so the group does not announce positions such
+ * as "1 of 4".
  *
  * @since 0.1.0
  * @status stable

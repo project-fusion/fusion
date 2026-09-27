@@ -7,10 +7,10 @@ import { styles } from './icon-root.css.js'
  * @summary A named icon from the Helix set.
  *
  * @description
- * Draws in `currentColor` and sizes from `--icon-size`, so an icon inherits the
- * color of the text it sits in and a container can resize it without reaching
- * for a prop. Inside a button that hook is set in `em`, which keeps the icon in
- * proportion as the button's own size changes.
+ * Draws in `currentColor` and sizes from `--icon-size`, so an icon takes the
+ * color of the text around it and a container can resize it without a property.
+ * Inside a button, `--icon-size` is set in `em`, so the icon scales with the
+ * button.
  *
  * @since 0.1.0
  * @status stable

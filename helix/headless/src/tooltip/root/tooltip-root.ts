@@ -19,37 +19,29 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @summary A short text that appears next to an element on hover and focus.
  *
  * @description
- * The trigger is slotted and stays the consumer's own element. The bubble is
- * rendered here, in the top layer through the popover API, so it clears any
- * ancestor with `overflow: hidden` without a `z-index` anywhere. Position comes
- * from `FloatingController`, which flips to another side when the preferred one
- * does not fit.
+ * The trigger is slotted and stays your own element. The bubble renders in the
+ * top layer through the popover API, so an ancestor with `overflow: hidden`
+ * does not clip it and no `z-index` is needed. `FloatingController` positions
+ * it and flips it to another side when the preferred side does not fit.
  *
- * **Two forms, and they are not equivalent for a screen reader.** Wrapping is
- * the convenience form and is right where the bubble decorates a control that
- * already says what it is: nothing here can describe a slotted trigger, an
- * IDREF being unable to cross a shadow boundary.
+ * Wrapping the trigger is the convenient form. Use it where the trigger already
+ * has an accessible name, because the tooltip cannot describe a slotted
+ * trigger: an IDREF cannot cross a shadow boundary.
  *
- * `for` is the form that works. The tooltip sits *beside* the trigger in the
- * consumer's own tree and names it by id, so an IDREF between them is legal in
- * the ordinary way:
+ * To add a description, place the tooltip beside the trigger and name the
+ * trigger with `for`:
  *
  * ```html
  * <helix-headless-button id="save" aria-describedby="save-tip">Save</helix-headless-button>
  * <helix-headless-tooltip id="save-tip" for="save" content="Save your work"></helix-headless-tooltip>
  * ```
  *
- * The reference points at *this host*, not at the bubble in its shadow root:
- * the description is computed from the flat tree, which descends into shadow
- * content on its own.
+ * Write the `aria-describedby` yourself, pointing at the tooltip host. Setting
+ * it at runtime causes a hydration mismatch that React does not fix. With
+ * `for`, the tooltip warns once on first open if the attribute is missing.
  *
- * **The consumer writes that `aria-describedby`, and nothing here writes it for
- * them.** Setting it at runtime is a hydration mismatch React will not patch
- * up. `for` audits itself on first open and warns once where it is missing.
- *
- * It shows on hover and on focus, and hides on leave, on blur, on Escape, and
- * once the trigger has been activated: the hint is spent when the control has
- * been used.
+ * The tooltip shows on hover and on focus. It hides on pointer leave, on blur,
+ * on Escape, and when the trigger is activated.
  *
  * @since 0.1.0
  * @status stable

@@ -8,11 +8,11 @@ import { styles } from './tooltip-root.css.js'
  * @summary A short text that appears next to an element on hover and focus.
  *
  * @description
- * The bubble is in the top layer, so it needs no `z-index` and cannot be
- * clipped by whatever it sits inside.
+ * The bubble is in the top layer, so it needs no `z-index` and no container
+ * clips it.
  *
- * The arrow is positioned by the same pass that positions the bubble, so it
- * still points at the trigger after the bubble has slid along to stay in view.
+ * The arrow is positioned in the same pass as the bubble, so it still points at
+ * the trigger after the bubble shifts to stay in view.
  *
  * @since 0.1.0
  * @status stable

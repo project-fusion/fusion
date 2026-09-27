@@ -39,57 +39,37 @@ export interface AreaStack {
  * @summary A chart that shows how a total is made up over time, as bands stacked on one another.
  *
  * @description
- * The chart for a composition: every column of the table is a part, the parts
- * sum to the whole at each reading, and the top edge is that whole. What a line
- * chart of the same table cannot show is the share, which here is the
- * thickness of a band.
+ * Shows how a total is made up. Each numeric column of the table is a part, the
+ * parts add up to the total at each reading, and the top edge is that total.
+ * The thickness of a band is that part's amount.
  *
- * **Not `Line Chart` with `area`.** That washes each series from the floor on
- * its own, so the series overlap; this adds them. Reach for `Line Chart` when
- * the question is how each series moved, and for this when it is how the whole
- * is made up.
+ * Use `LineChart` with `area` to show how each series moved: it fills each
+ * series from the floor separately, so the fills overlap. Use this chart to
+ * show the composition: it stacks the series.
  *
- * **It measures from zero, always**, which is `BarChart`'s rule and for the same
- * reason: a band's thickness *is* its value, so a range that starts anywhere
- * else draws every part in proportion to nothing. `LineChart` measures from its
- * own range because a line claims a position; a band claims an amount.
+ * **The value axis always starts at zero**, as in `BarChart`, because a band's
+ * thickness is its value. For the same reason there is no streamgraph mode,
+ * which moves the baseline. To show how the composition changed, set `share`.
  *
- * **And so it is not a streamgraph**, which is the near neighbor to name.
- * A streamgraph moves its baseline to center the bands and reads as a river; it
- * is a real form and it is the one thing the rule above refuses, so this
- * carries no alias for it. What it has instead is `share`, which answers the
- * question a streamgraph is usually reached for, how the composition changed,
- * without giving up a floor a reader can measure against.
+ * Band edges are straight between readings by default. A smoothed curve through
+ * one sum can dip below the curve through the sum beneath it, which draws a
+ * part as less than zero. Other curves:
  *
- * **Straight between readings unless asked otherwise.** A band's top edge is a
- * sum, and a curve fitted through one sum can pass under the curve fitted
- * through the sum beneath it, so a smoothed stack can draw a part as less than
- * nothing between two readings. Straight segments between ordered points stay
- * ordered. `curve="smooth"` is there for a stack that is read as a shape.
+ * - `curve="smooth"`: for a stack read as an overall shape.
+ * - `curve="step"`: holds each reading and jumps at the midpoint, so stacked
+ *   edges stay in order, as with `straight`. Use it for a quantity that changes
+ *   at a moment, such as a headcount or a price.
  *
- * `curve="step"` falls on the safe side of that argument rather than being
- * unanswered by it, and it is worth saying which side because a reader cannot
- * tell from the argument alone. A step takes no value the readings do not have:
- * it holds one, jumps at the midpoint, and holds the next. So two stepped edges
- * that are ordered at every reading are ordered everywhere between them, which
- * is what `straight` is chosen for. It is the curve for a quantity that changes
- * at a moment rather than across an interval, a headcount or a price, where a
- * sloped edge claims a gradual change nothing measured.
+ * `share` draws each reading as 100 percent, so the top edge is flat and the
+ * bands show each part's share. Use it to see which part grew. The default
+ * shows whether the total grew.
  *
- * **`share` draws each reading as a hundred percent**, so the bands are the
- * parts' shares and the top edge is flat. It answers "which part grew" where
- * the default answers "did the whole grow".
+ * The drawing is `aria-hidden`. The text summary gives the latest reading's
+ * total and each part's share of it, and the table beside the chart has every
+ * number.
  *
- * **What a reader without the picture is told is the total and the share**, not
- * every band in turn. The table beside the chart already reads out every
- * number; what the drawing adds is the composition, so the summary says the
- * latest reading's total and each part's share of it. The drawing itself is
- * `aria-hidden`.
- *
- * Every numeric column is a part. A table that carries its own total column
- * would count it twice, so leave it out of the table the chart reads.
- * A negative reading is drawn as none: a part of a whole cannot be less than
- * nothing, and a band that folded under its neighbor would say it was.
+ * Every numeric column is a part, so leave a total column out of the table the
+ * chart reads, or it is counted twice. A negative reading is drawn as zero.
  *
  * @since 0.1.0
  * @status stable

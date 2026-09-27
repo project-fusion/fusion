@@ -9,24 +9,16 @@ import { styles } from './sparkline-root.css.js'
  * @summary A small chart with no axes that shows the shape of a series beside its number.
  *
  * @description
- * Sized in `em` by default, so a sparkline set beside a figure is a figure-sized
- * thing and one set in a table row is a row-sized thing. The type scale is
- * absolute and cannot say "a little wider than this".
+ * Sized in `em` by default, so it scales with the text around it: figure-sized
+ * beside a figure, and row-sized in a table row.
  *
- * The stroke does not scale with the box. `preserveAspectRatio="none"` is what
- * lets one drawing fill a 60px slot and a 600px one, and without
- * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
- * first and heavy in the second.
+ * `preserveAspectRatio="none"` lets one drawing fill a 60px slot or a 600px
+ * one, and `vector-effect: non-scaling-stroke` keeps the stroke from stretching
+ * with it. The line's weight is set in `em`, so it grows with the drawing's
+ * text size.
  *
- * One color on the host, read by the line, the wash, the columns and the mark
- * alike, so moving `--sparkline-color` cannot leave parts of one drawing
- * disagreeing.
- *
- * The line's weight is set in `em` rather than pixels, so it grows with the
- * drawing the way the drawing grows with its type. A fixed pixel width leaves a
- * 200 pixel sparkline wearing a hairline: `vector-effect` keeps a stroke out of
- * the view box's stretch, and it also keeps it out of every other reason it
- * might want to be bigger.
+ * Set `--sparkline-color` on the host to color the line, the fill, the columns,
+ * and the mark together.
  *
  * @since 0.1.0
  * @status stable

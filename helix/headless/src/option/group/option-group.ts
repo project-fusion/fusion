@@ -6,13 +6,13 @@ import { property } from 'lit/decorators.js'
  * @summary A labeled group of options inside a listbox.
  *
  * @description
- * A heading over a set, and nothing else: it holds no selection and no value,
- * because grouping is presentation over a list whose owner is the listbox. Its
- * options are still the listbox's options, which is what keeps the keyboard
- * moving through a grouped list exactly as it moves through a flat one.
+ * A heading over a set of options. The group holds no selection and no value,
+ * because the listbox owns those. Its options are still the listbox's options,
+ * so the keyboard moves through a grouped list the same way as a flat one.
  *
- * `role="group"` named by the heading, so a screen reader announces which run
- * an option is in without the heading becoming something to land on.
+ * The group has `role="group"` and takes its name from the heading, so a screen
+ * reader announces which group an option is in, and the heading is not a stop
+ * of its own.
  *
  * @since 0.1.0
  * @status stable

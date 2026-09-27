@@ -7,8 +7,8 @@ import { styles } from './toolbar-root.css.js'
  * @summary A group of controls that share one tab stop.
  *
  * @description
- * No chrome of its own: a toolbar is a place controls sit, and a border around
- * them would be a second frame inside whatever already frames the bar.
+ * The toolbar draws no frame of its own, so it does not add a second frame
+ * inside whatever already frames the bar.
  *
  * @since 0.1.0
  * @status stable

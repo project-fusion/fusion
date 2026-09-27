@@ -12,12 +12,11 @@ import { styles } from './listbox-root.css.js'
  *
  * @description
  * A framed, scrolling list with the field's three parts around it. The frame is
- * the list rather than the host, so a filter that empties it leaves a box with
- * a message in it rather than a border collapsing to nothing.
+ * on the list itself, so a filter that hides every option leaves a box with a
+ * message in it, and the border stays in place.
  *
- * `--listbox-max-block-size` is what makes it scroll rather than run down the
- * page. The keyboard brings the active option into that box itself, so a long
- * list moves under the reader rather than the reader moving to find it.
+ * Set `--listbox-max-block-size` to make the list scroll. The keyboard scrolls
+ * the active option into view inside that box.
  *
  * @since 0.1.0
  * @status stable

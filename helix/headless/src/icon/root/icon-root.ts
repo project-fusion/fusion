@@ -8,28 +8,24 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary A named icon from the Helix set.
  *
  * @description
- * The set is Phosphor, drawn on a 256 box at stroke-width 16, and each glyph is
- * rendered as its own inner markup rather than as a single path. Most icons are
- * several elements at once, each with its own stroke and fill, so a one-path
- * model would draw a fraction of the set and quietly drop the rest.
+ * The icons are Phosphor, drawn on a 256 box at stroke-width 16. Each glyph
+ * renders its full inner markup, because most icons are several elements, each
+ * with its own stroke and fill.
  *
- * **The markup is trusted by construction.** It is generated at build time from
- * SVG files in this repository, never from anything a user supplies, which is
- * what makes `unsafeSVG` the right tool rather than a risk.
+ * The markup is generated at build time from SVG files in this repository and
+ * never comes from user input, so rendering it with `unsafeSVG` is safe.
  *
- * The `<svg>` carries `fill="currentColor"` because the generator keeps only
- * the inner markup and discards the source's own root tag, and that tag is
- * where Phosphor puts its fill. Without it, every solid glyph in the set, 65 of
- * them, falls back to the SVG default of black and disappears on a dark page.
- * Shapes that set their own `fill` or `stroke` are unaffected, which is why the
- * outline icons looked fine and hid this.
+ * The `<svg>` carries `fill="currentColor"`. The generator keeps only the inner
+ * markup, and Phosphor sets its fill on the root tag that the generator
+ * discards. Without it, the 65 solid glyphs fall back to black and disappear on
+ * a dark background. Shapes that set their own `fill` or `stroke` are
+ * unaffected.
  *
- * A name with no match renders nothing at all instead of an empty box, so a
- * typo cannot leave a hole in a layout that looks deliberate.
+ * A name with no match renders nothing.
  *
- * An icon is decorative by default and hidden from assistive technology. Give
- * it a `label` only when the icon is the sole carrier of meaning, such as
- * inside a button with no text.
+ * An icon is decorative by default and hidden from assistive technology. Set
+ * `label` only when the icon is the only carrier of meaning, such as in a
+ * button with no text.
  *
  * @since 0.1.0
  * @status stable

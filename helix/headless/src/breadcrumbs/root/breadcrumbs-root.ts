@@ -5,18 +5,19 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @summary Shows the path to the current page.
  *
  * @description
- * The host is the landmark, so `aria-label` on it names the trail directly. A
- * page may hold more than one navigation, and landmarks are how a
- * screen-reader user chooses between them.
+ * The host is the navigation landmark, so an `aria-label` on it names the
+ * trail. When a page has more than one navigation landmark, screen reader users
+ * choose between them by name.
  *
- * `role="list"` is set explicitly on the `<ol>` even though it is one:
- * `list-style: none` strips list semantics in Safari, and a breadcrumb trail
- * always removes its markers.
+ * The `<ol>` has an explicit `role="list"`, because Safari removes list
+ * semantics from a list with `list-style: none`, and the trail always hides its
+ * markers.
  *
- * Items are slotted rather than wrapped, so they are `<ol>` children in the
- * flat tree and each carries `role="listitem"` itself.
+ * The items are slotted directly, so they are `<ol>` children in the flat tree,
+ * and each item sets `role="listitem"` on itself.
  *
- * **The trail does not measure itself, and the overflow is markup.**
+ * The trail does not measure itself, and you write its overflow in markup: put
+ * the crumb that holds the folded items where the gap should appear.
  *
  * @since 0.1.0
  * @status stable

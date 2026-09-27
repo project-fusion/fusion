@@ -7,10 +7,9 @@ import { styles } from './lightbox-item.css.js'
  * @summary One item a lightbox can show, such as a picture, a video frame, or a chart.
  *
  * @description
- * Presentation only: the box centers what it was given and holds it inside the
- * viewport rather than sizing it, because what is in here is the consumer's and
- * may be a picture, a frame of video or a chart. Which item is shown, and the
- * arithmetic that decides, is the base class.
+ * Presentation only. The box centers its content and keeps it within the
+ * viewport without setting its size, because the content may be a picture, a
+ * video frame, or a chart. The base class decides which item is shown.
  *
  * @since 0.100.0
  * @status stable

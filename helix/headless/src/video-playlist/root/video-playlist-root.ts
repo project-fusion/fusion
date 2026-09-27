@@ -7,28 +7,24 @@ import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
  * @summary A list of video clips that play one after another in a single player.
  *
  * @description
- * **The player is slotted, never rendered here.** A consumer's player carries
- * their appearance, their extra controls, their captions and their poster
- * treatment, and a playlist that rendered its own would either lose all of that
- * or grow a property for each of them. `Sandbox` takes its preview and `Menu`
- * its trigger the same way.
+ * **You slot the player**, so it keeps your appearance, extra controls,
+ * captions, and poster treatment. `Sandbox` takes its preview and `Menu` its
+ * trigger the same way.
  *
- * **The entries are markup rather than an array property.** A list of objects
- * would be the shorter API and it does not survive the trip: React skips every
- * property it would have to apply imperatively while hydrating, so an array
- * handed to a custom element is missing on the first paint of every
- * server-rendered page. `using-the-elements.mdx` carries the measurement. Markup
- * is also what makes each entry a real button with a real name in it.
+ * **Entries are markup.** React skips properties it would set imperatively
+ * during hydration, so an array property on a custom element is missing on the
+ * first paint of a server-rendered page. `using-the-elements.mdx` has the
+ * measurement. Markup also makes each entry a real button with its name inside.
  *
- * **Nothing here plays anything.** It sets `src` on the player and lets the
- * player be a player. What the playlist owns is which entry is current, and it
- * moves that on three signals: an entry pressed, `helix-next` or
- * `helix-previous` from the player, and the player reaching the end.
+ * **The playlist does not play media.** It sets `src` on the player and tracks
+ * which entry is current. The current entry moves when:
  *
- * `ended` advances without asking, because a set of clips that stopped between
- * each one is a set the reader has to nurse. The clip that follows starts where
- * the last one left off, which is `autoplay` in the only sense that matters
- * here: the reader already pressed play once.
+ * - an entry is pressed,
+ * - the player dispatches `helix-next` or `helix-previous`, or
+ * - the player reaches the end.
+ *
+ * On `ended` the playlist advances and the next clip starts playing, because
+ * the user already pressed play once.
  *
  * @since 0.1.0
  * @status stable

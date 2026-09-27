@@ -5,12 +5,12 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @summary One tab in a tab list.
  *
  * @description
- * An element rather than a slot because it owns selection and its own tab stop.
+ * A tab is an element, because it manages selection and its own tab stop.
  *
- * Its id and the id it controls are both derived from `value`, so the pairing
- * between a tab and its panel survives server rendering. A generated id would
- * differ between the server's render and the client's and break the link, and
- * `aria-controls` pointing at nothing is worse than not being there.
+ * Its id and the id it controls both come from `value`, so the link between a
+ * tab and its panel works with server rendering. A generated id would differ
+ * between the server render and the client render, and `aria-controls` would
+ * point at nothing.
  *
  * @since 0.1.0
  * @status stable

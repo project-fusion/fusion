@@ -8,11 +8,9 @@ import { styles } from './virtual-list-root.css.js'
  * @summary A list that renders only the rows of a long set that are on screen.
  *
  * @description
- * The styled tier adds the scrolling box's own treatment and nothing else. Rows
- * are the consumer's markup in the light DOM, so they are styled by the
- * consumer's stylesheet the way any other content is, and this must not reach
- * into them: a rule here for a row would be a design system styling markup it
- * did not write.
+ * The styled tier styles only the scrolling box. Rows are your markup in the
+ * light DOM, so your stylesheet styles them the same as any other content, and
+ * this tier sets no rules for them.
  *
  * @category layout
  * @since 0.1.0

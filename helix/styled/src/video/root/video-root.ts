@@ -12,20 +12,15 @@ import { styles } from './video-root.css.js'
  * @summary A video player with controls drawn by Helix.
  *
  * @description
- * The player is the headless tier's. What this adds is the bar: where it sits, when
- * it is there, and what the two ranges look like, which is the whole reason to
- * replace a control set that cannot be styled.
+ * The player comes from the headless tier. This tier adds the control bar:
+ * where it sits, when it shows, and how the two ranges look.
  *
- * **The bar is over the picture, not under it.** A bar in the layout would move
- * everything below the video by its own height and would leave a strip of page
- * color under a picture that is meant to be the whole of it. Over it, the
- * video is the component's size and the controls belong to it.
+ * The bar sits over the picture, so the video keeps its own size and nothing
+ * below it moves.
  *
- * **It goes when nobody is using it, and comes back for the keyboard.** Hidden
- * once a playing video has gone `idle-delay` without being touched, shown again
- * the moment the pointer moves, and shown whenever anything inside it has
- * focus, which is what keeps it reachable without a pointer. A paused video
- * keeps its bar, because a reader who stopped it is deciding what to do next.
+ * The bar hides once a playing video has gone `idle-delay` without input. It
+ * shows again when the pointer moves, and whenever anything inside it has
+ * focus, so you can reach it with the keyboard. A paused video keeps its bar.
  *
  * @since 0.1.0
  * @status stable

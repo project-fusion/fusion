@@ -23,34 +23,25 @@ import '../../tooltip/index.js'
  * @summary A chart that draws series over time as lines, read from a table.
  *
  * @description
- * The chart for a shape rather than for a quantity, which is what decides the
- * one thing a bar chart is not allowed to do.
+ * A line chart shows the shape of each series: where the readings went.
  *
- * **It measures from its own range and not from zero, deliberately.** `BarChart`
- * refuses that switch because a bar's length *is* its value, so a baseline
- * anywhere else makes the lengths proportional to nothing. A line claims no
- * such thing: it says where the readings went, and forcing zero into the range
- * of a series that moves between 980 and 1020 flattens the entire shape into a
- * rule across the top of the box. The two rules are opposite because the two
- * charts answer opposite questions, and `zero` is here for the case where the
- * distance from nothing is the point.
+ * The scale covers the range of the data. Including zero in the range of a
+ * series that moves between 980 and 1020 would flatten the line into a rule
+ * across the top of the box. `BarChart` always starts at zero, because a bar's
+ * length is its value. Set `zero` when the distance from zero is the point.
  *
- * **One scale across every series**, the same as the bar chart, because two
- * series drawn to different scales are two charts sharing a picture.
+ * Every series shares one scale, as in the bar chart.
  *
- * **Not the chart for a total made of parts.** `area` washes each series from
- * the floor on its own, so they overlap; `Area Chart` stacks them, so the top
- * edge is the total and each band is a share. A line chart answers how each
- * series moved, an area chart how the whole is made up.
+ * `area` fills each series down to the floor on its own, so the fills overlap.
+ * For a total made of parts, use `Area Chart`, which stacks the series so the
+ * top edge is the total and each band is a share.
  *
- * **The labels are HTML beside the drawing rather than `<text>` inside it**, for
- * the reason `BarChart` records: an `<svg>` that fills its box scales its type
- * with everything else, the same `font-size` arriving at 10px in a narrow chart
- * and 43px in a wide one, and there is no non-scaling-font to answer it the way
- * `vector-effect` answers strokes.
+ * The labels are HTML beside the drawing, as in `BarChart`. Text inside an
+ * `<svg>` that fills its box scales with the box, so the same `font-size` can
+ * render at 10px in a narrow chart and 43px in a wide one.
  *
- * The table is the accessible representation and this drawing is `aria-hidden`.
- * A reader who wants the numbers gets the numbers, not a described picture.
+ * The table is the accessible representation, and the drawing is `aria-hidden`.
+ * Screen reader users get the numbers.
  *
  * @since 0.1.0
  * @status stable

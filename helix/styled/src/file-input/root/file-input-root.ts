@@ -15,19 +15,15 @@ import { styles } from './file-input-root.css.js'
  * @summary A field for choosing files from a picker or by dropping them on it.
  *
  * @description
- * The field is a box rather than a line, because nothing is typed into it: its
- * height is not a line of text, and what a reader aims at is the whole area. The
- * border is dashed for the same reason a drop target usually is, which is the
- * only affordance one has before anything is being dragged.
+ * The field is a box, because nothing is typed into it and the whole area is
+ * the target. The dashed border marks it as a drop target before anything is
+ * dragged.
  *
- * The native input is kept and laid over the field at zero opacity rather than
- * hidden, so a click anywhere on the box lands on the input itself and opens the
- * picker. Hiding it with `display: none` would take it out of the tab order and
- * out of the form, and a script clicking a hidden input is the same thing with
- * more moving parts.
+ * The native input is laid over the field at zero opacity, so a click anywhere
+ * on the box lands on the input and opens the picker. `display: none` would
+ * remove the input from the tab order and from the form.
  *
- * The focus ring is drawn on the field, because the control it belongs to is
- * invisible.
+ * The focus ring is drawn on the field, because the input is invisible.
  *
  * @since 0.1.0
  * @status stable

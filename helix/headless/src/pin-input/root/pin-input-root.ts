@@ -17,31 +17,25 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @summary A field for a short code, with one box for each character.
  *
  * @description
- * **One `<input>` per cell, rather than one input drawn as cells.** A single
- * field autofills perfectly and needs a drawn caret nobody can style well;
- * separate fields give every box a real focus ring, a real caret and a real tab
- * stop for free. Autofill's gap is closed below rather than lived with.
+ * Each cell is its own `<input>`, so every box has a real focus ring, caret,
+ * and tab stop.
  *
- * **Anything longer than one character is treated as a paste, wherever it
- * lands.** That covers the obvious case and two that are not: a browser
- * autofilling an SMS code drops the whole thing into whichever box is focused,
- * and a password manager does the same. So a six-character arrival in cell three
- * fills from cell three rather than being truncated to its first character,
- * which is what a per-cell `maxlength` would have done silently.
+ * Input longer than one character is treated as a paste, in any cell. This
+ * covers pasting, a browser autofilling an SMS code, and a password manager,
+ * which all put the whole code into the focused box. A six-character code that
+ * arrives in cell three fills from cell three.
  *
- * **The code is one value to a form.** The cells are inside a shadow root and
- * submit nothing on their own; the host is form-associated and reports the
- * joined string, which is also what carries validity and answers a reset.
+ * The code is one value to a form. The cells are in a shadow root and submit
+ * nothing. The host is form-associated and submits the joined string, which
+ * also carries validity and responds to a form reset.
  *
- * `autocomplete="one-time-code"` is on the first cell only. It is a hint about
- * the field as a whole, and repeating it on six boxes offers a browser six
- * places to put one code.
+ * Only the first cell has `autocomplete="one-time-code"`, because the hint
+ * applies to the whole field.
  *
- * **Left to right on every page.** A code is read the way a phone number is,
- * one character after another from the left, in Arabic and Hebrew as in
- * English, so the row carries `dir="ltr"`: the first box is the leftmost, a
- * paste fills rightward and the right arrow moves on. The label, the hint and
- * the feedback are words and keep the page's direction.
+ * The row of cells always runs left to right, with `dir="ltr"`, including in
+ * Arabic and Hebrew. The first box is the leftmost, a paste fills to the right,
+ * and the right arrow moves to the next box. The label, hint, and feedback
+ * follow the page's direction.
  *
  * @since 0.1.0
  * @status stable

@@ -13,21 +13,18 @@ import { property } from 'lit/decorators.js'
  * @summary A control that turns something on or off.
  *
  * @description
- * **A switch is not a checkbox with a different shape.** A checkbox is an
- * answer to a question the form asks when it is submitted; a switch is a thing
- * happening now. That is why `role="switch"` exists and why a switch belongs
- * outside a form as often as in one: it says "on" and "off" rather than
- * "ticked" and "unticked", and a reader expects the effect immediately rather
- * than on Save.
+ * A switch turns something on or off right away, and a checkbox is an answer
+ * the form submits later. A screen reader announces `role="switch"` as "on" or
+ * "off", and people expect the change to take effect immediately. A switch is
+ * as common outside a form as inside one.
  *
- * Rendered as a real `<input type="checkbox">` carrying `role="switch"`, which
- * is the pairing ARIA describes: the input is what a form submits and what a
- * label forwards a press to, and the role is what a screen reader announces.
- * Neither half can be got from the other.
+ * It renders a real `<input type="checkbox">` with `role="switch"`, the pairing
+ * ARIA describes. The input is what a form submits and what a label forwards a
+ * press to, and the role is what a screen reader announces.
  *
- * The label sits beside it, inside the `<label>` that forwards the press, the
- * way a checkbox's does. The hint and the message go under the row, because
- * there is no above: the switch and the words naming it are one line.
+ * The label sits beside the switch, inside the `<label>` that forwards the
+ * press, the same as a checkbox. The hint and the message go below the row,
+ * because the switch and its label share one line.
  *
  * @since 0.1.0
  * @status stable

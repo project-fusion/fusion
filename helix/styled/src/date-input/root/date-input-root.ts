@@ -19,18 +19,15 @@ import { styles } from './date-input-root.css.js'
  * @summary A date, typed or picked from a calendar.
  *
  * @description
- * The frame is the field rather than the input, so the trigger sits inside the
- * same box as the text and the focus ring is drawn once around the whole
- * control. The trigger is a mark within that box rather than a button beside it:
- * a second frame inside the first is two controls where a reader sees one.
+ * The frame is drawn around the whole field, so the trigger sits inside the
+ * same box as the text and the focus ring surrounds the whole control. The
+ * trigger is a mark inside that box, so the field reads as one control.
  *
- * The calendar is the real `helix-date-picker`, in a panel with no border of its
- * own. A surface over the page is told apart by its shadow and by what it
- * covers, and a line around it as well reads as a box drawn around something
- * already separate.
+ * The calendar is the real `helix-date-picker`, in a panel with no border. Its
+ * shadow and what it covers set it apart from the page.
  *
- * Height comes from the region, like every other control: `data-density` on
- * whatever holds it.
+ * Height comes from the region, like every other control. Set `data-density` on
+ * the element that holds it.
  *
  * @since 0.1.0
  * @status stable

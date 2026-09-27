@@ -35,20 +35,19 @@ const PANEL_MAX = 0.8
  * @summary An editable source pane paired with a live preview.
  *
  * @description
- * Coordination is by event: a source pane dispatches `helix-before-edit`, which
- * bubbles, and the sandbox hands the value to whatever preview is slotted into
- * it. Neither child knows the other exists, so either can be replaced or used
+ * A source pane dispatches `helix-before-edit`, which bubbles, and the sandbox
+ * passes the value to the preview slotted into it. The source pane and the
+ * preview do not reference each other, so you can replace either one or use it
  * alone.
  *
- * The event carries the pane's `name`, which is what lets one sandbox hold
- * several panes: `html` is the preview's markup and `css` its stylesheet. A
- * pane named anything else is showing something rather than driving it, and is
- * ignored.
+ * The event carries the pane's `name`, so one sandbox can hold several panes.
+ * `html` sets the preview's markup and `css` sets its stylesheet. The sandbox
+ * ignores a pane with any other name, so that pane can show content without
+ * changing the preview.
  *
- * **The dividers are two nested `helix-splitter`s**, not a grid this element
- * drags itself, so the pointer handling, the keyboard handling and the corner
- * are all the splitter's. The panes are the inner splitter and the panel is the
- * outer one, which is the order that makes the panel span the full width.
+ * **The dividers are two nested `helix-splitter` elements**, which handle the
+ * pointer, the keyboard, and the corner. The inner splitter holds the panes and
+ * the outer one holds the panel, so the panel spans the full width.
  *
  * @since 0.1.0
  * @status stable

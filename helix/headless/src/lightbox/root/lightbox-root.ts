@@ -20,30 +20,22 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
  * @summary A viewer that shows one item at a time over the page.
  *
  * @description
- * **A lightbox is chrome around a picture rather than a picture.** It draws
- * nothing of its own: what it shows is whatever the consumer opened, so this
- * earns its place on the frame, the keyboard and the reading that says where in
- * the set the reader is.
+ * The frame around content you open, such as a picture, a video frame, or a
+ * chart. The lightbox draws no content of its own. It provides the frame, the
+ * keyboard behavior, and text that states the current position in the set.
  *
- * **The modal half is the platform's.** A real `<dialog>` opened with
- * `showModal()` brings the top layer, a backdrop, Escape and `inert` behind it,
- * and this repository has already removed one hand-written focus trap for being
- * worse than that: `inert` on the rest of the document is something no
- * JavaScript trap can achieve. Every way it can close comes back through
- * `requestOpen`, which is what `Dialog` and `Drawer` both do and for the reason
- * they both give.
+ * The modal behavior comes from a native `<dialog>` opened with `showModal()`,
+ * which provides the top layer, a backdrop, Escape to close, and `inert` on the
+ * rest of the document. Every way of closing goes through `requestOpen`, as in
+ * `Dialog` and `Drawer`.
  *
- * **The set is this component's own and not `Carousel`'s.** A carousel is a
- * track: a scroller with snap points, per-view arithmetic and stops it can rest
- * between. A lightbox shows one thing at a time and has no track, so what it
- * needs is which item is current, which is `active` and the same pair `Tabs`
- * uses. The arrow keys move the picture under a reader whose focus stays in the
- * dialog, which is also why `KeyboardNavigationController` is not the right
- * tool: that one moves focus between focusable items, and these are pictures.
+ * A lightbox shows one item at a time and has no scrolling track, so `active`
+ * holds the current item, as in `Tabs`. The arrow keys change the item while
+ * focus stays in the dialog.
  *
- * **Chrome hides while the reader is still**, on `IdleController`, and comes
- * back on a pointer move or a focus. `fullscreen` is `FullscreenController`, the
- * same pair `Video` holds and the only two it shares.
+ * The chrome hides when there is no input, through `IdleController`, and comes
+ * back on a pointer move or a focus. `fullscreen` uses `FullscreenController`,
+ * as `Video` does.
  *
  * @since 0.100.0
  * @status stable

@@ -9,9 +9,9 @@ import { styles } from './announcement-root.css.js'
  * @summary A message for the whole page, shown above its header, that can be dismissed.
  *
  * @description
- * Full width and flat, with the severity carried by a tinted fill and a
- * hairline beneath rather than by a border on four sides: an announcement is a
- * band across the top of the page, not a box that happens to be wide.
+ * Full width and flat. The tone is a tinted fill and a hairline along the
+ * bottom edge, with no border on the other sides, so the announcement is a band
+ * across the top of the page.
  *
  * @since 0.1.0
  * @status stable

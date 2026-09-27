@@ -6,13 +6,12 @@ import { property } from 'lit/decorators.js'
  * @summary A short quotation, set inline with the text around it.
  *
  * @description
- * Renders a real `<q>`, which is what supplies the quotation marks: the browser
- * inserts the right ones for the document's language, and nests them correctly
- * when one quotation sits inside another. Typing the marks into the content
- * instead gets both of those wrong in every language but one.
+ * Renders a real `<q>`, so the browser supplies the quotation marks. It inserts
+ * the correct marks for the document's language and nests them correctly when
+ * one quotation sits inside another. Do not type quotation marks into the
+ * content.
  *
- * A passage set off from the prose rather than run inside it is a blockquote,
- * which is a different element for a different job.
+ * For a passage set off from the surrounding text, use a blockquote.
  *
  * @since 0.1.0
  * @status stable

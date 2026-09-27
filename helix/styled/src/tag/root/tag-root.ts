@@ -8,9 +8,8 @@ import { styles } from './tag-root.css.js'
  * @summary A short label that adds metadata to content.
  *
  * @description
- * Seven tones. The fill is a tint of the status color, mixed with
- * `color-mix` rather than held as a token per status, so a theme that changes
- * the status colors gets the tints with them.
+ * Seven tones. The fill is a tint of the status color made with `color-mix`, so
+ * when a theme changes its status colors, the tints change with them.
  *
  * @since 0.1.0
  * @status stable

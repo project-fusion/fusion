@@ -43,40 +43,28 @@ const child = (path: string, key: string): string =>
  * see how many entries each holds, and copy any part.
  *
  * @description
- * What a developer-facing product shows constantly is a structured value: an
- * API response, a config, a row's raw record. As text in a code block, a reader
- * scrolls a wall of JSON and cannot put away the branch they do not care about;
- * as a Tree, every node is a label and a string reads the same as a number. This
- * reads the value and draws each entry with its type visible.
+ * Object Inspector shows a structured value, such as an API response, a config,
+ * or a raw record, as a read-only tree with each entry's type visible.
  *
- * **It reads and never edits.** An inspector that edits is a different
- * component, with validation, undo and a model of what changed, and the reading
- * one is what is wanted.
+ * Pass the object to `value`, or name a `<script type="application/json">` by
+ * id with `for`, the same source `VirtualList` and the charts read. JSON text
+ * works with server rendering and with React hydration, which skips object
+ * properties. `value` wins when both are set.
  *
- * **The data is text in the page or a property.** `for` names a
- * `<script type="application/json">` by id, the channel `VirtualList` and the
- * charts already read: it survives a server, which has attributes and no
- * children, and React's hydration, which skips object properties. `value` is
- * there for a page that already holds the object, and wins when both are set.
+ * The tree is one tab stop. Up and Down move between rows, Right opens a branch
+ * or moves into it, Left closes it or moves to its parent, and Home and End
+ * move to the first and last rows. Focus stays on the tree, and
+ * `aria-activedescendant` marks the active row. Each row carries its real
+ * level, position, and set size, including in a windowed tree.
  *
- * **One tab stop, and the rows are reached with the arrow keys**, the tree
- * pattern: Up and Down move, Right opens a branch or enters it, Left closes it or
- * goes to its parent, Home and End go to the ends. The tree keeps focus and
- * points at the active row with `aria-activedescendant`, which is what lets a
- * windowed tree drop rows from the page without dropping focus with them. Each
- * row carries its real level, position and set size, so a reader on a windowed
- * row hears where it is in the value rather than in the slice drawn.
+ * The copy button copies the active row, a branch as JSON and a string as its
+ * text. So do Command+C and Control+C while the tree has focus and no text is
+ * selected. The button sits beside the tree, because assistive technology
+ * cannot reliably reach a button inside a tree item.
  *
- * **Copying takes the active row**, as JSON for a branch and as itself for a
- * string, from the copy button or from Command or Control with C while the tree
- * has focus and nothing is selected. The button sits beside the tree rather than in each row, where a
- * button would be an interactive control inside a tree item, which assistive
- * technology cannot reach reliably.
- *
- * **`windowed` draws only the rows in view**, for a value of thousands of
- * entries, through the same controller `VirtualList` and `DataTable` use. The
- * box has to have a height for that to mean anything, which the styled tier
- * gives it and a headless consumer has to.
+ * `windowed` draws only the rows in view, for values with thousands of entries.
+ * The box needs a height for windowing to work. The styled tier sets one, and
+ * in the headless tier you set it yourself.
  *
  * @since 0.1.0
  * @status stable

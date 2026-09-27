@@ -22,26 +22,20 @@ import '../../tooltip/index.js'
  * @summary A chart that draws a table's categories as columns.
  *
  * @description
- * Two decisions are made here rather than left to a consumer.
+ * Every bar is measured from zero, and no property changes the baseline,
+ * because a bar's length is its value. To show the differences between values,
+ * use a line chart.
  *
- * **It measures from zero and there is no property to change that.** A bar's
- * length *is* its value, so a baseline anywhere else makes the lengths
- * proportional to nothing. A reader who wants the differences between values
- * rather than the values should be drawing a line, which claims only a shape.
+ * The labels are HTML beside the drawing. An `<svg>` that fills its box scales
+ * the text inside it: the same `font-size` renders at 10px in a narrow chart
+ * and 43px in a wide one, and SVG has no setting that keeps text at one size
+ * the way `vector-effect` does for strokes.
  *
- * **The labels are HTML beside the drawing rather than `<text>` inside it.** An
- * `<svg>` that fills its box scales everything in it, including type: the same
- * `font-size` comes out at 10px in a narrow chart and 43px in a wide one, and
- * there is no non-scaling-font to answer it the way `vector-effect` answers
- * strokes. So the columns are drawn and the words are written around them.
+ * The table is the accessible representation, and the drawing is `aria-hidden`,
+ * so screen reader users get the numbers themselves.
  *
- * The table is the accessible representation and this drawing is `aria-hidden`.
- * A reader who wants the numbers gets the numbers, not a described picture of
- * them.
- *
- * The custom properties below are written by this component and read by whoever
- * draws it. A consumer sets none of them: they carry a number this element
- * computed and CSS cannot.
+ * The component writes the custom properties below with numbers it computes,
+ * and the stylesheet that draws the chart reads them. Do not set them yourself.
  *
  * @since 0.1.0
  * @status stable

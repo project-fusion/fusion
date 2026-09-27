@@ -7,8 +7,8 @@ import { styles } from './timeline-item.css.js'
  * @summary One event on a timeline: when it happened, and what it was.
  *
  * @description
- * Presentation only: the rail down the side, the mark on it, and the line that
- * arrives at this entry from the one before.
+ * Draws the rail down the side, the mark on it, and the line that arrives from
+ * the previous entry.
  *
  * @since 0.1.0
  * @status stable

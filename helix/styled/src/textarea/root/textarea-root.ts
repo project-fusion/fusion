@@ -10,10 +10,9 @@ import { styles } from './textarea-root.css.js'
  * @summary A multi-line text field.
  *
  * @description
- * The same frame an `Input` wears, so a form of mixed fields reads as one set
- * rather than as two kinds of box. What differs is the resize handle, which is
- * the platform's and is left alone on the block axis only: a field that can be
- * dragged wider than the form holding it is a field that breaks the layout.
+ * Uses the same frame as `Input`, so mixed fields in a form match. The
+ * platform's resize handle is kept on the block axis only, so the field cannot
+ * be dragged wider than its form.
  *
  * @since 0.1.0
  * @status stable

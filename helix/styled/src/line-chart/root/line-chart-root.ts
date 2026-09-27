@@ -12,23 +12,21 @@ import '../../tooltip/index.js'
  * @summary A chart that draws series over time as lines, read from a table.
  *
  * @description
- * The lines take the series palette in order, so a chart of one is series one
- * and a chart of four is the first four, and a legend beside it maps the same
- * twenty-four.
+ * The lines take the series palette in order. A chart of one series uses series
+ * one, a chart of four uses the first four, and a legend beside it maps the
+ * same twenty-four.
  *
- * The stroke does not scale with the box. `preserveAspectRatio="none"` is what
- * lets one drawing fill a narrow card and a wide panel, and without
- * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
- * first and heavy in the second. It rescues strokes and not geometry, which is
- * why nothing inside the drawing marks a reading: a circle in a stretched
- * coordinate space is an ellipse, and there is no vector-effect that answers
- * for a shape.
+ * The stroke width stays the same at any size. The drawing uses
+ * `preserveAspectRatio="none"` to fill a narrow card or a wide panel, and
+ * `vector-effect: non-scaling-stroke` keeps the line from turning hairline in
+ * one and heavy in the other. That applies to strokes only: a circle in the
+ * stretched drawing becomes an ellipse, so nothing inside the drawing marks a
+ * reading.
  *
- * **The last reading of each series is marked, and that is the same rule rather
- * than an exception to it.** `terminus` draws an HTML element placed over the
- * plot by percentage instead of a shape inside it, so it keeps its shape at any
- * width. It is on by default, as a dot, because the column of marks at the far
- * edge is where a reader looks for "and what is it now".
+ * `terminus` marks the last reading of each series with an HTML element placed
+ * over the plot by percentage, so it keeps its shape at any width. It is on by
+ * default, as a dot, because the far edge is where you look for the current
+ * value.
  *
  * @since 0.1.0
  * @status stable

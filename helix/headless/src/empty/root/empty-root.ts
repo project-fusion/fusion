@@ -11,21 +11,18 @@ import { property } from 'lit/decorators.js'
  * @summary A message that a region has nothing in it, and the next step to take.
  *
  * @description
- * An empty region with no explanation is indistinguishable from one that failed
- * to load, so this exists to tell the difference: what would be here, and the
- * one action that would put something here.
+ * Shows what would be in a region and the one action that would fill it, so an
+ * empty region does not look like one that failed to load.
  *
- * Announced, because an empty view usually arrives in place of content that was
- * being fetched: saying so is the only way a screen-reader user learns the
- * search returned nothing, rather than being left waiting. **From a region of
- * its own that is there before its words are**, filled a frame after the view
- * appears. The host was the region, and a page inserts an empty state with its
- * message already in it, which is a region arriving with its words: read
- * inconsistently at best.
+ * The message is announced, because an empty view often replaces content that
+ * was loading, and the announcement tells a screen reader user that the search
+ * returned nothing. It is announced from a status region of its own, which is
+ * rendered empty and filled a frame after the view appears. Screen readers read
+ * a region that arrives with its text already in it inconsistently.
  *
- * Every region is a bare slot. The reference ships an `empty-state-heading` and
- * an `empty-state-actions` whose only job is to assign themselves a slot on
- * connect, which is a component for something the consumer can write.
+ * Every region is a bare slot. There is no `empty-state-heading` or
+ * `empty-state-actions` element: assign your own heading and actions to the
+ * slots.
  *
  * @since 0.1.0
  * @status stable

@@ -15,27 +15,26 @@ type Row = Record<string, string>
  * @summary A list that renders only the rows of a long set that are on screen.
  *
  * @description
- * **The set arrives as data, which is what makes this a virtual list rather
- * than a box that hides children.** `for` names a
- * `<script type="application/json">` holding an array of objects, and a
- * `<template>` child says what one row looks like: elements carrying
- * `data-field="name"` are filled with that field of the item.
+ * The items arrive as data:
  *
- * Both halves are markup, and that is the reason for the shape. An `items`
- * property cannot survive React hydration, which skips every property it would
- * have to apply imperatively, and light-DOM children exist by the time anything
- * could decide not to create them. Text in the document is neither, and it is
- * one node whatever the row count.
+ * - `for` names a `<script type="application/json">` that holds an array of
+ *   objects.
+ * - A `<template>` child defines one row. Elements with `data-field="name"` are
+ *   filled with that field of the item.
  *
- * **The accessible version is not a `<table>`**, the way it is for the charts
- * that share this `for="<id>"` shape: ten thousand rows in one is the cost this
- * exists to avoid. It is the rendered window plus `aria-setsize`.
+ * Both are markup. React hydration skips every property it would have to set
+ * imperatively, so an `items` property would be lost, and light-DOM children
+ * would all exist before anything could window them. The JSON text is one node
+ * whatever the row count.
  *
- * **The box scrolls on this tier.** The viewport carries `data-scroller` and
- * `core` ships `[data-scroller] { overflow: auto }` into every shadow root, so
- * `scrollTop` exists with no stylesheet at all. What a headless consumer still
- * has to supply is a block size, which is a design decision; the `overflow`
- * they used to supply was a mechanism they had no way of knowing was missing.
+ * For assistive technology the list exposes the rendered window with
+ * `aria-setsize`. Charts that use the same `for="<id>"` shape render an
+ * accessible `<table>`, and ten thousand rows in one is the cost this component
+ * avoids.
+ *
+ * The viewport scrolls on this tier. It carries `data-scroller`, and `core`
+ * ships `[data-scroller] { overflow: auto }` into every shadow root, so
+ * `scrollTop` works with no stylesheet. You still need to set a block size.
  *
  * @since 0.1.0
  * @status stable

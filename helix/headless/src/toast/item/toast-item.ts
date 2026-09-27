@@ -15,17 +15,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One message in the toast region.
  *
  * @description
- * An element rather than a slot, because it carries a timeout, a tone, a
- * dismiss control and a lifetime that pauses: behavior, state and API.
+ * Each message is an element because it has a timeout, a tone, a dismiss
+ * control, and a lifetime that pauses.
  *
- * **The timer is the item's own.** Held by the region, one message arriving
- * would restart another's, so a stack of three would go from three seconds each
- * to nine for the last.
+ * **Each item runs its own timer.** A timer held by the region would restart
+ * with each new message, and the last of three messages would stay for nine
+ * seconds.
  *
- * **A message is the opposite of the page it is over.** Inverted by default, so
- * a thing arriving in a corner is told apart from the page before it is read,
- * and by a flip of `color-scheme` rather than by spending a color that means
- * something.
+ * **Messages are inverted by default.** The item flips `color-scheme`, so a new
+ * message stands out from the page without using a color that carries meaning.
  *
  * @since 0.1.0
  * @status stable

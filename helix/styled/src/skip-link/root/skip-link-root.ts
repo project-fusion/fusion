@@ -8,19 +8,16 @@ import { styles } from './skip-link-root.css.js'
  * header to the main content.
  *
  * @description
- * Out of sight until the keyboard reaches it, then in the corner of the
- * viewport and impossible to miss. The hiding is the base layer's visually
- * hidden helper, so the link stays in the tab order and in the accessibility
- * tree while nobody can see it; `display: none` would have taken it out of
- * both. The reveal is this sheet's.
+ * Hidden until it receives keyboard focus, then shown in the corner of the
+ * viewport. It is hidden with the base layer's visually hidden helper, so it
+ * stays in the tab order and the accessibility tree. This stylesheet adds the
+ * reveal.
  *
- * **Fixed to the viewport rather than placed where it sits in the document**,
- * because it is first in the document and the page may already be scrolled
- * when focus arrives, by a restored position or an anchor in the address. A
- * link revealed above the top of the screen is revealed to nobody.
+ * It is fixed to the viewport, because the page may already be scrolled when
+ * focus arrives, from a restored position or an anchor in the address.
  *
- * Put it first inside `<body>`, before the header, and give the content
- * region the id its `href` names.
+ * Put it first inside `<body>`, before the header, and give the content region
+ * the id its `href` names.
  *
  * @since 0.1.0
  * @status stable

@@ -12,17 +12,19 @@ import { property } from 'lit/decorators.js'
  * @summary A list of the series in a chart, each name beside the color it is drawn in.
  *
  * @description
- * A legend is a list, so it is a list: not part of a chart, and shared by
- * whichever of them needs one. It takes its entries from the same table the
- * chart reads, through `for`, so the two cannot disagree.
+ * Renders a legend as a list, separate from any chart, so any chart can use
+ * one. Set `for` to the table the chart reads, and the legend takes its entries
+ * from that table, so the two always match.
  *
- * `entries` picks which way to read that table. `series` is one entry per data
- * column, named by the header row, which is a line or a bar chart.
- * `categories` is one entry per body row, which is a donut: its slices are the
- * rows and it has no axis to write their names along. `measures` drops the
- * first data column, which is a scatter.
+ * `entries` sets how the table is read:
  *
- * **The table is resolved on the client and there is no server pass.**
+ * - `series`: one entry per data column, named by the header row. Use it for a
+ *   line or bar chart.
+ * - `categories`: one entry per body row. Use it for a donut, whose slices are
+ *   the rows and which has no axis to name them on.
+ * - `measures`: drops the first data column. Use it for a scatter.
+ *
+ * The table is resolved on the client. There is no server pass.
  *
  * @since 0.1.0
  * @status stable

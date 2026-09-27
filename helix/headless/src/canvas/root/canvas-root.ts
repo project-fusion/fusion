@@ -189,63 +189,63 @@ const size = (element: HTMLElement, name: string, value: number): void => {
  * @summary A board of cards and the connections between them, which can be navigated, rearranged, and connected.
  *
  * @description
- * **The first of these surfaces Helix draws itself**, and the reason is where
- * the positions come from. On a canvas **position is data**: somebody placed
- * every card and the placement carries the meaning, so there is no layout to
- * compute and drawing is arithmetic over rectangles. A map is somebody else's
- * tiles and a graph view's positions are computed, which is why `Map` takes a
- * slotted map and this takes a document.
+ * A board of cards and connectors, drawn by Helix. On a canvas every position
+ * is data that someone placed, so drawing is arithmetic over rectangles with no
+ * layout to compute. `Map` takes a slotted map, because another renderer draws
+ * its tiles.
  *
- * **The format is open.** [JSON Canvas](https://jsoncanvas.org) gives each node
- * an `x`, `y`, `width`, `height` and a type, and each edge the two nodes it
- * joins and the sides it leaves and arrives on. A card belongs to a group when
- * it sits inside the group's bounds, which the format leaves to the geometry.
+ * The format is [JSON Canvas](https://jsoncanvas.org), an open format. Each
+ * node has an `x`, `y`, `width`, `height`, and a type. Each edge names the two
+ * nodes it joins and the sides it leaves and arrives on. A card belongs to a
+ * group when it sits inside the group's bounds.
  *
- * **Accessibility is the design work, not the drawing.** The cards are text in
- * the DOM, so they are readable already; what space does not supply is an order
- * and the connections. So the family chooses an order, walks the cards in it,
- * and says every card's links as text. `order` takes `spatial`, which bands the
- * cards into rows, and `edges`, which follows the arrows from the cards nothing
- * points to.
+ * The cards are text in the DOM, so a screen reader can read them. The family
+ * adds a reading order and states each card's connections as text. `order` sets
+ * the reading order:
+ * - `spatial` bands the cards into rows.
+ * - `edges` follows the arrows, starting from the cards that nothing points to.
  *
- * **Cards move by default, the way a form control takes input by default.**
- * The board writes the new `x` and `y` onto the card itself, as an input writes
- * its own value, and says so twice: `helix-before-move` for every step, which a
- * consumer holding the positions in their own state refuses and applies
- * themselves, and `helix-move` once the move is finished. A resize is the same
- * pair with a size in it. `readonly` keeps every card where it is, for a board
- * that is published rather than worked on, and `readonly` on one card or
- * connection keeps that one.
+ * **Cards move by default.** The board writes the new `x` and `y` onto the
+ * card, the way an input writes its own value, and dispatches two events:
+ * - `helix-before-move` for every step. Cancel it to hold the positions in your
+ *   own state and apply them yourself.
+ * - `helix-move` once the move is finished.
  *
- * **The cards are the way around it.** One of them holds the board's tab stop,
- * arrow keys walk them in reading order, and the one a reader lands on is
- * brought into view with what it connects to read out beside it. Shift with an
- * arrow moves it, which is the keyboard's way to do what a drag does. The
- * connections leaving a card are stops of their own, straight after it, and
- * Enter on one goes to the card it arrives at.
+ * A resize dispatches the same pair with a size. Set `readonly` on the board to
+ * keep every card in place, such as on a published board. Set `readonly` on one
+ * card or connection to keep only that one in place.
  *
- * **Every drag can be done with clicks instead**, which WCAG 2.5.7 asks of a
- * pointer that cannot hold a button down. A click on a selected card's move
- * handle, a corner, a card's connection point or the end of a selected
- * connection picks the thing up; it follows the pointer with no button held,
- * and the next click puts it down wherever a drag let go there would have. On
- * touch, the next tap is where it lands. Escape, or a press off the board,
- * puts it back.
+ * Keyboard behavior:
+ * - One card holds the board's tab stop.
+ * - The arrow keys move through the cards in reading order. The card you land
+ *   on scrolls into view, and its connections are announced with it.
+ * - Shift with an arrow key moves the card.
+ * - The connections leaving a card are stops of their own, straight after it.
+ *   Enter on one moves to the card it arrives at.
  *
- * **Connecting and removing are requests, and the page acts on them.** Drawing
- * from a card's handle to another card, or pressing C on one and Enter on
- * another, sends `helix-connect`; Delete on a card or a connection sends
- * `helix-remove`, naming every connection a removed card would strand. A move
- * can be applied by the board because the card is already there. A connection
- * is a new element, and one a board added to markup React renders would be
- * thrown away on the next render, so the board asks and the page writes it.
+ * Every drag also works with clicks, as WCAG 2.5.7 requires for a pointer that
+ * cannot hold a button down. Click a selected card's move handle, a corner, a
+ * card's connection point, or the end of a selected connection to pick it up.
+ * It follows the pointer with no button held, and the next click puts it down
+ * where a drag would have. On touch, the next tap sets where it lands. Escape,
+ * or a press outside the board, puts it back.
  *
- * **Markup rather than a `src` or a document property.** Nothing in this
- * library fetches, and an array handed to an element is missing from the first
- * paint of every server-rendered React page. The cards and connections are
- * `helix-canvas-node` and `helix-canvas-edge` elements, in the served markup
- * whichever renderer wrote them; `fromJsonCanvas` turns a JSON Canvas document
- * into their props and `toJsonCanvas()` writes a board back out.
+ * Connecting and removing dispatch requests, and your code applies them:
+ * - Drawing from a card's handle to another card, or pressing C on one card and
+ *   Enter on another, dispatches `helix-connect`.
+ * - Delete on a card or a connection dispatches `helix-remove`. The event names
+ *   every connection that removing the card would leave without an end.
+ *
+ * The board applies a move itself, because the card already exists. A
+ * connection is a new element, and React discards an element the board adds to
+ * its markup on the next render, so you write the connection.
+ *
+ * Cards and connections are `helix-canvas-node` and `helix-canvas-edge`
+ * elements, so they are in the served markup whichever renderer wrote them. The
+ * library fetches nothing, and an array passed to an element is missing from
+ * the first paint of a server-rendered React page. `fromJsonCanvas` turns a
+ * JSON Canvas document into their props, and `toJsonCanvas()` writes a board
+ * back out.
  *
  * @since 0.100.0
  * @status experimental

@@ -7,16 +7,15 @@ import { styles } from './sandbox-toolbar.css.js'
  * @summary The bar across the top of a sandbox.
  *
  * @description
- * Spans the source pane and the preview together, so what it holds is about the
- * sandbox rather than about one side of it. The files go at the start and the
- * menus at the end, which is the arrangement every editor has settled on.
+ * Spans the source pane and the preview, and holds controls for the whole
+ * sandbox. Files go at the start and menus at the end, as in most editors.
  *
- * **Not `role="toolbar"`.** That role brings a roving tabindex, one tab stop
- * for the whole group, and it is for a set of controls of the same kind. This
- * holds a tab list, which owns its own arrow-key behavior and would lose it.
- * Use `helix-toolbar` where the contents really are a row of buttons.
+ * The toolbar does not have `role="toolbar"`. That role gives a group of
+ * similar controls one tab stop with a roving tabindex. The toolbar holds a tab
+ * list, which has its own arrow-key behavior that the role would break. Use
+ * `helix-toolbar` for a row of buttons.
  *
- * Both slots are bare, so an unfilled one generates no box and costs no gap.
+ * Both slots are bare, so an empty slot adds no box and no gap.
  *
  * @since 0.1.0
  * @status stable

@@ -10,15 +10,13 @@ import '../notification/notification.js'
  * @summary A feed of notifications, each marked read or unread.
  *
  * @description
- * Three rows: header, a list that scrolls, footer. The list scrolls and the
- * other two do not, because a panel is opened at a fixed height and a mark-all
- * control that slides away as the reader scrolls is the control they were
- * reaching for.
+ * Three rows: a header, a scrolling list, and a footer. Only the list scrolls,
+ * so the controls in the header and footer stay in view in a fixed-height
+ * panel.
  *
- * **It does not virtualize and it cannot**, which is the headless tier's note
- * and worth repeating where the choice is made: the items are the consumer's own
- * elements, so N notifications is N elements by construction. A feed that really
- * holds thousands wants `helix-data-table` with a custom cell.
+ * The list does not virtualize. The items are your own elements, so N
+ * notifications are N elements. For a feed of thousands, use `helix-data-table`
+ * with a custom cell.
  *
  * @since 0.1.0
  * @status stable

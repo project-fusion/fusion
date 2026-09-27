@@ -8,17 +8,16 @@ import { styles } from './card-root.css.js'
  * @summary Groups related content and actions into a single surface.
  *
  * @description
- * Regions are bare slots with no wrapper element: `media`, `header`, the default
- * slot for content, and `footer`. An omitted one occupies no space without the
- * card having to detect that it is missing, so a card with only content needs no
- * wrapper markup at all. Style slotted content directly rather than reaching for
- * a part: a header is whatever element you slotted, not a wrapper around it.
+ * The regions are the `media`, `header`, and `footer` slots and the default
+ * slot for content. None of them has a wrapper element. A region you leave out
+ * takes no space, so a card with only content needs no extra markup. Style
+ * slotted content directly: a header is the element you slotted, so there is no
+ * part to target.
  *
  * `media` runs edge to edge and clips to the card's corners, so an image needs
- * no inset correction. Set `orientation="horizontal"` to move it alongside the
- * header, content, and footer stack rather than above it, or
- * `media-placement="end"` to put it under the content instead of over it, which
- * is what a chart concluding a card wants.
+ * no inset. Set `orientation="horizontal"` to put the media beside the header,
+ * content, and footer. Set `media-placement="end"` to put it below the content,
+ * for example for a chart that ends a card.
  *
  * @since 0.1.0
  * @status stable

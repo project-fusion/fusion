@@ -6,23 +6,18 @@ import { property } from 'lit/decorators.js'
  * @summary One entry in a video playlist.
  *
  * @description
- * **It holds what the player needs and nothing about playing.** A source, a
- * poster and a name: the entry knows which file it stands for, and the playlist
- * is what hands that to a player. Nothing here touches a `<video>`, which is
- * what keeps a playlist usable with a player the consumer configured
- * themselves.
+ * **An entry holds a source, a poster, and a name**, and the playlist passes
+ * them to the player. The entry does not touch a `<video>`, so the playlist
+ * works with a player you configured yourself.
  *
- * **A real `<button>`, in a `listitem`.** A playlist is a list of things to
- * choose, and the list roles are the honest ones: `list` and `listitem` say how
- * many there are and where you are in them, which `listbox` would too, at the
- * cost of the pattern a listbox obliges. `Option` records that trap in full,
- * that a listbox has to keep focus elsewhere and say which item is current with
- * `aria-activedescendant`. Nothing here needs that, because focus really moves
- * to the button.
+ * **Each entry is a `<button>` inside a `listitem`.** The `list` and `listitem`
+ * roles tell a screen reader how many entries there are and the position of the
+ * focused one. Focus moves to the button, so the entry does not need the
+ * `listbox` pattern, which keeps focus elsewhere and marks the current item
+ * with `aria-activedescendant`. `Option` documents that pattern.
  *
- * `aria-current` rather than `aria-selected`, which belongs to the roles that
- * have a selection. What is true of the entry playing now is that it is the one
- * the player is on.
+ * The entry playing now carries `aria-current`. `aria-selected` belongs to
+ * roles that have a selection.
  *
  * @since 0.1.0
  * @status stable

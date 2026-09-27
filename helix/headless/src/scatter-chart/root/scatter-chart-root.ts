@@ -87,39 +87,27 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * @summary A chart that shows whether two measures move together, with one point per row.
  *
  * @description
- * The chart for a relation rather than a series. The table's first numeric
- * column is measured across and every other numeric column is measured up, one
- * point per row, so a table of countries with a column of income and a column
- * of life expectancy draws one dot for each country. More numeric columns are
- * more series against the same across, each in its own color.
+ * A scatter chart shows how two measures relate. The table's first numeric
+ * column is measured across, every other numeric column is measured up, and
+ * each row is one point. A table of countries with an income column and a life
+ * expectancy column draws one point for each country. Each additional numeric
+ * column is another series, in its own color.
  *
- * **Both axes are measured, so both are labeled.** A line chart's readings are
- * named along the bottom and its values are read from the tooltip; here the
- * horizontal position is itself a value, and a point with no scale under it says
- * nothing about how far along it is. The ticks sit at round numbers and the
- * range is widened to them, so the plot's edges are numbers a reader can name.
+ * Both axes are labeled, because both positions are values. The ticks sit at
+ * round numbers, and the range extends to them.
  *
- * **What a reader without the picture is told is how strongly the two relate**,
- * because that is the question a scatter is drawn to answer and the one a table
- * of the same numbers makes hardest to see. The summary gives each series'
- * correlation coefficient and how many points it rests on; the table has every
- * number, and the drawing is `aria-hidden`.
+ * The summary gives each series' correlation coefficient and its number of
+ * points. The table has every number, and the drawing is `aria-hidden`.
  *
- * **The points are elements, not shapes in the drawing.** The drawing stretches
- * to its box, and a circle in a stretched space is an ellipse, so each point is
- * a `<span>` placed by percentage over it, which is how `LineChart` draws its
- * termini and for the same reason.
+ * Each point is a `<span>` placed by percentage over the drawing, as
+ * `LineChart` places its end points, so points stay round when the drawing
+ * stretches.
  *
- * **Left to right on every page, the one chart here that is.** A bar or a line
- * chart's across is the order its readings are named in, which follows the
- * line of text and turns with it. Here it is a measure, and a measure has a
- * direction of its own: more is to the right in every script, as a number line
- * is. So the plot, its axes and the names at their ends sit in a `plane` part
- * that carries `dir="ltr"`, which holds the y axis on the left and the points,
- * rules, ticks, pointer and tooltip mark where a left-to-right page puts them,
- * with no stylesheet asked to know. The names carry `dir="auto"`, so one written
- * in Arabic or Hebrew still reads its own way; the summary is outside the plane
- * and the bubble is told the page's direction, both being words.
+ * The plot runs left to right in every text direction, as a number line does.
+ * The plot, its axes, and the axis names sit in a `plane` part with
+ * `dir="ltr"`. The axis names carry `dir="auto"`, so a name in Arabic or Hebrew
+ * reads in its own direction. The summary and the tooltip bubble follow the
+ * page's direction.
  *
  * @since 0.1.0
  * @status stable

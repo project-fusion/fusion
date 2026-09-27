@@ -69,48 +69,46 @@ export const edgeOf = (align: string | undefined): string | undefined =>
  * @summary One column of a table: its heading, its width, and the field it reads from each row.
  *
  * @description
- * **The column is the source of both its heading and its track.** Add one and
- * the table has another track; remove one and it does not. That is what ties
- * the two together, and a table-level track list on its own does not: a list
- * that is accidentally the headings is invalid CSS a grid ignores in silence,
- * drawing the whole table as one column. `Table`'s `columns` is dealt out a
- * track at a time against the columns declared under it, so a heading among the
- * widths costs its own column a width and no more, and a list longer or shorter
- * than the columns is trimmed or shared rather than being a second count of
- * them. A column's own `width` wins over the track in its place.
+ * Each column provides both its heading and its grid track. Adding a column
+ * adds a track, and removing one removes it. `Table`'s `columns` is applied one
+ * track at a time to the columns declared under it:
  *
- * **It is also where every per-column fact goes**, which is the reason
- * `DataTable` needs no column config object. `field` names the key the cell
- * reads, `sortable` says a reader may reorder by it, `text-align` says which edge
- * the values line up against, and `cell` takes a function for anything the
- * field alone cannot express. The schema is markup and the data is a property:
- * a schema is small, declarative, and something a reader should be able to see
- * in the HTML, and data is large and windowed.
+ * - A heading name in the list affects only its own column's width.
+ * - A list longer or shorter than the columns is trimmed or shared.
+ * - A column's own `width` overrides the track in its place.
  *
- * **The same element serves both tables**, the markup one and the data one. It
- * is identified by a flag rather than by `instanceof`, so a `TableColumn` works
- * inside either without the two roots sharing anything else.
+ * This protects the table from a track list that contains the headings by
+ * mistake, which is invalid CSS that the grid ignores silently, drawing the
+ * whole table as one column.
  *
- * **It generates no box of its own**, the same as a row: the heading is a grid
- * item of the table, so it lines up with the cells under it rather than sitting
- * in a wrapper that has to be kept the same width.
+ * Every per-column setting goes on the column, so `DataTable` needs no column
+ * configuration object:
  *
- * **`hidden` takes the column out of the grid**, its heading and its track
- * both, so the columns after it keep their own widths and every row keeps its
- * cells under their headings. `hidden="until-found"` keeps its track, the
- * heading being left drawn, as every Helix element leaves one with that value.
- * `DataTable` draws the cells, so it leaves out the ones under a hidden column.
- * A `Table`'s cells are markup the consumer wrote, so hide them with the
- * column, as removing a column means removing its cells: a row with a cell more
- * than the table has tracks wraps into the next.
+ * - `field` names the key the cell reads.
+ * - `sortable` lets people sort by the column.
+ * - `text-align` sets which edge the values line up against.
+ * - `cell` takes a function for anything `field` alone cannot express.
  *
- * **A heading that does something holds a control that does it.** The host is
- * the column header, and a header is not focusable, so a sortable heading is a
- * `<button>` inside it: the pattern for a sortable table, and the only way a
- * reader on a keyboard reaches the sort at all. A column a reader may resize
- * carries a `separator` on its end edge, moved by dragging it or with the arrow
- * keys, and a column in a table that lets a reader reorder its columns carries
- * a grip the table moves.
+ * The same element works in both `Table` and `DataTable`. It is identified by a
+ * flag, so the two roots share nothing else.
+ *
+ * The column generates no box of its own, the same as a row. The heading is a
+ * grid item of the table, so it lines up with the cells below it.
+ *
+ * `hidden` takes the column out of the grid, both its heading and its track, so
+ * the other columns keep their widths and every row keeps its cells under their
+ * headings. `hidden="until-found"` keeps the track and leaves the heading
+ * drawn, as it does on every Helix element. `DataTable` leaves out the cells
+ * under a hidden column. In a `Table` the cells are markup you wrote, so hide
+ * them with the column: a row with more cells than the table has tracks wraps
+ * onto the next line.
+ *
+ * A heading that does something holds a control. A column header is not
+ * focusable, so a sortable heading contains a `<button>`, which is the pattern
+ * for a sortable table and the only way to reach the sort by keyboard. A
+ * resizable column has a `separator` on its end edge, moved by dragging or with
+ * the arrow keys. In a table with reorderable columns, each column has a grip
+ * that the table moves.
  *
  * @since 0.1.0
  * @status stable

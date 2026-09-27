@@ -7,31 +7,24 @@ import { property } from 'lit/decorators.js'
  * header to the main content.
  *
  * @description
- * A keyboard reader arriving on a page tabs through the whole header before
- * reaching anything the page is about, and does it again on the next page. This
- * is the control that skips it: first in the document, and pointed at the
- * content.
+ * Without a skip link, keyboard users tab through the whole header on every
+ * page before they reach the content. The skip link goes first in the document
+ * and points at the content.
  *
- * **It moves focus, not only the scroll position.** An in-page link on its own
- * scrolls to its target and leaves focus behind, so the next Tab goes to
- * whatever followed the link, which is the header it was meant to skip. Pressed,
- * this focuses the target. A target that cannot take focus, which is most of
- * them, since `<main>` cannot, is given `tabindex="-1"` for as long as it holds
- * focus and has it taken off again when focus leaves, so the page ends up as the
- * consumer wrote it.
+ * Pressing it moves focus as well as the scroll position. An in-page link alone
+ * scrolls but leaves focus behind, so the next Tab lands in the header. A
+ * target that cannot take focus, such as `<main>`, gets `tabindex="-1"` while
+ * it has focus, and the attribute is removed when focus leaves.
  *
- * **The address is left alone.** The press is handled rather than followed, so
- * no `#main` lands in the URL and no history entry is added, which matters to a
- * router reading the hash. The anchor is still a real anchor with a real
- * `href`, so before any script has run the link does what a plain link does:
- * it scrolls there and moves the point the next Tab starts from.
+ * The press is handled in script, so no `#main` is added to the URL and no
+ * history entry is created, and a router that reads the hash is not affected.
+ * The anchor has a real `href`, so before any script runs it works as a plain
+ * link: it scrolls to the target and moves the point the next Tab starts from.
  *
- * **Hidden until focused is the styled tier's**, being a decision about paint,
- * and on this tier the link is simply a link. A headless consumer hides
- * `::part(link)` while the host is not `:focus-within` and shows it when it is.
- * Hiding with `display: none` or `visibility: hidden` takes it out of the tab
- * order as well, and a skip link nobody can reach is the most common way one is
- * broken.
+ * The styled tier hides the link until it has focus. On this tier the link is
+ * always visible. To hide it yourself, hide `::part(link)` while the host is
+ * not `:focus-within`. Do not use `display: none` or `visibility: hidden`,
+ * because they also remove the link from the tab order.
  *
  * @since 0.1.0
  * @status stable

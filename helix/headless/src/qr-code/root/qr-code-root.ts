@@ -102,27 +102,23 @@ const pathFor = (
  * @summary A scannable QR code for a short piece of text.
  *
  * @description
- * **The picture is one `<path>`, not a grid of squares.** A code of any useful
- * length is a thousand modules, and drawing each as its own rect is a thousand
- * nodes for one image. Runs of adjacent dark modules are joined, so a row of
- * eight is one horizontal move rather than eight squares.
+ * The code is drawn as one `<path>`. Runs of adjacent dark modules are joined,
+ * so a row of eight is one horizontal move. A code of useful length has about a
+ * thousand modules, and an element for each would be a thousand nodes for one
+ * image.
  *
- * **It is an image and says so.** `role="img"` with a name, because what a
- * reader with a screen reader needs is what the code is *for*, and no amount of
- * describing the pattern gives them that. Where nothing is passed the value
- * itself is the name, which is right far more often than it looks: most codes
- * hold a URL, and a URL read aloud is the destination.
+ * The element has `role="img"` and an accessible name. Set the name to what the
+ * code is for. When you pass no name, the value is the name. Most codes hold a
+ * URL, and a URL read aloud gives the destination.
  *
- * **The quiet zone is part of the code.** Four modules of margin are required
- * by the specification, not a design choice, and a scanner will refuse a code
- * that is cropped to its edge. It is drawn inside the `viewBox` so it survives
- * any size the component is given, including one set in CSS.
+ * The quiet zone of four modules is required by the specification, and a
+ * scanner rejects a code cropped to its edge. It is drawn inside the `viewBox`,
+ * so it stays at any size, including a size set in CSS.
  *
- * `correction` is what buys the middle slot. A code at `H` can lose thirty
- * percent of itself and still read, which is what makes covering the center
- * with a mark safe; at `L` the same mark makes the code unscannable. That is
- * why the slot exists on the same element as the property, and why the default
- * moves when the slot is filled.
+ * `correction` sets how much of the code can be lost. At `H` a code can lose
+ * thirty percent and still scan, so a mark in the center slot is safe. At `L`
+ * the same mark makes the code unscannable. The default is `M`, and `H` when the
+ * `logo` slot is filled.
  *
  * @since 0.1.0
  * @status stable
