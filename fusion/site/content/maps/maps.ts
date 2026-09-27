@@ -127,55 +127,8 @@ export const MAP_FEATURES: readonly MapFeature[] = [
   },
 ]
 
-/** A step of getting started, and the code it is. */
-export interface MapStep {
-  body: string
-  code: string
-  language: 'html' | 'js' | 'sh'
-  title: string
-}
-
-/** Getting started, in three steps. */
-export const MAP_STEPS: readonly MapStep[] = [
-  {
-    body: 'Install Helix, the map connector, and MapLibre.',
-    code: 'bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl',
-    language: 'sh',
-    title: 'Install',
-  },
-  {
-    body: 'Add the map frame, an element for the renderer to draw in, and your places.',
-    code: `<helix-map label="Our stores">
-  <div id="map"></div>
-  <helix-map-marker label="Flagship" lat="30.2672" lng="-97.7431"></helix-map-marker>
-</helix-map>`,
-    language: 'html',
-    title: 'Write the map',
-  },
-  {
-    body: 'Create the map with a style from your theme, then connect it to the frame.',
-    code: `import '@fusion.dev/helix'
-import 'maplibre-gl/dist/maplibre-gl.css'
-import { colorsReady, connectMap } from '@fusion.dev/helix-map'
-import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
-import maplibregl from 'maplibre-gl'
-
-const frame = document.querySelector('helix-map')
-const style = (colors) => mapLibreStyle(colors)
-const map = new maplibregl.Map({
-  attributionControl: false,
-  center: [-97.7431, 30.2672],
-  container: 'map',
-  style: style(await colorsReady(frame)),
-  zoom: 13,
-})
-
-connectMap(frame, mapLibreDriver(map))
-followTheme(map, frame, style)`,
-    language: 'js',
-    title: 'Connect it',
-  },
-]
+/** The one command that installs a map, shown on the page with a link to the guide. */
+export const MAP_INSTALL = 'bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl'
 
 /**
  * The Maps page's words, which the page renders and its document serves.
@@ -213,9 +166,12 @@ export const MAPS: PageCopy = {
       title: 'Markers, routes, and live positions',
     },
     {
-      items: MAP_STEPS.map((step) => ({ body: `${step.body} ${step.code}`, name: step.title })),
+      body: [
+        'Install Helix, the map connector, and MapLibre. The Maps guide shows how to add a map, connect it, and style it with your theme.',
+        `\`${MAP_INSTALL}\``,
+      ],
       kicker: 'Get started',
-      title: 'Add a map in three steps',
+      title: 'Add a map to your site',
     },
     {
       body: [
