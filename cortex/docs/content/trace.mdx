@@ -1,20 +1,23 @@
 ---
 title: Trace
-description: 'The provenance spine: why(), replay, and cascading deletion.'
+description: 'How Cortex traces every output to its inputs, with why(), replay, and cascading deletion.'
 ---
 
 # Trace
 
-Every memory, context assembly, tool call, and output is a node with edges to
-whatever produced it. Provenance is the spine of Cortex rather than a module
-beside it, and three capabilities fall out of that which cannot be retrofitted.
+Trace records every memory, context, tool call, and output as a node, with an
+edge to each node it came from. Every other part of Cortex is built on this
+graph, and it makes three things possible:
+
+- `why()`, which answers where an output came from
+- replay, which re-runs a trace against another model
+- cascading deletion, which removes everything derived from deleted data
 
 ## What a node carries
 
-A node's payload is typed. This is what separates a trace from a log: a replay
-has to reconstitute the call that produced a node, and an untyped payload cannot
-promise the fields it needs are there, or spelled the same way they were last
-release.
+A node's payload is typed. A replay has to rebuild the call that produced a
+node, so it needs every field present and spelled the same way from one release
+to the next. An untyped payload cannot guarantee that.
 
 [//]: # (rust:fusion-cortex-trace::Detail)
 
@@ -38,9 +41,9 @@ assert_eq!(node.kind(), NodeKind::Output);
 
 [//]: # (/rust)
 
-The kind is read off the detail rather than stored beside it, so a node tagged
-`Output` carrying a tool call's payload is a state the type makes
-unrepresentable rather than a case every caller has to check for.
+The kind is read from the detail, so a node cannot claim to be an `Output`
+while it carries a tool call's payload. The type rules that case out, and no
+caller has to check for it.
 
 | Detail | Carries | Replay |
 | --- | --- | --- |
@@ -50,14 +53,13 @@ unrepresentable rather than a case every caller has to check for.
 | `ToolCall` | Tool name, arguments, and result | Recomputed |
 | `Output` | Content, model, prompt version, and what it cost | Recomputed |
 
-`ToolCall` keeps `serde_json::Value` for its arguments and result, and it is the
-one payload where that is the right type: tool arguments are arbitrary JSON by
-the wire format's definition, so a stricter type would be Cortex inventing a
-schema it cannot enforce.
+`ToolCall` stores its arguments and result as `serde_json::Value`. Tool
+arguments can be any JSON, so a stricter type would describe a schema that
+Cortex cannot enforce.
 
 ## why()
 
-The query the product rests on.
+`why()` returns every node an output was derived from.
 
 [//]: # (rust:fusion-cortex-trace::Graph::why)
 
@@ -80,14 +82,14 @@ assert_eq!(trace.len(), 4);
 
 [//]: # (/rust)
 
-`why()` walks the derivation transitively and terminates on cycles, which a
-buggy writer can produce.
+`why()` follows every edge back to the start, and it stops if it finds a cycle,
+which a faulty writer can create.
 
 ## Replay
 
-Given a trace, re-run it against a different model and diff the result. This is
-how you regression-test a system whose outputs are not deterministic: you hold
-the inputs fixed and compare, rather than asserting on text.
+Replay re-runs a trace against a different model and compares the results. It
+lets you test for regressions in a system whose outputs vary from run to run:
+you keep the inputs fixed and compare the outputs.
 
 [//]: # (rust:fusion-cortex-trace::replay::Graph::replay)
 
@@ -104,43 +106,41 @@ assert_eq!(replay.graph.len(), 3);      // a replay is itself a trace
 
 [//]: # (/rust)
 
-### What varies, and what is held
+### What a replay recomputes
 
-A replay recomputes the `Output` nodes in a trace and carries everything else
-forward. Each of the three holds is a decision rather than a limitation:
+A replay recomputes the `Output` nodes in a trace and keeps everything else
+fixed:
 
-- **Inputs are the question.** Re-running a `Source` or a `Memory` would change
-  it rather than answer it again.
-- **Context is held by design.** The point of a model-drift replay is to isolate
-  the model as the variable. Recomputing retrieval in the same run confounds the
-  two, and you could no longer say whether an answer moved because the model
-  changed or because it was handed different memories. Varying retrieval instead
-  is a different experiment, and it needs Recall.
-- **Tool calls are held out of necessity.** Re-executing a tool re-performs its
-  side effects: a replay of a trace that sent an email would send the email
-  again. Running tools needs a sandbox and an explicit opt-in, and until it has
-  both, not running them is the only safe default.
+- **Inputs stay fixed.** A `Source` or a `Memory` is the question being asked,
+  so re-running it would change the question.
+- **Context stays fixed.** A replay measures how a different model changes the
+  answer. If retrieval also ran again, you could not tell whether an answer
+  changed because of the model or because of different memories. Varying
+  retrieval is a separate experiment, and it needs Recall.
+- **Tool calls stay fixed.** Running a tool again repeats its side effects: a
+  replay of a trace that sent an email would send the email again. Running tools
+  in a replay needs a sandbox and an explicit opt-in, and neither exists yet.
 
-Prompt substitution is absent rather than stubbed. Resolving a version to the
-prompt it names needs a registry that does not exist, and a field that only
-relabelled the output would be a lie about what ran.
+Replay cannot substitute a different prompt yet. Looking up the prompt that a
+version names needs a prompt registry, which does not exist. A field that only
+changed the version label would misreport what ran.
 
 ### The judge has to be pinned
 
-Deciding whether two outputs are the same answer is the hard half, and judging
-model output with a model is circular: if the judge moves between runs, you
-cannot tell which of the two things moved. So a `Scorer` reports a versioned
-`id()`, every result records it, and a judge that cannot be pinned to a version
-has no business implementing the trait.
+Deciding whether two outputs give the same answer is the hard part. If a model
+judges the outputs and the judge itself changes between runs, you cannot tell
+which change you are measuring. So each `Scorer` reports a versioned `id()`,
+every result records it, and only a judge that can be pinned to a version
+should implement the trait.
 
-`Exact` is the floor: byte equality, useless for prose, and the only scorer
-that introduces no instrument of its own. Numbers from it carry full confidence;
-model-judged claims layer on top as weaker ones. A pinned local judge is what
-the local-first requirement buys: a hosted model can be updated behind a stable
-name, which is the phenomenon a drift measurement is trying to detect.
+`Exact` compares bytes. It is too strict for prose, but it is the only scorer
+that adds no judgment of its own, so its results carry full confidence. Results
+from a model judge are weaker and sit on top. Running the judge locally lets
+you pin it: a hosted model can change behind the same name, which is the drift
+a replay is trying to detect.
 
-A replay is itself a trace, so `why()` and cascading deletion both work on the
-result. A replay of a memory the user later deletes goes with it.
+A replay is itself a trace, so `why()` and cascading deletion both work on it.
+When you delete a memory, the replays that used it are deleted too.
 
 ### Order
 
@@ -167,19 +167,18 @@ assert!(plan[1..3].contains(&left) && plan[1..3].contains(&right));
 
 [//]: # (/rust)
 
-**`plan()` exists because `why()` is the wrong order to execute in.**
-Breadth-first from the output is reachability, not dependency. Reversing it
-happens to work wherever every node sits at exactly one depth, which is why a
-chain and a plain diamond both survive the mistake and hide it. It breaks as
-soon as a node is reachable at two different depths: breadth-first pins that
-node at its shallowest, and execution needs it before the deepest thing that
-reads it. What comes out is a recomputation run against an input that does not
-exist yet, and it still looks like an answer.
+**Use `plan()` for the order to run nodes in.** `why()` walks breadth-first
+from the output, which finds every node an output depends on but does not put
+them in dependency order. Reversing it works only when every node sits at one
+depth, as in a chain or a plain diamond. When a node can be reached at two
+depths, breadth-first order places it at the shallower one, but it has to run
+before the deepest node that reads it. The result is a recomputation that reads
+an input that does not exist yet, and it still looks like a valid answer.
 
 ## Cascading deletion
 
-Deleting a memory must also remove the summaries, embeddings, and outputs
-computed from it, or "delete" is a promise the system cannot keep.
+Deleting a memory also removes the summaries, embeddings, and outputs computed
+from it. Otherwise the deleted data would live on in what was derived from it.
 
 [//]: # (rust:fusion-cortex-trace::Graph::delete_cascade)
 
@@ -193,10 +192,9 @@ assert!(graph.get(source).is_some());  // ancestors are untouched
 
 [//]: # (/rust)
 
-A reverse index is maintained on insert, so cascading deletion does not require
-a full scan, and dangling parent references are dropped afterwards so the graph
+Trace keeps a reverse index as nodes are inserted, so a cascading deletion
+needs no full scan. It then drops references to deleted parents, so the graph
 stays consistent.
 
-This is what makes deletion mechanical rather than nominal. A user's right to delete is
-only real if the system can find everything that was derived from what they
-deleted, and provenance is what makes that tractable.
+To honor a request to delete data, a system has to find everything derived
+from that data. Provenance is what makes that possible.
