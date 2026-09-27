@@ -16,6 +16,7 @@ import {
   MAP_STACK,
   MAPS,
   type MapFeature,
+  RADAR,
 } from '@/content/maps/maps'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
@@ -24,6 +25,7 @@ import { serverTheme } from '@/utils/theme-engine/theme-engine.server'
 import styles from './maps.module.css'
 import { MapsHero } from './maps-hero'
 import { MapsPoints } from './maps-points'
+import { MapsRadar } from './maps-radar'
 import { MapsTerrain } from './maps-terrain'
 import { mapIntent, propertiesOf } from './maps-theme'
 
@@ -122,6 +124,20 @@ const TERRAIN_MARKUP = `<helix-map
   ></helix-map-contours>
 </helix-map>`
 
+/** The radar layer as a page writes it, which the radar demo beside it is. */
+const RADAR_MARKUP = `<helix-map
+  label="Weather radar over the United States"
+>
+  <div id="map"></div>
+  <helix-map-raster
+    label="Weather radar"
+    attribution="${RADAR.attribution}"
+    frames="
+${RADAR.frames.map((one) => `      ${one}`).join('\n')}
+    "
+  ></helix-map-raster>
+</helix-map>`
+
 /**
  * A band's cells, two by two on a wide card: each thing's name, what it does,
  * and what you write for it, set as code.
@@ -161,13 +177,14 @@ export const metadata = pageMetadata({
  *
  * **Sold, then shown, then handed over.** Under the live map: what a map gets
  * from Helix, the one thing a marker cannot do shown running, what a map can
- * hold, the ground under it shown running, the layers you add and what every
- * map draws, how to start one of your own, and last how it is built, the
+ * hold, the ground under it shown running, the layers you add, the weather
+ * shown running, what every map draws, how to start one of your own, and last
+ * how it is built, the
  * stack each of those rests on. The bands and their field are the landing
  * page's, so Maps reads as a part of the same site rather than a tool page.
  */
 export default async function Page({ searchParams }: { searchParams: Promise<Params> }) {
-  const [, pillars, points, features, terrain, layers, basics, started, stack] = MAPS.blocks
+  const [, pillars, points, features, terrain, layers, radar, basics, started, stack] = MAPS.blocks
   /* **A theme the builder sent, derived here so it is in the first paint.**
      The link carries the builder's own query, read by the builder's own
      `settingsFrom`, so every value is validated the same way and falls back
@@ -270,6 +287,25 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
             <Lede>{layers?.body?.[0]}</Lede>
           </helix-flex>
           <Features features={MAP_LAYERS} />
+        </Band>
+
+        {/* **The weather, running**: the radar the last layer card names, on
+            the live frames, and the button that plays it. */}
+        <Band reveal shell="plain" wide>
+          <div className={band.bandSplit}>
+            <helix-flex class={band.bandSection} direction="column" gap="md">
+              <Eyebrow>{radar?.kicker}</Eyebrow>
+              <SectionTitle>{radar?.title}</SectionTitle>
+              <Lede>{radar?.body?.[0]}</Lede>
+              <Code code={RADAR_MARKUP} label="The markup" language="html" wrap />
+              <helix-text emphasis="subtle" variant="caption">
+                {radar?.body?.[1]}
+              </helix-text>
+            </helix-flex>
+            <div className={band.bandSection}>
+              <MapsRadar />
+            </div>
+          </div>
         </Band>
 
         <Band reveal>

@@ -209,6 +209,15 @@ export const IMAGERY = {
   src: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',
 }
 
+/**
+ * Weather radar for the last 50 minutes, oldest first, from this site's radar
+ * route, which cleans and recolors the Iowa Environmental Mesonet's tiles.
+ */
+export const RADAR = {
+  attribution: 'NWS radar from the Iowa Environmental Mesonet',
+  frames: [50, 40, 30, 20, 10, 0].map((ago) => `/maps/radar/${ago}/{z}/{x}/{y}.png`),
+}
+
 /** The one command that installs a map, shown on the page with a link to the guide. */
 export const MAP_INSTALL = 'bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl'
 
@@ -261,6 +270,14 @@ export const MAPS: PageCopy = {
       items: MAP_LAYERS.map((feature) => ({ body: feature.body, name: feature.title })),
       kicker: 'Layers',
       title: 'Terrain, buildings, imagery, and weather',
+    },
+    {
+      body: [
+        'Rain and storms across the United States over the last 50 minutes, in 10-minute steps, laid over a map in your theme. Press Play radar to watch the rain move.',
+        'The radar is the National Weather Service’s, from the Iowa Environmental Mesonet. We clean and recolor its tiles for this site. On your page, set the frames attribute to your own tile server or to the Mesonet’s tiles.',
+      ],
+      kicker: 'Weather radar',
+      title: 'Rain across the United States',
     },
     {
       body: [
