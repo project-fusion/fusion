@@ -1,24 +1,23 @@
 ---
 title: Engram
-description: Episodic and semantic memory, consolidation, and decay.
+description: How Cortex remembers, with episodic and semantic memory, consolidation, and decay.
 ---
 
 # Engram
 
-**Storage is not memory.** A table of everything that ever happened is the raw
-material memory operates on. Memory implies selection, consolidation, and
-forgetting.
+Engram is the memory in Cortex. It records what happened, distills it into
+facts, and lowers its confidence in facts as they age. A table of every event is
+the raw material for that work.
 
-## Two kinds, for now
+## Two kinds of memory
 
 | Kind | Holds | Example |
 | --- | --- | --- |
 | **Episodic** | What happened. Timestamped, raw, append-only | "At 09:14 the user asked about tariff windows" |
 | **Semantic** | What is true. Distilled, deduplicated, confidence-scored | "The user's utility bills on a time-of-use plan" |
 
-Procedural memory (distilling repeated successful action sequences into
-reusable procedure) is deferred to v1. It is a research problem, and the first
-two already differentiate.
+Procedural memory turns a sequence of actions that worked into a procedure that
+can be reused. It is planned for v1, after episodic and semantic memory.
 
 [//]: # (rust:fusion-cortex-engram)
 
@@ -37,9 +36,9 @@ memory.assert_fact(Fact::new("on a time-of-use plan", vec![episode], 0.9), None)
 
 ## Consolidation
 
-Episodes accumulate and are distilled into semantic facts.
-`unconsolidated()` returns the episodes not yet folded into any fact, which is
-the input to that pass. The pass itself is not built yet.
+Episodes accumulate, and consolidation distills them into semantic facts.
+`unconsolidated()` returns the episodes that no fact includes yet, which are the
+input to consolidation. Consolidation itself is not built yet.
 
 [//]: # (rust:fusion-cortex-engram::Memory::unconsolidated)
 
@@ -49,13 +48,13 @@ let pending = memory.unconsolidated();
 
 [//]: # (/rust)
 
-Consolidation runs as a background job rather than inline. Running it on the
-request path is what makes a memory system slow enough that people turn it off.
+Consolidation will run as a background job. On the request path, it would slow
+every request down.
 
-## Superseding, not overwriting
+## Newer facts supersede older ones
 
-When a newer fact contradicts an older one, the old fact is marked superseded
-and **retained**. Provenance needs it to explain outputs that were produced
+When a newer fact contradicts an older one, the old fact is marked as
+superseded and **kept**. Provenance needs it to explain the outputs produced
 while it was current.
 
 [//]: # (rust:fusion-cortex-engram::Memory::assert_fact)
@@ -69,10 +68,10 @@ assert_eq!(memory.current_facts().len(), 1); // only the newer one is current
 
 [//]: # (/rust)
 
-## Forgetting is an operation
+## Confidence decays over time
 
-A memory system that never lowers its confidence in stale claims is a memory
-system that confidently tells you things that stopped being true.
+Engram lowers its confidence in a fact as the fact ages, so an old claim does
+not keep the confidence it had when it was new.
 
 [//]: # (rust:fusion-cortex-engram::Fact::decayed_confidence)
 
@@ -85,5 +84,5 @@ assert!(fact.decayed_confidence(300.0, 30.0) < 0.01);  // ten half-lives
 
 [//]: # (/rust)
 
-Decay is exponential with a configurable half-life, and confidence is reinforced
-when new episodes support the same claim.
+Decay is exponential, with a half-life you can set. When new episodes support
+the same claim, its confidence goes back up.
