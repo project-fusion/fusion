@@ -226,14 +226,15 @@ describe('map layers menu', () => {
       'Hybrid',
       'Satellite',
     ])
-    expect((cards[0]?.querySelector('input') as HTMLInputElement).checked).toBe(true)
+    const radio = (at: number): HTMLInputElement =>
+      cards[at]?.querySelector('input') as HTMLInputElement
+    expect(radio(0).checked).toBe(true)
     const tiles = [
       ...(part(host, 'layer-choices')?.querySelectorAll('[part="layer-choice"]') ?? []),
     ]
     expect(tiles.map((one) => (one.textContent ?? '').trim())).toEqual(['3D buildings'])
 
-    const hybrid = cards[1]?.querySelector('input') as HTMLInputElement
-    hybrid.click()
+    radio(1).click()
     await settle(host)
     expect(host.mapType).toBe('hybrid')
     expect(host.getAttribute('map-type')).toBe('hybrid')
@@ -242,7 +243,7 @@ describe('map layers menu', () => {
     host.mapPreviews = { satellite: PICTURE }
     await settle(host)
     expect(cards[2]?.querySelector('img')?.getAttribute('src')).toBe(PICTURE)
-    ;(cards[0]?.querySelector('input') as HTMLInputElement).click()
+    radio(0).click()
     await settle(host)
     expect(host.hasAttribute('map-type')).toBe(false)
     expect(imagery.hidden).toBe(true)
