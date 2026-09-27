@@ -14,6 +14,7 @@ pub mod orphans;
 pub mod references;
 pub mod repository;
 pub mod tag_order;
+pub mod voice;
 
 use crate::rules::{floor, Rule, Runner};
 
@@ -73,6 +74,12 @@ pub fn all() -> Vec<Rule> {
             name: "tag-order",
             run: Runner::Source(tag_order::run),
             summary: "every class doc block carries its tags in one order, with every list sorted",
+        },
+        Rule {
+            fix: None,
+            name: "voice",
+            run: Runner::Source(voice::run),
+            summary: "the text a reader sees has no contraction, no \"rather than\", and no \", not\" ending",
         },
     ]
 }
