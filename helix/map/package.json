@@ -39,7 +39,8 @@
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {
-    "@fusion.dev/helix-core": "workspace:*"
+    "@fusion.dev/helix-core": "workspace:*",
+    "@fusion.dev/helix-icons": "workspace:*"
   },
   "devDependencies": {
     "@fusion.dev/helix-headless": "workspace:*",

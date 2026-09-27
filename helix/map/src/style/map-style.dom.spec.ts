@@ -48,6 +48,39 @@ describe('mapLibreStyle', () => {
     expect(mapLibreStyle(LIGHT).sky).toBeUndefined()
   })
 
+  test('given a typeface, labels are drawn from it in the page, with no glyphs to fetch', () => {
+    const style = mapLibreStyle(LIGHT, { font: 'Geist' })
+    expect(style.glyphs).toBeUndefined()
+    const fonts = style.layers
+      .map((layer) => (layer.layout as Record<string, unknown> | undefined)?.['text-font'])
+      .filter(Boolean)
+    expect(fonts).toContainEqual(['Geist'])
+    expect(fonts).toContainEqual(['Geist Bold', 'Geist'])
+    expect(fonts).toContainEqual(['Geist Italic', 'Geist'])
+    expect(validateStyleMin(style as never)).toEqual([])
+    expect(mapLibreStyle(LIGHT).glyphs).toContain('openfreemap')
+  })
+
+  test('landmarks and highway signs name images the style describes, and neighborhoods are in capitals', () => {
+    const style = mapLibreStyle(LIGHT)
+    const images = style.metadata['helix:images']
+    const landmark = style.layers.find((layer) => layer.id === 'label-landmark')
+    const named = JSON.stringify((landmark?.layout as Record<string, unknown>)['icon-image'])
+    const ids = Object.keys(images).filter((id) => id.startsWith('helix-landmark-'))
+    expect(ids.length).toBeGreaterThan(5)
+    for (const id of ids) {
+      expect(named).toContain(id)
+      expect(images[id]).toMatchObject({ kind: 'landmark' })
+    }
+    expect(images['helix-sign-interstate-2']).toMatchObject({
+      kind: 'sign',
+      length: 2,
+      shape: 'interstate',
+    })
+    const neighbourhood = style.layers.find((layer) => layer.id === 'label-neighbourhood')
+    expect((neighbourhood?.layout as Record<string, unknown>)['text-transform']).toBe('uppercase')
+  })
+
   test('draws on the land and reads its tiles and type from OpenFreeMap', () => {
     const style = mapLibreStyle(LIGHT)
     expect(style.layers[0]).toMatchObject({ id: 'land', type: 'background' })
@@ -87,14 +120,24 @@ describe('mapLibreStyle', () => {
       for (const target of [4.5, 7]) {
         const style = mapLibreStyle(colors, { contrast: target })
         const land = parseColor(String(paint(style, 'land', 'background-color')))
-        const labels = style.layers.filter((layer) => String(layer.id).startsWith('label'))
+        /* Not a sign's number, which is read against the sign. */
+        const labels = style.layers.filter(
+          (layer) => String(layer.id).startsWith('label') && layer.id !== 'label-shield',
+        )
         expect(labels.length).toBeGreaterThan(5)
         for (const label of labels) {
-          const ink = parseColor(String(paint(style, String(label.id), 'text-color')))
-          const ratio = land && ink ? contrast(ink, land) : 0
-          const inkRatio = contrast(parseColor(colors.foreground) as never, land as never)
-          // Clears it, or is the ink itself where not even the ink can.
-          expect(ratio).toBeGreaterThanOrEqual(Math.min(target, inkRatio) - 0.01)
+          /* Every color a label can be, a landmark's being one per kind. */
+          const given = paint(style, String(label.id), 'text-color')
+          const inks = (Array.isArray(given) ? given.flat(2) : [given])
+            .map((one) => parseColor(String(one)))
+            .filter((one): one is NonNullable<typeof one> => one !== null && one !== undefined)
+          expect(inks.length).toBeGreaterThan(0)
+          for (const ink of inks) {
+            const ratio = land ? contrast(ink, land) : 0
+            const inkRatio = contrast(parseColor(colors.foreground) as never, land as never)
+            // Clears it, or is the ink itself where not even the ink can.
+            expect(ratio).toBeGreaterThanOrEqual(Math.min(target, inkRatio) - 0.01)
+          }
         }
       }
     }
