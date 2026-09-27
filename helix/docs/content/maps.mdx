@@ -89,8 +89,9 @@ It also draws landmarks, highway signs, and neighborhood names:
   parks, museums, schools, hotels, hospitals, stations, and stadiums from zoom
   14, and food and shops from zoom 16. Each color is a fixed hue at your brand
   color's lightness, so the kinds stay apart in any theme.
-- A highway's number is on its sign: the red and blue Interstate shield, the
-  white US route shield, the white state oval, and a plain plate for other
+- A highway's number is on its sign, drawn to the Federal Highway
+  Administration's outlines: the red and blue Interstate shield, the white US
+  route shield, the white circle of a state route, and a plain plate for other
   roads.
 - Neighborhoods are in spaced capitals, quieter than the towns.
 
@@ -138,6 +139,8 @@ reports which one is missing.
 | `helix-map-buildings` | The map's buildings, raised to their heights in 3D |
 | `helix-map-raster` | Map tiles over the map, such as weather radar or satellite imagery |
 | `helix-map-terrain` | Hills and mountains, shaded and raised in 3D |
+| `helix-map-contours` | Contour lines, each at one height |
+| `helix-map-landcover` | What covers the ground: forest, grass, farmland, sand, rock, and ice |
 
 Each element takes `tone`, such as `primary` or `danger`, for its color.
 
@@ -336,6 +339,33 @@ the default. For tiles in the Mapbox encoding, set `encoding="mapbox"`. Credit
 the sources your map shows: in the United States, the U.S. Geological Survey.
 
 Leaflet draws maps flat, so a Leaflet map shows no terrain.
+
+### Contour lines
+
+```html
+<helix-map-contours
+  max-zoom="15"
+  src="https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
+  unit="feet"
+></helix-map-contours>
+```
+
+`helix-map-contours` draws lines of equal height from the same elevation tiles
+as terrain. The lines are closer together as the map zooms in, from 500 meters
+apart over a region to 5 meters at street level. Every fifth line is heavier and
+labeled with its height, in meters, or in feet with `unit="feet"`. They show
+from zoom 9, and lie on the ground when it is raised.
+
+### Land cover
+
+```html
+<helix-map-landcover></helix-map-landcover>
+```
+
+`helix-map-landcover` colors the ground by what covers it: forest and grass in
+greens, farmland in wheat, wetland in teal, sand in tan, rock in gray, and ice
+in pale blue. Each color is mixed into your theme's land color. It draws over
+parks and under water and roads, so a park shows its meadows and forests.
 
 ### Turn layers on and off
 
