@@ -62,8 +62,10 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   }
   const panel = root.querySelector('[data-preview-map-clear]')
   const language = document.documentElement.lang || 'en'
+  /* A globe where the example asks for one with `data-preview-map-globe`. */
+  const globe = frame.hasAttribute('data-preview-map-globe')
   const styled = (colors: ReturnType<typeof mapColorsFrom>) =>
-    mapLibreStyle(colors, { contrast: contrastOf(frame), language }) as never
+    mapLibreStyle(colors, { contrast: contrastOf(frame), globe, language }) as never
   /* **A fixed view where the example gives one**, for a layer with no places
      to frame, such as buildings seen tilted or radar over a region. Written
      as `data-preview-map-view="lat,lng,zoom,pitch,bearing"`, the last two
