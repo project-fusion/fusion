@@ -5,6 +5,9 @@
 # rather than finding and pasting an SVG. A name the package does not have is
 # read from raw/, which is where marks that are not Phosphor live.
 airplay
+archive
+arrow-clockwise
+arrow-counter-clockwise
 arrow-down
 arrow-elbow-down-left
 arrow-left
@@ -17,6 +20,7 @@ bell
 book-open-text
 briefcase
 building
+buildings
 calendar-blank
 caret-double-left
 caret-double-right
@@ -32,12 +36,14 @@ circle
 clock
 closed-captioning
 cloud
+cloud-rain
 compass
 copy
 corners-in
 corners-out
 cortex
 cube
+dots-nine
 dots-three
 dots-three-vertical
 download
@@ -63,25 +69,30 @@ laptop
 layout
 lightbulb
 link
+linkedin-logo
 list
 magnifying-glass
 microscope
 minus
 monitor
 moon
+mountains
 notebook
 palette
+path
 pause
 phone
 picture-in-picture
 play
 plus
+polygon
 pulse
 push-pin
 push-pin-slash
 react
 receipt
 record
+satellite
 share-network
 shield-check
 sidebar-simple
@@ -107,8 +118,4 @@ warning
 warning-fill
 x
 x-circle-fill
-arrow-clockwise
-arrow-counter-clockwise
-archive
-linkedin-logo
 x-logo
