@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import './weather.css'
 
-const TILES = 'https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0'
-
-// Radar frames from 50 minutes ago to now, oldest first.
-const FRAMES = ['-m50m', '-m40m', '-m30m', '-m20m', '-m10m', ''].map(
-  (ago) => `${TILES}/nexrad-n0q-900913${ago}/{z}/{x}/{y}.png`,
-)
+// Radar frames from 50 minutes ago to now, oldest first. They come from this
+// site's radar route, which draws the Mesonet's radar without speckle and at
+// twice the resolution. On your page, use your own tile server or the Mesonet's
+// tiles.
+const FRAMES = [50, 40, 30, 20, 10, 0].map((ago) => `/maps/radar/${ago}/{z}/{x}/{y}.png`)
 
 export function Example() {
   const [playing, setPlaying] = useState(false)
