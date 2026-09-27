@@ -2,7 +2,14 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { HelixActivateEvent, HelixMap, HelixMapRoute } from '@fusion.dev/helix'
-import { colorsReady, connectMap, distancesAlong, motionOf } from '@fusion.dev/helix-map'
+import {
+  colorsReady,
+  connectMap,
+  distancesAlong,
+  fontReady,
+  mapFontFrom,
+  motionOf,
+} from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import Link from 'next/link'
@@ -172,13 +179,20 @@ export function MapsHero({
       /* The tokens can be a frame or two behind the page, so the map waits for
          them, and a page that never has them is told so by name. */
       const colors = await colorsReady(host)
+      /* The theme's typeface, loaded before the map draws a label in it. */
+      await fontReady(mapFontFrom(host))
       if (!live) {
         return
       }
       /* The labels held to the contrast chosen at the moment the map is
          styled, which a sent theme sets and a brand of the page's own clears. */
       const styled = (from: typeof colors) =>
-        mapLibreStyle(from, { contrast: labels.current, globe: true, language }) as never
+        mapLibreStyle(from, {
+          contrast: labels.current,
+          font: mapFontFrom(host),
+          globe: true,
+          language,
+        }) as never
       /* **Tilted, so the city stands up**: the buildings are raised to their
          heights, and a reader turns and tilts the map from its controls. */
       const map = new maplibregl.Map({
