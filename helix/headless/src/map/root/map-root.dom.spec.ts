@@ -38,7 +38,7 @@ describe('map frame', () => {
   test('the controls are buttons, so every screen reader can find them', async () => {
     // Not arrow keys alone: what a screen reader does with arrows is not ours to
     // decide, and a button needs no bargain about reading mode.
-    const host = await map()
+    const host = await map('controls="pan zoom fullscreen"')
     for (const name of ['pan-up', 'pan-down', 'pan-start', 'pan-end', 'zoom-in', 'zoom-out']) {
       const button = control(host, name)
       expect(button?.tagName.toLowerCase()).toBe('button')
@@ -47,7 +47,7 @@ describe('map frame', () => {
   })
 
   test('a press asks rather than moves, and says which way and how far', async () => {
-    const host = await map()
+    const host = await map('controls="pan zoom fullscreen"')
     const asked: Array<{ by: number; to: string }> = []
     host.addEventListener('helix-map-pan', (event) => {
       asked.push((event as CustomEvent<{ by: number; to: string }>).detail)
@@ -75,7 +75,7 @@ describe('map frame', () => {
   })
 
   test('the step is a fraction of the viewport, and a consumer can change it', async () => {
-    const host = await map('pan-step="0.5"')
+    const host = await map('controls="pan" pan-step="0.5"')
     const asked: number[] = []
     host.addEventListener('helix-map-pan', (event) => {
       asked.push((event as CustomEvent<{ by: number }>).detail.by)
@@ -129,11 +129,13 @@ describe('map frame', () => {
  * a MapLibre consumer choose between two zoom controls and no pan pad.
  */
 describe('map controls a consumer keeps or drops', () => {
-  test('all three by default', async () => {
+  test('zoom, the compass, and fullscreen by default, and pan where a page asks', async () => {
     const host = await map()
-    for (const name of ['pan-up', 'zoom-in', 'fullscreen']) {
+    for (const name of ['zoom-in', 'face-north', 'fullscreen']) {
       expect(control(host, name)).not.toBeNull()
     }
+    expect(control(host, 'pan-up')).toBeNull()
+    expect(control(await map('controls="pan"'), 'pan-up')).not.toBeNull()
   })
 
   test('the pan pad without the zoom, which is the MapLibre case', async () => {
@@ -218,11 +220,11 @@ describe('map controls on a right-to-left page', () => {
   test('the start control says and points the way it sits, which is right', async () => {
     /* The pad is laid out in reading order, so on a right-to-left page the
        start control is on the right: it said "left" and pointed left from there. */
-    const host = await map('dir="rtl"')
+    const host = await map('controls="pan" dir="rtl"')
     const start = control(host, 'pan-start')
     expect(start?.getAttribute('aria-label')).toBe('Pan right')
     expect(start?.textContent?.trim()).toBe('→')
-    const ltr = await map()
+    const ltr = await map('controls="pan"')
     expect(control(ltr, 'pan-start')?.getAttribute('aria-label')).toBe('Pan left')
   })
 
@@ -260,8 +262,8 @@ describe('map controls on a right-to-left page', () => {
     expect(control(host, 'face-north')?.getAttribute('aria-label')).toBe('Face north')
   })
 
-  test('the controls are one column in reading order, the arrows round a compass that is always drawn', async () => {
-    const plain = await map()
+  test('the controls are one column in reading order, the arrows round a compass', async () => {
+    const plain = await map('controls="pan"')
     const inCompass = (host: Map): string[] =>
       [...(control(host, 'compass')?.children ?? [])].map((one) => one.getAttribute('part') ?? '')
     expect(inCompass(plain)).toEqual(['pan-up', 'pan-start', 'face-north', 'pan-end', 'pan-down'])
@@ -282,6 +284,7 @@ describe('map controls on a right-to-left page', () => {
       'pan-down',
     ])
     expect(control(await map('controls="zoom"'), 'compass')).toBeNull()
+    expect(inCompass(await map())).toEqual(['face-north'])
   })
 
   test('shift with the arrow keys rotates and tilts, and the region says so', async () => {

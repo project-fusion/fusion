@@ -19,7 +19,7 @@ export type ViewportControlsPlacement = 'top-start' | 'top-end' | 'bottom-start'
  * The API a pan-and-zoom surface has, as TypeScript sees it.
  */
 export declare class ViewportElement {
-  /** Which controls to show, as a list of `pan`, `zoom`, and `fullscreen`, or `none`. */
+  /** Which controls to show, as a list such as `pan zoom fullscreen`, or `none`. A family adds words of its own. */
   controls?: string
 
   /** Which corner the controls sit in. */
@@ -145,7 +145,8 @@ export declare class ViewportElement {
 export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
   class Viewport extends Base {
     /**
-     * Which controls to show, as a list of `pan`, `zoom`, and `fullscreen`, or `none`.
+     * Which controls to show, as a list such as `pan zoom fullscreen`, or
+     * `none`. A family can add words of its own.
      *
      * **A list rather than a switch, because the overlap is not symmetric.** A
      * surface a consumer brings often has zoom controls of its own and almost
@@ -159,9 +160,10 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
      * the surface.
      *
      * Absent is whatever the family rests at, which is this library's rule that
-     * a resting value is an attribute's absence: all three for a map, whose
-     * reader may have no other way to move it, and zoom and fullscreen for a
-     * board, which a reader drags and whose pad took a third of the frame. The
+     * a resting value is an attribute's absence: zoom, the compass and
+     * fullscreen for a map, whose pan buttons a page asks for, and zoom and
+     * fullscreen for a board, which a reader drags and whose pad took a third
+     * of the frame. The
      * stylesheet lays the cluster out by which buttons are in it rather than by
      * this attribute, so the two defaults need no rule each.
      */

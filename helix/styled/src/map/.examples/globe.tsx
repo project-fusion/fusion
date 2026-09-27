@@ -13,7 +13,6 @@ export function Example() {
     <>
       {/* Preview frame: data-preview-map has the frame connect MapLibre, data-preview-map-globe asks mapLibreStyle for a globe, and data-preview-map-view sets the view; on your page, pass globe: true to mapLibreStyle. */}
       <helix-map
-        controls="pan zoom rotate fullscreen"
         data-preview-map
         data-preview-map-globe
         data-preview-map-view="25,-40,1.3"
