@@ -97,20 +97,6 @@ const CodeFence = ({ children }: { children?: ReactNode }) => {
  */
 const InlineCode = ({ children }: { children?: ReactNode }) => <helix-code>{children}</helix-code>
 
-/**
- * A cell, with its content in one span.
- *
- * `helix-table-cell` is a flex container, so a cell holding text and inline code
- * made each text run and each `helix-code` its own flex item. At 390 wide they
- * sat side by side and broke mid-word ("Shi ps" beside `vue.d.ts`). One span
- * gives the cell a single item, and the text inside it wraps as a line of prose.
- */
-const TableCell = ({ children }: { children?: ReactNode }) => (
-  <helix-table-cell>
-    <span>{children}</span>
-  </helix-table-cell>
-)
-
 /** A column heading, which is a column in this component rather than a cell. */
 const TableColumn = ({ children }: { children?: ReactNode }) => (
   <helix-table-column>{children}</helix-table-column>
@@ -302,7 +288,7 @@ export const PROSE_COMPONENTS = {
   ),
   table: Table,
   tbody: Unwrap,
-  td: TableCell,
+  td: ({ children }: { children?: ReactNode }) => <helix-table-cell>{children}</helix-table-cell>,
   th: TableColumn,
   thead: Unwrap,
   tr: TableRow,
