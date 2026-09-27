@@ -510,13 +510,17 @@ export function MapsHero({
         />
         <helix-map-route
           description="Passes all seven places in order"
+          group="walk"
           label="Walking route from UT Tower to Barton Springs Pool"
           points={WALK.path.map(([lat, lng]) => ({ lat, lng }))}
         />
         {/* **Dotted where it leaves the path**: a place set back from its
             road is where directions draw the last steps as dots, from where
-            the route ends to the place itself, and the first steps the same. */}
+            the route ends to the place itself, and the first steps the same.
+            In the route's group, so the layers menu turns the walk on and off
+            as one. */}
         <helix-map-route
+          group="walk"
           label={`Walk from ${PLACES[0]?.label ?? ''} to the route`}
           points={[
             { lat: PLACES[0]?.lat ?? 0, lng: PLACES[0]?.lng ?? 0 },
@@ -525,6 +529,7 @@ export function MapsHero({
           variant="dotted"
         />
         <helix-map-route
+          group="walk"
           label={`Walk from the route to ${PLACES.at(-1)?.label ?? ''}`}
           points={[
             { lat: WALK.path.at(-1)?.[0] ?? 0, lng: WALK.path.at(-1)?.[1] ?? 0 },
