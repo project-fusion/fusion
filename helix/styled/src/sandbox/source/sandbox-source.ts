@@ -15,14 +15,11 @@ import { styles } from './sandbox-source.css.js'
  * @summary An editable source pane for a sandbox preview.
  *
  * @description
- * A real `<textarea>`, not a contenteditable div with a syntax highlighter over
- * it. Undo, selection, spellcheck suppression, mobile keyboards, and screen
- * reader support all come from the platform, and every one of them is
- * expensive to rebuild and easy to get subtly wrong.
+ * A real `<textarea>`, so undo, selection, spellcheck suppression, mobile
+ * keyboards, and screen reader support come from the platform.
  *
- * Tab inserts two spaces rather than leaving the field, because a code pane
- * that cannot indent is not one. Escape then Tab still moves focus out, which
- * is the documented escape hatch for exactly this trade.
+ * Tab inserts two spaces, so you can indent code. To move focus out of the
+ * field, press Escape and then Tab.
  *
  * @since 0.1.0
  * @status stable

@@ -7,10 +7,9 @@ import { styles } from './divider-root.css.js'
  * @summary A line that separates content into groups.
  *
  * @description
- * A one-pixel rule in the border color, running the full inline size by
- * default. A vertical divider stretches to its flex parent instead of setting
- * its own height, so it matches whatever it sits beside without being told how
- * tall that is.
+ * A one-pixel rule in the border color that spans the full inline size by
+ * default. A vertical divider stretches to fit its flex parent, so it matches
+ * the height of what it sits beside.
  *
  * @since 0.1.0
  * @status stable

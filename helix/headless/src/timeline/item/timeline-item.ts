@@ -8,20 +8,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One event on a timeline: when it happened, and what it was.
  *
  * @description
- * **The time is a `<time>`, and only when there is a time to put in it.** Given
- * `datetime`, the label a consumer wrote is wrapped in the element the platform
- * has for exactly this, so the machine-readable instant travels with the human
- * one: a crawler, a reader's own tooling and a copy-paste all get "2026-08-19",
- * where "yesterday" on its own is a word. Given no `datetime`, it stays a span,
- * because a `<time>` with nothing to be precise about is markup pretending.
+ * Given `datetime`, the label you write is wrapped in a `<time>` element, so a
+ * machine-readable value such as "2026-08-19" travels with a label such as
+ * "yesterday". Without `datetime`, the label is a `<span>`.
  *
- * **The connector is this element's, not the list's.** Each entry draws the line
- * that arrives at it and hides it when it is first, which `:host(:first-child)`
- * settles with no index, no counting parent and no script. `Steps` and
- * `Breadcrumbs` both do it this way and for the same reason.
+ * Each entry draws the connector line that arrives at it and hides it when it
+ * is the first entry, using `:host(:first-child)`. This needs no index, no
+ * counting parent, and no script. `Steps` and `Breadcrumbs` work the same way.
  *
- * `tone` says what kind of event it was, and it is the only thing that colors
- * the mark. It takes `Announcement`'s vocabulary rather than a second one.
+ * `tone` sets the kind of event and is the only thing that colors the mark. It
+ * uses the same values as `Announcement`.
  *
  * @since 0.1.0
  * @status stable

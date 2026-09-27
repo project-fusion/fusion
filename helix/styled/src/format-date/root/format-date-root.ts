@@ -7,13 +7,10 @@ import { styles } from './format-date-root.css.js'
  * @summary A timestamp, formatted for the user's locale.
  *
  * @description
- * The base tier does the reading; this adds the one thing a design system has to
- * say about it. A timestamp takes the family, size and color of the text around
- * it, so almost nothing here is a decision. The exception is figures: an elapsed
- * reading counts up under the reader, and proportional digits move the trailing
- * edge as it does, which in a feed is a whole column shifting whenever any row
- * in it ticks over. `tabular-nums` in that mode and not in the other, because a
- * date is written once and should sit in the text like the text.
+ * Takes the font family, size, and color of the surrounding text. In `elapsed`
+ * mode it uses `tabular-nums`, so a column of readings in a feed does not shift
+ * as they count up. A date keeps proportional figures, so it sits in the text
+ * like the words around it.
  *
  * @since 0.1.0
  * @status stable

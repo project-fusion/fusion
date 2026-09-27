@@ -7,8 +7,8 @@ import { styles } from './video-playlist-item.css.js'
  * @summary One entry in a video playlist.
  *
  * @description
- * Presentation only: the row, its thumbnail column, and the mark on the one
- * playing. The base class holds what the entry is and what it announces.
+ * Styles the row, its thumbnail column, and the marker on the playing entry.
+ * The base class holds the entry's data and its accessibility semantics.
  *
  * @since 0.1.0
  * @status stable

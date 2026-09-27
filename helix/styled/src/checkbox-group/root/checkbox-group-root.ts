@@ -10,8 +10,8 @@ import { styles } from './checkbox-group-root.css.js'
  * @summary A group of related checkboxes under one label, with one value for the set.
  *
  * @description
- * A column by default, which is what a list of choices wants: the eye scans one
- * line per answer rather than hunting along a row.
+ * Lays the checkboxes out in a column by default, one choice per line, which is
+ * easier to scan than a row.
  *
  * @since 0.1.0
  * @status stable

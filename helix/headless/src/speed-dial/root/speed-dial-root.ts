@@ -18,26 +18,23 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * @summary A floating button that opens a short list of the main actions on a screen.
  *
  * @description
- * **A menu, and deliberately not a new one.** Its rows are commands, which is
- * what `role="menu"` and `menuitem` exist for, so this takes them and takes the
- * behavior with them: the arrow keys are `KeyboardNavigationController`, the
- * panel is `PopoverController`, and open and closed is `MixinControllerOpen`.
- * `Menu` is built from the same pieces. What is not shared is what actually
- * differs: a dial has no submenus, no headers, no checkable rows and no long
- * list to type ahead through, and shipping it as an appearance of `Menu` would
- * mean defining what a dial with a submenu in it does.
+ * A speed dial is a menu. Its items are commands, so it uses `role="menu"` and
+ * `menuitem`, and it is built from the same pieces as `Menu`:
+ * - `KeyboardNavigationController` for the arrow keys
+ * - `PopoverController` for the panel
+ * - `MixinControllerOpen` for open and closed
  *
- * **The trigger is a control the consumer slots**, and the floating action
- * button is the usual one: `IconButton` with `shape="circle"` and `raised`.
- * There is no `helix-fab`, because it would re-declare `emphasis`, `tone`,
- * `label` and a size around a control that already has all four. A round raised
- * button is a shape, and where it sits is `data-dock` in the base layer.
+ * It is a separate component because a speed dial has no submenus, headers,
+ * checkable items, or type-ahead.
  *
- * **Nothing is reserved from the keyboard.** A menu that drills has to keep the
- * horizontal pair for going in and coming back; a dial goes nowhere, so all four
- * arrows move through the actions and a reader who guesses either axis is
- * answered. That is the controller's own house position, and this is a component
- * with no reason to argue with it.
+ * You slot the trigger. The usual floating action button is `IconButton` with
+ * `shape="circle"` and `raised`. There is no `helix-fab`, because `IconButton`
+ * already has `emphasis`, `tone`, `label`, and a size. Position the button with
+ * `data-dock` in the base layer.
+ *
+ * All four arrow keys move through the actions, because a speed dial has no
+ * nested levels to reserve the horizontal pair for. This is the default
+ * behavior of the keyboard controller.
  *
  * @since 0.1.0
  * @status stable

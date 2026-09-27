@@ -88,21 +88,18 @@ const onApple = (): boolean =>
  * @summary A keyboard key or chord, set inline with text.
  *
  * @description
- * Renders a real `<kbd>`, so the passage still means "press this" to anything
- * reading the markup.
+ * Renders a `<kbd>` element.
  *
- * **One key per element, with `keys` as the stated exception.** A sequence is
- * several of these with the separator written between them as ordinary text,
- * because that separator is prose: "then" in a sequence, "plus" in a chord, and
- * a component inserting one would have to guess which.
+ * Each element holds one key, except when you use `keys`. For a sequence or a
+ * chord, write one element per key and put the separator between them as text,
+ * such as "then" or "plus".
  *
- * **`keys` exists because the glyphs were being typed by hand and were wrong.**
- * A literal `⌘K` in a template tells a reader on Windows to press a key their
- * keyboard does not have, and nothing catches it. Given `mod` this renders
- * `⌘K` on Apple and `Ctrl+K` everywhere else.
+ * `keys` renders the right glyphs for the platform. Given `mod`, it renders
+ * `⌘K` on Apple devices and `Ctrl+K` everywhere else. A `⌘K` typed into a
+ * template is wrong for anyone on Windows.
  *
- * **`within` is what binds it, and it is absent by default**, so this draws a
- * key and listens for nothing unless asked.
+ * The element binds the shortcut only when `within` is set. By default it draws
+ * the key and listens for nothing.
  *
  * @since 0.1.0
  * @status stable

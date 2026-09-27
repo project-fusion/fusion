@@ -6,13 +6,13 @@ import { property } from 'lit/decorators.js'
  * @summary One label and its value.
  *
  * @description
- * An element rather than a pair of slots on the list, because a pair is the
- * unit a reader hears: the label is the `<dt>` and the value its `<dd>`, and the
- * two stay together however the list lays them out.
+ * Each pair is its own element: the label is the `<dt>` and the value its
+ * `<dd>`, and a screen reader hears them together however the list lays them
+ * out.
  *
- * The value is the default slot, since it is what varies and is often more
- * than text: a tag, an avatar, a link. The label is text almost every time, so
- * it is also a property.
+ * The value is the default slot, because it varies and is often more than text,
+ * such as a tag, an avatar, or a link. The label is almost always text, so it
+ * is also a property.
  *
  * @since 0.1.0
  * @status stable

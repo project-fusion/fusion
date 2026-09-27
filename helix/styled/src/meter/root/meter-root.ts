@@ -8,32 +8,23 @@ import { styles } from './meter-root.css.js'
  * @summary A measurement in a known range, with optional bands that mark it good, fair, or poor.
  *
  * @description
- * The bar `Progress` draws, at twice the height and on the house corner rather
- * than its pill.
+ * Draws the same bar as `Progress`, at twice the height, with the library's
+ * standard corner radius in place of the pill shape.
  *
- * Taller than a progress bar rather than matched to it. The two are unrelated
- * controls, and a reader telling a level from a task at a glance is the point
- * rather than the cost. A meter also carries more, a fill and a mark at each
- * threshold, and at eight pixels those marks are hairlines. At sixteen they are
- * unmistakable.
+ * The extra height makes a meter easy to tell apart from a progress bar and
+ * keeps the tick at each threshold visible. At eight pixels the ticks are
+ * hairlines. At sixteen they are clear. The ticks cut the fill into segments,
+ * which is why the corners are square: a pill-shaped bar would have round outer
+ * ends and square inner ends.
  *
- * The corner is the ticks' doing: they cut the fill into segments, and a
- * pill-ended bar comes out as a run whose outer ends are round and whose inner
- * ends are square.
+ * Once you set thresholds, the fill takes the success, warning, or danger tone
+ * of the band the reading falls in. A meter with no thresholds is neutral. A
+ * tick marks each threshold, so the reading can be placed against the bands
+ * without relying on color.
  *
- * What else differs is what the color means. A progress bar is one color because
- * there is one thing to say; a meter's fill takes the success, warning or danger
- * tone from the band its reading falls in, and only once thresholds have been
- * declared. An unbanded meter is neutral, because a gauge with nothing said
- * about it is a reading rather than good news.
- *
- * A tick marks each threshold, so the reading can be placed against the bands
- * without seeing color at all.
- *
- * A reading past either end squares the corner it ran out at, which is the
- * convention for a quantity continuing past the frame it is drawn in. The bar
- * itself stops, because that is what an end is; the words and the accessible
- * reading are what say how far past.
+ * A reading past either end squares the corner on that side, the convention for
+ * a quantity that continues past its frame. The bar stops at the end, and the
+ * text and the accessible value give the actual reading.
  *
  * @since 0.1.0
  * @status stable

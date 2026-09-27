@@ -6,19 +6,16 @@ import { property } from 'lit/decorators.js'
  * @summary Text that shows which items are on the current page, out of the total.
  *
  * @description
- * Its own element rather than a part of `Pagination`, so a consumer decides
- * where it goes: above, below, in a table's caption, or on the other side of
- * the page. Inside the run it could only ever be at one end of one row.
+ * A separate element from `Pagination`, so you decide where the count goes:
+ * above, below, in a table caption, or elsewhere on the page.
  *
- * **It repeats `page`, `page-size` and `total`, and the cost of that is skew.**
- * Those three come from the consumer's own query, so writing them on two
- * elements is one variable used twice; what it risks is the two disagreeing.
+ * You set `page`, `page-size`, and `total` on both this element and
+ * `Pagination`. They come from your own query, so use the same values for both
+ * and the two elements agree.
  *
- * **Nothing removes that at this level, and it was measured.** A coordinating
- * root can only reach light-DOM children by writing attributes onto them, which
- * a framework reports as a hydration error, or through context, which is dead
- * on a server: `@lit/context` subscribes from `connectedCallback`, and Lit SSR
- * does not call it.
+ * A shared parent cannot pass the values down. Writing attributes onto light
+ * DOM children causes hydration errors in frameworks, and `@lit/context`
+ * subscribes in `connectedCallback`, which Lit SSR does not call.
  *
  * @since 0.1.0
  * @status stable

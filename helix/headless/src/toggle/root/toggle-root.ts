@@ -6,11 +6,11 @@ import { property } from 'lit/decorators.js'
  * @summary One option in a toggle group.
  *
  * @description
- * Renders a `<button role="radio">`. This is a form control and nothing else.
+ * Renders a `<button role="radio">` for use as a form control.
  *
- * Navigation is not this. It is links marked with `aria-current` and styled by
- * the `data-navigation-item` recipe in the base layer, which carries the same look
- * without radio semantics announcing destinations as choices.
+ * Do not use it for navigation. For navigation, use links marked with
+ * `aria-current` and styled by the `data-navigation-item` recipe in the base
+ * layer. The recipe has the same look, and links are not announced as choices.
  *
  * @since 0.1.0
  * @status stable

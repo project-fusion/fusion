@@ -8,9 +8,9 @@ import { styles } from './drawer-root.css.js'
  * @summary A panel that slides in from an edge.
  *
  * @description
- * The panel translates and the scrim fades, both on transform and opacity only,
- * which is the one place motion is allowed to carry the work: the surface at
- * rest is flat and the movement is what says something happened.
+ * The panel slides and the scrim fades, animating only `transform` and
+ * `opacity`. At rest the surface is flat, and the motion shows that the drawer
+ * opened or closed.
  *
  * @since 0.1.0
  * @status stable

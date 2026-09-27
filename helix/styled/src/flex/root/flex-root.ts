@@ -8,19 +8,14 @@ import { styles } from './flex-root.css.js'
  * @summary A layout that places its children in a row or a column.
  *
  * @description
- * The host is the flex container itself and the only child is a slot, so the
- * element adds no box of its own: `<helix-flex>` costs exactly the `<div>` it
- * replaces.
+ * The host is the flex container and its only child is a slot, so
+ * `<helix-flex>` adds no box beyond the `<div>` it replaces.
  *
- * There is no separate Stack. A stack is this with `direction="column"`, and a
- * second element whose whole definition is one default of the first is a name
- * to learn rather than a capability to gain.
+ * There is no separate Stack component. For a stack, set `direction="column"`.
  *
- * Gap takes a space token name rather than a length, so spacing stays on the
- * scale. A layout that can say `gap="13px"` is one that will.
+ * `gap` takes a space token name, so spacing stays on the scale.
  *
- * Presentation only, so there is no headless tier: the split exists to keep
- * behavior separate from styling, and this is entirely styling.
+ * Flex is presentation only, so it has no headless tier.
  *
  * @since 0.1.0
  * @status stable

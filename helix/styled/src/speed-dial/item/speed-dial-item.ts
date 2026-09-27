@@ -7,9 +7,9 @@ import { styles } from './speed-dial-item.css.js'
  * @summary One action in a speed dial: an icon and a name beside it.
  *
  * @description
- * Presentation only: a round mark the size of a small control, and the name on
- * a chip beside it so it can be read against whatever the dial is floating
- * over. Everything about choosing it is the base class.
+ * Presentation only: a round mark the size of a small control, with the name on
+ * a chip beside it so it stays readable over whatever the dial floats over. The
+ * base class handles its behavior.
  *
  * @since 0.1.0
  * @status stable

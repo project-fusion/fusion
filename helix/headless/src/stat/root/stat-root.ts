@@ -6,14 +6,13 @@ import { property } from 'lit/decorators.js'
  * @summary One measurement, with a label that names what it measures.
  *
  * @description
- * Label first in the markup and the value after it, which is the reading order
- * a screen reader takes and the order a caption sits above a figure. The eye
- * lands on the number either way, because the number is the loud thing; a
- * reader hearing it needs to know what it counts before hearing how many.
+ * The label comes first in the markup and the value after it, so a screen
+ * reader reads what the figure counts before the number. Visually, the number
+ * stands out either way.
  *
- * Both are bare slots. An element whose only job is to assign itself a slot on
- * connect gives its own host an attribute after upgrade, which a React
- * consumer's server markup never had.
+ * Both are bare slots. An element that assigned itself a slot on connect would
+ * add an attribute after upgrade, which markup rendered on the server by React
+ * does not have.
  *
  * @since 0.1.0
  * @status stable

@@ -10,27 +10,21 @@ import '../../format-date/index.js'
  * @summary A single notification about something that happened, marked read or unread.
  *
  * @description
- * A four-column grid: media, body, actions, dismiss.
+ * A four-column grid: media, body, actions, and dismiss.
  *
- * **The media column is held open by the feed, not by the item.** Each item is
- * its own grid, so nothing about one row's tracks reaches the row below it: a
- * feed where some items had an avatar and some did not drew its text at two
- * different left edges, which is the fault a grid was chosen to prevent. The
- * root publishes whether anything in it has media and every item reserves that
- * much, so a mixed feed reads down one edge and a feed with no media anywhere
- * pays nothing for the column.
+ * The feed holds the media column open. Each item is its own grid, so the root
+ * reports whether any item has media, and every item reserves that column. In a
+ * mixed feed, all text starts at one edge. A feed with no media reserves no
+ * column.
  *
- * **Unread is weight and a mark on the inline start edge, not a fill.** Depth
- * comes from a single border in this library, and a filled row is elevation
- * spelled differently; a feed of filled rows is a striped list nobody can read.
- * The mark is a fixed height on the first line rather than the height of the
- * row, so it says the same thing about a one line notification and a five line
- * one.
+ * Unread is shown by font weight and a mark on the inline start edge. The row
+ * has no fill, because depth in Helix comes from a single border. The mark has
+ * a fixed height on the first line, so it looks the same on a one-line and a
+ * five-line notification.
  *
- * **Narrow, the actions go under the body.** How much room the row was given is
- * a fact about this box and about nothing else, so it is a container query: a
- * feed in a 320 pixel side panel is narrow inside a 1400 pixel window, and a
- * viewport rule would hand it the wide branch.
+ * In a narrow container, the actions move under the body. This is a container
+ * query, so a feed in a 320 pixel side panel gets the narrow layout inside a
+ * 1400 pixel window.
  *
  * @since 0.1.0
  * @status stable

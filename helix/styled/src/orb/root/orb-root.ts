@@ -64,41 +64,34 @@ const GRAY: ColorBytes = [128, 128, 128]
  * @summary An animated shape that shows what an agent is doing.
  *
  * @description
- * A cloud of dots, drawn to a canvas, with one shape per state. `connecting`
- * and `thinking` are the same leaning sash and differ in how agitated it is;
- * `waiting` and `done` are the same settled ball at different tempos, which is
- * the difference between not having started and having finished. `fetching` is
- * a globe with a light going round it, `listening` a closed sphere with a
- * ripple crossing it, and `working` a ring.
+ * A cloud of dots drawn to a canvas, with one shape per state:
  *
- * **None of them is a separate drawing.** Each is the same banded grid given
- * different numbers, so changing state interpolates the numbers and every frame
- * in between is a whole shape. A loader that cuts between pictures says the
- * work restarted; one that carries a shape into the next says it moved on.
+ * - `connecting` and `thinking`: the same leaning sash, differing in how
+ *   agitated it is.
+ * - `waiting` and `done`: the same settled ball at different tempos.
+ * - `fetching`: a globe with a light moving around it.
+ * - `listening`: a closed sphere with a ripple crossing it.
+ * - `working`: a ring.
  *
- * **A change is measured before it is played.** Two states differing in one
- * small number are given less time than a sash becoming a ring, and the
- * silhouette leads what the shape is doing, so a light is never seen orbiting
- * something that has not finished becoming round.
+ * Every state is the same banded grid with different parameters. Changing state
+ * interpolates the parameters, so every frame in between is a complete shape. A
+ * small change gets less time than a large one, such as a sash becoming a ring.
+ * The outline changes first, so the light starts orbiting only after the shape
+ * is round.
  *
- * **Nothing spins.** The whole cloud holds still and everything that moves is
- * moving inside it, which is what makes it read as thought rather than as a
- * thing being rotated. The one exception is the light, which travels because a
- * ring of evenly spaced dots is unchanged by rotation: without something fixed
- * in space passing over them, a state that turns has nothing a reader can see
- * turning.
+ * The cloud does not rotate, and all movement happens inside it. The exception
+ * is the light, which travels because a ring of evenly spaced dots looks the
+ * same when rotated, so a turning state needs something fixed passing over it.
  *
- * **The palette is read from the tokens**, not given as colors: a dot's ink is
- * mixed toward the ground by how far away it is, and both ends come from
- * `--orb-color` and `--orb-ground`. That is what makes depth survive a theme
- * change without the consumer restating anything.
+ * Colors come from `--orb-color` and `--orb-ground`. Each dot's color is mixed
+ * toward the ground color by its depth, so depth holds when the theme changes.
  *
- * **It stops when nobody is looking**, off screen and in a background tab, and
- * `prefers-reduced-motion` gets one still frame rather than an empty box.
+ * The animation stops when the orb is off screen or in a background tab. With
+ * `prefers-reduced-motion`, it draws one still frame.
  *
- * Styled only, and with behavior, which the tier split does not otherwise
- * allow: the behavior is drawing dots to a canvas, so there is no structure a
- * consumer could restyle and nothing for a headless twin to hold.
+ * The orb is styled only and has behavior, which the tier split does not
+ * otherwise allow. The behavior is drawing dots to a canvas, so there is no
+ * structure to restyle and nothing for a headless element to hold.
  *
  * @since 0.8.0
  * @status stable

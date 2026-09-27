@@ -5,17 +5,13 @@ import { html, type TemplateResult } from 'lit'
  * @summary A fragment of code inside a line of prose.
  *
  * @description
- * **A real `<code>`, because the element is the meaning.** A styled span reads
- * as code and is not: a screen reader announces nothing about it, a translation
- * tool will happily translate it, and a search that understands documents
- * cannot tell it from emphasis. The tag is the whole point, which is also why
- * this component is so small.
+ * Renders a real `<code>` element, which marks the text as code for translation
+ * tools and document search. A styled span carries no such meaning, and a
+ * screen reader announces nothing about it.
  *
- * **Inline, and only inline.** A block of code is `CodeBlock`, a separate
- * family rather than a variant here. The two differ in more than presentation:
- * one flows with a sentence and must never scroll, the other is a figure with
- * its own box, its own overflow and something to copy. Namespacing them
- * together would say `CodeBlock` is part of `Code`, and it is not.
+ * `Code` is inline only and never scrolls. For a block of code with its own
+ * box, its own overflow, and copying, use `CodeBlock`, which is a separate
+ * family.
  *
  * @since 0.1.0
  * @status stable

@@ -7,14 +7,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary A short label that adds metadata to content.
  *
  * @description
- * A tag is a label, and optionally a label the reader can take off.
- * `dismissible` is what separates it from a badge: a badge reports a state the
- * reader cannot change, a tag names something they can.
+ * A label that people can optionally remove. `dismissible` is the difference
+ * from a badge: a badge shows a state that people cannot change, and a tag
+ * names something they can remove.
  *
- * Dismissing is a request. The tag does not remove itself, because the consumer
- * owns the list it sits in and taking the node out from under them would put
- * their state and the document out of step. Canceling `helix-dismiss` is a
- * refusal.
+ * The remove button sends `helix-dismiss`. The tag does not remove itself,
+ * because your code owns the list it is in, so remove it in your handler. A
+ * listener can cancel `helix-dismiss`, and `dismiss()` then returns `false`.
  *
  * @since 0.1.0
  * @status stable

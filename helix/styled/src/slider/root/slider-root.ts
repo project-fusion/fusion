@@ -10,14 +10,12 @@ import { styles } from './slider-root.css.js'
  *
  * @description
  * The track and the thumb are the browser's own, restyled through the range
- * pseudo-elements rather than replaced. What that buys is everything a
- * hand-built slider has to reimplement and usually gets slightly wrong: the
- * drag, the keys, and a hit area sized by the platform for a finger.
+ * pseudo-elements. The drag, the keys, and the hit area sized for a finger stay
+ * native.
  *
- * The filled part of the track is painted with a gradient driven by the
- * fraction the headless tier writes, rather than by a second element laid over
- * it. One element cannot be half one color by any other means that survives
- * the thumb being dragged.
+ * The filled part of the track is a gradient driven by the fraction the
+ * headless tier writes. A gradient lets one element show two colors that follow
+ * the thumb while you drag it.
  *
  * @since 0.1.0
  * @status stable

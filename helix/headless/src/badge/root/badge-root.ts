@@ -6,20 +6,19 @@ import { property } from 'lit/decorators.js'
  * @summary A count or a dot pinned to the corner of another element.
  *
  * @description
- * Wraps whatever it decorates and pins the indicator to its corner, so the
- * thing being counted stays the thing in the layout: a badge is an annotation,
- * not a container that happens to hold an icon.
+ * Badge wraps the element it decorates and pins an indicator to its corner, so
+ * the wrapped element keeps its place in the layout.
  *
- * The indicator says how many, and none is none. A `value` that reads as zero
- * shows no mark at all, an absent one shows a bare dot, and any other value
- * shows the value. `max` caps the top: past it the indicator reads `{max}+`
- * rather than growing to fit, since a corner mark that widens with its value
- * pushes the layout around.
+ * What the indicator shows depends on `value`:
  *
- * **A dot needs a label.** Without one it is a colored circle that announces
- * nothing, which tells a sighted reader there is something new and tells
- * everyone else there is not. The label is required in that form, and the
- * indicator is hidden from assistive technology when a number already says it.
+ * - A `value` of zero shows no indicator.
+ * - No `value` shows a dot.
+ * - Any other value shows the value. Above `max`, the indicator shows `{max}+`,
+ *   so its width stays the same as the count grows.
+ *
+ * A count is announced from its own text, and `label` replaces that with a
+ * fuller name, such as `4 unread`. A dot needs a `label`. Without one, the dot
+ * is a colored circle that screen readers do not announce.
  *
  * @since 0.1.0
  * @status stable

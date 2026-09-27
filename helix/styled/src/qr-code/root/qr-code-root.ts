@@ -7,14 +7,13 @@ import { styles } from './qr-code-root.css.js'
  * @summary A scannable QR code for a short piece of text.
  *
  * @description
- * The picture is the headless tier's. What this adds is a size that can be set
+ * The headless tier draws the code. The styled tier adds a size you can set
  * once, the colors a scanner needs, and the box that holds a center mark.
  *
- * **The ink is `currentColor` and the ground is a real fill.** A code has to be
- * dark on light to read, and the pair that guarantees it is not the page's
- * foreground and background: those invert together in dark mode, and a code
- * drawn light-on-dark is refused by a good half of the scanners in the world.
- * So the ground is stated and the ink is the foreground it is chosen for.
+ * The ink is `currentColor` and the background is a solid fill. A code must be
+ * dark on light to scan. The page's foreground and background invert together
+ * in dark mode, and at least half of scanners reject a light-on-dark code, so
+ * the background is set explicitly and the ink is the foreground chosen for it.
  *
  * @since 0.1.0
  * @status stable

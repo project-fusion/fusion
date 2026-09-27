@@ -16,19 +16,17 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * @summary A guided tour of an interface, one stop at a time.
  *
  * @description
- * The root owns the order and nothing else. Which stop is current, what Next
- * and Back mean, when the run is finished; the stops own where they point, and
- * the consumer owns every word.
+ * The root holds the order of the stops: which stop is current, what Next and
+ * Back do, and when the tour is finished. Each stop holds its target, and you
+ * write all the text.
  *
- * **The spotlight is a shadow, not a hole.** The scrim is a box the size of the
- * current target with an enormous spread on its `box-shadow`, so the darkness
- * is what the shadow paints. A `clip-path` on a full-screen scrim needs the
- * viewport in the same coordinate space as the cut, which stops being true the
- * moment anything between them is transformed.
+ * **The spotlight is a shadow.** The scrim is a box the size of the current
+ * target with a very large `box-shadow` spread, and the shadow paints the
+ * darkness. A `clip-path` on a full-screen scrim breaks as soon as an element
+ * between the scrim and the viewport is transformed.
  *
- * **It measures, and the target is an element elsewhere on the page whose
- * position nothing can know statically.** Nothing is measured on the server and
- * nothing needs to be: a tour starts when a reader asks for it.
+ * The root measures the target's position in the browser. Nothing is measured
+ * on the server, because a tour starts only on request.
  *
  * @since 0.1.0
  * @status stable

@@ -9,17 +9,14 @@ import { styles } from './pin-input-root.css.js'
  * @summary A field for a short code, with one box for each character.
  *
  * @description
- * Square boxes at the control height with real space between them, which is the
- * whole picture: a code is read as separate characters, and boxes shoulder to
- * shoulder read as one field with lines drawn in it.
+ * Square boxes at the control height, with space between them so the code reads
+ * as separate characters.
  *
- * The focus ring is on the box the reader is in rather than around the row. A
- * code is entered one character at a time and the boxes exist to say which one
- * is next, so a ring around all six would answer the question the component is
- * for.
+ * The focus ring is on the current box, so you can see which character comes
+ * next.
  *
- * Figures are tabular, so a 1 takes the room an 8 does and the row does not
- * breathe as a code is typed into it.
+ * Figures are tabular, so every digit takes the same width and the row does not
+ * shift as you type.
  *
  * @since 0.1.0
  * @status stable

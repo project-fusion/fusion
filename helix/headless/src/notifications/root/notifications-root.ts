@@ -15,22 +15,19 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @summary A feed of notifications, each marked read or unread.
  *
  * @description
- * **Slotted children rather than a data property.** A notification is a small
- * piece of somebody's own markup, with an avatar and a link and a button in it,
- * and there are tens of them rather than thousands, so writing them out lets an
- * item hold anything.
+ * Notifications are slotted children. Each one is your own markup, with an
+ * avatar, a link, or a button in it. Feeds usually hold tens of items, so
+ * writing them out lets an item hold anything.
  *
- * **This does not virtualize, and it cannot.** Windowing needs the list to own
- * the data, and here the consumer owns it: N notifications is N elements by
- * construction. A feed that really does hold thousands wants a data table with a
- * custom cell, and this component will not grow into one.
+ * The list does not virtualize. Windowing needs the list to own the data, and
+ * here you own it, so N notifications are N elements. For a feed of thousands,
+ * use a data table with a custom cell.
  *
- * **Read state is reported, never invented.** Marking read is usually a round
- * trip: this element asks its items and each item asks the consumer, so a
- * refused `helix-read` leaves everything alone and a consumer who owns `read`
- * sees nothing change until they say so. `unread` is derived from the items and
- * written to an attribute, so a stylesheet and a badge can both read it without
- * either of them counting.
+ * Read state is reported to you. Marking read goes from the root to the item
+ * and from the item to you, so a canceled `helix-read` changes nothing, and if
+ * you own `read`, nothing changes until you set it. `unread` is derived from
+ * the items and written to an attribute, so a stylesheet and a badge can both
+ * use it without counting.
  *
  * @since 0.1.0
  * @status stable

@@ -12,17 +12,17 @@ import { property } from 'lit/decorators.js'
  * @summary Links to the headings on the page, with the section in view marked.
  *
  * @description
- * A table of contents, named for the job. It sits beside `Navigation`, which is
- * the same job at the other scale: one navigates a site, the other a document.
+ * Outline is a table of contents for a document. `Navigation` does the same job
+ * for a site.
  *
- * **The links are the consumer's own anchors.** A router renders its own `<a>`
- * and cannot render one inside this shadow root, and the hrefs are fragments
- * the page already knows.
+ * The links are your own anchors. A router renders its own `<a>` and cannot
+ * render one inside the outline's shadow root, and the hrefs are fragments on
+ * the same page.
  *
- * **What is current is decided by position, not by intersection.** An
- * `IntersectionObserver` with a band near the top fails in both directions:
- * with headings far apart nothing is in the band and the marker goes out, and
- * with headings close together several are in it at once.
+ * The current section is decided by the headings' positions. An
+ * `IntersectionObserver` with a band near the top fails both ways: when
+ * headings are far apart, none is in the band and no section is marked, and
+ * when they are close together, several are in the band at once.
  *
  * @since 0.1.0
  * @status stable

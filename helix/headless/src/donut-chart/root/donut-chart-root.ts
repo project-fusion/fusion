@@ -62,15 +62,14 @@ const THICKNESS: Record<string, number> = {
  * @summary A chart that shows parts of a whole as a ring, read from a table.
  *
  * @description
- * The chart with the narrowest honest use, so the component is narrow too.
+ * A donut chart divides one whole into parts, so the component reads one
+ * column.
  *
- * **It reads one column and treats the rows as the parts.** Every other chart
- * here takes a column per series; a ring has one whole to divide, so the first
- * column of numbers is the series and each row is a slice.
+ * **The first column of numbers is the series, and each row is a slice.** Other
+ * Helix charts take one column per series.
  *
- * **It refuses negative values rather than drawing them.** An arc for a
- * negative number either runs backwards over its neighbors or is silently
- * dropped. Those rows are skipped and the total is of what is left.
+ * **Negative values are skipped.** An arc cannot show a negative number, so
+ * those rows are left out and the total is the sum of the remaining rows.
  *
  * @since 0.1.0
  * @status stable

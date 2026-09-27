@@ -7,14 +7,13 @@ import { styles } from './steps-root.css.js'
  * @summary A sequence of stages that shows which stage the user is on.
  *
  * @description
- * The numbering is a CSS counter rather than a property, so a step's position
- * is drawn by the browser at layout and is right in the server's markup with no
- * script involved. Reordering the steps renumbers them; nothing has to be told.
+ * The numbers are a CSS counter, so the browser draws each step's position at
+ * layout, the numbers are correct in the server's markup with no script, and
+ * reordering the steps renumbers them.
  *
- * A step's name is a `helix-button`, so what it looks like under the pointer,
- * with focus, and when refused are Button's decisions and Button's hooks. There
- * is no `--steps-hover-color`: `--button-background-color` is that hook, and a
- * second name for it here would be a second thing to keep in step.
+ * A step's name is a `helix-button`, so its hover, focus, and disabled styles
+ * come from `Button` and use Button's custom properties. To change the hover
+ * color, set `--button-background-color`. There is no `--steps-hover-color`.
  *
  * @since 0.1.0
  * @status stable

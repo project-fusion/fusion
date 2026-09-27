@@ -20,26 +20,25 @@ import { fits, toneOf } from './buckets.js'
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
  *
  * @description
- * **One family covers both readings.** `rows="1"` is a status strip, `rows="7"`
- * is a contribution graph, and a cell that takes a tone covers both: GitHub's
- * contribution graph is five discrete levels rather than a gradient.
+ * A grid of cells, each colored by a tone. `rows="1"` makes a status strip, and
+ * `rows="7"` makes a contribution graph. GitHub's contribution graph uses five
+ * discrete levels, which a set of tones covers.
  *
- * **What it cannot be is a bar chart with flat values**, and the data model is
- * what closes that: chart color is per *series* everywhere else here, so ninety
- * differently colored cells would be ninety series.
+ * Color in a heatmap is per cell. In every other Helix chart, color is per
+ * series, so ninety differently colored cells would need ninety series.
  *
- * **The data is a real `<table>` named by `for`**, the convention every chart
- * in this library uses, and it is the accessible representation. Hide it with
- * `data-hidden-visually` and the reading is still there.
+ * **The data is a real `<table>` named by `for`**, as in every Helix chart, and
+ * the table is the accessible representation. Hide it with
+ * `data-hidden-visually`, and screen readers still read it.
  *
  * A cell takes its tone from its own `data-tone`, or from `thresholds` and
- * `tones` bucketing its value. The cell's own wins, so a page that already
- * knows a day was degraded does not encode that as a number to be decoded.
+ * `tones` applied to its value. `data-tone` wins, so when you already know a
+ * day was degraded, you can set the tone directly.
  *
- * **A tone is a name this tier never resolves.** `tone="success"` writes
- * `--heatmap-tone: var(--heatmap-tone-success)` and stops, so what a name is
- * worth is the answering tier's to say. Reaching for `var(--helix-color-*)`
- * here is the dependency the tiers exist to prevent.
+ * **The headless tier does not resolve tone names.** A tone named `success`
+ * writes `--heatmap-tone: var(--heatmap-tone-success)`, and the styled tier or
+ * your own stylesheet defines that property. The headless tier does not use
+ * `var(--helix-color-*)`.
  *
  * @since 0.1.0
  * @status stable

@@ -10,10 +10,9 @@ import '../../tooltip/index.js'
  * @summary A button that copies a string to the clipboard and confirms the copy.
  *
  * @description
- * Takes the icon button's square box, then stacks its two faces in one grid
- * cell so the press never changes the button's size. See the stylesheet: a
- * control that resizes under the pointer at the moment a reader is looking at
- * it for reassurance reads as a second, accidental press.
+ * Uses the icon button's square box and stacks its two faces in one grid cell,
+ * so a press never changes the button's size. A button that resizes as you
+ * press it looks like a second, accidental press.
  *
  * @since 0.1.0
  * @status stable

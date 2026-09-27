@@ -11,17 +11,14 @@ import '../message/chat-message.js'
  * @summary A conversation's turns in a scrolling transcript that keeps the user's place.
  *
  * @description
- * Three regions stacked, and only the transcript scrolls: a composer that slid
- * away as the reader scrolled up to re-read would be the thing they were about
- * to type into.
+ * The chat stacks three regions, and only the transcript scrolls, so the
+ * composer stays in view while the user scrolls back to read.
  *
- * **The transcript keeps its turns at the bottom when there are too few to fill
- * it**, which is what a conversation looks like. A new one starting at the top
- * of an empty column reads as a document.
+ * When there are too few turns to fill the transcript, they sit at the bottom,
+ * the way a conversation looks.
  *
- * The way back sits over the transcript rather than in the column, so offering
- * it does not move what the reader is reading, which is the whole point of
- * offering it.
+ * The control that returns to the bottom sits over the transcript, so showing
+ * it does not move the text the user is reading.
  *
  * @since 0.1.0
  * @status stable

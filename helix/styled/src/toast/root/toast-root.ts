@@ -7,18 +7,16 @@ import { styles } from './toast-root.css.js'
  * @summary The region that holds toast messages, and the only element that announces them.
  *
  * @description
- * Fixed to the window, and it catches nothing: the region spans a whole edge,
- * so a stack of one message in a corner would otherwise put an invisible bar
- * across everything beside it. The region is transparent to a pointer and the
- * messages take it back.
+ * Fixed to the window. The region spans a whole edge, so it ignores the pointer
+ * and only the messages receive clicks. Content beside a message stays
+ * clickable.
  *
- * **It belongs at the root of the application.** `position: fixed` is
- * positioned against the viewport only while no ancestor carries `transform`,
- * `filter`, `perspective` or `contain`, any of which makes that ancestor the
- * containing block instead, and it is still clipped by an ancestor with
- * `overflow: hidden`. That is a real constraint rather than a style note, and
- * it is the same fact that put every other floating surface in this library
- * into the top layer.
+ * **Place the region at the root of your application.** `position: fixed`
+ * positions against the viewport only while no ancestor has `transform`,
+ * `filter`, `perspective`, or `contain`. Any of these makes that ancestor the
+ * containing block, and an ancestor with `overflow: hidden` still clips the
+ * region. The other floating surfaces in Helix use the top layer for the same
+ * reason.
  *
  * @since 0.1.0
  * @status stable

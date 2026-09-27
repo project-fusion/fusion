@@ -7,9 +7,8 @@ import { styles } from './option-group.css.js'
  * @summary A labeled group of options inside a listbox.
  *
  * @description
- * The heading is set small and quiet, because it is a divider that happens to
- * have words on it: a run of options is read as a list and the heading is what
- * tells you which list, not something to read on its own.
+ * The heading is small and muted. It labels the run of options below it and is
+ * not meant to be read as content of its own.
  *
  * @since 0.1.0
  * @status stable

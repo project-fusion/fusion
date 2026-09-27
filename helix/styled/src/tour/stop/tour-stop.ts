@@ -8,10 +8,9 @@ import '../../button/index.js'
  * @summary One stop on a tour: the element it points at, and a panel of content about it.
  *
  * @description
- * The panel is `Popover`'s panel by another name, on purpose: a surface, an
- * inset and a lift, so a stop and a flyout on the same page are the same
- * object. What this tier adds beyond that is the point, which no other surface
- * here draws.
+ * The panel uses the same styles as `Popover`'s panel, with a surface, an
+ * inset, and a shadow, so a stop matches a popover on the same page. The styled
+ * tier adds the pointer toward the target, which no other Helix surface draws.
  *
  * @since 0.1.0
  * @status stable

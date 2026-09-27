@@ -9,16 +9,15 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @summary A measurement in a known range, with optional bands that mark it good, fair, or poor.
  *
  * @description
- * **Not `Progress`, and the difference is the whole component.** A progress bar
- * reports how far along a task is: it starts empty, ends full, and full is
- * always the good end. A meter reports a level in a range that is not going
- * anywhere, and which end is good is a fact about the thing measured. So there
- * is no `indeterminate`: a measurement whose value is unknown is not one.
+ * A meter shows a level within a range. Use `Progress` to show how far along a
+ * task is. A progress bar starts empty and ends full, and full is always the
+ * good end. For a meter, which end is good depends on what is measured. There
+ * is no `indeterminate`, because a meter always has a value.
  *
- * **`low`, `high` and `optimum` are the reason it exists**, following the HTML
- * specification's own rule. The three cut the range into a low band, a middle
- * and a high band, and `optimum` says which is the one to be in; the band next
- * to it is fair and the one two away is poor.
+ * **Set `low`, `high`, and `optimum`**, as defined in the HTML specification.
+ * `low` and `high` divide the range into a low band, a middle band, and a high
+ * band. `optimum` sets the preferred band. The band next to it is fair, and the
+ * band two away is poor.
  *
  * @since 0.1.0
  * @status stable

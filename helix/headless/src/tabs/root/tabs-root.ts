@@ -15,15 +15,16 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @summary A row of tabs and the panel each one shows.
  *
  * @description
- * Selection is coordinated by event, the same shape the accordion and the tree
- * use: a tab dispatches `helix-select` and the root pairs it with the panel of
- * the same value. Nothing registers with anything, so tabs added later work
- * without the root being told.
+ * Selection works through an event, the same as in the accordion and the tree.
+ * A tab dispatches `helix-select`, and the root pairs it with the panel of the
+ * same value. Nothing registers with anything, so tabs added later work with no
+ * extra setup.
  *
- * The tab list is a single tab stop, moved with the arrow keys through
- * `KeyboardNavigationController`, the same one the radio and toggle groups use.
- * Selection follows focus, which is the right default for a small set where
- * showing a panel is cheap; a set where it is not should use `manual`.
+ * The tab list is a single tab stop, and the arrow keys move between tabs
+ * through `KeyboardNavigationController`, the same as in the radio and toggle
+ * groups. Selection follows focus, which suits a small set where showing a
+ * panel is cheap. Set `manual` when showing a panel is expensive, so focus can
+ * move without selecting.
  *
  * @since 0.1.0
  * @status stable

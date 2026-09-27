@@ -71,21 +71,20 @@ export type PreviewMessage =
  * @summary A frame that renders sandbox source in a separate document.
  *
  * @description
- * A sandboxed `<iframe>` pointed at `src`, a document the consumer provides.
- * That document imports whatever the examples need, listens for a render
- * message, and writes the markup into itself.
+ * A sandboxed `<iframe>` that loads `src`, a document you provide. That
+ * document imports what the examples need, listens for a render message, and
+ * writes the markup into itself.
  *
- * **A frame rather than the page.** Rendering into the page meant an example
- * was styled by whatever surrounded it: an example restyling `helix-card`
- * restyled the sandbox too, a script ran against the real document, and a stray
- * `position: fixed` escaped the pane. The cost is that the frame starts empty,
- * a document having its own stylesheets and a window its own registry, so `src`
- * has to load them.
+ * **Examples render in a frame**, so an example's styles and scripts do not
+ * affect the page around the sandbox, and `position: fixed` stays inside the
+ * pane. The frame starts empty, with its own stylesheets and its own custom
+ * element registry, so `src` must load the styles and components the examples
+ * use.
  *
- * **The source is not trusted, and the frame is what makes that safe.**
- * `sandbox="allow-scripts"` and never `allow-same-origin`: the two together are
- * the same as no sandbox at all, a document on its own origin being able to
- * reach up and remove the attribute.
+ * **The source is untrusted, and the frame keeps it isolated.** The frame uses
+ * `sandbox="allow-scripts"` and never `allow-same-origin`. Together, the two
+ * let a document on the same origin remove its own sandbox, which is the same
+ * as having none.
  *
  * @since 0.1.0
  * @status stable

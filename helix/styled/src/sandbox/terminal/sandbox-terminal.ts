@@ -17,18 +17,16 @@ const LIMIT = 200
  * @summary A panel that shows what the previewed example wrote to the console.
  *
  * @description
- * Fed by the sandbox, which hears `helix-console` from the preview and hands it
- * here. The preview is a separate document, so what arrives has already crossed
- * `postMessage`: text, not values.
+ * The sandbox receives `helix-console` events from the preview and passes them
+ * to the terminal. The preview is a separate document, so messages cross
+ * `postMessage` and arrive as text.
  *
- * **Repeats collapse.** An example with a render loop can write the same
- * warning hundreds of times, and two hundred identical lines say nothing that
- * one line and a count does not. Only consecutive repeats collapse, so the
- * order of what happened survives.
+ * **Repeats collapse.** Consecutive identical lines show as one line with a
+ * count, so an example with a render loop does not fill the panel with the same
+ * warning. Only consecutive repeats collapse, so the order of messages is kept.
  *
- * A `role="log"` rather than a live region by hand. It is the semantic for an
- * append-only stream, and it means a reader is told about new output without
- * the whole panel being re-announced each time.
+ * The panel has `role="log"`, the role for an append-only stream. Screen
+ * readers announce new output without reading the whole panel again.
  *
  * @since 0.1.0
  * @status stable

@@ -19,15 +19,12 @@ const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: bool
  * @summary A group of controls that share one tab stop.
  *
  * @description
- * Separate from a button group, and the difference is what it holds: a group is
- * homogeneous, a toolbar is not. A toolbar mixes buttons, toggles, and menus,
- * which is why it is its own component rather than a variant of something.
+ * A toolbar holds a mix of controls, such as buttons, toggles, and menus. A
+ * button group holds one kind, so the two are separate components.
  *
- * The whole toolbar is one tab stop and the arrows move between controls, so a
- * page with three toolbars costs three presses of Tab to get past rather than
- * thirty. Controls are found by asking the browser what is focusable rather
- * than by matching tag names, so a toolbar works with anything put in it,
- * including a consumer's own elements.
+ * The toolbar is one tab stop, and the arrow keys move between its controls, so
+ * three toolbars take three presses of Tab to pass. Any element the browser can
+ * focus counts as a control, including your own elements.
  *
  * @since 0.1.0
  * @status stable

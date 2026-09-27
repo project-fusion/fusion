@@ -9,13 +9,13 @@ import { styles } from './pagination-size.css.js'
  * @summary A control for choosing how many items each page shows.
  *
  * @description
- * A `Select`, laid out on one row. Every other field stacks its label because it
- * stands in a column of fields; this one stands in a footer beside a run of page
- * numbers, where a two-line control makes the whole row two lines tall.
+ * A `Select` laid out on one row. Other fields stack their label because they
+ * sit in a column of fields. This one sits in a footer beside the page numbers,
+ * where a two-line control would make the whole row two lines tall.
  *
- * `Select`'s own parts are exported under `control-`, so `::part(control-trigger)` and
- * `::part(control-label)` reach through both boundaries and a consumer styles it
- * as the select it is.
+ * `Select`'s parts are exported with a `control-` prefix, so
+ * `::part(control-trigger)` and `::part(control-label)` reach through both
+ * shadow boundaries, and you can style it like any select.
  *
  * @since 0.1.0
  * @status stable

@@ -6,26 +6,21 @@ import { property } from 'lit/decorators.js'
  * @summary One row of a list.
  *
  * @description
- * Layout and semantics, and deliberately not a target.
+ * Provides layout and semantics. The row is a target only when you set `href`.
  *
- * **`href` makes the row itself the link.** A whole-row target needs the anchor
- * to wrap the layout, which a *consumer's* anchor cannot do for slots it does not
- * own. The component's can: an `<a part="row">` wraps this component's own layout
- * perfectly well, which is what `Tree.Item` does.
+ * **`href` makes the whole row a link.** The component wraps its own layout in
+ * an `<a part="row">`, as `Tree.Item` does. An anchor of your own cannot wrap
+ * slots it does not own. With the anchor, the whole row is a target, Enter
+ * follows it, middle click opens a new tab, the status bar shows the
+ * destination, and all of it works before JavaScript runs.
  *
- * What the anchor buys is what the row could not fake: the whole row is a
- * target, Enter follows it, middle click opens a tab, the status bar shows the
- * destination, and it all works before any JavaScript runs.
+ * Client-side routing needs your own handling. A router cannot render its
+ * anchor inside the shadow root, so to navigate without a page load, intercept
+ * the click: the anchor is in `composedPath()`. Handle only a plain primary
+ * click, so native gestures keep working.
  *
- * What it costs is client-side routing, and that is the consumer's to restore.
- * A router renders its own anchor and cannot render one inside this shadow
- * root, so a framework wanting a soft navigation intercepts the click on the
- * way out: the anchor is in `composedPath()`, and taking only a plain primary
- * press leaves every native gesture alone.
- *
- * **`data-list-item` is still the answer for a row that is not a destination.**
- * A list row is often a container of controls rather than a place to go, and a
- * row with `href` unset behaves exactly as it always did.
+ * **For a row that holds controls and is not a destination, use
+ * `data-list-item`.** With `href` unset, the row is not a link.
  *
  * @since 0.1.0
  * @status stable

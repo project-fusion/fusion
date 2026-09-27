@@ -7,9 +7,8 @@ import { styles } from './tour-root.css.js'
  * @summary A guided tour of an interface, one stop at a time.
  *
  * @description
- * It draws the light and nothing else: the scrim's color and the lit box's
- * corners are this tier's, and the order, the stops and the measuring stay
- * below.
+ * Draws the spotlight: the scrim's color and the corners of the lit box. The
+ * order, the stops, and the measuring are in the headless tier.
  *
  * @since 0.1.0
  * @status stable

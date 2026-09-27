@@ -8,10 +8,8 @@ import { styles } from './accordion-root.css.js'
  * @summary A group of collapsible sections.
  *
  * @description
- * Items share one rule between neighbors rather than each drawing its own, so
- * the seam between two items is one pixel and not two. Those seams are what
- * carry the grouping, which is why the surrounding frame is opt-in rather than
- * the default: an accordion is a list, where a card is a surface.
+ * Neighboring items share one line, so the line between two items is one pixel
+ * wide. The lines show the grouping, so a frame around each item is opt-in.
  *
  * @since 0.1.0
  * @status stable

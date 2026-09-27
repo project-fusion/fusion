@@ -9,14 +9,13 @@ import { styles } from './icon-button-root.css.js'
  * @summary A square button whose content is an icon.
  *
  * @description
- * Top-level rather than `Button.Icon`, because a namespace means composition:
- * `Tabs.Tab` is part of a tab set, and an icon-only button is not part of a
- * button. It is a button with different content and a different shape, which
- * makes it its own component.
+ * Icon Button is a top-level component. A namespace such as `Tabs.Tab` is for a
+ * part of a larger component, and an icon-only button is a complete button with
+ * different content and a different shape.
  *
- * `label` is not optional in practice. An icon-only control with no accessible
- * name is announced as "button" and nothing else, which is the single most
- * common way a toolbar becomes unusable without sight.
+ * Always set `label`. An icon-only control with no accessible name is announced
+ * as "button" and nothing else, which is the most common way a toolbar becomes
+ * unusable without sight.
  *
  * @since 0.1.0
  * @status stable

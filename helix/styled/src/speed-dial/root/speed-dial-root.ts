@@ -9,9 +9,8 @@ import '../../icon/index.js'
  * @summary A floating button that opens a short list of the main actions on a screen.
  *
  * @description
- * Presentation only: the column the actions fan into, and which end they line
- * up on. Everything about what opens it, what closes it and how a keyboard
- * moves through it is the base class.
+ * Presentation only: the column the actions fan into, and the end they align
+ * to. The base class handles opening, closing, and keyboard movement.
  *
  * @since 0.1.0
  * @status stable

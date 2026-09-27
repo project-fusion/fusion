@@ -6,19 +6,17 @@ import { property } from 'lit/decorators.js'
  * @summary Groups related content and actions into a single surface.
  *
  * @description
- * Regions are slots rather than separate elements, because a header, body, and
- * footer carry no state, no behavior, and no API of their own. Slotting them
- * costs one custom element instead of five and lets the consumer bring their
- * own markup, so a title can be a real `<h2>` rather than an emulated one.
+ * The header, body, and footer regions are slots, because they have no state,
+ * behavior, or API of their own. You bring your own markup, so a title can be a
+ * real `<h2>`.
  *
- * The host is the surface. A wrapper `<div part="container">` would be a second
- * box doing nothing the host cannot: the element itself takes the border, the
- * radius, and the grid, and a consumer styles `Card` rather than reaching
- * through `::part`. One node instead of two, on every card on the page.
+ * The host is the surface. The element itself takes the border, the radius, and
+ * the grid, so you style `Card` directly and there is no wrapper part to reach
+ * through with `::part`.
  *
- * Name the card with `aria-label` or `aria-labelledby`. That is the only
- * naming that survives server rendering: reading a title out of the light DOM
- * needs a DOM, and the server has none.
+ * Name the card with `aria-label` or `aria-labelledby`. These are the only
+ * names that work with server rendering, because reading a title from the light
+ * DOM needs a DOM, and the server has none.
  *
  * @since 0.1.0
  * @status stable

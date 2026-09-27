@@ -41,20 +41,19 @@ const COUNT_OR_AUTO = {
  * @summary Shows one slide of several, with controls to move between them.
  *
  * @description
- * The track is a scroller with scroll snapping, so a drag, a trackpad swipe,
- * and the browser's own momentum all work without being reimplemented. The
- * controls scroll it; they do not drive a transform.
+ * The track is a scroll container with scroll snapping, so dragging, trackpad
+ * swipes, and the browser's momentum scrolling all work. The controls scroll
+ * the track.
  *
- * Slides are the consumer's own elements, and nothing is written onto them. The
- * component renders a pane per slide carrying `role="group"`,
- * `aria-roledescription="slide"` and a name reading its position in the set,
- * and assigns the slide into it: a screen-reader user hears where they are, and
- * a slide that is itself a link is still a link. See `assign`.
+ * Slides are your own elements, and the carousel writes nothing onto them. It
+ * renders a pane for each slide with `role="group"`,
+ * `aria-roledescription="slide"`, and a name that gives the slide's position in
+ * the set, and assigns the slide into it. A screen reader announces the
+ * position, and a slide that is a link stays a link. See `assign`.
  *
- * **Rotation stops on focus and on hover, and once stopped it stays stopped.**
- * The APG is explicit: rotation must not resume unless the reader asks for it,
- * so hovering away does not start it again. The control names the action it
- * performs, and it is first in the tab order.
+ * **Rotation stops on focus and on hover, and stays stopped** until the user
+ * starts it again, as the APG requires. The rotation control is labeled with
+ * the action it performs and is first in the tab order.
  *
  * @since 0.1.0
  * @status stable

@@ -8,17 +8,16 @@ import '../../tooltip/index.js'
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
  *
  * @description
- * One grid, filled down the column then across: a week is a column, so the strip
- * reads left to right in weeks and top to bottom in days. `rows="1"` makes it a
+ * Cells fill down each column, then across. A column is a week, so the strip
+ * reads left to right in weeks and top to bottom in days. `rows="1"` makes a
  * single row.
  *
- * An empty cell takes the palette's quietest ground rather than being
- * transparent, so a gap reads as a period with nothing in it rather than as a
- * hole in the picture.
+ * An empty cell takes the palette's quietest background color, so a gap shows
+ * as a period with no data.
  *
- * `tones="success"` and `data-tone="danger"` reach the theme's status colors;
- * `tones="1 2 3 4 5"` reaches a five-step ramp of one hue, which is the only
- * thing two cells can be compared by.
+ * `tones="success"` and `data-tone="danger"` use the theme's status colors.
+ * `tones="1 2 3 4 5"` uses a five-step ramp of one hue, so cells can be
+ * compared by value.
  *
  * @since 0.1.0
  * @status stable

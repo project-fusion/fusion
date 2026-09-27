@@ -15,20 +15,15 @@ import { property } from 'lit/decorators.js'
  * @summary A multi-line text field.
  *
  * @description
- * A real `<textarea>`, so the caret, the selection, spellcheck, the resize
- * handle and the keyboard a phone chooses are all the platform's, and it
- * serializes into the server's markup so the field is usable before any script
- * loads.
+ * Renders a `<textarea>`, so the caret, selection, spellcheck, resize handle,
+ * and phone keyboard come from the platform. It is in the server markup, so the
+ * field works before any script loads.
  *
- * **Not an Input with a taller box.** The difference is the Enter key: in a
- * single-line field it submits the form, and here it inserts a line. That is a
- * behavioral difference the platform owns and cannot be styled into existence,
- * which is why this is its own element rather than `Input` with a property.
+ * It is a separate element from `Input` because Enter inserts a line break
+ * here. In a single-line field, Enter submits the form.
  *
- * `rows` sets the height it starts at, and `auto-grow` lets it follow its own
- * content. They are not alternatives: `rows` is where an empty field begins and
- * `auto-grow` is what happens after, so a field that grows still has to start
- * somewhere.
+ * `rows` sets the starting height, and `auto-grow` makes the field grow with
+ * its content. You can use both: `rows` sets where an empty field begins.
  *
  * @since 0.1.0
  * @status stable

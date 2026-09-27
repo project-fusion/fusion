@@ -7,15 +7,14 @@ import type { CanvasEnd, CanvasSide } from '../root/canvas-document.js'
  * @summary A connector between two cards on a canvas.
  *
  * @description
- * **A declaration rather than a drawing**, which is the shape `Table.Column`
- * has: this element renders nothing at all and the board draws the line,
- * because a connector is geometry between two other elements and neither end of
- * it belongs here. What this carries is which cards, which sides, and what sits
- * at the ends.
+ * Declares a connector between two cards, the way `Table.Column` declares a
+ * column. The element renders nothing, and the board draws the line. The
+ * element carries which cards the connector joins, which sides it leaves and
+ * arrives on, and what sits at each end.
  *
- * Written as markup for the reason its cards are: an array of edges handed to a
- * custom element does not survive React's hydration, and a connector a consumer
- * can write is one they can also put a condition around.
+ * Connectors are markup for the same reason cards are: an array of edges passed
+ * to a custom element does not survive React hydration. As markup, a connector
+ * can also be rendered conditionally.
  *
  * @since 0.100.0
  * @status experimental

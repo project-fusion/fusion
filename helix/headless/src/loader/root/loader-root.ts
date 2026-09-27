@@ -6,25 +6,20 @@ import { property } from 'lit/decorators.js'
  * @summary Shows that work of unknown length is in progress.
  *
  * @description
- * Two concentric circles rather than one arc: the track is what makes the
- * moving part read as a proportion of a whole rather than as a shape drifting
- * on its own, and it costs one element.
+ * Draws two concentric circles: a track and a moving arc. The track shows the
+ * arc as a proportion of a whole, and costs one element.
  *
- * **The center is a slot and is empty by default.** A loader with a mark in the
- * middle is a brand's loader, and this library does not know whose. The slot is
- * the capability; the logo is the application's, put in once wherever the app
- * wraps it. Nothing is rendered when nothing is slotted, so an unbranded loader
- * is still two circles and no extra box.
+ * **The center is a slot, empty by default.** Put your logo there once, where
+ * your app wraps the loader. When nothing is slotted, nothing extra is
+ * rendered.
  *
- * What is slotted does not turn. Only the arc moves, because a mark rotating
- * with it stops reading as a mark and becomes part of the animation, and a
- * wordmark upside down twice a second is worse than no wordmark.
+ * Slotted content does not rotate. Only the arc moves, so a logo stays
+ * readable.
  *
- * The semantics are on the host through `ElementInternals`, not on an inner
- * span. A `role` written into the shadow root announces correctly but leaves
- * the host itself anonymous to anything walking the light DOM, and a `role`
- * written onto the host as an attribute is one a React consumer's server markup
- * never had.
+ * The role is set on the host through `ElementInternals`. A `role` in the
+ * shadow root would leave the host itself without a role in the light DOM, and
+ * a `role` attribute on the host would be missing from React server-rendered
+ * markup.
  *
  * @since 0.1.0
  * @status stable
