@@ -8,6 +8,7 @@ export type {
   MapLayerSpec,
   MapPadding,
   MapPlace,
+  MapType,
 } from './connect-map/index.js'
 export { connectMap, distancesAlong } from './connect-map/index.js'
 export type { CreditPart } from './credit/index.js'

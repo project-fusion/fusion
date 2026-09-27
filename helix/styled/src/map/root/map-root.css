@@ -241,9 +241,7 @@
   box-shadow: var(--helix-shadow-floating);
   color: var(--helix-color-foreground);
   display: grid;
-  gap: var(--helix-space-xs);
-  /* Three tiles across, fewer on a narrow map. */
-  grid-template-columns: repeat(auto-fill, minmax(calc(var(--helix-size-control-lg) * 1.75), 1fr));
+  gap: var(--helix-space-sm);
   inline-size: min(calc(var(--helix-size-control-lg) * 6), 70vw);
   inset-block-start: 0;
   inset-inline-end: calc(100% + var(--helix-space-2xs));
@@ -261,6 +259,67 @@
 
 :host([controls-placement$="start"]) [part="layers-menu"] {
   inset-inline: calc(100% + var(--helix-space-2xs)) auto;
+}
+
+/* **The map types first, three across**: a picture of the map over its name,
+   the chosen one ringed in the brand. The radio button is there for the
+   keyboard and a screen reader, and the card is what is seen. */
+[part="map-types"] {
+  display: grid;
+  gap: var(--helix-space-xs);
+  grid-template-columns: repeat(3, 1fr);
+}
+
+[part="map-type"] {
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: grid;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-2xs);
+  justify-items: center;
+  position: relative;
+}
+
+[part="map-type"] input {
+  block-size: 1px;
+  inline-size: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+[part="map-type-preview"] {
+  aspect-ratio: 4 / 3;
+  background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thick) solid transparent;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  display: block;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+[part="map-type"]:hover,
+[part="map-type"]:has(input:checked) {
+  color: var(--helix-color-foreground);
+}
+
+[part="map-type"]:has(input:checked) [part="map-type-preview"] {
+  border-color: var(--helix-color-primary-surface);
+}
+
+[part="map-type"]:has(input:focus-visible) [part="map-type-preview"] {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The layers under them, three tiles across and fewer on a narrow map. */
+[part="layer-choices"] {
+  display: grid;
+  gap: var(--helix-space-xs);
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--helix-size-control-lg) * 1.75), 1fr));
 }
 
 /* **A tile for each layer**: its picture over its name, lit in the brand
