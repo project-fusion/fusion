@@ -538,12 +538,12 @@ export function MapsHero({
           variant="dotted"
         />
         {/* **The city in 3D, and the ground from above**: the buildings are
-            shown, and the aerial photographs wait in the layers menu. */}
+            shown, and the aerial photographs are the Hybrid and Satellite
+            map types in the layers menu. */}
         <helix-map-buildings />
         <helix-map-raster
           attribution="Imagery from USGS The National Map"
           ground
-          hidden
           label="Satellite imagery"
           max-zoom="16"
           opacity={1}
