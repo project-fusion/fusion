@@ -24,7 +24,6 @@ import {
   mountains,
   path,
   polygon,
-  satellite,
   stack,
 } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -53,11 +52,17 @@ interface MapLayer extends Element {
  */
 export type MapControlsPlacement = ViewportControlsPlacement
 
+/** How the map draws the ground: the themed map, imagery under its roads and names, or imagery alone. */
+export type MapType = 'hybrid' | 'satellite' | 'standard'
+
+/** The map types, in the order the menu offers them. */
+const MAP_TYPES: readonly MapType[] = ['standard', 'hybrid', 'satellite']
+
 /**
  * A layer's picture in the layers menu, by what it draws: a path for a route,
- * a shape for an area, dots for points, buildings, mountains for terrain, a
- * satellite for imagery of the ground, and a rain cloud for tiles over it,
- * such as weather.
+ * a shape for an area, dots for points, buildings, mountains for terrain, and
+ * a rain cloud for tiles over the map, such as weather. Imagery of the ground
+ * is a map type, with a card of its own.
  */
 const iconOf = (layer: MapLayer | undefined): HelixIcon => {
   switch (layer?.layerKind) {
@@ -72,7 +77,7 @@ const iconOf = (layer: MapLayer | undefined): HelixIcon => {
     case 'terrain':
       return mountains
     case 'raster':
-      return layer.ground ? satellite : cloudRain
+      return cloudRain
     default:
       return stack
   }
@@ -120,7 +125,13 @@ const TILTED = 50
  *
  * Add `layers` to `controls` for a layers button. It opens a menu with a tile
  * for each layer, which sets the layer's `hidden` attribute. Layers with the
- * same `group`, such as a route and its dotted legs, share one tile. `connectMap` does not draw a hidden layer, so a layer you write with
+ * same `group`, such as a route and its dotted legs, share one tile.
+ *
+ * Imagery, a `helix-map-raster` with `ground`, is a map type and not a tile.
+ * The menu opens with a card for each type, Standard, Hybrid, and Satellite,
+ * with a picture of the map in it, and `map-type` says which is chosen.
+ * Standard hides the imagery, Hybrid draws it under the roads and names, and
+ * Satellite draws it alone. `connectMap` does not draw a hidden layer, so a layer you write with
  * `hidden` starts turned off.
  *
  * Markers, routes, areas, live positions, and points layers go inside the
@@ -154,11 +165,16 @@ const TILTED = 50
  * @csspart header - The strip above the map.
  * @csspart layer - One entry in the list of the map's layers.
  * @csspart layer-choice - One layer's tile in the layers menu, pressed while the layer is shown.
+ * @csspart layer-choices - The layer tiles in the layers menu, under the map types.
  * @csspart layer-icon - The picture on a layer's tile, drawn for its kind: a line for a route, a peak for terrain.
  * @csspart layer-name - The name on a layer's tile.
  * @csspart layers - The list of the map's shown layers, such as routes, areas, and points, read by screen readers.
  * @csspart layers-menu - The menu of the map's layers, which the layers button opens.
  * @csspart layers-toggle - The button that opens and closes the layers menu.
+ * @csspart map-type - One map type's card in the layers menu: a radio button, its picture, and its name.
+ * @csspart map-type-name - The name on a map type's card.
+ * @csspart map-type-preview - The picture of the map on a map type's card.
+ * @csspart map-types - The map-type cards at the top of the layers menu, where the map has imagery.
  * @csspart needle - The compass needle, turned to point north.
  * @csspart pan-down - The button that pans the map down.
  * @csspart pan-end - The button that pans toward the end of a line of text: right in English.
@@ -197,6 +213,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ attribute: 'face-north-label' })
   faceNorthLabel = 'Face north'
 
+  /** The Hybrid map type's name. */
+  @property({ attribute: 'hybrid-label' })
+  hybridLabel = 'Hybrid'
+
   /**
    * The map's name, read by screen readers. Name the place, such as "Delivery
    * area", so that several maps on one page can be told apart. Required.
@@ -210,6 +230,25 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   @property({ attribute: 'layers-label' })
   layersLabel = 'Map layers'
+
+  /**
+   * @internal Pictures of the map in each map type, written by the connector
+   * when the layers menu opens.
+   */
+  @state()
+  mapPreviews: Partial<Record<MapType, string>> = {}
+
+  /**
+   * How the map draws the ground, where it has imagery: `hybrid` for imagery
+   * under the roads and names, and `satellite` for imagery alone. Absent is
+   * the standard, themed map. The layers menu chooses it.
+   */
+  @property({ attribute: 'map-type', reflect: true })
+  mapType?: 'hybrid' | 'satellite' | undefined
+
+  /** The name of the map types in the layers menu, read by screen readers. */
+  @property({ attribute: 'map-type-label' })
+  mapTypeLabel = 'Map type'
 
   /**
    * How far the map is tilted, in degrees from looking straight down.
@@ -226,6 +265,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   /** The rotate right button's label. */
   @property({ attribute: 'rotate-right-label' })
   rotateRightLabel = 'Rotate right'
+
+  /** The Satellite map type's name. */
+  @property({ attribute: 'satellite-label' })
+  satelliteLabel = 'Satellite'
+
+  /** The Standard map type's name. */
+  @property({ attribute: 'standard-label' })
+  standardLabel = 'Standard'
 
   /** The 3D button's label. */
   @property({ attribute: 'tilt-label' })
@@ -268,6 +315,23 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
   }
 
+  /**
+   * The imagery among the layers: raster layers drawn as the ground, which the
+   * map types show and hide rather than a tile of their own.
+   */
+  private get imagery(): MapLayer[] {
+    return this.layers.filter((layer) => layer.layerKind === 'raster' && layer.ground === true)
+  }
+
+  /** A map type's name on its card. */
+  private nameOf(type: MapType): string {
+    return type === 'hybrid'
+      ? this.hybridLabel
+      : type === 'satellite'
+        ? this.satelliteLabel
+        : this.standardLabel
+  }
+
   /** Shows or hides layers, which `connectMap` draws or takes off the map. */
   private showLayers(layers: readonly MapLayer[], shown: boolean): void {
     for (const layer of layers) {
@@ -283,7 +347,8 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   private get layerEntries(): MapLayer[][] {
     const entries: MapLayer[][] = []
     const groups = new Map<string, MapLayer[]>()
-    for (const layer of this.layers) {
+    const imagery = this.imagery
+    for (const layer of this.layers.filter((one) => !imagery.includes(one))) {
       const had = layer.group ? groups.get(layer.group) : undefined
       if (had) {
         had.push(layer)
@@ -455,6 +520,20 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* **The map type shows or hides the imagery**, so it is the one thing
+       deciding it: written only where it differs, since a write is heard by
+       the connector and by this frame. */
+    const photographed = this.mapType !== undefined
+    for (const layer of this.imagery) {
+      if (layer.hidden === photographed) {
+        layer.hidden = !photographed
+      }
+    }
+    /* A new map type is a redraw, and hides or shows the map's own roads and
+       names, which `connectMap` hears from here. */
+    if (changed.has('mapType')) {
+      this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'layer' }))
+    }
     if (changed.has('layersOpen')) {
       if (this.layersOpen) {
         document.addEventListener('pointerdown', this.handleOutside)
@@ -506,6 +585,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     if (!this.drawsControls('layers') || layers.length === 0) {
       return nothing
     }
+    const entries = this.layerEntries
     return html`<button
         part="layers-toggle"
         aria-controls="layers-menu"
@@ -514,6 +594,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         type="button"
         @click=${() => {
           this.layersOpen = !this.layersOpen
+          /* Opening asks the connector for fresh previews of the map types. */
+          if (this.layersOpen) {
+            this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'menu' }))
+          }
         }}
         @keydown=${this.handleMenuKeydown}
       >
@@ -529,21 +613,58 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         ?hidden=${!this.layersOpen}
         @keydown=${this.handleMenuKeydown}
       >
-        ${this.layerEntries.map((entry) => {
-          const shown = entry.some((layer) => !layer.hidden)
-          return html`<button
-            part="layer-choice"
-            aria-pressed=${shown ? 'true' : 'false'}
-            type="button"
-            @click=${() => this.showLayers(entry, !shown)}
-          >
-            <svg part="layer-icon" aria-hidden="true" fill="currentColor" viewBox=${iconOf(entry[0]).viewBox}>
-              ${unsafeSVG(iconOf(entry[0]).content)}
-            </svg>
-            <span part="layer-name">${entry[0]?.label ?? ''}</span>
-          </button>`
-        })}
+        ${this.imagery.length > 0 ? this.renderMapTypes() : nothing}
+        ${
+          entries.length > 0
+            ? html`<div part="layer-choices">
+                ${entries.map((entry) => {
+                  const shown = entry.some((layer) => !layer.hidden)
+                  return html`<button
+                    part="layer-choice"
+                    aria-pressed=${shown ? 'true' : 'false'}
+                    type="button"
+                    @click=${() => this.showLayers(entry, !shown)}
+                  >
+                    <svg part="layer-icon" aria-hidden="true" fill="currentColor" viewBox=${iconOf(entry[0]).viewBox}>
+                      ${unsafeSVG(iconOf(entry[0]).content)}
+                    </svg>
+                    <span part="layer-name">${entry[0]?.label ?? ''}</span>
+                  </button>`
+                })}
+              </div>`
+            : nothing
+        }
       </div>`
+  }
+
+  /**
+   * The map types, as cards with a picture of the map in each: Standard,
+   * Hybrid, and Satellite. One is chosen, so they are radio buttons, and the
+   * arrow keys move between them as a group of radios does.
+   */
+  private renderMapTypes(): TemplateResult {
+    const chosen = this.mapType ?? 'standard'
+    return html`<div part="map-types" role="radiogroup" aria-label=${this.mapTypeLabel}>
+      ${MAP_TYPES.map((type) => {
+        const preview = this.mapPreviews[type]
+        return html`<label part="map-type">
+          <input
+            type="radio"
+            name="map-type"
+            .checked=${chosen === type}
+            @change=${() => {
+              this.mapType = type === 'standard' ? undefined : type
+            }}
+          />
+          ${
+            preview
+              ? html`<img part="map-type-preview" alt="" src=${preview} />`
+              : html`<span part="map-type-preview"></span>`
+          }
+          <span part="map-type-name">${this.nameOf(type)}</span>
+        </label>`
+      })}
+    </div>`
   }
 
   /**

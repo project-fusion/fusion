@@ -9,6 +9,7 @@ export type {
 export { HelixHeadlessMapPoints } from './points/map-points.js'
 export { HelixHeadlessMapPosition } from './position/map-position.js'
 export { HelixHeadlessMapRaster } from './raster/map-raster.js'
+export type { MapType } from './root/map-root.js'
 export { HelixHeadlessMap } from './root/map-root.js'
 export type { MapPoint } from './route/map-route.js'
 export { HelixHeadlessMapRoute } from './route/map-route.js'

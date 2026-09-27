@@ -1,4 +1,10 @@
-import type { MapDriver, MapInView, MapLayerSpec, MapPadding } from '../connect-map/connect-map.js'
+import type {
+  MapDriver,
+  MapInView,
+  MapLayerSpec,
+  MapPadding,
+  MapType,
+} from '../connect-map/connect-map.js'
 import type { MapMotion } from '../motion/motion.js'
 import { colorsNow, type MapColors, mapColorsFrom, PATIENCE } from '../style/map-colors.js'
 import { watchTheme } from '../theme/watch-theme.js'
@@ -269,6 +275,12 @@ interface MapLibreAnimation {
 export interface MapLibreMap {
   /** The canvas, which MapLibre makes focusable. */
   getCanvas(): HTMLElement
+  /** The middle of the view, which a map-type picture is drawn around. */
+  getCenter?(): { lat: number; lng: number }
+  /** One layout property of one layer, read before it is set again. */
+  getLayoutProperty?(layer: string, name: string): unknown
+  /** How far the view is zoomed in. */
+  getZoom?(): number
   /** The element the map was made in, which holds its controls. */
   getContainer(): HTMLElement
   /**
@@ -403,6 +415,38 @@ const turn = (map: MapLibreMap, bearing: number, pitch: number, motion: MapMotio
   map.easeTo({ bearing, pitch, ...animation(motion) })
 }
 
+/** Whether the Satellite map type hides a map's own roads and names, per map. */
+const bared = new WeakMap<MapLibreMap, boolean>()
+
+/** A layer of the style's own that draws a road or a name: a line or a label, and not ours. */
+const isLabel = (layer: { id: string; type: string }): boolean =>
+  !layer.id.startsWith('helix-') && (layer.type === 'line' || layer.type === 'symbol')
+
+/* Each line and label shown or hidden, where it is not already, since a
+   layout set is itself a style change and one set on every `styledata`
+   would be heard as another. */
+const showLabels = (map: MapLibreMap, shown: boolean): void => {
+  const visibility = shown ? 'visible' : 'none'
+  for (const layer of map.getStyle()?.layers ?? []) {
+    if (
+      isLabel(layer) &&
+      (map.getLayoutProperty?.(layer.id, 'visibility') ?? 'visible') !== visibility
+    ) {
+      map.setLayoutProperty(layer.id, 'visibility', visibility)
+    }
+  }
+}
+
+/** A small map drawn off the page and read back as a picture, which MapLibre's own class makes. */
+interface PictureMap {
+  getCanvas(): HTMLCanvasElement
+  once(type: 'idle', listener: () => void): unknown
+  remove(): void
+}
+
+/** The width and height of a map-type picture, in CSS pixels, drawn at twice that. */
+const PICTURE = { height: 90, width: 120 }
+
 /**
  * Drives a MapLibre map from the Map frame.
  *
@@ -458,6 +502,20 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     )
   },
   focusTarget: () => map.getCanvas(),
+  /* **Roads and names hidden for the Satellite map type**, and hidden again
+     when a restyle for the theme brings them back. */
+  labels: (shown) => {
+    const heard = bared.has(map)
+    bared.set(map, !shown)
+    showLabels(map, shown)
+    if (!heard) {
+      map.on('styledata', () => {
+        if (bared.get(map)) {
+          showLabels(map, false)
+        }
+      })
+    }
+  },
   /* **Under the place names**, which is the one thing a page drawing its own
      canvas over the map could not do: a route crossing a city is under the
      city's name, not through it. And **drawn again whenever the style is
@@ -1000,6 +1058,105 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     map.panBy([x, y], animation(motion))
   },
   pitch: () => map.getPitch(),
+  /* **A picture of the view in each map type**: one small map, off the page,
+     made from this map's own style without the page's layers, drawn
+     once per type with the imagery added or its roads and names hidden, and
+     read back when it goes still. MapLibre's own class makes it, so this
+     package still imports no renderer. */
+  previews: async ({ imagery, types }) => {
+    const center = map.getCenter?.()
+    const zoom = map.getZoom?.()
+    const style = map.getStyle() as
+      | {
+          layers?: { id: string; layout?: Record<string, unknown>; type: string }[]
+          sources?: Record<string, unknown>
+          terrain?: unknown
+        }
+      | undefined
+    if (!center || zoom === undefined || !style) {
+      return {}
+    }
+    const Picture = (
+      map as unknown as { constructor: new (options: Record<string, unknown>) => PictureMap }
+    ).constructor
+    const box = document.createElement('div')
+    box.style.cssText = `position:fixed;left:-10000px;top:0;width:${PICTURE.width}px;height:${PICTURE.height}px`
+    document.body.append(box)
+    const base = JSON.parse(JSON.stringify(style)) as NonNullable<typeof style>
+    delete base.terrain
+    /* **The base map alone**: the page's own routes, points, buildings,
+       imagery, and terrain are taken out, so each picture shows the map type
+       and not what is on it. */
+    const ours = (id: string): boolean => id.startsWith('helix-')
+    base.layers = (base.layers ?? []).filter((layer) => !ours(layer.id))
+    base.sources = Object.fromEntries(
+      Object.entries(base.sources ?? {}).filter(([id]) => !ours(id)),
+    )
+    const pictures: Partial<Record<MapType, string>> = {}
+    try {
+      for (const type of types) {
+        if (type !== 'standard' && !imagery) {
+          continue
+        }
+        const layers = base.layers.map((layer) =>
+          isLabel(layer)
+            ? {
+                ...layer,
+                layout: { ...layer.layout, visibility: type === 'satellite' ? 'none' : 'visible' },
+              }
+            : layer,
+        )
+        if (type !== 'standard' && imagery) {
+          const lastFill = layers.findLastIndex(
+            (layer) => layer.type === 'fill' && !layer.id.startsWith('helix-'),
+          )
+          layers.splice(lastFill + 1, 0, {
+            id: 'helix-picture-imagery',
+            source: 'helix-picture-imagery',
+            type: 'raster',
+          } as never)
+        }
+        const sources =
+          type !== 'standard' && imagery
+            ? {
+                ...base.sources,
+                'helix-picture-imagery': {
+                  ...(imagery.maxZoom === undefined ? {} : { maxzoom: imagery.maxZoom }),
+                  tileSize: 256,
+                  tiles: [imagery.src],
+                  type: 'raster',
+                },
+              }
+            : base.sources
+        const picture = new Picture({
+          attributionControl: false,
+          bearing: map.getBearing(),
+          center: [center.lng, center.lat],
+          container: box,
+          fadeDuration: 0,
+          interactive: false,
+          /* Flat, from above, as map types are compared. */
+          pitch: 0,
+          pixelRatio: 2,
+          preserveDrawingBuffer: true,
+          style: { ...base, layers, sources },
+          zoom: Math.max(0, zoom - 1.5),
+        })
+        await new Promise<void>((done) => {
+          const late = setTimeout(done, 6000)
+          picture.once('idle', () => {
+            clearTimeout(late)
+            done()
+          })
+        })
+        pictures[type] = picture.getCanvas().toDataURL('image/jpeg', 0.85)
+        picture.remove()
+      }
+    } finally {
+      box.remove()
+    }
+    return pictures
+  },
   project: ({ lat, lng }) => {
     const { x, y } = map.project([lng, lat])
     return { x, y }
