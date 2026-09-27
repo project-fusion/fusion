@@ -223,25 +223,23 @@ setting `pitch` when you create it:
 const map = new maplibregl.Map({ container: 'map', pitch: 55, style, zoom: 15.5 })
 ```
 
-To let users turn and tilt the map, add `rotate` and `tilt` to the frame's
-`controls`:
+To let users tilt the map, add `tilt` to the frame's `controls`:
 
 ```html
 <helix-map
-  controls="pan zoom rotate tilt fullscreen"
+  controls="zoom compass tilt fullscreen"
   label="Downtown Austin in 3D"
 >
 ```
 
-The compass's needle points north as the map turns, and pressing the compass
-turns the map back to north. The rotate buttons at its top corners turn the map
-15 degrees. The 3D button is a toggle. Pressed, it
-tilts the map 50 degrees toward the horizon and raises the buildings. Pressed
-again, it makes the map flat, and the buildings are the map's own flat
-footprints. Raised terrain lies flat with them, and keeps its shading.
+The 3D button is a toggle. Pressed, it tilts the map 50 degrees toward the
+horizon and raises the buildings. Pressed again, it makes the map flat, and the
+buildings are the map's own flat footprints. Raised terrain lies flat with them,
+and keeps its shading. The compass's needle points north as the map turns, and
+pressing the compass turns the map back to north.
 
 Leaflet draws maps flat and does not rotate, so a Leaflet map shows no
-buildings, and the rotate and tilt buttons do nothing.
+buildings, and the compass and the 3D button do nothing.
 
 ### Weather and other tile overlays
 
@@ -313,7 +311,7 @@ Leaflet draws maps flat, so a Leaflet map shows no terrain.
 
 ```html
 <helix-map
-  controls="pan zoom layers fullscreen"
+  controls="zoom compass layers fullscreen"
   label="Downtown Austin"
 >
 ```
@@ -341,9 +339,9 @@ after the label.
   move top to bottom and along each line. Enter on a count zooms in to it.
 - Screen readers find the map's shown layers in a list inside the frame, named
   by their `label` and `description`.
-- The pan and rotate buttons sit around the compass. They show while the
-  pointer or the keyboard is on the compass, and always on a touch screen, so a
-  user can move and turn the map without dragging it.
+- With a pointer, dragging is the only way to move and turn the map. Where your
+  map has to work without dragging, as WCAG 2.2 asks at level AA, add `pan` and
+  `rotate` to `controls` for buttons around the compass that move and turn it.
 - In the layers menu, Tab moves between the tiles, Space or Enter turns a layer
   on or off, and Escape closes the menu.
 
