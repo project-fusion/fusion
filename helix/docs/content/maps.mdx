@@ -7,7 +7,7 @@ title: Maps
 # Maps
 
 Helix Maps puts a frame around a map drawn by MapLibre, Leaflet, or a renderer of
-your own. The frame adds pan and zoom buttons and a place for the map credit. You
+your own. The frame adds a column of controls and a place for the map credit. You
 add places, routes, areas, live positions, and data as elements inside the
 frame, and `@fusion.dev/helix-map` connects the frame to the renderer and styles
 the map with your theme.
@@ -233,8 +233,9 @@ To let users turn and tilt the map, add `rotate` and `tilt` to the frame's
 >
 ```
 
-The rotate buttons turn the map 15 degrees, and Face north turns it back. Its
-arrow points north as the map turns. The 3D button is a toggle. Pressed, it
+The compass's needle points north as the map turns, and pressing the compass
+turns the map back to north. The rotate buttons at its top corners turn the map
+15 degrees. The 3D button is a toggle. Pressed, it
 tilts the map 50 degrees toward the horizon and raises the buildings. Pressed
 again, it makes the map flat, and the buildings are the map's own flat
 footprints. Raised terrain lies flat with them, and keeps its shading.
@@ -318,13 +319,16 @@ Leaflet draws maps flat, so a Leaflet map shows no terrain.
 ```
 
 Add `layers` to the frame's `controls` for a layers button. It opens a menu with
-a checkbox for each layer, named by its `label`. A checkbox sets its layer's
-`hidden` attribute, and `connectMap` does not draw a hidden layer. Write
-`hidden` on a layer to start it turned off.
+a tile for each layer: a picture of what the layer draws, and its `label`. A
+tile is lit while its layer is shown. Pressing a tile sets its layer's `hidden`
+attribute, and `connectMap` does not draw a hidden layer. Write `hidden` on a
+layer to start it turned off.
 
-Give layers the same `group` to show them as one checkbox, such as a route and
-the dotted legs at its ends. The checkbox takes the name of the first layer in
-the group, and shows or hides every layer in it.
+Give layers the same `group` to show them as one tile, such as a route and the
+dotted legs at its ends. The tile takes the name of the first layer in the
+group, and shows or hides every layer in it. Keep labels short, such as
+"Walking route", and put the rest in `description`, which screen readers read
+after the label.
 
 ## Keyboard and screen readers
 
@@ -337,8 +341,11 @@ the group, and shows or hides every layer in it.
   move top to bottom and along each line. Enter on a count zooms in to it.
 - Screen readers find the map's shown layers in a list inside the frame, named
   by their `label` and `description`.
-- In the layers menu, Tab moves between the checkboxes, Space turns a layer on
-  or off, and Escape closes the menu.
+- The pan and rotate buttons sit around the compass. They show while the
+  pointer or the keyboard is on the compass, and always on a touch screen, so a
+  user can move and turn the map without dragging it.
+- In the layers menu, Tab moves between the tiles, Space or Enter turns a layer
+  on or off, and Escape closes the menu.
 
 ## Write a driver
 

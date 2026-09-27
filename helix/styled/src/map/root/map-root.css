@@ -118,36 +118,26 @@
   }
 }
 
-/* ======================================================= rotate and tilt === */
+/* ========================================================== the column === */
 
-/* **Rotate and tilt fill the pad's empty cells**: turn left and right in the
-   top corners beside up, Face north in the center, and the 3D toggle in the
-   bottom corner before down. Only a frame that asks for them changes, so a
-   map with pan and zoom alone keeps its layout. */
-[part="controls"]:has([part="rotate-left"], [part="tilt"]) {
-  grid-template-areas:
-    "rotl   up     rotr  zoomin"
-    "start  north  end   zoomout"
-    "tilt   down   .     full";
+/* **One column, read top to bottom**: fullscreen, layers, 3D, zoom, and the
+   compass last, each centered over the compass, which is the widest. The
+   surface's pad grid is a board's; a map's arrows are round its compass. */
+[part="controls"] {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
 }
 
-[part="rotate-left"] {
-  grid-area: rotl;
+/* Zoom in and out are one pair, joined where they meet. */
+[part="zoom-in"] {
+  border-end-end-radius: 0;
+  border-end-start-radius: 0;
 }
-[part="rotate-right"] {
-  grid-area: rotr;
-}
-[part="face-north"] {
-  grid-area: north;
-}
-[part="tilt"] {
-  grid-area: tilt;
-}
-
-/* The needle points north as the map turns. */
-[part="needle"] {
-  display: inline-block;
-  transform: rotate(var(--map-needle-turn, 0deg));
+[part="zoom-out"] {
+  border-start-end-radius: 0;
+  border-start-start-radius: 0;
+  margin-block-start: calc(-1 * var(--helix-space-2xs));
 }
 
 [part="tilt"] {
@@ -167,17 +157,100 @@
   background-color: var(--helix-color-primary-surface-hover);
 }
 
-/* ============================================================ layers menu === */
+/* ========================================================= the compass === */
 
-/* **The layers button goes under the stack in the last column**, a row of
-   its own, so it joins every layout of the pad without redrawing one. */
-[part="layers-toggle"] {
-  grid-column: -2 / -1;
-  grid-row: 4;
+/* **The arrows ring the compass**, up, down, and the sides for panning, and
+   the top corners for turning. A panel behind them is drawn with them, in
+   the corner every floating panel takes. */
+[part="compass"] {
+  border-radius: var(--helix-radii-sm);
+  display: grid;
+  grid-template-areas:
+    "rotl   up     rotr"
+    "start  north  end"
+    ".      down   .";
+  place-items: center;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* **The menu floats beside the controls**, out of their grid, from the edge
-   they sit on: under them in a top corner and over them in a bottom one. */
+[part="rotate-left"] {
+  grid-area: rotl;
+}
+[part="rotate-right"] {
+  grid-area: rotr;
+}
+[part="face-north"] {
+  border-radius: var(--helix-radii-full);
+  grid-area: north;
+}
+
+/* The arrows are small and bare on the disc. */
+[part="compass"] > :not([part="face-north"]) {
+  background-color: transparent;
+  block-size: calc(var(--helix-size-control-sm) * 0.75);
+  border-color: transparent;
+  box-shadow: none;
+  font-size: var(--helix-text-xs);
+  inline-size: calc(var(--helix-size-control-sm) * 0.75);
+}
+
+/* **Shown where the pointer or the keyboard is on the compass**, and hidden
+   the rest of the time, so the column is five buttons and not twelve. Still
+   in the tab order while hidden, so the keyboard reaching one shows them. */
+[part="compass"]:has([part="face-north"]) > :not([part="face-north"]) {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="compass"]:is(:hover, :focus-within) {
+  background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
+  box-shadow:
+    var(--helix-shadow-floating),
+    0 0 0 var(--helix-border-floating) var(--helix-color-border);
+}
+
+[part="compass"]:is(:hover, :focus-within) > :not([part="face-north"]) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* **Always shown where nothing can hover**, a phone's screen, since the
+   arrows are the way to move the map there without dragging it. */
+@media (hover: none) {
+  [part="compass"] {
+    background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
+    box-shadow:
+      var(--helix-shadow-floating),
+      0 0 0 var(--helix-border-floating) var(--helix-color-border);
+  }
+
+  [part="compass"]:has([part="face-north"]) > :not([part="face-north"]) {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* The needle turns with the map: north in the danger red a compass paints its
+   north in, south in the ink. */
+[part="needle"] {
+  block-size: var(--helix-size-icon-md);
+  inline-size: var(--helix-size-icon-md);
+  transform: rotate(var(--map-needle-turn, 0deg));
+}
+[part="needle"] [data-end="north"] {
+  fill: var(--helix-color-danger);
+}
+[part="needle"] [data-end="south"] {
+  fill: var(--helix-color-foreground-muted);
+}
+
+/* ========================================================= layers menu === */
+
+/* **The menu opens beside the column**, level with its button, on the side
+   away from the edge the column sits on. */
 [part="layers-menu"] {
   background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
   border: var(--helix-border-floating) solid var(--helix-color-border);
@@ -185,13 +258,13 @@
   box-shadow: var(--helix-shadow-floating);
   color: var(--helix-color-foreground);
   display: grid;
-  gap: var(--helix-space-2xs);
-  inline-size: max-content;
-  inset-block-start: calc(100% + var(--helix-space-2xs));
-  inset-inline-end: 0;
-  /* A long name wraps, inside the width of a phone. */
-  max-inline-size: min(18rem, 80vw);
-  padding: var(--helix-space-xs) var(--helix-space-sm);
+  gap: var(--helix-space-xs);
+  /* Three tiles across, fewer on a narrow map. */
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--helix-size-control-lg) * 1.75), 1fr));
+  inline-size: min(calc(var(--helix-size-control-lg) * 6), 70vw);
+  inset-block-start: 0;
+  inset-inline-end: calc(100% + var(--helix-space-xs));
+  padding: var(--helix-space-sm);
   position: absolute;
 }
 
@@ -200,24 +273,52 @@
 }
 
 :host([controls-placement^="bottom"]) [part="layers-menu"] {
-  inset-block: auto calc(100% + var(--helix-space-2xs));
+  inset-block: auto 0;
 }
 
 :host([controls-placement$="start"]) [part="layers-menu"] {
-  inset-inline: 0 auto;
+  inset-inline: calc(100% + var(--helix-space-xs)) auto;
 }
 
-[part="layer-choice"] {
-  align-items: center;
-  cursor: pointer;
-  display: flex;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  gap: var(--helix-space-xs);
-  min-block-size: var(--helix-size-control-sm);
+/* **A tile for each layer**: its picture over its name, lit in the brand
+   while the layer is shown. */
+[part="layers-menu"] [part="layer-choice"] {
+  align-content: start;
+  background-color: var(--helix-color-surface);
+  block-size: auto;
+  /* In the menu's flow, so the in-flow edge and lift. */
+  border: var(--helix-border-surface) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-surface);
+  color: var(--helix-color-foreground-muted);
+  display: grid;
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-2xs);
+  inline-size: auto;
+  justify-items: center;
+  padding: var(--helix-space-sm) var(--helix-space-xs);
+  text-align: center;
 }
 
-[part="layer-choice"] input {
-  accent-color: var(--helix-color-primary-surface);
-  margin: 0;
+[part="layers-menu"] [part="layer-choice"]:hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
+[part="layers-menu"] [part="layer-choice"][aria-pressed="true"] {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-primary-surface) 14%,
+    var(--helix-color-surface)
+  );
+  border-color: var(--helix-color-primary-surface);
+  color: var(--helix-color-foreground);
+}
+
+[part="layer-icon"] {
+  block-size: var(--helix-size-icon-lg);
+  inline-size: var(--helix-size-icon-lg);
+}
+
+[part="layers-menu"] [part="layer-choice"][aria-pressed="true"] [part="layer-icon"] {
+  color: var(--helix-color-primary);
 }
