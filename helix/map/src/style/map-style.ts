@@ -83,8 +83,11 @@ export type MapImage =
       design: 'interstate' | 'plate' | 'state' | 'us'
       edge?: string | undefined
       fill?: string | undefined
+      /** The CSS font family the number is drawn in, at bold. */
+      font: string
+      /** The number's color. */
+      ink: string
       kind: 'sign'
-      length: number
     }
 
 /**
@@ -326,19 +329,26 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
     LANDMARKS.filter((one) => (one.everyday === true) === everyday).flatMap(
       ({ classes }) => classes,
     )
-  /* The signs, one image per shape and number of characters, which is the
-     schema's `ref_length`, so a sign is as wide as its number. */
+  /* **The signs, one description per design**, which the driver draws with
+     each road's number in it: an image named for its design and number,
+     `helix-sign-us|290`, as wide as the number. The numbers are in the
+     theme's typeface at bold, where there is one. */
+  const signFont = face ? `"${face}", sans-serif` : 'sans-serif'
+  images['helix-sign-interstate'] = {
+    design: 'interstate',
+    font: signFont,
+    ink: '#ffffff',
+    kind: 'sign',
+  }
+  images['helix-sign-us'] = { design: 'us', font: signFont, ink: '#1a1a1a', kind: 'sign' }
+  images['helix-sign-state'] = { design: 'state', font: signFont, ink: '#1a1a1a', kind: 'sign' }
   const plate = { edge: toward(0.5), fill: halo }
-  for (let length = 1; length <= 6; length++) {
-    for (const design of ['interstate', 'state', 'us'] as const) {
-      images[`helix-sign-${design}-${length}`] = { design, kind: 'sign', length }
-    }
-    images[`helix-sign-plate-${idOf(plate.fill + plate.edge)}-${length}`] = {
-      ...plate,
-      design: 'plate',
-      kind: 'sign',
-      length,
-    }
+  images[`helix-sign-plate-${idOf(plate.fill + plate.edge)}`] = {
+    ...plate,
+    design: 'plate',
+    font: signFont,
+    ink: cssColor(ink),
+    kind: 'sign',
   }
   const signShape: unknown[] = ['match', ['get', 'network']]
   for (const [network, shape] of Object.entries(SIGNS)) {
@@ -552,46 +562,12 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         ],
         id: 'label-shield',
         layout: {
-          'icon-image': [
-            'concat',
-            'helix-sign-',
-            signShape,
-            '-',
-            ['to-string', ['get', 'ref_length']],
-          ],
+          'icon-image': ['concat', 'helix-sign-', signShape, '|', ['get', 'ref']],
           'icon-rotation-alignment': 'viewport',
           'symbol-placement': 'line',
           'symbol-spacing': 320,
-          'text-field': ['get', 'ref'],
-          'text-font': BOLD,
-          /* In the blue field under the Interstate's crown, and a little low
-             in the US shield, whose point is its narrowest part. */
-          'text-offset': [
-            'match',
-            ['get', 'network'],
-            'us-interstate',
-            ['literal', [0, 0.3]],
-            'us-highway',
-            ['literal', [0, 0.1]],
-            ['literal', [0, 0]],
-          ],
-          'text-rotation-alignment': 'viewport',
-          'text-size': 10,
         },
         minzoom: 7,
-        paint: {
-          'text-color': [
-            'match',
-            ['get', 'network'],
-            'us-interstate',
-            '#ffffff',
-            'us-highway',
-            '#1a1a1a',
-            'us-state',
-            '#1a1a1a',
-            cssColor(ink),
-          ],
-        },
         source: 'openmaptiles',
         'source-layer': 'transportation_name',
         type: 'symbol',
