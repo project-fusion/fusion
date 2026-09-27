@@ -286,6 +286,13 @@
     // Reads the manifests and every `.examples` file, so it depends on the
     // analyzer having run: `analyze` writes `custom-elements.json`, and a
     // catalog built before it would describe whatever the last analysis left.
+    //
+    // **The site's own copy is an input too.** Every page's `.md` is rendered
+    // from `content/**` through `utils/copy-markdown`, so the Maps page's
+    // steps changed and the cache restored the old document over the new one.
+    // `content/**` holds this task's own output, which is excluded so the task
+    // does not change its own key. Both tiers' examples are read, not only
+    // the styled ones.
     "catalog": {
       "dependsOn": ["^build", "^analyze"],
       "inputs": [
@@ -293,10 +300,13 @@
         "$TURBO_ROOT$/helix/docs/src/naming.ts",
         "$TURBO_ROOT$/helix/docs/content/**",
         "$TURBO_ROOT$/helix/docs/src/reference.ts",
-        "content/routes/routes.ts",
+        "content/**",
+        "!content/catalog/catalog.generated.json",
+        "utils/copy-markdown/**",
         "$TURBO_ROOT$/helix/headless/custom-elements.json",
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/custom-elements.json",
+        "$TURBO_ROOT$/helix/headless/src/*/.examples/**",
         "$TURBO_ROOT$/helix/styled/src/*/.examples/**",
         "$TURBO_ROOT$/fusion/docs/insights/**",
         "$TURBO_ROOT$/fusion/site/scripts/build-catalog.mjs"
@@ -452,6 +462,12 @@
     // answer for. It skips its own measurement only on the receipt a write on
     // the same machine left for the same inputs, which a restore never brings,
     // so `verify` measures a changed tree once rather than twice.
+    // **What it measures is an input: each package's published files.** With
+    // only the manifests listed, a change to a component's code or CSS moved
+    // the byte counts and not the key, so a cache hit restored a
+    // `metrics.mdx` with last week's sizes and `check:gen:metrics` failed
+    // against the fresh build. `bun.lock` is here because Lit is bundled into
+    // every row.
     "metrics": {
       "dependsOn": [
         "@fusion.dev/helix#build",
@@ -464,13 +480,27 @@
         "!content/metrics.mdx",
         "peers.json",
         "timings.json",
+        "$TURBO_ROOT$/bun.lock",
         "$TURBO_ROOT$/fusion/scripts/build-metrics.mjs",
         "$TURBO_ROOT$/helix/core/package.json",
+        "$TURBO_ROOT$/helix/core/custom-elements.json",
+        "$TURBO_ROOT$/helix/core/dist/**",
         "$TURBO_ROOT$/helix/headless/package.json",
+        "$TURBO_ROOT$/helix/headless/custom-elements.json",
+        "$TURBO_ROOT$/helix/headless/dist/**",
+        "$TURBO_ROOT$/helix/headless/types/**",
         "$TURBO_ROOT$/helix/icons/package.json",
+        "$TURBO_ROOT$/helix/icons/dist/**",
+        "$TURBO_ROOT$/helix/icons/raw/**",
         "$TURBO_ROOT$/helix/styled/package.json",
+        "$TURBO_ROOT$/helix/styled/custom-elements.json",
+        "$TURBO_ROOT$/helix/styled/dist/**",
+        "$TURBO_ROOT$/helix/styled/types/**",
         "$TURBO_ROOT$/helix/styles/package.json",
-        "$TURBO_ROOT$/helix/theme/package.json"
+        "$TURBO_ROOT$/helix/styles/dist/**",
+        "$TURBO_ROOT$/helix/theme/package.json",
+        "$TURBO_ROOT$/helix/theme/dist/**",
+        "$TURBO_ROOT$/helix/theme/wasm/**"
       ],
       "outputs": [
         "content/metrics.mdx",
