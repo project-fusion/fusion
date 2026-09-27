@@ -33,8 +33,9 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
-    "test": "bun run test:dom",
+    "test": "bun run test:pure && bun run test:dom",
     "test:dom": "bun test dom.spec",
+    "test:pure": "bun test pure.spec",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
