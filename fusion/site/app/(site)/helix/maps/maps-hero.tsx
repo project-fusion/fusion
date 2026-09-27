@@ -489,7 +489,7 @@ export function MapsHero({
       <helix-map
         class={styles.mapsHeroFrame}
         cluster
-        controls="pan zoom rotate tilt layers fullscreen"
+        controls="zoom compass tilt layers fullscreen"
         label="Map of Austin"
         ref={frame}
       >
