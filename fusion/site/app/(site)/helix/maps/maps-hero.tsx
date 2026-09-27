@@ -509,9 +509,9 @@ export function MapsHero({
           lng={PLACES[0]?.lng}
         />
         <helix-map-route
-          description="Passes all seven places in order"
+          description="From UT Tower to Barton Springs Pool, past all seven places in order"
           group="walk"
-          label="Walking route from UT Tower to Barton Springs Pool"
+          label="Walking route"
           points={WALK.path.map(([lat, lng]) => ({ lat, lng }))}
         />
         {/* **Dotted where it leaves the path**: a place set back from its
