@@ -22,6 +22,8 @@ import { property } from 'lit/decorators.js'
  * @slot - The cell's content.
  *
  * @cssproperty --table-cell-align - The text alignment of the column above the cell: `start`, `center`, or `end`, and unset when the column sets none. The table writes it, and the stylesheet that draws the cell reads it for `justify-content` and `text-align`, which both follow the writing direction.
+ *
+ * @cssstate text - The cell holds text of its own, beside or instead of elements, so the stylesheet lets its content flow as a line of text.
  */
 @customElement('helix-headless-table-cell')
 export class HelixHeadlessTableCell extends HelixElement {
@@ -37,8 +39,22 @@ export class HelixHeadlessTableCell extends HelixElement {
     hostAria(this.internals, { role: this.header ? 'columnheader' : 'cell' })
   }
 
+  /**
+   * Sets the `text` state from the cell's own content.
+   *
+   * Only text nodes count, and only ones with more than whitespace. A cell of
+   * elements alone keeps its elements laid out as they were, which is what a
+   * lone tag, button, or block of text wants.
+   */
+  private readonly handleSlotChange = (): void => {
+    const text = [...this.childNodes].some(
+      (node) => node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim() !== '',
+    )
+    this.toggleState('text', text)
+  }
+
   protected override render(): TemplateResult {
-    return html`<slot></slot>`
+    return html`<slot @slotchange=${this.handleSlotChange}></slot>`
   }
 }
 

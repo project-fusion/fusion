@@ -41,6 +41,17 @@
   text-align: var(--table-cell-align);
 }
 
+/* A cell that holds text of its own flows it as a line of text. Otherwise the
+   slot is `display: contents` and each run of text and each element is its own
+   flex item, so "Ships `vue.d.ts`, needs ..." sat side by side in columns and
+   broke mid-word at 390px. As one flex item the slot keeps the host's centering
+   and `justify-content`, and `text-align` lines up a value that wraps. A cell
+   of elements alone keeps the flex layout. */
+:host(:state(text)) slot {
+  display: block;
+  min-inline-size: 0;
+}
+
 /* The cell can shrink and its content could not: `min-inline-size: 0` above
    frees the grid item, and a flex item inside keeps an automatic minimum of its
    own until it is told otherwise. Both are needed and neither is enough. */
