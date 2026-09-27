@@ -88,6 +88,19 @@ export const mix = (from: Rgb, to: Rgb, amount: number): Rgb => {
   )
 }
 
+/**
+ * A color of the same lightness and colorfulness as `like`, at another hue,
+ * in degrees round OKLCH's wheel: how a set of kinds can each keep a hue of
+ * their own and still sit in one theme, light or dark. `least` is the
+ * colorfulness it takes at the least, so a gray brand still gives hues.
+ */
+export const rehue = (like: Rgb, hue: number, least = 0.1): Rgb => {
+  const [lightness, a, b] = toOklab(like)
+  const chroma = Math.max(Math.hypot(a, b), least)
+  const angle = (hue * Math.PI) / 180
+  return fromOklab([lightness, chroma * Math.cos(angle), chroma * Math.sin(angle)], like.alpha)
+}
+
 /** A color as the `rgb()` or `rgba()` a map style takes. */
 export const cssColor = ({ alpha, blue, green, red }: Rgb): string => {
   const [r, g, b] = [red, green, blue].map((channel) => Math.round(channel * 255))

@@ -315,60 +315,58 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The layers under them, three tiles across and fewer on a narrow map. */
+/* **The layers under them, the same size as the map types**: three across,
+   each an icon in a box the size of a card's picture, its name under it, and
+   the box ringed in the brand while the layer is shown. */
 [part="layer-choices"] {
   display: grid;
   gap: var(--helix-space-xs);
-  grid-template-columns: repeat(auto-fill, minmax(calc(var(--helix-size-control-lg) * 1.75), 1fr));
+  grid-template-columns: repeat(3, 1fr);
 }
 
-/* **A tile for each layer**: its picture over its name, lit in the brand
-   while the layer is shown. */
+/* The tile is the card's shape, and none of a control button's own ground. */
 [part="layers-menu"] [part="layer-choice"] {
   align-content: start;
-  background-color: var(--helix-color-surface);
+  background-color: transparent;
   block-size: auto;
-  /* In the menu's flow, so the in-flow edge and lift. */
-  border: var(--helix-border-surface) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  box-shadow: var(--helix-shadow-surface);
+  border: 0;
+  box-shadow: none;
   color: var(--helix-color-foreground-muted);
   display: grid;
   font-size: var(--helix-text-xs);
   gap: var(--helix-space-2xs);
   inline-size: auto;
   justify-items: center;
-  padding: var(--helix-space-sm) var(--helix-space-xs);
+  padding: 0;
   text-align: center;
 }
 
-[part="layers-menu"] [part="layer-choice"]:hover {
-  background-color: color-mix(
-    in oklab,
-    var(--helix-color-foreground) 8%,
-    var(--helix-color-surface)
-  );
-}
-
+[part="layers-menu"] [part="layer-choice"]:hover,
 [part="layers-menu"] [part="layer-choice"][aria-pressed="true"] {
-  background-color: color-mix(
-    in oklab,
-    var(--helix-color-primary-surface) 14%,
-    var(--helix-color-surface)
-  );
-  border-color: var(--helix-color-primary-surface);
+  background-color: transparent;
   color: var(--helix-color-foreground);
 }
 
-[part="layers-menu"] [part="layer-choice"][aria-pressed="true"]:hover {
-  background-color: color-mix(
-    in oklab,
-    var(--helix-color-primary-surface) 24%,
-    var(--helix-color-surface)
-  );
+[part="layers-menu"] [part="layer-choice"]:focus-visible {
+  outline: none;
 }
 
 [part="layer-icon"] {
-  block-size: var(--helix-size-icon-lg);
-  inline-size: var(--helix-size-icon-lg);
+  aspect-ratio: 4 / 3;
+  background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thick) solid transparent;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  display: block;
+  inline-size: 100%;
+  padding: var(--helix-space-sm);
+}
+
+[part="layer-choice"][aria-pressed="true"] [part="layer-icon"] {
+  border-color: var(--helix-color-primary-surface);
+}
+
+[part="layer-choice"]:focus-visible [part="layer-icon"] {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
 }
