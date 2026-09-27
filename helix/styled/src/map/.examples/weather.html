@@ -9,6 +9,7 @@
   gap="sm"
 >
   <!-- Preview frame: data-preview-map has the frame connect MapLibre and data-preview-map-view sets the view; on your page, connectMap does, and you set the view on your map. -->
+  <!-- The frames come from this site's radar route, which draws the Mesonet's radar without speckle and at twice the resolution. On your page, point frames at your own tile server or at the Mesonet's tiles. -->
   <helix-map
     data-preview-map
     data-preview-map-view="31,-99,5"
@@ -20,12 +21,12 @@
       attribution="NWS radar from the Iowa Environmental Mesonet"
       description="The last 50 minutes, in 10-minute steps"
       frames="
-        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m50m/{z}/{x}/{y}.png
-        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m40m/{z}/{x}/{y}.png
-        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m30m/{z}/{x}/{y}.png
-        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m20m/{z}/{x}/{y}.png
-        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m10m/{z}/{x}/{y}.png
-        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png
+        /maps/radar/50/{z}/{x}/{y}.png
+        /maps/radar/40/{z}/{x}/{y}.png
+        /maps/radar/30/{z}/{x}/{y}.png
+        /maps/radar/20/{z}/{x}/{y}.png
+        /maps/radar/10/{z}/{x}/{y}.png
+        /maps/radar/0/{z}/{x}/{y}.png
       "
       id="radar"
       label="Weather radar"
