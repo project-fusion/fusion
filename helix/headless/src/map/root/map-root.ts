@@ -92,29 +92,32 @@ const TILTED = 50
  * a name for the map, a column of controls, and a strip for the map credit.
  * Helix does not draw the map itself.
  *
- * The controls are one column: fullscreen, the layers button, 3D, zoom, and
- * a compass. The compass's needle points north, and pressing it turns the map
- * to face north. The pan and rotate buttons sit around the compass, so a user
- * can move and turn the map without dragging it. The styled frame shows them
- * while the pointer or the keyboard is on the compass, and always on a screen
- * with no hover, such as a phone.
+ * The controls are one column, and `controls` names which ones: `fullscreen`,
+ * `layers`, `tilt`, `zoom`, and `compass`, top to bottom. `zoom compass
+ * fullscreen` by default. The compass's needle points north as the map turns,
+ * and pressing it turns the map to face north.
+ *
+ * Add `pan` and `rotate` for buttons around the compass that move and turn the
+ * map. Dragging is otherwise the only way a pointer moves the map, so add them
+ * where the map has to be usable without dragging, as WCAG 2.2 asks at level
+ * AA. The arrow keys pan the map and Shift with Left or Right turns it either
+ * way.
  *
  * The pan and zoom buttons and the arrow keys send `helix-map-pan` and
  * `helix-map-zoom`. Move your map in response, or connect it with
  * `connectMap` from `@fusion.dev/helix-map`, which does this for you.
  *
- * Add `rotate` and `tilt` to `controls` for buttons that turn and tilt the
- * map, which a map with 3D buildings needs. The 3D button is a toggle. Pressed,
- * it tilts the map 50 degrees, and `connectMap` raises the buildings and the
- * ground. Pressed again, it makes the map flat, and lays them flat too. Shift
- * with the arrow keys turns and tilts the map in steps: left and right rotate,
- * and up and down tilt. They send `helix-map-rotate` and `helix-map-tilt`, which `connectMap`
- * answers on MapLibre. Leaflet draws maps flat and does not rotate.
+ * Add `tilt` to `controls` for the 3D button, which a map with 3D buildings
+ * or terrain needs. It is a toggle. Pressed, it tilts the map 50 degrees, and
+ * `connectMap` raises the buildings and the ground. Pressed again, it makes the
+ * map flat, and lays them flat too. Shift with Up or Down tilts the map in
+ * steps. Turning and tilting send `helix-map-rotate` and `helix-map-tilt`,
+ * which `connectMap` answers on MapLibre. Leaflet draws maps flat and does not
+ * rotate.
  *
- * Add `layers` to `controls` for a layers button. It opens a menu with a
- * checkbox for each layer, which sets the layer's `hidden` attribute. Layers
- * with the same `group`, such as a route and its dotted legs, share one
- * checkbox. `connectMap` does not draw a hidden layer, so a layer you write with
+ * Add `layers` to `controls` for a layers button. It opens a menu with a tile
+ * for each layer, which sets the layer's `hidden` attribute. Layers with the
+ * same `group`, such as a route and its dotted legs, share one tile. `connectMap` does not draw a hidden layer, so a layer you write with
  * `hidden` starts turned off.
  *
  * Markers, routes, areas, live positions, and points layers go inside the
@@ -542,13 +545,13 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   }
 
   /**
-   * The compass, and the pan and rotate buttons around it.
+   * The compass, and the pan and rotate buttons around it where `controls`
+   * names them.
    *
    * **One control for which way the map faces and where it goes.** The needle
    * turns with the map and points north; pressing it turns the map back. The
    * arrows around it are the way to move and turn the map without dragging,
-   * which a pointer otherwise needs, and the styled tier shows them where the
-   * pointer or the keyboard is on the compass.
+   * which a pointer otherwise needs.
    */
   private renderCompass(pan: boolean, rotate: boolean): TemplateResult {
     return html`<div part="compass">
@@ -660,14 +663,24 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               </button>`
           : nothing
       }
-      ${pan || rotate ? this.renderCompass(pan, rotate) : nothing}
+      ${this.drawsCompass ? this.renderCompass(pan, rotate) : nothing}
     </div>`
   }
 
-  /** The keys the region answers, which `rotate` and `tilt` add to. */
+  /** The controls the map draws while `controls` is absent. */
+  protected override get restingControls(): string {
+    return 'zoom compass fullscreen'
+  }
+
+  /** Whether the compass is drawn: named, or asked for by the arrows round it. */
+  private get drawsCompass(): boolean {
+    return ['compass', 'pan', 'rotate'].some((group) => this.drawsControls(group))
+  }
+
+  /** The keys the region answers, which the compass and `tilt` add to. */
   private get keyShortcuts(): string {
     const keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Plus', 'Minus']
-    if (this.drawsControls('rotate')) {
+    if (this.drawsCompass) {
       keys.push('Shift+ArrowLeft', 'Shift+ArrowRight')
     }
     if (this.drawsControls('tilt')) {
@@ -681,7 +694,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     if (!event.shiftKey) {
       return false
     }
-    if (this.drawsControls('rotate') && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+    if (this.drawsCompass && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
       this.rotate(event.key === 'ArrowLeft' ? -ROTATE_STEP : ROTATE_STEP)
       return true
     }

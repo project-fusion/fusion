@@ -127,14 +127,23 @@
   align-items: center;
   display: flex;
   flex-direction: column;
+  /* **In the map's row**, which an absolutely placed child of a grid takes
+     as its box: a corner is then the map's corner, and a bottom corner sits
+     above the credit rather than over it. Both lines named, since an `auto`
+     end line for such a child is the frame's edge and not the row's. */
+  grid-column: 1 / -1;
+  grid-row: 2 / 3;
 }
 
-/* Zoom in and out are one pair, joined where they meet. */
-[part="zoom-in"] {
+/* **Zoom in and out are one piece**, square where they meet, and the edge
+   between them is zoom in's. Named under the controls, to outrank the
+   corner every button in them takes. */
+[part="controls"] [part="zoom-in"] {
   border-end-end-radius: 0;
   border-end-start-radius: 0;
 }
-[part="zoom-out"] {
+[part="controls"] [part="zoom-out"] {
+  border-block-start: 0;
   border-start-end-radius: 0;
   border-start-start-radius: 0;
   margin-block-start: calc(-1 * var(--helix-space-2xs));
@@ -159,9 +168,9 @@
 
 /* ========================================================= the compass === */
 
-/* **The arrows ring the compass**, up, down, and the sides for panning, and
-   the top corners for turning. A panel behind them is drawn with them, in
-   the corner every floating panel takes. */
+/* **The arrows ring the compass**, where a page adds them: up, down, and the
+   sides for panning, and the top corners for turning. The compass takes the
+   corner every button in the column takes. */
 [part="compass"] {
   border-radius: var(--helix-radii-sm);
   display: grid;
@@ -170,9 +179,6 @@
     "start  north  end"
     ".      down   .";
   place-items: center;
-  transition:
-    background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 [part="rotate-left"] {
@@ -182,7 +188,6 @@
   grid-area: rotr;
 }
 [part="face-north"] {
-  border-radius: var(--helix-radii-full);
   grid-area: north;
 }
 
@@ -196,41 +201,13 @@
   inline-size: calc(var(--helix-size-control-sm) * 0.75);
 }
 
-/* **Shown where the pointer or the keyboard is on the compass**, and hidden
-   the rest of the time, so the column is five buttons and not twelve. Still
-   in the tab order while hidden, so the keyboard reaching one shows them. */
-[part="compass"]:has([part="face-north"]) > :not([part="face-north"]) {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-[part="compass"]:is(:hover, :focus-within) {
+/* **A panel behind the arrows**, where a page asks for them, so they read
+   as one control with the compass. The compass alone is one round button. */
+[part="compass"]:has(> :not([part="face-north"])) {
   background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
   box-shadow:
     var(--helix-shadow-floating),
     0 0 0 var(--helix-border-floating) var(--helix-color-border);
-}
-
-[part="compass"]:is(:hover, :focus-within) > :not([part="face-north"]) {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* **Always shown where nothing can hover**, a phone's screen, since the
-   arrows are the way to move the map there without dragging it. */
-@media (hover: none) {
-  [part="compass"] {
-    background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
-    box-shadow:
-      var(--helix-shadow-floating),
-      0 0 0 var(--helix-border-floating) var(--helix-color-border);
-  }
-
-  [part="compass"]:has([part="face-north"]) > :not([part="face-north"]) {
-    opacity: 1;
-    pointer-events: auto;
-  }
 }
 
 /* The needle turns with the map: north in the danger red a compass paints its

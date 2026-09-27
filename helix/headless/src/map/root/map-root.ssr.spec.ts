@@ -34,7 +34,7 @@ describe('map server output', () => {
     const markup = served()
     expect(partTag(markup, 'zoom-in')).toContain('aria-label="Zoom in"')
     expect(partTag(markup, 'zoom-out')).toContain('aria-label="Zoom out"')
-    expect(rendered(markup, 'helix-headless-map')).toContain('aria-label="Pan up"')
+    expect(partTag(markup, 'face-north')).toContain('aria-label="Face north"')
   })
 
   test('the name is on the host through internals rather than as an attribute', () => {
