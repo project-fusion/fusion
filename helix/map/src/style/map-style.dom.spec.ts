@@ -64,8 +64,9 @@ describe('mapLibreStyle', () => {
   test('landmarks and highway signs name images the style describes, and neighborhoods are in capitals', () => {
     const style = mapLibreStyle(LIGHT)
     const images = style.metadata['helix:images']
-    const landmark = style.layers.find((layer) => layer.id === 'label-landmark')
-    const named = JSON.stringify((landmark?.layout as Record<string, unknown>)['icon-image'])
+    const layoutOf = (id: string): Record<string, unknown> =>
+      (style.layers.find((layer) => layer.id === id)?.layout ?? {}) as Record<string, unknown>
+    const named = JSON.stringify(layoutOf('label-landmark')['icon-image'])
     const ids = Object.keys(images).filter((id) => id.startsWith('helix-landmark-'))
     expect(ids.length).toBeGreaterThan(5)
     for (const id of ids) {
@@ -77,8 +78,7 @@ describe('mapLibreStyle', () => {
       length: 2,
       shape: 'interstate',
     })
-    const neighbourhood = style.layers.find((layer) => layer.id === 'label-neighbourhood')
-    expect((neighbourhood?.layout as Record<string, unknown>)['text-transform']).toBe('uppercase')
+    expect(layoutOf('label-neighbourhood')['text-transform']).toBe('uppercase')
   })
 
   test('draws on the land and reads its tiles and type from OpenFreeMap', () => {
