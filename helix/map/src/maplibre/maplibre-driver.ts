@@ -12,6 +12,7 @@ import {
   type HeightEncoding,
   type HeightTile,
   heightsFrom,
+  joinedAcross,
   tilesCovering,
 } from '../contours/contours.js'
 import type { MapMotion } from '../motion/motion.js'
@@ -793,18 +794,15 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         const known = new Map(
           read.filter((tile) => tile !== undefined).map((tile) => [`${tile.x}/${tile.y}`, tile]),
         )
-        const features: unknown[] = []
+        const traced: ContourLine[] = []
         for (const tile of known.values()) {
           const key = `${spec.src}|${tile.z}/${tile.x}/${tile.y}|${interval}|${unit}`
           let found = lines.get(key)
           if (!found) {
-            const beside = (dx: number, dy: number) =>
-              known.get(`${(tile.x + dx) % 2 ** tile.z}/${tile.y + dy}`)
-            found = contoursOf(tile, interval, unit, {
-              corner: beside(1, 1),
-              east: beside(1, 0),
-              south: beside(0, 1),
-            })
+            const across = 2 ** tile.z
+            found = contoursOf(tile, interval, unit, (dx, dy) =>
+              known.get(`${(tile.x + dx + across) % across}/${tile.y + dy}`),
+            )
             if (lines.size >= 200) {
               lines.delete(lines.keys().next().value as string)
             }
@@ -815,14 +813,13 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
               return
             }
           }
-          for (const line of found) {
-            features.push({
-              geometry: { coordinates: line.coordinates, type: 'LineString' },
-              properties: { elevation: line.elevation, index: line.index },
-              type: 'Feature',
-            })
-          }
+          traced.push(...found)
         }
+        const features = joinedAcross(traced).map((line) => ({
+          geometry: { coordinates: line.coordinates, type: 'LineString' },
+          properties: { elevation: line.elevation, index: line.index },
+          type: 'Feature',
+        }))
         source.setData({ features, type: 'FeatureCollection' } as never)
       }
     }
@@ -1025,6 +1022,10 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           } else {
             try {
               map.addSource(source, { data: NO_LINES, type: 'geojson' } as never)
+              /* One place for both, found before either is added: found
+                 again after the lines, it was under them, and the lines
+                 were drawn across their own labels. */
+              const beneath = underRoads()
               map.addLayer(
                 {
                   id: source,
@@ -1037,7 +1038,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
                   source,
                   type: 'line',
                 } as never,
-                underRoads(),
+                beneath,
               )
               map.addLayer(
                 {
@@ -1045,14 +1046,17 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
                   id: `${source}-label`,
                   layout: {
                     'symbol-placement': 'line',
-                    'symbol-spacing': 320,
+                    /* A label every 200 pixels along a line, where the line
+                       turns by no more than 40 degrees under it: as close as
+                       a printed map sets them, on lines traced from pixels. */
+                    'symbol-spacing': 200,
                     'text-field': [
                       'concat',
                       ['to-string', ['get', 'elevation']],
                       spec.unit === 'feet' ? ' ft' : ' m',
                     ],
                     'text-font': face,
-                    'text-max-angle': 25,
+                    'text-max-angle': 40,
                     'text-size': 10,
                   },
                   paint: {
@@ -1063,7 +1067,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
                   source,
                   type: 'symbol',
                 } as never,
-                underRoads(),
+                beneath,
               )
             } catch {
               continue
