@@ -64,10 +64,22 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   const language = document.documentElement.lang || 'en'
   const styled = (colors: ReturnType<typeof mapColorsFrom>) =>
     mapLibreStyle(colors, { contrast: contrastOf(frame), language }) as never
+  /* **A fixed view where the example gives one**, for a layer with no places
+     to frame, such as buildings seen tilted or radar over a region. Written
+     as `data-preview-map-view="lat,lng,zoom,pitch,bearing"`, the last two
+     optional. */
+  const [lat, lng, zoom, pitch = 0, bearing = 0] = (frame.dataset.previewMapView ?? '')
+    .split(',')
+    .map(Number)
+  const view =
+    Number.isFinite(lat) && Number.isFinite(lng) && Number.isFinite(zoom)
+      ? { bearing, center: [lng, lat] as [number, number], pitch, zoom }
+      : undefined
   const map = new maplibregl.Map({
     attributionControl: false,
     container: box,
     style: styled(mapColorsFrom(frame)),
+    ...view,
   })
   const connection = connectMap(frame, mapLibreDriver(map))
   /* **Every place the map holds, framed at once**: its markers, its
@@ -78,6 +90,9 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
      the fit, so a reader dragging the builder's separator would push the
      places out of view. */
   const frameAround = (): void => {
+    if (view) {
+      return
+    }
     connection.fit({ animate: false, padding: clearOf(box, panel) })
   }
   frameAround()

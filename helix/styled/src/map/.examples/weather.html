@@ -1,0 +1,49 @@
+<!-- @summary Weather radar over Texas for the last 50 minutes, with a button that plays it as a loop. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-flex
+  direction="column"
+  gap="sm"
+>
+  <!-- Preview frame: data-preview-map has the frame connect MapLibre and data-preview-map-view sets the view; on your page, connectMap does, and you set the view on your map. -->
+  <helix-map
+    data-preview-map
+    data-preview-map-view="31,-99,5"
+    label="Weather radar over Texas"
+  >
+    <div data-preview-map-canvas></div>
+
+    <helix-map-raster
+      attribution="NWS radar from the Iowa Environmental Mesonet"
+      description="The last 50 minutes, in 10-minute steps"
+      frames="
+        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m50m/{z}/{x}/{y}.png
+        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m40m/{z}/{x}/{y}.png
+        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m30m/{z}/{x}/{y}.png
+        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m20m/{z}/{x}/{y}.png
+        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913-m10m/{z}/{x}/{y}.png
+        https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png
+      "
+      id="radar"
+      label="Weather radar"
+    ></helix-map-raster>
+  </helix-map>
+
+  <helix-flex>
+    <helix-button id="toggle">Play radar</helix-button>
+  </helix-flex>
+</helix-flex>
+
+<script type="module">
+  const radar = document.getElementById('radar')
+  const toggle = document.getElementById('toggle')
+
+  // The loop starts paused on the latest frame, and the button plays and pauses it.
+  toggle.addEventListener('click', () => {
+    radar.playing = !radar.playing
+    toggle.textContent = radar.playing ? 'Pause radar' : 'Play radar'
+  })
+</script>

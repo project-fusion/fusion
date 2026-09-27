@@ -476,6 +476,56 @@ describe('connectMap with routes and areas', () => {
     expect(typeof drawn[0]?.[0]?.color).toBe('string')
   })
 
+  test('buildings reach the driver as their color alone, and a raster layer as its frames, the last shown', async () => {
+    const host = await frame(
+      `<helix-headless-map-buildings style="color: rgb(9, 9, 9)"></helix-headless-map-buildings>
+       <helix-headless-map-raster label="Radar" frames="a b c" attribution="Radar credit"></helix-headless-map-raster>
+       <helix-headless-map-raster label="One frame" src="x" opacity="3"></helix-headless-map-raster>
+       <helix-headless-map-raster label="Nothing to show"></helix-headless-map-raster>`,
+    )
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    expect(
+      drawn[0]?.map(({ attribution, color, frame, frames, kind, label, opacity }) => ({
+        attribution,
+        color,
+        frame,
+        frames,
+        kind,
+        label,
+        opacity,
+      })),
+    ).toEqual([
+      {
+        attribution: undefined,
+        color: 'rgb(9, 9, 9)',
+        frame: undefined,
+        frames: undefined,
+        kind: 'buildings',
+        label: '3D buildings',
+        opacity: undefined,
+      },
+      {
+        attribution: 'Radar credit',
+        color: expect.any(String),
+        frame: 2,
+        frames: ['a', 'b', 'c'],
+        kind: 'raster',
+        label: 'Radar',
+        opacity: 0.7,
+      },
+      {
+        attribution: undefined,
+        color: expect.any(String),
+        frame: 0,
+        frames: ['x'],
+        kind: 'raster',
+        label: 'One frame',
+        opacity: 1,
+      },
+    ])
+  })
+
   test('a route carries its edge as a casing where the edge is not its own color, and none where it is', async () => {
     const host = await frame(
       `<helix-headless-map-route label="Cased" points="1,2 3,4" style="color: rgb(1, 2, 3); border-color: rgb(250, 250, 250)"></helix-headless-map-route>
