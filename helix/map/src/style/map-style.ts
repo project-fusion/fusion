@@ -1,5 +1,17 @@
+import {
+  bed,
+  firstAid,
+  forkKnife,
+  graduationCap,
+  type HelixIcon,
+  shoppingBag,
+  star,
+  train,
+  tree,
+  trophy,
+} from '@fusion.dev/helix-icons'
 import type { MapColors } from './map-colors.js'
-import { contrast, cssColor, mix, parseColor, type Rgb } from './oklab.js'
+import { contrast, cssColor, mix, parseColor, type Rgb, rehue } from './oklab.js'
 
 /** Where the tiles and the type come from, where not OpenFreeMap, and how legible the type is. */
 export interface MapStyleOptions {
@@ -10,7 +22,14 @@ export interface MapStyleOptions {
    * does not, and one that clears it already keeps its place in the order.
    */
   contrast?: number | undefined
-  /** The font glyphs, a URL with `{fontstack}` and `{range}` in it. */
+  /**
+   * The typeface labels are drawn in, as one CSS font family the page has
+   * loaded, such as what `mapFontFrom` reads from the theme. MapLibre draws
+   * the letters in the page from it, so no glyphs are fetched. Absent, the
+   * labels are Noto Sans from the glyph server.
+   */
+  font?: string | undefined
+  /** The font glyphs, a URL with `{fontstack}` and `{range}` in it, where there is no `font`. */
   glyphs?: string | undefined
   /**
    * Draws the world as a globe when the map is zoomed out, turning into the
@@ -32,7 +51,12 @@ export interface MapStyleOptions {
  * `StyleSpecification` accepts it.
  */
 export interface MapLibreStyle {
-  glyphs: string
+  glyphs?: string
+  /**
+   * What the driver draws for each image the layers name: a landmark's icon
+   * on a disc in its color, and a highway's sign. `helix:images`, by id.
+   */
+  metadata: { 'helix:images': Record<string, MapImage> }
   layers: Array<Record<string, unknown>>
   name: string
   /** How the world is drawn: a globe where the style asks for one. */
@@ -49,9 +73,98 @@ const OPENFREEMAP = {
   tiles: 'https://tiles.openfreemap.org/planet',
 }
 
-const REGULAR = ['Noto Sans Regular']
-const BOLD = ['Noto Sans Bold']
-const ITALIC = ['Noto Sans Italic']
+/**
+ * An image a style names and the driver draws when the map asks for it:
+ * a landmark's icon on a disc, or a highway sign of a shape for its network.
+ */
+export type MapImage =
+  | { color: string; icon: { content: string; viewBox: string }; ink: string; kind: 'landmark' }
+  | {
+      band?: string | undefined
+      edge: string
+      fill: string
+      kind: 'sign'
+      length: number
+      shape: 'interstate' | 'oval' | 'plate' | 'shield'
+    }
+
+/**
+ * Landmarks by what they are, each group an icon and a hue: the schema's
+ * `poi` classes, the kinds a reader looks for on a map. Anything else, a post
+ * box or a fire hydrant, is not drawn.
+ */
+const LANDMARKS: readonly {
+  classes: readonly string[]
+  /** Everyday places, food and shops, which a city has on every block, wait for a closer zoom. */
+  everyday?: true
+  group: string
+  icon: HelixIcon
+  /** Its hue, in degrees round OKLCH's wheel, at the brand's lightness and colorfulness. */
+  hue: number
+}[] = [
+  {
+    classes: ['park', 'garden', 'playground', 'campsite', 'golf', 'zoo'],
+    group: 'nature',
+    hue: 145,
+    icon: tree,
+  },
+  {
+    /* The schema's own class names, spelled as the tiles spell them. */
+    classes: ['museum', 'art_gallery', 'theatre', 'cinema', 'castle', 'monument', 'attraction'], // dialect:quoted
+    group: 'culture',
+    hue: 350,
+    icon: star,
+  },
+  {
+    classes: ['college', 'school', 'university', 'library'],
+    group: 'learning',
+    hue: 65,
+    icon: graduationCap,
+  },
+  {
+    classes: ['restaurant', 'fast_food', 'cafe', 'bar', 'pub', 'beer', 'ice_cream', 'bakery'],
+    everyday: true,
+    group: 'food',
+    hue: 45,
+    icon: forkKnife,
+  },
+  { classes: ['lodging'], group: 'lodging', hue: 300, icon: bed },
+  {
+    classes: ['hospital', 'pharmacy', 'doctors', 'dentist'],
+    group: 'health',
+    hue: 20,
+    icon: firstAid,
+  },
+  {
+    classes: ['railway', 'ferry_terminal', 'aerialway'],
+    group: 'transit',
+    hue: 245,
+    icon: train,
+  },
+  {
+    classes: ['shop', 'grocery', 'clothing_store', 'alcohol_shop'],
+    everyday: true,
+    group: 'shopping',
+    hue: 85,
+    icon: shoppingBag,
+  },
+  { classes: ['stadium', 'pitch', 'swimming'], group: 'sport', hue: 190, icon: trophy },
+]
+
+/**
+ * The highway signs by the schema's `network`: the US Interstate's red and
+ * blue shield, the US route's white shield, a state route's white oval, and
+ * a plate in the map's own colors for every other network. Real signs' colors
+ * for the first three, since a reader knows them by their colors.
+ */
+const SIGNS: Record<string, 'interstate' | 'oval' | 'shield'> = {
+  'us-highway': 'shield',
+  'us-interstate': 'interstate',
+  'us-state': 'oval',
+}
+
+/** An id safe to name an image by, from a color. */
+const idOf = (color: string): string => color.replace(/[^0-9a-z]/gi, '')
 
 /** Width in pixels growing with the zoom, the way a road on paper is drawn wider close up. */
 const widen = (from: [number, number], to: [number, number]): unknown[] => [
@@ -109,6 +222,15 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
   const name = ['coalesce', ['get', `name:${language}`], ['get', 'name:latin'], ['get', 'name']]
   const halo = cssColor(land)
   const target = options.contrast ?? 4.5
+  /* **The theme's typeface, drawn in the page.** With no glyph URL, MapLibre
+     draws each letter from the names in `text-font` as CSS font families and
+     reads the weight from the first, so `Geist Bold, Geist` is Geist at 700. */
+  const face = options.font
+  const REGULAR = face ? [face] : ['Noto Sans Regular']
+  const MEDIUM = face ? [`${face} Medium`, face] : ['Noto Sans Regular']
+  const BOLD = face ? [`${face} Bold`, face] : ['Noto Sans Bold']
+  const ITALIC = face ? [`${face} Italic`, face] : ['Noto Sans Italic']
+  const glyphs = face ? options.glyphs : (options.glyphs ?? OPENFREEMAP.glyphs)
   /* **A label as quiet as it was designed, and no quieter than the target.**
      Each is a step toward the ink, and the step is what orders them, a
      country name quieter than a city's; on a theme whose ink is already
@@ -178,8 +300,73 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
     type: 'symbol',
   })
 
+  /* **A hue for each kind of landmark**, at the brand's lightness and
+     colorfulness: its own hue, so a museum and a hotel are told apart in a
+     theme whose accent is its brand, and the brand's weight, so the set sits
+     in the theme, light or dark. */
+  const hued = (hue: number): Rgb => rehue(brand, hue)
+  const images: Record<string, MapImage> = {}
+  const landmarkImage: unknown[] = ['match', ['get', 'class']]
+  const landmarkColor: unknown[] = ['match', ['get', 'class']]
+  for (const { classes, group, hue, icon } of LANDMARKS) {
+    const color = cssColor(hued(hue))
+    const id = `helix-landmark-${group}-${idOf(color)}`
+    images[id] = {
+      color,
+      icon: { content: icon.content, viewBox: icon.viewBox },
+      ink: halo,
+      kind: 'landmark',
+    }
+    landmarkImage.push([...classes], id)
+    landmarkColor.push([...classes], legible(hued(hue), 0))
+  }
+  landmarkImage.push('')
+  landmarkColor.push(legible(land, 0.6))
+  const classesOf = (everyday: boolean): string[] =>
+    LANDMARKS.filter((one) => (one.everyday === true) === everyday).flatMap(
+      ({ classes }) => classes,
+    )
+  /* The signs, one image per shape and number of characters, which is the
+     schema's `ref_length`, so a sign is as wide as its number. */
+  const plate = { edge: toward(0.5), fill: halo }
+  for (let length = 1; length <= 6; length++) {
+    images[`helix-sign-interstate-${length}`] = {
+      band: '#b31f2e',
+      edge: '#ffffff',
+      fill: '#1b3f8f',
+      kind: 'sign',
+      length,
+      shape: 'interstate',
+    }
+    images[`helix-sign-shield-${length}`] = {
+      edge: '#1a1a1a',
+      fill: '#ffffff',
+      kind: 'sign',
+      length,
+      shape: 'shield',
+    }
+    images[`helix-sign-oval-${length}`] = {
+      edge: '#1a1a1a',
+      fill: '#ffffff',
+      kind: 'sign',
+      length,
+      shape: 'oval',
+    }
+    images[`helix-sign-plate-${idOf(plate.fill + plate.edge)}-${length}`] = {
+      ...plate,
+      kind: 'sign',
+      length,
+      shape: 'plate',
+    }
+  }
+  const signShape: unknown[] = ['match', ['get', 'network']]
+  for (const [network, shape] of Object.entries(SIGNS)) {
+    signShape.push(network, shape)
+  }
+  signShape.push(`plate-${idOf(plate.fill + plate.edge)}`)
+
   return {
-    glyphs: options.glyphs ?? OPENFREEMAP.glyphs,
+    ...(glyphs ? { glyphs } : {}),
     layers: [
       { id: 'land', paint: { 'background-color': cssColor(land) }, type: 'background' },
       {
@@ -375,9 +562,76 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         'source-layer': 'transportation_name',
         type: 'symbol',
       },
+      {
+        filter: [
+          'all',
+          ['has', 'ref'],
+          ['<=', ['get', 'ref_length'], 6],
+          ['match', ['get', 'class'], ['motorway', 'trunk', 'primary'], true, false],
+        ],
+        id: 'label-shield',
+        layout: {
+          'icon-image': [
+            'concat',
+            'helix-sign-',
+            signShape,
+            '-',
+            ['to-string', ['get', 'ref_length']],
+          ],
+          'icon-rotation-alignment': 'viewport',
+          'symbol-placement': 'line',
+          'symbol-spacing': 320,
+          'text-field': ['get', 'ref'],
+          'text-font': BOLD,
+          'text-rotation-alignment': 'viewport',
+          'text-size': 10,
+        },
+        minzoom: 7,
+        paint: {
+          'text-color': [
+            'match',
+            ['get', 'network'],
+            'us-interstate',
+            '#ffffff',
+            'us-highway',
+            '#1a1a1a',
+            'us-state',
+            '#1a1a1a',
+            cssColor(ink),
+          ],
+        },
+        source: 'openmaptiles',
+        'source-layer': 'transportation_name',
+        type: 'symbol',
+      },
+      ...[false, true].map((everyday) => ({
+        /* **Landmarks**: an icon on a disc in the hue of what the place is,
+           and its name beside it in the same hue, the most important first
+           where they would meet, and none without its name. A city's food
+           and shops, which are on every block, wait for a closer zoom than
+           its parks, museums, schools, and stations. */
+        filter: ['match', ['get', 'class'], classesOf(everyday), true, false],
+        id: everyday ? 'label-landmark-everyday' : 'label-landmark',
+        layout: {
+          'icon-image': landmarkImage,
+          'symbol-sort-key': ['get', 'rank'],
+          'text-anchor': 'left',
+          'text-field': name,
+          'text-font': MEDIUM,
+          'text-justify': 'left',
+          'text-max-width': 8,
+          'text-offset': [1.1, 0],
+          'text-size': 11,
+        },
+        minzoom: everyday ? 16 : 14,
+        paint: { 'text-color': landmarkColor, 'text-halo-color': halo, 'text-halo-width': 1.5 },
+        source: 'openmaptiles',
+        'source-layer': 'poi',
+        type: 'symbol',
+      })),
       place(
         'label-village',
-        ['match', ['get', 'class'], ['village', 'hamlet', 'suburb', 'neighbourhood'], true, false],
+        ['match', ['get', 'class'], ['village', 'hamlet'], true, false],
         0.65,
         [
           [10, 10],
@@ -386,6 +640,29 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         REGULAR,
         11,
       ),
+      {
+        /* **Neighborhoods in spaced capitals**, quieter than the towns, as
+           a map names a district rather than a place to go. */
+        ...place(
+          'label-neighbourhood',
+          ['match', ['get', 'class'], ['suburb', 'neighbourhood', 'quarter'], true, false],
+          0.55,
+          [
+            [11, 9],
+            [16, 13],
+          ],
+          MEDIUM,
+          11,
+        ),
+        layout: {
+          'text-field': name,
+          'text-font': MEDIUM,
+          'text-letter-spacing': 0.12,
+          'text-max-width': 8,
+          'text-size': ['interpolate', ['linear'], ['zoom'], 11, 9, 16, 13],
+          'text-transform': 'uppercase',
+        },
+      },
       place(
         'label-town',
         ['==', ['get', 'class'], 'town'],
@@ -431,6 +708,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         2,
       ),
     ],
+    metadata: { 'helix:images': images },
     name: 'Helix',
     ...(options.globe
       ? {

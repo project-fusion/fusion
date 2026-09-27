@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { cssColor, mix, parseColor } from './oklab.js'
+import { contrast, cssColor, mix, parseColor, rehue } from './oklab.js'
 
 describe('the color arithmetic', () => {
   test('reads hex and rgb in the forms a style is handed', () => {
@@ -22,5 +22,16 @@ describe('the color arithmetic', () => {
     expect(cssColor(mix(black, white, 1))).toBe('rgb(255, 255, 255)')
     // What `color-mix(in oklab, black, white)` gives, lightness 0.5 in OKLab.
     expect(cssColor(mix(black, white, 0.5))).toBe('rgb(99, 99, 99)')
+  })
+
+  test('a color turned to another hue keeps how light it is, and a gray still takes a hue', () => {
+    const brand = parseColor('#2563eb') as NonNullable<ReturnType<typeof parseColor>>
+    const white = parseColor('#ffffff') as NonNullable<ReturnType<typeof parseColor>>
+    const pink = rehue(brand, 350)
+    // As far from white as the brand is, to within a little of the gamut's clipping.
+    expect(Math.abs(contrast(pink, white) - contrast(brand, white))).toBeLessThan(0.6)
+    expect(pink.red).toBeGreaterThan(pink.blue)
+    const gray = rehue(parseColor('#777777') as typeof brand, 145)
+    expect(gray.green).toBeGreaterThan(gray.red)
   })
 })
