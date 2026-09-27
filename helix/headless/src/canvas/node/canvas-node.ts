@@ -24,38 +24,33 @@ const DRAWN = [
  * @summary One card or group on a canvas.
  *
  * @description
- * **Markup rather than an entry in an array**, which is the rule
- * `VideoPlaylist` writes out: an array handed to a custom element is missing
- * from the first paint of every server-rendered React page, because React skips
- * the properties it would have to apply imperatively while hydrating. A card
- * written as an element is in the served HTML whichever renderer wrote it, and
- * what is inside it is the consumer's own DOM rather than a string this
- * component parses.
+ * A card is an element in the markup, the rule `VideoPlaylist` also follows. An
+ * array passed to a custom element is missing from the first paint of every
+ * server-rendered React page, because React skips the properties it would have
+ * to set imperatively during hydration. A card element is in the served HTML
+ * whichever renderer wrote it, and its contents are your own DOM.
  *
- * **Where it sits is data**, which is what makes a canvas a canvas: somebody
- * placed this card and the placement carries meaning, so `x` and `y` are given
- * rather than computed. The board reads them and places the card; a page with
- * no JavaScript has the cards and their text and not the arrangement, which is
- * the honest half of what a board can promise before it hydrates.
+ * Set `x` and `y` to place the card. On a canvas the placement carries meaning,
+ * so positions are given and never computed. The board reads them and places
+ * the card. Without JavaScript, the page shows the cards and their text without
+ * the arrangement.
  *
- * **Named by `name`, which only has to be unique on its board**, the way a
- * form control's is in its form. An `id` has to be unique on the whole page,
- * and two boards written from one template, or one board shown twice, would
- * each have a card called `write` with no way to say which one a connection
- * meant. `id` is left for the page, which can still use it.
+ * `name` identifies the card and only has to be unique on its board, like a
+ * form control's name in its form. An `id` must be unique on the whole page,
+ * which fails when two boards come from one template or one board is shown
+ * twice. `id` stays free for your own use.
  *
- * **What it holds is the consumer's**, which is why there is no card type any
- * more: a card of text is text, a link is a link they put inside it, a file is
- * whatever they show for one. The one kind the board treats differently is a
- * group, a box drawn behind the cards inside it, and `group` says so. JSON
- * Canvas's four types are mapped by `fromJsonCanvas` on the way in.
+ * The card holds your content, and there is no card type. Text is text, a link
+ * is a link you put inside the card, and a file is whatever you show for one.
+ * The board treats one kind differently: a group, drawn as a box behind the
+ * cards inside it. Set `group` for a group. `fromJsonCanvas` maps the four JSON
+ * Canvas node types on the way in.
  *
- * **The card is the way around the board, for a reader who cannot see it.** The
- * board keeps one tab stop among its cards, arrow keys walk them in reading
- * order, and the one a reader lands on is brought into view. What it connects
- * to is read out with it, so the arrows between cards are heard as well as
- * seen. That replaced a list of every card under the board, which said the same
- * thing twice to a sighted reader and took a row from the board to do it.
+ * The cards are how you move around the board with a keyboard or a screen
+ * reader. The board keeps one tab stop among its cards, the arrow keys move
+ * through them in reading order, and the card you land on scrolls into view.
+ * Its connections are announced with it, so a screen reader reads the arrows
+ * between cards.
  *
  * @since 0.100.0
  * @status experimental

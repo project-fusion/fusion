@@ -7,11 +7,10 @@ import { styles } from './chat-composer.css.js'
  * @summary A field for writing a turn in a conversation.
  *
  * @description
- * One row, and the field takes the room. **It grows with the text and stops at a
- * ceiling**, through `field-sizing: content` rather than a script measuring
- * anything: where that is not supported the field keeps its rows and scrolls,
- * which is the answer a textarea has always given. A composer that grows without
- * a ceiling eats the transcript it belongs to.
+ * The composer is one row, and the field takes the remaining width. The field
+ * grows with its text up to a maximum height, through `field-sizing: content`.
+ * Where that is not supported, the field keeps its rows and scrolls. The
+ * maximum height keeps the composer from covering the transcript.
  *
  * @since 0.1.0
  * @status stable

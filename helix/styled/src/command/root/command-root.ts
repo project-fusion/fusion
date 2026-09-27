@@ -9,11 +9,10 @@ import { styles } from './command-root.css.js'
  * @summary A command palette: a list of commands that opens from anywhere on the page and filters as you type.
  *
  * @description
- * The palette is a dialog holding a filterable listbox, so what this tier adds
- * is where that dialog sits and how the list reads inside it. It opens against
- * the top of the window rather than centered, which is where every palette a
- * reader has used opens: a list that grows and shrinks as it is filtered would
- * otherwise walk up and down the screen under the words being typed.
+ * The palette is a dialog holding a filterable listbox. This tier sets where
+ * the dialog sits and how the list looks inside it. The dialog opens near the
+ * top of the window, so the text field stays in place while the list grows and
+ * shrinks as you type.
  *
  * @since 0.1.0
  * @status stable

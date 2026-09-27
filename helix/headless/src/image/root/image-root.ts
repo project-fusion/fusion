@@ -6,15 +6,13 @@ import { property, state } from 'lit/decorators.js'
  * @summary An image that shows a placeholder while it loads and a fallback if it fails.
  *
  * @description
- * **An element rather than a recipe, because of the part CSS cannot do.**
- * Reserving the box is `aspect-ratio` and needs nothing from anybody. What
- * cannot be written as a rule is *when the picture arrived*: a stylesheet has
- * no way to know, and no way to hear that it never will. So this owns three
- * states and the two events that move between them, and leaves the box to the
- * stylesheet.
+ * Image handles the part CSS cannot: when the picture has loaded, or that it
+ * failed. `aspect-ratio` in your stylesheet reserves the box. The element
+ * tracks three states and relays the two events that move between them, and
+ * leaves the box to the stylesheet.
  *
- * **The placeholder is a slot with nothing in it by default.** A default of
- * `Skeleton` would make this tier depend on a component it does not ship.
+ * The `placeholder` slot is empty by default, so the headless tier does not
+ * depend on `Skeleton`, which it does not ship.
  *
  * @since 0.1.0
  * @status stable

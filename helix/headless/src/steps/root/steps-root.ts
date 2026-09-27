@@ -13,16 +13,13 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * @summary A sequence of stages that shows which stage the user is on.
  *
  * @description
- * **`active` names where the reader is. `complete` stays on each step.** Only
- * one of them is positional: return to stage one of three and stages one and
- * two are still finished, where "everything before the active one" says only
- * the first is. So this element drives `current` and never touches `complete`.
+ * `active` sets where the user is, and `complete` stays on each step. Returning
+ * to stage one of three leaves stages one and two finished, so the root sets
+ * `current` on the steps and never changes `complete`.
  *
- * **`active` is optional, and a sequence without it still renders.** Left
- * unset, each step's own `current` stands, which is what lets the whole
- * sequence be right in the server's markup: this element would have to count
- * its slotted children to know which is third, and the server has none to
- * count.
+ * `active` is optional. Without it, each step keeps its own `current`, so the
+ * sequence is correct in the server's markup, where the root cannot count its
+ * slotted children.
  *
  * @since 0.1.0
  * @status stable

@@ -7,10 +7,9 @@ import { styles } from './blockquote-root.css.js'
  * @summary A passage set off from the prose around it.
  *
  * @description
- * Set larger than body text on the display face, because a pulled quotation is
- * a change of voice and the type is what says so. No quotation marks are drawn:
- * the size and the space around it already set the passage apart, and marks on
- * top of that are the same thing said twice.
+ * Set in the display face, larger than body text, to mark a change of voice. No
+ * quotation marks are drawn, because the size and spacing already set the
+ * passage apart.
  *
  * @since 0.1.0
  * @status stable

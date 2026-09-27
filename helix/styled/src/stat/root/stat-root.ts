@@ -7,10 +7,9 @@ import { styles } from './stat-root.css.js'
  * @summary One measurement, with a label that names what it measures.
  *
  * @description
- * The value is set on the display face at a size the type scale does not reach,
- * because a figure is the one place on a page where the number is the design.
- * The label sits above it in the label ramp, quiet and wide-tracked, so the
- * pair reads as one object rather than as two lines of text.
+ * The value uses the display typeface at a size above the type scale, because
+ * the figure is the focus. The label sits above it in the label style, small
+ * and widely tracked, so the pair reads as one unit.
  *
  * @since 0.1.0
  * @status stable

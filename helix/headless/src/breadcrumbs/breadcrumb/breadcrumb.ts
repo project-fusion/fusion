@@ -8,30 +8,21 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One step in a breadcrumb trail.
  *
  * @description
- * Contributes the separator, the list-item role, and the link itself where one
- * is wanted.
+ * Each crumb renders its separator and sets its list-item role. It hides its
+ * own separator with `:host(:first-child)`, so the trail needs no index from
+ * the parent.
  *
- * **`href` makes the crumb the link.** A router cannot reach an anchor inside a
- * shadow root, and the consumer restores the soft navigation by intercepting the
- * click on the way out, which is what `Tree.Item` and `List.Item` both do. What
- * the anchor buys is the whole crumb as a target, Enter, middle click, the
- * status bar, and a trail that works before any JavaScript runs.
+ * Set `href` to make the whole crumb an anchor, which works with Enter, middle
+ * click, and the status bar, and before any JavaScript runs. A router cannot
+ * reach an anchor inside a shadow root, so intercept the click for client-side
+ * navigation, as with `Tree.Item` and `List.Item`. A trail that collapses also
+ * reads `href` to rebuild its hidden crumbs elsewhere.
  *
- * **And the parent needs it.** A trail that collapses has to rebuild its hidden
- * crumbs somewhere else, which means reading each one's destination. From a
- * property that is a read; from a consumer's slotted markup it is a hunt for an
- * anchor and a guess about which element is the link.
+ * Without `href`, the crumb renders a plain `<span>` around what you slot,
+ * including your own anchor.
  *
- * A crumb with no `href` is unchanged: the consumer slots whatever they like,
- * including their own anchor, and this renders a plain `<span>` around it.
- *
- * Each item renders its own separator and hides it with `:host(:first-child)`,
- * so the trail needs no index and no coordination from the parent. `:host()`
- * takes a structural pseudo-class, unlike `:has()`, which it rejects.
- *
- * The current page is text, not a link. Linking a page to itself is a known
- * screen-reader annoyance, and `aria-current="page"` on the host is what
- * conveys position.
+ * The current page is plain text, and `aria-current="page"` on the host conveys
+ * the position.
  *
  * @since 0.1.0
  * @status stable

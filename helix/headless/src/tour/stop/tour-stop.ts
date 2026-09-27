@@ -17,34 +17,25 @@ import '../../button/index.js'
  * @summary One stop on a tour: the element it points at, and a panel of content about it.
  *
  * @description
- * A stop names a target with `for` and holds whatever the consumer puts in it.
- * It owns no content of its own, which is the whole shape of this family: the
- * tour abstracts the three things that are genuinely hard, and the words are
- * the consumer's.
+ * A stop names its target with `for` and holds the content you put in it. The
+ * stop handles three things:
  *
- * What it does own:
+ * - **Placement.** The panel is anchored to the target by the same floating
+ *   positioning as the other Helix overlays.
+ * - **Stacking.** The panel is a popover, so it is in the top layer and shows
+ *   above dialogs, scrolling regions, and other stacking contexts.
+ * - **Visibility.** The stop shows when it is `current`, which the root sets.
  *
- * - **Where the panel goes.** Anchored to the target through the same floating
- *   pass every other overlay here uses.
- * - **That it is on top.** A popover, so it is in the top layer. A tour points
- *   at things inside dialogs, inside scrollers, inside anything with a stacking
- *   context, and a panel in the ordinary flow loses to all three.
- * - **When it shows.** Which is `current`, and which the root decides.
+ * Put any content in the stop, such as a `Card`, or a heading and a line of
+ * text. There are no fixed title or body parts.
  *
- * What it does not own is the heading, the paragraph, the picture and the
- * layout. Slot a `Card`, or a heading and a line of prose, or anything else.
- * Fixed `title` and `body` parts would be a component deciding what a tour is
- * allowed to say.
+ * **The buttons are slot fallback.** With nothing in the `actions` slot, you
+ * get Back, Next, and Skip, already wired. Slot your own `actions` and drive
+ * them with `next()`, `back()`, and `skip()` on the root.
  *
- * **The buttons are slot fallback, so the common case costs nothing and the
- * uncommon one is possible.** Write nothing and get Back, Next and Skip already
- * wired. Slot `actions` and they are yours, driven by `next()`, `back()` and
- * `skip()` on the root, which are public for exactly that.
- *
- * **`for` is an id, the same as `Tooltip`'s.** The target is elsewhere on the
- * page, and an id is the one reference a consumer can write in markup without
- * holding an element. Resolved against the root node, so a stop inside a shadow
- * tree points at a target in that tree.
+ * **`for` is an id, as with `Tooltip`**, so you can point at a target elsewhere
+ * on the page from markup. It resolves against the stop's root node, so a stop
+ * inside a shadow tree points at a target in that tree.
  *
  * @since 0.1.0
  * @status stable

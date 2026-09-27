@@ -14,16 +14,14 @@ const CONFIRM = 1600
  * @summary A button that copies a string to the clipboard and confirms the copy.
  *
  * @description
- * **The confirmation is the component.** Writing to the clipboard is three
- * lines; what makes this worth an element is that the platform gives a reader
- * no feedback at all, so a press that copies looks identical to one that
- * failed.
+ * Copies text to the clipboard and confirms the copy. The platform gives no
+ * feedback for a clipboard write, so without a confirmation a press that copies
+ * looks the same as one that fails.
  *
- * **Announced after the write, never before.** A clipboard write is a
- * permission the browser may refuse, for real reasons: an insecure origin, a
- * document that is not focused, a gesture that did not qualify. The
- * confirmation and the event both wait for the promise, and a refusal leaves
- * the button exactly as it was.
+ * The confirmation and the event wait for the write to finish. The browser can
+ * refuse a clipboard write, for example on an insecure origin, in a document
+ * that is not focused, or after a gesture that does not qualify. A refused
+ * write leaves the button unchanged.
  *
  * @since 0.1.0
  * @status stable

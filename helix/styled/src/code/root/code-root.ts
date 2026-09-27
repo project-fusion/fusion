@@ -7,8 +7,9 @@ import { styles } from './code-root.css.js'
  * @summary A fragment of code inside a line of prose.
  *
  * @description
- * A step down the scale, because a monospace face reads larger than the prose
- * around it at the same nominal size. `--code-size` overrides it.
+ * The text is one step smaller than the prose around it, because a monospace
+ * face looks larger than proportional text at the same nominal size. Set
+ * `--code-size` to change it.
  *
  * @since 0.1.0
  * @status stable

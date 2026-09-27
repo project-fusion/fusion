@@ -9,25 +9,19 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  * @summary A scrolling box that shows which edges have more content past them.
  *
  * @description
- * **The whole component is one fact a stylesheet cannot work out for itself:
- * which edges have content past them.** A fade at the bottom of a list is easy
- * to draw and impossible to decide, because CSS has no reading of scroll
- * position. So this measures and says, in a custom state per edge, and the
- * styled tier draws whatever it likes on the edges named.
+ * Measures which edges have content past them and sets one custom state per
+ * edge. CSS cannot read scroll position, so a stylesheet cannot work this out
+ * on its own. The styled tier draws a fade on each edge that has a state.
  *
- * **States rather than attributes**, so an element that upgrades after a
- * framework rendered its markup does not hand that framework markup it did not
- * write. A stylesheet asks `:host(:state(more-block-end))`.
+ * Custom states keep an element that upgrades after a framework rendered it
+ * from adding markup the framework did not write. Select them with
+ * `:host(:state(more-block-end))`.
  *
- * **A scrolling region takes the keyboard when it scrolls, and not before.**
- * A box a reader can only reach with a pointer is a box some readers cannot
- * read at all, which is what `tabindex` answers here. Only while it overflows:
- * a tab stop on a box with nothing to scroll is a stop that does nothing, and a
- * form full of them is worse than the problem.
+ * While the content overflows, the region gets a `tabindex`, so keyboard users
+ * can scroll it. When nothing overflows, it is not a tab stop.
  *
- * `role="region"` only with a `label`, because an unnamed region is an
- * announcement with no content: a screen reader says "region" and the reader
- * has learned nothing they did not already know.
+ * It has `role="region"` only when you set a `label`, because a screen reader
+ * announces an unnamed region as only "region".
  *
  * @since 0.1.0
  * @status stable

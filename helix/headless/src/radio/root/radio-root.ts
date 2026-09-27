@@ -6,20 +6,18 @@ import { property } from 'lit/decorators.js'
  * @summary One choice in a radio group.
  *
  * @description
- * Renders a `<button role="radio">`, not an `<input type="radio">`, and the
- * reason is the shadow boundary rather than preference: native radios group by
- * sharing a `name` within a form, and a radio inside a shadow root cannot join
- * a group on the other side of it. The group is the form control here, so the
- * option only has to say what it is and announce when it is chosen.
+ * Renders a `<button role="radio">`. Native radios group by sharing a `name`
+ * within a form, and a radio inside a shadow root cannot join a group outside
+ * it. The group is the form control, so each radio only exposes its role and
+ * dispatches an event when it is chosen.
  *
- * **It carries no label of its own.** A radio is named by the words beside it,
- * which is its own content, and the label, hint and message of the *set* belong
- * to the group. This is the one control in the family that takes nothing from
- * `MixinField`, because a lone radio is not a control: it is an answer to one.
+ * The radio has no label of its own. Its content names it, and the label, the
+ * hint, and the message of the set belong to the group. It is the only control
+ * in the family that takes nothing from `MixinField`.
  *
- * Selection is announced rather than applied. The item dispatches, the group
- * decides, and the group writes `selected` back. An item that set itself would
- * be a second source of truth for which one is on.
+ * When a radio is chosen, it dispatches an event, the group determines whether
+ * the choice stands, and the group writes `selected` back. The group is the one
+ * source of which radio is on.
  *
  * @since 0.1.0
  * @status stable

@@ -24,16 +24,16 @@ export const initialsOf = (name: string): string => {
  * @summary A person or entity, shown as an image or as their initials.
  *
  * @description
- * Shows `src` until it fails to load. Without an image, or after a failure,
- * the default slot is shown; its own fallback is the initials.
+ * Shows `src` until it fails to load. Without an image, or after a failure, the
+ * default slot is shown, and its own fallback is the initials.
  *
- * The host carries the accessible name, taken from `name`, so the `<img>` has an
- * empty `alt` and the initials are hidden from assistive technology. Announcing
- * either would repeat the name. An `aria-label` on the host overrides `name`,
- * for an avatar standing for something a person's name does not describe.
+ * The host carries the accessible name, taken from `name`. The `<img>` has an
+ * empty `alt` and the initials are hidden from assistive technology, so the
+ * name is announced once. Set `aria-label` on the host to override `name` when
+ * a person's name does not describe what the avatar stands for.
  *
- * `load` and `error` are relayed from the host. They are not composed, so they
- * stop at the shadow boundary otherwise.
+ * `load` and `error` are re-dispatched from the host, because they are not
+ * composed and would otherwise stop at the shadow boundary.
  *
  * @since 0.1.0
  * @status stable

@@ -7,8 +7,8 @@ import { styles } from './description-list-item.css.js'
  * @summary One label and its value.
  *
  * @description
- * A subgrid of the list, so the label and value stay one element, and one pair
- * to a screen reader, while lining up with every other pair in the list.
+ * Each item is a subgrid of the list, so the label and value stay one element,
+ * and one pair to a screen reader, while lining up with every other pair.
  *
  * @since 0.1.0
  * @status stable

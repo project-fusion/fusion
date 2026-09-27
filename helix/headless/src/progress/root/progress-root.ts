@@ -6,16 +6,16 @@ import { property } from 'lit/decorators.js'
  * @summary A bar or ring that shows how far along a task is.
  *
  * @description
- * Determinate by default, and `indeterminate` for a task whose total is not
- * known yet. `Loader` is still right where the wait is short or has no place of
- * its own on the page.
+ * Determinate by default. Set `indeterminate` for a task whose total is not
+ * known yet. Use `Loader` for a short wait or one with no place of its own on
+ * the page.
  *
- * A bar that fills at a made-up rate would be a bar that lies, so the
- * indeterminate one does not fill: it runs a segment across the track, which
- * says work is happening and claims no proportion. `aria-valuenow` is omitted
- * with it, which is the platform's own signal for the same thing.
+ * The indeterminate bar runs a segment across the track and does not fill, so
+ * it shows that work is happening without claiming a proportion.
+ * `aria-valuenow` is omitted in that state, which is the platform's signal for
+ * the same thing.
  *
- * **The fill is a fraction of the track, written as a custom property.**
+ * The fill is a fraction of the track, written as a custom property.
  *
  * @since 0.1.0
  * @status stable

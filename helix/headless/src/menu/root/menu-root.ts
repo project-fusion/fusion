@@ -22,22 +22,18 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @summary A menu of commands that opens from a trigger.
  *
  * @description
- * The trigger is slotted and stays the consumer's own element, the same way the
- * tooltip takes one. The surface is rendered here, in the top layer through the
- * popover API, so it clears any ancestor with `overflow: hidden` without a
- * `z-index` anywhere.
+ * The trigger is slotted and stays your own element, as with the tooltip. The
+ * menu renders its surface in the top layer with the popover API, so an
+ * ancestor with `overflow: hidden` does not clip it and it needs no `z-index`.
  *
- * **It drills down rather than flying out.** A submenu replaces what is on
- * screen and a back row returns, instead of opening a second panel beside the
- * first. Panels beside panels need a diagonal path a pointer has to travel
- * without straying, they run off the edge of a narrow window, and on a touch
- * screen there is no hover to open them with at all. One panel that changes
- * what it holds has none of those problems and reads the same on a phone.
+ * Submenus drill down. A submenu replaces the panel's content, and a back row
+ * returns to the previous page. One panel avoids the diagonal pointer path that
+ * side-by-side panels need, stays inside a narrow window, and works on touch
+ * screens, which have no hover.
  *
- * The open page is held here rather than in each item, because only one page
- * shows at a time and something has to know which. Items are told by property,
- * not by attribute: an attribute written onto a consumer's element after it
- * upgrades is a hydration mismatch waiting to happen.
+ * The root holds which page is open, because only one page shows at a time. It
+ * sets this on items as a property, never as an attribute. An attribute written
+ * onto your element after it upgrades causes a hydration mismatch.
  *
  * @since 0.1.0
  * @status stable

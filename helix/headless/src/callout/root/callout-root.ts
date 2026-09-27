@@ -7,21 +7,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary A passage set apart as information, a warning, or an error.
  *
  * @description
- * `tone` lives on the headless tier rather than being a treatment on the styled
- * one, because it is meaning and not decoration. It picks the icon and that
- * icon's accessible name, so a reader who cannot see that the box is red still
- * hears "Error". A callout whose meaning existed only as a color would say
- * nothing to them at all.
+ * `tone` is on the headless tier because it carries meaning. It picks the icon
+ * and the icon's accessible name, so a screen reader announces "Error" for an
+ * error callout whether or not the color is seen.
  *
- * The icon is the fallback content of a slot, so a consumer replaces it by
- * slotting their own and the default disappears with no emptiness check. That
- * is what slot fallback is for.
+ * The icon is the fallback content of a slot. Slot your own icon to replace it,
+ * and the default disappears with no extra check.
  *
- * Not an `Announcement`, which is the other thing this could be mistaken for.
- * A callout interrupts a document to set a passage apart and is read where it
- * sits; an announcement is page-level chrome above the masthead, announces
- * itself as a live region, and can be dismissed. Neither is a variant of the
- * other.
+ * A callout sets a passage apart inside a document and is read where it sits.
+ * For page-level chrome above the masthead that is a live region and can be
+ * dismissed, use `Announcement`.
  *
  * @since 0.1.0
  * @status stable

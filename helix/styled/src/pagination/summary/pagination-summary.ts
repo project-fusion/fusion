@@ -7,9 +7,8 @@ import { styles } from './pagination-summary.css.js'
  * @summary Text that shows which items are on the current page, out of the total.
  *
  * @description
- * Prose beside the controls rather than one of them: no box and no hover, in the
- * subtler of the two muted steps, because it is a fact about the result and not
- * a way to move through it.
+ * Plain text beside the controls, with no box and no hover, in the lighter of
+ * the two muted colors. It reports the result and is not a control.
  *
  * @since 0.1.0
  * @status stable

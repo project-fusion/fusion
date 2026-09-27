@@ -49,20 +49,18 @@ interface EyeDropperConstructor {
  * @summary A color picker made of a square and two ramps.
  *
  * @description
- * **The picker itself, with no field around it.** Color Input is this element
- * in a panel behind a text field; a settings pane or a toolbar wants the picker
- * flat on the page with nothing to open.
+ * The picker on its own, with no field around it, for a settings pane or a
+ * toolbar. Color Input shows this element in a panel behind a text field.
  *
- * **The square is two real range inputs.** Saturation and brightness are each
- * an `<input type="range">`, laid over the square and made invisible, and the
- * handle is drawn from their values. The keyboard, the announcements and the
- * touch targets are the platform's, and there is no `role="application"`.
+ * The saturation and brightness square is two `<input type="range">` elements,
+ * laid over the square and made invisible, and the handle is drawn from their
+ * values. The keyboard behavior, the announcements, and the touch targets come
+ * from the platform, and there is no `role="application"`.
  *
- * **The working model is HSB, and the value is derived from it.** The reverse
- * loses colors: black is `brightness: 0`, whose hue and saturation are both
- * undefined, so dragging to the bottom of the square and back would give gray
- * where there had been red. A value arriving from outside is read into the
- * model once.
+ * The picker works in HSB and derives the value from it. A value set from
+ * outside is read into the model once. Black is `brightness: 0`, which has no
+ * hue or saturation, so a model read back from the value would turn red into
+ * gray after you drag to the bottom of the square and back.
  *
  * @since 0.1.0
  * @status stable

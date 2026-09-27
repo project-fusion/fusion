@@ -8,9 +8,8 @@ import { styles } from './skeleton-root.css.js'
  * @summary A placeholder shown in place of content that is still loading.
  *
  * @description
- * A sweep rather than a pulse. A block fading in and out reads as something
- * broken; a highlight traveling across it reads as work in progress, and it is
- * the same one property animating either way.
+ * Animates a highlight sweeping across the block, which reads as work in
+ * progress. A block fading in and out can look broken.
  *
  * @since 0.1.0
  * @status stable

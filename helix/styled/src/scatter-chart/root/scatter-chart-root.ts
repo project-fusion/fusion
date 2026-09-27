@@ -11,35 +11,24 @@ import '../../tooltip/index.js'
  *
  * @description
  * The points take the series palette in order, so a table with one column
- * measured up is series one and a table with three is the first three.
+ * measured up uses the first color and a table with three uses the first three.
  *
- * Each point has a ring of the page around it and stops short of opaque, so a
- * dense cluster reads as dense rather than as one blot, and two points that
- * overlap each keep their edge.
+ * Each point has a ring in the page background color and is slightly
+ * transparent, so a dense cluster looks dense and overlapping points keep their
+ * edges.
  *
- * **No visual axis applies here, and that is the answer rather than a gap.**
- * Both refusals come out of that sentence, and both were argued in the
- * stylesheet before they were argued anywhere a reader looks.
+ * No visual axis applies to the scatter chart, including `emphasis` and
+ * `material`, because the points' opacity already carries data:
  *
- * `emphasis` is how much ink a mark claims, and on a scatter that channel is
- * already carrying data. The points rest at 0.8 so that where they pile up they
- * compound: how dark a region is *is* how many rows are in it, which is most of
- * what a reader is looking at a scatter to see and is the one thing a table of
- * the same numbers hides. `solid` flattens a dense cluster and a sparse one into
- * the same picture; `outlined` replaces the pile with overlapping rings, which
- * reads as texture rather than as count. An axis whose two ends each cost the
- * drawing its density is not a treatment, it is a second meaning for a property
- * the chart already spends.
+ * - The points rest at 0.8 opacity, so where they overlap they darken, and a
+ *   darker region has more rows. `solid` would make dense and sparse clusters
+ *   look the same, and `outlined` would turn a cluster into overlapping rings
+ *   that do not show the count.
+ * - Translucency shows density, so `glass` and `frosted` would make each point
+ *   count for less.
  *
- * `material` is the same refusal said once more. Translucency is the density
- * channel here, so `glass` and `frosted` are two more named stops on a scale
- * the data is using, and a point admitting the page through is a point that
- * counts for less than one.
- *
- * What stays adjustable is `--scatter-chart-point-opacity`, and it is a
- * continuum rather than an axis: a chart drawn over a busier ground wants a
- * different resting density, and that is a fact about the ground rather than a
- * claim about the points.
+ * To adjust the resting opacity, for example on a busier background, set
+ * `--scatter-chart-point-opacity`.
  *
  * @since 0.1.0
  * @status stable

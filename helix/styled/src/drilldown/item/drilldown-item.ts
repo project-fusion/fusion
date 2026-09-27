@@ -7,9 +7,8 @@ import { styles } from './drilldown-item.css.js'
  * @summary One row of a drill-down, which can open a page of its own.
  *
  * @description
- * A row is a full-width band rather than an inset pill, for the reason the
- * select's options are: it reaches both edges of the panel, so a highlight
- * lines up with the edge the eye is already following down the list.
+ * Each row is a full-width band that reaches both edges of the panel, like the
+ * options in a select, so the highlight lines up with the edge of the list.
  *
  * @since 0.1.0
  * @status stable

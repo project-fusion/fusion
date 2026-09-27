@@ -8,29 +8,19 @@ import { styles } from './pagination-root.css.js'
  * @summary Controls for moving between the pages of a long set of results.
  *
  * @description
- * One box for every control in the row, arrows and numbers alike, so the run has
- * a single rhythm and the steps sit at the numbers' height rather than between
- * them. Square, because a page number is one or two characters and a box sized
- * to the widest would leave the short ones swimming; `min-inline-size` rather
- * than a fixed one, so page 100 grows instead of overflowing.
+ * Every control in the row, arrows and numbers alike, uses the same box, so the
+ * row has one rhythm. Boxes are square with a `min-inline-size`, so page 100
+ * grows wider and does not overflow.
  *
- * Figures are tabular throughout. A page number is the one thing here that
- * changes under the pointer, and proportional digits make the whole row shuffle
- * as it does.
+ * Figures are tabular, so the row does not shift as the page number changes.
  *
- * The current page is a raised chip rather than a brand fill, which is the
- * treatment `Tabs` gives its selected tab. Brand on a page number claims more
- * than the state deserves: it is not a choice the reader made about anything,
- * it is where they happen to be standing, and a row of gray numbers with one
- * blue one reads as the blue one being an action.
+ * The current page is a raised chip, the same treatment `Tabs` gives its
+ * selected tab. A brand fill would make the current page look like an action.
+ * It is styled from `aria-current`, so there is no second attribute to keep in
+ * sync.
  *
- * Selected on `aria-current` rather than on a second attribute saying the same
- * thing: the state is already in the accessibility tree, and a `data-current`
- * beside it would be two places to keep in step.
- *
- * The gap takes the same box as everything else in the row and only sits back a
- * shade in color. It is a control, so it answers hover and focus like one; it
- * is a way through rather than a destination, so it does not compete.
+ * A gap uses the same box in a slightly muted color. It responds to hover and
+ * focus like any control, and it does not stand out from the numbers.
  *
  * @since 0.1.0
  * @status stable

@@ -22,18 +22,16 @@ const LABELS: Record<string, string> = {
  * @summary A bar that shows the cursor position and the language being edited.
  *
  * @description
- * Slotted into a sandbox, which feeds it: the editor dispatches `helix-caret`
- * on every keystroke and every arrow press, the sandbox hears it and writes the
- * position here. Nothing about that reaches the consumer's framework, which is
- * the point. A caret position routed through React state would re-render the
- * workbench on every cursor move, to update two numbers.
+ * Shows the caret position. The editor dispatches `helix-caret` on every
+ * keystroke and arrow press, and the sandbox writes the position to the status
+ * bar. The position does not pass through your framework, so React state does
+ * not re-render the sandbox on every cursor move.
  *
- * **Not a live region.** The readout changes on every keystroke, so announcing
- * it would talk over the reader continuously while they type. It is text they
- * can navigate to, which is what a status bar is in every editor that has one.
+ * **The status bar is not a live region.** The readout changes on every
+ * keystroke, and announcing it would interrupt screen reader users as they
+ * type. It is text that screen reader users can navigate to.
  *
- * A readout with nothing to say is not rendered at all rather than rendered
- * empty, or the bar keeps a gap where a value is not.
+ * A readout with no value is not rendered, so the bar has no empty gap.
  *
  * @since 0.1.0
  * @status stable

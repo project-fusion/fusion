@@ -7,8 +7,8 @@ import { styles } from './quote-root.css.js'
  * @summary A short quotation, set inline with the text around it.
  *
  * @description
- * Takes the surrounding type rather than a size of its own, because a quotation
- * inside a paragraph is that paragraph's text with marks around it.
+ * Inherits the surrounding type, because an inline quotation is part of its
+ * paragraph.
  *
  * @since 0.1.0
  * @status stable

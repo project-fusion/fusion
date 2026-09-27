@@ -7,14 +7,11 @@ import { styles } from './tree-item.css.js'
  * @summary One node in a tree.
  *
  * @description
- * Indent comes from the `level` the tree sets, as a multiple of one hook, so a
- * node moved to another depth re-indents without any nested selector. Nesting
- * selectors by depth is the usual approach and stops working at whatever depth
- * nobody wrote a rule for.
+ * Indentation is a multiple of one hook, set from the `level` the tree assigns,
+ * so an item moved to another depth re-indents with no nested selectors, at any
+ * depth.
  *
- * The twisty rotates rather than swapping glyphs, so opening a branch is a
- * short movement instead of a substitution. Motion carries the state change;
- * the row itself stays flat.
+ * The twisty rotates when a branch opens. The row itself stays flat.
  *
  * @since 0.1.0
  * @status stable

@@ -8,16 +8,18 @@ import { styles } from './app-header-root.css.js'
  * @summary Page-level banner holding brand, navigation, and actions.
  *
  * @description
- * Flat, opaque, and in the flow. Both of the interesting things a banner can do
- * are opt-in: `sticky` because following the reader is a decision about the
- * page rather than about the bar, and `material` because a backdrop filter
- * makes the header a containing block for `position: fixed` descendants, so an
- * overlay rendered inside a material header is placed against the header rather
- * than the viewport.
+ * The header is flat, opaque, and in the document flow. Two behaviors are
+ * opt-in:
  *
- * The separating rule appears only once the page has scrolled, which keeps the
- * banner flat against a hero and lifts it off the content afterwards. There is
- * no shadow: the rule is the whole of it.
+ * - `sticky` keeps the header in view while the page scrolls. Whether it should
+ *   follow the page is a decision about the page.
+ * - `material` adds a backdrop filter. The filter makes the header a containing
+ *   block for `position: fixed` descendants, so an overlay rendered inside a
+ *   material header is positioned against the header.
+ *
+ * A separating rule appears once the page has scrolled, so the header sits flat
+ * against a hero and lifts off the content afterwards. The header has no
+ * shadow.
  *
  * @since 0.1.0
  * @status stable

@@ -22,30 +22,26 @@ import '../../color-picker/index.js'
  * @summary A field for a color, typed in any syntax or picked from a panel.
  *
  * @description
- * **The picker is `ColorPicker`, not a second one written here.** It owns the
- * square, the ramps, the eyedropper and the syntax toggle, and it is worth
- * having on its own: a settings pane wants a picker flat on the page with
- * nothing to open. This element is the field, the overlay, and the form.
- * Exactly the arrangement Date Input has with `DatePicker`.
+ * A text field with a button that opens `ColorPicker` in an overlay.
+ * `ColorPicker` provides the square, the ramps, the eyedropper, and the syntax
+ * toggle, and you can also use it on its own, flat on the page. Color Input
+ * adds the field, the overlay, and the form value, the same arrangement Date
+ * Input has with `DatePicker`.
  *
- * **Typed as well as picked, and the typing is the reason this is not
- * `<input type="color">`.** The native control gives a free picker and takes
- * nearly all styling with it, which is a fair trade until a product needs the
- * panel to match everything around it. What is kept from the native one is the
- * part worth keeping: a real text field, so a reader who has the hex pastes it
- * and never opens anything.
+ * You can type or paste a color into the field without opening the picker.
+ * Color Input is a custom control, unlike `<input type="color">`, so you can
+ * style the panel to match your interface.
  *
- * **Every syntax is read; the one `format` names is written.** `#f00`,
- * `#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)`, `rgb(255 0 0 / 50%)` and
- * `hsl(0 100% 50%)` are all colors, and a field that refuses one because it
- * prefers another is arguing with the person using it. What the field *shows* is
- * the value itself, for the reason Date Input gives about its dates: half-typed
- * input does not survive a round trip through a formatter.
+ * The field reads every color syntax, including `#f00`, `#ff0000`,
+ * `rgb(255 0 0)`, `rgba(255,0,0,.5)`, `rgb(255 0 0 / 50%)`, and
+ * `hsl(0 100% 50%)`. It writes colors in the syntax that `format` names. The
+ * field shows the value without reformatting it, because half-typed input does
+ * not survive a round trip through a formatter. Date Input does the same with
+ * dates.
  *
- * The custom property below is written by this component and never set by a
- * consumer: it carries a value this element resolved and CSS cannot, which is
- * what lets a stylesheet on this tier paint the swatch without parsing anything
- * itself.
+ * The component sets `--color-input-swatch`, so do not set it yourself. It
+ * holds the resolved color, so the styled tier can paint the swatch without
+ * parsing the value.
  *
  * @since 0.1.0
  * @status stable

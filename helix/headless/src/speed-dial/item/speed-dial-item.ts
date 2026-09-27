@@ -6,16 +6,13 @@ import { property } from 'lit/decorators.js'
  * @summary One action in a speed dial: an icon and a name beside it.
  *
  * @description
- * **A command, which is why this is a `menuitem` and a megamenu's rows are not.**
- * The distinction is what the thing does, not what it looks like: a megamenu
- * holds destinations, so it is a disclosure of links, and this holds actions a
- * screen can take, which is exactly what `role="menu"` was written for. The
- * roles follow the contents.
+ * Each item is a command, so it has the `menuitem` role. A megamenu holds
+ * destinations, so it is a disclosure of links. A speed dial holds actions,
+ * which is what `role="menu"` is for.
  *
- * **The name is text, not a title.** A dial's actions are icons, and an icon
- * with a `title` is an action whose name only exists for whoever hovers it long
- * enough. The label is rendered beside the mark and is the accessible name by
- * being there, so it is read, searched and translated like anything else.
+ * The name is text rendered beside the icon, and it is the accessible name. A
+ * `title` on an icon shows only on hover. Visible text is read, searched, and
+ * translated like other text.
  *
  * @since 0.1.0
  * @status stable

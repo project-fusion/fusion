@@ -11,8 +11,7 @@ import { styles } from './tree-root.css.js'
  *
  * @description
  * Quiet by default: no rules between rows and no fill except on the selected
- * item. A navigation tree is read by scanning, and every line of chrome added
- * to it is one more thing between the reader and the label.
+ * item, so the labels are easy to scan.
  *
  * @since 0.1.0
  * @status stable

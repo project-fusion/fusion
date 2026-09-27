@@ -12,23 +12,21 @@ import { property } from 'lit/decorators.js'
  * @summary A box that is checked, unchecked, or indeterminate.
  *
  * @description
- * Renders a real `<input type="checkbox">`, so the space key, the focus ring,
- * and the indeterminate glyph come from the platform. `delegatesFocus` puts
- * focus on it, and it serializes into the server's markup, so the control is
- * reachable before any script loads.
+ * Renders a native `<input type="checkbox">`, so the Space key, the focus ring,
+ * and the indeterminate glyph come from the platform. `delegatesFocus` sends
+ * focus to the input, and the input is in the server-rendered markup, so the
+ * control works before any script loads.
  *
- * **The input inside a shadow root submits nothing**, because the form is on
- * the other side of the boundary. The host is form-associated instead and
- * reports its own value through `ElementInternals`, which is also what carries
- * validity and what answers a form reset.
+ * An input inside a shadow root does not submit with a form. The host is
+ * form-associated and uses `ElementInternals` for its value, its validity, and
+ * form reset.
  *
- * A checked box submits its `value`, and an unchecked one submits nothing at
- * all. That is what a native checkbox does, and a form built around one reads
- * the absence rather than a `false`.
+ * A checked box submits its `value`, and an unchecked one submits nothing, as a
+ * native checkbox does.
  *
- * `indeterminate` is presentation and nothing else. It is neither checked nor
- * unchecked to a reader, it never submits, and the first click resolves it: a
- * third state that survives interaction is a control nobody can finish.
+ * `indeterminate` changes only the presentation. Assistive technology reports
+ * it as neither checked nor unchecked, it never submits, and the first click
+ * resolves it.
  *
  * @since 0.1.0
  * @status stable

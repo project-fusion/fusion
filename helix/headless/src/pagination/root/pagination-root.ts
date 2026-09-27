@@ -70,34 +70,29 @@ const fill = (
  * @summary Controls for moving between the pages of a long set of results.
  *
  * @description
- * **The component is the truncation.** Given a page and a total it works out
- * which numbers to show and where the runs break, so this is data-driven rather
- * than composed: `<helix-headless-pagination page="4" pages="12">` rather than
- * twelve slotted children a consumer keeps in step with their own query.
+ * Set a page and a total, and the component works out which page numbers to
+ * show and where the gaps go:
+ * `<helix-headless-pagination page="4" pages="12">`. You do not slot a child
+ * for each page.
  *
- * **The width does not change as you page.** The run around the current page is
- * `siblings` either side, and grows to absorb a gap slot at a boundary, so the
- * control holds the same number of slots from the first page to the last.
- * Anything that lets the count vary moves the buttons under the pointer between
- * one click and the next.
+ * The width stays the same as you page. The run around the current page is
+ * `siblings` on each side and grows to absorb a gap at either end, so the
+ * control shows the same number of slots from the first page to the last, and
+ * the buttons do not move under the pointer.
  *
- * **A gap is only drawn where it hides more than one page, and a gap is a
- * control.** It goes to the middle of the run it stands over, which is the
- * binary-search step: any page in a set of any size is a handful of presses.
+ * A gap appears only where it hides more than one page. A gap is a control: it
+ * goes to the middle of the pages it hides, so any page is a few presses away.
  *
- * **`href` is what makes these links.** Set it and every page renders an `<a>`
- * with `{page}` filled in, so the output is crawlable, a middle click opens a
- * tab, and the address bar is the state. Left unset they are buttons, which is
- * right for a table paging in place. Either way the click announces
- * `helix-navigate` first, and `preventDefault()` stops the navigation as well
- * as the change, which is how a router takes over.
+ * Set `href` to render every page as an `<a>`, with `{page}` replaced by the
+ * page number. The links can be crawled, a middle click opens a tab, and the
+ * address bar holds the state. Without `href` the pages are buttons, for a
+ * table that pages in place. Either way, a click dispatches `helix-navigate`
+ * first. Call `preventDefault()` to stop both the navigation and the page
+ * change, for example to hand navigation to a router. There is no
+ * `helix-change`, because moving to another page selects nothing.
  *
- * **`helix-navigate` and not `helix-change`.** Moving to page four chooses
- * nothing; it moves the view over a result that has not changed.
- *
- * **The count and the page-size control are their own elements.**
- * `Pagination.Summary` and `Pagination.Size` sit beside this one, because a
- * slot can only offer one place: at one end of one row, in one order.
+ * `Pagination.Summary` and `Pagination.Size` are separate elements that you
+ * place beside this one, so you choose where they go and in what order.
  *
  * @since 0.1.0
  * @status stable

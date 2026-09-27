@@ -7,9 +7,9 @@ import { styles } from './scroll-area-root.css.js'
  * @summary A scrolling box that shows which edges have more content past them.
  *
  * @description
- * Presentation only: the fades on the edges the base class names, and a
- * scrollbar that belongs to the system rather than to the platform. Which edges
- * have content past them is measured by the base class.
+ * Presentation only: fades on the edges the base class reports, and a scrollbar
+ * styled to match the design system. The base class measures which edges have
+ * content past them.
  *
  * @since 0.1.0
  * @status stable

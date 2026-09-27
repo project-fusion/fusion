@@ -24,33 +24,26 @@ const TAGS: Record<string, StaticValue> = {
  * @summary Text, with its HTML element and its type style set separately.
  *
  * @description
- * Two properties, and they answer different questions. `as` is the element,
- * which decides the document outline and what a screen reader announces.
- * `variant` is the ramp, which decides size, weight, leading, and tracking
- * together.
+ * `as` sets the element, which decides the document outline and what a screen
+ * reader announces. `variant` sets the type ramp, which decides size, weight,
+ * leading, and tracking together.
  *
- * They are separate because they genuinely come apart: a section's second
- * heading sometimes has to look smaller without lying about the outline, and a
- * `<p>` sometimes has to read as a caption. They default to matching, so the
- * common case is `as="h2"` and nothing else.
+ * The two match by default, so usually you set only `as`, such as `as="h2"`.
+ * Set `variant` when the look and the element differ, such as a heading that
+ * looks smaller or a `<p>` styled as a caption.
  *
- * The pairing is resolved in CSS rather than by computing an attribute, so the
- * element writes nothing to its own host: `as="h2"` picks up the heading ramp
- * through a selector, and setting `variant` takes the pairing rule out of play.
- * Deriving it in `willUpdate` works and must not be done: it puts an attribute
- * on the host that the server's markup does not have, which is a hydration
- * mismatch in every React consumer.
+ * The pairing is resolved in CSS, so the element writes nothing to its host.
+ * `as="h2"` picks up the heading ramp through a selector, and setting `variant`
+ * overrides the pairing. Do not derive it in `willUpdate`, because that adds a
+ * host attribute the server markup does not have, which causes a hydration
+ * mismatch in React.
  *
- * **Size, weight, and leading are not properties.** Exposing them separately
- * offers a few hundred combinations of which a handful are right, and every
- * caller then picks one. A ramp is a decision the system already made:
- * the ramp is named, and a page built from it is consistent because there was
- * nothing else to choose.
+ * Size, weight, and leading are not separate properties. Choose a named ramp
+ * with `variant`.
  *
- * `tone` and `emphasis` stay separate, because color carries state rather than
- * typography, and what a line means is not how loudly it says it. Folding
- * either in would mean `caption-danger` and `label-muted` and the rest of the
- * cross product, which is the explosion a named ramp exists to prevent.
+ * `tone` and `emphasis` are separate from `variant`, because color carries
+ * state. Combining them would need a variant for every pair, such as
+ * `caption-danger` and `label-muted`.
  *
  * @since 0.1.0
  * @status stable

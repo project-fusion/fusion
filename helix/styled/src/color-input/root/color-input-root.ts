@@ -15,21 +15,16 @@ import { styles } from './color-input-root.css.js'
  * @summary A field for a color, typed in any syntax or picked from a panel.
  *
  * @description
- * The frame is the field rather than the input, so the trigger sits inside the
- * same box as the text and the focus ring is drawn once around the whole
- * control.
+ * The frame wraps the whole field, so the trigger sits inside the same box as
+ * the text and one focus ring surrounds the control.
  *
- * **The trigger fills the trailing end rather than sitting in it as an icon.** A
- * color field has one thing to show and it is a color, so the swatch takes the
- * height of the control and reads as a block of it. It is the one field here
- * whose trailing affordance is the value itself: Date Input's calendar mark
- * stands for an action, and an action stretched to field height is a large icon
- * and nothing more.
+ * The trigger fills the trailing end of the field. It is a swatch of the
+ * current color at the full height of the control. Date Input's calendar
+ * trigger stays icon-sized, because it stands for an action.
  *
- * **The panel has no padding, and clips instead.** The square runs to its edge
- * and takes the panel's rounded corners from being clipped by it, rather than
- * sitting inset with a band of overlay showing on all four sides. The picker
- * pads its own lower rows.
+ * The panel has no padding and clips its content, so the square runs to the
+ * panel's edges and takes its rounded corners. The picker pads its own lower
+ * rows.
  *
  * @since 0.1.0
  * @status stable

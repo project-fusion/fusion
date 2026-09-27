@@ -7,14 +7,14 @@ import { styles } from './breadcrumb.css.js'
  * @summary One step in a breadcrumb trail.
  *
  * @description
- * The separator is hidden on the first item with `:host(:first-child)`, so no
- * item needs to know its own index and the parent needs no coordination.
+ * The separator is hidden on the first crumb with `:host(:first-child)`, so no
+ * crumb needs its index and the parent needs no coordination.
  *
- * The link carries `data-link="quiet"`, the recipe navigation uses everywhere
- * else, which is what owns its color. Under the pointer it reads as a subtle
- * button. That part is styled from in here: the base layer sets color and
- * text-decoration on an anchor and nothing else, so the outer tree wins those
- * and leaves box and background to `::slotted`.
+ * The link carries `data-link="quiet"`, the link recipe navigation uses
+ * everywhere else, which sets its color. Under the pointer it looks like a
+ * subtle button, and that style is set inside the crumb. The base layer sets
+ * only color and text-decoration on an anchor, so your styles win for those,
+ * and the box and background come from `::slotted`.
  *
  * @since 0.1.0
  * @status stable

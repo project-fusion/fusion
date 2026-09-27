@@ -6,17 +6,15 @@ import { HelixElement } from '../helix-element/helix-element.js'
  * @summary Base for every element that participates in a form.
  *
  * @description
- * This has to be a class rather than a mixin or controller, and that is not a
- * style preference: the browser reads `formAssociated` off the constructor
- * during element upgrade, which cannot be delegated to a composed object.
+ * `HelixFormElement` is a class because the browser reads `formAssociated` from
+ * the constructor during element upgrade, and a mixin or controller cannot
+ * supply it.
  *
  * `internals` comes from `HelixElement`, which attaches it for every component.
- * `attachInternals()` throws on a second call, so there is exactly one owner.
+ * `attachInternals()` throws on a second call, so only one class attaches it.
  *
- * Deliberately small. It carries what every form participant needs and nothing
- * more; `value`, validity, and the reset and restore callbacks land when the
- * first input does, rather than being designed against components that do not
- * exist yet.
+ * The class carries only what every form participant needs. `value`, validity,
+ * and the reset and restore callbacks are added with the first input component.
  *
  * @since 0.1.0
  * @status experimental

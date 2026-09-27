@@ -45,15 +45,13 @@ const dates = (value: string): string[] =>
  * @summary A date, typed or picked from a calendar.
  *
  * @description
- * **The calendar is `DatePicker`, not a second one written here.** It already
- * knows about months, ranges, disabled days, the first day of the week and
- * every keyboard rule a grid owes a reader. This element is the field, the
- * overlay, and the translation between them.
+ * The calendar is `DatePicker`, which handles months, ranges, disabled days,
+ * the first day of the week, and the grid's keyboard behavior. The date input
+ * adds the field, the overlay, and the connection between them.
  *
- * **Typed as well as picked, and the typing is why it is not
- * `<input type="date">`.** The native control gives a free picker and a free
- * locale and takes almost all styling with it. What is kept from it is the part
- * worth keeping: a real text field.
+ * You can type a date as well as pick one. The native `<input type="date">`
+ * gives a picker and locale formatting but allows almost no styling, so the
+ * field is a text field.
  *
  * @since 0.1.0
  * @status stable

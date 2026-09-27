@@ -14,19 +14,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary A field for writing a turn in a conversation.
  *
  * @description
- * **A separate element because it is separately replaceable.** A consumer with
- * attachments, slash commands or a model picker replaces the composer and keeps
- * the transcript, which is only possible if the two were never one component.
+ * The composer is a separate element so you can replace it. If you need
+ * attachments, slash commands, or a model picker, replace the composer and keep
+ * the transcript.
  *
- * **Enter sends and Shift+Enter opens a line, and it is configurable rather than
- * decided.** The convention is near-universal in messaging and near-inverted in
- * anything that is really a document editor, and a component that picks one
- * makes the other consumer reimplement the composer. `submit-on` takes `enter`
- * or `button`, and the second is what a long-form composer wants.
+ * By default, Enter sends and Shift+Enter starts a new line, the convention in
+ * messaging apps. Document editors mostly use the opposite, so `submit-on`
+ * takes `enter` or `button`. Use `button` for a long-form composer.
  *
- * The composer clears only when nobody refused the send, because a composer that
- * empties itself and then hears the request failed has thrown away the only copy
- * of what the reader wrote.
+ * The composer clears only when no listener cancels the send, so the text is
+ * kept when you cancel a send that failed.
  *
  * @since 0.1.0
  * @status stable
