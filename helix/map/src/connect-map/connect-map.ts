@@ -16,6 +16,9 @@ import { type MapPoints, pointsFrom } from '../points/points.js'
 import { settledColor } from '../style/map-colors.js'
 import { watchTheme } from '../theme/watch-theme.js'
 
+/** How the map draws the ground: the themed map, imagery under its roads and names, or imagery alone. */
+export type MapType = 'hybrid' | 'satellite' | 'standard'
+
 /**
  * What a renderer has to answer for the frame to drive it, and nothing that is
  * the same for every renderer: that is the connector's.
@@ -56,6 +59,11 @@ export interface MapDriver {
    */
   fit?(bounds: MapBounds, padding: MapPadding, motion: MapMotion | null): void
   /**
+   * Shows or hides the renderer's own roads and names, which the Satellite
+   * map type hides so the imagery stands alone.
+   */
+  labels?(shown: boolean): void
+  /**
    * Draws the frame's routes and areas as the renderer's own layers, under its
    * place names where it has them. `read` is the whole set as it stands, its
    * colors settled, and a driver asks it every time it draws, including after
@@ -84,6 +92,15 @@ export interface MapDriver {
    * page's own motion, or at once where it is `null`.
    */
   panBy(x: number, y: number, motion: MapMotion | null): void
+  /**
+   * Pictures of the view in each map type, as image URLs, for the cards in
+   * the frame's layers menu. `imagery` is the tile URL the Hybrid and
+   * Satellite types draw; without it, only Standard can be drawn.
+   */
+  previews?(ask: {
+    imagery?: { maxZoom?: number | undefined; src: string } | undefined
+    types: readonly MapType[]
+  }): Promise<Partial<Record<MapType, string>>>
   /**
    * How far the view is tilted, in degrees from looking straight down, where
    * the renderer can tilt it. The frame's 3D button is pressed while it is
@@ -255,6 +272,10 @@ interface Marker extends HTMLElement {
 /** The frame, as far as the connector reads it: whether it gathers its markers. */
 interface Frame extends HTMLElement {
   cluster?: boolean | undefined
+  /** Pictures of the map in each map type, for the layers menu's cards. */
+  mapPreviews?: Partial<Record<MapType, string>>
+  /** How the map draws the ground, where it has imagery; absent is standard. */
+  mapType?: 'hybrid' | 'satellite' | undefined
 }
 
 /**
@@ -565,6 +586,53 @@ export const connectMap = (
   }
   syncBearing()
   const stopBearing = driver.bearing || driver.pitch ? driver.onView?.(syncBearing) : undefined
+
+  /* **The Satellite map type hides the renderer's roads and names**, and the
+     others show them: asked only when that changes, since the renderer shows
+     them to begin with. */
+  let bare = false
+  const syncType = (): void => {
+    const next = (frame as Frame).mapType === 'satellite'
+    if (next !== bare) {
+      bare = next
+      driver.labels?.(!next)
+    }
+  }
+  syncType()
+  /* **The menu's pictures, drawn when it opens**, and drawn again only once
+     the view has moved: a picture of each map type is a small map rendered
+     and read back, which is too much to do on every open of a still map. */
+  let stale = true
+  const stopWatchingPreviews = driver.previews
+    ? driver.onView?.(() => {
+        stale = true
+      })
+    : undefined
+  let picturing: Promise<unknown> | undefined
+  const drawPreviews = (): void => {
+    const imagery = [...frame.children]
+      .filter(isLayer)
+      .find((layer) => layer.layerKind === 'raster' && layer.ground === true)
+    const src = imagery?.src ?? imagery?.frames?.at(-1)
+    if (!driver.previews || !src || !stale || picturing) {
+      return
+    }
+    stale = false
+    picturing = driver
+      .previews({
+        imagery: { maxZoom: imagery?.maxZoom, src },
+        types: ['standard', 'hybrid', 'satellite'],
+      })
+      .then((previews) => {
+        ;(frame as Frame).mapPreviews = previews
+      })
+      .catch(() => {
+        stale = true
+      })
+      .finally(() => {
+        picturing = undefined
+      })
+  }
 
   const restoreKeyboard = options.keyboard === 'renderer' ? undefined : driver.silenceKeyboard?.()
 
@@ -1124,6 +1192,13 @@ export const connectMap = (
   }
   const handlePartChange = (event: Event): void => {
     const { kind } = (event as HelixMapPartChangeEvent).detail
+    if (kind === 'menu') {
+      drawPreviews()
+      return
+    }
+    if (kind === 'layer') {
+      syncType()
+    }
     /* A cluster gathered or let go is the connector's own doing. */
     if (kind !== 'cluster') {
       soon(kind === 'layer' ? { draw: true } : { place: true })
@@ -1292,6 +1367,10 @@ export const connectMap = (
       frame.removeEventListener(HelixMapRotateEvent.eventName, handleRotate)
       frame.removeEventListener(HelixMapTiltEvent.eventName, handleTilt)
       stopBearing?.()
+      stopWatchingPreviews?.()
+      if (bare) {
+        driver.labels?.(true)
+      }
       restoreKeyboard?.()
       restoreZoom?.()
       if (focusable) {

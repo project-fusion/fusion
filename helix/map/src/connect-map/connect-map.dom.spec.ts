@@ -518,11 +518,50 @@ describe('connectMap with routes and areas', () => {
     ])
   })
 
+  test('the Satellite map type hides the renderer’s labels, and the menu opening asks for pictures of each type', async () => {
+    const host = (await frame(
+      '<helix-headless-map-raster ground label="Satellite imagery" max-zoom="16" src="photo/{z}/{y}/{x}"></helix-headless-map-raster>',
+    )) as Frame & {
+      mapPreviews: Record<string, string>
+      mapType?: string
+      updateComplete: Promise<boolean>
+    }
+    const { driver } = layering()
+    const labels: boolean[] = []
+    const asked: unknown[] = []
+    const connection = connectMap(host, {
+      ...driver,
+      labels: (shown) => labels.push(shown),
+      previews: async (ask) => {
+        asked.push(ask)
+        return { hybrid: 'h.jpg', satellite: 's.jpg', standard: 'm.jpg' }
+      },
+    })
+    expect(labels).toEqual([])
+    host.mapType = 'satellite'
+    await host.updateComplete
+    expect(labels).toEqual([false])
+    host.dispatchEvent(new CustomEvent('helix-map-part-change', { detail: { kind: 'menu' } }))
+    host.dispatchEvent(new CustomEvent('helix-map-part-change', { detail: { kind: 'menu' } }))
+    await new Promise((done) => setTimeout(done, 0))
+    expect(asked).toEqual([
+      {
+        imagery: { maxZoom: 16, src: 'photo/{z}/{y}/{x}' },
+        types: ['standard', 'hybrid', 'satellite'],
+      },
+    ])
+    expect(host.mapPreviews).toEqual({ hybrid: 'h.jpg', satellite: 's.jpg', standard: 'm.jpg' })
+    connection.disconnect()
+    expect(labels).toEqual([false, true])
+  })
+
   test('a raster layer drawn as the ground says so, with the deepest zoom its tiles reach', async () => {
     const host = await frame(
       `<helix-headless-map-raster ground label="Satellite imagery" max-zoom="16" src="x"></helix-headless-map-raster>
        <helix-headless-map-raster label="Radar" src="y"></helix-headless-map-raster>`,
     )
+    host.setAttribute('map-type', 'hybrid')
+    await (host as Frame & { updateComplete: Promise<boolean> }).updateComplete
     const { driver, drawn } = layering()
     connectMap(host, driver)
     expect(drawn[0]?.map(({ ground, label, maxZoom }) => ({ ground, label, maxZoom }))).toEqual([
