@@ -109,7 +109,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
   retryLabel = 'Try again'
 
   /**
-   * The name of each state, read by screen readers.
+   * The label shown while the message is sending.
    */
   @property({ attribute: 'sending-label' })
   sendingLabel = 'Sending'
