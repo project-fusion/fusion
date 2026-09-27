@@ -84,3 +84,93 @@ describe('map route and area', () => {
     expect(part(bare, 'layers')).toBeNull()
   })
 })
+
+describe('map layers menu', () => {
+  const menuFrame = async (): Promise<Frame> => {
+    const host = (await mount(
+      `<helix-headless-map controls="pan zoom layers" label="Deliveries">
+        <helix-headless-map-route label="Depot to Mission" points="1,1 2,2"></helix-headless-map-route>
+        <helix-headless-map-area hidden label="Delivery zone" points="1,1 2,2 1,3"></helix-headless-map-area>
+      </helix-headless-map>`,
+    )) as Frame
+    await host.updateComplete
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+    return host
+  }
+  const settle = async (host: Frame): Promise<void> => {
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+  }
+
+  test('the menu is drawn only where controls name it, and opens from its button', async () => {
+    const plain = await frame(
+      '<helix-headless-map-route label="Round" points="1,1 2,2"></helix-headless-map-route>',
+    )
+    expect(part(plain, 'layers-toggle')).toBeNull()
+
+    const host = await menuFrame()
+    const toggle = part(host, 'layers-toggle') as HTMLButtonElement
+    const menu = part(host, 'layers-menu') as HTMLElement
+    expect(toggle.getAttribute('aria-label')).toBe('Map layers')
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect(menu.hidden).toBe(true)
+    const scope = toggle.getRootNode() as ShadowRoot
+    expect(scope.getElementById(toggle.getAttribute('aria-controls') ?? '')).toBe(menu)
+
+    toggle.click()
+    await host.updateComplete
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect(menu.hidden).toBe(false)
+    const choices = [...menu.querySelectorAll('[part="layer-choice"]')].map((one) => [
+      (one.textContent ?? '').trim(),
+      (one.querySelector('input') as HTMLInputElement).checked,
+    ])
+    expect(choices).toEqual([
+      ['Depot to Mission', true],
+      ['Delivery zone', false],
+    ])
+
+    menu.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+    await host.updateComplete
+    expect(menu.hidden).toBe(true)
+  })
+
+  test('a checkbox hides or shows its layer, the list names only what is shown, and a page hiding one is followed', async () => {
+    const host = await menuFrame()
+    expect(listed(host)).toEqual(['Depot to Mission'])
+    const boxes = [
+      ...(part(host, 'layers-menu')?.querySelectorAll('input') ?? []),
+    ] as HTMLInputElement[]
+    const [route, area] = [...host.children] as HTMLElement[]
+
+    boxes[0]?.click()
+    boxes[1]?.click()
+    await settle(host)
+    expect(route?.hidden).toBe(true)
+    expect(area?.hidden).toBe(false)
+    expect(listed(host)).toEqual(['Delivery zone'])
+
+    route?.removeAttribute('hidden')
+    await settle(host)
+    expect(boxes[0]?.checked).toBe(true)
+    expect(listed(host)).toEqual(['Depot to Mission', 'Delivery zone'])
+  })
+
+  test('keys in the menu do not reach the map, and a press outside closes it', async () => {
+    const host = await menuFrame()
+    const panned: string[] = []
+    host.addEventListener('helix-map-pan', () => panned.push('pan'))
+    ;(part(host, 'layers-toggle') as HTMLButtonElement).click()
+    await host.updateComplete
+    const box = part(host, 'layers-menu')?.querySelector('input') as HTMLInputElement
+    box.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowUp' }),
+    )
+    expect(panned).toEqual([])
+
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    await host.updateComplete
+    expect((part(host, 'layers-menu') as HTMLElement).hidden).toBe(true)
+  })
+})

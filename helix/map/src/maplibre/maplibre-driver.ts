@@ -547,6 +547,13 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       map.getLayer(LAYERS[0]?.id ?? '')
         ? LAYERS[0]?.id
         : map.getStyle()?.layers?.find((layer) => layer.type === 'symbol')?.id
+    /* **Imagery goes under the style's roads**, its first line, name, or
+       raised building, so a photograph of the ground takes the place of the
+       land and keeps the streets and names over it. */
+    const underRoads = (): string | undefined =>
+      map
+        .getStyle()
+        ?.layers?.find((layer) => ['fill-extrusion', 'line', 'symbol'].includes(layer.type))?.id
     const drawExtras = (specs: MapLayerSpec[]): void => {
       const wanted = new Set(specs.map((spec) => spec.id))
       for (const id of [...drawnExtras.keys()]) {
@@ -577,7 +584,10 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           continue
         }
         const frames = spec.frames ?? []
-        const key = frames.join(' ')
+        /* Where it is drawn and how deep its tiles go are its source's and
+           its place's, so a change to either draws it again. No spaces, which
+           count the frames. */
+        const key = `${frames.join(' ')}|${spec.ground ? 'ground' : ''}|${spec.maxZoom ?? ''}`
         if (drawnExtras.get(spec.id)?.key !== key) {
           takeOffExtra(spec.id)
         }
@@ -596,6 +606,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
             if (!map.getSource(name)) {
               map.addSource(name, {
                 ...(spec.attribution ? { attribution: spec.attribution } : {}),
+                ...(spec.maxZoom === undefined ? {} : { maxzoom: spec.maxZoom }),
                 tileSize: 256,
                 tiles: [url],
                 type: 'raster',
@@ -608,7 +619,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
                 source: name,
                 type: 'raster',
               } as never,
-              under(),
+              spec.ground ? underRoads() : under(),
             )
           } catch {
             /* A style still loading refuses both, and its `load` draws again. */
@@ -874,9 +885,9 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     }
   },
   /* MapLibre holds the pitch to its own `maxPitch`, so only flat is held here. */
-  tilt: (by, motion) => {
+  tilt: ({ by, to }, motion) => {
     const { bearing, pitch } = aimFrom(map)
-    turn(map, bearing, Math.max(0, pitch + by), motion)
+    turn(map, bearing, Math.max(0, to ?? pitch + (by ?? 0)), motion)
   },
   zoomBy: (direction, motion) => {
     if (direction > 0) {

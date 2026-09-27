@@ -476,6 +476,36 @@ describe('connectMap with routes and areas', () => {
     expect(typeof drawn[0]?.[0]?.color).toBe('string')
   })
 
+  test('a hidden layer is not drawn, and hiding or showing one draws the layers again', async () => {
+    const host = await frame(
+      `<helix-headless-map-route label="Shown" points="1,2 3,4"></helix-headless-map-route>
+       <helix-headless-map-route hidden label="Hidden" points="1,2 3,4"></helix-headless-map-route>`,
+    )
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    expect(drawn.at(-1)?.map((one) => one.label)).toEqual(['Shown'])
+    const [shown, hidden] = [...host.children] as HTMLElement[]
+    if (shown && hidden) {
+      shown.hidden = true
+      hidden.hidden = false
+    }
+    await new Promise((done) => setTimeout(done, 0))
+    expect(drawn.at(-1)?.map((one) => one.label)).toEqual(['Hidden'])
+  })
+
+  test('a raster layer drawn as the ground says so, with the deepest zoom its tiles reach', async () => {
+    const host = await frame(
+      `<helix-headless-map-raster ground label="Satellite imagery" max-zoom="16" src="x"></helix-headless-map-raster>
+       <helix-headless-map-raster label="Radar" src="y"></helix-headless-map-raster>`,
+    )
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    expect(drawn[0]?.map(({ ground, label, maxZoom }) => ({ ground, label, maxZoom }))).toEqual([
+      { ground: true, label: 'Satellite imagery', maxZoom: 16 },
+      { ground: undefined, label: 'Radar', maxZoom: undefined },
+    ])
+  })
+
   test('buildings reach the driver as their color alone, and a raster layer as its frames, the last shown', async () => {
     const host = await frame(
       `<helix-headless-map-buildings style="color: rgb(9, 9, 9)"></helix-headless-map-buildings>
@@ -1028,6 +1058,7 @@ describe('connectMap with rotate and tilt', () => {
       faceNorth(): void
       rotate(by: number): void
       tilt(by: number): void
+      tiltTo(to: number): void
       updateComplete: Promise<boolean>
     }
     const asked: string[] = []
@@ -1041,14 +1072,20 @@ describe('connectMap with rotate and tilt', () => {
       },
       panBy: () => {},
       rotate: (turn) => asked.push(`rotate ${JSON.stringify(turn)}`),
-      tilt: (by) => asked.push(`tilt ${by}`),
+      tilt: (tilt) => asked.push(`tilt ${JSON.stringify(tilt)}`),
       zoomBy: () => {},
     })
     expect(host.bearing).toBe(30)
     host.rotate(15)
     host.faceNorth()
     host.tilt(-10)
-    expect(asked).toEqual(['rotate {"by":15}', 'rotate {"to":0}', 'tilt -10'])
+    host.tiltTo(0)
+    expect(asked).toEqual([
+      'rotate {"by":15}',
+      'rotate {"to":0}',
+      'tilt {"by":-10}',
+      'tilt {"to":0}',
+    ])
     bearing = 45.04
     for (const listener of moved) {
       listener()
@@ -1056,6 +1093,6 @@ describe('connectMap with rotate and tilt', () => {
     expect(host.bearing).toBe(45)
     connection.disconnect()
     host.rotate(15)
-    expect(asked).toHaveLength(3)
+    expect(asked).toHaveLength(4)
   })
 })
