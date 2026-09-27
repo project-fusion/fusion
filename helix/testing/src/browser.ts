@@ -584,9 +584,17 @@ const RAN = '__helixExampleRan'
  * frame the example's `.css` beside its markup. An example whose behavior
  * depends on layout, an outline tracking which section a scroll container is
  * showing, behaves differently without it, and silently.
+ *
+ * The example's own `<link rel="stylesheet">` is removed first, as the preview
+ * frame removes it. The stylesheet arrives as `styles`, and the link's relative
+ * `href` would otherwise request a file that is not there, such as
+ * `/helix/sandbox/styles.css` from the sandbox's spec results.
  */
 export const example = async (file: unknown, styles: unknown = ''): Promise<HTMLElement> => {
-  document.body.innerHTML = String(file)
+  document.body.innerHTML = String(file).replace(
+    /<link\b[^>]*\brel=(["'])stylesheet\1[^>]*>\s*/gi,
+    '',
+  )
   if (String(styles) !== '') {
     const sheet = document.createElement('style')
     sheet.textContent = String(styles)
