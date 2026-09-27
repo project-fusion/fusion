@@ -151,6 +151,13 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* **Pointed at: the ground with a little of the ink in it**, as a quiet
+   button shows it. The raised surface was the overlay's own color in a dark
+   theme, so a pointer on a button changed nothing a reader could see. */
 [part="controls"] button:hover {
-  background-color: var(--helix-color-surface-raised);
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 10%,
+    var(--viewport-control-background-color, var(--helix-color-surface-overlay))
+  );
 }
