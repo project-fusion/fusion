@@ -73,11 +73,8 @@ describe('mapLibreStyle', () => {
       expect(named).toContain(id)
       expect(images[id]).toMatchObject({ kind: 'landmark' })
     }
-    expect(images['helix-sign-interstate-2']).toMatchObject({
-      design: 'interstate',
-      kind: 'sign',
-      length: 2,
-    })
+    expect(images['helix-sign-interstate']).toMatchObject({ design: 'interstate', kind: 'sign' })
+    expect(JSON.stringify(layoutOf('label-shield')['icon-image'])).toContain('"|",["get","ref"]')
     expect(layoutOf('label-neighbourhood')['text-transform']).toBe('uppercase')
   })
 
