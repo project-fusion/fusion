@@ -5,14 +5,21 @@ path: /legal/privacy
 title: Privacy policy
 ---
 
-Last updated September 26, 2026. This page describes what the site does with
+Last updated September 27, 2026. This page describes what the site does with
 your data. The site stores very little, so the page is short.
 
 ## We do not collect what you type
 
 The site has no forms. The [contact](/contact) page is a `mailto:` link, so
 writing to us opens your own mail client, and the message goes from you to us
-without passing through our systems. Nothing you type into the site reaches us.
+without passing through our systems.
+
+The one field that sends what you type is the place search on the
+[Maps](/helix/maps) page. What you type there goes to our server, which asks
+Photon, a place search run by komoot, for places that match. Photon receives the
+text from our server, so it does not see your IP address. We do not store the
+text. It travels in the body of the request, not in the web address, so it is
+not in the request records described below.
 
 The same is true of the sandbox. The code you write there runs in your browser
 with an opaque origin, and it is never sent to a server. The
@@ -37,6 +44,21 @@ preferences.
 tracking script from us or from anyone else, and no pixel, tag manager, or
 advertising identifier. We do not know how many people visit.
 
+## Maps load pictures from other services
+
+The maps on the site draw pictures that come from other services:
+
+| What | From |
+| --- | --- |
+| Streets, places, and names | OpenFreeMap |
+| Hills and contour lines | Terrain Tiles on Amazon Web Services |
+| Aerial photographs | The U.S. Geological Survey |
+
+Your browser asks these services directly, so each one receives your IP address
+and which part of the map you are looking at. The weather radar comes through
+our own server from the Iowa Environmental Mesonet, which sees our server and
+not you. The map labels use the site's own fonts, so they add no font service.
+
 ## What our hosting provider records
 
 A hosting provider serves the site. Like every web server, it records each
@@ -49,9 +71,10 @@ that you visited.
 
 ## Why the policy is short
 
-The site holds almost no data: three preferences in your browser, no cookies, no
-analytics, and nothing sent from your device on our behalf. A longer policy
-would claim rights over data we do not hold.
+The site holds almost no data: three preferences in your browser, no cookies,
+and no analytics. What leaves your device is what a page needs to work, such as
+the map pictures and the place search above. A longer policy would claim rights
+over data we do not hold.
 
 If this changes, this page changes with it, and the previous wording stays in
 the repository's history.

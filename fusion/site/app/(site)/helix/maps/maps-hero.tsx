@@ -7,6 +7,8 @@ import {
   connectMap,
   distancesAlong,
   fontReady,
+  type MapBounds,
+  type MapConnection,
   mapFontFrom,
   motionOf,
 } from '@fusion.dev/helix-map'
@@ -18,9 +20,11 @@ import { MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { boundsOf, clearOf } from '@/utils/map-view/map-view'
+import type { FoundPlace } from '@/utils/place-search/place-search'
 import { siteScheme } from '@/utils/site-scheme/site-scheme'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './maps.module.css'
+import { MapsSearch } from './maps-search'
 import { mapIntent, propertiesOf, type SentTheme } from './maps-theme'
 
 /**
@@ -91,6 +95,32 @@ const bearing = (from: { lat: number; lng: number }, to: { lat: number; lng: num
 /** The places' corners, as the camera frames them. */
 const BOUNDS = boundsOf(PLACES)
 
+/**
+ * How far a found place is framed round it at the least, in degrees either
+ * way: a few streets, which is where the buildings stand up and the landmarks
+ * show, and not one building filling the view.
+ */
+const AROUND = 0.002
+
+/**
+ * Where a found place is framed: an area by its own extent, and at the least
+ * the streets round it, so a place mapped as one building is still seen among
+ * its neighbors.
+ */
+const framingOf = (place: FoundPlace): MapBounds => {
+  const [west, south, east, north] = place.bounds ?? [place.lng, place.lat, place.lng, place.lat]
+  return {
+    northEast: {
+      lat: Math.max(north, place.lat + AROUND),
+      lng: Math.max(east, place.lng + AROUND),
+    },
+    southWest: {
+      lat: Math.min(south, place.lat - AROUND),
+      lng: Math.min(west, place.lng - AROUND),
+    },
+  }
+}
+
 /** How far the hero's map is tilted when it opens, in degrees from looking straight down. */
 const PITCH = 45
 
@@ -135,6 +165,13 @@ export function MapsHero({
   const panel = useRef<HTMLDivElement>(null)
   const bar = useRef<HTMLFieldSetElement>(null)
   const engine = useRef<Promise<ThemeEngine> | null>(null)
+  /* The map and its connection, which the search moves once they exist. */
+  const view = useRef<{
+    connection: MapConnection
+    map: { getCenter(): { lat: number; lng: number } }
+  } | null>(null)
+  /* The place the search found, marked on the map with a pin. */
+  const [found, setFound] = useState<FoundPlace | undefined>(undefined)
   /* **The contrast the labels are held to**: a sent theme's own target while
      it is the one chosen, and the compiler's default otherwise. A ref rather
      than state, because the map reads it when it restyles and a render would
@@ -212,6 +249,7 @@ export function MapsHero({
         })
       })
       const connection = connectMap(host, mapLibreDriver(map))
+      view.current = { connection, map }
       /* **A walker along the route, on a loop, that a reader can stop.**
          Anything that moves by itself for more than five seconds beside the
          rest of a page needs a way to pause it, and this has one in the
@@ -373,6 +411,7 @@ export function MapsHero({
         stopSeeing()
         theme.stop()
         host.removeEventListener('helix-activate', visit)
+        view.current = null
         connection.disconnect()
         map.remove()
       }
@@ -382,6 +421,33 @@ export function MapsHero({
       teardown()
     }
   }, [])
+
+  /* **A found place is framed where the reader can see it**, clear of the
+     pitch and the bar, at the theme's pace for a trip: a city by its extent,
+     an address by the streets round it. Clearing the search frames the walk
+     again. */
+  const go = (place: FoundPlace | undefined): void => {
+    setFound(place)
+    const box = container.current
+    if (!view.current || !box) {
+      return
+    }
+    /* On a phone the bar is under the map, so the map is brought back into
+       view to be seen going there. */
+    if (box.getBoundingClientRect().top < 0) {
+      box.scrollIntoView({
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    }
+    const [[west, south], [east, north]] = BOUNDS
+    view.current.connection.fit({
+      bounds: place
+        ? framingOf(place)
+        : { northEast: { lat: north, lng: east }, southWest: { lat: south, lng: west } },
+      padding: clearOf(box, panel.current, bar.current),
+    })
+  }
 
   /* The scope, painted from the controls: nothing where both follow the site.
      **Swapped in one step, once the new values exist**, rather than cleared and
@@ -590,6 +656,18 @@ export function MapsHero({
         {SHARED.map((place) => (
           <helix-map-marker key={place.label} label={place.label} lat={place.lat} lng={place.lng} />
         ))}
+        {/* **The place the search found**, a pin in the brand, last in the
+            keyboard's order. */}
+        {found ? (
+          <helix-map-marker
+            key={found.id}
+            label={found.name}
+            lat={found.lat}
+            lng={found.lng}
+            shape="pin"
+            tone="primary"
+          />
+        ) : null}
       </helix-map>
       {/* The controls that customize the map: brand, mode, and the walker, in
           one bar at the bottom of the map so they read as the map's own. The
@@ -641,6 +719,13 @@ export function MapsHero({
               <helix-toggle value="light">Light</helix-toggle>
               <helix-toggle value="dark">Dark</helix-toggle>
             </helix-toggle-group>
+          </div>
+          <div className={styles.mapsControl}>
+            <MapsSearch
+              back="Back to the walk"
+              near={() => view.current?.map.getCenter()}
+              onChoose={go}
+            />
           </div>
           {/* **The same control as the mode beside it**, since it is the same
               kind of choice: a button of its own drew a second label style

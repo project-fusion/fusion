@@ -65,7 +65,10 @@ followTheme(map, frame, style)
 - The renderer's own keyboard handling and zoom buttons are turned off, so the
   frame's controls are the only ones.
 - The renderer's credit is shown in the frame's footer.
-- `connection.fit()` frames every place on the map.
+- `connection.fit()` frames every place on the map. Pass `bounds` to frame an
+  area instead, such as a city a search found.
+- `connection.show(place)` brings a place to the middle of the map, at its
+  `zoom` where you give one.
 - `connection.disconnect()` puts back everything `connectMap` changed.
 
 Use `mapLibreDriver(map)` for MapLibre GL JS 5 and `leafletDriver(map, L)` for
@@ -419,7 +422,7 @@ animation. Each optional method turns on a feature:
 | Method | Turns on |
 |---|---|
 | `project`, `onView` | Placing markers and positions |
-| `show` | Bringing a focused marker into view |
+| `show` | `connection.show()` and bringing a focused marker into view |
 | `fit` | `connection.fit()` and zooming in to clusters |
 | `layers` | Drawing routes, areas, and points |
 | `credits` | The map credit in the frame's footer |

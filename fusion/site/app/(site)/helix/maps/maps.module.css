@@ -205,6 +205,45 @@ fieldset.mapsControl {
   padding: 0;
 }
 
+/* The search, its field as wide as a street address, and its label drawn as
+   the other controls' are. */
+.mapsSearch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  inline-size: 20rem;
+  max-inline-size: 100%;
+}
+
+.mapsSearch helix-combobox::part(label) {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-regular);
+  padding: 0;
+}
+
+.mapsSearchNote {
+  color: var(--helix-color-foreground-subtle);
+}
+
+/* A button drawn as the site's links are, with `data-link`, in the
+   caption's size since it sits in the caption's line: only a button's own
+   chrome taken off here. */
+.mapsSearchBack {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--helix-text-xs);
+  padding: 0;
+}
+
+.mapsSearchBack:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-border-thick) solid var(--helix-color-focus-ring);
+  outline-offset: 2px;
+}
+
 .mapsSwatches {
   align-items: center;
   display: flex;

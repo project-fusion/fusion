@@ -420,10 +420,12 @@ describe('connectMap with routes and areas', () => {
     driver: MapDriver
     drawn: MapLayerSpec[][]
     fitted: string[]
+    shown: string[]
     stopped: boolean[]
   } => {
     const drawn: MapLayerSpec[][] = []
     const fitted: string[] = []
+    const shown: string[] = []
     const stopped: boolean[] = []
     const driver: MapDriver = {
       fit: (bounds, padding, motion) => {
@@ -441,9 +443,12 @@ describe('connectMap with routes and areas', () => {
         }
       },
       panBy: () => {},
+      show: (place, motion) => {
+        shown.push(`${JSON.stringify(place)} ${paced(motion)}`)
+      },
       zoomBy: () => {},
     }
-    return { drawn, driver, fitted, stopped }
+    return { drawn, driver, fitted, shown, stopped }
   }
 
   test('each route and area reaches the driver as its kind, its points and its name, and one too short to draw does not', async () => {
@@ -768,6 +773,25 @@ describe('connectMap with routes and areas', () => {
       '{"northEast":{"lat":3,"lng":10},"southWest":{"lat":-1,"lng":2}} 48 320ms',
       '{"northEast":{"lat":3,"lng":10},"southWest":{"lat":-1,"lng":2}} 12 320ms',
     ])
+  })
+
+  test('fitting given bounds frames them, whatever places the frame holds', async () => {
+    const host = await frame(
+      '<helix-headless-map-marker label="Depot" lat="-1" lng="10"></helix-headless-map-marker>',
+    )
+    const { driver, fitted } = layering()
+    const bounds = { northEast: { lat: 31, lng: -97 }, southWest: { lat: 30, lng: -98 } }
+    connectMap(host, driver).fit({ animate: false, bounds })
+    expect(fitted).toEqual([`${JSON.stringify(bounds)} 48 jump`])
+  })
+
+  test('showing a place brings it to the middle at its zoom, at the pace of a trip or at once', async () => {
+    const host = await frame('')
+    const { driver, shown } = layering()
+    const connection = connectMap(host, driver)
+    connection.show({ lat: 30.27, lng: -97.74, zoom: 16 })
+    connection.show({ lat: 1, lng: 2 }, { animate: false })
+    expect(shown).toEqual(['{"lat":30.27,"lng":-97.74,"zoom":16} 320ms', '{"lat":1,"lng":2} jump'])
   })
 })
 

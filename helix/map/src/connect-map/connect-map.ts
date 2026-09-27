@@ -514,10 +514,25 @@ export interface MapConnection {
    * Frames every place the frame holds, its markers and every point of its
    * routes and areas, inset by `padding`, 48 pixels by default, at the page's
    * pace for a trip, or at once with `animate: false`, which is what framing
-   * a map that is still settling its size wants. Nothing where the frame
-   * holds no place or the driver cannot frame.
+   * a map that is still settling its size wants. Give `bounds` to frame that
+   * stretch of the world instead, such as a city a search found. Nothing where
+   * there is nothing to frame or the driver cannot frame.
    */
-  fit(options?: { animate?: boolean | undefined; padding?: MapPadding | undefined }): void
+  fit(options?: {
+    animate?: boolean | undefined
+    bounds?: MapBounds | undefined
+    padding?: MapPadding | undefined
+  }): void
+  /**
+   * Brings a place to the middle of the view, at `zoom` where it is given, at
+   * the page's pace for a trip, or at once with `animate: false`. A reader who
+   * asked for reduced motion is taken there at once either way. Nothing where
+   * the driver cannot show a place.
+   */
+  show(
+    place: MapPlace & { zoom?: number | undefined },
+    options?: { animate?: boolean | undefined },
+  ): void
 }
 
 /** Where the connector writes the renderer's credit, so it can find its own. */
@@ -1426,6 +1441,12 @@ export const connectMap = (
       if (!driver.fit) {
         return
       }
+      const motion = options.animate === false ? null : motionOf(frame, 'travel')
+      const padding = options.padding ?? 48
+      if (options.bounds) {
+        driver.fit(options.bounds, padding, motion)
+        return
+      }
       /* The points as written: framing needs where a route goes, not its color. */
       const places: MapPlace[] = [
         ...[...markers(), ...positions()]
@@ -1447,9 +1468,12 @@ export const connectMap = (
           northEast: { lat: Math.max(...lats), lng: Math.max(...lngs) },
           southWest: { lat: Math.min(...lats), lng: Math.min(...lngs) },
         },
-        options.padding ?? 48,
-        options.animate === false ? null : motionOf(frame, 'travel'),
+        padding,
+        motion,
       )
+    },
+    show(place, options = {}): void {
+      driver.show?.(place, options.animate === false ? null : motionOf(frame, 'travel'))
     },
   }
 }
