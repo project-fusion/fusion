@@ -5,7 +5,7 @@ export function Example() {
     <>
       {/* Preview frame: data-preview-map has the frame connect MapLibre and data-preview-map-view tilts it; on your page, connectMap does, and you set the view on your map. */}
       <helix-map
-        controls="pan zoom rotate tilt layers fullscreen"
+        controls="zoom compass tilt layers fullscreen"
         data-preview-map
         data-preview-map-view="30.2672,-97.7431,15.6,50,-17"
         label="Downtown Austin from above"
