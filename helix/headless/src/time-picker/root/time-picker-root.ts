@@ -77,29 +77,29 @@ const isTwelveHour = (locale?: string): boolean =>
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart column - One column of the wheels.
- * @csspart column-empty - Shown when a filter has hidden everything.
- * @csspart column-feedback - The message that says what is wrong.
+ * @csspart column-empty - The text shown when the filter hides every option.
+ * @csspart column-feedback - The message that says what is wrong with the value.
  * @csspart column-filter-icon - The icon beside the filter field.
- * @csspart column-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart column-filter-mark - The default icon beside the filter field, shown when none is slotted.
  * @csspart column-hint - Help under the list.
- * @csspart column-items - The list itself.
+ * @csspart column-items - The list of options.
  * @csspart column-label - The label above the list.
- * @csspart column-live - The inner list's `live` part, the region that announces its empty and loading messages.
- * @csspart column-loading - Shown while the options load.
- * @csspart column-search - The region holding the field that narrows the list.
+ * @csspart column-live - A copy of the empty and loading text, in a region that screen readers announce when it changes. Visually hidden in the styled tier.
+ * @csspart column-loading - The text shown while the options load.
+ * @csspart column-search - The region that holds the filter field.
  * @csspart column-search-field - The filter field.
  * @csspart columns - The row of columns, in `wheels`.
  * @csspart list - The listbox holding the times, in `list`.
- * @csspart list-empty - Shown when a filter has hidden everything.
- * @csspart list-feedback - The message that says what is wrong.
+ * @csspart list-empty - The text shown when the filter hides every option.
+ * @csspart list-feedback - The message that says what is wrong with the value.
  * @csspart list-filter-icon - The icon beside the filter field.
- * @csspart list-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart list-filter-mark - The default icon beside the filter field, shown when none is slotted.
  * @csspart list-hint - Help under the list.
- * @csspart list-items - The list itself.
+ * @csspart list-items - The list of options.
  * @csspart list-label - The label above the list.
- * @csspart list-live - The inner list's `live` part, the region that announces its empty and loading messages.
- * @csspart list-loading - Shown while the options load.
- * @csspart list-search - The region holding the field that narrows the list.
+ * @csspart list-live - A copy of the empty and loading text, in a region that screen readers announce when it changes. Visually hidden in the styled tier.
+ * @csspart list-loading - The text shown while the options load.
+ * @csspart list-search - The region that holds the filter field.
  * @csspart list-search-field - The filter field.
  * @csspart option - One time in the list. It carries `data-between` inside a range.
  * @csspart option-between - A time inside a chosen range, excluding its ends, beside `option`.
