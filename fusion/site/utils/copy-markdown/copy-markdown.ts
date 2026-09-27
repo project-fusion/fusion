@@ -103,7 +103,7 @@ const STAGES: Record<string, string> = {
  */
 const insightsCopy = (): PageCopy => ({
   blocks: [{ from: 'insights', title: 'Everything published so far' }],
-  lede: 'Short pieces on what we are building and why. Arguments rather than announcements.',
+  lede: 'Articles on what we are building and why.',
   source: 'the insight registry, which the page also renders from',
   title: 'Insights',
 })
