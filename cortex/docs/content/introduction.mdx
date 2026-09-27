@@ -1,34 +1,30 @@
 ---
 title: Introduction
-description: 'What Cortex is: memory and provenance, not a model wrapper.'
+description: 'What Cortex is: a memory and provenance layer for AI systems.'
 ---
 
 # Cortex
 
-Cortex is Fusion's cognitive substrate. Rust, local-first, storage-agnostic.
+Cortex is a memory and provenance layer for AI systems. It is written in Rust,
+keeps data on your machine by default, and works with any storage backend.
 
-**Most AI systems are amnesiac and unaccountable. Cortex is neither.**
+It adds two things to a model call:
 
-Two properties turn a model call into cognition:
-
-- **Memory** that persists, consolidates, and forgets. Not a log of everything
-  that ever happened, which is the raw material memory operates on rather than
-  memory itself.
-- **Provenance** that makes every output traceable to its inputs. Almost no AI
-  stack can answer *"why did it say that?"* Cortex answers it by construction,
-  because provenance is the spine rather than a module.
+- **Memory** that persists, consolidates, and forgets. A log of every event is
+  the raw material that memory is built from.
+- **Provenance** that traces every output to its inputs, so you can answer "why
+  did it say that?" for any answer. Every other part of Cortex is built on it.
 
 ## Why local-first
 
-An AI that remembers you, but whose memory lives on someone else's server, has
-relocated the dependency rather than removed it.
+If a system that remembers you stores that memory on someone else's server, you
+still depend on that server.
 
-Cortex will default to a single SQLite file on your machine. The stores in the
-crates today are in-memory references; SQLite and Postgres are required behind a
-trait rather than built. The hosted tier is a convenience rather than a
-requirement. The
-`Provider` trait carries an `is_local` flag so a product can tell the user
-whether their data left the device:
+Cortex will store everything in a single SQLite file on your machine by
+default. Today the stores in the crates keep data in memory. SQLite and
+Postgres are planned behind a shared trait, and a hosted tier will be an
+option. The `Provider` trait has an `is_local` flag, so a product can tell you
+whether your data left the device:
 
 [//]: # (rust:fusion-cortex-core::provider::MockProvider)
 
@@ -50,14 +46,14 @@ assert!(provider.is_local());
 | **Recall** | `fusion-cortex-recall` | Context assembly. Not yet built |
 | Core | `fusion-cortex-core` | Identifiers, provider abstraction, shared errors |
 
-Three modules carry the differentiated ideas and earn names of their own.
-Everything else stays descriptive.
+Engram, Trace, and Recall have names of their own because each is a distinct
+idea. Everything else has a descriptive name.
 
 ## Identifiers
 
-Ids are UUIDv7 rather than v4. The timestamp prefix makes them sort in creation
-order, which turns index locality and time-range scans over episodic memory
-into a property of the key rather than a separate column.
+Ids are UUIDv7. The timestamp at the start of each id makes ids sort in the
+order they were created. An index stays in order, and a time-range scan over
+episodic memory needs no separate time column.
 
 [//]: # (rust:fusion-cortex-core::Id)
 
