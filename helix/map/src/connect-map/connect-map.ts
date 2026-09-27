@@ -220,7 +220,7 @@ export interface MapLayerSpec {
   id: string
   /** What a points layer writes its counts in. */
   ink?: string | undefined
-  kind: 'area' | 'buildings' | 'points' | 'raster' | 'route' | 'terrain'
+  kind: 'area' | 'buildings' | 'contours' | 'landcover' | 'points' | 'raster' | 'route' | 'terrain'
   /** What the frame's list calls it. */
   label: string
   /** A raster layer's deepest zoom with tiles, past which a renderer enlarges them. */
@@ -234,8 +234,10 @@ export interface MapLayerSpec {
   pattern?: 'dotted' | undefined
   /** Whether a terrain layer raises the ground to its height in 3D. */
   raised?: boolean | undefined
-  /** A terrain layer's elevation tile URL, with `{z}`, `{x}`, and `{y}` in it. */
+  /** A terrain or contours layer's elevation tile URL, with `{z}`, `{x}`, and `{y}` in it. */
   src?: string | undefined
+  /** The unit a contours layer's heights are labeled in. */
+  unit?: 'feet' | 'meters' | undefined
   /**
    * In order: along a route, and around an area without repeating the first;
    * a points layer's every point, the same array for as long as its data is
@@ -356,13 +358,23 @@ interface Layer extends HTMLElement {
   ground?: boolean | undefined
   isMapLayer: true
   label?: string | undefined
-  layerKind: 'area' | 'buildings' | 'points' | 'raster' | 'route' | 'terrain'
+  layerKind:
+    | 'area'
+    | 'buildings'
+    | 'contours'
+    | 'landcover'
+    | 'points'
+    | 'raster'
+    | 'route'
+    | 'terrain'
   /** A raster layer's deepest zoom with tiles of its own. */
   maxZoom?: number | undefined
   /** A points layer's: the property each point is named by. */
   nameKey?: string | undefined
   /** A terrain layer's: whether the ground is raised to its height in 3D. */
   raised?: boolean | undefined
+  /** A contours layer's: the unit its heights are labeled in. */
+  unit?: 'feet' | 'meters' | undefined
   /** A raster layer's opacity, from `0` to `1`. */
   opacity?: number | undefined
   points?: MapPlace[] | undefined
@@ -825,6 +837,33 @@ export const connectMap = (
         /* **Terrain is its elevation tiles and two colors**, the shadow's
            and the highlight's, which the styled tier sets as the element's
            color and border. */
+        /* **Contours are their elevation tiles, their color, and the unit
+           their heights are in**; land cover is the color of the land its
+           covers are mixed into, and the map's own tiles. */
+        if (layer.layerKind === 'contours') {
+          if (!layer.src) {
+            return []
+          }
+          return [
+            {
+              ...(layer.attribution ? { attribution: layer.attribution } : {}),
+              color,
+              encoding: layer.encoding === 'mapbox' ? 'mapbox' : 'terrarium',
+              id: idOf(layer),
+              kind: 'contours',
+              label: layer.label ?? '',
+              ...(typeof layer.maxZoom === 'number' ? { maxZoom: layer.maxZoom } : {}),
+              points: [],
+              src: layer.src,
+              unit: layer.unit === 'feet' ? 'feet' : 'meters',
+            },
+          ]
+        }
+        if (layer.layerKind === 'landcover') {
+          return [
+            { color, id: idOf(layer), kind: 'landcover', label: layer.label ?? '', points: [] },
+          ]
+        }
         if (layer.layerKind === 'terrain') {
           if (!layer.src) {
             return []

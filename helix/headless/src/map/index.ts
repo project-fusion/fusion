@@ -1,5 +1,7 @@
 export { HelixHeadlessMapArea } from './area/map-area.js'
 export { HelixHeadlessMapBuildings } from './buildings/map-buildings.js'
+export { HelixHeadlessMapContours } from './contours/map-contours.js'
+export { HelixHeadlessMapLandcover } from './landcover/map-landcover.js'
 export { HelixHeadlessMapMarker } from './marker/map-marker.js'
 export type {
   MapPointsCollection,

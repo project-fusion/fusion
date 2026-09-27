@@ -80,12 +80,11 @@ const OPENFREEMAP = {
 export type MapImage =
   | { color: string; icon: { content: string; viewBox: string }; ink: string; kind: 'landmark' }
   | {
-      band?: string | undefined
-      edge: string
-      fill: string
+      design: 'interstate' | 'plate' | 'state' | 'us'
+      edge?: string | undefined
+      fill?: string | undefined
       kind: 'sign'
       length: number
-      shape: 'interstate' | 'oval' | 'plate' | 'shield'
     }
 
 /**
@@ -152,15 +151,16 @@ const LANDMARKS: readonly {
 ]
 
 /**
- * The highway signs by the schema's `network`: the US Interstate's red and
- * blue shield, the US route's white shield, a state route's white oval, and
- * a plate in the map's own colors for every other network. Real signs' colors
- * for the first three, since a reader knows them by their colors.
+ * The highway signs by the schema's `network`, drawn as the Federal Highway
+ * Administration draws them: the Interstate's red and blue shield, the US
+ * route's white shield, and a white circle for a state route, the standard
+ * marker where a state has none of its own. Every other network's number is
+ * on a plate in the map's own colors.
  */
-const SIGNS: Record<string, 'interstate' | 'oval' | 'shield'> = {
-  'us-highway': 'shield',
+const SIGNS: Record<string, 'interstate' | 'state' | 'us'> = {
+  'us-highway': 'us',
   'us-interstate': 'interstate',
-  'us-state': 'oval',
+  'us-state': 'state',
 }
 
 /** An id safe to name an image by, from a color. */
@@ -330,33 +330,14 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
      schema's `ref_length`, so a sign is as wide as its number. */
   const plate = { edge: toward(0.5), fill: halo }
   for (let length = 1; length <= 6; length++) {
-    images[`helix-sign-interstate-${length}`] = {
-      band: '#b31f2e',
-      edge: '#ffffff',
-      fill: '#1b3f8f',
-      kind: 'sign',
-      length,
-      shape: 'interstate',
-    }
-    images[`helix-sign-shield-${length}`] = {
-      edge: '#1a1a1a',
-      fill: '#ffffff',
-      kind: 'sign',
-      length,
-      shape: 'shield',
-    }
-    images[`helix-sign-oval-${length}`] = {
-      edge: '#1a1a1a',
-      fill: '#ffffff',
-      kind: 'sign',
-      length,
-      shape: 'oval',
+    for (const design of ['interstate', 'state', 'us'] as const) {
+      images[`helix-sign-${design}-${length}`] = { design, kind: 'sign', length }
     }
     images[`helix-sign-plate-${idOf(plate.fill + plate.edge)}-${length}`] = {
       ...plate,
+      design: 'plate',
       kind: 'sign',
       length,
-      shape: 'plate',
     }
   }
   const signShape: unknown[] = ['match', ['get', 'network']]
@@ -583,6 +564,17 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
           'symbol-spacing': 320,
           'text-field': ['get', 'ref'],
           'text-font': BOLD,
+          /* In the blue field under the Interstate's crown, and a little low
+             in the US shield, whose point is its narrowest part. */
+          'text-offset': [
+            'match',
+            ['get', 'network'],
+            'us-interstate',
+            ['literal', [0, 0.3]],
+            'us-highway',
+            ['literal', [0, 0.1]],
+            ['literal', [0, 0]],
+          ],
           'text-rotation-alignment': 'viewport',
           'text-size': 10,
         },

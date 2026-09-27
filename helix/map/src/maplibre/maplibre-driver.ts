@@ -5,9 +5,19 @@ import type {
   MapPadding,
   MapType,
 } from '../connect-map/connect-map.js'
+import {
+  type ContourLine,
+  contourInterval,
+  contoursOf,
+  type HeightEncoding,
+  type HeightTile,
+  heightsFrom,
+  tilesCovering,
+} from '../contours/contours.js'
 import type { MapMotion } from '../motion/motion.js'
 import { colorsNow, type MapColors, mapColorsFrom, PATIENCE } from '../style/map-colors.js'
 import type { MapImage } from '../style/map-style.js'
+import { cssColor, mix, oklch, parseColor, type Rgb } from '../style/oklab.js'
 import { watchTheme } from '../theme/watch-theme.js'
 import { drawMapImage, IMAGE_RATIO } from './map-images.js'
 
@@ -148,7 +158,37 @@ export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
 const buildingsLayer = (id: string): string => `helix-buildings-${id}`
 
 /** The kinds of layer drawn apart from the routes, areas, and points. */
-const EXTRAS = new Set<MapLayerSpec['kind']>(['buildings', 'raster', 'terrain'])
+const EXTRAS = new Set<MapLayerSpec['kind']>([
+  'buildings',
+  'contours',
+  'landcover',
+  'raster',
+  'terrain',
+])
+
+/** A contours layer's lines and their labels, one GeoJSON source for both. */
+const contoursSource = (id: string): string => `helix-contours-${id}`
+
+/** A land cover layer's fill. */
+const landcoverLayer = (id: string): string => `helix-landcover-${id}`
+
+/**
+ * The covers the schema names, each a color mixed into the land by how much
+ * it covers the ground, at a lightness between a light and a dark land:
+ * forest greener than grass, farmland wheat, sand tan, rock gray, ice pale.
+ */
+const COVERS: readonly [string, Rgb, number][] = [
+  ['wood', oklch(0.55, 0.11, 145), 0.42],
+  ['grass', oklch(0.68, 0.1, 130), 0.3],
+  ['farmland', oklch(0.75, 0.08, 90), 0.32],
+  ['wetland', oklch(0.62, 0.07, 185), 0.35],
+  ['sand', oklch(0.8, 0.06, 80), 0.4],
+  ['rock', oklch(0.62, 0.015, 60), 0.35],
+  ['ice', oklch(0.93, 0.03, 230), 0.55],
+]
+
+/** No lines, for a contours layer while the map is too far out to draw any. */
+const NO_LINES = { features: [], type: 'FeatureCollection' }
 
 /** A terrain layer's hill shading, one style layer. */
 const terrainLayer = (id: string): string => `helix-terrain-${id}`
@@ -339,6 +379,8 @@ export interface MapLibreMap {
     | undefined
   /** Which way the view is turned, in degrees clockwise from north. */
   getBearing(): number
+  /** The stretch of the world in view, which a contours layer traces the tiles of. */
+  getBounds?(): { getEast(): number; getNorth(): number; getSouth(): number; getWest(): number }
   /** How far the view is tilted from looking straight down, in degrees. */
   getPitch(): number
   /** Goes to a place, gliding. */
@@ -363,6 +405,7 @@ export interface MapLibreMap {
       | 'move'
       | 'resize'
       | 'sourcedata'
+      | 'moveend'
       | 'styledata'
       | 'styleimagemissing',
     listener: (event?: MapLibreEvent) => void,
@@ -376,6 +419,7 @@ export interface MapLibreMap {
       | 'move'
       | 'resize'
       | 'sourcedata'
+      | 'moveend'
       | 'styledata'
       | 'styleimagemissing',
     listener: (event?: MapLibreEvent) => void,
@@ -654,10 +698,151 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     /* **Buildings, raster, and terrain layers**, by spec id, with what each
        was drawn from: the buildings' color, a raster layer's tile URLs, a
        terrain layer's tiles and how it raises the ground. */
-    const drawnExtras = new Map<string, { kind: 'buildings' | 'raster' | 'terrain'; key: string }>()
+    const drawnExtras = new Map<
+      string,
+      { kind: 'buildings' | 'contours' | 'landcover' | 'raster' | 'terrain'; key: string }
+    >()
+    /* **Contour lines, traced in the page.** The heights of each tile are
+       read once, the lines of each tile at each interval traced once, and the
+       tiles in view traced again after the map moves; a trace overtaken by
+       another move is dropped. */
+    const traced = new Map<string, MapLayerSpec>()
+    const heights = new Map<string, Promise<HeightTile | undefined>>()
+    const lines = new Map<string, ContourLine[]>()
+    let tracing = 0
+    const heightsOf = (
+      url: string,
+      tile: { x: number; y: number; z: number },
+      encoding: HeightEncoding,
+    ) => {
+      const had = heights.get(url)
+      if (had) {
+        return had
+      }
+      const read = fetch(url)
+        .then((response) => (response.ok ? response.blob() : undefined))
+        .then((blob) => (blob ? createImageBitmap(blob) : undefined))
+        .then((bitmap) => {
+          if (!bitmap) {
+            return undefined
+          }
+          const canvas = document.createElement('canvas')
+          canvas.width = bitmap.width
+          canvas.height = bitmap.height
+          const context = canvas.getContext('2d', { willReadFrequently: true })
+          if (!context) {
+            return undefined
+          }
+          context.drawImage(bitmap, 0, 0)
+          const pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data
+          return { ...tile, heights: heightsFrom(pixels, encoding), size: bitmap.width }
+        })
+        .catch(() => undefined)
+      /* The last hundred tiles, which a map panned about keeps coming back to. */
+      if (heights.size >= 100) {
+        heights.delete(heights.keys().next().value as string)
+      }
+      heights.set(url, read)
+      return read
+    }
+    const trace = async (): Promise<void> => {
+      const run = ++tracing
+      const zoom = map.getZoom?.() ?? 0
+      const view = map.getBounds?.()
+      for (const [id, spec] of traced) {
+        const source = map.getSource(contoursSource(id))
+        if (!source?.setData || !spec.src) {
+          continue
+        }
+        if (zoom < 9 || !view) {
+          source.setData(NO_LINES as never)
+          continue
+        }
+        /* A tile at a zoom under the map's, fewer where the view is wide,
+           as a tilted one is out to its horizon. */
+        const bounds = {
+          east: view.getEast(),
+          north: view.getNorth(),
+          south: view.getSouth(),
+          west: view.getWest(),
+        }
+        let z = Math.min(spec.maxZoom ?? 15, Math.max(0, Math.floor(zoom) - 1))
+        let tiles = tilesCovering(bounds, z)
+        while (tiles.length > 24 && z > 0) {
+          z -= 1
+          tiles = tilesCovering(bounds, z)
+        }
+        const unit = spec.unit ?? 'meters'
+        const interval = contourInterval(zoom, unit)
+        const src = spec.src
+        const read = await Promise.all(
+          tiles.map((tile) =>
+            heightsOf(
+              src
+                .replace('{z}', `${tile.z}`)
+                .replace('{x}', `${tile.x}`)
+                .replace('{y}', `${tile.y}`),
+              tile,
+              spec.encoding ?? 'terrarium',
+            ),
+          ),
+        )
+        if (run !== tracing) {
+          return
+        }
+        const known = new Map(
+          read.filter((tile) => tile !== undefined).map((tile) => [`${tile.x}/${tile.y}`, tile]),
+        )
+        const features: unknown[] = []
+        for (const tile of known.values()) {
+          const key = `${spec.src}|${tile.z}/${tile.x}/${tile.y}|${interval}|${unit}`
+          let found = lines.get(key)
+          if (!found) {
+            const beside = (dx: number, dy: number) =>
+              known.get(`${(tile.x + dx) % 2 ** tile.z}/${tile.y + dy}`)
+            found = contoursOf(tile, interval, unit, {
+              corner: beside(1, 1),
+              east: beside(1, 0),
+              south: beside(0, 1),
+            })
+            if (lines.size >= 200) {
+              lines.delete(lines.keys().next().value as string)
+            }
+            lines.set(key, found)
+            /* A frame to the page between tiles, so a trace does not hold it. */
+            await new Promise((next) => setTimeout(next, 0))
+            if (run !== tracing) {
+              return
+            }
+          }
+          for (const line of found) {
+            features.push({
+              geometry: { coordinates: line.coordinates, type: 'LineString' },
+              properties: { elevation: line.elevation, index: line.index },
+              type: 'Feature',
+            })
+          }
+        }
+        source.setData({ features, type: 'FeatureCollection' } as never)
+      }
+    }
     const takeOffExtra = (id: string): void => {
       const had = drawnExtras.get(id)
-      if (had?.kind === 'terrain') {
+      if (had?.kind === 'contours') {
+        for (const layer of [contoursSource(id), `${contoursSource(id)}-label`]) {
+          if (map.getLayer(layer)) {
+            map.removeLayer(layer)
+          }
+        }
+        if (map.getSource(contoursSource(id))) {
+          map.removeSource(contoursSource(id))
+        }
+        traced.delete(id)
+      } else if (had?.kind === 'landcover') {
+        if (map.getLayer(landcoverLayer(id))) {
+          map.removeLayer(landcoverLayer(id))
+        }
+      } else if (had?.kind === 'terrain') {
         if (map.getLayer(terrainLayer(id))) {
           map.removeLayer(terrainLayer(id))
         }
@@ -770,6 +955,123 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
             }
           }
           drawnExtras.set(spec.id, { key: spec.color, kind: 'buildings' })
+          continue
+        }
+        if (spec.kind === 'landcover') {
+          /* **Over the style's own land cover and its parks**, from the
+             source its land cover layer draws, so any OpenMapTiles style
+             works; under its water and roads. Over the parks, since a park
+             is a boundary drawn round the ground, and a national park drawn
+             over it hid a valley's every meadow and forest. */
+          const style = map.getStyle()?.layers ?? []
+          const own = style.findIndex((layer) => layer['source-layer'] === 'landcover')
+          const source = style[own]?.source
+          const water = style.findIndex((layer) => layer['source-layer'] === 'water')
+          const land = parseColor(spec.color)
+          if (!source || !land) {
+            continue
+          }
+          const fill: unknown[] = ['match', ['get', 'class']]
+          for (const [cover, color, amount] of COVERS) {
+            fill.push(cover, cssColor(mix(land, color, amount)))
+          }
+          fill.push('rgba(0, 0, 0, 0)')
+          const layer = landcoverLayer(spec.id)
+          if (map.getLayer(layer)) {
+            map.setPaintProperty(layer, 'fill-color', fill)
+          } else {
+            try {
+              map.addLayer(
+                {
+                  filter: ['match', ['get', 'class'], COVERS.map(([cover]) => cover), true, false],
+                  id: layer,
+                  paint: { 'fill-color': fill },
+                  source,
+                  'source-layer': 'landcover',
+                  type: 'fill',
+                } as never,
+                water >= 0 ? style[water]?.id : underRoads(),
+              )
+            } catch {
+              continue
+            }
+          }
+          drawnExtras.set(spec.id, { key: spec.color, kind: 'landcover' })
+          continue
+        }
+        if (spec.kind === 'contours') {
+          /* **Lines under the roads, every fifth heavier and labeled with its
+             height**, in the style's own upright face, haloed in its land. */
+          const key = `${spec.src ?? ''}|${spec.encoding ?? ''}|${spec.maxZoom ?? ''}|${spec.unit ?? ''}`
+          if (drawnExtras.get(spec.id)?.key !== key) {
+            takeOffExtra(spec.id)
+          }
+          const source = contoursSource(spec.id)
+          const style = map.getStyle()?.layers ?? []
+          const face = style
+            .filter((layer) => layer.type === 'symbol')
+            .map((layer) => (layer.layout as Record<string, unknown> | undefined)?.['text-font'])
+            .find(
+              (one): one is string[] =>
+                Array.isArray(one) && !one.some((name) => /italic|bold/i.test(String(name))),
+            ) ?? ['Noto Sans Regular']
+          const land = style.find((layer) => layer.type === 'background') as
+            | { paint?: Record<string, unknown> }
+            | undefined
+          const halo = String(land?.paint?.['background-color'] ?? 'rgba(0, 0, 0, 0)')
+          if (map.getSource(source)) {
+            map.setPaintProperty(source, 'line-color', spec.color)
+            map.setPaintProperty(`${source}-label`, 'text-color', spec.color)
+          } else {
+            try {
+              map.addSource(source, { data: NO_LINES, type: 'geojson' } as never)
+              map.addLayer(
+                {
+                  id: source,
+                  layout: { 'line-join': 'round' },
+                  paint: {
+                    'line-color': spec.color,
+                    'line-opacity': ['case', ['get', 'index'], 0.85, 0.55],
+                    'line-width': ['case', ['get', 'index'], 1.1, 0.6],
+                  },
+                  source,
+                  type: 'line',
+                } as never,
+                underRoads(),
+              )
+              map.addLayer(
+                {
+                  filter: ['get', 'index'],
+                  id: `${source}-label`,
+                  layout: {
+                    'symbol-placement': 'line',
+                    'symbol-spacing': 320,
+                    'text-field': [
+                      'concat',
+                      ['to-string', ['get', 'elevation']],
+                      spec.unit === 'feet' ? ' ft' : ' m',
+                    ],
+                    'text-font': face,
+                    'text-max-angle': 25,
+                    'text-size': 10,
+                  },
+                  paint: {
+                    'text-color': spec.color,
+                    'text-halo-color': halo,
+                    'text-halo-width': 1.5,
+                  },
+                  source,
+                  type: 'symbol',
+                } as never,
+                underRoads(),
+              )
+            } catch {
+              continue
+            }
+          }
+          traced.set(spec.id, spec)
+          drawnExtras.set(spec.id, { key, kind: 'contours' })
+          void trace()
           continue
         }
         if (spec.kind === 'terrain') {
@@ -925,7 +1227,11 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           ? !map.getLayer(buildingsLayer(id))
           : had.kind === 'terrain'
             ? !map.getLayer(terrainLayer(id))
-            : !map.getLayer(rasterFrame(id, 0)),
+            : had.kind === 'contours'
+              ? !map.getLayer(contoursSource(id))
+              : had.kind === 'landcover'
+                ? !map.getLayer(landcoverLayer(id))
+                : !map.getLayer(rasterFrame(id, 0)),
       )
       for (const [id] of lostExtras) {
         drawnExtras.delete(id)
@@ -1069,6 +1375,12 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     map.on('move', stood)
     const missing = (event?: MapLibreEvent): void => supplyImage(map, event?.id)
     map.on('styleimagemissing', missing)
+    const moved = (): void => {
+      if (traced.size > 0) {
+        void trace()
+      }
+    }
+    map.on('moveend', moved)
     draw()
     return {
       expand: (id, cluster) => expand(id, cluster),
@@ -1081,6 +1393,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         map.off('idle', settled)
         map.off('move', stood)
         map.off('styleimagemissing', missing)
+        map.off('moveend', moved)
         for (const id of drawnPoints.keys()) {
           takeOff(id)
         }

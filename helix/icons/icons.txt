@@ -71,6 +71,7 @@ info
 info-fill
 laptop
 layout
+leaf
 lightbulb
 link
 linkedin-logo
@@ -112,6 +113,7 @@ stop
 strategy
 sun
 tag-simple
+target
 text-b
 text-italic
 train
