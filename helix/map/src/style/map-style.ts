@@ -33,7 +33,8 @@ export interface MapStyleOptions {
   glyphs?: string | undefined
   /**
    * Draws the world as a globe when the map is zoomed out, turning into the
-   * flat map as it zooms in. MapLibre 5 and later.
+   * flat map as it zooms in. `true` by default. Set `false` for a flat map at
+   * every zoom, which MapLibre 4 also needs, since it has no globe.
    */
   globe?: boolean | undefined
   /**
@@ -59,7 +60,7 @@ export interface MapLibreStyle {
   metadata: { 'helix:images': Record<string, MapImage> }
   layers: Array<Record<string, unknown>>
   name: string
-  /** How the world is drawn: a globe where the style asks for one. */
+  /** How the world is drawn: a globe, unless the style is asked for a flat map. */
   projection?: { type: 'globe' }
   /** The sky over the horizon and the atmosphere round a globe. */
   sky?: Record<string, unknown>
@@ -678,7 +679,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
     ],
     metadata: { 'helix:images': images },
     name: 'Helix',
-    ...(options.globe
+    ...(options.globe !== false
       ? {
           projection: { type: 'globe' as const },
           /* **An atmosphere round the globe**, so its edge shows against a
