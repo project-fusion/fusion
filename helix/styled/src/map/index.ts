@@ -1,6 +1,8 @@
 export { HelixMapArea } from './area/map-area.js'
+export { HelixMapBuildings } from './buildings/map-buildings.js'
 export { HelixMapMarker } from './marker/map-marker.js'
 export { HelixMapPoints } from './points/map-points.js'
 export { HelixMapPosition } from './position/map-position.js'
+export { HelixMapRaster } from './raster/map-raster.js'
 export { HelixMap } from './root/map-root.js'
 export { HelixMapRoute } from './route/map-route.js'

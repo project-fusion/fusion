@@ -277,4 +277,51 @@ describe('leafletDriver', () => {
     ])
     expect(made).toEqual(['polyline [[1,2],[3,4]] rgb(1, 2, 3) 0 10'])
   })
+
+  test('a raster layer is a tile layer a frame, kept between redraws and switched by opacity', () => {
+    const { asked, map } = stand()
+    const shape = (name: string) => ({
+      addTo: () => {
+        asked.push(`add ${name}`)
+      },
+      remove: () => {
+        asked.push(`remove ${name}`)
+      },
+    })
+    let frame = 1
+    const drawn = leafletDriver(map, {
+      polygon: () => shape('polygon'),
+      polyline: () => shape('polyline'),
+      tileLayer: (url) => ({
+        ...shape(url),
+        setOpacity: (opacity: number) => {
+          asked.push(`opacity ${url} ${opacity}`)
+        },
+      }),
+    }).layers?.(() => [
+      { color: 'red', id: 'b', kind: 'buildings', label: '3D buildings', points: [] },
+      {
+        color: 'red',
+        frame,
+        frames: ['a/{z}/{x}/{y}', 'b/{z}/{x}/{y}'],
+        id: 'w',
+        kind: 'raster',
+        label: 'Weather radar',
+        opacity: 0.5,
+        points: [],
+      },
+    ])
+    // Buildings draw nothing on a flat map; each frame is added once.
+    expect(asked.filter((one) => one.startsWith('add '))).toEqual([
+      'add a/{z}/{x}/{y}',
+      'add b/{z}/{x}/{y}',
+    ])
+    expect(asked.slice(-2)).toEqual(['opacity a/{z}/{x}/{y} 0', 'opacity b/{z}/{x}/{y} 0.5'])
+    frame = 0
+    drawn?.update()
+    expect(asked.filter((one) => one.startsWith('add '))).toHaveLength(2)
+    expect(asked.slice(-2)).toEqual(['opacity a/{z}/{x}/{y} 0.5', 'opacity b/{z}/{x}/{y} 0'])
+    drawn?.stop()
+    expect(asked.slice(-2)).toEqual(['remove a/{z}/{x}/{y}', 'remove b/{z}/{x}/{y}'])
+  })
 })

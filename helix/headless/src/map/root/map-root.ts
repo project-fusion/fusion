@@ -101,11 +101,11 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   label = ''
 
   /**
-   * The name of the list of routes, areas, and points layers, read by screen
-   * readers.
+   * The name of the list of the map's layers, such as routes, areas, and
+   * points, read by screen readers.
    */
   @property({ attribute: 'layers-label' })
-  layersLabel = 'Routes, areas, and points'
+  layersLabel = 'Map layers'
 
   /**
    * The routes and areas among the frame's children, in the order they are
