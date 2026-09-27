@@ -1,7 +1,7 @@
 # @fusion.dev/helix-icons
 
-The Helix icon set: 108 marks resolved from [Phosphor](https://phosphoricons.com)
-at build time, plus the few that are ours.
+The Helix icon set: 115 marks, 109 resolved from
+[Phosphor](https://phosphoricons.com) at build time and 6 of our own.
 
 ```sh
 npm install @fusion.dev/helix-icons
@@ -53,7 +53,7 @@ import { peak } from './icons'
 <helix-icon icon={peak} />
 ```
 
-Any set, not only ours. A subset of Phosphor larger than the 108 here is the
+Any set, not only ours. A subset of Phosphor larger than the 109 here is the
 same command against the package it resolves from, and `--suffix` is for a set
 that spells a weight into the file name:
 
