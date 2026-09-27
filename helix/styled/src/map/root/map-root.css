@@ -103,10 +103,15 @@
   background-color: var(--viewport-control-background-color, transparent);
 }
 
-/* Pointed at, whatever the ground: the raised surface, so a button a reader is
-   on reads as the one they are on over glass as well as over nothing. */
+/* Pointed at, whatever the ground: the overlay with a little of the ink in
+   it, so a button a reader is on reads as the one they are on over glass as
+   well as over nothing. */
 :host([material]) [part="controls"] button:hover {
-  background-color: var(--helix-color-surface-raised);
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 10%,
+    var(--helix-color-surface-overlay)
+  );
 }
 
 /* **Printed as it stands rather than hidden.** A map is the content of the page
@@ -279,7 +284,11 @@
 }
 
 [part="layers-menu"] [part="layer-choice"]:hover {
-  background-color: var(--helix-color-surface-raised);
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 8%,
+    var(--helix-color-surface)
+  );
 }
 
 [part="layers-menu"] [part="layer-choice"][aria-pressed="true"] {
@@ -292,11 +301,15 @@
   color: var(--helix-color-foreground);
 }
 
+[part="layers-menu"] [part="layer-choice"][aria-pressed="true"]:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-primary-surface) 24%,
+    var(--helix-color-surface)
+  );
+}
+
 [part="layer-icon"] {
   block-size: var(--helix-size-icon-lg);
   inline-size: var(--helix-size-icon-lg);
-}
-
-[part="layers-menu"] [part="layer-choice"][aria-pressed="true"] [part="layer-icon"] {
-  color: var(--helix-color-primary);
 }
