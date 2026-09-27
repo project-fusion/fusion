@@ -178,7 +178,7 @@ export function MapsHero({
       /* The labels held to the contrast chosen at the moment the map is
          styled, which a sent theme sets and a brand of the page's own clears. */
       const styled = (from: typeof colors) =>
-        mapLibreStyle(from, { contrast: labels.current, language }) as never
+        mapLibreStyle(from, { contrast: labels.current, globe: true, language }) as never
       /* **Tilted, so the city stands up**: the buildings are raised to their
          heights, and a reader turns and tilts the map from its controls. */
       const map = new maplibregl.Map({
