@@ -7,10 +7,14 @@ import type {
 } from '../connect-map/connect-map.js'
 import type { MapMotion } from '../motion/motion.js'
 import { colorsNow, type MapColors, mapColorsFrom, PATIENCE } from '../style/map-colors.js'
+import type { MapImage } from '../style/map-style.js'
 import { watchTheme } from '../theme/watch-theme.js'
+import { drawMapImage, IMAGE_RATIO } from './map-images.js'
 
 /** What MapLibre hands a listener, as far as the driver reads it. */
 interface MapLibreEvent {
+  /** On `styleimagemissing`: the image a layer names and the style has not got. */
+  id?: string
   /** On a press or a move: where the pointer is, in the map's box. */
   point?: { x: number; y: number }
   /** On `sourcedata`: `metadata` where a source learned its TileJSON, credit and all. */
@@ -290,6 +294,14 @@ export interface MapLibreMap {
    * own validator by a spec instead, which is a stricter check than a type.
    */
   addLayer(layer: never, beforeId?: string): unknown
+  /** Adds an image a layer names, drawn at `pixelRatio` times its size. */
+  addImage?(
+    id: string,
+    image: { data: Uint8Array; height: number; width: number },
+    options?: { pixelRatio?: number },
+  ): unknown
+  /** Whether the style has an image of that id. */
+  hasImage?(id: string): boolean
   /** Adds a source, which the frame's routes and areas are one of. `never` for `addLayer`'s reason. */
   addSource(id: string, source: never): unknown
   /** Frames a stretch of the world, west-south then east-north. */
@@ -343,11 +355,29 @@ export interface MapLibreMap {
   /** The arrow-key handler MapLibre adds unless told not to. */
   keyboard: { disable(): void; enable(): void; isEnabled(): boolean }
   off(
-    type: 'click' | 'idle' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type:
+      | 'click'
+      | 'idle'
+      | 'load'
+      | 'mousemove'
+      | 'move'
+      | 'resize'
+      | 'sourcedata'
+      | 'styledata'
+      | 'styleimagemissing',
     listener: (event?: MapLibreEvent) => void,
   ): unknown
   on(
-    type: 'click' | 'idle' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type:
+      | 'click'
+      | 'idle'
+      | 'load'
+      | 'mousemove'
+      | 'move'
+      | 'resize'
+      | 'sourcedata'
+      | 'styledata'
+      | 'styleimagemissing',
     listener: (event?: MapLibreEvent) => void,
   ): unknown
   removeLayer(id: string): unknown
@@ -438,10 +468,31 @@ const showLabels = (map: MapLibreMap, shown: boolean): void => {
 }
 
 /** A small map drawn off the page and read back as a picture, which MapLibre's own class makes. */
-interface PictureMap {
+interface PictureMap extends ImageHolder {
   getCanvas(): HTMLCanvasElement
+  on(type: 'styleimagemissing', listener: (event?: MapLibreEvent) => void): unknown
   once(type: 'idle', listener: () => void): unknown
   remove(): void
+}
+
+/** What an image is added to: a map, the connected one or a picture's. */
+type ImageHolder = Pick<MapLibreMap, 'addImage' | 'getStyle' | 'hasImage'>
+
+/**
+ * **Draws an image the style describes and the map has asked for**: a
+ * landmark's icon or a highway sign, named in `helix:images` in the style's
+ * metadata by `mapLibreStyle`. Nothing for an image of another's.
+ */
+const supplyImage = (holder: ImageHolder, id: string | undefined): void => {
+  if (!id?.startsWith('helix-') || holder.hasImage?.(id)) {
+    return
+  }
+  const style = holder.getStyle() as { metadata?: { 'helix:images'?: Record<string, MapImage> } }
+  const image = style?.metadata?.['helix:images']?.[id]
+  const drawn = image ? drawMapImage(image) : undefined
+  if (drawn) {
+    holder.addImage?.(id, drawn, { pixelRatio: IMAGE_RATIO })
+  }
 }
 
 /** The width and height of a map-type picture, in CSS pixels, drawn at twice that. */
@@ -1016,6 +1067,8 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     map.on('mousemove', pointing)
     map.on('idle', settled)
     map.on('move', stood)
+    const missing = (event?: MapLibreEvent): void => supplyImage(map, event?.id)
+    map.on('styleimagemissing', missing)
     draw()
     return {
       expand: (id, cluster) => expand(id, cluster),
@@ -1027,6 +1080,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         map.off('mousemove', pointing)
         map.off('idle', settled)
         map.off('move', stood)
+        map.off('styleimagemissing', missing)
         for (const id of drawnPoints.keys()) {
           takeOff(id)
         }
@@ -1142,6 +1196,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           style: { ...base, layers, sources },
           zoom: Math.max(0, zoom - 1.5),
         })
+        picture.on('styleimagemissing', (event) => supplyImage(picture, event?.id))
         await new Promise<void>((done) => {
           const late = setTimeout(done, 6000)
           picture.once('idle', () => {

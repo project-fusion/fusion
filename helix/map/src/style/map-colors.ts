@@ -118,6 +118,41 @@ export const colorsNow = (element: Element): MapColors | null => {
   }
 }
 
+/**
+ * The theme's typeface where the map is, as the one family name a map's
+ * labels are drawn in: the first of `--helix-font-sans`, unquoted.
+ */
+export const mapFontFrom = (element: Element): string => {
+  const probe = document.createElement('span')
+  probe.style.display = 'none'
+  probe.style.fontFamily = 'var(--helix-font-sans)'
+  element.append(probe)
+  const stack = getComputedStyle(probe).fontFamily
+  probe.remove()
+  return (
+    stack
+      .split(',')[0]
+      ?.trim()
+      .replace(/^["']|["']$/g, '') || 'sans-serif'
+  )
+}
+
+/**
+ * Resolves once the typeface's weights a map draws are loaded: regular,
+ * medium, bold and italic. MapLibre draws each letter once and keeps it, so
+ * one drawn before the face arrived stays in the fallback face.
+ */
+export const fontReady = async (font: string): Promise<void> => {
+  if (typeof document === 'undefined' || !document.fonts) {
+    return
+  }
+  await Promise.all(
+    ['400', '500', '700', 'italic 400'].map((face) =>
+      document.fonts.load(`${face} 24px "${font}"`).catch(() => []),
+    ),
+  )
+}
+
 /** How many frames to wait for the tokens before saying they are missing: a few seconds. */
 export const PATIENCE = 180
 

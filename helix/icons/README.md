@@ -1,6 +1,6 @@
 # @fusion.dev/helix-icons
 
-The Helix icon set: 114 marks, 109 resolved from
+The Helix icon set: 123 marks, 118 resolved from
 [Phosphor](https://phosphoricons.com) at build time and 5 of our own.
 
 ```sh
@@ -53,7 +53,7 @@ import { peak } from './icons'
 <helix-icon icon={peak} />
 ```
 
-Any set, not only ours. A subset of Phosphor larger than the 109 here is the
+Any set, not only ours. A subset of Phosphor larger than the 118 here is the
 same command against the package it resolves from, and `--suffix` is for a set
 that spells a weight into the file name:
 
