@@ -123,6 +123,9 @@ const stand = (): {
     removeSource: (id) => {
       delete sources[id]
     },
+    setLayoutProperty: (layer, name, value) => {
+      asked.push(`setLayoutProperty ${layer} ${name} ${value}`)
+    },
     setPaintProperty: (layer, name) => {
       asked.push(`setPaintProperty ${layer} ${name}`)
     },
@@ -177,6 +180,15 @@ describe('mapLibreDriver', () => {
       'zoomIn false undefined',
       'zoomOut undefined 250',
     ])
+  })
+
+  test('a place is behind only where a globe says it is out of sight', () => {
+    const { map } = stand()
+    const driver = mapLibreDriver(map)
+    expect(driver.behind?.({ lat: 0, lng: 0 })).toBe(false)
+    map.transform = { isLocationOccluded: ({ lng }) => lng > 90 }
+    expect(driver.behind?.({ lat: 0, lng: 120 })).toBe(true)
+    expect(driver.behind?.({ lat: 0, lng: 0 })).toBe(false)
   })
 
   test('its keys go quiet and come back only if they were on', () => {
@@ -678,6 +690,73 @@ describe('mapLibreDriver', () => {
     drawn?.stop()
     expect(styleLayers.map((one) => one.id)).not.toContain('helix-terrain-t')
     expect(sources['helix-terrain-t-shade']).toBeUndefined()
+  })
+
+  test('looking straight down, buildings and raised ground lie flat, and they stand when the map tilts', () => {
+    const { asked, fire, map, styleLayers } = stand()
+    styleLayers.splice(1, 0, {
+      id: 'building',
+      source: 'openmaptiles',
+      'source-layer': 'building',
+      type: 'fill',
+    } as { id: string; type: string })
+    let pitch = 0
+    map.getPitch = () => pitch
+    const held: { terrain: { exaggeration?: number; source: string } | null } = { terrain: null }
+    map.getTerrain = () => held.terrain
+    map.setTerrain = (next) => {
+      held.terrain = next
+    }
+    const added: Record<string, unknown> = {}
+    const addLayer = map.addLayer.bind(map)
+    map.addLayer = (layer, before) => {
+      added[(layer as unknown as { id: string }).id] = layer
+      return addLayer(layer, before)
+    }
+    mapLibreDriver(map).layers?.(() => [
+      { color: 'gray', id: 'b', kind: 'buildings', label: '3D buildings', points: [] },
+      {
+        color: 'black',
+        id: 't',
+        kind: 'terrain',
+        label: 'Terrain',
+        points: [],
+        raised: true,
+        src: 'https://tiles.test/dem/{z}/{x}/{y}.png',
+      },
+    ])
+    expect(added['helix-buildings-b']).toMatchObject({ layout: { visibility: 'none' } })
+    expect(held.terrain).toBeNull()
+
+    pitch = 50
+    fire('move')
+    expect(asked).toContain('setLayoutProperty helix-buildings-b visibility visible')
+    expect(held.terrain).toEqual({ exaggeration: 1, source: 'helix-terrain-t-dem' })
+
+    pitch = 0
+    fire('move')
+    expect(asked.at(-1)).toBe('setLayoutProperty helix-buildings-b visibility none')
+    expect(held.terrain).toBeNull()
+  })
+
+  test('imagery goes over the style’s flat buildings and under its first line after them', () => {
+    const { map, styleLayers } = stand()
+    styleLayers.splice(1, 0, { id: 'waterway', type: 'line' }, { id: 'building', type: 'fill' })
+    mapLibreDriver(map).layers?.(() => [
+      {
+        color: 'red',
+        frame: 0,
+        frames: ['https://tiles.test/photo/{z}/{y}/{x}.jpg'],
+        ground: true,
+        id: 'p',
+        kind: 'raster',
+        label: 'Satellite imagery',
+        points: [],
+      },
+    ])
+    const order = styleLayers.map((one) => one.id)
+    expect(order.indexOf('helix-raster-p-0')).toBeGreaterThan(order.indexOf('building'))
+    expect(order.indexOf('helix-raster-p-0')).toBeLessThan(order.indexOf('road'))
   })
 
   test('the buildings and raster layers it adds are a style MapLibre’s own validator accepts', () => {

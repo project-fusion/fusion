@@ -242,8 +242,14 @@ describe('map controls on a right-to-left page', () => {
     control(host, 'rotate-left')?.click()
     control(host, 'rotate-right')?.click()
     control(host, 'face-north')?.click()
-    control(host, 'tilt')?.click()
-    control(host, 'flatten')?.click()
+    const tilt = control(host, 'tilt')
+    expect(tilt?.getAttribute('aria-pressed')).toBe('false')
+    tilt?.click()
+    ;(host as Map & { pitch: number }).pitch = 50
+    await host.updateComplete
+    expect(tilt?.getAttribute('aria-pressed')).toBe('true')
+    tilt?.click()
+    expect(control(host, 'flatten')).toBeNull()
     expect(asked).toEqual([
       'rotate {"by":-15}',
       'rotate {"by":15}',

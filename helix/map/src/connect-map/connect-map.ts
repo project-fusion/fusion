@@ -34,6 +34,11 @@ export interface MapDriver {
    */
   bearing?(): number
   /**
+   * Whether a place is on the far side of a globe, out of sight. A marker
+   * there is hidden, and stays in the frame's walk.
+   */
+  behind?(place: MapPlace): boolean
+  /**
    * The renderer's credits as it writes them, which is markup, and a way to
    * hear them change. `stop` ends the listening and puts back anything the
    * driver hid to take the credit over, such as the renderer's own control.
@@ -80,6 +85,12 @@ export interface MapDriver {
    */
   panBy(x: number, y: number, motion: MapMotion | null): void
   /**
+   * How far the view is tilted, in degrees from looking straight down, where
+   * the renderer can tilt it. The frame's 3D button is pressed while it is
+   * above `0`.
+   */
+  pitch?(): number
+  /**
    * Where a place falls in the map's box, in CSS pixels from its top left.
    * Without it markers cannot be placed, and the connector leaves them hidden.
    */
@@ -107,7 +118,7 @@ export interface MapDriver {
   /**
    * Tilts the view `by` degrees toward the horizon, or back toward flat where
    * negative, or `to` a tilt, `0` being flat, within what the renderer allows.
-   * What the frame's 3D and 2D buttons and tilt keys ask.
+   * What the frame's 3D button and tilt keys ask.
    */
   tilt?(tilt: { by?: number | undefined; to?: number | undefined }, motion: MapMotion | null): void
   /** Zooms one step in, `1`, or out, `-1`, by whatever a step is to this renderer. */
@@ -218,6 +229,8 @@ export interface MapLayerSpec {
 
 /** What the connector reads off a marker, which is all it needs of one. */
 interface Marker extends HTMLElement {
+  /** Whether its place is on the far side of a globe, where it is hidden. */
+  behind?: boolean
   /**
    * How far the marker reaches from its point along the line, name included,
    * in CSS pixels. Where it says, the connector turns the name to whichever
@@ -536,17 +549,22 @@ export const connectMap = (
   }
   frame.addEventListener(HelixMapRotateEvent.eventName, handleRotate)
   frame.addEventListener(HelixMapTiltEvent.eventName, handleTilt)
-  /* The frame's `bearing` follows the view, so its Face north needle points
-     north as the map turns. Rounded, so a still map writes nothing. */
-  const holder = frame as HTMLElement & { bearing?: number }
+  /* The frame's `bearing` and `pitch` follow the view, so its Face north
+     needle points north as the map turns, and its 3D button is pressed while
+     the map is tilted. Rounded, so a still map writes nothing. */
+  const holder = frame as HTMLElement & { bearing?: number; pitch?: number }
   const syncBearing = (): void => {
     const bearing = Math.round((driver.bearing?.() ?? 0) * 10) / 10
     if ('bearing' in holder && holder.bearing !== bearing) {
       holder.bearing = bearing
     }
+    const pitch = Math.round((driver.pitch?.() ?? 0) * 10) / 10
+    if ('pitch' in holder && holder.pitch !== pitch) {
+      holder.pitch = pitch
+    }
   }
   syncBearing()
-  const stopBearing = driver.bearing ? driver.onView?.(syncBearing) : undefined
+  const stopBearing = driver.bearing || driver.pitch ? driver.onView?.(syncBearing) : undefined
 
   const restoreKeyboard = options.keyboard === 'renderer' ? undefined : driver.silenceKeyboard?.()
 
@@ -873,13 +891,35 @@ export const connectMap = (
        marker's move and the next it laid the page out once per marker on
        every frame of a pan. Read together, it is laid out once, and what is
        read does not depend on where anything stands. */
-    const standing = markers()
+    const everywhere = markers()
       .filter((marker) => typeof marker.lat === 'number' && typeof marker.lng === 'number')
-      .map((marker) => ({
-        at: project({ lat: marker.lat as number, lng: marker.lng as number }),
-        marker,
-        reach: typeof marker.extent === 'function' ? marker.extent() : undefined,
-      }))
+      .map((marker) => {
+        const where = { lat: marker.lat as number, lng: marker.lng as number }
+        return {
+          at: project(where),
+          behind: driver.behind?.(where) === true,
+          marker,
+          reach: typeof marker.extent === 'function' ? marker.extent() : undefined,
+        }
+      })
+    /* **A place on the far side of the globe is out of sight**: in no
+       cluster and hidden where it stands, and still placed and walked, so a
+       reader reaching it turns the globe to show it. */
+    for (const one of everywhere) {
+      if (one.marker.behind !== one.behind) {
+        one.marker.behind = one.behind
+      }
+    }
+    const hidden = everywhere.filter((one) => one.behind)
+    for (const { marker } of hidden) {
+      if (marker.gatheredBy !== undefined) {
+        marker.gatheredBy = undefined
+      }
+      if ((marker.gathered?.length ?? 0) > 0) {
+        marker.gathered = []
+      }
+    }
+    const standing = everywhere.filter((one) => !one.behind)
     /* **Gathered where they would draw over each other**, on a frame that
        asks for it: each marker, in the order they are written, takes every
        later one standing near enough to its point, and is drawn at their
@@ -986,6 +1026,7 @@ export const connectMap = (
         reach: one.reach,
       })
     }
+    placing.push(...hidden.map(({ at, marker, reach }) => ({ at, marker, reach })))
     for (const { at, marker, reach } of placing) {
       marker.style.setProperty('--_map-marker-x', `${at.x}px`)
       marker.style.setProperty('--_map-marker-y', `${at.y}px`)
@@ -1011,6 +1052,14 @@ export const connectMap = (
        walker going north points up and to the left. */
     for (const position of positions()) {
       if (typeof position.lat !== 'number' || typeof position.lng !== 'number') {
+        continue
+      }
+      /* Unplaced behind a globe, which hides it: a position is watched
+         rather than walked, so nothing needs to reach it there. */
+      if (driver.behind?.({ lat: position.lat, lng: position.lng })) {
+        for (const name of ['heading', 'radius', 'x', 'y']) {
+          position.style.removeProperty(`--_map-position-${name}`)
+        }
         continue
       }
       const at = project({ lat: position.lat, lng: position.lng })
@@ -1122,9 +1171,11 @@ export const connectMap = (
     if (typeof marker.lat !== 'number' || typeof marker.lng !== 'number') {
       return
     }
-    const at = driver.project({ lat: marker.lat, lng: marker.lng })
+    const where = { lat: marker.lat, lng: marker.lng }
+    const at = driver.project(where)
     const { height, width } = viewportOf(frame)
-    if (at.x < 0 || at.y < 0 || at.x > width || at.y > height) {
+    /* Behind a globe is out of view wherever it projects to. */
+    if (driver.behind?.(where) || at.x < 0 || at.y < 0 || at.x > width || at.y > height) {
       driver.show({ lat: marker.lat, lng: marker.lng }, motionOf(frame, 'travel'))
     }
   }

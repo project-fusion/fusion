@@ -39,6 +39,15 @@ describe('mapLibreStyle', () => {
     }
   })
 
+  test('asked for a globe, it draws one, and the style is one MapLibre accepts', () => {
+    const style = mapLibreStyle(LIGHT, { globe: true })
+    expect(style.projection).toEqual({ type: 'globe' })
+    expect(style.sky?.['atmosphere-blend']).toBeDefined()
+    expect(validateStyleMin(style as never)).toEqual([])
+    expect(mapLibreStyle(LIGHT).projection).toBeUndefined()
+    expect(mapLibreStyle(LIGHT).sky).toBeUndefined()
+  })
+
   test('draws on the land and reads its tiles and type from OpenFreeMap', () => {
     const style = mapLibreStyle(LIGHT)
     expect(style.layers[0]).toMatchObject({ id: 'land', type: 'background' })
