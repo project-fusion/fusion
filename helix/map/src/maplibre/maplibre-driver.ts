@@ -137,6 +137,18 @@ export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
 /** A buildings layer's style layer, one per element. */
 const buildingsLayer = (id: string): string => `helix-buildings-${id}`
 
+/** The kinds of layer drawn apart from the routes, areas, and points. */
+const EXTRAS = new Set<MapLayerSpec['kind']>(['buildings', 'raster', 'terrain'])
+
+/** A terrain layer's hill shading, one style layer. */
+const terrainLayer = (id: string): string => `helix-terrain-${id}`
+
+/**
+ * A terrain layer's sources: one for the shading and one for the raised
+ * ground, since MapLibre draws both better from sources of their own.
+ */
+const terrainSource = (id: string, use: 'dem' | 'shade'): string => `helix-terrain-${id}-${use}`
+
 /** A raster layer's frame, one source and one style layer each, so every frame's tiles stay loaded. */
 const rasterFrame = (id: string, at: number): string => `helix-raster-${id}-${at}`
 
@@ -340,6 +352,10 @@ export interface MapLibreMap {
     layer: { id: string }
     properties: Record<string, unknown> | null
   }[]
+  /** The raised ground, where the map has one. */
+  getTerrain?(): { source: string } | null | undefined
+  /** Raises the ground from an elevation source, or lays it flat with `null`. */
+  setTerrain?(terrain: { exaggeration?: number; source: string } | null): unknown
   /** Sets one paint property of one layer, which is how a points layer takes a new color. */
   setPaintProperty(layer: string, name: string, value: unknown): unknown
   /** Replaces the style, by a diff against the one it has where `diff` is set. `never` for `addLayer`'s reason. */
@@ -519,12 +535,27 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         drawnPoints.set(spec.id, { cluster, points: spec.points })
       }
     }
-    /* **Buildings and raster layers**, by spec id, with what each was drawn
-       from: the buildings' color, a raster layer's tile URLs. */
-    const drawnExtras = new Map<string, { kind: 'buildings' | 'raster'; key: string }>()
+    /* **Buildings, raster, and terrain layers**, by spec id, with what each
+       was drawn from: the buildings' color, a raster layer's tile URLs, a
+       terrain layer's tiles and how it raises the ground. */
+    const drawnExtras = new Map<string, { kind: 'buildings' | 'raster' | 'terrain'; key: string }>()
     const takeOffExtra = (id: string): void => {
       const had = drawnExtras.get(id)
-      if (had?.kind === 'buildings') {
+      if (had?.kind === 'terrain') {
+        if (map.getLayer(terrainLayer(id))) {
+          map.removeLayer(terrainLayer(id))
+        }
+        /* The ground laid flat before its source goes, which MapLibre
+           refuses to take away from under it. */
+        if (map.getTerrain?.()?.source === terrainSource(id, 'dem')) {
+          map.setTerrain?.(null)
+        }
+        for (const use of ['dem', 'shade'] as const) {
+          if (map.getSource(terrainSource(id, use))) {
+            map.removeSource(terrainSource(id, use))
+          }
+        }
+      } else if (had?.kind === 'buildings') {
         if (map.getLayer(buildingsLayer(id))) {
           map.removeLayer(buildingsLayer(id))
         }
@@ -581,6 +612,64 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
             }
           }
           drawnExtras.set(spec.id, { key: spec.color, kind: 'buildings' })
+          continue
+        }
+        if (spec.kind === 'terrain') {
+          /* **Shaded at the ground**, under the roads as imagery is, and
+             raised where it asks. A change of tiles or of how it is raised
+             draws it again; a change of color is a paint. */
+          const key = `${spec.src ?? ''}|${spec.encoding ?? ''}|${spec.maxZoom ?? ''}|${spec.raised ? (spec.exaggeration ?? 1) : ''}`
+          if (drawnExtras.get(spec.id)?.key !== key) {
+            takeOffExtra(spec.id)
+          }
+          const paint = {
+            'hillshade-accent-color': spec.color,
+            'hillshade-highlight-color': spec.highlight ?? spec.color,
+            'hillshade-shadow-color': spec.color,
+          }
+          const shade = terrainLayer(spec.id)
+          if (map.getLayer(shade)) {
+            for (const [name, value] of Object.entries(paint)) {
+              map.setPaintProperty(shade, name, value)
+            }
+          } else {
+            try {
+              const uses = spec.raised ? (['shade', 'dem'] as const) : (['shade'] as const)
+              for (const use of uses) {
+                if (!map.getSource(terrainSource(spec.id, use))) {
+                  map.addSource(terrainSource(spec.id, use), {
+                    ...(spec.attribution && use === 'shade'
+                      ? { attribution: spec.attribution }
+                      : {}),
+                    encoding: spec.encoding ?? 'terrarium',
+                    ...(spec.maxZoom === undefined ? {} : { maxzoom: spec.maxZoom }),
+                    tileSize: 256,
+                    tiles: [spec.src],
+                    type: 'raster-dem',
+                  } as never)
+                }
+              }
+              map.addLayer(
+                {
+                  id: shade,
+                  paint,
+                  source: terrainSource(spec.id, 'shade'),
+                  type: 'hillshade',
+                } as never,
+                underRoads(),
+              )
+              if (spec.raised) {
+                map.setTerrain?.({
+                  exaggeration: spec.exaggeration ?? 1,
+                  source: terrainSource(spec.id, 'dem'),
+                })
+              }
+            } catch {
+              /* A style still loading refuses the source, and its `load` draws again. */
+              continue
+            }
+          }
+          drawnExtras.set(spec.id, { key, kind: 'terrain' })
           continue
         }
         const frames = spec.frames ?? []
@@ -647,7 +736,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           source.setData(data as never)
           drawnData = json
         }
-        drawExtras(specs.filter((spec) => spec.kind === 'buildings' || spec.kind === 'raster'))
+        drawExtras(specs.filter((spec) => EXTRAS.has(spec.kind)))
         return
       }
       /* **Simplified by zoom, not smoothed.** A route is the router's path
@@ -668,14 +757,16 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       for (const layer of LAYERS) {
         map.addLayer(layer as never, labels)
       }
-      drawExtras(specs.filter((spec) => spec.kind === 'buildings' || spec.kind === 'raster'))
+      drawExtras(specs.filter((spec) => EXTRAS.has(spec.kind)))
     }
     /* A replaced style takes every layer of ours with it, the points' too. */
     const restore = (): void => {
       const lostExtras = [...drawnExtras.entries()].filter(([id, had]) =>
         had.kind === 'buildings'
           ? !map.getLayer(buildingsLayer(id))
-          : !map.getLayer(rasterFrame(id, 0)),
+          : had.kind === 'terrain'
+            ? !map.getLayer(terrainLayer(id))
+            : !map.getLayer(rasterFrame(id, 0)),
       )
       for (const [id] of lostExtras) {
         drawnExtras.delete(id)

@@ -25,6 +25,14 @@ export class HelixHeadlessMapArea extends HelixElement {
   @property()
   description?: string
 
+  /**
+   * A name this layer shares with other layers, such as a route and its
+   * dotted legs. The layers menu shows layers in the same group as one entry,
+   * named by the first of them, and its checkbox shows or hides them all.
+   */
+  @property()
+  group?: string
+
   /** Marks this as a layer for the frame and the connector, whatever its tag. */
   readonly isMapLayer = true
 

@@ -629,6 +629,57 @@ describe('mapLibreDriver', () => {
     expect(sent['helix-raster-w-0']).not.toHaveProperty('maxzoom')
   })
 
+  test('terrain is shaded under the roads, raised from a source of its own, and laid flat when it goes', () => {
+    const { map, sources, styleLayers } = stand()
+    const held: { terrain: { exaggeration?: number; source: string } | null } = { terrain: null }
+    const sent: Record<string, unknown> = {}
+    const addSource = map.addSource.bind(map)
+    map.addSource = (id, source) => {
+      sent[id] = source
+      return addSource(id, source)
+    }
+    map.getTerrain = () => held.terrain
+    map.setTerrain = (next) => {
+      held.terrain = next
+    }
+    let raised = true
+    const drawn = mapLibreDriver(map).layers?.(() => [
+      {
+        attribution: 'Elevation credit',
+        color: 'rgba(0, 0, 0, 0.4)',
+        encoding: 'terrarium',
+        exaggeration: 1.5,
+        highlight: 'rgba(255, 255, 255, 0.25)',
+        id: 't',
+        kind: 'terrain',
+        label: 'Terrain',
+        maxZoom: 15,
+        points: [],
+        raised,
+        src: 'https://tiles.test/dem/{z}/{x}/{y}.png',
+      },
+    ])
+    const order = styleLayers.map((one) => one.id)
+    expect(order.indexOf('helix-terrain-t')).toBeLessThan(order.indexOf('road'))
+    expect(sent['helix-terrain-t-shade']).toMatchObject({
+      attribution: 'Elevation credit',
+      encoding: 'terrarium',
+      maxzoom: 15,
+      type: 'raster-dem',
+    })
+    expect(held.terrain).toEqual({ exaggeration: 1.5, source: 'helix-terrain-t-dem' })
+
+    raised = false
+    drawn?.update()
+    expect(held.terrain).toBeNull()
+    expect(sources['helix-terrain-t-dem']).toBeUndefined()
+    expect(styleLayers.map((one) => one.id)).toContain('helix-terrain-t')
+
+    drawn?.stop()
+    expect(styleLayers.map((one) => one.id)).not.toContain('helix-terrain-t')
+    expect(sources['helix-terrain-t-shade']).toBeUndefined()
+  })
+
   test('the buildings and raster layers it adds are a style MapLibre’s own validator accepts', () => {
     const style = {
       layers: [
@@ -653,6 +704,51 @@ describe('mapLibreDriver', () => {
       },
       version: 8,
     }
+    expect(validateStyleMin(style as never)).toEqual([])
+  })
+
+  test('the terrain it adds, raised, is a style MapLibre’s own validator accepts', () => {
+    const { map } = stand()
+    const layers: unknown[] = []
+    const sources: Record<string, unknown> = {}
+    const held: { terrain: unknown } = { terrain: undefined }
+    const addLayer = map.addLayer.bind(map)
+    const addSource = map.addSource.bind(map)
+    map.addLayer = (layer, before) => {
+      layers.push(layer)
+      return addLayer(layer, before)
+    }
+    map.addSource = (id, source) => {
+      sources[id] = source
+      return addSource(id, source)
+    }
+    map.setTerrain = (terrain) => {
+      held.terrain = terrain
+    }
+    mapLibreDriver(map).layers?.(() => [
+      {
+        color: 'rgba(0, 0, 0, 0.4)',
+        encoding: 'terrarium',
+        exaggeration: 1.5,
+        highlight: 'rgba(255, 255, 255, 0.25)',
+        id: 't',
+        kind: 'terrain',
+        label: 'Terrain',
+        maxZoom: 15,
+        points: [],
+        raised: true,
+        src: 'https://tiles.test/dem/{z}/{x}/{y}.png',
+      },
+    ])
+    const style = {
+      layers: layers.filter((layer) => (layer as { type: string }).type === 'hillshade'),
+      sources: Object.fromEntries(
+        Object.entries(sources).filter(([id]) => id.startsWith('helix-terrain')),
+      ),
+      terrain: held.terrain,
+      version: 8,
+    }
+    expect(style.layers).toHaveLength(1)
     expect(validateStyleMin(style as never)).toEqual([])
   })
 
