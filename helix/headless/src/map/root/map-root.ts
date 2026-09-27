@@ -59,10 +59,11 @@ const TILTED = 50
  * `connectMap` from `@fusion.dev/helix-map`, which does this for you.
  *
  * Add `rotate` and `tilt` to `controls` for buttons that turn and tilt the
- * map, which a map with 3D buildings needs. The 3D button tilts the map 50
- * degrees in one press, and the 2D button makes it flat. Shift with the arrow
- * keys turns and tilts it in steps: left and right rotate, and up and down
- * tilt. They send `helix-map-rotate` and `helix-map-tilt`, which `connectMap`
+ * map, which a map with 3D buildings needs. The 3D button is a toggle. Pressed,
+ * it tilts the map 50 degrees, and `connectMap` raises the buildings and the
+ * ground. Pressed again, it makes the map flat, and lays them flat too. Shift
+ * with the arrow keys turns and tilts the map in steps: left and right rotate,
+ * and up and down tilt. They send `helix-map-rotate` and `helix-map-tilt`, which `connectMap`
  * answers on MapLibre. Leaflet draws maps flat and does not rotate.
  *
  * Add `layers` to `controls` for a layers button. It opens a menu with a
@@ -90,13 +91,12 @@ const TILTED = 50
  * @event {HelixMapPanEvent} helix-map-pan - A pan button or arrow key was pressed. Move your map in response.
  * @event {HelixMapPartChangeEvent} helix-map-part-change - Clustering was turned on or off. Used by `connectMap`; pages do not need to listen for it.
  * @event {HelixMapRotateEvent} helix-map-rotate - A rotate or Face north button, or Shift with Left or Right, was pressed. Turn your map in response.
- * @event {HelixMapTiltEvent} helix-map-tilt - The 3D or 2D button, or Shift with Up or Down, was pressed. Tilt your map in response.
+ * @event {HelixMapTiltEvent} helix-map-tilt - The 3D button, or Shift with Up or Down, was pressed. Tilt your map in response.
  * @event {HelixMapZoomEvent} helix-map-zoom - A zoom button or key was pressed, with a direction. Zoom your map in response.
  *
  * @csspart attribution - The strip under the map that holds the credit.
  * @csspart controls - The group of buttons that move the map.
  * @csspart face-north - The button that turns the map to face north. Its needle points north as the map turns.
- * @csspart flatten - The 2D button, which makes the map flat.
  * @csspart footer - The strip below the map.
  * @csspart fullscreen - The button that makes the map fill the screen.
  * @csspart header - The strip above the map.
@@ -113,7 +113,7 @@ const TILTED = 50
  * @csspart region - The named region the map sits in.
  * @csspart rotate-left - The button that turns the map counterclockwise.
  * @csspart rotate-right - The button that turns the map clockwise.
- * @csspart tilt - The 3D button, which tilts the map toward the horizon.
+ * @csspart tilt - The 3D button, which tilts the map and makes it flat again. Pressed while the map is tilted.
  * @csspart viewport - The box the map is drawn in.
  * @csspart zoom-in - The button that zooms in.
  * @csspart zoom-out - The button that zooms out.
@@ -143,10 +143,6 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ attribute: 'face-north-label' })
   faceNorthLabel = 'Face north'
 
-  /** The flatten button's label. */
-  @property({ attribute: 'flatten-label' })
-  flattenLabel = 'Flatten the map'
-
   /**
    * The map's name, read by screen readers. Name the place, such as "Delivery
    * area", so that several maps on one page can be told apart. Required.
@@ -161,6 +157,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ attribute: 'layers-label' })
   layersLabel = 'Map layers'
 
+  /**
+   * How far the map is tilted, in degrees from looking straight down.
+   * `connectMap` keeps it current, and the 3D button is pressed while it is
+   * above `0`.
+   */
+  @property({ type: Number })
+  pitch = 0
+
   /** The rotate left button's label. */
   @property({ attribute: 'rotate-left-label' })
   rotateLeftLabel = 'Rotate left'
@@ -169,9 +173,9 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ attribute: 'rotate-right-label' })
   rotateRightLabel = 'Rotate right'
 
-  /** The tilt button's label. */
+  /** The 3D button's label. */
   @property({ attribute: 'tilt-label' })
-  tiltLabel = 'Tilt the map'
+  tiltLabel = 'Show in 3D'
 
   /**
    * The routes and areas among the frame's children, in the order they are
@@ -508,11 +512,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         : nothing
     }${
       tilt
-        ? html`<button part="tilt" aria-label=${this.tiltLabel} type="button" @click=${() => this.tiltTo(TILTED)}>
+        ? html`<button
+              part="tilt"
+              aria-label=${this.tiltLabel}
+              aria-pressed=${this.pitch > 0 ? 'true' : 'false'}
+              type="button"
+              @click=${() => this.tiltTo(this.pitch > 0 ? 0 : TILTED)}
+            >
               3D
-            </button>
-            <button part="flatten" aria-label=${this.flattenLabel} type="button" @click=${() => this.tiltTo(0)}>
-              2D
             </button>`
         : nothing
     }${menu}`

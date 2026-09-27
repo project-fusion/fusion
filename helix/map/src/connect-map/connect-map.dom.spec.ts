@@ -831,6 +831,35 @@ describe('connectMap with a frame that gathers its markers', () => {
     expect(depot.style.getPropertyValue('--_map-marker-x')).toBe('100px')
   })
 
+  test('a place on the far side of a globe is hidden, in no cluster, and still placed', async () => {
+    const { host, places } = await gathering()
+    const [depot, ferry, mission] = places as [
+      Gathered & { behind: boolean },
+      Gathered & { behind: boolean },
+      Gathered & { behind: boolean },
+    ]
+    const { driver } = zooming()
+    connectMap(host, { ...driver, behind: ({ lng }) => lng === 2 })
+    expect([depot.behind, ferry.behind, mission.behind]).toEqual([false, true, false])
+    expect(depot.gathered).toEqual([])
+    expect(ferry.gatheredBy).toBeUndefined()
+    expect(ferry.style.getPropertyValue('--_map-marker-x')).toBe('20px')
+  })
+
+  test('a place behind the globe that the keyboard reaches is turned into view', async () => {
+    const { host, places } = await gathering()
+    const shown: string[] = []
+    const { driver } = zooming()
+    connectMap(host, {
+      ...driver,
+      behind: ({ lng }) => lng === 2,
+      show: ({ lat, lng }) => shown.push(`${lat},${lng}`),
+    })
+    places[1]?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    places[0]?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    expect(shown).toEqual(['1,2'])
+  })
+
   test('a cluster pressed is framed, unless the page answers it itself', async () => {
     const { host, places } = await gathering()
     const [depot] = places as [Gathered]
@@ -1081,6 +1110,7 @@ describe('connectMap with rotate and tilt', () => {
     const host = (await frame('')) as unknown as HTMLElement & {
       bearing: number
       faceNorth(): void
+      pitch: number
       rotate(by: number): void
       tilt(by: number): void
       tiltTo(to: number): void
@@ -1088,6 +1118,7 @@ describe('connectMap with rotate and tilt', () => {
     }
     const asked: string[] = []
     let bearing = 30
+    let pitch = 0
     const moved: (() => void)[] = []
     const connection = connectMap(host, {
       bearing: () => bearing,
@@ -1096,6 +1127,7 @@ describe('connectMap with rotate and tilt', () => {
         return () => {}
       },
       panBy: () => {},
+      pitch: () => pitch,
       rotate: (turn) => asked.push(`rotate ${JSON.stringify(turn)}`),
       tilt: (tilt) => asked.push(`tilt ${JSON.stringify(tilt)}`),
       zoomBy: () => {},
@@ -1112,10 +1144,12 @@ describe('connectMap with rotate and tilt', () => {
       'tilt {"to":0}',
     ])
     bearing = 45.04
+    pitch = 49.96
     for (const listener of moved) {
       listener()
     }
     expect(host.bearing).toBe(45)
+    expect(host.pitch).toBe(50)
     connection.disconnect()
     host.rotate(15)
     expect(asked).toHaveLength(4)

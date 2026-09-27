@@ -1,0 +1,42 @@
+<!-- @summary Offices around the world on a globe, where the places on its far side are hidden until it turns them into view. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<!-- Preview frame: data-preview-map has the frame connect MapLibre, data-preview-map-globe asks mapLibreStyle for a globe, and data-preview-map-view sets the view; on your page, pass globe: true to mapLibreStyle. -->
+<helix-map
+  controls="pan zoom rotate fullscreen"
+  data-preview-map
+  data-preview-map-globe
+  data-preview-map-view="25,-40,1.3"
+  label="Offices around the world"
+>
+  <div data-preview-map-canvas></div>
+
+  <helix-map-marker
+    label="Austin"
+    lat="30.2672"
+    lng="-97.7431"
+  ></helix-map-marker>
+  <helix-map-marker
+    label="London"
+    lat="51.5072"
+    lng="-0.1276"
+  ></helix-map-marker>
+  <helix-map-marker
+    label="São Paulo"
+    lat="-23.5505"
+    lng="-46.6333"
+  ></helix-map-marker>
+  <helix-map-marker
+    label="Tokyo"
+    lat="35.6762"
+    lng="139.6503"
+  ></helix-map-marker>
+  <helix-map-marker
+    label="Sydney"
+    lat="-33.8688"
+    lng="151.2093"
+  ></helix-map-marker>
+</helix-map>
