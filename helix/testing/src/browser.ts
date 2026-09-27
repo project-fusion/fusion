@@ -227,6 +227,7 @@ interface Matchers {
   toBeLessThanOrEqual: (expected: number) => void
   toBeNull: () => void
   toContain: (expected: unknown) => void
+  toContainEqual: (expected: unknown) => void
   toEqual: (expected: unknown) => void
   toHaveLength: (expected: number) => void
   toHaveProperty: (path: string | string[], value?: unknown) => void
@@ -289,6 +290,13 @@ const build = (actual: unknown, negated: boolean): Matchers => {
           : Array.isArray(actual) && actual.some((item) => same(item, expected))
       check(held, `to contain ${show(expected)}`)
     },
+    /* An item equal to `expected` by value, which is what `bun:test` means by
+       it: `toContain` above already compares by value, so the two agree here. */
+    toContainEqual: (expected) =>
+      check(
+        Array.isArray(actual) && actual.some((item) => same(item, expected)),
+        `to contain an item equal to ${show(expected)}`,
+      ),
     toEqual: (expected) => check(same(actual, expected), `to equal ${show(expected)}`),
     toHaveLength: (expected) => {
       const length = (actual as { length?: number } | null)?.length
