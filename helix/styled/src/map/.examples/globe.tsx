@@ -11,10 +11,9 @@ const OFFICES = [
 export function Example() {
   return (
     <>
-      {/* Preview frame: data-preview-map has the frame connect MapLibre, data-preview-map-globe asks mapLibreStyle for a globe, and data-preview-map-view sets the view; on your page, pass globe: true to mapLibreStyle. */}
+      {/* Preview frame: data-preview-map has the frame connect MapLibre and data-preview-map-view sets the view; on your page, connectMap does, and you set the view on your map. mapLibreStyle draws a globe by default. */}
       <helix-map
         data-preview-map
-        data-preview-map-globe
         data-preview-map-view="25,-40,1.3"
         label="Offices around the world"
       >

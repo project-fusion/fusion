@@ -39,13 +39,19 @@ describe('mapLibreStyle', () => {
     }
   })
 
-  test('asked for a globe, it draws one, and the style is one MapLibre accepts', () => {
-    const style = mapLibreStyle(LIGHT, { globe: true })
-    expect(style.projection).toEqual({ type: 'globe' })
-    expect(style.sky?.['atmosphere-blend']).toBeDefined()
+  test('draws a globe by default, and the style is one MapLibre accepts', () => {
+    for (const style of [mapLibreStyle(LIGHT), mapLibreStyle(LIGHT, { globe: true })]) {
+      expect(style.projection).toEqual({ type: 'globe' })
+      expect(style.sky?.['atmosphere-blend']).toBeDefined()
+      expect(validateStyleMin(style as never)).toEqual([])
+    }
+  })
+
+  test('asked for a flat map, it draws no globe and no sky', () => {
+    const style = mapLibreStyle(LIGHT, { globe: false })
+    expect(style.projection).toBeUndefined()
+    expect(style.sky).toBeUndefined()
     expect(validateStyleMin(style as never)).toEqual([])
-    expect(mapLibreStyle(LIGHT).projection).toBeUndefined()
-    expect(mapLibreStyle(LIGHT).sky).toBeUndefined()
   })
 
   test('given a typeface, labels are drawn from it in the page, with no glyphs to fetch', () => {
