@@ -14,7 +14,10 @@ const framesConverter = {
  *
  * @description
  * `connectMap` draws the tiles over the map's land and roads, and under its
- * routes, areas, and place names. Set `src` to one tile URL with `{z}`, `{x}`,
+ * routes, areas, and place names. Set `ground` to draw them under the roads
+ * as well, for imagery of the ground, such as satellite or aerial photographs.
+ * Set `max-zoom` to the deepest zoom the provider has tiles for, and the map
+ * enlarges those tiles past it. Set `src` to one tile URL with `{z}`, `{x}`,
  * and `{y}` in it, or set `frames` to several, such as the last hour of radar.
  * While `playing` is set, the layer shows the frames in order, `interval`
  * milliseconds each, and starts again from the first.
@@ -32,7 +35,7 @@ const framesConverter = {
  * @aliases Weather radar, Tile overlay, Raster layer
  * @documentation https://fusion.dev/helix/components/map
  *
- * @event {HelixMapPartChangeEvent} helix-map-part-change - The tiles, the frame shown, or the opacity changed. Used by `connectMap`; pages do not need to listen for it.
+ * @event {HelixMapPartChangeEvent} helix-map-part-change - The tiles, the frame shown, the opacity, or where the tiles are drawn changed. Used by `connectMap`; pages do not need to listen for it.
  */
 @customElement('helix-headless-map-raster')
 export class HelixHeadlessMapRaster extends HelixElement {
@@ -52,6 +55,13 @@ export class HelixHeadlessMapRaster extends HelixElement {
   @property({ converter: framesConverter })
   frames?: string[]
 
+  /**
+   * Draws the tiles as the ground, under the map's roads and place names, for
+   * imagery such as satellite photographs.
+   */
+  @property({ type: Boolean })
+  ground = false
+
   /** How long each frame shows while `playing`, in milliseconds. */
   @property({ type: Number })
   interval = 600
@@ -65,6 +75,13 @@ export class HelixHeadlessMapRaster extends HelixElement {
   /** The layer's name in the frame's list. */
   @property()
   label?: string
+
+  /**
+   * The deepest zoom the provider has tiles for. The map enlarges those tiles
+   * at deeper zooms, where it would otherwise ask for tiles that do not exist.
+   */
+  @property({ attribute: 'max-zoom', type: Number })
+  maxZoom?: number
 
   /** How opaque the tiles are, from `0` to `1`. */
   @property({ type: Number })
