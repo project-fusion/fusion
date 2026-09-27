@@ -238,7 +238,9 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
               if (
                 layer.kind === 'buildings' ||
                 layer.kind === 'raster' ||
-                layer.kind === 'terrain'
+                layer.kind === 'terrain' ||
+                layer.kind === 'contours' ||
+                layer.kind === 'landcover'
               ) {
                 return []
               }

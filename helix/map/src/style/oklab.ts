@@ -101,6 +101,12 @@ export const rehue = (like: Rgb, hue: number, least = 0.1): Rgb => {
   return fromOklab([lightness, chroma * Math.cos(angle), chroma * Math.sin(angle)], like.alpha)
 }
 
+/** A color from its OKLCH lightness, colorfulness, and hue in degrees. */
+export const oklch = (lightness: number, chroma: number, hue: number): Rgb => {
+  const angle = (hue * Math.PI) / 180
+  return fromOklab([lightness, chroma * Math.cos(angle), chroma * Math.sin(angle)], 1)
+}
+
 /** A color as the `rgb()` or `rgba()` a map style takes. */
 export const cssColor = ({ alpha, blue, green, red }: Rgb): string => {
   const [r, g, b] = [red, green, blue].map((channel) => Math.round(channel * 255))

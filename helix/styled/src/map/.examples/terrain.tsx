@@ -20,12 +20,18 @@ export function Example() {
           opacity={1}
           src="https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}"
         ></helix-map-raster>
+        <helix-map-landcover></helix-map-landcover>
         <helix-map-terrain
           attribution="Elevation from 3DEP and SRTM data, courtesy of the U.S. Geological Survey"
           max-zoom="15"
           raised
           src="https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
         ></helix-map-terrain>
+        <helix-map-contours
+          max-zoom="15"
+          src="https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
+          unit="feet"
+        ></helix-map-contours>
       </helix-map>
     </>
   )
