@@ -19,22 +19,20 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @summary A field for a single line of text.
  *
  * @description
- * Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the
- * password manager and the on-screen keyboard a phone chooses are all the
- * platform's. It serializes into the server's markup, so the field is usable
- * before any script loads.
+ * Renders a real `<input>`, so the caret, selection, autofill, spellcheck,
+ * password managers, and a phone's on-screen keyboard all work natively. The
+ * field is in the server markup, so it works before any script loads.
  *
- * **The input inside a shadow root submits nothing**, the form being on the
- * other side of the boundary. The host is form-associated instead and reports
- * its own value through `ElementInternals`, which also carries validity and
- * answers a form reset.
+ * An input inside a shadow root does not submit with a form outside it, so the
+ * host is form-associated and reports its value through `ElementInternals`.
+ * That also carries validity and handles a form reset.
  *
- * `value` and `defaultValue` are separate the way `checked` and
- * `defaultChecked` are: `value` is what is in the field now, `defaultValue` is
- * what the markup asked for and where a reset returns to.
+ * `value` and `defaultValue` work like `checked` and `defaultChecked`. `value`
+ * is what is in the field now, and `defaultValue` is the value from the markup,
+ * which a reset restores.
  *
- * **Validity is the platform's.** `type` and `required` are set on the real
- * input and its `validity` is copied onto the host.
+ * Validity comes from the browser. `type` and `required` are set on the real
+ * input, and its `validity` is copied to the host.
  *
  * @since 0.1.0
  * @status stable

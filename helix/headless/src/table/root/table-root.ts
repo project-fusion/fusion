@@ -57,20 +57,19 @@ const tracksOf = (list: string, wanted: number): string[] => {
  * @summary A table of data, laid out on a grid.
  *
  * @description
- * A grid rather than a `<table>`, so every column lines up across rows while
+ * Lays out the rows on a CSS grid, so every column lines up across rows and
  * each row stays a real element that can be styled, hidden, or made
- * interactive. Table layout gives column alignment and takes away almost
- * everything else; grid gives both.
+ * interactive. A `<table>` layout aligns columns but limits almost everything
+ * else.
  *
- * The cost is that the roles have to be declared, since a grid of divs is not a
- * table to anyone reading it. `table`, `row`, `cell`, and `columnheader` are
- * all set explicitly, and rows are `display: contents` so their cells become
- * items of the one grid that does the aligning.
+ * A grid of elements has no table structure for assistive technology, so the
+ * roles are set explicitly: `table`, `row`, `cell`, and `columnheader`. Rows
+ * are `display: contents`, so their cells become items of the one grid.
  *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * The CSS custom properties listed for this component are written by it and
+ * read by the stylesheet that draws it. Do not set them. Each holds a number
+ * the component computes and CSS cannot, so the stylesheet can draw the table
+ * without measuring anything.
  *
  * @since 0.1.0
  * @status stable

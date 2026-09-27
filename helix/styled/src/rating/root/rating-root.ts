@@ -10,8 +10,8 @@ import { styles } from './rating-root.css.js'
  * @summary A row of marks, such as stars, for giving or showing a score.
  *
  * @description
- * Presentation only: the marks, and the clip that fills them partway.
- * Everything about what the score is and how it is chosen is the base class.
+ * Draws the marks and the clip that fills them partway. The value and how it is
+ * chosen come from the headless base class.
  *
  * @since 0.1.0
  * @status stable

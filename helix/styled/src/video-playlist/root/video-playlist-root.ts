@@ -7,8 +7,8 @@ import { styles } from './video-playlist-root.css.js'
  * @summary A list of video clips that play one after another in a single player.
  *
  * @description
- * Presentation only: the arrangement of the two regions and the scroller the
- * entries sit in. Everything about which clip is current is the base class.
+ * Styles the layout of the two regions and the scroller that holds the entries.
+ * The base class tracks which clip is current.
  *
  * @since 0.1.0
  * @status stable

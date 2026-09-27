@@ -7,10 +7,9 @@ import { styles } from './navigation-root.css.js'
  * @summary A set of destinations, with a marker on the current one.
  *
  * @description
- * One marker that travels, rather than a background that appears on whichever
- * destination is current. A fill that swaps is two things changing at once and
- * reads as a flicker; one that moves is a single object the eye follows, and it
- * says where the current page was as well as where it is.
+ * One marker moves to the current destination. A moving marker is easier to
+ * follow than a background that switches from one item to another, and the
+ * movement shows which page you came from as well as which one is current.
  *
  * @since 0.1.0
  * @status stable

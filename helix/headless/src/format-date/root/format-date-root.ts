@@ -19,30 +19,21 @@ interface Absolute {
  * @summary A timestamp, formatted for the user's locale.
  *
  * @description
- * A date in a page is almost never wanted as an ISO string, and formatting one
- * in the consumer's own code means every consumer ships a copy of the same
- * `Intl` call and a different set of options. This is that call, as an element,
- * so a date is written where it is shown.
+ * Formats a date with `Intl` where it is shown, so you do not write the same
+ * `Intl` call and options in your own code.
  *
- * **`elapsed` is the mode a feed wants, and it stops being relative on
- * purpose.** "42m", "3h", "1d" is what a row of activity reads as, and past a
- * week the compact form is a lie: `Intl.NumberFormat` narrow renders both
- * `minute` and `month` as `m` in en-US, so "3m" is three minutes at the top of a
- * feed and three months further down it. Past six days this shows a date, which
- * is shorter to read and impossible to misread. `elapsedTime` in `helix/core`
- * carries the measurement.
+ * **`elapsed` shows compact relative time for a feed**, such as "42m", "3h", or
+ * "1d". After six days it shows a date. In en-US, `Intl.NumberFormat` narrow
+ * renders both `minute` and `month` as `m`, so a compact "3m" could mean three
+ * minutes or three months. `elapsedTime` in `helix/core` does the measurement.
  *
- * **The reading refreshes itself, from one timer the page shares.** A relative
- * timestamp is correct for as long as its unit lasts and wrong afterwards, and a
- * page left open is exactly where that shows. Each element asks to be woken when
- * its own reading expires rather than polling, and an element showing a date
- * asks for nothing at all: fifty rows and fifty intervals is fifty wakeups a
- * second where one will do, and a feed of last month's notifications should cost
- * nothing to leave open.
+ * **The text refreshes on one timer shared by the page.** Each element
+ * schedules an update for when its current reading expires, and an element
+ * showing a date schedules none, so a long feed left open costs almost nothing.
  *
- * **`<time datetime>` whatever the text says**, so a screen reader, a copy and
- * paste, and anything parsing the page all get the real instant rather than
- * "yesterday".
+ * **The output is always `<time datetime>`**, so screen readers, copy and
+ * paste, and scripts parsing the page get the exact instant, whatever the
+ * visible text says.
  *
  * @since 0.1.0
  * @status stable

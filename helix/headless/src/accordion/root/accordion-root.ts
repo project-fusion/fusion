@@ -35,24 +35,20 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
  * @summary A group of collapsible sections.
  *
  * @description
- * Holds the mode and nothing else. The item that was clicked is what
- * coordinates: it walks up to the nearest accordion, reads the mode off it, and
- * closes its peers itself.
+ * Holds the mode. Each item coordinates itself: when you click an item, it
+ * finds the nearest accordion, reads the mode, and closes the other items.
  *
- * Coordination is structural, not a subscription. `helix-before-open` does not bubble
- * and is not composed, because overlays nest and an inner one's lifecycle must
- * never read as the outer one's, so an accordion cannot learn that a child
- * opened by listening for it.
+ * The accordion does not listen for items opening. `helix-before-open` does not
+ * bubble and is not composed, because overlays nest and an inner overlay's
+ * events must stay separate from the outer one's.
  *
- * Membership resolves on demand, so there is no registry to keep in step: an
- * item added a second after render coordinates on its first click.
+ * Items are found when they are clicked, so there is no registry to keep up to
+ * date. An item added after render coordinates on its first click. Items are
+ * matched with `instanceof HelixHeadlessAccordionItem`, so the headless tier
+ * does not depend on the styled tier's tag names.
  *
- * Items are matched with `instanceof HelixHeadlessAccordionItem`, never by tag
- * name, so this tier does not learn about the styled one.
- *
- * The keyboard listener is the controller's and is attached on connect, so
- * none of it runs on the server, where there is no tree to walk and no events
- * to hear.
+ * The keyboard listener belongs to the controller and is attached on connect,
+ * so it does not run on the server.
  *
  * @since 0.1.0
  * @status stable

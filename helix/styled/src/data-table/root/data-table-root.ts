@@ -12,22 +12,20 @@ import '../../table/index.js'
  * @summary A table drawn from an array of rows, with sorting, filtering, and paging.
  *
  * @description
- * Hairline rules between rows and no fill, per the rule that depth comes from a
- * single border rather than from elevation. A header band would be elevation
- * spelled differently, so the headings are weight and color instead.
+ * Rows have hairline rules between them and no fill, and the headings are set
+ * apart by weight and color. Helix shows depth with a single border and no
+ * elevation, and a header band would be elevation.
  *
- * The grid scrolls its own box and the toolbar and footer sit outside it: a
- * search field that slides sideways when a reader scrolls the columns is a
- * search field they lose.
+ * The grid scrolls in its own box, and the toolbar and footer sit outside it,
+ * so the search field stays in place when the columns scroll sideways.
  *
  * `windowed` draws only the rows in view, for a result too long to lay out at
- * once, and the headings stay put while they scroll. It is independent of
- * `paginated` and of `mode`, so a page can be windowed and a server-fed chunk
- * can be too.
+ * once, and the headings stay in place while the rows scroll. It works with or
+ * without `paginated` and with either `mode`, so a page or a chunk from a
+ * server can be windowed.
  *
- * **The cell values do not server-render**, which is the headless tier's
- * limitation and worth repeating where a consumer chooses between the two: use
- * `helix-table` where the content has to be in the served HTML.
+ * **The cell values do not server-render.** Use `helix-table` when the content
+ * has to be in the served HTML.
  *
  * @since 0.1.0
  * @status stable

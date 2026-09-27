@@ -17,16 +17,14 @@ export const FOLDS_UP_TO = 12
  * @summary Overlapping avatars, with a count for the ones not shown.
  *
  * @description
- * A part of `Avatar` rather than a family of its own: it arranges avatars and
- * is about nothing else.
+ * A part of `Avatar` that arranges avatars.
  *
- * **The overflow count is the group's, not a slot.** Which avatars are hidden
- * is a fact the group works out from `max`, so a consumer writing the "+3"
- * would be writing a number that has to agree with a list they do not control.
+ * The group computes the overflow count from `max` and renders the "+3" itself.
+ * There is no slot for it, because the number has to match which avatars are
+ * hidden.
  *
- * **Hidden, not removed.** Past `max` the extra avatars stay in the DOM and
- * stop being shown, so nothing re-renders when `max` changes and the accessible
- * name is still built from all of them.
+ * Avatars past `max` stay in the DOM and are hidden. Changing `max` re-renders
+ * nothing, and the accessible name is still built from all of them.
  *
  * @since 0.1.0
  * @status stable

@@ -8,36 +8,32 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One active filter: a field, a comparison, and the values it is compared to.
  *
  * @description
- * A chip is the readable form of the thing `FilterField` declares. It carries
- * the three parts a filter has and a control that asks for it to go.
+ * Shows one filter declared by a `FilterField`: the field, the operator, and
+ * the values, with a control to remove the filter.
  *
- * **The operator is drawn only when it is worth drawing**, which is the whole
- * reason the common case reads as plainly as it does:
+ * The operator is shown only when it is not the field's default:
  *
  * ```
- * Disposition   refunded, chargeback         the field's usual comparison, unwritten
- * Disposition   is not   refunded            a comparison somebody chose, so it shows
- * Created       after    1 Aug               a scalar, which has no usual comparison
+ * Disposition   refunded, chargeback         default operator, hidden
+ * Disposition   is not   refunded            chosen operator, shown
+ * Created       after    1 Aug               a scalar field has no default
  * ```
  *
- * A reader ticking two values in a menu gets the first, with no jargon on it. A
- * reader who reaches for a comparison gets the third, which explains itself the
- * first time they see one. The rule is one line: **omit `operator-label` for the
- * field's default operator and pass it for every other.** Whoever builds the
- * chip holds the field, and the field knows which its default is.
+ * Omit `operator-label` for the field's default operator and pass it for every
+ * other operator. The code that builds the chip has the field, and the field
+ * defines its default.
  *
- * **It shows a filter and never applies one.** Dismissing is a request, the way
- * it is on `Tag` and `Announcement`: the chip is the consumer's element in a
- * consumer's list, and taking it out from under them would put their model and
- * the document out of step. `preventDefault()` on the `helix-dismiss` is a
- * refusal, and that is also how a consumer takes control of the interaction for
- * one press: `requestChange` documents the whole pattern, and its first line is
- * that control is an action rather than a mode.
+ * The chip shows a filter and does not apply it. Dismissing fires
+ * `helix-dismiss` as a request, as on `Tag` and `Announcement`. The chip is
+ * your element in your list, so you remove it, which keeps your model and the
+ * document in step. Call `preventDefault()` on `helix-dismiss` to cancel the
+ * dismissal, which is also how you take control of the interaction for one
+ * press. `requestChange` documents the pattern.
  *
- * **Changing the comparison belongs to whatever is slotted into `operator`.** A
- * menu trigger there makes the segment a control; the text fallback makes it a
- * label. This element does not learn either, for the reason `FilterOperator`
- * gives: what the words mean is the domain's.
+ * To let the user change the operator, slot a menu trigger into `operator`.
+ * With the text fallback, the operator is a label. The chip does not interpret
+ * operators: their meaning belongs to your domain, as `FilterOperator`
+ * explains.
  *
  * @since 0.23.0
  * @status stable

@@ -15,20 +15,17 @@ import { styles } from './input-root.css.js'
  * @summary A field for a single line of text.
  *
  * @description
- * The frame is the field rather than the input, so anything slotted at either
- * end sits inside the same box as the text and the focus ring is drawn once,
- * around the whole control, instead of around a smaller box within it.
+ * The frame wraps the whole field, so anything slotted at either end sits in
+ * the same box as the text, and the focus ring goes around the whole control.
  *
- * The input itself is the native one, stripped rather than replaced, so the
- * caret, the selection, the autofill, and the keyboard a phone chooses are all
- * the platform's.
+ * The inner input is the native one with its styling removed, so the caret,
+ * selection, autofill, and a phone's keyboard all work natively.
  *
- * Height comes from the region, like every other control: `data-density` on
- * whatever holds it, not a `size` here. Invalid styling waits for the `invalid`
- * custom state, because a field is not wrong before anyone has filled it in and
- * `:user-invalid` cannot answer that here: it tracks the control the reader is
- * in, which is inside this shadow root, so it never reaches the host the rule
- * selects on.
+ * Height comes from `data-density` on a containing element, like every other
+ * control. There is no `size` property. Invalid styling applies only with the
+ * `invalid` custom state, so an empty field is not marked wrong before anyone
+ * fills it in. `:user-invalid` cannot be used here, because it matches the
+ * input inside the shadow root and never the host.
  *
  * @since 0.1.0
  * @status stable

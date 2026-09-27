@@ -30,24 +30,18 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * @summary One choice in a listbox.
  *
  * @description
- * **Its own family rather than a part of Select, and the reason is what it
- * belongs to.** `role="option"` requires an owning `role="listbox"`, which is
- * the ARIA contract: an option cannot stand alone. But a Select is *a listbox
- * with a trigger*, a Combobox is *a listbox with a text input*, and a command
- * palette is the same listbox again. The thing an option belongs to is the
- * listbox, not any one control that happens to contain one.
+ * Options are their own family, separate from Select, because an option belongs
+ * to a listbox and several controls contain one. `role="option"` requires an
+ * owning `role="listbox"`. A Select is a listbox with a trigger, a Combobox is
+ * a listbox with a text input, and a command palette is a listbox in a dialog.
+ * `Radio` is a part of its group, because a radio has only one kind of owner.
  *
- * That is the difference from `Radio`, which is a part of its group: a radio
- * has exactly one kind of owner, and an option has several.
+ * Selection works the way it does for a radio. Choosing an option dispatches an
+ * event, the listbox decides whether the choice stands, and the listbox sets
+ * `selected`.
  *
- * Selection is announced rather than applied, the way a radio's is. The option
- * says it was chosen, the listbox decides whether that stands, and the listbox
- * writes `selected` back. An option that selected itself would be a second
- * answer to which one is chosen.
- *
- * **Nothing here knows about filtering.** A hidden option is hidden by whatever
- * owns it, through `hidden`, because what counts as a match is the listbox's
- * question and differs between a select and a command palette.
+ * Filtering belongs to the owner, which hides an option with `hidden`. What
+ * counts as a match differs between a select and a command palette.
  *
  * @since 0.1.0
  * @status stable

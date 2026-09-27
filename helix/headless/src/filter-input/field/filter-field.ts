@@ -9,10 +9,9 @@ import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js
  * @summary A field that a filter can apply to, with its comparisons and values.
  *
  * @description
- * **A declaration, not a control.** It renders nothing and is never seen. A
- * consumer writes one per field, with the comparisons that field supports and
- * the values it supports them on, and the filter input reads them to build its
- * menu:
+ * Declares a filter field. It renders nothing. Write one per field, with the
+ * operators that field supports and its values, and the filter input reads them
+ * to build its menu:
  *
  * ```html
  * <helix-headless-filter-field name="disposition" label="Disposition">
@@ -24,25 +23,19 @@ import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js
  * </helix-headless-filter-field>
  * ```
  *
- * **Operators are per field and never global.** `is after` belongs to a date and
- * `has all of` to a set, and a field that supports one comparison shows no
- * chooser at all. A global list would offer every field every word and leave the
- * component deciding which of them made sense, which is the domain question it
- * declines to answer.
+ * Operators are declared per field. `is after` fits a date and `has all of`
+ * fits a set. A field with one operator shows no operator chooser.
  *
- * **A field that declares none gets two, and they are the ones the punctuation
- * can say.** `is any of` and `is none of` are what `field:a,b` and `-field:a,b`
- * mean, so declaring them was ceremony for the case every product has; the
- * example above is what a consumer writes when the words matter, not the price
- * of admission. Declaring one comparison replaces both rather than joining
- * them: see `vocabulary`, which is where that is decided once for the menu and
- * the grammar together.
+ * A field that declares no operators gets two: `is any of` and `is none of`,
+ * which match the typed forms `field:a,b` and `-field:a,b`. Declare operators,
+ * as in the example above, when you want to set the words. Declaring any
+ * operator replaces both defaults. `vocabulary` defines this once for both the
+ * menu and the grammar.
  *
- * **Values are `Option`s, which is the element a consumer already has.** They
- * carry a value, a label and a disabled state, and a picker built on `Menu` or
- * `Listbox` can render them without this element inventing a second way to say
- * the same thing. A field whose values cannot be enumerated declares none, and
- * what fills a chip then is whatever the consumer types.
+ * Values are `Option` elements, with a value, a label, and a disabled state, so
+ * a picker built on `Menu` or `Listbox` can render them directly. A field whose
+ * values cannot be listed declares none, and a chip for it holds whatever you
+ * type.
  *
  * @since 0.23.0
  * @status stable

@@ -8,12 +8,14 @@ import { styles } from './grid-root.css.js'
  * @summary A layout that places its children on a grid.
  *
  * @description
- * Two ways to declare columns, and only two. `columns` is a fixed count;
- * `min` fills as many equal columns as fit above that width, which is a
- * responsive layout with no breakpoint to maintain. Setting `min` wins, because
- * a fixed count that also reflows is two intentions in one element.
+ * Set columns in one of two ways:
  *
- * Presentation only, so there is no headless tier.
+ * - `columns` sets a fixed count.
+ * - `min` fits as many equal columns as there is room for at that width, so the
+ *   layout responds with no breakpoints to maintain.
+ *
+ * If you set both, `min` wins. The grid is presentation only, so there is no
+ * headless tier.
  *
  * @since 0.1.0
  * @status stable

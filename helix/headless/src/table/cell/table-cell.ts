@@ -6,13 +6,13 @@ import { property } from 'lit/decorators.js'
  * @summary One cell of a table.
  *
  * @description
- * Carries its own role, because a grid of divs is not a table to anything
- * reading it. `header` makes the cell a `columnheader`, which is what lets a
- * screen reader announce "Attribute, appearance" rather than just the value.
+ * Sets its own role, because a grid of elements has no table structure for
+ * assistive technology otherwise. `header` makes the cell a `columnheader`, so
+ * a screen reader announces the heading with the value, for example "Attribute,
+ * appearance".
  *
- * The role goes on the host rather than inside the shadow root, because the
- * cell has to be a child of its row in the flat tree for the table's structure
- * to hold together.
+ * The role is on the host so the cell stays a child of its row in the flat
+ * tree, which keeps the table structure intact.
  *
  * @since 0.1.0
  * @status stable

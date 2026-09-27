@@ -27,24 +27,23 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @summary An indicator that shows which way a measurement moved, and whether the change is good.
  *
  * @description
- * Three parts: a direction that is up, down or neutral, the metric that moved,
- * and a label saying over what. The arrow carries the direction and its color
- * carries the judgment, and the two are separate properties because they are
- * separate facts.
+ * A trend has three parts: a direction of up, down, or neutral, the metric that
+ * moved, and a label for the period it moved over. The arrow shows the
+ * direction and its color shows whether the change is good. Direction and
+ * judgment are separate properties because they are separate facts.
  *
- * **`good` is absent by default, so an unjudged trend is gray.** Every
- * dashboard convention says up is green, and for churn, latency, error rate,
- * cost and bounce rate that convention is a lie told in the most legible color
- * on the page. State the metric's polarity once and the component does the part
- * that varies.
+ * `good` is unset by default, so a trend with no judgment is gray. For churn,
+ * latency, error rate, cost, and bounce rate, up is bad. Set the metric's
+ * polarity once with `good`, and the component picks the color from the
+ * direction.
  *
- * The direction is also written as a word, because a colored arrow says
- * nothing to a reader who is not looking at it. `part="direction"` is what the
- * styled tier clips out of sight and leaves in the accessibility tree.
+ * The direction is also written as a word, so a screen reader reads it. The
+ * styled tier hides `part="direction"` visually and keeps it in the
+ * accessibility tree.
  *
- * Both the metric and the label are bare slots. An element whose only job is to
- * assign itself a slot on connect gives its own host an attribute after
- * upgrade, which a React consumer's server markup never had.
+ * The metric and the label are bare slots. An element that assigned its own
+ * slot on connect would add an attribute to its host after upgrade, which the
+ * React server markup did not have.
  *
  * @since 0.1.0
  * @status stable

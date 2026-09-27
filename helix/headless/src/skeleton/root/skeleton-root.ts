@@ -5,13 +5,12 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @summary A placeholder shown in place of content that is still loading.
  *
  * @description
- * Carries `aria-busy` and a polite live region, so a reader using a screen
- * reader is told the region is filling rather than told nothing and left to
- * wonder. Both go through `ElementInternals`, which writes no attribute.
+ * Sets `aria-busy` and a polite live region, so a screen reader announces that
+ * the region is loading. Both are set through `ElementInternals`, which writes
+ * no attributes.
  *
- * Holds no `shape`. Whether a placeholder is a line, a block or a circle is
- * presentation, and putting it here would give the headless tier an appearance
- * property, which is the one thing that tier is for not having.
+ * There is no `shape` property. Whether a placeholder is a line, a block, or a
+ * circle is presentation, which belongs to the styled tier.
  *
  * @since 0.1.0
  * @status stable

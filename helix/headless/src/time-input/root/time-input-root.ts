@@ -31,22 +31,20 @@ import '../../time-picker/index.js'
  * @summary A field for a time, typed or picked from a list.
  *
  * @description
- * **The list is `TimePicker`, not a second one written here.** It is worth
- * having on its own, flat in a settings pane with nothing to open, and this
- * element is the field, the overlay and the form. Exactly the arrangement Input
- * Date has with `DatePicker` and Color Input with `ColorPicker`.
+ * The list is a `TimePicker`, which you can also use on its own, for example in
+ * a settings pane. This element adds the field, the overlay, and the form
+ * association, the same arrangement Date Input has with `DatePicker` and Color
+ * Input has with `ColorPicker`.
  *
- * **Typed as well as picked, and that is the division the list depends on.** A
- * list at a step offers the times a product actually has, and the field is how a
- * reader says `09:07`. Neither is a worse version of the other: without the
- * field a step is a cage, and without the list every common time is typed out.
+ * You can type a time or pick one. The list offers times at a step, and the
+ * field lets you enter any time, such as `09:07`.
  *
- * **The value is `HH:mm` on a twenty-four hour clock, always**, because that is
- * what a form submits, what `min` and `max` compare against, and what sorts as a
- * string. What the field *shows* is the reader's own convention while it is
- * idle, and the value itself once the caret is in it: the same separation Input
- * Date draws, and for the same reason, which is that `2:30 PM` cannot be typed
- * back and `Intl` has no parser to make it so.
+ * The value is always `HH:mm` on a 24-hour clock, because that is what the form
+ * submits, what `min` and `max` compare against, and what sorts correctly as a
+ * string. While idle, the field shows the time in the user's locale format.
+ * Once the caret is in the field, it shows the value itself, because a
+ * formatted time such as `2:30 PM` cannot be typed back and `Intl` has no
+ * parser for it.
  *
  * @since 0.1.0
  * @status stable

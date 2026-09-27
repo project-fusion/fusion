@@ -18,15 +18,13 @@ import { styles } from './time-input-root.css.js'
  * @summary A field for a time, typed or picked from a list.
  *
  * @description
- * The frame is the field rather than the input, so the trigger sits inside the
- * same box as the text and the focus ring is drawn once around the whole
- * control. The trigger is a mark within that box rather than a button beside it,
- * the arrangement Date Input settled on.
+ * The frame wraps the whole field, so the trigger sits in the same box as the
+ * text and the focus ring goes around the whole control. The trigger is drawn
+ * inside that box, as in Date Input.
  *
- * The panel is the field's width, which is the one place this differs from Input
- * Date: a calendar is seven columns with a width of its own, and a list of times
- * is a column of one line each, so it should be as wide as the control it
- * belongs to. That is the same reasoning Select gives for its own list.
+ * The panel is as wide as the field. This is the one difference from Input
+ * Date, whose calendar has seven columns and a width of its own. A list of
+ * times is one column, so it matches the control, as Select's list does.
  *
  * @since 0.1.0
  * @status stable

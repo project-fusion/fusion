@@ -13,25 +13,22 @@ import { property } from 'lit/decorators.js'
  * @summary Triggers an action, submits a form, or navigates.
  *
  * @description
- * Renders a real `<button>`, so activation, focus, and the browser's own
- * affordances come from the platform rather than from key handlers.
+ * Renders a real `<button>`, so activation, focus, and other browser behavior
+ * come from the platform.
  *
- * **It never renders an anchor.** A router has to render its own `<a>` to
- * intercept a click and cannot render one inside this shadow root, so a button
- * that could also be a link forced every such navigation to be a full page
- * load. A link that looks like a button is styling rather than behavior, so it
- * is a recipe in the base layer: `<Link data-button="solid">` is the same
- * control, and the consumer keeps their anchor.
+ * **It never renders an anchor.** A router renders its own `<a>` to intercept a
+ * click, and it cannot render one inside the button's shadow root. For a link
+ * that looks like a button, use the base layer recipe on your own anchor:
+ * `<Link data-button="solid">` draws the same control.
  *
- * `delegatesFocus` puts focus on the inner control, and it serializes into the
- * server's markup, so the button is keyboard reachable before any JavaScript
+ * `delegatesFocus` moves focus to the inner control. It is serialized into the
+ * server markup, so the button is reachable by keyboard before any JavaScript
  * loads.
  *
- * Form submission is explicit. A `<button type="submit">` inside a shadow root
- * submits nothing, because the form is on the other side of the boundary, so
- * the inner control is always `type="button"` and this element calls
- * `requestSubmit()` on its form instead. That routes through validation, unlike
- * `submit()`.
+ * The inner control is always `type="button"`, because a
+ * `<button type="submit">` inside a shadow root cannot submit a form outside
+ * it. To submit, the button calls `requestSubmit()` on its form, which runs
+ * validation, unlike `submit()`.
  *
  * @since 0.1.0
  * @status stable

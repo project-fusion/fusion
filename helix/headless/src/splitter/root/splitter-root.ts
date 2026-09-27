@@ -30,35 +30,29 @@ const STACK_BELOW = 512
  * @summary Two panes and a divider that you can move.
  *
  * @description
- * **One axis, and nesting is how you get two.** A splitter inside a splitter
- * gives back the cross, and gives the three-pane and four-pane arrangements a
- * single divider never had.
+ * A splitter has one axis. Nest splitters to get two axes and three-pane or
+ * four-pane layouts.
  *
- * **Where two of them cross there is a corner, and it moves both.** A splitter
- * slotted into a pane of another, at right angles to it, grows a handle at the
- * crossing: `move` under the pointer, both arrow axes on the keyboard, and a
- * drag that carries the two positions at once. It appears at `firstUpdated`
- * rather than in the served markup, being an affordance rather than content,
- * and a splitter with no corner yet is a splitter with two working dividers.
+ * When a splitter is slotted into a pane of another at a right angle, a corner
+ * handle appears where the dividers cross. It shows the `move` cursor, responds
+ * to both arrow axes, and a drag moves both dividers at once. The corner is
+ * added at `firstUpdated` and is not in the server markup. Before it appears,
+ * both dividers work on their own.
  *
- * **The divider is a real `role="separator"` with `aria-valuenow`**, moved by
- * the arrow keys as well as by pointer, with `Home` and `End` taking it to its
- * bounds. A drag in progress is a state rather than `:hover`, so both dividers
- * a corner moves are lit for as long as it moves them.
+ * The divider has `role="separator"` and `aria-valuenow`. Drag it with a
+ * pointer or move it with the arrow keys, and press `Home` or `End` to move it
+ * to its bounds. A drag in progress is tracked as a state, so both dividers a
+ * corner moves stay lit for as long as they move.
  *
- * **It goes where it is put, all the way to either end.** `min` and `max` are
- * nothing and everything unless a consumer says otherwise, because a divider
- * that stops short of the edge gives a reader no way to put a pane away.
+ * By default, `min` and `max` let the divider reach either edge, so you can
+ * drag a pane fully closed. Set them to limit the range.
  *
- * **A pane can be shut, and that is not the same as a divider at the edge.**
- * The geometry is identical and the knowledge is not: only a shut pane knows
- * where to open back to. So `collapsed` is a second state rather than a reading
- * of the position, and the position it opens to is where the gesture that shut
- * it began, whichever gesture that was: a drag takes its reading on the press,
- * and every other door takes it in `settle`, nothing having been applied there
- * yet. `collapsed-size` keeps a sliver showing where a pane has a tab strip
- * worth leaving, and collapse overrides `min` and `max`, which is what those
- * are for.
+ * A pane can be collapsed, which is a separate state from a divider at the
+ * edge. `collapsed` names the shut pane, `start` or `end`, and the pane opens
+ * back to the position where the collapsing gesture began. A drag records that position
+ * on press, and every other way of collapsing records it in `settle`.
+ * `collapsed-size` keeps a sliver of the pane visible, such as a tab strip.
+ * Collapsing overrides `min` and `max`.
  *
  * @since 0.1.0
  * @status stable

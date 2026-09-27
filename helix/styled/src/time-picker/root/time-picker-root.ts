@@ -11,14 +11,12 @@ import { styles } from './time-picker-root.css.js'
  * @summary A control for choosing a time from a list or from wheels.
  *
  * @description
- * A bounded list on a surface of its own, because ninety-six rows is taller than
- * anywhere it will be put. `--time-picker-list-block-size` is the bound and it is a height
- * rather than a count of rows: what a panel has is room, and a row count would
- * have to be recomputed every time the density changed.
+ * The list has a bounded height on a surface of its own, because 96 rows are
+ * taller than any place it is used. `--time-picker-list-block-size` sets the
+ * bound as a height, so it does not need recomputing when the density changes.
  *
- * No border and no fill of its own. Flat on a page it takes what it is given,
- * and in Time Input's panel the panel supplies both: a list that brought its own
- * card would be a card inside a card there.
+ * The picker has no border or fill of its own. On a page it takes the space it
+ * is given, and inside Time Input the panel supplies both.
  *
  * @since 0.1.0
  * @status stable

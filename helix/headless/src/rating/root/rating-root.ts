@@ -15,18 +15,15 @@ import { property, state } from 'lit/decorators.js'
  * @summary A row of marks, such as stars, for giving or showing a score.
  *
  * @description
- * **Half marks decide the shape.** Supporting them means the value is not an
- * integer and the targets are not the marks: five stars at a half step is ten
- * places to press. The pointer handling and `step` are built around that
- * rather than added over it.
+ * Supports half marks, so the value is not always an integer and the press
+ * targets are not the marks: five stars at a half step give ten places to
+ * press. The pointer handling and `step` are built around half marks.
  *
- * **A partial mark is the whole mark, clipped**, not a second glyph filled to
- * the middle: the fill is the same marks over the same marks, cut off partway,
- * so any mark works and any fraction does.
+ * A partial mark is the full mark, clipped. The filled marks are drawn over the
+ * empty marks and cut off partway, so any mark and any fraction work.
  *
- * **Read-only is not this control grayed out.** The commoner use is showing a
- * score nobody is being asked for, which is a reading rather than a disabled
- * input, and it is announced as one.
+ * A read-only rating displays a score, which is the most common use. It is
+ * announced as a displayed value and does not look disabled.
  *
  * @since 0.1.0
  * @status stable

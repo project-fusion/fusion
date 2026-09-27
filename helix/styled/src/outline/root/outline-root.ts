@@ -7,15 +7,13 @@ import { styles } from './outline-root.css.js'
  * @summary Links to the headings on the page, with the section in view marked.
  *
  * @description
- * A rule down the leading edge with the current section lit along it, which is
- * the shape a table of contents has taken since printed marginalia: the line
- * says the list is one thing, and the lit segment says where in it you are.
+ * A rule runs down the leading edge, and the current section is highlighted
+ * along it.
  *
- * Nesting is the consumer's, expressed as `data-level` on a link, and the
- * levels are the heading levels: `2` through `6` each take one more step of
- * `--outline-indent`, and a link with no `data-level` is the top one. An
- * outline that read heading levels itself would have to look at the document,
- * and the document is not always where the headings are.
+ * Set nesting with `data-level` on each link, using the heading levels: `2`
+ * through `6` each add one step of `--outline-indent`, and a link without
+ * `data-level` is at the top level. The outline does not read heading levels
+ * from the document, because the headings are not always in the document.
  *
  * @since 0.1.0
  * @status stable

@@ -9,25 +9,18 @@ import { styles } from './trend-root.css.js'
  * @summary An indicator that shows which way a measurement moved, and whether the change is good.
  *
  * @description
- * The arrow takes the judgment color and the number does not, which is the
- * opposite of the dashboard convention and is measured rather than preferred:
- * in light mode the success token is 3.8:1 on the surface, enough for a glyph
- * and short of what 13px text needs, and there is no darker green in the ramp.
- * The number therefore keeps the page's own foreground and stays the most
- * legible thing here, which is right anyway, since the number is what a reader
- * reads and the judgment is a gloss on it.
+ * The arrow takes the judgment color and the number keeps the foreground color.
+ * In light mode the success token has 3.8:1 contrast on the surface, enough for
+ * a glyph and short of what 13px text needs, and the ramp has no darker green.
+ * The number stays the most legible part.
  *
- * **No visual axis applies here, and that is the answer rather than a gap.**
- * `emphasis` is how much ink a mark claims, and there is no mark: an arrow glyph
- * and two runs of text, whose weight is `Text`'s business and whose size is the
- * region's. `material` is what reads through a surface, and a 13px glyph has
- * nothing behind it. `wash` is a gradient across an area, and there is no area.
+ * Trend has no `emphasis`, `material`, or `wash`. It has no mark for emphasis,
+ * no surface for material, and no area for a wash. The text weight comes from
+ * `Text` and the size from the region.
  *
- * The meaning axis is here and is *derived*, which is the more interesting half:
- * `direction` and `good` together resolve to success, danger or muted, so a
- * consumer states the metric's polarity once rather than picking a color. A
- * declared `tone` would let the color disagree with the arrow, which is the one
- * thing this component exists to stop.
+ * The meaning axis is derived: `direction` and `good` resolve to success,
+ * danger, or muted, so you state the metric's polarity once. There is no
+ * `tone`, because a declared tone could disagree with the arrow.
  *
  * @since 0.1.0
  * @status stable

@@ -12,17 +12,19 @@ import { property } from 'lit/decorators.js'
  * @summary A modal window built on the native `<dialog>` element.
  *
  * @description
- * A real `<dialog>` opened with `showModal()`, not a div with a role and a
- * hand-built trap. The platform gives four things that are each a day's work to
- * reimplement: the top layer, so the dialog is above everything whatever
- * `z-index` anyone wrote; a real backdrop; Escape; and inert-behind, so the
- * page underneath is unreachable by pointer, keyboard or virtual cursor.
+ * Renders a native `<dialog>` opened with `showModal()`. The platform provides:
  *
- * **`open` drives `showModal()`, and every way it can close comes back through
- * `requestOpen`.** A native dialog closes from three directions: the property,
- * Escape, and a `<form method="dialog">` submit. Left alone, two of them would
- * shut the dialog while the consumer's state still said open, which is the bug
- * that makes a modal impossible to reopen.
+ * - the top layer, so the dialog is above everything whatever the `z-index`
+ * - a backdrop
+ * - closing with Escape
+ * - an inert page behind the dialog, unreachable by pointer, keyboard, or
+ *   virtual cursor
+ *
+ * `open` calls `showModal()`, and every way the dialog closes goes through
+ * `requestOpen`. A native dialog closes three ways: the property, Escape, and a
+ * `<form method="dialog">` submit. Routing all three through `requestOpen`
+ * keeps your state in step, so the dialog never closes while your state still
+ * says it is open, which would leave it impossible to reopen.
  *
  * @since 0.1.0
  * @status stable

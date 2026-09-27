@@ -35,27 +35,22 @@ const parse = (hotkey: string) => {
  * @summary A command palette: a list of commands that opens from anywhere on the page and filters as you type.
  *
  * @description
- * **The list is `Listbox`, filtering and all.** Listbox already owns narrowing,
- * the empty state, the highlight over what matched, `aria-activedescendant`,
- * scrolling an option into view and the keyboard that moves between them. Its
- * own note says a command palette is that list again with something different
- * opening it, and this is that something: a dialog, and a key that summons it.
+ * The list is a `Listbox`, which handles filtering, the empty state, the match
+ * highlight, `aria-activedescendant`, scrolling an option into view, and moving
+ * between options with the keyboard. The palette adds a dialog and a hotkey
+ * that opens it.
  *
- * **The value is not kept.** A palette runs a command and forgets it: nothing
- * here is a form control and nothing is submitted, so what it reports is that
- * an option was chosen, once, with `helix-select`. A consumer that wants the
- * last command remembered is a consumer with somewhere better to keep it.
+ * The palette keeps no value. It is not a form control and submits nothing.
+ * Choosing an option dispatches `helix-select` once. To remember the last
+ * command, store it yourself.
  *
- * **The hotkey is global and the element does not have to be open to hear it.**
- * The listener is on the document, because the point of a palette is that it
- * answers from wherever the reader is, including from inside another control's
- * text field. `mod` is Command on a Mac and Control elsewhere, resolved here so
- * a consumer writes one thing.
+ * The hotkey listener is on the document, so the hotkey works from anywhere on
+ * the page, including inside another control's text field, whether or not the
+ * palette is open. `mod` means Command on a Mac and Control elsewhere, so you
+ * write one binding.
  *
- * The filter is emptied as the palette closes, for the reason Combobox and
- * Select both record: a control reopened still narrowed by the last visit's
- * search is one whose second use starts from the first one's leftovers, and a
- * palette is used far more often than either.
+ * The filter is cleared when the palette closes, so each opening starts from
+ * the full list. Combobox and Select do the same.
  *
  * @since 0.1.0
  * @status stable

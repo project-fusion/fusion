@@ -117,19 +117,19 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @summary A list of options, from which you choose one or several.
  *
  * @description
- * **The listbox is the control and the options are its vocabulary.** A Select
- * is this with a trigger in front of it, a Combobox is this with a text input,
- * and a command palette is this again: they differ in what opens the list and
- * what filters it, not in what the list is.
+ * The listbox is the control, and options are its items. A Select is a listbox
+ * with a trigger in front of it, a Combobox is a listbox with a text input, and
+ * a command palette is a listbox in a dialog. They differ only in what opens
+ * the list and what filters it.
  *
- * **`value` is comma separated when `multiple` is set**, the way
- * `Checkbox.Group`'s is, and a string because that is what `MixinControllerValue`
- * holds. The form is sent one entry per answer, as a native `<select multiple>`
- * sends it, so a server never has to know to split on a comma.
+ * With `multiple` set, `value` is a comma-separated string, like
+ * `Checkbox.Group`'s, because `MixinControllerValue` holds a string. The form
+ * receives one entry per selected option, as a native `<select multiple>` sends
+ * it, so your server does not split on commas.
  *
- * **Chosen and active are two different things.** Chosen is the answer; active
- * is where the keyboard is. Only the second moves with the arrows, and
- * `aria-activedescendant` names it while focus stays on the list.
+ * Selected and active are separate. The selected option is the value. The
+ * active option is where the keyboard is: the arrow keys move it, and
+ * `aria-activedescendant` points to it while focus stays on the list.
  *
  * @since 0.1.0
  * @status stable

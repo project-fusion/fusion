@@ -15,22 +15,22 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @summary A group of related checkboxes under one label, with one value for the set.
  *
  * @description
- * The host is the group, so `role="group"` sits on it through internals and
- * `label` names it. A run of checkboxes with no name is announced as separate
- * controls, which is what the grouping exists to say it is not.
+ * The host is the group. It has `role="group"` through internals, and `label`
+ * names it. Without a name, screen readers announce the checkboxes as separate
+ * controls.
  *
- * **Each checkbox still submits itself.** They are form-associated already and
- * a native group is several inputs sharing a name, so this adds no form value
- * of its own: it would submit the same answers twice. What it adds is the
- * grouping, a shared `name` so it is written once, and one place to read and
- * write the whole set.
+ * **Each checkbox submits its own value.** Checkboxes are already
+ * form-associated, and a native group is several inputs that share a name, so
+ * the group adds no form value of its own. It adds the grouping, a shared
+ * `name` that you write once, and one place to read and write the whole set.
  *
- * `value` is the checked values, comma separated, in the order the boxes are
- * written. Setting it ticks exactly those and unticks the rest.
+ * `value` is the checked values, separated by commas, in the order the
+ * checkboxes are written. Setting it checks exactly those values and unchecks
+ * the rest.
  *
- * **Its message is always given, never derived.** The group is form-associated
- * for validity alone and never calls `setFormValue`, so `feedback` is what shows
- * here: the browser has nothing to say about a set it does not submit.
+ * **The group shows the message you set in `feedback`.** It is form-associated
+ * only for validity and never calls `setFormValue`, so the browser does not
+ * generate a message for it.
  *
  * @since 0.1.0
  * @status stable

@@ -6,29 +6,24 @@ import { property } from 'lit/decorators.js'
  * @summary The region that holds toast messages, and the only element that announces them.
  *
  * @description
- * **The region is why this is one family rather than two.** A live region has
- * to be in the document *before* a message is put into it: assistive technology
- * subscribes to the region, and a region that arrives already holding its
- * message is frequently not announced at all. So the container is a part of the
- * family and not an arranger of complete things, which is the same reasoning
- * that puts `Radio.Group` inside its own family.
+ * The region and its items are one family because a live region must be in the
+ * document before a message is added to it. Assistive technology often does not
+ * announce a region that arrives already holding its message. `Radio.Group` is
+ * part of its family for the same reason.
  *
- * **Polite, never assertive.** `role="alert"` interrupts whatever a reader is
- * being told, and almost nothing that arrives in a corner of the screen has
- * earned that. Something that genuinely cannot wait is a `Dialog`, which stops
- * the page for everyone rather than only for the people who cannot see it.
+ * **The region is polite, never assertive.** `role="alert"` interrupts whatever
+ * a screen reader is reading. For something that cannot wait, use a `Dialog`,
+ * which stops the page for every user.
  *
- * **It never creates or destroys anything.** The consumer renders items and
- * removes them; asking to go is a cancelable `helix-dismiss` from the item. An
- * item that has gone hides itself and stays in the tree, so a consumer whose
- * state still lists it does not have their framework fighting a node this
- * component took away. It hides without waiting to be told, unless the consumer
- * declared `open` and said the state is theirs.
- * There is no `toast.show()`, because an imperative queue inside a component is
- * a second copy of the application's state that nothing can render from: an app
- * that wants a `toast()` function writes a thin one over the state it already
- * has, and keeps the ability to render the same messages on the server, in a
- * test, or twice.
+ * **The region never creates or removes items.** You render items and remove
+ * them. An item requests closing with a cancelable `helix-dismiss` event. A
+ * dismissed item hides itself and stays in the DOM, so your framework's state
+ * and the DOM stay in sync. It hides on its own unless you set `open`, which
+ * makes the state yours.
+ *
+ * There is no `toast.show()`. For a `toast()` function, write a small one over
+ * your app's state, which also lets you render the same messages on the server,
+ * in a test, or more than once.
  *
  * @since 0.1.0
  * @status stable

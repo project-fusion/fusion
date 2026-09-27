@@ -8,9 +8,9 @@ import { styles } from './badge-root.css.js'
  * @summary A count or a dot pinned to the corner of another element.
  *
  * @description
- * The indicator carries a ring in the page's own background color, so it stays
- * legible where it overlaps the thing it is pinned to. Without it a dark badge
- * on a dark icon reads as a bite taken out of the icon.
+ * The indicator has a ring in the page background color, so it stays legible
+ * where it overlaps the element it is pinned to, such as a dark badge on a dark
+ * icon.
  *
  * @since 0.1.0
  * @status stable

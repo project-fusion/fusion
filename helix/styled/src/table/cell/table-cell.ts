@@ -7,10 +7,10 @@ import { styles } from './table-cell.css.js'
  * @summary One cell of a table.
  *
  * @description
- * Every cell is the same height whatever it holds, so a row with a tag or an
- * icon button in it sits level with a row of text. Content is set in full
- * foreground, since the cells are what a reader is reading, and a long
- * identifier breaks rather than running into the next column.
+ * Every cell has the same height whatever it holds, so a row with a tag or an
+ * icon button in it sits level with a row of text. Content uses the full
+ * foreground color, and a long identifier breaks onto a new line so it does not
+ * run into the next column.
  *
  * @since 0.1.0
  * @status stable

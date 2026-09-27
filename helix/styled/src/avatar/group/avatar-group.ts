@@ -7,17 +7,14 @@ import { styles } from './avatar-group.css.js'
  * @summary Overlapping avatars, with a count for the ones not shown.
  *
  * @description
- * They overlap by a step of space, which is enough to read as a stack without
- * the faces occluding each other. Each carries a ring in the page's own
- * background color, because a stack with no separation between its members
- * reads as one shape rather than several: the ring is what makes the edge of
- * each avatar visible against the one behind it.
+ * Avatars overlap by one step of space, so they read as a stack and each face
+ * stays visible. Each avatar has a ring in the page background color, which
+ * marks its edge against the avatar behind it.
  *
- * Each avatar is drawn over the one before it, which falls out of document
- * order and needs no `z-index`. The familiar trick for putting the *first*
- * avatar on top is `row-reverse`, and it also reverses the row: the person
- * written first appears last. A facepile whose reading order is the reverse of
- * its markup is the worse trade of the two.
+ * Each avatar is drawn over the one before it, in document order, with no
+ * `z-index`. The group does not use `row-reverse` to put the first avatar on
+ * top, because that also reverses the visual order: the person written first
+ * would appear last.
  *
  * @since 0.1.0
  * @status stable

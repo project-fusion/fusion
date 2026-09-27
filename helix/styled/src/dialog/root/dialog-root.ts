@@ -8,10 +8,9 @@ import { styles } from './dialog-root.css.js'
  * @summary A modal window built on the native `<dialog>` element.
  *
  * @description
- * The panel is `surface-overlay` with a shadow, because that is what it is: a
- * thing over the page rather than on it. The scrim is drawn on `::backdrop`,
- * which is the platform's own element for it and sits in the top layer with the
- * dialog rather than being a div somebody positioned.
+ * The panel uses `surface-overlay` with a shadow, because it sits over the
+ * page. The scrim is drawn on `::backdrop`, the platform's element for it,
+ * which sits in the top layer with the dialog.
  *
  * @since 0.1.0
  * @status stable

@@ -26,32 +26,26 @@ const STRIP_HEIGHT = 32
  * @summary A small chart with no axes that shows the shape of a series beside its number.
  *
  * @description
- * The one chart here that takes its numbers from an attribute, and the reversal
- * is deliberate. Every other chart reads a table because a reader might want to
- * interrogate it; nobody interrogates the squiggle next to a figure. A
- * fourteen-row table behind a bare trend line is fourteen dates read aloud in
- * place of the one sentence that carries the meaning, so `values` is the list
- * and `label` is the sentence.
+ * Takes its numbers from the `values` attribute. The other charts read a table,
+ * but a table behind a small trend line would be read aloud row by row. Set
+ * `values` to the data and `label` to the one sentence a screen reader
+ * announces.
  *
- * That is the library's own rule rather than a second data channel: a content
- * property is its slot's fallback, which is why `Tooltip` takes `content` and
- * `Avatar` takes `name`. `for` stays for the sparkline that genuinely has a
- * table behind it, and it wins where both are given.
+ * This follows the library's rule that a content property is the fallback for
+ * its slot, as with `Tooltip`'s `content` and `Avatar`'s `name`. Use `for` when
+ * a sparkline has a real table behind it. `for` wins when both are set.
  *
- * **No label means decorative, and that is a choice rather than an oversight.**
- * A sparkline beside a stat that already says "Sessions, 1,102" has nothing of
- * its own to announce, and an unnamed `role="img"` announces "graphic" and
- * stops. So an unlabeled sparkline is `aria-hidden`, and a labeled one is an
- * image named by its sentence.
+ * Without a `label` the sparkline is decorative and `aria-hidden`, for example
+ * beside a stat that already says "Sessions, 1,102". With a `label` it is an
+ * image named by that sentence.
  *
- * It goes *beside* a `Stat` rather than inside one: a change beside a figure is
- * a second fact, which is what `Stat`'s own spec says. `Trend` composes the same
- * way.
+ * Place it beside a `Stat`, because a change beside a figure is a second fact,
+ * as `Stat`'s own spec says. `Trend` is composed the same way.
  *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * The component writes the properties listed below, and the stylesheet that
+ * draws the sparkline reads them. Do not set them yourself. They carry numbers
+ * the component computes and CSS cannot, so a stylesheet can draw the sparkline
+ * without measuring anything.
  *
  * @since 0.1.0
  * @status stable

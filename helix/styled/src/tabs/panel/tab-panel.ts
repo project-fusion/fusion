@@ -7,9 +7,8 @@ import { styles } from './tab-panel.css.js'
  * @summary The content shown for one tab.
  *
  * @description
- * No box of its own, so only the panel that is showing takes space: a tab set
- * with four panels gives the visible one the whole height rather than a
- * quarter of it.
+ * The panel has no box of its own, so only the panel that is showing takes
+ * space. In a set of four panels, the visible one gets the full height.
  *
  * @since 0.1.0
  * @status stable

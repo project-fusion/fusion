@@ -14,27 +14,26 @@ import { styles } from './color-picker-root.css.js'
  * @summary A color picker made of a square and two ramps.
  *
  * @description
- * **The square is painted in three layers, not composited from elements**: the
- * hue underneath, white sliding in from the left to take the saturation out,
- * black rising from the bottom to take the brightness out. One element, one
- * declaration, and it repaints as the hue moves because the hue is a custom
- * property the tier below writes.
+ * The square is one element painted in three layers:
  *
- * **The two range inputs over it are invisible and still there.** Not
- * `display: none` and not `visibility: hidden`, either of which would take them
- * out of the tab order and out of the accessibility tree, which is the entire
- * reason a square built this way is reachable at all. They carry
- * `pointer-events: none` so the square answers the pointer itself, and the focus
- * ring is drawn on the square rather than on them, so it lands where the reader
- * is looking.
+ * - the hue at the bottom
+ * - white from the left, which removes saturation
+ * - black from the bottom, which removes brightness
  *
- * **Every chip sits on a checkerboard.** A color with alpha painted on a solid
- * background is just a different color, and the one thing a preview owes a
- * reader is the difference between "pale blue" and "blue, half transparent".
+ * It repaints as the hue changes, because the hue is a custom property that the
+ * headless tier writes.
  *
- * No padding and no surface of its own. Flat on a page it takes the space it is
- * given, and in Color Input's panel the panel supplies both: a picker that
- * brought its own card would be a card inside a card there.
+ * The two range inputs over the square are invisible and stay in the tab order
+ * and the accessibility tree, which is what makes the square reachable. They
+ * have `pointer-events: none`, so the square handles the pointer, and the focus
+ * ring is drawn on the square.
+ *
+ * Every color chip sits on a checkerboard, so a color with alpha looks
+ * transparent. On a solid background, half-transparent blue would look the same
+ * as pale blue.
+ *
+ * The picker has no padding or surface of its own. On a page it takes the space
+ * it is given, and inside Color Input the panel supplies both.
  *
  * @since 0.1.0
  * @status stable

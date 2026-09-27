@@ -9,16 +9,15 @@ import { styles } from './legend-root.css.js'
  * @summary A list of the series in a chart, each name beside the color it is drawn in.
  *
  * @description
- * A row that wraps, because a legend sits under a chart as wide as the chart
- * and there is no arrangement of eight names that fits every width. Set
- * `--legend-direction` to `column` where it sits beside one instead.
+ * Entries are laid out in a row that wraps, because a legend under a chart is
+ * as wide as the chart, and its names have to fit any width. Set
+ * `--legend-direction` to `column` when the legend sits beside a chart.
  *
- * The series colors are mapped on this tier rather than in the one below, which
- * carries the index and holds no tokens. `shared/chart/series.css` is where the
- * mapping lives, because an index in markup cannot select a token and a custom
- * property set inline would be the headless tier naming a color, and it is
- * shared because a chart and the legend keying it have to reach the same
- * twenty-four names.
+ * Series colors are mapped in this tier. The headless tier carries the index
+ * and holds no tokens. The mapping is in `shared/chart/series.css`, because an
+ * index in markup cannot select a token, and an inline custom property would
+ * put a color in the headless tier. Charts and legends share the file, so both
+ * use the same twenty-four color names.
  *
  * @since 0.1.0
  * @status stable

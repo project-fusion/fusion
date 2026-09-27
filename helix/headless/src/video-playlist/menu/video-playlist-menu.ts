@@ -17,15 +17,11 @@ import '../../menu/index.js'
  * @summary The playlist's entries, as a menu inside the player's control bar.
  *
  * @description
- * The entries again, reachable without leaving the picture. A playlist beside
- * the player is a list a reader scrolls to; the same list in the control bar is
- * one they open over the video.
+ * Opens the playlist entries from the player's control bar, over the video.
  *
- * **It is placed by the consumer, not rendered by the playlist**, and that is
- * forced rather than chosen: a shadow root cannot project into a sibling's
- * light DOM, so nothing the playlist renders can land inside the player's
- * control bar. What can is an element the consumer writes there, which is what
- * `Video`'s `controls` slot is for.
+ * **You place the menu yourself**, in `Video`'s `controls` slot. A shadow root
+ * cannot project into a sibling's light DOM, so the playlist cannot render into
+ * the player's control bar.
  *
  * @since 0.1.0
  * @status stable

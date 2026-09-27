@@ -16,24 +16,22 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * @summary A set of radios where exactly one can be chosen.
  *
  * @description
- * **The group is the control, and the radios are its options.** This is the
- * asymmetry with checkboxes and it comes from what a form submits: a set of
- * checkboxes is several answers and each box submits its own, while a set of
- * radios is one answer, so the group owns the `name`, the `value` and the
- * validity, and a lone radio outside a group is not a control at all.
+ * The group is the form control, and the radios are its options. A set of
+ * radios submits one answer, so the group owns the `name`, the `value`, and the
+ * validity. A radio outside a group is not a control. Checkboxes work the other
+ * way: each checkbox submits its own answer.
  *
- * Which is also why `MixinField` lands here and not on `Radio`: the label, the
- * hint and the message are about the question, and the question is the set.
+ * `MixinField` applies to the group for the same reason. The label, the hint,
+ * and the message describe the question, and the question belongs to the set.
  *
- * Selection travels up and state travels down. An item announces that it was
- * chosen, the group decides whether that stands, and the group writes
- * `selected` onto every item. Nothing sets itself, so there is one answer to
- * "which one is on" rather than one per item.
+ * Selection moves up and state moves down. A radio dispatches an event when it
+ * is chosen, the group determines whether the choice stands, and the group
+ * writes `selected` onto every radio. The group is the one source of which
+ * radio is on.
  *
- * `value` and `defaultValue` are separate for the reason `checked` and
- * `defaultChecked` are: `value` is the answer now, `defaultValue` is what the
- * markup asked for, which is where a reset returns and is gone the moment
- * anything is chosen.
+ * `value` is the current answer. `defaultValue` is what the markup declared:
+ * the value until something is chosen, and where a reset returns. The two work
+ * like `checked` and `defaultChecked`.
  *
  * @since 0.1.0
  * @status stable

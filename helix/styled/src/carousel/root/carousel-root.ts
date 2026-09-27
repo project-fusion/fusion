@@ -8,16 +8,13 @@ import { styles } from './carousel-root.css.js'
  * @summary Shows one slide of several, with controls to move between them.
  *
  * @description
- * The track scroll-snaps, so a drag and a trackpad swipe move it with the
- * browser's own momentum and the controls only have to scroll.
+ * The track scroll-snaps, so dragging and trackpad swipes use the browser's
+ * momentum, and the controls only scroll the track.
  *
- * Slides take the full track by default. `per-view` fits more than one across,
- * at any count, and is declared on the tier below because it decides how many
- * positions the track has rather than only how wide a slide is,
- * which is what a run of cards wants rather than a run of full-width panels.
- * This sheet divides the track by the number that tier publishes rather than
- * enumerating the values it will answer for, so there is no count it silently
- * draws one across.
+ * Each slide fills the track by default. `per-view` shows more than one slide
+ * across, at any count, for a run of cards. It is declared on the headless tier
+ * because it sets how many positions the track has. The styles divide the track
+ * by the count the headless tier publishes, so every count works.
  *
  * @since 0.1.0
  * @status stable

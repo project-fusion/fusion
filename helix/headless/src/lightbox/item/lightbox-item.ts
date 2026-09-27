@@ -6,15 +6,13 @@ import { property } from 'lit/decorators.js'
  * @summary One item a lightbox can show, such as a picture, a video frame, or a chart.
  *
  * @description
- * A wrapper around whatever the consumer opened, which is the whole of what it
- * is: a picture, a frame of video, a chart. The family shows one at a time and
- * this is how it says which, so the content stays the consumer's and the
- * arithmetic stays the root's.
+ * Wraps one piece of content in the lightbox, such as a picture, a video frame,
+ * or a chart. The lightbox shows one item at a time, and the root decides
+ * which.
  *
- * Hidden rather than unmounted while another item is current, for the reason
- * `TabPanel` gives: what is in the markup is what a crawler reads and what a
- * server sent, and an `<img>` that has already decoded does not decode again
- * when the reader walks back to it.
+ * An item that is not current is hidden and stays in the DOM, as a `TabPanel`
+ * does. Crawlers can read it, it is in the server-rendered markup, and an
+ * `<img>` that has decoded does not decode again when you go back to it.
  *
  * @since 0.100.0
  * @status stable

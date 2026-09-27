@@ -6,18 +6,17 @@ import { property } from 'lit/decorators.js'
  * @summary Page-level banner holding brand, navigation, and actions.
  *
  * @description
- * Tracks whether the page has scrolled and carries it as the custom state
- * `scrolled`, so the styled tier can lift the bar without a scroll handler of
- * its own. It is read on connect rather than derived: a fresh load starts at
- * the top, which is what the server rendered, and a reload part-way down
- * corrects on hydration.
+ * Tracks whether the page has scrolled and sets the custom state `scrolled`, so
+ * the styled tier can lift the bar without a scroll handler of its own. The
+ * state is read when the element connects. A fresh load starts at the top,
+ * which matches the server markup, and a reload partway down the page is
+ * corrected on hydration.
  *
- * **A custom state and never `data-scrolled`.** An attribute the element writes
- * onto its own host is one the server did not send, so a hydrating framework
- * reports a mismatch, intermittently: only when the reader reloads far enough
- * down the page. `ElementInternals.states` is not in the DOM, so there is
- * nothing for a hydration pass to disagree with, and `:state(scrolled)` selects
- * it.
+ * The element uses a custom state because an attribute such as `data-scrolled`,
+ * written onto its own host, is one the server did not send. A hydrating
+ * framework would report a mismatch whenever the page reloads far enough down.
+ * `ElementInternals.states` is not in the DOM, so hydration has nothing to
+ * compare. Select the state with `:state(scrolled)`.
  *
  * @since 0.1.0
  * @status stable

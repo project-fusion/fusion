@@ -6,9 +6,9 @@ import { property } from 'lit/decorators.js'
  * @summary The content shown for one tab.
  *
  * @description
- * Hidden rather than unmounted when inactive, so anything typed into a panel is
- * still there when the reader comes back to it, and so the content is in the
- * server's markup for a crawler regardless of which tab is open.
+ * An inactive panel is hidden and stays mounted. Anything typed into it is
+ * still there when the person comes back, and the content of every panel is in
+ * the server-rendered markup for crawlers, whichever tab is open.
  *
  * @since 0.1.0
  * @status stable

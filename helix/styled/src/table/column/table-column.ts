@@ -7,9 +7,8 @@ import { styles } from './table-column.css.js'
  * @summary One column of a table: its heading and its width.
  *
  * @description
- * Styled as the header cell it is, and it carries the same rule and inset as
- * the cells beneath it so the heading and its column read as one line down the
- * table.
+ * Styled as a header cell, with the same rule and inset as the cells below it,
+ * so the heading and its column read as one line down the table.
  *
  * @since 0.1.0
  * @status stable

@@ -7,8 +7,8 @@ import { styles } from './megamenu-root.css.js'
  * @summary A section of a navigation with a trigger that opens a panel of links.
  *
  * @description
- * Presentation only: the trigger, and the panel it opens as a grid of columns.
- * Everything about what opens it and what closes it is the base class.
+ * Styles the trigger and lays out the panel it opens as a grid of columns. What
+ * opens and closes the panel comes from the base class.
  *
  * @since 0.1.0
  * @status stable

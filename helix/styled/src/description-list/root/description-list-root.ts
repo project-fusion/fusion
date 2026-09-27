@@ -8,19 +8,19 @@ import { styles } from './description-list-root.css.js'
  * @summary A list of labels and their values, such as a details panel.
  *
  * @description
- * Each label is quiet and each value takes the text around it, so the eye goes
- * to the values and the labels are there to find them by. With
- * `direction="row"` the labels share one column, as wide as the longest of
- * them, and the values start on one line beside it.
+ * Labels are muted and values use the style of the surrounding text, so the
+ * values stand out and the labels help you find them. With `direction="row"`,
+ * the labels share one column as wide as the longest label, and the values
+ * start on one line beside it.
  *
- * **Beside falls back to over below about 22rem of its own width**, measured on
- * the list rather than on the viewport, since a details panel is as often a
- * sidebar on a wide screen as the whole of a narrow one. Below that the label
- * column leaves the values too little room to be read.
+ * **Below about 22rem of its own width, the row layout stacks** each label
+ * above its value. The width is measured on the list, because a details panel
+ * can be a sidebar on a wide screen or the whole of a narrow one. Below that
+ * width the label column leaves too little room for the values.
  *
- * **`width="auto"` with `justify="between"` is a summary**: the list as wide as
- * its widest pair, labels on the start edge and values on the end one in
- * figures of one width, which is how a set of totals is read.
+ * **For a summary, set `width="auto"` and `justify="between"`.** The list is as
+ * wide as its widest pair, labels sit on the start edge, and values sit on the
+ * end edge in tabular figures, as in a set of totals.
  *
  * @since 0.1.0
  * @status stable

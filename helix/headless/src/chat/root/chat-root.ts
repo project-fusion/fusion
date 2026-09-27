@@ -114,48 +114,30 @@ const spoken = (message: Element): string =>
  * @summary A conversation's turns in a scrolling transcript that keeps the user's place.
  *
  * @description
- * **It has no opinion about where it sits.** A chat is asked for as a floating
- * button, a page, a palette, a sidebar, a modal and an inline block, and none
- * of those is a variant of a conversation: they are containers, and the
- * containers already exist. Nothing here is positioned, nothing has a backdrop,
- * and nothing owns a trigger. If a form factor needs a mode on this element,
- * the split is wrong.
+ * Chat has no positioning, no backdrop, and no trigger, so you can put it in
+ * any container, such as a page, a sidebar, a modal, or a floating panel.
  *
- * **Scroll ownership is the behavior everything else depends on.** A transcript
- * that grows wants to stay at the bottom, except when the reader has scrolled
- * up to read, where pinning is hostile. The rule: pin while the reader is
- * within `threshold` of the bottom, and let go the moment they leave it. A turn
- * growing under a pinned reader is not the reader leaving, so a streamed answer
- * is followed to its last line.
+ * The transcript stays pinned to the bottom, including while a streamed answer
+ * grows, until the user scrolls more than `threshold` away from it.
  *
- * **History loads upward, under a reader who does not move.** With `history`
- * set to `more`, reaching the top fires `helix-history`; the consumer sets
- * `loading` while it fetches and prepends the older turns, and the turn the
- * reader was looking at stays where it was on screen while the room above it
- * grows.
+ * With `history` set to `more`, reaching the top fires `helix-history`. Set
+ * `loading` while you fetch, then prepend the older turns. The turn the user
+ * was reading stays in place on screen.
  *
- * **A turn is announced once, when it settles**, and not by the log. A log
- * that is a live region reads what enters it, which is every token of a stream
- * where `aria-busy` is not honored, every page of history as it loads, and
- * every window of a long transcript as the reader scrolls through it. So the
- * log is `aria-live="off"`, and a status region of its own says each new turn
- * when it has finished arriving: never the reader's own words unless they
- * failed to send, never a turn loaded above the ones already there, and never
- * what was in the transcript when it opened.
+ * The log is `aria-live="off"`. A separate status region announces each new
+ * turn once, when it has finished arriving. It skips the user's own turns
+ * unless they failed to send, turns loaded as history, and the turns already
+ * there when the transcript opened.
  *
- * **Turns are markup children or data, not both.** Children serve whole from a
- * server and are what most conversations want. `turns` is for the transcript
- * too long to hold as elements: it is drawn a window at a time, measured as it
- * goes, and the log needs a block size of its own for that to mean anything.
+ * Pass the turns as children or as `turns` data. Do not use both. Children
+ * render from the server and suit most conversations. `turns` draws a long
+ * transcript one window at a time, so the log needs a block size of its own.
  *
- * **A fed turn is styled through this element, not its own.** Its message is
- * drawn in this shadow root, where `[author="me"]` cannot reach it, so every
- * fed turn's parts are forwarded as `message-*`, and the ones that change with
- * the turn a second time while it holds: `-mine` for a turn by `me`, and
- * `message-meta-failed`, `message-content-sending` and
- * `message-content-streaming` for its state. Every other author has the plain
- * names only, so a conversation styling each participant apart passes its
- * turns as children.
+ * A turn from `turns` is drawn in the chat's shadow root, so style it through
+ * the forwarded `message-*` parts. A turn by `me` also gets each part with
+ * `-mine` added, and the turn's state adds `message-meta-failed`,
+ * `message-content-sending`, and `message-content-streaming`. To style each
+ * participant differently, pass the turns as children.
  *
  * @since 0.1.0
  * @status stable
