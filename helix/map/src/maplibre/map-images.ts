@@ -38,7 +38,25 @@ const US_ROUTE =
 /** The drawings' box, in their own units. */
 const BOX = 600
 
-/** A sign's width for its number, as a share of its height: wider for three digits and more. */
+/**
+ * Where a sign's number goes, as shares of its box: the middle of the field
+ * the number is printed in, how wide the field is there, and how tall the
+ * number stands. The Interstate's is the blue under its crown, whose optical
+ * middle is below the box's, since the shield narrows to its point; the US
+ * route's is the white above its point; a state's circle and a plate are
+ * centered.
+ */
+const FIELDS: Record<
+  'interstate' | 'plate' | 'state' | 'us',
+  { height: number; middle: number; width: number }
+> = {
+  interstate: { height: 0.36, middle: 0.585, width: 0.74 },
+  plate: { height: 0.5, middle: 0.5, width: 1 },
+  state: { height: 0.42, middle: 0.5, width: 0.72 },
+  us: { height: 0.38, middle: 0.47, width: 0.74 },
+}
+
+/** A sign's width for its number, as a share of its height: wider for three characters and more. */
 const across = (length: number): number => (length <= 2 ? 1 : length === 3 ? 1.25 : 1.5)
 
 /**
@@ -96,25 +114,67 @@ const drawSign = (
 }
 
 /**
+ * A sign's number, drawn in its field: the digits' own ink measured and set
+ * in the middle of the field, which a label laid over the sign could only
+ * guess at from the font's line box; as tall as the field allows; and
+ * narrowed where it is wider than the field, as a sign's condensed letters
+ * are.
+ */
+const drawNumber = (
+  context: CanvasRenderingContext2D,
+  image: Extract<MapImage, { kind: 'sign' }>,
+  text: string,
+  width: number,
+  height: number,
+): void => {
+  const field = FIELDS[image.design]
+  const reference = 100
+  context.font = `700 ${reference}px ${image.font}`
+  const sample = context.measureText(text)
+  const tall = sample.actualBoundingBoxAscent + sample.actualBoundingBoxDescent || reference * 0.7
+  const size = (reference * field.height * height) / tall
+  context.font = `700 ${size}px ${image.font}`
+  const measured = context.measureText(text)
+  const room = image.design === 'plate' ? width - 8 * IMAGE_RATIO : width * field.width
+  const narrow = Math.min(1, room / measured.width)
+  const middle = height * field.middle
+  const baseline =
+    middle + (measured.actualBoundingBoxAscent - measured.actualBoundingBoxDescent) / 2
+  context.save()
+  context.translate(width / 2, baseline)
+  context.scale(narrow, 1)
+  context.fillStyle = image.ink
+  context.textAlign = 'center'
+  context.textBaseline = 'alphabetic'
+  context.fillText(text, 0, 0)
+  context.restore()
+}
+
+/**
  * The image a style describes, drawn on a canvas: a landmark's icon on a disc
  * in its hue, ringed in the land so it stands off the map, or a highway sign
- * as wide as its number. `undefined` where there is no canvas to draw on.
+ * as wide as `text`, its number, with the number in it. `undefined` where
+ * there is no canvas to draw on.
  */
-export const drawMapImage = (image: MapImage): DrawnImage | undefined => {
+export const drawMapImage = (image: MapImage, text = ''): DrawnImage | undefined => {
   const canvas = document.createElement('canvas')
-  const height = (image.kind === 'landmark' ? 22 : 22) * IMAGE_RATIO
-  const width =
-    image.kind === 'landmark'
-      ? height
-      : image.design === 'plate'
-        ? Math.max(20, 10 + 7 * image.length) * IMAGE_RATIO
-        : Math.round(height * across(image.length))
-  canvas.width = width
-  canvas.height = height
   const context = canvas.getContext('2d')
   if (!context) {
     return undefined
   }
+  const height = 22 * IMAGE_RATIO
+  let width = height
+  if (image.kind === 'sign') {
+    if (image.design === 'plate') {
+      /* A plate as wide as its number, with room either side. */
+      context.font = `700 ${height * 0.5}px ${image.font}`
+      width = Math.max(height, Math.ceil(context.measureText(text).width + 10 * IMAGE_RATIO))
+    } else {
+      width = Math.round(height * across(text.length))
+    }
+  }
+  canvas.width = width
+  canvas.height = height
   if (image.kind === 'landmark') {
     const middle = width / 2
     context.fillStyle = image.ink
@@ -138,6 +198,7 @@ export const drawMapImage = (image: MapImage): DrawnImage | undefined => {
     context.restore()
   } else {
     drawSign(context, image, width, height)
+    drawNumber(context, image, text, width, height)
   }
   const { data } = context.getImageData(0, 0, width, height)
   return { data: new Uint8Array(data.buffer.slice(0)), height, width }
