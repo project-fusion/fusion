@@ -781,6 +781,54 @@ describe('mapLibreDriver', () => {
     expect(order.indexOf('helix-raster-p-0')).toBeLessThan(order.indexOf('road'))
   })
 
+  test('land cover is laid over the style’s own and its parks, under its water, and contour lines under the roads, empty while zoomed out', () => {
+    const { map, sources, styleLayers } = stand()
+    styleLayers.splice(
+      1,
+      0,
+      { id: 'landcover', source: 'openmaptiles', 'source-layer': 'landcover', type: 'fill' } as {
+        id: string
+        type: string
+      },
+      { id: 'park', type: 'fill' },
+      { id: 'water', 'source-layer': 'water', type: 'fill' } as { id: string; type: string },
+    )
+    const added: Record<string, unknown> = {}
+    const addLayer = map.addLayer.bind(map)
+    map.addLayer = (layer, before) => {
+      added[(layer as unknown as { id: string }).id] = layer
+      return addLayer(layer, before)
+    }
+    const data: unknown[] = []
+    const addSource = map.addSource.bind(map)
+    map.addSource = (id, source) => {
+      addSource(id, source)
+      const made = sources[id] as { setData?(next: unknown): unknown }
+      made.setData = (next) => data.push(next)
+    }
+    map.getZoom = () => 6
+    mapLibreDriver(map).layers?.(() => [
+      { color: 'rgb(250, 250, 250)', id: 'l', kind: 'landcover', label: 'Land cover', points: [] },
+      {
+        color: 'rgb(120, 90, 60)',
+        id: 'c',
+        kind: 'contours',
+        label: 'Contour lines',
+        points: [],
+        src: 'https://tiles.test/dem/{z}/{x}/{y}.png',
+        unit: 'feet',
+      },
+    ])
+    const order = styleLayers.map((one) => one.id)
+    expect(order.indexOf('helix-landcover-l')).toBe(order.indexOf('park') + 1)
+    expect(order.indexOf('helix-landcover-l')).toBe(order.indexOf('water') - 1)
+    expect(order.indexOf('helix-contours-c')).toBeLessThan(order.indexOf('road'))
+    expect(order.indexOf('helix-contours-c-label')).toBeLessThan(order.indexOf('road'))
+    expect(JSON.stringify(added['helix-landcover-l'])).toContain('wood')
+    expect(JSON.stringify(added['helix-contours-c-label'])).toContain(' ft')
+    expect(data.at(-1)).toEqual({ features: [], type: 'FeatureCollection' })
+  })
+
   test('the buildings and raster layers it adds are a style MapLibre’s own validator accepts', () => {
     const style = {
       layers: [

@@ -21,10 +21,12 @@ import {
   cloudRain,
   dotsNine,
   type HelixIcon,
+  leaf,
   mountains,
   path,
   polygon,
   stack,
+  target,
 } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -60,8 +62,9 @@ const MAP_TYPES: readonly MapType[] = ['standard', 'hybrid', 'satellite']
 
 /**
  * A layer's picture in the layers menu, by what it draws: a path for a route,
- * a shape for an area, dots for points, buildings, mountains for terrain, and
- * a rain cloud for tiles over the map, such as weather. Imagery of the ground
+ * a shape for an area, dots for points, buildings, mountains for terrain,
+ * rings for contour lines, a leaf for land cover, and a rain cloud for tiles
+ * over the map, such as weather. Imagery of the ground
  * is a map type, with a card of its own.
  */
 const iconOf = (layer: MapLayer | undefined): HelixIcon => {
@@ -76,6 +79,10 @@ const iconOf = (layer: MapLayer | undefined): HelixIcon => {
       return buildings
     case 'terrain':
       return mountains
+    case 'contours':
+      return target
+    case 'landcover':
+      return leaf
     case 'raster':
       return cloudRain
     default:

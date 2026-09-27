@@ -1,0 +1,7 @@
+/* Nothing drawn here. The connector reads the land color the covers are
+   mixed into from this element's color: the theme's surface, which is the
+   land a themed map is drawn on. */
+:host {
+  color: var(--map-landcover-ground, var(--helix-color-surface));
+  display: none;
+}

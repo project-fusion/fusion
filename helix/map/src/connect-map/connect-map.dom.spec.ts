@@ -555,6 +555,43 @@ describe('connectMap with routes and areas', () => {
     expect(labels).toEqual([false, true])
   })
 
+  test('contour lines reach the driver as their tiles, color, and unit, and land cover as its ground', async () => {
+    const host = await frame(
+      `<helix-headless-map-contours src="dem" unit="feet" style="color: rgb(1, 2, 3)"></helix-headless-map-contours>
+       <helix-headless-map-contours label="No tiles"></helix-headless-map-contours>
+       <helix-headless-map-landcover style="color: rgb(9, 9, 9)"></helix-headless-map-landcover>`,
+    )
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    expect(
+      drawn[0]?.map(({ color, encoding, kind, label, src, unit }) => ({
+        color,
+        encoding,
+        kind,
+        label,
+        src,
+        unit,
+      })),
+    ).toEqual([
+      {
+        color: 'rgb(1, 2, 3)',
+        encoding: 'terrarium',
+        kind: 'contours',
+        label: 'Contour lines',
+        src: 'dem',
+        unit: 'feet',
+      },
+      {
+        color: 'rgb(9, 9, 9)',
+        encoding: undefined,
+        kind: 'landcover',
+        label: 'Land cover',
+        src: undefined,
+        unit: undefined,
+      },
+    ])
+  })
+
   test('a raster layer drawn as the ground says so, with the deepest zoom its tiles reach', async () => {
     const host = await frame(
       `<helix-headless-map-raster ground label="Satellite imagery" max-zoom="16" src="x"></helix-headless-map-raster>
