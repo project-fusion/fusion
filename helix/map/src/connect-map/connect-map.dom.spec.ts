@@ -493,6 +493,31 @@ describe('connectMap with routes and areas', () => {
     expect(drawn.at(-1)?.map((one) => one.label)).toEqual(['Hidden'])
   })
 
+  test('terrain reaches the driver as its tiles, its two colors, and how it raises the ground', async () => {
+    const host = await frame(
+      `<helix-headless-map-terrain attribution="Elevation credit" exaggeration="2" max-zoom="15" raised src="dem" style="color: rgb(1, 2, 3); border-top-color: rgb(4, 5, 6)"></helix-headless-map-terrain>
+       <helix-headless-map-terrain label="No tiles"></helix-headless-map-terrain>`,
+    )
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    expect(drawn[0]).toEqual([
+      {
+        attribution: 'Elevation credit',
+        color: 'rgb(1, 2, 3)',
+        encoding: 'terrarium',
+        exaggeration: 2,
+        highlight: 'rgb(4, 5, 6)',
+        id: expect.any(String),
+        kind: 'terrain',
+        label: 'Terrain',
+        maxZoom: 15,
+        points: [],
+        raised: true,
+        src: 'dem',
+      },
+    ])
+  })
+
   test('a raster layer drawn as the ground says so, with the deepest zoom its tiles reach', async () => {
     const host = await frame(
       `<helix-headless-map-raster ground label="Satellite imagery" max-zoom="16" src="x"></helix-headless-map-raster>

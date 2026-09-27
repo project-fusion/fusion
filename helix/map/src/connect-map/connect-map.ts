@@ -164,6 +164,10 @@ export interface MapLayerSpec {
    * to draw.
    */
   casing?: string | undefined
+  /** How a terrain layer's elevation tiles store heights in their colors. */
+  encoding?: 'mapbox' | 'terrarium' | undefined
+  /** How many times its real height a raised terrain layer's ground is raised. */
+  exaggeration?: number | undefined
   /** Whether a points layer's points are gathered into their counts where they would meet. */
   cluster?: boolean | undefined
   /** `#hex`, `rgb()` or `rgba()`, which every renderer takes. */
@@ -182,11 +186,13 @@ export interface MapLayerSpec {
    * place names, where other raster layers are over the roads.
    */
   ground?: boolean | undefined
+  /** The color of a terrain layer's slopes that face the light. Its `color` is the shadow's. */
+  highlight?: string | undefined
   /** Stable for as long as the element is in the frame, for a renderer that keys its layers. */
   id: string
   /** What a points layer writes its counts in. */
   ink?: string | undefined
-  kind: 'area' | 'buildings' | 'points' | 'raster' | 'route'
+  kind: 'area' | 'buildings' | 'points' | 'raster' | 'route' | 'terrain'
   /** What the frame's list calls it. */
   label: string
   /** A raster layer's deepest zoom with tiles, past which a renderer enlarges them. */
@@ -198,6 +204,10 @@ export interface MapLayerSpec {
    * off the network the rest is routed on, a place set back from its road.
    */
   pattern?: 'dotted' | undefined
+  /** Whether a terrain layer raises the ground to its height in 3D. */
+  raised?: boolean | undefined
+  /** A terrain layer's elevation tile URL, with `{z}`, `{x}`, and `{y}` in it. */
+  src?: string | undefined
   /**
    * In order: along a route, and around an area without repeating the first;
    * a points layer's every point, the same array for as long as its data is
@@ -304,15 +314,21 @@ interface Layer extends HTMLElement {
   frame?: number | undefined
   /** A raster layer's tile URLs, one per frame. */
   frames?: string[] | undefined
+  /** A terrain layer's: how its tiles store heights. */
+  encoding?: 'mapbox' | 'terrarium' | undefined
+  /** A terrain layer's: how many times its real height the ground is raised. */
+  exaggeration?: number | undefined
   /** A raster layer's: drawn as the ground, under the roads. */
   ground?: boolean | undefined
   isMapLayer: true
   label?: string | undefined
-  layerKind: 'area' | 'buildings' | 'points' | 'raster' | 'route'
+  layerKind: 'area' | 'buildings' | 'points' | 'raster' | 'route' | 'terrain'
   /** A raster layer's deepest zoom with tiles of its own. */
   maxZoom?: number | undefined
   /** A points layer's: the property each point is named by. */
   nameKey?: string | undefined
+  /** A terrain layer's: whether the ground is raised to its height in 3D. */
+  raised?: boolean | undefined
   /** A raster layer's opacity, from `0` to `1`. */
   opacity?: number | undefined
   points?: MapPlace[] | undefined
@@ -720,6 +736,30 @@ export const connectMap = (
         const color = settledColor(layer)
         /* **Buildings are the tiles' own**, raised by the renderer, so the
            spec carries only their color. */
+        /* **Terrain is its elevation tiles and two colors**, the shadow's
+           and the highlight's, which the styled tier sets as the element's
+           color and border. */
+        if (layer.layerKind === 'terrain') {
+          if (!layer.src) {
+            return []
+          }
+          return [
+            {
+              ...(layer.attribution ? { attribution: layer.attribution } : {}),
+              color,
+              encoding: layer.encoding === 'mapbox' ? 'mapbox' : 'terrarium',
+              exaggeration: Math.max(0, layer.exaggeration ?? 1),
+              highlight: settledColor(layer, 'border-top-color'),
+              id: idOf(layer),
+              kind: 'terrain',
+              label: layer.label ?? '',
+              ...(typeof layer.maxZoom === 'number' ? { maxZoom: layer.maxZoom } : {}),
+              points: [],
+              raised: layer.raised === true,
+              src: layer.src,
+            },
+          ]
+        }
         if (layer.layerKind === 'buildings') {
           return [
             { color, id: idOf(layer), kind: 'buildings', label: layer.label ?? '', points: [] },

@@ -1,0 +1,15 @@
+/* Nothing drawn here. The renderer shades the land, and the connector reads
+   the two colors from this element: the shadow from `color` and the highlight
+   from the border. The media colors are black and white in both modes, so the
+   slopes read over a light map, a dark one, and imagery. */
+:host {
+  border-top-color: var(
+    --map-terrain-highlight-color,
+    color-mix(in oklab, var(--helix-color-foreground-media) 25%, transparent)
+  );
+  color: var(
+    --map-terrain-shadow-color,
+    color-mix(in oklab, var(--helix-color-surface-media) 40%, transparent)
+  );
+  display: none;
+}
