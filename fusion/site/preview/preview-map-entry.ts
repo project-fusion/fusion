@@ -18,7 +18,7 @@
  * MapLibre's weight for nothing.
  */
 
-import { connectMap, mapColorsFrom } from '@fusion.dev/helix-map'
+import { connectMap, fontReady, mapColorsFrom, mapFontFrom } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { clearOf } from '../utils/map-view/map-view'
 import { RESTYLED } from './preview-events'
@@ -52,10 +52,29 @@ const contrastOf = (frame: Element): number | undefined => {
 }
 
 /**
+ * One map, made once the theme's typeface is loaded: MapLibre draws each
+ * letter of a label once and keeps it, so a map made first would keep its
+ * labels in the fallback face. A frame taken away before then gets none.
+ */
+const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
+  let gone = false
+  let stop: (() => void) | undefined
+  void fontReady(mapFontFrom(frame)).then(() => {
+    if (!gone) {
+      stop = start(frame, root)
+    }
+  })
+  return () => {
+    gone = true
+    stop?.()
+  }
+}
+
+/**
  * One map: the renderer made, connected to its frame, framed around every
  * place it holds clear of the panel, and redrawn when the theme moves.
  */
-const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
+const start = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   const box = frame.querySelector<HTMLElement>('[data-preview-map-canvas]')
   if (!box) {
     return () => undefined
@@ -65,7 +84,12 @@ const mountOne = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   /* A globe where the example asks for one with `data-preview-map-globe`. */
   const globe = frame.hasAttribute('data-preview-map-globe')
   const styled = (colors: ReturnType<typeof mapColorsFrom>) =>
-    mapLibreStyle(colors, { contrast: contrastOf(frame), globe, language }) as never
+    mapLibreStyle(colors, {
+      contrast: contrastOf(frame),
+      font: mapFontFrom(frame),
+      globe,
+      language,
+    }) as never
   /* **A fixed view where the example gives one**, for a layer with no places
      to frame, such as buildings seen tilted or radar over a region. Written
      as `data-preview-map-view="lat,lng,zoom,pitch,bearing"`, the last two
