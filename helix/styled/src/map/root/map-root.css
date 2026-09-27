@@ -121,14 +121,14 @@
 /* ======================================================= rotate and tilt === */
 
 /* **Rotate and tilt fill the pad's empty cells**: turn left and right in the
-   top corners beside up, Face north in the center, and 3D and 2D in the
-   bottom corners beside down. Only a frame that asks for them changes, so a
+   top corners beside up, Face north in the center, and the 3D toggle in the
+   bottom corner before down. Only a frame that asks for them changes, so a
    map with pan and zoom alone keeps its layout. */
 [part="controls"]:has([part="rotate-left"], [part="tilt"]) {
   grid-template-areas:
     "rotl   up     rotr  zoomin"
     "start  north  end   zoomout"
-    "tilt   down   flat  full";
+    "tilt   down   .     full";
 }
 
 [part="rotate-left"] {
@@ -143,9 +143,6 @@
 [part="tilt"] {
   grid-area: tilt;
 }
-[part="flatten"] {
-  grid-area: flat;
-}
 
 /* The needle points north as the map turns. */
 [part="needle"] {
@@ -153,10 +150,21 @@
   transform: rotate(var(--map-needle-turn, 0deg));
 }
 
-[part="tilt"],
-[part="flatten"] {
+[part="tilt"] {
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
+}
+
+/* **Pressed while the map is tilted**, in the brand's fill, so the one
+   toggle among the buttons says which view is showing. */
+[part="tilt"][aria-pressed="true"] {
+  background-color: var(--helix-color-primary-surface);
+  border-color: var(--helix-color-primary-surface);
+  color: var(--helix-color-foreground-on-accent);
+}
+
+[part="tilt"][aria-pressed="true"]:hover {
+  background-color: var(--helix-color-primary-surface-hover);
 }
 
 /* ============================================================ layers menu === */

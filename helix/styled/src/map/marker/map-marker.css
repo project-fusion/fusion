@@ -52,6 +52,14 @@
   visibility: hidden;
 }
 
+/* **Behind the globe**, out of sight and out of the pointer's way, and still
+   focusable: a reader walking the markers reaches it, and the connector
+   turns the globe to show it. */
+:host(:state(behind)) {
+  opacity: 0;
+  pointer-events: none;
+}
+
 [part="marker"] {
   align-items: center;
   cursor: pointer;

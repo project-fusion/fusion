@@ -88,6 +88,11 @@ theme. Map labels meet a contrast target of 4.5 against the land. Pass
 `contrast` to change it, `language` to choose which name each place is labeled
 with, and `tiles` and `glyphs` to use your own tile server.
 
+Pass `globe: true` to draw the world as a globe when the map is zoomed out. The
+globe turns into the flat map as the map zooms in. `connectMap` hides markers on
+the far side of the globe, and a keyboard user who moves to one turns the globe
+to show it.
+
 `followTheme(map, frame, style)` restyles the map when your theme changes. It
 watches for a new color mode, class, or theme value on the frame or its
 ancestors, and for a change in the system's light or dark setting. If your page
@@ -229,8 +234,10 @@ To let users turn and tilt the map, add `rotate` and `tilt` to the frame's
 ```
 
 The rotate buttons turn the map 15 degrees, and Face north turns it back. Its
-arrow points north as the map turns. The 3D button tilts the map 50 degrees
-toward the horizon, and the 2D button makes it flat.
+arrow points north as the map turns. The 3D button is a toggle. Pressed, it
+tilts the map 50 degrees toward the horizon and raises the buildings. Pressed
+again, it makes the map flat, and the buildings are the map's own flat
+footprints. Raised terrain lies flat with them, and keeps its shading.
 
 Leaflet draws maps flat and does not rotate, so a Leaflet map shows no
 buildings, and the rotate and tilt buttons do nothing.
