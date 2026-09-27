@@ -102,11 +102,13 @@
 }
 
 /**
- * Two unequal halves of one card, and no rule between them.
+ * Two unequal halves of one card, and no rule between them. Stacked, the one
+ * column is as wide as the card and no wider: `1fr` alone is at least as wide
+ * as its content, so a long line of code in a half widened the page.
  */
 .bandSplit {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /**

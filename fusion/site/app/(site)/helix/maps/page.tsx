@@ -6,7 +6,17 @@ import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import { Lede } from '@/components/lede/lede'
 import { SectionTitle } from '@/components/section-title/section-title'
 import { GOOGLE_FACES } from '@/content/faces/faces.generated'
-import { MAP_FEATURES, MAP_INSTALL, MAP_PILLARS, MAP_STACK, MAPS } from '@/content/maps/maps'
+import {
+  ELEVATION,
+  MAP_BASICS,
+  MAP_FEATURES,
+  MAP_INSTALL,
+  MAP_LAYERS,
+  MAP_PILLARS,
+  MAP_STACK,
+  MAPS,
+  type MapFeature,
+} from '@/content/maps/maps'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { type Params, queryFrom, settingsFrom } from '@/utils/theme-defaults/theme-defaults'
@@ -14,6 +24,7 @@ import { serverTheme } from '@/utils/theme-engine/theme-engine.server'
 import styles from './maps.module.css'
 import { MapsHero } from './maps-hero'
 import { MapsPoints } from './maps-points'
+import { MapsTerrain } from './maps-terrain'
 import { mapIntent, propertiesOf } from './maps-theme'
 
 /** A snippet as the reference pages show one, highlighted by this build from its own source. */
@@ -46,6 +57,44 @@ const POINTS_MARKUP = `<helix-map label="Food and drink in Austin">
   ></helix-map-points>
 </helix-map>`
 
+/** The ground layers as a page writes them, which the Yosemite demo beside it is, less its imagery. */
+const TERRAIN_MARKUP = `<helix-map controls="zoom compass tilt layers fullscreen">
+  <div id="map"></div>
+  <helix-map-landcover></helix-map-landcover>
+  <helix-map-terrain
+    src="${ELEVATION.src}"
+    raised
+  ></helix-map-terrain>
+  <helix-map-contours
+    src="${ELEVATION.src}"
+    unit="feet"
+  ></helix-map-contours>
+</helix-map>`
+
+/**
+ * A band's cells, two by two on a wide card: each thing's name, what it does,
+ * and what you write for it, set as code.
+ */
+function Features({ features }: { features: readonly MapFeature[] }) {
+  return (
+    <div className={styles.mapsFeatures}>
+      {features.map((feature) => (
+        <helix-flex class={styles.mapsFeature} direction="column" gap="sm" key={feature.title}>
+          <Claim>{feature.title}</Claim>
+          <helix-text emphasis="muted">{feature.body}</helix-text>
+          <helix-flex gap="xs" wrap>
+            {feature.elements.map((element) => (
+              <code className={styles.mapsElement} key={element}>
+                {element}
+              </code>
+            ))}
+          </helix-flex>
+        </helix-flex>
+      ))}
+    </div>
+  )
+}
+
 export const metadata = pageMetadata({
   description: MAPS.lede,
   path: '/helix/maps',
@@ -61,12 +110,13 @@ export const metadata = pageMetadata({
  *
  * **Sold, then shown, then handed over.** Under the live map: what a map gets
  * from Helix, the one thing a marker cannot do shown running, what a map can
- * hold, how to start one of your own, and last how it is built, the
+ * hold, the ground under it shown running, the layers you add and what every
+ * map draws, how to start one of your own, and last how it is built, the
  * stack each of those rests on. The bands and their field are the landing
  * page's, so Maps reads as a part of the same site rather than a tool page.
  */
 export default async function Page({ searchParams }: { searchParams: Promise<Params> }) {
-  const [, pillars, points, features, started, stack] = MAPS.blocks
+  const [, pillars, points, features, terrain, layers, basics, started, stack] = MAPS.blocks
   /* **A theme the builder sent, derived here so it is in the first paint.**
      The link carries the builder's own query, read by the builder's own
      `settingsFrom`, so every value is validated the same way and falls back
@@ -143,26 +193,41 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
             <SectionTitle>{features?.title}</SectionTitle>
             <Lede>{features?.body?.[0]}</Lede>
           </helix-flex>
-          <div className={styles.mapsFeatures}>
-            {MAP_FEATURES.map((feature) => (
-              <helix-flex
-                class={styles.mapsFeature}
-                direction="column"
-                gap="sm"
-                key={feature.title}
-              >
-                <Claim>{feature.title}</Claim>
-                <helix-text emphasis="muted">{feature.body}</helix-text>
-                <helix-flex gap="xs" wrap>
-                  {feature.elements.map((element) => (
-                    <code className={styles.mapsElement} key={element}>
-                      {element}
-                    </code>
-                  ))}
-                </helix-flex>
-              </helix-flex>
-            ))}
+          <Features features={MAP_FEATURES} />
+        </Band>
+
+        {/* **The ground, running**: the layers under the places, raised and
+            tilted on a valley whose walls show them, beside the markup. */}
+        <Band reveal shell="plain" wide>
+          <div className={band.bandSplit}>
+            <helix-flex class={band.bandSection} direction="column" gap="md">
+              <Eyebrow>{terrain?.kicker}</Eyebrow>
+              <SectionTitle>{terrain?.title}</SectionTitle>
+              <Lede>{terrain?.body?.[0]}</Lede>
+              <Code code={TERRAIN_MARKUP} label="The markup" language="html" />
+            </helix-flex>
+            <div className={band.bandSection}>
+              <MapsTerrain />
+            </div>
           </div>
+        </Band>
+
+        <Band reveal>
+          <helix-flex class={band.bandSection} direction="column" gap="md">
+            <Eyebrow>{layers?.kicker}</Eyebrow>
+            <SectionTitle>{layers?.title}</SectionTitle>
+            <Lede>{layers?.body?.[0]}</Lede>
+          </helix-flex>
+          <Features features={MAP_LAYERS} />
+        </Band>
+
+        <Band reveal>
+          <helix-flex class={band.bandSection} direction="column" gap="md">
+            <Eyebrow>{basics?.kicker}</Eyebrow>
+            <SectionTitle>{basics?.title}</SectionTitle>
+            <Lede>{basics?.body?.[0]}</Lede>
+          </helix-flex>
+          <Features features={MAP_BASICS} />
         </Band>
       </div>
       {/* **A second field for the second half**, the way the landing page
