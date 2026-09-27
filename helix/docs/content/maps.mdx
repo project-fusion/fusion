@@ -83,10 +83,33 @@ you already have. Leaflet draws routes, areas, and points only when you pass it
 - Main roads use `primary`, your brand color.
 - Smaller roads, buildings, borders, and labels use `foreground`.
 
+It also draws landmarks, highway signs, and neighborhood names:
+
+- A landmark is an icon on a disc and its name, in a color for its kind:
+  parks, museums, schools, hotels, hospitals, stations, and stadiums from zoom
+  14, and food and shops from zoom 16. Each color is a fixed hue at your brand
+  color's lightness, so the kinds stay apart in any theme.
+- A highway's number is on its sign: the red and blue Interstate shield, the
+  white US route shield, the white state oval, and a plain plate for other
+  roads.
+- Neighborhoods are in spaced capitals, quieter than the towns.
+
 The same call builds a light map for a light theme and a dark map for a dark
 theme. Map labels meet a contrast target of 4.5 against the land. Pass
 `contrast` to change it, `language` to choose which name each place is labeled
 with, and `tiles` and `glyphs` to use your own tile server.
+
+Pass `font` to draw the labels in your theme's typeface. MapLibre draws the
+letters in the page from the font your page has loaded, so there are no glyph
+files to fetch. `mapFontFrom(frame)` reads the typeface from your theme, and
+`fontReady(font)` waits until its weights are loaded. Wait for it before you
+create the map, because MapLibre keeps each letter as first drawn:
+
+```js
+const font = mapFontFrom(frame)
+await fontReady(font)
+const map = new maplibregl.Map({ container: 'map', style: mapLibreStyle(colors, { font }) })
+```
 
 Pass `globe: true` to draw the world as a globe when the map is zoomed out. The
 globe turns into the flat map as the map zooms in. `connectMap` hides markers on
