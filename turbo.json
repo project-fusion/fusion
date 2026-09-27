@@ -468,11 +468,16 @@
     // `metrics.mdx` with last week's sizes and `check:gen:metrics` failed
     // against the fresh build. `bun.lock` is here because Lit is bundled into
     // every row.
+    // **`token-layer` as well as the styles' build**, which runs it too:
+    // `check:cli:component` asks for `token-layer` by name, and a cache hit
+    // restores `dist/tokens.json` while this reads it, so `metrics` parsed half
+    // a file and failed on `Unexpected EOF`.
     "metrics": {
       "dependsOn": [
         "@fusion.dev/helix#build",
         "@fusion.dev/helix-headless#build",
         "@fusion.dev/helix-styles#build",
+        "@fusion.dev/helix-styles#token-layer",
         "@fusion.dev/helix-theme#build"
       ],
       "inputs": [
