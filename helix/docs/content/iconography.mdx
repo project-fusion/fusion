@@ -10,12 +10,12 @@ title: Iconography
 <helix-icon name="trash"></helix-icon>
 ```
 
-Helix has 108 glyphs from Phosphor, drawn on a 256 box at Phosphor's bold
-weight. We keep Phosphor's own geometry. Rescaling to a 24 box would change the
-optical weight of every glyph, and the set would stop matching Phosphor. We use
-the bold weight because Phosphor's regular weight is a hairline beside the
-medium weight of Helix text. An icon that looks lighter than the words next to
-it does not work as a mark.
+Helix has 115 glyphs, 109 of them from Phosphor, drawn on a 256 box at
+Phosphor's bold weight. We keep Phosphor's own geometry. Rescaling to a 24 box
+would change the optical weight of every glyph, and the set would stop matching
+Phosphor. We use the bold weight because Phosphor's regular weight is a
+hairline beside the medium weight of Helix text. An icon that looks lighter than
+the words next to it does not work as a mark.
 
 ## Size and color come from the surrounding text
 
@@ -90,7 +90,7 @@ both are set, `icon` wins.
 
 `icon` also keeps your bundle small. `name` looks up glyphs in an index of the
 whole set, and no bundler can tree-shake that index. If you render one icon by
-`name`, you ship the whole set: 15 kB gzipped for 108 glyphs. With `icon`, you
+`name`, you ship the whole set: 16 kB gzipped for 115 glyphs. With `icon`, you
 ship only the glyph you import.
 
 `icon` also draws glyphs from outside this set. Anything that exports the same
