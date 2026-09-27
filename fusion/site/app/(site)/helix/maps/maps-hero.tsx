@@ -84,6 +84,9 @@ const bearing = (from: { lat: number; lng: number }, to: { lat: number; lng: num
 /** The places' corners, as the camera frames them. */
 const BOUNDS = boundsOf(PLACES)
 
+/** How far the hero's map is tilted when it opens, in degrees from looking straight down. */
+const PITCH = 45
+
 /**
  * The site's own brand, as the browser settles it at the root, for the swatch
  * that goes back to it: read inside the hero it would be whichever brand was
@@ -176,17 +179,24 @@ export function MapsHero({
          styled, which a sent theme sets and a brand of the page's own clears. */
       const styled = (from: typeof colors) =>
         mapLibreStyle(from, { contrast: labels.current, language }) as never
+      /* **Tilted, so the city stands up**: the buildings are raised to their
+         heights, and a reader turns and tilts the map from its controls. */
       const map = new maplibregl.Map({
         attributionControl: false,
         bounds: BOUNDS,
         container: box,
-        fitBoundsOptions: { padding: clearOf(box, panel.current, bar.current) },
+        fitBoundsOptions: { padding: clearOf(box, panel.current, bar.current), pitch: PITCH },
+        pitch: PITCH,
         style: styled(colors),
       })
       /* Framed again once it has drawn: the page is still settling the map's
          height when it is made, and a resize keeps the center, not the fit. */
       map.once('load', () => {
-        map.fitBounds(BOUNDS, { animate: false, padding: clearOf(box, panel.current, bar.current) })
+        map.fitBounds(BOUNDS, {
+          animate: false,
+          padding: clearOf(box, panel.current, bar.current),
+          pitch: PITCH,
+        })
       })
       const connection = connectMap(host, mapLibreDriver(map))
       /* **A walker along the route, on a loop, that a reader can stop.**
@@ -476,7 +486,13 @@ export function MapsHero({
       {/* **Gathered as the map zooms out**, so the seven places are one
           count over the city rather than seven names drawn over each other,
           and come apart again as it zooms in. */}
-      <helix-map class={styles.mapsHeroFrame} cluster label="Map of Austin" ref={frame}>
+      <helix-map
+        class={styles.mapsHeroFrame}
+        cluster
+        controls="pan zoom rotate tilt layers fullscreen"
+        label="Map of Austin"
+        ref={frame}
+      >
         <div className={styles.mapsCanvas} ref={container} />
         {/* **The page's ground run in over the map, inside its own box**, so
             it washes the map and not the credit under it, and the places
@@ -515,6 +531,18 @@ export function MapsHero({
             { lat: PLACES.at(-1)?.lat ?? 0, lng: PLACES.at(-1)?.lng ?? 0 },
           ]}
           variant="dotted"
+        />
+        {/* **The city in 3D, and the ground from above**: the buildings are
+            shown, and the aerial photographs wait in the layers menu. */}
+        <helix-map-buildings />
+        <helix-map-raster
+          attribution="Imagery from USGS The National Map"
+          ground
+          hidden
+          label="Satellite imagery"
+          max-zoom="16"
+          opacity={1}
+          src="https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}"
         />
         {/* **Lettered in the order they are walked**, the letter seen and the
             place's name read: the stops rings in the walker's ink, and the
