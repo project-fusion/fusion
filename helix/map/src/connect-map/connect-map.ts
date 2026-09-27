@@ -106,10 +106,10 @@ export interface MapDriver {
   show?(place: MapPlace & { zoom?: number | undefined }, motion: MapMotion | null): void
   /**
    * Tilts the view `by` degrees toward the horizon, or back toward flat where
-   * negative, within what the renderer allows. What the frame's tilt buttons
-   * and keys ask.
+   * negative, or `to` a tilt, `0` being flat, within what the renderer allows.
+   * What the frame's 3D and 2D buttons and tilt keys ask.
    */
-  tilt?(by: number, motion: MapMotion | null): void
+  tilt?(tilt: { by?: number | undefined; to?: number | undefined }, motion: MapMotion | null): void
   /** Zooms one step in, `1`, or out, `-1`, by whatever a step is to this renderer. */
   zoomBy(direction: 1 | -1, motion: MapMotion | null): void
 }
@@ -177,6 +177,11 @@ export interface MapLayerSpec {
   frame?: number | undefined
   /** A raster layer's tile URLs, one per frame, each with `{z}`, `{x}`, and `{y}` in it. */
   frames?: readonly string[] | undefined
+  /**
+   * A raster layer drawn as the ground, such as imagery: under the roads and
+   * place names, where other raster layers are over the roads.
+   */
+  ground?: boolean | undefined
   /** Stable for as long as the element is in the frame, for a renderer that keys its layers. */
   id: string
   /** What a points layer writes its counts in. */
@@ -184,6 +189,8 @@ export interface MapLayerSpec {
   kind: 'area' | 'buildings' | 'points' | 'raster' | 'route'
   /** What the frame's list calls it. */
   label: string
+  /** A raster layer's deepest zoom with tiles, past which a renderer enlarges them. */
+  maxZoom?: number | undefined
   /** How opaque a raster layer's tiles are, from `0` to `1`. */
   opacity?: number | undefined
   /**
@@ -297,9 +304,13 @@ interface Layer extends HTMLElement {
   frame?: number | undefined
   /** A raster layer's tile URLs, one per frame. */
   frames?: string[] | undefined
+  /** A raster layer's: drawn as the ground, under the roads. */
+  ground?: boolean | undefined
   isMapLayer: true
   label?: string | undefined
   layerKind: 'area' | 'buildings' | 'points' | 'raster' | 'route'
+  /** A raster layer's deepest zoom with tiles of its own. */
+  maxZoom?: number | undefined
   /** A points layer's: the property each point is named by. */
   nameKey?: string | undefined
   /** A raster layer's opacity, from `0` to `1`. */
@@ -504,8 +515,8 @@ export const connectMap = (
     driver.rotate?.({ by, to }, motionOf(frame, 'step'))
   }
   const handleTilt = (event: Event): void => {
-    const { by } = (event as CustomEvent<{ by: number }>).detail
-    driver.tilt?.(by, motionOf(frame, 'step'))
+    const { by, to } = (event as CustomEvent<{ by?: number; to?: number }>).detail
+    driver.tilt?.({ by, to }, motionOf(frame, 'step'))
   }
   frame.addEventListener(HelixMapRotateEvent.eventName, handleRotate)
   frame.addEventListener(HelixMapTiltEvent.eventName, handleTilt)
@@ -699,94 +710,103 @@ export const connectMap = (
     seen = next
     place()
   }
+  /* **A hidden layer is not drawn**, which is how the frame's layers menu
+     turns one off, and how a page can. */
   const readLayers = (): MapLayerSpec[] =>
-    [...frame.children].filter(isLayer).flatMap((layer): MapLayerSpec[] => {
-      const color = settledColor(layer)
-      /* **Buildings are the tiles' own**, raised by the renderer, so the
+    [...frame.children]
+      .filter(isLayer)
+      .filter((layer) => !(layer as HTMLElement).hidden)
+      .flatMap((layer): MapLayerSpec[] => {
+        const color = settledColor(layer)
+        /* **Buildings are the tiles' own**, raised by the renderer, so the
            spec carries only their color. */
-      if (layer.layerKind === 'buildings') {
-        return [{ color, id: idOf(layer), kind: 'buildings', label: layer.label ?? '', points: [] }]
-      }
-      /* **A raster layer is its tile URLs and the one shown**, `src` being a
+        if (layer.layerKind === 'buildings') {
+          return [
+            { color, id: idOf(layer), kind: 'buildings', label: layer.label ?? '', points: [] },
+          ]
+        }
+        /* **A raster layer is its tile URLs and the one shown**, `src` being a
            layer of one frame. The last frame shows until one is chosen. */
-      if (layer.layerKind === 'raster') {
-        const frames = layer.frames?.length ? [...layer.frames] : layer.src ? [layer.src] : []
-        if (frames.length === 0) {
-          return []
+        if (layer.layerKind === 'raster') {
+          const frames = layer.frames?.length ? [...layer.frames] : layer.src ? [layer.src] : []
+          if (frames.length === 0) {
+            return []
+          }
+          const last = frames.length - 1
+          return [
+            {
+              ...(layer.attribution ? { attribution: layer.attribution } : {}),
+              color,
+              frame: Math.min(Math.max(0, layer.frame ?? last), last),
+              frames,
+              ...(layer.ground ? { ground: true } : {}),
+              id: idOf(layer),
+              kind: 'raster',
+              label: layer.label ?? '',
+              ...(typeof layer.maxZoom === 'number' ? { maxZoom: layer.maxZoom } : {}),
+              opacity: Math.min(Math.max(0, layer.opacity ?? 0.7), 1),
+              points: [],
+            },
+          ]
         }
-        const last = frames.length - 1
-        return [
-          {
-            ...(layer.attribution ? { attribution: layer.attribution } : {}),
-            color,
-            frame: Math.min(Math.max(0, layer.frame ?? last), last),
-            frames,
-            id: idOf(layer),
-            kind: 'raster',
-            label: layer.label ?? '',
-            opacity: Math.min(Math.max(0, layer.opacity ?? 0.7), 1),
-            points: [],
-          },
-        ]
-      }
-      /* **Points are drawn from their data**, ringed in the border's color
+        /* **Points are drawn from their data**, ringed in the border's color
            and counted in the outline's. */
-      if (layer.layerKind === 'points') {
-        const { points } = pointsOf(layer)
-        if (points.length === 0) {
+        if (layer.layerKind === 'points') {
+          const { points } = pointsOf(layer)
+          if (points.length === 0) {
+            return []
+          }
+          const id = idOf(layer)
+          pointLayers.set(id, layer)
+          return [
+            {
+              casing: settledColor(layer, 'border-top-color'),
+              cluster: layer.cluster === true,
+              color,
+              id,
+              ink: settledColor(layer, 'outline-color'),
+              kind: 'points',
+              label: layer.label ?? '',
+              points,
+            },
+          ]
+        }
+        if ((layer.points?.length ?? 0) < (layer.layerKind === 'area' ? 3 : 2)) {
           return []
         }
-        const id = idOf(layer)
-        pointLayers.set(id, layer)
-        return [
-          {
-            casing: settledColor(layer, 'border-top-color'),
-            cluster: layer.cluster === true,
-            color,
-            id,
-            ink: settledColor(layer, 'outline-color'),
-            kind: 'points',
-            label: layer.label ?? '',
-            points,
-          },
-        ]
-      }
-      if ((layer.points?.length ?? 0) < (layer.layerKind === 'area' ? 3 : 2)) {
-        return []
-      }
-      /* **The edge is the element's border color**, which the styled tier
+        /* **The edge is the element's border color**, which the styled tier
            sets to the surface and a page can set to anything; where it is the
            route's own color, which is what an unstyled element's border is,
            there is no casing to draw. */
-      const edge = layer.layerKind === 'route' ? settledColor(layer, 'border-top-color') : color
-      /* A dotted leg takes no casing: an edge under a line of dots is a
+        const edge = layer.layerKind === 'route' ? settledColor(layer, 'border-top-color') : color
+        /* A dotted leg takes no casing: an edge under a line of dots is a
            dashed band, not a line of dots. */
-      const dotted = layer.layerKind === 'route' && layer.variant === 'dotted'
-      const spec: MapLayerSpec = {
-        ...(edge && edge !== color && !dotted ? { casing: edge } : {}),
-        color,
-        id: idOf(layer),
-        kind: layer.layerKind,
-        label: layer.label ?? '',
-        ...(dotted ? { pattern: 'dotted' as const } : {}),
-        points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
-      }
-      /* **A route under way is two lines**, the part behind drawn quieter,
+        const dotted = layer.layerKind === 'route' && layer.variant === 'dotted'
+        const spec: MapLayerSpec = {
+          ...(edge && edge !== color && !dotted ? { casing: edge } : {}),
+          color,
+          id: idOf(layer),
+          kind: layer.layerKind,
+          label: layer.label ?? '',
+          ...(dotted ? { pattern: 'dotted' as const } : {}),
+          points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
+        }
+        /* **A route under way is two lines**, the part behind drawn quieter,
            cut at its progress: none of it behind draws it whole, and all of
            it behind draws it all quieter. */
-      const progress = layer.layerKind === 'route' ? layer.progress : undefined
-      if (typeof progress !== 'number' || progress <= 0) {
-        return [spec]
-      }
-      if (progress >= 1) {
-        return [{ ...spec, faded: true }]
-      }
-      const [behind, ahead] = cut(spec.points, progress)
-      return [
-        { ...spec, faded: true, id: `${spec.id}-behind`, points: behind },
-        { ...spec, points: ahead },
-      ]
-    })
+        const progress = layer.layerKind === 'route' ? layer.progress : undefined
+        if (typeof progress !== 'number' || progress <= 0) {
+          return [spec]
+        }
+        if (progress >= 1) {
+          return [{ ...spec, faded: true }]
+        }
+        const [behind, ahead] = cut(spec.points, progress)
+        return [
+          { ...spec, faded: true, id: `${spec.id}-behind`, points: behind },
+          { ...spec, points: ahead },
+        ]
+      })
   /* **A point pressed is a place pressed**, reported as a marker's press is,
      from the points layer it belongs to, with its id or its name. */
   const drawn = driver.layers?.(readLayers, {
@@ -1024,13 +1044,14 @@ export const connectMap = (
   /* **A route's color is its stylesheet's**, so what restyles one is watched
      on each route and area themselves, and not over the whole frame, where
      the renderer rebuilds its own controls: a class, an inline token, and the
-     tone and variant axes for a part whose tier does not hear them. */
+     tone and variant axes for a part whose tier does not hear them. `hidden`
+     turns a layer off. */
   const styled = new MutationObserver(() => soon({ draw: true }))
   const watchLayers = (): void => {
     styled.disconnect()
     for (const layer of [...frame.children].filter(isLayer)) {
       styled.observe(layer, {
-        attributeFilter: ['class', 'style', 'tone', 'variant'],
+        attributeFilter: ['class', 'hidden', 'style', 'tone', 'variant'],
         attributes: true,
       })
     }

@@ -90,7 +90,7 @@ export interface LeafletShapes {
   /** A layer of map tiles from a URL, which a raster layer's frames are drawn in. */
   tileLayer?(
     url: string,
-    options: { attribution?: string; opacity: number; zIndex?: number },
+    options: { attribution?: string; maxNativeZoom?: number; opacity: number; zIndex?: number },
   ): LeafletTiles
 }
 
@@ -202,7 +202,7 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
             }
             for (const spec of specs) {
               const frames = spec.frames ?? []
-              const key = frames.join(' ')
+              const key = `${frames.join(' ')}|${spec.maxZoom ?? ''}`
               let had = rasters.get(spec.id)
               if (had?.key !== key) {
                 for (const tiles of had?.tiles ?? []) {
@@ -213,6 +213,7 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
                   tiles: frames.map((url) => {
                     const tiles = make(url, {
                       ...(spec.attribution ? { attribution: spec.attribution } : {}),
+                      ...(spec.maxZoom === undefined ? {} : { maxNativeZoom: spec.maxZoom }),
                       opacity: 0,
                     })
                     tiles.addTo(map as never)
