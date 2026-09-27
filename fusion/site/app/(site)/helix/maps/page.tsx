@@ -194,15 +194,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
             <div className={styles.mapsInstall}>
               <Code code={MAP_INSTALL} label="Install" language="sh" />
             </div>
-            <helix-flex align-items="center" class="siteActions" data-density="lg" gap="lg" wrap>
+            <helix-flex class="siteActions" data-density="lg">
               <Link data-button="solid" data-button-tone="primary" href="/helix/docs/maps">
                 Read the Maps guide
-              </Link>
-              <Link data-link="quiet" href="/helix/theme?layout=map">
-                Open the Map layout in the theme builder
-              </Link>
-              <Link data-link="quiet" href="/helix/components/map">
-                Map component reference
               </Link>
             </helix-flex>
           </helix-flex>
