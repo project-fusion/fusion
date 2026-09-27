@@ -52,21 +52,21 @@ import '../../select/index.js'
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the size changes, and cancelable. Canceling it is the only way to stop a size change.
  *
  * @csspart control - The select.
- * @csspart control-feedback - The message that says what is wrong.
+ * @csspart control-feedback - The message that says what is wrong with the value.
  * @csspart control-hint - Help under the trigger.
  * @csspart control-indicator - The caret that shows the control opens.
  * @csspart control-label - The label beside the number.
  * @csspart control-listbox - The list inside the panel.
- * @csspart control-listbox-empty - Shown when a filter has hidden everything.
- * @csspart control-listbox-feedback - The message that says what is wrong with the list.
- * @csspart control-listbox-filter-icon - The mark beside the filter field.
- * @csspart control-listbox-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart control-listbox-empty - The text shown when the filter hides every option.
+ * @csspart control-listbox-feedback - The inner list's message that says what is wrong with the value.
+ * @csspart control-listbox-filter-icon - The icon beside the filter field.
+ * @csspart control-listbox-filter-mark - The default icon beside the filter field, shown when none is slotted.
  * @csspart control-listbox-hint - Help under the list.
- * @csspart control-listbox-items - The list itself.
+ * @csspart control-listbox-items - The list of options.
  * @csspart control-listbox-label - The label above the list.
- * @csspart control-listbox-live - The inner listbox's `live` part, the region that announces its empty and loading messages.
- * @csspart control-listbox-loading - Shown while the options load.
- * @csspart control-listbox-search - The region holding the field that narrows the list.
+ * @csspart control-listbox-live - The inner list's `live` part, the region screen readers announce its empty and loading text from.
+ * @csspart control-listbox-loading - The text shown while the options load.
+ * @csspart control-listbox-search - The region that holds the filter field.
  * @csspart control-listbox-search-field - The filter field.
  * @csspart control-surface - The floating panel.
  * @csspart control-trigger - The closed control, which shows the chosen size.

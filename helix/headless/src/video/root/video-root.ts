@@ -168,7 +168,7 @@ const clock = (seconds: number): string => {
  * @csspart speed - The playback speed control, when `extra-controls` includes it.
  * @csspart stage - The box holding the picture and its controls, and the focus
  * target the keys are bound to.
- * @csspart start - The large play button over the picture.
+ * @csspart start - The large play button over the picture, shown while the video is not playing.
  * @csspart time - The position and the duration.
  * @csspart video - The video itself.
  * @csspart volume - The volume slider.
