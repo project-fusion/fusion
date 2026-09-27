@@ -2,7 +2,7 @@
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type { HelixActivateEvent, HelixMap } from '@fusion.dev/helix'
-import { colorsReady, connectMap } from '@fusion.dev/helix-map'
+import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { useEffect, useRef, useState } from 'react'
 import { AUSTIN_PLACES } from '@/content/maps/points'
@@ -47,11 +47,14 @@ export function MapsPoints() {
       const { default: maplibregl } = await import('maplibre-gl')
       await customElements.whenDefined('helix-map')
       const colors = await colorsReady(host)
+      /* The theme's typeface, loaded before the map draws a label in it. */
+      await fontReady(mapFontFrom(host))
       if (!live) {
         return
       }
       const language = document.documentElement.lang || 'en'
-      const style = (from: typeof colors) => mapLibreStyle(from, { language }) as never
+      const style = (from: typeof colors) =>
+        mapLibreStyle(from, { font: mapFontFrom(host), language }) as never
       const map = new maplibregl.Map({
         attributionControl: false,
         bounds: AUSTIN,
