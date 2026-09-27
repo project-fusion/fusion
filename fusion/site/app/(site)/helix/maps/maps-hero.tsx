@@ -190,7 +190,6 @@ export function MapsHero({
         mapLibreStyle(from, {
           contrast: labels.current,
           font: mapFontFrom(host),
-          globe: true,
           language,
         }) as never
       /* **Tilted, so the city stands up**: the buildings are raised to their
