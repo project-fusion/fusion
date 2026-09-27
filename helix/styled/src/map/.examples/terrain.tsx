@@ -15,7 +15,6 @@ export function Example() {
         <helix-map-raster
           attribution="Imagery from USGS The National Map"
           ground
-          hidden
           label="Satellite imagery"
           max-zoom="16"
           opacity={1}

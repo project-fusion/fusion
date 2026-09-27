@@ -874,9 +874,10 @@ export interface MapPartChangeDetail {
   /**
    * `layer` for a route or an area, which is redrawn; `place` for a marker or
    * a position, which is moved; `cluster` for a marker gathered into another
-   * or let go, which moves the frame's tab stop.
+   * or let go, which moves the frame's tab stop; `menu` for the frame's layers
+   * menu opening, which asks for its map-type previews.
    */
-  kind: 'cluster' | 'layer' | 'place'
+  kind: 'cluster' | 'layer' | 'menu' | 'place'
 }
 
 /**

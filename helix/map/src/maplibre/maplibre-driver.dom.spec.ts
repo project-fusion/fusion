@@ -191,6 +191,28 @@ describe('mapLibreDriver', () => {
     expect(driver.behind?.({ lat: 0, lng: 0 })).toBe(false)
   })
 
+  test('the Satellite map type hides the style’s own roads and names, and hides them again after a restyle', async () => {
+    const { asked, fire, map, styleLayers } = stand()
+    styleLayers.push({ id: 'helix-points-p-points', type: 'symbol' })
+    const shown = new Map<string, unknown>()
+    map.getLayoutProperty = (layer) => shown.get(layer) ?? 'visible'
+    map.setLayoutProperty = (layer, _name, value) => {
+      shown.set(layer, value)
+      asked.push(`${layer} ${value}`)
+    }
+    const driver = mapLibreDriver(map)
+    driver.labels?.(false)
+    expect(asked).toEqual(['road none', 'label-city none'])
+    shown.clear()
+    fire('styledata')
+    expect(asked.slice(2)).toEqual(['road none', 'label-city none'])
+    driver.labels?.(true)
+    expect(asked.slice(4)).toEqual(['road visible', 'label-city visible'])
+    fire('styledata')
+    expect(asked).toHaveLength(6)
+    expect(await driver.previews?.({ types: ['standard'] })).toEqual({})
+  })
+
   test('its keys go quiet and come back only if they were on', () => {
     const { map } = stand()
     const restore = mapLibreDriver(map).silenceKeyboard?.()
