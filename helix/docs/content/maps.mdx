@@ -109,6 +109,7 @@ reports which one is missing.
 | `helix-map-points` | Thousands of places loaded from GeoJSON |
 | `helix-map-buildings` | The map's buildings, raised to their heights in 3D |
 | `helix-map-raster` | Map tiles over the map, such as weather radar or satellite imagery |
+| `helix-map-terrain` | Hills and mountains, shaded and raised in 3D |
 
 Each element takes `tone`, such as `primary` or `danger`, for its color.
 
@@ -277,6 +278,29 @@ The imagery above is from the U.S. Geological Survey. It is in the public domain
 and covers the United States. Some providers put `{y}` before `{x}` in their
 tile URLs, as this one does.
 
+### Terrain
+
+```html
+<helix-map-terrain
+  attribution="Elevation from 3DEP and SRTM data, courtesy of the U.S. Geological Survey"
+  max-zoom="15"
+  raised
+  src="https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
+></helix-map-terrain>
+```
+
+`helix-map-terrain` shades the land by its slopes, so hills and valleys show on a
+flat map. Set `raised` to raise the ground to its real height as well, and tilt
+the map to see it. Set `exaggeration` to raise it more than its real height,
+such as `1.5`. Routes, areas, and buildings lie on the raised ground.
+
+The elevation tiles above are Terrain Tiles on AWS, which are free to use and
+cover the world. Their tiles store heights in the `terrarium` encoding, which is
+the default. For tiles in the Mapbox encoding, set `encoding="mapbox"`. Credit
+the sources your map shows: in the United States, the U.S. Geological Survey.
+
+Leaflet draws maps flat, so a Leaflet map shows no terrain.
+
 ### Turn layers on and off
 
 ```html
@@ -290,6 +314,10 @@ Add `layers` to the frame's `controls` for a layers button. It opens a menu with
 a checkbox for each layer, named by its `label`. A checkbox sets its layer's
 `hidden` attribute, and `connectMap` does not draw a hidden layer. Write
 `hidden` on a layer to start it turned off.
+
+Give layers the same `group` to show them as one checkbox, such as a route and
+the dotted legs at its ends. The checkbox takes the name of the first layer in
+the group, and shows or hides every layer in it.
 
 ## Keyboard and screen readers
 
