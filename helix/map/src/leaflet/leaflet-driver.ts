@@ -87,6 +87,16 @@ export interface LeafletShapes {
   ): LeafletShape
   polygon(latlngs: [number, number][], options: LeafletShapeOptions): LeafletShape
   polyline(latlngs: [number, number][], options: LeafletShapeOptions): LeafletShape
+  /** A layer of map tiles from a URL, which a raster layer's frames are drawn in. */
+  tileLayer?(
+    url: string,
+    options: { attribution?: string; opacity: number; zIndex?: number },
+  ): LeafletTiles
+}
+
+/** A tile layer, which a raster layer's frame is, faded in and out by opacity. */
+export interface LeafletTiles extends LeafletShape {
+  setOpacity(opacity: number): unknown
 }
 
 /** How a shape is painted, in Leaflet's own words for it. */
@@ -172,11 +182,61 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
     ? {
         layers: (read: () => MapLayerSpec[], events?: MapLayerEvents) => {
           let drawn: LeafletShape[] = []
+          /* **A raster layer's frames are kept between redraws**, one tile
+             layer each and switched by opacity, so a playing loop does not
+             load its tiles again on every frame. */
+          const rasters = new Map<string, { key: string; tiles: LeafletTiles[] }>()
+          const drawRasters = (specs: MapLayerSpec[]): void => {
+            const make = shapes.tileLayer
+            const wanted = new Set(specs.map((spec) => spec.id))
+            for (const [id, had] of [...rasters]) {
+              if (!wanted.has(id)) {
+                for (const tiles of had.tiles) {
+                  tiles.remove()
+                }
+                rasters.delete(id)
+              }
+            }
+            if (!make) {
+              return
+            }
+            for (const spec of specs) {
+              const frames = spec.frames ?? []
+              const key = frames.join(' ')
+              let had = rasters.get(spec.id)
+              if (had?.key !== key) {
+                for (const tiles of had?.tiles ?? []) {
+                  tiles.remove()
+                }
+                had = {
+                  key,
+                  tiles: frames.map((url) => {
+                    const tiles = make(url, {
+                      ...(spec.attribution ? { attribution: spec.attribution } : {}),
+                      opacity: 0,
+                    })
+                    tiles.addTo(map as never)
+                    return tiles
+                  }),
+                }
+                rasters.set(spec.id, had)
+              }
+              for (const [at, tiles] of had.tiles.entries()) {
+                tiles.setOpacity(at === spec.frame ? (spec.opacity ?? 0.7) : 0)
+              }
+            }
+          }
           const draw = (): void => {
             for (const shape of drawn) {
               shape.remove()
             }
-            drawn = read().flatMap((layer) => {
+            const specs = read()
+            /* Buildings are not drawn: Leaflet draws maps flat. */
+            drawRasters(specs.filter((spec) => spec.kind === 'raster'))
+            drawn = specs.flatMap((layer) => {
+              if (layer.kind === 'buildings' || layer.kind === 'raster') {
+                return []
+              }
               const latlngs = layer.points.map(({ lat, lng }): [number, number] => [lat, lng])
               /* **Points as circles, and unclustered**: Leaflet gathers
                  markers only with a plugin this package does not bring, so a
@@ -248,6 +308,7 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
                 shape.remove()
               }
               drawn = []
+              drawRasters([])
             },
             update: draw,
           }

@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, registerDom } from '@fusion.dev/helix-testing/dom'
 import wired from '../.examples/events.html' with { type: 'text' }
 import points from '../.examples/points.html' with { type: 'text' }
+import weather from '../.examples/weather.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -76,5 +77,22 @@ describe('the points example', () => {
     expect(layer.data?.every((one) => Number.isFinite(one.lat) && Number.isFinite(one.lng))).toBe(
       true,
     )
+  })
+})
+
+describe('the weather example', () => {
+  run('the button plays the radar loop, then pauses it, and says which it will do', async () => {
+    await example(weather)
+    const radar = document.getElementById('radar') as HTMLElement & { playing: boolean }
+    const toggle = document.getElementById('toggle') as HTMLElement
+    expect(radar.playing).toBe(false)
+    expect(toggle.textContent?.trim()).toBe('Play radar')
+    toggle.click()
+    await idle()
+    expect(radar.playing).toBe(true)
+    expect(toggle.textContent?.trim()).toBe('Pause radar')
+    toggle.click()
+    await idle()
+    expect(radar.playing).toBe(false)
   })
 })
