@@ -6,7 +6,7 @@ import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import { Lede } from '@/components/lede/lede'
 import { SectionTitle } from '@/components/section-title/section-title'
 import { GOOGLE_FACES } from '@/content/faces/faces.generated'
-import { MAP_FEATURES, MAP_PILLARS, MAP_STACK, MAP_STEPS, MAPS } from '@/content/maps/maps'
+import { MAP_FEATURES, MAP_INSTALL, MAP_PILLARS, MAP_STACK, MAPS } from '@/content/maps/maps'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { type Params, queryFrom, settingsFrom } from '@/utils/theme-defaults/theme-defaults'
@@ -61,7 +61,7 @@ export const metadata = pageMetadata({
  *
  * **Sold, then shown, then handed over.** Under the live map: what a map gets
  * from Helix, the one thing a marker cannot do shown running, what a map can
- * hold, the three steps to one of your own, and last how it is built, the
+ * hold, how to start one of your own, and last how it is built, the
  * stack each of those rests on. The bands and their field are the landing
  * page's, so Maps reads as a part of the same site rather than a tool page.
  */
@@ -179,34 +179,27 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
           variant="flow"
         ></helix-aura>
 
+        {/* The install command, and the guide for everything after it. The
+            guide is the one place the setup code lives, so the page and the
+            docs cannot drift apart. */}
         <Band id="get-started" reveal>
-          <helix-flex class={band.bandSection} direction="column" gap="md">
+          <helix-flex
+            class={`${band.bandSection} ${styles.mapsStarted}`}
+            direction="column"
+            gap="md"
+          >
             <Eyebrow>{started?.kicker}</Eyebrow>
             <SectionTitle>{started?.title}</SectionTitle>
-          </helix-flex>
-          <ol className={styles.mapsSteps}>
-            {MAP_STEPS.map((step, at) => (
-              <li className={styles.mapsStep} key={step.title}>
-                <span aria-hidden="true" className={styles.mapsStepNumber}>
-                  {at + 1}
-                </span>
-                <helix-flex direction="column" gap="sm">
-                  <helix-text as="h3" variant="title">
-                    {step.title}
-                  </helix-text>
-                  <helix-text emphasis="muted">{step.body}</helix-text>
-                  <Code code={step.code} label={step.title} language={step.language} />
-                </helix-flex>
-              </li>
-            ))}
-          </ol>
-          <helix-flex class={band.bandSection} direction="column" gap="md">
+            <Lede>{started?.body?.[0]}</Lede>
+            <div className={styles.mapsInstall}>
+              <Code code={MAP_INSTALL} label="Install" language="sh" />
+            </div>
             <helix-flex align-items="center" class="siteActions" data-density="lg" gap="lg" wrap>
-              <Link data-button="subtle" href="/helix/theme?layout=map">
-                Open the Map layout in the theme builder
-              </Link>
-              <Link data-link="quiet" href="/helix/docs/maps">
+              <Link data-button="solid" data-button-tone="primary" href="/helix/docs/maps">
                 Read the Maps guide
+              </Link>
+              <Link data-link="quiet" href="/helix/theme?layout=map">
+                Open the Map layout in the theme builder
               </Link>
               <Link data-link="quiet" href="/helix/components/map">
                 Map component reference

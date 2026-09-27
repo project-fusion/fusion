@@ -387,44 +387,22 @@ fieldset.mapsControl {
 
 /* ========================================================= get started === */
 
-/* Three steps down the card, each numbered in a circle beside its words and
-   its code, which is the order a reader follows them in. */
-.mapsSteps {
-  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
-  display: grid;
-  gap: var(--helix-space-xl);
-  list-style: none;
-  margin: 0;
-  padding: var(--helix-space-xl);
+/* The install command is one long line, and a flex column is as wide as its
+   widest child unless told otherwise. Letting the section shrink keeps the
+   command in its own scrolling block at 390px, with the text beside it
+   wrapping to the screen. */
+.mapsStarted {
+  min-inline-size: 0;
 }
 
-.mapsStep {
-  display: grid;
-  gap: var(--helix-space-md);
-  grid-template-columns: auto minmax(0, 1fr);
-}
-
-.mapsStepNumber {
-  align-items: center;
-  block-size: 2rem;
-  border: var(--helix-border-thin) solid var(--helix-material-border);
-  border-radius: var(--helix-radii-full);
-  color: var(--helix-color-foreground);
-  display: flex;
-  font-variant-numeric: tabular-nums;
-  font-weight: var(--helix-weight-semibold);
-  inline-size: 2rem;
-  justify-content: center;
+.mapsInstall {
+  max-inline-size: 100%;
+  min-inline-size: 0;
 }
 
 @media (max-width: 40rem) {
-  .mapsFeature,
-  .mapsSteps {
+  .mapsFeature {
     padding-inline: 0;
-  }
-
-  .mapsStep {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 
