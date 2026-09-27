@@ -96,6 +96,15 @@ export declare class ViewportElement {
 
   /** Which controls the surface draws while `controls` is absent. */
   protected get restingControls(): string
+
+  /** Whether `controls`, or the resting controls, names a group. */
+  protected drawsControls(group: string): boolean
+
+  /** More buttons for the group of controls, after zoom, for a family that adds its own. */
+  protected renderMoreControls(): TemplateResult | typeof nothing
+
+  /** Answers a key the family adds, and says whether it did. */
+  protected handleMoreKeys(event: KeyboardEvent): boolean
 }
 
 /**
@@ -317,9 +326,19 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       return 'pan zoom fullscreen'
     }
 
-    /** Whether a named group of controls is one this surface draws. */
-    private draws(group: 'pan' | 'zoom' | 'fullscreen'): boolean {
+    /** Whether `controls`, or the resting controls, names a group. */
+    protected drawsControls(group: string): boolean {
       return (this.controls ?? this.restingControls).split(/\s+/).includes(group)
+    }
+
+    /** More buttons for the group of controls, after zoom. None here; a family adds its own. */
+    protected renderMoreControls(): TemplateResult | typeof nothing {
+      return nothing
+    }
+
+    /** Answers a key the family adds, and says whether it did. None here. */
+    protected handleMoreKeys(_event: KeyboardEvent): boolean {
+      return false
     }
 
     /**
@@ -420,6 +439,10 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       if (target !== own && !own.matches('[part~="controls"]')) {
         return
       }
+      if (this.handleMoreKeys(event)) {
+        event.preventDefault()
+        return
+      }
       const along = inlineStep(this, event.key)
       if (along === 1) {
         event.preventDefault()
@@ -462,10 +485,11 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
      * `pan-` and a consumer's `::part(pan-up)` would match nothing.
      */
     protected renderControls(): TemplateResult | typeof nothing {
-      const pan = this.draws('pan')
-      const zoom = this.draws('zoom')
-      const fullscreen = this.draws('fullscreen')
-      if (!pan && !zoom && !fullscreen) {
+      const pan = this.drawsControls('pan')
+      const zoom = this.drawsControls('zoom')
+      const fullscreen = this.drawsControls('fullscreen')
+      const more = this.renderMoreControls()
+      if (!pan && !zoom && !fullscreen && more === nothing) {
         return nothing
       }
       return html`<div part="controls" role="group" aria-label=${this.controlsLabel ?? this.restingControlsLabel}>
@@ -495,6 +519,7 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
                 </button>`
             : nothing
         }
+        ${more}
         ${
           fullscreen
             ? html`<button

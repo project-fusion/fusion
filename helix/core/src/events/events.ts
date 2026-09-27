@@ -819,6 +819,54 @@ export class HelixMapZoomEvent extends CustomEvent<ViewportZoomDetail> {
   }
 }
 
+/** A rotate request: turn by some degrees, or turn to a bearing. */
+export interface MapRotateDetail {
+  /** Degrees to turn the map clockwise. Negative turns it counterclockwise. */
+  by?: number
+  /** The bearing to turn the map to, in degrees clockwise from north. `0` faces north. */
+  to?: number
+}
+
+/** A tilt request, in degrees. */
+export interface MapTiltDetail {
+  /** Degrees to tilt the map toward the horizon. Negative tilts it back toward flat. */
+  by: number
+}
+
+/**
+ * The user asked the map to rotate, from a rotate button or key. Turn your map
+ * in response. Not cancelable, because the frame moves nothing itself.
+ */
+export class HelixMapRotateEvent extends CustomEvent<MapRotateDetail> {
+  static readonly eventName = 'helix-map-rotate'
+
+  constructor(detail: MapRotateDetail) {
+    super(HelixMapRotateEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * The user asked the map to tilt, from a tilt button or key. Tilt your map in
+ * response. Not cancelable, because the frame moves nothing itself.
+ */
+export class HelixMapTiltEvent extends CustomEvent<MapTiltDetail> {
+  static readonly eventName = 'helix-map-tilt'
+
+  constructor(detail: MapTiltDetail) {
+    super(HelixMapTiltEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** What changed on a part of a map: a line or a shape, or something standing on a place. */
 export interface MapPartChangeDetail {
   /**
@@ -1613,6 +1661,8 @@ const registry = {
   HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,
+  HelixMapRotateEvent,
+  HelixMapTiltEvent,
   HelixMapZoomEvent,
   HelixMoveEvent,
   HelixNavigateEvent,
