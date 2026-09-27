@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  idle,
+  mount,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -52,5 +60,22 @@ describe('one table cell', () => {
     const host = await cell()
     expect(host.shadowRoot?.querySelector('slot')).not.toBeNull()
     expect(part(host, 'cell')).toBeNull()
+  })
+
+  /* Browser only: happy-dom fires no `slotchange`. Text of its own is what makes
+     the content flow as a line; a cell of elements alone keeps the flex layout a
+     lone tag or button is centered by. */
+  ;(hasLayout() ? test : test.skip)('says when it holds text of its own', async () => {
+    const mixed = await mount(
+      '<helix-headless-table-cell>Ships <code>vue.d.ts</code></helix-headless-table-cell>',
+    )
+    await idle()
+    expect(hasState(mixed, 'text')).toBe(true)
+
+    const elements = await mount(
+      '<helix-headless-table-cell> <span>solid</span> </helix-headless-table-cell>',
+    )
+    await idle()
+    expect(hasState(elements, 'text')).toBe(false)
   })
 })
