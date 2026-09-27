@@ -533,8 +533,11 @@ const supplyImage = (holder: ImageHolder, id: string | undefined): void => {
     return
   }
   const style = holder.getStyle() as { metadata?: { 'helix:images'?: Record<string, MapImage> } }
-  const image = style?.metadata?.['helix:images']?.[id]
-  const drawn = image ? drawMapImage(image) : undefined
+  /* A sign is named for its design and its number, `helix-sign-us|290`, so
+     one description draws every number the design carries. */
+  const [named = '', text = ''] = id.split('|')
+  const image = style?.metadata?.['helix:images']?.[named]
+  const drawn = image ? drawMapImage(image, text) : undefined
   if (drawn) {
     holder.addImage?.(id, drawn, { pixelRatio: IMAGE_RATIO })
   }
