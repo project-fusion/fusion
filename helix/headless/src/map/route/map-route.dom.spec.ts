@@ -85,6 +85,9 @@ describe('map route and area', () => {
   })
 })
 
+/** A picture that is data, so a spec run in a page asks the network for nothing. */
+const PICTURE = 'data:image/gif;base64,R0lGODlhAQABAAAAACw='
+
 describe('map layers menu', () => {
   const menuFrame = async (): Promise<Frame> => {
     const host = (await mount(
@@ -198,5 +201,55 @@ describe('map layers menu', () => {
     await settle(host)
     const [route, buildings, leg] = [...host.children] as HTMLElement[]
     expect([route?.hidden, buildings?.hidden, leg?.hidden]).toEqual([true, false, true])
+  })
+
+  test('imagery makes map-type cards, not a tile, and the chosen type shows or hides it', async () => {
+    const host = (await mount(
+      `<helix-headless-map controls="layers" label="Downtown">
+        <helix-headless-map-raster ground label="Satellite imagery" src="photo/{z}/{y}/{x}"></helix-headless-map-raster>
+        <helix-headless-map-buildings></helix-headless-map-buildings>
+      </helix-headless-map>`,
+    )) as Frame & { mapPreviews: Record<string, string>; mapType?: string }
+    await settle(host)
+    const imagery = host.querySelector('helix-headless-map-raster') as HTMLElement
+    expect(imagery.hidden).toBe(true)
+    const kinds: string[] = []
+    host.addEventListener('helix-map-part-change', (event) => kinds.push(event.detail.kind))
+    ;(part(host, 'layers-toggle') as HTMLButtonElement).click()
+    await settle(host)
+    expect(kinds).toContain('menu')
+
+    const cards = [...(part(host, 'map-types')?.querySelectorAll('[part="map-type"]') ?? [])]
+    expect(part(host, 'map-types')?.getAttribute('role')).toBe('radiogroup')
+    expect(cards.map((one) => (one.textContent ?? '').trim())).toEqual([
+      'Standard',
+      'Hybrid',
+      'Satellite',
+    ])
+    expect((cards[0]?.querySelector('input') as HTMLInputElement).checked).toBe(true)
+    const tiles = [
+      ...(part(host, 'layer-choices')?.querySelectorAll('[part="layer-choice"]') ?? []),
+    ]
+    expect(tiles.map((one) => (one.textContent ?? '').trim())).toEqual(['3D buildings'])
+
+    const hybrid = cards[1]?.querySelector('input') as HTMLInputElement
+    hybrid.click()
+    await settle(host)
+    expect(host.mapType).toBe('hybrid')
+    expect(host.getAttribute('map-type')).toBe('hybrid')
+    expect(imagery.hidden).toBe(false)
+
+    host.mapPreviews = { satellite: PICTURE }
+    await settle(host)
+    expect(cards[2]?.querySelector('img')?.getAttribute('src')).toBe(PICTURE)
+    ;(cards[0]?.querySelector('input') as HTMLInputElement).click()
+    await settle(host)
+    expect(host.hasAttribute('map-type')).toBe(false)
+    expect(imagery.hidden).toBe(true)
+  })
+
+  test('a map with no imagery has no map-type cards', async () => {
+    const host = await menuFrame()
+    expect(part(host, 'map-types')).toBeNull()
   })
 })

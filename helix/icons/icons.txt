@@ -92,7 +92,6 @@ push-pin-slash
 react
 receipt
 record
-satellite
 share-network
 shield-check
 sidebar-simple

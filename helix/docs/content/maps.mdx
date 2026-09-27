@@ -262,7 +262,7 @@ each. Every frame's tiles load once, so the loop plays without a blank frame.
 - Content that moves for more than five seconds needs a way to pause it, so
   give `playing` a control on your page.
 
-### Satellite imagery
+### Satellite imagery and map types
 
 ```html
 <helix-map-raster
@@ -275,8 +275,15 @@ each. Every frame's tiles load once, so the loop plays without a blank frame.
 ></helix-map-raster>
 ```
 
-Set `ground` on `helix-map-raster` to draw its tiles as the ground: under the
-roads and place names, in place of the map's land. Set `max-zoom` to the deepest
+Set `ground` on `helix-map-raster` to make its tiles the map's imagery. Imagery
+is a map type, which the frame's `map-type` attribute chooses:
+
+- Absent, the Standard map: your themed map, without the imagery.
+- `hybrid`: the imagery in place of the map's land, under its roads and names.
+- `satellite`: the imagery alone, without the roads and names.
+
+With `layers` in the frame's `controls`, the layers menu opens with a card for
+each map type, showing a picture of the map in it. Set `max-zoom` to the deepest
 zoom your provider has tiles for, and the map enlarges those tiles when a user
 zooms in further.
 

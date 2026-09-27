@@ -9,6 +9,7 @@ export function Example() {
         data-preview-map
         data-preview-map-view="30.2672,-97.7431,15.6,50,-17"
         label="Downtown Austin from above"
+        map-type="hybrid"
       >
         <div data-preview-map-canvas></div>
 
