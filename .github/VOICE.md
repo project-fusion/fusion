@@ -40,6 +40,16 @@ comments are rewritten only when the code around them changes.
 13. **Use the serial comma.** Write "places, routes, and live positions", with a
     comma before the "and" or "or" that ends a list of three or more.
 
+## What is checked
+
+`fusion prose` checks the spelling (rule 12), and its `voice` rule checks the
+text a reader sees for three patterns: contractions (rule 7), "rather than",
+and a sentence that ends in ", not" and a short phrase (rule 2). It covers the
+docs pages, the example summaries, the descriptions on a component's tags, and
+the first paragraph of each property. An article with an `author` is the
+author's own essay and is not checked. The other rules need a person to read
+for them.
+
 ## By surface
 
 | Surface | What it does | Example |
