@@ -223,13 +223,13 @@ export const CONTEXTS: readonly Context[] = [
         {
           body: [
             'Small teams, close to the operators. Every engineer here has spent a week in a control room, because a dashboard designed away from one is a dashboard nobody opens twice. The people who use this have four screens and a phone that does not stop, and anything asking more of their attention than it returns gets closed by Tuesday.',
-            'We ship on Thursdays and read the support queue on Fridays. Not as a ritual: the queue is the only place where the gap between what was built and what somebody needed shows up in words rather than in a metric, and words are the part you can act on.',
+            'We ship on Thursdays and read the support queue on Fridays. The queue is where customers tell us, in their own words, what they needed and what we built instead, and those words are what we act on the next week.',
           ],
           rail: 'How we build',
         },
         {
           body: [
-            'Everything here is written by whoever did the work. There is no content team and nothing is written to rank for anything. When a feed changes shape at three in the morning and somebody spends a day working out why, that day is worth a page, and the page is worth more if it says what actually happened rather than what would have been tidier.',
+            'Everything here is written by the people who did the work. We have no content team, and we do not write for search rankings. When a data feed changes shape at three in the morning and someone spends a day finding out why, we write that day up as it happened, including the parts that went wrong.',
           ],
           rail: 'What we publish',
         },
@@ -479,7 +479,7 @@ export const CONTEXTS: readonly Context[] = [
     },
     features: [
       {
-        body: 'Edited, not aggregated. Nothing arrives that an editor did not choose to send.',
+        body: 'Every story is chosen by an editor. Nothing arrives that an editor did not choose to send.',
         icon: 'book-open-text',
         title: 'One piece a day',
       },
@@ -504,7 +504,7 @@ export const CONTEXTS: readonly Context[] = [
       assurance: 'No card. The first month is open, and the archive with it.',
       badge: 'New',
       body: 'Deckle commissions long reporting on the things that move slowly, and sends one piece a day instead of forty.',
-      headline: 'Read the argument, not the headline.',
+      headline: 'Read the whole argument before you share it.',
       note: 'Three new essays this week, from three continents',
       primary: 'Start reading',
       secondary: 'Read a sample',
@@ -647,8 +647,8 @@ export const CONTEXTS: readonly Context[] = [
         },
         {
           body: [
-            'Nine fibers, with swatches of all of them posted free before you decide. Sixty days to send anything back, with a printed label already in the box and the refund issued when it is scanned rather than when somebody gets round to inspecting it.',
-            'We hold stock rather than taking pre-orders, so the number on the page is the number on the shelf, counted this morning. When something sells out it says sold out, and it returns when the loom reaches it, which is usually four weeks and occasionally longer if the fleece was late.',
+            'Nine fibers, with free swatches of each one posted before you decide. You have sixty days to send anything back, with a printed label already in the box, and we issue the refund as soon as the courier scans the parcel.',
+            'We sell only what we have in stock, so the number on the page is the number on the shelf, counted this morning. When something sells out, the page says so, and it returns when the loom reaches it, usually in four weeks and sometimes longer if the fleece arrives late.',
           ],
           rail: 'The range',
         },
@@ -848,13 +848,13 @@ export const CONTEXTS: readonly Context[] = [
         {
           body: [
             'Body text on the measure. It runs to several lines on purpose, because leading, measure and the muted foreground are only judgeable across more than one line of it. A single sentence tells you what a color is. A paragraph tells you whether you could read a page of it.',
-            'A second block, to show the space between two of them, and to give the measure enough text that its length reads as a decision rather than an accident. This is the hardest surface in the preview for a text palette: no card, no border, and nothing holding the ink up except the ground it lands on.',
+            'A second block of text shows the space between two paragraphs, and gives each line enough words to show the full measure. This is the hardest surface in the preview for a text palette: there is no card and no border, only text on the page background.',
           ],
           rail: 'Label',
         },
         {
           body: [
-            'One more block at the same measure, so the rhythm can be seen holding down the page rather than only at the top of it. The rail beside it carries the only other word in the row, set in mono at the smallest size the theme produces, which is the one place a mono face choice is visible at all.',
+            'One more block at the same measure shows the spacing holding all the way down the page. The rail beside it holds the only other word in the row, set in the monospace face at the smallest size the theme produces, which is the one place that face is visible.',
           ],
           rail: 'Label',
         },
@@ -892,7 +892,7 @@ export const CONTEXTS: readonly Context[] = [
     hero: {
       assurance: 'Caption beside an icon, the smallest text on the page.',
       badge: 'Tag',
-      body: 'Body text under it. A paragraph rather than a line, because the measure, the leading and the muted foreground all need more than one line before a reader can judge any of them.',
+      body: 'Body text under the heading. It runs to several lines, because the line length, the line height, and the muted text color each need more than one line to judge.',
       headline: 'Display text, at the top of the type scale',
       note: 'Caption beside the tag',
       primary: 'Primary',
