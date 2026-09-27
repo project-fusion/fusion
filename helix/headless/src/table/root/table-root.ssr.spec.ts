@@ -53,7 +53,9 @@ describe('table server output', () => {
         ssr(html`<helix-headless-table-cell></helix-headless-table-cell>`),
         'helix-headless-table-cell',
       ),
-    ).toContain('<slot></slot>')
+      /* The cell's slot carries a `slotchange` listener, which Lit marks with a
+         node comment and a space inside the tag. It is still an unnamed slot. */
+    ).toMatch(/<slot\s*><\/slot>/)
   })
 })
 
