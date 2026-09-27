@@ -23,6 +23,7 @@ import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
 /** What the frame reads off a layer, which is all its list and menu need. */
 interface MapLayer extends Element {
   description?: string | undefined
+  group?: string | undefined
   hidden: boolean
   isMapLayer: true
   label?: string | undefined
@@ -65,8 +66,9 @@ const TILTED = 50
  * answers on MapLibre. Leaflet draws maps flat and does not rotate.
  *
  * Add `layers` to `controls` for a layers button. It opens a menu with a
- * checkbox for each layer, which sets the layer's `hidden` attribute.
- * `connectMap` does not draw a hidden layer, so a layer you write with
+ * checkbox for each layer, which sets the layer's `hidden` attribute. Layers
+ * with the same `group`, such as a route and its dotted legs, share one
+ * checkbox. `connectMap` does not draw a hidden layer, so a layer you write with
  * `hidden` starts turned off.
  *
  * Markers, routes, areas, live positions, and points layers go inside the
@@ -208,10 +210,34 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
   }
 
-  /** Shows or hides a layer, which `connectMap` draws or takes off the map. */
-  private showLayer(layer: MapLayer, shown: boolean): void {
-    layer.hidden = !shown
+  /** Shows or hides layers, which `connectMap` draws or takes off the map. */
+  private showLayers(layers: readonly MapLayer[], shown: boolean): void {
+    for (const layer of layers) {
+      layer.hidden = !shown
+    }
     this.requestUpdate()
+  }
+
+  /**
+   * The layers menu's entries, in the order the layers are written: a layer
+   * of its own, or every layer in a group, at the place of the first.
+   */
+  private get layerEntries(): MapLayer[][] {
+    const entries: MapLayer[][] = []
+    const groups = new Map<string, MapLayer[]>()
+    for (const layer of this.layers) {
+      const had = layer.group ? groups.get(layer.group) : undefined
+      if (had) {
+        had.push(layer)
+        continue
+      }
+      const entry = [layer]
+      entries.push(entry)
+      if (layer.group) {
+        groups.set(layer.group, entry)
+      }
+    }
+    return entries
   }
 
   /**
@@ -413,8 +439,9 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   }
 
   /**
-   * The layers button and its menu: a checkbox for each layer, in the order
-   * they are written, which shows or hides it.
+   * The layers button and its menu: a checkbox for each layer or group, in the
+   * order they are written, which shows or hides it. A group's checkbox is on
+   * while any of its layers is shown.
    */
   private renderLayersMenu(): TemplateResult | typeof nothing {
     const layers = this.layers
@@ -445,15 +472,15 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         ?hidden=${!this.layersOpen}
         @keydown=${this.handleMenuKeydown}
       >
-        ${layers.map(
-          (layer) =>
+        ${this.layerEntries.map(
+          (entry) =>
             html`<label part="layer-choice">
               <input
                 type="checkbox"
-                .checked=${!layer.hidden}
-                @change=${(event: Event) => this.showLayer(layer, (event.target as HTMLInputElement).checked)}
+                .checked=${entry.some((layer) => !layer.hidden)}
+                @change=${(event: Event) => this.showLayers(entry, (event.target as HTMLInputElement).checked)}
               />
-              ${layer.label ?? ''}
+              ${entry[0]?.label ?? ''}
             </label>`,
         )}
       </div>`

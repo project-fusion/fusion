@@ -173,4 +173,27 @@ describe('map layers menu', () => {
     await host.updateComplete
     expect((part(host, 'layers-menu') as HTMLElement).hidden).toBe(true)
   })
+
+  test('layers in one group are one checkbox, named by the first, that shows or hides them all', async () => {
+    const host = (await mount(
+      `<helix-headless-map controls="layers" label="Walk">
+        <helix-headless-map-route group="walk" label="Walking route" points="1,1 2,2"></helix-headless-map-route>
+        <helix-headless-map-buildings></helix-headless-map-buildings>
+        <helix-headless-map-route group="walk" label="Walk to the route" points="1,1 0,0"></helix-headless-map-route>
+      </helix-headless-map>`,
+    )) as Frame
+    await settle(host)
+    const choices = [
+      ...(part(host, 'layers-menu')?.querySelectorAll('[part="layer-choice"]') ?? []),
+    ]
+    expect(choices.map((one) => (one.textContent ?? '').trim())).toEqual([
+      'Walking route',
+      '3D buildings',
+    ])
+    const walk = choices[0]?.querySelector('input')
+    walk?.click()
+    await settle(host)
+    const [route, buildings, leg] = [...host.children] as HTMLElement[]
+    expect([route?.hidden, buildings?.hidden, leg?.hidden]).toEqual([true, false, true])
+  })
 })

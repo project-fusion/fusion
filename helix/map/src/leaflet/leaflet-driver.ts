@@ -235,7 +235,11 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
             /* Buildings are not drawn: Leaflet draws maps flat. */
             drawRasters(specs.filter((spec) => spec.kind === 'raster'))
             drawn = specs.flatMap((layer) => {
-              if (layer.kind === 'buildings' || layer.kind === 'raster') {
+              if (
+                layer.kind === 'buildings' ||
+                layer.kind === 'raster' ||
+                layer.kind === 'terrain'
+              ) {
                 return []
               }
               const latlngs = layer.points.map(({ lat, lng }): [number, number] => [lat, lng])

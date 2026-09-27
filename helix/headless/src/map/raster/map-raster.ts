@@ -62,6 +62,14 @@ export class HelixHeadlessMapRaster extends HelixElement {
   @property({ type: Boolean })
   ground = false
 
+  /**
+   * A name this layer shares with other layers, such as a route and its
+   * dotted legs. The layers menu shows layers in the same group as one entry,
+   * named by the first of them, and its checkbox shows or hides them all.
+   */
+  @property()
+  group?: string
+
   /** How long each frame shows while `playing`, in milliseconds. */
   @property({ type: Number })
   interval = 600
