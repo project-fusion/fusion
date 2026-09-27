@@ -1,0 +1,12 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <title>Satellite</title>
+  <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="18" transform="translate(128 128) scale(1.06) rotate(-45) translate(-128 -128)">
+    <rect height="64" rx="12" width="52" x="102" y="100" />
+    <path d="M76 132h26M154 132h26" />
+    <rect height="48" rx="6" width="56" x="20" y="108" />
+    <rect height="48" rx="6" width="56" x="180" y="108" />
+    <path d="M48 108v48M208 108v48" />
+    <path d="M128 100V76" />
+    <path d="M98 60a30 30 0 0 0 60 0Z" />
+  </g>
+</svg>

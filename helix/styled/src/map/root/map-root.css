@@ -226,8 +226,9 @@
 
 /* ========================================================= layers menu === */
 
-/* **The menu opens beside the column**, level with its button, on the side
-   away from the edge the column sits on. */
+/* **The menu opens beside the column**, level with its top, on the side away
+   from the edge the column sits on, as close to it as the buttons are to
+   each other. */
 [part="layers-menu"] {
   background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
   border: var(--helix-border-floating) solid var(--helix-color-border);
@@ -240,7 +241,7 @@
   grid-template-columns: repeat(auto-fill, minmax(calc(var(--helix-size-control-lg) * 1.75), 1fr));
   inline-size: min(calc(var(--helix-size-control-lg) * 6), 70vw);
   inset-block-start: 0;
-  inset-inline-end: calc(100% + var(--helix-space-xs));
+  inset-inline-end: calc(100% + var(--helix-space-2xs));
   padding: var(--helix-space-sm);
   position: absolute;
 }
@@ -254,7 +255,7 @@
 }
 
 :host([controls-placement$="start"]) [part="layers-menu"] {
-  inset-inline: calc(100% + var(--helix-space-xs)) auto;
+  inset-inline: calc(100% + var(--helix-space-2xs)) auto;
 }
 
 /* **A tile for each layer**: its picture over its name, lit in the brand

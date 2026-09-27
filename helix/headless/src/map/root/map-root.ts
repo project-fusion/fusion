@@ -17,14 +17,19 @@ import {
   type ViewportZoomDetail,
 } from '@fusion.dev/helix-core'
 import {
-  html,
-  nothing,
-  type PropertyValues,
-  type SVGTemplateResult,
-  svg,
-  type TemplateResult,
-} from 'lit'
+  buildings,
+  cloudRain,
+  dotsNine,
+  type HelixIcon,
+  mountains,
+  path,
+  polygon,
+  satellite,
+  stack,
+} from '@fusion.dev/helix-icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
 
 /** What the frame reads off a layer, which is all its list and menu need. */
@@ -49,29 +54,27 @@ interface MapLayer extends Element {
 export type MapControlsPlacement = ViewportControlsPlacement
 
 /**
- * A layer's picture in the layers menu, by what it draws: a line for a route,
- * a shape for an area, dots for points, blocks for buildings, a peak for
- * terrain, a photograph for imagery of the ground, and a cloud for tiles
- * over it, such as weather.
+ * A layer's picture in the layers menu, by what it draws: a path for a route,
+ * a shape for an area, dots for points, buildings, mountains for terrain, a
+ * satellite for imagery of the ground, and a rain cloud for tiles over it,
+ * such as weather.
  */
-const iconOf = (layer: MapLayer | undefined): SVGTemplateResult => {
+const iconOf = (layer: MapLayer | undefined): HelixIcon => {
   switch (layer?.layerKind) {
     case 'route':
-      return svg`<path d="M4 19c5 0 4-7 8-7s3-7 8-7" /><circle cx="4" cy="19" r="1.5" /><circle cx="20" cy="5" r="1.5" />`
+      return path
     case 'area':
-      return svg`<path d="M4 8l7-4 9 4-2 11-12 1Z" />`
+      return polygon
     case 'points':
-      return svg`<circle cx="6" cy="8" r="2" /><circle cx="15" cy="6" r="2" /><circle cx="10" cy="16" r="2" /><circle cx="18" cy="15" r="2" />`
+      return dotsNine
     case 'buildings':
-      return svg`<path d="M3 21V10l5-2v13M8 21V4l7 2v15M15 21v-9l6 2v7M2 21h20" />`
+      return buildings
     case 'terrain':
-      return svg`<path d="M2 20l7-12 4 6 3-4 6 10Z" /><path d="M7.5 10.5 9 12l1.5-1.5" />`
+      return mountains
     case 'raster':
-      return layer.ground
-        ? svg`<rect height="16" rx="2" width="18" x="3" y="4" /><path d="M3 16l5-5 4 4 3-3 6 6" /><circle cx="16" cy="9" r="1.5" />`
-        : svg`<path d="M7 16a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.4A3.5 3.5 0 0 1 17 16Z" /><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2" />`
+      return layer.ground ? satellite : cloudRain
     default:
-      return svg`<path d="M12 3 21 8 12 13 3 8Z" /><path d="M3 13l9 5 9-5" />`
+      return stack
   }
 }
 
@@ -514,9 +517,8 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         }}
         @keydown=${this.handleMenuKeydown}
       >
-        <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 16 16" width="16">
-          <path d="M8 2.5 14 6 8 9.5 2 6Z" />
-          <path d="M2 9.5 8 13 14 9.5" />
+        <svg aria-hidden="true" fill="currentColor" height="16" viewBox=${stack.viewBox} width="16">
+          ${unsafeSVG(stack.content)}
         </svg>
       </button>
       <div
@@ -535,8 +537,8 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
             type="button"
             @click=${() => this.showLayers(entry, !shown)}
           >
-            <svg part="layer-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24">
-              ${iconOf(entry[0])}
+            <svg part="layer-icon" aria-hidden="true" fill="currentColor" viewBox=${iconOf(entry[0]).viewBox}>
+              ${unsafeSVG(iconOf(entry[0]).content)}
             </svg>
             <span part="layer-name">${entry[0]?.label ?? ''}</span>
           </button>`
