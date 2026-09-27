@@ -3,7 +3,14 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /** What the frame and the connector write on a marker, which is not news to either. */
-const BOOKKEEPING = new Set<PropertyKey>(['current', 'fanned', 'gathered', 'gatheredBy', 'side'])
+const BOOKKEEPING = new Set<PropertyKey>([
+  'behind',
+  'current',
+  'fanned',
+  'gathered',
+  'gatheredBy',
+  'side',
+])
 
 /**
  * @summary A named place on a map.
@@ -34,6 +41,7 @@ const BOOKKEEPING = new Set<PropertyKey>(['current', 'fanned', 'gathered', 'gath
  * @csspart marker - The button, holding the point and the name.
  * @csspart point - The dot on the place, holding the icon if there is one.
  *
+ * @cssstate behind - On the far side of a globe, out of sight until the globe turns it into view.
  * @cssstate cluster - Shows several markers as one count.
  * @cssstate clustered - Hidden inside another marker's cluster.
  * @cssstate current - Holds the map's tab stop.
@@ -58,6 +66,14 @@ export class HelixHeadlessMapMarker extends HelixElement {
    */
   @state()
   gathered: string[] = []
+
+  /**
+   * @internal Whether the place is on the far side of a globe, written by the
+   * connector. It is hidden meanwhile, and stays in the frame's walk, so a
+   * reader reaching it turns the globe to show it.
+   */
+  @state()
+  behind = false
 
   /**
    * @internal Whether this stands fanned out from a spot it shares with
@@ -119,6 +135,7 @@ export class HelixHeadlessMapMarker extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.toggleState('behind', this.behind)
     this.toggleState('cluster', this.gathered.length > 1)
     this.toggleState('clustered', this.gatheredBy !== undefined)
     this.toggleState('current', this.current)

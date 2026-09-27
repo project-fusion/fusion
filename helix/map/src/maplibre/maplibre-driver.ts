@@ -356,8 +356,12 @@ export interface MapLibreMap {
   getTerrain?(): { source: string } | null | undefined
   /** Raises the ground from an elevation source, or lays it flat with `null`. */
   setTerrain?(terrain: { exaggeration?: number; source: string } | null): unknown
+  /** The view's projection, which on a globe says whether a place is on its far side. */
+  transform?: { isLocationOccluded?(place: { lat: number; lng: number }): boolean }
   /** Sets one paint property of one layer, which is how a points layer takes a new color. */
   setPaintProperty(layer: string, name: string, value: unknown): unknown
+  /** Sets one layout property of one layer, which is how the buildings are shown and hidden. */
+  setLayoutProperty(layer: string, name: string, value: unknown): unknown
   /** Replaces the style, by a diff against the one it has where `diff` is set. `never` for `addLayer`'s reason. */
   setStyle(style: never, options?: { diff?: boolean }): unknown
   zoomIn(options?: MapLibreAnimation): unknown
@@ -411,6 +415,9 @@ const turn = (map: MapLibreMap, bearing: number, pitch: number, motion: MapMotio
  */
 export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
   bearing: () => map.getBearing(),
+  /* Out of sight on a globe's far side; never on a flat map, whose
+     projection says no to every place. */
+  behind: ({ lat, lng }) => map.transform?.isLocationOccluded?.({ lat, lng }) === true,
   credits(changed) {
     const control = map.getContainer().querySelector<HTMLElement>(CONTROL)
     const display = control?.style.display ?? ''
@@ -550,6 +557,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         if (map.getTerrain?.()?.source === terrainSource(id, 'dem')) {
           map.setTerrain?.(null)
         }
+        lifts.delete(id)
         for (const use of ['dem', 'shade'] as const) {
           if (map.getSource(terrainSource(id, use))) {
             map.removeSource(terrainSource(id, use))
@@ -578,13 +586,48 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       map.getLayer(LAYERS[0]?.id ?? '')
         ? LAYERS[0]?.id
         : map.getStyle()?.layers?.find((layer) => layer.type === 'symbol')?.id
-    /* **Imagery goes under the style's roads**, its first line, name, or
-       raised building, so a photograph of the ground takes the place of the
-       land and keeps the streets and names over it. */
-    const underRoads = (): string | undefined =>
-      map
-        .getStyle()
-        ?.layers?.find((layer) => ['fill-extrusion', 'line', 'symbol'].includes(layer.type))?.id
+    /* **Imagery goes over the style's land and under its roads**: after the
+       last area the style fills, its buildings' footprints among them, and
+       under the first line, name, or raised building after that. So a
+       photograph of the ground takes the place of the land and the flat
+       buildings, whose rooftops it shows, and keeps the streets and names
+       over it. */
+    const underRoads = (): string | undefined => {
+      const layers = map.getStyle()?.layers ?? []
+      const lastFill = layers.findLastIndex(
+        (layer) => layer.type === 'fill' && !layer.id.startsWith('helix-'),
+      )
+      return layers
+        .slice(lastFill + 1)
+        .find((layer) => ['fill-extrusion', 'line', 'symbol'].includes(layer.type))?.id
+    }
+    /* **Raised only while the map is tilted.** Looking straight down, the
+       buildings are the style's own flat footprints and the ground is flat,
+       so the 3D button laying the map flat lays these flat too. */
+    let standing = map.getPitch() > 0
+    /* The raised ground each terrain layer asks for, by spec id. */
+    const lifts = new Map<string, { exaggeration: number; source: string }>()
+    const lift = (): void => {
+      const [ground] = [...lifts.values()].slice(-1)
+      if (standing && ground) {
+        map.setTerrain?.(ground)
+      } else if (map.getTerrain?.()?.source.startsWith('helix-terrain-')) {
+        map.setTerrain?.(null)
+      }
+    }
+    const stood = (): void => {
+      const now = map.getPitch() > 0
+      if (now === standing) {
+        return
+      }
+      standing = now
+      for (const [id, had] of drawnExtras) {
+        if (had.kind === 'buildings' && map.getLayer(buildingsLayer(id))) {
+          map.setLayoutProperty(buildingsLayer(id), 'visibility', standing ? 'visible' : 'none')
+        }
+      }
+      lift()
+    }
     const drawExtras = (specs: MapLayerSpec[]): void => {
       const wanted = new Set(specs.map((spec) => spec.id))
       for (const id of [...drawnExtras.keys()]) {
@@ -606,7 +649,13 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
             map.setPaintProperty(buildingsLayer(spec.id), 'fill-extrusion-color', spec.color)
           } else {
             try {
-              map.addLayer(buildingsExtrusion(spec, source) as never, under())
+              map.addLayer(
+                {
+                  ...buildingsExtrusion(spec, source),
+                  layout: { visibility: standing ? 'visible' : 'none' },
+                } as never,
+                under(),
+              )
             } catch {
               continue
             }
@@ -659,10 +708,11 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
                 underRoads(),
               )
               if (spec.raised) {
-                map.setTerrain?.({
+                lifts.set(spec.id, {
                   exaggeration: spec.exaggeration ?? 1,
                   source: terrainSource(spec.id, 'dem'),
                 })
+                lift()
               }
             } catch {
               /* A style still loading refuses the source, and its `load` draws again. */
@@ -907,6 +957,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     map.on('click', pressed)
     map.on('mousemove', pointing)
     map.on('idle', settled)
+    map.on('move', stood)
     draw()
     return {
       expand: (id, cluster) => expand(id, cluster),
@@ -917,6 +968,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         map.off('click', pressed)
         map.off('mousemove', pointing)
         map.off('idle', settled)
+        map.off('move', stood)
         for (const id of drawnPoints.keys()) {
           takeOff(id)
         }
@@ -947,6 +999,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
   panBy: (x, y, motion) => {
     map.panBy([x, y], animation(motion))
   },
+  pitch: () => map.getPitch(),
   project: ({ lat, lng }) => {
     const { x, y } = map.project([lng, lat])
     return { x, y }

@@ -13,6 +13,11 @@ export interface MapStyleOptions {
   /** The font glyphs, a URL with `{fontstack}` and `{range}` in it. */
   glyphs?: string | undefined
   /**
+   * Draws the world as a globe when the map is zoomed out, turning into the
+   * flat map as it zooms in. MapLibre 5 and later.
+   */
+  globe?: boolean | undefined
+  /**
    * The language labels are written in, where the tiles carry it, falling back
    * to the Latin name and then the local one. `en` by default.
    */
@@ -30,6 +35,10 @@ export interface MapLibreStyle {
   glyphs: string
   layers: Array<Record<string, unknown>>
   name: string
+  /** How the world is drawn: a globe where the style asks for one. */
+  projection?: { type: 'globe' }
+  /** The sky over the horizon and the atmosphere round a globe. */
+  sky?: Record<string, unknown>
   sources: Record<string, Record<string, unknown>>
   version: 8
 }
@@ -423,6 +432,21 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
       ),
     ],
     name: 'Helix',
+    ...(options.globe
+      ? {
+          projection: { type: 'globe' as const },
+          /* **An atmosphere round the globe**, so its edge shows against a
+             page the land's own color, faded out as the map zooms in and
+             the globe turns flat. The sky over a tilted horizon is the
+             water's color, and meets the land at it. */
+          sky: {
+            'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 7, 0],
+            'horizon-color': cssColor(land),
+            'sky-color': cssColor(water),
+            'sky-horizon-blend': 0.5,
+          },
+        }
+      : {}),
     sources: { openmaptiles: { type: 'vector', url: options.tiles ?? OPENFREEMAP.tiles } },
     version: 8,
   }
