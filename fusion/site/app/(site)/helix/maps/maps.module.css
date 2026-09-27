@@ -338,6 +338,17 @@ fieldset.mapsControl {
   --map-block-size: min(70svh, 34rem);
 }
 
+/* The terrain demo, laid out as the points demo is: the map, and a caption under it. */
+.mapsDemo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+}
+
+.mapsDemoFrame {
+  --map-block-size: min(70svh, 34rem);
+}
+
 /* =========================================================== features === */
 
 /* Four cells, two by two on a wide card and stacked on a narrow one, ruled
