@@ -5,6 +5,8 @@ import {
   HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,
+  HelixMapRotateEvent,
+  HelixMapTiltEvent,
   HelixMapZoomEvent,
   hostAria,
   KeyboardNavigationController,
@@ -33,6 +35,12 @@ interface MapLayer {
  */
 export type MapControlsPlacement = ViewportControlsPlacement
 
+/** Degrees a rotate button or key turns the map. */
+const ROTATE_STEP = 15
+
+/** Degrees a tilt button or key tilts the map. */
+const TILT_STEP = 10
+
 /**
  * @summary A frame around a map drawn by another library.
  *
@@ -44,6 +52,12 @@ export type MapControlsPlacement = ViewportControlsPlacement
  * The pan and zoom buttons and the arrow keys send `helix-map-pan` and
  * `helix-map-zoom`. Move your map in response, or connect it with
  * `connectMap` from `@fusion.dev/helix-map`, which does this for you.
+ *
+ * Add `rotate` and `tilt` to `controls` for buttons that turn and tilt the
+ * map, which a map with 3D buildings needs. Shift with the arrow keys does the
+ * same: left and right rotate, up tilts, and down flattens. They send
+ * `helix-map-rotate` and `helix-map-tilt`, which `connectMap` answers on
+ * MapLibre. Leaflet draws maps flat and does not rotate.
  *
  * Markers, routes, areas, live positions, and points layers go inside the
  * frame as child elements.
@@ -63,23 +77,33 @@ export type MapControlsPlacement = ViewportControlsPlacement
  * @event {HelixMapClusterEvent} helix-map-cluster - A cluster was pressed. Sent from the marker that shows the cluster, with the names of its places.
  * @event {HelixMapPanEvent} helix-map-pan - A pan button or arrow key was pressed. Move your map in response.
  * @event {HelixMapPartChangeEvent} helix-map-part-change - Clustering was turned on or off. Used by `connectMap`; pages do not need to listen for it.
+ * @event {HelixMapRotateEvent} helix-map-rotate - A rotate or Face north button, or Shift with Left or Right, was pressed. Turn your map in response.
+ * @event {HelixMapTiltEvent} helix-map-tilt - A tilt or flatten button, or Shift with Up or Down, was pressed. Tilt your map in response.
  * @event {HelixMapZoomEvent} helix-map-zoom - A zoom button or key was pressed, with a direction. Zoom your map in response.
  *
  * @csspart attribution - The strip under the map that holds the credit.
- * @csspart controls - The group of pan and zoom buttons.
+ * @csspart controls - The group of buttons that move the map.
+ * @csspart face-north - The button that turns the map to face north. Its needle points north as the map turns.
+ * @csspart flatten - The button that tilts the map back toward flat.
  * @csspart footer - The strip below the map.
  * @csspart fullscreen - The button that makes the map fill the screen.
  * @csspart header - The strip above the map.
- * @csspart layer - One entry in the list of routes, areas, and points layers.
- * @csspart layers - The list of routes, areas, and points layers, read by screen readers.
+ * @csspart layer - One entry in the list of the map's layers.
+ * @csspart layers - The list of the map's layers, such as routes, areas, and points, read by screen readers.
+ * @csspart needle - The arrow inside the Face north button, turned to point north.
  * @csspart pan-down - The button that pans the map down.
  * @csspart pan-end - The button that pans toward the end of a line of text: right in English.
  * @csspart pan-start - The button that pans toward the start of a line of text: left in English.
  * @csspart pan-up - The button that pans the map up.
  * @csspart region - The named region the map sits in.
+ * @csspart rotate-left - The button that turns the map counterclockwise.
+ * @csspart rotate-right - The button that turns the map clockwise.
+ * @csspart tilt - The button that tilts the map toward the horizon.
  * @csspart viewport - The box the map is drawn in.
  * @csspart zoom-in - The button that zooms in.
  * @csspart zoom-out - The button that zooms out.
+ *
+ * @cssproperty --map-needle-turn - How far the needle turns to point north, as an angle. The frame writes it from `bearing`.
  *
  * @cssstate fullscreen - The map fills the screen.
  * @cssstate idle - The user has been still long enough for the header and footer to fade.
@@ -87,11 +111,26 @@ export type MapControlsPlacement = ViewportControlsPlacement
 @customElement('helix-headless-map')
 export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   /**
+   * The map's rotation, in degrees clockwise from north. `connectMap` keeps it
+   * current, and the Face north button's needle turns with it.
+   */
+  @property({ type: Number })
+  bearing = 0
+
+  /**
    * Combines markers that would overlap into one count. Counts split apart as
    * the map zooms in, and pressing one zooms in to its places.
    */
   @property({ type: Boolean })
   cluster = false
+
+  /** The Face north button's label. */
+  @property({ attribute: 'face-north-label' })
+  faceNorthLabel = 'Face north'
+
+  /** The flatten button's label. */
+  @property({ attribute: 'flatten-label' })
+  flattenLabel = 'Flatten the map'
 
   /**
    * The map's name, read by screen readers. Name the place, such as "Delivery
@@ -106,6 +145,18 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   @property({ attribute: 'layers-label' })
   layersLabel = 'Map layers'
+
+  /** The rotate left button's label. */
+  @property({ attribute: 'rotate-left-label' })
+  rotateLeftLabel = 'Rotate left'
+
+  /** The rotate right button's label. */
+  @property({ attribute: 'rotate-right-label' })
+  rotateRightLabel = 'Rotate right'
+
+  /** The tilt button's label. */
+  @property({ attribute: 'tilt-label' })
+  tiltLabel = 'Tilt the map'
 
   /**
    * The routes and areas among the frame's children, in the order they are
@@ -284,6 +335,80 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
   }
 
+  /** Turns the map by some degrees, clockwise where positive. */
+  rotate(by: number): void {
+    this.dispatchEvent(new HelixMapRotateEvent({ by }))
+  }
+
+  /** Turns the map to face north. */
+  faceNorth(): void {
+    this.dispatchEvent(new HelixMapRotateEvent({ to: 0 }))
+  }
+
+  /** Tilts the map by some degrees, toward the horizon where positive. */
+  tilt(by: number): void {
+    this.dispatchEvent(new HelixMapTiltEvent({ by }))
+  }
+
+  /** The rotate and tilt buttons, where `controls` names them. */
+  protected override renderMoreControls(): TemplateResult | typeof nothing {
+    const rotate = this.drawsControls('rotate')
+    const tilt = this.drawsControls('tilt')
+    if (!rotate && !tilt) {
+      return nothing
+    }
+    return html`${
+      rotate
+        ? html`<button part="rotate-left" aria-label=${this.rotateLeftLabel} type="button" @click=${() => this.rotate(-ROTATE_STEP)}>
+              ↺
+            </button>
+            <button part="face-north" aria-label=${this.faceNorthLabel} type="button" style=${`--map-needle-turn: ${-this.bearing}deg`} @click=${() => this.faceNorth()}>
+              <span part="needle" aria-hidden="true">↑</span>
+            </button>
+            <button part="rotate-right" aria-label=${this.rotateRightLabel} type="button" @click=${() => this.rotate(ROTATE_STEP)}>
+              ↻
+            </button>`
+        : nothing
+    }${
+      tilt
+        ? html`<button part="tilt" aria-label=${this.tiltLabel} type="button" @click=${() => this.tilt(TILT_STEP)}>
+              3D
+            </button>
+            <button part="flatten" aria-label=${this.flattenLabel} type="button" @click=${() => this.tilt(-TILT_STEP)}>
+              2D
+            </button>`
+        : nothing
+    }`
+  }
+
+  /** The keys the region answers, which `rotate` and `tilt` add to. */
+  private get keyShortcuts(): string {
+    const keys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Plus', 'Minus']
+    if (this.drawsControls('rotate')) {
+      keys.push('Shift+ArrowLeft', 'Shift+ArrowRight')
+    }
+    if (this.drawsControls('tilt')) {
+      keys.push('Shift+ArrowUp', 'Shift+ArrowDown')
+    }
+    return keys.join(' ')
+  }
+
+  /** Shift with the arrow keys: left and right rotate, up tilts, and down flattens. */
+  protected override handleMoreKeys(event: KeyboardEvent): boolean {
+    if (!event.shiftKey) {
+      return false
+    }
+    if (this.drawsControls('rotate') && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+      this.rotate(event.key === 'ArrowLeft' ? -ROTATE_STEP : ROTATE_STEP)
+      return true
+    }
+    if (this.drawsControls('tilt') && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+      this.tilt(event.key === 'ArrowUp' ? TILT_STEP : -TILT_STEP)
+      return true
+    }
+    return false
+  }
+
   /** The events this family names, the surface naming none of its own. */
   protected override panEvent(detail: ViewportPanDetail): Event {
     return new HelixMapPanEvent(detail)
@@ -357,7 +482,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       part="region"
       role="group"
       aria-label=${this.label || 'Map'}
-      aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Plus Minus"
+      aria-keyshortcuts=${this.keyShortcuts}
       tabindex="0"
       @focusin=${this.idle.stir}
       @keydown=${this.handleKeydown}
