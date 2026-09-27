@@ -59,8 +59,8 @@ followTheme(map, frame, style)
 
 `connectMap` links the frame to the renderer:
 
-- The frame's pan and zoom buttons and keys move the map, using your theme's
-  motion settings. The map moves without animation when a user has asked for
+- The frame's pan, zoom, rotate, and tilt buttons and keys move the map, using
+  your theme's motion settings. The map moves without animation when a user has asked for
   reduced motion.
 - The renderer's own keyboard handling and zoom buttons are turned off, so the
   frame's controls are the only ones.
@@ -217,7 +217,22 @@ setting `pitch` when you create it:
 const map = new maplibregl.Map({ container: 'map', pitch: 55, style, zoom: 15.5 })
 ```
 
-Leaflet draws maps flat, so a Leaflet map shows no buildings.
+To let users turn and tilt the map, add `rotate` and `tilt` to the frame's
+`controls`:
+
+```html
+<helix-map
+  controls="pan zoom rotate tilt fullscreen"
+  label="Downtown Austin in 3D"
+>
+```
+
+The rotate buttons turn the map 15 degrees, and Face north turns it back. Its
+arrow points north as the map turns. The 3D button tilts the map 10 degrees
+toward the horizon, and the 2D button tilts it back toward flat.
+
+Leaflet draws maps flat and does not rotate, so a Leaflet map shows no
+buildings, and the rotate and tilt buttons do nothing.
 
 ### Weather and other tile overlays
 
@@ -243,7 +258,8 @@ each. Every frame's tiles load once, so the loop plays without a blank frame.
 ## Keyboard and screen readers
 
 - The frame is one tab stop. Arrow keys pan the map, and the plus and minus keys
-  zoom it.
+  zoom it. Shift with Left or Right rotates the map, and Shift with Up or Down
+  tilts it.
 - The markers are one tab stop. Arrow keys move between them in the order you
   wrote them. The map pans to show a marker that is off screen.
 - A points layer is one tab stop over the points and counts in view. Arrow keys
@@ -269,7 +285,8 @@ animation. Each optional method turns on a feature:
 | `layers` | Drawing routes, areas, and points |
 | `credits` | The map credit in the frame's footer |
 | `silenceKeyboard`, `focusTarget`, `replaceZoom` | Using the frame's keys and zoom buttons |
-| `bearing` | Arrows that stay correct when the map is rotated |
+| `bearing` | Arrows that stay correct when the map is rotated, and the Face north arrow |
+| `rotate`, `tilt` | The rotate, Face north, and tilt buttons and keys |
 
 Without `project`, markers stay hidden. To animate a move your page makes
 itself, read the same motion with `motionOf(element, pace)`.
