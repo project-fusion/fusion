@@ -158,3 +158,58 @@
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
 }
+
+/* ============================================================ layers menu === */
+
+/* **The layers button goes under the stack in the last column**, a row of
+   its own, so it joins every layout of the pad without redrawing one. */
+[part="layers-toggle"] {
+  grid-column: -2 / -1;
+  grid-row: 4;
+}
+
+/* **The menu floats beside the controls**, out of their grid, from the edge
+   they sit on: under them in a top corner and over them in a bottom one. */
+[part="layers-menu"] {
+  background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  color: var(--helix-color-foreground);
+  display: grid;
+  gap: var(--helix-space-2xs);
+  inline-size: max-content;
+  inset-block-start: calc(100% + var(--helix-space-2xs));
+  inset-inline-end: 0;
+  /* A long name wraps, inside the width of a phone. */
+  max-inline-size: min(18rem, 80vw);
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+  position: absolute;
+}
+
+[part="layers-menu"][hidden] {
+  display: none;
+}
+
+:host([controls-placement^="bottom"]) [part="layers-menu"] {
+  inset-block: auto calc(100% + var(--helix-space-2xs));
+}
+
+:host([controls-placement$="start"]) [part="layers-menu"] {
+  inset-inline: 0 auto;
+}
+
+[part="layer-choice"] {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-xs);
+  min-block-size: var(--helix-size-control-sm);
+}
+
+[part="layer-choice"] input {
+  accent-color: var(--helix-color-primary-surface);
+  margin: 0;
+}

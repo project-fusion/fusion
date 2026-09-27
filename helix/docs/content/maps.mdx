@@ -108,7 +108,7 @@ reports which one is missing.
 | `helix-map-position` | A moving point or arrow, such as a vehicle |
 | `helix-map-points` | Thousands of places loaded from GeoJSON |
 | `helix-map-buildings` | The map's buildings, raised to their heights in 3D |
-| `helix-map-raster` | Map tiles over the map, such as weather radar |
+| `helix-map-raster` | Map tiles over the map, such as weather radar or satellite imagery |
 
 Each element takes `tone`, such as `primary` or `danger`, for its color.
 
@@ -228,8 +228,8 @@ To let users turn and tilt the map, add `rotate` and `tilt` to the frame's
 ```
 
 The rotate buttons turn the map 15 degrees, and Face north turns it back. Its
-arrow points north as the map turns. The 3D button tilts the map 10 degrees
-toward the horizon, and the 2D button tilts it back toward flat.
+arrow points north as the map turns. The 3D button tilts the map 50 degrees
+toward the horizon, and the 2D button makes it flat.
 
 Leaflet draws maps flat and does not rotate, so a Leaflet map shows no
 buildings, and the rotate and tilt buttons do nothing.
@@ -255,6 +255,42 @@ each. Every frame's tiles load once, so the loop plays without a blank frame.
 - Content that moves for more than five seconds needs a way to pause it, so
   give `playing` a control on your page.
 
+### Satellite imagery
+
+```html
+<helix-map-raster
+  attribution="Imagery from USGS The National Map"
+  ground
+  label="Satellite imagery"
+  max-zoom="16"
+  opacity="1"
+  src="https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}"
+></helix-map-raster>
+```
+
+Set `ground` on `helix-map-raster` to draw its tiles as the ground: under the
+roads and place names, in place of the map's land. Set `max-zoom` to the deepest
+zoom your provider has tiles for, and the map enlarges those tiles when a user
+zooms in further.
+
+The imagery above is from the U.S. Geological Survey. It is in the public domain
+and covers the United States. Some providers put `{y}` before `{x}` in their
+tile URLs, as this one does.
+
+### Turn layers on and off
+
+```html
+<helix-map
+  controls="pan zoom layers fullscreen"
+  label="Downtown Austin"
+>
+```
+
+Add `layers` to the frame's `controls` for a layers button. It opens a menu with
+a checkbox for each layer, named by its `label`. A checkbox sets its layer's
+`hidden` attribute, and `connectMap` does not draw a hidden layer. Write
+`hidden` on a layer to start it turned off.
+
 ## Keyboard and screen readers
 
 - The frame is one tab stop. Arrow keys pan the map, and the plus and minus keys
@@ -264,8 +300,10 @@ each. Every frame's tiles load once, so the loop plays without a blank frame.
   wrote them. The map pans to show a marker that is off screen.
 - A points layer is one tab stop over the points and counts in view. Arrow keys
   move top to bottom and along each line. Enter on a count zooms in to it.
-- Screen readers find the map's layers in a list inside the frame, named by
-  their `label` and `description`.
+- Screen readers find the map's shown layers in a list inside the frame, named
+  by their `label` and `description`.
+- In the layers menu, Tab moves between the checkboxes, Space turns a layer on
+  or off, and Escape closes the menu.
 
 ## Write a driver
 
