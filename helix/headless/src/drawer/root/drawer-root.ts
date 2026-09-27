@@ -12,23 +12,24 @@ import { property } from 'lit/decorators.js'
  * @summary A panel that slides in from an edge.
  *
  * @description
- * Takes `MixinControllerOpen`, so `open`, `defaultOpen` and the
- * `helix-before-open` and `helix-before-close` requests behave exactly as they
- * do on an accordion item, and a consumer already knows the API.
+ * Uses `MixinControllerOpen`, so `open`, `defaultOpen`, and the
+ * `helix-before-open` and `helix-before-close` events work the same way as on
+ * an accordion item.
  *
- * Modal by default, which is three things together and not one: focus is
- * trapped inside, Escape and an outside press close it, and the page behind is
- * covered. A panel with the look of a modal and none of its behavior is worse
- * than an inline one, because it invites the reader to treat it as blocking.
+ * The drawer is modal by default, which means three things:
  *
- * Content stays mounted when closed, so it is in the server's markup and can
- * animate. A closed `<dialog>` is already out of the tab order and out of the
- * accessibility tree, so nothing here writes `inert`. The `role`, the
- * `aria-modal` and the scrim come from the element too, and
- * `drawer-root.ssr.spec.ts` asserts the panel carries no hand-written `inert`
- * and no hand-written `role`.
+ * - focus is trapped inside
+ * - Escape and a press outside close it
+ * - the page behind is covered
  *
- * Opened declaratively with the platform's invoker attributes:
+ * Content stays mounted when the drawer is closed, so it is in the server
+ * markup and can animate. A closed `<dialog>` is already out of the tab order
+ * and the accessibility tree, so the drawer does not write `inert`. The `role`,
+ * `aria-modal`, and the scrim also come from the `<dialog>` element.
+ * `drawer-root.ssr.spec.ts` checks that the panel has no hand-written `inert`
+ * or `role`.
+ *
+ * Open the drawer declaratively with the platform's invoker attributes:
  *
  * ```html
  * <helix-headless-button commandfor="nav" command="--toggle">Menu</helix-headless-button>

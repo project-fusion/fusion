@@ -7,12 +7,11 @@ import { styles } from './kbd-root.css.js'
  * @summary A keyboard key or chord, set inline with text.
  *
  * @description
- * Drawn as a physical key: a hairline, a sunken fill, and one inset shadow
- * along the bottom edge that reads as depth without becoming a picture of a
- * key.
+ * Drawn as a physical key, with a hairline border, a sunken fill, and one inset
+ * shadow along the bottom edge.
  *
- * Sized in `em`, so it stays proportional to whatever it is set inside rather
- * than holding one size and looking wrong in a heading.
+ * Sized in `em`, so it stays in proportion with the text around it, including
+ * in a heading.
  *
  * @since 0.1.0
  * @status stable

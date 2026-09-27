@@ -9,9 +9,8 @@ import { styles } from './table-root.css.js'
  * @summary A table of data, laid out on a grid.
  *
  * @description
- * Hairline rules between rows and no fill, per the rule that depth comes from a
- * single border rather than from elevation. A dense table earns its density by
- * decorating none of it.
+ * Rows have hairline rules between them and no fill. Helix shows depth with a
+ * single border and no elevation, and a dense table adds no other decoration.
  *
  * @since 0.1.0
  * @status stable

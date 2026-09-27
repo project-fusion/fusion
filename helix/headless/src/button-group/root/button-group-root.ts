@@ -6,17 +6,16 @@ import { property } from 'lit/decorators.js'
  * @summary Groups related buttons into one control.
  *
  * @description
- * The host is the group, so `role="group"` sits on it through internals and
- * `label` names it. A group of buttons with no name is announced as a run of
- * separate controls, which is what the grouping exists to say it is not.
+ * Sets `role="group"` on the host through internals, and `label` names the
+ * group. Without a name, a screen reader announces the buttons as separate
+ * controls.
  *
- * It manages no focus. A group is not a toolbar: the APG toolbar pattern asks
- * for one tab stop with arrow keys inside it, and that is what Toolbar is for.
- * Here every button keeps its own tab stop, which is what a reader expects from
- * buttons sitting side by side.
+ * The group does not manage focus, so each button keeps its own tab stop. For
+ * one tab stop with arrow keys between the buttons, the APG toolbar pattern,
+ * use Toolbar.
  *
- * Buttons are slotted rather than wrapped, so they stay the consumer's own
- * elements and keep whatever appearance and size they were given.
+ * Buttons are slotted, so they stay your own elements and keep their own
+ * appearance and size.
  *
  * @since 0.1.0
  * @status stable

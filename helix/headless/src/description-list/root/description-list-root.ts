@@ -6,20 +6,16 @@ import { property } from 'lit/decorators.js'
  * @summary A list of labels and their values, such as a details panel.
  *
  * @description
- * "Owner: Ada, Region: us-east, Created: 3 days ago" is the commonest panel in
- * any console, and built from layout primitives it is a run of adjacent text:
- * nothing tells a screen reader that a label and a value belong together, or
- * how many pairs there are. This renders the element the platform has for it,
- * a `<dl>`, with each item's label a `<dt>` and its value a `<dd>`.
+ * Renders a `<dl>`, with each item's label as a `<dt>` and its value as a
+ * `<dd>`, for panels such as "Owner: Ada, Region: us-east, Created: 3 days
+ * ago". A screen reader announces which label goes with which value and how
+ * many pairs there are.
  *
- * **The items render their own term and description**, and the list takes them
- * through its slot. The accessibility tree is built from the flattened tree, so
- * the pairs reach it inside the list rather than beside it. Measured in
- * Chromium's tree rather than assumed, because a list whose semantics stopped
- * at a shadow boundary would look identical on screen: one description list
- * holding term and definition pairs, node for node what a plain `<dl>` with the
- * same content produces, with a slotted label and with an item drawn as
- * `display: contents` alike.
+ * **Each item renders its own term and description**, and the list takes the
+ * items through its slot. The accessibility tree is built from the flattened
+ * tree, so the pairs appear inside the list. Measured in Chromium, the result
+ * matches a plain `<dl>` with the same content node for node, both with a
+ * slotted label and with an item set to `display: contents`.
  *
  * @since 0.1.0
  * @status stable

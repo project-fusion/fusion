@@ -8,15 +8,12 @@ import { styles } from './progress-root.css.js'
  * @summary A bar or ring that shows how far along a task is.
  *
  * @description
- * A track and the part of it that is done. The height comes from a token rather
- * than from a size property, for the reason the rest of the library gives about
- * controls: how heavy a bar is says something about the region it is in, and a
- * `--progress-size` on that region says it once.
+ * A track and the part of it that is done. The height comes from a token, like
+ * control sizes elsewhere in the library, so you can set `--progress-size` once
+ * on a region.
  *
- * The fill transitions, which is worth more here than it looks. Progress
- * arrives in steps, often large ones, and a bar that jumps between them reads
- * as a series of unrelated states where one that travels reads as a single
- * thing advancing.
+ * The fill transitions between values. Progress often arrives in large steps,
+ * and a fill that moves between them shows one task advancing.
  *
  * @since 0.1.0
  * @status stable

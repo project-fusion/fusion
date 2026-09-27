@@ -7,8 +7,8 @@ import { styles } from './breadcrumbs-root.css.js'
  * @summary Shows the path to the current page.
  *
  * @description
- * A single wrapping line by default. The trail wraps rather than scrolling,
- * because a truncated path tells the reader less than a two-line one.
+ * The trail is a single line by default and wraps onto a second line when it
+ * runs out of room, so every crumb stays visible.
  *
  * @since 0.1.0
  * @status stable

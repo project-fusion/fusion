@@ -8,15 +8,13 @@ import { styles } from './popover-root.css.js'
  * @summary A panel that opens next to its trigger and holds any content.
  *
  * @description
- * A surface with an inset and a shadow, and nothing about what goes in it. The
- * inset is the panel's rather than the consumer's, which is the same call
- * `Dialog` and `Drawer` make and for the same reason: everyone was writing it,
- * and everyone was writing the same one.
+ * The styled tier draws a surface with an inset and a shadow and styles nothing
+ * inside it. The panel sets its own inset, as `Dialog` and `Drawer` do, because
+ * every use needed the same one.
  *
- * It arrives from the side it opened on. `data-placement` is written by the
- * positioning, so the panel knows which way it flipped and can animate from the
- * trigger rather than from a fixed direction that would be backwards half the
- * time.
+ * The panel animates in from the side it opened on. The positioning writes
+ * `data-placement`, so the panel animates from the trigger's side, including
+ * after it flips.
  *
  * @since 0.1.0
  * @status stable

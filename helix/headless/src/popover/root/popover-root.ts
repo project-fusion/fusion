@@ -16,26 +16,21 @@ import { property } from 'lit/decorators.js'
  * @summary A panel that opens next to its trigger and holds any content.
  *
  * @description
- * The general case the specific overlays are versions of. `Menu` holds
- * commands, `Select` holds options, `Tooltip` holds a description; this holds
- * whatever the consumer puts in it, which is why it has no keyboard of its own
- * and no opinion about what is inside.
+ * Popover is the general overlay that the specific ones build on. `Menu` holds
+ * commands, `Select` holds options, and `Tooltip` holds a description. Popover
+ * holds any content you put in it, so it has no keyboard handling of its own.
  *
- * **The trigger is slotted and stays the consumer's own element.** Nothing is
- * written onto it: no `aria-expanded`, no `id`, no `tabindex`. A component that
- * decorates a consumer's markup after upgrading is a component whose output a
- * React consumer's hydration disagrees with, and the attribute they would care
- * about most is the one that changes on every open.
+ * The trigger is slotted and stays your own element. The popover writes nothing
+ * onto it, including `aria-expanded`, `id`, and `tabindex`, because changing
+ * your markup after upgrade causes a React hydration mismatch.
  *
- * **The panel is in the top layer**, through the popover API, so it clears any
- * ancestor with `overflow: hidden` without a `z-index` fight. `position: fixed`
- * does not do that: it is still clipped by `overflow`, and re-anchored entirely
- * by an ancestor carrying `transform`, `filter` or `contain`.
+ * The panel is in the top layer through the popover API, so it needs no
+ * `z-index`, and an ancestor with `overflow: hidden`, `transform`, `filter`, or
+ * `contain` does not clip or move it.
  *
- * **It opens on click, and from a command.** `command="--show"` and its
- * siblings work here the way they do on `Dialog` and `Drawer`, so a trigger
- * elsewhere on the page can open it without a line of script and without being
- * slotted into it.
+ * It opens on click and from a command. `command="--show"` and the related
+ * commands work as they do on `Dialog` and `Drawer`, so a button anywhere on
+ * the page can open the popover with no script.
  *
  * @since 0.1.0
  * @status stable

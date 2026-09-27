@@ -9,11 +9,10 @@ import '../../copy-button/index.js'
  * see how many entries each holds, and copy any part.
  *
  * @description
- * Code Block's frame around a tree of entries. Each type takes its ink from the
- * syntax set the code blocks already use, a key in one, a string in another and
- * a number, a boolean and a null in theirs, and each row is one line with a long
- * string ending in an ellipsis, so every row is one height and a windowed tree
- * never has to measure them one by one.
+ * The styled tier draws the tree in the Code Block frame. Keys and each type of
+ * value take their colors from the syntax colors code blocks use. Each row is
+ * one line, and a long string ends in an ellipsis, so every row has the same
+ * height and a windowed tree does not measure rows one by one.
  *
  * @since 0.1.0
  * @status stable

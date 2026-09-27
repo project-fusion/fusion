@@ -73,20 +73,23 @@ const addMonths = (date: Date, months: number): Date => {
  * @summary A month calendar for choosing one or more dates.
  *
  * @description
- * A grid of days, per the APG date grid: the whole grid is one tab stop, arrows
- * move by day and week, `PageUp` and `PageDown` by month, `Home` and `End` to
- * the ends of the week. Only the focused cell is in the tab sequence.
+ * A grid of days that follows the APG date grid pattern:
  *
- * **Dates are `YYYY-MM-DD` strings and every calculation is in UTC.** A
- * local-time `Date` shifts across a timezone or a daylight-saving boundary.
+ * - The grid is one tab stop. Only the focused cell is in the tab sequence.
+ * - Arrow keys move by day and by week.
+ * - `PageUp` and `PageDown` move by month.
+ * - `Home` and `End` move to the start and end of the week.
  *
- * `month` is what the grid shows, separately from `value`, so paging does not
- * select anything and a consumer can drive the view. Left unset it follows the
+ * **Dates are `YYYY-MM-DD` strings, and every calculation is in UTC**, because
+ * a local-time `Date` shifts across a time zone or daylight-saving boundary.
+ *
+ * `month` sets which month the grid shows, separately from `value`, so paging
+ * selects nothing and you can control the view. When unset, it follows the
  * first selected date, then the current month.
  *
- * `mode` decides how many dates are held: absent takes one, `range` takes two
- * and marks everything between them, `multiple` toggles. All three read and
- * write the same comma-separated `value`.
+ * `mode` sets how many dates are held. Unset holds one, `range` holds two and
+ * marks the dates between them, and `multiple` toggles each date. All three
+ * read and write the same comma-separated `value`.
  *
  * @since 0.1.0
  * @status stable

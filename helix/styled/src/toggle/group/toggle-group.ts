@@ -10,15 +10,13 @@ import { styles } from './toggle-group.css.js'
  * @summary A row of options with the selection marked by a moving indicator.
  *
  * @description
- * The indicator travels between items rather than the fill swapping. A fill
- * that appears on one item as it disappears from another is two changes at once
- * and reads as a flicker; one object moving is something the eye follows, and
- * it says where the selection came from as well as where it went.
+ * The indicator moves between items, so a change of selection is one moving
+ * object the eye can follow.
  *
- * It animates `translate` and `inline-size`. Width is a layout property and the
- * rule is transform and opacity only, but the indicator is out of flow, so
- * animating its width reflows nothing else. Scaling instead would distort the
- * corner radius, which is worse than the exception.
+ * It animates `translate` and `inline-size`. Animating width is an exception to
+ * the transform and opacity rule, and it is safe because the indicator is out
+ * of flow and its width reflows nothing else. Scaling would distort the corner
+ * radius.
  *
  * @since 0.1.0
  * @status stable

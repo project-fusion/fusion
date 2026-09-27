@@ -17,9 +17,9 @@ import { styles } from './combobox-root.css.js'
  * @summary A text field that filters a list of options as you type.
  *
  * @description
- * The frame is the field rather than the input, so the caret, the marks and the
- * focus ring are drawn once around the whole control, which is the arrangement
- * Input, Color Input and Date Input all take.
+ * The frame is drawn around the field, so the caret, the marks, and the focus
+ * ring sit inside one outline around the whole control. Input, Color Input, and
+ * Date Input use the same arrangement.
  *
  * @since 0.1.0
  * @status stable

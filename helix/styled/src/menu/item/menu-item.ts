@@ -7,12 +7,12 @@ import { styles } from './menu-item.css.js'
  * @summary One row in a menu: a command, a choice, or a way into a submenu.
  *
  * @description
- * A row draws a column beside its label only where it has something to put in
- * one, and the width is the menu's rather than the row's: the page reserves a
- * leading or a trailing track as soon as any row on it fills one, so every
- * label on that page starts at the same edge and a page that fills neither pays
- * for neither. A row knows about its own slots and nothing about its
- * neighbors, which is why the reservation is not made here.
+ * A row draws a leading or trailing column only when it has content for it. The
+ * menu page sets the column width: once any row on a page fills a leading or
+ * trailing slot, the page reserves that track for every row, so all labels on
+ * the page start at the same edge. A page that fills neither reserves nothing.
+ * The reservation is made on the page because each row's styles cover only its
+ * own slots.
  *
  * @since 0.1.0
  * @status stable

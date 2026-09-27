@@ -7,12 +7,12 @@ import { styles } from './callout-root.css.js'
  * @summary A passage set apart as information, a warning, or an error.
  *
  * @description
- * Tinted from the tone's status color with `color-mix`, and marked with a bar
- * on the inline start so the tone survives being read in grayscale or by anyone
- * who does not distinguish the hues.
+ * The background is a tint of the tone's status color, mixed with `color-mix`.
+ * A bar on the inline start edge also marks the tone, so it still shows in
+ * grayscale and for people who do not distinguish the hues.
  *
- * There is no treatment axis here. `tone` carries the meaning and lives on the
- * headless tier; this tier only decides what that meaning looks like.
+ * This tier has no treatment property. `tone` is set on the headless tier and
+ * carries the meaning, and this tier draws it.
  *
  * @since 0.1.0
  * @status stable

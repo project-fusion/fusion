@@ -6,9 +6,9 @@ import { type CSSResultGroup, css } from 'lit'
  * @summary A connector between two cards on a canvas.
  *
  * @description
- * Draws nothing and takes no room: the board draws every connector into one
- * layer under the cards, which is the only place a line between two of them can
- * be drawn. What this element carries is which cards and which sides.
+ * Draws nothing and takes no room. The board draws every connector into one
+ * layer under the cards. The element carries which cards and which sides the
+ * connector joins.
  *
  * @since 0.100.0
  * @status experimental

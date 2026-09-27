@@ -8,11 +8,10 @@ import { styles } from './accordion-item.css.js'
  *
  * @description
  * The open and close transition animates `grid-template-rows` from `0fr` to
- * `1fr`, which is the only technique that reaches the content's intrinsic
- * height without measuring it in JavaScript. It is disabled under
- * `prefers-reduced-motion`.
+ * `1fr`, which reaches the content's intrinsic height without measuring it in
+ * JavaScript. The transition is off under `prefers-reduced-motion`.
  *
- * Usable on its own as a disclosure, with no accordion around it.
+ * You can use an item on its own as a disclosure, with no accordion around it.
  *
  * @since 0.1.0
  * @status stable

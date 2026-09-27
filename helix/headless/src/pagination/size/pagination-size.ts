@@ -17,32 +17,26 @@ import '../../select/index.js'
  * @summary A control for choosing how many items each page shows.
  *
  * @description
- * Its own element beside `Pagination` rather than a slot inside it, for the
- * reason `Pagination.Summary` is: a footer's direction and order are the
- * consumer's, and a control that can only sit at one end of one row has taken
- * that decision for them.
+ * A separate element that you place beside `Pagination`, like
+ * `Pagination.Summary`, so you choose the direction and order of your footer.
  *
- * **`Select`, not a native `<select>`.** Two dropdowns identical closed and
- * different open meet each other in the same footer as a table's filters. The
- * caret is `Select`'s rather than a color literal baked into a data URI,
- * because a background image cannot read `currentColor`, and the label is a
- * real `<label for>` against the trigger's own id.
+ * It uses `Select`, so it matches a table's filter dropdowns in the same
+ * footer, both open and closed. The caret is `Select`'s, so it follows
+ * `currentColor`, and the label is a real `<label for>` pointing at the
+ * trigger's id.
  *
- * **The label sits on the row, not above it.** `Select`'s host is a column, and
- * an outer-tree rule beats a `:host` rule, so turning it into a row needs no
- * property on `Select` and nothing written into the consumer's markup.
+ * The label sits on the same row as the select. `Select`'s host is a column,
+ * and an outer-tree rule overrides a `:host` rule, so the row layout needs no
+ * property on `Select` and nothing added to your markup.
  *
- * **An empty `sizes` renders nothing**, rather than falling back to the
- * built-in list, which would be a component overruling a consumer who said
- * "none". Same rule as `Pagination` over a single page, and reported the same
- * way, through `ElementInternals.states` rather than an attribute the server
- * never wrote.
+ * An empty `sizes` renders nothing and does not fall back to the built-in list.
+ * `Pagination` does the same with a single page, and both report it through
+ * `ElementInternals.states`.
  *
- * `value` is the size the control holds and `default-value` is what the markup
- * declared.
- * Changing it announces `helix-before-change`; re-querying and moving back to
- * page one is the consumer's, because only they know whether the reader's
- * position should survive it.
+ * `value` is the current size, and `default-value` is the size from the markup.
+ * Changing it dispatches `helix-before-change`. Re-querying and returning to
+ * page one is up to you, because only you know whether the current position
+ * should be kept.
  *
  * @since 0.1.0
  * @status stable

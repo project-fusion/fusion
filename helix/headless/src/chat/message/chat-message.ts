@@ -24,16 +24,13 @@ export const FAILED_LABEL = 'Not sent'
  * @summary One turn in a conversation, with its state, such as sending or failed.
  *
  * @description
- * **The states are the component.** Bubbles are paint; what a chat message has
- * to carry is whether it is on its way, arrived, still arriving, or failed, and
- * a failed message needs a retry that is a real action rather than a toast the
- * reader has to catch.
+ * A chat message carries its state: sending, arrived, streaming, or failed. A
+ * failed message has a retry control in the message, which fires `helix-send`.
  *
- * `streaming` is the state everything else is arranged around. A message
- * arriving token by token changes height on every frame, so it is marked
- * `aria-busy` while it arrives and announced once when it settles: a screen
- * reader reading a stream character by character is unusable, and announcing on
- * completion is the only version of this that works.
+ * `streaming` is the state the others are arranged around. A streaming message
+ * changes height on every frame, so it is marked `aria-busy` while it arrives
+ * and announced once when it settles. A screen reader cannot follow a stream
+ * read out character by character.
  *
  * @since 0.1.0
  * @status stable

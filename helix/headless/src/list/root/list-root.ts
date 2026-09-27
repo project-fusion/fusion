@@ -6,9 +6,8 @@ import { property } from 'lit/decorators.js'
  * @summary A set of rows, announced as a list.
  *
  * @description
- * `role="list"` on the host, so the rows are counted and announced as "1 of 7"
- * rather than as seven unrelated passages. That count is the whole reason to
- * use a list rather than a stack of divs.
+ * Sets `role="list"` on the host, so a screen reader counts the rows and
+ * announces each one's position, such as "1 of 7".
  *
  * @since 0.1.0
  * @status stable

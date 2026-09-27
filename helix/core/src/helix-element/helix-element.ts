@@ -263,14 +263,14 @@ const LOOK_FOR = 96
  * @summary Base class every Helix element extends.
  *
  * @description
- * Owns only what is universal: normalizing `box-sizing` inside the shadow root,
- * so component CSS can rely on border-box on both sides of the boundary.
+ * Handles only what every component needs: it sets `box-sizing` inside the
+ * shadow root, so component CSS can rely on border-box on both sides of the
+ * boundary.
  *
- * There is deliberately no `emit(name, detail)` helper. A dispatch through a
- * generic helper cannot be named by the manifest analyzer, which recorded the
- * parameter identifier and produced a phantom event on every element that
- * inherited it. Components dispatch concrete event classes from `events.ts`,
- * which the analyzer and TypeScript can both see.
+ * There is no `emit(name, detail)` helper. The manifest analyzer cannot name an
+ * event dispatched through a generic helper, so components dispatch the
+ * concrete event classes from `events.ts`, which the analyzer and TypeScript
+ * can both read.
  *
  * @since 0.1.0
  * @status experimental

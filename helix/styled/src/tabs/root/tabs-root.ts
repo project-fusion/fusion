@@ -7,16 +7,17 @@ import { styles } from './tabs-root.css.js'
  * @summary A row of tabs and the panel each one shows.
  *
  * @description
- * One mark travels between the tabs rather than each of them filling and
- * emptying in turn. A fill that swaps is two things changing at once and reads
- * as a flicker; one that moves is a single object the eye follows, and it says
- * where the current tab was as well as where it is. `Navigation` marks its
- * destinations the same way and for the same reason.
+ * One mark moves between the tabs to show the current one. A moving mark is a
+ * single object that is easy to follow, and it shows where the selection came
+ * from. A fill that switches from tab to tab changes two things at once and
+ * looks like a flicker. `Navigation` marks its destinations the same way.
  *
- * What the mark is depends on `variant`: unset it is a raised pill on the
- * selected tab with nothing behind the row, `underlined` makes it a bar along
- * the bottom of the strip on a rule, and `segmented` grows it to the tab's own
- * box inside a sunken track.
+ * The mark depends on `variant`:
+ *
+ * - Unset, it is a raised pill on the selected tab, with nothing behind the
+ *   row.
+ * - `underlined` makes it a bar along the bottom of the strip, on a rule.
+ * - `segmented` makes it the size of the tab's box, inside a sunken track.
  *
  * @since 0.1.0
  * @status stable

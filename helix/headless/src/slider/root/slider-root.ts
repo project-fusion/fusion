@@ -13,30 +13,27 @@ import { property } from 'lit/decorators.js'
  * @summary A value chosen from a range by dragging.
  *
  * @description
- * A real `<input type="range">`, so the drag, the arrow keys, Home and End, the
- * page keys and the touch target are the platform's. The last is the one nobody
- * notices: a native range has a hit area larger than its thumb, sized by the
- * platform for a finger.
+ * Renders a native `<input type="range">`, so the drag, the arrow keys, Home,
+ * End, the page keys, and the touch target come from the platform. A native
+ * range has a hit area larger than its thumb, sized for a finger.
  *
- * **The value is a string, like every other form control's.** A range submits
- * text and `MixinControllerValue` holds text, so the number is a reading of the
- * value. `valueAsNumber` is there for arithmetic.
+ * The value is a string, like every other form control's, and
+ * `MixinControllerValue` holds text. Use `valueAsNumber` for arithmetic.
  *
- * **Marks are drawn rather than left to `<datalist>`**, whose ticks cannot be
- * styled and which Firefox does not render for a range at all. A mark is
- * decoration; what a reader can land on is `step`, which the input enforces
- * whether or not anything is drawn. `markers` is a count rather than a flag, so
- * a slider from zero to a hundred cannot silently ask for a hundred and one.
+ * Marks are drawn by the component. The ticks of a `<datalist>` cannot be
+ * styled, and Firefox does not render them for a range. Marks are decoration.
+ * `step` sets where the value can land, and the input enforces it whether or
+ * not marks are drawn. `markers` is a count, so a slider from zero to a hundred
+ * does not draw a hundred and one marks by accident.
  *
- * **A range is two of them.** There is no native two-thumb range, so two are
- * stacked on one track and each thumb keeps its own.
+ * A range with two thumbs is two inputs stacked on one track, because there is
+ * no native two-thumb range. Each thumb keeps its own value.
  *
- * **`required` arrives with the field mixin and cannot fail here**, which is
- * worth saying rather than leaving a reader to find. A range is never empty:
- * the platform shows its own midpoint whatever is set, and `willUpdate` seeds
- * that midpoint into `defaultValue` so the value agrees with the handle from the
- * first render. HTML does not apply `required` to a range either, so it stays
- * off the control and the marker beside the label is all it does.
+ * `required` comes with the field mixin and cannot fail. A range is never
+ * empty: the platform shows its midpoint when no value is set, and `willUpdate`
+ * seeds that midpoint into `defaultValue`, so the value matches the handle from
+ * the first render. HTML does not apply `required` to a range either, so it is
+ * not set on the input. It only adds the marker beside the label.
  *
  * @since 0.1.0
  * @status stable

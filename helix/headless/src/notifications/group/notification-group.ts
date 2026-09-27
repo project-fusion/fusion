@@ -12,24 +12,19 @@ const LABEL_ID = 'label'
  * them.
  *
  * @description
- * **What groups with what is the consumer's, and this never guesses.** A feed
- * can be cut by day, by the thing being talked about, by the person doing the
- * talking, or by nothing at all, and which of those is right is a question about
- * the product. So a group is written by hand around the rows that belong
- * together and told what to call itself, exactly as `FilterField` is told what
- * its operators are.
+ * You decide what goes in each group. A feed can be grouped by day, by subject,
+ * by person, or not at all, so you write a group around the rows that belong
+ * together and give it a `label`, the same way you give `FilterField` its
+ * operators.
  *
- * **Collapsed shows the first row and assigns the rest nowhere.** Not `hidden`,
- * not `inert`, not a stylesheet: the slot is assigned imperatively, so a
- * collapsed group's later rows are absent from the layout and from the
- * accessibility tree with no CSS at all, which is what the headless tier claims
- * for itself. `Notifications` already assigns its list this way and this borrows
- * the mechanism.
+ * A collapsed group shows its first row and assigns the rest to no slot. The
+ * slot is assigned imperatively, so the later rows are absent from the layout
+ * and from the accessibility tree without any CSS. `Notifications` assigns its
+ * list the same way.
  *
- * The count is separate from how many rows are written, because it usually is: a
- * group saying five with one row under it and a link to the rest is the common
- * shape, and computing the number from the children would make that unsayable.
- * Left off, it is the number of rows.
+ * `count` is set separately from the rows, so a group can show a count of five
+ * with one row under it and a link to the rest. When `count` is not set, it is
+ * the number of rows.
  *
  * @since 0.24.0
  * @status stable

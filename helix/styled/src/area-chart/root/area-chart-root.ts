@@ -10,37 +10,25 @@ import '../../tooltip/index.js'
  * @summary A chart that shows how a total is made up over time, as bands stacked on one another.
  *
  * @description
- * The bands take the series palette in order, the first column at the bottom,
- * so a legend beside the chart names them in the order they are stacked.
+ * The bands take the series palette in order, with the first column at the
+ * bottom, so a legend lists them in stacking order.
  *
- * Each band is a pale fill with its top edge drawn at the series' full color.
- * The fills are mixed toward the page rather than made translucent, because
- * the bands overlap where they are drawn and a translucent one would show the
- * others through it.
+ * Each band is a pale fill with its top edge in the series' full color. The
+ * fills are mixed toward the page background, because translucent bands would
+ * show each other where they overlap.
  *
- * **No visual axis applies here, and that is the answer rather than a gap.**
- * Both refusals are geometric and both were argued in the stylesheet before
- * they were argued anywhere a reader looks.
+ * **The chart supports neither the `emphasis` nor the `material` axis.**
  *
- * `emphasis` is which of a family's two marks carries the reading, and here
- * neither can give way. The fill is the value, a band's thickness being its
- * amount, and the edge is the boundary, which is why it is drawn at full color
- * over a pale fill rather than left to two pale fills meeting. Every point on
- * the axis moves one at the other's expense: `outlined` thins the fill until
- * the chart is a set of cumulative lines, which is `LineChart` and is the form
- * this one exists because a reader cannot read shares off; `solid` takes the
- * fill to the series' own color, which is the edge's color, so the boundary
- * disappears into the band it bounds. `LineChart` can take the axis because its
- * wash is optional there, `area` deciding whether one is drawn at all.
+ * - `emphasis`: the fill shows the value and the edge shows the boundary, and
+ *   both need to stay. `outlined` would thin the fill into cumulative lines,
+ *   which is `LineChart`. `solid` would fill the band in the edge color, so the
+ *   boundary would disappear.
+ * - `material`: a band covers everything under its top edge, so a translucent
+ *   band would show the bands behind it as a color outside the palette.
+ *   `LineChart` has no `wash` for the same reason.
  *
- * `material` is what reads through a mark, and a band cannot let anything
- * through. Each is drawn as everything under its top edge with the next one
- * down covering the rest, so a translucent band shows the bands behind it and
- * reads as a third color that is in no palette. That is `LineChart`'s recorded
- * reason for refusing `wash`, met here from the other side. The strength of a
- * fill is still adjustable and is `--area-chart-fill-strength`, which is a
- * continuum rather than an axis and is a theme's business rather than a
- * reader's.
+ * To change the strength of the fills, set `--area-chart-fill-strength` in your
+ * theme.
  *
  * @since 0.1.0
  * @status stable

@@ -10,13 +10,13 @@ import { styles } from './checkbox-root.css.js'
  * @summary A box that is checked, unchecked, or indeterminate.
  *
  * @description
- * The box is the native input with its own drawing switched off, so the control
- * stays a control for anything reading the page while the tick and the
- * indeterminate dash are drawn here, as masks over a mark beside it, and their
- * weight, color and motion are the design system's rather than the browser's.
+ * The box is the native input with its own drawing turned off, so it stays a
+ * real control for assistive technology. The tick and the indeterminate dash
+ * are masks over a mark beside it, and their weight, color, and motion come
+ * from the design system.
  *
- * The label sits beside it and the whole thing is the click target, which is
- * what a native `<label>` wrapping a checkbox gives and what a reader expects.
+ * The label sits beside the box, and the whole component is the click target,
+ * as with a native `<label>` wrapping a checkbox.
  *
  * @since 0.1.0
  * @status stable

@@ -77,30 +77,29 @@ const clock = (seconds: number): string => {
  * @summary A video player with controls drawn by Helix.
  *
  * @description
- * **The picture is a real `<video>`.** Decoding, buffering, captions, Picture
- * in Picture, AirPlay and whatever codecs a device has are the platform's. What
- * is replaced is the control bar, which is the one part that cannot be styled.
+ * The picture is a native `<video>`, so decoding, buffering, captions, Picture
+ * in Picture, AirPlay, and codecs come from the platform. The component
+ * replaces the control bar, because the native bar cannot be styled.
  *
- * **Every control is a real control.** The scrubber and the volume are
- * `<input type="range">`, so arrow keys, Home and End, the platform's touch
- * target and its screen reader announcement all come for free.
+ * The scrubber and the volume are `<input type="range">` elements, so arrow
+ * keys, Home and End, touch targets, and screen reader announcements work as
+ * they do natively.
  *
- * **Native controls are the fallback, not the default.** Where a consumer sets
- * `controls` the browser's bar is used and this one is not drawn, and the keys
- * below are not bound: two handlers on one press is a video that seeks twice.
+ * When you set `controls`, the browser's control bar is used, the Helix bar is
+ * not drawn, and the keys below are not bound, so a key press does not seek
+ * twice.
  *
- * The keys are the ones every player uses: Space and `k` to play or pause, the
- * arrows to seek and to change volume, `m` to mute, `f` for fullscreen. They
- * are bound on this element rather than on the document, because a video is not
- * a palette.
+ * The keys match other players, and they are bound on the element only:
+ * - Space and `k` play or pause.
+ * - The arrow keys seek and change the volume.
+ * - `m` mutes.
+ * - `f` toggles fullscreen.
  *
- * **`<source>` and `<track>` are copied into the video, never slotted into it.**
- * A media element runs resource selection over its own child *nodes*, and a slot
- * is one node, so slotted sources reach it as nothing: no text tracks, no
- * current source, `readyState` zero. A video given sources that way does not
- * merely lack captions, it does not play. They are copied rather than moved,
- * because the consumer's light DOM is theirs, and rebuilt whenever the slot
- * changes.
+ * `<source>` and `<track>` children are copied into the video. A media element
+ * selects resources from its own child nodes, and a slot is one node, so
+ * slotted sources would give the video no text tracks, no current source, and a
+ * `readyState` of zero, and it would not play. They are copied so your light
+ * DOM stays intact, and are copied again whenever the slot changes.
  *
  * @since 0.1.0
  * @status stable

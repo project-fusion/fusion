@@ -7,12 +7,12 @@ import { styles } from './filter-operator.css.js'
  * @summary One way a filter can compare a field to its values.
  *
  * @description
- * A declaration rather than a control: it renders nothing, and the field it is
- * written under reads it. The headless note carries the model, including why the
- * words are the consumer's and never this element's.
+ * Declares an operator. It renders nothing, and the field it is written under
+ * reads it. The headless element documents the model, including why the
+ * operator words are yours.
  *
- * The stylesheet is one rule and it is a guard rather than a look, for the
- * reason `FilterField`'s note gives.
+ * The stylesheet has one rule, `display: none`, as a guard, for the reason
+ * given on `FilterField`.
  *
  * @since 0.23.0
  * @status stable

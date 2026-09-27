@@ -12,28 +12,21 @@ import '../../button/index.js'
  * @summary One stage in a sequence.
  *
  * @description
- * **The name is a button, and only the name.** The marker is `aria-hidden`
- * decoration, so wrapping it would add hit area and no meaning. It is `Button`
- * rather than a `<button>` this element resets: the hover wash, the focus ring
- * and the disabled treatment are decisions the button carries.
+ * Only the step's name is a button. The marker is `aria-hidden` decoration, so
+ * it is outside the button. The name uses `Button`, so the hover wash, the
+ * focus ring, and the disabled style come from `Button`.
  *
- * **It says nothing about where a reader may go.** Every step is pressable and
- * announces itself with `helix-select`; refusing the ones ahead is `disabled`,
- * which the consumer sets, because only they know whether a form can be
- * skipped.
+ * Every step can be pressed and fires `helix-select`. To stop the user from
+ * moving to a step, set `disabled` on it.
  *
- * **The marker is a slot whose fallback is the state.** A finished stage shows
- * a check, the current one a target, one not yet reached an empty ring. Exactly
- * one is rendered, chosen from the step's own two booleans, rather than three
- * with two hidden in CSS: the accessibility tree would otherwise carry marks
- * that are not there.
+ * The marker is a slot, and its fallback shows the step's state: a check for a
+ * finished stage, a target for the current stage, and an empty ring for a stage
+ * not reached yet. Only that one mark is rendered, so the accessibility tree
+ * has no hidden marks.
  *
- * **The two half lines either side of the mark are a sheet's, on `::before` and
- * `::after` of the step.** Both are placed entirely from properties the list
- * hands down, so there was nothing about them for a box to carry, and this tier
- * ships no CSS: a box it rendered for one to paint would be an empty child
- * costing whatever the consumer's own layout charges for a child. `ListItem`
- * measured that.
+ * The half lines on each side of the mark are drawn on the step's `::before`
+ * and `::after` from properties the list sets, so the step renders no extra
+ * element for them.
  *
  * @since 0.1.0
  * @status stable

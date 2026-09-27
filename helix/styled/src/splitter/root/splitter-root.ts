@@ -8,32 +8,23 @@ import { styles } from './splitter-root.css.js'
  * @summary Two panes and a divider that you can move.
  *
  * @description
- * The divider is a line to look at and a box to hit, and they are different
- * sizes. Drawn at the border's own width it is a one pixel pointer target, which
- * is the fault every hand-rolled splitter has; the line is a border and the
- * target is the box around it.
+ * The divider's line and its pointer target are different sizes. The line is a
+ * border, and the target is the larger box around it.
  *
- * It lights on hover before it is touched, because a hairline says nothing about
- * being movable, and the whole target lights rather than the line, so the thing
- * that answers the pointer is the thing that changed.
+ * The whole target lights on hover, so you can see that the divider moves
+ * before you drag it.
  *
- * Both panes scroll and both have their minimum size taken off them. A flex
- * item's floor is its content, so a pane holding anything scrollable would
- * otherwise refuse to go below it: the divider would stop at a width nobody
- * asked for and nothing would say why.
+ * Both panes scroll, and both have their minimum size removed. Without this, a
+ * pane holding scrollable content could not shrink below its content, and the
+ * divider would stop early with no visible reason.
  *
- * The corner where a nested splitter crosses is twice the divider's target,
- * because it is aimed at as a point rather than a line. It draws nothing of its
- * own: the `move` cursor already says what it is, at the moment a reader is on
- * it. A ring on focus is the exception, since with nothing drawn there would
- * otherwise be no way to see where the keyboard is.
+ * The corner where a nested splitter crosses is twice the divider's target
+ * size, because you aim at a point. It draws nothing except a focus ring, and
+ * the `move` cursor shows what it is.
  *
- * A divider stays lit for as long as it is moving, which `:hover` cannot say on
- * its own: a drag captures the pointer, and a corner moves the nested divider
- * while the reader is nowhere near it. It goes primary while it moves rather
- * than merely darker, because hover is a question and a drag is an answer, and
- * because a corner moving two dividers at once needs the pair to read as one
- * gesture.
+ * A divider stays lit while it moves, including while a drag captures the
+ * pointer and while a corner moves it. It uses the primary color while moving,
+ * so the two dividers a corner moves look like one gesture.
  *
  * @since 0.1.0
  * @status stable

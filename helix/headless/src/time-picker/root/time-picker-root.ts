@@ -34,37 +34,28 @@ const isTwelveHour = (locale?: string): boolean =>
  * @summary A control for choosing a time from a list or from wheels.
  *
  * @description
- * **A list rather than three wheels**, and the reason is what a list already
- * is. `Listbox` brings the keyboard, the typeahead, the scroll into view and
- * the announcement of a set of options, and a time at a step is a set of
- * options. Three little wheels for hours, minutes and a meridiem are three
- * controls to build, three to test, and a tab stop each for something a reader
- * answers once.
+ * Shows the times at each `step` as a `Listbox`, which provides the keyboard
+ * behavior, typeahead, scrolling into view, and announcements for a set of
+ * options. `variant="wheels"` shows a column each for the hour, the minute, and
+ * the meridiem.
  *
- * **A step is what makes it a list at all.** Fifteen minutes is ninety-six rows,
- * which a reader scrolls or types into; one minute is one thousand four hundred
- * and forty, which is a listbox in name only. So the list is for the times a
- * product actually offers, and arbitrary times are the field's job in Input
- * Time, the same division Date Input draws between typing a date and using the
- * calendar.
+ * The step keeps the list usable. At the default of 15 minutes a day is 96
+ * rows, which people can scroll or type into. At 1 minute it is 1,440. Use the
+ * list for the times your product offers, and Time Input for any time, the same
+ * way Date Input separates typing a date from picking one on the calendar.
  *
- * **The value is `HH:mm` on a twenty-four hour clock, always.** That is what a
- * form submits and what `min` and `max` compare against, and it sorts as a
- * string, which is the whole reason the shape is that one. What each row *says*
- * is the reader's own convention, from `Intl`.
+ * The value is always `HH:mm` on a 24-hour clock. A form submits that shape,
+ * `min` and `max` compare against it, and it sorts as a string. Each row's text
+ * follows the person's own conventions, from `Intl`.
  *
- * **The chosen row is marked in the markup, not worked out on upgrade.** The
- * listbox is handed the answer as `.value`, and lit-ssr serializes no property
- * binding, so a served `value="09:30"` shipped ninety-six rows with nothing on
- * any of them saying which one it was: the mark arrived when the listbox
- * upgraded and ran `place`. So each option is given `selected` as well, which
- * is an attribute binding and does serve, and which the listbox then agrees
- * with rather than fights, `place` writing the same answer from the same value.
- * `selected` is the declaration a consumer writes on `Option` anywhere else in
- * the library, and Date Picker expresses its own choice as markup for the same
- * reason: a picker whose answer is invisible until a script runs is a picker
- * whose answer is not served at all. Both readings do it, the list and the
- * wheels, a wheel being a listbox like the list is.
+ * The chosen row is marked in the served markup. The listbox gets the answer as
+ * `.value`, and Lit SSR serializes no property binding, so without more the 96
+ * served rows would carry no mark until the listbox upgrades and runs `place`.
+ * Each option also gets `selected`, an attribute binding that does serialize,
+ * and `place` then writes the same answer from the same value. This is the same
+ * `selected` you write on `Option` elsewhere in Helix, and Date Picker marks
+ * its choice in markup for the same reason. The list and the wheels both do
+ * this, because each wheel is also a listbox.
  *
  * @since 0.1.0
  * @status stable

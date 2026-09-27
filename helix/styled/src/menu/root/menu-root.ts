@@ -11,11 +11,11 @@ import { styles } from './menu-root.css.js'
  * @summary A menu of commands that opens from a trigger.
  *
  * @description
- * The surface is in the top layer, so it needs no `z-index` and cannot be
- * clipped by whatever it sits inside.
+ * The surface is in the top layer, so it needs no `z-index` and its container
+ * cannot clip it.
  *
- * A submenu replaces the page rather than opening beside it, so the panel stays
- * one panel and reads the same on a phone as on a desk.
+ * A submenu replaces the current page, so the menu stays one panel and works
+ * the same on a phone as on a desktop.
  *
  * @since 0.1.0
  * @status stable

@@ -25,20 +25,20 @@ let showing: HelixHeadlessMegamenu | undefined
  * @summary A section of a navigation with a trigger that opens a panel of links.
  *
  * @description
- * **A disclosure, not a menu, and that is the whole design.** `role="menu"` and
- * `menuitem` are for an application's commands: they take over the arrow keys,
- * announce "menu" to a reader who asked for navigation, and put every link
- * inside a role that is not a link. This is a button that shows and hides a
- * region of the consumer's own anchors, which leaves a middle click, a modified
- * click and the status bar working. `Menu` remains right for a row of commands.
+ * A disclosure: a button that shows and hides a region of your own links. It
+ * does not use `role="menu"` or `menuitem`, which are for application commands.
+ * Those roles take over the arrow keys, announce "menu" to someone looking for
+ * navigation, and put every link inside a role that is not a link. As a
+ * disclosure, middle clicks, modified clicks, and the status bar keep working.
+ * Use `Menu` for a row of commands.
  *
- * **It renders no links.** A router renders its own anchor and cannot render
- * one inside this shadow root, so the panel is a slot and what goes in it is
- * the lists and headings the consumer wrote.
+ * It renders no links. A router renders its own anchors and cannot render them
+ * inside this shadow root, so the panel is a slot for the lists and headings
+ * you write.
  *
- * **It opens on hover, and a press is always the fallback.** `open-on` says
- * which, and hover is the resting value because a nav bar is where a reader
- * expects to sweep along a row and see each section.
+ * It opens on hover by default, and a press always opens it too. `open-on` sets
+ * which. Hover is the default because in a navigation bar people expect to move
+ * along the row and see each section.
  *
  * @since 0.1.0
  * @status stable

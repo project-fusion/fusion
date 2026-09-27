@@ -8,9 +8,8 @@ import { styles } from './empty-root.css.js'
  * @summary A message that a region has nothing in it, and the next step to take.
  *
  * @description
- * Centered and given room, because an empty view is the only thing on screen
- * and crowding it against the top edge makes the region look broken rather than
- * empty.
+ * Centered with space around it. An empty view is the only thing on screen, and
+ * pressed against the top edge it looks broken.
  *
  * @since 0.1.0
  * @status stable

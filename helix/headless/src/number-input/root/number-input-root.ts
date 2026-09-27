@@ -40,31 +40,24 @@ const SCRUB_FINE = 16
  * @summary A field for a number, typed or changed with step buttons.
  *
  * @description
- * **A family rather than `Input`'s `type="number"`.** It renders two buttons,
- * binds four keys `Input` does not, and owns clamping and stepping, so it is an
- * alternative and not a variant.
+ * A separate family from `Input`'s `type="number"`. It renders two buttons,
+ * binds four keys `Input` does not, and handles clamping and stepping.
  *
- * **The field is `type="text"` with `inputmode="decimal"`, and that is a
- * measurement.** Asked of a real browser, `type=number` fails three ways this
- * control cannot live with:
+ * The field is `type="text"` with `inputmode="decimal"`. Tested in a real
+ * browser, `type="number"` fails in three ways:
+ * - Typing `12e` gives a `.value` of `""`, so the element cannot see what you
+ *   typed. A `type="text"` field keeps `"12e"`.
+ * - The mouse wheel over a focused field changes the value, for example from 5
+ *   to 4, when you only meant to scroll the page.
+ * - `selectionStart` is `null`, so the caret cannot be managed.
  *
- * ```
- * typed "12e" into type=number  → .value === ""
- * focused, wheeled over it      → 5 became 4
- * selectionStart on type=number → null
- * same keystrokes into type=text → .value === "12e"
- * ```
+ * `inputmode="decimal"` keeps the numeric keypad on phones.
  *
- * The first is fatal alone: the element cannot see what the reader typed. The
- * second changes a value because a page scrolled past. The third means the
- * caret cannot be managed at all. `inputmode` keeps the phone keypad, which is
- * the one thing `type=number` was giving.
- *
- * Validity is still the platform's, through `min`, `max` and `step` mirrored
+ * Validity still comes from the platform: `min`, `max`, and `step` are mirrored
  * onto the host's own `setValidity`.
  *
- * **Stepping is separate from typing**, so a reader mid-way through a number is
- * not corrected under their hands.
+ * Stepping is separate from typing, so a number is not corrected while you type
+ * it.
  *
  * @since 0.1.0
  * @status stable

@@ -7,10 +7,9 @@ import { styles } from './toast-item.css.js'
  * @summary One message in the toast region.
  *
  * @description
- * A surface with a shadow, because a toast sits over whatever the reader was
- * looking at rather than in it. The severity is a bar down the leading edge and
- * not a fill: a message is text to be read, and a colored panel behind it
- * costs contrast for something the mark already says.
+ * A surface with a shadow, because a toast sits over the page content. The
+ * severity is a bar along the leading edge, so the message text keeps full
+ * contrast on the surface.
  *
  * @since 0.1.0
  * @status stable

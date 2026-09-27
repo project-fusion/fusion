@@ -8,10 +8,9 @@ import { styles } from './stat-group.css.js'
  * @summary A row of related measurements.
  *
  * @description
- * Wraps rather than scrolls, and each figure keeps its own width instead of
- * every one taking an equal share: a set of figures is read by comparing them,
- * and equal columns make a four-digit number and a two-digit one look like the
- * same quantity.
+ * Stats wrap onto a new line when space runs out, and each figure keeps its own
+ * width. Figures are read by comparing them, and equal columns would make a
+ * four-digit number and a two-digit one look like the same quantity.
  *
  * @since 0.1.0
  * @status stable

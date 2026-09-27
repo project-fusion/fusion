@@ -7,13 +7,14 @@ import { styles } from './filter-chip.css.js'
  * @summary One active filter: a field, a comparison, and the values it is compared to.
  *
  * @description
- * Three segments and a control, drawn so the reader's eye lands on the values.
- * The field is the quietest of the three because it is the part they already
- * know, having picked it; the values carry the weight, because a bar of these is
- * scanned for what the filters are set to rather than for what they are on.
+ * Draws three segments and a remove control, with the values most prominent.
+ * The field is the quietest segment, because the user picked it. The values
+ * carry the most weight, because a row of chips is scanned for what each filter
+ * is set to.
  *
- * The operator segment is drawn only where there is one, which is what keeps the
- * common chip free of jargon. See the headless note, which records the rule.
+ * The operator segment is drawn only when there is an operator, so the common
+ * chip shows only the field and the values. The headless element documents the
+ * rule.
  *
  * @since 0.23.0
  * @status stable

@@ -74,16 +74,15 @@ const kind = (file: File): string => {
  * @summary A field for choosing files from a picker or by dropping them on it.
  *
  * @description
- * **A real `<input type="file">`, kept and made invisible rather than
- * replaced.** It is the only way to open a file picker: the dialog is a
- * privileged action a script cannot start on its own, and it opens for a click
- * on the input or on a `<label>` pointing at it. A component that draws its own
- * button calls `.click()` on a hidden input anyway, and then has two things a
- * screen reader can find where there is one control.
+ * File Input keeps a real `<input type="file">` and makes it invisible. Only a
+ * file input opens the file picker: the browser opens it for a click on the
+ * input or on a `<label>` that points at it, and a script cannot open it on its
+ * own. A custom button would still call `.click()` on a hidden input, and a
+ * screen reader would find two controls.
  *
- * So the input stays, holding the label, the name, the validity and the focus,
- * and the visible trigger is a `<label for>`. A label is not focusable and does
- * not need to be: the input is, and Enter and Space on it open the picker.
+ * The input holds the label, the name, the validity, and the focus, and the
+ * visible trigger is a `<label for>`. The label is not focusable. The input is,
+ * and Enter and Space on it open the picker.
  *
  * @since 0.1.0
  * @status stable

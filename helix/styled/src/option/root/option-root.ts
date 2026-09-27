@@ -7,10 +7,9 @@ import { styles } from './option-root.css.js'
  * @summary One choice in a listbox.
  *
  * @description
- * Two states that look different on purpose: chosen, which is a fact about the
- * value, and active, which is where the keyboard is. A list that draws them the
- * same way leaves a reader arrowing through it unable to tell what they have
- * picked from what they are looking at.
+ * Selected and active look different. Selected is the value, and active is
+ * where the keyboard is. If both looked the same, you could not tell what you
+ * picked from where you are while moving through the list with the arrow keys.
  *
  * @since 0.1.0
  * @status stable

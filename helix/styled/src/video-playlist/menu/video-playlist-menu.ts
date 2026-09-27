@@ -10,21 +10,19 @@ import '../../menu/index.js'
  * @summary The playlist's entries, as a menu inside the player's control bar.
  *
  * @description
- * Presentation only: a control-bar button drawn like the ones beside it, and a
- * menu that opens over the picture rather than under it. The base class holds
- * where the playlist is, what the entries are, and what choosing announces.
+ * Styles the trigger as a control-bar button like the ones beside it, and opens
+ * the menu over the video. The base class holds the link to the playlist, the
+ * entries, and what a screen reader announces when you choose one.
  *
- * The trigger's declarations are `Video`'s control rule written out a second
- * time, which is not duplication that could be avoided. That rule is
- * `[part="controls"] :where(a, button)` inside `Video`'s shadow root, and this
- * element sits in its light DOM: a shadow rule reaches an assigned node only
- * through `::slotted()` and never reaches into the node's own shadow root at
- * all. So the button here is two boundaries away from the rule that styles
- * every button beside it, and the same tokens are what make the two agree.
+ * The trigger repeats the declarations of `Video`'s control rule,
+ * `[part="controls"] :where(a, button)`. That rule is inside `Video`'s shadow
+ * root, and this element is in its light DOM. A shadow rule reaches a slotted
+ * node only through `::slotted()` and never reaches into that node's own shadow
+ * root, so the rule cannot style this button. Shared tokens keep the two
+ * buttons consistent.
  *
- * Color is inherited rather than named, so the bar's own color arrives on
- * its own. `--video-playlist-menu-color` is there for the case where it should
- * not.
+ * Color is inherited from the control bar. To set a different color, use
+ * `--video-playlist-menu-color`.
  *
  * @since 0.1.0
  * @status stable

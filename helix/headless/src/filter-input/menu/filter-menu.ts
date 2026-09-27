@@ -14,10 +14,9 @@ import '../../menu/index.js'
  * @summary A menu for building a filter by picking a field and checking its values.
  *
  * @description
- * **It reads the declarations and renders a menu.** A consumer writes their
- * fields as `FilterField`s inside this, and what comes out is a two level menu:
- * the fields, and under each one its comparisons and its values. Nothing here
- * knows what a field means, which is the line `FilterField` already draws.
+ * Reads the `FilterField` declarations inside it and renders a two-level menu:
+ * the fields, and under each field its operators and values. The menu does not
+ * interpret what a field means.
  *
  * ```html
  * <helix-headless-filter-menu label="Filter">
@@ -27,33 +26,36 @@ import '../../menu/index.js'
  * </helix-headless-filter-menu>
  * ```
  *
- * That field declares no comparisons and so is offered `is any of` and `is none
- * of`, which are the two the typed grammar can say. The menu and the text end up
- * offering the same filters because both read `FilterField.vocabulary`, and a
- * consumer whose field needs other words declares them there.
+ * That field declares no operators, so it offers `is any of` and `is none of`,
+ * the two the typed grammar supports. The menu and the typed text offer the
+ * same filters because both read `FilterField.vocabulary`. Declare other
+ * operators on the field when you need them.
  *
- * **A tick is a filter, immediately.** There is no Apply: ticking a value
- * announces the field's whole set as it now stands, so a queue narrows as the
- * reader works rather than after they have finished. Unticking the last value
- * announces an empty set, which is a consumer's cue to drop the chip.
+ * Ticking a value applies the filter immediately. There is no Apply button.
+ * Each tick fires `helix-facet` with the field's whole set of values, so
+ * results narrow as the user works. Unticking the last value fires an empty
+ * set, which is your cue to remove the chip.
  *
- * **The operator is chosen here and written nowhere else.** `helix-facet` carries
- * `operatorLabel` empty when the comparison is the field's default, which is
- * exactly what a chip's `operator-label` wants: the segment appears only where
- * somebody picked something worth noticing. Deciding it here is the point, since
- * this is the only thing that has read both the field and its operators.
+ * The operator is chosen in the menu. `helix-facet` carries an empty
+ * `operatorLabel` when the operator is the field's default, which is the value
+ * a chip's `operator-label` expects, so the operator segment appears only for a
+ * non-default choice. The menu decides this because it is the only element that
+ * reads both the field and its operators.
  *
- * **How many values a comparison takes decides what is under it.** A field
- * whose comparison is `arity="none"`, `is empty` or `is set`, is offered no
- * values at all and gives back any that were ticked: the comparison is the whole
- * filter. One at `arity="one"` offers its values as a single choice, so pressing
- * another replaces it and pressing the one already on clears it. Both announce
- * `arity` in the facet, which is what lets a consumer tell an empty filter from
- * no filter at all.
+ * An operator's `arity` sets what appears under it:
  *
- * **It applies nothing.** The chips are the consumer's markup and the rows are
- * their data, so this announces and stops, the way `Notification` reports a read
- * rather than inventing one. Refusing `helix-facet` refuses the change.
+ * - `arity="none"`, such as `is empty` or `is set`, offers no values and clears
+ *   any that were ticked. The operator is the whole filter.
+ * - `arity="one"` offers the values as a single choice. Pressing another value
+ *   replaces the choice, and pressing the chosen value clears it.
+ *
+ * `helix-facet` includes `arity`, so you can tell an empty filter from no
+ * filter.
+ *
+ * The menu applies nothing. The chips are your markup and the rows are your
+ * data, so the menu fires the event and leaves the change to you, as
+ * `Notification` does for a read. Call `preventDefault()` on `helix-facet` to
+ * cancel the change.
  *
  * @since 0.25.0
  * @status stable

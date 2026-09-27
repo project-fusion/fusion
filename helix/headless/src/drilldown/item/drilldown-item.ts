@@ -8,24 +8,24 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One row of a drill-down, which can open a page of its own.
  *
  * @description
- * A row that opens a page *contains* that page: its rows are this row's own
- * children, assigned to the `page` slot. The tree is the structure, so there
- * are no ids to wire and a consumer who moves a row has moved its page with it.
+ * A row that opens a page contains that page: the page's rows are this row's
+ * own children, assigned to the `page` slot. There are no ids to wire, and
+ * moving a row moves its page with it.
  *
- * **It renders one of three things**, and which one is the stack's business
- * rather than its own. On the page showing, it is a row. Showing its own page,
- * it contributes that page's rows and nothing else, because its row belongs to
- * the page above. On neither, it renders nothing at all: the rows are in the
- * light DOM and come back untouched, so there is no state to keep and nothing
- * to hide with an attribute this element would have to write onto itself.
+ * What the item renders depends on the stack:
  *
- * Choosing is announced, never applied. The row dispatches and the stack
- * decides whether that means drilling in or choosing a command.
+ * - On the page that is showing, it renders its row.
+ * - When its own page is showing, it renders only that page's rows. Its row
+ *   belongs to the page above.
+ * - Otherwise it renders nothing. The rows stay in the light DOM untouched, so
+ *   there is no state to keep.
  *
- * **A row that opens a page says so**, with a caret after its words and
- * `aria-haspopup`, the way `Menu` marks a row with a submenu: a row that goes
- * somewhere and a row that does something otherwise look the same until one is
- * pressed. Not on the server, which cannot see the children and so cannot know.
+ * Choosing a row dispatches an event, and the stack decides whether that drills
+ * in or runs a command.
+ *
+ * A row that opens a page shows a caret after its text and sets
+ * `aria-haspopup`, the same way `Menu` marks a row with a submenu. The server
+ * render leaves both out, because the server cannot see the children.
  *
  * @since 0.1.0
  * @status stable

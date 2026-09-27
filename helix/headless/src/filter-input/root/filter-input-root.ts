@@ -50,80 +50,61 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @summary A text field for filters, with the active filters shown in it as tokens.
  *
  * @description
- * **The tokens are the consumer's own elements, slotted.** What a filter narrows
- * by belongs to the consumer's model rather than to this element: a facet with a
- * prefix, a saved query, a range. So they are slotted rather than rendered from
- * a list of strings, and removing one is a request this element makes rather
- * than a change it applies. Combobox is the other way round, and that is the
- * difference between the two: its tokens are a view of a selection it owns,
- * drawn from options it was handed.
+ * Tokens are your own elements, slotted in. A filter can be a facet with a
+ * prefix, a saved query, or a range, and these belong to your model, so the
+ * element does not render tokens from a list of strings. Removing a token is a
+ * request the element fires, and you apply it. Combobox works the other way:
+ * its tokens show a selection it owns, drawn from the options it was given.
  *
- * **`value` is the text being typed, not the tokens**, which is what makes this
- * a field a consumer can listen to. Every keystroke announces `input` with the
- * text on the element, so a table narrows as the reader types. The tokens need
- * no reporting back, being markup the consumer already holds.
+ * `value` is the typed text. Every keystroke fires `input` with the text on the
+ * element, so a table can narrow as the user types. Tokens are not reported,
+ * because they are markup you already hold. Backspace in an empty field fires
+ * `helix-dismiss` on the last token, the same event its remove control fires,
+ * so one handler covers the pointer and the keyboard.
  *
- * Backspace on an empty field asks the last token to go, through the same
- * `helix-dismiss` its own remove control fires, so a consumer who handled the
- * pointer has already handled the keyboard.
+ * **Typed filters.** The field parses only the fields you declare. Write
+ * `FilterField` elements, usually inside the `FilterMenu` slotted into `start`,
+ * so the picker and the text share one set. On Enter, the field reads the text
+ * against them. `disposition:refunded,settled` and `-disposition:refunded` fire
+ * `helix-facet` exactly as ticking those values in the picker would, and the
+ * parsed text is removed. Everything else stays, so `refund tuesday
+ * disposition:settled` is a filter and a search at once. Helix defines the
+ * punctuation and you define every word. `grammar.ts` has the full rule, so
+ * read it before you rely on it. A field with no `FilterField` in it parses
+ * nothing.
  *
- * **It reads what was declared, and nothing that was not.** Write
- * `FilterField`s (usually inside the `FilterMenu` slotted into `start`, so the
- * picker and the text work off one set), and Enter reads the box against them:
- * `disposition:refunded,settled` and `-disposition:refunded` announce
- * `helix-facet`, exactly as ticking those values in the picker would, and the
- * text they were read from goes. Everything else stays where it was typed, so
- * `refund tuesday disposition:settled` is a filter and a search at once.
- * `grammar.ts` carries the whole rule and is worth reading before relying on it;
- * the short version is that Helix owns the punctuation and the consumer owns
- * every word in it. A field with no `FilterField` in it parses nothing, which is
- * the behavior this had before it could.
+ * A field whose values cannot be listed, such as `assignee:ada`, goes directly
+ * inside this element, outside the menu. It is not assigned to a slot, so
+ * nothing draws it and the menu has no page for it, and the grammar still reads
+ * it.
  *
- * **A field whose values cannot be listed belongs here rather than in the
- * picker.** `assignee:ada` is a filter and nobody wants to enumerate every name
- * in the company, but a menu page for it would have nothing on it to press.
- * Written directly inside this element it is read by the grammar and never
- * offered as a page: unslotted, so nothing draws it, which is the same trick
- * `FilterField` already plays on its own children.
+ * **Suggestions.** Slot options into `suggestions` and the field shows them,
+ * moves through them with the arrow keys, and presses one on Enter. The option
+ * fires its own `helix-select`, and you decide what choosing it means. Keys
+ * before a colon and values after it use the same panel with different
+ * contents. `readFilterText` is exported so you can narrow the panel against
+ * partly typed text. The panel opens when it has options and closes when it has
+ * none, and a choice does not close it, so after picking a key you see its
+ * values next. Use `selectionStart` and `setSelectionRange` to write a
+ * completion back and put the caret after it, or the next parse reads the wrong
+ * term.
  *
- * **It can suggest what to type next, and deciding what to suggest is still the
- * consumer's.** Slot options into `suggestions` and the field shows them, moves
- * through them with the arrows, and lets Enter press one; the option fires its
- * own `helix-select` and the consumer decides what choosing meant. Keys before
- * a colon and values after it are the same panel with different contents, and
- * `readFilterText` is exported for a consumer narrowing that panel against what
- * a reader has half typed.
+ * **State.** Three things have three different owners:
  *
- * **The panel opens when there is something in it and closes when there is
- * not**, rather than on a choice. A reader who picks a key wants its values
- * next, and closing on the choice would shut the panel between two renders. Use
- * `selectionStart` and `setSelectionRange` to write a completion back and put
- * the caret after it, or the next parse reads the wrong term.
- *
- * **Three things here have three different owners.**
- *
- * `value` is the text: the reader types, the element applies it, and `input`
- * says so. **Writing `value` does not take that over.** It is a seed and a
- * correction, so a consumer who sets it and then expects the field to hold
- * still will watch the next keystroke overwrite them.
- * Ownership is taken by refusing `helix-before-change` and writing the value
- * you want, which is the same shape every field in this library uses and is
- * worth saying out loud here because the property looks like React's.
- * `default-value` seeds the field without claiming anything.
- *
- * `open` is the suggestions panel, and it is the ordinary pair: refuse
- * `helix-before-open` or `helix-before-close` to take the decision, and
- * `default-open` to seed it.
- *
- * The tokens are neither, because they are not state. They are the consumer's
- * own elements in a slot, so there is nothing for this to own and nothing to
- * report back: a token goes when the consumer removes it from their markup,
- * having been asked by `helix-dismiss`. **A `FilterChip` naming a declared field
- * is asked differently**, and it has to be: the picker holds what is ticked, so
- * a chip that removed itself without telling it left the value ticked in a list
- * nobody could see was wrong. That dismissal is answered as the field being
- * filtered by nothing, so it arrives as `helix-facet` like every other change
- * and the chip goes because the filter went.
+ * - `value` is the text. The user types, the element applies it, and `input`
+ *   reports it. Setting `value` seeds or corrects the text, and the next
+ *   keystroke overwrites it, even in React. To control the value, cancel
+ *   `helix-before-change` and write the value you want, as with every field in
+ *   this library. `default-value` seeds the field.
+ * - `open` is the suggestions panel. Cancel `helix-before-open` or
+ *   `helix-before-close` to control it, and use `default-open` to seed it.
+ * - Tokens are your elements in a slot and hold no state. A token goes when you
+ *   remove it from your markup after `helix-dismiss`. A `FilterChip` naming a
+ *   declared field works differently, because the picker holds what is ticked
+ *   and removing the chip alone would leave its value ticked in the hidden
+ *   menu. Its dismissal is treated as the field being filtered by nothing, so
+ *   it fires `helix-facet` like every other change, and the chip goes when the
+ *   filter goes.
  *
  * @since 0.1.0
  * @status stable

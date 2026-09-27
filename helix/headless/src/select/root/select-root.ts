@@ -22,19 +22,16 @@ import '../../listbox/index.js'
  * @summary A control that opens a list of options to choose from.
  *
  * @description
- * **A trigger and a `Listbox`, not a listbox reimplemented behind a button.**
- * The list this opens is the same element a consumer can use on its own, with
- * the same keyboard, the same filtering and the same multi-select rules. What
- * Select adds is the closing: a trigger that says what is chosen, a surface
- * that floats, and somewhere for focus to go back to.
+ * A trigger that opens a `Listbox`. The list is the same element you can use on
+ * its own, with the same keyboard behavior, filtering, and multi-select rules.
+ * Select adds a trigger that shows what is chosen, a floating surface, and a
+ * place for focus to return to when the list closes.
  *
- * The options are the consumer's, in the consumer's light DOM, slotted through
- * into the listbox. That is why the listbox walks through slots to find them:
- * from its point of view the options belong to something else.
+ * Your options stay in your light DOM and are slotted through into the listbox,
+ * so the listbox looks through slots to find them.
  *
- * **What it does not do is duplicate the value.** `Select` owns it, hands it
- * down, and takes changes back; the listbox is the thing being operated and not
- * a second place the answer lives.
+ * `Select` owns the value, passes it down to the listbox, and takes changes
+ * back, so the value lives in one place.
  *
  * @since 0.1.0
  * @status stable

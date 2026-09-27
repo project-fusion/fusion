@@ -7,9 +7,8 @@ import { styles } from './toggle-root.css.js'
  * @summary One option in a toggle group.
  *
  * @description
- * Carries no background of its own. The selected look comes from the group's
- * indicator sitting behind it, which is what lets that marker travel instead of
- * one fill appearing as another disappears.
+ * Has no background of its own. The selected look comes from the group's
+ * indicator behind it, which moves between items.
  *
  * @since 0.1.0
  * @status stable

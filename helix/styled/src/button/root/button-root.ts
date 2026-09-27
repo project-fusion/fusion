@@ -9,13 +9,16 @@ import { styles } from './button-root.css.js'
  * @summary Triggers an action, submits a form, or navigates.
  *
  * @description
- * Four appearances, all drawn on one control so a link styled as a button and a
- * real button are indistinguishable to a reader. There are no sizes: a control
- * takes its height from the region it is in, through `data-density`, which is
- * the one size axis in the library and the reason a row of controls cannot come
- * out ragged. The focus ring is declared here rather than inherited, because the
- * base layer's `:focus-visible` rule is a light-DOM rule and stops at the shadow
- * boundary.
+ * Four appearances, all drawn on the same control, so a link styled as a button
+ * looks the same as a real button.
+ *
+ * There are no sizes. A control takes its height from the `data-density` of the
+ * region it is in, so a row of controls lines up. `data-density` is the only
+ * size setting in the library.
+ *
+ * The focus ring is declared in the component's styles, because the base
+ * layer's `:focus-visible` rule applies to the light DOM and stops at the
+ * shadow boundary.
  *
  * @since 0.1.0
  * @status stable

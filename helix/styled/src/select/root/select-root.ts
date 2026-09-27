@@ -18,13 +18,12 @@ import '../../option/index.js'
  * @summary A control that opens a list of options to choose from.
  *
  * @description
- * The trigger wears the same frame as an `Input`, because in a form it stands
- * in a row with them and a control that looks like a button among fields reads
- * as an action rather than an answer.
+ * The trigger uses the same frame as `Input`, so it lines up with the fields
+ * beside it in a form. A trigger that looked like a button would read as an
+ * action.
  *
- * The panel is an overlay surface rather than a sunken one: it sits over the
- * page instead of on it, which is what its shadow says and what tells it apart
- * from the field it came out of.
+ * The panel uses an overlay surface. Its shadow shows that it sits over the
+ * page and sets it apart from the field it opened from.
  *
  * @since 0.1.0
  * @status stable

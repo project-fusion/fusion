@@ -22,24 +22,21 @@ import { styles } from './filter-input-root.css.js'
  * @summary A text field for filters, with the active filters shown in it as tokens.
  *
  * @description
- * The frame is the field rather than the input, so the tokens sit inside the
- * same box as the text and the focus ring is drawn once around the whole
- * control. It grows down a line at a time as tokens are added, which is the
- * arrangement Combobox takes when it is holding a selection.
+ * The frame is drawn around the field, so the tokens sit in the same box as the
+ * text and one focus ring surrounds the whole control. The field grows one line
+ * at a time as tokens are added, as Combobox does when it holds a selection.
  *
- * **The tokens are the consumer's own elements**, so the only thing said about
- * them here is to keep their size and not run past the field. A `Tag` slotted
- * into `tags` already looks like one; anything else looks like whatever it is.
+ * Tokens are your own elements, so the only rule for them keeps their size and
+ * stops them running past the field. A `Tag` slotted into `tags` already looks
+ * like a token.
  *
- * **The suggestion panel is this element's own box, not a listbox's.** Combobox
- * puts a `helix-listbox` in its panel because the options there are a selection
- * it owns; these are the consumer's suggestions, so the panel is a plain
- * `role="listbox"` region and the options pass their own `helix-select`
- * straight through it. That is why this surface scrolls where Combobox's does
- * not: there is no list inside to do it.
+ * The suggestion panel is this element's own box with `role="listbox"`, and the
+ * options pass their own `helix-select` through it. Combobox puts a
+ * `helix-listbox` in its panel, which scrolls, because Combobox owns the
+ * selection. This panel has no list inside it, so the panel itself scrolls.
  *
- * Height comes from the region, like every other control: `data-density` on
- * whatever holds it, not a `size` here.
+ * Height comes from the region, like every other control. Set `data-density` on
+ * a container. The element has no `size`.
  *
  * @since 0.1.0
  * @status stable

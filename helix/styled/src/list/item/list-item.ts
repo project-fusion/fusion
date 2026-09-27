@@ -7,9 +7,8 @@ import { styles } from './list-item.css.js'
  * @summary One row of a list.
  *
  * @description
- * A grid rather than a flex row, so the supporting text lines up under the
- * label rather than under the leading icon. The leading and trailing regions
- * hold their own width and the middle takes the rest.
+ * Laid out as a grid, so supporting text lines up under the label. The leading
+ * and trailing regions keep their own width, and the middle takes the rest.
  *
  * @since 0.1.0
  * @status stable

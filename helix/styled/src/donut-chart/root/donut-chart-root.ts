@@ -11,22 +11,19 @@ import '../../tooltip/index.js'
  * @summary A chart that shows parts of a whole as a ring, read from a table.
  *
  * @description
- * The slices take the series palette in order, so a legend beside it maps the
- * same twenty-four.
+ * The slices take the series palette in order, so a legend beside the chart
+ * uses the same twenty-four colors.
  *
- * The ring starts at twelve o'clock, which is a rotation applied here rather
- * than arithmetic done below: where a reader expects the first slice to begin
- * is a fact about the picture, not about the numbers.
+ * The ring starts at twelve o'clock. The styled tier applies that as a
+ * rotation.
  *
- * A track is drawn under the slices, so a ring whose values do not fill it
- * still reads as a ring with a gap rather than as a broken arc.
+ * A track is drawn under the slices, so when the values do not fill the ring,
+ * the gap shows as part of the ring.
  *
- * **How thick the ring is drawn is `hole`, not a CSS hook.** The stroke's width
- * and the ring's radius have to agree: the outer edge is `r + width / 2`, so
- * setting one in CSS and deriving the other in markup gives a drawing that is
- * wrong in both. Measured with such a hook in place, every ring came out twelve
- * units thick whatever its `hole`, so a pie was a small ring with a hole in it
- * and `large` was drawn larger than the default.
+ * **Set the ring's thickness with `hole`.** There is no CSS hook for it,
+ * because the stroke width and the ring's radius must agree: the outer edge is
+ * `r + width / 2`, and setting one in CSS while the markup derives the other
+ * draws the ring wrong.
  *
  * @since 0.1.0
  * @status stable

@@ -18,26 +18,20 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @summary A stack of pages that shows one at a time, with a back button.
  *
  * @description
- * One panel that changes rather than panels opening beside each other. That is
- * the right shape wherever there is no room for a second column: a phone has
- * none, and a touch screen has no hover to open one with.
+ * One panel whose content changes as you move between pages. Use it where there
+ * is no room for a second column, such as on a phone, or on a touch screen with
+ * no hover to open one.
  *
- * **Not a `Menu`, and the difference is what it is for rather than how it
- * looks.** A menu is a thing that opens from a trigger and closes when it is
- * done; this is a region that sits where it is put, inside a drawer or a
- * sidebar or a settings panel. `Menu` drills too, through the same controller,
- * because a menu deep enough to need pages wants exactly this behavior without
- * being this component.
+ * It is a region that stays where you put it, such as inside a drawer, a
+ * sidebar, or a settings panel. A `Menu` opens from a trigger and closes when
+ * you are done. `Menu` can drill into pages too, through the same controller.
  *
- * **Navigation, never a value.** Rows are places to go and commands to run, so
- * nothing here is form-associated and nothing is submitted. A drill-down that
- * reported a value would be a `Listbox` whose options happen to nest, and that
- * is the component to reach for instead.
+ * Rows are places to go and commands to run. Nothing here is form-associated
+ * and nothing is submitted. To choose a value, use a `Listbox`.
  *
- * **The tree is the state.** A row that opens a page contains that page, so the
- * stack holds one reference and reads the rest from the DOM. See
- * `DrilldownController`, which is where this behavior lives and which `Menu`
- * shares.
+ * A row that opens a page contains that page, so the stack holds one reference
+ * and reads the rest from the DOM. The behavior lives in `DrilldownController`,
+ * which `Menu` shares.
  *
  * @since 0.1.0
  * @status stable

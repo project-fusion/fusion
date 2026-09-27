@@ -28,13 +28,13 @@ const KEYS = new Set([
  * @summary A hierarchy of items, with branches that open and close.
  *
  * @description
- * Focus is a single tab stop, moved with the arrow keys, which is what the tree
- * pattern requires: a sidebar of forty items should not be forty presses of Tab
- * to get past. The tree owns which item is the tab stop and moves it as focus
- * moves, so the browser's own focus order is never fought with.
+ * The tree is a single tab stop, and arrow keys move focus between items, as
+ * the tree pattern requires, so Tab moves past a long sidebar in one press. The
+ * tree moves the tab stop to the focused item, so the browser's focus order
+ * stays intact.
  *
  * Items are found with `instanceof`, never by tag name, so the headless tier
- * does not learn about the styled one.
+ * does not depend on the styled one.
  *
  * @since 0.1.0
  * @status stable

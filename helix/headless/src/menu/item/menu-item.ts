@@ -8,21 +8,19 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One row in a menu: a command, a choice, or a way into a submenu.
  *
  * @description
- * Three shapes, one element, because a reader moving down a menu with the
- * arrow keys does not care which kind each row is and neither should the
- * markup. What it is follows from what it was given: something slotted into
- * `submenu` makes it a way in, `checked` makes it a choice, and neither makes
- * it a command.
+ * One element covers three kinds of row, and what you give it decides which:
+ * - Content in the `submenu` slot makes the row open a submenu page.
+ * - `checked` makes the row a choice.
+ * - With neither, the row is a command.
  *
- * **The role follows the shape.** A row that can be ticked is
- * `menuitemcheckbox` and carries `aria-checked`, because a reader is told "one
- * of these is on" rather than "here is a button"; `exclusive` makes it
- * `menuitemradio`, for a set where only one can be. A row that opens a page
- * keeps `menuitem` and says `aria-haspopup`, since the page it opens is a menu.
+ * The role follows the kind. A row with `checked` is `menuitemcheckbox` with
+ * `aria-checked`, and `exclusive` makes it `menuitemradio`, for a set where
+ * only one can be on. A row that opens a page keeps `menuitem` and sets
+ * `aria-haspopup`.
  *
- * Whether it is on the page showing is set by the menu as a property, never as
- * an attribute: an attribute written onto a consumer's element after it
- * upgrades is a hydration mismatch waiting to happen.
+ * The menu sets whether the row's page is showing as a property, never as an
+ * attribute. An attribute written onto your element after it upgrades causes a
+ * hydration mismatch.
  *
  * @since 0.1.0
  * @status stable

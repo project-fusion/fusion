@@ -45,31 +45,26 @@ const isInsertion = (event: Event): boolean =>
  * @summary A text field that filters a list of options as you type.
  *
  * @description
- * **The list is `Listbox`, and the filtering is its own.** It owns narrowing,
- * the empty state, the highlight, `aria-activedescendant` and scrolling an
- * option into view. What is left for this element is the field, the panel and
- * the traffic between them.
+ * The list is a `Listbox`, which handles filtering, the empty state, the
+ * highlight, `aria-activedescendant`, and scrolling an option into view. This
+ * element handles the field, the panel, and the communication between them.
  *
- * **The text and the value are two things.** What a reader types is a filter:
- * it narrows the list and is thrown away. The value is whichever option they
- * then choose, and the field is rewritten to that option's words once they
- * have. The filter is cleared on close, so a reopened control does not start
- * from the last visit's leftovers.
+ * The typed text and the value are separate. The text is a filter: it narrows
+ * the list and is then discarded. The value is the option you choose, and the
+ * field then shows that option's text. The filter clears on close, so a
+ * reopened combobox starts from the whole list.
  *
- * **Focus stays in the field, which is the whole of what a combobox is.** The
- * arrows move the list without leaving the text, through the listbox's public
- * `navigate`. `role="combobox"` is on the input rather than on a wrapper,
- * because the thing the pattern describes is the text field.
+ * Focus stays in the text field. The arrow keys move through the list with the
+ * listbox's public `navigate` method. `role="combobox"` is on the input itself.
  *
- * **With `multiple`, the chosen options are tags in the field**, one object per
- * answer, each with its own remove control. The panel stays open while more
- * than one can be chosen and the filter clears on each choice, so the next pick
- * starts from the whole list.
+ * With `multiple`, each chosen option is a tag in the field with its own remove
+ * control. The panel stays open and the filter clears after each choice, so the
+ * next choice starts from the whole list.
  *
- * **`creatable` announces, and does not write.** The options are the consumer's
- * light DOM and nothing here puts an element into it: a component that grew the
- * consumer's markup would be one their framework re-renders over. It offers the
- * row and fires the event; adding the option is the consumer's.
+ * With `creatable`, the combobox offers a create row and fires `helix-create`.
+ * It does not add the option. The options are your light DOM, and your
+ * framework would re-render over an element the combobox inserted, so add the
+ * option in your event handler.
  *
  * @since 0.1.0
  * @status stable

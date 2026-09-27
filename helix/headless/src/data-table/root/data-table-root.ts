@@ -44,10 +44,9 @@ import {
  * @summary A table drawn from an array of rows, with sorting, filtering, and paging.
  *
  * @description
- * **The schema is markup and the data is a property.** Columns are declared as
- * `TableColumn` children, because a schema is small and something a reader
- * should see in the HTML; rows are handed over as an array, because a table
- * that draws ten thousand elements cannot window them.
+ * Declare the columns as `TableColumn` children and pass the rows as an array.
+ * The schema stays readable in the HTML, and the rows can be windowed, which
+ * ten thousand row elements cannot be.
  *
  * ```html
  * <helix-headless-data-table .rows=${rows} sort="name:asc" page-size="20">
@@ -56,45 +55,42 @@ import {
  * </helix-headless-data-table>
  * ```
  *
- * `Table` takes rows as markup and is the right component for a table of twelve
- * things a person wrote out.
+ * For a short table written out by hand, use `Table`, which takes rows as
+ * markup.
  *
- * **Sort and filter apply to the whole set, never the page.** Sorting the drawn
- * window is correct on the first screen and wrong on every other one.
+ * Sort and filter apply to the whole set, including the rows on other pages.
  *
- * **The cell values do not server-render.** The headings do, and the row
- * elements do, but reading a cell needs the columns, and the columns are markup
- * children Lit SSR does not hand this element. So a crawler sees a table of the
- * right shape with nothing in it. That is the cost of the first paragraph: use
- * `Table` where the served HTML has to carry the values.
+ * **The cell values do not server-render.** The headings and the row elements
+ * do. Reading a cell needs the columns, and Lit SSR does not pass the column
+ * children to this element, so a crawler sees an empty table of the right
+ * shape. Use `Table` when the served HTML has to carry the values.
  *
- * **`selectable` adds a column of checkboxes, keyed on `row-key`.** A row is
- * selected by its identity rather than its position, so a selection survives a
- * sort, a filter and a page. `selected` is the chosen keys, comma separated, the
- * shape Listbox uses for a multiple choice, and like `sort` writing it applies
- * while `default-selected` is what the markup declared. The box in the heading
- * selects every row in the result, across pages, and shows a dash while only
- * some are chosen.
- * Choosing one of many, rather than several, is opening a row, and that is a
- * link or a button in a cell rather than a selection.
+ * `selectable` adds a column of checkboxes, keyed on `row-key`:
  *
- * **A reader can size and order the columns.** `resizable` on a column puts a
- * separator on its edge; `reorderable` on the table puts a grip on each heading
- * that has a `field`, moved by dragging or with the arrow keys. The order lands
- * in `order` as fields, and the consumer's own markup is never rewritten: the
- * table assigns the headings to its header in that order instead.
+ * - A row is selected by its key, so the selection survives a sort, a filter,
+ *   and a page change.
+ * - `selected` holds the chosen keys, comma separated, the same shape `Listbox`
+ *   uses for a multiple choice. As with `sort`, writing it applies the
+ *   selection, and `default-selected` holds what the markup declared.
+ * - The checkbox in the heading selects every row in the result, across pages,
+ *   and shows a dash while only some are chosen.
  *
- * **`csv()` hands back the result as text**: every row the filter lets through,
- * in the order on screen, in the columns on screen. Saving it is the page's
- * business, the same as any other file.
+ * To act on a single row, such as opening it, put a link or a button in a cell.
  *
- * **There is no `columns` attribute here, and Table has one.** The difference
- * is what a column is in each: here it is the schema, so a table without one
- * has nothing to read a row with, and every column is a place to write a
- * `width`. A Table holds cells a consumer wrote and can be written with no
- * column at all, so its `columns` is where such a table is sized from. Written
- * on this element the attribute is inert, which is the trap worth knowing when
- * moving between the two.
+ * People can resize and reorder the columns. `resizable` on a column puts a
+ * separator on its edge. `reorderable` on the table puts a grip on each heading
+ * that has a `field`, moved by dragging or with the arrow keys. The new order
+ * is written to `order` as a list of fields. Your markup is not rewritten: the
+ * table assigns the headings to its header in that order.
+ *
+ * `csv()` returns the result as text: every row that passes the filter, in the
+ * order and the columns on screen. Saving the file is up to you.
+ *
+ * `DataTable` has no `columns` attribute. Each `TableColumn` is part of the
+ * schema, so you size a column with its own `width`. `Table` has `columns`
+ * because its cells are markup you write and it can have no columns at all.
+ * Written on `DataTable`, `columns` has no effect, so watch for it when you
+ * move a table from `Table` to `DataTable`.
  *
  * @since 0.1.0
  * @status stable

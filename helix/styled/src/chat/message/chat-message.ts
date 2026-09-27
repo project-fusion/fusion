@@ -8,13 +8,12 @@ import { styles } from './chat-message.css.js'
  * @summary One turn in a conversation, with its state, such as sending or failed.
  *
  * @description
- * **`author="me"` is the one piece of paint that says whose turn it is**, and it
- * says it by which edge the turn sits against. Everything else about a turn is
- * the same on both sides, because two bubble styles is two components.
+ * `author="me"` is the only style that shows whose turn it is, and it sets
+ * which edge the turn sits against. Everything else about a turn looks the same
+ * on both sides.
  *
- * A failure is the only state that takes a tone, because it is the one a reader
- * has to find rather than notice. `streaming` is left alone: the text arriving
- * is the signal, and decorating it competes with the thing it is decorating.
+ * Only a failed turn takes a tone, because the user has to find a failure.
+ * `streaming` has no extra style, because the arriving text already shows it.
  *
  * @since 0.1.0
  * @status stable

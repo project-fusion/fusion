@@ -6,23 +6,18 @@ import { property } from 'lit/decorators.js'
  * @summary One way a filter can compare a field to its values.
  *
  * @description
- * **A declaration, not a control.** It renders nothing and is never seen: it is
- * how a consumer says which comparisons their field supports, in markup, beside
- * the values it supports them on. `Field` reads them; the chip shows the one in
- * force; the menu offers the rest.
+ * Declares one operator a field supports. It renders nothing. Write operators
+ * in markup beside the field's values. `FilterField` reads them, the chip shows the
+ * one in use, and the menu offers the rest.
  *
- * **The vocabulary is the consumer's and this element never learns it.** What
- * `is none of` means against a queue of refunds is a question about refunds, so
- * nothing here compares anything or knows what `name` will be handed to. Helix
- * owns the shape a filter has, which is a field, an operator and some values,
- * and owns the interaction that builds one. What the words mean is the domain's,
- * which is the same line `FilterInput` already draws when it declines to learn a
- * grammar.
+ * Helix defines the shape of a filter, which is a field, an operator, and
+ * values, and the interaction that builds one. The meaning of each operator
+ * belongs to your domain: the element compares nothing and does not interpret
+ * `name`.
  *
- * **`default` is what makes a chip readable.** The operator a field is usually
- * filtered by is the one nobody needs told, so a chip drawn with it says only
- * the field and the values. Naming a second operator `default` on one field is a
- * consumer bug and the field reports it rather than guessing.
+ * Mark the field's usual operator `default`. A chip with the default operator
+ * shows only the field and the values. Marking a second operator `default` on
+ * one field is an error, and the field reports it.
  *
  * @since 0.23.0
  * @status stable

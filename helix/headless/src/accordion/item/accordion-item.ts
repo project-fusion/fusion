@@ -27,14 +27,14 @@ const TRIGGER_ID = 'trigger'
  * @summary One collapsible section of an accordion.
  *
  * @description
- * Carries its own open state, which is why it is an element rather than a slot.
- * Used alone, outside an accordion, it is a disclosure.
+ * Holds its own open state. Used alone, outside an accordion, it works as a
+ * disclosure.
  *
- * Content stays mounted when closed, so it can animate and so the text is
- * present in server-rendered HTML. Closed content carries both `hidden` and
- * `inert`: the first collapses it with no stylesheet in play, the second keeps
- * it out of the tab order and the accessibility tree once the styled tier's
- * `display` has overridden the first.
+ * Content stays mounted when the item is closed, so it can animate and its text
+ * is present in server-rendered HTML. Closed content has both `hidden` and
+ * `inert`. `hidden` collapses it when no stylesheet is loaded. `inert` keeps it
+ * out of the tab order and the accessibility tree after the styled tier's
+ * `display` overrides `hidden`.
  *
  * @since 0.1.0
  * @status stable

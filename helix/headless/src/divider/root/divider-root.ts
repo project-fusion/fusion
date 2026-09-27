@@ -6,15 +6,14 @@ import { property } from 'lit/decorators.js'
  * @summary A line that separates content into groups.
  *
  * @description
- * The separator role lives on the rule inside the shadow root rather than on
- * the host. A role does not need to cross the shadow boundary the way an IDREF
- * does, and putting it on the rendered element means the semantics are in the
- * server's markup with no attribute written during a lifecycle the server never
- * runs.
+ * The separator role is on the rule inside the shadow root. A role does not
+ * need to cross the shadow boundary the way an IDREF does, so it can sit on the
+ * rendered element. The semantics are then in the server-rendered markup, with
+ * no attribute written by script after the element connects.
  *
  * Use `orientation="vertical"` between items on one line, such as inside a
- * toolbar. A vertical divider stretches to its flex parent rather than setting
- * a height of its own.
+ * toolbar. A vertical divider stretches to fit its flex parent and sets no
+ * height of its own.
  *
  * @since 0.1.0
  * @status stable

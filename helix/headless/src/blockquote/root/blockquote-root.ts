@@ -6,13 +6,11 @@ import { property } from 'lit/decorators.js'
  * @summary A passage set off from the prose around it.
  *
  * @description
- * Renders a real `<blockquote>` with a `<footer>` for the attribution, which is
- * the structure the HTML spec describes for exactly this: the attribution is
- * about the quotation rather than part of it, and putting it inside the quoted
- * text claims the source said their own name.
+ * Renders a `<blockquote>` with a `<footer>` for the attribution, the structure
+ * the HTML spec describes. The attribution sits outside the quoted text because
+ * it is about the quotation.
  *
- * A quotation run inside a sentence is a `Quote`, which is a different element
- * because it is a different job.
+ * For a quotation inside a sentence, use `Quote`.
  *
  * @since 0.1.0
  * @status stable

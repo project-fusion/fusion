@@ -8,10 +8,8 @@ import { styles } from './loader-root.css.js'
  * @summary Shows that work of unknown length is in progress.
  *
  * @description
- * Sized in `em`, so it matches whatever text it sits beside without being told.
- * The color is `currentColor` for the same reason: a loader inside a primary
- * button is on the accent, and one in body copy is not, and neither should have
- * to say so.
+ * Sized in `em`, so it matches the text beside it. The color is `currentColor`,
+ * so it matches the text color around it, including inside a primary button.
  *
  * @since 0.1.0
  * @status stable

@@ -10,14 +10,13 @@ import { styles } from './canvas-root.css.js'
  * @summary A board of cards and the connections between them, which can be navigated, rearranged, and connected.
  *
  * @description
- * **Cards and connections say what they mean with `tone`**, the word every
- * other family uses, and the tones resolve to semantic tokens, so a board
- * follows the page into dark mode rather than carrying somebody else's hex into
- * it. JSON Canvas's six color presets arrive as tones through `fromJsonCanvas`.
+ * Cards and connections take `tone`, like every other family. The tones resolve
+ * to semantic tokens, so a board follows the page into dark mode.
+ * `fromJsonCanvas` maps the six JSON Canvas color presets to tones.
  *
- * The plane is the one thing that moves: panning and zooming write three custom
- * properties and one transform reads them, so the cards are placed once in the
- * document's own coordinates and never laid out again.
+ * Panning and zooming move only the plane. They write three custom properties
+ * that one transform reads, so the cards are placed once in the document's
+ * coordinates and are not laid out again.
  *
  * @since 0.100.0
  * @status experimental

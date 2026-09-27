@@ -16,15 +16,14 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * @summary A row of options with the selection marked by a moving indicator.
  *
  * @description
- * The indicator is one element that travels, not a background that appears on
- * whichever item is current. A fill that swaps is two things changing at once
- * and reads as a flicker; one that moves is a single object the eye follows,
- * and it says where the selection came from as well as where it went.
+ * The indicator is one element that moves to the selected item. A single moving
+ * object is easier to follow than a fill that swaps, and it shows where the
+ * selection came from.
  *
- * Its box is measured from the selected item and written onto the indicator as
- * custom properties, labels being different lengths. Measurement is client-side
- * by necessity, so the server renders the indicator hidden and it fades in once
- * it has somewhere to be, which is the harmless direction.
+ * Its size and position are measured from the selected item and written to the
+ * indicator as custom properties, because labels have different lengths.
+ * Measurement happens on the client, so the server renders the indicator hidden
+ * and it fades in once measured.
  *
  * @since 0.1.0
  * @status stable

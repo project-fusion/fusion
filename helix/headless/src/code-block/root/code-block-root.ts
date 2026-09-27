@@ -9,41 +9,28 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @summary A block of code with an optional name and a copy button.
  *
  * @description
- * **`<pre><code>` and nothing cleverer.** The pair is what the platform means
- * by a block of code: `pre` keeps the whitespace, `code` says what the
- * whitespace is for, and losing either one loses something no styling puts
- * back. Indentation in a `div` is a paragraph with odd spacing.
+ * Renders a `<pre><code>` pair: `pre` keeps the whitespace, and `code` marks it
+ * as code. Long lines scroll inside the block and do not wrap, because a line
+ * break can be significant in code.
  *
- * **It scrolls rather than wraps.** A wrapped line of code is a lie about where
- * the line ends, and in a language where a line break can be significant it is
- * a lie that costs someone an afternoon. The box takes its own scrollbar.
+ * A copy button is on by default. Set `no-copy` to remove it. The button copies
+ * the slotted text, so there is no second copy of the code to keep in sync.
  *
- * **The copy button is here because the alternative is selecting it by hand.**
- * Every consumer would otherwise put one there, slightly differently, and the
- * one that forgot would be the one with the longest snippet. It is on unless
- * `no-copy` says otherwise, and takes its text from the slot rather than from a
- * property, so there is no second copy of the code to keep in step.
+ * For a fragment of code inside a sentence, use `Code`.
  *
- * A `Code` for a fragment inside a sentence. Separate families, because one
- * flows with prose and the other is a figure.
+ * Set `diff` to show a change. Put a unified diff, the output of `git diff` or
+ * `diff -u`, in the same slot, and the block draws the lines it added and
+ * removed. The block never computes a diff itself. Line numbers come from the
+ * hunk headers and are hidden from the accessibility tree. Changed lines are
+ * `<ins>` and `<del>` with the `+` and `-` kept as text, so the change does not
+ * depend on color. Each file in the patch is its own block under its own name,
+ * and its copy button copies the new version of the file. `variant="split"`
+ * shows the old version beside the new, each removal opposite its replacement.
  *
- * **`diff` reads the code as a change.** The content is then a unified diff,
- * what `git diff` and `diff -u` write, in the same slot ordinary code goes in,
- * and it is drawn as the lines it added and removed. The block reads a diff and
- * never computes one, so the algorithm stays wherever the two versions are.
- * Numbers come from the hunk headers, which makes them the file's; changed lines
- * are `<ins>` and `<del>` with the `+` and `-` kept as text, so the change is not
- * carried by color; the numbers are hidden from the accessibility tree. Each
- * file in the patch is a block of its own under its own name, and its copy
- * button takes the file as it now reads. `variant="split"` sets the old version
- * beside the new, each removal opposite its replacement.
- *
- * **Before the script runs, a diff is its own text.** A server has no children
- * to read, so it renders the slot as ordinary code, which for a diff is the
- * patch in a `<pre>`: a legible diff, and the first render the client makes
- * too, which is what keeps hydration clean. The drawn diff replaces it once the
- * content can be read. Diff mode is experimental while the rest of the family
- * is stable.
+ * On the server, the slot renders as ordinary code, so a diff first appears as
+ * the patch text in a `<pre>`. The client makes the same first render, which
+ * keeps hydration clean, and draws the diff once it can read the content. Diff
+ * mode is experimental. The rest of the family is stable.
  *
  * @since 0.1.0
  * @status stable
