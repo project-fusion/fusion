@@ -9,7 +9,7 @@ import { ELEVATION, IMAGERY } from '@/content/maps/maps'
 import styles from './maps.module.css'
 
 /** Yosemite Valley from the west, El Capitan in front and Half Dome at the far end. */
-const VALLEY = { bearing: 70, center: [-119.61, 37.73] as [number, number], pitch: 60, zoom: 12.4 }
+const VALLEY = { bearing: 70, center: [-119.61, 37.73] as [number, number], pitch: 60, zoom: 11.4 }
 
 /**
  * Yosemite Valley raised in 3D, on a map of its own: terrain, contour lines,
