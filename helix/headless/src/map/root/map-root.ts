@@ -16,17 +16,28 @@ import {
   type ViewportPanDetail,
   type ViewportZoomDetail,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import {
+  html,
+  nothing,
+  type PropertyValues,
+  type SVGTemplateResult,
+  svg,
+  type TemplateResult,
+} from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
 
 /** What the frame reads off a layer, which is all its list and menu need. */
 interface MapLayer extends Element {
   description?: string | undefined
+  /** A raster layer's: whether it is imagery of the ground. */
+  ground?: boolean | undefined
   group?: string | undefined
   hidden: boolean
   isMapLayer: true
   label?: string | undefined
+  /** Which kind of layer, which picks its picture in the layers menu. */
+  layerKind?: string | undefined
 }
 
 /**
@@ -36,6 +47,33 @@ interface MapLayer extends Element {
  * imported this before the surface was shared still has it.
  */
 export type MapControlsPlacement = ViewportControlsPlacement
+
+/**
+ * A layer's picture in the layers menu, by what it draws: a line for a route,
+ * a shape for an area, dots for points, blocks for buildings, a peak for
+ * terrain, a photograph for imagery of the ground, and a cloud for tiles
+ * over it, such as weather.
+ */
+const iconOf = (layer: MapLayer | undefined): SVGTemplateResult => {
+  switch (layer?.layerKind) {
+    case 'route':
+      return svg`<path d="M4 19c5 0 4-7 8-7s3-7 8-7" /><circle cx="4" cy="19" r="1.5" /><circle cx="20" cy="5" r="1.5" />`
+    case 'area':
+      return svg`<path d="M4 8l7-4 9 4-2 11-12 1Z" />`
+    case 'points':
+      return svg`<circle cx="6" cy="8" r="2" /><circle cx="15" cy="6" r="2" /><circle cx="10" cy="16" r="2" /><circle cx="18" cy="15" r="2" />`
+    case 'buildings':
+      return svg`<path d="M3 21V10l5-2v13M8 21V4l7 2v15M15 21v-9l6 2v7M2 21h20" />`
+    case 'terrain':
+      return svg`<path d="M2 20l7-12 4 6 3-4 6 10Z" /><path d="M7.5 10.5 9 12l1.5-1.5" />`
+    case 'raster':
+      return layer.ground
+        ? svg`<rect height="16" rx="2" width="18" x="3" y="4" /><path d="M3 16l5-5 4 4 3-3 6 6" /><circle cx="16" cy="9" r="1.5" />`
+        : svg`<path d="M7 16a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.4A3.5 3.5 0 0 1 17 16Z" /><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2" />`
+    default:
+      return svg`<path d="M12 3 21 8 12 13 3 8Z" /><path d="M3 13l9 5 9-5" />`
+  }
+}
 
 /** Degrees a rotate button or key turns the map. */
 const ROTATE_STEP = 15
@@ -51,8 +89,15 @@ const TILTED = 50
  *
  * @description
  * Wraps a map drawn by MapLibre, Leaflet, or another renderer. The frame adds
- * a name for the map, pan and zoom buttons, a fullscreen button, and a strip
- * for the map credit. Helix does not draw the map itself.
+ * a name for the map, a column of controls, and a strip for the map credit.
+ * Helix does not draw the map itself.
+ *
+ * The controls are one column: fullscreen, the layers button, 3D, zoom, and
+ * a compass. The compass's needle points north, and pressing it turns the map
+ * to face north. The pan and rotate buttons sit around the compass, so a user
+ * can move and turn the map without dragging it. The styled frame shows them
+ * while the pointer or the keyboard is on the compass, and always on a screen
+ * with no hover, such as a phone.
  *
  * The pan and zoom buttons and the arrow keys send `helix-map-pan` and
  * `helix-map-zoom`. Move your map in response, or connect it with
@@ -95,17 +140,20 @@ const TILTED = 50
  * @event {HelixMapZoomEvent} helix-map-zoom - A zoom button or key was pressed, with a direction. Zoom your map in response.
  *
  * @csspart attribution - The strip under the map that holds the credit.
- * @csspart controls - The group of buttons that move the map.
- * @csspart face-north - The button that turns the map to face north. Its needle points north as the map turns.
+ * @csspart compass - The compass and the pan and rotate buttons around it.
+ * @csspart controls - The column of buttons that move the map.
+ * @csspart face-north - The compass: its needle points north as the map turns, and pressing it turns the map to face north.
  * @csspart footer - The strip below the map.
  * @csspart fullscreen - The button that makes the map fill the screen.
  * @csspart header - The strip above the map.
  * @csspart layer - One entry in the list of the map's layers.
- * @csspart layer-choice - One layer's checkbox and name in the layers menu.
+ * @csspart layer-choice - One layer's tile in the layers menu, pressed while the layer is shown.
+ * @csspart layer-icon - The picture on a layer's tile, drawn for its kind: a line for a route, a peak for terrain.
+ * @csspart layer-name - The name on a layer's tile.
  * @csspart layers - The list of the map's shown layers, such as routes, areas, and points, read by screen readers.
  * @csspart layers-menu - The menu of the map's layers, which the layers button opens.
  * @csspart layers-toggle - The button that opens and closes the layers menu.
- * @csspart needle - The arrow inside the Face north button, turned to point north.
+ * @csspart needle - The compass needle, turned to point north.
  * @csspart pan-down - The button that pans the map down.
  * @csspart pan-end - The button that pans toward the end of a line of text: right in English.
  * @csspart pan-start - The button that pans toward the start of a line of text: left in English.
@@ -443,9 +491,9 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   }
 
   /**
-   * The layers button and its menu: a checkbox for each layer or group, in the
-   * order they are written, which shows or hides it. A group's checkbox is on
-   * while any of its layers is shown.
+   * The layers button and its menu: a tile for each layer or group, in the
+   * order they are written, with its picture and name, pressed while it is
+   * shown. A group's tile is pressed while any of its layers is shown.
    */
   private renderLayersMenu(): TemplateResult | typeof nothing {
     const layers = this.layers
@@ -476,43 +524,122 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         ?hidden=${!this.layersOpen}
         @keydown=${this.handleMenuKeydown}
       >
-        ${this.layerEntries.map(
-          (entry) =>
-            html`<label part="layer-choice">
-              <input
-                type="checkbox"
-                .checked=${entry.some((layer) => !layer.hidden)}
-                @change=${(event: Event) => this.showLayers(entry, (event.target as HTMLInputElement).checked)}
-              />
-              ${entry[0]?.label ?? ''}
-            </label>`,
-        )}
+        ${this.layerEntries.map((entry) => {
+          const shown = entry.some((layer) => !layer.hidden)
+          return html`<button
+            part="layer-choice"
+            aria-pressed=${shown ? 'true' : 'false'}
+            type="button"
+            @click=${() => this.showLayers(entry, !shown)}
+          >
+            <svg part="layer-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24">
+              ${iconOf(entry[0])}
+            </svg>
+            <span part="layer-name">${entry[0]?.label ?? ''}</span>
+          </button>`
+        })}
       </div>`
   }
 
-  /** The rotate, tilt, and layers buttons, where `controls` names them. */
-  protected override renderMoreControls(): TemplateResult | typeof nothing {
-    const rotate = this.drawsControls('rotate')
-    const tilt = this.drawsControls('tilt')
-    const menu = this.renderLayersMenu()
-    if (!rotate && !tilt && menu === nothing) {
-      return nothing
-    }
-    return html`${
-      rotate
-        ? html`<button part="rotate-left" aria-label=${this.rotateLeftLabel} type="button" @click=${() => this.rotate(-ROTATE_STEP)}>
+  /**
+   * The compass, and the pan and rotate buttons around it.
+   *
+   * **One control for which way the map faces and where it goes.** The needle
+   * turns with the map and points north; pressing it turns the map back. The
+   * arrows around it are the way to move and turn the map without dragging,
+   * which a pointer otherwise needs, and the styled tier shows them where the
+   * pointer or the keyboard is on the compass.
+   */
+  private renderCompass(pan: boolean, rotate: boolean): TemplateResult {
+    return html`<div part="compass">
+      ${
+        rotate
+          ? html`<button part="rotate-left" aria-label=${this.rotateLeftLabel} type="button" @click=${() => this.rotate(-ROTATE_STEP)}>
               ↺
-            </button>
-            <button part="face-north" aria-label=${this.faceNorthLabel} type="button" style=${`--map-needle-turn: ${-this.bearing}deg`} @click=${() => this.faceNorth()}>
-              <span part="needle" aria-hidden="true">↑</span>
-            </button>
-            <button part="rotate-right" aria-label=${this.rotateRightLabel} type="button" @click=${() => this.rotate(ROTATE_STEP)}>
+            </button>`
+          : nothing
+      }
+      ${
+        pan
+          ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>
+              ${this.panGlyph('up')}
+            </button>`
+          : nothing
+      }
+      ${
+        rotate
+          ? html`<button part="rotate-right" aria-label=${this.rotateRightLabel} type="button" @click=${() => this.rotate(ROTATE_STEP)}>
               ↻
             </button>`
-        : nothing
-    }${
-      tilt
-        ? html`<button
+          : nothing
+      }
+      ${
+        pan
+          ? html`<button part="pan-start" aria-label=${this.panLabel('start')} type="button" @click=${() => this.pan('start')}>
+              ${this.panGlyph('start')}
+            </button>`
+          : nothing
+      }
+      <button part="face-north" aria-label=${this.faceNorthLabel} type="button" style=${`--map-needle-turn: ${-this.bearing}deg`} @click=${() => this.faceNorth()}>
+        <svg part="needle" aria-hidden="true" viewBox="0 0 16 16">
+          <path data-end="north" d="M8 1.5 10.5 8h-5Z" />
+          <path data-end="south" d="M8 14.5 5.5 8h5Z" />
+        </svg>
+      </button>
+      ${
+        pan
+          ? html`<button part="pan-end" aria-label=${this.panLabel('end')} type="button" @click=${() => this.pan('end')}>
+              ${this.panGlyph('end')}
+            </button>`
+          : nothing
+      }
+      ${
+        pan
+          ? html`<button part="pan-down" aria-label=${this.panLabel('down')} type="button" @click=${() => this.pan('down')}>
+              ${this.panGlyph('down')}
+            </button>`
+          : nothing
+      }
+    </div>`
+  }
+
+  /**
+   * The controls, in one column in the order they are read: fullscreen, the
+   * layers, 3D, zoom, and the compass with the arrows round it, last, where
+   * the room its arrows take is below the column and not inside it.
+   *
+   * **Drawn here, not by the surface**, which lays its pad out for a board:
+   * a map's arrows belong round its compass, and the reading order is the
+   * column's, top to bottom.
+   */
+  protected override renderControls(): TemplateResult | typeof nothing {
+    const pan = this.drawsControls('pan')
+    const zoom = this.drawsControls('zoom')
+    const rotate = this.drawsControls('rotate')
+    const tilt = this.drawsControls('tilt')
+    const fullscreen = this.drawsControls('fullscreen')
+    const menu = this.renderLayersMenu()
+    if (!pan && !zoom && !rotate && !tilt && !fullscreen && menu === nothing) {
+      return nothing
+    }
+    return html`<div part="controls" role="group" aria-label=${this.controlsLabel ?? this.restingControlsLabel}>
+      ${
+        fullscreen
+          ? html`<button
+              part="fullscreen"
+              aria-label=${this.fullscreenLabel}
+              aria-pressed=${this.filled ? 'true' : 'false'}
+              type="button"
+              @click=${this.toggleFullscreen}
+            >
+              ⤢
+            </button>`
+          : nothing
+      }
+      ${menu}
+      ${
+        tilt
+          ? html`<button
               part="tilt"
               aria-label=${this.tiltLabel}
               aria-pressed=${this.pitch > 0 ? 'true' : 'false'}
@@ -521,8 +648,20 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
             >
               3D
             </button>`
-        : nothing
-    }${menu}`
+          : nothing
+      }
+      ${
+        zoom
+          ? html`<button part="zoom-in" aria-label=${this.zoomInLabel} type="button" @click=${() => this.zoom(1)}>
+                +
+              </button>
+              <button part="zoom-out" aria-label=${this.zoomOutLabel} type="button" @click=${() => this.zoom(-1)}>
+                −
+              </button>`
+          : nothing
+      }
+      ${pan || rotate ? this.renderCompass(pan, rotate) : nothing}
+    </div>`
   }
 
   /** The keys the region answers, which `rotate` and `tilt` add to. */

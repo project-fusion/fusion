@@ -105,6 +105,12 @@ export declare class ViewportElement {
 
   /** Answers a key the family adds, and says whether it did. */
   protected handleMoreKeys(event: KeyboardEvent): boolean
+
+  /** What one pan control is called, for a family that draws its own. */
+  protected panLabel(way: ViewportWay): string
+
+  /** The arrow drawn on one pan control, for a family that draws its own. */
+  protected panGlyph(way: ViewportWay): string
 }
 
 /**
@@ -376,7 +382,7 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
      * and a reader knows which way left is. The event keeps the reading-order
      * name, which is the one a right-to-left page needs.
      */
-    private named(way: ViewportWay): string {
+    protected panLabel(way: ViewportWay): string {
       const side = this.sideOf(way)
       return side === 'up'
         ? this.panUpLabel
@@ -388,7 +394,7 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     }
 
     /** The arrow drawn on a pan control, pointing the way it goes on screen. */
-    private glyph(way: ViewportWay): string {
+    protected panGlyph(way: ViewportWay): string {
       return { down: '↓', left: '←', right: '→', up: '↑' }[this.sideOf(way)] ?? ''
     }
 
@@ -495,17 +501,17 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       return html`<div part="controls" role="group" aria-label=${this.controlsLabel ?? this.restingControlsLabel}>
         ${
           pan
-            ? html`<button part="pan-up" aria-label=${this.named('up')} type="button" @click=${() => this.pan('up')}>
-                  ${this.glyph('up')}
+            ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>
+                  ${this.panGlyph('up')}
                 </button>
-                <button part="pan-start" aria-label=${this.named('start')} type="button" @click=${() => this.pan('start')}>
-                  ${this.glyph('start')}
+                <button part="pan-start" aria-label=${this.panLabel('start')} type="button" @click=${() => this.pan('start')}>
+                  ${this.panGlyph('start')}
                 </button>
-                <button part="pan-end" aria-label=${this.named('end')} type="button" @click=${() => this.pan('end')}>
-                  ${this.glyph('end')}
+                <button part="pan-end" aria-label=${this.panLabel('end')} type="button" @click=${() => this.pan('end')}>
+                  ${this.panGlyph('end')}
                 </button>
-                <button part="pan-down" aria-label=${this.named('down')} type="button" @click=${() => this.pan('down')}>
-                  ${this.glyph('down')}
+                <button part="pan-down" aria-label=${this.panLabel('down')} type="button" @click=${() => this.pan('down')}>
+                  ${this.panGlyph('down')}
                 </button>`
             : nothing
         }
