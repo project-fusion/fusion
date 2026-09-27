@@ -1020,3 +1020,42 @@ describe('connectMap walking a points layer', () => {
     expect(expanded[0]).toMatch(/ 4$/)
   })
 })
+
+describe('connectMap with rotate and tilt', () => {
+  test('the frame’s rotate and tilt reach the driver, and its bearing follows the view', async () => {
+    const host = (await frame('')) as unknown as HTMLElement & {
+      bearing: number
+      faceNorth(): void
+      rotate(by: number): void
+      tilt(by: number): void
+      updateComplete: Promise<boolean>
+    }
+    const asked: string[] = []
+    let bearing = 30
+    const moved: (() => void)[] = []
+    const connection = connectMap(host, {
+      bearing: () => bearing,
+      onView: (listener) => {
+        moved.push(listener)
+        return () => {}
+      },
+      panBy: () => {},
+      rotate: (turn) => asked.push(`rotate ${JSON.stringify(turn)}`),
+      tilt: (by) => asked.push(`tilt ${by}`),
+      zoomBy: () => {},
+    })
+    expect(host.bearing).toBe(30)
+    host.rotate(15)
+    host.faceNorth()
+    host.tilt(-10)
+    expect(asked).toEqual(['rotate {"by":15}', 'rotate {"to":0}', 'tilt -10'])
+    bearing = 45.04
+    for (const listener of moved) {
+      listener()
+    }
+    expect(host.bearing).toBe(45)
+    connection.disconnect()
+    host.rotate(15)
+    expect(asked).toHaveLength(3)
+  })
+})

@@ -225,4 +225,56 @@ describe('map controls on a right-to-left page', () => {
     const ltr = await map()
     expect(control(ltr, 'pan-start')?.getAttribute('aria-label')).toBe('Pan left')
   })
+
+  test('rotate and tilt are drawn only where controls name them, and ask for a turn and a tilt', async () => {
+    const plain = await map()
+    expect(control(plain, 'rotate-left')).toBeNull()
+    expect(control(plain, 'tilt')).toBeNull()
+
+    const host = await map('controls="pan zoom rotate tilt fullscreen"')
+    const asked: string[] = []
+    host.addEventListener('helix-map-rotate', (event) =>
+      asked.push(`rotate ${JSON.stringify(event.detail)}`),
+    )
+    host.addEventListener('helix-map-tilt', (event) =>
+      asked.push(`tilt ${JSON.stringify(event.detail)}`),
+    )
+    control(host, 'rotate-left')?.click()
+    control(host, 'rotate-right')?.click()
+    control(host, 'face-north')?.click()
+    control(host, 'tilt')?.click()
+    control(host, 'flatten')?.click()
+    expect(asked).toEqual([
+      'rotate {"by":-15}',
+      'rotate {"by":15}',
+      'rotate {"to":0}',
+      'tilt {"by":10}',
+      'tilt {"by":-10}',
+    ])
+    expect(control(host, 'face-north')?.getAttribute('aria-label')).toBe('Face north')
+  })
+
+  test('shift with the arrow keys rotates and tilts, and the region says so', async () => {
+    const host = await map('controls="pan zoom rotate tilt"')
+    const asked: string[] = []
+    host.addEventListener('helix-map-rotate', (event) => asked.push(`rotate ${event.detail.by}`))
+    host.addEventListener('helix-map-tilt', (event) => asked.push(`tilt ${event.detail.by}`))
+    host.addEventListener('helix-map-pan', () => asked.push('pan'))
+    const region = part(host, 'region') as HTMLElement
+    for (const key of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']) {
+      region.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key, shiftKey: true }))
+    }
+    expect(asked).toEqual(['rotate -15', 'rotate 15', 'tilt 10', 'tilt -10'])
+    expect(region.getAttribute('aria-keyshortcuts')).toContain('Shift+ArrowLeft')
+    expect(region.getAttribute('aria-keyshortcuts')).toContain('Shift+ArrowUp')
+  })
+
+  test('the Face north needle turns against the bearing', async () => {
+    const host = (await map('controls="rotate"')) as Map & { bearing: number }
+    host.bearing = 90
+    await host.updateComplete
+    expect(control(host, 'face-north')?.getAttribute('style')).toContain(
+      '--map-needle-turn: -90deg',
+    )
+  })
 })

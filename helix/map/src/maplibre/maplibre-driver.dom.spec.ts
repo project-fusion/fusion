@@ -71,18 +71,23 @@ const stand = (): {
       }
       asked.push(`addSource ${id}`)
     },
-    easeTo: ({ center, duration, easing, zoom }) => {
-      asked.push(`easeTo ${center.join(',')} ${zoom} ${duration} ${easing?.(0.5)}`)
+    easeTo: ({ bearing, center, duration, easing, pitch, zoom }) => {
+      if (center) {
+        asked.push(`easeTo ${center.join(',')} ${zoom} ${duration} ${easing?.(0.5)}`)
+      } else {
+        asked.push(`easeTo bearing ${bearing} pitch ${pitch} ${duration}`)
+      }
     },
     fitBounds: (bounds, options) => {
       asked.push(
         `fitBounds ${JSON.stringify(bounds)} ${JSON.stringify(options?.padding)} ${options?.duration ?? options?.animate}`,
       )
     },
-    getBearing: () => 0,
+    getBearing: () => 30,
     getCanvas: () => canvas,
     getContainer: () => container,
     getLayer: (id) => styleLayers.find((one) => one.id === id),
+    getPitch: () => 20,
     getSource: (id) => sources[id],
     getStyle: () => ({ layers: styleLayers, sources }),
     jumpTo: ({ center, zoom }) => {
@@ -611,5 +616,22 @@ describe('mapLibreDriver', () => {
       version: 8,
     }
     expect(validateStyleMin(style as never)).toEqual([])
+  })
+
+  test('a rotate or tilt during a glide aims from where the glide is headed, and tilting stops at flat', () => {
+    const { asked, map } = stand()
+    const driver = mapLibreDriver(map)
+    driver.rotate?.({ by: 15 }, glide)
+    driver.rotate?.({ by: 15 }, glide)
+    driver.tilt?.(10, glide)
+    driver.rotate?.({ to: 0 }, null)
+    driver.tilt?.(-40, null)
+    expect(asked).toEqual([
+      'easeTo bearing 45 pitch 20 250',
+      'easeTo bearing 60 pitch 20 250',
+      'easeTo bearing 60 pitch 30 250',
+      'easeTo bearing 0 pitch 30 undefined',
+      'easeTo bearing 30 pitch 0 undefined',
+    ])
   })
 })

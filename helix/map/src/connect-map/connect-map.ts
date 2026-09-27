@@ -3,6 +3,8 @@ import {
   HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,
+  HelixMapRotateEvent,
+  HelixMapTiltEvent,
   HelixMapZoomEvent,
   isRtl,
   type ViewportPanDetail,
@@ -88,12 +90,26 @@ export interface MapDriver {
    */
   replaceZoom?(): () => void
   /**
+   * Turns the view by `by` degrees clockwise, or to the bearing `to`, over the
+   * page's motion or at once. What the frame's rotate buttons and keys ask.
+   */
+  rotate?(
+    turn: { by?: number | undefined; to?: number | undefined },
+    motion: MapMotion | null,
+  ): void
+  /**
    * Turns the renderer's own keyboard handling off, and returns what turns it
    * back to how it was.
    */
   silenceKeyboard?(): () => void
   /** Brings a place to the middle of the view, at its zoom where it has one. */
   show?(place: MapPlace & { zoom?: number | undefined }, motion: MapMotion | null): void
+  /**
+   * Tilts the view `by` degrees toward the horizon, or back toward flat where
+   * negative, within what the renderer allows. What the frame's tilt buttons
+   * and keys ask.
+   */
+  tilt?(by: number, motion: MapMotion | null): void
   /** Zooms one step in, `1`, or out, `-1`, by whatever a step is to this renderer. */
   zoomBy(direction: 1 | -1, motion: MapMotion | null): void
 }
@@ -481,6 +497,29 @@ export const connectMap = (
   }
   frame.addEventListener(HelixMapPanEvent.eventName, handlePan)
   frame.addEventListener(HelixMapZoomEvent.eventName, handleZoom)
+  /* **Rotate and tilt, where the renderer can.** A driver without them, such
+     as Leaflet's, which draws flat, leaves the buttons doing nothing. */
+  const handleRotate = (event: Event): void => {
+    const { by, to } = (event as CustomEvent<{ by?: number; to?: number }>).detail
+    driver.rotate?.({ by, to }, motionOf(frame, 'step'))
+  }
+  const handleTilt = (event: Event): void => {
+    const { by } = (event as CustomEvent<{ by: number }>).detail
+    driver.tilt?.(by, motionOf(frame, 'step'))
+  }
+  frame.addEventListener(HelixMapRotateEvent.eventName, handleRotate)
+  frame.addEventListener(HelixMapTiltEvent.eventName, handleTilt)
+  /* The frame's `bearing` follows the view, so its Face north needle points
+     north as the map turns. Rounded, so a still map writes nothing. */
+  const holder = frame as HTMLElement & { bearing?: number }
+  const syncBearing = (): void => {
+    const bearing = Math.round((driver.bearing?.() ?? 0) * 10) / 10
+    if ('bearing' in holder && holder.bearing !== bearing) {
+      holder.bearing = bearing
+    }
+  }
+  syncBearing()
+  const stopBearing = driver.bearing ? driver.onView?.(syncBearing) : undefined
 
   const restoreKeyboard = options.keyboard === 'renderer' ? undefined : driver.silenceKeyboard?.()
 
@@ -1138,6 +1177,9 @@ export const connectMap = (
       }
       frame.removeEventListener(HelixMapPanEvent.eventName, handlePan)
       frame.removeEventListener(HelixMapZoomEvent.eventName, handleZoom)
+      frame.removeEventListener(HelixMapRotateEvent.eventName, handleRotate)
+      frame.removeEventListener(HelixMapTiltEvent.eventName, handleTilt)
+      stopBearing?.()
       restoreKeyboard?.()
       restoreZoom?.()
       if (focusable) {

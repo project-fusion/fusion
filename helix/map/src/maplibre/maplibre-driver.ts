@@ -303,8 +303,17 @@ export interface MapLibreMap {
     | undefined
   /** Which way the view is turned, in degrees clockwise from north. */
   getBearing(): number
+  /** How far the view is tilted from looking straight down, in degrees. */
+  getPitch(): number
   /** Goes to a place, gliding. */
-  easeTo(options: MapLibreAnimation & { center: [number, number]; zoom?: number }): unknown
+  easeTo(
+    options: MapLibreAnimation & {
+      bearing?: number
+      center?: [number, number]
+      pitch?: number
+      zoom?: number
+    },
+  ): unknown
   /** Goes to a place at once. */
   jumpTo(options: { center: [number, number]; zoom?: number }): unknown
   /** The arrow-key handler MapLibre adds unless told not to. */
@@ -348,6 +357,31 @@ const CONTROL = '.maplibregl-ctrl-attrib'
  */
 const animation = (motion: MapMotion | null): MapLibreAnimation =>
   motion ? { duration: motion.duration, easing: motion.easing } : { animate: false }
+
+/** A turn and tilt the map is gliding to, and when it arrives. */
+interface Aim {
+  bearing: number
+  pitch: number
+  until: number
+}
+
+/* Where the last rotate or tilt was headed, per map. A press during the glide
+   aims from there: two quick presses turn the map twice as far, and a tilt
+   does not stop a turn partway. After the glide, a press aims from the view,
+   which a user may have dragged since. */
+const aims = new WeakMap<MapLibreMap, Aim>()
+
+const aimFrom = (map: MapLibreMap): Omit<Aim, 'until'> => {
+  const aim = aims.get(map)
+  return aim && performance.now() < aim.until
+    ? aim
+    : { bearing: map.getBearing(), pitch: map.getPitch() }
+}
+
+const turn = (map: MapLibreMap, bearing: number, pitch: number, motion: MapMotion | null): void => {
+  aims.set(map, { bearing, pitch, until: performance.now() + (motion?.duration ?? 0) })
+  map.easeTo({ bearing, pitch, ...animation(motion) })
+}
 
 /**
  * Drives a MapLibre map from the Map frame.
@@ -815,6 +849,10 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     const { x, y } = map.project([lng, lat])
     return { x, y }
   },
+  rotate: ({ by, to }, motion) => {
+    const { bearing, pitch } = aimFrom(map)
+    turn(map, to ?? bearing + (by ?? 0), pitch, motion)
+  },
   show: ({ lat, lng, zoom }, motion) => {
     const options = {
       center: [lng, lat] as [number, number],
@@ -834,6 +872,11 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         map.keyboard.enable()
       }
     }
+  },
+  /* MapLibre holds the pitch to its own `maxPitch`, so only flat is held here. */
+  tilt: (by, motion) => {
+    const { bearing, pitch } = aimFrom(map)
+    turn(map, bearing, Math.max(0, pitch + by), motion)
   },
   zoomBy: (direction, motion) => {
     if (direction > 0) {

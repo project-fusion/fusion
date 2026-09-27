@@ -117,3 +117,44 @@
     display: none;
   }
 }
+
+/* ======================================================= rotate and tilt === */
+
+/* **Rotate and tilt fill the pad's empty cells**: turn left and right in the
+   top corners beside up, Face north in the center, and 3D and 2D in the
+   bottom corners beside down. Only a frame that asks for them changes, so a
+   map with pan and zoom alone keeps its layout. */
+[part="controls"]:has([part="rotate-left"], [part="tilt"]) {
+  grid-template-areas:
+    "rotl   up     rotr  zoomin"
+    "start  north  end   zoomout"
+    "tilt   down   flat  full";
+}
+
+[part="rotate-left"] {
+  grid-area: rotl;
+}
+[part="rotate-right"] {
+  grid-area: rotr;
+}
+[part="face-north"] {
+  grid-area: north;
+}
+[part="tilt"] {
+  grid-area: tilt;
+}
+[part="flatten"] {
+  grid-area: flat;
+}
+
+/* The needle points north as the map turns. */
+[part="needle"] {
+  display: inline-block;
+  transform: rotate(var(--map-needle-turn, 0deg));
+}
+
+[part="tilt"],
+[part="flatten"] {
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+}
