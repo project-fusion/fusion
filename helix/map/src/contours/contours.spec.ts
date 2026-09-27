@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { contourInterval, contoursOf, heightsFrom, tilesCovering } from './contours.js'
+import {
+  contourInterval,
+  contoursOf,
+  heightsFrom,
+  joinedAcross,
+  tilesCovering,
+} from './contours.js'
 
 /** A hill: a cone `top` meters high in the middle of a tile, flat at its foot. */
 const hill = (size = 32, top = 100) => {
@@ -54,5 +60,68 @@ describe('contour lines', () => {
       { x: 0, y: 1, z: 1 },
       { x: 1, y: 1, z: 1 },
     ])
+  })
+
+  test('a line cut at a tile seam is joined back into one, whichever way its halves run', () => {
+    const west = {
+      coordinates: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+      ] as [number, number][],
+      elevation: 100,
+      index: true,
+    }
+    const east = {
+      coordinates: [
+        [4, 0],
+        [3, 0],
+        [2, 0],
+      ] as [number, number][],
+      elevation: 100,
+      index: true,
+    }
+    const other = {
+      coordinates: [
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ] as [number, number][],
+      elevation: 200,
+      index: false,
+    }
+    const joined = joinedAcross([west, east, other])
+    expect(joined).toHaveLength(2)
+    expect(joined[0]?.coordinates).toEqual([
+      [0, 0],
+      [1, 0],
+      [2, 0],
+      [3, 0],
+      [4, 0],
+    ])
+  })
+
+  test('two tiles traced apart meet at their seam, and their halves join into one line', () => {
+    /* A slope rising to the south-east across two tiles side by side, so
+       every line crosses the seam between them. */
+    const size = 16
+    const tileAt = (x: number) => {
+      const heights = new Float32Array(size * size)
+      for (let row = 0; row < size; row++) {
+        for (let column = 0; column < size; column++) {
+          heights[row * size + column] = (x * size + column) * 4 + row * 4
+        }
+      }
+      return { heights, size, x, y: 0, z: 2 }
+    }
+    const [west, east] = [tileAt(0), tileAt(1)]
+    const halves = [
+      ...contoursOf(west, 20, 'meters', (dx, dy) => (dx === 1 && dy === 0 ? east : undefined)),
+      ...contoursOf(east, 20, 'meters', (dx, dy) => (dx === -1 && dy === 0 ? west : undefined)),
+    ]
+    const joined = joinedAcross(halves)
+    expect(joined.length).toBeLessThan(halves.length)
+    const crossing = joined.filter((line) => line.elevation === 100)
+    expect(crossing).toHaveLength(1)
   })
 })

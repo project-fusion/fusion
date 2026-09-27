@@ -77,58 +77,52 @@ export const contourInterval = (zoom: number, unit: 'feet' | 'meters'): number =
 }
 
 /**
+ * The tile beside another, `dx` columns east and `dy` rows south, where it
+ * is known: what closes a seam, so a line crossing it is traced as one.
+ */
+export type NeighborOf = (dx: number, dy: number) => HeightTile | undefined
+
+/**
  * A tile's heights with one more column and row, from the tiles to its east
- * and south where they are known, so lines meet across the seam, and its own
- * edge repeated where they are not; smoothed by a three-by-three average, so
- * a line follows the ground and not the noise in the survey.
+ * and south where they are known, so lines meet across the seam; smoothed by
+ * a three-by-three average, so a line follows the ground and not the noise
+ * in the survey.
+ *
+ * **Smoothed from all eight neighbors.** The column two tiles share has to
+ * come out the same in both, or the halves of a line cross the seam at two
+ * places and cannot be joined: smoothed from the east and south alone, the
+ * shared column was averaged with different pixels on each side.
  */
 const extended = (
   tile: HeightTile,
-  east: HeightTile | undefined,
-  south: HeightTile | undefined,
-  corner: HeightTile | undefined,
+  neighbor: NeighborOf,
 ): { grid: Float32Array; width: number } => {
   const size = tile.size
   const width = size + 1
-  const raw = new Float32Array(width * width)
-  const at = (source: HeightTile, x: number, y: number): number =>
-    source.heights[y * source.size + x] ?? 0
-  for (let y = 0; y < width; y++) {
-    for (let x = 0; x < width; x++) {
-      const eastward = x === size
-      const southward = y === size
-      raw[y * width + x] =
-        eastward && southward
-          ? corner
-            ? at(corner, 0, 0)
-            : at(tile, size - 1, size - 1)
-          : eastward
-            ? east
-              ? at(east, 0, y)
-              : at(tile, size - 1, y)
-            : southward
-              ? south
-                ? at(south, x, 0)
-                : at(tile, x, size - 1)
-              : at(tile, x, y)
+  /* The height at a pixel of this tile's frame, from `-1` to `size + 1`,
+     read from whichever tile holds it, and from this tile's own nearest
+     edge where that tile is not known. */
+  const heightAt = (x: number, y: number): number => {
+    const dx = x < 0 ? -1 : x >= size ? 1 : 0
+    const dy = y < 0 ? -1 : y >= size ? 1 : 0
+    const holder = dx === 0 && dy === 0 ? tile : neighbor(dx, dy)
+    if (holder) {
+      return holder.heights[(y - dy * size) * size + (x - dx * size)] ?? 0
     }
+    const cx = Math.min(size - 1, Math.max(0, x))
+    const cy = Math.min(size - 1, Math.max(0, y))
+    return tile.heights[cy * size + cx] ?? 0
   }
-  const grid = new Float32Array(raw.length)
+  const grid = new Float32Array(width * width)
   for (let y = 0; y < width; y++) {
     for (let x = 0; x < width; x++) {
       let sum = 0
-      let count = 0
       for (let dy = -1; dy <= 1; dy++) {
         for (let dx = -1; dx <= 1; dx++) {
-          const nx = x + dx
-          const ny = y + dy
-          if (nx >= 0 && ny >= 0 && nx < width && ny < width) {
-            sum += raw[ny * width + nx] ?? 0
-            count++
-          }
+          sum += heightAt(x + dx, y + dy)
         }
       }
-      grid[y * width + x] = sum / count
+      grid[y * width + x] = sum / 9
     }
   }
   return { grid, width }
@@ -206,21 +200,78 @@ const join = (segments: [number, number, number, number][]): [number, number][][
 }
 
 /**
+ * A line's points averaged with their neighbors, twice, and then thinned to
+ * the ones that bend it by more than a fifth of a pixel. **Traced lines step
+ * from pixel to pixel**, a corner at every one, and a label along a line is
+ * placed only where the line turns gently under it: unsmoothed, a flat map
+ * placed two of a valley's labels. A closed ring stays closed, and an open
+ * line keeps its ends, which meet the next tile's.
+ */
+export const smoothed = (line: readonly [number, number][]): [number, number][] => {
+  const [first, last] = [line[0], line.at(-1)]
+  const closed = line.length > 3 && first?.[0] === last?.[0] && first?.[1] === last?.[1]
+  let points = closed ? line.slice(0, -1) : [...line]
+  for (let pass = 0; pass < 2; pass++) {
+    points = points.map((point, at) => {
+      if (!closed && (at === 0 || at === points.length - 1)) {
+        return point
+      }
+      const before = points[(at - 1 + points.length) % points.length] as [number, number]
+      const after = points[(at + 1) % points.length] as [number, number]
+      return [(before[0] + point[0] * 2 + after[0]) / 4, (before[1] + point[1] * 2 + after[1]) / 4]
+    })
+  }
+  const thinned = simplified(closed ? [...points, points[0] as [number, number]] : points, 0.2)
+  return thinned
+}
+
+/** A line with the points that bend it by less than `tolerance` taken out, by Douglas and Peucker's method. */
+const simplified = (line: [number, number][], tolerance: number): [number, number][] => {
+  if (line.length < 3) {
+    return line
+  }
+  const keep = new Uint8Array(line.length)
+  keep[0] = 1
+  keep[line.length - 1] = 1
+  const stack: [number, number][] = [[0, line.length - 1]]
+  while (stack.length > 0) {
+    const [from, to] = stack.pop() as [number, number]
+    const [ax, ay] = line[from] as [number, number]
+    const [bx, by] = line[to] as [number, number]
+    const length = Math.hypot(bx - ax, by - ay)
+    let farthest = -1
+    let distance = tolerance
+    for (let at = from + 1; at < to; at++) {
+      const [px, py] = line[at] as [number, number]
+      const away =
+        length === 0
+          ? Math.hypot(px - ax, py - ay)
+          : Math.abs((bx - ax) * (ay - py) - (ax - px) * (by - ay)) / length
+      if (away > distance) {
+        distance = away
+        farthest = at
+      }
+    }
+    if (farthest >= 0) {
+      keep[farthest] = 1
+      stack.push([from, farthest], [farthest, to])
+    }
+  }
+  return line.filter((_, at) => keep[at] === 1)
+}
+
+/**
  * A tile's contour lines, every `interval` of height in `unit`, the fifth an
- * index line, placed on the globe. `east`, `south`, and `corner` are the
- * neighbors whose first column, row, and pixel close the seam where known.
+ * index line, placed on the globe. `neighbor` gives the tiles around it,
+ * which close its seams where they are known.
  */
 export const contoursOf = (
   tile: HeightTile,
   interval: number,
   unit: 'feet' | 'meters',
-  neighbors: {
-    corner?: HeightTile | undefined
-    east?: HeightTile | undefined
-    south?: HeightTile | undefined
-  } = {},
+  neighbor: NeighborOf = () => undefined,
 ): ContourLine[] => {
-  const { grid, width } = extended(tile, neighbors.east, neighbors.south, neighbors.corner)
+  const { grid, width } = extended(tile, neighbor)
   const scale = unit === 'feet' ? 1 / FOOT : 1
   const value = (x: number, y: number): number => (grid[y * width + x] ?? 0) * scale
   const byLevel = new Map<number, [number, number, number, number][]>()
@@ -293,13 +344,67 @@ export const contoursOf = (
         continue
       }
       lines.push({
-        coordinates: line.map(([px, py]) => placeOf(tile, px, py)),
+        coordinates: smoothed(line).map(([px, py]) => placeOf(tile, px, py)),
         elevation: Math.round(level),
         index: Math.round(level / interval) % 5 === 0,
       })
     }
   }
   return lines
+}
+
+/**
+ * Lines from neighboring tiles joined where one ends at another's start or
+ * end at the same height: a tile's edge is carried into its neighbor when it
+ * is traced, so the two halves of a line meet at one point. Joined, a line
+ * is long enough to hold its labels, where halves cut at every seam held few.
+ */
+export const joinedAcross = (lines: readonly ContourLine[]): ContourLine[] => {
+  const key = ([lng, lat]: [number, number], elevation: number): string =>
+    `${elevation}|${lng.toFixed(5)},${lat.toFixed(5)}`
+  const ends = new Map<string, number[]>()
+  lines.forEach((line, at) => {
+    const [first, last] = [line.coordinates[0], line.coordinates.at(-1)]
+    if (!first || !last || key(first, line.elevation) === key(last, line.elevation)) {
+      return
+    }
+    for (const end of [key(first, line.elevation), key(last, line.elevation)]) {
+      ends.set(end, [...(ends.get(end) ?? []), at])
+    }
+  })
+  const used = new Uint8Array(lines.length)
+  const next = (point: [number, number], elevation: number): [number, number][] | undefined => {
+    for (const at of ends.get(key(point, elevation)) ?? []) {
+      if (used[at]) {
+        continue
+      }
+      used[at] = 1
+      const coordinates = (lines[at] as ContourLine).coordinates
+      const first = coordinates[0] as [number, number]
+      return key(first, elevation) === key(point, elevation)
+        ? coordinates.slice(1)
+        : coordinates.slice(0, -1).reverse()
+    }
+    return undefined
+  }
+  const joined: ContourLine[] = []
+  lines.forEach((line, at) => {
+    if (used[at]) {
+      return
+    }
+    used[at] = 1
+    const coordinates = [...line.coordinates]
+    for (let more = next(coordinates.at(-1) as [number, number], line.elevation); more; ) {
+      coordinates.push(...more)
+      more = next(coordinates.at(-1) as [number, number], line.elevation)
+    }
+    for (let more = next(coordinates[0] as [number, number], line.elevation); more; ) {
+      coordinates.unshift(...more.reverse())
+      more = next(coordinates[0] as [number, number], line.elevation)
+    }
+    joined.push({ ...line, coordinates })
+  })
+  return joined
 }
 
 /** The tiles at a zoom that cover a stretch of the world, west to east and north to south. */
