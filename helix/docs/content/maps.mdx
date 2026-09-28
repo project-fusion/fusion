@@ -128,6 +128,42 @@ changes its theme another way, such as by replacing a stylesheet, call
 a frame or two after the page loads. If the colors never become available, it
 reports which one is missing.
 
+## Draw the map before it loads
+
+`mapSnapshot(view)` draws the map on your server as an SVG, from the same tiles
+and in the same colors as `mapLibreStyle`. Put it in the frame after the element
+MapLibre draws in, and the page shows a map from its first paint. `connectMap`
+fades it out once MapLibre has drawn its tiles.
+
+```js
+import { mapSnapshot } from '@fusion.dev/helix-map/snapshot'
+
+const view = {
+  center: { lat: 30.27, lng: -97.74 },
+  height: 700,
+  pitch: 45,
+  width: 1200,
+  zoom: 14,
+}
+const snapshot = await mapSnapshot(view)
+// Inside helix-map, after <div id="map"></div>, write the snapshot's markup.
+```
+
+Give MapLibre the same `center`, `zoom`, `pitch`, and `bearing`, and the snapshot
+lines up with the map that replaces it. `width` and `height` are the box it is
+drawn for, and a smaller box shows its middle. A snapshot draws the land, water,
+parks, buildings, and roads, and leaves the labels to MapLibre. Its colors are
+your theme's tokens, so it is light or dark with the page and follows a theme
+change. It resolves to an empty string when the tiles cannot be read.
+
+In a framework that renders the markup for you, such as React, put the snapshot
+in an element that is a direct child of the frame and has the
+`data-helix-map-snapshot` attribute. `connectMap` hides that element, and leaves
+removing it to your framework.
+
+A snapshot is a flat map. A map zoomed out past about 6 is a globe in MapLibre,
+so draw snapshots of city and street views.
+
 ## What you can add to a map
 
 | Element | What it adds |
