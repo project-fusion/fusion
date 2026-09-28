@@ -774,18 +774,20 @@ describe('connectMap with routes and areas', () => {
 describe('connectMap with a position', () => {
   test('a position is stood where it is, turned its heading, and ringed as wide as its accuracy on the map', async () => {
     const host = await frame(
-      '<helix-headless-map-position label="Van 12" lat="1" lng="2" heading="90" accuracy="111320"></helix-headless-map-position>',
+      '<helix-headless-map-position label="Van 12" lat="0" lng="2" heading="90" accuracy="111320"></helix-headless-map-position>',
     )
     const position = host.querySelector('helix-headless-map-position') as HTMLElement
     const read = (name: string): string =>
       position.style.getPropertyValue(`--_map-position-${name}`)
     const connection = connectMap(host, projecting().driver)
-    // Ten pixels a degree, and 111,320 meters is a degree of latitude.
-    expect([read('x'), read('y'), read('heading'), read('radius')]).toEqual([
+    /* Ten pixels a degree, and 111,320 meters is a degree on the equator,
+       where this driver's degrees are as long across as they are north. */
+    expect([read('x'), read('y'), read('heading'), read('radius'), read('pitch')]).toEqual([
       '20px',
-      '10px',
+      '0px',
       '90deg',
       '10px',
+      '0deg',
     ])
 
     position.setAttribute('lng', '3')
@@ -795,6 +797,28 @@ describe('connectMap with a position', () => {
 
     connection.disconnect()
     expect(read('x')).toBe('')
+  })
+
+  test('on a tilted map it lies on the ground, its ring measured across the view', async () => {
+    const host = await frame(
+      '<helix-headless-map-position label="Van 12" lat="0" lng="2" accuracy="111320"></helix-headless-map-position>',
+    )
+    const position = host.querySelector('helix-headless-map-position') as HTMLElement
+    const read = (name: string): string =>
+      position.style.getPropertyValue(`--_map-position-${name}`)
+    /* Turned to face east and tilted back: across the view is south, and a
+       driver that shortened what runs away from the eye would still give the
+       ring its whole width that way. */
+    const { driver } = projecting()
+    connectMap(host, {
+      ...driver,
+      bearing: () => 90,
+      pitch: () => 50,
+      /* Facing east, south is to the right and east is up, and up is what
+         the tilt shortens. */
+      project: ({ lat, lng }) => ({ x: -lat * 10, y: -lng * 10 * Math.cos((50 * Math.PI) / 180) }),
+    })
+    expect([read('pitch'), read('radius')]).toEqual(['50deg', '10px'])
   })
 
   test('its heading is drawn against the view, which a renderer can turn', async () => {
