@@ -16,7 +16,7 @@ serde_json = { workspace = true }
 # **The digest the register prints.** A hash is a primitive with one right
 # answer, and the crate that implements it is reviewed by more people than a
 # copy in this file would be.
-sha2 = "0.10"
+sha2 = "0.11"
 # **The runtime, with a compiler and the interpreter rather than a JIT backend.**
 # `cranelift` translates a module once per run and `pulley` executes the result
 # without generating native code, which is the trade a check wants: a rule runs
