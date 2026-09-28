@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import Pbf from 'pbf'
+import { PbfWriter } from 'pbf'
 import { mapLibreStyle } from '../style/map-style.js'
 import { cssColor, mix, parseColor } from '../style/oklab.js'
 import { cameraOf, worldOf } from './camera.js'
@@ -159,7 +159,7 @@ describe('the layers', () => {
    polygon and a motorway across it, so the snapshot has something to draw
    and nothing to fetch. */
 const tileOf = (): Uint8Array => {
-  const pbf = new Pbf()
+  const pbf = new PbfWriter()
   const command = (id: number, count: number): number => (id & 7) | (count << 3)
   const zigzag = (n: number): number => (n << 1) ^ (n >> 31)
   const layers = [
@@ -210,13 +210,13 @@ const tileOf = (): Uint8Array => {
   for (const layer of layers) {
     pbf.writeMessage(
       3,
-      (value: typeof layer, out: Pbf) => {
+      (value: typeof layer, out: PbfWriter) => {
         out.writeVarintField(15, 2)
         out.writeStringField(1, value.name)
         for (const feature of value.features) {
           out.writeMessage(
             2,
-            (f: typeof feature, into: Pbf) => {
+            (f: typeof feature, into: PbfWriter) => {
               into.writePackedVarint(2, f.tags)
               into.writeVarintField(3, f.type)
               into.writePackedVarint(4, f.geometry)
@@ -228,7 +228,7 @@ const tileOf = (): Uint8Array => {
           out.writeStringField(3, key)
         }
         for (const text of value.values) {
-          out.writeMessage(4, (t: string, into: Pbf) => into.writeStringField(1, t), text)
+          out.writeMessage(4, (t: string, into: PbfWriter) => into.writeStringField(1, t), text)
         }
         out.writeVarintField(5, 4096)
       },

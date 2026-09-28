@@ -449,6 +449,14 @@ export interface MapLibreMap {
   setTerrain?(terrain: { exaggeration?: number; source: string } | null): unknown
   /** The view's projection, which on a globe says whether a place is on its far side. */
   transform?: { isLocationOccluded?(place: { lat: number; lng: number }): boolean }
+  /**
+   * MapLibre 6's camera, which holds the transform `transform` was in 5. Not
+   * public in 6, which removed `transform` and gave no other way to ask
+   * whether a place is behind the globe; read only for that.
+   */
+  _camera?: { transform?: { isLocationOccluded?(place: { lat: number; lng: number }): boolean } }
+  /** Draws each image a style names as it is asked for. MapLibre 6. */
+  setMissingStyleImageResolver?(resolver: ((id: string) => void) | null): unknown
   /** Sets one paint property of one layer, which is how a points layer takes a new color. */
   setPaintProperty(layer: string, name: string, value: unknown): unknown
   /** Sets one layout property of one layer, which is how the buildings are shown and hidden. */
@@ -519,13 +527,22 @@ const showLabels = (map: MapLibreMap, shown: boolean): void => {
 /** A small map drawn off the page and read back as a picture, which MapLibre's own class makes. */
 interface PictureMap extends ImageHolder {
   getCanvas(): HTMLCanvasElement
+  off?(type: 'styleimagemissing', listener: (event?: MapLibreEvent) => void): unknown
   on(type: 'styleimagemissing', listener: (event?: MapLibreEvent) => void): unknown
+  setMissingStyleImageResolver?(resolver: ((id: string) => void) | null): unknown
   once(type: 'idle', listener: () => void): unknown
   remove(): void
 }
 
 /** What an image is added to: a map, the connected one or a picture's. */
 type ImageHolder = Pick<MapLibreMap, 'addImage' | 'getStyle' | 'hasImage'>
+
+/** What asks for images: a map, which asks through a resolver in MapLibre 6 and an event in 5. */
+type ImageAsker = ImageHolder & {
+  off?(type: 'styleimagemissing', listener: (event?: MapLibreEvent) => void): unknown
+  on(type: 'styleimagemissing', listener: (event?: MapLibreEvent) => void): unknown
+  setMissingStyleImageResolver?(resolver: ((id: string) => void) | null): unknown
+}
 
 /**
  * **Draws an image the style describes and the map has asked for**: a
@@ -547,6 +564,23 @@ const supplyImage = (holder: ImageHolder, id: string | undefined): void => {
   }
 }
 
+/**
+ * **Draws each image a style names as the map asks for it**, and returns what
+ * stops it. MapLibre 6 asks through `setMissingStyleImageResolver`, and its
+ * `styleimagemissing` only says an image is missing; MapLibre 5 asks through
+ * that event. A map with the resolver is answered by it, since in 6 an image
+ * added from the event comes too late for the layer that asked.
+ */
+const answerImages = (holder: ImageAsker): (() => void) => {
+  if (typeof holder.setMissingStyleImageResolver === 'function') {
+    holder.setMissingStyleImageResolver((id) => supplyImage(holder, id))
+    return () => holder.setMissingStyleImageResolver?.(null)
+  }
+  const missing = (event?: MapLibreEvent): void => supplyImage(holder, event?.id)
+  holder.on('styleimagemissing', missing)
+  return () => holder.off?.('styleimagemissing', missing)
+}
+
 /** The width and height of a map-type picture, in CSS pixels, drawn at twice that. */
 const PICTURE = { height: 90, width: 120 }
 
@@ -564,7 +598,8 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
   bearing: () => map.getBearing(),
   /* Out of sight on a globe's far side; never on a flat map, whose
      projection says no to every place. */
-  behind: ({ lat, lng }) => map.transform?.isLocationOccluded?.({ lat, lng }) === true,
+  behind: ({ lat, lng }) =>
+    (map.transform ?? map._camera?.transform)?.isLocationOccluded?.({ lat, lng }) === true,
   credits(changed) {
     const control = map.getContainer().querySelector<HTMLElement>(CONTROL)
     const display = control?.style.display ?? ''
@@ -1384,8 +1419,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     map.on('mousemove', pointing)
     map.on('idle', settled)
     map.on('move', stood)
-    const missing = (event?: MapLibreEvent): void => supplyImage(map, event?.id)
-    map.on('styleimagemissing', missing)
+    const stopImages = answerImages(map)
     const moved = (): void => {
       if (traced.size > 0) {
         void trace()
@@ -1403,7 +1437,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         map.off('mousemove', pointing)
         map.off('idle', settled)
         map.off('move', stood)
-        map.off('styleimagemissing', missing)
+        stopImages()
         map.off('moveend', moved)
         for (const id of drawnPoints.keys()) {
           takeOff(id)
@@ -1520,7 +1554,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           style: { ...base, layers, sources },
           zoom: Math.max(0, zoom - 1.5),
         })
-        picture.on('styleimagemissing', (event) => supplyImage(picture, event?.id))
+        answerImages(picture)
         await new Promise<void>((done) => {
           const late = setTimeout(done, 6000)
           picture.once('idle', () => {

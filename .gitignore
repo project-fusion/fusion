@@ -75,6 +75,9 @@ fusion/site/public/specs
 # The theme engine the site serves, copied from `helix/theme/wasm` by
 # `turbo run wasm-copy`. The tracked binary is the one in the package.
 fusion/site/public/helix/theme.wasm
+# MapLibre's worker and its shared module, copied from the installed package by
+# `scripts/copy-maplibre.mjs`.
+fusion/site/public/maplibre/
 
 # The artifact a failed visual comparison leaves behind. What belongs in the
 # history is the baseline a reviewer approved, not the run that disagreed.

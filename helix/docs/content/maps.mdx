@@ -40,7 +40,10 @@ import '@fusion.dev/helix'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { colorsReady, connectMap } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
-import maplibregl from 'maplibre-gl'
+import * as maplibregl from 'maplibre-gl'
+
+// MapLibre 6 runs its worker from a file of its own. Point it there once.
+maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs')
 
 const frame = document.querySelector('helix-map')
 const style = (colors) => mapLibreStyle(colors)
@@ -68,10 +71,17 @@ followTheme(map, frame, style)
 - `connection.fit()` frames every place on the map.
 - `connection.disconnect()` puts back everything `connectMap` changed.
 
-Use `mapLibreDriver(map)` for MapLibre GL JS 5 and `leafletDriver(map, L)` for
-Leaflet 1.9. Neither renderer is bundled with Helix, so you can use the version
-you already have. Leaflet draws routes, areas, and points only when you pass it
-`L`.
+Use `mapLibreDriver(map)` for MapLibre GL JS 5 or 6 and `leafletDriver(map, L)`
+for Leaflet 1.9. Neither renderer is bundled with Helix, so you can use the
+version you already have. Leaflet draws routes, areas, and points only when you
+pass it `L`.
+
+MapLibre 6 ships as modules and runs its worker from its own file,
+`maplibre-gl-worker.mjs`, which imports `maplibre-gl-shared.mjs` beside it.
+Serve both from one folder and call `setWorkerUrl` with the worker's address
+before you create a map, as MapLibre's installation guide shows for your
+bundler. In Next.js, copy both files into `public/` at build time. MapLibre 6
+fixes a sanitizing flaw in earlier versions, so use 6.4.1 or later.
 
 ## Style the map with your theme
 

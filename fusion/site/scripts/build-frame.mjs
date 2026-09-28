@@ -25,6 +25,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const out = join(root, 'fusion/site/public/sandbox')
 const entry = join(root, 'fusion/site/preview/preview-frame-entry.ts')
 const mapEntry = join(root, 'fusion/site/preview/preview-map-entry.ts')
+const maplibreEntry = join(root, 'fusion/site/preview/preview-maplibre-entry.ts')
 
 /* The layers, in the order a consumer is told to import them. `elements.css` is
    generated from the element sources and hides each tag until it upgrades.
@@ -62,18 +63,51 @@ const stamp = (contents) => createHash('sha256').update(contents).digest('hex').
 
 /* **A live map, in two files the frame loads only when a render carries one.**
  *
- * MapLibre as it ships, copied rather than bundled: its default build makes its
- * worker from a blob at run time, which is the one worker an opaque origin may
- * start, and running that build through a second minifier buys nothing. Then
- * the map chunk, which is the connector and the style compiler, with
+ * MapLibre, bundled into a classic script by `preview-maplibre-entry.ts`:
+ * MapLibre 6 ships as modules, which an opaque origin cannot load from the
+ * site, and its worker is bundled into that script, which starts it.
+ * Then the map chunk, which is the connector and the style compiler, with
  * MapLibre's stylesheet inlined because the chunk is what knows it needs one.
  * Both are classic scripts for the reason the frame is one.
  *
  * `frame.js` learns both stamped URLs at build time, so a new MapLibre or a
  * new chunk is a new URL the moment it is built. */
-const maplibre = await readFile(
-  fileURLToPath(import.meta.resolve('maplibre-gl/dist/maplibre-gl.js')),
-)
+/* **MapLibre's worker as one classic script**, its shared module inside it,
+   which the entry carries and the frame starts from a `blob:` URL: an opaque
+   origin can start no worker from the site, nor one that imports. */
+const workerBuilt = await Bun.build({
+  define: { 'import.meta.url': 'globalThis.location.href' },
+  entrypoints: [fileURLToPath(import.meta.resolve('maplibre-gl/dist/maplibre-gl-worker.mjs'))],
+  format: 'iife',
+  minify: true,
+  target: 'browser',
+})
+if (!workerBuilt.success) {
+  for (const log of workerBuilt.logs) {
+    console.error(log)
+  }
+  process.exit(1)
+}
+const maplibreBuilt = await Bun.build({
+  /* **The page's address for the module's own**, which a classic script has
+     no way to name, `import.meta` being a syntax error there. MapLibre reads
+     it to find its worker when none is set, and the entry sets one. */
+  define: {
+    __MAPLIBRE_WORKER__: JSON.stringify(await workerBuilt.outputs[0].text()),
+    'import.meta.url': 'globalThis.location.href',
+  },
+  entrypoints: [maplibreEntry],
+  format: 'iife',
+  minify: true,
+  target: 'browser',
+})
+if (!maplibreBuilt.success) {
+  for (const log of maplibreBuilt.logs) {
+    console.error(log)
+  }
+  process.exit(1)
+}
+const maplibre = await maplibreBuilt.outputs[0].text()
 await writeFile(join(out, 'maplibre-gl.js'), maplibre)
 const mapBuilt = await Bun.build({
   define: {

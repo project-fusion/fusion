@@ -1,5 +1,5 @@
 import { VectorTile } from '@mapbox/vector-tile'
-import Pbf from 'pbf'
+import { PbfReader } from 'pbf'
 import { cameraOf, type MapView, type ScreenPoint } from './camera.js'
 
 /** The token a snapshot layer's color is the land moved toward. */
@@ -374,7 +374,7 @@ export const mapSnapshot = async (
       if (!bytes) {
         return
       }
-      const tile = new VectorTile(new Pbf(new Uint8Array(bytes)))
+      const tile = new VectorTile(new PbfReader(new Uint8Array(bytes)))
       for (const layer of shown) {
         const source = tile.layers[layer.source]
         if (!source) {
