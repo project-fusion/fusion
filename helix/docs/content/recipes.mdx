@@ -112,14 +112,40 @@ In prose:
 
 See [Typography](./typography).
 
-If you control the Markdown renderer, map two elements to components, because
-HTML alone cannot hold what they need:
+Two Markdown constructs need components, because HTML alone cannot hold what
+they need:
 
-- **Fenced code** to `helix-code-block`, with the fence's language as its `label`.
-  A `<pre>` has no label or copy button.
-- **Alerts** such as `> [!WARNING]` to `helix-callout`. A `<blockquote>` has no
-  tone. `NOTE` and `IMPORTANT` become `tone="info"`, `TIP` becomes `success`,
-  `WARNING` becomes `warning`, and `CAUTION` becomes `danger`.
+- **Fenced code** becomes `helix-code-block`, with the fence's language as its
+  `label`. A `<pre>` has no label or copy button.
+- **Alerts** such as `> [!WARNING]` become `helix-callout`. A `<blockquote>` has no
+  tone. `NOTE` becomes `tone="info"`, `TIP` becomes `success`, `WARNING` becomes
+  `warning`, and `CAUTION` becomes `danger`. `IMPORTANT` has no tone. Each
+  callout is headed by its kind, as GitHub shows it.
+
+The `rehype` plugin from `@fusion.dev/helix/rehype` makes both changes in the
+tree your Markdown library has already built. It parses nothing, so your
+library, its dialect, and your sanitizing stay yours. Add it to any pipeline
+that reaches rehype, such as `remark` with `remark-rehype`, `react-markdown`, or
+MDX:
+
+```js
+import rehypeHelix from '@fusion.dev/helix/rehype'
+
+const html = await unified()
+  .use(remarkParse)
+  .use(remarkRehype)
+  .use(rehypeHelix)
+  .use(rehypeStringify)
+  .process(markdown)
+```
+
+Code that a highlighter colored before the plugin ran keeps its colors. Pass
+`fences: false` if your page draws its own code blocks, `alerts: false` to keep
+alerts as quotes, and `headings` to name each kind in your page's language.
+
+> [!NOTE]
+> The plugin changes only these two constructs. If the Markdown comes from your
+> users, sanitize it in your pipeline before the plugin runs.
 
 Prose spaces each component the same as the element it replaces.
 
