@@ -624,12 +624,6 @@ helix-app-header {
   }
 }
 
-/* A markdown table, which can now outgrow its column. */
-helix-table[data-prose-table] {
-  display: block;
-  overflow-x: auto;
-}
-
 /* The swatch in a documentation token table, written by `build-docs.mjs`. */
 [data-token-swatch] {
   background-clip: padding-box;

@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
@@ -15,7 +16,11 @@ interface Node {
 
 /** Markdown through the pipeline a consumer runs, and the tree it ends in. */
 const treeOf = async (markdown: string, options?: RehypeHelixOptions): Promise<Node> => {
-  const processor = unified().use(remarkParse).use(remarkRehype).use(rehypeHelix, options)
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypeHelix, options)
   return (await processor.run(processor.parse(markdown))) as Node
 }
 
@@ -90,5 +95,85 @@ describe('rehypeHelix', () => {
     expect(quoted.map((one) => one.tagName)).toEqual(['helix-code-block', 'blockquote'])
     const [, callout] = top(await treeOf(markdown, { headings: { warning: 'Achtung' } }))
     expect(textOf(callout?.children?.[0] as Node)).toBe('Achtung')
+  })
+
+  test('a table becomes a Helix table, its header row its columns, each aligned as written', async () => {
+    const [table] = top(
+      await treeOf(
+        '| Token | Size |\n| :-- | --: |\n| `--helix-text-sm` | 14px |\n| `--helix-text-md` | 16px |',
+      ),
+    )
+    expect(table?.tagName).toBe('helix-table')
+    const children = table?.children ?? []
+    expect(children.map((one) => one.tagName)).toEqual([
+      'helix-table-column',
+      'helix-table-column',
+      'helix-table-row',
+      'helix-table-row',
+    ])
+    expect(children.map((one) => one.properties)).toEqual([
+      { 'text-align': 'start' },
+      { 'text-align': 'end' },
+      {},
+      {},
+    ])
+    const [row] = children.slice(2)
+    expect(row?.children?.map((one) => one.tagName)).toEqual([
+      'helix-table-cell',
+      'helix-table-cell',
+    ])
+    expect(row?.children?.[0]?.children?.[0]?.tagName).toBe('code')
+    expect(textOf(row as Node)).toBe('--helix-text-sm14px')
+  })
+
+  /* One cell spanning two columns would put every cell after it a column
+     late, and a heading in a body row would be announced as a heading of
+     its column. HTML draws both, so they stay HTML. */
+  test('a table the grid cannot draw as written stays a table', async () => {
+    const cell = (tagName: string, properties = {}): Node => ({
+      children: [{ type: 'text', value: 'x' }],
+      properties,
+      tagName,
+      type: 'element',
+    })
+    const tableOf = (head: Node[], row: Node[]): Node => ({
+      children: [
+        {
+          children: [
+            {
+              children: [
+                {
+                  children: [{ children: head, tagName: 'tr', type: 'element' }],
+                  tagName: 'thead',
+                  type: 'element',
+                },
+                {
+                  children: [{ children: row, tagName: 'tr', type: 'element' }],
+                  tagName: 'tbody',
+                  type: 'element',
+                },
+              ],
+              tagName: 'table',
+              type: 'element',
+            },
+          ],
+          tagName: 'div',
+          type: 'element',
+        },
+      ],
+      type: 'root',
+    })
+    const drawn = (tree: Node): string | undefined => {
+      rehypeHelix()(tree as never)
+      return tree.children?.[0]?.children?.[0]?.tagName
+    }
+    expect(drawn(tableOf([cell('th'), cell('th')], [cell('td'), cell('td')]))).toBe('helix-table')
+    expect(drawn(tableOf([cell('th'), cell('th')], [cell('td', { colSpan: 2 })]))).toBe('table')
+    expect(drawn(tableOf([cell('th'), cell('th')], [cell('th'), cell('td')]))).toBe('table')
+  })
+
+  test('tables can be left alone', async () => {
+    const [table] = top(await treeOf('| A |\n| - |\n| x |', { tables: false }))
+    expect(table?.tagName).toBe('table')
   })
 })
