@@ -779,7 +779,12 @@ describe('connectMap with a position', () => {
     const position = host.querySelector('helix-headless-map-position') as HTMLElement
     const read = (name: string): string =>
       position.style.getPropertyValue(`--_map-position-${name}`)
-    const connection = connectMap(host, projecting().driver)
+    /* North up, as a renderer draws it, so a heading is read the right way
+       round from the line the connector projects. */
+    const connection = connectMap(host, {
+      ...projecting().driver,
+      project: ({ lat, lng }) => ({ x: lng * 10, y: -lat * 10 }),
+    })
     /* Ten pixels a degree, and 111,320 meters is a degree on the equator,
        where this driver's degrees are as long across as they are north. */
     expect([read('x'), read('y'), read('heading'), read('radius'), read('pitch')]).toEqual([
@@ -826,9 +831,39 @@ describe('connectMap with a position', () => {
       '<helix-headless-map-position label="Van 12" lat="1" lng="2" heading="90"></helix-headless-map-position>',
     )
     const position = host.querySelector('helix-headless-map-position') as HTMLElement
+    /* Turned 30 degrees, as a renderer turned so is drawn: east on the
+       ground is 30 degrees up from the right on the screen. */
+    const turn = (30 * Math.PI) / 180
     const { driver } = projecting()
-    connectMap(host, { ...driver, bearing: () => 30 })
+    connectMap(host, {
+      ...driver,
+      bearing: () => 30,
+      project: ({ lat, lng }) => ({
+        x: (lng * Math.cos(turn) - lat * Math.sin(turn)) * 10,
+        y: -(lng * Math.sin(turn) + lat * Math.cos(turn)) * 10,
+      }),
+    })
     expect(position.style.getPropertyValue('--_map-position-heading')).toBe('60deg')
+  })
+
+  test('on a map drawn in perspective, it points along the line the renderer draws', async () => {
+    const host = await frame(
+      '<helix-headless-map-position label="Van 12" lat="0" lng="0" heading="0"></helix-headless-map-position>',
+    )
+    const position = host.querySelector('helix-headless-map-position') as HTMLElement
+    /* North leans left as it runs up the screen, as a street at the right of
+       a tilted view leans toward the horizon: one pixel left for every two
+       up. Tilted 60 degrees, whose cosine is a half, the arrow's run up the
+       screen is halved, so it is turned in the ground's plane less far, to
+       the angle whose tangent is a quarter, and the tilt lands it on the
+       line. */
+    const { driver } = projecting()
+    connectMap(host, {
+      ...driver,
+      pitch: () => 60,
+      project: ({ lat, lng }) => ({ x: (lng - lat / 2) * 10, y: -lat * 10 }),
+    })
+    expect(position.style.getPropertyValue('--_map-position-heading')).toBe('-14.04deg')
   })
 
   test('a position moving, set as a property, moves it and draws no route again', async () => {
