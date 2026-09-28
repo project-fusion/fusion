@@ -1,13 +1,16 @@
 # @fusion.dev/helix-map
 
 Connects the Helix `Map` frame to whatever draws the map: MapLibre, Leaflet, or
-a driver of your own, with a style made from your tokens. **Private for now**:
-it publishes once the registry has seen it, which
-[`.github/RELEASING.md`](../../.github/RELEASING.md#a-new-package) describes.
+a driver of your own, with a style made from your tokens.
+
+```sh
+bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl
+```
 
 **The guide is [Maps](https://fusion.dev/helix/docs/maps)**: connecting a
-renderer, the style, markers, clusters, routes, a live position, points, the
-keyboard, and writing a driver. The elements themselves are on the
+renderer, the style, markers, clusters, routes, a live position, points, layers
+such as 3D buildings, terrain, and weather radar, the keyboard, and writing a
+driver. The elements themselves are on the
 [Map reference](https://fusion.dev/helix/components/map).
 
 ```js
