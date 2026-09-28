@@ -2,7 +2,6 @@
   "name": "@fusion.dev/helix-map",
   "description": "Connects the Helix Map frame to a map renderer: MapLibre, Leaflet, or a driver of your own.",
   "version": "0.104.1",
-  "private": true,
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
@@ -58,5 +57,8 @@
     "maplibre",
     "leaflet",
     "accessibility"
-  ]
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
 }
