@@ -112,7 +112,7 @@ const TableRow = ({ children }: { children?: ReactNode }) => {
   return heading ? children : <helix-table-row>{children}</helix-table-row>
 }
 
-/** Every string under a node, which is what decides how wide its column is. */
+/** Every string under a node, which is what a heading's slug is made from. */
 const textOf = (node: ReactNode): string => {
   if (node === null || node === undefined || typeof node === 'boolean') {
     return ''
@@ -129,88 +129,6 @@ const textOf = (node: ReactNode): string => {
   return ''
 }
 
-/** The rows of a table, as the cells of each. */
-const rowsOf = (children: ReactNode): ReactNode[][] =>
-  Children.toArray(children)
-    .flatMap((group) =>
-      isValidElement<{ children?: ReactNode }>(group) && group.type === Unwrap
-        ? Children.toArray(group.props.children)
-        : [group],
-    )
-    .map((row) =>
-      isValidElement<{ children?: ReactNode }>(row) ? Children.toArray(row.props.children) : [],
-    )
-    .filter((cells) => cells.length > 0)
-
-/**
- * The longest cell in each column, in characters.
- *
- * A proxy for width rather than a measurement of one, and it only has to be
- * good enough to rank columns against each other. Nothing here can measure
- * text: this runs once at build, on a server, with no layout.
- */
-const widthsOf = (rows: ReactNode[][]): number[] => {
-  const widths: number[] = []
-  for (const cells of rows) {
-    for (const [at, cell] of cells.entries()) {
-      widths[at] = Math.max(widths[at] ?? 0, textOf(cell).trim().length)
-    }
-  }
-  return widths
-}
-
-/**
- * A column short enough that it should simply never wrap.
- *
- * Set from what these columns actually hold: `--helix-color-background` is 24
- * characters and `@fusion.dev/helix-headless` is 18, and both were being broken across
- * three lines by a track that had no reason to be as wide as the prose beside
- * it. Above this a column is carrying a sentence or a token value, and wrapping
- * is the only thing it can do.
- */
-const SHORT = 32
-
-/**
- * The least room a wrapping column may be given before the table scrolls.
- *
- * **Never `minmax(0, …)`.** A zero minimum lets a track vanish: measured at a
- * 900px viewport, a `max-content` name column asking for 250 starved both prose
- * columns to exactly `0px` and wrapped their text to forty-eight lines. A floor
- * turns that into an overflow, which the host can scroll.
- */
-const FLOOR = '14ch'
-
-/**
- * The track list, derived from what the table holds.
- *
- * **The default track is `minmax(0, 1fr)` and it is wrong twice over here.**
- * Every column comes out the same width whatever it carries, so a column of
- * 24-character token names is as wide as a column of sentences; and the `0`
- * minimum lets a track shrink below its own content, which is what licenses the
- * browser to break inside a word. Both were visible on the same page:
- * `--helix-color-background` across three lines, and `appearance` split into
- * `appeara` and `nce` with the inline-code chip broken across the two.
- */
-const tracksOf = (children: ReactNode): string | undefined => {
-  const widths = widthsOf(rowsOf(children))
-  if (widths.length === 0) {
-    return undefined
-  }
-  const long = widths.filter((width) => width > SHORT)
-  if (long.length === 0) {
-    return widths.map((_, at) => (at === widths.length - 1 ? 'auto' : 'max-content')).join(' ')
-  }
-  /* Against the narrowest long column rather than against the total, so the
-     numbers stay small and readable in the inspector: a column with twice the
-     text of its neighbor asks for twice the room. */
-  const narrowest = Math.min(...long)
-  return widths
-    .map((width) =>
-      width > SHORT ? `minmax(${FLOOR}, ${(width / narrowest).toFixed(2)}fr)` : 'max-content',
-    )
-    .join(' ')
-}
-
 /**
  * The table itself, and nothing around it.
  *
@@ -221,14 +139,9 @@ const tracksOf = (children: ReactNode): string | undefined => {
  * a wrapper would scroll never exceeds it. It costs nothing while everything
  * fits, since `auto` shows no scrollbar until there is something to scroll.
  */
-const Table = ({ children }: { children?: ReactNode }) => {
-  const tracks = tracksOf(children)
-  return (
-    <helix-table data-prose-table style={tracks ? { '--table-columns': tracks } : undefined}>
-      {children}
-    </helix-table>
-  )
-}
+const Table = ({ children }: { children?: ReactNode }) => (
+  <helix-table data-prose-table>{children}</helix-table>
+)
 
 /** `thead` and `tbody` are grouping this grid does not have. */
 const Unwrap = ({ children }: { children?: ReactNode }) => children

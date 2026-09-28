@@ -219,6 +219,88 @@ describe('a table whose columns are sized by its `columns`', () => {
 })
 
 /**
+ * The columns that set no width, fitted to what they hold.
+ *
+ * **A column of sentences wraps and a column of values does not.** Left at
+ * `minmax(max-content, 1fr)`, a description asks for its longest sentence on
+ * one line and the table scrolls to give it. A value must never wrap, so a
+ * hyphen in `eu-central-1` is no place to break it.
+ */
+describe('a table fitting the columns that set nothing', () => {
+  const sentence = 'The color every surface is painted over, and the page behind it.'
+
+  const fitted = async (columns: string, rows: string[][], list = ''): Promise<string> => {
+    const body = rows
+      .map(
+        (cells) =>
+          `<helix-headless-table-row>${cells
+            .map((cell) => `<helix-headless-table-cell>${cell}</helix-headless-table-cell>`)
+            .join('')}</helix-headless-table-row>`,
+      )
+      .join('')
+    const host = (await mount(
+      `<helix-headless-table columns="${list}" label="Tokens">${columns}${body}</helix-headless-table>`,
+    )) as Updating
+    await settle(host)
+    return template(host)
+  }
+
+  const two = `
+    <helix-headless-table-column>Token</helix-headless-table-column>
+    <helix-headless-table-column>Description</helix-headless-table-column>`
+
+  test('keeps a column of values whole and lets the column of sentences wrap', async () => {
+    expect(await fitted(two, [['--helix-color-background', sentence]])).toBe(
+      '--table-template: max-content minmax(14ch, 1fr)',
+    )
+  })
+
+  test('shares the room between columns of sentences by how much each says', async () => {
+    /* Forty characters and eighty, so the second asks for twice the first. */
+    const forty = 'The color text is drawn in, on a page.'.padEnd(40, '.')
+    const eighty = `${forty}${forty}`
+    const three = `${two}<helix-headless-table-column>Notes</helix-headless-table-column>`
+    expect(await fitted(three, [['--helix-color-background', forty, eighty]])).toBe(
+      '--table-template: max-content minmax(14ch, 1fr) minmax(14ch, 2fr)',
+    )
+  })
+
+  test('keeps the default in a table of values alone', async () => {
+    expect(await fitted(two, [['helix-web', 'eu-central-1']])).toBe(
+      '--table-template: minmax(max-content, 1fr) minmax(max-content, 1fr)',
+    )
+  })
+
+  test("leaves a column's width and a track in `columns` as they were set", async () => {
+    const sized = `
+      <helix-headless-table-column width="12rem">Token</helix-headless-table-column>
+      <helix-headless-table-column>Description</helix-headless-table-column>`
+    expect(await fitted(sized, [['--helix-color-background', sentence]])).toBe(
+      '--table-template: 12rem minmax(14ch, 1fr)',
+    )
+    expect(await fitted(two, [['--helix-color-background', sentence]], 'auto')).toBe(
+      '--table-template: auto minmax(14ch, 1fr)',
+    )
+  })
+
+  test('refits when the text in a cell changes', async () => {
+    const host = (await mount(
+      `<helix-headless-table label="Tokens">${two}
+        <helix-headless-table-row>
+          <helix-headless-table-cell>helix-web</helix-headless-table-cell>
+          <helix-headless-table-cell>eu-central-1</helix-headless-table-cell>
+        </helix-headless-table-row>
+      </helix-headless-table>`,
+    )) as Updating
+    await settle(host)
+    const cell = host.querySelectorAll('helix-headless-table-cell')[1] as Element
+    ;(cell.firstChild as Text).data = sentence
+    await settle(host)
+    expect(template(host)).toBe('--table-template: max-content minmax(14ch, 1fr)')
+  })
+})
+
+/**
  * A hidden column, which takes no track.
  *
  * Left in, the header row had a heading fewer than the grid had tracks, the

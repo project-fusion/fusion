@@ -260,6 +260,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
    * Set here, it wins over that list, which is what lets a reader resize a
    * column in a table that set one.
    *
+   * **A `Table` fits the columns that set neither to what they hold.** Once
+   * any of them holds a sentence, the columns of short values keep
+   * `max-content` and the columns of sentences wrap, above a floor of `14ch`,
+   * each taking a share of the room in proportion to its text. A table of
+   * values alone keeps the default.
+   *
    * **The floor is `max-content`, never `0` and never `min-content`.** A zero
    * floor lets a track shrink under its own content: at 375 the columns squeeze
    * to 75px and `eu-central-1` wraps across lines, which reads as corrupt data
@@ -271,10 +277,9 @@ export class HelixHeadlessTableColumn extends HelixElement {
    * instead of the value being destroyed. Measured at 375: tracks of 192, 89 and
    * 102 against a 343 box, so the table scrolls 384 and the page does not move.
    *
-   * The cost is that a column of prose asks for its longest paragraph on one
-   * line, so a column holding sentences rather than values wants
-   * `width="minmax(0, 1fr)"` to opt back into wrapping. A headless consumer owns
-   * the overflow either way, that being paint, and gets the honest track list.
+   * A column of sentences does not pay for this: the table sees the sentences
+   * and lets that column wrap. A headless consumer owns the overflow either
+   * way, that being paint, and gets the honest track list.
    */
   @property()
   width = ''
