@@ -18,6 +18,7 @@ import { MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { boundsOf, clearOf } from '@/utils/map-view/map-view'
+import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import { siteScheme } from '@/utils/site-scheme/site-scheme'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './maps.module.css'
@@ -173,7 +174,7 @@ export function MapsHero({
     let teardown = (): void => undefined
     let stopSeeing = (): void => undefined
     void (async () => {
-      const { default: maplibregl } = await import('maplibre-gl')
+      const maplibregl = await loadMapLibre()
       await customElements.whenDefined('helix-map')
       if (!live) {
         return

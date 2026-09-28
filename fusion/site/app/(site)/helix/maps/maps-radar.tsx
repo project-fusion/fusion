@@ -6,6 +6,7 @@ import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/hel
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { useEffect, useRef, useState } from 'react'
 import { RADAR } from '@/content/maps/maps'
+import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import styles from './maps.module.css'
 
 /** The lower 48 states, west-south then east-north, which the radar covers. */
@@ -38,7 +39,7 @@ export function MapsRadar() {
     let live = true
     let teardown = (): void => undefined
     const start = async (): Promise<void> => {
-      const { default: maplibregl } = await import('maplibre-gl')
+      const maplibregl = await loadMapLibre()
       await customElements.whenDefined('helix-map')
       const colors = await colorsReady(host)
       /* The theme's typeface, loaded before the map draws a label in it. */

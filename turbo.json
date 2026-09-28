@@ -178,6 +178,7 @@
         "catalog",
         "frame",
         "specs",
+        "maplibre-copy",
         "wasm-copy"
       ],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "content/faces/faces.generated.ts"],
@@ -188,7 +189,16 @@
     // persistent as the shared `dev` is; what is added is the order.
     "@fusion.dev/site#dev": {
       "cache": false,
-      "dependsOn": ["^build", "faces", "themed-page", "catalog", "frame", "specs", "wasm-copy"],
+      "dependsOn": [
+        "^build",
+        "faces",
+        "themed-page",
+        "catalog",
+        "frame",
+        "specs",
+        "maplibre-copy",
+        "wasm-copy"
+      ],
       "persistent": true
     },
     // `tsc` imports the catalog, the font list and the themed page's markup,
@@ -415,12 +425,14 @@
         "preview/preview-events.ts",
         "preview/preview-frame-entry.ts",
         "preview/preview-map-entry.ts",
+        "preview/preview-maplibre-entry.ts",
         "utils/map-view/map-view.ts",
         "preview/preview-frame.css",
         "public/fonts/**",
         "$TURBO_ROOT$/helix/styles/src/*.css",
         "$TURBO_ROOT$/helix/styles/src/elements.css",
-        "$TURBO_ROOT$/fusion/site/scripts/build-frame.mjs"
+        "$TURBO_ROOT$/fusion/site/scripts/build-frame.mjs",
+        "$TURBO_ROOT$/node_modules/maplibre-gl/package.json"
       ],
       "outputs": ["public/sandbox/**"]
     },
@@ -432,6 +444,20 @@
     "icons": {
       "inputs": ["icons.txt", "raw/**", "$TURBO_ROOT$/helix/icons/scripts/build-icons.mjs"],
       "outputs": ["src/generated.ts", "src/*.generated.ts"]
+    },
+    // The site serves the theme engine as a static file, and the file is a copy
+    // of the tracked binary in `helix/theme/wasm`. It was tracked twice, byte
+    // for byte, with `build-wasm.mjs` writing both; now the copy is build output
+    // like the frame, and the tracked one is the only source.
+    // MapLibre 6's worker and the module it imports, served from `public/` as
+    // MapLibre's guide says for Next.js, whose bundler emits the worker
+    // without its neighbor. Keyed on the installed version.
+    "maplibre-copy": {
+      "inputs": [
+        "$TURBO_ROOT$/node_modules/maplibre-gl/package.json",
+        "$TURBO_ROOT$/fusion/site/scripts/copy-maplibre.mjs"
+      ],
+      "outputs": ["public/maplibre/**"]
     },
     // **The three tiers by name, because no dependency edge reaches them.**
     // `helix/docs` devDepends on the manifest reader and the shared scripts and
@@ -653,10 +679,6 @@
       "outputs": []
     },
     "wasm-check": { "cache": false },
-    // The site serves the theme engine as a static file, and the file is a copy
-    // of the tracked binary in `helix/theme/wasm`. It was tracked twice, byte
-    // for byte, with `build-wasm.mjs` writing both; now the copy is build output
-    // like the frame, and the tracked one is the only source.
     "wasm-copy": {
       "inputs": [
         "$TURBO_ROOT$/helix/theme/wasm/fusion_helix_theme_bg.wasm",
