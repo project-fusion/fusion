@@ -122,11 +122,14 @@ const siteBrand = (): string => {
 export function MapsHero({
   painted,
   sent,
+  snapshots,
 }: {
   /** The sent theme as the server derived it, so it is in the first paint. */
   painted?: Record<string, string>
   /** A theme the builder sent, which the page opens in. */
   sent?: SentTheme
+  /** The map drawn on the server for a wide screen and a narrow one, shown until MapLibre has drawn. */
+  snapshots?: { narrow: string; wide: string } | undefined
 }) {
   const [intro] = MAPS.blocks
   const scope = useRef<HTMLDivElement>(null)
@@ -507,6 +510,27 @@ export function MapsHero({
         ref={frame}
       >
         <div className={styles.mapsCanvas} ref={container} />
+        {/* **The map from the first paint**, drawn on the server at the
+            camera the map opens at on a wide screen and on a narrow one,
+            over the canvas until MapLibre has drawn its tiles, since it
+            paints its land before them. Before the markers, which stand on
+            it. */}
+        {snapshots ? (
+          <>
+            <div
+              className={`${styles.mapsSnapshot} ${styles.mapsSnapshotWide}`}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG this site drew on its server from map tiles
+              dangerouslySetInnerHTML={{ __html: snapshots.wide }}
+              data-helix-map-snapshot=""
+            />
+            <div
+              className={`${styles.mapsSnapshot} ${styles.mapsSnapshotNarrow}`}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG this site drew on its server from map tiles
+              dangerouslySetInnerHTML={{ __html: snapshots.narrow }}
+              data-helix-map-snapshot=""
+            />
+          </>
+        ) : null}
         {/* **The page's ground run in over the map, inside its own box**, so
             it washes the map and not the credit under it, and the places
             drawn after it stand over it. */}

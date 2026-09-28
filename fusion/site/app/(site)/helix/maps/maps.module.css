@@ -10,6 +10,27 @@
 
 /* =============================================================== hero === */
 
+/* **The map drawn on the server**, over the canvas and under the markers,
+   letting the pointer through to the map. One for each side of the layout's
+   break, since the map opens at a different camera on each. */
+.mapsSnapshot {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+@media (width > 48rem) {
+  .mapsSnapshotNarrow {
+    display: none;
+  }
+}
+
+@media (max-width: 48rem) {
+  .mapsSnapshotWide {
+    display: none;
+  }
+}
+
 /* The map the whole width of the page, and the scope the controls paint. */
 .mapsHero {
   /* The map's height, read by the frame and by what lies over the map. */

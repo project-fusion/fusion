@@ -771,6 +771,46 @@ describe('connectMap with routes and areas', () => {
   })
 })
 
+describe('connectMap with a snapshot drawn on the server', () => {
+  test('the snapshot stays until the renderer has drawn, and is then hidden', async () => {
+    const host = await frame('<div data-helix-map-snapshot></div><div id="canvas"></div>')
+    /* A duration of zero, which is a jump: the snapshot goes at once. */
+    host.style.setProperty('--helix-duration-normal', '0ms')
+    let done = (): void => undefined
+    let stopped = false
+    const { driver } = projecting()
+    const connection = connectMap(host, {
+      ...driver,
+      ready: (heard) => {
+        done = heard
+        return () => {
+          stopped = true
+        }
+      },
+    })
+    const snapshot = host.querySelector('[data-helix-map-snapshot]') as HTMLElement
+    expect(snapshot.hidden).toBe(false)
+    done()
+    expect(snapshot.hidden).toBe(true)
+    connection.disconnect()
+    expect(stopped).toBe(true)
+  })
+
+  test('a frame with no snapshot does not wait for the renderer', async () => {
+    const host = await frame('<div id="canvas"></div>')
+    let asked = false
+    const { driver } = projecting()
+    connectMap(host, {
+      ...driver,
+      ready: () => {
+        asked = true
+        return () => undefined
+      },
+    })
+    expect(asked).toBe(false)
+  })
+})
+
 describe('connectMap with a position', () => {
   test('a position is stood where it is, turned its heading, and ringed as wide as its accuracy on the map', async () => {
     const host = await frame(

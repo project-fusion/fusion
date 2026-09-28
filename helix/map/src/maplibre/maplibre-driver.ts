@@ -318,6 +318,10 @@ interface MapLibreAnimation {
  * renderer and a page brings whichever version it has.
  */
 export interface MapLibreMap {
+  /** Whether every tile the view needs has loaded. */
+  areTilesLoaded?(): boolean
+  /** Whether the style has loaded. */
+  loaded?(): boolean
   /** The canvas, which MapLibre makes focusable. */
   getCanvas(): HTMLElement
   /** The middle of the view, which a map-type picture is drawn around. */
@@ -1535,6 +1539,23 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
   project: ({ lat, lng }) => {
     const { x, y } = map.project([lng, lat])
     return { x, y }
+  },
+  /* **Ready at `load`**, which MapLibre fires once, after its first
+     complete drawing with every tile the view needs, or at once where the
+     map has loaded already. Not its first `idle`: a map with something
+     moving on it, a walker along a route, redraws every few frames and is
+     never idle. */
+  ready: (done) => {
+    if (map.loaded?.() && map.areTilesLoaded?.()) {
+      done()
+      return () => undefined
+    }
+    const heard = (): void => {
+      map.off('load', heard)
+      done()
+    }
+    map.on('load', heard)
+    return () => map.off('load', heard)
   },
   rotate: ({ by, to }, motion) => {
     const { bearing, pitch } = aimFrom(map)

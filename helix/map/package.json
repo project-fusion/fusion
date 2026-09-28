@@ -24,6 +24,10 @@
     "./maplibre": {
       "types": "./dist/maplibre/index.d.ts",
       "default": "./dist/maplibre/index.js"
+    },
+    "./snapshot": {
+      "types": "./dist/snapshot/index.d.ts",
+      "default": "./dist/snapshot/index.js"
     }
   },
   "files": [
@@ -40,7 +44,9 @@
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {
     "@fusion.dev/helix-core": "workspace:*",
-    "@fusion.dev/helix-icons": "workspace:*"
+    "@fusion.dev/helix-icons": "workspace:*",
+    "@mapbox/vector-tile": "^2.0.4",
+    "pbf": "^4.0.1"
   },
   "devDependencies": {
     "@fusion.dev/helix-headless": "workspace:*",

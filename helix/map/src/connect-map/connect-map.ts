@@ -48,6 +48,12 @@ export interface MapDriver {
    */
   credits?(changed: () => void): { read(): string[]; stop(): void }
   /**
+   * Calls `done` once the renderer has drawn its view with its tiles, and
+   * returns what stops the waiting. What takes a snapshot drawn on the server
+   * away; without it, the snapshot stays under the renderer's drawing.
+   */
+  ready?(done: () => void): () => void
+  /**
    * The element the renderer made focusable, which the connector takes out of
    * the tab order while connected so the frame's region is the one stop.
    */
@@ -1242,6 +1248,39 @@ export const connectMap = (
     }
   }
   const stopViewing = driver.onView?.(place)
+  /* **A snapshot drawn on the server is taken away once the renderer has
+     drawn over it**, faded at the page's pace for a step, or at once for a
+     reader who asked for less motion. Until then it is the map, which is the
+     point of it: the page has one from its first paint. **Hidden rather than
+     removed**, since the page's framework may own the element and remove it
+     itself later, and an element already gone is an error there. */
+  const away = (snapshot: HTMLElement): void => {
+    snapshot.hidden = true
+    snapshot.style.display = 'none'
+  }
+  const snapshots = [...frame.querySelectorAll<HTMLElement>(':scope > [data-helix-map-snapshot]')]
+  const stopWaiting =
+    snapshots.length > 0
+      ? driver.ready?.(() => {
+          const motion = motionOf(frame, 'step')
+          for (const snapshot of snapshots) {
+            if (!motion || typeof snapshot.animate !== 'function') {
+              away(snapshot)
+              continue
+            }
+            snapshot
+              .animate([{ opacity: 1 }, { opacity: 0 }], {
+                duration: motion.duration,
+                /* The theme's curve, sampled as CSS takes a curve. */
+                easing: `linear(${Array.from({ length: 13 }, (_, step) => motion.easing(step / 12).toFixed(3)).join(', ')})`,
+              })
+              .finished.then(
+                () => away(snapshot),
+                () => away(snapshot),
+              )
+          }
+        })
+      : undefined
   /* **What is drawn follows what is written, once a task.** A part that
      moves, is renamed or is retoned says so with `helix-map-part-change`,
      and a marker or a position is placed again while a route or an area is
@@ -1415,6 +1454,7 @@ export const connectMap = (
       live = false
       drawn?.stop()
       stopViewing?.()
+      stopWaiting?.()
       stopTheming?.()
       styled.disconnect()
       children.disconnect()
