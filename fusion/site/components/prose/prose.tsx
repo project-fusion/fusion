@@ -1,11 +1,5 @@
 import { type HighlightLanguage, highlight } from '@fusion.dev/helix-sandbox/highlight'
-import {
-  type AnchorHTMLAttributes,
-  Children,
-  isValidElement,
-  type ReactElement,
-  type ReactNode,
-} from 'react'
+import { type AnchorHTMLAttributes, isValidElement, type ReactElement, type ReactNode } from 'react'
 import { SectionHeading } from '@/components/section-heading/section-heading'
 
 /*
@@ -97,21 +91,6 @@ const CodeFence = ({ children }: { children?: ReactNode }) => {
  */
 const InlineCode = ({ children }: { children?: ReactNode }) => <helix-code>{children}</helix-code>
 
-/** A column heading, which is a column in this component rather than a cell. */
-const TableColumn = ({ children }: { children?: ReactNode }) => (
-  <helix-table-column>{children}</helix-table-column>
-)
-
-/**
- * A row, or the header row, which is not a row at all.
- */
-const TableRow = ({ children }: { children?: ReactNode }) => {
-  const heading = Children.toArray(children).some(
-    (child) => isValidElement(child) && child.type === TableColumn,
-  )
-  return heading ? children : <helix-table-row>{children}</helix-table-row>
-}
-
 /** Every string under a node, which is what a heading's slug is made from. */
 const textOf = (node: ReactNode): string => {
   if (node === null || node === undefined || typeof node === 'boolean') {
@@ -128,23 +107,6 @@ const textOf = (node: ReactNode): string => {
   }
   return ''
 }
-
-/**
- * The table itself, and nothing around it.
- *
- * **The overflow belongs on the host, never on a wrapper around it.** A track
- * can be `max-content` here, so the grid can genuinely outgrow its container on
- * a narrow screen or a table of long names, and the host is the box that moves.
- * A wrapper reaches nothing: `[part="table"]` is `inline-size: 100%`, so the box
- * a wrapper would scroll never exceeds it. It costs nothing while everything
- * fits, since `auto` shows no scrollbar until there is something to scroll.
- */
-const Table = ({ children }: { children?: ReactNode }) => (
-  <helix-table data-prose-table>{children}</helix-table>
-)
-
-/** `thead` and `tbody` are grouping this grid does not have. */
-const Unwrap = ({ children }: { children?: ReactNode }) => children
 
 /**
  * An address for a heading, derived from what it says.
@@ -199,12 +161,6 @@ export const PROSE_COMPONENTS = {
   strong: ({ children }: { children?: ReactNode }) => (
     <helix-text as="strong">{children}</helix-text>
   ),
-  table: Table,
-  tbody: Unwrap,
-  td: ({ children }: { children?: ReactNode }) => <helix-table-cell>{children}</helix-table-cell>,
-  th: TableColumn,
-  thead: Unwrap,
-  tr: TableRow,
   ul: ({ children }: { children?: ReactNode }) => (
     <helix-list kind="unordered">{children}</helix-list>
   ),

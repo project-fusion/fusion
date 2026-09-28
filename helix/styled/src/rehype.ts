@@ -1,11 +1,12 @@
 /**
- * **A rehype plugin that gives Markdown's two missing constructs their Helix
+ * **A rehype plugin that gives Markdown's fences, alerts and tables their Helix
  * elements, and parses nothing.** Your Markdown library turns `###` into
- * `<h3>`, and `data-prose` styles the HTML it writes. Two constructs carry
+ * `<h3>`, and `data-prose` styles the HTML it writes. Three constructs carry
  * what plain HTML cannot: a code fence, which a reader copies and which has a
- * language, and a GitHub alert, which says how much a passage matters. This
- * rewrites those two in the tree your parser already built, after your own
- * sanitizing, and leaves everything else as it is.
+ * language; a GitHub alert, which says how much a passage matters; and a
+ * table, whose values must stay whole on a narrow screen. This rewrites those
+ * three in the tree your parser already built, after your own sanitizing, and
+ * leaves everything else as it is.
  *
  * - A fence becomes `helix-code-block`, labeled with its language. What is
  *   inside the code is kept, so a highlighter that ran before this has its
@@ -14,6 +15,13 @@
  *   note is `info`, a tip `success`, a warning `warning`, and a caution
  *   `danger`. An important passage has no tone, since none of the four says
  *   it. Each keeps its kind as its heading, as GitHub shows it.
+ * - A table becomes `helix-table`: its header row becomes its columns, each
+ *   aligned as the Markdown aligned it, and every other row a
+ *   `helix-table-row` of `helix-table-cell`. The table sizes its columns from
+ *   what they hold, so a column of values stays whole and a column of
+ *   sentences wraps. A table the grid cannot draw as written, with a caption,
+ *   a cell spanning more than one column or row, or a heading cell outside the
+ *   one header row, stays a table.
  *
  * Any pipeline that reaches rehype takes it: `remark` with `remark-rehype`,
  * `react-markdown`, and MDX.
@@ -48,6 +56,8 @@ export interface RehypeHelixOptions {
   fences?: boolean | undefined
   /** An alert's heading by its kind, for a page in another language. English by default. */
   headings?: Partial<Record<AlertKind, string>> | undefined
+  /** Whether tables become Helix tables. `true` by default. */
+  tables?: boolean | undefined
 }
 
 /** Each alert's tone, where one of the four says it. */
@@ -154,9 +164,77 @@ const calloutOf = (node: HastNode, headings: Record<AlertKind, string>): HastNod
   }
 }
 
+/** Each alignment a Markdown table writes, as the edge a column's `text-align` names. */
+const EDGES: Record<string, 'center' | 'end' | 'start'> = {
+  center: 'center',
+  left: 'start',
+  right: 'end',
+}
+
+/** Whether a cell spans more than one column or row, which a grid of cells cannot draw. */
+const spans = (cell: HastNode): boolean =>
+  Number(cell.properties?.colSpan ?? 1) > 1 || Number(cell.properties?.rowSpan ?? 1) > 1
+
+/** An element of the Helix table, holding what the cell it replaces held. */
+const helix = (tagName: string, children: HastNode[], properties = {}): HastNode => ({
+  children,
+  properties,
+  tagName,
+  type: 'element',
+})
+
+/**
+ * A table as a Helix table, or nothing where the node is not a table the grid
+ * can draw: one header row of heading cells, and body rows of data cells with
+ * no spans.
+ *
+ * The header row's cells become the columns, since a column in Helix is its
+ * heading. Each column takes the alignment its heading was given, and the
+ * table hands it to every cell under it, so the cells carry none of their own.
+ */
+const tableOf = (node: HastNode): HastNode | undefined => {
+  if (node.tagName !== 'table') {
+    return undefined
+  }
+  const head: HastNode[] = []
+  const body: HastNode[] = []
+  for (const group of elements(node)) {
+    const rows = group.tagName === 'tr' ? [group] : elements(group)
+    if (
+      !['tbody', 'tfoot', 'thead', 'tr'].includes(group.tagName ?? '') ||
+      rows.some((row) => row.tagName !== 'tr')
+    ) {
+      return undefined
+    }
+    ;(group.tagName === 'thead' ? head : body).push(...rows)
+  }
+  const [heading] = head
+  const headings = heading ? elements(heading) : []
+  const cells = body.map((row) => elements(row))
+  if (
+    head.length !== 1 ||
+    headings.some((cell) => cell.tagName !== 'th' || spans(cell)) ||
+    cells.some((row) => row.some((cell) => cell.tagName !== 'td' || spans(cell)))
+  ) {
+    return undefined
+  }
+  const columns = headings.map((cell) => {
+    const edge = EDGES[String(cell.properties?.align)]
+    return helix('helix-table-column', cell.children ?? [], edge ? { 'text-align': edge } : {})
+  })
+  const rows = cells.map((row) =>
+    helix(
+      'helix-table-row',
+      row.map((cell) => helix('helix-table-cell', cell.children ?? [])),
+    ),
+  )
+  return helix('helix-table', [...columns, ...rows])
+}
+
 /**
  * The plugin: rewrites the tree in place, from the top down, so a fence
- * inside an alert becomes a code block inside a callout.
+ * inside an alert becomes a code block inside a callout, and a table inside
+ * one a Helix table.
  */
 export default function rehypeHelix(options: RehypeHelixOptions = {}) {
   const headings = { ...HEADINGS, ...options.headings }
@@ -168,7 +246,8 @@ export default function rehypeHelix(options: RehypeHelixOptions = {}) {
     children.forEach((child, index) => {
       const replaced =
         (options.fences !== false ? codeBlockOf(child) : undefined) ??
-        (options.alerts !== false ? calloutOf(child, headings) : undefined)
+        (options.alerts !== false ? calloutOf(child, headings) : undefined) ??
+        (options.tables !== false ? tableOf(child) : undefined)
       if (replaced) {
         children[index] = replaced
       }

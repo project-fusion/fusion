@@ -112,7 +112,7 @@ In prose:
 
 See [Typography](./typography).
 
-Two Markdown constructs need components, because HTML alone cannot hold what
+Three Markdown constructs need components, because HTML alone cannot hold what
 they need:
 
 - **Fenced code** becomes `helix-code-block`, with the fence's language as its
@@ -121,8 +121,13 @@ they need:
   tone. `NOTE` becomes `tone="info"`, `TIP` becomes `success`, `WARNING` becomes
   `warning`, and `CAUTION` becomes `danger`. `IMPORTANT` has no tone. Each
   callout is headed by its kind, as GitHub shows it.
+- **Tables** become `helix-table`. A `<table>` squeezes its columns to fit, so
+  a narrow screen breaks a value such as `eu-central-1` across lines. The
+  header row becomes the table's columns, each aligned as the Markdown aligned
+  it. A column of short values stays whole, a column of sentences wraps, and a
+  table wider than the screen scrolls in its own box.
 
-The `rehype` plugin from `@fusion.dev/helix/rehype` makes both changes in the
+The `rehype` plugin from `@fusion.dev/helix/rehype` makes all three changes in the
 tree your Markdown library has already built. It parses nothing, so your
 library, its dialect, and your sanitizing stay yours. Add it to any pipeline
 that reaches rehype, such as `remark` with `remark-rehype`, `react-markdown`, or
@@ -141,10 +146,13 @@ const html = await unified()
 
 Code that a highlighter colored before the plugin ran keeps its colors. Pass
 `fences: false` if your page draws its own code blocks, `alerts: false` to keep
-alerts as quotes, and `headings` to name each kind in your page's language.
+alerts as quotes, `tables: false` to keep tables as HTML, and `headings` to
+name each kind in your page's language. A table with a caption, a cell that
+spans more than one column or row, or a heading cell outside its header row
+stays HTML, because the grid cannot draw it as written.
 
 > [!NOTE]
-> The plugin changes only these two constructs. If the Markdown comes from your
+> The plugin changes only these three constructs. If the Markdown comes from your
 > users, sanitize it in your pipeline before the plugin runs.
 
 Prose spaces each component the same as the element it replaces.

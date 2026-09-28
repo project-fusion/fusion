@@ -10,9 +10,10 @@ import { DOCUMENT_COMPONENTS, PROSE_COMPONENTS } from '../../components/prose/pr
 /**
  * MDX, compiled to React at build time.
  *
- * **GitHub alerts become callouts** through Helix's own rehype plugin, the one
- * the recipes page gives consumers. Its fences are left to `CodeFence`, which
- * highlights them with the sandbox's grammars.
+ * **GitHub alerts become callouts and tables become Helix tables** through
+ * Helix's own rehype plugin, the one the recipes page gives consumers. Its
+ * fences are left to `CodeFence`, which highlights them with the sandbox's
+ * grammars.
  */
 const render = async (source: string, components: MDXComponents): Promise<ReactNode> => {
   const { default: Content } = await evaluate(source, {
