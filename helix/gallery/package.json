@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-gallery",
   "description": "Card art for Helix component families. Versioned content, rendered by a site.",
-  "version": "0.104.1",
+  "version": "0.105.0",
   "private": true,
   "license": "MIT",
   "repository": {
