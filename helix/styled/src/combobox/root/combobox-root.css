@@ -116,12 +116,15 @@ slot[name="end"]::slotted(*) {
  * `shared/floating`'s: this sheet hands it the family's own hooks and says what
  * is particular to a combobox.
  *
- * The field's width, from the controller rather than from a percentage: the
- * panel is positioned `fixed`, so `100%` would be the viewport and not the
- * field.
+ * As wide as its widest option, and at least the field's width, from the
+ * controller rather than from a percentage: the panel is positioned `fixed`,
+ * so `100%` would be the viewport and not the field.
  *
  * And never taller than the room under the field: the space is measured, not
- * declared.
+ * declared. **Never wider than the screen either**, less a margin each side:
+ * the panel grows to its widest option, and an option with a long
+ * description ran off a phone's edge. Its label and description end in an
+ * ellipsis where they meet the cap.
  */
 [part="surface"] {
   --_floating-border-color: var(--combobox-border-color, var(--helix-color-border));
@@ -129,9 +132,10 @@ slot[name="end"]::slotted(*) {
   --_floating-shadow: var(--combobox-shadow, var(--helix-shadow-floating));
 
   box-sizing: border-box;
-  inline-size: var(--combobox-panel-size, var(--floating-anchor-inline-size, 100%));
+  inline-size: var(--combobox-panel-size, max-content);
   max-block-size: var(--floating-available-block-size, none);
-  min-inline-size: max-content;
+  max-inline-size: calc(100vw - var(--helix-space-md) * 2);
+  min-inline-size: var(--floating-anchor-inline-size, 100%);
   overflow: hidden;
   padding: var(--helix-space-none);
   position: absolute;
