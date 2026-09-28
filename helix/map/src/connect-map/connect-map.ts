@@ -338,6 +338,9 @@ const isPosition = (node: unknown): node is Position =>
 /** Meters in a degree of latitude, which is near enough constant for a ring. */
 const METERS_PER_DEGREE = 111_320
 
+/** How far ahead of a position its heading is measured on the screen, in meters. */
+const AHEAD = 10
+
 /** What the connector reads off a route or an area. */
 interface Layer extends HTMLElement {
   /** A raster layer's credit for its tiles. */
@@ -1159,12 +1162,39 @@ export const connectMap = (
        **across the view, not north**: a tilted map shortens what runs away
        from the eye and not what runs across it, and the ring is laid on the
        ground by the tilt below, so measured north it was shortened twice.
-       **Its heading is against the view**, which a renderer can turn: on a
-       map turned east, a walker going north points up and to the left. **And
-       it lies on the ground** where the map is tilted, the tilt written
-       beside it: a mark standing flat on the screen over a map lying back
-       read as a sticker on the glass. */
+       **Its heading is measured on the screen**: the renderer projects a
+       point a few meters ahead of it, and the arrow is turned along the line
+       to that point. A heading less the bearing is right on a flat map, and
+       wrong on a tilted one, which is drawn in perspective: the roads lean
+       toward the horizon, a north-south street at the side of the view
+       leaning in, and an arrow turned by the bearing alone stood upright
+       beside it with its point off the road. **And it lies on the ground**
+       where the map is tilted, the tilt written beside it: a mark standing
+       flat on the screen over a map lying back read as a sticker on the
+       glass. The tilt shortens the arrow's run toward the horizon, so it is
+       turned in the ground's plane by the angle that lands on the measured
+       line once it is tilted. */
     const across = ((bearing + 90) * Math.PI) / 180
+    const tilted = Math.max(Math.cos((pitch * Math.PI) / 180), 0.05)
+    const headingOf = (
+      position: { heading?: number | undefined; lat: number; lng: number },
+      at: { x: number; y: number },
+    ): number => {
+      const heading = position.heading ?? 0
+      const toward = (heading * Math.PI) / 180
+      const ahead = project({
+        lat: position.lat + (AHEAD * Math.cos(toward)) / METERS_PER_DEGREE,
+        lng:
+          position.lng +
+          (AHEAD * Math.sin(toward)) /
+            (METERS_PER_DEGREE * Math.cos((position.lat * Math.PI) / 180)),
+      })
+      const [dx, dy] = [ahead.x - at.x, ahead.y - at.y]
+      if (Math.hypot(dx, dy) < 1e-6) {
+        return heading - bearing
+      }
+      return Math.round(((Math.atan2(dx, -dy / tilted) * 180) / Math.PI) * 100) / 100
+    }
     for (const position of positions()) {
       if (typeof position.lat !== 'number' || typeof position.lng !== 'number') {
         continue
@@ -1193,7 +1223,7 @@ export const connectMap = (
       position.style.setProperty('--_map-position-y', `${at.y}px`)
       position.style.setProperty(
         '--_map-position-heading',
-        `${(position.heading ?? 0) - bearing}deg`,
+        `${headingOf({ heading: position.heading, lat: position.lat, lng: position.lng }, at)}deg`,
       )
       position.style.setProperty(
         '--_map-position-radius',
