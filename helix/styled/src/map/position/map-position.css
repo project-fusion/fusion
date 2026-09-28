@@ -28,6 +28,7 @@
   /* **Declared here and written by the connector**, onto the host, where the
      connector can reach and this can read. */
   --_map-position-heading: 0deg;
+  --_map-position-pitch: 0deg;
   --_map-position-radius: 0px;
   --_map-position-x: 0px;
   --_map-position-y: 0px;
@@ -48,8 +49,17 @@
   visibility: hidden;
 }
 
+/* **Laid on the ground**, tilted back as far as the map is, so its ring, its
+   glow and its arrow shorten with the road they stand on. Every part turns
+   in the ground's plane before the plane is tilted, which is how the map
+   itself turns and then tilts. A zero-sized box at the point, so the tilt
+   turns about the point. */
 [part="position"] {
   display: block;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transform: rotateX(var(--_map-position-pitch));
 }
 
 /* **As wide as the position is uncertain**, in meters on the ground, which
