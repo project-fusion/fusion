@@ -5,7 +5,7 @@ path: /legal/privacy
 title: Privacy policy
 ---
 
-Last updated September 26, 2026. This page describes what the site does with
+Last updated September 27, 2026. This page describes what the site does with
 your data. The site stores very little, so the page is short.
 
 ## We do not collect what you type
@@ -37,6 +37,21 @@ preferences.
 tracking script from us or from anyone else, and no pixel, tag manager, or
 advertising identifier. We do not know how many people visit.
 
+## Maps load pictures from other services
+
+The maps on the site draw pictures that come from other services:
+
+| What | From |
+| --- | --- |
+| Streets, places, and names | OpenFreeMap |
+| Hills and contour lines | Terrain Tiles on Amazon Web Services |
+| Aerial photographs | The U.S. Geological Survey |
+
+Your browser asks these services directly, so each one receives your IP address
+and which part of the map you are looking at. The weather radar comes through
+our own server from the Iowa Environmental Mesonet, which sees our server and
+not you. The map labels use the site's own fonts, so they add no font service.
+
 ## What our hosting provider records
 
 A hosting provider serves the site. Like every web server, it records each
@@ -49,9 +64,10 @@ that you visited.
 
 ## Why the policy is short
 
-The site holds almost no data: three preferences in your browser, no cookies, no
-analytics, and nothing sent from your device on our behalf. A longer policy
-would claim rights over data we do not hold.
+The site holds almost no data: three preferences in your browser, no cookies,
+and no analytics. What leaves your device is what a page needs to work, such as
+the map pictures above. A longer policy would claim rights over data we do not
+hold.
 
 If this changes, this page changes with it, and the previous wording stays in
 the repository's history.
