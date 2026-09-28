@@ -993,6 +993,7 @@ export const connectMap = (
     const { width } = viewportOf(frame)
     const rtl = isRtl(frame)
     const bearing = driver.bearing?.() ?? 0
+    const pitch = driver.pitch?.() ?? 0
     /* **Every measure first, then every write.** A marker's reach is its
        button's width, which asking for flushes layout, and asked between one
        marker's move and the next it laid the page out once per marker on
@@ -1152,11 +1153,18 @@ export const connectMap = (
     /* **A position is placed as a marker is, and its ring is measured on the
        map.** The accuracy is meters on the ground, and how many pixels that is
        depends on the zoom and, in Web Mercator, the latitude: so the ring is
-       the distance between the position and a point that many meters north of
+       the distance between the position and a point that many meters from
        it, projected by the renderer, which is right at every zoom and on every
-       renderer without knowing which projection it uses. **Its heading is
-       against the view**, which a renderer can turn: on a map turned east, a
-       walker going north points up and to the left. */
+       renderer without knowing which projection it uses. That point is
+       **across the view, not north**: a tilted map shortens what runs away
+       from the eye and not what runs across it, and the ring is laid on the
+       ground by the tilt below, so measured north it was shortened twice.
+       **Its heading is against the view**, which a renderer can turn: on a
+       map turned east, a walker going north points up and to the left. **And
+       it lies on the ground** where the map is tilted, the tilt written
+       beside it: a mark standing flat on the screen over a map lying back
+       read as a sticker on the glass. */
+    const across = ((bearing + 90) * Math.PI) / 180
     for (const position of positions()) {
       if (typeof position.lat !== 'number' || typeof position.lng !== 'number') {
         continue
@@ -1164,7 +1172,7 @@ export const connectMap = (
       /* Unplaced behind a globe, which hides it: a position is watched
          rather than walked, so nothing needs to reach it there. */
       if (driver.behind?.({ lat: position.lat, lng: position.lng })) {
-        for (const name of ['heading', 'radius', 'x', 'y']) {
+        for (const name of ['heading', 'pitch', 'radius', 'x', 'y']) {
           position.style.removeProperty(`--_map-position-${name}`)
         }
         continue
@@ -1173,7 +1181,13 @@ export const connectMap = (
       const meters = position.accuracy ?? 0
       const edge =
         meters > 0
-          ? project({ lat: position.lat + meters / METERS_PER_DEGREE, lng: position.lng })
+          ? project({
+              lat: position.lat + (meters * Math.cos(across)) / METERS_PER_DEGREE,
+              lng:
+                position.lng +
+                (meters * Math.sin(across)) /
+                  (METERS_PER_DEGREE * Math.cos((position.lat * Math.PI) / 180)),
+            })
           : at
       position.style.setProperty('--_map-position-x', `${at.x}px`)
       position.style.setProperty('--_map-position-y', `${at.y}px`)
@@ -1185,6 +1199,7 @@ export const connectMap = (
         '--_map-position-radius',
         `${Math.hypot(edge.x - at.x, edge.y - at.y)}px`,
       )
+      position.style.setProperty('--_map-position-pitch', `${pitch}deg`)
     }
     /* **The points in view, stood where they are now**: which they are was
        asked of the renderer when it last went still, and a pan in between
@@ -1397,7 +1412,7 @@ export const connectMap = (
         layer.walk = []
       }
       for (const position of positions()) {
-        for (const name of ['heading', 'radius', 'x', 'y']) {
+        for (const name of ['heading', 'pitch', 'radius', 'x', 'y']) {
           position.style.removeProperty(`--_map-position-${name}`)
         }
       }
