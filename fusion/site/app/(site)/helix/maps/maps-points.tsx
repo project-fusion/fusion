@@ -5,15 +5,9 @@ import type { HelixActivateEvent, HelixMap } from '@fusion.dev/helix'
 import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { useEffect, useRef, useState } from 'react'
-import { AUSTIN_PLACES } from '@/content/maps/points'
+import { AUSTIN_PLACES, POINTS_VIEW } from '@/content/maps/points'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import styles from './maps.module.css'
-
-/** Greater Austin, west-south then east-north, which is what the file holds. */
-const AUSTIN: [[number, number], [number, number]] = [
-  [-97.93, 30.14],
-  [-97.58, 30.5],
-]
 
 /** How many, as the page's language writes a number. */
 const COUNTED = AUSTIN_PLACES.toLocaleString('en-US')
@@ -31,7 +25,12 @@ const COUNTED = AUSTIN_PLACES.toLocaleString('en-US')
  * `helix-activate` a marker sends, in a polite live region, so pressing one
  * does something a reader can see and hear without the demo opening panels.
  */
-export function MapsPoints() {
+export function MapsPoints({
+  snapshot,
+}: {
+  /** The map drawn on the server at `POINTS_VIEW`, shown until MapLibre has drawn. */
+  snapshot?: string | undefined
+}) {
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
   const [pressed, setPressed] = useState('')
@@ -58,9 +57,10 @@ export function MapsPoints() {
         mapLibreStyle(from, { font: mapFontFrom(host), language }) as never
       const map = new maplibregl.Map({
         attributionControl: false,
-        bounds: AUSTIN,
+        center: [POINTS_VIEW.center.lng, POINTS_VIEW.center.lat],
         container: box,
         style: style(colors),
+        zoom: POINTS_VIEW.zoom,
       })
       const connection = connectMap(host, mapLibreDriver(map))
       const theme = followTheme(map, host, style)
@@ -100,6 +100,16 @@ export function MapsPoints() {
         ref={frame}
       >
         <div className={styles.mapsCanvas} ref={container} />
+        {/* The streets from the first paint, which the map is made over only
+            when it nears the view; the points come with the map. */}
+        {snapshot ? (
+          <div
+            className={styles.mapsSnapshot}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG this site drew on its server from map tiles
+            dangerouslySetInnerHTML={{ __html: snapshot }}
+            data-helix-map-snapshot=""
+          />
+        ) : null}
         <helix-map-points
           cluster
           description={`${COUNTED} places from OpenStreetMap`}
