@@ -168,6 +168,31 @@ const stand = (): {
  */
 const glide: MapMotion = { duration: 250, easing: (t) => t * t }
 
+describe('mapLibreDriver, ready', () => {
+  test('at once where the view is drawn, and otherwise at load, once', () => {
+    const drawn = stand()
+    let heard = 0
+    mapLibreDriver({ ...drawn.map, areTilesLoaded: () => true, loaded: () => true }).ready?.(() => {
+      heard += 1
+    })
+    expect(heard).toBe(1)
+
+    const loading = stand()
+    let waited = 0
+    mapLibreDriver({ ...loading.map, areTilesLoaded: () => false, loaded: () => true }).ready?.(
+      () => {
+        waited += 1
+      },
+    )
+    expect(waited).toBe(0)
+    loading.fire('idle')
+    expect(waited).toBe(0)
+    loading.fire('load')
+    loading.fire('load')
+    expect(waited).toBe(1)
+  })
+})
+
 describe('mapLibreDriver', () => {
   test('a pan and a zoom are MapLibre’s own calls, over the page’s duration and curve', () => {
     const { asked, map } = stand()

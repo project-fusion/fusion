@@ -19,6 +19,7 @@ import {
   RADAR,
 } from '@/content/maps/maps'
 import { stageAppearance } from '@/content/verticals/verticals'
+import { snapshotOf } from '@/utils/map-snapshot/map-snapshot'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { type Params, queryFrom, settingsFrom } from '@/utils/theme-defaults/theme-defaults'
 import { serverTheme } from '@/utils/theme-engine/theme-engine.server'
@@ -162,6 +163,30 @@ function Features({ features }: { features: readonly MapFeature[] }) {
   )
 }
 
+/**
+ * **The cameras the hero's map opens at**, measured: MapLibre frames the walk
+ * clear of the pitch and the bar, which the server cannot lay out, so the
+ * snapshot is drawn at what that framing comes to on a wide screen, 1440 by
+ * 900, and on a phone, 390 wide. A screen between draws a little off from
+ * the map it fades into, which the fade carries.
+ */
+const HERO_VIEWS = {
+  narrow: {
+    center: { lat: 30.27802, lng: -97.75071 },
+    height: 483,
+    pitch: 45,
+    width: 390,
+    zoom: 12.377,
+  },
+  wide: {
+    center: { lat: 30.27297, lng: -97.77172 },
+    height: 727,
+    pitch: 45,
+    width: 1440,
+    zoom: 13.313,
+  },
+}
+
 export const metadata = pageMetadata({
   description: MAPS.lede,
   path: '/helix/maps',
@@ -202,9 +227,17 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
         ),
       )
     : undefined
+  const [wide, narrow] = await Promise.all([
+    snapshotOf(HERO_VIEWS.wide),
+    snapshotOf(HERO_VIEWS.narrow),
+  ])
   return (
     <>
-      <MapsHero painted={painted} sent={sent} />
+      <MapsHero
+        painted={painted}
+        sent={sent}
+        snapshots={wide && narrow ? { narrow, wide } : undefined}
+      />
       {/* **One field behind every band**, the landing page's, so the glass
           the cards are made of has something to show through it. */}
       <div className={styles.mapsField}>

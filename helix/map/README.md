@@ -9,8 +9,8 @@ bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl
 
 **The guide is [Maps](https://fusion.dev/helix/docs/maps)**: connecting a
 renderer, the style, markers, clusters, routes, a live position, points, layers
-such as 3D buildings, terrain, and weather radar, the keyboard, and writing a
-driver. The elements themselves are on the
+such as 3D buildings, terrain, and weather radar, a snapshot drawn on the server
+for the first paint, the keyboard, and writing a driver. The elements themselves are on the
 [Map reference](https://fusion.dev/helix/components/map).
 
 ```js

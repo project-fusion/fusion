@@ -11,6 +11,10 @@ interface LeafletAnimation {
 export interface LeafletLayer {
   /** The layer's credit, where it has one. */
   getAttribution?: (() => string | null | undefined) | undefined
+  /** Whether a tile layer still has tiles on the way. */
+  isLoading?: (() => boolean) | undefined
+  off?: ((type: 'load', listener: () => void) => unknown) | undefined
+  once?: ((type: 'load', listener: () => void) => unknown) | undefined
 }
 
 /** The credit control Leaflet adds unless told not to. */
@@ -170,6 +174,35 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
     map.on('move zoom resize', moved)
     return () => {
       map.off('move zoom resize', moved)
+    }
+  },
+  /* **Ready once every tile layer still loading has loaded**, each firing
+     its own `load`, or at once where none is. */
+  ready: (done) => {
+    const loading: LeafletLayer[] = []
+    map.eachLayer((layer) => {
+      if (layer.isLoading?.()) {
+        loading.push(layer)
+      }
+    })
+    if (loading.length === 0) {
+      done()
+      return () => undefined
+    }
+    let left = loading.length
+    const heard = (): void => {
+      left -= 1
+      if (left === 0) {
+        done()
+      }
+    }
+    for (const layer of loading) {
+      layer.once?.('load', heard)
+    }
+    return () => {
+      for (const layer of loading) {
+        layer.off?.('load', heard)
+      }
     }
   },
   /* **Only where the page handed Leaflet over**, as `leafletDriver(map, L)`:
