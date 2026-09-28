@@ -106,19 +106,29 @@ export const placesFrom = (features: readonly PhotonFeature[]): FoundPlace[] => 
   })
 }
 
-/**
- * Asks Photon for the places matching `query`, near `near` where it is given,
- * which ranks what is close to the map's view first.
- */
-export const searchPlaces = async (
+/** Asks Photon one question, streets only where `layer` says so. */
+const ask = async (
   query: string,
-  { language, near }: { language: string; near?: { lat: number; lng: number } | undefined },
-): Promise<FoundPlace[]> => {
+  {
+    language,
+    layer,
+    limit,
+    near,
+  }: {
+    language: string
+    layer?: 'street' | undefined
+    limit: number
+    near?: { lat: number; lng: number } | undefined
+  },
+): Promise<PhotonFeature[]> => {
   const url = new URL(PHOTON)
   url.searchParams.set('q', query)
-  url.searchParams.set('limit', String(LIMIT))
+  url.searchParams.set('limit', String(limit))
   if (LANGUAGES.has(language)) {
     url.searchParams.set('lang', language)
+  }
+  if (layer) {
+    url.searchParams.set('layer', layer)
   }
   if (near) {
     url.searchParams.set('lat', near.lat.toFixed(2))
@@ -135,5 +145,135 @@ export const searchPlaces = async (
     throw new Error(`Photon answered ${response.status}`)
   }
   const body = (await response.json()) as { features?: PhotonFeature[] }
-  return placesFrom(body.features ?? [])
+  return body.features ?? []
+}
+
+/**
+ * A house number at the start of a search, and the rest of it: `1234` and
+ * `Main St, Dallas` from `1234 Main St, Dallas`. A number with a letter or a
+ * range, such as `221B` or `10-12`, is one too.
+ */
+const numbered = (query: string): { number: string; rest: string } | undefined => {
+  const match = /^\s*(\d+[a-z]?(?:-\d+[a-z]?)?)\s+(.*\S.*)$/i.exec(query)
+  return match?.[1] && match[2] ? { number: match[1], rest: match[2] } : undefined
+}
+
+/** Street words written short, by their long form. */
+const SHORT: Record<string, string> = {
+  ave: 'avenue',
+  blvd: 'boulevard',
+  ct: 'court',
+  dr: 'drive',
+  e: 'east',
+  hwy: 'highway',
+  ln: 'lane',
+  n: 'north',
+  ne: 'northeast',
+  nw: 'northwest',
+  pkwy: 'parkway',
+  pl: 'place',
+  rd: 'road',
+  s: 'south',
+  se: 'southeast',
+  sq: 'square',
+  st: 'street',
+  sw: 'southwest',
+  w: 'west',
+}
+
+/** The words of a street's name that say which way or what kind it is, and not which street. */
+const GENERIC = new Set([
+  ...Object.keys(SHORT),
+  ...Object.values(SHORT),
+  'alley',
+  'loop',
+  'ste',
+  'suite',
+  'trail',
+  'way',
+])
+
+/** The words of some text, lowercased, without its punctuation. */
+const wordsOf = (text: string): string[] =>
+  text
+    .toLowerCase()
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean)
+
+/** Whether a typed word is a word of an address, or the start of one, as `Aus` is of `Austin` while it is typed. */
+const names = (typed: string, word: string): boolean =>
+  word.startsWith(typed) || word === SHORT[typed]
+
+/**
+ * Whether an answer is the address asked for: it carries the number, its
+ * street is named in what was typed, and every other word typed is a word of
+ * its address. A number alone is not enough: `1234 Main St Dallas` found a
+ * 1234 on a Main Street in California, and `2425 E Camelback Rd` a 2425 on
+ * another street in a district named Camelback East.
+ */
+const isAddress = (feature: PhotonFeature, asked: { number: string; rest: string }): boolean => {
+  const properties = feature.properties ?? {}
+  if (properties.housenumber?.toLowerCase() !== asked.number.toLowerCase()) {
+    return false
+  }
+  const typed = wordsOf(asked.rest)
+  const street = wordsOf(properties.street ?? '').filter((word) => !GENERIC.has(word))
+  if (!street.some((word) => typed.some((one) => names(one, word)))) {
+    return false
+  }
+  const address = wordsOf(
+    [
+      properties.street,
+      properties.locality,
+      properties.district,
+      properties.city,
+      properties.county,
+      properties.state,
+      properties.country,
+    ].join(' '),
+  )
+  return typed.every((one) => address.some((word) => names(one, word)))
+}
+
+/**
+ * A search with its street words written out, `E Camelback Rd` as `East
+ * Camelback Road`, which is how the map's streets are named and so what
+ * Photon matches them by.
+ */
+const spelledOut = (text: string): string =>
+  text.replace(/[\p{L}]+/gu, (word) => SHORT[word.toLowerCase()] ?? word)
+
+/** How many streets a missed number offers, ahead of what else matched. */
+const STREETS = 3
+
+/**
+ * Asks Photon for the places matching `query`, near `near` where it is given,
+ * which ranks what is close to the map's view first.
+ *
+ * **A house number that is not mapped falls back to its street.** Photon
+ * knows only the numbers mapped in OpenStreetMap, which in much of the United
+ * States is few of them, and for a number it does not know it answers with
+ * whatever else matches the words, such as a hotel down the block. So where
+ * the search starts with a number and no answer carries it, the rest of the
+ * search is asked again for streets only, and those lead the list, each saying
+ * that its number is not mapped. The second question is asked only then, which
+ * keeps the load on Photon to one question for most searches.
+ */
+export const searchPlaces = async (
+  query: string,
+  { language, near }: { language: string; near?: { lat: number; lng: number } | undefined },
+): Promise<FoundPlace[]> => {
+  const found = await ask(query, { language, limit: LIMIT, near })
+  const asked = numbered(query)
+  if (!asked || found.some((feature) => isAddress(feature, asked))) {
+    return placesFrom(found)
+  }
+  const streets = placesFrom(
+    await ask(spelledOut(asked.rest), { language, layer: 'street', limit: STREETS, near }),
+  ).map((street) => ({
+    ...street,
+    detail: [`Number ${asked.number} is not mapped`, street.detail].filter(Boolean).join('. '),
+    id: `street-${street.id}`,
+  }))
+  return [...streets, ...placesFrom(found)].slice(0, LIMIT)
 }

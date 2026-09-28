@@ -37,9 +37,10 @@ const degrees = (value: unknown, limit: number): number | undefined =>
  * server and not the reader.
  *
  * **Throttled for the geocoder's sake.** Photon's public instance is fair
- * use, so this instance sends it at most `RATE` searches a second, and
- * answers 429 past that. The page waits for a pause in typing before it
- * asks.
+ * use, so this instance takes at most `RATE` searches a second, and answers
+ * 429 past that. A search is one question to Photon, or two where a house
+ * number is not mapped and its street is asked for. The page waits for a
+ * pause in typing before it asks.
  */
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
