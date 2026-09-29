@@ -139,8 +139,15 @@ describe('selection', () => {
   })
 
   test('names each checkbox for the row it chooses', async () => {
+    /* In the `<label>` around the box's input, which is where its name comes
+       from. The attribute on the host alone names nothing: measured in
+       Chromium, every row's box was a checkbox with no name. */
     const element = await table('selectable row-key="id"')
+    const words = (box?: Box): string =>
+      box?.shadowRoot?.querySelector('[part="label"]')?.textContent?.trim() ?? ''
     expect(boxes(element)[1]?.getAttribute('aria-label')).toBe('Select delta')
+    expect(words(boxes(element)[1])).toBe('Select delta')
+    expect(words(boxes(element)[0])).toBe('Select every row')
   })
 })
 

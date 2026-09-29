@@ -21,7 +21,18 @@ describe('checkbox server output', () => {
        a checkbox with no children: the only shadow root is its own. */
     const markup = ssr(html`<helix-headless-checkbox></helix-headless-checkbox>`)
     expect(rendered(markup, 'helix-headless-checkbox')).toMatch(
-      /<span part="label">(<!--[^>]*-->)*<slot\s*>/,
+      /<span part="label"\s*>(<!--[^>]*-->)*<slot\s*>/,
+    )
+  })
+
+  test('a name from aria-label is served in the label, clipped', () => {
+    /* So a box sent by a server is named before it upgrades, the same way a
+       labeled one is, and its words are never shown on the way. */
+    const markup = ssr(
+      html`<helix-headless-checkbox aria-label="Select delta"></helix-headless-checkbox>`,
+    )
+    expect(rendered(markup, 'helix-headless-checkbox')).toMatch(
+      /<span part="label" data-hidden\s*>(<!--[^>]*-->)*<slot\s*>(<!--[^>]*-->)*Select delta/,
     )
   })
 

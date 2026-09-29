@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
+  hasLayout,
   hasState,
   mount,
   part,
@@ -180,6 +181,56 @@ describe('checkbox label fallback', () => {
     const slot = (part(host, 'label') as HTMLElement).querySelector('slot') as HTMLSlotElement
     expect(slot.assignedNodes().length).toBe(0)
     expect(slot.textContent?.trim()).toBe('Accept')
+  })
+})
+
+/**
+ * A name from the host's `aria-label`, which is the only way a box with no
+ * words beside it is named. The host is not what a reader is on: the input is,
+ * and the `<label>` around it is what names it.
+ */
+const browser = hasLayout() ? test : (): void => {}
+
+describe('checkbox named by aria-label', () => {
+  const label = (host: HTMLElement): HTMLElement => part(host, 'label') as HTMLElement
+
+  test('draws the name into the label, clipped, and leaves no room for it', async () => {
+    const host = await mount(
+      '<helix-headless-checkbox aria-label="Select delta"></helix-headless-checkbox>',
+    )
+    expect(label(host).textContent?.trim()).toBe('Select delta')
+    expect(label(host).hasAttribute('data-hidden')).toBe(true)
+    expect(hasState(host, 'has-label')).toBe(false)
+  })
+
+  /* Browser only: happy-dom leaves a slot's fallback out of a flattened
+     `assignedNodes`, so it reads every label drawn from a string as empty and
+     hides it. In Chromium the fallback counts, which is what keeps the name in
+     the tree: `hidden` would take it out, where the clip only takes it off
+     screen. */
+  browser('keeps the clipped label in the tree', async () => {
+    const host = await mount(
+      '<helix-headless-checkbox aria-label="Select delta"></helix-headless-checkbox>',
+    )
+    expect(label(host).hasAttribute('hidden')).toBe(false)
+  })
+
+  test('shows the words a consumer wrote, which win over the attribute', async () => {
+    const host = await mount(
+      '<helix-headless-checkbox aria-label="Ignored">Terms</helix-headless-checkbox>',
+    )
+    expect(label(host).hasAttribute('data-hidden')).toBe(false)
+    expect(hasState(host, 'has-label')).toBe(true)
+  })
+
+  test('takes a new name when the attribute changes', async () => {
+    /* What a column move does to every row's box in Data Table. */
+    const host = (await mount(
+      '<helix-headless-checkbox aria-label="Select delta"></helix-headless-checkbox>',
+    )) as Updatable
+    host.setAttribute('aria-label', 'Select 200')
+    await settle(host)
+    expect(label(host).textContent?.trim()).toBe('Select 200')
   })
 })
 
