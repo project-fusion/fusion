@@ -398,6 +398,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
           autocomplete=${this.autocomplete || nothing}
           spellcheck="false"
           aria-describedby=${this.describedBy ?? nothing}
+          aria-invalid=${this.invalidity ?? nothing}
           ?disabled=${this.isDisabled}
           ?required=${this.required}
           @input=${this.handleInput}

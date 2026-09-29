@@ -410,6 +410,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
         minlength=${this.minLength ?? nothing}
         maxlength=${this.maxLength ?? nothing}
         aria-describedby=${this.describedBy ?? nothing}
+        aria-invalid=${this.invalidity ?? nothing}
         ?disabled=${this.isDisabled}
         ?readonly=${this.readOnly}
         ?required=${this.required}

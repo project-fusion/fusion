@@ -231,6 +231,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
           ?disabled=${this.isDisabled}
           ?required=${this.required}
           aria-describedby=${this.describedBy ?? nothing}
+          aria-invalid=${this.invalidity ?? nothing}
           @change=${this.handleChange}
           @input=${this.stopInner}
         />

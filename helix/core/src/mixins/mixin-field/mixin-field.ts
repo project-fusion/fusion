@@ -48,6 +48,12 @@ export declare class MixinFieldInterface {
   readonly describedBy: string | undefined
 
   /**
+   * `'true'` for `aria-invalid` on the control while a message is shown, and
+   * `undefined` otherwise, so the attribute is absent.
+   */
+  readonly invalidity: 'true' | undefined
+
+  /**
    * The validation message shown under the control. It replaces the browser's
    * message.
    *
@@ -373,6 +379,22 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
         return FEEDBACK_ID
       }
       return this.hint === '' ? undefined : HINT_ID
+    }
+
+    /**
+     * @internal `aria-invalid` for the control, bound beside `describedBy` in
+     * the field's own template.
+     *
+     * **On the control, because the control is what a screen reader is on.**
+     * `ariaInvalid` on the host's internals reaches a host that has a role of
+     * its own, a group or a radiogroup, and nothing else: read from Chromium's
+     * tree, an Input showing "Too short" was a textbox reporting `invalid:
+     * false`, described by its message. A reader heard the message as though it
+     * were a hint. Bound in the template, so a server that renders a field
+     * already failing sends it failing.
+     */
+    get invalidity(): 'true' | undefined {
+      return this.resolvedFeedback === '' ? undefined : 'true'
     }
 
     /**

@@ -542,6 +542,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
           }
           autocomplete=${this.autocomplete || nothing}
           aria-describedby=${this.describedBy ?? nothing}
+          aria-invalid=${this.invalidity ?? nothing}
           ?disabled=${this.isDisabled}
           ?readonly=${this.readOnly}
           ?required=${this.required}

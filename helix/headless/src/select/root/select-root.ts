@@ -430,6 +430,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         aria-haspopup="listbox"
         aria-expanded=${this.open ? 'true' : 'false'}
         aria-describedby=${this.describedBy ?? nothing}
+        aria-invalid=${this.invalidity ?? nothing}
         ?disabled=${this.isDisabled}
         @click=${() => this.toggleOpen()}
         @keydown=${this.handleTriggerKeydown}
