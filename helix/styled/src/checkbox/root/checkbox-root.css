@@ -133,8 +133,11 @@
    the choice: a required group with nothing ticked is the invalid case, and
    there the reader is being told about the group rather than about the tick. */
 
-/* Nothing to read, so nothing to space away from the box. */
-:host(:not(:state(has-label))) [part="label"] {
+/* Nothing to read, so nothing to space away from the box. A label drawn only
+   to carry the host's `aria-label` is kept: it is what names the box, and
+   `display: none` takes it out of the tree along with the room. The shared
+   field rule clips it instead, out of the flow, so it spaces nothing. */
+:host(:not(:state(has-label))) [part="label"]:not([data-hidden]) {
   display: none;
 }
 

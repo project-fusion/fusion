@@ -165,10 +165,18 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
    */
   private syncLabelPresence(): void {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('[part="label"] slot')
-    const filled = (slot?.assignedNodes({ flatten: true }) ?? []).some(
-      (node) => node.textContent?.trim() !== '' || node.nodeType === Node.ELEMENT_NODE,
-    )
-    this.toggleState('has-label', filled)
+    const meaningful = (node: Node): boolean =>
+      node.textContent?.trim() !== '' || node.nodeType === Node.ELEMENT_NODE
+    const filled = (slot?.assignedNodes({ flatten: true }) ?? []).some(meaningful)
+    /* A name that is not shown is no label to leave room for. Content the
+       consumer wrote wins over the host's `aria-label`, as it does in the
+       platform's own `<label>`, so the clip only holds while the slot is empty. */
+    const hidden =
+      this.label === '' &&
+      Boolean(this.getAttribute('aria-label')) &&
+      !(slot?.assignedNodes() ?? []).some(meaningful)
+    this.partNamed('label')?.toggleAttribute('data-hidden', hidden)
+    this.toggleState('has-label', filled && !hidden)
     /* And `hidden` on the region itself, because the state is on the host and
        this tier has no sheet to turn one into the other, so a checkbox with no
        label would keep an empty label box beside it. The styled rule stays,
@@ -205,6 +213,14 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
        value that serves no attribute and sets the property to `undefined`, so
        the client keeps the property it needs and the server states nothing it
        cannot support. */
+    /* **`aria-label` names without showing**, the rule every field follows:
+       the attribute on the host reaches nothing, since the name a reader hears
+       is the input's and the input is named by this `<label>`. Measured in
+       Chromium's own tree, Data Table's row boxes were each a `checkbox` with
+       no name while "Select asset-001.webp" sat on the host around it. So the
+       words are drawn into the label and clipped, and the name arrives through
+       the same `<label>` a visible one does. */
+    const named = this.label === '' ? this.getAttribute('aria-label') : null
     return html`<label part="field">
       <span part="box">
         <input
@@ -223,7 +239,9 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
           aria-hidden="true"
         ></span>
       </span>
-      <span part="label"><slot @slotchange=${this.handleLabelChange}>${this.label}</slot></span>
+      <span part="label" ?data-hidden=${named !== null}
+        ><slot @slotchange=${this.handleLabelChange}>${this.label || named}</slot></span
+      >
     </label>
     ${this.renderHint()}${this.renderFeedback()}`
   }
