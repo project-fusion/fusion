@@ -56,6 +56,7 @@
     "rs:check": "cargo clippy --workspace --all-targets -- -D warnings",
     "rs:fmt": "cargo fmt --all",
     "rs:test": "cargo test --workspace",
+    "serve:examples": "turbo run frame && bun fusion/scripts/serve-examples.mjs",
     "shot": "bun fusion/scripts/shot.mjs",
     "smoke:examples": "turbo run frame && bun fusion/scripts/run-example-smoke.mjs",
     "smoke:scaffold": "turbo run build analyze && bun fusion/scripts/run-template-build.mjs",
