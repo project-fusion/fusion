@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMap } from '@fusion.dev/helix-headless/map'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './map-root.css.js'
 
@@ -34,8 +35,9 @@ export class HelixMap extends HelixHeadlessMap {
   material?: 'frosted' | 'glass' | 'transparent'
 
   /* The surface's sheet first, this family's after, so a map's own rules win
-     where the two speak about the same box. */
-  static override styles: CSSResultGroup = [viewportStyles, styles]
+     where the two speak about the same box. The live region's clip first of
+     all, as that sheet asks. */
+  static override styles: CSSResultGroup = [liveStyles, viewportStyles, styles]
 }
 
 declare global {

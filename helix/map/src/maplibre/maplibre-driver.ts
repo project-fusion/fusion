@@ -1620,6 +1620,9 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     const { bearing, pitch } = aimFrom(map)
     turn(map, bearing, Math.max(0, to ?? pitch + (by ?? 0)), motion)
   },
+  /* Only where the map can say, so the frame never announces a level it made
+     up. */
+  ...(map.getZoom ? { zoom: () => map.getZoom?.() ?? 0 } : {}),
   zoomBy: (direction, motion) => {
     if (direction > 0) {
       map.zoomIn(animation(motion))

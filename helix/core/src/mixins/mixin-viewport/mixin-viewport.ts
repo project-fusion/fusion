@@ -108,6 +108,8 @@ export declare class ViewportElement {
 
   /** What one pan control is called, for a family that draws its own. */
   protected panLabel(way: ViewportWay): string
+  /** The side of the screen a reading-order way is on: `up`, `down`, `left` or `right`. */
+  protected sideOf(way: ViewportWay): string
 
   /** The arrow drawn on one pan control, for a family that draws its own. */
   protected panGlyph(way: ViewportWay): string
@@ -356,7 +358,7 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
      * laid out in reading order, so on a right-to-left page the start button
      * sits on the right, and it said "left" and pointed left from there.
      */
-    private sideOf(way: ViewportWay): string {
+    protected sideOf(way: ViewportWay): string {
       if (way !== 'start' && way !== 'end') {
         return way
       }

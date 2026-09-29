@@ -451,6 +451,14 @@ after the label.
   `rotate` to `controls` for buttons around the compass that move and turn it.
 - In the layers menu, Tab moves between the tiles, Space or Enter turns a layer
   on or off, and Escape closes the menu.
+- After the map moves in answer to a key or button, screen readers hear what
+  changed once it stops: "Moved left", "Zoom level 14", "Facing 15 degrees",
+  or "Tilted 10 degrees". Each sentence is a `-label` property, such as
+  `zoomed-label` and `moved-left-label`, so you can write it in your page's
+  language.
+- If your page moves its own map in answer to `helix-map-pan` and the other
+  events, call the frame's `moved()` once it has moved. The frame says nothing
+  until it is told, so it never describes a move that did not happen.
 
 ## Write a driver
 
@@ -472,6 +480,7 @@ animation. Each optional method turns on a feature:
 | `silenceKeyboard`, `focusTarget`, `replaceZoom` | Using the frame's keys and zoom buttons |
 | `bearing` | Arrows that stay correct when the map is rotated, and the Face north arrow |
 | `rotate`, `tilt` | The rotate, Face north, and tilt buttons and keys |
+| `zoom` | Saying the zoom level after a zoom |
 
 Without `project`, markers stay hidden. To animate a move your page makes
 itself, read the same motion with `motionOf(element, pace)`.
