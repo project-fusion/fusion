@@ -180,6 +180,18 @@ export class HelixHeadlessButton extends HelixFormElement {
   @property()
   label = ''
 
+  /**
+   * What kind of panel this button opens, where it opens one: `menu` for a
+   * `Menu`.
+   *
+   * Set by the component that owns the panel, as a property for the reason
+   * `expanded` gives above. It is what makes a reader say the button opens a
+   * menu. Read from Chromium's tree, a Menu's trigger was a plain button that
+   * reported collapsed and expanded and no popup.
+   */
+  @property({ attribute: false })
+  popup?: 'dialog' | 'grid' | 'listbox' | 'menu' | 'tree'
+
   /** Moves focus to the inner control, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
     ...HelixFormElement.shadowRootOptions,
@@ -397,6 +409,7 @@ export class HelixHeadlessButton extends HelixFormElement {
       part="button"
       type="button"
       aria-expanded=${this.expanded === undefined ? nothing : String(this.expanded)}
+      aria-haspopup=${this.popup ?? nothing}
       aria-label=${this.label || nothing}
       command=${this.command || nothing}
       tabindex=${stop}

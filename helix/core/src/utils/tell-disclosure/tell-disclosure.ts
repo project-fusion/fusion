@@ -2,7 +2,8 @@
 const warned = new WeakSet<Element>()
 
 /**
- * Tells a slotted trigger that it opens something, and whether it is open.
+ * Tells a slotted trigger that it opens something, whether it is open, and,
+ * where `popup` names it, what kind of thing it opens.
  *
  * **Writing `aria-expanded` onto the consumer's element is a hydration
  * mismatch, so it is not written.** The gap that answer was reaching for is
@@ -50,7 +51,11 @@ const warned = new WeakSet<Element>()
  * all to a trigger that already carries `aria-expanded`, which is a consumer
  * mirroring the state from the component's `toggle` event.
  */
-export const tellDisclosure = (trigger: Element | null | undefined, open: boolean): void => {
+export const tellDisclosure = (
+  trigger: Element | null | undefined,
+  open: boolean,
+  popup?: 'dialog' | 'grid' | 'listbox' | 'menu' | 'tree',
+): void => {
   if (!trigger) {
     return
   }
@@ -61,6 +66,11 @@ export const tellDisclosure = (trigger: Element | null | undefined, open: boolea
      element that is about to be perfectly capable. */
   if (trigger.localName.includes('-')) {
     ;(trigger as unknown as Record<string, unknown>).expanded = open
+    /* What it opens, where that is one of the kinds a reader names: a menu
+       button is announced as one, and a disclosure is announced by its state. */
+    if (popup) {
+      ;(trigger as unknown as Record<string, unknown>).popup = popup
+    }
     return
   }
   /* A consumer who took the warning's advice has already said it, and a
