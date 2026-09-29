@@ -253,7 +253,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
           variant="flow"
         ></helix-aura>
 
-        <Band reveal>
+        <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>{pillars?.kicker}</Eyebrow>
             <SectionTitle>{pillars?.title}</SectionTitle>
@@ -276,7 +276,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
         {/* **The one thing a marker cannot do, running.** Thousands of places
             are a layer the renderer draws, and the demo is the real layer on
             the real data beside the markup it takes. */}
-        <Band reveal shell="plain" wide>
+        <Band shell="plain" wide>
           <div className={band.bandSplit}>
             <helix-flex class={band.bandSection} direction="column" gap="md">
               <Eyebrow>{points?.kicker}</Eyebrow>
@@ -290,7 +290,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
           </div>
         </Band>
 
-        <Band reveal>
+        <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>{features?.kicker}</Eyebrow>
             <SectionTitle>{features?.title}</SectionTitle>
@@ -301,7 +301,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
 
         {/* **The ground, running**: the layers under the places, raised and
             tilted on a valley whose walls show them, beside the markup. */}
-        <Band reveal shell="plain" wide>
+        <Band shell="plain" wide>
           <div className={band.bandSplit}>
             <helix-flex class={band.bandSection} direction="column" gap="md">
               <Eyebrow>{terrain?.kicker}</Eyebrow>
@@ -315,7 +315,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
           </div>
         </Band>
 
-        <Band reveal>
+        <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>{layers?.kicker}</Eyebrow>
             <SectionTitle>{layers?.title}</SectionTitle>
@@ -326,7 +326,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
 
         {/* **The weather, running**: the radar the last layer card names, on
             the live frames, and the button that plays it. */}
-        <Band reveal shell="plain" wide>
+        <Band shell="plain" wide>
           <div className={band.bandSplit}>
             <helix-flex class={band.bandSection} direction="column" gap="md">
               <Eyebrow>{radar?.kicker}</Eyebrow>
@@ -343,7 +343,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
           </div>
         </Band>
 
-        <Band reveal>
+        <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>{basics?.kicker}</Eyebrow>
             <SectionTitle>{basics?.title}</SectionTitle>
@@ -369,7 +369,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
         {/* The install command, and the guide for everything after it. The
             guide is the one place the setup code lives, so the page and the
             docs cannot drift apart. */}
-        <Band id="get-started" reveal>
+        <Band id="get-started">
           <helix-flex
             class={`${band.bandSection} ${styles.mapsStarted}`}
             direction="column"
@@ -389,7 +389,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
           </helix-flex>
         </Band>
 
-        <Band reveal>
+        <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>{stack?.kicker}</Eyebrow>
             <SectionTitle>{stack?.title}</SectionTitle>

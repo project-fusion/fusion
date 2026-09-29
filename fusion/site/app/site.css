@@ -552,43 +552,6 @@ helix-drawer helix-tree {
 
 /* ============================================================ motion ===== */
 
-/* Sections arrive as they are scrolled to, once, and never on the way back up.
-
-   **Driven from `reveal-on-scroll.tsx` rather than a view timeline**, whose own
-   note carries the argument: a scroll-driven animation with `fill: both` never
-   detaches, which makes the section a permanent backdrop root and takes the
-   `backdrop-filter` off every card in it. A transition ends.
-
-   **Nothing here hides anything on its own.** The armed state is written by
-   script, so a page whose JavaScript never ran has no rule that can hide a
-   section.
-
-   **A rise and no fade, because a fade breaks the glass on the way in.** An
-   element below full opacity is a backdrop root, and the blur returns the
-   instant the value reaches exactly 1, which snaps at the end of the reveal.
-   Measured against hard stripes: only `opacity: .99` blocked it.
-
-   **Bigger, slower and sprung**, because a rise has to earn visibility that a
-   fade gets for free: 96px, three times `slow`, and `easing-spring`. The scale
-   is the second thing the transform can say, a rise alone being hard to
-   separate from the scroll carrying the section up anyway. */
-[data-reveal="armed"] {
-  transform: translateY(calc(var(--helix-space-3xl) * 1.5)) scale(0.97);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  [data-reveal="armed"],
-  [data-reveal="shown"] {
-    transition: transform calc(var(--helix-duration-slow) * 3) var(--helix-easing-spring);
-  }
-}
-
-/* Stated rather than left to the base style, so the transition has two ends to
-   run between and the element lands on a value it was given. */
-[data-reveal="shown"] {
-  transform: none;
-}
-
 /* Cross-route transitions. */
 @view-transition {
   navigation: auto;

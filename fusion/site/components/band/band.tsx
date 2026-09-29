@@ -9,7 +9,6 @@ export function Band({
   card = true,
   children,
   id,
-  reveal,
   shell = 'flex',
   wide,
 }: {
@@ -17,8 +16,6 @@ export function Band({
   card?: boolean
   children: ReactNode
   id?: string | undefined
-  /** Marks the band for `RevealOnScroll`. */
-  reveal?: boolean | undefined
   shell?: 'flex' | 'plain'
   wide?: boolean | undefined
 }) {
@@ -34,7 +31,6 @@ export function Band({
       className={wide ? `${styles.showcaseBand} ${styles.fieldBand}` : styles.fieldBand}
       data-band
       id={id}
-      {...(reveal ? { 'data-reveal': true } : {})}
     >
       {shell === 'plain' ? (
         <div data-shell>{inner}</div>

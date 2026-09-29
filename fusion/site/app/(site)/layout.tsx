@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { HashTarget } from '@/components/hash-target/hash-target'
 import { HelixElements } from '@/components/helix-elements/helix-elements'
-import { RevealOnScroll } from '@/components/reveal-on-scroll/reveal-on-scroll'
 import { SiteFooter } from '@/components/site-footer/site-footer'
 import { SiteNav } from '@/components/site-nav/site-nav'
 import { type RouteKind, routes } from '../../content/routes/routes'
@@ -43,7 +42,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         ]}
       />
       <main style={{ viewTransitionName: 'site-content' }}>{children}</main>
-      <RevealOnScroll />
 
       <SiteFooter />
     </>

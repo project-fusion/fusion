@@ -51,7 +51,7 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section data-band data-reveal>
+      <section data-band>
         <helix-flex data-shell direction="column" gap="xl">
           <helix-text as="h2" data-measure data-section-title>
             {CONTACT.blocks[0]?.title}
@@ -78,7 +78,7 @@ export default function Page() {
         </helix-flex>
       </section>
 
-      <section data-band data-reveal>
+      <section data-band>
         <helix-flex data-shell direction="column" gap="xl">
           <helix-text as="h2" data-measure data-section-title>
             {CONTACT.blocks[1]?.title}
