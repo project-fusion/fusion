@@ -33,6 +33,8 @@ export declare class CollectionElement {
    * Rendered by the component outside its rows, where a status is allowed.
    */
   protected renderLive(hasContent: boolean): TemplateResult
+  /** News the component has for the live region while there are rows and nothing is loading. */
+  protected announced: string
 
   /** Binds to a rows slot's `slotchange`, and answers `hasRows` from it. */
   protected countRows(event: Event): void
@@ -216,9 +218,22 @@ export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) =>
      * tier clips it; the visible lines are `renderStatus`.
      */
     protected renderLive(hasContent: boolean): TemplateResult {
-      const said = this.loading ? this.loadingText : hasContent ? '' : this.emptyText
+      const said = this.loading ? this.loadingText : hasContent ? this.announced : this.emptyText
       return html`<span part="live" role="status">${said}</span>`
     }
+
+    /**
+     * What the region says while there are rows and nothing is loading, which
+     * is nothing unless the component has news of its own.
+     *
+     * **One region, so two messages never talk over each other.** Data Table
+     * says a sort and a selection here; a second `role="status"` beside this
+     * one would be heard in whichever order the reader happens to queue them.
+     * Loading and empty win, being the larger news. Set before the render that
+     * shows it, in `willUpdate`, and not reactive: it changes only when
+     * something else already asked for a render.
+     */
+    protected announced = ''
   }
 
   return Collection as unknown as Constructor<CollectionElement> & T

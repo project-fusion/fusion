@@ -1,5 +1,7 @@
 import {
   customElement,
+  fillTemplate,
+  formatNumbers,
   type HelixBeforeToggleEvent,
   HelixElement,
   HelixFilterEvent,
@@ -167,6 +169,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     slotAssignment: 'manual',
   }
 
+  /** The word for an ascending sort, in `sorted-label`. */
+  @property({ attribute: 'ascending-label' })
+  ascendingLabel = 'ascending'
+
   /**
    * The starting search query, used until `filter` is set.
    */
@@ -203,6 +209,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'default-sort' })
   defaultSort = ''
+
+  /** The word for a descending sort, in `sorted-label`. */
+  @property({ attribute: 'descending-label' })
+  descendingLabel = 'descending'
 
   /**
    * The estimated height of a row before it is drawn, in pixels.
@@ -402,6 +412,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * What screen readers hear when the chosen rows change. `{count}` is how many
+   * rows are chosen.
+   */
+  @property({ attribute: 'selected-label' })
+  selectedLabel = '{count} selected'
+
+  /**
    * The sort order, as `field:direction`.
    *
    * Set it and this element defers: a reader's click fires `helix-sort` and
@@ -420,6 +437,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * What screen readers hear when the table is sorted. `{column}` is the
+   * column's heading and `{order}` is `ascending-label` or `descending-label`.
+   */
+  @property({ attribute: 'sorted-label' })
+  sortedLabel = 'Sorted by {column}, {order}'
+
+  /**
    * The number of rows in the whole result, for when the table cannot count
    * them.
    *
@@ -430,6 +454,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ type: Number })
   total = 0
+
+  /** What screen readers hear when the table stops being sorted. */
+  @property({ attribute: 'unsorted-label' })
+  unsortedLabel = 'Not sorted'
 
   /**
    * Draws only the rows in view, with empty space in place of the rest.
@@ -1102,8 +1130,51 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     }
   }
 
+  /** The sort last heard, so a render that changed nothing says nothing. */
+  private heardSort: string | undefined = undefined
+
+  /** The selection last heard, for the same reason. */
+  private heardSelected: string | undefined = undefined
+
+  /**
+   * What the table says after a sort or a change to the chosen rows.
+   *
+   * **The state changed and nothing said so.** A sort moved `aria-sort` on the
+   * heading, and a reader on the heading's button is not told its column's
+   * state changed; a chosen row ticked one box, and nothing gave the count. So
+   * each is said in the collection's live region, once, after it has happened.
+   * Whoever set it, a reader or a consumer answering `helix-sort`, since either
+   * way the rows under the reader have moved. Not on the first render, which
+   * is the table arriving rather than anything changing.
+   */
+  private news(): string {
+    const sort = this.sort
+    const selected = this.selectable ? this.selected : ''
+    let said = this.announced
+    if (this.hasUpdated && sort !== this.heardSort) {
+      const parsed = parse(sort)
+      const column = parsed
+        ? this.tableColumns.find((one) => one.field === parsed.field)
+        : undefined
+      said = parsed
+        ? fillTemplate(this.sortedLabel, {
+            column: column?.textContent?.trim() || parsed.field,
+            order: parsed.direction === 'asc' ? this.ascendingLabel : this.descendingLabel,
+          })
+        : this.unsortedLabel
+    } else if (this.hasUpdated && selected !== this.heardSelected) {
+      said = fillTemplate(this.selectedLabel, {
+        count: formatNumbers(this.lang)(this.chosen.size),
+      })
+    }
+    this.heardSort = sort
+    this.heardSelected = selected
+    return said
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.announced = this.news()
     hostAria(this.internals, { label: this.label || 'Table', role: 'grid' })
     this.internals.ariaMultiSelectable = this.selectable ? 'true' : null
     /* **Anything that changes which row sits at which index**, and not just a
