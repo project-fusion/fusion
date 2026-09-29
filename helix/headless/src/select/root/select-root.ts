@@ -421,12 +421,33 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     </slot>`
   }
 
+  /**
+   * What names the trigger: the label, then the choice.
+   *
+   * **A button is named by its label alone**, and what it shows is not read:
+   * the `<label for>` wins over the button's own text. Read from Chromium's
+   * tree, a Select showing "Spanish" was a button named "Language", with the
+   * choice in no name or value, so a reader never heard what was chosen. A
+   * native `<select>` says both, and this names the trigger by both, the label
+   * and then the value, in that order.
+   *
+   * A consumer's own `aria-labelledby` on the host wins, carried to the trigger
+   * by `AriaForwardController`, so nothing is written here to fight it.
+   */
+  private get triggerNames(): string | typeof nothing {
+    if (this.hasAttribute('aria-labelledby')) {
+      return nothing
+    }
+    return this.labeled ? `${this.labelId} value` : 'value'
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <button
         part="trigger"
         id=${this.controlId}
         type="button"
+        aria-labelledby=${this.triggerNames}
         aria-haspopup="listbox"
         aria-expanded=${this.open ? 'true' : 'false'}
         aria-describedby=${this.describedBy ?? nothing}
@@ -436,7 +457,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         @keydown=${this.handleTriggerKeydown}
       >
         <slot name="start"></slot>
-        <span part="value">${this.display}</span>
+        <span part="value" id="value">${this.display}</span>
         ${
           /* Before the indicator, not after it. The caret is the affordance
              saying the control opens, so it stays the last thing in the trigger
