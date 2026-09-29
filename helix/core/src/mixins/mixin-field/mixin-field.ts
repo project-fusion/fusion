@@ -226,38 +226,21 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
     protected labelId = 'label'
 
     /**
-     * `aria-label` as well as the properties, because the host's name is drawn.
+     * @internal The host's `aria-label`, observed so a new one renders.
      *
      * **An `aria-label` is read when the field renders, and nothing else would
      * render it again.** It is the platform's attribute and no property of this
      * element's, so writing a new one scheduled no update and the label kept
      * the old words. Data Table meets this on every column move: each row's
      * checkbox is named by the first column, so reordering renames every one.
-     */
-    static get observedAttributes(): string[] {
-      /* The base's getter with this class as its receiver: Lit's reads the
-         properties off `this`, so called on the base alone it would answer
-         with the base's attributes and drop every one declared below it. */
-      const inherited = Reflect.get(Base, 'observedAttributes', this) as string[] | undefined
-      return [...(inherited ?? []), 'aria-label']
-    }
-
-    /**
-     * Renders the field again when its `aria-label` changes, since the label
-     * draws it.
      *
-     * @internal Called by the platform. Not a consumer's to call.
+     * A reactive property on the attribute, which is the one way Lit observes
+     * one. Overriding `observedAttributes` in a mixin compiled `this` to the
+     * mixin's own class, so every field observed only this mixin's attributes
+     * and dropped its own. Not reflected: the attribute is the consumer's.
      */
-    override attributeChangedCallback(
-      name: string,
-      old: string | null,
-      value: string | null,
-    ): void {
-      super.attributeChangedCallback(name, old, value)
-      if (name === 'aria-label' && old !== value) {
-        this.requestUpdate()
-      }
-    }
+    @property({ attribute: 'aria-label' })
+    protected namedBy: string | null = null
 
     /** Whether a label is drawn at all, in either shape. */
     protected get labeled(): boolean {
