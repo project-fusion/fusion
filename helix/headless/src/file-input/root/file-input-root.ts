@@ -499,6 +499,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
           capture=${this.capture ?? nothing}
           name=${this.name || nothing}
           aria-describedby=${this.describedBy ?? nothing}
+          aria-invalid=${this.invalidity ?? nothing}
           ?disabled=${this.isDisabled}
           ?multiple=${this.multiple}
           ?required=${this.required}

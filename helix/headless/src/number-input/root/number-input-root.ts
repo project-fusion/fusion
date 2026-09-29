@@ -636,6 +636,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           name=${this.name || nothing}
           placeholder=${this.placeholder || nothing}
           aria-describedby=${this.describedBy ?? nothing}
+          aria-invalid=${this.invalidity ?? nothing}
           aria-valuemin=${this.min ?? nothing}
           aria-valuemax=${this.max ?? nothing}
           aria-valuenow=${parsed ?? nothing}

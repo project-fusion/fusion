@@ -652,6 +652,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
           autocomplete=${this.autocomplete || nothing}
           inputmode="numeric"
           aria-describedby=${this.describedBy ?? nothing}
+          aria-invalid=${this.invalidity ?? nothing}
           ?disabled=${this.isDisabled}
           ?readonly=${this.readOnly}
           ?required=${this.required}

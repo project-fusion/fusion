@@ -420,6 +420,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         .value=${String(at)}
         aria-labelledby=${this.labeled ? `${this.labelId} ${which}-name` : `${which}-name`}
         aria-describedby=${this.describedBy ?? nothing}
+        aria-invalid=${this.invalidity ?? nothing}
         ?disabled=${this.isDisabled}
         @input=${this.handleInput}
         @change=${this.handleChange}
@@ -475,6 +476,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
               .value=${this.value}
               name=${this.name || nothing}
               aria-describedby=${this.describedBy ?? nothing}
+              aria-invalid=${this.invalidity ?? nothing}
               ?disabled=${this.isDisabled}
               @input=${this.handleInput}
               @change=${this.handleChange}

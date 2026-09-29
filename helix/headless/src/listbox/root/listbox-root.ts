@@ -886,6 +886,7 @@ export class HelixHeadlessListbox extends MixinCollection(
         role="listbox"
         aria-busy=${this.loading ? 'true' : nothing}
         aria-describedby=${this.describedBy ?? nothing}
+        aria-invalid=${this.invalidity ?? nothing}
         aria-labelledby=${this.labeled ? this.labelId : nothing}
         aria-multiselectable=${this.multiple ? 'true' : nothing}
         aria-required=${this.required ? 'true' : nothing}

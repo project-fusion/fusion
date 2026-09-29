@@ -522,6 +522,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
       aria-label=${this.readOnly ? said : nothing}
       aria-labelledby=${!this.readOnly && this.labeled ? this.labelId : nothing}
       aria-describedby=${this.describedBy ?? nothing}
+      aria-invalid=${this.invalidity ?? nothing}
       aria-required=${this.required && !this.readOnly ? 'true' : nothing}
       data-slotted=${this.markSource ? '' : nothing}
       style=${`--rating-full: ${Math.floor(showing)}; --rating-part: ${showing - Math.floor(showing)}; --rating-steps: ${this.positions.length}`}

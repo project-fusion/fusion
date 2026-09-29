@@ -851,6 +851,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
           aria-autocomplete=${this.suggest ? 'both' : 'list'}
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-describedby=${this.describedBy ?? nothing}
+          aria-invalid=${this.invalidity ?? nothing}
           placeholder=${(this.chosen.length > 0 || this.unresolved ? '' : this.placeholder) || nothing}
           ?disabled=${this.isDisabled}
           .value=${this.multiple || this.open ? this.suggestion || this.typed : this.word}

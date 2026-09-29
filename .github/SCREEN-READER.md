@@ -64,9 +64,6 @@ are marked **Gap** in the steps below. Record what VoiceOver says anyway, since
 the tree is what VoiceOver reads and a gap may sound worse or better than it
 reads.
 
-- **A field with a message is never called invalid.** Input, Select,
-  and Combobox describe their control with the message, and the control itself
-  reports `invalid: false`. The message is heard as though it were help text.
 - **A select's button does not say what is chosen.** Its name is the field's
   label alone, and the choice it shows is in no name or value.
 - **The menu's button does not say it opens a menu.** It reports collapsed and
@@ -163,8 +160,8 @@ Expect the list to close, the field to say it is collapsed, and "TypeScript" to
 be its value. Press Escape and expect nothing to change.
 
 **C5. A field with a message.** Open `/combobox/invalid`. Press Tab.
-Expect "Region", then "That region is not available on your plan".
-**Gap:** it is not called invalid.
+Expect "Region", that it is invalid, then "That region is not available on
+your plan".
 
 ## Select
 
@@ -182,8 +179,8 @@ trigger, which now says "French". This is how a single select behaves here:
 each arrow in the open list chooses.
 
 **S4. A field with a message.** Open `/select/invalid`. Press Tab.
-Expect "Region", then "That region is not available on your plan".
-**Gap:** it is not called invalid.
+Expect "Region", that it is invalid, then "That region is not available on
+your plan".
 
 ## Data Table
 
@@ -238,9 +235,9 @@ reply". The asterisk after the label is drawn and should not be spoken; record
 "star" if it is.
 
 **I2. Submitting it empty.** Tab to "Submit" and press Enter.
-Expect focus to return to "Email" and the browser's message for an empty
-required field to be spoken.
-**Gap:** it is not called invalid.
+Expect focus to return to "Email", that it is invalid, and the browser's
+message for an empty required field. Type an address and press Tab, and expect
+the field to stop being invalid.
 
 **I3. Showing a password.** Open `/input/reveal`. Press Tab twice.
 Expect "Show password", a button that says it is not pressed. Press Space.

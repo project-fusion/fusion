@@ -150,6 +150,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
           ?disabled=${this.isDisabled}
           ?required=${this.required}
           aria-describedby=${this.describedBy ?? nothing}
+          aria-invalid=${this.invalidity ?? nothing}
           @change=${this.handleChange}
           @input=${this.stopInner}
         />

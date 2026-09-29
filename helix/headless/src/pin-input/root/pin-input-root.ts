@@ -550,6 +550,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
             inputmode=${this.type === 'numeric' ? 'numeric' : 'text'}
             autocomplete=${at === 0 ? this.autocomplete || nothing : 'off'}
             aria-label=${fillTemplate(this.cellLabel, { index: at + 1, length: this.count })}
+            aria-invalid=${this.invalidity ?? nothing}
             ?disabled=${this.isDisabled}
             ?readonly=${this.readOnly}
             @focus=${this.handleFocus}

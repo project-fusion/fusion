@@ -857,6 +857,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}
         aria-describedby=${this.describedBy ?? nothing}
+        aria-invalid=${this.invalidity ?? nothing}
         role=${this.suggesting ? 'combobox' : nothing}
         aria-autocomplete=${this.suggesting ? 'list' : nothing}
         aria-controls=${this.suggesting ? 'suggestions' : nothing}
