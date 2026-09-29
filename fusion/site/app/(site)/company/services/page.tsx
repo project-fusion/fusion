@@ -109,7 +109,7 @@ export default async function Page() {
           answer rather than three unrelated claims that happen to be adjacent.
           The rules also line the offers up on one grid, so you can compare
           them. */}
-        <Band reveal>
+        <Band>
           {/*
            * *A head on the card, which is what makes it the same object as
            *                 the landing's.** That one opens with a label, a heading and a
@@ -188,7 +188,7 @@ export default async function Page() {
         {/*
          * *The closing prose as two panels in a row, one per argument.**
          */}
-        <Band card={false} reveal>
+        <Band card={false}>
           <div className={styles.closingRow}>
             {sections.map((section, index) => (
               <div className={band.bandCard} data-material="glass" data-substrate key={section.key}>
