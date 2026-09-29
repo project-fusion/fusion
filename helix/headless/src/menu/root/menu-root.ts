@@ -151,7 +151,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   private tellTrigger(): void {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
-    tellDisclosure(slot?.assignedElements({ flatten: false })[0], this.open)
+    tellDisclosure(slot?.assignedElements({ flatten: false })[0], this.open, 'menu')
   }
 
   /** The element the surface opens against. */
