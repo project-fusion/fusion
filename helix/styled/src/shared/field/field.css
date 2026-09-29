@@ -17,13 +17,25 @@
   line-height: var(--helix-leading-tight);
 }
 
-/* Marked on the label rather than in it, so the mark is not part of the
-   accessible name: a screen reader says "required" from the control's own state,
-   and hearing the word twice is worse than not seeing the asterisk. */
+/* The mark is drawn and not named: a screen reader says "required" from the
+   control's own state, and hearing it twice is worse than not seeing the
+   asterisk. **Generated content is part of the name**, so drawing it after the
+   label was not enough. Read from Chromium's tree, a required Input was named
+   "Email *". The empty alternative after the slash names it nothing.
+
+   Behind `@supports`, because a browser without the syntax drops the whole
+   declaration and would draw no mark at all: Firefox has it from 128, and the
+   oldest Firefox with `light-dark()` and popovers is 125. */
 :host([required]) [part="label"]::after {
   color: var(--helix-color-danger);
   content: "*";
   margin-inline-start: var(--helix-space-2xs);
+}
+
+@supports (content: "*" / "") {
+  :host([required]) [part="label"]::after {
+    content: "*" / "";
+  }
 }
 
 /* The space above is the one margin here that is not zero. */
