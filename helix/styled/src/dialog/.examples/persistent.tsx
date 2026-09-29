@@ -2,6 +2,7 @@ export function Example() {
   return (
     <helix-dialog
       default-open
+      id="unsaved"
       label="Unsaved changes"
       persistent
     >
@@ -11,8 +12,15 @@ export function Example() {
         slot="footer"
         variant="spaced"
       >
-        <helix-button>Discard changes</helix-button>
         <helix-button
+          command="--close"
+          commandfor="unsaved"
+        >
+          Discard changes
+        </helix-button>
+        <helix-button
+          command="--close"
+          commandfor="unsaved"
           emphasis="solid"
           tone="primary"
         >

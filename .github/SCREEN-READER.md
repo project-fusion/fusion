@@ -54,35 +54,18 @@ In the keys below, **VO** is Control-Option.
 Where a step says **Expect**, the words may differ from VoiceOver's own
 phrasing, and the facts may not: a name, a role and a state are either spoken
 or missing. Record what you heard, word for word, and mark the step **Pass** or
-**Fail**.
-
-## Gaps already measured
-
-Chromium's accessibility tree was read for each family before this script was
-written. These steps are expected to fail until the components change, and they
-are marked **Gap** in the steps below. Record what VoiceOver says anyway, since
-the tree is what VoiceOver reads and a gap may sound worse or better than it
-reads.
-
-- **A select's button does not say what is chosen.** Its name is the field's
-  label alone, and the choice it shows is in no name or value.
-- **The menu's button does not say it opens a menu.** It reports collapsed and
-  expanded, and no popup.
-- **A map says nothing when it moves.** Panning, zooming, and turning change the
-  picture and speak nothing.
-- **A data table says nothing when it sorts or when rows are chosen.** The
-  column's sort state changes, and nothing is announced.
-- **A persistent dialog cannot be closed from the keyboard.** Escape is refused
-  and its buttons have no command.
+**Fail**. Each expectation was checked in Chromium's accessibility tree before
+it was written. Safari builds its own tree, which is why the pass is run by ear.
 
 ## Map
 
 **M1. The frame.** Open `/map/events`. Press Tab.
 Expect "City map", and that it is a group.
 
-**M2. Moving the map.** With focus on the map, press Right Arrow, then Plus.
-Expect the grid on screen to move and then grow.
-**Gap:** nothing is spoken.
+**M2. A map that is not connected.** With focus on the map, press Right
+Arrow, then Plus. Expect the grid on screen to move and then grow, and nothing
+to be spoken: this page moves its own grid and does not call `moved()`, so the
+map is never told the move happened.
 
 **M3. The controls.** Press Tab four times, and expect these in order:
 
@@ -103,11 +86,17 @@ Avenue Bridge". Press Down Arrow once more and expect "Texas Capitol, passed"
 again, since the walk wraps. Press Home and End and expect the first and last
 place.
 
-**M5. What is drawn on the map.** VO-Right through the map from its start.
+**M5. Moving the map.** Press Shift-Tab until focus is on the map itself,
+"Walking route in downtown Austin". Press Right Arrow.
+Expect "Moved right" once the map stops. Press Plus and expect "Zoom level",
+then a number. Press Shift-Right Arrow and expect "Facing 15 degrees", then
+Shift-Left Arrow and expect "Facing north".
+
+**M6. What is drawn on the map.** VO-Right through the map from its start.
 Expect a list named "Map layers" holding "Walking route, From the Capitol to the
 Congress Avenue Bridge", and an image named "Your location".
 
-**M6. A live position.** In Safari's console, run:
+**M7. A live position.** In Safari's console, run:
 
 ```js
 document.querySelector('helix-map-position').description = 'Arrived at Rainey Street'
@@ -117,7 +106,7 @@ Expect "Arrived at Rainey Street" to be spoken without focus moving. Run it
 again with a different sentence straight away, and expect it to wait: a
 position's words are spoken at most once every five seconds.
 
-**M7. Places that share a spot.** Open `/map/clusters` and zoom out with Minus
+**M8. Places that share a spot.** Open `/map/clusters` and zoom out with Minus
 until places gather. Tab to a gathered place.
 Expect the names it holds joined into one, for example "Hotel and Hotel café",
 as a button. Press Enter and expect the places to spread out or the map to zoom
@@ -138,8 +127,8 @@ the page behind the dialog.
 Expect the dialog to close and focus to return to "Open dialog".
 
 **D4. A dialog that refuses.** Open `/dialog/persistent`, where the dialog
-opens with the page. Press Escape. Expect the dialog to stay open.
-**Gap:** nothing on the keyboard closes it. Reload the page to leave.
+opens with the page. Press Escape. Expect the dialog to stay open. Tab to
+"Discard changes" and press Enter, and expect it to close.
 
 ## Combobox
 
@@ -166,9 +155,8 @@ your plan".
 ## Select
 
 **S1. The trigger.** Open `/select/preview`. Press Tab.
-Expect "Language", a pop-up button, its choice "Spanish", then "Used for
-emails and notifications".
-**Gap:** "Spanish" is shown and may not be spoken.
+Expect "Language Spanish", a pop-up button, then "Used for emails and
+notifications".
 
 **S2. Opening.** Press Down Arrow.
 Expect the list to open with "Spanish" as the current choice.
@@ -192,16 +180,14 @@ column's heading.
 
 **T2. Sorting.** Tab to the "Name" heading.
 Expect "Name", a button, and that the column is sorted ascending. Press Enter.
-Expect the column to say it is sorted descending. Press Enter again and expect
-it to be unsorted.
-**Gap:** no sentence says the table has been sorted.
+Expect "Sorted by Name, descending". Press Enter again and expect "Not
+sorted".
 
 **T3. Choosing rows.** Open `/data-table/selecting-and-arranging`. Press Tab.
 Expect "Select every row", a checkbox that is partly checked, since one row
 starts chosen. Tab past the headings' controls to the first row's box.
 Expect "Select asset-001.webp", a checkbox, not checked. Press Space and
-expect it to be checked.
-**Gap:** no sentence says how many rows are chosen.
+expect it to be checked, then "2 selected".
 
 **T4. Pages.** Tab to the page buttons under the table.
 Expect a navigation landmark named "Pagination", with "Previous page", "Page
@@ -246,8 +232,7 @@ Expect it to say it is pressed, and the field to show "hunter2".
 ## Menu
 
 **N1. The trigger.** Open `/menu/preview`. Press Tab.
-Expect "View options", a button, collapsed.
-**Gap:** it does not say it opens a menu.
+Expect "View options", a menu button, collapsed.
 
 **N2. Opening.** Press Enter.
 Expect a menu named "View options", and focus on "Sort by", which says it has
@@ -301,8 +286,8 @@ of the pass, for example `2026-09-29.md`:
 | Step | Result | Heard |
 | --- | --- | --- |
 | M1 | Pass | "City map, group" |
-| M2 | Gap | Nothing |
+| M2 | Pass | Nothing |
 ```
 
-Every step gets a row, and a skipped step says why. A failure that is not in
-the gaps above gets an issue, and the record names it.
+Every step gets a row, and a skipped step says why. A failure gets an issue,
+and the record names it.
