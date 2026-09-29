@@ -1,5 +1,7 @@
 import {
   customElement,
+  fillTemplate,
+  formatNumbers,
   HelixActivateEvent,
   HelixElement,
   HelixMapClusterEvent,
@@ -100,6 +102,15 @@ const TILT_STEP = 10
 const TILTED = 50
 
 /**
+ * How long after a reader asks that the view moving still counts as the
+ * answer, in milliseconds. Longer than the slowest trip the connector animates.
+ */
+const ASK_LAPSES = 3000
+
+/** How long the view must be still before what it did is said, in milliseconds. */
+const SETTLES = 400
+
+/**
  * @summary A frame around a map drawn by another library.
  *
  * @description
@@ -178,6 +189,7 @@ const TILTED = 50
  * @csspart layers - The list of the map's shown layers, such as routes, areas, and points, read by screen readers.
  * @csspart layers-menu - The menu of the map's layers, which the layers button opens.
  * @csspart layers-toggle - The button that opens and closes the layers menu.
+ * @csspart live - What screen readers hear after the map moves: the zoom level, the way it faces, its tilt, or the way it moved. Visually hidden in the styled tier.
  * @csspart map-type - One map type's card in the layers menu: a radio button, its picture, and its name.
  * @csspart map-type-name - The name on a map type's card.
  * @csspart map-type-preview - The picture of the map on a map type's card.
@@ -220,6 +232,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ attribute: 'face-north-label' })
   faceNorthLabel = 'Face north'
 
+  /** What screen readers hear when the map is tilted back to looking straight down. */
+  @property({ attribute: 'flat-label' })
+  flatLabel = 'Looking straight down'
+
   /** The Hybrid map type's name. */
   @property({ attribute: 'hybrid-label' })
   hybridLabel = 'Hybrid'
@@ -257,6 +273,26 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ attribute: 'map-type-label' })
   mapTypeLabel = 'Map type'
 
+  /** What screen readers hear when the map has moved down. */
+  @property({ attribute: 'moved-down-label' })
+  movedDownLabel = 'Moved down'
+
+  /** What screen readers hear when the map has moved left. */
+  @property({ attribute: 'moved-left-label' })
+  movedLeftLabel = 'Moved left'
+
+  /** What screen readers hear when the map has moved right. */
+  @property({ attribute: 'moved-right-label' })
+  movedRightLabel = 'Moved right'
+
+  /** What screen readers hear when the map has moved up. */
+  @property({ attribute: 'moved-up-label' })
+  movedUpLabel = 'Moved up'
+
+  /** What screen readers hear when the map is turned back to face north. */
+  @property({ attribute: 'north-label' })
+  northLabel = 'Facing north'
+
   /**
    * How far the map is tilted, in degrees from looking straight down.
    * `connectMap` keeps it current, and the 3D button is pressed while it is
@@ -281,9 +317,110 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   @property({ attribute: 'standard-label' })
   standardLabel = 'Standard'
 
+  /**
+   * What screen readers hear when the map is tilted. `{degrees}` is the tilt
+   * from looking straight down.
+   */
+  @property({ attribute: 'tilted-label' })
+  tiltedLabel = 'Tilted {degrees} degrees'
+
   /** The 3D button's label. */
   @property({ attribute: 'tilt-label' })
   tiltLabel = 'Show in 3D'
+
+  /**
+   * What screen readers hear when the map is turned. `{degrees}` is the way the
+   * top of the map faces, clockwise from north.
+   */
+  @property({ attribute: 'turned-label' })
+  turnedLabel = 'Facing {degrees} degrees'
+
+  /**
+   * What screen readers hear after a zoom. `{level}` is the zoom level.
+   */
+  @property({ attribute: 'zoomed-label' })
+  zoomedLabel = 'Zoom level {level}'
+
+  /**
+   * How far the map is zoomed, in its renderer's levels. `connectMap` keeps it
+   * current, and the map says it after a zoom.
+   */
+  @property({ attribute: 'zoom-level', type: Number })
+  zoomLevel?: number | undefined
+
+  /** What the live region says now. */
+  @state()
+  private said = ''
+
+  /** What a reader last asked of the map, until the map has answered it. */
+  private asked:
+    | { at: number; kind: 'north' | 'pan' | 'rotate' | 'tilt' | 'zoom'; side?: string }
+    | undefined = undefined
+
+  /** The wait for the view to settle before it is said. */
+  private settling: ReturnType<typeof setTimeout> | undefined = undefined
+
+  /**
+   * Says the map has moved, where a reader asked it to.
+   *
+   * **Called by whatever moves the map**, as `connectMap` does on every frame
+   * the view moves. The frame's keys and buttons only ask, and nothing moves
+   * until something answers, so the frame says nothing until it is told the
+   * view moved: an announcement for a move that never happened is worse than
+   * none. A page moving its own map in answer to `helix-map-pan` calls this
+   * once it has.
+   *
+   * What is said waits for the view to settle, so a held key or a long
+   * animation is one sentence, and it is the view's state where there is one:
+   * the zoom level, the way the map faces, its tilt. A pan has no state to
+   * say, so it says which way the map moved.
+   */
+  moved(): void {
+    if (!this.asked || performance.now() - this.asked.at > ASK_LAPSES) {
+      return
+    }
+    clearTimeout(this.settling)
+    this.settling = setTimeout(() => this.say(), SETTLES)
+  }
+
+  private say(): void {
+    const asked = this.asked
+    this.asked = undefined
+    if (!asked) {
+      return
+    }
+    const numbers = formatNumbers(this.lang)
+    const degrees = (value: number): string => numbers(Math.round(value))
+    const bearing = ((Math.round(this.bearing) % 360) + 360) % 360
+    const words: Record<string, string> = {
+      down: this.movedDownLabel,
+      left: this.movedLeftLabel,
+      right: this.movedRightLabel,
+      up: this.movedUpLabel,
+    }
+    const next =
+      asked.kind === 'pan'
+        ? (words[asked.side ?? ''] ?? '')
+        : asked.kind === 'zoom'
+          ? this.zoomLevel === undefined
+            ? ''
+            : fillTemplate(this.zoomedLabel, { level: numbers(this.zoomLevel) })
+          : asked.kind === 'tilt'
+            ? Math.round(this.pitch) === 0
+              ? this.flatLabel
+              : fillTemplate(this.tiltedLabel, { degrees: degrees(this.pitch) })
+            : bearing === 0
+              ? this.northLabel
+              : fillTemplate(this.turnedLabel, { degrees: degrees(bearing) })
+    /* The same words twice would change nothing in the region and be heard
+       once, so a second "Moved left" differs by a space no reader says. */
+    this.said = next !== '' && next === this.said.trim() ? `${next}\u00a0` : next
+  }
+
+  /** Records what a reader asked, so the answer can be said. */
+  private ask(kind: 'north' | 'pan' | 'rotate' | 'tilt' | 'zoom', side?: string): void {
+    this.asked = { at: performance.now(), kind, ...(side ? { side } : {}) }
+  }
 
   /**
    * The routes and areas among the frame's children, in the order they are
@@ -511,6 +648,8 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    clearTimeout(this.settling)
+    this.settling = undefined
     this.hiding?.disconnect()
     document.removeEventListener('pointerdown', this.handleOutside)
     this.removeEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)
@@ -564,21 +703,25 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
 
   /** Turns the map by some degrees, clockwise where positive. */
   rotate(by: number): void {
+    this.ask('rotate')
     this.dispatchEvent(new HelixMapRotateEvent({ by }))
   }
 
   /** Turns the map to face north. */
   faceNorth(): void {
+    this.ask('north')
     this.dispatchEvent(new HelixMapRotateEvent({ to: 0 }))
   }
 
   /** Tilts the map by some degrees, toward the horizon where positive. */
   tilt(by: number): void {
+    this.ask('tilt')
     this.dispatchEvent(new HelixMapTiltEvent({ by }))
   }
 
   /** Tilts the map to some degrees from looking straight down. `0` makes it flat. */
   tiltTo(to: number): void {
+    this.ask('tilt')
     this.dispatchEvent(new HelixMapTiltEvent({ to }))
   }
 
@@ -837,10 +980,12 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
 
   /** The events this family names, the surface naming none of its own. */
   protected override panEvent(detail: ViewportPanDetail): Event {
+    this.ask('pan', this.sideOf(detail.to))
     return new HelixMapPanEvent(detail)
   }
 
   protected override zoomEvent(detail: ViewportZoomDetail): Event {
+    this.ask('zoom')
     return new HelixMapZoomEvent(detail)
   }
 
@@ -929,6 +1074,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       <div part="attribution">
         <slot name="attribution"></slot>
       </div>
+      <span part="live" role="status">${this.said}</span>
     </div>`
   }
 }

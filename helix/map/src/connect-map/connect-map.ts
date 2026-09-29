@@ -144,6 +144,11 @@ export interface MapDriver {
    * What the frame's 3D button and tilt keys ask.
    */
   tilt?(tilt: { by?: number | undefined; to?: number | undefined }, motion: MapMotion | null): void
+  /**
+   * How far the view is zoomed, in the renderer's own levels. The frame says
+   * it after a zoom, so a reader hears where a step took them.
+   */
+  zoom?(): number
   /** Zooms one step in, `1`, or out, `-1`, by whatever a step is to this renderer. */
   zoomBy(direction: 1 | -1, motion: MapMotion | null): void
 }
@@ -607,6 +612,19 @@ export const connectMap = (
   }
   syncBearing()
   const stopBearing = driver.bearing || driver.pitch ? driver.onView?.(syncBearing) : undefined
+  /* **The frame is told the view moved, so it can say so.** Its keys and
+     buttons only ask; this is what answers, and only an answer is worth
+     announcing. The zoom goes with it, rounded as the bearing is. */
+  const viewed = frame as HTMLElement & { moved?: () => void; zoomLevel?: number | undefined }
+  const syncView = (): void => {
+    const zoom = driver.zoom ? Math.round(driver.zoom() * 10) / 10 : undefined
+    if ('zoomLevel' in viewed && viewed.zoomLevel !== zoom) {
+      viewed.zoomLevel = zoom
+    }
+    viewed.moved?.()
+  }
+  syncView()
+  const stopView = driver.onView?.(syncView)
 
   /* **The Satellite map type hides the renderer's roads and names**, and the
      others show them: asked only when that changes, since the renderer shows
@@ -1491,6 +1509,7 @@ export const connectMap = (
       frame.removeEventListener(HelixMapRotateEvent.eventName, handleRotate)
       frame.removeEventListener(HelixMapTiltEvent.eventName, handleTilt)
       stopBearing?.()
+      stopView?.()
       stopWatchingPreviews?.()
       if (bare) {
         driver.labels?.(true)

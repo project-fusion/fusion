@@ -53,6 +53,8 @@ export interface LeafletMap {
   setView(center: [number, number], zoom?: number, options?: LeafletAnimation): unknown
   /** The zoom buttons Leaflet adds unless told not to. */
   zoomControl?: { remove(): unknown } | undefined
+  /** How far the view is zoomed in. */
+  getZoom?(): number
   zoomIn(delta?: number, options?: { animate?: boolean }): unknown
   zoomOut(delta?: number, options?: { animate?: boolean }): unknown
 }
@@ -384,6 +386,9 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
       }
     }
   },
+  /* Only where the map can say, so the frame never announces a level it made
+     up. */
+  ...(map.getZoom ? { zoom: () => map.getZoom?.() ?? 0 } : {}),
   zoomBy: (direction, motion) => {
     if (direction > 0) {
       map.zoomIn(1, { animate: motion !== null })
