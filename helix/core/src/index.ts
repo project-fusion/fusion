@@ -68,6 +68,7 @@ export {
   PaintGateController,
   type PaintGateOptions,
 } from './controllers/paint-gate-controller/paint-gate-controller.js'
+export { PlacementController } from './controllers/placement-controller/placement-controller.js'
 export {
   PopoverController,
   type PopoverOptions,

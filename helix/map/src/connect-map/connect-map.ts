@@ -278,6 +278,8 @@ interface Marker extends HTMLElement {
   lat?: number | undefined
   lng?: number | undefined
   name?: string | undefined
+  /** Keeps custom properties in its own shadow root. See `placeOn`. */
+  place?(properties: Readonly<Record<string, string | undefined>>): void
   /** Which side of its point the name sits on, in reading order. */
   side?: 'end' | 'start'
 }
@@ -341,10 +343,48 @@ interface Position extends HTMLElement {
   isMapPosition: true
   lat?: number | undefined
   lng?: number | undefined
+  /** Keeps custom properties in its own shadow root. See `placeOn`. */
+  place?(properties: Readonly<Record<string, string | undefined>>): void
 }
 
 const isPosition = (node: unknown): node is Position =>
   (node as Partial<Position> | null)?.isMapPosition === true
+
+/**
+ * Stands a marker or a position where the map draws it: each custom property
+ * given, and each one given as `undefined` taken away.
+ *
+ * **Through the element's own `place`**, which keeps them in its shadow root.
+ * The element is the page's markup, and so is its `style`: written there, a
+ * place was markup the server never sent, and a page that set `style` itself
+ * wiped it. Onto `style` only for an element of the page's own making with no
+ * `place` of its own.
+ */
+const placeOn = (
+  element: Marker | Position,
+  properties: Readonly<Record<string, string | undefined>>,
+): void => {
+  if (element.place) {
+    element.place(properties)
+    return
+  }
+  for (const [name, value] of Object.entries(properties)) {
+    if (value === undefined) {
+      element.style.removeProperty(name)
+    } else {
+      element.style.setProperty(name, value)
+    }
+  }
+}
+
+/** No place at all, which hides a position until it has one again. */
+const UNPLACED_POSITION = {
+  '--_map-position-heading': undefined,
+  '--_map-position-pitch': undefined,
+  '--_map-position-radius': undefined,
+  '--_map-position-x': undefined,
+  '--_map-position-y': undefined,
+}
 
 /** Meters in a degree of latitude, which is near enough constant for a ring. */
 const METERS_PER_DEGREE = 111_320
@@ -1223,11 +1263,10 @@ export const connectMap = (
         if (member.fanned !== true) {
           member.fanned = true
         }
-        member.style.setProperty('--_map-marker-leg', `${Math.hypot(offset.x, offset.y)}px`)
-        member.style.setProperty(
-          '--_map-marker-leg-angle',
-          `${Math.atan2(-offset.y, -offset.x)}rad`,
-        )
+        placeOn(member, {
+          '--_map-marker-leg': `${Math.hypot(offset.x, offset.y)}px`,
+          '--_map-marker-leg-angle': `${Math.atan2(-offset.y, -offset.x)}rad`,
+        })
         placing.push({
           at: { x: center.x + offset.x, y: center.y + offset.y },
           marker: member,
@@ -1238,8 +1277,7 @@ export const connectMap = (
     for (const marker of markers()) {
       if (!fan.has(marker) && marker.fanned === true) {
         marker.fanned = false
-        marker.style.removeProperty('--_map-marker-leg')
-        marker.style.removeProperty('--_map-marker-leg-angle')
+        placeOn(marker, { '--_map-marker-leg': undefined, '--_map-marker-leg-angle': undefined })
       }
     }
     for (const one of standing) {
@@ -1286,8 +1324,7 @@ export const connectMap = (
     }
     placing.push(...hidden.map(({ at, marker, reach }) => ({ at, marker, reach })))
     for (const { at, marker, reach } of placing) {
-      marker.style.setProperty('--_map-marker-x', `${at.x}px`)
-      marker.style.setProperty('--_map-marker-y', `${at.y}px`)
+      placeOn(marker, { '--_map-marker-x': `${at.x}px`, '--_map-marker-y': `${at.y}px` })
       /* **The name goes where there is room for it.** It sits after the
          point in reading order, and a place near that edge of the view had
          its name cut off by it: shown on focus, which is exactly when a reader
@@ -1349,9 +1386,7 @@ export const connectMap = (
       /* Unplaced behind a globe, which hides it: a position is watched
          rather than walked, so nothing needs to reach it there. */
       if (driver.behind?.({ lat: position.lat, lng: position.lng })) {
-        for (const name of ['heading', 'pitch', 'radius', 'x', 'y']) {
-          position.style.removeProperty(`--_map-position-${name}`)
-        }
+        placeOn(position, UNPLACED_POSITION)
         continue
       }
       const at = project({ lat: position.lat, lng: position.lng })
@@ -1366,17 +1401,13 @@ export const connectMap = (
                   (METERS_PER_DEGREE * Math.cos((position.lat * Math.PI) / 180)),
             })
           : at
-      position.style.setProperty('--_map-position-x', `${at.x}px`)
-      position.style.setProperty('--_map-position-y', `${at.y}px`)
-      position.style.setProperty(
-        '--_map-position-heading',
-        `${headingOf({ heading: position.heading, lat: position.lat, lng: position.lng }, at)}deg`,
-      )
-      position.style.setProperty(
-        '--_map-position-radius',
-        `${Math.hypot(edge.x - at.x, edge.y - at.y)}px`,
-      )
-      position.style.setProperty('--_map-position-pitch', `${pitch}deg`)
+      placeOn(position, {
+        '--_map-position-heading': `${headingOf({ heading: position.heading, lat: position.lat, lng: position.lng }, at)}deg`,
+        '--_map-position-pitch': `${pitch}deg`,
+        '--_map-position-radius': `${Math.hypot(edge.x - at.x, edge.y - at.y)}px`,
+        '--_map-position-x': `${at.x}px`,
+        '--_map-position-y': `${at.y}px`,
+      })
     }
     /* **The points in view, stood where they are now**: which they are was
        asked of the renderer when it last went still, and a pan in between
@@ -1618,8 +1649,12 @@ export const connectMap = (
       frame.removeEventListener('pointerdown', handleFanDown)
       frame.removeEventListener('click', handleFanPress)
       for (const marker of markers()) {
-        marker.style.removeProperty('--_map-marker-x')
-        marker.style.removeProperty('--_map-marker-y')
+        placeOn(marker, {
+          '--_map-marker-leg': undefined,
+          '--_map-marker-leg-angle': undefined,
+          '--_map-marker-x': undefined,
+          '--_map-marker-y': undefined,
+        })
         if (marker.gatheredBy !== undefined) {
           marker.gatheredBy = undefined
         }
@@ -1638,16 +1673,12 @@ export const connectMap = (
         if (marker.side === 'start') {
           marker.side = 'end'
         }
-        marker.style.removeProperty('--_map-marker-leg')
-        marker.style.removeProperty('--_map-marker-leg-angle')
       }
       for (const layer of seen.keys()) {
         layer.walk = []
       }
       for (const position of positions()) {
-        for (const name of ['heading', 'pitch', 'radius', 'x', 'y']) {
-          position.style.removeProperty(`--_map-position-${name}`)
-        }
+        placeOn(position, UNPLACED_POSITION)
       }
       frame.removeEventListener(HelixMapPanEvent.eventName, handlePan)
       frame.removeEventListener(HelixMapZoomEvent.eventName, handleZoom)

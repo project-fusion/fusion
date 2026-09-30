@@ -1,4 +1,9 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  HelixMapPartChangeEvent,
+  PlacementController,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -30,6 +35,8 @@ import { property, state } from 'lit/decorators.js'
  * @csspart position - The image of the position, named by its label.
  * @csspart pulse - A ring that spreads out from the point, showing that the position is live.
  * @csspart status - The description, announced when it changes.
+ *
+ * @cssstate placed - Placed on the map by the connector.
  */
 @customElement('helix-headless-map-position')
 export class HelixHeadlessMapPosition extends HelixElement {
@@ -66,6 +73,24 @@ export class HelixHeadlessMapPosition extends HelixElement {
   /** Longitude, in degrees. */
   @property({ type: Number })
   lng?: number
+
+  /** Where the position was placed, kept in its own shadow root. */
+  private readonly placement = new PlacementController(this)
+
+  /**
+   * @internal Places the position, written by the connector: each custom property
+   * given, and each one given as `undefined` taken away. Kept in a sheet in the
+   * element's own shadow root, since its `style` is the page's.
+   */
+  place(properties: Readonly<Record<string, string | undefined>>): void {
+    this.placement.set(properties)
+    this.toggleState('placed', this.placement.get('--_map-position-x') !== undefined)
+  }
+
+  /** @internal What a custom property was placed at, or `undefined` where it was not. */
+  placed(name: string): string | undefined {
+    return this.placement.get(name)
+  }
 
   /** The words last spoken, which is what the status holds. */
   @state()

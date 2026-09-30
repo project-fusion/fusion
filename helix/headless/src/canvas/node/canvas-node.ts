@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, PlacementController } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -77,6 +77,7 @@ const DRAWN = [
  *
  * @cssstate candidate - While a connection is being drawn and this card is somewhere it could arrive.
  * @cssstate current - The card that receives focus when you tab into the board.
+ * @cssstate placed - Placed on the board.
  * @cssstate selected - The card is selected.
  * @cssstate target - A connection being drawn would end here if you released it.
  */
@@ -129,6 +130,24 @@ export class HelixHeadlessCanvasNode extends HelixElement {
    */
   @property()
   label = ''
+
+  /** Where the card was placed, kept in its own shadow root. */
+  private readonly placement = new PlacementController(this)
+
+  /**
+   * @internal Places the card, written by the board: each custom property
+   * given, and each one given as `undefined` taken away. Kept in a sheet in the
+   * element's own shadow root, since its `style` is the page's.
+   */
+  place(properties: Readonly<Record<string, string | undefined>>): void {
+    this.placement.set(properties)
+    this.toggleState('placed', this.placement.get('--_canvas-card-x') !== undefined)
+  }
+
+  /** @internal What a custom property was placed at, or `undefined` where it was not. */
+  placed(name: string): string | undefined {
+    return this.placement.get(name)
+  }
 
   /**
    * The name that connections and events use for this card, unique on its

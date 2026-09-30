@@ -15,7 +15,8 @@
 }
 
 /* The frame. The board writes where it sits onto the viewport as three custom
-   properties, and each card's place onto the card, so positioning is a read. */
+   properties, and each card's place in the card's own shadow root, which sets
+   them on the card, so positioning is a read. */
 helix-headless-canvas::part(region) {
   background-color: var(--_gray-subtle);
   block-size: 20rem;
