@@ -3,6 +3,7 @@ export function Example() {
     <helix-canvas
       grid="dots"
       label="Project plan"
+      toneLabels={{ accent: 'In progress', success: 'Done', warning: 'At risk' }}
     >
       <helix-canvas-node
         height={64}

@@ -149,6 +149,14 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   links = ''
 
   /**
+   * @internal What the card's tone means, in the page's words, written by the
+   * board from its `toneLabels`. Read out before where the card leads, since
+   * a reader who can see the board is told it by the card's color first.
+   */
+  @state()
+  meaning = ''
+
+  /**
    * Prevents the card from being moved, connected, or removed.
    *
    * **The board's own word, meaning the same thing one card at a time.** A
@@ -267,12 +275,15 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   }
 
   /**
-   * The card, and the sentence that says where it leads.
+   * The card, and the sentence that says what its tone means and where it
+   * leads.
    *
    * **`aria-describedby` at a hidden element, which is allowed and is the
    * point.** A description is computed from its target whether or not the
    * target is rendered, so the connections are read out and never drawn: the
-   * arrows already draw them.
+   * arrows already draw them. **One element, the two joined with a comma**:
+   * two elements named in the reference are joined with a space alone, which
+   * read "Done leads to Launch" as one phrase.
    */
   protected override render(): TemplateResult {
     return html`${
@@ -283,7 +294,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
         : nothing
     }<div
       part="node"
-      aria-describedby=${this.links ? 'links' : nothing}
+      aria-describedby=${this.meaning || this.links ? 'about' : nothing}
       aria-label=${this.group ? this.label || nothing : nothing}
       aria-keyshortcuts=${this.connectable ? 'Enter F2 Space Shift+ArrowRight Shift+ArrowDown Alt+ArrowRight Alt+ArrowDown C Delete' : nothing}
       role=${this.group ? 'group' : 'article'}
@@ -291,7 +302,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
     >
       <slot></slot>
       <slot name="description"></slot>
-      <span id="links" hidden>${this.links}</span>
+      <span id="about" hidden>${[this.meaning, this.links].filter(Boolean).join(', ')}</span>
     </div>
     ${
       /* **Written out, four times, because a part name behind an interpolation

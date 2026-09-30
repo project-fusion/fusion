@@ -1371,6 +1371,31 @@ describe('canvas review fixes', () => {
  * The gestures a board is reached for with, which are this family's rather than
  * the surface's: what `Map` frames drags its own view.
  */
+describe('canvas tones', () => {
+  test('a tone the page named is read with the card and the connection, and one it did not is not', async () => {
+    const host = await canvas(
+      `tone-labels='{"danger": "Blocked"}'`,
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="80" height="40" tone="danger">A</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="120" y="0" width="80" height="40" tone="success">B</helix-headless-canvas-node>
+       <helix-headless-canvas-edge name="e" from="a" to="b" tone="danger" label="waits on"></helix-headless-canvas-edge>`,
+    )
+    await (card(host, 'a') as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    const described = (id: string): string => {
+      const node = card(host, id).shadowRoot?.querySelector('[part="node"]') as HTMLElement
+      const scope = node.getRootNode() as ShadowRoot
+      return (node.getAttribute('aria-describedby') ?? '')
+        .split(' ')
+        .filter(Boolean)
+        .map((ref) => scope.getElementById(ref)?.textContent ?? '')
+        .join(' | ')
+    }
+    expect(described('a')).toBe('Blocked, leads to B')
+    expect(described('b')).toBe('from A')
+    const line = host.shadowRoot?.querySelector('[part="edge-target"]') as SVGPathElement
+    expect(line.getAttribute('aria-description')).toBe('Blocked, waits on')
+  })
+})
+
 describe('canvas gestures', () => {
   /** A pointer event happy-dom will carry, with the fields the handler reads. */
   const pointer = (type: string, at: { x: number; y: number }): PointerEvent =>
@@ -1434,6 +1459,57 @@ describe('canvas gestures', () => {
     viewport.dispatchEvent(pointer('pointerup', { x: 100, y: 100 }))
     await host.updateComplete
     expect(hasState(host, 'direct')).toBe(false)
+  })
+
+  /** A finger on a touch screen, which is a pointer of its own. */
+  const finger = (type: string, id: number, spot: { x: number; y: number }): PointerEvent =>
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: spot.x,
+      clientY: spot.y,
+      composed: true,
+      pointerId: id,
+      pointerType: 'touch',
+    })
+
+  test('two fingers spread apart zoom the board, and what was between them stays there', async () => {
+    const host = await canvas()
+    const viewport = part(host, 'viewport') as HTMLElement
+    const box = viewport.getBoundingClientRect()
+    const before = at(host)
+    viewport.dispatchEvent(finger('pointerdown', 1, { x: 100, y: 100 }))
+    viewport.dispatchEvent(finger('pointerdown', 2, { x: 200, y: 100 }))
+    /* Twice as far apart, and the point between them 50 pixels to the right. */
+    viewport.dispatchEvent(finger('pointermove', 2, { x: 300, y: 100 }))
+    await host.updateComplete
+    const after = at(host)
+    expect(after.zoom).toBeCloseTo(before.zoom * 2, 5)
+    /* The point of the board under the fingers' middle at the start is under
+       their middle now. */
+    const from = 150 - box.left
+    const to = 200 - box.left
+    expect(after.x).toBeCloseTo(to - (from - before.x) * 2, 5)
+  })
+
+  test('the second finger starts nothing of its own, and the one left after a pinch moves nothing', async () => {
+    const host = await canvas()
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.dispatchEvent(finger('pointerdown', 1, { x: 100, y: 100 }))
+    viewport.dispatchEvent(finger('pointerdown', 2, { x: 200, y: 100 }))
+    viewport.dispatchEvent(finger('pointermove', 2, { x: 260, y: 100 }))
+    await host.updateComplete
+    viewport.dispatchEvent(finger('pointerup', 2, { x: 260, y: 100 }))
+    const pinched = at(host)
+    viewport.dispatchEvent(finger('pointermove', 1, { x: 180, y: 160 }))
+    await host.updateComplete
+    expect(at(host)).toEqual(pinched)
+    viewport.dispatchEvent(finger('pointerup', 1, { x: 180, y: 160 }))
+    /* And the next single finger pans again. */
+    viewport.dispatchEvent(finger('pointerdown', 3, { x: 100, y: 100 }))
+    viewport.dispatchEvent(finger('pointermove', 3, { x: 130, y: 100 }))
+    await host.updateComplete
+    expect(at(host).x - pinched.x).toBe(30)
   })
 
   test('a press that began on a control is not a drag', async () => {
