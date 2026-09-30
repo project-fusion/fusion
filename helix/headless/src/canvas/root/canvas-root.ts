@@ -37,6 +37,7 @@ import {
   type CanvasEdge,
   type CanvasNode,
   type CanvasSide,
+  type CanvasTone,
   colorOf,
   connector,
   ends,
@@ -431,6 +432,19 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** The text announced when a connection is stopped before it is requested. */
   @property({ attribute: 'stopped-label' })
   stoppedLabel = 'Stopped connecting.'
+
+  /**
+   * What each tone means on this board, in words read out with the cards and
+   * connections in it, such as `{"danger": "Blocked", "success": "Done"}`.
+   *
+   * **Named by the page, since the tone names a color and the page gives it
+   * its meaning.** JSON Canvas leaves its six colors to the application, so
+   * red is "blocked" on one board and "urgent" on the next. A reader who can
+   * see the board is told by the color; this is how a reader who cannot is
+   * told the same. A tone left out is not read.
+   */
+  @property({ attribute: 'tone-labels', type: Object })
+  toneLabels: Partial<Record<CanvasTone, string>> = {}
 
   /** The card or connection that holds the board's one tab stop, by its key. */
   @state()
@@ -889,6 +903,21 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         asked?: boolean
         /** Whether it was picked up by a click and is carried until the next one. */
         held?: boolean
+      }
+    | undefined
+
+  /** Where each finger on the board is, by pointer, which a pinch is measured from. */
+  private readonly fingers = new Map<number, { x: number; y: number }>()
+
+  /**
+   * A pinch under way: how far apart its fingers were and the point between
+   * them, in the box, and the view, when the second finger landed.
+   */
+  private pinching:
+    | {
+        at: { x: number; y: number; zoom: number }
+        middle: { x: number; y: number }
+        spread: number
       }
     | undefined
 
@@ -1560,6 +1589,18 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (event.button !== 0 || on('controls') || !(card || on('viewport'))) {
       return
     }
+    /* **A second finger pinches**, and never starts a gesture of its own: it
+       took over the first finger's pan, which jumped the board to wherever
+       the second finger landed. */
+    if (event.pointerType === 'touch') {
+      this.fingers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      if (this.fingers.size > 1) {
+        if (this.fingers.size === 2 && !this.pinching) {
+          this.startPinch()
+        }
+        return
+      }
+    }
     /* **The press that puts down what a click picked up.** Wherever it lands
        is where the drag would have been let go, card, corner or line alike. */
     if (this.held) {
@@ -1705,6 +1746,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   private readonly handlePointerMove = (event: PointerEvent): void => {
     this.idle.stir()
+    if (this.fingers.has(event.pointerId)) {
+      this.fingers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      if (this.pinching) {
+        this.pinch()
+        return
+      }
+    }
     /* **A mouse with no button down has let go**, whether or not the board
        heard it. A press on a card is not captured until it moves far enough
        to be a drag, so one flicked off the board and released outside it sent
@@ -1804,6 +1852,32 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   private readonly handlePointerUp = (event: PointerEvent): void => {
+    const finger = this.fingers.delete(event.pointerId)
+    /* **A pinch ends when either finger lifts**, and the one left down moves
+       nothing: carried on as a pan, the board jumped from under the finger
+       by however far the pinch had moved the middle. */
+    if (this.pinching) {
+      if (this.fingers.size < 2) {
+        this.pinching = undefined
+        this.direct = false
+      }
+      if (this.fingers.size === 0) {
+        this.pressing = false
+      }
+      return
+    }
+    /* A finger that landed while another was carrying something, and so
+       did nothing, lets go of nothing. */
+    const owner = [
+      this.sizing?.pointer,
+      this.marquee?.pointer,
+      this.linking?.pointer,
+      this.carrying?.pointer,
+      this.dragging?.pointer,
+    ].includes(event.pointerId)
+    if (finger && !owner && this.fingers.size > 0) {
+      return
+    }
     this.pressing = false
     const pointing = this.pointing
     this.pointing = false
@@ -2490,6 +2564,68 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     ></div>`
   }
 
+  /**
+   * The fingers' spread and the point between them, in the box. Taken from
+   * the first two fingers down, where a third has landed as well.
+   */
+  private fingerSpan(): { middle: { x: number; y: number }; spread: number } {
+    const [one, two] = [...this.fingers.values()] as [
+      { x: number; y: number },
+      { x: number; y: number },
+    ]
+    const box = this.partNamed('viewport')?.getBoundingClientRect()
+    return {
+      middle: {
+        x: (one.x + two.x) / 2 - (box?.left ?? 0),
+        y: (one.y + two.y) / 2 - (box?.top ?? 0),
+      },
+      spread: Math.hypot(two.x - one.x, two.y - one.y),
+    }
+  }
+
+  /**
+   * Turns what the first finger was doing into a pinch, where that was a pan
+   * or a press that had not yet moved anything. A finger already carrying a
+   * card, drawing a line, resizing or drawing a box goes on doing that.
+   */
+  private startPinch(): void {
+    if (this.sizing || this.marquee || this.linking || this.held || this.carrying?.started) {
+      return
+    }
+    this.carrying = undefined
+    this.dragging = undefined
+    this.pointing = false
+    const { middle, spread } = this.fingerSpan()
+    if (spread === 0) {
+      return
+    }
+    for (const pointer of this.fingers.keys()) {
+      capturePointer(this, pointer)
+    }
+    this.touched = true
+    this.direct = true
+    this.pinching = { at: { ...this.at }, middle, spread }
+  }
+
+  /**
+   * Scales the board by how far the fingers have spread since the pinch
+   * began, about the point between them, and carries it with that point, so
+   * what was under the fingers stays under them.
+   */
+  private pinch(): void {
+    const start = this.pinching
+    if (!start) {
+      return
+    }
+    const { middle, spread } = this.fingerSpan()
+    const zoom = Math.min(Math.max((start.at.zoom * spread) / start.spread, ZOOM_MIN), ZOOM_MAX)
+    this.at = {
+      x: middle.x - ((start.middle.x - start.at.x) * zoom) / start.at.zoom,
+      y: middle.y - ((start.middle.y - start.at.y) * zoom) / start.at.zoom,
+      zoom,
+    }
+  }
+
   /** Scales about a point in the box, which is what both the buttons and a pinch want. */
   private zoomAbout(by: number, about: { x: number; y: number }): void {
     const from = this.at.zoom
@@ -3025,6 +3161,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
          which React's hydration reports on every card in a group. */
       const node = this.byId.get(card.name)
       card.links = node ? this.linksOf(node) : ''
+      card.meaning = card.tone ? (this.toneLabels[card.tone] ?? '') : ''
       card.current = card.name === stop
       card.selected = picked.has(card.name)
       card.resizable = alone === card.name && !this.fixed(card)
@@ -3148,7 +3285,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
            so a press lands on the target under it. */
         return svg`<path
             part="edge-target"
-            aria-description=${edge.label || nothing}
+            aria-description=${[element?.tone ? this.toneLabels[element.tone] : undefined, edge.label].filter(Boolean).join(', ') || nothing}
             aria-label=${fillTemplate(this.connectionLabel, { from: this.textOf(from), to: this.textOf(to) })}
             d=${drawn.d}
             data-edge=${key}
