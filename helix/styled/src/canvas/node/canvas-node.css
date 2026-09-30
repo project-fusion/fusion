@@ -35,8 +35,13 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   inline-size: var(--_canvas-card-inline-size);
-  inset-block-start: var(--_canvas-card-y);
-  inset-inline-start: var(--_canvas-card-x);
+  /* **Physical, as the document's coordinates are.** A card's `x` runs from
+     the plane's left edge in any language; placed from the inline start, the
+     cards moved to the right-hand side of a right-to-left page while their
+     connectors, drawn from the left, stayed, and a drag to the right moved a
+     card left. */
+  left: var(--_canvas-card-x);
+  top: var(--_canvas-card-y);
   /* Visible, so the handles can sit across the edge; the box inside clips
      what the card holds instead. */
   overflow: visible;
@@ -221,6 +226,17 @@
 
 :host(:state(target)) [part~="handle"] {
   background-color: var(--_canvas-handle-color);
+}
+
+/* **The card a connection will land on, told apart in forced colors.** The
+   ring above is a shadow and the handles a fill, and forced colors take the
+   first away and replace the second, so the target looked like every other
+   card. An outline is kept, in the platform's color for a choice. */
+@media (forced-colors: active) {
+  :host(:state(target)) {
+    outline: var(--helix-border-thick) solid Highlight;
+    outline-offset: var(--helix-space-2xs);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

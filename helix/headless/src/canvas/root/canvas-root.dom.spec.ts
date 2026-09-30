@@ -147,12 +147,13 @@ describe('canvas', () => {
     expect(style).toContain('--_canvas-card-inline-size: 200px')
   })
 
-  test('a card belongs to the smallest group that contains it', async () => {
+  /* It wrote `data-group` onto the page's own cards, which nothing read and
+     which React's hydration reports as markup the server never sent. */
+  test('writes no attribute onto a card, whichever group it sits in', async () => {
     const host = await canvas()
-    const first = cards(host).find((one) => one.getAttribute('name') === 'a') as HTMLElement
-    const loose = cards(host).find((one) => one.getAttribute('name') === 'c') as HTMLElement
-    expect(first.getAttribute('data-group')).toBe('pair')
-    expect(loose.hasAttribute('data-group')).toBe(false)
+    for (const card of cards(host)) {
+      expect(card.hasAttribute('data-group')).toBe(false)
+    }
   })
 
   test('a group is a group to a screen reader, and a card is an article', async () => {
