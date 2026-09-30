@@ -79,9 +79,28 @@ describe('mapLibreStyle', () => {
       expect(named).toContain(id)
       expect(images[id]).toMatchObject({ kind: 'landmark' })
     }
-    expect(images['helix-sign-interstate']).toMatchObject({ design: 'interstate', kind: 'sign' })
-    expect(JSON.stringify(layoutOf('label-shield')['icon-image'])).toContain('"|",["get","ref"]')
+    const interstate = Object.keys(images).find(
+      (id) => id.startsWith('helix-sign-') && id.endsWith('-interstate'),
+    )
+    expect(images[interstate ?? '']).toMatchObject({ design: 'interstate', kind: 'sign' })
+    const shield = JSON.stringify(layoutOf('label-shield')['icon-image'])
+    expect(shield).toContain('"|",["get","ref"]')
+    expect(shield).toContain(interstate?.replace(/interstate$/, '') ?? 'none')
     expect(layoutOf('label-neighbourhood')['text-transform']).toBe('uppercase')
+  })
+
+  /* MapLibre keeps an image it has, and a restyle's diff keeps them all, so a
+     name that left out part of the drawing kept the old theme's ring on a
+     dark map, and the old face on the signs. */
+  test('names each image by everything it draws, so a new theme or face draws new ones', () => {
+    const light = Object.keys(mapLibreStyle(LIGHT).metadata['helix:images'])
+    const dark = Object.keys(mapLibreStyle(DARK).metadata['helix:images'])
+    const faced = Object.keys(mapLibreStyle(LIGHT, { font: 'Geist' }).metadata['helix:images'])
+    const landmarks = (ids: string[]): string[] =>
+      ids.filter((id) => id.startsWith('helix-landmark-'))
+    const signs = (ids: string[]): string[] => ids.filter((id) => id.startsWith('helix-sign-'))
+    expect(landmarks(light).some((id) => landmarks(dark).includes(id))).toBe(false)
+    expect(signs(light).some((id) => signs(faced).includes(id))).toBe(false)
   })
 
   test('draws on the land and reads its tiles and type from OpenFreeMap', () => {

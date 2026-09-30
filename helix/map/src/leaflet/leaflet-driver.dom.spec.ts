@@ -278,6 +278,42 @@ describe('leafletDriver', () => {
     expect(made).toEqual(['polyline [[1,2],[3,4]] rgb(1, 2, 3) 0 10'])
   })
 
+  /* The keyboard reaches points through what is in view, and without it a
+     points layer on Leaflet was never a tab stop; and a redraw that changed
+     nothing about the points took every circle off and put it back. */
+  test('a points layer says which points are in view, and keeps its circles while they are the same', () => {
+    const { map } = stand()
+    Object.defineProperties(map.getContainer(), {
+      clientHeight: { value: 400 },
+      clientWidth: { value: 400 },
+    })
+    let made = 0
+    let settled = 0
+    const points = [
+      { lat: -10, lng: 10 },
+      { lat: -90, lng: 90 },
+    ]
+    const drawn = leafletDriver(map, {
+      circleMarker: () => {
+        made += 1
+        return { addTo: () => {}, on: () => {}, remove: () => {} }
+      },
+      polygon: () => ({ addTo: () => {}, remove: () => {} }),
+      polyline: () => ({ addTo: () => {}, remove: () => {} }),
+    }).layers?.(() => [{ color: 'red', id: 'p', kind: 'points', label: 'Places', points }], {
+      motion: () => null,
+      press: () => {},
+      settled: () => {
+        settled += 1
+      },
+    })
+    expect(made).toBe(2)
+    expect(settled).toBe(1)
+    expect(drawn?.inView?.('p')).toEqual([{ at: 0, place: { lat: -10, lng: 10 } }])
+    drawn?.update()
+    expect(made).toBe(2)
+  })
+
   test('a raster layer is a tile layer a frame, kept between redraws and switched by opacity', () => {
     const { asked, map } = stand()
     const shape = (name: string) => ({

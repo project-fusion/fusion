@@ -1,4 +1,9 @@
-import type { MapDriver, MapLayerEvents, MapLayerSpec } from '../connect-map/connect-map.js'
+import type {
+  MapDriver,
+  MapLayerEvents,
+  MapLayerSpec,
+  MapPlace,
+} from '../connect-map/connect-map.js'
 import type { MapMotion } from '../motion/motion.js'
 
 /** How Leaflet is told to move: over a time, in seconds, or at once. */
@@ -39,8 +44,8 @@ export interface LeafletMap {
   keyboard?: { disable(): unknown; enable(): unknown; enabled(): boolean } | undefined
   /** Where a place falls in the map's box, in pixels. */
   latLngToContainerPoint(latLng: [number, number]): { x: number; y: number }
-  off(type: 'layeradd layerremove' | 'move zoom resize', listener: () => void): unknown
-  on(type: 'layeradd layerremove' | 'move zoom resize', listener: () => void): unknown
+  off(type: 'layeradd layerremove' | 'move zoom resize' | 'moveend', listener: () => void): unknown
+  on(type: 'layeradd layerremove' | 'move zoom resize' | 'moveend', listener: () => void): unknown
   fitBounds(
     bounds: [[number, number], [number, number]],
     options?: LeafletAnimation & {
@@ -217,6 +222,21 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
     ? {
         layers: (read: () => MapLayerSpec[], events?: MapLayerEvents) => {
           let drawn: LeafletShape[] = []
+          /* **Each points layer's circles, kept while its points and colors
+             are**: the connector hands the same array while the data is, so
+             a route's progress ticking no longer took every circle off the
+             map and put it back, each one a credit read in turn. */
+          const circles = new Map<
+            string,
+            {
+              casing?: string | undefined
+              color: string
+              points: MapPlace[]
+              shapes: LeafletShape[]
+            }
+          >()
+          /* Each points layer's points, for the keyboard's walk of those in view. */
+          let placed = new Map<string, MapPlace[]>()
           /* **A raster layer's frames are kept between redraws**, one tile
              layer each and switched by opacity, so a playing loop does not
              load its tiles again on every frame. */
@@ -267,6 +287,8 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
               shape.remove()
             }
             const specs = read()
+            const kept = new Set<string>()
+            placed = new Map()
             /* Buildings are not drawn: Leaflet draws maps flat. */
             drawRasters(specs.filter((spec) => spec.kind === 'raster'))
             drawn = specs.flatMap((layer) => {
@@ -290,7 +312,21 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
                 if (!circle) {
                   return []
                 }
-                return latlngs.map((latlng, at) => {
+                kept.add(layer.id)
+                placed.set(layer.id, layer.points)
+                const had = circles.get(layer.id)
+                if (
+                  had &&
+                  had.points === layer.points &&
+                  had.color === layer.color &&
+                  had.casing === layer.casing
+                ) {
+                  return []
+                }
+                for (const shape of had?.shapes ?? []) {
+                  shape.remove()
+                }
+                const made = latlngs.map((latlng, at) => {
                   const point = circle(latlng, {
                     color: layer.casing ?? layer.color,
                     fillColor: layer.color,
@@ -303,6 +339,13 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
                   point.addTo(map as never)
                   return point
                 })
+                circles.set(layer.id, {
+                  casing: layer.casing,
+                  color: layer.color,
+                  points: layer.points,
+                  shapes: made,
+                })
+                return []
               }
               /* The casing first, so the route is drawn over it. */
               const casing =
@@ -342,14 +385,46 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
               }
               return [...casing, shape]
             })
+            for (const [id, had] of [...circles]) {
+              if (!kept.has(id)) {
+                for (const shape of had.shapes) {
+                  shape.remove()
+                }
+                circles.delete(id)
+              }
+            }
+            events?.settled?.()
           }
+          /* **The walk asked again once a move ends**, which is the keyboard's
+             way to the points: without `inView` a points layer on Leaflet was
+             never a tab stop, though the guide says it is. */
+          const settled = (): void => events?.settled?.()
+          map.on('moveend', settled)
           draw()
           return {
+            /* The points of a layer inside the map's box, each by its place in
+               the layer: Leaflet draws them unclustered, so none is a count. */
+            inView: (id) => {
+              const box = map.getContainer()
+              const width = box.clientWidth
+              const height = box.clientHeight
+              return (placed.get(id) ?? []).flatMap((place, at) => {
+                const { x, y } = map.latLngToContainerPoint([place.lat, place.lng])
+                return x >= 0 && y >= 0 && x <= width && y <= height ? [{ at, place }] : []
+              })
+            },
             stop: () => {
+              map.off('moveend', settled)
               for (const shape of drawn) {
                 shape.remove()
               }
               drawn = []
+              for (const had of circles.values()) {
+                for (const shape of had.shapes) {
+                  shape.remove()
+                }
+              }
+              circles.clear()
               drawRasters([])
             },
             update: draw,

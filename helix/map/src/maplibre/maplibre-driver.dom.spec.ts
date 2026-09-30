@@ -22,7 +22,16 @@ beforeAll(() => {
 const stand = (): {
   asked: string[]
   fire(
-    type: 'click' | 'idle' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type:
+      | 'click'
+      | 'idle'
+      | 'load'
+      | 'mousemove'
+      | 'move'
+      | 'render'
+      | 'resize'
+      | 'sourcedata'
+      | 'styledata',
     event?: { point?: { x: number; y: number }; sourceDataType?: string },
   ): void
   map: MapLibreMap
@@ -140,7 +149,16 @@ const stand = (): {
     },
   }
   const fire = (
-    type: 'click' | 'idle' | 'load' | 'mousemove' | 'move' | 'resize' | 'sourcedata' | 'styledata',
+    type:
+      | 'click'
+      | 'idle'
+      | 'load'
+      | 'mousemove'
+      | 'move'
+      | 'render'
+      | 'resize'
+      | 'sourcedata'
+      | 'styledata',
     event?: { point?: { x: number; y: number }; sourceDataType?: string },
   ): void => {
     for (const listener of listeners.get(type) ?? []) {
@@ -191,6 +209,30 @@ describe('mapLibreDriver, ready', () => {
     loading.fire('load')
     expect(waited).toBe(1)
   })
+
+  /* MapLibre fires `load` once, so a page connecting inside its own `load`
+     handler had already had it: drawing the connector's layers dirties the
+     style, `loaded()` answers false, and without `render` the snapshot over
+     the live map stayed for good. */
+  test('on a map that loaded before it was connected, at the first frame drawn in full', () => {
+    let tiles = false
+    const late = stand()
+    let heard = 0
+    mapLibreDriver({
+      ...late.map,
+      areTilesLoaded: () => tiles,
+      isStyleLoaded: () => true,
+      loaded: () => false,
+    }).ready?.(() => {
+      heard += 1
+    })
+    late.fire('render')
+    expect(heard).toBe(0)
+    tiles = true
+    late.fire('render')
+    late.fire('render')
+    expect(heard).toBe(1)
+  })
 })
 
 describe('mapLibreDriver', () => {
@@ -230,10 +272,13 @@ describe('mapLibreDriver', () => {
     expect(asked).toEqual(['road none', 'label-city none'])
     shown.clear()
     fire('styledata')
+    fire('styledata')
+    await Promise.resolve()
     expect(asked.slice(2)).toEqual(['road none', 'label-city none'])
     driver.labels?.(true)
     expect(asked.slice(4)).toEqual(['road visible', 'label-city visible'])
     fire('styledata')
+    await Promise.resolve()
     expect(asked).toHaveLength(6)
     expect(await driver.previews?.({ types: ['standard'] })).toEqual({})
   })
