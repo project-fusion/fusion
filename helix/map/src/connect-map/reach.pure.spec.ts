@@ -16,10 +16,20 @@ describe('reachOf', () => {
   })
 
   /* A box of no size is answered with a renderer's deepest zoom. */
-  test('gives one place room around it', () => {
-    const { bounds } = reachOf([{ lat: 30.27, lng: -97.74 }])
+  test('gives one place the room it is asked to', () => {
+    const { bounds } = reachOf([{ lat: 30.27, lng: -97.74 }], 0.005)
     expect(bounds.northEast.lat - bounds.southWest.lat).toBeGreaterThan(0.009)
     expect(bounds.northEast.lng - bounds.southWest.lng).toBeGreaterThan(0.009)
+  })
+
+  /* A cluster pressed is framed to come apart, which room around it undoes. */
+  test('frames places a street apart as tightly as they stand unless asked for room', () => {
+    const { bounds } = reachOf([
+      { lat: 30.2665, lng: -97.7431 },
+      { lat: 30.2681, lng: -97.7417 },
+    ])
+    expect(bounds.northEast.lat - bounds.southWest.lat).toBeCloseTo(0.0016, 6)
+    expect(bounds.northEast.lng - bounds.southWest.lng).toBeCloseTo(0.0014, 6)
   })
 
   test('measures across the antimeridian the short way round', () => {
