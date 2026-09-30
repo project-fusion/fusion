@@ -1,11 +1,12 @@
-/* **The card is the host, because the board places the host.** Its coordinates
-   are written onto this element by the board, so the element itself is what is
+/* **The card is the host, because the board places the host.** The board
+   gives this element its coordinates, so the element itself is what is
    positioned: a wrapper inside would have to be told the same things twice. */
 :host {
   /* **Declared here and written by the board**, which is what makes them
-     readable above: the board sets each card's coordinates onto the card at run
-     time, and a private read with nothing declaring it is a value fixed at its
-     fallback as far as anything reading this sheet can tell. Zero is where an
+     readable above: the board sets each card's coordinates in a sheet of the
+     card's own at run time, and a private read with nothing declaring it is a
+     value fixed at its fallback as far as anything reading this sheet can
+     tell. Zero is where an
      unplaced card sits, which is what a card is before a board has counted
      them. */
   --_canvas-card-x: 0px;
@@ -272,7 +273,7 @@
 
 /* Before it is placed, a card is a card in the flow: what a page without
    JavaScript has is the text somebody wrote, in the order they wrote it. */
-:host(:not([style*="--_canvas-card-x"])) {
+:host(:not(:state(placed))) {
   position: static;
 }
 

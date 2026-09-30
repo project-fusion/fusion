@@ -14,7 +14,14 @@ type Canvas = HTMLElement & {
   updateComplete: Promise<boolean>
 }
 
-type Card = HTMLElement & { current: boolean; label: string; links: string; x: number; y: number }
+type Card = HTMLElement & {
+  current: boolean
+  label: string
+  links: string
+  placed(name: string): string | undefined
+  x: number
+  y: number
+}
 
 /**
  * A small board, written the way a consumer writes one: two cards side by side,
@@ -137,14 +144,16 @@ describe('canvas', () => {
     /* Position is data here, which is the whole reason this family draws: there
        is no layout to compute, only arithmetic against the board's extent. */
     const host = await canvas()
-    const second = cards(host).find((one) => one.getAttribute('name') === 'b') as HTMLElement
-    const style = second.getAttribute('style') ?? ''
+    const second = card(host, 'b')
     /* The extent starts at the group, at -20, and the plane keeps a margin of
        32 around it so a group's name and a bowing connector are not clipped. So
        a card the document put at 260 is drawn at 312. */
-    expect(style).toContain('--_canvas-card-x: 312px')
-    expect(style).toContain('--_canvas-card-y: 52px')
-    expect(style).toContain('--_canvas-card-inline-size: 200px')
+    expect(second.placed('--_canvas-card-x')).toBe('312px')
+    expect(second.placed('--_canvas-card-y')).toBe('52px')
+    expect(second.placed('--_canvas-card-inline-size')).toBe('200px')
+    /* **In the card's own shadow root**: its `style` is the page's markup,
+       which a place written there made differ from what the server sent. */
+    expect(second.hasAttribute('style')).toBe(false)
   })
 
   /* It wrote `data-group` onto the page's own cards, which nothing read and
@@ -1794,14 +1803,15 @@ describe('canvas beyond the properties', () => {
     expect(written).toBe(0)
   })
 
-  test('a card whose style a page rewrote whole is put back in its place', async () => {
+  test('a page that rewrites a card’s whole style leaves its place as it was', async () => {
     const host = await canvas()
     const a = card(host, 'a')
-    const was = a.style.getPropertyValue('--_canvas-card-x')
-    expect(was).not.toBe('')
+    const was = a.placed('--_canvas-card-x')
+    expect(was).toBeDefined()
     a.setAttribute('style', '--canvas-node-color: red')
     await heard(host)
-    expect(a.style.getPropertyValue('--_canvas-card-x')).toBe(was)
+    expect(a.placed('--_canvas-card-x')).toBe(was)
+    expect(a.getAttribute('style')).toBe('--canvas-node-color: red')
   })
 
   test('a color written onto a connection after the first paint is drawn', async () => {
@@ -1880,8 +1890,8 @@ describe('canvas beyond the properties', () => {
       '<helix-headless-canvas-node name="loose" x="0" y="0">Loose</helix-headless-canvas-node>',
     )
     const loose = card(host, 'loose')
-    expect(loose.style.getPropertyValue('--_canvas-card-inline-size')).toBe('')
-    expect(loose.style.getPropertyValue('--_canvas-card-block-size')).toBe('')
+    expect(loose.placed('--_canvas-card-inline-size')).toBeUndefined()
+    expect(loose.placed('--_canvas-card-block-size')).toBeUndefined()
   })
 
   test('a file’s subpath and a group’s picture come through the import', async () => {

@@ -1,4 +1,9 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  HelixMapPartChangeEvent,
+  PlacementController,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -48,6 +53,7 @@ const BOOKKEEPING = new Set<PropertyKey>([
  * @cssstate fanned - Spread out from a location it shares with other markers, after their cluster was pressed.
  * @cssstate icon - Has content in the icon slot.
  * @cssstate passed - Marked as passed.
+ * @cssstate placed - Placed on the map by the connector.
  * @cssstate start - Shows its name before the point, because there was no room after it.
  */
 @customElement('helix-headless-map-marker')
@@ -117,6 +123,24 @@ export class HelixHeadlessMapMarker extends HelixElement {
    */
   @state()
   side: 'end' | 'start' = 'end'
+
+  /** Where the marker was placed, kept in its own shadow root. */
+  private readonly placement = new PlacementController(this)
+
+  /**
+   * @internal Places the marker, written by the connector: each custom property
+   * given, and each one given as `undefined` taken away. Kept in a sheet in the
+   * element's own shadow root, since its `style` is the page's.
+   */
+  place(properties: Readonly<Record<string, string | undefined>>): void {
+    this.placement.set(properties)
+    this.toggleState('placed', this.placement.get('--_map-marker-x') !== undefined)
+  }
+
+  /** @internal What a custom property was placed at, or `undefined` where it was not. */
+  placed(name: string): string | undefined {
+    return this.placement.get(name)
+  }
 
   /** The value `helix-activate` reports. Defaults to the label. */
   @property()

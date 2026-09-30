@@ -25,8 +25,8 @@
   --_map-position-edge: var(--map-position-edge, var(--helix-color-surface));
   --_map-position-fill: var(--map-position-fill, var(--_map-position-ink));
   --_map-position-size: var(--map-position-size, 1.25rem);
-  /* **Declared here and written by the connector**, onto the host, where the
-     connector can reach and this can read. */
+  /* **Declared here and written by the connector**, in a sheet of the
+     position's own, where this can read them. */
   --_map-position-heading: 0deg;
   --_map-position-pitch: 0deg;
   --_map-position-radius: 0px;
@@ -47,7 +47,7 @@
 /* Not yet placed, which would draw it in the frame's corner. **The drawing
    and not the host**, so its status stays in the tree: a position behind the
    globe is unplaced, and a van there that arrived said nothing. */
-:host(:not([style*="--_map-position-x"])) [part="position"] {
+:host(:not(:state(placed))) [part="position"] {
   visibility: hidden;
 }
 

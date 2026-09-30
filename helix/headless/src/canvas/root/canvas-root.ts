@@ -175,14 +175,8 @@ const custom = (element: HTMLElement | undefined, name: string): string =>
  */
 const finite = (value: number): number => (Number.isFinite(value) ? value : 0)
 
-/** Writes a length onto an element, or takes it away where there is none. */
-const size = (element: HTMLElement, name: string, value: number): void => {
-  if (value > 0) {
-    element.style.setProperty(name, `${value}px`)
-  } else {
-    element.style.removeProperty(name)
-  }
-}
+/** A length as a card places it, or nothing where there is none. */
+const size = (value: number): string | undefined => (value > 0 ? `${value}px` : undefined)
 
 /**
  * @summary A board of cards and the connections between them, which can be navigated, rearranged, and connected.
@@ -2865,16 +2859,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return true
     }
     const target = record.target
-    /* A page that wrote a card's whole `style` took its place with it, which
-       the board puts back rather than taking the card to be where it was. */
-    if (
-      target instanceof HelixHeadlessCanvasNode &&
-      this.placed.has(target) &&
-      custom(target, '--_canvas-card-x') === ''
-    ) {
-      this.placed.delete(target)
-      return true
-    }
     const name =
       target instanceof HelixHeadlessCanvasNode
         ? '--canvas-node-color'
@@ -3017,20 +3001,24 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         ? this.stop
         : reading(all, this.edges, this.order ?? 'spatial')[0]?.id
     for (const card of this.cards) {
-      /* Written only where it moved: a style write is a mutation the words
-         observer hears, and a drag of three cards on a board of eight hundred
-         rewrote every card's place on every step. */
+      /* Written only where it moved: a drag of three cards on a board of
+         eight hundred rewrote every card's place on every step. **Into the
+         card's own shadow root**, since its `style` is the page's: there a
+         place was markup the server never sent, and a page that set a card's
+         color wiped it. */
       const x = finite(card.x) - origin.x
       const y = finite(card.y) - origin.y
       const placed = `${x} ${y} ${finite(card.width)} ${finite(card.height)}`
       if (this.placed.get(card) !== placed) {
         this.placed.set(card, placed)
-        card.style.setProperty('--_canvas-card-x', `${x}px`)
-        card.style.setProperty('--_canvas-card-y', `${y}px`)
         /* A card with no size of its own is as large as what it says, the
            sheet's own default, rather than a zero box hiding its words. */
-        size(card, '--_canvas-card-inline-size', finite(card.width))
-        size(card, '--_canvas-card-block-size', finite(card.height))
+        card.place({
+          '--_canvas-card-block-size': size(finite(card.height)),
+          '--_canvas-card-inline-size': size(finite(card.width)),
+          '--_canvas-card-x': `${x}px`,
+          '--_canvas-card-y': `${y}px`,
+        })
       }
       /* **No `data-group` written onto the card**, which it was, for nothing
          to read: an attribute on the page's own markup the server never sent,

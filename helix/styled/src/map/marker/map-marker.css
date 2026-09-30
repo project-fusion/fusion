@@ -23,8 +23,8 @@
   --_map-marker-lift: 0px;
   --_map-marker-shadow: var(--helix-shadow-sm);
   --_map-marker-size: var(--map-marker-size, 0.875rem);
-  /* **Declared here and written by the connector**, onto the host, which is
-     what makes them readable below: the connector lives in another package
+  /* **Declared here and written by the connector**, in a sheet of the
+     marker's own, which is what makes them readable below: the connector lives in another package
      and writes the place's screen position every time the view moves. Zero is
      where an unplaced marker would sit, which the rule after this hides. */
   --_map-marker-leg: 0px;
@@ -48,7 +48,7 @@
 
 /* Not yet placed, which is a marker the connector has not reached: drawn at
    the corner it would be a place in the wrong place. */
-:host(:not([style*="--_map-marker-x"])) {
+:host(:not(:state(placed))) {
   visibility: hidden;
 }
 

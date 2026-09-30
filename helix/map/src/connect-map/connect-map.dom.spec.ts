@@ -31,6 +31,13 @@ interface Recording {
   stopped: boolean
 }
 
+/**
+ * What the connector placed an element at: kept in the element's own shadow
+ * root, which the page's `style` never shows.
+ */
+const placedAt = (element: Element, name: string): string =>
+  (element as Element & { placed(name: string): string | undefined }).placed(name) ?? ''
+
 /** A motion as a word: its duration, or a jump where there is none. */
 const paced = (motion: MapMotion | null): string => (motion ? `${motion.duration}ms` : 'jump')
 
@@ -328,10 +335,29 @@ describe('connectMap with markers', () => {
     const marker = host.querySelector('helix-headless-map-marker') as HTMLElement
     const { driver, moved } = projecting()
     connectMap(host, driver)
-    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('30px')
-    expect(marker.style.getPropertyValue('--_map-marker-y')).toBe('20px')
+    expect(placedAt(marker, '--_map-marker-x')).toBe('30px')
+    expect(placedAt(marker, '--_map-marker-y')).toBe('20px')
     moved()
-    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('35px')
+    expect(placedAt(marker, '--_map-marker-x')).toBe('35px')
+  })
+
+  test('a marker is placed without a word written onto its style, which is the page’s', async () => {
+    const host = await frame(
+      `<helix-headless-map-marker label="Depot" lat="2" lng="3" style="color: red"></helix-headless-map-marker>
+       <helix-headless-map-position label="Van" lat="2" lng="3"></helix-headless-map-position>`,
+    )
+    const marker = host.querySelector('helix-headless-map-marker') as HTMLElement
+    const position = host.querySelector('helix-headless-map-position') as HTMLElement
+    const { driver, moved } = projecting()
+    connectMap(host, driver)
+    expect(marker.getAttribute('style')).toBe('color: red')
+    expect(position.hasAttribute('style')).toBe(false)
+    /* A page that sets the whole of `style` again takes nothing of the place. */
+    marker.setAttribute('style', 'color: blue')
+    moved()
+    expect(marker.getAttribute('style')).toBe('color: blue')
+    expect(placedAt(marker, '--_map-marker-x')).toBe('35px')
+    expect(placedAt(position, '--_map-position-x')).toBe('35px')
   })
 
   test('a marker added or moved later is placed too', async () => {
@@ -343,10 +369,10 @@ describe('connectMap with markers', () => {
     marker.setAttribute('lng', '1')
     host.append(marker)
     await settle()
-    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('10px')
+    expect(placedAt(marker, '--_map-marker-x')).toBe('10px')
     marker.setAttribute('lng', '4')
     await settle()
-    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('40px')
+    expect(placedAt(marker, '--_map-marker-x')).toBe('40px')
   })
 
   test('a marker with no place is left unplaced, which its sheet hides', async () => {
@@ -356,7 +382,7 @@ describe('connectMap with markers', () => {
     const { driver } = projecting()
     connectMap(host, driver)
     const marker = host.querySelector('helix-headless-map-marker') as HTMLElement
-    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('')
+    expect(placedAt(marker, '--_map-marker-x')).toBe('')
   })
 
   test('a marker the keyboard reaches off the edge is brought into view, and one in view is not', async () => {
@@ -414,9 +440,9 @@ describe('connectMap with markers', () => {
     const marker = host.querySelector('helix-headless-map-marker') as HTMLElement
     const { driver, moved } = projecting()
     connectMap(host, driver).disconnect()
-    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('')
+    expect(placedAt(marker, '--_map-marker-x')).toBe('')
     moved()
-    expect(marker.style.getPropertyValue('--_map-marker-x')).toBe('')
+    expect(placedAt(marker, '--_map-marker-x')).toBe('')
   })
 })
 
@@ -823,8 +849,7 @@ describe('connectMap with a position', () => {
       '<helix-headless-map-position label="Van 12" lat="0" lng="2" heading="90" accuracy="111320"></helix-headless-map-position>',
     )
     const position = host.querySelector('helix-headless-map-position') as HTMLElement
-    const read = (name: string): string =>
-      position.style.getPropertyValue(`--_map-position-${name}`)
+    const read = (name: string): string => placedAt(position, `--_map-position-${name}`)
     /* North up, as a renderer draws it, so a heading is read the right way
        round from the line the connector projects. */
     const connection = connectMap(host, {
@@ -855,8 +880,7 @@ describe('connectMap with a position', () => {
       '<helix-headless-map-position label="Van 12" lat="0" lng="2" accuracy="111320"></helix-headless-map-position>',
     )
     const position = host.querySelector('helix-headless-map-position') as HTMLElement
-    const read = (name: string): string =>
-      position.style.getPropertyValue(`--_map-position-${name}`)
+    const read = (name: string): string => placedAt(position, `--_map-position-${name}`)
     /* Turned to face east and tilted back: across the view is south, and a
        driver that shortened what runs away from the eye would still give the
        ring its whole width that way. */
@@ -889,7 +913,7 @@ describe('connectMap with a position', () => {
         y: -(lng * Math.sin(turn) + lat * Math.cos(turn)) * 10,
       }),
     })
-    expect(position.style.getPropertyValue('--_map-position-heading')).toBe('60deg')
+    expect(placedAt(position, '--_map-position-heading')).toBe('60deg')
   })
 
   test('on a map drawn in perspective, it points along the line the renderer draws', async () => {
@@ -909,7 +933,7 @@ describe('connectMap with a position', () => {
       pitch: () => 60,
       project: ({ lat, lng }) => ({ x: (lng - lat / 2) * 10, y: -lat * 10 }),
     })
-    expect(position.style.getPropertyValue('--_map-position-heading')).toBe('-14.04deg')
+    expect(placedAt(position, '--_map-position-heading')).toBe('-14.04deg')
   })
 
   test('a position moving, set as a property, moves it and draws no route again', async () => {
@@ -931,7 +955,7 @@ describe('connectMap with a position', () => {
     })
     position.lng = 4
     await settle()
-    expect(position.style.getPropertyValue('--_map-position-x')).toBe('40px')
+    expect(placedAt(position, '--_map-position-x')).toBe('40px')
     expect(draws).toBe(1)
   })
 
@@ -1004,12 +1028,12 @@ describe('connectMap with a frame that gathers its markers', () => {
     expect(depot.gathered).toEqual(['Depot', 'Ferry'])
     expect(ferry.gatheredBy).toBe(depot)
     expect([mission.gathered, mission.gatheredBy]).toEqual([[], undefined])
-    expect(depot.style.getPropertyValue('--_map-marker-x')).toBe('15px')
+    expect(placedAt(depot, '--_map-marker-x')).toBe('15px')
 
     zoom(100)
     expect(depot.gathered).toEqual([])
     expect(ferry.gatheredBy).toBeUndefined()
-    expect(depot.style.getPropertyValue('--_map-marker-x')).toBe('100px')
+    expect(placedAt(depot, '--_map-marker-x')).toBe('100px')
   })
 
   test('a place on the far side of a globe is hidden, in no cluster, and still placed', async () => {
@@ -1024,7 +1048,7 @@ describe('connectMap with a frame that gathers its markers', () => {
     expect([depot.behind, ferry.behind, mission.behind]).toEqual([false, true, false])
     expect(depot.gathered).toEqual([])
     expect(ferry.gatheredBy).toBeUndefined()
-    expect(ferry.style.getPropertyValue('--_map-marker-x')).toBe('20px')
+    expect(placedAt(ferry, '--_map-marker-x')).toBe('20px')
   })
 
   test('a place behind the globe that the keyboard reaches is turned into view', async () => {
@@ -1083,7 +1107,7 @@ describe('connectMap with a frame that gathers its markers', () => {
     await first.updateComplete
     expect(first.gathered).toHaveLength(3)
     const at = (one: HTMLElement): string =>
-      `${one.style.getPropertyValue('--_map-marker-x')} ${one.style.getPropertyValue('--_map-marker-y')}`
+      `${placedAt(one, '--_map-marker-x')} ${placedAt(one, '--_map-marker-y')}`
     first.shadowRoot
       ?.querySelector('[part="marker"]')
       ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
@@ -1096,7 +1120,7 @@ describe('connectMap with a frame that gathers its markers', () => {
     ])
     expect(at(first)).toBe('50px 10px')
     expect(new Set(studios.map(at)).size).toBe(3)
-    expect(first.style.getPropertyValue('--_map-marker-leg')).toBe('40px')
+    expect(placedAt(first, '--_map-marker-leg')).toBe('40px')
 
     host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
     expect(studios.map((one) => one.fanned)).toEqual([false, false, false])
