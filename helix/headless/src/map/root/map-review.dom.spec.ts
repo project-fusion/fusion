@@ -98,10 +98,12 @@ describe('the same move said again', () => {
   test('is heard every time', async () => {
     const host = (await mount('<helix-headless-map label="City"></helix-headless-map>')) as Frame
     const said: string[] = []
-    for (let time = 0; time < 4; time += 1) {
+    /* Three, since the third is the one that was lost, each past the wait the
+       frame gives the view to settle. */
+    for (let time = 0; time < 3; time += 1) {
       host.pan('start')
       host.moved()
-      await new Promise((done) => setTimeout(done, 500))
+      await new Promise((done) => setTimeout(done, 450))
       await settle(host)
       said.push(host.shadowRoot?.querySelector('[part="live"]')?.textContent ?? '')
     }
@@ -135,7 +137,7 @@ describe('the marker walk', () => {
     ;(other as unknown as HTMLElement).focus()
     expect(other?.shadowRoot?.activeElement).not.toBeNull()
     ;(lead as Marker).gathered = ['Hotel', 'Hotel café']
-    ;(other as Marker).gatheredBy = lead
+    ;(other as Marker).gatheredBy = lead as Marker
     await settle(other as Marker)
     await settle(lead as Marker)
     expect(lead?.shadowRoot?.activeElement).not.toBeNull()
