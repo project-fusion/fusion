@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   HelixFormElement,
+  HostClickController,
   MixinControllerChecked,
   MixinField,
   markRegion,
@@ -61,6 +62,9 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
   protected readonly aria = new AriaForwardController(this, {
     target: () => this.partNamed('control'),
   })
+
+  /** A click on the element itself, `click()` or a page's `<label for>`, toggles it. */
+  protected readonly clicks = new HostClickController(this, () => this.partNamed('control'))
 
   /**
    * Value submitted when the switch is on.

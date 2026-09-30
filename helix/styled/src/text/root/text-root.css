@@ -104,6 +104,30 @@
   line-height: var(--helix-leading-normal);
 }
 
+/* **A heading keeps the heading ink where a surface mutes its body.** A card
+   sets its whole body in the muted ink and gives only its header slot the full
+   one, so a form's title placed in a card's body read as body copy. The
+   surface names the ink in `--_heading-ink`; anywhere else a heading inherits
+   as it always has, `currentColor` being the inherited color, so a heading a
+   page set in white over a dark picture stays white. A rule of the page's, or
+   a component's own `::slotted` rule, still wins over this one. */
+:host(
+  :is(
+    [as="h1"],
+    [as="h2"],
+    [as="h3"],
+    [as="h4"],
+    [as="h5"],
+    [as="h6"],
+    [variant="display"],
+    [variant="heading"],
+    [variant="subheading"],
+    [variant="title"]
+  )
+) {
+  color: var(--_heading-ink, currentColor);
+}
+
 [part="text"] {
   color: inherit;
   font: inherit;

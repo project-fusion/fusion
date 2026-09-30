@@ -5,6 +5,28 @@
   gap: var(--_stat-group-gap);
 }
 
+/* **Equal columns where a count is asked for**, as plain CSS so a server's
+   markup is right with no JavaScript. `minmax(0, 1fr)` is what lets a long
+   label wrap in its own column instead of widening it. */
+:host([columns]) {
+  display: grid;
+}
+:host([columns="2"]) {
+  grid-template-columns: var(--stat-group-columns, repeat(2, minmax(0, 1fr)));
+}
+:host([columns="3"]) {
+  grid-template-columns: var(--stat-group-columns, repeat(3, minmax(0, 1fr)));
+}
+:host([columns="4"]) {
+  grid-template-columns: var(--stat-group-columns, repeat(4, minmax(0, 1fr)));
+}
+:host([columns="5"]) {
+  grid-template-columns: var(--stat-group-columns, repeat(5, minmax(0, 1fr)));
+}
+:host([columns="6"]) {
+  grid-template-columns: var(--stat-group-columns, repeat(6, minmax(0, 1fr)));
+}
+
 /* The rule goes on the figure rather than between slots, because a `<slot>` is
    `display: contents` and generates no box to put a border on.
 

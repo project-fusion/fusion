@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   HelixFormElement,
+  HostClickController,
   MixinControllerChecked,
   MixinField,
 } from '@fusion.dev/helix-core'
@@ -64,6 +65,9 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   protected readonly aria = new AriaForwardController(this, {
     target: () => this.partNamed('control'),
   })
+
+  /** A click on the element itself, `click()` or a page's `<label for>`, toggles it. */
+  protected readonly clicks = new HostClickController(this, () => this.partNamed('control'))
 
   /**
    * Shows the box as neither checked nor unchecked.

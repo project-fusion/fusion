@@ -5,6 +5,20 @@ import { property } from 'lit/decorators.js'
 import { styles } from './grid-root.css.js'
 
 /**
+ * **The track lists every grid sets for itself, set back so none is taken from
+ * a grid around it.** Custom properties inherit, so a `columns={3}` grid inside
+ * a `min` grid took the outer grid's template and came out one column, and a
+ * `--grid-columns` written on an outer grid reached every grid inside it. A
+ * page's own `--grid-columns` on the element still wins: it is declared on the
+ * element, and a declaration there outranks this `:host` rule.
+ *
+ * In the template's `<style>` element, and so also written as its text in
+ * `render`, where the server renders it: the adopted sheet cascades after that
+ * element, and a reset there would undo every `min`.
+ */
+const UNINHERITED = '--grid-columns: initial; --_grid-template: initial;'
+
+/**
  * @summary A layout that places its children on a grid.
  *
  * @description
@@ -116,8 +130,8 @@ export class HelixGrid extends HelixElement {
     const min = this.min?.trim() ?? ''
     sheet.textContent =
       min !== '' && length.test(min)
-        ? `:host { --_grid-template: repeat(auto-fit, minmax(min(${min}, 100%), 1fr)); }`
-        : ''
+        ? `:host { ${UNINHERITED} --_grid-template: repeat(auto-fit, minmax(min(${min}, 100%), 1fr)); }`
+        : `:host { ${UNINHERITED} }`
   }
 
   /* `updated` alone, and never a `firstUpdated` beside it. Lit puts every
@@ -131,7 +145,7 @@ export class HelixGrid extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<style id="template"></style>
+    return html`<style id="template">:host { --grid-columns: initial; --_grid-template: initial; }</style>
       <slot></slot>`
   }
 

@@ -13,6 +13,9 @@
   --_canvas-card-y: 0px;
   --_canvas-card-inline-size: auto;
   --_canvas-card-block-size: auto;
+  /* The ink a `helix-text` heading on the card takes, where the body around
+     it is muted, as on `Card`. */
+  --_heading-ink: var(--helix-color-foreground);
   /* **The card's color: a custom one where the page wrote it, its tone where
      it has one, and the border where it has neither.** A tone is an attribute
      this sheet matches below; a color with no meaning is a hook the page

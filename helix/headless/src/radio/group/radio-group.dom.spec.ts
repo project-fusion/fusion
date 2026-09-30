@@ -28,6 +28,15 @@ const options = (host: Updatable): (HTMLElement & { selected: boolean; value: st
   [...host.children] as (HTMLElement & { selected: boolean; value: string })[]
 
 describe('radio group', () => {
+  test('`click()` on a radio chooses it', async () => {
+    const host = await group()
+    const [, two] = options(host)
+    two?.click()
+    await settle(host)
+    expect(two?.selected).toBe(true)
+    expect((host as Updatable & { value: string }).value).toBe('two')
+  })
+
   test('is a radio group, named on internals rather than on the host', async () => {
     // Through internals, so nothing lands on the host as an attribute a React
     // consumer's server markup never had.

@@ -16,6 +16,22 @@ beforeAll(async () => {
 const control = (host: HTMLElement): HTMLInputElement => part(host, 'control') as HTMLInputElement
 
 describe('switch', () => {
+  test('`click()` on the element toggles it, once, as it does a native checkbox', async () => {
+    const host = (await mount('<helix-headless-switch>On</helix-headless-switch>')) as Updatable & {
+      checked: boolean
+    }
+    const changes: boolean[] = []
+    host.addEventListener('change', () => changes.push(host.checked))
+    host.click()
+    await host.updateComplete
+    expect(host.checked).toBe(true)
+    /* A press inside, on the control itself, still toggles it once. */
+    control(host).click()
+    await host.updateComplete
+    expect(host.checked).toBe(false)
+    expect(changes).toEqual([true, false])
+  })
+
   test('is a checkbox wearing the switch role, because it needs both halves', async () => {
     /* The input is what a form submits and what a label forwards a press to;
        the role is what a screen reader announces. Neither half can be got from

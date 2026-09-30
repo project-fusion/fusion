@@ -7,6 +7,19 @@ beforeAll(async () => {
 })
 
 describe('option', () => {
+  test('with a label and nothing in it, it shows and reads the label, as `<option label>` does', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="sar" label="Search and rescue"></helix-headless-option>',
+    )) as HTMLElement & { text: string }
+    const slot = host.shadowRoot?.querySelector('[part="label"] slot') as HTMLSlotElement
+    expect(slot.assignedNodes()).toHaveLength(0)
+    expect(slot.textContent).toBe('Search and rescue')
+    expect(host.text).toBe('Search and rescue')
+    /* Content, where there is some, is still what it says. */
+    host.textContent = 'Search'
+    expect(host.text).toBe('Search')
+  })
+
   test('its row says selected and active in part names, and only while they hold', async () => {
     /* For the option a component draws in its own shadow root, where no
        selector naming the host can reach `:state(selected)` or `data-active`. */

@@ -10,8 +10,17 @@ describe('option server output', () => {
        only shadow root in the markup is the option's own. */
     const markup = ssr(html`<helix-headless-option value="ross"></helix-headless-option>`)
     expect(hasPart(markup, 'item')).toBe(true)
+    expect(rendered(markup, 'helix-headless-option')).toMatch(
+      /<span part="label"><slot>(<!--lit-part-->)?(<!--\/lit-part-->)?<\/slot><\/span>/,
+    )
+  })
+
+  test('a label with nothing in the option is served as the row', () => {
+    const markup = ssr(
+      html`<helix-headless-option value="sar" label="Search and rescue"></helix-headless-option>`,
+    )
     expect(rendered(markup, 'helix-headless-option')).toContain(
-      '<span part="label"><slot></slot></span>',
+      '<slot><!--lit-part-->Search and rescue<!--/lit-part--></slot>',
     )
   })
 
