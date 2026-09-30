@@ -1066,6 +1066,27 @@ describe('connectMap with a frame that gathers its markers', () => {
     expect(heard).toEqual([['Depot', 'Ferry']])
   })
 
+  test('a cluster of places a street apart is framed as tightly as they stand, which opens it', async () => {
+    const host = await frame(
+      `<helix-headless-map-marker label="Depot" lat="1" lng="1"></helix-headless-map-marker>
+       <helix-headless-map-marker label="Ferry" lat="1.001" lng="1.001"></helix-headless-map-marker>`,
+    )
+    ;(host as Frame & { cluster: boolean }).cluster = true
+    await host.updateComplete
+    const [depot] = [...host.querySelectorAll('helix-headless-map-marker')] as Gathered[]
+    const { driver, fitted } = zooming()
+    connectMap(host, driver)
+    await depot?.updateComplete
+    expect(depot?.gathered).toEqual(['Depot', 'Ferry'])
+    depot?.shadowRoot
+      ?.querySelector('[part="marker"]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    await settle()
+    expect(fitted).toEqual([
+      '{"northEast":{"lat":1.001,"lng":1.001},"southWest":{"lat":1,"lng":1}} 96',
+    ])
+  })
+
   test('places at the very same spot fan out when pressed, rather than zooming, and fold back on Escape or a zoom', async () => {
     const host = await frame(
       `<helix-headless-map-marker label="Studio 1" lat="5" lng="5"></helix-headless-map-marker>

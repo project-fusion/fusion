@@ -350,14 +350,19 @@ const isPosition = (node: unknown): node is Position =>
 const METERS_PER_DEGREE = 111_320
 
 /**
- * The least room a place is framed with, in degrees either side: about half a
- * kilometer. Framing one place, or several at one spot, is a box of no size,
- * which a renderer answers with its deepest zoom.
+ * The least room `fit()` frames a place with, in degrees either side: about
+ * half a kilometer. Framing one place, or several at one spot, is a box of no
+ * size, which a renderer answers with its deepest zoom.
  */
 const LEAST_REACH = 0.005
 
 /**
- * The stretch of the world some places cover, and their middle.
+ * The stretch of the world some places cover, and their middle, with at least
+ * `least` degrees either side where they cover less than that.
+ *
+ * **No least reach for a cluster that was pressed**, which is framed to come
+ * apart: widened to half a kilometer, a cluster of places a street apart was
+ * framed as far out as it already was, and pressing it never opened it.
  *
  * **One pass rather than `Math.max(...lats)`**, which spreads every place into
  * an argument list and throws past about 65,000 of them in Safari: a points
@@ -369,7 +374,10 @@ const LEAST_REACH = 0.005
  * to the globe, and their middle landed at 0. The bounds may run past 180 as
  * a result, which both renderers draw.
  */
-export const reachOf = (places: readonly MapPlace[]): { bounds: MapBounds; middle: MapPlace } => {
+export const reachOf = (
+  places: readonly MapPlace[],
+  least = 0,
+): { bounds: MapBounds; middle: MapPlace } => {
   const first = places[0]?.lng ?? 0
   let north = -90
   let south = 90
@@ -388,11 +396,11 @@ export const reachOf = (places: readonly MapPlace[]): { bounds: MapBounds; middl
   }
   const count = Math.max(places.length, 1)
   const across = ((lngs / count + 540) % 360) - 180
-  if (north - south < LEAST_REACH && east - west < LEAST_REACH) {
-    north += LEAST_REACH
-    south -= LEAST_REACH
-    east += LEAST_REACH
-    west -= LEAST_REACH
+  if (north - south < least && east - west < least) {
+    north += least
+    south -= least
+    east += least
+    west -= least
   }
   return {
     bounds: { northEast: { lat: north, lng: east }, southWest: { lat: south, lng: west } },
@@ -1690,7 +1698,7 @@ export const connectMap = (
         return
       }
       driver.fit(
-        reachOf(places).bounds,
+        reachOf(places, LEAST_REACH).bounds,
         options.padding ?? 48,
         options.animate === false ? null : motionOf(frame, 'travel'),
       )
