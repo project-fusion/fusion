@@ -2768,6 +2768,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     super.firstUpdated(changed)
     this.finishHydration()
     if (this.waiting) {
+      /* The box as it is now, so the first resize after this keeps the view's
+         middle: the viewport settles its height after the first render, and
+         a view placed before it moved by half of what it gained. */
+      this.measured = this.box
       this.view = this.waiting
     }
   }

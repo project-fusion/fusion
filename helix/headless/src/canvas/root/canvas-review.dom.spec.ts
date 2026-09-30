@@ -106,13 +106,18 @@ describe('a board saved', () => {
 
 describe('a view written before the board has drawn', () => {
   test('is the view it shows once it has', async () => {
-    const host = document.createElement('helix-headless-canvas') as Canvas
+    const host = document.createElement('helix-headless-canvas') as unknown as Canvas
     host.setAttribute('label', 'A board')
     host.innerHTML = BOARD
     host.view = { x: 600, y: 450, zoom: 1 }
     document.body.append(host)
     await host.updateComplete
     await host.updateComplete
+    /* Past the frame a browser settles the board's size in, which the board
+       hears from its resize observer and keeps the middle through. */
+    for (let frame = 0; frame < 2; frame += 1) {
+      await new Promise((done) => requestAnimationFrame(done))
+    }
     expect(host.view).toEqual({ x: 600, y: 450, zoom: 1 })
     host.remove()
   })
