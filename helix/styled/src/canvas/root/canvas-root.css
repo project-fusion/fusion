@@ -44,8 +44,12 @@
 [part="board"] {
   block-size: var(--_canvas-plane-block-size);
   inline-size: var(--_canvas-plane-inline-size);
-  inset: 0;
+  /* At the top left in any language, which is where the transform and the
+     document's coordinates start: `inset: 0` with a width is over-constrained,
+     and a right-to-left page anchored the plane to the right. */
+  left: 0;
   position: absolute;
+  top: 0;
   transform: translate(var(--_canvas-x), var(--_canvas-y)) scale(var(--_canvas-zoom));
   transform-origin: 0 0;
   /* The move a press asks for, eased. A board that jumped would leave a reader

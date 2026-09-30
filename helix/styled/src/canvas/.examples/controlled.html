@@ -47,13 +47,17 @@
   // The grid spacing, so each card lands on a grid line.
   const STEP = 32
 
+  // The nearest grid line, leaning the way the card moved, so a keyboard nudge
+  // of half a step reaches the next line in every direction.
+  const snap = (from, to) => Math.round(to / STEP + Math.sign(to - from) * 0.01) * STEP
+
   // Cancel the move, then place each card on the nearest grid line.
   plan.addEventListener('helix-before-move', (event) => {
     event.preventDefault()
     for (const { name, x, y } of event.detail.nodes) {
       const card = plan.querySelector(`[name="${name}"]`)
-      card.x = Math.round(x / STEP) * STEP
-      card.y = Math.round(y / STEP) * STEP
+      card.x = snap(card.x, x)
+      card.y = snap(card.y, y)
     }
   })
 </script>

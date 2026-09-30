@@ -96,7 +96,12 @@ export function Example() {
                   if (event.key === 'Escape') {
                     event.currentTarget.value = card.text
                   }
+                  // Back to the card, since the input goes when it is saved.
+                  const holder = event.currentTarget.closest(
+                    'helix-canvas-node',
+                  ) as HTMLElement | null
                   event.currentTarget.blur()
+                  holder?.focus()
                 }
               }}
               ref={(field) => {

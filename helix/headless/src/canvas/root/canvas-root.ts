@@ -41,7 +41,6 @@ import {
   connector,
   ends,
   extent,
-  groupOf,
   inside,
   port,
   reading,
@@ -300,7 +299,7 @@ const size = (element: HTMLElement, name: string, value: number): void => {
  * @cssstate empty - While the document has no nodes.
  * @cssstate fullscreen - While the board fills the screen.
  * @cssstate holding - An item picked up with a click follows the pointer until the next press puts it down.
- * @cssstate idle - The user has been still long enough for the controls to hide.
+ * @cssstate idle - The user has been still for `idle-delay` milliseconds. The board's own controls stay; select on it to hide chrome of your own.
  * @cssstate pressing - While a press on the board, its cards or its connections is under way.
  */
 @customElement('helix-headless-canvas')
@@ -603,11 +602,6 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   /** A card's geometry by its name. */
   private get byId(): Map<string, CanvasNode> {
     return this.remember('byId', () => new Map(this.nodes.map((node) => [node.id, node])))
-  }
-
-  /** The groups alone, which is all a card's group is chosen from. */
-  private get groups(): CanvasNode[] {
-    return this.remember('groups', () => this.nodes.filter((node) => node.type === 'group'))
   }
 
   /**
@@ -1165,6 +1159,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       element.toSide = detail.toSide
       this.rekey(linking.edge, this.keyOfElement(element))
     }
+    /* Said from the keyboard, as a new connection is: a reader who moved one
+       end heard the start and never the end. */
+    if (linking.pointer === undefined) {
+      this.said = fillTemplate(this.connectedLabel, {
+        from: this.nameOf(detail.from),
+        to: this.nameOf(detail.to),
+      })
+    }
     this.dispatchEvent(new HelixReconnectEvent(detail))
   }
 
@@ -1361,7 +1363,51 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   /** The element behind a connection's key, for what only the element knows. */
   private edgeElement(key: string): HelixHeadlessCanvasEdge | undefined {
+    if (this.keying) {
+      return this.keying.byKey.get(key)
+    }
     return this.edgeElements.find((child) => this.keyOfElement(child) === key)
+  }
+
+  /**
+   * Every connection's key and every key's element, worked out once for the
+   * render that asks for them.
+   *
+   * **One pass, where each asked alone walked them all.** A connection with no
+   * `name` counts its twins to be told apart, and a render asks every
+   * connection's element by key, so four hundred unnamed connections cost 53
+   * ms a render and 4.7 seconds with them all chosen, every step of a drag.
+   * Kept from `willUpdate` to `updated` only: outside a render a handler may
+   * have just moved a connection's ends, and its key is worked out afresh.
+   */
+  private keying:
+    | {
+        byElement: Map<HelixHeadlessCanvasEdge, string>
+        byKey: Map<string, HelixHeadlessCanvasEdge>
+      }
+    | undefined = undefined
+
+  private keyAll(): {
+    byElement: Map<HelixHeadlessCanvasEdge, string>
+    byKey: Map<string, HelixHeadlessCanvasEdge>
+  } {
+    const byElement = new Map<HelixHeadlessCanvasEdge, string>()
+    const byKey = new Map<string, HelixHeadlessCanvasEdge>()
+    const twins = new Map<string, number>()
+    for (const element of this.edgeElements) {
+      const base = keyBase({ fromNode: element.from, id: element.name, toNode: element.to })
+      let key = base
+      if (!element.name) {
+        const count = (twins.get(base) ?? 0) + 1
+        twins.set(base, count)
+        key = count > 1 ? `${base}#${count}` : base
+      }
+      byElement.set(element, key)
+      if (!byKey.has(key)) {
+        byKey.set(key, element)
+      }
+    }
+    return { byElement, byKey }
   }
 
   /** The connections declared, in the order they were written. */
@@ -1380,6 +1426,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * key the walk found the first every time and never reached the card after.
    */
   private keyOfElement(element: HelixHeadlessCanvasEdge): string {
+    const known = this.keying?.byElement.get(element)
+    if (known !== undefined) {
+      return known
+    }
     const base = keyBase({ fromNode: element.from, id: element.name, toNode: element.to })
     if (element.name) {
       return base
@@ -2053,6 +2103,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     const key = edge ?? (card as HelixHeadlessCanvasNode).name
     const along = inlineStep(this, event.key)
     const down = event.key === 'ArrowDown' ? 1 : event.key === 'ArrowUp' ? -1 : 0
+    /* **A letter or Delete with a modifier is someone else's.** Command or
+       Control with C is Copy, and on a card it started a connection, on a
+       connection a reconnect. Shift, Alt with the arrows, and Command or
+       Control with A are this board's own, read below. */
+    const plain = !event.metaKey && !event.ctrlKey && !event.altKey
 
     if (card && event.shiftKey && (along !== 0 || down !== 0)) {
       event.preventDefault()
@@ -2118,7 +2173,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     }
     /* F2 edits a label the board draws, the platform's key for renaming; on
        a card, Enter does too, a card having no other use for it. */
-    if (!this.linking && (event.key === 'F2' || (card && event.key === 'Enter'))) {
+    if (plain && !this.linking && (event.key === 'F2' || (card && event.key === 'Enter'))) {
       event.preventDefault()
       this.editStop(key)
       return
@@ -2136,7 +2191,13 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       }
       return
     }
-    if (card && !this.fixed(card) && !this.linking && (event.key === 'c' || event.key === 'C')) {
+    if (
+      plain &&
+      card &&
+      !this.fixed(card) &&
+      !this.linking &&
+      (event.key === 'c' || event.key === 'C')
+    ) {
       event.preventDefault()
       this.startLinking(card.name)
       return
@@ -2146,13 +2207,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       !this.linking &&
       !this.readOnly &&
       !this.edgeElement(edge)?.readOnly &&
+      plain &&
       (event.key === 'c' || event.key === 'C')
     ) {
       event.preventDefault()
       this.startReconnect(edge, 'to')
       return
     }
-    if (event.key === 'Delete' || event.key === 'Backspace') {
+    /* Not while connecting: the card being connected from was sent for
+       removal with its connections while the board still said it was
+       connecting from it. */
+    if (plain && !this.linking && (event.key === 'Delete' || event.key === 'Backspace')) {
       /* The whole selection where this is in it, less anything held. */
       const picked = this.picked
       const keys = picked.includes(key) ? picked : [key]
@@ -2170,7 +2235,12 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     /* Walking while connecting stops on cards only: a connection is not
        somewhere a new one can arrive. */
     const walk = this.linking ? this.walk.filter((one) => one.kind === 'node') : this.walk
-    const at = walk.findIndex((one) => one.key === key)
+    /* From the card whose end stays, where the press is on the connection
+       being moved, which is not in a walk of cards: from nowhere, the first
+       arrow went to the first card on the board. */
+    const found = walk.findIndex((one) => one.key === key)
+    const at =
+      found === -1 && this.linking ? walk.findIndex((one) => one.key === this.linking?.from) : found
     const to =
       event.key === 'Home'
         ? 0
@@ -2212,7 +2282,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       if (this.linking) {
         this.linking = { ...this.linking, to: this.arrival(card.name) }
       }
-      this.reveal(card.name)
+      /* **Brought into view for a keyboard, never under a press.** A card
+         pressed at the edge of the view took focus and eased the board to
+         center it, so the card slid from under the pointer, a drag that
+         started there drifted away from the hand, and the board stopped
+         fitting itself. */
+      if (!this.pointing) {
+        this.reveal(card.name)
+      }
     }
   }
 
@@ -2539,6 +2616,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * it rather than fitting the board again.
    */
   get view(): CanvasView {
+    if (this.waiting) {
+      return this.waiting
+    }
     const origin = this.origin ?? { x: 0, y: 0 }
     const { height, width } = this.box
     return {
@@ -2549,10 +2629,25 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   set view(next: CanvasView) {
-    const origin = this.origin ?? { x: 0, y: 0 }
-    const { height, width } = this.box
-    const zoom = Math.min(Math.max(next.zoom, ZOOM_MIN), ZOOM_MAX)
+    /* A number is a view and anything else is not: `NaN` was written into
+       every transform the board draws with. */
+    if (![next.x, next.y, next.zoom].every(Number.isFinite)) {
+      return
+    }
     this.touched = true
+    /* **Held until the board has drawn**, and so knows where its corner is and
+       how big its view is. Restoring a saved view as the board is made, which
+       is what this is for, was measured against neither, and landed off by
+       the distance between them: `{ x: 600, y: 450 }` came back as
+       `{ x: 1068, y: 818 }`. */
+    if (!this.hasUpdated || !this.origin) {
+      this.waiting = next
+      return
+    }
+    this.waiting = undefined
+    const { height, width } = this.box
+    const origin = this.origin
+    const zoom = Math.min(Math.max(next.zoom, ZOOM_MIN), ZOOM_MAX)
     this.direct = false
     this.at = {
       x: width / 2 - (next.x - origin.x) * zoom,
@@ -2560,6 +2655,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       zoom,
     }
   }
+
+  /** A view written before the board could place it, placed once it can. */
+  private waiting: CanvasView | undefined = undefined
 
   /** The view last reported, so a render that did not move the board says nothing. */
   private reported?: CanvasView
@@ -2577,12 +2675,24 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
        cards it joins, counted where two join the same pair. Copies, so a
        consumer editing what came back is not editing what the board draws. */
     const taken = new Set(this.edges.map((edge) => edge.id).filter(Boolean))
-    const edges = this.edges.map((edge) => {
+    const edges = this.edges.map((read) => {
+      /* **The sides as written**, and none where none was. The board reads
+         each connection with the sides it worked out, so an export named
+         them all, and a board saved and loaded again had every connection
+         pinned to sides that no longer turned toward a moved card. */
+      const { fromSide: _from, toSide: _to, ...rest } = read
+      const key = this.keyOf(read)
+      const element = this.edgeElement(key)
+      const edge: CanvasEdge = {
+        ...rest,
+        ...(element?.fromSide ? { fromSide: element.fromSide } : {}),
+        ...(element?.toSide ? { toSide: element.toSide } : {}),
+      }
       if (edge.id) {
-        return { ...edge }
+        return edge
       }
       /* The name the page already knows it by, from the selection. */
-      const base = this.publicName(this.keyOf(edge))
+      const base = this.publicName(key)
       let id = base
       for (let count = 2; taken.has(id); count++) {
         id = `${base}-${count}`
@@ -2657,6 +2767,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+    if (this.waiting) {
+      this.view = this.waiting
+    }
   }
 
   /** A card added or taken away is a board of a different size. */
@@ -2665,6 +2778,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   protected override updated(changed: PropertyValues): void {
+    this.keying = undefined
     super.updated(changed)
     /* A hold that ended some other way than being put down or put back, a
        connection finished with Enter, still stops listening for its end. */
@@ -2855,6 +2969,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   protected override willUpdate(changed: PropertyValues): void {
+    this.keying = this.keyAll()
     super.willUpdate(changed)
     const drawn = extent(this.nodes)
     const origin = { x: drawn.x - MARGIN, y: drawn.y - MARGIN }
@@ -2897,21 +3012,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       this.stop !== undefined && this.keyNamed(this.stop) === this.stop
         ? this.stop
         : reading(all, this.edges, this.order ?? 'spatial')[0]?.id
-    const groups = this.groups
     for (const card of this.cards) {
-      const group = card.group
-        ? undefined
-        : groupOf(
-            {
-              height: card.height,
-              id: card.name,
-              type: 'text',
-              width: card.width,
-              x: card.x,
-              y: card.y,
-            },
-            groups,
-          )
       /* Written only where it moved: a style write is a mutation the words
          observer hears, and a drag of three cards on a board of eight hundred
          rewrote every card's place on every step. */
@@ -2927,11 +3028,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         size(card, '--_canvas-card-inline-size', finite(card.width))
         size(card, '--_canvas-card-block-size', finite(card.height))
       }
-      if (group) {
-        card.setAttribute('data-group', group.id)
-      } else {
-        card.removeAttribute('data-group')
-      }
+      /* **No `data-group` written onto the card**, which it was, for nothing
+         to read: an attribute on the page's own markup the server never sent,
+         which React's hydration reports on every card in a group. */
       const node = this.byId.get(card.name)
       card.links = node ? this.linksOf(node) : ''
       card.current = card.name === stop
@@ -3037,8 +3136,12 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         const element = elements.get(key)
         const drawn = this.geometryOf(edge, origin)
         /* The connection whose end is in hand is drawn by the draft instead,
-           so a reader sees it lifted rather than drawn twice. */
-        if (!drawn || (this.linking?.edge === key && !this.linking.pressed)) {
+           so a reader sees it lifted rather than drawn twice. **Lifted from
+           the keyboard, its target stays**, with only the line gone: the
+           target is what has focus, and taking it away dropped the reader to
+           the page with no card able to take the tab stop. */
+        const lifted = this.linking?.edge === key && !this.linking.pressed
+        if (!drawn || (lifted && this.linking?.pointer !== undefined)) {
           return nothing
         }
         const { from, to } = drawn
@@ -3062,7 +3165,10 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
             role="button"
             tabindex=${key === stop ? '0' : '-1'}
           />
-          <path
+          ${
+            lifted
+              ? nothing
+              : svg`<path
             part="edge"
             aria-hidden="true"
             d=${drawn.d}
@@ -3073,7 +3179,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
             marker-end=${ends.end ? `url(#${ARROW})` : nothing}
             marker-start=${ends.start ? `url(#${ARROW})` : nothing}
             style=${custom(element, '--canvas-edge-color') ? `--_canvas-edge-color: ${custom(element, '--canvas-edge-color')}` : nothing}
-          />
+          />`
+          }
 `
       })}
       ${this.renderDraft(origin)}

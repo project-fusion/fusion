@@ -3,7 +3,10 @@ import { useState } from 'react'
 // The grid spacing, so each card lands on a grid line.
 const STEP = 32
 
-const snap = (value: number) => Math.round(value / STEP) * STEP
+// The nearest grid line, leaning the way the card moved, so a keyboard nudge of
+// half a step reaches the next line in every direction.
+const snap = (from: number, to: number) =>
+  Math.round(to / STEP + Math.sign(to - from) * 0.01) * STEP
 
 type Card = { name: string; text: string; tone?: 'accent' | 'success'; x: number; y: number }
 
@@ -27,7 +30,7 @@ export function Example() {
         setCards((before) =>
           before.map((card) => {
             const to = moved.get(card.name)
-            return to ? { ...card, x: snap(to.x), y: snap(to.y) } : card
+            return to ? { ...card, x: snap(card.x, to.x), y: snap(card.y, to.y) } : card
           }),
         )
       }}
