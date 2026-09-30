@@ -8,7 +8,7 @@
 use crate::derive::solve::solve_against;
 use crate::derive::surfaces::Surfaces;
 use crate::derive::Cast;
-use crate::oklch::{lightness_for_contrast, Oklch, CONTRAST_STEPS};
+use crate::oklch::{lightness_for_contrast, shipped_contrast_ratio, Oklch, CONTRAST_STEPS};
 
 /// What the page is written in.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -23,11 +23,19 @@ pub struct NeutralInks {
 
 /// Solves the three against the page ladder.
 ///
-/// **Three figures, and the TypeScript records a reason for none of them.**
-/// `foreground` is solved at 1.6 times the target, `muted` at the target
-/// exactly, and `border` at a flat 1.4 against the page alone rather than
-/// against the ladder. Those are three bare lines with no comment above them,
-/// so what follows is a reading rather than a record.
+/// **`foreground` is the strongest ink the neutral has**, its end on the side
+/// away from the page: black on a light page, white on a dark one, which is
+/// what the shipped stylesheet writes, `neutral-1000` and `neutral-0`. It was
+/// solved at 1.6 times the target, which aims at a ratio and lands on a gray:
+/// from `brand: '#2358e8'` and the default 4.5, `#4c5057` in light and
+/// `#a2a5ad` in dark, and every heading on the page read as muted (#422). A
+/// reader expects body text to be the darkest thing the theme writes, and the
+/// target is a floor, which is what `muted` answers to.
+///
+/// **Two figures, and the TypeScript recorded a reason for neither.** `muted`
+/// is solved at the target exactly, and `border` at a flat 1.4 against the
+/// page alone rather than against the ladder, so what follows is a reading
+/// rather than a record.
 ///
 /// `muted` is the quietest thing that still has to be read, so it is the ink
 /// that answers to `contrastTarget`, and body text standing well clear of the
@@ -41,9 +49,8 @@ pub struct NeutralInks {
 /// The numbers themselves are asserted against the oracle, so a reader who
 /// disagrees with the reading can still rely on the behavior.
 ///
-/// `1.6` is not unique to `foreground`, which is a fact rather than a reading:
-/// the inverse pair uses the same multiplier, so whatever it is for, it is for
-/// body text on any ground rather than for the page in particular.
+/// The inverse pair still solves its ink at 1.6 times the target, which is
+/// what the shipped stylesheet's `neutral-50` on `neutral-900` comes to.
 #[must_use]
 pub fn neutral_inks(surfaces: Surfaces, neutral: Cast, contrast_target: f64) -> NeutralInks {
     let grounds = surfaces.solved_against();
@@ -56,7 +63,33 @@ pub fn neutral_inks(surfaces: Surfaces, neutral: Cast, contrast_target: f64) -> 
             None,
             CONTRAST_STEPS,
         ),
-        foreground: solve_against(&grounds, neutral, contrast_target * 1.6),
+        foreground: strongest(&grounds, neutral),
         muted: solve_against(&grounds, neutral, contrast_target),
+    }
+}
+
+/// Black or white, whichever stands further from every ground, judged by the
+/// worst of the grounds as `solve_against` judges its candidates.
+fn strongest(grounds: &[Oklch], neutral: Cast) -> Oklch {
+    let worst = |ink: Oklch| {
+        grounds
+            .iter()
+            .map(|ground| shipped_contrast_ratio(ink, *ground))
+            .fold(f64::INFINITY, f64::min)
+    };
+    /* No chroma at either end, where there is none to show: a cast at
+    lightness 0 or 1 is outside the gamut, and fitting it takes the chroma off
+    anyway. The hue is kept only so the value reads as the neutral's. */
+    let end = |lightness| Oklch {
+        chroma: 0.0,
+        hue: neutral.hue,
+        lightness,
+    };
+    let darkest = end(0.0);
+    let lightest = end(1.0);
+    if worst(darkest) >= worst(lightest) {
+        darkest
+    } else {
+        lightest
     }
 }

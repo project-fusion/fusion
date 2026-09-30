@@ -113,9 +113,14 @@ export interface ThemeIntent {
     scale?: number
   }
   /**
-   * Target contrast for body text. 4.5 is WCAG AA, 7 is AAA. The European
-   * Accessibility Act points at WCAG 2.1 AA, so 4.5 is the figure with legal
-   * weight and is the default.
+   * The least contrast any text may have. 4.5 is WCAG AA, 7 is AAA. The
+   * European Accessibility Act points at WCAG 2.1 AA, so 4.5 is the figure with
+   * legal weight and is the default.
+   *
+   * A floor, which the muted ink is solved to and every other text ink is
+   * measured against. Body text, `color-foreground`, is the strongest ink the
+   * neutral has whatever the target: black on a light page and white on a dark
+   * one, as the shipped stylesheet writes it.
    */
   contrastTarget?: number
   /**

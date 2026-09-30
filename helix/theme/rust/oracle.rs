@@ -1033,6 +1033,56 @@ fn the_neutral_inks_land_where_the_typescript_lands() {
     }
 }
 
+/// Body text is the strongest ink the theme has, and stands well clear of the
+/// quiet ink beside it (#422).
+///
+/// **The property rather than the snapshot**, since the snapshot above is what
+/// held the gray in place: solved at 1.6 times the target, `foreground` came
+/// out `#4c5057` from `#2358e8`, a heading on the page read as muted, and the
+/// oracle recorded it faithfully. Measured on the default blue, on the brand
+/// that found it, and at AAA, where the target is highest, in both schemes.
+#[test]
+fn body_text_is_the_strongest_ink_and_stands_clear_of_the_muted_one() {
+    let mut intents = vec![
+        ("default".to_owned(), intent_for("default")),
+        ("aaa".to_owned(), intent_for("aaa")),
+    ];
+    for scheme in [Scheme::Light, Scheme::Dark] {
+        let mut intent = ThemeIntent::new(Color::Hex("#2358e8".to_owned()));
+        intent.scheme = Some(scheme);
+        intents.push((format!("#2358e8/{scheme:?}"), intent));
+    }
+    let mut dark = intent_for("default");
+    dark.scheme = Some(Scheme::Dark);
+    intents.push(("default/dark".to_owned(), dark));
+
+    for (label, intent) in intents {
+        let resolved = resolve(&intent).expect("the intent resolves");
+        let policy = Policy::new(resolved.chroma);
+        let (_raw, _brand, neutral) = brand_and_neutral(&resolved, policy);
+        let built = surfaces(
+            resolved.scheme,
+            neutral,
+            ladder(resolved.separation.surface),
+        );
+        let inks = neutral_inks(built, neutral, resolved.contrast_target);
+        let (strongest, gap) = if resolved.scheme == Scheme::Dark {
+            (1.0, inks.foreground.lightness - inks.muted.lightness)
+        } else {
+            (0.0, inks.muted.lightness - inks.foreground.lightness)
+        };
+        assert!(
+            (inks.foreground.lightness - strongest).abs() < f64::EPSILON,
+            "{label}: foreground at lightness {}, not the end of the neutral",
+            inks.foreground.lightness
+        );
+        assert!(
+            gap > 0.25,
+            "{label}: foreground only {gap} of lightness from the muted ink"
+        );
+    }
+}
+
 /// `solve_against` keeps the candidate whose weakest pairing is strongest.
 ///
 /// **Asserted as the property rather than as an outcome, because an outcome
