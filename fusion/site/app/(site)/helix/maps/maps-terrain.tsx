@@ -4,8 +4,8 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import type { HelixMap } from '@fusion.dev/helix'
 import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
-import { useEffect, useRef } from 'react'
-import { ELEVATION, IMAGERY } from '@/content/maps/maps'
+import { useEffect, useRef, useState } from 'react'
+import { ELEVATION, IMAGERY, MAP_FAILED } from '@/content/maps/maps'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import styles from './maps.module.css'
 
@@ -23,6 +23,8 @@ const VALLEY = { bearing: 70, center: [-119.61, 37.73] as [number, number], pitc
 export function MapsTerrain() {
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
+  /* Said in the map's footer, where a failed load would leave an empty box. */
+  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     const host = frame.current
@@ -62,7 +64,11 @@ export function MapsTerrain() {
       ([entry]) => {
         if (entry?.isIntersecting) {
           near.disconnect()
-          void start()
+          start().catch(() => {
+            if (live) {
+              setFailed(true)
+            }
+          })
         }
       },
       { rootMargin: '400px' },
@@ -84,6 +90,11 @@ export function MapsTerrain() {
         ref={frame}
       >
         <div className={styles.mapsCanvas} ref={container} />
+        {failed ? (
+          <helix-text slot="footer" variant="caption">
+            {MAP_FAILED}
+          </helix-text>
+        ) : null}
         <helix-map-raster
           attribution={IMAGERY.attribution}
           ground

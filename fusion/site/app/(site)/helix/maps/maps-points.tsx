@@ -5,6 +5,7 @@ import type { HelixActivateEvent, HelixMap } from '@fusion.dev/helix'
 import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { useEffect, useRef, useState } from 'react'
+import { MAP_FAILED } from '@/content/maps/maps'
 import { AUSTIN_PLACES, POINTS_VIEW } from '@/content/maps/points'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import styles from './maps.module.css'
@@ -33,6 +34,8 @@ export function MapsPoints({
 }) {
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
+  /* Said in the map's footer, where a failed load would leave an empty box. */
+  const [failed, setFailed] = useState(false)
   const [pressed, setPressed] = useState('')
 
   useEffect(() => {
@@ -79,7 +82,11 @@ export function MapsPoints({
       ([entry]) => {
         if (entry?.isIntersecting) {
           near.disconnect()
-          void start()
+          start().catch(() => {
+            if (live) {
+              setFailed(true)
+            }
+          })
         }
       },
       { rootMargin: '400px' },
@@ -100,6 +107,11 @@ export function MapsPoints({
         ref={frame}
       >
         <div className={styles.mapsCanvas} ref={container} />
+        {failed ? (
+          <helix-text slot="footer" variant="caption">
+            {MAP_FAILED}
+          </helix-text>
+        ) : null}
         {/* The streets from the first paint, which the map is made over only
             when it nears the view; the points come with the map. */}
         {snapshot ? (

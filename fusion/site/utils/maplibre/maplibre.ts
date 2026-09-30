@@ -1,5 +1,13 @@
-/** Where the site serves MapLibre's worker, which `scripts/copy-maplibre.mjs` puts there. */
-export const MAPLIBRE_WORKER = '/maplibre/maplibre-gl-worker.mjs'
+/**
+ * Where the site serves a MapLibre version's worker, which
+ * `scripts/copy-maplibre.mjs` puts there.
+ *
+ * **In a folder named for the version**, so the worker a page starts is the
+ * one its MapLibre was built with: the main module is a hashed chunk from the
+ * page's own deploy, and a fixed path served the newest deploy's worker to a
+ * tab opened before an upgrade.
+ */
+export const workerOf = (version: string): string => `/maplibre/${version}/maplibre-gl-worker.mjs`
 
 let loading: Promise<typeof import('maplibre-gl')> | undefined
 
@@ -13,9 +21,17 @@ let loading: Promise<typeof import('maplibre-gl')> | undefined
  * module it imports, so the site serves both from `public/maplibre/`.
  */
 export const loadMapLibre = (): Promise<typeof import('maplibre-gl')> => {
-  loading ??= import('maplibre-gl').then((maplibregl) => {
-    maplibregl.setWorkerUrl(MAPLIBRE_WORKER)
-    return maplibregl
-  })
+  loading ??= import('maplibre-gl')
+    .then((maplibregl) => {
+      maplibregl.setWorkerUrl(workerOf(maplibregl.getVersion()))
+      return maplibregl
+    })
+    .catch((error: unknown) => {
+      /* **Forgotten, so the next map asks again.** Kept, one chunk that failed
+         to load, on a bad network or across a deploy, left every map on the
+         site empty for the rest of the visit. */
+      loading = undefined
+      throw error
+    })
   return loading
 }

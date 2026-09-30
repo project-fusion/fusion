@@ -165,7 +165,10 @@ lines up with the map that replaces it. `width` and `height` are the box it is
 drawn for, and a smaller box shows its middle. A snapshot draws the land, water,
 parks, buildings, and roads, and leaves the labels to MapLibre. Its colors are
 your theme's tokens, so it is light or dark with the page and follows a theme
-change. It resolves to an empty string when the tiles cannot be read.
+change. It resolves to an empty string when any tile it needs cannot be read
+in time, so a snapshot is whole or absent and the map draws in its place. Each
+request is given `timeout` milliseconds, 3000 by default. Cache only a snapshot
+that is not empty.
 
 In a framework that renders the markup for you, such as React, put the snapshot
 in an element that is a direct child of the frame and has the

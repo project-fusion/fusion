@@ -80,7 +80,12 @@ export const cameraOf = (view: MapView): MapCamera => {
     },
     toWorld: ([sx, sy]) => {
       const x = sx - view.width / 2
-      const y = sy - view.height / 2
+      /* **Held just short of the horizon.** Past about 71.6 degrees of tilt a
+         box's top corners look above it, where the ground is behind the
+         camera: a corner at 75 degrees landed 3,000 pixels behind the view,
+         and the tiles asked for were the wrong ones. */
+      const horizon = tilt > 0 ? -distance / Math.tan(tilt) : -Infinity
+      const y = Math.max(sy - view.height / 2, horizon * 0.95)
       const toward = (y * distance) / (distance * Math.cos(tilt) + y * Math.sin(tilt))
       const across = (x * (distance - toward * Math.sin(tilt))) / distance
       return [

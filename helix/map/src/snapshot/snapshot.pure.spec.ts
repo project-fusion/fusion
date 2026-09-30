@@ -290,4 +290,59 @@ describe('mapSnapshot', () => {
     })
     expect(svg).toBe('')
   })
+
+  /* A snapshot missing a tile looks finished and is not, and a tile that is
+     not a tile took the page down with it. */
+  test('is nothing where a tile fails, or is not a tile, and never throws', async () => {
+    const answering = (answer: () => Response): typeof fetch =>
+      (async (input: string | URL | Request) =>
+        String(input).endsWith('tiles.json')
+          ? Response.json({ maxzoom: 14, tiles: ['https://tiles.test/{z}/{x}/{y}.pbf'] })
+          : answer()) as typeof fetch
+    const failed = await mapSnapshot(view, {
+      fetch: answering(() => new Response(null, { status: 503 })),
+      tiles: 'https://tiles.test/tiles.json',
+    })
+    const garbled = await mapSnapshot(view, {
+      fetch: answering(() => new Response('<html>Too many requests</html>')),
+      tiles: 'https://tiles.test/tiles.json',
+    })
+    expect([failed, garbled]).toEqual(['', ''])
+  })
+
+  test('is nothing where a request takes longer than it is given', async () => {
+    /* A server that never answers and a fetch that never listens. */
+    const hanging = (async (input: string | URL | Request) =>
+      String(input).endsWith('tiles.json')
+        ? Response.json({ maxzoom: 14, tiles: ['https://tiles.test/{z}/{x}/{y}.pbf'] })
+        : new Promise<Response>(() => {})) as typeof fetch
+    const svg = await mapSnapshot(view, {
+      fetch: hanging,
+      tiles: 'https://tiles.test/tiles.json',
+      timeout: 50,
+    })
+    expect(svg).toBe('')
+  })
+
+  test('writes numbers into its markup and nothing else', async () => {
+    const svg = await mapSnapshot(
+      { ...view, width: '400" onload="alert(1)' as unknown as number },
+      { fetch: serving([]), tiles: 'https://tiles.test/tiles.json' },
+    )
+    expect(svg).toBe('')
+    const drawn = await mapSnapshot(
+      { ...view, height: '300' as unknown as number },
+      { fetch: serving([]), tiles: 'https://tiles.test/tiles.json' },
+    )
+    expect(drawn).toContain('height="300"')
+  })
+
+  /* Tiles overlap at their edges, and even-odd emptied every place two covered. */
+  test('fills overlapping shapes whole', async () => {
+    const svg = await mapSnapshot(view, {
+      fetch: serving([]),
+      tiles: 'https://tiles.test/tiles.json',
+    })
+    expect(svg).not.toContain('evenodd')
+  })
 })

@@ -14,7 +14,7 @@ import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-ma
 import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { MAPS } from '@/content/maps/maps'
+import { MAP_FAILED, MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { boundsOf, clearOf } from '@/utils/map-view/map-view'
@@ -155,6 +155,8 @@ export function MapsHero({
   /* Whether it moves at all, which a reader who asked for less motion
      decides, and which says whether there is a walk to pause. */
   const [still, setStill] = useState(false)
+  /* Said in the map's footer where MapLibre or its style could not load. */
+  const [failed, setFailed] = useState(false)
   useEffect(() => {
     setStill(matchMedia('(prefers-reduced-motion: reduce)').matches)
   }, [])
@@ -173,7 +175,7 @@ export function MapsHero({
     let live = true
     let teardown = (): void => undefined
     let stopSeeing = (): void => undefined
-    void (async () => {
+    ;(async () => {
       const maplibregl = await loadMapLibre()
       await customElements.whenDefined('helix-map')
       if (!live) {
@@ -380,7 +382,11 @@ export function MapsHero({
         connection.disconnect()
         map.remove()
       }
-    })()
+    })().catch(() => {
+      if (live) {
+        setFailed(true)
+      }
+    })
     return () => {
       live = false
       teardown()
@@ -438,11 +444,17 @@ export function MapsHero({
     }
     let live = true
     engine.current ??= initTheme(THEME_ENGINE)
-    void engine.current.then((loaded) => {
-      if (live) {
-        paint(propertiesOf(loaded.derive(intent)))
-      }
-    })
+    engine.current
+      .then((loaded) => {
+        if (live) {
+          paint(propertiesOf(loaded.derive(intent)))
+        }
+      })
+      .catch(() => {
+        /* Forgotten, so the next brand pressed loads it again: kept, one
+           failed load left every swatch doing nothing for the visit. */
+        engine.current = null
+      })
     return () => {
       live = false
     }
@@ -511,6 +523,11 @@ export function MapsHero({
         ref={frame}
       >
         <div className={styles.mapsCanvas} ref={container} />
+        {failed ? (
+          <helix-text slot="footer" variant="caption">
+            {MAP_FAILED}
+          </helix-text>
+        ) : null}
         {/* **The map from the first paint**, drawn on the server at the
             camera the map opens at on a wide screen and on a narrow one,
             over the canvas until MapLibre has drawn its tiles, since it
