@@ -10,6 +10,9 @@ import { AUSTIN_PLACES, POINTS_VIEW } from '@/content/maps/points'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import styles from './maps.module.css'
 
+/** Where the snapshot is served, which `app/maps/snapshot/points` draws. */
+const SNAPSHOT = '/maps/snapshot/points'
+
 /** How many, as the page's language writes a number. */
 const COUNTED = AUSTIN_PLACES.toLocaleString('en-US')
 
@@ -22,26 +25,60 @@ const COUNTED = AUSTIN_PLACES.toLocaleString('en-US')
  * a map is still a canvas, a worker and a screen of tiles, and a reader who
  * never scrolls this far should not pay for it.
  *
+ * **Its snapshot is asked for a little sooner**, from `SNAPSHOT`, and the map
+ * is made only once that answer is in: the connector finds a snapshot when it
+ * connects, so one that arrived after was never taken away, and stood over
+ * the live map.
+ *
  * **What was pressed is said under it**, the point's name through the same
  * `helix-activate` a marker sends, in a polite live region, so pressing one
  * does something a reader can see and hear without the demo opening panels.
  */
-export function MapsPoints({
-  snapshot,
-}: {
-  /** The map drawn on the server at `POINTS_VIEW`, shown until MapLibre has drawn. */
-  snapshot?: string | undefined
-}) {
+export function MapsPoints() {
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
   /* Said in the map's footer, where a failed load would leave an empty box. */
   const [failed, setFailed] = useState(false)
   const [pressed, setPressed] = useState('')
+  /* The map drawn on the server at `POINTS_VIEW`, shown until MapLibre has
+     drawn, and whether asking for it is over, however it went. */
+  const [snapshot, setSnapshot] = useState('')
+  const [asked, setAsked] = useState(false)
+
+  useEffect(() => {
+    const box = container.current
+    if (!box) {
+      return
+    }
+    let live = true
+    const near = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          near.disconnect()
+          fetch(SNAPSHOT)
+            .then((answer) => (answer.ok ? answer.text() : ''))
+            .catch(() => '')
+            .then((svg) => {
+              if (live) {
+                setSnapshot(svg)
+                setAsked(true)
+              }
+            })
+        }
+      },
+      { rootMargin: '800px' },
+    )
+    near.observe(box)
+    return () => {
+      live = false
+      near.disconnect()
+    }
+  }, [])
 
   useEffect(() => {
     const host = frame.current
     const box = container.current
-    if (!host || !box) {
+    if (!asked || !host || !box) {
       return
     }
     let live = true
@@ -97,7 +134,7 @@ export function MapsPoints({
       near.disconnect()
       teardown()
     }
-  }, [])
+  }, [asked])
 
   return (
     <div className={styles.mapsPoints}>
@@ -112,8 +149,8 @@ export function MapsPoints({
             {MAP_FAILED}
           </helix-text>
         ) : null}
-        {/* The streets from the first paint, which the map is made over only
-            when it nears the view; the points come with the map. */}
+        {/* The streets before the map has drawn them; the points come with
+            the map. */}
         {snapshot ? (
           <div
             className={styles.mapsSnapshot}

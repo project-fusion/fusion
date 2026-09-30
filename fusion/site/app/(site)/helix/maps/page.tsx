@@ -18,7 +18,6 @@ import {
   type MapFeature,
   RADAR,
 } from '@/content/maps/maps'
-import { POINTS_VIEW } from '@/content/maps/points'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { snapshotOf } from '@/utils/map-snapshot/map-snapshot'
 import { pageMetadata } from '@/utils/metadata/metadata'
@@ -229,10 +228,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
         ),
       )
     : undefined
-  const [wide, narrow, pointsSnapshot] = await Promise.all([
+  const [wide, narrow] = await Promise.all([
     snapshotOf(HERO_VIEWS.wide),
     snapshotOf(HERO_VIEWS.narrow),
-    snapshotOf(POINTS_VIEW),
   ])
   return (
     <>
@@ -286,7 +284,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
               <Code code={POINTS_MARKUP} label="The markup" language="html" />
             </helix-flex>
             <div className={band.bandSection}>
-              <MapsPoints snapshot={pointsSnapshot || undefined} />
+              <MapsPoints />
             </div>
           </div>
         </Band>
