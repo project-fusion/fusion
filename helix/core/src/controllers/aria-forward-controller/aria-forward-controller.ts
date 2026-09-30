@@ -36,12 +36,16 @@ const RELATIONSHIPS = [
  * `Select` writes `aria-expanded` onto its own trigger, and a controller
  * carrying nothing would wipe both on every update.
  *
+ * `aria-invalid` is one of them: a field a server has already judged wrong is
+ * written `aria-invalid="true"`, and a picker marks the list or slider it
+ * draws with it, and either way the word belongs on the control a reader is on.
+ *
  * So the record below holds what was forwarded last time, and a host that stops
  * carrying one removes exactly that and nothing else. A control's own attribute
  * is untouched either way, which is the only rule that can be right: this
  * controller knows what the host said and cannot know what the template meant.
  */
-const STATES = ['aria-expanded', 'aria-haspopup', 'aria-controls'] as const
+const STATES = ['aria-expanded', 'aria-haspopup', 'aria-controls', 'aria-invalid'] as const
 
 /**
  * Carries a host's ARIA references down to the control inside it.

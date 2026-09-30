@@ -22,6 +22,7 @@ beforeAll(async () => {
   await Promise.all([
     import('./checkbox/index.js'),
     import('./color-input/index.js'),
+    import('./color-picker/index.js'),
     import('./combobox/index.js'),
     import('./date-input/index.js'),
     import('./file-input/index.js'),
@@ -36,6 +37,7 @@ beforeAll(async () => {
     import('./switch/index.js'),
     import('./textarea/index.js'),
     import('./time-input/index.js'),
+    import('./time-picker/index.js'),
   ])
 })
 
@@ -103,5 +105,51 @@ describe('a field showing a message', () => {
     host.feedback = ''
     await settle(host)
     expect(invalid(host)).toEqual([])
+  })
+})
+
+/**
+ * A picker marked invalid says so on what a reader is on.
+ *
+ * Neither host has a role, so `ariaInvalid` on its internals reached nothing:
+ * read from Chromium's tree, an invalid Color Picker's sliders and value, and
+ * an invalid Time Picker's list, all reported no invalid state.
+ */
+describe('a picker marked invalid', () => {
+  const inner = (host: Element | null | undefined, part: string): Element | null | undefined =>
+    host?.shadowRoot?.querySelector(`[part="${part}"]`)
+
+  test('color picker: the value, the square, and the hue slider', async () => {
+    const host = await mount('<helix-headless-color-picker invalid></helix-headless-color-picker>')
+    await settle(host as Updatable)
+    for (const part of ['value', 'grid-saturation', 'grid-brightness']) {
+      expect(inner(host, part)?.getAttribute('aria-invalid')).toBe('true')
+    }
+    const hue = inner(host, 'channel')
+    await settle(hue as Updatable)
+    expect(inner(hue, 'control')?.getAttribute('aria-invalid')).toBe('true')
+  })
+
+  test('time picker: its list, and the list inside that', async () => {
+    const host = await mount('<helix-headless-time-picker invalid></helix-headless-time-picker>')
+    await settle(host as Updatable)
+    const list = host.shadowRoot?.querySelector('[part="list"], [part="column"]')
+    expect(list?.getAttribute('aria-invalid')).toBe('true')
+    await settle(list as Updatable)
+    expect(inner(list, 'items')?.getAttribute('aria-invalid')).toBe('true')
+  })
+})
+
+/* What a server that has already judged a field writes, carried to the control
+   by `AriaForwardController` as the other states are. */
+describe('a field written aria-invalid', () => {
+  test('passes it to its control', async () => {
+    const host = (await mount(
+      '<helix-headless-input label="Name" aria-invalid="true"></helix-headless-input>',
+    )) as Updatable
+    await settle(host)
+    expect(host.shadowRoot?.querySelector('[part="control"]')?.getAttribute('aria-invalid')).toBe(
+      'true',
+    )
   })
 })
