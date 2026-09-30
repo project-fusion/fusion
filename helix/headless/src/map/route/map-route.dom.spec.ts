@@ -203,6 +203,9 @@ describe('map layers menu', () => {
     expect([route?.hidden, buildings?.hidden, leg?.hidden]).toEqual([true, false, true])
   })
 
+  /* Shown and hidden by the map type through the frame's list and the
+     connector, which ask it, and never by `hidden` written onto the layer:
+     that was an attribute on the consumer's own markup nobody asked for. */
   test('imagery makes map-type cards, not a tile, and the chosen type shows or hides it', async () => {
     const host = (await mount(
       `<helix-headless-map controls="layers" label="Downtown">
@@ -212,7 +215,10 @@ describe('map layers menu', () => {
     )) as Frame & { mapPreviews: Record<string, string>; mapType?: string }
     await settle(host)
     const imagery = host.querySelector('helix-headless-map-raster') as HTMLElement
-    expect(imagery.hidden).toBe(true)
+    const listed = (): boolean =>
+      (part(host, 'layers')?.textContent ?? '').includes('Satellite imagery')
+    expect(imagery.hidden).toBe(false)
+    expect(listed()).toBe(false)
     const kinds: string[] = []
     host.addEventListener('helix-map-part-change', (event) => kinds.push(event.detail.kind))
     ;(part(host, 'layers-toggle') as HTMLButtonElement).click()
@@ -238,7 +244,7 @@ describe('map layers menu', () => {
     await settle(host)
     expect(host.mapType).toBe('hybrid')
     expect(host.getAttribute('map-type')).toBe('hybrid')
-    expect(imagery.hidden).toBe(false)
+    expect(listed()).toBe(true)
 
     host.mapPreviews = { satellite: PICTURE }
     await settle(host)
@@ -246,7 +252,8 @@ describe('map layers menu', () => {
     radio(0).click()
     await settle(host)
     expect(host.hasAttribute('map-type')).toBe(false)
-    expect(imagery.hidden).toBe(true)
+    expect(listed()).toBe(false)
+    expect(imagery.hidden).toBe(false)
   })
 
   test('a map with no imagery has no map-type cards', async () => {

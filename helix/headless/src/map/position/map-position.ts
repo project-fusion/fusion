@@ -55,9 +55,9 @@ export class HelixHeadlessMapPosition extends HelixElement {
   /** Marks this as a position for the connector, whatever its tag. */
   readonly isMapPosition = true
 
-  /** What it is, such as "Van 12". Read by screen readers. */
+  /** What it is, such as "Van 12". Read by screen readers. Defaults to "Live position". */
   @property()
-  label?: string
+  label = 'Live position'
 
   /** Latitude, in degrees. */
   @property({ type: Number })

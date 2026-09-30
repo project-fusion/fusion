@@ -101,6 +101,10 @@ const TILT_STEP = 10
 /** The tilt the 3D button goes to, in degrees from looking straight down. */
 const TILTED = 50
 
+/** Whether a marker has a place to stand, which the connector needs to show it. */
+const placed = (marker: HelixHeadlessMapMarker): boolean =>
+  Number.isFinite(marker.lat) && Number.isFinite(marker.lng)
+
 /**
  * How long after a reader asks that the view moving still counts as the
  * answer, in milliseconds. Longer than the slowest trip the connector animates.
@@ -367,8 +371,9 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * the view moves. The frame's keys and buttons only ask, and nothing moves
    * until something answers, so the frame says nothing until it is told the
    * view moved: an announcement for a move that never happened is worse than
-   * none. A page moving its own map in answer to `helix-map-pan` calls this
-   * once it has.
+   * none. A page moving its own map in answer to `helix-map-pan` sets
+   * `zoomLevel`, `bearing` and `pitch` to where the map now is and then calls
+   * this, since those are what is said.
    *
    * What is said waits for the view to settle, so a held key or a long
    * animation is one sentence, and it is the view's state where there is one:
@@ -389,7 +394,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     if (!asked) {
       return
     }
-    const numbers = formatNumbers(this.lang)
+    const numbers = formatNumbers(this.closest('[lang]')?.getAttribute('lang') ?? '')
     const degrees = (value: number): string => numbers(Math.round(value))
     const bearing = ((Math.round(this.bearing) % 360) + 360) % 360
     const words: Record<string, string> = {
@@ -414,7 +419,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               : fillTemplate(this.turnedLabel, { degrees: degrees(bearing) })
     /* The same words twice would change nothing in the region and be heard
        once, so a second "Moved left" differs by a space no reader says. */
-    this.said = next !== '' && next === this.said.trim() ? `${next}\u00a0` : next
+    /* Against the region as it stands, and not trimmed: `trim` takes the
+       no-break space off too, so the third "Moved left" matched the second and
+       was never heard. */
+    this.said = next !== '' && next === this.said ? `${next}\u00a0` : next
   }
 
   /** Records what a reader asked, so the answer can be said. */
@@ -465,6 +473,19 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   private get imagery(): MapLayer[] {
     return this.layers.filter((layer) => layer.layerKind === 'raster' && layer.ground === true)
+  }
+
+  /**
+   * Whether a layer is drawn: not hidden, and, for imagery of the ground, while
+   * a map type shows imagery.
+   *
+   * **The map type decides imagery without writing onto it.** It set `hidden`
+   * on the consumer's own `<helix-map-raster ground>`, before anyone had asked,
+   * which is an attribute their server never sent: the hydration mismatch the
+   * area rules record. `connectMap` asks the same question.
+   */
+  private shown(layer: MapLayer): boolean {
+    return !layer.hidden && !(layer.layerKind === 'raster' && layer.ground && !this.mapType)
   }
 
   /** A map type's name on its card. */
@@ -549,8 +570,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
              does not retarget reports it. */
           contains: (node) =>
             node !== null && (marker.contains(node) || marker.shadowRoot?.contains(node) === true),
-          /* Hidden inside a cluster, which the walk reaches instead. */
-          disabled: marker.gatheredBy !== undefined,
+          /* Hidden inside a cluster, which the walk reaches instead, or with
+             no place to stand, which a stylesheet cannot show: a walk that
+             stopped there moved the stop to a marker nothing could focus. */
+          disabled: marker.gatheredBy !== undefined || !placed(marker),
           /* The stop moves with the walk rather than waiting to hear focus
              arrive: a focus event from inside a marker's own shadow root is
              one an engine can fail to carry out to the frame, and the stop
@@ -660,21 +683,27 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   }
 
   /**
+   * Asks for the render the hydration put off, which is the first one to know
+   * the markers and the layers.
+   *
+   * **Without it a map a server sent never drew them.** The hydrating render
+   * reads no children, and the parts' own first updates reach the frame while
+   * its update is still pending, so nothing else asked: every marker kept
+   * `tabindex="-1"` and there was no list of layers until the connector
+   * happened to write a property, and a page moving its own map never did.
+   */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
+  /**
    * Puts the tab stop on one marker and takes it off the rest, the roving
    * pattern the toolbar uses: every marker at `-1` is a map whose places the
    * keyboard cannot reach, and every one at `0` is a Tab press per place.
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    /* **The map type shows or hides the imagery**, so it is the one thing
-       deciding it: written only where it differs, since a write is heard by
-       the connector and by this frame. */
-    const photographed = this.mapType !== undefined
-    for (const layer of this.imagery) {
-      if (layer.hidden === photographed) {
-        layer.hidden = !photographed
-      }
-    }
     /* A new map type is a redraw, and hides or shows the map's own roads and
        names, which `connectMap` hears from here. */
     if (changed.has('mapType')) {
@@ -689,8 +718,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
     const markers = this.markers
     /* On the cluster standing for the marker the stop was on, while it is
-       gathered, so Tab still reaches the map's places. */
-    const on = markers[Math.min(this.stop, markers.length - 1)]
+       gathered, so Tab still reaches the map's places, and on a placed
+       marker where the stop's own has no place to stand. */
+    const at = markers[Math.min(this.stop, markers.length - 1)]
+    const on = at && placed(at) ? at : (markers.find(placed) ?? at)
     const stop = on?.gatheredBy ?? on
     for (const marker of markers) {
       marker.current = marker === stop
@@ -1024,7 +1055,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * the page once a renderer has drawn it, which is later still.
    */
   protected renderLayers(): TemplateResult | typeof nothing {
-    const layers = this.layers.filter((layer) => !layer.hidden)
+    const layers = this.layers.filter((layer) => this.shown(layer))
     if (layers.length === 0) {
       return nothing
     }
@@ -1052,7 +1083,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     return html`<div
       part="region"
       role="group"
-      aria-label=${this.label || 'Map'}
+      aria-label=${this.label || this.getAttribute('aria-label') || 'Map'}
       aria-keyshortcuts=${this.keyShortcuts}
       tabindex="0"
       @focusin=${this.idle.stir}

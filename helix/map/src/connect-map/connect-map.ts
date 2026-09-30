@@ -852,11 +852,17 @@ export const connectMap = (
     place()
   }
   /* **A hidden layer is not drawn**, which is how the frame's layers menu
-     turns one off, and how a page can. */
+     turns one off, and how a page can. **Nor is imagery of the ground while
+     no map type shows it**, which the frame decides by its `mapType` and no
+     longer writes onto the layer. */
   const readLayers = (): MapLayerSpec[] =>
     [...frame.children]
       .filter(isLayer)
       .filter((layer) => !(layer as HTMLElement).hidden)
+      .filter(
+        (layer) =>
+          !(layer.layerKind === 'raster' && layer.ground === true && !(frame as Frame).mapType),
+      )
       .flatMap((layer): MapLayerSpec[] => {
         const color = settledColor(layer)
         /* **Buildings are the tiles' own**, raised by the renderer, so the

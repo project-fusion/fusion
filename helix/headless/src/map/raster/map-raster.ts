@@ -80,9 +80,12 @@ export class HelixHeadlessMapRaster extends HelixElement {
   /** @internal Which kind of layer, which is how the connector draws it. */
   readonly layerKind = 'raster' as const
 
-  /** The layer's name in the frame's list. */
+  /**
+   * The layer's name in the frame's list and its tile in the layers menu.
+   * Defaults to "Overlay", so neither is ever a control with no name.
+   */
   @property()
-  label?: string
+  label = 'Overlay'
 
   /**
    * The deepest zoom the provider has tiles for. The map enlarges those tiles
@@ -105,6 +108,16 @@ export class HelixHeadlessMapRaster extends HelixElement {
 
   /** The timer that moves to the next frame while playing. */
   private timer: ReturnType<typeof setInterval> | undefined
+
+  /* **Moved in the page, it plays on.** A move is a disconnect and a connect,
+     and only an update restarted the timer, which a move does not cause, so
+     radar moved into a new panel stood still on whichever frame it had. */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (this.hasUpdated) {
+      this.schedule()
+    }
+  }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()

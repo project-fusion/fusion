@@ -438,8 +438,10 @@ after the label.
 ## Keyboard and screen readers
 
 - The frame is one tab stop. Arrow keys pan the map, and the plus and minus keys
-  zoom it. Shift with Left or Right rotates the map, and Shift with Up or Down
-  tilts it.
+  zoom it. Shift with Left or Right rotates the map while the compass, `pan`, or
+  `rotate` is in `controls`, and Shift with Up or Down tilts it while `tilt` is.
+  Keys with Control, Command, or Alt are left to the browser, so page zoom and
+  Back still work with focus on the map.
 - The markers are one tab stop. Arrow keys move between them in the order you
   wrote them. The map pans to show a marker that is off screen.
 - A points layer is one tab stop over the points and counts in view. Arrow keys
@@ -457,8 +459,9 @@ after the label.
   `zoomed-label` and `moved-left-label`, so you can write it in your page's
   language.
 - If your page moves its own map in answer to `helix-map-pan` and the other
-  events, call the frame's `moved()` once it has moved. The frame says nothing
-  until it is told, so it never describes a move that did not happen.
+  events, set the frame's `zoomLevel`, `bearing`, and `pitch` to where the map
+  now is, then call its `moved()`. The frame says nothing until it is told, so
+  it never describes a move that did not happen.
 
 ## Write a driver
 
