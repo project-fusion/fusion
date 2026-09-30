@@ -640,6 +640,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
         hint: channel-hint, label: channel-label, marker: channel-marker,
         marker-label: channel-marker-label, markers: channel-markers, output: channel-output"
       data-channel=${channel}
+      aria-invalid=${this.invalid ? 'true' : nothing}
       label=${label}
       max=${max}
       min="0"
@@ -734,7 +735,9 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   /* `ariaInvalid` on the host through `ElementInternals`, the same route
      Date Picker takes and for the reason the whole library records: a `role` or a
      state written onto the host as an attribute is one a React consumer's
-     server markup never had. */
+     server markup never had. **And on every control it draws**, since the host
+     has no role and a reader is on a slider or the value: read from Chromium's
+     tree, an invalid picker's sliders and value all reported `invalid: false`. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaInvalid = this.invalid ? 'true' : null
@@ -798,6 +801,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           min="0"
           max="100"
           aria-label=${this.saturationLabel}
+          aria-invalid=${this.invalid ? 'true' : nothing}
           .value=${String(color.saturation)}
           ?disabled=${this.isDisabled}
           @input=${(event: Event) => this.takeArea('saturation', event)}
@@ -808,6 +812,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           min="0"
           max="100"
           aria-label=${this.brightnessLabel}
+          aria-invalid=${this.invalid ? 'true' : nothing}
           .value=${String(color.brightness)}
           ?disabled=${this.isDisabled}
           @input=${(event: Event) => this.takeArea('brightness', event)}
@@ -845,6 +850,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                 part="value"
                 type="text"
                 aria-label=${this.valueLabel}
+                aria-invalid=${this.invalid ? 'true' : nothing}
                 autocomplete=${this.autocomplete || nothing}
                 spellcheck="false"
                 .value=${this.value}

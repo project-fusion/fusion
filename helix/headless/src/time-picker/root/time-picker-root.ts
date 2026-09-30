@@ -589,7 +589,10 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   /* `ariaInvalid` on the host through `ElementInternals`, the same route
      Date Picker takes and for the reason the whole library records: a `role` or a
      state written onto the host as an attribute is one a React consumer's
-     server markup never had. */
+     server markup never had. **And on each list it draws**, since the host has
+     no role and a reader is in a list: read from Chromium's tree, an invalid
+     picker's list reported no invalid state. The list carries it to its own
+     control through `AriaForwardController`. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaInvalid = this.invalid ? 'true' : null
@@ -640,6 +643,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     return html`<${this.tag('listbox')}
       part="column"
       data-column=${part}
+      aria-invalid=${this.invalid ? 'true' : nothing}
       exportparts="empty: column-empty, feedback: column-feedback, filter-icon: column-filter-icon,
         filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
         live: column-live, loading: column-loading, search: column-search, search-field: column-search-field"
@@ -725,6 +729,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   protected renderList(): TemplateResult {
     return html`<${this.tag('listbox')}
       part="list"
+      aria-invalid=${this.invalid ? 'true' : nothing}
       exportparts="empty: list-empty, feedback: list-feedback, filter-icon: list-filter-icon,
         filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,
         live: list-live, loading: list-loading, search: list-search, search-field: list-search-field"
