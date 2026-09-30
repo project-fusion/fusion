@@ -349,6 +349,57 @@ const isPosition = (node: unknown): node is Position =>
 /** Meters in a degree of latitude, which is near enough constant for a ring. */
 const METERS_PER_DEGREE = 111_320
 
+/**
+ * The least room a place is framed with, in degrees either side: about half a
+ * kilometer. Framing one place, or several at one spot, is a box of no size,
+ * which a renderer answers with its deepest zoom.
+ */
+const LEAST_REACH = 0.005
+
+/**
+ * The stretch of the world some places cover, and their middle.
+ *
+ * **One pass rather than `Math.max(...lats)`**, which spreads every place into
+ * an argument list and throws past about 65,000 of them in Safari: a points
+ * layer of that size made `fit()` throw.
+ *
+ * **Measured the short way round.** Longitudes are taken within 180 degrees of
+ * the first place, so two places either side of the antimeridian are a degree
+ * apart and not the whole world: framed naively, 179.5 and -179.5 zoomed out
+ * to the globe, and their middle landed at 0. The bounds may run past 180 as
+ * a result, which both renderers draw.
+ */
+export const reachOf = (places: readonly MapPlace[]): { bounds: MapBounds; middle: MapPlace } => {
+  const first = places[0]?.lng ?? 0
+  let north = -90
+  let south = 90
+  let east = -Infinity
+  let west = Infinity
+  let lats = 0
+  let lngs = 0
+  for (const place of places) {
+    const lng = place.lng + 360 * Math.round((first - place.lng) / 360)
+    north = Math.max(north, place.lat)
+    south = Math.min(south, place.lat)
+    east = Math.max(east, lng)
+    west = Math.min(west, lng)
+    lats += place.lat
+    lngs += lng
+  }
+  const count = Math.max(places.length, 1)
+  const across = ((lngs / count + 540) % 360) - 180
+  if (north - south < LEAST_REACH && east - west < LEAST_REACH) {
+    north += LEAST_REACH
+    south -= LEAST_REACH
+    east += LEAST_REACH
+    west -= LEAST_REACH
+  }
+  return {
+    bounds: { northEast: { lat: north, lng: east }, southWest: { lat: south, lng: west } },
+    middle: { lat: lats / count, lng: across },
+  }
+}
+
 /** How far ahead of a position its heading is measured on the screen, in meters. */
 const AHEAD = 10
 
@@ -464,6 +515,19 @@ interface Walked {
 /** The most points and counts a layer walks: past it, a reader zooms in or the layer clusters. */
 const WALKED = 100
 
+/**
+ * How tall a line of the walk is, in CSS pixels: points whose tops fall in one
+ * band are walked along it, the way text runs. Sorted by exact height, points
+ * a pixel apart were walked right, then far left, then right again.
+ */
+const WALK_LINE = 24
+
+/** How long after the view stops moving the walk is asked again, in milliseconds. */
+const WALK_SETTLES = 250
+
+/** How far a press may travel, in CSS pixels, and still be a press and not a drag. */
+const DRAGGED = 4
+
 /** Whether a walk is the one a layer already has, to the pixel, so it is not written again. */
 const sameWalk = (had: readonly Walked[] | undefined, walk: readonly Walked[]): boolean =>
   (had?.length ?? 0) === walk.length &&
@@ -474,6 +538,7 @@ const sameWalk = (had: readonly Walked[] | undefined, walk: readonly Walked[]): 
       Math.round(was.x) === Math.round(one.x) &&
       Math.round(was.y) === Math.round(one.y) &&
       was.label === one.label &&
+      was.value === one.value &&
       was.count === one.count
     )
   })
@@ -663,7 +728,10 @@ export const connectMap = (
         types: ['standard', 'hybrid', 'satellite'],
       })
       .then((previews) => {
-        ;(frame as Frame).mapPreviews = previews
+        /* Not onto a frame this connection has already let go. */
+        if (live) {
+          ;(frame as Frame).mapPreviews = previews
+        }
       })
       .catch(() => {
         stale = true
@@ -677,9 +745,22 @@ export const connectMap = (
 
   /* One set of zoom buttons: the renderer's go while the frame draws its
      own, and stay where a page turned the frame's off. */
-  const restoreZoom = frame.shadowRoot?.querySelector('[part~="zoom-in"]')
-    ? driver.replaceZoom?.()
-    : undefined
+  let restoreZoom: (() => void) | undefined
+  const replaceZoom = (): void => {
+    if (!restoreZoom && frame.shadowRoot?.querySelector('[part~="zoom-in"]')) {
+      restoreZoom = driver.replaceZoom?.()
+    }
+  }
+  replaceZoom()
+  /* **And again once the frame has drawn**, since connecting in the same
+     turn the element was defined finds its first render still to come: the
+     zoom buttons were not there to be found, and the renderer's own stayed
+     beside them. */
+  void (frame as HTMLElement & { updateComplete?: Promise<unknown> }).updateComplete?.then(() => {
+    if (live) {
+      replaceZoom()
+    }
+  })
 
   /* Out of the tab order, and back to exactly what it was: a renderer that
      wrote `tabindex="0"` gets `0` back, one that wrote nothing gets nothing. */
@@ -699,6 +780,23 @@ export const connectMap = (
      a route is redrawn, and rebuilding the links each time took a reader's
      focus off the one they had tabbed to. */
   let written: string | undefined
+  /* **Once per turn, however many changes arrive in it.** A renderer says its
+     credit may have changed on every layer added or removed and every style
+     change, and each read walks every layer and parses every credit: Leaflet
+     redrawing five hundred points asked a thousand times in one update. */
+  let crediting = false
+  const creditSoon = (): void => {
+    if (crediting) {
+      return
+    }
+    crediting = true
+    queueMicrotask(() => {
+      crediting = false
+      if (live) {
+        writeCredit()
+      }
+    })
+  }
   const writeCredit = (): void => {
     if (!listening || !credit) {
       return
@@ -737,7 +835,7 @@ export const connectMap = (
     credit = document.createElement('span')
     credit.setAttribute('slot', 'attribution')
     credit.setAttribute(CREDIT, '')
-    listening = driver.credits(writeCredit)
+    listening = driver.credits(creditSoon)
     writeCredit()
   }
 
@@ -752,7 +850,9 @@ export const connectMap = (
      ten meters were when they fanned: a zoom changes that, and closes them,
      since the cluster may have come apart or grown; a pan does not, and the
      fan moves with the map. */
-  let fanned: { members: Marker[]; place: MapPlace; scale: number } | undefined
+  let fanned:
+    | { members: Marker[]; place: MapPlace; scale: number; zoom?: number | undefined }
+    | undefined
   const scaleOf = (place: MapPlace): number => {
     if (!driver.project) {
       return 0
@@ -828,7 +928,11 @@ export const connectMap = (
       }
       const { names, values } = pointsOf(layer)
       const found = drawn.inView(id).map((one) => ({ at: project(one.place), one }))
-      found.sort((a, b) => a.at.y - b.at.y || (rtl ? b.at.x - a.at.x : a.at.x - b.at.x))
+      found.sort(
+        (a, b) =>
+          Math.floor(a.at.y / WALK_LINE) - Math.floor(b.at.y / WALK_LINE) ||
+          (rtl ? b.at.x - a.at.x : a.at.x - b.at.x),
+      )
       next.set(
         layer,
         found.slice(0, WALKED).map(({ one }) =>
@@ -855,7 +959,13 @@ export const connectMap = (
      turns one off, and how a page can. **Nor is imagery of the ground while
      no map type shows it**, which the frame decides by its `mapType` and no
      longer writes onto the layer. */
-  const readLayers = (): MapLayerSpec[] =>
+  const readLayers = (): MapLayerSpec[] => {
+    /* Filled as the layers are read, so a points layer taken off the page is
+       not kept for the life of the connection. */
+    pointLayers.clear()
+    return readShown()
+  }
+  const readShown = (): MapLayerSpec[] =>
     [...frame.children]
       .filter(isLayer)
       .filter((layer) => !(layer as HTMLElement).hidden)
@@ -1061,6 +1171,9 @@ export const connectMap = (
       }
     }
     const standing = everywhere.filter((one) => !one.behind)
+    /* By marker, so asking after one is a lookup and not a walk of them all:
+       asked once per marker per frame, it was quadratic in the markers. */
+    const stood = new Map(standing.map((one) => [one.marker, one]))
     /* **Gathered where they would draw over each other**, on a frame that
        asks for it: each marker, in the order they are written, takes every
        later one standing near enough to its point, and is drawn at their
@@ -1070,7 +1183,7 @@ export const connectMap = (
     const gathering = (frame as Frame).cluster === true
     /* A marker with no place is in no cluster. */
     for (const marker of markers()) {
-      if (!standing.some((one) => one.marker === marker) && marker.gatheredBy !== undefined) {
+      if (!stood.has(marker) && marker.gatheredBy !== undefined) {
         marker.gatheredBy = undefined
       }
     }
@@ -1078,10 +1191,14 @@ export const connectMap = (
     if (fanned) {
       const scale = scaleOf(fanned.place)
       const members = fanned.members
-      if (
-        Math.abs(scale - fanned.scale) > fanned.scale * 0.02 ||
-        !members.every((member) => standing.some((one) => one.marker === member))
-      ) {
+      /* **A zoom by its level where the renderer says it.** Ten meters on a
+         tilted map shorten as the spot moves toward the horizon, so a pan
+         read as a zoom and closed the fan. */
+      const zoomed =
+        fanned.zoom !== undefined && driver.zoom
+          ? Math.abs(driver.zoom() - fanned.zoom) > 0.01
+          : Math.abs(scale - fanned.scale) > fanned.scale * 0.02
+      if (zoomed || !members.every((member) => stood.has(member))) {
         fanned = undefined
       }
     }
@@ -1114,7 +1231,7 @@ export const connectMap = (
         placing.push({
           at: { x: center.x + offset.x, y: center.y + offset.y },
           marker: member,
-          reach: standing.find((one) => one.marker === member)?.reach,
+          reach: stood.get(member)?.reach,
         })
       })
     }
@@ -1271,7 +1388,16 @@ export const connectMap = (
       }
     }
   }
-  const stopViewing = driver.onView?.(place)
+  /* **And the walk asked again once a move stops**, not only when the
+     renderer goes still: a route whose progress moves every frame keeps
+     MapLibre from ever going idle, and the walk kept the points of the view
+     before the pan, or none at all on a map that had never been still. */
+  let looking: ReturnType<typeof setTimeout> | undefined
+  const stopViewing = driver.onView?.(() => {
+    place()
+    clearTimeout(looking)
+    looking = setTimeout(look, WALK_SETTLES)
+  })
   /* **A snapshot drawn on the server is taken away once the renderer has
      drawn over it**, faded at the page's pace for a step, or at once for a
      reader who asked for less motion. Until then it is the map, which is the
@@ -1418,36 +1544,27 @@ export const connectMap = (
     if (!members || options.clusterZoom === false) {
       return
     }
-    const lats = members.map((one) => one.lat as number)
-    const lngs = members.map((one) => one.lng as number)
     /* **Places no zoom draws apart fan out where they are**, as does every
        cluster on a renderer that cannot frame a stretch of the world. */
-    const middle = {
-      lat: lats.reduce((sum, lat) => sum + lat, 0) / lats.length,
-      lng: lngs.reduce((sum, lng) => sum + lng, 0) / lngs.length,
-    }
-    const spread = Math.max(
-      ...members.map(
-        (one) =>
-          Math.hypot(
-            (one.lat as number) - middle.lat,
-            ((one.lng as number) - middle.lng) * Math.cos((middle.lat * Math.PI) / 180),
-          ) * METERS_PER_DEGREE,
-      ),
+    const { bounds, middle } = reachOf(
+      members.map((one) => ({ lat: one.lat as number, lng: one.lng as number })),
     )
+    let spread = 0
+    for (const one of members) {
+      const across =
+        ((((one.lng as number) - middle.lng + 540) % 360) - 180) *
+        Math.cos((middle.lat * Math.PI) / 180)
+      spread = Math.max(
+        spread,
+        Math.hypot((one.lat as number) - middle.lat, across) * METERS_PER_DEGREE,
+      )
+    }
     if (spread <= SAME_SPOT || !driver.fit) {
-      fanned = { members, place: middle, scale: scaleOf(middle) }
+      fanned = { members, place: middle, scale: scaleOf(middle), zoom: driver.zoom?.() }
       place()
       return
     }
-    driver.fit(
-      {
-        northEast: { lat: Math.max(...lats), lng: Math.max(...lngs) },
-        southWest: { lat: Math.min(...lats), lng: Math.min(...lngs) },
-      },
-      96,
-      motionOf(frame, 'travel'),
-    )
+    driver.fit(bounds, 96, motionOf(frame, 'travel'))
   }
   frame.addEventListener(HelixMapClusterEvent.eventName, handleCluster)
 
@@ -1465,12 +1582,23 @@ export const connectMap = (
       closeFan()?.focus()
     }
   }
+  /* Where the press began, so the click a drag ends with is told apart from
+     a press: a browser fires `click` after a drag that starts and ends on the
+     map, and panning closed the fan the comment above says a pan does not. */
+  let pressedAt: { x: number; y: number } | undefined
+  const handleFanDown = (event: PointerEvent): void => {
+    pressedAt = { x: event.clientX, y: event.clientY }
+  }
   const handleFanPress = (event: MouseEvent): void => {
-    if (fanned && !event.composedPath().some(isMarker)) {
+    const dragged =
+      pressedAt !== undefined &&
+      Math.hypot(event.clientX - pressedAt.x, event.clientY - pressedAt.y) > DRAGGED
+    if (fanned && !dragged && !event.composedPath().some(isMarker)) {
       closeFan()
     }
   }
   frame.addEventListener('keydown', handleFanKey)
+  frame.addEventListener('pointerdown', handleFanDown)
   frame.addEventListener('click', handleFanPress)
 
   return {
@@ -1478,6 +1606,7 @@ export const connectMap = (
       live = false
       drawn?.stop()
       stopViewing?.()
+      clearTimeout(looking)
       stopWaiting?.()
       stopTheming?.()
       styled.disconnect()
@@ -1486,6 +1615,7 @@ export const connectMap = (
       frame.removeEventListener('focusin', reveal)
       frame.removeEventListener(HelixMapClusterEvent.eventName, handleCluster)
       frame.removeEventListener('keydown', handleFanKey)
+      frame.removeEventListener('pointerdown', handleFanDown)
       frame.removeEventListener('click', handleFanPress)
       for (const marker of markers()) {
         marker.style.removeProperty('--_map-marker-x')
@@ -1498,6 +1628,15 @@ export const connectMap = (
         }
         if (marker.fanned === true) {
           marker.fanned = false
+        }
+        /* What the connector alone decided, put back with the rest: a marker
+           left `behind` stayed faded and out of the pointer's way on a map
+           that had stopped turning the globe. */
+        if (marker.behind === true) {
+          marker.behind = false
+        }
+        if (marker.side === 'start') {
+          marker.side = 'end'
         }
         marker.style.removeProperty('--_map-marker-leg')
         marker.style.removeProperty('--_map-marker-leg-angle')
@@ -1550,13 +1689,8 @@ export const connectMap = (
       if (places.length === 0) {
         return
       }
-      const lats = places.map((place) => place.lat)
-      const lngs = places.map((place) => place.lng)
       driver.fit(
-        {
-          northEast: { lat: Math.max(...lats), lng: Math.max(...lngs) },
-          southWest: { lat: Math.min(...lats), lng: Math.min(...lngs) },
-        },
+        reachOf(places).bounds,
         options.padding ?? 48,
         options.animate === false ? null : motionOf(frame, 'travel'),
       )

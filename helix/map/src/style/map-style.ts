@@ -167,8 +167,23 @@ const SIGNS: Record<string, 'interstate' | 'state' | 'us'> = {
   'us-state': 'state',
 }
 
-/** An id safe to name an image by, from a color. */
-const idOf = (color: string): string => color.replace(/[^0-9a-z]/gi, '')
+/**
+ * A short name for what an image draws, from all of it.
+ *
+ * **Everything drawn is in the name**, because MapLibre keeps an image it
+ * already has and a restyle's diff keeps the images too: named by its color
+ * alone, with punctuation stripped, a landmark kept the light theme's ring on
+ * a dark map, a sign kept the old typeface, and `rgb(1, 23, 4)` and
+ * `rgb(12, 3, 4)` were one name. FNV-1a, which only has to tell descriptions
+ * apart.
+ */
+const stamp = (drawn: unknown): string => {
+  let hash = 0x811c9dc5
+  for (const char of JSON.stringify(drawn)) {
+    hash = Math.imul(hash ^ (char.codePointAt(0) ?? 0), 0x01000193) >>> 0
+  }
+  return hash.toString(36)
+}
 
 /** Width in pixels growing with the zoom, the way a road on paper is drawn wider close up. */
 const widen = (from: [number, number], to: [number, number]): unknown[] => [
@@ -314,13 +329,14 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
   const landmarkColor: unknown[] = ['match', ['get', 'class']]
   for (const { classes, group, hue, icon } of LANDMARKS) {
     const color = cssColor(hued(hue))
-    const id = `helix-landmark-${group}-${idOf(color)}`
-    images[id] = {
+    const image: MapImage = {
       color,
       icon: { content: icon.content, viewBox: icon.viewBox },
       ink: halo,
       kind: 'landmark',
     }
+    const id = `helix-landmark-${group}-${stamp(image)}`
+    images[id] = image
     landmarkImage.push([...classes], id)
     landmarkColor.push([...classes], legible(hued(hue), 0))
   }
@@ -335,27 +351,32 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
      `helix-sign-us|290`, as wide as the number. The numbers are in the
      theme's typeface at bold, where there is one. */
   const signFont = face ? `"${face}", sans-serif` : 'sans-serif'
-  images['helix-sign-interstate'] = {
+  /* Every sign's name carries its typeface, the one thing the fixed designs
+     share with the theme. */
+  const signs = `helix-sign-${stamp(signFont)}-`
+  images[`${signs}interstate`] = {
     design: 'interstate',
     font: signFont,
     ink: '#ffffff',
     kind: 'sign',
   }
-  images['helix-sign-us'] = { design: 'us', font: signFont, ink: '#1a1a1a', kind: 'sign' }
-  images['helix-sign-state'] = { design: 'state', font: signFont, ink: '#1a1a1a', kind: 'sign' }
-  const plate = { edge: toward(0.5), fill: halo }
-  images[`helix-sign-plate-${idOf(plate.fill + plate.edge)}`] = {
-    ...plate,
+  images[`${signs}us`] = { design: 'us', font: signFont, ink: '#1a1a1a', kind: 'sign' }
+  images[`${signs}state`] = { design: 'state', font: signFont, ink: '#1a1a1a', kind: 'sign' }
+  const plate: MapImage = {
     design: 'plate',
+    edge: toward(0.5),
+    fill: halo,
     font: signFont,
     ink: cssColor(ink),
     kind: 'sign',
   }
+  const plateShape = `plate-${stamp(plate)}`
+  images[`${signs}${plateShape}`] = plate
   const signShape: unknown[] = ['match', ['get', 'network']]
   for (const [network, shape] of Object.entries(SIGNS)) {
     signShape.push(network, shape)
   }
-  signShape.push(`plate-${idOf(plate.fill + plate.edge)}`)
+  signShape.push(plateShape)
 
   return {
     ...(glyphs ? { glyphs } : {}),
@@ -563,7 +584,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         ],
         id: 'label-shield',
         layout: {
-          'icon-image': ['concat', 'helix-sign-', signShape, '|', ['get', 'ref']],
+          'icon-image': ['concat', signs, signShape, '|', ['get', 'ref']],
           'icon-rotation-alignment': 'viewport',
           'symbol-placement': 'line',
           'symbol-spacing': 320,

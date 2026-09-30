@@ -208,6 +208,7 @@ describe('connectMap', () => {
     expect(slotted.querySelector('a')?.dataset.link).toBe('quiet')
     seen.credits = ['Weather by Rain Co']
     seen.changed?.()
+    await Promise.resolve()
     expect(slotted.textContent).toBe('Weather by Rain Co')
   })
 
@@ -218,9 +219,11 @@ describe('connectMap', () => {
     expect(credit(host)).toBeNull()
     seen.credits = ['Tiles']
     seen.changed?.()
+    await Promise.resolve()
     expect(credit(host)?.textContent).toBe('Tiles')
     seen.credits = []
     seen.changed?.()
+    await Promise.resolve()
     expect(credit(host)).toBeNull()
   })
 
@@ -258,10 +261,13 @@ describe('connectMap', () => {
     connectMap(host, driver)
     const link = credit(host)?.querySelector('a') as HTMLAnchorElement
     seen.changed?.()
+    await Promise.resolve()
     seen.changed?.()
+    await Promise.resolve()
     expect(credit(host)?.querySelector('a')).toBe(link)
     seen.credits = ['<a href="https://openfreemap.org">OpenFreeMap</a>']
     seen.changed?.()
+    await Promise.resolve()
     expect(credit(host)?.textContent).toBe('OpenFreeMap')
   })
 

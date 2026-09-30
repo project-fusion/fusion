@@ -320,8 +320,10 @@ interface MapLibreAnimation {
 export interface MapLibreMap {
   /** Whether every tile the view needs has loaded. */
   areTilesLoaded?(): boolean
-  /** Whether the style has loaded. */
+  /** Whether the style and every tile have loaded, and nothing is waiting to be drawn. */
   loaded?(): boolean
+  /** Whether the style has loaded: `true`, and anything else is not yet. MapLibre 6 types it loosely. */
+  isStyleLoaded?(): unknown
   /** The canvas, which MapLibre makes focusable. */
   getCanvas(): HTMLElement
   /** The middle of the view, which a map-type picture is drawn around. */
@@ -411,6 +413,7 @@ export interface MapLibreMap {
       | 'resize'
       | 'sourcedata'
       | 'moveend'
+      | 'render'
       | 'styledata'
       | 'styleimagemissing',
     listener: (event?: MapLibreEvent) => void,
@@ -425,6 +428,7 @@ export interface MapLibreMap {
       | 'resize'
       | 'sourcedata'
       | 'moveend'
+      | 'render'
       | 'styledata'
       | 'styleimagemissing',
     listener: (event?: MapLibreEvent) => void,
@@ -456,7 +460,7 @@ export interface MapLibreMap {
    */
   _camera?: { transform?: { isLocationOccluded?(place: { lat: number; lng: number }): boolean } }
   /** Draws each image a style names as it is asked for. MapLibre 6. */
-  setMissingStyleImageResolver?(resolver: ((id: string) => void) | null): unknown
+  setMissingStyleImageResolver?(resolver: ((id: string) => unknown) | null): unknown
   /** Sets one paint property of one layer, which is how a points layer takes a new color. */
   setPaintProperty(layer: string, name: string, value: unknown): unknown
   /** Sets one layout property of one layer, which is how the buildings are shown and hidden. */
@@ -529,7 +533,7 @@ interface PictureMap extends ImageHolder {
   getCanvas(): HTMLCanvasElement
   off?(type: 'styleimagemissing', listener: (event?: MapLibreEvent) => void): unknown
   on(type: 'styleimagemissing', listener: (event?: MapLibreEvent) => void): unknown
-  setMissingStyleImageResolver?(resolver: ((id: string) => void) | null): unknown
+  setMissingStyleImageResolver?(resolver: ((id: string) => unknown) | null): unknown
   once(type: 'idle', listener: () => void): unknown
   remove(): void
 }
@@ -541,7 +545,31 @@ type ImageHolder = Pick<MapLibreMap, 'addImage' | 'getStyle' | 'hasImage'>
 type ImageAsker = ImageHolder & {
   off?(type: 'styleimagemissing', listener: (event?: MapLibreEvent) => void): unknown
   on(type: 'styleimagemissing', listener: (event?: MapLibreEvent) => void): unknown
-  setMissingStyleImageResolver?(resolver: ((id: string) => void) | null): unknown
+  setMissingStyleImageResolver?(resolver: ((id: string) => unknown) | null): unknown
+}
+
+/**
+ * The style's image descriptions, read once for a burst of missing images.
+ * `getStyle()` serializes the whole style, and a view's first frame asks for
+ * dozens of images at once.
+ */
+const described = new WeakMap<
+  object,
+  { metadata?: { 'helix:images'?: Record<string, MapImage> } }
+>()
+const describedOf = (
+  holder: ImageHolder,
+): { metadata?: { 'helix:images'?: Record<string, MapImage> } } => {
+  const had = described.get(holder)
+  if (had) {
+    return had
+  }
+  const style = (holder.getStyle() ?? {}) as {
+    metadata?: { 'helix:images'?: Record<string, MapImage> }
+  }
+  described.set(holder, style)
+  queueMicrotask(() => described.delete(holder))
+  return style
 }
 
 /**
@@ -553,7 +581,7 @@ const supplyImage = (holder: ImageHolder, id: string | undefined): void => {
   if (!id?.startsWith('helix-') || holder.hasImage?.(id)) {
     return
   }
-  const style = holder.getStyle() as { metadata?: { 'helix:images'?: Record<string, MapImage> } }
+  const style = describedOf(holder)
   /* A sign is named for its design and its number, `helix-sign-us|290`, so
      one description draws every number the design carries. */
   const [named = '', text = ''] = id.split('|')
@@ -573,8 +601,18 @@ const supplyImage = (holder: ImageHolder, id: string | undefined): void => {
  */
 const answerImages = (holder: ImageAsker): (() => void) => {
   if (typeof holder.setMissingStyleImageResolver === 'function') {
-    holder.setMissingStyleImageResolver((id) => supplyImage(holder, id))
-    return () => holder.setMissingStyleImageResolver?.(null)
+    /* **The page's own resolver kept**, and asked for every image that is not
+       Helix's. MapLibre 6 holds one resolver a map, so taking the slot took a
+       page's on-demand sprites away while connected and for good after,
+       which the note above says this never does. Read from MapLibre's own
+       field, since it offers no getter; absent, there was none. */
+    const before =
+      (holder as { _missingStyleImageResolver?: ((id: string) => unknown) | null })
+        ._missingStyleImageResolver ?? null
+    holder.setMissingStyleImageResolver((id) =>
+      id.startsWith('helix-') ? supplyImage(holder, id) : before?.(id),
+    )
+    return () => holder.setMissingStyleImageResolver?.(before)
   }
   const missing = (event?: MapLibreEvent): void => supplyImage(holder, event?.id)
   holder.on('styleimagemissing', missing)
@@ -647,10 +685,22 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     bared.set(map, !shown)
     showLabels(map, shown)
     if (!heard) {
+      /* **Once a burst, not once an event.** MapLibre fires `styledata` for
+         every image added and every paint change, a radar frame switching
+         among them, and each ran a full pass over the layers while Satellite
+         was on. Before the next frame, so a restyle never shows its labels. */
+      let pending = false
       map.on('styledata', () => {
-        if (bared.get(map)) {
-          showLabels(map, false)
+        if (!bared.get(map) || pending) {
+          return
         }
+        pending = true
+        queueMicrotask(() => {
+          pending = false
+          if (bared.get(map)) {
+            showLabels(map, false)
+          }
+        })
       })
     }
   },
@@ -758,7 +808,9 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       tile: { x: number; y: number; z: number },
       encoding: HeightEncoding,
     ) => {
-      const had = heights.get(url)
+      /* By the encoding too, which turns the same pixels into other heights. */
+      const key = `${url}|${encoding}`
+      const had = heights.get(key)
       if (had) {
         return had
       }
@@ -781,11 +833,20 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
           return { ...tile, heights: heightsFrom(pixels, encoding), size: bitmap.width }
         })
         .catch(() => undefined)
+        .then((tile) => {
+          /* **A tile that failed is asked again next time**, not kept as a
+             hole: a moment's network error or a 429 left a square with no
+             lines until a hundred other tiles pushed it out. */
+          if (tile === undefined && heights.get(key) === read) {
+            heights.delete(key)
+          }
+          return tile
+        })
       /* The last hundred tiles, which a map panned about keeps coming back to. */
       if (heights.size >= 100) {
         heights.delete(heights.keys().next().value as string)
       }
-      heights.set(url, read)
+      heights.set(key, read)
       return read
     }
     const trace = async (): Promise<void> => {
@@ -838,10 +899,21 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         )
         const traced: ContourLine[] = []
         for (const tile of known.values()) {
-          const key = `${spec.src}|${tile.z}/${tile.x}/${tile.y}|${interval}|${unit}`
+          /* **By which neighbors were known when it was traced**, since a
+             tile's lines are joined across its edges with theirs: traced at
+             the view's edge without them, a tile was kept and reused once a
+             pan brought them in, and the seam never closed. */
+          const across = 2 ** tile.z
+          const beside = [-1, 0, 1]
+            .flatMap((dy) =>
+              [-1, 0, 1].map((dx) =>
+                known.has(`${(tile.x + dx + across) % across}/${tile.y + dy}`) ? '1' : '0',
+              ),
+            )
+            .join('')
+          const key = `${spec.src}|${spec.encoding ?? ''}|${tile.z}/${tile.x}/${tile.y}|${interval}|${unit}|${beside}`
           let found = lines.get(key)
           if (!found) {
-            const across = 2 ** tile.z
             found = contoursOf(tile, interval, unit, (dx, dy) =>
               known.get(`${(tile.x + dx + across) % across}/${tile.y + dy}`),
             )
@@ -1574,22 +1646,42 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     const { x, y } = map.project([lng, lat])
     return { x, y }
   },
-  /* **Ready at `load`**, which MapLibre fires once, after its first
-     complete drawing with every tile the view needs, or at once where the
-     map has loaded already. Not its first `idle`: a map with something
-     moving on it, a walker along a route, redraws every few frames and is
-     never idle. */
+  /* **When the view has drawn with every tile it needs**, or at once where it
+     has. Not its first `idle`: a map with something moving on it, a walker
+     along a route, redraws every few frames and is never idle.
+
+     **Heard on `render` as well as `load`**, because `load` fires once in a
+     map's life. A page connecting inside its own `load` handler, the way
+     MapLibre's examples start, found `loaded()` false, since drawing the
+     connector's layers had just dirtied the style, and waited for a `load`
+     that had already been: the server's snapshot covered the live map for
+     good. Each frame after that is a chance to find the style and tiles in. */
   ready: (done) => {
     if (map.loaded?.() && map.areTilesLoaded?.()) {
       done()
       return () => undefined
     }
-    const heard = (): void => {
-      map.off('load', heard)
+    let finished = false
+    const finish = (): void => {
+      if (finished) {
+        return
+      }
+      finished = true
+      stop()
       done()
     }
-    map.on('load', heard)
-    return () => map.off('load', heard)
+    const drawn = (): void => {
+      if (map.isStyleLoaded?.() === true && map.areTilesLoaded?.() === true) {
+        finish()
+      }
+    }
+    const stop = (): void => {
+      map.off('load', finish)
+      map.off('render', drawn)
+    }
+    map.on('load', finish)
+    map.on('render', drawn)
+    return stop
   },
   rotate: ({ by, to }, motion) => {
     const { bearing, pitch } = aimFrom(map)
