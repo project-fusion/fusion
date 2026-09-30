@@ -6,12 +6,11 @@
  * classic `<script src>` is the one kind of request from there that is not
  * CORS-checked. MapLibre loads the same way, as its own file, before this.
  *
- * **MapLibre's own file, not rebundled.** Its build makes its worker from a
- * blob at run time, which is the only worker an opaque origin may start: the
- * CSP build's worker is a file, and from `null` every file is another origin,
- * so the browser refuses it outright. Checked in the builder's real frame on
- * 26 Sep 2026. Rebundling the default build would put its worker source through
- * a second minifier for no gain, so it is copied as shipped.
+ * **MapLibre is rebundled for the frame**, with its worker inside it:
+ * `preview-maplibre-entry.ts`, built by `build-frame.mjs` into one classic
+ * script that starts the worker from a `blob:` URL, the only worker an opaque
+ * origin may start. MapLibre 6 ships as modules and runs its worker from a
+ * file of its own, and from `null` every file is another origin.
  *
  * **Separate from `frame.js`** because most renders never draw a map: the
  * sandbox's examples and four of the builder's five layouts would carry

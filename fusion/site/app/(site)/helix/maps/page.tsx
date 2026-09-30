@@ -105,7 +105,7 @@ const POINTS_MARKUP = `<helix-map label="Food and drink in Austin">
   <div id="map"></div>
   <helix-map-points
     label="Food and drink"
-    src="/austin-food-and-drink.geojson"
+    src="/maps/austin-food-and-drink.geojson"
     cluster
   ></helix-map-points>
 </helix-map>`
@@ -134,6 +134,7 @@ const RADAR_MARKUP = `<helix-map
   <helix-map-raster
     label="Weather radar"
     attribution="${RADAR.attribution}"
+    max-zoom="${RADAR.maxZoom}"
     frames="
 ${RADAR.frames.map((one) => `      ${one}`).join('\n')}
     "

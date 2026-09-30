@@ -228,6 +228,8 @@ const simplified = (points: ScreenPoint[]): ScreenPoint[] => {
 export interface SnapshotOptions {
   /** The fetch the tiles are asked for with, where a server has its own, such as one that caches. */
   fetch?: typeof fetch | undefined
+  /** How long each request may take, in milliseconds, before the snapshot is given up. 3000 by default. */
+  timeout?: number | undefined
   /** A TileJSON URL for vector tiles in the OpenMapTiles schema: the one given to `mapLibreStyle`. OpenFreeMap's by default. */
   tiles?: string | undefined
 }
@@ -259,14 +261,52 @@ const MARGIN = 16
  * toward a token in OKLab, so it is drawn in whichever theme the page is in,
  * light or dark, and changes with it.
  *
- * Resolves to an empty string where the tiles cannot be read, which a page
- * renders as nothing.
+ * **Whole or nothing.** Resolves to an empty string where any tile the view
+ * needs cannot be read in time, or the view is not numbers, which a page
+ * renders as nothing and the renderer then draws. A snapshot with a tile
+ * missing looks finished and is not, and one that waited on a slow server
+ * held the page: each request is given `timeout` milliseconds. A tile the
+ * server says it does not have, a 404, is drawn empty, as the sea is.
  */
 export const mapSnapshot = async (
-  view: MapView,
+  asked: MapView,
   options: SnapshotOptions = {},
 ): Promise<string> => {
-  const get = options.fetch ?? fetch
+  /* **Numbers, and only numbers, reach the markup.** A page building the view
+     from a request's query would otherwise write whatever it was sent into
+     the SVG's attributes. */
+  const view: MapView = {
+    bearing: Number(asked.bearing ?? 0),
+    center: { lat: Number(asked.center?.lat), lng: Number(asked.center?.lng) },
+    height: Math.round(Number(asked.height)),
+    pitch: Number(asked.pitch ?? 0),
+    width: Math.round(Number(asked.width)),
+    zoom: Number(asked.zoom),
+  }
+  if (
+    ![view.bearing, view.center.lat, view.center.lng, view.pitch, view.zoom].every(
+      Number.isFinite,
+    ) ||
+    !(view.width > 0 && view.height > 0)
+  ) {
+    return ''
+  }
+  const wait = options.timeout ?? 3000
+  /* Raced against the clock as well as told to stop, so a fetch of the
+     page's own that does not listen for the signal still gives up on time. */
+  const get = (url: string): Promise<Response> => {
+    const control = new AbortController()
+    let timer: ReturnType<typeof setTimeout> | undefined
+    return Promise.race([
+      (options.fetch ?? fetch)(url, { signal: control.signal }),
+      new Promise<never>((_, refuse) => {
+        timer = setTimeout(() => {
+          control.abort()
+          refuse(new Error(`${url} took longer than ${wait} ms`))
+        }, wait)
+      }),
+    ]).finally(() => clearTimeout(timer))
+  }
   const tiles = await get(options.tiles ?? OPENFREEMAP)
     .then((response) => (response.ok ? response.json() : undefined))
     .catch(() => undefined)
@@ -293,9 +333,12 @@ export const mapSnapshot = async (
     const ys = ground.map(([, y]) => Math.floor(y / span))
     const count = 2 ** at
     const wanted: [number, number][] = []
+    /* **Where it is drawn, not where it is fetched.** A view across the
+       antimeridian wants the tiles past the world's edge drawn there; the
+       address is wrapped only when it is asked for. */
     for (let x = Math.min(...xs); x <= Math.max(...xs); x++) {
       for (let y = Math.max(0, Math.min(...ys)); y <= Math.min(count - 1, Math.max(...ys)); y++) {
-        wanted.push([((x % count) + count) % count, y])
+        wanted.push([x, y])
       }
     }
     return wanted
@@ -362,50 +405,71 @@ export const mapSnapshot = async (
     return path
   }
 
+  let whole = true
+  const count = 2 ** depth
   await Promise.all(
     wanted.map(async (at) => {
       const url = template
         .replace('{z}', String(depth))
-        .replace('{x}', String(at[0]))
+        .replace('{x}', String(((at[0] % count) + count) % count))
         .replace('{y}', String(at[1]))
       const bytes = await get(url)
-        .then((response) => (response.ok ? response.arrayBuffer() : undefined))
+        .then((response) =>
+          response.ok
+            ? response.arrayBuffer()
+            : response.status === 404
+              ? new ArrayBuffer(0)
+              : undefined,
+        )
         .catch(() => undefined)
       if (!bytes) {
+        whole = false
         return
       }
-      const tile = new VectorTile(new PbfReader(new Uint8Array(bytes)))
-      for (const layer of shown) {
-        const source = tile.layers[layer.source]
-        if (!source) {
-          continue
-        }
-        for (let index = 0; index < source.length; index++) {
-          const feature = source.feature(index)
-          const kind = String(feature.properties.class ?? '')
-          if (
-            feature.type !== (layer.kind === 'fill' ? 3 : 2) ||
-            (layer.classes && !layer.classes.includes(kind)) ||
-            layer.except?.includes(kind) ||
-            (layer.overground && feature.properties.brunnel === 'tunnel')
-          ) {
-            continue
-          }
-          const path = pathOf(
-            feature.loadGeometry(),
-            at,
-            source.extent,
-            layer.kind === 'fill',
-            layer.smallest ?? 0,
-          )
-          if (path) {
-            drawn.get(layer.id)?.push(path)
-          }
-        }
+      /* A 200 that is not a tile, such as a rate limit's page, throws as it
+         is read, and gives the snapshot up rather than the page. */
+      try {
+        drawTile(new VectorTile(new PbfReader(new Uint8Array(bytes))), at)
+      } catch {
+        whole = false
       }
     }),
   )
 
+  function drawTile(tile: VectorTile, at: [number, number]): void {
+    for (const layer of shown) {
+      const source = tile.layers[layer.source]
+      if (!source) {
+        continue
+      }
+      for (let index = 0; index < source.length; index++) {
+        const feature = source.feature(index)
+        const kind = String(feature.properties.class ?? '')
+        if (
+          feature.type !== (layer.kind === 'fill' ? 3 : 2) ||
+          (layer.classes && !layer.classes.includes(kind)) ||
+          layer.except?.includes(kind) ||
+          (layer.overground && feature.properties.brunnel === 'tunnel')
+        ) {
+          continue
+        }
+        const path = pathOf(
+          feature.loadGeometry(),
+          at,
+          source.extent,
+          layer.kind === 'fill',
+          layer.smallest ?? 0,
+        )
+        if (path) {
+          drawn.get(layer.id)?.push(path)
+        }
+      }
+    }
+  }
+
+  if (!whole) {
+    return ''
+  }
   const body = shown
     .map((layer) => {
       const paths = drawn.get(layer.id) ?? []
@@ -414,7 +478,11 @@ export const mapSnapshot = async (
       }
       const color = colorOf(layer)
       return layer.kind === 'fill'
-        ? `<path fill-rule="evenodd" style="fill:${color}" d="${paths.join('')}"/>`
+        ? /* **Nonzero, since tiles overlap.** A tile's polygons run past its
+             edges and features overlap within one, and even-odd emptied every
+             place two covered: a quarter of Austin's land cover drew as
+             holes. A tile's holes wind the other way, and still cut out. */
+          `<path style="fill:${color}" d="${paths.join('')}"/>`
         : `<path style="fill:none;stroke:${color};stroke-width:${+widthAt(
             layer.width ?? [
               [0, 1],

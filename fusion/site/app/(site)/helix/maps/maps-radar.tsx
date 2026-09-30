@@ -1,11 +1,11 @@
 'use client'
 
 import 'maplibre-gl/dist/maplibre-gl.css'
-import type { HelixMap } from '@fusion.dev/helix'
+import type { HelixMap, HelixMapRaster } from '@fusion.dev/helix'
 import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { useEffect, useRef, useState } from 'react'
-import { RADAR } from '@/content/maps/maps'
+import { MAP_FAILED, RADAR } from '@/content/maps/maps'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import styles from './maps.module.css'
 
@@ -28,7 +28,29 @@ const STATES: [[number, number], [number, number]] = [
 export function MapsRadar() {
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
+  /* Said in the map's footer, where a failed load would leave an empty box. */
+  const [failed, setFailed] = useState(false)
   const [playing, setPlaying] = useState(false)
+  /* **With less motion asked for, a step at a time.** The layer never plays
+     for such a reader, and the button that said Pause over a still map was
+     telling them it did. Read after the page has drawn, since the server
+     cannot know. */
+  const [stepping, setStepping] = useState(false)
+  const radar = useRef<HelixMapRaster>(null)
+  useEffect(() => {
+    const query = matchMedia('(prefers-reduced-motion: reduce)')
+    const heard = (): void => setStepping(query.matches)
+    heard()
+    query.addEventListener('change', heard)
+    return () => query.removeEventListener('change', heard)
+  }, [])
+  const step = (): void => {
+    const layer = radar.current
+    if (layer) {
+      const count = RADAR.frames.length
+      layer.frame = ((layer.frame ?? count - 1) + 1) % count
+    }
+  }
 
   useEffect(() => {
     const host = frame.current
@@ -68,7 +90,11 @@ export function MapsRadar() {
       ([entry]) => {
         if (entry?.isIntersecting) {
           near.disconnect()
-          void start()
+          start().catch(() => {
+            if (live) {
+              setFailed(true)
+            }
+          })
         }
       },
       { rootMargin: '400px' },
@@ -89,18 +115,29 @@ export function MapsRadar() {
         ref={frame}
       >
         <div className={styles.mapsCanvas} ref={container} />
+        {failed ? (
+          <helix-text slot="footer" variant="caption">
+            {MAP_FAILED}
+          </helix-text>
+        ) : null}
         <helix-map-raster
           attribution={RADAR.attribution}
           description="The last 50 minutes, in 10-minute steps"
           frames={RADAR.frames}
           label="Weather radar"
-          playing={playing}
+          max-zoom={RADAR.maxZoom}
+          playing={playing && !stepping}
+          ref={radar}
         />
       </helix-map>
       <helix-flex>
-        <helix-button onClick={() => setPlaying(!playing)}>
-          {playing ? 'Pause radar' : 'Play radar'}
-        </helix-button>
+        {stepping ? (
+          <helix-button onClick={step}>Show the next frame</helix-button>
+        ) : (
+          <helix-button onClick={() => setPlaying(!playing)}>
+            {playing ? 'Pause radar' : 'Play radar'}
+          </helix-button>
+        )}
       </helix-flex>
     </div>
   )

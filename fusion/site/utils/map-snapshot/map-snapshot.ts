@@ -8,8 +8,25 @@ import { unstable_cache } from 'next/cache'
  */
 const DRAWN_BY = process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL_GIT_COMMIT_SHA ?? 'local'
 
+/**
+ * How long each request for a tile may take on the server, in milliseconds.
+ * The page waits for its snapshots, so a slow tile server is a slow page.
+ */
+const PATIENCE = 2000
+
+/* **Only a whole snapshot is kept.** `mapSnapshot` answers an empty string
+   when any tile failed or ran out of time, and kept, that was a Maps page
+   with no first paint for a day after one bad minute of the tile server,
+   which every deploy is the first to ask. Thrown here, so the cache stores
+   nothing, and caught by `snapshotOf`. */
 const cached = unstable_cache(
-  async (view: MapView): Promise<string> => mapSnapshot(view),
+  async (view: MapView): Promise<string> => {
+    const svg = await mapSnapshot(view, { timeout: PATIENCE })
+    if (svg === '') {
+      throw new Error('The map snapshot could not be drawn.')
+    }
+    return svg
+  },
   ['map-snapshot', DRAWN_BY],
   { revalidate: 86_400 },
 )
@@ -22,7 +39,16 @@ const cached = unstable_cache(
  * written into it, so the page that holds it can render per request, as the
  * Maps page does for a theme sent from the builder, and still draw it once.
  * **Drawn every time in development**, where the code that draws it changes
- * between one request and the next.
+ * between one request and the next. **Never throws**: a snapshot that cannot
+ * be drawn is an empty string, and the page draws the live map alone.
  */
-export const snapshotOf = (view: MapView): Promise<string> =>
-  process.env.NODE_ENV === 'development' ? mapSnapshot(view) : cached(view)
+export const snapshotOf = async (view: MapView): Promise<string> => {
+  if (process.env.NODE_ENV === 'development') {
+    return mapSnapshot(view, { timeout: PATIENCE })
+  }
+  try {
+    return await cached(view)
+  } catch {
+    return ''
+  }
+}

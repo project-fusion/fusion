@@ -28,6 +28,7 @@ export function Example() {
           description="The last 50 minutes, in 10-minute steps"
           frames={FRAMES}
           label="Weather radar"
+          max-zoom="10"
           playing={playing}
         ></helix-map-raster>
       </helix-map>

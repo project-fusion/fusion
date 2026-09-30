@@ -216,6 +216,8 @@ export const IMAGERY = {
 export const RADAR = {
   attribution: 'NWS radar from the Iowa Environmental Mesonet',
   frames: [50, 40, 30, 20, 10, 0].map((ago) => `/maps/radar/${ago}/{z}/{x}/{y}.png`),
+  /* The deepest zoom the route serves, past which MapLibre enlarges its tiles. */
+  maxZoom: 10,
 }
 
 /** The one command that installs a map, shown on the page with a link to the guide. */
@@ -311,3 +313,6 @@ export const MAPS: PageCopy = {
   source: 'rendered by the page, which reads this module',
   title: 'Maps',
 }
+
+/** What a map on the page says when MapLibre or its style could not load. */
+export const MAP_FAILED = 'The map could not load. Reload the page to try again.'
