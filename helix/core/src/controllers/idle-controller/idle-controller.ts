@@ -49,7 +49,12 @@ export class IdleController implements ReactiveController {
    */
   readonly leave = (): void => {
     clearTimeout(this.timer)
-    this.report(true)
+    /* Only where there is a wait at all. `0` is the promise that the chrome
+       stays, and leaving hid it anyway: a search field in a map's header went
+       the moment the pointer crossed the edge. */
+    if (this.delay() > 0) {
+      this.report(true)
+    }
   }
 
   hostDisconnected(): void {

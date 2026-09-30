@@ -449,6 +449,14 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
       if (target !== own && !own.matches('[part~="controls"]')) {
         return
       }
+      /* **A modifier is someone else's shortcut.** Control or Command with Plus
+         is the browser's page zoom, which a reader with low vision relies on,
+         and Alt with an arrow is Back and Forward: taken here, a press on the
+         map zoomed the map and the page stayed small. Shift is this surface's
+         own, which a family reads in `handleMoreKeys`. */
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return
+      }
       if (this.handleMoreKeys(event)) {
         event.preventDefault()
         return
