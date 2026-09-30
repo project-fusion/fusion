@@ -44,8 +44,10 @@
   z-index: var(--helix-layer-raised);
 }
 
-/* Not yet placed, which would draw it in the frame's corner. */
-:host(:not([style*="--_map-position-x"])) {
+/* Not yet placed, which would draw it in the frame's corner. **The drawing
+   and not the host**, so its status stays in the tree: a position behind the
+   globe is unplaced, and a van there that arrived said nothing. */
+:host(:not([style*="--_map-position-x"])) [part="position"] {
   visibility: hidden;
 }
 

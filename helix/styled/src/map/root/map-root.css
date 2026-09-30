@@ -245,6 +245,11 @@
   inline-size: min(calc(var(--helix-size-control-lg) * 6), 70vw);
   inset-block-start: 0;
   inset-inline-end: calc(100% + var(--helix-space-2xs));
+  /* **No taller than the map, and scrolled past that.** The frame clips what
+     overflows it, so a map of imagery and eight layers cut its last tiles
+     off, and they stayed focusable where nobody could see them. */
+  max-block-size: calc(var(--map-block-size, 24rem) - var(--helix-space-sm) * 2);
+  overflow-y: auto;
   padding: var(--helix-space-sm);
   position: absolute;
 }
@@ -369,4 +374,25 @@
 [part="layer-choice"]:focus-visible [part="layer-icon"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
+}
+
+/* ======================================================= forced colors === */
+
+/* **Each pressed and chosen state in a system color.** Forced colors replace
+   the brand fill and the ring these states are drawn in with the same button
+   and border colors as the rest, so the tilted map, the chosen map type and
+   the shown layers looked exactly like their opposites. `Highlight` is the
+   platform's color for a choice. */
+@media (forced-colors: active) {
+  [part="tilt"][aria-pressed="true"] {
+    background-color: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  [part="map-type"]:has(input:checked),
+  [part="layers-menu"] [part="layer-choice"][aria-pressed="true"] {
+    outline: var(--helix-border-thick) solid Highlight;
+    outline-offset: var(--helix-space-2xs);
+  }
 }

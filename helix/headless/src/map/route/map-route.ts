@@ -68,9 +68,12 @@ export class HelixHeadlessMapRoute extends HelixElement {
   /** @internal Which kind of layer, which is how the connector draws it. */
   readonly layerKind: 'area' | 'route' = 'route'
 
-  /** The route's name, used in the frame's list. */
+  /**
+   * The route's name, used in the frame's list and its tile in the layers
+   * menu. Defaults to "Route", so neither is ever a control with no name.
+   */
   @property()
-  label?: string
+  label = 'Route'
 
   /**
    * The points the line passes through, in order. Write the attribute as

@@ -118,9 +118,12 @@ export class HelixHeadlessMapPoints extends HelixElement {
   /** Marks this as a layer for the frame and the connector, whatever its tag. */
   readonly isMapLayer = true
 
-  /** The layer's name, used in the frame's list. */
+  /**
+   * The layer's name, used in the frame's list, its tile in the layers menu,
+   * and the group of places the keyboard walks. Defaults to "Places".
+   */
   @property()
-  label?: string
+  label = 'Places'
 
   /** @internal Which kind of layer, which is how the connector draws it. */
   readonly layerKind = 'points' as const

@@ -133,8 +133,17 @@ export class HelixHeadlessMapMarker extends HelixElement {
   @property({ attribute: 'passed-label' })
   passedLabel = 'passed'
 
+  /** Whether focus is on this marker as it is gathered, and so has to move on. */
+  private handingOver = false
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* Asked before the render hides the button: once it is hidden, focus has
+       already gone to the page. */
+    this.handingOver =
+      changed.has('gatheredBy') &&
+      this.gatheredBy !== undefined &&
+      (this.getRootNode() as Document | ShadowRoot).activeElement === this
     this.toggleState('behind', this.behind)
     this.toggleState('cluster', this.gathered.length > 1)
     this.toggleState('clustered', this.gatheredBy !== undefined)
@@ -158,6 +167,14 @@ export class HelixHeadlessMapMarker extends HelixElement {
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* **A reader on a place that is gathered into a cluster lands on the
+       cluster**, the marker the walk now reaches it through. Hidden with focus
+       on it, the button dropped the reader to the start of the page: a walk
+       to a place off screen moves the map, and the new view can gather it. */
+    if (this.handingOver) {
+      this.handingOver = false
+      this.gatheredBy?.focus()
+    }
     const keys = [...changed.keys()]
     if (keys.some((key) => key === 'gathered' || key === 'gatheredBy')) {
       this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'cluster' }))

@@ -39,9 +39,12 @@ export class HelixHeadlessMapArea extends HelixElement {
   /** @internal Which kind of layer, which is how the connector draws it. */
   readonly layerKind: 'area' | 'route' = 'area'
 
-  /** The area's name, used in the frame's list. */
+  /**
+   * The area's name, used in the frame's list and its tile in the layers
+   * menu. Defaults to "Area", so neither is ever a control with no name.
+   */
   @property()
-  label?: string
+  label = 'Area'
 
   /**
    * The corners of the shape, in order. The last point connects back to the
