@@ -178,6 +178,10 @@ export class HelixHeadlessOption extends HelixElement {
    * room than the row does, which is what a select's closed trigger has. Empty
    * means the row's own content, which is the common case and is why this is not
    * simply the accessible name.
+   *
+   * **An option with a label and nothing in it shows the label**, as
+   * `<option label>` does: written the platform's way, a select listed a row of
+   * nothing for every choice.
    */
   @property()
   label = ''
@@ -233,15 +237,21 @@ export class HelixHeadlessOption extends HelixElement {
    * It is worse than one wrong label, because of the six readers listed above:
    * the filter and Combobox's match compare against this string, so a marker in
    * it is in every comparison too.
+   *
+   * **The `label` where the slot holds nothing**, which is what the row shows
+   * then, so the six read the words a reader sees.
    */
   get text(): string {
-    return [...this.childNodes]
-      .filter(
-        (node) => node.nodeType === Node.TEXT_NODE || (node instanceof Element && node.slot === ''),
-      )
-      .map((node) => node.textContent ?? '')
-      .join('')
-      .trim()
+    return (
+      [...this.childNodes]
+        .filter(
+          (node) =>
+            node.nodeType === Node.TEXT_NODE || (node instanceof Element && node.slot === ''),
+        )
+        .map((node) => node.textContent ?? '')
+        .join('')
+        .trim() || this.label
+    )
   }
 
   /** Sends `helix-select` for this option. Does nothing when it is disabled. */
@@ -299,7 +309,7 @@ export class HelixHeadlessOption extends HelixElement {
     >
       <slot name="start"></slot>
       <span part="text">
-        <span part="label"><slot></slot></span>
+        <span part="label"><slot>${this.label}</slot></span>
         ${this.description ? html`<span part="description">${this.description}</span>` : nothing}
       </span>
       <slot name="end"></slot>

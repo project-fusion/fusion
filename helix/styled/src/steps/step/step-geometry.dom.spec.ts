@@ -30,6 +30,29 @@ const half = (step: Element, which: '::before' | '::after'): CSSStyleDeclaration
    step itself. Nothing is rendered for either half: both are placed entirely
    from properties the list hands down, so there was nothing for a box to carry,
    and `steps-root.ssr.spec.ts` holds the markup to saying so. */
+describe('a row of steps', () => {
+  if (hasLayout()) {
+    test('a step with a shorter description keeps its name level with the others', async () => {
+      const host = (await mount(
+        `<helix-steps label="How it works" style="inline-size: 40rem">
+          <helix-step>Go out<span slot="description">Each searcher drops points and logs tracks with no signal at all, all day.</span></helix-step>
+          <helix-step>Come back<span slot="description">Short.</span></helix-step>
+        </helix-steps>`,
+      )) as Step
+      await host.updateComplete
+      const every = [...host.querySelectorAll('helix-step')] as Step[]
+      for (const one of every) {
+        await one.updateComplete
+      }
+      const top = (step: Step): number =>
+        (
+          step.shadowRoot?.querySelector('[part="label"]') as HTMLElement | null
+        )?.getBoundingClientRect().top ?? Number.NaN
+      expect(top(at(every, 1))).toBeCloseTo(top(at(every, 0)), 0)
+    })
+  }
+})
+
 describe('the rule between the marks', () => {
   if (hasLayout()) {
     test('both halves draw, so the line reads as continuous across the gap', async () => {

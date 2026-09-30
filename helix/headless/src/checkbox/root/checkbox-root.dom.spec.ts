@@ -26,6 +26,14 @@ const checkbox = async (attrs = ''): Promise<Checkbox> =>
 const control = (box: Checkbox): HTMLInputElement => part(box, 'control') as HTMLInputElement
 
 describe('checkbox', () => {
+  test('`click()` on the element toggles it, as it does a native checkbox', async () => {
+    const box = await checkbox()
+    box.click()
+    await box.updateComplete
+    expect(box.checked).toBe(true)
+    expect(control(box).checked).toBe(true)
+  })
+
   test('its mark says checked and indeterminate in part names, and only while they hold', async () => {
     /* For the box a component draws in its own shadow root, where nothing can
        name the host to reach `:state(checked)`. */

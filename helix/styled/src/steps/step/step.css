@@ -8,6 +8,11 @@
      would otherwise start a dozen pixels to the left of the name above it.
      Written once so the two cannot drift. */
   --_step-inset: var(--helix-space-sm);
+  /* **Rows at the top, whatever the step's height.** A row of steps stretches
+     each to the tallest, and without this the height a shorter description
+     left over was shared between the rows, which dropped that step's name
+     below its neighbors' by as much as a line. */
+  align-content: start;
   align-items: start;
   column-gap: var(--helix-space-2xs);
   counter-increment: helix-step;

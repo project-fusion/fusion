@@ -7,6 +7,9 @@
   --_card-inset: var(--card-padding, var(--helix-space-control));
   /* How wide the media column is when the card lays out sideways. */
   --_card-media: var(--card-media-size, 12rem);
+  /* The ink a `helix-text` heading anywhere in the card takes, where the body
+     around it is muted. */
+  --_heading-ink: var(--helix-color-foreground);
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--card-border-width, var(--helix-border-surface)) solid
     var(--card-border-color, var(--helix-color-border));
