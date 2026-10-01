@@ -11,8 +11,8 @@ import { styles } from './graph-root.css.js'
  * @description
  * The styled frame: the drawing with its zoom and fullscreen buttons, and the
  * list of notes beside it, which moves below the drawing where the frame is
- * narrower than 40rem. The selected note is drawn in the primary color, and
- * the notes linked to it are named by how they link.
+ * narrower than 40rem. The selected note leads the list on a surface of its
+ * own, and the notes linked to it are named by how they link.
  *
  * @since 0.116.0
  * @status experimental

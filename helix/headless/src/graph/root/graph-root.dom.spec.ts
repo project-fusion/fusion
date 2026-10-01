@@ -147,7 +147,7 @@ describe('graph frame', () => {
 
   test('a search keeps the notes whose names hold it, and says how many', async () => {
     const host = await graph()
-    const field = part(host, 'search') as HTMLInputElement
+    const field = part(host, 'search-field') as HTMLInputElement
     field.value = 'ha'
     field.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }))
     await settle(host)
@@ -156,12 +156,24 @@ describe('graph frame', () => {
     expect(part(host, 'live')?.textContent).toBe('2 notes')
   })
 
+  test('Escape empties a search, and the list holds every note again', async () => {
+    const host = await graph()
+    const field = part(host, 'search-field') as HTMLInputElement
+    field.value = 'ha'
+    field.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }))
+    await settle(host)
+    key(field, 'Escape')
+    await settle(host)
+    expect(field.value).toBe('')
+    expect(names(host).length).toBe(5)
+  })
+
   test('ArrowDown in the search moves to the list, and the frame keeps its keys', async () => {
     const host = await graph()
     const panned: unknown[] = []
     host.addEventListener('helix-graph-pan', (event) => panned.push(event.detail))
-    key(part(host, 'search') as HTMLElement, 'ArrowDown')
-    key(part(host, 'search') as HTMLElement, 'ArrowLeft')
+    key(part(host, 'search-field') as HTMLElement, 'ArrowDown')
+    key(part(host, 'search-field') as HTMLElement, 'ArrowLeft')
     expect(host.shadowRoot?.activeElement).toBe(list(host))
     expect(panned).toEqual([])
   })

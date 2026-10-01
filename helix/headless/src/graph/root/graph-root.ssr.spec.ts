@@ -30,7 +30,7 @@ describe('graph server output', () => {
 
   test('the search field and the named list are served', () => {
     const markup = served()
-    expect(partTag(markup, 'search')).toContain('aria-label="Find a note"')
+    expect(partTag(markup, 'search-field')).toContain('aria-label="Find a note"')
     expect(partTag(markup, 'list')).toContain('role="listbox"')
     expect(partTag(markup, 'list')).toContain('aria-label="Notes"')
   })

@@ -52,10 +52,8 @@
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
   color: var(--helix-color-foreground);
   display: grid;
-  gap: var(--helix-space-2xs);
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   min-block-size: 0;
-  padding-block-start: var(--helix-space-xs);
 }
 
 /* Below the drawing on a narrow frame, which is where a list of notes reads
@@ -72,24 +70,57 @@
   }
 }
 
+/* The bar that narrows the list, drawn as the listbox draws its filter: the
+   magnifier, a field with no box of its own, and the count at the end. */
 [part="search"] {
-  background-color: var(--helix-color-surface-sunken);
-  block-size: var(--helix-size-control-sm);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  box-sizing: border-box;
-  color: var(--helix-color-foreground);
-  font: inherit;
-  font-size: var(--helix-text-sm);
-  margin-inline: var(--helix-space-xs);
-  padding-inline: var(--helix-space-xs);
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  gap: var(--helix-space-2xs);
+  padding: var(--helix-space-2xs);
+  padding-inline-start: var(--helix-space-xs);
 }
 
-[part="search"]::placeholder {
+[part="filter-icon"] {
+  align-items: center;
+  color: var(--helix-color-foreground-subtle);
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+[part="filter-icon"] svg,
+slot[name="filter-icon"]::slotted(*) {
+  --icon-size: var(--helix-size-icon-tight);
+
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
+}
+
+[part="search-field"] {
+  appearance: none;
+  background-color: transparent;
+  block-size: var(--helix-size-control-tight);
+  border: none;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  min-inline-size: 0;
+  padding-inline: var(--helix-space-2xs);
+}
+
+[part="search-field"]::placeholder {
   color: var(--helix-color-foreground-subtle);
 }
 
-[part="search"]:focus-visible,
+/* The bar is the field to the eye, so the bar takes the ring. */
+[part="search-field"]:focus-visible {
+  outline: none;
+}
+
+[part="search"]:has([part="search-field"]:focus-visible),
 [part="list"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
@@ -97,40 +128,59 @@
 
 [part="count"] {
   color: var(--helix-color-foreground-muted);
+  flex: 0 0 auto;
   font-size: var(--helix-text-xs);
-  padding-inline: var(--helix-space-xs);
+  font-variant-numeric: tabular-nums;
+  /* The rest of the rows' inset, after the bar's own, so the count ends on
+     the column the relations below it end on. */
+  padding-inline-end: calc(var(--helix-space-xs) - var(--helix-space-2xs));
 }
 
+/* Block padding only, as the listbox has: the rows run edge to edge, and the
+   padding holds the first and last clear of the bar and the frame. */
 [part="list"] {
   min-block-size: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding-block: var(--helix-space-2xs);
 }
 
-/* One row a line, so ten thousand notes measure as they are drawn. */
+/* An option's row: its height, its inset and its type, so a graph's list
+   reads as the library's other lists. One line, so ten thousand notes
+   measure as they are drawn. */
 [part~="note"] {
-  align-items: baseline;
+  align-items: center;
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
   font-size: var(--helix-text-sm);
-  gap: var(--helix-space-xs);
-  line-height: var(--helix-leading-normal);
-  min-block-size: 2rem;
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  gap: var(--helix-space-sm);
+  min-block-size: var(--helix-size-control-tight);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+  user-select: none;
 }
 
 /* The wash a hovered option takes, on the row the keyboard is on as well. A
-   ring there drew a box inside the list's own ring. */
+   ring there drew a box inside the list's own ring. An image and not a
+   color, so it lies over the selected row's surface and the keyboard shows
+   on the row it starts on. */
 [part~="note"]:hover,
 [part="list"]:focus-visible [part~="note-cursor"] {
-  background-color: light-dark(
+  --_graph-wash: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
     color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
   );
+
+  background-image: linear-gradient(var(--_graph-wash), var(--_graph-wash));
 }
 
+/* The name keeps its room and the relation gives way first: a reader finds
+   a note by its name, and the relation is said in full to a screen reader
+   whatever is cut here. */
 [part="note-name"] {
+  flex: 0 1 auto;
+  max-inline-size: 70%;
   min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -139,24 +189,23 @@
 
 [part="note-relation"] {
   color: var(--helix-color-foreground-muted);
-  flex: none;
+  flex: 1 1 0;
   font-size: var(--helix-text-xs);
-  margin-inline-start: auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-align: end;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* A surface and not the accent, as a tree marks its selected row, and the
+   name's weight, so the note the list is about reads as its heading. */
 [part~="note-selected"] {
-  background-color: var(--helix-color-primary-subtle);
-  color: var(--helix-color-foreground);
-  font-weight: var(--helix-weight-semibold);
+  background-color: var(--helix-color-surface-sunken);
 }
 
-[part~="note-selected"]:hover,
-[part="list"]:focus-visible [part~="note-selected"][part~="note-cursor"] {
-  background-color: color-mix(
-    in oklab,
-    var(--helix-color-primary-subtle),
-    var(--helix-color-foreground) 8%
-  );
+[part~="note-selected"] [part="note-name"] {
+  font-weight: var(--helix-weight-semibold);
 }
 
 [part="header"],
@@ -170,7 +219,8 @@
     outline-offset: calc(var(--helix-size-focus-offset) * -1);
   }
 
-  [part~="note-selected"] {
+  [part~="note-selected"],
+  [part~="note-selected"] [part="note-relation"] {
     background-color: Highlight;
     color: HighlightText;
     forced-color-adjust: none;
