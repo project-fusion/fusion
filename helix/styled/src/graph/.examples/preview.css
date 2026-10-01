@@ -1,0 +1,10 @@
+.stand-in {
+  align-items: center;
+  background-image: radial-gradient(var(--helix-color-border) 1px, transparent 1px);
+  background-size: 24px 24px;
+  block-size: 100%;
+  color: var(--helix-color-foreground-subtle);
+  display: flex;
+  font-size: var(--helix-text-sm);
+  justify-content: center;
+}

@@ -819,6 +819,49 @@ export class HelixMapZoomEvent extends CustomEvent<ViewportZoomDetail> {
   }
 }
 
+/**
+ * The reader asked the graph to move. A request, as a map's is: Helix draws no
+ * graph, and the renderer the page slotted, or `connectGraph`, answers it.
+ */
+export class HelixGraphPanEvent extends CustomEvent<ViewportPanDetail> {
+  static readonly eventName = 'helix-graph-pan'
+
+  constructor(detail: ViewportPanDetail) {
+    super(HelixGraphPanEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** The reader asked the graph to zoom, a direction and not a level, as a map's is. */
+export class HelixGraphZoomEvent extends CustomEvent<ViewportZoomDetail> {
+  static readonly eventName = 'helix-graph-zoom'
+
+  constructor(detail: ViewportZoomDetail) {
+    super(HelixGraphZoomEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * The graph has been drawn whole, laid out and settled, sent once each time it
+ * is connected, from the frame, which then matches `:state(ready)`.
+ */
+export class HelixGraphReadyEvent extends Event {
+  static readonly eventName = 'helix-graph-ready'
+
+  constructor() {
+    super(HelixGraphReadyEvent.eventName, { bubbles: true, cancelable: false, composed: true })
+  }
+}
+
 /** A rotate request: turn by some degrees, or turn to a bearing. */
 export interface MapRotateDetail {
   /** Degrees to turn the map clockwise. Negative turns it counterclockwise. */
@@ -1680,6 +1723,9 @@ const registry = {
   HelixDismissEvent,
   HelixFacetEvent,
   HelixFilterEvent,
+  HelixGraphPanEvent,
+  HelixGraphReadyEvent,
+  HelixGraphZoomEvent,
   HelixHistoryEvent,
   HelixMapClusterEvent,
   HelixMapPanEvent,
