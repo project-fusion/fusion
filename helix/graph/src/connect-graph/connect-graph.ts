@@ -75,6 +75,8 @@ export interface GraphDriver {
   gestures?(mode: ViewportGestureMode): void
   /** The element the renderer made focusable, which the connector takes out of the tab order. */
   focusTarget?(): HTMLElement | null
+  /** Removes whatever the driver added to the renderer or the page, when the connection ends. */
+  stop?(): void
 }
 
 /** How a connection behaves where the page does not say. */
@@ -93,6 +95,12 @@ export interface GraphConnection {
   disconnect(): void
   /** Lays the graph out again from where it starts, ignoring where the last layout put each note. */
   relayout(): void
+  /**
+   * Reads the page's colors again. The connection hears a theme that changes
+   * by a class, a mode or the reader's preference on its own; call this after
+   * replacing a stylesheet, which no attribute shows.
+   */
+  restyle(): void
 }
 
 /** The frame as the connector reads it: `helix-graph` or `helix-headless-graph`. */
@@ -315,11 +323,16 @@ export const connectGraph = (
         }
       }
       driver.gestures?.('free')
+      driver.stop?.()
       graph.drawn?.(false)
     },
     relayout: () => {
       known = new Map()
       draw()
+    },
+    restyle: () => {
+      colors = null
+      restyle()
     },
   }
 }

@@ -33,6 +33,9 @@ const connection = connectGraph(
 // Keep where the layout put each note, and pass it back as `x` and `y` next time.
 frame.addEventListener('helix-graph-layout', (event) => save(event.detail.positions))
 
+// After replacing a stylesheet, which no attribute shows:
+connection.restyle()
+
 // Later, when the graph goes away:
 connection.disconnect()
 ```

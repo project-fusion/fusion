@@ -13,6 +13,8 @@ export interface GraphColors {
   ink: string
   /** A note in no group, and the links that touch the selected note: `foreground-muted`. */
   muted: string
+  /** What a note's name is drawn on while the pointer is over it: `surface-overlay`. */
+  overlay: string
   /** The selected note: `primary`. */
   primary: string
   /** One color for each group, in the order of the groups' names: `series-1` and on. */
@@ -28,6 +30,7 @@ const TOKENS = {
   ink: '--helix-color-foreground',
   line: '--helix-color-border',
   muted: '--helix-color-foreground-muted',
+  overlay: '--helix-color-surface-overlay',
   primary: '--helix-color-primary',
 } as const
 
@@ -95,8 +98,15 @@ export interface NodeLook {
   color: string
   /** Outside the local graph that `depth` keeps. */
   hidden: boolean
-  /** Its name is drawn whatever the room, as the selected note's and its neighbors' are. */
-  label: boolean
+  /**
+   * When its name is drawn: `always`, whatever the room, as the selected
+   * note's is; `room`, where it does not cover another name, as the
+   * renderer decides for every note at rest; `never`, as a faded note's is.
+   *
+   * **The neighbors get room and not always.** Forced, a hub's twenty
+   * neighbors drew their names over each other in a knot nobody could read.
+   */
+  label: 'always' | 'never' | 'room'
   /** Drawn over the rest, as the selected note and its neighbors are. */
   raised: boolean
   /** The selected note. */
@@ -116,6 +126,8 @@ export interface GraphLooks {
   font: string
   /** The color the labels are drawn in. */
   ink: string
+  /** What a name is drawn on while the pointer is over its note. */
+  overlay: string
   link(source: string, target: string): LinkLook
   node(id: string): NodeLook
 }
@@ -129,7 +141,8 @@ const FADED = 0.75
  * **The neighborhood stands out and the rest steps back**, which is what
  * selecting a note in a graph of thousands is for: the selected note in the
  * brand color, the notes it links to and from in their groups' colors with
- * their names drawn, and every other note faded toward the ground. With
+ * their names drawn where there is room, and every other note faded toward
+ * the ground, unnamed. With
  * nothing selected, every note is in its group's color.
  *
  * Groups take the series in the order of their names, so a group keeps its
@@ -175,7 +188,7 @@ export const looksOf = (options: {
         return {
           color: colors.primary,
           hidden: hidden(id),
-          label: true,
+          label: 'always',
           raised: true,
           selected: true,
         }
@@ -184,10 +197,11 @@ export const looksOf = (options: {
       return {
         color: focused && !neighbor ? mixRgb(own(id), colors.ground, FADED) : own(id),
         hidden: hidden(id),
-        label: neighbor,
+        label: focused && !neighbor ? 'never' : 'room',
         raised: neighbor,
         selected: false,
       }
     },
+    overlay: colors.overlay,
   }
 }

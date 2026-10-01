@@ -71,6 +71,7 @@ const rendererOf = () => {
     off: (_type, listener) => listeners.delete(listener),
     on: (_type, listener) => listeners.add(listener),
     refresh: () => {},
+    resize: () => {},
     setSetting: (name, value) => settings.set(name, value),
     /* A framed graph one unit across the 800 pixels. */
     viewportToFramedGraph: ({ x, y }) => ({ x: x / 800, y: y / 400 }),
@@ -100,10 +101,11 @@ const looks: GraphLooks = {
   node: (id) => ({
     color: id === 'a' ? 'rgb(0, 0, 255)' : 'rgb(7, 7, 7)',
     hidden: id === 'c',
-    label: id === 'a',
+    label: id === 'a' ? 'always' : id === 'b' ? 'never' : 'room',
     raised: id === 'a',
     selected: id === 'a',
   }),
+  overlay: 'rgb(4, 5, 6)',
 }
 
 describe('sigmaDriver', () => {
@@ -141,7 +143,13 @@ describe('sigmaDriver', () => {
       forceLabel: true,
       hidden: false,
     })
-    expect(node('b', { size: 4 })).toMatchObject({ size: 4, zIndex: 0 })
+    expect(node('b', { label: 'Bravo', size: 4 })).toMatchObject({
+      label: null,
+      size: 4,
+      zIndex: 0,
+    })
+    expect(node('d', { label: 'Delta' })).toMatchObject({ forceLabel: false, label: 'Delta' })
+    expect(typeof settings.get('defaultDrawNodeHover')).toBe('function')
     expect(node('c', {}).hidden).toBe(true)
     expect(edge('e', { from: 'a', to: 'b' })).toMatchObject({ color: 'rgb(9, 9, 9)', size: 1.5 })
     expect(settings.get('labelColor')).toEqual({ color: 'rgb(1, 2, 3)' })
@@ -196,6 +204,19 @@ describe('sigmaDriver', () => {
     driver.gestures?.('free')
     wheel()
     expect(reached).toEqual(['wheel', 'mousedown', 'wheel'])
+  })
+
+  test('stopping lets every gesture through again and puts the touch action back', () => {
+    const renderer = rendererOf()
+    renderer.container.style.touchAction = 'none'
+    const reached: string[] = []
+    renderer.container.addEventListener('mousedown', () => reached.push('mousedown'))
+    const driver = sigmaDriver(renderer.sigma)
+    driver.gestures?.('off')
+    driver.stop?.()
+    renderer.container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    expect(reached).toEqual(['mousedown'])
+    expect(renderer.container.style.touchAction).toBe('none')
   })
 
   test('runs the layout over the notes without a place and stops once they are still', async () => {

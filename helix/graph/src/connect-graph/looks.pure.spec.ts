@@ -6,6 +6,7 @@ const colors: GraphColors = {
   ink: 'rgb(250, 250, 250)',
   line: 'rgb(100, 100, 100)',
   muted: 'rgb(150, 150, 150)',
+  overlay: 'rgb(40, 40, 40)',
   primary: 'rgb(0, 0, 255)',
   series: ['rgb(255, 0, 0)', 'rgb(0, 255, 0)'],
 }
@@ -29,6 +30,10 @@ describe('mixRgb', () => {
 })
 
 describe('looksOf', () => {
+  test('names every note where there is room while nothing is selected', () => {
+    expect(looks().node('d').label).toBe('room')
+  })
+
   test('colors each group from the series in the order of the groups’ names', () => {
     expect(looks().node('b').color).toBe('rgb(255, 0, 0)')
     expect(looks().node('a').color).toBe('rgb(0, 255, 0)')
@@ -40,19 +45,19 @@ describe('looksOf', () => {
     expect(drawn.node('a')).toEqual({
       color: colors.primary,
       hidden: false,
-      label: true,
+      label: 'always',
       raised: true,
       selected: true,
     })
     expect(drawn.node('b')).toEqual({
       color: 'rgb(255, 0, 0)',
       hidden: false,
-      label: true,
+      label: 'room',
       raised: true,
       selected: false,
     })
     expect(drawn.node('d').color).toBe(mixRgb('rgb(0, 255, 0)', colors.ground, 0.75))
-    expect(drawn.node('d').label).toBe(false)
+    expect(drawn.node('d').label).toBe('never')
   })
 
   test('raises the links that touch the selected note, and hides what depth leaves out', () => {
