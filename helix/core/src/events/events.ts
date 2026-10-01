@@ -875,9 +875,10 @@ export interface MapPartChangeDetail {
    * `layer` for a route or an area, which is redrawn; `place` for a marker or
    * a position, which is moved; `cluster` for a marker gathered into another
    * or let go, which moves the frame's tab stop; `menu` for the frame's layers
-   * menu opening, which asks for its map-type previews.
+   * menu opening, which asks for its map-type previews; `gestures` for which
+   * gestures the map takes, which the renderer is told.
    */
-  kind: 'cluster' | 'layer' | 'menu' | 'place'
+  kind: 'cluster' | 'gestures' | 'layer' | 'menu' | 'place'
 }
 
 /**

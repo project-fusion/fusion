@@ -29,6 +29,13 @@ export interface LeafletAttribution {
   remove(): unknown
 }
 
+/** One of Leaflet's gesture handlers, as far as the driver switches it. */
+export interface LeafletHandler {
+  disable(): unknown
+  enable(): unknown
+  enabled(): boolean
+}
+
 /**
  * The part of a Leaflet `Map` the driver uses, so this package imports no
  * renderer and a page brings whichever version it has.
@@ -60,6 +67,16 @@ export interface LeafletMap {
   zoomControl?: { remove(): unknown } | undefined
   /** How far the view is zoomed in. */
   getZoom?(): number
+  /** The wheel's zoom, one of the handlers a frame's `gestures` switches. */
+  scrollWheelZoom?: LeafletHandler | undefined
+  /** Dragging the map, by a mouse or one finger. */
+  dragging?: LeafletHandler | undefined
+  /** Two fingers zooming the map. */
+  touchZoom?: LeafletHandler | undefined
+  /** The place under a pointer, which a zoom with the wheel is made round. */
+  mouseEventToLatLng?(event: MouseEvent): { lat: number; lng: number }
+  /** Zooms keeping a place where it is on screen. */
+  setZoomAround?(latlng: { lat: number; lng: number }, zoom: number): unknown
   zoomIn(delta?: number, options?: { animate?: boolean }): unknown
   zoomOut(delta?: number, options?: { animate?: boolean }): unknown
 }
@@ -135,6 +152,18 @@ interface LeafletShapeOptions {
 }
 
 /**
+ * What each map had before a frame first told it, and the wheel listener a
+ * cooperative map is zoomed by, by map.
+ */
+const gestureState = new WeakMap<
+  LeafletMap,
+  {
+    had: Record<'drag' | 'scroll' | 'touch', boolean>
+    wheel?: ((event: WheelEvent) => void) | undefined
+  }
+>()
+
+/**
  * Drives a Leaflet map from the Map frame.
  *
  * **The credit is the control's prefix and every layer's attribution**, in the
@@ -188,14 +217,66 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
     )
   },
   focusTarget: () => map.getContainer(),
+  /* **Ready once every tile layer still loading has loaded**, each firing
+     its own `load`, or at once where none is. */
+  /* **Leaflet has no cooperative mode of its own**, so this is one. The
+     wheel's zoom is off, and a wheel with Ctrl or ⌘ zooms round the pointer;
+     on a device whose pointer is a finger, one finger no longer drags, so it
+     scrolls the page, and two still zoom. A mouse drags the map as ever. What
+     the page had is kept from the first time and put back for `free`. */
+  gestures: (mode) => {
+    const handlers = { drag: map.dragging, scroll: map.scrollWheelZoom, touch: map.touchZoom }
+    const state = gestureState.get(map) ?? {
+      had: {
+        drag: handlers.drag?.enabled() ?? false,
+        scroll: handlers.scroll?.enabled() ?? false,
+        touch: handlers.touch?.enabled() ?? false,
+      },
+    }
+    gestureState.set(map, state)
+    const finger = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches
+    const want =
+      mode === 'free'
+        ? state.had
+        : mode === 'cooperative'
+          ? { drag: !finger, scroll: false, touch: true }
+          : { drag: false, scroll: false, touch: false }
+    for (const name of ['drag', 'scroll', 'touch'] as const) {
+      const handler = handlers[name]
+      if (handler && handler.enabled() !== want[name]) {
+        if (want[name]) {
+          handler.enable()
+        } else {
+          handler.disable()
+        }
+      }
+    }
+    const box = map.getContainer()
+    if (state.wheel) {
+      box.removeEventListener('wheel', state.wheel)
+      state.wheel = undefined
+    }
+    if (mode === 'cooperative' && map.mouseEventToLatLng && map.setZoomAround && map.getZoom) {
+      state.wheel = (event: WheelEvent): void => {
+        if (!(event.ctrlKey || event.metaKey)) {
+          return
+        }
+        event.preventDefault()
+        const at = map.mouseEventToLatLng?.(event)
+        const zoom = map.getZoom?.()
+        if (at && zoom !== undefined) {
+          map.setZoomAround?.(at, zoom - Math.sign(event.deltaY) * 0.5)
+        }
+      }
+      box.addEventListener('wheel', state.wheel, { passive: false })
+    }
+  },
   onView: (moved) => {
     map.on('move zoom resize', moved)
     return () => {
       map.off('move zoom resize', moved)
     }
   },
-  /* **Ready once every tile layer still loading has loaded**, each firing
-     its own `load`, or at once where none is. */
   ready: (done) => {
     const loading: LeafletLayer[] = []
     map.eachLayer((layer) => {

@@ -10,6 +10,7 @@ export function Example() {
         data-preview-map-landmarks="false"
         data-preview-map-view="30.2672,-97.7431,13.5,40,0"
         fill
+        gestures="cooperative"
         label="Downtown Austin"
       >
         <div data-preview-map-canvas></div>

@@ -25,6 +25,96 @@ const map = async (extra = ''): Promise<Map> =>
 const control = (host: Map, name: string): HTMLElement | null =>
   (host.shadowRoot?.querySelector(`[part~="${name}"]`) as HTMLElement) ?? null
 
+describe('map frame, gestures', () => {
+  type Gestured = Map & { gestureMode: string; gestures: string }
+
+  const hint = (host: Map): string => {
+    const shown = control(host, 'gesture-hint')
+    return shown && !shown.hidden ? (shown.textContent ?? '') : ''
+  }
+  /* The modifier set on the event itself as well, which happy-dom's
+     constructor leaves out and a browser's does not. */
+  const wheel = (host: Map, init: WheelEventInit = {}): void => {
+    const event = new WheelEvent('wheel', { bubbles: true, deltaY: 40, ...init })
+    Object.defineProperty(event, 'ctrlKey', { value: init.ctrlKey === true })
+    host.querySelector('canvas')?.dispatchEvent(event)
+  }
+  const press = (target: Element, type = 'pointerdown', pointerType = 'mouse'): void => {
+    target.dispatchEvent(new PointerEvent(type, { bubbles: true, composed: true, pointerType }))
+  }
+
+  test('by default the renderer takes every gesture and the frame says nothing', async () => {
+    const host = (await map()) as Gestured
+    expect(host.gestures).toBeUndefined()
+    expect(host.gestureMode).toBe('free')
+    wheel(host)
+    await host.updateComplete
+    expect(hint(host)).toBe('')
+  })
+
+  test('cooperative: a plain wheel and one finger are the page’s, and the frame says how to reach the map', async () => {
+    const host = (await map('gestures="cooperative"')) as Gestured
+    const told: string[] = []
+    host.addEventListener('helix-map-part-change', (event) =>
+      told.push((event as CustomEvent).detail.kind),
+    )
+    expect(host.gestureMode).toBe('cooperative')
+    /* Ctrl or ⌘ with the wheel is the map's, a trackpad's pinch among them. */
+    wheel(host, { ctrlKey: true })
+    await host.updateComplete
+    expect(hint(host)).toBe('')
+    wheel(host)
+    await host.updateComplete
+    expect(hint(host)).toMatch(/^Use (Ctrl|⌘) and scroll to zoom the map$/)
+    const canvas = host.querySelector('canvas') as HTMLCanvasElement
+    const touch = new TouchEvent('touchmove', { bubbles: true })
+    Object.defineProperty(touch, 'touches', { value: [{}] })
+    canvas.dispatchEvent(touch)
+    await host.updateComplete
+    expect(hint(host)).toBe('Use two fingers to move the map')
+    host.gestures = 'always'
+    await host.updateComplete
+    expect(told).toContain('gestures')
+  })
+
+  test('activate: nothing until the map is pressed, and given back on Escape, on leaving, or on a press elsewhere', async () => {
+    const host = (await map('gestures="activate"')) as Gestured
+    const canvas = host.querySelector('canvas') as HTMLCanvasElement
+    const region = control(host, 'region') as HTMLElement
+    expect(host.gestureMode).toBe('off')
+    wheel(host)
+    await host.updateComplete
+    expect(hint(host)).toBe('Press the map to use it')
+
+    press(canvas)
+    await host.updateComplete
+    expect(host.gestureMode).toBe('free')
+    expect(hasState(host, 'using')).toBe(true)
+    expect(control(host, 'gesture-status')?.hidden).toBe(false)
+
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+    await host.updateComplete
+    expect(host.gestureMode).toBe('off')
+
+    press(canvas)
+    await host.updateComplete
+    /* A finger lifting is a `pointerleave`, and a tap is not a release. */
+    press(region, 'pointerleave', 'touch')
+    await host.updateComplete
+    expect(host.gestureMode).toBe('free')
+    press(region, 'pointerleave', 'mouse')
+    await host.updateComplete
+    expect(host.gestureMode).toBe('off')
+
+    press(canvas)
+    await host.updateComplete
+    press(document.body)
+    await host.updateComplete
+    expect(host.gestureMode).toBe('off')
+    expect(hasState(host, 'using')).toBe(false)
+  })
+})
+
 describe('map frame, drawn', () => {
   test('says it once each time the map is drawn whole, in an event, a state and `ready`', async () => {
     const host = (await map()) as Awaited<ReturnType<typeof map>> & {
