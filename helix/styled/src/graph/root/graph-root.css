@@ -52,6 +52,9 @@
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
   color: var(--helix-color-foreground);
   display: grid;
+  /* A column the panel's width and no wider: the field's own width, which
+     the font decides, grew it past the panel where a face set wide. */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
   min-block-size: 0;
 }

@@ -76,6 +76,7 @@ helix-headless-graph::part(panel) {
   background-color: var(--_gray-surface);
   border-inline-start: 1px solid var(--_gray-edge);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
   min-block-size: 0;
 }
