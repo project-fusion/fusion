@@ -1,8 +1,10 @@
-import { html, type LitElement, nothing, type TemplateResult } from 'lit'
+import { html, type LitElement, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { FullscreenController } from '../../controllers/fullscreen-controller/fullscreen-controller.js'
 import { IdleController } from '../../controllers/idle-controller/idle-controller.js'
 import type { ViewportPanDetail, ViewportZoomDetail } from '../../events/events.js'
+import type { HelixElement } from '../../helix-element/helix-element.js'
+import { fillTemplate } from '../../utils/fill-template/fill-template.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
 
@@ -14,6 +16,30 @@ export type ViewportWay = 'up' | 'down' | 'start' | 'end'
 
 /** Where the controls sit, in the corner words the rest of the library uses. */
 export type ViewportControlsPlacement = 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end'
+
+/** Which gestures a surface takes from the page. */
+export type ViewportGestures = 'activate' | 'always' | 'cooperative'
+
+/**
+ * Which gestures the thing drawing the surface takes right now: all of them,
+ * the cooperative set, or none, while an `activate` surface waits to be pressed.
+ */
+export type ViewportGestureMode = 'cooperative' | 'free' | 'off'
+
+/** The words a surface says about its gestures, where the page does not say them. */
+export interface ViewportGestureLabels {
+  /** The hint while an `activate` surface waits to be pressed. */
+  activate: string
+  /** The hint when one finger swipes over a `cooperative` surface. */
+  twoFinger: string
+  /** The line while an `activate` surface has the gestures. */
+  using: string
+  /** The hint when the wheel scrolls past a `cooperative` surface, with `{key}`. */
+  wheel: string
+}
+
+/** How long a hint shows over the surface, in milliseconds: long enough to read twice. */
+const HINT_SHOWS = 1600
 
 /**
  * The API a pan-and-zoom surface has, as TypeScript sees it.
@@ -27,6 +53,42 @@ export declare class ViewportElement {
 
   /** The fullscreen button's label. */
   fullscreenLabel: string
+
+  /** Which gestures the surface takes from the page. Unset is the family's own. */
+  gestures?: ViewportGestures
+
+  /** The hint while a surface with `gestures="activate"` waits to be pressed. */
+  activateHintLabel?: string
+
+  /** The hint when one finger swipes over a surface with `gestures="cooperative"`. */
+  twoFingerHintLabel?: string
+
+  /** The line while a surface with `gestures="activate"` has the gestures. */
+  usingLabel?: string
+
+  /** The hint when the wheel scrolls past a surface with `gestures="cooperative"`, with `{key}`. */
+  wheelHintLabel?: string
+
+  /** @internal Which gestures the thing drawing the surface takes right now. */
+  get gestureMode(): ViewportGestureMode
+
+  /** What the surface says about its gestures where the page does not say it, which each family says for itself. */
+  protected get restingGestureLabels(): ViewportGestureLabels
+
+  /** Whether an `activate` surface has been pressed, and has the gestures. */
+  protected gesturesTaken: boolean
+
+  /** Whether a gesture that started with this event is the surface's to answer. */
+  protected gestureAllowed(event: Event): boolean
+
+  /** Says that `gestureMode` changed, for a family that tells a renderer. */
+  protected gesturesChanged(): void
+
+  /** The pointer leaving the frame, bound by the family's own region. */
+  protected handlePointerLeave: (event: PointerEvent) => void
+
+  /** The hint and the line in use, drawn inside the family's viewport. */
+  protected renderGestures(): TemplateResult
 
   /** How long, in milliseconds, before the header and footer hide when the user is inactive. `0` keeps them visible. */
   idleDelay: number
@@ -144,8 +206,15 @@ export declare class ViewportElement {
  * manifest cannot see: a loop over the four pan buttons would publish `pan-`
  * and a consumer's `::part(pan-up)` would match nothing.
  */
-export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
+export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
   class Viewport extends Base {
+    /**
+     * The hint shown when a surface waiting to be pressed is scrolled or
+     * swiped over, with `gestures="activate"`. Absent is the family's own.
+     */
+    @property({ attribute: 'activate-hint-label' })
+    activateHintLabel?: string
+
     /**
      * Which controls to show, as a list such as `pan zoom fullscreen`, or
      * `none`. A family can add words of its own.
@@ -204,6 +273,30 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     fullscreenLabel = 'Fill the screen'
 
     /**
+     * Which gestures the surface takes from the page.
+     *
+     * - `always`: the surface takes the wheel and one finger, for a surface
+     *   that is the page, such as a full-screen view. A map rests here.
+     * - Unset is the family's own: `always` for a map, and for a board, a
+     *   drag and a pinch, with the plain wheel left to the page until the
+     *   board fills the screen.
+     * - `cooperative`: the wheel and one finger scroll the page, and the
+     *   surface takes Ctrl or ⌘ with the wheel, and two fingers. The frame
+     *   says so when a gesture passes to the page. Best for a surface embedded
+     *   in a page.
+     * - `activate`: the surface takes nothing until it is pressed, and gives it
+     *   back on Escape, when the pointer leaves it, or on a press elsewhere.
+     *
+     * The keyboard and the frame's buttons work in every mode.
+     *
+     * **Unreflected and without a default**, because a default that reflected
+     * would write an attribute onto every host that no server sent, and the
+     * hydration that followed would disagree with it.
+     */
+    @property()
+    gestures?: ViewportGestures
+
+    /**
      * How long, in milliseconds, before the header and footer hide when the user is inactive. `0` keeps them visible.
      *
      * Zero keeps it up, which is the default: these controls are how a keyboard
@@ -248,6 +341,28 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     @property({ attribute: 'pan-up-label' })
     panUpLabel = 'Pan up'
 
+    /**
+     * The hint shown when one finger swipes over a surface with
+     * `gestures="cooperative"`. Absent is the family's own.
+     */
+    @property({ attribute: 'two-finger-hint-label' })
+    twoFingerHintLabel?: string
+
+    /**
+     * The line shown while a surface with `gestures="activate"` has the
+     * gestures. Absent is the family's own.
+     */
+    @property({ attribute: 'using-label' })
+    usingLabel?: string
+
+    /**
+     * The hint shown when the wheel scrolls past a surface with
+     * `gestures="cooperative"`, with `{key}`, which is ⌘ on a Mac and Ctrl
+     * elsewhere. Absent is the family's own.
+     */
+    @property({ attribute: 'wheel-hint-label' })
+    wheelHintLabel?: string
+
     /** The zoom in button's label. */
     @property({ attribute: 'zoom-in-label' })
     zoomInLabel = 'Zoom in'
@@ -259,6 +374,28 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
     /** Whether the surface is filling the screen. */
     @state()
     protected filled = false
+
+    /** Whether an `activate` surface has been pressed, and has the gestures. */
+    @state()
+    protected gesturesTaken = false
+
+    /** The hint over the surface while one shows, put there by a gesture it let pass. */
+    @state()
+    private hint = ''
+
+    /** When the hint goes. */
+    private hinting: ReturnType<typeof setTimeout> | undefined
+
+    /**
+     * Where the gesture was, in the viewport's box, which the hint is shown
+     * at: where the reader is looking, and on the surface wherever a page laid
+     * its own content over the rest of it.
+     */
+    @state()
+    private hintAt: { x: number; y: number } | undefined
+
+    /** The press that took the gestures, which is not also the first gesture. */
+    private takenBy: Event | undefined
 
     protected readonly fullscreen = new FullscreenController(this, (full) => {
       this.filled = full
@@ -285,6 +422,217 @@ export const MixinViewport = <T extends Constructor<LitElement>>(Base: T) => {
      */
     protected get restingControlsLabel(): string {
       return 'View controls'
+    }
+
+    /**
+     * What the surface says about its gestures where the page does not say
+     * it, which a family overrides to name what it is: "Press the map to use
+     * it" reads better than a word that fits every surface.
+     */
+    protected get restingGestureLabels(): ViewportGestureLabels {
+      return {
+        activate: 'Press to use it',
+        twoFinger: 'Use two fingers to move it',
+        using: 'In use. Press Escape to scroll the page again.',
+        wheel: 'Use {key} and scroll to zoom',
+      }
+    }
+
+    /**
+     * @internal Which gestures the thing drawing the surface takes: all of
+     * them, the cooperative set, or none, while an `activate` surface waits to
+     * be pressed. A connector reads it and tells the renderer.
+     */
+    get gestureMode(): ViewportGestureMode {
+      if (this.gestures === 'cooperative') {
+        return 'cooperative'
+      }
+      return this.gestures === 'activate' && !this.gesturesTaken ? 'off' : 'free'
+    }
+
+    /**
+     * Whether a gesture that started with this event is the surface's to
+     * answer, for a family that answers gestures itself. Never while an
+     * `activate` surface waits, and never on the press that ended the wait:
+     * that press hands over the gestures and moves nothing.
+     */
+    protected gestureAllowed(event: Event): boolean {
+      return this.gestureMode !== 'off' && event !== this.takenBy
+    }
+
+    /**
+     * Says that `gestureMode` changed. Nothing here; a family whose renderer
+     * is told through a connector says it with its own event.
+     */
+    protected gesturesChanged(): void {}
+
+    /** Shows a hint over the surface for a moment, where the gesture was. */
+    private showHint(words: string, at?: { clientX: number; clientY: number }): void {
+      const box = this.renderRoot?.querySelector?.('[part="viewport"]')?.getBoundingClientRect()
+      this.hintAt =
+        at && box && box.width > 0 && box.height > 0
+          ? { x: (at.clientX - box.left) / box.width, y: (at.clientY - box.top) / box.height }
+          : undefined
+      this.hint = words
+      clearTimeout(this.hinting)
+      this.hinting = setTimeout(() => {
+        this.hint = ''
+      }, HINT_SHOWS)
+    }
+
+    /**
+     * A wheel the surface let pass to the page, which is said: a reader
+     * scrolling the page past a surface that did not zoom is told why, and how
+     * to zoom it. **Ctrl or ⌘ with the wheel is the surface's**, and is what a
+     * trackpad's pinch arrives as.
+     */
+    private readonly handleGestureWheel = (event: WheelEvent): void => {
+      if (this.gestures === 'cooperative' && !(event.ctrlKey || event.metaKey)) {
+        const mac = typeof navigator !== 'undefined' && navigator.userAgent.includes('Mac')
+        const words = this.wheelHintLabel ?? this.restingGestureLabels.wheel
+        this.showHint(fillTemplate(words, { key: mac ? '⌘' : 'Ctrl' }), event)
+      } else if (this.gestures === 'activate' && !this.gesturesTaken) {
+        this.showHint(this.activateHintLabel ?? this.restingGestureLabels.activate, event)
+      }
+    }
+
+    /** One finger moving over the surface, which scrolls the page, and is said. */
+    private readonly handleGestureTouch = (event: TouchEvent): void => {
+      const finger = event.touches[0]
+      if (event.touches.length !== 1) {
+        return
+      }
+      if (this.gestures === 'cooperative') {
+        this.showHint(this.twoFingerHintLabel ?? this.restingGestureLabels.twoFinger, finger)
+      } else if (this.gestures === 'activate' && !this.gesturesTaken) {
+        this.showHint(this.activateHintLabel ?? this.restingGestureLabels.activate, finger)
+      }
+    }
+
+    /** A press on the surface itself, which hands a waiting surface the gestures. */
+    private readonly handleTake = (event: PointerEvent): void => {
+      const viewport = this.renderRoot?.querySelector?.('[part="viewport"]')
+      if (this.gestures !== 'activate' || this.gesturesTaken || !viewport) {
+        return
+      }
+      /* On the surface: its viewport, or what the page put in it, which is the
+         frame's own children in no named slot, the renderer's box among them. */
+      const path = event.composedPath()
+      const on =
+        path.includes(viewport) ||
+        path.some((one) => one instanceof Element && one.parentElement === this && one.slot === '')
+      if (on) {
+        this.takenBy = event
+        this.gesturesTaken = true
+        this.hint = ''
+      }
+    }
+
+    /** Escape, which gives the page its scroll back. */
+    private readonly handleGiveBackKey = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape' && this.gesturesTaken) {
+        this.gesturesTaken = false
+      }
+    }
+
+    /** A press anywhere else on the page, which gives it its scroll back. */
+    private readonly handleGiveBackOutside = (event: PointerEvent): void => {
+      if (!event.composedPath().includes(this)) {
+        this.gesturesTaken = false
+      }
+    }
+
+    /** The window losing focus, as a reader switching away does. */
+    private readonly handleGiveBackBlur = (): void => {
+      this.gesturesTaken = false
+    }
+
+    /**
+     * The pointer leaving the frame, which the family binds on its region.
+     * **Heard on the frame and not the drawing**, which a pointer resting on
+     * something raised over it has left. **A mouse or a pen and never a
+     * finger**, whose `pointerleave` is the finger lifting: a tap took the
+     * surface and gave it back in one.
+     */
+    protected readonly handlePointerLeave = (event: PointerEvent): void => {
+      this.idle.leave()
+      if (event.pointerType !== 'touch') {
+        this.gesturesTaken = false
+      }
+    }
+
+    override connectedCallback(): void {
+      super.connectedCallback()
+      this.addEventListener('keydown', this.handleGiveBackKey)
+      this.addEventListener('pointerdown', this.handleTake)
+      this.addEventListener('touchmove', this.handleGestureTouch, { passive: true })
+      this.addEventListener('wheel', this.handleGestureWheel, { passive: true })
+    }
+
+    override disconnectedCallback(): void {
+      super.disconnectedCallback()
+      this.removeEventListener('keydown', this.handleGiveBackKey)
+      this.removeEventListener('pointerdown', this.handleTake)
+      this.removeEventListener('touchmove', this.handleGestureTouch)
+      this.removeEventListener('wheel', this.handleGestureWheel)
+      clearTimeout(this.hinting)
+      this.gesturesTaken = false
+      document.removeEventListener('pointerdown', this.handleGiveBackOutside)
+      window.removeEventListener('blur', this.handleGiveBackBlur)
+    }
+
+    /**
+     * The states a stylesheet reads the gestures by: `using` while an
+     * `activate` surface has them, and `sharing` while the page keeps one
+     * finger and the plain wheel, which is where a surface that answers
+     * touches itself lets the page scroll.
+     */
+    protected override willUpdate(changed: PropertyValues): void {
+      super.willUpdate(changed)
+      this.toggleState('using', this.gesturesTaken)
+      this.toggleState(
+        'sharing',
+        this.gestures === 'cooperative' || (this.gestures === 'activate' && !this.gesturesTaken),
+      )
+    }
+
+    /**
+     * Which gestures the renderer takes, which the family's connector hears
+     * from `gesturesChanged`; and while a waiting surface has them, the page
+     * listened to for their return.
+     */
+    protected override updated(changed: PropertyValues): void {
+      super.updated(changed)
+      if (!changed.has('gestures') && !changed.has('gesturesTaken')) {
+        return
+      }
+      if (this.gestures !== 'activate' && this.gesturesTaken) {
+        this.gesturesTaken = false
+      }
+      if (this.gesturesTaken) {
+        document.addEventListener('pointerdown', this.handleGiveBackOutside)
+        window.addEventListener('blur', this.handleGiveBackBlur)
+      } else {
+        document.removeEventListener('pointerdown', this.handleGiveBackOutside)
+        window.removeEventListener('blur', this.handleGiveBackBlur)
+      }
+      this.gesturesChanged()
+    }
+
+    /**
+     * The hint over the surface and the line while it is in use, which the
+     * family draws inside its viewport, over what was slotted. The parts are
+     * written out, as the controls' are, so the manifest sees them.
+     */
+    protected renderGestures(): TemplateResult {
+      const at = this.hintAt
+      return html`<div
+          part="gesture-hint"
+          aria-hidden="true"
+          ?hidden=${this.hint === ''}
+          style=${at ? `--_viewport-hint-x: ${(at.x * 100).toFixed(2)}%; --_viewport-hint-y: ${(at.y * 100).toFixed(2)}%` : nothing}
+        >${this.hint}</div>
+        <div part="gesture-status" aria-hidden="true" ?hidden=${!this.gesturesTaken}>${this.usingLabel ?? this.restingGestureLabels.using}</div>`
     }
 
     /**

@@ -24,6 +24,7 @@ import {
   type MoveDetail,
   type ReconnectDetail,
   type RelabelDetail,
+  type ViewportGestureLabels,
   type ViewportPanDetail,
   type ViewportWay,
   type ViewportZoomDetail,
@@ -275,6 +276,8 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @csspart edges - The layer the connectors are drawn in.
  * @csspart footer - The strip below the board.
  * @csspart fullscreen - The button that makes the board fill the screen.
+ * @csspart gesture-hint - Words over the board for a moment when it lets a gesture pass to the page, such as how to zoom it.
+ * @csspart gesture-status - The line shown while a board with `gestures="activate"` has the gestures.
  * @csspart header - The strip above the board.
  * @csspart label - The label on a connector.
  * @csspart label-editor - The field for editing a connection's label or a group's name, placed over that text.
@@ -296,6 +299,8 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @cssstate holding - An item picked up with a click follows the pointer until the next press puts it down.
  * @cssstate idle - The user has been still for `idle-delay` milliseconds. The board's own controls stay; select on it to hide chrome of your own.
  * @cssstate pressing - While a press on the board, its cards or its connections is under way.
+ * @cssstate sharing - The page keeps the plain wheel and one finger, with `gestures="cooperative"` or while a board with `gestures="activate"` waits to be pressed.
+ * @cssstate using - A board with `gestures="activate"` has been pressed and has the gestures.
  */
 @customElement('helix-headless-canvas')
 export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
@@ -769,6 +774,16 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
 
   protected override get restingControlsLabel(): string {
     return 'Board controls'
+  }
+
+  /** What the board says about its gestures where the page does not say it. */
+  protected override get restingGestureLabels(): ViewportGestureLabels {
+    return {
+      activate: 'Press the board to use it',
+      twoFinger: 'Use two fingers to move the board',
+      using: 'Using the board. Press Escape to scroll the page again.',
+      wheel: 'Use {key} and scroll to zoom the board',
+    }
   }
 
   /**
@@ -1576,6 +1591,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * So the host listens, and the path says what was pressed.
    */
   private readonly handlePointerDown = (event: PointerEvent): void => {
+    /* **Nothing while a board with `gestures="activate"` waits**, and nothing
+       on the press that ends the wait, which hands over the gestures. */
+    if (!this.gestureAllowed(event)) {
+      return
+    }
     const path = event.composedPath()
     /* The primary button only, and never a press that began on a control: the
        buttons are inside this region and a press on one is not a drag. Nor one
@@ -1598,6 +1618,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         if (this.fingers.size === 2 && !this.pinching) {
           this.startPinch()
         }
+        return
+      }
+      /* **One finger is the page's on a cooperative board**, which scrolls
+         past it; two pinch and move the board. */
+      if (this.gestureMode === 'cooperative') {
         return
       }
     }
@@ -2123,13 +2148,20 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * the wheel is the board's.
    */
   private readonly handleWheel = (event: WheelEvent): void => {
-    if (!event.ctrlKey && !this.filled) {
+    /* **⌘ as well as Ctrl**, which is the key a cooperative board's hint
+       names on a Mac. A board with `gestures="always"` takes the plain wheel
+       as a filled one does, and one waiting to be pressed takes none. */
+    const zooming = event.ctrlKey || event.metaKey
+    if (!this.gestureAllowed(event)) {
+      return
+    }
+    if (!zooming && !this.filled && this.gestures !== 'always') {
       return
     }
     event.preventDefault()
     this.touched = true
     this.direct = true
-    if (event.ctrlKey) {
+    if (zooming) {
       /* **About the pointer, measured against the box rather than the target.**
          `offsetX` is relative to whatever the pointer is over, and over a board
          that is usually a card: a pinch on one scaled about a point a card's
@@ -2141,6 +2173,18 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     this.at = { ...this.at, x: this.at.x - event.deltaX, y: this.at.y - event.deltaY }
+  }
+
+  /**
+   * A second finger on a cooperative board, which would otherwise go on
+   * scrolling the page the first finger started: stopped at the start, so
+   * the two fingers pinch and move the board. **Not passive**, which is the
+   * only way a start can be stopped.
+   */
+  private readonly handleTouchStart = (event: TouchEvent): void => {
+    if (this.gestureMode === 'cooperative' && event.touches.length > 1) {
+      event.preventDefault()
+    }
   }
 
   /**
@@ -3070,6 +3114,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.addEventListener('pointerdown', this.handlePointerDown)
     this.addEventListener('pointermove', this.handlePointerMove)
     this.addEventListener('pointerup', this.handlePointerUp)
+    this.addEventListener('touchstart', this.handleTouchStart, { passive: false })
   }
 
   override disconnectedCallback(): void {
@@ -3090,6 +3135,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     this.removeEventListener('pointerdown', this.handlePointerDown)
     this.removeEventListener('pointermove', this.handlePointerMove)
     this.removeEventListener('pointerup', this.handlePointerUp)
+    this.removeEventListener('touchstart', this.handleTouchStart)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -3412,7 +3458,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       tabindex="0"
       @focusin=${this.idle.stir}
       @keydown=${this.handleKeydown}
-      @pointerleave=${this.idle.leave}
+      @pointerleave=${this.handlePointerLeave}
       @pointermove=${this.idle.stir}
     >
       <div part="header">
@@ -3447,6 +3493,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           ${this.renderMarquee(origin)}
         </div>
         <slot name="empty"></slot>
+        ${this.renderGestures()}
       </div>
       ${this.renderControls()}
       <span part="live" role="status">${this.said}</span>

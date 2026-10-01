@@ -239,6 +239,9 @@ export {
   MixinViewport,
   type ViewportControlsPlacement,
   type ViewportElement,
+  type ViewportGestureLabels,
+  type ViewportGestureMode,
+  type ViewportGestures,
   type ViewportWay,
 } from './mixins/mixin-viewport/mixin-viewport.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'

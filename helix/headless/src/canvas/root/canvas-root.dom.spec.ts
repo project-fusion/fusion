@@ -1561,6 +1561,109 @@ describe('canvas gestures', () => {
     expect(at(host).zoom).toBeGreaterThan(before.zoom)
   })
 
+  /** A wheel with its modifiers put back, which happy-dom's constructor drops. */
+  const wheel = (init: WheelEventInit = {}): WheelEvent => {
+    const event = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      deltaY: 40,
+      ...init,
+    })
+    Object.defineProperty(event, 'ctrlKey', { value: init.ctrlKey === true })
+    Object.defineProperty(event, 'metaKey', { value: init.metaKey === true })
+    return event
+  }
+
+  const hint = (host: Canvas): string => {
+    const shown = part(host, 'gesture-hint') as HTMLElement | null
+    return shown && !shown.hidden ? (shown.textContent ?? '') : ''
+  }
+
+  test('always: the plain wheel moves the board', async () => {
+    const host = await canvas('gestures="always"')
+    const before = at(host)
+    const event = wheel()
+    ;(part(host, 'viewport') as HTMLElement).dispatchEvent(event)
+    await host.updateComplete
+    expect(event.defaultPrevented).toBe(true)
+    expect(at(host).y).not.toBe(before.y)
+  })
+
+  test('cooperative: the plain wheel is the page’s and is said, and ⌘ with it zooms', async () => {
+    const host = await canvas('gestures="cooperative"')
+    const viewport = part(host, 'viewport') as HTMLElement
+    const before = at(host)
+    const plain = wheel()
+    viewport.dispatchEvent(plain)
+    await host.updateComplete
+    expect(plain.defaultPrevented).toBe(false)
+    expect(at(host)).toEqual(before)
+    expect(hint(host)).toMatch(/^Use (Ctrl|⌘) and scroll to zoom the board$/)
+    expect(hasState(host, 'sharing')).toBe(true)
+    const zoom = wheel({ deltaY: -10, metaKey: true })
+    viewport.dispatchEvent(zoom)
+    await host.updateComplete
+    expect(zoom.defaultPrevented).toBe(true)
+    expect(at(host).zoom).toBeGreaterThan(before.zoom)
+  })
+
+  test('cooperative: one finger is the page’s, and moves nothing', async () => {
+    const host = await canvas('gestures="cooperative"')
+    const viewport = part(host, 'viewport') as HTMLElement
+    const before = at(host)
+    const finger = (type: string, x: number): PointerEvent =>
+      new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: 100,
+        composed: true,
+        pointerId: 7,
+        pointerType: 'touch',
+      })
+    viewport.dispatchEvent(finger('pointerdown', 100))
+    viewport.dispatchEvent(finger('pointermove', 160))
+    await host.updateComplete
+    expect(at(host)).toEqual(before)
+  })
+
+  test('activate: the first press hands over the gestures and moves nothing, and Escape gives them back', async () => {
+    /* Over the board, as a page styling the headless tier puts them: in the
+       flow, the hint's line refits the board, which a browser measures. */
+    const over = document.createElement('style')
+    over.textContent = `helix-headless-canvas::part(gesture-hint),
+      helix-headless-canvas::part(gesture-status) { position: absolute; }`
+    document.head.append(over)
+    const host = await canvas('gestures="activate"')
+    const viewport = part(host, 'viewport') as HTMLElement
+    const before = at(host)
+    const ignored = wheel({ ctrlKey: true })
+    viewport.dispatchEvent(ignored)
+    await host.updateComplete
+    expect(ignored.defaultPrevented).toBe(false)
+    expect(hint(host)).toBe('Press the board to use it')
+
+    viewport.dispatchEvent(pointer('pointerdown', { x: 100, y: 100 }))
+    viewport.dispatchEvent(pointer('pointermove', { x: 160, y: 130 }))
+    viewport.dispatchEvent(pointer('pointerup', { x: 160, y: 130 }))
+    await host.updateComplete
+    expect(at(host)).toEqual(before)
+    expect(hasState(host, 'using')).toBe(true)
+    expect(part(host, 'gesture-status')?.hasAttribute('hidden')).toBe(false)
+
+    viewport.dispatchEvent(pointer('pointerdown', { x: 100, y: 100 }))
+    viewport.dispatchEvent(pointer('pointermove', { x: 160, y: 130 }))
+    await host.updateComplete
+    expect(at(host).x - before.x).toBe(60)
+    viewport.dispatchEvent(pointer('pointerup', { x: 160, y: 130 }))
+
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+    await host.updateComplete
+    expect(hasState(host, 'using')).toBe(false)
+    over.remove()
+  })
+
   test('zoom holds the middle of the view rather than the corner', async () => {
     /* Scaling from the origin pushes what a reader is looking at toward the
        corner, so every press has to be undone with a pan. */
