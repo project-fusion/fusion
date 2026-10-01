@@ -325,6 +325,29 @@ service such as OSRM or Valhalla.
 - `distancesAlong(points)` measures a route the same way the connector does, so
   something you move along the route and the lighter part stay in step.
 
+An area is a shape, such as a delivery zone or a search sector. Set `caption` to
+write a few words on the map with it:
+
+```html
+<helix-map-area
+  caption="A"
+  label="Sector A"
+  points="30.2693,-97.7745 30.2693,-97.7700 30.2655,-97.7700 30.2655,-97.7745"
+  tone="success"
+></helix-map-area>
+```
+
+The caption stands inside the area, at the point furthest from its edges. Set
+`caption-placement="outside"` to stand it above the area's northernmost point
+instead, clear of what the area holds. It is drawn in the area's color, brought
+toward the theme's text color until it reaches a 4.5:1 contrast ratio against
+the map, with a halo of the map's land around it. A caption is drawn, not
+focusable, so it adds nothing to the tab order. A screen reader hears the area's
+`label` in the frame's list of layers.
+
+On Leaflet, pass `L`, as `leafletDriver(map, L)`, and the caption is drawn as a
+marker that nobody can press or reach with the keyboard.
+
 ### Live positions
 
 ```html

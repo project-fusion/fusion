@@ -11,6 +11,11 @@ import { type MapPoint, pointsConverter } from '../route/map-route.js'
  * The frame lists each area by its `label` and `description` for screen
  * readers.
  *
+ * Set `caption` to draw words on the map with the area, such as a letter for a
+ * search sector, in a color that reads on the map. It is drawn rather than
+ * focusable, so it adds nothing to the tab order, and a screen reader reads
+ * the area's `label` in the frame's list.
+ *
  * @since 0.105.0
  * @status experimental
  * @category media
@@ -21,6 +26,23 @@ import { type MapPoint, pointsConverter } from '../route/map-route.js'
  */
 @customElement('helix-headless-map-area')
 export class HelixHeadlessMapArea extends HelixElement {
+  /**
+   * Words drawn on the map with the area, such as `A` for a search sector.
+   * Unset, nothing is drawn. Keep it short: it is a caption on a map, and the
+   * area's `label` is what a screen reader hears.
+   */
+  @property()
+  caption?: string
+
+  /**
+   * Where the caption stands. `inside`, the default, at the point of the area
+   * furthest from its edges. `outside`, just above the area's northernmost
+   * point, clear of the shape, for an area whose caption would cover what is
+   * in it.
+   */
+  @property({ attribute: 'caption-placement' })
+  captionPlacement: 'inside' | 'outside' = 'inside'
+
   /** More about the area. Read after its label in the frame's list. */
   @property()
   description?: string

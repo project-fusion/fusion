@@ -250,6 +250,66 @@ describe('leafletDriver', () => {
     expect(made).toEqual(['remove polyline', 'remove polyline', 'remove polygon'])
   })
 
+  test('an area’s caption is a marker no one presses, its words text in the connector’s colors', () => {
+    const { map } = stand()
+    const made: string[] = []
+    let words: HTMLElement | undefined
+    const flat = () => ({ addTo: () => {}, remove: () => {} })
+    const drawn = leafletDriver(map, {
+      divIcon: (options) => {
+        words = options.html
+        made.push(`divIcon ${options.className}`)
+        return 'icon'
+      },
+      marker: (latlng, options) => {
+        made.push(
+          `marker ${JSON.stringify(latlng)} ${String(options.icon)} ${options.interactive} ${options.keyboard}`,
+        )
+        return {
+          addTo: () => {
+            made.push('add marker')
+          },
+          remove: () => {
+            made.push('remove marker')
+          },
+        }
+      },
+      polygon: flat,
+      polyline: flat,
+    }).layers?.(() => [
+      {
+        caption: {
+          anchor: 'center',
+          at: { lat: 0.5, lng: 0.5 },
+          halo: 'rgb(250, 250, 250)',
+          ink: 'rgb(1, 2, 3)',
+          text: '<b>A</b>',
+        },
+        color: 'rgb(4, 5, 6)',
+        id: 'b',
+        kind: 'area',
+        label: 'Sector A',
+        points: [
+          { lat: 0, lng: 0 },
+          { lat: 0, lng: 1 },
+          { lat: 1, lng: 1 },
+        ],
+      },
+    ])
+    expect(made).toEqual([
+      'divIcon helix-map-caption',
+      'marker [0.5,0.5] icon false false',
+      'add marker',
+    ])
+    /* Set as text, so a caption that looks like markup is shown as written. */
+    expect(words?.textContent).toBe('<b>A</b>')
+    expect(words?.children).toHaveLength(0)
+    expect(words?.style.color).toBe('rgb(1, 2, 3)')
+    made.length = 0
+    drawn?.stop()
+    expect(made).toEqual(['remove marker'])
+  })
+
   test('a dotted route is a Leaflet polyline of dots, with nothing under it', () => {
     const { map } = stand()
     const made: string[] = []

@@ -1,0 +1,38 @@
+<!-- @summary Search sectors, each named on the map by its caption: two inside their sector and one above it, clear of what it holds. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<!-- Preview frame: data-preview-map has the frame connect MapLibre; on your page, connectMap does. -->
+<helix-map
+  data-preview-map
+  label="Search sectors in Zilker Park"
+>
+  <div data-preview-map-canvas></div>
+
+  <helix-map-area
+    caption="A"
+    description="Searched"
+    label="Sector A"
+    points="30.2693,-97.7745 30.2693,-97.7700 30.2655,-97.7700 30.2655,-97.7745"
+    tone="success"
+  ></helix-map-area>
+
+  <helix-map-area
+    caption="B"
+    description="Being searched"
+    label="Sector B"
+    points="30.2693,-97.7700 30.2693,-97.7655 30.2655,-97.7655 30.2655,-97.7700"
+    tone="info"
+  ></helix-map-area>
+
+  <helix-map-area
+    caption="C"
+    caption-placement="outside"
+    description="Not yet searched"
+    label="Sector C"
+    points="30.2693,-97.7655 30.2700,-97.7620 30.2655,-97.7605 30.2640,-97.7630 30.2655,-97.7655"
+    tone="warning"
+  ></helix-map-area>
+</helix-map>

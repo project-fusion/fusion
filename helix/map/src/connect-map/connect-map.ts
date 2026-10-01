@@ -13,8 +13,10 @@ import {
 import { creditParts } from '../credit/credit.js'
 import { type MapMotion, motionOf } from '../motion/motion.js'
 import { type MapPoints, pointsFrom } from '../points/points.js'
-import { settledColor } from '../style/map-colors.js'
+import { colorsNow, settledColor } from '../style/map-colors.js'
+import { legible, parseColor, type Rgb } from '../style/oklab.js'
 import { watchTheme } from '../theme/watch-theme.js'
+import { captionAt } from './caption.js'
 
 /** How the map draws the ground: the themed map, imagery under its roads and names, or imagery alone. */
 export type MapType = 'hybrid' | 'satellite' | 'standard'
@@ -200,6 +202,15 @@ export type MapPadding = number | { bottom: number; left: number; right: number;
 export interface MapLayerSpec {
   /** A raster layer's credit for its tiles, which the frame shows with the map's own. */
   attribution?: string | undefined
+  /**
+   * An area's caption: its words, the place they stand on and which part of
+   * them stands there, `center` or `bottom` for words above the place, and
+   * the colors to draw them in, an `ink` that reads on the map and a `halo`
+   * of the land round it. Drawn above the place names, and never pressed.
+   */
+  caption?:
+    | { anchor: 'bottom' | 'center'; at: MapPlace; halo: string; ink: string; text: string }
+    | undefined
   /**
    * A route's edge, drawn wider under it so it reads as laid over the roads
    * rather than as one of them, where the roads are drawn in the same brand;
@@ -392,6 +403,12 @@ const UNPLACED_POSITION = {
   '--_map-position-y': undefined,
 }
 
+/**
+ * The contrast an area's caption clears against the land: WCAG's AA for text,
+ * which is what the style's own labels clear by default.
+ */
+const CAPTION_CONTRAST = 4.5
+
 /** Meters in a degree of latitude, which is near enough constant for a ring. */
 const METERS_PER_DEGREE = 111_320
 
@@ -461,6 +478,10 @@ const AHEAD = 10
 interface Layer extends HTMLElement {
   /** A raster layer's credit for its tiles. */
   attribution?: string | undefined
+  /** An area's words, drawn on the map with it. */
+  caption?: string | undefined
+  /** Where an area's caption stands: in it, or above its northernmost point. */
+  captionPlacement?: 'inside' | 'outside' | undefined
   /** A points layer's: whether its points gather into counts. */
   cluster?: boolean | undefined
   /** A points layer's data as a script set it. */
@@ -1009,6 +1030,38 @@ export const connectMap = (
     seen = next
     place()
   }
+  /* **The theme's land and ink, read once** for the captions' colors, and
+     again when the theme moves: reading them paints a pixel to settle each
+     token, and a route walking along its progress redraws every layer every
+     frame. `null` where the page has no tokens to read. */
+  let captionTheme: { halo: string; ink: Rgb; land: Rgb } | null | undefined
+  /**
+   * An area's caption: where it stands, and colors that read on the map, the
+   * area's own color brought toward the ink until it clears AA against the
+   * land, haloed in the land. In the area's color where there is no theme.
+   */
+  const captionOf = (
+    layer: Layer,
+    text: string,
+    color: string,
+  ): NonNullable<MapLayerSpec['caption']> => {
+    if (captionTheme === undefined) {
+      const colors = colorsNow(frame)
+      const land = colors ? parseColor(colors.surface) : undefined
+      const ink = colors ? parseColor(colors.foreground) : undefined
+      captionTheme = colors && land && ink ? { halo: colors.surface, ink, land } : null
+    }
+    const own = parseColor(color)
+    return {
+      ...captionAt(layer.points ?? [], layer.captionPlacement ?? 'inside'),
+      halo: captionTheme?.halo ?? 'rgba(0, 0, 0, 0)',
+      ink:
+        captionTheme && own
+          ? legible(own, captionTheme.ink, captionTheme.land, CAPTION_CONTRAST)
+          : color,
+      text,
+    }
+  }
   /* **A hidden layer is not drawn**, which is how the frame's layers menu
      turns one off, and how a page can. **Nor is imagery of the ground while
      no map type shows it**, which the frame decides by its `mapType` and no
@@ -1144,7 +1197,9 @@ export const connectMap = (
         /* A dotted leg takes no casing: an edge under a line of dots is a
            dashed band, not a line of dots. */
         const dotted = layer.layerKind === 'route' && layer.variant === 'dotted'
+        const words = layer.layerKind === 'area' ? layer.caption?.trim() : undefined
         const spec: MapLayerSpec = {
+          ...(words ? { caption: captionOf(layer, words, color) } : {}),
           ...(edge && edge !== color && !dotted ? { casing: edge } : {}),
           color,
           id: idOf(layer),
@@ -1556,7 +1611,12 @@ export const connectMap = (
   /* **A theme that moves moves the routes**, whose colors are settled once
      and handed to a renderer that cannot read a token: a mode switched or a
      brand painted on anything above the frame draws them again. */
-  const stopTheming = drawn ? watchTheme(frame, () => drawn.update()) : undefined
+  const stopTheming = drawn
+    ? watchTheme(frame, () => {
+        captionTheme = undefined
+        drawn.update()
+      })
+    : undefined
   place()
 
   /* **A marker the keyboard reaches is a marker in view.** The walk goes in

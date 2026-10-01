@@ -124,3 +124,33 @@ export const contrast = (one: Rgb, other: Rgb): number => {
   const [light, dark] = [luminance(one), luminance(other)].sort((a, b) => b - a) as [number, number]
   return (light + 0.05) / (dark + 0.05)
 }
+
+/**
+ * A color that can be read on a ground: `from` mixed toward `ink` by
+ * `amount`, and further until it clears `target` against `ground`, or `ink`
+ * itself where nothing short of it does. What the style draws its labels in,
+ * and an area's caption.
+ *
+ * **Measured as it will be drawn**, rounded to eight bits a channel: the
+ * unrounded color cleared 7:1 and the one written out read 6.96.
+ */
+export const legible = (from: Rgb, ink: Rgb, ground: Rgb, target: number, amount = 0): string => {
+  const at = (step: number): Rgb => parseColor(cssColor(mix(from, ink, step))) as Rgb
+  if (contrast(at(amount), ground) >= target) {
+    return cssColor(at(amount))
+  }
+  if (contrast(ink, ground) < target) {
+    return cssColor(ink)
+  }
+  let low = amount
+  let high = 1
+  for (let round = 0; round < 20; round++) {
+    const middle = (low + high) / 2
+    if (contrast(at(middle), ground) >= target) {
+      high = middle
+    } else {
+      low = middle
+    }
+  }
+  return cssColor(at(high))
+}
