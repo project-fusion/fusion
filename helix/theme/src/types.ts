@@ -310,6 +310,21 @@ export interface ThemeIntent {
   tokens?: Record<string, Color>
 }
 
+/** One intent derived in both modes, from `deriveModes`. */
+export interface DerivedModes {
+  /**
+   * One block per selector asked for, each color a `light-dark()` pair. A
+   * value that is not a color and differs by mode, such as a floating
+   * surface's edge, is set by the rules after the block, for the operating
+   * system's dark mode and for `[data-color-mode]` on or inside the selector.
+   */
+  css: Record<string, string>
+  /** The dark theme, with its own findings. Its `css` is empty. */
+  dark: DerivedTheme
+  /** The light theme, with its own findings. Its `css` is empty. */
+  light: DerivedTheme
+}
+
 /** A derived token, carrying the check that produced it. */
 export interface DerivedToken {
   /**

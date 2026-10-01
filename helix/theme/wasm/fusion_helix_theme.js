@@ -45,6 +45,45 @@ export function derive(intent, selectors) {
 }
 
 /**
+ * Derives a theme in both modes, and renders them as one block under every
+ * selector asked for, each color a `light-dark()` pair.
+ *
+ * The intent's own `scheme` is set aside, since both are derived. The result
+ * carries each mode's report, `light` and `dark`, so a finding in either is
+ * still read, and `css` keyed by selector.
+ *
+ * # Errors
+ *
+ * When either argument is not the JSON it should be, or when the engine refuses
+ * the intent in either mode.
+ * @param {string} intent
+ * @param {string} selectors
+ * @returns {string}
+ */
+export function deriveModes(intent, selectors) {
+    let deferred4_0;
+    let deferred4_1;
+    try {
+        const ptr0 = passStringToWasm0(intent, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(selectors, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.deriveModes(ptr0, len0, ptr1, len1);
+        var ptr3 = ret[0];
+        var len3 = ret[1];
+        if (ret[3]) {
+            ptr3 = 0; len3 = 0;
+            throw takeFromExternrefTable0(ret[2]);
+        }
+        deferred4_0 = ptr3;
+        deferred4_1 = len3;
+        return getStringFromWasm0(ptr3, len3);
+    } finally {
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+    }
+}
+
+/**
  * Reads a hex color into its OKLCH components, as JSON.
  *
  * **Throws rather than returning a `NaN` triple**, which is the decision

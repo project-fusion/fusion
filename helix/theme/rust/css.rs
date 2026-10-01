@@ -12,8 +12,10 @@
 //! the same as emitting a copy of them: a copy is a value this engine then owns,
 //! and it stops tracking the stylesheet the moment either moves.
 
+use std::fmt::Write as _;
+
 use crate::derive::theme::Theme;
-use crate::intent::{Character, Mechanism, Weight};
+use crate::intent::{Character, Mechanism, Scheme, Weight};
 
 /// The three durations a pace applies to. `instant` is 0 and is a statement.
 const DURATIONS: [(&str, f64); 3] = [("fast", 120.0), ("normal", 200.0), ("slow", 320.0)];
@@ -153,10 +155,17 @@ pub fn to_css(theme: &Theme, selector: &str) -> String {
     }
     if let Some(floating) = theme.intent.separation.floating {
         let mechanism = floating.into();
-        lines.push(format!(
-            "  --{namespace}-border-floating: {};",
+        /* **A hairline under a shadow in the dark**, where a shadow is not
+        seen: a dark ink at low alpha composites to nearly the ground it falls
+        on, which the stylesheet measured at 1.006 for an elevated card on
+        black. A theme floating on shadow alone left a select's list, a menu
+        and a popover on a card with no edge at all (#430). */
+        let width = if mechanism == Mechanism::Shadow && theme.intent.scheme == Scheme::Dark {
+            edge(Mechanism::Border)
+        } else {
             edge(mechanism)
-        ));
+        };
+        lines.push(format!("  --{namespace}-border-floating: {width};"));
         let shadow = if mechanism == Mechanism::Shadow {
             SHADOW_FLOATING
         } else {
@@ -171,6 +180,93 @@ pub fn to_css(theme: &Theme, selector: &str) -> String {
     material(theme, namespace, &mut lines);
 
     format!("{selector} {{\n{}\n}}\n", lines.join("\n"))
+}
+
+/// Renders a light and a dark derivation of one intent as one block, for a site
+/// with both modes.
+///
+/// **Each color as a `light-dark()` pair**, which is how the shipped stylesheet
+/// writes every token: one declaration, and `color-scheme` picks the half. A
+/// site that wanted both modes derived twice and merged the two blocks by hand,
+/// key by key (#421).
+///
+/// **A value that is not a color and still differs by mode cannot be a pair**,
+/// since `light-dark()` takes colors only: the accent seed's lightness and a
+/// floating surface's edge, which a shadow keeps only in the dark. The block
+/// carries the light value, and rules scoped to the same selector carry the
+/// dark one, for the operating system's dark mode and for
+/// `[data-color-mode="dark"]` on the element or inside it, with
+/// `[data-color-mode="light"]` restoring the light one, the way the stylesheet
+/// decides a mode.
+///
+/// Rendered from the two blocks `to_css` writes, line by line, so the two
+/// cannot drift apart: a line both modes write the same is written once.
+#[must_use]
+pub fn to_css_modes(light: &Theme, dark: &Theme, selector: &str) -> String {
+    let lines = |theme: &Theme| -> Vec<String> {
+        to_css(theme, "x")
+            .lines()
+            .filter(|line| line.starts_with("  "))
+            .map(str::to_owned)
+            .collect()
+    };
+    let name = |line: &str| line.trim().split(':').next().unwrap_or_default().to_owned();
+    let value = |line: &str| {
+        line.trim()
+            .split_once(':')
+            .map(|(_, rest)| rest.trim().trim_end_matches(';').to_owned())
+            .unwrap_or_default()
+    };
+    let is_hex = |text: &str| text.starts_with('#') && text.len() == 7;
+
+    let dark_lines = lines(dark);
+    let mut base = Vec::new();
+    let mut lights = Vec::new();
+    let mut darks = Vec::new();
+    for line in lines(light) {
+        let key = name(&line);
+        let other = dark_lines
+            .iter()
+            .find(|candidate| key.starts_with("--") && name(candidate) == key);
+        match other {
+            Some(other) if *other != line => {
+                let (bright, dim) = (value(&line), value(other));
+                if is_hex(&bright) && is_hex(&dim) {
+                    base.push(format!("  {key}: light-dark({bright}, {dim});"));
+                } else {
+                    base.push(line.clone());
+                    lights.push(line.clone());
+                    darks.push(format!("  {key}: {dim};"));
+                }
+            }
+            _ => base.push(line),
+        }
+    }
+
+    let mut out = format!("{selector} {{\n{}\n}}\n", base.join("\n"));
+    if !darks.is_empty() {
+        let scoped = |mode: &str| {
+            selector
+                .split(',')
+                .map(str::trim)
+                .flat_map(|one| {
+                    [
+                        format!("{one}[data-color-mode=\"{mode}\"]"),
+                        format!("{one} [data-color-mode=\"{mode}\"]"),
+                    ]
+                })
+                .collect::<Vec<_>>()
+                .join(",\n")
+        };
+        let _ = write!(
+            out,
+            "@media (prefers-color-scheme: dark) {{\n  {selector} {{\n  {}\n  }}\n}}\n",
+            darks.join("\n  ")
+        );
+        let _ = write!(out, "{} {{\n{}\n}}\n", scoped("dark"), darks.join("\n"));
+        let _ = write!(out, "{} {{\n{}\n}}\n", scoped("light"), lights.join("\n"));
+    }
+    out
 }
 
 /// **Families are emitted and the rest of the type system is not**, which is the

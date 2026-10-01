@@ -22,6 +22,21 @@
 export function derive(intent: string, selectors: string): string;
 
 /**
+ * Derives a theme in both modes, and renders them as one block under every
+ * selector asked for, each color a `light-dark()` pair.
+ *
+ * The intent's own `scheme` is set aside, since both are derived. The result
+ * carries each mode's report, `light` and `dark`, so a finding in either is
+ * still read, and `css` keyed by selector.
+ *
+ * # Errors
+ *
+ * When either argument is not the JSON it should be, or when the engine refuses
+ * the intent in either mode.
+ */
+export function deriveModes(intent: string, selectors: string): string;
+
+/**
  * Reads a hex color into its OKLCH components, as JSON.
  *
  * **Throws rather than returning a `NaN` triple**, which is the decision
@@ -40,6 +55,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly derive: (a: number, b: number, c: number, d: number) => [number, number, number, number];
+    readonly deriveModes: (a: number, b: number, c: number, d: number) => [number, number, number, number];
     readonly hexToOklch: (a: number, b: number) => [number, number, number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;

@@ -43,7 +43,7 @@
 
 use serde_json::Value;
 
-use crate::css::to_css;
+use crate::css::{to_css, to_css_modes};
 use crate::derive::accent::{seeded, settle};
 use crate::derive::emphasis::emphasis;
 use crate::derive::inks::neutral_inks;
@@ -1081,6 +1081,83 @@ fn body_text_is_the_strongest_ink_and_stands_clear_of_the_muted_one() {
             "{label}: foreground only {gap} of lightness from the muted ink"
         );
     }
+}
+
+/// A floating surface separated by shadow alone keeps a hairline in the dark,
+/// where a shadow is not seen, and none in the light, where it is (#430).
+#[test]
+fn a_shadow_floats_with_a_hairline_only_in_the_dark() {
+    for (scheme, width) in [(Scheme::Light, "0"), (Scheme::Dark, "1px")] {
+        let mut intent = ThemeIntent::new(Color::Hex("#2358e8".to_owned()));
+        intent.scheme = Some(scheme);
+        intent.separation = Some(Separation {
+            floating: Some(Floating::Shadow),
+            surface: None,
+        });
+        let css = to_css(&derive_theme(&intent).expect("the intent derives"), ":root");
+        assert!(
+            css.contains(&format!("--helix-border-floating: {width};")),
+            "{scheme:?}: expected a {width} edge in\n{css}"
+        );
+        assert!(
+            css.contains("--helix-shadow-floating: 0 12px 32px"),
+            "{scheme:?}: the shadow stays"
+        );
+    }
+}
+
+/// One intent in both modes is one block: each color a `light-dark()` pair, a
+/// line both modes share written once, and the values `light-dark()` cannot
+/// carry set by mode in rules scoped to the same selector (#421).
+#[test]
+fn both_modes_render_as_one_block_of_pairs() {
+    let in_mode = |scheme| {
+        let mut intent = ThemeIntent::new(Color::Hex("#2358e8".to_owned()));
+        intent.scheme = Some(scheme);
+        intent.separation = Some(Separation {
+            floating: Some(Floating::Shadow),
+            surface: None,
+        });
+        derive_theme(&intent).expect("the intent derives")
+    };
+    let css = to_css_modes(&in_mode(Scheme::Light), &in_mode(Scheme::Dark), ":root");
+
+    assert!(
+        css.contains("--helix-color-foreground: light-dark(#000000, #ffffff);"),
+        "{css}"
+    );
+    assert!(
+        css.contains("--helix-color-background: light-dark(#ffffff, "),
+        "{css}"
+    );
+    assert_eq!(css.matches("--helix-shadow-floating:").count(), 1, "{css}");
+    /* The edge is no color, so the block holds the light one and the rules the dark. */
+    let (block, rules) = css.split_once("}\n").expect("a block, then rules");
+    assert!(block.contains("--helix-border-floating: 0;"), "{css}");
+    assert!(
+        rules.contains("@media (prefers-color-scheme: dark)"),
+        "{css}"
+    );
+    let rule = |head: &str| {
+        let from = rules
+            .find(head)
+            .unwrap_or_else(|| panic!("no rule for {head} in\n{css}"));
+        rules[from..]
+            .split('}')
+            .next()
+            .unwrap_or_default()
+            .to_owned()
+    };
+    assert!(
+        rule(":root[data-color-mode=\"dark\"],\n:root [data-color-mode=\"dark\"] {")
+            .contains("--helix-border-floating: 1px;"),
+        "{css}"
+    );
+    assert!(
+        rule(":root[data-color-mode=\"light\"],\n:root [data-color-mode=\"light\"] {")
+            .contains("--helix-border-floating: 0;"),
+        "{css}"
+    );
 }
 
 /// `solve_against` keeps the candidate whose weakest pairing is strongest.
