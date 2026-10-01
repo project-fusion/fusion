@@ -32,12 +32,18 @@
     "peers": "bun scripts/build-peers.mjs",
     "test": "bun test src",
     "timings": "bun scripts/build-timings.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit && bun scripts/check-snippets.mjs"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "devDependencies": {
+    "@fusion.dev/helix": "workspace:*",
     "@fusion.dev/helix-cem": "workspace:*",
+    "@fusion.dev/helix-headless": "workspace:*",
+    "@fusion.dev/helix-icons": "workspace:*",
+    "@fusion.dev/helix-map": "workspace:*",
+    "@fusion.dev/helix-styles": "workspace:*",
     "@fusion.dev/helix-testing": "workspace:*",
+    "@fusion.dev/helix-theme": "workspace:*",
     "@fusion.dev/scripts": "workspace:*",
     "lit": "^3.2.1",
     "playwright": "^1.62.1"
