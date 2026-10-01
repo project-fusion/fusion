@@ -324,6 +324,11 @@ export interface MapLibreMap {
   loaded?(): boolean
   /** Whether the style has loaded: `true`, and anything else is not yet. MapLibre 6 types it loosely. */
   isStyleLoaded?(): unknown
+  /**
+   * Whether one source has every tile the view needs, once the view has asked
+   * for them; a source no shown layer draws from has nothing to wait for.
+   */
+  isSourceLoaded?(id: string): boolean
   /** The canvas, which MapLibre makes focusable. */
   getCanvas(): HTMLElement
   /** The middle of the view, which a map-type picture is drawn around. */
@@ -1646,41 +1651,88 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     const { x, y } = map.project([lng, lat])
     return { x, y }
   },
-  /* **When the view has drawn with every tile it needs**, or at once where it
-     has. Not its first `idle`: a map with something moving on it, a walker
-     along a route, redraws every few frames and is never idle.
+  /* **When the view has drawn whole**: the style, and every source drawn
+     from tiles with every tile the view needs. The terrain's elevation is one
+     of those, so the ground has risen by then, where it shifted under the
+     markers half a second after a map that looked finished.
 
-     **Heard on `render` as well as `load`**, because `load` fires once in a
-     map's life. A page connecting inside its own `load` handler, the way
-     MapLibre's examples start, found `loaded()` false, since drawing the
-     connector's layers had just dirtied the style, and waited for a `load`
-     that had already been: the server's snapshot covered the live map for
-     good. Each frame after that is a chance to find the style and tiles in. */
+     **Never the shapes the frame draws**, which are GeoJSON. A route that
+     animates rewrites its source every frame, and MapLibre's `load`,
+     `isStyleLoaded()` and `areTilesLoaded()` all count it: measured with a
+     walker moving from the first frame, none of them ever came true, and the
+     server's snapshot covered the live map for good.
+
+     **Heard on every `render`**, each a chance to find it whole, and not on
+     `load`, which fires once in a map's life: a page connecting inside its
+     own `load` handler, the way MapLibre's examples start, waited for one that
+     had already been. Which sources to ask is read again when the style
+     changes, and not on every frame, since reading the style serializes it. */
   ready: (done) => {
-    if (map.loaded?.() && map.areTilesLoaded?.()) {
+    if (!map.isSourceLoaded) {
+      /* A stand-in map without the per-source answer, which every MapLibre
+         this package supports has: its own `load`, or a frame drawn with
+         the style and every tile in. */
+      if (map.loaded?.() && map.areTilesLoaded?.()) {
+        done()
+        return () => undefined
+      }
+      let finished = false
+      const finish = (): void => {
+        if (!finished) {
+          finished = true
+          map.off('load', finish)
+          map.off('render', drawn)
+          done()
+        }
+      }
+      const drawn = (): void => {
+        if (map.isStyleLoaded?.() === true && map.areTilesLoaded?.() === true) {
+          finish()
+        }
+      }
+      map.on('load', finish)
+      map.on('render', drawn)
+      return () => {
+        map.off('load', finish)
+        map.off('render', drawn)
+      }
+    }
+    let tiled: string[] | undefined
+    const read = (): void => {
+      const sources = map.getStyle()?.sources
+      tiled = sources
+        ? Object.entries(sources)
+            .filter(([, source]) => (source as { type?: string }).type !== 'geojson')
+            .map(([id]) => id)
+        : undefined
+    }
+    const whole = (): boolean => {
+      if (tiled === undefined) {
+        read()
+      }
+      return tiled?.every((id) => map.isSourceLoaded?.(id) === true) === true
+    }
+    if (whole()) {
       done()
       return () => undefined
     }
-    let finished = false
-    const finish = (): void => {
-      if (finished) {
-        return
-      }
-      finished = true
-      stop()
-      done()
+    const restyled = (): void => {
+      tiled = undefined
     }
-    const drawn = (): void => {
-      if (map.isStyleLoaded?.() === true && map.areTilesLoaded?.() === true) {
-        finish()
+    const heard = (): void => {
+      if (whole()) {
+        stop()
+        done()
       }
     }
     const stop = (): void => {
-      map.off('load', finish)
-      map.off('render', drawn)
+      map.off('styledata', restyled)
+      map.off('render', heard)
+      map.off('idle', heard)
     }
-    map.on('load', finish)
-    map.on('render', drawn)
+    map.on('styledata', restyled)
+    map.on('render', heard)
+    map.on('idle', heard)
     return stop
   },
   rotate: ({ by, to }, motion) => {

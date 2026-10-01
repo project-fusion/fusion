@@ -137,6 +137,7 @@ export {
   HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,
+  HelixMapReadyEvent,
   HelixMapRotateEvent,
   HelixMapTiltEvent,
   HelixMapZoomEvent,

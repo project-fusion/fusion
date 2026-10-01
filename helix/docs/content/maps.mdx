@@ -193,7 +193,7 @@ licenses require the credit to stay visible, so Helix never hides it.
 `mapSnapshot(view)` draws the map on your server as an SVG, from the same tiles
 and in the same colors as `mapLibreStyle`. Put it in the frame after the element
 MapLibre draws in, and the page shows a map from its first paint. `connectMap`
-fades it out once MapLibre has drawn its tiles.
+fades it out once MapLibre has drawn the map whole.
 
 ```js
 import { mapSnapshot } from '@fusion.dev/helix-map/snapshot'
@@ -226,6 +226,32 @@ removing it to your framework.
 
 A snapshot is a flat map. A map zoomed out past about 6 is a globe in MapLibre,
 so draw snapshots of city and street views.
+
+## Show the map once it is drawn
+
+MapLibre draws a map in stages: the streets, then the imagery tile by tile,
+then the ground rising where there is terrain. `connectMap` tells the frame when
+the map is drawn whole, with every tile the view needs and the ground in place.
+The frame then sends `helix-map-ready` and matches `:state(ready)`. Its `ready`
+property is `true` from then on, for code that runs after the event.
+
+To show a map only once it is finished, fade it in on the state:
+
+```css
+helix-map #map {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+helix-map:state(ready) #map {
+  opacity: 1;
+}
+```
+
+The routes and areas the frame draws are not part of "drawn whole", so a route
+that moves along its progress does not hold the map back. A page that draws its
+own map without `connectMap` calls `drawn()` on the frame when its map is
+finished.
 
 ## What you can add to a map
 

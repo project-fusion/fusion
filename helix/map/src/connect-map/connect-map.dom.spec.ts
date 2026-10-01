@@ -828,18 +828,34 @@ describe('connectMap with a snapshot drawn on the server', () => {
     expect(stopped).toBe(true)
   })
 
-  test('a frame with no snapshot does not wait for the renderer', async () => {
-    const host = await frame('<div id="canvas"></div>')
-    let asked = false
-    const { driver } = projecting()
-    connectMap(host, {
-      ...driver,
-      ready: () => {
-        asked = true
+  test('the frame is told when the map is drawn whole, with what stands on it placed again first', async () => {
+    const host = (await frame(
+      '<div id="canvas"></div><helix-headless-map-marker label="Depot" lat="2" lng="3"></helix-headless-map-marker>',
+    )) as Frame & { ready: boolean }
+    const marker = host.querySelector('helix-headless-map-marker') as HTMLElement
+    let done = (): void => undefined
+    /* The ground's height arrives with the last tiles, and the view does not
+       move for it: only the projection changes. */
+    let raised = 0
+    const heard: string[] = []
+    host.addEventListener('helix-map-ready', () =>
+      heard.push(`ready, the marker at ${placedAt(marker, '--_map-marker-y')}`),
+    )
+    const connection = connectMap(host, {
+      ...projecting().driver,
+      project: ({ lat, lng }) => ({ x: lng * 10, y: lat * 10 - raised }),
+      ready: (whole) => {
+        done = whole
         return () => undefined
       },
     })
-    expect(asked).toBe(false)
+    expect(host.ready).toBe(false)
+    raised = 15
+    done()
+    expect(heard).toEqual(['ready, the marker at 5px'])
+    expect(host.ready).toBe(true)
+    connection.disconnect()
+    expect(host.ready).toBe(false)
   })
 })
 
