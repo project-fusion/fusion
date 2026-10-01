@@ -1,8 +1,8 @@
 /**
  * What the frame tells what runs inside it, named once for both sides.
  *
- * A module of its own so `frame.js` and the map chunk can share the name
- * without either bundling the other.
+ * A module of its own so `frame.js` and the map and graph chunks can share
+ * the name without either bundling the other.
  */
 
 /** Sent on the window after the frame applies new styles or a new mode. */
@@ -15,5 +15,7 @@ declare global {
      * frame calls to mount the maps in a render and later take them down.
      */
     helixPreviewMap?: { mount(root: HTMLElement): () => void }
+    /** What the graph chunk leaves on the window, the same way. */
+    helixPreviewGraph?: { mount(root: HTMLElement): () => void }
   }
 }

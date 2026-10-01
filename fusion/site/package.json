@@ -30,16 +30,20 @@
     "@fusion.dev/helix": "workspace:*",
     "@fusion.dev/helix-docs": "workspace:*",
     "@fusion.dev/helix-gallery": "workspace:*",
+    "@fusion.dev/helix-graph": "workspace:*",
     "@fusion.dev/helix-map": "workspace:*",
     "@fusion.dev/helix-sandbox": "workspace:*",
     "@fusion.dev/helix-styles": "workspace:*",
     "@fusion.dev/helix-theme": "workspace:*",
     "@fusion.dev/insights": "workspace:*",
+    "graphology": "^0.26.0",
+    "graphology-layout-forceatlas2": "^0.10.1",
     "maplibre-gl": "^6.11.2",
     "next": "^16.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "sigma": "^3.0.3"
   },
   "devDependencies": {
     "@fusion.dev/helix-testing": "workspace:*",

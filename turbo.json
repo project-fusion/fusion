@@ -414,16 +414,19 @@
     // measuring. The entry imports `@fusion.dev/helix`, whose own `^build`
     // brings the core, the headless tier and the icons, and the stylesheets
     // are `@fusion.dev/helix-styles`' output. The map chunk beside it imports
-    // `@fusion.dev/helix-map`, the connector and the style compiler.
+    // `@fusion.dev/helix-map`, the connector and the style compiler, and the
+    // graph chunk `@fusion.dev/helix-graph`.
     "frame": {
       "dependsOn": [
         "@fusion.dev/helix#build",
+        "@fusion.dev/helix-graph#build",
         "@fusion.dev/helix-map#build",
         "@fusion.dev/helix-styles#build"
       ],
       "inputs": [
         "preview/preview-events.ts",
         "preview/preview-frame-entry.ts",
+        "preview/preview-graph-entry.ts",
         "preview/preview-map-entry.ts",
         "preview/preview-maplibre-entry.ts",
         "utils/map-view/map-view.ts",
@@ -432,7 +435,8 @@
         "$TURBO_ROOT$/helix/styles/src/*.css",
         "$TURBO_ROOT$/helix/styles/src/elements.css",
         "$TURBO_ROOT$/fusion/site/scripts/build-frame.mjs",
-        "$TURBO_ROOT$/node_modules/maplibre-gl/package.json"
+        "$TURBO_ROOT$/node_modules/maplibre-gl/package.json",
+        "$TURBO_ROOT$/node_modules/sigma/package.json"
       ],
       "outputs": ["public/sandbox/**"]
     },
