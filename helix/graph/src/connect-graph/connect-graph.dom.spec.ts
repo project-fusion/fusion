@@ -31,6 +31,7 @@ const recording = (withLayout = true) => {
     drawn: [] as { links: DrawnLink[]; nodes: DrawnNode[] }[],
     gestures: [] as ViewportGestureMode[],
     panned: [] as [number, number][],
+    stopped: false,
     zoomed: [] as number[],
   }
   let press: ((id: string) => void) | undefined
@@ -48,6 +49,9 @@ const recording = (withLayout = true) => {
       }
     },
     panBy: (x, y) => asked.panned.push([x, y]),
+    stop: () => {
+      asked.stopped = true
+    },
     zoomBy: (direction) => asked.zoomed.push(direction),
     ...(withLayout
       ? {
@@ -190,6 +194,7 @@ describe('connectGraph', () => {
     expect(asked.gestures.at(-1)).toBe('cooperative')
     connection.disconnect()
     expect(asked.gestures.at(-1)).toBe('free')
+    expect(asked.stopped).toBe(true)
     expect(host.ready).toBe(false)
   })
 })

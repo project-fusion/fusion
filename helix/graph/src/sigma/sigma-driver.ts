@@ -36,8 +36,15 @@ export interface SigmaRenderer {
   off(type: 'clickNode', listener: (payload: { node: string }) => void): unknown
   on(type: 'clickNode', listener: (payload: { node: string }) => void): unknown
   refresh(): unknown
+  resize(force?: boolean): unknown
   setSetting(
-    name: 'edgeReducer' | 'labelColor' | 'labelFont' | 'nodeReducer',
+    name:
+      | 'defaultDrawNodeHover'
+      | 'edgeReducer'
+      | 'labelColor'
+      | 'labelFont'
+      | 'labelRenderedSizeThreshold'
+      | 'nodeReducer',
     value: unknown,
   ): unknown
   viewportToFramedGraph(point: { x: number; y: number }): { x: number; y: number }
@@ -105,6 +112,49 @@ const IDLE = 2000
 /** A note's drawn radius in pixels, from its relative size: a note of size 4 is half again as wide as one of size 1. */
 const pixels = (size: number): number => 2 + 2 * Math.sqrt(Math.max(size, 0))
 
+/** What Sigma hands a hover drawing: where the note is drawn, its size and its name. */
+interface HoverData {
+  label?: string | null | undefined
+  size: number
+  x: number
+  y: number
+}
+
+/**
+ * The name of the note the pointer is over, on the theme's overlay in the
+ * theme's ink.
+ *
+ * **Sigma's own is a white box**, which in a dark theme held white letters on
+ * white. This draws the box the way a tooltip is drawn here: the overlay
+ * surface, a soft shadow, a small radius.
+ */
+const hoverOf =
+  (looks: GraphLooks) =>
+  (
+    context: CanvasRenderingContext2D,
+    data: HoverData,
+    settings: { labelFont: string; labelSize: number; labelWeight: string },
+  ): void => {
+    if (!data.label) {
+      return
+    }
+    const size = settings.labelSize
+    context.font = `${settings.labelWeight} ${size}px ${settings.labelFont}`
+    const width = context.measureText(data.label).width
+    const x = data.x + data.size + 2
+    const height = size + 8
+    context.save()
+    context.shadowBlur = 8
+    context.shadowColor = 'rgba(0, 0, 0, 0.25)'
+    context.fillStyle = looks.overlay
+    context.beginPath()
+    context.roundRect(x - 4, data.y - height / 2, width + 8, height, 4)
+    context.fill()
+    context.restore()
+    context.fillStyle = looks.ink
+    context.fillText(data.label, x, data.y + size / 3)
+  }
+
 /** Every note's position as the graph holds it now. */
 const positionsOf = (graph: SigmaGraph): Map<string, GraphPoint> => {
   const positions = new Map<string, GraphPoint>()
@@ -171,6 +221,19 @@ export const sigmaDriver = (
     container.addEventListener(type, hold, { capture: true, passive: false })
   }
 
+  /* **Its own box, and not only the window.** Sigma measures its container
+     when the window resizes, and a frame filling the screen, or settling its
+     height, changes the box with the window as it was: the drawing stretched
+     to the old size until something else made Sigma look. */
+  const sized =
+    typeof ResizeObserver === 'function'
+      ? new ResizeObserver(() => {
+          sigma.resize(true)
+          sigma.refresh()
+        })
+      : undefined
+  sized?.observe(container)
+
   return {
     center: (id, animate) => {
       const at = sigma.getNodeDisplayData(id)
@@ -214,15 +277,26 @@ export const sigmaDriver = (
     look: (looks: GraphLooks) => {
       sigma.setSetting('labelColor', { color: looks.ink })
       sigma.setSetting('labelFont', looks.font)
+      /* **Named wherever there is room, and not only once drawn large.**
+         Sigma names a note only from six pixels across, which every note in a
+         graph of thousands is under until zoomed: a selected note's
+         neighbors went unnamed. Its own grid still keeps names apart, the
+         larger note's first. */
+      sigma.setSetting('labelRenderedSizeThreshold', 0)
+      sigma.setSetting('defaultDrawNodeHover', hoverOf(looks))
       sigma.setSetting('nodeReducer', (node: string, data: Record<string, unknown>) => {
         const look = looks.node(node)
+        /* The selected note half again its size, so it reads as the one, and
+           its neighbors a quarter, so where two names would collide Sigma,
+           which keeps the larger note's, keeps theirs. */
+        const grown = look.selected ? 1.5 : look.raised ? 1.25 : 1
         return {
           ...data,
           color: look.color,
-          forceLabel: look.label,
+          forceLabel: look.label === 'always',
           hidden: look.hidden,
-          /* The selected note half again its size, so it reads as the one. */
-          size: look.selected && typeof data.size === 'number' ? data.size * 1.5 : data.size,
+          label: look.label === 'never' ? null : data.label,
+          size: typeof data.size === 'number' ? data.size * grown : data.size,
           zIndex: look.selected ? 2 : look.raised ? 1 : 0,
         }
       })
@@ -255,6 +329,13 @@ export const sigmaDriver = (
       } else {
         camera.setState(to)
       }
+    },
+    stop: () => {
+      sized?.disconnect()
+      for (const type of held) {
+        container.removeEventListener(type, hold, { capture: true })
+      }
+      container.style.touchAction = touchAction
     },
     zoomBy: (direction, animate) => {
       const ratio = camera.getState().ratio * (direction > 0 ? 1 / ZOOM : ZOOM)
