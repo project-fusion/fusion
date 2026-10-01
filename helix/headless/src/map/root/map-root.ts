@@ -7,6 +7,7 @@ import {
   HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,
+  HelixMapReadyEvent,
   HelixMapRotateEvent,
   HelixMapTiltEvent,
   HelixMapZoomEvent,
@@ -174,6 +175,7 @@ const SETTLES = 400
  * @event {HelixMapClusterEvent} helix-map-cluster - A cluster was pressed. Sent from the marker that shows the cluster, with the names of its places.
  * @event {HelixMapPanEvent} helix-map-pan - A pan button or arrow key was pressed. Move your map in response.
  * @event {HelixMapPartChangeEvent} helix-map-part-change - Clustering was turned on or off. Used by `connectMap`; pages do not need to listen for it.
+ * @event {HelixMapReadyEvent} helix-map-ready - The map has been drawn whole: its style, every tile the view needs, and the ground where it has terrain. Sent once per connection. Show a map that is finished on it, where it would otherwise draw in stages.
  * @event {HelixMapRotateEvent} helix-map-rotate - A rotate or Face north button, or Shift with Left or Right, was pressed. Turn your map in response.
  * @event {HelixMapTiltEvent} helix-map-tilt - The 3D button, or Shift with Up or Down, was pressed. Tilt your map in response.
  * @event {HelixMapZoomEvent} helix-map-zoom - A zoom button or key was pressed, with a direction. Zoom your map in response.
@@ -215,6 +217,7 @@ const SETTLES = 400
  *
  * @cssstate fullscreen - The map fills the screen.
  * @cssstate idle - The user has been still long enough for the header and footer to fade.
+ * @cssstate ready - The map has been drawn whole, after `helix-map-ready`.
  */
 @customElement('helix-headless-map')
 export class HelixHeadlessMap extends MixinViewport(HelixElement) {
@@ -386,6 +389,38 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
     clearTimeout(this.settling)
     this.settling = setTimeout(() => this.say(), SETTLES)
+  }
+
+  /**
+   * Whether the map has been drawn whole, which `drawn()` says. For a page that
+   * connects after `helix-map-ready` has been sent, and missed it.
+   */
+  get ready(): boolean {
+    return this.whole
+  }
+
+  /** What `ready` reads, written by `drawn()`. */
+  private whole = false
+
+  /**
+   * Says the map has been drawn whole, or with `false`, that it no longer is.
+   *
+   * **Called by whatever draws the map**, as `connectMap` does once its driver
+   * has every tile the view needs and the ground where there is terrain, and
+   * with `false` when it disconnects. A page drawing its own map calls it when
+   * that map is finished. The first call after the map was not drawn sends
+   * `helix-map-ready` and turns on `:state(ready)`, so a page can wait on the
+   * event or select on the state, and a page that connects late reads `ready`.
+   */
+  drawn(whole = true): void {
+    if (whole === this.whole) {
+      return
+    }
+    this.whole = whole
+    this.toggleState('ready', whole)
+    if (whole) {
+      this.dispatchEvent(new HelixMapReadyEvent())
+    }
   }
 
   private say(): void {

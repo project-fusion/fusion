@@ -235,6 +235,81 @@ describe('mapLibreDriver, ready', () => {
   })
 })
 
+describe('mapLibreDriver, ready on a map that answers for each source', () => {
+  /** A map whose style lists sources by type, each loaded or not as the spec says. */
+  const sourced = (types: Record<string, string>) => {
+    const loaded = new Set<string>()
+    let styled = false
+    const stood = stand()
+    const map: MapLibreMap = {
+      ...stood.map,
+      getStyle: () =>
+        styled
+          ? {
+              layers: [],
+              sources: Object.fromEntries(
+                Object.entries(types).map(([id, type]) => [id, { type }]),
+              ),
+            }
+          : undefined,
+      isSourceLoaded: (id) => loaded.has(id),
+      isStyleLoaded: () => false,
+    }
+    return {
+      fire: stood.fire,
+      load: (id: string) => loaded.add(id),
+      map,
+      style: () => {
+        styled = true
+      },
+    }
+  }
+
+  test('waits for the style and every tiled source, and never for a shape the frame draws', () => {
+    const map = sourced({ dem: 'raster-dem', route: 'geojson', streets: 'vector' })
+    let heard = 0
+    mapLibreDriver(map.map).ready?.(() => {
+      heard += 1
+    })
+    /* No style yet, which is no sources to ask, and not a map drawn whole. */
+    map.fire('render')
+    expect(heard).toBe(0)
+    map.style()
+    map.fire('styledata')
+    map.load('streets')
+    map.fire('render')
+    expect(heard).toBe(0)
+    /* The terrain's elevation is a tiled source like any other. */
+    map.load('dem')
+    map.fire('render')
+    map.fire('render')
+    /* The route never loads, as one rewritten every frame never does. */
+    expect(heard).toBe(1)
+  })
+
+  test('at once where it is whole already, and nothing after it is stopped', () => {
+    const whole = sourced({ streets: 'vector' })
+    whole.style()
+    whole.load('streets')
+    let heard = 0
+    mapLibreDriver(whole.map).ready?.(() => {
+      heard += 1
+    })
+    expect(heard).toBe(1)
+
+    const later = sourced({ streets: 'vector' })
+    let waited = 0
+    const stop = mapLibreDriver(later.map).ready?.(() => {
+      waited += 1
+    })
+    stop?.()
+    later.style()
+    later.load('streets')
+    later.fire('render')
+    expect(waited).toBe(0)
+  })
+})
+
 describe('mapLibreDriver', () => {
   test('a pan and a zoom are MapLibre’s own calls, over the page’s duration and curve', () => {
     const { asked, map } = stand()

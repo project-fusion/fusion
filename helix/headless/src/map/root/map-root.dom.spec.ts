@@ -25,6 +25,28 @@ const map = async (extra = ''): Promise<Map> =>
 const control = (host: Map, name: string): HTMLElement | null =>
   (host.shadowRoot?.querySelector(`[part~="${name}"]`) as HTMLElement) ?? null
 
+describe('map frame, drawn', () => {
+  test('says it once each time the map is drawn whole, in an event, a state and `ready`', async () => {
+    const host = (await map()) as Awaited<ReturnType<typeof map>> & {
+      drawn(whole?: boolean): void
+      ready: boolean
+    }
+    let heard = 0
+    host.addEventListener('helix-map-ready', () => {
+      heard += 1
+    })
+    expect([host.ready, hasState(host, 'ready')]).toEqual([false, false])
+    host.drawn()
+    host.drawn()
+    expect([heard, host.ready, hasState(host, 'ready')]).toEqual([1, true, true])
+    /* Taken away, as a renderer that disconnects does, which says nothing. */
+    host.drawn(false)
+    expect([heard, host.ready, hasState(host, 'ready')]).toEqual([1, false, false])
+    host.drawn()
+    expect(heard).toBe(2)
+  })
+})
+
 describe('map frame', () => {
   test('the region carries the name, which is the whole argument for the family', async () => {
     /* Measured before this was written: a canvas slotted the ordinary way has no

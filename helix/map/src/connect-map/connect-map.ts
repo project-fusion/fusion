@@ -48,9 +48,13 @@ export interface MapDriver {
    */
   credits?(changed: () => void): { read(): string[]; stop(): void }
   /**
-   * Calls `done` once the renderer has drawn its view with its tiles, and
-   * returns what stops the waiting. What takes a snapshot drawn on the server
-   * away; without it, the snapshot stays under the renderer's drawing.
+   * Calls `done` once the renderer has drawn its view whole, with every tile
+   * it needs and the ground where there is terrain, and returns what stops the
+   * waiting. Leave the frame's own shapes out, since a route that animates is
+   * redrawn every frame and would never count as drawn. What takes a snapshot
+   * drawn on the server away and sends the frame's `helix-map-ready`; without
+   * it, the snapshot stays under the renderer's drawing and the frame is never
+   * `:state(ready)`.
    */
   ready?(done: () => void): () => void
   /**
@@ -287,6 +291,8 @@ interface Marker extends HTMLElement {
 /** The frame, as far as the connector reads it: whether it gathers its markers. */
 interface Frame extends HTMLElement {
   cluster?: boolean | undefined
+  /** Says the map has been drawn whole, or with `false`, that it no longer is. */
+  drawn?(whole?: boolean): void
   /** Pictures of the map in each map type, for the layers menu's cards. */
   mapPreviews?: Partial<Record<MapType, string>>
   /** How the map draws the ground, where it has imagery; absent is standard. */
@@ -1448,28 +1454,35 @@ export const connectMap = (
     snapshot.style.display = 'none'
   }
   const snapshots = [...frame.querySelectorAll<HTMLElement>(':scope > [data-helix-map-snapshot]')]
-  const stopWaiting =
-    snapshots.length > 0
-      ? driver.ready?.(() => {
-          const motion = motionOf(frame, 'step')
-          for (const snapshot of snapshots) {
-            if (!motion || typeof snapshot.animate !== 'function') {
-              away(snapshot)
-              continue
-            }
-            snapshot
-              .animate([{ opacity: 1 }, { opacity: 0 }], {
-                duration: motion.duration,
-                /* The theme's curve, sampled as CSS takes a curve. */
-                easing: `linear(${Array.from({ length: 13 }, (_, step) => motion.easing(step / 12).toFixed(3)).join(', ')})`,
-              })
-              .finished.then(
-                () => away(snapshot),
-                () => away(snapshot),
-              )
-          }
+  /* **Waited on whether or not there is a snapshot**, since the frame is told
+     too: `helix-map-ready` and `:state(ready)` are what a page shows a
+     finished map on. */
+  const stopWaiting = driver.ready?.(() => {
+    /* **Placed again first**, so what stands on the map stands where the
+       finished map puts it. A marker was last placed when the view last
+       moved, which on a map with terrain was before the elevation came in:
+       measured on a tilted valley, a marker jumped 70 pixels just after the
+       map said it was finished, the first time anything placed it again. */
+    place()
+    ;(frame as Frame).drawn?.()
+    const motion = motionOf(frame, 'step')
+    for (const snapshot of snapshots) {
+      if (!motion || typeof snapshot.animate !== 'function') {
+        away(snapshot)
+        continue
+      }
+      snapshot
+        .animate([{ opacity: 1 }, { opacity: 0 }], {
+          duration: motion.duration,
+          /* The theme's curve, sampled as CSS takes a curve. */
+          easing: `linear(${Array.from({ length: 13 }, (_, step) => motion.easing(step / 12).toFixed(3)).join(', ')})`,
         })
-      : undefined
+        .finished.then(
+          () => away(snapshot),
+          () => away(snapshot),
+        )
+    }
+  })
   /* **What is drawn follows what is written, once a task.** A part that
      moves, is renamed or is retoned says so with `helix-map-part-change`,
      and a marker or a position is placed again while a route or an area is
@@ -1647,6 +1660,10 @@ export const connectMap = (
       stopViewing?.()
       clearTimeout(looking)
       stopWaiting?.()
+      /* No longer drawn by anything, so no longer ready: a page that shows
+         the map on `:state(ready)` hides it until the next connection draws
+         it whole again. */
+      ;(frame as Frame).drawn?.(false)
       stopTheming?.()
       styled.disconnect()
       children.disconnect()
