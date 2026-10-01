@@ -45,22 +45,35 @@ exact for the default seed and approximate for any other.
 target, measures every pair, and returns the theme with any violations:
 
 ```ts
-import { deriveTheme, toCss } from '@fusion.dev/helix-theme'
+import { readFile } from 'node:fs/promises'
+import { initTheme } from '@fusion.dev/helix-theme'
 
-const theme = deriveTheme({
-  brand: '#0b3d91',
-  contrastTarget: 4.5, // 4.5 is WCAG AA, 7 is AAA
-  scheme: 'light',
-})
+const engine = await initTheme(
+  await readFile(new URL(import.meta.resolve('@fusion.dev/helix-theme/wasm/fusion_helix_theme_bg.wasm'))),
+)
+
+const theme = engine.derive(
+  {
+    brand: '#0b3d91',
+    contrastTarget: 4.5, // 4.5 is WCAG AA, 7 is AAA
+    scheme: 'light',
+  },
+  [':root'],
+)
 
 if (theme.violations.length > 0) {
   throw new Error(theme.violations.join('\n'))
 }
 
-console.log(toCss(theme))
+console.log(theme.css[':root'])
 ```
 
-The CSS from `toCss` includes the seeds as well as the tokens. The stylesheet
+The engine is WebAssembly, so `initTheme` loads it once and you wait for it.
+Node passes the module's bytes, as above. A browser passes the URL you serve
+`fusion_helix_theme_bg.wasm` from, such as `initTheme('/theme.wasm')`.
+`derive` renders the CSS under each selector you name.
+
+The CSS includes the seeds as well as the tokens. The stylesheet
 computes the values the engine does not, from the same seeds the engine used:
 
 - The twenty-four series colors for charts
@@ -106,7 +119,7 @@ engine solves each foreground color against the hardest surface it appears on.
 Each derived token includes the result of its contrast check:
 
 ```ts
-const theme = deriveTheme({ brand })
+const theme = engine.derive({ brand })
 
 for (const token of theme.tokens) {
   console.log(token.name, token.hex, token.contrast, token.chromaReduced)

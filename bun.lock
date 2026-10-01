@@ -150,8 +150,14 @@
       "name": "@fusion.dev/helix-docs",
       "version": "0.111.1",
       "devDependencies": {
+        "@fusion.dev/helix": "helix/styled",
         "@fusion.dev/helix-cem": "helix/cem",
+        "@fusion.dev/helix-headless": "helix/headless",
+        "@fusion.dev/helix-icons": "helix/icons",
+        "@fusion.dev/helix-map": "helix/map",
+        "@fusion.dev/helix-styles": "helix/styles",
         "@fusion.dev/helix-testing": "helix/testing",
+        "@fusion.dev/helix-theme": "helix/theme",
         "@fusion.dev/scripts": "fusion/scripts",
         "lit": "^3.2.1",
         "playwright": "^1.62.1",
@@ -380,7 +386,7 @@
 
     "@fusion.dev/helix-diagnostics": ["@fusion.dev/helix-diagnostics@workspace:helix/diagnostics", { "devDependencies": { "@fusion.dev/helix-testing": "helix/testing", "@types/bun": "^1.3.0" } }],
 
-    "@fusion.dev/helix-docs": ["@fusion.dev/helix-docs@workspace:helix/docs", { "devDependencies": { "@fusion.dev/helix-cem": "helix/cem", "@fusion.dev/helix-testing": "helix/testing", "@fusion.dev/scripts": "fusion/scripts", "lit": "^3.2.1", "playwright": "^1.62.1" } }],
+    "@fusion.dev/helix-docs": ["@fusion.dev/helix-docs@workspace:helix/docs", { "devDependencies": { "@fusion.dev/helix": "helix/styled", "@fusion.dev/helix-cem": "helix/cem", "@fusion.dev/helix-headless": "helix/headless", "@fusion.dev/helix-icons": "helix/icons", "@fusion.dev/helix-map": "helix/map", "@fusion.dev/helix-styles": "helix/styles", "@fusion.dev/helix-testing": "helix/testing", "@fusion.dev/helix-theme": "helix/theme", "@fusion.dev/scripts": "fusion/scripts", "lit": "^3.2.1", "playwright": "^1.62.1" } }],
 
     "@fusion.dev/helix-gallery": ["@fusion.dev/helix-gallery@workspace:helix/gallery", { "devDependencies": { "@types/react": "^19.0.0", "react": "^19.0.0" }, "peerDependencies": { "react": "^19.0.0" } }],
 

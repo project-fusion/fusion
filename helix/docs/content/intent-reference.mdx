@@ -10,10 +10,13 @@ title: Intent reference
 every field `ThemeIntent` accepts and what changes when you set it.
 
 ```ts
-import { derive } from '@fusion.dev/helix-theme'
+import { initTheme } from '@fusion.dev/helix-theme'
 
-const theme = derive({ brand: '#2563eb' })
+const engine = await initTheme('/theme.wasm')
+const theme = engine.derive({ brand: '#2563eb' })
 ```
+
+[Deriving a theme](./theming) shows how Node loads the engine.
 
 **`brand` is the only required input.** Every other field has a default,
 computed from `brand` or from the Helix design language. A theme that sets only
