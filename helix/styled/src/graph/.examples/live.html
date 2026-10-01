@@ -1,4 +1,4 @@
-<!-- @summary A graph of company notes drawn by Sigma.js and laid out by ForceAtlas2, with the list beside it. -->
+<!-- @summary A graph of company notes drawn by Sigma.js, with notes arriving and messages passing between them as they happen. -->
 
 <!-- Preview frame: data-preview-graph has the frame connect Sigma.js; on your page, connectGraph does. -->
 <helix-graph
@@ -52,4 +52,24 @@
 
   notes.nodes = nodes
   notes.links = links
+
+  /* Messages passing along the links, twice a second, a few of them problems. */
+  setInterval(() => {
+    const link = pick(notes.links)
+    notes.signal(link.source, link.target, { tone: random() < 0.1 ? 'danger' : 'primary' })
+  }, 500)
+
+  /* A new call note every few seconds, linked to its subject. A new array is
+     all the frame needs: only the new note is drawn and laid out. */
+  let calls = 0
+  const arriving = setInterval(() => {
+    calls += 1
+    const [group, hubs] = pick(Object.entries(subjects))
+    const id = `Call ${calls}`
+    notes.nodes = [...notes.nodes, { group, id, label: id }]
+    notes.links = [...notes.links, { source: id, target: pick(hubs) }]
+    if (calls === 12) {
+      clearInterval(arriving)
+    }
+  }, 3000)
 </script>

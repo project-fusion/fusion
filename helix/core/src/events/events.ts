@@ -901,6 +901,35 @@ export class HelixGraphPartChangeEvent extends CustomEvent<GraphPartChangeDetail
   }
 }
 
+/** One signal between two notes, as the frame's `signal()` sends it. */
+export interface GraphSignalDetail {
+  /** The note the signal leaves, by its `id`. */
+  from: string
+  /** What the signal means, which colors it. `primary` where none is given. */
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined
+  /** The note the signal reaches, by its `id`. */
+  to: string
+}
+
+/**
+ * Something passed between two notes, which the renderer draws traveling
+ * from one to the other. The connector hears it and the renderer draws it; it
+ * stays on the frame, being the family's own bookkeeping rather than news for
+ * a page.
+ */
+export class HelixGraphSignalEvent extends CustomEvent<GraphSignalDetail> {
+  static readonly eventName = 'helix-graph-signal'
+
+  constructor(detail: GraphSignalDetail) {
+    super(HelixGraphSignalEvent.eventName, {
+      bubbles: false,
+      cancelable: false,
+      composed: false,
+      detail,
+    })
+  }
+}
+
 /**
  * The graph has been drawn whole, laid out and settled, sent once each time it
  * is connected, from the frame, which then matches `:state(ready)`.
@@ -1778,6 +1807,7 @@ const registry = {
   HelixGraphPanEvent,
   HelixGraphPartChangeEvent,
   HelixGraphReadyEvent,
+  HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   HelixHistoryEvent,
   HelixMapClusterEvent,

@@ -55,12 +55,44 @@ connection.disconnect()
   changes.
 - Answers the frame's pan and zoom buttons and keys, and tells the renderer which
   gestures the frame's `gestures` lets it take.
+- Draws only what changed when the page hands the frame new notes or links, and
+  draws the frame's `signal()`s.
+
+## Live graphs
+
+**Hand the frame new arrays as often as the graph changes.** The connection
+compares them with what is drawn, by each note's `id` and each link's two ends,
+and the renderer is told only what was added, taken away, renamed or moved. New
+notes grow in and are laid out with the rest held still, and the frame stays
+`:state(ready)` throughout.
+
+```js
+socket.addEventListener('message', ({ data }) => {
+  const note = JSON.parse(data)
+  frame.nodes = [...frame.nodes, note]
+  frame.links = [...frame.links, { source: note.id, target: note.parent }]
+})
+```
+
+**`frame.signal(from, to, { tone })` shows something passing between two
+notes**: a message, a request, a payment. It is drawn traveling from one to the
+other and arriving with a pulse, in the tone's color, over the graph and without
+redrawing it, so a busy feed costs a dot each. A reader who asks for less motion
+sees the link lit for a moment instead.
+
+```js
+frame.signal('Checkout', 'Payments', { tone: 'success' })
+frame.signal('Payments', 'Fraud review', { tone: 'danger' })
+```
+
+A signal is drawn and never said: a screen reader does not hear it. Where what
+passed matters to a reader, say it in the page's own words as well.
 
 ## What it exports
 
 | Import | What |
 |---|---|
-| `@fusion.dev/helix-graph` | `connectGraph`, `graphColorsFrom`, `seedPositions`, and the `GraphDriver` type |
+| `@fusion.dev/helix-graph` | `connectGraph`, `diffGraph`, `graphColorsFrom`, `seedPositions`, and the `GraphDriver` and `GraphChanges` types |
 | `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)` |
 
 **Neither Sigma nor graphology is a dependency.** The driver types the renderer

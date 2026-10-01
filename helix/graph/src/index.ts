@@ -3,9 +3,11 @@ export {
   connectGraph,
   type DrawnLink,
   type DrawnNode,
+  type GraphChanges,
   type GraphConnection,
   type GraphDriver,
 } from './connect-graph/connect-graph.js'
+export { diffGraph } from './connect-graph/diff.js'
 export {
   type GraphColors,
   type GraphLooks,

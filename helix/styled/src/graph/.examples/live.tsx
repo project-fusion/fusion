@@ -1,3 +1,6 @@
+import type { HelixGraph } from '@fusion.dev/helix'
+import { useEffect, useRef, useState } from 'react'
+
 /* Five subjects, each with the notes most of the rest link to. */
 const subjects: Record<string, string[]> = {
   Finance: ['Budget', 'Forecast', 'Invoices'],
@@ -46,9 +49,49 @@ const graph = () => {
   return { links, nodes }
 }
 
-const { links, nodes } = graph()
+const start = graph()
+
+/* The same choices on every load, for what happens after it. */
+let seed = 11
+const random = (): number => {
+  seed = (seed * 1664525 + 1013904223) % 4294967296
+  return seed / 4294967296
+}
+const pick = <T,>(list: T[]): T => list[Math.floor(random() * list.length)] as T
 
 export function Example() {
+  const frame = useRef<HelixGraph>(null)
+  const [nodes, setNodes] = useState<Note[]>(start.nodes)
+  const [links, setLinks] = useState(start.links)
+
+  /* Messages passing along the links, twice a second, a few of them problems. */
+  useEffect(() => {
+    const sending = setInterval(() => {
+      const link = pick(start.links)
+      frame.current?.signal(link.source, link.target, {
+        tone: random() < 0.1 ? 'danger' : 'primary',
+      })
+    }, 500)
+    return () => clearInterval(sending)
+  }, [])
+
+  /* A new call note every few seconds, linked to its subject. A new array is
+     all the frame needs: only the new note is drawn and laid out. */
+  useEffect(() => {
+    let calls = 0
+    const arriving = setInterval(() => {
+      calls += 1
+      const [group, hubs] = pick(Object.entries(subjects))
+      const id = `Call ${calls}`
+      setNodes((all) => [...all, { group, id, label: id }])
+      setLinks((all) => [...all, { source: id, target: pick(hubs) }])
+      if (calls === 12) {
+        clearInterval(arriving)
+      }
+    }, 3000)
+    return () => clearInterval(arriving)
+  }, [])
+
   return (
     <>
       {/* Preview frame: data-preview-graph has the frame connect Sigma.js; on your page, connectGraph does. */}
@@ -57,6 +100,7 @@ export function Example() {
         label="Company notes"
         links={links}
         nodes={nodes}
+        ref={frame}
       >
         <div data-preview-graph-canvas></div>
       </helix-graph>

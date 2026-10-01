@@ -24,6 +24,17 @@ const graphOf = (): SigmaGraph & {
       nodes.clear()
       edges.clear()
     },
+    dropEdge: (source, target) => {
+      edges.delete(`${source}>${target}`)
+    },
+    dropNode: (node) => {
+      nodes.delete(node)
+      for (const key of [...edges.keys()]) {
+        if (key.startsWith(`${node}>`) || key.endsWith(`>${node}`)) {
+          edges.delete(key)
+        }
+      }
+    },
     edges,
     forEachNode: (callback) => {
       for (const [node, attributes] of nodes) {
@@ -33,6 +44,9 @@ const graphOf = (): SigmaGraph & {
     getNodeAttributes: (node) => nodes.get(node) ?? {},
     hasEdge: (source, target) => edges.has(`${source}>${target}`),
     hasNode: (node) => nodes.has(node),
+    mergeNodeAttributes: (node, attributes) => {
+      nodes.set(node, { ...nodes.get(node), ...attributes })
+    },
     nodes,
     get order() {
       return nodes.size
@@ -55,6 +69,7 @@ const rendererOf = () => {
   let state = { angle: 0, ratio: 1, x: 0.5, y: 0.5 }
   const listeners = new Set<(payload: { node: string }) => void>()
   const sigma: SigmaRenderer = {
+    framedGraphToViewport: ({ x, y }) => ({ x: x * 800, y: y * 400 }),
     getCamera: () => ({
       animate: (next) => {
         state = { ...state, ...next }
@@ -67,11 +82,17 @@ const rendererOf = () => {
     getContainer: () => container,
     getDimensions: () => ({ height: 400, width: 800 }),
     getGraph: () => graph,
-    getNodeDisplayData: (node) => (node === 'a' ? { x: 0.2, y: 0.8 } : undefined),
+    getNodeDisplayData: (node) =>
+      node === 'a'
+        ? { size: 4, x: 0.2, y: 0.8 }
+        : node === 'b'
+          ? { size: 4, x: 0.6, y: 0.2 }
+          : undefined,
     off: (_type, listener) => listeners.delete(listener),
     on: (_type, listener) => listeners.add(listener),
     refresh: () => {},
     resize: () => {},
+    scaleSize: (size = 1) => size,
     setSetting: (name, value) => settings.set(name, value),
     /* A framed graph one unit across the 800 pixels. */
     viewportToFramedGraph: ({ x, y }) => ({ x: x / 800, y: y / 400 }),
@@ -217,6 +238,45 @@ describe('sigmaDriver', () => {
     renderer.container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
     expect(reached).toEqual(['mousedown'])
     expect(renderer.container.style.touchAction).toBe('none')
+  })
+
+  test('applies only what changed, and leaves every other note where it is', () => {
+    const { graph, sigma } = rendererOf()
+    const driver = sigmaDriver(sigma)
+    driver.draw({
+      links: [{ source: 'a', target: 'b' }],
+      nodes: [
+        { id: 'a', label: 'Alpha', size: 1, x: 0, y: 0 },
+        { id: 'b', label: 'Bravo', size: 1, x: 1, y: 1 },
+        { id: 'c', label: 'Charlie', size: 1, x: 2, y: 2 },
+      ],
+    })
+    driver.update?.(
+      {
+        addLinks: [{ source: 'a', target: 'd' }],
+        addNodes: [{ id: 'd', label: 'Delta', size: 1, x: 3, y: 3 }],
+        changeNodes: [{ id: 'b', label: 'Bravo two', size: 4, x: 1, y: 1 }],
+        removeLinks: [{ source: 'a', target: 'b' }],
+        removeNodes: ['c'],
+      },
+      false,
+    )
+    expect([...graph.nodes.keys()].sort()).toEqual(['a', 'b', 'd'])
+    expect(graph.nodes.get('b')).toMatchObject({ label: 'Bravo two', size: 6 })
+    expect(graph.nodes.get('d')).toMatchObject({ size: 4, x: 3, y: 3 })
+    expect([...graph.edges.keys()]).toEqual(['a>d'])
+  })
+
+  test('a signal is drawn on a canvas of its own, which stopping takes away', () => {
+    const renderer = rendererOf()
+    const driver = sigmaDriver(renderer.sigma)
+    driver.signal?.('a', 'b', 'rgb(0, 0, 255)', true)
+    const overlay = renderer.container.querySelector('canvas')
+    expect(overlay).not.toBeNull()
+    expect(overlay?.getAttribute('aria-hidden')).toBe('true')
+    expect(overlay?.style.pointerEvents).toBe('none')
+    driver.stop?.()
+    expect(renderer.container.querySelector('canvas')).toBeNull()
   })
 
   test('runs the layout over the notes without a place and stops once they are still', async () => {

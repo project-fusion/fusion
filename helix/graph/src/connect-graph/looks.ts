@@ -5,6 +5,10 @@ import { readColor } from '@fusion.dev/helix-core'
  * where the frame is.
  */
 export interface GraphColors {
+  /** A signal meaning something to look at: `accent`. */
+  accent: string
+  /** A signal meaning something went wrong: `danger`. */
+  danger: string
   /** What the drawing is laid on, which faded notes are mixed toward: `surface-sunken`. */
   ground: string
   /** The links: `border`. */
@@ -19,6 +23,12 @@ export interface GraphColors {
   primary: string
   /** One color for each group, in the order of the groups' names: `series-1` and on. */
   series: string[]
+  /** A signal meaning something done: `success`. */
+  success: string
+  /** A signal meaning something to know: `info`. */
+  info: string
+  /** A signal meaning something to watch: `warning`. */
+  warning: string
 }
 
 /** How many of the series tokens a graph reads. */
@@ -26,12 +36,17 @@ const SERIES = 24
 
 /** The Helix token each color is read from. */
 const TOKENS = {
+  accent: '--helix-color-accent',
+  danger: '--helix-color-danger',
   ground: '--helix-color-surface-sunken',
+  info: '--helix-color-info',
   ink: '--helix-color-foreground',
   line: '--helix-color-border',
   muted: '--helix-color-foreground-muted',
   overlay: '--helix-color-surface-overlay',
   primary: '--helix-color-primary',
+  success: '--helix-color-success',
+  warning: '--helix-color-warning',
 } as const
 
 /**

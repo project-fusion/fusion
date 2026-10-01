@@ -1,6 +1,8 @@
 import {
+  type GraphSignalDetail,
   HelixGraphPanEvent,
   HelixGraphPartChangeEvent,
+  HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   isRtl,
   type ViewportGestureMode,
@@ -8,25 +10,18 @@ import {
   type ViewportZoomDetail,
   watchTheme,
 } from '@fusion.dev/helix-core'
+import {
+  type DrawnLink,
+  type DrawnNode,
+  diffGraph,
+  type GraphChanges,
+  isEmpty,
+  linkKey,
+} from './diff.js'
 import { type GraphColors, type GraphLooks, graphColorsFrom, looksOf } from './looks.js'
 import { type GraphPoint, seedPositions } from './seed.js'
 
-/** A note as the renderer draws it, placed. */
-export interface DrawnNode {
-  id: string
-  label: string
-  /** How large it is drawn, relative to the others: the note's `size`, or 1. */
-  size: number
-  x: number
-  y: number
-}
-
-/** A link as the renderer draws it, between two notes the graph holds. */
-export interface DrawnLink {
-  label?: string | undefined
-  source: string
-  target: string
-}
+export type { DrawnLink, DrawnNode, GraphChanges } from './diff.js'
 
 /**
  * What a renderer has to answer for the frame to drive it, and nothing that is
@@ -43,6 +38,21 @@ export interface GraphDriver {
    * Keep the view where it is: a note added to a graph is no reason to move.
    */
   draw(graph: { links: DrawnLink[]; nodes: DrawnNode[] }): void
+  /**
+   * Applies what changed since the last drawing, in place: what to add, what
+   * to take away and which notes moved or were renamed. `animate` says
+   * whether the reader may watch it happen. Without one, every change is a
+   * whole `draw`, which is right for a graph that changes now and then and
+   * wasteful for one that changes on every message.
+   */
+  update?(changes: GraphChanges, animate: boolean): void
+  /**
+   * Draws something passing from one note to another, in `color`, traveling
+   * the way it went and arriving with a pulse, or, where `animate` is false,
+   * the link between them lit for a moment. `color` is undefined while the
+   * page's colors cannot be read.
+   */
+  signal?(from: string, to: string, color: string | undefined, animate: boolean): void
   /**
    * How each note and link is drawn from now on, asked one at a time as the
    * renderer draws them: a selection or a theme changed.
@@ -131,6 +141,14 @@ const viewportOf = (frame: HTMLElement): { width: number; height: number } => {
   return { height: box.height, width: box.width }
 }
 
+/** A signal's color, from its tone: `neutral` is the muted ink, and no tone is `primary`. */
+const toneColor = (colors: GraphColors, tone: GraphSignalDetail['tone']): string =>
+  tone === undefined || tone === 'primary'
+    ? colors.primary
+    : tone === 'neutral'
+      ? colors.muted
+      : colors[tone]
+
 /** Whether the page asks for movement to be kept to a minimum. */
 const still = (): boolean =>
   typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -143,8 +161,12 @@ const still = (): boolean =>
  * connection draws the frame's `nodes` and `links`, lays out the notes that
  * have no position and says where it put them in `helix-graph-layout`, answers
  * the frame's pan and zoom, keeps the selection the same in the list and the
- * drawing, colors the graph from the page's tokens, and tells the renderer
- * which gestures it may take.
+ * drawing, colors the graph from the page's tokens, tells the renderer which
+ * gestures it may take, and draws the frame's `signal()`s.
+ *
+ * **A page changes the graph by handing the frame new arrays**, as often as
+ * it likes: the connection compares them with what is drawn and the renderer
+ * is told only what changed.
  */
 export const connectGraph = (
   frame: HTMLElement,
@@ -153,6 +175,13 @@ export const connectGraph = (
 ): GraphConnection => {
   const graph = frame as Frame
   let known = new Map<string, GraphPoint>()
+  /* What the renderer holds now, which the next drawing is compared with. */
+  let drawnNodes = new Map<string, DrawnNode>()
+  let drawnLinks = new Map<string, DrawnLink>()
+  let first = true
+  /* The notes a layout was placing when the next change cut it short, which
+     the next layout places with the new ones. */
+  let waiting = new Set<string>()
   let colors: GraphColors | null = null
   let stopSettling: (() => void) | undefined
   let pressed: string | undefined
@@ -195,50 +224,105 @@ export const connectGraph = (
     )
   }
 
-  const draw = (): void => {
-    stopSettling?.()
-    stopSettling = undefined
+  /**
+   * Draws the frame's notes and links: the whole graph the first time, and
+   * after that only what changed, so a graph fed by a busy page redraws one
+   * note for one note added. A layout places the notes that have nowhere to
+   * be, with the rest held, and the frame stays ready while it runs: the
+   * graph was drawn whole once, and a note arriving does not undo that.
+   */
+  const draw = (whole = false): void => {
+    if (stopSettling) {
+      stopSettling()
+      stopSettling = undefined
+    }
     cancelAnimationFrame(pending)
     const nodes = graph.nodes ?? []
     const ids = new Set(nodes.map((node) => node.id))
     /* A link to a note the graph does not hold is left out of the drawing,
-       which has nothing to draw it to; the list keeps counting it. */
-    const links = (graph.links ?? []).filter(
-      ({ source, target }) => source !== target && ids.has(source) && ids.has(target),
-    )
-    const { positions, unplaced } = seedPositions(nodes, links, known)
-    graph.drawn?.(false)
-    driver.draw({
-      links: links.map(({ label, source, target }) => ({ label, source, target })),
-      nodes: nodes.map((node) => {
-        const at = positions.get(node.id) as GraphPoint
-        return {
-          id: node.id,
-          label: node.label || node.id,
-          size: Number.isFinite(node.size) ? (node.size as number) : 1,
-          x: at.x,
-          y: at.y,
-        }
-      }),
-    })
+       which has nothing to draw it to; the list keeps counting it. One link
+       a pair, whatever the page repeats. */
+    const nextLinks = new Map<string, DrawnLink>()
+    for (const { label, source, target } of graph.links ?? []) {
+      if (source !== target && ids.has(source) && ids.has(target)) {
+        nextLinks.set(linkKey({ source, target }), { label, source, target })
+      }
+    }
+    const { positions, unplaced } = seedPositions(nodes, [...nextLinks.values()], known)
+    const nextNodes = new Map<string, DrawnNode>()
+    for (const node of nodes) {
+      const at = positions.get(node.id) as GraphPoint
+      nextNodes.set(node.id, {
+        id: node.id,
+        label: node.label || node.id,
+        size: Number.isFinite(node.size) ? (node.size as number) : 1,
+        x: at.x,
+        y: at.y,
+      })
+    }
+    for (const id of waiting) {
+      if (ids.has(id)) {
+        unplaced.add(id)
+      }
+    }
+    const incremental = !first && !whole && driver.update !== undefined
+    if (incremental) {
+      const changes = diffGraph(
+        { links: drawnLinks, nodes: drawnNodes },
+        { links: nextLinks, nodes: nextNodes },
+      )
+      if (!isEmpty(changes)) {
+        driver.update?.(changes, !still())
+      }
+    } else {
+      graph.drawn?.(false)
+      driver.draw({ links: [...nextLinks.values()], nodes: [...nextNodes.values()] })
+    }
+    drawnNodes = nextNodes
+    drawnLinks = nextLinks
+    known = positions
     restyle()
+    const opening = first || whole
+    first = false
     if (unplaced.size > 0 && driver.settle) {
+      waiting = unplaced
       stopSettling = driver.settle(unplaced, (settled) => {
         stopSettling = undefined
+        waiting = new Set()
         known = new Map(settled)
+        for (const [id, at] of settled) {
+          const node = drawnNodes.get(id)
+          if (node) {
+            drawnNodes.set(id, { ...node, x: at.x, y: at.y })
+          }
+        }
         graph.laidOut?.(Object.fromEntries([...settled].map(([id, at]) => [id, { ...at }])))
-        graph.drawn?.(true)
+        if (opening) {
+          graph.drawn?.(true)
+        }
       })
       return
     }
-    known = positions
-    /* Drawn on the renderer's next frame, which is when what was drawn is
-       on screen. */
-    pending = requestAnimationFrame(() => {
-      if (connected) {
-        graph.drawn?.(true)
-      }
-    })
+    waiting = new Set()
+    if (opening) {
+      /* Drawn on the renderer's next frame, which is when what was drawn is
+         on screen. */
+      pending = requestAnimationFrame(() => {
+        if (connected) {
+          graph.drawn?.(true)
+        }
+      })
+    }
+  }
+
+  /** Something passed between two notes, which the renderer draws in the tone's color. */
+  const handleSignal = (event: Event): void => {
+    const { from, to, tone } = (event as HelixGraphSignalEvent).detail
+    if (!driver.signal || !drawnNodes.has(from) || !drawnNodes.has(to)) {
+      return
+    }
+    colors ??= graphColorsFrom(frame)
+    driver.signal(from, to, colors ? toneColor(colors, tone) : undefined, !still())
   }
 
   const handlePartChange = (event: Event): void => {
@@ -273,6 +357,7 @@ export const connectGraph = (
   }
 
   frame.addEventListener(HelixGraphPartChangeEvent.eventName, handlePartChange)
+  frame.addEventListener(HelixGraphSignalEvent.eventName, handleSignal)
   frame.addEventListener(HelixGraphPanEvent.eventName, handlePan)
   frame.addEventListener(HelixGraphZoomEvent.eventName, handleZoom)
 
@@ -313,6 +398,7 @@ export const connectGraph = (
       stopPress?.()
       stopTheme()
       frame.removeEventListener(HelixGraphPartChangeEvent.eventName, handlePartChange)
+      frame.removeEventListener(HelixGraphSignalEvent.eventName, handleSignal)
       frame.removeEventListener(HelixGraphPanEvent.eventName, handlePan)
       frame.removeEventListener(HelixGraphZoomEvent.eventName, handleZoom)
       if (focusable) {
@@ -328,7 +414,8 @@ export const connectGraph = (
     },
     relayout: () => {
       known = new Map()
-      draw()
+      waiting = new Set()
+      draw(true)
     },
     restyle: () => {
       colors = null
