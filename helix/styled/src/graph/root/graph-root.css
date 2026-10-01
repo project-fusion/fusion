@@ -1,0 +1,184 @@
+/* The host draws nothing: the region inside it is the frame. */
+:host {
+  display: contents;
+}
+
+/* A size container, so the list can move below the drawing where the frame
+   is narrow, whatever the page is: a graph in a sidebar is narrow on a wide
+   screen. */
+[part="region"] {
+  background-color: var(--graph-background-color, var(--helix-color-surface-sunken));
+  block-size: var(--graph-block-size, 32rem);
+  border: var(--helix-border-thin) solid var(--graph-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  container-type: inline-size;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  position: relative;
+}
+
+/* The drawing and the list side by side, the list a fixed width, so the
+   drawing takes the room a wider frame gives. */
+[part="body"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--graph-panel-size, 18rem);
+  min-block-size: 0;
+}
+
+/* The drawing, with the controls over it. A stacking context of its own, so
+   nothing a renderer raises reaches the list. */
+[part="stage"] {
+  isolation: isolate;
+  min-block-size: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+[part="viewport"] {
+  inset: 0;
+  position: absolute;
+}
+
+/* What was slotted fills the box: a renderer measures its container. */
+[part="viewport"] ::slotted(*) {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+[part="panel"] {
+  background-color: var(--helix-color-surface);
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  color: var(--helix-color-foreground);
+  display: grid;
+  gap: var(--helix-space-2xs);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  min-block-size: 0;
+  padding-block-start: var(--helix-space-xs);
+}
+
+/* Below the drawing on a narrow frame, which is where a list of notes reads
+   on a phone, the drawing above it still there to point at. */
+@container (inline-size < 40rem) {
+  [part="body"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 3fr) minmax(0, 2fr);
+  }
+
+  [part="panel"] {
+    border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+    border-inline-start: none;
+  }
+}
+
+[part="search"] {
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--helix-size-control-sm);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font: inherit;
+  font-size: var(--helix-text-sm);
+  margin-inline: var(--helix-space-xs);
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="search"]::placeholder {
+  color: var(--helix-color-foreground-subtle);
+}
+
+[part="search"]:focus-visible,
+[part="list"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="count"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="list"] {
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* One row a line, so ten thousand notes measure as they are drawn. */
+[part~="note"] {
+  align-items: baseline;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-xs);
+  line-height: var(--helix-leading-normal);
+  min-block-size: 2rem;
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+/* The wash a hovered option takes, on the row the keyboard is on as well. A
+   ring there drew a box inside the list's own ring. */
+[part~="note"]:hover,
+[part="list"]:focus-visible [part~="note-cursor"] {
+  background-color: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+  );
+}
+
+[part="note-name"] {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[part="note-relation"] {
+  color: var(--helix-color-foreground-muted);
+  flex: none;
+  font-size: var(--helix-text-xs);
+  margin-inline-start: auto;
+}
+
+[part~="note-selected"] {
+  background-color: var(--helix-color-primary-subtle);
+  color: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
+}
+
+[part~="note-selected"]:hover,
+[part="list"]:focus-visible [part~="note-selected"][part~="note-cursor"] {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-primary-subtle),
+    var(--helix-color-foreground) 8%
+  );
+}
+
+[part="header"],
+[part="footer"] {
+  min-inline-size: 0;
+}
+
+@media (forced-colors: active) {
+  [part="list"]:focus-visible [part~="note-cursor"] {
+    outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+    outline-offset: calc(var(--helix-size-focus-offset) * -1);
+  }
+
+  [part~="note-selected"] {
+    background-color: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+}
+
+@media print {
+  :host {
+    print-color-adjust: economy;
+  }
+}

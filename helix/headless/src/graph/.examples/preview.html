@@ -1,0 +1,40 @@
+<!-- @summary The graph frame on the headless tier, with every style written by hand. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-headless-graph
+  default-active="pricing"
+  id="notes"
+  label="Company notes"
+>
+  <!-- Put your graph here, drawn by Sigma.js, a canvas, or an image. -->
+  <div class="stand-in">Graph</div>
+</helix-headless-graph>
+
+<script>
+  const notes = document.getElementById('notes')
+
+  notes.nodes = [
+    { id: 'pricing', label: 'Pricing' },
+    { id: 'plans', label: 'Plans and tiers' },
+    { id: 'churn', label: 'Churn review' },
+    { id: 'onboarding', label: 'Onboarding' },
+    { id: 'roadmap', label: 'Roadmap' },
+    { id: 'support', label: 'Support playbook' },
+    { id: 'hiring', label: 'Hiring plan' },
+    { id: 'budget', label: 'Budget' },
+  ]
+
+  notes.links = [
+    { source: 'pricing', target: 'plans' },
+    { source: 'churn', target: 'pricing' },
+    { source: 'pricing', target: 'budget' },
+    { source: 'budget', target: 'pricing' },
+    { source: 'onboarding', target: 'churn' },
+    { source: 'roadmap', target: 'onboarding' },
+    { source: 'support', target: 'churn' },
+    { source: 'hiring', target: 'budget' },
+  ]
+</script>

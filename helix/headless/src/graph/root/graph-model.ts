@@ -1,0 +1,144 @@
+/** One note in a graph. */
+export interface GraphNode {
+  /** Unique in the graph, and what `active` and a link's ends name. */
+  id: string
+  /** What the note is called. Its `id` where it has none. */
+  label?: string | undefined
+  /** A kind the note belongs to, such as a tag, which a renderer colors it by. */
+  group?: string | undefined
+  /** How large the renderer draws it, relative to the others. */
+  size?: number | undefined
+  /** Where the note stands, where the page already knows. Laid out where it does not. */
+  x?: number | undefined
+  /** Where the note stands, where the page already knows. Laid out where it does not. */
+  y?: number | undefined
+}
+
+/** One link between two notes, from `source` to `target`. */
+export interface GraphLink {
+  source: string
+  target: string
+  /** What the link says, such as "cites". */
+  label?: string | undefined
+}
+
+/** Which notes each note links to and is linked from. */
+export type Adjacency = Map<string, { from: Set<string>; to: Set<string> }>
+
+/** How a note in the list stands to the selected one. */
+export type Relation = 'both' | 'from' | 'selected' | 'to'
+
+/** One row of the list: a note, and how it stands to the selected one where it does. */
+export interface Entry {
+  node: GraphNode
+  relation?: Relation | undefined
+}
+
+/** A note's name, its `id` where it has no label. */
+export const nameOf = (node: GraphNode): string => node.label || node.id
+
+/**
+ * Which notes each note links to and is linked from, in one pass over the
+ * links. A link naming a note that is not in the graph is kept: the list
+ * shows notes and not links, so it does no harm, and a page adding the note a
+ * moment later finds its links already counted.
+ */
+export const adjacencyOf = (links: readonly GraphLink[]): Adjacency => {
+  const adjacency: Adjacency = new Map()
+  const at = (id: string) => {
+    let found = adjacency.get(id)
+    if (!found) {
+      found = { from: new Set(), to: new Set() }
+      adjacency.set(id, found)
+    }
+    return found
+  }
+  for (const { source, target } of links) {
+    if (source === target) {
+      continue
+    }
+    at(source).to.add(target)
+    at(target).from.add(source)
+  }
+  return adjacency
+}
+
+/**
+ * The notes within `depth` links of `from`, whichever way each link runs, the
+ * note itself included: the local graph.
+ *
+ * **Both ways, as a reader thinks of a note's neighborhood**: a note that
+ * cites this one is as near to it as one this one cites.
+ */
+export const within = (adjacency: Adjacency, from: string, depth: number): Set<string> => {
+  const reached = new Set([from])
+  let edge = [from]
+  for (let step = 0; step < depth && edge.length > 0; step++) {
+    const next: string[] = []
+    for (const id of edge) {
+      const near = adjacency.get(id)
+      for (const one of [...(near?.to ?? []), ...(near?.from ?? [])]) {
+        if (!reached.has(one)) {
+          reached.add(one)
+          next.push(one)
+        }
+      }
+    }
+    edge = next
+  }
+  return reached
+}
+
+/**
+ * The list's rows, in the order a reader wants them: the selected note, then
+ * the notes it links to and from, then every other note, each part in the
+ * order of its names, and only the notes `shown` holds and `query` matches.
+ *
+ * **The neighborhood first**, because it is what a reader came to the graph
+ * for and what a picture of it shows by its lines, which a list has to say in
+ * its order instead.
+ */
+export const entriesOf = (
+  sorted: readonly GraphNode[],
+  adjacency: Adjacency,
+  active: string,
+  query: string,
+  shown?: ReadonlySet<string>,
+): Entry[] => {
+  const wanted = query.trim().toLocaleLowerCase()
+  const kept = (node: GraphNode): boolean =>
+    (!shown || shown.has(node.id)) &&
+    (wanted === '' || nameOf(node).toLocaleLowerCase().includes(wanted))
+  const near = adjacency.get(active)
+  const relationOf = (id: string): Relation | undefined => {
+    if (id === active) {
+      return 'selected'
+    }
+    const to = near?.to.has(id) === true
+    const from = near?.from.has(id) === true
+    return to && from ? 'both' : to ? 'to' : from ? 'from' : undefined
+  }
+  const first: Entry[] = []
+  const neighbors: Entry[] = []
+  const rest: Entry[] = []
+  for (const node of sorted) {
+    if (!kept(node)) {
+      continue
+    }
+    const relation = relationOf(node.id)
+    if (relation === 'selected') {
+      first.push({ node, relation })
+    } else if (relation) {
+      neighbors.push({ node, relation })
+    } else {
+      rest.push({ node })
+    }
+  }
+  return [...first, ...neighbors, ...rest]
+}
+
+/** The notes in the order of their names, as the page's language orders words. */
+export const sortedOf = (nodes: readonly GraphNode[], lang?: string): GraphNode[] => {
+  const collator = new Intl.Collator(lang || undefined, { numeric: true, sensitivity: 'base' })
+  return [...nodes].sort((one, other) => collator.compare(nameOf(one), nameOf(other)))
+}
