@@ -8,6 +8,7 @@ import {
   HelixGraphZoomEvent,
   MixinControllerActive,
   MixinViewport,
+  type ViewportGestureLabels,
   type ViewportPanDetail,
   type ViewportZoomDetail,
   VirtualizeController,
@@ -83,6 +84,8 @@ const PAGE = 10
  * @csspart filter-mark - The default icon beside the search field, shown when none is slotted.
  * @csspart footer - The strip below the graph.
  * @csspart fullscreen - The button that makes the graph fill the screen.
+ * @csspart gesture-hint - Words over the graph for a moment when it lets a gesture pass to the page, such as how to zoom it.
+ * @csspart gesture-status - The line shown while a graph with `gestures="activate"` has the gestures.
  * @csspart header - The strip above the graph.
  * @csspart list - The list of notes, which draws only the rows in view.
  * @csspart live - What screen readers hear when a search changes how many notes there are.
@@ -108,6 +111,8 @@ const PAGE = 10
  * @cssstate fullscreen - The graph fills the screen.
  * @cssstate idle - The user has been still long enough for the header and footer to fade.
  * @cssstate ready - The graph has been drawn whole, after `helix-graph-ready`.
+ * @cssstate sharing - The page keeps the plain wheel and one finger, with `gestures="cooperative"` or while a graph with `gestures="activate"` waits to be pressed.
+ * @cssstate using - A graph with `gestures="activate"` has been pressed and has the gestures.
  */
 @customElement('helix-headless-graph')
 export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(HelixElement)) {
@@ -284,6 +289,16 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     return 'Graph controls'
   }
 
+  /** What the graph says about its gestures where the page does not say it. */
+  protected override get restingGestureLabels(): ViewportGestureLabels {
+    return {
+      activate: 'Press the graph to use it',
+      twoFinger: 'Use two fingers to move the graph',
+      using: 'Using the graph. Press Escape to scroll the page again.',
+      wheel: 'Use {key} and scroll to zoom the graph',
+    }
+  }
+
   /** How many notes the list holds, in the page's numbers. */
   private countText(): string {
     const lang = this.closest?.('[lang]')?.getAttribute('lang') ?? ''
@@ -440,7 +455,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       tabindex="0"
       @focusin=${this.idle.stir}
       @keydown=${this.handleKeydown}
-      @pointerleave=${this.idle.leave}
+      @pointerleave=${this.handlePointerLeave}
       @pointermove=${this.idle.stir}
     >
       <div part="header">
@@ -450,6 +465,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
         <div part="stage">
           <div part="viewport">
             <slot></slot>
+            ${this.renderGestures()}
           </div>
           ${this.renderControls()}
         </div>

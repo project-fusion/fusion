@@ -186,6 +186,32 @@ describe('graph frame', () => {
     expect(names(host).length).toBe(5)
   })
 
+  test('cooperative: a plain wheel over the drawing is the page’s, and the frame says how to zoom', async () => {
+    const host = await graph('gestures="cooperative"')
+    const wheel = new WheelEvent('wheel', { bubbles: true, composed: true, deltaY: 40 })
+    host.querySelector('canvas')?.dispatchEvent(wheel)
+    await host.updateComplete
+    const shown = part(host, 'gesture-hint') as HTMLElement
+    expect(shown.hidden).toBe(false)
+    expect(shown.textContent).toMatch(/^Use (Ctrl|⌘) and scroll to zoom the graph$/)
+    expect((host as Graph & { gestureMode: string }).gestureMode).toBe('cooperative')
+  })
+
+  test('activate: the renderer takes nothing until the drawing is pressed, and a press on the list does not count', async () => {
+    const host = (await graph('gestures="activate"')) as Graph & { gestureMode: string }
+    const press = (on: Element): void => {
+      on.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    }
+    expect(host.gestureMode).toBe('off')
+    press(rows(host)[0] as HTMLElement)
+    await host.updateComplete
+    expect(host.gestureMode).toBe('off')
+    press(host.querySelector('canvas') as HTMLCanvasElement)
+    await host.updateComplete
+    expect(host.gestureMode).toBe('free')
+    expect(hasState(host, 'using')).toBe(true)
+  })
+
   test('says it is drawn once, and again only after it was not', async () => {
     const host = await graph()
     let told = 0

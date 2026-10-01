@@ -330,6 +330,12 @@
   touch-action: none;
 }
 
+/* One finger scrolls the page past a board that shares its gestures, and two
+   still pinch it, which the board stops the page taking. */
+:host(:state(sharing)) [part="viewport"] {
+  touch-action: pan-x pan-y;
+}
+
 /* **A drag across a card is a move, not a selection**, but only while the
    press lasts: on the viewport for good, it also stopped a reader copying a
    card's text, and a page's own editor typing into one. */

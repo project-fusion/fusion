@@ -42,57 +42,6 @@
   position: relative;
 }
 
-/* **What the map let pass to the page, said over it for a moment**, and the
-   line a map that has been pressed shows while it has the gestures: in the
-   inverse of the page, so they read over any part of any map, and taking no
-   pointer, so the gesture after it reaches the map. Over the places, which a
-   hint covers for no longer than it is read. */
-[part="gesture-hint"],
-[part="gesture-status"] {
-  background-color: var(--helix-color-surface-inverse);
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-inverse);
-  /* **`left` and not `inset-inline-start`**, as the markers stand: the
-     translate that centers them is physical, and so is where the pointer
-     was measured from, so a right-to-left page put both a box's width out. */
-  left: 50%;
-  max-inline-size: calc(100% - var(--helix-space-lg) * 2);
-  pointer-events: none;
-  position: absolute;
-  text-align: center;
-  z-index: calc(var(--helix-layer-raised) + 2);
-}
-
-/* **At the height of the gesture**, which the frame says in
-   `--_map-hint-y`, and across the middle: the middle of the map was where a
-   page laid its words over a map behind them, and the hint went unseen there.
-   Centered on the pointer's height and kept clear of the map's top and
-   bottom: above the pointer, it ran under the words again on a phone, where
-   the map shows below them. The frame also says
-   `--_map-hint-x`, for a page that wants it under the pointer. */
-[part="gesture-hint"] {
-  font-size: var(--helix-text-sm);
-  inset-block-start: clamp(
-    var(--helix-space-2xl),
-    var(--_map-hint-y, 50%),
-    calc(100% - var(--helix-space-2xl))
-  );
-  padding: var(--helix-space-xs) var(--helix-space-sm);
-  translate: -50% -50%;
-}
-
-[part="gesture-status"] {
-  font-size: var(--helix-text-xs);
-  inset-block-start: var(--helix-space-xs);
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
-  translate: -50% 0;
-}
-
-[part="gesture-hint"][hidden],
-[part="gesture-status"][hidden] {
-  display: none;
-}
-
 /* **The routes and areas, said rather than shown.** The renderer draws them
    for a reader who can see the map, and this list names them for one who
    cannot, which is the part of it a sighted reader would only read twice.
