@@ -508,6 +508,25 @@ describe('connectMap with routes and areas', () => {
     expect(typeof drawn[0]?.[0]?.color).toBe('string')
   })
 
+  test('an area with a caption reaches the driver with its words, where they stand and their colors', async () => {
+    const host = await frame(
+      `<helix-headless-map-area caption=" A " label="Sector A" points="0,0 0,2 2,2 2,0"></helix-headless-map-area>
+       <helix-headless-map-area caption="B" caption-placement="outside" label="Sector B" points="0,3 1,4 0,5"></helix-headless-map-area>
+       <helix-headless-map-area label="Unnamed on the map" points="5,5 5,6 6,6"></helix-headless-map-area>`,
+    )
+    const { driver, drawn } = layering()
+    connectMap(host, driver)
+    const [a, b, plain] = drawn.at(-1) ?? []
+    expect(a?.caption?.text).toBe('A')
+    expect(a?.caption?.anchor).toBe('center')
+    expect(a?.caption?.at.lat).toBeCloseTo(1, 1)
+    expect(a?.caption?.at.lng).toBeCloseTo(1, 1)
+    expect(typeof a?.caption?.ink).toBe('string')
+    expect(typeof a?.caption?.halo).toBe('string')
+    expect(b?.caption).toMatchObject({ anchor: 'bottom', at: { lat: 1, lng: 4 }, text: 'B' })
+    expect(plain?.caption).toBeUndefined()
+  })
+
   test('a hidden layer is not drawn, and hiding or showing one draws the layers again', async () => {
     const host = await frame(
       `<helix-headless-map-route label="Shown" points="1,2 3,4"></helix-headless-map-route>

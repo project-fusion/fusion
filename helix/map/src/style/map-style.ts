@@ -11,7 +11,7 @@ import {
   trophy,
 } from '@fusion.dev/helix-icons'
 import type { MapColors } from './map-colors.js'
-import { contrast, cssColor, mix, parseColor, type Rgb, rehue } from './oklab.js'
+import { cssColor, legible as legibleOn, mix, parseColor, type Rgb, rehue } from './oklab.js'
 
 /** Where the tiles and the type come from, where not OpenFreeMap, and how legible the type is. */
 export interface MapStyleOptions {
@@ -287,28 +287,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
      gray, the designed step fell short of AA against the halo. So each is
      taken further toward the ink only as far as it has to go, and a theme
      whose ink cannot clear the target at all gets the ink. */
-  const legible = (from: Rgb, amount: number): string => {
-    /* Measured as it will be drawn, rounded to eight bits a channel: the
-       unrounded color cleared 7:1 and the one written out read 6.96. */
-    const at = (step: number): Rgb => parseColor(cssColor(mix(from, ink, step))) as Rgb
-    if (contrast(at(amount), land) >= target) {
-      return cssColor(at(amount))
-    }
-    if (contrast(ink, land) < target) {
-      return cssColor(ink)
-    }
-    let low = amount
-    let high = 1
-    for (let round = 0; round < 20; round++) {
-      const middle = (low + high) / 2
-      if (contrast(at(middle), land) >= target) {
-        high = middle
-      } else {
-        low = middle
-      }
-    }
-    return cssColor(at(high))
-  }
+  const legible = (from: Rgb, amount: number): string => legibleOn(from, ink, land, target, amount)
 
   const road = (
     id: string,

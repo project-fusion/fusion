@@ -34,18 +34,31 @@ interface MapLibreEvent {
 
 /** The frame's routes and areas, as MapLibre draws GeoJSON. */
 interface GeoJson {
-  features: {
-    geometry: { coordinates: unknown; type: 'LineString' | 'Polygon' }
-    properties: {
-      casing?: string
-      color: string
-      faded?: boolean
-      kind: 'area' | 'route'
-      label: string
-      pattern?: 'dotted'
-    }
-    type: 'Feature'
-  }[]
+  features: (
+    | {
+        geometry: { coordinates: unknown; type: 'LineString' | 'Polygon' }
+        properties: {
+          casing?: string
+          color: string
+          faded?: boolean
+          kind: 'area' | 'route'
+          label: string
+          pattern?: 'dotted'
+        }
+        type: 'Feature'
+      }
+    | {
+        geometry: { coordinates: [number, number]; type: 'Point' }
+        properties: {
+          anchor: 'bottom' | 'center'
+          halo: string
+          ink: string
+          kind: 'caption'
+          text: string
+        }
+        type: 'Feature'
+      }
+  )[]
   type: 'FeatureCollection'
 }
 
@@ -129,14 +142,83 @@ export const LAYERS: MapLibreLayer[] = [
   },
 ]
 
+/**
+ * The areas' captions, a layer of their own over the place names, so a
+ * caption is placed before a street's name that would meet it, and never
+ * hidden for one: a sector's letter is what the reader is looking for.
+ */
+const CAPTIONS = 'helix-area-captions'
+
+/** The caption layer, in the face the style draws its names in. */
+export const captionLayer = (font: readonly string[]): Record<string, unknown> => ({
+  filter: ['==', ['get', 'kind'], 'caption'],
+  id: CAPTIONS,
+  layout: {
+    'text-allow-overlap': true,
+    'text-anchor': ['get', 'anchor'],
+    'text-field': ['get', 'text'],
+    'text-font': font,
+    /* Words above a place stand a little clear of it. */
+    'text-offset': [
+      'case',
+      ['==', ['get', 'anchor'], 'bottom'],
+      ['literal', [0, -0.3]],
+      ['literal', [0, 0]],
+    ],
+    'text-size': 14,
+  },
+  paint: { 'text-color': ['get', 'ink'], 'text-halo-color': ['get', 'halo'], 'text-halo-width': 2 },
+  source: SOURCE,
+  type: 'symbol',
+})
+
+/**
+ * The face the style draws its names in, a heavier one where it has one, as
+ * a caption is short and has to be found: from the style's own symbol
+ * layers, since a face it does not have is a request for glyphs that fails.
+ */
+const faceOf = (map: MapLibreMap): string[] => {
+  const faces = (map.getStyle()?.layers ?? [])
+    .filter((layer) => layer.type === 'symbol')
+    .map((layer) => (layer.layout as Record<string, unknown> | undefined)?.['text-font'])
+    .filter(
+      (face): face is string[] =>
+        Array.isArray(face) &&
+        face.every((one) => typeof one === 'string') &&
+        !face.some((one) => /italic/i.test(one)),
+    )
+  return (
+    faces.find((face) => face.some((one) => /medium|semibold|bold/i.test(one))) ??
+    faces[0] ?? ['Noto Sans Regular']
+  )
+}
+
 /** The routes and areas as GeoJSON, longitude first, an area's ring closed as GeoJSON requires. */
 export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
-  features: layers.flatMap((layer) => {
+  features: layers.flatMap((layer): GeoJson['features'] => {
     if (layer.kind !== 'area' && layer.kind !== 'route') {
       return []
     }
     const coordinates = layer.points.map(({ lat, lng }) => [lng, lat])
-    return {
+    const caption = layer.caption
+      ? [
+          {
+            geometry: {
+              coordinates: [layer.caption.at.lng, layer.caption.at.lat] as [number, number],
+              type: 'Point' as const,
+            },
+            properties: {
+              anchor: layer.caption.anchor,
+              halo: layer.caption.halo,
+              ink: layer.caption.ink,
+              kind: 'caption' as const,
+              text: layer.caption.text,
+            },
+            type: 'Feature' as const,
+          },
+        ]
+      : []
+    const shape = {
       geometry:
         layer.kind === 'route'
           ? { coordinates, type: 'LineString' as const }
@@ -151,6 +233,7 @@ export const geoJson = (layers: MapLayerSpec[]): GeoJson => ({
       },
       type: 'Feature' as const,
     }
+    return [shape, ...caption]
   }),
   type: 'FeatureCollection',
 })
@@ -1336,6 +1419,7 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       for (const layer of LAYERS) {
         map.addLayer(layer as never, labels)
       }
+      map.addLayer(captionLayer(faceOf(map)) as never)
       drawExtras(specs.filter((spec) => EXTRAS.has(spec.kind)))
     }
     /* A replaced style takes every layer of ours with it, the points' too. */
@@ -1518,9 +1602,9 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         for (const id of [...drawnExtras.keys()]) {
           takeOffExtra(id)
         }
-        for (const layer of [...LAYERS].reverse()) {
-          if (map.getLayer(layer.id)) {
-            map.removeLayer(layer.id)
+        for (const id of [CAPTIONS, ...[...LAYERS].reverse().map((layer) => layer.id)]) {
+          if (map.getLayer(id)) {
+            map.removeLayer(id)
           }
         }
         if (map.getSource(SOURCE)) {

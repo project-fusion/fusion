@@ -96,6 +96,17 @@ export interface LeafletShapes {
     latlng: [number, number],
     options: LeafletShapeOptions & { radius: number },
   ): LeafletShape
+  /** An icon of the page's own markup, which an area's caption is drawn in. */
+  divIcon?(options: { className: string; html: HTMLElement; iconSize: [number, number] }): unknown
+  /**
+   * A marker at a place, which an area's caption stands on. `icon` takes
+   * `never` for `addTo`'s reason: it is what `divIcon` made, which Leaflet
+   * types as its own class.
+   */
+  marker?(
+    latlng: [number, number],
+    options: { icon: never; interactive: boolean; keyboard: boolean },
+  ): LeafletShape
   polygon(latlngs: [number, number][], options: LeafletShapeOptions): LeafletShape
   polyline(latlngs: [number, number][], options: LeafletShapeOptions): LeafletShape
   /** A layer of map tiles from a URL, which a raster layer's frames are drawn in. */
@@ -237,6 +248,43 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
           >()
           /* Each points layer's points, for the keyboard's walk of those in view. */
           let placed = new Map<string, MapPlace[]>()
+          /**
+           * An area's caption, as a marker no one presses or reaches with the
+           * keyboard, its words set as text, never as markup, and drawn in
+           * the connector's colors with the halo as a shadow round them.
+           * Nothing where the page did not hand over `marker` and `divIcon`.
+           */
+          const captionOf = (caption: MapLayerSpec['caption']): LeafletShape[] => {
+            if (!caption || !shapes.marker || !shapes.divIcon) {
+              return []
+            }
+            const words = document.createElement('span')
+            words.textContent = caption.text
+            const halo = caption.halo
+            Object.assign(words.style, {
+              color: caption.ink,
+              font: '600 14px/1 var(--helix-font-sans, sans-serif)',
+              left: '0',
+              pointerEvents: 'none',
+              position: 'absolute',
+              textShadow: `0 0 2px ${halo}, 0 0 2px ${halo}, 0 0 3px ${halo}`,
+              top: '0',
+              transform:
+                caption.anchor === 'bottom' ? 'translate(-50%, -130%)' : 'translate(-50%, -50%)',
+              whiteSpace: 'nowrap',
+            })
+            return [
+              shapes.marker([caption.at.lat, caption.at.lng], {
+                icon: shapes.divIcon({
+                  className: 'helix-map-caption',
+                  html: words,
+                  iconSize: [0, 0],
+                }) as never,
+                interactive: false,
+                keyboard: false,
+              }),
+            ]
+          }
           /* **A raster layer's frames are kept between redraws**, one tile
              layer each and switched by opacity, so a playing loop does not
              load its tiles again on every frame. */
@@ -380,10 +428,11 @@ export const leafletDriver = (map: LeafletMap, shapes?: LeafletShapes): MapDrive
                       interactive: false,
                       weight: 1.5,
                     })
-              for (const one of [...casing, shape]) {
+              const caption = layer.kind === 'area' ? captionOf(layer.caption) : []
+              for (const one of [...casing, shape, ...caption]) {
                 one.addTo(map as never)
               }
-              return [...casing, shape]
+              return [...casing, shape, ...caption]
             })
             for (const [id, had] of [...circles]) {
               if (!kept.has(id)) {

@@ -4,6 +4,7 @@ import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec'
 import type { MapMotion } from '../motion/motion.js'
 import {
   buildingsExtrusion,
+  captionLayer,
   geoJson,
   LAYERS,
   type MapLibreMap,
@@ -385,6 +386,9 @@ describe('mapLibreDriver', () => {
       'helix-route-dots',
       'helix-routes',
       'label-city',
+      /* The areas' captions over the place names, so a caption is placed
+         before a name that would meet it. */
+      'helix-area-captions',
     ])
     const data = sources['helix-layers']?.data as {
       features: { geometry: { coordinates: unknown }; properties: { casing?: string } }[]
@@ -470,6 +474,41 @@ describe('mapLibreDriver', () => {
     const style = {
       layers: LAYERS,
       sources: { 'helix-layers': { data: geoJson([]), type: 'geojson' } },
+      version: 8,
+    }
+    expect(validateStyleMin(style as never)).toEqual([])
+  })
+
+  test('an area’s caption is a point of its own in the data, drawn by a layer the validator accepts', () => {
+    const data = geoJson([
+      {
+        caption: {
+          anchor: 'bottom',
+          at: { lat: 2, lng: 3 },
+          halo: '#ffffff',
+          ink: '#123456',
+          text: 'A',
+        },
+        color: '#0000ff',
+        id: 'a1',
+        kind: 'area',
+        label: 'Sector A',
+        points: [
+          { lat: 0, lng: 0 },
+          { lat: 0, lng: 1 },
+          { lat: 1, lng: 1 },
+        ],
+      },
+    ])
+    expect(data.features.map((one) => one.geometry.type)).toEqual(['Polygon', 'Point'])
+    expect(data.features[1]).toMatchObject({
+      geometry: { coordinates: [3, 2] },
+      properties: { anchor: 'bottom', halo: '#ffffff', ink: '#123456', kind: 'caption', text: 'A' },
+    })
+    const style = {
+      glyphs: 'https://example.com/{fontstack}/{range}.pbf',
+      layers: [...LAYERS, captionLayer(['Noto Sans Medium'])],
+      sources: { 'helix-layers': { data, type: 'geojson' } },
       version: 8,
     }
     expect(validateStyleMin(style as never)).toEqual([])
