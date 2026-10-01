@@ -86,6 +86,58 @@ const stand = (
 /** A motion as the connector hands one over, which Leaflet takes in seconds. */
 const glide: MapMotion = { duration: 250, easing: (t) => t }
 
+describe('leafletDriver, gestures', () => {
+  const handler = (on: boolean) => {
+    let enabled = on
+    return {
+      disable: () => {
+        enabled = false
+      },
+      enable: () => {
+        enabled = true
+      },
+      enabled: () => enabled,
+    }
+  }
+
+  test('cooperative takes the wheel only with Ctrl or ⌘, off takes nothing, and free is what the page had', () => {
+    const { map } = stand()
+    const zoomed: number[] = []
+    const handlers = {
+      dragging: handler(true),
+      scrollWheelZoom: handler(true),
+      touchZoom: handler(true),
+    }
+    const driver = leafletDriver({
+      ...map,
+      ...handlers,
+      getZoom: () => 10,
+      mouseEventToLatLng: () => ({ lat: 1, lng: 2 }),
+      setZoomAround: (_at, zoom) => zoomed.push(zoom),
+    })
+    const read = (): boolean[] =>
+      [handlers.dragging, handlers.scrollWheelZoom, handlers.touchZoom].map((one) => one.enabled())
+    driver.gestures?.('cooperative')
+    /* A mouse still drags; the wheel is the page's. */
+    expect(read()).toEqual([true, false, true])
+    const box = map.getContainer()
+    const plain = new WheelEvent('wheel', { cancelable: true, deltaY: 40 })
+    box.dispatchEvent(plain)
+    const held = new WheelEvent('wheel', { cancelable: true, deltaY: -40 })
+    Object.defineProperty(held, 'ctrlKey', { value: true })
+    box.dispatchEvent(held)
+    expect(zoomed).toEqual([10.5])
+    expect(held.defaultPrevented).toBe(true)
+    expect(plain.defaultPrevented).toBe(false)
+    driver.gestures?.('off')
+    expect(read()).toEqual([false, false, false])
+    box.dispatchEvent(held)
+    expect(zoomed).toEqual([10.5])
+    driver.gestures?.('free')
+    expect(read()).toEqual([true, true, true])
+  })
+})
+
 describe('leafletDriver', () => {
   test('a pan is pixels over the page’s duration, and a zoom is one level, as Leaflet’s own buttons take', () => {
     const { asked, map } = stand()

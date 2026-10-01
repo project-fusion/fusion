@@ -187,6 +187,54 @@ const stand = (): {
  */
 const glide: MapMotion = { duration: 250, easing: (t) => t * t }
 
+describe('mapLibreDriver, gestures', () => {
+  const handler = (on: boolean) => {
+    let enabled = on
+    return {
+      disable: () => {
+        enabled = false
+      },
+      enable: () => {
+        enabled = true
+      },
+      isEnabled: () => enabled,
+    }
+  }
+
+  test('each mode is MapLibre’s own handlers, and free is what the page had, its own choices kept', () => {
+    const { map } = stand()
+    map
+      .getContainer()
+      .insertAdjacentHTML('beforeend', '<div class="maplibregl-cooperative-gesture-screen"></div>')
+    /* A page that switched dragging off on its own map. */
+    const handlers = {
+      cooperativeGestures: handler(false),
+      dragPan: handler(false),
+      scrollZoom: handler(true),
+      touchZoomRotate: handler(true),
+    }
+    const driver = mapLibreDriver({ ...map, ...handlers })
+    const read = (): boolean[] =>
+      [
+        handlers.cooperativeGestures,
+        handlers.dragPan,
+        handlers.scrollZoom,
+        handlers.touchZoomRotate,
+      ].map((one) => one.isEnabled())
+    driver.gestures?.('cooperative')
+    expect(read()).toEqual([true, true, true, true])
+    /* The frame says what passed, in the page's theme; MapLibre's own words are hidden. */
+    expect(
+      (map.getContainer().querySelector('.maplibregl-cooperative-gesture-screen') as HTMLElement)
+        .style.display,
+    ).toBe('none')
+    driver.gestures?.('off')
+    expect(read()).toEqual([false, false, false, false])
+    driver.gestures?.('free')
+    expect(read()).toEqual([false, false, true, true])
+  })
+})
+
 describe('mapLibreDriver, ready', () => {
   test('at once where the view is drawn, and otherwise at load, once', () => {
     const drawn = stand()

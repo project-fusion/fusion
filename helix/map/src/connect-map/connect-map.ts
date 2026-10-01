@@ -60,6 +60,15 @@ export interface MapDriver {
    */
   ready?(done: () => void): () => void
   /**
+   * Which gestures the renderer takes from the page, as the frame's
+   * `gestures` decides. `free` is what the renderer did before it was told
+   * otherwise. `cooperative` leaves the wheel and one finger to the page and
+   * takes the wheel with Ctrl or ⌘, and two fingers. `off` takes none, while a
+   * map waiting to be pressed has not been. The frame tells the reader what
+   * passed to the page, so hide the renderer's own message where it has one.
+   */
+  gestures?(mode: 'cooperative' | 'free' | 'off'): void
+  /**
    * The element the renderer made focusable, which the connector takes out of
    * the tab order while connected so the frame's region is the one stop.
    */
@@ -304,6 +313,8 @@ interface Frame extends HTMLElement {
   cluster?: boolean | undefined
   /** Says the map has been drawn whole, or with `false`, that it no longer is. */
   drawn?(whole?: boolean): void
+  /** Which gestures the renderer takes, from the frame's `gestures`. */
+  gestureMode?: 'cooperative' | 'free' | 'off'
   /** Pictures of the map in each map type, for the layers menu's cards. */
   mapPreviews?: Partial<Record<MapType, string>>
   /** How the map draws the ground, where it has imagery; absent is standard. */
@@ -1570,8 +1581,25 @@ export const connectMap = (
       queueMicrotask(flush)
     }
   }
+  /* **The renderer told only when the frame's answer changes**, and `free`,
+     what it did before, at the start: a map left at `always` is a renderer
+     the connector never touches, so a page that switched a gesture off on
+     its own map keeps it off. */
+  let gestured: 'cooperative' | 'free' | 'off' = 'free'
+  const tellGestures = (): void => {
+    const mode = (frame as Frame).gestureMode ?? 'free'
+    if (mode !== gestured) {
+      gestured = mode
+      driver.gestures?.(mode)
+    }
+  }
+  tellGestures()
   const handlePartChange = (event: Event): void => {
     const { kind } = (event as HelixMapPartChangeEvent).detail
+    if (kind === 'gestures') {
+      tellGestures()
+      return
+    }
     if (kind === 'menu') {
       drawPreviews()
       return
@@ -1724,6 +1752,9 @@ export const connectMap = (
          the map on `:state(ready)` hides it until the next connection draws
          it whole again. */
       ;(frame as Frame).drawn?.(false)
+      if (gestured !== 'free') {
+        driver.gestures?.('free')
+      }
       stopTheming?.()
       styled.disconnect()
       children.disconnect()

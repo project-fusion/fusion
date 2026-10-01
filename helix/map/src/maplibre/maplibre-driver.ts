@@ -396,6 +396,13 @@ interface MapLibreAnimation {
   easing?: (t: number) => number
 }
 
+/** One of MapLibre's gesture handlers, as far as the driver switches it. */
+export interface MapLibreHandler {
+  disable(): unknown
+  enable(): unknown
+  isEnabled(): boolean
+}
+
 /**
  * The part of a MapLibre `Map` the driver uses, so this package imports no
  * renderer and a page brings whichever version it has.
@@ -414,6 +421,14 @@ export interface MapLibreMap {
   isSourceLoaded?(id: string): boolean
   /** The canvas, which MapLibre makes focusable. */
   getCanvas(): HTMLElement
+  /** The wheel's zoom, one of the handlers a frame's `gestures` switches. */
+  scrollZoom?: MapLibreHandler
+  /** Dragging the map, by a mouse or one finger. */
+  dragPan?: MapLibreHandler
+  /** Two fingers zooming and turning the map. */
+  touchZoomRotate?: MapLibreHandler
+  /** MapLibre's own cooperative gestures: Ctrl or ⌘ with the wheel, and two fingers. */
+  cooperativeGestures?: MapLibreHandler
   /** The middle of the view, which a map-type picture is drawn around. */
   getCenter?(): { lat: number; lng: number }
   /** One layout property of one layer, read before it is set again. */
@@ -710,6 +725,9 @@ const answerImages = (holder: ImageAsker): (() => void) => {
 /** The width and height of a map-type picture, in CSS pixels, drawn at twice that. */
 const PICTURE = { height: 90, width: 120 }
 
+/** Which gestures each map had before a frame first told it, by map. */
+const originalGestures = new WeakMap<MapLibreMap, Record<string, boolean>>()
+
 /**
  * Drives a MapLibre map from the Map frame.
  *
@@ -766,6 +784,48 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     )
   },
   focusTarget: () => map.getCanvas(),
+  /* **What the page had, kept from the first time the frame asks**, and put
+     back for `free`: a page that switched the wheel off on its own map does
+     not find it switched on by a frame that let it go. MapLibre's own
+     message for a gesture it let pass is hidden, since the frame says it in
+     the page's theme and its words. */
+  gestures: (mode) => {
+    const handlers = {
+      cooperative: map.cooperativeGestures,
+      drag: map.dragPan,
+      scroll: map.scrollZoom,
+      touch: map.touchZoomRotate,
+    }
+    const had = (originalGestures.get(map) ??
+      Object.fromEntries(
+        Object.entries(handlers).map(([name, handler]) => [name, handler?.isEnabled() ?? false]),
+      )) as Record<keyof typeof handlers, boolean>
+    originalGestures.set(map, had)
+    const want =
+      mode === 'free'
+        ? had
+        : mode === 'cooperative'
+          ? { cooperative: true, drag: true, scroll: true, touch: true }
+          : { cooperative: false, drag: false, scroll: false, touch: false }
+    for (const [name, handler] of Object.entries(handlers) as [
+      keyof typeof handlers,
+      MapLibreHandler | undefined,
+    ][]) {
+      if (handler && handler.isEnabled() !== want[name]) {
+        if (want[name]) {
+          handler.enable()
+        } else {
+          handler.disable()
+        }
+      }
+    }
+    const screen = map
+      .getContainer()
+      .querySelector<HTMLElement>('.maplibregl-cooperative-gesture-screen')
+    if (screen) {
+      screen.style.display = 'none'
+    }
+  },
   /* **Roads and names hidden for the Satellite map type**, and hidden again
      when a restyle for the theme brings them back. */
   labels: (shown) => {

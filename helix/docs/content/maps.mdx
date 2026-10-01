@@ -227,6 +227,35 @@ removing it to your framework.
 A snapshot is a flat map. A map zoomed out past about 6 is a globe in MapLibre,
 so draw snapshots of city and street views.
 
+## Share the scroll with the page
+
+By default a map takes every gesture over it: the wheel zooms the map, and one
+finger pans it. That suits a map that is the page, such as a full-screen view.
+A map embedded in a page, such as a hero, takes the wheel from a reader who is
+scrolling past it. Set `gestures` on the frame to share them:
+
+```html
+<helix-map gestures="cooperative" label="Downtown Austin">
+  <div id="map"></div>
+</helix-map>
+```
+
+- `cooperative` leaves the wheel and one finger to the page. The map takes Ctrl
+  or ⌘ with the wheel, and two fingers. When a gesture passes to the page, the
+  frame says how to reach the map, where the gesture was. Use it for a map
+  embedded in a page.
+- `activate` takes nothing until the map is pressed. The frame then shows that
+  the map has the gestures, and gives them back when the reader presses Escape,
+  moves the pointer off the map, or presses elsewhere on the page.
+- `always`, the default, takes every gesture.
+
+The keyboard and the frame's buttons work the same in every mode. `connectMap`
+tells the renderer, so MapLibre and Leaflet behave alike, and MapLibre's own
+message is replaced by the frame's. For Leaflet, pass `L`, as
+`leafletDriver(map, L)`. Change the words with `wheel-hint-label`,
+`two-finger-hint-label`, `activate-hint-label`, and `using-label`. Style the
+hint and the line with `::part(gesture-hint)` and `::part(gesture-status)`.
+
 ## Show the map once it is drawn
 
 MapLibre draws a map in stages: the streets, then the imagery tile by tile,

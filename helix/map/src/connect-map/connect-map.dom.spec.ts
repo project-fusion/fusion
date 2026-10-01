@@ -878,6 +878,24 @@ describe('connectMap with a snapshot drawn on the server', () => {
   })
 })
 
+describe('connectMap and the frame’s gestures', () => {
+  test('the renderer is told only when the frame’s answer changes, and never for a map left alone', async () => {
+    const host = (await frame('<div id="canvas"></div>')) as Frame & { gestures: string }
+    const told: string[] = []
+    const driver = { ...projecting().driver, gestures: (mode: string) => told.push(mode) }
+    const connection = connectMap(host, driver as never)
+    expect(told).toEqual([])
+    host.gestures = 'cooperative'
+    await host.updateComplete
+    host.gestures = 'activate'
+    await host.updateComplete
+    expect(told).toEqual(['cooperative', 'off'])
+    /* What the renderer did before, given back when the connector goes. */
+    connection.disconnect()
+    expect(told).toEqual(['cooperative', 'off', 'free'])
+  })
+})
+
 describe('connectMap with a position', () => {
   test('a position is stood where it is, turned its heading, and ringed as wide as its accuracy on the map', async () => {
     const host = await frame(

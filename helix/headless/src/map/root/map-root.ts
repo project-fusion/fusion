@@ -112,6 +112,9 @@ const placed = (marker: HelixHeadlessMapMarker): boolean =>
  */
 const ASK_LAPSES = 3000
 
+/** How long a hint shows over the map, in milliseconds: long enough to read twice. */
+const HINT_SHOWS = 1600
+
 /** How long the view must be still before what it did is said, in milliseconds. */
 const SETTLES = 400
 
@@ -186,6 +189,8 @@ const SETTLES = 400
  * @csspart face-north - The compass: its needle points north as the map turns, and pressing it turns the map to face north.
  * @csspart footer - The strip below the map.
  * @csspart fullscreen - The button that makes the map fill the screen.
+ * @csspart gesture-hint - Words over the map for a moment when it lets a gesture pass to the page, such as how to zoom it.
+ * @csspart gesture-status - The line shown while a map with `gestures="activate"` has the gestures.
  * @csspart header - The strip above the map.
  * @csspart layer - One entry in the list of the map's layers.
  * @csspart layer-choice - One layer's tile in the layers menu, pressed while the layer is shown.
@@ -218,9 +223,17 @@ const SETTLES = 400
  * @cssstate fullscreen - The map fills the screen.
  * @cssstate idle - The user has been still long enough for the header and footer to fade.
  * @cssstate ready - The map has been drawn whole, after `helix-map-ready`.
+ * @cssstate using - A map with `gestures="activate"` has been pressed and has the gestures.
  */
 @customElement('helix-headless-map')
 export class HelixHeadlessMap extends MixinViewport(HelixElement) {
+  /**
+   * The hint shown when a map waiting to be pressed is scrolled or swiped
+   * over, with `gestures="activate"`.
+   */
+  @property({ attribute: 'activate-hint-label' })
+  activateHintLabel = 'Press the map to use it'
+
   /**
    * The map's rotation, in degrees clockwise from north. `connectMap` keeps it
    * current, and the Face north button's needle turns with it.
@@ -242,6 +255,23 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   /** What screen readers hear when the map is tilted back to looking straight down. */
   @property({ attribute: 'flat-label' })
   flatLabel = 'Looking straight down'
+
+  /**
+   * Which gestures the map takes from the page.
+   *
+   * - `always`, which unset is: the wheel zooms the map and one finger pans
+   *   it, for a map that is the page, such as a full-screen view.
+   * - `cooperative`: the wheel and one finger scroll the page, and the map
+   *   takes Ctrl or ⌘ with the wheel, and two fingers. The frame says so
+   *   when a gesture passes to the page. Best for a map embedded in a page.
+   * - `activate`: the map takes nothing until it is pressed, and gives it
+   *   back on Escape, when the pointer leaves it, or on a press elsewhere.
+   *
+   * The keyboard and the frame's buttons work in every mode. The renderer is
+   * told through the connector, so MapLibre and Leaflet behave alike.
+   */
+  @property()
+  gestures?: 'activate' | 'always' | 'cooperative'
 
   /** The Hybrid map type's name. */
   @property({ attribute: 'hybrid-label' })
@@ -341,6 +371,22 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   @property({ attribute: 'turned-label' })
   turnedLabel = 'Facing {degrees} degrees'
+
+  /** The hint shown when one finger swipes over a map with `gestures="cooperative"`. */
+  @property({ attribute: 'two-finger-hint-label' })
+  twoFingerHintLabel = 'Use two fingers to move the map'
+
+  /** The line shown while a map with `gestures="activate"` has the gestures. */
+  @property({ attribute: 'using-label' })
+  usingLabel = 'Using the map. Press Escape to scroll the page again.'
+
+  /**
+   * The hint shown when the wheel scrolls past a map with
+   * `gestures="cooperative"`, with `{key}`, which is ⌘ on a Mac and Ctrl
+   * elsewhere, as the renderer reads it.
+   */
+  @property({ attribute: 'wheel-hint-label' })
+  wheelHintLabel = 'Use {key} and scroll to zoom the map'
 
   /**
    * What screen readers hear after a zoom. `{level}` is the zoom level.
@@ -688,6 +734,130 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
   }
 
+  /** The hint on the map while one shows, put there by a gesture the map let pass. */
+  @state()
+  private hint = ''
+
+  /** When the hint goes. */
+  private hinting: ReturnType<typeof setTimeout> | undefined
+
+  /**
+   * Where the gesture was, in the map's box, which the hint is shown at:
+   * where the reader is looking, and on the map wherever a page laid its own
+   * content over the rest of it.
+   */
+  @state()
+  private hintAt: { x: number; y: number } | undefined
+
+  /** Whether a map with `gestures="activate"` has been pressed, and has the gestures. */
+  @state()
+  private taken = false
+
+  /**
+   * @internal Which gestures the renderer takes, which `connectMap` tells it:
+   * all of them, the cooperative set, or none, while an `activate` map waits
+   * to be pressed.
+   */
+  get gestureMode(): 'cooperative' | 'free' | 'off' {
+    if (this.gestures === 'cooperative') {
+      return 'cooperative'
+    }
+    return this.gestures === 'activate' && !this.taken ? 'off' : 'free'
+  }
+
+  /** Shows a hint over the map for a moment, where the gesture was. */
+  private showHint(words: string, at?: { clientX: number; clientY: number }): void {
+    const box = this.partNamed('viewport')?.getBoundingClientRect()
+    this.hintAt =
+      at && box && box.width > 0 && box.height > 0
+        ? { x: (at.clientX - box.left) / box.width, y: (at.clientY - box.top) / box.height }
+        : undefined
+    this.hint = words
+    clearTimeout(this.hinting)
+    this.hinting = setTimeout(() => {
+      this.hint = ''
+    }, HINT_SHOWS)
+  }
+
+  /**
+   * A wheel the map let pass to the page, which is said: a reader scrolling
+   * the page past a map that did not zoom is told why, and how to zoom it.
+   * **Ctrl or ⌘ with the wheel is the map's**, and is what a trackpad's pinch
+   * arrives as.
+   */
+  private readonly handleWheel = (event: WheelEvent): void => {
+    if (this.gestures === 'cooperative' && !(event.ctrlKey || event.metaKey)) {
+      const mac = typeof navigator !== 'undefined' && navigator.userAgent.includes('Mac')
+      this.showHint(fillTemplate(this.wheelHintLabel, { key: mac ? '⌘' : 'Ctrl' }), event)
+    } else if (this.gestures === 'activate' && !this.taken) {
+      this.showHint(this.activateHintLabel, event)
+    }
+  }
+
+  /** One finger moving over the map, which scrolls the page, and is said. */
+  private readonly handleTouchMove = (event: TouchEvent): void => {
+    const finger = event.touches[0]
+    if (event.touches.length !== 1) {
+      return
+    }
+    if (this.gestures === 'cooperative') {
+      this.showHint(this.twoFingerHintLabel, finger)
+    } else if (this.gestures === 'activate' && !this.taken) {
+      this.showHint(this.activateHintLabel, finger)
+    }
+  }
+
+  /** A press on the map itself, which hands a waiting map the gestures. */
+  private readonly handleTake = (event: PointerEvent): void => {
+    const viewport = this.partNamed('viewport')
+    if (this.gestures !== 'activate' || this.taken || !viewport) {
+      return
+    }
+    /* On the map: its viewport, or what the page put in it, which is the
+       frame's own children in no named slot, the renderer's box among them. */
+    const path = event.composedPath()
+    const onMap =
+      path.includes(viewport) ||
+      path.some((one) => one instanceof Element && one.parentElement === this && one.slot === '')
+    if (onMap) {
+      this.taken = true
+      this.hint = ''
+    }
+  }
+
+  /** Escape, which gives the page its scroll back. */
+  private readonly handleGiveBackKey = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape' && this.taken) {
+      this.taken = false
+    }
+  }
+
+  /** A press anywhere else on the page, which gives it its scroll back. */
+  private readonly handleGiveBackOutside = (event: PointerEvent): void => {
+    if (!event.composedPath().includes(this)) {
+      this.taken = false
+    }
+  }
+
+  /** The window losing focus, as a reader switching away does. */
+  private readonly handleGiveBackBlur = (): void => {
+    this.taken = false
+  }
+
+  /**
+   * The pointer leaving the frame. **Heard on the frame and not the map's
+   * canvas**, which a pointer resting on a marker has left, since markers
+   * stand outside it. **A mouse or a pen and never a finger**, whose
+   * `pointerleave` is the finger lifting: a tap took the map and gave it back
+   * in one.
+   */
+  private readonly handleLeave = (event: PointerEvent): void => {
+    this.idle.leave()
+    if (event.pointerType !== 'touch') {
+      this.taken = false
+    }
+  }
+
   /** A marker added or taken away is a walk of a different length. */
   private readonly handleSlotChange = (): void => {
     this.requestUpdate()
@@ -700,6 +870,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('keydown', this.handleMarkerKeydown)
     this.addEventListener('keyup', this.handleMarkerKeyup)
+    this.addEventListener('keydown', this.handleGiveBackKey)
+    this.addEventListener('pointerdown', this.handleTake)
+    this.addEventListener('touchmove', this.handleTouchMove, { passive: true })
+    this.addEventListener('wheel', this.handleWheel, { passive: true })
     this.hiding = new MutationObserver(() => this.requestUpdate())
     this.hiding.observe(this, { attributeFilter: ['hidden'], attributes: true, subtree: true })
   }
@@ -715,6 +889,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('keydown', this.handleMarkerKeydown)
     this.removeEventListener('keyup', this.handleMarkerKeyup)
+    this.removeEventListener('keydown', this.handleGiveBackKey)
+    this.removeEventListener('pointerdown', this.handleTake)
+    this.removeEventListener('touchmove', this.handleTouchMove)
+    this.removeEventListener('wheel', this.handleWheel)
+    clearTimeout(this.hinting)
+    this.taken = false
+    document.removeEventListener('pointerdown', this.handleGiveBackOutside)
+    window.removeEventListener('blur', this.handleGiveBackBlur)
   }
 
   /**
@@ -743,6 +925,22 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
        names, which `connectMap` hears from here. */
     if (changed.has('mapType')) {
       this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'layer' }))
+    }
+    /* Which gestures the renderer takes, which `connectMap` hears from here;
+       and while a waiting map has them, the page listened to for their
+       return. */
+    if (changed.has('gestures') || changed.has('taken')) {
+      if (this.gestures !== 'activate' && this.taken) {
+        this.taken = false
+      }
+      if (this.taken) {
+        document.addEventListener('pointerdown', this.handleGiveBackOutside)
+        window.addEventListener('blur', this.handleGiveBackBlur)
+      } else {
+        document.removeEventListener('pointerdown', this.handleGiveBackOutside)
+        window.removeEventListener('blur', this.handleGiveBackBlur)
+      }
+      this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'gestures' }))
     }
     if (changed.has('layersOpen')) {
       if (this.layersOpen) {
@@ -1073,6 +1271,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     hostAria(this.internals, { label: this.label })
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
+    this.toggleState('using', this.taken)
   }
 
   /**
@@ -1123,7 +1322,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       tabindex="0"
       @focusin=${this.idle.stir}
       @keydown=${this.handleKeydown}
-      @pointerleave=${this.idle.leave}
+      @pointerleave=${this.handleLeave}
       @pointermove=${this.idle.stir}
     >
       <div part="header">
@@ -1131,6 +1330,13 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       </div>
       <div part="viewport">
         <slot @slotchange=${this.handleSlotChange}></slot>
+        <div
+          part="gesture-hint"
+          aria-hidden="true"
+          ?hidden=${this.hint === ''}
+          style=${this.hintAt ? `--_map-hint-x: ${(this.hintAt.x * 100).toFixed(2)}%; --_map-hint-y: ${(this.hintAt.y * 100).toFixed(2)}%` : nothing}
+        >${this.hint}</div>
+        <div part="gesture-status" aria-hidden="true" ?hidden=${!this.taken}>${this.usingLabel}</div>
       </div>
       ${this.renderLayers()}
       ${this.renderControls()}
