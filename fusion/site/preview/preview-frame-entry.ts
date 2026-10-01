@@ -23,7 +23,8 @@
 import '@fusion.dev/helix'
 import { RESTYLED } from './preview-events'
 
-/** Where the map chunk and MapLibre are, stamped at build time. */
+/** Where the map chunk, MapLibre and the graph chunk are, stamped at build time. */
+declare const __PREVIEW_GRAPH_URL__: string
 declare const __PREVIEW_MAP_URL__: string
 declare const __PREVIEW_MAPLIBRE_URL__: string
 
@@ -51,8 +52,13 @@ const host = document.getElementById('preview-root')
  */
 let rendered: string | undefined
 
-/** Takes down whatever the last markup mounted, before it is replaced. */
-let unmount: (() => void) | undefined
+/** Takes down whatever the last markup mounted, before it is replaced: its maps and its graphs. */
+const mounted: (() => void)[] = []
+const unmount = (): void => {
+  for (const one of mounted.splice(0)) {
+    one()
+  }
+}
 
 /** Counts renders, so a map chunk that lands late mounts only on the latest. */
 let generation = 0
@@ -86,7 +92,24 @@ const mountMaps = (root: HTMLElement, at: number): void => {
     .then(() => load(__PREVIEW_MAP_URL__))
     .then(() => {
       if (at === generation && window.helixPreviewMap) {
-        unmount = window.helixPreviewMap.mount(root)
+        mounted.push(window.helixPreviewMap.mount(root))
+      }
+    })
+    .catch((error: unknown) => console.error(String(error)))
+}
+
+/**
+ * A live graph for any `helix-graph[data-preview-graph]` the markup carries,
+ * with Sigma and the connector loaded the first time one does and never before.
+ */
+const mountGraphs = (root: HTMLElement, at: number): void => {
+  if (!root.querySelector('helix-graph[data-preview-graph]')) {
+    return
+  }
+  void load(__PREVIEW_GRAPH_URL__)
+    .then(() => {
+      if (at === generation && window.helixPreviewGraph) {
+        mounted.push(window.helixPreviewGraph.mount(root))
       }
     })
     .catch((error: unknown) => console.error(String(error)))
@@ -159,8 +182,7 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
   const fresh = source !== rendered
   if (fresh) {
     generation += 1
-    unmount?.()
-    unmount = undefined
+    unmount()
     host.innerHTML = source.replace(/<link\b[^>]*\brel=(["'])stylesheet\1[^>]*>\s*/gi, '')
     runScripts(host)
     rendered = source
@@ -177,6 +199,7 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
      sent with, and one already mounted hears that its colors may have moved. */
   if (fresh) {
     mountMaps(host, generation)
+    mountGraphs(host, generation)
   }
   window.dispatchEvent(new Event(RESTYLED))
   measure()

@@ -24,6 +24,7 @@ import { fileURLToPath } from 'node:url'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const out = join(root, 'fusion/site/public/sandbox')
 const entry = join(root, 'fusion/site/preview/preview-frame-entry.ts')
+const graphEntry = join(root, 'fusion/site/preview/preview-graph-entry.ts')
 const mapEntry = join(root, 'fusion/site/preview/preview-map-entry.ts')
 const maplibreEntry = join(root, 'fusion/site/preview/preview-maplibre-entry.ts')
 
@@ -132,8 +133,27 @@ if (!mapBuilt.success) {
 const mapScript = await mapBuilt.outputs[0].text()
 await writeFile(join(out, 'map.js'), mapScript)
 
+/* **A live graph, in one file the frame loads only when a render carries
+ * one**: the connector, Sigma, graphology and ForceAtlas2, whose layout
+ * starts its own worker from a `blob:` URL. */
+const graphBuilt = await Bun.build({
+  entrypoints: [graphEntry],
+  format: 'iife',
+  minify: true,
+  target: 'browser',
+})
+if (!graphBuilt.success) {
+  for (const log of graphBuilt.logs) {
+    console.error(log)
+  }
+  process.exit(1)
+}
+const graphScript = await graphBuilt.outputs[0].text()
+await writeFile(join(out, 'graph.js'), graphScript)
+
 const built = await Bun.build({
   define: {
+    __PREVIEW_GRAPH_URL__: JSON.stringify(`./graph.js?v=${stamp(graphScript)}`),
     __PREVIEW_MAP_URL__: JSON.stringify(`./map.js?v=${stamp(mapScript)}`),
     __PREVIEW_MAPLIBRE_URL__: JSON.stringify(`./maplibre-gl.js?v=${stamp(maplibre)}`),
   },
@@ -231,6 +251,7 @@ await writeFile(
 
 const size = Math.round((script.length + css.join('').length) / 1024)
 const mapSize = Math.round((maplibre.length + mapScript.length) / 1024)
+const graphSize = Math.round(graphScript.length / 1024)
 console.log(
-  `frame: ${size} KB, ${layers.length} style layers, one classic script, and ${mapSize} KB of map loaded only when a render carries one`,
+  `frame: ${size} KB, ${layers.length} style layers, one classic script, and ${mapSize} KB of map and ${graphSize} KB of graph loaded only when a render carries one`,
 )
