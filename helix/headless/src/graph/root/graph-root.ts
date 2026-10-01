@@ -12,8 +12,10 @@ import {
   type ViewportZoomDetail,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
+import { magnifyingGlass } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import {
   type Adjacency,
   adjacencyOf,
@@ -62,6 +64,7 @@ const PAGE = 10
  * @documentation https://fusion.dev/helix/components/graph
  *
  * @slot - The renderer's box, which the drawing is made in.
+ * @slot filter-icon - The icon in the search field. Defaults to a magnifying glass.
  * @slot footer - Content below the graph.
  * @slot header - Content above the graph.
  *
@@ -75,7 +78,9 @@ const PAGE = 10
  * @csspart before - The room the notes before those drawn would take.
  * @csspart body - The drawing beside the list, or above it where the frame is narrow.
  * @csspart controls - The group the pan and zoom buttons sit in.
- * @csspart count - How many notes the list holds, which a search narrows.
+ * @csspart count - How many notes the list holds, which a search narrows, at the end of the search bar.
+ * @csspart filter-icon - The icon beside the search field.
+ * @csspart filter-mark - The default icon beside the search field, shown when none is slotted.
  * @csspart footer - The strip below the graph.
  * @csspart fullscreen - The button that makes the graph fill the screen.
  * @csspart header - The strip above the graph.
@@ -93,7 +98,8 @@ const PAGE = 10
  * @csspart pan-up - The button that moves the graph up.
  * @csspart panel - The search field and the list, beside the drawing or below it.
  * @csspart region - The frame: the drawing, its controls and the list.
- * @csspart search - The field that finds a note by its name.
+ * @csspart search - The bar holding the icon, the search field and the count.
+ * @csspart search-field - The field that finds a note by its name.
  * @csspart stage - The drawing and its controls.
  * @csspart viewport - The box the renderer draws in.
  * @csspart zoom-in - The zoom in button.
@@ -359,17 +365,40 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     }
   }
 
-  /** The search field's keys, which belong to the field and never pan the graph. */
+  /**
+   * The search field's keys, which belong to the field and never pan the
+   * graph. Escape empties a search that has words in it, and passes through
+   * an empty one to whatever the page does with it.
+   */
   private readonly handleSearchKeydown = (event: KeyboardEvent): void => {
     if (event.key === 'ArrowDown') {
       event.preventDefault()
       this.partNamed('list')?.focus()
+    }
+    if (event.key === 'Escape') {
+      if (this.query === '') {
+        return
+      }
+      event.preventDefault()
+      this.query = ''
     }
     event.stopPropagation()
   }
 
   private readonly handleSearch = (event: Event): void => {
     this.query = (event.target as HTMLInputElement).value
+  }
+
+  /**
+   * The mark in the search field, behind a seam: a slot for the page, and a
+   * method for the tier above, as the listbox's filter has.
+   */
+  protected renderFilterIcon(): TemplateResult {
+    return html`<slot name="filter-icon">
+      <svg part="filter-mark" fill="currentColor" viewBox=${magnifyingGlass.viewBox}>
+        ${unsafeSVG(magnifyingGlass.content)}
+      </svg>
+    </slot>`
   }
 
   private renderRows(): TemplateResult[] {
@@ -425,16 +454,21 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
           ${this.renderControls()}
         </div>
         <div part="panel">
-          <input
-            part="search"
-            type="search"
-            aria-label=${this.searchLabel}
-            placeholder=${this.searchLabel}
-            .value=${this.query}
-            @input=${this.handleSearch}
-            @keydown=${this.handleSearchKeydown}
-          />
-          <div part="count" aria-hidden="true">${this.countText()}</div>
+          <div part="search">
+            <span part="filter-icon" aria-hidden="true">${this.renderFilterIcon()}</span>
+            <input
+              part="search-field"
+              type="text"
+              autocomplete="off"
+              spellcheck="false"
+              aria-label=${this.searchLabel}
+              placeholder=${this.searchLabel}
+              .value=${this.query}
+              @input=${this.handleSearch}
+              @keydown=${this.handleSearchKeydown}
+            />
+            <span part="count" aria-hidden="true">${this.countText()}</span>
+          </div>
           <div
             part="list"
             role="listbox"
