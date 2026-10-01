@@ -84,6 +84,32 @@ This keeps both ways of theming in agreement on the same page.
 
 Use tuned to try a color. Use verified for the theme you ship.
 
+## Derive both modes
+
+A site with light and dark mode needs both themes. `deriveModes` derives your
+intent in each mode and renders one block, with each color as a
+`light-dark()` pair, the way the shipped stylesheet writes its tokens:
+
+```ts
+import { initTheme } from '@fusion.dev/helix-theme'
+
+const engine = await initTheme('/theme.wasm')
+const { css, dark, light } = engine.deriveModes({ brand: '#0b3d91' }, [':root'])
+
+for (const theme of [light, dark]) {
+  if (theme.violations.length > 0) {
+    throw new Error(theme.violations.join('\n'))
+  }
+}
+
+console.log(css[':root'])
+```
+
+`color-scheme` picks the half, so the block follows the operating system and
+`[data-color-mode]` on any element, as described in [Color modes](./color-modes).
+A value that is not a color and still changes with the mode, such as the edge
+of a floating surface, is set by rules after the block, one for each mode.
+
 ## Why Helix uses OKLCH
 
 Equal numeric steps in sRGB do not look like equal steps. That makes scales and

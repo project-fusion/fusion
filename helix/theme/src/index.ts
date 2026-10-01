@@ -23,11 +23,12 @@
  * }))
  * ```
  */
-import initWasm, { derive, hexToOklch as readHex } from '../wasm/fusion_helix_theme.js'
-import type { DerivedTheme, Oklch, ThemeIntent } from './types.js'
+import initWasm, { derive, deriveModes, hexToOklch as readHex } from '../wasm/fusion_helix_theme.js'
+import type { DerivedModes, DerivedTheme, Oklch, ThemeIntent } from './types.js'
 
 export type {
   Color,
+  DerivedModes,
   DerivedTheme,
   DerivedToken,
   Oklch,
@@ -50,6 +51,18 @@ export interface ThemeEngine {
    * outside the range it is meaningful in.
    */
   derive(intent: ThemeIntent, selectors?: readonly string[]): DerivedTheme
+  /**
+   * Derives a theme in both modes, and renders them as one block under each
+   * selector asked for, every color a `light-dark()` pair, which is how the
+   * shipped stylesheet writes its tokens. The intent's `scheme` is set aside.
+   *
+   * For a site with both modes, which otherwise derived twice and merged the
+   * blocks by hand. Each mode's theme comes back too, so a finding in either is
+   * still read.
+   *
+   * @throws when the engine refuses the intent in either mode.
+   */
+  deriveModes(intent: ThemeIntent, selectors?: readonly string[]): DerivedModes
   /**
    * Reads a hex color into its OKLCH components.
    *
@@ -91,6 +104,8 @@ export function initTheme(source: Source): Promise<ThemeEngine> {
   loading ??= initWasm({ module_or_path: source }).then(() => ({
     derive: (intent: ThemeIntent, selectors: readonly string[] = []): DerivedTheme =>
       JSON.parse(derive(JSON.stringify(intent), JSON.stringify(selectors))) as DerivedTheme,
+    deriveModes: (intent: ThemeIntent, selectors: readonly string[] = []): DerivedModes =>
+      JSON.parse(deriveModes(JSON.stringify(intent), JSON.stringify(selectors))) as DerivedModes,
     hexToOklch: (hex: string): Oklch => JSON.parse(readHex(hex)) as Oklch,
   }))
   return loading

@@ -22,9 +22,9 @@
 
 use wasm_bindgen::prelude::*;
 
-use crate::css::to_css;
+use crate::css::{to_css, to_css_modes};
 use crate::derive::theme::derive_theme;
-use crate::intent::ThemeIntent;
+use crate::intent::{Scheme, ThemeIntent};
 use crate::shape::report;
 
 /// Derives a theme, and renders it under every selector asked for.
@@ -59,6 +59,50 @@ pub fn derive(intent: &str, selectors: &str) -> Result<String, JsError> {
         .collect::<serde_json::Map<_, _>>();
     report["css"] = serde_json::Value::Object(blocks);
     Ok(serde_json::to_string(&report)?)
+}
+
+/// Derives a theme in both modes, and renders them as one block under every
+/// selector asked for, each color a `light-dark()` pair.
+///
+/// The intent's own `scheme` is set aside, since both are derived. The result
+/// carries each mode's report, `light` and `dark`, so a finding in either is
+/// still read, and `css` keyed by selector.
+///
+/// # Errors
+///
+/// When either argument is not the JSON it should be, or when the engine refuses
+/// the intent in either mode.
+#[wasm_bindgen(js_name = deriveModes)]
+pub fn derive_modes(intent: &str, selectors: &str) -> Result<String, JsError> {
+    let intent: ThemeIntent = serde_json::from_str(intent)?;
+    let selectors: Vec<String> = serde_json::from_str(selectors)?;
+    let in_mode = |scheme| {
+        let mut one = intent.clone();
+        one.scheme = Some(scheme);
+        derive_theme(&one)
+    };
+    let light = in_mode(Scheme::Light)?;
+    let dark = in_mode(Scheme::Dark)?;
+
+    let blocks = selectors
+        .into_iter()
+        .map(|selector| {
+            let block = to_css_modes(&light, &dark, &selector);
+            (selector, serde_json::Value::String(block))
+        })
+        .collect::<serde_json::Map<_, _>>();
+    /* Each mode's report as `derive` returns one, `css` and all, empty here
+    because the block is the pair's. */
+    let alone = |theme| {
+        let mut one = report(theme);
+        one["css"] = serde_json::Value::Object(serde_json::Map::new());
+        one
+    };
+    Ok(serde_json::to_string(&serde_json::json!({
+        "css": blocks,
+        "dark": alone(&dark),
+        "light": alone(&light),
+    }))?)
 }
 
 /// Reads a hex color into its OKLCH components, as JSON.
