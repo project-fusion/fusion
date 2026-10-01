@@ -34,6 +34,11 @@ helix-headless-graph::part(body) {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: 3fr 2fr;
   }
+
+  helix-headless-graph::part(panel) {
+    border-block-start: 1px solid var(--_gray-edge);
+    border-inline-start: none;
+  }
 }
 
 helix-headless-graph::part(stage) {
@@ -96,11 +101,13 @@ helix-headless-graph::part(search-field) {
   color: var(--_gray-strong);
   flex: 1 1 auto;
   font: inherit;
+  font-size: 0.875rem;
   min-inline-size: 0;
 }
 
 helix-headless-graph::part(count) {
   font-size: 0.75rem;
+  white-space: nowrap;
 }
 
 helix-headless-graph::part(list) {
@@ -127,10 +134,22 @@ helix-headless-graph:focus-within::part(note-cursor) {
   outline-offset: -2px;
 }
 
+helix-headless-graph::part(note-name) {
+  flex: 0 1 auto;
+  max-inline-size: 70%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 helix-headless-graph::part(note-relation) {
   color: var(--_gray-muted);
+  flex: 1 1 0;
   font-size: 0.75rem;
-  margin-inline-start: auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-align: end;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
