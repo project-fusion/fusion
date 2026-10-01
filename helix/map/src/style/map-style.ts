@@ -38,6 +38,18 @@ export interface MapStyleOptions {
    */
   globe?: boolean | undefined
   /**
+   * Which landmarks the map draws, each kind an icon in a hue of its own.
+   * `true`, the default, draws every kind in `MAP_LANDMARKS`; `false` draws
+   * none, for a map whose own markers are the places a reader is looking for;
+   * a list draws those kinds and no others, such as `['nature', 'transit']`.
+   *
+   * **An option of the style, so it holds through a theme change.**
+   * `followTheme` builds the style again from the same options when the mode
+   * changes, where a page hiding the layers itself had them back on every
+   * rebuild and had to learn their ids from this file to do it.
+   */
+  landmarks?: boolean | readonly MapLandmark[] | undefined
+  /**
    * The language labels are written in, where the tiles carry it, falling back
    * to the Latin name and then the local one. `en` by default.
    */
@@ -92,6 +104,25 @@ export type MapImage =
     }
 
 /**
+ * The kinds of landmark the style draws, each an icon in a hue of its own, for
+ * `MapStyleOptions.landmarks`.
+ */
+export const MAP_LANDMARKS = [
+  'culture',
+  'food',
+  'health',
+  'learning',
+  'lodging',
+  'nature',
+  'shopping',
+  'sport',
+  'transit',
+] as const
+
+/** One kind of landmark, such as `nature` for parks and gardens. */
+export type MapLandmark = (typeof MAP_LANDMARKS)[number]
+
+/**
  * Landmarks by what they are, each group an icon and a hue: the schema's
  * `poi` classes, the kinds a reader looks for on a map. Anything else, a post
  * box or a fire hydrant, is not drawn.
@@ -100,7 +131,7 @@ const LANDMARKS: readonly {
   classes: readonly string[]
   /** Everyday places, food and shops, which a city has on every block, wait for a closer zoom. */
   everyday?: true
-  group: string
+  group: MapLandmark
   icon: HelixIcon
   /** Its hue, in degrees round OKLCH's wheel, at the brand's lightness and colorfulness. */
   hue: number
@@ -327,7 +358,14 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
   const images: Record<string, MapImage> = {}
   const landmarkImage: unknown[] = ['match', ['get', 'class']]
   const landmarkColor: unknown[] = ['match', ['get', 'class']]
-  for (const { classes, group, hue, icon } of LANDMARKS) {
+  /* Only the kinds asked for, and their images with them, so a map that
+     draws no landmarks carries no icon for one. */
+  const kept = LANDMARKS.filter(({ group }) =>
+    options.landmarks === undefined || options.landmarks === true
+      ? true
+      : options.landmarks !== false && options.landmarks.includes(group),
+  )
+  for (const { classes, group, hue, icon } of kept) {
     const color = cssColor(hued(hue))
     const image: MapImage = {
       color,
@@ -343,9 +381,7 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
   landmarkImage.push('')
   landmarkColor.push(legible(land, 0.6))
   const classesOf = (everyday: boolean): string[] =>
-    LANDMARKS.filter((one) => (one.everyday === true) === everyday).flatMap(
-      ({ classes }) => classes,
-    )
+    kept.filter((one) => (one.everyday === true) === everyday).flatMap(({ classes }) => classes)
   /* **The signs, one description per design**, which the driver draws with
      each road's number in it: an image named for its design and number,
      `helix-sign-us|290`, as wide as the number. The numbers are in the
@@ -594,31 +630,35 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
         'source-layer': 'transportation_name',
         type: 'symbol',
       },
-      ...[false, true].map((everyday) => ({
-        /* **Landmarks**: an icon on a disc in the hue of what the place is,
+      /* A layer only where it has a kind to draw: an empty list of classes
+         is not a filter MapLibre accepts. */
+      ...[false, true]
+        .filter((everyday) => classesOf(everyday).length > 0)
+        .map((everyday) => ({
+          /* **Landmarks**: an icon on a disc in the hue of what the place is,
            and its name beside it in the same hue, the most important first
            where they would meet, and none without its name. A city's food
            and shops, which are on every block, wait for a closer zoom than
            its parks, museums, schools, and stations. */
-        filter: ['match', ['get', 'class'], classesOf(everyday), true, false],
-        id: everyday ? 'label-landmark-everyday' : 'label-landmark',
-        layout: {
-          'icon-image': landmarkImage,
-          'symbol-sort-key': ['get', 'rank'],
-          'text-anchor': 'left',
-          'text-field': name,
-          'text-font': MEDIUM,
-          'text-justify': 'left',
-          'text-max-width': 8,
-          'text-offset': [1.1, 0],
-          'text-size': 11,
-        },
-        minzoom: everyday ? 16 : 14,
-        paint: { 'text-color': landmarkColor, 'text-halo-color': halo, 'text-halo-width': 1.5 },
-        source: 'openmaptiles',
-        'source-layer': 'poi',
-        type: 'symbol',
-      })),
+          filter: ['match', ['get', 'class'], classesOf(everyday), true, false],
+          id: everyday ? 'label-landmark-everyday' : 'label-landmark',
+          layout: {
+            'icon-image': landmarkImage,
+            'symbol-sort-key': ['get', 'rank'],
+            'text-anchor': 'left',
+            'text-field': name,
+            'text-font': MEDIUM,
+            'text-justify': 'left',
+            'text-max-width': 8,
+            'text-offset': [1.1, 0],
+            'text-size': 11,
+          },
+          minzoom: everyday ? 16 : 14,
+          paint: { 'text-color': landmarkColor, 'text-halo-color': halo, 'text-halo-width': 1.5 },
+          source: 'openmaptiles',
+          'source-layer': 'poi',
+          type: 'symbol',
+        })),
       place(
         'label-village',
         ['match', ['get', 'class'], ['village', 'hamlet'], true, false],

@@ -15,6 +15,23 @@
   position: relative;
 }
 
+/* **Covering the container, for a map behind a page's own content**, such as
+   a hero whose words decide its height. A height from the region could not
+   follow them: a percentage resolves against a parent with no height of its
+   own, and a fixed one let the words run out of the hero at one width and
+   leave a gap at another. Positioned instead, against whatever the page
+   positioned, which is the one thing a backdrop asks of its container. No
+   frame, since the container's edge is the map's. A size container, so what
+   measures against the map's height has one to measure. */
+:host([fill]) [part="region"] {
+  block-size: auto;
+  border: none;
+  border-radius: 0;
+  container-type: size;
+  inset: 0;
+  position: absolute;
+}
+
 /* **A stacking context of its own**, so what is raised over the map, a live
    position over the places it passes, is raised within the map and never
    over the frame's own controls beside it. */
@@ -75,6 +92,44 @@
   display: block;
   font-size: var(--helix-text-xs);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+/* **The credit in a corner over the map**, for a map the width of the page,
+   under which a strip the width of the page ran to two lines. Compact and on
+   one line, the whole of it on hover or on focus, which reaches it from the
+   keyboard through its links, the form OpenStreetMap's guidance accepts for a
+   credit that has to stay out of the way. Never hidden: most tile licenses
+   require it seen. */
+:host([credit-placement]) [part="attribution"] {
+  inset-block-end: var(--helix-space-2xs);
+  max-inline-size: calc(100% - var(--helix-space-2xs) * 2);
+  position: absolute;
+}
+
+:host([credit-placement="bottom-end"]) [part="attribution"] {
+  inset-inline-end: var(--helix-space-2xs);
+}
+
+:host([credit-placement="bottom-start"]) [part="attribution"] {
+  inset-inline-start: var(--helix-space-2xs);
+}
+
+:host([credit-placement]) ::slotted([slot="attribution"]) {
+  backdrop-filter: var(--helix-material-backdrop);
+  background-color: var(--helix-material-translucent);
+  border-block-start: none;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  overflow: hidden;
+  padding: var(--helix-space-none) var(--helix-space-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host([credit-placement])
+  [part="attribution"]:is(:hover, :focus-within)
+  ::slotted([slot="attribution"]) {
+  white-space: normal;
 }
 
 /* **Material is the controls' ground**, the one part of the frame that lies
@@ -252,6 +307,10 @@
   overflow-y: auto;
   padding: var(--helix-space-sm);
   position: absolute;
+}
+
+:host([fill]) [part="layers-menu"] {
+  max-block-size: calc(100cqb - var(--helix-space-sm) * 2);
 }
 
 [part="layers-menu"][hidden] {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec'
-import { mapLibreStyle } from './map-style.js'
+import { MAP_LANDMARKS, mapLibreStyle } from './map-style.js'
 import { contrast, parseColor } from './oklab.js'
 
 const LIGHT = {
@@ -44,6 +44,49 @@ describe('mapLibreStyle', () => {
       expect(style.projection).toEqual({ type: 'globe' })
       expect(style.sky?.['atmosphere-blend']).toBeDefined()
       expect(validateStyleMin(style as never)).toEqual([])
+    }
+  })
+
+  test('asked for no landmarks, it draws none and carries no icon for one', () => {
+    const style = mapLibreStyle(LIGHT, { landmarks: false })
+    expect(style.layers.filter((layer) => String(layer.id).startsWith('label-landmark'))).toEqual(
+      [],
+    )
+    expect(
+      Object.keys(style.metadata['helix:images']).filter((id) => id.startsWith('helix-landmark-')),
+    ).toEqual([])
+    expect(validateStyleMin(style as never)).toEqual([])
+  })
+
+  test('asked for some kinds of landmark, it draws those and no others', () => {
+    const style = mapLibreStyle(LIGHT, { landmarks: ['nature', 'food'] })
+    const filterOf = (id: string): string =>
+      JSON.stringify(style.layers.find((layer) => layer.id === id)?.filter)
+    expect(filterOf('label-landmark')).toContain('park')
+    expect(filterOf('label-landmark')).not.toContain('museum')
+    expect(filterOf('label-landmark-everyday')).toContain('restaurant')
+    expect(filterOf('label-landmark-everyday')).not.toContain('shop')
+    const kinds = Object.keys(style.metadata['helix:images'])
+      .filter((id) => id.startsWith('helix-landmark-'))
+      .map((id) => id.split('-')[2])
+    expect(kinds.sort()).toEqual(['food', 'nature'])
+    expect(validateStyleMin(style as never)).toEqual([])
+  })
+
+  test('a list of kinds with nothing everyday leaves the everyday layer out', () => {
+    const style = mapLibreStyle(LIGHT, { landmarks: ['transit'] })
+    expect(style.layers.some((layer) => layer.id === 'label-landmark')).toBe(true)
+    expect(style.layers.some((layer) => layer.id === 'label-landmark-everyday')).toBe(false)
+    expect(validateStyleMin(style as never)).toEqual([])
+  })
+
+  test('by default, and asked for all of them, it draws every kind', () => {
+    for (const landmarks of [undefined, true, MAP_LANDMARKS] as const) {
+      const style = mapLibreStyle(LIGHT, landmarks === undefined ? {} : { landmarks })
+      const kinds = Object.keys(style.metadata['helix:images']).filter((id) =>
+        id.startsWith('helix-landmark-'),
+      )
+      expect(kinds).toHaveLength(MAP_LANDMARKS.length)
     }
   })
 

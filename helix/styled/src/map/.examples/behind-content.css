@@ -1,0 +1,23 @@
+/* The container the map fills: positioned, which is all `fill` asks of it,
+   and as tall as its words and the room around them. Padding rather than the
+   words' margins, which would collapse through it and leave the hero short.
+   The end side keeps the map's controls clear, a column of buttons in that
+   corner, which the words covered on a phone. */
+.hero {
+  padding: var(--helix-space-2xl) var(--helix-space-lg) var(--helix-space-3xl);
+  padding-inline-end: calc(var(--helix-size-control-sm) + var(--helix-space-lg) * 2);
+  position: relative;
+}
+
+/* Over the map, on a ground of their own so they read over any part of it,
+   and above it in the stacking order, being later and positioned. */
+.words {
+  backdrop-filter: var(--helix-material-backdrop);
+  background-color: var(--helix-material-translucent);
+  border-radius: var(--helix-radii-lg);
+  display: grid;
+  gap: var(--helix-space-sm);
+  max-inline-size: 26rem;
+  padding: var(--helix-space-lg);
+  position: relative;
+}
