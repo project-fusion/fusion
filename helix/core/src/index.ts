@@ -105,6 +105,8 @@ export {
   type DismissDetail,
   type FacetDetail,
   type FilterDetail,
+  type GraphLayoutDetail,
+  type GraphPartChangeDetail,
   HelixActivateEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
@@ -133,7 +135,9 @@ export {
   HelixDismissEvent,
   HelixFacetEvent,
   HelixFilterEvent,
+  HelixGraphLayoutEvent,
   HelixGraphPanEvent,
+  HelixGraphPartChangeEvent,
   HelixGraphReadyEvent,
   HelixGraphZoomEvent,
   HelixHistoryEvent,
@@ -344,5 +348,6 @@ export {
   valueAsNumber,
   valueAsTime,
 } from './utils/value-as/value-as.js'
+export { watchTheme } from './utils/watch-theme/watch-theme.js'
 export { writeTime } from './utils/write-time/write-time.js'
 export { writtenList, writtenNumbers } from './utils/written-list/written-list.js'

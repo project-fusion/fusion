@@ -850,6 +850,57 @@ export class HelixGraphZoomEvent extends CustomEvent<ViewportZoomDetail> {
   }
 }
 
+/** Where each note was laid out, by its `id`, in the renderer's own units. */
+export interface GraphLayoutDetail {
+  positions: Record<string, { x: number; y: number }>
+}
+
+/**
+ * A layout settled, with where it put every note. Keep the positions and hand
+ * them back as each note's `x` and `y`, and the graph opens where the reader
+ * left it, with no layout to run.
+ */
+export class HelixGraphLayoutEvent extends CustomEvent<GraphLayoutDetail> {
+  static readonly eventName = 'helix-graph-layout'
+
+  constructor(detail: GraphLayoutDetail) {
+    super(HelixGraphLayoutEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/** What changed on a graph frame that the renderer has to hear. */
+export interface GraphPartChangeDetail {
+  /**
+   * `data` for the notes or the links, which are drawn again; `focus` for the
+   * selected note or the depth, which change what is emphasized and shown;
+   * `gestures` for which gestures the renderer takes.
+   */
+  kind: 'data' | 'focus' | 'gestures'
+}
+
+/**
+ * The frame's notes, links, selection, depth or gestures changed, which the
+ * connector hears and the renderer is told. It stays on the frame, being the
+ * family's own bookkeeping rather than news for a page.
+ */
+export class HelixGraphPartChangeEvent extends CustomEvent<GraphPartChangeDetail> {
+  static readonly eventName = 'helix-graph-part-change'
+
+  constructor(detail: GraphPartChangeDetail) {
+    super(HelixGraphPartChangeEvent.eventName, {
+      bubbles: false,
+      cancelable: false,
+      composed: false,
+      detail,
+    })
+  }
+}
+
 /**
  * The graph has been drawn whole, laid out and settled, sent once each time it
  * is connected, from the frame, which then matches `:state(ready)`.
@@ -1723,7 +1774,9 @@ const registry = {
   HelixDismissEvent,
   HelixFacetEvent,
   HelixFilterEvent,
+  HelixGraphLayoutEvent,
   HelixGraphPanEvent,
+  HelixGraphPartChangeEvent,
   HelixGraphReadyEvent,
   HelixGraphZoomEvent,
   HelixHistoryEvent,

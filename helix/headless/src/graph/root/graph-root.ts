@@ -3,7 +3,9 @@ import {
   fillTemplate,
   formatNumbers,
   HelixElement,
+  HelixGraphLayoutEvent,
   HelixGraphPanEvent,
+  HelixGraphPartChangeEvent,
   HelixGraphReadyEvent,
   HelixGraphZoomEvent,
   MixinControllerActive,
@@ -38,8 +40,8 @@ const PAGE = 10
  * @description
  * Helix draws no graph. A force layout of thousands of notes is physics and
  * WebGL, which a renderer such as Sigma.js does. Put the renderer's box in the
- * frame, draw `nodes` and `links` in it, and answer the frame's pan and zoom
- * events by moving the drawing.
+ * frame, and `connectGraph` from `@fusion.dev/helix-graph` draws `nodes` and
+ * `links` in it and keeps it in step with the frame.
  *
  * What the frame adds is what a drawing of a graph cannot do: a list of every
  * note beside it, which is the graph for a screen reader and a quick way to
@@ -71,9 +73,11 @@ const PAGE = 10
  *
  * @event {HelixActivateEvent} helix-activate - A note was selected, in the list or in the drawing. The detail's `value` is its `id`.
  * @event {HelixBeforeActivateEvent} helix-before-activate - A note is about to be selected. Cancelable: cancel it to keep the selection in your own state.
- * @event {HelixGraphPanEvent} helix-graph-pan - A pan button or arrow key was pressed. Move the drawing.
+ * @event {HelixGraphLayoutEvent} helix-graph-layout - A layout settled, with where it put each note, sent by `laidOut()`. Keep the positions and pass them back as each note's `x` and `y`.
+ * @event {HelixGraphPanEvent} helix-graph-pan - A pan button or arrow key was pressed. `connectGraph` moves the drawing.
+ * @event {HelixGraphPartChangeEvent} helix-graph-part-change - The notes, the links, the selection, the depth or the gestures changed. Used by `connectGraph`; pages do not need to listen for it.
  * @event {HelixGraphReadyEvent} helix-graph-ready - The graph has been drawn whole, laid out and settled. Sent each time `drawn()` says it is drawn after it was not.
- * @event {HelixGraphZoomEvent} helix-graph-zoom - A zoom button or key was pressed. Zoom the drawing.
+ * @event {HelixGraphZoomEvent} helix-graph-zoom - A zoom button or key was pressed. `connectGraph` zooms the drawing.
  *
  * @csspart after - The room the notes after those drawn would take, so the list scrolls its whole length.
  * @csspart before - The room the notes before those drawn would take.
@@ -204,7 +208,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   })
 
   /**
-   * @internal The notes the drawing shows, for the code that draws it: those
+   * @internal The notes the drawing shows, which `connectGraph` reads: those
    * within `depth` of the selected note, or `undefined` for every note.
    */
   get shown(): ReadonlySet<string> | undefined {
@@ -218,8 +222,8 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
 
   /**
    * Says the graph has been drawn whole, or with `false`, that it no longer
-   * is. Call it when the renderer's layout has settled and the graph is
-   * finished. The first call after
+   * is. Called by `connectGraph` once its layout has settled; a page drawing
+   * its own graph calls it when that graph is finished. The first call after
    * the graph was not drawn sends `helix-graph-ready` and turns on
    * `:state(ready)`.
    */
@@ -232,6 +236,16 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     if (whole) {
       this.dispatchEvent(new HelixGraphReadyEvent())
     }
+  }
+
+  /**
+   * Says where a layout put each note, by its `id`: sends
+   * `helix-graph-layout` for the page to keep. Called by `connectGraph` once
+   * its layout has settled; a page laying out its own graph calls it the same
+   * way.
+   */
+  laidOut(positions: Record<string, { x: number; y: number }>): void {
+    this.dispatchEvent(new HelixGraphLayoutEvent({ positions }))
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -266,6 +280,12 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     /* After every render, because a change of notes or a search changes how
        many rows there are, and the window is the list's to settle. */
     this.virtualize.measure()
+    /* What the renderer has to hear, which `connectGraph` listens for. */
+    if (changed.has('nodes') || changed.has('links')) {
+      this.dispatchEvent(new HelixGraphPartChangeEvent({ kind: 'data' }))
+    } else if (changed.has('active') || changed.has('depth')) {
+      this.dispatchEvent(new HelixGraphPartChangeEvent({ kind: 'focus' }))
+    }
     /* The count said when a search changes it, which is when a reader who
        cannot see the list needs to know how much it holds. */
     if (changed.has('query') && changed.get('query') !== undefined) {
@@ -287,6 +307,11 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
 
   protected override get restingControlsLabel(): string {
     return 'Graph controls'
+  }
+
+  /** Which gestures the renderer takes, which `connectGraph` hears from here. */
+  protected override gesturesChanged(): void {
+    this.dispatchEvent(new HelixGraphPartChangeEvent({ kind: 'gestures' }))
   }
 
   /** What the graph says about its gestures where the page does not say it. */
