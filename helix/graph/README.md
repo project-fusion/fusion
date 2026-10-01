@@ -72,7 +72,7 @@ here rather than a page.
 | `sigmaDriver` option | Default | What else it takes |
 |---|---|---|
 | `layout` | none | A function that makes a layout for the graph, such as ForceAtlas2's worker |
-| `layoutLimit` | `8000` | The longest a layout runs, in milliseconds |
+| `layoutLimit` | `10000` | The longest a layout runs, in milliseconds, about where 10,000 notes settle |
 
 ## Working on it
 

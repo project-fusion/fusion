@@ -69,7 +69,7 @@ export interface SigmaDriverOptions {
    * Without one, notes stay where the connector started them.
    */
   layout?: ((graph: SigmaGraph) => SigmaLayout) | undefined
-  /** The longest a layout runs, in milliseconds, settled or not. 8 seconds by default. */
+  /** The longest a layout runs, in milliseconds, settled or not. 10 seconds by default, about where 10,000 notes settle. */
   layoutLimit?: number | undefined
 }
 
@@ -83,10 +83,18 @@ const ZOOM = 1.5
 const SAMPLE = 250
 
 /**
- * How little the notes may move between two samples, as a share of the
- * graph's extent, for the layout to count as settled.
+ * How little the notes may move between two samples, on average and as a
+ * share of the graph's extent, for the layout to count as still.
+ *
+ * **Measured on 1 October 2026, on graphs shaped like a knowledge base**:
+ * clusters of notes about one subject, a few hubs in each, and sparse links
+ * across. ForceAtlas2 settles a graph into its clusters and then jitters at
+ * about 0.002 for as long as it runs, so 0.002 was a line a 2,000-note graph
+ * never crossed. At 0.004, held for two samples, 500 notes stop at about 1.5
+ * seconds, 2,000 at 5.8 and 10,000 at 9.8, each once its clusters had
+ * stopped changing to the eye.
  */
-const STILL = 0.002
+const STILL = 0.004
 
 /** How many samples in a row the notes must hold still for, once they have moved, to count as settled. */
 const HELD = 2
@@ -267,7 +275,7 @@ export const sigmaDriver = (
             })
             const layout = make(graph)
             layout.start()
-            const limit = options.layoutLimit ?? 8000
+            const limit = options.layoutLimit ?? 10000
             const started = performance.now()
             let last = positionsOf(graph)
             let done = false

@@ -176,7 +176,7 @@
     },
     "helix/graph": {
       "name": "@fusion.dev/helix-graph",
-      "version": "0.115.0",
+      "version": "0.117.0",
       "dependencies": {
         "@fusion.dev/helix-core": "helix/core",
       },
