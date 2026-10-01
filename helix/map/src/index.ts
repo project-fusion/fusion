@@ -1,3 +1,4 @@
+export { watchTheme } from '@fusion.dev/helix-core'
 export type {
   ConnectOptions,
   MapBounds,
@@ -27,4 +28,3 @@ export {
   PATIENCE,
   settledColor,
 } from './style/index.js'
-export { watchTheme } from './theme/index.js'

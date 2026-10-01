@@ -2,18 +2,16 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 import { validateStyleMin } from '@maplibre/maplibre-gl-style-spec'
 import type { MapMotion } from '../motion/motion.js'
-import {
-  buildingsExtrusion,
-  captionLayer,
-  geoJson,
-  LAYERS,
-  type MapLibreMap,
-  mapLibreDriver,
-  pointsLayers,
-} from './maplibre-driver.js'
+import type { MapLibreMap } from './maplibre-driver.js'
 
-beforeAll(() => {
+/* Imported after the DOM is registered: the driver reaches
+   `@fusion.dev/helix-core`, which evaluates Lit, and Lit's element class
+   extends whatever `HTMLElement` exists when it first loads. */
+let maplibre: typeof import('./maplibre-driver.js')
+
+beforeAll(async () => {
   registerDom()
+  maplibre = await import('./maplibre-driver.js')
 })
 
 /**
@@ -213,7 +211,7 @@ describe('mapLibreDriver, gestures', () => {
       scrollZoom: handler(true),
       touchZoomRotate: handler(true),
     }
-    const driver = mapLibreDriver({ ...map, ...handlers })
+    const driver = maplibre.mapLibreDriver({ ...map, ...handlers })
     const read = (): boolean[] =>
       [
         handlers.cooperativeGestures,
@@ -239,18 +237,20 @@ describe('mapLibreDriver, ready', () => {
   test('at once where the view is drawn, and otherwise at load, once', () => {
     const drawn = stand()
     let heard = 0
-    mapLibreDriver({ ...drawn.map, areTilesLoaded: () => true, loaded: () => true }).ready?.(() => {
-      heard += 1
-    })
+    maplibre
+      .mapLibreDriver({ ...drawn.map, areTilesLoaded: () => true, loaded: () => true })
+      .ready?.(() => {
+        heard += 1
+      })
     expect(heard).toBe(1)
 
     const loading = stand()
     let waited = 0
-    mapLibreDriver({ ...loading.map, areTilesLoaded: () => false, loaded: () => true }).ready?.(
-      () => {
+    maplibre
+      .mapLibreDriver({ ...loading.map, areTilesLoaded: () => false, loaded: () => true })
+      .ready?.(() => {
         waited += 1
-      },
-    )
+      })
     expect(waited).toBe(0)
     loading.fire('idle')
     expect(waited).toBe(0)
@@ -267,14 +267,16 @@ describe('mapLibreDriver, ready', () => {
     let tiles = false
     const late = stand()
     let heard = 0
-    mapLibreDriver({
-      ...late.map,
-      areTilesLoaded: () => tiles,
-      isStyleLoaded: () => true,
-      loaded: () => false,
-    }).ready?.(() => {
-      heard += 1
-    })
+    maplibre
+      .mapLibreDriver({
+        ...late.map,
+        areTilesLoaded: () => tiles,
+        isStyleLoaded: () => true,
+        loaded: () => false,
+      })
+      .ready?.(() => {
+        heard += 1
+      })
     late.fire('render')
     expect(heard).toBe(0)
     tiles = true
@@ -317,7 +319,7 @@ describe('mapLibreDriver, ready on a map that answers for each source', () => {
   test('waits for the style and every tiled source, and never for a shape the frame draws', () => {
     const map = sourced({ dem: 'raster-dem', route: 'geojson', streets: 'vector' })
     let heard = 0
-    mapLibreDriver(map.map).ready?.(() => {
+    maplibre.mapLibreDriver(map.map).ready?.(() => {
       heard += 1
     })
     /* No style yet, which is no sources to ask, and not a map drawn whole. */
@@ -341,14 +343,14 @@ describe('mapLibreDriver, ready on a map that answers for each source', () => {
     whole.style()
     whole.load('streets')
     let heard = 0
-    mapLibreDriver(whole.map).ready?.(() => {
+    maplibre.mapLibreDriver(whole.map).ready?.(() => {
       heard += 1
     })
     expect(heard).toBe(1)
 
     const later = sourced({ streets: 'vector' })
     let waited = 0
-    const stop = mapLibreDriver(later.map).ready?.(() => {
+    const stop = maplibre.mapLibreDriver(later.map).ready?.(() => {
       waited += 1
     })
     stop?.()
@@ -362,7 +364,7 @@ describe('mapLibreDriver, ready on a map that answers for each source', () => {
 describe('mapLibreDriver', () => {
   test('a pan and a zoom are MapLibre’s own calls, over the page’s duration and curve', () => {
     const { asked, map } = stand()
-    const driver = mapLibreDriver(map)
+    const driver = maplibre.mapLibreDriver(map)
     driver.panBy(100, -50, glide)
     driver.zoomBy(1, null)
     driver.zoomBy(-1, glide)
@@ -375,7 +377,7 @@ describe('mapLibreDriver', () => {
 
   test('a place is behind only where a globe says it is out of sight', () => {
     const { map } = stand()
-    const driver = mapLibreDriver(map)
+    const driver = maplibre.mapLibreDriver(map)
     expect(driver.behind?.({ lat: 0, lng: 0 })).toBe(false)
     map.transform = { isLocationOccluded: ({ lng }) => lng > 90 }
     expect(driver.behind?.({ lat: 0, lng: 120 })).toBe(true)
@@ -391,7 +393,7 @@ describe('mapLibreDriver', () => {
       shown.set(layer, value)
       asked.push(`${layer} ${value}`)
     }
-    const driver = mapLibreDriver(map)
+    const driver = maplibre.mapLibreDriver(map)
     driver.labels?.(false)
     expect(asked).toEqual(['road none', 'label-city none'])
     shown.clear()
@@ -409,24 +411,24 @@ describe('mapLibreDriver', () => {
 
   test('its keys go quiet and come back only if they were on', () => {
     const { map } = stand()
-    const restore = mapLibreDriver(map).silenceKeyboard?.()
+    const restore = maplibre.mapLibreDriver(map).silenceKeyboard?.()
     expect(map.keyboard.isEnabled()).toBe(false)
     restore?.()
     expect(map.keyboard.isEnabled()).toBe(true)
 
     map.keyboard.disable()
-    mapLibreDriver(map).silenceKeyboard?.()?.()
+    maplibre.mapLibreDriver(map).silenceKeyboard?.()?.()
     expect(map.keyboard.isEnabled()).toBe(false)
   })
 
   test('a place is where MapLibre projects it, longitude first as MapLibre takes it', () => {
     const { map } = stand()
-    expect(mapLibreDriver(map).project?.({ lat: 2, lng: 3 })).toEqual({ x: 30, y: -20 })
+    expect(maplibre.mapLibreDriver(map).project?.({ lat: 2, lng: 3 })).toEqual({ x: 30, y: -20 })
   })
 
   test('showing a place glides on the page’s curve, or jumps where there is no motion to have', () => {
     const { asked, map } = stand()
-    const driver = mapLibreDriver(map)
+    const driver = maplibre.mapLibreDriver(map)
     driver.show?.({ lat: 2, lng: 3, zoom: 14 }, glide)
     driver.show?.({ lat: 2, lng: 3 }, null)
     expect(asked).toEqual(['easeTo 3,2 14 250 0.25', 'jumpTo 3,2 undefined'])
@@ -435,7 +437,7 @@ describe('mapLibreDriver', () => {
   test('the view moving is heard until it is told to stop', () => {
     const { fire, map } = stand()
     let heard = 0
-    const stop = mapLibreDriver(map).onView?.(() => {
+    const stop = maplibre.mapLibreDriver(map).onView?.(() => {
       heard += 1
     })
     fire('move')
@@ -447,14 +449,14 @@ describe('mapLibreDriver', () => {
 
   test('the canvas is what it takes out of the tab order', () => {
     const { map } = stand()
-    expect(mapLibreDriver(map).focusTarget?.()).toBe(map.getCanvas())
+    expect(maplibre.mapLibreDriver(map).focusTarget?.()).toBe(map.getCanvas())
   })
 
   test('its credit is every source’s, heard again as sources arrive, and its control is put back', () => {
     const { fire, map, sources } = stand()
     const control = map.getContainer().querySelector('.maplibregl-ctrl-attrib') as HTMLElement
     let heard = 0
-    const credits = mapLibreDriver(map).credits?.(() => {
+    const credits = maplibre.mapLibreDriver(map).credits?.(() => {
       heard += 1
     })
     expect(control.style.display).toBe('none')
@@ -476,7 +478,7 @@ describe('mapLibreDriver', () => {
   test('routes and areas are MapLibre’s own layers, under the place names', () => {
     const { asked, map, sources, styleLayers } = stand()
     let color = 'rgb(1, 2, 3)'
-    const drawn = mapLibreDriver(map).layers?.(() => [
+    const drawn = maplibre.mapLibreDriver(map).layers?.(() => [
       {
         casing: 'rgb(250, 250, 250)',
         color,
@@ -545,7 +547,7 @@ describe('mapLibreDriver', () => {
   test('a style replaced takes the layers with it, and they come back with their colors read again', () => {
     const { fire, map, sources, styleLayers } = stand()
     let read = 0
-    mapLibreDriver(map).layers?.(() => {
+    maplibre.mapLibreDriver(map).layers?.(() => {
       read += 1
       return [
         {
@@ -574,7 +576,7 @@ describe('mapLibreDriver', () => {
   test('on a map whose style is still loading, they are drawn when it has', () => {
     const { fire, map, notReady, ready, styleLayers } = stand()
     notReady()
-    mapLibreDriver(map).layers?.(() => [
+    maplibre.mapLibreDriver(map).layers?.(() => [
       {
         color: 'rgb(1, 2, 3)',
         id: 'a',
@@ -595,15 +597,15 @@ describe('mapLibreDriver', () => {
 
   test('the layers it adds are a style MapLibre’s own validator accepts', () => {
     const style = {
-      layers: LAYERS,
-      sources: { 'helix-layers': { data: geoJson([]), type: 'geojson' } },
+      layers: maplibre.LAYERS,
+      sources: { 'helix-layers': { data: maplibre.geoJson([]), type: 'geojson' } },
       version: 8,
     }
     expect(validateStyleMin(style as never)).toEqual([])
   })
 
   test('an area’s caption is a point of its own in the data, drawn by a layer the validator accepts', () => {
-    const data = geoJson([
+    const data = maplibre.geoJson([
       {
         caption: {
           anchor: 'bottom',
@@ -630,7 +632,7 @@ describe('mapLibreDriver', () => {
     })
     const style = {
       glyphs: 'https://example.com/{fontstack}/{range}.pbf',
-      layers: [...LAYERS, captionLayer(['Noto Sans Medium'])],
+      layers: [...maplibre.LAYERS, maplibre.captionLayer(['Noto Sans Medium'])],
       sources: { 'helix-layers': { data, type: 'geojson' } },
       version: 8,
     }
@@ -650,7 +652,7 @@ describe('mapLibreDriver', () => {
     }
     const style = {
       glyphs: 'https://example.com/{fontstack}/{range}.pbf',
-      layers: pointsLayers('p1', spec, ['Noto Sans Regular']),
+      layers: maplibre.pointsLayers('p1', spec, ['Noto Sans Regular']),
       sources: {
         'helix-points-p1': {
           cluster: true,
@@ -665,11 +667,9 @@ describe('mapLibreDriver', () => {
 
   test('fitting is MapLibre’s fitBounds, west-south first, over the page’s motion', () => {
     const { asked, map } = stand()
-    mapLibreDriver(map).fit?.(
-      { northEast: { lat: 3, lng: 4 }, southWest: { lat: 1, lng: 2 } },
-      24,
-      glide,
-    )
+    maplibre
+      .mapLibreDriver(map)
+      .fit?.({ northEast: { lat: 3, lng: 4 }, southWest: { lat: 1, lng: 2 } }, 24, glide)
     expect(asked).toEqual(['fitBounds [[2,1],[4,3]] 24 250'])
   })
 
@@ -690,7 +690,7 @@ describe('mapLibreDriver', () => {
       points,
     }
     let color = spec.color
-    const drawn = mapLibreDriver(map).layers?.(() => [{ ...spec, color }])
+    const drawn = maplibre.mapLibreDriver(map).layers?.(() => [{ ...spec, color }])
     expect(asked.filter((one) => one.startsWith('addLayer helix-points'))).toEqual([
       'addLayer helix-points-p1-halo before undefined',
       'addLayer helix-points-p1-clusters before undefined',
@@ -713,7 +713,7 @@ describe('mapLibreDriver', () => {
     const pressed: string[] = []
     const found: ReturnType<MapLibreMap['queryRenderedFeatures']> = []
     map.queryRenderedFeatures = () => found
-    mapLibreDriver(map).layers?.(
+    maplibre.mapLibreDriver(map).layers?.(
       () => [
         {
           cluster: true,
@@ -770,7 +770,7 @@ describe('mapLibreDriver', () => {
     ]
     map.queryRenderedFeatures = () => found
     let settled = 0
-    const drawn = mapLibreDriver(map).layers?.(
+    const drawn = maplibre.mapLibreDriver(map).layers?.(
       () => [
         {
           cluster: true,
@@ -800,9 +800,9 @@ describe('mapLibreDriver', () => {
       type: 'fill',
     } as { id: string; type: string })
     let color = 'rgb(40, 40, 40)'
-    const drawn = mapLibreDriver(map).layers?.(() => [
-      { color, id: 'b', kind: 'buildings', label: '3D buildings', points: [] },
-    ])
+    const drawn = maplibre
+      .mapLibreDriver(map)
+      .layers?.(() => [{ color, id: 'b', kind: 'buildings', label: '3D buildings', points: [] }])
     expect(styleLayers.map((one) => one.id)).toContain('helix-buildings-b')
     expect(asked).toContain('addLayer helix-buildings-b before helix-areas')
     color = 'rgb(200, 200, 200)'
@@ -814,9 +814,11 @@ describe('mapLibreDriver', () => {
 
   test('a style without building data raises no buildings', () => {
     const { map, styleLayers } = stand()
-    mapLibreDriver(map).layers?.(() => [
-      { color: 'red', id: 'b', kind: 'buildings', label: '3D buildings', points: [] },
-    ])
+    maplibre
+      .mapLibreDriver(map)
+      .layers?.(() => [
+        { color: 'red', id: 'b', kind: 'buildings', label: '3D buildings', points: [] },
+      ])
     expect(styleLayers.map((one) => one.id)).not.toContain('helix-buildings-b')
   })
 
@@ -824,7 +826,7 @@ describe('mapLibreDriver', () => {
     const { asked, map, sources, styleLayers } = stand()
     let frame = 1
     const frames = ['https://tiles.test/a/{z}/{x}/{y}.png', 'https://tiles.test/b/{z}/{x}/{y}.png']
-    const drawn = mapLibreDriver(map).layers?.(() => [
+    const drawn = maplibre.mapLibreDriver(map).layers?.(() => [
       {
         attribution: 'Radar credit',
         color: 'red',
@@ -865,7 +867,7 @@ describe('mapLibreDriver', () => {
       sent[id] = source
       return addSource(id, source)
     }
-    mapLibreDriver(map).layers?.(() => [
+    maplibre.mapLibreDriver(map).layers?.(() => [
       {
         color: 'red',
         frame: 0,
@@ -909,7 +911,7 @@ describe('mapLibreDriver', () => {
       held.terrain = next
     }
     let raised = true
-    const drawn = mapLibreDriver(map).layers?.(() => [
+    const drawn = maplibre.mapLibreDriver(map).layers?.(() => [
       {
         attribution: 'Elevation credit',
         color: 'rgba(0, 0, 0, 0.4)',
@@ -967,7 +969,7 @@ describe('mapLibreDriver', () => {
       added[(layer as unknown as { id: string }).id] = layer
       return addLayer(layer, before)
     }
-    mapLibreDriver(map).layers?.(() => [
+    maplibre.mapLibreDriver(map).layers?.(() => [
       { color: 'gray', id: 'b', kind: 'buildings', label: '3D buildings', points: [] },
       {
         color: 'black',
@@ -996,7 +998,7 @@ describe('mapLibreDriver', () => {
   test('imagery goes over the style’s flat buildings and under its first line after them', () => {
     const { map, styleLayers } = stand()
     styleLayers.splice(1, 0, { id: 'waterway', type: 'line' }, { id: 'building', type: 'fill' })
-    mapLibreDriver(map).layers?.(() => [
+    maplibre.mapLibreDriver(map).layers?.(() => [
       {
         color: 'red',
         frame: 0,
@@ -1039,7 +1041,7 @@ describe('mapLibreDriver', () => {
       made.setData = (next) => data.push(next)
     }
     map.getZoom = () => 6
-    mapLibreDriver(map).layers?.(() => [
+    maplibre.mapLibreDriver(map).layers?.(() => [
       { color: 'rgb(250, 250, 250)', id: 'l', kind: 'landcover', label: 'Land cover', points: [] },
       {
         color: 'rgb(120, 90, 60)',
@@ -1064,7 +1066,7 @@ describe('mapLibreDriver', () => {
   test('the buildings and raster layers it adds are a style MapLibre’s own validator accepts', () => {
     const style = {
       layers: [
-        buildingsExtrusion(
+        maplibre.buildingsExtrusion(
           { color: '#888888', id: 'b', kind: 'buildings', label: '', points: [] },
           'openmaptiles',
         ),
@@ -1106,7 +1108,7 @@ describe('mapLibreDriver', () => {
     map.setTerrain = (terrain) => {
       held.terrain = terrain
     }
-    mapLibreDriver(map).layers?.(() => [
+    maplibre.mapLibreDriver(map).layers?.(() => [
       {
         color: 'rgba(0, 0, 0, 0.4)',
         encoding: 'terrarium',
@@ -1135,7 +1137,7 @@ describe('mapLibreDriver', () => {
 
   test('a rotate or tilt during a glide aims from where the glide is headed, a tilt can go to an angle, and tilting stops at flat', () => {
     const { asked, map } = stand()
-    const driver = mapLibreDriver(map)
+    const driver = maplibre.mapLibreDriver(map)
     driver.rotate?.({ by: 15 }, glide)
     driver.rotate?.({ by: 15 }, glide)
     driver.tilt?.({ by: 10 }, glide)

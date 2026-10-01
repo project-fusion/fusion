@@ -9,13 +9,13 @@ import {
   isRtl,
   type ViewportPanDetail,
   type ViewportZoomDetail,
+  watchTheme,
 } from '@fusion.dev/helix-core'
 import { creditParts } from '../credit/credit.js'
 import { type MapMotion, motionOf } from '../motion/motion.js'
 import { type MapPoints, pointsFrom } from '../points/points.js'
 import { colorsNow, settledColor } from '../style/map-colors.js'
 import { legible, parseColor, type Rgb } from '../style/oklab.js'
-import { watchTheme } from '../theme/watch-theme.js'
 import { captionAt } from './caption.js'
 
 /** How the map draws the ground: the themed map, imagery under its roads and names, or imagery alone. */

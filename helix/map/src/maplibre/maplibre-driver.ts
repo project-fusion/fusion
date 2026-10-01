@@ -1,3 +1,4 @@
+import { watchTheme } from '@fusion.dev/helix-core'
 import type {
   MapDriver,
   MapInView,
@@ -19,7 +20,6 @@ import type { MapMotion } from '../motion/motion.js'
 import { colorsNow, type MapColors, mapColorsFrom, PATIENCE } from '../style/map-colors.js'
 import type { MapImage } from '../style/map-style.js'
 import { cssColor, mix, oklch, parseColor, type Rgb } from '../style/oklab.js'
-import { watchTheme } from '../theme/watch-theme.js'
 import { drawMapImage, IMAGE_RATIO } from './map-images.js'
 
 /** What MapLibre hands a listener, as far as the driver reads it. */
