@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import type { ViewportGestureMode } from '@fusion.dev/helix-core'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
-import type { DrawnLink, DrawnNode, GraphDriver } from './connect-graph.js'
+import type { DrawnLink, DrawnNode, GraphChanges, GraphDriver } from './connect-graph.js'
 import type { GraphPoint } from './seed.js'
 
 /* Imported after the DOM is registered, like the elements: the connector
@@ -25,13 +25,15 @@ type Frame = HTMLElement & {
 }
 
 /** A driver that records what it was asked, and settles when told to. */
-const recording = (withLayout = true) => {
+const recording = (withLayout = true, incremental = false) => {
   const asked = {
     centered: [] as string[],
     drawn: [] as { links: DrawnLink[]; nodes: DrawnNode[] }[],
     gestures: [] as ViewportGestureMode[],
     panned: [] as [number, number][],
+    signals: [] as [string, string][],
     stopped: false,
+    updates: [] as GraphChanges[],
     zoomed: [] as number[],
   }
   let press: ((id: string) => void) | undefined
@@ -49,6 +51,8 @@ const recording = (withLayout = true) => {
       }
     },
     panBy: (x, y) => asked.panned.push([x, y]),
+    signal: (from, to) => asked.signals.push([from, to]),
+    ...(incremental ? { update: (changes: GraphChanges) => asked.updates.push(changes) } : {}),
     stop: () => {
       asked.stopped = true
     },
@@ -196,5 +200,49 @@ describe('connectGraph', () => {
     expect(asked.gestures.at(-1)).toBe('free')
     expect(asked.stopped).toBe(true)
     expect(host.ready).toBe(false)
+  })
+
+  test('a driver that can update is told only what changed, and the frame stays ready', async () => {
+    const host = await frame()
+    const recorder = recording(true, true)
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    recorder.settle({ a: { x: 0, y: 0 }, b: { x: 5, y: 5 }, c: { x: -5, y: 5 } })
+    expect(host.ready).toBe(true)
+    let told = 0
+    host.addEventListener('helix-graph-ready', () => told++)
+    host.nodes = [...host.nodes.filter((node) => node.id !== 'c'), { id: 'd', label: 'Delta' }]
+    host.links = [...host.links, { source: 'd', target: 'a' }]
+    await settled(host)
+    expect(recorder.asked.drawn).toHaveLength(1)
+    const changes = recorder.asked.updates.at(-1)
+    expect(changes?.addNodes.map((node) => node.id)).toEqual(['d'])
+    expect(changes?.removeNodes).toEqual(['c'])
+    expect(changes?.addLinks).toEqual([{ label: undefined, source: 'd', target: 'a' }])
+    expect([...recorder.unplaced()]).toEqual(['d'])
+    expect(host.ready).toBe(true)
+    expect(told).toBe(0)
+  })
+
+  test('a layout cut short by the next change places its notes with the new ones', async () => {
+    const host = await frame()
+    const recorder = recording(true, true)
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    host.nodes = [...host.nodes, { id: 'd' }]
+    await settled(host)
+    expect([...recorder.unplaced()].sort()).toEqual(['b', 'c', 'd'])
+  })
+
+  test('a signal between two drawn notes reaches the driver, and one to a missing note does not', async () => {
+    const host = (await frame()) as Frame & {
+      signal(from: string, to: string, options?: { tone?: string }): void
+    }
+    const recorder = recording()
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    host.signal('a', 'b', { tone: 'success' })
+    host.signal('a', 'nowhere')
+    expect(recorder.asked.signals).toEqual([['a', 'b']])
   })
 })

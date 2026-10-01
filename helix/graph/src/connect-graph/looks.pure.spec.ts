@@ -2,13 +2,18 @@ import { describe, expect, test } from 'bun:test'
 import { type GraphColors, looksOf, mixRgb } from './looks.js'
 
 const colors: GraphColors = {
+  accent: 'rgb(200, 0, 200)',
+  danger: 'rgb(220, 0, 0)',
   ground: 'rgb(0, 0, 0)',
+  info: 'rgb(0, 120, 220)',
   ink: 'rgb(250, 250, 250)',
   line: 'rgb(100, 100, 100)',
   muted: 'rgb(150, 150, 150)',
   overlay: 'rgb(40, 40, 40)',
   primary: 'rgb(0, 0, 255)',
   series: ['rgb(255, 0, 0)', 'rgb(0, 255, 0)'],
+  success: 'rgb(0, 160, 0)',
+  warning: 'rgb(220, 160, 0)',
 }
 
 const groups: Record<string, string | undefined> = { a: 'work', b: 'home', c: undefined, d: 'work' }

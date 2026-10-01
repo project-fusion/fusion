@@ -1,5 +1,10 @@
 import type { ViewportGestureMode } from '@fusion.dev/helix-core'
-import type { DrawnLink, DrawnNode, GraphDriver } from '../connect-graph/connect-graph.js'
+import type {
+  DrawnLink,
+  DrawnNode,
+  GraphChanges,
+  GraphDriver,
+} from '../connect-graph/connect-graph.js'
 import type { GraphLooks } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
 
@@ -8,10 +13,13 @@ export interface SigmaGraph {
   addEdge(source: string, target: string, attributes?: Record<string, unknown>): unknown
   addNode(node: string, attributes?: Record<string, unknown>): unknown
   clear(): void
+  dropEdge(source: string, target: string): void
+  dropNode(node: string): void
   forEachNode(callback: (node: string, attributes: Record<string, unknown>) => void): void
   getNodeAttributes(node: string): Record<string, unknown>
   hasEdge(source: string, target: string): boolean
   hasNode(node: string): boolean
+  mergeNodeAttributes(node: string, attributes: Record<string, unknown>): unknown
   readonly order: number
   setNodeAttribute(node: string, name: string, value: unknown): unknown
 }
@@ -32,11 +40,15 @@ export interface SigmaRenderer {
   getContainer(): HTMLElement
   getDimensions(): { height: number; width: number }
   getGraph(): SigmaGraph
-  getNodeDisplayData(node: string): { x: number; y: number } | undefined
+  framedGraphToViewport(point: { x: number; y: number }): { x: number; y: number }
+  getNodeDisplayData(
+    node: string,
+  ): { hidden?: boolean; size: number; x: number; y: number } | undefined
   off(type: 'clickNode', listener: (payload: { node: string }) => void): unknown
   on(type: 'clickNode', listener: (payload: { node: string }) => void): unknown
   refresh(): unknown
   resize(force?: boolean): unknown
+  scaleSize(size?: number): number
   setSetting(
     name:
       | 'defaultDrawNodeHover'
@@ -155,6 +167,30 @@ const hoverOf =
     context.fillText(data.label, x, data.y + size / 3)
   }
 
+/** How long a signal takes to cross from one note to the other, in milliseconds. */
+const TRAVEL = 700
+
+/** How long the pulse on arrival lasts, in milliseconds. */
+const PULSE = 450
+
+/** How long a new note takes to grow to its size, in milliseconds. */
+const GROW = 300
+
+/** The most signals in flight at once. A page sending more drops the oldest. */
+const FLYING = 400
+
+/** One signal on its way. */
+interface Flight {
+  animate: boolean
+  color: string
+  from: string
+  started: number
+  to: string
+}
+
+/** Eases in and out, so a signal leaves and arrives gently. */
+const ease = (at: number): number => (at < 0.5 ? 2 * at * at : 1 - (-2 * at + 2) ** 2 / 2)
+
 /** Every note's position as the graph holds it now. */
 const positionsOf = (graph: SigmaGraph): Map<string, GraphPoint> => {
   const positions = new Map<string, GraphPoint>()
@@ -234,6 +270,115 @@ export const sigmaDriver = (
       : undefined
   sized?.observe(container)
 
+  /* **Signals are drawn on a canvas of the driver's own**, over Sigma's, so a
+     signal never makes Sigma redraw the graph: ten signals a second over ten
+     thousand notes draw ten dots. It draws only while something is in
+     flight, and takes no pointer, so a press reaches the note under it. */
+  let overlay: HTMLCanvasElement | undefined
+  let flights: Flight[] = []
+  let flying = 0
+  let ink = 'rgb(128, 128, 128)'
+
+  /** Where a note is on screen, and how large, or nothing where it is not drawn. */
+  const onScreen = (id: string): { radius: number; x: number; y: number } | undefined => {
+    const data = sigma.getNodeDisplayData(id)
+    if (!data || data.hidden) {
+      return undefined
+    }
+    const at = sigma.framedGraphToViewport(data)
+    return { radius: sigma.scaleSize(data.size), x: at.x, y: at.y }
+  }
+
+  const fly = (now: number): void => {
+    const context = overlay?.getContext('2d')
+    if (!overlay || !context) {
+      flights = []
+      return
+    }
+    const ratio = window.devicePixelRatio || 1
+    const width = Math.round(container.clientWidth * ratio)
+    const height = Math.round(container.clientHeight * ratio)
+    if (overlay.width !== width || overlay.height !== height) {
+      overlay.width = width
+      overlay.height = height
+    }
+    context.setTransform(ratio, 0, 0, ratio, 0, 0)
+    context.clearRect(0, 0, width, height)
+    flights = flights.filter((flight) => {
+      const from = onScreen(flight.from)
+      const to = onScreen(flight.to)
+      const gone = (now - flight.started) / TRAVEL
+      if (!from || !to || gone >= 1 + PULSE / TRAVEL) {
+        return false
+      }
+      context.save()
+      context.strokeStyle = flight.color
+      context.fillStyle = flight.color
+      if (gone < 1) {
+        if (flight.animate) {
+          /* A dot crossing, with the path it has come lit faintly behind it. */
+          const along = ease(gone)
+          const x = from.x + (to.x - from.x) * along
+          const y = from.y + (to.y - from.y) * along
+          context.globalAlpha = 0.6
+          context.lineWidth = 2
+          context.beginPath()
+          context.moveTo(from.x, from.y)
+          context.lineTo(x, y)
+          context.stroke()
+          context.globalAlpha = 1
+          context.shadowBlur = 14
+          context.shadowColor = flight.color
+          context.beginPath()
+          context.arc(x, y, 5, 0, Math.PI * 2)
+          context.fill()
+          /* A pale core, so a signal reads over a note of its own color. */
+          context.shadowBlur = 0
+          context.fillStyle = 'rgba(255, 255, 255, 0.85)'
+          context.beginPath()
+          context.arc(x, y, 2, 0, Math.PI * 2)
+          context.fill()
+        } else {
+          /* For a reader who asked for less motion, the link lit for a moment. */
+          context.globalAlpha = 1 - gone
+          context.lineWidth = 2
+          context.beginPath()
+          context.moveTo(from.x, from.y)
+          context.lineTo(to.x, to.y)
+          context.stroke()
+        }
+      } else if (flight.animate) {
+        /* The arrival: a ring opening out from the note it reached. */
+        const opened = (gone - 1) / (PULSE / TRAVEL)
+        context.globalAlpha = 1 - opened
+        context.lineWidth = 2.5
+        context.beginPath()
+        context.arc(to.x, to.y, to.radius + 2 + opened * 16, 0, Math.PI * 2)
+        context.stroke()
+      }
+      context.restore()
+      return true
+    })
+    flying = flights.length > 0 ? requestAnimationFrame(fly) : 0
+  }
+
+  /** Grows notes from nothing to their size, so a note arriving is seen to arrive. */
+  const grow = (sizes: Map<string, number>): void => {
+    const started = performance.now()
+    const step = (now: number): void => {
+      const along = Math.min((now - started) / GROW, 1)
+      for (const [id, size] of sizes) {
+        if (graph.hasNode(id)) {
+          graph.setNodeAttribute(id, 'size', size * ease(along))
+        }
+      }
+      if (along < 1) {
+        requestAnimationFrame(step)
+      }
+    }
+    requestAnimationFrame(step)
+  }
+
   return {
     center: (id, animate) => {
       const at = sigma.getNodeDisplayData(id)
@@ -275,6 +420,7 @@ export const sigmaDriver = (
         next === 'free' ? touchAction : next === 'cooperative' ? 'pan-x pan-y' : 'auto'
     },
     look: (looks: GraphLooks) => {
+      ink = looks.ink
       sigma.setSetting('labelColor', { color: looks.ink })
       sigma.setSetting('labelFont', looks.font)
       /* **Named wherever there is room, and not only once drawn large.**
@@ -330,12 +476,83 @@ export const sigmaDriver = (
         camera.setState(to)
       }
     },
+    signal: (from, to, color, animate) => {
+      if (!overlay) {
+        overlay = document.createElement('canvas')
+        overlay.setAttribute('aria-hidden', 'true')
+        overlay.style.cssText =
+          'position:absolute;inset:0;width:100%;height:100%;pointer-events:none'
+        container.append(overlay)
+      }
+      flights.push({ animate, color: color ?? ink, from, started: performance.now(), to })
+      if (flights.length > FLYING) {
+        flights = flights.slice(-FLYING)
+      }
+      if (!flying) {
+        flying = requestAnimationFrame(fly)
+      }
+    },
     stop: () => {
+      cancelAnimationFrame(flying)
+      flying = 0
+      flights = []
+      overlay?.remove()
+      overlay = undefined
       sized?.disconnect()
       for (const type of held) {
         container.removeEventListener(type, hold, { capture: true })
       }
       container.style.touchAction = touchAction
+    },
+    update: (changes: GraphChanges, animate: boolean) => {
+      for (const id of changes.removeNodes) {
+        if (graph.hasNode(id)) {
+          graph.dropNode(id)
+        }
+      }
+      for (const link of changes.removeLinks) {
+        if (graph.hasEdge(link.source, link.target)) {
+          graph.dropEdge(link.source, link.target)
+        }
+      }
+      const growing = new Map<string, number>()
+      for (const node of changes.addNodes) {
+        const size = pixels(node.size)
+        graph.addNode(node.id, {
+          label: node.label,
+          size: animate ? 0 : size,
+          x: node.x,
+          y: node.y,
+        })
+        if (animate) {
+          growing.set(node.id, size)
+        }
+      }
+      for (const node of changes.changeNodes) {
+        graph.mergeNodeAttributes(node.id, {
+          label: node.label,
+          size: pixels(node.size),
+          x: node.x,
+          y: node.y,
+        })
+      }
+      for (const link of changes.addLinks) {
+        if (
+          graph.hasNode(link.source) &&
+          graph.hasNode(link.target) &&
+          !graph.hasEdge(link.source, link.target)
+        ) {
+          graph.addEdge(link.source, link.target, {
+            from: link.source,
+            label: link.label,
+            size: 1,
+            to: link.target,
+          })
+        }
+      }
+      if (growing.size > 0) {
+        grow(growing)
+      }
     },
     zoomBy: (direction, animate) => {
       const ratio = camera.getState().ratio * (direction > 0 ? 1 / ZOOM : ZOOM)

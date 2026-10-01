@@ -2,11 +2,13 @@ import {
   customElement,
   fillTemplate,
   formatNumbers,
+  type GraphSignalDetail,
   HelixElement,
   HelixGraphLayoutEvent,
   HelixGraphPanEvent,
   HelixGraphPartChangeEvent,
   HelixGraphReadyEvent,
+  HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   MixinControllerActive,
   MixinViewport,
@@ -77,6 +79,7 @@ const PAGE = 10
  * @event {HelixGraphPanEvent} helix-graph-pan - A pan button or arrow key was pressed. `connectGraph` moves the drawing.
  * @event {HelixGraphPartChangeEvent} helix-graph-part-change - The notes, the links, the selection, the depth or the gestures changed. Used by `connectGraph`; pages do not need to listen for it.
  * @event {HelixGraphReadyEvent} helix-graph-ready - The graph has been drawn whole, laid out and settled. Sent each time `drawn()` says it is drawn after it was not.
+ * @event {HelixGraphSignalEvent} helix-graph-signal - Something passed between two notes, sent by `signal()`. Used by `connectGraph`; pages do not need to listen for it.
  * @event {HelixGraphZoomEvent} helix-graph-zoom - A zoom button or key was pressed. `connectGraph` zooms the drawing.
  *
  * @csspart after - The room the notes after those drawn would take, so the list scrolls its whole length.
@@ -246,6 +249,20 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    */
   laidOut(positions: Record<string, { x: number; y: number }>): void {
     this.dispatchEvent(new HelixGraphLayoutEvent({ positions }))
+  }
+
+  /**
+   * Shows something passing from one note to another, such as a message, a
+   * request or a payment, drawn traveling along the drawing and arriving with
+   * a pulse. `tone` says what it means and colors it. Call it as often as
+   * things happen; each call is one signal.
+   *
+   * **Drawn, and never said.** A signal is motion in the drawing, which a
+   * screen reader does not hear: where what passed matters to a reader, say it
+   * in the page's own words as well.
+   */
+  signal(from: string, to: string, options: { tone?: GraphSignalDetail['tone'] } = {}): void {
+    this.dispatchEvent(new HelixGraphSignalEvent({ from, to, tone: options.tone }))
   }
 
   protected override willUpdate(changed: PropertyValues): void {
