@@ -8,5 +8,5 @@ export {
   PATIENCE,
   settledColor,
 } from './map-colors.js'
-export type { MapImage, MapLibreStyle, MapStyleOptions } from './map-style.js'
-export { mapLibreStyle } from './map-style.js'
+export type { MapImage, MapLandmark, MapLibreStyle, MapStyleOptions } from './map-style.js'
+export { MAP_LANDMARKS, mapLibreStyle } from './map-style.js'

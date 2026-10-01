@@ -18,7 +18,12 @@
  */
 
 import { connectMap, fontReady, mapColorsFrom, mapFontFrom } from '@fusion.dev/helix-map'
-import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
+import {
+  followTheme,
+  type MapLandmark,
+  mapLibreDriver,
+  mapLibreStyle,
+} from '@fusion.dev/helix-map/maplibre'
 import { clearOf } from '../utils/map-view/map-view'
 import { RESTYLED } from './preview-events'
 
@@ -80,10 +85,21 @@ const start = (frame: HTMLElement, root: HTMLElement): (() => void) => {
   }
   const panel = root.querySelector('[data-preview-map-clear]')
   const language = document.documentElement.lang || 'en'
+  /* **The landmarks the example asks for**, as `data-preview-map-landmarks`:
+     `false` for none, or the kinds to keep, comma separated, which is
+     `MapStyleOptions.landmarks` written as an attribute. */
+  const asked = frame.dataset.previewMapLandmarks
+  const landmarks =
+    asked === undefined
+      ? undefined
+      : asked === 'false'
+        ? false
+        : (asked.split(',').map((one) => one.trim()) as MapLandmark[])
   const styled = (colors: ReturnType<typeof mapColorsFrom>) =>
     mapLibreStyle(colors, {
       contrast: contrastOf(frame),
       font: mapFontFrom(frame),
+      landmarks,
       language,
     }) as never
   /* **A fixed view where the example gives one**, for a layer with no places

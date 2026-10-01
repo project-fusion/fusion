@@ -106,6 +106,19 @@ It also draws landmarks, highway signs, and neighborhood names:
   roads.
 - Neighborhoods are in spaced capitals, quieter than the towns.
 
+Pass `landmarks` to choose which kinds the map draws. `false` draws none, for a
+map whose own markers are the places a reader is looking for. A list draws only
+those kinds:
+
+```js
+mapLibreStyle(colors, { landmarks: ['nature', 'transit'] })
+```
+
+The kinds are `culture`, `food`, `health`, `learning`, `lodging`, `nature`,
+`shopping`, `sport`, and `transit`, and `MAP_LANDMARKS` lists them. The option
+holds when `followTheme` restyles the map, because it builds the style from the
+same options.
+
 The same call builds a light map for a light theme and a dark map for a dark
 theme. Map labels meet a contrast target of 4.5 against the land. Pass
 `contrast` to change it, `language` to choose which name each place is labeled
@@ -138,6 +151,42 @@ changes its theme another way, such as by replacing a stylesheet, call
 `colorsReady(frame)` waits until your theme's colors can be read, which can take
 a frame or two after the page loads. If the colors never become available, it
 reports which one is missing.
+
+## Put a map behind your content
+
+Set `fill` to lay a map behind your page's own content, such as a hero whose
+words decide its height. The frame covers its container instead of taking a
+height of its own, and draws no border or corners, because the container's edge
+is the map's. Give the container a position, such as `position: relative`:
+
+```html
+<section class="hero">
+  <helix-map fill credit-placement="bottom-end" label="Downtown Austin">
+    <div id="map"></div>
+  </helix-map>
+  <div class="hero-words">
+    <h1>Every stop, one map</h1>
+  </div>
+</section>
+```
+
+```css
+.hero,
+.hero-words {
+  position: relative;
+}
+```
+
+Content after the map, with a position of its own, is drawn over it. Give that
+content a ground of its own, such as a translucent panel, so it reads over any
+part of the map.
+
+`credit-placement` draws the map's credit in a corner over the map instead of in
+a strip under it. Use `bottom-end` or `bottom-start`, and keep it away from the
+corner your controls are in. The credit is one line until it is pointed at or
+its links are focused, and then it shows in full. That compact form is the one
+OpenStreetMap's attribution guidance accepts for a small credit. Most tile
+licenses require the credit to stay visible, so Helix never hides it.
 
 ## Draw the map before it loads
 
