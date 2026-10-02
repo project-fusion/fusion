@@ -135,6 +135,17 @@ export const cosmosDriver = (
   /* Whether the reader has moved the view since the graph was drawn, after
      which the view is theirs and the layout no longer fits it. */
   let moved = false
+  /* Whether the connector has stopped the driver, after which the page may
+     destroy the graph, and nothing here touches it again: a fit or a read
+     still waiting would reach a graph with no GPU. */
+  let stopped = false
+  /* How many notes cosmos.gl has on the GPU. None until it has started with
+     notes to draw: a graph first drawn empty, as a frame is before its page
+     gives it notes, has no places on the GPU, and reading them throws. */
+  let uploaded = 0
+  /** Whether cosmos.gl's places can be read: it has the GPU, notes on it, and still has it. */
+  const live = (): boolean => graph.isReady && uploaded > 0 && !stopped
+
   /* Each note's group, by index, as cosmos.gl was last given it. */
   let clustered: (number | undefined)[] = []
 
@@ -181,7 +192,7 @@ export const cosmosDriver = (
   let trackedAt = Number.NEGATIVE_INFINITY
   const positionsNow = (): ReadonlyMap<number, [number, number]> => {
     const now = performance.now()
-    if (now - trackedAt > 8 && graph.isReady) {
+    if (now - trackedAt > 8 && live()) {
       tracked = graph.getTrackedPointPositionsMap()
       trackedAt = now
     }
@@ -275,19 +286,22 @@ export const cosmosDriver = (
    * and reading them before it has the GPU throws.
    */
   const flatNow = (): number[] =>
-    graph.isReady
+    live()
       ? graph.getPointPositions()
       : ids.flatMap((id) => toSpace(drawnNow.get(id) ?? { x: 0, y: 0 }))
 
   /** Fits the view to the whole graph, unless the reader has moved it. */
   const fitAll = (duration: number): void => {
+    if (stopped) {
+      return
+    }
     /* A fit before cosmos.gl has the GPU and its size measures nothing, so
        it waits for both: the start, and the frame after. */
     if (!graph.isReady) {
       void graph.ready.then(() => requestAnimationFrame(() => fitAll(duration)))
       return
     }
-    if (!moved) {
+    if (!moved && live()) {
       graph.fitView(duration, PADDING)
       clearTimeout(overviewing)
       overviewing = setTimeout(() => {
@@ -415,6 +429,15 @@ export const cosmosDriver = (
     graph.setPointPositions(positions, true)
     graph.setLinks(pairs)
     paint(transition)
+    /* On the GPU now, or once cosmos.gl has started and drawn what it was given. */
+    uploaded = 0
+    if (graph.isReady) {
+      uploaded = ids.length
+    } else {
+      void graph.ready.then(() => {
+        uploaded = ids.length
+      })
+    }
   }
 
   graph.setConfigPartial({
@@ -604,6 +627,7 @@ export const cosmosDriver = (
       signals.signal(from, to, colors, animate)
     },
     stop: () => {
+      stopped = true
       clearTimeout(overviewing)
       graph.setConfigPartial({
         onPointClick: undefined,
