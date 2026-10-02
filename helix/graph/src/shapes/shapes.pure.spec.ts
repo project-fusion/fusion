@@ -34,6 +34,20 @@ describe('shapeFromTriangles', () => {
     expect(field.distance(middle.x, middle.y, middle.z)).toBeCloseTo(-5, 0)
   })
 
+  test('says which named part a point is in: the part of the nearest triangle', () => {
+    /* The cube's twelve triangles: the two on its near face, at z 0, named `low`, and the rest `high`. */
+    const named = shapeFromTriangles(cube(), null, {
+      regions: {
+        names: ['low', 'high'],
+        ofTriangle: Array.from({ length: 12 }, (_, at) => (at < 2 ? 0 : 1)),
+      },
+      resolution: 40,
+    })
+    expect(named.regionOf?.(named.width / 2, named.height / 2, 0.6)).toBe('low')
+    expect(named.regionOf?.(named.width / 2, named.height / 2, named.depth - 0.6)).toBe('high')
+    expect(field.regionOf).toBeUndefined()
+  })
+
   test('keeps the surface it was read from, to be drawn as it is', () => {
     expect(field.mesh?.triangles).toHaveLength(36)
     expect(field.mesh?.corners).toHaveLength(36 * 3)

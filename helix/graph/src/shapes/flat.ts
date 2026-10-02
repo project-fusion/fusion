@@ -34,7 +34,8 @@ const pathOf = (element: Element): string => {
 /**
  * A flat field from an SVG: an `<svg>` element, or its markup. Its box is
  * its `viewBox`, and its shape every path, rectangle, circle, ellipse and
- * polygon in it, together, their holes cut by the even-odd rule.
+ * polygon in it, together, their holes cut by the even-odd rule. Each shape
+ * with an `id`, or in a group with one, is a named part.
  *
  * Transforms on the shapes are not read: draw the outline in the `viewBox`'s
  * own units, as an exported icon or logo is.
@@ -52,10 +53,73 @@ export const shapeFromSvg = (svg: SVGSVGElement | string, resolution = FLAT): Sh
     height: height || Number(element.getAttribute('height') ?? 0),
     width: width || Number(element.getAttribute('width') ?? 0),
   }
-  const path = [...element.querySelectorAll('path, rect, circle, ellipse, polygon')]
-    .map(pathOf)
-    .join(' ')
-  return fieldFromPath(path, box.width || 1, box.height || 1, resolution)
+  const shapes = [...element.querySelectorAll('path, rect, circle, ellipse, polygon')]
+  const path = shapes.map(pathOf).join(' ')
+  const field = fieldFromPath(path, box.width || 1, box.height || 1, resolution)
+  /* **Each shape with an `id`, or inside a group with one, a named part**,
+     so a page can send a group of notes to a state on a map by its id. */
+  const named = shapes.flatMap((shape) => {
+    const name = shape.closest('[id]')?.getAttribute('id')
+    return name && shape.closest('[id]') !== element ? [{ name, path: pathOf(shape) }] : []
+  })
+  return named.length > 0 ? { ...field, regionOf: partsOf(named, field, resolution) } : field
+}
+
+/**
+ * Which named part a point of a flat shape is in, read off a grid each part
+ * is drawn into once, each in a color of its own. A point on no part, as
+ * between two or on a part's softened edge, takes the nearest part a few
+ * cells away.
+ */
+const partsOf = (
+  named: readonly { name: string; path: string }[],
+  box: { height: number; width: number },
+  resolution: number,
+): ((x: number, y: number) => string | undefined) => {
+  const cell = Math.max(box.width, box.height, 1) / resolution
+  const nx = Math.max(1, Math.ceil(box.width / cell))
+  const ny = Math.max(1, Math.ceil(box.height / cell))
+  const canvas = document.createElement('canvas')
+  canvas.width = nx
+  canvas.height = ny
+  const context = canvas.getContext('2d', { willReadFrequently: true })
+  const labels = new Uint16Array(nx * ny)
+  if (context) {
+    context.scale(1 / cell, 1 / cell)
+    named.forEach(({ path }, at) => {
+      const label = at + 1
+      context.fillStyle = `rgb(${label & 255}, ${(label >> 8) & 255}, 0)`
+      context.fill(new Path2D(path), 'evenodd')
+    })
+    const pixels = context.getImageData(0, 0, nx, ny).data
+    for (let at = 0; at < labels.length; at++) {
+      /* Only a pixel wholly one part's color: an edge blends two. */
+      if ((pixels[at * 4 + 3] ?? 0) === 255 && (pixels[at * 4 + 2] ?? 0) === 0) {
+        const label = (pixels[at * 4] ?? 0) + ((pixels[at * 4 + 1] ?? 0) << 8)
+        labels[at] = label <= named.length ? label : 0
+      }
+    }
+  }
+  return (x, y) => {
+    const column = Math.floor(x / cell)
+    const row = Math.floor(y / cell)
+    for (let ring = 0; ring <= 3; ring++) {
+      for (let dy = -ring; dy <= ring; dy++) {
+        for (let dx = -ring; dx <= ring; dx++) {
+          const c = column + dx
+          const r = row + dy
+          if (c < 0 || r < 0 || c >= nx || r >= ny) {
+            continue
+          }
+          const label = labels[r * nx + c] ?? 0
+          if (label > 0) {
+            return named[label - 1]?.name
+          }
+        }
+      }
+    }
+    return undefined
+  }
 }
 
 /** How an image is read as a shape. */

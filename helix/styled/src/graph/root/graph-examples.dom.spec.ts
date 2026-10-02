@@ -134,6 +134,7 @@ describe('the brain-3d example', () => {
       }
       expect(graph.dataset.previewGraph).toBe('three')
       expect(graph.dataset.previewGraphModel).toBe('/media/models/brain.glb')
+      expect(graph.dataset.previewGraphRegions).toContain('Vision: occipital')
       expect(graph.dataset.previewGraphPlace).toBe('surface')
       expect(graph.nodes).toHaveLength(8000)
       expect(new Set(graph.nodes.map((node) => node.group)).size).toBe(8)

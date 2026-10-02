@@ -21,6 +21,11 @@ export interface ShapeField {
    * field, since it holds every detail the field's cells are too coarse for.
    */
   readonly mesh?: { corners: Float32Array; triangles: Uint32Array } | undefined
+  /**
+   * Which named part of the shape a point is in, where the shape has named
+   * parts: the part nearest it, or undefined where it has none.
+   */
+  regionOf?(x: number, y: number, z?: number): string | undefined
   /** How wide the box is. */
   readonly width: number
 }

@@ -4,7 +4,10 @@ import { shapeFromTriangles, type TriangleOptions } from './triangles.js'
 /**
  * A solid field from a glTF model, the web's standard format for one: a
  * URL to a `.glb` or `.gltf` file, or the file's bytes. Every mesh in it is
- * read, placed as the model places it.
+ * read, placed as the model places it, and where it has two meshes or more,
+ * each is a part of the field, named as the model names it, which a
+ * stencil's `regions` sends groups to. A mesh the model leaves unnamed is
+ * named as three.js names it, `mesh_0` and on.
  *
  * **three.js reads the file**, imported when this is first called, so a page
  * that draws no model never downloads a loader. It is an optional peer of
@@ -25,6 +28,12 @@ export const shapeFromModel = async (
       : await loader.parseAsync(source, '')
   model.scene.updateMatrixWorld(true)
   const corners: number[] = []
+  /* **Each mesh a named part**, by its node's name or its mesh's, so a page
+     can send a group to it: `{ Vision: 'occipital' }`. three.js names a
+     node and its mesh as the file does, the characters a name cannot hold
+     in an animation path replaced. */
+  const names: string[] = []
+  const ofTriangle: number[] = []
   const point = new Vector3()
   model.scene.traverse((object) => {
     if (!(object instanceof Mesh)) {
@@ -35,12 +44,25 @@ export const shapeFromModel = async (
     if (!place) {
       return
     }
+    const name = object.name || (geometry.name as string) || ''
+    let part = names.indexOf(name)
+    if (name && part < 0) {
+      part = names.push(name) - 1
+    }
     const index = geometry.getIndex()
     const count = index ? index.count : place.count
     for (let at = 0; at < count; at++) {
       point.fromBufferAttribute(place, index ? index.getX(at) : at).applyMatrix4(object.matrixWorld)
       corners.push(point.x, point.y, point.z)
     }
+    for (let triangle = 0; triangle < Math.floor(count / 3); triangle++) {
+      ofTriangle.push(part)
+    }
   })
-  return shapeFromTriangles(corners, null, options)
+  /* Parts only where there are two or more, since one part leaves nothing to choose. */
+  const named = names.length > 1 && !ofTriangle.includes(-1)
+  return shapeFromTriangles(corners, null, {
+    ...options,
+    ...(named ? { regions: { names, ofTriangle } } : {}),
+  })
 }

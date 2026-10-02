@@ -14,7 +14,8 @@
  *   as a field 96 cells across can tell apart from more.
  * - **A brain**, from the distance field in `brain-model.mjs`, wrapped in
  *   triangles by the surface nets the Graph driver draws shapes with, fine
- *   enough to hold its folds.
+ *   enough to hold its folds, and written in its lobes, one named mesh each,
+ *   so a page can send a group of notes to `occipital`.
  *
  * Written by hand, not by three.js's exporter, which needs a browser's
  * `FileReader`: a `.glb` is a twelve-byte header, a JSON chunk saying where
@@ -25,7 +26,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { surfaceOf } from '@fusion.dev/helix-graph/shapes'
 import { TorusKnotGeometry } from 'three'
-import { BOX, brain } from './brain-model.mjs'
+import { BOX, brain, LOBES, lobeOf } from './brain-model.mjs'
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'media', 'models')
 
@@ -33,57 +34,65 @@ const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'media
 const padded = (length) => Math.ceil(length / 4) * 4
 
 /**
- * A binary glTF file holding one mesh: its corners, and its triangles by
- * corner, in sixteen bits a corner where there are few enough corners.
+ * A binary glTF file holding meshes, each named, each one node: its corners,
+ * and its triangles by corner, in sixteen bits a corner where there are few
+ * enough corners. A page reading the file sees each mesh as a named part.
  */
-const glb = (positions, wide) => {
-  const indices = positions.length / 3 < 65536 ? Uint16Array.from(wide) : Uint32Array.from(wide)
-  const low = [Infinity, Infinity, Infinity]
-  const high = [-Infinity, -Infinity, -Infinity]
-  for (let at = 0; at < positions.length; at += 3) {
-    for (let axis = 0; axis < 3; axis++) {
-      low[axis] = Math.min(low[axis], positions[at + axis])
-      high[axis] = Math.max(high[axis], positions[at + axis])
-    }
+const glb = (meshes) => {
+  const views = []
+  const accessors = []
+  const chunks = []
+  let offset = 0
+  const add = (array, target) => {
+    const bytes = new Uint8Array(array.buffer, array.byteOffset, array.byteLength)
+    views.push({ buffer: 0, byteLength: bytes.byteLength, byteOffset: offset, target })
+    chunks.push([offset, bytes])
+    offset = padded(offset + bytes.byteLength)
+    return views.length - 1
   }
-  const binary = new Uint8Array(padded(positions.byteLength + indices.byteLength))
-  binary.set(new Uint8Array(positions.buffer, positions.byteOffset, positions.byteLength), 0)
-  binary.set(
-    new Uint8Array(indices.buffer, indices.byteOffset, indices.byteLength),
-    positions.byteLength,
-  )
+  const parts = meshes.map(({ name, positions, triangles }) => {
+    const indices =
+      positions.length / 3 < 65536 ? Uint16Array.from(triangles) : Uint32Array.from(triangles)
+    const low = [Infinity, Infinity, Infinity]
+    const high = [-Infinity, -Infinity, -Infinity]
+    for (let at = 0; at < positions.length; at += 3) {
+      for (let axis = 0; axis < 3; axis++) {
+        low[axis] = Math.min(low[axis], positions[at + axis])
+        high[axis] = Math.max(high[axis], positions[at + axis])
+      }
+    }
+    accessors.push({
+      bufferView: add(positions, 34962),
+      componentType: 5126,
+      count: positions.length / 3,
+      max: high,
+      min: low,
+      type: 'VEC3',
+    })
+    accessors.push({
+      bufferView: add(indices, 34963),
+      componentType: indices instanceof Uint16Array ? 5123 : 5125,
+      count: indices.length,
+      type: 'SCALAR',
+    })
+    return { indices: accessors.length - 1, name, position: accessors.length - 2 }
+  })
+  const binary = new Uint8Array(padded(offset))
+  for (const [at, bytes] of chunks) {
+    binary.set(bytes, at)
+  }
   const json = JSON.stringify({
-    accessors: [
-      {
-        bufferView: 0,
-        componentType: 5126,
-        count: positions.length / 3,
-        max: high,
-        min: low,
-        type: 'VEC3',
-      },
-      {
-        bufferView: 1,
-        componentType: indices instanceof Uint16Array ? 5123 : 5125,
-        count: indices.length,
-        type: 'SCALAR',
-      },
-    ],
+    accessors,
     asset: { generator: 'fusion/site/scripts/build-models.mjs', version: '2.0' },
     buffers: [{ byteLength: binary.byteLength }],
-    bufferViews: [
-      { buffer: 0, byteLength: positions.byteLength, byteOffset: 0, target: 34962 },
-      {
-        buffer: 0,
-        byteLength: indices.byteLength,
-        byteOffset: positions.byteLength,
-        target: 34963,
-      },
-    ],
-    meshes: [{ primitives: [{ attributes: { POSITION: 0 }, indices: 1 }] }],
-    nodes: [{ mesh: 0 }],
+    bufferViews: views,
+    meshes: parts.map(({ indices, name, position }) => ({
+      name,
+      primitives: [{ attributes: { POSITION: position }, indices }],
+    })),
+    nodes: parts.map(({ name }, at) => ({ mesh: at, name })),
     scene: 0,
-    scenes: [{ nodes: [0] }],
+    scenes: [{ nodes: parts.map((_, at) => at) }],
   })
   const text = new TextEncoder().encode(json)
   const jsonLength = padded(text.length)
@@ -102,6 +111,34 @@ const glb = (positions, wide) => {
   out.set(binary, 28 + jsonLength)
   return out
 }
+
+/**
+ * A surface split into named parts by the part each triangle's middle is in:
+ * each part its own corners and triangles.
+ */
+const split = (corners, triangles, partOf, names) =>
+  names.flatMap((name) => {
+    const index = new Map()
+    const own = []
+    const tris = []
+    for (let at = 0; at < triangles.length; at += 3) {
+      const [a, b, c] = [triangles[at], triangles[at + 1], triangles[at + 2]]
+      const middle = [0, 1, 2].map(
+        (axis) => (corners[a * 3 + axis] + corners[b * 3 + axis] + corners[c * 3 + axis]) / 3,
+      )
+      if (partOf(...middle) !== name) {
+        continue
+      }
+      for (const corner of [a, b, c]) {
+        if (!index.has(corner)) {
+          index.set(corner, own.length / 3)
+          own.push(corners[corner * 3], corners[corner * 3 + 1], corners[corner * 3 + 2])
+        }
+        tris.push(index.get(corner))
+      }
+    }
+    return tris.length > 0 ? [{ name, positions: new Float32Array(own), triangles: tris }] : []
+  })
 
 const knot = new TorusKnotGeometry(1, 0.32, 128, 16, 2, 3)
 const positions = new Float32Array(knot.getAttribute('position').array)
@@ -129,9 +166,11 @@ for (let at = 0; at < wrapped.corners.length; at += 3) {
 }
 
 await mkdir(OUT, { recursive: true })
+/* The brain in its lobes, each a named mesh, read in the field's box where `lobeOf` is measured. */
+const lobes = split(brainCorners, wrapped.triangles, (x, y, z) => lobeOf(x + 110, 85 - y, z), LOBES)
 for (const [name, file, triangles] of [
-  ['torus-knot.glb', glb(positions, indices), indices.length / 3],
-  ['brain.glb', glb(brainCorners, wrapped.triangles), wrapped.triangles.length / 3],
+  ['torus-knot.glb', glb([{ name: 'knot', positions, triangles: indices }]), indices.length / 3],
+  ['brain.glb', glb(lobes), wrapped.triangles.length / 3],
 ]) {
   await writeFile(join(OUT, name), file)
   console.log(`models: ${name}, ${triangles} triangles, ${Math.round(file.length / 1024)} KB`)

@@ -21,6 +21,14 @@ export type GraphStencil = (
   place?: 'fill' | 'surface' | undefined
   /** How thick the surface's shell is, as a share of the shape's size. 0.04 by default. */
   shell?: number | undefined
+  /**
+   * Which named part of the shape each group's notes go to, by group, such
+   * as `{ Vision: 'occipital' }`, where the shape has named parts: a model's
+   * named meshes, or an SVG's elements with an `id`. A group not named here,
+   * or naming a part the shape does not have, shares the parts no group
+   * claims.
+   */
+  regions?: Readonly<Record<string, string>> | undefined
 }
 
 /** How many cells a side the grid has that measures how much of the box the shape fills. */
@@ -135,6 +143,78 @@ export const placesIn = (
 }
 
 /**
+ * Places for notes in a shape with named parts: **each part's places for the
+ * groups that claim it**, as many as they have notes and spread evenly over
+ * it, and the rest's places spread over the parts no group claims. Places
+ * are drawn from an even spread over the whole shape several times as large
+ * as needed, and each part takes the first of its own, which are spread
+ * evenly over it since the spread comes in no order. Says which part each
+ * place is for: a part's name, or undefined for the rest.
+ */
+const placesByRegion = (
+  field: ShapeField,
+  wanted: ReadonlyMap<string | undefined, number>,
+  options: { place: 'fill' | 'surface'; shell: number },
+): { places: GraphPoint[]; regions: (string | undefined)[] } | undefined => {
+  const regionOf = field.regionOf
+  const count = [...wanted.values()].reduce((sum, many) => sum + many, 0)
+  if (!regionOf) {
+    return undefined
+  }
+  for (let times = 3; times <= 24; times *= 2) {
+    const pool = placesIn(field, count * times, options)
+    if (pool.length === 0) {
+      return undefined
+    }
+    const byRegion = new Map<string | undefined, GraphPoint[]>()
+    const inRegion = pool.map((place) => regionOf(place.x, place.y, place.z))
+    pool.forEach((place, at) => {
+      const region = inRegion[at]
+      const list = byRegion.get(region)
+      if (list) {
+        list.push(place)
+      } else {
+        byRegion.set(region, [place])
+      }
+    })
+    const claimed = new Set<string | undefined>(
+      [...wanted.keys()].filter((region) => region !== undefined),
+    )
+    const places: GraphPoint[] = []
+    const regions: (string | undefined)[] = []
+    let short = false
+    for (const [region, many] of wanted) {
+      if (region === undefined) {
+        continue
+      }
+      const own = byRegion.get(region) ?? []
+      if (own.length < many) {
+        short = true
+        break
+      }
+      for (const place of own.slice(0, many)) {
+        places.push(place)
+        regions.push(region)
+      }
+    }
+    /* The rest over the parts no group claims, or over the whole shape where every part is claimed. */
+    const rest = wanted.get(undefined) ?? 0
+    const taken = new Set(places)
+    const free = pool.filter((_, at) => !claimed.has(inRegion[at]))
+    const spare = free.length >= rest ? free : pool.filter((place) => !taken.has(place))
+    if (short || spare.length < rest) {
+      continue
+    }
+    for (const place of spare.slice(0, rest)) {
+      places.push(place)
+      regions.push(undefined)
+    }
+    return { places, regions }
+  }
+  return undefined
+}
+
+/**
  * Items put in an order that keeps near things near: sorted by the first
  * key, cut into slices, each slice sorted by the next key, and so on. Two
  * lists as long as each other, ordered this way, pair what lies at the same
@@ -208,10 +288,31 @@ export const fitInStencil = (
     return { positions: new Map() }
   }
   const field = fieldOf(stencil)
-  const places = placesIn(field, notes.length, {
-    place: stencil.place ?? 'fill',
-    shell: stencil.shell ?? SHELL,
-  })
+  const options = { place: stencil.place ?? 'fill', shell: stencil.shell ?? SHELL } as const
+  /* **Each note's part of the shape**, from its group, where the stencil
+     names parts for groups and the shape has them: undefined for the rest. */
+  const groupOf = (id: string): string | undefined => clustersOf?.(id)[0]
+  const noteRegion = new Map<string, string | undefined>(
+    notes.map((note) => {
+      const group = groupOf(note.id)
+      return [note.id, group === undefined ? undefined : stencil.regions?.[group]]
+    }),
+  )
+  const wanted = new Map<string | undefined, number>()
+  for (const region of noteRegion.values()) {
+    wanted.set(region, (wanted.get(region) ?? 0) + 1)
+  }
+  const regional =
+    stencil.regions && [...wanted.keys()].some((region) => region !== undefined)
+      ? placesByRegion(field, wanted, options)
+      : undefined
+  if (!regional) {
+    for (const id of noteRegion.keys()) {
+      noteRegion.set(id, undefined)
+    }
+  }
+  const places = regional?.places ?? placesIn(field, notes.length, options)
+  const placeRegion = regional?.regions ?? places.map(() => undefined)
   if (places.length < notes.length) {
     return { positions: new Map(positions) }
   }
@@ -380,16 +481,27 @@ export const fitInStencil = (
       halve(ours.slice(0, half), near, level)
       halve(ours.slice(half), rest, level)
     }
-    halve(
-      [...notes],
-      targets.map((_, at) => at),
-    )
+    /* Each part's notes matched to its places, and the rest to theirs. */
+    for (const region of wanted.keys()) {
+      halve(
+        notes.filter((note) => noteRegion.get(note.id) === region),
+        targets.flatMap((_, at) => (placeRegion[at] === region ? [at] : [])),
+      )
+    }
     return { frame: { field, middle, scale, shell: thickness }, positions: fitted }
   }
-  const ours = nested(notes, [(note) => note.at.x, (note) => note.at.y])
-  const theirs = nested(spots, [(spot) => spot.across, (spot) => spot.down])
-  ours.forEach((note, at) => {
-    fitted.set(note.id, (theirs[at] as (typeof spots)[number]).at)
-  })
+  for (const region of wanted.keys()) {
+    const ours = nested(
+      notes.filter((note) => noteRegion.get(note.id) === region),
+      [(note) => note.at.x, (note) => note.at.y],
+    )
+    const theirs = nested(
+      spots.filter((_, at) => placeRegion[at] === region),
+      [(spot) => spot.across, (spot) => spot.down],
+    )
+    ours.forEach((note, at) => {
+      fitted.set(note.id, (theirs[at] as (typeof spots)[number]).at)
+    })
+  }
   return { frame: { field, middle, scale, shell: thickness }, positions: fitted }
 }

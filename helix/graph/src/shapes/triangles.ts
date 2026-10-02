@@ -5,8 +5,79 @@ const NUDGE = 1e-6 * Math.PI
 
 /** How a solid is read from triangles. */
 export interface TriangleOptions {
+  /**
+   * The named parts the triangles make: each part's name, and which part
+   * each triangle is in, by its place in `names`. Gives the field
+   * `regionOf`, the part a point is in: the part of the triangle nearest it.
+   */
+  regions?: { names: readonly string[]; ofTriangle: ArrayLike<number> } | undefined
   /** How many cells the field has along the solid's longest side. 96 by default. */
   resolution?: number | undefined
+}
+
+/** How many cells across the grid is that finds the triangle nearest a point. */
+const NEAREST = 40
+
+/**
+ * The part a point is in: the part of the triangle whose middle is nearest
+ * it, found through a grid of the middles, searched outward ring by ring.
+ */
+const nearestPart = (
+  middles: Float32Array,
+  parts: ArrayLike<number>,
+  names: readonly string[],
+  box: { depth: number; height: number; width: number },
+): ((x: number, y: number, z?: number) => string | undefined) => {
+  const size = Math.max(box.width, box.height, box.depth) / NEAREST
+  const cells = new Map<string, number[]>()
+  const key = (cx: number, cy: number, cz: number): string => `${cx},${cy},${cz}`
+  const count = middles.length / 3
+  for (let at = 0; at < count; at++) {
+    const k = key(
+      Math.floor((middles[at * 3] as number) / size),
+      Math.floor((middles[at * 3 + 1] as number) / size),
+      Math.floor((middles[at * 3 + 2] as number) / size),
+    )
+    const list = cells.get(k)
+    if (list) {
+      list.push(at)
+    } else {
+      cells.set(k, [at])
+    }
+  }
+  return (x, y, z = box.depth / 2) => {
+    const cx = Math.floor(x / size)
+    const cy = Math.floor(y / size)
+    const cz = Math.floor(z / size)
+    let best = -1
+    let nearest = Number.POSITIVE_INFINITY
+    for (let ring = 0; ring <= NEAREST; ring++) {
+      for (let dx = -ring; dx <= ring; dx++) {
+        for (let dy = -ring; dy <= ring; dy++) {
+          for (let dz = -ring; dz <= ring; dz++) {
+            if (Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz)) !== ring) {
+              continue
+            }
+            for (const at of cells.get(key(cx + dx, cy + dy, cz + dz)) ?? []) {
+              const far =
+                ((middles[at * 3] as number) - x) ** 2 +
+                ((middles[at * 3 + 1] as number) - y) ** 2 +
+                ((middles[at * 3 + 2] as number) - z) ** 2
+              if (far < nearest) {
+                nearest = far
+                best = at
+              }
+            }
+          }
+        }
+      }
+      /* Nothing in a further ring can be nearer than one found a ring in. */
+      if (best >= 0 && Math.sqrt(nearest) <= ring * size) {
+        break
+      }
+    }
+    return best < 0 ? undefined : names[parts[best] as number]
+  }
 }
 
 /**
@@ -25,7 +96,7 @@ export interface TriangleOptions {
 export const shapeFromTriangles = (
   positions: ArrayLike<number>,
   index?: ArrayLike<number> | null | undefined,
-  { resolution = SOLID }: TriangleOptions = {},
+  { regions, resolution = SOLID }: TriangleOptions = {},
 ): ShapeField => {
   const corners = Math.floor(positions.length / 3)
   const low = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY]
@@ -121,9 +192,23 @@ export const shapeFromTriangles = (
     height: ny * cell,
     width: nx * cell,
   })
+  let regionOf: ((x: number, y: number, z?: number) => string | undefined) | undefined
+  if (regions && regions.names.length > 0) {
+    const middles = new Float32Array(triangles * 3)
+    for (let triangle = 0; triangle < triangles; triangle++) {
+      for (let which = 0; which < 3; which++) {
+        const at = corner(triangle, which)
+        middles[triangle * 3] = (middles[triangle * 3] as number) + (at[0] * cell) / 3
+        middles[triangle * 3 + 1] = (middles[triangle * 3 + 1] as number) + (at[1] * cell) / 3
+        middles[triangle * 3 + 2] = (middles[triangle * 3 + 2] as number) + (at[2] * cell) / 3
+      }
+    }
+    regionOf = nearestPart(middles, regions.ofTriangle, regions.names, field)
+  }
   return {
     ...field,
     distance: field.distance,
     mesh: { corners: meshCorners, triangles: meshTriangles },
+    ...(regionOf ? { regionOf } : {}),
   }
 }

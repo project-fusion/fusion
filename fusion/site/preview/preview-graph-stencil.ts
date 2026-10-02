@@ -31,9 +31,24 @@ export const stencilOf = (frame: HTMLElement): GraphStencil | undefined => {
 }
 
 /**
+ * Which part of the model each group's notes go to, from the frame's
+ * `data-preview-graph-regions`: `Group: part` pairs, a comma between, as
+ * `Vision: occipital, Balance: cerebellum`. A stencil's `regions`, written
+ * where JSON would need quoting.
+ */
+const regionsOf = (frame: HTMLElement): Record<string, string> | undefined => {
+  const pairs = (frame.dataset.previewGraphRegions ?? '')
+    .split(',')
+    .map((pair) => pair.split(':').map((side) => side.trim()))
+    .filter((pair): pair is [string, string] => pair.length === 2 && !!pair[0] && !!pair[1])
+  return pairs.length > 0 ? Object.fromEntries(pairs) : undefined
+}
+
+/**
  * The 3D model an example draws its notes on, named by the frame's
  * `data-preview-graph-model`, read once it has loaded, with
- * `data-preview-graph-place` as the stencil's `place`. Undefined where the
+ * `data-preview-graph-place` as the stencil's `place` and
+ * `data-preview-graph-regions` as its `regions`. Undefined where the
  * frame names none, or the model cannot be read.
  */
 export const modelOf = async (frame: HTMLElement): Promise<GraphStencil | undefined> => {
@@ -43,7 +58,11 @@ export const modelOf = async (frame: HTMLElement): Promise<GraphStencil | undefi
   }
   try {
     const field = await shapeFromModel(url)
-    return { ...field, place: frame.dataset.previewGraphPlace === 'surface' ? 'surface' : 'fill' }
+    return {
+      ...field,
+      place: frame.dataset.previewGraphPlace === 'surface' ? 'surface' : 'fill',
+      regions: regionsOf(frame),
+    }
   } catch (error) {
     console.error(`The model ${url} could not be read: ${String(error)}`)
     return undefined

@@ -278,8 +278,8 @@ const capsule = (x, y, z, a, b, r0, r1) => {
   )
 }
 
-/** The brain's distance at a point: below zero inside. */
-export const brain = (x, y, z) => {
+/** The brain's three parts' distances at a point: below zero inside each. */
+const parts = (x, y, z) => {
   const outside = read(side, x, y)
   let cerebrum = Math.max(outside, Math.abs(z) - reach(x, outside))
   /* The fissure between the hemispheres, from the top down to where they join. */
@@ -309,5 +309,57 @@ export const brain = (x, y, z) => {
     ellipsoid(x, y, z, 128, 140, 0, 13, 12, 14),
     6,
   )
+  return { cerebellum, cerebrum, stem }
+}
+
+/** The brain's distance at a point: below zero inside. */
+export const brain = (x, y, z) => {
+  const { cerebellum, cerebrum, stem } = parts(x, y, z)
   return smin(smin(cerebrum, cerebellum, 5), stem, 7)
+}
+
+/** Where the lateral fissure runs, as how far down it is at a point along the brain. */
+const fissureAt = (x) => {
+  const line = grooves[0].points
+  if (x <= line[0][0]) {
+    return line[0][1]
+  }
+  for (let at = 1; at < line.length; at++) {
+    const [ax, ay] = line[at - 1]
+    const [bx, by] = line[at]
+    if (x <= bx) {
+      return ay + ((by - ay) * (x - ax)) / (bx - ax)
+    }
+  }
+  return line[line.length - 1][1]
+}
+
+/** Where the central sulcus runs, as how far along the brain it is at a height. */
+const centralAt = (y) => 120 - ((Math.min(Math.max(y, 14), 74) - 14) / 60) * 20
+
+/** The lobes of the brain, as the model names its meshes. */
+export const LOBES = ['frontal', 'parietal', 'temporal', 'occipital', 'cerebellum', 'brainstem']
+
+/**
+ * Which lobe a point of the brain's surface is in: **the cerebellum and the
+ * brainstem by which part is nearest**, and the cerebrum's lobes by where
+ * the point is, as anatomy draws them: the temporal lobe below the lateral
+ * fissure, the occipital at the back, and the frontal and parietal either
+ * side of the central sulcus.
+ */
+export const lobeOf = (x, y, z) => {
+  const { cerebellum, cerebrum, stem } = parts(x, y, z)
+  if (cerebellum < cerebrum && cerebellum < stem) {
+    return 'cerebellum'
+  }
+  if (stem < cerebrum) {
+    return 'brainstem'
+  }
+  if (x > 168) {
+    return 'occipital'
+  }
+  if (y > fissureAt(x) + 2) {
+    return 'temporal'
+  }
+  return x < centralAt(y) ? 'frontal' : 'parietal'
 }
