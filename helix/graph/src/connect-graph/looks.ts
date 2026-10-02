@@ -167,6 +167,8 @@ export interface LinkLook {
 export interface GraphLooks {
   /** The typeface the labels are drawn in: the first of the frame's own. */
   font: string
+  /** What the drawing is laid on, which a name is ringed in so it reads over the links. */
+  ground: string
   /** The color the labels are drawn in. */
   ink: string
   /** What a name is drawn on while the pointer is over its note. */
@@ -217,15 +219,19 @@ export const looksOf = (options: {
   const hidden = (id: string): boolean => shown !== undefined && !shown.has(id)
   return {
     font: options.font || 'sans-serif',
+    ground: colors.ground,
     ink: colors.ink,
     link: (source, target) => {
       const touches = focused && (source === selected || target === selected)
+      /* **Tinted by the note it leaves**, faintly, so a cluster reads as a
+         region of its own color and not a gray web. The selected note's
+         links take its color, and every other steps back. */
       return {
         color: touches
-          ? colors.muted
+          ? own(selected as string)
           : focused
-            ? mixRgb(colors.line, colors.ground, 0.5)
-            : colors.line,
+            ? mixRgb(colors.line, colors.ground, 0.6)
+            : mixRgb(own(source), colors.ground, 0.72),
         hidden: hidden(source) || hidden(target),
         raised: touches,
       }

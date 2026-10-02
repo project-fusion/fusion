@@ -45,8 +45,14 @@ export interface SigmaRenderer {
   getNodeDisplayData(
     node: string,
   ): { hidden?: boolean; size: number; x: number; y: number } | undefined
-  off(type: 'clickNode', listener: (payload: { node: string }) => void): unknown
-  on(type: 'clickNode', listener: (payload: { node: string }) => void): unknown
+  off(
+    type: 'clickNode' | 'enterNode' | 'leaveNode',
+    listener: (payload: { node: string }) => void,
+  ): unknown
+  on(
+    type: 'clickNode' | 'enterNode' | 'leaveNode',
+    listener: (payload: { node: string }) => void,
+  ): unknown
   getSetting(name: 'nodeProgramClasses'): Record<string, unknown>
   refresh(): unknown
   resize(force?: boolean): unknown
@@ -57,7 +63,11 @@ export interface SigmaRenderer {
       | 'edgeReducer'
       | 'labelColor'
       | 'labelFont'
+      | 'defaultDrawNodeLabel'
+      | 'labelGridCellSize'
       | 'labelRenderedSizeThreshold'
+      | 'labelSize'
+      | 'minEdgeThickness'
       | 'nodeProgramClasses'
       | 'nodeReducer',
     value: unknown,
@@ -137,8 +147,8 @@ const HELD = 2
 /** How long a layout may go without moving anything before it counts as having nothing to do, in milliseconds. */
 const IDLE = 2000
 
-/** A note's drawn radius in pixels, from its relative size: a note of size 4 is half again as wide as one of size 1. */
-const pixels = (size: number): number => 2 + 2 * Math.sqrt(Math.max(size, 0))
+/** A note's drawn radius in pixels, from its relative size: a leaf about four, a busy hub about nine. */
+const pixels = (size: number): number => 1.6 + 1.35 * Math.max(size, 0)
 
 /** What Sigma hands a hover drawing: where the note is drawn, its size and its name. */
 interface HoverData {
@@ -183,11 +193,17 @@ const hoverOf =
     context.fillText(data.label, x, data.y + size / 3)
   }
 
-/** How long a signal takes to cross from one note to the other, in milliseconds. */
-const TRAVEL = 800
+/**
+ * How fast a signal crosses, in pixels a second, and the least and most time
+ * a crossing takes, in milliseconds: at one speed, a short link is not
+ * crawled along and a long one is not jumped.
+ */
+const SPEED = 340
+const QUICKEST = 450
+const SLOWEST = 1400
 
-/** How long the burst on arrival lasts, in milliseconds. */
-const PULSE = 520
+/** How long a note brightens when a signal reaches it, in milliseconds. */
+const ARRIVAL = 380
 
 /** How long a new note takes to grow to its size, in milliseconds. */
 const GROW = 300
@@ -198,6 +214,8 @@ const FLYING = 400
 /** One signal on its way. */
 interface Flight {
   animate: boolean
+  /** How long the crossing takes, settled on its first frame from how far it goes. */
+  crossing?: number
   color: string
   from: string
   started: number
@@ -210,75 +228,85 @@ const withAlpha = (color: string, alpha: number): string => {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`
 }
 
-/** How far behind its head a streak's tail reaches, in pixels. */
-const TAIL = 90
+/** How far behind its head a pulse's tail reaches, in pixels. */
+const TAIL = 110
 
 /**
- * A signal on its way: a streak of light whose tail fades into the link it
- * came along, and a head of white light in the signal's color.
+ * A signal on its way: a fine pulse of light running along the link, its
+ * tail fading into the line it came along, a small bright point at its head,
+ * and the link itself lit faintly while it passes, as light runs along a
+ * fiber. Quiet on purpose: on a busy feed there are dozens at once.
  */
-const streak = (
+const pulse = (
   context: CanvasRenderingContext2D,
   color: string,
   from: { x: number; y: number },
   to: { x: number; y: number },
   along: number,
+  through: number,
+  glowing: boolean,
 ): void => {
+  /* Added light reads fainter than paint at the same strength, so on a dark
+     ground the pulse carries a little more of it. */
+  const strength = glowing ? 1.3 : 1
   const length = Math.hypot(to.x - from.x, to.y - from.y) || 1
   const head = { x: from.x + (to.x - from.x) * along, y: from.y + (to.y - from.y) * along }
   const behind = Math.max(along - TAIL / length, 0)
   const tail = { x: from.x + (to.x - from.x) * behind, y: from.y + (to.y - from.y) * behind }
+  context.lineCap = 'round'
+  /* The link lit while the pulse is on it, rising and falling with it. */
+  context.globalAlpha = 0.14 * Math.sin(Math.PI * through)
+  context.strokeStyle = color
+  context.lineWidth = 1
+  context.beginPath()
+  context.moveTo(from.x, from.y)
+  context.lineTo(to.x, to.y)
+  context.stroke()
+  /* The tail, fading in toward the head, soft and then fine. */
   const fade = context.createLinearGradient(tail.x, tail.y, head.x, head.y)
   fade.addColorStop(0, withAlpha(color, 0))
-  fade.addColorStop(1, withAlpha(color, 1))
-  context.lineCap = 'round'
+  fade.addColorStop(0.6, withAlpha(color, 0.25))
+  fade.addColorStop(1, withAlpha(color, 0.95))
   context.strokeStyle = fade
-  /* The glow, wide and soft, then the streak itself, narrow and bright. */
   context.shadowColor = color
-  context.shadowBlur = 18
-  context.globalAlpha = 0.45
-  context.lineWidth = 7
+  context.shadowBlur = 8
+  context.globalAlpha = Math.min(0.35 * strength, 1)
+  context.lineWidth = 3.5
   context.beginPath()
   context.moveTo(tail.x, tail.y)
   context.lineTo(head.x, head.y)
   context.stroke()
-  context.globalAlpha = 1
-  context.lineWidth = 2.5
-  context.stroke()
-  const light = context.createRadialGradient(head.x, head.y, 0, head.x, head.y, 9)
-  light.addColorStop(0, 'rgba(255, 255, 255, 0.95)')
-  light.addColorStop(0.35, withAlpha(color, 0.9))
-  light.addColorStop(1, withAlpha(color, 0))
   context.shadowBlur = 0
+  context.globalAlpha = 1
+  context.lineWidth = 1.4 * strength
+  context.stroke()
+  /* The head: a point of white light in the signal's color. */
+  const reach = 5 * strength
+  const light = context.createRadialGradient(head.x, head.y, 0, head.x, head.y, reach)
+  light.addColorStop(0, 'rgba(255, 255, 255, 0.9)')
+  light.addColorStop(0.4, withAlpha(color, 0.75))
+  light.addColorStop(1, withAlpha(color, 0))
   context.fillStyle = light
   context.beginPath()
-  context.arc(head.x, head.y, 9, 0, Math.PI * 2)
+  context.arc(head.x, head.y, reach, 0, Math.PI * 2)
   context.fill()
 }
 
-/** A signal arriving: a bloom of its light over the note, and a ring opening out from it. */
-const burst = (
+/** A signal arriving: the note it reached brightening for a moment, and nothing more. */
+const arrive = (
   context: CanvasRenderingContext2D,
   color: string,
   at: { radius: number; x: number; y: number },
-  opened: number,
+  gone: number,
 ): void => {
-  const reach = at.radius + 4 + opened * 22
-  const bloom = context.createRadialGradient(at.x, at.y, at.radius * 0.5, at.x, at.y, reach)
-  bloom.addColorStop(0, withAlpha(color, 0.55 * (1 - opened)))
-  bloom.addColorStop(1, withAlpha(color, 0))
-  context.fillStyle = bloom
+  const reach = at.radius + 6
+  const glow = context.createRadialGradient(at.x, at.y, at.radius * 0.4, at.x, at.y, reach)
+  glow.addColorStop(0, withAlpha(color, 0.5 * (1 - gone) ** 2))
+  glow.addColorStop(1, withAlpha(color, 0))
+  context.fillStyle = glow
   context.beginPath()
   context.arc(at.x, at.y, reach, 0, Math.PI * 2)
   context.fill()
-  context.globalAlpha = 1 - opened
-  context.strokeStyle = color
-  context.lineWidth = 2
-  context.shadowColor = color
-  context.shadowBlur = 10
-  context.beginPath()
-  context.arc(at.x, at.y, reach, 0, Math.PI * 2)
-  context.stroke()
 }
 
 /** Whether an `rgb()` color is light, which a light ink says the ground is dark. */
@@ -289,6 +317,32 @@ const isLight = (color: string): boolean => {
 
 /** Eases in and out, so a signal leaves and arrives gently. */
 const ease = (at: number): number => (at < 0.5 ? 2 * at * at : 1 - (-2 * at + 2) ** 2 / 2)
+
+/**
+ * A note's name, ringed in the ground's color so it reads over the links it
+ * crosses, and heavier on a larger note, so a hub's name leads.
+ */
+const labelOf =
+  (looks: GraphLooks) =>
+  (
+    context: CanvasRenderingContext2D,
+    data: HoverData,
+    settings: { labelFont: string; labelSize: number },
+  ): void => {
+    if (!data.label) {
+      return
+    }
+    const size = settings.labelSize
+    context.font = `${data.size >= 8 ? 600 : 500} ${size}px ${settings.labelFont}`
+    const x = data.x + data.size + 4
+    const y = data.y + size / 3
+    context.lineJoin = 'round'
+    context.lineWidth = 3
+    context.strokeStyle = looks.ground
+    context.strokeText(data.label, x, y)
+    context.fillStyle = looks.ink
+    context.fillText(data.label, x, y)
+  }
 
 /** Every note's position as the graph holds it now. */
 const positionsOf = (graph: SigmaGraph): Map<string, GraphPoint> => {
@@ -375,6 +429,19 @@ export const sigmaDriver = (
       : undefined
   sized?.observe(container)
 
+  /* The note under the pointer, whose links are lit. */
+  let hovered: string | undefined
+  const enter = ({ node }: { node: string }): void => {
+    hovered = node
+    sigma.refresh()
+  }
+  const leave = (): void => {
+    hovered = undefined
+    sigma.refresh()
+  }
+  sigma.on('enterNode', enter)
+  sigma.on('leaveNode', leave)
+
   /* **Signals are drawn on a canvas of the driver's own**, over Sigma's, so a
      signal never makes Sigma redraw the graph: ten signals a second over ten
      thousand notes draw ten dots. It draws only while something is in
@@ -412,21 +479,29 @@ export const sigmaDriver = (
     }
     context.setTransform(ratio, 0, 0, ratio, 0, 0)
     context.clearRect(0, 0, width, height)
-    /* **Light added to light on a dark ground**, so a streak glows and two
+    /* **Light added to light on a dark ground**, so a pulse glows and two
        crossing brighten where they meet. On a light ground the same blend
-       washes to white, so there a streak is laid over the drawing as paint. */
+       washes to white, so there a pulse is laid over the drawing as paint. */
     context.globalCompositeOperation = glowing ? 'lighter' : 'source-over'
     flights = flights.filter((flight) => {
       const from = onScreen(flight.from)
       const to = onScreen(flight.to)
-      const gone = (now - flight.started) / TRAVEL
-      if (!from || !to || gone >= 1 + PULSE / TRAVEL) {
+      if (!from || !to) {
+        return false
+      }
+      flight.crossing ??= Math.min(
+        Math.max((Math.hypot(to.x - from.x, to.y - from.y) / SPEED) * 1000, QUICKEST),
+        SLOWEST,
+      )
+      const crossing = flight.crossing
+      const gone = (now - flight.started) / crossing
+      if (gone >= 1 + ARRIVAL / crossing) {
         return false
       }
       context.save()
       if (gone < 1) {
         if (flight.animate) {
-          streak(context, flight.color, from, to, ease(gone))
+          pulse(context, flight.color, from, to, ease(gone), gone, glowing)
         } else {
           /* For a reader who asked for less motion, the link lit for a moment. */
           context.globalAlpha = 1 - gone
@@ -438,7 +513,7 @@ export const sigmaDriver = (
           context.stroke()
         }
       } else if (flight.animate) {
-        burst(context, flight.color, to, (gone - 1) / (PULSE / TRAVEL))
+        arrive(context, flight.color, to, (gone - 1) / (ARRIVAL / crossing))
       }
       context.restore()
       return true
@@ -496,6 +571,33 @@ export const sigmaDriver = (
         }
       }
     },
+    fit: (ids, animate) => {
+      let low = { x: Number.POSITIVE_INFINITY, y: Number.POSITIVE_INFINITY }
+      let high = { x: Number.NEGATIVE_INFINITY, y: Number.NEGATIVE_INFINITY }
+      for (const id of ids) {
+        const at = sigma.getNodeDisplayData(id)
+        if (at) {
+          low = { x: Math.min(low.x, at.x), y: Math.min(low.y, at.y) }
+          high = { x: Math.max(high.x, at.x), y: Math.max(high.y, at.y) }
+        }
+      }
+      if (!Number.isFinite(low.x)) {
+        return
+      }
+      /* The camera's ratio is the share of the whole graph the view shows, so
+         the neighborhood's spread, with room around it, is the ratio that
+         holds it. Never closer than an eighth, nor farther than the whole. */
+      const state = {
+        ratio: Math.min(Math.max(Math.max(high.x - low.x, high.y - low.y) * 2.4, 0.12), 1),
+        x: (low.x + high.x) / 2,
+        y: (low.y + high.y) / 2,
+      }
+      if (animate) {
+        camera.animate(state, { duration: STEP * 2 })
+      } else {
+        camera.setState(state)
+      }
+    },
     gestures: (next) => {
       mode = next
       /* One finger scrolls the page past a graph that shares its gestures, and
@@ -507,13 +609,20 @@ export const sigmaDriver = (
       ink = looks.ink
       glowing = isLight(looks.ink)
       sigma.setSetting('labelColor', { color: looks.ink })
+      sigma.setSetting('labelSize', 13)
+      /* Fine lines, which a graph of thousands needs: Sigma's floor drew every
+         link nearly two pixels wide. */
+      sigma.setSetting('minEdgeThickness', 0.8)
       sigma.setSetting('labelFont', looks.font)
-      /* **Named wherever there is room, and not only once drawn large.**
-         Sigma names a note only from six pixels across, which every note in a
-         graph of thousands is under until zoomed: a selected note's
-         neighbors went unnamed. Its own grid still keeps names apart, the
-         larger note's first. */
-      sigma.setSetting('labelRenderedSizeThreshold', 0)
+      /* **Named once drawn large enough to matter**: the hubs at rest, and
+         the rest as the reader zooms in, which is how a reader takes in a
+         graph of thousands. A selected note's neighbors are drawn a quarter
+         larger, which names them. Sigma's grid keeps names apart, the larger
+         note's first. */
+      sigma.setSetting('labelRenderedSizeThreshold', 6)
+      /* Cells wide enough for a name, so two names never share a line. */
+      sigma.setSetting('labelGridCellSize', 130)
+      sigma.setSetting('defaultDrawNodeLabel', labelOf(looks))
       sigma.setSetting('defaultDrawNodeHover', hoverOf(looks))
       sigma.setSetting('nodeReducer', (node: string, data: Record<string, unknown>) => {
         const look = looks.node(node)
@@ -540,12 +649,14 @@ export const sigmaDriver = (
          ends, so `draw` writes the ends onto it as `from` and `to`. */
       sigma.setSetting('edgeReducer', (_edge: string, data: Record<string, unknown>) => {
         const look = looks.link(String(data.from), String(data.to))
+        /* The note under the pointer lights its links in its own color. */
+        const lit = hovered !== undefined && (data.from === hovered || data.to === hovered)
         return {
           ...data,
-          color: look.color,
+          color: lit ? looks.node(hovered as string).color : look.color,
           hidden: look.hidden,
-          size: look.raised ? 1.5 : 1,
-          zIndex: look.raised ? 1 : 0,
+          size: look.raised || lit ? 1.6 : 0.8,
+          zIndex: look.raised || lit ? 1 : 0,
         }
       })
       sigma.refresh()
@@ -583,6 +694,8 @@ export const sigmaDriver = (
       }
     },
     stop: () => {
+      sigma.off('enterNode', enter)
+      sigma.off('leaveNode', leave)
       cancelAnimationFrame(flying)
       flying = 0
       flights = []

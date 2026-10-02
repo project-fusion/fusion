@@ -120,6 +120,7 @@ const rendererOf = () => {
 
 const looks: GraphLooks = {
   font: 'Inter',
+  ground: 'rgb(0, 0, 0)',
   ink: 'rgb(1, 2, 3)',
   link: (source) => ({
     color: source === 'a' ? 'rgb(9, 9, 9)' : 'rgb(5, 5, 5)',
@@ -148,8 +149,8 @@ describe('sigmaDriver', () => {
         { id: 'b', label: 'Bravo', size: 1, x: 3, y: 4 },
       ],
     })
-    expect(graph.nodes.get('a')).toEqual({ label: 'Alpha', size: 6, x: 1, y: 2 })
-    expect(graph.nodes.get('b')?.size).toBe(4)
+    expect(graph.nodes.get('a')).toEqual({ label: 'Alpha', size: 7, x: 1, y: 2 })
+    expect(graph.nodes.get('b')?.size).toBe(2.95)
     expect(graph.edges.get('a>b')).toMatchObject({ from: 'a', to: 'b' })
   })
 
@@ -181,7 +182,7 @@ describe('sigmaDriver', () => {
     expect(node('d', { label: 'Delta' })).toMatchObject({ forceLabel: false, label: 'Delta' })
     expect(typeof settings.get('defaultDrawNodeHover')).toBe('function')
     expect(node('c', {}).hidden).toBe(true)
-    expect(edge('e', { from: 'a', to: 'b' })).toMatchObject({ color: 'rgb(9, 9, 9)', size: 1.5 })
+    expect(edge('e', { from: 'a', to: 'b' })).toMatchObject({ color: 'rgb(9, 9, 9)', size: 1.6 })
     expect(settings.get('labelColor')).toEqual({ color: 'rgb(1, 2, 3)' })
     expect(settings.get('labelFont')).toBe('Inter')
   })
@@ -295,8 +296,8 @@ describe('sigmaDriver', () => {
       false,
     )
     expect([...graph.nodes.keys()].sort()).toEqual(['a', 'b', 'd'])
-    expect(graph.nodes.get('b')).toMatchObject({ label: 'Bravo two', size: 6 })
-    expect(graph.nodes.get('d')).toMatchObject({ size: 4, x: 3, y: 3 })
+    expect(graph.nodes.get('b')).toMatchObject({ label: 'Bravo two', size: 7 })
+    expect(graph.nodes.get('d')).toMatchObject({ size: 2.95, x: 3, y: 3 })
     expect([...graph.edges.keys()]).toEqual(['a>d'])
   })
 

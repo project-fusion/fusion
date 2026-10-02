@@ -37,7 +37,7 @@
   const links = []
   for (const [group, hubs] of Object.entries(subjects)) {
     for (const label of hubs) {
-      nodes.push({ group, id: label, label, shape: 'square', size: 4, tone: tones[label] })
+      nodes.push({ group, id: label, label, shape: 'square', tone: tones[label] })
     }
     for (let at = 1; at <= 36; at++) {
       const id = `${group} note ${at}`

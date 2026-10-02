@@ -257,4 +257,16 @@ describe('connectGraph', () => {
     recorder.settle({ a: { x: 0, y: 0 }, b: { x: 5, y: 5 }, c: { x: -5, y: 5 }, d: { x: 1, y: 1 } })
     expect(host.ready).toBe(true)
   })
+
+  test('a note without a size is drawn as large as it is connected', async () => {
+    const host = await frame()
+    const { asked, driver } = recording()
+    connectGraph(host, driver)
+    await settled(host)
+    const sizes = Object.fromEntries(
+      (asked.drawn.at(-1)?.nodes ?? []).map((node) => [node.id, node.size]),
+    )
+    /* `a` and `b` share one link; `c` has none. */
+    expect(sizes).toEqual({ a: 2, b: 2, c: 1 })
+  })
 })

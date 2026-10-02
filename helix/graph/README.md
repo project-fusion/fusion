@@ -110,6 +110,12 @@ frame.nodes = [
 where it does not say. The selected note keeps its own color and is told apart by
 a ring and a glow in that color.
 
+**A note without a `size` is as large as it is connected**, so hubs read at a
+glance. Hubs are named at rest and the rest as the reader zooms in, each name
+ringed in the ground's color so it reads over the links. Links are tinted by the
+note they leave, the selected note's and the hovered note's in their color, and
+choosing a note in the list frames it with its neighbors.
+
 ## What it exports
 
 | Import | What |

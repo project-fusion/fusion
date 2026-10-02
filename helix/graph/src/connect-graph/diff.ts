@@ -2,7 +2,7 @@
 export interface DrawnNode {
   id: string
   label: string
-  /** How large it is drawn, relative to the others: the note's `size`, or 1. */
+  /** How large it is drawn, relative to the others: the note's `size`, or from how many links it has. */
   size: number
   x: number
   y: number
