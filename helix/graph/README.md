@@ -113,8 +113,11 @@ frame.nodes = [
 
 `sigmaDriver(sigma, { material, shape, emphasis })` sets what a note is drawn as
 where it does not say. A note without a material is matte, lit across so it
-reads as round. In three dimensions every note is an orb of light, with a hot
-core and a halo on a dark ground. The selected note keeps its own color and is told apart by
+reads as round. In three dimensions every note is a solid: a circle is a
+sphere, worked out for each pixel and written at its depth, so notes meet the
+shape and each other as solids do; a square is a cube and a diamond an
+octahedron. All are lit by a light fixed in the scene, so their highlights move
+as the reader turns the graph, and on a dark ground each has a soft halo. The selected note keeps its own color and is told apart by
 a ring and a glow in that color.
 
 **A note without a `size` is as large as it is connected**, so hubs read at a
