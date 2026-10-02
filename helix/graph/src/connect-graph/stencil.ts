@@ -1,5 +1,6 @@
 import type { GraphPoint } from './seed.js'
 import { fieldFromInside, fieldFromPath, type ShapeField } from './shape-field.js'
+import { surfaceWeb } from './surface-web.js'
 
 /**
  * A shape the notes are drawn in. **Any shape field**, flat or solid, such as
@@ -170,10 +171,31 @@ const nested = <T>(items: T[], keys: ((item: T) => number)[]): T[] => {
 export const fitToStencil = (
   positions: ReadonlyMap<string, GraphPoint>,
   stencil: GraphStencil,
-): Map<string, GraphPoint> => {
+): Map<string, GraphPoint> => fitInStencil(positions, stencil).positions
+
+/**
+ * Where a stencil's box was put, in the places' units: its middle, and how
+ * many of the places' units one of the box's is. A point in the box at `x`,
+ * `y` and `z` is at `middle.x + (x - width / 2) * scale`,
+ * `middle.y - (y - height / 2) * scale` and `middle.z + (z - depth / 2) * scale`.
+ */
+export interface StencilFrame {
+  field: ShapeField
+  middle: { x: number; y: number; z: number }
+  /** How many of the places' units one of the box's is. */
+  scale: number
+  /** How thick the shell the notes were placed in is, in the box's units: none where they fill the shape. */
+  shell: number
+}
+
+/** `fitToStencil`, saying where it put the stencil's box as well, where it fitted the places at all. */
+export const fitInStencil = (
+  positions: ReadonlyMap<string, GraphPoint>,
+  stencil: GraphStencil,
+): { frame?: StencilFrame | undefined; positions: Map<string, GraphPoint> } => {
   const notes = [...positions].map(([id, at]) => ({ at, id }))
   if (notes.length === 0) {
-    return new Map()
+    return { positions: new Map() }
   }
   const field = fieldOf(stencil)
   const places = placesIn(field, notes.length, {
@@ -181,9 +203,13 @@ export const fitToStencil = (
     shell: stencil.shell ?? SHELL,
   })
   if (places.length < notes.length) {
-    return new Map(positions)
+    return { positions: new Map(positions) }
   }
   const solid = field.depth > 0
+  const thickness =
+    (stencil.place ?? 'fill') === 'surface'
+      ? (stencil.shell ?? SHELL) * Math.max(field.width, field.height, field.depth)
+      : 0
   const low = {
     x: Number.POSITIVE_INFINITY,
     y: Number.POSITIVE_INFINITY,
@@ -233,17 +259,6 @@ export const fitToStencil = (
      and its back at once, so a group split there landed on both, where half
      of them by direction is one side of the shell. */
   if (solid) {
-    const surface = (stencil.place ?? 'fill') === 'surface'
-    const way = (point: GraphPoint): GraphPoint => {
-      if (!surface) {
-        return point
-      }
-      const x = point.x - middle.x
-      const y = point.y - middle.y
-      const z = (point.z ?? 0) - middle.z
-      const length = Math.hypot(x, y, z) || 1
-      return { x: x / length, y: y / length, z: z / length }
-    }
     const widest = (points: readonly GraphPoint[]): 'x' | 'y' | 'z' => {
       let best: 'x' | 'y' | 'z' = 'x'
       let spread = Number.NEGATIVE_INFINITY
@@ -262,33 +277,50 @@ export const fitToStencil = (
       }
       return best
     }
-    type Keyed = { at: GraphPoint; key: GraphPoint }
-    const halve = (ours: (Keyed & { id: string })[], theirs: Keyed[]): void => {
+    /* **On a surface, the places are halved across it**, which keeps each
+       half one piece of it, whatever the shape: a knot's tube or a brain's
+       lobe. Through a solid, across its widest spread. */
+    const targets = spots.map((spot) => spot.at)
+    const web = (stencil.place ?? 'fill') === 'surface' ? surfaceWeb(targets) : undefined
+    const halveTargets = (places: number[], first: number): [number[], number[]] => {
+      if (web && places.length > 2) {
+        return web.halve(places, first)
+      }
+      const axis = widest(places.map((at) => targets[at] as GraphPoint))
+      const ordered = [...places].sort(
+        (one, other) =>
+          ((targets[one] as GraphPoint)[axis] ?? 0) - ((targets[other] as GraphPoint)[axis] ?? 0),
+      )
+      return [ordered.slice(0, first), ordered.slice(first)]
+    }
+    const halve = (ours: (typeof notes)[number][], theirs: number[]): void => {
       if (ours.length === 1) {
-        fitted.set((ours[0] as Keyed & { id: string }).id, (theirs[0] as Keyed).at)
+        fitted.set(
+          (ours[0] as (typeof notes)[number]).id,
+          targets[theirs[0] as number] as GraphPoint,
+        )
         return
       }
       if (ours.length === 0) {
         return
       }
-      const mine = widest(ours.map((note) => note.key))
-      const yours = widest(theirs.map((spot) => spot.key))
-      ours.sort((one, other) => (one.key[mine] ?? 0) - (other.key[mine] ?? 0))
-      theirs.sort((one, other) => (one.key[yours] ?? 0) - (other.key[yours] ?? 0))
+      const mine = widest(ours.map((note) => note.at))
+      ours.sort((one, other) => (one.at[mine] ?? 0) - (other.at[mine] ?? 0))
       const half = Math.floor(ours.length / 2)
-      halve(ours.slice(0, half), theirs.slice(0, half))
-      halve(ours.slice(half), theirs.slice(half))
+      const [near, rest] = halveTargets(theirs, half)
+      halve(ours.slice(0, half), near)
+      halve(ours.slice(half), rest)
     }
     halve(
-      notes.map((note) => ({ ...note, key: way(note.at) })),
-      spots.map((spot) => ({ at: spot.at, key: way(spot.at) })),
+      [...notes],
+      targets.map((_, at) => at),
     )
-    return fitted
+    return { frame: { field, middle, scale, shell: thickness }, positions: fitted }
   }
   const ours = nested(notes, [(note) => note.at.x, (note) => note.at.y])
   const theirs = nested(spots, [(spot) => spot.across, (spot) => spot.down])
   ours.forEach((note, at) => {
     fitted.set(note.id, (theirs[at] as (typeof spots)[number]).at)
   })
-  return fitted
+  return { frame: { field, middle, scale, shell: thickness }, positions: fitted }
 }

@@ -18,6 +18,7 @@
     "./formatted": "./lib/formatted.mjs",
     "./frontmatter": "./lib/frontmatter.mjs",
     "./literal": "./lib/literal.mjs",
+    "./models": "./lib/models.mjs",
     "./paint": "./lib/paint.mjs",
     "./pool": "./lib/pool.mjs",
     "./scope": "./lib/scope.mjs",

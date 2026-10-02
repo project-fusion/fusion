@@ -19,8 +19,8 @@ export interface ShapeField {
 }
 
 /** How many cells a field has along its longer side, flat and solid. */
-const FLAT = 512
-const SOLID = 96
+export const FLAT = 512
+export const SOLID = 96
 
 /** A distance far enough that nothing is nearer, for the transform's empty cells. */
 const FAR = 1e20
@@ -103,11 +103,12 @@ const transform = (marked: Uint8Array, sizes: readonly [number, number, number])
 }
 
 /**
- * A field from a grid of cells marked inside, `size` box units a cell: the
- * distance to the nearest outside cell, taken from the distance to the
- * nearest inside one, so the sign says which side of the edge a point is on.
+ * A field from a grid of cells marked inside, `cell` box units a cell, x
+ * fastest and z slowest: the distance to the nearest outside cell, taken
+ * from the distance to the nearest inside one, so the sign says which side
+ * of the edge a point is on.
  */
-const fieldFromCells = (
+export const fieldFromCells = (
   inside: Uint8Array,
   sizes: readonly [number, number, number],
   cell: number,

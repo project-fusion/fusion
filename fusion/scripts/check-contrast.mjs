@@ -51,6 +51,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
 import { costOf } from '@fusion.dev/scripts/cost'
+import { modelFile } from '@fusion.dev/scripts/models'
 import { offline, pool } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { pairs } from '@fusion.dev/scripts/theme-facts'
@@ -72,6 +73,12 @@ const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascrip
 
 const server = createServer((request, response) => {
   const path = (request.url ?? '/').split('?')[0]
+  const model = modelFile(path)
+  if (model) {
+    response.writeHead(200, { 'content-type': model.type })
+    response.end(model.body)
+    return
+  }
   try {
     const body = readFileSync(join(frame, path.replace(/^\/+/, '') || 'frame.html'))
     response.writeHead(200, { 'content-type': TYPES[extname(path)] ?? 'text/plain' })

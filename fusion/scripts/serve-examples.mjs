@@ -21,6 +21,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
+import { modelFile } from '@fusion.dev/scripts/models'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 
 const frame = join(root, 'fusion/site/public/sandbox')
@@ -124,6 +125,11 @@ const server = createServer((request, response) => {
   const send = (status, type, body) => {
     response.writeHead(status, { 'content-type': type })
     response.end(body)
+  }
+  /* The models the Graph examples draw on, which live with the site's media. */
+  const model = modelFile(url.pathname)
+  if (model) {
+    return send(200, model.type, model.body)
   }
   if (!family) {
     return send(200, 'text/html', index())

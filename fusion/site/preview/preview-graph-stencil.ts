@@ -1,5 +1,5 @@
 import type { GraphStencil } from '@fusion.dev/helix-graph'
-import { inflate, shapeFromPath } from '@fusion.dev/helix-graph/shapes'
+import { inflate, shapeFromModel, shapeFromPath } from '@fusion.dev/helix-graph/shapes'
 
 /**
  * The shape an example draws its notes in, drawn as an SVG inside the frame
@@ -28,4 +28,24 @@ export const stencilOf = (frame: HTMLElement): GraphStencil | undefined => {
     return { ...inflate(shapeFromPath(path, width, height), { depth }), place }
   }
   return { height, path, place, width }
+}
+
+/**
+ * The 3D model an example draws its notes on, named by the frame's
+ * `data-preview-graph-model`, read once it has loaded, with
+ * `data-preview-graph-place` as the stencil's `place`. Undefined where the
+ * frame names none, or the model cannot be read.
+ */
+export const modelOf = async (frame: HTMLElement): Promise<GraphStencil | undefined> => {
+  const url = frame.dataset.previewGraphModel
+  if (!url) {
+    return undefined
+  }
+  try {
+    const field = await shapeFromModel(url)
+    return { ...field, place: frame.dataset.previewGraphPlace === 'surface' ? 'surface' : 'fill' }
+  } catch (error) {
+    console.error(`The model ${url} could not be read: ${String(error)}`)
+    return undefined
+  }
 }
