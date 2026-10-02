@@ -257,7 +257,12 @@ export const connectGraph = (
       const members = new Map<string, string[]>()
       for (const node of nodes) {
         if (node.group !== undefined) {
-          members.set(node.group, [...(members.get(node.group) ?? []), node.id])
+          const list = members.get(node.group)
+          if (list) {
+            list.push(node.id)
+          } else {
+            members.set(node.group, [node.id])
+          }
         }
       }
       const own = selected === undefined ? undefined : notes.get(selected)?.group
@@ -303,7 +308,8 @@ export const connectGraph = (
     /* **A note without a size is as large as it is connected**, so a hub
        reads as one at a glance and the graph's shape shows before a word of
        it is read. The square root, so a note with a hundred links is not ten
-       times the size of one with ten. */
+       times the size of one with ten, and no larger than a note with
+       thirty-six, so a hub with thousands does not cover its own region. */
     const degree = new Map<string, number>()
     for (const { source, target } of nextLinks.values()) {
       degree.set(source, (degree.get(source) ?? 0) + 1)
@@ -317,7 +323,7 @@ export const connectGraph = (
         label: node.label || node.id,
         size: Number.isFinite(node.size)
           ? (node.size as number)
-          : 1 + Math.sqrt(degree.get(node.id) ?? 0),
+          : 1 + Math.min(Math.sqrt(degree.get(node.id) ?? 0), 6),
         x: at.x,
         y: at.y,
       })

@@ -27,6 +27,7 @@
     "wasm-copy": "bun scripts/copy-wasm.mjs"
   },
   "dependencies": {
+    "@cosmos.gl/graph": "^3.4.2",
     "@fusion.dev/helix": "workspace:*",
     "@fusion.dev/helix-docs": "workspace:*",
     "@fusion.dev/helix-gallery": "workspace:*",
