@@ -127,6 +127,50 @@ describe('connectGraph', () => {
     expect(host.ready).toBe(true)
   })
 
+  test('fits the notes into a stencil once a layout has placed all of them, and moves them there', async () => {
+    const host = await frame()
+    host.nodes = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }]
+    const recorder = recording(true, true)
+    const told: Record<string, GraphPoint>[] = []
+    host.addEventListener('helix-graph-layout', (event) =>
+      told.push((event as CustomEvent).detail.positions),
+    )
+    /* A box 10 by 10 whose left half is the shape. */
+    connectGraph(host, recorder.driver, {
+      stencil: { height: 10, inside: (x) => x < 5, width: 10 },
+    })
+    await settled(host)
+    recorder.settle({
+      a: { x: 0, y: 0 },
+      b: { x: 10, y: 0 },
+      c: { x: 0, y: 10 },
+      d: { x: 10, y: 10 },
+    })
+    const placed = told.at(-1) ?? {}
+    expect(Object.keys(placed).sort()).toEqual(['a', 'b', 'c', 'd'])
+    for (const at of Object.values(placed)) {
+      expect(at.x).toBeLessThan(5)
+    }
+    /* The note the layout put furthest left is still left of the one it put furthest right. */
+    expect(placed.a?.x ?? 0).toBeLessThanOrEqual(placed.d?.x ?? 0)
+    const moved = recorder.asked.updates.at(-1)?.changeNodes ?? []
+    expect(Object.fromEntries(moved.map((node) => [node.id, { x: node.x, y: node.y }]))).toEqual(
+      placed,
+    )
+    expect(host.ready).toBe(true)
+  })
+
+  test('does not fit a layout that placed only some of the notes', async () => {
+    const host = await frame()
+    const recorder = recording(true, true)
+    connectGraph(host, recorder.driver, {
+      stencil: { height: 10, inside: (x) => x < 5, width: 10 },
+    })
+    await settled(host)
+    recorder.settle({ a: { x: 0, y: 0 }, b: { x: 50, y: 5 }, c: { x: -5, y: 5 } })
+    expect(recorder.asked.updates.flatMap((changes) => changes.changeNodes)).toEqual([])
+  })
+
   test('keeps where the layout put each note when the page adds one', async () => {
     const host = await frame()
     const recorder = recording()

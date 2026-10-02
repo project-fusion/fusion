@@ -18,6 +18,7 @@ import forceAtlas2 from 'graphology-layout-forceatlas2'
 import FA2Layout from 'graphology-layout-forceatlas2/worker'
 import Sigma from 'sigma'
 import { RESTYLED } from './preview-events'
+import { stencilOf } from './preview-graph-stencil'
 
 /** One graph: the renderer made in the frame's box, connected, and recolored when the frame restyles. */
 const start = (frame: HTMLElement): (() => void) => {
@@ -39,6 +40,7 @@ const start = (frame: HTMLElement): (() => void) => {
       material: asked.previewGraphMaterial as never,
       shape: asked.previewGraphShape as never,
     }),
+    { stencil: stencilOf(frame) },
   )
   /* A theme the builder sends is a stylesheet replaced, which no attribute
      shows, so the frame says so and the colors are read again. */

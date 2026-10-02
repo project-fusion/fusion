@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import brain from '../.examples/brain.html' with { type: 'text' }
 import large from '../.examples/large.html' with { type: 'text' }
 import live from '../.examples/live.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
@@ -99,4 +100,23 @@ describe('the large example', () => {
     expect(sent.length).toBeGreaterThanOrEqual(3)
     expect(sent.every((one) => keys.has(`${one.from}\u0000${one.to}`))).toBe(true)
   })
+})
+
+describe('the brain example', () => {
+  run(
+    'gives the frame eight regions of a thousand notes, and a shape to fit them into',
+    async () => {
+      await example(brain)
+      await idle()
+      const graph = document.querySelector('helix-graph') as unknown as HTMLElement & {
+        nodes: { group: string; id: string }[]
+      }
+      expect(graph.nodes).toHaveLength(8000)
+      expect(new Set(graph.nodes.map((node) => node.group)).size).toBe(8)
+      const stencil = graph.querySelector('svg[data-preview-graph-stencil]')
+      expect(stencil?.getAttribute('viewBox')).toBe('0 0 220 170')
+      expect(stencil?.querySelector('path')?.getAttribute('d')?.startsWith('M')).toBe(true)
+      expect(part(graph, 'count')?.textContent).toBe('8,000 notes')
+    },
+  )
 })

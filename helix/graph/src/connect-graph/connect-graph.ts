@@ -26,6 +26,7 @@ import {
   toneColor,
 } from './looks.js'
 import { type GraphPoint, seedPositions } from './seed.js'
+import { fitToStencil, type GraphStencil } from './stencil.js'
 
 export type { DrawnLink, DrawnNode, GraphChanges } from './diff.js'
 
@@ -132,6 +133,14 @@ export interface ConnectGraphOptions {
    * reader is already looking at it.
    */
   center?: boolean | undefined
+  /**
+   * A shape the notes are fitted into when a layout has placed all of them,
+   * such as a brain or a country's outline: an SVG path and the box it is
+   * drawn in. Notes the layout put together land together, so each group
+   * takes a region of the shape. A layout that places only new notes leaves
+   * the others where they are.
+   */
+  stencil?: GraphStencil | undefined
 }
 
 /** A connection, which is ended rather than left to leak. */
@@ -356,14 +365,32 @@ export const connectGraph = (
     first = false
     if (unplaced.size > 0 && driver.settle) {
       waiting = unplaced
-      stopSettling = driver.settle(unplaced, (settled) => {
+      const everything = unplaced.size === ids.size
+      stopSettling = driver.settle(unplaced, (laid) => {
         stopSettling = undefined
         waiting = new Set()
+        const stencil = everything ? options.stencil : undefined
+        const settled = stencil ? fitToStencil(laid, stencil) : laid
         known = new Map(settled)
+        const moved: DrawnNode[] = []
         for (const [id, at] of settled) {
           const node = drawnNodes.get(id)
           if (node) {
-            drawnNodes.set(id, { ...node, x: at.x, y: at.y })
+            const next = { ...node, x: at.x, y: at.y }
+            drawnNodes.set(id, next)
+            moved.push(next)
+          }
+        }
+        /* The layout drew the notes where it put them, so a stencil moves
+           them again, into the shape. */
+        if (stencil) {
+          if (driver.update) {
+            driver.update(
+              { addLinks: [], addNodes: [], changeNodes: moved, removeLinks: [], removeNodes: [] },
+              !still(),
+            )
+          } else {
+            driver.draw({ links: [...drawnLinks.values()], nodes: [...drawnNodes.values()] })
           }
         }
         graph.laidOut?.(Object.fromEntries([...settled].map(([id, at]) => [id, { ...at }])))

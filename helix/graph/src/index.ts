@@ -17,3 +17,4 @@ export {
   type NodeLook,
 } from './connect-graph/looks.js'
 export { type GraphPoint, seedPositions } from './connect-graph/seed.js'
+export { fitToStencil, type GraphStencil } from './connect-graph/stencil.js'
