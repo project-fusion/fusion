@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import brain from '../.examples/brain.html' with { type: 'text' }
 import brain3d from '../.examples/brain-3d.html' with { type: 'text' }
+import knot from '../.examples/knot.html' with { type: 'text' }
 import large from '../.examples/large.html' with { type: 'text' }
 import live from '../.examples/live.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
@@ -137,6 +138,25 @@ describe('the brain-3d example', () => {
       const stencil = graph.querySelector<SVGSVGElement>('svg[data-preview-graph-stencil]')
       expect(stencil?.dataset.previewGraphDepth).toBe('140')
       expect(stencil?.dataset.previewGraphPlace).toBe('surface')
+    },
+  )
+})
+
+describe('the knot example', () => {
+  run(
+    'gives the frame six teams of five hundred services, and names the model to draw them on',
+    async () => {
+      await example(knot)
+      await idle()
+      const graph = document.querySelector('helix-graph') as unknown as HTMLElement & {
+        nodes: { group: string; id: string; shape?: string }[]
+      }
+      expect(graph.dataset.previewGraph).toBe('three')
+      expect(graph.dataset.previewGraphModel).toBe('/media/models/torus-knot.glb')
+      expect(graph.dataset.previewGraphPlace).toBe('surface')
+      expect(graph.nodes).toHaveLength(3000)
+      expect(new Set(graph.nodes.map((node) => node.group)).size).toBe(6)
+      expect(graph.nodes.filter((node) => node.shape === 'square')).toHaveLength(30)
     },
   )
 })

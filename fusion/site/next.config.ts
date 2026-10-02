@@ -74,6 +74,16 @@ const config: NextConfig = {
         ],
         source: '/fonts/:file*',
       },
+      /**
+       * The 3D models the Graph examples draw their notes on, fetchable by the
+       * sandbox frame, for the reason the faces are: three.js reads a model
+       * with `fetch`, which from an opaque origin is a CORS request. Models
+       * this site made and already serves, and carry nothing of a reader's.
+       */
+      {
+        headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
+        source: '/media/models/:file*',
+      },
     ]
   },
 

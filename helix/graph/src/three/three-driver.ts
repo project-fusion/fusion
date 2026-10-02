@@ -9,7 +9,9 @@ import {
   AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
+  DoubleSide,
   LineSegments,
+  Mesh,
   NormalBlending,
   PerspectiveCamera,
   Points,
@@ -30,6 +32,7 @@ import type {
 } from '../connect-graph/connect-graph.js'
 import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
+import type { StencilFrame } from '../connect-graph/stencil.js'
 import {
   ease,
   gesturesHeld,
@@ -39,6 +42,7 @@ import {
   type OnScreen,
   signalsOver,
 } from '../overlay/overlay.js'
+import { surfaceOf } from './surface.js'
 
 /** How the three.js driver behaves where the page does not say. */
 export interface ThreeDriverOptions {
@@ -184,6 +188,34 @@ void main() {
 }
 `
 
+// language=GLSL
+const SOLID_VERTEX = /* glsl */ `
+varying vec3 vNormal;
+varying vec3 vView;
+
+void main() {
+  vec4 view = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * view;
+  vNormal = normalize(normalMatrix * normal);
+  vView = normalize(-view.xyz);
+}
+`
+
+// language=GLSL
+const SOLID_FRAGMENT = /* glsl */ `
+uniform vec3 ground;
+uniform vec3 ink;
+varying vec3 vNormal;
+varying vec3 vView;
+
+void main() {
+  /* The ground's color, a breath of ink at the edge turning away, so the
+     shape is felt and not seen: the notes on it are what is drawn. */
+  float edge = 1.0 - abs(dot(normalize(vNormal), normalize(vView)));
+  gl_FragColor = vec4(mix(ground, ink, 0.16 * pow(edge, 2.0)), 1.0);
+}
+`
+
 /** An `rgb()` color as three channels from 0 to 1. */
 const channels = (color: string): [number, number, number] => {
   const [red = 128, green = 128, blue = 128] = color.match(/[\d.]+/g)?.map(Number) ?? []
@@ -292,7 +324,57 @@ export const threeDriver = (
   const lit = new LineSegments(new BufferGeometry(), lines(0.9))
   quiet.frustumCulled = false
   lit.frustumCulled = false
-  scene.add(quiet, lit, points)
+  /* **The shape the notes are on, drawn in the ground's color** just inside
+     them, where they are on a solid's surface: what is behind it is hidden by
+     it, as it would be by the thing it is shaped like. */
+  const solid = new Mesh(
+    new BufferGeometry(),
+    new ShaderMaterial({
+      fragmentShader: SOLID_FRAGMENT,
+      polygonOffset: true,
+      polygonOffsetFactor: 2,
+      polygonOffsetUnits: 2,
+      side: DoubleSide,
+      uniforms: { ground: { value: [0, 0, 0] }, ink: { value: [1, 1, 1] } },
+      vertexShader: SOLID_VERTEX,
+    }),
+  )
+  solid.renderOrder = -1
+  solid.visible = false
+  solid.frustumCulled = false
+  scene.add(solid, quiet, lit, points)
+  let shapeFrame: StencilFrame | undefined
+  let surfaced = false
+  let solidAt = Number.NaN
+
+  /** The solid, made again where the shape or how far the notes reach has changed. */
+  const shapeSolid = (): void => {
+    const frame = shapeFrame
+    if (!frame || !surfaced || frame.field.depth <= 0) {
+      solid.visible = false
+      return
+    }
+    if (solidAt === scale) {
+      solid.visible = true
+      return
+    }
+    solidAt = scale
+    const { corners, triangles } = surfaceOf(frame.field, -frame.shell * 0.6)
+    const { depth, height, width } = frame.field
+    for (let at = 0; at < corners.length; at += 3) {
+      corners[at] = (frame.middle.x + ((corners[at] as number) - width / 2) * frame.scale) * scale
+      corners[at + 1] =
+        (frame.middle.y - ((corners[at + 1] as number) - height / 2) * frame.scale) * scale
+      corners[at + 2] =
+        (frame.middle.z + ((corners[at + 2] as number) - depth / 2) * frame.scale) * scale
+    }
+    solid.geometry.dispose()
+    solid.geometry = new BufferGeometry()
+    solid.geometry.setAttribute('position', new BufferAttribute(corners, 3))
+    solid.geometry.setIndex(new BufferAttribute(triangles, 1))
+    solid.geometry.computeVertexNormals()
+    solid.visible = true
+  }
 
   const at = (spot: number): Vector3 =>
     new Vector3(positions[spot * 3], positions[spot * 3 + 1], positions[spot * 3 + 2])
@@ -333,7 +415,9 @@ export const threeDriver = (
       return undefined
     }
     const depth = -at(spot).applyMatrix4(camera.matrixWorldInverse).z
-    return uniforms.steep.value > 0 && depth > uniforms.middle.value ? undefined : onScreen(id)
+    return (uniforms.steep.value > 0 || solid.visible) && depth > uniforms.middle.value
+      ? undefined
+      : onScreen(id)
   }
   const groups = groupsOver(container, nearOnScreen)
   const names = namesOver(container, onScreen)
@@ -445,6 +529,9 @@ export const threeDriver = (
     geometry.setAttribute('shape', new BufferAttribute(shapes, 1))
     geometry.setAttribute('glow', new BufferAttribute(glows, 1))
     dark = !isLight(looks.ground)
+    const solidUniforms = solid.material.uniforms as Record<string, { value: number[] }>
+    ;(solidUniforms.ground as { value: number[] }).value = channels(looks.ground)
+    ;(solidUniforms.ink as { value: number[] }).value = channels(looks.ink)
     const blending = dark ? AdditiveBlending : NormalBlending
     points.material.blending = blending
     quiet.material.blending = blending
@@ -690,9 +777,17 @@ export const threeDriver = (
     hovering = requestAnimationFrame(() => {
       raycaster.setFromCamera(pointer, camera)
       raycaster.params.Points = { threshold: uniforms.unit.value * 2.4 }
+      /* A note behind the shape is hidden by it, so the pointer cannot be on it. */
+      const front = solid.visible
+        ? (raycaster.intersectObject(solid, false)[0]?.distance ?? Number.POSITIVE_INFINITY)
+        : Number.POSITIVE_INFINITY
       const hit = raycaster.intersectObject(points, false).find((one) => {
         const id = one.index === undefined ? undefined : ids[one.index]
-        return id !== undefined && looks?.node(id).hidden !== true
+        return (
+          id !== undefined &&
+          looks?.node(id).hidden !== true &&
+          one.distance < front + uniforms.unit.value * 3
+        )
       })
       const next = hit?.index
       if (next !== hovered) {
@@ -731,6 +826,7 @@ export const threeDriver = (
       })
       moved = false
       load(nodes, next, places)
+      shapeSolid()
       fitAll(0)
     },
     fit: (fitted, animate) => {
@@ -850,8 +946,14 @@ export const threeDriver = (
         layout = undefined
       }
     },
-    shape: (place) => {
-      uniforms.steep.value = place === 'surface' ? 1 : 0
+    shape: (place, frame) => {
+      surfaced = place === 'surface'
+      if (frame !== shapeFrame) {
+        shapeFrame = frame
+        solidAt = Number.NaN
+      }
+      /* Steeply only where there is no solid to hide the far side. */
+      uniforms.steep.value = surfaced && !frame ? 1 : 0
     },
     signal: (from, to, colors, animate) => {
       signals.signal(from, to, colors, animate)
@@ -865,7 +967,7 @@ export const threeDriver = (
       canvas.removeEventListener('pointermove', hover)
       canvas.removeEventListener('pointerleave', leave)
       controls.dispose()
-      for (const object of [points, quiet, lit]) {
+      for (const object of [points, quiet, lit, solid]) {
         object.geometry.dispose()
         object.material.dispose()
       }

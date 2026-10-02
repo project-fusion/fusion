@@ -10,20 +10,35 @@
 import { connectGraph } from '@fusion.dev/helix-graph'
 import { threeDriver } from '@fusion.dev/helix-graph/three'
 import { RESTYLED } from './preview-events'
-import { stencilOf } from './preview-graph-stencil'
+import { modelOf, stencilOf } from './preview-graph-stencil'
 
-/** One graph: the renderer made in the frame's box, connected, and recolored when the frame restyles. */
+/**
+ * One graph: the renderer made in the frame's box, connected, and recolored
+ * when the frame restyles. **Connected once its model has loaded**, where the
+ * frame names one, so the notes are drawn on the model from the first
+ * frame; the list is there before.
+ */
 const start = (frame: HTMLElement): (() => void) => {
   const box = frame.querySelector<HTMLElement>('[data-preview-graph-canvas]')
   if (!box) {
     return () => undefined
   }
-  const connection = connectGraph(frame, threeDriver(box), { stencil: stencilOf(frame) })
-  window.addEventListener(RESTYLED, connection.restyle)
-  return () => {
-    window.removeEventListener(RESTYLED, connection.restyle)
-    connection.disconnect()
+  let stopped = false
+  let stop = (): void => {
+    stopped = true
   }
+  void modelOf(frame).then((model) => {
+    if (stopped) {
+      return
+    }
+    const connection = connectGraph(frame, threeDriver(box), { stencil: model ?? stencilOf(frame) })
+    window.addEventListener(RESTYLED, connection.restyle)
+    stop = () => {
+      window.removeEventListener(RESTYLED, connection.restyle)
+      connection.disconnect()
+    }
+  })
+  return () => stop()
 }
 
 window.helixPreviewGraphThree = {

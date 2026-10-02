@@ -27,7 +27,7 @@ import {
   toneColor,
 } from './looks.js'
 import { type GraphPoint, seedPositions } from './seed.js'
-import { fieldOf, fitToStencil, type GraphStencil } from './stencil.js'
+import { fieldOf, fitInStencil, type GraphStencil, type StencilFrame } from './stencil.js'
 
 export type { DrawnLink, DrawnNode, GraphChanges } from './diff.js'
 
@@ -114,9 +114,11 @@ export interface GraphDriver {
    * Where in a shape the notes are drawn, where a `stencil` gives one:
    * `surface`, a shell, whose far side a renderer that draws in three
    * dimensions sets back so its near side reads; `fill`, all through it; or
-   * undefined, no shape.
+   * undefined, no shape. `frame` is the shape and where it was put among the
+   * notes, once the connector has drawn the notes in it, for a renderer that
+   * draws the shape as well.
    */
-  shape?(place: 'fill' | 'surface' | undefined): void
+  shape?(place: 'fill' | 'surface' | undefined, frame?: StencilFrame): void
   /** Removes whatever the driver added to the renderer or the page, when the connection ends. */
   stop?(): void
 }
@@ -218,6 +220,8 @@ export const connectGraph = (
 ): GraphConnection => {
   const graph = frame as Frame
   let known = new Map<string, GraphPoint>()
+  /* Where the stencil was put among the notes, once the connector drew them in it. */
+  let shapeFrame: StencilFrame | undefined
   /* What the renderer holds now, which the next drawing is compared with. */
   let drawnNodes = new Map<string, DrawnNode>()
   let drawnLinks = new Map<string, DrawnLink>()
@@ -327,16 +331,20 @@ export const connectGraph = (
        wait for: a layout run first and fitted after showed the graph in
        some other shape for seconds before it became this one. Only when
        nothing has a place, so a page's own places and a layout's are kept. */
-    const shaped =
+    const fit =
       options.stencil && ids.size > 0 && unplaced.size === ids.size
-        ? fitToStencil(
+        ? fitInStencil(
             arrangeByGroup(nodes, [...nextLinks.values()], {
               solid: fieldOf(options.stencil).depth > 0,
             }),
             options.stencil,
           )
         : undefined
-    driver.shape?.(options.stencil ? (options.stencil.place ?? 'fill') : undefined)
+    const shaped = fit?.positions
+    if (fit?.frame) {
+      shapeFrame = fit.frame
+    }
+    driver.shape?.(options.stencil ? (options.stencil.place ?? 'fill') : undefined, shapeFrame)
     if (shaped) {
       positions = shaped
       unplaced = new Set()

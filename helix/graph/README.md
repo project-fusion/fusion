@@ -211,9 +211,26 @@ makes one from what a page has, and a field is a stencil itself:
 
 | Function | Makes |
 |---|---|
+| `shapeFromModel(url)` | A solid from a glTF model, `.glb` or `.gltf`, every mesh where the model places it. Async; three.js reads the file |
+| `shapeFromTriangles(positions, index)` | A solid from a closed surface of triangles a page already holds |
+| `shapeFromSvg(svg)` | A flat field from an `<svg>` or its markup: every path, rectangle, circle, ellipse and polygon in its `viewBox` |
+| `shapeFromImage(image, { threshold })` | A flat field from an image's opaque pixels |
 | `shapeFromPath(path, width, height)` | A flat field from an SVG path |
 | `shapeFromInside(inside, { width, height, depth })` | A flat field, or a solid where `depth` is given, from a test of what is inside |
 | `inflate(field, { depth, roundness })` | A solid puffed out of a flat field, as a cushion is, cut through where the flat shape has a hole |
+| `sphere`, `torus`, `box` | Solids measured exactly from their formulas |
+| `onSphere(field, { radius, thickness })` | A flat map wrapped round a ball, as a world map is round a globe |
+
+```js
+const stencil = { ...(await shapeFromModel('/models/brain.glb')), place: 'surface' }
+connectGraph(frame, threeDriver(box), { stencil })
+```
+
+**A model is read a column of cells at a time**, so one of a hundred thousand
+triangles becomes a field in a moment. Any closed mesh works; a mesh with
+holes is read as closed where it can be. A model served from another origin
+needs that origin to allow it, as any `fetch` does. Use a model whose license
+lets your readers copy it, since the examples a reader takes away name it.
 
 ## In three dimensions
 
@@ -237,15 +254,18 @@ connectGraph(frame, threeDriver(box), {
 
 - **A solid stencil draws the notes in the solid**: all through it, or, with
   `place: 'surface'`, in a thin shell just inside its edge, which is how a
-  solid reads as the thing it is shaped like. Each group takes one side of
-  the shape, and each hub's notes a patch around it.
+  solid reads as the thing it is shaped like. Each group takes one piece of
+  the surface, measured across it, so a group on a knot is a stretch of its
+  tube, and each hub's notes a patch around it.
+- **On a surface, the shape itself is drawn** in the ground's color just
+  inside the notes, so what is behind it is hidden, and the pointer finds
+  only the notes in front.
 - **Without a stencil, a layout runs in three dimensions** with d3-force-3d.
 - **Dragging turns the graph, and the wheel and a pinch bring it nearer.** It
   turns slowly by itself while nobody is handling it, and never for a reader
   who asks for less motion.
-- **The far side recedes.** On a surface, the far side of the shape falls to
-  a tenth, so the near side reads; through a graph, its far notes are a
-  little quieter than its near ones.
+- **The far side recedes.** Through a graph, its far notes are a little
+  quieter than its near ones.
 - **Each group is named over its near side**, and a group's name moves a line
   where it would cover another's.
 
@@ -264,7 +284,7 @@ connectGraph(frame, threeDriver(box), {
 | `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)` |
 | `@fusion.dev/helix-graph/cosmos` | `cosmosDriver(graph, box, options)` |
 | `@fusion.dev/helix-graph/three` | `threeDriver(box, options)` |
-| `@fusion.dev/helix-graph/shapes` | `shapeFromPath`, `shapeFromInside`, `inflate`, and the `ShapeField` type |
+| `@fusion.dev/helix-graph/shapes` | `shapeFromModel`, `shapeFromTriangles`, `shapeFromSvg`, `shapeFromImage`, `shapeFromPath`, `shapeFromInside`, `inflate`, `sphere`, `torus`, `box`, `onSphere`, and the `ShapeField` type |
 
 **Sigma, cosmos.gl, three.js and d3-force-3d are optional peers, and graphology is the page's.** Each
 driver types its renderer by the calls it makes on it, so a page brings
