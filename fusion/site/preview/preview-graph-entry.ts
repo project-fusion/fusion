@@ -26,11 +26,18 @@ const start = (frame: HTMLElement): (() => void) => {
     return () => undefined
   }
   const sigma = new Sigma(new Graph(), box, { allowInvalidContainer: true })
+  /* **The drawing the example asks for**, as `data-preview-graph-material`,
+     `-shape` and `-emphasis`, which are `sigmaDriver`'s options written as
+     attributes. */
+  const asked = frame.dataset
   const connection = connectGraph(
     frame,
     sigmaDriver(sigma, {
+      emphasis: asked.previewGraphEmphasis as never,
       layout: (graph) =>
         new FA2Layout(graph as never, { settings: forceAtlas2.inferSettings(graph as never) }),
+      material: asked.previewGraphMaterial as never,
+      shape: asked.previewGraphShape as never,
     }),
   )
   /* A theme the builder sends is a stylesheet replaced, which no attribute

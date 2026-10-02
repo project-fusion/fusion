@@ -21,9 +21,9 @@ const groups: Record<string, string | undefined> = { a: 'work', b: 'home', c: un
 const looks = (selected?: string, near: string[] = [], shown?: string[]) =>
   looksOf({
     colors,
-    groupOf: (id) => groups[id],
     groups: ['work', 'home', 'work'],
     near: new Set(near),
+    noteOf: (id: string) => ({ group: groups[id] }),
     selected,
     shown: shown ? new Set(shown) : undefined,
   })
@@ -45,17 +45,19 @@ describe('looksOf', () => {
     expect(looks().node('c').color).toBe(colors.muted)
   })
 
-  test('draws the selected note in the brand color, its neighbors named, and the rest faded', () => {
+  test('draws the selected note glowing in its own color, its neighbors named, and the rest faded', () => {
     const drawn = looks('a', ['b'])
-    expect(drawn.node('a')).toEqual({
-      color: colors.primary,
+    expect(drawn.node('a')).toMatchObject({
+      color: 'rgb(0, 255, 0)',
+      glow: 1,
       hidden: false,
       label: 'always',
       raised: true,
       selected: true,
     })
-    expect(drawn.node('b')).toEqual({
+    expect(drawn.node('b')).toMatchObject({
       color: 'rgb(255, 0, 0)',
+      glow: 0,
       hidden: false,
       label: 'room',
       raised: true,
@@ -70,5 +72,17 @@ describe('looksOf', () => {
     expect(drawn.link('a', 'b')).toEqual({ color: colors.muted, hidden: false, raised: true })
     expect(drawn.link('b', 'd').hidden).toBe(true)
     expect(drawn.node('d').hidden).toBe(true)
+  })
+
+  test('a note’s tone colors it over its group, and its shape and material are passed on', () => {
+    const drawn = looksOf({
+      colors,
+      groups: ['work'],
+      near: new Set(),
+      noteOf: () => ({ group: 'work', material: 'glass', shape: 'diamond', tone: 'danger' }),
+      selected: undefined,
+      shown: undefined,
+    }).node('a')
+    expect(drawn).toMatchObject({ color: colors.danger, material: 'glass', shape: 'diamond' })
   })
 })

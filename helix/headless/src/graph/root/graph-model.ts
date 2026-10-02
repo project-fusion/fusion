@@ -1,11 +1,48 @@
+/** The shapes a note can be drawn in, from the `shape` axis. */
+export type GraphNodeShape = 'circle' | 'diamond' | 'ring' | 'square'
+
+/** How heavily a note is drawn, from the `emphasis` axis. */
+export type GraphNodeEmphasis = 'outlined' | 'solid' | 'subtle'
+
+/** What a note is drawn as made of, from the `material` axis. */
+export type GraphNodeMaterial = 'frosted' | 'glass'
+
+/** What a note means, from the `tone` axis, which colors it over its group. */
+export type GraphNodeTone =
+  | 'accent'
+  | 'danger'
+  | 'info'
+  | 'neutral'
+  | 'primary'
+  | 'success'
+  | 'warning'
+
 /** One note in a graph. */
 export interface GraphNode {
   /** Unique in the graph, and what `active` and a link's ends name. */
   id: string
   /** What the note is called. Its `id` where it has none. */
   label?: string | undefined
+  /**
+   * How heavily it is drawn: `solid`, filled, which unset is; `outlined`, a
+   * ring with the ground showing through; `subtle`, a tinted fill with a
+   * ring. Unset is the renderer's own.
+   */
+  emphasis?: GraphNodeEmphasis | undefined
   /** A kind the note belongs to, such as a tag, which a renderer colors it by. */
   group?: string | undefined
+  /** What it is drawn as made of: `glass` or `frosted`. Unset is the renderer's own. */
+  material?: GraphNodeMaterial | undefined
+  /**
+   * Its shape, which says what kind of note it is at a glance: a person as a
+   * circle and a document as a square. Unset is the renderer's own.
+   */
+  shape?: GraphNodeShape | undefined
+  /**
+   * What it means, which colors it over its group's color: `danger` for an
+   * incident, `success` for something done.
+   */
+  tone?: GraphNodeTone | undefined
   /** How large the renderer draws it, relative to the others. */
   size?: number | undefined
   /** Where the note stands, where the page already knows. Laid out where it does not. */

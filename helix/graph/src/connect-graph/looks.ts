@@ -122,11 +122,39 @@ export interface NodeLook {
    * neighbors drew their names over each other in a knot nobody could read.
    */
   label: 'always' | 'never' | 'room'
+  /** How heavily it is drawn, where the note says. */
+  emphasis?: 'outlined' | 'solid' | 'subtle' | undefined
+  /** How strongly it glows, from 0 to 1: the selected note's halo. */
+  glow: number
+  /** What it is drawn as made of, where the note says. */
+  material?: 'frosted' | 'glass' | undefined
   /** Drawn over the rest, as the selected note and its neighbors are. */
   raised: boolean
   /** The selected note. */
   selected: boolean
+  /** Its shape, where the note says. */
+  shape?: 'circle' | 'diamond' | 'ring' | 'square' | undefined
 }
+
+/** A tone from the `tone` axis. */
+export type GraphTone = 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
+
+/** What the looks read off one note. */
+export interface NoteFacts {
+  emphasis?: NodeLook['emphasis']
+  group?: string | undefined
+  material?: NodeLook['material']
+  shape?: NodeLook['shape']
+  tone?: GraphTone | undefined
+}
+
+/** A tone's color: `neutral` is the muted ink, and no tone is `primary`. */
+export const toneColor = (colors: GraphColors, tone: GraphTone | undefined): string =>
+  tone === undefined || tone === 'primary'
+    ? colors.primary
+    : tone === 'neutral'
+      ? colors.muted
+      : colors[tone]
 
 /** How one link is drawn. */
 export interface LinkLook {
@@ -154,8 +182,8 @@ const FADED = 0.75
  * How the graph is drawn for one selection.
  *
  * **The neighborhood stands out and the rest steps back**, which is what
- * selecting a note in a graph of thousands is for: the selected note in the
- * brand color, the notes it links to and from in their groups' colors with
+ * selecting a note in a graph of thousands is for: the selected note
+ * glowing, the notes it links to and from in their groups' colors with
  * their names drawn where there is room, and every other note faded toward
  * the ground, unnamed. With
  * nothing selected, every note is in its group's color.
@@ -166,16 +194,20 @@ const FADED = 0.75
 export const looksOf = (options: {
   colors: GraphColors
   font?: string | undefined
-  groupOf: (id: string) => string | undefined
   groups: readonly string[]
   near: ReadonlySet<string>
+  noteOf: (id: string) => NoteFacts | undefined
   selected: string | undefined
   shown: ReadonlySet<string> | undefined
 }): GraphLooks => {
-  const { colors, groupOf, near, selected, shown } = options
+  const { colors, near, noteOf, selected, shown } = options
   const order = new Map([...new Set(options.groups)].sort().map((group, at) => [group, at]))
   const own = (id: string): string => {
-    const group = groupOf(id)
+    const note = noteOf(id)
+    if (note?.tone) {
+      return toneColor(colors, note.tone)
+    }
+    const group = note?.group
     const at = group === undefined ? undefined : order.get(group)
     return at === undefined || colors.series.length === 0
       ? colors.muted
@@ -199,9 +231,16 @@ export const looksOf = (options: {
       }
     },
     node: (id) => {
+      const note = noteOf(id)
+      const facts = { emphasis: note?.emphasis, material: note?.material, shape: note?.shape }
+      /* **The selected note keeps its own color**, its tone or its group's,
+         and is told apart by its glow, its size and its name: drawn in the
+         brand color, an incident selected stopped looking like one. */
       if (id === selected) {
         return {
-          color: colors.primary,
+          ...facts,
+          color: own(id),
+          glow: 1,
           hidden: hidden(id),
           label: 'always',
           raised: true,
@@ -210,7 +249,9 @@ export const looksOf = (options: {
       }
       const neighbor = focused && near.has(id)
       return {
+        ...facts,
         color: focused && !neighbor ? mixRgb(own(id), colors.ground, FADED) : own(id),
+        glow: 0,
         hidden: hidden(id),
         label: focused && !neighbor ? 'never' : 'room',
         raised: neighbor,

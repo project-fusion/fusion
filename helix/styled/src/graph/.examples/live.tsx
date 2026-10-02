@@ -11,11 +11,17 @@ const subjects: Record<string, string[]> = {
 }
 
 interface Note {
+  emphasis?: 'outlined'
   group: string
   id: string
   label: string
+  shape?: 'diamond' | 'square'
   size?: number
+  tone?: 'danger' | 'warning' | undefined
 }
+
+/* What a few of them mean, which colors them over their subject. */
+const tones: Record<string, Note['tone']> = { Escalations: 'warning', 'Known issues': 'danger' }
 
 /* The same graph on every load. */
 const graph = () => {
@@ -30,7 +36,7 @@ const graph = () => {
   const links: { source: string; target: string }[] = []
   for (const [group, hubs] of Object.entries(subjects)) {
     for (const label of hubs) {
-      nodes.push({ group, id: label, label, size: 4 })
+      nodes.push({ group, id: label, label, shape: 'square', size: 4, tone: tones[label] })
     }
     for (let at = 1; at <= 36; at++) {
       const id = `${group} note ${at}`
@@ -83,7 +89,7 @@ export function Example() {
       calls += 1
       const [group, hubs] = pick(Object.entries(subjects))
       const id = `Call ${calls}`
-      setNodes((all) => [...all, { group, id, label: id }])
+      setNodes((all) => [...all, { emphasis: 'outlined', group, id, label: id, shape: 'diamond' }])
       setLinks((all) => [...all, { source: id, target: pick(hubs) }])
       if (calls === 12) {
         clearInterval(arriving)
@@ -94,9 +100,10 @@ export function Example() {
 
   return (
     <>
-      {/* Preview frame: data-preview-graph has the frame connect Sigma.js; on your page, connectGraph does. */}
+      {/* Preview frame: data-preview-graph has the frame connect Sigma.js, in glass; on your page, connectGraph does. */}
       <helix-graph
         data-preview-graph
+        data-preview-graph-material="glass"
         label="Company notes"
         links={links}
         nodes={nodes}
