@@ -234,13 +234,23 @@ const reach = (x, outside) => {
 /** Where the fissure between the hemispheres stops going down: low at the front and back, where it runs through. */
 const fissureFloor = (x) => 70 + 140 * (1 - smoothstep(26, 52, x)) + 140 * smoothstep(156, 178, x)
 
-/** Folds: where the surface sinks into a sulcus, from 0 to 1, in curling lines over it. */
+/** How far apart the gyri are, ridge to ridge. */
+const GYRUS = 15
+
+/**
+ * Folds: how far the surface sinks at a point, from 0 on a gyrus's crown to
+ * 1 at the bottom of a sulcus. **Long winding ridges**: stripes, their
+ * direction and their spacing bent by slow waves through the brain, so they
+ * meander as gyri do, with broad rounded crowns and narrow deep sulci.
+ */
 const folds = (x, y, z) => {
-  const f =
-    Math.sin(0.33 * x + 1.7 * Math.sin(0.19 * y + 0.8 * Math.sin(0.15 * z))) +
-    Math.sin(0.31 * y + 1.6 * Math.sin(0.17 * z + 0.9 * Math.sin(0.21 * x))) +
-    Math.sin(0.35 * z + 1.5 * Math.sin(0.23 * x + 0.7 * Math.sin(0.13 * y)))
-  return 1 - smoothstep(0, 0.42, Math.abs(f))
+  const bend =
+    7 * Math.sin(0.045 * x + 1.2 * Math.sin(0.05 * z)) +
+    7 * Math.sin(0.052 * y + 1.1 * Math.sin(0.043 * x)) +
+    6 * Math.sin(0.048 * z + 0.9 * Math.sin(0.057 * y))
+  const across = 0.55 * x + 0.75 * y + 0.35 * Math.abs(z) + bend
+  const crown = (1 + Math.cos(((2 * Math.PI) / GYRUS) * across)) / 2
+  return (1 - crown) ** 3
 }
 
 /** An ellipsoid's distance, near enough near its surface. */
@@ -282,7 +292,7 @@ export const brain = (x, y, z) => {
   }
   /* Folds, near the surface only, where they shape what is seen. */
   if (cerebrum > -6 && cerebrum < 6) {
-    cerebrum += 2.6 * folds(x, y, z)
+    cerebrum += 4.5 * folds(x, y, z)
   }
   /* The cerebellum's two lobes, finely striped across. */
   let cerebellum = smin(
