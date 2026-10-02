@@ -138,6 +138,11 @@ void main(void) {
     color = mix(color, vec3(1.0), rim * 0.14);
     alpha = 0.86;
   } else {
+    /* Flat, which unset is: matte, with a gentle fall of light across it so
+       a note reads as round, brighter toward its middle the larger it is
+       drawn, and a fine rim a shade darker so notes that touch stay two. */
+    color *= mix(0.82, 1.1, lit);
+    color = mix(color, min(color * 1.25, vec3(1.0)), (1.0 - smoothstep(0.0, 0.8, length(p - vec2(-0.25, 0.3)))) * 0.35 * drawn);
     color = mix(color, color * 0.72, rim * 0.6);
   }
 

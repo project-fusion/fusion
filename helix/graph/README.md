@@ -75,11 +75,15 @@ socket.addEventListener('message', ({ data }) => {
 ```
 
 **`frame.signal(from, to, { tone })` shows something passing between two
-notes**: a message, a request, a payment. It is drawn as a pulse of light
-traveling from one to the other, turning from the first note's color to the
-second's, or in the tone's color where it has one, over the graph and without
-redrawing it, so a busy feed costs a dot each. A reader who asks for less motion
-sees the link lit for a moment instead.
+notes**: a message, a request, a payment. It is drawn as a comet traveling
+from one to the other along a gently bowed path, its tail tapering and turning
+from the first note's color to the second's, or in the tone's color where it
+has one. A small ring spreads from the note it leaves, and the note it reaches
+brightens and ripples. A reply on the same link bows the other way, so the two
+do not run over each other, and in three dimensions the path arcs over the
+shape. It is drawn over the graph without redrawing it, so a busy feed costs a
+few strokes each. A reader who asks for less motion sees the path lit for a
+moment instead.
 
 ```js
 frame.signal('Checkout', 'Payments', { tone: 'success' })
@@ -108,7 +112,9 @@ frame.nodes = [
 ```
 
 `sigmaDriver(sigma, { material, shape, emphasis })` sets what a note is drawn as
-where it does not say. The selected note keeps its own color and is told apart by
+where it does not say. A note without a material is matte, lit across so it
+reads as round. In three dimensions every note is an orb of light, with a hot
+core and a halo on a dark ground. The selected note keeps its own color and is told apart by
 a ring and a glow in that color.
 
 **A note without a `size` is as large as it is connected**, so hubs read at a

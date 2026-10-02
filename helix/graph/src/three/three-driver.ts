@@ -35,6 +35,7 @@ import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
 import type { StencilFrame } from '../connect-graph/stencil.js'
 import {
+  type Bend,
   ease,
   gesturesHeld,
   groupsOver,
@@ -96,6 +97,16 @@ const REST = 8000
  */
 const WASH = { dark: 0.2, full: 1.5, light: 0.26, notes: 6, reach: 3.5 }
 
+/**
+ * How strong the halo every note carries is, on a dark ground and a light
+ * one: light that falls off the note into the dark, and almost none on a
+ * light ground, where a halo would read as a smudge.
+ */
+const BLOOM = { dark: 0.28, light: 0 }
+
+/** How high a signal's path rises over the shape, as a share of how far it goes. */
+const LIFT = 0.42
+
 /** The field of view, in degrees. Narrow, so depth reads without the edges stretching. */
 const FOV = 40
 
@@ -129,18 +140,23 @@ attribute float glow;
 
 uniform float scale;
 uniform float unit;
+uniform float bloom;
 
 varying vec4 vTint;
 varying float vShape;
 varying float vGlow;
 varying float vFade;
+varying float vRoom;
 
 void main() {
   vec4 view = modelViewMatrix * vec4(position, 1.0);
   gl_Position = projectionMatrix * view;
   float depth = max(-view.z, 0.001);
+  /* Room around the note for its halo, which every note has where the
+     ground is dark, and more for a glowing one. */
+  vRoom = 1.0 + (bloom > 0.0 ? 0.9 : 0.0) + glow * 1.4;
   /* As large as the note is, at the distance it is: nearer is larger. */
-  gl_PointSize = size * unit * scale / depth * (1.0 + glow * 1.4);
+  gl_PointSize = size * unit * scale / depth * vRoom;
   vFade = fade(depth);
   vTint = tint;
   vShape = shape;
@@ -150,24 +166,35 @@ void main() {
 
 // language=GLSL
 const FRAGMENT = /* glsl */ `
+uniform float bloom;
+
 varying vec4 vTint;
 varying float vShape;
 varying float vGlow;
 varying float vFade;
+varying float vRoom;
 
 void main() {
-  vec2 p = gl_PointCoord * 2.0 - 1.0;
-  /* The note's body inside the sprite; the rest is room for its glow. */
-  float body = 1.0 / (1.0 + vGlow * 1.4);
-  float reach = vShape > 1.5 ? (abs(p.x) + abs(p.y)) * 0.78 : vShape > 0.5 ? max(abs(p.x), abs(p.y)) * 1.08 : length(p);
-  float d = reach / body;
-  float inside = 1.0 - smoothstep(0.86, 1.0, d);
-  /* Lit from the middle out, so a note reads as round. */
-  vec3 color = vTint.rgb * mix(1.15, 0.8, clamp(d, 0.0, 1.0));
-  float halo = vGlow * (1.0 - smoothstep(1.0, 1.0 / body, d)) * 0.55;
+  /* Where in the note's body this is, from its middle at 0 to its edge at 1;
+     the sprite past the body is room for its halo. */
+  vec2 q = (gl_PointCoord * 2.0 - 1.0) * vec2(1.0, -1.0) * vRoom;
+  float d = vShape > 1.5 ? (abs(q.x) + abs(q.y)) * 0.78 : vShape > 0.5 ? max(abs(q.x), abs(q.y)) * 1.08 : length(q);
+  float inside = 1.0 - smoothstep(0.84, 1.0, d);
+  /* **An orb of light**: lit from above and to the left, a hot core toward
+     white a little off its middle, and its rim brighter in its own color,
+     as light catches the edge of a glass bead. */
+  float lit = clamp(0.5 + 0.5 * dot(normalize(vec2(-0.5, 0.7)), q), 0.0, 1.0);
+  vec3 body = vTint.rgb * mix(0.7, 1.12, lit);
+  float core = 1.0 - smoothstep(0.0, 0.6, length(q - vec2(-0.2, 0.24)));
+  body = mix(body, vec3(1.0), core * core * 0.6);
+  body = mix(body, min(vTint.rgb * 1.35, vec3(1.0)), smoothstep(0.62, 0.96, d) * 0.4);
+  /* The halo: soft light falling away past the body, faint for every note
+     on a dark ground and stronger for one that glows. */
+  float past = clamp((d - 1.0) / max(vRoom - 1.0, 0.001), 0.0, 1.0);
+  float halo = (bloom + vGlow * 0.6) * pow(1.0 - past, 2.4) * step(1.0, d);
   float alpha = (inside + halo * (1.0 - inside)) * vTint.a * vFade;
   if (alpha < 0.01) discard;
-  gl_FragColor = vec4(color, alpha);
+  gl_FragColor = vec4(mix(vTint.rgb, body, inside), alpha);
 }
 `
 
@@ -313,6 +340,7 @@ export const threeDriver = (
   let positions: Float32Array<ArrayBufferLike> = new Float32Array()
 
   const uniforms = {
+    bloom: { value: BLOOM.dark },
     middle: { value: 1 },
     radius: { value: 1 },
     scale: { value: 1 },
@@ -589,7 +617,35 @@ export const threeDriver = (
   }
 
   const held = gesturesHeld(container)
-  const signals = signalsOver(container, onScreen)
+  /* **A signal arcs over the shape**: its path rises from the middle of the
+     graph out, as far as a share of how far it goes, so a signal between two
+     notes on a brain runs over it and not through it. */
+  const arc: Bend = (from, to) => {
+    const one = index.get(from)
+    const other = index.get(to)
+    if (one === undefined || other === undefined) {
+      return undefined
+    }
+    const a = at(one)
+    const b = at(other)
+    const middle = a.clone().add(b).multiplyScalar(0.5)
+    const center = points.geometry.boundingSphere?.center ?? controls.target
+    const out = middle.clone().sub(center)
+    if (out.lengthSq() < 1e-9) {
+      out.copy(camera.up)
+    }
+    /* Twice the rise, since a curve only reaches half way to the point it bends toward. */
+    const peak = middle.add(out.normalize().multiplyScalar(a.distanceTo(b) * LIFT * 2))
+    const depth = peak.clone().applyMatrix4(camera.matrixWorldInverse).z
+    if (depth > 0) {
+      return undefined
+    }
+    peak.project(camera)
+    const { clientHeight: height, clientWidth: width } = container
+    return { x: ((peak.x + 1) / 2) * width, y: ((1 - peak.y) / 2) * height }
+  }
+  /* Drawn only between notes in view, where the shape hides the far side. */
+  const signals = signalsOver(container, (id) => nearOnScreen(id), arc)
   /* **On a shape's surface, a group is named where its near side is**: over
      the notes in front of the graph's middle, so a group that wraps round
      the far side is named over what of it the reader sees, and one entirely
@@ -720,6 +776,7 @@ export const threeDriver = (
     ;(solidUniforms.ground as { value: number[] }).value = channels(looks.ground)
     ;(solidUniforms.ink as { value: number[] }).value = channels(looks.ink)
     ;(solid.material.uniforms.strength as { value: number }).value = dark ? WASH.dark : WASH.light
+    uniforms.bloom.value = dark ? BLOOM.dark : BLOOM.light
     const blending = dark ? AdditiveBlending : NormalBlending
     points.material.blending = blending
     quiet.material.blending = blending
