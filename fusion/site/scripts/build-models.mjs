@@ -6,11 +6,15 @@
  * bun scripts/build-models.mjs
  * ```
  *
- * **Made here from three.js's own geometry**, so every vertex is this
- * repository's and no model's license travels with an example a reader
- * copies. A torus knot, three times round, which reads as a knot from any
- * side a reader turns it to, in as few triangles as a field 96 cells across
- * can tell apart from more.
+ * **Made here**, so every vertex is this repository's and no model's license
+ * travels with an example a reader copies:
+ *
+ * - **A torus knot**, from three.js's own geometry, three times round, which
+ *   reads as a knot from any side a reader turns it to, in as few triangles
+ *   as a field 96 cells across can tell apart from more.
+ * - **A brain**, from the distance field in `brain-model.mjs`, wrapped in
+ *   triangles by the surface nets the Graph driver draws shapes with, fine
+ *   enough to hold its folds.
  *
  * Written by hand, not by three.js's exporter, which needs a browser's
  * `FileReader`: a `.glb` is a twelve-byte header, a JSON chunk saying where
@@ -19,15 +23,21 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { surfaceOf } from '@fusion.dev/helix-graph/shapes'
 import { TorusKnotGeometry } from 'three'
+import { BOX, brain } from './brain-model.mjs'
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'media', 'models')
 
 /** A chunk's length padded to four bytes, as glTF asks. */
 const padded = (length) => Math.ceil(length / 4) * 4
 
-/** A binary glTF file holding one mesh: its corners, and its triangles by corner. */
-const glb = (positions, indices) => {
+/**
+ * A binary glTF file holding one mesh: its corners, and its triangles by
+ * corner, in sixteen bits a corner where there are few enough corners.
+ */
+const glb = (positions, wide) => {
+  const indices = positions.length / 3 < 65536 ? Uint16Array.from(wide) : Uint32Array.from(wide)
   const low = [Infinity, Infinity, Infinity]
   const high = [-Infinity, -Infinity, -Infinity]
   for (let at = 0; at < positions.length; at += 3) {
@@ -52,7 +62,12 @@ const glb = (positions, indices) => {
         min: low,
         type: 'VEC3',
       },
-      { bufferView: 1, componentType: 5125, count: indices.length, type: 'SCALAR' },
+      {
+        bufferView: 1,
+        componentType: indices instanceof Uint16Array ? 5123 : 5125,
+        count: indices.length,
+        type: 'SCALAR',
+      },
     ],
     asset: { generator: 'fusion/site/scripts/build-models.mjs', version: '2.0' },
     buffers: [{ byteLength: binary.byteLength }],
@@ -92,9 +107,33 @@ const knot = new TorusKnotGeometry(1, 0.32, 128, 16, 2, 3)
 const positions = new Float32Array(knot.getAttribute('position').array)
 const indices = new Uint32Array(knot.getIndex().array)
 
-await mkdir(OUT, { recursive: true })
-const file = glb(positions, indices)
-await writeFile(join(OUT, 'torus-knot.glb'), file)
-console.log(
-  `models: torus-knot.glb, ${indices.length / 3} triangles, ${Math.round(file.length / 1024)} KB`,
+/** How many cells the brain's surface is read in along its longest side. */
+const BRAIN_CELLS = 100
+
+const started = performance.now()
+const wrapped = surfaceOf(
+  {
+    depth: BOX.across * 2,
+    distance: (x, y, z) => brain(x + BOX.left, y + BOX.top, z - BOX.across),
+    height: BOX.height,
+    width: BOX.width,
+  },
+  { cells: BRAIN_CELLS },
 )
+/* From the field's box, y down, to the model's, y up and the middle at the origin. */
+const brainCorners = new Float32Array(wrapped.corners.length)
+for (let at = 0; at < wrapped.corners.length; at += 3) {
+  brainCorners[at] = wrapped.corners[at] + BOX.left - 110
+  brainCorners[at + 1] = 85 - (wrapped.corners[at + 1] + BOX.top)
+  brainCorners[at + 2] = wrapped.corners[at + 2] - BOX.across
+}
+
+await mkdir(OUT, { recursive: true })
+for (const [name, file, triangles] of [
+  ['torus-knot.glb', glb(positions, indices), indices.length / 3],
+  ['brain.glb', glb(brainCorners, wrapped.triangles), wrapped.triangles.length / 3],
+]) {
+  await writeFile(join(OUT, name), file)
+  console.log(`models: ${name}, ${triangles} triangles, ${Math.round(file.length / 1024)} KB`)
+}
+console.log(`models: the brain took ${Math.round(performance.now() - started)} ms`)

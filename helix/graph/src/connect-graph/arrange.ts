@@ -53,21 +53,15 @@ const plus = (one: GraphPoint, other: GraphPoint): GraphPoint => ({
 })
 
 /**
- * Places for every note from the graph's structure alone, with no layout to
- * wait for: **each group around a circle, or a sphere in a solid, each hub in its group, and each
- * note beside the hub it hangs from**, the most connected note it links to
- * in its group.
- *
- * Not a layout to look at, since fans overlap and nothing is pushed apart:
- * it is where a stencil starts, which reads only which notes are near which,
- * so the shape is drawn from the first frame with each group a region and
- * each hub's notes around it.
+ * The hub each note hangs from, and how connected each note is: a note
+ * hangs from its most connected neighbor in its group, where that neighbor
+ * is more connected than it is, and the note at the end of the chain is the
+ * hub. A note nothing is more connected than is its own hub.
  */
-export const arrangeByGroup = (
+export const hubsOf = (
   nodes: readonly ArrangedNode[],
   links: readonly SeedLink[],
-  { solid = false }: { solid?: boolean } = {},
-): Map<string, GraphPoint> => {
+): { hubOf: (id: string) => string; rank: (id: string) => number } => {
   const groupOf = new Map(nodes.map((node) => [node.id, node.group ?? '']))
   const degree = new Map<string, number>()
   const neighbors = new Map<string, string[]>()
@@ -117,6 +111,27 @@ export const arrangeByGroup = (
     }
     return at
   }
+  return { hubOf, rank }
+}
+
+/**
+ * Places for every note from the graph's structure alone, with no layout to
+ * wait for: **each group around a circle, or a sphere in a solid, each hub in its group, and each
+ * note beside the hub it hangs from**, the most connected note it links to
+ * in its group.
+ *
+ * Not a layout to look at, since fans overlap and nothing is pushed apart:
+ * it is where a stencil starts, which reads only which notes are near which,
+ * so the shape is drawn from the first frame with each group a region and
+ * each hub's notes around it.
+ */
+export const arrangeByGroup = (
+  nodes: readonly ArrangedNode[],
+  links: readonly SeedLink[],
+  { solid = false }: { solid?: boolean } = {},
+): Map<string, GraphPoint> => {
+  const groupOf = new Map(nodes.map((node) => [node.id, node.group ?? '']))
+  const { hubOf, rank } = hubsOf(nodes, links)
   /* Groups in the order their first notes were given, and each group's hubs
      with the notes that hang from them. */
   const groups = new Map<string, Map<string, string[]>>()

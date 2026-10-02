@@ -9,7 +9,7 @@ import {
   type ViewportZoomDetail,
   watchTheme,
 } from '@fusion.dev/helix-core'
-import { arrangeByGroup } from './arrange.js'
+import { arrangeByGroup, hubsOf } from './arrange.js'
 import {
   type DrawnLink,
   type DrawnNode,
@@ -133,6 +133,16 @@ export interface GraphGroup {
   ids: readonly string[]
   /** The group's name, as the notes give it. */
   name: string
+}
+
+/** Each note's group and then its hub, which a stencil gives a piece of its shape each. */
+const clustersOf = (
+  nodes: readonly { group?: string | undefined; id: string }[],
+  links: readonly { source: string; target: string }[],
+): ((id: string) => readonly string[]) => {
+  const groupOf = new Map(nodes.map((node) => [node.id, node.group ?? '']))
+  const { hubOf } = hubsOf(nodes, links)
+  return (id) => [groupOf.get(id) ?? '', hubOf(id)]
 }
 
 /** How a connection behaves where the page does not say. */
@@ -338,6 +348,7 @@ export const connectGraph = (
               solid: fieldOf(options.stencil).depth > 0,
             }),
             options.stencil,
+            { clustersOf: clustersOf(nodes, [...nextLinks.values()]) },
           )
         : undefined
     const shaped = fit?.positions

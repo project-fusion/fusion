@@ -220,6 +220,7 @@ makes one from what a page has, and a field is a stencil itself:
 | `inflate(field, { depth, roundness })` | A solid puffed out of a flat field, as a cushion is, cut through where the flat shape has a hole |
 | `sphere`, `torus`, `box` | Solids measured exactly from their formulas |
 | `onSphere(field, { radius, thickness })` | A flat map wrapped round a ball, as a world map is round a globe |
+| `surfaceOf(field, { at, cells })` | The surface of a solid as triangles, to draw or to save as a model |
 
 ```js
 const stencil = { ...(await shapeFromModel('/models/brain.glb')), place: 'surface' }
@@ -254,12 +255,14 @@ connectGraph(frame, threeDriver(box), {
 
 - **A solid stencil draws the notes in the solid**: all through it, or, with
   `place: 'surface'`, in a thin shell just inside its edge, which is how a
-  solid reads as the thing it is shaped like. Each group takes one piece of
-  the surface, measured across it, so a group on a knot is a stretch of its
-  tube, and each hub's notes a patch around it.
+  solid reads as the thing it is shaped like. **Each group is given a piece
+  of the shape of its own**, as many places as it has notes, and each hub a
+  piece of its group's, so no group is cut in two: on a knot, a group is a
+  stretch of its tube, and on a brain, a region of it.
 - **On a surface, the shape itself is drawn** in the ground's color just
-  inside the notes, so what is behind it is hidden, and the pointer finds
-  only the notes in front.
+  inside the notes, lit faintly from above, so what is behind it is hidden
+  and the pointer finds only the notes in front. A model's own surface is
+  drawn, with every fold the field's cells are too coarse to hold.
 - **Without a stencil, a layout runs in three dimensions** with d3-force-3d.
 - **Dragging turns the graph, and the wheel and a pinch bring it nearer.** It
   turns slowly by itself while nobody is handling it, and never for a reader
@@ -284,7 +287,7 @@ connectGraph(frame, threeDriver(box), {
 | `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)` |
 | `@fusion.dev/helix-graph/cosmos` | `cosmosDriver(graph, box, options)` |
 | `@fusion.dev/helix-graph/three` | `threeDriver(box, options)` |
-| `@fusion.dev/helix-graph/shapes` | `shapeFromModel`, `shapeFromTriangles`, `shapeFromSvg`, `shapeFromImage`, `shapeFromPath`, `shapeFromInside`, `inflate`, `sphere`, `torus`, `box`, `onSphere`, and the `ShapeField` type |
+| `@fusion.dev/helix-graph/shapes` | `shapeFromModel`, `shapeFromTriangles`, `shapeFromSvg`, `shapeFromImage`, `shapeFromPath`, `shapeFromInside`, `inflate`, `sphere`, `torus`, `box`, `onSphere`, `surfaceOf`, and the `ShapeField` type |
 
 **Sigma, cosmos.gl, three.js and d3-force-3d are optional peers, and graphology is the page's.** Each
 driver types its renderer by the calls it makes on it, so a page brings

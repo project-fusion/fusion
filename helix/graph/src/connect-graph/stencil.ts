@@ -192,6 +192,16 @@ export interface StencilFrame {
 export const fitInStencil = (
   positions: ReadonlyMap<string, GraphPoint>,
   stencil: GraphStencil,
+  {
+    clustersOf,
+  }: {
+    /**
+     * The clusters a note is in, broadest first, such as its group and then
+     * its hub. Each cluster is given a piece of a solid of its own, as many
+     * places as it has notes, so no cluster is cut in two.
+     */
+    clustersOf?: ((id: string) => readonly string[]) | undefined
+  } = {},
 ): { frame?: StencilFrame | undefined; positions: Map<string, GraphPoint> } => {
   const notes = [...positions].map(([id, at]) => ({ at, id }))
   if (notes.length === 0) {
@@ -293,23 +303,82 @@ export const fitInStencil = (
       )
       return [ordered.slice(0, first), ordered.slice(first)]
     }
-    const halve = (ours: (typeof notes)[number][], theirs: number[]): void => {
+    type Note = (typeof notes)[number]
+    const keysOf = new Map(notes.map((note) => [note.id, clustersOf?.(note.id) ?? []]))
+    /* **Halved by cluster where the notes are in more than one**: the
+       clusters ordered across where their notes are, and cut where the count
+       comes nearest half, so the places are split at exactly that count and
+       every cluster lands whole on one side. Within one cluster, the next
+       level down; past the last, the notes by where they are. */
+    const halve = (ours: Note[], theirs: number[], level = 0): void => {
       if (ours.length === 1) {
-        fitted.set(
-          (ours[0] as (typeof notes)[number]).id,
-          targets[theirs[0] as number] as GraphPoint,
-        )
+        fitted.set((ours[0] as Note).id, targets[theirs[0] as number] as GraphPoint)
         return
       }
       if (ours.length === 0) {
+        return
+      }
+      const clusters = new Map<string, Note[]>()
+      for (const note of ours) {
+        const key = keysOf.get(note.id)?.[level]
+        if (key !== undefined) {
+          const list = clusters.get(key)
+          if (list) {
+            list.push(note)
+          } else {
+            clusters.set(key, [note])
+          }
+        }
+      }
+      if (clusters.size === 1) {
+        halve(ours, theirs, level + 1)
+        return
+      }
+      if (
+        clusters.size > 1 &&
+        [...clusters.values()].reduce((sum, list) => sum + list.length, 0) === ours.length
+      ) {
+        const middles = [...clusters.values()].map((list) => ({
+          list,
+          middle: {
+            x: list.reduce((sum, note) => sum + note.at.x, 0) / list.length,
+            y: list.reduce((sum, note) => sum + note.at.y, 0) / list.length,
+            z: list.reduce((sum, note) => sum + (note.at.z ?? 0), 0) / list.length,
+          },
+        }))
+        const axis = widest(middles.map((one) => one.middle))
+        middles.sort((one, other) => one.middle[axis] - other.middle[axis])
+        let cut = 1
+        let count = 0
+        let best = Number.POSITIVE_INFINITY
+        let first = 0
+        for (let at = 0; at < middles.length - 1; at++) {
+          count += (middles[at] as (typeof middles)[number]).list.length
+          if (Math.abs(count - ours.length / 2) < best) {
+            best = Math.abs(count - ours.length / 2)
+            cut = at + 1
+            first = count
+          }
+        }
+        const [near, rest] = halveTargets(theirs, first)
+        halve(
+          middles.slice(0, cut).flatMap((one) => one.list),
+          near,
+          level,
+        )
+        halve(
+          middles.slice(cut).flatMap((one) => one.list),
+          rest,
+          level,
+        )
         return
       }
       const mine = widest(ours.map((note) => note.at))
       ours.sort((one, other) => (one.at[mine] ?? 0) - (other.at[mine] ?? 0))
       const half = Math.floor(ours.length / 2)
       const [near, rest] = halveTargets(theirs, half)
-      halve(ours.slice(0, half), near)
-      halve(ours.slice(half), rest)
+      halve(ours.slice(0, half), near, level)
+      halve(ours.slice(half), rest, level)
     }
     halve(
       [...notes],

@@ -4,6 +4,7 @@ export {
   inflate,
   type ShapeField,
 } from '../connect-graph/shape-field.js'
+export { surfaceOf } from '../three/surface.js'
 export { type ImageOptions, shapeFromImage, shapeFromSvg } from './flat.js'
 export { shapeFromModel } from './model.js'
 export { box, onSphere, sphere, torus } from './solids.js'
