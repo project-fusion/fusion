@@ -88,6 +88,14 @@ const LINKS = { dark: { close: 0.3, far: 0.05 }, light: { close: 0.55, far: 0.12
 /** How long the graph rests after the reader lets go before it turns again, in milliseconds. */
 const REST = 8000
 
+/**
+ * How a shape's surface is washed in its notes' colors: how strongly, on a
+ * dark ground and a light one; how many notes each corner of it blends;
+ * how far it reaches for them, in the spacing of the notes; and how much
+ * weight of notes makes the wash whole.
+ */
+const WASH = { dark: 0.2, full: 1.5, light: 0.26, notes: 6, reach: 3.5 }
+
 /** The field of view, in degrees. Narrow, so depth reads without the edges stretching. */
 const FOV = 40
 
@@ -191,14 +199,17 @@ void main() {
 
 // language=GLSL
 const SOLID_VERTEX = /* glsl */ `
+attribute vec4 wash;
 varying vec3 vNormal;
 varying vec3 vView;
+varying vec4 vWash;
 
 void main() {
   vec4 view = modelViewMatrix * vec4(position, 1.0);
   gl_Position = projectionMatrix * view;
   vNormal = normalize(normalMatrix * normal);
   vView = normalize(-view.xyz);
+  vWash = wash;
 }
 `
 
@@ -206,19 +217,26 @@ void main() {
 const SOLID_FRAGMENT = /* glsl */ `
 uniform vec3 ground;
 uniform vec3 ink;
+uniform float strength;
 varying vec3 vNormal;
 varying vec3 vView;
+varying vec4 vWash;
 
 void main() {
-  /* The ground's color, a breath of ink at the edge turning away and where
-     light from above and to the left falls, so the shape and its folds are
-     felt and not seen: the notes on it are what is drawn. */
+  /* **Each region washed in its notes' color**, as a translucent stain on
+     the ground's color, and lit: a breath of ink where light from above and
+     to the left falls, and the region's own color glowing at the edge
+     turning away. Felt more than seen: the notes on it are what is drawn. */
   vec3 normal = normalize(vNormal);
   vec3 view = normalize(vView);
   if (dot(normal, view) < 0.0) normal = -normal;
   float edge = 1.0 - dot(normal, view);
   float lit = max(dot(normal, normalize(vec3(-0.4, 0.8, 0.45))), 0.0);
-  gl_FragColor = vec4(mix(ground, ink, 0.12 * pow(edge, 2.0) + 0.14 * lit * lit), 1.0);
+  float washed = strength * vWash.a;
+  vec3 base = mix(ground, vWash.rgb, washed);
+  vec3 shaded = mix(base, ink, 0.1 * pow(edge, 2.0) + 0.17 * lit * lit);
+  vec3 rim = mix(shaded, vWash.rgb, washed * 1.6 * pow(edge, 3.0));
+  gl_FragColor = vec4(rim, 1.0);
 }
 `
 
@@ -341,7 +359,11 @@ export const threeDriver = (
       polygonOffsetFactor: 2,
       polygonOffsetUnits: 2,
       side: DoubleSide,
-      uniforms: { ground: { value: [0, 0, 0] }, ink: { value: [1, 1, 1] } },
+      uniforms: {
+        ground: { value: [0, 0, 0] },
+        ink: { value: [1, 1, 1] },
+        strength: { value: WASH.dark },
+      },
       vertexShader: SOLID_VERTEX,
     }),
   )
@@ -369,38 +391,29 @@ export const threeDriver = (
     const inset = frame.shell * 0.6
     /* **The shape's own surface where it came with one**, as a model does,
        which holds every fold; otherwise one made from the field. Moved in
-       along its normals, so it sits just inside the notes. */
+       along the field's own slope, read a cell apart, which is smooth where
+       the surface folds: moved along its own normals, a folded surface
+       crumples through itself. */
     let geometry = new BufferGeometry()
     if (field.mesh) {
       geometry.setAttribute('position', new BufferAttribute(field.mesh.corners.slice(), 3))
       geometry.setIndex(new BufferAttribute(field.mesh.triangles, 1))
-      geometry.deleteAttribute('normal')
       geometry = mergeVertices(geometry)
-      geometry.computeVertexNormals()
       const place = geometry.getAttribute('position') as BufferAttribute
-      const normal = geometry.getAttribute('normal') as BufferAttribute
-      /* Which way is in: the way the field falls below zero, read at a few corners. */
-      let inward = 0
-      for (let at = 0; at < place.count; at += Math.max(1, Math.floor(place.count / 64))) {
-        const [x, y, z, nx, ny, nz] = [
-          place.getX(at),
-          place.getY(at),
-          place.getZ(at),
-          normal.getX(at),
-          normal.getY(at),
-          normal.getZ(at),
-        ]
-        inward +=
-          field.distance(x + nx * inset, y + ny * inset, z + nz * inset) -
-          field.distance(x - nx * inset, y - ny * inset, z - nz * inset)
-      }
-      const step = inward > 0 ? -inset : inset
+      const step = Math.max(field.width, field.height, field.depth) / 64
       for (let at = 0; at < place.count; at++) {
+        const x = place.getX(at)
+        const y = place.getY(at)
+        const z = place.getZ(at)
+        const gx = field.distance(x + step, y, z) - field.distance(x - step, y, z)
+        const gy = field.distance(x, y + step, z) - field.distance(x, y - step, z)
+        const gz = field.distance(x, y, z + step) - field.distance(x, y, z - step)
+        const length = Math.hypot(gx, gy, gz) || 1
         place.setXYZ(
           at,
-          place.getX(at) + normal.getX(at) * step,
-          place.getY(at) + normal.getY(at) * step,
-          place.getZ(at) + normal.getZ(at) * step,
+          x - (gx / length) * inset,
+          y - (gy / length) * inset,
+          z - (gz / length) * inset,
         )
       }
     } else {
@@ -422,6 +435,130 @@ export const threeDriver = (
     solid.geometry.dispose()
     solid.geometry = geometry
     solid.visible = true
+    tieSurface()
+  }
+
+  /* **The notes nearest each corner of the shape's surface**, and how much
+     each counts, found once a drawing, so washing the surface in its notes'
+     colors on every repaint is a sum and not a search. */
+  let washFrom = new Int32Array()
+  let washWeight = new Float32Array()
+  let noteTints = new Float32Array()
+  const tieSurface = (): void => {
+    const place = solid.geometry.getAttribute('position') as BufferAttribute | undefined
+    if (!solid.visible || !place || ids.length === 0) {
+      washFrom = new Int32Array()
+      return
+    }
+    /* How far apart neighboring notes are, from a sample of them. */
+    const sample = Math.min(ids.length, 200)
+    const nearest: number[] = []
+    for (let step = 0; step < sample; step++) {
+      const one = Math.floor((step * ids.length) / sample)
+      let best = Number.POSITIVE_INFINITY
+      for (let other = 0; other < ids.length; other++) {
+        if (other !== one) {
+          best = Math.min(best, at(one).distanceToSquared(at(other)))
+        }
+      }
+      nearest.push(Math.sqrt(best))
+    }
+    nearest.sort((one, other) => one - other)
+    const reach = (nearest[Math.floor(nearest.length / 2)] ?? 1) * WASH.reach
+    /* The notes by cell of a grid as wide as the reach. */
+    const cells = new Map<string, number[]>()
+    const key = (x: number, y: number, z: number): string =>
+      `${Math.floor(x / reach)},${Math.floor(y / reach)},${Math.floor(z / reach)}`
+    for (let spot = 0; spot < ids.length; spot++) {
+      const k = key(
+        positions[spot * 3] as number,
+        positions[spot * 3 + 1] as number,
+        positions[spot * 3 + 2] as number,
+      )
+      const list = cells.get(k)
+      if (list) {
+        list.push(spot)
+      } else {
+        cells.set(k, [spot])
+      }
+    }
+    washFrom = new Int32Array(place.count * WASH.notes).fill(-1)
+    washWeight = new Float32Array(place.count * WASH.notes)
+    const best = new Float32Array(WASH.notes)
+    const which = new Int32Array(WASH.notes)
+    for (let corner = 0; corner < place.count; corner++) {
+      const x = place.getX(corner)
+      const y = place.getY(corner)
+      const z = place.getZ(corner)
+      best.fill(Number.POSITIVE_INFINITY)
+      which.fill(-1)
+      const cx = Math.floor(x / reach)
+      const cy = Math.floor(y / reach)
+      const cz = Math.floor(z / reach)
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dz = -1; dz <= 1; dz++) {
+            for (const spot of cells.get(`${cx + dx},${cy + dy},${cz + dz}`) ?? []) {
+              const far =
+                ((positions[spot * 3] as number) - x) ** 2 +
+                ((positions[spot * 3 + 1] as number) - y) ** 2 +
+                ((positions[spot * 3 + 2] as number) - z) ** 2
+              if (far < (best[WASH.notes - 1] as number)) {
+                let slot = WASH.notes - 1
+                while (slot > 0 && (best[slot - 1] as number) > far) {
+                  best[slot] = best[slot - 1] as number
+                  which[slot] = which[slot - 1] as number
+                  slot -= 1
+                }
+                best[slot] = far
+                which[slot] = spot
+              }
+            }
+          }
+        }
+      }
+      for (let slot = 0; slot < WASH.notes; slot++) {
+        washFrom[corner * WASH.notes + slot] = which[slot] as number
+        /* Falling away smoothly with distance, to nothing at the reach. */
+        const far = Math.sqrt(best[slot] as number) / reach
+        washWeight[corner * WASH.notes + slot] = far < 1 ? (1 - far * far) ** 2 : 0
+      }
+    }
+    washSurface()
+  }
+
+  /** The surface's wash: each corner the weighted blend of its nearest notes' colors, and how much of it there is. */
+  const washSurface = (): void => {
+    const place = solid.geometry.getAttribute('position') as BufferAttribute | undefined
+    if (!place || washFrom.length !== place.count * WASH.notes || noteTints.length === 0) {
+      return
+    }
+    const wash = new Float32Array(place.count * 4)
+    for (let corner = 0; corner < place.count; corner++) {
+      let red = 0
+      let green = 0
+      let blue = 0
+      let total = 0
+      for (let slot = 0; slot < WASH.notes; slot++) {
+        const spot = washFrom[corner * WASH.notes + slot] as number
+        const weight =
+          (washWeight[corner * WASH.notes + slot] as number) * (noteTints[spot * 4 + 3] ?? 0)
+        if (spot < 0 || weight <= 0) {
+          continue
+        }
+        red += (noteTints[spot * 4] as number) * weight
+        green += (noteTints[spot * 4 + 1] as number) * weight
+        blue += (noteTints[spot * 4 + 2] as number) * weight
+        total += weight
+      }
+      if (total > 0) {
+        wash.set(
+          [red / total, green / total, blue / total, Math.min(total / WASH.full, 1)],
+          corner * 4,
+        )
+      }
+    }
+    solid.geometry.setAttribute('wash', new BufferAttribute(wash, 4))
   }
 
   const at = (spot: number): Vector3 =>
@@ -573,6 +710,8 @@ export const threeDriver = (
     })
     const geometry = points.geometry
     geometry.setAttribute('tint', new BufferAttribute(tints, 4))
+    noteTints = tints
+    washSurface()
     geometry.setAttribute('size', new BufferAttribute(drawn, 1))
     geometry.setAttribute('shape', new BufferAttribute(shapes, 1))
     geometry.setAttribute('glow', new BufferAttribute(glows, 1))
@@ -580,6 +719,7 @@ export const threeDriver = (
     const solidUniforms = solid.material.uniforms as Record<string, { value: number[] }>
     ;(solidUniforms.ground as { value: number[] }).value = channels(looks.ground)
     ;(solidUniforms.ink as { value: number[] }).value = channels(looks.ink)
+    ;(solid.material.uniforms.strength as { value: number }).value = dark ? WASH.dark : WASH.light
     const blending = dark ? AdditiveBlending : NormalBlending
     points.material.blending = blending
     quiet.material.blending = blending
@@ -663,6 +803,10 @@ export const threeDriver = (
     points.geometry.computeBoundingSphere()
     hovered = undefined
     paint()
+    /* The notes moved, so the surface's wash is tied to them again. */
+    if (solid.visible) {
+      tieSurface()
+    }
   }
 
   const toWorld = (node: GraphPoint & { id?: string }): [number, number, number] => [
