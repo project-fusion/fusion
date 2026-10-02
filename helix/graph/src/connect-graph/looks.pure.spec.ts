@@ -69,7 +69,7 @@ describe('looksOf', () => {
 
   test('raises the links that touch the selected note, and hides what depth leaves out', () => {
     const drawn = looks('a', ['b'], ['a', 'b'])
-    expect(drawn.link('a', 'b')).toEqual({ color: colors.muted, hidden: false, raised: true })
+    expect(drawn.link('a', 'b')).toEqual({ color: 'rgb(0, 255, 0)', hidden: false, raised: true })
     expect(drawn.link('b', 'd').hidden).toBe(true)
     expect(drawn.node('d').hidden).toBe(true)
   })

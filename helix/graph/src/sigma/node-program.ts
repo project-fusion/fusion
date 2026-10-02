@@ -118,20 +118,27 @@ void main(void) {
 
   vec3 color = v_color.rgb;
   float alpha = 1.0;
+  /* How large the note is drawn, in pixels: a highlight that suits a hub is
+     a speck of noise on a leaf, so the detail grows in with the size. */
+  float drawn = smoothstep(4.0, 14.0, v_radius / u_correctionRatio);
   /* Lit from above on the left, as every surface here is. */
   float lit = clamp(0.5 + 0.5 * dot(normalize(vec2(-0.45, 0.9)), p), 0.0, 1.0);
+  /* A fine rim a shade darker, so notes that touch stay two. */
+  float rim = smoothstep(-0.2 - aa, -0.2, d);
   if (v_material > 0.5 && v_material < 1.5) {
-    /* Glass: shaded like a sphere, a bright highlight, and light at its rim. */
-    color *= mix(0.62, 1.18, lit);
-    float highlight = exp(-pow(length(p - vec2(-0.34, 0.4)) / 0.3, 2.0));
-    color = mix(color, vec3(1.0), highlight * 0.7);
-    color = mix(color, vec3(1.0), smoothstep(-0.22, 0.0, d) * 0.35);
-    alpha = 0.92;
+    /* Glass: shaded like a sphere, a highlight, and light at its rim. */
+    color *= mix(0.72, 1.12, lit);
+    float highlight = exp(-pow(length(p - vec2(-0.32, 0.38)) / 0.26, 2.0));
+    color = mix(color, vec3(1.0), highlight * mix(0.25, 0.6, drawn));
+    color = mix(color, vec3(1.0), rim * 0.22 * drawn);
+    alpha = 0.94;
   } else if (v_material > 1.5) {
     /* Frosted: a milky body, a soft fall of light, and no sharp highlight. */
-    color = mix(color * mix(0.82, 1.08, lit), vec3(1.0), 0.2);
-    color = mix(color, vec3(1.0), smoothstep(-0.3, 0.0, d) * 0.18);
-    alpha = 0.84;
+    color = mix(color * mix(0.86, 1.06, lit), vec3(1.0), 0.16);
+    color = mix(color, vec3(1.0), rim * 0.14);
+    alpha = 0.86;
+  } else {
+    color = mix(color, color * 0.72, rim * 0.6);
   }
 
   float body = inside * fill * alpha * v_color.a;

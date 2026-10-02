@@ -70,6 +70,11 @@ export interface GraphDriver {
   zoomBy(direction: 1 | -1, animate: boolean): void
   /** Brings a note into the middle of the view, where the renderer can. */
   center?(id: string, animate: boolean): void
+  /**
+   * Frames a set of notes, the selected one and its neighbors, in the middle
+   * of the view at a zoom that holds them all, where the renderer can.
+   */
+  fit?(ids: readonly string[], animate: boolean): void
   /** Calls `press` with a note's `id` when the reader presses it in the drawing. Returns what stops listening. */
   onPress?(press: (id: string) => void): () => void
   /**
@@ -250,13 +255,24 @@ export const connectGraph = (
       }
     }
     const { positions, unplaced } = seedPositions(nodes, [...nextLinks.values()], known)
+    /* **A note without a size is as large as it is connected**, so a hub
+       reads as one at a glance and the graph's shape shows before a word of
+       it is read. The square root, so a note with a hundred links is not ten
+       times the size of one with ten. */
+    const degree = new Map<string, number>()
+    for (const { source, target } of nextLinks.values()) {
+      degree.set(source, (degree.get(source) ?? 0) + 1)
+      degree.set(target, (degree.get(target) ?? 0) + 1)
+    }
     const nextNodes = new Map<string, DrawnNode>()
     for (const node of nodes) {
       const at = positions.get(node.id) as GraphPoint
       nextNodes.set(node.id, {
         id: node.id,
         label: node.label || node.id,
-        size: Number.isFinite(node.size) ? (node.size as number) : 1,
+        size: Number.isFinite(node.size)
+          ? (node.size as number)
+          : 1 + Math.sqrt(degree.get(node.id) ?? 0),
         x: at.x,
         y: at.y,
       })
@@ -338,7 +354,21 @@ export const connectGraph = (
       restyle()
       const selected = graph.active
       if (selected && selected !== pressed && options.center !== false) {
-        driver.center?.(selected, !still())
+        /* The note and the notes it links to and from, framed together, so a
+           neighborhood opens out to be read rather than sitting in a knot. */
+        const near = [selected]
+        for (const { source, target } of drawnLinks.values()) {
+          if (source === selected) {
+            near.push(target)
+          } else if (target === selected) {
+            near.push(source)
+          }
+        }
+        if (driver.fit && near.length > 1) {
+          driver.fit(near, !still())
+        } else {
+          driver.center?.(selected, !still())
+        }
       }
       pressed = undefined
     } else {
