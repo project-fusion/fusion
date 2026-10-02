@@ -428,6 +428,7 @@
         "preview/preview-frame-entry.ts",
         "preview/preview-graph-cosmos-entry.ts",
         "preview/preview-graph-entry.ts",
+        "preview/preview-graph-stencil.ts",
         "preview/preview-map-entry.ts",
         "preview/preview-maplibre-entry.ts",
         "utils/map-view/map-view.ts",

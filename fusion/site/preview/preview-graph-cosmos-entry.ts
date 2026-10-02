@@ -12,6 +12,7 @@ import { Graph } from '@cosmos.gl/graph'
 import { connectGraph } from '@fusion.dev/helix-graph'
 import { cosmosDriver } from '@fusion.dev/helix-graph/cosmos'
 import { RESTYLED } from './preview-events'
+import { stencilOf } from './preview-graph-stencil'
 
 /** One graph: the renderer made in the frame's box, connected, and recolored when the frame restyles. */
 const start = (frame: HTMLElement): (() => void) => {
@@ -26,7 +27,7 @@ const start = (frame: HTMLElement): (() => void) => {
     renderHoveredPointRing: true,
     scalePointsOnZoom: false,
   })
-  const connection = connectGraph(frame, cosmosDriver(graph, box))
+  const connection = connectGraph(frame, cosmosDriver(graph, box), { stencil: stencilOf(frame) })
   window.addEventListener(RESTYLED, connection.restyle)
   return () => {
     window.removeEventListener(RESTYLED, connection.restyle)

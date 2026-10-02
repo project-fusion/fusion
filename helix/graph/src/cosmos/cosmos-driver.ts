@@ -59,6 +59,12 @@ const SHAPES = { circle: 0, diamond: 3, ring: 0, square: 1 } as const
 /** How long a step of the view takes, in milliseconds. */
 const STEP = 250
 
+/** How clear a link is drawn across the whole graph, from 0 to 1. */
+const FAINT = 0.16
+
+/** How long notes take to glide to places they were moved to, in milliseconds. */
+const MORPH = 1400
+
 /** How far one zoom step goes. */
 const ZOOM = 1.5
 
@@ -285,11 +291,48 @@ export const cosmosDriver = (
     if (Math.abs(by - grown) > 0.01) {
       grown = by
       graph.setConfigPartial({ pointSizeScale: by })
+      if (Math.abs(clarity() - painted) > 0.04) {
+        paintLinks()
+        graph.render()
+      }
     }
   }
 
+  /* **Links faint across the whole graph and whole up close**: thousands of
+     them would cover the notes and the shape the notes make, and a reader
+     zoomed in to a neighborhood is there to follow them. The selected
+     note's links and the hovered note's are always whole. */
+  const clarity = (): number => FAINT + (1 - FAINT) * Math.min(Math.max((grown - 1) / 0.8, 0), 1)
+  let painted = 1
+
+  /** The links' colors and widths, from the looks and how far the reader has zoomed in. */
+  const paintLinks = (): void => {
+    if (!looks) {
+      return
+    }
+    painted = clarity()
+    const linkColors = new Float32Array(links.length * 4)
+    const widths = new Float32Array(links.length)
+    const lit = hovered === undefined ? undefined : ids[hovered]
+    links.forEach((link, at) => {
+      const look = (looks as GraphLooks).link(link.source, link.target)
+      const touches = lit !== undefined && (link.source === lit || link.target === lit)
+      const whole = look.raised || touches
+      linkColors.set(
+        channels(
+          touches ? (looks as GraphLooks).node(lit).color : look.color,
+          look.hidden ? 0 : whole ? 1 : painted,
+        ),
+        at * 4,
+      )
+      widths[at] = whole ? 1.6 : 0.8
+    })
+    graph.setLinkColors(linkColors)
+    graph.setLinkWidths(widths)
+  }
+
   /** Colors, sizes and shapes from the looks, and the links' colors and widths. */
-  const paint = (): void => {
+  const paint = (transition = 0): void => {
     if (!looks) {
       return
     }
@@ -317,20 +360,7 @@ export const cosmosDriver = (
     graph.setPointColors(colors)
     graph.setPointSizes(drawn)
     graph.setPointShapes(shapes)
-    const linkColors = new Float32Array(links.length * 4)
-    const widths = new Float32Array(links.length)
-    const lit = hovered === undefined ? undefined : ids[hovered]
-    links.forEach((link, at) => {
-      const look = (looks as GraphLooks).link(link.source, link.target)
-      const touches = lit !== undefined && (link.source === lit || link.target === lit)
-      linkColors.set(
-        channels(touches ? (looks as GraphLooks).node(lit).color : look.color, look.hidden ? 0 : 1),
-        at * 4,
-      )
-      widths[at] = look.raised || touches ? 1.6 : 0.8
-    })
-    graph.setLinkColors(linkColors)
-    graph.setLinkWidths(widths)
+    paintLinks()
     const focused = selected === undefined ? undefined : index.get(selected)
     graph.setConfigPartial({
       focusedPointIndex: focused,
@@ -339,7 +369,11 @@ export const cosmosDriver = (
       hoveredPointRingColor: channels(looks.ink, 0.6),
     })
     follow()
-    graph.render()
+    if (transition > 0) {
+      graph.render(undefined, transition)
+    } else {
+      graph.render()
+    }
     redraw()
   }
 
@@ -348,6 +382,7 @@ export const cosmosDriver = (
     nodes: readonly DrawnNode[],
     next: readonly DrawnLink[],
     positions: Float32Array,
+    transition = 0,
   ): void => {
     ids = nodes.map((node) => node.id)
     index = new Map(ids.map((id, at) => [id, at]))
@@ -361,7 +396,7 @@ export const cosmosDriver = (
     })
     graph.setPointPositions(positions, true)
     graph.setLinks(pairs)
-    paint()
+    paint(transition)
   }
 
   graph.setConfigPartial({
@@ -559,7 +594,7 @@ export const cosmosDriver = (
       names.remove()
       held.stop()
     },
-    update: (changes: GraphChanges) => {
+    update: (changes: GraphChanges, animate) => {
       /* cosmos.gl is by index, so a change is the arrays again: every note
          that stays where the layout has it now, unless the page moved it. */
       const flat = graph.getPointPositions()
@@ -573,9 +608,11 @@ export const cosmosDriver = (
       for (const id of changes.removeNodes) {
         kept.delete(id)
       }
+      let shifted = false
       for (const node of changes.changeNodes) {
         const was = drawnNow.get(node.id)
         const moved = was !== undefined && (was.x !== node.x || was.y !== node.y)
+        shifted ||= moved
         const now = kept.get(node.id)
         kept.set(node.id, moved || !now ? node : { ...node, x: now.x, y: now.y })
       }
@@ -594,7 +631,13 @@ export const cosmosDriver = (
       nodes.forEach((node, at) => {
         positions.set(toSpace(node), at * 2)
       })
-      load(nodes, next, positions)
+      /* Notes the page or a stencil moved glide to their new places, and the
+         view follows them unless the reader has moved it. */
+      const glide = shifted && animate ? MORPH : 0
+      load(nodes, next, positions, glide)
+      if (shifted) {
+        fitAll(glide)
+      }
     },
     zoomBy: (direction, animate) => {
       graph.setZoomLevel(
