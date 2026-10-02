@@ -18,6 +18,8 @@ const graphOf = () => {
     links: new Float32Array() as Float32Array<ArrayBufferLike>,
     pinned: null as number[] | null,
     positions: new Float32Array() as Float32Array<ArrayBufferLike>,
+    read: 0,
+    ready: true,
     shapes: new Float32Array() as Float32Array<ArrayBufferLike>,
     sizes: new Float32Array() as Float32Array<ArrayBufferLike>,
     started: false,
@@ -25,9 +27,18 @@ const graphOf = () => {
   const graph: CosmosGraph = {
     fitView: () => {},
     fitViewByPointIndices: () => {},
-    getPointPositions: () => [...held.positions],
+    getPointPositions: () => {
+      if (!held.ready) {
+        throw new TypeError('Cannot destructure property device')
+      }
+      held.read += 1
+      return [...held.positions]
+    },
     getTrackedPointPositionsMap: () => new Map(),
     getZoomLevel: () => 1,
+    get isReady() {
+      return held.ready
+    },
     pause: () => {},
     render: () => {},
     screenToSpacePosition: ([x, y]) => [x, y],
@@ -129,6 +140,27 @@ describe('cosmosDriver', () => {
       },
       false,
     )
+    expect([...held.positions.slice(0, 4)]).toEqual(before)
+    expect(held.positions).toHaveLength(6)
+  })
+
+  test('changes the graph while cosmos.gl is still starting, from where the notes were drawn', () => {
+    const { box, graph, held } = graphOf()
+    held.ready = false
+    const driver = cosmosDriver(graph, box)
+    driver.draw({ links: [], nodes })
+    const before = [...held.positions]
+    driver.update?.(
+      {
+        addLinks: [],
+        addNodes: [{ id: 'c', label: 'Charlie', size: 1, x: 0, y: 1 }],
+        changeNodes: [],
+        removeLinks: [],
+        removeNodes: [],
+      },
+      false,
+    )
+    expect(held.read).toBe(0)
     expect([...held.positions.slice(0, 4)]).toEqual(before)
     expect(held.positions).toHaveLength(6)
   })
