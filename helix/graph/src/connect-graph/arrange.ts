@@ -9,15 +9,52 @@ export interface ArrangedNode {
 /** The angle between one place and the next on a spiral: the golden angle, which never lines two up. */
 const TURN = Math.PI * (3 - Math.sqrt(5))
 
-/** The `at`th place on a spiral whose places are `spacing` apart. */
-const spiral = (at: number, spacing: number): GraphPoint => ({
-  x: Math.cos(at * TURN) * Math.sqrt(at + 0.5) * spacing,
-  y: Math.sin(at * TURN) * Math.sqrt(at + 0.5) * spacing,
+/** The golden ratio's fraction, which steps a ball's places down it without lining two up. */
+const STEP = (Math.sqrt(5) - 1) / 2
+
+/**
+ * The `at`th place on a spiral whose places are `spacing` apart, or, in a
+ * solid, in a ball: each place in a direction of its own and as far out as
+ * the room the places before it fill.
+ */
+const spiral = (at: number, spacing: number, solid: boolean): GraphPoint => {
+  if (!solid) {
+    return {
+      x: Math.cos(at * TURN) * Math.sqrt(at + 0.5) * spacing,
+      y: Math.sin(at * TURN) * Math.sqrt(at + 0.5) * spacing,
+    }
+  }
+  const height = 1 - 2 * ((at * STEP) % 1)
+  const around = Math.sqrt(1 - height * height)
+  const out = Math.cbrt(at + 0.5) * spacing
+  return {
+    x: Math.cos(at * TURN) * around * out,
+    y: height * out,
+    z: Math.sin(at * TURN) * around * out,
+  }
+}
+
+/** The `at`th of `count` directions spread evenly around a circle, or over a sphere in a solid. */
+const around = (at: number, count: number, solid: boolean): GraphPoint => {
+  if (!solid) {
+    const turn = (at / count) * Math.PI * 2
+    return { x: Math.cos(turn), y: Math.sin(turn) }
+  }
+  const height = 1 - (2 * (at + 0.5)) / count
+  const ring = Math.sqrt(1 - height * height)
+  return { x: Math.cos(at * TURN) * ring, y: height, z: Math.sin(at * TURN) * ring }
+}
+
+/** Two points added. */
+const plus = (one: GraphPoint, other: GraphPoint): GraphPoint => ({
+  x: one.x + other.x,
+  y: one.y + other.y,
+  ...(one.z === undefined && other.z === undefined ? {} : { z: (one.z ?? 0) + (other.z ?? 0) }),
 })
 
 /**
  * Places for every note from the graph's structure alone, with no layout to
- * wait for: **each group around a circle, each hub in its group, and each
+ * wait for: **each group around a circle, or a sphere in a solid, each hub in its group, and each
  * note beside the hub it hangs from**, the most connected note it links to
  * in its group.
  *
@@ -29,6 +66,7 @@ const spiral = (at: number, spacing: number): GraphPoint => ({
 export const arrangeByGroup = (
   nodes: readonly ArrangedNode[],
   links: readonly SeedLink[],
+  { solid = false }: { solid?: boolean } = {},
 ): Map<string, GraphPoint> => {
   const groupOf = new Map(nodes.map((node) => [node.id, node.group ?? '']))
   const degree = new Map<string, number>()
@@ -98,26 +136,38 @@ export const arrangeByGroup = (
     for (const members of hubs.values()) {
       count += members.length + 1
     }
-    return Math.sqrt(count) * 1.5
+    return (solid ? Math.cbrt(count) : Math.sqrt(count)) * 1.5
   }
   const radii = [...groups.values()].map(radiusOf)
   const widest = Math.max(0, ...radii)
-  const ring = groups.size > 1 ? (widest * 1.2) / Math.sin(Math.PI / groups.size) : 0
+  /* Far enough out that neighboring groups, a circle's or a sphere's share
+     of the way around apart, do not overlap. */
+  const ring =
+    groups.size > 1
+      ? solid
+        ? (widest * 2.4) / Math.sqrt((4 * Math.PI) / groups.size)
+        : (widest * 1.2) / Math.sin(Math.PI / groups.size)
+      : 0
   const positions = new Map<string, GraphPoint>()
   ;[...groups.values()].forEach((hubs, at) => {
-    const turn = (at / groups.size) * Math.PI * 2
-    const middle = { x: Math.cos(turn) * ring, y: Math.sin(turn) * ring }
+    const way = around(at, groups.size, solid)
+    const middle = {
+      x: way.x * ring,
+      y: way.y * ring,
+      ...(solid ? { z: (way.z ?? 0) * ring } : {}),
+    }
     const ordered = [...hubs].sort(([, one], [, other]) => other.length - one.length)
     const mean = ordered.reduce((sum, [, members]) => sum + members.length + 1, 0) / ordered.length
     ordered.forEach(([hub, members], place) => {
-      const spot = spiral(place, Math.sqrt(mean) * 2)
-      const center = { x: middle.x + spot.x, y: middle.y + spot.y }
+      const center = plus(
+        middle,
+        spiral(place, (solid ? Math.cbrt(mean) : Math.sqrt(mean)) * 2, solid),
+      )
       positions.set(hub, center)
       members
         .sort((one, other) => rank(other) - rank(one))
         .forEach((member, step) => {
-          const off = spiral(step + 1, 1)
-          positions.set(member, { x: center.x + off.x, y: center.y + off.y })
+          positions.set(member, plus(center, spiral(step + 1, 1, solid)))
         })
     })
   })

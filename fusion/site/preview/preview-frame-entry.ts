@@ -25,6 +25,7 @@ import { RESTYLED } from './preview-events'
 
 /** Where the map chunk, MapLibre and the graph chunk are, stamped at build time. */
 declare const __PREVIEW_GRAPH_COSMOS_URL__: string
+declare const __PREVIEW_GRAPH_THREE_URL__: string
 declare const __PREVIEW_GRAPH_URL__: string
 declare const __PREVIEW_MAP_URL__: string
 declare const __PREVIEW_MAPLIBRE_URL__: string
@@ -104,11 +105,25 @@ const mountMaps = (root: HTMLElement, at: number): void => {
  * with Sigma and the connector loaded the first time one does and never before.
  */
 const mountGraphs = (root: HTMLElement, at: number): void => {
-  if (root.querySelector('helix-graph[data-preview-graph]:not([data-preview-graph="cosmos"])')) {
+  if (
+    root.querySelector(
+      'helix-graph[data-preview-graph]:not([data-preview-graph="cosmos"]):not([data-preview-graph="three"])',
+    )
+  ) {
     void load(__PREVIEW_GRAPH_URL__)
       .then(() => {
         if (at === generation && window.helixPreviewGraph) {
           mounted.push(window.helixPreviewGraph.mount(root))
+        }
+      })
+      .catch((error: unknown) => console.error(String(error)))
+  }
+  /* A graph three.js draws, in three dimensions, from a chunk of its own. */
+  if (root.querySelector('helix-graph[data-preview-graph="three"]')) {
+    void load(__PREVIEW_GRAPH_THREE_URL__)
+      .then(() => {
+        if (at === generation && window.helixPreviewGraphThree) {
+          mounted.push(window.helixPreviewGraphThree.mount(root))
         }
       })
       .catch((error: unknown) => console.error(String(error)))

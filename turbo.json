@@ -429,6 +429,7 @@
         "preview/preview-graph-cosmos-entry.ts",
         "preview/preview-graph-entry.ts",
         "preview/preview-graph-stencil.ts",
+        "preview/preview-graph-three-entry.ts",
         "preview/preview-map-entry.ts",
         "preview/preview-maplibre-entry.ts",
         "utils/map-view/map-view.ts",
@@ -439,7 +440,8 @@
         "$TURBO_ROOT$/fusion/site/scripts/build-frame.mjs",
         "$TURBO_ROOT$/node_modules/maplibre-gl/package.json",
         "$TURBO_ROOT$/node_modules/sigma/package.json",
-        "$TURBO_ROOT$/node_modules/@cosmos.gl/graph/package.json"
+        "$TURBO_ROOT$/node_modules/@cosmos.gl/graph/package.json",
+        "$TURBO_ROOT$/node_modules/three/package.json"
       ],
       "outputs": ["public/sandbox/**"]
     },

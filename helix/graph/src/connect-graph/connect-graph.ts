@@ -27,7 +27,7 @@ import {
   toneColor,
 } from './looks.js'
 import { type GraphPoint, seedPositions } from './seed.js'
-import { fitToStencil, type GraphStencil } from './stencil.js'
+import { fieldOf, fitToStencil, type GraphStencil } from './stencil.js'
 
 export type { DrawnLink, DrawnNode, GraphChanges } from './diff.js'
 
@@ -110,6 +110,13 @@ export interface GraphDriver {
    * outside the group is selected.
    */
   groups?(groups: readonly GraphGroup[]): void
+  /**
+   * Where in a shape the notes are drawn, where a `stencil` gives one:
+   * `surface`, a shell, whose far side a renderer that draws in three
+   * dimensions sets back so its near side reads; `fill`, all through it; or
+   * undefined, no shape.
+   */
+  shape?(place: 'fill' | 'surface' | undefined): void
   /** Removes whatever the driver added to the renderer or the page, when the connection ends. */
   stop?(): void
 }
@@ -322,8 +329,14 @@ export const connectGraph = (
        nothing has a place, so a page's own places and a layout's are kept. */
     const shaped =
       options.stencil && ids.size > 0 && unplaced.size === ids.size
-        ? fitToStencil(arrangeByGroup(nodes, [...nextLinks.values()]), options.stencil)
+        ? fitToStencil(
+            arrangeByGroup(nodes, [...nextLinks.values()], {
+              solid: fieldOf(options.stencil).depth > 0,
+            }),
+            options.stencil,
+          )
         : undefined
+    driver.shape?.(options.stencil ? (options.stencil.place ?? 'fill') : undefined)
     if (shaped) {
       positions = shaped
       unplaced = new Set()
@@ -350,6 +363,7 @@ export const connectGraph = (
           : 1 + Math.min(Math.sqrt(degree.get(node.id) ?? 0), 6),
         x: at.x,
         y: at.y,
+        ...(at.z === undefined ? {} : { z: at.z }),
       })
     }
     for (const id of waiting) {
@@ -387,7 +401,7 @@ export const connectGraph = (
         for (const [id, at] of settled) {
           const node = drawnNodes.get(id)
           if (node) {
-            drawnNodes.set(id, { ...node, x: at.x, y: at.y })
+            drawnNodes.set(id, { ...node, x: at.x, y: at.y, z: at.z })
           }
         }
         graph.laidOut?.(Object.fromEntries([...settled].map(([id, at]) => [id, { ...at }])))

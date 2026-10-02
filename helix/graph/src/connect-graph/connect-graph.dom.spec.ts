@@ -160,6 +160,19 @@ describe('connectGraph', () => {
     expect(host.ready).toBe(true)
   })
 
+  test('tells the driver where in its shape the notes are drawn', async () => {
+    const host = await frame()
+    const places: ('fill' | 'surface' | undefined)[] = []
+    const { driver } = recording()
+    connectGraph(
+      host,
+      { ...driver, shape: (place) => places.push(place) },
+      { stencil: { height: 10, inside: () => true, place: 'surface', width: 10 } },
+    )
+    await settled(host)
+    expect(places.at(-1)).toBe('surface')
+  })
+
   test('leaves a graph with places of its own to the layout when a stencil is given', async () => {
     const host = await frame()
     const recorder = recording(true, true)

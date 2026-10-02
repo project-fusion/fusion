@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'bun:test'
+import { arrangeByGroup } from './arrange.js'
 import type { GraphPoint } from './seed.js'
+import { fieldFromInside } from './shape-field.js'
 import { fitToStencil, type GraphStencil } from './stencil.js'
 
 /** A square of notes from 0 to 100 each way, `side` to a row. */
@@ -56,5 +58,54 @@ describe('fitToStencil', () => {
   test('leaves the notes where they were when the shape has no inside', () => {
     const notes = square(4)
     expect(fitToStencil(notes, { height: 10, inside: () => false, width: 10 })).toEqual(notes)
+  })
+})
+
+describe('fitToStencil in three dimensions', () => {
+  /* Two groups of a hub and 199 notes each, arranged in three dimensions. */
+  const nodes = ['a', 'b'].flatMap((group) => [
+    { group, id: `${group}-hub` },
+    ...Array.from({ length: 199 }, (_, at) => ({ group, id: `${group}-${at}` })),
+  ])
+  const links = ['a', 'b'].flatMap((group) =>
+    Array.from({ length: 199 }, (_, at) => ({ source: `${group}-${at}`, target: `${group}-hub` })),
+  )
+  const ball = fieldFromInside((x, y, z) => Math.hypot(x - 50, y - 50, z - 50) < 45, {
+    depth: 100,
+    height: 100,
+    width: 100,
+  })
+  const fitted = fitToStencil(arrangeByGroup(nodes, links, { solid: true }), {
+    ...ball,
+    place: 'surface',
+  })
+  const points = [...fitted.values()]
+  const middle = {
+    x: points.reduce((sum, at) => sum + at.x, 0) / points.length,
+    y: points.reduce((sum, at) => sum + at.y, 0) / points.length,
+    z: points.reduce((sum, at) => sum + (at.z ?? 0), 0) / points.length,
+  }
+  const out = (at: { x: number; y: number; z?: number | undefined }): number =>
+    Math.hypot(at.x - middle.x, at.y - middle.y, (at.z ?? 0) - middle.z)
+
+  test('puts every note on the surface: all about as far from the middle', () => {
+    expect(fitted.size).toBe(400)
+    const reach = points.map(out)
+    expect(Math.min(...reach) / Math.max(...reach)).toBeGreaterThan(0.85)
+  })
+
+  test('puts each group on one side of the shape', () => {
+    const side = (group: string) => {
+      const mine = [...fitted].filter(([id]) => id.startsWith(`${group}-`)).map(([, at]) => at)
+      const x = mine.reduce((sum, at) => sum + at.x - middle.x, 0)
+      const y = mine.reduce((sum, at) => sum + at.y - middle.y, 0)
+      const z = mine.reduce((sum, at) => sum + (at.z ?? 0) - middle.z, 0)
+      const length = Math.hypot(x, y, z)
+      return { x: x / length, y: y / length, z: z / length }
+    }
+    const a = side('a')
+    const b = side('b')
+    /* The two groups' middles point away from each other. */
+    expect(a.x * b.x + a.y * b.y + a.z * b.z).toBeLessThan(-0.5)
   })
 })
