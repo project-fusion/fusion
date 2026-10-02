@@ -24,6 +24,7 @@ import {
   WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
 import type {
   DrawnLink,
   DrawnNode,
@@ -209,10 +210,15 @@ varying vec3 vNormal;
 varying vec3 vView;
 
 void main() {
-  /* The ground's color, a breath of ink at the edge turning away, so the
-     shape is felt and not seen: the notes on it are what is drawn. */
-  float edge = 1.0 - abs(dot(normalize(vNormal), normalize(vView)));
-  gl_FragColor = vec4(mix(ground, ink, 0.16 * pow(edge, 2.0)), 1.0);
+  /* The ground's color, a breath of ink at the edge turning away and where
+     light from above and to the left falls, so the shape and its folds are
+     felt and not seen: the notes on it are what is drawn. */
+  vec3 normal = normalize(vNormal);
+  vec3 view = normalize(vView);
+  if (dot(normal, view) < 0.0) normal = -normal;
+  float edge = 1.0 - dot(normal, view);
+  float lit = max(dot(normal, normalize(vec3(-0.4, 0.8, 0.45))), 0.0);
+  gl_FragColor = vec4(mix(ground, ink, 0.12 * pow(edge, 2.0) + 0.14 * lit * lit), 1.0);
 }
 `
 
@@ -359,20 +365,62 @@ export const threeDriver = (
       return
     }
     solidAt = scale
-    const { corners, triangles } = surfaceOf(frame.field, -frame.shell * 0.6)
-    const { depth, height, width } = frame.field
-    for (let at = 0; at < corners.length; at += 3) {
-      corners[at] = (frame.middle.x + ((corners[at] as number) - width / 2) * frame.scale) * scale
-      corners[at + 1] =
-        (frame.middle.y - ((corners[at + 1] as number) - height / 2) * frame.scale) * scale
-      corners[at + 2] =
-        (frame.middle.z + ((corners[at + 2] as number) - depth / 2) * frame.scale) * scale
+    const { field } = frame
+    const inset = frame.shell * 0.6
+    /* **The shape's own surface where it came with one**, as a model does,
+       which holds every fold; otherwise one made from the field. Moved in
+       along its normals, so it sits just inside the notes. */
+    let geometry = new BufferGeometry()
+    if (field.mesh) {
+      geometry.setAttribute('position', new BufferAttribute(field.mesh.corners.slice(), 3))
+      geometry.setIndex(new BufferAttribute(field.mesh.triangles, 1))
+      geometry.deleteAttribute('normal')
+      geometry = mergeVertices(geometry)
+      geometry.computeVertexNormals()
+      const place = geometry.getAttribute('position') as BufferAttribute
+      const normal = geometry.getAttribute('normal') as BufferAttribute
+      /* Which way is in: the way the field falls below zero, read at a few corners. */
+      let inward = 0
+      for (let at = 0; at < place.count; at += Math.max(1, Math.floor(place.count / 64))) {
+        const [x, y, z, nx, ny, nz] = [
+          place.getX(at),
+          place.getY(at),
+          place.getZ(at),
+          normal.getX(at),
+          normal.getY(at),
+          normal.getZ(at),
+        ]
+        inward +=
+          field.distance(x + nx * inset, y + ny * inset, z + nz * inset) -
+          field.distance(x - nx * inset, y - ny * inset, z - nz * inset)
+      }
+      const step = inward > 0 ? -inset : inset
+      for (let at = 0; at < place.count; at++) {
+        place.setXYZ(
+          at,
+          place.getX(at) + normal.getX(at) * step,
+          place.getY(at) + normal.getY(at) * step,
+          place.getZ(at) + normal.getZ(at) * step,
+        )
+      }
+    } else {
+      const { corners, triangles } = surfaceOf(field, { at: -inset })
+      geometry.setAttribute('position', new BufferAttribute(corners, 3))
+      geometry.setIndex(new BufferAttribute(triangles, 1))
     }
+    const place = geometry.getAttribute('position') as BufferAttribute
+    const { depth, height, width } = field
+    for (let at = 0; at < place.count; at++) {
+      place.setXYZ(
+        at,
+        (frame.middle.x + (place.getX(at) - width / 2) * frame.scale) * scale,
+        (frame.middle.y - (place.getY(at) - height / 2) * frame.scale) * scale,
+        (frame.middle.z + (place.getZ(at) - depth / 2) * frame.scale) * scale,
+      )
+    }
+    geometry.computeVertexNormals()
     solid.geometry.dispose()
-    solid.geometry = new BufferGeometry()
-    solid.geometry.setAttribute('position', new BufferAttribute(corners, 3))
-    solid.geometry.setIndex(new BufferAttribute(triangles, 1))
-    solid.geometry.computeVertexNormals()
+    solid.geometry = geometry
     solid.visible = true
   }
 
