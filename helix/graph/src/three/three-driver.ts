@@ -141,25 +141,36 @@ float fade(float depth) {
 `
 
 /**
- * How a note's surface is lit, the same for an orb and a cube: from a light
- * fixed in the scene, so a highlight moves over the note as the reader turns
- * the graph, with a soft fill, a sharp highlight, and its rim brighter in its
- * own color, as light catches the edge of glass. `n` and `light` are in the
- * view's space, `n` facing the eye at `z` 1.
+ * **A note as an orb of energy**: on a dark ground, a dark glassy body in
+ * its color, a rim that glows brighter toward its edge, energy gathering at
+ * its middle to a hot point, and a crisp glint where the light fixed in the
+ * scene catches it, so the glint moves as the reader turns the graph. On a
+ * light ground, where light cannot glow, frosted glass: pale at its middle,
+ * its color deepening to a ring at its rim, and the same glint. `n` and `light` are in the view's space, `n` facing
+ * the eye at `z` 1. Returns the color and how opaque it is.
  */
 // language=GLSL
-const SHADE = /* glsl */ `
+const ORB = /* glsl */ `
 uniform vec3 light;
+uniform float dark;
 
-vec3 shade(vec3 base, vec3 n) {
+vec4 orb(vec3 base, vec3 n) {
   float diffuse = max(dot(n, light), 0.0);
-  vec3 half_ = normalize(light + vec3(0.0, 0.0, 1.0));
-  float highlight = pow(max(dot(n, half_), 0.0), 42.0);
-  float rim = pow(1.0 - clamp(n.z, 0.0, 1.0), 2.4);
-  vec3 color = base * (0.36 + 0.8 * diffuse);
-  color += vec3(1.0) * highlight * 0.6;
-  color += min(base * 1.4, vec3(1.0)) * rim * 0.32;
-  return color;
+  float rim = pow(1.0 - clamp(n.z, 0.0, 1.0), 2.2);
+  float core = pow(clamp(n.z, 0.0, 1.0), 5.0);
+  float glint = pow(max(dot(n, normalize(light + vec3(0.0, 0.0, 1.0))), 0.0), 140.0);
+  vec3 energy = base * (0.08 + 0.2 * diffuse);
+  energy += base * core * 0.5;
+  energy += mix(base, vec3(1.0), 0.6) * pow(clamp(n.z, 0.0, 1.0), 40.0) * 0.55;
+  energy += mix(base, vec3(1.0), 0.25) * rim * 1.2;
+  energy += vec3(glint * 0.55);
+  vec3 frost = mix(base, vec3(1.0), 0.45 * pow(clamp(n.z, 0.0, 1.0), 1.5));
+  frost *= 0.86 + 0.14 * diffuse;
+  frost = mix(frost, base * 0.78, rim * 0.75);
+  frost += vec3(glint * 0.6);
+  return dark > 0.5
+    ? vec4(energy, mix(0.5, 1.0, max(rim, core)))
+    : vec4(frost, mix(0.78, 1.0, rim));
 }
 `
 
@@ -213,7 +224,7 @@ void main() {
 // language=GLSL
 const FRAGMENT = /* glsl */ `
 uniform mat4 projectionMatrix;
-${SHADE}
+${ORB}
 varying vec4 vTint;
 varying float vShape;
 varying float vFade;
@@ -228,10 +239,12 @@ void main() {
   vec3 n = vec3(q, sqrt(1.0 - d2));
   vec4 clip = projectionMatrix * vec4(vCenter + n * vRadius, 1.0);
   gl_FragDepth = clip.z / clip.w * 0.5 + 0.5;
-  float edge = 1.0 - smoothstep(0.9, 1.0, sqrt(d2));
-  float alpha = edge * vTint.a * vFade;
+  /* Antialiased in the last few percent only, so the glowing rim runs to the edge. */
+  float edge = 1.0 - smoothstep(0.965, 1.0, sqrt(d2));
+  vec4 lit = orb(vTint.rgb, n);
+  float alpha = edge * lit.a * vTint.a * vFade;
   if (alpha < 0.01) discard;
-  gl_FragColor = vec4(shade(vTint.rgb, n), alpha);
+  gl_FragColor = vec4(lit.rgb, alpha);
 }
 `
 
@@ -248,21 +261,30 @@ varying float vRoom;
 void main() {
   vec2 q = (gl_PointCoord * 2.0 - 1.0) * vRoom;
   float d = vShape > 1.5 ? (abs(q.x) + abs(q.y)) * 0.78 : vShape > 0.5 ? max(abs(q.x), abs(q.y)) * 1.08 : length(q);
-  if (d < 1.0) discard;
-  float past = clamp((d - 1.0) / max(vRoom - 1.0, 0.001), 0.0, 1.0);
+  /* From just inside the body's edge, under its antialiasing, so no seam of
+     dark ground shows between the body and its halo. */
+  if (d < 0.965) discard;
+  float past = clamp((d - 0.965) / max(vRoom - 0.965, 0.001), 0.0, 1.0);
   float alpha = (bloom + vGlow * 0.6) * pow(1.0 - past, 2.4) * vTint.a * vFade;
   if (alpha < 0.01) discard;
   gl_FragColor = vec4(vTint.rgb, alpha);
 }
 `
 
-/** A note drawn as a mesh, a cube or an octahedron, one instance a note, lit as an orb is. */
+/**
+ * A note drawn as a mesh, a cube or an octahedron, one instance a note:
+ * **a hologram**, faint faces with fine edges of light, the edges at the
+ * back showing through. `frame` says how far a point is from its face's
+ * edges, the least of its four numbers.
+ */
 // language=GLSL
 const SHAPE_VERTEX = /* glsl */ `
 ${FADE}
 attribute vec4 tone;
+attribute vec4 frame;
 varying vec3 vNormal;
 varying vec4 vTone;
+varying vec4 vFrame;
 varying float vFade;
 
 void main() {
@@ -270,21 +292,32 @@ void main() {
   gl_Position = projectionMatrix * view;
   vNormal = normalize(normalMatrix * mat3(instanceMatrix) * normal);
   vTone = tone;
+  vFrame = frame;
   vFade = fade(max(-view.z, 0.001));
 }
 `
 
 // language=GLSL
 const SHAPE_FRAGMENT = /* glsl */ `
-${SHADE}
+uniform float dark;
 varying vec3 vNormal;
 varying vec4 vTone;
+varying vec4 vFrame;
 varying float vFade;
 
 void main() {
-  float alpha = vTone.a * vFade;
+  float e = min(min(vFrame.x, vFrame.y), min(vFrame.z, vFrame.w));
+  float w = fwidth(e);
+  /* The edge as a line about a pixel and a half wide, whatever the size. */
+  float line = 1.0 - smoothstep(w * 0.6, w * 2.2, e);
+  float inner = exp(-e * 12.0);
+  float facing = abs(normalize(vNormal).z);
+  vec3 edge = dark > 0.5 ? mix(vTone.rgb, vec3(1.0), 0.35) : vTone.rgb * 0.8;
+  vec3 face = vTone.rgb * (dark > 0.5 ? 0.3 + 0.7 * inner : 1.0);
+  float faceAlpha = (dark > 0.5 ? 0.1 : 0.16) + 0.3 * inner + 0.12 * (1.0 - facing);
+  float alpha = mix(faceAlpha, 1.0, line) * vTone.a * vFade;
   if (alpha < 0.01) discard;
-  gl_FragColor = vec4(shade(vTone.rgb, normalize(vNormal)), alpha);
+  gl_FragColor = vec4(mix(face, edge, line), alpha);
 }
 `
 
@@ -356,6 +389,31 @@ void main() {
   gl_FragColor = vec4(rim, 1.0);
 }
 `
+
+/**
+ * A mesh with how far each point is from its face's edges, as the hologram
+ * draws them: a box's faces are squares, read off their texture coordinates,
+ * and an octahedron's triangles, read off each corner's share.
+ */
+const framed = (geometry: BufferGeometry): BufferGeometry => {
+  const uv = geometry.getAttribute('uv') as BufferAttribute | undefined
+  const count = geometry.getAttribute('position').count
+  const frame = new Float32Array(count * 4)
+  if (geometry.getIndex() && uv) {
+    for (let at = 0; at < count; at++) {
+      const u = uv.getX(at)
+      const v = uv.getY(at)
+      frame.set([u, 1 - u, v, 1 - v], at * 4)
+    }
+  } else {
+    for (let at = 0; at < count; at++) {
+      const corner = at % 3
+      frame.set([corner === 0 ? 1 : 0, corner === 1 ? 1 : 0, corner === 2 ? 1 : 0, 1], at * 4)
+    }
+  }
+  geometry.setAttribute('frame', new BufferAttribute(frame, 4))
+  return geometry
+}
 
 /** An `rgb()` color as three channels from 0 to 1. */
 const channels = (color: string): [number, number, number] => {
@@ -431,6 +489,7 @@ export const threeDriver = (
 
   const uniforms = {
     bloom: { value: BLOOM.dark },
+    dark: { value: 1 },
     light: { value: new Vector3(-0.4, 0.8, 0.45).normalize() },
     middle: { value: 1 },
     radius: { value: 1 },
@@ -478,10 +537,12 @@ export const threeDriver = (
   halos.renderOrder = 1
   /* Notes in another shape, as meshes: a cube for a square, an octahedron for a diamond. */
   const shapeMaterial = new ShaderMaterial({
+    depthWrite: false,
     fragmentShader: SHAPE_FRAGMENT,
+    side: DoubleSide,
     transparent: true,
     uniforms: {
-      light: uniforms.light,
+      dark: uniforms.dark,
       middle: uniforms.middle,
       radius: uniforms.radius,
       steep: uniforms.steep,
@@ -490,12 +551,12 @@ export const threeDriver = (
   })
   const solids = {
     cube: {
-      geometry: new BoxGeometry(1.5, 1.5, 1.5),
+      geometry: framed(new BoxGeometry(1.5, 1.5, 1.5)),
       mesh: undefined as InstancedMesh | undefined,
       spots: [] as number[],
     },
     octahedron: {
-      geometry: new OctahedronGeometry(1.15),
+      geometry: framed(new OctahedronGeometry(1.15)),
       mesh: undefined as InstancedMesh | undefined,
       spots: [] as number[],
     },
@@ -544,7 +605,8 @@ export const threeDriver = (
     }
     solidAt = scale
     const { field } = frame
-    const inset = frame.shell * 0.6
+    /* Below the deepest notes in the shell, so none is cut by the surface it sits on. */
+    const inset = frame.shell * 1.15
     /* **The shape's own surface where it came with one**, as a model does,
        which holds every fold; otherwise one made from the field. Moved in
        along the field's own slope, read a cell apart, which is smooth where
@@ -907,9 +969,12 @@ export const threeDriver = (
     ;(solidUniforms.ink as { value: number[] }).value = channels(looks.ink)
     ;(solid.material.uniforms.strength as { value: number }).value = dark ? WASH.dark : WASH.light
     uniforms.bloom.value = dark ? BLOOM.dark : BLOOM.light
+    uniforms.dark.value = dark ? 1 : 0
     /* Bodies are solid and painted; light, the halos and links, adds up on a dark ground. */
     const blending = dark ? AdditiveBlending : NormalBlending
     halos.material.blending = blending
+    shapeMaterial.blending = blending
+    shapeMaterial.needsUpdate = true
     quiet.material.blending = blending
     lit.material.blending = blending
     halos.material.needsUpdate = true
