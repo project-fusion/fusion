@@ -415,6 +415,52 @@ const framed = (geometry: BufferGeometry): BufferGeometry => {
   return geometry
 }
 
+/** How many passes smooth the way a surface is moved in, and the surface after. */
+const SMOOTH = { surface: 3, ways: 6 }
+
+/** Each corner's neighbors on a surface, from its triangles. */
+const neighborsOf = (index: BufferAttribute, count: number): Int32Array[] => {
+  const sets: Set<number>[] = Array.from({ length: count }, () => new Set())
+  for (let at = 0; at < index.count; at += 3) {
+    const a = index.getX(at)
+    const b = index.getX(at + 1)
+    const c = index.getX(at + 2)
+    sets[a]?.add(b).add(c)
+    sets[b]?.add(a).add(c)
+    sets[c]?.add(a).add(b)
+  }
+  return sets.map((set) => Int32Array.from(set))
+}
+
+/** Each corner's three numbers moved `share` of the way toward its neighbors' average: away from it where `share` is below zero. */
+const averaged = (
+  values: Float32Array<ArrayBufferLike>,
+  neighbors: Int32Array[],
+  share: number,
+): Float32Array<ArrayBufferLike> => {
+  const out = new Float32Array(values.length)
+  neighbors.forEach((around, at) => {
+    let x = 0
+    let y = 0
+    let z = 0
+    for (const other of around) {
+      x += values[other * 3] as number
+      y += values[other * 3 + 1] as number
+      z += values[other * 3 + 2] as number
+    }
+    const many = around.length || 1
+    for (const [axis, sum] of [
+      [0, x],
+      [1, y],
+      [2, z],
+    ] as const) {
+      const value = values[at * 3 + axis] as number
+      out[at * 3 + axis] = around.length ? value + share * (sum / many - value) : value
+    }
+  })
+  return out
+}
+
 /** An `rgb()` color as three channels from 0 to 1. */
 const channels = (color: string): [number, number, number] => {
   const [red = 128, green = 128, blue = 128] = color.match(/[\d.]+/g)?.map(Number) ?? []
@@ -618,22 +664,44 @@ export const threeDriver = (
       geometry.setIndex(new BufferAttribute(field.mesh.triangles, 1))
       geometry = mergeVertices(geometry)
       const place = geometry.getAttribute('position') as BufferAttribute
+      const count = place.count
+      const neighbors = neighborsOf(geometry.getIndex() as BufferAttribute, count)
+      /* Which way is in at each corner: the field's slope, read a cell apart,
+         and then **smoothed across neighboring corners**, since slopes read
+         off a coarse field differ from corner to corner, and a surface moved
+         along them comes out jagged. */
       const step = Math.max(field.width, field.height, field.depth) / 64
-      for (let at = 0; at < place.count; at++) {
+      let way: Float32Array<ArrayBufferLike> = new Float32Array(count * 3)
+      for (let at = 0; at < count; at++) {
         const x = place.getX(at)
         const y = place.getY(at)
         const z = place.getZ(at)
-        const gx = field.distance(x + step, y, z) - field.distance(x - step, y, z)
-        const gy = field.distance(x, y + step, z) - field.distance(x, y - step, z)
-        const gz = field.distance(x, y, z + step) - field.distance(x, y, z - step)
-        const length = Math.hypot(gx, gy, gz) || 1
+        way[at * 3] = field.distance(x + step, y, z) - field.distance(x - step, y, z)
+        way[at * 3 + 1] = field.distance(x, y + step, z) - field.distance(x, y - step, z)
+        way[at * 3 + 2] = field.distance(x, y, z + step) - field.distance(x, y, z - step)
+      }
+      for (let pass = 0; pass < SMOOTH.ways; pass++) {
+        way = averaged(way, neighbors, 0.5)
+      }
+      for (let at = 0; at < count; at++) {
+        const length =
+          Math.hypot(way[at * 3] as number, way[at * 3 + 1] as number, way[at * 3 + 2] as number) ||
+          1
         place.setXYZ(
           at,
-          x - (gx / length) * inset,
-          y - (gy / length) * inset,
-          z - (gz / length) * inset,
+          place.getX(at) - ((way[at * 3] as number) / length) * inset,
+          place.getY(at) - ((way[at * 3 + 1] as number) / length) * inset,
+          place.getZ(at) - ((way[at * 3 + 2] as number) / length) * inset,
         )
       }
+      /* **The surface itself smoothed** a few times over, each pass a step
+         toward its neighbors and a step back out, so its folds soften and
+         it keeps its size. */
+      let corners: Float32Array<ArrayBufferLike> = place.array as Float32Array
+      for (let pass = 0; pass < SMOOTH.surface; pass++) {
+        corners = averaged(averaged(corners, neighbors, 0.5), neighbors, -0.53)
+      }
+      place.array.set(corners)
     } else {
       const { corners, triangles } = surfaceOf(field, { at: -inset })
       geometry.setAttribute('position', new BufferAttribute(corners, 3))
