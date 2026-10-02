@@ -155,9 +155,9 @@ product built on it, is licensed for noncommercial use only.
 
 ## Shapes
 
-**`stencil` fits the notes into a shape** once a layout has placed all of
-them, such as a brain or a country's outline. Pass an SVG path and the box it
-is drawn in, as the SVG's `viewBox` gives it:
+**`stencil` draws the notes in a shape**, such as a brain or a country's
+outline. Pass an SVG path and the box it is drawn in, as the SVG's `viewBox`
+gives it:
 
 ```js
 connectGraph(frame, driver, {
@@ -165,13 +165,14 @@ connectGraph(frame, driver, {
 })
 ```
 
-The notes fill the shape evenly and keep their order, left to right and top
-to bottom, so the notes a layout put together land together and each group
-takes a region of the shape. Holes are cut by the even-odd rule, which is how
-the grooves of a brain show. With cosmos.gl the notes glide from the layout
-into the shape. A layout that places only new notes leaves the others where
-they are. `stencil` also takes `inside(x, y)`, a test of whether a point in
-the box is in the shape, in place of `path`.
+No layout runs, so the shape is there from the first frame. Each group takes
+a region of the shape, each note sits by the hub it links to, and the notes
+fill the shape evenly, with borders between regions that curve. Holes are cut
+by the even-odd rule, which is how the grooves of a brain show. Only a graph
+with no places of its own is shaped; a note added later is placed by the
+layout beside its neighbors. `stencil` also takes `inside(x, y)`, a test of
+whether a point in the box is in the shape, in place of `path`, and
+`fitToStencil` fits places a page has into one.
 
 ## What it exports
 
@@ -191,7 +192,7 @@ Sigma 3 is a peer dependency.
 | `connectGraph` option | Default | What else it takes |
 |---|---|---|
 | `center` | `true` | `false` leaves the view where it is when a note is chosen in the list |
-| `stencil` | none | A shape to fit the notes into: `{ path, width, height }` or `{ inside, width, height }` |
+| `stencil` | none | A shape to draw the notes in: `{ path, width, height }` or `{ inside, width, height }` |
 
 | `sigmaDriver` option | Default | What else it takes |
 |---|---|---|

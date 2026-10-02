@@ -23,7 +23,6 @@ const start = (frame: HTMLElement): (() => void) => {
   const graph = new Graph(box, {
     attribution: '',
     enableSimulation: true,
-    fitViewOnInit: true,
     renderHoveredPointRing: true,
     scalePointsOnZoom: false,
   })

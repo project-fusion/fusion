@@ -40,6 +40,7 @@ const graphOf = () => {
       return held.ready
     },
     pause: () => {},
+    ready: Promise.resolve(),
     render: () => {},
     screenToSpacePosition: ([x, y]) => [x, y],
     setClusterPositions: () => {},
