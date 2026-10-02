@@ -146,7 +146,9 @@ cosmos.gl draws notes with its own shaders, so a note's `shape` is honored and
 its `material` and `emphasis` are not. Each group is given a place of its own
 and its notes are drawn toward it, so twenty thousand notes in twelve groups
 come apart into twelve regions. The view follows the layout as it opens out,
-until the reader moves it.
+until the reader moves it. Zoomed out, a note is a fine point and a leaf is
+drawn partly clear, so a group reads as a field of points with its hubs
+standing out; notes grow as the reader zooms in.
 
 **The driver is for `@cosmos.gl/graph`, which is MIT.** Cosmograph, the
 product built on it, is licensed for noncommercial use only.

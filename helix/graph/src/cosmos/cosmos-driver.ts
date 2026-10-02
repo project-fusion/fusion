@@ -73,7 +73,7 @@ const SAMPLE = 24
 const pixels = (size: number): number => 0.5 * (1.6 + 1.35 * Math.max(size, 0))
 
 /** How hard each group's notes are drawn toward its place, which keeps the groups apart. */
-const CLUSTER = 0.03
+const CLUSTER = 0.1
 
 /** How often the view is fitted to the layout as it opens out, in milliseconds. */
 const FOLLOW = 1000
@@ -265,6 +265,26 @@ export const cosmosDriver = (
   const fitAll = (duration: number): void => {
     if (!moved) {
       graph.fitView(duration, PADDING)
+      clearTimeout(overviewing)
+      overviewing = setTimeout(() => {
+        overview = graph.getZoomLevel()
+        grow()
+      }, duration + 20)
+    }
+  }
+
+  /* **Notes grow as the reader zooms in**, from fine points across the whole
+     graph to the size the Sigma driver draws a note, so the overview reads as
+     a field of light and a neighborhood as notes. */
+  let overview = 0
+  let overviewing: ReturnType<typeof setTimeout> | undefined
+  let grown = 1
+  const grow = (): void => {
+    const by =
+      overview > 0 ? Math.min(Math.max(Math.sqrt(graph.getZoomLevel() / overview), 0.7), 2.4) : 1
+    if (Math.abs(by - grown) > 0.01) {
+      grown = by
+      graph.setConfigPartial({ pointSizeScale: by })
     }
   }
 
@@ -280,7 +300,12 @@ export const cosmosDriver = (
     near = new Set()
     ids.forEach((id, at) => {
       const look = (looks as GraphLooks).node(id)
-      colors.set(channels(look.color, look.hidden ? 0 : 1), at * 4)
+      /* **A leaf is drawn partly clear and a hub solid**, so where thousands
+         of leaves crowd they build into a bright core with a mist at its
+         edge, and the hubs stand out of it. */
+      const weight = Math.min(Math.max(((drawnNow.get(id)?.size ?? 1) - 1) / 6, 0), 1)
+      const alpha = look.selected || look.raised ? 1 : 0.5 + 0.5 * weight
+      colors.set(channels(look.color, look.hidden ? 0 : alpha), at * 4)
       drawn[at] = (sizes[at] ?? 8) * (look.selected ? 1.5 : look.raised ? 1.25 : 1)
       shapes[at] = SHAPES[look.shape ?? options.shape ?? 'circle']
       if (look.selected) {
@@ -352,19 +377,26 @@ export const cosmosDriver = (
     },
     onSimulationTick: redraw,
     onTransition: redraw,
-    onZoom: redraw,
+    onZoom: () => {
+      grow()
+      redraw()
+    },
     onZoomStart: (_: unknown, userDriven: boolean) => {
       moved ||= userDriven
     },
-    /* **Cooled five times as fast as cosmos.gl's own**, which runs a large
-       graph for most of a minute: a reader is waiting for it to settle. */
-    simulationDecay: 1000,
-    /* **Longer, softer links and a stronger push apart** than cosmos.gl's
-       own, which pack a group of thousands into a solid disc: these open
-       each hub out into the fan of notes around it. */
+    /* **Cooled eight times as fast as cosmos.gl's own**, which runs a large
+       graph for most of a minute: a reader is waiting for it to settle. A
+       step is a frame, so this is ten seconds at sixty frames a second. */
+    simulationDecay: 600,
+    /* **Longer, softer links, a far stronger push apart, and a pull to the
+       middle that holds it in** than cosmos.gl's own, which pack a group of
+       thousands into a solid disc: these open each group out until its
+       notes and the fan around each hub can be told apart, and the pull
+       keeps them off the edge of the space. */
+    simulationGravity: 1.5,
     simulationLinkDistance: 30,
-    simulationLinkSpring: 0.3,
-    simulationRepulsion: 4,
+    simulationLinkSpring: 0.15,
+    simulationRepulsion: 30,
     spaceSize: space,
   })
 
@@ -512,6 +544,7 @@ export const cosmosDriver = (
       signals.signal(from, to, colors, animate)
     },
     stop: () => {
+      clearTimeout(overviewing)
       graph.setConfigPartial({
         onPointClick: undefined,
         onPointMouseOut: undefined,
