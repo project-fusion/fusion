@@ -16,6 +16,7 @@ export interface CosmosGraph {
   getTrackedPointPositionsMap(): ReadonlyMap<number, [number, number]>
   getZoomLevel(): number
   readonly isReady: boolean
+  readonly ready: Promise<void>
   pause(): void
   render(simulationAlpha?: number, transitionDuration?: number): void
   screenToSpacePosition(screenPosition: [number, number]): [number, number]
@@ -280,6 +281,12 @@ export const cosmosDriver = (
 
   /** Fits the view to the whole graph, unless the reader has moved it. */
   const fitAll = (duration: number): void => {
+    /* A fit before cosmos.gl has the GPU and its size measures nothing, so
+       it waits for both: the start, and the frame after. */
+    if (!graph.isReady) {
+      void graph.ready.then(() => requestAnimationFrame(() => fitAll(duration)))
+      return
+    }
     if (!moved) {
       graph.fitView(duration, PADDING)
       clearTimeout(overviewing)
@@ -467,6 +474,13 @@ export const cosmosDriver = (
         positions.set(toSpace(node), at * 2)
       })
       load(nodes, next, positions)
+      /* **Still until a layout is asked for**: cosmos.gl runs its own from
+         the moment it has notes, which would pull notes drawn in their
+         places, as a stencil draws them, out of those places. */
+      graph.pause()
+      /* Fitted now, which a graph drawn in its places, with no layout to
+         follow, needs, and which marks how far out the whole graph is. */
+      fitAll(0)
     },
     fit: (fitted, animate) => {
       const indices = fitted.flatMap((id) => {

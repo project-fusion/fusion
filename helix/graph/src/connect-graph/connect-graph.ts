@@ -9,6 +9,7 @@ import {
   type ViewportZoomDetail,
   watchTheme,
 } from '@fusion.dev/helix-core'
+import { arrangeByGroup } from './arrange.js'
 import {
   type DrawnLink,
   type DrawnNode,
@@ -134,11 +135,11 @@ export interface ConnectGraphOptions {
    */
   center?: boolean | undefined
   /**
-   * A shape the notes are fitted into when a layout has placed all of them,
-   * such as a brain or a country's outline: an SVG path and the box it is
-   * drawn in. Notes the layout put together land together, so each group
-   * takes a region of the shape. A layout that places only new notes leaves
-   * the others where they are.
+   * A shape the notes are drawn in, such as a brain or a country's outline:
+   * an SVG path and the box it is drawn in. **No layout runs**: each group
+   * takes a region of the shape and each note sits by the hub it links to,
+   * from the first frame. Only a graph with no places of its own is shaped;
+   * a note added later is placed by the layout beside its neighbors.
    */
   stencil?: GraphStencil | undefined
 }
@@ -313,7 +314,21 @@ export const connectGraph = (
         nextLinks.set(linkKey({ source, target }), { label, source, target })
       }
     }
-    const { positions, unplaced } = seedPositions(nodes, [...nextLinks.values()], known)
+    let { positions, unplaced } = seedPositions(nodes, [...nextLinks.values()], known)
+    /* **A stencil places every note itself, from the graph's structure**, so
+       the shape is drawn from the first frame and there is no layout to
+       wait for: a layout run first and fitted after showed the graph in
+       some other shape for seconds before it became this one. Only when
+       nothing has a place, so a page's own places and a layout's are kept. */
+    const shaped =
+      options.stencil && ids.size > 0 && unplaced.size === ids.size
+        ? fitToStencil(arrangeByGroup(nodes, [...nextLinks.values()]), options.stencil)
+        : undefined
+    if (shaped) {
+      positions = shaped
+      unplaced = new Set()
+      known = new Map(shaped)
+    }
     /* **A note without a size is as large as it is connected**, so a hub
        reads as one at a glance and the graph's shape shows before a word of
        it is read. The square root, so a note with a hundred links is not ten
@@ -365,32 +380,14 @@ export const connectGraph = (
     first = false
     if (unplaced.size > 0 && driver.settle) {
       waiting = unplaced
-      const everything = unplaced.size === ids.size
-      stopSettling = driver.settle(unplaced, (laid) => {
+      stopSettling = driver.settle(unplaced, (settled) => {
         stopSettling = undefined
         waiting = new Set()
-        const stencil = everything ? options.stencil : undefined
-        const settled = stencil ? fitToStencil(laid, stencil) : laid
         known = new Map(settled)
-        const moved: DrawnNode[] = []
         for (const [id, at] of settled) {
           const node = drawnNodes.get(id)
           if (node) {
-            const next = { ...node, x: at.x, y: at.y }
-            drawnNodes.set(id, next)
-            moved.push(next)
-          }
-        }
-        /* The layout drew the notes where it put them, so a stencil moves
-           them again, into the shape. */
-        if (stencil) {
-          if (driver.update) {
-            driver.update(
-              { addLinks: [], addNodes: [], changeNodes: moved, removeLinks: [], removeNodes: [] },
-              !still(),
-            )
-          } else {
-            driver.draw({ links: [...drawnLinks.values()], nodes: [...drawnNodes.values()] })
+            drawnNodes.set(id, { ...node, x: at.x, y: at.y })
           }
         }
         graph.laidOut?.(Object.fromEntries([...settled].map(([id, at]) => [id, { ...at }])))
@@ -402,6 +399,11 @@ export const connectGraph = (
       return
     }
     waiting = new Set()
+    /* Where the stencil put each note, said as a layout's places are, so a
+       page keeps them as it keeps those. */
+    if (shaped) {
+      graph.laidOut?.(Object.fromEntries([...shaped].map(([id, at]) => [id, { ...at }])))
+    }
     if (owed) {
       /* Drawn on the renderer's next frame, which is when what was drawn is
          on screen. */

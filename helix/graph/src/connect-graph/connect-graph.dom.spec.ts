@@ -19,7 +19,7 @@ type Frame = HTMLElement & {
   active: string
   gestures?: string
   links: { source: string; target: string }[]
-  nodes: { id: string; label?: string; x?: number; y?: number }[]
+  nodes: { group?: string; id: string; label?: string; x?: number; y?: number }[]
   ready: boolean
   updateComplete: Promise<boolean>
 }
@@ -127,10 +127,19 @@ describe('connectGraph', () => {
     expect(host.ready).toBe(true)
   })
 
-  test('fits the notes into a stencil once a layout has placed all of them, and moves them there', async () => {
+  test('draws the notes in a stencil’s shape from the first frame, with no layout, and says where they are', async () => {
     const host = await frame()
-    host.nodes = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }]
-    const recorder = recording(true, true)
+    host.nodes = [
+      { group: 'left', id: 'a' },
+      { group: 'left', id: 'b' },
+      { group: 'right', id: 'c' },
+      { group: 'right', id: 'd' },
+    ]
+    host.links = [
+      { source: 'b', target: 'a' },
+      { source: 'd', target: 'c' },
+    ]
+    const recorder = recording()
     const told: Record<string, GraphPoint>[] = []
     host.addEventListener('helix-graph-layout', (event) =>
       told.push((event as CustomEvent).detail.positions),
@@ -140,27 +149,18 @@ describe('connectGraph', () => {
       stencil: { height: 10, inside: (x) => x < 5, width: 10 },
     })
     await settled(host)
-    recorder.settle({
-      a: { x: 0, y: 0 },
-      b: { x: 10, y: 0 },
-      c: { x: 0, y: 10 },
-      d: { x: 10, y: 10 },
-    })
+    await new Promise((done) => requestAnimationFrame(done))
+    expect(recorder.unplaced().size).toBe(0)
+    const drawn = recorder.asked.drawn.at(-1)?.nodes ?? []
+    expect(drawn.map((node) => node.id).sort()).toEqual(['a', 'b', 'c', 'd'])
     const placed = told.at(-1) ?? {}
-    expect(Object.keys(placed).sort()).toEqual(['a', 'b', 'c', 'd'])
-    for (const at of Object.values(placed)) {
-      expect(at.x).toBeLessThan(5)
-    }
-    /* The note the layout put furthest left is still left of the one it put furthest right. */
-    expect(placed.a?.x ?? 0).toBeLessThanOrEqual(placed.d?.x ?? 0)
-    const moved = recorder.asked.updates.at(-1)?.changeNodes ?? []
-    expect(Object.fromEntries(moved.map((node) => [node.id, { x: node.x, y: node.y }]))).toEqual(
+    expect(Object.fromEntries(drawn.map((node) => [node.id, { x: node.x, y: node.y }]))).toEqual(
       placed,
     )
     expect(host.ready).toBe(true)
   })
 
-  test('does not fit a layout that placed only some of the notes', async () => {
+  test('leaves a graph with places of its own to the layout when a stencil is given', async () => {
     const host = await frame()
     const recorder = recording(true, true)
     connectGraph(host, recorder.driver, {
