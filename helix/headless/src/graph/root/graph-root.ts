@@ -75,7 +75,7 @@ const PAGE = 10
  *
  * @event {HelixActivateEvent} helix-activate - A note was selected, in the list or in the drawing. The detail's `value` is its `id`.
  * @event {HelixBeforeActivateEvent} helix-before-activate - A note is about to be selected. Cancelable: cancel it to keep the selection in your own state.
- * @event {HelixGraphLayoutEvent} helix-graph-layout - A layout settled, with where it put each note, sent by `laidOut()`. Keep the positions and pass them back as each note's `x` and `y`.
+ * @event {HelixGraphLayoutEvent} helix-graph-layout - A layout settled, with where it put each note, sent by `laidOut()`. Keep the positions and pass them back as each note's `x` and `y`, and `z` where a renderer draws in three dimensions.
  * @event {HelixGraphPanEvent} helix-graph-pan - A pan button or arrow key was pressed. `connectGraph` moves the drawing.
  * @event {HelixGraphPartChangeEvent} helix-graph-part-change - The notes, the links, the selection, the depth or the gestures changed. Used by `connectGraph`; pages do not need to listen for it.
  * @event {HelixGraphReadyEvent} helix-graph-ready - The graph has been drawn whole, laid out and settled. Sent each time `drawn()` says it is drawn after it was not.
@@ -247,7 +247,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    * its layout has settled; a page laying out its own graph calls it the same
    * way.
    */
-  laidOut(positions: Record<string, { x: number; y: number }>): void {
+  laidOut(positions: Record<string, { x: number; y: number; z?: number | undefined }>): void {
     this.dispatchEvent(new HelixGraphLayoutEvent({ positions }))
   }
 

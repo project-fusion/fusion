@@ -136,7 +136,7 @@ const arrive = (
 }
 
 /** Whether an `rgb()` color is light, which a light ink says the ground is dark. */
-const isLight = (color: string): boolean => {
+export const isLight = (color: string): boolean => {
   const [red = 0, green = 0, blue = 0] = color.match(/[\d.]+/g)?.map(Number) ?? []
   return (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255 > 0.5
 }
@@ -172,6 +172,9 @@ const nameGroups = (
   context.textAlign = 'center'
   context.textBaseline = 'middle'
   context.shadowColor = looks.ground
+  /* Where names already are, so two groups that meet on screen do not print
+     one name over the other. */
+  const taken: Box[] = []
   for (const group of groups) {
     let x = 0
     let y = 0
@@ -197,6 +200,28 @@ const nameGroups = (
       continue
     }
     const name = group.name.toLocaleUpperCase()
+    const half = context.measureText(name).width / 2 + 4
+    const boxAt = (middle: number): Box => ({
+      bottom: middle + 9,
+      left: x - half,
+      right: x + half,
+      top: middle - 9,
+    })
+    const clear = (box: Box): boolean =>
+      taken.every(
+        (other) =>
+          box.right < other.left ||
+          box.left > other.right ||
+          box.bottom < other.top ||
+          box.top > other.bottom,
+      )
+    /* Where it falls, or a line below or above it, and not at all where none is clear. */
+    const line = [0, 18, -18].map((step) => y + step).find((middle) => clear(boxAt(middle)))
+    if (line === undefined) {
+      continue
+    }
+    y = line
+    taken.push(boxAt(y))
     context.globalAlpha = group.faded ? 0.3 : 0.92
     context.fillStyle = mixRgb(group.color, looks.ink, 0.6)
     /* Twice: once with a wide shadow and once with a close one, which together
@@ -212,7 +237,7 @@ const nameGroups = (
 }
 
 /** A canvas laid over the renderer's, taking no pointer and said to no one. */
-const layer = (container: HTMLElement, kind: 'groups' | 'signals'): HTMLCanvasElement => {
+const layer = (container: HTMLElement, kind: 'groups' | 'names' | 'signals'): HTMLCanvasElement => {
   const canvas = document.createElement('canvas')
   canvas.setAttribute('aria-hidden', 'true')
   canvas.dataset.helixGraphLayer = kind
@@ -347,6 +372,67 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen) => {
       flights = []
       overlay?.remove()
       overlay = undefined
+    },
+  }
+}
+
+/** A note to name over the drawing: its name, and whether it is the one the reader is on. */
+export interface Named {
+  id: string
+  name: string
+  strong: boolean
+}
+
+/**
+ * **Names on a canvas of their own**, for a renderer that draws none: each
+ * note given, beside it, ringed in the ground's color so it reads over the
+ * links. The strong ones always, and the rest where there is room, in the
+ * order given.
+ */
+export const namesOver = (container: HTMLElement, onScreen: OnScreen) => {
+  const canvas = layer(container, 'names')
+  return {
+    draw: (looks: GraphLooks | undefined, named: readonly Named[]): void => {
+      const context = looks ? fresh(canvas, container) : null
+      if (!context || !looks) {
+        return
+      }
+      const taken: Box[] = []
+      for (const { id, name, strong } of named) {
+        const at = onScreen(id)
+        if (!at || looks.node(id).hidden) {
+          continue
+        }
+        context.font = `${strong ? 600 : 500} ${strong ? 13 : 12}px ${looks.font}`
+        const x = at.x + at.radius + 4
+        const y = at.y + 4
+        const box = {
+          bottom: y + 4,
+          left: x - 2,
+          right: x + context.measureText(name).width + 2,
+          top: y - 13,
+        }
+        const free = taken.every(
+          (other) =>
+            box.right < other.left ||
+            box.left > other.right ||
+            box.bottom < other.top ||
+            box.top > other.bottom,
+        )
+        if (!free && !strong) {
+          continue
+        }
+        taken.push(box)
+        context.lineJoin = 'round'
+        context.lineWidth = 3
+        context.strokeStyle = looks.ground
+        context.strokeText(name, x, y)
+        context.fillStyle = strong ? looks.ink : looks.quiet
+        context.fillText(name, x, y)
+      }
+    },
+    stop: (): void => {
+      canvas.remove()
     },
   }
 }

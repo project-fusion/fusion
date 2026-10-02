@@ -36,3 +36,22 @@ describe('arrangeByGroup', () => {
     expect([...arrangeByGroup(nodes, links)]).toEqual([...arrangeByGroup(nodes, links)])
   })
 })
+
+describe('arrangeByGroup in three dimensions', () => {
+  test('gives every note a depth, and keeps each note nearer its own hub', () => {
+    const placed = arrangeByGroup(nodes, links, { solid: true })
+    expect([...placed.values()].every((at) => Number.isFinite(at.z))).toBe(true)
+    for (let at = 0; at < 30; at++) {
+      const note = placed.get(`a-${at}`)
+      const own = placed.get('a-hub')
+      const other = placed.get('b-hub')
+      const far = (one: typeof note, two: typeof note): number =>
+        Math.hypot(
+          (one?.x ?? 0) - (two?.x ?? 0),
+          (one?.y ?? 0) - (two?.y ?? 0),
+          (one?.z ?? 0) - (two?.z ?? 0),
+        )
+      expect(far(note, own)).toBeLessThan(far(note, other))
+    }
+  })
+})

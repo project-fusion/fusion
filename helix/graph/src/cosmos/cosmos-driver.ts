@@ -6,7 +6,13 @@ import type {
 } from '../connect-graph/connect-graph.js'
 import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
-import { gesturesHeld, groupsOver, type OnScreen, signalsOver } from '../overlay/overlay.js'
+import {
+  gesturesHeld,
+  groupsOver,
+  namesOver,
+  type OnScreen,
+  signalsOver,
+} from '../overlay/overlay.js'
 
 /** A cosmos.gl graph, as far as the driver calls it. */
 export interface CosmosGraph {
@@ -213,67 +219,18 @@ export const cosmosDriver = (
   const signals = signalsOver(container, onScreen)
   const groups = groupsOver(container, onScreen)
 
-  /* **Names on a canvas of their own**, since cosmos.gl draws none: the note
-     under the pointer, the selected note and its neighbors where there is
-     room, drawn again whenever the view or the layout moves. */
-  const names = document.createElement('canvas')
-  names.setAttribute('aria-hidden', 'true')
-  names.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none'
-  container.append(names)
+  /* **Names over the drawing**, since cosmos.gl draws none: the note under
+     the pointer, the selected note and its neighbors where there is room,
+     drawn again whenever the view or the layout moves. */
+  const names = namesOver(container, onScreen)
   const drawNames = (): void => {
-    const context = names.getContext('2d')
-    if (!context || !looks) {
-      return
-    }
-    const ratio = window.devicePixelRatio || 1
-    const width = Math.round(container.clientWidth * ratio)
-    const height = Math.round(container.clientHeight * ratio)
-    if (names.width !== width || names.height !== height) {
-      names.width = width
-      names.height = height
-    }
-    context.setTransform(ratio, 0, 0, ratio, 0, 0)
-    context.clearRect(0, 0, width, height)
-    const taken: { bottom: number; left: number; right: number; top: number }[] = []
-    const shown = [selected, hovered === undefined ? undefined : ids[hovered], ...near]
-    for (const id of shown) {
-      if (id === undefined) {
-        continue
-      }
-      const at = onScreen(id)
-      const label = looks.node(id)
-      if (!at || label.hidden) {
-        continue
-      }
-      const name = drawnNow.get(id)?.label ?? id
-      const strong = id === selected || id === ids[hovered ?? -1]
-      context.font = `${strong ? 600 : 500} ${strong ? 13 : 12}px ${looks.font}`
-      const x = at.x + at.radius + 4
-      const y = at.y + 4
-      const box = {
-        bottom: y + 4,
-        left: x - 2,
-        right: x + context.measureText(name).width + 2,
-        top: y - 13,
-      }
-      const free = taken.every(
-        (other) =>
-          box.right < other.left ||
-          box.left > other.right ||
-          box.bottom < other.top ||
-          box.top > other.bottom,
-      )
-      if (!free && !strong) {
-        continue
-      }
-      taken.push(box)
-      context.lineJoin = 'round'
-      context.lineWidth = 3
-      context.strokeStyle = looks.ground
-      context.strokeText(name, x, y)
-      context.fillStyle = strong ? looks.ink : looks.quiet
-      context.fillText(name, x, y)
-    }
+    const lit = hovered === undefined ? undefined : ids[hovered]
+    const shown = [...new Set([selected, lit, ...near])].flatMap((id) =>
+      id === undefined
+        ? []
+        : [{ id, name: drawnNow.get(id)?.label ?? id, strong: id === selected || id === lit }],
+    )
+    names.draw(looks, shown)
   }
   const redraw = (): void => {
     drawNames()
@@ -640,7 +597,7 @@ export const cosmosDriver = (
       })
       signals.stop()
       groups.stop()
-      names.remove()
+      names.stop()
       held.stop()
     },
     update: (changes: GraphChanges, animate) => {

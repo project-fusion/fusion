@@ -1,20 +1,32 @@
 import type { GraphPoint } from './seed.js'
+import { fieldFromInside, fieldFromPath, type ShapeField } from './shape-field.js'
 
 /**
- * A shape the notes are fitted into once a layout settles, in a box `width`
- * by `height`, as an SVG's `viewBox="0 0 width height"` gives one: an SVG
- * path, whose holes are cut by the even-odd rule, or a test of whether a
- * point in the box is inside.
+ * A shape the notes are drawn in. **Any shape field**, flat or solid, such as
+ * `inflate` makes; or, flat, an SVG path in a box `width` by `height`, as an
+ * SVG's `viewBox="0 0 width height"` gives one, whose holes are cut by the
+ * even-odd rule; or a test of whether a point in that box is inside.
  */
-export type GraphStencil =
+export type GraphStencil = (
+  | ShapeField
   | { height: number; path: string; width: number }
   | { height: number; inside: (x: number, y: number) => boolean; width: number }
-
-/** How many pixels across a path is drawn to be read, along its longer side. */
-const RASTER = 1024
+) & {
+  /**
+   * Where in the shape the notes go: `fill`, all through it, which unset is;
+   * or `surface`, a thin shell just inside its edge, which is how a solid
+   * reads as the thing it is shaped like.
+   */
+  place?: 'fill' | 'surface' | undefined
+  /** How thick the surface's shell is, as a share of the shape's size. 0.04 by default. */
+  shell?: number | undefined
+}
 
 /** How many cells a side the grid has that measures how much of the box the shape fills. */
-const PROBE = 64
+const PROBE = { flat: 64, solid: 32 }
+
+/** How thick a surface's shell is where the stencil does not say, as a share of the shape's size. */
+const SHELL = 0.04
 
 /** How far the strips the notes are matched in wave, as a share of the shape's size. */
 const WAVE = 0.07
@@ -28,75 +40,82 @@ const seeded = (seed: number): (() => number) => {
   }
 }
 
-/**
- * Whether a point in the stencil's box is inside its shape. A path is drawn
- * once to a canvas and read off it, which is what lets twenty thousand notes
- * be fitted in a moment.
- */
-const insideOf = (stencil: GraphStencil): ((x: number, y: number) => boolean) => {
-  if ('inside' in stencil) {
-    return stencil.inside
+/* A stencil's field, made once: a path is drawn and measured, which is not
+   work to repeat for every drawing of the same graph. */
+const fields = new WeakMap<object, ShapeField>()
+
+/** The field a stencil is, or is made into. */
+export const fieldOf = (stencil: GraphStencil): ShapeField => {
+  if ('distance' in stencil) {
+    return stencil
   }
-  const scale = RASTER / Math.max(stencil.width, stencil.height, 1)
-  const width = Math.max(1, Math.ceil(stencil.width * scale))
-  const height = Math.max(1, Math.ceil(stencil.height * scale))
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const context = canvas.getContext('2d', { willReadFrequently: true })
-  if (!context) {
-    return () => true
+  const made = fields.get(stencil)
+  if (made) {
+    return made
   }
-  context.scale(scale, scale)
-  context.fill(new Path2D(stencil.path), 'evenodd')
-  const alpha = context.getImageData(0, 0, width, height).data
-  return (x, y) => {
-    const column = Math.floor(x * scale)
-    const row = Math.floor(y * scale)
-    return (
-      column >= 0 &&
-      row >= 0 &&
-      column < width &&
-      row < height &&
-      (alpha[(row * width + column) * 4 + 3] ?? 0) > 127
-    )
-  }
+  const field =
+    'path' in stencil
+      ? fieldFromPath(stencil.path, stencil.width, stencil.height)
+      : fieldFromInside((x, y) => stencil.inside(x, y), stencil)
+  fields.set(stencil, field)
+  return field
 }
 
 /**
- * `count` places spread evenly over the inside of a shape: a grid sized to
- * the shape's area, each place shaken within its cell so no rows show, and
- * the grid made finer until it holds enough.
+ * `count` places spread evenly over a shape: through all of it, or through a
+ * shell just inside its edge. A grid sized to the room there is, each place
+ * shaken within its cell so no rows show, and made finer until it holds
+ * enough.
  */
 export const placesIn = (
-  inside: (x: number, y: number) => boolean,
-  width: number,
-  height: number,
+  field: ShapeField,
   count: number,
+  { place = 'fill', shell = SHELL }: { place?: 'fill' | 'surface'; shell?: number } = {},
 ): GraphPoint[] => {
-  let filled = 0
-  for (let row = 0; row < PROBE; row++) {
-    for (let column = 0; column < PROBE; column++) {
-      if (inside(((column + 0.5) / PROBE) * width, ((row + 0.5) / PROBE) * height)) {
-        filled += 1
+  const solid = field.depth > 0
+  const { depth, height, width } = field
+  const thickness = shell * Math.max(width, height, depth)
+  const takes = (x: number, y: number, z: number): boolean => {
+    const distance = field.distance(x, y, z)
+    return distance < 0 && (place === 'fill' || distance > -thickness)
+  }
+  const probe = solid ? PROBE.solid : PROBE.flat
+  let taken = 0
+  for (let layer = 0; layer < (solid ? probe : 1); layer++) {
+    for (let row = 0; row < probe; row++) {
+      for (let column = 0; column < probe; column++) {
+        if (
+          takes(
+            ((column + 0.5) / probe) * width,
+            ((row + 0.5) / probe) * height,
+            solid ? ((layer + 0.5) / probe) * depth : 0,
+          )
+        ) {
+          taken += 1
+        }
       }
     }
   }
-  if (count === 0 || filled === 0) {
+  if (count === 0 || taken === 0) {
     return []
   }
   const random = seeded(count)
-  let step = Math.sqrt(((filled / PROBE ** 2) * width * height) / count)
+  const room = (taken / probe ** (solid ? 3 : 2)) * width * height * (solid ? depth : 1)
+  let step = (room / count) ** (1 / (solid ? 3 : 2))
   for (let tries = 0; tries < 8; tries++) {
     const places: GraphPoint[] = []
-    for (let y = step / 2; y < height; y += step) {
-      for (let x = step / 2; x < width; x += step) {
-        const place = {
-          x: x + (random() - 0.5) * step * 0.8,
-          y: y + (random() - 0.5) * step * 0.8,
-        }
-        if (inside(place.x, place.y)) {
-          places.push(place)
+    const layers = solid ? Math.ceil(depth / step) : 1
+    for (let layer = 0; layer < layers; layer++) {
+      for (let y = step / 2; y < height; y += step) {
+        for (let x = step / 2; x < width; x += step) {
+          const place = {
+            x: x + (random() - 0.5) * step * 0.8,
+            y: y + (random() - 0.5) * step * 0.8,
+            ...(solid ? { z: (layer + 0.5 + (random() - 0.5) * 0.8) * step } : {}),
+          }
+          if (takes(place.x, place.y, place.z ?? 0)) {
+            places.push(place)
+          }
         }
       }
     }
@@ -109,21 +128,44 @@ export const placesIn = (
       }
       return places.slice(0, count)
     }
-    step *= Math.sqrt(places.length / count) * 0.97 || 0.5
+    step *= (places.length / count) ** (1 / (solid ? 3 : 2)) * 0.97 || 0.5
   }
   return []
 }
 
 /**
- * Places a layout put anywhere, moved into the stencil's shape and filling it
- * evenly. **The notes keep their order**, left to right and, within each
- * strip, top to bottom, so notes the layout put together land together, and
- * each group takes a region of the shape.
+ * Items put in an order that keeps near things near: sorted by the first
+ * key, cut into slices, each slice sorted by the next key, and so on. Two
+ * lists as long as each other, ordered this way, pair what lies at the same
+ * place in each.
+ */
+const nested = <T>(items: T[], keys: ((item: T) => number)[]): T[] => {
+  const [key, ...rest] = keys
+  if (!key) {
+    return items
+  }
+  const sorted = [...items].sort((one, other) => key(one) - key(other))
+  if (rest.length === 0) {
+    return sorted
+  }
+  const slice = Math.ceil(items.length ** (rest.length / keys.length))
+  const out: T[] = []
+  for (let from = 0; from < sorted.length; from += slice) {
+    out.push(...nested(sorted.slice(from, from + slice), rest))
+  }
+  return out
+}
+
+/**
+ * Places a layout or an arrangement put anywhere, moved into the stencil's
+ * shape and spread evenly over it. **The notes keep their order**, left to
+ * right, top to bottom, and front to back in a solid, so notes put together
+ * land together, and each group takes a region of the shape.
  *
- * Centered where the layout was, and as large. The stencil's y points down,
- * as an SVG's does, and the layout's up, as Sigma and cosmos.gl draw it.
- * Places the shape cannot hold, as when it has no inside, come back as they
- * were.
+ * Centered where the places were, and as large. The stencil's y points down,
+ * as an SVG's does, and the places' up, as Sigma, cosmos.gl and three.js draw
+ * them. Places the shape cannot hold, as when it has no inside, come back as
+ * they were.
  */
 export const fitToStencil = (
   positions: ReadonlyMap<string, GraphPoint>,
@@ -133,48 +175,120 @@ export const fitToStencil = (
   if (notes.length === 0) {
     return new Map()
   }
-  const places = placesIn(insideOf(stencil), stencil.width, stencil.height, notes.length)
+  const field = fieldOf(stencil)
+  const places = placesIn(field, notes.length, {
+    place: stencil.place ?? 'fill',
+    shell: stencil.shell ?? SHELL,
+  })
   if (places.length < notes.length) {
     return new Map(positions)
   }
-  let left = Number.POSITIVE_INFINITY
-  let right = Number.NEGATIVE_INFINITY
-  let bottom = Number.POSITIVE_INFINITY
-  let top = Number.NEGATIVE_INFINITY
-  for (const { at } of notes) {
-    left = Math.min(left, at.x)
-    right = Math.max(right, at.x)
-    bottom = Math.min(bottom, at.y)
-    top = Math.max(top, at.y)
+  const solid = field.depth > 0
+  const low = {
+    x: Number.POSITIVE_INFINITY,
+    y: Number.POSITIVE_INFINITY,
+    z: Number.POSITIVE_INFINITY,
   }
-  const scale = Math.max(right - left, top - bottom, 1) / Math.max(stencil.width, stencil.height)
-  /* **The strips wave**: each place is sorted by where it would be if the
+  const high = {
+    x: Number.NEGATIVE_INFINITY,
+    y: Number.NEGATIVE_INFINITY,
+    z: Number.NEGATIVE_INFINITY,
+  }
+  for (const { at } of notes) {
+    for (const axis of ['x', 'y', 'z'] as const) {
+      const value = at[axis] ?? 0
+      low[axis] = Math.min(low[axis], value)
+      high[axis] = Math.max(high[axis], value)
+    }
+  }
+  const { depth, height, width } = field
+  const scale =
+    Math.max(high.x - low.x, high.y - low.y, solid ? high.z - low.z : 0, 1) /
+    Math.max(width, height, depth)
+  const middle = { x: (low.x + high.x) / 2, y: (low.y + high.y) / 2, z: (low.z + high.z) / 2 }
+  /* **The slices wave**: each place is sorted by where it would be if the
      shape were bent a little, so the borders between groups curve as a
-     region's would, where straight strips cut them in straight lines. */
-  const { height, width } = stencil
-  const spots = places
-    .map((place) => ({
+     region's would, where straight slices cut them in straight lines. */
+  const spots = places.map((place) => {
+    const z = place.z ?? depth / 2
+    return {
       across: place.x + WAVE * width * Math.sin((place.y / height) * Math.PI * 3 + 1.3),
       at: {
-        x: (left + right) / 2 + (place.x - width / 2) * scale,
-        y: (bottom + top) / 2 - (place.y - height / 2) * scale,
+        x: middle.x + (place.x - width / 2) * scale,
+        y: middle.y - (place.y - height / 2) * scale,
+        ...(solid ? { z: middle.z + (z - depth / 2) * scale } : {}),
       },
       down: -place.y + WAVE * height * Math.sin((place.x / width) * Math.PI * 3 + 0.4),
-    }))
-    .sort((one, other) => one.across - other.across)
-  notes.sort((one, other) => one.at.x - other.at.x || one.at.y - other.at.y)
-  /* Strips of as many notes as there are strips, matched one to one. */
-  const strip = Math.ceil(Math.sqrt(notes.length))
+    }
+  })
   const fitted = new Map<string, GraphPoint>()
-  for (let from = 0; from < notes.length; from += strip) {
-    const ours = notes.slice(from, from + strip).sort((one, other) => one.at.y - other.at.y)
-    const theirs = spots
-      .slice(from, from + strip)
-      .sort((one, other) => one.down - other.down)
-      .map((spot) => spot.at)
-    ours.forEach((note, at) => {
-      fitted.set(note.id, theirs[at] as GraphPoint)
-    })
+  /* **A solid is matched by halves**: the notes split in two across their
+     widest spread, the places split in two across theirs, each half matched
+     to its half, and so on down to one. Every group, and every hub's fan
+     within it, lands as one piece of the shape, where matching across, down
+     and deep in slices drew a group as a band all the way round.
+
+     **On a surface, the halves are of directions**, which way each lies
+     from the middle: half of a shell's places by position can be its front
+     and its back at once, so a group split there landed on both, where half
+     of them by direction is one side of the shell. */
+  if (solid) {
+    const surface = (stencil.place ?? 'fill') === 'surface'
+    const way = (point: GraphPoint): GraphPoint => {
+      if (!surface) {
+        return point
+      }
+      const x = point.x - middle.x
+      const y = point.y - middle.y
+      const z = (point.z ?? 0) - middle.z
+      const length = Math.hypot(x, y, z) || 1
+      return { x: x / length, y: y / length, z: z / length }
+    }
+    const widest = (points: readonly GraphPoint[]): 'x' | 'y' | 'z' => {
+      let best: 'x' | 'y' | 'z' = 'x'
+      let spread = Number.NEGATIVE_INFINITY
+      for (const axis of ['x', 'y', 'z'] as const) {
+        let low = Number.POSITIVE_INFINITY
+        let high = Number.NEGATIVE_INFINITY
+        for (const point of points) {
+          const value = point[axis] ?? 0
+          low = Math.min(low, value)
+          high = Math.max(high, value)
+        }
+        if (high - low > spread) {
+          spread = high - low
+          best = axis
+        }
+      }
+      return best
+    }
+    type Keyed = { at: GraphPoint; key: GraphPoint }
+    const halve = (ours: (Keyed & { id: string })[], theirs: Keyed[]): void => {
+      if (ours.length === 1) {
+        fitted.set((ours[0] as Keyed & { id: string }).id, (theirs[0] as Keyed).at)
+        return
+      }
+      if (ours.length === 0) {
+        return
+      }
+      const mine = widest(ours.map((note) => note.key))
+      const yours = widest(theirs.map((spot) => spot.key))
+      ours.sort((one, other) => (one.key[mine] ?? 0) - (other.key[mine] ?? 0))
+      theirs.sort((one, other) => (one.key[yours] ?? 0) - (other.key[yours] ?? 0))
+      const half = Math.floor(ours.length / 2)
+      halve(ours.slice(0, half), theirs.slice(0, half))
+      halve(ours.slice(half), theirs.slice(half))
+    }
+    halve(
+      notes.map((note) => ({ ...note, key: way(note.at) })),
+      spots.map((spot) => ({ at: spot.at, key: way(spot.at) })),
+    )
+    return fitted
   }
+  const ours = nested(notes, [(note) => note.at.x, (note) => note.at.y])
+  const theirs = nested(spots, [(spot) => spot.across, (spot) => spot.down])
+  ours.forEach((note, at) => {
+    fitted.set(note.id, (theirs[at] as (typeof spots)[number]).at)
+  })
   return fitted
 }

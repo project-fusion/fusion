@@ -49,6 +49,8 @@ export interface GraphNode {
   x?: number | undefined
   /** Where the note stands, where the page already knows. Laid out where it does not. */
   y?: number | undefined
+  /** How near the viewer the note stands, for a renderer that draws in three dimensions. */
+  z?: number | undefined
 }
 
 /** One link between two notes, from `source` to `target`. */

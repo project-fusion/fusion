@@ -54,10 +54,10 @@ const start = (frame: HTMLElement): (() => void) => {
 
 window.helixPreviewGraph = {
   mount(root) {
-    /* Every graph but the ones cosmos.gl draws, which have a chunk of their own. */
+    /* Every graph but the ones cosmos.gl and three.js draw, which have chunks of their own. */
     const unmounts = [
       ...root.querySelectorAll<HTMLElement>(
-        'helix-graph[data-preview-graph]:not([data-preview-graph="cosmos"])',
+        'helix-graph[data-preview-graph]:not([data-preview-graph="cosmos"]):not([data-preview-graph="three"])',
       ),
     ].map(start)
     return () => {

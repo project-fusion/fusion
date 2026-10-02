@@ -6,6 +6,8 @@ export interface DrawnNode {
   size: number
   x: number
   y: number
+  /** How near the viewer, for a renderer that draws in three dimensions. */
+  z?: number | undefined
 }
 
 /** A link as the renderer draws it, between two notes the graph holds. */
@@ -68,7 +70,8 @@ export const diffGraph = (
       was.label !== node.label ||
       was.size !== node.size ||
       was.x !== node.x ||
-      was.y !== node.y
+      was.y !== node.y ||
+      was.z !== node.z
     ) {
       changes.changeNodes.push(node)
     }

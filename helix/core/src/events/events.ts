@@ -852,7 +852,7 @@ export class HelixGraphZoomEvent extends CustomEvent<ViewportZoomDetail> {
 
 /** Where each note was laid out, by its `id`, in the renderer's own units. */
 export interface GraphLayoutDetail {
-  positions: Record<string, { x: number; y: number }>
+  positions: Record<string, { x: number; y: number; z?: number | undefined }>
 }
 
 /**

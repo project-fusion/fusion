@@ -205,6 +205,57 @@ layout beside its neighbors. `stencil` also takes `inside(x, y)`, a test of
 whether a point in the box is in the shape, in place of `path`, and
 `fitToStencil` fits places a page has into one.
 
+**Every shape becomes a distance field**: for each point in its box, how far
+it is from the shape's edge, below zero inside. `@fusion.dev/helix-graph/shapes`
+makes one from what a page has, and a field is a stencil itself:
+
+| Function | Makes |
+|---|---|
+| `shapeFromPath(path, width, height)` | A flat field from an SVG path |
+| `shapeFromInside(inside, { width, height, depth })` | A flat field, or a solid where `depth` is given, from a test of what is inside |
+| `inflate(field, { depth, roundness })` | A solid puffed out of a flat field, as a cushion is, cut through where the flat shape has a hole |
+
+## In three dimensions
+
+**`threeDriver(box)` draws the graph in three dimensions** with three.js, to
+be turned and looked into. The frame, the list, selection, names and signals
+are the same as in two:
+
+```sh
+bun add three d3-force-3d
+```
+
+```js
+import { connectGraph } from '@fusion.dev/helix-graph'
+import { inflate, shapeFromPath } from '@fusion.dev/helix-graph/shapes'
+import { threeDriver } from '@fusion.dev/helix-graph/three'
+
+connectGraph(frame, threeDriver(box), {
+  stencil: { ...inflate(shapeFromPath(path, 220, 170), { depth: 140 }), place: 'surface' },
+})
+```
+
+- **A solid stencil draws the notes in the solid**: all through it, or, with
+  `place: 'surface'`, in a thin shell just inside its edge, which is how a
+  solid reads as the thing it is shaped like. Each group takes one side of
+  the shape, and each hub's notes a patch around it.
+- **Without a stencil, a layout runs in three dimensions** with d3-force-3d.
+- **Dragging turns the graph, and the wheel and a pinch bring it nearer.** It
+  turns slowly by itself while nobody is handling it, and never for a reader
+  who asks for less motion.
+- **The far side recedes.** On a surface, the far side of the shape falls to
+  a tenth, so the near side reads; through a graph, its far notes are a
+  little quieter than its near ones.
+- **Each group is named over its near side**, and a group's name moves a line
+  where it would cover another's.
+
+| `threeDriver` option | Default | What else it takes |
+|---|---|---|
+| `autoRotate` | `true` | `false` leaves the graph still until the reader turns it |
+| `shape` | `circle` | `square` or `diamond`, for every note that does not say |
+| `groupLabels` | `true` | `false` leaves each group unnamed |
+| `layoutLimit` | `10000` | The longest a layout runs, in milliseconds |
+
 ## What it exports
 
 | Import | What |
@@ -212,8 +263,10 @@ whether a point in the box is in the shape, in place of `path`, and
 | `@fusion.dev/helix-graph` | `connectGraph`, `diffGraph`, `fitToStencil`, `graphColorsFrom`, `seedPositions`, and the `GraphDriver`, `GraphChanges` and `GraphStencil` types |
 | `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)` |
 | `@fusion.dev/helix-graph/cosmos` | `cosmosDriver(graph, box, options)` |
+| `@fusion.dev/helix-graph/three` | `threeDriver(box, options)` |
+| `@fusion.dev/helix-graph/shapes` | `shapeFromPath`, `shapeFromInside`, `inflate`, and the `ShapeField` type |
 
-**Sigma and cosmos.gl are optional peers, and graphology is the page's.** Each
+**Sigma, cosmos.gl, three.js and d3-force-3d are optional peers, and graphology is the page's.** Each
 driver types its renderer by the calls it makes on it, so a page brings
 whichever version it has, and a spec holds those shapes to the real classes,
 so a renamed method fails a typecheck here before it reaches a page. `@fusion.dev/helix-graph/sigma` imports
@@ -223,7 +276,7 @@ Sigma 3 is a peer dependency.
 | `connectGraph` option | Default | What else it takes |
 |---|---|---|
 | `center` | `true` | `false` leaves the view where it is when a note is chosen in the list |
-| `stencil` | none | A shape to draw the notes in: `{ path, width, height }` or `{ inside, width, height }` |
+| `stencil` | none | A shape to draw the notes in: a field from `shapes`, `{ path, width, height }` or `{ inside, width, height }`, with `place`, `fill` or `surface` |
 
 | `sigmaDriver` option | Default | What else it takes |
 |---|---|---|

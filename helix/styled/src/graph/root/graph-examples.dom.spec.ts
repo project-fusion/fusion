@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import brain from '../.examples/brain.html' with { type: 'text' }
+import brain3d from '../.examples/brain-3d.html' with { type: 'text' }
 import large from '../.examples/large.html' with { type: 'text' }
 import live from '../.examples/live.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
@@ -117,6 +118,25 @@ describe('the brain example', () => {
       expect(stencil?.getAttribute('viewBox')).toBe('0 0 220 170')
       expect(stencil?.querySelector('path')?.getAttribute('d')?.startsWith('M')).toBe(true)
       expect(part(graph, 'count')?.textContent).toBe('8,000 notes')
+    },
+  )
+})
+
+describe('the brain-3d example', () => {
+  run(
+    'gives the frame eight regions of a thousand notes, and a solid shape to draw them on',
+    async () => {
+      await example(brain3d)
+      await idle()
+      const graph = document.querySelector('helix-graph') as unknown as HTMLElement & {
+        nodes: { group: string; id: string }[]
+      }
+      expect(graph.dataset.previewGraph).toBe('three')
+      expect(graph.nodes).toHaveLength(8000)
+      expect(new Set(graph.nodes.map((node) => node.group)).size).toBe(8)
+      const stencil = graph.querySelector<SVGSVGElement>('svg[data-preview-graph-stencil]')
+      expect(stencil?.dataset.previewGraphDepth).toBe('140')
+      expect(stencil?.dataset.previewGraphPlace).toBe('surface')
     },
   )
 })

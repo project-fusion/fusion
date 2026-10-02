@@ -2,6 +2,8 @@
 export interface GraphPoint {
   x: number
   y: number
+  /** How near the viewer, for a renderer that draws in three dimensions. */
+  z?: number | undefined
 }
 
 /** A note as the connector reads it off the frame. */
@@ -9,6 +11,7 @@ export interface SeedNode {
   id: string
   x?: number | undefined
   y?: number | undefined
+  z?: number | undefined
 }
 
 /** A link as the connector reads it off the frame. */
@@ -56,7 +59,11 @@ export const seedPositions = (
   const unplaced = new Set<string>()
   for (const node of nodes) {
     if (Number.isFinite(node.x) && Number.isFinite(node.y)) {
-      positions.set(node.id, { x: node.x as number, y: node.y as number })
+      positions.set(node.id, {
+        x: node.x as number,
+        y: node.y as number,
+        ...(Number.isFinite(node.z) ? { z: node.z as number } : {}),
+      })
     } else {
       const kept = known.get(node.id)
       if (kept) {
@@ -89,7 +96,12 @@ export const seedPositions = (
     const beside = placed === undefined ? undefined : positions.get(placed)
     if (beside) {
       const offset = nudge(node.id)
-      positions.set(node.id, { x: beside.x + offset.x, y: beside.y + offset.y })
+      positions.set(node.id, {
+        x: beside.x + offset.x,
+        y: beside.y + offset.y,
+        /* Beside it in depth as well, where the neighbor has a depth. */
+        ...(beside.z === undefined ? {} : { z: beside.z + offset.x * offset.y }),
+      })
       continue
     }
     const radius = Math.sqrt(spiral + 0.5)
