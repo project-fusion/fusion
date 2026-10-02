@@ -1,8 +1,9 @@
 <!-- @summary A graph of company notes drawn by Sigma.js, with notes arriving and messages passing between them as they happen. -->
 
-<!-- Preview frame: data-preview-graph has the frame connect Sigma.js; on your page, connectGraph does. -->
+<!-- Preview frame: data-preview-graph has the frame connect Sigma.js, in glass; on your page, connectGraph does. -->
 <helix-graph
   data-preview-graph
+  data-preview-graph-material="glass"
   id="notes"
   label="Company notes"
 >
@@ -21,6 +22,9 @@
     Support: ['Support playbook', 'Escalations', 'Known issues'],
   }
 
+  /* What a few of them mean, which colors them over their subject. */
+  const tones = { Escalations: 'warning', 'Known issues': 'danger' }
+
   /* The same graph on every load. */
   let seed = 7
   const random = () => {
@@ -33,7 +37,7 @@
   const links = []
   for (const [group, hubs] of Object.entries(subjects)) {
     for (const label of hubs) {
-      nodes.push({ group, id: label, label, size: 4 })
+      nodes.push({ group, id: label, label, shape: 'square', size: 4, tone: tones[label] })
     }
     for (let at = 1; at <= 36; at++) {
       const id = `${group} note ${at}`
@@ -66,7 +70,7 @@
     calls += 1
     const [group, hubs] = pick(Object.entries(subjects))
     const id = `Call ${calls}`
-    notes.nodes = [...notes.nodes, { group, id, label: id }]
+    notes.nodes = [...notes.nodes, { emphasis: 'outlined', group, id, label: id, shape: 'diamond' }]
     notes.links = [...notes.links, { source: id, target: pick(hubs) }]
     if (calls === 12) {
       clearInterval(arriving)

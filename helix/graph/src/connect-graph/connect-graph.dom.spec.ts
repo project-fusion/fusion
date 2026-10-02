@@ -245,4 +245,16 @@ describe('connectGraph', () => {
     host.signal('a', 'nowhere')
     expect(recorder.asked.signals).toEqual([['a', 'b']])
   })
+
+  test('a change during the first layout does not cost the frame its ready', async () => {
+    const host = await frame()
+    const recorder = recording(true, true)
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    host.nodes = [...host.nodes, { id: 'd' }]
+    await settled(host)
+    expect(host.ready).toBe(false)
+    recorder.settle({ a: { x: 0, y: 0 }, b: { x: 5, y: 5 }, c: { x: -5, y: 5 }, d: { x: 1, y: 1 } })
+    expect(host.ready).toBe(true)
+  })
 })

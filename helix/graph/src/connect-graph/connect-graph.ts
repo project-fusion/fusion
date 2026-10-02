@@ -1,5 +1,4 @@
 import {
-  type GraphSignalDetail,
   HelixGraphPanEvent,
   HelixGraphPartChangeEvent,
   HelixGraphSignalEvent,
@@ -18,7 +17,14 @@ import {
   isEmpty,
   linkKey,
 } from './diff.js'
-import { type GraphColors, type GraphLooks, graphColorsFrom, looksOf } from './looks.js'
+import {
+  type GraphColors,
+  type GraphLooks,
+  graphColorsFrom,
+  looksOf,
+  type NoteFacts,
+  toneColor,
+} from './looks.js'
 import { type GraphPoint, seedPositions } from './seed.js'
 
 export type { DrawnLink, DrawnNode, GraphChanges } from './diff.js'
@@ -120,14 +126,13 @@ interface Frame extends HTMLElement {
   gestureMode?: ViewportGestureMode
   laidOut?(positions: Record<string, GraphPoint>): void
   links?: readonly { label?: string | undefined; source: string; target: string }[]
-  nodes?: readonly {
-    group?: string | undefined
+  nodes?: readonly (NoteFacts & {
     id: string
     label?: string | undefined
     size?: number | undefined
     x?: number | undefined
     y?: number | undefined
-  }[]
+  })[]
   requestActive?(id: string): boolean
   shown?: ReadonlySet<string> | undefined
   updateComplete?: Promise<unknown>
@@ -140,14 +145,6 @@ const viewportOf = (frame: HTMLElement): { width: number; height: number } => {
   ).getBoundingClientRect()
   return { height: box.height, width: box.width }
 }
-
-/** A signal's color, from its tone: `neutral` is the muted ink, and no tone is `primary`. */
-const toneColor = (colors: GraphColors, tone: GraphSignalDetail['tone']): string =>
-  tone === undefined || tone === 'primary'
-    ? colors.primary
-    : tone === 'neutral'
-      ? colors.muted
-      : colors[tone]
 
 /** Whether the page asks for movement to be kept to a minimum. */
 const still = (): boolean =>
@@ -182,6 +179,10 @@ export const connectGraph = (
   /* The notes a layout was placing when the next change cut it short, which
      the next layout places with the new ones. */
   let waiting = new Set<string>()
+  /* Whether the frame is still owed its first `drawn()`. Kept apart from the
+     drawing that owes it: a change arriving while the first layout runs cuts
+     that layout short, and the layout after it pays the debt. */
+  let owed = false
   let colors: GraphColors | null = null
   let stopSettling: (() => void) | undefined
   let pressed: string | undefined
@@ -206,7 +207,7 @@ export const connectGraph = (
         }
       }
     }
-    const groups = new Map(nodes.map((node) => [node.id, node.group]))
+    const notes = new Map(nodes.map((node) => [node.id, node]))
     driver.look(
       looksOf({
         colors,
@@ -215,9 +216,9 @@ export const connectGraph = (
           .fontFamily.split(',')[0]
           ?.trim()
           .replace(/^["']|["']$/g, ''),
-        groupOf: (id) => groups.get(id),
         groups: nodes.flatMap((node) => (node.group === undefined ? [] : [node.group])),
         near,
+        noteOf: (id) => notes.get(id),
         selected,
         shown: graph.shown,
       }),
@@ -282,7 +283,9 @@ export const connectGraph = (
     drawnLinks = nextLinks
     known = positions
     restyle()
-    const opening = first || whole
+    if (first || whole) {
+      owed = true
+    }
     first = false
     if (unplaced.size > 0 && driver.settle) {
       waiting = unplaced
@@ -297,18 +300,20 @@ export const connectGraph = (
           }
         }
         graph.laidOut?.(Object.fromEntries([...settled].map(([id, at]) => [id, { ...at }])))
-        if (opening) {
+        if (owed) {
+          owed = false
           graph.drawn?.(true)
         }
       })
       return
     }
     waiting = new Set()
-    if (opening) {
+    if (owed) {
       /* Drawn on the renderer's next frame, which is when what was drawn is
          on screen. */
       pending = requestAnimationFrame(() => {
-        if (connected) {
+        if (connected && owed) {
+          owed = false
           graph.drawn?.(true)
         }
       })

@@ -53,6 +53,14 @@
     "sigma",
     "accessibility"
   ],
+  "peerDependencies": {
+    "sigma": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "sigma": {
+      "optional": true
+    }
+  },
   "publishConfig": {
     "access": "restricted"
   }

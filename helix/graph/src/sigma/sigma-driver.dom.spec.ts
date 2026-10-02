@@ -7,6 +7,12 @@ let sigmaDriver: typeof import('./sigma-driver.js').sigmaDriver
 
 beforeAll(async () => {
   registerDom()
+  /* Sigma's programs read WebGL's constants as they load, which happy-dom has
+     none of. A number for every name is all loading them asks. */
+  const constants = new Proxy(function WebGL() {}, {
+    get: (target, name) => (name === 'prototype' ? Reflect.get(target, name) : 1),
+  })
+  Object.assign(globalThis, { WebGL2RenderingContext: constants, WebGLRenderingContext: constants })
   ;({ sigmaDriver } = await import('./sigma-driver.js'))
 })
 
@@ -88,6 +94,7 @@ const rendererOf = () => {
         : node === 'b'
           ? { size: 4, x: 0.6, y: 0.2 }
           : undefined,
+    getSetting: () => ({ circle: 'Circle' }),
     off: (_type, listener) => listeners.delete(listener),
     on: (_type, listener) => listeners.add(listener),
     refresh: () => {},
@@ -121,10 +128,12 @@ const looks: GraphLooks = {
   }),
   node: (id) => ({
     color: id === 'a' ? 'rgb(0, 0, 255)' : 'rgb(7, 7, 7)',
+    glow: id === 'a' ? 1 : 0,
     hidden: id === 'c',
     label: id === 'a' ? 'always' : id === 'b' ? 'never' : 'room',
     raised: id === 'a',
     selected: id === 'a',
+    shape: id === 'a' ? 'diamond' : undefined,
   }),
   overlay: 'rgb(4, 5, 6)',
 }
@@ -175,6 +184,30 @@ describe('sigmaDriver', () => {
     expect(edge('e', { from: 'a', to: 'b' })).toMatchObject({ color: 'rgb(9, 9, 9)', size: 1.5 })
     expect(settings.get('labelColor')).toEqual({ color: 'rgb(1, 2, 3)' })
     expect(settings.get('labelFont')).toBe('Inter')
+  })
+
+  test('draws every note with its own program, in its shape and the driver’s material', () => {
+    const { settings, sigma } = rendererOf()
+    const driver = sigmaDriver(sigma, { emphasis: 'subtle', material: 'glass' })
+    expect(Object.keys(settings.get('nodeProgramClasses') as object).sort()).toEqual([
+      'circle',
+      'helix',
+    ])
+    driver.look(looks)
+    const node = settings.get('nodeReducer') as (
+      id: string,
+      data: object,
+    ) => Record<string, unknown>
+    expect(node('a', {})).toMatchObject({
+      emphasisCode: 2,
+      glow: 1,
+      materialCode: 1,
+      shapeCode: 2,
+      type: 'helix',
+    })
+    expect(node('d', {})).toMatchObject({ glow: 0, shapeCode: 0 })
+    driver.stop?.()
+    expect(Object.keys(settings.get('nodeProgramClasses') as object)).toEqual(['circle'])
   })
 
   test('pans by pixels, zooms by a step, and centers a note', () => {

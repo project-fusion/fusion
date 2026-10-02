@@ -88,6 +88,28 @@ frame.signal('Payments', 'Fraud review', { tone: 'danger' })
 A signal is drawn and never said: a screen reader does not hear it. Where what
 passed matters to a reader, say it in the page's own words as well.
 
+## How notes look
+
+Each note can say how it is drawn, in the words Helix's other components use:
+
+| Field | Values | What it does |
+|---|---|---|
+| `shape` | `circle`, `square`, `diamond`, `ring` | What kind of note it is at a glance |
+| `emphasis` | `solid`, `outlined`, `subtle` | Filled, a ring with the ground showing through, or a tinted fill with a ring |
+| `material` | `glass`, `frosted` | A shaded sphere with a highlight and a lit rim, or a milky body with a soft fall of light |
+| `tone` | `primary`, `accent`, `info`, `success`, `warning`, `danger`, `neutral` | What it means, which colors it over its group |
+
+```js
+frame.nodes = [
+  { id: 'Roadmap', group: 'Product', shape: 'square' },
+  { id: 'Outage 14', group: 'Support', tone: 'danger', emphasis: 'outlined' },
+]
+```
+
+`sigmaDriver(sigma, { material, shape, emphasis })` sets what a note is drawn as
+where it does not say. The selected note keeps its own color and is told apart by
+a ring and a glow in that color.
+
 ## What it exports
 
 | Import | What |
@@ -95,10 +117,12 @@ passed matters to a reader, say it in the page's own words as well.
 | `@fusion.dev/helix-graph` | `connectGraph`, `diffGraph`, `graphColorsFrom`, `seedPositions`, and the `GraphDriver` and `GraphChanges` types |
 | `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)` |
 
-**Neither Sigma nor graphology is a dependency.** The driver types the renderer
-by the calls it makes on it, so a page brings whichever version it has. A spec
-holds those shapes to the real classes, so a renamed method fails a typecheck
-here rather than a page.
+**Sigma is a peer, and graphology is the page's.** The driver types the renderer
+by the calls it makes on it, so a page brings whichever version it has, and a
+spec holds those shapes to the real classes, so a renamed method fails a
+typecheck here rather than a page. `@fusion.dev/helix-graph/sigma` imports
+Sigma's rendering module for the program that draws the notes, which is why
+Sigma 3 is a peer dependency.
 
 | `connectGraph` option | Default | What else it takes |
 |---|---|---|
@@ -107,6 +131,9 @@ here rather than a page.
 | `sigmaDriver` option | Default | What else it takes |
 |---|---|---|
 | `layout` | none | A function that makes a layout for the graph, such as ForceAtlas2's worker |
+| `material` | flat | `glass` or `frosted`, for every note that does not say |
+| `shape` | `circle` | `square`, `diamond` or `ring`, for every note that does not say |
+| `emphasis` | `solid` | `outlined` or `subtle`, for every note that does not say |
 | `layoutLimit` | `10000` | The longest a layout runs, in milliseconds, about where 10,000 notes settle |
 
 ## Working on it

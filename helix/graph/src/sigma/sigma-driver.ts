@@ -5,8 +5,9 @@ import type {
   GraphChanges,
   GraphDriver,
 } from '../connect-graph/connect-graph.js'
-import type { GraphLooks } from '../connect-graph/looks.js'
+import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
+import { EMPHASES, HelixNodeProgram, MATERIALS, SHAPES } from './node-program.js'
 
 /** A graphology graph, as far as the driver calls it. */
 export interface SigmaGraph {
@@ -46,6 +47,7 @@ export interface SigmaRenderer {
   ): { hidden?: boolean; size: number; x: number; y: number } | undefined
   off(type: 'clickNode', listener: (payload: { node: string }) => void): unknown
   on(type: 'clickNode', listener: (payload: { node: string }) => void): unknown
+  getSetting(name: 'nodeProgramClasses'): Record<string, unknown>
   refresh(): unknown
   resize(force?: boolean): unknown
   scaleSize(size?: number): number
@@ -56,6 +58,7 @@ export interface SigmaRenderer {
       | 'labelColor'
       | 'labelFont'
       | 'labelRenderedSizeThreshold'
+      | 'nodeProgramClasses'
       | 'nodeReducer',
     value: unknown,
   ): unknown
@@ -88,6 +91,19 @@ export interface SigmaDriverOptions {
    * Without one, notes stay where the connector started them.
    */
   layout?: ((graph: SigmaGraph) => SigmaLayout) | undefined
+  /**
+   * How heavily a note is drawn where it does not say: `solid`, filled, by
+   * default; `outlined`, a ring; `subtle`, a tinted fill with a ring.
+   */
+  emphasis?: NodeLook['emphasis']
+  /**
+   * What a note is drawn as made of where it does not say: flat by default,
+   * `glass`, a shaded sphere with a highlight and a lit rim, or `frosted`, a
+   * milky body with a soft fall of light.
+   */
+  material?: NodeLook['material']
+  /** A note's shape where it does not say: `circle` by default, `square`, `diamond` or `ring`. */
+  shape?: NodeLook['shape']
   /** The longest a layout runs, in milliseconds, settled or not. 10 seconds by default, about where 10,000 notes settle. */
   layoutLimit?: number | undefined
 }
@@ -168,10 +184,10 @@ const hoverOf =
   }
 
 /** How long a signal takes to cross from one note to the other, in milliseconds. */
-const TRAVEL = 700
+const TRAVEL = 800
 
-/** How long the pulse on arrival lasts, in milliseconds. */
-const PULSE = 450
+/** How long the burst on arrival lasts, in milliseconds. */
+const PULSE = 520
 
 /** How long a new note takes to grow to its size, in milliseconds. */
 const GROW = 300
@@ -186,6 +202,89 @@ interface Flight {
   from: string
   started: number
   to: string
+}
+
+/** An `rgb()` color with an alpha, for a gradient's stops. */
+const withAlpha = (color: string, alpha: number): string => {
+  const [red = 128, green = 128, blue = 128] = color.match(/[\d.]+/g)?.map(Number) ?? []
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`
+}
+
+/** How far behind its head a streak's tail reaches, in pixels. */
+const TAIL = 90
+
+/**
+ * A signal on its way: a streak of light whose tail fades into the link it
+ * came along, and a head of white light in the signal's color.
+ */
+const streak = (
+  context: CanvasRenderingContext2D,
+  color: string,
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  along: number,
+): void => {
+  const length = Math.hypot(to.x - from.x, to.y - from.y) || 1
+  const head = { x: from.x + (to.x - from.x) * along, y: from.y + (to.y - from.y) * along }
+  const behind = Math.max(along - TAIL / length, 0)
+  const tail = { x: from.x + (to.x - from.x) * behind, y: from.y + (to.y - from.y) * behind }
+  const fade = context.createLinearGradient(tail.x, tail.y, head.x, head.y)
+  fade.addColorStop(0, withAlpha(color, 0))
+  fade.addColorStop(1, withAlpha(color, 1))
+  context.lineCap = 'round'
+  context.strokeStyle = fade
+  /* The glow, wide and soft, then the streak itself, narrow and bright. */
+  context.shadowColor = color
+  context.shadowBlur = 18
+  context.globalAlpha = 0.45
+  context.lineWidth = 7
+  context.beginPath()
+  context.moveTo(tail.x, tail.y)
+  context.lineTo(head.x, head.y)
+  context.stroke()
+  context.globalAlpha = 1
+  context.lineWidth = 2.5
+  context.stroke()
+  const light = context.createRadialGradient(head.x, head.y, 0, head.x, head.y, 9)
+  light.addColorStop(0, 'rgba(255, 255, 255, 0.95)')
+  light.addColorStop(0.35, withAlpha(color, 0.9))
+  light.addColorStop(1, withAlpha(color, 0))
+  context.shadowBlur = 0
+  context.fillStyle = light
+  context.beginPath()
+  context.arc(head.x, head.y, 9, 0, Math.PI * 2)
+  context.fill()
+}
+
+/** A signal arriving: a bloom of its light over the note, and a ring opening out from it. */
+const burst = (
+  context: CanvasRenderingContext2D,
+  color: string,
+  at: { radius: number; x: number; y: number },
+  opened: number,
+): void => {
+  const reach = at.radius + 4 + opened * 22
+  const bloom = context.createRadialGradient(at.x, at.y, at.radius * 0.5, at.x, at.y, reach)
+  bloom.addColorStop(0, withAlpha(color, 0.55 * (1 - opened)))
+  bloom.addColorStop(1, withAlpha(color, 0))
+  context.fillStyle = bloom
+  context.beginPath()
+  context.arc(at.x, at.y, reach, 0, Math.PI * 2)
+  context.fill()
+  context.globalAlpha = 1 - opened
+  context.strokeStyle = color
+  context.lineWidth = 2
+  context.shadowColor = color
+  context.shadowBlur = 10
+  context.beginPath()
+  context.arc(at.x, at.y, reach, 0, Math.PI * 2)
+  context.stroke()
+}
+
+/** Whether an `rgb()` color is light, which a light ink says the ground is dark. */
+const isLight = (color: string): boolean => {
+  const [red = 0, green = 0, blue = 0] = color.match(/[\d.]+/g)?.map(Number) ?? []
+  return (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255 > 0.5
 }
 
 /** Eases in and out, so a signal leaves and arrives gently. */
@@ -257,6 +356,12 @@ export const sigmaDriver = (
     container.addEventListener(type, hold, { capture: true, passive: false })
   }
 
+  /* **The notes are drawn by Helix's own program**, which cuts each to its
+     shape, draws its emphasis and its material, and lights its glow: added
+     beside the page's programs and taken away again when the driver stops. */
+  const programs = sigma.getSetting('nodeProgramClasses')
+  sigma.setSetting('nodeProgramClasses', { ...programs, helix: HelixNodeProgram })
+
   /* **Its own box, and not only the window.** Sigma measures its container
      when the window resizes, and a frame filling the screen, or settling its
      height, changes the box with the window as it was: the drawing stretched
@@ -278,6 +383,9 @@ export const sigmaDriver = (
   let flights: Flight[] = []
   let flying = 0
   let ink = 'rgb(128, 128, 128)'
+  /* Whether the drawing's ground is dark, read from its ink, which decides how
+     a signal's light is laid over it. */
+  let glowing = false
 
   /** Where a note is on screen, and how large, or nothing where it is not drawn. */
   const onScreen = (id: string): { radius: number; x: number; y: number } | undefined => {
@@ -304,6 +412,10 @@ export const sigmaDriver = (
     }
     context.setTransform(ratio, 0, 0, ratio, 0, 0)
     context.clearRect(0, 0, width, height)
+    /* **Light added to light on a dark ground**, so a streak glows and two
+       crossing brighten where they meet. On a light ground the same blend
+       washes to white, so there a streak is laid over the drawing as paint. */
+    context.globalCompositeOperation = glowing ? 'lighter' : 'source-over'
     flights = flights.filter((flight) => {
       const from = onScreen(flight.from)
       const to = onScreen(flight.to)
@@ -312,35 +424,13 @@ export const sigmaDriver = (
         return false
       }
       context.save()
-      context.strokeStyle = flight.color
-      context.fillStyle = flight.color
       if (gone < 1) {
         if (flight.animate) {
-          /* A dot crossing, with the path it has come lit faintly behind it. */
-          const along = ease(gone)
-          const x = from.x + (to.x - from.x) * along
-          const y = from.y + (to.y - from.y) * along
-          context.globalAlpha = 0.6
-          context.lineWidth = 2
-          context.beginPath()
-          context.moveTo(from.x, from.y)
-          context.lineTo(x, y)
-          context.stroke()
-          context.globalAlpha = 1
-          context.shadowBlur = 14
-          context.shadowColor = flight.color
-          context.beginPath()
-          context.arc(x, y, 5, 0, Math.PI * 2)
-          context.fill()
-          /* A pale core, so a signal reads over a note of its own color. */
-          context.shadowBlur = 0
-          context.fillStyle = 'rgba(255, 255, 255, 0.85)'
-          context.beginPath()
-          context.arc(x, y, 2, 0, Math.PI * 2)
-          context.fill()
+          streak(context, flight.color, from, to, ease(gone))
         } else {
           /* For a reader who asked for less motion, the link lit for a moment. */
           context.globalAlpha = 1 - gone
+          context.strokeStyle = flight.color
           context.lineWidth = 2
           context.beginPath()
           context.moveTo(from.x, from.y)
@@ -348,13 +438,7 @@ export const sigmaDriver = (
           context.stroke()
         }
       } else if (flight.animate) {
-        /* The arrival: a ring opening out from the note it reached. */
-        const opened = (gone - 1) / (PULSE / TRAVEL)
-        context.globalAlpha = 1 - opened
-        context.lineWidth = 2.5
-        context.beginPath()
-        context.arc(to.x, to.y, to.radius + 2 + opened * 16, 0, Math.PI * 2)
-        context.stroke()
+        burst(context, flight.color, to, (gone - 1) / (PULSE / TRAVEL))
       }
       context.restore()
       return true
@@ -421,6 +505,7 @@ export const sigmaDriver = (
     },
     look: (looks: GraphLooks) => {
       ink = looks.ink
+      glowing = isLight(looks.ink)
       sigma.setSetting('labelColor', { color: looks.ink })
       sigma.setSetting('labelFont', looks.font)
       /* **Named wherever there is room, and not only once drawn large.**
@@ -439,10 +524,15 @@ export const sigmaDriver = (
         return {
           ...data,
           color: look.color,
+          emphasisCode: EMPHASES[look.emphasis ?? options.emphasis ?? 'solid'],
           forceLabel: look.label === 'always',
+          glow: look.glow,
           hidden: look.hidden,
           label: look.label === 'never' ? null : data.label,
+          materialCode: MATERIALS[look.material ?? options.material ?? 'flat'],
+          shapeCode: SHAPES[look.shape ?? options.shape ?? 'circle'],
           size: typeof data.size === 'number' ? data.size * grown : data.size,
+          type: 'helix',
           zIndex: look.selected ? 2 : look.raised ? 1 : 0,
         }
       })
@@ -498,6 +588,7 @@ export const sigmaDriver = (
       flights = []
       overlay?.remove()
       overlay = undefined
+      sigma.setSetting('nodeProgramClasses', programs)
       sized?.disconnect()
       for (const type of held) {
         container.removeEventListener(type, hold, { capture: true })
