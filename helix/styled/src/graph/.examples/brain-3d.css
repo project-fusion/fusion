@@ -1,4 +1,0 @@
-/* The shape the notes are drawn in is read, not shown. */
-[data-preview-graph-stencil] {
-  display: none;
-}

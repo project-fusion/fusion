@@ -125,7 +125,7 @@ describe('the brain example', () => {
 
 describe('the brain-3d example', () => {
   run(
-    'gives the frame eight regions of a thousand notes, and a solid shape to draw them on',
+    'gives the frame eight regions of a thousand notes, and names the brain model to draw them on',
     async () => {
       await example(brain3d)
       await idle()
@@ -133,11 +133,10 @@ describe('the brain-3d example', () => {
         nodes: { group: string; id: string }[]
       }
       expect(graph.dataset.previewGraph).toBe('three')
+      expect(graph.dataset.previewGraphModel).toBe('/media/models/brain.glb')
+      expect(graph.dataset.previewGraphPlace).toBe('surface')
       expect(graph.nodes).toHaveLength(8000)
       expect(new Set(graph.nodes.map((node) => node.group)).size).toBe(8)
-      const stencil = graph.querySelector<SVGSVGElement>('svg[data-preview-graph-stencil]')
-      expect(stencil?.dataset.previewGraphDepth).toBe('140')
-      expect(stencil?.dataset.previewGraphPlace).toBe('surface')
     },
   )
 })

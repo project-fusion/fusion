@@ -106,9 +106,24 @@ export const shapeFromTriangles = (
       }
     }
   }
-  return fieldFromCells(cells, [nx, ny, nz], cell, {
+  /* The surface itself, in the box's units, which a renderer can draw as it is. */
+  const meshCorners = new Float32Array(corners * 3)
+  for (let at = 0; at < corners; at++) {
+    meshCorners[at * 3] = (positions[at * 3] as number) - origin[0]
+    meshCorners[at * 3 + 1] = (high[1] as number) + cell - (positions[at * 3 + 1] as number)
+    meshCorners[at * 3 + 2] = (positions[at * 3 + 2] as number) - origin[2]
+  }
+  const meshTriangles = index
+    ? Uint32Array.from({ length: triangles * 3 }, (_, at) => index[at] as number)
+    : Uint32Array.from({ length: triangles * 3 }, (_, at) => at)
+  const field = fieldFromCells(cells, [nx, ny, nz], cell, {
     depth: nz * cell,
     height: ny * cell,
     width: nx * cell,
   })
+  return {
+    ...field,
+    distance: field.distance,
+    mesh: { corners: meshCorners, triangles: meshTriangles },
+  }
 }

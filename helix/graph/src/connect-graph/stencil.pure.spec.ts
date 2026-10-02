@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import { arrangeByGroup } from './arrange.js'
+import { arrangeByGroup, hubsOf } from './arrange.js'
 import type { GraphPoint } from './seed.js'
 import { fieldFromInside } from './shape-field.js'
-import { fitToStencil, type GraphStencil } from './stencil.js'
+import { fitInStencil, fitToStencil, type GraphStencil } from './stencil.js'
 
 /** A square of notes from 0 to 100 each way, `side` to a row. */
 const square = (side: number, prefix = 'n'): Map<string, GraphPoint> => {
@@ -107,5 +107,68 @@ describe('fitToStencil in three dimensions', () => {
     const b = side('b')
     /* The two groups' middles point away from each other. */
     expect(a.x * b.x + a.y * b.y + a.z * b.z).toBeLessThan(-0.5)
+  })
+})
+
+describe('fitInStencil by cluster', () => {
+  /* Six groups of a hub and 99 notes each, on a ball's surface. */
+  const groups = ['a', 'b', 'c', 'd', 'e', 'f']
+  const nodes = groups.flatMap((group) => [
+    { group, id: `${group}-hub` },
+    ...Array.from({ length: 99 }, (_, at) => ({ group, id: `${group}-${at}` })),
+  ])
+  const links = groups.flatMap((group) =>
+    Array.from({ length: 99 }, (_, at) => ({ source: `${group}-${at}`, target: `${group}-hub` })),
+  )
+  const ball = fieldFromInside((x, y, z) => Math.hypot(x - 50, y - 50, z - 50) < 45, {
+    depth: 100,
+    height: 100,
+    width: 100,
+  })
+  const groupOf = new Map(nodes.map((node) => [node.id, node.group]))
+  const { hubOf } = hubsOf(nodes, links)
+
+  /** The share of notes nearer the middle of their own group than of any other. */
+  const together = (fitted: Map<string, { x: number; y: number; z?: number | undefined }>) => {
+    const middles = new Map<string, { x: number; y: number; z: number; count: number }>()
+    for (const [id, at] of fitted) {
+      const group = groupOf.get(id) as string
+      const middle = middles.get(group) ?? { count: 0, x: 0, y: 0, z: 0 }
+      middle.x += at.x
+      middle.y += at.y
+      middle.z += at.z ?? 0
+      middle.count += 1
+      middles.set(group, middle)
+    }
+    let own = 0
+    for (const [id, at] of fitted) {
+      let best = ''
+      let nearest = Number.POSITIVE_INFINITY
+      for (const [group, { count, x, y, z }] of middles) {
+        const far = Math.hypot(at.x - x / count, at.y - y / count, (at.z ?? 0) - z / count)
+        if (far < nearest) {
+          nearest = far
+          best = group
+        }
+      }
+      own += best === groupOf.get(id) ? 1 : 0
+    }
+    return own / fitted.size
+  }
+
+  test('gives each group a piece of the surface of its own, where without clusters groups mix', () => {
+    const { positions } = fitInStencil(
+      arrangeByGroup(nodes, links, { solid: true }),
+      { ...ball, place: 'surface' },
+      { clustersOf: (id) => [groupOf.get(id) as string, hubOf(id)] },
+    )
+    const plain = fitInStencil(arrangeByGroup(nodes, links, { solid: true }), {
+      ...ball,
+      place: 'surface',
+    }).positions
+    expect(positions.size).toBe(600)
+    /* Measured at 0.82 by cluster and 0.68 without, on 2 Oct 2026. */
+    expect(together(positions)).toBeGreaterThan(0.75)
+    expect(together(positions) - together(plain)).toBeGreaterThan(0.1)
   })
 })

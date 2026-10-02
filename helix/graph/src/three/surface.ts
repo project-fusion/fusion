@@ -1,6 +1,6 @@
 import type { ShapeField } from '../connect-graph/shape-field.js'
 
-/** How many cells the surface is read in along the shape's longest side. */
+/** How many cells the surface is read in along the shape's longest side, where none is asked for. */
 const CELLS = 72
 
 /**
@@ -13,10 +13,18 @@ const CELLS = 72
  */
 export const surfaceOf = (
   field: ShapeField,
-  at = 0,
+  {
+    at = 0,
+    cells = CELLS,
+  }: {
+    /** The distance the surface is drawn at: below zero inside the shape. 0 by default. */
+    at?: number | undefined
+    /** How many cells the field is read in along its longest side. 72 by default. */
+    cells?: number | undefined
+  } = {},
 ): { corners: Float32Array; triangles: Uint32Array } => {
   const { depth, height, width } = field
-  const cell = Math.max(width, height, depth) / CELLS
+  const cell = Math.max(width, height, depth) / cells
   /* A cell of room on every side, so a shape that fills its box is closed. */
   const nx = Math.ceil(width / cell) + 3
   const ny = Math.ceil(height / cell) + 3

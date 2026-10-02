@@ -34,6 +34,11 @@ describe('shapeFromTriangles', () => {
     expect(field.distance(middle.x, middle.y, middle.z)).toBeCloseTo(-5, 0)
   })
 
+  test('keeps the surface it was read from, to be drawn as it is', () => {
+    expect(field.mesh?.triangles).toHaveLength(36)
+    expect(field.mesh?.corners).toHaveLength(36 * 3)
+  })
+
   test('is outside past each face', () => {
     expect(field.distance(middle.x, middle.y, 0.1)).toBeGreaterThan(0)
     expect(field.distance(0.1, middle.y, middle.z)).toBeGreaterThan(0)

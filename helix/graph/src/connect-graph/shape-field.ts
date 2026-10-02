@@ -14,6 +14,13 @@ export interface ShapeField {
   distance(x: number, y: number, z?: number): number
   /** How tall the box is. Its y points down, as an SVG's does. */
   readonly height: number
+  /**
+   * The surface the field was read from, where it was read from one, in the
+   * box's units: corners three numbers each, and triangles three corners
+   * each. A renderer draws it in place of a surface it would make from the
+   * field, since it holds every detail the field's cells are too coarse for.
+   */
+  readonly mesh?: { corners: Float32Array; triangles: Uint32Array } | undefined
   /** How wide the box is. */
   readonly width: number
 }

@@ -19,7 +19,7 @@ describe('surfaceOf', () => {
   })
 
   test('wraps the surface a distance inside the solid, where asked', () => {
-    const { corners } = surfaceOf(sphere({ radius: 30 }), -5)
+    const { corners } = surfaceOf(sphere({ radius: 30 }), { at: -5 })
     const out = Math.hypot(
       (corners[0] as number) - 30,
       (corners[1] as number) - 30,

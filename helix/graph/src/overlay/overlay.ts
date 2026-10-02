@@ -189,7 +189,10 @@ const nameGroups = (
         points.push(point)
       }
     }
-    if (count < 2) {
+    /* Named only where enough of the group is in view to say which notes
+       the name means: a group mostly round the far side of a shape would be
+       named over its neighbor's notes. */
+    if (count < Math.max(2, group.ids.length * 0.3)) {
       continue
     }
     x /= count
