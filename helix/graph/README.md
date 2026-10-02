@@ -150,6 +150,37 @@ until the reader moves it. Zoomed out, a note is a fine point and a leaf is
 drawn partly clear, so a group reads as a field of points with its hubs
 standing out; notes grow as the reader zooms in.
 
+**cosmos.gl's own start reports a `ResizeObserver loop` error**, which is
+harmless and shows in the console: it observes its canvas from inside
+luma.gl's resize callback. Make the GPU device yourself and hand it over a
+frame after its canvas is measured, and cosmos.gl starts outside any callback:
+
+```js
+import { luma } from '@luma.gl/core'
+import { webgl2Adapter } from '@luma.gl/webgl'
+
+const canvas = Object.assign(document.createElement('canvas'), {
+  style: 'width:100%;height:100%',
+})
+box.append(canvas)
+const device = luma
+  .createDevice({
+    adapters: [webgl2Adapter],
+    createCanvasContext: { autoResize: true, canvas, useDevicePixels: true },
+    type: 'webgl',
+    webgl: { antialias: false },
+  })
+  .then(async (made) => {
+    await made.canvasContext?.initialized
+    await new Promise((done) => requestAnimationFrame(done))
+    return made
+  })
+const graph = new Graph(box, { attribution: '', enableSimulation: true }, device)
+```
+
+Use the `@luma.gl` version `@cosmos.gl/graph` depends on, since two versions
+on one page throw, and destroy the device after the graph.
+
 **The driver is for `@cosmos.gl/graph`, which is MIT.** Cosmograph, the
 product built on it, is licensed for noncommercial use only.
 

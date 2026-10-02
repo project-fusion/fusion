@@ -37,6 +37,8 @@
     "@fusion.dev/helix-styles": "workspace:*",
     "@fusion.dev/helix-theme": "workspace:*",
     "@fusion.dev/insights": "workspace:*",
+    "@luma.gl/core": "~9.3.6",
+    "@luma.gl/webgl": "~9.3.6",
     "graphology": "^0.26.0",
     "graphology-layout-forceatlas2": "^0.10.1",
     "maplibre-gl": "^6.11.2",

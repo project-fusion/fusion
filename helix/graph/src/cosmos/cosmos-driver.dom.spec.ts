@@ -166,6 +166,38 @@ describe('cosmosDriver', () => {
     expect(held.positions).toHaveLength(6)
   })
 
+  test('reads nothing from the GPU when notes arrive after a drawing with none', () => {
+    const { box, graph, held } = graphOf()
+    const driver = cosmosDriver(graph, box)
+    driver.draw({ links: [], nodes: [] })
+    held.read = 0
+    driver.update?.(
+      { addLinks: [], addNodes: nodes, changeNodes: [], removeLinks: [], removeNodes: [] },
+      false,
+    )
+    expect(held.read).toBe(0)
+    expect(held.positions).toHaveLength(4)
+  })
+
+  test('reads nothing from cosmos.gl once stopped, when the page may have destroyed it', () => {
+    const { box, graph, held } = graphOf()
+    const driver = cosmosDriver(graph, box)
+    driver.draw({ links: [], nodes })
+    driver.stop?.()
+    held.read = 0
+    driver.update?.(
+      {
+        addLinks: [],
+        addNodes: [],
+        changeNodes: [{ id: 'a', label: 'Alpha', size: 1, x: 3, y: 3 }],
+        removeLinks: [],
+        removeNodes: [],
+      },
+      false,
+    )
+    expect(held.read).toBe(0)
+  })
+
   test('lays out the notes without a place, with the rest pinned, and says where they went', () => {
     const { box, graph, held } = graphOf()
     const driver = cosmosDriver(graph, box)
