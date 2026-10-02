@@ -165,6 +165,8 @@ export interface LinkLook {
 
 /** How every note and link is drawn, asked one at a time, so ten thousand cost nothing until drawn. */
 export interface GraphLooks {
+  /** A note's own color, its tone's or its group's, whatever the selection fades. */
+  colorOf(id: string): string
   /** The typeface the labels are drawn in: the first of the frame's own. */
   font: string
   /** What the drawing is laid on, which a name is ringed in so it reads over the links. */
@@ -173,6 +175,8 @@ export interface GraphLooks {
   ink: string
   /** What a name is drawn on while the pointer is over its note. */
   overlay: string
+  /** The quieter ink a name at rest is drawn in, beside the selected note's and its neighbors'. */
+  quiet: string
   link(source: string, target: string): LinkLook
   node(id: string): NodeLook
 }
@@ -218,6 +222,7 @@ export const looksOf = (options: {
   const focused = selected !== undefined
   const hidden = (id: string): boolean => shown !== undefined && !shown.has(id)
   return {
+    colorOf: own,
     font: options.font || 'sans-serif',
     ground: colors.ground,
     ink: colors.ink,
@@ -265,5 +270,6 @@ export const looksOf = (options: {
       }
     },
     overlay: colors.overlay,
+    quiet: colors.muted,
   }
 }

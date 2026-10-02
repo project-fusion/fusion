@@ -75,8 +75,9 @@ socket.addEventListener('message', ({ data }) => {
 ```
 
 **`frame.signal(from, to, { tone })` shows something passing between two
-notes**: a message, a request, a payment. It is drawn traveling from one to the
-other and arriving with a pulse, in the tone's color, over the graph and without
+notes**: a message, a request, a payment. It is drawn as a pulse of light
+traveling from one to the other, turning from the first note's color to the
+second's, or in the tone's color where it has one, over the graph and without
 redrawing it, so a busy feed costs a dot each. A reader who asks for less motion
 sees the link lit for a moment instead.
 
@@ -111,10 +112,15 @@ where it does not say. The selected note keeps its own color and is told apart b
 a ring and a glow in that color.
 
 **A note without a `size` is as large as it is connected**, so hubs read at a
-glance. Hubs are named at rest and the rest as the reader zooms in, each name
-ringed in the ground's color so it reads over the links. Links are tinted by the
-note they leave, the selected note's and the hovered note's in their color, and
-choosing a note in the list frames it with its neighbors.
+glance. Links are tinted by the note they leave, the selected note's and the
+hovered note's in their color, and choosing a note in the list frames it with
+its neighbors.
+
+**Notes are named on hover**, and the selected note and its neighbors where
+there is room, each name ringed in the ground's color so it reads over the
+links. Each group's name is drawn over its notes, which is how a reader finds
+their way. `labels: 'hubs'` names the busiest notes at rest as well, quietly,
+and `labels: 'all'` every note where its name does not cover another.
 
 ## What it exports
 
@@ -140,6 +146,8 @@ Sigma 3 is a peer dependency.
 | `material` | flat | `glass` or `frosted`, for every note that does not say |
 | `shape` | `circle` | `square`, `diamond` or `ring`, for every note that does not say |
 | `emphasis` | `solid` | `outlined` or `subtle`, for every note that does not say |
+| `labels` | `'hover'` | `'hubs'` or `'all'`: which notes are named at rest |
+| `groupLabels` | `true` | `false` leaves each group unnamed |
 | `layoutLimit` | `10000` | The longest a layout runs, in milliseconds, about where 10,000 notes settle |
 
 ## Working on it
