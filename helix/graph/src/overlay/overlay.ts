@@ -89,6 +89,24 @@ const bowed = (from: Point, to: Point): Point => {
   }
 }
 
+/**
+ * The point a path bends toward, held near enough its straight line that
+ * the path bows and never loops: two notes close on screen with an arc
+ * lifted mostly sideways drew a loop out past them.
+ */
+const bounded = (from: Point, to: Point, toward: Point): Point => {
+  const middle = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 }
+  const far = Math.hypot(toward.x - middle.x, toward.y - middle.y)
+  const most = Math.max(Math.hypot(to.x - from.x, to.y - from.y) * 0.9, 12)
+  if (far <= most) {
+    return toward
+  }
+  return {
+    x: middle.x + ((toward.x - middle.x) * most) / far,
+    y: middle.y + ((toward.y - middle.y) * most) / far,
+  }
+}
+
 /** The curve's path, traced. */
 const trace = (context: CanvasRenderingContext2D, a: Point, c: Point, b: Point): void => {
   context.beginPath()
@@ -390,7 +408,7 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen, bend?: B
       if (gone >= 1 + ARRIVAL / crossing) {
         return false
       }
-      const toward = bend?.(flight.from, flight.to) ?? bowed(from, to)
+      const toward = bounded(from, to, bend?.(flight.from, flight.to) ?? bowed(from, to))
       context.save()
       if (gone < 1) {
         if (flight.animate) {
