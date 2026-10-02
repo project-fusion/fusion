@@ -7,14 +7,21 @@ import {
 } from 'd3-force-3d'
 import {
   AdditiveBlending,
+  BoxGeometry,
   BufferAttribute,
   BufferGeometry,
   DoubleSide,
+  Euler,
+  InstancedBufferAttribute,
+  InstancedMesh,
   LineSegments,
+  Matrix4,
   Mesh,
   NormalBlending,
+  OctahedronGeometry,
   PerspectiveCamera,
   Points,
+  Quaternion,
   Raycaster,
   Scene,
   ShaderMaterial,
@@ -95,7 +102,7 @@ const REST = 8000
  * how far it reaches for them, in the spacing of the notes; and how much
  * weight of notes makes the wash whole.
  */
-const WASH = { dark: 0.2, full: 1.5, light: 0.26, notes: 6, reach: 3.5 }
+const WASH = { dark: 0.14, full: 1.5, light: 0.18, notes: 6, reach: 3.5 }
 
 /**
  * How strong the halo every note carries is, on a dark ground and a light
@@ -103,6 +110,9 @@ const WASH = { dark: 0.2, full: 1.5, light: 0.26, notes: 6, reach: 3.5 }
  * light ground, where a halo would read as a smudge.
  */
 const BLOOM = { dark: 0.28, light: 0 }
+
+/** Where the light falls from, fixed in the scene: above, to the left, and in front. */
+const LIGHT = new Vector3(-0.4, 0.8, 0.45).normalize()
 
 /** How high a signal's path rises over the shape, as a share of how far it goes. */
 const LIFT = 0.42
@@ -130,6 +140,29 @@ float fade(float depth) {
 }
 `
 
+/**
+ * How a note's surface is lit, the same for an orb and a cube: from a light
+ * fixed in the scene, so a highlight moves over the note as the reader turns
+ * the graph, with a soft fill, a sharp highlight, and its rim brighter in its
+ * own color, as light catches the edge of glass. `n` and `light` are in the
+ * view's space, `n` facing the eye at `z` 1.
+ */
+// language=GLSL
+const SHADE = /* glsl */ `
+uniform vec3 light;
+
+vec3 shade(vec3 base, vec3 n) {
+  float diffuse = max(dot(n, light), 0.0);
+  vec3 half_ = normalize(light + vec3(0.0, 0.0, 1.0));
+  float highlight = pow(max(dot(n, half_), 0.0), 42.0);
+  float rim = pow(1.0 - clamp(n.z, 0.0, 1.0), 2.4);
+  vec3 color = base * (0.36 + 0.8 * diffuse);
+  color += vec3(1.0) * highlight * 0.6;
+  color += min(base * 1.4, vec3(1.0)) * rim * 0.32;
+  return color;
+}
+`
+
 // language=GLSL
 const VERTEX = /* glsl */ `
 ${FADE}
@@ -141,22 +174,28 @@ attribute float glow;
 uniform float scale;
 uniform float unit;
 uniform float bloom;
+uniform float halo;
 
 varying vec4 vTint;
 varying float vShape;
 varying float vGlow;
 varying float vFade;
 varying float vRoom;
+varying vec3 vCenter;
+varying float vRadius;
 
 void main() {
   vec4 view = modelViewMatrix * vec4(position, 1.0);
   gl_Position = projectionMatrix * view;
   float depth = max(-view.z, 0.001);
-  /* Room around the note for its halo, which every note has where the
-     ground is dark, and more for a glowing one. */
-  vRoom = 1.0 + (bloom > 0.0 ? 0.9 : 0.0) + glow * 1.4;
+  /* The halo's pass has room around the note for it, which every note has
+     where the ground is dark, and more for a glowing one; the body's pass
+     is the note and no more. */
+  vRoom = halo > 0.5 ? 1.0 + (bloom > 0.0 ? 0.9 : 0.0) + glow * 1.4 : 1.0;
   /* As large as the note is, at the distance it is: nearer is larger. */
   gl_PointSize = size * unit * scale / depth * vRoom;
+  vCenter = view.xyz;
+  vRadius = size * unit * 0.5;
   vFade = fade(depth);
   vTint = tint;
   vShape = shape;
@@ -164,10 +203,42 @@ void main() {
 }
 `
 
+/**
+ * A note's body: **a sphere, worked out for each pixel of its sprite**. The
+ * sprite faces the eye, and each pixel inside it finds the point of the
+ * sphere under it, its normal, and its depth, which it writes, so notes meet
+ * the shape and each other as solids do, and are lit as solids are. A note
+ * in another shape is drawn by a mesh, so its sprite draws nothing.
+ */
 // language=GLSL
 const FRAGMENT = /* glsl */ `
-uniform float bloom;
+uniform mat4 projectionMatrix;
+${SHADE}
+varying vec4 vTint;
+varying float vShape;
+varying float vFade;
+varying vec3 vCenter;
+varying float vRadius;
 
+void main() {
+  if (vShape > 0.5) discard;
+  vec2 q = (gl_PointCoord * 2.0 - 1.0) * vec2(1.0, -1.0);
+  float d2 = dot(q, q);
+  if (d2 > 1.0) discard;
+  vec3 n = vec3(q, sqrt(1.0 - d2));
+  vec4 clip = projectionMatrix * vec4(vCenter + n * vRadius, 1.0);
+  gl_FragDepth = clip.z / clip.w * 0.5 + 0.5;
+  float edge = 1.0 - smoothstep(0.9, 1.0, sqrt(d2));
+  float alpha = edge * vTint.a * vFade;
+  if (alpha < 0.01) discard;
+  gl_FragColor = vec4(shade(vTint.rgb, n), alpha);
+}
+`
+
+/** A note's halo: soft light falling away past its body, drawn after the bodies and hidden where they are. */
+// language=GLSL
+const HALO_FRAGMENT = /* glsl */ `
+uniform float bloom;
 varying vec4 vTint;
 varying float vShape;
 varying float vGlow;
@@ -175,26 +246,45 @@ varying float vFade;
 varying float vRoom;
 
 void main() {
-  /* Where in the note's body this is, from its middle at 0 to its edge at 1;
-     the sprite past the body is room for its halo. */
-  vec2 q = (gl_PointCoord * 2.0 - 1.0) * vec2(1.0, -1.0) * vRoom;
+  vec2 q = (gl_PointCoord * 2.0 - 1.0) * vRoom;
   float d = vShape > 1.5 ? (abs(q.x) + abs(q.y)) * 0.78 : vShape > 0.5 ? max(abs(q.x), abs(q.y)) * 1.08 : length(q);
-  float inside = 1.0 - smoothstep(0.84, 1.0, d);
-  /* **An orb of light**: lit from above and to the left, a hot core toward
-     white a little off its middle, and its rim brighter in its own color,
-     as light catches the edge of a glass bead. */
-  float lit = clamp(0.5 + 0.5 * dot(normalize(vec2(-0.5, 0.7)), q), 0.0, 1.0);
-  vec3 body = vTint.rgb * mix(0.7, 1.12, lit);
-  float core = 1.0 - smoothstep(0.0, 0.6, length(q - vec2(-0.2, 0.24)));
-  body = mix(body, vec3(1.0), core * core * 0.6);
-  body = mix(body, min(vTint.rgb * 1.35, vec3(1.0)), smoothstep(0.62, 0.96, d) * 0.4);
-  /* The halo: soft light falling away past the body, faint for every note
-     on a dark ground and stronger for one that glows. */
+  if (d < 1.0) discard;
   float past = clamp((d - 1.0) / max(vRoom - 1.0, 0.001), 0.0, 1.0);
-  float halo = (bloom + vGlow * 0.6) * pow(1.0 - past, 2.4) * step(1.0, d);
-  float alpha = (inside + halo * (1.0 - inside)) * vTint.a * vFade;
+  float alpha = (bloom + vGlow * 0.6) * pow(1.0 - past, 2.4) * vTint.a * vFade;
   if (alpha < 0.01) discard;
-  gl_FragColor = vec4(mix(vTint.rgb, body, inside), alpha);
+  gl_FragColor = vec4(vTint.rgb, alpha);
+}
+`
+
+/** A note drawn as a mesh, a cube or an octahedron, one instance a note, lit as an orb is. */
+// language=GLSL
+const SHAPE_VERTEX = /* glsl */ `
+${FADE}
+attribute vec4 tone;
+varying vec3 vNormal;
+varying vec4 vTone;
+varying float vFade;
+
+void main() {
+  vec4 view = viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * view;
+  vNormal = normalize(normalMatrix * mat3(instanceMatrix) * normal);
+  vTone = tone;
+  vFade = fade(max(-view.z, 0.001));
+}
+`
+
+// language=GLSL
+const SHAPE_FRAGMENT = /* glsl */ `
+${SHADE}
+varying vec3 vNormal;
+varying vec4 vTone;
+varying float vFade;
+
+void main() {
+  float alpha = vTone.a * vFade;
+  if (alpha < 0.01) discard;
+  gl_FragColor = vec4(shade(vTone.rgb, normalize(vNormal)), alpha);
 }
 `
 
@@ -341,6 +431,7 @@ export const threeDriver = (
 
   const uniforms = {
     bloom: { value: BLOOM.dark },
+    light: { value: new Vector3(-0.4, 0.8, 0.45).normalize() },
     middle: { value: 1 },
     radius: { value: 1 },
     scale: { value: 1 },
@@ -361,17 +452,54 @@ export const threeDriver = (
       },
       vertexShader: LINE_VERTEX,
     })
+  /* **Notes in two passes**: their bodies, solid, writing their depth, and
+     after them their halos, which are light and hide behind what is solid. */
   const points = new Points(
     new BufferGeometry(),
     new ShaderMaterial({
-      depthWrite: false,
       fragmentShader: FRAGMENT,
       transparent: true,
-      uniforms,
+      uniforms: { ...uniforms, halo: { value: 0 } },
       vertexShader: VERTEX,
     }),
   )
   points.frustumCulled = false
+  const halos = new Points(
+    points.geometry,
+    new ShaderMaterial({
+      depthWrite: false,
+      fragmentShader: HALO_FRAGMENT,
+      transparent: true,
+      uniforms: { ...uniforms, halo: { value: 1 } },
+      vertexShader: VERTEX,
+    }),
+  )
+  halos.frustumCulled = false
+  halos.renderOrder = 1
+  /* Notes in another shape, as meshes: a cube for a square, an octahedron for a diamond. */
+  const shapeMaterial = new ShaderMaterial({
+    fragmentShader: SHAPE_FRAGMENT,
+    transparent: true,
+    uniforms: {
+      light: uniforms.light,
+      middle: uniforms.middle,
+      radius: uniforms.radius,
+      steep: uniforms.steep,
+    },
+    vertexShader: SHAPE_VERTEX,
+  })
+  const solids = {
+    cube: {
+      geometry: new BoxGeometry(1.5, 1.5, 1.5),
+      mesh: undefined as InstancedMesh | undefined,
+      spots: [] as number[],
+    },
+    octahedron: {
+      geometry: new OctahedronGeometry(1.15),
+      mesh: undefined as InstancedMesh | undefined,
+      spots: [] as number[],
+    },
+  }
   const quiet = new LineSegments(new BufferGeometry(), lines(LINKS.dark.far))
   const lit = new LineSegments(new BufferGeometry(), lines(0.9))
   quiet.frustumCulled = false
@@ -398,7 +526,7 @@ export const threeDriver = (
   solid.renderOrder = -1
   solid.visible = false
   solid.frustumCulled = false
-  scene.add(solid, quiet, lit, points)
+  scene.add(solid, quiet, lit, points, halos)
   let shapeFrame: StencilFrame | undefined
   let surfaced = false
   let solidAt = Number.NaN
@@ -771,20 +899,92 @@ export const threeDriver = (
     geometry.setAttribute('size', new BufferAttribute(drawn, 1))
     geometry.setAttribute('shape', new BufferAttribute(shapes, 1))
     geometry.setAttribute('glow', new BufferAttribute(glows, 1))
+    drawnSizes = drawn
+    meshShapes(shapes, tints)
     dark = !isLight(looks.ground)
     const solidUniforms = solid.material.uniforms as Record<string, { value: number[] }>
     ;(solidUniforms.ground as { value: number[] }).value = channels(looks.ground)
     ;(solidUniforms.ink as { value: number[] }).value = channels(looks.ink)
     ;(solid.material.uniforms.strength as { value: number }).value = dark ? WASH.dark : WASH.light
     uniforms.bloom.value = dark ? BLOOM.dark : BLOOM.light
+    /* Bodies are solid and painted; light, the halos and links, adds up on a dark ground. */
     const blending = dark ? AdditiveBlending : NormalBlending
-    points.material.blending = blending
+    halos.material.blending = blending
     quiet.material.blending = blending
     lit.material.blending = blending
-    points.material.needsUpdate = true
+    halos.material.needsUpdate = true
     quiet.material.needsUpdate = true
     lit.material.needsUpdate = true
     paintLinks()
+  }
+
+  /* The notes drawn as meshes, by shape, each instance one note. */
+  let drawnSizes = new Float32Array()
+  const meshShapes = (shapes: Float32Array, tints: Float32Array): void => {
+    for (const [code, solidShape] of [
+      [SHAPES.square, solids.cube],
+      [SHAPES.diamond, solids.octahedron],
+    ] as const) {
+      const spots: number[] = []
+      shapes.forEach((shape, spot) => {
+        if (shape === code) {
+          spots.push(spot)
+        }
+      })
+      solidShape.spots = spots
+      if (!solidShape.mesh || solidShape.mesh.count !== spots.length) {
+        if (solidShape.mesh) {
+          scene.remove(solidShape.mesh)
+          solidShape.mesh.dispose()
+        }
+        solidShape.mesh =
+          spots.length > 0
+            ? new InstancedMesh(solidShape.geometry, shapeMaterial, spots.length)
+            : undefined
+        if (solidShape.mesh) {
+          solidShape.mesh.frustumCulled = false
+          scene.add(solidShape.mesh)
+        }
+      }
+      const mesh = solidShape.mesh
+      if (mesh) {
+        const tone = new Float32Array(spots.length * 4)
+        spots.forEach((spot, at) => {
+          tone.set(tints.subarray(spot * 4, spot * 4 + 4), at * 4)
+        })
+        mesh.geometry = solidShape.geometry
+        mesh.geometry.setAttribute('tone', new InstancedBufferAttribute(tone, 4))
+      }
+    }
+    placeShapes()
+  }
+
+  /* Each mesh where its note is and as large, turned a little of its own so
+     a field of cubes is not a grid. */
+  const turned = new Quaternion()
+  const placed = new Matrix4()
+  const where = new Vector3()
+  const scaled = new Vector3()
+  const placeShapes = (): void => {
+    for (const solidShape of [solids.cube, solids.octahedron]) {
+      const mesh = solidShape.mesh
+      if (!mesh) {
+        continue
+      }
+      solidShape.spots.forEach((spot, at) => {
+        const size = (drawnSizes[spot] ?? 1) * uniforms.unit.value * 0.5
+        const twist = depthOf(ids[spot] ?? '')
+        turned.setFromEuler(new Euler(0.45 + twist * 0.3, 0.6 + twist, 0.2 * twist))
+        where.set(
+          positions[spot * 3] as number,
+          positions[spot * 3 + 1] as number,
+          positions[spot * 3 + 2] as number,
+        )
+        scaled.setScalar(size)
+        mesh.setMatrixAt(at, placed.compose(where, turned, scaled))
+      })
+      mesh.instanceMatrix.needsUpdate = true
+    }
   }
 
   /** The links: all of them faint, and the ones the reader is on whole. */
@@ -887,6 +1087,9 @@ export const threeDriver = (
 
   /* The view's depth cue, from how near and far the graph is from the camera. */
   const cue = (): void => {
+    /* The light is fixed in the scene, so it turns against the view as the reader turns the graph. */
+    camera.updateMatrixWorld()
+    uniforms.light.value.copy(LIGHT).transformDirection(camera.matrixWorldInverse)
     const distance = camera.position.distanceTo(controls.target)
     const { center, radius } = points.geometry.boundingSphere ?? {
       center: controls.target,
@@ -979,6 +1182,9 @@ export const threeDriver = (
       now - handled > REST
     controls.update()
     cue()
+    if (solids.cube.mesh || solids.octahedron.mesh) {
+      placeShapes()
+    }
     renderer.render(scene, camera)
     groups.draw()
     drawNames()
@@ -1216,6 +1422,12 @@ export const threeDriver = (
       canvas.removeEventListener('pointermove', hover)
       canvas.removeEventListener('pointerleave', leave)
       controls.dispose()
+      for (const solidShape of [solids.cube, solids.octahedron]) {
+        solidShape.mesh?.dispose()
+        solidShape.geometry.dispose()
+      }
+      shapeMaterial.dispose()
+      halos.material.dispose()
       for (const object of [points, quiet, lit, solid]) {
         object.geometry.dispose()
         object.material.dispose()
