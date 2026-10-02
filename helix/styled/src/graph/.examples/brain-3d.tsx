@@ -59,11 +59,12 @@ export function Example() {
 
   return (
     <>
-      {/* Preview frame: data-preview-graph="three" has the frame connect three.js, and data-preview-graph-model names the model the notes are drawn on; on your page, connectGraph(frame, threeDriver(box), { stencil: { ...(await shapeFromModel(url)), place: 'surface' } }) does. */}
+      {/* Preview frame: data-preview-graph="three" has the frame connect three.js, and data-preview-graph-model names the model the notes are drawn on, and data-preview-graph-regions sends each region of the mind to a lobe of the brain; on your page, connectGraph(frame, threeDriver(box), { stencil: { ...(await shapeFromModel(url)), place: 'surface', regions: { Vision: 'occipital' } } }) does. */}
       <helix-graph
         data-preview-graph="three"
         data-preview-graph-model="/media/models/brain.glb"
         data-preview-graph-place="surface"
+        data-preview-graph-regions="Planning: frontal, Movement: frontal, Language: frontal, Feeling: parietal, Hearing: temporal, Memory: temporal, Vision: occipital, Balance: cerebellum"
         label="A mind"
         links={links}
         nodes={nodes}

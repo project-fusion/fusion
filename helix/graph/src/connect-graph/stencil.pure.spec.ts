@@ -172,3 +172,58 @@ describe('fitInStencil by cluster', () => {
     expect(together(positions) - together(plain)).toBeGreaterThan(0.1)
   })
 })
+
+describe('fitInStencil with named regions', () => {
+  /* A ball whose left half is the part `west` and right half `east`, and three groups. */
+  const ball = {
+    ...fieldFromInside((x, y, z) => Math.hypot(x - 50, y - 50, z - 50) < 45, {
+      depth: 100,
+      height: 100,
+      width: 100,
+    }),
+    regionOf: (x: number) => (x < 50 ? 'west' : 'east'),
+  }
+  const groups = ['a', 'b', 'c']
+  const nodes = groups.flatMap((group) => [
+    { group, id: `${group}-hub` },
+    ...Array.from({ length: 99 }, (_, at) => ({ group, id: `${group}-${at}` })),
+  ])
+  const links = groups.flatMap((group) =>
+    Array.from({ length: 99 }, (_, at) => ({ source: `${group}-${at}`, target: `${group}-hub` })),
+  )
+  const groupOf = new Map(nodes.map((node) => [node.id, node.group]))
+  const { hubOf } = hubsOf(nodes, links)
+  const fit = (regions: Record<string, string>) =>
+    fitInStencil(
+      arrangeByGroup(nodes, links, { solid: true }),
+      { ...ball, place: 'surface', regions },
+      { clustersOf: (id) => [groupOf.get(id) as string, hubOf(id)] },
+    )
+
+  /** Which side of the ball's middle a group's notes are on: the share on the west. */
+  const west = (positions: Map<string, { x: number }>, group: string): number => {
+    const xs = [...positions].filter(([id]) => groupOf.get(id) === group).map(([, at]) => at.x)
+    const all = [...positions.values()].map((at) => at.x)
+    const middle = (Math.min(...all) + Math.max(...all)) / 2
+    return xs.filter((x) => x < middle).length / xs.length
+  }
+
+  test('puts each mapped group in its own part of the shape', () => {
+    const { positions } = fit({ a: 'west', b: 'east' })
+    expect(positions.size).toBe(300)
+    expect(west(positions, 'a')).toBe(1)
+    expect(west(positions, 'b')).toBe(0)
+  })
+
+  test('puts a group no part is named for in the parts no group claims', () => {
+    const { positions } = fit({ a: 'west' })
+    expect(west(positions, 'a')).toBe(1)
+    expect(west(positions, 'b')).toBe(0)
+    expect(west(positions, 'c')).toBe(0)
+  })
+
+  test('treats a part the shape does not have as no part at all', () => {
+    const { positions } = fit({ a: 'nowhere' })
+    expect(positions.size).toBe(300)
+  })
+})

@@ -239,6 +239,23 @@ const stencil = { ...(await shapeFromModel('/models/brain.glb')), place: 'surfac
 connectGraph(frame, threeDriver(box), { stencil })
 ```
 
+**`regions` sends each group to a named part of the shape**, such as a lobe
+of a brain or a state on a map:
+
+```js
+const stencil = {
+  ...(await shapeFromModel('/models/brain.glb')),
+  place: 'surface',
+  regions: { Vision: 'occipital', Hearing: 'temporal', Balance: 'cerebellum' },
+}
+```
+
+A model's parts are its meshes, named as it names them, where it has two or
+more; an SVG's are its shapes with an `id`, or in a group with one; and a
+field a page makes says its own with `regionOf(x, y, z)`. Each part fills
+evenly with the groups sent to it, and a group sent nowhere, or to a part the
+shape does not have, shares the parts no group claims.
+
 **A model is read a column of cells at a time**, so one of a hundred thousand
 triangles becomes a field in a moment. Any closed mesh works; a mesh with
 holes is read as closed where it can be. A model served from another origin

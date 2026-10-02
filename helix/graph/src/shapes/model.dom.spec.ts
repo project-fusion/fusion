@@ -8,8 +8,11 @@ beforeAll(async () => {
   ;({ shapeFromModel } = await import('./model.js'))
 })
 
-/** A binary glTF file of one mesh: a cube from 0 to 10 on each axis, moved `by` along x by its node. */
-const cubeGlb = (by: number): ArrayBuffer => {
+/**
+ * A binary glTF file of cubes from 0 to 10 on each axis, one mesh each,
+ * each moved along x by its node, which is named where a name is given.
+ */
+const cubeGlb = (by: number, ...more: { by: number; name: string }[]): ArrayBuffer => {
   const corners = new Float32Array([
     0, 0, 0, 10, 0, 0, 10, 10, 0, 0, 10, 0, 0, 0, 10, 10, 0, 10, 10, 10, 10, 0, 10, 10,
   ])
@@ -40,9 +43,12 @@ const cubeGlb = (by: number): ArrayBuffer => {
         { buffer: 0, byteLength: faces.byteLength, byteOffset: corners.byteLength },
       ],
       meshes: [{ primitives: [{ attributes: { POSITION: 0 }, indices: 1 }] }],
-      nodes: [{ mesh: 0, translation: [by, 0, 0] }],
+      nodes: [
+        { mesh: 0, translation: [by, 0, 0], ...(more.length ? { name: 'first' } : {}) },
+        ...more.map((one) => ({ mesh: 0, name: one.name, translation: [one.by, 0, 0] })),
+      ],
       scene: 0,
-      scenes: [{ nodes: [0] }],
+      scenes: [{ nodes: [0, ...more.map((_, at) => at + 1)] }],
     }),
   )
   const jsonLength = Math.ceil(text.length / 4) * 4
@@ -71,5 +77,12 @@ describe('shapeFromModel', () => {
     expect(field.depth).toBeGreaterThan(10)
     expect(field.distance(field.width / 2, field.height / 2, field.depth / 2)).toBeCloseTo(-5, 0)
     expect(field.distance(0.1, field.height / 2, field.depth / 2)).toBeGreaterThan(0)
+  })
+
+  test('names a part for each mesh, where there are two or more', async () => {
+    const field = await shapeFromModel(cubeGlb(0, { by: 20, name: 'second' }), { resolution: 40 })
+    expect(field.regionOf?.(field.width * 0.2, field.height / 2, field.depth / 2)).toBe('first')
+    expect(field.regionOf?.(field.width * 0.8, field.height / 2, field.depth / 2)).toBe('second')
+    expect((await shapeFromModel(cubeGlb(0), { resolution: 40 })).regionOf).toBeUndefined()
   })
 })
