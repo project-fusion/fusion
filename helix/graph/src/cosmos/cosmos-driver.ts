@@ -15,6 +15,7 @@ export interface CosmosGraph {
   getPointPositions(): number[]
   getTrackedPointPositionsMap(): ReadonlyMap<number, [number, number]>
   getZoomLevel(): number
+  readonly isReady: boolean
   pause(): void
   render(simulationAlpha?: number, transitionDuration?: number): void
   screenToSpacePosition(screenPosition: [number, number]): [number, number]
@@ -179,7 +180,7 @@ export const cosmosDriver = (
   let trackedAt = Number.NEGATIVE_INFINITY
   const positionsNow = (): ReadonlyMap<number, [number, number]> => {
     const now = performance.now()
-    if (now - trackedAt > 8) {
+    if (now - trackedAt > 8 && graph.isReady) {
       tracked = graph.getTrackedPointPositionsMap()
       trackedAt = now
     }
@@ -266,6 +267,16 @@ export const cosmosDriver = (
     drawNames()
     groups.draw()
   }
+
+  /**
+   * Where cosmos.gl has each note now, flat, by index. **The places last
+   * drawn while cosmos.gl is starting**: the places it has are on the GPU,
+   * and reading them before it has the GPU throws.
+   */
+  const flatNow = (): number[] =>
+    graph.isReady
+      ? graph.getPointPositions()
+      : ids.flatMap((id) => toSpace(drawnNow.get(id) ?? { x: 0, y: 0 }))
 
   /** Fits the view to the whole graph, unless the reader has moved it. */
   const fitAll = (duration: number): void => {
@@ -554,7 +565,7 @@ export const cosmosDriver = (
         graph.setPinnedPoints(null)
         graph.pause()
         fitAll(STEP * 2)
-        const flat = graph.getPointPositions()
+        const flat = flatNow()
         placed(
           new Map(ids.map((id, at) => [id, fromSpace(flat[at * 2] ?? 0, flat[at * 2 + 1] ?? 0)])),
         )
@@ -597,7 +608,7 @@ export const cosmosDriver = (
     update: (changes: GraphChanges, animate) => {
       /* cosmos.gl is by index, so a change is the arrays again: every note
          that stays where the layout has it now, unless the page moved it. */
-      const flat = graph.getPointPositions()
+      const flat = flatNow()
       const kept = new Map<string, DrawnNode>()
       ids.forEach((id, at) => {
         const node = drawnNow.get(id)
