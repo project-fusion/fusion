@@ -164,11 +164,14 @@ const nameGroups = (
   looks: GraphLooks,
   at: (id: string) => { x: number; y: number } | undefined,
 ): void => {
-  context.font = `600 13px ${looks.font}`
+  /* **Named as a map names a region**: small capitals spread wide, lit in the
+     group's color, over a soft fall of the ground's color in place of a hard
+     ring, so the name sits in the drawing and not on it. */
+  context.font = `650 11px ${looks.font}`
+  context.letterSpacing = '0.14em'
   context.textAlign = 'center'
   context.textBaseline = 'middle'
-  context.lineJoin = 'round'
-  context.lineWidth = 4
+  context.shadowColor = looks.ground
   for (const group of groups) {
     let x = 0
     let y = 0
@@ -193,12 +196,18 @@ const nameGroups = (
     if (spread < 12) {
       continue
     }
-    context.globalAlpha = group.faded ? 0.3 : 0.85
-    context.strokeStyle = looks.ground
-    context.strokeText(group.name, x, y)
-    context.fillStyle = mixRgb(group.color, looks.ink, 0.35)
-    context.fillText(group.name, x, y)
+    const name = group.name.toLocaleUpperCase()
+    context.globalAlpha = group.faded ? 0.3 : 0.92
+    context.fillStyle = mixRgb(group.color, looks.ink, 0.6)
+    /* Twice: once with a wide shadow and once with a close one, which together
+       clear the notes under the name without boxing it. */
+    context.shadowBlur = 10
+    context.fillText(name, x, y)
+    context.shadowBlur = 3
+    context.fillText(name, x, y)
   }
+  context.shadowBlur = 0
+  context.letterSpacing = '0px'
   context.globalAlpha = 1
 }
 
