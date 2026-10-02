@@ -17,5 +17,7 @@ declare global {
     helixPreviewMap?: { mount(root: HTMLElement): () => void }
     /** What the graph chunk leaves on the window, the same way. */
     helixPreviewGraph?: { mount(root: HTMLElement): () => void }
+    /** What the cosmos.gl graph chunk leaves on the window, the same way. */
+    helixPreviewGraphCosmos?: { mount(root: HTMLElement): () => void }
   }
 }

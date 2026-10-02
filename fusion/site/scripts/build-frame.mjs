@@ -25,6 +25,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const out = join(root, 'fusion/site/public/sandbox')
 const entry = join(root, 'fusion/site/preview/preview-frame-entry.ts')
 const graphEntry = join(root, 'fusion/site/preview/preview-graph-entry.ts')
+const cosmosEntry = join(root, 'fusion/site/preview/preview-graph-cosmos-entry.ts')
 const mapEntry = join(root, 'fusion/site/preview/preview-map-entry.ts')
 const maplibreEntry = join(root, 'fusion/site/preview/preview-maplibre-entry.ts')
 
@@ -151,8 +152,25 @@ if (!graphBuilt.success) {
 const graphScript = await graphBuilt.outputs[0].text()
 await writeFile(join(out, 'graph.js'), graphScript)
 
+/* The same for a graph cosmos.gl draws, which lays out and draws on the GPU. */
+const cosmosBuilt = await Bun.build({
+  entrypoints: [cosmosEntry],
+  format: 'iife',
+  minify: true,
+  target: 'browser',
+})
+if (!cosmosBuilt.success) {
+  for (const log of cosmosBuilt.logs) {
+    console.error(log)
+  }
+  process.exit(1)
+}
+const cosmosScript = await cosmosBuilt.outputs[0].text()
+await writeFile(join(out, 'graph-cosmos.js'), cosmosScript)
+
 const built = await Bun.build({
   define: {
+    __PREVIEW_GRAPH_COSMOS_URL__: JSON.stringify(`./graph-cosmos.js?v=${stamp(cosmosScript)}`),
     __PREVIEW_GRAPH_URL__: JSON.stringify(`./graph.js?v=${stamp(graphScript)}`),
     __PREVIEW_MAP_URL__: JSON.stringify(`./map.js?v=${stamp(mapScript)}`),
     __PREVIEW_MAPLIBRE_URL__: JSON.stringify(`./maplibre-gl.js?v=${stamp(maplibre)}`),
@@ -252,6 +270,7 @@ await writeFile(
 const size = Math.round((script.length + css.join('').length) / 1024)
 const mapSize = Math.round((maplibre.length + mapScript.length) / 1024)
 const graphSize = Math.round(graphScript.length / 1024)
+const cosmosSize = Math.round(cosmosScript.length / 1024)
 console.log(
-  `frame: ${size} KB, ${layers.length} style layers, one classic script, and ${mapSize} KB of map and ${graphSize} KB of graph loaded only when a render carries one`,
+  `frame: ${size} KB, ${layers.length} style layers, one classic script, and ${mapSize} KB of map and ${graphSize} KB of graph, or ${cosmosSize} KB drawn by cosmos.gl, loaded only when a render carries one`,
 )

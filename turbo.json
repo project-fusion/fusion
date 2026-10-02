@@ -426,6 +426,7 @@
       "inputs": [
         "preview/preview-events.ts",
         "preview/preview-frame-entry.ts",
+        "preview/preview-graph-cosmos-entry.ts",
         "preview/preview-graph-entry.ts",
         "preview/preview-map-entry.ts",
         "preview/preview-maplibre-entry.ts",
@@ -436,7 +437,8 @@
         "$TURBO_ROOT$/helix/styles/src/elements.css",
         "$TURBO_ROOT$/fusion/site/scripts/build-frame.mjs",
         "$TURBO_ROOT$/node_modules/maplibre-gl/package.json",
-        "$TURBO_ROOT$/node_modules/sigma/package.json"
+        "$TURBO_ROOT$/node_modules/sigma/package.json",
+        "$TURBO_ROOT$/node_modules/@cosmos.gl/graph/package.json"
       ],
       "outputs": ["public/sandbox/**"]
     },

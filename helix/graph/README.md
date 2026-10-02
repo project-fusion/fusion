@@ -1,6 +1,6 @@
 # @fusion.dev/helix-graph
 
-Connects the Helix `Graph` frame to whatever draws the graph: Sigma.js, or a
+Connects the Helix `Graph` frame to whatever draws the graph: Sigma.js, cosmos.gl, or a
 driver of your own, colored from your tokens.
 
 ```sh
@@ -122,17 +122,47 @@ links. Each group's name is drawn over its notes, which is how a reader finds
 their way. `labels: 'hubs'` names the busiest notes at rest as well, quietly,
 and `labels: 'all'` every note where its name does not cover another.
 
+## Large graphs
+
+**Past fifty thousand notes, draw with cosmos.gl**, which lays the graph out
+and draws it on the GPU. The frame, the list, selection and signals are the
+same; only the driver changes:
+
+```sh
+bun add @cosmos.gl/graph
+```
+
+```js
+import { Graph } from '@cosmos.gl/graph'
+import { connectGraph } from '@fusion.dev/helix-graph'
+import { cosmosDriver } from '@fusion.dev/helix-graph/cosmos'
+
+const box = document.getElementById('drawing')
+const graph = new Graph(box, { attribution: '', enableSimulation: true, scalePointsOnZoom: false })
+connectGraph(frame, cosmosDriver(graph, box))
+```
+
+cosmos.gl draws notes with its own shaders, so a note's `shape` is honored and
+its `material` and `emphasis` are not. Each group is given a place of its own
+and its notes are drawn toward it, so twenty thousand notes in twelve groups
+come apart into twelve regions. The view follows the layout as it opens out,
+until the reader moves it.
+
+**The driver is for `@cosmos.gl/graph`, which is MIT.** Cosmograph, the
+product built on it, is licensed for noncommercial use only.
+
 ## What it exports
 
 | Import | What |
 |---|---|
 | `@fusion.dev/helix-graph` | `connectGraph`, `diffGraph`, `graphColorsFrom`, `seedPositions`, and the `GraphDriver` and `GraphChanges` types |
 | `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)` |
+| `@fusion.dev/helix-graph/cosmos` | `cosmosDriver(graph, box, options)` |
 
-**Sigma is a peer, and graphology is the page's.** The driver types the renderer
-by the calls it makes on it, so a page brings whichever version it has, and a
-spec holds those shapes to the real classes, so a renamed method fails a
-typecheck here rather than a page. `@fusion.dev/helix-graph/sigma` imports
+**Sigma and cosmos.gl are optional peers, and graphology is the page's.** Each
+driver types its renderer by the calls it makes on it, so a page brings
+whichever version it has, and a spec holds those shapes to the real classes,
+so a renamed method fails a typecheck here before it reaches a page. `@fusion.dev/helix-graph/sigma` imports
 Sigma's rendering module for the program that draws the notes, which is why
 Sigma 3 is a peer dependency.
 
@@ -149,6 +179,13 @@ Sigma 3 is a peer dependency.
 | `labels` | `'hover'` | `'hubs'` or `'all'`: which notes are named at rest |
 | `groupLabels` | `true` | `false` leaves each group unnamed |
 | `layoutLimit` | `10000` | The longest a layout runs, in milliseconds, about where 10,000 notes settle |
+
+| `cosmosDriver` option | Default | What else it takes |
+|---|---|---|
+| `shape` | `circle` | `square` or `diamond`, for every note that does not say |
+| `groupLabels` | `true` | `false` leaves each group unnamed |
+| `layoutLimit` | `15000` | The longest a layout runs, in milliseconds |
+| `spaceSize` | `4096` | The size of cosmos.gl's space, as its own `spaceSize` says |
 
 ## Working on it
 

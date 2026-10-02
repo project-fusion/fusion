@@ -65,9 +65,19 @@ export const seedPositions = (
     }
   }
   const neighbors = new Map<string, string[]>()
+  /* Appended in place: copying a hub's list for each of its links made
+     seeding quadratic in its links, seconds for a hub with thousands. */
+  const add = (from: string, to: string): void => {
+    const list = neighbors.get(from)
+    if (list) {
+      list.push(to)
+    } else {
+      neighbors.set(from, [to])
+    }
+  }
   for (const { source, target } of links) {
-    neighbors.set(source, [...(neighbors.get(source) ?? []), target])
-    neighbors.set(target, [...(neighbors.get(target) ?? []), source])
+    add(source, target)
+    add(target, source)
   }
   let spiral = positions.size
   for (const node of nodes) {
