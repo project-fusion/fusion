@@ -21,8 +21,8 @@ const SPEED = 340
 const QUICKEST = 450
 const SLOWEST = 1400
 
-/** How long a note brightens when a signal reaches it, in milliseconds. */
-const ARRIVAL = 380
+/** How long a note brightens and ripples when a signal reaches it, in milliseconds. */
+const ARRIVAL = 520
 
 /** The most signals in flight at once. A page sending more drops the oldest. */
 const FLYING = 400
@@ -46,93 +46,166 @@ const withAlpha = (color: string, alpha: number): string => {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`
 }
 
-/** How far behind its head a pulse's tail reaches, in pixels. */
-const TAIL = 110
+/** How far behind its head a signal's tail reaches, in pixels. */
+const TAIL = 120
+
+/** How many pieces a tail is drawn in, each a little wider and brighter than the one behind. */
+const PIECES = 14
+
+/** How far a signal's path bows from the straight line, as a share of its length, and at most, in pixels. */
+const BOW = 0.16
+const BOW_MOST = 90
+
+/** How long a signal's spark lasts as it leaves, as a share of its crossing. */
+const SPARK = 0.22
+
+/** A point and how to bend toward it: the control point of a curve on screen. */
+export type Bend = (from: string, to: string) => { x: number; y: number } | undefined
+
+type Point = { x: number; y: number }
+
+/** A point on a curve from `a` to `b`, drawn toward `c`, `t` of the way along. */
+const on = (a: Point, c: Point, b: Point, t: number): Point => {
+  const u = 1 - t
+  return {
+    x: u * u * a.x + 2 * u * t * c.x + t * t * b.x,
+    y: u * u * a.y + 2 * u * t * c.y + t * t * b.y,
+  }
+}
 
 /**
- * A signal on its way: a fine pulse of light running along the link, its
- * tail fading into the line it came along, a small bright point at its head,
- * and the link itself lit faintly while it passes, as light runs along a
- * fiber. Quiet on purpose: on a busy feed there are dozens at once.
+ * Where a signal's path bends toward, where the driver does not say: to the
+ * left of the way it travels, so a reply on the same link bows the other
+ * way and the two do not run over each other.
  */
-const pulse = (
+const bowed = (from: Point, to: Point): Point => {
+  const dx = to.x - from.x
+  const dy = to.y - from.y
+  const length = Math.hypot(dx, dy) || 1
+  const bow = Math.min(length * BOW, BOW_MOST) * 2
+  return {
+    x: (from.x + to.x) / 2 - (dy / length) * bow,
+    y: (from.y + to.y) / 2 + (dx / length) * bow,
+  }
+}
+
+/** The curve's path, traced. */
+const trace = (context: CanvasRenderingContext2D, a: Point, c: Point, b: Point): void => {
+  context.beginPath()
+  context.moveTo(a.x, a.y)
+  context.quadraticCurveTo(c.x, c.y, b.x, b.y)
+}
+
+/**
+ * A signal on its way: a comet running along a gently bowed path, its tail
+ * tapering and fading into the line it came along and turning from one
+ * note's color to the other's, a bright head blooming in its color, and the
+ * path itself lit faintly while it passes. Quiet on purpose: on a busy feed
+ * there are dozens at once.
+ */
+const comet = (
   context: CanvasRenderingContext2D,
   leaves: string,
   arrives: string,
-  from: { x: number; y: number },
-  to: { x: number; y: number },
+  from: Point,
+  bend: Point,
+  to: Point,
   along: number,
   through: number,
   glowing: boolean,
 ): void => {
   /* Added light reads fainter than paint at the same strength, so on a dark
-     ground the pulse carries a little more of it. */
-  const strength = glowing ? 1.3 : 1
-  /* The color where the head is, and where the tail ends: the signal turns
-     from one note's color to the other's as it crosses. */
+     ground the comet carries a little more of it. */
+  const strength = glowing ? 1.25 : 1
+  const length =
+    Math.hypot(bend.x - from.x, bend.y - from.y) + Math.hypot(to.x - bend.x, to.y - bend.y) || 1
   const color = mixRgb(leaves, arrives, along)
-  const length = Math.hypot(to.x - from.x, to.y - from.y) || 1
-  const head = { x: from.x + (to.x - from.x) * along, y: from.y + (to.y - from.y) * along }
-  const behind = Math.max(along - TAIL / length, 0)
-  const tail = { x: from.x + (to.x - from.x) * behind, y: from.y + (to.y - from.y) * behind }
   context.lineCap = 'round'
-  /* The link lit while the pulse is on it, rising and falling with it. */
-  context.globalAlpha = 0.14 * Math.sin(Math.PI * through)
+  /* The path lit while the comet is on it, rising and falling with it. */
   const line = context.createLinearGradient(from.x, from.y, to.x, to.y)
-  line.addColorStop(0, leaves)
-  line.addColorStop(1, arrives)
+  line.addColorStop(0, withAlpha(leaves, 0.16 * Math.sin(Math.PI * through)))
+  line.addColorStop(1, withAlpha(arrives, 0.16 * Math.sin(Math.PI * through)))
   context.strokeStyle = line
   context.lineWidth = 1
-  context.beginPath()
-  context.moveTo(from.x, from.y)
-  context.lineTo(to.x, to.y)
+  trace(context, from, bend, to)
   context.stroke()
-  /* The tail, fading in toward the head, soft and then fine. */
-  const fade = context.createLinearGradient(tail.x, tail.y, head.x, head.y)
-  const back = mixRgb(leaves, arrives, behind)
-  fade.addColorStop(0, withAlpha(back, 0))
-  fade.addColorStop(0.6, withAlpha(mixRgb(back, color, 0.6), 0.25))
-  fade.addColorStop(1, withAlpha(color, 0.95))
-  context.strokeStyle = fade
-  context.shadowColor = color
-  context.shadowBlur = 8
-  context.globalAlpha = Math.min(0.35 * strength, 1)
-  context.lineWidth = 3.5
-  context.beginPath()
-  context.moveTo(tail.x, tail.y)
-  context.lineTo(head.x, head.y)
-  context.stroke()
-  context.shadowBlur = 0
-  context.globalAlpha = 1
-  context.lineWidth = 1.4 * strength
-  context.stroke()
-  /* The head: a point of white light in the signal's color. */
-  const reach = 5 * strength
-  const light = context.createRadialGradient(head.x, head.y, 0, head.x, head.y, reach)
-  light.addColorStop(0, 'rgba(255, 255, 255, 0.9)')
-  light.addColorStop(0.4, withAlpha(color, 0.75))
+  /* The tail, in pieces: fine and clear at its end, wider and brighter
+     toward the head. */
+  const reach = Math.min(TAIL / length, along)
+  /* Butt ends, so the pieces meet and do not overlap into beads. */
+  context.lineCap = 'butt'
+  let behind = on(from, bend, to, along - reach)
+  for (let piece = 1; piece <= PIECES; piece++) {
+    const share = piece / PIECES
+    const t = along - reach * (1 - share)
+    const ahead = on(from, bend, to, t)
+    context.strokeStyle = withAlpha(
+      mixRgb(leaves, arrives, t),
+      (glowing ? 0.85 : 1) * share * share,
+    )
+    context.lineWidth = (0.4 + 2.2 * share) * strength
+    context.beginPath()
+    context.moveTo(behind.x, behind.y)
+    context.lineTo(ahead.x, ahead.y)
+    context.stroke()
+    behind = ahead
+  }
+  /* The head: white at its heart on a dark ground, blooming in the signal's
+     color; on a light ground, where white is the ground, its own color at
+     its heart. */
+  const head = on(from, bend, to, along)
+  const bloom = 9 * strength
+  const light = context.createRadialGradient(head.x, head.y, 0, head.x, head.y, bloom)
+  light.addColorStop(0, glowing ? 'rgba(255, 255, 255, 0.95)' : withAlpha(color, 1))
+  light.addColorStop(
+    0.18,
+    glowing ? withAlpha(mixRgb(color, 'rgb(255, 255, 255)', 0.5), 0.9) : withAlpha(color, 0.85),
+  )
+  light.addColorStop(0.45, withAlpha(color, 0.35))
   light.addColorStop(1, withAlpha(color, 0))
   context.fillStyle = light
   context.beginPath()
-  context.arc(head.x, head.y, reach, 0, Math.PI * 2)
+  context.arc(head.x, head.y, bloom, 0, Math.PI * 2)
   context.fill()
 }
 
-/** A signal arriving: the note it reached brightening for a moment, and nothing more. */
+/** A signal leaving: a small ring spreading from the note it left, in its color. */
+const spark = (
+  context: CanvasRenderingContext2D,
+  color: string,
+  at: { radius: number; x: number; y: number },
+  gone: number,
+): void => {
+  context.strokeStyle = withAlpha(color, 0.6 * (1 - gone) ** 2)
+  context.lineWidth = 1.2
+  context.beginPath()
+  context.arc(at.x, at.y, at.radius + 2 + 8 * ease(gone), 0, Math.PI * 2)
+  context.stroke()
+}
+
+/**
+ * A signal arriving: the note it reached brightening, and a ring rippling
+ * out from it and fading, in the color the signal arrived in.
+ */
 const arrive = (
   context: CanvasRenderingContext2D,
   color: string,
   at: { radius: number; x: number; y: number },
   gone: number,
 ): void => {
-  const reach = at.radius + 6
+  const reach = at.radius + 7
   const glow = context.createRadialGradient(at.x, at.y, at.radius * 0.4, at.x, at.y, reach)
-  glow.addColorStop(0, withAlpha(color, 0.5 * (1 - gone) ** 2))
+  glow.addColorStop(0, withAlpha(color, 0.55 * (1 - gone) ** 2))
   glow.addColorStop(1, withAlpha(color, 0))
   context.fillStyle = glow
   context.beginPath()
   context.arc(at.x, at.y, reach, 0, Math.PI * 2)
   context.fill()
+  context.strokeStyle = withAlpha(color, 0.7 * (1 - gone) ** 1.5)
+  context.lineWidth = 1.5 * (1 - gone) + 0.5
+  context.beginPath()
+  context.arc(at.x, at.y, at.radius + 3 + 16 * ease(gone), 0, Math.PI * 2)
+  context.stroke()
 }
 
 /** Whether an `rgb()` color is light, which a light ink says the ground is dark. */
@@ -282,7 +355,7 @@ const fresh = (
  * over ten thousand notes draw ten dots. It draws only while something is in
  * flight, and takes no pointer, so a press reaches the note under it.
  */
-export const signalsOver = (container: HTMLElement, onScreen: OnScreen) => {
+export const signalsOver = (container: HTMLElement, onScreen: OnScreen, bend?: Bend) => {
   let overlay: HTMLCanvasElement | undefined
   let flights: Flight[] = []
   let flying = 0
@@ -307,8 +380,9 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen) => {
       if (!from || !to) {
         return false
       }
+      /* A little longer than the straight line, for the bow in its path. */
       flight.crossing ??= Math.min(
-        Math.max((Math.hypot(to.x - from.x, to.y - from.y) / SPEED) * 1000, QUICKEST),
+        Math.max(((Math.hypot(to.x - from.x, to.y - from.y) * 1.08) / SPEED) * 1000, QUICKEST),
         SLOWEST,
       )
       const crossing = flight.crossing
@@ -316,21 +390,23 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen) => {
       if (gone >= 1 + ARRIVAL / crossing) {
         return false
       }
+      const toward = bend?.(flight.from, flight.to) ?? bowed(from, to)
       context.save()
       if (gone < 1) {
         if (flight.animate) {
-          pulse(context, flight.leaves, flight.arrives, from, to, ease(gone), gone, glowing)
+          comet(context, flight.leaves, flight.arrives, from, toward, to, ease(gone), gone, glowing)
+          if (gone < SPARK) {
+            spark(context, flight.leaves, from, gone / SPARK)
+          }
         } else {
-          /* For a reader who asked for less motion, the link lit for a moment. */
+          /* For a reader who asked for less motion, the path lit for a moment. */
           const line = context.createLinearGradient(from.x, from.y, to.x, to.y)
           line.addColorStop(0, flight.leaves)
           line.addColorStop(1, flight.arrives)
           context.globalAlpha = 1 - gone
           context.strokeStyle = line
           context.lineWidth = 2
-          context.beginPath()
-          context.moveTo(from.x, from.y)
-          context.lineTo(to.x, to.y)
+          trace(context, from, toward, to)
           context.stroke()
         }
       } else if (flight.animate) {
