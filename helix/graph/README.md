@@ -259,10 +259,12 @@ connectGraph(frame, threeDriver(box), {
   of the shape of its own**, as many places as it has notes, and each hub a
   piece of its group's, so no group is cut in two: on a knot, a group is a
   stretch of its tube, and on a brain, a region of it.
-- **On a surface, the shape itself is drawn** in the ground's color just
-  inside the notes, lit faintly from above, so what is behind it is hidden
-  and the pointer finds only the notes in front. A model's own surface is
-  drawn, with every fold the field's cells are too coarse to hold.
+- **On a surface, the shape itself is drawn** just inside the notes, so what
+  is behind it is hidden and the pointer finds only the notes in front.
+  **Each region is washed in its notes' color**, a translucent stain that
+  fades into the next region's, and glows in that color at the edge turning
+  away. It is lit faintly from above, and a model's own surface is drawn,
+  with every fold the field's cells are too coarse to hold.
 - **Without a stencil, a layout runs in three dimensions** with d3-force-3d.
 - **Dragging turns the graph, and the wheel and a pinch bring it nearer.** It
   turns slowly by itself while nobody is handling it, and never for a reader
