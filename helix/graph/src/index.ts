@@ -6,6 +6,7 @@ export {
   type GraphChanges,
   type GraphConnection,
   type GraphDriver,
+  type GraphGroup,
 } from './connect-graph/connect-graph.js'
 export { diffGraph } from './connect-graph/diff.js'
 export {

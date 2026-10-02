@@ -53,12 +53,18 @@ export interface GraphDriver {
    */
   update?(changes: GraphChanges, animate: boolean): void
   /**
-   * Draws something passing from one note to another, in `color`, traveling
-   * the way it went and arriving with a pulse, or, where `animate` is false,
-   * the link between them lit for a moment. `color` is undefined while the
-   * page's colors cannot be read.
+   * Draws something passing from one note to another, traveling the way it
+   * went and arriving with a pulse, or, where `animate` is false, the link
+   * between them lit for a moment. It leaves in `colors.from` and arrives in
+   * `colors.to`, which are one color where the signal has a tone. `colors` is
+   * undefined while the page's colors cannot be read.
    */
-  signal?(from: string, to: string, color: string | undefined, animate: boolean): void
+  signal?(
+    from: string,
+    to: string,
+    colors: { from: string; to: string } | undefined,
+    animate: boolean,
+  ): void
   /**
    * How each note and link is drawn from now on, asked one at a time as the
    * renderer draws them: a selection or a theme changed.
@@ -96,8 +102,26 @@ export interface GraphDriver {
   gestures?(mode: ViewportGestureMode): void
   /** The element the renderer made focusable, which the connector takes out of the tab order. */
   focusTarget?(): HTMLElement | null
+  /**
+   * The graph's groups, each named over its notes, which is how a reader
+   * finds their way while notes are named only on hover. `faded` while a note
+   * outside the group is selected.
+   */
+  groups?(groups: readonly GraphGroup[]): void
   /** Removes whatever the driver added to the renderer or the page, when the connection ends. */
   stop?(): void
+}
+
+/** One group of notes, as the renderer names it over them. */
+export interface GraphGroup {
+  /** The group's color, which its name is drawn in. */
+  color: string
+  /** Whether a note outside the group is selected, which steps its name back. */
+  faded: boolean
+  /** The notes in the group, by `id`. */
+  ids: readonly string[]
+  /** The group's name, as the notes give it. */
+  name: string
 }
 
 /** How a connection behaves where the page does not say. */
@@ -189,6 +213,8 @@ export const connectGraph = (
      that layout short, and the layout after it pays the debt. */
   let owed = false
   let colors: GraphColors | null = null
+  /* The looks last handed the driver, which a signal takes its colors from. */
+  let current: GraphLooks | undefined
   let stopSettling: (() => void) | undefined
   let pressed: string | undefined
   let pending = 0
@@ -213,21 +239,40 @@ export const connectGraph = (
       }
     }
     const notes = new Map(nodes.map((node) => [node.id, node]))
-    driver.look(
-      looksOf({
-        colors,
-        /* The theme's face, unquoted, which Sigma writes into a canvas font. */
-        font: getComputedStyle(frame)
-          .fontFamily.split(',')[0]
-          ?.trim()
-          .replace(/^["']|["']$/g, ''),
-        groups: nodes.flatMap((node) => (node.group === undefined ? [] : [node.group])),
-        near,
-        noteOf: (id) => notes.get(id),
-        selected,
-        shown: graph.shown,
-      }),
-    )
+    current = looksOf({
+      colors,
+      /* The theme's face, unquoted, which Sigma writes into a canvas font. */
+      font: getComputedStyle(frame)
+        .fontFamily.split(',')[0]
+        ?.trim()
+        .replace(/^["']|["']$/g, ''),
+      groups: nodes.flatMap((node) => (node.group === undefined ? [] : [node.group])),
+      near,
+      noteOf: (id) => notes.get(id),
+      selected,
+      shown: graph.shown,
+    })
+    driver.look(current)
+    if (driver.groups) {
+      const members = new Map<string, string[]>()
+      for (const node of nodes) {
+        if (node.group !== undefined) {
+          members.set(node.group, [...(members.get(node.group) ?? []), node.id])
+        }
+      }
+      const own = selected === undefined ? undefined : notes.get(selected)?.group
+      const looks = current
+      driver.groups(
+        [...members].map(([name, ids]) => ({
+          /* A group's color is its notes' own, read from the first without a
+             tone, since a tone colors a note over its group. */
+          color: looks.colorOf(ids.find((id) => notes.get(id)?.tone === undefined) ?? ids[0] ?? ''),
+          faded: selected !== undefined && own !== name,
+          ids,
+          name,
+        })),
+      )
+    }
   }
 
   /**
@@ -343,7 +388,21 @@ export const connectGraph = (
       return
     }
     colors ??= graphColorsFrom(frame)
-    driver.signal(from, to, colors ? toneColor(colors, tone) : undefined, !still())
+    /* **From one note's color to the other's**, so a message between two
+       clusters is seen to cross from one to the other. A tone is what the
+       signal means, which outranks where it came from, so a toned signal is
+       its tone the whole way. */
+    const toned = tone !== undefined && colors ? toneColor(colors, tone) : undefined
+    driver.signal(
+      from,
+      to,
+      toned
+        ? { from: toned, to: toned }
+        : current
+          ? { from: current.colorOf(from), to: current.colorOf(to) }
+          : undefined,
+      !still(),
+    )
   }
 
   const handlePartChange = (event: Event): void => {

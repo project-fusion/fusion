@@ -119,6 +119,7 @@ const rendererOf = () => {
 }
 
 const looks: GraphLooks = {
+  colorOf: (id) => (id === 'a' ? 'rgb(0, 0, 255)' : 'rgb(7, 7, 7)'),
   font: 'Inter',
   ground: 'rgb(0, 0, 0)',
   ink: 'rgb(1, 2, 3)',
@@ -137,6 +138,7 @@ const looks: GraphLooks = {
     shape: id === 'a' ? 'diamond' : undefined,
   }),
   overlay: 'rgb(4, 5, 6)',
+  quiet: 'rgb(9, 9, 9)',
 }
 
 describe('sigmaDriver', () => {
@@ -179,7 +181,11 @@ describe('sigmaDriver', () => {
       size: 4,
       zIndex: 0,
     })
-    expect(node('d', { label: 'Delta' })).toMatchObject({ forceLabel: false, label: 'Delta' })
+    expect(node('d', { label: 'Delta' })).toMatchObject({
+      forceLabel: false,
+      label: null,
+      strong: false,
+    })
     expect(typeof settings.get('defaultDrawNodeHover')).toBe('function')
     expect(node('c', {}).hidden).toBe(true)
     expect(edge('e', { from: 'a', to: 'b' })).toMatchObject({ color: 'rgb(9, 9, 9)', size: 1.6 })
@@ -209,6 +215,37 @@ describe('sigmaDriver', () => {
     expect(node('d', {})).toMatchObject({ glow: 0, shapeCode: 0 })
     driver.stop?.()
     expect(Object.keys(settings.get('nodeProgramClasses') as object)).toEqual(['circle'])
+  })
+
+  test('names only the selected note and its neighbors by default, and the hubs or every note where asked', () => {
+    const named = (labels?: 'all' | 'hover' | 'hubs') => {
+      const { settings, sigma } = rendererOf()
+      sigmaDriver(sigma, labels ? { labels } : {}).look(looks)
+      const node = settings.get('nodeReducer') as (
+        id: string,
+        data: object,
+      ) => Record<string, unknown>
+      return ['a', 'd', 'e'].map((id) => node(id, { label: id, size: id === 'e' ? 9 : 4 }).label)
+    }
+    /* `a` is selected; `d` and `e` are notes at rest, `e` a hub. */
+    expect(named()).toEqual(['a', null, null])
+    expect(named('hubs')).toEqual(['a', null, 'e'])
+    expect(named('all')).toEqual(['a', 'd', 'e'])
+  })
+
+  test('names each group over its notes on a canvas of its own, unless asked not to', () => {
+    const renderer = rendererOf()
+    const driver = sigmaDriver(renderer.sigma)
+    driver.look(looks)
+    driver.groups?.([{ color: 'rgb(0, 0, 255)', faded: false, ids: ['a', 'b'], name: 'Sales' }])
+    expect(renderer.container.querySelectorAll('canvas')).toHaveLength(1)
+    driver.stop?.()
+    expect(renderer.container.querySelectorAll('canvas')).toHaveLength(0)
+    const quiet = rendererOf()
+    sigmaDriver(quiet.sigma, { groupLabels: false }).groups?.([
+      { color: 'rgb(0, 0, 255)', faded: false, ids: ['a', 'b'], name: 'Sales' },
+    ])
+    expect(quiet.container.querySelectorAll('canvas')).toHaveLength(0)
   })
 
   test('pans by pixels, zooms by a step, and centers a note', () => {
@@ -304,7 +341,7 @@ describe('sigmaDriver', () => {
   test('a signal is drawn on a canvas of its own, which stopping takes away', () => {
     const renderer = rendererOf()
     const driver = sigmaDriver(renderer.sigma)
-    driver.signal?.('a', 'b', 'rgb(0, 0, 255)', true)
+    driver.signal?.('a', 'b', { from: 'rgb(0, 0, 255)', to: 'rgb(255, 0, 0)' }, true)
     const overlay = renderer.container.querySelector('canvas')
     expect(overlay).not.toBeNull()
     expect(overlay?.getAttribute('aria-hidden')).toBe('true')

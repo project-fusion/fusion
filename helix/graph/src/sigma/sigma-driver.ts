@@ -4,8 +4,9 @@ import type {
   DrawnNode,
   GraphChanges,
   GraphDriver,
+  GraphGroup,
 } from '../connect-graph/connect-graph.js'
-import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
+import { type GraphLooks, mixRgb, type NodeLook } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
 import { EMPHASES, HelixNodeProgram, MATERIALS, SHAPES } from './node-program.js'
 
@@ -49,10 +50,12 @@ export interface SigmaRenderer {
     type: 'clickNode' | 'enterNode' | 'leaveNode',
     listener: (payload: { node: string }) => void,
   ): unknown
+  off(type: 'afterRender' | 'beforeRender', listener: () => void): unknown
   on(
     type: 'clickNode' | 'enterNode' | 'leaveNode',
     listener: (payload: { node: string }) => void,
   ): unknown
+  on(type: 'afterRender' | 'beforeRender', listener: () => void): unknown
   getSetting(name: 'nodeProgramClasses'): Record<string, unknown>
   refresh(): unknown
   resize(force?: boolean): unknown
@@ -114,6 +117,17 @@ export interface SigmaDriverOptions {
   material?: NodeLook['material']
   /** A note's shape where it does not say: `circle` by default, `square`, `diamond` or `ring`. */
   shape?: NodeLook['shape']
+  /**
+   * Whether each group's name is drawn over its notes. On by default, which
+   * is how a reader finds their way while notes are named only on hover.
+   */
+  groupLabels?: boolean | undefined
+  /**
+   * Which notes are named. `hover`, by default: the note under the pointer,
+   * the selected note and its neighbors. `hubs`: the busiest notes as well, at
+   * rest. `all`: every note, where its name does not cover another.
+   */
+  labels?: 'all' | 'hover' | 'hubs' | undefined
   /** The longest a layout runs, in milliseconds, settled or not. 10 seconds by default, about where 10,000 notes settle. */
   layoutLimit?: number | undefined
 }
@@ -216,8 +230,10 @@ interface Flight {
   animate: boolean
   /** How long the crossing takes, settled on its first frame from how far it goes. */
   crossing?: number
-  color: string
   from: string
+  /** The color it leaves in, and the color it arrives in. */
+  leaves: string
+  arrives: string
   started: number
   to: string
 }
@@ -239,7 +255,8 @@ const TAIL = 110
  */
 const pulse = (
   context: CanvasRenderingContext2D,
-  color: string,
+  leaves: string,
+  arrives: string,
   from: { x: number; y: number },
   to: { x: number; y: number },
   along: number,
@@ -249,6 +266,9 @@ const pulse = (
   /* Added light reads fainter than paint at the same strength, so on a dark
      ground the pulse carries a little more of it. */
   const strength = glowing ? 1.3 : 1
+  /* The color where the head is, and where the tail ends: the signal turns
+     from one note's color to the other's as it crosses. */
+  const color = mixRgb(leaves, arrives, along)
   const length = Math.hypot(to.x - from.x, to.y - from.y) || 1
   const head = { x: from.x + (to.x - from.x) * along, y: from.y + (to.y - from.y) * along }
   const behind = Math.max(along - TAIL / length, 0)
@@ -256,7 +276,10 @@ const pulse = (
   context.lineCap = 'round'
   /* The link lit while the pulse is on it, rising and falling with it. */
   context.globalAlpha = 0.14 * Math.sin(Math.PI * through)
-  context.strokeStyle = color
+  const line = context.createLinearGradient(from.x, from.y, to.x, to.y)
+  line.addColorStop(0, leaves)
+  line.addColorStop(1, arrives)
+  context.strokeStyle = line
   context.lineWidth = 1
   context.beginPath()
   context.moveTo(from.x, from.y)
@@ -264,8 +287,9 @@ const pulse = (
   context.stroke()
   /* The tail, fading in toward the head, soft and then fine. */
   const fade = context.createLinearGradient(tail.x, tail.y, head.x, head.y)
-  fade.addColorStop(0, withAlpha(color, 0))
-  fade.addColorStop(0.6, withAlpha(color, 0.25))
+  const back = mixRgb(leaves, arrives, behind)
+  fade.addColorStop(0, withAlpha(back, 0))
+  fade.addColorStop(0.6, withAlpha(mixRgb(back, color, 0.6), 0.25))
   fade.addColorStop(1, withAlpha(color, 0.95))
   context.strokeStyle = fade
   context.shadowColor = color
@@ -323,26 +347,104 @@ const ease = (at: number): number => (at < 0.5 ? 2 * at * at : 1 - (-2 * at + 2)
  * crosses, and heavier on a larger note, so a hub's name leads.
  */
 const labelOf =
-  (looks: GraphLooks) =>
+  (looks: GraphLooks, claim: (box: Box, must: boolean) => boolean) =>
   (
     context: CanvasRenderingContext2D,
-    data: HoverData,
+    data: HoverData & { forceLabel?: boolean; strong?: boolean },
     settings: { labelFont: string; labelSize: number },
   ): void => {
     if (!data.label) {
       return
     }
-    const size = settings.labelSize
-    context.font = `${data.size >= 8 ? 600 : 500} ${size}px ${settings.labelFont}`
+    /* **Quiet at rest and full where the reader is looking**: a name the
+       graph shows unasked is the muted ink, a step smaller, and the selected
+       note's and its neighbors' are the ink itself. */
+    const strong = data.strong === true
+    const size = strong ? settings.labelSize : settings.labelSize - 1
+    context.font = `${strong ? 600 : 500} ${size}px ${settings.labelFont}`
     const x = data.x + data.size + 4
     const y = data.y + size / 3
+    /* **A name that would cover one already drawn is left out**, the
+       selected note's excepted, which is always drawn: Sigma's grid keeps
+       one name a cell, and two notes either side of a cell's edge drew their
+       names over each other. */
+    const box = {
+      bottom: y + 4,
+      left: x - 2,
+      right: x + context.measureText(data.label).width + 2,
+      top: y - size,
+    }
+    if (!claim(box, data.forceLabel === true)) {
+      return
+    }
     context.lineJoin = 'round'
     context.lineWidth = 3
     context.strokeStyle = looks.ground
     context.strokeText(data.label, x, y)
-    context.fillStyle = looks.ink
+    context.fillStyle = strong ? looks.ink : looks.quiet
     context.fillText(data.label, x, y)
   }
+
+/** A name's box on screen, in pixels. */
+interface Box {
+  bottom: number
+  left: number
+  right: number
+  top: number
+}
+
+/** How large a note is drawn, in pixels, for `labels: 'hubs'` to name it at rest. */
+const HUB = 6.5
+
+/**
+ * Each group's name over the middle of its notes, in the group's color made
+ * quiet, ringed in the ground's color, and stepped back while a note outside
+ * it is selected. Not where a group is drawn too small for its name to say
+ * which notes it means.
+ */
+const nameGroups = (
+  context: CanvasRenderingContext2D,
+  groups: readonly GraphGroup[],
+  looks: GraphLooks,
+  at: (id: string) => { x: number; y: number } | undefined,
+): void => {
+  context.font = `600 13px ${looks.font}`
+  context.textAlign = 'center'
+  context.textBaseline = 'middle'
+  context.lineJoin = 'round'
+  context.lineWidth = 4
+  for (const group of groups) {
+    let x = 0
+    let y = 0
+    let count = 0
+    const points: { x: number; y: number }[] = []
+    for (const id of group.ids) {
+      const point = at(id)
+      if (point) {
+        x += point.x
+        y += point.y
+        count += 1
+        points.push(point)
+      }
+    }
+    if (count < 2) {
+      continue
+    }
+    x /= count
+    y /= count
+    const spread =
+      points.reduce((sum, point) => sum + Math.hypot(point.x - x, point.y - y), 0) / count
+    if (spread < 24) {
+      continue
+    }
+    context.globalAlpha = group.faded ? 0.3 : 0.85
+    context.strokeStyle = looks.ground
+    context.strokeText(group.name, x, y)
+    context.fillStyle = mixRgb(group.color, looks.ink, 0.35)
+    context.fillText(group.name, x, y)
+  }
+  context.globalAlpha = 1
+}
 
 /** Every note's position as the graph holds it now. */
 const positionsOf = (graph: SigmaGraph): Map<string, GraphPoint> => {
@@ -442,6 +544,50 @@ export const sigmaDriver = (
   sigma.on('enterNode', enter)
   sigma.on('leaveNode', leave)
 
+  /* **Group names are drawn on a canvas of their own**, under the signals',
+     after every frame Sigma draws, so they follow the view as it moves. */
+  const naming = options.labels ?? 'hover'
+  /* The boxes the names drawn this frame take, cleared as each frame starts. */
+  let taken: Box[] = []
+  /** Takes a name's box where it is free, or where the name must be drawn anyway, and says whether it did. */
+  const claim = (box: Box, must: boolean): boolean => {
+    const free = taken.every(
+      (other) =>
+        box.right < other.left ||
+        box.left > other.right ||
+        box.bottom < other.top ||
+        box.top > other.bottom,
+    )
+    if (free || must) {
+      taken.push(box)
+    }
+    return free || must
+  }
+  const clear = (): void => {
+    taken = []
+  }
+  sigma.on('beforeRender', clear)
+  let regions: HTMLCanvasElement | undefined
+  let groupsNow: readonly GraphGroup[] = []
+  let looksNow: GraphLooks | undefined
+  const drawGroups = (): void => {
+    const context = regions?.getContext('2d')
+    if (!regions || !context || !looksNow) {
+      return
+    }
+    const ratio = window.devicePixelRatio || 1
+    const width = Math.round(container.clientWidth * ratio)
+    const height = Math.round(container.clientHeight * ratio)
+    if (regions.width !== width || regions.height !== height) {
+      regions.width = width
+      regions.height = height
+    }
+    context.setTransform(ratio, 0, 0, ratio, 0, 0)
+    context.clearRect(0, 0, width, height)
+    nameGroups(context, groupsNow, looksNow, (id) => onScreen(id))
+  }
+  sigma.on('afterRender', drawGroups)
+
   /* **Signals are drawn on a canvas of the driver's own**, over Sigma's, so a
      signal never makes Sigma redraw the graph: ten signals a second over ten
      thousand notes draw ten dots. It draws only while something is in
@@ -501,11 +647,14 @@ export const sigmaDriver = (
       context.save()
       if (gone < 1) {
         if (flight.animate) {
-          pulse(context, flight.color, from, to, ease(gone), gone, glowing)
+          pulse(context, flight.leaves, flight.arrives, from, to, ease(gone), gone, glowing)
         } else {
           /* For a reader who asked for less motion, the link lit for a moment. */
+          const line = context.createLinearGradient(from.x, from.y, to.x, to.y)
+          line.addColorStop(0, flight.leaves)
+          line.addColorStop(1, flight.arrives)
           context.globalAlpha = 1 - gone
-          context.strokeStyle = flight.color
+          context.strokeStyle = line
           context.lineWidth = 2
           context.beginPath()
           context.moveTo(from.x, from.y)
@@ -513,7 +662,7 @@ export const sigmaDriver = (
           context.stroke()
         }
       } else if (flight.animate) {
-        arrive(context, flight.color, to, (gone - 1) / (ARRIVAL / crossing))
+        arrive(context, flight.arrives, to, (gone - 1) / (ARRIVAL / crossing))
       }
       context.restore()
       return true
@@ -605,7 +754,26 @@ export const sigmaDriver = (
       container.style.touchAction =
         next === 'free' ? touchAction : next === 'cooperative' ? 'pan-x pan-y' : 'auto'
     },
+    groups: (groups) => {
+      if (options.groupLabels === false) {
+        return
+      }
+      if (!regions) {
+        regions = document.createElement('canvas')
+        regions.setAttribute('aria-hidden', 'true')
+        regions.style.cssText =
+          'position:absolute;inset:0;width:100%;height:100%;pointer-events:none'
+        if (overlay) {
+          container.insertBefore(regions, overlay)
+        } else {
+          container.append(regions)
+        }
+      }
+      groupsNow = groups
+      drawGroups()
+    },
     look: (looks: GraphLooks) => {
+      looksNow = looks
       ink = looks.ink
       glowing = isLight(looks.ink)
       sigma.setSetting('labelColor', { color: looks.ink })
@@ -614,15 +782,12 @@ export const sigmaDriver = (
          link nearly two pixels wide. */
       sigma.setSetting('minEdgeThickness', 0.8)
       sigma.setSetting('labelFont', looks.font)
-      /* **Named once drawn large enough to matter**: the hubs at rest, and
-         the rest as the reader zooms in, which is how a reader takes in a
-         graph of thousands. A selected note's neighbors are drawn a quarter
-         larger, which names them. Sigma's grid keeps names apart, the larger
-         note's first. */
-      sigma.setSetting('labelRenderedSizeThreshold', 6)
+      /* **Which notes are named is the reducer's**, by `labels`, and Sigma's
+         grid keeps the names it is given apart, the larger note's first. */
+      sigma.setSetting('labelRenderedSizeThreshold', 0)
       /* Cells wide enough for a name, so two names never share a line. */
       sigma.setSetting('labelGridCellSize', 130)
-      sigma.setSetting('defaultDrawNodeLabel', labelOf(looks))
+      sigma.setSetting('defaultDrawNodeLabel', labelOf(looks, claim))
       sigma.setSetting('defaultDrawNodeHover', hoverOf(looks))
       sigma.setSetting('nodeReducer', (node: string, data: Record<string, unknown>) => {
         const look = looks.node(node)
@@ -630,6 +795,14 @@ export const sigmaDriver = (
            its neighbors a quarter, so where two names would collide Sigma,
            which keeps the larger note's, keeps theirs. */
         const grown = look.selected ? 1.5 : look.raised ? 1.25 : 1
+        /* Named as `labels` says: always the selected note, its neighbors
+           where there is room, and the rest only as the page asked. */
+        const named =
+          look.label === 'always' ||
+          (look.label === 'room' &&
+            (look.raised ||
+              naming === 'all' ||
+              (naming === 'hubs' && typeof data.size === 'number' && data.size >= HUB)))
         return {
           ...data,
           color: look.color,
@@ -637,10 +810,11 @@ export const sigmaDriver = (
           forceLabel: look.label === 'always',
           glow: look.glow,
           hidden: look.hidden,
-          label: look.label === 'never' ? null : data.label,
+          label: named ? data.label : null,
           materialCode: MATERIALS[look.material ?? options.material ?? 'flat'],
           shapeCode: SHAPES[look.shape ?? options.shape ?? 'circle'],
           size: typeof data.size === 'number' ? data.size * grown : data.size,
+          strong: look.selected || look.raised,
           type: 'helix',
           zIndex: look.selected ? 2 : look.raised ? 1 : 0,
         }
@@ -677,7 +851,7 @@ export const sigmaDriver = (
         camera.setState(to)
       }
     },
-    signal: (from, to, color, animate) => {
+    signal: (from, to, colors, animate) => {
       if (!overlay) {
         overlay = document.createElement('canvas')
         overlay.setAttribute('aria-hidden', 'true')
@@ -685,7 +859,14 @@ export const sigmaDriver = (
           'position:absolute;inset:0;width:100%;height:100%;pointer-events:none'
         container.append(overlay)
       }
-      flights.push({ animate, color: color ?? ink, from, started: performance.now(), to })
+      flights.push({
+        animate,
+        arrives: colors?.to ?? ink,
+        from,
+        leaves: colors?.from ?? ink,
+        started: performance.now(),
+        to,
+      })
       if (flights.length > FLYING) {
         flights = flights.slice(-FLYING)
       }
@@ -694,6 +875,10 @@ export const sigmaDriver = (
       }
     },
     stop: () => {
+      sigma.off('afterRender', drawGroups)
+      sigma.off('beforeRender', clear)
+      regions?.remove()
+      regions = undefined
       sigma.off('enterNode', enter)
       sigma.off('leaveNode', leave)
       cancelAnimationFrame(flying)
