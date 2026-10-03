@@ -168,7 +168,7 @@ export const GRAPH: PageCopy = {
     },
     {
       body: [
-        'Install Helix, the connector, and a renderer. The Graph reference covers the rest.',
+        'Install Helix, the connector, and a renderer. The Graphs guide covers the rest.',
         `\`${GRAPH_INSTALL}\``,
       ],
       kicker: 'Get started',
