@@ -1,4 +1,9 @@
 export {
+  communitiesOf,
+  type GroupByCommunityOptions,
+  groupByCommunity,
+} from './connect-graph/communities.js'
+export {
   type ConnectGraphOptions,
   connectGraph,
   type DrawnLink,
