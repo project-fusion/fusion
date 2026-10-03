@@ -890,6 +890,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "fusion-cortex-core",
+ "fusion-cortex-engram",
  "serde",
  "serde_json",
  "thiserror 2.0.21",
