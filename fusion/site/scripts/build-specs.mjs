@@ -38,10 +38,11 @@
  * Run with bun, not node: `Bun.build` is the bundler.
  */
 
+import { existsSync } from 'node:fs'
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { CONNECTORS, root, TIERS } from '@fusion.dev/scripts/workspace'
+import { CONNECTORS, root, SOURCE, TIERS } from '@fusion.dev/scripts/workspace'
 
 /**
  * Both tiers, merged by family.
@@ -167,6 +168,28 @@ const shareRuntime = {
   },
 }
 
+/**
+ * Points the headless tier's package at its source, as the headless specs
+ * import it.
+ *
+ * **One class for each element, or the page holds two copies of Helix.** A
+ * headless spec imports its family from the source, and the styled element it
+ * shares a page with imports the same family from the package's `dist`: two
+ * modules, two classes, and the second registration warned that the page held
+ * two copies, as Graph and Map did on every run. Resolved to the source, the
+ * two are one module, and the specs test the code as it stands.
+ */
+const headlessFromSource = {
+  name: 'headless-from-source',
+  setup(build) {
+    build.onResolve({ filter: /^@fusion\.dev\/helix-headless(\/[a-z0-9-]+)?$/ }, ({ path }) => {
+      const family = path.slice('@fusion.dev/helix-headless'.length)
+      const entry = join(root, SOURCE.headless, family, 'index.ts')
+      return existsSync(entry) ? { path: entry } : undefined
+    })
+  },
+}
+
 /** Points the spec harness imports at the browser one. */
 const useBrowserHarness = {
   name: 'browser-spec-harness',
@@ -244,7 +267,7 @@ const result = await Bun.build({
   // is not something the served URL should carry.
   naming: { chunk: '[name]-[hash].[ext]', entry: '[name].[ext]' },
   outdir: out,
-  plugins: [shareRuntime, useBrowserHarness],
+  plugins: [shareRuntime, useBrowserHarness, headlessFromSource],
   /* Off, for the reason the header gives: an entry holding both tiers of a
      family puts a subclass and its base in different chunks and the cycle is
      unresolvable. `RUNTIME` above fixes the same fault for one pair of Lit
