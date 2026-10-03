@@ -80,11 +80,14 @@ function Showcase({
   code,
   copy,
   kind,
+  legend = false,
   noPanel = false,
 }: {
   code: string
   copy: (typeof GRAPH.blocks)[number] | undefined
   kind: 'knowledge' | 'services' | 'team'
+  /** Whether the frame names its groups over the drawing, each a button that shows or hides its notes. */
+  legend?: boolean
   /** Whether the frame leaves its list behind its button, so the drawing takes the width. */
   noPanel?: boolean
 }) {
@@ -99,7 +102,7 @@ function Showcase({
         </helix-flex>
         {/* The graph, and under it what to try, as each map on Maps has. */}
         <div className={`${band.bandSection} ${styles.graphShowcase}`}>
-          <GraphDemo className={styles.graphDemo} kind={kind} noPanel={noPanel} />
+          <GraphDemo className={styles.graphDemo} kind={kind} legend={legend} noPanel={noPanel} />
           <helix-text emphasis="subtle" variant="caption">
             {copy?.body?.[1]}
           </helix-text>
@@ -165,7 +168,7 @@ export default function Page() {
           </div>
         </Band>
 
-        <Showcase code={LIVE_CODE} copy={live} kind="team" />
+        <Showcase code={LIVE_CODE} copy={live} kind="team" legend />
 
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
