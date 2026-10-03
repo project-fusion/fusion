@@ -70,6 +70,7 @@ export function GraphHero() {
         kind="mind"
         noPanel
         paused={!passing}
+        poster={{ dark: '/media/graph/brain-dark.webp', light: '/media/graph/brain-light.webp' }}
       />
       <ThemeTry
         brand={brand}

@@ -130,6 +130,45 @@
   }
 }
 
+/* **The graph as it is first drawn**, where it will be drawn: a square
+   picture, contained, lies where the three.js driver frames the graph in a
+   box of any shape. One for each mode, and gone once the graph is drawn. */
+.graphPoster {
+  block-size: 100%;
+  inline-size: 100%;
+  inset: 0;
+  object-fit: contain;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-slow) var(--helix-easing-standard);
+}
+
+.graphPoster[data-drawn] {
+  opacity: 0;
+}
+
+.graphPosterDark {
+  display: none;
+}
+
+[data-color-mode="dark"] .graphPosterDark {
+  display: block;
+}
+
+[data-color-mode="dark"] .graphPosterLight {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-color-mode]) .graphPosterDark {
+    display: block;
+  }
+
+  :root:not([data-color-mode]) .graphPosterLight {
+    display: none;
+  }
+}
+
 /* The demos beside their code, a little shorter than the hero's. */
 .graphDemo {
   --graph-block-size: min(70svh, 34rem);
