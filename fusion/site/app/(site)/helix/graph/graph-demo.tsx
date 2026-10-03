@@ -18,6 +18,12 @@ import styles from './graph.module.css'
 /** Which of the page's graphs to draw. */
 export type DemoKind = 'knowledge' | 'mind' | 'services' | 'team'
 
+/** The model a kind is drawn on, where it is drawn on one. */
+const MODELS: Partial<Record<DemoKind, string>> = {
+  mind: '/media/models/brain.glb',
+  services: '/media/models/torus-knot.glb',
+}
+
 /** The frame each kind draws in: its name, and how much of a screen it takes. */
 const FRAMES: Record<DemoKind, { label: string }> = {
   knowledge: { label: 'Company knowledge base, 20,000 notes' },
@@ -37,6 +43,17 @@ const start = async (
   box: HTMLDivElement,
   paused: () => boolean,
 ): Promise<() => void> => {
+  /* **The model asked for first**, so it downloads while the renderer's code
+     does: asked for once three.js had loaded, it waited on all of it. */
+  const model = MODELS[kind]
+  const bytes = model
+    ? fetch(model).then((answer) => {
+        if (!answer.ok) {
+          throw new Error(`The model ${model} could not be fetched: ${answer.status}`)
+        }
+        return answer.arrayBuffer()
+      })
+    : undefined
   const { connectGraph } = await import('@fusion.dev/helix-graph')
   const graph: DemoGraph =
     kind === 'mind'
@@ -148,9 +165,7 @@ const start = async (
       import('@fusion.dev/helix-graph/three'),
       import('@fusion.dev/helix-graph/model'),
     ])
-    const field = await shapeFromModel(
-      kind === 'mind' ? '/media/models/brain.glb' : '/media/models/torus-knot.glb',
-    )
+    const field = await shapeFromModel((await bytes) as ArrayBuffer)
     connection = connectGraph(frame, threeDriver(box), {
       stencil: {
         ...field,
@@ -262,20 +277,18 @@ export function GraphDemo({
       <div className={`${styles.graphCanvas} ${canvasClassName ?? ''}`} ref={box}>
         {/* **The graph as it is first drawn**, under the renderer's canvas,
             until the graph is drawn over it, and then faded out. Said to no
-            one: the frame's list names every note. */}
+            one: the frame's list names every note. **A background, not an
+            image**: a hidden image still downloads, and a hidden background
+            does not, so a reader fetches the picture for their mode alone. */}
         {poster
           ? (['light', 'dark'] as const).map((mode) => (
-              // biome-ignore lint/performance/noImgElement: a picture that stands in a renderer's box, sized by the box, which Next's Image would wrap in a box of its own
-              <img
-                alt=""
+              <div
                 aria-hidden="true"
                 className={`${styles.graphPoster} ${mode === 'dark' ? styles.graphPosterDark : styles.graphPosterLight}`}
                 data-drawn={drawn ? '' : undefined}
                 data-graph-poster=""
-                decoding="async"
-                fetchPriority="high"
                 key={mode}
-                src={poster[mode]}
+                style={{ backgroundImage: `url("${poster[mode]}")` }}
               />
             ))
           : null}

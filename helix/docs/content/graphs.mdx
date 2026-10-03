@@ -230,7 +230,9 @@ connectGraph(frame, driver, {
 
 With three.js, place the notes on the surface of a 3D model.
 `shapeFromModel` reads a `.glb` or `.gltf` file, and is in its own entry,
-`@fusion.dev/helix-graph/model`, since it loads three.js:
+`@fusion.dev/helix-graph/model`, since it loads three.js. It reads a model
+compressed with meshopt, as `gltfpack` writes one, which is often a third of
+the size:
 
 ```js
 import { shapeFromModel } from '@fusion.dev/helix-graph/model'
