@@ -1,0 +1,299 @@
+{
+  "deleted": "m-price",
+  "links": [
+    {
+      "source": "s-release",
+      "target": "f-shipped"
+    },
+    {
+      "source": "s-release",
+      "target": "f-export"
+    },
+    {
+      "source": "s-pricing-september",
+      "target": "f-price-september"
+    },
+    {
+      "source": "s-pricing",
+      "target": "f-price"
+    },
+    {
+      "source": "s-chat",
+      "target": "f-plan"
+    },
+    {
+      "source": "s-chat",
+      "target": "f-email"
+    },
+    {
+      "source": "s-refunds",
+      "target": "f-refunds"
+    },
+    {
+      "source": "f-shipped",
+      "target": "m-release"
+    },
+    {
+      "source": "f-export",
+      "target": "m-release"
+    },
+    {
+      "source": "q-release",
+      "target": "m-release"
+    },
+    {
+      "source": "f-price-september",
+      "target": "m-price-september"
+    },
+    {
+      "source": "f-plan",
+      "target": "m-price-september"
+    },
+    {
+      "source": "q-price-september",
+      "target": "m-price-september"
+    },
+    {
+      "source": "f-price",
+      "target": "m-price"
+    },
+    {
+      "source": "f-plan",
+      "target": "m-price"
+    },
+    {
+      "source": "q-price",
+      "target": "m-price"
+    },
+    {
+      "source": "f-refunds",
+      "target": "m-refund"
+    },
+    {
+      "source": "f-email",
+      "target": "m-refund"
+    },
+    {
+      "source": "q-refund",
+      "target": "m-refund"
+    },
+    {
+      "source": "q-price",
+      "target": "t-search-docs"
+    },
+    {
+      "source": "q-price",
+      "target": "t-lookup-account"
+    },
+    {
+      "source": "q-release",
+      "target": "c-release"
+    },
+    {
+      "source": "m-release",
+      "target": "c-release"
+    },
+    {
+      "source": "q-price-september",
+      "target": "c-price-september"
+    },
+    {
+      "source": "m-price-september",
+      "target": "c-price-september"
+    },
+    {
+      "source": "q-price",
+      "target": "c-price"
+    },
+    {
+      "source": "m-price",
+      "target": "c-price"
+    },
+    {
+      "source": "t-search-docs",
+      "target": "c-price"
+    },
+    {
+      "source": "t-lookup-account",
+      "target": "c-price"
+    },
+    {
+      "source": "q-refund",
+      "target": "c-refund"
+    },
+    {
+      "source": "m-refund",
+      "target": "c-refund"
+    },
+    {
+      "source": "c-release",
+      "target": "o-release"
+    },
+    {
+      "source": "c-price-september",
+      "target": "o-price-september"
+    },
+    {
+      "source": "c-price",
+      "target": "o-price"
+    },
+    {
+      "source": "c-refund",
+      "target": "o-refund"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "q-release",
+      "kind": "source",
+      "label": "When did 0.11 ship?"
+    },
+    {
+      "id": "s-release",
+      "kind": "source",
+      "label": "Release notes"
+    },
+    {
+      "id": "q-price-september",
+      "kind": "source",
+      "label": "What does Pro cost?"
+    },
+    {
+      "id": "s-pricing-september",
+      "kind": "source",
+      "label": "September pricing"
+    },
+    {
+      "id": "q-price",
+      "kind": "source",
+      "label": "What will my plan cost?"
+    },
+    {
+      "id": "s-pricing",
+      "kind": "source",
+      "label": "October pricing"
+    },
+    {
+      "id": "s-chat",
+      "kind": "source",
+      "label": "Support chat"
+    },
+    {
+      "id": "q-refund",
+      "kind": "source",
+      "label": "Can I get a refund?"
+    },
+    {
+      "id": "s-refunds",
+      "kind": "source",
+      "label": "Refund policy"
+    },
+    {
+      "id": "f-shipped",
+      "kind": "fact",
+      "label": "Shipped October 8"
+    },
+    {
+      "id": "f-export",
+      "kind": "fact",
+      "label": "Fixes the export bug"
+    },
+    {
+      "id": "f-price-september",
+      "kind": "fact",
+      "label": "Pro is $15 a seat",
+      "superseded": true
+    },
+    {
+      "id": "f-price",
+      "kind": "fact",
+      "label": "Pro is $20 a seat"
+    },
+    {
+      "id": "f-plan",
+      "kind": "fact",
+      "label": "On the Pro plan"
+    },
+    {
+      "id": "f-email",
+      "kind": "fact",
+      "label": "Prefers email"
+    },
+    {
+      "id": "f-refunds",
+      "kind": "fact",
+      "label": "Refunds in 30 days"
+    },
+    {
+      "id": "m-release",
+      "kind": "memory",
+      "label": "Release retrieval"
+    },
+    {
+      "id": "m-price-september",
+      "kind": "memory",
+      "label": "September price retrieval"
+    },
+    {
+      "id": "m-price",
+      "kind": "memory",
+      "label": "October price retrieval"
+    },
+    {
+      "id": "m-refund",
+      "kind": "memory",
+      "label": "Refund retrieval"
+    },
+    {
+      "id": "t-search-docs",
+      "kind": "tool_call",
+      "label": "search_docs"
+    },
+    {
+      "id": "t-lookup-account",
+      "kind": "tool_call",
+      "label": "lookup_account"
+    },
+    {
+      "id": "c-release",
+      "kind": "context",
+      "label": "Release context"
+    },
+    {
+      "id": "c-price-september",
+      "kind": "context",
+      "label": "September pricing context"
+    },
+    {
+      "id": "c-price",
+      "kind": "context",
+      "label": "October pricing context"
+    },
+    {
+      "id": "c-refund",
+      "kind": "context",
+      "label": "Refund context"
+    },
+    {
+      "id": "o-release",
+      "kind": "output",
+      "label": "“Shipped on the 8th.”"
+    },
+    {
+      "id": "o-price-september",
+      "kind": "output",
+      "label": "“Pro is $15 a seat.”"
+    },
+    {
+      "id": "o-price",
+      "kind": "output",
+      "label": "“Pro is $20 a seat.”"
+    },
+    {
+      "id": "o-refund",
+      "kind": "output",
+      "label": "“Within 30 days.”"
+    }
+  ],
+  "removed": ["m-price", "c-price", "o-price"]
+}
