@@ -134,6 +134,33 @@
   text-wrap: pretty;
 }
 
+/**
+ * The hero on load: a blur that clears while the column rises.
+ */
+@keyframes site-hero-arrive {
+  /* **From 0.01, never 0.** Chromium does not count an element at opacity 0
+     as painted, so the heading became the page's largest paint only when its
+     rise had finished: measured on October 3, 2026, 1.67 s against 0.48 s
+     with no animation. At 0.01 under a 12px blur nothing shows, and the paint
+     counts from the first frame, back at 0.48 s. */
+  from {
+    filter: blur(12px);
+    opacity: 0.01;
+    transform: translateY(var(--helix-space-2xl));
+  }
+
+  to {
+    filter: blur(0);
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* **In this module, beside the rule that reads it.** A CSS module scopes an
+   animation name, and these keyframes sat in the landing page's sheet, where
+   they were scoped to that sheet: `getAnimations()` returned nothing and the
+   animation never ran. */
+
 @media (prefers-reduced-motion: no-preference) {
   .heroShell > * {
     animation: site-hero-arrive calc(var(--helix-duration-slow) * 3) var(--helix-easing-decelerate)

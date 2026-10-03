@@ -132,23 +132,6 @@
   }
 }
 
-/**
- * The hero on load: a blur that clears while the column rises.
- */
-@keyframes site-hero-arrive {
-  from {
-    filter: blur(12px);
-    opacity: 0;
-    transform: translateY(var(--helix-space-2xl));
-  }
-
-  to {
-    filter: blur(0);
-    opacity: 1;
-    transform: none;
-  }
-}
-
 /* ── The field ─────────────────────────────────────────────────────── */
 
 @keyframes preview-settle {
@@ -476,31 +459,6 @@
     var(--helix-color-surface) 46%,
     transparent
   );
-}
-
-/**
- * The theme pill, arriving after everything else has settled.
- *
- * **Last, and from nothing.** It is an invitation rather than part of the
- * argument, so it grows in once the column above it has finished. `scale(0)` to
- * full reads as appearing rather than sliding in from off screen, which a pill
- * pinned to the viewport has no room to do. `backwards` holds it at zero
- * through the delay instead of jumping to nothing when the animation starts.
- *
- * **No `to` block**: the resting width is declared once on the rule above, and
- * a keyframe naming it again goes stale the day the pill is resized.
- *
- * **Three properties to reach an actual zero.** `inline-size: 0` alone cannot
- * fall below the element's own `padding-inline`, so a sliver of glass sits on
- * screen through the delay with `shadow-floating` drawn around it.
- */
-@keyframes site-fab-arrive {
-  from {
-    box-shadow: none;
-    inline-size: 0;
-    opacity: 0;
-    padding-inline: 0;
-  }
 }
 
 /* The light that travels a band card's edge moved to `site.css`, so the
