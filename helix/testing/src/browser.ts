@@ -158,6 +158,10 @@ const show = (value: unknown): string => {
   if (value === null || value === undefined || typeof value !== 'object') {
     return String(value)
   }
+  /* A matcher standing in an expectation, by what it stands for. */
+  if (asymmetric(value)) {
+    return value.toString()
+  }
   /* Named for the same reason they are named in `same`: `JSON.stringify` renders
      either as `{}`, so a failure said "expected {} not to equal {}" and told the
      reader nothing about which sets those were. */
@@ -191,6 +195,9 @@ const same = (a: unknown, b: unknown): boolean => {
   if (Object.is(a, b)) {
     return true
   }
+  if (asymmetric(b)) {
+    return b.matches(a)
+  }
   if (Array.isArray(a) && Array.isArray(b)) {
     return a.length === b.length && a.every((item, index) => same(item, b[index]))
   }
@@ -212,6 +219,49 @@ const same = (a: unknown, b: unknown): boolean => {
   }
   return false
 }
+
+/**
+ * A matcher that stands in an expectation for any value of a kind, as
+ * `expect.any(Function)` and `expect.arrayContaining([...])` do in `bun:test`.
+ * A spec that uses one there and dies here on `expect.any is not a function`
+ * says nothing about what it tests, which is how the first browser run of the
+ * map connector's specs failed.
+ */
+interface Asymmetric {
+  readonly [ASYMMETRIC]: true
+  matches(value: unknown): boolean
+  toString(): string
+}
+
+const ASYMMETRIC = Symbol('asymmetric matcher')
+
+const asymmetric = (value: unknown): value is Asymmetric =>
+  typeof value === 'object' && value !== null && ASYMMETRIC in value
+
+/** Any value made by `kind`, or of its primitive type for `Number`, `String`, `Boolean`, `BigInt`, and `Symbol`. */
+const any = (kind: abstract new (...args: never[]) => unknown): Asymmetric => ({
+  [ASYMMETRIC]: true,
+  matches: (value) => {
+    const primitive: Record<string, string> = {
+      BigInt: 'bigint',
+      Boolean: 'boolean',
+      Number: 'number',
+      String: 'string',
+      Symbol: 'symbol',
+    }
+    const type = primitive[kind.name]
+    return (type !== undefined && typeof value === type) || value instanceof kind
+  },
+  toString: () => `Any<${kind.name}>`,
+})
+
+/** An array holding every one of `items`, in any order and among others. */
+const arrayContaining = (items: readonly unknown[]): Asymmetric => ({
+  [ASYMMETRIC]: true,
+  matches: (value) =>
+    Array.isArray(value) && items.every((item) => value.some((held) => same(held, item))),
+  toString: () => `ArrayContaining<${show(items)}>`,
+})
 
 interface Matchers {
   toBe: (expected: unknown) => void
@@ -346,16 +396,28 @@ const build = (actual: unknown, negated: boolean): Matchers => {
        harness must never do. So a nested expectation descends by the same rule
        rather than falling through to whole-value equality. */
     toMatchObject: (expected) => {
-      const partial = (value: unknown, shape: Record<string, unknown>): boolean => {
+      /* **An array matched item by item, each partially**, as `bun:test`
+         matches one: as long as the expectation, and each item held to its
+         own partial shape, so `{}` stands for any object in its place. */
+      const partial = (value: unknown, shape: unknown): boolean => {
+        if (asymmetric(shape)) {
+          return shape.matches(value)
+        }
+        if (Array.isArray(shape)) {
+          return (
+            Array.isArray(value) &&
+            value.length === shape.length &&
+            shape.every((wanted, index) => partial(value[index], wanted))
+          )
+        }
+        if (typeof shape !== 'object' || shape === null) {
+          return same(value, shape)
+        }
         if (typeof value !== 'object' || value === null) {
           return false
         }
         const held = value as Record<string, unknown>
-        return Object.entries(shape).every(([key, wanted]) =>
-          typeof wanted === 'object' && wanted !== null && !Array.isArray(wanted)
-            ? partial(held[key], wanted as Record<string, unknown>)
-            : same(held[key], wanted),
-        )
+        return Object.entries(shape).every(([key, wanted]) => partial(held[key], wanted))
       }
       check(partial(actual, expected), `to match ${show(expected)}`)
     },
@@ -391,9 +453,12 @@ const build = (actual: unknown, negated: boolean): Matchers => {
   }
 }
 
-/** The assertion entry point, with `.not` for the negated form. */
-export const expect = (actual: unknown): Matchers & { not: Matchers } =>
-  Object.assign(build(actual, false), { not: build(actual, true) })
+/** The assertion entry point, with `.not` for the negated form, and the matchers that stand in an expectation. */
+export const expect = Object.assign(
+  (actual: unknown): Matchers & { not: Matchers } =>
+    Object.assign(build(actual, false), { not: build(actual, true) }),
+  { any, arrayContaining },
+)
 
 /**
  * Hands back a runner for everything registered since the last call.
