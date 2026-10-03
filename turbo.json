@@ -578,11 +578,13 @@
     // `@fusion.dev/helix-testing`, and nothing of `helix-docs`.
     "specs": {
       "dependsOn": ["@fusion.dev/helix#build", "@fusion.dev/helix-testing#build"],
-      // The connectors' specs import their package's own source, which no
-      // `build` this task depends on hashes, so the whole of each `src` is an
-      // input: a driver changed under an unchanged spec bundles anew.
+      // The connectors' specs import their package's own source, and the
+      // headless tier is bundled from its source too, so one class registers
+      // each element. No `build` this task depends on hashes those, so the
+      // whole of each `src` is an input: a change under an unchanged spec
+      // bundles anew.
       "inputs": [
-        "$TURBO_ROOT$/helix/headless/src/**/*.dom.spec.ts",
+        "$TURBO_ROOT$/helix/headless/src/**/*.ts",
         "$TURBO_ROOT$/helix/styled/src/**/*.dom.spec.ts",
         "$TURBO_ROOT$/helix/graph/src/**/*.ts",
         "$TURBO_ROOT$/helix/map/src/**/*.ts",
