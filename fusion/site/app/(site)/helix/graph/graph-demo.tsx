@@ -192,6 +192,7 @@ export function GraphDemo({
   canvasClassName,
   className,
   kind,
+  legend = false,
   noPanel = false,
   paused = false,
   poster,
@@ -200,6 +201,8 @@ export function GraphDemo({
   canvasClassName?: string
   className?: string
   kind: DemoKind
+  /** Whether the frame names the groups over the drawing, each a button that shows or hides its notes. */
+  legend?: boolean
   /** Whether the frame leaves its search and list out, behind a button among its controls. */
   noPanel?: boolean
   /**
@@ -271,6 +274,7 @@ export function GraphDemo({
          graph is passed on the way to the rest. */
       gestures="cooperative"
       label={FRAMES[kind].label}
+      legend={legend}
       no-panel={noPanel}
       ref={frame}
     >

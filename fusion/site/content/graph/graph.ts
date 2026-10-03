@@ -85,9 +85,9 @@ export const GRAPH_FEATURES: readonly MapFeature[] = [
     title: 'Live updates',
   },
   {
-    body: 'Show only the notes near the selected one.',
-    elements: ['<helix-graph depth="2">'],
-    title: 'A local graph',
+    body: 'Show only the notes near the selected one, or turn groups on and off in a legend.',
+    elements: ['<helix-graph depth="2">', '<helix-graph legend>'],
+    title: 'Fewer notes at once',
   },
 ]
 
@@ -142,7 +142,7 @@ export const GRAPH: PageCopy = {
     {
       body: [
         'New notes arrive and messages travel the links, drawn by Sigma.js.',
-        'Press a note to see its links. New calls appear in the list as they arrive.',
+        'Press a note to see its links, or a group in the legend to hide its notes. New calls appear in the list as they arrive.',
       ],
       kicker: 'Live data',
       title: 'Updates as your data changes',
