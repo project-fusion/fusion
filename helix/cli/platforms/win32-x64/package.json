@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-cli-win32-x64",
   "description": "The `helix` binary for Windows on x86-64. Installed by `@fusion.dev/helix-cli`, which runs it.",
-  "version": "0.131.0",
+  "version": "0.132.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
