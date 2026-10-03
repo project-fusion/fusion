@@ -87,8 +87,8 @@
 /* A row that matches the tree above it: same height, same inset, same quiet ink
    until it is pointed at. */
 .navExtra {
-  align-items: center;
   all: unset;
+  align-items: center;
   block-size: var(--helix-size-control);
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
