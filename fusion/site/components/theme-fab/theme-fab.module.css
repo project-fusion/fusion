@@ -217,6 +217,19 @@
     padding-block-end: calc(var(--helix-space-md) + env(safe-area-inset-bottom, 0px));
   }
 
+  /**
+   * **Up from the bottom edge, at its full width.** Above this breakpoint the
+   * pill widens into the bar, one object growing along the line it sits on.
+   * Here the open state is a sheet the width of the screen, and the same width
+   * transition drew it as a column the pill's width and the sheet's height
+   * that then sprang out sideways. A sheet rises from the edge it rests on, so
+   * the width changes at once and the rail carries the rise, which leaves the
+   * pill's own arrival animation alone.
+   */
+  .fab {
+    transition: background var(--helix-duration-normal) var(--helix-easing-standard);
+  }
+
   /* The two faces share one grid cell so the pill can morph into the bar. A
      sheet sizes to its contents, so the collapsed face has to stop contributing
      a height once it is not the thing being shown. */
@@ -275,6 +288,21 @@
   .fabClose {
     align-self: flex-end;
     order: -1;
+  }
+}
+
+@media (max-width: 40rem) and (prefers-reduced-motion: no-preference) {
+  .fabRail[data-open] {
+    animation: fabSheetRise var(--helix-duration-slow) var(--helix-easing-decelerate);
+  }
+}
+
+/* In this module, beside the rule that reads it: a CSS module scopes an
+   animation name, so keyframes in another sheet would never meet it. No `to`
+   block, so the rise ends where the rail rests. */
+@keyframes fabSheetRise {
+  from {
+    translate: 0 100%;
   }
 }
 
