@@ -1,6 +1,6 @@
 <!-- @summary A graph of company notes drawn by Sigma.js, with notes arriving and messages passing between them as they happen. -->
 
-<!-- Preview frame: data-preview-graph has the frame connect Sigma.js, in glass; on your page, connectGraph does. -->
+<!-- Preview frame: data-preview-graph has the frame connect Sigma.js, in glass; on your page, connectGraph(frame, sigmaDriver(new Sigma(new Graph(), box), { layout, material: 'glass' })) does, the box being the div inside the frame. -->
 <helix-graph
   data-preview-graph
   data-preview-graph-material="glass"
@@ -57,8 +57,13 @@
   notes.nodes = nodes
   notes.links = links
 
-  /* Messages passing along the links, twice a second, a few of them problems. */
-  setInterval(() => {
+  /* Messages passing along the links, twice a second, a few of them problems,
+     until the graph leaves the page. */
+  const sending = setInterval(() => {
+    if (!notes.isConnected) {
+      clearInterval(sending)
+      return
+    }
     const link = pick(notes.links)
     notes.signal(link.source, link.target, { tone: random() < 0.1 ? 'danger' : 'primary' })
   }, 500)
@@ -67,6 +72,10 @@
      all the frame needs: only the new note is drawn and laid out. */
   let calls = 0
   const arriving = setInterval(() => {
+    if (!notes.isConnected) {
+      clearInterval(arriving)
+      return
+    }
     calls += 1
     const [group, hubs] = pick(Object.entries(subjects))
     const id = `Call ${calls}`

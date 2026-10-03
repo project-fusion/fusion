@@ -100,7 +100,7 @@ export function Example() {
 
   return (
     <>
-      {/* Preview frame: data-preview-graph has the frame connect Sigma.js, in glass; on your page, connectGraph does. */}
+      {/* Preview frame: data-preview-graph has the frame connect Sigma.js, in glass; on your page, connectGraph(frame, sigmaDriver(new Sigma(new Graph(), box), { layout, material: 'glass' })) does, the box being the div inside the frame. */}
       <helix-graph
         data-preview-graph
         data-preview-graph-material="glass"

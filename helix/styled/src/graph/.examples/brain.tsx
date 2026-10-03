@@ -60,7 +60,7 @@ export function Example() {
 
   return (
     <>
-      {/* Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl, and the SVG marked data-preview-graph-stencil is the shape it fits the notes into; on your page, connectGraph(frame, driver, { stencil: { path, width, height } }) does. */}
+      {/* Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl, and the SVG marked data-preview-graph-stencil is the shape it fits the notes into; on your page, connectGraph(frame, cosmosDriver(graph, box), { stencil: { path, width, height } }) does, and brain.css keeps the outline from showing. */}
       <helix-graph
         data-preview-graph="cosmos"
         label="A mind"

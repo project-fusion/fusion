@@ -1,5 +1,5 @@
-import type { ShapeField } from '../connect-graph/shape-field.js'
-import { shapeFromTriangles, type TriangleOptions } from './triangles.js'
+import type { ShapeField } from '../shapes/shape-field.js'
+import { shapeFromTriangles, type TriangleOptions } from '../shapes/triangles.js'
 
 /**
  * A solid field from a glTF model, the web's standard format for one: a
@@ -11,21 +11,30 @@ import { shapeFromTriangles, type TriangleOptions } from './triangles.js'
  *
  * **three.js reads the file**, imported when this is first called, so a page
  * that draws no model never downloads a loader. It is an optional peer of
- * this package.
+ * this package. A model that cannot be fetched or read is an error that
+ * names it, the loader's own error as its `cause`.
  */
 export const shapeFromModel = async (
   source: string | ArrayBuffer,
   options: TriangleOptions = {},
 ): Promise<ShapeField> => {
+  const which = typeof source === 'string' ? `The model ${source}` : 'The model given as bytes'
   const [{ GLTFLoader }, { Mesh, Vector3 }] = await Promise.all([
     import('three/addons/loaders/GLTFLoader.js'),
     import('three'),
-  ])
+  ]).catch((cause: unknown) => {
+    throw new Error(
+      `${which} could not be read, because three.js could not be loaded. Install three alongside @fusion.dev/helix-graph.`,
+      { cause },
+    )
+  })
   const loader = new GLTFLoader()
-  const model =
-    typeof source === 'string'
-      ? await loader.loadAsync(source)
-      : await loader.parseAsync(source, '')
+  const model = await (typeof source === 'string'
+    ? loader.loadAsync(source)
+    : loader.parseAsync(source, '')
+  ).catch((cause: unknown) => {
+    throw new Error(`${which} could not be read as a glTF model: ${String(cause)}`, { cause })
+  })
   model.scene.updateMatrixWorld(true)
   const corners: number[] = []
   /* **Each mesh a named part**, by its node's name or its mesh's, so a page

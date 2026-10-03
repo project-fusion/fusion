@@ -1,12 +1,7 @@
-import {
-  forceCenter,
-  forceLink,
-  forceManyBody,
-  forceSimulation,
-  type SimulationNode,
-} from 'd3-force-3d'
+import type { Simulation, SimulationNode } from 'd3-force-3d'
 import {
   AdditiveBlending,
+  type Blending,
   BoxGeometry,
   BufferAttribute,
   BufferGeometry,
@@ -22,6 +17,7 @@ import {
   PerspectiveCamera,
   Points,
   Quaternion,
+  type Ray,
   Raycaster,
   Scene,
   ShaderMaterial,
@@ -41,7 +37,8 @@ import type {
   GraphChanges,
   GraphDriver,
 } from '../connect-graph/connect-graph.js'
-import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
+import { linkKey } from '../connect-graph/diff.js'
+import { type GraphLooks, type NodeLook, rgbOf } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
 import type { StencilFrame } from '../connect-graph/stencil.js'
 import {
@@ -53,7 +50,7 @@ import {
   type OnScreen,
   signalsOver,
 } from '../overlay/overlay.js'
-import { surfaceOf } from './surface.js'
+import { surfaceOf } from '../shapes/surface.js'
 
 /** How the three.js driver behaves where the page does not say. */
 export interface ThreeDriverOptions {
@@ -72,7 +69,7 @@ export interface ThreeDriverOptions {
   groupLabels?: boolean | undefined
   /** The longest a layout runs, in milliseconds, settled or not. 10 seconds by default. */
   layoutLimit?: number | undefined
-  /** A note's shape where it does not say: `circle` by default, `square` or `diamond`. */
+  /** A note's shape where it does not say: `circle` by default, `square` or `diamond`. A `ring` is drawn as a circle. */
   shape?: NodeLook['shape']
 }
 
@@ -154,8 +151,9 @@ float fade(float depth) {
  * its middle to a hot point, and a crisp glint where the light fixed in the
  * scene catches it, so the glint moves as the reader turns the graph. On a
  * light ground, where light cannot glow, frosted glass: pale at its middle,
- * its color deepening to a ring at its rim, and the same glint. `n` and `light` are in the view's space, `n` facing
- * the eye at `z` 1. Returns the color and how opaque it is.
+ * its color deepening to a ring at its rim, and the same glint. `n` and
+ * `light` are in the view's space, `n` facing the eye at `z` 1. Returns the
+ * color and how opaque it is.
  */
 // language=GLSL
 const ORB = /* glsl */ `
@@ -176,9 +174,9 @@ vec4 orb(vec3 base, vec3 n) {
   frost *= 0.86 + 0.14 * diffuse;
   frost = mix(frost, base * 0.78, rim * 0.75);
   frost += vec3(glint * 0.6);
-  return dark > 0.5
-    ? vec4(energy, mix(0.5, 1.0, max(rim, core)))
-    : vec4(frost, mix(0.78, 1.0, rim));
+  /* Opaque, since a body writes its depth: a clear one hid what is behind it
+     and showed the ground through itself, a notch where it met another. */
+  return dark > 0.5 ? vec4(energy, 1.0) : vec4(frost, 1.0);
 }
 `
 
@@ -194,6 +192,7 @@ uniform float scale;
 uniform float unit;
 uniform float bloom;
 uniform float halo;
+uniform float most;
 
 varying vec4 vTint;
 varying float vShape;
@@ -211,10 +210,13 @@ void main() {
      where the ground is dark, and more for a glowing one; the body's pass
      is the note and no more. */
   vRoom = halo > 0.5 ? 1.0 + (bloom > 0.0 ? 0.9 : 0.0) + glow * 1.4 : 1.0;
-  /* As large as the note is, at the distance it is: nearer is larger. */
-  gl_PointSize = size * unit * scale / depth * vRoom;
+  /* As large as the note is, at the distance it is: nearer is larger. No
+     larger than the GPU draws a point, and a note that would be is drawn
+     whole and smaller, where cut to the largest point it lost its edge. */
+  float wanted = size * unit * scale / depth * vRoom;
+  gl_PointSize = min(wanted, most);
   vCenter = view.xyz;
-  vRadius = size * unit * 0.5;
+  vRadius = size * unit * 0.5 * gl_PointSize / max(wanted, 0.001);
   vFade = fade(depth);
   vTint = tint;
   vShape = shape;
@@ -445,7 +447,7 @@ const averaged = (
 
 /** An `rgb()` color as three channels from 0 to 1. */
 const channels = (color: string): [number, number, number] => {
-  const [red = 128, green = 128, blue = 128] = color.match(/[\d.]+/g)?.map(Number) ?? []
+  const [red, green, blue] = rgbOf(color)
   return [red / 255, green / 255, blue / 255]
 }
 
@@ -471,13 +473,18 @@ const depthOf = (id: string): number => {
  * place; with a solid `stencil`, the notes are drawn in its shape and none
  * runs. Dragging turns the graph, the wheel and a pinch bring it nearer, and
  * it turns slowly by itself while nobody is handling it, unless the reader
- * asks for less motion.
+ * asks for less motion. It draws only while something moves, and not at all
+ * while the box is out of view or off the page.
+ *
+ * The renderer is the driver's own, and `disconnect()` frees it.
  */
 export const threeDriver = (
   container: HTMLElement,
   options: ThreeDriverOptions = {},
 ): GraphDriver => {
-  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+  /* Read each time, since the reader can change it while the page is open. */
+  const still = (): boolean =>
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
   const renderer = new WebGLRenderer({ alpha: true, antialias: true })
   /* **Drawn finer than the screen and smoothed down**: half as many pixels
      again as the screen has, and never fewer than two for each of the
@@ -494,10 +501,10 @@ export const threeDriver = (
   const camera = new PerspectiveCamera(FOV, 1, 0.1, REACH * 40)
   camera.position.set(0, 0, REACH * 3)
   const controls = new OrbitControls(camera, canvas)
-  controls.enableDamping = !still
+  controls.enableDamping = !still()
   controls.dampingFactor = 0.08
   controls.rotateSpeed = 0.6
-  controls.autoRotate = !still && options.autoRotate !== false
+  controls.autoRotate = !still() && options.autoRotate !== false
   controls.autoRotateSpeed = 0.5
 
   /* Each note's place in the arrays, which are by index. */
@@ -526,6 +533,16 @@ export const threeDriver = (
     dark: { value: 1 },
     light: { value: new Vector3(-0.4, 0.8, 0.45).normalize() },
     middle: { value: 1 },
+    /* The largest point the GPU draws, in pixels. */
+    most: {
+      value: Number(
+        (
+          renderer.getContext().getParameter(renderer.getContext().ALIASED_POINT_SIZE_RANGE) as
+            | Float32Array
+            | undefined
+        )?.[1] ?? 256,
+      ),
+    },
     radius: { value: 1 },
     scale: { value: 1 },
     steep: { value: 0 },
@@ -603,11 +620,13 @@ export const threeDriver = (
       geometry: framed(new BoxGeometry(1.5, 1.5, 1.5)),
       mesh: undefined as InstancedMesh | undefined,
       spots: [] as number[],
+      turns: [] as Quaternion[],
     },
     octahedron: {
       geometry: framed(new OctahedronGeometry(1.15)),
       mesh: undefined as InstancedMesh | undefined,
       spots: [] as number[],
+      turns: [] as Quaternion[],
     },
   }
   const quiet = new LineSegments2(new LineSegmentsGeometry(), lines(LINKS.dark.far, WIDTH.quiet))
@@ -744,25 +763,37 @@ export const threeDriver = (
     const nearest: number[] = []
     for (let step = 0; step < sample; step++) {
       const one = Math.floor((step * ids.length) / sample)
+      const [ox, oy, oz] = [
+        positions[one * 3] as number,
+        positions[one * 3 + 1] as number,
+        positions[one * 3 + 2] as number,
+      ]
       let best = Number.POSITIVE_INFINITY
       for (let other = 0; other < ids.length; other++) {
         if (other !== one) {
-          best = Math.min(best, at(one).distanceToSquared(at(other)))
+          const far =
+            ((positions[other * 3] as number) - ox) ** 2 +
+            ((positions[other * 3 + 1] as number) - oy) ** 2 +
+            ((positions[other * 3 + 2] as number) - oz) ** 2
+          best = Math.min(best, far)
         }
       }
       nearest.push(Math.sqrt(best))
     }
     nearest.sort((one, other) => one - other)
     const reach = (nearest[Math.floor(nearest.length / 2)] ?? 1) * WASH.reach
-    /* The notes by cell of a grid as wide as the reach. */
-    const cells = new Map<string, number[]>()
-    const key = (x: number, y: number, z: number): string =>
-      `${Math.floor(x / reach)},${Math.floor(y / reach)},${Math.floor(z / reach)}`
+    /* The notes by cell of a grid as wide as the reach, each cell a number:
+       a grid of 65,536 cells a side, far past any graph's reach, never runs
+       two together, and its numbers stay whole in a double. */
+    const cells = new Map<number, number[]>()
+    const SIDE = 1 << 16
+    const key = (cx: number, cy: number, cz: number): number =>
+      ((cx + SIDE / 2) * SIDE + (cy + SIDE / 2)) * SIDE + (cz + SIDE / 2)
     for (let spot = 0; spot < ids.length; spot++) {
       const k = key(
-        positions[spot * 3] as number,
-        positions[spot * 3 + 1] as number,
-        positions[spot * 3 + 2] as number,
+        Math.floor((positions[spot * 3] as number) / reach),
+        Math.floor((positions[spot * 3 + 1] as number) / reach),
+        Math.floor((positions[spot * 3 + 2] as number) / reach),
       )
       const list = cells.get(k)
       if (list) {
@@ -787,7 +818,7 @@ export const threeDriver = (
       for (let dx = -1; dx <= 1; dx++) {
         for (let dy = -1; dy <= 1; dy++) {
           for (let dz = -1; dz <= 1; dz++) {
-            for (const spot of cells.get(`${cx + dx},${cy + dy},${cz + dz}`) ?? []) {
+            for (const spot of cells.get(key(cx + dx, cy + dy, cz + dz)) ?? []) {
               const far =
                 ((positions[spot * 3] as number) - x) ** 2 +
                 ((positions[spot * 3 + 1] as number) - y) ** 2 +
@@ -894,7 +925,8 @@ export const threeDriver = (
       ? undefined
       : onScreen(id)
   }
-  const groups = groupsOver(container, nearOnScreen)
+  /* Group names keep clear of the notes' names, drawn first. */
+  const groups = groupsOver(container, nearOnScreen, () => names.boxes())
   const names = namesOver(container, onScreen)
   const drawNames = (): void => {
     const pointed = hovered === undefined ? undefined : ids[hovered]
@@ -921,7 +953,7 @@ export const threeDriver = (
   const glideTo = (to: Vector3, distance: number, duration: number): void => {
     const from = controls.target.clone()
     const fromDistance = camera.position.distanceTo(controls.target)
-    if (duration <= 0 || still) {
+    if (duration <= 0 || still()) {
       const way = camera.position.clone().sub(controls.target).normalize()
       controls.target.copy(to)
       camera.position.copy(to.clone().add(way.multiplyScalar(distance)))
@@ -944,11 +976,12 @@ export const threeDriver = (
     }
     return { center, radius: Math.max(radius, 1) }
   }
-  const frame = (spots: readonly number[], duration: number): void => {
+  const frame = (spots: readonly number[], duration: number, least = 0): void => {
     if (spots.length === 0) {
       return
     }
-    const { center, radius } = sphereOf(spots)
+    const { center, radius: reach } = sphereOf(spots)
+    const radius = Math.max(reach, least)
     const fov = ((camera.fov / 2) * Math.PI) / 180
     /* Near enough that the graph's widest turn still fits, and no nearer. */
     const fits = radius / Math.tan(Math.min(fov, Math.atan(Math.tan(fov) * camera.aspect)))
@@ -973,39 +1006,87 @@ export const threeDriver = (
   let dark = true
   const sizeOf = (size: number): number => 1.6 + 1.35 * Math.max(size, 0)
 
+  /* Each note's tint, size, shape and glow, written in place on every paint,
+     and made again only when the notes change. */
+  let tints = new Float32Array()
+  let shapes = new Float32Array()
+  let glows = new Float32Array()
+  /* How each note's size is grown for the selection, before the pointer's own. */
+  let grownBy = new Float32Array()
+  /** Writes a note's drawn size and glow, for the selection and the pointer. */
+  const sizeNote = (spot: number): void => {
+    const pointed = spot === hovered
+    drawnSizes[spot] = (sizes[spot] ?? 1) * Math.max(grownBy[spot] ?? 1, pointed ? 1.25 : 1)
+    if (!(glows[spot] === 1)) {
+      glows[spot] = pointed ? 0.6 : 0
+    }
+  }
+  /** Marks a note attribute as changed, so the GPU is given it again. */
+  const changed = (name: string): void => {
+    const attribute = points.geometry.getAttribute(name) as BufferAttribute | undefined
+    if (attribute) {
+      attribute.needsUpdate = true
+    }
+  }
+  /** Sets a note attribute, made again only where its array is new. */
+  const attribute = (name: string, array: Float32Array, size: number): void => {
+    const was = points.geometry.getAttribute(name) as BufferAttribute | undefined
+    if (was?.array === array) {
+      was.needsUpdate = true
+    } else {
+      points.geometry.setAttribute(name, new BufferAttribute(array, size))
+    }
+  }
+  /* The blending last set, so the materials compile again only when the ground turns. */
+  let blended: Blending | undefined
+
   /** Colors, sizes, shapes and glows from the looks, and the links' colors. */
   const paint = (): void => {
     if (!looks) {
       return
     }
-    const tints = new Float32Array(ids.length * 4)
-    const drawn = new Float32Array(ids.length)
-    const shapes = new Float32Array(ids.length)
-    const glows = new Float32Array(ids.length)
+    if (tints.length !== ids.length * 4) {
+      tints = new Float32Array(ids.length * 4)
+      drawnSizes = new Float32Array(ids.length)
+      shapes = new Float32Array(ids.length)
+      glows = new Float32Array(ids.length)
+      grownBy = new Float32Array(ids.length)
+    }
+    /* The wash is summed again only where a note's tint changed. */
+    let tinted = false
     selected = undefined
     near = new Set()
     ids.forEach((id, spot) => {
       const look = (looks as GraphLooks).node(id)
       const [red, green, blue] = channels(look.color)
-      tints.set([red, green, blue, look.hidden ? 0 : 1], spot * 4)
-      drawn[spot] =
-        (sizes[spot] ?? 1) * (look.selected ? 1.5 : look.raised || spot === hovered ? 1.25 : 1)
+      const alpha = look.hidden ? 0 : 1
+      if (
+        tints[spot * 4] !== red ||
+        tints[spot * 4 + 1] !== green ||
+        tints[spot * 4 + 2] !== blue ||
+        tints[spot * 4 + 3] !== alpha
+      ) {
+        tints.set([red, green, blue, alpha], spot * 4)
+        tinted = true
+      }
+      grownBy[spot] = look.selected ? 1.5 : look.raised ? 1.25 : 1
+      glows[spot] = look.selected ? 1 : 0
+      sizeNote(spot)
       shapes[spot] = SHAPES[look.shape ?? options.shape ?? 'circle']
-      glows[spot] = look.selected ? 1 : spot === hovered ? 0.6 : 0
       if (look.selected) {
         selected = id
       } else if (look.raised) {
         near.add(id)
       }
     })
-    const geometry = points.geometry
-    geometry.setAttribute('tint', new BufferAttribute(tints, 4))
-    noteTints = tints
-    washSurface()
-    geometry.setAttribute('size', new BufferAttribute(drawn, 1))
-    geometry.setAttribute('shape', new BufferAttribute(shapes, 1))
-    geometry.setAttribute('glow', new BufferAttribute(glows, 1))
-    drawnSizes = drawn
+    attribute('tint', tints, 4)
+    attribute('size', drawnSizes, 1)
+    attribute('shape', shapes, 1)
+    attribute('glow', glows, 1)
+    if (tinted || noteTints !== tints) {
+      noteTints = tints
+      washSurface()
+    }
     meshShapes(shapes, tints)
     dark = !isLight(looks.ground)
     const solidUniforms = solid.material.uniforms as Record<string, { value: number[] }>
@@ -1016,15 +1097,36 @@ export const threeDriver = (
     uniforms.dark.value = dark ? 1 : 0
     /* Bodies are solid and painted; light, the halos and links, adds up on a dark ground. */
     const blending = dark ? AdditiveBlending : NormalBlending
-    halos.material.blending = blending
-    shapeMaterial.blending = blending
-    shapeMaterial.needsUpdate = true
-    quiet.material.blending = blending
-    lit.material.blending = blending
-    halos.material.needsUpdate = true
-    quiet.material.needsUpdate = true
-    lit.material.needsUpdate = true
-    paintLinks()
+    if (blending !== blended) {
+      blended = blending
+      for (const material of [halos.material, shapeMaterial, quiet.material, lit.material]) {
+        material.blending = blending
+        material.needsUpdate = true
+      }
+    }
+    paintQuiet()
+    paintLit()
+    invalidate()
+  }
+
+  /** Lights the note under the pointer and its links, and puts back the note it left. */
+  const point = (next: number | undefined): void => {
+    const was = hovered
+    hovered = next
+    canvas.style.cursor = next === undefined ? '' : 'pointer'
+    if (!looks || drawnSizes.length !== ids.length) {
+      return
+    }
+    for (const spot of [was, next]) {
+      if (spot !== undefined) {
+        sizeNote(spot)
+      }
+    }
+    changed('size')
+    changed('glow')
+    shapesPlaced = false
+    paintLit()
+    invalidate()
   }
 
   /* The notes drawn as meshes, by shape, each instance one note. */
@@ -1041,6 +1143,13 @@ export const threeDriver = (
         }
       })
       solidShape.spots = spots
+      /* Each mesh turned a little of its own, worked out once a drawing. */
+      solidShape.turns = spots.map((spot) => {
+        const twist = depthOf(ids[spot] ?? '')
+        return new Quaternion().setFromEuler(
+          new Euler(0.45 + twist * 0.3, 0.6 + twist, 0.2 * twist),
+        )
+      })
       if (!solidShape.mesh || solidShape.mesh.count !== spots.length) {
         if (solidShape.mesh) {
           scene.remove(solidShape.mesh)
@@ -1065,16 +1174,23 @@ export const threeDriver = (
         mesh.geometry.setAttribute('tone', new InstancedBufferAttribute(tone, 4))
       }
     }
-    placeShapes()
+    shapesPlaced = false
   }
 
   /* Each mesh where its note is and as large, turned a little of its own so
-     a field of cubes is not a grid. */
-  const turned = new Quaternion()
+     a field of cubes is not a grid. Placed again only when the notes move,
+     their sizes change, or the unit they are sized in does. */
+  let shapesPlaced = false
+  let placedUnit = Number.NaN
   const placed = new Matrix4()
   const where = new Vector3()
   const scaled = new Vector3()
   const placeShapes = (): void => {
+    if (shapesPlaced && placedUnit === uniforms.unit.value) {
+      return
+    }
+    shapesPlaced = true
+    placedUnit = uniforms.unit.value
     for (const solidShape of [solids.cube, solids.octahedron]) {
       const mesh = solidShape.mesh
       if (!mesh) {
@@ -1082,8 +1198,7 @@ export const threeDriver = (
       }
       solidShape.spots.forEach((spot, at) => {
         const size = (drawnSizes[spot] ?? 1) * uniforms.unit.value * 0.5
-        const twist = depthOf(ids[spot] ?? '')
-        turned.setFromEuler(new Euler(0.45 + twist * 0.3, 0.6 + twist, 0.2 * twist))
+        const turned = solidShape.turns[at] as Quaternion
         where.set(
           positions[spot * 3] as number,
           positions[spot * 3 + 1] as number,
@@ -1096,49 +1211,70 @@ export const threeDriver = (
     }
   }
 
-  /** The links: all of them faint, and the ones the reader is on whole. */
-  const paintLinks = (): void => {
+  /** A set of links drawn again: each link's two ends and its color at each. */
+  const fill = (line: LineSegments2, ends: number[], colors: number[]): void => {
+    const place = new Float32Array(ends.length * 3)
+    ends.forEach((spot, step) => {
+      place.set(positions.subarray(spot * 3, spot * 3 + 3), step * 3)
+    })
+    line.geometry.dispose()
+    line.geometry = new LineSegmentsGeometry()
+    if (ends.length > 0) {
+      line.geometry.setPositions(place)
+      line.geometry.setColors(colors)
+    }
+    line.userData.ends = ends
+  }
+
+  /**
+   * The links at rest, faint: every link the selection does not raise. Drawn
+   * again when the looks or the links change, never for the pointer, whose
+   * links are drawn whole over these.
+   */
+  const paintQuiet = (): void => {
+    if (!looks) {
+      return
+    }
+    const ends: number[] = []
+    const colors: number[] = []
+    for (const link of links) {
+      const from = index.get(link.source)
+      const to = index.get(link.target)
+      const look = looks.link(link.source, link.target)
+      if (from === undefined || to === undefined || look.hidden || look.raised) {
+        continue
+      }
+      const color = channels(look.color)
+      ends.push(from, to)
+      colors.push(...color, ...color)
+    }
+    fill(quiet, ends, colors)
+  }
+
+  /** The links the reader is on, whole: the selection's, and the note under the pointer's in its color. */
+  const paintLit = (): void => {
     if (!looks) {
       return
     }
     const on = hovered === undefined ? undefined : ids[hovered]
-    const quietEnds: number[] = []
-    const quietTints: number[] = []
-    const litEnds: number[] = []
-    const litTints: number[] = []
+    const ends: number[] = []
+    const colors: number[] = []
     for (const link of links) {
+      const touches = on !== undefined && (link.source === on || link.target === on)
+      const look = looks.link(link.source, link.target)
+      if (look.hidden || !(look.raised || touches)) {
+        continue
+      }
       const from = index.get(link.source)
       const to = index.get(link.target)
       if (from === undefined || to === undefined) {
         continue
       }
-      const look = looks.link(link.source, link.target)
-      if (look.hidden) {
-        continue
-      }
-      const touches = on !== undefined && (link.source === on || link.target === on)
-      const whole = look.raised || touches
       const color = channels(touches ? looks.node(on).color : look.color)
-      const ends = whole ? litEnds : quietEnds
-      const tints = whole ? litTints : quietTints
       ends.push(from, to)
-      tints.push(...color, ...color)
+      colors.push(...color, ...color)
     }
-    const fill = (line: LineSegments2, ends: number[], tints: number[]): void => {
-      const place = new Float32Array(ends.length * 3)
-      ends.forEach((spot, step) => {
-        place.set(positions.subarray(spot * 3, spot * 3 + 3), step * 3)
-      })
-      line.geometry.dispose()
-      line.geometry = new LineSegmentsGeometry()
-      if (ends.length > 0) {
-        line.geometry.setPositions(place)
-        line.geometry.setColors(tints)
-      }
-      line.userData.ends = ends
-    }
-    fill(quiet, quietEnds, quietTints)
-    fill(lit, litEnds, litTints)
+    fill(lit, ends, colors)
   }
 
   /** The links' ends moved to where their notes are now, while a layout or a glide moves them. */
@@ -1173,9 +1309,13 @@ export const threeDriver = (
     sizes = nodes.map((node) => sizeOf(node.size))
     links = next.filter((link) => index.has(link.source) && index.has(link.target))
     positions = places
+    /* A glide under way moved the arrays these replace. */
+    morph = undefined
     points.geometry.setAttribute('position', new BufferAttribute(positions, 3))
     points.geometry.computeBoundingSphere()
     hovered = undefined
+    canvas.style.cursor = ''
+    shapesPlaced = false
     paint()
     /* The notes moved, so the surface's wash is tied to them again. */
     if (solid.visible) {
@@ -1198,7 +1338,7 @@ export const threeDriver = (
         done: () => void
         limit: number
         nodes: SimulationNode[]
-        simulation: ReturnType<typeof forceSimulation>
+        simulation: Simulation
       }
     | undefined
 
@@ -1236,12 +1376,23 @@ export const threeDriver = (
     quiet.material.opacity = shade.far + (shade.close - shade.far) * closeness
   }
 
+  /* **Drawn only while something changes**: a glide, a layout, the reader's
+     hands, the turning, or a paint. A graph at rest costs the GPU nothing. */
+  let dirty = true
+  const invalidate = (): void => {
+    dirty = true
+  }
+  /* Whether the box is in view: out of it, or off the page, nothing is drawn
+     and no frame is asked for, until it is back. */
+  let visible = true
   let pending = 0
   const tick = (now: number): void => {
-    if (stopped) {
+    pending = 0
+    if (stopped || !visible || !container.isConnected) {
       return
     }
     pending = requestAnimationFrame(tick)
+    const moving = glide !== undefined || morph !== undefined || layout !== undefined
     if (glide) {
       const through = Math.min((now - glide.start) / glide.duration, 1)
       const eased = ease(through)
@@ -1255,7 +1406,7 @@ export const threeDriver = (
       }
     }
     if (morph) {
-      const through = still ? 1 : Math.min((now - morph.start) / MORPH, 1)
+      const through = still() ? 1 : Math.min((now - morph.start) / MORPH, 1)
       const eased = ease(through)
       for (let step = 0; step < positions.length; step++) {
         positions[step] =
@@ -1264,6 +1415,7 @@ export const threeDriver = (
       }
       ;(points.geometry.getAttribute('position') as BufferAttribute).needsUpdate = true
       followLinks()
+      shapesPlaced = false
       if (through >= 1) {
         morph = undefined
         points.geometry.computeBoundingSphere()
@@ -1283,6 +1435,7 @@ export const threeDriver = (
       ;(points.geometry.getAttribute('position') as BufferAttribute).needsUpdate = true
       points.geometry.computeBoundingSphere()
       followLinks()
+      shapesPlaced = false
       if (layout.simulation.alpha() <= layout.simulation.alphaMin() || now > layout.limit) {
         layout.done()
       } else if (!moved && !glide) {
@@ -1291,20 +1444,43 @@ export const threeDriver = (
     }
     /* Turning by itself only while nobody is on a note or has just let go. */
     controls.autoRotate =
-      !still &&
+      !still() &&
       options.autoRotate !== false &&
       hovered === undefined &&
       selected === undefined &&
       now - handled > REST
-    controls.update()
+    controls.enableDamping = !still()
+    /* The controls say whether they moved the camera: turning, easing to a stop, or handled. */
+    const turned = controls.update()
+    if (!(moving || turned || dirty)) {
+      return
+    }
+    dirty = false
     cue()
     if (solids.cube.mesh || solids.octahedron.mesh) {
       placeShapes()
     }
     renderer.render(scene, camera)
-    groups.draw()
     drawNames()
+    groups.draw()
   }
+  /** Asks for frames again, where none is asked for and the box can be drawn. */
+  const wake = (): void => {
+    invalidate()
+    if (!pending && !stopped && visible && container.isConnected) {
+      pending = requestAnimationFrame(tick)
+    }
+  }
+  const seen =
+    typeof IntersectionObserver === 'function'
+      ? new IntersectionObserver((entries) => {
+          visible = entries.at(-1)?.isIntersecting ?? true
+          if (visible) {
+            wake()
+          }
+        })
+      : undefined
+  seen?.observe(container)
 
   /* The drawing is sized to its box, a frame after the box changes, so the
      resize is never made inside the observer's own callback. */
@@ -1314,6 +1490,7 @@ export const threeDriver = (
     renderer.setSize(width, height, false)
     camera.aspect = width / height
     camera.updateProjectionMatrix()
+    invalidate()
   }
   let resizing = 0
   const sized = new ResizeObserver(() => {
@@ -1328,10 +1505,66 @@ export const threeDriver = (
     moved = true
     handled = Number.POSITIVE_INFINITY
     glide = undefined
+    wake()
   })
   controls.addEventListener('end', () => {
     handled = performance.now()
   })
+
+  /**
+   * How far along a ray the drawn shape's near surface is, in three.js's
+   * units, or infinitely far where the ray misses it. **Stepped along the
+   * shape's field**, each step as long as the field says the surface is
+   * away, which finds the surface in a few dozen reads of the field: a ray
+   * cast against the surface's hundred thousand triangles took longer than a
+   * frame on every move of the pointer.
+   */
+  const frontOf = (ray: Ray): number => {
+    const frame = shapeFrame
+    if (!frame) {
+      return Number.POSITIVE_INFINITY
+    }
+    const { depth, distance, height, width } = frame.field
+    /* Three.js's units are the field's box scaled by this, its y turned over. */
+    const by = frame.scale * scale
+    const toBox = (x: number, y: number, z: number): [number, number, number] => [
+      (x / scale - frame.middle.x) / frame.scale + width / 2,
+      -(y / scale - frame.middle.y) / frame.scale + height / 2,
+      (z / scale - frame.middle.z) / frame.scale + depth / 2,
+    ]
+    const [ox, oy, oz] = toBox(ray.origin.x, ray.origin.y, ray.origin.z)
+    const way = [ray.direction.x, -ray.direction.y, ray.direction.z] as const
+    /* Where the ray is inside the field's box, and only there, since the field says nothing past it. */
+    let enter = 0
+    let leave = Number.POSITIVE_INFINITY
+    for (const [from, along, size] of [
+      [ox, way[0], width],
+      [oy, way[1], height],
+      [oz, way[2], depth],
+    ] as const) {
+      if (Math.abs(along) < 1e-9) {
+        if (from < 0 || from > size) {
+          return Number.POSITIVE_INFINITY
+        }
+        continue
+      }
+      const one = (0 - from) / along
+      const other = (size - from) / along
+      enter = Math.max(enter, Math.min(one, other))
+      leave = Math.min(leave, Math.max(one, other))
+    }
+    /* The drawn surface is set in from the field's edge, below the notes' shell. */
+    const inset = frame.shell * 1.15
+    const least = Math.max(width, height, depth) / 400
+    for (let t = enter, step = 0; t <= leave && step < 128; step++) {
+      const away = distance(ox + way[0] * t, oy + way[1] * t, oz + way[2] * t) + inset
+      if (away <= least) {
+        return t * by
+      }
+      t += Math.max(away, least)
+    }
+    return Number.POSITIVE_INFINITY
+  }
 
   /* **The note under the pointer**, found once a frame at most: a ray from
      the eye through the pointer, wide enough to catch a note's whole body. */
@@ -1348,9 +1581,7 @@ export const threeDriver = (
     raycaster.setFromCamera(pointer, camera)
     raycaster.params.Points = { threshold: uniforms.unit.value * 2.4 }
     /* A note behind the shape is hidden by it, so the pointer cannot be on it. */
-    const front = solid.visible
-      ? (raycaster.intersectObject(solid, false)[0]?.distance ?? Number.POSITIVE_INFINITY)
-      : Number.POSITIVE_INFINITY
+    const front = solid.visible ? frontOf(raycaster.ray) : Number.POSITIVE_INFINITY
     return raycaster.intersectObject(points, false).find((one) => {
       const id = one.index === undefined ? undefined : ids[one.index]
       return (
@@ -1366,17 +1597,15 @@ export const threeDriver = (
     hovering = requestAnimationFrame(() => {
       const next = noteAt(clientX, clientY)
       if (next !== hovered) {
-        hovered = next
-        canvas.style.cursor = next === undefined ? '' : 'pointer'
-        paint()
+        point(next)
+        wake()
       }
     })
   }
   const leave = (): void => {
     if (hovered !== undefined) {
-      hovered = undefined
-      canvas.style.cursor = ''
-      paint()
+      point(undefined)
+      wake()
     }
   }
   canvas.addEventListener('pointermove', hover)
@@ -1386,14 +1615,18 @@ export const threeDriver = (
     center: (id, animate) => {
       const spot = index.get(id)
       if (spot !== undefined) {
+        /* The view is the reader's from here: a layout still running no longer fits it. */
+        moved = true
         glideTo(at(spot), camera.position.distanceTo(controls.target), animate ? STEP * 2 : 0)
+        wake()
       }
     },
     draw: ({ links: next, nodes }) => {
-      const reach = Math.max(
-        1e-6,
-        ...nodes.map((node) => Math.max(Math.abs(node.x), Math.abs(node.y), Math.abs(node.z ?? 0))),
-      )
+      /* A loop, not a spread: a spread of a hundred thousand notes overflows the stack. */
+      let reach = 1e-6
+      for (const node of nodes) {
+        reach = Math.max(reach, Math.abs(node.x), Math.abs(node.y), Math.abs(node.z ?? 0))
+      }
       scale = REACH / reach
       const places = new Float32Array(nodes.length * 3)
       nodes.forEach((node, spot) => {
@@ -1403,14 +1636,20 @@ export const threeDriver = (
       load(nodes, next, places)
       shapeSolid()
       fitAll(0)
+      wake()
     },
     fit: (fitted, animate) => {
+      moved = true
+      wake()
+      /* **Never closer than a third of the whole graph across**: a note and
+         its one neighbor, fitted alone, filled the view with two spheres. */
       frame(
         fitted.flatMap((id) => {
           const spot = index.get(id)
           return spot === undefined ? [] : [spot]
         }),
         animate ? STEP * 2 : 0,
+        (points.geometry.boundingSphere?.radius ?? REACH) * 0.35,
       )
     },
     gestures: (next) => {
@@ -1418,17 +1657,20 @@ export const threeDriver = (
       controls.enabled = next !== 'off'
       /* One finger scrolls the page past a graph that shares its gestures. */
       controls.touches.ONE = next === 'cooperative' ? (null as unknown as TOUCH) : TOUCH.ROTATE
+      wake()
     },
     groups: (next) => {
       if (options.groupLabels !== false) {
         groups.set(next.map((group) => ({ ...group, ids: group.ids.slice(0, SAMPLE) })))
       }
+      wake()
     },
     look: (next) => {
       looks = next
       signals.look(next)
       groups.look(next)
       paint()
+      wake()
     },
     onPress: (press) => {
       let down: { time: number; x: number; y: number } | undefined
@@ -1466,7 +1708,9 @@ export const threeDriver = (
       const side = new Vector3().crossVectors(turn, offset).normalize()
       offset.applyAxisAngle(side, (y / Math.max(height, 1)) * (Math.PI / 2))
       const to = controls.target.clone().add(offset)
-      if (!animate || still) {
+      moved = true
+      invalidate()
+      if (!animate || still()) {
         camera.position.copy(to)
         return
       }
@@ -1482,6 +1726,13 @@ export const threeDriver = (
       requestAnimationFrame(step)
     },
     settle: (unplaced, placed) => {
+      /* A glide still under way is finished first, so the layout starts from where the notes are going. */
+      if (morph) {
+        positions.set(morph.to)
+        morph = undefined
+        ;(points.geometry.getAttribute('position') as BufferAttribute).needsUpdate = true
+        points.geometry.computeBoundingSphere()
+      }
       /* The notes that have a place keep it, held, while the layout places the rest. */
       const nodes: SimulationNode[] = ids.map((id, spot) => {
         const x = (positions[spot * 3] as number) / scale
@@ -1489,32 +1740,54 @@ export const threeDriver = (
         const z = (positions[spot * 3 + 2] as number) / scale
         return unplaced.has(id) ? { id, x, y, z } : { fx: x, fy: y, fz: z, id, x, y, z }
       })
-      const simulation = forceSimulation(nodes, 3)
-        .force(
-          'link',
-          forceLink(links.map((link) => ({ source: link.source, target: link.target })))
-            .id((node) => node.id)
-            .distance(1.6),
-        )
-        .force('charge', forceManyBody().strength(-1.2).theta(1.2))
-        .force('center', forceCenter(0, 0, 0))
-        .alphaDecay(0.03)
-        .stop()
       let done = false
-      layout = {
-        done: () => {
-          if (done) {
+      /* **d3-force-3d is loaded when a layout first runs**, so a page that
+         draws its notes in a shape, with no layout, never downloads it. */
+      void import('d3-force-3d')
+        .then(({ forceCenter, forceLink, forceManyBody, forceSimulation }) => {
+          if (done || stopped) {
             return
           }
-          done = true
-          layout = undefined
-          fitAll(STEP * 2)
-          placed(new Map(nodes.map((node) => [node.id, { x: node.x, y: node.y, z: node.z }])))
-        },
-        limit: performance.now() + (options.layoutLimit ?? 10000),
-        nodes,
-        simulation,
-      }
+          const simulation = forceSimulation(nodes, 3)
+            .force(
+              'link',
+              forceLink(links.map((link) => ({ source: link.source, target: link.target })))
+                .id((node) => node.id)
+                .distance(1.6),
+            )
+            .force('charge', forceManyBody().strength(-1.2).theta(1.2))
+            .force('center', forceCenter(0, 0, 0))
+            .alphaDecay(0.03)
+            .stop()
+          layout = {
+            done: () => {
+              if (done) {
+                return
+              }
+              done = true
+              layout = undefined
+              fitAll(STEP * 2)
+              placed(new Map(nodes.map((node) => [node.id, { x: node.x, y: node.y, z: node.z }])))
+            },
+            limit: performance.now() + (options.layoutLimit ?? 10000),
+            nodes,
+            simulation,
+          }
+          wake()
+        })
+        .catch((cause: unknown) => {
+          /* Without the layout the notes stay where they were started, and the frame is told so. */
+          console.error(
+            new Error(
+              'The three.js driver could not load d3-force-3d to lay out the notes. Install d3-force-3d alongside @fusion.dev/helix-graph.',
+              { cause },
+            ),
+          )
+          if (!done && !stopped) {
+            done = true
+            placed(new Map(nodes.map((node) => [node.id, { x: node.x, y: node.y, z: node.z }])))
+          }
+        })
       return () => {
         done = true
         layout = undefined
@@ -1528,6 +1801,7 @@ export const threeDriver = (
       }
       /* Steeply only where there is no solid to hide the far side. */
       uniforms.steep.value = surfaced && !frame ? 1 : 0
+      wake()
     },
     signal: (from, to, colors, animate) => {
       signals.signal(from, to, colors, animate)
@@ -1538,6 +1812,7 @@ export const threeDriver = (
       cancelAnimationFrame(hovering)
       cancelAnimationFrame(resizing)
       sized.disconnect()
+      seen?.disconnect()
       canvas.removeEventListener('pointermove', hover)
       canvas.removeEventListener('pointerleave', leave)
       controls.dispose()
@@ -1551,6 +1826,10 @@ export const threeDriver = (
         object.geometry.dispose()
         object.material.dispose()
       }
+      /* The GPU's context let go now, and not whenever the page is collected:
+         a browser holds a handful, and a page that draws a graph again and
+         again ran out of them. */
+      renderer.forceContextLoss()
       renderer.dispose()
       canvas.remove()
       signals.stop()
@@ -1593,13 +1872,8 @@ export const threeDriver = (
       for (const node of changes.addNodes) {
         kept.set(node.id, { node, world: toWorld(node) })
       }
-      const removed = new Set(
-        changes.removeLinks.map((link) => `${link.source}\u0000${link.target}`),
-      )
-      const next = [
-        ...links.filter((link) => !removed.has(`${link.source}\u0000${link.target}`)),
-        ...changes.addLinks,
-      ]
+      const removed = new Set(changes.removeLinks.map(linkKey))
+      const next = [...links.filter((link) => !removed.has(linkKey(link))), ...changes.addLinks]
       const entries = [...kept.values()]
       const from = new Float32Array(entries.length * 3)
       const to = new Float32Array(entries.length * 3)
@@ -1619,8 +1893,11 @@ export const threeDriver = (
       if (shifted) {
         fitAll(animate ? MORPH : 0)
       }
+      wake()
     },
     zoomBy: (direction, animate) => {
+      moved = true
+      wake()
       const distance = camera.position.distanceTo(controls.target)
       glideTo(
         controls.target.clone(),

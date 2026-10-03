@@ -9,13 +9,17 @@ import type { GraphPoint } from '../connect-graph/seed.js'
 import { type Box, ease, gesturesHeld, groupsOver, signalsOver } from '../overlay/overlay.js'
 import { EMPHASES, HelixNodeProgram, MATERIALS, SHAPES } from './node-program.js'
 
-/** A graphology graph, as far as the driver calls it. */
+/**
+ * A graphology graph, as far as the driver calls it. Each member is
+ * graphology's own, as its documentation describes it.
+ */
 export interface SigmaGraph {
   addEdge(source: string, target: string, attributes?: Record<string, unknown>): unknown
   addNode(node: string, attributes?: Record<string, unknown>): unknown
   clear(): void
   dropEdge(source: string, target: string): void
   dropNode(node: string): void
+  edges(node: string): string[]
   forEachNode(callback: (node: string, attributes: Record<string, unknown>) => void): void
   getNodeAttributes(node: string): Record<string, unknown>
   hasEdge(source: string, target: string): boolean
@@ -25,7 +29,7 @@ export interface SigmaGraph {
   setNodeAttribute(node: string, name: string, value: unknown): unknown
 }
 
-/** Sigma's camera, as far as the driver calls it. */
+/** Sigma's camera, as far as the driver calls it. Each member is Sigma's own. */
 export interface SigmaCamera {
   animate(
     state: { ratio?: number; x?: number; y?: number },
@@ -35,12 +39,15 @@ export interface SigmaCamera {
   setState(state: { ratio?: number; x?: number; y?: number }): unknown
 }
 
-/** A Sigma renderer, as far as the driver calls it. */
-export interface SigmaRenderer {
+/**
+ * A Sigma renderer, as far as the driver calls it, over a graph of type `G`.
+ * Each member is Sigma's own, as its documentation describes it.
+ */
+export interface SigmaRenderer<G extends SigmaGraph = SigmaGraph> {
   getCamera(): SigmaCamera
   getContainer(): HTMLElement
   getDimensions(): { height: number; width: number }
-  getGraph(): SigmaGraph
+  getGraph(): G
   framedGraphToViewport(point: { x: number; y: number }): { x: number; y: number }
   getNodeDisplayData(
     node: string,
@@ -55,27 +62,46 @@ export interface SigmaRenderer {
     listener: (payload: { node: string }) => void,
   ): unknown
   on(type: 'afterRender' | 'beforeRender' | 'clickStage', listener: () => void): unknown
-  getSetting(name: 'nodeProgramClasses'): Record<string, unknown>
-  refresh(): unknown
+  getSetting(name: SigmaSetting): unknown
+  refresh(options?: { partialGraph?: { edges?: string[]; nodes?: string[] } }): unknown
   resize(force?: boolean): unknown
   scaleSize(size?: number): number
-  setSetting(
-    name:
-      | 'defaultDrawNodeHover'
-      | 'edgeReducer'
-      | 'labelColor'
-      | 'labelFont'
-      | 'defaultDrawNodeLabel'
-      | 'labelGridCellSize'
-      | 'labelRenderedSizeThreshold'
-      | 'labelSize'
-      | 'minEdgeThickness'
-      | 'nodeProgramClasses'
-      | 'nodeReducer',
-    value: unknown,
-  ): unknown
+  setSetting(name: SigmaSetting, value: unknown): unknown
   viewportToFramedGraph(point: { x: number; y: number }): { x: number; y: number }
 }
+
+/** The settings the driver sets, and puts back as they were when it stops. */
+type SigmaSetting =
+  | 'defaultDrawNodeHover'
+  | 'defaultDrawNodeLabel'
+  | 'edgeReducer'
+  | 'enableCameraPanning'
+  | 'enableCameraZooming'
+  | 'labelColor'
+  | 'labelFont'
+  | 'labelGridCellSize'
+  | 'labelRenderedSizeThreshold'
+  | 'labelSize'
+  | 'minEdgeThickness'
+  | 'nodeProgramClasses'
+  | 'nodeReducer'
+
+/** Every setting the driver sets, to be read before it does and put back when it stops. */
+const SETTINGS: readonly SigmaSetting[] = [
+  'defaultDrawNodeHover',
+  'defaultDrawNodeLabel',
+  'edgeReducer',
+  'enableCameraPanning',
+  'enableCameraZooming',
+  'labelColor',
+  'labelFont',
+  'labelGridCellSize',
+  'labelRenderedSizeThreshold',
+  'labelSize',
+  'minEdgeThickness',
+  'nodeProgramClasses',
+  'nodeReducer',
+]
 
 /** A layout that runs over a graphology graph until it is stopped, as ForceAtlas2's worker does. */
 export interface SigmaLayout {
@@ -84,8 +110,8 @@ export interface SigmaLayout {
   stop(): void
 }
 
-/** How the Sigma driver behaves where the page does not say. */
-export interface SigmaDriverOptions {
+/** How the Sigma driver behaves where the page does not say, over a graph of type `G`. */
+export interface SigmaDriverOptions<G extends SigmaGraph = SigmaGraph> {
   /**
    * Makes a layout for the graph, which the driver runs where notes have no
    * position and stops once they have settled. ForceAtlas2's worker is the
@@ -102,18 +128,18 @@ export interface SigmaDriverOptions {
    *
    * Without one, notes stay where the connector started them.
    */
-  layout?: ((graph: SigmaGraph) => SigmaLayout) | undefined
+  layout?: ((graph: G) => SigmaLayout) | undefined
   /**
    * How heavily a note is drawn where it does not say: `solid`, filled, by
    * default; `outlined`, a ring; `subtle`, a tinted fill with a ring.
    */
   emphasis?: NodeLook['emphasis']
   /**
-   * What a note is drawn as made of where it does not say: flat by default,
+   * What a note is drawn as made of where it does not say: `flat` by default,
    * `glass`, a shaded sphere with a highlight and a lit rim, or `frosted`, a
    * milky body with a soft fall of light.
    */
-  material?: NodeLook['material']
+  material?: NodeLook['material'] | 'flat'
   /** A note's shape where it does not say: `circle` by default, `square`, `diamond` or `ring`. */
   shape?: NodeLook['shape']
   /**
@@ -206,7 +232,7 @@ const hoverOf =
     context.fillText(data.label, x, data.y + size / 3)
   }
 
-/** How long a new note takes to grow to its size, in milliseconds. */
+/** How long a new note takes to grow to its size, and a moved one to glide to its place, in milliseconds. */
 const GROW = 300
 
 /**
@@ -275,20 +301,24 @@ const positionsOf = (graph: SigmaGraph): Map<string, GraphPoint> => {
  *
  * **Neither Sigma nor graphology is a dependency.** The driver types the
  * renderer by the calls it makes on it, so a page brings whichever version it
- * has, and a spec holds those shapes to the real classes.
+ * has, and a spec holds those shapes to the real classes. The renderer is the
+ * page's: after `disconnect()`, `sigma.kill()` frees it.
  */
-export const sigmaDriver = (
-  sigma: SigmaRenderer,
-  options: SigmaDriverOptions = {},
+export const sigmaDriver = <G extends SigmaGraph>(
+  sigma: SigmaRenderer<G>,
+  options: SigmaDriverOptions<G> = {},
 ): GraphDriver => {
   const graph = sigma.getGraph()
   const container = sigma.getContainer()
   const camera = sigma.getCamera()
 
+  /* Every setting the driver changes, as the page left it, put back when it stops. */
+  const before = new Map(SETTINGS.map((name) => [name, sigma.getSetting(name)]))
+
   /* **The notes are drawn by Helix's own program**, which cuts each to its
      shape, draws its emphasis and its material, and lights its glow: added
      beside the page's programs and taken away again when the driver stops. */
-  const programs = sigma.getSetting('nodeProgramClasses')
+  const programs = before.get('nodeProgramClasses') as Record<string, unknown> | undefined
   sigma.setSetting('nodeProgramClasses', { ...programs, helix: HelixNodeProgram })
 
   /* **Its own box, and not only the window.** Sigma measures its container
@@ -304,15 +334,29 @@ export const sigmaDriver = (
       : undefined
   sized?.observe(container)
 
-  /* The note under the pointer, whose links are lit. */
+  /* The note under the pointer, whose links are lit, and the pointer a hand
+     over it, as over anything a press chooses. */
   let hovered: string | undefined
+  const cursor = container.style.cursor
+  /** Draws again only the links of the note the pointer left and the one it is over. */
+  const relight = (from: string | undefined, to: string | undefined): void => {
+    const edges = [from, to].flatMap((id) =>
+      id !== undefined && graph.hasNode(id) ? graph.edges(id) : [],
+    )
+    /* Indexed again, so a lit link is drawn over the rest; the reducers run for these links alone. */
+    sigma.refresh({ partialGraph: { edges } })
+  }
   const enter = ({ node }: { node: string }): void => {
+    const was = hovered
     hovered = node
-    sigma.refresh()
+    container.style.cursor = 'pointer'
+    relight(was, node)
   }
   const leave = (): void => {
+    const was = hovered
     hovered = undefined
-    sigma.refresh()
+    container.style.cursor = cursor
+    relight(was, undefined)
   }
   sigma.on('enterNode', enter)
   sigma.on('leaveNode', leave)
@@ -350,25 +394,43 @@ export const sigmaDriver = (
     return { radius: sigma.scaleSize(data.size), x: at.x, y: at.y }
   }
   const signals = signalsOver(container, onScreen)
-  const groups = groupsOver(container, onScreen)
+  /* Group names keep clear of the notes' names Sigma drew this frame. */
+  const groups = groupsOver(container, onScreen, () => taken)
   /* Group names follow the view: drawn again after every frame Sigma draws. */
   sigma.on('afterRender', groups.draw)
 
-  /** Grows notes from nothing to their size, so a note arriving is seen to arrive. */
-  const grow = (sizes: Map<string, number>): void => {
+  /* The frame a glide or a growth waits on, canceled when the driver stops. */
+  let gliding = 0
+  /**
+   * Grows notes from nothing to their size, so a note arriving is seen to
+   * arrive, and glides notes that moved from where they were to where they
+   * are, so a change of places is seen as the same notes moving.
+   */
+  const glide = (
+    sizes: ReadonlyMap<string, number>,
+    moves: ReadonlyMap<string, { from: GraphPoint; to: GraphPoint }>,
+  ): void => {
+    cancelAnimationFrame(gliding)
     const started = performance.now()
-    const step = (now: number): void => {
-      const along = Math.min((now - started) / GROW, 1)
+    const step = (): void => {
+      const along = Math.min((performance.now() - started) / GROW, 1)
+      const eased = ease(along)
       for (const [id, size] of sizes) {
         if (graph.hasNode(id)) {
-          graph.setNodeAttribute(id, 'size', size * ease(along))
+          graph.setNodeAttribute(id, 'size', size * eased)
         }
       }
-      if (along < 1) {
-        requestAnimationFrame(step)
+      for (const [id, { from, to }] of moves) {
+        if (graph.hasNode(id)) {
+          graph.mergeNodeAttributes(id, {
+            x: from.x + (to.x - from.x) * eased,
+            y: from.y + (to.y - from.y) * eased,
+          })
+        }
       }
+      gliding = along < 1 ? requestAnimationFrame(step) : 0
     }
-    requestAnimationFrame(step)
+    gliding = requestAnimationFrame(step)
   }
 
   return {
@@ -419,9 +481,10 @@ export const sigmaDriver = (
       }
       /* The camera's ratio is the share of the whole graph the view shows, so
          the neighborhood's spread, with room around it, is the ratio that
-         holds it. Never closer than an eighth, nor farther than the whole. */
+         holds it. Never closer than a quarter, where a note and its one
+         neighbor filled the view and left the graph, nor farther than the whole. */
       const state = {
-        ratio: Math.min(Math.max(Math.max(high.x - low.x, high.y - low.y) * 2.4, 0.12), 1),
+        ratio: Math.min(Math.max(Math.max(high.x - low.x, high.y - low.y) * 2.4, 0.25), 1),
         x: (low.x + high.x) / 2,
         y: (low.y + high.y) / 2,
       }
@@ -433,6 +496,11 @@ export const sigmaDriver = (
     },
     gestures: (next) => {
       held.set(next)
+      /* A double click zooms in Sigma, which no listener before its own can
+         keep from it, since it counts the clicks itself: off is off there too.
+         The camera still moves for the frame's buttons. */
+      sigma.setSetting('enableCameraZooming', next !== 'off')
+      sigma.setSetting('enableCameraPanning', next !== 'off')
     },
     groups: (next) => {
       if (options.groupLabels !== false) {
@@ -530,7 +598,12 @@ export const sigmaDriver = (
       signals.stop()
       sigma.off('enterNode', enter)
       sigma.off('leaveNode', leave)
-      sigma.setSetting('nodeProgramClasses', programs)
+      cancelAnimationFrame(gliding)
+      container.style.cursor = cursor
+      /* The renderer as the page made it: its programs, reducers and settings. */
+      for (const [name, value] of before) {
+        sigma.setSetting(name, value)
+      }
       sized?.disconnect()
       held.stop()
     },
@@ -558,12 +631,18 @@ export const sigmaDriver = (
           growing.set(node.id, size)
         }
       }
+      const moves = new Map<string, { from: GraphPoint; to: GraphPoint }>()
       for (const node of changes.changeNodes) {
+        const was = graph.getNodeAttributes(node.id)
+        const from = { x: Number(was.x), y: Number(was.y) }
+        const moved = from.x !== node.x || from.y !== node.y
+        if (animate && moved && Number.isFinite(from.x) && Number.isFinite(from.y)) {
+          moves.set(node.id, { from, to: { x: node.x, y: node.y } })
+        }
         graph.mergeNodeAttributes(node.id, {
           label: node.label,
           size: pixels(node.size),
-          x: node.x,
-          y: node.y,
+          ...(moves.has(node.id) ? {} : { x: node.x, y: node.y }),
         })
       }
       for (const link of changes.addLinks) {
@@ -580,8 +659,8 @@ export const sigmaDriver = (
           })
         }
       }
-      if (growing.size > 0) {
-        grow(growing)
+      if (growing.size > 0 || moves.size > 0) {
+        glide(growing, moves)
       }
     },
     zoomBy: (direction, animate) => {
@@ -595,7 +674,7 @@ export const sigmaDriver = (
     ...(options.layout
       ? {
           settle: (unplaced, placed) => {
-            const make = options.layout as (graph: SigmaGraph) => SigmaLayout
+            const make = options.layout as (graph: G) => SigmaLayout
             /* The notes that have a place keep it: ForceAtlas2 leaves a note
                marked `fixed` where it is. */
             graph.forEachNode((node) => {
@@ -659,6 +738,10 @@ export const sigmaDriver = (
               clearInterval(timer)
               layout.stop()
               layout.kill()
+              /* No note stays held where it is for a layout that will not run. */
+              graph.forEachNode((node) => {
+                graph.setNodeAttribute(node, 'fixed', false)
+              })
             }
           },
         }

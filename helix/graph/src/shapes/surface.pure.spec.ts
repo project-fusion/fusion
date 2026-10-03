@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { sphere } from '../shapes/solids.js'
+import { sphere } from './solids.js'
 import { surfaceOf } from './surface.js'
 
 describe('surfaceOf', () => {

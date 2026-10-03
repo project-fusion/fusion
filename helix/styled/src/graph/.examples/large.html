@@ -1,6 +1,6 @@
 <!-- @summary Twenty thousand notes, laid out and drawn on the GPU by cosmos.gl, with messages passing between them. -->
 
-<!-- Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl; on your page, connectGraph does. -->
+<!-- Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl; on your page, connectGraph(frame, cosmosDriver(new Graph(box, { enableSimulation: true }), box)) does, the box being the div inside the frame. -->
 <helix-graph
   data-preview-graph="cosmos"
   id="knowledge"
@@ -39,8 +39,11 @@
      subjects now and then. */
   const nodes = []
   const links = []
-  const each = 20000 / subjects.length
-  for (const group of subjects) {
+  /* Twenty thousand in all, shared as evenly as the subjects allow. */
+  for (const [place, group] of subjects.entries()) {
+    const each =
+      Math.floor((20000 * (place + 1)) / subjects.length) -
+      Math.floor((20000 * place) / subjects.length)
     const hubs = Array.from({ length: 8 }, (_, at) => `${group} hub ${at + 1}`)
     for (const id of hubs) {
       nodes.push({ group, id, label: id, shape: 'square' })
@@ -60,8 +63,12 @@
   knowledge.nodes = nodes
   knowledge.links = links
 
-  /* Messages passing along the links, ten a second. */
-  setInterval(() => {
+  /* Messages passing along the links, ten a second, until the graph leaves the page. */
+  const sending = setInterval(() => {
+    if (!knowledge.isConnected) {
+      clearInterval(sending)
+      return
+    }
     const link = pick(knowledge.links)
     knowledge.signal(link.source, link.target, { tone: random() < 0.05 ? 'danger' : undefined })
   }, 100)

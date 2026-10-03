@@ -4,7 +4,8 @@ import type {
   GraphChanges,
   GraphDriver,
 } from '../connect-graph/connect-graph.js'
-import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
+import { linkKey } from '../connect-graph/diff.js'
+import { type GraphLooks, type NodeLook, rgbOf } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
 import {
   gesturesHeld,
@@ -38,7 +39,12 @@ export interface CosmosGraph {
   setPointShapes(pointShapes: Float32Array): void
   setPointSizes(pointSizes: Float32Array): void
   setZoomLevel(value: number, duration?: number): void
-  setZoomTransformByPointPositions(positions: Float32Array, duration?: number, scale?: number): void
+  setZoomTransformByPointPositions(
+    positions: Float32Array,
+    duration?: number,
+    scale?: number,
+    padding?: number,
+  ): void
   spaceToScreenPosition(spacePosition: [number, number]): [number, number]
   spaceToScreenRadius(spaceRadius: number): number
   start(alpha?: number): void
@@ -55,7 +61,7 @@ export interface CosmosDriverOptions {
    * default, past where twenty thousand notes settle on a laptop's GPU.
    */
   layoutLimit?: number | undefined
-  /** A note's shape where it does not say: `circle` by default, `square` or `diamond`. */
+  /** A note's shape where it does not say: `circle` by default, `square` or `diamond`. A `ring` is drawn as a circle. */
   shape?: NodeLook['shape']
   /** The size of cosmos.gl's space, as its own `spaceSize` says. 4096 by default. */
   spaceSize?: number | undefined
@@ -95,9 +101,16 @@ const FOLLOW = 1000
 /** The room around the graph when the view is fitted to it, as a share of the view. */
 const PADDING = 0.08
 
+/** How long a signal's ends stay followed on screen, in milliseconds: past its slowest crossing and its arrival. */
+const SIGNALED = 2500
+
+/** Whether the reader asked for less motion, read each time, since they can change it while the page is open. */
+const still = (): boolean =>
+  typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+
 /** An `rgb()` color as cosmos.gl takes one: four channels from 0 to 1. */
 const channels = (color: string, alpha = 1): [number, number, number, number] => {
-  const [red = 128, green = 128, blue = 128] = color.match(/[\d.]+/g)?.map(Number) ?? []
+  const [red, green, blue] = rgbOf(color)
   return [red / 255, green / 255, blue / 255, alpha]
 }
 
@@ -118,7 +131,8 @@ const channels = (color: string, alpha = 1): [number, number, number, number] =>
  * each group, over the drawing, as the Sigma driver does.
  *
  * **It is `@cosmos.gl/graph`, which is MIT**, and not Cosmograph, which is
- * licensed for noncommercial use only.
+ * licensed for noncommercial use only. The graph is the page's: after
+ * `disconnect()`, `graph.destroy()` frees it.
  */
 export const cosmosDriver = (
   graph: CosmosGraph,
@@ -138,6 +152,8 @@ export const cosmosDriver = (
   let near = new Set<string>()
   let groupSample: number[] = []
   let following = new Set<number>()
+  /* The ends of signals in flight, followed until each is due to have landed. */
+  const signaled = new Map<number, number>()
   /* Whether the reader has moved the view since the graph was drawn, after
      which the view is theirs and the layout no longer fits it. */
   let moved = false
@@ -182,8 +198,16 @@ export const cosmosDriver = (
     if (hovered !== undefined) {
       next.add(hovered)
     }
+    const now = performance.now()
     for (const at of extra) {
-      next.add(at)
+      signaled.set(at, now + SIGNALED)
+    }
+    for (const [at, until] of signaled) {
+      if (until < now) {
+        signaled.delete(at)
+      } else {
+        next.add(at)
+      }
     }
     if (next.size !== following.size || [...next].some((at) => !following.has(at))) {
       following = next
@@ -217,7 +241,8 @@ export const cosmosDriver = (
 
   const held = gesturesHeld(container)
   const signals = signalsOver(container, onScreen)
-  const groups = groupsOver(container, onScreen)
+  /* Group names keep clear of the notes' names, drawn first. */
+  const groups = groupsOver(container, onScreen, () => names.boxes())
 
   /* **Names over the drawing**, since cosmos.gl draws none: the note under
      the pointer, the selected note and its neighbors where there is room,
@@ -248,10 +273,11 @@ export const cosmosDriver = (
       : ids.flatMap((id) => toSpace(drawnNow.get(id) ?? { x: 0, y: 0 }))
 
   /** Fits the view to the whole graph, unless the reader has moved it. */
-  const fitAll = (duration: number): void => {
+  const fitAll = (asked: number): void => {
     if (stopped) {
       return
     }
+    const duration = still() ? 0 : asked
     /* A fit before cosmos.gl has the GPU and its size measures nothing, so
        it waits for both: the start, and the frame after. */
     if (!graph.isReady) {
@@ -282,7 +308,7 @@ export const cosmosDriver = (
       graph.setConfigPartial({ pointSizeScale: by })
       if (Math.abs(clarity() - painted) > 0.04) {
         paintLinks()
-        graph.render()
+        graph.render(undefined, 0)
       }
     }
   }
@@ -294,31 +320,70 @@ export const cosmosDriver = (
   const clarity = (): number => FAINT + (1 - FAINT) * Math.min(Math.max((grown - 1) / 0.8, 0), 1)
   let painted = 1
 
+  /* The links' colors and widths, kept between paints so a hover writes only
+     the links it lights and dims, and the arrays are made again only when the
+     links change. */
+  let linkColors = new Float32Array(0)
+  let widths = new Float32Array(0)
+  /* Each note's links, by index into `links`, which a hover lights. */
+  let linksOf = new Map<string, number[]>()
+
+  /** One link's color and width, from the looks, the hovered note, and how far the reader has zoomed in. */
+  const paintLink = (at: number, lit: string | undefined): void => {
+    const link = links[at] as DrawnLink
+    const look = (looks as GraphLooks).link(link.source, link.target)
+    const touches = lit !== undefined && (link.source === lit || link.target === lit)
+    const whole = look.raised || touches
+    linkColors.set(
+      channels(
+        touches ? (looks as GraphLooks).node(lit).color : look.color,
+        look.hidden ? 0 : whole ? 1 : painted,
+      ),
+      at * 4,
+    )
+    widths[at] = whole ? 1.6 : 0.8
+  }
+
   /** The links' colors and widths, from the looks and how far the reader has zoomed in. */
   const paintLinks = (): void => {
     if (!looks) {
       return
     }
     painted = clarity()
-    const linkColors = new Float32Array(links.length * 4)
-    const widths = new Float32Array(links.length)
+    if (linkColors.length !== links.length * 4) {
+      linkColors = new Float32Array(links.length * 4)
+      widths = new Float32Array(links.length)
+    }
     const lit = hovered === undefined ? undefined : ids[hovered]
-    links.forEach((link, at) => {
-      const look = (looks as GraphLooks).link(link.source, link.target)
-      const touches = lit !== undefined && (link.source === lit || link.target === lit)
-      const whole = look.raised || touches
-      linkColors.set(
-        channels(
-          touches ? (looks as GraphLooks).node(lit).color : look.color,
-          look.hidden ? 0 : whole ? 1 : painted,
-        ),
-        at * 4,
-      )
-      widths[at] = whole ? 1.6 : 0.8
-    })
+    for (let at = 0; at < links.length; at++) {
+      paintLink(at, lit)
+    }
     graph.setLinkColors(linkColors)
     graph.setLinkWidths(widths)
   }
+
+  /** Lights the links of the note under the pointer, and puts back those of the note it left. */
+  const hover = (next: number | undefined): void => {
+    const was = hovered === undefined ? undefined : ids[hovered]
+    hovered = next
+    container.style.cursor = next === undefined ? cursor : 'pointer'
+    if (!looks) {
+      return
+    }
+    const lit = next === undefined ? undefined : ids[next]
+    for (const id of [was, lit]) {
+      for (const at of id === undefined ? [] : (linksOf.get(id) ?? [])) {
+        paintLink(at, lit)
+      }
+    }
+    graph.setLinkColors(linkColors)
+    graph.setLinkWidths(widths)
+    follow()
+    /* At once: a hover drawn over cosmos.gl's own transition lagged the pointer. */
+    graph.render(undefined, 0)
+    redraw()
+  }
+  const cursor = container.style.cursor
 
   /** Colors, sizes and shapes from the looks, and the links' colors and widths. */
   const paint = (transition = 0): void => {
@@ -358,11 +423,9 @@ export const cosmosDriver = (
       hoveredPointRingColor: channels(looks.ink, 0.6),
     })
     follow()
-    if (transition > 0) {
-      graph.render(undefined, transition)
-    } else {
-      graph.render()
-    }
+    /* At once unless notes are gliding to new places: cosmos.gl's own
+       transition, the default, held a recolor back most of a second. */
+    graph.render(undefined, still() ? 0 : transition)
     redraw()
   }
 
@@ -377,7 +440,20 @@ export const cosmosDriver = (
     index = new Map(ids.map((id, at) => [id, at]))
     drawnNow = new Map(nodes.map((node) => [node.id, node]))
     sizes = nodes.map((node) => pixels(node.size))
+    /* A note under the pointer before is not one now, whatever is at its index. */
+    hovered = undefined
     links = next.filter((link) => index.has(link.source) && index.has(link.target))
+    linksOf = new Map()
+    links.forEach((link, at) => {
+      for (const end of [link.source, link.target]) {
+        const list = linksOf.get(end)
+        if (list) {
+          list.push(at)
+        } else {
+          linksOf.set(end, [at])
+        }
+      }
+    })
     const pairs = new Float32Array(links.length * 2)
     links.forEach((link, at) => {
       pairs[at * 2] = index.get(link.source) as number
@@ -400,14 +476,8 @@ export const cosmosDriver = (
   graph.setConfigPartial({
     /* The page's ground shows through, so the drawing is the frame's color. */
     backgroundColor: [0, 0, 0, 0],
-    onPointMouseOut: () => {
-      hovered = undefined
-      paint()
-    },
-    onPointMouseOver: (at: number) => {
-      hovered = at
-      paint()
-    },
+    onPointMouseOut: () => hover(undefined),
+    onPointMouseOver: (at: number) => hover(at),
     onSimulationTick: redraw,
     onTransition: redraw,
     onZoom: () => {
@@ -437,16 +507,19 @@ export const cosmosDriver = (
     center: (id, animate) => {
       const at = index.get(id)
       if (at !== undefined) {
+        /* The view is the reader's from here: a layout still running no longer fits it. */
+        moved = true
         graph.zoomToPointByIndex(at, animate ? STEP * 2 : 0, graph.getZoomLevel(), true)
       }
     },
     draw: ({ links: next, nodes }) => {
       /* Spread so the notes take a quarter of the space, which leaves the
          layout room to open them out. */
-      const reach = Math.max(
-        1,
-        ...nodes.map((node) => Math.max(Math.abs(node.x), Math.abs(node.y))),
-      )
+      /* A loop, not a spread: a spread of a hundred thousand notes overflows the stack. */
+      let reach = 1
+      for (const node of nodes) {
+        reach = Math.max(reach, Math.abs(node.x), Math.abs(node.y))
+      }
       scale = (space * 0.12) / reach
       moved = false
       const positions = new Float32Array(nodes.length * 2)
@@ -463,11 +536,49 @@ export const cosmosDriver = (
       fitAll(0)
     },
     fit: (fitted, animate) => {
-      const indices = fitted.flatMap((id) => {
+      const flat = flatNow()
+      const box = { bottom: -Infinity, left: Infinity, right: -Infinity, top: Infinity }
+      for (const id of fitted) {
         const at = index.get(id)
-        return at === undefined ? [] : [at]
-      })
-      graph.fitViewByPointIndices(indices, animate ? STEP * 2 : 0, 0.25)
+        if (at !== undefined) {
+          const x = flat[at * 2] ?? 0
+          const y = flat[at * 2 + 1] ?? 0
+          box.left = Math.min(box.left, x)
+          box.right = Math.max(box.right, x)
+          box.top = Math.min(box.top, y)
+          box.bottom = Math.max(box.bottom, y)
+        }
+      }
+      if (!Number.isFinite(box.left)) {
+        return
+      }
+      /* **Never closer than a fifth of the whole graph across**: a note and
+         its one neighbor, fitted alone, filled the view and left the rest of
+         the graph out of it. */
+      let low = Infinity
+      let high = -Infinity
+      for (let at = 0; at < flat.length; at++) {
+        low = Math.min(low, flat[at] as number)
+        high = Math.max(high, flat[at] as number)
+      }
+      const least = Math.max((high - low) * 0.2, 1)
+      const middle = { x: (box.left + box.right) / 2, y: (box.top + box.bottom) / 2 }
+      const half = {
+        x: Math.max(box.right - box.left, least) / 2,
+        y: Math.max(box.bottom - box.top, least) / 2,
+      }
+      moved = true
+      graph.setZoomTransformByPointPositions(
+        new Float32Array([
+          middle.x - half.x,
+          middle.y - half.y,
+          middle.x + half.x,
+          middle.y + half.y,
+        ]),
+        animate && !still() ? STEP * 2 : 0,
+        undefined,
+        0.25,
+      )
     },
     gestures: (next) => {
       held.set(next)
@@ -540,6 +651,7 @@ export const cosmosDriver = (
     panBy: (x, y, animate) => {
       const { height, width } = container.getBoundingClientRect()
       const to = graph.screenToSpacePosition([width / 2 + x, height / 2 + y])
+      moved = true
       graph.setZoomTransformByPointPositions(
         new Float32Array(to),
         animate ? STEP : 0,
@@ -577,6 +689,8 @@ export const cosmosDriver = (
         clearInterval(fitting)
         graph.setConfigPartial({ onSimulationEnd: undefined })
         graph.setPinnedPoints(null)
+        /* A layout cut short stops moving the notes, and the next one starts from where they are. */
+        graph.pause()
       }
     },
     signal: (from, to, colors, animate) => {
@@ -587,6 +701,7 @@ export const cosmosDriver = (
     stop: () => {
       stopped = true
       clearTimeout(overviewing)
+      container.style.cursor = cursor
       graph.setConfigPartial({
         onBackgroundClick: undefined,
         onPointClick: undefined,
@@ -627,13 +742,8 @@ export const cosmosDriver = (
       for (const node of changes.addNodes) {
         kept.set(node.id, node)
       }
-      const removed = new Set(
-        changes.removeLinks.map((link) => `${link.source}\u0000${link.target}`),
-      )
-      const next = [
-        ...links.filter((link) => !removed.has(`${link.source}\u0000${link.target}`)),
-        ...changes.addLinks,
-      ]
+      const removed = new Set(changes.removeLinks.map(linkKey))
+      const next = [...links.filter((link) => !removed.has(linkKey(link))), ...changes.addLinks]
       const nodes = [...kept.values()]
       const positions = new Float32Array(nodes.length * 2)
       nodes.forEach((node, at) => {
@@ -648,6 +758,7 @@ export const cosmosDriver = (
       }
     },
     zoomBy: (direction, animate) => {
+      moved = true
       graph.setZoomLevel(
         graph.getZoomLevel() * (direction > 0 ? ZOOM : 1 / ZOOM),
         animate ? STEP : 0,

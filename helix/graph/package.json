@@ -21,6 +21,10 @@
       "types": "./dist/cosmos/index.d.ts",
       "default": "./dist/cosmos/index.js"
     },
+    "./model": {
+      "types": "./dist/model/index.d.ts",
+      "default": "./dist/model/index.js"
+    },
     "./shapes": {
       "types": "./dist/shapes/index.d.ts",
       "default": "./dist/shapes/index.js"
@@ -77,7 +81,7 @@
     "@cosmos.gl/graph": "^3.4.0",
     "d3-force-3d": "^3.0.0",
     "sigma": "^3.0.0",
-    "three": ">=0.160.0"
+    "three": ">=0.160.0 <0.200.0"
   },
   "peerDependenciesMeta": {
     "@cosmos.gl/graph": {

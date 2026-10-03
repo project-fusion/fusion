@@ -28,8 +28,11 @@ const pick = <T,>(list: T[]): T => list[Math.floor(random() * list.length)] as T
    subjects now and then. */
 const nodes: { group: string; id: string; label: string; shape?: 'square' }[] = []
 const links: { source: string; target: string }[] = []
-const each = 20000 / subjects.length
-for (const group of subjects) {
+/* Twenty thousand in all, shared as evenly as the subjects allow. */
+for (const [place, group] of subjects.entries()) {
+  const each =
+    Math.floor((20000 * (place + 1)) / subjects.length) -
+    Math.floor((20000 * place) / subjects.length)
   const hubs = Array.from({ length: 8 }, (_, at) => `${group} hub ${at + 1}`)
   for (const id of hubs) {
     nodes.push({ group, id, label: id, shape: 'square' })
@@ -63,7 +66,7 @@ export function Example() {
 
   return (
     <>
-      {/* Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl; on your page, connectGraph does. */}
+      {/* Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl; on your page, connectGraph(frame, cosmosDriver(new Graph(box, { enableSimulation: true }), box)) does, the box being the div inside the frame. */}
       <helix-graph
         data-preview-graph="cosmos"
         label="Company knowledge base"

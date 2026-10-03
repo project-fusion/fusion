@@ -1,6 +1,6 @@
 <!-- @summary Three thousand services on the surface of a 3D model, a knot, each team a stretch of it, with requests passing between them. -->
 
-<!-- Preview frame: data-preview-graph="three" has the frame connect three.js, and data-preview-graph-model names the model the notes are drawn on; on your page, connectGraph(frame, threeDriver(box), { stencil: { ...(await shapeFromModel(url)), place: 'surface' } }) does. -->
+<!-- Preview frame: data-preview-graph="three" has the frame connect three.js, and data-preview-graph-model names the model the notes are drawn on; on your page, in a module script, connectGraph(frame, threeDriver(box), { stencil: { ...(await shapeFromModel(url)), place: 'surface' } }) does. -->
 <helix-graph
   data-preview-graph="three"
   data-preview-graph-model="/media/models/torus-knot.glb"
@@ -48,8 +48,12 @@
   services.nodes = nodes
   services.links = links
 
-  /* Requests passing along the calls, ten a second, a few of them failing. */
-  setInterval(() => {
+  /* Requests passing along the calls, ten a second, a few of them failing, until the graph leaves the page. */
+  const sending = setInterval(() => {
+    if (!services.isConnected) {
+      clearInterval(sending)
+      return
+    }
     const link = pick(services.links)
     services.signal(link.source, link.target, { tone: random() < 0.05 ? 'danger' : undefined })
   }, 100)

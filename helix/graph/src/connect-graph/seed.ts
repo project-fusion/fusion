@@ -1,6 +1,8 @@
 /** A point in the renderer's own units. */
 export interface GraphPoint {
+  /** Across. */
   x: number
+  /** Up. */
   y: number
   /** How near the viewer, for a renderer that draws in three dimensions. */
   z?: number | undefined
@@ -20,8 +22,36 @@ export interface SeedLink {
   target: string
 }
 
-/** The angle between one note and the next on the spiral: the golden angle, which never lines two up. */
-const TURN = Math.PI * (3 - Math.sqrt(5))
+/** The angle between one place and the next on a spiral: the golden angle, which never lines two up. */
+export const TURN = Math.PI * (3 - Math.sqrt(5))
+
+/**
+ * Each note's neighbors across the links, both ways, kept to the links
+ * whose two ends `keep` allows where it is given.
+ */
+export const neighborsOf = (
+  links: readonly SeedLink[],
+  keep?: (id: string) => boolean,
+): Map<string, string[]> => {
+  const neighbors = new Map<string, string[]>()
+  /* Appended in place: copying a hub's list for each of its links made
+     seeding quadratic in its links, seconds for a hub with thousands. */
+  const add = (from: string, to: string): void => {
+    const list = neighbors.get(from)
+    if (list) {
+      list.push(to)
+    } else {
+      neighbors.set(from, [to])
+    }
+  }
+  for (const { source, target } of links) {
+    if (!keep || (keep(source) && keep(target))) {
+      add(source, target)
+      add(target, source)
+    }
+  }
+  return neighbors
+}
 
 /** How far a note starts from a placed neighbor, in the spiral's units. */
 const NEAR = 0.5
@@ -71,21 +101,7 @@ export const seedPositions = (
       }
     }
   }
-  const neighbors = new Map<string, string[]>()
-  /* Appended in place: copying a hub's list for each of its links made
-     seeding quadratic in its links, seconds for a hub with thousands. */
-  const add = (from: string, to: string): void => {
-    const list = neighbors.get(from)
-    if (list) {
-      list.push(to)
-    } else {
-      neighbors.set(from, [to])
-    }
-  }
-  for (const { source, target } of links) {
-    add(source, target)
-    add(target, source)
-  }
+  const neighbors = neighborsOf(links)
   let spiral = positions.size
   for (const node of nodes) {
     if (positions.has(node.id)) {

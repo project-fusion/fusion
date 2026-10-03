@@ -1,13 +1,10 @@
-import type { GraphPoint, SeedLink } from './seed.js'
+import { type GraphPoint, neighborsOf, type SeedLink, TURN } from './seed.js'
 
 /** A note as the arrangement reads it: its group, if it has one. */
 export interface ArrangedNode {
   group?: string | undefined
   id: string
 }
-
-/** The angle between one place and the next on a spiral: the golden angle, which never lines two up. */
-const TURN = Math.PI * (3 - Math.sqrt(5))
 
 /** The golden ratio's fraction, which steps a ball's places down it without lining two up. */
 const STEP = (Math.sqrt(5) - 1) / 2
@@ -63,28 +60,12 @@ export const hubsOf = (
   links: readonly SeedLink[],
 ): { hubOf: (id: string) => string; rank: (id: string) => number } => {
   const groupOf = new Map(nodes.map((node) => [node.id, node.group ?? '']))
-  const degree = new Map<string, number>()
-  const neighbors = new Map<string, string[]>()
-  const add = (from: string, to: string): void => {
-    degree.set(from, (degree.get(from) ?? 0) + 1)
-    const list = neighbors.get(from)
-    if (list) {
-      list.push(to)
-    } else {
-      neighbors.set(from, [to])
-    }
-  }
-  for (const { source, target } of links) {
-    if (groupOf.has(source) && groupOf.has(target)) {
-      add(source, target)
-      add(target, source)
-    }
-  }
+  const neighbors = neighborsOf(links, (id) => groupOf.has(id))
   /* Each note hangs from its most connected neighbor in its group, where
      that neighbor is more connected than it is, and a note nothing is more
      connected than is a hub. Ties go to the earlier id, so a pair of equals
      does not hang from each other. */
-  const rank = (id: string): number => degree.get(id) ?? 0
+  const rank = (id: string): number => neighbors.get(id)?.length ?? 0
   const above = (one: string, other: string): boolean =>
     rank(one) > rank(other) || (rank(one) === rank(other) && one < other)
   const parent = new Map<string, string>()
@@ -128,10 +109,17 @@ export const hubsOf = (
 export const arrangeByGroup = (
   nodes: readonly ArrangedNode[],
   links: readonly SeedLink[],
-  { solid = false }: { solid?: boolean } = {},
+  {
+    hubs = hubsOf(nodes, links),
+    solid = false,
+  }: {
+    /** Each note's hub and the notes' ranks, where the caller worked them out already. */
+    hubs?: ReturnType<typeof hubsOf>
+    solid?: boolean
+  } = {},
 ): Map<string, GraphPoint> => {
   const groupOf = new Map(nodes.map((node) => [node.id, node.group ?? '']))
-  const { hubOf, rank } = hubsOf(nodes, links)
+  const { hubOf, rank } = hubs
   /* Groups in the order their first notes were given, and each group's hubs
      with the notes that hang from them. */
   const groups = new Map<string, Map<string, string[]>>()

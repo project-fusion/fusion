@@ -86,3 +86,12 @@ describe('shapeFromModel', () => {
     expect((await shapeFromModel(cubeGlb(0), { resolution: 40 })).regionOf).toBeUndefined()
   })
 })
+
+describe('shapeFromModel’s errors', () => {
+  test('names the model it could not read, the loader’s error as the cause', async () => {
+    const error = await shapeFromModel(new ArrayBuffer(8)).catch((caught: unknown) => caught)
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).toContain('The model given as bytes could not be read')
+    expect((error as Error).cause).toBeDefined()
+  })
+})

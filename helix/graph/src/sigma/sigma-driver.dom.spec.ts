@@ -18,7 +18,7 @@ beforeAll(async () => {
 
 /** A graphology graph's few calls, over two maps. */
 const graphOf = (): SigmaGraph & {
-  edges: Map<string, Record<string, unknown>>
+  edgeMap: Map<string, Record<string, unknown>>
   nodes: Map<string, Record<string, unknown>>
 } => {
   const nodes = new Map<string, Record<string, unknown>>()
@@ -41,7 +41,9 @@ const graphOf = (): SigmaGraph & {
         }
       }
     },
-    edges,
+    edgeMap: edges,
+    edges: (node) =>
+      [...edges.keys()].filter((key) => key.startsWith(`${node}>`) || key.endsWith(`>${node}`)),
     forEachNode: (callback) => {
       for (const [node, attributes] of nodes) {
         callback(node, attributes)
@@ -100,7 +102,12 @@ const rendererOf = () => {
         : node === 'b'
           ? { size: 4, x: 0.6, y: 0.2 }
           : undefined,
-    getSetting: () => ({ circle: 'Circle' }),
+    getSetting: (name) =>
+      settings.has(name)
+        ? settings.get(name)
+        : name === 'nodeProgramClasses'
+          ? { circle: 'Circle' }
+          : undefined,
     off: (type, listener) => of(type).delete(listener),
     on: (type, listener) => of(type).add(listener),
     refresh: () => {},
@@ -164,7 +171,7 @@ describe('sigmaDriver', () => {
     })
     expect(graph.nodes.get('a')).toEqual({ label: 'Alpha', size: 7, x: 1, y: 2 })
     expect(graph.nodes.get('b')?.size).toBe(2.95)
-    expect(graph.edges.get('a>b')).toMatchObject({ from: 'a', to: 'b' })
+    expect(graph.edgeMap.get('a>b')).toMatchObject({ from: 'a', to: 'b' })
   })
 
   test('draws each note and link as the looks say', () => {
@@ -295,7 +302,7 @@ describe('sigmaDriver', () => {
     }
 
     driver.gestures?.('cooperative')
-    expect(renderer.container.style.touchAction).toBe('pan-x pan-y')
+    expect(renderer.container.getAttribute('data-helix-graph-gestures')).toBe('cooperative')
     wheel()
     wheel(true)
     renderer.container.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
@@ -348,7 +355,46 @@ describe('sigmaDriver', () => {
     expect([...graph.nodes.keys()].sort()).toEqual(['a', 'b', 'd'])
     expect(graph.nodes.get('b')).toMatchObject({ label: 'Bravo two', size: 7 })
     expect(graph.nodes.get('d')).toMatchObject({ size: 2.95, x: 3, y: 3 })
-    expect([...graph.edges.keys()]).toEqual(['a>d'])
+    expect([...graph.edgeMap.keys()]).toEqual(['a>d'])
+  })
+
+  test('glides a moved note to its place where the change is animated', async () => {
+    /* happy-dom runs a frame's callback once and no more, so frames come on a timer here. */
+    const frame = globalThis.requestAnimationFrame
+    globalThis.requestAnimationFrame = (callback) =>
+      setTimeout(() => callback(performance.now()), 16) as unknown as number
+    const { graph, sigma } = rendererOf()
+    const driver = sigmaDriver(sigma)
+    driver.draw({ links: [], nodes: [{ id: 'a', label: 'Alpha', size: 1, x: 0, y: 0 }] })
+    driver.update?.(
+      {
+        addLinks: [],
+        addNodes: [],
+        changeNodes: [{ id: 'a', label: 'Alpha', size: 1, x: 10, y: 0 }],
+        removeLinks: [],
+        removeNodes: [],
+      },
+      true,
+    )
+    /* Where it was, until the glide's first frame moves it. */
+    expect(graph.nodes.get('a')).toMatchObject({ x: 0 })
+    await new Promise((done) => setTimeout(done, 400))
+    globalThis.requestAnimationFrame = frame
+    expect(graph.nodes.get('a')).toMatchObject({ x: 10 })
+  })
+
+  test('off turns the camera’s own gestures off, and stopping puts every setting back', () => {
+    const { settings, sigma } = rendererOf()
+    settings.set('nodeReducer', 'the page’s')
+    const driver = sigmaDriver(sigma)
+    driver.look(looks)
+    driver.gestures?.('off')
+    expect(settings.get('enableCameraZooming')).toBe(false)
+    expect(settings.get('enableCameraPanning')).toBe(false)
+    driver.stop?.()
+    expect(settings.get('nodeReducer')).toBe('the page’s')
+    expect(settings.get('enableCameraZooming')).toBeUndefined()
+    expect(settings.get('nodeProgramClasses')).toEqual({ circle: 'Circle' })
   })
 
   test('a signal is drawn on a canvas of its own, which stopping takes away', () => {

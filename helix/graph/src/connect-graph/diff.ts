@@ -1,10 +1,14 @@
 /** A note as the renderer draws it, placed. */
 export interface DrawnNode {
+  /** The note's `id`, as the frame holds it. */
   id: string
+  /** The name drawn beside it: its `label`, or its `id` where it has none. */
   label: string
   /** How large it is drawn, relative to the others: the note's `size`, or from how many links it has. */
   size: number
+  /** Across, in the renderer's own units. */
   x: number
+  /** Up, in the renderer's own units. */
   y: number
   /** How near the viewer, for a renderer that draws in three dimensions. */
   z?: number | undefined
@@ -12,8 +16,11 @@ export interface DrawnNode {
 
 /** A link as the renderer draws it, between two notes the graph holds. */
 export interface DrawnLink {
+  /** What the link says, where it says anything. */
   label?: string | undefined
+  /** The `id` of the note the link runs from. */
   source: string
+  /** The `id` of the note the link runs to. */
   target: string
 }
 

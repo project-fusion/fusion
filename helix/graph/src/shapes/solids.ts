@@ -1,4 +1,4 @@
-import type { ShapeField } from '../connect-graph/shape-field.js'
+import type { ShapeField } from './shape-field.js'
 
 /*
  * Solids measured exactly, from their formulas: no grid, so a sphere is as
@@ -33,8 +33,8 @@ export const torus = ({
   }
 }
 
-/** A box `width` by `height` by `depth`, its edges rounded `round` in. */
-export const box = ({
+/** A cuboid `width` by `height` by `depth`, its edges rounded `round` in. */
+export const cuboid = ({
   depth = 100,
   height = 100,
   round = 0,
@@ -74,24 +74,39 @@ export const onSphere = (
   /* How far one unit of the flat shape is round the ball, so a distance read
      off the map is a distance on the ball's surface, near enough. */
   const along = (Math.PI * 2 * radius) / Math.max(flat.width, 1e-9)
+  /* Where on the flat map a point of the ball is, and how far from the ball's middle. */
+  const onMap = (x: number, y: number, z: number): { out: number; u: number; v: number } => {
+    const dx = x - radius
+    const dy = y - radius
+    const dz = z - radius
+    const out = Math.hypot(dx, dy, dz)
+    /* Longitude round from the front, latitude down from the top, as the map is laid out. */
+    const longitude = Math.atan2(dx, dz)
+    const latitude = Math.acos(Math.min(Math.max(dy / (out || 1), -1), 1))
+    return {
+      out,
+      u: ((longitude + Math.PI) / (Math.PI * 2)) * flat.width,
+      v: (latitude / Math.PI) * flat.height,
+    }
+  }
+  const regionOf = flat.regionOf
   return {
     depth: radius * 2,
     distance: (x, y, z = radius) => {
-      const dx = x - radius
-      const dy = y - radius
-      const dz = z - radius
-      const out = Math.hypot(dx, dy, dz)
+      const { out, u, v } = onMap(x, y, z)
       const shell = Math.abs(out - (radius - thickness / 2)) - thickness / 2
-      /* Longitude round from the front, latitude down from the top, as the map is laid out. */
-      const longitude = Math.atan2(dx, dz)
-      const latitude = Math.acos(Math.min(Math.max(dy / (out || 1), -1), 1))
-      const map = flat.distance(
-        ((longitude + Math.PI) / (Math.PI * 2)) * flat.width,
-        (latitude / Math.PI) * flat.height,
-      )
-      return Math.max(shell, map * along)
+      return Math.max(shell, flat.distance(u, v) * along)
     },
     height: radius * 2,
     width: radius * 2,
+    /* The map's parts, as a state on a globe is the state on the map. */
+    ...(regionOf
+      ? {
+          regionOf: (x: number, y: number, z = radius) => {
+            const { u, v } = onMap(x, y, z)
+            return regionOf(u, v)
+          },
+        }
+      : {}),
   }
 }

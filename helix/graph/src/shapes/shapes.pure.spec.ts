@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { fieldFromInside } from '../connect-graph/shape-field.js'
-import { box, onSphere, sphere, torus } from './solids.js'
+import { fieldFromInside, inflate } from './shape-field.js'
+import { cuboid, onSphere, sphere, torus } from './solids.js'
 import { shapeFromTriangles } from './triangles.js'
 
 /* A cube from 0 to 10 on each axis: twelve triangles, two to a face. */
@@ -48,6 +48,73 @@ describe('shapeFromTriangles', () => {
     expect(field.regionOf).toBeUndefined()
   })
 
+  test('finds the part of the nearest triangle as a search of every triangle does', () => {
+    /* Each face of the cube cut into a hundred squares, a part a face. */
+    const corners: number[] = []
+    const ofTriangle: number[] = []
+    const faces: ((u: number, v: number) => number[])[] = [
+      (u, v) => [u, v, 0],
+      (u, v) => [u, v, 10],
+      (u, v) => [u, 0, v],
+      (u, v) => [u, 10, v],
+      (u, v) => [0, u, v],
+      (u, v) => [10, u, v],
+    ]
+    faces.forEach((face, part) => {
+      for (let u = 0; u < 10; u++) {
+        for (let v = 0; v < 10; v++) {
+          corners.push(...face(u, v), ...face(u + 1, v), ...face(u + 1, v + 1))
+          corners.push(...face(u, v), ...face(u + 1, v + 1), ...face(u, v + 1))
+          ofTriangle.push(part, part)
+        }
+      }
+    })
+    const names = ['a', 'b', 'c', 'd', 'e', 'f']
+    const named = shapeFromTriangles(corners, null, {
+      regions: { names, ofTriangle },
+      resolution: 40,
+    })
+    const shift = (named.width - 10) / 2
+    const middles = Array.from({ length: corners.length / 9 }, (_, at) =>
+      [0, 1, 2].map(
+        (axis) =>
+          ((corners[at * 9 + axis] as number) +
+            (corners[at * 9 + 3 + axis] as number) +
+            (corners[at * 9 + 6 + axis] as number)) /
+          3,
+      ),
+    )
+    let compared = 0
+    for (let step = 0; step < 400; step++) {
+      const point = [7, 13, 29].map((stride) => ((step * stride) % 97) / 9.7)
+      const far = middles
+        .map((middle, at) => ({
+          at,
+          far: Math.hypot(...middle.map((one, axis) => one - (point[axis] as number))),
+        }))
+        .sort((one, other) => one.far - other.far)
+      const [first] = far
+      if (!first) {
+        continue
+      }
+      /* Only where the nearest triangle's part is plain: no other part's triangle about as near. */
+      const rival = far.find((one) => ofTriangle[one.at] !== ofTriangle[first.at])
+      if (!rival || rival.far - first.far < 1e-3) {
+        continue
+      }
+      compared += 1
+      expect(
+        named.regionOf?.(
+          (point[0] as number) + shift,
+          /* The field's y points down, and the triangles' up. */
+          shift + 10 - (point[1] as number),
+          (point[2] as number) + shift,
+        ),
+      ).toBe(names[ofTriangle[first.at] as number])
+    }
+    expect(compared).toBeGreaterThan(300)
+  })
+
   test('keeps the surface it was read from, to be drawn as it is', () => {
     expect(field.mesh?.triangles).toHaveLength(36)
     expect(field.mesh?.corners).toHaveLength(36 * 3)
@@ -80,6 +147,27 @@ describe('shapeFromTriangles', () => {
   })
 })
 
+describe('parts carried through', () => {
+  /* A flat square whose left half is `west` and right half `east`. */
+  const flat = {
+    ...fieldFromInside(() => true, { depth: 0, height: 100, width: 100 }),
+    regionOf: (x: number) => (x < 50 ? 'west' : 'east'),
+  }
+
+  test('a puffed shape keeps the flat shape’s parts', () => {
+    const puffed = inflate(flat, { depth: 20 })
+    expect(puffed.regionOf?.(10, 50, 10)).toBe('west')
+    expect(puffed.regionOf?.(90, 50, 10)).toBe('east')
+  })
+
+  test('a map wrapped round a ball keeps the map’s parts', () => {
+    const globe = onSphere(flat, { radius: 50 })
+    /* Longitude runs from the back round to the back, so the front's left is the map's west half. */
+    expect(globe.regionOf?.(10, 50, 50)).toBe('west')
+    expect(globe.regionOf?.(90, 50, 50)).toBe('east')
+  })
+})
+
 describe('solids', () => {
   test('a sphere is measured exactly', () => {
     const ball = sphere({ radius: 10 })
@@ -95,7 +183,7 @@ describe('solids', () => {
   })
 
   test('a rounded box is inside at its middle and outside past its corners', () => {
-    const block = box({ depth: 20, height: 20, round: 4, width: 20 })
+    const block = cuboid({ depth: 20, height: 20, round: 4, width: 20 })
     expect(block.distance(10, 10, 10)).toBe(-10)
     expect(block.distance(0.5, 0.5, 0.5)).toBeGreaterThan(0)
   })

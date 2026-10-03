@@ -20,9 +20,11 @@ const graphOf = () => {
     positions: new Float32Array() as Float32Array<ArrayBufferLike>,
     read: 0,
     ready: true,
+    renders: [] as (number | undefined)[],
     shapes: new Float32Array() as Float32Array<ArrayBufferLike>,
     sizes: new Float32Array() as Float32Array<ArrayBufferLike>,
     started: false,
+    tracked: [] as number[],
   }
   const graph: CosmosGraph = {
     fitView: () => {},
@@ -41,7 +43,9 @@ const graphOf = () => {
     },
     pause: () => {},
     ready: Promise.resolve(),
-    render: () => {},
+    render: (_, transition) => {
+      held.renders.push(transition)
+    },
     screenToSpacePosition: ([x, y]) => [x, y],
     setClusterPositions: () => {},
     setConfigPartial: (config) => Object.assign(held.config, config),
@@ -73,7 +77,9 @@ const graphOf = () => {
     start: () => {
       held.started = true
     },
-    trackPointPositionsByIndices: () => {},
+    trackPointPositionsByIndices: (indices) => {
+      held.tracked = indices
+    },
     zoomToPointByIndex: () => {},
   }
   const box = document.createElement('div')
@@ -114,6 +120,45 @@ describe('cosmosDriver', () => {
     /* Spread about the middle of the space, the first left and the second right. */
     expect(held.positions[0]).toBeLessThan(2048)
     expect(held.positions[2]).toBeGreaterThan(2048)
+  })
+
+  test('lights a hovered note’s links at once, with a hand for the pointer, and forgets it on a new drawing', () => {
+    const { box, graph, held } = graphOf()
+    const driver = cosmosDriver(graph, box)
+    driver.draw({ links: [{ source: 'a', target: 'b' }], nodes })
+    driver.look(looks)
+    held.renders = []
+    ;(held.config.onPointMouseOver as (at: number) => void)(1)
+    expect(held.renders).toEqual([0])
+    expect(box.style.cursor).toBe('pointer')
+    ;(held.config.onPointMouseOut as () => void)()
+    expect(box.style.cursor).toBe('')
+  })
+
+  test('keeps following a signal’s ends while the notes it follows change', () => {
+    const { box, graph, held } = graphOf()
+    const driver = cosmosDriver(graph, box)
+    driver.draw({ links: [{ source: 'a', target: 'b' }], nodes })
+    driver.look(looks)
+    driver.signal?.('a', 'b', undefined, true)
+    /* Looks with nothing selected, which leave no note followed but the signal's. */
+    driver.look({ ...looks, node: (id) => ({ ...looks.node(id), selected: false }) })
+    expect([...held.tracked].sort()).toEqual([0, 1])
+  })
+
+  test('the zoom buttons make the view the reader’s, so a layout that ends does not fit it', () => {
+    const { box, graph, held } = graphOf()
+    let fitted = 0
+    graph.fitView = () => {
+      fitted += 1
+    }
+    const driver = cosmosDriver(graph, box)
+    driver.draw({ links: [], nodes })
+    driver.settle?.(new Set(['a']), () => {})
+    const before = fitted
+    driver.zoomBy?.(1, false)
+    ;(held.config.onSimulationEnd as () => void)()
+    expect(fitted).toBe(before)
   })
 
   test('paints each note in its color and shape, and rings the selected one', () => {

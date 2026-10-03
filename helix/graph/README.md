@@ -1,7 +1,7 @@
 # @fusion.dev/helix-graph
 
-Connects the Helix `Graph` frame to whatever draws the graph: Sigma.js, cosmos.gl, or a
-driver of your own, colored from your tokens.
+Connects the Helix `Graph` frame to whatever draws the graph: Sigma.js, cosmos.gl,
+three.js, or a driver of your own, colored from your tokens.
 
 ```sh
 bun add @fusion.dev/helix @fusion.dev/helix-graph sigma graphology graphology-layout-forceatlas2
@@ -22,7 +22,9 @@ const frame = document.querySelector('helix-graph')
 frame.nodes = notes // [{ id, label, group, size, x, y }]
 frame.links = links // [{ source, target, label }]
 
-const sigma = new Sigma(new Graph(), document.getElementById('drawing'))
+// The box the drawing goes in: a <div> inside the frame, sized by it.
+const box = frame.querySelector('div')
+const sigma = new Sigma(new Graph(), box)
 const connection = connectGraph(
   frame,
   sigmaDriver(sigma, {
@@ -36,9 +38,19 @@ frame.addEventListener('helix-graph-layout', (event) => save(event.detail.positi
 // After replacing a stylesheet, which no attribute shows:
 connection.restyle()
 
-// Later, when the graph goes away:
+// Lay the graph out again from the start, ignoring every place it has.
+connection.relayout()
+
+// Later, when the graph goes away: the connection first, then the renderer.
 connection.disconnect()
+sigma.kill()
 ```
+
+**The renderer is the page's to free.** After `disconnect()`, call
+`sigma.kill()` for Sigma and `graph.destroy()` for cosmos.gl; `threeDriver`
+makes its own renderer, and `disconnect()` frees it. A frame taken off the
+page without `disconnect()` leaves its renderer running, so disconnect it
+first.
 
 ## What it does
 
@@ -99,7 +111,7 @@ Each note can say how it is drawn, in the words Helix's other components use:
 |---|---|---|
 | `shape` | `circle`, `square`, `diamond`, `ring` | What kind of note it is at a glance |
 | `emphasis` | `solid`, `outlined`, `subtle` | Filled, a ring with the ground showing through, or a tinted fill with a ring |
-| `material` | `glass`, `frosted` | A shaded sphere with a highlight and a lit rim, or a milky body with a soft fall of light |
+| `material` | `flat`, `glass`, `frosted` | Matte, a shaded sphere with a highlight and a lit rim, or a milky body with a soft fall of light |
 | `tone` | `primary`, `accent`, `info`, `success`, `warning`, `danger`, `neutral` | What it means, which colors it over its group |
 
 ```js
@@ -132,8 +144,9 @@ so the graph's colors come back, in every driver.
 **Notes are named on hover**, and the selected note and its neighbors where
 there is room, each name ringed in the ground's color so it reads over the
 links. Each group's name is drawn over its notes, which is how a reader finds
-their way. `labels: 'hubs'` names the busiest notes at rest as well, quietly,
-and `labels: 'all'` every note where its name does not cover another.
+their way. With Sigma, `sigmaDriver(sigma, { labels: 'hubs' })` names the
+busiest notes at rest as well, quietly, and `labels: 'all'` every note where
+its name does not cover another.
 
 ## Large graphs
 
@@ -204,41 +217,52 @@ outline. Pass an SVG path and the box it is drawn in, as the SVG's `viewBox`
 gives it:
 
 ```js
+const brain = document.querySelector('#brain path')
 connectGraph(frame, driver, {
-  stencil: { path: brain.getAttribute('d'), width: 220, height: 170 },
+  stencil: { path: brain?.getAttribute('d') ?? '', width: 220, height: 170 },
 })
 ```
 
 No layout runs, so the shape is there from the first frame. Each group takes
 a region of the shape, each note sits by the hub it links to, and the notes
 fill the shape evenly, with borders between regions that curve. Holes are cut
-by the even-odd rule, which is how the grooves of a brain show. Only a graph
-with no places of its own is shaped; a note added later is placed by the
-layout beside its neighbors. `stencil` also takes `inside(x, y)`, a test of
-whether a point in the box is in the shape, in place of `path`, and
-`fitToStencil` fits places a page has into one.
+by the even-odd rule, which is how the grooves of a brain show. Every whole
+drawing is shaped, whatever places its notes carry, so places a page kept from
+an earlier drawing come back in the same shape; a note added later is placed
+by the layout beside its neighbors. A shape with no inside to hold the notes
+is warned of in the console, and the graph is laid out instead. `stencil` also
+takes `inside(x, y)`, a test of whether a point in the box is in the shape, in
+place of `path`, and `fitToStencil` fits places a page has into one.
 
 **Every shape becomes a distance field**: for each point in its box, how far
 it is from the shape's edge, below zero inside. `@fusion.dev/helix-graph/shapes`
-makes one from what a page has, and a field is a stencil itself:
+makes one from what a page has, and a field is a stencil itself.
+`shapeFromModel` is an entry of its own, `@fusion.dev/helix-graph/model`, since
+it loads three.js, so a page that draws a flat shape never bundles it:
 
 | Function | Makes |
 |---|---|
-| `shapeFromModel(url)` | A solid from a glTF model, `.glb` or `.gltf`, every mesh where the model places it. Async; three.js reads the file |
+| `shapeFromModel(url)` | From `/model`: a solid from a glTF model, `.glb` or `.gltf`, every mesh where the model places it. Async; three.js reads the file, and an error names the model |
 | `shapeFromTriangles(positions, index)` | A solid from a closed surface of triangles a page already holds |
 | `shapeFromSvg(svg)` | A flat field from an `<svg>` or its markup: every path, rectangle, circle, ellipse and polygon in its `viewBox` |
 | `shapeFromImage(image, { threshold })` | A flat field from an image's opaque pixels |
 | `shapeFromPath(path, width, height)` | A flat field from an SVG path |
 | `shapeFromInside(inside, { width, height, depth })` | A flat field, or a solid where `depth` is given, from a test of what is inside |
 | `inflate(field, { depth, roundness })` | A solid puffed out of a flat field, as a cushion is, cut through where the flat shape has a hole |
-| `sphere`, `torus`, `box` | Solids measured exactly from their formulas |
+| `sphere({ radius })`, `torus({ radius, tube })`, `cuboid({ width, height, depth, round })` | Solids measured exactly from their formulas |
 | `onSphere(field, { radius, thickness })` | A flat map wrapped round a ball, as a world map is round a globe |
 | `surfaceOf(field, { at, cells })` | The surface of a solid as triangles, to draw or to save as a model |
 
 ```js
-const stencil = { ...(await shapeFromModel('/models/brain.glb')), place: 'surface' }
+import { shapeFromModel } from '@fusion.dev/helix-graph/model'
+
+const stencil = { ...(await shapeFromModel('/models/brain.glb')), place: 'surface' as const }
 connectGraph(frame, threeDriver(box), { stencil })
 ```
+
+In a module script, as `await` at the top level needs. In TypeScript,
+`as const` keeps `place` the word the stencil takes, where a plain object
+widens it to any string.
 
 **`regions` sends each group to a named part of the shape**, such as a lobe
 of a brain or a state on a map:
@@ -246,7 +270,7 @@ of a brain or a state on a map:
 ```js
 const stencil = {
   ...(await shapeFromModel('/models/brain.glb')),
-  place: 'surface',
+  place: 'surface' as const,
   regions: { Vision: 'occipital', Hearing: 'temporal', Balance: 'cerebellum' },
 }
 ```
@@ -254,8 +278,10 @@ const stencil = {
 A model's parts are its meshes, named as it names them, where it has two or
 more; an SVG's are its shapes with an `id`, or in a group with one; and a
 field a page makes says its own with `regionOf(x, y, z)`. Each part fills
-evenly with the groups sent to it, and a group sent nowhere, or to a part the
-shape does not have, shares the parts no group claims.
+evenly with the groups sent to it, and a group sent nowhere shares the parts
+no group claims. A part the shape does not have, as one misspelled, is warned
+of in the console with the parts it has, and its groups are placed with the
+rest.
 
 **A model is read a column of cells at a time**, so one of a hundred thousand
 triangles becomes a field in a moment. Any closed mesh works; a mesh with
@@ -279,7 +305,7 @@ import { inflate, shapeFromPath } from '@fusion.dev/helix-graph/shapes'
 import { threeDriver } from '@fusion.dev/helix-graph/three'
 
 connectGraph(frame, threeDriver(box), {
-  stencil: { ...inflate(shapeFromPath(path, 220, 170), { depth: 140 }), place: 'surface' },
+  stencil: { ...inflate(shapeFromPath(path, 220, 170), { depth: 140 }), place: 'surface' as const },
 })
 ```
 
@@ -304,12 +330,14 @@ connectGraph(frame, threeDriver(box), {
 - **Edges are smooth at any density.** The drawing has half as many pixels again as the screen, at least two for each of the page's, and links are lines of a set width with smooth edges, where WebGL draws its own a device pixel wide.
 - **Each group is named over its near side**, and a group's name moves a line
   where it would cover another's.
+- **It draws only while something moves**: the reader's hands, the turning, a
+  layout, or a glide. It draws nothing while its box is out of view.
 
 | `threeDriver` option | Default | What else it takes |
 |---|---|---|
 | `autoRotate` | `true` | `false` leaves the graph still until the reader turns it |
 | `density` | screen × 1.5, 2 to 3 | How many pixels the drawing has for each of the page's; fewer is faster on a slow GPU |
-| `shape` | `circle` | `square` or `diamond`, for every note that does not say |
+| `shape` | `circle` | `square` or `diamond`, for every note that does not say; a `ring` is drawn as a circle |
 | `groupLabels` | `true` | `false` leaves each group unnamed |
 | `layoutLimit` | `10000` | The longest a layout runs, in milliseconds |
 
@@ -317,11 +345,12 @@ connectGraph(frame, threeDriver(box), {
 
 | Import | What |
 |---|---|
-| `@fusion.dev/helix-graph` | `connectGraph`, `diffGraph`, `fitToStencil`, `graphColorsFrom`, `seedPositions`, and the `GraphDriver`, `GraphChanges` and `GraphStencil` types |
-| `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)` |
-| `@fusion.dev/helix-graph/cosmos` | `cosmosDriver(graph, box, options)` |
-| `@fusion.dev/helix-graph/three` | `threeDriver(box, options)` |
-| `@fusion.dev/helix-graph/shapes` | `shapeFromModel`, `shapeFromTriangles`, `shapeFromSvg`, `shapeFromImage`, `shapeFromPath`, `shapeFromInside`, `inflate`, `sphere`, `torus`, `box`, `onSphere`, `surfaceOf`, and the `ShapeField` type |
+| `@fusion.dev/helix-graph` | `connectGraph`, `diffGraph`, `fitToStencil`, `graphColorsFrom`, `linkKey`, `seedPositions`, and the types `ConnectGraphOptions`, `DrawnLink`, `DrawnNode`, `GraphChanges`, `GraphColors`, `GraphConnection`, `GraphDriver`, `GraphGroup`, `GraphLooks`, `GraphPoint`, `GraphStencil`, `GraphTone`, `LinkLook`, `NodeLook`, `SeedLink`, `SeedNode`, `ShapeField` and `StencilFrame` |
+| `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)`, and the types `SigmaDriverOptions`, `SigmaGraph`, `SigmaLayout` and `SigmaRenderer` |
+| `@fusion.dev/helix-graph/cosmos` | `cosmosDriver(graph, box, options)`, and the types `CosmosDriverOptions` and `CosmosGraph` |
+| `@fusion.dev/helix-graph/three` | `threeDriver(box, options)`, and the type `ThreeDriverOptions` |
+| `@fusion.dev/helix-graph/shapes` | `shapeFromTriangles`, `shapeFromSvg`, `shapeFromImage`, `shapeFromPath`, `shapeFromInside`, `inflate`, `sphere`, `torus`, `cuboid`, `onSphere`, `surfaceOf`, and the types `ImageOptions`, `ShapeField` and `TriangleOptions` |
+| `@fusion.dev/helix-graph/model` | `shapeFromModel(source, options)`, which needs three.js |
 
 **Sigma, cosmos.gl, three.js and d3-force-3d are optional peers, and graphology is the page's.** Each
 driver types its renderer by the calls it makes on it, so a page brings
@@ -333,12 +362,12 @@ Sigma 3 is a peer dependency.
 | `connectGraph` option | Default | What else it takes |
 |---|---|---|
 | `center` | `true` | `false` leaves the view where it is when a note is chosen in the list |
-| `stencil` | none | A shape to draw the notes in: a field from `shapes`, `{ path, width, height }` or `{ inside, width, height }`, with `place`, `fill` or `surface` |
+| `stencil` | none | A shape to draw the notes in: a field from `shapes`, `{ path, width, height }` or `{ inside, width, height }`, with `place`, `fill` or `surface`; `shell`, how thick a surface's shell is as a share of the shape's size, `0.04` by default; and `regions`, the part each group goes to |
 
 | `sigmaDriver` option | Default | What else it takes |
 |---|---|---|
 | `layout` | none | A function that makes a layout for the graph, such as ForceAtlas2's worker |
-| `material` | flat | `glass` or `frosted`, for every note that does not say |
+| `material` | `flat` | `glass` or `frosted`, for every note that does not say |
 | `shape` | `circle` | `square`, `diamond` or `ring`, for every note that does not say |
 | `emphasis` | `solid` | `outlined` or `subtle`, for every note that does not say |
 | `labels` | `'hover'` | `'hubs'` or `'all'`: which notes are named at rest |
@@ -347,7 +376,7 @@ Sigma 3 is a peer dependency.
 
 | `cosmosDriver` option | Default | What else it takes |
 |---|---|---|
-| `shape` | `circle` | `square` or `diamond`, for every note that does not say |
+| `shape` | `circle` | `square` or `diamond`, for every note that does not say; a `ring` is drawn as a circle |
 | `groupLabels` | `true` | `false` leaves each group unnamed |
 | `layoutLimit` | `15000` | The longest a layout runs, in milliseconds |
 | `spaceSize` | `4096` | The size of cosmos.gl's space, as its own `spaceSize` says |
