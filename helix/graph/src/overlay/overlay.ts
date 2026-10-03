@@ -448,6 +448,65 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen) => {
   }
 }
 
+/**
+ * Where the frame's own controls lie over the drawing, in the drawing's
+ * pixels: its zoom buttons, and its list where it opens over the drawing.
+ * Names keep clear of them, since a name under a button can be read by
+ * nobody. Read from the frame the drawing is in, where there is one.
+ */
+export const chromeOver = (container: HTMLElement): Box[] => {
+  const frame = container.closest('helix-graph, helix-headless-graph')
+  const parts = frame?.shadowRoot?.querySelectorAll('[part="controls"], [part="panel"]') ?? []
+  const origin = container.getBoundingClientRect()
+  const boxes: Box[] = []
+  for (const part of parts) {
+    const at = part.getBoundingClientRect()
+    if (at.width > 0 && at.height > 0) {
+      boxes.push({
+        bottom: at.bottom - origin.top,
+        left: at.left - origin.left,
+        right: at.right - origin.left,
+        top: at.top - origin.top,
+      })
+    }
+  }
+  return boxes
+}
+
+/** Whether a box overlaps none of `others`. */
+export const clearOf = (box: Box, others: readonly Box[]): boolean =>
+  others.every(
+    (other) =>
+      box.right < other.left ||
+      box.left > other.right ||
+      box.bottom < other.top ||
+      box.top > other.bottom,
+  )
+
+/**
+ * Where a note's name starts, along the line: after the note, or before it
+ * where after it would run under the frame's controls or off the drawing.
+ * `box` gives the name's box for a start.
+ */
+export const nameStart = (
+  at: { radius: number; x: number },
+  width: number,
+  box: (start: number) => Box,
+  avoid: readonly Box[],
+  room: number,
+): number => {
+  const after = at.x + at.radius + 4
+  const fits = (start: number): boolean => {
+    const placed = box(start)
+    return placed.left >= 0 && placed.right <= room && clearOf(placed, avoid)
+  }
+  if (fits(after)) {
+    return after
+  }
+  const before = at.x - at.radius - 4 - width
+  return fits(before) ? before : after
+}
+
 /** A note to name over the drawing: its name, and whether it is the one the reader is on. */
 export interface Named {
   id: string
@@ -473,29 +532,25 @@ export const namesOver = (container: HTMLElement, onScreen: OnScreen) => {
       if (!context || !looks) {
         return
       }
-      taken = []
+      /* The frame's controls first, so no name is drawn under them. */
+      taken = chromeOver(container)
       for (const { id, name, strong } of named) {
         const at = onScreen(id)
         if (!at || looks.node(id).hidden) {
           continue
         }
         context.font = `${strong ? 600 : 500} ${strong ? 13 : 12}px ${looks.font}`
-        const x = at.x + at.radius + 4
+        const width = context.measureText(name).width
         const y = at.y + 4
-        const box = {
+        const boxAt = (start: number): Box => ({
           bottom: y + 4,
-          left: x - 2,
-          right: x + context.measureText(name).width + 2,
+          left: start - 2,
+          right: start + width + 2,
           top: y - 13,
-        }
-        const free = taken.every(
-          (other) =>
-            box.right < other.left ||
-            box.left > other.right ||
-            box.bottom < other.top ||
-            box.top > other.bottom,
-        )
-        if (!free && !strong) {
+        })
+        const x = nameStart(at, width, boxAt, taken, container.clientWidth)
+        const box = boxAt(x)
+        if (!clearOf(box, taken) && !strong) {
           continue
         }
         taken.push(box)

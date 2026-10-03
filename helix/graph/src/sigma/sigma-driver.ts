@@ -6,7 +6,16 @@ import type {
 } from '../connect-graph/connect-graph.js'
 import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
-import { type Box, ease, gesturesHeld, groupsOver, signalsOver } from '../overlay/overlay.js'
+import {
+  type Box,
+  chromeOver,
+  clearOf,
+  ease,
+  gesturesHeld,
+  groupsOver,
+  nameStart,
+  signalsOver,
+} from '../overlay/overlay.js'
 import { EMPHASES, HelixNodeProgram, MATERIALS, SHAPES } from './node-program.js'
 
 /**
@@ -240,7 +249,11 @@ const GROW = 300
  * crosses, and heavier on a larger note, so a hub's name leads.
  */
 const labelOf =
-  (looks: GraphLooks, claim: (box: Box, must: boolean) => boolean) =>
+  (
+    looks: GraphLooks,
+    claim: (box: Box, must: boolean) => boolean,
+    start: (at: { radius: number; x: number }, width: number, box: (from: number) => Box) => number,
+  ) =>
   (
     context: CanvasRenderingContext2D,
     data: HoverData & { forceLabel?: boolean; strong?: boolean },
@@ -255,18 +268,22 @@ const labelOf =
     const strong = data.strong === true
     const size = strong ? settings.labelSize : settings.labelSize - 1
     context.font = `${strong ? 600 : 500} ${size}px ${settings.labelFont}`
-    const x = data.x + data.size + 4
+    const width = context.measureText(data.label).width
     const y = data.y + size / 3
+    const boxAt = (from: number): Box => ({
+      bottom: y + 4,
+      left: from - 2,
+      right: from + width + 2,
+      top: y - size,
+    })
+    /* After the note, or before it where after it would run under the
+       frame's controls or off the drawing. */
+    const x = start({ radius: data.size, x: data.x }, width, boxAt)
     /* **A name that would cover one already drawn is left out**, the
        selected note's excepted, which is always drawn: Sigma's grid keeps
        one name a cell, and two notes either side of a cell's edge drew their
        names over each other. */
-    const box = {
-      bottom: y + 4,
-      left: x - 2,
-      right: x + context.measureText(data.label).width + 2,
-      top: y - size,
-    }
+    const box = boxAt(x)
     if (!claim(box, data.forceLabel === true)) {
       return
     }
@@ -366,20 +383,15 @@ export const sigmaDriver = <G extends SigmaGraph>(
   let taken: Box[] = []
   /** Takes a name's box where it is free, or where the name must be drawn anyway, and says whether it did. */
   const claim = (box: Box, must: boolean): boolean => {
-    const free = taken.every(
-      (other) =>
-        box.right < other.left ||
-        box.left > other.right ||
-        box.bottom < other.top ||
-        box.top > other.bottom,
-    )
+    const free = clearOf(box, taken)
     if (free || must) {
       taken.push(box)
     }
     return free || must
   }
   const clear = (): void => {
-    taken = []
+    /* The frame's controls first, so no name is drawn under them. */
+    taken = chromeOver(container)
   }
   sigma.on('beforeRender', clear)
   const held = gesturesHeld(container)
@@ -521,7 +533,12 @@ export const sigmaDriver = <G extends SigmaGraph>(
       sigma.setSetting('labelRenderedSizeThreshold', 0)
       /* Cells wide enough for a name, so two names never share a line. */
       sigma.setSetting('labelGridCellSize', 130)
-      sigma.setSetting('defaultDrawNodeLabel', labelOf(looks, claim))
+      sigma.setSetting(
+        'defaultDrawNodeLabel',
+        labelOf(looks, claim, (at, width, box) =>
+          nameStart(at, width, box, taken, container.clientWidth),
+        ),
+      )
       sigma.setSetting('defaultDrawNodeHover', hoverOf(looks))
       sigma.setSetting('nodeReducer', (node: string, data: Record<string, unknown>) => {
         const look = looks.node(node)

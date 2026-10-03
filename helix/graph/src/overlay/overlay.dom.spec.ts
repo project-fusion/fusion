@@ -81,6 +81,24 @@ describe('signalsOver', () => {
   })
 })
 
+describe('nameStart', () => {
+  /* A name 40 wide on one line, its box a pixel round it. */
+  const box = (start: number) => ({ bottom: 14, left: start - 2, right: start + 42, top: 0 })
+
+  test('puts a name after its note where there is room', () => {
+    expect(overlay.nameStart({ radius: 4, x: 100 }, 40, box, [], 400)).toBe(108)
+  })
+
+  test('puts a name before its note where after it would run under the controls', () => {
+    const controls = { bottom: 40, left: 120, right: 160, top: 0 }
+    expect(overlay.nameStart({ radius: 4, x: 100 }, 40, box, [controls], 400)).toBe(52)
+  })
+
+  test('puts a name before its note where after it would run off the drawing', () => {
+    expect(overlay.nameStart({ radius: 4, x: 380 }, 40, box, [], 400)).toBe(332)
+  })
+})
+
 describe('colors', () => {
   test('a light ink says the ground is dark', () => {
     expect(overlay.isLight('rgb(240, 240, 240)')).toBe(true)
