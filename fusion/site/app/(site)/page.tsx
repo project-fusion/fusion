@@ -2,10 +2,7 @@ import { findSitePage } from '@fusion.dev/insights'
 import Link from 'next/link'
 import { Band, band } from '@/components/band/band'
 import { Claim } from '@/components/claim/claim'
-import {
-  DerivationDiagram,
-  DerivationDiagramStacked,
-} from '@/components/derivation-diagram/derivation-diagram'
+import { DerivationDiagrams } from '@/components/derivation-diagram/derivation-diagram'
 import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import { Hero } from '@/components/hero/hero'
 import { Lede } from '@/components/lede/lede'
@@ -118,10 +115,7 @@ export default function Home() {
               and background pair for contrast before the theme is used.
             </Lede>
           </helix-flex>
-          <div className={band.bandSection}>
-            <DerivationDiagram />
-            <DerivationDiagramStacked />
-          </div>
+          <DerivationDiagrams className={band.bandSection} />
         </Band>
 
         {/* **The band does not paint its own ground.** An opaque fill here cut
