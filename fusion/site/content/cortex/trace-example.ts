@@ -68,18 +68,61 @@ const COLUMNS: readonly (readonly string[])[] = [
 const ACROSS = 10
 const DOWN = 2.6
 
-const placed = (nodes: readonly Omit<TraceNode, 'x' | 'y'>[]): TraceNode[] => {
+/** How the trace is laid out: in columns, across a wide screen, or in rows, down a narrow one. */
+export type TraceLayout = 'columns' | 'rows'
+
+/**
+ * **Each note's place, in columns or in rows.**
+ *
+ * - `columns` sets each kind side by side, its notes down the column.
+ * - `rows` stacks the kinds down the screen, one note to a line, so a phone
+ *   names every note without two names sharing a line. Each kind steps a
+ *   little to the right of the one before, so the trace still reads from
+ *   what came in to the answer, and a line between kinds parts them.
+ *
+ * Either way room is left open at each kind's middle, where its group's
+ * name is drawn.
+ */
+const placesFor = (layout: TraceLayout): Map<string, { x: number; y: number }> => {
   const at = new Map<string, { x: number; y: number }>()
+  let line = 0
   COLUMNS.forEach((column, across) => {
-    const half = column.length / 2
+    if (layout === 'columns') {
+      const half = column.length / 2
+      column.forEach((id, down) => {
+        /* Up is positive in the drawing, so the first in a column is at the
+           top; the lower half steps down one more, past the open middle row. */
+        const row = down < half ? down : down + 1
+        at.set(id, { x: across * ACROSS, y: (column.length / 2 - row) * DOWN })
+      })
+      return
+    }
+    /* **The group's name is drawn at the middle of its notes**, so the open
+       space is where that middle falls. With an even count it is one line,
+       halfway between the two halves. With an odd count the upper half is
+       one longer, which pulls the middle up off the line between them, so
+       the space is three lines, and the middle lands clear of every name. */
+    const upper = Math.ceil(column.length / 2)
+    const open = column.length % 2 === 0 ? 1 : 3
     column.forEach((id, down) => {
-      /* Up is positive in the drawing, so the first in a column is at the
-         top; the lower half steps down one more, past the open middle row. */
-      const row = down < half ? down : down + 1
-      at.set(id, { x: across * ACROSS, y: (column.length / 2 - row) * DOWN })
+      const row = down < upper ? down : down + open
+      at.set(id, { x: across * 0.6, y: -(line + row) })
     })
+    /* Past this kind's notes and its open middle, and one more line between kinds. */
+    line += column.length + open + 1
   })
+  return at
+}
+
+const placed = (nodes: readonly Omit<TraceNode, 'x' | 'y'>[]): TraceNode[] => {
+  const at = placesFor('columns')
   return nodes.map((one) => ({ ...one, ...(at.get(one.id) ?? { x: 0, y: 0 }) }))
+}
+
+/** The trace's notes placed for a layout. */
+export const traceIn = (layout: TraceLayout): TraceNode[] => {
+  const at = placesFor(layout)
+  return TRACE_NODES.map((one) => ({ ...one, ...(at.get(one.id) ?? { x: 0, y: 0 }) }))
 }
 
 export const TRACE_NODES: readonly TraceNode[] = placed([

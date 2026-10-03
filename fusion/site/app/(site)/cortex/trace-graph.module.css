@@ -10,6 +10,14 @@
   --graph-block-size: min(70svh, 34rem);
 }
 
+/* **Tall on a phone**, where the trace runs down the screen one note to a
+   line: tall enough for a line each at a size a name reads at. */
+@media (max-width: 40rem) {
+  .traceFrame {
+    --graph-block-size: 52rem;
+  }
+}
+
 /* The box Sigma draws in, the whole of the frame's drawing. */
 .traceCanvas {
   block-size: 100%;

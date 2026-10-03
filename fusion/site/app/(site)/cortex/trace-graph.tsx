@@ -7,7 +7,8 @@ import {
   TRACE_DELETED,
   TRACE_LINKS,
   TRACE_NODES,
-  type TraceNode,
+  type TraceLayout,
+  traceIn,
 } from '@/content/cortex/trace-example'
 import styles from './trace-graph.module.css'
 
@@ -19,13 +20,16 @@ const DELETED = TRACE_NODES.find((node) => node.id === TRACE_DELETED)?.label ?? 
  * and everything derived from it, as Trace deletes, and nothing it was
  * derived from.
  */
-const traceOf = (deleted: boolean) => {
+const traceOf = (deleted: boolean, layout: TraceLayout) => {
   const removed = deleted ? cascadeOf(TRACE_DELETED, TRACE_LINKS) : new Set<string>()
   return {
     links: TRACE_LINKS.filter((link) => !removed.has(link.source) && !removed.has(link.target)),
-    nodes: TRACE_NODES.filter((node) => !removed.has(node.id)) as TraceNode[],
+    nodes: traceIn(layout).filter((node) => !removed.has(node.id)),
   }
 }
+
+/** Where the trace turns from columns to rows: a phone's width, as the page's own narrow layout. */
+const NARROW = '(max-width: 40rem)'
 
 /**
  * An example trace, drawn with Helix Graph by Sigma.js: three answers and
@@ -39,9 +43,18 @@ export function TraceGraph() {
   const frame = useRef<HelixGraph>(null)
   const box = useRef<HTMLDivElement>(null)
   const [deleted, setDeleted] = useState(false)
-  /* Read when the graph is first given its notes, in case the button was pressed before it loaded. */
-  const deletedNow = useRef(deleted)
-  deletedNow.current = deleted
+  /* In rows on a narrow screen, and in columns otherwise, read once the page can ask. */
+  const [layout, setLayout] = useState<TraceLayout>('columns')
+  useEffect(() => {
+    const query = matchMedia(NARROW)
+    const follow = (): void => setLayout(query.matches ? 'rows' : 'columns')
+    follow()
+    query.addEventListener('change', follow)
+    return () => query.removeEventListener('change', follow)
+  }, [])
+  /* Read when the graph is first given its notes, in case either changed before it loaded. */
+  const now = useRef({ deleted, layout })
+  now.current = { deleted, layout }
   const [failed, setFailed] = useState(false)
 
   useEffect(() => {
@@ -64,7 +77,7 @@ export function TraceGraph() {
       if (!live) {
         return
       }
-      const trace = traceOf(deletedNow.current)
+      const trace = traceOf(now.current.deleted, now.current.layout)
       host.nodes = trace.nodes
       host.links = trace.links
       const sigma = new Sigma(new Graph(), drawing, { allowInvalidContainer: true })
@@ -109,10 +122,10 @@ export function TraceGraph() {
     if (!host?.nodes?.length) {
       return
     }
-    const trace = traceOf(deleted)
+    const trace = traceOf(deleted, layout)
     host.nodes = trace.nodes
     host.links = trace.links
-  }, [deleted])
+  }, [deleted, layout])
 
   return (
     <div className={styles.trace}>
