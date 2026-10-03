@@ -26,10 +26,12 @@ import {
   type NoteFacts,
   toneColor,
 } from './looks.js'
+import { type GraphReach, reachOf } from './reach.js'
 import { type GraphPoint, seedPositions } from './seed.js'
 import { fieldOf, fitInStencil, type GraphStencil, type StencilFrame } from './stencil.js'
 
 export type { DrawnLink, DrawnNode, GraphChanges } from './diff.js'
+export type { GraphReach } from './reach.js'
 
 /**
  * What a renderer has to answer for the frame to drive it, and nothing that is
@@ -157,6 +159,15 @@ export interface ConnectGraphOptions {
    * reader is already looking at it.
    */
   center?: boolean | undefined
+  /**
+   * How far a selection reaches, which the drawing lights and a selection
+   * made in the list frames: `links`, the notes it links to and from, which
+   * is the default; `upstream`, everything a path of links leads from to it;
+   * or `downstream`, everything a path leads to from it. Where each link runs
+   * from what a note was derived from to the note, `upstream` lights all a
+   * note came from.
+   */
+  reach?: GraphReach | undefined
   /**
    * A shape the notes are drawn in, such as a brain or a country's outline:
    * an SVG path and the box it is drawn in. **No layout runs**: each group
@@ -289,18 +300,11 @@ export const connectGraph = (
     const nodes = graph.nodes ?? []
     const links = graph.links ?? []
     const selected = selectedNote()
-    const near = new Set<string>()
-    if (selected !== undefined) {
-      for (const { source, target } of links) {
-        if (source === selected) {
-          near.add(target)
-        } else if (target === selected) {
-          near.add(source)
-        }
-      }
-    }
+    const reached =
+      selected === undefined ? undefined : reachOf(selected, links, options.reach ?? 'links')
     const notes = new Map(nodes.map((node) => [node.id, node]))
     current = looksOf({
+      along: reached?.along,
       colors,
       /* The theme's face, unquoted, which Sigma writes into a canvas font. */
       font: getComputedStyle(frame)
@@ -309,7 +313,7 @@ export const connectGraph = (
         .replace(/^["']|["']$/g, ''),
       groups: nodes.flatMap((node) => (node.group === undefined ? [] : [node.group])),
       links: links.length,
-      near,
+      near: reached?.near ?? new Set(),
       noteOf: (id) => notes.get(id),
       selected,
       shown: graph.shown,
@@ -559,16 +563,12 @@ export const connectGraph = (
       options.center !== false &&
       drawnNodes.has(selected)
     ) {
-      /* The note and the notes it links to and from, framed together, so a
+      /* The note and the notes it reaches, framed together, so a
          neighborhood opens out to be read rather than sitting in a knot. */
-      const near = [selected]
-      for (const { source, target } of drawnLinks.values()) {
-        if (source === selected) {
-          near.push(target)
-        } else if (target === selected) {
-          near.push(source)
-        }
-      }
+      const near = [
+        selected,
+        ...reachOf(selected, drawnLinks.values(), options.reach ?? 'links').near,
+      ]
       if (driver.fit && near.length > 1) {
         driver.fit(near, !still())
       } else {

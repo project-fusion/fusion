@@ -7,6 +7,7 @@ export {
   type GraphConnection,
   type GraphDriver,
   type GraphGroup,
+  type GraphReach,
 } from './connect-graph/connect-graph.js'
 export { diffGraph, linkKey } from './connect-graph/diff.js'
 export {

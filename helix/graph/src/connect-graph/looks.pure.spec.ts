@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { type GraphColors, looksOf, mixRgb } from './looks.js'
+import { reachOf } from './reach.js'
 
 const colors: GraphColors = {
   accent: 'rgb(200, 0, 200)',
@@ -90,6 +91,26 @@ describe('looksOf', () => {
     expect(drawn.link('a', 'b')).toEqual({ color: 'rgb(0, 255, 0)', hidden: false, raised: true })
     expect(drawn.link('b', 'd').hidden).toBe(true)
     expect(drawn.node('d').hidden).toBe(true)
+  })
+
+  test('raises the links a reach goes along, where one is given, the far ones as well', () => {
+    const links = [
+      { source: 'a', target: 'b' },
+      { source: 'b', target: 'c' },
+    ]
+    const reached = reachOf('c', links, 'upstream')
+    const lit = looksOf({
+      along: reached.along,
+      colors,
+      groups: [],
+      near: reached.near,
+      noteOf: () => undefined,
+      selected: 'c',
+      shown: undefined,
+    })
+    expect(lit.link('a', 'b').raised).toBe(true)
+    expect(lit.node('a').raised).toBe(true)
+    expect(looks('c', ['b']).link('a', 'b').raised).toBe(false)
   })
 
   test('a note’s tone colors it over its group, and its shape and material are passed on', () => {
