@@ -1,4 +1,4 @@
-<!-- @summary A graph of company notes drawn by Sigma.js, with notes arriving and messages passing between them as they happen. -->
+<!-- @summary A graph of company notes drawn by Sigma.js, with notes arriving and messages passing between them as they happen, and a legend that shows or hides each subject. -->
 
 <!-- Preview frame: data-preview-graph has the frame connect Sigma.js, in glass; on your page, connectGraph(frame, sigmaDriver(new Sigma(new Graph(), box), { layout, material: 'glass' })) does, the box being the div inside the frame. -->
 <helix-graph
@@ -6,6 +6,7 @@
   data-preview-graph-material="glass"
   id="notes"
   label="Company notes"
+  legend
 >
   <div data-preview-graph-canvas></div>
 </helix-graph>

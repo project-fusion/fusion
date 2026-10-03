@@ -945,6 +945,30 @@ export class HelixGraphReadyEvent extends Event {
   }
 }
 
+/** Detail carried by `helix-graph-filter`. */
+export interface GraphFilterDetail {
+  /** The groups the graph would hide, by name: every group the reader has turned off, after this press. */
+  hidden: readonly string[]
+}
+
+/**
+ * A reader pressed a group in the graph's legend, which would show or hide
+ * its notes, sent from the frame before it does. Cancelable: cancel it to
+ * keep the groups as they were, or to set `hiddenGroups` yourself.
+ */
+export class HelixGraphFilterEvent extends CustomEvent<GraphFilterDetail> {
+  static readonly eventName = 'helix-graph-filter'
+
+  constructor(detail: GraphFilterDetail) {
+    super(HelixGraphFilterEvent.eventName, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** A rotate request: turn by some degrees, or turn to a bearing. */
 export interface MapRotateDetail {
   /** Degrees to turn the map clockwise. Negative turns it counterclockwise. */
@@ -1806,6 +1830,7 @@ const registry = {
   HelixDismissEvent,
   HelixFacetEvent,
   HelixFilterEvent,
+  HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
   HelixGraphPanEvent,
   HelixGraphPartChangeEvent,

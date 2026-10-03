@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test'
-import { adjacencyOf, entriesOf, nameOf, sortedOf, within } from './graph-model.js'
+import {
+  adjacencyOf,
+  entriesOf,
+  groupsOf,
+  nameOf,
+  sortedOf,
+  within,
+  withoutGroups,
+} from './graph-model.js'
 
 const nodes = [
   { id: 'a', label: 'Alpha' },
@@ -111,5 +119,41 @@ describe('nameOf', () => {
     expect(nameOf({ id: 'x', label: 'Ex' })).toBe('Ex')
     expect(nameOf({ id: 'x' })).toBe('x')
     expect(nameOf({ id: 'x', label: '' })).toBe('x')
+  })
+})
+
+describe('groupsOf', () => {
+  test('names each group once, in the order sort gives, with the tone its notes share', () => {
+    expect(
+      groupsOf([
+        { group: 'b', id: '1', tone: 'danger' },
+        { group: 'a', id: '2' },
+        { group: 'b', id: '3', tone: 'danger' },
+        { group: 'C', id: '4', tone: 'info' },
+        { group: 'C', id: '5' },
+        { id: '6' },
+        { group: '', id: '7' },
+      ]),
+    ).toEqual([
+      { name: 'C', tone: undefined },
+      { name: 'a', tone: undefined },
+      { name: 'b', tone: 'danger' },
+    ])
+  })
+})
+
+describe('withoutGroups', () => {
+  const grouped = [{ group: 'work', id: 'a' }, { group: 'home', id: 'b' }, { id: 'c' }]
+
+  test('keeps every note outside the hidden groups, and a note in no group always', () => {
+    expect([...(withoutGroups(grouped, undefined, ['work']) ?? [])]).toEqual(['b', 'c'])
+  })
+
+  test('keeps only what the local graph keeps as well', () => {
+    expect([...(withoutGroups(grouped, new Set(['a', 'c']), ['home']) ?? [])]).toEqual(['a', 'c'])
+  })
+
+  test('leaves nothing out where no group is hidden', () => {
+    expect(withoutGroups(grouped, undefined, [])).toBeUndefined()
   })
 })

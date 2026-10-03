@@ -181,3 +181,59 @@ export const sortedOf = (nodes: readonly GraphNode[], lang?: string): GraphNode[
   const collator = new Intl.Collator(lang || undefined, { numeric: true, sensitivity: 'base' })
   return [...nodes].sort((one, other) => collator.compare(nameOf(one), nameOf(other)))
 }
+
+/** One group the notes are in, as the legend names it. */
+export interface GraphGroupEntry {
+  /** The group's name, as the notes give it. */
+  name: string
+  /** The tone every note in the group has, where they all have the same one, which colors them over the group's color. */
+  tone?: GraphNodeTone | undefined
+}
+
+/**
+ * The groups the notes are in, each once, **in the order `sort()` gives
+ * their names**, which is the order `connectGraph` hands out the series
+ * colors in: the legend's first group is the drawing's first color.
+ *
+ * A group takes a tone where every one of its notes has the same one, since
+ * the drawing colors a toned note by its tone and the group's name in the
+ * color of a note without one.
+ */
+export const groupsOf = (nodes: readonly GraphNode[]): GraphGroupEntry[] => {
+  const tones = new Map<string, GraphNodeTone | null | undefined>()
+  for (const node of nodes) {
+    if (node.group === undefined || node.group === '') {
+      continue
+    }
+    const tone = node.tone ?? null
+    if (!tones.has(node.group)) {
+      tones.set(node.group, tone)
+    } else if (tones.get(node.group) !== tone) {
+      tones.set(node.group, null)
+    }
+  }
+  return [...tones.keys()].sort().map((name) => ({ name, tone: tones.get(name) ?? undefined }))
+}
+
+/**
+ * The notes kept by the local graph, `local`, where there is one, less every
+ * note in a hidden group, or `undefined` where nothing is left out. A note in
+ * no group is never hidden: the legend names only groups.
+ */
+export const withoutGroups = (
+  nodes: readonly GraphNode[],
+  local: Set<string> | undefined,
+  hidden: readonly string[],
+): Set<string> | undefined => {
+  if (hidden.length === 0) {
+    return local
+  }
+  const off = new Set(hidden)
+  const kept = new Set<string>()
+  for (const node of nodes) {
+    if ((local === undefined || local.has(node.id)) && !off.has(node.group ?? '')) {
+      kept.add(node.id)
+    }
+  }
+  return kept
+}

@@ -320,9 +320,13 @@ export const connectGraph = (
     })
     driver.look(current)
     if (driver.groups) {
+      /* **Named over the notes the drawing shows**, so a group the legend
+         turned off, or one the local graph leaves out whole, is not named
+         over nothing. */
       const members = new Map<string, string[]>()
+      const shown = graph.shown
       for (const node of nodes) {
-        if (node.group !== undefined) {
+        if (node.group !== undefined && (!shown || shown.has(node.id))) {
           const list = members.get(node.group)
           if (list) {
             list.push(node.id)
@@ -525,7 +529,15 @@ export const connectGraph = (
   /** Something passed between two notes, which the renderer draws in the tone's color. */
   const handleSignal = (event: Event): void => {
     const { from, to, tone } = (event as HelixGraphSignalEvent).detail
-    if (!driver.signal || !drawnNodes.has(from) || !drawnNodes.has(to)) {
+    /* Nor between notes the drawing hides, by `depth` or the legend: a pulse
+       crossing empty ground says something passed between nothing. */
+    const shown = graph.shown
+    if (
+      !driver.signal ||
+      !drawnNodes.has(from) ||
+      !drawnNodes.has(to) ||
+      (shown && !(shown.has(from) && shown.has(to)))
+    ) {
       return
     }
     colors ??= graphColorsFrom(frame)
