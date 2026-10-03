@@ -56,6 +56,21 @@ slot:not([name]) {
   text-overflow: ellipsis;
 }
 
+/* **The letters at the middle, in any font.** A line box is centered, and
+   the letters sit in it where the font's ascent and descent put them: in a
+   face with a deep descent, such as Source Sans 3, measured 2px high in a
+   24px tag. Trimmed to the capitals and the baseline, the box is the letters,
+   and equal padding on both sides centers them. The padding is also room for
+   the descenders, which the clip for the ellipsis cut once the box was
+   trimmed. Only where the trim is supported: without it the padding only
+   makes the line box taller. */
+@supports (text-box: trim-both cap alphabetic) {
+  slot:not([name]) {
+    padding-block: var(--helix-space-2xs);
+    text-box: trim-both cap alphabetic;
+  }
+}
+
 /* A slotted icon sits on the middle, not on the baseline. Measured on the
    gallery's experimental mark, a 14px icon in a 28px tag: the slot came out
    17.39px tall and the icon sat 5.30px from the top against 8.70px from the

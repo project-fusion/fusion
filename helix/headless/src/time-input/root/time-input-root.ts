@@ -108,6 +108,7 @@ import '../../time-picker/index.js'
  * @csspart time - One held time, as a tag, in `multiple`.
  * @csspart time-dismiss - The remove button, when `dismissible`.
  * @csspart time-dismiss-mark - The default icon on the remove button, shown when none is slotted.
+ * @csspart time-label - The label, trimmed to its capitals and baseline.
  * @csspart time-start - The category before the label.
  * @csspart trigger - The control that opens the list.
  * @csspart trigger-icon - The icon on the button that opens the clock.
@@ -484,7 +485,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   protected renderTag(at: string): TemplateResult {
     return html`<${this.tag('tag')}
                   part="time"
-      exportparts="dismiss: time-dismiss, dismiss-mark: time-dismiss-mark, start: time-start"
+      exportparts="dismiss: time-dismiss, dismiss-mark: time-dismiss-mark, label: time-label, start: time-start"
                   dismissible
                   dismiss-label=${fillTemplate(this.removeLabel, { name: this.written(at) })}
                   ?disabled=${this.isDisabled}

@@ -28,6 +28,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @csspart dismiss - The button that removes the tag.
  * @csspart dismiss-mark - The icon on the remove button.
+ * @csspart label - The label, which the styled tag trims to its capitals and baseline so the letters sit at the middle in any font.
  * @csspart start - The category before the label.
  */
 @customElement('helix-headless-tag')
@@ -39,7 +40,7 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
 
   protected override render(): TemplateResult {
     return html`<slot name="start" part="start"></slot>
-      <slot></slot>
+      <slot part="label"></slot>
       ${
         this.dismissible
           ? html`<button
