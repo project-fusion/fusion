@@ -459,6 +459,8 @@ export const sigmaDriver = <G extends SigmaGraph>(
     },
     draw: ({ links, nodes }: { links: DrawnLink[]; nodes: DrawnNode[] }) => {
       graph.clear()
+      /* Framed afresh: Sigma frames the whole graph at its resting camera. */
+      camera.setState({ ratio: 1, x: 0.5, y: 0.5 })
       for (const node of nodes) {
         graph.addNode(node.id, {
           label: node.label,
@@ -700,7 +702,7 @@ export const sigmaDriver = <G extends SigmaGraph>(
             const layout = make(graph)
             layout.start()
             const limit = options.layoutLimit ?? 10000
-            const started = performance.now()
+            let started = performance.now()
             let last = positionsOf(graph)
             let done = false
             /* **Settled is still after moving, never still before it.** The
@@ -721,7 +723,25 @@ export const sigmaDriver = <G extends SigmaGraph>(
               })
               placed(positionsOf(graph))
             }
+            /* Whether the layout is paused while its box is off the page. */
+            let paused = false
             const timer = setInterval(() => {
+              /* **Paused while its box is off the page**, where every move it
+                 makes is a frame Sigma draws for no one, and taken up again
+                 where it left off when the box is back, its time limit
+                 counting only the time it ran. */
+              if (!container.isConnected) {
+                if (!paused) {
+                  paused = true
+                  layout.stop()
+                }
+                started += SAMPLE
+                return
+              }
+              if (paused) {
+                paused = false
+                layout.start()
+              }
               const now = positionsOf(graph)
               let moved = 0
               let low = Number.POSITIVE_INFINITY
