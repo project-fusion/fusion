@@ -73,6 +73,62 @@
   }
 }
 
+/* **With `no-panel`, the drawing takes the whole frame**, and the search and
+   the list open over its end, on the floating surface a menu opens on, with
+   the controls moved clear of them so the button that closes them stays in
+   reach. At every width: a frame that leaves its list out is one shown large. */
+:host([no-panel]) [part="body"] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  position: relative;
+}
+
+:host([no-panel]) [part="panel"] {
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  inline-size: min(var(--graph-panel-size, 18rem), calc(100% - var(--helix-space-sm) * 2));
+  inset-block: var(--helix-space-sm);
+  inset-inline-end: var(--helix-space-sm);
+  overflow: hidden;
+  position: absolute;
+  z-index: 1;
+}
+
+:host([no-panel]) [part="panel"][hidden] {
+  display: none;
+}
+
+:host([no-panel]) [part="body"]:has([part="panel"]:not([hidden])) [part="controls"] {
+  inset-inline-end: calc(min(var(--graph-panel-size, 18rem), 100%) + var(--helix-space-sm) * 2);
+}
+
+/* The button that opens them, after zoom in the column, before full screen. */
+[part="notes-toggle"] {
+  grid-area: notes;
+}
+
+[part="notes-toggle"] svg {
+  block-size: 1em;
+  inline-size: 1em;
+}
+
+[part="controls"]:has([part="notes-toggle"]):not(:has([part="pan-up"])) {
+  grid-template-areas:
+    "zoomin"
+    "zoomout"
+    "notes"
+    "full";
+}
+
+[part="controls"]:has([part="notes-toggle"]):has([part="pan-up"]) {
+  grid-template-areas:
+    ".      up    .      zoomin"
+    "start  .     end    zoomout"
+    ".      down  .      notes"
+    ".      .     .      full";
+}
+
 /* The bar that narrows the list, drawn as the listbox draws its filter: the
    magnifier, a field with no box of its own, and the count at the end. */
 [part="search"] {

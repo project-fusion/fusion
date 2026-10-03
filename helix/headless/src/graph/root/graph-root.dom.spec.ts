@@ -186,6 +186,31 @@ describe('graph frame', () => {
     expect(names(host).length).toBe(5)
   })
 
+  test('no-panel leaves the search and the list out, behind a button that opens them', async () => {
+    const host = await graph('no-panel')
+    const panel = part(host, 'panel') as HTMLElement
+    const toggle = part(host, 'notes-toggle') as HTMLButtonElement
+    expect(panel.hidden).toBe(true)
+    expect(toggle.getAttribute('aria-label')).toBe('Notes')
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect(host.shadowRoot?.getElementById(toggle.getAttribute('aria-controls') ?? '')).toBe(panel)
+    toggle.click()
+    await settle(host)
+    expect(panel.hidden).toBe(false)
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'search-field'))
+    key(part(host, 'search-field') as HTMLElement, 'Escape')
+    await settle(host)
+    expect(panel.hidden).toBe(true)
+    expect(host.shadowRoot?.activeElement).toBe(toggle)
+  })
+
+  test('without no-panel the list is beside the drawing and there is no button for it', async () => {
+    const host = await graph()
+    expect((part(host, 'panel') as HTMLElement).hidden).toBe(false)
+    expect(part(host, 'notes-toggle')).toBeNull()
+  })
+
   test('depth keeps nothing out once the selected note is taken away', async () => {
     const host = await graph('default-active="a" depth="1"')
     host.nodes = host.nodes.filter((node) => node.id !== 'a')
