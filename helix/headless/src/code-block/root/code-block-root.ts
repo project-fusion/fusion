@@ -46,8 +46,8 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart context - In a diff, a line both versions share.
  * @csspart copy - The copy button. It sits in the header when there is one, and beside the code otherwise.
  * @csspart copy-button - The inner button.
- * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart copy-mark - The clipboard icon, and the check mark that replaces it after a copy.
+ * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart copy-tooltip - The copy button's tooltip.
  * @csspart copy-tooltip-arrow - The tooltip's arrow, which points at the copy button.
  * @csspart copy-tooltip-arrow-bottom - The arrow while the tooltip is below the copy button, on the tooltip's top edge. Applied with `copy-tooltip-arrow`.
