@@ -391,6 +391,36 @@
   inline-size: 100%;
 }
 
+/**
+ * The theme pill, arriving after everything else has settled.
+ *
+ * **Last, and from nothing.** It is an invitation rather than part of the
+ * argument, so it grows in once the column above it has finished. `scale(0)` to
+ * full reads as appearing rather than sliding in from off screen, which a pill
+ * pinned to the viewport has no room to do. `backwards` holds it at zero
+ * through the delay instead of jumping to nothing when the animation starts.
+ *
+ * **No `to` block**: the resting width is declared once on the rule above, and
+ * a keyframe naming it again goes stale the day the pill is resized.
+ *
+ * **Three properties to reach an actual zero.** `inline-size: 0` alone cannot
+ * fall below the element's own `padding-inline`, so a sliver of glass sits on
+ * screen through the delay with `shadow-floating` drawn around it.
+ */
+@keyframes site-fab-arrive {
+  from {
+    box-shadow: none;
+    inline-size: 0;
+    opacity: 0;
+    padding-inline: 0;
+  }
+}
+
+/* **In this module, beside the rule that reads it.** A CSS module scopes an
+   animation name, and these keyframes sat in the landing page's sheet, where
+   they were scoped to that sheet: `getAnimations()` returned nothing and the
+   animation never ran. */
+
 @media (prefers-reduced-motion: no-preference) {
   .fab {
     animation: site-fab-arrive calc(var(--helix-duration-slow) * 2) var(--helix-easing-spring)
