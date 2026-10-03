@@ -705,26 +705,23 @@ export const THEMED_PAGE_STYLES = css`
     text-align: center;
   }
 
-  /* **A picture drawn from the theme**: the media ground, lit from above by the
-     brand, which is what a photograph under a caption is to the tokens. Its
-     words take the media ink, the pair the theme measures for exactly this. */
+  /* **On the page's own ground, tinted by the brand**, in whichever mode the
+     page is. It was drawn on the media ground as a stand-in for a photograph,
+     and without a photograph it read as a dark band dropped into a light page.
+     The tint is the brand at a fifth, falling away from the top, as the other
+     heroes sit on the page with nothing between them and it. */
   .themedLocalHero {
-    background-color: var(--helix-color-surface-media);
-    background-image:
-      radial-gradient(ellipse 80% 70% at 50% 0%, color-mix(in oklab, var(--helix-color-primary) 45%, transparent), transparent),
-      linear-gradient(to bottom, transparent 55%, color-mix(in oklab, var(--helix-color-primary) 18%, transparent));
-    color: var(--helix-color-foreground-media);
+    background-image: radial-gradient(
+      ellipse 80% 70% at 50% 0%,
+      color-mix(in oklab, var(--helix-color-primary) 18%, transparent),
+      transparent
+    );
     padding: calc(var(--helix-space-2xl) * 2) var(--helix-space-2xl);
     text-align: center;
   }
 
   .themedLocalHero helix-text[as="h1"] {
-    color: inherit;
     max-inline-size: 18ch;
-  }
-
-  .themedLocalRating helix-text {
-    color: inherit;
   }
 
   .themedLocalStars {
