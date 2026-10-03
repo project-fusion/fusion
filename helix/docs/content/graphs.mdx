@@ -1,0 +1,346 @@
+---
+description: Add interactive graphs to your site, styled with your theme and drawn by Sigma.js, cosmos.gl, or three.js.
+section: Essentials
+title: Graphs
+---
+
+# Graphs
+
+Helix Graph puts a frame around a graph drawn by Sigma.js, cosmos.gl, three.js,
+or a renderer of your own. The frame adds a searchable list of every note, zoom
+and fullscreen buttons, and keyboard controls. You give the frame notes and
+links, and `@fusion.dev/helix-graph` draws them with the renderer, colored by
+your theme.
+
+## Add a graph
+
+Install Helix, the graph connector, and Sigma.js with its layout:
+
+```sh
+bun add @fusion.dev/helix @fusion.dev/helix-graph sigma graphology graphology-layout-forceatlas2
+```
+
+Add the frame, with an element inside it for the renderer to draw in:
+
+```html
+<helix-graph label="Research notes">
+  <div></div>
+</helix-graph>
+```
+
+Give the frame its notes and links, make the renderer, and connect the two:
+
+```js
+import '@fusion.dev/helix'
+import { connectGraph } from '@fusion.dev/helix-graph'
+import { sigmaDriver } from '@fusion.dev/helix-graph/sigma'
+import Graph from 'graphology'
+import forceAtlas2 from 'graphology-layout-forceatlas2'
+import FA2Layout from 'graphology-layout-forceatlas2/worker'
+import Sigma from 'sigma'
+
+const frame = document.querySelector('helix-graph')
+frame.nodes = [
+  { id: 'roadmap', label: 'Roadmap', group: 'Product' },
+  { id: 'pricing', label: 'Pricing', group: 'Sales' },
+]
+frame.links = [{ source: 'pricing', target: 'roadmap' }]
+
+const sigma = new Sigma(new Graph(), frame.querySelector('div'))
+const connection = connectGraph(
+  frame,
+  sigmaDriver(sigma, {
+    layout: (graph) => new FA2Layout(graph, { settings: forceAtlas2.inferSettings(graph) }),
+  }),
+)
+```
+
+`nodes` and `links` are properties. Set them in JavaScript, since a graph of
+thousands of notes written as markup would be thousands of elements.
+
+## What the connector does
+
+`connectGraph` links the frame to the renderer:
+
+- It draws the notes and links, and lays out the notes that have no place.
+- It colors each group from your theme's series colors, and the names in your
+  theme's typeface. It recolors the graph when your theme or mode changes.
+  After you replace a stylesheet, which changes no attribute, call
+  `connection.restyle()`.
+- The note you select in the list is the note selected in the drawing, and the
+  other way round. The selected note's links stand out, and the rest of the
+  graph fades.
+- The frame's zoom buttons and keys move the drawing.
+- `connection.relayout()` lays the whole graph out again.
+- `connection.disconnect()` puts back everything `connectGraph` changed.
+
+## Choose a renderer
+
+| Renderer | Use it for | Install | Driver |
+|---|---|---|---|
+| Sigma.js | Graphs of thousands of notes | `sigma graphology graphology-layout-forceatlas2` | `sigmaDriver` from `@fusion.dev/helix-graph/sigma` |
+| cosmos.gl | Graphs of tens of thousands of notes or more, laid out on the GPU | `@cosmos.gl/graph` | `cosmosDriver` from `@fusion.dev/helix-graph/cosmos` |
+| three.js | Graphs in 3D, and graphs on the surface of a 3D model | `three d3-force-3d` | `threeDriver` from `@fusion.dev/helix-graph/three` |
+
+None of the renderers is bundled with Helix, so you can use the version you
+already have.
+
+With cosmos.gl, make the graph in the frame's box and pass the box as well:
+
+```js
+import { Graph } from '@cosmos.gl/graph'
+import { cosmosDriver } from '@fusion.dev/helix-graph/cosmos'
+
+const box = frame.querySelector('div')
+const graph = new Graph(box, { attribution: '', enableSimulation: true, scalePointsOnZoom: false })
+const connection = connectGraph(frame, cosmosDriver(graph, box))
+```
+
+With three.js, pass the box, and the driver makes the renderer:
+
+```js
+import { threeDriver } from '@fusion.dev/helix-graph/three'
+
+const connection = connectGraph(frame, threeDriver(frame.querySelector('div')))
+```
+
+Drag to turn a 3D graph, and use the wheel or a pinch to zoom. It turns slowly
+on its own until someone handles it, unless they asked for reduced motion. Set
+`autoRotate: false` to keep it still.
+
+## Free the renderer
+
+Call `connection.disconnect()` when the graph leaves the page, then free the
+renderer you made:
+
+```js
+connection.disconnect()
+sigma.kill() // Sigma.js
+graph.destroy() // cosmos.gl
+```
+
+`threeDriver` makes its own renderer, and `disconnect()` frees it. A graph you
+remove from the page without disconnecting keeps its renderer running.
+
+## Keep the layout
+
+A layout places every note that has no `x` and `y`, and moves only those. When
+it settles, the frame sends `helix-graph-layout` with where each note ended.
+Save the positions and pass them back as each note's `x` and `y`, and the graph
+opens in the same places next time, with no layout to wait for:
+
+```js
+frame.addEventListener('helix-graph-layout', (event) => {
+  localStorage.setItem('positions', JSON.stringify(event.detail.positions))
+})
+```
+
+## Update the graph as your data changes
+
+Give the frame new arrays whenever your data changes. The connector compares
+them with what is drawn, by each note's `id` and each link's two ends, and
+draws only what changed. New notes grow in beside their neighbors, and the rest
+stay where they are:
+
+```js
+socket.addEventListener('message', ({ data }) => {
+  const note = JSON.parse(data)
+  frame.nodes = [...frame.nodes, note]
+  frame.links = [...frame.links, { source: note.id, target: note.parent }]
+})
+```
+
+Call `signal()` to show something passing between two notes, such as a message
+or a payment. A comet travels along the link between them, in the first note's
+color turning to the second's, or in the color of a tone you give it:
+
+```js
+frame.signal('checkout', 'payments', { tone: 'success' })
+```
+
+When someone asked for reduced motion, the link lights up for a moment
+instead. Screen readers do not announce signals, so say anything a reader needs
+to know in your page's own words as well.
+
+## Style the notes
+
+Each note takes these fields, as Helix's other components do:
+
+| Field | Values | What it does |
+|---|---|---|
+| `group` | Any name | Colors the note from your theme's series. Each group's name is drawn over its notes |
+| `shape` | `circle`, `square`, `diamond`, `ring` | Says what kind of note it is at a glance |
+| `emphasis` | `solid`, `outlined`, `subtle` | Fills the note, rings it, or tints it |
+| `material` | `glass`, `frosted` | Draws the note as a shaded sphere or as frosted glass |
+| `tone` | `primary`, `accent`, `info`, `success`, `warning`, `danger`, `neutral` | Colors the note by what it means, over its group's color |
+| `size` | A number | How large the note is. A note without one is as large as it is connected |
+
+Set a default for every note with the driver's options, such as
+`sigmaDriver(sigma, { material: 'glass', shape: 'circle' })`. cosmos.gl draws a
+note's `shape` and not its `emphasis` or `material`.
+
+## Select a note
+
+Pressing a note selects it, and pressing where no note is clears the selection.
+The frame sends `helix-activate` with the note's `id`, and its `active`
+property holds the selected note. Set `active` to select a note from your page,
+and the frame brings it into view with its neighbors. Start with one selected
+with `default-active`:
+
+```html
+<helix-graph default-active="roadmap" label="Research notes">
+  <div></div>
+</helix-graph>
+```
+
+To keep the selection in your own state, cancel `helix-before-activate` and set
+`active` yourself.
+
+Set `depth` to show only the notes within that many links of the selected one,
+for a graph too large to read at once:
+
+```html
+<helix-graph default-active="roadmap" depth="2" label="Research notes">
+  <div></div>
+</helix-graph>
+```
+
+## Draw the notes in a shape
+
+Pass a `stencil` and the connector places the notes in its shape from the first
+frame, with no layout. Each group takes a region of the shape. Give it an SVG
+path and the size of the box it is drawn in:
+
+```js
+connectGraph(frame, driver, {
+  stencil: { path: outline.getAttribute('d') ?? '', width: 220, height: 170 },
+})
+```
+
+`@fusion.dev/helix-graph/shapes` makes shapes from what you have:
+
+| Function | Makes |
+|---|---|
+| `shapeFromSvg(svg)` | A shape from an SVG's paths, rectangles, circles, ellipses, and polygons |
+| `shapeFromImage(image)` | A shape from an image's opaque pixels |
+| `shapeFromPath(path, width, height)` | A shape from one SVG path |
+| `inflate(shape, { depth })` | A solid from a flat shape, puffed out as a cushion is |
+| `onSphere(shape)` | A flat map wrapped around a globe |
+| `sphere()`, `torus()`, `cuboid()` | Solids |
+
+With three.js, place the notes on the surface of a 3D model.
+`shapeFromModel` reads a `.glb` or `.gltf` file, and is in its own entry,
+`@fusion.dev/helix-graph/model`, since it loads three.js:
+
+```js
+import { shapeFromModel } from '@fusion.dev/helix-graph/model'
+
+const brain = await shapeFromModel('/models/brain.glb')
+connectGraph(frame, threeDriver(box), {
+  stencil: {
+    ...brain,
+    place: 'surface',
+    regions: { Vision: 'occipital', Hearing: 'temporal' },
+  },
+})
+```
+
+- `place: 'surface'` puts the notes in a thin shell just inside the surface,
+  and draws the model under them. `place: 'fill'`, the default, puts them all
+  through it.
+- `regions` sends each group to a named part of the shape. A model's parts are
+  its meshes, and an SVG's are its shapes with an `id`. A part the shape does
+  not have is reported in the console, with the parts it has.
+- In TypeScript, write `place: 'surface' as const`, so the object keeps the
+  type the stencil takes.
+
+## Share the scroll with the page
+
+By default a graph takes every gesture over it: the wheel zooms it, and one
+finger moves it. A graph embedded in a page takes the wheel from a reader who
+is scrolling past it. Set `gestures` on the frame to share them:
+
+```html
+<helix-graph gestures="cooperative" label="Research notes">
+  <div></div>
+</helix-graph>
+```
+
+- `cooperative` leaves the wheel and one finger to the page. The graph takes
+  Ctrl or ⌘ with the wheel, and two fingers, and says so when a gesture passes
+  to the page. Use it for a graph embedded in a page.
+- `activate` takes nothing until the graph is pressed, and gives the gestures
+  back on Escape, when the pointer leaves, or on a press elsewhere.
+- `always`, the default, takes every gesture.
+
+The keyboard and the frame's buttons work the same in every mode.
+
+## Show the graph large
+
+Set `no-panel` to leave the search and the list out of the frame, so the
+drawing takes all of it, as at the top of a page. A Notes button among the
+controls opens them over the drawing:
+
+```html
+<helix-graph gestures="cooperative" label="Research notes" no-panel>
+  <div></div>
+</helix-graph>
+```
+
+Set the frame's height with `--graph-block-size`, and the list's width with
+`--graph-panel-size`.
+
+## Show the graph once it is drawn
+
+When the layout settles, the frame sends `helix-graph-ready` and matches
+`:state(ready)`. Its `ready` property is `true` from then on. To show a graph
+only once it is laid out, fade it in on the state:
+
+```css
+helix-graph > div {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+helix-graph:state(ready) > div {
+  opacity: 1;
+}
+```
+
+## Keyboard and screen readers
+
+- The frame is one tab stop. Arrow keys move the drawing, and the plus and
+  minus keys zoom it. Set `controls="pan zoom fullscreen"` to add buttons that
+  move it.
+- The list is a listbox, named by `notes-label`. Arrow keys, Home, End, Page
+  Up, and Page Down move through it, and Enter or Space selects a note.
+- In the search field, Down moves into the list, and Escape empties the search.
+  With `no-panel`, Escape on an empty search closes the list.
+- Screen readers read the selected note first, then how each other note links
+  to it, such as "Linked from Roadmap", and the count as a search narrows it.
+- Change the words with `search-label`, `count-label`, `selected-label`,
+  `links-to-label`, `linked-from-label`, and `linked-both-label`.
+
+## Write a driver
+
+To use another renderer, write a driver: an object with four methods.
+
+- `draw({ nodes, links })` draws the graph, each note at its `x` and `y`.
+- `look(looks)` says how each note and link is drawn, from the theme and the
+  selection.
+- `panBy(x, y, animate)` moves the view by a number of pixels.
+- `zoomBy(direction, animate)` zooms in for `1` and out for `-1`.
+
+Each optional method turns on a feature:
+
+| Method | Turns on |
+|---|---|
+| `update` | Drawing only what changed, for live data |
+| `settle` | Laying out notes that have no place |
+| `onPress` | Selecting a note by pressing it in the drawing |
+| `center`, `fit` | Bringing a selected note and its neighbors into view |
+| `signal` | Signals between notes |
+| `groups` | Each group's name over its notes |
+| `gestures`, `focusTarget` | Sharing gestures with the page, and the frame's keys |
+| `shape` | Drawing a stencil's shape |
+| `stop` | Removing what the driver added when the graph disconnects |

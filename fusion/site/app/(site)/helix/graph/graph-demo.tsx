@@ -111,7 +111,7 @@ const start = async (
       import('@luma.gl/webgl'),
     ])
     /* The GPU device made here and handed over once its canvas is measured,
-       so cosmos.gl starts outside a resize callback, as the Graph reference
+       so cosmos.gl starts outside a resize callback, as the graph package's README
        shows. */
     const canvas = document.createElement('canvas')
     canvas.style.cssText = 'width:100%;height:100%'

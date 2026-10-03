@@ -208,8 +208,8 @@ export default function Page() {
               <Snippet code={GRAPH_INSTALL} label="Install" language="sh" />
             </div>
             <helix-flex class="siteActions" data-density="lg">
-              <Link data-button="solid" data-button-tone="primary" href="/helix/components/graph">
-                Open the Graph reference
+              <Link data-button="solid" data-button-tone="primary" href="/helix/docs/graphs">
+                Read the Graphs guide
               </Link>
             </helix-flex>
           </helix-flex>
