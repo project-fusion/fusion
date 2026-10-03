@@ -169,6 +169,13 @@
   }
 }
 
+/* A demo and the caption under it, laid out as the demos on Maps are. */
+.graphShowcase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+}
+
 /* The demos beside their code, a little shorter than the hero's. */
 .graphDemo {
   --graph-block-size: min(70svh, 34rem);
