@@ -537,7 +537,7 @@ export const sigmaDriver = <G extends SigmaGraph>(
          a graph that names its notes on hover and at its hubs. Fine where it
          names every note it can: the driver keeps names off each other
          itself, and a grid as wide as a name left one name in each cell. */
-      sigma.setSetting('labelGridCellSize', naming === 'all' ? 24 : 130)
+      sigma.setSetting('labelGridCellSize', naming === 'all' ? 8 : 130)
       sigma.setSetting(
         'defaultDrawNodeLabel',
         labelOf(looks, claim, (at, width, box) =>
