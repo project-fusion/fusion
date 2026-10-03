@@ -905,7 +905,10 @@ export class HelixGraphPartChangeEvent extends CustomEvent<GraphPartChangeDetail
 export interface GraphSignalDetail {
   /** The note the signal leaves, by its `id`. */
   from: string
-  /** What the signal means, which colors it. `primary` where none is given. */
+  /**
+   * What the signal means, which colors it. Where none is given, the signal
+   * turns from the first note's color to the second's as it crosses.
+   */
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning' | undefined
   /** The note the signal reaches, by its `id`. */
   to: string

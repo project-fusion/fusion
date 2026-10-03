@@ -186,6 +186,13 @@ describe('graph frame', () => {
     expect(names(host).length).toBe(5)
   })
 
+  test('depth keeps nothing out once the selected note is taken away', async () => {
+    const host = await graph('default-active="a" depth="1"')
+    host.nodes = host.nodes.filter((node) => node.id !== 'a')
+    await settle(host)
+    expect(names(host).length).toBe(4)
+  })
+
   test('cooperative: a plain wheel over the drawing is the page’s, and the frame says how to zoom', async () => {
     const host = await graph('gestures="cooperative"')
     const wheel = new WheelEvent('wheel', { bubbles: true, composed: true, deltaY: 40 })

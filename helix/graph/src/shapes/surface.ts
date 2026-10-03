@@ -1,4 +1,4 @@
-import type { ShapeField } from '../connect-graph/shape-field.js'
+import type { ShapeField } from './shape-field.js'
 
 /** How many cells the surface is read in along the shape's longest side, where none is asked for. */
 const CELLS = 72

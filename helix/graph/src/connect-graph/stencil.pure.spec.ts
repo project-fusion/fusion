@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
+import { fieldFromInside } from '../shapes/shape-field.js'
 import { arrangeByGroup, hubsOf } from './arrange.js'
 import type { GraphPoint } from './seed.js'
-import { fieldFromInside } from './shape-field.js'
 import { fitInStencil, fitToStencil, type GraphStencil } from './stencil.js'
 
 /** A square of notes from 0 to 100 each way, `side` to a row. */
@@ -224,6 +224,28 @@ describe('fitInStencil with named regions', () => {
 
   test('treats a part the shape does not have as no part at all', () => {
     const { positions } = fit({ a: 'nowhere' })
+    expect(positions.size).toBe(300)
+  })
+
+  test('places every note where every group is sent somewhere and one part is misspelled', () => {
+    const { frame, positions } = fit({ a: 'west', b: 'east', c: 'esat' })
+    expect(frame).toBeDefined()
+    expect(positions.size).toBe(300)
+    /* Most of the way, since the rest share the parts and the halves are measured by the notes' spread. */
+    expect(west(positions, 'a')).toBeGreaterThan(0.9)
+    for (const at of positions.values()) {
+      expect(Number.isFinite(at.x) && Number.isFinite(at.y)).toBe(true)
+    }
+  })
+
+  test('places every note where the shape has no named parts at all', () => {
+    const { regionOf: _, ...plain } = ball
+    const { frame, positions } = fitInStencil(
+      arrangeByGroup(nodes, links, { solid: true }),
+      { ...plain, place: 'surface', regions: { a: 'west', b: 'east', c: 'west' } },
+      { clustersOf: (id) => [groupOf.get(id) as string, hubOf(id)] },
+    )
+    expect(frame).toBeDefined()
     expect(positions.size).toBe(300)
   })
 })

@@ -99,17 +99,22 @@ export const graphColorsFrom = (element: Element): GraphColors | null => {
   }
 }
 
+/** An `rgb()` color's red, green and blue, from 0 to 255, each `missing` where the color does not say. */
+export const rgbOf = (color: string, missing = 128): [number, number, number] => {
+  const [red = missing, green = missing, blue = missing] = color.match(/[\d.]+/g)?.map(Number) ?? []
+  return [red, green, blue]
+}
+
 /** One `rgb()` moved toward another by `amount`, from 0 to 1. */
 export const mixRgb = (from: string, to: string, amount: number): string => {
-  const parts = (value: string): number[] => value.match(/[\d.]+/g)?.map(Number) ?? [0, 0, 0]
-  const [one, other] = [parts(from), parts(to)]
-  const channel = (at: number): number =>
-    Math.round((one[at] ?? 0) + ((other[at] ?? 0) - (one[at] ?? 0)) * amount)
+  const [one, other] = [rgbOf(from, 0), rgbOf(to, 0)]
+  const channel = (at: 0 | 1 | 2): number => Math.round(one[at] + (other[at] - one[at]) * amount)
   return `rgb(${channel(0)}, ${channel(1)}, ${channel(2)})`
 }
 
 /** How one note is drawn. */
 export interface NodeLook {
+  /** The color it is drawn in: its own, or faded toward the ground where the selection sets it back. */
   color: string
   /** Outside the local graph that `depth` keeps. */
   hidden: boolean
@@ -158,8 +163,11 @@ export const toneColor = (colors: GraphColors, tone: GraphTone | undefined): str
 
 /** How one link is drawn. */
 export interface LinkLook {
+  /** The color it is drawn in. */
   color: string
+  /** Outside the local graph that `depth` keeps. */
   hidden: boolean
+  /** Drawn over the rest, as a link that touches the selected note is. */
   raised: boolean
 }
 
@@ -177,7 +185,9 @@ export interface GraphLooks {
   overlay: string
   /** The quieter ink a name at rest is drawn in, beside the selected note's and its neighbors'. */
   quiet: string
+  /** How the link from `source` to `target` is drawn. */
   link(source: string, target: string): LinkLook
+  /** How the note `id` is drawn. */
   node(id: string): NodeLook
 }
 

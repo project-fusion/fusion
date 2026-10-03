@@ -1,6 +1,6 @@
 <!-- @summary Eight thousand notes on the surface of a 3D model of a brain, each region of the mind in its lobe of the brain, with thoughts passing between them. -->
 
-<!-- Preview frame: data-preview-graph="three" has the frame connect three.js, and data-preview-graph-model names the model the notes are drawn on, and data-preview-graph-regions sends each region of the mind to a lobe of the brain; on your page, connectGraph(frame, threeDriver(box), { stencil: { ...(await shapeFromModel(url)), place: 'surface', regions: { Vision: 'occipital' } } }) does. -->
+<!-- Preview frame: data-preview-graph="three" has the frame connect three.js, and data-preview-graph-model names the model the notes are drawn on, and data-preview-graph-regions sends each region of the mind to a lobe of the brain; on your page, in a module script, connectGraph(frame, threeDriver(box), { stencil: { ...(await shapeFromModel(url)), place: 'surface', regions: { Vision: 'occipital' } } }) does. -->
 <helix-graph
   data-preview-graph="three"
   data-preview-graph-model="/media/models/brain.glb"
@@ -58,8 +58,12 @@
   mind.nodes = nodes
   mind.links = links
 
-  /* Thoughts passing along the links, fifteen a second. */
-  setInterval(() => {
+  /* Thoughts passing along the links, fifteen a second, until the graph leaves the page. */
+  const sending = setInterval(() => {
+    if (!mind.isConnected) {
+      clearInterval(sending)
+      return
+    }
     const link = pick(mind.links)
     mind.signal(link.source, link.target)
   }, 66)

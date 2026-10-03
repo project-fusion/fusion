@@ -1,4 +1,4 @@
-import { fieldFromCells, type ShapeField, SOLID } from '../connect-graph/shape-field.js'
+import { fieldFromCells, type ShapeField, SOLID } from './shape-field.js'
 
 /** How far off a column's middle it is sampled, in cells. */
 const NUDGE = 1e-6 * Math.PI
@@ -20,7 +20,8 @@ const NEAREST = 40
 
 /**
  * The part a point is in: the part of the triangle whose middle is nearest
- * it, found through a grid of the middles, searched outward ring by ring.
+ * it, found through a grid of the middles, searched outward one shell of
+ * cells at a time.
  */
 const nearestPart = (
   middles: Float32Array,
@@ -28,50 +29,75 @@ const nearestPart = (
   names: readonly string[],
   box: { depth: number; height: number; width: number },
 ): ((x: number, y: number, z?: number) => string | undefined) => {
-  const size = Math.max(box.width, box.height, box.depth) / NEAREST
-  const cells = new Map<string, number[]>()
-  const key = (cx: number, cy: number, cz: number): string => `${cx},${cy},${cz}`
+  const size = Math.max(box.width, box.height, box.depth) / NEAREST || 1
+  const nx = Math.ceil(box.width / size) + 1
+  const ny = Math.ceil(box.height / size) + 1
+  const nz = Math.ceil(box.depth / size) + 1
+  const clamp = (value: number, most: number): number => Math.min(most - 1, Math.max(0, value))
+  const cellOf = (x: number, y: number, z: number): number =>
+    clamp(Math.floor(x / size), nx) +
+    nx * (clamp(Math.floor(y / size), ny) + ny * clamp(Math.floor(z / size), nz))
+  /* Each cell's middles, in one list in cell order: a cell's run starts at
+     `start[cell]` and ends where the next cell's starts. */
   const count = middles.length / 3
+  const start = new Int32Array(nx * ny * nz + 1)
+  const cellAt = new Int32Array(count)
   for (let at = 0; at < count; at++) {
-    const k = key(
-      Math.floor((middles[at * 3] as number) / size),
-      Math.floor((middles[at * 3 + 1] as number) / size),
-      Math.floor((middles[at * 3 + 2] as number) / size),
+    const cell = cellOf(
+      middles[at * 3] as number,
+      middles[at * 3 + 1] as number,
+      middles[at * 3 + 2] as number,
     )
-    const list = cells.get(k)
-    if (list) {
-      list.push(at)
-    } else {
-      cells.set(k, [at])
-    }
+    cellAt[at] = cell
+    start[cell + 1] = (start[cell + 1] as number) + 1
   }
+  for (let cell = 0; cell < nx * ny * nz; cell++) {
+    start[cell + 1] = (start[cell + 1] as number) + (start[cell] as number)
+  }
+  const filled = start.slice(0, -1)
+  const order = new Int32Array(count)
+  for (let at = 0; at < count; at++) {
+    const cell = cellAt[at] as number
+    order[filled[cell] as number] = at
+    filled[cell] = (filled[cell] as number) + 1
+  }
+  const furthest = Math.max(nx, ny, nz)
   return (x, y, z = box.depth / 2) => {
-    const cx = Math.floor(x / size)
-    const cy = Math.floor(y / size)
-    const cz = Math.floor(z / size)
+    const cx = clamp(Math.floor(x / size), nx)
+    const cy = clamp(Math.floor(y / size), ny)
+    const cz = clamp(Math.floor(z / size), nz)
     let best = -1
     let nearest = Number.POSITIVE_INFINITY
-    for (let ring = 0; ring <= NEAREST; ring++) {
-      for (let dx = -ring; dx <= ring; dx++) {
+    const search = (ix: number, iy: number, iz: number): void => {
+      if (ix < 0 || iy < 0 || iz < 0 || ix >= nx || iy >= ny || iz >= nz) {
+        return
+      }
+      const cell = ix + nx * (iy + ny * iz)
+      for (let at = start[cell] as number; at < (start[cell + 1] as number); at++) {
+        const one = order[at] as number
+        const far =
+          ((middles[one * 3] as number) - x) ** 2 +
+          ((middles[one * 3 + 1] as number) - y) ** 2 +
+          ((middles[one * 3 + 2] as number) - z) ** 2
+        if (far < nearest) {
+          nearest = far
+          best = one
+        }
+      }
+    }
+    for (let ring = 0; ring <= furthest; ring++) {
+      /* Only the cells on this shell: whole faces at its front and back, and
+         each slice between only its rim. */
+      for (let dz = -ring; dz <= ring; dz++) {
+        const face = Math.abs(dz) === ring
         for (let dy = -ring; dy <= ring; dy++) {
-          for (let dz = -ring; dz <= ring; dz++) {
-            if (Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz)) !== ring) {
-              continue
-            }
-            for (const at of cells.get(key(cx + dx, cy + dy, cz + dz)) ?? []) {
-              const far =
-                ((middles[at * 3] as number) - x) ** 2 +
-                ((middles[at * 3 + 1] as number) - y) ** 2 +
-                ((middles[at * 3 + 2] as number) - z) ** 2
-              if (far < nearest) {
-                nearest = far
-                best = at
-              }
-            }
+          const edge = face || Math.abs(dy) === ring
+          for (let dx = -ring; dx <= ring; dx += edge || ring === 0 ? 1 : 2 * ring) {
+            search(cx + dx, cy + dy, cz + dz)
           }
         }
       }
-      /* Nothing in a further ring can be nearer than one found a ring in. */
+      /* Nothing in a further shell can be nearer than one found a shell in. */
       if (best >= 0 && Math.sqrt(nearest) <= ring * size) {
         break
       }

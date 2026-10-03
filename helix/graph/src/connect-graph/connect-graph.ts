@@ -142,10 +142,9 @@ export interface GraphGroup {
 /** Each note's group and then its hub, which a stencil gives a piece of its shape each. */
 const clustersOf = (
   nodes: readonly { group?: string | undefined; id: string }[],
-  links: readonly { source: string; target: string }[],
+  hubOf: (id: string) => string,
 ): ((id: string) => readonly string[]) => {
   const groupOf = new Map(nodes.map((node) => [node.id, node.group ?? '']))
-  const { hubOf } = hubsOf(nodes, links)
   return (id) => [groupOf.get(id) ?? '', hubOf(id)]
 }
 
@@ -161,8 +160,11 @@ export interface ConnectGraphOptions {
    * A shape the notes are drawn in, such as a brain or a country's outline:
    * an SVG path and the box it is drawn in. **No layout runs**: each group
    * takes a region of the shape and each note sits by the hub it links to,
-   * from the first frame. Only a graph with no places of its own is shaped;
-   * a note added later is placed by the layout beside its neighbors.
+   * from the first frame. Every whole drawing is shaped, whatever places its
+   * notes carry, so places a page kept from an earlier drawing are shaped
+   * again the same way; a note added later is placed by the layout beside
+   * its neighbors. A shape that holds none of the notes is warned of, and
+   * the graph is laid out instead.
    */
   stencil?: GraphStencil | undefined
 }
@@ -171,7 +173,10 @@ export interface ConnectGraphOptions {
 export interface GraphConnection {
   /** Stops answering the frame and puts back everything connecting changed. */
   disconnect(): void
-  /** Lays the graph out again from where it starts, ignoring where the last layout put each note. */
+  /**
+   * Lays the graph out again from where it starts, ignoring where the last
+   * layout put each note and the places the page gave its notes.
+   */
   relayout(): void
   /**
    * Reads the page's colors again. The connection hears a theme that changes
@@ -216,7 +221,9 @@ const still = (): boolean =>
  * Connects a Graph frame to whatever draws the graph.
  *
  * The frame is `helix-graph` or `helix-headless-graph`, and the driver is
- * `sigmaDriver` from `@fusion.dev/helix-graph/sigma` or one of your own. The
+ * `sigmaDriver` from `@fusion.dev/helix-graph/sigma`, `cosmosDriver` from
+ * `./cosmos`, `threeDriver` from `./three`, or one of your own. The page
+ * keeps the renderer it made: after `disconnect()`, kill or destroy it. The
  * connection draws the frame's `nodes` and `links`, lays out the notes that
  * have no position and says where it put them in `helix-graph-layout`, answers
  * the frame's pan and zoom, keeps the selection the same in the list and the
@@ -233,7 +240,16 @@ export const connectGraph = (
   options: ConnectGraphOptions = {},
 ): GraphConnection => {
   const graph = frame as Frame
+  if (!('nodes' in frame) || typeof graph.requestActive !== 'function') {
+    console.warn(
+      'connectGraph: the element given is not a Graph frame (helix-graph or helix-headless-graph), so nothing will be drawn.',
+      frame,
+    )
+  }
   let known = new Map<string, GraphPoint>()
+  /* The selection the view was last framed on, so a selection that arrives
+     with new notes is framed once they are drawn. */
+  let framed: string | undefined
   /* Where the stencil was put among the notes, once the connector drew them in it. */
   let shapeFrame: StencilFrame | undefined
   /* What the renderer holds now, which the next drawing is compared with. */
@@ -255,14 +271,23 @@ export const connectGraph = (
   let pending = 0
   let connected = true
 
+  /** The selected note, where the graph still holds it: a selection whose note was taken away is none. */
+  const selectedNote = (): string | undefined => {
+    const active = graph.active
+    return active && (graph.nodes ?? []).some((node) => node.id === active) ? active : undefined
+  }
+
   const restyle = (): void => {
+    if (!connected) {
+      return
+    }
     colors ??= graphColorsFrom(frame)
     if (!colors) {
       return
     }
     const nodes = graph.nodes ?? []
     const links = graph.links ?? []
-    const selected = graph.active || undefined
+    const selected = selectedNote()
     const near = new Set<string>()
     if (selected !== undefined) {
       for (const { source, target } of links) {
@@ -322,7 +347,7 @@ export const connectGraph = (
    * be, with the rest held, and the frame stays ready while it runs: the
    * graph was drawn whole once, and a note arriving does not undo that.
    */
-  const draw = (whole = false): void => {
+  const draw = (whole = false, fresh = false): void => {
     if (stopSettling) {
       stopSettling()
       stopSettling = undefined
@@ -339,25 +364,48 @@ export const connectGraph = (
         nextLinks.set(linkKey({ source, target }), { label, source, target })
       }
     }
-    let { positions, unplaced } = seedPositions(nodes, [...nextLinks.values()], known)
+    const linkList = [...nextLinks.values()]
+    /* A fresh layout starts from nothing: the page's own places as well as the last layout's. */
+    let { positions, unplaced } = seedPositions(
+      fresh ? nodes.map(({ id }) => ({ id })) : nodes,
+      linkList,
+      fresh ? new Map() : known,
+    )
     /* **A stencil places every note itself, from the graph's structure**, so
        the shape is drawn from the first frame and there is no layout to
        wait for: a layout run first and fitted after showed the graph in
-       some other shape for seconds before it became this one. Only when
-       nothing has a place, so a page's own places and a layout's are kept. */
-    const fit =
-      options.stencil && ids.size > 0 && unplaced.size === ids.size
-        ? fitInStencil(
-            arrangeByGroup(nodes, [...nextLinks.values()], {
-              solid: fieldOf(options.stencil).depth > 0,
-            }),
-            options.stencil,
-            { clustersOf: clustersOf(nodes, [...nextLinks.values()]) },
-          )
-        : undefined
-    const shaped = fit?.positions
+       some other shape for seconds before it became this one. Every whole
+       drawing is shaped, the places a page kept with it, and a drawing whose
+       notes are all new; notes added to a shaped graph are laid out beside
+       their neighbors. */
+    const shaping =
+      options.stencil !== undefined &&
+      ids.size > 0 &&
+      (first || whole || unplaced.size === ids.size)
+    let fit: ReturnType<typeof fitInStencil> | undefined
+    if (shaping && options.stencil) {
+      const hubs = hubsOf(nodes, linkList)
+      fit = fitInStencil(
+        arrangeByGroup(nodes, linkList, { hubs, solid: fieldOf(options.stencil).depth > 0 }),
+        options.stencil,
+        { clustersOf: clustersOf(nodes, hubs.hubOf) },
+      )
+    }
+    /* A shape that held the notes; where it held none, the layout's places instead. */
+    const shaped = fit?.frame ? fit.positions : undefined
     if (fit?.frame) {
       shapeFrame = fit.frame
+    } else if (shaping) {
+      console.warn(
+        'connectGraph: the stencil has no inside to place the notes in, so the graph is laid out instead.',
+        options.stencil,
+      )
+      positions = seedPositions(
+        nodes.map(({ id }) => ({ id })),
+        linkList,
+        new Map(),
+      ).positions
+      unplaced = new Set(ids)
     }
     driver.shape?.(options.stencil ? (options.stencil.place ?? 'fill') : undefined, shapeFrame)
     if (shaped) {
@@ -405,7 +453,7 @@ export const connectGraph = (
       }
     } else {
       graph.drawn?.(false)
-      driver.draw({ links: [...nextLinks.values()], nodes: [...nextNodes.values()] })
+      driver.draw({ links: linkList, nodes: [...nextNodes.values()] })
     }
     drawnNodes = nextNodes
     drawnLinks = nextLinks
@@ -419,6 +467,10 @@ export const connectGraph = (
       waiting = unplaced
       stopSettling = driver.settle(unplaced, (settled) => {
         stopSettling = undefined
+        /* A driver that finishes after the connection ended is not heard. */
+        if (!connected) {
+          return
+        }
         waiting = new Set()
         known = new Map(settled)
         for (const [id, at] of settled) {
@@ -477,31 +529,52 @@ export const connectGraph = (
     )
   }
 
+  /**
+   * Frames the selected note with its neighbors, where the selection changed
+   * and was not pressed in the drawing, where the reader is already looking.
+   */
+  const frameSelection = (): void => {
+    const selected = selectedNote()
+    if (selected === framed) {
+      pressed = undefined
+      return
+    }
+    framed = selected
+    if (
+      selected !== undefined &&
+      selected !== pressed &&
+      options.center !== false &&
+      drawnNodes.has(selected)
+    ) {
+      /* The note and the notes it links to and from, framed together, so a
+         neighborhood opens out to be read rather than sitting in a knot. */
+      const near = [selected]
+      for (const { source, target } of drawnLinks.values()) {
+        if (source === selected) {
+          near.push(target)
+        } else if (target === selected) {
+          near.push(source)
+        }
+      }
+      if (driver.fit && near.length > 1) {
+        driver.fit(near, !still())
+      } else {
+        driver.center?.(selected, !still())
+      }
+    }
+    pressed = undefined
+  }
+
   const handlePartChange = (event: Event): void => {
     const { kind } = (event as HelixGraphPartChangeEvent).detail
     if (kind === 'data') {
       draw()
+      /* A selection that came with the notes, as a page that loads a graph
+         with a note chosen, is framed once they are drawn. */
+      frameSelection()
     } else if (kind === 'focus') {
       restyle()
-      const selected = graph.active
-      if (selected && selected !== pressed && options.center !== false) {
-        /* The note and the notes it links to and from, framed together, so a
-           neighborhood opens out to be read rather than sitting in a knot. */
-        const near = [selected]
-        for (const { source, target } of drawnLinks.values()) {
-          if (source === selected) {
-            near.push(target)
-          } else if (target === selected) {
-            near.push(source)
-          }
-        }
-        if (driver.fit && near.length > 1) {
-          driver.fit(near, !still())
-        } else {
-          driver.center?.(selected, !still())
-        }
-      }
-      pressed = undefined
+      frameSelection()
     } else {
       driver.gestures?.(graph.gestureMode ?? 'free')
     }
@@ -588,9 +661,12 @@ export const connectGraph = (
       graph.drawn?.(false)
     },
     relayout: () => {
+      if (!connected) {
+        return
+      }
       known = new Map()
       waiting = new Set()
-      draw(true)
+      draw(true, true)
     },
     restyle: () => {
       colors = null

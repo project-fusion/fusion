@@ -49,7 +49,7 @@ export function Example() {
 
   return (
     <>
-      {/* Preview frame: data-preview-graph="three" has the frame connect three.js, and data-preview-graph-model names the model the notes are drawn on; on your page, connectGraph(frame, threeDriver(box), { stencil: { ...(await shapeFromModel(url)), place: 'surface' } }) does. */}
+      {/* Preview frame: data-preview-graph="three" has the frame connect three.js, and data-preview-graph-model names the model the notes are drawn on; on your page, in a module script, connectGraph(frame, threeDriver(box), { stencil: { ...(await shapeFromModel(url)), place: 'surface' } }) does. */}
       <helix-graph
         data-preview-graph="three"
         data-preview-graph-model="/media/models/torus-knot.glb"

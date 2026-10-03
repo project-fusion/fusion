@@ -1,6 +1,6 @@
 import type { ViewportGestureMode } from '@fusion.dev/helix-core'
 import type { GraphGroup } from '../connect-graph/connect-graph.js'
-import { type GraphLooks, mixRgb } from '../connect-graph/looks.js'
+import { type GraphLooks, mixRgb, rgbOf } from '../connect-graph/looks.js'
 
 /*
  * What a driver draws over its renderer, the same whatever the renderer: the
@@ -42,7 +42,7 @@ interface Flight {
 
 /** An `rgb()` color with an alpha, for a gradient's stops. */
 const withAlpha = (color: string, alpha: number): string => {
-  const [red = 128, green = 128, blue = 128] = color.match(/[\d.]+/g)?.map(Number) ?? []
+  const [red, green, blue] = rgbOf(color)
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`
 }
 
@@ -183,7 +183,7 @@ const arrive = (
 
 /** Whether an `rgb()` color is light, which a light ink says the ground is dark. */
 export const isLight = (color: string): boolean => {
-  const [red = 0, green = 0, blue = 0] = color.match(/[\d.]+/g)?.map(Number) ?? []
+  const [red, green, blue] = rgbOf(color, 0)
   return (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255 > 0.5
 }
 
@@ -198,6 +198,9 @@ export interface Box {
   top: number
 }
 
+/** How many of a group's notes say where its name goes. */
+const SAMPLED = 96
+
 /**
  * Each group's name over the middle of its notes, in the group's color made
  * quiet, ringed in the ground's color, and stepped back while a note outside
@@ -209,6 +212,7 @@ const nameGroups = (
   groups: readonly GraphGroup[],
   looks: GraphLooks,
   at: (id: string) => { x: number; y: number } | undefined,
+  avoid: readonly Box[],
 ): void => {
   /* **Named as a map names a region**: small capitals spread wide, lit in the
      group's color, over a soft fall of the ground's color in place of a hard
@@ -219,15 +223,21 @@ const nameGroups = (
   context.textBaseline = 'middle'
   context.shadowColor = looks.ground
   /* Where names already are, so two groups that meet on screen do not print
-     one name over the other. */
-  const taken: Box[] = []
+     one name over the other, nor over a note's name. */
+  const taken: Box[] = [...avoid]
   for (const group of groups) {
     let x = 0
     let y = 0
     let count = 0
     const points: { x: number; y: number }[] = []
-    for (const id of group.ids) {
-      const point = at(id)
+    /* **A sample of the group's notes, spread through it**, since the names
+       are drawn again on every frame the view moves: where a group's middle
+       is, read from a hundred of its notes, is where it is read from all. */
+    const step = Math.max(1, Math.floor(group.ids.length / SAMPLED))
+    let asked = 0
+    for (let index = 0; index < group.ids.length; index += step) {
+      asked += 1
+      const point = at(group.ids[index] as string)
       if (point) {
         x += point.x
         y += point.y
@@ -238,7 +248,7 @@ const nameGroups = (
     /* Named only where enough of the group is in view to say which notes
        the name means: a group mostly round the far side of a shape would be
        named over its neighbor's notes. */
-    if (count < Math.max(2, group.ids.length * 0.3)) {
+    if (count < Math.max(2, asked * 0.3)) {
       continue
     }
     x /= count
@@ -345,7 +355,8 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen) => {
   let glowing = false
 
   const fly = (now: number): void => {
-    const context = overlay ? fresh(overlay, container) : null
+    /* A drawing taken off the page draws nothing, and its signals are dropped. */
+    const context = overlay && container.isConnected ? fresh(overlay, container) : null
     if (!context) {
       flights = []
       return
@@ -360,7 +371,7 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen) => {
       if (!from || !to) {
         return false
       }
-      /* A little longer than the straight line, for the bow in its path. */
+      /* How long the crossing takes, from how far it goes, at one speed. */
       flight.crossing ??= Math.min(
         Math.max((Math.hypot(to.x - from.x, to.y - from.y) / SPEED) * 1000, QUICKEST),
         SLOWEST,
@@ -408,6 +419,9 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen) => {
       colors: { from: string; to: string } | undefined,
       animate: boolean,
     ): void => {
+      if (!container.isConnected) {
+        return
+      }
       overlay ??= layer(container, 'signals')
       flights.push({
         animate,
@@ -449,13 +463,17 @@ export interface Named {
  */
 export const namesOver = (container: HTMLElement, onScreen: OnScreen) => {
   const canvas = layer(container, 'names')
+  /* The boxes the names last drawn take, which group names keep clear of. */
+  let taken: Box[] = []
   return {
+    /** The boxes the names last drawn take. */
+    boxes: (): readonly Box[] => taken,
     draw: (looks: GraphLooks | undefined, named: readonly Named[]): void => {
       const context = looks ? fresh(canvas, container) : null
       if (!context || !looks) {
         return
       }
-      const taken: Box[] = []
+      taken = []
       for (const { id, name, strong } of named) {
         const at = onScreen(id)
         if (!at || looks.node(id).hidden) {
@@ -498,15 +516,21 @@ export const namesOver = (container: HTMLElement, onScreen: OnScreen) => {
 /**
  * **Group names are drawn on a canvas of their own**, under the signals', and
  * drawn again whenever the driver says the view moved, so they follow it.
+ * `avoid` says where notes' names are drawn, which a group's name keeps
+ * clear of: moved a line, or left out where no line is clear.
  */
-export const groupsOver = (container: HTMLElement, onScreen: OnScreen) => {
+export const groupsOver = (
+  container: HTMLElement,
+  onScreen: OnScreen,
+  avoid: () => readonly Box[] = () => [],
+) => {
   let canvas: HTMLCanvasElement | undefined
   let groups: readonly GraphGroup[] = []
   let looks: GraphLooks | undefined
   const draw = (): void => {
     const context = canvas && looks ? fresh(canvas, container) : null
     if (context && looks) {
-      nameGroups(context, groups, looks, onScreen)
+      nameGroups(context, groups, looks, onScreen, avoid())
     }
   }
   return {
@@ -527,22 +551,50 @@ export const groupsOver = (container: HTMLElement, onScreen: OnScreen) => {
   }
 }
 
+/** The attribute that says which gestures a renderer's container keeps from it. */
+const GESTURES = 'data-helix-graph-gestures'
+
+/**
+ * The rule that gives the page its touches over every canvas a renderer made,
+ * in the document or shadow root the container is in, added once there.
+ * **A renderer sets `touch-action: none` on its own canvases**, which the
+ * container's own `touch-action` cannot undo, since a touch takes the action
+ * of the element it lands on; only a rule with `!important` outranks the
+ * renderer's inline style.
+ */
+const touchRule = (container: HTMLElement): void => {
+  const root = container.getRootNode()
+  const holder = root instanceof ShadowRoot ? root : document.head
+  if (!holder || holder.querySelector(`style[${GESTURES}]`)) {
+    return
+  }
+  const style = document.createElement('style')
+  style.setAttribute(GESTURES, '')
+  style.textContent = `[${GESTURES}="cooperative"], [${GESTURES}="cooperative"] * { touch-action: pan-x pan-y !important; }
+[${GESTURES}="off"], [${GESTURES}="off"] * { touch-action: auto !important; }`
+  holder.append(style)
+}
+
 /**
  * **Held back from the renderer rather than switched off in it.** A
  * renderer's own switches turn its zoom and pan off for code as well, so the
  * frame's buttons stopped working with them. A listener on the container in
  * the capture phase runs before the renderer's, and keeps from it what the
  * page has: the plain wheel and one finger while cooperative, and every
- * gesture while a waiting surface is off.
+ * gesture while a waiting surface is off, a double click among them, which
+ * zooms where a renderer zooms on one. A single click still selects a note.
  */
 export const gesturesHeld = (container: HTMLElement) => {
   let mode: ViewportGestureMode = 'free'
-  const touchAction = container.style.touchAction
   const hold = (event: Event): void => {
     if (mode === 'free') {
       return
     }
     if (mode === 'off') {
+      /* The first click of two still selects; the second, which makes it a double click, is held. */
+      if (event.type === 'click' && (event as MouseEvent).detail < 2) {
+        return
+      }
       event.stopImmediatePropagation()
       return
     }
@@ -561,7 +613,7 @@ export const gesturesHeld = (container: HTMLElement) => {
       }
     }
   }
-  const held = ['wheel', 'touchstart', 'touchmove', 'mousedown'] as const
+  const held = ['wheel', 'touchstart', 'touchmove', 'mousedown', 'click', 'dblclick'] as const
   for (const type of held) {
     container.addEventListener(type, hold, { capture: true, passive: false })
   }
@@ -573,14 +625,18 @@ export const gesturesHeld = (container: HTMLElement) => {
      */
     set: (next: ViewportGestureMode): void => {
       mode = next
-      container.style.touchAction =
-        next === 'free' ? touchAction : next === 'cooperative' ? 'pan-x pan-y' : 'auto'
+      if (next === 'free') {
+        container.removeAttribute(GESTURES)
+      } else {
+        touchRule(container)
+        container.setAttribute(GESTURES, next)
+      }
     },
     stop: (): void => {
       for (const type of held) {
         container.removeEventListener(type, hold, { capture: true })
       }
-      container.style.touchAction = touchAction
+      container.removeAttribute(GESTURES)
     },
   }
 }

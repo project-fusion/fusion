@@ -275,9 +275,12 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     if (changed.has('nodes')) {
       this.sorted = sortedOf(this.nodes, this.closest?.('[lang]')?.getAttribute('lang') ?? '')
     }
-    if (changed.has('active') || changed.has('depth') || changed.has('links')) {
+    if (['nodes', 'links', 'active', 'depth'].some((name) => changed.has(name))) {
+      /* A selection whose note the graph no longer holds keeps nothing out,
+         as no selection would: kept to its depth, the list would be empty. */
+      const held = this.active !== '' && this.nodes.some((node) => node.id === this.active)
       this.kept =
-        typeof this.depth === 'number' && this.active !== ''
+        typeof this.depth === 'number' && held
           ? within(this.adjacency, this.active, Math.max(0, this.depth))
           : undefined
     }

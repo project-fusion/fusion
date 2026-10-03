@@ -212,13 +212,15 @@ export const fieldFromInside = (
 /**
  * A flat field from an SVG path in a box `width` by `height`, its holes cut by
  * the even-odd rule. Drawn once to a canvas and read off it, which is what
- * lets a detailed outline become a field in a moment.
+ * lets a detailed outline become a field in a moment. A box that starts
+ * somewhere other than 0, as an SVG `viewBox` can, is given as `origin`.
  */
 export const fieldFromPath = (
   path: string,
   width: number,
   height: number,
   resolution = FLAT,
+  origin: { x: number; y: number } = { x: 0, y: 0 },
 ): ShapeField => {
   const cell = Math.max(width, height, 1) / resolution
   const nx = Math.max(1, Math.ceil(width / cell))
@@ -230,6 +232,7 @@ export const fieldFromPath = (
   const cells = new Uint8Array(nx * ny)
   if (context) {
     context.scale(1 / cell, 1 / cell)
+    context.translate(-origin.x, -origin.y)
     context.fill(new Path2D(path), 'evenodd')
     const alpha = context.getImageData(0, 0, nx, ny).data
     for (let at = 0; at < cells.length; at++) {
@@ -281,5 +284,7 @@ export const inflate = (
     },
     height: flat.height,
     width: flat.width,
+    /* The flat shape's parts, through its whole depth. */
+    ...(flat.regionOf ? { regionOf: (x: number, y: number) => flat.regionOf?.(x, y) } : {}),
   }
 }

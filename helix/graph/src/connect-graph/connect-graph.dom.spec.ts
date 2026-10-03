@@ -173,15 +173,37 @@ describe('connectGraph', () => {
     expect(places.at(-1)).toBe('surface')
   })
 
-  test('leaves a graph with places of its own to the layout when a stencil is given', async () => {
+  test('shapes a graph with places of its own as well, so places kept from an earlier drawing come back in the shape', async () => {
     const host = await frame()
-    const recorder = recording(true, true)
-    connectGraph(host, recorder.driver, {
-      stencil: { height: 10, inside: (x) => x < 5, width: 10 },
-    })
+    const recorder = recording()
+    const places: string[] = []
+    connectGraph(
+      host,
+      { ...recorder.driver, shape: (place) => places.push(place ?? 'fill') },
+      { stencil: { height: 10, inside: (x) => x < 5, width: 10 } },
+    )
     await settled(host)
-    recorder.settle({ a: { x: 0, y: 0 }, b: { x: 50, y: 5 }, c: { x: -5, y: 5 } })
-    expect(recorder.asked.updates.flatMap((changes) => changes.changeNodes)).toEqual([])
+    expect([...recorder.unplaced()]).toEqual([])
+    expect(places).toEqual(['fill'])
+    expect(host.ready).toBe(true)
+  })
+
+  test('lays the graph out where the stencil has no inside to hold the notes, and says so', async () => {
+    const host = await frame()
+    const recorder = recording()
+    const warn = console.warn
+    const warned: unknown[] = []
+    console.warn = (message: unknown) => warned.push(message)
+    try {
+      connectGraph(host, recorder.driver, {
+        stencil: { height: 10, inside: () => false, width: 10 },
+      })
+      await settled(host)
+    } finally {
+      console.warn = warn
+    }
+    expect([...recorder.unplaced()].sort()).toEqual(['a', 'b', 'c'])
+    expect(String(warned[0])).toContain('no inside')
   })
 
   test('keeps where the layout put each note when the page adds one', async () => {
@@ -326,6 +348,47 @@ describe('connectGraph', () => {
     expect(host.ready).toBe(false)
     recorder.settle({ a: { x: 0, y: 0 }, b: { x: 5, y: 5 }, c: { x: -5, y: 5 }, d: { x: 1, y: 1 } })
     expect(host.ready).toBe(true)
+  })
+
+  test('a selection that arrives with the notes it names is framed once they are drawn', async () => {
+    const host = await frame()
+    const recorder = recording()
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    host.nodes = [...host.nodes, { id: 'd' }]
+    host.active = 'd'
+    await settled(host)
+    expect(recorder.asked.centered).toEqual(['d'])
+  })
+
+  test('relayout lays out every note again, the places the page gave them as well', async () => {
+    const host = await frame()
+    const recorder = recording()
+    const connection = connectGraph(host, recorder.driver)
+    await settled(host)
+    recorder.settle({ a: { x: 0, y: 0 }, b: { x: 5, y: 5 }, c: { x: -5, y: 5 } })
+    connection.relayout()
+    expect([...recorder.unplaced()].sort()).toEqual(['a', 'b', 'c'])
+  })
+
+  test('a layout that finishes after disconnect is not heard', async () => {
+    const host = await frame()
+    const recorder = recording()
+    const told: unknown[] = []
+    host.addEventListener('helix-graph-layout', (event) => told.push(event))
+    let finish: ((positions: ReadonlyMap<string, GraphPoint>) => void) | undefined
+    const connection = connectGraph(host, {
+      ...recorder.driver,
+      settle: (_, placed) => {
+        finish = placed
+        return () => {}
+      },
+    })
+    await settled(host)
+    connection.disconnect()
+    finish?.(new Map([['a', { x: 0, y: 0 }]]))
+    connection.relayout()
+    expect(told).toEqual([])
   })
 
   test('a note without a size is drawn as large as it is connected', async () => {

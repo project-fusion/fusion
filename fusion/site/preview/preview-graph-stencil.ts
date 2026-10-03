@@ -1,5 +1,6 @@
 import type { GraphStencil } from '@fusion.dev/helix-graph'
-import { inflate, shapeFromModel, shapeFromPath } from '@fusion.dev/helix-graph/shapes'
+import { shapeFromModel } from '@fusion.dev/helix-graph/model'
+import { inflate, shapeFromPath } from '@fusion.dev/helix-graph/shapes'
 
 /**
  * The shape an example draws its notes in, drawn as an SVG inside the frame
@@ -8,7 +9,8 @@ import { inflate, shapeFromModel, shapeFromPath } from '@fusion.dev/helix-graph/
  * which is what an example can carry.
  *
  * `data-preview-graph-depth` puffs the outline into a solid that deep, as
- * `inflate` does, and `data-preview-graph-place` is the stencil's `place`.
+ * `inflate` does, and `data-preview-graph-place`, on the drawing or the frame,
+ * is the stencil's `place`.
  */
 export const stencilOf = (frame: HTMLElement): GraphStencil | undefined => {
   const drawing = frame.querySelector<SVGSVGElement>('svg[data-preview-graph-stencil]')
@@ -23,12 +25,16 @@ export const stencilOf = (frame: HTMLElement): GraphStencil | undefined => {
     return undefined
   }
   const depth = Number(drawing.dataset.previewGraphDepth)
-  const place = drawing.dataset.previewGraphPlace === 'surface' ? 'surface' : 'fill'
+  const place = placeOf(drawing.dataset.previewGraphPlace ?? frame.dataset.previewGraphPlace)
   if (Number.isFinite(depth) && depth > 0) {
     return { ...inflate(shapeFromPath(path, width, height), { depth }), place }
   }
   return { height, path, place, width }
 }
+
+/** A stencil's `place`, from the attribute that names it: `fill` unless it says `surface`. */
+const placeOf = (named: string | undefined): 'fill' | 'surface' =>
+  named === 'surface' ? 'surface' : 'fill'
 
 /**
  * Which part of the model each group's notes go to, from the frame's
@@ -60,11 +66,11 @@ export const modelOf = async (frame: HTMLElement): Promise<GraphStencil | undefi
     const field = await shapeFromModel(url)
     return {
       ...field,
-      place: frame.dataset.previewGraphPlace === 'surface' ? 'surface' : 'fill',
+      place: placeOf(frame.dataset.previewGraphPlace),
       regions: regionsOf(frame),
     }
   } catch (error) {
-    console.error(`The model ${url} could not be read: ${String(error)}`)
+    console.error(error)
     return undefined
   }
 }

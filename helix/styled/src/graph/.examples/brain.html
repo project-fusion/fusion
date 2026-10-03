@@ -4,7 +4,7 @@
   rel="stylesheet"
 />
 
-<!-- Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl, and the SVG marked data-preview-graph-stencil is the shape it fits the notes into; on your page, connectGraph(frame, driver, { stencil: { path, width, height } }) does. -->
+<!-- Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl, and the SVG marked data-preview-graph-stencil is the shape it fits the notes into; on your page, connectGraph(frame, cosmosDriver(graph, box), { stencil: { path, width, height } }) does, and brain.css keeps the outline from showing. -->
 <helix-graph
   data-preview-graph="cosmos"
   id="mind"
@@ -66,8 +66,12 @@
   mind.nodes = nodes
   mind.links = links
 
-  /* Thoughts passing along the links, fifteen a second. */
-  setInterval(() => {
+  /* Thoughts passing along the links, fifteen a second, until the graph leaves the page. */
+  const sending = setInterval(() => {
+    if (!mind.isConnected) {
+      clearInterval(sending)
+      return
+    }
     const link = pick(mind.links)
     mind.signal(link.source, link.target)
   }, 66)

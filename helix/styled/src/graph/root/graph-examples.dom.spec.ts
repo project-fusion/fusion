@@ -77,13 +77,13 @@ describe('the large example', () => {
         links: { source: string; target: string }[]
         nodes: { group: string; id: string; shape?: string }[]
       }
-      expect(graph.nodes).toHaveLength(19992)
+      expect(graph.nodes).toHaveLength(20000)
       expect(new Set(graph.nodes.map((node) => node.group)).size).toBe(12)
       expect(graph.nodes.filter((node) => node.shape === 'square')).toHaveLength(96)
       const group = new Map(graph.nodes.map((node) => [node.id, node.group]))
       const within = graph.links.filter((link) => group.get(link.source) === group.get(link.target))
       expect(within.length / graph.links.length).toBeGreaterThan(0.95)
-      expect(part(graph, 'count')?.textContent).toBe('19,992 notes')
+      expect(part(graph, 'count')?.textContent).toBe('20,000 notes')
     },
   )
 

@@ -1,9 +1,4 @@
-import {
-  FLAT,
-  fieldFromCells,
-  fieldFromPath,
-  type ShapeField,
-} from '../connect-graph/shape-field.js'
+import { FLAT, fieldFromCells, fieldFromPath, type ShapeField } from './shape-field.js'
 
 /** The path an SVG shape element draws, as a path's `d`. */
 const pathOf = (element: Element): string => {
@@ -45,24 +40,28 @@ export const shapeFromSvg = (svg: SVGSVGElement | string, resolution = FLAT): Sh
     typeof svg === 'string'
       ? new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement
       : svg
-  const [, , width = 0, height = 0] = (element.getAttribute('viewBox') ?? '')
+  const [left = 0, top = 0, width = 0, height = 0] = (element.getAttribute('viewBox') ?? '')
     .trim()
     .split(/[\s,]+/)
     .map(Number)
+  /* A `viewBox` that starts somewhere other than 0, as `-50 -50 100 100` does. */
+  const origin = { x: Number.isFinite(left) ? left : 0, y: Number.isFinite(top) ? top : 0 }
   const box = {
     height: height || Number(element.getAttribute('height') ?? 0),
     width: width || Number(element.getAttribute('width') ?? 0),
   }
   const shapes = [...element.querySelectorAll('path, rect, circle, ellipse, polygon')]
   const path = shapes.map(pathOf).join(' ')
-  const field = fieldFromPath(path, box.width || 1, box.height || 1, resolution)
+  const field = fieldFromPath(path, box.width || 1, box.height || 1, resolution, origin)
   /* **Each shape with an `id`, or inside a group with one, a named part**,
      so a page can send a group of notes to a state on a map by its id. */
   const named = shapes.flatMap((shape) => {
     const name = shape.closest('[id]')?.getAttribute('id')
     return name && shape.closest('[id]') !== element ? [{ name, path: pathOf(shape) }] : []
   })
-  return named.length > 0 ? { ...field, regionOf: partsOf(named, field, resolution) } : field
+  return named.length > 0
+    ? { ...field, regionOf: partsOf(named, field, resolution, origin) }
+    : field
 }
 
 /**
@@ -75,6 +74,7 @@ const partsOf = (
   named: readonly { name: string; path: string }[],
   box: { height: number; width: number },
   resolution: number,
+  origin: { x: number; y: number },
 ): ((x: number, y: number) => string | undefined) => {
   const cell = Math.max(box.width, box.height, 1) / resolution
   const nx = Math.max(1, Math.ceil(box.width / cell))
@@ -86,6 +86,7 @@ const partsOf = (
   const labels = new Uint16Array(nx * ny)
   if (context) {
     context.scale(1 / cell, 1 / cell)
+    context.translate(-origin.x, -origin.y)
     named.forEach(({ path }, at) => {
       const label = at + 1
       context.fillStyle = `rgb(${label & 255}, ${(label >> 8) & 255}, 0)`

@@ -1,5 +1,5 @@
+import { fieldFromInside, fieldFromPath, type ShapeField } from '../shapes/shape-field.js'
 import type { GraphPoint } from './seed.js'
-import { fieldFromInside, fieldFromPath, type ShapeField } from './shape-field.js'
 import { surfaceWeb } from './surface-web.js'
 
 /**
@@ -149,15 +149,19 @@ export const placesIn = (
  * are drawn from an even spread over the whole shape several times as large
  * as needed, and each part takes the first of its own, which are spread
  * evenly over it since the spread comes in no order. Says which part each
- * place is for: a part's name, or undefined for the rest.
+ * place is for: a part's name, or undefined for the rest, and which of the
+ * parts asked for the shape does not have, whose notes are placed with the
+ * rest.
  */
 const placesByRegion = (
   field: ShapeField,
-  wanted: ReadonlyMap<string | undefined, number>,
+  asked: ReadonlyMap<string | undefined, number>,
   options: { place: 'fill' | 'surface'; shell: number },
-): { places: GraphPoint[]; regions: (string | undefined)[] } | undefined => {
+):
+  | { found: Set<string>; missing: string[]; places: GraphPoint[]; regions: (string | undefined)[] }
+  | undefined => {
   const regionOf = field.regionOf
-  const count = [...wanted.values()].reduce((sum, many) => sum + many, 0)
+  const count = [...asked.values()].reduce((sum, many) => sum + many, 0)
   if (!regionOf) {
     return undefined
   }
@@ -177,6 +181,21 @@ const placesByRegion = (
         byRegion.set(region, [place])
       }
     })
+    /* **A part the shape does not have**, as one misspelled, is looked for
+       again in a finer spread, since a small part can be missed by a coarse
+       one, and in the finest its notes join the rest. */
+    const found = new Set([...byRegion.keys()].filter((region) => region !== undefined))
+    const missing = [...asked.keys()].filter(
+      (region): region is string => region !== undefined && !found.has(region),
+    )
+    if (missing.length > 0 && times * 2 <= 24) {
+      continue
+    }
+    const wanted = new Map<string | undefined, number>()
+    for (const [region, many] of asked) {
+      const part = region !== undefined && found.has(region) ? region : undefined
+      wanted.set(part, (wanted.get(part) ?? 0) + many)
+    }
     const claimed = new Set<string | undefined>(
       [...wanted.keys()].filter((region) => region !== undefined),
     )
@@ -209,7 +228,7 @@ const placesByRegion = (
       places.push(place)
       regions.push(undefined)
     }
-    return { places, regions }
+    return { found, missing, places, regions }
   }
   return undefined
 }
@@ -260,7 +279,9 @@ export const fitToStencil = (
  * `middle.y - (y - height / 2) * scale` and `middle.z + (z - depth / 2) * scale`.
  */
 export interface StencilFrame {
+  /** The stencil's shape, as a field, whatever form it was given in. */
   field: ShapeField
+  /** Where the middle of the stencil's box was put, in the places' units. */
   middle: { x: number; y: number; z: number }
   /** How many of the places' units one of the box's is. */
   scale: number
@@ -298,18 +319,34 @@ export const fitInStencil = (
       return [note.id, group === undefined ? undefined : stencil.regions?.[group]]
     }),
   )
+  const asked = new Map<string | undefined, number>()
+  for (const region of noteRegion.values()) {
+    asked.set(region, (asked.get(region) ?? 0) + 1)
+  }
+  const regional = [...asked.keys()].some((region) => region !== undefined)
+    ? placesByRegion(field, asked, options)
+    : undefined
+  if (regional && regional.missing.length > 0) {
+    console.warn(
+      `fitInStencil: the shape has no part named ${regional.missing.map((part) => `"${part}"`).join(', ')}, so the notes sent there are placed with the rest. Its parts: ${[...regional.found].join(', ') || 'none'}.`,
+    )
+  } else if (!regional && [...asked.keys()].some((region) => region !== undefined)) {
+    console.warn(
+      field.regionOf
+        ? 'fitInStencil: the parts named in regions are too small for the notes sent to them, so the notes are placed over the whole shape.'
+        : 'fitInStencil: the shape has no named parts, so regions is not used and the notes are placed over the whole shape.',
+    )
+  }
+  /* Each note's part, now that the parts the shape lacks are known: the
+     rest's, where its part is missing or the parts were not used at all. */
+  for (const [id, region] of noteRegion) {
+    if (region !== undefined && !regional?.found.has(region)) {
+      noteRegion.set(id, undefined)
+    }
+  }
   const wanted = new Map<string | undefined, number>()
   for (const region of noteRegion.values()) {
     wanted.set(region, (wanted.get(region) ?? 0) + 1)
-  }
-  const regional =
-    stencil.regions && [...wanted.keys()].some((region) => region !== undefined)
-      ? placesByRegion(field, wanted, options)
-      : undefined
-  if (!regional) {
-    for (const id of noteRegion.keys()) {
-      noteRegion.set(id, undefined)
-    }
   }
   const places = regional?.places ?? placesIn(field, notes.length, options)
   const placeRegion = regional?.regions ?? places.map(() => undefined)

@@ -35,8 +35,7 @@ const start = (frame: HTMLElement): (() => void) => {
     frame,
     sigmaDriver(sigma, {
       emphasis: asked.previewGraphEmphasis as never,
-      layout: (graph) =>
-        new FA2Layout(graph as never, { settings: forceAtlas2.inferSettings(graph as never) }),
+      layout: (graph) => new FA2Layout(graph, { settings: forceAtlas2.inferSettings(graph) }),
       material: asked.previewGraphMaterial as never,
       shape: asked.previewGraphShape as never,
     }),
