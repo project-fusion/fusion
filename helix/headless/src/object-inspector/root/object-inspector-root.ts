@@ -79,8 +79,8 @@ const child = (path: string, key: string): string =>
  * @csspart boolean - A `true` or `false`.
  * @csspart copy - The copy button, which copies the active row.
  * @csspart copy-button - The button inside the copy control.
- * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart copy-mark - The clipboard icon, and the confirmation icon that replaces it.
+ * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart copy-tooltip - The tooltip, forwarded from the copy button's tooltip.
  * @csspart copy-tooltip-arrow - The tooltip's arrow, pointing at the copy button.
  * @csspart copy-tooltip-arrow-bottom - The arrow while the tooltip is below the copy button, on the tooltip's top edge. Set alongside `copy-tooltip-arrow`.
