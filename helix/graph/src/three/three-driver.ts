@@ -14,7 +14,7 @@ import {
   Euler,
   InstancedBufferAttribute,
   InstancedMesh,
-  LineSegments,
+  type InterleavedBufferAttribute,
   Matrix4,
   Mesh,
   NormalBlending,
@@ -31,6 +31,9 @@ import {
   WebGLRenderer,
 } from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js'
+import { LineSegments2 } from 'three/addons/lines/LineSegments2.js'
+import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js'
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
 import type {
   DrawnLink,
@@ -55,6 +58,12 @@ import { surfaceOf } from './surface.js'
 
 /** How the three.js driver behaves where the page does not say. */
 export interface ThreeDriverOptions {
+  /**
+   * How many pixels the drawing has for each of the page's. By default half
+   * as many again as the screen has, at least two and at most three, which
+   * smooths every edge. Fewer is faster on a slow GPU.
+   */
+  density?: number | undefined
   /**
    * Whether the graph turns slowly while nobody is handling it. On by
    * default, and never for a reader who asks for less motion.
@@ -91,7 +100,7 @@ const SAMPLE = 96
  * close. Fainter on a dark ground, where links add their light together and
  * a hub's fan of thousands burns white.
  */
-const LINKS = { dark: { close: 0.3, far: 0.05 }, light: { close: 0.55, far: 0.12 } }
+const LINKS = { dark: { close: 0.16, far: 0.025 }, light: { close: 0.36, far: 0.07 } }
 
 /** How long the graph rests after the reader lets go before it turns again, in milliseconds. */
 const REST = 8000
@@ -116,6 +125,9 @@ const LIGHT = new Vector3(-0.4, 0.8, 0.45).normalize()
 
 /** How high a signal's path rises over the shape, as a share of how far it goes. */
 const LIFT = 0.42
+
+/** How wide links are drawn, in pixels on screen: all of them, and the ones the reader is on. */
+const WIDTH = { lit: 1.8, quiet: 0.8 }
 
 /** The field of view, in degrees. Narrow, so depth reads without the edges stretching. */
 const FOV = 40
@@ -322,32 +334,6 @@ void main() {
 `
 
 // language=GLSL
-const LINE_VERTEX = /* glsl */ `
-${FADE}
-attribute vec3 color;
-varying vec3 vColor;
-varying float vFade;
-
-void main() {
-  vec4 view = modelViewMatrix * vec4(position, 1.0);
-  gl_Position = projectionMatrix * view;
-  vColor = color;
-  vFade = fade(max(-view.z, 0.001));
-}
-`
-
-// language=GLSL
-const LINE_FRAGMENT = /* glsl */ `
-uniform float opacity;
-varying vec3 vColor;
-varying float vFade;
-
-void main() {
-  gl_FragColor = vec4(vColor, opacity * vFade);
-}
-`
-
-// language=GLSL
 const SOLID_VERTEX = /* glsl */ `
 attribute vec4 wash;
 varying vec3 vNormal;
@@ -497,7 +483,13 @@ export const threeDriver = (
 ): GraphDriver => {
   const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
   const renderer = new WebGLRenderer({ alpha: true, antialias: true })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+  /* **Drawn finer than the screen and smoothed down**: half as many pixels
+     again as the screen has, and never fewer than two for each of the
+     page's, so on a screen of one every edge is drawn twice as finely, and
+     a dense phone's three are met. A page with a slow GPU asks for fewer. */
+  renderer.setPixelRatio(
+    options.density ?? Math.min(Math.max((window.devicePixelRatio || 1) * 1.5, 2), 3),
+  )
   renderer.setClearColor(0x000000, 0)
   const canvas = renderer.domElement
   canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block'
@@ -543,20 +535,35 @@ export const threeDriver = (
     steep: { value: 0 },
     unit: { value: 1 },
   }
-  /** A material for links, which fade behind the graph's middle as its notes do. */
-  const lines = (opacity: number): ShaderMaterial =>
-    new ShaderMaterial({
+  /**
+   * A material for links: **lines of a set width with smooth edges**, as
+   * meshes, since WebGL draws its own lines a device pixel wide whatever is
+   * asked, a hairline on a dense screen that shimmers as the graph turns.
+   * They fade behind the graph's middle as its notes do.
+   */
+  const lines = (opacity: number, width: number): LineMaterial => {
+    const material = new LineMaterial({
       depthWrite: false,
-      fragmentShader: LINE_FRAGMENT,
+      linewidth: width,
+      opacity,
       transparent: true,
-      uniforms: {
-        middle: uniforms.middle,
-        opacity: { value: opacity },
-        radius: uniforms.radius,
-        steep: uniforms.steep,
-      },
-      vertexShader: LINE_VERTEX,
+      vertexColors: true,
     })
+    material.onBeforeCompile = (shader) => {
+      shader.uniforms.middle = uniforms.middle
+      shader.uniforms.radius = uniforms.radius
+      shader.uniforms.steep = uniforms.steep
+      shader.vertexShader = `${FADE}\nvarying float vLinkFade;\n${shader.vertexShader.replace(
+        'vec4 end = modelViewMatrix * vec4( instanceEnd, 1.0 );',
+        'vec4 end = modelViewMatrix * vec4( instanceEnd, 1.0 );\nvLinkFade = fade(max(-(position.y < 0.5 ? start.z : end.z), 0.001));',
+      )}`
+      shader.fragmentShader = `varying float vLinkFade;\n${shader.fragmentShader.replace(
+        'gl_FragColor = vec4( diffuseColor.rgb, alpha );',
+        'gl_FragColor = vec4( diffuseColor.rgb, alpha * vLinkFade );',
+      )}`
+    }
+    return material
+  }
   /* **Notes in two passes**: their bodies, solid, writing their depth, and
      after them their halos, which are light and hide behind what is solid. */
   const points = new Points(
@@ -607,8 +614,8 @@ export const threeDriver = (
       spots: [] as number[],
     },
   }
-  const quiet = new LineSegments(new BufferGeometry(), lines(LINKS.dark.far))
-  const lit = new LineSegments(new BufferGeometry(), lines(0.9))
+  const quiet = new LineSegments2(new LineSegmentsGeometry(), lines(LINKS.dark.far, WIDTH.quiet))
+  const lit = new LineSegments2(new LineSegmentsGeometry(), lines(0.9, WIDTH.lit))
   quiet.frustumCulled = false
   lit.frustumCulled = false
   /* **The shape the notes are on, drawn in the ground's color** just inside
@@ -1148,13 +1155,17 @@ export const threeDriver = (
       ends.push(from, to)
       tints.push(...color, ...color)
     }
-    const fill = (line: LineSegments, ends: number[], tints: number[]): void => {
+    const fill = (line: LineSegments2, ends: number[], tints: number[]): void => {
       const place = new Float32Array(ends.length * 3)
       ends.forEach((spot, step) => {
         place.set(positions.subarray(spot * 3, spot * 3 + 3), step * 3)
       })
-      line.geometry.setAttribute('position', new BufferAttribute(place, 3))
-      line.geometry.setAttribute('color', new BufferAttribute(new Float32Array(tints), 3))
+      line.geometry.dispose()
+      line.geometry = new LineSegmentsGeometry()
+      if (ends.length > 0) {
+        line.geometry.setPositions(place)
+        line.geometry.setColors(tints)
+      }
       line.userData.ends = ends
     }
     fill(quiet, quietEnds, quietTints)
@@ -1165,14 +1176,18 @@ export const threeDriver = (
   const followLinks = (): void => {
     for (const line of [quiet, lit]) {
       const ends = line.userData.ends as number[] | undefined
-      const place = line.geometry.getAttribute('position') as BufferAttribute | undefined
+      const place = line.geometry.getAttribute('instanceStart') as
+        | InterleavedBufferAttribute
+        | undefined
       if (!ends || !place) {
         continue
       }
+      /* Start and end are read from one buffer, six numbers a link. */
+      const array = place.data.array as Float32Array
       ends.forEach((spot, step) => {
-        place.array.set(positions.subarray(spot * 3, spot * 3 + 3), step * 3)
+        array.set(positions.subarray(spot * 3, spot * 3 + 3), step * 3)
       })
-      place.needsUpdate = true
+      place.data.needsUpdate = true
     }
   }
 
@@ -1249,8 +1264,7 @@ export const threeDriver = (
     /* Links clear as the reader comes close and faint across the whole graph. */
     const closeness = Math.min(Math.max(1 - distance / (radius * 3), 0), 1)
     const shade = LINKS[dark ? 'dark' : 'light']
-    ;(quiet.material.uniforms.opacity as { value: number }).value =
-      shade.far + (shade.close - shade.far) * closeness
+    quiet.material.opacity = shade.far + (shade.close - shade.far) * closeness
   }
 
   let pending = 0
@@ -1355,29 +1369,33 @@ export const threeDriver = (
   const raycaster = new Raycaster()
   const pointer = new Vector2()
   let hovering = 0
-  const hover = (event: PointerEvent): void => {
+  /** The note under a point of the page, or undefined where there is none. */
+  const noteAt = (clientX: number, clientY: number): number | undefined => {
     const box = canvas.getBoundingClientRect()
     pointer.set(
-      ((event.clientX - box.left) / box.width) * 2 - 1,
-      -((event.clientY - box.top) / box.height) * 2 + 1,
+      ((clientX - box.left) / box.width) * 2 - 1,
+      -((clientY - box.top) / box.height) * 2 + 1,
     )
+    raycaster.setFromCamera(pointer, camera)
+    raycaster.params.Points = { threshold: uniforms.unit.value * 2.4 }
+    /* A note behind the shape is hidden by it, so the pointer cannot be on it. */
+    const front = solid.visible
+      ? (raycaster.intersectObject(solid, false)[0]?.distance ?? Number.POSITIVE_INFINITY)
+      : Number.POSITIVE_INFINITY
+    return raycaster.intersectObject(points, false).find((one) => {
+      const id = one.index === undefined ? undefined : ids[one.index]
+      return (
+        id !== undefined &&
+        looks?.node(id).hidden !== true &&
+        one.distance < front + uniforms.unit.value * 3
+      )
+    })?.index
+  }
+  const hover = (event: PointerEvent): void => {
+    const { clientX, clientY } = event
     cancelAnimationFrame(hovering)
     hovering = requestAnimationFrame(() => {
-      raycaster.setFromCamera(pointer, camera)
-      raycaster.params.Points = { threshold: uniforms.unit.value * 2.4 }
-      /* A note behind the shape is hidden by it, so the pointer cannot be on it. */
-      const front = solid.visible
-        ? (raycaster.intersectObject(solid, false)[0]?.distance ?? Number.POSITIVE_INFINITY)
-        : Number.POSITIVE_INFINITY
-      const hit = raycaster.intersectObject(points, false).find((one) => {
-        const id = one.index === undefined ? undefined : ids[one.index]
-        return (
-          id !== undefined &&
-          looks?.node(id).hidden !== true &&
-          one.distance < front + uniforms.unit.value * 3
-        )
-      })
-      const next = hit?.index
+      const next = noteAt(clientX, clientY)
       if (next !== hovered) {
         hovered = next
         canvas.style.cursor = next === undefined ? '' : 'pointer'
@@ -1451,17 +1469,16 @@ export const threeDriver = (
       const end = (event: PointerEvent): void => {
         const was = down
         down = undefined
-        /* A press, where a drag that turned the graph is not one. */
+        /* A press, where a drag that turned the graph is not one: on the
+           note under it, found now, since a finger has no hover before it;
+           or, on no note, a press away. */
         if (
           was &&
           Math.hypot(event.clientX - was.x, event.clientY - was.y) < 5 &&
-          performance.now() - was.time < 500 &&
-          hovered !== undefined
+          performance.now() - was.time < 500
         ) {
-          const id = ids[hovered]
-          if (id !== undefined) {
-            press(id)
-          }
+          const spot = noteAt(event.clientX, event.clientY)
+          press(spot === undefined ? undefined : ids[spot])
         }
       }
       canvas.addEventListener('pointerdown', start)

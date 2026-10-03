@@ -36,7 +36,7 @@ const recording = (withLayout = true, incremental = false) => {
     updates: [] as GraphChanges[],
     zoomed: [] as number[],
   }
-  let press: ((id: string) => void) | undefined
+  let press: ((id: string | undefined) => void) | undefined
   let settle: ((positions: ReadonlyMap<string, GraphPoint>) => void) | undefined
   let unplaced: ReadonlySet<string> = new Set()
   const driver: GraphDriver = {
@@ -72,7 +72,7 @@ const recording = (withLayout = true, incremental = false) => {
   return {
     asked,
     driver,
-    press: (id: string) => press?.(id),
+    press: (id: string | undefined) => press?.(id),
     settle: (positions: Record<string, GraphPoint>) => settle?.(new Map(Object.entries(positions))),
     unplaced: () => unplaced,
   }
@@ -231,6 +231,19 @@ describe('connectGraph', () => {
     host.active = 'c'
     await settled(host)
     expect(recorder.asked.centered).toEqual(['c'])
+  })
+
+  test('a press on no note lets the selection go', async () => {
+    const host = await frame()
+    const recorder = recording()
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    recorder.press('b')
+    await settled(host)
+    expect(host.active).toBe('b')
+    recorder.press(undefined)
+    await settled(host)
+    expect(host.active).toBe('')
   })
 
   test('a press the page refuses selects nothing', async () => {

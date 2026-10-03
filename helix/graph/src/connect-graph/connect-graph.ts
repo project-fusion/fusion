@@ -83,8 +83,12 @@ export interface GraphDriver {
    * of the view at a zoom that holds them all, where the renderer can.
    */
   fit?(ids: readonly string[], animate: boolean): void
-  /** Calls `press` with a note's `id` when the reader presses it in the drawing. Returns what stops listening. */
-  onPress?(press: (id: string) => void): () => void
+  /**
+   * Calls `press` with a note's `id` when the reader presses it in the
+   * drawing, and with undefined when they press where no note is. Returns
+   * what stops listening.
+   */
+  onPress?(press: (id: string | undefined) => void): () => void
   /**
    * Runs a layout over the drawn graph, moving the notes in `unplaced` and
    * holding the rest, and calls `placed` once it has settled with where every
@@ -524,8 +528,17 @@ export const connectGraph = (
   frame.addEventListener(HelixGraphZoomEvent.eventName, handleZoom)
 
   /* A press in the drawing asks the frame, which a page can refuse, and the
-     note pressed is not moved: the reader is looking at it. */
+     note pressed is not moved: the reader is looking at it. **A press on no
+     note lets the selection go**, so the graph's colors come back, as a
+     click away from a selection does anywhere else. */
   const stopPress = driver.onPress?.((id) => {
+    if (id === undefined) {
+      pressed = undefined
+      if (graph.active) {
+        graph.requestActive?.('')
+      }
+      return
+    }
     pressed = id
     if (graph.requestActive?.(id) === false || graph.active !== id) {
       pressed = undefined

@@ -11,7 +11,7 @@
  *
  * - **A torus knot**, from three.js's own geometry, three times round, which
  *   reads as a knot from any side a reader turns it to, in as few triangles
- *   as a field 96 cells across can tell apart from more.
+ *   as a field 144 cells across can tell apart from more.
  * - **A brain**, from the distance field in `brain-model.mjs`, wrapped in
  *   triangles by the surface nets the Graph driver draws shapes with, fine
  *   enough to hold its folds, and written in its lobes, one named mesh each,

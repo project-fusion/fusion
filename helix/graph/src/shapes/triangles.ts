@@ -11,7 +11,7 @@ export interface TriangleOptions {
    * `regionOf`, the part a point is in: the part of the triangle nearest it.
    */
   regions?: { names: readonly string[]; ofTriangle: ArrayLike<number> } | undefined
-  /** How many cells the field has along the solid's longest side. 96 by default. */
+  /** How many cells the field has along the solid's longest side. 144 by default. */
   resolution?: number | undefined
 }
 
