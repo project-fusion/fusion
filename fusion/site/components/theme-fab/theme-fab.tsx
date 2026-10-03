@@ -80,7 +80,11 @@ export const ThemeFab = () => {
   }, [open])
 
   return (
-    <div className={styles.fabRail} data-retired={nearFooter ? '' : undefined}>
+    <div
+      className={styles.fabRail}
+      data-open={open || undefined}
+      data-retired={nearFooter ? '' : undefined}
+    >
       <div
         className={`${styles.fab} ${open ? styles.fabOpen : ''}`}
         data-open={open || undefined}
