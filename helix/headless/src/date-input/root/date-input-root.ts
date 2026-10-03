@@ -74,6 +74,7 @@ const dates = (value: string): string[] =>
  * @csspart date - One held date, as a tag, in `multiple`.
  * @csspart date-dismiss - The remove button, when `dismissible`.
  * @csspart date-dismiss-mark - The icon on the remove button, shown when no icon is slotted.
+ * @csspart date-label - The label, trimmed to its capitals and baseline.
  * @csspart date-start - The category before the label.
  * @csspart feedback - The error message under the field.
  * @csspart field - The box that holds the text and the trigger.
@@ -590,7 +591,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   protected renderTag(date: string): TemplateResult {
     return html`<${this.tag('tag')}
                   part="date"
-      exportparts="dismiss: date-dismiss, dismiss-mark: date-dismiss-mark, start: date-start"
+      exportparts="dismiss: date-dismiss, dismiss-mark: date-dismiss-mark, label: date-label, start: date-start"
                   dismissible
                   dismiss-label=${fillTemplate(this.removeLabel, { name: this.written(date) })}
                   ?disabled=${this.isDisabled}
