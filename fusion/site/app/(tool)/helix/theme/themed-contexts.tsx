@@ -81,6 +81,23 @@ export interface Context {
   /** What a reader picks this context by. */
   label: string
   /**
+   * The words a local business's page says: an announcement over the page,
+   * the rating under the hero, three prices, how it goes, what people ask,
+   * and where to find it.
+   */
+  local: {
+    announcement: string
+    contact: { cta: string; heading: string }
+    faq: readonly { answer: string; question: string }[]
+    faqHeading: string
+    rating: { count: string; score: string }
+    steps: readonly { body: string; title: string }[]
+    stepsHeading: string
+    tiers: readonly { includes: readonly string[]; name: string; price: string }[]
+    tiersHeading: string
+    visit: { address: string; body: string; heading: string; hours: string }
+  }
+  /**
    * What the map layout needs: a panel over a map, and the places on it.
    *
    * **The table's four rows, put where they happen**, each keeping its state,
@@ -268,6 +285,60 @@ export const CONTEXTS: readonly Context[] = [
       secondary: 'Book a walkthrough',
     },
     label: 'Logistics platform',
+    local: {
+      announcement: 'Now watching every port on the North Sea.',
+      contact: { cta: 'Send', heading: 'Talk to the team' },
+      faq: [
+        {
+          answer: 'Most teams see their first warning the day after they connect a carrier.',
+          question: 'How long does it take to set up?',
+        },
+        {
+          answer: 'Every carrier that publishes a schedule, and any that sends telematics.',
+          question: 'Which carriers do you read?',
+        },
+        {
+          answer: 'Yes. Your history exports as a file whenever you ask.',
+          question: 'Can we take our data with us?',
+        },
+      ],
+      faqHeading: 'What shippers ask',
+      rating: { count: 'from 212 shippers', score: '4.8' },
+      steps: [
+        {
+          body: 'We read their schedules, the terminals and the telematics.',
+          title: 'Connect your carriers',
+        },
+        { body: 'Pick the routes you want watched.', title: 'Choose your lanes' },
+        { body: 'Say who hears about a late arrival, and how.', title: 'Set your alerts' },
+        { body: 'The first warnings arrive within a day.', title: 'See tomorrow' },
+      ],
+      stepsHeading: 'How it starts',
+      tiers: [
+        {
+          includes: ['Up to 20 lanes', 'A morning digest of arrivals', 'Alerts by email'],
+          name: 'Starter',
+          price: '$400 a month',
+        },
+        {
+          includes: ['Up to 100 lanes', 'The live map', 'Alerts to your phone'],
+          name: 'Fleet',
+          price: '$1,200 a month',
+        },
+        {
+          includes: ['Every lane you run', 'An account manager', 'Your history, exported nightly'],
+          name: 'Network',
+          price: '$3,000 a month',
+        },
+      ],
+      tiersHeading: 'One price for each size of network',
+      visit: {
+        address: 'Wilhelminakade 91, Rotterdam',
+        body: 'See the warnings arrive on the wall of the operations room.',
+        heading: 'Visit the operations room',
+        hours: 'Weekdays, 9 to 5',
+      },
+    },
     map: {
       heading: 'Arrivals today',
       label: 'Where today’s shipments arrive',
@@ -510,6 +581,65 @@ export const CONTEXTS: readonly Context[] = [
       secondary: 'Read a sample',
     },
     label: 'Publication',
+    local: {
+      announcement: 'The winter series starts on Monday.',
+      contact: { cta: 'Send', heading: 'Write to the editors' },
+      faq: [
+        {
+          answer: 'Three pieces a month are free, with no account.',
+          question: 'Can I read before I subscribe?',
+        },
+        {
+          answer: 'Yes. A gift starts on the day you choose.',
+          question: 'Can I give a subscription?',
+        },
+        {
+          answer: 'No. Your questions reach them without your name.',
+          question: 'Do reporters see my details?',
+        },
+      ],
+      faqHeading: 'What readers ask',
+      rating: { count: 'from 1,840 readers', score: '4.9' },
+      steps: [
+        { body: 'Each one starts the day you subscribe.', title: 'Choose a plan' },
+        { body: 'Every piece, back to the first issue.', title: 'Read the archive' },
+        { body: 'Reporters answer readers each Friday.', title: 'Ask a question' },
+        { body: 'One step either way.', title: 'Renew or leave' },
+      ],
+      stepsHeading: 'How a subscription works',
+      tiers: [
+        {
+          includes: ['Every piece', 'On any device', 'Cancel whenever you like'],
+          name: 'Reader',
+          price: '$6 a month',
+        },
+        {
+          includes: [
+            'Everything a reader has',
+            'The print edition, quarterly',
+            'Questions to the reporters',
+          ],
+          name: 'Supporter',
+          price: '$12 a month',
+        },
+        {
+          includes: [
+            'Everything a supporter has',
+            'Your name in the annual report',
+            'One commission a year',
+          ],
+          name: 'Patron',
+          price: '$30 a month',
+        },
+      ],
+      tiersHeading: 'Read it, support it, or commission it',
+      visit: {
+        address: '14 Harbour Street, Leith',
+        body: 'Readers are welcome at the Friday briefing.',
+        heading: 'Visit the newsroom',
+        hours: 'Fridays, 10 to 12',
+      },
+    },
     map: {
       heading: 'Filed this week',
       label: 'Where this week’s pieces were filed',
@@ -693,6 +823,54 @@ export const CONTEXTS: readonly Context[] = [
       secondary: 'Order swatches',
     },
     label: 'Storefront',
+    local: {
+      announcement: 'Swatches are free and arrive in two days.',
+      contact: { cta: 'Send', heading: 'Ask the weavers' },
+      faq: [
+        {
+          answer: 'Send it back within sixty days for a full refund.',
+          question: 'What if it is not right?',
+        },
+        {
+          answer: 'Cold, by hand or on a wool cycle, and dry it flat.',
+          question: 'How do I wash it?',
+        },
+        { answer: 'To the UK and the EU, with duties paid.', question: 'Do you ship abroad?' },
+      ],
+      faqHeading: 'What customers ask',
+      rating: { count: 'from 3,120 orders', score: '4.8' },
+      steps: [
+        { body: 'Up to six, free, in two days.', title: 'Order swatches' },
+        { body: 'Hold each one before you pick.', title: 'Choose your cloth' },
+        { body: 'Your blanket is made in the week you order it.', title: 'We weave it' },
+        { body: 'Dispatched within four days of weaving.', title: 'It arrives' },
+      ],
+      stepsHeading: 'From swatch to bed',
+      tiers: [
+        {
+          includes: ['140 by 180 centimeters', 'Merino or cotton', 'Sixty days to return it'],
+          name: 'Throw',
+          price: '$90',
+        },
+        {
+          includes: ['200 by 230 centimeters', 'Merino or cotton', 'Sixty days to return it'],
+          name: 'Blanket',
+          price: '$160',
+        },
+        {
+          includes: ['260 by 260 centimeters', 'Merino only', 'Sixty days to return it'],
+          name: 'Bedspread',
+          price: '$240',
+        },
+      ],
+      tiersHeading: 'Three sizes, one price each',
+      visit: {
+        address: 'Mill Lane, Hebden Bridge',
+        body: 'Watch the looms, and hold every cloth in the range.',
+        heading: 'Visit the mill',
+        hours: 'Saturdays, 10 to 4',
+      },
+    },
     map: {
       heading: 'Orders today',
       label: 'Where today’s orders are going',
@@ -899,6 +1077,51 @@ export const CONTEXTS: readonly Context[] = [
       secondary: 'Secondary',
     },
     label: 'Generic',
+    local: {
+      announcement: 'An announcement, on a band of its own',
+      contact: { cta: 'Send', heading: 'A form to get in touch' },
+      faq: [
+        { answer: 'Its answer, in a sentence.', question: 'A question somebody asks' },
+        {
+          answer: 'Another answer, a little longer than the first one.',
+          question: 'Another question',
+        },
+        { answer: 'A third answer.', question: 'A third question' },
+      ],
+      faqHeading: 'Questions, with their answers',
+      rating: { count: 'from a count of reviews', score: '4.8' },
+      steps: [
+        { body: 'What happens first.', title: 'First step' },
+        { body: 'What happens next.', title: 'Second step' },
+        { body: 'What follows that.', title: 'Third step' },
+        { body: 'How it ends.', title: 'Last step' },
+      ],
+      stepsHeading: 'How it goes, in order',
+      tiers: [
+        {
+          includes: ['A thing it includes', 'Another thing', 'A third thing'],
+          name: 'Small',
+          price: '$10',
+        },
+        {
+          includes: ['Everything in Small', 'One thing more', 'And another'],
+          name: 'Medium',
+          price: '$20',
+        },
+        {
+          includes: ['Everything in Medium', 'The most of it', 'Something only Large has'],
+          name: 'Large',
+          price: '$30',
+        },
+      ],
+      tiersHeading: 'Three tiers, each with a price',
+      visit: {
+        address: 'An address',
+        body: 'Why somebody would come in person.',
+        heading: 'A place to visit',
+        hours: 'Opening hours',
+      },
+    },
     map: {
       heading: 'A map',
       label: 'A map with four places',

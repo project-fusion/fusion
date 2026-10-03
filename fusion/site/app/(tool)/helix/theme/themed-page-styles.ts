@@ -681,4 +681,152 @@ export const THEMED_PAGE_STYLES = css`
       grid-template-columns: minmax(0, 1fr);
     }
   }
+
+  /* ---------------------------------------------------------------------- *
+     The local business layout: a services site's page.
+
+     **The shape a pool builder's or a joiner's site has**: an announcement over
+     everything, a hero on a picture with the one call to action and a rating
+     under it, three prices, the steps, the questions, and where to find them.
+   * ---------------------------------------------------------------------- */
+  .themedLocal {
+    --themed-measure: 64rem;
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* On the brand fill, as an announcement is, unless the builder gives it a
+     color of its own. */
+  .themedLocalBar {
+    background-color: var(--helix-color-primary-surface);
+    color: var(--helix-color-foreground-on-accent);
+    padding: var(--helix-space-xs) var(--helix-space-lg);
+    text-align: center;
+  }
+
+  /* **A picture drawn from the theme**: the media ground, lit from above by the
+     brand, which is what a photograph under a caption is to the tokens. Its
+     words take the media ink, the pair the theme measures for exactly this. */
+  .themedLocalHero {
+    background-color: var(--helix-color-surface-media);
+    background-image:
+      radial-gradient(ellipse 80% 70% at 50% 0%, color-mix(in oklab, var(--helix-color-primary) 45%, transparent), transparent),
+      linear-gradient(to bottom, transparent 55%, color-mix(in oklab, var(--helix-color-primary) 18%, transparent));
+    color: var(--helix-color-foreground-media);
+    padding: calc(var(--helix-space-2xl) * 2) var(--helix-space-2xl);
+    text-align: center;
+  }
+
+  .themedLocalHero helix-text[as="h1"] {
+    color: inherit;
+    max-inline-size: 18ch;
+  }
+
+  .themedLocalRating helix-text {
+    color: inherit;
+  }
+
+  .themedLocalStars {
+    color: var(--helix-color-primary);
+    display: inline-flex;
+    gap: var(--helix-space-2xs);
+  }
+
+  .themedLocalSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--helix-space-lg);
+    inline-size: 100%;
+    margin-inline: auto;
+    max-inline-size: var(--themed-measure);
+    padding: var(--helix-space-2xl) var(--helix-space-2xl) 0;
+    box-sizing: border-box;
+  }
+
+  .themedLocalPrice {
+    color: var(--helix-color-primary);
+  }
+
+  .themedLocalIncludes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--helix-space-xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .themedLocalIncludes li {
+    align-items: center;
+    display: flex;
+    gap: var(--helix-space-xs);
+  }
+
+  .themedLocalIncludes helix-icon {
+    color: var(--helix-color-primary);
+  }
+
+  /* The steps in a row, each under its number, which is the brand's. */
+  .themedLocalSteps {
+    display: grid;
+    gap: var(--helix-space-lg);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .themedLocalSteps li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--helix-space-sm);
+  }
+
+  .themedLocalStepNumber {
+    align-items: center;
+    background-color: var(--helix-color-primary-subtle);
+    border-radius: var(--helix-radii-full);
+    block-size: var(--helix-size-control-sm);
+    color: var(--helix-color-primary);
+    display: inline-flex;
+    font-weight: var(--helix-weight-semibold);
+    inline-size: var(--helix-size-control-sm);
+    justify-content: center;
+  }
+
+  .themedLocalVisit {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-block-end: var(--helix-space-2xl);
+  }
+
+  .themedLocal .themedFooter {
+    margin-block-start: auto;
+  }
+
+  @container (width < 52rem) {
+    .themedLocalSteps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .themedLocalVisit {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .themedLocal helix-grid {
+      --grid-columns: minmax(0, 1fr);
+    }
+  }
+
+  @container (width < 30rem) {
+    .themedLocalSteps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .themedLocalHero,
+    .themedLocalSection {
+      padding-inline: var(--helix-space-lg);
+    }
+  }
 `
