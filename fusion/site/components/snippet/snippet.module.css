@@ -1,0 +1,16 @@
+/* A snippet whose long lines wrap: at the breaks the page puts after a URL's
+   slashes, with each word kept whole, and each line hanging two characters
+   in from its own indent. */
+.snippetWrapped::part(code) {
+  white-space: pre-wrap;
+}
+
+.snippetLine {
+  display: block;
+  padding-inline-start: calc(var(--indent) * 1ch);
+  text-indent: calc(var(--indent) * -1ch);
+}
+
+.snippetWord {
+  white-space: nowrap;
+}

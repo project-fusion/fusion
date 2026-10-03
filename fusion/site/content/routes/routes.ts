@@ -165,6 +165,15 @@ const PROSE: Route[] = [
   },
   {
     description:
+      'Interactive graphs in your brand’s colors, drawn by Sigma.js, cosmos.gl, or three.js.',
+    kind: 'page',
+    path: '/helix/graph',
+    priority: 0.5,
+    section: 'Helix',
+    title: 'Graph',
+  },
+  {
+    description:
       'Edit the source of any Helix component example and see the result beside it. Link to an example with `?e=<family>.<example>`.',
     kind: 'page',
     path: '/helix/sandbox',

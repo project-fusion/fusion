@@ -201,6 +201,15 @@ export const PRODUCTS: Product[] = [
         summary: 'Interactive maps in your brand’s colors.',
         title: 'Maps',
       },
+      /* Beside Maps, for Maps' reason: its argument is Helix's, a graph in
+         the page's theme with a list of every note beside it, and without
+         Helix it is Sigma.js, cosmos.gl, or three.js and somebody's data. */
+      {
+        href: '/helix/graph',
+        stage: 'Building',
+        summary: 'Interactive graphs in your brand’s colors, in 2D and 3D.',
+        title: 'Graph',
+      },
     ],
     href: '/helix',
     install: 'bun add @fusion.dev/helix',
