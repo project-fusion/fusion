@@ -17,8 +17,8 @@ You enter the same inputs that `derive()` takes:
 
 - **Color:** the brand, the color scheme, the contrast target, the saturation,
   the accent angle, and the page's color in light and in dark
-- **Shape and type:** the density, the corner radius, the three faces, the body
-  size, and the type scale
+- **Shape and type:** the density, the corner radius, the three faces and a
+  stylesheet for faces of your own, the body size, and the type scale
 - **Status:** how far the status colors follow the palette, and how far their
   hues may move
 - **Motion, separation, and material:** the motion character, how surfaces are
@@ -39,10 +39,25 @@ or black, the grays take its tint, and every text color is solved against it. A
 page that no text color can reach the contrast target on is left out of the
 preview, and a caption under the fields says so.
 
-**Color the figures band** gives one section of the Marketing site layout a
-color of its own, as its own theme. The band is dark or light by whichever text
-reads better on it, and its block follows the page's in the generated
-stylesheet. See [Color one section](./theming#color-one-section).
+**Color one band** gives one section a color of its own, as its own theme: the
+figures band in the Marketing site layout, or the announcement in the Local
+business layout. The band is dark or light by whichever text reads better on
+it, and its block follows the page's in the generated stylesheet. See
+[Color one section](./theming#color-one-section).
+
+## Faces of your own
+
+Type a family's name into the Body face, Display face, or Mono face field and
+choose **Use**, then give the stylesheet that declares it in **Font
+stylesheet**, as Google Fonts, Adobe Fonts, or your own server serves one. The
+preview loads the stylesheet, and the link keeps both. The stylesheet has to
+allow other sites to load its fonts, as the font services do.
+
+## Layouts
+
+The Layout field picks the page the theme is drawn on. **Local business** is a
+services site: an announcement over the page, a hero on a picture with a rating,
+three prices, the steps, the questions people ask, and where to visit.
 
 ## The audit
 

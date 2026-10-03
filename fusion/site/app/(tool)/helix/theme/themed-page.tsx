@@ -271,7 +271,7 @@ function MarketingPage(context: Context) {
 
       {/* A recessed band, so `surface-sunken` is on screen beside the others
           rather than being the one ground nobody looks at. */}
-      <section className="themedFigures">
+      <section className="themedFigures" data-band-slot>
         {figures.map((stat) => (
           <helix-stat key={stat.label}>
             {stat.figure}
@@ -859,6 +859,166 @@ function MapPage(context: Context) {
 }
 
 /**
+ * A local business's page: an announcement over everything, a hero on a
+ * picture, three prices, how it goes, what people ask, and where to find it.
+ *
+ * **The shape of a services site**, a pool builder's or a joiner's, where the
+ * marketing layout is a product's: no chart, no table, and the price on the
+ * page. The hero's picture is drawn from the theme, so its words sit on
+ * `surface-media` in `foreground-media`, the pair a photograph's caption uses.
+ */
+function LocalPage(context: Context) {
+  const { company, hero, local } = context
+
+  return (
+    <div className="themedLocal">
+      {/* The band the builder can color, as a site sets an announcement apart. */}
+      <div className="themedLocalBar" data-band-slot>
+        <helix-text variant="caption">{local.announcement}</helix-text>
+      </div>
+
+      <helix-app-header className="themedHeader">
+        <helix-flex align-items="center" gap="xs" slot="start">
+          <Mark mark={context.mark} />
+          <helix-text variant="label">{company}</helix-text>
+        </helix-flex>
+        <helix-flex align-items="center" gap="xs" slot="end">
+          <helix-button emphasis="solid" tone="primary">
+            {local.contact.heading}
+          </helix-button>
+        </helix-flex>
+      </helix-app-header>
+
+      <section className="themedLocalHero">
+        <helix-flex align-items="center" direction="column" gap="lg">
+          <helix-text as="h1" variant="display">
+            {hero.headline}
+          </helix-text>
+          <helix-button data-density="lg" emphasis="solid" tone="primary">
+            {hero.primary}
+          </helix-button>
+          <helix-flex align-items="center" className="themedLocalRating" gap="xs">
+            <helix-text variant="label">{local.rating.score}</helix-text>
+            <span
+              aria-label={`${local.rating.score} out of 5`}
+              className="themedLocalStars"
+              role="img"
+            >
+              {[1, 2, 3, 4, 5].map((star) => (
+                <helix-icon key={star} name="star"></helix-icon>
+              ))}
+            </span>
+            <helix-text variant="caption">{local.rating.count}</helix-text>
+          </helix-flex>
+        </helix-flex>
+      </section>
+
+      <section className="themedLocalSection">
+        <helix-text as="h2" variant="heading">
+          {local.tiersHeading}
+        </helix-text>
+        <helix-grid columns={3} gap="md">
+          {local.tiers.map((tier) => (
+            <helix-card key={tier.name}>
+              <helix-flex direction="column" gap="md">
+                <helix-flex direction="column" gap="2xs">
+                  <helix-text as="h3" variant="title">
+                    {tier.name}
+                  </helix-text>
+                  <helix-text className="themedLocalPrice" variant="subheading">
+                    {tier.price}
+                  </helix-text>
+                </helix-flex>
+                <ul className="themedLocalIncludes">
+                  {tier.includes.map((item) => (
+                    <li key={item}>
+                      <helix-icon name="check"></helix-icon>
+                      <helix-text variant="caption">{item}</helix-text>
+                    </li>
+                  ))}
+                </ul>
+                <helix-button emphasis="outlined">Choose {tier.name}</helix-button>
+              </helix-flex>
+            </helix-card>
+          ))}
+        </helix-grid>
+      </section>
+
+      <section className="themedLocalSection">
+        <helix-text as="h2" variant="heading">
+          {local.stepsHeading}
+        </helix-text>
+        <ol className="themedLocalSteps">
+          {local.steps.map((step, at) => (
+            <li key={step.title}>
+              <span aria-hidden="true" className="themedLocalStepNumber">
+                {at + 1}
+              </span>
+              <helix-flex direction="column" gap="2xs">
+                <helix-text as="h3" variant="title">
+                  {step.title}
+                </helix-text>
+                <helix-text variant="caption">{step.body}</helix-text>
+              </helix-flex>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="themedLocalSection">
+        <helix-text as="h2" variant="heading">
+          {local.faqHeading}
+        </helix-text>
+        <helix-accordion>
+          {local.faq.map((item, at) => (
+            <helix-accordion-item default-open={at === 0 || undefined} key={item.question}>
+              <span slot="summary">{item.question}</span>
+              {item.answer}
+            </helix-accordion-item>
+          ))}
+        </helix-accordion>
+      </section>
+
+      <section className="themedLocalSection themedLocalVisit">
+        <helix-card>
+          <helix-flex direction="column" gap="md">
+            <helix-text as="h2" variant="subheading">
+              {local.visit.heading}
+            </helix-text>
+            <helix-text variant="caption">{local.visit.body}</helix-text>
+            <helix-flex align-items="center" gap="xs">
+              <helix-icon name="building"></helix-icon>
+              <helix-text variant="caption">{local.visit.address}</helix-text>
+            </helix-flex>
+            <helix-flex align-items="center" gap="xs">
+              <helix-icon name="clock"></helix-icon>
+              <helix-text variant="caption">{local.visit.hours}</helix-text>
+            </helix-flex>
+          </helix-flex>
+        </helix-card>
+        <helix-card>
+          <helix-flex direction="column" gap="md">
+            <helix-text as="h2" variant="subheading">
+              {local.contact.heading}
+            </helix-text>
+            <helix-input label="Name" name="name"></helix-input>
+            <helix-input label="Email" name="email" type="email"></helix-input>
+            <helix-textarea label="Message" name="message"></helix-textarea>
+            <helix-flex>
+              <helix-button emphasis="solid" tone="primary">
+                {local.contact.cta}
+              </helix-button>
+            </helix-flex>
+          </helix-flex>
+        </helix-card>
+      </section>
+
+      {Footer(context)}
+    </div>
+  )
+}
+
+/**
  * The layouts, in the order the builder offers them, resting one first.
  *
  * Same convention as `CONTEXTS`, so neither axis has a default stated anywhere
@@ -870,6 +1030,7 @@ export const LAYOUTS: readonly {
   value: string
 }[] = [
   { label: 'Marketing site', render: MarketingPage, value: 'marketing' },
+  { label: 'Local business', render: LocalPage, value: 'local' },
   { label: 'Minimal', render: MinimalPage, value: 'minimal' },
   { label: 'Editorial', render: EditorialPage, value: 'editorial' },
   { label: 'Application', render: WorkspacePage, value: 'workspace' },

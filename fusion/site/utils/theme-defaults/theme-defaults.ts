@@ -28,6 +28,8 @@ export interface Settings {
   density: number
   displayFace: string
   floating: Mechanism
+  /** A stylesheet that declares the brand's own faces, as an https URL, or empty. */
+  fontCss: string
   harmony: number
   monoFace: string
   motion: Character
@@ -56,6 +58,7 @@ export const INITIAL: Settings = {
   density: 100,
   displayFace: '',
   floating: 'shadow',
+  fontCss: '',
   harmony: 50,
   monoFace: '',
   motion: '',
@@ -228,7 +231,34 @@ const color = (raw: string | string[] | undefined, fallback: string): string => 
 }
 
 /**
- * A face, if it is one we offer.
+ * A family named by the reader, which is any name a stylesheet could declare:
+ * letters, digits, spaces, hyphens and underscores, and no quote, which would
+ * end the string the stack writes it into.
+ */
+const OWN_FACE = /^[\p{L}\p{N} _-]{1,64}$/u
+
+/**
+ * The stylesheet a link names for the brand's own faces, or none.
+ *
+ * **Only https, and written back as the URL parser writes it**, so a quote or
+ * a bracket in the link arrives percent-encoded and cannot end the `@import`
+ * it is placed in. Loaded in the preview's sandboxed frame and nowhere else.
+ */
+export const stylesheet = (raw: string | string[] | undefined): string => {
+  const value = one(raw)
+  if (!value) {
+    return ''
+  }
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:' ? url.href : ''
+  } catch {
+    return ''
+  }
+}
+
+/**
+ * A face, if it is one we offer or one the reader named.
  */
 const face = (
   raw: string | string[] | undefined,
@@ -243,9 +273,12 @@ const face = (
   /* **`!== 1` rather than `=== 0`.** The catalog's third field is a category,
      not a monospace flag: 1 is monospace and every other value is proportional,
      so a serif tested with `=== 0` would be refused as though it were mono. */
-  return catalog.some((row) => row[0] === value && (mono ? row[2] === 1 : row[2] !== 1))
-    ? value
-    : fallback
+  if (catalog.some((row) => row[0] === value && (mono ? row[2] === 1 : row[2] !== 1))) {
+    return value
+  }
+  /* **A family the catalog does not have is the reader's own**, served by the
+     stylesheet they named, and kept where its name could be one. */
+  return catalog.some((row) => row[0] === value) || !OWN_FACE.test(value) ? fallback : value
 }
 
 /**
@@ -271,6 +304,7 @@ export function settingsFrom(
     density: bounded(params.density, BOUNDS.density, INITIAL.density),
     displayFace: face(params['display-face'], false, INITIAL.displayFace, catalog),
     floating: oneOf(params.floating, FLOATING, INITIAL.floating),
+    fontCss: stylesheet(params['font-css']),
     harmony: bounded(params.harmony, BOUNDS.harmony, INITIAL.harmony),
     monoFace: face(params['mono-face'], true, INITIAL.monoFace, catalog),
     motion: oneOf(params.motion, CHARACTERS, INITIAL.motion),
@@ -315,6 +349,7 @@ export function queryFrom(
   write('density', settings.density, INITIAL.density)
   write('display-face', settings.displayFace, INITIAL.displayFace)
   write('floating', settings.floating, INITIAL.floating)
+  write('font-css', settings.fontCss, INITIAL.fontCss)
   write('harmony', settings.harmony, INITIAL.harmony)
   if (preview.layout) {
     params.set('layout', preview.layout)

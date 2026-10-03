@@ -23,6 +23,7 @@ import {
   queryFrom,
   SCOPE,
   type Settings,
+  stylesheet,
 } from '@/utils/theme-defaults/theme-defaults'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
 import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
@@ -153,9 +154,16 @@ const ALL_FACES: Face[] = [...CATALOG, ...CATALOG_MONO]
 /**
  * The options inside a face dropdown: the resting one loose, then the groups.
  */
-const faceOptions = (groups: FaceGroup[], rest: Face) => (
+const faceOptions = (groups: FaceGroup[], rest: Face, current: string) => (
   <>
     <helix-option value={rest.family}>{rest.label}</helix-option>
+    {/* **A family the reader named, kept as an option**, since the field shows
+        only a value one of its options holds. */}
+    {current && !ALL_FACES.some((face) => face.family === current) ? (
+      <helix-option-group label="Your own">
+        <helix-option value={current}>{current}</helix-option>
+      </helix-option-group>
+    ) : null}
     {groups.map((group) => (
       <helix-option-group key={group.label} label={group.label}>
         {group.faces.map((face) => (
@@ -351,6 +359,9 @@ export function ThemeBuilder({
   const [harmony, setHarmony] = useState(initialSettings.harmony)
   const [split, setSplit] = useState(PREVIEW_SHARE)
   const [bodyFace, setBodyFace] = useState(initialSettings.bodyFace)
+  /* The stylesheet for the brand's own faces, and what its field holds. */
+  const [fontCss, setFontCss] = useState(initialSettings.fontCss)
+  const [fontCssText, setFontCssText] = useState(initialSettings.fontCss)
   const [displayFace, setDisplayFace] = useState(initialSettings.displayFace)
   const [monoFace, setMonoFace] = useState(initialSettings.monoFace)
   const [motion, setMotion] = useState(initialSettings.motion)
@@ -404,6 +415,7 @@ export function ThemeBuilder({
       density,
       displayFace,
       floating,
+      fontCss,
       harmony,
       monoFace,
       motion,
@@ -428,6 +440,7 @@ export function ThemeBuilder({
       density,
       displayFace,
       floating,
+      fontCss,
       harmony,
       monoFace,
       motion,
@@ -489,6 +502,8 @@ export function ThemeBuilder({
     setDensity(INITIAL.density)
     setDisplayFace(INITIAL.displayFace)
     setFloating(INITIAL.floating)
+    setFontCss(INITIAL.fontCss)
+    setFontCssText(INITIAL.fontCss)
     setHarmony(INITIAL.harmony)
     setMonoFace(INITIAL.monoFace)
     setMotion(INITIAL.motion)
@@ -650,8 +665,8 @@ export function ThemeBuilder({
        color. */
     preview.current.source = bandBlock
       ? source.replaceAll(
-          '<section class="themedFigures">',
-          `<section class="themedFigures" data-band data-color-mode="${bandBlock.scheme}" data-helix-theme>`,
+          'data-band-slot="true"',
+          `data-band data-color-mode="${bandBlock.scheme}" data-helix-theme`,
         )
       : source
     /* **The palette, the layout and the faces, because the frame has none of
@@ -675,6 +690,10 @@ export function ThemeBuilder({
        an `@import` after any rule is dropped. */
     preview.current.styles = [
       fontsHref ? `@import url("${fontsHref}");` : '',
+      /* The brand's own faces, from the stylesheet the reader named: here, in
+         the sandboxed frame, and never in this document, so a link cannot
+         bring a stylesheet onto the site's own page. */
+      fontCss ? `@import url("${fontCss}");` : '',
       THEMED_PAGE_STYLES,
       framed,
       /* The band on its own page color, and its block after the page's. */
@@ -687,7 +706,7 @@ export function ThemeBuilder({
          every label to it, the way the palette holds every text pair. */
       `:root { --themed-contrast-target: ${contrastTarget}; }`,
     ].join('\n')
-  }, [bandBlock, contrastTarget, fontsHref, framed, source])
+  }, [bandBlock, contrastTarget, fontCss, fontsHref, framed, source])
 
   /* **Lightness only, and in whichever direction reaches the target.** The
      solver moves one component: a brand keeps its hue and its chroma and gives
@@ -827,7 +846,7 @@ export function ThemeBuilder({
              *                 two facts they are choosing.
              */}
             <helix-select
-              hint="How much page there is. Minimal has no chart and nothing that floats; Map is a live map with a panel over it."
+              hint="How much page there is. Minimal has no chart and nothing that floats; Local business is a services site, with prices and questions; Map is a live map with a panel over it."
               label="Layout"
               name="layout"
               onChange={(event) => setLayout(event.currentTarget.value)}
@@ -932,8 +951,8 @@ export function ThemeBuilder({
                 from the same inputs with the band's color as its page. */}
             <helix-switch
               checked={band !== ''}
-              hint="The figures band, in the Marketing site layout, in a color of its own."
-              label="Color the figures band"
+              hint="The figures band in Marketing site, or the announcement in Local business, in a color of its own."
+              label="Color one band"
               onChange={(event) => setBand(event.currentTarget.checked ? bandColor : '')}
             ></helix-switch>
             {band ? (
@@ -1051,7 +1070,26 @@ export function ThemeBuilder({
                 contributes no word, so a generic placeholder makes all three of
                 these read `Choose` while sitting on a real, named answer. The
                 option stays in each list so there is a way back to it. */}
+            {/* **The brand's own faces**: type a family into a face field and use
+                it, and name the stylesheet that declares it here, as Google
+                Fonts, Adobe Fonts or your own server gives one. */}
+            <helix-input
+              hint="The stylesheet that declares your own faces. Type a family's name into a face field to use it. Loaded only in the preview."
+              label="Font stylesheet"
+              name="font-css"
+              onChange={(event) => {
+                const typed = event.currentTarget.value
+                setFontCssText(typed)
+                setFontCss(stylesheet(typed.trim()))
+              }}
+              placeholder="https://"
+              type="url"
+              value={fontCssText}
+            ></helix-input>
+
             <helix-combobox
+              creatable
+              create-label="Use"
               label="Body face"
               name="body-face"
               onChange={(event) => setBodyFace(event.currentTarget.value)}
@@ -1059,10 +1097,12 @@ export function ThemeBuilder({
               value={bodyFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {faceOptions(FACE_GROUPS, SYSTEM)}
+              {faceOptions(FACE_GROUPS, SYSTEM, bodyFace)}
             </helix-combobox>
 
             <helix-combobox
+              creatable
+              create-label="Use"
               hint="Headings. Follows the body face where it is left alone."
               label="Display face"
               name="display-face"
@@ -1071,10 +1111,12 @@ export function ThemeBuilder({
               value={displayFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {faceOptions(FACE_GROUPS, DISPLAY_REST)}
+              {faceOptions(FACE_GROUPS, DISPLAY_REST, displayFace)}
             </helix-combobox>
 
             <helix-combobox
+              creatable
+              create-label="Use"
               label="Mono face"
               name="mono-face"
               onChange={(event) => setMonoFace(event.currentTarget.value)}
@@ -1082,7 +1124,7 @@ export function ThemeBuilder({
               value={monoFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {faceOptions(MONO_GROUPS, MONO_REST)}
+              {faceOptions(MONO_GROUPS, MONO_REST, monoFace)}
             </helix-combobox>
 
             {/* **Hue is meaning and loudness is not**, which is the line this
