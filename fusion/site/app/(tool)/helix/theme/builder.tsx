@@ -299,9 +299,10 @@ export function ThemeBuilder({
       setBrand(formatColor(read, 'hex', false))
     }
   }
-  /* **The page's color for each scheme, empty for pure white or pure black**,
-     each with the text its field holds apart from it, for the brand's reason:
-     a half-typed color is not one. Emptied, the field gives the page back. */
+  /* **The page's color for each scheme, white and black at rest**, each with
+     the text its field holds apart from it, for the brand's reason: a
+     half-typed color is not one. Emptied, the field goes back to white or
+     black. */
   const [pageLight, setPageLight] = useState(initialSettings.pageLight)
   const [pageLightText, setPageLightText] = useState(initialSettings.pageLight)
   const [pageDark, setPageDark] = useState(initialSettings.pageDark)
@@ -310,10 +311,11 @@ export function ThemeBuilder({
     typed: string,
     setText: (text: string) => void,
     setPage: (page: string) => void,
+    rest: string,
   ): void => {
     setText(typed)
     if (typed.trim() === '') {
-      setPage('')
+      setPage(rest)
       return
     }
     const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(typed.trim())?.[1]
@@ -854,23 +856,26 @@ export function ThemeBuilder({
                 take its tint. A page no text can be read on is set aside, and
                 the caption says so under the fields. */}
             <helix-color-input
-              hint="The page's color in light. Empty is white."
+              hint="The page's color in light."
               label="Light page"
               name="page-light"
               onChange={(event) =>
-                pageTyped(event.currentTarget.value, setPageLightText, setPageLight)
+                pageTyped(
+                  event.currentTarget.value,
+                  setPageLightText,
+                  setPageLight,
+                  INITIAL.pageLight,
+                )
               }
-              placeholder="#ffffff"
               value={pageLightText}
             ></helix-color-input>
             <helix-color-input
-              hint="The page's color in dark. Empty is black."
+              hint="The page's color in dark."
               label="Dark page"
               name="page-dark"
               onChange={(event) =>
-                pageTyped(event.currentTarget.value, setPageDarkText, setPageDark)
+                pageTyped(event.currentTarget.value, setPageDarkText, setPageDark, INITIAL.pageDark)
               }
-              placeholder="#000000"
               value={pageDarkText}
             ></helix-color-input>
             {refused ? (

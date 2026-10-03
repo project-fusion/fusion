@@ -29,9 +29,9 @@ export interface Settings {
   harmony: number
   monoFace: string
   motion: Character
-  /** The page's color in dark, as a hex, or empty for pure black. */
+  /** The page's color in dark, as a hex. Pure black is the engine's own page. */
   pageDark: string
-  /** The page's color in light, as a hex, or empty for pure white. */
+  /** The page's color in light, as a hex. Pure white is the engine's own page. */
   pageLight: string
   radius: number
   /** Which half a reader sees: the site's own mode, or light or dark whatever the site shows. */
@@ -56,8 +56,8 @@ export const INITIAL: Settings = {
   harmony: 50,
   monoFace: '',
   motion: '',
-  pageDark: '',
-  pageLight: '',
+  pageDark: '#000000',
+  pageLight: '#ffffff',
   radius: 50,
   scheme: 'site',
   surface: 'border',
@@ -113,13 +113,19 @@ export function intentFrom(settings: Settings, site: 'dark' | 'light' = 'light')
   } = settings
   const accent = accentFrom(accentHue)
 
+  /* **White and black are no page of its own**, so they leave `background`
+     out: the fields always hold a color, as Brand does, and at rest they hold
+     the page the engine draws without one. */
+  const dark = pageDark !== INITIAL.pageDark ? pageDark : undefined
+  const light = pageLight !== INITIAL.pageLight ? pageLight : undefined
+
   return {
     ...(accent ? { accent } : {}),
-    ...(pageDark || pageLight
+    ...(dark || light
       ? {
           background: {
-            ...(pageDark ? { dark: pageDark } : {}),
-            ...(pageLight ? { light: pageLight } : {}),
+            ...(dark ? { dark } : {}),
+            ...(light ? { light } : {}),
           },
         }
       : {}),
