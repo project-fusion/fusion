@@ -205,6 +205,16 @@ for a graph too large to read at once:
 </helix-graph>
 ```
 
+The selected note lights the notes it links to and from. Pass `reach` to
+`connectGraph` to light more: `upstream` lights every note a path of links
+leads from to the selected one, and `downstream` every note a path leads to
+from it. Where each link runs from what a note was derived from to the note,
+`upstream` lights everything the note came from:
+
+```ts
+connectGraph(frame, sigmaDriver(sigma), { reach: 'upstream' })
+```
+
 ## Draw the notes in a shape
 
 Pass a `stencil` and the connector places the notes in its shape from the first

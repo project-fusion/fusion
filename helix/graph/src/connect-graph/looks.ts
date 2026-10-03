@@ -208,6 +208,11 @@ const FADED = 0.75
  * color whichever notes a page loads first.
  */
 export const looksOf = (options: {
+  /**
+   * Whether a link is one the selection reaches along, which lights it. The
+   * links that touch the selected note, where not given.
+   */
+  along?: ((source: string, target: string) => boolean) | undefined
   colors: GraphColors
   font?: string | undefined
   groups: readonly string[]
@@ -247,7 +252,9 @@ export const looksOf = (options: {
     ground: colors.ground,
     ink: colors.ink,
     link: (source, target) => {
-      const touches = focused && (source === selected || target === selected)
+      const touches =
+        focused &&
+        (options.along ? options.along(source, target) : source === selected || target === selected)
       /* **Tinted by the note it leaves**, faintly, so a cluster reads as a
          region of its own color and not a gray web. The selected note's
          links take its color, and every other steps back. */

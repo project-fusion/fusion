@@ -362,6 +362,7 @@ Sigma 3 is a peer dependency.
 | `connectGraph` option | Default | What else it takes |
 |---|---|---|
 | `center` | `true` | `false` leaves the view where it is when a note is chosen in the list |
+| `reach` | `links` | How far a selection reaches, which the drawing lights: `upstream`, every note a path of links leads from to the selected one, or `downstream`, every note a path leads to from it |
 | `stencil` | none | A shape to draw the notes in: a field from `shapes`, `{ path, width, height }` or `{ inside, width, height }`, with `place`, `fill` or `surface`; `shell`, how thick a surface's shell is as a share of the shape's size, `0.04` by default; and `regions`, the part each group goes to |
 
 | `sigmaDriver` option | Default | What else it takes |
