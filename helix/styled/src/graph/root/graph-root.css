@@ -129,6 +129,211 @@
     ".      .     .      full";
 }
 
+/* **The legend, at the drawing's bottom start**, clear of the controls'
+   column at its end, wrapping upward where its groups are many. */
+[part="legend"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xs);
+  inset-block-end: var(--helix-space-sm);
+  inset-inline-start: var(--helix-space-sm);
+  max-inline-size: calc(100% - var(--helix-space-sm) * 3 - var(--helix-size-control-sm));
+  position: absolute;
+}
+
+/* The other bottom corner, where the controls take this one. */
+:host([controls-placement="bottom-start"]) [part="legend"] {
+  inset-inline: auto var(--helix-space-sm);
+}
+
+/* **One row on a narrow frame, which scrolls**, since wrapped it stacked a
+   row for every two or three groups over a drawing that is small already.
+   Padded by the space it is moved in by, so the buttons' shadows and the
+   focus ring are not cut by the scroll's edge. */
+@container (inline-size < 40rem) {
+  [part="legend"] {
+    flex-wrap: nowrap;
+    inset-block-end: calc(var(--helix-space-sm) - var(--helix-space-2xs));
+    inset-inline-start: calc(var(--helix-space-sm) - var(--helix-space-2xs));
+    overflow-x: auto;
+    padding: var(--helix-space-2xs);
+    scrollbar-width: none;
+  }
+}
+
+/* Drawn as the controls are, on the floating surface, so the legend reads as
+   one of the frame's own controls over the drawing. */
+[part~="legend-item"] {
+  align-items: center;
+  background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
+  block-size: var(--helix-size-control-tight);
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+  white-space: nowrap;
+}
+
+[part~="legend-item"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* **A group's color by its place in the legend**, which is the order of the
+   groups' names: the order `connectGraph` hands out the series in, so each
+   mark is the color its notes are drawn in. */
+[part~="legend-item"]:nth-child(24n + 1) {
+  --_graph-swatch: var(--helix-color-series-1);
+}
+
+[part~="legend-item"]:nth-child(24n + 2) {
+  --_graph-swatch: var(--helix-color-series-2);
+}
+
+[part~="legend-item"]:nth-child(24n + 3) {
+  --_graph-swatch: var(--helix-color-series-3);
+}
+
+[part~="legend-item"]:nth-child(24n + 4) {
+  --_graph-swatch: var(--helix-color-series-4);
+}
+
+[part~="legend-item"]:nth-child(24n + 5) {
+  --_graph-swatch: var(--helix-color-series-5);
+}
+
+[part~="legend-item"]:nth-child(24n + 6) {
+  --_graph-swatch: var(--helix-color-series-6);
+}
+
+[part~="legend-item"]:nth-child(24n + 7) {
+  --_graph-swatch: var(--helix-color-series-7);
+}
+
+[part~="legend-item"]:nth-child(24n + 8) {
+  --_graph-swatch: var(--helix-color-series-8);
+}
+
+[part~="legend-item"]:nth-child(24n + 9) {
+  --_graph-swatch: var(--helix-color-series-9);
+}
+
+[part~="legend-item"]:nth-child(24n + 10) {
+  --_graph-swatch: var(--helix-color-series-10);
+}
+
+[part~="legend-item"]:nth-child(24n + 11) {
+  --_graph-swatch: var(--helix-color-series-11);
+}
+
+[part~="legend-item"]:nth-child(24n + 12) {
+  --_graph-swatch: var(--helix-color-series-12);
+}
+
+[part~="legend-item"]:nth-child(24n + 13) {
+  --_graph-swatch: var(--helix-color-series-13);
+}
+
+[part~="legend-item"]:nth-child(24n + 14) {
+  --_graph-swatch: var(--helix-color-series-14);
+}
+
+[part~="legend-item"]:nth-child(24n + 15) {
+  --_graph-swatch: var(--helix-color-series-15);
+}
+
+[part~="legend-item"]:nth-child(24n + 16) {
+  --_graph-swatch: var(--helix-color-series-16);
+}
+
+[part~="legend-item"]:nth-child(24n + 17) {
+  --_graph-swatch: var(--helix-color-series-17);
+}
+
+[part~="legend-item"]:nth-child(24n + 18) {
+  --_graph-swatch: var(--helix-color-series-18);
+}
+
+[part~="legend-item"]:nth-child(24n + 19) {
+  --_graph-swatch: var(--helix-color-series-19);
+}
+
+[part~="legend-item"]:nth-child(24n + 20) {
+  --_graph-swatch: var(--helix-color-series-20);
+}
+
+[part~="legend-item"]:nth-child(24n + 21) {
+  --_graph-swatch: var(--helix-color-series-21);
+}
+
+[part~="legend-item"]:nth-child(24n + 22) {
+  --_graph-swatch: var(--helix-color-series-22);
+}
+
+[part~="legend-item"]:nth-child(24n + 23) {
+  --_graph-swatch: var(--helix-color-series-23);
+}
+
+[part~="legend-item"]:nth-child(24n + 24) {
+  --_graph-swatch: var(--helix-color-series-24);
+}
+
+/* A group whose every note has one tone is drawn in that tone, so its mark is too. */
+[part~="legend-item"][data-tone="accent"] {
+  --_graph-swatch: var(--helix-color-accent);
+}
+
+[part~="legend-item"][data-tone="danger"] {
+  --_graph-swatch: var(--helix-color-danger);
+}
+
+[part~="legend-item"][data-tone="info"] {
+  --_graph-swatch: var(--helix-color-info);
+}
+
+[part~="legend-item"][data-tone="neutral"] {
+  --_graph-swatch: var(--helix-color-foreground-muted);
+}
+
+[part~="legend-item"][data-tone="primary"] {
+  --_graph-swatch: var(--helix-color-primary);
+}
+
+[part~="legend-item"][data-tone="success"] {
+  --_graph-swatch: var(--helix-color-success);
+}
+
+[part~="legend-item"][data-tone="warning"] {
+  --_graph-swatch: var(--helix-color-warning);
+}
+
+[part="legend-swatch"] {
+  block-size: var(--helix-space-xs);
+  border: var(--helix-border-thin) solid var(--_graph-swatch, var(--helix-color-foreground-muted));
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  background-color: var(--_graph-swatch, var(--helix-color-foreground-muted));
+  flex: 0 0 auto;
+  inline-size: var(--helix-space-xs);
+}
+
+/* **A hidden group keeps its place and its ring**, so a reader finds it to
+   turn back on, and its name steps back to say it is off. */
+[part~="legend-item-hidden"] {
+  color: var(--helix-color-foreground-subtle);
+}
+
+[part~="legend-item-hidden"] [part="legend-swatch"] {
+  background-color: transparent;
+}
+
 /* The bar that narrows the list, drawn as the listbox draws its filter: the
    magnifier, a field with no box of its own, and the count at the end. */
 [part="search"] {
@@ -273,6 +478,10 @@ slot[name="filter-icon"]::slotted(*) {
 }
 
 @media (forced-colors: active) {
+  [part~="legend-item-hidden"] {
+    color: GrayText;
+  }
+
   [part="list"]:focus-visible [part~="note-cursor"] {
     outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
     outline-offset: calc(var(--helix-size-focus-offset) * -1);

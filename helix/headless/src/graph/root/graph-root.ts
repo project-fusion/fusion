@@ -4,6 +4,7 @@ import {
   formatNumbers,
   type GraphSignalDetail,
   HelixElement,
+  HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
   HelixGraphPanEvent,
   HelixGraphPartChangeEvent,
@@ -26,11 +27,14 @@ import {
   adjacencyOf,
   type Entry,
   entriesOf,
+  type GraphGroupEntry,
   type GraphLink,
   type GraphNode,
+  groupsOf,
   nameOf,
   sortedOf,
   within,
+  withoutGroups,
 } from './graph-model.js'
 
 /** How many rows a Page Up or Page Down moves through the list. */
@@ -54,6 +58,10 @@ const PAGE = 10
  * Set `depth` to show the local graph: only the notes within that many links
  * of the selected one.
  *
+ * Set `legend` to name the groups over the drawing, each a button that shows
+ * or hides its notes. `hiddenGroups` holds the groups turned off, and the
+ * list holds only what the drawing shows.
+ *
  * `nodes` and `links` are properties, never markup: a graph of ten thousand
  * notes as ten thousand elements would cost what the renderer exists to save.
  * The list draws only the rows in view.
@@ -75,6 +83,7 @@ const PAGE = 10
  *
  * @event {HelixActivateEvent} helix-activate - A note was selected, in the list or in the drawing. The detail's `value` is its `id`.
  * @event {HelixBeforeActivateEvent} helix-before-activate - A note is about to be selected. Cancelable: cancel it to keep the selection in your own state.
+ * @event {HelixGraphFilterEvent} helix-graph-filter - A group in the legend was pressed, to show or hide its notes. The detail's `hidden` is every group that would be hidden. Cancelable: cancel it to keep the groups as they were, or to set `hiddenGroups` yourself.
  * @event {HelixGraphLayoutEvent} helix-graph-layout - A layout settled, with where it put each note, sent by `laidOut()`. Keep the positions and pass them back as each note's `x` and `y`, and `z` where a renderer draws in three dimensions.
  * @event {HelixGraphPanEvent} helix-graph-pan - A pan button or arrow key was pressed. `connectGraph` moves the drawing.
  * @event {HelixGraphPartChangeEvent} helix-graph-part-change - The notes, the links, the selection, the depth or the gestures changed. Used by `connectGraph`; pages do not need to listen for it.
@@ -94,6 +103,10 @@ const PAGE = 10
  * @csspart gesture-hint - Words over the graph for a moment when it lets a gesture pass to the page, such as how to zoom it.
  * @csspart gesture-status - The line shown while a graph with `gestures="activate"` has the gestures.
  * @csspart header - The strip above the graph.
+ * @csspart legend - The groups over the drawing, with `legend`, each a button that shows or hides its notes.
+ * @csspart legend-item - One group in the legend, pressed while its notes are shown. Carries `data-tone` where every note in the group has the same tone, which colors the notes over the group's own color.
+ * @csspart legend-item-hidden - A group in the legend whose notes are hidden.
+ * @csspart legend-swatch - The mark in a group's color, before its name.
  * @csspart list - The list of notes, which draws only the rows in view.
  * @csspart live - What screen readers hear when a search changes how many notes there are.
  * @csspart note - One note in the list.
@@ -135,12 +148,27 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ type: Number })
   depth?: number
 
+  /** The groups turned off in the legend, by name, whose notes neither the drawing nor the list shows. A property, never an attribute. */
+  @property({ attribute: false })
+  hiddenGroups: readonly string[] = []
+
   /**
    * The graph's name, read by screen readers, such as "Research notes".
    * Required.
    */
   @property()
   label = ''
+
+  /**
+   * Names the groups over the drawing, each a button in its color that shows
+   * or hides its notes. Drawn where the notes have two groups or more.
+   */
+  @property({ type: Boolean })
+  legend = false
+
+  /** The legend's name, read by screen readers. */
+  @property({ attribute: 'legend-label' })
+  legendLabel = 'Groups'
 
   /** How a note linked both to and from the selected one is described, with `{note}`. */
   @property({ attribute: 'linked-both-label' })
@@ -203,8 +231,15 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   /** The list's rows, read again when anything they come from changes. */
   private entries: Entry[] = []
 
-  /** The notes the local graph keeps, or every note where there is no `depth`. */
+  /** The notes the local graph and the legend keep, or `undefined` where neither leaves any out. */
   private kept: Set<string> | undefined
+
+  /**
+   * The groups the notes are in, each with the tone all its notes share
+   * where they share one. **In the order of their names**, which is the
+   * order `connectGraph` gives them their colors in.
+   */
+  private groups: GraphGroupEntry[] = []
 
   /** Whether the graph has been drawn whole, which `drawn()` says. */
   private whole = false
@@ -288,16 +323,24 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     if (changed.has('nodes')) {
       this.sorted = sortedOf(this.nodes, this.closest?.('[lang]')?.getAttribute('lang') ?? '')
     }
-    if (['nodes', 'links', 'active', 'depth'].some((name) => changed.has(name))) {
+    if (changed.has('nodes')) {
+      this.groups = groupsOf(this.nodes)
+    }
+    if (['nodes', 'links', 'active', 'depth', 'hiddenGroups'].some((name) => changed.has(name))) {
       /* A selection whose note the graph no longer holds keeps nothing out,
          as no selection would: kept to its depth, the list would be empty. */
       const held = this.active !== '' && this.nodes.some((node) => node.id === this.active)
-      this.kept =
+      const local =
         typeof this.depth === 'number' && held
           ? within(this.adjacency, this.active, Math.max(0, this.depth))
           : undefined
+      this.kept = withoutGroups(this.nodes, local, this.hiddenGroups)
     }
-    if (['nodes', 'links', 'active', 'depth', 'query'].some((name) => changed.has(name))) {
+    if (
+      ['nodes', 'links', 'active', 'depth', 'hiddenGroups', 'query'].some((name) =>
+        changed.has(name),
+      )
+    ) {
       this.entries = entriesOf(this.sorted, this.adjacency, this.active, this.query, this.kept)
       /* A new order is a list read from its top, the selected note first. */
       this.cursor = 0
@@ -316,7 +359,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     /* What the renderer has to hear, which `connectGraph` listens for. */
     if (changed.has('nodes') || changed.has('links')) {
       this.dispatchEvent(new HelixGraphPartChangeEvent({ kind: 'data' }))
-    } else if (changed.has('active') || changed.has('depth')) {
+    } else if (changed.has('active') || changed.has('depth') || changed.has('hiddenGroups')) {
       this.dispatchEvent(new HelixGraphPartChangeEvent({ kind: 'focus' }))
     }
     /* The count said when a search changes it, which is when a reader who
@@ -379,6 +422,42 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       default:
         return ''
     }
+  }
+
+  /** Shows a group's notes or hides them, through the request a page can refuse. */
+  private toggleGroup(name: string): void {
+    const hidden = this.hiddenGroups.includes(name)
+      ? this.hiddenGroups.filter((group) => group !== name)
+      : [...this.hiddenGroups, name]
+    if (this.dispatchEvent(new HelixGraphFilterEvent({ hidden }))) {
+      this.hiddenGroups = hidden
+    }
+  }
+
+  /**
+   * The groups over the drawing, with `legend`, each a button pressed while
+   * its notes are shown. **Nothing for one group or none**: a legend of one
+   * names what every note is, and turning it off empties the graph.
+   */
+  private renderLegend(): TemplateResult | typeof nothing {
+    if (!this.legend || this.groups.length < 2) {
+      return nothing
+    }
+    const hidden = new Set(this.hiddenGroups)
+    return html`<div part="legend" role="group" aria-label=${this.legendLabel}>
+      ${this.groups.map(({ name, tone }) => {
+        const shown = !hidden.has(name)
+        return html`<button
+          part="legend-item${shown ? '' : ' legend-item-hidden'}"
+          type="button"
+          aria-pressed=${shown ? 'true' : 'false'}
+          data-tone=${tone ?? nothing}
+          @click=${() => this.toggleGroup(name)}
+        >
+          <span part="legend-swatch" aria-hidden="true"></span>${name}
+        </button>`
+      })}
+    </div>`
   }
 
   /** Selects the note a row names, through the request a page can refuse. */
@@ -575,7 +654,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
             <slot></slot>
             ${this.renderGestures()}
           </div>
-          ${this.renderControls()}
+          ${this.renderControls()} ${this.renderLegend()}
         </div>
         <div
           part="panel"

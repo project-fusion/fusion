@@ -179,6 +179,33 @@ Set a default for every note with the driver's options, such as
 `sigmaDriver(sigma, { material: 'glass', shape: 'circle' })`. cosmos.gl draws a
 note's `shape` and not its `emphasis` or `material`.
 
+## Show a legend
+
+Set `legend` to name the groups over the drawing, each in its color. Each name
+is a button that shows or hides the group's notes, in the drawing and in the
+list:
+
+```html
+<helix-graph label="Company notes" legend>
+  <div></div>
+</helix-graph>
+```
+
+`hiddenGroups` holds the names of the groups turned off. Set it to start with
+some hidden. A press sends `helix-graph-filter` first, with every group that
+would be hidden. Cancel it to keep the groups as they were, or to keep them in
+your own state and set `hiddenGroups` yourself:
+
+```ts
+frame.addEventListener('helix-graph-filter', (event) => {
+  event.preventDefault()
+  frame.hiddenGroups = event.detail.hidden
+})
+```
+
+The legend is drawn where the notes have two groups or more. On a frame
+narrower than 40rem it is one row, which scrolls.
+
 ## Select a note
 
 Pressing a note selects it, and pressing where no note is clears the selection.

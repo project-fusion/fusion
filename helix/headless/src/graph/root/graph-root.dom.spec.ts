@@ -186,6 +186,79 @@ describe('graph frame', () => {
     expect(names(host).length).toBe(5)
   })
 
+  test('legend names each group in the order of its name, pressed while its notes are shown', async () => {
+    const grouped: GraphNode[] = [
+      { group: 'work', id: 'a', label: 'Alpha' },
+      { group: 'home', id: 'b', label: 'Bravo' },
+      { group: 'work', id: 'c', label: 'Charlie', tone: 'danger' },
+      { group: 'alerts', id: 'd', label: 'Delta', tone: 'danger' },
+      { id: 'e', label: 'Echo' },
+    ]
+    const host = await graph('legend', grouped)
+    const legend = part(host, 'legend') as HTMLElement
+    expect(legend.getAttribute('role')).toBe('group')
+    expect(legend.getAttribute('aria-label')).toBe('Groups')
+    const items = [...legend.querySelectorAll('button')]
+    expect(items.map((item) => item.textContent?.trim())).toEqual(['alerts', 'home', 'work'])
+    expect(items.every((item) => item.getAttribute('aria-pressed') === 'true')).toBe(true)
+    /* A tone every note in the group shares, which the drawing colors them by. */
+    expect(items.map((item) => item.dataset.tone)).toEqual(['danger', undefined, undefined])
+  })
+
+  test('a press on a group hides its notes from the list and the drawing, and says so first', async () => {
+    const grouped: GraphNode[] = [
+      { group: 'work', id: 'a', label: 'Alpha' },
+      { group: 'home', id: 'b', label: 'Bravo' },
+      { group: 'work', id: 'c', label: 'Charlie' },
+      { id: 'd', label: 'Delta' },
+    ]
+    const host = (await graph('legend', grouped)) as Graph & {
+      hiddenGroups: readonly string[]
+      shown?: ReadonlySet<string>
+    }
+    const told: (readonly string[])[] = []
+    host.addEventListener('helix-graph-filter', (event) => told.push(event.detail.hidden))
+    const work = () =>
+      [...(part(host, 'legend')?.querySelectorAll('button') ?? [])].find(
+        (item) => item.textContent?.trim() === 'work',
+      )
+    work()?.click()
+    await settle(host)
+    expect(told).toEqual([['work']])
+    expect(host.hiddenGroups).toEqual(['work'])
+    expect(names(host)).toEqual(['Bravo', 'Delta'])
+    expect([...(host.shown ?? [])].sort()).toEqual(['b', 'd'])
+    expect(work()?.getAttribute('aria-pressed')).toBe('false')
+    expect(work()?.getAttribute('part')).toBe('legend-item legend-item-hidden')
+    work()?.click()
+    await settle(host)
+    expect(host.hiddenGroups).toEqual([])
+    expect(names(host).length).toBe(4)
+  })
+
+  test('a page that cancels the filter keeps every group as it was', async () => {
+    const grouped: GraphNode[] = [
+      { group: 'work', id: 'a' },
+      { group: 'home', id: 'b' },
+    ]
+    const host = (await graph('legend', grouped)) as Graph & { hiddenGroups: readonly string[] }
+    host.addEventListener('helix-graph-filter', (event) => event.preventDefault())
+    part(host, 'legend')?.querySelector('button')?.click()
+    await settle(host)
+    expect(host.hiddenGroups).toEqual([])
+    expect(names(host).length).toBe(2)
+  })
+
+  test('draws no legend for one group, or without legend', async () => {
+    const one = await graph('legend', [{ group: 'work', id: 'a' }, { id: 'b' }])
+    expect(part(one, 'legend')).toBeNull()
+    const off = await graph('', [
+      { group: 'work', id: 'a' },
+      { group: 'home', id: 'b' },
+    ])
+    expect(part(off, 'legend')).toBeNull()
+  })
+
   test('no-panel leaves the search and the list out, behind a button that opens them', async () => {
     const host = await graph('no-panel')
     const panel = part(host, 'panel') as HTMLElement

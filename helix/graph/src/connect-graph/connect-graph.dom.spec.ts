@@ -351,6 +351,29 @@ describe('connectGraph', () => {
     expect(recorder.asked.signals).toEqual([['a', 'b']])
   })
 
+  test('a signal to a note the legend hides does not reach the driver', async () => {
+    const host = (await frame('legend')) as Frame & {
+      hiddenGroups: string[]
+      signal(from: string, to: string): void
+    }
+    host.nodes = [
+      { group: 'x', id: 'a', x: 0, y: 0 },
+      { group: 'y', id: 'b', x: 1, y: 1 },
+    ]
+    host.links = [{ source: 'a', target: 'b' }]
+    const recorder = recording()
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    host.hiddenGroups = ['y']
+    await settled(host)
+    host.signal('a', 'b')
+    expect(recorder.asked.signals).toEqual([])
+    host.hiddenGroups = []
+    await settled(host)
+    host.signal('a', 'b')
+    expect(recorder.asked.signals).toEqual([['a', 'b']])
+  })
+
   test('a change during the first layout does not cost the frame its ready', async () => {
     const host = await frame()
     const recorder = recording(true, true)

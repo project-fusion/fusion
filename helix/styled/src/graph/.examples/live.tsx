@@ -105,6 +105,7 @@ export function Example() {
         data-preview-graph
         data-preview-graph-material="glass"
         label="Company notes"
+        legend
         links={links}
         nodes={nodes}
         ref={frame}
