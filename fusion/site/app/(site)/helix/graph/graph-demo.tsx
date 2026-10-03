@@ -179,6 +179,7 @@ export function GraphDemo({
   kind,
   noPanel = false,
   paused = false,
+  poster,
 }: {
   /** A class for the box the renderer draws in, as the hero gives it to keep its drawing clear of the words. */
   canvasClassName?: string
@@ -186,12 +187,20 @@ export function GraphDemo({
   kind: DemoKind
   /** Whether the frame leaves its search and list out, behind a button among its controls. */
   noPanel?: boolean
+  /**
+   * Pictures of the graph as it is first drawn, one for each mode, shown in
+   * its place until it is drawn, so the box is never empty while its renderer
+   * and its model load.
+   */
+  poster?: { dark: string; light: string } | undefined
   /** Whether its messages are held, which a control on the page decides; read as each is sent, so pausing does not remake the graph. */
   paused?: boolean
 }) {
   const frame = useRef<HelixGraph>(null)
   const box = useRef<HTMLDivElement>(null)
   const [failed, setFailed] = useState(false)
+  /* Whether the graph has been drawn, after which the pictures fade out. */
+  const [drawn, setDrawn] = useState(false)
   const holding = useRef(paused)
   holding.current = paused
 
@@ -203,6 +212,8 @@ export function GraphDemo({
     }
     let live = true
     let stop = (): void => undefined
+    const ready = (): void => setDrawn(true)
+    host.addEventListener('helix-graph-ready', ready)
     const near = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) {
@@ -231,6 +242,7 @@ export function GraphDemo({
     near.observe(drawing)
     return () => {
       live = false
+      host.removeEventListener('helix-graph-ready', ready)
       near.disconnect()
       stop()
     }
@@ -247,7 +259,27 @@ export function GraphDemo({
       no-panel={noPanel}
       ref={frame}
     >
-      <div className={`${styles.graphCanvas} ${canvasClassName ?? ''}`} ref={box} />
+      <div className={`${styles.graphCanvas} ${canvasClassName ?? ''}`} ref={box}>
+        {/* **The graph as it is first drawn**, under the renderer's canvas,
+            until the graph is drawn over it, and then faded out. Said to no
+            one: the frame's list names every note. */}
+        {poster
+          ? (['light', 'dark'] as const).map((mode) => (
+              // biome-ignore lint/performance/noImgElement: a picture that stands in a renderer's box, sized by the box, which Next's Image would wrap in a box of its own
+              <img
+                alt=""
+                aria-hidden="true"
+                className={`${styles.graphPoster} ${mode === 'dark' ? styles.graphPosterDark : styles.graphPosterLight}`}
+                data-drawn={drawn ? '' : undefined}
+                data-graph-poster=""
+                decoding="async"
+                fetchPriority="high"
+                key={mode}
+                src={poster[mode]}
+              />
+            ))
+          : null}
+      </div>
       {failed ? (
         <helix-text slot="footer" variant="caption">
           {GRAPH_FAILED}
