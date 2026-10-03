@@ -57,8 +57,9 @@ export default function Page() {
         </helix-text>
         <helix-text data-measure emphasis="muted">
           Trace links every output to what it was derived from: the sources it read, the memories it
-          used, the context it assembled, and the tools it called. This example shows three answers
-          from a support assistant, drawn with Helix Graph. Trace is still being built.
+          used, the context it assembled, and the tools it called. Each memory cites facts kept in
+          Engram. This example shows four answers from a support assistant, built by Trace and
+          Engram and drawn with Helix Graph. Trace is still being built.
         </helix-text>
         <TraceGraph />
       </helix-flex>

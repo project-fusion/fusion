@@ -1,19 +1,53 @@
 /**
- * An example trace, drawn on the Cortex page: three answers a support
- * assistant gave, and everything each was derived from, in Trace's own
- * terms. Each link runs from a node to what was derived from it, the way
- * `derived_from` reads backward, so deleting a node removes everything
- * downstream of it, as `delete_cascade` does.
+ * An example trace, drawn on the Cortex page: four answers a support
+ * assistant gave, and everything each was derived from.
+ *
+ * **Built by Trace and Engram themselves.** `trace-example.json` is written by
+ * `cortex/trace/tests/site_example.rs`, which makes each node with Trace's
+ * `Graph`, each fact with Engram's `Memory`, and the deletion with
+ * `delete_cascade`, and fails when this file falls behind them. Each link runs
+ * from a node to what was derived from it, the way `derived_from` reads
+ * backward. This module only places what it is given.
  */
+import example from './trace-example.json'
 
-/** The kinds a trace's nodes are, as Trace's `NodeKind` names them, and how each is drawn. */
+/** What the example holds, as the Rust writes it. */
+interface Example {
+  deleted: string
+  links: readonly TraceLink[]
+  nodes: readonly {
+    id: string
+    kind: keyof typeof KINDS
+    label: string
+    superseded?: boolean
+  }[]
+  removed: readonly string[]
+}
+
+/** The kinds the example's nodes are, Trace's `NodeKind` and Engram's facts, and how each is drawn. */
 const KINDS = {
   context: { group: 'Contexts', shape: 'diamond' },
-  memory: { group: 'Memories', shape: 'circle' },
+  fact: { group: 'Facts, in Engram', shape: 'circle' },
+  memory: { group: 'Memories', shape: 'ring' },
   output: { group: 'Outputs', shape: 'circle' },
   source: { group: 'Sources', shape: 'square' },
-  tool: { group: 'Tool calls', shape: 'ring' },
+  tool_call: { group: 'Tool calls', shape: 'diamond' },
 } as const
+
+/**
+ * **The order of the columns**, which is the order a trace reads in: what
+ * came in, what was kept, what was retrieved, what was looked up, the
+ * context assembled, and the answer. A list, since an object's keys are
+ * kept sorted.
+ */
+const ORDER: readonly (keyof typeof KINDS)[] = [
+  'source',
+  'fact',
+  'memory',
+  'tool_call',
+  'context',
+  'output',
+]
 
 /** One node of the trace, as the frame takes it, placed. */
 export interface TraceNode {
@@ -33,40 +67,22 @@ export interface TraceLink {
   target: string
 }
 
-const node = (
-  kind: keyof typeof KINDS,
-  id: string,
-  label: string,
-  more: Partial<TraceNode> = {},
-): Omit<TraceNode, 'x' | 'y'> => ({ id, label, ...KINDS[kind], ...more })
+const EXAMPLE = example as Example
 
 /**
- * **In columns, the way a trace reads**: what came in, what was kept, what
- * was looked up, the context assembled from them, and the answer. Each
- * column's notes in the order of the answers they lead to, so the links run
- * across and seldom cross, and **a row left open at each column's middle**,
- * where its group's name is drawn. Placed here, so no layout runs.
+ * Each kind's notes, in the order the example made them, which the Rust sets
+ * so each column reads in the order of the answers its notes lead to, and
+ * the links run across and seldom cross.
  */
-const COLUMNS: readonly (readonly string[])[] = [
-  [
-    'q-release',
-    's-release',
-    'q-price',
-    's-pricing-september',
-    's-pricing',
-    's-chat',
-    'q-refund',
-    's-refunds',
-  ],
-  ['m-shipped', 'm-export', 'm-price-september', 'm-price', 'm-plan', 'm-email', 'm-refunds'],
-  ['t-search', 't-account'],
-  ['c-release', 'c-price', 'c-refund'],
-  ['o-release', 'o-price', 'o-refund'],
-]
+const COLUMNS: readonly (readonly string[])[] = ORDER.map((kind) =>
+  EXAMPLE.nodes.filter((node) => node.kind === kind).map((node) => node.id),
+)
 
 /** How far apart the columns are, and the notes in a column, in the graph's units. */
 const ACROSS = 10
 const DOWN = 2.6
+/** How much further the columns after the sources start, for the sources' longer names. */
+const SOURCE_NAMES = 3
 
 /** How the trace is laid out: in columns, across a wide screen, or in rows, down a narrow one. */
 export type TraceLayout = 'columns' | 'rows'
@@ -93,7 +109,15 @@ const placesFor = (layout: TraceLayout): Map<string, { x: number; y: number }> =
         /* Up is positive in the drawing, so the first in a column is at the
            top; the lower half steps down one more, past the open middle row. */
         const row = down < half ? down : down + 1
-        at.set(id, { x: across * ACROSS, y: (column.length / 2 - row) * DOWN })
+        /* **The tool calls sit half a row off**, between the rows the
+           retrievals and contexts share: on a row, the link from a
+           retrieval to its context ran straight through a tool call it has
+           nothing to do with. */
+        const off = ORDER[across] === 'tool_call' ? DOWN / 2 : 0
+        /* The sources' names are the longest, so the columns after them
+           start a little further over. */
+        const x = across * ACROSS + (across > 0 ? SOURCE_NAMES : 0)
+        at.set(id, { x, y: (column.length / 2 - row) * DOWN + off })
       })
       return
     }
@@ -114,95 +138,55 @@ const placesFor = (layout: TraceLayout): Map<string, { x: number; y: number }> =
   return at
 }
 
-const placed = (nodes: readonly Omit<TraceNode, 'x' | 'y'>[]): TraceNode[] => {
-  const at = placesFor('columns')
-  return nodes.map((one) => ({ ...one, ...(at.get(one.id) ?? { x: 0, y: 0 }) }))
-}
+/** Every note as the frame takes it, before it is placed. */
+const NOTES: readonly Omit<TraceNode, 'x' | 'y'>[] = EXAMPLE.nodes.map((node) => ({
+  id: node.id,
+  ...KINDS[node.kind],
+  /* **Superseded and kept**: Engram retains a fact that was replaced, since
+     an answer given while it was current is explained by it. */
+  ...(node.superseded
+    ? { emphasis: 'outlined', label: `${node.label} (superseded)`, tone: 'neutral' }
+    : { label: node.label }),
+  ...(node.kind === 'output' ? { tone: 'primary' } : {}),
+}))
 
 /** The trace's notes placed for a layout. */
 export const traceIn = (layout: TraceLayout): TraceNode[] => {
   const at = placesFor(layout)
-  return TRACE_NODES.map((one) => ({ ...one, ...(at.get(one.id) ?? { x: 0, y: 0 }) }))
+  return NOTES.map((one) => ({ ...one, ...(at.get(one.id) ?? { x: 0, y: 0 }) }))
 }
 
-export const TRACE_NODES: readonly TraceNode[] = placed([
-  node('source', 'q-release', 'When did 0.11 ship?'),
-  node('source', 'q-price', 'What will my plan cost?'),
-  node('source', 'q-refund', 'Can I get a refund?'),
-  node('source', 's-release', 'Release notes'),
-  node('source', 's-pricing-september', 'September pricing'),
-  node('source', 's-pricing', 'October pricing'),
-  node('source', 's-chat', 'Support chat'),
-  node('source', 's-refunds', 'Refund policy'),
-  node('memory', 'm-shipped', 'Shipped October 8'),
-  node('memory', 'm-export', 'Fixes the export bug'),
-  /* **Superseded and kept**: Trace retains a fact that was replaced, since
-     an answer given while it was current is explained by it. */
-  node('memory', 'm-price-september', 'Pro was $15 (superseded)', {
-    emphasis: 'outlined',
-    tone: 'neutral',
-  }),
-  node('memory', 'm-price', 'Pro is $20 a seat'),
-  node('memory', 'm-plan', 'On the Pro plan'),
-  node('memory', 'm-email', 'Prefers email'),
-  node('memory', 'm-refunds', 'Refunds in 30 days'),
-  node('tool', 't-search', 'search_docs'),
-  node('tool', 't-account', 'lookup_account'),
-  node('context', 'c-release', 'Release context'),
-  node('context', 'c-price', 'Pricing context'),
-  node('context', 'c-refund', 'Refund context'),
-  node('output', 'o-release', '“Shipped on the 8th.”', { tone: 'primary' }),
-  node('output', 'o-price', '“Pro is $20 a seat.”', { tone: 'primary' }),
-  node('output', 'o-refund', '“Within 30 days.”', { tone: 'primary' }),
-])
+export const TRACE_NODES: readonly TraceNode[] = traceIn('columns')
 
-const from = (source: string, ...targets: string[]): TraceLink[] =>
-  targets.map((target) => ({ source, target }))
+export const TRACE_LINKS: readonly TraceLink[] = EXAMPLE.links
 
-export const TRACE_LINKS: readonly TraceLink[] = [
-  ...from('s-release', 'm-shipped', 'm-export'),
-  ...from('s-pricing-september', 'm-price-september'),
-  ...from('s-pricing', 'm-price'),
-  ...from('s-chat', 'm-plan', 'm-email'),
-  ...from('s-refunds', 'm-refunds'),
-  ...from('q-price', 't-search', 't-account'),
-  ...from('t-search', 'c-price'),
-  ...from('t-account', 'c-price'),
-  ...from('q-release', 'c-release'),
-  ...from('m-shipped', 'c-release'),
-  ...from('m-export', 'c-release'),
-  ...from('q-price', 'c-price'),
-  ...from('m-price', 'c-price'),
-  ...from('m-plan', 'c-price'),
-  ...from('q-refund', 'c-refund'),
-  ...from('m-refunds', 'c-refund'),
-  ...from('m-email', 'c-refund'),
-  ...from('c-release', 'o-release'),
-  ...from('c-price', 'o-price'),
-  ...from('c-refund', 'o-refund'),
-]
+/** The memory the page's button deletes. */
+export const TRACE_DELETED = EXAMPLE.deleted
 
-/** The memory the page's button deletes, with everything derived from it. */
-export const TRACE_DELETED = 'm-price'
+/** What deleting it removes, as Trace's `delete_cascade` answered: the memory and everything derived from it. */
+export const TRACE_REMOVED: ReadonlySet<string> = new Set(EXAMPLE.removed)
+
+/** How far past the last column the box reaches, in the graph's units, for the answers' names. */
+const NAMES = 0.8 * ACROSS
 
 /**
- * A node and everything derived from it, as `delete_cascade` removes them:
- * the node, what was derived from it, and on down. What it was derived from
- * is untouched.
+ * **The box the drawing is fitted to, with room for the answers' names.**
+ * Sigma fits the notes to the frame, and a name is drawn to the right of its
+ * note, so in columns the last column's names ran past the frame's edge. In
+ * rows the notes take a narrow strip in the middle, which leaves names room
+ * either side, and the notes' own box is the right one, which `null` asks for.
  */
-export const cascadeOf = (id: string, links: readonly TraceLink[]): Set<string> => {
-  const removed = new Set<string>()
-  const queue = [id]
-  for (let next = queue.pop(); next !== undefined; next = queue.pop()) {
-    if (removed.has(next)) {
-      continue
-    }
-    removed.add(next)
-    for (const link of links) {
-      if (link.source === next) {
-        queue.push(link.target)
-      }
-    }
+export const boxFor = (
+  layout: TraceLayout,
+): { x: [number, number]; y: [number, number] } | null => {
+  if (layout === 'rows') {
+    return null
   }
-  return removed
+  const places = [...placesFor(layout).values()]
+  const xs = places.map((place) => place.x)
+  const ys = places.map((place) => place.y)
+  return {
+    x: [Math.min(...xs), Math.max(...xs) + NAMES],
+    y: [Math.min(...ys), Math.max(...ys)],
+  }
 }
