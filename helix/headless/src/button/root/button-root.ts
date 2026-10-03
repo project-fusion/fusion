@@ -40,6 +40,7 @@ import { property } from 'lit/decorators.js'
  * @slot start - Content before the label, usually an icon.
  *
  * @csspart button - The inner control.
+ * @csspart text - The button's words, which the styled button trims to their capitals and baseline so the letters sit at the middle in any font.
  */
 @customElement('helix-headless-button')
 export class HelixHeadlessButton extends HelixFormElement {
@@ -402,7 +403,7 @@ export class HelixHeadlessButton extends HelixFormElement {
   }
 
   protected override render(): TemplateResult {
-    const label = html`<slot name="start"></slot><slot></slot><slot name="end"></slot>`
+    const label = html`<slot name="start"></slot><slot part="text"></slot><slot name="end"></slot>`
     const stop = this.focusable ? nothing : '-1'
 
     return html`<button

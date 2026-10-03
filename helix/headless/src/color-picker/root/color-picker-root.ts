@@ -92,9 +92,11 @@ interface EyeDropperConstructor {
  * @csspart controls - The row under the square.
  * @csspart eyedropper - The control that samples a color from the screen.
  * @csspart eyedropper-button - The button inside `eyedropper`.
+ * @csspart eyedropper-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart footer - The row holding the value and the tools.
  * @csspart format - The control that changes the syntax the value is written in.
  * @csspart format-button - The button inside `format`.
+ * @csspart format-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart grid - The saturation and brightness square. Draw the mark that shows
  * where the color sits with `::part(grid)::after` in your stylesheet. The
  * square carries the two channels as `--color-picker-saturation` and
@@ -761,7 +763,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                   this.sampling && !this.noEyedropper
                     ? html`<${this.tag('button')}
                         part="eyedropper"
-      exportparts="button: eyedropper-button"
+      exportparts="button: eyedropper-button, text: eyedropper-text"
                         aria-label=${this.eyedropperLabel}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
@@ -775,7 +777,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                     ? nothing
                     : html`<${this.tag('button')}
                         part="format"
-      exportparts="button: format-button"
+      exportparts="button: format-button, text: format-text"
                         aria-label=${fillTemplate(this.formatLabel, { format: this.format ?? 'hex' })}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}
