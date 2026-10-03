@@ -128,6 +128,9 @@ glance. Links are tinted by the note they leave, the selected note's and the
 hovered note's in their color, and choosing a note in the list frames it with
 its neighbors.
 
+**A press on a note selects it, and a press where no note is lets it go**,
+so the graph's colors come back, in every driver.
+
 **Notes are named on hover**, and the selected note and its neighbors where
 there is room, each name ringed in the ground's color so it reads over the
 links. Each group's name is drawn over its notes, which is how a reader finds
@@ -300,12 +303,14 @@ connectGraph(frame, threeDriver(box), {
   who asks for less motion.
 - **The far side recedes.** Through a graph, its far notes are a little
   quieter than its near ones.
+- **Edges are smooth at any density.** The drawing has half as many pixels again as the screen, at least two for each of the page's, and links are lines of a set width with smooth edges, where WebGL draws its own a device pixel wide.
 - **Each group is named over its near side**, and a group's name moves a line
   where it would cover another's.
 
 | `threeDriver` option | Default | What else it takes |
 |---|---|---|
 | `autoRotate` | `true` | `false` leaves the graph still until the reader turns it |
+| `density` | screen × 1.5, 2 to 3 | How many pixels the drawing has for each of the page's; fewer is faster on a slow GPU |
 | `shape` | `circle` | `square` or `diamond`, for every note that does not say |
 | `groupLabels` | `true` | `false` leaves each group unnamed |
 | `layoutLimit` | `10000` | The longest a layout runs, in milliseconds |

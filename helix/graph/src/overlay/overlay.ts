@@ -346,7 +346,14 @@ const layer = (container: HTMLElement, kind: 'groups' | 'names' | 'signals'): HT
   return canvas
 }
 
-/** Sizes a layer to its box at the screen's density, and clears it. */
+/**
+ * How many pixels a layer has for each of the page's: the screen's own, and
+ * never fewer than two, so on a screen of one a name's edges and a signal's
+ * tail are drawn twice as finely and smoothed down. At most three.
+ */
+export const overlayDensity = (): number => Math.min(Math.max(window.devicePixelRatio || 1, 2), 3)
+
+/** Sizes a layer to its box at the overlay's density, and clears it. */
 const fresh = (
   canvas: HTMLCanvasElement,
   container: HTMLElement,
@@ -355,7 +362,7 @@ const fresh = (
   if (!context) {
     return null
   }
-  const ratio = window.devicePixelRatio || 1
+  const ratio = overlayDensity()
   const width = Math.round(container.clientWidth * ratio)
   const height = Math.round(container.clientHeight * ratio)
   if (canvas.width !== width || canvas.height !== height) {

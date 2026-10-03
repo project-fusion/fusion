@@ -527,6 +527,7 @@ export const cosmosDriver = (
     },
     onPress: (press) => {
       graph.setConfigPartial({
+        onBackgroundClick: () => press(undefined),
         onPointClick: (at: number) => {
           const id = ids[at]
           if (id !== undefined) {
@@ -534,7 +535,7 @@ export const cosmosDriver = (
           }
         },
       })
-      return () => graph.setConfigPartial({ onPointClick: undefined })
+      return () => graph.setConfigPartial({ onBackgroundClick: undefined, onPointClick: undefined })
     },
     panBy: (x, y, animate) => {
       const { height, width } = container.getBoundingClientRect()
@@ -587,6 +588,7 @@ export const cosmosDriver = (
       stopped = true
       clearTimeout(overviewing)
       graph.setConfigPartial({
+        onBackgroundClick: undefined,
         onPointClick: undefined,
         onPointMouseOut: undefined,
         onPointMouseOver: undefined,

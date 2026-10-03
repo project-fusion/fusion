@@ -73,7 +73,13 @@ const rendererOf = () => {
   document.body.append(container)
   const settings = new Map<string, unknown>()
   let state = { angle: 0, ratio: 1, x: 0.5, y: 0.5 }
-  const listeners = new Set<(payload: { node: string }) => void>()
+  /* Each event's listeners, by the event's name. */
+  const listeners = new Map<string, Set<(payload: { node: string }) => void>>()
+  const of = (type: string) => {
+    const set = listeners.get(type) ?? new Set()
+    listeners.set(type, set)
+    return set
+  }
   const sigma: SigmaRenderer = {
     framedGraphToViewport: ({ x, y }) => ({ x: x * 800, y: y * 400 }),
     getCamera: () => ({
@@ -95,8 +101,8 @@ const rendererOf = () => {
           ? { size: 4, x: 0.6, y: 0.2 }
           : undefined,
     getSetting: () => ({ circle: 'Circle' }),
-    off: (_type, listener) => listeners.delete(listener),
-    on: (_type, listener) => listeners.add(listener),
+    off: (type, listener) => of(type).delete(listener),
+    on: (type, listener) => of(type).add(listener),
     refresh: () => {},
     resize: () => {},
     scaleSize: (size = 1) => size,
@@ -107,8 +113,13 @@ const rendererOf = () => {
   return {
     camera: () => state,
     click: (node: string) => {
-      for (const listener of listeners) {
+      for (const listener of of('clickNode')) {
         listener({ node })
+      }
+    },
+    clickAway: () => {
+      for (const listener of of('clickStage')) {
+        listener({ node: '' })
       }
     },
     container,
@@ -259,14 +270,16 @@ describe('sigmaDriver', () => {
     expect([renderer.camera().x, renderer.camera().y]).toEqual([0.2, 0.8])
   })
 
-  test('says which note was pressed until told to stop', () => {
+  test('says which note was pressed, and a press on no note, until told to stop', () => {
     const renderer = rendererOf()
-    const pressed: string[] = []
+    const pressed: (string | undefined)[] = []
     const stop = sigmaDriver(renderer.sigma).onPress?.((id) => pressed.push(id))
     renderer.click('a')
+    renderer.clickAway()
     stop?.()
     renderer.click('b')
-    expect(pressed).toEqual(['a'])
+    renderer.clickAway()
+    expect(pressed).toEqual(['a', undefined])
   })
 
   test('keeps the plain wheel from the renderer while cooperative, and every gesture while off', () => {

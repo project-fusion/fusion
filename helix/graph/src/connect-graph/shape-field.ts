@@ -32,7 +32,7 @@ export interface ShapeField {
 
 /** How many cells a field has along its longer side, flat and solid. */
 export const FLAT = 512
-export const SOLID = 96
+export const SOLID = 144
 
 /** A distance far enough that nothing is nearer, for the transform's empty cells. */
 const FAR = 1e20

@@ -49,12 +49,12 @@ export interface SigmaRenderer {
     type: 'clickNode' | 'enterNode' | 'leaveNode',
     listener: (payload: { node: string }) => void,
   ): unknown
-  off(type: 'afterRender' | 'beforeRender', listener: () => void): unknown
+  off(type: 'afterRender' | 'beforeRender' | 'clickStage', listener: () => void): unknown
   on(
     type: 'clickNode' | 'enterNode' | 'leaveNode',
     listener: (payload: { node: string }) => void,
   ): unknown
-  on(type: 'afterRender' | 'beforeRender', listener: () => void): unknown
+  on(type: 'afterRender' | 'beforeRender' | 'clickStage', listener: () => void): unknown
   getSetting(name: 'nodeProgramClasses'): Record<string, unknown>
   refresh(): unknown
   resize(force?: boolean): unknown
@@ -503,9 +503,12 @@ export const sigmaDriver = (
     },
     onPress: (press) => {
       const listener = ({ node }: { node: string }): void => press(node)
+      const away = (): void => press(undefined)
       sigma.on('clickNode', listener)
+      sigma.on('clickStage', away)
       return () => {
         sigma.off('clickNode', listener)
+        sigma.off('clickStage', away)
       }
     },
     panBy: (x, y, animate) => {
