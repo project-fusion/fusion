@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-cem",
   "description": "The framework typings written from a Helix manifest once `helix manifest build` has written it.",
-  "version": "0.133.1",
+  "version": "0.134.0",
   "private": true,
   "license": "MIT",
   "repository": {

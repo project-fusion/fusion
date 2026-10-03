@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-graph",
   "description": "Connects the Helix Graph frame to a graph renderer: Sigma.js, cosmos.gl, three.js, or a driver of your own.",
-  "version": "0.133.1",
+  "version": "0.134.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
