@@ -15,53 +15,60 @@ a theme from a few inputs, and the theme builder shows you the result.
 
 You enter the same inputs that `derive()` takes:
 
-- a brand color
-- a chroma ceiling
-- a radius
-- a density
-- a contrast target
-- a motion character
+- **Color:** the brand, the color scheme, the contrast target, the saturation,
+  the accent angle, and the page's color in light and in dark
+- **Shape and type:** the density, the corner radius, the three faces, the body
+  size, and the type scale
+- **Status:** how far the status colors follow the palette, and how far their
+  hues may move
+- **Motion, separation, and material:** the motion character, how surfaces are
+  set apart, and how floating surfaces are blurred and see-through
 
-The theme builder runs the full derivation. It shows you every token, and the
-components drawn with them.
+The theme builder runs the full derivation on every change. It shows a page
+drawn with the theme, and the stylesheet the theme generates beside it.
 
-It shows light and dark at the same time. `[data-color-mode]` works on any
-element, so the two previews are two subtrees of one document. See
-[Color modes](./color-modes).
+The Color scheme field picks which half you see: light, dark, or the site's own
+mode. See [Color modes](./color-modes).
 
-## The contrast column
+## A page of your own color
 
-The contrast column lists every color pair Helix computed. Each pair shows its
-ratio, measured against the background it is painted on. A pair has one of
-three states:
+The Light page and Dark page fields give the page a color, such as a warm cream
+or a deep teal. Empty, the page is pure white in light and pure black in dark.
+The surfaces keep the contrast with it they keep with white or black, the grays
+take its tint, and every text color is solved against it. A page that no text
+color can reach the contrast target on is left out of the preview, and a
+caption under the fields says so.
 
-- **Met.** The pair reaches the target.
-- **Unverifiable.** The background is translucent, so there is no known color
-  to measure against. The pair neither passes nor fails. This is the cost of a
-  translucent material, and the theme builder reports it.
-- **Pinned.** You set the color yourself. The engine did not compute it, so its
-  contrast is not guaranteed.
+## The audit
 
-A column of `unverifiable` pairs means your theme makes a trade. The column lets
-you see that you made it.
+The audit lists every color pair Helix computed. Each pair shows its ratio,
+measured against the background it is painted on, and either passes or fails
+its target. Its three tabs are:
 
-## What the theme builder exports
+- **Contrast.** The pairs that fail, or a line saying that every pair passes.
+- **Collisions.** Colors too close to each other to tell apart, such as the
+  primary color and a status color.
+- **Unverifiable.** Pairs whose background is translucent, so there is no known
+  color to measure against. This is the cost of a translucent material, and
+  the theme builder reports it.
 
-The theme builder gives you the token block as CSS, to paste into your own
+## What the theme builder gives you
+
+The generated stylesheet is the token block as CSS, to paste into your own
 stylesheet:
 
 ```css
-:root {
-  --helix-color-primary: oklch(…);
+[data-theme="preview"] {
+  --helix-color-background: #f7f2eb;
   …
 }
 ```
 
-It also gives you the intent object, to keep in your repository and derive the
-theme from again:
+The page's link holds every input you changed, so a link is the theme. To derive
+the theme in your own build, write the same inputs as an intent object:
 
 ```ts
-export const theme = { brand: '#2563eb', chroma: { ceiling: 0.1 }, radius: 2 }
+export const theme = { background: { light: '#f7f2eb' }, brand: '#ff6200' }
 ```
 
 **Keep the intent object in your repository.** The tokens are the output of a
