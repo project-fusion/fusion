@@ -69,6 +69,8 @@ first.
   gestures the frame's `gestures` lets it take.
 - Draws only what changed when the page hands the frame new notes or links, and
   draws the frame's `signal()`s.
+- Fades out a snapshot drawn on the server by `graphSnapshot` once the renderer
+  has drawn the graph whole.
 
 ## Live graphs
 
@@ -357,6 +359,7 @@ connectGraph(frame, threeDriver(box), {
 | `@fusion.dev/helix-graph/three` | `threeDriver(box, options)`, and the type `ThreeDriverOptions` |
 | `@fusion.dev/helix-graph/shapes` | `shapeFromTriangles`, `shapeFromSvg`, `shapeFromImage`, `shapeFromPath`, `shapeFromInside`, `inflate`, `sphere`, `torus`, `cuboid`, `onSphere`, `surfaceOf`, and the types `ImageOptions`, `ShapeField` and `TriangleOptions` |
 | `@fusion.dev/helix-graph/model` | `shapeFromModel(source, options)`, which needs three.js |
+| `@fusion.dev/helix-graph/snapshot` | `graphSnapshot(nodes, links, options)`, an SVG of the graph to paint before the renderer loads, and the types `GraphSnapshotOptions`, `SnapshotLink` and `SnapshotNode` |
 
 **Sigma, cosmos.gl, three.js and d3-force-3d are optional peers, and graphology is the page's.** Each
 driver types its renderer by the calls it makes on it, so a page brings

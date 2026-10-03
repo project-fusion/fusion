@@ -228,6 +228,22 @@ describe('connectGraph', () => {
     expect(host.ready).toBe(true)
   })
 
+  test('takes a snapshot away once the graph is drawn, and leaves it in the page', async () => {
+    const host = await frame()
+    host.nodes = [{ id: 'a', x: 0, y: 0 }]
+    const snapshot = document.createElement('div')
+    snapshot.setAttribute('data-helix-graph-snapshot', '')
+    host.append(snapshot)
+    await host.updateComplete
+    connectGraph(host, recording(false).driver)
+    expect(snapshot.hidden).toBe(false)
+    await settled(host)
+    await new Promise((done) => setTimeout(done, 400))
+    expect(host.ready).toBe(true)
+    expect(snapshot.hidden).toBe(true)
+    expect(snapshot.isConnected).toBe(true)
+  })
+
   test('answers the frame’s pan and zoom', async () => {
     const host = await frame()
     const { asked, driver } = recording()

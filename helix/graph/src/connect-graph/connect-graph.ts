@@ -28,6 +28,7 @@ import {
 } from './looks.js'
 import { type GraphReach, reachOf } from './reach.js'
 import { type GraphPoint, seedPositions } from './seed.js'
+import { sizeOf } from './sizes.js'
 import { fieldOf, fitInStencil, type GraphStencil, type StencilFrame } from './stencil.js'
 
 export type { DrawnLink, DrawnNode, GraphChanges } from './diff.js'
@@ -283,6 +284,47 @@ export const connectGraph = (
   let pending = 0
   let connected = true
 
+  /* **A snapshot drawn on the server is taken away once the renderer has
+     drawn over it**, faded at the page's pace for a step, or at once for a
+     reader who asked for less motion. Until then it is the graph, which is
+     the point of it: the page has one from its first paint. **Hidden and
+     not removed**, since the page's framework may own the element and
+     remove it itself later, and an element already gone is an error there. */
+  const snapshots = [...frame.querySelectorAll<HTMLElement>(':scope > [data-helix-graph-snapshot]')]
+  const away = (snapshot: HTMLElement): void => {
+    snapshot.hidden = true
+    snapshot.style.display = 'none'
+  }
+  const ready = (): void => {
+    graph.drawn?.(true)
+    if (snapshots.length === 0) {
+      return
+    }
+    const style = getComputedStyle(frame)
+    const time = /^\s*(\d*\.?\d+)(ms|s)\s*$/i.exec(
+      style.getPropertyValue('--helix-duration-normal'),
+    )
+    const duration = time ? Number(time[1]) * (time[2]?.toLowerCase() === 's' ? 1000 : 1) : 200
+    const easing = style.getPropertyValue('--helix-easing-standard').trim() || 'ease'
+    for (const snapshot of snapshots.splice(0)) {
+      if (still() || duration <= 0 || typeof snapshot.animate !== 'function') {
+        away(snapshot)
+        continue
+      }
+      let fade: Animation
+      try {
+        fade = snapshot.animate([{ opacity: 1 }, { opacity: 0 }], { duration, easing })
+      } catch {
+        /* A curve the browser cannot animate by, which a theme may write. */
+        fade = snapshot.animate([{ opacity: 1 }, { opacity: 0 }], { duration })
+      }
+      fade.finished.then(
+        () => away(snapshot),
+        () => away(snapshot),
+      )
+    }
+  }
+
   /** The selected note, where the graph still holds it: a selection whose note was taken away is none. */
   const selectedNote = (): string | undefined => {
     const active = graph.active
@@ -434,11 +476,7 @@ export const connectGraph = (
       unplaced = new Set()
       known = new Map(shaped)
     }
-    /* **A note without a size is as large as it is connected**, so a hub
-       reads as one at a glance and the graph's shape shows before a word of
-       it is read. The square root, so a note with a hundred links is not ten
-       times the size of one with ten, and no larger than a note with
-       thirty-six, so a hub with thousands does not cover its own region. */
+    /* As large as it is connected, where the note gives no size: `sizeOf`. */
     const degree = new Map<string, number>()
     for (const { source, target } of nextLinks.values()) {
       degree.set(source, (degree.get(source) ?? 0) + 1)
@@ -450,9 +488,7 @@ export const connectGraph = (
       nextNodes.set(node.id, {
         id: node.id,
         label: node.label || node.id,
-        size: Number.isFinite(node.size)
-          ? (node.size as number)
-          : 1 + Math.min(Math.sqrt(degree.get(node.id) ?? 0), 6),
+        size: sizeOf(node.size, degree.get(node.id) ?? 0),
         x: at.x,
         y: at.y,
         ...(at.z === undefined ? {} : { z: at.z }),
@@ -503,7 +539,7 @@ export const connectGraph = (
         graph.laidOut?.(Object.fromEntries([...settled].map(([id, at]) => [id, { ...at }])))
         if (owed) {
           owed = false
-          graph.drawn?.(true)
+          ready()
         }
       })
       return
@@ -520,7 +556,7 @@ export const connectGraph = (
       pending = requestAnimationFrame(() => {
         if (connected && owed) {
           owed = false
-          graph.drawn?.(true)
+          ready()
         }
       })
     }
