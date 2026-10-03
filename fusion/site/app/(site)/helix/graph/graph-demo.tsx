@@ -177,12 +177,15 @@ export function GraphDemo({
   canvasClassName,
   className,
   kind,
+  noPanel = false,
   paused = false,
 }: {
   /** A class for the box the renderer draws in, as the hero gives it to keep its drawing clear of the words. */
   canvasClassName?: string
   className?: string
   kind: DemoKind
+  /** Whether the frame leaves its search and list out, behind a button among its controls. */
+  noPanel?: boolean
   /** Whether its messages are held, which a control on the page decides; read as each is sent, so pausing does not remake the graph. */
   paused?: boolean
 }) {
@@ -241,6 +244,7 @@ export function GraphDemo({
          graph is passed on the way to the rest. */
       gestures="cooperative"
       label={FRAMES[kind].label}
+      no-panel={noPanel}
       ref={frame}
     >
       <div className={`${styles.graphCanvas} ${canvasClassName ?? ''}`} ref={box} />

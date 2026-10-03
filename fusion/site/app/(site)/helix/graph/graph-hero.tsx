@@ -68,6 +68,7 @@ export function GraphHero() {
         canvasClassName={styles.graphHeroCanvas}
         className={styles.graphHeroFrame}
         kind="mind"
+        noPanel
         paused={!passing}
       />
       <ThemeTry
