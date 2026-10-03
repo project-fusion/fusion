@@ -18,7 +18,12 @@
   /* `svh`, never `vh` or `dvh`. `vh` is the tallest the viewport ever gets, so
      on a phone the band overflows by the height of the browser chrome. `dvh`
      resizes while that chrome hides and moves the page under the reader's
-     thumb. `svh` is the small stable one. */
+     thumb. `svh` is the small stable one.
+
+     **At every width, a phone's included.** The hero gave up the height below
+     48rem and sat at the top of a short band, which on a tall phone left the
+     claim in the upper third and the next band's top showing under it. Filling
+     the first screen at every width keeps the claim at its middle. */
   min-block-size: 100svh;
   /* The aura is placed against this, so the hero has to be the containing
      block. `overflow: hidden` because a canvas that overhangs the section would
@@ -93,12 +98,6 @@
   /* `md` rather than `sm`, now that the box is the button row's width: the
      command sits off the edge by the same amount the buttons' labels do. */
   padding-inline: var(--helix-space-md);
-}
-
-@media (max-width: 48rem) {
-  .hero {
-    min-block-size: auto;
-  }
 }
 
 .heroInstall code {
