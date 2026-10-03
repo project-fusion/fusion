@@ -365,6 +365,15 @@ describe('sigmaDriver', () => {
     expect([...graph.edgeMap.keys()]).toEqual(['a>d'])
   })
 
+  test('a whole drawing frames the graph afresh, wherever the reader had zoomed', () => {
+    const renderer = rendererOf()
+    const driver = sigmaDriver(renderer.sigma)
+    driver.zoomBy(1, false)
+    expect(renderer.camera().ratio).not.toBe(1)
+    driver.draw({ links: [], nodes: [{ id: 'a', label: 'Alpha', size: 1, x: 0, y: 0 }] })
+    expect(renderer.camera()).toMatchObject({ ratio: 1, x: 0.5, y: 0.5 })
+  })
+
   test('glides a moved note to its place where the change is animated', async () => {
     /* happy-dom runs a frame's callback once and no more, so frames come on a timer here. */
     const frame = globalThis.requestAnimationFrame
@@ -451,5 +460,25 @@ describe('sigmaDriver', () => {
     expect(killed).toBe(true)
     expect(placed.get('b')).toEqual({ x: 10, y: 1 })
     expect(renderer.graph.nodes.get('a')?.fixed).toBe(false)
+  })
+
+  test('pauses the layout while its box is off the page, and takes it up again when it is back', async () => {
+    const renderer = rendererOf()
+    const asked: string[] = []
+    const layout = (): SigmaLayout => ({
+      kill: () => asked.push('kill'),
+      start: () => asked.push('start'),
+      stop: () => asked.push('stop'),
+    })
+    const driver = sigmaDriver(renderer.sigma, { layout })
+    driver.draw({ links: [], nodes: [{ id: 'a', label: 'a', size: 1, x: 0, y: 0 }] })
+    const stop = driver.settle?.(new Set(['a']), () => {})
+    renderer.container.remove()
+    await new Promise((done) => setTimeout(done, 300))
+    expect(asked).toEqual(['start', 'stop'])
+    document.body.append(renderer.container)
+    await new Promise((done) => setTimeout(done, 300))
+    expect(asked).toEqual(['start', 'stop', 'start'])
+    stop?.()
   })
 })

@@ -42,8 +42,9 @@ export type { DrawnLink, DrawnNode, GraphChanges } from './diff.js'
  */
 export interface GraphDriver {
   /**
-   * Draws the graph, replacing whatever was drawn, where each note is placed.
-   * Keep the view where it is: a note added to a graph is no reason to move.
+   * Draws the graph whole, replacing whatever was drawn, where each note is
+   * placed, and frames it: the first drawing, a graph the page replaced with
+   * one that shares no note, or every change for a driver without `update`.
    */
   draw(graph: { links: DrawnLink[]; nodes: DrawnNode[] }): void
   /**
@@ -355,6 +356,17 @@ export const connectGraph = (
     cancelAnimationFrame(pending)
     const nodes = graph.nodes ?? []
     const ids = new Set(nodes.map((node) => node.id))
+    /* **A graph replaced whole is drawn as a new one**: none of its notes was
+       drawn before, so the view the reader had is over nothing, and the new
+       graph is framed afresh. A change that keeps any note keeps the view. */
+    if (
+      !first &&
+      drawnNodes.size > 0 &&
+      ids.size > 0 &&
+      ![...ids].some((id) => drawnNodes.has(id))
+    ) {
+      whole = true
+    }
     /* A link to a note the graph does not hold is left out of the drawing,
        which has nothing to draw it to; the list keeps counting it. One link
        a pair, whatever the page repeats. */

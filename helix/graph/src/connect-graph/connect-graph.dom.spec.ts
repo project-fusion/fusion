@@ -316,6 +316,19 @@ describe('connectGraph', () => {
     expect(told).toBe(0)
   })
 
+  test('a graph replaced with one that shares no note is drawn whole, to be framed afresh', async () => {
+    const host = await frame()
+    const recorder = recording(true, true)
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    host.nodes = [{ id: 'x' }, { id: 'y' }]
+    host.links = [{ source: 'x', target: 'y' }]
+    await settled(host)
+    expect(recorder.asked.drawn).toHaveLength(2)
+    expect(recorder.asked.drawn.at(-1)?.nodes.map((node) => node.id)).toEqual(['x', 'y'])
+    expect(recorder.asked.updates).toHaveLength(0)
+  })
+
   test('a layout cut short by the next change places its notes with the new ones', async () => {
     const host = await frame()
     const recorder = recording(true, true)
