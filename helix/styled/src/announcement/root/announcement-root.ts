@@ -20,6 +20,8 @@ import { styles } from './announcement-root.css.js'
  * @documentation https://fusion.dev/helix/components/announcement
  *
  * @cssproperty --announcement-block-size - The band's minimum height, so adding a control to it does not move the page down. A message long enough to wrap makes the band taller.
+ * @cssproperty --announcement-background-color - The band's fill, in place of the one its separation gives it. A tone's tint still paints over it, so a band that sets this usually carries no tone.
+ * @cssproperty --announcement-foreground-color - The message's color, to pair with a fill set through the background hook.
  * @cssproperty --announcement-inset - The inline padding, matched to the page.
  */
 @customElement('helix-announcement')
@@ -29,7 +31,8 @@ export class HelixAnnouncement extends HelixHeadlessAnnouncement {
    *
    * `filled` is the resting one, a well sunk below the page. `elevated` brings
    * it up to the surface step, for a band that reads as part of the furniture
-   * rather than as a slot cut into it.
+   * rather than as a slot cut into it. `outlined` draws a hairline under the
+   * band, in its tone where it has one; no other value draws a line.
    *
    * **`separation` and not `tone`, because a rung is not a meaning.** A band
    * can be `info` and elevated at the same time, and two values that can both
@@ -40,7 +43,7 @@ export class HelixAnnouncement extends HelixHeadlessAnnouncement {
    * survives having nothing to paint with, and it is the only axis that does.
    */
   @property({ reflect: true })
-  separation?: 'elevated' | 'filled'
+  separation?: 'elevated' | 'filled' | 'outlined'
 
   static override styles: CSSResultGroup = [liveStyles, styles]
 }

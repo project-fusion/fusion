@@ -20,11 +20,11 @@
   --_announcement-ground: var(--helix-color-background);
 
   align-items: center;
-  background-color: var(--helix-color-surface-sunken);
-  /* Beneath only. A band across the top of the page is bounded by the page's
-     own edges on three sides already. */
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  color: var(--helix-color-foreground);
+  background-color: var(--announcement-background-color, var(--helix-color-surface-sunken));
+  /* **No line, until `separation="outlined"` asks for one.** The band's own
+     fill already parts it from the page, and a hairline under every band was
+     a second statement of the same edge. */
+  color: var(--announcement-foreground-color, var(--helix-color-foreground));
   display: flex;
   font-size: var(--helix-text-sm);
   /* A step up from body weight, on the host beside the size for the same
@@ -94,7 +94,6 @@
    `[tone]` matching *any* value, so neutral has to opt back out of the tint. */
 :host([tone="neutral"]) {
   background-image: none;
-  border-block-end-color: var(--helix-color-border);
 }
 
 /* The brand, for a band that is about the product rather than about a state.
@@ -124,11 +123,6 @@
       color-mix(in oklab, var(--_announcement-color) 20%, var(--_announcement-ground))
     )
   );
-  border-block-end-color: color-mix(
-    in oklab,
-    var(--_announcement-color) 40%,
-    var(--_announcement-ground)
-  );
 }
 
 /* Which rung the band rides, which is not what color it is: the two are set
@@ -144,14 +138,29 @@
    generated page should be able to put a band back rather than delete an
    attribute to get there. */
 :host([separation="filled"]) {
-  background-color: var(--helix-color-surface-sunken);
+  background-color: var(--announcement-background-color, var(--helix-color-surface-sunken));
 }
 
 /* A step up off the page rather than a tint of anything. */
 :host([separation="elevated"]) {
   --_announcement-ground: var(--helix-color-surface);
 
-  background-color: var(--helix-color-surface);
+  background-color: var(--announcement-background-color, var(--helix-color-surface));
+}
+
+/* A line under the band, beneath only: a band across the top of the page is
+   bounded by the page's own edges on three sides already. Its color is the
+   tone's where the band has one, set by the tone rules above. */
+:host([separation="outlined"]) {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+:host([separation="outlined"][tone]:not([tone="neutral"])) {
+  border-block-end-color: color-mix(
+    in oklab,
+    var(--_announcement-color) 40%,
+    var(--_announcement-ground)
+  );
 }
 
 /*
