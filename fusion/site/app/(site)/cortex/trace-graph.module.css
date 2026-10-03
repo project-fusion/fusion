@@ -24,3 +24,25 @@
   block-size: 100%;
   inline-size: 100%;
 }
+
+/* The trace drawn on the server, over the box until Sigma has drawn: the
+   columns beside the text, and the rows on a phone. */
+.columns,
+.rows {
+  inset: 0;
+  position: absolute;
+}
+
+.rows {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  .columns {
+    display: none;
+  }
+
+  .rows {
+    display: block;
+  }
+}

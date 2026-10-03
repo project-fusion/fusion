@@ -1,6 +1,7 @@
 'use client'
 
 import type { HelixGraph } from '@fusion.dev/helix'
+import { graphSnapshot } from '@fusion.dev/helix-graph/snapshot'
 import { useEffect, useRef, useState } from 'react'
 import {
   boxFor,
@@ -38,6 +39,24 @@ const FIRST = 'o-price'
 
 /** A note's name, by its id. */
 const nameOf = (id: string): string => TRACE_NODES.find((node) => node.id === id)?.label ?? id
+
+/**
+ * **The trace drawn before Sigma loads**, in each layout, at the size the
+ * frame is drawn: 34rem tall beside the text, and a 390-pixel phone's width
+ * in rows. Lit for the first answer, as the drawing opens. CSS shows the one
+ * for the screen, and the connection fades both once Sigma has drawn.
+ */
+const SNAPSHOTS = (['columns', 'rows'] as const).map((layout) => ({
+  layout,
+  markup: graphSnapshot(traceIn(layout), TRACE_LINKS, {
+    active: FIRST,
+    bounds: boxFor(layout),
+    height: layout === 'rows' ? 990 : 542,
+    labels: 'all',
+    reach: 'upstream',
+    width: layout === 'rows' ? 340 : 1280,
+  }),
+}))
 
 /** Where the trace turns from columns to rows: a phone's width, as the page's own narrow layout. */
 const NARROW = '(max-width: 40rem)'
@@ -214,6 +233,15 @@ export function TraceGraph() {
         ref={frame}
       >
         <div className={styles.traceCanvas} ref={box} />
+        {SNAPSHOTS.map((snapshot) => (
+          <div
+            className={styles[snapshot.layout]}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG Helix Graph drew from this file's own trace, its names escaped
+            dangerouslySetInnerHTML={{ __html: snapshot.markup }}
+            data-helix-graph-snapshot=""
+            key={snapshot.layout}
+          />
+        ))}
         {failed ? (
           <helix-text slot="footer" variant="caption">
             The trace could not load. Reload the page to try again.
