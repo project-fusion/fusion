@@ -14,7 +14,7 @@ use crate::derive::marks::{brand_mark, focus_ring, inverse};
 use crate::derive::quiet::quiet;
 use crate::derive::resolve::{Policy, Resolved};
 use crate::derive::status::{statuses, StatusColor};
-use crate::derive::surfaces::{ladder, surfaces};
+use crate::derive::surfaces::{ladder, surfaces_on};
 use crate::derive::{resolve, token, Cast, DerivedToken, Deriving, Origin};
 use crate::intent::{to_oklch, Seed};
 use crate::oklch::Oklch;
@@ -46,8 +46,9 @@ pub fn derive_tokens(resolved: &Resolved) -> Derived {
         contrast_target: resolved.contrast_target,
         policy,
         scheme: resolved.scheme,
-        surfaces: surfaces(
+        surfaces: surfaces_on(
             resolved.scheme,
+            resolve::page(resolved),
             neutral,
             ladder(resolved.separation.surface),
         ),
