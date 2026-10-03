@@ -134,10 +134,10 @@
    picture, contained, lies where the three.js driver frames the graph in a
    box of any shape. One for each mode, and gone once the graph is drawn. */
 .graphPoster {
-  block-size: 100%;
-  inline-size: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
   inset: 0;
-  object-fit: contain;
   pointer-events: none;
   position: absolute;
   transition: opacity var(--helix-duration-slow) var(--helix-easing-standard);

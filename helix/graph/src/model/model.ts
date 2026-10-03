@@ -11,7 +11,10 @@ import { shapeFromTriangles, type TriangleOptions } from '../shapes/triangles.js
  *
  * **three.js reads the file**, imported when this is first called, so a page
  * that draws no model never downloads a loader. It is an optional peer of
- * this package. A model that cannot be fetched or read is an error that
+ * this package. A file compressed with meshopt, as `gltfpack` and
+ * glTF-Transform write one, is read with the decoder three.js ships, and
+ * corners stored as integers, as `KHR_mesh_quantization` allows, are read as
+ * the places they stand for. A model that cannot be fetched or read is an error that
  * names it, the loader's own error as its `cause`.
  */
 export const shapeFromModel = async (
@@ -19,8 +22,9 @@ export const shapeFromModel = async (
   options: TriangleOptions = {},
 ): Promise<ShapeField> => {
   const which = typeof source === 'string' ? `The model ${source}` : 'The model given as bytes'
-  const [{ GLTFLoader }, { Mesh, Vector3 }] = await Promise.all([
+  const [{ GLTFLoader }, { MeshoptDecoder }, { Mesh, Vector3 }] = await Promise.all([
     import('three/addons/loaders/GLTFLoader.js'),
+    import('three/addons/libs/meshopt_decoder.module.js'),
     import('three'),
   ]).catch((cause: unknown) => {
     throw new Error(
@@ -29,6 +33,9 @@ export const shapeFromModel = async (
     )
   })
   const loader = new GLTFLoader()
+  /* About 8 KB compressed, and the difference between reading a compressed
+     model and refusing it: the loader cannot tell before it has the file. */
+  loader.setMeshoptDecoder(MeshoptDecoder)
   const model = await (typeof source === 'string'
     ? loader.loadAsync(source)
     : loader.parseAsync(source, '')

@@ -242,7 +242,7 @@ it loads three.js, so a page that draws a flat shape never bundles it:
 
 | Function | Makes |
 |---|---|
-| `shapeFromModel(url)` | From `/model`: a solid from a glTF model, `.glb` or `.gltf`, every mesh where the model places it. Async; three.js reads the file, and an error names the model |
+| `shapeFromModel(url)` | From `/model`: a solid from a glTF model, `.glb` or `.gltf`, every mesh where the model places it, compressed with meshopt or not. Async; three.js reads the file, and an error names the model |
 | `shapeFromTriangles(positions, index)` | A solid from a closed surface of triangles a page already holds |
 | `shapeFromSvg(svg)` | A flat field from an `<svg>` or its markup: every path, rectangle, circle, ellipse and polygon in its `viewBox` |
 | `shapeFromImage(image, { threshold })` | A flat field from an image's opaque pixels |
