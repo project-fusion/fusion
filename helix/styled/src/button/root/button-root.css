@@ -220,6 +220,22 @@
   opacity: 0.5;
 }
 
+/* **The letters at the middle, in any font**, as the tag's are. The line box
+   is centered and the letters sit in it where the font's ascent and descent
+   put them: in Source Sans 3, measured 1.3px high in a 40px button. Trimmed to
+   the capitals and the baseline, with equal padding for the descenders, the
+   box is the letters. A box, so the trim has something to apply to: the slot
+   is `display: contents` otherwise. The icons stay their own flex items in
+   `start` and `end`, centered on the letters. Only where the trim is
+   supported, the padding being only a taller line box without it. */
+@supports (text-box: trim-both cap alphabetic) {
+  slot:not([name]) {
+    display: block;
+    padding-block: var(--helix-space-2xs);
+    text-box: trim-both cap alphabetic;
+  }
+}
+
 /* Icons scale with the label rather than holding the global icon size, so a
    large button does not end up with a small glyph beside big text. */
 [part="button"] ::slotted(helix-icon) {

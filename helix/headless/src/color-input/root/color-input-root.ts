@@ -83,9 +83,11 @@ import '../../color-picker/index.js'
  * @csspart picker-controls - The row under the square.
  * @csspart picker-eyedropper - The control that samples a color from the screen.
  * @csspart picker-eyedropper-button - The button inside `picker-eyedropper`.
+ * @csspart picker-eyedropper-text - The words on the button inside `picker-eyedropper`.
  * @csspart picker-footer - The row holding the value and the tools.
  * @csspart picker-format - The control that changes the syntax the value is written in.
  * @csspart picker-format-button - The button inside `picker-format`.
+ * @csspart picker-format-text - The words on the button inside `picker-format`.
  * @csspart picker-grid - The saturation and brightness square.
  * @csspart picker-grid-brightness - The range input for the square's vertical axis.
  * @csspart picker-grid-handle - The mark showing where in the square the color sits.
@@ -353,8 +355,8 @@ export class HelixHeadlessColorInput extends MixinPickerField(
         channel-marker: picker-channel-marker, channel-marker-label: picker-channel-marker-label,
         channel-markers: picker-channel-markers, channel-output: picker-channel-output,
         channels: picker-channels, controls: picker-controls, eyedropper: picker-eyedropper,
-        eyedropper-button: picker-eyedropper-button, footer: picker-footer, format: picker-format,
-        format-button: picker-format-button, grid: picker-grid,
+        eyedropper-button: picker-eyedropper-button, eyedropper-text: picker-eyedropper-text, footer: picker-footer, format: picker-format,
+        format-button: picker-format-button, format-text: picker-format-text, grid: picker-grid,
         grid-brightness: picker-grid-brightness, grid-handle: picker-grid-handle,
         grid-saturation: picker-grid-saturation, icon: picker-icon, sample: picker-sample,
         swatch: picker-swatch, swatches: picker-swatches, value: picker-value"
