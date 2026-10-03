@@ -160,100 +160,14 @@
     );
 }
 
-/* **Try it, docked to the map's foot**: a floating bar the way the frame's
-   own controls float, over the faded foot where the map is quietest, and at
-   the start under the words it follows. */
+/* **Customize the map, docked to the map's foot**: over the faded foot
+   where the map is quietest, and at the start under the words it follows. */
 .mapsTry {
-  align-items: flex-end;
-  background: var(--helix-color-surface-overlay);
-  border: var(--helix-border-floating) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-lg);
-  box-shadow: var(--helix-shadow-floating);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-sm) var(--helix-space-lg);
   inset-block-end: calc(var(--_maps-credit) + var(--helix-space-lg));
   inset-inline-start: var(--site-inset);
-  margin: 0;
   max-inline-size: calc(100% - var(--site-inset) * 2);
-  min-inline-size: 0;
-  padding: var(--helix-space-sm) var(--helix-space-md);
   position: absolute;
   z-index: calc(var(--helix-layer-raised) + 1);
-}
-
-/* The bar's name, standing where its controls do, so the row reads Try it,
-   then what to try. **Floated, which makes it an ordinary child** rather than
-   the legend a fieldset draws in its border, and so one of the row's items. */
-.mapsTryLabel {
-  align-self: center;
-  float: inline-start;
-  padding: 0;
-  color: var(--helix-color-foreground);
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-semibold);
-}
-
-.mapsControls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-sm) var(--helix-space-lg);
-}
-
-.mapsControl {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-xs);
-}
-
-/* A fieldset for its legend, which names the swatches as a group, with none
-   of a fieldset's own frame. */
-fieldset.mapsControl {
-  border: 0;
-  margin: 0;
-  min-inline-size: 0;
-  padding: 0;
-}
-
-/* Brand's legend and Mode's own label drawn the same, so the two controls
-   read as a pair: the toggle group keeps its label, visible and named, and
-   takes the caption's voice through its part. */
-.mapsLegend,
-.mapsControl helix-toggle-group::part(label) {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-regular);
-  padding: 0;
-}
-
-.mapsSwatches {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-xs);
-  min-block-size: 2.25rem;
-}
-
-/* A swatch is its color and nothing else, ringed when it is the one chosen. */
-.mapsSwatch {
-  background: var(--swatch, var(--helix-color-primary));
-  block-size: 1.5rem;
-  border: var(--helix-border-thin) solid
-    color-mix(in oklab, var(--helix-color-foreground) 15%, transparent);
-  border-radius: var(--helix-radii-full);
-  cursor: pointer;
-  inline-size: 1.5rem;
-  padding: 0;
-}
-
-.mapsSwatch[aria-pressed="true"] {
-  outline: var(--helix-border-thick) solid var(--helix-color-foreground);
-  outline-offset: var(--helix-space-2xs);
-}
-
-.mapsSwatch:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-space-2xs);
 }
 
 /* **A phone reads it in order and on the page**: the words above the map,
@@ -283,8 +197,9 @@ fieldset.mapsControl {
     );
   }
 
-  /* On the page's own ground under the map, as a part of the page. */
-  .mapsTry {
+  /* On the page's own ground under the map, as a part of the page: named
+     with the hero, to outrank the bar's own floating look. */
+  .mapsHero .mapsTry {
     background: none;
     border: 0;
     border-radius: 0;

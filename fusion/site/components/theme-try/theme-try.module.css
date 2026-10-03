@@ -1,0 +1,90 @@
+/* The bar that customizes a hero: a floating bar the way a frame's own
+   controls float. Where it stands is the page's: each hero docks it on its
+   own drawing. */
+.tryBar {
+  align-items: flex-end;
+  background: var(--helix-color-surface-overlay);
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+  box-shadow: var(--helix-shadow-floating);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-sm) var(--helix-space-lg);
+  margin: 0;
+  min-inline-size: 0;
+  padding: var(--helix-space-sm) var(--helix-space-md);
+}
+
+/* The bar's name, standing where its controls do, so the row reads Try it,
+   then what to try. **Floated, which makes it an ordinary child** rather than
+   the legend a fieldset draws in its border, and so one of the row's items. */
+.tryLabel {
+  align-self: center;
+  float: inline-start;
+  padding: 0;
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-semibold);
+}
+
+.tryControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-sm) var(--helix-space-lg);
+}
+
+.tryControl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+}
+
+/* A fieldset for its legend, which names the swatches as a group, with none
+   of a fieldset's own frame. */
+fieldset.tryControl {
+  border: 0;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+
+/* Brand's legend and Mode's own label drawn the same, so the two controls
+   read as a pair: the toggle group keeps its label, visible and named, and
+   takes the caption's voice through its part. */
+.tryLegend,
+.tryControl helix-toggle-group::part(label) {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-regular);
+  padding: 0;
+}
+
+.trySwatches {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-xs);
+  min-block-size: 2.25rem;
+}
+
+/* A swatch is its color and nothing else, ringed when it is the one chosen. */
+.trySwatch {
+  background: var(--swatch, var(--helix-color-primary));
+  block-size: 1.5rem;
+  border: var(--helix-border-thin) solid
+    color-mix(in oklab, var(--helix-color-foreground) 15%, transparent);
+  border-radius: var(--helix-radii-full);
+  cursor: pointer;
+  inline-size: 1.5rem;
+  padding: 0;
+}
+
+.trySwatch[aria-pressed="true"] {
+  outline: var(--helix-border-thick) solid var(--helix-color-foreground);
+  outline-offset: var(--helix-space-2xs);
+}
+
+.trySwatch:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-space-2xs);
+}

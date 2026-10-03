@@ -35,6 +35,7 @@ const start = async (
   kind: DemoKind,
   frame: HelixGraph,
   box: HTMLDivElement,
+  paused: () => boolean,
 ): Promise<() => void> => {
   const { connectGraph } = await import('@fusion.dev/helix-graph')
   const graph: DemoGraph =
@@ -52,7 +53,7 @@ const start = async (
   const every = kind === 'team' ? 500 : kind === 'mind' ? 66 : 100
   const send = (): void => {
     const link = pick(frame.links)
-    if (!link) {
+    if (!link || paused()) {
       return
     }
     if (kind === 'mind') {
@@ -172,10 +173,24 @@ const start = async (
  * One of the page's live graphs: a Graph frame, connected to its renderer
  * once it is near the screen and disconnected when the page leaves.
  */
-export function GraphDemo({ className, kind }: { className?: string; kind: DemoKind }) {
+export function GraphDemo({
+  canvasClassName,
+  className,
+  kind,
+  paused = false,
+}: {
+  /** A class for the box the renderer draws in, as the hero gives it to keep its drawing clear of the words. */
+  canvasClassName?: string
+  className?: string
+  kind: DemoKind
+  /** Whether its messages are held, which a control on the page decides; read as each is sent, so pausing does not remake the graph. */
+  paused?: boolean
+}) {
   const frame = useRef<HelixGraph>(null)
   const box = useRef<HTMLDivElement>(null)
   const [failed, setFailed] = useState(false)
+  const holding = useRef(paused)
+  holding.current = paused
 
   useEffect(() => {
     const host = frame.current
@@ -193,7 +208,7 @@ export function GraphDemo({ className, kind }: { className?: string; kind: DemoK
         near.disconnect()
         customElements
           .whenDefined('helix-graph')
-          .then(() => start(kind, host, drawing))
+          .then(() => start(kind, host, drawing, () => holding.current))
           .then((stopping) => {
             if (live) {
               stop = stopping
@@ -228,7 +243,7 @@ export function GraphDemo({ className, kind }: { className?: string; kind: DemoK
       label={FRAMES[kind].label}
       ref={frame}
     >
-      <div className={styles.graphCanvas} ref={box} />
+      <div className={`${styles.graphCanvas} ${canvasClassName ?? ''}`} ref={box} />
       {failed ? (
         <helix-text slot="footer" variant="caption">
           {GRAPH_FAILED}

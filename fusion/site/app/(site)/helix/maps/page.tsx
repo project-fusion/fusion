@@ -21,6 +21,7 @@ import {
 import { stageAppearance } from '@/content/verticals/verticals'
 import { snapshotOf } from '@/utils/map-snapshot/map-snapshot'
 import { pageMetadata } from '@/utils/metadata/metadata'
+import { propertiesOf, sentIntent } from '@/utils/scope-theme/scope-theme'
 import { type Params, queryFrom, settingsFrom } from '@/utils/theme-defaults/theme-defaults'
 import { serverTheme } from '@/utils/theme-engine/theme-engine.server'
 import styles from './maps.module.css'
@@ -28,7 +29,6 @@ import { MapsHero } from './maps-hero'
 import { MapsPoints } from './maps-points'
 import { MapsRadar } from './maps-radar'
 import { MapsTerrain } from './maps-terrain'
-import { mapIntent, propertiesOf } from './maps-theme'
 
 /** The points layer as a page writes it, which the demo beside it is. */
 const POINTS_MARKUP = `<helix-map label="Food and drink in Austin">
@@ -155,7 +155,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
   const painted = sent
     ? propertiesOf(
         (await serverTheme()).derive(
-          mapIntent(settings, settings.scheme === 'site' ? 'light' : settings.scheme),
+          sentIntent(settings, settings.scheme === 'site' ? 'light' : settings.scheme),
         ),
       )
     : undefined
