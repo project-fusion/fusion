@@ -370,23 +370,6 @@ fieldset.mapsControl {
   --map-block-size: min(70svh, 34rem);
 }
 
-/* A snippet whose long lines wrap: at the breaks the page puts after a URL's
-   slashes, with each word kept whole, and each line hanging two characters
-   in from its own indent. */
-.mapsWrapped::part(code) {
-  white-space: pre-wrap;
-}
-
-.mapsLine {
-  display: block;
-  padding-inline-start: calc(var(--indent) * 1ch);
-  text-indent: calc(var(--indent) * -1ch);
-}
-
-.mapsWord {
-  white-space: nowrap;
-}
-
 /* =========================================================== features === */
 
 /* Four cells, two by two on a wide card and stacked on a narrow one, ruled

@@ -1,0 +1,222 @@
+/* The Graph page: the pitch over a mind drawn on a model of a brain, and
+   under it the landing page's bands on its field, as on Maps: what a graph
+   gets from Helix, three live graphs beside their code, how to start, and
+   the stack it is built from. */
+
+/* The box a renderer draws in, the whole of the frame's drawing. */
+.graphCanvas {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+/* =============================================================== hero === */
+
+/* **The pitch beside the graph on a wide screen**, both in the first screen,
+   and the pitch above it on a narrow one, at the page's gutter. */
+.graphHero {
+  align-items: center;
+  background: var(--helix-color-background);
+  color: var(--helix-color-foreground);
+  display: grid;
+  gap: var(--helix-space-xl) var(--helix-space-2xl);
+  grid-template-columns: minmax(0, 1fr);
+  padding: var(--helix-space-2xl) var(--site-inset);
+}
+
+@media (min-width: 64rem) {
+  .graphHero {
+    grid-template-columns: minmax(20rem, 30rem) minmax(0, 1fr);
+    min-block-size: calc(100svh - 4rem);
+  }
+}
+
+.graphIntro {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-md);
+  max-inline-size: 46rem;
+}
+
+.graphTitle {
+  font-size: clamp(var(--helix-text-2xl), 3.4vw, calc(var(--helix-text-3xl) * 1.25));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+.graphLede {
+  font-size: clamp(var(--helix-text-lg), 1.6vw, var(--helix-text-xl));
+  line-height: var(--helix-leading-normal);
+}
+
+/* The graph on the page's own ground, tall enough to turn the brain in, its
+   list a little narrower than a frame's own so the drawing keeps the room. */
+.graphHeroFrame {
+  --graph-background-color: var(--helix-color-background);
+  --graph-block-size: min(calc(100svh - 8rem), 48rem);
+  --graph-panel-size: 15rem;
+}
+
+@media (max-width: 48rem) {
+  .graphHeroFrame {
+    --graph-block-size: min(70svh, 34rem);
+  }
+}
+
+/* The demos beside their code, a little shorter than the hero's. */
+.graphDemo {
+  --graph-block-size: min(70svh, 34rem);
+}
+
+/* ============================================================= field === */
+
+.graphField {
+  position: relative;
+}
+
+.graphField > *:not([data-layer]) {
+  position: relative;
+}
+
+.graphAura {
+  block-size: auto;
+  inset: 0;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 12rem, black 94%, transparent 100%);
+  opacity: 0.5;
+  pointer-events: none;
+  position: absolute;
+}
+
+@media (max-width: 40rem) {
+  .graphAura {
+    opacity: 0.78;
+  }
+}
+
+/* ============================================================ pillars === */
+
+.graphFacts {
+  display: grid;
+  gap: var(--helix-space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.graphFacts li {
+  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-md);
+  line-height: 1.5;
+  padding-block: var(--helix-space-2xs);
+  padding-inline-start: var(--helix-space-md);
+}
+
+/* =========================================================== features === */
+
+/* Four cells, two by two on a wide card and stacked on a narrow one, ruled
+   between as on Maps. */
+.graphFeatures {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.graphFeature {
+  padding: var(--helix-space-xl);
+}
+
+.graphFeature + .graphFeature {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+}
+
+@media (min-width: 48rem) {
+  .graphFeatures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .graphFeature + .graphFeature {
+    border-block-start: 0;
+  }
+
+  .graphFeature:nth-child(n + 3) {
+    border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  }
+
+  .graphFeature:nth-child(even) {
+    border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
+  }
+}
+
+/* What you write, set as code. */
+.graphElement {
+  align-self: start;
+  background: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+/* ========================================================= get started === */
+
+/* The install command is one long line, kept in its own scrolling block at 390px. */
+.graphStarted {
+  min-inline-size: 0;
+}
+
+.graphInstall {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+@media (max-width: 40rem) {
+  .graphFeature {
+    padding-inline: 0;
+  }
+}
+
+/* ============================================================== stack === */
+
+.graphStack {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.graphLayer {
+  align-items: start;
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  display: grid;
+  gap: var(--helix-space-sm) var(--helix-space-xl);
+  grid-template-columns: minmax(0, 1fr);
+  padding: var(--helix-space-xl);
+}
+
+/* The one layer that is not ours, its rules dashed, as on Maps. */
+.graphLayer[data-owned="false"],
+.graphLayer[data-owned="false"] + .graphLayer {
+  border-block-start-style: dashed;
+}
+
+.graphLayerStage {
+  justify-self: start;
+}
+
+@media (min-width: 48rem) {
+  .graphLayer {
+    grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr) auto;
+  }
+
+  .graphLayerStage {
+    justify-self: end;
+  }
+}
+
+@media (max-width: 40rem) {
+  .graphLayer {
+    padding-inline: 0;
+  }
+}
