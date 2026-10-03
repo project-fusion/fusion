@@ -11,35 +11,75 @@
 
 /* =============================================================== hero === */
 
-/* **The pitch beside the graph on a wide screen**, both in the first screen,
-   and the pitch above it on a narrow one, at the page's gutter. */
+/* **The graph the whole width of the page**, as the map is on Maps, and the
+   scope the bar paints. Its ground and text declared here, so a mode the bar
+   sets resolves in the scope's own colors. */
 .graphHero {
-  align-items: center;
+  --_graph-hero-size: min(84svh, 50rem);
+  /* **How much of the hero's start the words take**, which the drawing stays
+     clear of: measured against the hero, so the words' column and the
+     drawing's margin, which sits inside the narrower stage, agree. */
+  --_graph-words: min(36rem, 42cqi);
   background: var(--helix-color-background);
   color: var(--helix-color-foreground);
-  display: grid;
-  gap: var(--helix-space-xl) var(--helix-space-2xl);
-  grid-template-columns: minmax(0, 1fr);
-  padding: var(--helix-space-2xl) var(--site-inset);
+  container-type: inline-size;
+  position: relative;
 }
 
-@media (min-width: 64rem) {
-  .graphHero {
-    grid-template-columns: minmax(20rem, 30rem) minmax(0, 1fr);
-    min-block-size: calc(100svh - 4rem);
-  }
+/* Edge to edge, on the page's own ground, so no frame of its own: the page
+   is the frame, and the list stands at the end as the map's controls do. */
+.graphHeroFrame {
+  --graph-background-color: var(--helix-color-background);
+  --graph-block-size: var(--_graph-hero-size);
+  --graph-panel-size: 16rem;
 }
 
+.graphHeroFrame::part(region) {
+  border: 0;
+  border-radius: 0;
+}
+
+/* **The drawing starts where the words end**, so the brain is framed in
+   what is left of the stage and nothing is drawn under the words. */
+.graphHeroCanvas {
+  inline-size: auto;
+  margin-inline-start: var(--_graph-words);
+  position: relative;
+}
+
+/* **The pitch, set on the graph's ground**: the site's hero type, the
+   height of the graph and centered in it at the start. Only what is in it
+   takes the pointer. */
 .graphIntro {
   align-items: flex-start;
+  block-size: var(--_graph-hero-size);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-md);
-  max-inline-size: 46rem;
+  inline-size: var(--_graph-words);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  justify-content: center;
+  /* Clear of the bar docked under it at the foot. */
+  padding-block: var(--helix-space-2xl) calc(var(--helix-space-2xl) * 2.5);
+  padding-inline: var(--site-inset) var(--helix-space-xl);
+  pointer-events: none;
+  position: absolute;
+  z-index: calc(var(--helix-layer-raised) + 1);
+}
+
+.graphIntro > * {
+  pointer-events: auto;
+}
+
+/* The column's width for the pair, which shrunk to one button's width stacked them. */
+.graphActions {
+  align-self: stretch;
 }
 
 .graphTitle {
-  font-size: clamp(var(--helix-text-2xl), 3.4vw, calc(var(--helix-text-3xl) * 1.25));
+  font-size: clamp(var(--helix-text-2xl), 4vw, calc(var(--helix-text-3xl) * 1.4));
   letter-spacing: var(--helix-tracking-tight);
   line-height: 1.02;
   text-wrap: balance;
@@ -50,17 +90,45 @@
   line-height: var(--helix-leading-normal);
 }
 
-/* The graph on the page's own ground, tall enough to turn the brain in, its
-   list a little narrower than a frame's own so the drawing keeps the room. */
-.graphHeroFrame {
-  --graph-background-color: var(--helix-color-background);
-  --graph-block-size: min(calc(100svh - 8rem), 48rem);
-  --graph-panel-size: 15rem;
+/* **Customize the graph, docked at the foot** under the words it follows. */
+.graphTry {
+  inset-block-end: var(--helix-space-lg);
+  inset-inline-start: var(--site-inset);
+  /* The stage's width, short of the list at the end, which it stays clear of. */
+  max-inline-size: calc(100% - 16rem - var(--site-inset) * 2);
+  position: absolute;
+  z-index: calc(var(--helix-layer-raised) + 1);
 }
 
+/* **A phone reads it in order and on the page**: the words above the graph
+   and the bar under it, each in the page's own flow, and the drawing the
+   whole width of the stage. */
 @media (max-width: 48rem) {
-  .graphHeroFrame {
-    --graph-block-size: min(70svh, 34rem);
+  .graphHero {
+    --_graph-hero-size: min(70svh, 34rem);
+  }
+
+  .graphHeroCanvas {
+    margin-inline-start: 0;
+  }
+
+  .graphIntro {
+    block-size: auto;
+    inline-size: auto;
+    padding: var(--site-band) var(--site-inset) var(--helix-space-xl);
+    position: static;
+  }
+
+  /* On the page's own ground under the graph, as a part of the page: named
+     with the hero, to outrank the bar's own floating look. */
+  .graphHero .graphTry {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    max-inline-size: none;
+    padding: var(--helix-space-md) var(--site-inset);
+    position: static;
   }
 }
 

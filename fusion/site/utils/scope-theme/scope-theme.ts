@@ -1,3 +1,7 @@
+/*
+ * A hero's own theme, which its brand and mode controls paint on the element
+ * around the drawing: the Maps and Graph pages share it.
+ */
 import type { DerivedTheme, ThemeIntent } from '@fusion.dev/helix-theme'
 import { intentFrom, type Settings } from '@/utils/theme-defaults/theme-defaults'
 
@@ -17,11 +21,11 @@ export interface SentTheme {
  * from a font service is not loaded here, so naming it would only swap the
  * panel's text to a fallback.
  *
- * Here rather than in the hero because the server derives the first paint from
+ * Here rather than in a hero because the server derives the first paint from
  * it, and a function exported from a client module is not one a server can
  * call.
  */
-export function mapIntent(settings: Settings, scheme: 'dark' | 'light'): ThemeIntent {
+export function sentIntent(settings: Settings, scheme: 'dark' | 'light'): ThemeIntent {
   return intentFrom({ ...settings, bodyFace: '', displayFace: '', monoFace: '', scheme })
 }
 

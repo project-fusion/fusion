@@ -11,32 +11,17 @@ import {
   motionOf,
 } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
-import { initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { ThemeTry } from '@/components/theme-try/theme-try'
 import { MAP_FAILED, MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
 import { stageAppearance } from '@/content/verticals/verticals'
 import { boundsOf, clearOf } from '@/utils/map-view/map-view'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
-import { siteScheme } from '@/utils/site-scheme/site-scheme'
-import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
+import type { SentTheme } from '@/utils/scope-theme/scope-theme'
+import { type Mode, useScopeTheme, YOURS } from '@/utils/scope-theme/use-scope-theme'
 import styles from './maps.module.css'
-import { mapIntent, propertiesOf, type SentTheme } from './maps-theme'
-
-/**
- * Brands to try, picked to be far apart on the wheel rather than pretty
- * together, and a gray first: the map with no brand in it at all, which is
- * the one a reader comparing the others needs to compare them against.
- */
-const BRANDS = [
-  { hex: '#71717a', name: 'Neutral' },
-  { hex: '#0d9488', name: 'Teal' },
-  { hex: '#7c3aed', name: 'Violet' },
-  { hex: '#e4572e', name: 'Coral' },
-  { hex: '#ca8a04', name: 'Amber' },
-  { hex: '#db2777', name: 'Pink' },
-] as const
 
 /**
  * Places on the opening view, in the order a reader walks them with the arrow
@@ -66,11 +51,6 @@ const SHARED = [
   { label: '1886 Café & Bakery', lat: 30.26811, lng: -97.74172 },
 ] as const
 
-type Mode = 'site' | 'light' | 'dark'
-
-/** The brand choice that is a whole theme from the builder rather than a color. */
-const YOURS = 'yours'
-
 /** How long the whole walk takes, in milliseconds. */
 const WALK_TIME = 60_000
 
@@ -94,20 +74,6 @@ const BOUNDS = boundsOf(PLACES)
 
 /** How far the hero's map is tilted when it opens, in degrees from looking straight down. */
 const PITCH = 45
-
-/**
- * The site's own brand, as the browser settles it at the root, for the swatch
- * that goes back to it: read inside the hero it would be whichever brand was
- * chosen last, since the hero is the scope the choice is painted on.
- */
-const siteBrand = (): string => {
-  const probe = document.createElement('span')
-  probe.style.color = 'var(--helix-color-primary)'
-  document.body.append(probe)
-  const color = getComputedStyle(probe).color
-  probe.remove()
-  return color
-}
 
 /**
  * The top of the Maps page: the map as the whole width of the page, with what
@@ -138,7 +104,6 @@ export function MapsHero({
   const container = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const bar = useRef<HTMLFieldSetElement>(null)
-  const engine = useRef<Promise<ThemeEngine> | null>(null)
   /* **The contrast the labels are held to**: a sent theme's own target while
      it is the one chosen, and the compiler's default otherwise. A ref rather
      than state, because the map reads it when it restyles and a render would
@@ -146,7 +111,8 @@ export function MapsHero({
   const labels = useRef<number | undefined>(sent?.settings.contrastTarget)
   const [brand, setBrand] = useState<string | null>(sent ? YOURS : null)
   const [mode, setMode] = useState<Mode>(sent?.settings.scheme ?? 'site')
-  const [home, setHome] = useState<string>('')
+  labels.current = brand === YOURS && sent ? sent.settings.contrastTarget : undefined
+  useScopeTheme(scope, { brand, mode, sent })
   /* Whether the walker is walking, which the pause control decides; read by
      the map's own loop through a ref, so pausing does not remake the map. */
   const [walking, setWalking] = useState(true)
@@ -159,10 +125,6 @@ export function MapsHero({
   const [failed, setFailed] = useState(false)
   useEffect(() => {
     setStill(matchMedia('(prefers-reduced-motion: reduce)').matches)
-  }, [])
-
-  useEffect(() => {
-    setHome(siteBrand())
   }, [])
 
   /* The map, loaded after the page, and restyled when its colors move. */
@@ -393,73 +355,6 @@ export function MapsHero({
     }
   }, [])
 
-  /* The scope, painted from the controls: nothing where both follow the site.
-     **Swapped in one step, once the new values exist**, rather than cleared and
-     repainted: the engine loads asynchronously, and clearing first showed the
-     site's theme for a moment between any two choices, and on arrival between
-     the server's paint of a sent theme and the same values derived again. */
-  useEffect(() => {
-    const node = scope.current
-    if (!node) {
-      return
-    }
-    const scheme = mode === 'site' ? siteScheme() : mode
-    /* **The mode as the token layer takes it**, which is `data-color-mode`:
-       the site's `light-dark()` is compiled into a shim that resolves
-       through it, so `color-scheme` alone moved the scrollbars and left
-       every token on its light arm, and the switcher did nothing a reader
-       could see unless a brand was picked, which paints its colors outright. */
-    node.style.colorScheme = mode === 'site' ? '' : scheme
-    if (mode === 'site') {
-      delete node.dataset.colorMode
-    } else {
-      node.dataset.colorMode = scheme
-    }
-    const paint = (values: Record<string, string>): void => {
-      for (const name of [...node.style]) {
-        if (name.startsWith('--helix-') && !(name in values)) {
-          node.style.removeProperty(name)
-        }
-      }
-      for (const [name, value] of Object.entries(values)) {
-        node.style.setProperty(name, value)
-      }
-      /* **Marked as a theme, or the seeds are read by nothing.** The radii,
-         the spacing and the series colors are derived from the seeds by
-         `helix/styles` wherever `data-helix-theme` is, and only there: painted
-         on an unmarked scope they sat unread and a sent radius of 90 still
-         drew 4px corners. **And marked for a mode of its own**, since the
-         tokens are resolved where they are declared, so a mode set on this
-         scope moves them only where they are declared again here. Unmarked
-         when following the site in everything, whose own values at the root
-         a re-derivation here would override. */
-      node.toggleAttribute('data-helix-theme', Object.keys(values).length > 0 || mode !== 'site')
-    }
-    labels.current = brand === YOURS && sent ? sent.settings.contrastTarget : undefined
-    const intent =
-      brand === YOURS && sent ? mapIntent(sent.settings, scheme) : brand ? { brand, scheme } : null
-    if (!intent) {
-      paint({})
-      return
-    }
-    let live = true
-    engine.current ??= initTheme(THEME_ENGINE)
-    engine.current
-      .then((loaded) => {
-        if (live) {
-          paint(propertiesOf(loaded.derive(intent)))
-        }
-      })
-      .catch(() => {
-        /* Forgotten, so the next brand pressed loads it again: kept, one
-           failed load left every swatch doing nothing for the visit. */
-        engine.current = null
-      })
-    return () => {
-      live = false
-    }
-  }, [brand, mode, sent])
-
   return (
     <div
       className={styles.mapsHero}
@@ -636,71 +531,30 @@ export function MapsHero({
       {/* The controls that customize the map: brand, mode, and the walker, in
           one bar at the bottom of the map so they read as the map's own. The
           bar is inside the scope they restyle, so it changes with the map. */}
-      <fieldset className={styles.mapsTry} ref={bar}>
-        <legend className={styles.mapsTryLabel}>Customize the map</legend>
-        <div className={styles.mapsControls}>
-          <fieldset className={styles.mapsControl}>
-            <legend className={styles.mapsLegend}>Brand</legend>
-            <div className={styles.mapsSwatches}>
-              {sent ? (
-                <button
-                  aria-label="Your theme, from the theme builder"
-                  aria-pressed={brand === YOURS}
-                  className={styles.mapsSwatch}
-                  onClick={() => setBrand(YOURS)}
-                  style={{ '--swatch': sent.settings.brand } as React.CSSProperties}
-                  type="button"
-                />
-              ) : null}
-              <button
-                aria-label="Site brand"
-                aria-pressed={brand === null}
-                className={styles.mapsSwatch}
-                onClick={() => setBrand(null)}
-                style={{ '--swatch': home } as React.CSSProperties}
-                type="button"
-              />
-              {BRANDS.map((one) => (
-                <button
-                  aria-label={one.name}
-                  aria-pressed={brand === one.hex}
-                  className={styles.mapsSwatch}
-                  key={one.hex}
-                  onClick={() => setBrand(one.hex)}
-                  style={{ '--swatch': one.hex } as React.CSSProperties}
-                  type="button"
-                />
-              ))}
-            </div>
-          </fieldset>
-          <div className={styles.mapsControl}>
-            <helix-toggle-group
-              label="Mode"
-              onChange={(event) => setMode(event.currentTarget.value as Mode)}
-              value={mode}
-            >
-              <helix-toggle value="site">Site</helix-toggle>
-              <helix-toggle value="light">Light</helix-toggle>
-              <helix-toggle value="dark">Dark</helix-toggle>
-            </helix-toggle-group>
-          </div>
-          {/* **The same control as the mode beside it**, since it is the same
-              kind of choice: a button of its own drew a second label style
-              and a second height in a row that had one of each. */}
-          {still ? null : (
-            <div className={styles.mapsControl}>
-              <helix-toggle-group
-                label="Walker"
-                onChange={(event) => setWalking(event.currentTarget.value === 'walking')}
-                value={walking ? 'walking' : 'paused'}
-              >
-                <helix-toggle value="walking">Walking</helix-toggle>
-                <helix-toggle value="paused">Paused</helix-toggle>
-              </helix-toggle-group>
-            </div>
-          )}
-        </div>
-      </fieldset>
+      <ThemeTry
+        brand={brand}
+        className={styles.mapsTry}
+        label="Customize the map"
+        mode={mode}
+        onBrand={setBrand}
+        onMode={setMode}
+        ref={bar}
+        sent={sent}
+      >
+        {/* **The same control as the mode beside it**, since it is the same
+            kind of choice: a button of its own drew a second label style
+            and a second height in a row that had one of each. */}
+        {still ? null : (
+          <helix-toggle-group
+            label="Walker"
+            onChange={(event) => setWalking(event.currentTarget.value === 'walking')}
+            value={walking ? 'walking' : 'paused'}
+          >
+            <helix-toggle value="walking">Walking</helix-toggle>
+            <helix-toggle value="paused">Paused</helix-toggle>
+          </helix-toggle-group>
+        )}
+      </ThemeTry>
     </div>
   )
 }

@@ -18,6 +18,7 @@ import { stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import styles from './graph.module.css'
 import { GraphDemo } from './graph-demo'
+import { GraphHero } from './graph-hero'
 
 /** Live data as a page writes it, which the demo beside it is. */
 const LIVE_CODE = `const frame = document.querySelector('helix-graph')
@@ -120,35 +121,10 @@ export const metadata = pageMetadata({
  * to start one, and how it is built.
  */
 export default function Page() {
-  const [intro, pillars, live, features, shape, shapes, large, started, stack] = GRAPH.blocks
+  const [, pillars, live, features, shape, shapes, large, started, stack] = GRAPH.blocks
   return (
     <>
-      <div className={styles.graphHero}>
-        <div className={styles.graphIntro}>
-          <helix-flex align-items="center" data-density="sm" gap="xs">
-            <helix-tag>Helix</helix-tag>
-            <helix-tag tone={stageAppearance('Building')}>Building</helix-tag>
-          </helix-flex>
-          <helix-text as="h1" class={styles.graphTitle}>
-            {intro?.title}
-          </helix-text>
-          <helix-text as="p" class={styles.graphLede} data-measure emphasis="muted">
-            {intro?.body?.[0]}
-          </helix-text>
-          <helix-flex class="siteActions" data-density="lg" gap="sm" wrap>
-            <Link data-button="solid" data-button-tone="primary" href="#get-started">
-              Get started
-            </Link>
-            <Link data-button="subtle" href="/helix/components/graph">
-              Open the Graph reference
-            </Link>
-          </helix-flex>
-        </div>
-        {/* **A mind on a model of a brain**, each region in its lobe, with
-            thoughts passing between its notes: the three things the page
-            goes on to show, in one graph. */}
-        <GraphDemo className={styles.graphHeroFrame} kind="mind" />
-      </div>
+      <GraphHero />
 
       {/* **One field behind every band**, the landing page's, as on Maps. */}
       <div className={styles.graphField}>
