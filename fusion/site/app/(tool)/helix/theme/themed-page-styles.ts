@@ -673,6 +673,15 @@ export const THEMED_PAGE_STYLES = css`
     flex-direction: column;
   }
 
+  /* **The announcement on the inverse pair**, a dark band on a light page and
+     a light one on a dark page, through the component's own hooks: a tint of
+     the brand barely parted it from the page. The engine measures the pair,
+     so it holds whatever the brand. Color one band gives it the brand. */
+  .themedLocal helix-announcement {
+    --announcement-background-color: var(--helix-color-surface-inverse);
+    --announcement-foreground-color: var(--helix-color-foreground-inverse);
+  }
+
   /* **On the page's own ground, tinted by the brand**, in whichever mode the
      page is. It was drawn on the media ground as a stand-in for a photograph,
      and without a photograph it read as a dark band dropped into a light page.

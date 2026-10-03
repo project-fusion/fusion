@@ -885,9 +885,7 @@ function LocalPage(context: Context) {
   return (
     <div className="themedLocal">
       {/* The band the builder can color, as a site sets an announcement apart. */}
-      <helix-announcement data-band-slot="" tone="primary">
-        {local.announcement}
-      </helix-announcement>
+      <helix-announcement data-band-slot="">{local.announcement}</helix-announcement>
 
       <helix-app-header className="themedHeader">
         <helix-flex align-items="center" gap="xs" slot="start">
