@@ -190,3 +190,31 @@ export const boxFor = (
     y: [Math.min(...ys), Math.max(...ys)],
   }
 }
+
+/**
+ * Everything a note was derived from, as Trace's `why()` walks it: up the
+ * links from the note, each note once. The note itself is not among them.
+ */
+export const derivedFrom = (id: string, links: readonly TraceLink[]): Set<string> => {
+  const reached = new Set<string>()
+  const queue = [id]
+  for (let next = queue.shift(); next !== undefined; next = queue.shift()) {
+    for (const link of links) {
+      if (link.target === next && !reached.has(link.source)) {
+        reached.add(link.source)
+        queue.push(link.source)
+      }
+    }
+  }
+  reached.delete(id)
+  return reached
+}
+
+/** The groups in the order an answer is explained in: nearest first, back to what came in. */
+export const WHY_ORDER: readonly string[] = [
+  'Contexts',
+  'Tool calls',
+  'Memories',
+  'Facts, in Engram',
+  'Sources',
+]
