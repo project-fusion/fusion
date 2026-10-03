@@ -644,3 +644,14 @@ export const DerivationDiagramStacked = () => (
     </svg>
   </div>
 )
+
+/**
+ * Both figures in one box, which decides between them by its own width: the
+ * wide one where it has its 52rem, the stacked one where it does not.
+ */
+export const DerivationDiagrams = ({ className }: { className?: string }) => (
+  <div className={`${styles.diagrams} ${className ?? ''}`}>
+    <DerivationDiagram />
+    <DerivationDiagramStacked />
+  </div>
+)

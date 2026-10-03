@@ -24,23 +24,40 @@
 }
 
 /**
- * Which of the two figures is showing, decided by width alone.
+ * Which of the two figures is showing, decided by the room they are given.
  *
  * The wide one scrolls below its 52rem floor rather than shrinking, which keeps
  * the type legible and costs a horizontal drag twice the width of a phone. The
  * stacked one needs no floor: it was drawn for 340 units and reads at any width
- * a phone has. So the breakpoint is simply where the wide figure stops fitting.
+ * a phone has. So the switch is where the wide figure stops fitting: 52rem of
+ * its own container.
+ *
+ * **The container's width, never the viewport's.** Switched at a 40rem
+ * viewport, the wide figure showed in a band with less than 52rem of room
+ * between 641 and about 1,080 pixels, and its floor widened the band's column
+ * to 896px: the lede and the figure both ran past the card and were cut off.
+ * Size containment also keeps the floor from widening the column at all.
  */
+.diagrams {
+  container-type: inline-size;
+}
+
 .diagramStacked {
   display: none;
 }
 
+/* **Capped, and centered.** Drawn for a phone, it scaled with a band up to
+   52rem wide, and at 900 pixels its labels stood at 22px, larger than the
+   lede above them. 32rem is about the width a tablet's column gives it. */
 .diagramStackedSvg {
   block-size: auto;
+  display: block;
   inline-size: 100%;
+  margin-inline: auto;
+  max-inline-size: 32rem;
 }
 
-@media (max-width: 40rem) {
+@container (inline-size < 52rem) {
   .diagram {
     display: none;
   }
