@@ -11,10 +11,11 @@
 }
 
 /* **Tall on a phone**, where the trace runs down the screen one note to a
-   line: tall enough for a line each at a size a name reads at. */
+   line: tall enough for a line each at a size a name reads at. 52rem held 39
+   lines; the example takes 46 since it gained the facts and a fourth answer. */
 @media (max-width: 40rem) {
   .traceFrame {
-    --graph-block-size: 52rem;
+    --graph-block-size: 62rem;
   }
 }
 

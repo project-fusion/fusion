@@ -3,10 +3,11 @@
 import type { HelixGraph } from '@fusion.dev/helix'
 import { useEffect, useRef, useState } from 'react'
 import {
-  cascadeOf,
+  boxFor,
   TRACE_DELETED,
   TRACE_LINKS,
   TRACE_NODES,
+  TRACE_REMOVED,
   type TraceLayout,
   traceIn,
 } from '@/content/cortex/trace-example'
@@ -16,12 +17,11 @@ import styles from './trace-graph.module.css'
 const DELETED = TRACE_NODES.find((node) => node.id === TRACE_DELETED)?.label ?? ''
 
 /**
- * The trace as the frame is handed it: whole, or without the deleted memory
- * and everything derived from it, as Trace deletes, and nothing it was
- * derived from.
+ * The trace as the frame is handed it: whole, or without what Trace's
+ * `delete_cascade` removed with the deleted memory.
  */
 const traceOf = (deleted: boolean, layout: TraceLayout) => {
-  const removed = deleted ? cascadeOf(TRACE_DELETED, TRACE_LINKS) : new Set<string>()
+  const removed = deleted ? TRACE_REMOVED : new Set<string>()
   return {
     links: TRACE_LINKS.filter((link) => !removed.has(link.source) && !removed.has(link.target)),
     nodes: traceIn(layout).filter((node) => !removed.has(node.id)),
@@ -32,9 +32,10 @@ const traceOf = (deleted: boolean, layout: TraceLayout) => {
 const NARROW = '(max-width: 40rem)'
 
 /**
- * An example trace, drawn with Helix Graph by Sigma.js: three answers and
+ * An example trace, drawn with Helix Graph by Sigma.js: four answers and
  * everything each was derived from, and a button that deletes a memory the
- * way Trace does, with everything derived from it.
+ * way Trace does, with everything derived from it. Pressing a note lights
+ * everything upstream of it, all it was derived from.
  *
  * **Made when it is nearly in view**, so a reader who never scrolls this far
  * loads no renderer.
@@ -42,6 +43,8 @@ const NARROW = '(max-width: 40rem)'
 export function TraceGraph() {
   const frame = useRef<HelixGraph>(null)
   const box = useRef<HTMLDivElement>(null)
+  /* The renderer, once made, which is told the box to fit when the layout changes. */
+  const renderer = useRef<import('sigma').default | null>(null)
   const [deleted, setDeleted] = useState(false)
   /* In rows on a narrow screen, and in columns otherwise, read once the page can ask. */
   const [layout, setLayout] = useState<TraceLayout>('columns')
@@ -81,12 +84,16 @@ export function TraceGraph() {
       host.nodes = trace.nodes
       host.links = trace.links
       const sigma = new Sigma(new Graph(), drawing, { allowInvalidContainer: true })
+      sigma.setCustomBBox(boxFor(now.current.layout))
+      renderer.current = sigma
       const connection = connectGraph(
         host,
         /* Every note is placed in its column, so no layout runs. */
         sigmaDriver(sigma, { labels: 'all', material: 'glass' }),
+        { reach: 'upstream' },
       )
       stop = () => {
+        renderer.current = null
         connection.disconnect()
         sigma.kill()
       }
@@ -122,6 +129,7 @@ export function TraceGraph() {
     if (!host?.nodes?.length) {
       return
     }
+    renderer.current?.setCustomBBox(boxFor(layout))
     const trace = traceOf(deleted, layout)
     host.nodes = trace.nodes
     host.links = trace.links
@@ -132,7 +140,7 @@ export function TraceGraph() {
       <helix-graph
         class={styles.traceFrame}
         gestures="cooperative"
-        label="An example trace of three answers"
+        label="An example trace of four answers"
         no-panel
         ref={frame}
       >
@@ -157,8 +165,8 @@ export function TraceGraph() {
       </helix-flex>
       <helix-text aria-live="polite" emphasis="subtle" variant="caption">
         {deleted
-          ? `Deleted “${DELETED}”, the context built from it, and the answer that context produced. The sources it came from remain.`
-          : 'Press an answer to see what it was derived from, or open the list with the Notes button. The superseded price stays in the trace, since an answer given while it was current is explained by it.'}
+          ? `Deleted “${DELETED}”, the context built from it, and the answer that context produced. The facts it cited and the sources they came from remain.`
+          : 'Press an answer to light everything it was derived from, through the facts in Engram to the sources they came from. The September answer cites the superseded price, which is why Engram keeps it.'}
       </helix-text>
     </div>
   )
