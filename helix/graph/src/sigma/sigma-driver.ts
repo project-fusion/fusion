@@ -533,8 +533,11 @@ export const sigmaDriver = <G extends SigmaGraph>(
       /* **Which notes are named is the reducer's**, by `labels`, and Sigma's
          grid keeps the names it is given apart, the larger note's first. */
       sigma.setSetting('labelRenderedSizeThreshold', 0)
-      /* Cells wide enough for a name, so two names never share a line. */
-      sigma.setSetting('labelGridCellSize', 130)
+      /* **Cells wide enough for a name**, so two names never share a line, for
+         a graph that names its notes on hover and at its hubs. Fine where it
+         names every note it can: the driver keeps names off each other
+         itself, and a grid as wide as a name left one name in each cell. */
+      sigma.setSetting('labelGridCellSize', naming === 'all' ? 24 : 130)
       sigma.setSetting(
         'defaultDrawNodeLabel',
         labelOf(looks, claim, (at, width, box) =>
