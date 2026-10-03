@@ -744,6 +744,14 @@ helix-toggle[disabled]::part(item) {
   white-space: nowrap;
 }
 
+/* **Down a column, a destination reads from its start**, as every sidebar's
+   does: centered, three names of different lengths had three left edges.
+   Here and not in the component, since a slotted link is styled by the page's
+   rules ahead of anything the shadow root says about it. */
+:where(helix-navigation[orientation="vertical"]) :where([data-navigation-item], a) {
+  justify-content: start;
+}
+
 :where([data-navigation-item], helix-navigation a):hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   color: var(--helix-color-foreground);

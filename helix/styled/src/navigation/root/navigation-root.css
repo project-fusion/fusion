@@ -43,6 +43,22 @@
   opacity: 1;
 }
 
+/* **A column, for a sidebar.** The bar's height is the row's; a column is as
+   tall as its destinations, each takes the column's width, and the marker
+   moves down to the current one by the position the controller already
+   publishes for the block axis. */
+:host([orientation="vertical"]) [part="nav"] {
+  align-items: stretch;
+  block-size: auto;
+  flex-direction: column;
+  overflow-x: visible;
+}
+
+:host([orientation="vertical"]) [part="indicator"] {
+  inset-block-start: 0;
+  translate: var(--indicator-x, 0) var(--indicator-y, 0);
+}
+
 /* Print: the same, and the marker under it marks a page nobody is on.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
