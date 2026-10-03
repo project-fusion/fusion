@@ -864,8 +864,8 @@ function MapPage(context: Context) {
  *
  * **The shape of a services site**, a pool builder's or a joiner's, where the
  * marketing layout is a product's: no chart, no table, and the price on the
- * page. The hero's picture is drawn from the theme, so its words sit on
- * `surface-media` in `foreground-media`, the pair a photograph's caption uses.
+ * page. The hero sits on the page's own ground with a brand tint, in either
+ * mode, since there is no photograph in the preview to put words over.
  */
 function LocalPage(context: Context) {
   const { company, hero, local } = context
