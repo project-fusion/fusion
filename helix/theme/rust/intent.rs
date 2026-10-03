@@ -209,6 +209,36 @@ pub struct Motion {
     pub scale: Option<f64>,
 }
 
+/// The page's own color, for each scheme.
+///
+/// **Unset is pure white in light and pure black in dark**, the stylesheet's
+/// page. Set, the surfaces step from it as they step from white or black, the
+/// grays take its cast unless `neutral` says otherwise, and every ink is
+/// solved against it. A page no ink can clear the contrast target on is
+/// refused: black on a light page, white on a dark one, is the strongest ink
+/// there is.
+#[derive(Clone, Debug, Default, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
+pub struct Background {
+    pub dark: Option<Color>,
+    pub light: Option<Color>,
+}
+
+impl Background {
+    /// The page given for a scheme, where one is.
+    #[must_use]
+    pub fn for_scheme(&self, scheme: Scheme) -> Option<&Color> {
+        match scheme {
+            Scheme::Dark => self.dark.as_ref(),
+            Scheme::Light => self.light.as_ref(),
+        }
+    }
+}
+
 /// The cast every gray carries. Chroma 0 is a dead gray and is the default,
 /// matching `primitives.css`: a fixed chroma is a rising *saturation* as a
 /// surface darkens, so a trace that looks right on a light page reads navy
@@ -330,6 +360,8 @@ pub struct Status {
 pub struct ThemeIntent {
     /// The second emphasis. Unnamed, it is the brand.
     pub accent: Option<Seed>,
+    /// The page's color for each scheme. Unset is pure white and pure black.
+    pub background: Option<Background>,
     /// The one color most consumers care about, and the only required input.
     pub brand: Color,
     pub chroma: Option<Chroma>,
@@ -370,6 +402,7 @@ impl ThemeIntent {
     pub fn new(brand: Color) -> Self {
         Self {
             accent: None,
+            background: None,
             brand,
             chroma: None,
             contrast_target: None,

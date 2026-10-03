@@ -6,11 +6,11 @@
 
 use crate::derive::Cast;
 use crate::intent::{
-    to_oklch, Chroma, Color, Font, Material, Motion, Neutral, PairingRequest, Scheme, Seed,
-    Separation, Status, StatusSeed, ThemeIntent, STATUS_NAMES,
+    to_oklch, Background, Chroma, Color, Font, Material, Motion, Neutral, PairingRequest, Scheme,
+    Seed, Separation, Status, StatusSeed, ThemeIntent, STATUS_NAMES,
 };
 use crate::model::{Contrast, INKS};
-use crate::oklch::Oklch;
+use crate::oklch::{fit_to_gamut, shipped_contrast_ratio, Oklch, GAMUT_STEPS};
 
 /// Why an intent was refused.
 ///
@@ -91,6 +91,7 @@ pub struct Resolved {
     /// `None` when nobody named one, and that is not a missing default: an
     /// accent nobody named is the brand, so there is no seed to fill in.
     pub accent: Option<Seed>,
+    pub background: Background,
     pub brand: Color,
     pub chroma: Chroma,
     pub contrast_target: f64,
@@ -158,6 +159,7 @@ pub fn defaults(intent: &ThemeIntent) -> Resolved {
         the same thing either, since `settle` would rotate it out of the
         brand's way and hand back a near miss. */
         accent: intent.accent.clone(),
+        background: intent.background.clone().unwrap_or_default(),
         brand: intent.brand.clone(),
         chroma: intent.chroma.unwrap_or_default(),
         contrast_target,
@@ -282,6 +284,43 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
         }
     }
 
+    /* **A page is refused where no ink can be read on it**, which is the one
+    bound that is not a number somebody chose: black on a light page and white
+    on a dark one are the strongest inks there are, so where they miss the
+    target every ink does. Each page against its own scheme, so a dark color
+    given for the light page is refused whichever scheme is derived. */
+    for scheme in [Scheme::Light, Scheme::Dark] {
+        let Some(color) = resolved.background.for_scheme(scheme) else {
+            continue;
+        };
+        let label = match scheme {
+            Scheme::Dark => "background.dark",
+            Scheme::Light => "background.light",
+        };
+        let page = to_oklch(color).ok_or_else(|| IntentError::Unreadable {
+            label: label.to_owned(),
+            value: color.to_string(),
+        })?;
+        finite(&format!("{label}.lightness"), page.lightness)?;
+        finite(&format!("{label}.chroma"), page.chroma)?;
+        finite(&format!("{label}.hue"), page.hue)?;
+        let ink = strongest_ink(scheme);
+        let ratio = shipped_contrast_ratio(ink, fit_to_gamut(page, GAMUT_STEPS));
+        if ratio < resolved.contrast_target {
+            let ink_name = match scheme {
+                Scheme::Dark => "white",
+                Scheme::Light => "black",
+            };
+            return Err(range(
+                label,
+                &format!(
+                    "leaves no ink that reaches the contrast target of {target}: {ink_name}, the strongest, reaches {ratio:.2} on it",
+                    target = resolved.contrast_target,
+                ),
+            ));
+        }
+    }
+
     if let Some(allowance) = resolved.status.allowance {
         finite("status.allowance", allowance)?;
         if !(0.0..=180.0).contains(&allowance) {
@@ -293,6 +332,30 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     }
 
     Ok(resolved)
+}
+
+/// The strongest ink a scheme has: black in light and white in dark.
+#[must_use]
+pub fn strongest_ink(scheme: Scheme) -> Oklch {
+    Oklch {
+        chroma: 0.0,
+        hue: 0.0,
+        lightness: if scheme == Scheme::Dark { 1.0 } else { 0.0 },
+    }
+}
+
+/// The page given for the scheme being derived, where one is.
+///
+/// # Panics
+///
+/// If handed a [`Resolved`] whose page is unreadable, which [`resolve`]
+/// refuses, so one cannot be built through it.
+#[must_use]
+pub fn page(resolved: &Resolved) -> Option<Oklch> {
+    resolved
+        .background
+        .for_scheme(resolved.scheme)
+        .map(|color| to_oklch(color).expect("resolve refused an unreadable page"))
 }
 
 /// The brand, with the policy applied, and the neutral cast derived from it.
@@ -315,9 +378,20 @@ pub fn brand_and_neutral(resolved: &Resolved, policy: Policy) -> (Oklch, Oklch, 
     /* Chroma 0 by default, which is what `primitives.css` settled on: a fixed
     chroma is a rising saturation as a surface darkens, and 0.008 reads navy
     across a dark page. */
-    let neutral = Cast {
-        chroma: policy.apply(resolved.neutral.chroma.unwrap_or(0.0)),
-        hue: resolved.neutral.hue.unwrap_or(brand.hue),
+    let neutral = match (page(resolved), resolved.neutral.chroma) {
+        /* **A page given, the grays take its cast**, so a cream page has warm
+        cards on it where a gray card would read as a hole. Its own chroma and
+        hue, and the chroma policy left out: the page is a color handed in,
+        which the policy never touches, and the grays drawn from it have to
+        match it. `neutral` still wins where it says anything. */
+        (Some(page), None) => Cast {
+            chroma: page.chroma,
+            hue: resolved.neutral.hue.unwrap_or(page.hue),
+        },
+        (_, chroma) => Cast {
+            chroma: policy.apply(chroma.unwrap_or(0.0)),
+            hue: resolved.neutral.hue.unwrap_or(brand.hue),
+        },
     };
     (raw, brand, neutral)
 }

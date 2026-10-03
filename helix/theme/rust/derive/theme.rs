@@ -64,3 +64,115 @@ pub fn derive_theme(intent: &ThemeIntent) -> Result<Theme, IntentError> {
         intent: resolved,
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::derive_theme;
+    use crate::derive::resolve::IntentError;
+    use crate::intent::{Background, Color, Neutral, Scheme, ThemeIntent};
+
+    fn hex(value: &str) -> Color {
+        Color::Hex(value.to_owned())
+    }
+
+    /// Golden Hour Pools' page: a warm cream, `#F7F2EB`, under an orange brand.
+    fn cream() -> ThemeIntent {
+        ThemeIntent {
+            background: Some(Background {
+                dark: None,
+                light: Some(hex("#F7F2EB")),
+            }),
+            ..ThemeIntent::new(hex("#FF6200"))
+        }
+    }
+
+    fn token<'a>(theme: &'a super::Theme, name: &str) -> &'a crate::derive::DerivedToken {
+        theme
+            .tokens
+            .iter()
+            .find(|token| token.name == name)
+            .unwrap_or_else(|| panic!("{name} is emitted"))
+    }
+
+    #[test]
+    fn a_page_given_is_the_page_and_the_surfaces_keep_their_distance_from_it() {
+        let theme = derive_theme(&cream()).expect("a cream page derives");
+        assert_eq!(token(&theme, "color-background").hex, "#f7f2eb");
+        let page = token(&theme, "color-background").value;
+        let surface = token(&theme, "color-surface").value;
+        /* 0.015 under the page, as 0.985 is under white. */
+        assert!((page.lightness - surface.lightness - 0.015).abs() < 0.002);
+        /* Pure white for a menu, on any light page. */
+        assert_eq!(token(&theme, "color-surface-overlay").hex, "#ffffff");
+    }
+
+    #[test]
+    fn the_grays_take_the_page_cast_and_every_pair_clears() {
+        let theme = derive_theme(&cream()).expect("a cream page derives");
+        let surface = token(&theme, "color-surface").value;
+        assert!((surface.chroma - 0.011).abs() < 0.002, "{}", surface.chroma);
+        assert!((surface.hue - 77.0).abs() < 4.0, "{}", surface.hue);
+        assert!(theme.violations.is_empty(), "{:?}", theme.violations);
+    }
+
+    #[test]
+    fn a_neutral_given_wins_over_the_page_cast() {
+        let theme = derive_theme(&ThemeIntent {
+            neutral: Some(Neutral {
+                chroma: Some(0.0),
+                hue: None,
+            }),
+            ..cream()
+        })
+        .expect("derives");
+        assert!(token(&theme, "color-surface").value.chroma < 0.0005);
+    }
+
+    #[test]
+    fn a_dark_page_of_its_own_color_carries_light_surfaces_and_clears() {
+        let theme = derive_theme(&ThemeIntent {
+            background: Some(Background {
+                dark: Some(hex("#0B2A33")),
+                light: None,
+            }),
+            scheme: Some(Scheme::Dark),
+            ..ThemeIntent::new(hex("#2DD4BF"))
+        })
+        .expect("a deep teal page derives");
+        assert_eq!(token(&theme, "color-background").hex, "#0b2a33");
+        assert!(
+            token(&theme, "color-surface").value.lightness
+                > token(&theme, "color-background").value.lightness
+        );
+        assert!(theme.violations.is_empty(), "{:?}", theme.violations);
+    }
+
+    #[test]
+    fn a_page_no_ink_can_be_read_on_is_refused_with_why() {
+        let refused = derive_theme(&ThemeIntent {
+            background: Some(Background {
+                dark: None,
+                light: Some(hex("#333333")),
+            }),
+            ..ThemeIntent::new(hex("#FF6200"))
+        });
+        let Err(IntentError::OutOfRange { label, message }) = refused else {
+            panic!("a dark page for the light scheme is refused, got {refused:?}")
+        };
+        assert_eq!(label, "background.light");
+        assert!(message.contains("black, the strongest"), "{message}");
+    }
+
+    #[test]
+    fn a_page_for_the_other_scheme_leaves_this_one_white() {
+        let theme = derive_theme(&ThemeIntent {
+            background: Some(Background {
+                dark: Some(hex("#0B2A33")),
+                light: None,
+            }),
+            ..ThemeIntent::new(hex("#FF6200"))
+        })
+        .expect("derives");
+        assert_eq!(token(&theme, "color-background").hex, "#ffffff");
+    }
+}

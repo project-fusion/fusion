@@ -26,7 +26,7 @@ fn intent_schema() -> serde_json::Value {
     serde_json::json!({
         "properties": {
             "intent": {
-                "description": "A theme intent, the same JSON `helix.theme.json` holds. `brand` is the only required key: a hex color. Optional keys include `scheme` (\"light\" or \"dark\"), `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `chroma`, `neutral`, `radius`, `density` and `separation`.",
+                "description": "A theme intent, the same JSON `helix.theme.json` holds. `brand` is the only required key: a hex color. Optional keys include `scheme` (\"light\" or \"dark\"), `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density` and `separation`.",
                 "type": "object",
             },
         },

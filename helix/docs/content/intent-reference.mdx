@@ -28,7 +28,8 @@ computed from `brand` or from the Helix design language. A theme that sets only
 |---|---|
 | `brand` | Your main brand color. Required |
 | `accent` | The second emphasis color. Defaults to the brand color. `{ from: 'brand', rotate: 180 }` gives the complementary color |
-| `neutral` | The gray ramp, which can be tinted toward the brand |
+| `background` | The page's color, `{ light, dark }`, for a page that is not pure white or pure black. The surfaces keep their contrast with it, and the grays take its tint. A page no text color can reach the contrast target on is refused |
+| `neutral` | The gray ramp, which can be tinted toward the brand. With `background`, it takes the page's tint |
 | `status` | `info`, `success`, `warning`, and `danger`. A color pins one. An object adjusts its hue while it keeps its meaning |
 | `chroma` | How saturated the palette is, independent of hue |
 | `scheme` | `'light'` or `'dark'`, for a theme that has only one mode |

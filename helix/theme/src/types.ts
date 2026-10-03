@@ -94,6 +94,20 @@ export interface ThemeIntent {
    */
   accent?: Seed
   /**
+   * The page's own color for each scheme. Unset is pure white in light and
+   * pure black in dark.
+   *
+   * Set, the surfaces keep the contrast with it they keep with white or black,
+   * the grays take its cast unless `neutral` says otherwise, and every ink is
+   * solved against it. A page no ink can reach the contrast target on is
+   * refused: black on a light page, and white on a dark one, is the strongest
+   * ink there is.
+   */
+  background?: {
+    dark?: Color
+    light?: Color
+  }
+  /**
    * The one color most consumers care about, and the only required input.
    */
   brand: Color
@@ -216,7 +230,8 @@ export interface ThemeIntent {
    * Chroma 0 is a dead gray and is the default, matching `primitives.css`,
    * which records why: a fixed chroma is a rising *saturation* as a surface
    * darkens, so a trace that looks right on a light page reads navy across a
-   * dark one.
+   * dark one. Where `background` gives the page a color, the default is the
+   * page's own cast.
    */
   neutral?: {
     chroma?: number

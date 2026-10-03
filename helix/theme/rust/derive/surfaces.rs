@@ -104,25 +104,45 @@ impl Surfaces {
 /// lightness of 1.05 and the gamut check caught it.
 #[must_use]
 pub fn surfaces(scheme: Scheme, neutral: Cast, rung: f64) -> Surfaces {
+    surfaces_on(scheme, None, neutral, rung)
+}
+
+/// The ladder on a page of the consumer's own color, or on pure white or pure
+/// black where there is none.
+///
+/// **Each rung keeps its contrast with the page**, the measure everything else
+/// here is solved by. Kept as a distance in lightness, it lifted the surface
+/// of a deep teal page from 0.27 to 0.45, a mid-tone: the steps off black are
+/// large because black hides small ones, and a lighter page does not. A cream
+/// page at 0.963 has its surface at 0.948, as a white one has it at 0.985.
+/// The light overlay stays pure white, a menu being white on any light page,
+/// as Golden Hour Pools draws its cards white on cream.
+#[must_use]
+pub fn surfaces_on(scheme: Scheme, page: Option<Oklch>, neutral: Cast, rung: f64) -> Surfaces {
     let dark = scheme == Scheme::Dark;
-    let raw_background = if dark {
-        Oklch {
-            chroma: 0.0,
-            hue: 0.0,
-            lightness: 0.0,
-        }
-    } else {
-        Oklch {
-            chroma: 0.0,
-            hue: 0.0,
-            lightness: 1.0,
+    let white_or_black = if dark { 0.0 } else { 1.0 };
+    let raw_background = page.unwrap_or(Oklch {
+        chroma: 0.0,
+        hue: 0.0,
+        lightness: white_or_black,
+    });
+
+    /* A rung's lightness on white or black, scaled by the separation policy,
+    and then moved onto the page. On no page of its own, exactly what it was. */
+    let on_page = |from: f64| {
+        let scaled = white_or_black + (from - white_or_black) * rung;
+        match page {
+            None => scaled,
+            Some(page) => kept_contrast(white_or_black, scaled, page.lightness),
         }
     };
-    let surface_base_lightness = if dark { 0.182 } else { 0.985 };
-
-    /* The step away from the page, scaled by the separation policy. */
-    let step =
-        |from: f64| neutral.at(raw_background.lightness + (from - raw_background.lightness) * rung);
+    let base = if dark { 0.182 } else { 0.985 };
+    /* Where `surface` sits before the policy scales it, which the dark tint
+    of the emphasis phase is measured from: on the page, by the same rule. */
+    let surface_base_lightness = page.map_or(base, |page| {
+        kept_contrast(white_or_black, base, page.lightness)
+    });
+    let step = |from: f64| neutral.at(on_page(from));
 
     Surfaces {
         raw_background,
@@ -143,7 +163,21 @@ pub fn surfaces(scheme: Scheme, neutral: Cast, rung: f64) -> Surfaces {
         /* Declared after the ladder, since `surface` is on it: it is the ground a
         card uses, so a fill-first theme has to move it too or the one surface the
         policy is most about is the one it does not reach. */
-        raw_surface: step(surface_base_lightness),
+        raw_surface: step(base),
         surface_base_lightness,
     }
+}
+
+/// The lightness that stands from `page` at the contrast `rung` stands from
+/// `origin`, white or black, in WCAG's terms.
+///
+/// A gray's relative luminance is its `OKLab` lightness cubed, so the solve is
+/// closed: the ratio of `(luminance + 0.05)` carried over, and back through a
+/// cube root. Stopped at white and black.
+fn kept_contrast(origin: f64, rung: f64, page: f64) -> f64 {
+    let luminance = |lightness: f64| lightness.powi(3);
+    let ratio = (luminance(rung) + 0.05) / (luminance(origin) + 0.05);
+    ((luminance(page) + 0.05) * ratio - 0.05)
+        .clamp(0.0, 1.0)
+        .cbrt()
 }
