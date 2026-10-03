@@ -47,6 +47,17 @@ describe('graph server output', () => {
     expect(hasPart(markup, 'pan-up')).toBe(false)
   })
 
+  test('with no-panel, the list is served hidden behind its button', () => {
+    const markup = withoutStyles(
+      ssr(
+        html`<helix-headless-graph label="Research notes" no-panel .nodes=${nodes}></helix-headless-graph>`,
+      ),
+    )
+    expect(partTag(markup, 'panel')).toContain('hidden')
+    expect(partTag(markup, 'notes-toggle')).toContain('aria-expanded="false"')
+    expect(partTag(markup, 'notes-toggle')).toContain('aria-label="Notes"')
+  })
+
   test('the slots a consumer fills are served', () => {
     const inside = rendered(served(), 'helix-headless-graph')
     expect(inside).toContain('name="header"')

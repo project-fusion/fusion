@@ -17,7 +17,7 @@ import {
   type ViewportZoomDetail,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
-import { magnifyingGlass } from '@fusion.dev/helix-icons'
+import { list, magnifyingGlass } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -102,11 +102,12 @@ const PAGE = 10
  * @csspart note-name - A note's name in the list.
  * @csspart note-relation - How a note stands to the selected one, such as "Linked from Alpha".
  * @csspart note-selected - The selected note, first in the list.
+ * @csspart notes-toggle - The button among the controls that opens the search and the list over the drawing, with `no-panel`.
  * @csspart pan-down - The button that moves the graph down.
  * @csspart pan-end - The button that moves the graph toward the end of a line of text: right in English.
  * @csspart pan-start - The button that moves the graph toward the start of a line of text: left in English.
  * @csspart pan-up - The button that moves the graph up.
- * @csspart panel - The search field and the list, beside the drawing or below it.
+ * @csspart panel - The search field and the list, beside the drawing or below it, or over the drawing when opened with `no-panel`.
  * @csspart region - The frame: the drawing, its controls and the list.
  * @csspart search - The bar holding the icon, the search field and the count.
  * @csspart search-field - The field that finds a note by its name.
@@ -161,7 +162,15 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ attribute: false })
   nodes: readonly GraphNode[] = []
 
-  /** The list's name, read by screen readers. */
+  /**
+   * Leaves the search and the list out of the frame, behind a button among
+   * its controls that opens them over the drawing. For a graph shown large,
+   * such as at the top of a page, where the drawing takes the whole frame.
+   */
+  @property({ attribute: 'no-panel', reflect: true, type: Boolean })
+  noPanel = false
+
+  /** The list's name, read by screen readers, and the name of the button that opens it with `no-panel`. */
   @property({ attribute: 'notes-label' })
   notesLabel = 'Notes'
 
@@ -180,6 +189,10 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   /** The row the keyboard is on, as an index into the list. */
   @state()
   private cursor = 0
+
+  /** Whether the search and the list are open over the drawing, with `no-panel`. */
+  @state()
+  private panelOpen = false
 
   /** Which notes link to and from each, read again when `links` changes. */
   private adjacency: Adjacency = new Map()
@@ -445,6 +458,56 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     event.stopPropagation()
   }
 
+  /**
+   * Opens the search and the list over the drawing, or closes them, with
+   * `no-panel`. **Opened, the search field takes the focus**, since finding
+   * a note is what the button is pressed for; closed from inside, the focus
+   * goes back to the button, where it was.
+   */
+  private togglePanel(open = !this.panelOpen): void {
+    const inside =
+      this.panelOpen && this.partNamed('panel')?.contains(this.shadowRoot?.activeElement ?? null)
+    this.panelOpen = open
+    void this.updateComplete.then(() => {
+      if (open) {
+        ;(this.partNamed('search-field') as HTMLElement | null)?.focus()
+      } else if (inside) {
+        ;(this.partNamed('notes-toggle') as HTMLElement | null)?.focus()
+      }
+    })
+  }
+
+  /** Escape in the panel closes it, with `no-panel`, once the search it holds is empty. */
+  private readonly handlePanelKeydown = (event: KeyboardEvent): void => {
+    if (event.key === 'Escape' && this.noPanel && this.panelOpen) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.togglePanel(false)
+    }
+  }
+
+  /**
+   * The button that opens the search and the list over the drawing, among
+   * the controls after zoom, where the frame leaves them out with `no-panel`.
+   */
+  protected override renderMoreControls(): TemplateResult | typeof nothing {
+    if (!this.noPanel) {
+      return nothing
+    }
+    return html`<button
+      part="notes-toggle"
+      aria-controls="panel"
+      aria-expanded=${this.panelOpen ? 'true' : 'false'}
+      aria-label=${this.notesLabel}
+      type="button"
+      @click=${() => this.togglePanel()}
+    >
+      <svg aria-hidden="true" fill="currentColor" viewBox=${list.viewBox}>
+        ${unsafeSVG(list.content)}
+      </svg>
+    </button>`
+  }
+
   private readonly handleSearch = (event: Event): void => {
     this.query = (event.target as HTMLInputElement).value
   }
@@ -514,7 +577,12 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
           </div>
           ${this.renderControls()}
         </div>
-        <div part="panel">
+        <div
+          part="panel"
+          id="panel"
+          ?hidden=${this.noPanel && !this.panelOpen}
+          @keydown=${this.handlePanelKeydown}
+        >
           <div part="search">
             <span part="filter-icon" aria-hidden="true">${this.renderFilterIcon()}</span>
             <input
