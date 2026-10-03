@@ -4,12 +4,14 @@ import type { HelixGraph } from '@fusion.dev/helix'
 import { useEffect, useRef, useState } from 'react'
 import {
   boxFor,
+  derivedFrom,
   TRACE_DELETED,
   TRACE_LINKS,
   TRACE_NODES,
   TRACE_REMOVED,
   type TraceLayout,
   traceIn,
+  WHY_ORDER,
 } from '@/content/cortex/trace-example'
 import styles from './trace-graph.module.css'
 
@@ -27,6 +29,15 @@ const traceOf = (deleted: boolean, layout: TraceLayout) => {
     nodes: traceIn(layout).filter((node) => !removed.has(node.id)),
   }
 }
+
+/** The four answers, which the reader chooses between. */
+const ANSWERS = TRACE_NODES.filter((node) => node.group === 'Outputs')
+
+/** The answer chosen when the page loads, so its derivation is lit before anything is pressed. */
+const FIRST = 'o-price'
+
+/** A note's name, by its id. */
+const nameOf = (id: string): string => TRACE_NODES.find((node) => node.id === id)?.label ?? id
 
 /** Where the trace turns from columns to rows: a phone's width, as the page's own narrow layout. */
 const NARROW = '(max-width: 40rem)'
@@ -55,9 +66,13 @@ export function TraceGraph() {
     query.addEventListener('change', follow)
     return () => query.removeEventListener('change', follow)
   }, [])
-  /* Read when the graph is first given its notes, in case either changed before it loaded. */
-  const now = useRef({ deleted, layout })
-  now.current = { deleted, layout }
+  /* **The note whose derivation is shown**, an answer at first, so the graph
+     opens lit rather than waiting for a reader to guess that pressing does
+     something. Pressing a note in the drawing chooses it too. */
+  const [active, setActive] = useState(FIRST)
+  /* Read when the graph is first given its notes, in case any changed before it loaded. */
+  const now = useRef({ active, deleted, layout })
+  now.current = { active, deleted, layout }
   const [failed, setFailed] = useState(false)
 
   useEffect(() => {
@@ -90,9 +105,16 @@ export function TraceGraph() {
         host,
         /* Every note is placed in its column, so no layout runs. */
         sigmaDriver(sigma, { labels: 'all', material: 'glass' }),
-        { reach: 'upstream' },
+        /* A note's whole derivation lights, not only its neighbors. */
+        { center: false, reach: 'upstream' },
       )
+      host.active = now.current.active
+      /* A note pressed in the drawing is the one the list below explains. */
+      const pressed = (event: Event): void =>
+        setActive((event as CustomEvent<{ value: string }>).detail.value)
+      host.addEventListener('helix-activate', pressed)
       stop = () => {
+        host.removeEventListener('helix-activate', pressed)
         renderer.current = null
         connection.disconnect()
         sigma.kill()
@@ -135,8 +157,55 @@ export function TraceGraph() {
     host.links = trace.links
   }, [deleted, layout])
 
+  /* The choice handed to the frame, which lights it. */
+  useEffect(() => {
+    const host = frame.current
+    if (host?.nodes?.length && host.active !== active) {
+      host.active = active
+    }
+  }, [active])
+
+  /* **A deleted answer cannot stay chosen**, so the choice moves to the first
+     answer the trace still holds. */
+  const removed = deleted ? TRACE_REMOVED : new Set<string>()
+  const answers = ANSWERS.filter((answer) => !removed.has(answer.id))
+  useEffect(() => {
+    if (removed.has(active)) {
+      setActive(answers[0]?.id ?? '')
+    }
+  }, [active, answers, removed])
+
+  /* What the chosen note was derived from, by kind, nearest first. */
+  const links = TRACE_LINKS.filter((link) => !removed.has(link.source) && !removed.has(link.target))
+  const why = active ? derivedFrom(active, links) : new Set<string>()
+  const kinds = WHY_ORDER.map((group) => ({
+    group,
+    names: TRACE_NODES.filter((node) => node.group === group && why.has(node.id)).map(
+      (node) => node.label,
+    ),
+  })).filter((kind) => kind.names.length > 0)
+
   return (
     <div className={styles.trace}>
+      {/* **Choose an answer, and see what it came from.** The four answers are
+          the way in, since an answer is what a reader asks about. */}
+      <helix-radio-group
+        label="Choose an answer"
+        onChange={(event) => setActive(event.currentTarget.value)}
+        orientation="horizontal"
+        value={answers.some((answer) => answer.id === active) ? active : ''}
+      >
+        {answers.map((answer) => (
+          <helix-radio key={answer.id} value={answer.id}>
+            {answer.label}
+          </helix-radio>
+        ))}
+      </helix-radio-group>
+      <helix-text emphasis="subtle" variant="caption">
+        {layout === 'rows' ? 'Read from the top down' : 'Read from left to right'}: what came in,
+        the facts Engram kept from it, what was retrieved and looked up, the context the model was
+        given, and the answer it gave. The chosen answer is lit back to where it came from.
+      </helix-text>
       <helix-graph
         class={styles.traceFrame}
         gestures="cooperative"
@@ -151,6 +220,29 @@ export function TraceGraph() {
           </helix-text>
         ) : null}
       </helix-graph>
+      {/* The derivation in words, the same walk the drawing lights. */}
+      <helix-card>
+        <helix-flex direction="column" gap="sm">
+          <helix-text as="h3" variant="subheading">
+            {active ? `What ${nameOf(active)} came from` : 'Choose an answer'}
+          </helix-text>
+          {kinds.length > 0 ? (
+            <helix-description-list>
+              {kinds.map((kind) => (
+                <helix-description-list-item key={kind.group} label={kind.group}>
+                  {kind.names.join(', ')}
+                </helix-description-list-item>
+              ))}
+            </helix-description-list>
+          ) : (
+            <helix-text emphasis="muted">
+              {active
+                ? 'Nothing in this trace. It came in from outside.'
+                : 'Choose an answer above, or press a note in the trace.'}
+            </helix-text>
+          )}
+        </helix-flex>
+      </helix-card>
       <helix-flex align-items="center" gap="sm" wrap>
         <helix-button disabled={deleted || undefined} onClick={() => setDeleted(true)}>
           Delete “{DELETED}”
@@ -166,7 +258,7 @@ export function TraceGraph() {
       <helix-text aria-live="polite" emphasis="subtle" variant="caption">
         {deleted
           ? `Deleted “${DELETED}”, the context built from it, and the answer that context produced. The facts it cited and the sources they came from remain.`
-          : 'Press an answer to light everything it was derived from, through the facts in Engram to the sources they came from. The September answer cites the superseded price, which is why Engram keeps it.'}
+          : 'Deleting a memory removes everything derived from it, as Trace does. The September answer cites the superseded price, which is why Engram keeps it.'}
       </helix-text>
     </div>
   )
