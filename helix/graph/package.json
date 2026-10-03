@@ -33,6 +33,10 @@
       "types": "./dist/sigma/index.d.ts",
       "default": "./dist/sigma/index.js"
     },
+    "./snapshot": {
+      "types": "./dist/snapshot/index.d.ts",
+      "default": "./dist/snapshot/index.js"
+    },
     "./three": {
       "types": "./dist/three/index.d.ts",
       "default": "./dist/three/index.js"

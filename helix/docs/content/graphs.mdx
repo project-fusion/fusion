@@ -365,6 +365,44 @@ helix-graph:state(ready) > div {
 }
 ```
 
+## Draw the graph before it loads
+
+`graphSnapshot(nodes, links, options)` draws the graph on your server as an
+SVG, fitted to its box as Sigma.js fits it and in your theme's colors. Put it
+in the frame after the element the renderer draws in, and the page shows a
+graph from its first paint. `connectGraph` fades it out once the renderer has
+drawn the graph whole.
+
+```js
+import { graphSnapshot } from '@fusion.dev/helix-graph/snapshot'
+
+const snapshot = graphSnapshot(nodes, links, {
+  height: 540,
+  labels: 'all',
+  width: 1200,
+})
+// Inside helix-graph, after <div id="drawing"></div>, write the snapshot's markup.
+```
+
+Give the snapshot the options you give the renderer, and it lines up with the
+drawing that replaces it:
+
+- `labels`, `groupLabels`, `shape`, and `emphasis`, as `sigmaDriver` takes them.
+- `active` and `reach`, as the frame and `connectGraph` take them, to draw the
+  selection lit.
+- `bounds`, the box you hand Sigma's `setCustomBBox`, where you hand it one.
+
+`width` and `height` are the box it is drawn for, and a smaller box shows its
+middle. Every note needs an `x` and a `y`, since only a layout run in the
+browser could place one without. The snapshot is an empty string where a note
+has no place, so it is whole or absent. Its colors are your theme's tokens, so
+it is light or dark with the page and follows a theme change.
+
+In a framework that renders the markup for you, such as React, put the snapshot
+in an element that is a direct child of the frame and has the
+`data-helix-graph-snapshot` attribute. `connectGraph` hides that element, and
+leaves removing it to your framework.
+
 ## Keyboard and screen readers
 
 - The frame is one tab stop. Arrow keys move the drawing, and the plus and

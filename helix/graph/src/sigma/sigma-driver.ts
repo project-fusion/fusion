@@ -6,6 +6,7 @@ import type {
 } from '../connect-graph/connect-graph.js'
 import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
+import { pixelsOf } from '../connect-graph/sizes.js'
 import {
   type Box,
   chromeOver,
@@ -194,9 +195,6 @@ const HELD = 2
 
 /** How long a layout may go without moving anything before it counts as having nothing to do, in milliseconds. */
 const IDLE = 2000
-
-/** A note's drawn radius in pixels, from its relative size: a leaf about four, a busy hub about nine. */
-const pixels = (size: number): number => 1.6 + 1.35 * Math.max(size, 0)
 
 /** What Sigma hands a hover drawing: where the note is drawn, its size and its name. */
 interface HoverData {
@@ -464,7 +462,7 @@ export const sigmaDriver = <G extends SigmaGraph>(
       for (const node of nodes) {
         graph.addNode(node.id, {
           label: node.label,
-          size: pixels(node.size),
+          size: pixelsOf(node.size),
           x: node.x,
           y: node.y,
         })
@@ -642,7 +640,7 @@ export const sigmaDriver = <G extends SigmaGraph>(
       }
       const growing = new Map<string, number>()
       for (const node of changes.addNodes) {
-        const size = pixels(node.size)
+        const size = pixelsOf(node.size)
         graph.addNode(node.id, {
           label: node.label,
           size: animate ? 0 : size,
@@ -663,7 +661,7 @@ export const sigmaDriver = <G extends SigmaGraph>(
         }
         graph.mergeNodeAttributes(node.id, {
           label: node.label,
-          size: pixels(node.size),
+          size: pixelsOf(node.size),
           ...(moves.has(node.id) ? {} : { x: node.x, y: node.y }),
         })
       }
