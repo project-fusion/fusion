@@ -271,7 +271,7 @@ function MarketingPage(context: Context) {
 
       {/* A recessed band, so `surface-sunken` is on screen beside the others
           rather than being the one ground nobody looks at. */}
-      <section className="themedFigures" data-band-slot>
+      <section className="themedFigures" data-band-slot="">
         {figures.map((stat) => (
           <helix-stat key={stat.label}>
             {stat.figure}
@@ -503,7 +503,7 @@ function WorkspacePage(context: Context) {
             is the mechanism rather than a class, so a screen reader is told the
             same thing the eye is, and the base layer already carries the
             treatment for it. */}
-        <nav aria-label="Sections" className="themedAppNav">
+        <helix-navigation label="Sections" orientation="vertical">
           {context.nav.map((item, index) => (
             <a
               aria-current={index === 0 ? 'page' : undefined}
@@ -514,7 +514,7 @@ function WorkspacePage(context: Context) {
               {item.label}
             </a>
           ))}
-        </nav>
+        </helix-navigation>
 
         {/* The one avatar in the preview, and it is here because this is the
             only layout with somewhere a signed-in person belongs. It falls back
@@ -657,7 +657,11 @@ function EditorialPage(context: Context) {
 
       <main className="themedEditorialMain">
         <div className="themedRail">
-          <div className="themedRailLabel">{editorial.place}</div>
+          <div className="themedRailLabel">
+            <helix-text emphasis="subtle" variant="code">
+              {editorial.place}
+            </helix-text>
+          </div>
           <div className="themedMeasure">
             <helix-text as="p" variant="display">
               {editorial.lead}
@@ -667,7 +671,11 @@ function EditorialPage(context: Context) {
 
         {editorial.sections.map((section) => (
           <div className="themedRail" key={section.rail}>
-            <div className="themedRailLabel">{section.rail}</div>
+            <div className="themedRailLabel">
+              <helix-text emphasis="subtle" variant="code">
+                {section.rail}
+              </helix-text>
+            </div>
             <div className="themedMeasure">
               {section.body.map((paragraph) => (
                 <helix-text as="p" key={paragraph} variant="body">
@@ -684,7 +692,11 @@ function EditorialPage(context: Context) {
             which is the component's own arrangement rather than a second column
             built here. */}
         <div className="themedRail">
-          <div className="themedRailLabel">Writing</div>
+          <div className="themedRailLabel">
+            <helix-text emphasis="subtle" variant="code">
+              Writing
+            </helix-text>
+          </div>
           <div className="themedMeasure">
             <helix-list divided label="Recent writing">
               {editorial.posts.map((post) => (
@@ -873,9 +885,9 @@ function LocalPage(context: Context) {
   return (
     <div className="themedLocal">
       {/* The band the builder can color, as a site sets an announcement apart. */}
-      <div className="themedLocalBar" data-band-slot>
-        <helix-text variant="caption">{local.announcement}</helix-text>
-      </div>
+      <helix-announcement data-band-slot="" tone="primary">
+        {local.announcement}
+      </helix-announcement>
 
       <helix-app-header className="themedHeader">
         <helix-flex align-items="center" gap="xs" slot="start">
@@ -897,17 +909,13 @@ function LocalPage(context: Context) {
           <helix-button data-density="lg" emphasis="solid" tone="primary">
             {hero.primary}
           </helix-button>
-          <helix-flex align-items="center" className="themedLocalRating" gap="xs">
-            <helix-text variant="label">{local.rating.score}</helix-text>
-            <span
-              aria-label={`${local.rating.score} out of 5`}
-              className="themedLocalStars"
-              role="img"
-            >
-              {[1, 2, 3, 4, 5].map((star) => (
-                <helix-icon key={star} name="star"></helix-icon>
-              ))}
-            </span>
+          <helix-flex align-items="center" gap="sm">
+            <helix-rating
+              default-value={local.rating.score}
+              readonly
+              show-value
+              value-text={`${local.rating.score} out of 5, ${local.rating.count}`}
+            ></helix-rating>
             <helix-text variant="caption">{local.rating.count}</helix-text>
           </helix-flex>
         </helix-flex>
@@ -929,14 +937,11 @@ function LocalPage(context: Context) {
                     {tier.price}
                   </helix-text>
                 </helix-flex>
-                <ul className="themedLocalIncludes">
+                <helix-list kind="unordered" label={`What ${tier.name} includes`}>
                   {tier.includes.map((item) => (
-                    <li key={item}>
-                      <helix-icon name="check"></helix-icon>
-                      <helix-text variant="caption">{item}</helix-text>
-                    </li>
+                    <helix-list-item key={item}>{item}</helix-list-item>
                   ))}
-                </ul>
+                </helix-list>
                 <helix-button emphasis="outlined">Choose {tier.name}</helix-button>
               </helix-flex>
             </helix-card>
@@ -948,21 +953,16 @@ function LocalPage(context: Context) {
         <helix-text as="h2" variant="heading">
           {local.stepsHeading}
         </helix-text>
-        <ol className="themedLocalSteps">
-          {local.steps.map((step, at) => (
-            <li key={step.title}>
-              <span aria-hidden="true" className="themedLocalStepNumber">
-                {at + 1}
-              </span>
-              <helix-flex direction="column" gap="2xs">
-                <helix-text as="h3" variant="title">
-                  {step.title}
-                </helix-text>
-                <helix-text variant="caption">{step.body}</helix-text>
-              </helix-flex>
-            </li>
+        {/* **An ordered list, not Steps**: Steps is a control whose stages are
+            buttons that select one, and this is a sequence to read. */}
+        <helix-list kind="ordered" label={local.stepsHeading}>
+          {local.steps.map((step) => (
+            <helix-list-item key={step.title}>
+              {step.title}
+              <span slot="description">{step.body}</span>
+            </helix-list-item>
           ))}
-        </ol>
+        </helix-list>
       </section>
 
       <section className="themedLocalSection">
@@ -986,14 +986,16 @@ function LocalPage(context: Context) {
               {local.visit.heading}
             </helix-text>
             <helix-text variant="caption">{local.visit.body}</helix-text>
-            <helix-flex align-items="center" gap="xs">
-              <helix-icon name="building"></helix-icon>
-              <helix-text variant="caption">{local.visit.address}</helix-text>
-            </helix-flex>
-            <helix-flex align-items="center" gap="xs">
-              <helix-icon name="clock"></helix-icon>
-              <helix-text variant="caption">{local.visit.hours}</helix-text>
-            </helix-flex>
+            <helix-list label={local.visit.heading}>
+              <helix-list-item>
+                <helix-icon name="building" slot="start"></helix-icon>
+                {local.visit.address}
+              </helix-list-item>
+              <helix-list-item>
+                <helix-icon name="clock" slot="start"></helix-icon>
+                {local.visit.hours}
+              </helix-list-item>
+            </helix-list>
           </helix-flex>
         </helix-card>
         <helix-card>
