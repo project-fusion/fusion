@@ -3,6 +3,7 @@ import { PRODUCTS } from '@/content/products/products'
 import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { CORTEX_MODULES } from './modules'
+import { TraceGraph } from './trace-graph'
 
 const vertical = findVertical('/cortex')
 const product = PRODUCTS.find((entry) => entry.href === '/cortex')
@@ -46,6 +47,20 @@ export default function Page() {
             </helix-card>
           ))}
         </helix-grid>
+      </helix-flex>
+      {/* **What Trace records, drawn with Helix**: an example of the graph
+          Trace keeps, in its own terms, and its deletion run on it. Said to
+          be an example, since Trace is still being built. */}
+      <helix-flex direction="column" gap="md">
+        <helix-text as="h2" variant="title">
+          An example trace
+        </helix-text>
+        <helix-text data-measure emphasis="muted">
+          Trace links every output to what it was derived from: the sources it read, the memories it
+          used, the context it assembled, and the tools it called. This example shows three answers
+          from a support assistant, drawn with Helix Graph. Trace is still being built.
+        </helix-text>
+        <TraceGraph />
       </helix-flex>
     </VerticalPage>
   )

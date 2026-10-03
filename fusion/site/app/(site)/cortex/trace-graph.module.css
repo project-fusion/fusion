@@ -1,0 +1,17 @@
+/* The example trace on the Cortex page: the graph, the two buttons that
+   delete a memory and restore it, and what happened, under it. */
+.trace {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+}
+
+.traceFrame {
+  --graph-block-size: min(70svh, 34rem);
+}
+
+/* The box Sigma draws in, the whole of the frame's drawing. */
+.traceCanvas {
+  block-size: 100%;
+  inline-size: 100%;
+}
