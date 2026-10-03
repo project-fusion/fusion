@@ -211,6 +211,8 @@ export const looksOf = (options: {
   colors: GraphColors
   font?: string | undefined
   groups: readonly string[]
+  /** How many links the graph draws, which sets how far a link at rest steps back. */
+  links?: number | undefined
   near: ReadonlySet<string>
   noteOf: (id: string) => NoteFacts | undefined
   selected: string | undefined
@@ -231,6 +233,14 @@ export const looksOf = (options: {
   }
   const focused = selected !== undefined
   const hidden = (id: string): boolean => shown !== undefined && !shown.has(id)
+  /* **A link at rest steps back as far as the graph is dense**: thousands of
+     links drawn plainly cover the notes in a web, and a few dozen drawn as
+     faintly vanish, though in a small graph the links are the point. From
+     0.35 of the way to the ground at fifty links or fewer to 0.72 at two
+     thousand or more, evenly by the order of the count between. */
+  const count = options.links ?? 2000
+  const along = Math.min(Math.max(Math.log(count / 50) / Math.log(2000 / 50), 0), 1)
+  const rest = 0.35 + (0.72 - 0.35) * along
   return {
     colorOf: own,
     font: options.font || 'sans-serif',
@@ -246,7 +256,7 @@ export const looksOf = (options: {
           ? own(selected as string)
           : focused
             ? mixRgb(colors.line, colors.ground, 0.6)
-            : mixRgb(own(source), colors.ground, 0.72),
+            : mixRgb(own(source), colors.ground, rest),
         hidden: hidden(source) || hidden(target),
         raised: touches,
       }

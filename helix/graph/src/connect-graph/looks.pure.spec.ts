@@ -67,6 +67,24 @@ describe('looksOf', () => {
     expect(drawn.node('d').label).toBe('never')
   })
 
+  test('steps a link at rest back further the more links the graph draws', () => {
+    const at = (links: number) =>
+      looksOf({
+        colors,
+        groups: ['work'],
+        links,
+        near: new Set(),
+        noteOf: () => ({ group: 'work' }),
+        selected: undefined,
+        shown: undefined,
+      }).link('a', 'b').color
+    /* The link's own color, the group's, mixed toward the ground: less of it in a dense graph. */
+    const red = (color: string) => Number(color.match(/\d+/)?.[0])
+    expect(red(at(20))).toBeGreaterThan(red(at(500)))
+    expect(red(at(500))).toBeGreaterThan(red(at(5000)))
+    expect(at(5000)).toBe(at(100000))
+  })
+
   test('raises the links that touch the selected note, and hides what depth leaves out', () => {
     const drawn = looks('a', ['b'], ['a', 'b'])
     expect(drawn.link('a', 'b')).toEqual({ color: 'rgb(0, 255, 0)', hidden: false, raised: true })

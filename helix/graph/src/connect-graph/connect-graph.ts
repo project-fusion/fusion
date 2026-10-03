@@ -308,6 +308,7 @@ export const connectGraph = (
         ?.trim()
         .replace(/^["']|["']$/g, ''),
       groups: nodes.flatMap((node) => (node.group === undefined ? [] : [node.group])),
+      links: links.length,
       near,
       noteOf: (id) => notes.get(id),
       selected,
