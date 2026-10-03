@@ -16,6 +16,9 @@ export function Example() {
       >
         Your workspace was moved to a new server.
       </helix-announcement>
+      <helix-announcement separation="outlined">
+        Billing moves to the first of the month in June.
+      </helix-announcement>
     </helix-flex>
   )
 }
