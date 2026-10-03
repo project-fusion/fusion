@@ -52,71 +52,28 @@ const TAIL = 120
 /** How many pieces a tail is drawn in, each a little wider and brighter than the one behind. */
 const PIECES = 14
 
-/** How far a signal's path bows from the straight line, as a share of its length, and at most, in pixels. */
-const BOW = 0.16
-const BOW_MOST = 90
-
 /** How long a signal's spark lasts as it leaves, as a share of its crossing. */
 const SPARK = 0.22
 
-/** A point and how to bend toward it: the control point of a curve on screen. */
-export type Bend = (from: string, to: string) => { x: number; y: number } | undefined
-
 type Point = { x: number; y: number }
 
-/** A point on a curve from `a` to `b`, drawn toward `c`, `t` of the way along. */
-const on = (a: Point, c: Point, b: Point, t: number): Point => {
-  const u = 1 - t
-  return {
-    x: u * u * a.x + 2 * u * t * c.x + t * t * b.x,
-    y: u * u * a.y + 2 * u * t * c.y + t * t * b.y,
-  }
-}
+/** A point on the line from `a` to `b`, `t` of the way along. */
+const on = (a: Point, b: Point, t: number): Point => ({
+  x: a.x + (b.x - a.x) * t,
+  y: a.y + (b.y - a.y) * t,
+})
 
-/**
- * Where a signal's path bends toward, where the driver does not say: to the
- * left of the way it travels, so a reply on the same link bows the other
- * way and the two do not run over each other.
- */
-const bowed = (from: Point, to: Point): Point => {
-  const dx = to.x - from.x
-  const dy = to.y - from.y
-  const length = Math.hypot(dx, dy) || 1
-  const bow = Math.min(length * BOW, BOW_MOST) * 2
-  return {
-    x: (from.x + to.x) / 2 - (dy / length) * bow,
-    y: (from.y + to.y) / 2 + (dx / length) * bow,
-  }
-}
-
-/**
- * The point a path bends toward, held near enough its straight line that
- * the path bows and never loops: two notes close on screen with an arc
- * lifted mostly sideways drew a loop out past them.
- */
-const bounded = (from: Point, to: Point, toward: Point): Point => {
-  const middle = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 }
-  const far = Math.hypot(toward.x - middle.x, toward.y - middle.y)
-  const most = Math.max(Math.hypot(to.x - from.x, to.y - from.y) * 0.9, 12)
-  if (far <= most) {
-    return toward
-  }
-  return {
-    x: middle.x + ((toward.x - middle.x) * most) / far,
-    y: middle.y + ((toward.y - middle.y) * most) / far,
-  }
-}
-
-/** The curve's path, traced. */
-const trace = (context: CanvasRenderingContext2D, a: Point, c: Point, b: Point): void => {
+/** The link's path, traced. */
+const trace = (context: CanvasRenderingContext2D, a: Point, b: Point): void => {
   context.beginPath()
   context.moveTo(a.x, a.y)
-  context.quadraticCurveTo(c.x, c.y, b.x, b.y)
+  context.lineTo(b.x, b.y)
 }
 
 /**
- * A signal on its way: a comet running along a gently bowed path, its tail
- * tapering and fading into the line it came along and turning from one
+ * A signal on its way: a comet running along its link, **on the line the
+ * link is drawn as**, so it is seen to travel the connection it passes
+ * along; its tail tapering and fading into the line it came along and turning from one
  * note's color to the other's, a bright head blooming in its color, and the
  * path itself lit faintly while it passes. Quiet on purpose: on a busy feed
  * there are dozens at once.
@@ -126,7 +83,6 @@ const comet = (
   leaves: string,
   arrives: string,
   from: Point,
-  bend: Point,
   to: Point,
   along: number,
   through: number,
@@ -135,8 +91,7 @@ const comet = (
   /* Added light reads fainter than paint at the same strength, so on a dark
      ground the comet carries a little more of it. */
   const strength = glowing ? 1.25 : 1
-  const length =
-    Math.hypot(bend.x - from.x, bend.y - from.y) + Math.hypot(to.x - bend.x, to.y - bend.y) || 1
+  const length = Math.hypot(to.x - from.x, to.y - from.y) || 1
   const color = mixRgb(leaves, arrives, along)
   context.lineCap = 'round'
   /* The path lit while the comet is on it, rising and falling with it. */
@@ -145,18 +100,18 @@ const comet = (
   line.addColorStop(1, withAlpha(arrives, 0.16 * Math.sin(Math.PI * through)))
   context.strokeStyle = line
   context.lineWidth = 1
-  trace(context, from, bend, to)
+  trace(context, from, to)
   context.stroke()
   /* The tail, in pieces: fine and clear at its end, wider and brighter
      toward the head. */
   const reach = Math.min(TAIL / length, along)
   /* Butt ends, so the pieces meet and do not overlap into beads. */
   context.lineCap = 'butt'
-  let behind = on(from, bend, to, along - reach)
+  let behind = on(from, to, along - reach)
   for (let piece = 1; piece <= PIECES; piece++) {
     const share = piece / PIECES
     const t = along - reach * (1 - share)
-    const ahead = on(from, bend, to, t)
+    const ahead = on(from, to, t)
     context.strokeStyle = withAlpha(
       mixRgb(leaves, arrives, t),
       (glowing ? 0.85 : 1) * share * share,
@@ -171,7 +126,7 @@ const comet = (
   /* The head: white at its heart on a dark ground, blooming in the signal's
      color; on a light ground, where white is the ground, its own color at
      its heart. */
-  const head = on(from, bend, to, along)
+  const head = on(from, to, along)
   const bloom = 9 * strength
   const light = context.createRadialGradient(head.x, head.y, 0, head.x, head.y, bloom)
   light.addColorStop(0, glowing ? 'rgba(255, 255, 255, 0.95)' : withAlpha(color, 1))
@@ -380,7 +335,7 @@ const fresh = (
  * over ten thousand notes draw ten dots. It draws only while something is in
  * flight, and takes no pointer, so a press reaches the note under it.
  */
-export const signalsOver = (container: HTMLElement, onScreen: OnScreen, bend?: Bend) => {
+export const signalsOver = (container: HTMLElement, onScreen: OnScreen) => {
   let overlay: HTMLCanvasElement | undefined
   let flights: Flight[] = []
   let flying = 0
@@ -407,7 +362,7 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen, bend?: B
       }
       /* A little longer than the straight line, for the bow in its path. */
       flight.crossing ??= Math.min(
-        Math.max(((Math.hypot(to.x - from.x, to.y - from.y) * 1.08) / SPEED) * 1000, QUICKEST),
+        Math.max((Math.hypot(to.x - from.x, to.y - from.y) / SPEED) * 1000, QUICKEST),
         SLOWEST,
       )
       const crossing = flight.crossing
@@ -415,11 +370,10 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen, bend?: B
       if (gone >= 1 + ARRIVAL / crossing) {
         return false
       }
-      const toward = bounded(from, to, bend?.(flight.from, flight.to) ?? bowed(from, to))
       context.save()
       if (gone < 1) {
         if (flight.animate) {
-          comet(context, flight.leaves, flight.arrives, from, toward, to, ease(gone), gone, glowing)
+          comet(context, flight.leaves, flight.arrives, from, to, ease(gone), gone, glowing)
           if (gone < SPARK) {
             spark(context, flight.leaves, from, gone / SPARK)
           }
@@ -431,7 +385,7 @@ export const signalsOver = (container: HTMLElement, onScreen: OnScreen, bend?: B
           context.globalAlpha = 1 - gone
           context.strokeStyle = line
           context.lineWidth = 2
-          trace(context, from, toward, to)
+          trace(context, from, to)
           context.stroke()
         }
       } else if (flight.animate) {

@@ -45,7 +45,6 @@ import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
 import type { StencilFrame } from '../connect-graph/stencil.js'
 import {
-  type Bend,
   ease,
   gesturesHeld,
   groupsOver,
@@ -122,9 +121,6 @@ const BLOOM = { dark: 0.28, light: 0 }
 
 /** Where the light falls from, fixed in the scene: above, to the left, and in front. */
 const LIGHT = new Vector3(-0.4, 0.8, 0.45).normalize()
-
-/** How high a signal's path rises over the shape, as a share of how far it goes. */
-const LIFT = 0.42
 
 /** How wide links are drawn, in pixels on screen: all of them, and the ones the reader is on. */
 const WIDTH = { lit: 1.8, quiet: 0.8 }
@@ -882,35 +878,8 @@ export const threeDriver = (
   }
 
   const held = gesturesHeld(container)
-  /* **A signal arcs over the shape**: its path rises from the middle of the
-     graph out, as far as a share of how far it goes, so a signal between two
-     notes on a brain runs over it and not through it. */
-  const arc: Bend = (from, to) => {
-    const one = index.get(from)
-    const other = index.get(to)
-    if (one === undefined || other === undefined) {
-      return undefined
-    }
-    const a = at(one)
-    const b = at(other)
-    const middle = a.clone().add(b).multiplyScalar(0.5)
-    const center = points.geometry.boundingSphere?.center ?? controls.target
-    const out = middle.clone().sub(center)
-    if (out.lengthSq() < 1e-9) {
-      out.copy(camera.up)
-    }
-    /* Twice the rise, since a curve only reaches half way to the point it bends toward. */
-    const peak = middle.add(out.normalize().multiplyScalar(a.distanceTo(b) * LIFT * 2))
-    const depth = peak.clone().applyMatrix4(camera.matrixWorldInverse).z
-    if (depth > 0) {
-      return undefined
-    }
-    peak.project(camera)
-    const { clientHeight: height, clientWidth: width } = container
-    return { x: ((peak.x + 1) / 2) * width, y: ((1 - peak.y) / 2) * height }
-  }
   /* Drawn only between notes in view, where the shape hides the far side. */
-  const signals = signalsOver(container, (id) => nearOnScreen(id), arc)
+  const signals = signalsOver(container, (id) => nearOnScreen(id))
   /* **On a shape's surface, a group is named where its near side is**: over
      the notes in front of the graph's middle, so a group that wraps round
      the far side is named over what of it the reader sees, and one entirely
