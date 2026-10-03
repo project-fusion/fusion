@@ -110,6 +110,39 @@ console.log(css[':root'])
 A value that is not a color and still changes with the mode, such as the edge
 of a floating surface, is set by rules after the block, one for each mode.
 
+## Color one section
+
+A section in a color of its own, such as a deep teal band on a cream page, is a
+theme of its own. Derive it from the same intent, with the section's color as
+its page, under a selector for the section:
+
+```ts
+const band = engine.derive(
+  { ...intent, background: { dark: '#0b2a33' }, scheme: 'dark' },
+  ['[data-band]'],
+)
+```
+
+Choose the scheme the color needs: `dark` for a color light text reads on, and
+`light` for one dark text reads on. A color no text can reach the contrast
+target on is refused, as a page is.
+
+Mark the section so the stylesheet derives its own colors there from the
+section's seeds, in the section's mode, and paint it with its page color:
+
+```html
+<section data-band data-color-mode="dark" data-helix-theme>…</section>
+```
+
+```css
+[data-band] {
+  background-color: var(--helix-color-background);
+  color: var(--helix-color-foreground);
+}
+```
+
+Write the section's block after the page's, so it wins inside the section.
+
 ## Why Helix uses OKLCH
 
 Equal numeric steps in sRGB do not look like equal steps. That makes scales and

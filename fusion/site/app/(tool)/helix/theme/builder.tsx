@@ -11,7 +11,10 @@ import { Wordmark } from '@/components/wordmark/wordmark'
 import { type FaceRow, GOOGLE_FACES } from '@/content/faces/faces.generated'
 import { useSiteScheme } from '@/utils/site-scheme/site-scheme'
 import {
+  BAND,
+  type Band,
   BOUNDS,
+  bandTheme,
   type Character,
   deriveOr,
   INITIAL,
@@ -184,6 +187,9 @@ const faceOptions = (groups: FaceGroup[], rest: Face) => (
   </>
 )
 
+/** Where the band switch starts the band: a deep teal, a band of its own on any light page. */
+const BAND_COLOR = '#0b2a33'
+
 export function ThemeBuilder({
   contexts,
   findable,
@@ -329,6 +335,12 @@ export function ThemeBuilder({
       setPage(formatColor(read, 'hex', false))
     }
   }
+  /* **The figures band's own color, empty where the band is the page's**,
+     with the color the switch brings back once it has been turned off, and
+     the text its field holds, for the brand's reason. */
+  const [band, setBand] = useState(initialSettings.band)
+  const [bandColor, setBandColor] = useState(initialSettings.band || BAND_COLOR)
+  const [bandText, setBandText] = useState(initialSettings.band || BAND_COLOR)
   const [scheme, setScheme] = useState(initialSettings.scheme)
   const [contrastTarget, setContrastTarget] = useState(initialSettings.contrastTarget)
   const [chromaScale, setChromaScale] = useState(initialSettings.chromaScale)
@@ -383,6 +395,7 @@ export function ThemeBuilder({
     () => ({
       accentHue,
       allowance,
+      band,
       blur,
       bodyFace,
       brand,
@@ -406,6 +419,7 @@ export function ThemeBuilder({
     [
       accentHue,
       allowance,
+      band,
       blur,
       bodyFace,
       brand,
@@ -463,6 +477,9 @@ export function ThemeBuilder({
   const reset = (): void => {
     setAccentHue(INITIAL.accentHue)
     setAllowance(INITIAL.allowance)
+    setBand(INITIAL.band)
+    setBandColor(BAND_COLOR)
+    setBandText(BAND_COLOR)
     setBlur(INITIAL.blur)
     setBodyFace(INITIAL.bodyFace)
     setBrand(INITIAL.brand)
@@ -579,7 +596,17 @@ export function ThemeBuilder({
 
   useFacePreviews(controls)
 
-  const css = theme.css[SCOPE] ?? ''
+  /* The band's own theme, where it has a color: derived beside the page's,
+     from the same intent, and written after it. */
+  const banded: Band | undefined = useMemo(
+    () => (engine && band ? bandTheme(engine, intent, band) : undefined),
+    [band, engine, intent],
+  )
+  const bandBlock = banded && 'theme' in banded ? banded : undefined
+
+  const css = [theme.css[SCOPE] ?? '', bandBlock?.theme.css[`${SCOPE} ${BAND}`] ?? '']
+    .filter(Boolean)
+    .join('\n\n')
 
   /* **The artifact keeps its scope and the frame gets `:root`.** What the editor
      shows is what a consumer pastes, which wants a named scope so it can sit
@@ -616,7 +643,17 @@ export function ThemeBuilder({
     if (!preview.current) {
       return
     }
-    preview.current.source = source
+    /* **Marked as a consumer marks it**: `data-helix-theme`, so the stylesheet
+       derives its own half of the palette there from the band's seeds, and
+       `data-color-mode`, so that half is in the band's mode. The markup is
+       generated once, so the marks are written into it while the band has a
+       color. */
+    preview.current.source = bandBlock
+      ? source.replaceAll(
+          '<section class="themedFigures">',
+          `<section class="themedFigures" data-band data-color-mode="${bandBlock.scheme}" data-helix-theme>`,
+        )
+      : source
     /* **The palette, the layout and the faces, because the frame has none of
        them.** A sandboxed document cannot fetch the site's stylesheet, so the
        page's own rules travel with its markup the way the theme does. The theme
@@ -640,13 +677,17 @@ export function ThemeBuilder({
       fontsHref ? `@import url("${fontsHref}");` : '',
       THEMED_PAGE_STYLES,
       framed,
+      /* The band on its own page color, and its block after the page's. */
+      bandBlock
+        ? `${BAND} { background-color: var(--helix-color-background); color: var(--helix-color-foreground); }\n${bandBlock.theme.css[BAND] ?? ''}`
+        : '',
       /* **The contrast target, which no token carries**, for the one thing in
          the preview drawn outside CSS: a map's labels are painted by its
          renderer, so the frame's map reads the target from here and holds
          every label to it, the way the palette holds every text pair. */
       `:root { --themed-contrast-target: ${contrastTarget}; }`,
     ].join('\n')
-  }, [contrastTarget, fontsHref, framed, source])
+  }, [bandBlock, contrastTarget, fontsHref, framed, source])
 
   /* **Lightness only, and in whichever direction reaches the target.** The
      solver moves one component: a brand keeps its hue and its chroma and gives
@@ -883,6 +924,47 @@ export function ThemeBuilder({
                 No text reaches {contrastTarget}:1 on the{' '}
                 {refused.startsWith('background.dark') ? 'dark' : 'light'} page, so the preview
                 leaves it out.
+              </helix-text>
+            ) : null}
+
+            {/* **One section in a color of its own**, as a site sets an
+                announcement or a closing band apart: its own theme, derived
+                from the same inputs with the band's color as its page. */}
+            <helix-switch
+              checked={band !== ''}
+              hint="The figures band, in the Marketing site layout, in a color of its own."
+              label="Color the figures band"
+              onChange={(event) => setBand(event.currentTarget.checked ? bandColor : '')}
+            ></helix-switch>
+            {band ? (
+              <helix-color-input
+                hint="Dark text or light, whichever reads better on it."
+                label="Band color"
+                name="band"
+                onChange={(event) =>
+                  pageTyped(
+                    event.currentTarget.value,
+                    setBandText,
+                    (next) => {
+                      setBand(next)
+                      setBandColor(next)
+                    },
+                    bandColor,
+                  )
+                }
+                value={bandText}
+              ></helix-color-input>
+            ) : null}
+            {banded && 'refused' in banded ? (
+              <helix-text variant="caption">
+                No text reaches {contrastTarget}:1 on that band, so the preview leaves it the
+                page's.
+              </helix-text>
+            ) : bandBlock && bandBlock.theme.violations.length > 0 ? (
+              <helix-text variant="caption">
+                On the band, {bandBlock.theme.violations.length} pair
+                {bandBlock.theme.violations.length === 1 ? '' : 's'} fall short of {contrastTarget}
+                :1.
               </helix-text>
             ) : null}
 

@@ -18,6 +18,8 @@ export type Mechanism = 'border' | 'fill' | 'shadow' | 'space'
 export interface Settings {
   accentHue: number
   allowance: number
+  /** The figures band's own color, as a hex, or empty where the band is the page's. */
+  band: string
   blur: number
   bodyFace: string
   brand: string
@@ -45,6 +47,7 @@ export interface Settings {
 export const INITIAL: Settings = {
   accentHue: 0,
   allowance: 20,
+  band: '',
   blur: 16,
   bodyFace: '',
   brand: '#3b82f6',
@@ -259,6 +262,7 @@ export function settingsFrom(
   return {
     accentHue: bounded(params.accent, BOUNDS.accentHue, INITIAL.accentHue),
     allowance: bounded(params.allowance, BOUNDS.allowance, INITIAL.allowance),
+    band: color(params.band, INITIAL.band),
     blur: bounded(params['material-blur'], BOUNDS.blur, INITIAL.blur),
     bodyFace: face(params['body-face'], false, INITIAL.bodyFace, catalog),
     brand: color(params.brand, INITIAL.brand),
@@ -303,6 +307,7 @@ export function queryFrom(
      two readers comparing URLs are comparing themes rather than orderings. */
   write('accent', settings.accentHue, INITIAL.accentHue)
   write('allowance', settings.allowance, INITIAL.allowance)
+  write('band', settings.band, INITIAL.band)
   write('body-face', settings.bodyFace, INITIAL.bodyFace)
   write('brand', settings.brand, INITIAL.brand)
   write('chroma', settings.chromaScale, INITIAL.chromaScale)
@@ -358,5 +363,41 @@ export function deriveOr(
       refused: error instanceof Error ? error.message : String(error),
       theme: engine.derive(rest, selectors),
     }
+  }
+}
+
+/** The selector a colored band's block is written for. */
+export const BAND = '[data-band]'
+
+/** What a colored band is drawn with: its own theme, or why there is none. */
+export type Band =
+  | { refused: string }
+  | { scheme: 'dark' | 'light'; theme: ReturnType<ThemeEngine['derive']> }
+
+/**
+ * **A band of its own color is a theme of its own**, derived from the same
+ * intent with the band's color as its page, and written for `[data-band]`
+ * under the scope as well as on its own.
+ *
+ * **Dark where white text reads better on it, and light where black does**,
+ * by WCAG's ratio of each against it: a deep teal band is a dark theme on a
+ * light page, and a pale peach one stays light. A band no text can be read on
+ * is refused, as a page is, and the reason is handed back.
+ */
+export function bandTheme(engine: ThemeEngine, intent: ThemeIntent, band: string): Band {
+  /* A gray's luminance is its OKLab lightness cubed, near enough for a choice
+     between two inks: the engine measures the one it picks. */
+  const luminance = engine.hexToOklch(band).lightness ** 3
+  const scheme = 1.05 / (luminance + 0.05) >= (luminance + 0.05) / 0.05 ? 'dark' : 'light'
+  try {
+    return {
+      scheme,
+      theme: engine.derive(
+        { ...intent, background: { ...intent.background, [scheme]: band }, scheme },
+        [`${SCOPE} ${BAND}`, BAND],
+      ),
+    }
+  } catch (error) {
+    return { refused: error instanceof Error ? error.message : String(error) }
   }
 }
