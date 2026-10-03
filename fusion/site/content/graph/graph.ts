@@ -140,7 +140,10 @@ export const GRAPH: PageCopy = {
       title: 'What Helix adds',
     },
     {
-      body: ['New notes arrive and messages travel the links, drawn by Sigma.js.'],
+      body: [
+        'New notes arrive and messages travel the links, drawn by Sigma.js.',
+        'Press a note to see its links. New calls appear in the list as they arrive.',
+      ],
       kicker: 'Live data',
       title: 'Updates as your data changes',
     },
@@ -151,7 +154,10 @@ export const GRAPH: PageCopy = {
       title: 'Styles, signals, and live updates',
     },
     {
-      body: ['Three thousand services on a knot, drawn by three.js. Drag to turn it.'],
+      body: [
+        'Three thousand services on a knot, drawn by three.js. Drag to turn it.',
+        'Press a note to see its links. The Notes button opens the list.',
+      ],
       kicker: '3D',
       title: 'Graphs on 3D models',
     },
@@ -162,7 +168,10 @@ export const GRAPH: PageCopy = {
       title: 'Models, outlines, and solids',
     },
     {
-      body: ['Laid out and drawn on the GPU by cosmos.gl.'],
+      body: [
+        'Laid out and drawn on the GPU by cosmos.gl.',
+        'Pinch, or hold Ctrl or ⌘ and scroll, to zoom. The Notes button opens the list.',
+      ],
       kicker: 'Scale',
       title: 'Twenty thousand notes',
     },

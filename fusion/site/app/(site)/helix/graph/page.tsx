@@ -80,10 +80,13 @@ function Showcase({
   code,
   copy,
   kind,
+  noPanel = false,
 }: {
   code: string
   copy: (typeof GRAPH.blocks)[number] | undefined
   kind: 'knowledge' | 'services' | 'team'
+  /** Whether the frame leaves its list behind its button, so the drawing takes the width. */
+  noPanel?: boolean
 }) {
   return (
     <Band shell="plain" wide>
@@ -94,8 +97,12 @@ function Showcase({
           <Lede>{copy?.body?.[0]}</Lede>
           <Snippet code={code} label="The code" language="js" wrap />
         </helix-flex>
-        <div className={band.bandSection}>
-          <GraphDemo className={styles.graphDemo} kind={kind} />
+        {/* The graph, and under it what to try, as each map on Maps has. */}
+        <div className={`${band.bandSection} ${styles.graphShowcase}`}>
+          <GraphDemo className={styles.graphDemo} kind={kind} noPanel={noPanel} />
+          <helix-text emphasis="subtle" variant="caption">
+            {copy?.body?.[1]}
+          </helix-text>
         </div>
       </div>
     </Band>
@@ -169,7 +176,7 @@ export default function Page() {
           <Features features={GRAPH_FEATURES} />
         </Band>
 
-        <Showcase code={SHAPE_CODE} copy={shape} kind="services" />
+        <Showcase code={SHAPE_CODE} copy={shape} kind="services" noPanel />
 
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
@@ -180,7 +187,7 @@ export default function Page() {
           <Features features={GRAPH_SHAPES} />
         </Band>
 
-        <Showcase code={LARGE_CODE} copy={large} kind="knowledge" />
+        <Showcase code={LARGE_CODE} copy={large} kind="knowledge" noPanel />
       </div>
 
       {/* **A second field for the second half**, as Maps lights its closing bands. */}
