@@ -27,11 +27,10 @@
 }
 
 /* Edge to edge, on the page's own ground, so no frame of its own: the page
-   is the frame, and the list stands at the end as the map's controls do. */
+   is the frame. The list opens over the drawing from the controls. */
 .graphHeroFrame {
   --graph-background-color: var(--helix-color-background);
   --graph-block-size: var(--_graph-hero-size);
-  --graph-panel-size: 16rem;
 }
 
 .graphHeroFrame::part(region) {
@@ -94,8 +93,7 @@
 .graphTry {
   inset-block-end: var(--helix-space-lg);
   inset-inline-start: var(--site-inset);
-  /* The stage's width, short of the list at the end, which it stays clear of. */
-  max-inline-size: calc(100% - 16rem - var(--site-inset) * 2);
+  max-inline-size: calc(100% - var(--site-inset) * 2);
   position: absolute;
   z-index: calc(var(--helix-layer-raised) + 1);
 }
