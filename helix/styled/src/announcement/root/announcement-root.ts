@@ -19,8 +19,8 @@ import { styles } from './announcement-root.css.js'
  * @aliases Banner, Notification bar, Alert bar
  * @documentation https://fusion.dev/helix/components/announcement
  *
- * @cssproperty --announcement-block-size - The band's minimum height, so adding a control to it does not move the page down. A message long enough to wrap makes the band taller.
  * @cssproperty --announcement-background-color - The band's fill, in place of the one its separation gives it. A tone's tint still paints over it, so a band that sets this usually carries no tone.
+ * @cssproperty --announcement-block-size - The band's minimum height, so adding a control to it does not move the page down. A message long enough to wrap makes the band taller.
  * @cssproperty --announcement-foreground-color - The message's color, to pair with a fill set through the background hook.
  * @cssproperty --announcement-inset - The inline padding, matched to the page.
  */
