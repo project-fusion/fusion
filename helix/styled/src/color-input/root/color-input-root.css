@@ -30,8 +30,8 @@
  * an icon.
  */
 [part="trigger"] {
-  align-items: stretch;
   all: unset;
+  align-items: stretch;
   align-self: stretch;
   box-sizing: border-box;
   cursor: pointer;
