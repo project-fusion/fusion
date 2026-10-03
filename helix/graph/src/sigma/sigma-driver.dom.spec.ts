@@ -8,11 +8,18 @@ let sigmaDriver: typeof import('./sigma-driver.js').sigmaDriver
 beforeAll(async () => {
   registerDom()
   /* Sigma's programs read WebGL's constants as they load, which happy-dom has
-     none of. A number for every name is all loading them asks. */
-  const constants = new Proxy(function WebGL() {}, {
-    get: (target, name) => (name === 'prototype' ? Reflect.get(target, name) : 1),
-  })
-  Object.assign(globalThis, { WebGL2RenderingContext: constants, WebGLRenderingContext: constants })
+     none of. A number for every name is all loading them asks. **Only where
+     there is no WebGL**: in a browser, the page these specs share with the
+     family's examples draws real graphs with the real constants. */
+  if (typeof WebGL2RenderingContext === 'undefined') {
+    const constants = new Proxy(function WebGL() {}, {
+      get: (target, name) => (name === 'prototype' ? Reflect.get(target, name) : 1),
+    })
+    Object.assign(globalThis, {
+      WebGL2RenderingContext: constants,
+      WebGLRenderingContext: constants,
+    })
+  }
   ;({ sigmaDriver } = await import('./sigma-driver.js'))
 })
 

@@ -14,7 +14,7 @@ type Drivers = typeof import('./cosmos/index.js') & typeof import('./sigma/index
 const fits = (drivers: Drivers) => ({
   cosmos: (graph: Cosmos, box: HTMLDivElement) => drivers.cosmosDriver(graph, box),
   sigma: (sigma: Sigma, make: (graph: Graph) => FA2Layout) =>
-    drivers.sigmaDriver(sigma, { layout: (graph) => make(graph as unknown as Graph) }),
+    drivers.sigmaDriver(sigma, { layout: make }),
 })
 
 test('the real renderer fits the driver', () => {

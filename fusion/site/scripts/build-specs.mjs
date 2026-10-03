@@ -41,7 +41,7 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { root, TIERS } from '@fusion.dev/scripts/workspace'
+import { CONNECTORS, root, TIERS } from '@fusion.dev/scripts/workspace'
 
 /**
  * Both tiers, merged by family.
@@ -129,6 +129,17 @@ const families = async () => {
       }
     }
   }
+  /* **A connector's specs join its family's**, from anywhere in the
+     package: its drivers are what put the family's frame on a real canvas,
+     so they are tested in the page that tests the frame. */
+  for (const [family, source] of Object.entries(CONNECTORS)) {
+    const specs = (await readdir(join(root, source), { recursive: true }))
+      .filter((file) => file.endsWith('.dom.spec.ts'))
+      .map((file) => join(root, source, file))
+    if (specs.length > 0) {
+      found.set(family, [...(found.get(family) ?? []), ...specs].sort())
+    }
+  }
   return found
 }
 
@@ -208,14 +219,20 @@ if (!runtime.success) {
 const written = []
 for (const [family, specs] of found) {
   const file = join(entries, `${family}.ts`)
-  const imports = specs.map((spec) => `import '${relative(entries, spec).replaceAll('\\', '/')}'`)
+  /* **Each spec imported by name, and the names exported.** A bare
+     `import './x.dom.spec.ts'` is a side effect and nothing else, and a
+     package that declares `"sideEffects": false`, as the connectors do, has
+     it dropped by the bundler: the specs were listed and never ran. */
+  const imports = specs.map(
+    (spec, at) => `import * as spec${at} from '${relative(entries, spec).replaceAll('\\', '/')}'`,
+  )
   // `claim` runs after the spec imports above have evaluated, which hoisting
   // guarantees, and takes exactly the tests they registered. The harness is a
   // shared chunk, so without this a family would run every family opened before
   // it as well.
   await writeFile(
     file,
-    `${imports.join('\n')}\nimport { claim } from '${relative(entries, harness).replaceAll('\\', '/')}'\nexport const run = claim()\n`,
+    `${imports.join('\n')}\nimport { claim } from '${relative(entries, harness).replaceAll('\\', '/')}'\nexport const specs = [${specs.map((_, at) => `spec${at}`).join(', ')}]\nexport const run = claim()\n`,
   )
   written.push(file)
 }

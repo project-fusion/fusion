@@ -578,10 +578,16 @@
     // `@fusion.dev/helix-testing`, and nothing of `helix-docs`.
     "specs": {
       "dependsOn": ["@fusion.dev/helix#build", "@fusion.dev/helix-testing#build"],
+      // The connectors' specs import their package's own source, which no
+      // `build` this task depends on hashes, so the whole of each `src` is an
+      // input: a driver changed under an unchanged spec bundles anew.
       "inputs": [
         "$TURBO_ROOT$/helix/headless/src/**/*.dom.spec.ts",
         "$TURBO_ROOT$/helix/styled/src/**/*.dom.spec.ts",
+        "$TURBO_ROOT$/helix/graph/src/**/*.ts",
+        "$TURBO_ROOT$/helix/map/src/**/*.ts",
         "$TURBO_ROOT$/helix/testing/src/browser.ts",
+        "$TURBO_ROOT$/fusion/scripts/lib/workspace.mjs",
         "$TURBO_ROOT$/fusion/site/scripts/build-specs.mjs"
       ],
       "outputs": ["public/specs/**"]

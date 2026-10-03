@@ -64,7 +64,9 @@ export const TAG_PREFIX = 'helix-'
 export const SOURCE = {
   core: 'helix/core/src',
   gallery: 'helix/gallery/src',
+  graph: 'helix/graph/src',
   headless: 'helix/headless/src',
+  map: 'helix/map/src',
   sandbox: 'helix/sandbox/src',
   styled: 'helix/styled/src',
   styles: 'helix/styles/src',
@@ -111,6 +113,15 @@ export const ARTIFACT = {
 
 /** The two component tiers, which is the set six checks read on their own. */
 export const TIERS = [SOURCE.headless, SOURCE.styled]
+
+/**
+ * The packages that connect a family to someone else's renderer, by the
+ * family they serve: `connectGraph` and its drivers for Graph, `connectMap`
+ * and its drivers for Map. Their DOM specs run with the family's in a
+ * browser, where a driver meets a real canvas, a real WebGL context, and a
+ * layout, none of which happy-dom has.
+ */
+export const CONNECTORS = { graph: SOURCE.graph, map: SOURCE.map }
 
 /** Every workspace directory, with `dir/*` globs expanded. */
 export function directories() {
