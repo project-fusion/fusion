@@ -1,7 +1,7 @@
 /**
  * What a fresh builder starts as, stated once.
  */
-import type { ThemeIntent } from '@fusion.dev/helix-theme'
+import type { ThemeEngine, ThemeIntent } from '@fusion.dev/helix-theme'
 
 /**
  * The selector the emitted block is written for.
@@ -29,6 +29,10 @@ export interface Settings {
   harmony: number
   monoFace: string
   motion: Character
+  /** The page's color in dark, as a hex, or empty for pure black. */
+  pageDark: string
+  /** The page's color in light, as a hex, or empty for pure white. */
+  pageLight: string
   radius: number
   /** Which half a reader sees: the site's own mode, or light or dark whatever the site shows. */
   scheme: 'dark' | 'light' | 'site'
@@ -52,6 +56,8 @@ export const INITIAL: Settings = {
   harmony: 50,
   monoFace: '',
   motion: '',
+  pageDark: '',
+  pageLight: '',
   radius: 50,
   scheme: 'site',
   surface: 'border',
@@ -96,6 +102,8 @@ export function intentFrom(settings: Settings, site: 'dark' | 'light' = 'light')
     harmony,
     monoFace,
     motion,
+    pageDark,
+    pageLight,
     radius,
     scheme,
     surface,
@@ -107,6 +115,14 @@ export function intentFrom(settings: Settings, site: 'dark' | 'light' = 'light')
 
   return {
     ...(accent ? { accent } : {}),
+    ...(pageDark || pageLight
+      ? {
+          background: {
+            ...(pageDark ? { dark: pageDark } : {}),
+            ...(pageLight ? { light: pageLight } : {}),
+          },
+        }
+      : {}),
     brand,
     chroma: { scale: chromaScale / 100 },
     contrastTarget,
@@ -248,6 +264,8 @@ export function settingsFrom(
     harmony: bounded(params.harmony, BOUNDS.harmony, INITIAL.harmony),
     monoFace: face(params['mono-face'], true, INITIAL.monoFace, catalog),
     motion: oneOf(params.motion, CHARACTERS, INITIAL.motion),
+    pageDark: color(params['page-dark'], INITIAL.pageDark),
+    pageLight: color(params['page-light'], INITIAL.pageLight),
     radius: bounded(params.radius, BOUNDS.radius, INITIAL.radius),
     scheme: oneOf(params.scheme, ['site', 'light', 'dark'] as const, INITIAL.scheme),
     surface: oneOf(params.surface, SURFACES, INITIAL.surface),
@@ -294,6 +312,8 @@ export function queryFrom(
   write('material-opacity', settings.translucency, INITIAL.translucency)
   write('mono-face', settings.monoFace, INITIAL.monoFace)
   write('motion', settings.motion, INITIAL.motion)
+  write('page-dark', settings.pageDark, INITIAL.pageDark)
+  write('page-light', settings.pageLight, INITIAL.pageLight)
   if (preview.context) {
     params.set('preview', preview.context)
   }
@@ -304,4 +324,33 @@ export function queryFrom(
   write('text-scale', settings.textScale, INITIAL.textScale)
 
   return params.toString()
+}
+
+/**
+ * A theme derived from an intent, and why its page was set aside where the
+ * engine refused it.
+ *
+ * **A page no ink can be read on is refused, and the builder keeps going
+ * without it**: the engine throws, and a page that threw on the server or on
+ * a keystroke showed nothing at all. Derived again without `background`, so
+ * the rest of the theme still shows, and the reason is handed back for the
+ * field to say.
+ */
+export function deriveOr(
+  engine: ThemeEngine,
+  intent: ThemeIntent,
+  selectors: readonly string[],
+): { refused?: string; theme: ReturnType<ThemeEngine['derive']> } {
+  try {
+    return { theme: engine.derive(intent, selectors) }
+  } catch (error) {
+    if (!intent.background) {
+      throw error
+    }
+    const { background: _, ...rest } = intent
+    return {
+      refused: error instanceof Error ? error.message : String(error),
+      theme: engine.derive(rest, selectors),
+    }
+  }
 }

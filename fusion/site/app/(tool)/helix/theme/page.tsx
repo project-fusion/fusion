@@ -1,5 +1,11 @@
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { intentFrom, type Params, SCOPE, settingsFrom } from '@/utils/theme-defaults/theme-defaults'
+import {
+  deriveOr,
+  intentFrom,
+  type Params,
+  SCOPE,
+  settingsFrom,
+} from '@/utils/theme-defaults/theme-defaults'
 import { getFamilies } from '../../../../content/catalog/catalog'
 import { GOOGLE_FACES } from '../../../../content/faces/faces.generated'
 import { INSIGHTS } from '../../../../content/insights'
@@ -103,7 +109,7 @@ export default async function ThemePage({ searchParams }: { searchParams: Promis
      builder's sliders start at, so the palette that arrives in the HTML is the
      palette the browser would derive a moment later rather than a stand-in for
      it. */
-  const theme = (await serverTheme()).derive(intentFrom(settings), [SCOPE, ':root'])
+  const { theme } = deriveOr(await serverTheme(), intentFrom(settings), [SCOPE, ':root'])
 
   return (
     <ThemeBuilder

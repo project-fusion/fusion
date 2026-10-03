@@ -13,6 +13,7 @@ import { useSiteScheme } from '@/utils/site-scheme/site-scheme'
 import {
   BOUNDS,
   type Character,
+  deriveOr,
   INITIAL,
   intentFrom,
   type Mechanism,
@@ -298,6 +299,34 @@ export function ThemeBuilder({
       setBrand(formatColor(read, 'hex', false))
     }
   }
+  /* **The page's color for each scheme, empty for pure white or pure black**,
+     each with the text its field holds apart from it, for the brand's reason:
+     a half-typed color is not one. Emptied, the field gives the page back. */
+  const [pageLight, setPageLight] = useState(initialSettings.pageLight)
+  const [pageLightText, setPageLightText] = useState(initialSettings.pageLight)
+  const [pageDark, setPageDark] = useState(initialSettings.pageDark)
+  const [pageDarkText, setPageDarkText] = useState(initialSettings.pageDark)
+  const pageTyped = (
+    typed: string,
+    setText: (text: string) => void,
+    setPage: (page: string) => void,
+  ): void => {
+    setText(typed)
+    if (typed.trim() === '') {
+      setPage('')
+      return
+    }
+    const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(typed.trim())?.[1]
+    if (hex) {
+      const whole = hex.length === 3 ? [...hex].map((one) => one + one).join('') : hex
+      setPage(`#${whole.toLowerCase()}`)
+      return
+    }
+    const read = parseColor(typed)
+    if (read) {
+      setPage(formatColor(read, 'hex', false))
+    }
+  }
   const [scheme, setScheme] = useState(initialSettings.scheme)
   const [contrastTarget, setContrastTarget] = useState(initialSettings.contrastTarget)
   const [chromaScale, setChromaScale] = useState(initialSettings.chromaScale)
@@ -363,6 +392,8 @@ export function ThemeBuilder({
       harmony,
       monoFace,
       motion,
+      pageDark,
+      pageLight,
       radius,
       scheme,
       surface,
@@ -384,6 +415,8 @@ export function ThemeBuilder({
       harmony,
       monoFace,
       motion,
+      pageDark,
+      pageLight,
       radius,
       scheme,
       surface,
@@ -440,6 +473,10 @@ export function ThemeBuilder({
     setHarmony(INITIAL.harmony)
     setMonoFace(INITIAL.monoFace)
     setMotion(INITIAL.motion)
+    setPageDark(INITIAL.pageDark)
+    setPageDarkText(INITIAL.pageDark)
+    setPageLight(INITIAL.pageLight)
+    setPageLightText(INITIAL.pageLight)
     setRadius(INITIAL.radius)
     setScheme(INITIAL.scheme)
     setSurface(INITIAL.surface)
@@ -485,8 +522,11 @@ export function ThemeBuilder({
      rendering is not: asking for the block twice would derive twice for one
      keystroke. Measured at 17ms per derivation against the 39ms the TypeScript
      engine took for one, so this page does less work than it used to. */
-  const theme = useMemo(
-    () => engine?.derive(intent, [SCOPE, ':root']) ?? initialTheme,
+  const { refused, theme } = useMemo(
+    () =>
+      engine
+        ? deriveOr(engine, intent, [SCOPE, ':root'])
+        : { refused: undefined, theme: initialTheme },
     [engine, initialTheme, intent],
   )
 
@@ -808,6 +848,38 @@ export function ThemeBuilder({
               <helix-option value="light">Light</helix-option>
               <helix-option value="dark">Dark</helix-option>
             </helix-select>
+
+            {/* **A page of its own color, for each half.** The surfaces keep the
+                contrast with it they keep with white or black, and the grays
+                take its tint. A page no text can be read on is set aside, and
+                the caption says so under the fields. */}
+            <helix-color-input
+              hint="The page's color in light. Empty is white."
+              label="Light page"
+              name="page-light"
+              onChange={(event) =>
+                pageTyped(event.currentTarget.value, setPageLightText, setPageLight)
+              }
+              placeholder="#ffffff"
+              value={pageLightText}
+            ></helix-color-input>
+            <helix-color-input
+              hint="The page's color in dark. Empty is black."
+              label="Dark page"
+              name="page-dark"
+              onChange={(event) =>
+                pageTyped(event.currentTarget.value, setPageDarkText, setPageDark)
+              }
+              placeholder="#000000"
+              value={pageDarkText}
+            ></helix-color-input>
+            {refused ? (
+              <helix-text variant="caption">
+                No text reaches {contrastTarget}:1 on the{' '}
+                {refused.startsWith('background.dark') ? 'dark' : 'light'} page, so the preview
+                leaves it out.
+              </helix-text>
+            ) : null}
 
             <helix-select
               hint="The ratio every foreground has to clear against the ground it lands on."
