@@ -17,6 +17,15 @@
    the row's top sat 23px below the item's. */
 :host([kind="ordered"]),
 :host([kind="unordered"]) {
+  /* **Its own count, wherever the page puts it.** The numbers come from the
+     `list-item` counter, and with no `<ol>` or `<ul>` to own the rows the
+     browser counts them against the nearest containment instead. A page with a
+     size container anywhere above, `container-type` being style containment as
+     well, made that the container: measured in the theme builder's preview,
+     whose `body` is a container, a list of four steps after three lists of
+     three numbered 10 to 13. Style containment here makes each list its own. */
+  contain: style;
+
   /* Wide enough for a two-digit marker and no wider. With `outside`, the gap a
      reader sees is the gutter less the marker, so a wider rung spends the
      difference as empty space and the list reads as a column of numbers beside a

@@ -58,6 +58,15 @@ describe('list', () => {
     expect(list).toContain('padding-inline-start: var(--list-marker-gutter, var(--helix-space-md))')
   })
 
+  test('each list counts its own rows, whatever containment is above it', () => {
+    /* The rows are numbered by the `list-item` counter, which, with no `<ol>`
+       to own them, a size container above made one count for every list under
+       it: four steps after three lists of three came out 10 to 13. */
+    expect(rule('helix-list', ':host([kind="ordered"]),\n:host([kind="unordered"])')).toContain(
+      'contain: style',
+    )
+  })
+
   test("the rail is the list's counter, handed to each row through two hooks", () => {
     /* Nothing in a row knows its own index, and the alternative is the list
        writing a number onto the consumer's markup, which a server and a client
