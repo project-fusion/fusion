@@ -179,6 +179,15 @@ export class VirtualizeController implements ReactiveController {
     this.options = options
     this.heights = new Heights(() => this.options.estimate())
     host.addController(this)
+    /* **The render after a render is this controller's design**: rows are
+       measured once they are drawn, and a window that moves draws again.
+       Lit's development build warns of an update asked for after one
+       completed, on every list that moves its window, so the warning is
+       turned off for the class this serves. Lit's production build has no
+       warnings, and no `disableWarning`. */
+    ;(host.constructor as { disableWarning?: (kind: string) => void }).disableWarning?.(
+      'change-in-update',
+    )
   }
 
   hostConnected(): void {
