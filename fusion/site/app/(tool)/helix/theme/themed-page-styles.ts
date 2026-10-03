@@ -317,26 +317,6 @@ export const THEMED_PAGE_STYLES = css`
     padding: var(--helix-space-lg);
   }
 
-  /* Stacked, and stretched, so a destination is a row in the rail rather than a
-     word floating in it. The base layer's \`data-navigation-item\` helper does
-     the rest: this only decides the axis. */
-  .themedAppNav {
-    display: flex;
-    flex-direction: column;
-    gap: var(--helix-space-2xs);
-  }
-
-  /* **The helper centers, because a nav bar item should.** \`data-navigation-item\`
-     is \`display: flex; justify-content: center\`, which is right for a row and
-     wrong for a column: stacked, it put three destinations down the middle of
-     the rail with a ragged left edge. Both rules are document rules here, so
-     specificity decides and \`.themedAppNav a\` is one class heavier than the
-     bare attribute. The axis is the only thing taken; everything else about how
-     a destination looks stays the base layer's. */
-  .themedAppNav a {
-    justify-content: start;
-  }
-
   /* Pushed to the bottom, which is where a signed-in person sits in every
      application anybody has used. */
   .themedAppUser {
@@ -405,11 +385,8 @@ export const THEMED_PAGE_STYLES = css`
      the only mono on any preview, which is what gives the Mono face control
      something to move, and the only place \`foreground-subtle\` carries text with
      nothing else holding it up. */
+  /* The type is Helix Text's, mono and subtle; the rail sets only its side. */
   .themedRailLabel {
-    color: var(--helix-color-foreground-subtle);
-    font-family: var(--helix-font-mono);
-    font-size: var(--helix-text-xs);
-    line-height: var(--helix-leading-normal);
     text-align: end;
   }
 
@@ -696,15 +673,6 @@ export const THEMED_PAGE_STYLES = css`
     flex-direction: column;
   }
 
-  /* On the brand fill, as an announcement is, unless the builder gives it a
-     color of its own. */
-  .themedLocalBar {
-    background-color: var(--helix-color-primary-surface);
-    color: var(--helix-color-foreground-on-accent);
-    padding: var(--helix-space-xs) var(--helix-space-lg);
-    text-align: center;
-  }
-
   /* **On the page's own ground, tinted by the brand**, in whichever mode the
      page is. It was drawn on the media ground as a stand-in for a photograph,
      and without a photograph it read as a dark band dropped into a light page.
@@ -724,12 +692,6 @@ export const THEMED_PAGE_STYLES = css`
     max-inline-size: 18ch;
   }
 
-  .themedLocalStars {
-    color: var(--helix-color-primary);
-    display: inline-flex;
-    gap: var(--helix-space-2xs);
-  }
-
   .themedLocalSection {
     display: flex;
     flex-direction: column;
@@ -745,53 +707,6 @@ export const THEMED_PAGE_STYLES = css`
     color: var(--helix-color-primary);
   }
 
-  .themedLocalIncludes {
-    display: flex;
-    flex-direction: column;
-    gap: var(--helix-space-xs);
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .themedLocalIncludes li {
-    align-items: center;
-    display: flex;
-    gap: var(--helix-space-xs);
-  }
-
-  .themedLocalIncludes helix-icon {
-    color: var(--helix-color-primary);
-  }
-
-  /* The steps in a row, each under its number, which is the brand's. */
-  .themedLocalSteps {
-    display: grid;
-    gap: var(--helix-space-lg);
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .themedLocalSteps li {
-    display: flex;
-    flex-direction: column;
-    gap: var(--helix-space-sm);
-  }
-
-  .themedLocalStepNumber {
-    align-items: center;
-    background-color: var(--helix-color-primary-subtle);
-    border-radius: var(--helix-radii-full);
-    block-size: var(--helix-size-control-sm);
-    color: var(--helix-color-primary);
-    display: inline-flex;
-    font-weight: var(--helix-weight-semibold);
-    inline-size: var(--helix-size-control-sm);
-    justify-content: center;
-  }
-
   .themedLocalVisit {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -803,10 +718,6 @@ export const THEMED_PAGE_STYLES = css`
   }
 
   @container (width < 52rem) {
-    .themedLocalSteps {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .themedLocalVisit {
       grid-template-columns: minmax(0, 1fr);
     }
@@ -817,10 +728,6 @@ export const THEMED_PAGE_STYLES = css`
   }
 
   @container (width < 30rem) {
-    .themedLocalSteps {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
     .themedLocalHero,
     .themedLocalSection {
       padding-inline: var(--helix-space-lg);

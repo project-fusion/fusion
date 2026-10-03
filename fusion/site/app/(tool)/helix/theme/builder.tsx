@@ -665,7 +665,7 @@ export function ThemeBuilder({
        color. */
     preview.current.source = bandBlock
       ? source.replaceAll(
-          'data-band-slot="true"',
+          'data-band-slot=""',
           `data-band data-color-mode="${bandBlock.scheme}" data-helix-theme`,
         )
       : source
@@ -698,7 +698,7 @@ export function ThemeBuilder({
       framed,
       /* The band on its own page color, and its block after the page's. */
       bandBlock
-        ? `${BAND} { background-color: var(--helix-color-background); color: var(--helix-color-foreground); }\n${bandBlock.theme.css[BAND] ?? ''}`
+        ? `${BAND} { background-color: var(--helix-color-background); background-image: none; color: var(--helix-color-foreground); }\n${bandBlock.theme.css[BAND] ?? ''}`
         : '',
       /* **The contrast target, which no token carries**, for the one thing in
          the preview drawn outside CSS: a map's labels are painted by its
