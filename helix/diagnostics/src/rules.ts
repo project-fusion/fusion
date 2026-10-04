@@ -53,8 +53,10 @@ export const SHIPPED_RULES: Readonly<Record<Kind, Severity>> = {
   'dead-hook': 'error',
   'dead-part': 'error',
   'duplicate-registration': 'error',
+  'invalid-value': 'error',
   'manifest-skew': 'error',
   'unforwarded-part': 'warn',
+  'unknown-attribute': 'error',
   'unknown-tag': 'error',
 }
 

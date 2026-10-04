@@ -95,11 +95,24 @@ works on it:
 | Kind | Severity | Means |
 | --- | --- | --- |
 | `dead-part` | error | A `::part()` names a part the element does not publish |
-| `dead-hook` | error | A custom property is set where nothing answers it |
+| `dead-hook` | error | A hook is set where nothing answers it, or a name close to a hook is set that nothing reads |
+| `unknown-attribute` | error | A Helix element carries an attribute it does not take |
+| `invalid-value` | error | An attribute with a closed set of values carries one outside it, so the element falls back to its default |
 | `unforwarded-part` | warn | The headless tier publishes the part and the styled tier does not forward it, which is a gap in Helix |
 | `unknown-tag` | error | A rule names a tag no manifest lists |
 | `duplicate-registration` | error | Two copies of Helix are on the page |
-| `manifest-skew` | error | An element renders a part its manifest does not list, so the manifest is from another version. It replaces every other finding, since each would be judged against the wrong version. Turned off, the page is judged as usual |
+| `manifest-skew` | error | The manifest is from another version than the page runs. It replaces every other finding, since each would be judged against the wrong version. Turned off, the page is judged as usual |
+
+**Hooks are checked wherever they are set**: on a Helix tag, a class, `:root`,
+or any other selector. A hook on a selector naming no Helix tag is judged only
+on what the page holds now. It is a finding when the selector matches elements
+and none of them is, or holds, an element that answers it, while one that does
+is on the page. A selector matching nothing yet is left alone, since it may be
+for another route.
+
+**Attributes are checked on the elements the page wrote.** The global HTML
+attributes, `aria-*`, `data-*`, and the prefixes frameworks write are never
+findings. The markup Helix renders inside its own components is Helix's.
 
 ## Configure it
 
@@ -149,6 +162,24 @@ throws, and names the closest that does.
 
 Development only. It walks every stylesheet in the page, and it sends nothing
 anywhere.
+
+## In CI
+
+`@fusion.dev/helix-diagnostics/ci` gathers the runs of a CI job into one JSON
+file, in the shape every sink shares, and says whether the job should fail:
+
+```js
+import { ciSink } from '@fusion.dev/helix-diagnostics/ci'
+
+// `runs` are the reports `diagnose` returned in each page your job opened.
+const { code, summary } = ciSink(runs, { file: 'reports/helix-diagnostics.json' })
+console.log(summary)
+process.exitCode = code
+```
+
+A fault found on many pages is one line, with the pages it was on. `error`
+findings fail the job by default; pass `failOn: 'warn'` to fail on warnings
+too, or `'never'` to report without failing.
 
 ## Versions
 

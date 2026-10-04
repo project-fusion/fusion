@@ -54,7 +54,7 @@ export { type Override, type Rules, SHIPPED_RULES } from './rules.js'
 export { type Watcher, watch } from './usage.js'
 export { VERSION } from './version.js'
 
-import { analyze, registrations, skew, versionSkew } from './analyze.js'
+import { analyze, markup, registrations, skew, versionSkew } from './analyze.js'
 import { collect } from './collect.js'
 import { type Config, pagePattern, resolveConfig } from './config.js'
 import { identify } from './identity.js'
@@ -153,7 +153,7 @@ export const diagnose = (options: Options): Report => {
   const resolved = resolveConfig(file, call)
   const { detail } = resolved.configuration
   const document_ = from ?? globalThis.document
-  const { answered, coverage, rules: located } = collect(document_)
+  const { answered, coverage, readers, rules: located, used } = collect(document_)
   const tags = index(tiers)
   const counted = watcher ? watcher.counts() : walk(document_)
   const seen = loadedVersions()
@@ -179,7 +179,8 @@ export const diagnose = (options: Options): Report => {
       ? { findings: [], silenced: [] }
       : applyRules(
           [
-            ...analyze(located, tags, document_, answered),
+            ...analyze(located, tags, document_, answered, used, readers),
+            ...markup(tags, document_),
             ...registrations(document_, duplicates),
           ].map((one) => identify(one, tags)),
           file?.rules,

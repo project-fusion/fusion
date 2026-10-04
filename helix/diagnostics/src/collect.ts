@@ -21,6 +21,11 @@ import type { Coverage, Unreadable } from './report.js'
 export interface Located {
   index: number
   rule: CSSStyleRule
+  /**
+   * Where the rule's selector matches: the document for a page's own sheet,
+   * and the shadow root of the first host to adopt it for a component's.
+   */
+  scope?: Document | ShadowRoot | undefined
   sheet: string
 }
 
@@ -42,6 +47,18 @@ export interface Located {
  * the whole truth.
  */
 export type Answered = Map<string, Set<string>>
+
+/**
+ * The rules outside Helix's components that read each custom property with
+ * `var()`, by selector and the root they apply in. An element one of them
+ * matches answers the property as surely as a Helix tag does: Helix's own
+ * base sheet reads every button hook for a plain `[data-button]` link, and an
+ * example reads `--chart-series-1` in its own `::part()` rules.
+ */
+export type Readers = Map<
+  string,
+  Array<{ scope: Document | ShadowRoot | undefined; selector: string }>
+>
 
 /**
  * A sheet with no `href` still needs a name a reader can act on.
@@ -95,7 +112,9 @@ const rules = (
     if ('selectorText' in rule) {
       into.push({ index, rule: rule as CSSStyleRule, sheet })
       if (reads) {
-        for (const match of (rule.cssText ?? '').matchAll(/var\(\s*(--[a-zA-Z0-9-]+)/g)) {
+        /* `\w`, so a private `--_button-fill` is read as a name: Helix's own
+           sheets set and read dozens of them. */
+        for (const match of (rule.cssText ?? '').matchAll(/var\(\s*(--[\w-]+)/g)) {
           if (match[1]) {
             reads.add(match[1])
           }
@@ -185,12 +204,22 @@ const roots = (from: ParentNode, found: ShadowRoot[], depth = 0): void => {
  */
 export const collect = (
   from: Document = document,
-): { answered: Answered; coverage: Coverage; rules: Located[] } => {
+): {
+  answered: Answered
+  coverage: Coverage
+  readers: Readers
+  rules: Located[]
+  used: Set<string>
+} => {
   const located: Located[] = []
   const unreadable: Unreadable[] = []
   const seen = new Set<CSSStyleSheet>()
   const labels = new Map<string, number>()
   const answered: Answered = new Map()
+  /* Every custom property any sheet reads with `var()`, so a property the
+     page sets and reads itself is known to be its own. */
+  const used = new Set<string>()
+  const readers: Readers = new Map()
   let readable = 0
 
   const take = (sheet: CSSStyleSheet | null | undefined, host?: Element): void => {
@@ -198,13 +227,29 @@ export const collect = (
       return
     }
     seen.add(sheet)
-    let reads: Set<string> | undefined
+    let reads = used
     if (host) {
       reads = answered.get(host.localName) ?? new Set<string>()
       answered.set(host.localName, reads)
     }
+    const before = located.length
     if (read(sheet, located, unreadable, labels, 0, host, reads)) {
       readable += 1
+    }
+    const scope = host ? (host.shadowRoot ?? undefined) : from
+    const ours = !host?.localName.startsWith('helix-')
+    for (let at = before; at < located.length; at += 1) {
+      const one = located[at] as Located
+      one.scope = scope
+      if (ours && one.rule.selectorText) {
+        for (const match of (one.rule.cssText ?? '').matchAll(/var\(\s*(--[\w-]+)/g)) {
+          const property = match[1] as string
+          readers.set(property, [
+            ...(readers.get(property) ?? []),
+            { scope, selector: one.rule.selectorText },
+          ])
+        }
+      }
     }
   }
 
@@ -234,9 +279,22 @@ export const collect = (
     }
   }
 
+  /* **The page's reads, and a Helix component's apart.** A page's own
+     components, a non-Helix shadow root, read for the page; what a Helix
+     component reads is `answered`, and folding it in here would excuse a
+     hook set on the wrong element because some other component reads it. */
+  for (const [tag, reads] of answered) {
+    if (!tag.startsWith('helix-')) {
+      for (const property of reads) {
+        used.add(property)
+      }
+    }
+  }
   return {
     answered,
     coverage: { read: readable, roots: shadows.length, sheets: seen.size, unreadable },
+    readers,
     rules: located,
+    used,
   }
 }

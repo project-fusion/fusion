@@ -27,6 +27,8 @@ export interface ManifestSource {
     /** Where the module is, which names the family: `src/button/root/button-root.ts`. */
     path?: string
     declarations?: Array<{
+      attributes?: Array<{ name: string; type?: { text?: string } }>
+      members?: Array<{ kind?: string; name: string; readonly?: boolean; static?: boolean }>
       cssParts?: Array<{ name: string }>
       cssProperties?: Array<{ name: string }>
       tagName?: string
@@ -48,9 +50,20 @@ export interface Tier {
  * scope, and `analyze.ts` needs both in the same file.
  */
 export interface Published {
+  /**
+   * Each attribute the tag takes, with the values it allows where its type
+   * is a union of string literals, and `null` where it takes any value.
+   */
+  attributes: Map<string, Set<string> | null>
   /** The family, from the module's path: `button` for `src/button/root/button-root.ts`. */
   family?: string | undefined
   hooks: Map<string, Set<string>>
+  /**
+   * The attributes the element writes on itself: one named for a read-only
+   * member, as `helix-notifications` writes `unread`. Output, so never a
+   * finding when the page shows it.
+   */
+  written: Set<string>
   parts: Map<string, Set<string>>
 }
 
@@ -73,8 +86,25 @@ export const index = (tiers: Tier[]): Map<string, Published> => {
         }
         let element = tags.get(tag)
         if (!element) {
-          element = { family, hooks: new Map(), parts: new Map() }
+          element = {
+            attributes: new Map(),
+            family,
+            hooks: new Map(),
+            parts: new Map(),
+            written: new Set(),
+          }
           tags.set(tag, element)
+        }
+        for (const member of declaration.members ?? []) {
+          if (member.readonly && !member.static && member.kind === 'field') {
+            element.written.add(member.name)
+            element.written.add(
+              member.name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`),
+            )
+          }
+        }
+        for (const attribute of declaration.attributes ?? []) {
+          element.attributes.set(attribute.name, allowed(attribute.type?.text))
         }
         for (const [field, into] of [
           [declaration.cssParts, element.parts],
@@ -90,6 +120,23 @@ export const index = (tiers: Tier[]): Map<string, Published> => {
     }
   }
   return tags
+}
+
+/**
+ * The values an attribute allows, where its type is nothing but string
+ * literals, `undefined`, and `null`: `'ghost' | 'solid' | undefined` allows
+ * `ghost` and `solid`. `null` for any other type, which takes any value.
+ */
+const allowed = (type: string | undefined): Set<string> | null => {
+  if (!type) {
+    return null
+  }
+  const literals = [...type.matchAll(/'([^']*)'/g)].map((match) => match[1] as string)
+  const rest = type
+    .replace(/'[^']*'/g, '')
+    .replace(/\b(undefined|null)\b/g, '')
+    .replace(/[|\s]/g, '')
+  return literals.length > 0 && rest === '' ? new Set(literals) : null
 }
 
 /** The version each manifest describes, by package, where it says. */
@@ -117,9 +164,13 @@ export const versionsOf = (tiers: Tier[]): Record<string, string> => {
  * `--button-background-color` however close they sort, and a confident wrong
  * suggestion costs more than none.
  */
-export const nearest = (wrong: string, candidates: Iterable<string>): string | undefined => {
+export const nearest = (
+  wrong: string,
+  candidates: Iterable<string>,
+  ceiling = Math.floor(wrong.length / 3),
+): string | undefined => {
   let best: string | undefined
-  let distance = Math.floor(wrong.length / 3)
+  let distance = Math.min(ceiling, Math.floor(wrong.length / 3))
   for (const candidate of candidates) {
     const found = within(wrong, candidate, distance)
     if (found !== undefined && found < distance + 1) {

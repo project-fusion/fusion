@@ -94,8 +94,10 @@ export const KINDS = [
   'dead-hook',
   'dead-part',
   'duplicate-registration',
+  'invalid-value',
   'manifest-skew',
   'unforwarded-part',
+  'unknown-attribute',
   'unknown-tag',
 ] as const
 

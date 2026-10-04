@@ -17,7 +17,7 @@ beforeAll(() => {
   registerDom()
 })
 
-const { analyze, skew } = await import('./analyze.js')
+const { analyze, markup, skew } = await import('./analyze.js')
 const { collect } = await import('./collect.js')
 const { diagnose } = await import('./index.js')
 const { index, nearest } = await import('./manifest.js')
@@ -36,6 +36,10 @@ const tiers = [
         {
           declarations: [
             {
+              attributes: [
+                { name: 'emphasis', type: { text: "'ghost' | 'solid' | undefined" } },
+                { name: 'label', type: { text: 'string' } },
+              ],
               cssParts: [{ name: 'button' }, { name: 'icon' }],
               cssProperties: [{ name: '--button-background-color' }, { name: '--button-radius' }],
               tagName: 'helix-button',
@@ -265,7 +269,12 @@ describe('hooks', () => {
           ...tags,
           [
             'helix-other',
-            { hooks: new Map([['--borrowed-from-elsewhere', new Set(['t'])]]), parts: new Map() },
+            {
+              attributes: new Map(),
+              hooks: new Map([['--borrowed-from-elsewhere', new Set(['t'])]]),
+              parts: new Map(),
+              written: new Set(),
+            },
           ],
         ]),
         document,
@@ -993,5 +1002,259 @@ describe('console levels', () => {
     )
     expect(entries[0]?.[1]).toBe('helix diagnostics: 0 errors, 0 warnings, 0 info, 2 turned off')
     expect(entries).toContainEqual(['info', '2 unforwarded-parts turned off by the file'])
+  })
+})
+
+describe('attributes', () => {
+  test('an attribute the element does not take is a finding, with the closest it does', () => {
+    document.body.innerHTML = '<helix-button emphais="solid">Go</helix-button>'
+    const [found] = markup(tags, document)
+    expect([found?.kind, found?.subject, found?.expected]).toEqual([
+      'unknown-attribute',
+      '<helix-button emphais>',
+      'emphasis',
+    ])
+    document.body.innerHTML = ''
+  })
+
+  test('a value outside a closed set is a finding, once however many elements carry it', () => {
+    document.body.innerHTML =
+      '<helix-button emphasis="bold"></helix-button><helix-button emphasis="bold"></helix-button><helix-button emphasis="solid" label="anything"></helix-button>'
+    const found = markup(tags, document)
+    expect(found.map((one) => [one.kind, one.subject])).toEqual([
+      ['invalid-value', '<helix-button emphasis="bold">'],
+    ])
+    expect(found[0]?.message).toContain('On 2 elements.')
+    document.body.innerHTML = ''
+  })
+
+  test('global attributes, framework prefixes, and Helix’s own markup are not findings', () => {
+    document.body.innerHTML =
+      '<helix-button class="a" id="b" slot="c" aria-label="d" data-e="f" hidden title="g" _ngcontent-abc="">Go</helix-button>'
+    const host = document.createElement('helix-card')
+    host.attachShadow({ mode: 'open' }).innerHTML = '<helix-button wrong="1"></helix-button>'
+    document.body.append(host)
+    expect(markup(tags, document)).toEqual([])
+    document.body.innerHTML = ''
+  })
+})
+
+describe('hooks set outside a Helix selector', () => {
+  /** A page, its stylesheet, and the run's findings. */
+  const run = (html: string, css: string) => {
+    document.body.innerHTML = html
+    const style = document.createElement('style')
+    style.textContent = css
+    document.head.append(style)
+    const { answered, rules, used } = collect(document)
+    const findings = analyze(rules, tags, document, answered, used).filter(
+      (one) => one.kind === 'dead-hook',
+    )
+    style.remove()
+    document.body.innerHTML = ''
+    return findings
+  }
+
+  test('a hook on a class reaching an element that answers it is silent', () => {
+    expect(
+      run(
+        '<div class="toolbar"><helix-button></helix-button></div>',
+        '.toolbar { --button-radius: 0 }',
+      ),
+    ).toEqual([])
+    expect(run('<helix-button></helix-button>', ':root { --button-radius: 0 }')).toEqual([])
+  })
+
+  test('a hook on a class matching elements none of which reach an answerer is a finding', () => {
+    const [found] = run(
+      '<div class="toolbar"></div><helix-button></helix-button>',
+      '.toolbar { --button-radius: 0 }',
+    )
+    expect([found?.subject, found?.tag]).toEqual(['.toolbar { --button-radius }', 'helix-button'])
+  })
+
+  test('a selector matching nothing, or a page with nothing that answers, is left unjudged', () => {
+    expect(run('<helix-button></helix-button>', '.elsewhere { --button-radius: 0 }')).toEqual([])
+    expect(run('<div class="toolbar"></div>', '.toolbar { --button-radius: 0 }')).toEqual([])
+  })
+
+  test('a misspelled hook on a class is a finding, unless the page reads the name itself', () => {
+    const [found] = run('<div class="toolbar"></div>', '.toolbar { --button-radios: 0 }')
+    expect([found?.subject, found?.expected]).toEqual([
+      '.toolbar { --button-radios }',
+      '--button-radius',
+    ])
+    expect(
+      run(
+        '<div class="toolbar"></div>',
+        '.toolbar { --button-radios: 0 } .x { width: var(--button-radios) }',
+      ),
+    ).toEqual([])
+  })
+
+  test('a class named like a tag is a class', () => {
+    const [found] = run('<div class="helix-hero"></div>', '.helix-hero { --button-radios: 0 }')
+    expect(found?.subject).toBe('.helix-hero { --button-radios }')
+  })
+})
+
+describe('usage of hooks set outside a Helix selector', () => {
+  test('a hook on a class counts for every tag that lists it, with its value', () => {
+    const { rules } = ruled('.toolbar', ['--button-radius: 4px', '--my-own: 1'])
+    expect(styled(rules, tags, new Map())).toEqual({
+      hooks: { 'helix-button': { '--button-radius': 1 } },
+      hookValues: { 'helix-button': { '--button-radius': { '4px': 1 } } },
+      parts: {},
+    })
+  })
+})
+
+describe('hooks under a Helix selector, judged on what it matches now', () => {
+  /** A page, its stylesheet, and the dead hooks found. */
+  const dead = (html: string, css: string) => {
+    document.body.innerHTML = html
+    const style = document.createElement('style')
+    style.textContent = css
+    document.head.append(style)
+    const { answered, rules, used } = collect(document)
+    const findings = analyze(rules, tags, document, answered, used).filter(
+      (one) => one.kind === 'dead-hook',
+    )
+    style.remove()
+    document.body.innerHTML = ''
+    return findings
+  }
+
+  test('an element the selector matches may answer the hook itself', () => {
+    expect(
+      dead(
+        '<helix-breadcrumb><helix-button></helix-button></helix-breadcrumb>',
+        'helix-breadcrumb > * { --button-radius: 0 }',
+      ),
+    ).toEqual([])
+  })
+
+  test('a selector matching nothing on this page is left for the page it is for', () => {
+    expect(
+      dead('<helix-button></helix-button>', '.elsewhere helix-breadcrumb { --button-radius: 0 }'),
+    ).toEqual([])
+  })
+})
+
+describe('a Helix component’s own sheets', () => {
+  test('a private property a component sets is its own: read by it, never the page, and never a misspelled hook', () => {
+    const host = document.createElement('helix-button')
+    const root = host.attachShadow({ mode: 'open' })
+    const style = document.createElement('style')
+    style.textContent =
+      ':host([tone="danger"]) { --_button-fill: red } [part="button"] { background: var(--_button-fill) }'
+    root.append(style)
+    document.body.append(host)
+    const { answered, rules, used } = collect(document)
+    expect(answered.get('helix-button')?.has('--_button-fill')).toBe(true)
+    expect(used.has('--_button-fill')).toBe(false)
+    expect(analyze(rules, tags, document, answered, used)).toEqual([])
+    host.remove()
+  })
+})
+
+describe('what the review of the examples found', () => {
+  test('a hook the page reads itself is the page’s to use, wherever it is set', () => {
+    document.body.innerHTML = '<helix-button></helix-button>'
+    const style = document.createElement('style')
+    style.textContent =
+      'helix-button { --button-shade: red } helix-button::part(button) { color: var(--button-shade) }'
+    document.head.append(style)
+    const { answered, rules, used } = collect(document)
+    expect(analyze(rules, tags, document, answered, used)).toEqual([])
+    style.remove()
+    document.body.innerHTML = ''
+  })
+
+  test('a token is never judged as a hook', () => {
+    document.body.innerHTML = '<div class="x"></div><helix-button></helix-button>'
+    const style = document.createElement('style')
+    style.textContent = ':root { --helix-color-wel: red } .x { --helix-color-border: blue }'
+    document.head.append(style)
+    const { answered, rules, used } = collect(document)
+    expect(analyze(rules, tags, document, answered, used)).toEqual([])
+    style.remove()
+    document.body.innerHTML = ''
+  })
+
+  test('a name three edits from a hook is no misspelling of it', () => {
+    document.body.innerHTML = '<div class="x"></div>'
+    const style = document.createElement('style')
+    style.textContent = '.x { --button-radix-ab: 0 }'
+    document.head.append(style)
+    const { answered, rules, used } = collect(document)
+    expect(analyze(rules, tags, document, answered, used)).toEqual([])
+    style.remove()
+    document.body.innerHTML = ''
+  })
+
+  test('an attribute a component writes on itself, named for a read-only member, is its own', () => {
+    const own = index([
+      {
+        manifest: {
+          modules: [
+            {
+              declarations: [
+                {
+                  attributes: [],
+                  members: [
+                    { kind: 'field', name: 'unread', readonly: true },
+                    { kind: 'field', name: 'items' },
+                  ],
+                  tagName: 'helix-notifications',
+                },
+              ],
+            },
+          ],
+        },
+        name: '@fusion.dev/helix',
+      },
+    ])
+    document.body.innerHTML = '<helix-notifications unread="2" items="x"></helix-notifications>'
+    expect(markup(own, document).map((one) => one.subject)).toEqual(['<helix-notifications items>'])
+    document.body.innerHTML = ''
+  })
+})
+
+describe('a hook answered by a rule the page reads it in', () => {
+  /** A page, its stylesheet, and the dead hooks found. */
+  const dead = (html: string, css: string) => {
+    document.body.innerHTML = html
+    const style = document.createElement('style')
+    style.textContent = css
+    document.head.append(style)
+    const { answered, readers, rules, used } = collect(document)
+    const findings = analyze(rules, tags, document, answered, used, readers).filter(
+      (one) => one.kind === 'dead-hook',
+    )
+    style.remove()
+    document.body.innerHTML = ''
+    return findings
+  }
+  const css = '[data-button] { border-radius: var(--button-radius) } .x { --button-radius: 0 }'
+
+  test('an element a reading rule matches answers the hook, as a `[data-button]` link does', () => {
+    expect(
+      dead('<div class="x"><a data-button href="#">Go</a></div><helix-button></helix-button>', css),
+    ).toEqual([])
+  })
+
+  test('a selector holding nothing a reading rule matches is a finding, though the page reads the hook elsewhere', () => {
+    const [found] = dead('<div class="x"></div><a data-button href="#">Go</a>', css)
+    expect(found?.subject).toBe('.x { --button-radius }')
+  })
+
+  test('a hook set on a moment, such as focus, is judged on the element it is set on', () => {
+    expect(
+      dead(
+        '<div class="x"><helix-button></helix-button></div>',
+        '.x:focus-visible { --button-radius: 0 }',
+      ),
+    ).toEqual([])
   })
 })

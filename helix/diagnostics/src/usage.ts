@@ -220,12 +220,42 @@ export const styled = (
     hookValues: {},
     parts: {},
   }
+  /* The tags whose manifests list each hook, for a rule naming none. */
+  const listing = new Map<string, string[]>()
+  for (const [tag, element] of tags) {
+    for (const property of element.hooks.keys()) {
+      listing.set(property, [...(listing.get(property) ?? []), tag])
+    }
+  }
+  /** One hook set for one tag, and its value where the project allows it. */
+  const count = (located: Located, tag: string, property: string): void => {
+    bump(
+      under(counted.hooks, tag, () => ({})),
+      property,
+    )
+    if (!values) {
+      return
+    }
+    /* The declared value as written, cut at 200 characters so a gradient or
+       a data URL cannot swell a report. */
+    const value = (located.rule.style?.getPropertyValue?.(property) ?? '').trim().slice(0, 200)
+    if (value !== '') {
+      bump(
+        under(
+          under(counted.hookValues, tag, () => ({})),
+          property,
+          () => ({}),
+        ),
+        value,
+      )
+    }
+  }
   for (const located of rules) {
     const selector = located.rule.selectorText
-    if (!selector?.includes('helix-')) {
+    if (!selector) {
       continue
     }
-    for (const { names, tag } of parts(selector)) {
+    for (const { names, tag } of selector.includes('helix-') ? parts(selector) : []) {
       for (const name of names) {
         if (tags.get(tag)?.parts.has(name)) {
           bump(
@@ -235,34 +265,25 @@ export const styled = (
         }
       }
     }
-    for (const tag of targets(selector)) {
-      for (const property of Array.from(located.rule.style ?? [])) {
-        if (
-          property.startsWith('--') &&
-          (tags.get(tag)?.hooks.has(property) || answered.get(tag)?.has(property))
-        ) {
-          bump(
-            under(counted.hooks, tag, () => ({})),
-            property,
-          )
-          if (values) {
-            /* The declared value as written, cut at 200 characters so a
-               gradient or a data URL cannot swell a report. */
-            const value = (located.rule.style?.getPropertyValue?.(property) ?? '')
-              .trim()
-              .slice(0, 200)
-            if (value !== '') {
-              bump(
-                under(
-                  under(counted.hookValues, tag, () => ({})),
-                  property,
-                  () => ({}),
-                ),
-                value,
-              )
-            }
+    const named = targets(selector).filter((tag) => tags.has(tag))
+    for (const property of Array.from(located.rule.style ?? [])) {
+      if (!property.startsWith('--')) {
+        continue
+      }
+      if (named.length > 0) {
+        for (const tag of named) {
+          if (tags.get(tag)?.hooks.has(property) || answered.get(tag)?.has(property)) {
+            count(located, tag, property)
           }
         }
+        continue
+      }
+      /* **A hook set on a class, `:root`, or any selector naming no Helix
+         tag** counts for every tag whose manifest lists it: it is set for
+         whichever of them sit under the selector, and most hooks are set this
+         way. */
+      for (const tag of listing.get(property) ?? []) {
+        count(located, tag, property)
       }
     }
   }
