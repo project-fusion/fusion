@@ -33,6 +33,24 @@ Svelte passes objects and arrays as properties on its own:
 <helix-tabs items={tabs} />
 ```
 
+Svelte's own attributes are typed on every Helix tag as well, so `onclick`,
+`class`, and a `style` string check as they do on a `div`.
+
+## Ignore the click warnings on a control
+
+`svelte-check` warns about an `onclick` on any Helix element. Its accessibility
+check reads the tag, and the button a Helix control renders is in its shadow
+root, with its role and its keys. On a control that renders a button, such as
+`helix-button` or `helix-icon-button`, ignore the two warnings on that element:
+
+```svelte
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+<helix-icon-button label="Close" onclick={close}></helix-icon-button>
+```
+
+On an element that renders no control, such as `helix-tag`, the warning is
+right. Use a control there.
+
 ## Read values and refuse changes
 
 These two rules apply in every framework.
