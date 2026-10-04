@@ -47,6 +47,16 @@ type Counted = Pick<Usage, 'axes' | 'composed' | 'slots' | 'tags'>
 const empty = (): Counted => ({ axes: {}, composed: {}, slots: {}, tags: {} })
 
 /**
+ * The Helix versions loaded on the page: every copy of core adds its own to
+ * a list under a registered symbol as it loads. Empty for a core older than
+ * 0.137, which lists nothing.
+ */
+export const loadedVersions = (): string[] => {
+  const listed = (globalThis as Record<symbol, unknown>)[Symbol.for('fusion.dev/helix/versions')]
+  return Array.isArray(listed) ? listed.filter((one) => typeof one === 'string').sort() : []
+}
+
+/**
  * Counts one element.
  *
  * **What a Helix element renders inside itself is counted apart**, as
@@ -141,7 +151,7 @@ export const listed = (
 /** A running count of what renders, from `watch()`. */
 export interface Watcher {
   /** The counts so far. A copy: counting goes on after it is read. */
-  counts(): Pick<Usage, 'axes' | 'composed' | 'slots' | 'tags'>
+  counts(): Counted
   /** Stops counting, and gives the slot back to whatever held it before. */
   stop(): void
 }
@@ -203,8 +213,13 @@ export const styled = (
   rules: Located[],
   tags: Map<string, Published>,
   answered: Answered,
-): Pick<Usage, 'hooks' | 'parts'> => {
-  const counted: Pick<Usage, 'hooks' | 'parts'> = { hooks: {}, parts: {} }
+  values = true,
+): Pick<Usage, 'hookValues' | 'hooks' | 'parts'> => {
+  const counted: Pick<Usage, 'hookValues' | 'hooks' | 'parts'> = {
+    hooks: {},
+    hookValues: {},
+    parts: {},
+  }
   for (const located of rules) {
     const selector = located.rule.selectorText
     if (!selector?.includes('helix-')) {
@@ -230,6 +245,23 @@ export const styled = (
             under(counted.hooks, tag, () => ({})),
             property,
           )
+          if (values) {
+            /* The declared value as written, cut at 200 characters so a
+               gradient or a data URL cannot swell a report. */
+            const value = (located.rule.style?.getPropertyValue?.(property) ?? '')
+              .trim()
+              .slice(0, 200)
+            if (value !== '') {
+              bump(
+                under(
+                  under(counted.hookValues, tag, () => ({})),
+                  property,
+                  () => ({}),
+                ),
+                value,
+              )
+            }
+          }
         }
       }
     }

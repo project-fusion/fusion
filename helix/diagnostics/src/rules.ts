@@ -16,7 +16,16 @@
  * package exists to find, so it throws and names the closest kind.
  */
 import { nearest } from './manifest.js'
-import { type Finding, KINDS, type Kind, type Layer, type Raw, type Severity } from './report.js'
+import {
+  type Configuration,
+  type Finding,
+  type Identified,
+  KINDS,
+  type Kind,
+  type Layer,
+  type Raw,
+  type Severity,
+} from './report.js'
 
 /** One override: a severity, `off`, or either for some tags only. */
 export type Override =
@@ -96,17 +105,18 @@ const said = (rules: Rules | undefined, finding: Raw): Severity | 'off' | undefi
 }
 
 /**
- * The findings with their severities, and how many each layer turned off.
+ * The findings with their severities, and how many each override turned off,
+ * by kind and layer.
  *
  * The shipped rule first, then the file, then the argument, each later layer
  * replacing what it speaks to.
  */
 export const applyRules = (
-  findings: Raw[],
+  findings: Identified[],
   file: Rules | undefined,
   argument: Rules | undefined,
-): { findings: Finding[]; silenced: { argument: number; file: number } } => {
-  const silenced = { argument: 0, file: 0 }
+): { findings: Finding[]; silenced: Configuration['silenced'] } => {
+  const off = new Map<string, Configuration['silenced'][number]>()
   const kept: Finding[] = []
   for (const finding of findings) {
     let severity: Severity | 'off' = SHIPPED_RULES[finding.kind]
@@ -122,10 +132,34 @@ export const applyRules = (
       }
     }
     if (severity === 'off') {
-      silenced[decidedBy as Exclude<Layer, 'shipped'>] += 1
+      const layer = decidedBy as Exclude<Layer, 'shipped'>
+      const key = `${finding.kind} ${layer}`
+      const entry = off.get(key) ?? { count: 0, kind: finding.kind, layer }
+      entry.count += 1
+      off.set(key, entry)
       continue
     }
     kept.push({ ...finding, decidedBy, severity })
   }
-  return { findings: kept, silenced }
+  return { findings: kept, silenced: [...off.values()] }
 }
+
+/** Every override in effect, flattened, for the report's configuration. */
+export const overridesOf = (
+  file: Rules | undefined,
+  argument: Rules | undefined,
+): Configuration['overrides'] =>
+  (
+    [
+      ['file', file],
+      ['argument', argument],
+    ] as const
+  ).flatMap(([layer, rules]) =>
+    Object.entries(rules ?? {}).flatMap(([kind, value]) =>
+      (Array.isArray(value) ? value : [value]).map((one) =>
+        typeof one === 'string'
+          ? { kind: kind as Kind, layer, severity: one }
+          : { kind: kind as Kind, layer, severity: one.severity, tags: one.tags },
+      ),
+    ),
+  )

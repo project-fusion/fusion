@@ -43,21 +43,36 @@ diagnostic cannot drift from what is true.
 
 ## What a report holds
 
+A report is one run, in one shape for every sink, versioned by `schema`:
+
+- **`run`**: a new `id`, when it began (`at`), how long it took, where it ran
+  (`environment`, as you declare it), and the `page`, as a pattern by default:
+  `/orders/1042` reads `/orders/:id`.
+- **`project`**: the name and tags your configuration gives. The key is never
+  written into a report.
+- **`versions`**: the collector's and the rules', the Helix versions loaded on
+  the page (two means two copies), and the version each manifest describes.
 - **`coverage`**: how many stylesheets and shadow roots were read, and which
   sheets could not be. A cross-origin stylesheet throws on `.cssRules`, so a run
   that read three sheets of nineteen returns the same empty findings as one that
   read all nineteen. Read `coverage` before you believe `findings`.
-- **`findings`**: each with its kind, a severity, the layer that set the
-  severity, the tag, and the rule's own text as evidence.
-- **`silenced`**: how many findings each override layer turned off.
+- **`findings`**: each with its kind, a severity, the place that set the
+  severity, the tag and its family, a `category` (`styling`, `markup`,
+  `integrity`, or `guideline`), an `owner` (`consumer`, or `helix` for a fault
+  in the library), a `fingerprint` that stays the same from one run to the next
+  for the same fault, and the rule's own text as evidence.
 - **`usage`**: the Helix elements on the page by tag, the axes set on them
   (`emphasis`, `material`, `separation`, and `tone`), the named slots filled,
   the elements Helix renders inside other Helix elements, and the parts and
-  hooks your stylesheets use. With a watcher it counts every element that
-  rendered since `watch()` began, including ones since removed, such as a
-  closed dialog. Without one it counts the elements on the page at the moment
-  of the run. Elements named `helix-*` that no manifest lists, such as your
-  own, are counted apart as `unlisted`.
+  hooks your stylesheets use, with the values the hooks are set to. With a
+  watcher it counts every element that rendered since `watch()` began,
+  including ones since removed, such as a closed dialog. Without one it counts
+  the elements on the page at the moment of the run. Elements named `helix-*`
+  that no manifest lists, such as your own, are counted apart as `unlisted`.
+- **`configuration`**: the settings the run was made under, each override in
+  effect, and how many findings each override turned off, by kind.
+- **`withheld`**: the categories your configuration turned off for sending,
+  and which place turned each off.
 
 ## What the console shows
 
@@ -86,30 +101,62 @@ works on it:
 | `duplicate-registration` | error | Two copies of Helix are on the page |
 | `manifest-skew` | error | An element renders a part its manifest does not list, so the manifest is from another version. It replaces every other finding, since each would be judged against the wrong version. Turned off, the page is judged as usual |
 
-## Change a severity
+## Configure it
 
-Pass your project's file, parsed, as `file`, and overrides for one run as
-`rules`. The `rules` argument wins over the file, and each finding says which
-one set its severity. An override is a severity (`error`, `warn`, or `info`),
-`off`, or either for some tags only:
+Every setting can be given in three places, and a later place wins, field by
+field: the defaults this package ships, your project's file, and the call.
+The page cannot read files, so import your file and pass it as `file`:
 
 ```js
-import overrides from './helix-diagnostics.json' with { type: 'json' }
+import project from './helix-diagnostics.json' with { type: 'json' }
 
 diagnose({
-  file: overrides,
-  rules: {
-    'dead-hook': { severity: 'warn', tags: ['helix-card'] },
-    'unforwarded-part': 'off',
-  },
+  environment: 'development',
+  file: project,
+  rules: { 'unforwarded-part': 'off' },
   tiers,
 })
 ```
 
-An override for a kind that does not exist throws, and names the closest kind.
+```json
+{
+  "project": { "name": "storefront", "tags": ["web"] },
+  "rules": { "dead-hook": { "severity": "warn", "tags": ["helix-card"] } },
+  "console": { "findings": "warn", "usage": "off" },
+  "send": { "performance": false },
+  "detail": { "evidence": "full", "hookValues": true, "pages": "patterns" },
+  "environments": { "development": true, "ci": true, "production": false }
+}
+```
+
+| Setting | Takes | Default |
+| --- | --- | --- |
+| `rules.<kind>` | `error`, `warn`, `info`, `off`, or `{ severity, tags }` | see Finding kinds |
+| `console.findings` | `error`, `warn`, `info`, or `off`: the lowest severity printed | `info` |
+| `console.coverage` | `info` or `off` | `info` |
+| `console.usage` | `debug` or `off` | `debug` |
+| `send.<category>` | `true` or `false`, for `findings`, `usage`, `coverage`, `configuration`, `runtime`, `performance`, and `assist` | all on but `performance` |
+| `detail.evidence` | `full`, `selector`, or `none` | `full` |
+| `detail.hookValues` | `true` or `false` | `true` |
+| `detail.pages` | `patterns`, `full` (the path, never the query), or `none` | `patterns` |
+| `environments.<name>` | `true` or `false`; `production` takes `{ sample }` from 0 to 1 | development and CI on |
+| `project` | `key`, `name`, and `tags` | none |
+
+`send`, `detail`, and `environments` decide what a sending sink sends, and
+nothing here sends yet: they are recorded in every report, so a dashboard
+knows what a project withheld. A setting or a value that does not exist
+throws, and names the closest that does.
 
 Development only. It walks every stylesheet in the page, and it sends nothing
 anywhere.
+
+## Versions
+
+`@fusion.dev/helix-core` lists its version on the page as it loads, and every
+manifest built from 0.137 names the package and version it describes. Where
+both sides say, a manifest from another version is one `manifest-skew`
+finding in place of all others. Where either is silent, the check falls back
+to a part rendering that the manifest does not list.
 
 [Documentation](https://fusion.dev/helix)
 

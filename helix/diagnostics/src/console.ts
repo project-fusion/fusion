@@ -47,19 +47,37 @@ const entry = (finding: Finding): string => {
 /** A count and its noun, plural where it is not one. */
 const counted = (count: number, noun: string): string => `${count} ${noun}${count === 1 ? '' : 's'}`
 
-/** Writes a report and hands it back, so a caller can chain a second sink. */
+/** How serious each severity is, for the project's threshold. */
+const RANK: Record<Severity, number> = { error: 3, info: 1, warn: 2 }
+
+/**
+ * Writes a report and hands it back, so a caller can chain a second sink.
+ *
+ * **Each category prints as the project's `console` setting says**: findings
+ * at or above a severity, coverage and usage on or off. The heading counts
+ * every finding whatever is printed under it, and the ones the rules turned
+ * off, so a quiet console never reads as a clean page.
+ */
 export const report = (result: Report, to: ConsoleSink = console): Report => {
-  const { coverage, findings } = result
+  const { configuration, coverage, findings } = result
+  const levels = configuration.console
   const bySeverity = (severity: Severity): number =>
     findings.filter((finding) => finding.severity === severity).length
   const errors = bySeverity('error')
   const warnings = bySeverity('warn')
+  const off = configuration.silenced.reduce((total, one) => total + one.count, 0)
   const missed = coverage.sheets - coverage.read
 
+  const counts = [
+    counted(errors, 'error'),
+    counted(warnings, 'warning'),
+    `${bySeverity('info')} info`,
+    ...(off > 0 ? [`${off} turned off`] : []),
+  ]
   const heading =
-    findings.length === 0
+    findings.length === 0 && off === 0
       ? 'helix diagnostics: no findings'
-      : `helix diagnostics: ${counted(errors, 'error')}, ${counted(warnings, 'warning')}, ${bySeverity('info')} info`
+      : `helix diagnostics: ${counts.join(', ')}`
   /* Open where there is something to act on, closed where there is not. */
   if (errors + warnings > 0 || missed > 0) {
     to.group(heading)
@@ -67,9 +85,13 @@ export const report = (result: Report, to: ConsoleSink = console): Report => {
     to.groupCollapsed(heading)
   }
 
-  to.info(
-    `read ${coverage.read} of ${counted(coverage.sheets, 'stylesheet')} across ${counted(coverage.roots, 'shadow root')}`,
-  )
+  if (levels.coverage !== 'off') {
+    to.info(
+      `read ${coverage.read} of ${counted(coverage.sheets, 'stylesheet')} across ${counted(coverage.roots, 'shadow root')}` +
+        (result.run.page ? ` on ${result.run.page}` : ''),
+    )
+  }
+  /* Unread stylesheets print whatever the setting: they qualify every finding. */
   if (missed > 0) {
     to.warn(
       [
@@ -79,27 +101,37 @@ export const report = (result: Report, to: ConsoleSink = console): Report => {
     )
   }
 
-  const { argument, file } = result.silenced
-  if (argument + file > 0) {
+  if (off > 0 && levels.coverage !== 'off') {
     to.info(
-      `${counted(argument + file, 'finding')} turned off: ${file} by the file, ${argument} by the argument`,
+      configuration.silenced
+        .map((one) => `${counted(one.count, one.kind)} turned off by the ${one.layer}`)
+        .join('\n'),
     )
   }
 
   /* A severity is named for the console method that carries it. */
-  for (const finding of findings) {
-    to[finding.severity](entry(finding))
+  if (levels.findings !== 'off') {
+    const floor = RANK[levels.findings]
+    for (const finding of findings) {
+      if (RANK[finding.severity] >= floor) {
+        to[finding.severity](entry(finding))
+      }
+    }
   }
 
-  const { counted: how, hooks, parts, tags, unlisted } = result.usage
-  const sum = (counts: Record<string, Record<string, number>>): number =>
-    Object.values(counts).reduce((total, one) => total + Object.keys(one).length, 0)
-  const elements = Object.values(tags).reduce((total, one) => total + one, 0)
-  const others = Object.keys(unlisted).length
-  to.debug(
-    `usage (${how}): ${counted(Object.keys(tags).length, 'tag')} in ${counted(elements, 'element')}, ${counted(sum(parts), 'part')} styled, ${counted(sum(hooks), 'hook')} set` +
-      (others > 0 ? `, and ${counted(others, 'helix- tag')} no manifest lists` : ''),
-  )
+  if (levels.usage !== 'off') {
+    const { counted: how, hooks, parts, tags, unlisted } = result.usage
+    const sum = (counts: Record<string, Record<string, number>>): number =>
+      Object.values(counts).reduce((total, one) => total + Object.keys(one).length, 0)
+    const elements = Object.values(tags).reduce((total, one) => total + one, 0)
+    const others = Object.keys(unlisted).length
+    const versions = result.versions.helix
+    to.debug(
+      `usage (${how}): ${counted(Object.keys(tags).length, 'tag')} in ${counted(elements, 'element')}, ${counted(sum(parts), 'part')} styled, ${counted(sum(hooks), 'hook')} set` +
+        (others > 0 ? `, and ${counted(others, 'helix- tag')} no manifest lists` : '') +
+        (versions.length > 0 ? `; Helix ${versions.join(' and ')}` : ''),
+    )
+  }
 
   to.groupEnd()
   return result

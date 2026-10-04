@@ -41,6 +41,12 @@ export interface Origin {
  */
 export interface Finding {
   /**
+   * What the fault is about: `styling` for parts and hooks, `markup` for
+   * attributes and slots, `integrity` for the page and the library
+   * disagreeing, `guideline` for advice. A dashboard groups by it.
+   */
+  category: FindingCategory
+  /**
    * What the collector believes the author meant, when it can tell.
    *
    * `| undefined` rather than the bare optional, because
@@ -50,12 +56,25 @@ export interface Finding {
    * catch.
    */
   expected?: string | undefined
+  /** The family the tag belongs to, from the manifest's module path. */
+  family?: string | undefined
+  /**
+   * The finding's identity across runs: the same fault in the next run has
+   * the same fingerprint, which is what makes fixed and regressed computable.
+   * See `fingerprintOf`.
+   */
+  fingerprint: string
   /** Machine-readable fault class, stable across versions. */
   kind: Kind
   /** One sentence, addressed to whoever wrote the CSS. */
   message: string
   /** Where it was read. Absent only for faults that are not in a stylesheet. */
   origin?: Origin
+  /**
+   * Who fixes it: `consumer`, the page's authors, or `helix`, the library,
+   * as for a part the styled tier never forwarded.
+   */
+  owner: Owner
   /** How serious it is, after the shipped rules and any overrides. */
   severity: Severity
   /**
@@ -89,8 +108,40 @@ export type Severity = 'error' | 'info' | 'warn'
 /** Where a finding's severity was decided. */
 export type Layer = 'argument' | 'file' | 'shipped'
 
-/** A finding before the rules have given it a severity. */
-export type Raw = Omit<Finding, 'decidedBy' | 'severity'>
+/** What a fault is about. */
+export type FindingCategory = 'guideline' | 'integrity' | 'markup' | 'styling'
+
+/** Who fixes a fault. */
+export type Owner = 'consumer' | 'helix'
+
+/** A finding as a check first writes it. */
+export type Raw = Omit<
+  Finding,
+  'category' | 'decidedBy' | 'family' | 'fingerprint' | 'owner' | 'severity'
+>
+
+/** A finding with its identity, before the rules have given it a severity. */
+export type Identified = Omit<Finding, 'decidedBy' | 'severity'>
+
+/**
+ * The kinds of telemetry a run can hold, each its own shape. A project turns
+ * each on or off for sending; see `Config.send`.
+ */
+export const CATEGORIES = [
+  'assist',
+  'configuration',
+  'coverage',
+  'findings',
+  'performance',
+  'runtime',
+  'usage',
+] as const
+
+/** A kind of telemetry. */
+export type Category = (typeof CATEGORIES)[number]
+
+/** Where a run was declared to happen. Undeclared is never sent. */
+export type Environment = 'ci' | 'development' | 'production'
 
 /** A sheet the collector could not read, and the reason. */
 export interface Unreadable {
@@ -145,6 +196,13 @@ export interface Usage {
   counted: 'walked' | 'watched'
   /** Each hook the page's stylesheets set, by tag, counted per declaration. */
   hooks: Record<string, Record<string, number>>
+  /**
+   * The values each hook is set to, by tag, hook, and value, where the
+   * project allows it (`detail.hookValues`). A hook set to one value across
+   * projects is a token Helix should have shipped. Values over 200
+   * characters are cut there.
+   */
+  hookValues: Record<string, Record<string, Record<string, number>>>
   /** Each part the page's stylesheets style, by tag, counted per rule. */
   parts: Record<string, Record<string, number>>
   /** Each named slot filled, by tag. */
@@ -159,15 +217,88 @@ export interface Usage {
   unlisted: Record<string, number>
 }
 
-/** The whole result. Coverage and findings, never one without the other. */
+/** The settings a run was made under, and what they turned off. */
+export interface Configuration {
+  /** The lowest level each category prints at in the console, or `off`. */
+  console: {
+    coverage: 'info' | 'off'
+    findings: Severity | 'off'
+    usage: 'debug' | 'off'
+  }
+  /** How much detail goes with what is sent. */
+  detail: {
+    evidence: 'full' | 'none' | 'selector'
+    hookValues: boolean
+    pages: 'full' | 'none' | 'patterns'
+  }
+  /** Where sending happens, and production's sample rate. */
+  environments: {
+    ci: boolean
+    development: boolean
+    production: false | { sample: number }
+  }
+  /** Each override in effect, from the file or the call. */
+  overrides: Array<{
+    kind: Kind
+    layer: Exclude<Layer, 'shipped'>
+    severity: Severity | 'off'
+    tags?: string[]
+  }>
+  /**
+   * How many findings each override turned off, by kind and layer. A finding
+   * turned off is still a fault, and a report that hid the count would read
+   * as cleaner than the page is.
+   */
+  silenced: Array<{ count: number; kind: Kind; layer: Exclude<Layer, 'shipped'> }>
+}
+
+/**
+ * One run: what was found, what is used, how much could be seen, and the
+ * settings it was made under, with everything a dashboard needs to place it.
+ *
+ * **The same shape from every source and to every sink**, versioned by
+ * `schema`, so a run written by CI today is read by the dashboard next year.
+ */
 export interface Report {
+  /** The shape's version. Raised when a field changes meaning or goes. */
+  schema: 1
+  configuration: Configuration
   coverage: Coverage
   findings: Finding[]
   /**
-   * How many findings each override layer turned off. A finding turned off
-   * is still a fault, and a report that hid the count would read as cleaner
-   * than the page is.
+   * The project's own name and labels, as its configuration gives them. The
+   * key is never written into a report.
    */
-  silenced: { argument: number; file: number }
+  project: { name?: string; tags: string[] }
+  run: {
+    /** When the run began, as an ISO 8601 time. */
+    at: string
+    /** How long the run took, in milliseconds. */
+    duration: number
+    /** Where it was declared to run. Absent where nobody declared it. */
+    environment?: Environment
+    /** A new identity per run, so a run sent twice is stored once. */
+    id: string
+    /** The page, as `detail.pages` allows: a pattern, a path, or absent. */
+    page?: string
+    /** Where the run was made: in the page, or from the code. */
+    source: 'code' | 'page'
+  }
   usage: Usage
+  versions: {
+    /** This package's version, which collected the run. */
+    collector: string
+    /** The Helix versions loaded on the page, one per copy of core: two means two copies. */
+    helix: string[]
+    /** The version each manifest passed in describes, by package. */
+    manifests: Record<string, string>
+    /** The shipped rules' version, which is the collector's. */
+    rules: string
+  }
+  /**
+   * The categories the project turned off for sending, and which place
+   * turned each off, so an empty category reads as withheld and never as
+   * nothing there.
+   */
+  withheld: Array<{ category: Category; decidedBy: Layer }>
 }
