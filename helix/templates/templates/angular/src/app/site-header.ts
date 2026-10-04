@@ -31,8 +31,7 @@ const MARKS: Record<Mode, string> = { dark: 'moon', light: 'sun', system: 'monit
 export class SiteHeader {
   protected readonly path = inject(Pathname).current
   protected readonly marks = MARKS
-  /* `system` is the resting state, so the control draws the same glyph before
-     and after the reader first touches it. */
+  /* `system` is the resting state, the mode the page follows until the control is pressed. */
   protected readonly mode = signal<Mode>('system')
 
   /**
@@ -44,7 +43,7 @@ export class SiteHeader {
    * on a panel for a light preview inside a dark page.
    *
    * `system` removes the attribute. Writing out whichever mode is current would
-   * freeze the page there the moment the reader's machine changed.
+   * hold the page there when the system's own setting changed.
    */
   protected cycle(): void {
     const next = MODES[(MODES.indexOf(this.mode()) + 1) % MODES.length] ?? 'system'

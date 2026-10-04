@@ -10,7 +10,7 @@ import { Injectable, signal } from '@angular/core'
    the same document, and wherever you deploy has to be told to. A hash asks
    nothing of it. Each link in the app is a plain anchor to `#/` and a path. */
 
-/** Where the reader is, as a path, so the first page is `/`. */
+/** The current path, read from the hash, so the first page is `/`. */
 const read = (): string => window.location.hash.slice(1) || '/'
 
 /** The current path, kept current as the hash changes. */

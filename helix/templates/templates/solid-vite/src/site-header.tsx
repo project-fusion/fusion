@@ -13,8 +13,7 @@ const MARKS: Record<Mode, string> = { dark: 'moon', light: 'sun', system: 'monit
  * The bar across the top: the wordmark, the destinations, and the color mode.
  */
 export function SiteHeader() {
-  /* `system` is the resting state, so the control draws the same glyph before
-     and after the reader first touches it. */
+  /* `system` is the resting state, the mode the page follows until the control is pressed. */
   const [mode, setMode] = createSignal<Mode>('system')
 
   /**
@@ -26,7 +25,7 @@ export function SiteHeader() {
    * on a panel for a light preview inside a dark page.
    *
    * `system` removes the attribute. Writing out whichever mode is current would
-   * freeze the page there the moment the reader's machine changed.
+   * hold the page there when the system's own setting changed.
    */
   const cycle = () => {
     const next = MODES[(MODES.indexOf(mode()) + 1) % MODES.length] ?? 'system'

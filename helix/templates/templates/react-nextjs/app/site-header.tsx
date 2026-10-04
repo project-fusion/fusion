@@ -3,8 +3,8 @@
 /*
  * **A handler is what makes this a client component**, and so does `usePathname`:
  * a server component's output is serialized, and a function cannot be. The bar
- * is rendered from the layout, so it survives a navigation rather than being
- * rebuilt on every page.
+ * is rendered from the layout, so it stays in place across a navigation and is
+ * built once.
  */
 
 import Link from 'next/link'
@@ -28,18 +28,16 @@ export function SiteHeader() {
      control draws the same glyph on the server and on the first client paint. */
   const [mode, setMode] = useState<Mode>('system')
 
-  /**
+    /**
    * One attribute, two modes, and no second stylesheet.
    *
-   * Every Helix token is written once as a `light-dark()` pair, so which half
-   * resolves is decided by `color-scheme` and nothing else. `data-color-mode`
-   * sets it, and because `color-scheme` inherits the attribute works on any
-   * element, not only on the root: put it on a panel for a light preview inside
-   * a dark page.
+   * Every Helix token is written once as a `light-dark()` pair, so
+   * `color-scheme` decides which half resolves. `data-color-mode` sets it, and
+   * since `color-scheme` inherits, the attribute works on any element: put it
+   * on a panel for a light preview inside a dark page.
    *
-   * `system` removes the attribute rather than writing out whichever mode is
-   * current, which would freeze the page there the moment the reader's machine
-   * changed.
+   * `system` removes the attribute. Writing out whichever mode is current would
+   * hold the page there when the system's own setting changed.
    */
   const cycle = () => {
     const next = MODES[(MODES.indexOf(mode) + 1) % MODES.length]
@@ -53,11 +51,10 @@ export function SiteHeader() {
 
   return (
     <helix-app-header material="glass" sticky>
-      {/* The wordmark is the way back to the first page, which is what a reader
-          expects of one, so there is no third destination in the bar saying the
-          same thing. It is also the only name of the project on the screen: the
-          landing page leads with what this is rather than with what you called
-          it.
+      {/* The wordmark is the way back to the first page, as a wordmark usually
+          is, so there is no third destination in the bar saying the same thing.
+          It is also the only name of the project on the screen: the landing
+          page leads with what the starter is.
 
           The mark is a placeholder for your own, and it is drawn in
           `--helix-color-brand-mark`, the token for the brand as a graphic. */}
@@ -67,8 +64,8 @@ export function SiteHeader() {
       </Link>
 
       {/* The links are yours. Navigation owns the marker that travels between
-          them and renders no anchors of its own, because a router renders its
-          own and could not render them inside this shadow root. The base layer
+          them and renders no anchors of its own, since a router renders its
+          own, which could not sit inside this shadow root. The base layer
           styles them, `aria-current="page"` included. */}
       <helix-navigation label="Pages">
         <Link aria-current={path === '/overview' ? 'page' : undefined} href="/overview">
@@ -79,9 +76,8 @@ export function SiteHeader() {
         </Link>
       </helix-navigation>
 
-      {/* An icon with no words has no accessible name unless it is given one,
-          which is the whole reason this is its own element rather than a button
-          with a glyph in it. */}
+      {/* An icon with no words has no accessible name until it is given one,
+          which is why this is its own element. */}
       <helix-icon-button
         label={`Color mode: ${mode}`}
         onClick={cycle}

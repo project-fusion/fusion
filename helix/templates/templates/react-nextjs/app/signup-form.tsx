@@ -21,21 +21,21 @@ interface Message {
  * The form.
  *
  * **Every control here is a form-associated custom element**, so a `<form>`
- * collects them, resets them and validates them the way it does an `<input>`.
- * That is what `ElementInternals` buys, and the submit below proves it: it reads
- * the answers with `new FormData(form)` and nothing gathers them by hand.
+ * collects them, resets them, and validates them the way it does an `<input>`.
+ * `ElementInternals` makes that possible, and the submit below proves it: it
+ * reads the answers with `new FormData(form)`, and nothing gathers them by hand.
  *
- * There is no wrapping `Field` component. A label in one shadow root cannot name
- * a control in another, so every control renders its own `label`, `hint` and
- * `feedback` instead.
+ * There is no wrapping `Field` component. A label in one shadow root cannot
+ * name a control in another, so every control renders its own `label`, `hint`,
+ * and `feedback`.
  */
 export function SignupForm() {
   const [handle, setHandle] = useState('')
   const [messages, setMessages] = useState<readonly Message[]>([])
 
   const join = (event: FormEvent<HTMLFormElement>) => {
-    /* The page answers this, so nothing navigates. Remove the line and the form
-       posts to the server like any other, with the same names. */
+    /* The page takes the submit, so nothing navigates. Remove the line and the
+       form posts to the server like any other, with the same names. */
     event.preventDefault()
     const answers = [...new FormData(event.currentTarget).entries()]
       .map(([field, value]) => `${field}=${value}`)
@@ -58,18 +58,16 @@ export function SignupForm() {
         </helix-text>
       </header>
 
-      {/* The form takes a column of its own and the notes take what is left, so a
-          wide window is a page rather than a form with a void beside it. At 390
-          the two stack and the notes read as a postscript. */}
+      {/* The form takes a column of its own and the notes take what is left. At
+          390 the two stack, and the notes read as a postscript. */}
       <div className="split">
       <form className="form" onSubmit={join}>
         <helix-input autocomplete="name" label="Name" name="name" required />
 
         {/* Validation is the platform's: `type` and `required` are set on the
-            real input inside, and its own message is what shows once the reader
-            has touched the field. Set `feedback` to say it in your own words
-            instead, and it shows from the first paint rather than after a
-            mistake. */}
+            real input inside, and its own message shows once the field has been
+            touched. Set `feedback` to say it in your own words, and it shows
+            from the first paint. */}
         <helix-input
           hint="Where we send the welcome note."
           label="Email"
@@ -81,11 +79,11 @@ export function SignupForm() {
         {/* **A controlled value, which is the one habit to unlearn.** The handler
             is a prop named for the event, so `onhelix-before-change` hears
             `helix-before-change`. A Helix element is not read-only: writing
-            `value` seeds it and the element goes on applying its own changes, so
-            taking the decision means refusing the change with `preventDefault()`
-            and then setting the value you want. Declining to call `setHandle` is
-            not a refusal, and leaves the element holding what you did not
-            accept. */}
+            `value` seeds it, and the element goes on applying its own changes.
+            So taking the decision means refusing the change with
+            `preventDefault()`, then setting the value you want. Leaving
+            `setHandle` uncalled refuses nothing, and the element keeps the value
+            you meant to turn down. */}
         <helix-input
           hint="Lowercase and hyphens, whatever you type."
           label="Handle"
@@ -105,8 +103,8 @@ export function SignupForm() {
           ))}
         </helix-select>
 
-        {/* A switch is a thing happening now rather than an answer a form asks
-            for, which is why it says on and off. It still submits, as `on`. */}
+        {/* A switch is a thing happening now, which is why it says on and off.
+            It still submits, as `on`. */}
         <helix-switch label="Send me the weekly digest" name="digest" />
 
         <helix-button emphasis="solid" tone="primary" type="submit">
@@ -115,27 +113,26 @@ export function SignupForm() {
       </form>
 
         <aside className="notes">
-          {/* The one fact a reader needs before typing their name into a page
-              they have had for five minutes, which is why it is a callout and
-              not the fourth line of a paragraph. `tone` is the meaning and the
-              component decides what that looks like: a tint mixed from the
-              status color and a bar on the inline start, so it survives being
-              read in grayscale. */}
+          {/* The one fact you need before typing your name into a page you have
+              had for five minutes, so it is a callout. `tone` is the meaning,
+              and the component draws it with a tint mixed from the status color
+              and a bar on the inline start, so it survives being read in
+              grayscale. */}
           <helix-callout tone="info">
-            Nothing is posted anywhere. Submit it and the message shows exactly what a server would
-            have been handed.
+            The form posts nothing. Submit it, and a message shows exactly what a server would
+            receive.
           </helix-callout>
           <helix-text as="h2" variant="title">
-            What this is showing
+            What the form shows
           </helix-text>
           <helix-text as="p" emphasis="muted" variant="body">
-            Every control is a form-associated custom element, so the submit reads them with{' '}
-            <helix-code>new FormData(form)</helix-code> and nothing gathers the answers by hand.
-            Reset the form and they all go back, the way an <helix-code>input</helix-code> does.
+            Every control is a form-associated custom element, so the submit reads them all
+            with <helix-code>new FormData(form)</helix-code>. Reset the form and they all go back,
+            the way an <helix-code>input</helix-code> does.
           </helix-text>
           <helix-text as="p" emphasis="muted" variant="body">
-            Leave the email wrong and the complaint is the browser's own, in the reader's language.
-            Handle is the controlled one: it refuses the change and writes back what it will accept.
+            Leave the email wrong and the browser shows its own message, in your language. Handle is
+            the controlled field: the page refuses each change and writes back a cleaned value.
           </helix-text>
           <a data-link href={DOCS.forms}>
             Forms
@@ -145,9 +142,9 @@ export function SignupForm() {
 
       {/* **The region is rendered whether or not there is anything in it.**
           Assistive technology subscribes to a live region, and one that arrives
-          already holding its message is frequently never announced. Nothing
-          creates or destroys a message here either: the items are state, and a
-          dismissed one asks to go through `helix-dismiss`. */}
+          already holding its message is often never announced. Messages are
+          state, so nothing creates or destroys one here, and a dismissed one
+          asks to go through `helix-dismiss`. */}
       <helix-toast>
         {messages.map((message) => (
           <helix-toast-item

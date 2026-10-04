@@ -11,8 +11,7 @@ type Mode = (typeof MODES)[number]
 const MARKS: Record<Mode, string> = { dark: 'moon', light: 'sun', system: 'monitor' }
 
 const path = usePathname()
-/* `system` is the resting state, so the control draws the same glyph before and
-   after the reader first touches it. */
+/* `system` is the resting state, the mode the page follows until the control is pressed. */
 const mode = ref<Mode>('system')
 
 /**
@@ -24,7 +23,7 @@ const mode = ref<Mode>('system')
  * panel for a light preview inside a dark page.
  *
  * `system` removes the attribute. Writing out whichever mode is current would
- * freeze the page there the moment the reader's machine changed.
+ * hold the page there when the system's own setting changed.
  */
 const cycle = () => {
   const next = MODES[(MODES.indexOf(mode.value) + 1) % MODES.length] ?? 'system'

@@ -1,30 +1,28 @@
 /*
  * The page around the components.
  *
- * Helix draws its own insides, so what is left to an app stylesheet is the
- * measure, the rhythm between blocks, and the few things a component
- * deliberately leaves open. Everything below is a Helix token or a documented
- * hook, so a theme moves it and both color modes follow without a second copy
- * of anything.
+ * Helix draws the inside of each component, so an app stylesheet holds the
+ * measure, the rhythm between blocks, and the few decisions a component leaves
+ * open. Everything below is a Helix token or a documented hook, so a theme
+ * changes it, and both color modes follow from one copy.
  *
- * **Color appears twice and both places are named.** The wordmark takes
- * `--helix-color-brand-mark`, which is the token for the brand as a graphic
- * rather than as a word, and a chosen row takes `--helix-color-primary-subtle`
- * through the parts the table publishes. Everywhere else this page is ink on the
- * background and the components carry their own.
+ * **Color appears in two places, and both are named.** The wordmark takes
+ * `--helix-color-brand-mark`, the token for the brand as a graphic, and a
+ * chosen row takes `--helix-color-primary-subtle` through the parts the table
+ * publishes. Everywhere else the page is ink on the background, and the
+ * components carry their own color.
  */
 
 /*
- * **The shell, and what stops a short route ending in a void.** The overview is
- * a header, a table and a caption, which on a 1280 by 900 window left something
- * like four hundred pixels of nothing under it: a page that stopped rather than
- * a page that finished. A column the height of the window with the footer at the
- * end of it puts a floor under every route.
+ * **The shell: a column the height of the window, with the footer at its end.**
+ * The overview is a header, a table, and a caption, which on a 1280 by 900
+ * window left about four hundred empty pixels under it. The column puts a floor
+ * under every route.
  *
- * **Flex and not grid, because the bar is sticky.** A grid item's containing
- * block is its own grid area, which is one row as tall as the bar, so a sticky
- * header in a grid row sticks for nothing. A flex item's containing block is the
- * flex container, which is the whole document.
+ * **A flex column, because the bar is sticky.** A grid item's containing block
+ * is its own grid area, one row as tall as the bar, so a sticky header in a
+ * grid row has nowhere to stick. A flex item's containing block is the flex
+ * container, which here is the whole document.
  */
 .shell {
   display: flex;
@@ -33,14 +31,13 @@
 }
 
 /*
- * **56rem, which is a measure rather than a maximum.** A page is as wide as its
- * widest block can be read at, and the widest block here is a four-column table:
- * given the whole of a 1280 window its first column came out 448 pixels across
- * to hold a name, which reads as a table that has been stretched rather than
- * laid out. The bar and the footer are centered in the same width, so the
- * wordmark sits over the first column of the page rather than near it.
+ * **56rem, the width the widest block reads well at.** The widest block here is
+ * a four-column table: given the whole of a 1280 window, its first column came
+ * out 448 pixels across to hold a name, which reads as a stretched table. The
+ * bar and the footer are centered in the same width, so the wordmark sits over
+ * the first column of the page.
  *
- * `flex-grow` is what hands the slack to the page rather than to the footer.
+ * `flex-grow` gives the spare height to the page, and the footer keeps its own.
  */
 .page {
   flex-grow: 1;
@@ -51,23 +48,21 @@
 }
 
 /*
- * Two documented hooks, and both are about agreeing with the page. The bar
- * centers its row in the page's measure, so the wordmark sits over the first
- * column rather than near it. And it draws no line under itself by default,
- * because a header over a page that already has a surface does not need one:
- * this page has no such surface, so it asks for one. A token rather than a
- * color, so it follows the theme.
+ * Two documented hooks, both to match the page. The bar centers its row in the
+ * page's measure, so the wordmark sits over the first column. And the bar draws
+ * no line under itself by default, since a header over a page with its own
+ * surface needs none: this page has no such surface, so it sets one. The line
+ * is a token, so it follows the theme.
  */
 helix-app-header {
   --app-header-border-color: var(--helix-color-border);
   --app-header-max-inline-size: 56rem;
 }
 
-/* The mark beside the project's name, which is the one graphic on the page and
-   the reason `--helix-color-brand-mark` exists: a mark answers to the 3:1 WCAG
-   asks of a graphic rather than to the 4.5 a word does, so it may sit closer to
-   the brand a theme was seeded with than any text color can. Swap the glyph, or
-   replace the whole element with your own logo. */
+/* The mark beside the project's name, the one graphic on the page and the
+   reason `--helix-color-brand-mark` exists. WCAG asks 3:1 of a graphic and 4.5:1
+   of text, so a mark can sit closer to a theme's brand color than any text
+   color can. Swap the glyph, or replace the whole element with your own logo. */
 .wordmark {
   align-items: center;
   display: inline-flex;
@@ -79,16 +74,15 @@ helix-app-header {
 }
 
 /*
- * One rhythm between the blocks of a page, so no page states its own.
+ * One rhythm between the blocks of a page, so no page sets its own.
  *
- * **`minmax(0, 1fr)` and never a bare column, which is the trap in every grid
- * here.** An implicit track is `auto`, and an `auto` track's minimum is its
- * content's min-content size, so a child that would rather scroll itself widens
- * the track instead and takes the page with it. Measured at 320: the table's
- * columns floor at 344, the column it sits in should have been 288, and
- * `documentElement.scrollWidth` came back 360 against a 320 viewport. The whole
- * page scrolled sideways so that a table with its own scrollport would not have
- * to. Zero as the minimum hands the overflow back to whoever is equipped for it.
+ * **`minmax(0, 1fr)` for every column, the guard every grid here needs.** An
+ * implicit track is `auto`, and an `auto` track's minimum is its content's
+ * min-content size, so a child that scrolls itself widens the track and takes
+ * the page with it. Measured at 320: the table's columns floor at 344, the
+ * column it sits in should have been 288, and `documentElement.scrollWidth`
+ * came back 360 against a 320 viewport, so the whole page scrolled sideways. A
+ * minimum of zero leaves the overflow to the table, which scrolls its own box.
  */
 .stack,
 .section,
@@ -102,24 +96,22 @@ helix-app-header {
 }
 
 /* One step between the blocks of a page and a smaller one inside them, which is
-   the whole of the rhythm: `3xl` here against the `md` a section puts between
-   its heading and its block, so a reader sees three groups rather than six
-   evenly spaced things. */
+   the whole of the rhythm: `3xl` here, and the `md` a section puts between its
+   heading and its block, so the landing page reads as three groups. */
 .stack {
   display: grid;
   gap: var(--helix-space-3xl);
 }
 
 /*
- * **The first screen is two things at once**, which is what makes it a screen
- * rather than a stack: what this is, on the left, and the library doing it, on
- * the right. Below 60rem there is no room for two columns that are both worth
- * reading, so they become one and the panel reads as the thing the words were
- * about.
+ * **The first screen holds two things side by side**: what the starter is, on
+ * the left, and the library at work, on the right. Below 60rem two readable
+ * columns do not fit, so they become one, and the panel follows the words it
+ * illustrates.
  *
- * `start`, because a grid column stretches to its tallest sibling: the panel
- * beside a taller block of words would otherwise grow to match it and spread its
- * own regions out to fill the difference.
+ * `start`, because a grid item stretches to its tallest sibling: beside a
+ * taller block of words, the panel would grow to match and spread its own
+ * regions out to fill the difference.
  */
 .first-screen {
   align-items: start;
@@ -133,18 +125,17 @@ helix-app-header {
   }
 }
 
-/* A heading and the lines around it are one block, and the gap between them is
-   not the gap between blocks. Every route opens with one. */
+/* A heading and the lines around it are one block, with a smaller gap than the
+   one between blocks. Every route opens with one. */
 .hero {
   display: grid;
   gap: var(--helix-space-xs);
   justify-items: start;
 }
 
-/* **A measure for the lede, which the page's own is too wide to be.** A line of
-   prose across 56rem is around 110 characters, and the readable range tops out
-   near 75. The heading above it is exempt: a heading is scanned rather than
-   read along. */
+/* **A measure for the lede, narrower than the page's.** A line of prose across
+   56rem is around 110 characters, and the readable range tops out near 75. The
+   heading above it keeps the page's measure, since a heading is scanned. */
 .lede {
   max-inline-size: 42rem;
 }
@@ -157,12 +148,11 @@ helix-app-header {
 }
 
 /*
- * **The panel is the library rather than a picture of it**, so the only thing it
- * needs from here is room. Two documented hooks: the figures come down a step
- * from the display size, which is set for a figure on its own and is too loud
- * for three of them in a 20rem column, and the rule between them comes in from
- * `2xl`, which `divided` doubles and which would leave no column to put a
- * number in.
+ * **The panel is the library at work**, so all it needs from here is room. Two
+ * documented hooks: the figures come down a step from the display size, which
+ * suits one figure on its own and is too loud for three in a 20rem column, and
+ * the gap around the rule between them comes in from `2xl`, which `divided`
+ * doubles, leaving no room for a number.
  */
 .specimen {
   --stat-group-gap: var(--helix-space-md);
@@ -177,16 +167,13 @@ helix-app-header {
 }
 
 /*
- * **Three facts about the library, and deliberately not three cards.** A row of
- * identical outlined boxes is the shape a generated page takes, and it is also a
- * claim: a box says each of these is its own object, when they are three
- * paragraphs about the same installed thing. A rule over each column groups them
- * at a fraction of the weight, and leaves the cards below to mean something,
- * which is that they go somewhere.
+ * **Three facts about the library, each under a rule.** A box around each would
+ * say each is its own object, when they are three paragraphs about one
+ * installed thing. A rule over each column groups them at a fraction of the
+ * weight, and leaves boxes to the cards below, which each link somewhere.
  *
- * `border-thick` in the foreground rather than a hairline in the border color:
- * this is a heading device rather than a container edge, and it is the one place
- * the page draws in ink.
+ * `border-thick` in the foreground color: the rule heads a column, and it is
+ * the one place the page draws in ink.
  */
 .facts {
   display: grid;
@@ -209,11 +196,10 @@ helix-app-header {
 }
 
 /*
- * **The one departure the grids state.** `helix-grid` takes a fixed count as
- * plain CSS, which is what keeps a server-rendered row of cards correct before
- * any JavaScript arrives. Below this width there is only ever room for one
- * column, and `--grid-columns` is the documented way to say so from outside the
- * shadow root.
+ * **One column below 48rem.** `helix-grid` takes a fixed count as plain CSS,
+ * which keeps a server-rendered row of cards correct before any JavaScript
+ * arrives. Below this width there is room for one column, and `--grid-columns`
+ * is the documented way to say so from outside the shadow root.
  */
 @media (width < 48rem) {
   helix-grid {
@@ -222,25 +208,22 @@ helix-app-header {
 }
 
 /*
- * **The cards keep `start`, which is `--card-align`'s resting value, and the
- * alternative is worth naming because it looks right and is not.**
- * `space-between` puts the last line of each card on its bottom edge, so a row
- * of cards ends in a straight line. It gets there by sharing the slack out
- * between every region, and the first thing that moves is the body: three cards
- * of six, five and seven lines had their opening lines 50 pixels apart under
- * headings that were level. A reader scans the first line of each, so that is
- * the alignment worth keeping.
+ * **The cards keep `start`, `--card-align`'s resting value.** `space-between`
+ * would end a row of cards in a straight line by sharing the spare height out
+ * between every region, and the body moves first: three cards of six, five, and
+ * seven lines had their opening lines 50 pixels apart under level headings. You
+ * scan the first line of each, so that is the alignment worth keeping.
  */
 
 /* The card fills the link that wraps it, so a row of destinations ends level:
-   the anchor is the grid item and stretches, and the card inside it does not.
-   The regions stay packed at the top, per `--card-align` above. */
+   the anchor is the grid item, which stretches, and the card takes its full
+   height. The regions stay packed at the top, per `--card-align` above. */
 [data-card] > helix-card {
   block-size: 100%;
 }
 
-/* A form is read straight down, and a field wider than about this stops being
-   scannable however much room the window has. */
+/* A form is read straight down, and a field wider than about 28rem is hard to
+   scan, however much room the window has. */
 .form {
   align-content: start;
   display: grid;
@@ -255,11 +238,10 @@ helix-app-header {
 }
 
 /*
- * **The form takes a column and the notes take the rest.** A 28rem form on a
- * 1280 window is a third of a page and two thirds of nothing, which is what the
- * measure above cannot fix on its own: the form has a right width and the page
- * does not shrink to it. Narrow, the two stack and the notes read as a
- * postscript, which is the order they are written in.
+ * **The form takes a column and the notes take the rest.** A 28rem form alone
+ * on a 1280 window fills a third of the page and leaves two thirds empty: the
+ * form has a right width, and the page keeps its own. Narrow, the two stack,
+ * and the notes read as a postscript, the order they are written in.
  */
 .split {
   display: grid;
@@ -291,10 +273,10 @@ helix-app-header {
 }
 
 /*
- * **The counterpart to the bar, and the reason every route now ends rather than
- * stops.** The rule runs the window while its contents keep the page's measure,
- * which is what a footer under a centered page looks like; the shell above is
- * what holds it to the bottom of a window a route does not fill.
+ * **The counterpart to the bar, which gives every route an end.** The rule runs
+ * the width of the window while its contents keep the page's measure, as a
+ * footer under a centered page does. The shell above holds it to the bottom of a
+ * window a route does not fill.
  */
 .site-footer {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
@@ -318,10 +300,10 @@ helix-app-header {
 }
 
 /*
- * **Narrow, the gutter gives before the content does.** 24 pixels either side of
- * a 390 window is 48 of 390 spent on margin, and the table needs 355 of what is
- * left. At `md` it has 358 and fits; at `lg` it was 13 pixels short and the last
- * column sat outside the box until the reader scrolled the table sideways.
+ * **Narrow, the gutter gives first.** 24 pixels either side of a 390 window
+ * spend 48 of 390 on margin, and the table needs 355 of what is left. At `md` it
+ * has 358 and fits; at `lg` it was 13 pixels short, and the last column sat
+ * outside the box until you scrolled the table sideways.
  */
 @media (width < 40rem) {
   .page {
@@ -336,22 +318,21 @@ helix-app-header {
 
 /*
  * **The escape hatch, and the reason a component names its parts.** The table
- * washes a chosen row at the strength `Tag` rests at; this page wants a row
- * somebody has ticked to be findable from across the screen, and there is no
- * token for "more than that". `::part` reaches the boxes the component drew
- * without forking it, and a rule written out here beats the component's own
- * however specific that one is.
+ * tints a chosen row at the strength `Tag` rests at, and this page wants a
+ * ticked row easy to find from across the screen, a step past any token.
+ * `::part` reaches the boxes the component drew, with no fork, and a rule
+ * written out here beats the component's own, however specific that one is.
  *
- * **Two parts and not one, because a row has no box.** The row is
- * `display: contents` so that one grid can align every column across every row,
- * which leaves the cells as the only thing a selection can be painted on. The
- * table names both: the data cells and the cell holding the checkbox. Naming
- * only the first leaves a pale stripe down the left of every chosen row.
+ * **Two parts, because a row has no box.** The row is `display: contents`, so
+ * one grid can align every column across every row, and the cells are what a
+ * selection is painted on. The table names both: the data cells and the cell
+ * holding the checkbox. Naming only the first leaves a pale stripe down the
+ * left of every chosen row.
  *
  * The values are still the library's, so a theme carries them like everything
- * else. `primary-subtle` and not `primary-surface`: the second is the solid
- * accent a button stands on and expects white on top of it, so a row painted
- * with it puts the table's own ink on a saturated fill.
+ * else. `primary-subtle`, because `primary-surface` is the solid accent a
+ * button stands on, made for white text, so a row painted with it would put the
+ * table's own ink on a saturated fill.
  */
 helix-data-table::part(cell-selected),
 helix-data-table::part(select-selected) {
