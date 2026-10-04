@@ -14,7 +14,8 @@
  */
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
-import type { Finding, Report, Severity } from './report.js'
+import type { Finding, Report, RuntimeEntry, Severity } from './report.js'
+import { shownRuntime } from './runtime.js'
 
 /** What the CI sink writes, and what fails the job. */
 export interface CiOptions {
@@ -58,9 +59,21 @@ export const ciSink = (
   const failing =
     failOn === 'never' ? [] : all.filter(({ finding }) => RANK[finding.severity] >= RANK[failOn])
   const unread = runs.reduce((total, run) => total + run.coverage.unreadable.length, 0)
+  /* **Each runtime event once**, by fingerprint, with every page that heard it.
+     Reported and never failing: what the library said as it ran is advice
+     about how it is used, and the findings are what a job is held to. */
+  const events = new Map<string, { entry: RuntimeEntry; pages: Set<string> }>()
+  for (const run of runs) {
+    for (const entry of shownRuntime(run.runtime ?? [])) {
+      const event = events.get(entry.fingerprint) ?? { entry, pages: new Set<string>() }
+      event.pages.add(run.run.page ?? '(no page)')
+      events.set(entry.fingerprint, event)
+    }
+  }
 
   const lines = [
     `helix diagnostics: ${counted(runs.length, 'run')}, ${counted(of('error'), 'error')}, ${counted(of('warn'), 'warning')}, ${of('info')} info` +
+      (events.size > 0 ? `, ${events.size} runtime` : '') +
       (unread > 0 ? `, ${counted(unread, 'unreadable stylesheet')}` : '') +
       `. Written to ${file}.`,
   ]
@@ -69,6 +82,14 @@ export const ciSink = (
     lines.push(
       `  ${finding.severity} ${finding.kind}: ${finding.subject}`,
       `    ${finding.message}`,
+      `    on ${where.slice(0, 5).join(', ')}${where.length > 5 ? `, and ${where.length - 5} more` : ''}`,
+    )
+  }
+  for (const { entry, pages } of events.values()) {
+    const where = [...pages].sort()
+    lines.push(
+      `  runtime ${entry.kind}${entry.tag ? ` <${entry.tag}>` : ''}`,
+      `    ${entry.message}`,
       `    on ${where.slice(0, 5).join(', ')}${where.length > 5 ? `, and ${where.length - 5} more` : ''}`,
     )
   }

@@ -216,3 +216,38 @@ fn with_json_each_line_is_one_document_a_script_reads() {
     assert_eq!(line["counts"]["warn"], 0);
     assert_eq!(line["findings"][0]["fingerprint"], "f1");
 }
+
+#[test]
+fn a_runtime_event_is_counted_and_printed_once_and_one_a_finding_says_is_left_out() {
+    let relay = Relay::start("runtime", None);
+    let run = r#"{
+      "schema": 1,
+      "run": { "id": "r1", "page": "/table" },
+      "findings": [],
+      "runtime": [
+        { "count": 2, "fingerprint": "t1", "kind": "too-many-rows", "level": "warn",
+          "message": "Drawing 3000 rows at once.", "printed": true, "tag": "helix-data-table" },
+        { "count": 1, "fingerprint": "d1", "kind": "duplicate-registration", "level": "warn",
+          "message": "Two copies.", "printed": true, "tag": "helix-button" }
+      ]
+    }"#;
+    relay.ask("POST", "/runs", Some("http://localhost:5173"), run);
+    let printed = relay.printed().join("\n");
+    assert!(
+        printed.contains("/table: 0 errors, 0 warnings, 0 info, 1 runtime"),
+        "{printed}"
+    );
+    assert!(
+        printed.contains("warn runtime too-many-rows <helix-data-table>"),
+        "{printed}"
+    );
+    assert!(printed.contains("Drawing 3000 rows at once."), "{printed}");
+    assert!(!printed.contains("duplicate-registration"), "{printed}");
+    relay.ask(
+        "POST",
+        "/runs",
+        Some("http://localhost:5173"),
+        &run.replace("\"r1\"", "\"r2\""),
+    );
+    assert!(relay.printed().is_empty());
+}

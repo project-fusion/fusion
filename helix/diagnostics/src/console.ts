@@ -9,6 +9,7 @@
  * | A finding at `error` | `console.error` | The CSS does nothing where it was written |
  * | A finding at `warn` | `console.warn` | Worth fixing, and the page works |
  * | A finding at `info` | `console.info` | Advice |
+ * | A runtime event core left to diagnostics | `console.warn`, or `console.error` for a failure | The library was used wrong as it ran |
  * | Unreadable stylesheets | `console.warn` | The run could not see part of the page |
  * | Coverage, overrides, a clean run | `console.info` | What the run looked at |
  * | Usage | `console.debug` | For whoever studies usage, hidden at the default level |
@@ -25,6 +26,7 @@
  * OTLP exporter are the same `Report` consumed differently.
  */
 import type { Finding, Report, Severity } from './report.js'
+import { shownRuntime } from './runtime.js'
 
 /** The console methods this sink calls. A test hands in its own. */
 export type ConsoleSink = Pick<
@@ -81,19 +83,21 @@ export const report = (
   const warnings = bySeverity('warn')
   const off = configuration.silenced.reduce((total, one) => total + one.count, 0)
   const missed = coverage.sheets - coverage.read
+  const runtime = shownRuntime(result.runtime)
 
   const counts = [
     counted(errors, 'error'),
     counted(warnings, 'warning'),
     `${bySeverity('info')} info`,
+    ...(runtime.length > 0 ? [`${runtime.length} runtime`] : []),
     ...(off > 0 ? [`${off} turned off`] : []),
   ]
   const heading =
-    findings.length === 0 && off === 0
+    findings.length === 0 && off === 0 && runtime.length === 0
       ? 'helix diagnostics: no findings'
       : `helix diagnostics: ${counts.join(', ')}`
   /* Open where there is something to act on, closed where there is not. */
-  if (errors + warnings > 0 || missed > 0) {
+  if (errors + warnings + runtime.length > 0 || missed > 0) {
     to.group(heading)
   } else {
     to.groupCollapsed(heading)
@@ -140,6 +144,19 @@ export const report = (
     }
     if (before > 0) {
       to.info(`${counted(before, 'finding')} printed before, on this page, and not again`)
+    }
+  }
+
+  /* **Only the runtime events core left here**, each once. Core printed the
+     rest as they happened, with the stack they happened in, and the heading
+     counts them all. */
+  if (levels.runtime !== 'off') {
+    for (const one of runtime) {
+      if (one.printed || shown?.has(one.fingerprint)) {
+        continue
+      }
+      shown?.add(one.fingerprint)
+      to[one.level](`${one.kind}${one.tag ? ` <${one.tag}>` : ''}: ${one.message}`)
     }
   }
 

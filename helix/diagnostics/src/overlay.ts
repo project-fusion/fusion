@@ -15,6 +15,7 @@
 import { matchable } from './analyze.js'
 import { OVERLAY } from './page.js'
 import type { Finding, Report, Severity } from './report.js'
+import { shownRuntime } from './runtime.js'
 
 /** What a running instance does with the overlay. */
 export interface Overlay {
@@ -284,15 +285,14 @@ export const overlayOn = (page: Document): Overlay => {
     }
   })
 
-  /** Outlines the element a finding is about, where the page holds one. */
-  const point = (finding: Finding | undefined): void => {
-    const target = finding ? locate(finding, page) : null
+  /** Outlines the element an entry is about, where the page holds one. */
+  const point = (target: Element | null, severity?: Severity): void => {
     if (!target) {
       outline.hidden = true
       return
     }
     const box = target.getBoundingClientRect()
-    outline.style.borderColor = `var(--${finding?.severity})`
+    outline.style.borderColor = `var(--${severity})`
     outline.style.insetBlockStart = `${box.top - 3}px`
     outline.style.insetInlineStart = `${box.left - 3}px`
     outline.style.blockSize = `${box.height + 2}px`
@@ -300,16 +300,30 @@ export const overlayOn = (page: Document): Overlay => {
     outline.hidden = false
   }
 
+  /** Outlines an entry's element while it is pointed at or focused. */
+  const follow = (item: HTMLElement, target: () => Element | null, severity: Severity): void => {
+    item.addEventListener('mouseenter', () => point(target(), severity))
+    item.addEventListener('focus', () => point(target(), severity))
+    item.addEventListener('mouseleave', () => point(null))
+    item.addEventListener('blur', () => point(null))
+  }
+
   const show = (run: Report): void => {
     const findings = run.findings
+    const runtime = shownRuntime(run.runtime)
     const of = (severity: Severity) => findings.filter((one) => one.severity === severity).length
-    const worst: Severity = of('error') > 0 ? 'error' : of('warn') > 0 ? 'warn' : 'info'
-    const counts = (['error', 'warn', 'info'] as const)
-      .filter((severity) => of(severity) > 0)
-      .map((severity) => counted(of(severity), severity))
-      .join(', ')
-    badge.hidden = findings.length === 0
-    if (findings.length === 0) {
+    const failed = runtime.some((one) => one.level === 'error')
+    const worst: Severity =
+      of('error') > 0 || failed ? 'error' : of('warn') > 0 || runtime.length > 0 ? 'warn' : 'info'
+    const counts = [
+      ...(['error', 'warn', 'info'] as const)
+        .filter((severity) => of(severity) > 0)
+        .map((severity) => counted(of(severity), severity)),
+      ...(runtime.length > 0 ? [`${runtime.length} runtime`] : []),
+    ].join(', ')
+    const total = findings.length + runtime.length
+    badge.hidden = total === 0
+    if (total === 0) {
       open(false)
     }
     dot.style.background = `var(--${worst})`
@@ -332,10 +346,32 @@ export const overlayOn = (page: Document): Overlay => {
             make('pre', undefined, finding.origin.cssText),
           )
         }
-        item.addEventListener('mouseenter', () => point(finding))
-        item.addEventListener('focus', () => point(finding))
-        item.addEventListener('mouseleave', () => point(undefined))
-        item.addEventListener('blur', () => point(undefined))
+        follow(item, () => locate(finding, page), finding.severity)
+        return item
+      }),
+      /* **What the library reported as it ran**, after the findings: a
+         sentence that says what to do, and the first element of its tag to
+         outline. */
+      ...runtime.map((one) => {
+        const item = make('li')
+        item.tabIndex = 0
+        const head = make('span', 'kind')
+        head.append(make('span', one.level, `${one.level} `), document.createTextNode(one.kind))
+        item.append(head)
+        if (one.tag) {
+          item.append(make('code', 'subject', `<${one.tag}>`))
+        }
+        item.append(
+          worded(one.message),
+          make(
+            'span',
+            'where',
+            one.count === 1
+              ? 'Reported by Helix as the page ran'
+              : `Reported by Helix ${one.count} times as the page ran`,
+          ),
+        )
+        follow(item, () => (one.tag ? page.querySelector(one.tag) : null), one.level)
         return item
       }),
     )

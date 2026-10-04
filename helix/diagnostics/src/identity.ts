@@ -85,6 +85,18 @@ const hash = (text: string): string => {
 export const fingerprintOf = (finding: Pick<Raw, 'kind' | 'subject' | 'tag'>): string =>
   hash(`${finding.kind}\u0000${finding.tag}\u0000${normalize(finding.subject)}`)
 
+/**
+ * A runtime event's identity across runs: its kind, its tag, and its sentence
+ * with each run of digits read as one, so a count in the sentence is not part
+ * of what the event is.
+ */
+export const runtimeFingerprint = (
+  kind: string,
+  tag: string | undefined,
+  message: string,
+): string =>
+  hash(`runtime\u0000${kind}\u0000${tag ?? ''}\u0000${message.replace(/\d[\d,.]*/g, '#')}`)
+
 /** A finding with its category, owner, family, and fingerprint. */
 export const identify = (finding: Raw, tags: Map<string, Published>): Identified => ({
   ...finding,

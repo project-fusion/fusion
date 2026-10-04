@@ -11,6 +11,7 @@ import { index, lintFor, versionsOf } from './manifest.js'
 import { pageOf } from './page.js'
 import type { Environment, Report } from './report.js'
 import { applyRules, overridesOf } from './rules.js'
+import { logged, tally } from './runtime.js'
 import { listed, loadedVersions, styled, type Watcher, walk } from './usage.js'
 import { VERSION } from './version.js'
 
@@ -109,6 +110,24 @@ export const diagnose = (options: Options): Report => {
   const lints = tiers.map((tier) => ({ lint: lintFor(tier) }))
   const tags = index(lints)
   const counted = watcher ? watcher.counts() : walk(document_, walked)
+  /* Without a watcher, the events core kept, which it printed itself. */
+  const runtime = watcher
+    ? watcher.runtime()
+    : (() => {
+        const kept = tally()
+        for (const event of logged()) {
+          kept.add(event, true)
+        }
+        return kept.entries()
+      })()
+  /* **Two copies of Helix, as core reported them**, where nothing was passed:
+     core names each tag registered twice, which a live element alone cannot.
+     Where it reported none, the check compares live elements with their
+     classes, which finds them for a core too old to report. */
+  const reported = runtime
+    .filter((one) => one.kind === 'duplicate-registration' && one.tag !== undefined)
+    .map((one) => one.tag as string)
+  const twice = duplicates ?? (reported.length > 0 ? () => reported : undefined)
   const seen = loadedVersions()
   const manifests = versionsOf(lints)
 
@@ -134,7 +153,7 @@ export const diagnose = (options: Options): Report => {
           [
             ...analyze(located, tags, document_, answered, used, readers),
             ...markup(tags, document_, walked),
-            ...registrations(document_, duplicates, walked),
+            ...registrations(document_, twice, walked),
           ].map((one) => identify(one, tags)),
           file?.rules,
           call.rules,
@@ -164,6 +183,7 @@ export const diagnose = (options: Options): Report => {
       ...(environment === undefined ? {} : { environment }),
       ...(shownPage === undefined ? {} : { page: shownPage }),
     },
+    runtime,
     schema: 1,
     usage: {
       ...listed(counted, tags),

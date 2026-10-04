@@ -142,6 +142,32 @@ export const CATEGORIES = [
 /** A kind of telemetry. */
 export type Category = (typeof CATEGORIES)[number]
 
+/**
+ * A runtime event as a run holds it: what `@fusion.dev/helix-core` reported
+ * as the library ran, such as a selectable table with no `row-key`, one entry
+ * per distinct event on the page.
+ */
+export interface RuntimeEntry {
+  /** How many times it was reported on this page. */
+  count: number
+  /**
+   * Its identity across runs: the kind, the tag, and the sentence with its
+   * numbers left out, so a table drawing 3,000 rows and one drawing 3,200 are
+   * one event.
+   */
+  fingerprint: string
+  /** What went wrong, as core names it, stable across versions. */
+  kind: string
+  /** `error` for a failure, `warn` for a mistake in how the library is used. */
+  level: 'error' | 'warn'
+  /** The sentence core prints, which says what to do. */
+  message: string
+  /** Whether core printed it as it happened; where it did not, the console sink does. */
+  printed: boolean
+  /** The tag of the element it happened on, where there is one. */
+  tag?: string
+}
+
 /** Where a run was declared to happen. Undeclared is never sent. */
 export type Environment = 'ci' | 'development' | 'production'
 
@@ -225,7 +251,17 @@ export interface Configuration {
   console: {
     coverage: 'info' | 'off'
     findings: Severity | 'off'
+    /** The runtime events core left to diagnostics to print. */
+    runtime: 'warn' | 'off'
     usage: 'debug' | 'off'
+  }
+  /** What `@fusion.dev/helix-core` does itself. */
+  core: {
+    /**
+     * Whether core prints each runtime warning as it happens. Off, diagnostics
+     * prints them in its own group, at the `console.runtime` level.
+     */
+    warnings: boolean
   }
   /** How much detail goes with what is sent. */
   detail: {
@@ -274,6 +310,11 @@ export interface Report {
   configuration: Configuration
   coverage: Coverage
   findings: Finding[]
+  /**
+   * What the library reported going wrong as it ran on this page, from its
+   * first load: one entry per distinct event, counted.
+   */
+  runtime: RuntimeEntry[]
   /**
    * The project's own name and labels, as its configuration gives them. The
    * key is never written into a report.
