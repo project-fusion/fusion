@@ -57,7 +57,7 @@ await Bun.write(
        answers no hooks at all, so a rule reading it alone calls both dead. */
     `import '${join(root, 'helix/styled/src/copy-button/index.ts')}'`,
     `export { duplicateRegistrations } from '${join(root, 'helix/core/src/index.ts')}'`,
-    `export { collect, diagnose, watch } from '${join(root, 'helix/diagnostics/src/index.ts')}'`,
+    `export { collect, diagnose, initDiagnostics, watch } from '${join(root, 'helix/diagnostics/src/index.ts')}'`,
   ].join('\n'),
 )
 const bundle = await Bun.build({
@@ -100,6 +100,34 @@ const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascrip
 
 const server = createServer(async (request, response) => {
   const path = (request.url ?? '/').split('?')[0]
+  /* A page with nothing planted, for `initDiagnostics()`. */
+  if (path === '/init') {
+    response.writeHead(200, { 'content-type': 'text/html' })
+    response.end(
+      `<!doctype html><meta charset="utf-8"><title>init</title><link rel="stylesheet" href="/frame.css">`,
+    )
+    return
+  }
+  /* **The CDN, served here**: `/cdn/<package>@<version>/lint.json` answers
+     with the lint data `analyze` wrote, only for the version it describes,
+     so a page asking for another version is refused as a CDN would refuse
+     it. */
+  const asked = /^\/cdn\/(@fusion\.dev\/helix(?:-headless)?)@([^/]+)\/lint\.json$/.exec(path)
+  if (asked) {
+    const tier = asked[1] === '@fusion.dev/helix' ? 'helix/styled' : 'helix/headless'
+    try {
+      const body = await readFile(join(root, tier, 'lint.json'), 'utf8')
+      if (JSON.parse(body).version !== asked[2]) {
+        throw new Error('another version')
+      }
+      response.writeHead(200, { 'content-type': 'application/json' })
+      response.end(body)
+    } catch {
+      response.writeHead(404)
+      response.end()
+    }
+    return
+  }
   if (path === '/') {
     response.writeHead(200, { 'content-type': 'text/html' })
     response.end(
@@ -304,6 +332,67 @@ try {
     say('the dead `::part(buton)` was counted as use as well as reported as a finding.')
   }
 
+  /* **`initDiagnostics()` on a real page**: the lint data loaded through the
+     CDN path for the Helix version core lists, a first run on its own, and a
+     mistake added afterwards found by the next run the schedule makes. */
+  const init = await browser.newPage()
+  await init.goto(`${origin}/init`, { waitUntil: 'load' })
+  const started = await init.evaluate(
+    async ({ collector: source, tag }) => {
+      const url = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }))
+      const { initDiagnostics } = await import(url)
+      const wait = (ms) => new Promise((done) => setTimeout(done, ms))
+      const runs = []
+      const events = []
+      document.addEventListener('helix-diagnostics', (event) => events.push(event.detail))
+      const handle = initDiagnostics({
+        cdn: `${location.origin}/cdn`,
+        environment: 'development',
+        onReport: (run) => runs.push(run),
+      })
+      document.body.innerHTML = `<${tag}>Go</${tag}>`
+      await customElements.whenDefined(tag)
+      for (let at = 0; at < 80 && runs.length === 0; at += 1) {
+        await wait(100)
+      }
+      const first = runs.length
+      document.body.insertAdjacentHTML('beforeend', `<${tag} emphasis="bold">Bold</${tag}>`)
+      for (let at = 0; at < 80 && runs.length === first; at += 1) {
+        await wait(100)
+      }
+      const last = runs.at(-1)
+      handle.stop()
+      return {
+        events: events.length,
+        first,
+        kinds: last?.findings.map((finding) => finding.kind) ?? [],
+        manifests: last?.versions.manifests ?? {},
+        runs: runs.length,
+        versions: last?.versions.helix ?? [],
+      }
+    },
+    { collector, tag: `helix-${FAMILY}` },
+  )
+  await init.close()
+  if (started.first < 1) {
+    say('`initDiagnostics()` made no run on its own within eight seconds of the page loading.')
+  }
+  if (started.runs <= started.first || !started.kinds.includes('invalid-value')) {
+    say(
+      `\`initDiagnostics()\` did not run again after a mistake was added to the page: ${started.runs} runs, the last finding ${JSON.stringify(started.kinds)}.`,
+    )
+  }
+  if (Object.keys(started.manifests).length !== 2) {
+    say(
+      `\`initDiagnostics()\` loaded lint data for ${JSON.stringify(started.manifests)}, where both tiers were wanted for Helix ${started.versions.join(', ')}.`,
+    )
+  }
+  if (started.events !== started.runs) {
+    say(
+      `${started.runs} runs and ${started.events} \`helix-diagnostics\` events, where each run is one.`,
+    )
+  }
+
   /* Exact, not a floor: an extra finding is a false positive. */
   const expected = [
     /* `helix-copy-button { --icon-button-size }` is deliberately absent: the
@@ -339,7 +428,8 @@ try {
     console.log(
       `diagnostics: ${observed.findings.length} planted faults found and none invented, ` +
         `${observed.sheets} sheets across ${observed.roots} shadow roots on ${observed.hosts} elements, ` +
-        `\`::part()\` and \`@media\` both readable in Chromium`,
+        `\`::part()\` and \`@media\` both readable in Chromium, and \`initDiagnostics()\` ran ` +
+        `${started.runs} times on its own, finding the mistake added after its first run`,
     )
   }
 } finally {

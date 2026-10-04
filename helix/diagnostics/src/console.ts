@@ -58,7 +58,21 @@ const RANK: Record<Severity, number> = { error: 3, info: 1, warn: 2 }
  * every finding whatever is printed under it, and the ones the rules turned
  * off, so a quiet console never reads as a clean page.
  */
-export const report = (result: Report, to: ConsoleSink = console): Report => {
+export const report = (
+  result: Report,
+  to: ConsoleSink = console,
+  {
+    shown,
+  }: {
+    /**
+     * The fingerprints already printed for this page. Given, a finding prints
+     * only the first time its fingerprint is seen, and is added; the heading
+     * still counts every finding. `initDiagnostics()` keeps one per page, so
+     * a run after every change does not repeat itself.
+     */
+    shown?: Set<string> | undefined
+  } = {},
+): Report => {
   const { configuration, coverage, findings } = result
   const levels = configuration.console
   const bySeverity = (severity: Severity): number =>
@@ -112,10 +126,20 @@ export const report = (result: Report, to: ConsoleSink = console): Report => {
   /* A severity is named for the console method that carries it. */
   if (levels.findings !== 'off') {
     const floor = RANK[levels.findings]
+    let before = 0
     for (const finding of findings) {
-      if (RANK[finding.severity] >= floor) {
-        to[finding.severity](entry(finding))
+      if (RANK[finding.severity] < floor) {
+        continue
       }
+      if (shown?.has(finding.fingerprint)) {
+        before += 1
+        continue
+      }
+      shown?.add(finding.fingerprint)
+      to[finding.severity](entry(finding))
+    }
+    if (before > 0) {
+      to.info(`${counted(before, 'finding')} printed before, on this page, and not again`)
     }
   }
 
