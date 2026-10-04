@@ -32,7 +32,7 @@ serde_json = { workspace = true, features = ["preserve_order"] }
 [dev-dependencies]
 # Encodes the example plugin into a component, the way a plugin author's
 # toolchain does: the end-to-end test takes the path an author takes.
-wit-component = "0.259"
+wit-component = "0.260"
 
 [lints]
 workspace = true

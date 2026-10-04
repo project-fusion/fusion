@@ -34,7 +34,7 @@ wasmtime = { version = "49", default-features = false, features = [
 # Encodes a core module into a component, which is what a plugin author's
 # toolchain does for them. The tests build the example plugin the long way
 # round so the path an author takes is the path that is measured.
-wit-component = "0.259"
+wit-component = "0.260"
 
 [lints]
 workspace = true
