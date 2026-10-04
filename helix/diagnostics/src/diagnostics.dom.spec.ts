@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
+import type { Report } from './report.js'
 
 /**
  * The collector, against the faults it exists to find.
@@ -23,6 +24,9 @@ const { index, nearest } = await import('./manifest.js')
 const { report } = await import('./console.js')
 const { applyRules, checkRules } = await import('./rules.js')
 const { styled, walk, watch } = await import('./usage.js')
+const { fingerprintOf, identify, normalize } = await import('./identity.js')
+const { checkConfig, pagePattern, resolveConfig } = await import('./config.js')
+const { VERSION } = await import('./version.js')
 
 /** Two tiers, shaped like the real manifests and small enough to read. */
 const tiers = [
@@ -89,7 +93,19 @@ const ruled = (selector: string, declarations: string[] = []) => ({
       rule: {
         cssText: `${selector} { ${declarations.join('; ')} }`,
         selectorText: selector,
-        style: declarations.map((text) => text.split(':')[0]?.trim() ?? ''),
+        /* A declaration list with `getPropertyValue`, as `CSSStyleDeclaration` has. */
+        style: Object.assign(
+          declarations.map((text) => text.split(':')[0]?.trim() ?? ''),
+          {
+            getPropertyValue: (name: string) =>
+              declarations
+                .find((text) => text.split(':')[0]?.trim() === name)
+                ?.split(':')
+                .slice(1)
+                .join(':')
+                .trim() ?? '',
+          },
+        ),
       } as unknown as CSSStyleRule,
       sheet: 'test',
     },
@@ -397,18 +413,30 @@ describe('coverage', () => {
 
 /** A report's other halves, where a test is about coverage or findings. */
 const quiet = {
-  silenced: { argument: 0, file: 0 },
+  configuration: {
+    console: { coverage: 'info', findings: 'info', usage: 'debug' },
+    detail: { evidence: 'full', hookValues: true, pages: 'patterns' },
+    environments: { ci: true, development: true, production: false },
+    overrides: [],
+    silenced: [],
+  },
+  project: { tags: [] },
+  run: { at: '2026-10-04T00:00:00.000Z', duration: 1, id: 'run', source: 'page' },
+  schema: 1,
   usage: {
     axes: {},
     composed: {},
-    counted: 'walked' as const,
+    counted: 'walked',
     hooks: {},
+    hookValues: {},
     parts: {},
     slots: {},
     tags: {},
     unlisted: {},
   },
-}
+  versions: { collector: '0', helix: [], manifests: {}, rules: '0' },
+  withheld: [],
+} satisfies Omit<Report, 'coverage' | 'findings'>
 
 /** A console that records each entry with the method it went to. */
 const recording = () => {
@@ -437,10 +465,13 @@ const finding = (
   severity: 'error' | 'info' | 'warn',
   decidedBy: 'argument' | 'shipped' = 'shipped',
 ) => ({
+  category: 'styling' as const,
   decidedBy,
+  fingerprint: 'f',
   kind: 'dead-part' as const,
   message: 'nope',
   origin: { cssText: 'helix-button::part(x) { }', index: 4, sheet: 'app.css' },
+  owner: 'consumer' as const,
   severity,
   subject: 'helix-button::part(x)',
   tag: 'helix-button',
@@ -534,7 +565,9 @@ describe('the two fixes from review', () => {
     expect(refused.findings.map((one) => one.kind)).toEqual(['manifest-skew'])
     const judged = diagnose({ rules: { 'manifest-skew': 'off' }, tiers })
     expect(judged.findings.map((one) => one.kind)).toEqual(['dead-hook'])
-    expect(judged.silenced).toEqual({ argument: 1, file: 0 })
+    expect(judged.configuration.silenced).toEqual([
+      { count: 1, kind: 'manifest-skew', layer: 'argument' },
+    ])
     style.remove()
     host.remove()
   })
@@ -564,8 +597,11 @@ describe('nearest', () => {
 describe('rules', () => {
   /** One raw finding of a kind, about a tag. */
   const raw = (kind: 'dead-hook' | 'dead-part' | 'unforwarded-part', tag = 'helix-button') => ({
+    category: 'styling' as const,
+    fingerprint: 'f',
     kind,
     message: 'm',
+    owner: 'consumer' as const,
     subject: tag,
     tag,
   })
@@ -613,7 +649,10 @@ describe('rules', () => {
       { 'dead-part': 'off' },
     )
     expect(findings).toHaveLength(0)
-    expect(silenced).toEqual({ argument: 1, file: 2 })
+    expect(silenced).toEqual([
+      { count: 1, kind: 'dead-part', layer: 'argument' },
+      { count: 2, kind: 'unforwarded-part', layer: 'file' },
+    ])
   })
 
   test('an override for a kind that does not exist throws, and names the closest', () => {
@@ -706,8 +745,10 @@ describe('usage', () => {
     const { rules: dead } = ruled('helix-button::part(buton)', ['color: red'])
     expect(styled([...rules, ...hooks, ...dead], tags, new Map())).toEqual({
       hooks: { 'helix-button': { '--button-radius': 1 } },
+      hookValues: { 'helix-button': { '--button-radius': { '0': 1 } } },
       parts: { 'helix-button': { button: 1 } },
     })
+    expect(styled(hooks, tags, new Map(), false).hookValues).toEqual({})
   })
 
   test('diagnose reports usage, walked without a watcher and watched with one', () => {
@@ -748,5 +789,209 @@ describe('manifest skew', () => {
     document.body.append(host)
     expect(skew(tags, document)).toEqual([])
     host.remove()
+  })
+})
+
+describe('identity', () => {
+  test('hashed class names are normalized out, as each bundler writes them', () => {
+    expect(normalize('.trace-graph-module__lFhy0q__traceFrame helix-graph')).toBe(
+      '.trace-graph-module__traceFrame helix-graph',
+    )
+    expect(normalize('.card__title___3xYz1 helix-card')).toBe('.card__title helix-card')
+    expect(normalize('._title_1a2b3_7  helix-card')).toBe('._title helix-card')
+  })
+
+  test('the same fault in the next build has the same fingerprint, and another fault another', () => {
+    const one = fingerprintOf({
+      kind: 'dead-hook',
+      subject: '.a__lFhy0q__b helix-card { --x }',
+      tag: 'helix-card',
+    })
+    const next = fingerprintOf({
+      kind: 'dead-hook',
+      subject: '.a__Zq81Pw__b helix-card { --x }',
+      tag: 'helix-card',
+    })
+    const other = fingerprintOf({
+      kind: 'dead-part',
+      subject: '.a__lFhy0q__b helix-card { --x }',
+      tag: 'helix-card',
+    })
+    expect(one).toBe(next)
+    expect(one).not.toBe(other)
+    expect(one).toMatch(/^[0-9a-f]{14}$/)
+  })
+
+  test('a finding gets its category, its owner, and its family from the module path', () => {
+    const own = index([
+      {
+        manifest: {
+          modules: [
+            { declarations: [{ tagName: 'helix-button' }], path: 'src/button/root/button-root.ts' },
+          ],
+        },
+        name: '@fusion.dev/helix',
+      },
+    ])
+    const found = identify(
+      { kind: 'unforwarded-part', message: 'm', subject: 's', tag: 'helix-button' },
+      own,
+    )
+    expect([found.category, found.owner, found.family]).toEqual(['styling', 'helix', 'button'])
+    expect(
+      identify({ kind: 'dead-part', message: 'm', subject: 's', tag: 'helix-button' }, own).owner,
+    ).toBe('consumer')
+  })
+})
+
+describe('configuration', () => {
+  test('the file overrides the defaults, and the call overrides the file, field by field', () => {
+    const { configuration, send } = resolveConfig(
+      { console: { findings: 'warn' }, detail: { pages: 'full' }, send: { usage: false } },
+      { detail: { hookValues: false }, send: { coverage: false, usage: true } },
+    )
+    expect(configuration.console).toEqual({ coverage: 'info', findings: 'warn', usage: 'debug' })
+    expect(configuration.detail).toEqual({ evidence: 'full', hookValues: false, pages: 'full' })
+    expect(send.usage).toEqual({ decidedBy: 'argument', on: true })
+    expect(send.coverage).toEqual({ decidedBy: 'argument', on: false })
+    expect(send.performance).toEqual({ decidedBy: 'shipped', on: false })
+  })
+
+  test('a setting that names nothing throws, and names the closest', () => {
+    expect(() => checkConfig({ sends: {} } as never, 'file')).toThrow(
+      /`sends`, which is no setting. The closest is `send`/,
+    )
+    expect(() => checkConfig({ send: { usag: true } } as never, 'argument')).toThrow(
+      /`send.usag`.*closest is `send.usage`/,
+    )
+  })
+
+  test('a value a setting cannot take throws, and says what it takes', () => {
+    expect(() => checkConfig({ console: { findings: 'loud' } } as never, 'file')).toThrow(
+      /`error`, `warn`, `info`, `off`/,
+    )
+    expect(() => checkConfig({ environments: { production: { sample: 2 } } }, 'file')).toThrow(
+      /from 0 to 1/,
+    )
+    expect(() =>
+      checkConfig({ environments: { production: { sample: 0.1 } } }, 'file'),
+    ).not.toThrow()
+  })
+
+  test('a path becomes a pattern, each record named by it standing for any', () => {
+    expect(pagePattern('/orders/1042/items/9f8e7d6c5b4a')).toBe('/orders/:id/items/:id')
+    expect(pagePattern('/u/3f2504e0-4f89-11d3-9a0c-0305e82c3301/settings')).toBe('/u/:id/settings')
+    expect(pagePattern('/docs/getting-started')).toBe('/docs/getting-started')
+  })
+})
+
+describe('the run', () => {
+  test('a run carries its schema, a new identity, its page as a pattern, and what was withheld', () => {
+    document.body.innerHTML = ''
+    const one = diagnose({
+      environment: 'ci',
+      page: '/products/1042',
+      project: { key: 'secret', name: 'storefront', tags: ['fusion'] },
+      send: { usage: false },
+      tiers,
+    })
+    const two = diagnose({ tiers })
+    expect(one.schema).toBe(1)
+    expect(one.run.id).not.toBe(two.run.id)
+    expect(one.run.environment).toBe('ci')
+    expect(one.run.page).toBe('/products/:id')
+    expect(one.project).toEqual({ name: 'storefront', tags: ['fusion'] })
+    expect(JSON.stringify(one)).not.toContain('secret')
+    expect(one.withheld).toEqual([
+      { category: 'performance', decidedBy: 'shipped' },
+      { category: 'usage', decidedBy: 'argument' },
+    ])
+    expect(one.versions.collector).toBe(VERSION)
+    expect(diagnose({ detail: { pages: 'none' }, page: '/x', tiers }).run.page).toBeUndefined()
+  })
+
+  test('each finding in a run has a category, an owner, and a fingerprint', () => {
+    const style = document.createElement('style')
+    style.textContent = 'helix-button { --button-backgruond-color: red }'
+    document.head.append(style)
+    const [found] = diagnose({ tiers }).findings
+    expect(found?.category).toBe('styling')
+    expect(found?.owner).toBe('consumer')
+    expect(found?.fingerprint).toMatch(/^[0-9a-f]{14}$/)
+    style.remove()
+  })
+})
+
+describe('versions', () => {
+  const slot = Symbol.for('fusion.dev/helix/versions')
+  const store = globalThis as Record<symbol, unknown>
+  const versioned = (version: string) =>
+    tiers.map((tier) => ({
+      ...tier,
+      manifest: { ...tier.manifest, helix: { package: tier.name, version } },
+    }))
+
+  test('a manifest naming another version than the page loads is one finding in place of all others', () => {
+    store[slot] = ['0.136.0']
+    const style = document.createElement('style')
+    style.textContent = 'helix-button { --button-backgruond-color: red }'
+    document.head.append(style)
+    const run = diagnose({ tiers: versioned('0.130.0') })
+    expect(run.findings.map((one) => [one.kind, one.subject])).toEqual([
+      ['manifest-skew', '@fusion.dev/helix@0.130.0'],
+      ['manifest-skew', '@fusion.dev/helix-headless@0.130.0'],
+    ])
+    expect(run.findings[0]?.message).toContain('the page runs Helix 0.136.0')
+    expect(run.versions.helix).toEqual(['0.136.0'])
+    expect(diagnose({ tiers: versioned('0.136.0') }).findings.map((one) => one.kind)).toEqual([
+      'dead-hook',
+    ])
+    style.remove()
+    delete store[slot]
+  })
+
+  test('with no version on either side, the run says none and judges as usual', () => {
+    delete store[slot]
+    const run = diagnose({ tiers })
+    expect(run.versions.helix).toEqual([])
+    expect(run.versions.manifests).toEqual({})
+  })
+})
+
+describe('console levels', () => {
+  test('findings print at or above the project’s floor, and the heading still counts them all', () => {
+    const { entries, sink } = recording()
+    report(
+      {
+        ...quiet,
+        configuration: {
+          ...quiet.configuration,
+          console: { coverage: 'off', findings: 'error', usage: 'off' },
+        },
+        coverage: { read: 1, roots: 0, sheets: 1, unreadable: [] },
+        findings: [finding('error'), finding('warn')],
+      },
+      sink,
+    )
+    expect(entries[0]).toEqual(['group', 'helix diagnostics: 1 error, 1 warning, 0 info'])
+    expect(entries.map(([level]) => level)).toEqual(['group', 'error', 'groupEnd'])
+  })
+
+  test('findings turned off are counted in the heading, and said by kind and layer', () => {
+    const { entries, sink } = recording()
+    report(
+      {
+        ...quiet,
+        configuration: {
+          ...quiet.configuration,
+          silenced: [{ count: 2, kind: 'unforwarded-part', layer: 'file' }],
+        },
+        coverage: { read: 1, roots: 0, sheets: 1, unreadable: [] },
+        findings: [],
+      },
+      sink,
+    )
+    expect(entries[0]?.[1]).toBe('helix diagnostics: 0 errors, 0 warnings, 0 info, 2 turned off')
+    expect(entries).toContainEqual(['info', '2 unforwarded-parts turned off by the file'])
   })
 })

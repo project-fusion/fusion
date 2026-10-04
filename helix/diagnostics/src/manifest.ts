@@ -17,7 +17,15 @@
 
 /** The subset of the manifest schema this reads. Nothing else is touched. */
 export interface ManifestSource {
+  /**
+   * The package and version the manifest describes, which `helix manifest
+   * build` writes from the package's `package.json`. Absent from a manifest
+   * built before 0.137.
+   */
+  helix?: { package?: string; version?: string }
   modules?: Array<{
+    /** Where the module is, which names the family: `src/button/root/button-root.ts`. */
+    path?: string
     declarations?: Array<{
       cssParts?: Array<{ name: string }>
       cssProperties?: Array<{ name: string }>
@@ -40,6 +48,8 @@ export interface Tier {
  * scope, and `analyze.ts` needs both in the same file.
  */
 export interface Published {
+  /** The family, from the module's path: `button` for `src/button/root/button-root.ts`. */
+  family?: string | undefined
   hooks: Map<string, Set<string>>
   parts: Map<string, Set<string>>
 }
@@ -55,6 +65,7 @@ export const index = (tiers: Tier[]): Map<string, Published> => {
   const tags = new Map<string, Published>()
   for (const tier of tiers) {
     for (const module of tier.manifest.modules ?? []) {
+      const family = /^src\/([^/]+)\//.exec(module.path ?? '')?.[1]
       for (const declaration of module.declarations ?? []) {
         const tag = declaration.tagName
         if (!tag) {
@@ -62,7 +73,7 @@ export const index = (tiers: Tier[]): Map<string, Published> => {
         }
         let element = tags.get(tag)
         if (!element) {
-          element = { hooks: new Map(), parts: new Map() }
+          element = { family, hooks: new Map(), parts: new Map() }
           tags.set(tag, element)
         }
         for (const [field, into] of [
@@ -79,6 +90,18 @@ export const index = (tiers: Tier[]): Map<string, Published> => {
     }
   }
   return tags
+}
+
+/** The version each manifest describes, by package, where it says. */
+export const versionsOf = (tiers: Tier[]): Record<string, string> => {
+  const versions: Record<string, string> = {}
+  for (const tier of tiers) {
+    const version = tier.manifest.helix?.version
+    if (version) {
+      versions[tier.manifest.helix?.package ?? tier.name] = version
+    }
+  }
+  return versions
 }
 
 /**

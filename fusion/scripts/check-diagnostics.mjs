@@ -213,6 +213,7 @@ try {
         sheets: report.coverage.sheets,
         unreadable: report.coverage.unreadable,
         usage: report.usage,
+        versions: report.versions,
         watched,
       }
     },
@@ -273,6 +274,25 @@ try {
       `the watcher counted ${observed.watched.tags[tagged]} \`${tagged}\` where ${observed.hosts + 1} rendered, one since removed, so the slot in \`HelixElement\` is not reaching it.`,
     )
   }
+  /* Versions, from both sides: the elements say which release built them, the
+     manifests which release they describe, and the two agree in a build of
+     one commit. A mismatch here would be the skew check judging its own
+     repository wrong. */
+  const { helix, manifests: described } = observed.versions
+  if (helix.length !== 1) {
+    say(
+      `the elements reported ${helix.length} Helix versions (${helix.join(', ')}) where one copy is loaded.`,
+    )
+  }
+  if (
+    Object.keys(described).length !== 2 ||
+    Object.values(described).some((one) => one !== helix[0])
+  ) {
+    say(
+      `the manifests describe ${JSON.stringify(described)} against elements built from ${helix.join(', ')}, so \`helix manifest build\` is not writing the version or the two disagree.`,
+    )
+  }
+
   if (!observed.usage.parts[tagged]?.button) {
     say('the planted `::part(button)` rule, a part the button publishes, was not counted as use.')
   }

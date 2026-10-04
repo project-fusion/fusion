@@ -330,3 +330,21 @@ export const skew = (tags: Map<string, Published>, from: Document): Raw[] => {
   visit(from, 0)
   return findings
 }
+
+/**
+ * A manifest from another version, read from the numbers where both sides
+ * have one: the version a manifest describes, against the versions of core
+ * loaded on the page. Definite where `skew` above infers, and the check
+ * `diagnose` makes first.
+ */
+export const versionSkew = (manifests: Record<string, string>, seen: string[]): Raw[] =>
+  seen.length === 0
+    ? []
+    : Object.entries(manifests)
+        .filter(([, version]) => !seen.includes(version))
+        .map(([name, version]) => ({
+          kind: 'manifest-skew' as const,
+          message: `The manifest passed in for \`${name}\` describes ${version}, and the page runs Helix ${seen.join(' and ')}. Every other finding would be judged against the wrong version, so none are reported. Pass the \`custom-elements.json\` from the installed packages.`,
+          subject: `${name}@${version}`,
+          tag: '',
+        }))
