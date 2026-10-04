@@ -44,13 +44,19 @@ export const noteVersion = (): void => {
   store[VERSIONS_SLOT] = listed
 }
 
+/** Whether a listener's failure has been printed, so a failing listener prints once. */
+let told = false
+
 /**
  * Tells the listener, where there is one, that `element` has rendered for the
  * first time.
  *
- * **A listener that throws never breaks the element.** The error is thrown
- * again on a later microtask, so it reaches the console and the page's error
- * handlers, and the render that called this finishes as if nothing listened.
+ * **A listener that throws never breaks the element, nor the page.** The
+ * error is printed once, and the render that called this finishes as if
+ * nothing listened. It used to be thrown again on a later microtask, which
+ * reached `window.onerror`, a team's error tracker, and Cypress, which fails a
+ * test on any uncaught error: a diagnostics listener is the last thing that
+ * should fail somebody's tests.
  */
 export const reportUsage = (element: HTMLElement): void => {
   const listener = (globalThis as Record<symbol, unknown>)[USAGE_SLOT]
@@ -60,8 +66,12 @@ export const reportUsage = (element: HTMLElement): void => {
   try {
     listener(element)
   } catch (error) {
-    queueMicrotask(() => {
-      throw error
-    })
+    if (!told) {
+      told = true
+      console.error(
+        'helix: a usage listener threw, and the element rendered as usual. Later failures are not printed.',
+        error,
+      )
+    }
   }
 }

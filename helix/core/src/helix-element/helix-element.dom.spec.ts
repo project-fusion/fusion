@@ -497,29 +497,28 @@ describe('usage', () => {
     expect(await element.updateComplete).toBe(true)
   })
 
-  test('a listener that throws does not break the element', async () => {
+  test('a listener that throws breaks neither the element nor the page, and is printed once', async () => {
     store[slot] = () => {
       throw new Error('listener')
     }
-    const thrown: unknown[] = []
-    const original = globalThis.queueMicrotask
-    globalThis.queueMicrotask = (task) => {
-      try {
-        task()
-      } catch (error) {
-        thrown.push(error)
-      }
+    const printed: unknown[][] = []
+    const original = console.error
+    console.error = (...args: unknown[]) => {
+      printed.push(args)
     }
     try {
-      const element = document.createElement(tag) as HTMLElement & {
-        updateComplete: Promise<boolean>
+      for (let at = 0; at < 2; at += 1) {
+        const element = document.createElement(tag) as HTMLElement & {
+          updateComplete: Promise<boolean>
+        }
+        document.body.append(element)
+        expect(await element.updateComplete).toBe(true)
       }
-      document.body.append(element)
-      expect(await element.updateComplete).toBe(true)
     } finally {
-      globalThis.queueMicrotask = original
+      console.error = original
     }
-    expect(thrown).toHaveLength(1)
+    expect(printed).toHaveLength(1)
+    expect(String(printed[0]?.[0])).toContain('a usage listener threw')
   })
 })
 
