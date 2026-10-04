@@ -18,6 +18,7 @@
 mod args;
 mod component;
 mod config;
+mod diagnostics;
 mod manifest;
 mod mcp;
 mod new;
@@ -68,6 +69,7 @@ fn main() {
             Manifest::Build(args) => manifest::generate(args, &from, cli.json),
             Manifest::Diff(args) => manifest::diff(args, &from, cli.json),
         },
+        Noun::Diagnostics(args) => diagnostics::run(args, &from, cli.json, paint),
         Noun::New(args) => new::run(args, &from, cli.json, paint),
         Noun::Theme { verb } => match verb {
             Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint),
