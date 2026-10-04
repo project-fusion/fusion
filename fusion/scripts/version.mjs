@@ -73,8 +73,8 @@
  * their resting value and how a release is pinned by hand if one ever has to be.
  */
 import { execFileSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { argument, flag } from '@fusion.dev/scripts/argv'
 import { DOMAINS, domainOf, manifests, root } from '@fusion.dev/scripts/workspace'
 
@@ -203,6 +203,23 @@ if (flag('write')) {
     manifest.version = version
     writeFileSync(file, `${JSON.stringify(manifest, null, 2)}\n`)
     written.push(directory)
+    /* **The running code's own copy**, for a package that carries one: core
+       reports it from every element, and diagnostics compares it with the
+       version a manifest names. Written with the manifest, so the two cannot
+       disagree in anything built from here. */
+    const constant = join(dirname(file), 'src/version.ts')
+    if (existsSync(constant)) {
+      const source = readFileSync(constant, 'utf8')
+      const stamped = source.replace(
+        /^export const VERSION = '[^']*'$/m,
+        `export const VERSION = '${version}'`,
+      )
+      if (stamped === source && !source.includes(`'${version}'`)) {
+        fail(`${constant} has no \`export const VERSION = '…'\` line to stamp.`)
+      }
+      writeFileSync(constant, stamped)
+      written.push(`${directory}/src/version.ts`)
+    }
   }
 
   /* Each crate's own `version`, in its `[package]`. This wrote the root's
