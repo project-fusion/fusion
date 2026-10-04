@@ -16,14 +16,15 @@
  * consumer's own `--my-app-gap` out of the findings without a list of
  * exemptions, and what lets a finding say which tag it is wrong for.
  */
-import type { Answered, Located } from './collect.js'
+import type { Answered, Located, Readers } from './collect.js'
 import { nearest, type Published } from './manifest.js'
 import type { Origin, Raw } from './report.js'
 
 /** Every `helix-*` tag a selector mentions, in source order. */
 export const targets = (selector: string): string[] => {
   const found = new Set<string>()
-  for (const match of selector.matchAll(/\bhelix-[a-z0-9]+(?:-[a-z0-9]+)*/g)) {
+  /* A type selector only: never the `helix-hero` of a class or an id. */
+  for (const match of selector.matchAll(/(?<![\w.#-])helix-[a-z0-9]+(?:-[a-z0-9]+)*/g)) {
     found.add(match[0])
   }
   return [...found]
@@ -44,37 +45,193 @@ export const parts = (selector: string): Array<{ names: string[]; tag: string }>
 }
 
 /**
- * Whether any of `wanted` sits inside `host`, shadow roots included.
+ * A selector made matchable now: pseudo-elements and the pseudo-classes of a
+ * moment (hover, focus) taken off, since a hook set on `.card:hover` reaches
+ * what `.card` matches. `null` where it cannot be judged from the page, as
+ * for `:host`, which only a component's own root matches.
+ *
+ * The longer pseudo-classes come first, so `:focus-visible` is taken whole
+ * and never read as `:focus` followed by `-visible`.
+ */
+const matchable = (selector: string): string | null => {
+  if (selector.includes(':host')) {
+    return null
+  }
+  const plain = selector
+    .replace(/::[\w-]+(\([^)]*\))?/g, '')
+    .replace(/:(focus-visible|focus-within|hover|focus|active|visited|target)(?![\w-])/g, '')
+    .trim()
+  return plain === '' ? null : plain
+}
+
+/**
+ * Whether `node` answers `property`: a tag that does, or an element a rule
+ * outside Helix's components reads it for, in that rule's own root.
+ */
+const answersAt = (
+  node: Element,
+  property: string,
+  answering: ReadonlySet<string>,
+  readers: Readers,
+): boolean => {
+  if (answering.has(node.localName)) {
+    return true
+  }
+  for (const { scope, selector } of readers.get(property) ?? []) {
+    if (scope !== undefined && node.getRootNode() !== scope) {
+      continue
+    }
+    const plain = matchable(selector)
+    try {
+      if (plain !== null && node.matches(plain)) {
+        return true
+      }
+    } catch {
+      /* A selector this engine cannot parse matches nothing here. */
+    }
+  }
+  return false
+}
+
+/**
+ * Whether `host`, or anything under it, shadow roots included, answers
+ * `property`. **The host counts**: `helix-button-group > *` sets a hook on
+ * the buttons it matches, and they answer it themselves.
  *
  * **This is the check a static tool cannot make, and skipping it is a three
  * percent false-positive rate.** Measured on this repository: `landing.module.css`
  * sets `--icon-button-radius` and `--icon-button-size` on `helix-copy-button`,
  * which answers neither, and both work, because a copy button *renders* an icon
  * button and custom properties inherit through a shadow boundary. A rule that
- * reads the manifest alone calls those two dead. Six findings out of 197
- * declarations examined, every one wrong, in the library's own repository.
- *
- * A collector running in the page can simply look. That is the whole argument
- * for the collector being in the page rather than in a linter.
+ * reads the manifest alone calls those two dead. A collector running in the
+ * page can simply look, which is the whole argument for the collector being in
+ * the page and not in a linter.
  */
-const reaches = (host: Element, wanted: Set<string>, depth = 0): boolean => {
+const reachesAnswer = (
+  host: Element,
+  property: string,
+  answering: ReadonlySet<string>,
+  readers: Readers,
+  depth = 0,
+): boolean => {
   if (depth > 16) {
     return false
   }
   for (const node of [host, ...host.querySelectorAll('*')]) {
-    if (node !== host && wanted.has(node.localName)) {
+    if (answersAt(node, property, answering, readers)) {
       return true
     }
-    const root = node.shadowRoot
-    if (root) {
-      for (const child of root.children) {
-        if (wanted.has(child.localName) || reaches(child, wanted, depth + 1)) {
-          return true
-        }
+    for (const child of node.shadowRoot?.children ?? []) {
+      if (reachesAnswer(child, property, answering, readers, depth + 1)) {
+        return true
       }
     }
   }
   return false
+}
+
+/**
+ * The hooks a rule naming no Helix tag sets: on a class, an id, `:root`, or
+ * any other selector, which is where most hooks are set. Measured on this
+ * repository's site and examples, 95 of 159 Helix hook declarations sit in a
+ * class selector.
+ *
+ * **Two faults, each judged only on evidence the page holds:**
+ *
+ * - **A misspelled hook**: a name no Helix element answers, two edits or
+ *   fewer from one that one does, and read by no `var()` on the page. A name
+ *   the page reads itself is the page's own custom property, however close.
+ * - **A hook nothing under the selector answers**: the selector matches
+ *   elements, something on the page answers the hook, and nothing the
+ *   selector matches is, or holds, an element that does. A selector matching
+ *   nothing yet, or a page where nothing answers the hook, is left unjudged:
+ *   the rule may be for another route or a later state.
+ */
+const loose = (
+  located: Located,
+  answerers: Map<string, Set<string>>,
+  from: Document | undefined,
+  used: Set<string>,
+  onPage: (property: string, answering: Set<string>) => boolean,
+  listedBy: Map<string, Set<string>>,
+  readers: Readers,
+): Raw[] => {
+  const findings: Raw[] = []
+  /* **The page's CSS only.** A Helix component's own sheets, in its shadow
+     root, set and read its private properties, and they are the library's to
+     answer for: judged as a page's, every `--_button-fill` read as a typo. */
+  if (located.scope instanceof ShadowRoot && located.scope.host.localName.startsWith('helix-')) {
+    return findings
+  }
+  const selector = located.rule.selectorText
+  for (const property of Array.from(located.rule.style ?? [])) {
+    /* **Never a token, never private.** A `--helix-` token is read by every
+       component, so neither rule below applies to it: judged as hooks, the
+       token layer read as four thousand misspellings across the examples. A
+       `--_` name is private by Helix's convention. */
+    if (
+      !property.startsWith('--') ||
+      property.startsWith('--helix-') ||
+      property.startsWith('--_')
+    ) {
+      continue
+    }
+    const answering = answerers.get(property)
+    if (!answering) {
+      /* A name the page reads itself is the page's own variable. */
+      if (used.has(property)) {
+        continue
+      }
+      const suggestion = nearest(property, answerers.keys(), HOOK_DISTANCE)
+      if (!suggestion) {
+        continue
+      }
+      /* Named for a tag whose manifest lists the hook, so the finding's
+         fingerprint does not move with which components a page renders. */
+      const tag = [...(listedBy.get(suggestion) ?? answerers.get(suggestion) ?? [])].sort()[0] ?? ''
+      findings.push({
+        expected: suggestion,
+        kind: 'dead-hook',
+        message: `\`${selector}\` sets \`${property}\`, which no Helix element answers and nothing on the page reads. \`${suggestion}\` is a hook \`${tag}\` answers, two edits or fewer away, and almost certainly what was meant.`,
+        origin: origin(located),
+        subject: `${selector} { ${property} }`,
+        tag,
+      })
+      continue
+    }
+    const scope = located.scope ?? from
+    const plain = matchable(selector)
+    if (!scope || !from?.documentElement || plain === null) {
+      continue
+    }
+    let matched: Element[]
+    try {
+      matched = [...scope.querySelectorAll(plain)]
+    } catch {
+      /* A selector this engine cannot parse cannot be judged. */
+      continue
+    }
+    if (matched.length === 0 || !onPage(property, answering)) {
+      continue
+    }
+    if (matched.some((host) => reachesAnswer(host, property, answering, readers))) {
+      continue
+    }
+    const tags = [...answering].sort()
+    findings.push({
+      kind: 'dead-hook',
+      message: `\`${selector}\` sets \`${property}\`, and nothing under the ${matched.length === 1 ? 'element' : `${matched.length} elements`} it matches answers it, though something elsewhere on this page does. ${tags
+        .slice(0, 3)
+        .map((one) => `\`${one}\``)
+        .join(
+          ', ',
+        )} ${tags.length === 1 ? 'answers' : 'answer'} it. It targets the wrong element, or expects a descendant that is not there.`,
+      origin: origin(located),
+      subject: `${selector} { ${property} }`,
+      tag: tags[0] ?? '',
+    })
+  }
+  return findings
 }
 
 const origin = (located: Located): Origin => ({
@@ -95,16 +252,53 @@ export const analyze = (
   tags: Map<string, Published>,
   from?: Document,
   answered: Answered = new Map(),
+  used: Set<string> = new Set(),
+  readers: Readers = new Map(),
 ): Raw[] => {
   const findings: Raw[] = []
+  /* Which tags answer each hook, by the manifest or by their own styles. */
+  const answeredBy = new Map<string, Set<string>>()
+  const answers = (property: string, tag: string): void => {
+    const set = answeredBy.get(property) ?? new Set<string>()
+    set.add(tag)
+    answeredBy.set(property, set)
+  }
+  /* The manifest's own answer, kept apart for naming a finding's tag. */
+  const listedBy = new Map<string, Set<string>>()
+  for (const [tag, element] of tags) {
+    for (const property of element.hooks.keys()) {
+      answers(property, tag)
+      listedBy.set(property, new Set([...(listedBy.get(property) ?? []), tag]))
+    }
+  }
+  for (const [tag, reads] of answered) {
+    for (const property of reads) {
+      if (tags.has(tag)) {
+        answers(property, tag)
+      }
+    }
+  }
+  /* Whether anything on the page answers a hook, asked once per hook: the
+     walk covers the whole page, shadow roots included. */
+  const present = new Map<string, boolean>()
+  const onPage = (property: string, answering: Set<string>): boolean => {
+    let found = present.get(property)
+    if (found === undefined) {
+      found = from?.documentElement
+        ? reachesAnswer(from.documentElement, property, answering, readers)
+        : false
+      present.set(property, found)
+    }
+    return found
+  }
 
   for (const located of rules) {
     const selector = located.rule.selectorText
-    if (!selector?.includes('helix-')) {
+    if (!selector) {
       continue
     }
 
-    for (const { names, tag } of parts(selector)) {
+    for (const { names, tag } of selector.includes('helix-') ? parts(selector) : []) {
       const element = tags.get(tag)
       if (!element) {
         findings.push({
@@ -156,6 +350,7 @@ export const analyze = (
     const mentioned = targets(selector).map((tag) => [tag, tags.get(tag)] as const)
     const known = mentioned.filter(([, element]) => element)
     if (known.length === 0) {
+      findings.push(...loose(located, answeredBy, from, used, onPage, listedBy, readers))
       continue
     }
     for (const property of Array.from(located.rule.style ?? [])) {
@@ -181,8 +376,10 @@ export const analyze = (
         [...tags].filter(([, element]) => element.hooks.has(property)).map(([tag]) => tag),
       )
       const candidates = known.flatMap(([, element]) => [...(element?.hooks.keys() ?? [])])
-      const suggestion = nearest(property, candidates)
-      if (answerers.size === 0 && !suggestion) {
+      const suggestion = nearest(property, candidates, HOOK_DISTANCE)
+      /* A name the page reads itself is its own variable, set here for its
+         own rules, however close it is to a hook. */
+      if ((answerers.size === 0 && !suggestion) || (answerers.size === 0 && used.has(property))) {
         continue
       }
       /* Set on an ancestor of something that *does* answer it, this is
@@ -193,14 +390,30 @@ export const analyze = (
         if (!from) {
           continue
         }
-        let inherits = false
-        for (const host of from.querySelectorAll(selector.replaceAll(/::part\([^)]*\)/g, ''))) {
-          if (reaches(host, answerers)) {
-            inherits = true
-            break
-          }
+        /* **Judged only on elements the selector matches now.** A selector
+           matching nothing on this page may be for another route, which is
+           how one shared stylesheet serves many: measured on this
+           repository's site, a list rule in the document layout read as dead
+           on the one page with no ordered list. And **the matched element
+           itself may answer**: `helix-button-group > *` sets a hook on the
+           group's buttons, and looking only under each button called it dead
+           on all 163 pages. */
+        const plain = matchable(selector)
+        if (plain === null) {
+          continue
         }
-        if (inherits) {
+        let matched: Element[]
+        try {
+          matched = [...(located.scope ?? from).querySelectorAll(plain)]
+        } catch {
+          continue
+        }
+        if (
+          matched.length === 0 ||
+          matched.some((host) =>
+            reachesAnswer(host, property, answeredBy.get(property) ?? answerers, readers),
+          )
+        ) {
           continue
         }
       }
@@ -209,7 +422,7 @@ export const analyze = (
         expected: suggestion,
         kind: 'dead-hook',
         message: suggestion
-          ? `\`${tag}\` does not answer \`${property}\`. It answers \`${suggestion}\`, which is one character class away and is almost certainly what was meant.`
+          ? `\`${tag}\` does not answer \`${property}\`. It answers \`${suggestion}\`, two edits or fewer away, which is almost certainly what was meant.`
           : `\`${tag}\` does not answer \`${property}\`, and nothing under it that does was found in the page. ${[...answerers].sort().slice(0, 3).join(', ')} answer it, so this either targets the wrong element or expects a descendant that is not there.`,
         origin: origin(located),
         subject: `${selector} { ${property} }`,
@@ -348,3 +561,129 @@ export const versionSkew = (manifests: Record<string, string>, seen: string[]): 
           subject: `${name}@${version}`,
           tag: '',
         }))
+
+/**
+ * Attributes every element takes, whatever its manifest says: the global
+ * ones HTML defines, and the prefixes frameworks write. Anything else on a
+ * Helix element that its manifest does not list does nothing.
+ */
+const GLOBAL = new Set([
+  'accesskey',
+  'autocapitalize',
+  'autofocus',
+  'class',
+  'contenteditable',
+  'defer-hydration',
+  'dir',
+  'draggable',
+  'enterkeyhint',
+  'exportparts',
+  'hidden',
+  'id',
+  'inert',
+  'inputmode',
+  'is',
+  'itemid',
+  'itemprop',
+  'itemref',
+  'itemscope',
+  'itemtype',
+  'lang',
+  'nonce',
+  'part',
+  'popover',
+  'role',
+  'slot',
+  'spellcheck',
+  'style',
+  'tabindex',
+  'title',
+  'translate',
+  'writingsuggestions',
+])
+
+/** Attribute prefixes a page or a framework writes on any element. */
+const PREFIXES = ['aria-', 'data-', 'on', '_ngcontent-', '_nghost-', 'ng-', 'v-', 'x-', ':', '@']
+
+/**
+ * How far a misspelled hook may be from the real one: two edits, which a
+ * transposition is (`backgruond`) and a dropped or added letter is less
+ * than (`breadcrumb` for `breadcrumbs`). A third of a long name reached
+ * `--chart-terminus-y` from `--chart-series-1`, which is not a typo.
+ */
+const HOOK_DISTANCE = 2
+
+/**
+ * The attributes on the page's Helix elements that do nothing: a name the
+ * element does not take, and a value outside the ones a closed set allows.
+ * Both are valid HTML and silent, since the element falls back to its default.
+ *
+ * **Only what the page wrote.** An element Helix renders inside another is
+ * Helix's own markup. One finding per tag, attribute, and value, however many
+ * elements carry it.
+ */
+export const markup = (tags: Map<string, Published>, from: Document): Raw[] => {
+  const found = new Map<string, Raw & { count: number }>()
+  const visit = (root: ParentNode, depth: number): void => {
+    if (depth > 32) {
+      return
+    }
+    for (const element of root.querySelectorAll('*')) {
+      const host = element.getRootNode()
+      const composed = host instanceof ShadowRoot && host.host.localName.startsWith('helix-')
+      const published = composed ? undefined : tags.get(element.localName)
+      if (published) {
+        for (const { name, value } of Array.from(element.attributes)) {
+          if (
+            GLOBAL.has(name) ||
+            PREFIXES.some((prefix) => name.startsWith(prefix)) ||
+            published.written.has(name)
+          ) {
+            continue
+          }
+          const tag = element.localName
+          const allows = published.attributes.get(name)
+          let raw: Raw | undefined
+          if (allows === undefined) {
+            const suggestion = nearest(name, published.attributes.keys())
+            raw = {
+              expected: suggestion,
+              kind: 'unknown-attribute',
+              message: suggestion
+                ? `\`${tag}\` takes no attribute \`${name}\`, so it does nothing. The closest it takes is \`${suggestion}\`.`
+                : `\`${tag}\` takes no attribute \`${name}\`, so it does nothing.`,
+              subject: `<${tag} ${name}>`,
+              tag,
+            }
+          } else if (allows && value !== '' && !allows.has(value)) {
+            const suggestion = nearest(value, allows)
+            raw = {
+              expected: suggestion,
+              kind: 'invalid-value',
+              message: `\`${tag}\`'s \`${name}\` takes ${[...allows].map((one) => `\`${one}\``).join(', ')}, so \`${value}\` falls back to the default.${suggestion ? ` The closest is \`${suggestion}\`.` : ''}`,
+              subject: `<${tag} ${name}="${value}">`,
+              tag,
+            }
+          }
+          if (raw) {
+            const key = `${raw.kind} ${raw.subject}`
+            const seen = found.get(key)
+            if (seen) {
+              seen.count += 1
+            } else {
+              found.set(key, { ...raw, count: 1 })
+            }
+          }
+        }
+      }
+      if (element.shadowRoot) {
+        visit(element.shadowRoot, depth + 1)
+      }
+    }
+  }
+  visit(from, 0)
+  return [...found.values()].map(({ count, ...raw }) => ({
+    ...raw,
+    message: count > 1 ? `${raw.message} On ${count} elements.` : raw.message,
+  }))
+}

@@ -14,8 +14,10 @@ const CATEGORY: Readonly<Record<Kind, FindingCategory>> = {
   'dead-hook': 'styling',
   'dead-part': 'styling',
   'duplicate-registration': 'integrity',
+  'invalid-value': 'markup',
   'manifest-skew': 'integrity',
   'unforwarded-part': 'styling',
+  'unknown-attribute': 'markup',
   'unknown-tag': 'integrity',
 }
 
@@ -28,8 +30,10 @@ const OWNER: Readonly<Record<Kind, Owner>> = {
   'dead-hook': 'consumer',
   'dead-part': 'consumer',
   'duplicate-registration': 'consumer',
+  'invalid-value': 'consumer',
   'manifest-skew': 'consumer',
   'unforwarded-part': 'helix',
+  'unknown-attribute': 'consumer',
   'unknown-tag': 'consumer',
 }
 

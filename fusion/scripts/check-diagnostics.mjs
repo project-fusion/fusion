@@ -93,6 +93,7 @@ const PLANTED = `
   helix-copy-button { --icon-button-size: 2rem; --icon-button-radius: 4px }
   helix-button { --icon-button-size: 2rem }
   @media (min-width: 1px) { helix-button::part(insidemedia) { color: red } }
+  .planted-toolbar { --button-radios: 0; --button-radius: 0 }
 `
 
 const TYPES = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript' }
@@ -144,7 +145,10 @@ try {
       /* Twenty real elements, so the page holds twenty real Lit shadow roots
          all adopting the one stylesheet the class owns, which is the
          arrangement the dedup assertion below is about. */
-      document.body.innerHTML = `${`<${tag}>Press</${tag}>`.repeat(20)}<helix-copy-button value="x"></helix-copy-button>`
+      /* With the markup faults: an attribute the button does not take, a
+         value outside its closed set, and a toolbar holding no button that a
+         hook set on it could reach, while buttons stand beside it. */
+      document.body.innerHTML = `${`<${tag}>Press</${tag}>`.repeat(20)}<helix-copy-button value="x"></helix-copy-button><${tag} emphais="solid">Typo</${tag}><${tag} emphasis="bold">Bold</${tag}><div class="planted-toolbar"></div>`
       await customElements.whenDefined(tag)
       await customElements.whenDefined('helix-copy-button')
       await new Promise((done) => requestAnimationFrame(() => done()))
@@ -307,11 +311,15 @@ try {
        hook on `helix-button`, which renders no such thing, is a finding. That
        pair is the whole point of the inheritance check, and asserting the set
        exactly is what makes the pair testable at all. */
+    'dead-hook:.planted-toolbar { --button-radios }',
+    'dead-hook:.planted-toolbar { --button-radius }',
     'dead-hook:helix-button { --button-backgruond-color }',
     'dead-hook:helix-button { --icon-button-size }',
     'dead-part:helix-button::part(buton)',
     'dead-part:helix-button::part(insidemedia)',
+    'invalid-value:<helix-button emphasis="bold">',
     'unforwarded-part:helix-button::part(control)',
+    'unknown-attribute:<helix-button emphais>',
   ]
   const got = observed.findings.map((finding) => `${finding.kind}:${finding.subject}`).sort()
   const missing = expected.filter((one) => !got.includes(one))
