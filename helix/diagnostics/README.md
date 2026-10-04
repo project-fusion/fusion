@@ -54,6 +54,8 @@ so React's strict mode and hot module replacement start nothing twice.
   Core still prints each one as it happens, with the stack it happened in. Set
   `core: { warnings: false }` to have diagnostics print them in its group
   instead.
+- **Measures what the components cost, where you ask**: each tag's first
+  updates, layout shift, and long tasks. See [Performance](#performance).
 - **Hands each run to your app**: the `onReport` option, `subscribe()` on the
   handle it returns, and a `helix-diagnostics` event on `document`.
 
@@ -168,6 +170,8 @@ A report is one run, in one shape for every sink, versioned by `schema`:
   `integrity`, or `guideline`), an `owner` (`consumer`, or `helix` for a fault
   in the library), a `fingerprint` that stays the same from one run to the next
   for the same fault, and the rule's own text as evidence.
+- **`performance`**: what the components cost, by tag, where you asked for it.
+  See [Performance](#performance).
 - **`runtime`**: what the library reported going wrong as it ran on the page,
   from its first load. One entry per distinct event, with its `kind`, its
   `tag`, the sentence that says what to do, how many times it was reported,
@@ -202,6 +206,7 @@ works on it:
 | Stylesheets that could not be read | `console.warn` |
 | Coverage, and findings turned off | `console.info` |
 | Usage | `console.debug`, hidden at the default level |
+| Performance, where you asked for it | `console.info`, when the measures change |
 
 ## Finding kinds
 
@@ -259,6 +264,26 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `untold-trigger` | A slotted trigger is a plain element, which cannot carry `aria-expanded` |
 | `wrapped-trigger` | A tooltip wraps its trigger, so its text reaches no screen reader |
 
+## Performance
+
+Diagnostics measures what the components cost only where you ask for it. Set
+`console: { performance: 'info' }` to print the measures in DevTools, or
+`send: { performance: true }` to keep them in each run, for your app, the
+relay, and the CI file. For each tag rendered on the page, it measures:
+
+- **First updates**: each element's own first update, from `willUpdate` to
+  `updated`, as a count, a median, a 95th percentile, and the slowest. Time an
+  element spends waiting behind other elements is not counted.
+- **Layout shift**: the shift its elements moved, summed as the browser scores
+  it. A shift that follows a press or a keystroke is left out.
+- **Long tasks**: how many tasks of 50 ms or more one of its first updates ran
+  in.
+
+Core times each first update only while diagnostics is measuring, so a page
+that has not asked pays one property read per element. Layout shift and long
+tasks are measured in Chromium only. Elsewhere `measured` says so, and their
+numbers are left out.
+
 ## Configure it
 
 Every setting can be given in three places, and a later place wins, field by
@@ -294,6 +319,7 @@ diagnose({
 | `console.coverage` | `info` or `off` | `info` |
 | `console.usage` | `debug` or `off` | `debug` |
 | `console.runtime` | `warn` or `off`: the runtime events core left to diagnostics | `warn` |
+| `console.performance` | `info` or `off`: what the components cost, which is measured where this is on | `off` |
 | `core.warnings` | `true` or `false`: whether core prints each runtime event as it happens | `true` |
 | `sinks.overlay` | `true` or `false`, for the badge in development | `true` |
 | `sinks.relay` | `true`, `false`, or an address on a local host, such as `http://127.0.0.1:7417` | `false` |

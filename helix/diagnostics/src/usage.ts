@@ -15,7 +15,8 @@ import { parts, targets } from './analyze.js'
 import type { Answered, Located } from './collect.js'
 import type { Published } from './manifest.js'
 import { OVERLAY, type Page, pageOf } from './page.js'
-import type { RuntimeEntry, Usage } from './report.js'
+import { type Measurer, measure } from './performance.js'
+import type { PerformanceReport, RuntimeEntry, Usage } from './report.js'
 import { type Heard, logged, RUNTIME_SLOT, tally as tallyRuntime } from './runtime.js'
 
 /**
@@ -143,6 +144,8 @@ export const listed = (
 export interface Watcher {
   /** The counts so far. A copy: counting goes on after it is read. */
   counts(): Counted
+  /** What the components cost so far, where the watcher was asked to measure. */
+  performance(): PerformanceReport | undefined
   /**
    * The runtime events reported on this page from its first load, one entry
    * per distinct event: the ones core kept from before the watcher started,
@@ -173,6 +176,7 @@ export const watch = (
   {
     onRender,
     onRuntime,
+    performance,
     quiet,
   }: {
     /**
@@ -183,6 +187,12 @@ export const watch = (
     onRender?: ((element: Element) => void) | undefined
     /** Called with each runtime event core reports, after it is counted. */
     onRuntime?: ((event: Heard) => void) | undefined
+    /**
+     * Whether to measure what the components cost, from now on: each
+     * element's first update, and the layout shift and long tasks the browser
+     * reports.
+     */
+    performance?: boolean | undefined
     /**
      * Whether core should leave each runtime event for diagnostics to print,
      * asked as each arrives: `core.warnings: false`.
@@ -235,11 +245,14 @@ export const watch = (
     return silent
   }
   store[RUNTIME_SLOT] = hear
+  const measured: Measurer | undefined = performance ? measure() : undefined
   return {
     counts: () => structuredClone(counted),
+    performance: () => measured?.results(),
     runtime: () => heard.entries(),
     stop: () => {
       live = false
+      measured?.stop()
       if (store[SLOT] === listener) {
         store[SLOT] = before
       }

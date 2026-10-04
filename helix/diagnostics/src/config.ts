@@ -48,7 +48,13 @@ export interface Config {
 
 /** The shipped defaults. */
 export const DEFAULTS = {
-  console: { coverage: 'info', findings: 'info', runtime: 'warn', usage: 'debug' },
+  console: {
+    coverage: 'info',
+    findings: 'info',
+    performance: 'off',
+    runtime: 'warn',
+    usage: 'debug',
+  },
   /* **Core prints its warnings, as it always has.** As it happens, each comes
      with the stack it happened in, which a group printed a second later has
      lost. Off, diagnostics prints them in its group instead, and never twice. */
@@ -105,6 +111,7 @@ const ALLOWED: Record<
   console: {
     coverage: ['info', 'off'],
     findings: ['error', 'warn', 'info', 'off'],
+    performance: ['info', 'off'],
     runtime: ['warn', 'off'],
     usage: ['debug', 'off'],
   },

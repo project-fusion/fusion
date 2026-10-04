@@ -128,6 +128,8 @@ export const diagnose = (options: Options): Report => {
     .filter((one) => one.kind === 'duplicate-registration' && one.tag !== undefined)
     .map((one) => one.tag as string)
   const twice = duplicates ?? (reported.length > 0 ? () => reported : undefined)
+  /* What the components cost, where the watcher was asked to measure. */
+  const measured = watcher?.performance()
   const seen = loadedVersions()
   const manifests = versionsOf(lints)
 
@@ -183,6 +185,7 @@ export const diagnose = (options: Options): Report => {
       ...(environment === undefined ? {} : { environment }),
       ...(shownPage === undefined ? {} : { page: shownPage }),
     },
+    ...(measured === undefined ? {} : { performance: measured }),
     runtime,
     schema: 1,
     usage: {

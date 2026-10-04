@@ -13,6 +13,7 @@
  * | Unreadable stylesheets | `console.warn` | The run could not see part of the page |
  * | Coverage, overrides, a clean run | `console.info` | What the run looked at |
  * | Usage | `console.debug` | For whoever studies usage, hidden at the default level |
+ * | Performance, where asked for | `console.info` | What the components cost, by tag |
  *
  * **All of it in one group**, headed by the counts, so a page with other logs
  * keeps a run together and a clean run collapses to one line.
@@ -157,6 +158,34 @@ export const report = (
       }
       shown?.add(one.fingerprint)
       to[one.level](`${one.kind}${one.tag ? ` <${one.tag}>` : ''}: ${one.message}`)
+    }
+  }
+
+  /* **What the components cost, slowest first**, where the project asked,
+     and only when the measures moved: a run after every change would print
+     the same table again. */
+  if (levels.performance !== 'off' && result.performance) {
+    const { measured, tags } = result.performance
+    const rows = Object.entries(tags)
+      .sort(([, a], [, b]) => b.render.p95 - a.render.p95)
+      .slice(0, 10)
+    const lines = rows.map(
+      ([tag, one]) =>
+        `${tag}: ${one.render.p50} ms median, ${one.render.p95} ms p95, ${one.render.max} ms slowest, of ${counted(one.render.count, 'first update')}` +
+        (measured.layoutShift && one.shift > 0 ? `; ${one.shift} layout shift` : '') +
+        (measured.longTasks && one.longTasks > 0 ? `; ${counted(one.longTasks, 'long task')}` : ''),
+    )
+    const key = `performance ${result.run.page ?? ''} ${lines.join('|')}`
+    if (rows.length > 0 && !shown?.has(key)) {
+      shown?.add(key)
+      to.info(
+        [
+          `performance: ${counted(Object.keys(tags).length, 'tag')} measured, slowest first` +
+            (measured.layoutShift ? '' : '. Layout shift is not measured in this browser') +
+            (measured.longTasks ? '' : '. Long tasks are not measured in this browser'),
+          ...lines,
+        ].join('\n'),
+      )
     }
   }
 

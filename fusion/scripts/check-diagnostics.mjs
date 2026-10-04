@@ -359,6 +359,8 @@ try {
         cdn: `${location.origin}/cdn`,
         environment: 'development',
         onReport: (run) => runs.push(run),
+        /* Asked for, so each run carries what the components cost. */
+        send: { performance: true },
       })
       document.body.innerHTML = `<${tag}>Go</${tag}>`
       await customElements.whenDefined(tag)
@@ -385,6 +387,11 @@ try {
         first,
         kinds: last?.findings.map((finding) => finding.kind) ?? [],
         manifests: last?.versions.manifests ?? {},
+        performance: {
+          button: last?.performance?.tags[tag]?.render.count ?? 0,
+          measured: last?.performance?.measured,
+          table: last?.performance?.tags['helix-data-table']?.render.count ?? 0,
+        },
         runs: runs.length,
         runtime:
           last?.runtime.map((one) => `${one.kind} <${one.tag}> printed ${one.printed}`) ?? [],
@@ -418,6 +425,19 @@ try {
   if (!started.runtime.includes('missing-row-key <helix-data-table> printed true')) {
     say(
       `a selectable table with no \`row-key\` reached no run as a runtime event: the last run held ${JSON.stringify(started.runtime)}.`,
+    )
+  }
+  /* **What the components cost, measured by core in a real browser**: each
+     button's and the table's first update, and both of Chromium's observers. */
+  const cost = started.performance
+  if (cost.button < 2 || cost.table < 1) {
+    say(
+      `the run measured ${cost.button} button and ${cost.table} table first updates, where the page rendered two buttons and a table.`,
+    )
+  }
+  if (!cost.measured?.layoutShift || !cost.measured?.longTasks) {
+    say(
+      `Chromium measures layout shift and long tasks, and the run says ${JSON.stringify(cost.measured)}.`,
     )
   }
   if (printed.length !== 1 || printed[0] !== 'warning') {
@@ -462,8 +482,8 @@ try {
       `diagnostics: ${observed.findings.length} planted faults found and none invented, ` +
         `${observed.sheets} sheets across ${observed.roots} shadow roots on ${observed.hosts} elements, ` +
         `\`::part()\` and \`@media\` both readable in Chromium, and \`initDiagnostics()\` ran ` +
-        `${started.runs} times on its own, finding the mistake added after its first run ` +
-        'and hearing the one the library reported as it ran',
+        `${started.runs} times on its own, finding the mistake added after its first run, ` +
+        'hearing the one the library reported as it ran, and measuring each first update',
     )
   }
 } finally {
