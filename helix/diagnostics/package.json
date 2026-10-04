@@ -16,6 +16,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./ci": {
+      "types": "./dist/ci.d.ts",
+      "default": "./dist/ci.js"
     }
   },
   "files": [
