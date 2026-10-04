@@ -14,7 +14,7 @@
 import { parts, targets } from './analyze.js'
 import type { Answered, Located } from './collect.js'
 import type { Published } from './manifest.js'
-import { type Page, pageOf } from './page.js'
+import { OVERLAY, type Page, pageOf } from './page.js'
 import type { Usage } from './report.js'
 
 /**
@@ -66,7 +66,7 @@ export const loadedVersions = (): string[] => {
  */
 const tally = (counted: Counted, element: Element): void => {
   const tag = element.localName
-  if (!tag.startsWith('helix-')) {
+  if (!tag.startsWith('helix-') || tag === OVERLAY) {
     return
   }
   const root = element.getRootNode()

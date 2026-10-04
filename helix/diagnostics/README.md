@@ -45,13 +45,18 @@ so React's strict mode and hot module replacement start nothing twice.
   Nothing runs in a hidden tab, or when nothing changed.
 - **Prints each finding once per page**, in DevTools, at the levels your
   `console` setting gives. The heading still counts every finding.
+- **Shows the findings on the page**, in development. A badge in the corner
+  counts them and opens a list of each finding with its evidence. Hover over a
+  finding, or focus it, to outline the element it is about. The badge shows
+  only while the page has findings.
 - **Hands each run to your app**: the `onReport` option, `subscribe()` on the
   handle it returns, and a `helix-diagnostics` event on `document`.
 
 **It never runs in production by accident.** With no `environment`, it runs only
 on a local host: `localhost`, `127.0.0.1`, `[::1]`, `*.localhost`, and `*.test`.
 Production runs only with `environment: 'production'` and
-`environments: { production: { sample } }`.
+`environments: { production: { sample } }`, and there each run goes to your app
+alone. A visitor sees nothing in the console or on the page.
 
 **It never breaks your app.** It never throws. A setting that names nothing is
 printed with the closest real one, and the handle does nothing. A run that
@@ -67,11 +72,52 @@ throws stops neither the others nor the console.
 | `onReport` | Called with each run |
 | `duplicates` | `duplicateRegistrations` from `@fusion.dev/helix-core` |
 | `file` | Your project's `helix-diagnostics.json`, imported |
-| Any setting below | `rules`, `console`, `send`, `detail`, `environments`, `project` |
+| Any setting below | `rules`, `console`, `sinks`, `send`, `detail`, `environments`, `project` |
 
 The handle has `active`, `latest`, `run()`, `subscribe()`, and `stop()`. An
 end-to-end test reaches it at `globalThis[Symbol.for('fusion.dev/helix/diagnostics')]`
 to assert that a page has no findings.
+
+The badge is one element, `helix-diagnostics-overlay`, with its own shadow root
+and its own styles. Diagnostics leaves it out of everything it counts and reads.
+It is never on a page in CI, so your screenshots never hold it. Turn it off in
+development with `sinks: { overlay: false }`.
+
+## Print the findings in your terminal
+
+A page cannot write to your terminal, so the Helix CLI has a command that
+receives each run beside your dev server. Install the CLI, then start the
+command in the project's directory:
+
+```sh
+npm install --save-dev @fusion.dev/helix-cli
+npx helix diagnostics
+```
+
+Then turn the relay on where you call `initDiagnostics()`:
+
+```js
+initDiagnostics({ environment: import.meta.env.MODE, sinks: { relay: true } })
+```
+
+Each run that differs from the last one for its page is posted to
+`http://127.0.0.1:7417`, and the command prints each finding the first time a
+page has it. For a relay on another port, such as one started with
+`--port 7500`, pass its address: `sinks: { relay: 'http://127.0.0.1:7500' }`.
+The address is always on a local host.
+
+- **It is off by default.** A browser prints a refused connection in DevTools
+  on every page load where nothing listens. With the relay on and the command
+  not running, one warning is printed in the console, and nothing is sent.
+- **It serves your settings.** Where you pass no `file`, the page loads
+  `helix-diagnostics.json` from the directory the command runs in, so you do
+  not need to import it. Pass `--config <path>` for a file elsewhere. A file
+  that does not parse is not served.
+- **It writes the CI file.** With `--out reports/helix-diagnostics.json`, it
+  keeps the latest run of every page there, in the shape `ciSink` writes.
+- **It takes runs from pages on a local host only**: `localhost`, `127.0.0.1`,
+  `[::1]`, `*.localhost`, and `*.test`. It listens on `127.0.0.1`, so nothing
+  else on your network reaches it, and production pages never send to it.
 
 ## Run it once, directly
 
@@ -204,6 +250,8 @@ diagnose({
 | `console.findings` | `error`, `warn`, `info`, or `off`: the lowest severity printed | `info` |
 | `console.coverage` | `info` or `off` | `info` |
 | `console.usage` | `debug` or `off` | `debug` |
+| `sinks.overlay` | `true` or `false`, for the badge in development | `true` |
+| `sinks.relay` | `true`, `false`, or an address on a local host, such as `http://127.0.0.1:7417` | `false` |
 | `send.<category>` | `true` or `false`, for `findings`, `usage`, `coverage`, `configuration`, `runtime`, `performance`, and `assist` | all on but `performance` |
 | `detail.evidence` | `full`, `selector`, or `none` | `full` |
 | `detail.hookValues` | `true` or `false` | `true` |
@@ -211,13 +259,14 @@ diagnose({
 | `environments.<name>` | `true` or `false`; `production` takes `{ sample }` from 0 to 1 | development and CI on |
 | `project` | `key`, `name`, and `tags` | none |
 
-`send`, `detail`, and `environments` decide what a sending sink sends, and
-nothing here sends yet: they are recorded in every report, so a dashboard
-knows what a project withheld. A setting or a value that does not exist
-throws, and names the closest that does.
+`send`, `detail`, and `environments` decide what the diagnostics service is
+sent, and the service is not built yet. They are recorded in every report, so a
+dashboard knows what a project withheld. The relay runs on your own machine and
+receives each run whole. A setting or a value that does not exist throws, and
+names the closest that does.
 
-Development only. It walks every stylesheet in the page, and it sends nothing
-anywhere.
+**What the page requests**: the lint data, from `cdn`, once per page load, and
+the relay, where `sinks.relay` is on. Nothing else leaves the page.
 
 ## In CI
 

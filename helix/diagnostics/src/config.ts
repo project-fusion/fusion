@@ -36,6 +36,12 @@ export interface Config {
   rules?: Rules
   /** Each category, sent or withheld. Nothing is sent without a key. */
   send?: Partial<Record<Category, boolean>>
+  /**
+   * Where `initDiagnostics()` hands each run, beside the console: the
+   * `overlay` on the page, and the `relay`, `helix diagnostics`, on or off or
+   * at an address of its own.
+   */
+  sinks?: Partial<Configuration['sinks']>
 }
 
 /** The shipped defaults. */
@@ -52,15 +58,43 @@ export const DEFAULTS = {
     runtime: true,
     usage: true,
   },
+  /* **The relay is off until asked for.** A page asking for a relay that is
+     not running prints a refused connection in DevTools on every load, for
+     every project that never runs one. */
+  sinks: { overlay: true, relay: false },
 } as const satisfies {
   console: Configuration['console']
   detail: Configuration['detail']
   environments: Configuration['environments']
   send: Record<Category, boolean>
+  sinks: Configuration['sinks']
+}
+
+/**
+ * A local host: `localhost`, `127.0.0.1`, `[::1]`, `*.localhost`, and `*.test`.
+ * A page with no declared environment runs only on one, and the relay is only
+ * ever at one, as `helix diagnostics` takes runs only from one: a relay at
+ * another address would be a second way to send, with no key and no `send`.
+ */
+export const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\]|.+\.localhost|.+\.test)$/
+
+/** Whether `address` is an origin on a local host, such as `http://127.0.0.1:7417`. */
+const local = (address: string): boolean => {
+  if (!/^https?:\/\/[^/?#@]+$/.test(address)) {
+    return false
+  }
+  try {
+    return LOCAL.test(new URL(address).hostname)
+  } catch {
+    return false
+  }
 }
 
 /** The values each setting may take, for the errors below. */
-const ALLOWED: Record<string, Record<string, readonly unknown[] | 'string' | 'tags' | 'sample'>> = {
+const ALLOWED: Record<
+  string,
+  Record<string, readonly unknown[] | 'address' | 'sample' | 'string' | 'tags'>
+> = {
   console: {
     coverage: ['info', 'off'],
     findings: ['error', 'warn', 'info', 'off'],
@@ -74,6 +108,7 @@ const ALLOWED: Record<string, Record<string, readonly unknown[] | 'string' | 'ta
   environments: { ci: [true, false], development: [true, false], production: 'sample' },
   project: { key: 'string', name: 'string', tags: 'tags' },
   send: Object.fromEntries(CATEGORIES.map((category) => [category, [true, false]])),
+  sinks: { overlay: [true, false], relay: 'address' },
 }
 
 /** A value's name in an error. */
@@ -115,23 +150,27 @@ export const checkConfig = (config: Config | undefined, layer: Exclude<Layer, 's
           ? typeof one === 'string'
           : takes === 'tags'
             ? Array.isArray(one) && one.every((tag) => typeof tag === 'string')
-            : takes === 'sample'
-              ? one === false ||
-                (typeof one === 'object' &&
-                  one !== null &&
-                  typeof (one as { sample?: unknown }).sample === 'number' &&
-                  (one as { sample: number }).sample >= 0 &&
-                  (one as { sample: number }).sample <= 1)
-              : takes.includes(one)
+            : takes === 'address'
+              ? typeof one === 'boolean' || (typeof one === 'string' && local(one))
+              : takes === 'sample'
+                ? one === false ||
+                  (typeof one === 'object' &&
+                    one !== null &&
+                    typeof (one as { sample?: unknown }).sample === 'number' &&
+                    (one as { sample: number }).sample >= 0 &&
+                    (one as { sample: number }).sample <= 1)
+                : takes.includes(one)
       if (!fits) {
         const expected =
           takes === 'string'
             ? 'a string'
             : takes === 'tags'
               ? 'a list of strings'
-              : takes === 'sample'
-                ? '`false`, or `{ sample }` from 0 to 1'
-                : takes.map(shown).join(', ')
+              : takes === 'address'
+                ? '`true`, `false`, or an address on a local host, such as `http://127.0.0.1:7417`'
+                : takes === 'sample'
+                  ? '`false`, or `{ sample }` from 0 to 1'
+                  : takes.map(shown).join(', ')
         throw new Error(
           `The ${layer} sets \`${section}.${name}\` to \`${JSON.stringify(one)}\`. It takes ${expected}.`,
         )
@@ -153,7 +192,7 @@ export const resolveConfig = (file: Config | undefined, call: Config | undefined
   checkConfig(file, 'file')
   checkConfig(call, 'argument')
   const merged = <T extends object>(
-    section: 'console' | 'detail' | 'environments',
+    section: 'console' | 'detail' | 'environments' | 'sinks',
     base: T,
   ): T => ({
     ...base,
@@ -180,6 +219,7 @@ export const resolveConfig = (file: Config | undefined, call: Config | undefined
       console: merged('console', { ...DEFAULTS.console }),
       detail: merged('detail', { ...DEFAULTS.detail }),
       environments: merged('environments', { ...DEFAULTS.environments }),
+      sinks: merged('sinks', { ...DEFAULTS.sinks }),
     },
     /* The key opts a project in, and is never written into a report. */
     project: {

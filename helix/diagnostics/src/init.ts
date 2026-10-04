@@ -25,11 +25,12 @@
  * rate.
  */
 
-import { type Config, resolveConfig } from './config.js'
+import { type Config, checkConfig, LOCAL, resolveConfig } from './config.js'
 import { report as print } from './console.js'
 import { diagnose } from './diagnose.js'
 import type { LintData, Tier } from './manifest.js'
-import type { Environment, Report } from './report.js'
+import { type Overlay, overlayOn } from './overlay.js'
+import type { Configuration, Environment, Report } from './report.js'
 import { type Schedule, schedule } from './schedule.js'
 import { loadedVersions, type Watcher, watch } from './usage.js'
 
@@ -90,8 +91,11 @@ export const INSTANCE = Symbol.for('fusion.dev/helix/diagnostics')
 /** Where lint data comes from by default. */
 const CDN = 'https://cdn.jsdelivr.net/npm'
 
-/** The hosts a run with no declared environment may run on. */
-const LOCAL = /^(localhost|127\.0\.0\.1|\[::1\]|.+\.localhost|.+\.test)$/
+/** Where `helix diagnostics` listens by default. */
+const RELAY = 'http://127.0.0.1:7417'
+
+/** The largest body sent with `keepalive`, which browsers cap at 64 KB. */
+const KEEPALIVE = 60_000
 
 /** How many failed runs in a row stop it. */
 const FAILURES = 3
@@ -192,7 +196,18 @@ const start = (options: InitOptions, page: Document): Diagnostics => {
       return inert()
     }
   }
-  return running({ call, cdn, duplicates, environment, file, onReport, page, route, tiers })
+  return running({
+    call,
+    cdn,
+    duplicates,
+    environment,
+    file,
+    onReport,
+    page,
+    route,
+    sinks: configuration.sinks,
+    tiers,
+  })
 }
 
 /** Everything a running instance holds. */
@@ -205,12 +220,27 @@ interface Running {
   onReport: ((run: Report) => void) | undefined
   page: Document
   route: (() => string | undefined) | undefined
+  sinks: Configuration['sinks']
   tiers: Tier[] | undefined
 }
 
 /** The running instance: the watcher, the schedule, the triggers, and the sinks. */
 const running = (given: Running): Diagnostics => {
-  const { call, cdn, duplicates, environment, file, page, route } = given
+  const { call, cdn, duplicates, environment, page, route, sinks } = given
+  /* **The sinks for the developer stay with the developer.** A visitor never
+     sees the console's findings or the overlay, and a visitor's browser never
+     reaches a port on the visitor's own machine, so production runs go to the
+     app alone. CI keeps the console and the relay, and its screenshots never
+     hold the overlay. Undeclared, the page is on a local host: development. */
+  const production = environment === 'production'
+  const development = environment === undefined || environment === 'development'
+  /* The project's settings: given, or served by the relay once it answers. */
+  let file = given.file
+  let overlay: Overlay | undefined
+  /* The relay: where it is, whether it answered, and the last run sent for each page. */
+  const relay = production ? undefined : sinks.relay === true ? RELAY : sinks.relay || undefined
+  let relayed = false
+  const sent = new Map<string, string>()
   const listeners = new Set<(run: Report) => void>()
   if (given.onReport) {
     listeners.add(given.onReport)
@@ -282,13 +312,54 @@ const running = (given: Running): Diagnostics => {
     const key = run.run.page ?? ''
     const seen = shown.get(key) ?? new Set<string>()
     shown.set(key, seen)
-    deliver('the console', () => print(run, console, { shown: seen }))
+    if (!production) {
+      deliver('the console', () => print(run, console, { shown: seen }))
+    }
     for (const listener of listeners) {
       deliver('a subscriber', () => listener(run))
     }
     deliver('the helix-diagnostics event', () =>
       page.dispatchEvent(new CustomEvent('helix-diagnostics', { detail: run })),
     )
+    if (sinks.overlay && development) {
+      deliver('the overlay', () => {
+        /* Made the first time there is something to show, and not before. */
+        if (overlay || run.findings.length > 0) {
+          overlay ??= overlayOn(page)
+          overlay.show(run)
+        }
+      })
+    }
+    if (relay && relayed) {
+      deliver('the relay', () => {
+        /* **Only a run that differs from the last one sent for its page.** */
+        const same = JSON.stringify([
+          run.findings.map((one) => [one.fingerprint, one.severity]),
+          run.coverage.read,
+          run.coverage.sheets,
+          run.usage.tags,
+        ])
+        if (sent.get(key) === same) {
+          return
+        }
+        sent.set(key, same)
+        const body = JSON.stringify(run)
+        fetch(`${relay}/runs`, {
+          body,
+          credentials: 'omit',
+          headers: { 'content-type': 'text/plain' },
+          keepalive: body.length < KEEPALIVE,
+          method: 'POST',
+        }).catch(() => {
+          relayed = false
+          once('relay gone', () =>
+            console.warn(
+              'helix diagnostics: the relay stopped answering, so runs are no longer sent to it.',
+            ),
+          )
+        })
+      })
+    }
     return run.run.duration
   }
 
@@ -350,11 +421,65 @@ const running = (given: Running): Diagnostics => {
     )
   }
 
+  /* **One probe of the relay, at start**: absent, it is not asked again. */
+  if (relay) {
+    const ask = (path: string) =>
+      fetch(`${relay}${path}`, {
+        credentials: 'omit',
+        ...(typeof AbortSignal.timeout === 'function' ? { signal: AbortSignal.timeout(1000) } : {}),
+      })
+    ask('/health')
+      .then(async (answer) => {
+        if (!answer.ok) {
+          throw new Error(`it answered ${answer.status}`)
+        }
+        relayed = true
+        if (!given.file) {
+          const settings = await ask('/config')
+          if (settings.ok) {
+            const served = (await settings.json()) as Config
+            try {
+              checkConfig(served, 'file')
+              file = served
+            } catch (error) {
+              once(`relay settings ${messageOf(error)}`, () =>
+                console.error(
+                  `helix diagnostics: the settings the relay served were not used. ${messageOf(error)}`,
+                ),
+              )
+            }
+          }
+        }
+        plan.poke()
+      })
+      .catch((error: unknown) =>
+        once('no relay', () =>
+          console.warn(
+            `helix diagnostics: no relay at ${relay} (${messageOf(error)}). Start it with \`helix diagnostics\`, or turn \`sinks.relay\` off.`,
+          ),
+        ),
+      )
+  }
+
   const plan: Schedule = schedule(runNow)
   const watcher: Watcher = watch(page, { onRender: () => plan.poke() })
   const poke = (): void => plan.poke()
-  /* A change to the page's own markup, stylesheets among it. */
-  const observer = typeof MutationObserver === 'function' ? new MutationObserver(poke) : undefined
+  /* A change to the page's own markup, stylesheets among it, and never the
+     overlay arriving, which is diagnostics' own. */
+  const observer =
+    typeof MutationObserver === 'function'
+      ? new MutationObserver((records) => {
+          if (
+            records.some((record) =>
+              [...record.addedNodes, ...record.removedNodes].some(
+                (node) => node !== overlay?.element,
+              ),
+            )
+          ) {
+            poke()
+          }
+        })
+      : undefined
   observer?.observe(page.documentElement, { childList: true, subtree: true })
   /* A navigation: the Navigation API where there is one, history otherwise.
      A route's new markup is also a change the observer sees. */
@@ -385,6 +510,7 @@ const running = (given: Running): Diagnostics => {
     globalThis.removeEventListener?.('hashchange', poke)
     globalThis.removeEventListener?.('load', poke)
     listeners.clear()
+    overlay?.remove()
     const store = globalThis as Record<symbol, unknown>
     if (store[INSTANCE] === handle) {
       delete store[INSTANCE]
