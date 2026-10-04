@@ -14,6 +14,7 @@
 import { parts, targets } from './analyze.js'
 import type { Answered, Located } from './collect.js'
 import type { Published } from './manifest.js'
+import { type Page, pageOf } from './page.js'
 import type { Usage } from './report.js'
 
 /**
@@ -99,23 +100,12 @@ const tally = (counted: Counted, element: Element): void => {
   }
 }
 
-/** Every element in a document, shadow roots included. */
-const everyElement = (from: ParentNode, visit: (element: Element) => void, depth = 0): void => {
-  if (depth > 32) {
-    return
-  }
-  for (const element of from.querySelectorAll('*')) {
-    visit(element)
-    if (element.shadowRoot) {
-      everyElement(element.shadowRoot, visit, depth + 1)
-    }
-  }
-}
-
 /** The elements in the page now, counted once each. */
-export const walk = (from: Document): Counted => {
+export const walk = (from: Document, page: Page = pageOf(from)): Counted => {
   const counted = empty()
-  everyElement(from, (element) => tally(counted, element))
+  for (const element of page.elements) {
+    tally(counted, element)
+  }
   return counted
 }
 
@@ -192,7 +182,9 @@ export const watch = (from: Document = document): Watcher => {
     }
   }
   store[SLOT] = listener
-  everyElement(from, see)
+  for (const element of pageOf(from).elements) {
+    see(element)
+  }
   return {
     counts: () => structuredClone(counted),
     stop: () => {

@@ -60,6 +60,7 @@ import { type Config, pagePattern, resolveConfig } from './config.js'
 import { identify } from './identity.js'
 import type { Tier } from './manifest.js'
 import { index, versionsOf } from './manifest.js'
+import { pageOf } from './page.js'
 import type { Environment, Report } from './report.js'
 import { applyRules, overridesOf } from './rules.js'
 import { listed, loadedVersions, styled, type Watcher, walk } from './usage.js'
@@ -153,9 +154,11 @@ export const diagnose = (options: Options): Report => {
   const resolved = resolveConfig(file, call)
   const { detail } = resolved.configuration
   const document_ = from ?? globalThis.document
-  const { answered, coverage, readers, rules: located, used } = collect(document_)
+  /* One walk of the page, which every check below reads. */
+  const walked = pageOf(document_)
+  const { answered, coverage, readers, rules: located, used } = collect(document_, walked)
   const tags = index(tiers)
-  const counted = watcher ? watcher.counts() : walk(document_)
+  const counted = watcher ? watcher.counts() : walk(document_, walked)
   const seen = loadedVersions()
   const manifests = versionsOf(tiers)
 
@@ -168,7 +171,7 @@ export const diagnose = (options: Options): Report => {
   const byVersion = versionSkew(manifests, seen)
   const known = seen.length > 0 && Object.keys(manifests).length > 0
   const skewed = applyRules(
-    (byVersion.length > 0 ? byVersion : known ? [] : skew(tags, document_)).map((one) =>
+    (byVersion.length > 0 ? byVersion : known ? [] : skew(tags, document_, walked)).map((one) =>
       identify(one, tags),
     ),
     file?.rules,
@@ -180,8 +183,8 @@ export const diagnose = (options: Options): Report => {
       : applyRules(
           [
             ...analyze(located, tags, document_, answered, used, readers),
-            ...markup(tags, document_),
-            ...registrations(document_, duplicates),
+            ...markup(tags, document_, walked),
+            ...registrations(document_, duplicates, walked),
           ].map((one) => identify(one, tags)),
           file?.rules,
           call.rules,
