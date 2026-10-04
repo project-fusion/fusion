@@ -23,6 +23,7 @@
     },
     "./custom-elements.json": "./custom-elements.json",
     "./jsx": "./types/jsx.d.ts",
+    "./lint.json": "./lint.json",
     "./rehype": {
       "types": "./dist/rehype.d.ts",
       "default": "./dist/rehype.js"
@@ -33,6 +34,7 @@
   "files": [
     "custom-elements.json",
     "dist",
+    "lint.json",
     "types"
   ],
   "customElements": "custom-elements.json",

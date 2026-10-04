@@ -36,12 +36,98 @@ export interface ManifestSource {
   }>
 }
 
-/** One manifest, and which tier shipped it. */
-export interface Tier {
-  manifest: ManifestSource
-  /** Package name, used verbatim in a finding's message. */
-  name: string
+/**
+ * What diagnostics reads of one package's manifest, and nothing else: per
+ * tag, the parts, the hooks, the attributes with the values each allows, the
+ * attributes the element writes on itself, and the family.
+ *
+ * **About a seventieth of the manifest.** Measured 4 Oct 2026: 124 KB for the
+ * styled tier and 103 KB for the headless one, 18 KB and 14 KB compressed,
+ * against manifests of 8.6 MB and 7.0 MB. `analyze` writes it beside each
+ * `custom-elements.json` as `lint.json`, and every Helix package publishes
+ * it, so a page can load the data for exactly the version it runs.
+ */
+export interface LintData {
+  /** The package the data describes. */
+  package: string
+  tags: Record<string, LintTag>
+  /** The package's version, where the manifest says. */
+  version?: string | undefined
 }
+
+/** What one tag publishes, as lint data says it. */
+export interface LintTag {
+  /** Each attribute, with the values it allows, or `null` where it takes any. */
+  attributes: Record<string, string[] | null>
+  /** The family, from the module's path. */
+  family?: string | undefined
+  hooks: string[]
+  parts: string[]
+  /** The attributes the element writes on itself: one named for a read-only member. */
+  written: string[]
+}
+
+/**
+ * One installed tier: its manifest, with the package name, or its lint data,
+ * which names the package itself.
+ */
+export type Tier =
+  | {
+      manifest: ManifestSource
+      /** Package name, used verbatim in a finding's message. */
+      name: string
+    }
+  | { lint: LintData }
+
+/** The lint data for a manifest: what `analyze` writes, and what `index` reads. */
+export const lintOf = (manifest: ManifestSource, name: string): LintData => {
+  const tags: Record<string, LintTag> = {}
+  for (const module of manifest.modules ?? []) {
+    const family = /^src\/([^/]+)\//.exec(module.path ?? '')?.[1]
+    for (const declaration of module.declarations ?? []) {
+      const tag = declaration.tagName
+      if (!tag) {
+        continue
+      }
+      const entry: LintTag = tags[tag] ?? {
+        attributes: {},
+        family,
+        hooks: [],
+        parts: [],
+        written: [],
+      }
+      tags[tag] = entry
+      for (const member of declaration.members ?? []) {
+        if (member.readonly && !member.static && member.kind === 'field') {
+          entry.written.push(
+            member.name,
+            member.name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`),
+          )
+        }
+      }
+      for (const attribute of declaration.attributes ?? []) {
+        const values = allowed(attribute.type?.text)
+        entry.attributes[attribute.name] = values ? [...values] : null
+      }
+      entry.parts.push(...(declaration.cssParts ?? []).map((part) => part.name))
+      entry.hooks.push(...(declaration.cssProperties ?? []).map((hook) => hook.name))
+    }
+  }
+  for (const entry of Object.values(tags)) {
+    entry.written = [...new Set(entry.written)]
+    entry.parts = [...new Set(entry.parts)]
+    entry.hooks = [...new Set(entry.hooks)]
+  }
+  return {
+    package: manifest.helix?.package ?? name,
+    tags,
+    ...(manifest.helix?.version ? { version: manifest.helix.version } : {}),
+  }
+}
+
+/** A tier's lint data, read from its lint data or derived from its manifest. */
+export const lintFor = (tier: Tier): LintData =>
+  'lint' in tier ? tier.lint : lintOf(tier.manifest, tier.name)
 
 /**
  * What one tag publishes, per tier.
@@ -77,44 +163,33 @@ export interface Published {
 export const index = (tiers: Tier[]): Map<string, Published> => {
   const tags = new Map<string, Published>()
   for (const tier of tiers) {
-    for (const module of tier.manifest.modules ?? []) {
-      const family = /^src\/([^/]+)\//.exec(module.path ?? '')?.[1]
-      for (const declaration of module.declarations ?? []) {
-        const tag = declaration.tagName
-        if (!tag) {
-          continue
+    const lint = lintFor(tier)
+    for (const [tag, entry] of Object.entries(lint.tags)) {
+      let element = tags.get(tag)
+      if (!element) {
+        element = {
+          attributes: new Map(),
+          family: entry.family,
+          hooks: new Map(),
+          parts: new Map(),
+          written: new Set(),
         }
-        let element = tags.get(tag)
-        if (!element) {
-          element = {
-            attributes: new Map(),
-            family,
-            hooks: new Map(),
-            parts: new Map(),
-            written: new Set(),
-          }
-          tags.set(tag, element)
-        }
-        for (const member of declaration.members ?? []) {
-          if (member.readonly && !member.static && member.kind === 'field') {
-            element.written.add(member.name)
-            element.written.add(
-              member.name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`),
-            )
-          }
-        }
-        for (const attribute of declaration.attributes ?? []) {
-          element.attributes.set(attribute.name, allowed(attribute.type?.text))
-        }
-        for (const [field, into] of [
-          [declaration.cssParts, element.parts],
-          [declaration.cssProperties, element.hooks],
-        ] as const) {
-          for (const entry of field ?? []) {
-            const publishers = into.get(entry.name) ?? new Set<string>()
-            publishers.add(tier.name)
-            into.set(entry.name, publishers)
-          }
+        tags.set(tag, element)
+      }
+      for (const name of entry.written) {
+        element.written.add(name)
+      }
+      for (const [name, values] of Object.entries(entry.attributes)) {
+        element.attributes.set(name, values ? new Set(values) : null)
+      }
+      for (const [names, into] of [
+        [entry.parts, element.parts],
+        [entry.hooks, element.hooks],
+      ] as const) {
+        for (const name of names) {
+          const publishers = into.get(name) ?? new Set<string>()
+          publishers.add(lint.package)
+          into.set(name, publishers)
         }
       }
     }
@@ -143,9 +218,9 @@ const allowed = (type: string | undefined): Set<string> | null => {
 export const versionsOf = (tiers: Tier[]): Record<string, string> => {
   const versions: Record<string, string> = {}
   for (const tier of tiers) {
-    const version = tier.manifest.helix?.version
-    if (version) {
-      versions[tier.manifest.helix?.package ?? tier.name] = version
+    const lint = lintFor(tier)
+    if (lint.version) {
+      versions[lint.package] = lint.version
     }
   }
   return versions
