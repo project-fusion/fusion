@@ -17,8 +17,32 @@
  * never will; what the listener does with an element is the listener's.
  */
 
+import { VERSION } from '../../version.js'
+
 /** The key the listener is kept under. `@fusion.dev/helix-diagnostics` names the same string. */
 export const USAGE_SLOT = Symbol.for('fusion.dev/helix/usage')
+
+/**
+ * The key the loaded versions are listed under: every copy of core on the
+ * page adds its own once, so a page holding two copies lists two.
+ * `@fusion.dev/helix-diagnostics` compares the list with the version its
+ * manifest names.
+ *
+ * **On `globalThis` and not on the element classes**, where a field would be
+ * listed as a member of every component in the manifest and on every
+ * reference page.
+ */
+export const VERSIONS_SLOT = Symbol.for('fusion.dev/helix/versions')
+
+/** Adds this copy's version to the page's list, once. */
+export const noteVersion = (): void => {
+  const store = globalThis as Record<symbol, unknown>
+  const listed = Array.isArray(store[VERSIONS_SLOT]) ? (store[VERSIONS_SLOT] as string[]) : []
+  if (!listed.includes(VERSION)) {
+    listed.push(VERSION)
+  }
+  store[VERSIONS_SLOT] = listed
+}
 
 /**
  * Tells the listener, where there is one, that `element` has rendered for the

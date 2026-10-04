@@ -522,3 +522,13 @@ describe('usage', () => {
     expect(thrown).toHaveLength(1)
   })
 })
+
+describe('version', () => {
+  test('a loaded copy of core lists its version on the page once', async () => {
+    const { VERSION } = await import('../version.js')
+    const { noteVersion } = await import('../utils/report-usage/report-usage.js')
+    noteVersion()
+    const listed = (globalThis as Record<symbol, unknown>)[Symbol.for('fusion.dev/helix/versions')]
+    expect(listed).toEqual([VERSION])
+  })
+})
