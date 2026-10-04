@@ -143,6 +143,34 @@ export const CATEGORIES = [
 export type Category = (typeof CATEGORIES)[number]
 
 /**
+ * What the components cost on a page, by tag, where a project asked for it.
+ */
+export interface PerformanceReport {
+  /**
+   * What this browser could measure. Layout shift and long tasks are
+   * Chromium's, so elsewhere their numbers are absent, never zero.
+   */
+  measured: { layoutShift: boolean; longTasks: boolean }
+  /** Each tag rendered on the page. */
+  tags: Record<
+    string,
+    {
+      /** How many long tasks, of 50 ms or more, one of its elements' first updates ran in. */
+      longTasks: number
+      /**
+       * Its elements' first updates, in milliseconds: how many, the median,
+       * the 95th percentile, and the slowest. Each is the element's own
+       * update, from `willUpdate` to `updated`, so time spent waiting behind
+       * other elements is not counted.
+       */
+      render: { count: number; max: number; p50: number; p95: number }
+      /** The layout shift its elements moved, summed as the browser scores it. */
+      shift: number
+    }
+  >
+}
+
+/**
  * A runtime event as a run holds it: what `@fusion.dev/helix-core` reported
  * as the library ran, such as a selectable table with no `row-key`, one entry
  * per distinct event on the page.
@@ -251,6 +279,8 @@ export interface Configuration {
   console: {
     coverage: 'info' | 'off'
     findings: Severity | 'off'
+    /** What the components cost, by tag, which is measured where this is on. */
+    performance: 'info' | 'off'
     /** The runtime events core left to diagnostics to print. */
     runtime: 'warn' | 'off'
     usage: 'debug' | 'off'
@@ -310,6 +340,11 @@ export interface Report {
   configuration: Configuration
   coverage: Coverage
   findings: Finding[]
+  /**
+   * What the components cost, by tag. Present only where the project asked,
+   * with `console.performance` or `send.performance`.
+   */
+  performance?: PerformanceReport
   /**
    * What the library reported going wrong as it ran on this page, from its
    * first load: one entry per distinct event, counted.

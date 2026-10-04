@@ -423,7 +423,13 @@ describe('coverage', () => {
 /** A report's other halves, where a test is about coverage or findings. */
 const quiet = {
   configuration: {
-    console: { coverage: 'info', findings: 'info', runtime: 'warn', usage: 'debug' },
+    console: {
+      coverage: 'info',
+      findings: 'info',
+      performance: 'off',
+      runtime: 'warn',
+      usage: 'debug',
+    },
     core: { warnings: true },
     detail: { evidence: 'full', hookValues: true, pages: 'patterns' },
     environments: { ci: true, development: true, production: false },
@@ -865,6 +871,7 @@ describe('configuration', () => {
     expect(configuration.console).toEqual({
       coverage: 'info',
       findings: 'warn',
+      performance: 'off',
       runtime: 'warn',
       usage: 'debug',
     })
@@ -983,7 +990,13 @@ describe('console levels', () => {
         ...quiet,
         configuration: {
           ...quiet.configuration,
-          console: { coverage: 'off', findings: 'error', runtime: 'off', usage: 'off' },
+          console: {
+            coverage: 'off',
+            findings: 'error',
+            performance: 'off',
+            runtime: 'off',
+            usage: 'off',
+          },
         },
         coverage: { read: 1, roots: 0, sheets: 1, unreadable: [] },
         findings: [finding('error'), finding('warn')],

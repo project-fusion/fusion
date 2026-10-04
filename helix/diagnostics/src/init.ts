@@ -173,15 +173,16 @@ const start = (options: InitOptions, page: Document): Diagnostics => {
     ...call
   } = options
   /* A setting that names nothing: said, and nothing started. */
-  let configuration: ReturnType<typeof resolveConfig>['configuration']
+  let resolved: ReturnType<typeof resolveConfig>
   try {
-    configuration = resolveConfig(file, call).configuration
+    resolved = resolveConfig(file, call)
   } catch (error) {
     once(`settings ${messageOf(error)}`, () =>
       console.error(`helix diagnostics: not started. ${messageOf(error)}`),
     )
     return inert()
   }
+  const { configuration } = resolved
   const host = globalThis.location?.hostname ?? ''
   if (environment === undefined && !LOCAL.test(host)) {
     once(`host ${host}`, () =>
@@ -203,6 +204,8 @@ const start = (options: InitOptions, page: Document): Diagnostics => {
     duplicates,
     environment,
     file,
+    /* **Measured where it is wanted**: printed, or kept for sending. */
+    measure: resolved.send.performance.on || configuration.console.performance !== 'off',
     onReport,
     page,
     route,
@@ -219,6 +222,8 @@ interface Running {
   duplicates: (() => string[]) | undefined
   environment: Environment | undefined
   file: Config | undefined
+  /** Whether to measure what the components cost. */
+  measure: boolean
   onReport: ((run: Report) => void) | undefined
   page: Document
   route: (() => string | undefined) | undefined
@@ -474,6 +479,7 @@ const running = (given: Running): Diagnostics => {
   const watcher: Watcher = watch(page, {
     onRender: () => plan.poke(),
     onRuntime: () => plan.poke(),
+    performance: given.measure,
     quiet: () => !warnings,
   })
   const poke = (): void => plan.poke()
