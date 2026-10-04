@@ -88,8 +88,7 @@ helix-app-header {
 .section,
 .hero,
 .first-screen,
-.fact,
-.facts,
+.features,
 .notes,
 .split {
   grid-template-columns: minmax(0, 1fr);
@@ -97,31 +96,55 @@ helix-app-header {
 
 /* One step between the blocks of a page and a smaller one inside them, which is
    the whole of the rhythm: `3xl` here, and the `md` a section puts between its
-   heading and its block, so the landing page reads as three groups. */
+   heading and its block. */
 .stack {
   display: grid;
   gap: var(--helix-space-3xl);
 }
 
 /*
- * **The first screen holds two things side by side**: what the starter is, on
- * the left, and the library at work, on the right. Below 60rem two readable
- * columns do not fit, so they become one, and the panel follows the words it
- * illustrates.
+ * **The first screen: one lit panel, with what the starter is on the left and
+ * the library at work on the right.** Below 60rem two readable columns do not
+ * fit, so they become one, and the glass card follows the words.
  *
- * `start`, because a grid item stretches to its tallest sibling: beside a
- * taller block of words, the panel would grow to match and spread its own
- * regions out to fill the difference.
+ * `isolation` makes the panel its own stacking context, so the light behind it
+ * sits under the content and above the page, and `overflow: clip` keeps the
+ * light inside the rounded corners.
  */
 .first-screen {
-  align-items: start;
+  align-items: center;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
   display: grid;
-  gap: var(--helix-space-xl);
+  gap: var(--helix-space-2xl);
+  isolation: isolate;
+  overflow: clip;
+  padding: var(--helix-space-3xl) var(--helix-space-2xl);
+  position: relative;
 }
 
 @media (width >= 60rem) {
   .first-screen {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 18rem);
+  }
+}
+
+/* The light, under everything in the panel and out of the way of the pointer,
+   and faded out behind the words so they keep their contrast: it is at full
+   strength only behind the card, which is below the words in one column and
+   beside them in two. */
+.first-light {
+  block-size: auto;
+  inset: 0;
+  mask-image: linear-gradient(to bottom, transparent 40%, black 80%);
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-beneath);
+}
+
+@media (width >= 60rem) {
+  .first-light {
+    mask-image: linear-gradient(to right, transparent 35%, black 70%);
   }
 }
 
@@ -131,6 +154,17 @@ helix-app-header {
   display: grid;
   gap: var(--helix-space-xs);
   justify-items: start;
+}
+
+/* The first screen's heading takes more room around it than a route's, and
+   its lede a step more size, wrapped to even lines. */
+.first-screen .hero {
+  gap: var(--helix-space-md);
+}
+
+.first-screen .lede {
+  font-size: var(--helix-text-lg);
+  text-wrap: balance;
 }
 
 /* **A measure for the lede, narrower than the page's.** A line of prose across
@@ -150,7 +184,7 @@ helix-app-header {
 /*
  * **The panel is the library at work**, so all it needs from here is room. Two
  * documented hooks: the figures come down a step from the display size, which
- * suits one figure on its own and is too loud for three in a 20rem column, and
+ * suits one figure on its own and is too loud for three in an 18rem column, and
  * the gap around the rule between them comes in from `2xl`, which `divided`
  * doubles, leaving no room for a number.
  */
@@ -166,60 +200,33 @@ helix-app-header {
   gap: var(--helix-space-md);
 }
 
-/*
- * **Three facts about the library, each under a rule.** A box around each would
- * say each is its own object, when they are three paragraphs about one
- * installed thing. A rule over each column groups them at a fraction of the
- * weight, and leaves boxes to the cards below, which each link somewhere.
- *
- * `border-thick` in the foreground color: the rule heads a column, and it is
- * the one place the page draws in ink.
- */
-.facts {
+/* Three tiles, side by side where there is room for three. */
+.features {
   display: grid;
   gap: var(--helix-space-lg);
 }
 
 @media (width >= 48rem) {
-  .facts {
+  .features {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-.fact {
-  align-content: start;
-  border-block-start: var(--helix-border-thick) solid var(--helix-color-foreground);
-  display: grid;
-  gap: var(--helix-space-xs);
-  justify-items: start;
-  padding-block-start: var(--helix-space-sm);
-}
-
-/*
- * **One column below 48rem.** `helix-grid` takes a fixed count as plain CSS,
- * which keeps a server-rendered row of cards correct before any JavaScript
- * arrives. Below this width there is room for one column, and `--grid-columns`
- * is the documented way to say so from outside the shadow root.
- */
-@media (width < 48rem) {
-  helix-grid {
-    --grid-columns: minmax(0, 1fr);
-  }
-}
-
-/*
- * **The cards keep `start`, `--card-align`'s resting value.** `space-between`
- * would end a row of cards in a straight line by sharing the spare height out
- * between every region, and the body moves first: three cards of six, five, and
- * seven lines had their opening lines 50 pixels apart under level headings. You
- * scan the first line of each, so that is the alignment worth keeping.
- */
-
-/* The card fills the link that wraps it, so a row of destinations ends level:
-   the anchor is the grid item, which stretches, and the card takes its full
-   height. The regions stay packed at the top, per `--card-align` above. */
+/* The card fills the link that wraps it, so the row of tiles ends level: the
+   anchor is the grid item, which stretches, and the card takes its full height. */
 [data-card] > helix-card {
   block-size: 100%;
+}
+
+/* Each tile's icon, on a tint of the brand. */
+.feature-mark {
+  --icon-size: 1.25rem;
+  background-color: var(--helix-color-primary-subtle);
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-primary);
+  display: inline-flex;
+  inline-size: fit-content;
+  padding: var(--helix-space-xs);
 }
 
 /* A form is read straight down, and a field wider than about 28rem is hard to
@@ -306,6 +313,10 @@ helix-app-header {
  * outside the box until you scrolled the table sideways.
  */
 @media (width < 40rem) {
+  .first-screen {
+    padding: var(--helix-space-2xl) var(--helix-space-lg);
+  }
+
   .page {
     padding-block: var(--helix-space-xl) var(--helix-space-2xl);
     padding-inline: var(--helix-space-md);

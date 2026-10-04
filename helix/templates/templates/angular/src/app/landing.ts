@@ -8,8 +8,6 @@ import { DOCS } from './docs'
  * Delete it once you know your way around: nothing else imports it, and the
  * route it answers becomes yours.
  *
- * **The heading says what this is, and the project's name stays in the bar.**
- *
  * **The calls to action are anchors.** A button that navigates is a link
  * dressed as a button, and the two are different things to a keyboard and to
  * a screen reader. The base stylesheet styles an anchor that asks with
