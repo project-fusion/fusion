@@ -266,7 +266,13 @@
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/cli/src/**"
       ],
-      "outputs": ["custom-elements.json", "types/jsx.d.ts", "types/svelte.d.ts", "types/vue.d.ts"]
+      "outputs": [
+        "custom-elements.json",
+        "lint.json",
+        "types/jsx.d.ts",
+        "types/svelte.d.ts",
+        "types/vue.d.ts"
+      ]
     },
     "build": {
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],

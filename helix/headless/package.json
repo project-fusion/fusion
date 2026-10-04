@@ -23,12 +23,14 @@
     },
     "./custom-elements.json": "./custom-elements.json",
     "./jsx": "./types/jsx.d.ts",
+    "./lint.json": "./lint.json",
     "./svelte": "./types/svelte.d.ts",
     "./vue": "./types/vue.d.ts"
   },
   "files": [
     "custom-elements.json",
     "dist",
+    "lint.json",
     "types"
   ],
   "customElements": "custom-elements.json",

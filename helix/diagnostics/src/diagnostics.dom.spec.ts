@@ -20,7 +20,7 @@ beforeAll(() => {
 const { analyze, markup, skew } = await import('./analyze.js')
 const { collect } = await import('./collect.js')
 const { diagnose } = await import('./index.js')
-const { index, nearest } = await import('./manifest.js')
+const { index, lintOf, nearest } = await import('./manifest.js')
 const { report } = await import('./console.js')
 const { applyRules, checkRules } = await import('./rules.js')
 const { styled, walk, watch } = await import('./usage.js')
@@ -1256,5 +1256,28 @@ describe('a hook answered by a rule the page reads it in', () => {
         '.x:focus-visible { --button-radius: 0 }',
       ),
     ).toEqual([])
+  })
+})
+
+describe('lint data', () => {
+  test('lint data is the manifest less everything diagnostics never reads, and indexes the same', () => {
+    const lints = tiers.map((tier) => ({ lint: lintOf(tier.manifest, tier.name) }))
+    expect(index(lints)).toEqual(index(tiers))
+    expect(lints[0]?.lint.tags['helix-button']).toEqual({
+      attributes: { emphasis: ['ghost', 'solid'], label: null },
+      family: undefined,
+      hooks: ['--button-background-color', '--button-radius'],
+      parts: ['button', 'icon'],
+      written: [],
+    })
+  })
+
+  test('lint data names its package and version, from the manifest', () => {
+    const lint = lintOf(
+      { helix: { package: '@fusion.dev/helix', version: '0.138.0' }, modules: [] },
+      'given',
+    )
+    expect([lint.package, lint.version]).toEqual(['@fusion.dev/helix', '0.138.0'])
+    expect(lintOf({ modules: [] }, 'given').package).toBe('given')
   })
 })

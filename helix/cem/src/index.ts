@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
+import { lintOf, type ManifestSource } from '@fusion.dev/helix-diagnostics'
 import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { vuejsTypesPlugin } from '@wc-toolkit/vuejs-types'
 import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
@@ -52,6 +53,17 @@ const TYPES = 'types'
 
 /** The file every consumer reads, and what `analyze` exists to write. */
 const MANIFEST = 'custom-elements.json'
+
+/**
+ * What `@fusion.dev/helix-diagnostics` reads of the manifest, beside it.
+ *
+ * **About a seventieth of the manifest**, so a page in development can load
+ * the data for exactly the version it runs: measured 4 Oct 2026, 124 KB for
+ * the styled tier, 18 KB compressed, against a manifest of 8.6 MB. Derived by
+ * diagnostics' own `lintOf`, so what is written here and what diagnostics
+ * reads from a full manifest cannot drift apart.
+ */
+const LINT = 'lint.json'
 
 /**
  * What runs over the finished manifest, in the order it runs.
@@ -213,6 +225,14 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
   writeFileSync(join(cwd, MANIFEST), built.stdout)
 
   const customElementsManifest = JSON.parse(built.stdout) as HelixManifest
+  /* Only where the package declares an element: core's manifest holds the
+     base classes, which nothing diagnoses. */
+  const name = (JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')) as { name: string })
+    .name
+  const lint = lintOf(customElementsManifest as ManifestSource, name)
+  if (Object.keys(lint.tags).length > 0) {
+    writeFileSync(join(cwd, LINT), `${JSON.stringify(lint)}\n`)
+  }
   const context: HelixContext = {
     thirdPartyCEMs: [...dependencies.values()].map(
       (at) => JSON.parse(readFileSync(at, 'utf8')) as HelixManifest,

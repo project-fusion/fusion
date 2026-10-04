@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@fusion.dev/helix-cli": "workspace:*",
+    "@fusion.dev/helix-diagnostics": "workspace:*",
     "@wc-toolkit/jsx-types": "^1.7.1"
   },
   "devDependencies": {

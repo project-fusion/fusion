@@ -31,8 +31,8 @@ export { collect } from './collect.js'
 export { type Config, DEFAULTS, pagePattern } from './config.js'
 export { report } from './console.js'
 export { fingerprintOf, normalize } from './identity.js'
-export type { ManifestSource, Published, Tier } from './manifest.js'
-export { index, nearest } from './manifest.js'
+export type { LintData, LintTag, ManifestSource, Published, Tier } from './manifest.js'
+export { index, lintOf, nearest } from './manifest.js'
 export type {
   Category,
   Configuration,
@@ -59,7 +59,7 @@ import { collect } from './collect.js'
 import { type Config, pagePattern, resolveConfig } from './config.js'
 import { identify } from './identity.js'
 import type { Tier } from './manifest.js'
-import { index, versionsOf } from './manifest.js'
+import { index, lintFor, versionsOf } from './manifest.js'
 import { pageOf } from './page.js'
 import type { Environment, Report } from './report.js'
 import { applyRules, overridesOf } from './rules.js'
@@ -157,10 +157,12 @@ export const diagnose = (options: Options): Report => {
   /* One walk of the page, which every check below reads. */
   const walked = pageOf(document_)
   const { answered, coverage, readers, rules: located, used } = collect(document_, walked)
-  const tags = index(tiers)
+  /* Each tier as lint data once, which the index and the versions both read. */
+  const lints = tiers.map((tier) => ({ lint: lintFor(tier) }))
+  const tags = index(lints)
   const counted = watcher ? watcher.counts() : walk(document_, walked)
   const seen = loadedVersions()
-  const manifests = versionsOf(tiers)
+  const manifests = versionsOf(lints)
 
   /* **Refused on a manifest from another version**, unless the project
      turned that finding off, in which case it is judged as usual: a report
