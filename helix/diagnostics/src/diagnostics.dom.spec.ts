@@ -428,6 +428,7 @@ const quiet = {
     environments: { ci: true, development: true, production: false },
     overrides: [],
     silenced: [],
+    sinks: { overlay: true, relay: false },
   },
   project: { tags: [] },
   run: { at: '2026-10-04T00:00:00.000Z', duration: 1, id: 'run', source: 'page' },

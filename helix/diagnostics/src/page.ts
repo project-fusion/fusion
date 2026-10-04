@@ -7,6 +7,12 @@
  * run by hand never feels and a run after every change would.
  */
 
+/**
+ * The tag of the overlay `initDiagnostics()` puts on a page: the one element
+ * diagnostics adds, which it leaves out of everything it counts and reads.
+ */
+export const OVERLAY = 'helix-diagnostics-overlay'
+
 /** Every element on a page and every shadow root, from one walk. */
 export interface Page {
   /**

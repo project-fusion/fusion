@@ -54,7 +54,7 @@ export const parts = (selector: string): Array<{ names: string[]; tag: string }>
  * The longer pseudo-classes come first, so `:focus-visible` is taken whole
  * and never read as `:focus` followed by `-visible`.
  */
-const matchable = (selector: string): string | null => {
+export const matchable = (selector: string): string | null => {
   if (selector.includes(':host')) {
     return null
   }

@@ -15,7 +15,7 @@
  * the only way to know. Each one becomes a `Coverage.unreadable` entry, so the
  * hole is in the output rather than in the reader's assumptions.
  */
-import { type Page, pageOf } from './page.js'
+import { OVERLAY, type Page, pageOf } from './page.js'
 import type { Coverage, Unreadable } from './report.js'
 
 /** One rule, with where it came from. */
@@ -246,7 +246,8 @@ export const collect = (
      it exists, and inventing a number for what it cannot see is the
      dishonesty the coverage field is there to prevent. Every Helix root is
      open. */
-  const shadows = page.roots
+  /* The overlay's own sheet is diagnostics', and no part of the page. */
+  const shadows = page.roots.filter((root) => root.host.localName !== OVERLAY)
   for (const root of shadows) {
     for (const sheet of Array.from(root.styleSheets ?? [])) {
       take(sheet, root.host)

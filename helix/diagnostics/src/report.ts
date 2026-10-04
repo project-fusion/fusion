@@ -239,6 +239,13 @@ export interface Configuration {
     development: boolean
     production: false | { sample: number }
   }
+  /** Where `initDiagnostics()` hands each run, beside the console. */
+  sinks: {
+    /** The overlay on the page. */
+    overlay: boolean
+    /** The relay, `helix diagnostics`: off, on at its own address, or at this one. */
+    relay: boolean | string
+  }
   /** Each override in effect, from the file or the call. */
   overrides: Array<{
     kind: Kind
