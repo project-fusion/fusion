@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { RUNTIME_LOG, RUNTIME_SLOT, type RuntimeEvent, reportRuntime } from './report-runtime.js'
 
 const store = globalThis as Record<symbol, unknown>
@@ -24,10 +24,16 @@ const event: RuntimeEvent = {
   tag: 'helix-data-table',
 }
 
-afterEach(() => {
+/* **Before each test as well as after.** The slot and the log are on
+   `globalThis`, so a spec file that ran earlier in the same process can leave
+   events in the log, and the first test here would read them as its own. */
+const clear = () => {
   delete store[RUNTIME_SLOT]
   delete store[RUNTIME_LOG]
-})
+}
+
+beforeEach(clear)
+afterEach(clear)
 
 describe('reportRuntime', () => {
   test('with nothing listening, it prints the sentence and keeps the event', () => {
