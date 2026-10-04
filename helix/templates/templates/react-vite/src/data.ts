@@ -2,39 +2,40 @@
  * The rows the overview draws.
  *
  * A local module and no network, so the starter runs with nothing behind it.
- * Point `rows` at whatever you fetch and the table does not change: it takes the
- * whole result and does the sorting, the filtering and the paging itself. Past
- * the size a browser can hold, `mode="server"` inverts that and the table asks
- * you for a page instead.
+ * Point `rows` at whatever you fetch and the table stays the same: it takes the
+ * whole result and does the sorting, the filtering, and the paging itself. Past
+ * the size a browser can hold, `mode="server"` hands the paging to you, one page
+ * at a time.
  */
 
 /**
  * One person on the roster.
  *
- * **A type alias and not an interface**, which TypeScript makes load-bearing
- * here: `rows` takes `Readonly<Record<string, unknown>>`, an interface has no
- * implicit index signature, and so an interface of exactly these fields is not
- * assignable to it. The error names the index signature and not the shape, so
- * it reads as though the data were wrong.
+ * **A type alias, which TypeScript makes load-bearing here.** `rows` takes
+ * `Readonly<Record<string, unknown>>`, and an interface has no implicit index
+ * signature, so an interface of exactly these fields is not assignable to it.
+ * The error names the index signature, so it reads as though the data were
+ * wrong.
  */
 export type Member = {
   /**
    * A stable identity, which is what `row-key` names.
    *
-   * Sorting moves a row's element rather than rewriting every cell in it, so
-   * without one a sort throws away focus and anything attached to a row.
+   * With one, a sort moves each row's element whole, so focus and anything
+   * attached to a row go with it. Without one, a sort rewrites the cells in
+   * place and loses both.
    */
   readonly id: string
   /**
-   * What the reader is here to find.
+   * The name a row is found by.
    */
   readonly name: string
   /**
-   * A number rather than a formatted string, so the column sorts by size.
+   * A number, so the column sorts by size.
    *
    * A cell showing `2.4k` sorts as text unless the column's `compare` says what
-   * the value underneath is, which is the one thing here that is cheap to get
-   * right now and expensive to add later.
+   * the value underneath is, which is cheap to get right now and expensive to
+   * add later.
    */
   readonly reviews: number
   /**
@@ -68,8 +69,7 @@ export const teams: readonly string[] = [...new Set(members.map((one) => one.tea
 /**
  * The same roster as three figures, for the panel on the first screen.
  *
- * Derived rather than written out, so the panel cannot claim a number the table
- * does not show.
+ * Derived from the rows, so the panel and the table always agree.
  */
 export const roster = {
   /** How many rows the data view has. */

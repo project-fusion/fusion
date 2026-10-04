@@ -10,8 +10,7 @@
   /** The glyph each mode is announced and drawn with. */
   const MARKS: Record<Mode, string> = { dark: 'moon', light: 'sun', system: 'monitor' }
 
-  /* `system` is the resting state, so the control draws the same glyph before
-     and after the reader first touches it. */
+  /* `system` is the resting state, the mode the page follows until the control is pressed. */
   let mode = $state<Mode>('system')
 
   /**
@@ -23,7 +22,7 @@
    * on a panel for a light preview inside a dark page.
    *
    * `system` removes the attribute. Writing out whichever mode is current would
-   * freeze the page there the moment the reader's machine changed.
+   * hold the page there when the system's own setting changed.
    */
   const cycle = () => {
     const next = MODES[(MODES.indexOf(mode) + 1) % MODES.length] ?? 'system'

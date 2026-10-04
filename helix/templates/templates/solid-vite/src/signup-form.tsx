@@ -56,8 +56,8 @@ export function SignupForm() {
         <helix-input autocomplete="name" label="Name" name="name" required />
 
         {/* Validation is the platform's: `type` and `required` are set on the
-            real input inside, and its own message shows once the reader has
-            touched the field. Set `feedback` to say it in your own words. */}
+            real input inside, and its own message shows once the field has been
+            touched. Set `feedback` to say it in your own words. */}
         <helix-input
           hint="Where we send the welcome note."
           label="Email"
@@ -102,20 +102,20 @@ export function SignupForm() {
               and the component draws it with a tint and a bar on the inline
               start, so it survives being read in grayscale. */}
           <helix-callout tone="info">
-            Nothing is posted anywhere. Submit it and the message shows exactly what a server would
-            have been handed.
+            The form posts nothing. Submit it, and a message shows exactly what a server would
+            receive.
           </helix-callout>
           <helix-text as="h2" variant="title">
-            What this is showing
+            What the form shows
           </helix-text>
           <helix-text as="p" emphasis="muted" variant="body">
-            Every control is a form-associated custom element, so the submit reads them with{' '}
-            <helix-code>new FormData(form)</helix-code> and nothing gathers the answers by hand.
-            Reset the form and they all go back, the way an <helix-code>input</helix-code> does.
+            Every control is a form-associated custom element, so the submit reads them all
+            with <helix-code>new FormData(form)</helix-code>. Reset the form and they all go back,
+            the way an <helix-code>input</helix-code> does.
           </helix-text>
           <helix-text as="p" emphasis="muted" variant="body">
-            Leave the email wrong and the complaint is the browser's own, in the reader's language.
-            Handle is the controlled one: it refuses the change and writes back what it will accept.
+            Leave the email wrong and the browser shows its own message, in your language. Handle is
+            the controlled field: the page refuses each change and writes back a cleaned value.
           </helix-text>
           <a data-link href={DOCS.forms}>
             Forms

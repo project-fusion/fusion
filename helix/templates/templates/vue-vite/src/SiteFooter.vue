@@ -16,7 +16,7 @@ import { DOCS } from './docs.ts'
   <footer class="site-footer">
     <div class="footer-row">
       <helix-text as="p" emphasis="subtle" variant="caption">
-        Every component in here, with its API, its parts and its examples, has a page.
+        Every component here has a page, with its API, its parts, and its examples.
       </helix-text>
       <div class="footer-links">
         <a data-link="subtle" :href="DOCS.gallery">Components</a>

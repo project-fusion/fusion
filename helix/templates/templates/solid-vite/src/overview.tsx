@@ -65,8 +65,8 @@ export function Overview() {
 
         {/* A footnote to the table, so it takes the section's gap. */}
         <helix-text as="p" emphasis="muted" variant="caption">
-          Filtering, column reordering, resizing, virtualized rows and a server mode that asks you
-          for a page are all on{' '}
+          Filtering, column reordering, resizing, virtualized rows, and a server mode for large
+          results are on{' '}
           <a data-link href={DOCS.table}>
             the component's own page
           </a>

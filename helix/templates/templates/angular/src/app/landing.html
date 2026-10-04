@@ -3,9 +3,8 @@
     <helix-text emphasis="muted" variant="label">Helix starter</helix-text>
     <helix-text as="h1">Every tag on this page is Helix</helix-text>
     <helix-text as="p" class="lede" emphasis="muted" variant="body">
-      Nothing here is a wrapper: the tags are the library's own elements, and every color,
-      size and space inside them comes from one set of tokens. Three routes are laid down, and
-      all of them are yours.
+      The tags are the library's own elements, and every color, size, and space inside them comes
+      from one set of tokens. The three routes are yours.
     </helix-text>
     <div class="actions">
       <a data-button="solid" data-button-tone="primary" href="#/overview">See the data view</a>
@@ -42,10 +41,10 @@
        and no box. `app.css` says why at more length. -->
   <div class="facts">
     <article class="fact">
-      <helix-text as="h3" variant="title">Elements, not wrappers</helix-text>
+      <helix-text as="h3" variant="title">Custom elements</helix-text>
       <helix-text as="p" emphasis="muted" variant="body">
-        They are custom elements, so you write the tags and there is no per-component import
-        to keep in step. One line in <helix-code>src/main.ts</helix-code> registers all of
+        You write the tags directly, with no import per component to keep in step. One line
+        in <helix-code>src/main.ts</helix-code> registers all of
         them, and a subpath like <helix-code>&#64;fusion.dev/helix/tabs</helix-code> registers
         one.
       </helix-text>
@@ -55,9 +54,9 @@
     <article class="fact">
       <helix-text as="h3" variant="title">One set of tokens</helix-text>
       <helix-text as="p" emphasis="muted" variant="body">
-        Every color is written once as a light and dark pair, so the control in the bar moves
-        the whole page by setting a single attribute on the root. Type, spacing, radii and
-        control sizes come from the same place.
+        Every color is written once as a light and dark pair, so the control in the bar switches the
+        whole page by setting one attribute on the root. Type, spacing, radii, and control sizes
+        come from the same place.
       </helix-text>
       <a data-link [href]="docs.tokens">Tokens</a>
     </article>
@@ -65,9 +64,9 @@
     <article class="fact">
       <helix-text as="h3" variant="title">A short stylesheet</helix-text>
       <helix-text as="p" emphasis="muted" variant="body">
-        <helix-code>src/app.css</helix-code> holds this page's measure, the rhythm between its
-        blocks, and nothing a component already draws. Where a component leaves a decision
-        open it names a part: the data view reaches one to paint the row you tick.
+        <helix-code>src/app.css</helix-code> holds the page's measure and the rhythm between its
+        blocks. Where a component leaves a decision open, it names a part: the data view names one
+        for the rows you tick, and the stylesheet paints them.
       </helix-text>
       <a data-link [href]="docs.parts">Overriding a component</a>
     </article>
@@ -88,9 +87,9 @@
           <helix-text emphasis="subtle" variant="code">/overview</helix-text>
         </helix-flex>
         <helix-text as="p" emphasis="muted" variant="body">
-          Twelve people from a local module, sorted, paged and selected with nothing wired up.
-          The columns are markup you can read and the rows are one property, which is what
-          keeps the same component working at ten thousand.
+          Twelve people from a local module, sorted, paged, and selected with nothing wired up. The
+          columns are markup you can read and the rows are one property, which keeps the same
+          component working at ten thousand rows.
         </helix-text>
       </helix-card>
     </a>
@@ -104,7 +103,7 @@
         <helix-text as="p" emphasis="muted" variant="body">
           Five controls a <helix-code>&lt;form&gt;</helix-code> reads with
           <helix-code>FormData</helix-code>, because every one of them is a real form
-          participant. The email field's complaint is the browser's own.
+          participant. The email field's error message comes from the browser.
         </helix-text>
       </helix-card>
     </a>
