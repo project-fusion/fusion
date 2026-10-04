@@ -106,7 +106,7 @@ import { dirname, join, relative } from 'node:path'
 import { costOf } from '@fusion.dev/scripts/cost'
 import { offline, pool } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
-import { root, SOURCE } from '@fusion.dev/scripts/workspace'
+import { ARTIFACT, root, SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
 import { PNG } from 'pngjs'
@@ -413,8 +413,8 @@ const closed = offline(origin)
  * What it found is returned rather than recorded, so the pictures can be taken
  * on any worker and still be reported in the order the loop over them had.
  */
-const shoot = async (tab, tier, family, { mode, suffix, width }) => {
-  const outcome = { changed: [], compared: false, held: [], written: [] }
+const shoot = async (tab, tier, family, { mode, suffix, width }, first = false) => {
+  const outcome = { changed: [], compared: false, held: [], run: undefined, written: [] }
   await tab.setViewportSize({ height: 800, width })
   await tab.emulateMedia({ colorScheme: mode })
   await tab.goto(`${origin}/${tier.name}/${family}/?w=${width}&m=${mode}`, {
@@ -447,6 +447,12 @@ const shoot = async (tab, tier, family, { mode, suffix, width }) => {
      That is what makes a baseline a fact about the component rather than
      about the machine's timing. */
   const shot = await tab.screenshot({ animations: 'disabled', fullPage: true })
+  /* **The example's diagnostics, once per family and tier**, on the first
+     picture and after it is taken, so nothing the run reads can move a pixel.
+     See `DIAGNOSTICS`. */
+  if (first) {
+    outcome.run = await diagnoseIn(tab, tier, family)
+  }
   const baseline = join(tier.source, family, `.examples/preview${suffix}.png`)
   /* Both tiers, both widths, one name each. The pictures never collide
      because the tiers keep separate `src` trees, so the name says only
@@ -547,6 +553,58 @@ const shoot = async (tab, tier, family, { mode, suffix, width }) => {
    their ubuntu-latest baselines, the same pictures by the same counts on every
    run either way: 32 and 29 seconds on four workers and 69 on one, against 30,
    30 and 73 on a page per family. */
+/**
+ * **The examples are the first consumer of `@fusion.dev/helix-diagnostics`.**
+ * Every page this check pictures is an example as a reader copies it: the
+ * markup, its own stylesheet, and the built library. So each is diagnosed
+ * where it already stands, after its first picture, and the CI sink gathers
+ * the runs: a dead part, a dead hook, an attribute the element does not take,
+ * or a value it does not allow fails the job, as a moved pixel does.
+ *
+ * Built from source once, as `check-diagnostics.mjs` builds it, and handed to
+ * each page as a module. Both manifests are this commit's, so a run judges an
+ * example against the library it was written for.
+ */
+const DIAGNOSTICS = await (async () => {
+  const built = await Bun.build({
+    entrypoints: [join(root, 'helix/diagnostics/src/index.ts')],
+    target: 'browser',
+  })
+  if (!built.success) {
+    for (const message of built.logs) {
+      console.error(`visual: diagnostics: ${message}`)
+    }
+    process.exit(1)
+  }
+  return {
+    manifests: {
+      '@fusion.dev/helix': JSON.parse(readFileSync(join(root, ARTIFACT.styledManifest), 'utf8')),
+      '@fusion.dev/helix-headless': JSON.parse(
+        readFileSync(join(root, ARTIFACT.headlessManifest), 'utf8'),
+      ),
+    },
+    source: await built.outputs[0].text(),
+  }
+})()
+
+/** One run of the diagnostics over the example in `tab`. */
+const diagnoseIn = (tab, tier, family) =>
+  tab.evaluate(
+    async ({ manifests, page, source }) => {
+      const url = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }))
+      const { diagnose } = await import(url)
+      URL.revokeObjectURL(url)
+      return diagnose({
+        detail: { pages: 'full' },
+        environment: 'ci',
+        page,
+        project: { name: 'fusion examples', tags: ['fusion'] },
+        tiers: Object.entries(manifests).map(([name, manifest]) => ({ manifest, name })),
+      })
+    },
+    { ...DIAGNOSTICS, page: `/${tier.name}/${family}` },
+  )
+
 const units = tiers.flatMap((tier) => tier.families.map((family) => ({ family, tier })))
 const outcomes = await pool(units, {
   browser,
@@ -556,8 +614,8 @@ const outcomes = await pool(units, {
   prepare: closed,
   run: async (tab, { family, tier }) => {
     const taken = []
-    for (const shot of SHOTS) {
-      taken.push(await shoot(tab, tier, family, shot))
+    for (const [at, shot] of SHOTS.entries()) {
+      taken.push(await shoot(tab, tier, family, shot, at === 0))
     }
     return taken
   },
@@ -584,6 +642,17 @@ for (const at of SHOTS.keys()) {
 
 await browser.close()
 server.close()
+
+/* The CI sink over every example this shard pictured: the file for the
+   dashboard and a reviewer, and the summary here. A retake of baselines is
+   not held up by it, being about pictures. */
+const { ciSink } = await import(join(root, 'helix/diagnostics/src/ci.ts'))
+const diagnosed = ciSink(
+  outcomes.flatMap((taken) => taken.flatMap((one) => (one.run ? [one.run] : []))),
+  { file: join(root, '.local/diagnostics/examples.json') },
+)
+console.log(diagnosed.summary)
+const flawed = diagnosed.code === 1 && !update
 
 /** `2 headless, 3 styled`, from a map keyed by tier, with the empty ones out. */
 const counted = (counts) =>
@@ -628,3 +697,7 @@ console.log(
   `visual: ${counted(compared)} examples, every one pixel for pixel with its baseline` +
     (asked === undefined ? '' : `, in ${which(asked)}`),
 )
+if (flawed) {
+  console.error('visual: the examples have diagnostics errors, listed above.')
+  process.exit(1)
+}

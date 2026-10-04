@@ -638,6 +638,10 @@ jobs:
       # hidden files are asked for. Nothing says so, `ignore` being the setting:
       # on 13 Sep 2026 the repository held no `visual-diffs` artifact at all,
       # and a Linux-only hydration finding arrived as a count with no picture.
+      # The examples' diagnostics, which `check:spec:visual` writes beside the
+      # pictures, go with them: every run on every example, in the run format
+      # the dashboard reads.
+      #
       # Refreshed with `measure:browser --from`, which merges a run's worth of
       # these: [VERIFYING.md](../VERIFYING.md#how-many-browser-jobs). A shard
       # that held no family recorded nothing, which `ignore` covers.
@@ -663,6 +667,7 @@ jobs:
             helix/headless/src/*/.examples/*.parity.png
             helix/styled/src/*/.examples/*.parity.png
             .local/dsd/diff/*.png
+            .local/diagnostics/*.json
 
   # The one required context, because the shard counts are arguments and the
   # job names move with them. `always()` is load-bearing:
