@@ -466,3 +466,58 @@ describe('the object property React is holding', () => {
     expect(element.rows).toEqual([])
   })
 })
+
+describe('usage', () => {
+  const slot = Symbol.for('fusion.dev/helix/usage')
+  const store = globalThis as Record<symbol, unknown>
+
+  afterEach(() => {
+    delete store[slot]
+  })
+
+  test('an element tells the listener once, after its first render', async () => {
+    const told: Element[] = []
+    store[slot] = (element: Element) => told.push(element)
+    const element = document.createElement(tag) as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    document.body.append(element)
+    await element.updateComplete
+    element.setAttribute('data-again', '')
+    await element.updateComplete
+    expect(told).toEqual([element])
+  })
+
+  test('with no listener, an element renders as it always did', async () => {
+    const element = document.createElement(tag) as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    document.body.append(element)
+    expect(await element.updateComplete).toBe(true)
+  })
+
+  test('a listener that throws does not break the element', async () => {
+    store[slot] = () => {
+      throw new Error('listener')
+    }
+    const thrown: unknown[] = []
+    const original = globalThis.queueMicrotask
+    globalThis.queueMicrotask = (task) => {
+      try {
+        task()
+      } catch (error) {
+        thrown.push(error)
+      }
+    }
+    try {
+      const element = document.createElement(tag) as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      document.body.append(element)
+      expect(await element.updateComplete).toBe(true)
+    } finally {
+      globalThis.queueMicrotask = original
+    }
+    expect(thrown).toHaveLength(1)
+  })
+})
