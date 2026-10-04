@@ -49,6 +49,11 @@ so React's strict mode and hot module replacement start nothing twice.
   counts them and opens a list of each finding with its evidence. Hover over a
   finding, or focus it, to outline the element it is about. The badge shows
   only while the page has findings.
+- **Hears what the library reports as it runs**, such as a selectable table
+  with no `row-key`, and lists each event in the run, the badge, and the relay.
+  Core still prints each one as it happens, with the stack it happened in. Set
+  `core: { warnings: false }` to have diagnostics print them in its group
+  instead.
 - **Hands each run to your app**: the `onReport` option, `subscribe()` on the
   handle it returns, and a `helix-diagnostics` event on `document`.
 
@@ -72,7 +77,7 @@ throws stops neither the others nor the console.
 | `onReport` | Called with each run |
 | `duplicates` | `duplicateRegistrations` from `@fusion.dev/helix-core` |
 | `file` | Your project's `helix-diagnostics.json`, imported |
-| Any setting below | `rules`, `console`, `sinks`, `send`, `detail`, `environments`, `project` |
+| Any setting below | `rules`, `console`, `core`, `sinks`, `send`, `detail`, `environments`, `project` |
 
 The handle has `active`, `latest`, `run()`, `subscribe()`, and `stop()`. An
 end-to-end test reaches it at `globalThis[Symbol.for('fusion.dev/helix/diagnostics')]`
@@ -163,6 +168,11 @@ A report is one run, in one shape for every sink, versioned by `schema`:
   `integrity`, or `guideline`), an `owner` (`consumer`, or `helix` for a fault
   in the library), a `fingerprint` that stays the same from one run to the next
   for the same fault, and the rule's own text as evidence.
+- **`runtime`**: what the library reported going wrong as it ran on the page,
+  from its first load. One entry per distinct event, with its `kind`, its
+  `tag`, the sentence that says what to do, how many times it was reported,
+  and whether core printed it. A `fingerprint` stays the same from one run to
+  the next, with the numbers in the sentence left out.
 - **`usage`**: the Helix elements on the page by tag, the axes set on them
   (`emphasis`, `material`, `separation`, and `tone`), the named slots filled,
   the elements Helix renders inside other Helix elements, and the parts and
@@ -188,6 +198,7 @@ works on it:
 | A finding at `error` | `console.error` |
 | A finding at `warn` | `console.warn` |
 | A finding at `info` | `console.info` |
+| A runtime event core left to diagnostics | `console.warn`, or `console.error` for a failure |
 | Stylesheets that could not be read | `console.warn` |
 | Coverage, and findings turned off | `console.info` |
 | Usage | `console.debug`, hidden at the default level |
@@ -215,6 +226,38 @@ for another route.
 **Attributes are checked on the elements the page wrote.** The global HTML
 attributes, `aria-*`, `data-*`, and the prefixes frameworks write are never
 findings. The markup Helix renders inside its own components is Helix's.
+
+## Runtime events
+
+Helix reports these itself as it runs, through one channel in
+`@fusion.dev/helix-core`. Each is printed in the console as it happens, and
+diagnostics counts it by kind and tag. None fails a CI job.
+
+| Kind | Means |
+| --- | --- |
+| `duplicate-registration` | Two copies of Helix are on the page. Also the finding of the same name |
+| `fullscreen-refused` | The browser refused fullscreen, usually in a frame without `allow="fullscreen"` |
+| `max-past-fold` | An avatar group's `max` is past the number its fold is written for |
+| `min-out-of-range` | A rating's `min` is not a score between 0 and its `max` |
+| `misplaced-handler` | A React `on` prop names an event that another element dispatches |
+| `missing-layout` | The three.js graph driver could not load `d3-force-3d` |
+| `missing-row-key` | A selectable data table has no `row-key`, so it knows each row by its place |
+| `missing-stencil-parts` | A graph stencil names parts its shape does not have |
+| `missing-trigger` | A tooltip's `for` names no element in its own tree |
+| `negative-value` | An area chart was given a negative number, which it draws as none |
+| `not-a-graph` | `connectGraph` was given an element that is not a graph frame |
+| `picture-in-picture-refused` | The browser refused picture in picture |
+| `removed-callback` | A React prop is a callback that was removed and never ran from JSX |
+| `solid-handler-syntax` | A React prop uses Solid's `on:` syntax |
+| `stencil-regions-unused` | A graph stencil's regions could not be used |
+| `stencil-without-inside` | A graph stencil has no inside to place the notes in |
+| `too-many-rows` | A data table is drawing more rows at once than it stays responsive to |
+| `two-default-operators` | A filter field marks more than one operator as its default |
+| `unknown-event` | A React `on` prop names an event that no element dispatches |
+| `unlinked-trigger` | A tooltip's trigger does not name it in `aria-describedby` |
+| `unsettled-window` | A virtualized list's box has no height of its own |
+| `untold-trigger` | A slotted trigger is a plain element, which cannot carry `aria-expanded` |
+| `wrapped-trigger` | A tooltip wraps its trigger, so its text reaches no screen reader |
 
 ## Configure it
 
@@ -250,6 +293,8 @@ diagnose({
 | `console.findings` | `error`, `warn`, `info`, or `off`: the lowest severity printed | `info` |
 | `console.coverage` | `info` or `off` | `info` |
 | `console.usage` | `debug` or `off` | `debug` |
+| `console.runtime` | `warn` or `off`: the runtime events core left to diagnostics | `warn` |
+| `core.warnings` | `true` or `false`: whether core prints each runtime event as it happens | `true` |
 | `sinks.overlay` | `true` or `false`, for the badge in development | `true` |
 | `sinks.relay` | `true`, `false`, or an address on a local host, such as `http://127.0.0.1:7417` | `false` |
 | `send.<category>` | `true` or `false`, for `findings`, `usage`, `coverage`, `configuration`, `runtime`, `performance`, and `assist` | all on but `performance` |

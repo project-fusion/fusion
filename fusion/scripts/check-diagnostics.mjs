@@ -56,6 +56,9 @@ await Bun.write(
        through the shadow boundary and works. The manifest says copy button
        answers no hooks at all, so a rule reading it alone calls both dead. */
     `import '${join(root, 'helix/styled/src/copy-button/index.ts')}'`,
+    /* A selectable table with no `row-key`, which the real library reports
+       through core's runtime channel as it renders. */
+    `import '${join(root, 'helix/styled/src/data-table/index.ts')}'`,
     `export { duplicateRegistrations } from '${join(root, 'helix/core/src/index.ts')}'`,
     `export { collect, diagnose, initDiagnostics, watch } from '${join(root, 'helix/diagnostics/src/index.ts')}'`,
   ].join('\n'),
@@ -336,6 +339,13 @@ try {
      CDN path for the Helix version core lists, a first run on its own, and a
      mistake added afterwards found by the next run the schedule makes. */
   const init = await browser.newPage()
+  /* What the page printed about `row-key`, to count: core prints it once. */
+  const printed = []
+  init.on('console', (message) => {
+    if (message.text().includes('`row-key`')) {
+      printed.push(message.type())
+    }
+  })
   await init.goto(`${origin}/init`, { waitUntil: 'load' })
   const started = await init.evaluate(
     async ({ collector: source, tag }) => {
@@ -357,7 +367,15 @@ try {
       }
       const first = runs.length
       document.body.insertAdjacentHTML('beforeend', `<${tag} emphasis="bold">Bold</${tag}>`)
-      for (let at = 0; at < 80 && runs.length === first; at += 1) {
+      /* And a mistake only the library sees as it runs. */
+      const table = document.createElement('helix-data-table')
+      table.selectable = true
+      table.innerHTML = '<helix-table-column field="name">Name</helix-table-column>'
+      table.rows = [{ name: 'one' }, { name: 'two' }]
+      document.body.append(table)
+      const heard = () =>
+        runs.at(-1)?.runtime.some((one) => one.kind === 'missing-row-key') ?? false
+      for (let at = 0; at < 80 && (runs.length === first || !heard()); at += 1) {
         await wait(100)
       }
       const last = runs.at(-1)
@@ -368,6 +386,8 @@ try {
         kinds: last?.findings.map((finding) => finding.kind) ?? [],
         manifests: last?.versions.manifests ?? {},
         runs: runs.length,
+        runtime:
+          last?.runtime.map((one) => `${one.kind} <${one.tag}> printed ${one.printed}`) ?? [],
         versions: last?.versions.helix ?? [],
       }
     },
@@ -390,6 +410,19 @@ try {
   if (started.events !== started.runs) {
     say(
       `${started.runs} runs and ${started.events} \`helix-diagnostics\` events, where each run is one.`,
+    )
+  }
+  /* **Core's runtime channel, end to end**: the headless table reports the
+     missing key through core, the watcher hears it, the run carries it, and
+     the console printed it once, from core. */
+  if (!started.runtime.includes('missing-row-key <helix-data-table> printed true')) {
+    say(
+      `a selectable table with no \`row-key\` reached no run as a runtime event: the last run held ${JSON.stringify(started.runtime)}.`,
+    )
+  }
+  if (printed.length !== 1 || printed[0] !== 'warning') {
+    say(
+      `the missing \`row-key\` was printed ${printed.length} times (${printed.join(', ')}), where core prints it once.`,
     )
   }
 
@@ -429,7 +462,8 @@ try {
       `diagnostics: ${observed.findings.length} planted faults found and none invented, ` +
         `${observed.sheets} sheets across ${observed.roots} shadow roots on ${observed.hosts} elements, ` +
         `\`::part()\` and \`@media\` both readable in Chromium, and \`initDiagnostics()\` ran ` +
-        `${started.runs} times on its own, finding the mistake added after its first run`,
+        `${started.runs} times on its own, finding the mistake added after its first run ` +
+        'and hearing the one the library reported as it ran',
     )
   }
 } finally {

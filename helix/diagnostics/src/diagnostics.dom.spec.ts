@@ -423,7 +423,8 @@ describe('coverage', () => {
 /** A report's other halves, where a test is about coverage or findings. */
 const quiet = {
   configuration: {
-    console: { coverage: 'info', findings: 'info', usage: 'debug' },
+    console: { coverage: 'info', findings: 'info', runtime: 'warn', usage: 'debug' },
+    core: { warnings: true },
     detail: { evidence: 'full', hookValues: true, pages: 'patterns' },
     environments: { ci: true, development: true, production: false },
     overrides: [],
@@ -432,6 +433,7 @@ const quiet = {
   },
   project: { tags: [] },
   run: { at: '2026-10-04T00:00:00.000Z', duration: 1, id: 'run', source: 'page' },
+  runtime: [],
   schema: 1,
   usage: {
     axes: {},
@@ -860,7 +862,12 @@ describe('configuration', () => {
       { console: { findings: 'warn' }, detail: { pages: 'full' }, send: { usage: false } },
       { detail: { hookValues: false }, send: { coverage: false, usage: true } },
     )
-    expect(configuration.console).toEqual({ coverage: 'info', findings: 'warn', usage: 'debug' })
+    expect(configuration.console).toEqual({
+      coverage: 'info',
+      findings: 'warn',
+      runtime: 'warn',
+      usage: 'debug',
+    })
     expect(configuration.detail).toEqual({ evidence: 'full', hookValues: false, pages: 'full' })
     expect(send.usage).toEqual({ decidedBy: 'argument', on: true })
     expect(send.coverage).toEqual({ decidedBy: 'argument', on: false })
@@ -976,7 +983,7 @@ describe('console levels', () => {
         ...quiet,
         configuration: {
           ...quiet.configuration,
-          console: { coverage: 'off', findings: 'error', usage: 'off' },
+          console: { coverage: 'off', findings: 'error', runtime: 'off', usage: 'off' },
         },
         coverage: { read: 1, roots: 0, sheets: 1, unreadable: [] },
         findings: [finding('error'), finding('warn')],

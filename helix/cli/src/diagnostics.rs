@@ -3,8 +3,9 @@
 //! **Beside any dev server, whatever builds the app.** A page cannot write to
 //! a terminal, and a plugin per bundler is a plugin per framework, so the
 //! terminal gets a process of its own: the page posts each run to it on
-//! `127.0.0.1`, and it prints what is new, keeps the latest run of each page,
-//! and writes them to `--out` as the CI file. It also serves the project's
+//! `127.0.0.1`, and it prints what is new, findings and the runtime events
+//! the library reported, keeps the latest run of each page, and writes them to
+//! `--out` as the CI file. It also serves the project's
 //! `helix-diagnostics.json`, which a page cannot read from disk.
 //!
 //! **Only pages on a local host may post.** A page anywhere on the web could
@@ -14,8 +15,8 @@
 //! `curl`, is the developer's own.
 //!
 //! **With `--json`, one document a line**: the address first, then each page's
-//! counts and new findings whenever it prints them, for a script or an agent
-//! reading the stream.
+//! counts, new findings, and new runtime events whenever it prints them, for a
+//! script or an agent reading the stream.
 //!
 //! The standard library's listener and nothing else: a dev tool answering one
 //! page at a time needs no server framework, and the CLI ships to every
@@ -40,6 +41,11 @@ const LARGEST: usize = 8 * 1024 * 1024;
 
 /// How long a connection may take to say what it wants.
 const PATIENCE: Duration = Duration::from_secs(5);
+
+/// The runtime kinds a finding already reports, which are not printed twice:
+/// two copies of Helix on a page is the `duplicate-registration` finding. The
+/// page's console and overlay leave out the same ones.
+const AS_FINDINGS: [&str; 1] = ["duplicate-registration"];
 
 /// Serves until stopped.
 pub fn run(args: &Diagnostics, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
@@ -189,8 +195,9 @@ struct Relay {
     seen: HashSet<String>,
     /// The fingerprints printed, by page, so a page repeats nothing.
     shown: HashMap<String, HashSet<String>>,
-    /// Each page's counts when last printed, so an unchanged page prints nothing.
-    said: HashMap<String, (usize, usize, usize)>,
+    /// Each page's counts when last printed, so an unchanged page prints nothing:
+    /// errors, warnings, info, and runtime events.
+    said: HashMap<String, (usize, usize, usize, usize)>,
 }
 
 impl Relay {
@@ -294,44 +301,72 @@ impl Relay {
         }
     }
 
-    /// Prints a page's counts when they change, and each finding the first time it is seen there.
+    /// Prints a page's counts when they change, and each finding and runtime
+    /// event the first time it is seen there.
     fn print(&mut self, page: &str, run: &Value) {
-        let findings = run
-            .get("findings")
-            .and_then(Value::as_array)
-            .cloned()
-            .unwrap_or_default();
+        let list = |key: &str| {
+            run.get(key)
+                .and_then(Value::as_array)
+                .cloned()
+                .unwrap_or_default()
+        };
+        let findings = list("findings");
+        /* What the library reported as it ran, less what a finding already says. */
+        let runtime: Vec<Value> = list("runtime")
+            .into_iter()
+            .filter(|one| {
+                one.get("kind")
+                    .and_then(Value::as_str)
+                    .is_some_and(|kind| !AS_FINDINGS.contains(&kind))
+            })
+            .collect();
         let of = |severity: &str| {
             findings
                 .iter()
                 .filter(|finding| finding.get("severity").and_then(Value::as_str) == Some(severity))
                 .count()
         };
-        let counts = (of("error"), of("warn"), of("info"));
+        let counts = (of("error"), of("warn"), of("info"), runtime.len());
         let shown = self.shown.entry(page.to_owned()).or_default();
-        let fresh: Vec<&Value> = findings
-            .iter()
-            .filter(|finding| {
-                finding
-                    .get("fingerprint")
-                    .and_then(Value::as_str)
-                    .is_some_and(|fingerprint| shown.insert(fingerprint.to_owned()))
-            })
-            .collect();
-        if fresh.is_empty() && self.said.get(page) == Some(&counts) {
+        let mut new = |items: &[Value]| -> Vec<Value> {
+            items
+                .iter()
+                .filter(|item| {
+                    item.get("fingerprint")
+                        .and_then(Value::as_str)
+                        .is_some_and(|fingerprint| shown.insert(fingerprint.to_owned()))
+                })
+                .cloned()
+                .collect()
+        };
+        let fresh = new(&findings);
+        let heard = new(&runtime);
+        if fresh.is_empty() && heard.is_empty() && self.said.get(page) == Some(&counts) {
             return;
         }
         self.said.insert(page.to_owned(), counts);
         if self.json {
             let line = json!({
-                "counts": { "error": counts.0, "info": counts.2, "warn": counts.1 },
+                "counts": { "error": counts.0, "info": counts.2, "runtime": counts.3, "warn": counts.1 },
                 "findings": fresh,
                 "page": page,
+                "runtime": heard,
             });
             println!("{line}");
             let _ = std::io::stdout().flush();
             return;
         }
+        self.write(page, counts, &fresh, &heard);
+    }
+
+    /// Writes a page's counts, then its new findings and runtime events, as text.
+    fn write(
+        &self,
+        page: &str,
+        counts: (usize, usize, usize, usize),
+        fresh: &[Value],
+        heard: &[Value],
+    ) {
         let plural = |count: usize, noun: &str| {
             if count == 1 {
                 format!("{count} {noun}")
@@ -340,14 +375,19 @@ impl Relay {
             }
         };
         let heading = format!(
-            "{page}: {}, {}, {} info",
+            "{page}: {}, {}, {} info{}",
             plural(counts.0, "error"),
             plural(counts.1, "warning"),
-            counts.2
+            counts.2,
+            if counts.3 > 0 {
+                format!(", {} runtime", counts.3)
+            } else {
+                String::new()
+            }
         );
         println!(
             "{}",
-            if counts.0 + counts.1 > 0 {
+            if counts.0 + counts.1 + counts.3 > 0 {
                 self.paint.fail(&heading)
             } else {
                 self.paint.pass(&heading)
@@ -365,6 +405,21 @@ impl Relay {
             if let Some(sheet) = finding.pointer("/origin/sheet").and_then(Value::as_str) {
                 println!("    {}", self.paint.dim(&format!("in {sheet}")));
             }
+        }
+        for event in heard {
+            let text = |key: &str| event.get(key).and_then(Value::as_str).unwrap_or("");
+            let tag = text("tag");
+            println!(
+                "  {}{}",
+                self.paint
+                    .bold(&format!("{} runtime {}", text("level"), text("kind"))),
+                if tag.is_empty() {
+                    String::new()
+                } else {
+                    format!(" <{tag}>")
+                }
+            );
+            println!("    {}", text("message"));
         }
         let _ = std::io::stdout().flush();
     }

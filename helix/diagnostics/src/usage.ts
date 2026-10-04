@@ -15,7 +15,8 @@ import { parts, targets } from './analyze.js'
 import type { Answered, Located } from './collect.js'
 import type { Published } from './manifest.js'
 import { OVERLAY, type Page, pageOf } from './page.js'
-import type { Usage } from './report.js'
+import type { RuntimeEntry, Usage } from './report.js'
+import { type Heard, logged, RUNTIME_SLOT, tally as tallyRuntime } from './runtime.js'
 
 /**
  * The key `@fusion.dev/helix-core` reads a listener from. **A registered
@@ -142,7 +143,13 @@ export const listed = (
 export interface Watcher {
   /** The counts so far. A copy: counting goes on after it is read. */
   counts(): Counted
-  /** Stops counting, and gives the slot back to whatever held it before. */
+  /**
+   * The runtime events reported on this page from its first load, one entry
+   * per distinct event: the ones core kept from before the watcher started,
+   * and the ones heard since.
+   */
+  runtime(): RuntimeEntry[]
+  /** Stops counting, and gives the slots back to whatever held them before. */
   stop(): void
 }
 
@@ -165,6 +172,8 @@ export const watch = (
   from: Document = document,
   {
     onRender,
+    onRuntime,
+    quiet,
   }: {
     /**
      * Called as each Helix element renders for the first time, after it is
@@ -172,6 +181,13 @@ export const watch = (
      * element upgrades without adding anything to the DOM.
      */
     onRender?: ((element: Element) => void) | undefined
+    /** Called with each runtime event core reports, after it is counted. */
+    onRuntime?: ((event: Heard) => void) | undefined
+    /**
+     * Whether core should leave each runtime event for diagnostics to print,
+     * asked as each arrives: `core.warnings: false`.
+     */
+    quiet?: (() => boolean) | undefined
   } = {},
 ): Watcher => {
   const counted = empty()
@@ -198,12 +214,37 @@ export const watch = (
   for (const element of pageOf(from).elements) {
     see(element)
   }
+
+  /* The runtime events: core printed the ones it kept, since nothing listened. */
+  const heard = tallyRuntime()
+  for (const event of logged()) {
+    heard.add(event, true)
+  }
+  const beforeRuntime = store[RUNTIME_SLOT]
+  const hear = (event: Heard): boolean => {
+    let silent = false
+    if (live) {
+      silent = quiet?.() === true
+      heard.add(event, !silent)
+      onRuntime?.(event)
+    }
+    /* A watcher started before this one hears it too, and may print it itself. */
+    if (typeof beforeRuntime === 'function' && beforeRuntime(event) === true) {
+      silent = true
+    }
+    return silent
+  }
+  store[RUNTIME_SLOT] = hear
   return {
     counts: () => structuredClone(counted),
+    runtime: () => heard.entries(),
     stop: () => {
       live = false
       if (store[SLOT] === listener) {
         store[SLOT] = before
+      }
+      if (store[RUNTIME_SLOT] === hear) {
+        store[RUNTIME_SLOT] = beforeRuntime
       }
     },
   }

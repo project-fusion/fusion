@@ -23,6 +23,8 @@ import { checkRules, type Rules } from './rules.js'
 export interface Config {
   /** The lowest level each category prints at in the console, or `off`. */
   console?: Partial<Configuration['console']>
+  /** What `@fusion.dev/helix-core` does itself: whether it prints its runtime warnings. */
+  core?: Partial<Configuration['core']>
   /** How much detail goes with what is sent. */
   detail?: Partial<Configuration['detail']>
   /** Where sending happens. Production takes `{ sample }`, from 0 to 1. */
@@ -46,7 +48,11 @@ export interface Config {
 
 /** The shipped defaults. */
 export const DEFAULTS = {
-  console: { coverage: 'info', findings: 'info', usage: 'debug' },
+  console: { coverage: 'info', findings: 'info', runtime: 'warn', usage: 'debug' },
+  /* **Core prints its warnings, as it always has.** As it happens, each comes
+     with the stack it happened in, which a group printed a second later has
+     lost. Off, diagnostics prints them in its group instead, and never twice. */
+  core: { warnings: true },
   detail: { evidence: 'full', hookValues: true, pages: 'patterns' },
   environments: { ci: true, development: true, production: false },
   send: {
@@ -64,6 +70,7 @@ export const DEFAULTS = {
   sinks: { overlay: true, relay: false },
 } as const satisfies {
   console: Configuration['console']
+  core: Configuration['core']
   detail: Configuration['detail']
   environments: Configuration['environments']
   send: Record<Category, boolean>
@@ -98,8 +105,10 @@ const ALLOWED: Record<
   console: {
     coverage: ['info', 'off'],
     findings: ['error', 'warn', 'info', 'off'],
+    runtime: ['warn', 'off'],
     usage: ['debug', 'off'],
   },
+  core: { warnings: [true, false] },
   detail: {
     evidence: ['full', 'selector', 'none'],
     hookValues: [true, false],
@@ -192,7 +201,7 @@ export const resolveConfig = (file: Config | undefined, call: Config | undefined
   checkConfig(file, 'file')
   checkConfig(call, 'argument')
   const merged = <T extends object>(
-    section: 'console' | 'detail' | 'environments' | 'sinks',
+    section: 'console' | 'core' | 'detail' | 'environments' | 'sinks',
     base: T,
   ): T => ({
     ...base,
@@ -217,6 +226,7 @@ export const resolveConfig = (file: Config | undefined, call: Config | undefined
   return {
     configuration: {
       console: merged('console', { ...DEFAULTS.console }),
+      core: merged('core', { ...DEFAULTS.core }),
       detail: merged('detail', { ...DEFAULTS.detail }),
       environments: merged('environments', { ...DEFAULTS.environments }),
       sinks: merged('sinks', { ...DEFAULTS.sinks }),

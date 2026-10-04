@@ -31,6 +31,7 @@ import { diagnose } from './diagnose.js'
 import type { LintData, Tier } from './manifest.js'
 import { type Overlay, overlayOn } from './overlay.js'
 import type { Configuration, Environment, Report } from './report.js'
+import { shownRuntime } from './runtime.js'
 import { type Schedule, schedule } from './schedule.js'
 import { loadedVersions, type Watcher, watch } from './usage.js'
 
@@ -207,6 +208,7 @@ const start = (options: InitOptions, page: Document): Diagnostics => {
     route,
     sinks: configuration.sinks,
     tiers,
+    warnings: configuration.core.warnings,
   })
 }
 
@@ -222,6 +224,8 @@ interface Running {
   route: (() => string | undefined) | undefined
   sinks: Configuration['sinks']
   tiers: Tier[] | undefined
+  /** Whether core prints its runtime warnings itself: `core.warnings`. */
+  warnings: boolean
 }
 
 /** The running instance: the watcher, the schedule, the triggers, and the sinks. */
@@ -236,6 +240,9 @@ const running = (given: Running): Diagnostics => {
   const development = environment === undefined || environment === 'development'
   /* The project's settings: given, or served by the relay once it answers. */
   let file = given.file
+  /* **Whether core prints each runtime warning itself**, asked as each one
+     arrives, so settings the relay serves later decide the ones after. */
+  let warnings = given.warnings
   let overlay: Overlay | undefined
   /* The relay: where it is, whether it answered, and the last run sent for each page. */
   const relay = production ? undefined : sinks.relay === true ? RELAY : sinks.relay || undefined
@@ -324,7 +331,7 @@ const running = (given: Running): Diagnostics => {
     if (sinks.overlay && development) {
       deliver('the overlay', () => {
         /* Made the first time there is something to show, and not before. */
-        if (overlay || run.findings.length > 0) {
+        if (overlay || run.findings.length > 0 || shownRuntime(run.runtime).length > 0) {
           overlay ??= overlayOn(page)
           overlay.show(run)
         }
@@ -441,6 +448,7 @@ const running = (given: Running): Diagnostics => {
             try {
               checkConfig(served, 'file')
               file = served
+              warnings = resolveConfig(file, call).configuration.core.warnings
             } catch (error) {
               once(`relay settings ${messageOf(error)}`, () =>
                 console.error(
@@ -462,7 +470,12 @@ const running = (given: Running): Diagnostics => {
   }
 
   const plan: Schedule = schedule(runNow)
-  const watcher: Watcher = watch(page, { onRender: () => plan.poke() })
+  /* A runtime event is a change too: the next run carries it. */
+  const watcher: Watcher = watch(page, {
+    onRender: () => plan.poke(),
+    onRuntime: () => plan.poke(),
+    quiet: () => !warnings,
+  })
   const poke = (): void => plan.poke()
   /* A change to the page's own markup, stylesheets among it, and never the
      overlay arriving, which is diagnostics' own. */
