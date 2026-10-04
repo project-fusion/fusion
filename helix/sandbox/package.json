@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-sandbox",
   "description": "Sandbox elements: an editable source pane beside a live preview.",
-  "version": "0.135.0",
+  "version": "0.136.0",
   "private": true,
   "license": "MIT",
   "repository": {
