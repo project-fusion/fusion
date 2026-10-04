@@ -522,6 +522,57 @@ describe('usage', () => {
   })
 })
 
+describe('render', () => {
+  const slot = Symbol.for('fusion.dev/helix/render')
+  const store = globalThis as Record<symbol, unknown>
+
+  afterEach(() => {
+    delete store[slot]
+  })
+
+  test('an element tells the listener how long its first update took, and only that one', async () => {
+    const told: Array<{ duration: number; element: Element; start: number }> = []
+    store[slot] = (element: Element, measure: { duration: number; start: number }) =>
+      told.push({ element, ...measure })
+    const before = performance.now()
+    const element = document.createElement(tag) as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    document.body.append(element)
+    await element.updateComplete
+    element.setAttribute('data-again', '')
+    await element.updateComplete
+    expect(told).toHaveLength(1)
+    expect(told[0]?.element).toBe(element)
+    expect(told[0]?.start).toBeGreaterThanOrEqual(before)
+    expect(told[0]?.duration).toBeGreaterThanOrEqual(0)
+  })
+
+  test('a listener that throws breaks no element, and is printed once', async () => {
+    store[slot] = () => {
+      throw new Error('listener')
+    }
+    const printed: unknown[][] = []
+    const original = console.error
+    console.error = (...args: unknown[]) => {
+      printed.push(args)
+    }
+    try {
+      for (let at = 0; at < 2; at += 1) {
+        const element = document.createElement(tag) as HTMLElement & {
+          updateComplete: Promise<boolean>
+        }
+        document.body.append(element)
+        expect(await element.updateComplete).toBe(true)
+      }
+    } finally {
+      console.error = original
+    }
+    expect(printed).toHaveLength(1)
+    expect(String(printed[0]?.[0])).toContain('a render listener threw')
+  })
+})
+
 describe('version', () => {
   test('a loaded copy of core lists its version on the page once', async () => {
     const { VERSION } = await import('../version.js')
