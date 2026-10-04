@@ -1,5 +1,6 @@
 import { type CSSResultOrNative, css, LitElement, type PropertyValues } from 'lit'
 import { type StaticValue, unsafeStatic } from 'lit/static-html.js'
+import { measuring, reportRender } from '../utils/report-render/report-render.js'
 import { noteVersion, reportUsage } from '../utils/report-usage/report-usage.js'
 import {
   applyReactProperties,
@@ -619,6 +620,22 @@ export class HelixElement extends LitElement {
     styles?: CSSResultOrNative | CSSResultOrNative[],
   ): CSSResultOrNative[] {
     return [BOX_SIZING, HIDDEN, SCROLLER, MIRROR, SETTLED, ...LitElement.finalizeStyles(styles)]
+  }
+
+  /**
+   * The first update, timed where a page asked to measure what the components
+   * cost, and a property read where it did not: see `reportRender`.
+   */
+  protected override performUpdate(): void {
+    if (this.hasUpdated || !measuring()) {
+      super.performUpdate()
+      return
+    }
+    const start = performance.now()
+    super.performUpdate()
+    if (this.hasUpdated) {
+      reportRender(this, start, performance.now() - start)
+    }
   }
 
   /**
