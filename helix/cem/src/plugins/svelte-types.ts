@@ -27,6 +27,15 @@ export interface SvelteTypesOptions {
  * regenerating them, which is a few hundred bytes instead of another 360 kB and
  * cannot drift from the JSX ones by construction.
  *
+ * **Svelte's own attributes first, and the Helix props on top.** The JSX types
+ * carry React's spellings: `onClick` for a click, a `style` object, and
+ * `className`. In Svelte 5 an event attribute is case sensitive, so `onClick`
+ * listens for an event named `Click`, and the `onclick` a Svelte component
+ * writes was a type error on every Helix element. Each tag takes
+ * `HTMLAttributes` from `svelte/elements`, then the Helix props and
+ * `onhelix-*` handlers that Svelte's attributes do not already name, with
+ * React's spellings left out.
+ *
  * There is no maintained package for this. `custom-element-svelte-integration`
  * is the author's pre-toolkit one, last published January 2025, and the toolkit
  * has no Svelte generator. Ten lines that reuse a file we already emit is a
@@ -58,7 +67,10 @@ export const svelteTypes = ({
       return
     }
 
-    const tags = [...map[1].matchAll(/"([a-z][a-z0-9-]*)":/g)].map((match) => match[1])
+    /* **The map's own keys, at its own indentation.** A key inside a prop's
+       type, such as a tone's `"danger":`, is no tag, and matching it declared
+       `<danger>` and `<success>` as elements. */
+    const tags = [...map[1].matchAll(/^ {2}"([a-z][a-z0-9-]*)":/gm)].map((match) => match[1])
     if (tags.length === 0) {
       return
     }
@@ -70,10 +82,32 @@ export const svelteTypes = ({
       '// types already describe, so this augments `SvelteHTMLElements` with them',
       '// rather than emitting a second copy that could disagree.',
       `import type { CustomElements } from '${packageName}/jsx'`,
+      "import type { HTMLAttributes } from 'svelte/elements'",
+      '',
+      "// React's spellings, which Svelte reads another way or not at all.",
+      "type ReactOnly = 'className' | 'htmlFor' | 'key' | 'ref' | 'suppressHydrationWarning'",
+      '',
+      '// The element a tag makes, where the DOM lib knows it.',
+      'type ElementOf<Tag extends string> = Tag extends keyof HTMLElementTagNameMap',
+      '  ? HTMLElementTagNameMap[Tag]',
+      '  : HTMLElement',
+      '',
+      "// Svelte's attributes and lowercase events, then the Helix props and",
+      "// `onhelix-*` handlers Svelte's do not name. `onClick` and the other",
+      "// camel-case handlers are React's, and Svelte would read each as an event",
+      '// with a capital letter.',
+      'type Helix<Tag extends keyof CustomElements> = HTMLAttributes<ElementOf<Tag>> & {',
+      '  [Key in keyof CustomElements[Tag] as Key extends',
+      '    | keyof HTMLAttributes<ElementOf<Tag>>',
+      '    | ReactOnly',
+      '    | `on${Uppercase<string>}${string}`',
+      '    ? never',
+      '    : Key]: CustomElements[Tag][Key]',
+      '}',
       '',
       "declare module 'svelte/elements' {",
       '  interface SvelteHTMLElements {',
-      ...tags.map((tag) => `    '${tag}': CustomElements['${tag}']`),
+      ...tags.map((tag) => `    '${tag}': Helix<'${tag}'>`),
       '  }',
       '}',
       '',
