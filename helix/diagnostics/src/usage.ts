@@ -1,0 +1,209 @@
+/**
+ * What a page uses of Helix: the elements it renders, the axes and slots it
+ * sets on them, and the parts and hooks its stylesheets reach for.
+ *
+ * **Two sources, because each sees what the other cannot.** The elements tell
+ * `watch()` themselves, after their first render, through a slot
+ * `@fusion.dev/helix-core` reads, so a dialog that opened and closed is
+ * counted. The stylesheets are read by the collector, so a part styled is
+ * counted whether or not anything on the page matches the rule yet.
+ *
+ * **Counted, never sent.** This file holds counts and nothing that leaves the
+ * page. A sink decides where a report goes.
+ */
+import { parts, targets } from './analyze.js'
+import type { Answered, Located } from './collect.js'
+import type { Published } from './manifest.js'
+import type { Usage } from './report.js'
+
+/**
+ * The key `@fusion.dev/helix-core` reads a listener from. **A registered
+ * symbol**, the one name every copy of core on the page and this package agree
+ * on without either importing the other.
+ */
+const SLOT = Symbol.for('fusion.dev/helix/usage')
+
+/** The axes counted, which are the visual axes every styled family shares. */
+const AXES = ['emphasis', 'material', 'separation', 'tone'] as const
+
+/** Adds one to a count, making the counts on the way. */
+const bump = (into: Record<string, number>, key: string, by = 1): void => {
+  into[key] = (into[key] ?? 0) + by
+}
+
+/** The counts under a key, made where absent. */
+const under = <T>(into: Record<string, T>, key: string, make: () => T): T => {
+  let found = into[key]
+  if (found === undefined) {
+    found = make()
+    into[key] = found
+  }
+  return found
+}
+
+/** The element counts, before the stylesheets add theirs. */
+type Counted = Pick<Usage, 'axes' | 'composed' | 'slots' | 'tags'>
+
+const empty = (): Counted => ({ axes: {}, composed: {}, slots: {}, tags: {} })
+
+/**
+ * Counts one element.
+ *
+ * **What a Helix element renders inside itself is counted apart**, as
+ * `composed`: a pagination size draws a select, and counting that select as
+ * the page's own would credit a component nobody reached for.
+ */
+const tally = (counted: Counted, element: Element): void => {
+  const tag = element.localName
+  if (!tag.startsWith('helix-')) {
+    return
+  }
+  const root = element.getRootNode()
+  const host = root instanceof ShadowRoot ? root.host.localName : ''
+  if (host.startsWith('helix-')) {
+    bump(counted.composed, tag)
+    return
+  }
+  bump(counted.tags, tag)
+  for (const axis of AXES) {
+    const value = element.getAttribute(axis)
+    if (value !== null && value !== '') {
+      bump(
+        under(
+          under(counted.axes, tag, () => ({})),
+          axis,
+          () => ({}),
+        ),
+        value,
+      )
+    }
+  }
+  for (const child of element.children) {
+    const name = child.getAttribute('slot')
+    if (name) {
+      bump(
+        under(counted.slots, tag, () => ({})),
+        name,
+      )
+    }
+  }
+}
+
+/** Every element in a document, shadow roots included. */
+const everyElement = (from: ParentNode, visit: (element: Element) => void, depth = 0): void => {
+  if (depth > 32) {
+    return
+  }
+  for (const element of from.querySelectorAll('*')) {
+    visit(element)
+    if (element.shadowRoot) {
+      everyElement(element.shadowRoot, visit, depth + 1)
+    }
+  }
+}
+
+/** The elements in the page now, counted once each. */
+export const walk = (from: Document): Counted => {
+  const counted = empty()
+  everyElement(from, (element) => tally(counted, element))
+  return counted
+}
+
+/** A running count of what renders, from `watch()`. */
+export interface Watcher {
+  /** The counts so far. A copy: counting goes on after it is read. */
+  counts(): Pick<Usage, 'axes' | 'composed' | 'slots' | 'tags'>
+  /** Stops counting, and gives the slot back to whatever held it before. */
+  stop(): void
+}
+
+/**
+ * Starts counting the Helix elements that render, from now on, and the ones
+ * already in the page.
+ *
+ * Hand the watcher to `diagnose`, and its report counts every element seen
+ * since, including the ones that have gone. Without one, `diagnose` counts the
+ * elements in the page at the moment it runs, and says so.
+ *
+ * **Start it early**, before the components load where you can, so the
+ * elements an early route renders and removes are counted. The ones in the
+ * page when it starts are counted by walking the page once.
+ *
+ * Two watchers on one page both count: a second one keeps the first's
+ * listener and calls it too.
+ */
+export const watch = (from: Document = document): Watcher => {
+  const counted = empty()
+  const seen = new WeakSet<Element>()
+  const see = (element: Element): void => {
+    if (!seen.has(element)) {
+      seen.add(element)
+      tally(counted, element)
+    }
+  }
+  const store = globalThis as Record<symbol, unknown>
+  const before = store[SLOT]
+  let live = true
+  const listener = (element: Element): void => {
+    if (live) {
+      see(element)
+    }
+    if (typeof before === 'function') {
+      before(element)
+    }
+  }
+  store[SLOT] = listener
+  everyElement(from, see)
+  return {
+    counts: () => structuredClone(counted),
+    stop: () => {
+      live = false
+      if (store[SLOT] === listener) {
+        store[SLOT] = before
+      }
+    },
+  }
+}
+
+/**
+ * The parts and hooks a page's stylesheets reach for, where the manifest or
+ * the element's own styles say they exist. A dead one is a finding and is not
+ * counted as use.
+ */
+export const styled = (
+  rules: Located[],
+  tags: Map<string, Published>,
+  answered: Answered,
+): Pick<Usage, 'hooks' | 'parts'> => {
+  const counted: Pick<Usage, 'hooks' | 'parts'> = { hooks: {}, parts: {} }
+  for (const located of rules) {
+    const selector = located.rule.selectorText
+    if (!selector?.includes('helix-')) {
+      continue
+    }
+    for (const { names, tag } of parts(selector)) {
+      for (const name of names) {
+        if (tags.get(tag)?.parts.has(name)) {
+          bump(
+            under(counted.parts, tag, () => ({})),
+            name,
+          )
+        }
+      }
+    }
+    for (const tag of targets(selector)) {
+      for (const property of Array.from(located.rule.style ?? [])) {
+        if (
+          property.startsWith('--') &&
+          (tags.get(tag)?.hooks.has(property) || answered.get(tag)?.has(property))
+        ) {
+          bump(
+            under(counted.hooks, tag, () => ({})),
+            property,
+          )
+        }
+      }
+    }
+  }
+  return counted
+}

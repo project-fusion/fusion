@@ -13,7 +13,12 @@
 import type { Finding, Report } from './report.js'
 
 const line = (finding: Finding): string[] => {
-  const out = [`  ${finding.kind}: ${finding.subject}`, `    ${finding.message}`]
+  /* Who set the severity, where it was not the shipped rule. */
+  const by = finding.decidedBy === 'shipped' ? '' : `, set by the ${finding.decidedBy}`
+  const out = [
+    `  ${finding.severity} ${finding.kind}${by}: ${finding.subject}`,
+    `    ${finding.message}`,
+  ]
   if (finding.origin) {
     out.push(`    in ${finding.origin.sheet}, rule ${finding.origin.index}`)
     out.push(`    ${finding.origin.cssText}`)
@@ -32,6 +37,19 @@ export const report = (result: Report, to: Console = console): Report => {
   for (const sheet of coverage.unreadable) {
     to.log(`  unreadable (${sheet.reason}): ${sheet.sheet}`)
   }
+
+  const { argument, file } = result.silenced
+  if (argument + file > 0) {
+    to.log(
+      `  ${argument + file} finding${argument + file === 1 ? '' : 's'} turned off: ${file} by the file, ${argument} by the argument.`,
+    )
+  }
+  const { counted, hooks, parts, tags } = result.usage
+  const sum = (counts: Record<string, Record<string, number>>): number =>
+    Object.values(counts).reduce((total, one) => total + Object.keys(one).length, 0)
+  to.log(
+    `  usage: ${Object.keys(tags).length} tags in ${Object.values(tags).reduce((total, one) => total + one, 0)} elements (${counted}), ${sum(parts)} parts styled, ${sum(hooks)} hooks set.`,
+  )
 
   if (findings.length === 0) {
     to.log(

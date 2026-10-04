@@ -9,28 +9,90 @@ npm install --save-dev @fusion.dev/helix-diagnostics
 ```
 
 ```js
-import { diagnose, report } from '@fusion.dev/helix-diagnostics'
+import { diagnose, report, watch } from '@fusion.dev/helix-diagnostics'
+import { duplicateRegistrations } from '@fusion.dev/helix-core'
+import styled from '@fusion.dev/helix/custom-elements.json' with { type: 'json' }
 import headless from '@fusion.dev/helix-headless/custom-elements.json' with { type: 'json' }
 
-report(diagnose({ tiers: [headless] }))
+// Before the components load, so every element that renders is counted.
+const watcher = watch()
+
+// Later, once the page has rendered, and again after a route change.
+report(
+  diagnose({
+    duplicates: duplicateRegistrations,
+    tiers: [
+      { manifest: styled, name: '@fusion.dev/helix' },
+      { manifest: headless, name: '@fusion.dev/helix-headless' },
+    ],
+    watcher,
+  }),
+)
 ```
 
-`diagnose` needs at least one manifest and says so rather than defaulting: with
-none, every part name is unknown and every finding would be noise. `report` is
-the console sink; the `Report` it returns is the same object, so you can send it
-somewhere else instead.
+`diagnose` needs at least one manifest and says so instead of defaulting: with
+none, every part name is unknown and every finding would be noise. Pass both
+tiers when both are installed, since a part the headless tier publishes and the
+styled tier never forwarded is only visible with both. `report` is the console
+sink; the `Report` it returns is the same object, so you can send it somewhere
+else as well.
 
 None of these produces an error anywhere. They are detectable only against the
 custom elements manifest, which every Helix package already publishes, so the
 diagnostic cannot drift from what is true.
 
-**Coverage is half the return value, not a footnote.** A cross-origin stylesheet
-throws on `.cssRules`, so a run that read three sheets of nineteen returns the
-same empty findings array as one that read all nineteen. Read `coverage` before
-you believe `findings`.
+## What a report holds
 
-Development only. It walks stylesheets in the page and makes no network calls,
-ever.
+- **`coverage`**: how many stylesheets and shadow roots were read, and which
+  sheets could not be. A cross-origin stylesheet throws on `.cssRules`, so a run
+  that read three sheets of nineteen returns the same empty findings as one that
+  read all nineteen. Read `coverage` before you believe `findings`.
+- **`findings`**: each with its kind, a severity, the layer that set the
+  severity, the tag, and the rule's own text as evidence.
+- **`silenced`**: how many findings each override layer turned off.
+- **`usage`**: the Helix elements on the page by tag, the axes set on them
+  (`emphasis`, `material`, `separation`, and `tone`), the named slots filled,
+  the elements Helix renders inside other Helix elements, and the parts and
+  hooks your stylesheets use. With a watcher it counts every element that
+  rendered since `watch()` began, including ones since removed, such as a
+  closed dialog. Without one it counts the elements on the page at the moment
+  of the run.
+
+## Finding kinds
+
+| Kind | Severity | Means |
+| --- | --- | --- |
+| `dead-part` | error | A `::part()` names a part the element does not publish |
+| `dead-hook` | error | A custom property is set where nothing answers it |
+| `unforwarded-part` | warn | The headless tier publishes the part and the styled tier does not forward it, which is a gap in Helix |
+| `unknown-tag` | error | A rule names a tag no manifest lists |
+| `duplicate-registration` | error | Two copies of Helix are on the page |
+| `manifest-skew` | error | An element renders a part its manifest does not list, so the manifest is from another version. It replaces every other finding, since each would be judged against the wrong version |
+
+## Change a severity
+
+Pass your project's file, parsed, as `file`, and overrides for one run as
+`rules`. The `rules` argument wins over the file, and each finding says which
+one set its severity. An override is a severity (`error`, `warn`, or `info`),
+`off`, or either for some tags only:
+
+```js
+import overrides from './helix-diagnostics.json' with { type: 'json' }
+
+diagnose({
+  file: overrides,
+  rules: {
+    'dead-hook': { severity: 'warn', tags: ['helix-card'] },
+    'unforwarded-part': 'off',
+  },
+  tiers,
+})
+```
+
+An override for a kind that does not exist throws, and names the closest kind.
+
+Development only. It walks every stylesheet in the page, and it sends nothing
+anywhere.
 
 [Documentation](https://fusion.dev/helix)
 
