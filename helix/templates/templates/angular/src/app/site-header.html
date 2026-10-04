@@ -1,0 +1,30 @@
+<helix-app-header material="glass" sticky>
+  <!-- The wordmark is the way back to the first page, so there is no third
+       destination in the bar saying the same thing. It is also the only name
+       of the project on the screen. The mark is a placeholder for your own,
+       drawn in `--helix-color-brand-mark`, the token for the brand as a
+       graphic. -->
+  <a class="wordmark" data-link="quiet" href="#/" slot="start">
+    <helix-icon name="cube"></helix-icon>
+    <helix-text variant="body-strong">__PROJECT_NAME__</helix-text>
+  </a>
+
+  <!-- The links are yours. Navigation owns the marker that travels between
+       them and renders no anchors of its own. The base layer styles them,
+       `aria-current="page"` included. -->
+  <helix-navigation label="Pages">
+    <a [attr.aria-current]="path() === '/overview' ? 'page' : null" href="#/overview">Overview</a>
+    <a [attr.aria-current]="path() === '/join' ? 'page' : null" href="#/join">Join</a>
+  </helix-navigation>
+
+  <!-- An icon with no words has no accessible name until it is given one,
+       which is why this is its own element. -->
+  <helix-icon-button
+    [label]="'Color mode: ' + mode()"
+    slot="end"
+    [title]="'Color mode: ' + mode()"
+    (click)="cycle()"
+  >
+    <helix-icon [name]="marks[mode()]"></helix-icon>
+  </helix-icon-button>
+</helix-app-header>

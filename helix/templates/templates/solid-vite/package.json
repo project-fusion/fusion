@@ -1,0 +1,22 @@
+{
+  "name": "__PROJECT_NAME__",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fusion.dev/helix": "^__HELIX_VERSION__",
+    "@fusion.dev/helix-styles": "^__HELIX_VERSION__",
+    "solid-js": "^1.9.15"
+  },
+  "devDependencies": {
+    "@fusion.dev/helix-diagnostics": "^__HELIX_VERSION__",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0",
+    "vite-plugin-solid": "^2.11.14"
+  }
+}

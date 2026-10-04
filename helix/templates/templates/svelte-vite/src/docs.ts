@@ -1,0 +1,29 @@
+/**
+ * The documentation this starter links to.
+ *
+ * **One module, because a link is the thing in a starter most likely to rot.**
+ * A page that composes its own URLs ships a plausible-looking 404 to every
+ * project scaffolded from it, and nobody finds out until a reader clicks one.
+ * Here they are in a list somebody can open and check, and pointing the starter
+ * at a mirror or an internal copy is one edit.
+ *
+ * Checked 16 Sep 2026: every entry answers 200.
+ */
+export const DOCS = {
+  /** How the elements are registered and written, which is the first page to read. */
+  elements: 'https://fusion.dev/helix/docs/using-the-elements',
+  /** What a `<form>` does with these controls, and what it cannot do. */
+  forms: 'https://fusion.dev/helix/docs/forms',
+  /** Every component, with its API, its parts and its examples. */
+  gallery: 'https://fusion.dev/helix/components',
+  /** The light and dark pair, and the attribute that chooses between them. */
+  modes: 'https://fusion.dev/helix/docs/color-modes',
+  /** Reaching a component's parts from a page, which `app.css` does once. */
+  parts: 'https://fusion.dev/helix/docs/overriding-a-component',
+  /** Svelte specifically: the typings, props, and events. */
+  svelte: 'https://fusion.dev/helix/docs/svelte',
+  /** The data view's own page, where the rest of its API is. */
+  table: 'https://fusion.dev/helix/components/data-table',
+  /** Every token, and what each one is for. */
+  tokens: 'https://fusion.dev/helix/docs/tokens',
+} as const

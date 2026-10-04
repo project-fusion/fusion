@@ -1,0 +1,91 @@
+<header class="hero">
+  <helix-text emphasis="muted" variant="label">Form</helix-text>
+  <helix-text as="h1" variant="heading">Join the roster</helix-text>
+  <helix-text as="p" class="lede" emphasis="muted" variant="body">
+    Five controls, and a <helix-code>&lt;form&gt;</helix-code> reads every one of them the way
+    it reads an <helix-code>input</helix-code>.
+  </helix-text>
+</header>
+
+<!-- The form takes a column of its own and the notes take what is left. At
+     390 the two stack, and the notes read as a postscript. -->
+<div class="split">
+  <form class="form" (submit)="join($event)">
+    <helix-input autocomplete="name" label="Name" name="name" required></helix-input>
+
+    <!-- Validation is the platform's: `type` and `required` are set on the
+         real input inside, and its own message shows once the reader has
+         touched the field. Set `feedback` to say it in your own words. -->
+    <helix-input
+      hint="Where we send the welcome note."
+      label="Email"
+      name="email"
+      required
+      type="email"
+    ></helix-input>
+
+    <!-- `(helix-before-change)` binds with `addEventListener`, so it takes
+         the event's own name. -->
+    <helix-input
+      hint="Lowercase and hyphens, whatever you type."
+      label="Handle"
+      name="handle"
+      [value]="handle()"
+      (helix-before-change)="takeHandle($event)"
+    ></helix-input>
+
+    <helix-select label="Team" name="team" placeholder="Pick one" required>
+      @for (team of teams; track team) {
+        <helix-option [value]="team">{{ team }}</helix-option>
+      }
+    </helix-select>
+
+    <!-- A switch is a thing happening now, which is why it says on and off.
+         It still submits, as `on`. -->
+    <helix-switch label="Send me the weekly digest" name="digest"></helix-switch>
+
+    <helix-button emphasis="solid" tone="primary" type="submit">Join</helix-button>
+  </form>
+
+  <aside class="notes">
+    <!-- The one fact you need before typing your name into a page you have
+         had for five minutes, so it is a callout. `tone` is the meaning,
+         and the component draws it with a tint and a bar on the inline
+         start, so it survives being read in grayscale. -->
+    <helix-callout tone="info">
+      Nothing is posted anywhere. Submit it and the message shows exactly what a server would
+      have been handed.
+    </helix-callout>
+    <helix-text as="h2" variant="title">What this is showing</helix-text>
+    <helix-text as="p" emphasis="muted" variant="body">
+      Every control is a form-associated custom element, so the submit reads them with
+      <helix-code>new FormData(form)</helix-code> and nothing gathers the answers by hand.
+      Reset the form and they all go back, the way an <helix-code>input</helix-code> does.
+    </helix-text>
+    <helix-text as="p" emphasis="muted" variant="body">
+      Leave the email wrong and the complaint is the browser's own, in the reader's language.
+      Handle is the controlled one: it refuses the change and writes back what it will accept.
+    </helix-text>
+    <a data-link [href]="docs.forms">Forms</a>
+  </aside>
+</div>
+
+<!-- **The region is rendered whether or not there is anything in it.**
+     Assistive technology subscribes to a live region, and one that arrives
+     already holding its message is often never announced. A dismissed
+     message asks to go through `helix-dismiss`. -->
+<helix-toast>
+  @for (message of messages(); track message.id) {
+    <helix-toast-item
+      dismissible
+      [duration]="8000"
+      tone="success"
+      (helix-dismiss)="dismiss(message.id)"
+    >
+      <helix-flex direction="column" gap="2xs">
+        <helix-text variant="body-strong">Read by the form</helix-text>
+        <helix-text variant="code">{{ message.text }}</helix-text>
+      </helix-flex>
+    </helix-toast-item>
+  }
+</helix-toast>

@@ -1,0 +1,19 @@
+<!-- The bar, the route, and the footer, in a column the height of the window.
+     `app.css` says why the footer is worth having and why the column is flex. -->
+<div class="shell">
+  <app-site-header></app-site-header>
+  <main class="page">
+    @switch (path()) {
+      @case ('/overview') {
+        <div app-overview></div>
+      }
+      @case ('/join') {
+        <div app-signup-form></div>
+      }
+      @default {
+        <div app-landing></div>
+      }
+    }
+  </main>
+  <footer app-site-footer></footer>
+</div>
