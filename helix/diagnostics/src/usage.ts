@@ -109,6 +109,35 @@ export const walk = (from: Document): Counted => {
   return counted
 }
 
+/**
+ * The counts for the tags a manifest lists, and the rest apart as `unlisted`.
+ *
+ * Counted by prefix, since `watch()` runs before any manifest is at hand, and
+ * sorted here, where one is.
+ */
+export const listed = (
+  counted: Counted,
+  tags: Map<string, Published>,
+): Counted & Pick<Usage, 'unlisted'> => {
+  const keep = <T>(counts: Record<string, T>): Record<string, T> =>
+    Object.fromEntries(Object.entries(counts).filter(([tag]) => tags.has(tag)))
+  const unlisted: Record<string, number> = {}
+  for (const counts of [counted.tags, counted.composed]) {
+    for (const [tag, count] of Object.entries(counts)) {
+      if (!tags.has(tag)) {
+        bump(unlisted, tag, count)
+      }
+    }
+  }
+  return {
+    axes: keep(counted.axes),
+    composed: keep(counted.composed),
+    slots: keep(counted.slots),
+    tags: keep(counted.tags),
+    unlisted,
+  }
+}
+
 /** A running count of what renders, from `watch()`. */
 export interface Watcher {
   /** The counts so far. A copy: counting goes on after it is read. */

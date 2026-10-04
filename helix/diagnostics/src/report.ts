@@ -151,6 +151,12 @@ export interface Usage {
   slots: Record<string, Record<string, number>>
   /** Each Helix element the page put there, by tag. */
   tags: Record<string, number>
+  /**
+   * Elements named `helix-*` that no manifest passed in lists, by tag: a
+   * page's own element under the prefix, or a family whose manifest was not
+   * passed. Kept out of the other counts, which are Helix's.
+   */
+  unlisted: Record<string, number>
 }
 
 /** The whole result. Coverage and findings, never one without the other. */

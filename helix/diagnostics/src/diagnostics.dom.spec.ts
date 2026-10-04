@@ -406,8 +406,45 @@ const quiet = {
     parts: {},
     slots: {},
     tags: {},
+    unlisted: {},
   },
 }
+
+/** A console that records each entry with the method it went to. */
+const recording = () => {
+  const entries: Array<[string, string]> = []
+  const at =
+    (level: string) =>
+    (text = '') =>
+      entries.push([level, String(text)])
+  return {
+    entries,
+    sink: {
+      debug: at('debug'),
+      error: at('error'),
+      group: at('group'),
+      groupCollapsed: at('groupCollapsed'),
+      groupEnd: at('groupEnd'),
+      info: at('info'),
+      warn: at('warn'),
+    },
+    text: () => entries.map(([, text]) => text).join('\n'),
+  }
+}
+
+/** One finding at a severity, for the sink. */
+const finding = (
+  severity: 'error' | 'info' | 'warn',
+  decidedBy: 'argument' | 'shipped' = 'shipped',
+) => ({
+  decidedBy,
+  kind: 'dead-part' as const,
+  message: 'nope',
+  origin: { cssText: 'helix-button::part(x) { }', index: 4, sheet: 'app.css' },
+  severity,
+  subject: 'helix-button::part(x)',
+  tag: 'helix-button',
+})
 
 describe('the report', () => {
   test('diagnose refuses to run with no manifest', () => {
@@ -415,40 +452,100 @@ describe('the report', () => {
   })
 
   test('coverage is printed on a clean run, so an empty result cannot read as a pass', () => {
-    const lines: string[] = []
-    const sink = { log: (text: string) => lines.push(text) } as unknown as Console
+    const { entries, sink } = recording()
     report(
-      { ...quiet, coverage: { read: 3, roots: 0, sheets: 19, unreadable: [] }, findings: [] },
+      {
+        ...quiet,
+        coverage: {
+          read: 18,
+          roots: 0,
+          sheets: 19,
+          unreadable: [{ reason: 'cross-origin', sheet: 'https://cdn.example/x.css' }],
+        },
+        findings: [],
+      },
       sink,
     )
-    expect(lines[0]).toContain('read 3 of 19')
-    expect(lines.join('\n')).toContain('were not checked')
+    expect(entries[0]).toEqual(['group', 'helix diagnostics: no findings'])
+    expect(entries).toContainEqual(['info', 'read 18 of 19 stylesheets across 0 shadow roots'])
+    expect(entries.find(([level]) => level === 'warn')?.[1]).toContain('https://cdn.example/x.css')
+    expect(entries.at(-1)).toEqual(['groupEnd', ''])
   })
 
-  test('a finding prints its receipt', () => {
-    const lines: string[] = []
-    const sink = { log: (text: string) => lines.push(text) } as unknown as Console
+  test('a clean run that read everything collapses to one line', () => {
+    const { entries, sink } = recording()
+    report(
+      { ...quiet, coverage: { read: 2, roots: 1, sheets: 2, unreadable: [] }, findings: [] },
+      sink,
+    )
+    expect(entries[0]?.[0]).toBe('groupCollapsed')
+    expect(entries.some(([level]) => level === 'warn' || level === 'error')).toBe(false)
+  })
+
+  test('each finding goes to the console method named by its severity, with its receipt', () => {
+    const { entries, sink } = recording()
     report(
       {
         ...quiet,
         coverage: { read: 1, roots: 0, sheets: 1, unreadable: [] },
-        findings: [
-          {
-            decidedBy: 'shipped',
-            kind: 'dead-part',
-            message: 'nope',
-            origin: { cssText: 'helix-button::part(x) { }', index: 4, sheet: 'app.css' },
-            severity: 'error',
-            subject: 'helix-button::part(x)',
-            tag: 'helix-button',
-          },
-        ],
+        findings: [finding('error'), finding('warn', 'argument'), finding('info')],
       },
       sink,
     )
-    const text = lines.join('\n')
-    expect(text).toContain('app.css, rule 4')
-    expect(text).toContain('helix-button::part(x) { }')
+    expect(entries[0]).toEqual(['group', 'helix diagnostics: 1 error, 1 warning, 1 info'])
+    const levels = entries.filter(([, text]) => text.includes('dead-part')).map(([level]) => level)
+    expect(levels).toEqual(['error', 'warn', 'info'])
+    const error = entries.find(([level]) => level === 'error')?.[1] ?? ''
+    expect(error).toContain('app.css, rule 4')
+    expect(error).toContain('helix-button::part(x) { }')
+    expect(entries.find(([level]) => level === 'warn')?.[1]).toContain('set by the argument')
+  })
+
+  test('usage goes to debug, out of sight at the default level', () => {
+    const { entries, sink } = recording()
+    report(
+      {
+        ...quiet,
+        coverage: { read: 1, roots: 0, sheets: 1, unreadable: [] },
+        findings: [],
+        usage: { ...quiet.usage, tags: { 'helix-button': 3 }, unlisted: { 'helix-mine': 1 } },
+      },
+      sink,
+    )
+    const usage = entries.filter(([, text]) => text.startsWith('usage'))
+    expect(usage).toEqual([
+      [
+        'debug',
+        'usage (walked): 1 tag in 3 elements, 0 parts styled, 0 hooks set, and 1 helix- tag no manifest lists',
+      ],
+    ])
+  })
+})
+
+describe('the two fixes from review', () => {
+  test('a manifest-skew finding turned off lets the page be judged as usual', () => {
+    const host = document.createElement('helix-button')
+    host.attachShadow({ mode: 'open' }).innerHTML = '<button part="button control-new"></button>'
+    document.body.append(host)
+    const style = document.createElement('style')
+    style.textContent = 'helix-button { --button-backgruond-color: red }'
+    document.head.append(style)
+    const refused = diagnose({ tiers })
+    expect(refused.findings.map((one) => one.kind)).toEqual(['manifest-skew'])
+    const judged = diagnose({ rules: { 'manifest-skew': 'off' }, tiers })
+    expect(judged.findings.map((one) => one.kind)).toEqual(['dead-hook'])
+    expect(judged.silenced).toEqual({ argument: 1, file: 0 })
+    style.remove()
+    host.remove()
+  })
+
+  test('usage counts the tags a manifest lists, and keeps the rest apart', () => {
+    document.body.innerHTML =
+      '<helix-button></helix-button><helix-sandbox-editor></helix-sandbox-editor>'
+    const { usage } = diagnose({ tiers })
+    expect(usage.tags).toEqual({ 'helix-button': 1 })
+    expect(usage.unlisted).toEqual({ 'helix-sandbox-editor': 1 })
+    document.body.innerHTML = ''
   })
 })
 
