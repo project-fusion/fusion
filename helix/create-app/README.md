@@ -18,11 +18,19 @@ npm create @fusion.dev/helix-app@latest my-app -- --template react-vite
 |---|---|
 | `react-vite` | React and TypeScript on Vite. The shortest path to a running app. |
 | `react-nextjs` | React and TypeScript on the Next.js App Router, the three pages as real routes. |
+| `vue-vite` | Vue and TypeScript on Vite. |
+| `angular` | Angular and TypeScript on the Angular CLI. |
+| `svelte-vite` | Svelte and TypeScript on Vite. |
+| `solid-vite` | Solid and TypeScript on Vite. |
 
-Either one lays down the same three pages: a landing page saying what you have
-and where the rest of it is documented, an overview holding a sorted, paged,
-selectable data table, and a form a `<form>` reads with `FormData`. What differs
-between them is what the framework forces.
+Every template lays down the same three pages:
+
+- a landing page saying what you have and where the rest of it is documented;
+- an overview holding a sorted, paged, selectable data table;
+- a form a `<form>` reads with `FormData`.
+
+What differs between them is what each framework requires. Each one starts Helix
+diagnostics in development, and a production build leaves it out.
 
 This is `helix new` from
 [`@fusion.dev/helix-cli`](https://www.npmjs.com/package/@fusion.dev/helix-cli),

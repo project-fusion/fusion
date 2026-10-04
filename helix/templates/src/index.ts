@@ -63,6 +63,30 @@ export const templates: readonly Template[] = [
     named: ['app/layout.tsx', 'app/site-header.tsx', 'package.json'],
     title: 'React (Next.js)',
   },
+  {
+    description: 'Vue and TypeScript on Vite.',
+    id: 'vue-vite',
+    named: ['index.html', 'package.json', 'src/SiteHeader.vue'],
+    title: 'Vue (Vite)',
+  },
+  {
+    description: 'Angular and TypeScript on the Angular CLI.',
+    id: 'angular',
+    named: ['angular.json', 'package.json', 'src/app/site-header.html', 'src/index.html'],
+    title: 'Angular',
+  },
+  {
+    description: 'Svelte and TypeScript on Vite.',
+    id: 'svelte-vite',
+    named: ['index.html', 'package.json', 'src/SiteHeader.svelte'],
+    title: 'Svelte (Vite)',
+  },
+  {
+    description: 'Solid and TypeScript on Vite.',
+    id: 'solid-vite',
+    named: ['index.html', 'package.json', 'src/site-header.tsx'],
+    title: 'Solid (Vite)',
+  },
 ]
 
 /** The placeholder a scaffolder replaces with the project's name. */

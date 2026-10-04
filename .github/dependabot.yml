@@ -51,8 +51,20 @@ updates:
     package-ecosystem: npm
     schedule:
       interval: weekly
-  # The two consumer templates are not workspace members, so the root entry
-  # never sees them, and what they pin ships to every `helix new` project.
+  # The consumer templates are not workspace members, so the root entry never
+  # sees them, and what they pin ships to every `helix new` project. Angular's
+  # compiler, `vue-tsc`, and `svelte-check` each name the TypeScript they
+  # take, so a TypeScript major is theirs to adopt first.
+  - directory: /helix/templates/templates/angular
+    groups:
+      template:
+        patterns: ['*']
+    ignore:
+      - dependency-name: 'typescript'
+        update-types: [version-update:semver-major]
+    package-ecosystem: npm
+    schedule:
+      interval: weekly
   - directory: /helix/templates/templates/react-nextjs
     groups:
       template:
@@ -69,6 +81,33 @@ updates:
         patterns: ['*']
     ignore:
       - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+    package-ecosystem: npm
+    schedule:
+      interval: weekly
+  - directory: /helix/templates/templates/solid-vite
+    groups:
+      template:
+        patterns: ['*']
+    package-ecosystem: npm
+    schedule:
+      interval: weekly
+  - directory: /helix/templates/templates/svelte-vite
+    groups:
+      template:
+        patterns: ['*']
+    ignore:
+      - dependency-name: 'typescript'
+        update-types: [version-update:semver-major]
+    package-ecosystem: npm
+    schedule:
+      interval: weekly
+  - directory: /helix/templates/templates/vue-vite
+    groups:
+      template:
+        patterns: ['*']
+    ignore:
+      - dependency-name: 'typescript'
         update-types: [version-update:semver-major]
     package-ecosystem: npm
     schedule:

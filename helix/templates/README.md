@@ -16,13 +16,25 @@ written against.
 |---|---|
 | `react-vite` | React and TypeScript on Vite. The shortest path to a running app. |
 | `react-nextjs` | React and TypeScript on the Next.js App Router, the three pages as real routes. |
+| `vue-vite` | Vue and TypeScript on Vite. |
+| `angular` | Angular and TypeScript on the Angular CLI. |
+| `svelte-vite` | Svelte and TypeScript on Vite. |
+| `solid-vite` | Solid and TypeScript on Vite. |
 
-Both lay down the same three pages, in the same order and with the same copy: a
-landing page saying what is installed and where it is documented, an overview
-holding a sorted, paged, selectable data table, and a form whose controls a
-`<form>` reads with `FormData` because they are real form participants. What
-differs between them is what the framework forces, which is what makes them
-worth diffing against each other.
+Every template lays down the same three pages, in the same order and with the
+same copy:
+
+- a landing page saying what is installed and where it is documented;
+- an overview holding a sorted, paged, selectable data table;
+- a form whose controls a `<form>` reads with `FormData`, because they are real
+  form participants.
+
+What differs between them is what each framework requires. `bun run
+smoke:scaffold` builds every template and holds what each renders to React on
+Vite's, in markup and in pictures, so a template that drifts fails CI.
+
+Each one starts Helix diagnostics in development, checked against the lint data
+of the Helix it installed, and a production build leaves it out.
 
 **There is no build-free HTML template**, and that is a fact about the packages
 rather than an omission. `@fusion.dev/helix`'s published entry re-exports bare

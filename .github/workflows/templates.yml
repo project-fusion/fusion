@@ -1,6 +1,7 @@
 # Scaffolds every template with `helix new`, installs it from packed tarballs,
-# and builds it: [run-template-build.mjs](../../fusion/scripts/run-template-build.mjs)
-# says why nothing else here does.
+# builds it, and holds what it renders to React on Vite's:
+# [run-template-build.mjs](../../fusion/scripts/run-template-build.mjs) says why
+# nothing else here does.
 #
 # **Only on the pull requests that can break one**, and not in `verify`, because
 # it installs a framework per template and most changes reach neither. A
@@ -14,6 +15,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/templates.yml
+      - fusion/scripts/lib/settle.mjs
       - fusion/scripts/run-template-build.mjs
       - helix/cli/src/new.rs
       - helix/create-app/**
@@ -54,5 +56,21 @@ jobs:
       - name: Analyze
         run: bun run analyze
 
-      - name: Scaffold, install and build every template
+      # Each template is opened in Chromium and compared with React on Vite.
+      - name: Install Chromium
+        uses: ./.github/actions/browser
+
+      - name: Scaffold, install, build, and compare every template
         run: bun run smoke:scaffold
+
+      # **`include-hidden-files`, since the pictures are under `.local`**, and
+      # `upload-artifact` drops a dot directory unless asked.
+      - name: Upload the marked differences
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          if-no-files-found: ignore
+          include-hidden-files: true
+          name: template-parity
+          path: .local/template-parity
+          retention-days: 14

@@ -1,0 +1,28 @@
+{
+  "name": "__PROJECT_NAME__",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "ng build",
+    "dev": "ng serve",
+    "ng": "ng",
+    "start": "ng serve"
+  },
+  "dependencies": {
+    "@angular/common": "^22.2.1",
+    "@angular/compiler": "^22.2.1",
+    "@angular/core": "^22.2.1",
+    "@angular/platform-browser": "^22.2.1",
+    "@fusion.dev/helix": "^__HELIX_VERSION__",
+    "@fusion.dev/helix-styles": "^__HELIX_VERSION__",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.1",
+    "@angular/cli": "^22.2.1",
+    "@angular/compiler-cli": "^22.2.1",
+    "@fusion.dev/helix-diagnostics": "^__HELIX_VERSION__",
+    "typescript": "~6.0.3"
+  }
+}

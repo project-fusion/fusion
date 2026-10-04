@@ -94,7 +94,7 @@ export function Landing() {
             </helix-text>
             <helix-text as="p" emphasis="muted" variant="body">
               They are custom elements, so you write the tags and there is no per-component import
-              to keep in step. One line in <helix-code>src/main.tsx</helix-code> registers all of
+              to keep in step. One line in <helix-code>app/helix-elements.tsx</helix-code> registers all of
               them, and a subpath like <helix-code>@fusion.dev/helix/tabs</helix-code> registers
               one.
             </helix-text>
@@ -122,7 +122,7 @@ export function Landing() {
               A short stylesheet
             </helix-text>
             <helix-text as="p" emphasis="muted" variant="body">
-              <helix-code>src/app.css</helix-code> holds this page's measure, the rhythm between its
+              <helix-code>app/app.css</helix-code> holds this page's measure, the rhythm between its
               blocks, and nothing a component already draws. Where a component leaves a decision
               open it names a part: the data view reaches one to paint the row you tick.
             </helix-text>

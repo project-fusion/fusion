@@ -1,0 +1,23 @@
+{
+  "name": "__PROJECT_NAME__",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vue-tsc && vite build",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fusion.dev/helix": "^__HELIX_VERSION__",
+    "@fusion.dev/helix-styles": "^__HELIX_VERSION__",
+    "vue": "^3.5.43"
+  },
+  "devDependencies": {
+    "@fusion.dev/helix-diagnostics": "^__HELIX_VERSION__",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.0",
+    "vue-tsc": "^3.3.12"
+  }
+}

@@ -26,7 +26,7 @@ export function Overview() {
         </helix-text>
         <helix-text as="p" className="lede" emphasis="muted" variant="body">
           Twelve people from a local module. Sort a column, turn a page, or tick a row and watch the
-          rule in <helix-code>src/app.css</helix-code> paint it.
+          rule in <helix-code>app/app.css</helix-code> paint it.
         </helix-text>
       </header>
 

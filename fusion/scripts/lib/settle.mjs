@@ -10,22 +10,28 @@
 /**
  * Waits for every element on the page to be defined, and names the tags nothing
  * defines.
+ *
+ * `prefix` limits the wait to the tags that start with it, for a page whose
+ * framework writes hyphenated tags of its own that are never defined, such as
+ * Angular's `app-root`.
  */
-export const awaitUpgrades = (tab) =>
-  tab.evaluate(async () => {
+export const awaitUpgrades = (tab, prefix = '') =>
+  tab.evaluate(async (prefix) => {
     /* **Bounded, because `whenDefined` on a tag nothing registers never
        settles.** Unbounded, an example naming an element the bundle does not
        define hangs the run outright: no output, no failure, and no way to tell a
        slow machine from a stuck one. This gives up and says which tags it was
        waiting for. Five seconds is far past any real upgrade and far short of
        noticing it by hand. */
-    const pending = [...document.querySelectorAll(':not(:defined)')].map((one) => one.localName)
+    const pending = [...document.querySelectorAll(':not(:defined)')]
+      .map((one) => one.localName)
+      .filter((tag) => tag.startsWith(prefix))
     await Promise.race([
       Promise.all([...new Set(pending)].map((tag) => customElements.whenDefined(tag))),
       new Promise((done) => setTimeout(done, 5000)),
     ])
     return [...new Set(pending)].filter((tag) => customElements.get(tag) === undefined)
-  })
+  }, prefix)
 
 /**
  * Waits for the page to settle: three frames, fonts, every Helix element's own

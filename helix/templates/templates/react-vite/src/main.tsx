@@ -15,6 +15,12 @@ import './app.css'
 
 import { App } from './App.js'
 
+/* **Diagnostics in development, and none of it in a build.** `vite build`
+   replaces `import.meta.env.DEV` with `false` and drops the import with it. */
+if (import.meta.env.DEV) {
+  void import('./diagnostics.js')
+}
+
 createRoot(document.querySelector('#root') as HTMLElement).render(
   <StrictMode>
     <App />
