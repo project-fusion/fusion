@@ -313,6 +313,7 @@ export {
   type Relative,
   relativeTime,
 } from './utils/relative-time/relative-time.js'
+export { reportUsage, USAGE_SLOT } from './utils/report-usage/report-usage.js'
 export { reportValues } from './utils/report-values/report-values.js'
 export {
   type ChangeRequestOptions,

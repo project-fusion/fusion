@@ -1,5 +1,6 @@
 import { type CSSResultOrNative, css, LitElement, type PropertyValues } from 'lit'
 import { type StaticValue, unsafeStatic } from 'lit/static-html.js'
+import { reportUsage } from '../utils/report-usage/report-usage.js'
 import {
   applyReactProperties,
   auditReactProps,
@@ -631,6 +632,9 @@ export class HelixElement extends LitElement {
    */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    /* Counted where a page asked to count, and a null check where it did not:
+       see `reportUsage`. */
+    reportUsage(this)
     /* **The first look, and the one that costs nothing.** It succeeds whenever
        the definition landed after React hydrated, which is the ordering a
        deferred or lazily imported element has: the bag is already on the node,
