@@ -24,6 +24,7 @@ helix component fix        # the rules that can write
 | `component` | Holds components to the conventions. `--only <rule>` runs one of `attributes` `axes` `corners` `events` `hooks` `parts` `reflected` `seeds` `selectors` `ssr` `stable` `tokens` and the rest |
 | `theme` | `init` a starter intent, `build` it to CSS, `audit` every contrast pair, `check` in CI |
 | `new` | Scaffolds a project from a Helix template |
+| `diagnostics` | Receives the runs `initDiagnostics()` sends from your app and prints each new finding. `--out <path>` writes the CI file, `--port` picks the port, 7417 by default, and `--config <path>` names the settings served to the page |
 | `mcp` | Serves the derivation to an agent over stdio, as an MCP server |
 
 `--json` is on every verb, in a shape a script can read without parsing

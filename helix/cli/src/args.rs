@@ -79,6 +79,16 @@ pub enum Noun {
     does one thing to one subject and there is no second verb it could take:
     `helix new list` would be a word for what an omitted `--template` already
     prints. */
+    /* **A noun with no verb, like `mcp`**: it does one thing, which is to
+    serve, and a page asks for the rest over HTTP. */
+    /// Receive the runs `initDiagnostics()` sends from your app, and print them.
+    ///
+    /// Listens on 127.0.0.1 beside any dev server. Pages on a local host post
+    /// each run here; it prints each finding the first time a page has it,
+    /// writes the latest run of every page to `--out` where given, and serves
+    /// your `helix-diagnostics.json` to the page.
+    Diagnostics(Diagnostics),
+
     /* **A noun for the artifact rather than a verb on the component noun.**
     `component` holds a design system to its conventions; a manifest is a file,
     and what is asked of a file is whether two of them say the same thing. */
@@ -101,6 +111,24 @@ pub enum Noun {
         #[command(subcommand)]
         verb: Theme,
     },
+}
+
+/// What `helix diagnostics` takes.
+#[derive(Args, Debug)]
+pub struct Diagnostics {
+    /// The port to listen on. 0 picks a free one, and the first line printed
+    /// says which.
+    #[arg(long, default_value_t = 7417)]
+    pub port: u16,
+
+    /// Write the latest run of every page here, as the CI file.
+    #[arg(long, value_name = "PATH")]
+    pub out: Option<PathBuf>,
+
+    /// The settings to serve to the page. Defaults to `helix-diagnostics.json`
+    /// in the directory it runs in.
+    #[arg(long, value_name = "PATH")]
+    pub config: Option<PathBuf>,
 }
 
 #[derive(Debug, Subcommand)]
