@@ -161,7 +161,19 @@ export interface Watcher {
  * Two watchers on one page both count: a second one keeps the first's
  * listener and calls it too.
  */
-export const watch = (from: Document = document): Watcher => {
+export const watch = (
+  from: Document = document,
+  {
+    onRender,
+  }: {
+    /**
+     * Called as each Helix element renders for the first time, after it is
+     * counted: how `initDiagnostics()` hears that the page changed when an
+     * element upgrades without adding anything to the DOM.
+     */
+    onRender?: ((element: Element) => void) | undefined
+  } = {},
+): Watcher => {
   const counted = empty()
   const seen = new WeakSet<Element>()
   const see = (element: Element): void => {
@@ -176,6 +188,7 @@ export const watch = (from: Document = document): Watcher => {
   const listener = (element: Element): void => {
     if (live) {
       see(element)
+      onRender?.(element)
     }
     if (typeof before === 'function') {
       before(element)

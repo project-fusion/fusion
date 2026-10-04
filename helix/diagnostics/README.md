@@ -8,38 +8,94 @@ part a composed component never forwarded, two copies of the library on one page
 npm install --save-dev @fusion.dev/helix-diagnostics
 ```
 
+## Start it in your app
+
+Call `initDiagnostics()` once, at your app's entry, before the app mounts:
+
 ```js
-import { diagnose, report, watch } from '@fusion.dev/helix-diagnostics'
-import { duplicateRegistrations } from '@fusion.dev/helix-core'
-import styled from '@fusion.dev/helix/custom-elements.json' with { type: 'json' }
-import headless from '@fusion.dev/helix-headless/custom-elements.json' with { type: 'json' }
+import { initDiagnostics } from '@fusion.dev/helix-diagnostics'
 
-// Before the components load, so every element that renders is counted.
-const watcher = watch()
-
-// Later, once the page has rendered, and again after a route change.
-report(
-  diagnose({
-    duplicates: duplicateRegistrations,
-    tiers: [
-      { manifest: styled, name: '@fusion.dev/helix' },
-      { manifest: headless, name: '@fusion.dev/helix-headless' },
-    ],
-    watcher,
-  }),
-)
+initDiagnostics({ environment: import.meta.env.MODE })
 ```
 
-`diagnose` needs at least one manifest and says so instead of defaulting: with
-none, every part name is unknown and every finding would be noise. Pass both
-tiers when both are installed, since a part the headless tier publishes and the
-styled tier never forwarded is only visible with both. `report` is the console
-sink; the `Report` it returns is the same object, so you can send it somewhere
-else as well.
+It needs nothing from a framework, so the call is the same wherever Helix runs:
 
-None of these produces an error anywhere. They are detectable only against the
-custom elements manifest, which every Helix package already publishes, so the
-diagnostic cannot drift from what is true.
+- `main.ts` in Vite, Vue, Svelte, or Solid;
+- before `bootstrapApplication` in Angular, inside `ngZone.runOutsideAngular`
+  so its callbacks do not run change detection;
+- `instrumentation-client.ts` in Next.js;
+- a `<script type="module">` on a page with no bundler.
+
+On a server, with no `document`, it does nothing, so it is safe in code that
+server-side rendering also runs. A second call returns the first call's handle,
+so React's strict mode and hot module replacement start nothing twice.
+
+**What it does from there:**
+
+- **Counts from the start**, every Helix element that renders, including ones
+  that go, such as a closed dialog.
+- **Loads the lint data for the exact Helix version on the page**, from a public
+  npm CDN, about 18 KB compressed for each tier. Offline, or on a locked-down
+  network, pass it yourself:
+  `tiers: [{ lint }]` with `import lint from '@fusion.dev/helix/lint.json'`.
+- **Runs itself**: after the page loads, after a navigation, and after the page
+  changes, once changes stop for a second, in an idle moment, and never sooner
+  than two seconds after the last run, nor sooner than twenty times its
+  duration. A page that never stops changing still runs within ten seconds.
+  Nothing runs in a hidden tab, or when nothing changed.
+- **Prints each finding once per page**, in DevTools, at the levels your
+  `console` setting gives. The heading still counts every finding.
+- **Hands each run to your app**: the `onReport` option, `subscribe()` on the
+  handle it returns, and a `helix-diagnostics` event on `document`.
+
+**It never runs in production by accident.** With no `environment`, it runs only
+on a local host: `localhost`, `127.0.0.1`, `[::1]`, `*.localhost`, and `*.test`.
+Production runs only with `environment: 'production'` and
+`environments: { production: { sample } }`.
+
+**It never breaks your app.** It never throws. A setting that names nothing is
+printed with the closest real one, and the handle does nothing. A run that
+throws is printed, and three failures in a row stop it. A subscriber that
+throws stops neither the others nor the console.
+
+| Option | What it is |
+| --- | --- |
+| `environment` | `development`, `ci`, or `production`, as your build says it |
+| `tiers` | Lint data or manifests to check against, where you pass them yourself |
+| `cdn` | Where lint data loads from; `false` loads nothing |
+| `page` | A function returning the page's path as your router names it, such as `/products/[id]` |
+| `onReport` | Called with each run |
+| `duplicates` | `duplicateRegistrations` from `@fusion.dev/helix-core` |
+| `file` | Your project's `helix-diagnostics.json`, imported |
+| Any setting below | `rules`, `console`, `send`, `detail`, `environments`, `project` |
+
+The handle has `active`, `latest`, `run()`, `subscribe()`, and `stop()`. An
+end-to-end test reaches it at `globalThis[Symbol.for('fusion.dev/helix/diagnostics')]`
+to assert that a page has no findings.
+
+## Run it once, directly
+
+`diagnose()` is one run, which `initDiagnostics()` makes for you. Call it
+yourself in a test, a script, or anywhere you want a single report:
+
+```js
+import { diagnose, report } from '@fusion.dev/helix-diagnostics'
+import styled from '@fusion.dev/helix/lint.json' with { type: 'json' }
+import headless from '@fusion.dev/helix-headless/lint.json' with { type: 'json' }
+
+report(diagnose({ tiers: [{ lint: styled }, { lint: headless }] }))
+```
+
+`diagnose` needs at least one tier and says so instead of defaulting: with none,
+every part name is unknown and every finding would be noise. It takes lint data
+or a full `custom-elements.json`. Pass both tiers when both are installed, since
+a part the headless tier publishes and the styled tier never forwarded is only
+visible with both. `report` is the console sink; the `Report` it returns is the
+same object, so you can send it somewhere else as well.
+
+None of these faults produces an error anywhere. They are detectable only against
+the manifest, which every Helix package publishes, so the diagnostic cannot
+drift from what is true.
 
 ## What a report holds
 
