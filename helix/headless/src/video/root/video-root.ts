@@ -18,6 +18,7 @@ import {
   MediaSessionController,
   onUnlessFalse,
   RemotePlaybackController,
+  reportRuntime,
   SKIP_SECONDS,
   sameCopies,
   showCaption,
@@ -1130,10 +1131,12 @@ export class HelixHeadlessVideo extends HelixElement {
       }
       await video.requestPictureInPicture()
     } catch (error) {
-      console.warn(
-        `<${this.localName}> could not enter picture in picture. A press has to come from the reader, and one window holds it at a time.`,
-        error,
-      )
+      reportRuntime({
+        detail: error,
+        kind: 'picture-in-picture-refused',
+        message: `<${this.localName}> could not enter picture in picture. A press has to come from the reader, and one window holds it at a time.`,
+        tag: this.localName,
+      })
     }
   }
 

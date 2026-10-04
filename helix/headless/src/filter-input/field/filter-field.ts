@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessOption } from '../../option/index.js'
@@ -99,9 +99,11 @@ export class HelixHeadlessFilterField extends HelixElement {
   get defaultOperator(): HelixHeadlessFilterOperator | null {
     const marked = this.operators.filter((operator) => operator.default)
     if (marked.length > 1) {
-      console.warn(
-        `\`${this.name || 'A filter field'}\` names ${marked.length} default operators, and a chip can only leave one unwritten. Mark one.`,
-      )
+      reportRuntime({
+        kind: 'two-default-operators',
+        message: `\`${this.name || 'A filter field'}\` names ${marked.length} default operators, and a chip can only leave one unwritten. Mark one.`,
+        tag: this.localName,
+      })
     }
     return marked[0] ?? null
   }

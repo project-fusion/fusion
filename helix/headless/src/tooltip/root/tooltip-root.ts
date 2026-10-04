@@ -7,6 +7,7 @@ import {
   MixinControllerOpen,
   type Placement,
   PopoverController,
+  reportRuntime,
   type Side,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -620,21 +621,27 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        wrapping form is not the documented API, and this says so once, where
        somebody using it will see it. */
     if (this.for === '') {
-      console.warn(
-        `<${this.localName}> is wrapping its trigger rather than naming one, so its text ` +
+      reportRuntime({
+        kind: 'wrapped-trigger',
+        message:
+          `<${this.localName}> is wrapping its trigger rather than naming one, so its text ` +
           "reaches no screen reader: a description in this element's shadow root cannot be " +
           'referenced from a trigger in the light DOM. Give this tooltip an `id`, set `for` to ' +
           'the trigger\'s id, and add `aria-describedby="<that id>"` to the trigger.',
-      )
+        tag: this.localName,
+      })
       return
     }
     const trigger = this.named
     if (!trigger) {
-      console.warn(
-        `<${this.localName} for="${this.for}"> found no element with that id in its own tree, ` +
+      reportRuntime({
+        kind: 'missing-trigger',
+        message:
+          `<${this.localName} for="${this.for}"> found no element with that id in its own tree, ` +
           'so it has nothing to describe and nothing to point at. Ids resolve per tree: an ' +
           'element inside another shadow root is not reachable from here.',
-      )
+        tag: this.localName,
+      })
       return
     }
     const names = `${trigger.getAttribute('aria-describedby') ?? ''} ${
@@ -645,12 +652,15 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     if (this.id !== '' && names.includes(this.id)) {
       return
     }
-    console.warn(
-      `<${this.localName} for="${this.for}"> is not read out with its trigger. The link is ` +
+    reportRuntime({
+      kind: 'unlinked-trigger',
+      message:
+        `<${this.localName} for="${this.for}"> is not read out with its trigger. The link is ` +
         'written from the trigger, not from here: give this tooltip an `id` and add ' +
         '`aria-describedby="<that id>"` to the element it names. Written in your own markup ' +
         'it survives server rendering, which is why this element will not write it for you.',
-    )
+      tag: this.localName,
+    })
   }
 
   override connectedCallback(): void {

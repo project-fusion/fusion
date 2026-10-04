@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { reportRuntime } from '../../utils/report-runtime/report-runtime.js'
 
 /**
  * Into fullscreen and back, and honest about where the element is.
@@ -41,10 +42,12 @@ export class FullscreenController implements ReactiveController {
       /* Reported rather than swallowed, and reported once. A player embedded in
          a frame without the permission is the common case, and the fix is on
          the frame rather than here, so the message has to say which. */
-      console.warn(
-        `<${this.host.localName}> could not enter fullscreen. If it is inside an iframe, that frame needs allow="fullscreen".`,
-        error,
-      )
+      reportRuntime({
+        detail: error,
+        kind: 'fullscreen-refused',
+        message: `<${this.host.localName}> could not enter fullscreen. If it is inside an iframe, that frame needs allow="fullscreen".`,
+        tag: this.host.localName,
+      })
     }
   }
 

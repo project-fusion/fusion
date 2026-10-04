@@ -20,6 +20,8 @@
  * downstream changes.
  */
 
+import { reportRuntime } from '../report-runtime/report-runtime.js'
+
 /**
  * Tags already reported, so a page holding duplicates says each one once rather
  * than once per module that tried.
@@ -97,13 +99,16 @@ const warnDuplicate = (tagName: string): void => {
   }
   reported.add(tagName)
   duplicates.add(tagName)
-  console.warn(
-    `<${tagName}> is already registered by a different class, so this page holds two copies of ` +
+  reportRuntime({
+    kind: 'duplicate-registration',
+    message:
+      `<${tagName}> is already registered by a different class, so this page holds two copies of ` +
       'Helix. The first one keeps the tag: every element of this name is built from it, whatever ' +
       'the second copy exports, so `instanceof` against the second copy is false and its fixes are ' +
       'not in the DOM. Two dependencies asking for different versions is the usual cause, and a ' +
       'bundler shipping the same version twice is the other. Deduplicate the dependency.',
-  )
+    tag: tagName,
+  })
 }
 
 export const customElement =

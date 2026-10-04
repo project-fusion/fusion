@@ -14,6 +14,7 @@ import {
   isRtl,
   MixinCollection,
   markRegion,
+  reportRuntime,
   requestChange,
   VirtualizeController,
   writtenList,
@@ -737,12 +738,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return
     }
     this.warnedAboutSize = true
-    console.warn(
-      `<${this.localName}> is drawing ${drawn} rows at once, which is past the ${HelixHeadlessDataTable.COMFORTABLE} ` +
+    reportRuntime({
+      kind: 'too-many-rows',
+      message:
+        `<${this.localName}> is drawing ${drawn} rows at once, which is past the ${HelixHeadlessDataTable.COMFORTABLE} ` +
         'it stays responsive to: every row is rendered, so this costs roughly 37 microseconds each and ' +
         'crosses an interaction budget around 2,700. Set `page-size` to paginate, or `mode="server"` ' +
         'to hand it one page at a time with `total` describing the whole result.',
-    )
+      tag: this.localName,
+    })
   }
 
   /**
@@ -933,9 +937,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     }
     if (this.selectable && !this.warnedAboutKey && typeof window !== 'undefined') {
       this.warnedAboutKey = true
-      console.warn(
-        `<${this.localName} selectable> has no \`row-key\`, so it knows each row by its place in the result, and a sort, a filter or new data selects a different row than the one that was chosen. Set \`row-key\` to the field that identifies a row.`,
-      )
+      reportRuntime({
+        kind: 'missing-row-key',
+        message: `<${this.localName} selectable> has no \`row-key\`, so it knows each row by its place in the result, and a sort, a filter or new data selects a different row than the one that was chosen. Set \`row-key\` to the field that identifies a row.`,
+        tag: this.localName,
+      })
     }
     return String(place)
   }

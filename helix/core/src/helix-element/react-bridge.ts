@@ -1,6 +1,7 @@
 import type { LitElement } from 'lit'
 import { eventsForTag } from '../events/element-events.js'
 import { helixEventNames } from '../events/events.js'
+import { reportRuntime } from '../utils/report-runtime/report-runtime.js'
 
 /*
  * What a Helix element does about React's hydration, kept out of the base class.
@@ -105,19 +106,26 @@ export const auditReactProps = (host: EventTarget, props: Record<string, unknown
   }
   audited.add(host)
   const tag = host instanceof Element ? `<${host.localName}>` : 'A Helix element'
+  const element = host instanceof Element ? host.localName : undefined
   for (const key of Object.keys(props)) {
     if (key.startsWith('on:')) {
-      console.warn(
-        `${tag} was given \`${key}\`, which is Solid's syntax. React binds the name after \`on\` ` +
+      reportRuntime({
+        kind: 'solid-handler-syntax',
+        message:
+          `${tag} was given \`${key}\`, which is Solid's syntax. React binds the name after \`on\` ` +
           `verbatim, so this listens for an event called \`${key.slice(2)}\`. Write \`on${key.slice(3)}\`.`,
-      )
+        tag: element,
+      })
       continue
     }
     if (REMOVED.has(key)) {
-      console.warn(
-        `${tag} was given \`${key}\`, which was removed. It never worked from JSX, because React ` +
+      reportRuntime({
+        kind: 'removed-callback',
+        message:
+          `${tag} was given \`${key}\`, which was removed. It never worked from JSX, because React ` +
           `binds any \`on\` prop as an event of that name. Listen for the element's change event instead.`,
-      )
+        tag: element,
+      })
       continue
     }
     if (!key.startsWith('on') || !key.includes('-')) {
@@ -125,10 +133,13 @@ export const auditReactProps = (host: EventTarget, props: Record<string, unknown
     }
     const name = key.slice(2)
     if (!helixEventNames.has(name)) {
-      console.warn(
-        `${tag} was given \`${key}\`, and nothing dispatches \`${name}\`. TypeScript cannot ` +
+      reportRuntime({
+        kind: 'unknown-event',
+        message:
+          `${tag} was given \`${key}\`, and nothing dispatches \`${name}\`. TypeScript cannot ` +
           `check a hyphenated JSX prop, so this is the only place it shows up.`,
-      )
+        tag: element,
+      })
       continue
     }
     /* **A real name on the element that does not send it**, which is the mistake
@@ -142,11 +153,14 @@ export const auditReactProps = (host: EventTarget, props: Record<string, unknown
        this library or a package built before the map existed. */
     const mine = host instanceof Element ? eventsForTag(host.localName) : undefined
     if (mine && !mine.has(name)) {
-      console.warn(
-        `${tag} was given \`${key}\`, but it dispatches ${[...mine].map((one) => `\`${one}\``).join(', ')}. ` +
+      reportRuntime({
+        kind: 'misplaced-handler',
+        message:
+          `${tag} was given \`${key}\`, but it dispatches ${[...mine].map((one) => `\`${one}\``).join(', ')}. ` +
           `\`${name}\` is sent by a different element, and React only wires an \`on\` prop on the ` +
           'element that dispatches, so this handler will never run. Put it on that element.',
-      )
+        tag: element,
+      })
     }
   }
 }
