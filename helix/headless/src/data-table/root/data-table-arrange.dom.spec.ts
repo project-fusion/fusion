@@ -130,7 +130,7 @@ describe('selection', () => {
     const element = await table('selectable row-key="id" default-selected="a,c"')
     const mark = (box?: Box): string =>
       box?.shadowRoot?.querySelector('[part~="mark"]')?.getAttribute('part') ?? ''
-    expect(mark(boxes(element)[0])).toBe('mark mark-indeterminate')
+    expect(mark(boxes(element)[0])).toBe('mark mark-indeterminate mark-dash')
     expect(mark(boxes(element)[2])).toBe('mark mark-checked')
     expect(mark(boxes(element)[1])).toBe('mark')
     expect(boxes(element)[0]?.getAttribute('exportparts')).toContain(

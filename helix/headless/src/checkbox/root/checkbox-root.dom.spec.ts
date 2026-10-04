@@ -52,7 +52,23 @@ describe('checkbox', () => {
     box.checked = false
     box.indeterminate = true
     await box.updateComplete
-    expect(names()).toBe('mark mark-indeterminate')
+    expect(names()).toBe('mark mark-indeterminate mark-dash')
+  })
+
+  test('the mark keeps the dash after indeterminate, until the box is checked', async () => {
+    /* So a mark that shrinks away leaves as the dash it was, where a rule on
+       the host's state swapped in the tick at the first frame of the exit. */
+    const box = await checkbox('indeterminate')
+    const names = (): string => part(box, 'mark')?.getAttribute('part') ?? ''
+    box.indeterminate = false
+    await box.updateComplete
+    expect(names()).toBe('mark mark-dash')
+    box.checked = true
+    await box.updateComplete
+    expect(names()).toBe('mark mark-checked')
+    box.checked = false
+    await box.updateComplete
+    expect(names()).toBe('mark')
   })
 
   test('is a real input, so the platform gives it the space key and the tick', async () => {
