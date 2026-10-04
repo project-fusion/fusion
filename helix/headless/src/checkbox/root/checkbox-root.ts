@@ -49,6 +49,7 @@ import { property } from 'lit/decorators.js'
  * @csspart label - The label next to the box.
  * @csspart mark - The check mark, or the dash when the box is indeterminate.
  * @csspart mark-checked - Added to `mark` while the box is checked.
+ * @csspart mark-dash - Added to `mark` while the box is indeterminate, and kept until the box is checked, so a mark that animates out leaves as the dash it was.
  * @csspart mark-indeterminate - Added to `mark` while the box is indeterminate.
  *
  * @cssstate checked - While the box is checked.
@@ -82,6 +83,18 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
    */
   @property()
   value = 'on'
+
+  /**
+   * Whether the mark draws the dash: from the moment the box is indeterminate
+   * until it is checked.
+   *
+   * **Kept past indeterminate, so a mark leaving the box leaves as what it
+   * was.** A stylesheet that shrinks the mark away drew the tick in the dash's
+   * place for the whole exit, since the shape is a mask and a mask swaps at
+   * once. Measured on Data Table's select-all, deselecting the one row that
+   * was selected: 15 frames of a shrinking tick where the dash had been.
+   */
+  private dashed = false
 
   /** Focus is delegated to the input, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
@@ -125,6 +138,11 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaRequired = this.required ? 'true' : null
+    if (this.indeterminate) {
+      this.dashed = true
+    } else if (this.checked) {
+      this.dashed = false
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -240,7 +258,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
           @input=${this.stopInner}
         />
         <span
-          part="mark${this.checked ? ' mark-checked' : ''}${this.indeterminate ? ' mark-indeterminate' : ''}"
+          part="mark${this.checked ? ' mark-checked' : ''}${this.indeterminate ? ' mark-indeterminate' : ''}${this.dashed ? ' mark-dash' : ''}"
           aria-hidden="true"
         ></span>
       </span>

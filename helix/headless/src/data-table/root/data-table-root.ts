@@ -123,6 +123,7 @@ import {
  * @csspart checkbox-label - Forwarded from the checkbox. The label is read by screen readers only.
  * @csspart checkbox-mark - The check mark, or the dash while some rows are selected.
  * @csspart checkbox-mark-checked - Added to `checkbox-mark` while its box is checked.
+ * @csspart checkbox-mark-dash - Added to `checkbox-mark` while it draws the dash, which it keeps until its box is checked.
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
  * @csspart empty - Shown when there are no rows, because none arrived or the filter matches none. While rows are loading, the `loading` part is shown in its place.
  * @csspart footer - The region below the grid.
@@ -1309,7 +1310,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       part="checkbox"
       exportparts="box: checkbox-box, control: checkbox-control, feedback: checkbox-feedback,
         field: checkbox-field, hint: checkbox-hint, label: checkbox-label, mark: checkbox-mark,
-        mark-checked: checkbox-mark-checked, mark-indeterminate: checkbox-mark-indeterminate"
+        mark-checked: checkbox-mark-checked, mark-dash: checkbox-mark-dash,
+        mark-indeterminate: checkbox-mark-indeterminate"
       aria-label=${name}
       .checked=${checked}
       .indeterminate=${indeterminate}

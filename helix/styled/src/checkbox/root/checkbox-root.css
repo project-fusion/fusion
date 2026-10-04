@@ -85,7 +85,7 @@
      stops the mark flashing on the way out. Measured mid-uncheck: mask none,
      scale 1, background white. Holding it with a delayed `mask-image` transition
      was tried and does nothing, discrete property or not: Chrome 148 swaps it
-     regardless. */
+     regardless. The dash is held the other way, below. */
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E");
   mask-position: center;
   mask-repeat: no-repeat;
@@ -102,8 +102,14 @@
 }
 
 /* Indeterminate wins where both are set, because a box that is both is showing a
-   mixed set and the dash is what says so. */
-:host([indeterminate]) [part~="mark"] {
+   mixed set and the dash is what says so.
+
+   **`mark-dash`, which outlasts `[indeterminate]`.** The box leaves
+   indeterminate before the mark finishes shrinking, and a rule on the host
+   swapped the dash for the tick at the first frame of the exit, so emptying a
+   mixed set flashed a tick. The element keeps `mark-dash` until the box is
+   checked. */
+[part~="mark-dash"] {
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M7 12h10'/%3E%3C/svg%3E");
 }
 
