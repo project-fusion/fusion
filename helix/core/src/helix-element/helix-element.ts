@@ -1,6 +1,6 @@
 import { type CSSResultOrNative, css, LitElement, type PropertyValues } from 'lit'
 import { type StaticValue, unsafeStatic } from 'lit/static-html.js'
-import { reportUsage } from '../utils/report-usage/report-usage.js'
+import { noteVersion, reportUsage } from '../utils/report-usage/report-usage.js'
 import {
   applyReactProperties,
   auditReactProps,
@@ -697,3 +697,7 @@ export const whenHydrated = (element: Element, write: () => void): void => {
     write()
   }
 }
+
+/* This copy of Helix says which release it is, once, as it loads: see
+   `noteVersion`. */
+noteVersion()

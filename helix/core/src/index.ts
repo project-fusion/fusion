@@ -313,7 +313,12 @@ export {
   type Relative,
   relativeTime,
 } from './utils/relative-time/relative-time.js'
-export { reportUsage, USAGE_SLOT } from './utils/report-usage/report-usage.js'
+export {
+  noteVersion,
+  reportUsage,
+  USAGE_SLOT,
+  VERSIONS_SLOT,
+} from './utils/report-usage/report-usage.js'
 export { reportValues } from './utils/report-values/report-values.js'
 export {
   type ChangeRequestOptions,
@@ -356,3 +361,4 @@ export {
 export { watchTheme } from './utils/watch-theme/watch-theme.js'
 export { writeTime } from './utils/write-time/write-time.js'
 export { writtenList, writtenNumbers } from './utils/written-list/written-list.js'
+export { VERSION } from './version.js'
