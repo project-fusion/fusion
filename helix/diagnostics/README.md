@@ -56,7 +56,24 @@ diagnostic cannot drift from what is true.
   hooks your stylesheets use. With a watcher it counts every element that
   rendered since `watch()` began, including ones since removed, such as a
   closed dialog. Without one it counts the elements on the page at the moment
-  of the run.
+  of the run. Elements named `helix-*` that no manifest lists, such as your
+  own, are counted apart as `unlisted`.
+
+## What the console shows
+
+`report` writes one group per run, headed by the counts. It opens when there
+is something to act on, and collapses to one line when the run is clean. Each
+kind of entry goes to its own console method, so the browser's level filter
+works on it:
+
+| Entry | Console method |
+| --- | --- |
+| A finding at `error` | `console.error` |
+| A finding at `warn` | `console.warn` |
+| A finding at `info` | `console.info` |
+| Stylesheets that could not be read | `console.warn` |
+| Coverage, and findings turned off | `console.info` |
+| Usage | `console.debug`, hidden at the default level |
 
 ## Finding kinds
 
@@ -67,7 +84,7 @@ diagnostic cannot drift from what is true.
 | `unforwarded-part` | warn | The headless tier publishes the part and the styled tier does not forward it, which is a gap in Helix |
 | `unknown-tag` | error | A rule names a tag no manifest lists |
 | `duplicate-registration` | error | Two copies of Helix are on the page |
-| `manifest-skew` | error | An element renders a part its manifest does not list, so the manifest is from another version. It replaces every other finding, since each would be judged against the wrong version |
+| `manifest-skew` | error | An element renders a part its manifest does not list, so the manifest is from another version. It replaces every other finding, since each would be judged against the wrong version. Turned off, the page is judged as usual |
 
 ## Change a severity
 

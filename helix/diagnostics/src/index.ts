@@ -52,7 +52,7 @@ import type { Tier } from './manifest.js'
 import { index } from './manifest.js'
 import type { Report } from './report.js'
 import { applyRules, checkRules, type Rules } from './rules.js'
-import { styled, type Watcher, walk } from './usage.js'
+import { listed, styled, type Watcher, walk } from './usage.js'
 
 /** What to look at, and what to compare it against. */
 export interface Options {
@@ -129,18 +129,28 @@ export const diagnose = ({ duplicates, file, from, rules, tiers, watcher }: Opti
   const document_ = from ?? globalThis.document
   const { answered, coverage, rules: located } = collect(document_)
   const tags = index(tiers)
-  const skewed = skew(tags, document_)
-  const raw =
-    skewed.length > 0
-      ? skewed
-      : [...analyze(located, tags, document_, answered), ...registrations(document_, duplicates)]
-  const { findings, silenced } = applyRules(raw, file, rules)
+  /* **Refused on a manifest from another version**, unless the project
+     turned that finding off, in which case it is judged as usual: a report
+     that lost every finding to a check nobody wanted would read as a clean
+     page, which is the silent pass this package exists to prevent. */
+  const skewed = applyRules(skew(tags, document_), file, rules)
+  const judged =
+    skewed.findings.length > 0
+      ? { findings: [], silenced: { argument: 0, file: 0 } }
+      : applyRules(
+          [...analyze(located, tags, document_, answered), ...registrations(document_, duplicates)],
+          file,
+          rules,
+        )
   return {
     coverage,
-    findings,
-    silenced,
+    findings: [...skewed.findings, ...judged.findings],
+    silenced: {
+      argument: skewed.silenced.argument + judged.silenced.argument,
+      file: skewed.silenced.file + judged.silenced.file,
+    },
     usage: {
-      ...(watcher ? watcher.counts() : walk(document_)),
+      ...listed(watcher ? watcher.counts() : walk(document_), tags),
       ...styled(located, tags, answered),
       counted: watcher ? 'watched' : 'walked',
     },
