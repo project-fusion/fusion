@@ -18,6 +18,7 @@
  */
 import type { Answered, Located, Readers } from './collect.js'
 import { nearest, type Published } from './manifest.js'
+import { type Page, pageOf } from './page.js'
 import type { Origin, Raw } from './report.js'
 
 /** Every `helix-*` tag a selector mentions, in source order. */
@@ -155,6 +156,7 @@ const loose = (
   onPage: (property: string, answering: Set<string>) => boolean,
   listedBy: Map<string, Set<string>>,
   readers: Readers,
+  suggested: Map<string, string | undefined>,
 ): Raw[] => {
   const findings: Raw[] = []
   /* **The page's CSS only.** A Helix component's own sheets, in its shadow
@@ -182,7 +184,12 @@ const loose = (
       if (used.has(property)) {
         continue
       }
-      const suggestion = nearest(property, answerers.keys(), HOOK_DISTANCE)
+      /* Asked once per name, however many rules set it. */
+      let suggestion = suggested.get(property)
+      if (!suggested.has(property)) {
+        suggestion = nearest(property, answerers.keys(), HOOK_DISTANCE)
+        suggested.set(property, suggestion)
+      }
       if (!suggestion) {
         continue
       }
@@ -278,6 +285,8 @@ export const analyze = (
       }
     }
   }
+  /* The closest hook to each name that is not one, by name. */
+  const suggested = new Map<string, string | undefined>()
   /* Whether anything on the page answers a hook, asked once per hook: the
      walk covers the whole page, shadow roots included. */
   const present = new Map<string, boolean>()
@@ -350,7 +359,7 @@ export const analyze = (
     const mentioned = targets(selector).map((tag) => [tag, tags.get(tag)] as const)
     const known = mentioned.filter(([, element]) => element)
     if (known.length === 0) {
-      findings.push(...loose(located, answeredBy, from, used, onPage, listedBy, readers))
+      findings.push(...loose(located, answeredBy, from, used, onPage, listedBy, readers, suggested))
       continue
     }
     for (const property of Array.from(located.rule.style ?? [])) {
@@ -454,6 +463,7 @@ export const analyze = (
 export const registrations = (
   from: Document = document,
   known: () => string[] = () => [],
+  page: Page = pageOf(from),
 ): Raw[] => {
   const findings: Raw[] = []
   const registry = globalThis.customElements
@@ -478,7 +488,7 @@ export const registrations = (
   if (!registry) {
     return findings
   }
-  for (const element of from.querySelectorAll('*')) {
+  for (const element of page.elements) {
     const tag = element.localName
     if (!tag.startsWith('helix-') || said.has(tag)) {
       continue
@@ -506,41 +516,38 @@ export const registrations = (
  * between versions reads as dead in every rule that styles it, and a hundred
  * findings that are each the same mistake are worse than one that names it.
  */
-export const skew = (tags: Map<string, Published>, from: Document): Raw[] => {
+export const skew = (
+  tags: Map<string, Published>,
+  from: Document,
+  page: Page = pageOf(from),
+): Raw[] => {
   const findings: Raw[] = []
   const said = new Set<string>()
-  const visit = (root: ParentNode, depth: number): void => {
-    if (depth > 32) {
-      return
+  for (const element of page.elements) {
+    const shadow = element.shadowRoot
+    if (!shadow) {
+      continue
     }
-    for (const element of root.querySelectorAll('*')) {
-      const shadow = element.shadowRoot
-      if (!shadow) {
-        continue
+    const tag = element.localName
+    const published = tags.get(tag)
+    if (published && !said.has(tag)) {
+      const rendered = new Set(
+        [...shadow.querySelectorAll('[part]')].flatMap((node) =>
+          (node.getAttribute('part') ?? '').split(/\s+/).filter(Boolean),
+        ),
+      )
+      const missing = [...rendered].filter((name) => !published.parts.has(name)).sort()
+      if (missing.length > 0) {
+        said.add(tag)
+        findings.push({
+          kind: 'manifest-skew',
+          message: `\`${tag}\` renders ${missing.map((name) => `\`${name}\``).join(', ')}, which the manifest passed in does not list, so the manifest is from a different version of Helix than the page runs. Every other finding would be judged against the wrong version, so none are reported. Pass the \`custom-elements.json\` from the installed packages.`,
+          subject: tag,
+          tag,
+        })
       }
-      const tag = element.localName
-      const published = tags.get(tag)
-      if (published && !said.has(tag)) {
-        const rendered = new Set(
-          [...shadow.querySelectorAll('[part]')].flatMap((node) =>
-            (node.getAttribute('part') ?? '').split(/\s+/).filter(Boolean),
-          ),
-        )
-        const missing = [...rendered].filter((name) => !published.parts.has(name)).sort()
-        if (missing.length > 0) {
-          said.add(tag)
-          findings.push({
-            kind: 'manifest-skew',
-            message: `\`${tag}\` renders ${missing.map((name) => `\`${name}\``).join(', ')}, which the manifest passed in does not list, so the manifest is from a different version of Helix than the page runs. Every other finding would be judged against the wrong version, so none are reported. Pass the \`custom-elements.json\` from the installed packages.`,
-            subject: tag,
-            tag,
-          })
-        }
-      }
-      visit(shadow, depth + 1)
     }
   }
-  visit(from, 0)
   return findings
 }
 
@@ -622,66 +629,61 @@ const HOOK_DISTANCE = 2
  * Helix's own markup. One finding per tag, attribute, and value, however many
  * elements carry it.
  */
-export const markup = (tags: Map<string, Published>, from: Document): Raw[] => {
+export const markup = (
+  tags: Map<string, Published>,
+  from: Document,
+  page: Page = pageOf(from),
+): Raw[] => {
   const found = new Map<string, Raw & { count: number }>()
-  const visit = (root: ParentNode, depth: number): void => {
-    if (depth > 32) {
-      return
-    }
-    for (const element of root.querySelectorAll('*')) {
-      const host = element.getRootNode()
-      const composed = host instanceof ShadowRoot && host.host.localName.startsWith('helix-')
-      const published = composed ? undefined : tags.get(element.localName)
-      if (published) {
-        for (const { name, value } of Array.from(element.attributes)) {
-          if (
-            GLOBAL.has(name) ||
-            PREFIXES.some((prefix) => name.startsWith(prefix)) ||
-            published.written.has(name)
-          ) {
-            continue
+  for (const element of page.elements) {
+    const host = element.getRootNode()
+    const composed = host instanceof ShadowRoot && host.host.localName.startsWith('helix-')
+    const published = composed ? undefined : tags.get(element.localName)
+    if (published) {
+      for (const { name, value } of Array.from(element.attributes)) {
+        if (
+          GLOBAL.has(name) ||
+          PREFIXES.some((prefix) => name.startsWith(prefix)) ||
+          published.written.has(name)
+        ) {
+          continue
+        }
+        const tag = element.localName
+        const allows = published.attributes.get(name)
+        let raw: Raw | undefined
+        if (allows === undefined) {
+          const suggestion = nearest(name, published.attributes.keys())
+          raw = {
+            expected: suggestion,
+            kind: 'unknown-attribute',
+            message: suggestion
+              ? `\`${tag}\` takes no attribute \`${name}\`, so it does nothing. The closest it takes is \`${suggestion}\`.`
+              : `\`${tag}\` takes no attribute \`${name}\`, so it does nothing.`,
+            subject: `<${tag} ${name}>`,
+            tag,
           }
-          const tag = element.localName
-          const allows = published.attributes.get(name)
-          let raw: Raw | undefined
-          if (allows === undefined) {
-            const suggestion = nearest(name, published.attributes.keys())
-            raw = {
-              expected: suggestion,
-              kind: 'unknown-attribute',
-              message: suggestion
-                ? `\`${tag}\` takes no attribute \`${name}\`, so it does nothing. The closest it takes is \`${suggestion}\`.`
-                : `\`${tag}\` takes no attribute \`${name}\`, so it does nothing.`,
-              subject: `<${tag} ${name}>`,
-              tag,
-            }
-          } else if (allows && value !== '' && !allows.has(value)) {
-            const suggestion = nearest(value, allows)
-            raw = {
-              expected: suggestion,
-              kind: 'invalid-value',
-              message: `\`${tag}\`'s \`${name}\` takes ${[...allows].map((one) => `\`${one}\``).join(', ')}, so \`${value}\` falls back to the default.${suggestion ? ` The closest is \`${suggestion}\`.` : ''}`,
-              subject: `<${tag} ${name}="${value}">`,
-              tag,
-            }
+        } else if (allows && value !== '' && !allows.has(value)) {
+          const suggestion = nearest(value, allows)
+          raw = {
+            expected: suggestion,
+            kind: 'invalid-value',
+            message: `\`${tag}\`'s \`${name}\` takes ${[...allows].map((one) => `\`${one}\``).join(', ')}, so \`${value}\` falls back to the default.${suggestion ? ` The closest is \`${suggestion}\`.` : ''}`,
+            subject: `<${tag} ${name}="${value}">`,
+            tag,
           }
-          if (raw) {
-            const key = `${raw.kind} ${raw.subject}`
-            const seen = found.get(key)
-            if (seen) {
-              seen.count += 1
-            } else {
-              found.set(key, { ...raw, count: 1 })
-            }
+        }
+        if (raw) {
+          const key = `${raw.kind} ${raw.subject}`
+          const seen = found.get(key)
+          if (seen) {
+            seen.count += 1
+          } else {
+            found.set(key, { ...raw, count: 1 })
           }
         }
       }
-      if (element.shadowRoot) {
-        visit(element.shadowRoot, depth + 1)
-      }
     }
   }
-  visit(from, 0)
   return [...found.values()].map(({ count, ...raw }) => ({
     ...raw,
     message: count > 1 ? `${raw.message} On ${count} elements.` : raw.message,

@@ -15,6 +15,7 @@
  * the only way to know. Each one becomes a `Coverage.unreadable` entry, so the
  * hole is in the output rather than in the reader's assumptions.
  */
+import { type Page, pageOf } from './page.js'
 import type { Coverage, Unreadable } from './report.js'
 
 /** One rule, with where it came from. */
@@ -170,28 +171,6 @@ const read = (
 }
 
 /**
- * Every shadow root reachable from a node, depth first.
- *
- * **`querySelectorAll('*')` does not cross a shadow boundary**, so this recurses
- * per root rather than querying once. A closed root is invisible here and is
- * counted nowhere, which is the correct silence: the collector cannot know it
- * exists, and inventing a number for what it cannot see is the dishonesty the
- * coverage field is there to prevent. Every Helix root is open.
- */
-const roots = (from: ParentNode, found: ShadowRoot[], depth = 0): void => {
-  if (depth > 32) {
-    return
-  }
-  for (const element of from.querySelectorAll('*')) {
-    const root = element.shadowRoot
-    if (root) {
-      found.push(root)
-      roots(root, found, depth + 1)
-    }
-  }
-}
-
-/**
  * Every readable rule in the page, and what was missed getting them.
  *
  * **Sheets are counted by identity, and the reason is Lit.** A Lit class holds
@@ -204,6 +183,7 @@ const roots = (from: ParentNode, found: ShadowRoot[], depth = 0): void => {
  */
 export const collect = (
   from: Document = document,
+  page: Page = pageOf(from),
 ): {
   answered: Answered
   coverage: Coverage
@@ -260,8 +240,13 @@ export const collect = (
     take(sheet)
   }
 
-  const shadows: ShadowRoot[] = []
-  roots(from, shadows)
+  /* **`querySelectorAll('*')` does not cross a shadow boundary**, so the
+     page's walk recurses per root. A closed root is invisible to it and is
+     counted nowhere, which is the correct silence: the collector cannot know
+     it exists, and inventing a number for what it cannot see is the
+     dishonesty the coverage field is there to prevent. Every Helix root is
+     open. */
+  const shadows = page.roots
   for (const root of shadows) {
     for (const sheet of Array.from(root.styleSheets ?? [])) {
       take(sheet, root.host)
