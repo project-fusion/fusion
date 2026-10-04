@@ -2529,6 +2529,38 @@ fn a_tag_registered_by_a_call_is_a_definition() {
     assert_eq!(exports[1]["declaration"]["name"], "target");
 }
 
+/// A manifest says which package and version it describes, from the
+/// `package.json` beside the sources, and says nothing where there is none.
+#[test]
+fn a_manifest_names_the_package_and_version_it_describes() {
+    let sandbox = Sandbox::new("manifest-version", None);
+    let src = sandbox.0.join("src/badge/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("badge-root.ts"),
+        "/**\n * A badge.\n *\n * @summary Says one word.\n */\n@customElement('helix-badge')\nexport class HelixBadge extends HelixElement {}\n",
+    )
+    .expect("a source");
+
+    let bare = run(&sandbox.0, &["manifest", "build", ".", "--tier", "styled"]);
+    assert_eq!(code(&bare), 0);
+    let without: serde_json::Value = serde_json::from_str(&out(&bare)).expect("json");
+    assert!(without.get("helix").is_none(), "{without}");
+
+    std::fs::write(
+        sandbox.0.join("package.json"),
+        r#"{ "name": "@fusion.dev/helix", "version": "0.136.0" }"#,
+    )
+    .expect("a package.json");
+    let named = run(&sandbox.0, &["manifest", "build", ".", "--tier", "styled"]);
+    assert_eq!(code(&named), 0);
+    let with: serde_json::Value = serde_json::from_str(&out(&named)).expect("json");
+    assert_eq!(
+        with["helix"],
+        serde_json::json!({ "package": "@fusion.dev/helix", "version": "0.136.0" })
+    );
+}
+
 /// The keys come out in the analyzer's order, which is not one anyone chose.
 ///
 /// It is a trace of that tool's own execution: a class begins as a literal

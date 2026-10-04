@@ -93,7 +93,7 @@ fn walk(value: &mut Value, under: &str) {
 /// The order this object's keys go in, by the key it was found under.
 fn shape(fields: &Map<String, Value>, under: &str) -> Vec<&'static str> {
     match under {
-        "" => vec!["schemaVersion", "readme", "modules"],
+        "" => vec!["schemaVersion", "readme", "modules", "helix"],
         "modules" => vec!["kind", "path", "declarations", "exports"],
         "exports" => vec!["kind", "name", "declaration"],
         "declaration" | "inheritedFrom" | "superclass" | "mixins" => {

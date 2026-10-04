@@ -1357,11 +1357,29 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
     /* The version the analyzer writes, which is not the newest one: it is
     pinned to what the tool emits, and the four tiers all say `1.0.0`. */
     let mut said = json!({ "schemaVersion": "1.0.0", "readme": "", "modules": modules });
+    /* **Which package and version this manifest describes**, from the
+    `package.json` beside the sources. Nothing else records it: the schema has
+    no field for it, and the running code has only its own constant. A
+    diagnostics run compares the two, and a manifest from one version judging a
+    page running another is the mismatch it exists to name. Absent where there
+    is no `package.json`, or it names no version. */
+    if let Some(described) = described(package) {
+        said["helix"] = described;
+    }
     /* The keys go in the analyzer's order last of all, so the builders above
     can write each field where it reads best and one place holds the sequence
     the file is actually in. */
     crate::manifest::order::apply(&mut said);
     said
+}
+
+/// The package's name and version, from its `package.json`, where it has both.
+fn described(package: &Path) -> Option<Value> {
+    let text = fs::read_to_string(package.join("package.json")).ok()?;
+    let manifest: Value = serde_json::from_str(&text).ok()?;
+    let name = manifest.get("name")?.as_str()?;
+    let version = manifest.get("version")?.as_str()?;
+    Some(json!({ "package": name, "version": version }))
 }
 
 /// A module's `exports`, with each declaration's module said the way the
