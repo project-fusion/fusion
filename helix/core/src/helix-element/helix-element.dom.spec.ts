@@ -485,7 +485,8 @@ describe('usage', () => {
     await element.updateComplete
     element.setAttribute('data-again', '')
     await element.updateComplete
-    expect(told).toEqual([element])
+    expect(told).toHaveLength(1)
+    expect(told[0]).toBe(element)
   })
 
   test('with no listener, an element renders as it always did', async () => {
