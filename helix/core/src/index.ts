@@ -314,6 +314,13 @@ export {
   relativeTime,
 } from './utils/relative-time/relative-time.js'
 export {
+  RUNTIME_LOG,
+  RUNTIME_SLOT,
+  type RuntimeEvent,
+  type RuntimeKind,
+  reportRuntime,
+} from './utils/report-runtime/report-runtime.js'
+export {
   noteVersion,
   reportUsage,
   USAGE_SLOT,

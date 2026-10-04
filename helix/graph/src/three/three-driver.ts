@@ -1,3 +1,4 @@
+import { reportRuntime } from '@fusion.dev/helix-core'
 import type { Simulation, SimulationNode } from 'd3-force-3d'
 import {
   AdditiveBlending,
@@ -1777,12 +1778,13 @@ export const threeDriver = (
         })
         .catch((cause: unknown) => {
           /* Without the layout the notes stay where they were started, and the frame is told so. */
-          console.error(
-            new Error(
+          reportRuntime({
+            detail: cause,
+            kind: 'missing-layout',
+            level: 'error',
+            message:
               'The three.js driver could not load d3-force-3d to lay out the notes. Install d3-force-3d alongside @fusion.dev/helix-graph.',
-              { cause },
-            ),
-          )
+          })
           if (!done && !stopped) {
             done = true
             placed(new Map(nodes.map((node) => [node.id, { x: node.x, y: node.y, z: node.z }])))

@@ -4,6 +4,7 @@ import {
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   isRtl,
+  reportRuntime,
   type ViewportGestureMode,
   type ViewportPanDetail,
   type ViewportZoomDetail,
@@ -254,10 +255,13 @@ export const connectGraph = (
 ): GraphConnection => {
   const graph = frame as Frame
   if (!('nodes' in frame) || typeof graph.requestActive !== 'function') {
-    console.warn(
-      'connectGraph: the element given is not a Graph frame (helix-graph or helix-headless-graph), so nothing will be drawn.',
-      frame,
-    )
+    reportRuntime({
+      detail: frame,
+      kind: 'not-a-graph',
+      message:
+        'connectGraph: the element given is not a Graph frame (helix-graph or helix-headless-graph), so nothing will be drawn.',
+      tag: frame.localName,
+    })
   }
   let known = new Map<string, GraphPoint>()
   /* The selection the view was last framed on, so a selection that arrives
@@ -459,10 +463,13 @@ export const connectGraph = (
     if (fit?.frame) {
       shapeFrame = fit.frame
     } else if (shaping) {
-      console.warn(
-        'connectGraph: the stencil has no inside to place the notes in, so the graph is laid out instead.',
-        options.stencil,
-      )
+      reportRuntime({
+        detail: options.stencil,
+        kind: 'stencil-without-inside',
+        message:
+          'connectGraph: the stencil has no inside to place the notes in, so the graph is laid out instead.',
+        tag: frame.localName,
+      })
       positions = seedPositions(
         nodes.map(({ id }) => ({ id })),
         linkList,

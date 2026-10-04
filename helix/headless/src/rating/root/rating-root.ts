@@ -7,6 +7,7 @@ import {
   MixinControllerValue,
   MixinField,
   type NavigableItem,
+  reportRuntime,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -454,11 +455,14 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
        tells the consumer their number was not taken. */
     if (this.floor !== this.min && !this.warned) {
       this.warned = true
-      console.warn(
-        `<${this.localName}> has min="${this.min}", which is not a score between 0 and its max of ` +
+      reportRuntime({
+        kind: 'min-out-of-range',
+        message:
+          `<${this.localName}> has min="${this.min}", which is not a score between 0 and its max of ` +
           `${this.max}, so the lowest score it offers is ${this.floor}. Put min inside the marks, ` +
           'or move max.',
-      )
+        tag: this.localName,
+      })
     }
   }
 

@@ -1,3 +1,5 @@
+import { reportRuntime } from '../report-runtime/report-runtime.js'
+
 /** Triggers already told they cannot carry the state, so it is said once. */
 const warned = new WeakSet<Element>()
 
@@ -79,11 +81,14 @@ export const tellDisclosure = (
     return
   }
   warned.add(trigger)
-  console.warn(
-    `<${trigger.localName}> is slotted as a trigger and cannot be told that it opens something. ` +
+  reportRuntime({
+    kind: 'untold-trigger',
+    message:
+      `<${trigger.localName}> is slotted as a trigger and cannot be told that it opens something. ` +
       'The state would have to be written onto your markup as `aria-expanded`, which a React ' +
       "consumer's hydration reports and does not patch up, so it is not written. Slot a " +
       '`helix-button` or `helix-icon-button`, which carry it inside their own shadow root, or ' +
       'add `aria-haspopup` and your own `aria-expanded` to this element.',
-  )
+    tag: trigger.localName,
+  })
 }

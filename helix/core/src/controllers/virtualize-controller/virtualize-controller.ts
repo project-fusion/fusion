@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { reportRuntime } from '../../utils/report-runtime/report-runtime.js'
 import { Heights } from './heights.js'
 
 /** What the controller needs of a set and the box it is shown in. */
@@ -442,12 +443,16 @@ export class VirtualizeController implements ReactiveController {
       return
     }
     this.warned = true
-    console.warn(
-      `VirtualizeController: the window did not settle in ${UNSTABLE} passes, so it is holding ` +
+    const host = this.host as unknown as { localName?: unknown }
+    reportRuntime({
+      kind: 'unsettled-window',
+      message:
+        `VirtualizeController: the window did not settle in ${UNSTABLE} passes, so it is holding ` +
         'the last one. That happens when the scrolling box has no height of its own: its ' +
         '`clientHeight` is then a function of the rows just drawn, so measuring moves what is ' +
         'being measured and the two never agree. Give the container a block size and an ' +
         'overflow, which is what the styled tier does and what a headless consumer has to.',
-    )
+      tag: typeof host.localName === 'string' ? host.localName : undefined,
+    })
   }
 }

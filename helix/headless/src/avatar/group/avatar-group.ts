@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, reportRuntime } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -107,11 +107,14 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
     const limit = this.max ?? 0
     if (limit > FOLDS_UP_TO && this.avatars.length > limit && !this.warned) {
       this.warned = true
-      console.warn(
-        `<${this.localName}> has max="${this.max}", past the ${FOLDS_UP_TO} the fold is written for, ` +
+      reportRuntime({
+        kind: 'max-past-fold',
+        message:
+          `<${this.localName}> has max="${this.max}", past the ${FOLDS_UP_TO} the fold is written for, ` +
           'so every avatar is shown and none are counted. Lower `max`, or hand the group the ' +
           'avatars you want shown.',
-      )
+        tag: this.localName,
+      })
     }
   }
 

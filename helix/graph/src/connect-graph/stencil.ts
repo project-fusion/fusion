@@ -1,3 +1,4 @@
+import { reportRuntime } from '@fusion.dev/helix-core'
 import { fieldFromInside, fieldFromPath, type ShapeField } from '../shapes/shape-field.js'
 import type { GraphPoint } from './seed.js'
 import { surfaceWeb } from './surface-web.js'
@@ -327,15 +328,17 @@ export const fitInStencil = (
     ? placesByRegion(field, asked, options)
     : undefined
   if (regional && regional.missing.length > 0) {
-    console.warn(
-      `fitInStencil: the shape has no part named ${regional.missing.map((part) => `"${part}"`).join(', ')}, so the notes sent there are placed with the rest. Its parts: ${[...regional.found].join(', ') || 'none'}.`,
-    )
+    reportRuntime({
+      kind: 'missing-stencil-parts',
+      message: `fitInStencil: the shape has no part named ${regional.missing.map((part) => `"${part}"`).join(', ')}, so the notes sent there are placed with the rest. Its parts: ${[...regional.found].join(', ') || 'none'}.`,
+    })
   } else if (!regional && [...asked.keys()].some((region) => region !== undefined)) {
-    console.warn(
-      field.regionOf
+    reportRuntime({
+      kind: 'stencil-regions-unused',
+      message: field.regionOf
         ? 'fitInStencil: the parts named in regions are too small for the notes sent to them, so the notes are placed over the whole shape.'
         : 'fitInStencil: the shape has no named parts, so regions is not used and the notes are placed over the whole shape.',
-    )
+    })
   }
   /* Each note's part, now that the parts the shape lacks are known: the
      rest's, where its part is missing or the parts were not used at all. */
