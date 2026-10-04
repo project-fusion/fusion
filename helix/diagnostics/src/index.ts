@@ -20,10 +20,9 @@
  * report(diagnose({ tiers: [{ manifest: styled, name: '@fusion.dev/helix' }] }))
  * ```
  *
- * **Zero network calls, at this layer, ever.** The privacy policy this project
- * published says the site sends nothing, and a diagnostics package that phones
- * home from a consumer's page would make us the third party we told our own
- * readers we were not. Findings go where the caller puts them.
+ * **Nothing here sends anything.** `diagnose` returns a report and `report`
+ * prints it. Where else a report goes is a sink's decision, and every sink
+ * that leaves the page is one the caller adds.
  *
  * **Development only.** Import it from a dev-only entry: it walks every
  * stylesheet in the page and has no business in a production bundle.
@@ -32,13 +31,28 @@ export { collect } from './collect.js'
 export { report } from './console.js'
 export type { ManifestSource, Published, Tier } from './manifest.js'
 export { index, nearest } from './manifest.js'
-export type { Coverage, Finding, Origin, Report, Unreadable } from './report.js'
+export type {
+  Coverage,
+  Finding,
+  Kind,
+  Layer,
+  Origin,
+  Report,
+  Severity,
+  Unreadable,
+  Usage,
+} from './report.js'
+export { KINDS } from './report.js'
+export { type Override, type Rules, SHIPPED_RULES } from './rules.js'
+export { type Watcher, watch } from './usage.js'
 
-import { analyze, registrations } from './analyze.js'
+import { analyze, registrations, skew } from './analyze.js'
 import { collect } from './collect.js'
 import type { Tier } from './manifest.js'
 import { index } from './manifest.js'
 import type { Report } from './report.js'
+import { applyRules, checkRules, type Rules } from './rules.js'
+import { styled, type Watcher, walk } from './usage.js'
 
 /** What to look at, and what to compare it against. */
 export interface Options {
@@ -54,12 +68,26 @@ export interface Options {
    */
   duplicates?: () => string[]
   /**
+   * The project's own overrides, parsed from its file. The build reads the
+   * file, since the page cannot: import the JSON and pass it here.
+   */
+  file?: Rules | undefined
+  /**
    * The document to scan. Defaults to the ambient one.
    *
    * Present so a test can hand over a constructed document, and so a page with
    * an iframe it owns can scan that too.
    */
   from?: Document
+  /**
+   * Overrides for this run, which win over `file`. Each says a severity,
+   * `off`, or either for some tags only:
+   *
+   * ```ts
+   * diagnose({ tiers, rules: { 'unforwarded-part': 'off', 'dead-hook': { severity: 'warn', tags: ['helix-card'] } } })
+   * ```
+   */
+  rules?: Rules | undefined
   /**
    * The manifests to check against, one per installed tier.
    *
@@ -68,6 +96,11 @@ export interface Options {
    * invisible to either manifest alone.
    */
   tiers: Tier[]
+  /**
+   * A watcher from `watch()`, so usage counts every element that rendered
+   * since it began. Without one, usage counts the elements in the page now.
+   */
+  watcher?: Watcher | undefined
 }
 
 /**
@@ -81,21 +114,35 @@ export interface Options {
  *
  * Cheap enough to call on a route change. There is no observer and no polling
  * loop: sheets that arrive later are found by calling it again.
+ *
+ * **A manifest from another version is refused**, with one finding that says
+ * so in place of every other: see `skew`.
  */
-export const diagnose = ({ duplicates, from, tiers }: Options): Report => {
+export const diagnose = ({ duplicates, file, from, rules, tiers, watcher }: Options): Report => {
   if (tiers.length === 0) {
     throw new Error(
       'diagnose() needs at least one manifest. Without one every part name is unknown and every finding would be noise.',
     )
   }
+  checkRules(file, 'file')
+  checkRules(rules, 'argument')
   const document_ = from ?? globalThis.document
-  const { answered, coverage, rules } = collect(document_)
+  const { answered, coverage, rules: located } = collect(document_)
   const tags = index(tiers)
+  const skewed = skew(tags, document_)
+  const raw =
+    skewed.length > 0
+      ? skewed
+      : [...analyze(located, tags, document_, answered), ...registrations(document_, duplicates)]
+  const { findings, silenced } = applyRules(raw, file, rules)
   return {
     coverage,
-    findings: [
-      ...analyze(rules, tags, document_, answered),
-      ...registrations(document_, duplicates),
-    ],
+    findings,
+    silenced,
+    usage: {
+      ...(watcher ? watcher.counts() : walk(document_)),
+      ...styled(located, tags, answered),
+      counted: watcher ? 'watched' : 'walked',
+    },
   }
 }

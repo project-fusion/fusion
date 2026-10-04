@@ -18,10 +18,10 @@
  */
 import type { Answered, Located } from './collect.js'
 import { nearest, type Published } from './manifest.js'
-import type { Finding, Origin } from './report.js'
+import type { Origin, Raw } from './report.js'
 
 /** Every `helix-*` tag a selector mentions, in source order. */
-const targets = (selector: string): string[] => {
+export const targets = (selector: string): string[] => {
   const found = new Set<string>()
   for (const match of selector.matchAll(/\bhelix-[a-z0-9]+(?:-[a-z0-9]+)*/g)) {
     found.add(match[0])
@@ -30,7 +30,7 @@ const targets = (selector: string): string[] => {
 }
 
 /** Every `::part(a b)` in a selector, with the tag it hangs off. */
-const parts = (selector: string): Array<{ names: string[]; tag: string }> => {
+export const parts = (selector: string): Array<{ names: string[]; tag: string }> => {
   const found: Array<{ names: string[]; tag: string }> = []
   for (const match of selector.matchAll(
     /(helix-[a-z0-9-]+)((?:[^\s>+~,]*))::part\(\s*([^)]*?)\s*\)/g,
@@ -95,8 +95,8 @@ export const analyze = (
   tags: Map<string, Published>,
   from?: Document,
   answered: Answered = new Map(),
-): Finding[] => {
-  const findings: Finding[] = []
+): Raw[] => {
+  const findings: Raw[] = []
 
   for (const located of rules) {
     const selector = located.rule.selectorText
@@ -112,6 +112,7 @@ export const analyze = (
           message: `\`${tag}\` is in no manifest passed to the collector. Either the tag is misspelled, or the manifest is from a different version of Helix than the page.`,
           origin: origin(located),
           subject: tag,
+          tag,
         })
         continue
       }
@@ -131,6 +132,7 @@ export const analyze = (
             message: `\`${tag}\` does not publish \`${part}\`, though \`${elsewhere[0]}\` does. The rule matches nothing until the part is forwarded, which is a gap in Helix rather than in this CSS.`,
             origin: origin(located),
             subject: `${tag}::part(${part})`,
+            tag,
           })
           continue
         }
@@ -143,6 +145,7 @@ export const analyze = (
             : `\`${tag}\` publishes no part named \`${part}\`, so this rule matches nothing. Published: ${[...element.parts.keys()].sort().join(', ') || 'none'}.`,
           origin: origin(located),
           subject: `${tag}::part(${part})`,
+          tag,
         })
       }
     }
@@ -210,6 +213,7 @@ export const analyze = (
           : `\`${tag}\` does not answer \`${property}\`, and nothing under it that does was found in the page. ${[...answerers].sort().slice(0, 3).join(', ')} answer it, so this either targets the wrong element or expects a descendant that is not there.`,
         origin: origin(located),
         subject: `${selector} { ${property} }`,
+        tag,
       })
     }
   }
@@ -237,8 +241,8 @@ export const analyze = (
 export const registrations = (
   from: Document = document,
   known: () => string[] = () => [],
-): Finding[] => {
-  const findings: Finding[] = []
+): Raw[] => {
+  const findings: Raw[] = []
   const registry = globalThis.customElements
   const said = new Set<string>()
 
@@ -251,6 +255,7 @@ export const registrations = (
       kind: 'duplicate-registration',
       message: `\`${tag}\` is registered twice by different classes, so this page holds two copies of Helix (${how}). The first registration keeps the tag: every element of that name is built from it whatever the second copy exports, which makes \`instanceof\` against the second copy false and leaves its fixes out of the DOM. Deduplicate the dependency.`,
       subject: tag,
+      tag,
     })
   }
 
@@ -270,5 +275,58 @@ export const registrations = (
       duplicate(tag, 'a live element is not an instance of its own registered class')
     }
   }
+  return findings
+}
+
+/**
+ * Evidence that the manifest is from another version of Helix than the page
+ * runs: an element rendering a part its manifest entry does not list.
+ *
+ * **Read from what the elements render, because nothing records a version.**
+ * Neither the manifest nor the running code carries one. What a matching
+ * manifest guarantees is that every part an element renders is listed, since
+ * both are built from the same source, so a rendered part the manifest lacks
+ * means the two were built from different source. The reverse proves nothing:
+ * an element renders some parts only in some states.
+ *
+ * **One finding replaces all the others** (see `diagnose`). A part renamed
+ * between versions reads as dead in every rule that styles it, and a hundred
+ * findings that are each the same mistake are worse than one that names it.
+ */
+export const skew = (tags: Map<string, Published>, from: Document): Raw[] => {
+  const findings: Raw[] = []
+  const said = new Set<string>()
+  const visit = (root: ParentNode, depth: number): void => {
+    if (depth > 32) {
+      return
+    }
+    for (const element of root.querySelectorAll('*')) {
+      const shadow = element.shadowRoot
+      if (!shadow) {
+        continue
+      }
+      const tag = element.localName
+      const published = tags.get(tag)
+      if (published && !said.has(tag)) {
+        const rendered = new Set(
+          [...shadow.querySelectorAll('[part]')].flatMap((node) =>
+            (node.getAttribute('part') ?? '').split(/\s+/).filter(Boolean),
+          ),
+        )
+        const missing = [...rendered].filter((name) => !published.parts.has(name)).sort()
+        if (missing.length > 0) {
+          said.add(tag)
+          findings.push({
+            kind: 'manifest-skew',
+            message: `\`${tag}\` renders ${missing.map((name) => `\`${name}\``).join(', ')}, which the manifest passed in does not list, so the manifest is from a different version of Helix than the page runs. Every other finding would be judged against the wrong version, so none are reported. Pass the \`custom-elements.json\` from the installed packages.`,
+            subject: tag,
+            tag,
+          })
+        }
+      }
+      visit(shadow, depth + 1)
+    }
+  }
+  visit(from, 0)
   return findings
 }

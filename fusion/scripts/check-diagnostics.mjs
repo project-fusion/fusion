@@ -57,7 +57,7 @@ await Bun.write(
        answers no hooks at all, so a rule reading it alone calls both dead. */
     `import '${join(root, 'helix/styled/src/copy-button/index.ts')}'`,
     `export { duplicateRegistrations } from '${join(root, 'helix/core/src/index.ts')}'`,
-    `export { collect, diagnose } from '${join(root, 'helix/diagnostics/src/index.ts')}'`,
+    `export { collect, diagnose, watch } from '${join(root, 'helix/diagnostics/src/index.ts')}'`,
   ].join('\n'),
 )
 const bundle = await Bun.build({
@@ -134,7 +134,12 @@ try {
   const observed = await page.evaluate(
     async ({ collector: source, manifests: passed, tag }) => {
       const url = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }))
-      const { collect, diagnose, duplicateRegistrations } = await import(url)
+      const { collect, diagnose, duplicateRegistrations, watch } = await import(url)
+
+      /* **Started before anything renders**, as a page is told to start it, so
+         the element added and removed below is counted by the slot in
+         `HelixElement` and not by a walk of the page. */
+      const watcher = watch()
 
       /* Twenty real elements, so the page holds twenty real Lit shadow roots
          all adopting the one stylesheet the class owns, which is the
@@ -143,6 +148,18 @@ try {
       await customElements.whenDefined(tag)
       await customElements.whenDefined('helix-copy-button')
       await new Promise((done) => requestAnimationFrame(() => done()))
+      /* One that renders and goes, as a closed dialog does. */
+      const passing = document.createElement(tag)
+      document.body.append(passing)
+      await passing.updateComplete
+      passing.remove()
+
+      const watched = diagnose({
+        duplicates: duplicateRegistrations,
+        tiers: Object.entries(passed).map(([name, manifest]) => ({ manifest, name })),
+        watcher,
+      }).usage
+      watcher.stop()
 
       const report = diagnose({
         duplicates: duplicateRegistrations,
@@ -195,6 +212,8 @@ try {
         roots: report.coverage.roots,
         sheets: report.coverage.sheets,
         unreadable: report.coverage.unreadable,
+        usage: report.usage,
+        watched,
       }
     },
     { collector, manifests, tag: `helix-${FAMILY}` },
@@ -236,6 +255,29 @@ try {
     say(
       `coverage came back ${observed.readable} readable and ${observed.unreadable.length} unreadable on a page whose every sheet is same-origin.`,
     )
+  }
+
+  /* Usage, from real elements: what the page put there, what they render
+     inside themselves, and what its stylesheets reach for. */
+  const tagged = `helix-${FAMILY}`
+  if (observed.usage.counted !== 'walked' || observed.usage.tags[tagged] !== observed.hosts) {
+    say(
+      `a run without a watcher counted ${observed.usage.tags[tagged]} \`${tagged}\` (${observed.usage.counted}) on a page holding ${observed.hosts}.`,
+    )
+  }
+  if (
+    observed.watched.counted !== 'watched' ||
+    observed.watched.tags[tagged] !== observed.hosts + 1
+  ) {
+    say(
+      `the watcher counted ${observed.watched.tags[tagged]} \`${tagged}\` where ${observed.hosts + 1} rendered, one since removed, so the slot in \`HelixElement\` is not reaching it.`,
+    )
+  }
+  if (!observed.usage.parts[tagged]?.button) {
+    say('the planted `::part(button)` rule, a part the button publishes, was not counted as use.')
+  }
+  if (observed.usage.parts[tagged]?.buton) {
+    say('the dead `::part(buton)` was counted as use as well as reported as a finding.')
   }
 
   /* Exact, not a floor: an extra finding is a false positive. */

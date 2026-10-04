@@ -51,14 +51,46 @@ export interface Finding {
    */
   expected?: string | undefined
   /** Machine-readable fault class, stable across versions. */
-  kind: 'dead-hook' | 'dead-part' | 'duplicate-registration' | 'unforwarded-part' | 'unknown-tag'
+  kind: Kind
   /** One sentence, addressed to whoever wrote the CSS. */
   message: string
   /** Where it was read. Absent only for faults that are not in a stylesheet. */
   origin?: Origin
+  /** How serious it is, after the shipped rules and any overrides. */
+  severity: Severity
+  /**
+   * Which layer set `severity`: the rules this package ships, the project's
+   * file, or the argument to `diagnose`. With two layers able to override,
+   * a severity alone cannot say where it came from.
+   */
+  decidedBy: Layer
   /** The selector the fault sits in, or the tag for a runtime fault. */
   subject: string
+  /** The Helix tag the finding is about, which a scoped override matches on. */
+  tag: string
 }
+
+/** Every fault class, stable across versions. */
+export const KINDS = [
+  'dead-hook',
+  'dead-part',
+  'duplicate-registration',
+  'manifest-skew',
+  'unforwarded-part',
+  'unknown-tag',
+] as const
+
+/** A fault class. */
+export type Kind = (typeof KINDS)[number]
+
+/** How serious a finding is. */
+export type Severity = 'error' | 'info' | 'warn'
+
+/** Where a finding's severity was decided. */
+export type Layer = 'argument' | 'file' | 'shipped'
+
+/** A finding before the rules have given it a severity. */
+export type Raw = Omit<Finding, 'decidedBy' | 'severity'>
 
 /** A sheet the collector could not read, and the reason. */
 export interface Unreadable {
@@ -86,8 +118,50 @@ export interface Coverage {
   unreadable: Unreadable[]
 }
 
+/**
+ * What a page uses of Helix, counted by tag.
+ *
+ * Plain objects of counts, so a sink can write the report as JSON and read it
+ * back unchanged.
+ */
+export interface Usage {
+  /**
+   * Each axis set, by tag, axis, and value: `emphasis`, `material`,
+   * `separation`, and `tone`. An axis left unset is not counted.
+   */
+  axes: Record<string, Record<string, Record<string, number>>>
+  /**
+   * The Helix elements other Helix elements render inside their own shadow
+   * roots, such as the select a pagination size draws. Kept apart from
+   * `tags`, which counts what the page put there.
+   */
+  composed: Record<string, number>
+  /**
+   * How the elements were counted. `watched`: every element that rendered
+   * since `watch()` began, including the ones that have gone, such as a
+   * closed dialog. `walked`: the elements in the page at the moment of the
+   * run, which misses those.
+   */
+  counted: 'walked' | 'watched'
+  /** Each hook the page's stylesheets set, by tag, counted per declaration. */
+  hooks: Record<string, Record<string, number>>
+  /** Each part the page's stylesheets style, by tag, counted per rule. */
+  parts: Record<string, Record<string, number>>
+  /** Each named slot filled, by tag. */
+  slots: Record<string, Record<string, number>>
+  /** Each Helix element the page put there, by tag. */
+  tags: Record<string, number>
+}
+
 /** The whole result. Coverage and findings, never one without the other. */
 export interface Report {
   coverage: Coverage
   findings: Finding[]
+  /**
+   * How many findings each override layer turned off. A finding turned off
+   * is still a fault, and a report that hid the count would read as cleaner
+   * than the page is.
+   */
+  silenced: { argument: number; file: number }
+  usage: Usage
 }

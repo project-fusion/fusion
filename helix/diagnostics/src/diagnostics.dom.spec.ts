@@ -16,11 +16,13 @@ beforeAll(() => {
   registerDom()
 })
 
-const { analyze } = await import('./analyze.js')
+const { analyze, skew } = await import('./analyze.js')
 const { collect } = await import('./collect.js')
 const { diagnose } = await import('./index.js')
 const { index, nearest } = await import('./manifest.js')
 const { report } = await import('./console.js')
+const { applyRules, checkRules } = await import('./rules.js')
+const { styled, walk, watch } = await import('./usage.js')
 
 /** Two tiers, shaped like the real manifests and small enough to read. */
 const tiers = [
@@ -393,6 +395,20 @@ describe('coverage', () => {
   })
 })
 
+/** A report's other halves, where a test is about coverage or findings. */
+const quiet = {
+  silenced: { argument: 0, file: 0 },
+  usage: {
+    axes: {},
+    composed: {},
+    counted: 'walked' as const,
+    hooks: {},
+    parts: {},
+    slots: {},
+    tags: {},
+  },
+}
+
 describe('the report', () => {
   test('diagnose refuses to run with no manifest', () => {
     expect(() => diagnose({ tiers: [] })).toThrow(/at least one manifest/)
@@ -401,7 +417,10 @@ describe('the report', () => {
   test('coverage is printed on a clean run, so an empty result cannot read as a pass', () => {
     const lines: string[] = []
     const sink = { log: (text: string) => lines.push(text) } as unknown as Console
-    report({ coverage: { read: 3, roots: 0, sheets: 19, unreadable: [] }, findings: [] }, sink)
+    report(
+      { ...quiet, coverage: { read: 3, roots: 0, sheets: 19, unreadable: [] }, findings: [] },
+      sink,
+    )
     expect(lines[0]).toContain('read 3 of 19')
     expect(lines.join('\n')).toContain('were not checked')
   })
@@ -411,13 +430,17 @@ describe('the report', () => {
     const sink = { log: (text: string) => lines.push(text) } as unknown as Console
     report(
       {
+        ...quiet,
         coverage: { read: 1, roots: 0, sheets: 1, unreadable: [] },
         findings: [
           {
+            decidedBy: 'shipped',
             kind: 'dead-part',
             message: 'nope',
             origin: { cssText: 'helix-button::part(x) { }', index: 4, sheet: 'app.css' },
+            severity: 'error',
             subject: 'helix-button::part(x)',
+            tag: 'helix-button',
           },
         ],
       },
@@ -438,5 +461,195 @@ describe('nearest', () => {
 
   test('a far name is not, however few candidates there are', () => {
     expect(nearest('--button-x', ['--button-background-color'])).toBeUndefined()
+  })
+})
+
+describe('rules', () => {
+  /** One raw finding of a kind, about a tag. */
+  const raw = (kind: 'dead-hook' | 'dead-part' | 'unforwarded-part', tag = 'helix-button') => ({
+    kind,
+    message: 'm',
+    subject: tag,
+    tag,
+  })
+
+  test('the shipped rule sets the severity where nothing overrides it', () => {
+    const { findings } = applyRules(
+      [raw('dead-part'), raw('unforwarded-part')],
+      undefined,
+      undefined,
+    )
+    expect(findings.map((one) => [one.severity, one.decidedBy])).toEqual([
+      ['error', 'shipped'],
+      ['warn', 'shipped'],
+    ])
+  })
+
+  test('the argument wins over the file, and the report says which decided', () => {
+    const { findings } = applyRules(
+      [raw('dead-part'), raw('dead-hook')],
+      { 'dead-hook': 'info', 'dead-part': 'info' },
+      { 'dead-part': 'warn' },
+    )
+    expect(findings.map((one) => [one.kind, one.severity, one.decidedBy])).toEqual([
+      ['dead-part', 'warn', 'argument'],
+      ['dead-hook', 'info', 'file'],
+    ])
+  })
+
+  test('an override scoped to tags applies to those tags only, and outranks one that is not', () => {
+    const { findings } = applyRules(
+      [raw('dead-part', 'helix-card'), raw('dead-part', 'helix-button')],
+      undefined,
+      { 'dead-part': ['warn', { severity: 'info', tags: ['helix-card'] }] },
+    )
+    expect(findings.map((one) => [one.tag, one.severity])).toEqual([
+      ['helix-card', 'info'],
+      ['helix-button', 'warn'],
+    ])
+  })
+
+  test('a finding turned off is counted against the layer that did it', () => {
+    const { findings, silenced } = applyRules(
+      [raw('dead-part'), raw('unforwarded-part'), raw('unforwarded-part', 'helix-card')],
+      { 'unforwarded-part': 'off' },
+      { 'dead-part': 'off' },
+    )
+    expect(findings).toHaveLength(0)
+    expect(silenced).toEqual({ argument: 1, file: 2 })
+  })
+
+  test('an override for a kind that does not exist throws, and names the closest', () => {
+    expect(() => checkRules({ 'dead-parts': 'off' } as never, 'file')).toThrow(
+      /closest is `dead-part`/,
+    )
+  })
+
+  test('a severity that is not one throws', () => {
+    expect(() => checkRules({ 'dead-part': 'fatal' } as never, 'argument')).toThrow(
+      /error, warn, info, or off/,
+    )
+  })
+
+  test('a scope with no tags throws, since it would apply to nothing', () => {
+    expect(() => checkRules({ 'dead-part': { severity: 'off', tags: [] } }, 'argument')).toThrow(
+      /no tags/,
+    )
+  })
+
+  test('diagnose checks its overrides before it reads the page', () => {
+    expect(() => diagnose({ rules: { 'dead-hooks': 'off' } as never, tiers })).toThrow(
+      /argument overrides/,
+    )
+  })
+})
+
+describe('usage', () => {
+  const slot = Symbol.for('fusion.dev/helix/usage')
+  const store = globalThis as Record<symbol, unknown>
+
+  test('a walk counts the page’s elements, their axes and their filled slots', () => {
+    document.body.innerHTML =
+      '<helix-button emphasis="solid" tone="danger"><span slot="start">x</span>Go</helix-button>' +
+      '<helix-button emphasis="solid">Stop</helix-button><helix-card></helix-card>'
+    const counted = walk(document)
+    expect(counted.tags).toEqual({ 'helix-button': 2, 'helix-card': 1 })
+    expect(counted.axes).toEqual({
+      'helix-button': { emphasis: { solid: 2 }, tone: { danger: 1 } },
+    })
+    expect(counted.slots).toEqual({ 'helix-button': { start: 1 } })
+    document.body.innerHTML = ''
+  })
+
+  test('an element a Helix element renders inside itself is composed, and kept apart', () => {
+    const host = document.createElement('helix-pagination-size')
+    host.attachShadow({ mode: 'open' }).innerHTML = '<helix-select></helix-select>'
+    document.body.append(host)
+    const counted = walk(document)
+    expect(counted.tags).toEqual({ 'helix-pagination-size': 1 })
+    expect(counted.composed).toEqual({ 'helix-select': 1 })
+    host.remove()
+  })
+
+  test('a watcher counts what was there, and what renders and goes after it starts', () => {
+    document.body.innerHTML = '<helix-card></helix-card>'
+    const watcher = watch(document)
+    const dialog = document.createElement('helix-dialog')
+    document.body.append(dialog)
+    ;(store[slot] as (element: Element) => void)(dialog)
+    dialog.remove()
+    /* Told twice, counted once. */
+    ;(store[slot] as (element: Element) => void)(dialog)
+    expect(watcher.counts().tags).toEqual({ 'helix-card': 1, 'helix-dialog': 1 })
+    watcher.stop()
+    expect(store[slot]).toBeUndefined()
+    document.body.innerHTML = ''
+  })
+
+  test('a second watcher keeps the first counting, and stopping it gives the slot back', () => {
+    const first = watch(document)
+    const listener = store[slot]
+    const second = watch(document)
+    const element = document.createElement('helix-tag')
+    ;(store[slot] as (element: Element) => void)(element)
+    expect(first.counts().tags).toEqual({ 'helix-tag': 1 })
+    expect(second.counts().tags).toEqual({ 'helix-tag': 1 })
+    second.stop()
+    expect(store[slot]).toBe(listener)
+    first.stop()
+  })
+
+  test('the stylesheets count the parts and hooks that exist, and leave the dead ones to findings', () => {
+    const { rules } = ruled('helix-button::part(button)', ['color: red'])
+    const { rules: hooks } = ruled('helix-button', [
+      '--button-radius: 0',
+      '--button-radios: 0',
+      '--my-own: 1',
+    ])
+    const { rules: dead } = ruled('helix-button::part(buton)', ['color: red'])
+    expect(styled([...rules, ...hooks, ...dead], tags, new Map())).toEqual({
+      hooks: { 'helix-button': { '--button-radius': 1 } },
+      parts: { 'helix-button': { button: 1 } },
+    })
+  })
+
+  test('diagnose reports usage, walked without a watcher and watched with one', () => {
+    document.body.innerHTML = '<helix-button></helix-button>'
+    expect(diagnose({ tiers }).usage).toMatchObject({
+      counted: 'walked',
+      tags: { 'helix-button': 1 },
+    })
+    const watcher = watch(document)
+    expect(diagnose({ tiers, watcher }).usage.counted).toBe('watched')
+    watcher.stop()
+    document.body.innerHTML = ''
+  })
+})
+
+describe('manifest skew', () => {
+  test('an element rendering a part its manifest lacks is one finding in place of all the others', () => {
+    const host = document.createElement('helix-button')
+    host.attachShadow({ mode: 'open' }).innerHTML =
+      '<button part="button control-new"></button><span part="icon"></span>'
+    document.body.append(host)
+    expect(skew(tags, document).map((one) => [one.kind, one.subject])).toEqual([
+      ['manifest-skew', 'helix-button'],
+    ])
+    const style = document.createElement('style')
+    style.textContent = 'helix-button { --button-backgruond-color: red }'
+    document.head.append(style)
+    const findings = diagnose({ tiers }).findings
+    expect(findings.map((one) => one.kind)).toEqual(['manifest-skew'])
+    expect(findings[0]?.message).toContain('`control-new`')
+    style.remove()
+    host.remove()
+  })
+
+  test('an element rendering only listed parts, or fewer, is no evidence', () => {
+    const host = document.createElement('helix-button')
+    host.attachShadow({ mode: 'open' }).innerHTML = '<button part="button"></button>'
+    document.body.append(host)
+    expect(skew(tags, document)).toEqual([])
+    host.remove()
   })
 })
