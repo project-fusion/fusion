@@ -174,11 +174,16 @@ export class HelixHeadlessScrollArea extends HelixElement {
       return
     }
     const slack = 1
+    /* An axis `orientation` takes away has no edges with more past them: the
+       content is clipped there, and a fade would promise a scroll that never
+       comes. */
+    const block = this.orientation !== 'horizontal'
+    const inline = this.orientation !== 'vertical'
     const found: string[] = []
-    if (box.scrollTop > slack) {
+    if (block && box.scrollTop > slack) {
       found.push('block-start')
     }
-    if (box.scrollTop + box.clientHeight < box.scrollHeight - slack) {
+    if (block && box.scrollTop + box.clientHeight < box.scrollHeight - slack) {
       found.push('block-end')
     }
     /* How far from the inline start, whichever side that is. A right-to-left
@@ -186,14 +191,16 @@ export class HelixHeadlessScrollArea extends HelixElement {
        start never had more and its end always did, however far the reader had
        scrolled. */
     const along = Math.abs(box.scrollLeft)
-    if (along > slack) {
+    if (inline && along > slack) {
       found.push('inline-start')
     }
-    if (along + box.clientWidth < box.scrollWidth - slack) {
+    if (inline && along + box.clientWidth < box.scrollWidth - slack) {
       found.push('inline-end')
     }
     this.more = found
-    this.scrolls = box.scrollHeight > box.clientHeight || box.scrollWidth > box.clientWidth
+    this.scrolls =
+      (block && box.scrollHeight > box.clientHeight) ||
+      (inline && box.scrollWidth > box.clientWidth)
     if (this.scrollbars) {
       this.bars.read(box)
     }
@@ -261,7 +268,9 @@ export class HelixHeadlessScrollArea extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     /* Turned on after the first measurement, which read no scrollbars. */
-    if ((changed.has('scrollbars') || changed.has('orientation')) && this.scrollbars) {
+    if (changed.has('orientation') && this.hasUpdated) {
+      this.measure()
+    } else if (changed.has('scrollbars') && this.scrollbars) {
       const box = this.scroller
       if (box) {
         this.bars.read(box)

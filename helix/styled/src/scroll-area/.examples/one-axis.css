@@ -1,0 +1,13 @@
+/* Lines longer than the box, which `orientation="vertical"` cuts at the edge
+   rather than scroll sideways. */
+helix-scroll-area {
+  block-size: 9rem;
+  inline-size: 20rem;
+}
+
+helix-scroll-area pre {
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  margin: 0 0 var(--helix-space-xs);
+  padding-inline-end: var(--helix-space-md);
+}
