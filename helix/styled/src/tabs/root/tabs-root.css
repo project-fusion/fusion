@@ -23,13 +23,16 @@
   background-repeat: repeat-x;
   background-size: 100% var(--helix-border-thin);
   display: flex;
-  gap: var(--helix-space-2xs);
+  gap: var(--tabs-gap, var(--helix-space-2xs));
   overflow-x: auto;
 }
 
 /* Underlined. */
 :host([variant="underlined"]) {
-  --_tabs-rule: linear-gradient(var(--helix-color-border), var(--helix-color-border));
+  --_tabs-rule: linear-gradient(
+    var(--tabs-rule-color, var(--helix-color-border)),
+    var(--tabs-rule-color, var(--helix-color-border))
+  );
   --_tab-radius: var(--helix-radii-none);
   --_tab-selected-shadow: none;
   --_tab-selected-surface: transparent;
@@ -115,15 +118,18 @@
 
 /* Underline: a bar along the bottom of the strip, on the rule it replaces. */
 :host([variant="underlined"]) [part="indicator"] {
-  --_indicator-block: var(--helix-border-thick);
-  --_indicator-color: var(--helix-color-primary);
-  --_indicator-offset: calc(var(--indicator-block-size, 0px) - var(--helix-border-thick));
+  --_indicator-block: var(--tabs-indicator-thickness, var(--helix-border-thick));
+  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-primary));
+  --_indicator-offset: calc(
+    var(--indicator-block-size, 0px) -
+    var(--tabs-indicator-thickness, var(--helix-border-thick))
+  );
 }
 
 /* Segmented: the same mark, grown to the tab's own box. */
 :host([variant="segmented"]) [part="indicator"] {
   --_indicator-block: var(--indicator-block-size, 0);
-  --_indicator-color: var(--helix-color-surface-overlay);
+  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-surface-overlay));
   --_indicator-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
   --_indicator-shadow: var(--helix-shadow-sm);
   --_indicator-offset: 0px;
@@ -142,7 +148,7 @@
      hovered one read as the same thing. */
   --_indicator-border: var(--helix-border-thin);
   --_indicator-border-color: var(--helix-color-border);
-  --_indicator-color: var(--helix-color-surface-overlay);
+  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-surface-overlay));
   --_indicator-radius: var(--helix-radii-sm);
   --_indicator-shadow: var(--helix-shadow-sm);
   --_indicator-offset: 0px;

@@ -85,3 +85,26 @@ if (hasLayout()) {
     })
   })
 }
+
+/* The published hooks, read where the styled sheets draw. Browser only, for the
+   same reason as the geometry above. */
+if (hasLayout()) {
+  describe('tabs custom properties', () => {
+    test('reach the strip, the tabs and the panel', async () => {
+      const host = (await mount(
+        markup.replace(
+          '<helix-tabs default-active="one">',
+          '<helix-tabs default-active="one" style="--tabs-gap: 20px; --tab-padding-inline: 30px; --tab-panel-padding-block-start: 40px">',
+        ),
+      )) as Updatable
+      await host.updateComplete
+      const tab = host.querySelector('helix-tab') as Updatable
+      await tab.updateComplete
+      const panel = host.querySelector('helix-tab-panel') as Updatable
+      await panel.updateComplete
+      expect(getComputedStyle(part(host, 'tabs') as Element).columnGap).toBe('20px')
+      expect(getComputedStyle(part(tab, 'tab') as Element).paddingInlineStart).toBe('30px')
+      expect(getComputedStyle(part(panel, 'panel') as Element).paddingBlockStart).toBe('40px')
+    })
+  })
+}

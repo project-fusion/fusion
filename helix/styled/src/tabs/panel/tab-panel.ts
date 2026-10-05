@@ -17,6 +17,8 @@ import { styles } from './tab-panel.css.js'
  * @slot - The panel's content.
  *
  * @csspart panel - The panel container.
+ *
+ * @cssproperty --tab-panel-padding-block-start - The space between the tab row and the panel's content.
  */
 @customElement('helix-tab-panel')
 export class HelixTabPanel extends HelixHeadlessTabPanel {
