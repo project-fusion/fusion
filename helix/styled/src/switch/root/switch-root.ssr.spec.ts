@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, styles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  styles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -17,10 +24,10 @@ describe('switch server output', () => {
   })
 
   test('the thumb serves the icon for the state the switch is in, and hides the other', () => {
-    const off = ssr(html`<helix-switch>Dark mode</helix-switch>`)
+    const off = rendered(ssr(html`<helix-switch>Dark mode</helix-switch>`), 'helix-switch')
     expect(off).toMatch(/<slot name="on" hidden/)
     expect(off).not.toMatch(/<slot name="off" hidden/)
-    const on = ssr(html`<helix-switch checked>Dark mode</helix-switch>`)
+    const on = rendered(ssr(html`<helix-switch checked>Dark mode</helix-switch>`), 'helix-switch')
     expect(on).toMatch(/<slot name="off" hidden/)
     expect(on).not.toMatch(/<slot name="on" hidden/)
   })

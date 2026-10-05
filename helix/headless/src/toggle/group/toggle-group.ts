@@ -196,6 +196,25 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   focusable = true
 
   /**
+   * Where the group's label sits. `start` puts it on the track's line.
+   *
+   * Absent is above, which is what a field looks like and what almost every
+   * group wants. `start` is for a row of controls that are labeled rather than
+   * a form of fields: a toolbar reads as one line, and a label stacked over
+   * every group in it turns one row into two.
+   *
+   * **A placement rather than a slot, and that is the whole point of it.** A
+   * `start` slot would let a consumer put the word there, and would also let
+   * them put it there *instead of* setting `label`, which is the group's
+   * accessible name: the set would then be named for nobody using a screen
+   * reader while looking correct to everybody else. Worse, setting both draws
+   * it twice. One property moves the label the consumer already has to give,
+   * and cannot be used to remove it.
+   */
+  @property({ attribute: 'label-placement', reflect: true })
+  labelPlacement?: 'start'
+
+  /**
    * The direction the items run. `vertical` puts them in a column, and the up
    * and down arrows move between them.
    *
@@ -212,20 +231,6 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
    */
   @property({ attribute: 'selection-mode', reflect: true })
   selectionMode?: 'multiple' | 'single'
-
-  /**
-   * The pressed values as a list, under `selection-mode="multiple"`, in the
-   * order the items are written. Written, it presses exactly those items.
-   * Where one item is chosen, it is that one value, or none.
-   */
-  @property({ attribute: false })
-  get values(): string[] {
-    return this.multiple ? pressedValues(this.value) : this.value === '' ? [] : [this.value]
-  }
-
-  set values(next: string[]) {
-    this.value = next.join(',')
-  }
 
   /**
    * Focus goes to the item that holds the stop, and to the item that would
@@ -380,17 +385,6 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   }
 
   /**
-   * The verdict on the answer `required` asks for.
-   *
-   * `required` arrives with `MixinField` and enforces nothing on its own: the
-   * attribute reflects and the marker renders beside the label, and without this
-   * a form with an unanswered group submits anyway. The marker is a promise to
-   * the reader that something will stop them.
-   *
-   * The anchor is the track rather than the host, so the browser's own bubble
-   * points at the control rather than at a box with nothing in it.
-   */
-  /**
    * What the form receives: the value, or under `selection-mode="multiple"`
    * one entry per pressed value, as a native `<select multiple>` sends.
    */
@@ -408,28 +402,34 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     return data
   }
 
+  /**
+   * The verdict on the answer `required` asks for.
+   *
+   * `required` arrives with `MixinField` and enforces nothing on its own: the
+   * attribute reflects and the marker renders beside the label, and without this
+   * a form with an unanswered group submits anyway. The marker is a promise to
+   * the reader that something will stop them.
+   *
+   * The anchor is the track rather than the host, so the browser's own bubble
+   * points at the control rather than at a box with nothing in it.
+   */
   private validate(): void {
     this.reportRequired(!this.answered, 'Choose one to continue.', 'track')
   }
 
   /**
-   * Where the group's label sits. `start` puts it on the track's line.
-   *
-   * Absent is above, which is what a field looks like and what almost every
-   * group wants. `start` is for a row of controls that are labeled rather than
-   * a form of fields: a toolbar reads as one line, and a label stacked over
-   * every group in it turns one row into two.
-   *
-   * **A placement rather than a slot, and that is the whole point of it.** A
-   * `start` slot would let a consumer put the word there, and would also let
-   * them put it there *instead of* setting `label`, which is the group's
-   * accessible name: the set would then be named for nobody using a screen
-   * reader while looking correct to everybody else. Worse, setting both draws
-   * it twice. One property moves the label the consumer already has to give,
-   * and cannot be used to remove it.
+   * The pressed values as a list, under `selection-mode="multiple"`, in the
+   * order the items are written. Written, it presses exactly those items.
+   * Where one item is chosen, it is that one value, or none.
    */
-  @property({ attribute: 'label-placement', reflect: true })
-  labelPlacement?: 'start'
+  @property({ attribute: false })
+  get values(): string[] {
+    return this.multiple ? pressedValues(this.value) : this.value === '' ? [] : [this.value]
+  }
+
+  set values(next: string[]) {
+    this.value = next.join(',')
+  }
 
   /**
    * The row the track sits in, so something can sit beside it.

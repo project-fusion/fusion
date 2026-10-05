@@ -90,9 +90,6 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   protected override readonly announcesInput = true
 
   /**
-   * Shows the value at each mark.
-   */
-  /**
    * `Intl.NumberFormat` options the value is written with: a currency, a
    * percent, a unit, or a number of decimals. Written as JSON in the
    * attribute.
@@ -119,6 +116,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @property()
   locale = ''
 
+  /**
+   * Shows the value at each mark.
+   */
   @property({ attribute: 'marker-labels', reflect: true, type: Boolean })
   markerLabels = false
 
@@ -164,16 +164,16 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @property({ type: Number })
   min = 0
 
+  /** The name of a range's lower thumb, read after the slider's label. */
+  @property({ attribute: 'minimum-label' })
+  minimumLabel = 'minimum'
+
   /**
    * How many steps a range's two thumbs stay apart, as Zag's
    * `minStepsBetweenThumbs`. A thumb pushed closer stops there.
    */
   @property({ attribute: 'min-steps-between-thumbs', type: Number })
   minStepsBetweenThumbs = 0
-
-  /** The name of a range's lower thumb, read after the slider's label. */
-  @property({ attribute: 'minimum-label' })
-  minimumLabel = 'minimum'
 
   /**
    * The direction the track runs. `vertical` stands it on end.
@@ -458,7 +458,6 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     return String(this.settled(at))
   }
 
-  /** What a screen reader says for one thumb, where `value-text` asks. */
   /** How far apart a range's thumbs stay, in the slider's own units. */
   private get gap(): number {
     return Math.max(0, this.minStepsBetweenThumbs) * this.step
@@ -481,6 +480,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     return this.formatOptions ? formatNumber(number, this.locale, this.formatOptions) : String(at)
   }
 
+  /** What a screen reader says for one thumb, where `value-text` asks. */
   private spoken(at: number | string): string | typeof nothing {
     if (this.valueText) {
       return fillTemplate(this.valueText, { value: this.said(at) })
