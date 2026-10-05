@@ -1,7 +1,8 @@
 # @fusion.dev/helix-cli
 
 The Helix command line. Holds components to the conventions Helix is built on,
-derives themes, scaffolds a project, and serves the derivation to an agent.
+derives themes, scaffolds a project, checks a project's code against the Helix
+it installed, and serves the derivation to an agent.
 
 ```sh
 npm install --save-dev @fusion.dev/helix-cli
@@ -25,6 +26,7 @@ helix component fix        # the rules that can write
 | `theme` | `init` a starter intent, `build` it to CSS, `audit` every contrast pair, `check` in CI |
 | `new` | Scaffolds a project from a Helix template |
 | `diagnostics` | Receives the runs `initDiagnostics()` sends from your app and prints each new finding. `--out <path>` writes the CI file, `--port` picks the port, 7417 by default, and `--config <path>` names the settings served to the page |
+| `scan` | Reads your project's stylesheets, templates, and modules, and prints each finding with its file and line. `--build <dir>` weighs each Helix family in your bundle, `--out <path>` writes the run to the CI file, and `--config <path>` names the settings |
 | `mcp` | Serves the derivation to an agent over stdio, as an MCP server |
 
 `--json` is on every verb, in a shape a script can read without parsing

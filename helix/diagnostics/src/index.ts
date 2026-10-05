@@ -50,6 +50,7 @@ export type {
   Severity,
   Unreadable,
   Usage,
+  Weight,
 } from './report.js'
 export { CATEGORIES, KINDS } from './report.js'
 export { type Override, type Rules, SHIPPED_RULES } from './rules.js'
