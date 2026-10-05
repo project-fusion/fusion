@@ -13,7 +13,7 @@ describe('drilldown server output', () => {
     const markup = ssr(html`<helix-headless-drilldown label="Settings"></helix-headless-drilldown>`)
     expect(hasPart(markup, 'page')).toBe(true)
     expect(rendered(markup, 'helix-headless-drilldown')).toMatch(
-      /<div[^>]*part="page">\s*(?:<!--[^>]*-->)?<slot\s*><\/slot>/,
+      /<div[^>]*part="page"[^>]*>\s*(?:<!--[^>]*-->)?<slot\s*><\/slot>/,
     )
   })
 

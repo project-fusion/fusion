@@ -1,12 +1,14 @@
 import {
+  AriaForwardController,
   customElement,
   DrilldownController,
   HelixElement,
-  hostAria,
   inlineStep,
   KeyboardNavigationController,
   keyClaimed,
   MixinCollection,
+  type NavigableItem,
+  slottedWords,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -33,6 +35,11 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * and reads the rest from the DOM. The behavior lives in `DrilldownController`,
  * which `Menu` shares.
  *
+ * The rows of the page showing are a `menu`, named by `label` on the top page
+ * and by the page's title below it. The back button and the title sit above
+ * the menu. Disabled rows stay reachable with the arrow keys, and typing a
+ * letter moves to the next row whose name starts with it.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -49,7 +56,7 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @csspart header - The bar above a page, which holds the back button and the page's name.
  * @csspart live - A copy of the empty and loading text, in a region that screen readers announce when it changes. Visually hidden in the styled tier.
  * @csspart loading - Shown while the entries load.
- * @csspart page - The region the rows are in.
+ * @csspart page - The menu the rows are in.
  * @csspart title - The name of the page showing.
  *
  * @cssstate drilled - A row's page is showing, so a frame around the drilldown can style itself for that depth.
@@ -57,7 +64,11 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
 @customElement('helix-headless-drilldown')
 export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   /**
-   * The region's name, read by screen readers.
+   * The name of the top page's menu, read by screen readers. A page below it is
+   * named by its title.
+   *
+   * An `aria-label` or `aria-labelledby` on the host names the top page too,
+   * and wins over this.
    */
   @property()
   /* Not "Menu". This component's own description is built around not being one,
@@ -95,10 +106,22 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     slot: 'page',
   })
 
-  /** The rows on the page showing, which is what the keys move over. */
+  /**
+   * The rows on the page showing, which is what the keys move over.
+   *
+   * Disabled rows included. A row renders `aria-disabled` and keeps its
+   * `tabindex` so a reader can reach it and hear why it cannot be chosen, and
+   * `select()` is what refuses it.
+   */
   private get items(): HelixHeadlessDrilldownItem[] {
-    return this.drilldown.rows.filter((item) => !item.disabled)
+    return this.drilldown.rows
   }
+
+  /** Carries a host `aria-label` and `aria-labelledby` to the menu. */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('page'),
+  })
 
   /**
    * Moving between rows, which is `Menu`'s arrangement and not a second one.
@@ -119,9 +142,24 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
    * reader has just tabbed to is how they get onto the first row at all.
    */
   protected readonly keys = new KeyboardNavigationController(this, {
-    items: () => this.items,
+    /* Each row as one the controller never skips, which it does for any item
+       that says it is disabled. See `items`. */
+    items: () =>
+      this.items.map(
+        (item): NavigableItem & { words: string } => ({
+          contains: (node) => item.contains(node),
+          disabled: false,
+          focusItem: () => item.focusItem(),
+          select: () => item.select(),
+          get selected() {
+            return item.selected
+          },
+          words: slottedWords(item, ['']),
+        }),
+      ),
     reserved: () => ['ArrowLeft', 'ArrowRight'],
     selects: () => false,
+    typeahead: (item) => (item as NavigableItem & { words: string }).words,
   })
 
   /**
@@ -175,7 +213,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
      should return to where they were, not to the top of the page. */
   private readonly handleFocusIn = (event: FocusEvent): void => {
     const item = this.drilldown.rows.find((row) => row.contains(event.target as Node))
-    if (item && !item.disabled) {
+    if (item) {
       for (const row of this.drilldown.rows) {
         row.focusable = row === item
       }
@@ -265,11 +303,6 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     this.removeEventListener('focusin', this.handleFocusIn)
   }
 
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: 'menu' })
-  }
-
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     /* Which rows are on the page showing, written onto the rows themselves
@@ -321,10 +354,16 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
                 ${unsafeSVG(caretLeft.content)}
               </svg>
             </button>
-            <span part="title">${this.drilldown.label}</span>
+            <span id="title" part="title">${this.drilldown.label}</span>
           </div>`
     }
-      <div aria-busy=${this.loading ? 'true' : nothing} part="page">
+      <div
+        aria-busy=${this.loading ? 'true' : nothing}
+        aria-label=${this.drilldown.atRoot ? this.label || nothing : nothing}
+        aria-labelledby=${this.drilldown.atRoot ? nothing : 'title'}
+        part="page"
+        role="menu"
+      >
         <slot @slotchange=${(event: Event) => this.countRows(event)}></slot>
         ${this.renderStatus(this.hasRows)}
       </div>${this.renderLive(this.hasRows)}`
