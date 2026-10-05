@@ -3,6 +3,7 @@ import {
   deepContains,
   focusableElements,
   HelixElement,
+  HelixLoadMoreEvent,
   HelixReadEvent,
   hostAria,
   MixinCollection,
@@ -42,6 +43,11 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * the feed holds one page of a longer list, and each row says its place in the
  * whole of it.
  *
+ * **`load-more` adds a button after the list** that sends `helix-load-more`,
+ * for a feed that holds one page of a longer list. Append the next page, set
+ * `loading` while it is on its way, and take `load-more` off once there is
+ * nothing more. The button is hidden while the feed is loading.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
@@ -53,6 +59,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @slot header - Above the list, for a title and the mark-all control.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when the user dismisses a row. The row dispatches it, and you can listen for it on the feed. Cancelable: cancel it to keep the row.
+ * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader presses the `load-more` button, asking for the next page of the feed.
  * @event {HelixReadEvent} helix-read - Fired by an item when it is marked read or unread, and by the feed when everything is marked read. Cancelable.
  *
  * @csspart empty - Shown when there is nothing in the feed.
@@ -62,6 +69,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @csspart live - A copy of the empty and loading messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the feed is loading.
  * @csspart mark-all - The control that marks everything read.
+ * @csspart more - The button after the list that asks for more, while `load-more` is set and the feed is not loading.
  *
  * @cssstate media - While a notification in the list holds something in its media slot, so every row keeps that column.
  */
@@ -86,6 +94,19 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    */
   @property()
   label = ''
+
+  /**
+   * Whether to draw a button after the list that asks for the next page, by
+   * sending `helix-load-more`. Take it off once there is nothing more.
+   */
+  @property({ attribute: 'load-more', type: Boolean })
+  loadMore = false
+
+  /**
+   * The text of the `load-more` button.
+   */
+  @property({ attribute: 'load-more-label' })
+  loadMoreLabel = 'Load more'
 
   /**
    * Whether to draw a control that marks everything read.
@@ -478,7 +499,19 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
         ${this.renderStatus(hasItems)}
       </div>
       ${this.renderLive(hasItems)}
+      ${
+        this.loadMore && !this.loading
+          ? html`<button part="more" type="button" @click=${this.askForMore}>
+              ${this.loadMoreLabel}
+            </button>`
+          : nothing
+      }
       <div part="footer"><slot name="footer"></slot></div>`
+  }
+
+  /** Asks for the next page, for the `load-more` button. */
+  private readonly askForMore = (): void => {
+    this.dispatchEvent(new HelixLoadMoreEvent())
   }
 
   /**

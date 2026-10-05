@@ -30,6 +30,7 @@ import '../notification/notification.js'
  * @csspart list - The list itself.
  * @csspart live - A copy of the empty and loading messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart mark-all - The control that marks everything read.
+ * @csspart more - The button after the list that asks for more, while `load-more` is set and the feed is not loading.
  *
  * @cssproperty --notifications-max-block-size - How tall the feed may get before the list scrolls.
  * @cssproperty --notifications-media-column - Width of the media column that every item keeps when any item in the feed has media.
