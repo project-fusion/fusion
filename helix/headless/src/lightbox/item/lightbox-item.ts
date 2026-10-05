@@ -38,7 +38,8 @@ export class HelixHeadlessLightboxItem extends HelixElement {
   current = false
 
   /**
-   * The item's name, used in the status text that says which item is shown.
+   * The item's name. It names the item's group, and fills `{label}` in the
+   * lightbox's `status-label`.
    */
   @property()
   label = ''
