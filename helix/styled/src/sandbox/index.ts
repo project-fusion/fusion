@@ -12,6 +12,14 @@
  * hardcodes `sandbox="allow-scripts allow-forms"` on its frame and never
  * `allow-same-origin`, which is the pairing that would undo it.
  */
+export {
+  isRender,
+  LAYOUT_RULES,
+  loggedText,
+  type ServePreviewOptions,
+  servePreview,
+  withoutStylesheets,
+} from './frame.js'
 export * from './preview/sandbox-preview.js'
 export * from './root/sandbox-root.js'
 export * from './source/sandbox-source.js'
