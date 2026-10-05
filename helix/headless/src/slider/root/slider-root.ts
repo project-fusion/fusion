@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   customElement,
+  fillTemplate,
   HelixFormElement,
   MixinControllerValue,
   MixinField,
@@ -154,6 +155,13 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   range = false
 
   /**
+   * What a screen reader says for a thumb's value, with `{value}` filled in,
+   * such as `{value} degrees`. Empty announces the number alone.
+   */
+  @property({ attribute: 'value-text' })
+  valueText = ''
+
+  /**
    * Shows the chosen value beside the track.
    */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
@@ -241,13 +249,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * is what a filter with nothing filtered out looks like.
    */
   private get bounds(): [number, number] {
-    /* A lone number is not a range, so it is not read as one.
-     *
-     * An untouched range slider does not hold an empty string: the native input
-     * reports its own midpoint and the mixin takes it, so `value` came back as
-     * "50" on a slider from 10 to 90 and reading that as the lower thumb put a
-     * filter half shut before anyone touched it. Only a pair is a pair, and
-     * anything else opens fully wide, which is what "nothing filtered out"
+    /* A lone number is not a range, so it is not read as one. `willUpdate`
+     * seeds and sanitizes a range to a pair, and anything else that arrives
+     * between the two opens fully wide, which is what "nothing filtered out"
      * looks like. */
     const parts = this.value.split(',')
     const from = Number.parseFloat(parts[0] ?? '')
@@ -356,18 +360,63 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    /* A range with no value starts in the middle, which is the platform's own
-       rule and is what the control will show whether or not this agrees. Seeded
-       here so the value the form would submit matches the thumb from the first
-       render rather than from the first drag. */
+    /* A slider with no value starts in the middle, which is the platform's own
+       rule and is what the control will show whether or not this agrees, and a
+       range starts fully wide. Seeded here so the value the form would submit
+       matches the thumbs from the first render rather than from the first
+       drag: a range seeded with the midpoint drew its thumbs at the ends and
+       submitted one number. */
     if (!this.hasUpdated && this.value === '') {
       /* Onto `defaultValue`, never onto `value`. `defaultValue` is where the
          markup's intent lives and where a reset returns to, and "no value given"
          is exactly a fact about the markup. Writing `value` would record the
-         midpoint as something the reader chose, so a form reset would return to
-         it rather than clearing it. */
-      this.defaultValue = String(this.min + (this.max - this.min) / 2)
+         default as something the reader chose. */
+      this.defaultValue = this.range
+        ? `${this.min},${this.max}`
+        : String(this.min + (this.max - this.min) / 2)
     }
+    /* Sanitized as a native range sanitizes what it is given: into the bounds
+       and onto the step. The thumb always showed the sanitized number, and the
+       form submitted the one written, 150 on a slider that stops at 100. */
+    const clean = this.sanitize(this.value)
+    if (clean !== this.value) {
+      this.value = clean
+    }
+  }
+
+  /** One number pulled into the bounds and onto the step, as a range does. */
+  private settled(at: number): number {
+    const low = Math.min(this.min, this.max)
+    const high = Math.max(this.min, this.max)
+    return Math.min(high, Math.max(low, this.snapped(Math.min(high, Math.max(low, at)))))
+  }
+
+  /**
+   * The value as a native range would hold it: a number in the bounds on the
+   * step, or for a range, two of them in order.
+   */
+  private sanitize(text: string): string {
+    if (this.range) {
+      const [from, to] = text.split(',').map((part) => Number.parseFloat(part))
+      if (
+        from === undefined ||
+        to === undefined ||
+        !Number.isFinite(from) ||
+        !Number.isFinite(to)
+      ) {
+        return `${this.min},${this.max}`
+      }
+      const ends = [this.settled(from), this.settled(to)].sort((a, b) => a - b)
+      return ends.join(',')
+    }
+    const parsed = Number.parseFloat(text)
+    const at = Number.isFinite(parsed) ? parsed : this.min + (this.max - this.min) / 2
+    return String(this.settled(at))
+  }
+
+  /** What a screen reader says for one thumb, where `value-text` asks. */
+  private spoken(at: number | string): string | typeof nothing {
+    return this.valueText ? fillTemplate(this.valueText, { value: at }) : nothing
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -419,6 +468,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         step=${this.step}
         .value=${String(at)}
         aria-labelledby=${this.labeled ? `${this.labelId} ${which}-name` : `${which}-name`}
+        aria-valuetext=${this.spoken(at)}
         aria-describedby=${this.describedBy ?? nothing}
         aria-invalid=${this.invalidity ?? nothing}
         ?disabled=${this.isDisabled}
@@ -475,6 +525,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
               step=${this.step}
               .value=${this.value}
               name=${this.name || nothing}
+              aria-valuetext=${this.spoken(this.value)}
               aria-describedby=${this.describedBy ?? nothing}
               aria-invalid=${this.invalidity ?? nothing}
               ?disabled=${this.isDisabled}
