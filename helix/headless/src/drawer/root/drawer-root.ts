@@ -2,14 +2,26 @@ import {
   AriaForwardController,
   CommandController,
   customElement,
+  edgeOffset,
   HelixElement,
+  isRtl,
   lockScroll,
   MixinControllerOpen,
+  OpenPhaseController,
   onUnlessFalse,
+  parseSnapPoints,
+  SwipeController,
+  type SwipeEdge,
+  settleSwipe,
+  snapTravel,
+  swipeAxis,
+  swipeEdge,
+  towardEdge,
   unlockScroll,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { startsSwipe } from '../swipe-start.js'
 
 /**
  * @summary A panel that slides in from an edge.
@@ -27,7 +39,15 @@ import { property } from 'lit/decorators.js'
  * - the page behind does not scroll
  *
  * A drawer with `modal="false"` leaves the page usable and still closes on
- * Escape.
+ * Escape, in a browser without `closedby` as well.
+ *
+ * **A touch or a pen swipes it away**, toward the edge it came from, resolved
+ * against the writing direction. A swipe past halfway, or a quick one, closes
+ * it through the same request as every other way out. `snap-points` lists the
+ * fractions of the panel a reader can leave on screen, such as `0.5 1` for a
+ * sheet that rests half open: it opens at the smallest, and a swipe settles at
+ * the nearest. While a swipe moves the panel, the distance is written on it as
+ * `--drawer-swipe-x` and `--drawer-swipe-y`. `swipe="false"` turns swiping off.
  *
  * The panel's name is `label` when you set it. Otherwise it is the heading in
  * the `header` slot, or the elements an `aria-labelledby` on the host names.
@@ -53,6 +73,7 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/drawer
  *
  * @slot - The drawer's content.
+ * @slot footer - Content pinned below the scrolling area, such as the drawer's actions.
  * @slot header - Content pinned above the scrolling area.
  *
  * @event {Event} close - Sent from the host after the drawer closes, because the native `close` event does not leave the shadow root.
@@ -61,9 +82,15 @@ import { property } from 'lit/decorators.js'
  * @event {ToggleEvent} toggle - Sent when the drawer opens or closes, with `newState` and `oldState`.
  *
  * @csspart content - The scrolling content region.
+ * @csspart footer - The footer region.
  * @csspart header - The header region.
  * @csspart panel - The sliding panel.
  *
+ * @cssproperty --drawer-swipe-x - How far a swipe, or a snap point, has moved the panel across, in pixels, toward the right.
+ * @cssproperty --drawer-swipe-y - How far a swipe, or a snap point, has moved the panel down, in pixels.
+ *
+ * @cssstate entering - From the moment the drawer opens until its entrance has finished.
+ * @cssstate exiting - From the moment the drawer closes until its exit has finished.
  * @cssstate open - While the drawer is open.
  */
 @customElement('helix-headless-drawer')
@@ -134,6 +161,25 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   placement?: 'start' | 'end' | 'top' | 'bottom'
 
   /**
+   * The fractions of the panel a reader can leave on screen, as a list such as
+   * `0.5 1`. The drawer opens at the smallest, and a swipe comes to rest at the
+   * nearest, or closes the drawer below the smallest.
+   *
+   * Empty is `1`: the whole panel, and a swipe either closes it or puts it
+   * back.
+   */
+  @property({ attribute: 'snap-points' })
+  snapPoints = ''
+
+  /**
+   * Whether a touch or a pen can swipe the drawer away. `swipe="false"` turns
+   * it off, for a panel whose content has its own use for the gesture, such as
+   * a map.
+   */
+  @property({ converter: onUnlessFalse })
+  swipe = true
+
+  /**
    * What the dialog closed with, the way `<dialog>` reports it.
    *
    * **The whole point of a `<dialog>` returning a value is lost behind a shadow
@@ -163,6 +209,117 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
 
   /** What a value set before the element existed is kept in. */
   private returned = ''
+
+  /* `:state(entering)` and `:state(exiting)`, as `Dialog` records them. */
+  protected readonly phases = new OpenPhaseController(this, {
+    mark: {
+      entering: (on) => this.toggleState('entering', on),
+      exiting: (on) => this.toggleState('exiting', on),
+    },
+    open: () => this.open,
+    surface: () => this.panel,
+  })
+
+  /** How far the panel rests toward its edge, in pixels, at the snap point it settled on. */
+  private rest = 0
+
+  /** The edge the panel leaves through, from its placement and the writing direction. */
+  private get edge(): SwipeEdge {
+    return swipeEdge(this.placement ?? 'end', isRtl(this))
+  }
+
+  /** The panel's size along the swipe, in pixels. */
+  private get extent(): number {
+    const box = this.panel?.getBoundingClientRect()
+    return (swipeAxis(this.edge) === 'x' ? box?.width : box?.height) ?? 0
+  }
+
+  /* Swipe to dismiss. The controller says where the pointer is; what it means
+     here, a snap point or a close, is settled by `settleSwipe`. */
+  protected readonly swipes = new SwipeController(this, {
+    axis: () => (this.open && this.swipe ? swipeAxis(this.edge) : undefined),
+    end: (dx, dy, vx, vy) => this.settle(dx, dy, vx, vy),
+    move: (dx, dy) => this.place(Math.max(0, this.rest + towardEdge(this.edge, dx, dy))),
+    start: (target, event) =>
+      startsSwipe(target, event.pointerType, swipeAxis(this.edge), this.partNamed('content')),
+    surface: () => this.panel,
+  })
+
+  /**
+   * Writes how far the panel sits toward its edge, as the two properties the
+   * styled tier translates it by. Nothing is written at rest.
+   */
+  private place(travel: number): void {
+    const panel = this.panel
+    if (!panel) {
+      return
+    }
+    const { x, y } = edgeOffset(this.edge, travel)
+    const px = (value: number): string => (value === 0 ? '' : `${Math.round(value)}px`)
+    /* An empty value takes the property off, so nothing is written at rest. */
+    panel.style.setProperty('--drawer-swipe-x', px(x))
+    panel.style.setProperty('--drawer-swipe-y', px(y))
+  }
+
+  /** Brings a released swipe to rest: at a snap point, or closed through the request. */
+  private settle(dx: number, dy: number, vx: number, vy: number): void {
+    const edge = this.edge
+    const size = this.extent
+    const shown = settleSwipe({
+      points: parseSnapPoints(this.snapPoints),
+      size,
+      travel: Math.max(0, this.rest + towardEdge(edge, dx, dy)),
+      velocity: towardEdge(edge, vx, vy),
+    })
+    if (shown === 0 && this.requestOpen(false)) {
+      return
+    }
+    if (shown !== 0) {
+      this.rest = snapTravel(size, shown)
+    }
+    this.place(this.rest)
+  }
+
+  /** Opens the drawer. */
+  show(): void {
+    this.requestOpen(true)
+  }
+
+  /**
+   * Requests that the drawer close, and takes what it closed with, the way
+   * `Dialog.close(value)` does. A `helix-before-close` listener can refuse it,
+   * and then the value is not kept.
+   */
+  close(returnValue?: string): void {
+    const previous = this.returnValue
+    if (returnValue !== undefined) {
+      this.returnValue = returnValue
+    }
+    if (!this.requestOpen(false) && returnValue !== undefined) {
+      this.returnValue = previous
+    }
+  }
+
+  /**
+   * Escape on a drawer that is not modal, in a browser without `closedby`.
+   *
+   * `show()` gives a `<dialog>` no close watcher, and `closedby="closerequest"`
+   * is what asks for one. Where the browser does not know the attribute, the
+   * key is read here, and comes through the same request.
+   */
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (
+      event.key !== 'Escape' ||
+      event.defaultPrevented ||
+      this.modal ||
+      !this.open ||
+      closedByKnown()
+    ) {
+      return
+    }
+    event.preventDefault()
+    this.requestOpen(false)
+  }
 
   /** The panel, which is a real `<dialog>`. */
   private get panel(): HTMLDialogElement | null {
@@ -263,6 +420,10 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.nameByHeader()
+    if (changed.has('open') && !this.open) {
+      this.rest = 0
+      this.place(0)
+    }
     if (this.open && this.modal) {
       lockScroll(this)
     } else {
@@ -284,6 +445,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       } else {
         panel.show()
       }
+      /* At the smallest snap point, once the panel has a size to measure. */
+      this.rest = snapTravel(this.extent, parseSnapPoints(this.snapPoints)[0] ?? 1)
+      this.place(this.rest)
     } else if (!this.open && panel.open) {
       panel.close()
     }
@@ -306,9 +470,11 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       @cancel=${this.handleCancel}
       @click=${this.handleBackdrop}
       @close=${this.handleClose}
+      @keydown=${this.handleKeydown}
     >
       <div part="header"><slot name="header" @slotchange=${this.nameByHeader}></slot></div>
       <div part="content"><slot></slot></div>
+      <div part="footer"><slot name="footer"></slot></div>
     </dialog>`
   }
 }
@@ -325,6 +491,10 @@ const headingsIn = (slot: HTMLSlotElement | null): Element[] => {
   )
   return found.length > 0 ? found.slice(0, 1) : assigned
 }
+
+/** Whether the browser knows `<dialog closedby>`, which a non-modal drawer's Escape rests on. */
+const closedByKnown = (): boolean =>
+  typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype
 
 declare global {
   interface HTMLElementTagNameMap {
