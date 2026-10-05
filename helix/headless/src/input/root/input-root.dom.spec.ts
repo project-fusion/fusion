@@ -6,6 +6,20 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
+/** What the console was warned while `markup` mounted and settled, with nothing printed. */
+const warnedOn = async (markup: string): Promise<string[]> => {
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (message: string) => warnings.push(message)
+  try {
+    await mount(markup)
+    await new Promise((done) => setTimeout(done, 5))
+  } finally {
+    console.warn = original
+  }
+  return warnings
+}
+
 type Input = HTMLElement & {
   updateComplete: Promise<boolean>
   value: string
@@ -108,5 +122,24 @@ describe('what the host passes to its input', () => {
     expect(input.getAttribute('min')).toBe('1')
     expect(input.getAttribute('max')).toBe('5')
     expect(input.getAttribute('step')).toBe('2')
+  })
+})
+
+describe('a field with no name', () => {
+  test('is reported once, by its tag', async () => {
+    const warnings = await warnedOn('<helix-headless-input></helix-headless-input>')
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-input> has no accessible name')
+  })
+
+  test('a label, an aria-label, a slotted label or a page label names it', async () => {
+    for (const markup of [
+      '<helix-headless-input label="Email"></helix-headless-input>',
+      '<helix-headless-input aria-label="Email"></helix-headless-input>',
+      '<helix-headless-input><span slot="label">Email</span></helix-headless-input>',
+      '<div><label for="email">Email</label><helix-headless-input id="email"></helix-headless-input></div>',
+    ]) {
+      expect([markup, ...(await warnedOn(markup))]).toEqual([markup])
+    }
   })
 })

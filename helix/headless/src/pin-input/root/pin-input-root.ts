@@ -74,6 +74,11 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     target: () => this.partNamed('field'),
   })
 
+  /** @internal The element a missing name is checked on: the row of cells, so the name of one cell does not count as the name of the field. */
+  protected override get namedControl(): HTMLElement | null {
+    return this.partNamed('field')
+  }
+
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
   protected override readonly announcesInput = true
 
