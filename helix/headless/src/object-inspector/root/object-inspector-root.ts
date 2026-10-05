@@ -1,8 +1,10 @@
 import {
+  AriaForwardController,
   CopyController,
   customElement,
   elementById,
   fillTemplate,
+  formatNumbers,
   HelixElement,
   inlineStep,
   scrollItemIntoView,
@@ -53,9 +55,15 @@ const child = (path: string, key: string): string =>
  *
  * The tree is one tab stop. Up and Down move between rows, Right opens a branch
  * or moves into it, Left closes it or moves to its parent, and Home and End
- * move to the first and last rows. Focus stays on the tree, and
- * `aria-activedescendant` marks the active row. Each row carries its real
- * level, position, and set size, including in a windowed tree.
+ * move to the first and last rows. Typing moves to the next row whose key
+ * starts with what was typed, and `*` opens every branch beside the active
+ * row. Focus stays on the tree, and `aria-activedescendant` marks the active
+ * row. Each row carries its real level, position, and set size, including in
+ * a windowed tree.
+ *
+ * A new `value` keeps the branches a reader opened or closed, and the active
+ * row, where the new value still has them. A branch the old value did not have
+ * opens to `default-depth`.
  *
  * The copy button copies the active row, a branch as JSON and a string as its
  * text. So do Command+C and Control+C while the tree has focus and no text is
@@ -122,6 +130,29 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   /** The copy button's accessible name on a row without a key, such as the root. */
   @property({ attribute: 'copy-value-label' })
   copyValueLabel = 'Copy value'
+
+  /** How an array of one entry counts it. `{count}` is replaced with the count. */
+  @property({ attribute: 'item-label' })
+  itemLabel = '{count} item'
+
+  /** How an array of any other number of entries counts them. `{count}` is replaced with the count. */
+  @property({ attribute: 'items-label' })
+  itemsLabel = '{count} items'
+
+  /** How an object of one key counts it. `{count}` is replaced with the count. */
+  @property({ attribute: 'key-label' })
+  keyLabel = '{count} key'
+
+  /** How an object of any other number of keys counts them. `{count}` is replaced with the count. */
+  @property({ attribute: 'keys-label' })
+  keysLabel = '{count} keys'
+
+  /**
+   * The tree's accessible name when `label` is empty and the host names it
+   * with neither `aria-label` nor `aria-labelledby`.
+   */
+  @property({ attribute: 'tree-label' })
+  treeLabel = 'Value'
 
   /**
    * How many levels start open.
@@ -202,6 +233,18 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   /** Set by a keyboard move, so the next render brings the active row into view. */
   private revealing = false
 
+  /** What has been typed toward a key, and when the last letter came. */
+  private typed = { at: 0, text: '' }
+
+  /** The branches of the last value seen, by path, so a new value can tell old ones from new. */
+  private branches = new Set<string>()
+
+  /** Carries a host `aria-label` and `aria-labelledby` to the tree, which is what takes focus. */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('tree'),
+  })
+
   /**
    * How tall a row is taken to be before it has been drawn, in pixels.
    *
@@ -270,21 +313,37 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     return rows
   }
 
-  /** Opens every branch shallower than `defaultDepth`. */
-  private seed(): void {
+  /**
+   * Opens every branch shallower than `defaultDepth`.
+   *
+   * `keep` is for a new value: a branch the last value also had keeps whether
+   * a reader opened or closed it, and only a new one takes the default.
+   * **Assigning a value used to close everything**, so an inspector showing
+   * live data, a polled response or a debug panel, threw away the reader's
+   * place on every update.
+   */
+  private seed(keep: boolean): void {
     const opened = new Set<string>()
+    const branches = new Set<string>()
     const visit = (value: unknown, path: string, depth: number): void => {
-      if (!branchy(value) || depth >= this.defaultDepth) {
+      if (!branchy(value)) {
         return
       }
-      opened.add(path)
+      branches.add(path)
+      const known = keep && this.branches.has(path)
+      if (known ? this.opened.has(path) : depth < this.defaultDepth) {
+        opened.add(path)
+      }
       for (const [name, item] of entries(value)) {
         visit(item, child(path, name), depth + 1)
       }
     }
     visit(this.root, '', 0)
+    this.branches = branches
     this.opened = opened
-    this.active = 0
+    if (!keep) {
+      this.active = 0
+    }
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -299,8 +358,10 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       this.loadedFor = this.for
       this.load()
     }
+    /* The path the active row is on, so it stays there when the rows move. */
+    const was = this.rows[this.active]?.path
     if (changed.has('value') || changed.has('read') || changed.has('defaultDepth')) {
-      this.seed()
+      this.seed(!changed.has('defaultDepth'))
     }
     if (
       changed.has('value') ||
@@ -309,7 +370,8 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       changed.has('defaultDepth')
     ) {
       this.rows = this.flatten()
-      this.active = Math.min(this.active, Math.max(0, this.rows.length - 1))
+      const found = was === undefined ? -1 : this.rows.findIndex((row) => row.path === was)
+      this.active = found >= 0 ? found : Math.min(this.active, Math.max(0, this.rows.length - 1))
     }
   }
 
@@ -459,10 +521,57 @@ export class HelixHeadlessObjectInspector extends HelixElement {
           this.toggle(row)
         }
         break
+      case '*':
+        this.openSiblings(row)
+        break
       default:
-        return
+        if (event.key.length !== 1 || event.altKey || event.ctrlKey || event.metaKey) {
+          return
+        }
+        this.typeahead(event.key)
     }
     event.preventDefault()
+  }
+
+  /** Opens every branch at the active row's level under the same parent, as `*` asks. */
+  private openSiblings(row: Row): void {
+    const parent = row.path.slice(0, row.path.lastIndexOf('/'))
+    const opened = new Set(this.opened)
+    for (const one of this.rows) {
+      if (
+        one.branch &&
+        one.depth === row.depth &&
+        one.path.slice(0, one.path.lastIndexOf('/')) === parent
+      ) {
+        opened.add(one.path)
+      }
+    }
+    this.opened = opened
+  }
+
+  /**
+   * Moves to the next row whose key starts with what was typed.
+   *
+   * Letters typed within half a second of each other run together, so `me`
+   * finds `meta` past `message`. A repeated single letter cycles through the
+   * keys that start with it.
+   */
+  private typeahead(letter: string): void {
+    const now = Date.now()
+    const text = now - this.typed.at < 500 ? this.typed.text + letter : letter
+    this.typed = { at: now, text }
+    const wanted = text.toLocaleLowerCase()
+    const repeated = [...wanted].every((one) => one === wanted[0])
+    const rows = this.rows
+    const start = wanted.length === 1 || repeated ? this.active + 1 : this.active
+    for (let step = 0; step < rows.length; step += 1) {
+      const at = (start + step) % rows.length
+      const key = rows[at]?.key?.toLocaleLowerCase()
+      if (key?.startsWith(repeated ? (wanted[0] ?? '') : wanted)) {
+        this.move(at)
+        return
+      }
+    }
   }
 
   private handleRowClick(index: number, row: Row): void {
@@ -485,9 +594,20 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     if (row.branch) {
       const count = entries(value as object).length
       const array = Array.isArray(value)
-      const noun = array ? (count === 1 ? 'item' : 'items') : count === 1 ? 'key' : 'keys'
+      /* The language's own rule for which form a count takes, so a page that
+         sets `lang` and both words reads them right. */
+      const one = new Intl.PluralRules(this.lang || undefined).select(count) === 'one'
+      const words = array
+        ? one
+          ? this.itemLabel
+          : this.itemsLabel
+        : one
+          ? this.keyLabel
+          : this.keysLabel
       return html`<span part="summary">${array ? '[…]' : '{…}'}</span>
-        <span part="count" dir="auto">${`${count} ${noun}`}</span>`
+        <span part="count" dir="auto"
+          >${fillTemplate(words, { count: formatNumbers(this.lang)(count) })}</span
+        >`
     }
     if (typeof value === 'string') {
       return html`<span part="string" dir="ltr">${JSON.stringify(value)}</span>`
@@ -573,7 +693,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
           role="tree"
           tabindex="0"
           ?data-scroller=${this.windowed}
-          aria-label=${this.label || 'Value'}
+          aria-label=${this.label || this.treeLabel}
           aria-activedescendant=${rows.length > 0 ? `row-${this.active}` : nothing}
           @keydown=${this.handleKeydown}
           @scroll=${() => this.virtualize.measure()}
