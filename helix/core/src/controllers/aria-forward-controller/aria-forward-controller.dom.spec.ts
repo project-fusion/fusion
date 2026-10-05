@@ -255,6 +255,14 @@ describe('a state a consumer wrote on the host', () => {
     forward.hostUpdated()
     expect(control.getAttribute('aria-pressed')).toBe('true')
   })
+
+  /* A stage in a sequence marks its name's button as the current step, and the
+     word was left on the button's generic host. */
+  test('aria-current reaches the control', () => {
+    const { control, forward } = scene('aria-current="step"')
+    forward.hostUpdated()
+    expect(control.getAttribute('aria-current')).toBe('step')
+  })
 })
 
 describe('a name a consumer wrote on the host', () => {

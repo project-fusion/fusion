@@ -97,12 +97,17 @@ const RELATIONSHIPS = [
  * written `aria-invalid="true"`, and a picker marks the list or slider it
  * draws with it, and either way the word belongs on the control a reader is on.
  *
+ * `aria-current` is another: a stage in a sequence marks its name's button
+ * `aria-current="step"`, and the button is a host the tree reports as
+ * `generic`, so the word reached nobody until it was carried to the control.
+ *
  * So the record below holds what was forwarded last time, and a host that stops
  * carrying one removes exactly that and nothing else. A control's own attribute
  * is untouched either way, which is the only rule that can be right: this
  * controller knows what the host said and cannot know what the template meant.
  */
 const STATES = [
+  'aria-current',
   'aria-expanded',
   'aria-haspopup',
   'aria-controls',
