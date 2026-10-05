@@ -73,17 +73,25 @@ describe('sparkline', () => {
     expect(heights(await spark('values="1 oops 3"'))).toHaveLength(2)
   })
 
-  test('a label makes it an image, and no label makes it decorative', async () => {
-    /* An unnamed `role="img"` announces "graphic" and stops, which is worse
-       than silence beside a figure that already names itself. */
+  test('a label makes it a named drawing read by key, and no label makes it decorative', async () => {
+    /* An unnamed graphic announces "graphic" and stops, which is worse than
+       silence beside a figure that already names itself. Named, it is the
+       focusable `application` every chart's plot is; with nothing to read,
+       an image. */
     const named = await spark('values="1 2" label="Sessions rose over seven days"')
-    expect(part(named, 'svg')?.getAttribute('role')).toBe('img')
+    expect(part(named, 'svg')?.getAttribute('role')).toBe('application')
+    expect(part(named, 'svg')?.getAttribute('tabindex')).toBe('0')
+    const empty = await spark('label="Sessions"')
+    expect(part(empty, 'svg')?.getAttribute('role')).toBe('img')
+    expect(part(empty, 'svg')?.hasAttribute('tabindex')).toBe(false)
     expect(part(named, 'svg')?.getAttribute('aria-label')).toBe('Sessions rose over seven days')
     expect(part(named, 'svg')?.hasAttribute('aria-hidden')).toBe(false)
 
     const bare = await spark('values="1 2"')
     expect(part(bare, 'svg')?.getAttribute('aria-hidden')).toBe('true')
     expect(part(bare, 'svg')?.hasAttribute('role')).toBe(false)
+    expect(part(bare, 'svg')?.hasAttribute('tabindex')).toBe(false)
+    expect(part(bare, 'live')).toBeNull()
   })
 
   test('absent is an area, `line` is the bare stroke, and a bar is neither', async () => {
@@ -244,5 +252,75 @@ describe('sparkline from a table', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
     await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     expect(heights(host)).toHaveLength(4)
+  })
+})
+
+/* Every other chart is read by key, a reading at a time, and Sparkline was the
+   one that could not be: no keys, no readout, nothing under a pointer. It now
+   takes the same pointer controller. */
+describe('reading a sparkline', () => {
+  type Spark = HTMLElement & {
+    pointer: { set: (at: number) => void }
+    updateComplete: Promise<unknown>
+  }
+  const press = async (host: Spark, key: string): Promise<void> => {
+    part(host, 'svg')?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+    await host.updateComplete
+  }
+
+  test('the keys walk the readings, and the readout says each with where it stands', async () => {
+    const host = (await spark('label="Sessions" values="1240 1318 1102" locale="en"')) as Spark
+    expect(part(host, 'live')?.textContent).toBe('')
+    await press(host, 'ArrowRight')
+    await press(host, 'ArrowRight')
+    expect(part(host, 'live')?.textContent).toBe('1,318 (2 of 3)')
+    await press(host, 'End')
+    expect(part(host, 'live')?.textContent).toBe('1,102 (3 of 3)')
+    expect(part(host, 'readout')?.textContent).toBe('1,102')
+    await press(host, 'Escape')
+    expect(part(host, 'cursor')).toBeNull()
+  })
+
+  test('a table gives each reading its row and its cell as written', async () => {
+    await mount(
+      `<div><table id="deploys"><tbody><tr><th>Mon</th><td data-value="4000">$4k</td></tr><tr><th>Tue</th><td data-value="12000">$12k</td></tr></tbody></table><helix-headless-sparkline for="deploys" label="Deploys"></helix-headless-sparkline></div>`,
+    )
+    const host = document.querySelector('helix-headless-sparkline') as Spark
+    await host.updateComplete
+    await press(host, 'Home')
+    expect(part(host, 'live')?.textContent).toBe('Mon: $4k (1 of 2)')
+  })
+
+  test('a pointer resting on a reading marks it and writes it, at its place', async () => {
+    const host = (await spark('values="2 8 4" plot="bar"')) as Spark
+    host.pointer.set(1)
+    await host.updateComplete
+    const cursor = part(host, 'cursor') as HTMLElement
+    expect(cursor.getAttribute('style')).toContain('inset-inline-start: 50%')
+    expect(cursor.getAttribute('style')).toContain('inset-block-start: 0%')
+    expect(part(host, 'readout')?.textContent).toBe('8')
+  })
+
+  test('`marks` marks the highest and the lowest reading, and absent marks none', async () => {
+    const host = await spark('values="5 9 1 6" marks="high low"')
+    expect(part(host, 'high')?.getAttribute('style')).toContain('inset-block-start: 0%')
+    expect(part(host, 'low')?.getAttribute('style')).toContain('inset-block-start: 100%')
+    const plain = await spark('values="5 9 1 6"')
+    expect([part(plain, 'high'), part(plain, 'low')]).toEqual([null, null])
+  })
+
+  /* A blank cell joined across claims a value the table does not have. */
+  test('a blank cell in a table is a gap in the line, and the readings keep their places', async () => {
+    await mount(
+      `<div><table id="gappy"><tbody><tr><th>Mon</th><td>4</td></tr><tr><th>Tue</th><td>6</td></tr><tr><th>Wed</th><td></td></tr><tr><th>Thu</th><td>8</td></tr><tr><th>Fri</th><td>2</td></tr></tbody></table><helix-headless-sparkline for="gappy" plot="line"></helix-headless-sparkline></div>`,
+    )
+    const host = document.querySelector('helix-headless-sparkline') as Spark
+    await host.updateComplete
+    const d = path(host) ?? ''
+    expect(d.match(/M/g)).toHaveLength(2)
+    expect(d.startsWith('M0,')).toBe(true)
+    expect(d).toContain('M75,')
   })
 })

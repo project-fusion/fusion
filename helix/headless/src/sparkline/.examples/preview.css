@@ -99,3 +99,39 @@ helix-headless-sparkline::part(terminus) {
 helix-headless-sparkline:dir(rtl)::part(terminus) {
   translate: 50% -50%;
 }
+
+helix-headless-sparkline::part(svg):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-sparkline::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-sparkline::part(cursor) {
+  background-color: currentColor;
+  block-size: 5px;
+  border-radius: 50%;
+  inline-size: 5px;
+  pointer-events: none;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+helix-headless-sparkline::part(readout) {
+  background-color: var(--_gray-strong);
+  border-radius: var(--_radius-control);
+  color: var(--_gray-surface);
+  font-size: 0.75rem;
+  padding: 0 0.25rem;
+  pointer-events: none;
+  position: absolute;
+  translate: -50% calc(-100% - 5px);
+  white-space: nowrap;
+}

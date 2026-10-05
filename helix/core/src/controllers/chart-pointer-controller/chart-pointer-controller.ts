@@ -269,6 +269,9 @@ export class ChartPointerController implements ReactiveController {
   /**
    * The box the readings are laid out in, which is the plot and not the host.
    *
+   * Found by its part, or by the id every chart gives its plot, which is how
+   * a sparkline's drawing, whose part is `svg`, is found.
+   *
    * The host also holds the row of labels, so measuring against it would map
    * the pointer over a box taller than the drawing. That mattered the moment a
    * chart started measuring down the box rather than across it, which is what
@@ -285,7 +288,9 @@ export class ChartPointerController implements ReactiveController {
    */
   private box(): DOMRect | undefined {
     if (!this.plot?.isConnected) {
-      this.plot = this.host.renderRoot.querySelector<HTMLElement>('[part="plot"]') ?? undefined
+      this.plot =
+        this.host.renderRoot.querySelector<HTMLElement>(`[part="plot"], #${CHART_PLOT}`) ??
+        undefined
     }
     return this.plot?.getBoundingClientRect()
   }

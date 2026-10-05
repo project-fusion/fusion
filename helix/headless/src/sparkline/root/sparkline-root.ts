@@ -1,17 +1,24 @@
 import {
+  CHART_PLOT,
+  ChartPointerController,
   type Curve,
   customElement,
   extent,
+  formatNumbers,
   HelixElement,
   linear,
   linePath,
   PLOT_WIDTH,
   type Point,
+  type Series,
   SourceController,
+  unbroken,
+  writtenList,
   writtenNumbers,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { extremesOf, readingWords } from '../readings.js'
 
 /**
  * How tall the strip is drawn, which is the one coordinate this family states.
@@ -35,8 +42,16 @@ const STRIP_HEIGHT = 32
  * are set.
  *
  * Without a `label` the sparkline is decorative and `aria-hidden`, for example
- * beside a stat that already says "Sessions, 1,102". With a `label` it is an
- * image named by that sentence.
+ * beside a stat that already says "Sessions, 1,102". With a `label` it is
+ * named by that sentence and read by key, as every chart is: the drawing takes
+ * focus, the arrow keys walk the readings, Home and End go to the first and
+ * the last, Escape puts the reading away, and the `live` part says each
+ * reading with where it stands, such as "Mon: 12 (3 of 7)".
+ *
+ * A pointer resting on the drawing shows the reading under it: the `cursor`
+ * part marks it and the `readout` part writes it. `marks` adds a mark on the
+ * highest and the lowest reading. A blank cell in a `for` table is a gap in
+ * the line.
  *
  * Place it beside a `Stat`, because a change beside a figure is a second fact,
  * as `Stat`'s own spec says. `Trend` is composed the same way.
@@ -54,8 +69,13 @@ const STRIP_HEIGHT = 32
  *
  * @csspart area - The region between the line and the bottom of its range.
  * @csspart bar - One column, drawn when `plot="bar"`.
+ * @csspart cursor - The mark on the reading a pointer or a key rests on, rendered only while there is one. Placed with `inset-inline-start` and `inset-block-start`.
+ * @csspart high - The mark on the highest reading, under `marks="high"`. Placed as `cursor` is.
  * @csspart line - The line's path.
- * @csspart svg - The drawing.
+ * @csspart live - A polite region that says the reading a key moved to, rendered only with a `label`. Hide it visually.
+ * @csspart low - The mark on the lowest reading, under `marks="low"`. Placed as `cursor` is.
+ * @csspart readout - The reading a pointer or a key rests on, as the table or `values` writes it, rendered only while there is one. Placed as `cursor` is.
+ * @csspart svg - The drawing, which takes focus to be read by key where there is a `label`.
  * @csspart terminus - The mark on the last value.
  * @csspart wash-end - The far stop of the area's gradient.
  * @csspart wash-start - The stop of the area's gradient that meets the line.
@@ -121,6 +141,26 @@ export class HelixHeadlessSparkline extends HelixElement {
   label = ''
 
   /**
+   * The locale the readout's numbers and positions are written in, such as
+   * `de` for `1.240`.
+   *
+   * Absent uses the runtime's own. A table's cells are shown as the table
+   * writes them, whatever this says.
+   */
+  @property()
+  locale = ''
+
+  /**
+   * Which readings take a mark of their own: `high`, `low`, or both,
+   * separated by spaces.
+   *
+   * Absent marks none, and the drawing is what it was. Each mark is a part,
+   * placed at its reading, for a stylesheet to draw.
+   */
+  @property()
+  marks = ''
+
+  /**
    * What the readings are drawn as.
    *
    * Absent is `area`, a line with the region beneath it washed. `line` is the
@@ -153,6 +193,17 @@ export class HelixHeadlessSparkline extends HelixElement {
   plot?: 'area' | 'bar' | 'line'
 
   /**
+   * Where a reading the keys moved to stands among the readings, said after
+   * it. `{position}` and `{count}` are replaced with the numbers, written in
+   * `locale`.
+   *
+   * Set it to the words of the page's language, such as `{position} von
+   * {count}`, or to nothing to say no position.
+   */
+  @property({ attribute: 'position-label' })
+  positionLabel = '{position} of {count}'
+
+  /**
    * The numbers, separated by whitespace or by commas.
    *
    * An array assigned to the property works too, which is what React 19 does
@@ -167,26 +218,78 @@ export class HelixHeadlessSparkline extends HelixElement {
      out for itself. */
   protected readonly source = new SourceController(this)
 
+  /**
+   * Finds the reading a pointer or a key rests on, as it does for every
+   * chart, so a sparkline is read the way they are.
+   */
+  readonly pointer = new ChartPointerController(this)
+
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (changed.has('for')) {
       this.source.watch()
     }
   }
 
-  /** The series to draw: the table if there is one, the attribute otherwise. */
-  private points(): number[] {
-    const series = this.source.series
-    return series.length > 0
-      ? (series[0]?.points.map((point) => point.value) ?? [])
-      : writtenNumbers(this.values)
+  /**
+   * The series to draw, and how many readings it has room for: the table's
+   * first series over the table's rows if there is one, the attribute
+   * otherwise.
+   *
+   * Over the rows, so a blank cell is a reading with nothing in it and the
+   * line breaks there, as `LineChart` draws one. Joined across, the line
+   * claimed a value the table does not have.
+   */
+  private drawn(): { count: number; series: Series } {
+    const read = this.source.series
+    if (read.length > 0) {
+      return {
+        count: this.source.rows.length,
+        series: read[0] ?? { name: '', points: [] },
+      }
+    }
+    const values = writtenNumbers(this.values)
+    return {
+      count: values.length,
+      series: { name: '', points: values.map((value, at) => ({ at, label: '', value })) },
+    }
+  }
+
+  /** How many readings there are, which the pointer and the keys walk. */
+  get readings(): number {
+    return this.drawn().count
+  }
+
+  /**
+   * The reading at a place, in words: the table's cell as it is written, or
+   * the number in `locale`, after the row's name where a table gave one.
+   */
+  private reading(at: number, value: number | undefined): { label: string; text: string } {
+    const rows = this.source.rows
+    const row = rows[at]
+    if (!row) {
+      return { label: '', text: value === undefined ? '' : formatNumbers(this.locale)(value) }
+    }
+    /* The first column any row holds a number in, which is the one
+       `readSeries` drew first. */
+    const column = row.cells.findIndex((_, index) =>
+      rows.some((one) => one.cells[index]?.value !== undefined),
+    )
+    return { label: row.label, text: row.cells[column]?.text ?? '' }
   }
 
   protected override render(): TemplateResult {
-    const points = this.points()
+    const { count, series } = this.drawn()
+    const slots: (number | undefined)[] = Array.from({ length: count }, () => undefined)
+    for (const point of series.points) {
+      if (point.at >= 0 && point.at < count) {
+        slots[point.at] = point.value
+      }
+    }
+    const points = slots.filter((value): value is number => value !== undefined)
     /* Two points minimum, because one is not a trend and zero is not a line.
        An `<svg>` given a `d` of `M NaN,NaN` draws nothing and reports nothing,
        so the empty case is stated here rather than left to look like a bug. */
-    const x = linear([0, Math.max(points.length - 1, 1)], [0, PLOT_WIDTH])
+    const x = linear([0, Math.max(count - 1, 1)], [0, PLOT_WIDTH])
     /* **A bar measures from zero and a line measures from its own range**, and
        that is a correctness difference rather than a preference. A bar's
        *length* is the value, so a baseline anywhere but zero makes the lengths
@@ -203,8 +306,16 @@ export class HelixHeadlessSparkline extends HelixElement {
       this.plot === 'bar'
         ? linear([Math.min(0, low), Math.max(0, high)], [STRIP_HEIGHT, 0])
         : linear([low, high], [STRIP_HEIGHT, 0])
-    const coordinates: Point[] = points.map((value, index) => [x(index), y(value)])
-    const path = this.plot === 'bar' ? '' : linePath(coordinates, this.curve ?? 'smooth')
+    /* One path per unbroken run, so a blank reading is a gap and not a line
+       across it. A series with no blank is one run, and draws what it did. */
+    const runs =
+      this.plot === 'bar'
+        ? []
+        : unbroken(series)
+            .map((run) => run.map((point): Point => [x(point.at), y(point.value)]))
+            .map((run) => ({ path: linePath(run, this.curve ?? 'smooth'), run }))
+            .filter((one) => one.path !== '')
+    const path = runs.map((one) => one.path).join('')
 
     /* The same line closed down to the floor of its own range, which is where
        the wash goes. Its own path rather than a fill on the line, because a
@@ -219,7 +330,13 @@ export class HelixHeadlessSparkline extends HelixElement {
        the value nobody set, and `=== 'area'` would answer false. */
     const area =
       this.plot !== 'bar' && this.plot !== 'line' && path !== ''
-        ? `${path}L${PLOT_WIDTH},${STRIP_HEIGHT}L0,${STRIP_HEIGHT}Z`
+        ? runs
+            .map((one) => {
+              const first = one.run[0] as Point
+              const last = one.run.at(-1) as Point
+              return `${one.path}L${last[0]},${STRIP_HEIGHT}L${first[0]},${STRIP_HEIGHT}Z`
+            })
+            .join('')
         : ''
 
     /* One column per reading, inset so neighbors do not touch.
@@ -233,20 +350,26 @@ export class HelixHeadlessSparkline extends HelixElement {
      * gap is the smallest separation that still reads as separate columns at
      * the sizes a sparkline is drawn at, and it comes off the slot rather than
      * off the bar so a two-reading series does not get two enormous slabs. */
-    const slot = PLOT_WIDTH / Math.max(points.length, 1)
+    const slot = PLOT_WIDTH / Math.max(count, 1)
     const floor = y(0)
     const bars =
       this.plot === 'bar'
-        ? points.map((value, index) => ({
-            /* From the baseline to the reading, whichever of the two is
+        ? slots.flatMap((value, index) =>
+            value === undefined
+              ? []
+              : [
+                  {
+                    /* From the baseline to the reading, whichever of the two is
                higher up the box. A reading of exactly zero is a column of no
                height, which paints nothing, and that is the honest drawing of
                nothing rather than a hairline implying something. */
-            height: Math.abs(floor - y(value)),
-            width: slot * 0.72,
-            x: index * slot + slot * 0.14,
-            y: Math.min(floor, y(value)),
-          }))
+                    height: Math.abs(floor - y(value)),
+                    width: slot * 0.72,
+                    x: index * slot + slot * 0.14,
+                    y: Math.min(floor, y(value)),
+                  },
+                ],
+          )
         : []
 
     /* Where the series ended, as percentages of the box.
@@ -258,21 +381,38 @@ export class HelixHeadlessSparkline extends HelixElement {
      * they inherit down and never sideways, the two elements are siblings, and
      * the host cannot be styled from a template without a wrapper element that
      * carries nothing else. */
+    const lastAt = slots.findLastIndex((value) => value !== undefined)
     const end =
       points.length < 2
         ? undefined
-        : `--chart-terminus-x: 100%; --chart-terminus-y: ${
-            (y(points[points.length - 1] as number) / STRIP_HEIGHT) * 100
+        : `--chart-terminus-x: ${(x(lastAt) / PLOT_WIDTH) * 100}%; --chart-terminus-y: ${
+            (y(slots[lastAt] as number) / STRIP_HEIGHT) * 100
           }%`
+    /* Where a reading stands in the box, as percentages from the inline start
+       and the top: on the line for a line, and on the top of its column for a
+       bar. */
+    const at = (index: number, value: number): string => {
+      const across = this.plot === 'bar' ? index * slot + slot / 2 : x(index)
+      return `inset-inline-start: ${(across / PLOT_WIDTH) * 100}%; inset-block-start: ${
+        (y(value) / STRIP_HEIGHT) * 100
+      }%`
+    }
+    const named = this.label !== ''
 
+    /* **Named, the drawing is read by key**, as every chart's plot is: an
+       `application` so a screen reader passes the arrows through, one tab
+       stop, the readings walked by `pointer`. Decorative, it is hidden and
+       takes no stop. */
     return html`<svg
-        aria-hidden=${this.label === '' ? 'true' : nothing}
-        aria-label=${this.label === '' ? nothing : this.label}
+        aria-hidden=${named ? nothing : 'true'}
+        aria-label=${named ? this.label : nothing}
         data-mirror
+        id=${CHART_PLOT}
         part="svg"
         preserveAspectRatio="none"
-        role=${this.label === '' ? nothing : 'img'}
+        role=${named ? (points.length > 0 ? 'application' : 'img') : nothing}
         style=${end ?? nothing}
+        tabindex=${named && points.length > 0 ? '0' : nothing}
         viewBox="0 0 ${PLOT_WIDTH} ${STRIP_HEIGHT}"
       >
         ${
@@ -329,7 +469,65 @@ export class HelixHeadlessSparkline extends HelixElement {
         points.length < 2 || this.plot === 'bar'
           ? nothing
           : html`<span aria-hidden="true" part="terminus" style=${end ?? nothing}></span>`
+      }${this.renderMarks(slots, at)}${this.renderReading(slots, at)}${
+        named && count > 0 ? this.renderLive(slots) : nothing
       }`
+  }
+
+  /** The marks `marks` asks for, on the highest and the lowest reading. */
+  protected renderMarks(
+    slots: (number | undefined)[],
+    at: (index: number, value: number) => string,
+  ): TemplateResult | typeof nothing {
+    const asked = writtenList(this.marks)
+    if (asked.length === 0) {
+      return nothing
+    }
+    const found = extremesOf(slots)
+    return html`${(['high', 'low'] as const).map((name) => {
+      const index = found[name]
+      return asked.includes(name) && index !== undefined
+        ? html`<span
+            aria-hidden="true"
+            part=${name}
+            style=${at(index, slots[index] as number)}
+          ></span>`
+        : nothing
+    })}`
+  }
+
+  /**
+   * The reading a pointer or a key rests on: a mark on it and its words
+   * beside it. Hidden from a screen reader, which hears the `live` part.
+   */
+  protected renderReading(
+    slots: (number | undefined)[],
+    at: (index: number, value: number) => string,
+  ): TemplateResult | typeof nothing {
+    const index = this.pointer.at
+    const value = slots[index]
+    if (index < 0 || value === undefined) {
+      return nothing
+    }
+    const { label, text } = this.reading(index, value)
+    const place = at(index, value)
+    return html`<span aria-hidden="true" part="cursor" style=${place}></span
+      ><span aria-hidden="true" part="readout" style=${place}
+        >${readingWords(label, text, '')}</span
+      >`
+  }
+
+  /**
+   * The polite region that says a reading the keys moved to, in words and
+   * with where it stands. Rendered from the first drawing and empty until a
+   * key moves the reading, so it is heard when its words change.
+   */
+  protected renderLive(slots: (number | undefined)[]): TemplateResult {
+    const index = this.pointer.at
+    const said = this.pointer.keyed && index >= 0 ? this.reading(index, slots[index]) : undefined
+    return html`<span aria-live="polite" part="live" role="status"
+      >${said ? readingWords(said.label, said.text, this.pointer.position) : ''}</span
+    >`
   }
 }
 
