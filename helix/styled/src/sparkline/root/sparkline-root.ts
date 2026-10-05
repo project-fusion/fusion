@@ -3,6 +3,7 @@ import { HelixHeadlessSparkline } from '@fusion.dev/helix-headless/sparkline'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './sparkline-root.css.js'
 
 /**
@@ -35,6 +36,11 @@ import { styles } from './sparkline-root.css.js'
  * @cssproperty --sparkline-block-size - Height of the drawing.
  * @cssproperty --sparkline-color - Color of the line, the area fill, the columns, and the mark.
  * @cssproperty --sparkline-inline-size - Width of the drawing.
+ * @cssproperty --sparkline-mark-color - Color of the dot on the reading a pointer or a key rests on, and of the `marks` dots. Without it, the line's color.
+ * @cssproperty --sparkline-mark-size - Size of the dot on the reading a pointer or a key rests on, and of the `marks` dots.
+ * @cssproperty --sparkline-readout-background-color - Ground of the reading written above the dot.
+ * @cssproperty --sparkline-readout-color - Color of the reading written above the dot.
+ * @cssproperty --sparkline-readout-font-size - Size of the reading written above the dot.
  * @cssproperty --sparkline-width - Thickness of the line, overriding `weight`.
  */
 @customElement('helix-sparkline')
@@ -66,7 +72,7 @@ export class HelixSparkline extends HelixHeadlessSparkline {
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
-  static override styles: CSSResultGroup = [terminusStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, terminusStyles, styles]
 
   /**
    * The shape of the mark on the last reading.
