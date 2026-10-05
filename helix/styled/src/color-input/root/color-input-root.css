@@ -104,6 +104,19 @@
   padding: var(--helix-space-sm);
 }
 
+/* What a page puts above or below the picker takes the picker's inset, since
+   the panel itself has none. A margin, so a slotted button keeps its own
+   padding. */
+::slotted([slot="panel-header"]) {
+  display: block;
+  margin: var(--helix-space-sm) var(--helix-space-sm) var(--helix-space-none);
+}
+
+::slotted([slot="panel-footer"]) {
+  display: block;
+  margin: var(--helix-space-none) var(--helix-space-sm) var(--helix-space-sm);
+}
+
 @media (prefers-reduced-motion: reduce) {
   [part="field"] {
     transition: none;

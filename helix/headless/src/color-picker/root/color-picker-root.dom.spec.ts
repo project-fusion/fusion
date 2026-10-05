@@ -235,10 +235,52 @@ describe('color picker', () => {
   test('the chosen preset is not marked with a ring, but is still announced', async () => {
     // A ring on one swatch is a focus ring in another color sitting there
     // permanently, and what the swatch was chosen for is already showing on the
-    // chip. A screen reader has neither, so `aria-pressed` stays.
+    // chip. A screen reader has neither, so the option says it is selected.
     const host = await picker('default-value="#00ff00" swatches="#ff0000,#00ff00"')
     const swatches = [...(host.shadowRoot?.querySelectorAll('[part="swatch"]') ?? [])]
-    expect(swatches.map((one) => one.getAttribute('aria-pressed'))).toEqual(['false', 'true'])
+    expect(swatches.map((one) => one.getAttribute('aria-selected'))).toEqual(['false', 'true'])
+  })
+
+  test('the presets are a listbox with one tab stop, which the arrows move', async () => {
+    const host = await picker('default-value="#00ff00" swatches="#ff0000,#00ff00,#0000ff"')
+    const row = host.shadowRoot?.querySelector('[part="swatches"]') as HTMLElement
+    const swatches = [...row.querySelectorAll<HTMLElement>('[part="swatch"]')]
+    expect(row.getAttribute('role')).toBe('listbox')
+    expect(swatches.map((one) => one.getAttribute('role'))).toEqual(['option', 'option', 'option'])
+    expect(swatches.map((one) => one.getAttribute('tabindex'))).toEqual(['-1', '0', '-1'])
+    const press = async (key: string): Promise<void> => {
+      ;(host.shadowRoot?.activeElement ?? swatches[1])?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+      await host.updateComplete
+    }
+    swatches[1]?.focus()
+    await press('ArrowRight')
+    expect(host.shadowRoot?.activeElement).toBe(swatches[2])
+    expect(swatches.map((one) => one.getAttribute('tabindex'))).toEqual(['-1', '-1', '0'])
+    expect(host.value).toBe('#00ff00')
+    await press('Home')
+    expect(host.shadowRoot?.activeElement).toBe(swatches[0])
+    swatches[0]?.click()
+    await host.updateComplete
+    expect(host.value).toBe('#ff0000')
+    expect(swatches.map((one) => one.getAttribute('aria-selected'))).toEqual([
+      'true',
+      'false',
+      'false',
+    ])
+  })
+
+  test('the opacity ramp is heard as a percentage', async () => {
+    const host = await picker('alpha default-value="#ff000080"')
+    const ramp = host.shadowRoot?.querySelector('[data-channel="alpha"]') as HTMLElement & {
+      valueText?: string
+    }
+    expect(ramp.getAttribute('value-text')).toBe('50%')
+    const german = await picker('alpha lang="de" default-value="#ff000080"')
+    expect(
+      german.shadowRoot?.querySelector('[data-channel="alpha"]')?.getAttribute('value-text'),
+    ).toBe('50\u00a0%')
   })
 
   test('the chip copies the value, and says so for as long as it shows', async () => {
