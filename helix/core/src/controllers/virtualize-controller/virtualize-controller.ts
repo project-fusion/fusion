@@ -221,6 +221,9 @@ export class VirtualizeController implements ReactiveController {
     }
     this.observer.observe(box)
     box.addEventListener('scroll', this.handleScroll, { passive: true })
+    /* Takes the box out of the browser's scroll anchoring, through a rule
+       `HelixElement` ships into every shadow root. See `VIRTUAL` there. */
+    box.setAttribute('data-virtual', '')
     this.watching = true
   }
 

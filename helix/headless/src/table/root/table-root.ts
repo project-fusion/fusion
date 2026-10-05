@@ -13,6 +13,7 @@ import {
   reflectElements,
   requestChange,
   splitValues,
+  whenHydrated,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -519,10 +520,15 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       if (!row.isTableRow) {
         continue
       }
-      row.selectable = this.selectable
-      row.selected = keys.has(key)
-      row.selectLabel = fillTemplate(this.selectRowLabel, {
-        row: textOf(row.children[0]) || key,
+      const label = fillTemplate(this.selectRowLabel, { row: textOf(row.children[0]) || key })
+      /* Not into a row still hydrating what a server sent: see `whenHydrated`.
+         A server cannot tell a row it is in a selectable table, so it serves no
+         checkbox cell, and one written into the hydrating render is a template
+         where the server's markup has none, which Lit refuses. */
+      whenHydrated(row, () => {
+        row.selectable = this.selectable
+        row.selected = keys.has(key)
+        row.selectLabel = label
       })
     }
   }
@@ -680,6 +686,12 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   /* Columns arrive from the light DOM, which changes no property here, so
      nothing would schedule the render that reads them. */
+  /** Asks for the render a hydration put off, which reads the rows. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   private readonly handleSlotChange = (): void => {
     this.requestUpdate()
   }
@@ -854,7 +866,10 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     if (!this.selectable) {
       return nothing
     }
-    const every = this.keyed.map(({ key }) => key)
+    /* None while the rows are not known, as on a server, so a render hydrating
+       what one sent draws the box the server drew. Read from the rows there,
+       the box's mixed state was primed as committed and never drawn. */
+    const every = this.childrenKnown ? this.keyed.map(({ key }) => key) : []
     const keys = this.chosen
     const count = every.filter((key) => keys.has(key)).length
     const checkbox = this.tag('checkbox')

@@ -450,10 +450,18 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   private async focusIndex(index: number): Promise<void> {
     this.active = index
+    /* Drawn whether or not the window reaches it. Placed by the estimate, the
+       window can stop short of a row once the rows it measured turn out
+       shorter: in Chromium, End on 5000 rows of 18px drew 4983 to 4996. */
+    this.focusing = index
     this.virtualize.reveal(index)
     this.virtualize.measure()
     this.requestUpdate()
-    await this.updateComplete
+    try {
+      await this.updateComplete
+    } finally {
+      this.focusing = undefined
+    }
     /* Focus scrolls the row the rest of the way: placed by the estimate, a
        measured row can land short of the edge once its real height is known. */
     this.rowFor(index)?.focus()
@@ -493,9 +501,12 @@ export class HelixHeadlessVirtualList extends HelixElement {
     return index === undefined ? undefined : Number(index)
   }
 
-  /** The item drawn outside the window to keep focus, if there is one. */
+  /** The item a key is moving focus to, drawn until it has it. */
+  private focusing: number | undefined
+
+  /** The item drawn outside the window to keep focus, or to take it, if there is one. */
   private keptIndex(): number | undefined {
-    const index = this.focusedIndex()
+    const index = this.focusing ?? this.focusedIndex()
     const { first, last } = this.virtualize.window
     return index !== undefined && index < this.data.length && (index < first || index >= last)
       ? index

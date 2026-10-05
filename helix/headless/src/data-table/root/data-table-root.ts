@@ -2171,6 +2171,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.addEventListener('pointerdown', this.notePress, true)
     this.addEventListener('keydown', this.notePress, true)
     this.addEventListener('focusin', this.handleFocusIn)
+    /* And on the shadow root, for a move from one cell to another. Both ends
+       are inside it, so a browser stops the event there: retargeted, its
+       target and its related target are the same host, and the host never
+       hears it. A heading is a light-DOM column, which only the host hears. */
+    this.renderRoot.addEventListener('focusin', this.handleFocusIn as EventListener)
     this.addEventListener('keydown', this.handleGridKey)
     this.addEventListener('keydown', this.handleGripKey)
     this.addEventListener('pointerdown', this.handleGripDown)
@@ -2183,6 +2188,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.removeEventListener('pointerdown', this.notePress, true)
     this.removeEventListener('keydown', this.notePress, true)
     this.removeEventListener('focusin', this.handleFocusIn)
+    this.renderRoot.removeEventListener('focusin', this.handleFocusIn as EventListener)
     this.removeEventListener('keydown', this.handleGridKey)
     this.removeEventListener('keydown', this.handleGripKey)
     this.removeEventListener('pointerdown', this.handleGripDown)
