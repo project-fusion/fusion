@@ -1216,6 +1216,14 @@ fn declaration_of(
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
         let mut attributes = attributes_of(&members, &written);
         unnamed(&mut attributes, &hidden);
+        /* **What the class keeps to itself, held until inheritance has read
+        it.** A member the class redeclares `@internal` takes the parent's
+        published row with it, which only the inheritance step can do, so the
+        names travel on the declaration under a key `withheld` strips once
+        every round is over. */
+        if !hidden.is_empty() {
+            fields.insert(inherit::WITHHELD.to_owned(), json!(hidden));
+        }
         if !attributes.is_empty() {
             fields.insert("attributes".to_owned(), json!(attributes));
         }
@@ -1353,6 +1361,7 @@ pub fn build(package: &Path, given: &str, tier: &str, dependencies: &Dependencie
         mine = next;
     }
 
+    inherit::withheld(&mut finished);
     lend(&written, &mut finished, dependencies);
     declared(&mut finished);
     chained(&mut finished, dependencies);
