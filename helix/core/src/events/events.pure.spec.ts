@@ -1,20 +1,64 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { helixEventNames } from './names.js'
 
 type Module = typeof import('./events.js')
 
+let events: Module
 let HelixRejectEvent: Module['HelixRejectEvent']
-let helixEventNames: Module['helixEventNames']
 
 /* Imported after registration, because the event classes capture whichever
    `Event` is global when the module is evaluated. Specs share one module cache,
    and this file can run before any DOM spec has registered happy-dom. A static
    import here gave every later DOM spec classes that extend bun's built-in
    `Event`, and happy-dom refused their instances with "parameter 1 is not of
-   type 'Event'". */
+   type 'Event'". The names come from `names.js`, which holds no class. */
 beforeAll(async () => {
   registerDom()
-  ;({ HelixRejectEvent, helixEventNames } = await import('./events.js'))
+  events = await import('./events.js')
+  ;({ HelixRejectEvent } = events)
+})
+
+describe('the names this library dispatches', () => {
+  test('are the names of the event classes, every one and no other', () => {
+    const named = Object.values(events)
+      .map((value) => (value as { eventName?: unknown }).eventName)
+      .filter((name): name is string => typeof name === 'string')
+    expect([...helixEventNames].sort()).toEqual([...new Set(named)].sort())
+  })
+
+  test('each class is in a module of its own, which a bundle drops whole when nothing uses it', () => {
+    const crowded = readdirSync(import.meta.dir)
+      .filter((file) => file.endsWith('.ts') && !file.endsWith('.spec.ts'))
+      .filter(
+        (file) =>
+          (readFileSync(join(import.meta.dir, file), 'utf8').match(/^export class /gm) ?? [])
+            .length > 1,
+      )
+    expect(crowded).toEqual([])
+  })
+
+  test('ship without the event classes, so a family pays only for the events it sends', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'helix-events-'))
+    try {
+      const entry = join(dir, 'entry.js')
+      writeFileSync(
+        entry,
+        `import { helixEventNames } from ${JSON.stringify(join(import.meta.dir, 'events.ts'))}\n` +
+          'console.log(helixEventNames)\n',
+      )
+      const built = await Bun.build({ entrypoints: [entry], format: 'esm', target: 'browser' })
+      const code = await built.outputs[0]?.text()
+      expect(code).toContain('helix-before-open')
+      expect(code).not.toContain('extends CustomEvent')
+      expect(code).not.toContain('extends Event')
+    } finally {
+      rmSync(dir, { force: true, recursive: true })
+    }
+  })
 })
 
 describe('the event a file field sends for the files it refused', () => {

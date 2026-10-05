@@ -1412,9 +1412,13 @@ universal channel, and it needs a name a plain listener can use.
 
 The type in braces is what lets the React generator emit
 `(event: HelixBeforeOpenEvent) => void` instead of `(detail: unknown)`. Each event is a
-class in `helix/core/src/events/events.ts` that carries its own name and augments
-`HTMLElementEventMap`. There is no generic `emit(name, detail)` helper: a
-dispatch through one cannot be named by the analyzer.
+class that carries its own name, in a module of its own in `helix/core/src/events/`,
+and `events.ts` there gathers them, registers them and augments
+`HTMLElementEventMap`. One class to a module, because the compiler writes a
+static name as a static block, which Bun and Rollup keep as a side effect: with
+every class in one file, every element shipped all of them. There is no generic
+`emit(name, detail)` helper: a dispatch through one cannot be named by the
+analyzer.
 
 **Every state change is announced twice, and the two are for different
 people.**
