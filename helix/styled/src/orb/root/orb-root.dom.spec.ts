@@ -158,21 +158,27 @@ describe('orb', () => {
     expect(host.getAttribute('state')).toBe('working')
   })
 
-  test('says a new state aloud only when `announce` is set, and never the first one', async () => {
+  /* A live region inside a progress bar or an image may never be heard: what
+     those two hold is presentation to assistive technology. So an orb that
+     announces is the region itself, a `status` holding the state's word. */
+  test('says a new state aloud only when `announce` is set, as a status region of its own', async () => {
     const quiet = (await mount('<helix-orb state="working"></helix-orb>')) as Upgraded
     quiet.state = 'done'
     await quiet.updateComplete
     expect(quiet.shadowRoot?.querySelector('[part="live"]')).toBeNull()
+    expect(role(quiet)).toBe('img')
 
     const loud = (await mount('<helix-orb announce state="working"></helix-orb>')) as Upgraded
-    expect(loud.shadowRoot?.querySelector('[part="live"]')).toBeNull()
+    expect(role(loud)).toBe('status')
+    expect(loud.internals?.ariaBusy ?? null).toBeNull()
+    expect(label(loud)).toBe('Working')
+    const live = loud.shadowRoot?.querySelector('[part="live"]')
+    expect(live?.getAttribute('role')).toBeNull()
+    expect(live?.textContent).toBe('Working')
     loud.state = 'done'
     await loud.updateComplete
-    await new Promise((resolve) => requestAnimationFrame(resolve))
-    await loud.updateComplete
-    const live = loud.shadowRoot?.querySelector('[part="live"]')
-    expect(live?.getAttribute('role')).toBe('status')
-    expect(live?.textContent).toBe('Done')
+    expect(role(loud)).toBe('status')
+    expect(loud.shadowRoot?.querySelector('[part="live"]')?.textContent).toBe('Done')
   })
 
   /* **Lit updates an element whether or not it is still connected**, so one
