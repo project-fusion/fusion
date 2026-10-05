@@ -65,9 +65,6 @@ const TRIGGER_ID = 'trigger'
  * @csspart heading - The heading that holds the trigger.
  * @csspart trigger - The button that opens and closes the section, holding the summary.
  *
- * @cssproperty --accordion-content-height - The height of the content when open, in pixels,
- *   measured whenever it changes, for a stylesheet that animates the section its own way.
- *
  * @cssstate open - While the item is open.
  */
 @customElement('helix-headless-accordion-item')
@@ -186,25 +183,6 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
     ;(event.currentTarget as HTMLElement).setAttribute('hidden', 'until-found')
   }
 
-  /** Watches the content's size, for `--accordion-content-height`. */
-  private sizes: ResizeObserver | undefined
-
-  /**
-   * Publishes how tall the content is when open.
-   *
-   * `scrollHeight` of the inner box, which is the content's whole height
-   * whatever the region is clipped to. A closed region with no box reads 0
-   * and leaves the last height in place.
-   */
-  private readonly measure = (): void => {
-    const inner = this.renderRoot?.querySelector<HTMLElement>('[part="content-inner"]')
-    const region = this.renderRoot?.querySelector<HTMLElement>('[part="content"]')
-    const height = inner?.scrollHeight ?? 0
-    if (region && height > 0) {
-      region.style.setProperty('--accordion-content-height', `${height}px`)
-    }
-  }
-
   /** Whether the item was open at the last update, and `undefined` before one. */
   private wasOpen: boolean | undefined = undefined
 
@@ -305,34 +283,6 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
       this.closePeers()
     }
     this.wasOpen = this.open
-    if (changed.has('open')) {
-      this.measure()
-    }
-  }
-
-  /** Starts watching the content's size, once there is a render to watch. */
-  private watchSize(): void {
-    const inner = this.hasUpdated ? this.renderRoot.querySelector('[part="content-inner"]') : null
-    if (inner && !this.sizes && typeof ResizeObserver !== 'undefined') {
-      this.sizes = new ResizeObserver(this.measure)
-      this.sizes.observe(inner)
-    }
-  }
-
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    this.watchSize()
-  }
-
-  override connectedCallback(): void {
-    super.connectedCallback()
-    this.watchSize()
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    this.sizes?.disconnect()
-    this.sizes = undefined
   }
 
   /**

@@ -41,6 +41,13 @@ let showing: HelixHeadlessMegamenu | undefined
  * which. Hover is the default because in a navigation bar people expect to move
  * along the row and see each section.
  *
+ * When one panel opens in place of another, each says which way the reader
+ * moved, as Radix's `data-motion` does: the one opening is
+ * `:state(from-start)` or `:state(from-end)`, by where the one closing sits in
+ * the bar, and the one closing is `:state(to-start)` or `:state(to-end)`. A
+ * stylesheet slides them on that. Put megamenus in a `Navigation` with
+ * `arrows` and the arrow keys move between their triggers.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -59,8 +66,12 @@ let showing: HelixHeadlessMegamenu | undefined
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  *
+ * @cssstate from-end - The panel opened in place of one later in the bar, so it can enter from that side.
+ * @cssstate from-start - The panel opened in place of one earlier in the bar.
  * @cssstate narrow - The page is narrower than `band-below`, so the panel is shown as a band whatever its variant.
  * @cssstate open - The panel is open, and the trigger is shown as current.
+ * @cssstate to-end - The panel closed because one later in the bar opened, so it can leave toward it.
+ * @cssstate to-start - The panel closed because one earlier in the bar opened.
  */
 @customElement('helix-headless-megamenu')
 export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
@@ -204,6 +215,14 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
       this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]'),
       this.partNamed('trigger') ?? this,
     )
+  }
+
+  /**
+   * @internal The control a `Navigation`'s arrow keys move to: the trigger
+   * the consumer slotted, or the button drawn in its place.
+   */
+  get navigationControl(): HTMLElement {
+    return this.trigger
   }
 
   /** Shuts it and puts the reader back where they were. */
@@ -482,13 +501,32 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
       return
     }
     if (this.open) {
-      if (showing && showing !== this) {
-        showing.requestOpen(false)
+      const previous = showing && showing !== this ? showing : undefined
+      /* Which way the reader moved along the bar: toward the end where this
+         one comes after the one closing. */
+      const forward =
+        previous !== undefined &&
+        (previous.compareDocumentPosition(this) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
+      this.motion(previous ? (forward ? 'from-end' : 'from-start') : undefined)
+      if (previous) {
+        previous.motion(forward ? 'to-end' : 'to-start')
+        previous.requestOpen(false)
       }
       showing = this
     } else if (showing === this) {
       showing = undefined
     }
+  }
+
+  /**
+   * Says which way the reader moved when one panel took over from another.
+   * Nothing clears all four, for a panel opened on its own.
+   */
+  private motion(to: 'from-end' | 'from-start' | 'to-end' | 'to-start' | undefined): void {
+    this.toggleState('from-end', to === 'from-end')
+    this.toggleState('from-start', to === 'from-start')
+    this.toggleState('to-end', to === 'to-end')
+    this.toggleState('to-start', to === 'to-start')
   }
 
   protected override updated(changed: PropertyValues): void {

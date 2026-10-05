@@ -8,7 +8,7 @@
      the bar and its items have to agree. Relative, they parted wherever the step
      moved: inside App Header, already at `sm`, the bar came out 25.6 around 32
      pixel items, and `overflow-x` scrolled them in their own bar. */
-  block-size: var(--helix-size-control-sm);
+  block-size: var(--navigation-block-size, var(--helix-size-control-sm));
   display: flex;
   gap: var(--navigation-gap, var(--helix-space-2xs));
   /* Long navigation scrolls inside the bar instead of widening the page. */
@@ -22,7 +22,8 @@
 [part="indicator"] {
   background-color: var(--navigation-indicator-color, var(--helix-color-surface-sunken));
   block-size: var(--indicator-block-size, 0);
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--navigation-indicator-radius, var(--helix-radii-sm));
+  box-shadow: var(--navigation-indicator-shadow, none);
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;

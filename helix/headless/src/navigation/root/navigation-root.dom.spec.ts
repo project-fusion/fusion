@@ -4,6 +4,7 @@ import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/d
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../megamenu/index.js')
 })
 
 const bar = `<helix-headless-navigation label="Sections">
@@ -54,5 +55,54 @@ describe('the marker on a sidebar of sections', () => {
     </helix-headless-navigation>`)
     await new Promise((resolve) => requestAnimationFrame(resolve))
     expect(part(nav, 'indicator')?.hasAttribute('data-placed')).toBe(true)
+  })
+})
+
+describe('the arrow keys', () => {
+  /* Radix's navigation menu: the arrows move along the bar's destinations, and
+     a megamenu among them is reached at its trigger. */
+  const keyed = `<helix-headless-navigation arrows label="Sections">
+    <a href="/design">Design</a>
+    <helix-headless-megamenu label="Products"><a href="/a">A</a></helix-headless-megamenu>
+    <a href="/mind">Mind</a>
+  </helix-headless-navigation>`
+
+  const press = (from: Element, key: string): boolean => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    from.dispatchEvent(event)
+    return event.defaultPrevented
+  }
+
+  test('move along the row, reach a megamenu at its trigger, and stop at the ends', async () => {
+    const nav = await mount(keyed)
+    const [design, mind] = [...nav.querySelectorAll(':scope > a')] as HTMLElement[]
+    const mega = nav.querySelector('helix-headless-megamenu') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await mega.updateComplete
+    design?.focus()
+    const trigger = (mega as unknown as { navigationControl: HTMLElement }).navigationControl
+    expect(trigger.getAttribute('part')).toBe('trigger')
+    expect(press(design as HTMLElement, 'ArrowRight')).toBe(true)
+    expect(document.activeElement).toBe(mega)
+    press(trigger, 'ArrowRight')
+    expect(document.activeElement).toBe(mind ?? null)
+    press(mind as HTMLElement, 'ArrowRight')
+    expect(document.activeElement).toBe(mind ?? null)
+    press(mind as HTMLElement, 'Home')
+    expect(document.activeElement).toBe(design ?? null)
+  })
+
+  test('leave the other axis to the page, and do nothing unless asked for', async () => {
+    const nav = await mount(keyed)
+    const design = nav.querySelector('a') as HTMLElement
+    expect(press(design, 'ArrowDown')).toBe(false)
+    const plain = await mount(bar)
+    expect(press(plain.querySelector('a') as HTMLElement, 'ArrowRight')).toBe(false)
   })
 })
