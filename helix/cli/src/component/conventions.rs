@@ -44,21 +44,47 @@ const APPEARANCE: [&str; 4] = ["themed", "a styled", "styled", "a themed"];
 /// with `showPopover()` fire them on an element inside a shadow root, where they
 /// neither bubble nor compose and so reach nobody. Relaying is the platform
 /// doing the work rather than an invention.
-const RELAYED: [&str; 14] = [
+///
+/// The media names are the HTML standard's events of a media element, every
+/// one of them, which `Video` relays from its inner `<video>` so a listener on
+/// the player hears what it would hear on the element. `scroll` and `scrollend`
+/// are `Scroll Area`'s, sent from the host for the viewport it scrolls.
+const RELAYED: [&str; 35] = [
+    "abort",
     "beforetoggle",
     "blur",
     "cancel",
+    "canplay",
+    "canplaythrough",
     "change",
     "close",
+    "durationchange",
+    "emptied",
     "ended",
     "error",
     "focus",
     "input",
     "invalid",
     "load",
+    "loadeddata",
+    "loadedmetadata",
+    "loadstart",
     "pause",
     "play",
+    "playing",
+    "progress",
+    "ratechange",
+    "resize",
+    "scroll",
+    "scrollend",
+    "seeked",
+    "seeking",
+    "stalled",
+    "suspend",
+    "timeupdate",
     "toggle",
+    "volumechange",
+    "waiting",
 ];
 
 /// The metadata every component carries, and the tag it comes from.
@@ -411,6 +437,17 @@ mod tests {
     #[test]
     fn a_relayed_native_event_keeps_the_native_name() {
         assert!(said(&json!({ "events": [{ "description": "x", "name": "change" }] })).is_empty());
+    }
+
+    /// A player relays every media event, and a scroll area its scrolling.
+    #[test]
+    fn media_and_scroll_events_are_relayed_under_their_native_names() {
+        for name in ["timeupdate", "volumechange", "loadedmetadata", "scroll", "scrollend"] {
+            assert!(
+                said(&json!({ "events": [{ "description": "x", "name": name }] })).is_empty(),
+                "{name}"
+            );
+        }
     }
 
     /* **Hyphens are not limited.** Measured in Chrome against React 19.2.8,
