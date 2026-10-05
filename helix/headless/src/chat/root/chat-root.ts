@@ -153,7 +153,8 @@ const spoken = (message: Element): string =>
  *
  * A screen reader names each turn by its author and its time, such as "You, 2
  * minutes ago". Set `me-label` and `message-label` to say it in your language,
- * and give each turn by `them` an `author-label`.
+ * and give each turn by `them` an `author-label`. A turn with neither an author
+ * label nor a time is named by `turn-label`, "Message".
  *
  * A turn from `turns` is drawn in the chat's shadow root, so style it through
  * the forwarded `message-*` parts. A turn by `me` also gets each part with
@@ -322,6 +323,13 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    */
   @property({ type: Number })
   threshold = 48
+
+  /**
+   * The name a screen reader gives a turn with neither an author it can say
+   * nor a time: a turn by `them` with no `author-label`, say.
+   */
+  @property({ attribute: 'turn-label' })
+  turnLabel = 'Message'
 
   /**
    * The turns as data, for a transcript too long to hold as elements.
@@ -845,8 +853,8 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Conversation', role: 'region' })
-    if (changed.has('meLabel') || changed.has('messageLabel')) {
-      this.words = { me: this.meLabel, sentence: this.messageLabel }
+    if (changed.has('meLabel') || changed.has('messageLabel') || changed.has('turnLabel')) {
+      this.words = { me: this.meLabel, sentence: this.messageLabel, turn: this.turnLabel }
     }
     this.countRegions()
     if (changed.has('history')) {

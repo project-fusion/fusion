@@ -12,10 +12,12 @@ export interface TurnWords {
   me: string
   /** The sentence for a turn with an author and a time, with `{author}` and `{time}`. */
   sentence: string
+  /** The name of a turn with neither an author a reader can be told nor a time. */
+  turn: string
 }
 
 /** The words a chat says its turns with, where nobody said otherwise. */
-export const TURN_WORDS: TurnWords = { me: 'You', sentence: '{author}, {time}' }
+export const TURN_WORDS: TurnWords = { me: 'You', sentence: '{author}, {time}', turn: 'Message' }
 
 /**
  * Who wrote a turn, in words: its `author-label`, or else the chat's word for
@@ -40,7 +42,11 @@ export const authorWords = (
 
 /**
  * The turn's accessible name: the sentence where it has an author and a time,
- * and whichever of the two it has otherwise. Empty where it has neither.
+ * and whichever of the two it has otherwise. Where it has neither, a turn by
+ * `them` with no `author-label` and no time, the chat's word for a turn, so
+ * no turn is an `article` with no name.
  */
 export const turnName = (author: string, time: string, words: TurnWords): string =>
-  author !== '' && time !== '' ? fillTemplate(words.sentence, { author, time }) : author || time
+  author !== '' && time !== ''
+    ? fillTemplate(words.sentence, { author, time })
+    : author || time || words.turn
