@@ -62,6 +62,7 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * @csspart label - The option's label.
  * @csspart text - The label and the description under it, as one column.
  *
+ * @cssstate active - While the keyboard is on the option, which is the option `aria-activedescendant` names.
  * @cssstate selected - While the option is chosen.
  */
 @customElement('helix-headless-option')
@@ -69,7 +70,9 @@ export class HelixHeadlessOption extends HelixElement {
   /**
    * Whether this is the option the keyboard is on.
    *
-   * Written by the listbox.
+   * Written by the listbox, which writes it once a reader moves the highlight.
+   * It shows as `:state(active)`, and as a `data-active` attribute for the
+   * stylesheets written before the state existed.
    */
   @property({ attribute: 'data-active', reflect: true, type: Boolean })
   active = false
@@ -280,6 +283,7 @@ export class HelixHeadlessOption extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('selected', this.selected)
+    this.toggleState('active', this.active)
   }
 
   protected override render(): TemplateResult {

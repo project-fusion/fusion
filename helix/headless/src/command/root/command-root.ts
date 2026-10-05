@@ -63,6 +63,7 @@ const parse = (hotkey: string) => {
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The palette is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The palette is about to open. Cancelable: cancel it to keep it closed.
+ * @event {HelixFilterEvent} helix-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the commands yourself, for example on a server while `loading` is set.
  * @event {HelixSelectEvent} helix-select - A command was chosen. Cancelable: cancel it to keep the palette open.
  * @event {Event} toggle - The palette opened or closed. The event carries `newState` and `oldState`.
  *
@@ -100,6 +101,21 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   @property()
   hotkey = 'mod+k'
+
+  /**
+   * Whether the commands are still loading, for a palette that asks a server
+   * for them as the user types.
+   *
+   * Passed to the list, which shows `loading-text` and tells screen readers.
+   */
+  @property({ reflect: true, type: Boolean })
+  loading = false
+
+  /**
+   * The text shown while the commands load.
+   */
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading'
 
   /**
    * Accessible name for the overlay, which has no visible heading.
@@ -187,15 +203,17 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   }
 
   /**
-   * The row under the keyboard, read from the attribute the listbox writes.
+   * The row under the keyboard, read from the `active` property the listbox
+   * writes on each option.
    *
-   * `data-active` rather than a reference the listbox hands over, because the
-   * options are this element's own light DOM children and the attribute is
-   * already published: asking the listbox would mean a second channel saying
-   * what the markup says.
+   * Off the options rather than a reference the listbox hands over, because
+   * they are this element's own light DOM children and already say it.
    */
   private get activeOption(): (Element & { alternate?: string; value?: string }) | null {
-    return this.querySelector('[data-active]')
+    return (
+      this.listbox?.options.find((option) => option.active && !option.hidden) ??
+      this.querySelector('[data-active]')
+    )
   }
 
   /**
@@ -344,6 +362,8 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         aria-label=${this.label}
         empty-text=${this.emptyText}
         filter-label=${this.placeholder}
+        loading-text=${this.loadingText}
+        ?loading=${this.loading}
         filterable
         @helix-before-change=${this.handleChange}
         @change=${this.stopInner}

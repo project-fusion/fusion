@@ -307,6 +307,121 @@ describe('the keyboard in a filterable list', () => {
     await into(host, 'ArrowDown')
     expect(host.shadowRoot?.activeElement).toBe(field(host))
   })
+
+  test('a space is typed into the field, and chooses nothing', async () => {
+    /* Measured before this: the space reached the host handler, which took it
+       for choosing, so "New Y" chose New York and the field read "NewY". The
+       same handler served Select's filter and the command palette. */
+    const host = (await list('filterable')) as Updatable & { value: string }
+    type(host, 'a')
+    await settle(host)
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: ' ',
+    })
+    field(host).dispatchEvent(event)
+    await settle(host)
+    expect(event.defaultPrevented).toBe(false)
+    expect(host.value).toBe('')
+  })
+
+  test('the field is the one tab stop, and the list is not a second', async () => {
+    /* A second stop on the list was one where the arrows chose as they moved,
+       so in a command palette a Tab and an arrow ran a command. */
+    const host = (await list('filterable')) as Updatable
+    expect((part(host, 'items') as HTMLElement).hasAttribute('tabindex')).toBe(false)
+  })
+})
+
+describe('the keyboard in a list', () => {
+  const active = (host: Updatable): string | undefined =>
+    options(host)
+      .find((option) => option.active)
+      ?.textContent?.trim()
+
+  test('with `manual`, the arrows move without choosing, and Enter chooses', async () => {
+    const host = (await list('manual default-value="one"')) as Updatable & { value: string }
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowDown')
+    expect(host.value).toBe('one')
+    expect(active(host)).toBe('Gamma')
+    await press(host, 'Enter')
+    expect(host.value).toBe('three')
+  })
+
+  test('a letter moves to the option whose words start with it', async () => {
+    const host = (await list('manual')) as Updatable & { value: string }
+    await press(host, 'g')
+    expect(active(host)).toBe('Gamma')
+    expect(host.value).toBe('')
+  })
+
+  test('and chooses it, where moving is choosing', async () => {
+    const host = (await list()) as Updatable & { value: string }
+    await press(host, 'b')
+    expect(host.value).toBe('two')
+  })
+
+  test('PageDown and PageUp move a page, stopping at the ends', async () => {
+    const host = (await list('manual')) as Updatable
+    await press(host, 'ArrowDown')
+    await press(host, 'PageDown')
+    expect(active(host)).toBe('Gamma')
+    await press(host, 'PageUp')
+    expect(active(host)).toBe('Alpha')
+  })
+
+  test('a value set from outside takes the highlight with it', async () => {
+    /* Measured before this: the highlight stayed on the option picked before,
+       so the first arrow after a script set the value moved from the old pick
+       and chose its neighbor. */
+    const host = (await list()) as Updatable & { value: string }
+    await press(host, 'End')
+    expect(host.value).toBe('three')
+    host.value = 'one'
+    await settle(host)
+    await press(host, 'ArrowDown')
+    expect(host.value).toBe('two')
+  })
+})
+
+describe('an option the markup declares chosen', () => {
+  test('is the list`s value, and what a reset returns to', async () => {
+    document.body.innerHTML = `<helix-headless-listbox label="L" name="c">
+      <helix-headless-option value="one">Alpha</helix-headless-option>
+      <helix-headless-option value="two" selected>Beta</helix-headless-option>
+    </helix-headless-listbox>`
+    const host = document.querySelector('helix-headless-listbox') as Updatable & {
+      formResetCallback(): void
+      value: string
+    }
+    await settle(host)
+    expect(host.value).toBe('two')
+    expect(formValue(host)).toBe('two')
+    host.value = 'one'
+    await settle(host)
+    // happy-dom runs no reset algorithm, so the callback is called as a form would.
+    host.formResetCallback()
+    await settle(host)
+    expect(host.value).toBe('two')
+  })
+})
+
+describe('an option that leaves', () => {
+  test('takes its value with it, so the form no longer submits it', async () => {
+    const host = (await list('default-value="two"')) as Updatable & { value: string }
+    options(host)[1]?.remove()
+    await settle(host)
+    expect(host.value).toBe('')
+    expect(formValue(host)).toBeNull()
+  })
+
+  test('while a value set ahead of its options is kept until they arrive', async () => {
+    const host = (await list('default-value="four"')) as Updatable & { value: string }
+    expect(host.value).toBe('four')
+  })
 })
 
 /* Only in a real engine. `ariaActiveDescendantElement` is an element reference,

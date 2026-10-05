@@ -12,6 +12,8 @@ import {
   reportValues,
   requestChange,
   scrollItemIntoView,
+  Typeahead,
+  typesCharacter,
 } from '@fusion.dev/helix-core'
 import { magnifyingGlass } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -21,7 +23,19 @@ import { HelixHeadlessOptionGroup } from '../../option/group/option-group.js'
 import { HelixHeadlessOption } from '../../option/root/option-root.js'
 
 /** The keys that move within a list, which is every key that moves at all. */
-const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home'])
+const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageUp'])
+
+/**
+ * The keys that move the list from a text field the reader is typing in.
+ *
+ * Home and End are left out. In a text field they move the caret, which is
+ * what a reader editing a word expects, and APG lists them among the field's
+ * own editing keys for a combobox.
+ */
+const FIELD_MOVES = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp'])
+
+/** How many rows a page key moves where the list has no height to measure. */
+const PAGE = 10
 
 /**
  * The ranges each filtering list has matched, so the union can be rebuilt when
@@ -130,6 +144,12 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * Selected and active are separate. The selected option is the value. The
  * active option is where the keyboard is: the arrow keys move it, and
  * `aria-activedescendant` points to it while focus stays on the list.
+ *
+ * The arrow keys, Home, End, PageUp and PageDown move the highlight, and typed
+ * letters move it to the next option whose words start with them. In a
+ * single-choice list the highlight is the choice unless `manual` is set; then
+ * Enter, Space or a click chooses. In a filter field, Space, Home, End and
+ * letters edit the text.
  *
  * @since 0.1.0
  * @status stable
@@ -242,6 +262,17 @@ export class HelixHeadlessListbox extends MixinCollection(
   filterLabel = 'Filter'
 
   /**
+   * Stops the arrow keys from choosing each option they move to. Enter, Space
+   * or a click chooses the highlighted option.
+   *
+   * By default a single-choice list chooses as the arrows move, as a radio
+   * group does. Select and Time Input set this on the list in their panel, so
+   * a reader can move through the options before closing the panel on one.
+   */
+  @property({ type: Boolean })
+  manual = false
+
+  /**
    * Whether more than one option can be chosen.
    */
   @property({ reflect: true, type: Boolean })
@@ -252,6 +283,21 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   @state()
   private activeValue = ''
+
+  /**
+   * Whether the highlight was cleared on purpose, so the filter does not put
+   * it back on the first match.
+   */
+  private parked = false
+
+  /** The letters typed at the list, which move the highlight to a match. */
+  private readonly typeahead = new Typeahead()
+
+  /**
+   * The values of the options seen on the last pass, so an option that leaves
+   * can be told apart from one that has not arrived yet.
+   */
+  private seen = new Set<string>()
 
   /**
    * Whether the key being handled was forwarded rather than typed into this.
@@ -312,6 +358,63 @@ export class HelixHeadlessListbox extends MixinCollection(
   set selectedIndex(at: number) {
     const option = this.options[at]
     this.value = option?.value ?? ''
+  }
+
+  /**
+   * @internal Moves the highlight without choosing, for the control that owns
+   * this list: to the first or last option a reader can reach, to the chosen
+   * one (or the first where none is), or nowhere.
+   *
+   * Select opens its panel on the chosen option, or on the last one for
+   * ArrowUp, and Combobox moves the highlight off the list onto its create row.
+   */
+  highlight(where: 'first' | 'last' | 'none' | 'selected'): void {
+    const shown = this.shown.filter((option) => !option.disabled)
+    this.typeahead.reset()
+    this.parked = where === 'none'
+    if (where === 'none') {
+      this.activeValue = ''
+    } else if (where === 'first') {
+      this.activeValue = shown[0]?.value ?? ''
+    } else if (where === 'last') {
+      this.activeValue = shown.at(-1)?.value ?? ''
+    } else {
+      const chosen = shown.find((option) => this.values.includes(option.value))
+      this.activeValue = (chosen ?? shown[0])?.value ?? ''
+    }
+    if (this.childrenKnown) {
+      this.place()
+    }
+  }
+
+  /**
+   * @internal Moves the highlight to the option whose words start with the
+   * letters typed, and returns its value, or nothing where none matches.
+   *
+   * For a control that takes the letters while this list is not where focus
+   * is: Select's closed trigger chooses the option this returns, as a native
+   * `<select>` does.
+   */
+  typeaheadTo(key: string): string | undefined {
+    const shown = this.shown.filter((option) => !option.disabled)
+    const from = shown.findIndex((option) => option.value === this.currentValue)
+    const at = this.typeahead.match(
+      key,
+      shown.map((option) => option.text),
+      from,
+    )
+    const target = shown[at]
+    if (!target) {
+      return undefined
+    }
+    this.parked = false
+    this.activeValue = target.value
+    return target.value
+  }
+
+  /** @internal Whether letters typed in the last moment are still one search. */
+  get typing(): boolean {
+    return this.typeahead.typing()
   }
 
   /**
@@ -432,58 +535,102 @@ export class HelixHeadlessListbox extends MixinCollection(
    * Space and Enter are how a multi-select list chooses, and they are also how
    * a single-select one confirms what the arrows already did, so they act
    * either way rather than being guarded on `multiple`.
+   *
+   * **A reader in a text field is typing.** That is a filter field of this
+   * list's own, or a combobox's field that forwards its keys through
+   * `navigate`. There a Space is a character, Home and End move the caret, and
+   * a letter is a letter. Measured before this: a Space typed into a filter,
+   * a combobox or a command palette chose the highlighted option and closed the
+   * panel, so a query of two words could not be typed.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const shown = this.shown.filter((option) => !option.disabled)
     if (shown.length === 0) {
       return
     }
-    if (event.key === ' ' || event.key === 'Enter') {
-      event.preventDefault()
+    const typing = this.forwarded || event.composedPath()[0] === this.partNamed('search-field')
+    if (event.key === 'Enter' || (event.key === ' ' && !typing && !this.typeahead.typing())) {
+      /* Only where there is something to choose, so an Enter over a list with
+         no highlight is left to the page, which may submit a form with it. */
       if (this.activeValue !== '') {
+        event.preventDefault()
         this.choose(this.activeValue)
+      } else if (event.key === ' ') {
+        event.preventDefault()
       }
       return
     }
-    /* The list's own movement keys, plus Enter, which is choosing rather than
-       moving and is still the list's: a reader who has narrowed to one option
-       expects Enter to take it without leaving the field first. */
-    if (!MOVES.has(event.key) && event.key !== 'Enter') {
+    if (!typing && typesCharacter(event)) {
+      event.preventDefault()
+      const value = this.typeaheadTo(event.key)
+      if (value !== undefined) {
+        this.arrive(value)
+      }
+      return
+    }
+    if (!(typing ? FIELD_MOVES : MOVES).has(event.key)) {
       return
     }
     event.preventDefault()
+    this.typeahead.reset()
 
     const from = this.currentValue
     const at = shown.findIndex((option) => option.value === from)
+    const last = shown.length - 1
     let next = at
     if (event.key === 'ArrowDown') {
       next = at < 0 ? 0 : (at + 1) % shown.length
     } else if (event.key === 'ArrowUp') {
-      next = at < 0 ? shown.length - 1 : (at - 1 + shown.length) % shown.length
+      next = at < 0 ? last : (at - 1 + shown.length) % shown.length
     } else if (event.key === 'Home') {
       next = 0
+    } else if (event.key === 'End') {
+      next = last
+    } else if (event.key === 'PageDown') {
+      next = at < 0 ? 0 : Math.min(at + this.pageSize(), last)
     } else {
-      next = shown.length - 1
+      next = at < 0 ? last : Math.max(at - this.pageSize(), 0)
     }
 
     const target = shown[next]
-    if (!target) {
-      return
+    if (target) {
+      this.arrive(target.value)
     }
-    this.activeValue = target.value
-    /* Chosen on the way past only where moving is choosing. With `multiple` a
-       reader passing over four options on the way to the fifth did not mean to
-       pick all five.
+  }
 
-       Nor where the keys were forwarded. A list with the focus on it selects as
-       it moves, which is the pattern for a listbox; a combobox's arrows move
-       the highlight and Enter takes it, which is the pattern for a combobox,
-       and the two differ by exactly which element the reader is in. Measured
-       before this: the first Down in a combobox committed the second option
-       and shut the panel, one keystroke into the interaction. */
-    if (!this.multiple && !this.forwarded) {
-      this.choose(target.value)
+  /**
+   * Puts the highlight on an option, and chooses it where moving is choosing.
+   *
+   * Chosen on the way past only where moving is choosing. With `multiple` a
+   * reader passing over four options on the way to the fifth did not mean to
+   * pick all five, and with `manual` the owner has asked for the same.
+   *
+   * Nor where the keys were forwarded. A list with the focus on it selects as
+   * it moves, which is the pattern for a listbox; a combobox's arrows move the
+   * highlight and Enter takes it, which is the pattern for a combobox, and the
+   * two differ by exactly which element the reader is in. Measured before
+   * this: the first Down in a combobox committed the second option and shut the
+   * panel, one keystroke into the interaction.
+   */
+  private arrive(value: string): void {
+    this.parked = false
+    this.activeValue = value
+    if (!this.multiple && !this.manual && !this.forwarded) {
+      this.choose(value)
     }
+  }
+
+  /**
+   * How many rows PageUp and PageDown move: as many as the list shows at once.
+   *
+   * Measured off the rendered list and its first shown row. Where there is no
+   * layout to measure, as on a server or in a test double, it is ten.
+   */
+  private pageSize(): number {
+    const items = this.partNamed('items')
+    const row = this.shown[0]?.getBoundingClientRect().height ?? 0
+    const height = items?.clientHeight ?? 0
+    return row > 0 && height > 0 ? Math.max(1, Math.floor(height / row) - 1) : PAGE
   }
 
   /**
@@ -503,8 +650,9 @@ export class HelixHeadlessListbox extends MixinCollection(
    * flag is set here rather than exposed as a property. The difference between
    * a listbox and a combobox is not a mode a consumer picks: it is which
    * element the reader's focus is in, and that is exactly what calling this
-   * rather than being typed into means. Enter and Space still choose, because
-   * those are the caller asking for the answer rather than for a move.
+   * rather than being typed into means. Enter still chooses, because that is
+   * the caller asking for the answer rather than for a move. Space, Home, End
+   * and letters are left to the caller's field, where they are typing.
    */
   navigate(event: KeyboardEvent): void {
     this.forwarded = true
@@ -559,6 +707,7 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /** Hides what the filter excludes, and writes the rest onto the options. */
   private place(): void {
+    this.forgetRemoved()
     const needle = this.filter.trim().toLowerCase()
     const chosen = new Set(this.values)
     for (const option of this.options) {
@@ -588,7 +737,7 @@ export class HelixHeadlessListbox extends MixinCollection(
        parked the highlight on the first option while the panel was shut, so
        the reader's first Down arrived at the second. */
     const shown = this.shown
-    const rescue = needle !== '' || this.activeValue !== ''
+    const rescue = !this.parked && (needle !== '' || this.activeValue !== '')
     if (rescue && !shown.some((option) => option.value === this.activeValue)) {
       this.activeValue = shown.find((option) => !option.disabled)?.value ?? ''
     }
@@ -613,6 +762,24 @@ export class HelixHeadlessListbox extends MixinCollection(
       this.hasMatches = anyShown
     }
     this.counted = true
+  }
+
+  /**
+   * Takes an option that has left the list out of the value.
+   *
+   * Only one that was here before: a value set ahead of its options, which a
+   * list loading them from a server does, is kept until they arrive. Measured
+   * before this: removing the chosen option left the list showing nothing
+   * chosen while its form still submitted the removed value. A native
+   * `<select>` drops it too, and sends no event for it.
+   */
+  private forgetRemoved(): void {
+    const present = new Set(this.options.map((option) => option.value))
+    const gone = this.values.filter((value) => this.seen.has(value) && !present.has(value))
+    this.seen = present
+    if (gone.length > 0) {
+      this.value = this.values.filter((value) => !gone.includes(value)).join(',')
+    }
   }
 
   /** Scrolls the active option into view, which needs the rendered list to scroll. */
@@ -662,11 +829,48 @@ export class HelixHeadlessListbox extends MixinCollection(
        listbox may contain, while the element that took focus and held the
        active descendant had no role at all. They are `[part="items"]`'s now. */
     hostAria(this.internals, { role: '' })
+    /* A value moved from outside, by a script or by the field a list sits
+       under, takes the highlight with it. Left where it was, the first arrow
+       moved from the option picked before, and in a list that chooses as it
+       moves that chose a neighbor of the old answer. */
+    if (
+      changed.has('value') &&
+      !this.multiple &&
+      this.activeValue !== '' &&
+      !this.values.includes(this.activeValue)
+    ) {
+      this.activeValue = ''
+      this.typeahead.reset()
+    }
+    if (this.childrenKnown) {
+      this.seedDeclared()
+    }
     /* Before the render, so the empty state and the matches it draws are this
        update's rather than the last one's. Not on the server, whose element
        shim has no `children`, nor while hydrating what one sent. */
     if (this.childrenKnown) {
       this.place()
+    }
+  }
+
+  /**
+   * Takes `<helix-option selected>` as the list's default value, as a native
+   * `<select>` takes `<option selected>`.
+   *
+   * Only where the list declares no `default-value` of its own, which wins. A
+   * form reset returns to it, which is what `Option.defaultSelected` says.
+   * Read from the options once they are known, so a list served by a server
+   * shows the choice from hydration on.
+   */
+  private seedDeclared(): void {
+    if (this.defaultValue !== '' || this.hasAttribute('default-value')) {
+      return
+    }
+    const declared = this.options
+      .filter((option) => option.defaultSelected)
+      .map((option) => option.value)
+    if (declared.length > 0) {
+      this.defaultValue = this.multiple ? declared.join(',') : (declared.at(-1) ?? '')
     }
   }
 
@@ -755,6 +959,7 @@ export class HelixHeadlessListbox extends MixinCollection(
       apply: (value) => {
         const previous = this.filter
         this.filterState = value
+        this.parked = false
         this.requestUpdate('filter', previous)
       },
       event: (value) => new HelixFilterEvent({ value }),
@@ -788,7 +993,7 @@ export class HelixHeadlessListbox extends MixinCollection(
       this.requestFilter('')
       return
     }
-    if (!MOVES.has(event.key)) {
+    if (!FIELD_MOVES.has(event.key)) {
       return
     }
     /* **Forwarded, because the reader is in the field.** `navigate` says the
@@ -807,7 +1012,8 @@ export class HelixHeadlessListbox extends MixinCollection(
 
        `stopPropagation` is what closes the second half: the field handled the
        key, so it must not arrive at the host as well. The move keys are the
-       only ones taken, so Enter, Tab and every character still pass. */
+       only ones taken, so Enter, Tab and every character still pass, and the
+       host handler leaves the characters to the field. */
     event.stopPropagation()
     this.navigate(event)
   }
@@ -893,10 +1099,15 @@ export class HelixHeadlessListbox extends MixinCollection(
         ${
           /* `isDisabled`, matching the filter input above it: on `disabled`
              alone, a listbox in a disabled fieldset keeps its tab stop and
-             takes arrow keys while its own filter is correctly out. */
+             takes arrow keys while its own filter is correctly out.
+
+             No tab stop at all with a filter, whose field is the one stop: the
+             field announces the highlight and forwards the arrows. A second
+             stop on the list was one where the arrows chose as they moved, so
+             in a command palette a Tab and an arrow ran a command. */
           ''
         }
-        tabindex=${this.isDisabled ? -1 : 0}
+        tabindex=${this.filterable ? nothing : this.isDisabled ? -1 : 0}
       >
         <slot @slotchange=${() => this.place()}></slot>
         ${

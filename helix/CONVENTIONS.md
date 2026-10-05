@@ -583,8 +583,11 @@ The line that is drawn, and it is not "value is special":
   twenty-four stylesheets. Never the property's own attribute, so nothing a
   component records can be re-read as a declaration.
 - **Payload states do not.** `value` is a string, and so is `active`, which
-  names which child is active. Option's `data-active` is a boolean its listbox
-  writes, so it is the first rule rather than an exception to the second.
+  names which child is active. Option's `active` is a boolean its listbox
+  writes, so it is the first rule rather than an exception to the second: it
+  mirrors to `:state(active)`. It also keeps the `data-active` attribute it
+  had before the state, which the late side of the rule below allows, because
+  the listbox writes it only once a reader moves the highlight.
 
 **A mirror must never be an attribute.** An attribute is in the DOM: an element
 writes it on the first update, so `<helix-checkbox default-checked>` served by a
@@ -1886,7 +1889,8 @@ The naming, which was never about wrappers:
 
   `active` on a member is neither. It is the row the keyboard is on, which is
   the platform's `aria-activedescendant` and a fact about focus rather than
-  about the set: `Option` carries it as `data-active` and the listbox writes it.
+  about the set: `Option` carries it as `:state(active)` and `data-active`, and
+  the listbox writes it.
   An option can be active and not selected on every keypress that moves through
   a list without choosing anything.
 
