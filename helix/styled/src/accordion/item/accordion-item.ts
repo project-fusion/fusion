@@ -25,6 +25,7 @@ import { styles } from './accordion-item.css.js'
  * @csspart container - The outer wrapper.
  * @csspart content - The region that holds the content.
  * @csspart content-inner - The clipping box inside the animated region. The padding is on the slot inside it, so a closed section leaves no space.
+ * @csspart heading - The heading that holds the trigger.
  * @csspart trigger - The button that opens and closes the section, holding the summary.
  *
  * @cssproperty --accordion-item-padding - The padding of the trigger and the content.

@@ -110,6 +110,13 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
   name?: string
 
   /**
+   * Whether the section is disabled, so its trigger cannot be pressed or
+   * reached with the arrow keys. A script can still open and close it.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
+  /**
    * The level of the heading around the trigger, from 1 to 6.
    *
    * Unset takes the accordion's `heading-level`, and 3 where that is unset
@@ -177,6 +184,9 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * set collapsed after a listener refused it.
    */
   protected handleToggle = (): void => {
+    if (this.disabled) {
+      return
+    }
     const next = !this.open
     const mode = this.accordion?.mode
 
@@ -277,6 +287,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
           aria-expanded=${open ? 'true' : 'false'}
           part="trigger"
           type="button"
+          ?disabled=${this.disabled}
           @click=${this.handleToggle}
         >
           ${this.chevronPlacement === 'start' ? this.renderChevron() : nothing}

@@ -271,3 +271,25 @@ describe('the heading around each trigger', () => {
     expect(heading(alone)?.getAttribute('aria-level')).toBe('3')
   })
 })
+
+describe('a disabled section', () => {
+  test('cannot be pressed, and the arrows pass over it', async () => {
+    const host = await mount(`
+      <helix-headless-accordion>
+        <helix-headless-accordion-item><span slot="summary">One</span>1</helix-headless-accordion-item>
+        <helix-headless-accordion-item disabled><span slot="summary">Two</span>2</helix-headless-accordion-item>
+        <helix-headless-accordion-item><span slot="summary">Three</span>3</helix-headless-accordion-item>
+      </helix-headless-accordion>`)
+    const [one, two, three] = items(host) as [Item, Item, Item]
+    for (const item of [one, two, three]) {
+      await (item as Item & { updateComplete: Promise<unknown> }).updateComplete
+    }
+    click(two)
+    expect(two.open).toBe(false)
+    expect(two.shadowRoot?.querySelector('[part="trigger"]')?.hasAttribute('disabled')).toBe(true)
+    one.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowDown' }),
+    )
+    expect(three.shadowRoot?.activeElement?.getAttribute('part')).toBe('trigger')
+  })
+})
