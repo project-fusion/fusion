@@ -4,6 +4,7 @@ import {
   KeyboardNavigationController,
   type KeyboardNavigationOptions,
   type NavigableItem,
+  Typeahead,
 } from './keyboard-navigation-controller.js'
 
 /**
@@ -208,6 +209,15 @@ describe('a set with nothing chosen in it', () => {
     press(host, 'ArrowUp')
     expect(asked).toEqual(['focus item-2', 'select item-2'])
   })
+
+  /* Tabbing into an unanswered group lands on its first item. Measured before
+     this: the first Down chose that same item and the second one moved, where a
+     native radio group moves to the second radio on the first press. */
+  test('moves on from the item that has focus, rather than arriving at it again', () => {
+    const { asked, host } = set('aaa')
+    press(host, 'ArrowDown', 'item-0')
+    expect(asked).toEqual(['focus item-1', 'select item-1'])
+  })
 })
 
 describe('a set with nothing in it at all', () => {
@@ -293,6 +303,88 @@ describe('a key the component has already spoken for', () => {
     const { asked, host } = set('aAa', { reserved: () => ['ArrowRight', 'ArrowLeft'] })
     press(host, 'ArrowDown')
     expect(asked).toEqual(['focus item-2', 'select item-2'])
+  })
+})
+
+describe('typeahead', () => {
+  const named = (
+    names: string[],
+    options: Omit<KeyboardNavigationOptions, 'items'> = {},
+  ): { asked: string[]; host: HTMLElement } => {
+    const { asked, host, items } = set('a'.repeat(names.length), {
+      typeahead: (item) => names[items.indexOf(item as Item)] ?? '',
+      ...options,
+    })
+    return { asked, host }
+  }
+
+  test('is off unless a set asks for it', () => {
+    const { asked, host } = set('aAa')
+    expect(press(host, 'i')).toBe(false)
+    expect(asked).toEqual([])
+  })
+
+  test('moves to the first item whose words start with the letter', () => {
+    const { asked, host } = named(['Apple', 'Banana', 'Cherry'])
+    expect(press(host, 'c')).toBe(true)
+    expect(asked).toEqual(['focus item-2', 'select item-2'])
+  })
+
+  test('reads letters typed together as one word', () => {
+    const { asked, host } = named(['Cambodia', 'Canada', 'Chile'])
+    press(host, 'c')
+    press(host, 'a', 'item-0')
+    press(host, 'n', 'item-0')
+    expect(asked).toEqual(['focus item-0', 'select item-0', 'focus item-1', 'select item-1'])
+  })
+
+  test('moves on through the items that start with a letter typed again', () => {
+    const { asked, host } = named(['Cambodia', 'Canada', 'Chile'])
+    press(host, 'c', 'item-0')
+    expect(asked).toEqual(['focus item-1', 'select item-1'])
+  })
+
+  test('moves without choosing where arriving does not choose', () => {
+    const { asked, host } = named(['Apple', 'Banana'], { selects: () => false })
+    press(host, 'b')
+    expect(asked).toEqual(['focus item-1'])
+  })
+
+  /* A set may bind Space to choosing. Inside a word it is a letter, as in
+     "New York", which is what a native select does with it. */
+  test('leaves a Space alone unless a word is being typed', () => {
+    const { asked, host } = named(['New Haven', 'New York'])
+    expect(press(host, ' ')).toBe(false)
+    press(host, 'n')
+    for (const key of ['e', 'w', ' ', 'y']) {
+      expect(press(host, key, 'item-0')).toBe(true)
+    }
+    expect(asked).toEqual(['focus item-0', 'select item-0', 'focus item-1', 'select item-1'])
+  })
+
+  test('leaves a shortcut alone', () => {
+    const { asked, host } = named(['Apple'])
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: 'a',
+    })
+    host.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(false)
+    expect(asked).toEqual([])
+  })
+})
+
+describe('Typeahead', () => {
+  test('starts a new word after a pause', () => {
+    const search = new Typeahead({ timeout: 500 })
+    expect(search.match('c', ['Cambodia', 'Denmark'], -1, 0)).toBe(0)
+    expect(search.match('d', ['Cambodia', 'Denmark'], 0, 1000)).toBe(1)
+  })
+
+  test('matches nothing where no item starts with the word', () => {
+    expect(new Typeahead().match('z', ['Apple', 'Banana'], 0)).toBe(-1)
   })
 })
 

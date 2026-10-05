@@ -58,6 +58,8 @@ export {
   KeyboardNavigationController,
   type KeyboardNavigationOptions,
   type NavigableItem,
+  Typeahead,
+  typesCharacter,
 } from './controllers/keyboard-navigation-controller/keyboard-navigation-controller.js'
 export {
   MediaSessionController,
