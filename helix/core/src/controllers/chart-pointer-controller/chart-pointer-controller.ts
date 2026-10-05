@@ -94,8 +94,9 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
  * **The keyboard moves the same reading, which is what makes it the reading
  * and not the pointer's.** A chart's plot takes focus (`tabindex="0"` on the
  * element carrying `CHART_PLOT`), and while it has it the arrow keys walk the
- * readings, Home and End go to the first and the last, and the other pair of
- * arrows walks the series within a reading. Escape puts the bubble away, as it
+ * readings, Home and End go to the first and the last, PageUp and PageDown
+ * move a page of readings, and the other pair of arrows walks the series
+ * within a reading. Escape puts the bubble away, as it
  * does a tooltip. The tooltip follows because it already follows `at`, and the
  * chart's readout, a polite live region `drawTooltip` renders, says the
  * reading in words. It speaks only for a key: a pointer crossing a chart is a
@@ -195,6 +196,15 @@ export class ChartPointerController implements ReactiveController {
    */
   shows(cell: number): boolean {
     return this.host.showsColumn?.(cell) !== false
+  }
+
+  /**
+   * How far PageUp and PageDown move: four columns of a grid, which is four
+   * weeks of a calendar heatmap, a month near enough; and a tenth of the
+   * readings otherwise, at least one.
+   */
+  private page(count: number): number {
+    return this.grid > 1 ? this.grid * 4 : Math.max(1, Math.round(count / 10))
   }
 
   /**
@@ -392,6 +402,7 @@ export class ChartPointerController implements ReactiveController {
         axis: this.axis,
         count,
         grid: this.grid,
+        page: this.page(count),
         rtl: isRtl(this.host),
         series: this.columns().length,
       },

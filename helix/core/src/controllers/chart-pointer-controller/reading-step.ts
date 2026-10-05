@@ -19,6 +19,11 @@ export interface ReadingLayout {
   count: number
   /** How many readings stand in one column, for a grid. `1` is a row of them. */
   grid: number
+  /**
+   * How far PageUp and PageDown move, in readings. Absent, they move nothing
+   * and the page keeps them.
+   */
+  page?: number
   /** Whether the line of text runs right to left, which turns the inline arrows. */
   rtl: boolean
   /** How many series a reading holds, which the cross pair of arrows walks. */
@@ -78,7 +83,8 @@ export const amongSeries = (key: string, layout: ReadingLayout): number => {
  * Where a key moves the reading, or `undefined` for a key that moves nothing,
  * which the page keeps.
  *
- * Home and End go to the first and the last. From no reading, an arrow moving
+ * Home and End go to the first and the last, and PageUp and PageDown move a
+ * `page` of readings where the layout gives one. From no reading, an arrow moving
  * on starts at the first and one moving back at the last, so either arrow
  * starts somewhere a reader expects. A series key on no reading starts on the
  * first. Nothing walks off either end.
@@ -97,6 +103,14 @@ export const stepReading = (
   }
   if (key === 'End') {
     return { at: last, series: from.series }
+  }
+  /* A page back or on, which is the same in either direction of text: later
+     readings are further down the table. From no reading, a page on starts at
+     the first and a page back at the last, as the arrows do. */
+  if ((key === 'PageDown' || key === 'PageUp') && layout.page !== undefined) {
+    const step = Math.max(1, layout.page) * (key === 'PageDown' ? 1 : -1)
+    const at = from.at < 0 ? (step > 0 ? 0 : last) : Math.min(Math.max(from.at + step, 0), last)
+    return { at, series: from.series }
   }
   const along = alongReadings(key, layout)
   if (along !== 0) {

@@ -200,9 +200,10 @@
   font-weight: var(--helix-weight-medium);
 }
 
-/* The readout is for screen readers, and the bubble is what a sighted reader
-   reads. */
-[part="live"] {
+/* The readout and the overview are for screen readers, and the bubble and
+   the footer are what a sighted reader reads. */
+[part="live"],
+[part="overview"] {
   block-size: 1px;
   clip-path: inset(50%);
   inline-size: 1px;
