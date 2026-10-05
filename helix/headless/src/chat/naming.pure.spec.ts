@@ -32,7 +32,9 @@ describe('the name of a turn', () => {
   })
 
   test('the sentence is the chat’s, in its order', () => {
-    expect(turnName('Ada', 'hier', { me: 'Vous', sentence: '{time}, {author}' })).toBe('hier, Ada')
+    expect(
+      turnName('Ada', 'hier', { ...TURN_WORDS, me: 'Vous', sentence: '{time}, {author}' }),
+    ).toBe('hier, Ada')
   })
 
   test('one of the two is the name alone', () => {
@@ -40,7 +42,8 @@ describe('the name of a turn', () => {
     expect(turnName('', 'yesterday', TURN_WORDS)).toBe('yesterday')
   })
 
-  test('neither is no name', () => {
-    expect(turnName('', '', TURN_WORDS)).toBe('')
+  test('neither is the chat’s word for a turn, so no turn goes unnamed', () => {
+    expect(turnName('', '', TURN_WORDS)).toBe('Message')
+    expect(turnName('', '', { ...TURN_WORDS, turn: 'Nachricht' })).toBe('Nachricht')
   })
 })

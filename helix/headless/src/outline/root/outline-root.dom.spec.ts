@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -255,5 +255,52 @@ describe('the heading slot', () => {
       return
     }
     expect(landmark.ariaLabelledByElements?.map((one) => one.textContent)).toEqual(['Contents'])
+  })
+})
+
+/* Browser only: which box scrolls is a question of layout. */
+describe('following the section in view', () => {
+  const rail = async (attrs: string) => {
+    const links = Array.from({ length: 40 }, (_, at) => `<a href="#s${at}">Section ${at}</a>`).join(
+      '',
+    )
+    const sections = Array.from(
+      { length: 40 },
+      (_, at) => `<section id="s${at}" style="block-size: 400px"><h2>Section ${at}</h2></section>`,
+    ).join('')
+    const root = (await mount(
+      `<div><div id="rail" style="block-size: 120px; overflow-y: auto">` +
+        `<helix-headless-outline ${attrs} label="On this page">${links}</helix-headless-outline></div>` +
+        `${sections}</div>`,
+    )) as HTMLElement
+    const outline = root.querySelector('helix-headless-outline') as Nav
+    await outline.updateComplete
+    return { box: root.querySelector('#rail') as HTMLElement, outline, root }
+  }
+
+  test.if(hasLayout())(
+    'scrolls the rail to the link of the section in view, and only the rail',
+    async () => {
+      const { box, outline, root } = await rail('follow behavior="smooth"')
+      root
+        .querySelector<HTMLAnchorElement>('a[href="#s30"]')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }))
+      await outline.updateComplete
+      const link = root.querySelector('a[href="#s30"]') as HTMLElement
+      const shown = box.getBoundingClientRect()
+      const at = link.getBoundingClientRect()
+      expect(at.top).toBeGreaterThanOrEqual(shown.top - 1)
+      expect(at.bottom).toBeLessThanOrEqual(shown.bottom + 1)
+      expect(box.scrollTop).toBeGreaterThan(0)
+    },
+  )
+
+  test.if(hasLayout())('leaves the rail where it is without follow', async () => {
+    const { box, outline, root } = await rail('behavior="smooth"')
+    root
+      .querySelector<HTMLAnchorElement>('a[href="#s30"]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }))
+    await outline.updateComplete
+    expect(box.scrollTop).toBe(0)
   })
 })
