@@ -651,3 +651,26 @@ describe('a clearable rating', () => {
     expect(host.value).toBe('3')
   })
 })
+
+describe('the preview', () => {
+  /* Zag's `onHoverChange`: a page can show what a score means while the
+     pointer is over it, before anything is chosen. */
+  test('says the score under the pointer, and the empty string once the pointer leaves', async () => {
+    const host = (await rating('value="2"')) as HTMLElement & {
+      updateComplete: Promise<unknown>
+      value: string
+    }
+    const heard: string[] = []
+    host.addEventListener('helix-preview', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    options(host)[3]?.dispatchEvent(new PointerEvent('pointerenter'))
+    await host.updateComplete
+    options(host)[3]?.dispatchEvent(new PointerEvent('pointerenter'))
+    await host.updateComplete
+    host.dispatchEvent(new PointerEvent('pointerleave'))
+    await host.updateComplete
+    expect(heard).toEqual(['4', ''])
+    expect(host.value).toBe('2')
+  })
+})

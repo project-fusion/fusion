@@ -73,6 +73,7 @@ export const helixEventNames: ReadonlySet<string> = new Set([
   'helix-panel-resize',
   'helix-pin',
   'helix-press',
+  'helix-preview',
   'helix-previous',
   'helix-range-change',
   'helix-read',
@@ -96,5 +97,6 @@ export const helixEventNames: ReadonlySet<string> = new Set([
   'helix-split',
   'helix-toggle',
   'helix-tour-ask',
+  'helix-tour-status',
   'helix-typing',
 ])

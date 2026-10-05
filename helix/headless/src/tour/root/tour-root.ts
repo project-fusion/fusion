@@ -8,6 +8,7 @@ import {
   HelixBeforeActivateEvent,
   HelixCompleteEvent,
   HelixElement,
+  HelixTourStatusEvent,
   hostAria,
   MixinControllerOpen,
   requestChange,
@@ -72,6 +73,7 @@ import { onPage, waitFor } from '../wait.js'
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
  * @event {HelixTourAskEvent} helix-tour-ask - Fired when a stop's control is pressed to move the tour. The stop sends it, and the tour handles it.
+ * @event {HelixTourStatusEvent} helix-tour-status - Fired when the tour starts waiting at a `wait` stop, is skipped, or is completed, with the stop's index and `detail.status` saying which.
  * @event {ToggleEvent} toggle - Sent when the tour starts or ends, with `newState` and `oldState`.
  *
  * @csspart backdrop - Behind a dialog or a floating stop, which lights nothing. It draws no box until you give it one.
@@ -241,7 +243,10 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
    * `preventDefault` refusing something that has already happened.
    */
   skip(): void {
-    this.requestOpen(false)
+    const at = this.index
+    if (this.open && this.requestOpen(false)) {
+      this.dispatchEvent(new HelixTourStatusEvent({ index: at, status: 'skipped' }))
+    }
   }
 
   /* Announced before it closes, and not cancelable, which is the difference
@@ -251,6 +256,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
      listener that reads `open` and sees the tour as it was when it finished. */
   private finish(): void {
     this.dispatchEvent(new HelixCompleteEvent({ value: String(this.index) }))
+    this.dispatchEvent(new HelixTourStatusEvent({ index: this.index, status: 'completed' }))
     this.open = false
   }
 
@@ -522,6 +528,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     if (!next) {
       return
     }
+    this.dispatchEvent(new HelixTourStatusEvent({ index: this.index, status: 'waiting' }))
     this.unwait = waitFor(
       next.getRootNode(),
       () => onPage(next.target),
