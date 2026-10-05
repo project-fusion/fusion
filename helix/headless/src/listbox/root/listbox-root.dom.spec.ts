@@ -883,3 +883,36 @@ describe('a filter that waits for typing to rest', () => {
     expect(field(host).value).toBe('')
   })
 })
+
+describe('a list that asks for more', () => {
+  const scrolled = (host: Updatable, top: number): void => {
+    const items = part(host, 'items') as HTMLElement
+    Object.defineProperty(items, 'clientHeight', { configurable: true, value: 100 })
+    Object.defineProperty(items, 'scrollHeight', { configurable: true, value: 400 })
+    Object.defineProperty(items, 'scrollTop', { configurable: true, value: top })
+    items.dispatchEvent(new Event('scroll'))
+  }
+
+  test('asks once within a screen of the end, and again only after more arrive', async () => {
+    const host = (await list()) as Updatable & { loading: boolean }
+    let asked = 0
+    host.addEventListener('helix-load-more', () => {
+      asked += 1
+    })
+    scrolled(host, 50)
+    expect(asked).toBe(0)
+    scrolled(host, 220)
+    scrolled(host, 300)
+    expect(asked).toBe(1)
+    host.append(Object.assign(document.createElement('helix-headless-option'), { value: 'more' }))
+    await settle(host)
+    host.loading = true
+    await settle(host)
+    scrolled(host, 300)
+    expect(asked).toBe(1)
+    host.loading = false
+    await settle(host)
+    scrolled(host, 300)
+    expect(asked).toBe(2)
+  })
+})

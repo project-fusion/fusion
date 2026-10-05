@@ -6,6 +6,7 @@ import {
   DisabledCascadeController,
   HelixFilterEvent,
   HelixFormElement,
+  HelixLoadMoreEvent,
   type HelixSelectEvent,
   hostAria,
   MixinCollection,
@@ -183,6 +184,7 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the value is about to change, and cancelable.
  * @event {HelixFilterEvent} helix-filter - Fired before the list is filtered, and cancelable.
+ * @event {HelixLoadMoreEvent} helix-load-more - Fired once the list is scrolled within a screen of its end, once for each number of options, and not while `loading` is set. Add the next page of options and set `loading` while you fetch it.
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart empty - The text shown when the list has no options to show, or the filter hides every one. `:state(no-results)` is set for the second.
@@ -1146,6 +1148,26 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.filtering.flush()
   }
 
+  /** The number of options the list last asked for more at. */
+  private askedAt = -1
+
+  /**
+   * Asks for more once the reader is within a screen of the end, React Aria's
+   * `onLoadMore`: once for each number of options, so a scroll that goes on
+   * asks again only after the next page arrived, and never while loading.
+   */
+  private readonly handleScroll = (event: Event): void => {
+    const items = event.currentTarget as HTMLElement
+    const count = this.options.length
+    if (this.loading || count === this.askedAt || items.clientHeight === 0) {
+      return
+    }
+    if (items.scrollHeight - items.scrollTop - items.clientHeight <= items.clientHeight) {
+      this.askedAt = count
+      this.dispatchEvent(new HelixLoadMoreEvent())
+    }
+  }
+
   /** Requests a new filter, and returns whether the request went through. */
   requestFilter(next: string): boolean {
     if (next === this.filter) {
@@ -1377,6 +1399,7 @@ export class HelixHeadlessListbox extends MixinCollection(
           ''
         }
         tabindex=${this.filterable ? nothing : this.isDisabled ? -1 : 0}
+        @scroll=${this.handleScroll}
       >
         <slot @slotchange=${() => this.place()}></slot>
         ${
