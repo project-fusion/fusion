@@ -30,6 +30,14 @@ import { property } from 'lit/decorators.js'
  * it. To submit, the button calls `requestSubmit()` on its form, which runs
  * validation, unlike `submit()`.
  *
+ * A `submit` listener reads `event.submitter` as `null`, because the platform
+ * accepts only a native submit button there. The button's `name` and `value`
+ * are in the form data, so read them from `new FormData(form)` to tell two
+ * submit buttons apart.
+ *
+ * As the first submit button in its form, it is the form's default button:
+ * Enter in a text field of the form presses it, as it presses a native one.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions
@@ -50,6 +58,7 @@ export class HelixHeadlessButton extends HelixFormElement {
      the description and the accessibility tree exposed the inner control
      without it. */
   protected readonly aria = new AriaForwardController(this, {
+    label: true,
     target: () => this.partNamed('button'),
   })
 
@@ -400,6 +409,71 @@ export class HelixHeadlessButton extends HelixFormElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.linkCommand()
+  }
+
+  /** @internal A submit button is what its form's implicit submission presses. */
+  protected override get submitsForm(): boolean {
+    return this.type === 'submit'
+  }
+
+  /** @internal Pressed as the form's default button, through the inner control. */
+  protected override activate(): void {
+    this.partNamed('button')?.click()
+  }
+
+  /** The form whose Enter key this button listens to, as its default button. */
+  private watched: HTMLFormElement | null = null
+
+  /**
+   * Presses this button for Enter in a native text field of its form, when it
+   * is the form's default button.
+   *
+   * The platform cannot find a default button in a shadow root, so a form whose
+   * only submit button is this one found none: with two fields Enter did
+   * nothing, and with one it submitted without this button's name, value or
+   * overrides. The event's default is prevented so a later native submit button
+   * is not pressed instead.
+   */
+  private readonly pressOnEnter = (event: KeyboardEvent): void => {
+    const form = this.watched
+    if (
+      event.key !== 'Enter' ||
+      event.defaultPrevented ||
+      !form ||
+      !HelixFormElement.submitsOnEnter(event.composedPath()[0], form) ||
+      HelixFormElement.defaultButton(form) !== this
+    ) {
+      return
+    }
+    event.preventDefault()
+    if (!this.isDisabled) {
+      this.activate()
+    }
+  }
+
+  /** Listens to the form this button now belongs to, and to no other. */
+  private watchForm(form: HTMLFormElement | null): void {
+    if (form === this.watched) {
+      return
+    }
+    this.watched?.removeEventListener('keypress', this.pressOnEnter)
+    form?.addEventListener('keypress', this.pressOnEnter)
+    this.watched = form
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.watchForm(this.form)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.watchForm(null)
+  }
+
+  /** Called by the browser when the button's form changes. */
+  formAssociatedCallback(form: HTMLFormElement | null): void {
+    this.watchForm(form)
   }
 
   protected override render(): TemplateResult {

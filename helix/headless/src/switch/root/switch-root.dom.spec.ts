@@ -79,3 +79,13 @@ describe('switch', () => {
     )
   })
 })
+
+describe('a switch named on the host', () => {
+  /* A settings row puts its words in another column and names the switch with
+     `aria-label`, which stayed on the generic host: read from Chromium's tree,
+     the switch itself had no name. */
+  test('carries aria-label to the switch a reader is on', async () => {
+    const host = await mount('<helix-headless-switch aria-label="Wi-Fi"></helix-headless-switch>')
+    expect(control(host).getAttribute('aria-label')).toBe('Wi-Fi')
+  })
+})

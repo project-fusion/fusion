@@ -234,3 +234,60 @@ describe('button invokers', () => {
     expect<string | null>(received).toBe('--go')
   })
 })
+
+describe('button as its form’s default button', () => {
+  /* The platform cannot see a submit button in a shadow root, so a form whose
+     only submit button was this one had no default button, and Enter in either
+     of two fields did nothing. happy-dom leaves a custom element out of
+     `form.elements`, which a browser does not, so the list is supplied. */
+  test('is pressed by Enter in a native field of its form', async () => {
+    document.body.innerHTML =
+      '<form><input name="a" /><input name="b" /><helix-headless-button type="submit" name="act" value="save">Save</helix-headless-button></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    const button = document.querySelector('helix-headless-button') as Updatable
+    await button.updateComplete
+    Object.defineProperty(form, 'elements', { value: [...form.querySelectorAll('input'), button] })
+    let submitted = 0
+    form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      submitted += 1
+    })
+    const enter = new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' })
+    form.querySelector('input')?.dispatchEvent(enter)
+    expect(submitted).toBe(1)
+    expect(enter.defaultPrevented).toBe(true)
+  })
+
+  test('and not where a native submit button comes first', async () => {
+    document.body.innerHTML =
+      '<form><input name="a" /><button>Native</button><helix-headless-button type="submit">Save</helix-headless-button></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    const button = document.querySelector('helix-headless-button') as Updatable
+    await button.updateComplete
+    Object.defineProperty(form, 'elements', {
+      value: [form.querySelector('input'), form.querySelector('button'), button],
+    })
+    const enter = new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' })
+    form.querySelector('input')?.dispatchEvent(enter)
+    expect(enter.defaultPrevented).toBe(false)
+  })
+})
+
+describe('button state and name written on the host', () => {
+  /* Read from Chromium's tree, a `helix-button aria-pressed="true"` was a plain
+     button, and an icon-only one named with `aria-label` was unnamed: both
+     stayed on the generic host. */
+  test('aria-pressed reaches the inner control', async () => {
+    const button = await mount(
+      '<helix-headless-button aria-pressed="true">Bold</helix-headless-button>',
+    )
+    expect(control(button)?.getAttribute('aria-pressed')).toBe('true')
+  })
+
+  test('and so does aria-label', async () => {
+    const button = await mount(
+      '<helix-headless-button aria-label="Close">X</helix-headless-button>',
+    )
+    expect(control(button)?.getAttribute('aria-label')).toBe('Close')
+  })
+})

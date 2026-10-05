@@ -523,6 +523,23 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     this.sync()
   }
 
+  /**
+   * Enter submits the form, as it does in a native text field.
+   *
+   * On `keypress`, where the platform runs its own implicit submission, so a
+   * consumer who prevents the `keydown` for Enter stops this too.
+   */
+  private readonly handleKeypress = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' && !event.defaultPrevented) {
+      this.submitImplicitly()
+    }
+  }
+
+  /** @internal A single line of text counts against implicit submission. */
+  protected override get blocksImplicitSubmission(): boolean {
+    return true
+  }
+
   protected override render(): TemplateResult {
     const characters = this.characters
     /* `renderGroupLabel` and not `renderLabel`, which is what every other
@@ -556,6 +573,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
             @focus=${this.handleFocus}
             @input=${this.handleInput}
             @keydown=${this.handleKeydown}
+            @keypress=${this.handleKeypress}
             @paste=${this.handlePaste}
           />`,
         )}

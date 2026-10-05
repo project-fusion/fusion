@@ -1536,6 +1536,19 @@ form. Four things follow, and the ones a mixin does not do are the component's.
 - **It restores.** `formStateRestoreCallback` for a browser bringing a form back,
   falling back to the declared value rather than to empty, a restore with no
   state being the same situation as a fresh form.
+- **It validates through `internals.setValidity`, and nothing else.**
+  `HelixFormElement` wraps that one call so a message from `setCustomValidity`
+  or from `feedback` is laid over the control's own verdict on every report,
+  and so an anchor that cannot take focus is replaced by the control's first
+  tab stop. A family that reported some other way would lose both. `feedback`
+  is a verdict, so a field showing one does not submit.
+- **Its focus is its first tab stop.** `focus()` and a press on a `<label>` that
+  names the host land there, read through shadow roots and slots, so a group
+  lands on the member holding its tab stop. A family overrides `focus()` only
+  where a different element is right. It takes `delegatesFocus` only where the
+  first focusable element is the control: the platform delegates to the first
+  focusable element, which in Number Input was a stepper the reader never tabs
+  to.
 - **It renders what it took.** `MixinField` grafts `label`, `hint`, `feedback`
   and `required` onto a control and publishes all four on its reference page.
   Applying it and then calling none of `renderLabel`, `renderGroupLabel`,

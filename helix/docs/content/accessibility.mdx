@@ -106,11 +106,24 @@ and is read where it sits. Neither component is a variant of the other.
 
 `aria-labelledby` and `aria-describedby` inside a shadow root cannot point to an
 id in your document. The browser drops the reference silently and reports no
-error. For this reason, every control renders its own label, and connecting two
-components by id does not work. See [Forms and validation](./forms).
+error. For this reason, every control renders its own label. See
+[Forms and validation](./forms).
 
-A `<label for>` in your markup cannot reach into a shadow root either, so it
-does not name a Helix control. Use the control's own `label`.
+**What you write on the host reaches the control inside it.** The form controls,
+`Button`, and `IconButton` carry these down to the element a screen reader is on:
+
+- `aria-labelledby` and `aria-describedby`, as element references, so the ids
+  you name in your document resolve.
+- A `<label for>` that points at the host, or a `<label>` around it, when the
+  control has no `label` of its own.
+- `aria-expanded`, `aria-haspopup`, `aria-controls`, `aria-invalid`, and
+  `aria-pressed`.
+- `aria-label` on `Button`, `IconButton`, and `Switch`. A field renders its
+  `aria-label` as a hidden label.
+
+A `<label>` around a control also reads the words inside the control, such as
+the names of its buttons. Use `<label for>` or the control's own `label` to name
+it with your words alone.
 
 When a relationship has to cross the boundary, the components use
 `ElementInternals` and element-reference properties. They are the only mechanism

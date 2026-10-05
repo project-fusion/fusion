@@ -101,22 +101,55 @@ participants:
 ></helix-input>
 ```
 
-Submitting an empty form is blocked, and the browser points to the control.
-`checkValidity()`, `reportValidity()`, and `:invalid` work as they do for native
-controls.
+Submitting an empty form is blocked, and the browser moves focus to the control
+and shows its message there. Each control has the validity API of a native
+control:
 
-`feedback` replaces the browser's message. When `feedback` is empty, the
-browser shows its own message, which is localized and familiar. When you set it,
-the control shows the message in the words your product uses:
+- `checkValidity()` and `reportValidity()`
+- `setCustomValidity(message)`
+- `validity`, `validationMessage`, and `willValidate`
+
+`:invalid` matches the control as it matches a native one.
+
+`value-missing-message` replaces the browser's message for a required control
+that is empty. When it is not set, the browser shows its own message, which is
+localized and familiar:
 
 ```html
 <helix-input
-  feedback="We need this to send your receipt."
   label="Email"
   name="email"
   required
+  value-missing-message="We need this to send your receipt."
 ></helix-input>
 ```
+
+**`feedback` says what is wrong, and the form does not submit while it is
+set.** Use it for a verdict the browser cannot reach, such as one your server
+returned. The control shows the message under itself and is invalid until you
+clear `feedback`:
+
+```html
+<helix-input
+  feedback="That name is taken."
+  label="Username"
+  name="username"
+></helix-input>
+```
+
+`setCustomValidity()` blocks the form in the same way, and the control shows
+its message once the reader has edited the field.
+
+## Focus and Enter
+
+`focus()` on a control moves focus to the element a reader would reach with
+Tab, and pressing a `<label>` that names the control does the same. In a group,
+that is the chosen radio, or the first one when nothing is chosen.
+
+Pressing Enter in `Input`, `NumberInput`, or `PinInput` submits its form, as
+Enter in a native text field does. The form's first submit button is pressed,
+and a `helix-button type="submit"` counts as one, for a native field too. A form
+with no submit button is submitted when it has only one text field.
 
 `Radio.Group` and `Toggle.Group` take part in the form for their members. Each
 group owns the `name`, the `value`, and the validity. A single radio is an

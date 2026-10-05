@@ -26,6 +26,7 @@ type Field = HTMLElement & {
 
 const tag = 'probe-field'
 const looseTag = 'probe-field-loose'
+const drawnTag = 'probe-field-drawn'
 
 beforeAll(async () => {
   registerDom()
@@ -36,6 +37,15 @@ beforeAll(async () => {
   /* Not form-associated, which is a real shape here: a group whose members each
      submit themselves is asked about its own validity and would throw. */
   customElements.define(looseTag, class extends MixinField(HelixElement) {})
+  const { html } = await import('lit')
+  customElements.define(
+    drawnTag,
+    class extends MixinField(HelixFormElement) {
+      protected override render(): unknown {
+        return html`${this.renderLabel()}<input id="control" />${this.renderHint()}`
+      }
+    },
+  )
 })
 
 const field = async (attrs = '', name = tag): Promise<Field> => {
@@ -133,5 +143,48 @@ describe('being required', () => {
     const host = await field()
     host.reportRequired(true, 'Tick this box', 'control')
     expect(host.internals.validity.valueMissing).toBeFalsy()
+  })
+})
+
+/**
+ * Mounts a field and says its slot changed, which happy-dom never does: the
+ * assignment is real, and the event a browser would send is supplied.
+ */
+const slottedField = async (markup: string, name: string): Promise<Field> => {
+  document.body.innerHTML = markup
+  const host = document.body.firstElementChild as Field
+  await host.updateComplete
+  host.shadowRoot
+    ?.querySelector(`slot[name="${name}"]`)
+    ?.dispatchEvent(new Event('slotchange', { bubbles: true }))
+  await host.updateComplete
+  return host
+}
+
+describe('content in the label or hint slot', () => {
+  /* The forms guide's own example: a rich label slotted with no `label`
+     property drew nothing, and the field went unnamed. */
+  test('is drawn as the label without a `label` property', async () => {
+    const host = await slottedField(
+      `<${drawnTag}><span slot="label">Email</span></${drawnTag}>`,
+      'label',
+    )
+    const label = host.shadowRoot?.querySelector('[part="label"]')
+    expect(label?.getAttribute('for')).toBe('control')
+    expect(label?.querySelector('slot')?.assignedElements()[0]?.textContent).toBe('Email')
+  })
+
+  test('and as the hint, which the control is then described by', async () => {
+    const host = await slottedField(
+      `<${drawnTag} label="Email"><span slot="hint">Work email</span></${drawnTag}>`,
+      'hint',
+    )
+    expect(host.shadowRoot?.querySelector('[part="hint"]')).not.toBeNull()
+    expect(host.describedBy).toBeDefined()
+  })
+
+  test('while nothing slotted and no property draws no part at all', async () => {
+    const host = await field('', drawnTag)
+    expect(host.shadowRoot?.querySelector('[part="label"], [part="hint"]')).toBeNull()
   })
 })

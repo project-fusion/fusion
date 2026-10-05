@@ -3,8 +3,36 @@ import { elementById } from '../../utils/element-by-id/element-by-id.js'
 
 /** What the controller needs to know: which element inside is the control. */
 export interface AriaForwardOptions {
+  /**
+   * Whether a host `aria-label` names the control too.
+   *
+   * For a control named by its content, a button or a switch, which has no
+   * `label` to render it into. A field renders its `aria-label` as a clipped
+   * label already, so it leaves this off.
+   */
+  label?: boolean
   /** The focusable thing in the shadow root, or null before it renders. */
   target: () => HTMLElement | null
+}
+
+/**
+ * The text a node shows, read through slots to what is assigned to them, and
+ * skipping what is hidden.
+ *
+ * `textContent` stops at a slot, which is where a control's own label keeps
+ * the words a consumer gave it.
+ */
+const shownText = (node: Node): string => {
+  if (node instanceof HTMLSlotElement) {
+    return node.assignedNodes({ flatten: true }).map(shownText).join('')
+  }
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent ?? ''
+  }
+  if (node instanceof HTMLElement && node.hidden) {
+    return ''
+  }
+  return [...node.childNodes].map(shownText).join('')
 }
 
 /** The two relationships a consumer writes on a host and means for the control. */
@@ -45,7 +73,13 @@ const RELATIONSHIPS = [
  * is untouched either way, which is the only rule that can be right: this
  * controller knows what the host said and cannot know what the template meant.
  */
-const STATES = ['aria-expanded', 'aria-haspopup', 'aria-controls', 'aria-invalid'] as const
+const STATES = [
+  'aria-expanded',
+  'aria-haspopup',
+  'aria-controls',
+  'aria-invalid',
+  'aria-pressed',
+] as const
 
 /**
  * Carries a host's ARIA references down to the control inside it.
@@ -85,6 +119,13 @@ const STATES = ['aria-expanded', 'aria-haspopup', 'aria-controls', 'aria-invalid
  * a framework rendering a tooltip after this element upgrades, or a consumer
  * pointing `aria-describedby` at a different id, changes an attribute and
  * nothing schedules a Lit update.
+ *
+ * **A `<label>` that names the host names the control too**, when the control
+ * has no name of its own. The platform gives a form-associated host its labels
+ * and the host is a generic the reader never lands on, so a `<label for>` or a
+ * wrapping `<label>` left the textbox unnamed. The labels travel the same way a
+ * forwarded `aria-labelledby` does, as element references, and are read again
+ * when focus arrives, since a label can be added without the host hearing.
  */
 export class AriaForwardController implements ReactiveController {
   private readonly host: ReactiveControllerHost & HTMLElement
@@ -99,10 +140,42 @@ export class AriaForwardController implements ReactiveController {
   /** The control the record above is about, so a replacement resets it. */
   private recorded: HTMLElement | undefined
 
+  /** Whether a host `aria-label` is carried down. See the option. */
+  private readonly label: boolean
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: AriaForwardOptions) {
     this.host = host
     this.target = options.target
+    this.label = options.label === true
     host.addController(this)
+  }
+
+  /**
+   * Whether the control has a name that did not come from this controller: an
+   * `aria-label`, an `aria-labelledby` of its own, or a label of its own with
+   * words in it.
+   */
+  private namedByItself(target: HTMLElement): boolean {
+    if (target.getAttribute('aria-label')) {
+      return true
+    }
+    if (!this.forwarded.has('aria-labelledby') && target.hasAttribute('aria-labelledby')) {
+      return true
+    }
+    const own = (target as HTMLElement & { labels?: NodeList | null }).labels
+    return [...(own ?? [])].some((label) => shownText(label).trim() !== '')
+  }
+
+  /**
+   * The labels the platform associated with the host, for a control with no
+   * name of its own, and none otherwise.
+   */
+  private hostLabels(target: HTMLElement): HTMLElement[] {
+    const labels = (this.host as HTMLElement & { labels?: NodeList | null }).labels
+    if (!labels || labels.length === 0 || this.namedByItself(target)) {
+      return []
+    }
+    return [...labels].filter((label): label is HTMLElement => label instanceof HTMLElement)
   }
 
   /**
@@ -135,37 +208,9 @@ export class AriaForwardController implements ReactiveController {
       this.forwarded.clear()
       this.recorded = target
     }
-    for (const [attribute, property] of RELATIONSHIPS) {
-      if (!(property in target)) {
-        // An engine without element reflection. Nothing to do, and nothing that
-        // silently half works: assigning to a property it does not implement is
-        // a no-op rather than an error, which is what the guard makes visible.
-        continue
-      }
-      const ids = (this.host.getAttribute(attribute) ?? '').split(/\s+/).filter(Boolean)
-      const elements = ids
-        .map((id) => elementById(this.host, id))
-        .filter((element): element is HTMLElement => element !== null)
-      const reflect = target as unknown as Record<string, Element[] | null>
-      if (elements.length > 0) {
-        reflect[property] = elements
-        this.forwarded.add(attribute)
-        continue
-      }
-      /* Only if this controller is what put it there, which is the same rule
-         the states below keep and for a worse reason. `MixinField` writes
-         `aria-describedby` on the control for its own hint, and assigning null
-         here removes the content attribute, so forwarding nothing wiped the
-         component's own description on all eighteen form controls. Invisible to
-         every DOM spec: happy-dom implements no ARIA element reflection, so the
-         `property in target` guard above skips this whole branch and the suite
-         is green against code that clears a description in every browser. */
-      if (this.forwarded.has(attribute)) {
-        reflect[property] = null
-        this.forwarded.delete(attribute)
-      }
-    }
-    for (const attribute of STATES) {
+    /* The states first, so a host `aria-label` is on the control before the
+       labels below ask whether it has a name. */
+    for (const attribute of this.label ? [...STATES, 'aria-label'] : STATES) {
       const value = this.host.getAttribute(attribute)
       if (value === null) {
         // Only if this controller is what put it there. See the note above.
@@ -178,18 +223,63 @@ export class AriaForwardController implements ReactiveController {
       target.setAttribute(attribute, value)
       this.forwarded.add(attribute)
     }
+    for (const [attribute, property] of RELATIONSHIPS) {
+      if (!(property in target)) {
+        // An engine without element reflection. Nothing to do, and nothing that
+        // silently half works: assigning to a property it does not implement is
+        // a no-op rather than an error, which is what the guard makes visible.
+        continue
+      }
+      const ids = (this.host.getAttribute(attribute) ?? '').split(/\s+/).filter(Boolean)
+      const referenced = ids
+        .map((id) => elementById(this.host, id))
+        .filter((element): element is HTMLElement => element !== null)
+      const elements =
+        referenced.length === 0 && attribute === 'aria-labelledby'
+          ? this.hostLabels(target)
+          : referenced
+      const reflect = target as unknown as Record<string, Element[] | null>
+      if (elements.length > 0) {
+        reflect[property] = elements
+        this.forwarded.add(attribute)
+        continue
+      }
+      /* Only if this controller is what put it there, which is the same rule
+         the states above keep and for a worse reason. `MixinField` writes
+         `aria-describedby` on the control for its own hint, and assigning null
+         here removes the content attribute, so forwarding nothing wiped the
+         component's own description on all eighteen form controls. Invisible to
+         every DOM spec: happy-dom implements no ARIA element reflection, so the
+         `property in target` guard above skips this whole branch and the suite
+         is green against code that clears a description in every browser. */
+      if (this.forwarded.has(attribute)) {
+        reflect[property] = null
+        this.forwarded.delete(attribute)
+      }
+    }
   }
 
   hostConnected(): void {
     this.observer = new MutationObserver(() => this.forward())
     this.observer.observe(this.host, {
-      attributeFilter: [...RELATIONSHIPS.map(([attribute]) => attribute), ...STATES],
+      attributeFilter: [
+        ...RELATIONSHIPS.map(([attribute]) => attribute),
+        ...STATES,
+        ...(this.label ? ['aria-label'] : []),
+      ],
     })
+    this.host.addEventListener('focusin', this.refresh)
   }
 
   hostDisconnected(): void {
     this.observer?.disconnect()
     this.observer = undefined
+    this.host.removeEventListener('focusin', this.refresh)
+  }
+
+  /** Forwards again as focus arrives, for a label added since the last update. */
+  private readonly refresh = (): void => {
+    this.forward()
   }
 
   /* After the render that created the control, because there is nothing to
