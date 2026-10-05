@@ -17,9 +17,9 @@ import {
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import type { HelixHeadlessFilterField } from '../field/filter-field.js'
+import { HelixHeadlessFilterField } from '../field/filter-field.js'
 import { readFilterText } from '../grammar.js'
-import type { HelixHeadlessFilterMenu } from '../menu/filter-menu.js'
+import { HelixHeadlessFilterMenu } from '../menu/filter-menu.js'
 
 /** A token that answers a request to go, which is what `Tag` is. */
 type DismissibleToken = Element & { dismiss(): boolean }
@@ -378,11 +378,12 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * twice would be asking which of the two surfaces is the real one.
    */
   get fields(): HelixHeadlessFilterField[] {
-    return [
-      ...this.querySelectorAll<HelixHeadlessFilterField>(
-        'helix-headless-filter-field, helix-filter-field',
-      ),
-    ]
+    /* By class, as `FilterMenu` finds them, so a field registered under a tag
+       of a consumer's own is found too. Two tag names written here found the
+       stock ones and nothing a subclass registered. */
+    return [...this.querySelectorAll('*')].filter(
+      (element): element is HelixHeadlessFilterField => element instanceof HelixHeadlessFilterField,
+    )
   }
 
   /**
@@ -394,9 +395,10 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * reader is about to open.
    */
   private menuFor(field: string): HelixHeadlessFilterMenu | null {
-    for (const menu of this.querySelectorAll<HelixHeadlessFilterMenu>(
-      'helix-headless-filter-menu, helix-filter-menu',
-    )) {
+    for (const menu of this.querySelectorAll('*')) {
+      if (!(menu instanceof HelixHeadlessFilterMenu)) {
+        continue
+      }
       if (menu.fields.some((declared) => (declared.name ?? '') === field)) {
         return menu
       }
@@ -506,7 +508,10 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * disappear, which would otherwise land on the body.
    */
   private readonly handleClear = (): void => {
-    this.requestValue('')
+    // `change` as well, for `Input`'s reason: the native field saw no edit.
+    if (this.value !== '' && this.requestValue('')) {
+      this.announceChange()
+    }
     const control = this.control
     if (control) {
       restoreValue(control, this.value)
@@ -718,7 +723,12 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * something it was never given.
    */
   protected override removeLastToken(): void {
-    const last = this.tokens?.assignedElements({ flatten: true }).at(-1)
+    /* The last one shown. `max-tags` hides the ones over the cap, and taking
+       the last of those removed a filter the reader could not see. */
+    const last = this.tokens
+      ?.assignedElements({ flatten: true })
+      .filter((token) => !(token as HTMLElement).hidden)
+      .at(-1)
     if (asksToGo(last)) {
       last.dismiss()
     }
@@ -887,7 +897,14 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
          built only once there were options could never learn that there are
          any. A manual popover puts it in the top layer, so it is not clipped by
          a scrolling table or an overflow on an ancestor. -->
-    <div part="surface" id="suggestions" role="listbox" popover="manual" ?hidden=${!this.open}>
+    <div
+      part="surface"
+      id="suggestions"
+      role="listbox"
+      aria-labelledby=${this.labeled ? this.labelId : nothing}
+      popover="manual"
+      ?hidden=${!this.open}
+    >
       <slot name="suggestions" @slotchange=${this.handleSuggestions}></slot>
     </div>
     ${this.renderHint()}${this.renderFeedback()}`

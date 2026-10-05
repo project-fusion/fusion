@@ -178,3 +178,59 @@ describe('a required filter input', () => {
     expect(said.at(-1)?.valueMissing).toBe(true)
   })
 })
+
+describe('a filter the cap has hidden', () => {
+  /* `max-tags` hides the tokens over the cap, and Backspace took the last of
+     those, a filter the reader could not see. */
+  test('is not what Backspace asks to go', async () => {
+    const filter = await mount(`<helix-headless-filter-input label="Filter rows" max-tags="2">
+  <helix-headless-tag dismissible slot="tags">design</helix-headless-tag>
+  <helix-headless-tag dismissible slot="tags">infra</helix-headless-tag>
+  <helix-headless-tag dismissible slot="tags">docs</helix-headless-tag>
+</helix-headless-filter-input>`)
+    const asked: string[] = []
+    filter.addEventListener('helix-dismiss', (event) => {
+      asked.push((event as CustomEvent<{ label: string }>).detail.label)
+    })
+    backspace(filter)
+    expect(asked).toEqual(['infra'])
+  })
+})
+
+describe('the clear button', () => {
+  /* The native field saw no edit, so no `change` of its own followed. */
+  test('announces change as well as input', async () => {
+    const filter = await mount(
+      '<helix-headless-filter-input label="Filter rows" clearable default-value="deploy"></helix-headless-filter-input>',
+    )
+    const heard: string[] = []
+    filter.addEventListener('input', () => heard.push('input'))
+    filter.addEventListener('change', () => heard.push('change'))
+    ;(part(filter, 'clear') as HTMLButtonElement).click()
+    expect(heard).toEqual(['input', 'change'])
+  })
+})
+
+describe('the suggestions list', () => {
+  /* The combobox was named and the list it controls was not. */
+  test('is named by the label', async () => {
+    const filter = await mount('<helix-headless-filter-input label="Filter rows" />')
+    const surface = part(filter, 'surface')
+    const label = surface?.getAttribute('aria-labelledby') ?? ''
+    expect(filter.shadowRoot?.getElementById(label)?.textContent?.trim()).toBe('Filter rows')
+  })
+})
+
+describe('a subclass registered under a tag of its own', () => {
+  /* Fields were found by two tag names, so a headless subclass's grammar saw
+     none of its own fields and typed filters stayed plain text. */
+  test('finds the fields declared inside it', async () => {
+    const { HelixHeadlessFilterField, HelixHeadlessFilterInput } = await import('../index.js')
+    customElements.define('acme-filter-field', class extends HelixHeadlessFilterField {})
+    customElements.define('acme-filter-input', class extends HelixHeadlessFilterInput {})
+    const filter = (await mount(
+      '<acme-filter-input label="Issues"><acme-filter-field name="status"></acme-filter-field></acme-filter-input>',
+    )) as HTMLElement & { fields: HTMLElement[] }
+    expect(filter.fields.map((field) => field.localName)).toEqual(['acme-filter-field'])
+  })
+})
