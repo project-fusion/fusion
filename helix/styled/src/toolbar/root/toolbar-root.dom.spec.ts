@@ -50,11 +50,20 @@ describe('toolbar', () => {
     expect(host).toContain('--helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8)')
   })
 
-  test('no chrome of its own', () => {
+  test('no chrome of its own unless a hook asks for it', () => {
     // A toolbar is a place controls sit, and a border around them would be a
-    // second frame inside whatever already frames the bar.
-    expect(rule('[part="toolbar"]')).not.toContain('border')
-    expect(rule('[part="toolbar"]')).not.toContain('background')
+    // second frame inside whatever already frames the bar. Its fill, corner
+    // and inset are hooks that default to none.
+    expect(rule('[part="toolbar"]')).not.toContain('border:')
+    expect(rule('[part="toolbar"]')).toContain(
+      'background-color: var(--toolbar-background-color, transparent)',
+    )
+    expect(rule('[part="toolbar"]')).toContain(
+      'border-radius: var(--toolbar-radius, var(--helix-radii-none))',
+    )
+    expect(rule('[part="toolbar"]')).toContain(
+      'padding: var(--toolbar-padding, var(--helix-space-none))',
+    )
   })
 
   test('the hook the docs name is what the sheet reads', () => {

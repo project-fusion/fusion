@@ -148,7 +148,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   href = ''
 
   /**
-   * Whether the row is on the menu page that is showing.
+   * @internal Whether the row is on the menu page that is showing.
    *
    * Set by the menu, and a property rather than an attribute for that reason.
    * Public because the menu has to reach it, and not something a consumer
@@ -173,7 +173,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   shortcut = ''
 
   /**
-   * Whether the page showing is this row's submenu, or one below it.
+   * @internal Whether the page showing is this row's submenu, or one below it.
    *
    * Separate from `onPage`, and it has to be. A row that opened a page is not
    * itself on that page, so both are false for it, and rendering nothing on

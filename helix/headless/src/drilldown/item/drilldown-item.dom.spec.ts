@@ -93,8 +93,11 @@ describe('a row that opens a page', () => {
     const mark = part(host, 'mark')
     expect(mark?.localName).toBe('svg')
     expect(mark?.getAttribute('aria-hidden')).toBe('true')
-    expect(mark?.parentElement).toBe(part(host, 'item') as HTMLElement)
-    expect(mark?.previousElementSibling?.getAttribute('name')).toBe('end')
+    /* The fallback of the `chevron` slot, which sits after `end` in the row. */
+    const slot = mark?.parentElement
+    expect(slot?.getAttribute('name')).toBe('chevron')
+    expect(slot?.parentElement).toBe(part(host, 'item') as HTMLElement)
+    expect(slot?.previousElementSibling?.getAttribute('name')).toBe('end')
     expect(part(host, 'item')?.getAttribute('aria-haspopup')).toBe('menu')
   })
 

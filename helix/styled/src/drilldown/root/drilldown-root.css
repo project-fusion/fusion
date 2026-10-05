@@ -42,7 +42,8 @@
   justify-content: center;
 }
 
-[part="back"] svg {
+[part="back"] svg,
+slot[name="back-icon"]::slotted(*) {
   block-size: var(--helix-size-icon-tight);
   inline-size: var(--helix-size-icon-tight);
 }

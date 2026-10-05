@@ -57,11 +57,11 @@
  * panel is measured.
  */
 [part="actions"] {
-  --_dial-from: var(--helix-space-md);
+  --_dial-from: var(--speed-dial-travel, var(--helix-space-md));
 }
 
 [part="actions"][data-placement^="bottom"] {
-  --_dial-from: calc(var(--helix-space-md) * -1);
+  --_dial-from: calc(var(--speed-dial-travel, var(--helix-space-md)) * -1);
 }
 
 /* Scoped to the actions' own slot. `::slotted(*)` on its own matches everything
@@ -90,7 +90,7 @@
  *    from the end; flipped, it runs from the start.
  */
 [part="actions"] {
-  --_speed-dial-stagger: calc(var(--helix-duration-fast) / 3);
+  --_speed-dial-stagger: var(--speed-dial-stagger, calc(var(--helix-duration-fast) / 3));
 }
 
 [part="actions"][data-placed] ::slotted(:nth-last-child(2)) {
@@ -205,4 +205,11 @@
   :host {
     display: none;
   }
+}
+
+/* **Names on demand.** Under `labels="hover"` each action's name is drawn only
+   while its action is under the pointer or has focus, as a tooltip is. It stays
+   in the accessibility tree either way, being only transparent. */
+:host([labels="hover"]) {
+  --_speed-dial-label-opacity: 0;
 }

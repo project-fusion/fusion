@@ -370,3 +370,20 @@ describe('moving through a page by key', () => {
     expect(about.ownerDocument.activeElement).toBe(about)
   })
 })
+
+describe('the icons a drilldown draws', () => {
+  /* The back arrow and a row's caret were drawn glyphs a page could only
+     restyle, never replace. */
+  test('are the fallbacks of slots your own icons replace', async () => {
+    const host = await stack()
+    const row = host.querySelector('helix-headless-drilldown-item') as Item & {
+      updateComplete: Promise<boolean>
+    }
+    await row.updateComplete
+    expect(row.shadowRoot?.querySelector('slot[name="chevron"] [part="mark"]')).not.toBeNull()
+    await press(host, row)
+    expect(
+      host.shadowRoot?.querySelector('slot[name="back-icon"] [part="back-mark"]'),
+    ).not.toBeNull()
+  })
+})

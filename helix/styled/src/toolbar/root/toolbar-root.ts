@@ -20,7 +20,10 @@ import { styles } from './toolbar-root.css.js'
  *
  * @csspart toolbar - The toolbar container.
  *
+ * @cssproperty --toolbar-background-color - The fill behind the controls. Transparent unless set.
  * @cssproperty --toolbar-gap - The space between controls.
+ * @cssproperty --toolbar-padding - The space between the toolbar's edge and its controls.
+ * @cssproperty --toolbar-radius - The corner radius of the toolbar's fill.
  */
 @customElement('helix-toolbar')
 export class HelixToolbar extends HelixHeadlessToolbar {

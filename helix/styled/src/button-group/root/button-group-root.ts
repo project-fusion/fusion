@@ -16,6 +16,9 @@ import { styles } from './button-group-root.css.js'
  * shadow root, where this component's styles cannot reach. The same rule works
  * for your own anchor styled as a button.
  *
+ * The buttons take their height from the region, so set `data-density` on the
+ * group to make every button in it smaller or larger together.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions

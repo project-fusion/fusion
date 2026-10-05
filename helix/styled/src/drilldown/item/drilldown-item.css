@@ -44,7 +44,8 @@
    the step the back control's caret is drawn at, so the two carets on a page
    are one size. The row's gap is the seam before it, and the label's growth is
    what puts it at the end. */
-[part="mark"] {
+[part="mark"],
+slot[name="chevron"]::slotted(*) {
   block-size: var(--helix-size-icon-tight);
   color: var(--helix-color-foreground-subtle);
   flex: none;
