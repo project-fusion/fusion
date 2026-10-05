@@ -172,3 +172,16 @@ describe('what a screen reader says for the value', () => {
     expect(thumbs(host)[0]?.getAttribute('aria-valuetext')).toBe('40 degrees')
   })
 })
+
+describe('the bounds each thumb announces', () => {
+  /* The multi-thumb slider pattern has each thumb stop at the other, and both
+     announced the whole track. */
+  test('stop at the other thumb', async () => {
+    const host = await slider('range default-value="20,70"')
+    const [start, end] = thumbs(host)
+    expect(start?.getAttribute('aria-valuemax')).toBe('70')
+    expect(start?.hasAttribute('aria-valuemin')).toBe(false)
+    expect(end?.getAttribute('aria-valuemin')).toBe('20')
+    expect(end?.hasAttribute('aria-valuemax')).toBe(false)
+  })
+})
