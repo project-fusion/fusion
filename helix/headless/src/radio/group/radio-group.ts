@@ -12,9 +12,6 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessRadio } from '../root/radio-root.js'
 
-/** The keys that move the answer in a radio group. */
-const MOVING_KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home'])
-
 /**
  * @summary A set of radios where exactly one can be chosen.
  *
@@ -98,25 +95,13 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
    * Whether a reader can see and focus the answer and cannot change it. A
    * read-only group still submits its value.
    *
-   * React Aria's `isReadOnly`. A press on a radio is refused, and the arrow
-   * keys, Home and End leave focus on the answer, so Tab still reaches it and
-   * a reader hears it with the group's name. The group says `aria-readonly`.
-   * A script can still set `value`.
+   * React Aria's `isReadOnly`. A press on a radio is refused. The arrow keys,
+   * Home and End move focus between the radios and choose nothing, so a reader
+   * can hear every choice, and Tab still reaches the answer. The group says
+   * `aria-readonly`. A script can still set `value`.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
-
-  /**
-   * Keeps the keys that would move the answer from the keyboard controller
-   * while the group is read-only. A capture listener on the host runs ahead of
-   * the controller's own on the same target.
-   */
-  private readonly holdKeys = (event: KeyboardEvent): void => {
-    if (this.readOnly && MOVING_KEYS.has(event.key)) {
-      event.stopImmediatePropagation()
-      event.preventDefault()
-    }
-  }
 
   /* Moving and choosing are one act, which is the radio group pattern and is
      what this controller exists to stop being written per component. */
@@ -125,7 +110,13 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
      `protected` rather than `private` because a private field nothing reads is
      an unused one, and the subclass tier is where a consumer would reach for
      it. */
-  protected readonly keys = new KeyboardNavigationController(this, { items: () => this.items })
+  /* Read-only, the arrows move focus between radios and choose nothing, so a
+     move starts where focus is. */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () => this.items,
+    origin: () => (this.readOnly ? 'focus' : 'selection'),
+    selects: () => !this.readOnly,
+  })
 
   /* Stated once, and the group never thinks about it again. Hand calls from
      each method that could disable an item reach different paths per
@@ -284,13 +275,11 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection as EventListener)
-    this.addEventListener('keydown', this.holdKeys, { capture: true })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection as EventListener)
-    this.removeEventListener('keydown', this.holdKeys, { capture: true })
   }
 
   protected override willUpdate(changed: PropertyValues): void {

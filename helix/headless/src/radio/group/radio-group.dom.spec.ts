@@ -389,7 +389,7 @@ describe('a chosen radio that is removed', () => {
 describe('a read-only radio group', () => {
   /* React Aria's isReadOnly: the answer is seen, reached and submitted, and
      nothing a reader does changes it. */
-  test('refuses a press and the keys that move the answer, and still submits', async () => {
+  test('refuses a press, lets the keys move focus without choosing, and still submits', async () => {
     const host = await group('readonly', 'one')
     const value = (): string => (host as Updatable & { value: string }).value
     ;(
@@ -397,10 +397,14 @@ describe('a read-only radio group', () => {
     )?.click()
     await settle(host)
     expect(value()).toBe('one')
-    for (const key of ['ArrowDown', 'End']) {
-      host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key }))
-      await settle(host)
-    }
+    at(options(host), 0).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }),
+    )
+    await settle(host)
+    expect(document.activeElement).toBe(at(options(host), 1))
+    at(options(host), 1).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'End' }))
+    await settle(host)
+    expect(document.activeElement).toBe(at(options(host), 2))
     expect(value()).toBe('one')
     expect(formValue(host)).toBe('one')
     expect((host as unknown as { internals: ElementInternals }).internals.ariaReadOnly).toBe('true')

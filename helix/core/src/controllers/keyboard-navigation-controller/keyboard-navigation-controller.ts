@@ -23,6 +23,9 @@ export interface NavigableItem {
   selected: boolean
 }
 
+/** Where a move starts from: the item that has focus, or the chosen item. */
+export type KeyboardOrigin = 'focus' | 'selection'
+
 /** How the controller is told what it is moving through. */
 export interface KeyboardNavigationOptions {
   /** The items, in the order a reader moves through them. */
@@ -39,8 +42,13 @@ export interface KeyboardNavigationOptions {
    * every time. It is also the only reading that can tell a press on a tab from
    * a press somewhere else in the component, which matters wherever the host
    * holds more than the set (a tab panel is a tab stop of its own).
+   *
+   * A function where the answer changes with the element's state, read on every
+   * press. A read-only radio group is the case: while it is read-only the arrows
+   * move focus between radios without choosing, so the move has to start where
+   * focus is, and once it is editable again the selection is the start.
    */
-  origin?: 'focus' | 'selection'
+  origin?: KeyboardOrigin | (() => KeyboardOrigin)
   /**
    * Whether arriving also chooses.
    *
@@ -219,7 +227,7 @@ export class KeyboardNavigationController implements ReactiveController {
 
   private readonly items: () => NavigableItem[]
 
-  private readonly origin: 'focus' | 'selection'
+  private readonly originOf: () => KeyboardOrigin
 
   private readonly selects: () => boolean
 
@@ -244,12 +252,17 @@ export class KeyboardNavigationController implements ReactiveController {
   ) {
     this.host = host
     this.items = items
-    this.origin = origin
+    this.originOf = typeof origin === 'function' ? origin : () => origin
     this.reserved = reserved
     this.selects = selects
     this.words = typeahead
     this.wrap = wrap
     host.addController(this)
+  }
+
+  /** Where this press starts from, read again on every press. */
+  private get origin(): KeyboardOrigin {
+    return this.originOf()
   }
 
   /** Moves to an item, and chooses it where arriving is choosing. */

@@ -260,6 +260,18 @@ describe('where a move starts from', () => {
     expect(press(host, 'ArrowDown', 'stranger')).toBe(false)
     expect(asked).toEqual([])
   })
+
+  /* A read-only radio group moves focus without choosing, so it starts where
+     focus is while it is read-only, and from the answer once it is not. A value
+     read once at construction would keep the first answer for good. */
+  test('can be a function, read again on every press', () => {
+    let origin: 'focus' | 'selection' = 'focus'
+    const { asked, host } = set('Aaa', { origin: () => origin, selects: () => false })
+    press(host, 'ArrowDown', 'item-1')
+    origin = 'selection'
+    press(host, 'ArrowDown', 'item-1')
+    expect(asked).toEqual(['focus item-2', 'focus item-1'])
+  })
 })
 
 describe('whether arriving also chooses', () => {
