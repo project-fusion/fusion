@@ -1,6 +1,7 @@
 import {
   commaList,
   customElement,
+  HelixActionEvent,
   HelixBeforeChangeEvent,
   HelixElement,
   hostAria,
@@ -59,7 +60,7 @@ const PRESSABLE = 'a[href], button, input, label, select, textarea, [tabindex]'
  * @slot - The rows.
  *
  * @event {Event} change - Fired once a press has changed which rows are selected.
- * @event {Event} helix-action - Sent from a row when the reader acts on it: Enter, or a press in a list that selects nothing. Read the row from `target`. A row with `href` follows its link instead.
+ * @event {HelixActionEvent} helix-action - Sent from a row when the reader acts on it: Enter, or a press in a list that selects nothing. Read the row from `target`. A row with `href` follows its link instead.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press changes which rows are selected, with the `value` it would leave. Cancelable.
  *
  * @cssproperty --list-first - The number of the first row, written where `start` or `reversed` moves it.
@@ -257,7 +258,7 @@ export class HelixHeadlessList extends HelixElement {
       row.follow()
       return
     }
-    row.dispatchEvent(new Event('helix-action', { bubbles: true, composed: true }))
+    row.dispatchEvent(new HelixActionEvent())
   }
 
   /** Left and Right inside a row: the cell, then each control in `end`, and back. */
