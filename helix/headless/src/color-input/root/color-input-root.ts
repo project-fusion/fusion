@@ -39,6 +39,11 @@ import '../../color-picker/index.js'
  * not survive a round trip through a formatter. Date Input does the same with
  * dates.
  *
+ * Typing sends `input` on each keystroke and `change` when you leave the
+ * field, as a text field does, so the message about a color it cannot read
+ * waits until you are done. Dragging in the panel sends `input` as the color
+ * moves and `change` when it settles.
+ *
  * The component sets `--color-input-swatch`, so do not set it yourself. It
  * holds the resolved color, so the styled tier can paint the swatch without
  * parsing the value.
@@ -163,6 +168,34 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   placeholder = '#000000'
 
   /**
+   * Whether the color is locked. A read-only field still submits its value.
+   *
+   * The field can be read and copied from, and the panel does not open, as on
+   * Date Input and Time Input.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /** Typed, so a keystroke is announced as `input` alone. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
+  /** Requests a new value. While `readOnly` is set, nothing changes. */
+  override requestValue(next: string): boolean {
+    if (this.readOnly) {
+      return false
+    }
+    return super.requestValue(next)
+  }
+
+  /** Requests the panel open or closed. While `readOnly` is set, it does not open. */
+  override requestOpen(next: boolean): boolean {
+    if (next && this.readOnly) {
+      return false
+    }
+    return super.requestOpen(next)
+  }
+
+  /**
    * Colors offered under the picker, as a comma-separated list.
    */
   @property()
@@ -256,8 +289,25 @@ export class HelixHeadlessColorInput extends MixinPickerField(
     if (event.composedPath()[0] !== event.currentTarget) {
       return
     }
-    this.requestValue((event as HelixBeforeChangeEvent).detail.value)
+    /* Refused here, refused in the picker too, so its square stays on the
+       color this field holds. */
+    if (!this.requestValue((event as HelixBeforeChangeEvent).detail.value)) {
+      event.preventDefault()
+    }
     this.restore()
+  }
+
+  /**
+   * The picker's `change`, said under this element's name.
+   *
+   * The picker sends it when a drag, a key or a preset settles the color, so
+   * this field does too, and a drag is one `change` rather than one a frame.
+   */
+  private readonly handlePickerSettled = (event: Event): void => {
+    event.stopPropagation()
+    if (event.composedPath()[0] === event.currentTarget) {
+      this.announceChange()
+    }
   }
 
   /**
@@ -369,7 +419,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
       swatches=${this.swatches || nothing}
       ?disabled=${this.isDisabled}
       @helix-before-change=${this.handlePickerChange}
-      @change=${this.stopInner}
+      @change=${this.handlePickerSettled}
       @input=${this.stopInner}
       @helix-sample-start=${this.handleSampleStart}
       @helix-sample-end=${this.handleSampleEnd}
@@ -402,7 +452,9 @@ export class HelixHeadlessColorInput extends MixinPickerField(
           aria-describedby=${this.describedBy ?? nothing}
           aria-invalid=${this.invalidity ?? nothing}
           ?disabled=${this.isDisabled}
+          ?readonly=${this.readOnly}
           ?required=${this.required}
+          @change=${this.handleCommit}
           @input=${this.handleInput}
         />`
         }
@@ -412,6 +464,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
           id=${this.variant === 'swatch' ? 'control' : nothing}
           type="button"
           aria-controls="surface"
+          aria-disabled=${this.readOnly ? 'true' : nothing}
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-haspopup="dialog"
           aria-label=${this.variant === 'swatch' ? nothing : this.triggerLabel}
@@ -423,7 +476,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
               : nothing
           }
           ?disabled=${this.isDisabled}
-          @click=${() => this.toggleOpen()}
+          @click=${this.handleTriggerClick}
         >
           <span
             part="preview"

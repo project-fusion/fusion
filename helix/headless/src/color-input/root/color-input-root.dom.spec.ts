@@ -263,3 +263,38 @@ describe('input color, dragged', () => {
     expect(announced.filter((line) => !/ #[0-9a-f]{6}$/.test(line))).toEqual([])
   })
 })
+
+describe('a read-only color input', () => {
+  /* Date Input and Time Input had it and this one did not, so `readonly` was
+     ignored and the field stayed editable. */
+  test('refuses a typed color and does not open', async () => {
+    const host = (await field('readonly default-value="#3366ff"')) as InputColor & {
+      readOnly: boolean
+      requestValue(next: string): boolean
+    }
+    expect(host.readOnly).toBe(true)
+    expect(control(host).readOnly).toBe(true)
+    expect(host.requestValue('#ff0000')).toBe(false)
+    ;(part(host, 'trigger') as HTMLElement).click()
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    expect(host.value).toBe('#3366ff')
+  })
+})
+
+describe('the events a color input sends', () => {
+  /* Measured before this: typing #0f0 sent four `change` events, one for the
+     invalid `#`, and the message about it was shown from the first key. */
+  test('typing sends `input`, and `change` once the reader is done', async () => {
+    const host = await field()
+    const log: string[] = []
+    for (const name of ['input', 'change']) {
+      host.addEventListener(name, () => log.push(name))
+    }
+    await type(host, '#')
+    await type(host, '#0f0')
+    expect(log).toEqual(['input', 'input'])
+    control(host).dispatchEvent(new Event('change'))
+    expect(log).toEqual(['input', 'input', 'change'])
+  })
+})

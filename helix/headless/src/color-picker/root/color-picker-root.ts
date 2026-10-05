@@ -62,6 +62,12 @@ interface EyeDropperConstructor {
  * hue or saturation, so a model read back from the value would turn red into
  * gray after you drag to the bottom of the square and back.
  *
+ * The square is one tab stop. In it, the up and down arrows move brightness
+ * and the left and right arrows move saturation, and PageUp and PageDown move
+ * brightness by ten. The picker sends `input` as the color moves and `change`
+ * when a drag, a key, a typed value or a preset settles it, as
+ * `<input type="color">` does.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -284,16 +290,20 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * would give one control two of each. What is left is the validity call and
    * the anchor the browser points its bubble at.
    *
-   * **Emptiness is the only fault reported, and bad input deliberately is
-   * not.** The value row is typed into a character at a time and every
-   * keystroke reaches `requestValue`, so `#0`, `#00` and `#00f` would each be a
-   * reported fault on the way to `#00ff00`. Date Picker and Time Picker can
-   * report bad input because their value moves only on a commit. Color Input
-   * reports it for this family instead, once, against the field the reader
-   * typed into.
+   * **Text that is not a color is bad input**, so a form does not submit
+   * `#00` from a half-typed value. The picker draws no message of its own, so
+   * reporting it as each keystroke arrives shows nothing until the form asks;
+   * Color Input shows its own message against the field the reader typed
+   * into.
    */
   @property({ reflect: true, type: Boolean })
   required = false
+
+  /**
+   * The message shown when the value is text that is not a color.
+   */
+  @property({ attribute: 'bad-input-message' })
+  badInputMessage?: string
 
   /**
    * What the square's horizontal ramp is called.
@@ -358,6 +368,26 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * which reads back as hue 0 and saturation 0, and the next drag starts gray.
    */
   private owned = false
+
+  /** Dragged and keyed, so a move is announced as `input` alone. See `announcesInput`. */
+  protected override readonly announcesInput = true
+
+  /** Whether the value has moved since `change` was last sent. */
+  private unsettled = false
+
+  /**
+   * Sends `change` for a value that has settled, where it moved.
+   *
+   * Measured before this: a six-step drag sent six `change` events, so a
+   * consumer saving on `change`, as they would for `<input type="color">`,
+   * saved on every frame.
+   */
+  private settle(): void {
+    if (this.unsettled) {
+      this.unsettled = false
+      this.announceChange()
+    }
+  }
 
   /** The current color: the last one moved to, the value, or the start color. */
   get color(): Color {
@@ -427,7 +457,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     if (this.readOnly) {
       return false
     }
-    return super.requestValue(next)
+    const before = this.value
+    const taken = super.requestValue(next)
+    if (taken && this.value !== before) {
+      this.unsettled = true
+    }
+    return taken
   }
 
   /** Moves part of the model and announces the value that follows from it. */
@@ -438,6 +473,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     if (this.readOnly) {
       return
     }
+    const before = this.moved
     this.moved = { ...this.color, ...next }
     const value = formatColor(this.moved, this.format ?? 'hex', this.alpha)
     /* **Owned only where the value moves.** A move that hands back the value
@@ -445,7 +481,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
        flag, so the next value set from outside was taken for this element's own:
        after a reset, the square stayed where the drag ended. */
     this.owned = value !== this.value
-    this.requestValue(value)
+    /* A refusal puts the square back where the value still is, which is the
+       same promise `readOnly` keeps above, made for a listener that refused. */
+    if (!this.requestValue(value)) {
+      this.moved = before
+      this.owned = false
+    }
   }
 
   /**
@@ -467,6 +508,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     const parsed = parseColor(preset)
     if (parsed) {
       this.move(parsed)
+      this.settle()
     }
   }
 
@@ -481,6 +523,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     this.format = FORMATS[(FORMATS.indexOf(this.format ?? 'hex') + 1) % FORMATS.length] ?? 'hex'
     if (this.value !== '') {
       this.move({})
+      this.settle()
     }
   }
 
@@ -515,6 +558,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       if (parsed) {
         // A sample carries no alpha, so whatever was set is kept.
         this.move({ ...parsed, alpha: this.color.alpha })
+        this.settle()
       }
     } catch {
       /* Canceling is how this is normally left, and the platform reports it as
@@ -532,7 +576,17 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * reaches a corner, and without it the handle stops wherever the pointer left.
    */
   private readonly handleGridPointer = (event: PointerEvent): void => {
+    /* Off means off to a pointer too. Measured before this: a disabled picker,
+       by its own attribute or a disabled fieldset, took a click and a drag in
+       the square and changed its value. */
+    if (this.isDisabled) {
+      return
+    }
     const grid = event.currentTarget as HTMLElement
+    if (event.type === 'pointerup' || event.type === 'pointercancel') {
+      this.settle()
+      return
+    }
     if (event.type === 'pointerdown') {
       capturePointer(grid, event.pointerId)
       // So the keyboard carries on from where the pointer left off.
@@ -588,6 +642,39 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   }
 
   /**
+   * Moves the square from the keyboard, both axes from either of its inputs.
+   *
+   * The square is two native ranges, and a native range maps every arrow to
+   * its own one axis: on the saturation input, ArrowUp moved the handle
+   * sideways. Here the vertical keys move brightness and the horizontal keys
+   * move saturation, turned on a right-to-left page as the pointer is, which is
+   * what React Aria's ColorArea does.
+   */
+  private readonly handleAreaKeydown = (event: KeyboardEvent): void => {
+    if (this.isDisabled || this.readOnly) {
+      return
+    }
+    const color = this.color
+    const along = isRtl(this) ? -1 : 1
+    const clamp = (at: number): number => Math.min(100, Math.max(0, at))
+    const moves: Record<string, Partial<Color>> = {
+      ArrowDown: { brightness: clamp(color.brightness - 1) },
+      ArrowLeft: { saturation: clamp(color.saturation - along) },
+      ArrowRight: { saturation: clamp(color.saturation + along) },
+      ArrowUp: { brightness: clamp(color.brightness + 1) },
+      PageDown: { brightness: clamp(color.brightness - 10) },
+      PageUp: { brightness: clamp(color.brightness + 10) },
+    }
+    const next = moves[event.key]
+    if (!next) {
+      return
+    }
+    event.preventDefault()
+    this.move(next)
+    this.settle()
+  }
+
+  /**
    * Reports "required and empty", or clears it.
    *
    * Anchored on the square, which is where a reader would go to answer: it is
@@ -601,6 +688,14 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
         { valueMissing: true },
         this.valueMissingMessage || 'Choose a color.',
         this.partNamed('grid') ?? undefined,
+      )
+      return
+    }
+    if (this.value !== '' && parseColor(this.value) === null) {
+      this.internals.setValidity(
+        { badInput: true },
+        this.badInputMessage || 'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
+        this.partNamed('value') ?? this.partNamed('grid') ?? undefined,
       )
       return
     }
@@ -655,7 +750,10 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       .value=${String(value)}
       ?disabled=${this.isDisabled}
       @input=${(event: Event) => this.takeChannel(channel, event)}
-      @change=${(event: Event) => this.takeChannel(channel, event)}
+      @change=${(event: Event) => {
+        this.takeChannel(channel, event)
+        this.settle()
+      }}
       @helix-before-change=${this.keepChannelRequest}
     ></${this.tag('slider')}>`
   }
@@ -770,7 +868,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                     ? html`<${this.tag('button')}
                         part="eyedropper"
       exportparts="button: eyedropper-button, text: eyedropper-text"
-                        aria-label=${this.eyedropperLabel}
+                        label=${this.eyedropperLabel}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleEyeDropper}
                       >
@@ -784,7 +882,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                     : html`<${this.tag('button')}
                         part="format"
       exportparts="button: format-button, text: format-text"
-                        aria-label=${fillTemplate(this.formatLabel, { format: this.format ?? 'hex' })}
+                        label=${fillTemplate(this.formatLabel, { format: this.format ?? 'hex' })}
                         ?disabled=${this.isDisabled}
                         @click=${this.handleFormat}
                       >
@@ -797,11 +895,18 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   protected override render(): TemplateResult {
     const color = this.color
     const painted = toCss(color)
+    /* Each axis says both numbers, its own first, since either key pair moves
+       either axis from the one tab stop. */
+    const both = `${this.saturationLabel} ${color.saturation}%, ${this.brightnessLabel} ${color.brightness}%`
+    const reversed = `${this.brightnessLabel} ${color.brightness}%, ${this.saturationLabel} ${color.saturation}%`
     return html`<div
         part="grid"
         style="--color-picker-hue: ${color.hue}; --color-picker-saturation: ${color.saturation}%; --color-picker-brightness: ${color.brightness}%"
         @pointerdown=${this.handleGridPointer}
         @pointermove=${this.handleGridPointer}
+        @pointerup=${this.handleGridPointer}
+        @pointercancel=${this.handleGridPointer}
+        @keydown=${this.handleAreaKeydown}
       >
         <input
           part="grid-saturation"
@@ -809,21 +914,32 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
           min="0"
           max="100"
           aria-label=${this.saturationLabel}
+          aria-valuetext=${both}
           aria-invalid=${this.invalid ? 'true' : nothing}
           .value=${String(color.saturation)}
           ?disabled=${this.isDisabled}
           @input=${(event: Event) => this.takeArea('saturation', event)}
+          @change=${() => this.settle()}
         />
+        ${
+          /* Out of the Tab order: the square is one stop, and the saturation
+             input above takes both pairs of arrows. Still in the tree, so a
+             screen reader browsing the panel finds the vertical axis. */
+          ''
+        }
         <input
           part="grid-brightness"
           type="range"
           min="0"
           max="100"
+          tabindex="-1"
           aria-label=${this.brightnessLabel}
+          aria-valuetext=${reversed}
           aria-invalid=${this.invalid ? 'true' : nothing}
           .value=${String(color.brightness)}
           ?disabled=${this.isDisabled}
           @input=${(event: Event) => this.takeArea('brightness', event)}
+          @change=${() => this.settle()}
         />
       </div>
 
@@ -865,6 +981,10 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                 ?disabled=${this.isDisabled}
                 ?readonly=${this.readOnly}
                 @input=${this.handleValueInput}
+                @change=${(event: Event) => {
+                  event.stopPropagation()
+                  this.settle()
+                }}
               />`
         }
         ${this.tools ? html`${this.renderTools()}` : nothing}
