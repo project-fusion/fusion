@@ -98,3 +98,29 @@ describe('where the value comes from', () => {
     expect(part(element, 'time')?.textContent).toBe('3h')
   })
 })
+
+describe('a day with no time', () => {
+  /* Read in UTC, because it names a day rather than an instant: parsed, it is
+     midnight UTC, and in Los Angeles that was August 3. Asserted in whatever
+     zone runs the suite, which is the point: the answer must not depend on it. */
+  test('is that day in every zone', async () => {
+    const element = await stamp(
+      '<helix-headless-format-date date="2026-08-04" locale="en-US" month="long" day="numeric" year="numeric"></helix-headless-format-date>',
+    )
+    expect(part(element, 'time')?.textContent).toBe('August 4, 2026')
+    expect(part(element, 'time')?.getAttribute('datetime')).toBe('2026-08-04')
+  })
+})
+
+describe('an elapsed reading to a screen reader', () => {
+  /* Measured before this: Chromium named the `<time>` nothing and read its
+     only child, "3h", and the instant in `datetime` reached nobody. */
+  test('is named in full, and carries the whole date as its title', async () => {
+    const element = await stamp(
+      `<helix-headless-format-date elapsed locale="en-US" date="${at}"></helix-headless-format-date>`,
+    )
+    const time = part(element, 'time')
+    expect(time?.getAttribute('aria-label')).toBe('42 minutes ago')
+    expect(time?.getAttribute('title')).toContain(String(new Date(at).getFullYear()))
+  })
+})
