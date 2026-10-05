@@ -46,6 +46,13 @@ const KEYS = new Set([
 ])
 
 /**
+ * The first of a month at midnight UTC, with the year as written: year 1 is
+ * year 1, where `Date.UTC` reads it as 1901.
+ */
+const firstOf = (year: number, month: number): Date =>
+  addMonths(asDate('2000-01-01') as Date, (year - 2000) * 12 + month)
+
+/**
  * @summary A month calendar for choosing one or more dates.
  *
  * @description
@@ -385,7 +392,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   private get shown(): Date {
     const explicit = /^(\d{4})-(\d{2})$/.exec(this.monthState ?? this.defaultMonth)
     if (explicit) {
-      return new Date(Date.UTC(Number(explicit[1]), Number(explicit[2]) - 1, 1))
+      return firstOf(Number(explicit[1]), Number(explicit[2]) - 1)
     }
     return this.derivedMonth
   }
@@ -399,7 +406,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    */
   private get derivedMonth(): Date {
     const from = asDate(this.selected[0] ?? '') ?? new Date()
-    return new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), 1))
+    return firstOf(from.getUTCFullYear(), from.getUTCMonth())
   }
 
   /**
@@ -679,11 +686,21 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
         return
       }
       this.pageYear = at
-      this.periodFocus = at === this.shown.getUTCFullYear() ? this.shown.getUTCMonth() : 0
+      /* The month in view, in the year chosen, as React Aria keeps it: a reader
+         moving from August 2026 to 2030 is looking for August. Where `min` or
+         `max` leaves that month out, the nearest month the year has. */
+      const month = this.shown.getUTCMonth()
+      const open = Array.from({ length: 12 }, (_, index) => index).filter(
+        (index) => !this.monthOut(firstOf(at, index)),
+      )
+      this.periodFocus = open.includes(month)
+        ? month
+        : ([...open].sort((left, right) => Math.abs(left - month) - Math.abs(right - month))[0] ??
+          month)
       this.zoom('month')
       return
     }
-    const first = new Date(Date.UTC(this.periodYear, at, 1))
+    const first = firstOf(this.periodYear, at)
     if (this.monthOut(first)) {
       return
     }
@@ -1277,10 +1294,8 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     const years = this.view === 'year'
     const page = years ? yearPageOf(this.periodYear) : this.periodYear
     const heading = years
-      ? `${yearName.format(new Date(Date.UTC(page, 0, 1)))} – ${yearName.format(
-          new Date(Date.UTC(page + YEARS_SHOWN - 1, 0, 1)),
-        )}`
-      : yearName.format(new Date(Date.UTC(page, 0, 1)))
+      ? `${yearName.format(firstOf(page, 0))} – ${yearName.format(firstOf(page + YEARS_SHOWN - 1, 0))}`
+      : yearName.format(firstOf(page, 0))
     const stop = this.periodStop
     const cells = periodCells({
       max: this.max,

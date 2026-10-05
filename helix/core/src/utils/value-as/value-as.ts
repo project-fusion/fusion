@@ -45,6 +45,20 @@ const ISO_TIME = /^(\d{2}):(\d{2})(?::(\d{2}(?:\.\d{1,3})?))?$/
 const DAY = 86_400_000
 
 /**
+ * Midnight UTC on a day, with the year as written.
+ *
+ * `Date.UTC` reads a year from 0 to 99 as 1900 to 1999, so year 1, which a
+ * native date input accepts and a year segment reaches with Home, became 1901
+ * and the date was refused. `setUTCFullYear` takes the year as given, and
+ * rolls a month or a day past its end the way `Date.UTC` does.
+ */
+export const utcDate = (year: number, month: number, day: number): Date => {
+  const date = new Date(0)
+  date.setUTCFullYear(year, month, day)
+  return date
+}
+
+/**
  * The date a `YYYY-MM-DD` value names, at midnight UTC, or `null`.
  *
  * The range check is not decoration. `2026-02-31` matches the pattern and
@@ -57,7 +71,10 @@ export const valueAsDate = (value: string): Date | null => {
     return null
   }
   const [year, month, day] = [Number(parts[1]), Number(parts[2]), Number(parts[3])]
-  const date = new Date(Date.UTC(year, month - 1, day))
+  if (year < 1) {
+    return null
+  }
+  const date = utcDate(year, month - 1, day)
   const rolled =
     date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day
   return rolled ? null : date
