@@ -126,6 +126,7 @@ export {
 } from './controllers/virtualize-controller/virtualize-controller.js'
 export { eventsForTag, registerElementEvents } from './events/element-events.js'
 export {
+  type ActivateDetail,
   type AuraFallbackDetail,
   type CanvasView,
   type CaretDetail,
@@ -202,6 +203,7 @@ export {
   HelixPanelResizeEvent,
   HelixPinEvent,
   HelixPressEvent,
+  HelixPreviewEvent,
   HelixPreviousEvent,
   HelixRangeChangeEvent,
   HelixReadEvent,
@@ -225,6 +227,7 @@ export {
   HelixSplitEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
+  HelixTourStatusEvent,
   HelixTypingEvent,
   type MapClusterDetail,
   type MapPanDetail,
@@ -253,6 +256,7 @@ export {
   type SkipDetail,
   type SortDetail,
   type ToggleDetail,
+  type TourStatusDetail,
   type TypingDetail,
   type ViewportPanDetail,
   type ViewportZoomDetail,

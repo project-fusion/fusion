@@ -95,6 +95,16 @@ describe('a video playlist', () => {
     expect(player(host).src).toBe('/one.mp4')
   })
 
+  /* Web Awesome's `wa-video-change` says which entry it left; `helix-activate`
+     said only where it went. */
+  test('says the entry it moved to and the one it left', async () => {
+    const host = await list()
+    const heard: unknown[] = []
+    host.addEventListener('helix-activate', (event) => heard.push((event as CustomEvent).detail))
+    host.requestActive('two')
+    expect(heard).toEqual([{ previous: 'one', value: 'two' }])
+  })
+
   test('only one entry is current, and it says so with aria-current', async () => {
     /* `aria-current` and not `aria-selected`, which belongs to the roles that
        have a selection. What is true of this row is that the player is on it. */

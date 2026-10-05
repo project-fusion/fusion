@@ -120,6 +120,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
       if (next === this.active) {
         return true
       }
+      const before = this.active
       const applied = requestChange({
         apply: (value) => {
           const previous = this.active
@@ -131,7 +132,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
         next,
       })
       if (applied) {
-        this.announceActivated(next)
+        this.announceActivated(next, before)
       }
       return applied
     }
@@ -153,10 +154,11 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      * **After `apply`, which is the whole reason it is a second event**, so the
      * state is on the element by the time a handler reads it. Not cancelable:
      * the decision was taken by the event before this one, and two refusable
-     * events for one transition are two answers to one question.
+     * events for one transition are two answers to one question. `previous`
+     * is the item that was current, read before `apply`.
      */
-    private announceActivated(value: string): void {
-      this.dispatchEvent(new HelixActivateEvent({ value }))
+    private announceActivated(value: string, previous: string): void {
+      this.dispatchEvent(new HelixActivateEvent({ previous, value }))
     }
 
     /**

@@ -6,6 +6,7 @@ import {
   numberAsValue as fromNumber,
   HelixClearEvent,
   HelixFormElement,
+  HelixPreviewEvent,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -48,6 +49,7 @@ import { nearestStep } from '../steps.js'
  * @event {Event} change - The score was chosen. Sent together with `input`, because each choice commits the score.
  * @event {HelixBeforeChangeEvent} helix-before-change - The score is about to change. Cancelable: cancel it to keep the current score.
  * @event {HelixClearEvent} helix-clear - The rating went back to unrated, under `clearable`. Sent after `input` and `change`.
+ * @event {HelixPreviewEvent} helix-preview - The score under the pointer, shown before it is chosen, or `''` once the marks show the score again. Sent as the preview changes, not on every move.
  * @event {Event} input - The score changed.
  *
  * @csspart feedback - The message that says what is wrong.
@@ -547,6 +549,15 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
 
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
+    /* Once per change of what is previewed, not per pointer move: Lit records
+       `previewing` only when it differs. */
+    if (changed.has('previewing')) {
+      this.dispatchEvent(
+        new HelixPreviewEvent({
+          value: this.previewing === undefined ? '' : String(this.previewing),
+        }),
+      )
+    }
     // Every update, not only the ones that name `value`: see the note on
     // `MixinPickerField.updated`.
     this.sync()

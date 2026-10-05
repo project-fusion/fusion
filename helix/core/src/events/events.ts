@@ -126,6 +126,7 @@ import { HelixNextEvent } from './next.js'
 import { HelixPanelResizeEvent } from './panel-resize.js'
 import { HelixPinEvent } from './pin.js'
 import { HelixPressEvent } from './press.js'
+import { HelixPreviewEvent } from './preview.js'
 import { HelixPreviousEvent } from './previous.js'
 import { HelixRangeChangeEvent } from './range-change.js'
 import { HelixReadEvent } from './read.js'
@@ -149,9 +150,11 @@ import { HelixSortedEvent } from './sorted.js'
 import { HelixSplitEvent } from './split.js'
 import { HelixToggleEvent } from './toggle.js'
 import { HelixTourAskEvent } from './tour-ask.js'
+import { HelixTourStatusEvent } from './tour-status.js'
 import { HelixTypingEvent } from './typing.js'
 
 export type {
+  ActivateDetail,
   AuraFallbackDetail,
   CanvasView,
   CaretDetail,
@@ -196,6 +199,7 @@ export type {
   SortDetail,
   ToggleDetail,
   TourAskDetail,
+  TourStatusDetail,
   TypingDetail,
   ViewportPanDetail,
   ViewportZoomDetail,
@@ -262,6 +266,7 @@ export {
   HelixPanelResizeEvent,
   HelixPinEvent,
   HelixPressEvent,
+  HelixPreviewEvent,
   HelixPreviousEvent,
   HelixRangeChangeEvent,
   HelixReadEvent,
@@ -285,6 +290,7 @@ export {
   HelixSplitEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
+  HelixTourStatusEvent,
   HelixTypingEvent,
 }
 
@@ -361,6 +367,7 @@ const registry = {
   HelixPanelResizeEvent,
   HelixPinEvent,
   HelixPressEvent,
+  HelixPreviewEvent,
   HelixPreviousEvent,
   HelixRangeChangeEvent,
   HelixReadEvent,
@@ -384,6 +391,7 @@ const registry = {
   HelixSplitEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
+  HelixTourStatusEvent,
   HelixTypingEvent,
 } as const
 

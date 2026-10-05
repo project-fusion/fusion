@@ -281,6 +281,12 @@ export interface ChangeDetail {
   value: string
 }
 
+/** Detail carried by `helix-activate`: the value after the move, and the one before it. */
+export interface ActivateDetail extends ChangeDetail {
+  /** The value that was current before the move, where the set knows it. */
+  previous?: string
+}
+
 /** Where each note was laid out, by its `id`, in the renderer's own units. */
 export interface GraphLayoutDetail {
   positions: Record<string, { x: number; y: number; z?: number | undefined }>
@@ -374,6 +380,14 @@ export type PressPointerType = 'keyboard' | 'mouse' | 'pen' | 'touch' | 'virtual
 export interface PressDetail {
   /** What the press came from. */
   pointerType: PressPointerType
+}
+
+/** Detail carried by `helix-tour-status`. */
+export interface TourStatusDetail {
+  /** The stop it happened at, counting from 0. */
+  index: number
+  /** Waiting at a `wait` stop for its target, skipped, or completed. */
+  status: 'completed' | 'skipped' | 'waiting'
 }
 
 /** Detail carried by `helix-before-toggle`. */

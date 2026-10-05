@@ -599,3 +599,60 @@ describe('stops with nothing to light', () => {
     expect(element.index).toBe(1)
   })
 })
+
+describe('the tour status', () => {
+  /** What `helix-tour-status` said, in order. */
+  const statuses = (tour: Tour): Array<{ index: number; status: string }> => {
+    const heard: Array<{ index: number; status: string }> = []
+    tour.addEventListener('helix-tour-status', (event) =>
+      heard.push((event as CustomEvent<{ index: number; status: string }>).detail),
+    )
+    return heard
+  }
+
+  /* Zag's `onStatusChange`: how a tour ended, and where it waits, said once. */
+  test('says it was completed at the last stop', async () => {
+    const tour = await run()
+    const heard = statuses(tour)
+    tour.index = 2
+    await tour.updateComplete
+    tour.next()
+    await tour.updateComplete
+    expect(heard).toEqual([{ index: 2, status: 'completed' }])
+  })
+
+  test('says it was skipped, where the page let it close', async () => {
+    const tour = await run()
+    const heard = statuses(tour)
+    tour.next()
+    await tour.updateComplete
+    tour.skip()
+    await tour.updateComplete
+    const refused = await run()
+    const unheard = statuses(refused)
+    refused.addEventListener('helix-before-close', (event) => event.preventDefault())
+    refused.skip()
+    expect([heard, unheard]).toEqual([[{ index: 1, status: 'skipped' }], []])
+  })
+
+  test('says it is waiting at a `wait` stop whose target is not on the page', async () => {
+    const host = (await mount(
+      `<div>
+        <button id="one">One</button>
+        <helix-headless-tour label="Getting started">
+          <helix-headless-tour-stop for="one">First</helix-headless-tour-stop>
+          <helix-headless-tour-stop for="later" type="wait"></helix-headless-tour-stop>
+        </helix-headless-tour>
+      </div>`,
+    )) as HTMLElement
+    const tour = host.querySelector('helix-headless-tour') as Tour
+    await tour.updateComplete
+    const heard = statuses(tour)
+    tour.open = true
+    await tour.updateComplete
+    tour.next()
+    await tour.updateComplete
+    await tour.updateComplete
+    expect(heard).toEqual([{ index: 1, status: 'waiting' }])
+  })
+})
