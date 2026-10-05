@@ -897,7 +897,7 @@ describe('a preset taken', () => {
     await host.updateComplete
     expect(host.value).toBe('#0a141e')
     const rgb = await picker('format="rgb" alpha swatches="#00aa0080"')
-    ;(rgb.shadowRoot?.querySelector('[part="swatch"]') as HTMLElement).click()
+    ;(part(rgb, 'swatch') as HTMLElement).click()
     await rgb.updateComplete
     expect(rgb.value).toBe('rgba(0, 170, 0, 0.5)')
   })

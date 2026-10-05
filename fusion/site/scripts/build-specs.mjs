@@ -224,7 +224,15 @@ await Promise.all(
   ),
 )
 
+/* **`helix-development`, so the specs meet the missing-name warning.** Core
+   resolves `#audit-name` to the audit under it and to a function that does
+   nothing otherwise, as a production build does; the specs that assert the
+   warning run in the development build. The alias rather than `development`
+   itself, which would switch Lit to its development build too. */
+const conditions = ['helix-development']
+
 const runtime = await Bun.build({
+  conditions,
   entrypoints: Object.values(RUNTIME).map((name) => join(runtimeEntries, `${name}.ts`)),
   minify: true,
   naming: { chunk: '[name]-[hash].[ext]', entry: '[name].[ext]' },
@@ -262,6 +270,7 @@ for (const [family, specs] of found) {
 }
 
 const result = await Bun.build({
+  conditions,
   entrypoints: written,
   minify: true,
   // No [dir]: the entries are generated in a scratch directory, and that path

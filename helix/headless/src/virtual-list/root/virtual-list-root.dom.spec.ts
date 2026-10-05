@@ -8,6 +8,9 @@ import {
   type Updatable,
 } from '@fusion.dev/helix-testing/dom'
 
+/* Browser only: happy-dom lays nothing out. */
+const inBrowser = hasLayout() ? test : (): void => {}
+
 /**
  * The height the headless tier does not choose, and the list cannot work
  * without.
@@ -610,7 +613,7 @@ describe('rows shorter than the estimate', () => {
   /* Chromium only: the height is read from what was laid out. Rows of 21
      pixels against the estimate's 32 left the last rows undrawn at the end of
      the scroll, with a blank spacer under the window. */
-  test.if(hasLayout())('reaches the last row by scrollToIndex', async () => {
+  inBrowser('reaches the last row by scrollToIndex', async () => {
     document.body.innerHTML = `<helix-headless-virtual-list class="short" label="Rows"></helix-headless-virtual-list>`
     const host = document.body.firstElementChild as HTMLElement &
       Updatable &
