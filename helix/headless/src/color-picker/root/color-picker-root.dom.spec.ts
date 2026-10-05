@@ -677,3 +677,29 @@ describe('the tools of a color picker', () => {
     expect(format.label).toBe('Syntax: hex. Change it.')
   })
 })
+
+/* Only in a real engine, which gives a form-associated host its labels and
+   reflects element references. A page's `<label for>` reached no node a reader
+   lands on: the host had no role, and only the sliders had names. */
+if (hasLayout()) {
+  describe('a color picker a page labels', () => {
+    test('is a group named by that label, and has no role without one', async () => {
+      const label = await mount(
+        '<label for="tint">Tint</label><helix-headless-color-picker id="tint"></helix-headless-color-picker><helix-headless-color-picker></helix-headless-color-picker>',
+      )
+      const [named, bare] = [
+        ...(label.parentElement?.querySelectorAll('helix-headless-color-picker') ?? []),
+      ] as unknown as (HTMLElement & {
+        internals: ElementInternals & { ariaLabelledByElements: Element[] | null }
+        updateComplete: Promise<unknown>
+      })[]
+      await named?.updateComplete
+      await bare?.updateComplete
+      expect(named?.internals.role).toBe('group')
+      expect(named?.internals.ariaLabelledByElements?.map((one) => one.textContent)).toEqual([
+        'Tint',
+      ])
+      expect(bare?.internals.role).toBeNull()
+    })
+  })
+}

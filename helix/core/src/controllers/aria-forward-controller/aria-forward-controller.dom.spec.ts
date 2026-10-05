@@ -325,3 +325,41 @@ describe('a label the page wrote for the host', () => {
     expect(held(control, 'ariaLabelledByElements')).toBeNull()
   })
 })
+
+describe('what is read after the names from outside', () => {
+  /* Select is named by its label and then its choice. It put the value back
+     after the controller on every update and on focus, which held only while
+     its listener ran second. */
+  test('follows the host’s names in the same write, on every forward', () => {
+    document.body.innerHTML = '<span id="outside">Language</span><span></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    host.setAttribute('aria-labelledby', 'outside')
+    Object.assign(host, { addController: () => {} })
+    const control = reflecting()
+    const value = document.createElement('span')
+    value.id = 'value'
+    host.attachShadow({ mode: 'open' }).append(control, value)
+    const forward = new AriaForwardController(host as never, {
+      labelledByAfter: () => [value],
+      target: () => control,
+    })
+    forward.hostUpdated()
+    expect(held(control, 'ariaLabelledByElements')).toEqual(['outside', 'value'])
+    forward.hostUpdated()
+    expect(held(control, 'ariaLabelledByElements')).toEqual(['outside', 'value'])
+  })
+
+  test('and adds nothing where the host gives no name', () => {
+    document.body.innerHTML = '<span></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    Object.assign(host, { addController: () => {} })
+    const control = reflecting()
+    const value = document.createElement('span')
+    host.attachShadow({ mode: 'open' }).append(control, value)
+    new AriaForwardController(host as never, {
+      labelledByAfter: () => [value],
+      target: () => control,
+    }).hostUpdated()
+    expect(held(control, 'ariaLabelledByElements')).toBeNull()
+  })
+})

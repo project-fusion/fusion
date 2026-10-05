@@ -45,6 +45,25 @@ describe('icon rendering', () => {
     expect(heard).toBe(1)
   })
 
+  /* The `error` event reaches a listener that was bound; the warning reaches
+     the developer who wrote the name, once per name. */
+  test('and warns in the console, once for each name', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const icon = (await mount(
+        '<helix-headless-icon name="not-a-real-icon"></helix-headless-icon>',
+      )) as HTMLElement & { updateComplete: Promise<unknown> }
+      icon.setAttribute('mirror', '')
+      await icon.updateComplete
+    } finally {
+      console.warn = original
+    }
+    expect(warnings.length).toBe(1)
+    expect(warnings[0]).toContain('not-a-real-icon')
+  })
+
   /* `label` was the only way in, so an `aria-label` written on the element,
      the way a page names anything, left a generic element and a hidden glyph. */
   test('an `aria-label` on the element makes it an image with that name', async () => {

@@ -27,6 +27,8 @@ export type RuntimeKind =
   | 'max-past-fold'
   /** A rating's `min` is no score between 0 and its `max`. */
   | 'min-out-of-range'
+  /** A Stat was given one of Trend's directions, `up`, `down` or `neutral`, which lay nothing out. */
+  | 'misread-direction'
   /** A React handler prop names an event the element never dispatches itself. */
   | 'misplaced-handler'
   /** The three.js driver could not load its layout, so the notes stay where they started. */
@@ -59,6 +61,8 @@ export type RuntimeKind =
   | 'two-default-operators'
   /** A React handler prop names an event nothing dispatches. */
   | 'unknown-event'
+  /** An Icon's `name` is in no icon set it can read, so it draws nothing. */
+  | 'unknown-icon'
   /** A tooltip's trigger does not name it in `aria-describedby`, so it is not read out. */
   | 'unlinked-trigger'
   /** A Text rendered as a label wraps or names a control, which its shadow root cannot reach. */

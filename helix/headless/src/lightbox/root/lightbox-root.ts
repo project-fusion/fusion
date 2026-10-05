@@ -10,9 +10,11 @@ import {
   IdleController,
   inlineStep,
   keyClaimed,
+  lockScroll,
   MixinControllerActive,
   MixinControllerOpen,
   resolveActiveItem,
+  unlockScroll,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -448,51 +450,6 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       <span part="live" role="status" aria-live="polite">${this.announcement || nothing}</span>
     </dialog>`
   }
-}
-
-/**
- * The modal surfaces holding the page still, on `globalThis` under the key
- * `Dialog` and `Drawer` use, so they share one count with this viewer.
- */
-interface ScrollLock {
-  holders: Set<Element>
-  overflow: string
-  gutter: string
-}
-const SCROLL_LOCK = Symbol.for('fusion.helix.scroll-lock')
-
-/**
- * Stops the page behind the viewer from scrolling. See `lockScroll` in
- * `Dialog`, which this matches line for line.
- */
-const lockScroll = (holder: Element): void => {
-  const globals = globalThis as unknown as Record<symbol, ScrollLock | undefined>
-  const root = document.documentElement
-  globals[SCROLL_LOCK] ??= { gutter: '', holders: new Set(), overflow: '' }
-  const lock = globals[SCROLL_LOCK]
-  if (lock.holders.has(holder)) {
-    return
-  }
-  if (lock.holders.size === 0) {
-    lock.overflow = root.style.overflow
-    lock.gutter = root.style.scrollbarGutter
-    if (window.innerWidth > root.clientWidth) {
-      root.style.scrollbarGutter = 'stable'
-    }
-    root.style.overflow = 'hidden'
-  }
-  lock.holders.add(holder)
-}
-
-/** Lets go of the page, and gives it back once nothing else holds it. */
-const unlockScroll = (holder: Element): void => {
-  const lock = (globalThis as unknown as Record<symbol, ScrollLock | undefined>)[SCROLL_LOCK]
-  if (!lock?.holders.delete(holder) || lock.holders.size > 0) {
-    return
-  }
-  const root = document.documentElement
-  root.style.overflow = lock.overflow
-  root.style.scrollbarGutter = lock.gutter
 }
 
 declare global {

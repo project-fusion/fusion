@@ -5,6 +5,7 @@ import {
   focusableElements,
   HelixElement,
   hostAria,
+  scrollHolders,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -193,10 +194,7 @@ export class HelixHeadlessToast extends HelixElement {
    * in the document itself.
    */
   private blocked(): boolean {
-    const lock = (globalThis as unknown as Record<symbol, { holders: Set<Element> } | undefined>)[
-      Symbol.for('fusion.helix.scroll-lock')
-    ]
-    const holders = [...(lock?.holders ?? [])]
+    const holders = scrollHolders()
     try {
       const native = document.querySelector('dialog:modal')
       if (native) {

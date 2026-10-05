@@ -96,6 +96,10 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
+    labelledByAfter: () => {
+      const value = this.partNamed('value')
+      return value ? [value] : []
+    },
     target: () => this.partNamed('trigger'),
   })
 
@@ -283,7 +287,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
 
   /**
    * Hears an option's words change, which no slot reports, and the host's
-   * `aria-labelledby` change, which `nameWithValue` follows.
+   * `aria-labelledby` change, which `triggerNames` reads.
    *
    * The trigger shows the chosen option's words, read at render time. A slot
    * reports an option arriving or leaving and says nothing when the text of
@@ -306,9 +310,6 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     const naming = new MutationObserver(() => this.requestUpdate())
     naming.observe(this, { attributeFilter: ['aria-labelledby'] })
     this.watchers = [words, naming]
-    /* After `AriaForwardController`'s own, which forwards again as focus
-       arrives and writes the host's list without the value. */
-    this.addEventListener('focusin', this.keepValueInName)
   }
 
   override disconnectedCallback(): void {
@@ -317,12 +318,6 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       watcher.disconnect()
     }
     this.watchers = []
-    this.removeEventListener('focusin', this.keepValueInName)
-  }
-
-  /** Puts the value back into the trigger's name. See `nameWithValue`. */
-  private readonly keepValueInName = (): void => {
-    this.nameWithValue()
   }
 
   /** Opens the list with the highlight where the opening key says. */
@@ -504,7 +499,6 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     super.updated(changed)
     this.sync()
     this.linkHost()
-    this.nameWithValue()
     /* The panel follows `open` through the controller, which reads it after
        every update. What is left here is what only this element knows. */
     if (this.open) {
@@ -595,44 +589,17 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * native `<select>` says both, and this names the trigger by both, the label
    * and then the value, in that order.
    *
-   * A consumer's own `aria-labelledby` on the host wins, carried to the trigger
-   * by `AriaForwardController`, so nothing is written here to fight it. The
-   * value is added after it in `nameWithValue`.
+   * A consumer's own `aria-labelledby` on the host wins, and so does a
+   * `<label>` that names the host where there is no `label`. Both are carried
+   * to the trigger by `AriaForwardController`, which reads the value after
+   * them, so nothing is written here to fight it.
    */
   private get triggerNames(): string | typeof nothing {
-    if (this.hasAttribute('aria-labelledby')) {
+    const outside = (this.internals.labels?.length ?? 0) > 0 && !this.labeled
+    if (this.hasAttribute('aria-labelledby') || outside) {
       return nothing
     }
     return this.labeled ? `${this.labelId} value` : 'value'
-  }
-
-  /**
-   * Names the trigger by the host's `aria-labelledby` and then by the value.
-   *
-   * `AriaForwardController` hands the trigger the elements the host names,
-   * and that list alone dropped the value from the name: a reader heard the
-   * label and never what was chosen. The value element is added after them,
-   * which an element reference can do where an id cannot, the two being in
-   * different trees. Runs after the controller, which writes its list first on
-   * every update.
-   */
-  private nameWithValue(): void {
-    const trigger = this.partNamed('trigger') as
-      | (HTMLElement & { ariaLabelledByElements?: Element[] | null })
-      | null
-    const value = this.partNamed('value')
-    if (
-      !trigger ||
-      !value ||
-      !this.hasAttribute('aria-labelledby') ||
-      !('ariaLabelledByElements' in trigger)
-    ) {
-      return
-    }
-    const named = trigger.ariaLabelledByElements ?? []
-    if (named.length > 0 && !named.includes(value)) {
-      trigger.ariaLabelledByElements = [...named, value]
-    }
   }
 
   protected override render(): TemplateResult {

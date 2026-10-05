@@ -111,3 +111,20 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('a direction meant for Trend', () => {
+  /* A Stat and a Trend sit side by side, and `up` lays out nothing on a Stat. */
+  test('is reported, and a layout direction is not', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount('<helix-headless-stat direction="up">42</helix-headless-stat>')
+      await mount('<helix-headless-stat direction="row">42</helix-headless-stat>')
+    } finally {
+      console.warn = original
+    }
+    expect(warnings.length).toBe(1)
+    expect(warnings[0]).toContain('helix-trend')
+  })
+})
