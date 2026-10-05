@@ -238,3 +238,65 @@ describe('the copy button of a named block', () => {
     expect(copyOf(plain)?.getAttribute('label')).toBe('Copy code')
   })
 })
+
+/* A docs site's long example opens to every line from a capped block. */
+describe('an expandable block', () => {
+  type Block = Updatable & {
+    expandable: boolean
+    internals: ElementInternals
+    requestUpdate: () => void
+  }
+
+  /* happy-dom lays nothing out, so the cap is said by the scroller's sizes. */
+  const capped = (el: Element): void => {
+    const code = el.shadowRoot?.querySelector('[part="code"]') as HTMLElement
+    Object.defineProperty(code, 'scrollHeight', { configurable: true, get: () => 400 })
+    Object.defineProperty(code, 'clientHeight', { configurable: true, get: () => 120 })
+  }
+  const expand = (el: Element): HTMLButtonElement | null =>
+    el.shadowRoot?.querySelector<HTMLButtonElement>('[part="expand"]') ?? null
+
+  test('draws a button only while the cap hides lines', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block expandable>one\ntwo</helix-headless-code-block>',
+    )) as Block
+    await el.updateComplete
+    expect(expand(el)).toBeNull()
+    capped(el)
+    el.requestUpdate()
+    await el.updateComplete
+    await el.updateComplete
+    expect(expand(el)?.textContent?.trim()).toBe('Show all lines')
+    expect(expand(el)?.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('shows every line, says so, and shows fewer again', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block expandable collapse-label="Less" expand-label="More">one\ntwo</helix-headless-code-block>',
+    )) as Block
+    capped(el)
+    el.requestUpdate()
+    await el.updateComplete
+    await el.updateComplete
+    expand(el)?.click()
+    await el.updateComplete
+    expect(expand(el)?.getAttribute('aria-expanded')).toBe('true')
+    expect(expand(el)?.textContent?.trim()).toBe('Less')
+    expect(el.internals.states.has('expanded')).toBe(true)
+    expand(el)?.click()
+    await el.updateComplete
+    expect(expand(el)?.textContent?.trim()).toBe('More')
+    expect(el.internals.states.has('expanded')).toBe(false)
+  })
+
+  test('draws nothing without expandable, capped or not', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block>one\ntwo</helix-headless-code-block>',
+    )) as Block
+    capped(el)
+    el.requestUpdate()
+    await el.updateComplete
+    await el.updateComplete
+    expect(expand(el)).toBeNull()
+  })
+})
