@@ -14,9 +14,11 @@ import {
   HelixSampleStartEvent,
   hostAria,
   hueName,
+  inlineStep,
   isRtl,
   MixinControllerValue,
   parseColor,
+  rovingStop,
   splitValues,
   toCss,
 } from '@fusion.dev/helix-core'
@@ -26,6 +28,7 @@ import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
 import { type ChannelName, channelFields, writeChannel } from '../channels.js'
+import { swatchMove } from '../swatches.js'
 /* Relative, so this registers the base slider and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../button/index.js'
@@ -76,8 +79,12 @@ interface EyeDropperConstructor {
  *
  * A screen reader hears the color's name, such as "vibrant red", after the two
  * numbers on the square and after the number on the hue ramp, and each preset
- * is named by its color. Set `color-words` to speak the names in another
- * language.
+ * is named by its color. The opacity ramp is heard as a percentage. Set
+ * `color-words` to speak the names in another language.
+ *
+ * The presets are a listbox with the current color selected, and one tab
+ * stop. The arrow keys move between them, Home and End go to the ends, and
+ * Enter, Space or a press chooses one.
  *
  * @since 0.1.0
  * @status stable
@@ -127,8 +134,8 @@ interface EyeDropperConstructor {
  * @csspart grid-brightness - The range input for the square's vertical axis.
  * @csspart grid-saturation - The range input for the square's horizontal axis.
  * @csspart sample - A chip of the current color. Pressing it copies the value.
- * @csspart swatch - One preset.
- * @csspart swatches - The row of presets.
+ * @csspart swatch - One preset, an option in the `swatches` listbox.
+ * @csspart swatches - The row of presets, a listbox.
  * @csspart value - The text field that holds the color. It accepts a typed or pasted color.
  *
  * @cssproperty --color-picker-brightness - The chosen brightness, 0 to 100, as a percentage.
@@ -432,6 +439,10 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   @state()
   private sampling = false
 
+  /** The preset the reader was last on, which holds the row's one tab stop. */
+  @state()
+  private swatchAt: number | undefined
+
   /**
    * Whether the value on this element was produced here.
    *
@@ -582,6 +593,24 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
       this.move(parsed)
       this.settle()
     }
+  }
+
+  /**
+   * The arrows, Home and End in the presets: focus moves, and nothing is
+   * chosen until Enter, Space or a press, as in React Aria's swatch picker.
+   */
+  private readonly handleSwatchKeydown = (event: KeyboardEvent): void => {
+    const row = [
+      ...(this.renderRoot.querySelectorAll<HTMLElement>('[part="swatches"] [part="swatch"]') ?? []),
+    ]
+    const at = row.indexOf(event.target as HTMLElement)
+    const next = swatchMove(event.key, inlineStep(this, event.key), at, row.length)
+    if (at < 0 || next === null) {
+      return
+    }
+    event.preventDefault()
+    this.swatchAt = next
+    row[next]?.focus()
   }
 
   /** Walks the format on, and rewrites the value in it. */
@@ -1063,6 +1092,46 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
               </${this.tag('button-group')}>`
   }
 
+  /**
+   * The presets, as a listbox of colors with the current one selected, which
+   * is React Aria's ColorSwatchPicker: one tab stop, held by the preset the
+   * reader was last on, then the selected one, then the first.
+   */
+  private renderSwatches(painted: string): TemplateResult {
+    const presets = this.presets
+    const chosen = presets.map((preset) => {
+      const parsed = parseColor(preset)
+      return parsed !== null && toCss(parsed) === painted
+    })
+    const indexes = presets.map((_, index) => index)
+    const stop = rovingStop(indexes, this.swatchAt, { selected: (index) => chosen[index] === true })
+    return html`<div
+      part="swatches"
+      role="listbox"
+      aria-label=${this.presetsLabel}
+      aria-orientation="horizontal"
+      @keydown=${this.handleSwatchKeydown}
+    >
+      ${presets.map((preset, index) => {
+        const parsed = parseColor(preset)
+        return html`<button
+          part="swatch"
+          type="button"
+          role="option"
+          tabindex=${index === stop ? '0' : '-1'}
+          aria-label=${parsed ? colorName(parsed, this.colorWords, this.lang) : preset}
+          aria-selected=${chosen[index] ? 'true' : 'false'}
+          style="--color-picker-swatch: ${preset}"
+          ?disabled=${this.isDisabled}
+          @click=${() => {
+            this.swatchAt = index
+            this.handleSwatch(preset)
+          }}
+        ></button>`
+      })}
+    </div>`
+  }
+
   protected override render(): TemplateResult {
     const color = this.color
     const painted = toCss(color)
@@ -1146,7 +1215,22 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
         ></button>
         <div part="channels">
           ${this.renderChannel('hue', this.hueLabel, 360, color.hue, `{value}, ${hue}`)}
-          ${this.alpha ? this.renderChannel('alpha', this.opacityLabel, 100, color.alpha) : nothing}
+          ${
+            this.alpha
+              ? this.renderChannel(
+                  'alpha',
+                  this.opacityLabel,
+                  100,
+                  color.alpha,
+                  /* A percentage in the reader's language, "50%" or "50 %",
+                     React Aria's reading of an alpha slider: the bare number
+                     did not say what it counted. */
+                  new Intl.NumberFormat(this.lang || undefined, { style: 'percent' }).format(
+                    color.alpha / 100,
+                  ),
+                )
+              : nothing
+          }
         </div>
       </div>
       ${this.channelFields ? this.renderFields(color) : nothing}
@@ -1179,24 +1263,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
         ${this.tools ? html`${this.renderTools()}` : nothing}
       </div>
 
-      ${
-        this.presets.length === 0
-          ? nothing
-          : html`<div part="swatches" role="group" aria-label=${this.presetsLabel}>
-                ${this.presets.map((preset) => {
-                  const parsed = parseColor(preset)
-                  return html`<button
-                    part="swatch"
-                    type="button"
-                    aria-label=${parsed ? colorName(parsed, this.colorWords, this.lang) : preset}
-                    aria-pressed=${parsed !== null && toCss(parsed) === painted ? 'true' : 'false'}
-                    style="--color-picker-swatch: ${preset}"
-                    ?disabled=${this.isDisabled}
-                    @click=${() => this.handleSwatch(preset)}
-                  ></button>`
-                })}
-              </div>`
-      }`
+      ${this.presets.length === 0 ? nothing : this.renderSwatches(painted)}`
   }
 }
 

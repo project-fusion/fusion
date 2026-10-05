@@ -76,6 +76,8 @@ const dates = (value: string): string[] =>
  * @slot feedback - The error message under the field.
  * @slot hint - The help text under the field.
  * @slot next-icon - The icon on the calendar's next month control.
+ * @slot panel-footer - Content in the panel under the calendar, such as a note or an action.
+ * @slot panel-header - Content in the panel above the calendar, such as a heading or a shortcut.
  * @slot previous-icon - The icon on the calendar's previous month control.
  * @slot trigger - The icon on the button that opens the calendar.
  *
@@ -907,7 +909,9 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
         popover="manual"
         ?hidden=${!this.open}
       >
+        <slot name="panel-header"></slot>
         ${this.renderPicker()}
+        <slot name="panel-footer"></slot>
       </div>
       ${this.renderHint()}${this.renderFeedback()}`
   }
