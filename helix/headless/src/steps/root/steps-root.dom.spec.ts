@@ -277,3 +277,88 @@ describe('steps and what is inside a step', () => {
     expect(host.active).toBe('s1')
   })
 })
+
+type Step = HTMLElement & {
+  complete: boolean
+  locked: boolean
+  select(): void
+  updateComplete: Promise<unknown>
+}
+
+const linear = async (): Promise<{
+  host: Steps & { active: string; next(): boolean; previous(): boolean }
+  all: Step[]
+}> => {
+  const host = (await mount(`<helix-headless-steps linear active="a">
+    <helix-headless-step value="a">Details</helix-headless-step>
+    <helix-headless-step value="b" optional>Gift note</helix-headless-step>
+    <helix-headless-step value="c">Payment</helix-headless-step>
+    <helix-headless-step value="d">Review</helix-headless-step>
+  </helix-headless-steps>`)) as Steps & { active: string; next(): boolean; previous(): boolean }
+  const all = [...host.querySelectorAll('helix-headless-step')] as Step[]
+  for (let turn = 0; turn < 3; turn += 1) {
+    await host.updateComplete
+    await Promise.all(all.map((step) => step.updateComplete))
+    await new Promise((resolve) => setTimeout(resolve))
+  }
+  return { all, host }
+}
+
+describe('a linear sequence', () => {
+  /* Ark UI's linear steps: a stage ahead is out of reach until the ones before
+     it are finished, or optional. */
+  test('holds a stage ahead out of reach until the ones before it are finished', async () => {
+    const { all, host } = await linear()
+    expect(all.map((step) => step.locked)).toEqual([false, true, true, true])
+    at(all, 2).select()
+    await host.updateComplete
+    expect(host.active).toBe('a')
+    at(all, 0).complete = true
+    for (let turn = 0; turn < 3; turn += 1) {
+      await new Promise((resolve) => setTimeout(resolve))
+    }
+    expect(all.map((step) => step.locked)).toEqual([false, false, false, true])
+    at(all, 2).select()
+    await host.updateComplete
+    expect(host.active).toBe('c')
+  })
+
+  test('next and previous move one stage, under the same rules', async () => {
+    const { all, host } = await linear()
+    expect(host.next()).toBe(false)
+    at(all, 0).complete = true
+    await at(all, 0).updateComplete
+    expect(host.next()).toBe(true)
+    await host.updateComplete
+    expect(host.active).toBe('b')
+    expect(host.previous()).toBe(true)
+    await host.updateComplete
+    expect(host.active).toBe('a')
+    expect(host.previous()).toBe(false)
+  })
+})
+
+describe('a finished stage', () => {
+  /* The check was the only thing that said a stage was done, and it is hidden
+     from the accessibility tree. */
+  test('describes its button in words, and says it once when it is finished', async () => {
+    const host = await steps()
+    const [done, , review] = [...host.querySelectorAll('helix-headless-step')] as Step[]
+    await done?.updateComplete
+    expect(part(done as Step, 'label')?.getAttribute('aria-describedby')).toBe('state')
+    expect(part(done as Step, 'state')?.textContent).toBe('Complete')
+    expect(part(review as Step, 'label')?.hasAttribute('aria-describedby')).toBe(false)
+    ;(review as Step).complete = true
+    await (review as Step).updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 40))
+    await (review as Step).updateComplete
+    expect(part(review as Step, 'live')?.textContent).toBe('Review, Complete')
+  })
+
+  test('the current stage puts aria-current on its button', async () => {
+    const host = await steps()
+    const [, payment] = [...host.querySelectorAll('helix-headless-step')] as Step[]
+    await payment?.updateComplete
+    expect(part(payment as Step, 'label')?.getAttribute('aria-current')).toBe('step')
+  })
+})
