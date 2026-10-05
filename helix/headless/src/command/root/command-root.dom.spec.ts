@@ -371,6 +371,18 @@ describe('a command that is a link', () => {
 })
 
 describe('a palette filtered on a server', () => {
+  test('hands `load-error` and `no-results-text` to its list', async () => {
+    const host = await palette(
+      markup.replace(
+        '<helix-headless-command ',
+        '<helix-headless-command load-error="Offline" no-results-text="No such command" ',
+      ),
+    )
+    const inner = listbox(host) as unknown as { loadError: string; noResultsText?: string }
+    expect(inner.loadError).toBe('Offline')
+    expect(inner.noResultsText).toBe('No such command')
+  })
+
   test('hands `filter-delay` to its list', async () => {
     const host = await palette(
       markup.replace('<helix-headless-command ', '<helix-headless-command filter-delay="250" '),

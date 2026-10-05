@@ -5,7 +5,7 @@ import {
   HelixSelectEvent,
   MixinControllerOpen,
 } from '@fusion.dev/helix-core'
-import type { PropertyValues, TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
@@ -63,7 +63,9 @@ const parse = (hotkey: string) => {
  * @slot - The commands, and any groups of them.
  * @slot empty - What the palette shows when typing matches no commands, for content richer than `empty-text`.
  * @slot footer - Content under the list, such as the keys that work in the palette.
+ * @slot error - What the palette shows while `load-error` is set, for content richer than its text.
  * @slot loading - What the palette shows while the commands load, for content richer than `loading-text`.
+ * @slot no-results - What the palette shows when typing matches no commands, for content richer than `no-results-text`.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The palette is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The palette is about to open. Cancelable: cancel it to keep it closed.
@@ -80,6 +82,7 @@ const parse = (hotkey: string) => {
  * @csspart footer - The row under the list.
  * @csspart listbox - The listbox inside the palette.
  * @csspart listbox-empty - The text shown when the filter matches no commands.
+ * @csspart listbox-error - The text shown while `load-error` is set.
  * @csspart listbox-feedback - The listbox's error message.
  * @csspart listbox-filter-icon - The icon beside the filter field.
  * @csspart listbox-filter-mark - The default icon beside the filter field, drawn when no icon is slotted.
@@ -126,6 +129,14 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   label = 'Commands'
 
   /**
+   * What the list says when its commands could not be loaded, such as after a
+   * request to a server fails. Empty is no error. Passed to the list, which
+   * shows it under any commands there are and tells screen readers.
+   */
+  @property({ attribute: 'load-error' })
+  loadError = ''
+
+  /**
    * Whether the commands are still loading, for a palette that asks a server
    * for them as the user types.
    *
@@ -139,6 +150,13 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
+
+  /**
+   * The text shown when typing hides every one of the commands, where there are
+   * some. Absent, `empty-text` shows. See Listbox's `no-results-text`.
+   */
+  @property({ attribute: 'no-results-text' })
+  noResultsText?: string
 
   /**
    * The text shown in the filter field before anything is typed.
@@ -402,15 +420,17 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     >
       <${this.tag('listbox')}
         part="listbox"
-      exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
-        filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
-        label: listbox-label, live: listbox-live, loading: listbox-loading, search: listbox-search,
-        search-field: listbox-search-field"
+        exportparts="empty: listbox-empty, error: listbox-error, feedback: listbox-feedback,
+          filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
+          items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
+          search: listbox-search, search-field: listbox-search-field"
         aria-label=${this.label}
         empty-text=${this.emptyText}
         filter-delay=${this.filterDelay}
         filter-label=${this.placeholder}
+        load-error=${this.loadError}
         loading-text=${this.loadingText}
+        no-results-text=${this.noResultsText ?? nothing}
         result-label=${this.resultLabel}
         results-label=${this.resultsLabel}
         ?loading=${this.loading}
@@ -424,6 +444,14 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
              gives: the list's own fallback never shows behind a passed slot. -->
         <slot name="empty" slot="empty">${this.emptyText}</slot>
         <slot name="loading" slot="loading">${this.loadingText}</slot>
+        <slot name="error" slot="error">${this.loadError}</slot>
+        <!-- Handed on only while something fills it: an assigned slot hides the
+             list's own fallback, which is no-results-text or empty-text. -->
+        <slot
+          name="no-results"
+          slot=${this.querySelector?.(':scope > [slot="no-results"]') ? 'no-results' : nothing}
+          @slotchange=${() => this.requestUpdate()}
+        ></slot>
       </${this.tag('listbox')}>
       <div ?hidden=${!this.footed} part="footer" slot="footer">
         <slot

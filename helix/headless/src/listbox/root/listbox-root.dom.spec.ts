@@ -702,6 +702,59 @@ describe('the empty and loading lines', () => {
   })
 })
 
+describe('the no-results and error lines', () => {
+  const live = (host: Updatable): string => part(host, 'live')?.textContent?.trim() ?? ''
+  test('a filter that hides every option says `no-results-text`, and a list with none says `empty-text`', async () => {
+    const host = (await list('filterable no-results-text="Nothing matches"')) as Updatable & {
+      requestFilter: (next: string) => boolean
+    }
+    host.requestFilter('zzz')
+    await settle(host)
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Nothing matches')
+    expect(part(host, 'empty')?.querySelector('slot')?.getAttribute('name')).toBe('no-results')
+    expect(live(host)).toBe('Nothing matches')
+    expect(hasState(host, 'no-results')).toBe(true)
+    expect(hasState(host, 'empty')).toBe(true)
+    document.body.innerHTML =
+      '<helix-headless-listbox label="L" no-results-text="Nothing matches"></helix-headless-listbox>'
+    const bare = document.body.firstElementChild as Updatable
+    await settle(bare)
+    expect(part(bare, 'empty')?.textContent?.trim()).toBe('No matches')
+  })
+
+  test('without `no-results-text` a hidden list draws its empty line as it always has', async () => {
+    document.body.innerHTML = `<helix-headless-listbox label="L" filterable>
+      <helix-headless-option value="a">Alpha</helix-headless-option>
+      <b slot="empty">Nobody</b>
+    </helix-headless-listbox>`
+    const host = document.body.firstElementChild as Updatable & {
+      requestFilter: (next: string) => boolean
+    }
+    await settle(host)
+    host.requestFilter('zzz')
+    await settle(host)
+    const line = part(host, 'empty') as HTMLElement
+    const shown = line.querySelector('slot[name="empty"]') as HTMLSlotElement
+    expect(shown.assignedElements()[0]?.textContent).toBe('Nobody')
+    expect(live(host)).toBe('No matches')
+    expect(hasState(host, 'no-results')).toBe(true)
+  })
+
+  test('`load-error` shows under the options and is heard', async () => {
+    const host = (await list('load-error="Could not load people"')) as Updatable & {
+      loadError: string
+    }
+    expect(part(host, 'error')?.textContent?.trim()).toBe('Could not load people')
+    expect(live(host)).toBe('Could not load people')
+    expect(hasState(host, 'error')).toBe(true)
+    expect(host.querySelectorAll('helix-headless-option').length).toBeGreaterThan(0)
+    host.loadError = ''
+    await settle(host)
+    expect(part(host, 'error')).toBeNull()
+    expect(hasState(host, 'error')).toBe(false)
+  })
+})
+
 describe('ranges from the keyboard', () => {
   /* APG's multiple-selection listbox: Shift with Home or End takes in every
      option from the highlight to that end. */
