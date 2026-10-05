@@ -147,7 +147,7 @@ slot[name="end"]::slotted(*) {
  * the same way. `all: unset` first, since a `<button>` arrives with a
  * background, a border and a font of its own.
  */
-[part="create"] {
+[part~="create"] {
   all: unset;
 
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
@@ -166,8 +166,9 @@ slot[name="end"]::slotted(*) {
 
 /* The same wash a hovered option takes: a step on the surface ladder painted the
    highlight in the panel's own color and it vanished. The row is standing in for
-   an option, so it highlights like one. */
-[part="create"]:hover {
+   an option, so it highlights like one, and so does the keyboard on it. */
+[part~="create"]:hover,
+[part~="create-active"] {
   background-color: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
     color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
@@ -176,7 +177,7 @@ slot[name="end"]::slotted(*) {
 
 /* Inside the panel's own edge, which the panel clips: an outline drawn outward
    from a row flush with the surface is a ring with its outer half cut off. */
-[part="create"]:focus-visible {
+[part~="create"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
@@ -195,7 +196,7 @@ slot[name="end"]::slotted(*) {
     transition: none;
   }
 
-  [part="create"] {
+  [part~="create"] {
     transition: none;
   }
 }

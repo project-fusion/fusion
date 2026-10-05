@@ -56,6 +56,10 @@ const isInsertion = (event: Event): boolean =>
  *
  * Focus stays in the text field. The arrow keys move through the list with the
  * listbox's public `navigate` method. `role="combobox"` is on the input itself.
+ * ArrowDown and ArrowUp open the list on the chosen option, and Enter chooses
+ * the highlighted one. Space, Home, End and letters edit the text, and Enter in
+ * a closed field is left to the form. Emptying the field and leaving it clears
+ * a single choice; Escape puts the chosen words back.
  *
  * With `multiple`, each chosen option is a tag in the field with its own remove
  * control. The panel stays open and the filter clears after each choice, so the
@@ -74,7 +78,9 @@ const isInsertion = (event: Event): boolean =>
  *
  * @slot - The options.
  * @slot end - After the text, for a unit or a clear button.
+ * @slot hint - The hint, for content richer than plain text.
  * @slot indicator - Replaces the caret that shows the field opens a list.
+ * @slot label - The label, for content richer than plain text.
  * @slot start - Before the text, for an icon.
  *
  * @event {Event} change - Fired after the value changes.
@@ -88,6 +94,7 @@ const isInsertion = (event: Event): boolean =>
  *
  * @csspart control - The text field itself.
  * @csspart create - The row offering to add what was typed.
+ * @csspart create-active - The create row while the keyboard is on it. Set alongside `create`.
  * @csspart feedback - The message that explains what is wrong with the value.
  * @csspart field - The box around the text and its marks.
  * @csspart hint - Help text under the field, shown while there is no error.
@@ -147,7 +154,8 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * The row appears while what is typed matches no option's words exactly, so
    * it is offered next to near misses too: a reader typing "Ruby on Rails" with
    * "Ruby" in the list wants the one they are typing, not the one they are
-   * halfway through.
+   * halfway through. The arrow keys reach it after the last option, and Enter
+   * on it adds what was typed.
    */
   @property({ type: Boolean })
   creatable = false
@@ -256,6 +264,30 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   private suggestion = ''
 
   /**
+   * Whether the reader has typed since the list opened, which decides what the
+   * field shows: their text while they type, and the chosen words otherwise.
+   */
+  @state()
+  private editing = false
+
+  /** Whether the keyboard is on the create row rather than on an option. */
+  @state()
+  private onCreate = false
+
+  /**
+   * Whether the reader emptied the field, so leaving it clears the choice.
+   *
+   * Escape takes it back, being a reader putting things as they were.
+   */
+  private emptied = false
+
+  /** Where the highlight goes when an arrow opens the list. */
+  private opening: 'first' | 'last' | 'selected' | undefined = undefined
+
+  /** Hears an option's words change, which no slot reports. See `Select`. */
+  private watcher: MutationObserver | undefined = undefined
+
+  /**
    * Which option is chosen, as an index, or `-1` where none is.
    *
    * Read off the listbox this renders, which owns the options and is where the
@@ -267,11 +299,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     return this.listbox?.selectedIndex ?? -1
   }
 
+  /* Through this element's own value, which the field shows and the form
+     receives. Written to the listbox, the index changed and nothing else did. */
   set selectedIndex(at: number) {
-    const listbox = this.listbox
-    if (listbox) {
-      listbox.selectedIndex = at
-    }
+    this.value = this.listbox?.options[at]?.value ?? ''
   }
 
   /**
@@ -302,7 +333,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       this.partNamed('field'),
     ],
     offset: () => 4,
-    onDismiss: () => this.close(),
+    onDismiss: () => {
+      this.commitEmptied()
+      this.close()
+    },
     open: () => this.open,
     placement: 'bottom-start',
     surface: () => this.partNamed('surface'),
@@ -460,12 +494,65 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     this.partNamed('control')?.focus()
   }
 
+  /**
+   * Clears a single choice whose words the reader deleted, as they leave.
+   *
+   * Measured before this: emptying the field and pressing Tab put the old
+   * choice back, so a combobox that was not required could not be emptied
+   * once answered.
+   */
+  private commitEmptied(): void {
+    if (this.emptied && !this.multiple && this.value !== '') {
+      this.requestValue('')
+    }
+    this.emptied = false
+  }
+
+  /** The options the arrows can reach. */
+  private get reachable(): HelixHeadlessListbox['options'] {
+    return (this.listbox?.options ?? []).filter((option) => !option.hidden && !option.disabled)
+  }
+
+  /**
+   * Moves between the options and the create row, which sits after the last
+   * option, and returns whether the key was taken.
+   *
+   * The row is outside the list, so the list's own keys never reach it. While
+   * it is showing, a Down past the last option lands on it and an Up from the
+   * first one does, and either arrow from it goes back into the list.
+   */
+  private moveAroundCreate(event: KeyboardEvent): boolean {
+    if (this.creation === '' || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) {
+      return false
+    }
+    const down = event.key === 'ArrowDown'
+    if (this.onCreate) {
+      event.preventDefault()
+      this.onCreate = false
+      this.listbox?.highlight(down ? 'first' : 'last')
+      return true
+    }
+    const reachable = this.reachable
+    const at = reachable.findIndex((option) => option.active)
+    const edge = down ? reachable.length - 1 : 0
+    if (reachable.length === 0 || at === edge) {
+      event.preventDefault()
+      this.onCreate = true
+      this.listbox?.highlight('none')
+      return true
+    }
+    return false
+  }
+
   private readonly handleInput = (event: Event): void => {
     // Stopped for the reason `Input.handleInput` gives: the inner control's own
     // `input` is composed and would reach a consumer beside this element's.
     event.stopPropagation()
     const typed = (event.target as HTMLInputElement).value
     this.typed = typed
+    this.editing = true
+    this.onCreate = false
+    this.emptied = typed.trim() === ''
     /* **Announced from here rather than left to escape from the listbox
        inside.** The narrowing was always reaching consumers, because
        `requestFilter` dispatches a composed `helix-filter` and nothing stopped
@@ -530,6 +617,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       return
     }
     if (event.key === 'Escape') {
+      this.emptied = false
       if (this.open) {
         event.preventDefault()
         this.close()
@@ -537,6 +625,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       return
     }
     if (event.key === 'Tab') {
+      this.commitEmptied()
       if (this.open) {
         this.requestOpen(false)
       }
@@ -553,16 +642,30 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        create. Only then: with matches showing, Enter belongs to whichever one
        the arrows are on, and a reader pressing it over a highlighted "Rust"
        meant Rust. The row is still there to be pressed for the other case. */
-    if (event.key === 'Enter' && this.creation !== '' && !this.showing) {
+    if (event.key === 'Enter' && this.creation !== '' && (this.onCreate || !this.showing)) {
       event.preventDefault()
       this.create()
       return
     }
-    /* Opening on the first arrow, before the list is asked to move: a closed
-       combobox pressed Down should show its options and land on the first,
-       which is one gesture to the reader and two steps here. */
-    if (!this.open && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
-      this.requestOpen(true)
+    /* A closed field hands nothing to the list. Its highlight is whatever the
+       reader left when they dismissed it, so an Enter here chose the option
+       they had just rejected with Escape, and kept the form from submitting.
+
+       Down and Up open it, on the chosen option where there is one: one
+       gesture to the reader. Measured before this: Down opened the list one
+       past the chosen option. */
+    if (!this.open) {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault()
+        const fallback = event.key === 'ArrowDown' ? 'first' : 'last'
+        this.opening = this.values.length > 0 ? 'selected' : fallback
+        this.requestOpen(true)
+      }
+      return
+    }
+    if (this.moveAroundCreate(event)) {
+      void this.updateComplete.then(() => this.linkActive())
+      return
     }
     this.listbox?.navigate(event)
     void this.listbox?.updateComplete.then(() => this.linkActive())
@@ -588,9 +691,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     if (!control || !('ariaActiveDescendantElement' in control)) {
       return
     }
-    const active = this.open
-      ? (this.listbox?.options ?? []).find((option) => option.active && !option.hidden)
-      : undefined
+    const active = !this.open
+      ? undefined
+      : this.onCreate
+        ? this.partNamed('create')
+        : (this.listbox?.options ?? []).find((option) => option.active && !option.hidden)
     ;(
       control as Element & { ariaActiveDescendantElement: Element | null }
     ).ariaActiveDescendantElement = active ?? null
@@ -618,6 +723,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       return
     }
     // Either way the search is spent: it found what it was for.
+    this.emptied = false
     this.typed = ''
     this.suggestion = ''
     this.listbox?.requestFilter('')
@@ -700,6 +806,40 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     this.reportRequired(this.value === '', 'Choose one to continue.', 'control')
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.watcher = new MutationObserver(() => this.requestUpdate())
+    this.watcher.observe(this, {
+      attributeFilter: ['label', 'value'],
+      characterData: true,
+      childList: true,
+      subtree: true,
+    })
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.watcher?.disconnect()
+    this.watcher = undefined
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* `<helix-option selected>` is the default value where none is written,
+       as `<option selected>` is for a native `<select>`. See `Select`. */
+    if (this.childrenKnown && this.defaultValue === '' && !this.hasAttribute('default-value')) {
+      const declared = optionsAmong(this.knownChildren)
+        .filter((option) => option.defaultSelected)
+        .map((option) => option.value)
+      if (declared.length > 0) {
+        this.defaultValue = this.multiple ? declared.join(',') : (declared.at(-1) ?? '')
+      }
+    }
+    if (this.creation === '') {
+      this.onCreate = false
+    }
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
@@ -732,7 +872,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        reconcile writes behind Lit's back, so Lit's own dirty-check then
        believes the DOM already holds whatever it last wrote and declines to
        correct it. */
-    const wanted = this.multiple || this.open ? this.suggestion || this.typed : this.word
+    const wanted = this.fieldText
     if (control && control.value !== wanted) {
       control.value = wanted
     }
@@ -750,8 +890,36 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     if (!this.open) {
       this.typed = ''
       this.suggestion = ''
+      this.editing = false
+      this.onCreate = false
       this.listbox?.requestFilter('')
+    } else if (changed.has('open')) {
+      /* Opened by an arrow, the highlight goes where the arrow says. Opened
+         with the chosen words in the field, they are selected, so the first
+         letter typed replaces them. */
+      if (this.opening !== undefined) {
+        this.listbox?.highlight(this.opening)
+        this.opening = undefined
+        void this.listbox?.updateComplete.then(() => this.linkActive())
+      }
+      if (control && !this.editing && !this.multiple && control.value !== '') {
+        control.select()
+      }
     }
+  }
+
+  /**
+   * What the field shows: the typed text while the reader types, and the
+   * chosen words otherwise, open or closed.
+   *
+   * Measured before this: opening the list emptied the field, so a reader
+   * arrowing in to check the choice lost sight of it.
+   */
+  private get fieldText(): string {
+    if (this.multiple || (this.open && this.editing)) {
+      return this.suggestion || this.typed
+    }
+    return this.word
   }
 
   /**
@@ -855,7 +1023,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
           aria-invalid=${this.invalidity ?? nothing}
           placeholder=${(this.chosen.length > 0 || this.unresolved ? '' : this.placeholder) || nothing}
           ?disabled=${this.isDisabled}
-          .value=${this.multiple || this.open ? this.suggestion || this.typed : this.word}
+          .value=${this.fieldText}
           @input=${this.handleInput}
           @keydown=${this.handleKeydown}
         />
@@ -867,7 +1035,12 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
         ${
           this.creation === ''
             ? nothing
-            : html`<button part="create" type="button" @click=${() => this.create()}>
+            : html`<button
+                part=${this.onCreate ? 'create create-active' : 'create'}
+                id="create"
+                type="button"
+                @click=${() => this.create()}
+              >
                 ${this.createLabel} "${this.creation}"
               </button>`
         }
