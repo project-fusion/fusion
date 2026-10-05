@@ -13,6 +13,7 @@ import { trash } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
+import { type RefusedFile, screenFiles } from '../screen.js'
 import '../../tag/index.js'
 
 /**
@@ -75,29 +76,6 @@ const kind = (file: File): string => {
 }
 
 /**
- * Whether a file is one `accept` lists: an extension, a type, or a family
- * such as `image/*`, as the platform reads it.
- */
-const accepts = (file: File, accept: string): boolean => {
-  const tokens = accept
-    .split(',')
-    .map((token) => token.trim().toLowerCase())
-    .filter(Boolean)
-  if (tokens.length === 0) {
-    return true
-  }
-  const name = file.name.toLowerCase()
-  const type = file.type.toLowerCase()
-  return tokens.some((token) =>
-    token.startsWith('.')
-      ? name.endsWith(token)
-      : token.endsWith('/*')
-        ? type.startsWith(token.slice(0, -1))
-        : type === token,
-  )
-}
-
-/**
  * @summary A field for choosing files from a picker or by dropping them on it.
  *
  * @description
@@ -110,6 +88,12 @@ const accepts = (file: File, accept: string): boolean => {
  * The input holds the label, the name, the validity, and the focus, and the
  * visible trigger is a `<label for>`. The label is not focusable. The input is,
  * and Enter and Space on it open the picker.
+ *
+ * Files arrive from the picker, a drop, or a paste onto the field, and each one
+ * is screened: `accept`, `max-file-size`, `max-files` and your own `validate`
+ * can refuse it. A refused file is left out, `helix-reject` lists each one with
+ * its reason, and a reader hears `rejected-text` with the names filled in.
+ * `directory` asks the picker for a folder.
  *
  * @since 0.1.0
  * @status stable
@@ -125,6 +109,7 @@ const accepts = (file: File, accept: string): boolean => {
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen files change, with their names, and cancelable. Canceling it keeps the files the field had, even when the browser has already written a new pick.
  * @event {Event} input - Fired after the value changes.
+ * @event {CustomEvent} helix-reject - Fired when files arrive and some are refused. `detail.files` lists each with its `reason`: `type`, `size`, `count` or `invalid`, and your `validate` message.
  *
  * @csspart control - The file input itself, which carries the label and validity.
  * @csspart detail - A file's name, with its size and type below it.
@@ -139,6 +124,7 @@ const accepts = (file: File, accept: string): boolean => {
  * @csspart kind-start - The category before the label.
  * @csspart label - The label above the field.
  * @csspart list - The chosen files.
+ * @csspart live - The live region that says `rejected-text` when files are refused. It is rendered from the first refusal.
  * @csspart meta - The row that holds a file's size and type.
  * @csspart name - A file's name.
  * @csspart remove - The control that removes a file.
@@ -179,6 +165,13 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   capture?: 'environment' | 'user'
 
   /**
+   * Whether the picker chooses a folder, and the field takes every file in
+   * it. The platform's `webkitdirectory`.
+   */
+  @property({ type: Boolean })
+  directory = false
+
+  /**
    * Language tag the sizes are written in.
    *
    * Absent uses the runtime's own.
@@ -189,8 +182,28 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   /**
    * Whether more than one file can be chosen.
    */
+  /**
+   * The most bytes one file may have. A larger one is refused.
+   */
+  @property({ attribute: 'max-file-size', type: Number })
+  maxFileSize?: number
+
+  /**
+   * The most files the field holds, under `multiple`. Files past it are
+   * refused.
+   */
+  @property({ attribute: 'max-files', type: Number })
+  maxFiles?: number
+
   @property({ reflect: true, type: Boolean })
   multiple = false
+
+  /**
+   * What a reader hears when files are refused, with `{count}` and `{names}`
+   * filled in.
+   */
+  @property({ attribute: 'rejected-text' })
+  rejectedText = 'Not added: {names}'
 
   /**
    * The accessible name of the control that removes a file. `{name}` is
@@ -208,6 +221,85 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose files'
+
+  /**
+   * Your own check on each arriving file, which returns why it is refused, or
+   * nothing to take it. A property, since a function cannot be an attribute.
+   */
+  @property({ attribute: false })
+  validate?: (file: File) => string | null | undefined
+
+  /** Whether the live region is rendered: from the first refusal. */
+  @state()
+  private spoke = false
+
+  /** What the live region says. */
+  @state()
+  private said = ''
+
+  /**
+   * Screens arriving files and commits what is taken, after the files the
+   * field keeps. Refused files are announced and said.
+   */
+  private take(arriving: File[], keeping: File[], picked = false): void {
+    const { kept, refused } = screenFiles(arriving, keeping, {
+      accept: this.accept,
+      maxFileSize: this.maxFileSize,
+      maxFiles: this.maxFiles,
+      /* The picker already chose as many as the field holds, so only a drop
+         or a paste is cut to one. */
+      multiple: this.multiple || picked,
+      validate: this.validate,
+    })
+    /* Nothing taken and nothing moved, as when every dropped file is refused:
+       no change to announce. */
+    const same = (one: File[], two: File[]): boolean =>
+      one.length === two.length && one.every((file, at) => file === two[at])
+    if (!(same(kept, this.committed) && same(kept, this.files))) {
+      this.commit(kept)
+    }
+    if (refused.length > 0) {
+      this.refuse(refused)
+    }
+  }
+
+  /** Sends `helix-reject` and says which files were left out. */
+  private refuse(refused: RefusedFile[]): void {
+    this.dispatchEvent(
+      new CustomEvent('helix-reject', {
+        bubbles: true,
+        composed: true,
+        detail: { files: refused },
+      }),
+    )
+    const words = fillTemplate(this.rejectedText, {
+      count: refused.length,
+      names: refused.map((one) => one.file.name).join(', '),
+    })
+    /* The region arrives empty and takes its words a frame later, since a
+       region that arrives with its words is read inconsistently. Cleared
+       first, so the same words twice are said twice. */
+    this.spoke = true
+    this.said = ''
+    const fill = (): void => {
+      this.said = words
+    }
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(fill)
+    } else {
+      fill()
+    }
+  }
+
+  /** Takes files pasted onto the field, as a drop takes them. */
+  private readonly handlePaste = (event: ClipboardEvent): void => {
+    const pasted = [...(event.clipboardData?.files ?? [])]
+    if (this.isDisabled || pasted.length === 0) {
+      return
+    }
+    event.preventDefault()
+    this.take(pasted, this.multiple ? this.files : [])
+  }
 
   /**
    * Whether something is being dragged over the field.
@@ -398,8 +490,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     // consumer hears one event from one element rather than two from two.
     event.stopPropagation()
     /* The browser has already written the input, so the request is announced
-       for what it holds and a refusal is what puts the previous list back. */
-    this.commit(this.files)
+       for what it holds and a refusal is what puts the previous list back.
+       Screened first, since `accept` only filters the picker and the size,
+       the count and `validate` are this field's own. */
+    this.take(this.files, [], true)
   }
 
   /*
@@ -431,13 +525,13 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
       return
     }
     event.preventDefault()
-    const dropped = [...event.dataTransfer.files].filter((file) => accepts(file, this.accept))
+    const dropped = [...event.dataTransfer.files]
     if (dropped.length === 0) {
       return
     }
     // A single-file control takes the last thing dropped, the way choosing
     // again in the picker replaces rather than adds.
-    this.commit(this.multiple ? [...this.files, ...dropped] : dropped.slice(-1))
+    this.take(dropped, this.multiple ? this.files : [])
   }
 
   /**
@@ -546,6 +640,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
         @dragleave=${this.handleDragLeave}
         @dragover=${this.handleDragOver}
         @drop=${this.handleDrop}
+        @paste=${this.handlePaste}
       >
         <input
           part="control"
@@ -559,6 +654,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
           ?disabled=${this.isDisabled}
           ?multiple=${this.multiple}
           ?required=${this.required}
+          ?webkitdirectory=${this.directory}
           @change=${this.handleChange}
           @input=${this.stopInner}
         />
@@ -570,6 +666,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
            one ordering decision this component makes differently from the way it
            reads. Reasoning above renderMeta. -->
       ${this.renderHint()}${this.renderFeedback()}
+      ${this.spoke ? html`<span part="live" role="status">${this.said}</span>` : nothing}
       ${
         files.length === 0
           ? nothing
