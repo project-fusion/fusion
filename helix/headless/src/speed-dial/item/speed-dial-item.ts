@@ -74,15 +74,25 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
   }
 
   /**
-   * Whether the action has focus, which is what selected means in a speed dial.
+   * Whether the action has focus, which makes it the action the keyboard is on.
    *
-   * The focused node is found through every shadow root, as `Menu.Item` does,
-   * so a dial inside another component's shadow root still knows its current
-   * action.
+   * `Option` calls the same thing `active`. The focused node is found through
+   * every shadow root, as `Menu.Item` does, so a dial inside another
+   * component's shadow root still knows its current action.
    */
-  get selected(): boolean {
+  get active(): boolean {
     const active = deepActiveElement()
     return active !== null && active.getRootNode() === this.renderRoot
+  }
+
+  /**
+   * Whether the action has focus, the same as `active`.
+   *
+   * @deprecated Read `active`. Everywhere else in the library `selected` means
+   * chosen out of a set, and a speed dial's action is never chosen that way.
+   */
+  get selected(): boolean {
+    return this.active
   }
 
   private choose(): void {

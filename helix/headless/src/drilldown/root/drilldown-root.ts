@@ -145,18 +145,16 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     /* Each row as one the controller never skips, which it does for any item
        that says it is disabled. See `items`. */
     items: () =>
-      this.items.map(
-        (item): NavigableItem & { words: string } => ({
-          contains: (node) => item.contains(node),
-          disabled: false,
-          focusItem: () => item.focusItem(),
-          select: () => item.select(),
-          get selected() {
-            return item.selected
-          },
-          words: slottedWords(item, ['']),
-        }),
-      ),
+      this.items.map((item): NavigableItem & { words: string } => ({
+        contains: (node) => item.contains(node),
+        disabled: false,
+        focusItem: () => item.focusItem(),
+        select: () => item.select(),
+        get selected() {
+          return item.active
+        },
+        words: slottedWords(item, ['']),
+      })),
     reserved: () => ['ArrowLeft', 'ArrowRight'],
     selects: () => false,
     typeahead: (item) => (item as NavigableItem & { words: string }).words,

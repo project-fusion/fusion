@@ -1911,6 +1911,13 @@ The naming, which was never about wrappers:
   An option can be active and not selected on every keypress that moves through
   a list without choosing anything.
 
+  `Menu.Item`, `SpeedDial.Item` and `Drilldown.Item` answer `active` too, as a
+  read-only getter: their rows take focus themselves rather than being named by
+  `aria-activedescendant`, so focus is where the answer already is. They
+  published it first as `selected`, which still answers and is marked
+  `@deprecated`, because a reader moving from `Listbox` to `Menu` found one
+  word with two meanings.
+
   `active` on a root is a fourth thing and a different part of speech.
   `Tabs.Root` and `Tree.Root` take a string naming which member is chosen, by
   value, where the three above are booleans on the member. The pair is the
