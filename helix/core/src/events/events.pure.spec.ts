@@ -183,3 +183,16 @@ describe('the events phase two sent as plain events', () => {
     expect(new HelixTypingEvent({ typing: true }).detail.typing).toBe(true)
   })
 })
+
+describe('the event a control sends once a press has acted', () => {
+  test('is helix-press, carries what pressed it, bubbles out of the shadow root and cannot be canceled', async () => {
+    const { HelixPressEvent } = await import('./events.js')
+    const event = new HelixPressEvent({ pointerType: 'keyboard' })
+    expect(event.type).toBe('helix-press')
+    expect(event.detail.pointerType).toBe('keyboard')
+    expect(event.bubbles).toBe(true)
+    expect(event.composed).toBe(true)
+    expect(event.cancelable).toBe(false)
+    expect(helixEventNames.has('helix-press')).toBe(true)
+  })
+})

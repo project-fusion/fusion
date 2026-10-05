@@ -125,6 +125,7 @@ import { HelixNavigateEvent } from './navigate.js'
 import { HelixNextEvent } from './next.js'
 import { HelixPanelResizeEvent } from './panel-resize.js'
 import { HelixPinEvent } from './pin.js'
+import { HelixPressEvent } from './press.js'
 import { HelixPreviousEvent } from './previous.js'
 import { HelixRangeChangeEvent } from './range-change.js'
 import { HelixReadEvent } from './read.js'
@@ -176,6 +177,8 @@ export type {
   MoveDetail,
   NavigateDetail,
   OpenDetail,
+  PressDetail,
+  PressPointerType,
   RangeDetail,
   ReadDetail,
   ReconnectDetail,
@@ -258,6 +261,7 @@ export {
   HelixNextEvent,
   HelixPanelResizeEvent,
   HelixPinEvent,
+  HelixPressEvent,
   HelixPreviousEvent,
   HelixRangeChangeEvent,
   HelixReadEvent,
@@ -356,6 +360,7 @@ const registry = {
   HelixNextEvent,
   HelixPanelResizeEvent,
   HelixPinEvent,
+  HelixPressEvent,
   HelixPreviousEvent,
   HelixRangeChangeEvent,
   HelixReadEvent,
