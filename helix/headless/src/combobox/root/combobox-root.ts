@@ -78,6 +78,7 @@ const isInsertion = (event: Event): boolean =>
  *
  * @slot - The options.
  * @slot end - After the text, for a unit or a clear button.
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - The hint, for content richer than plain text.
  * @slot indicator - Replaces the caret that shows the field opens a list.
  * @slot label - The label, for content richer than plain text.
