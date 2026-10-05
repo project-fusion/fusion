@@ -35,8 +35,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot end - Content under the field, beside the send button.
  * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
- * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Sent on the composer and does not bubble.
  * @event {HelixSendEvent} helix-send - Fired when the user sends their turn, and cancelable.
+ * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Sent on the composer and does not bubble.
  *
  * @csspart composer - The whole composer.
  * @csspart end - The box around the `end` slot.
