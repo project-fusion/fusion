@@ -188,20 +188,10 @@ helix-app-header {
  * documented hooks: the figures come down a step from the display size, which
  * suits one figure on its own and is too loud for three in an 18rem column, and
  * the gap between them is wide enough to set them apart with no rule.
- *
- * **Level with the buttons where the panel has a column of its own**, so it
- * sits low, under the brightest part of the light, and its figures line up with
- * the actions beside them.
  */
 .specimen {
   --stat-group-gap: var(--helix-space-xl);
   --stat-value-size: var(--helix-text-2xl);
-}
-
-@media (width >= 60rem) {
-  .specimen {
-    align-self: end;
-  }
 }
 
 /* A section is its heading and its one block, closer together than two sections
