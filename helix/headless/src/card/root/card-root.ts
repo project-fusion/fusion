@@ -14,9 +14,11 @@ import { property, state } from 'lit/decorators.js'
  * the grid, so you style `Card` directly and there is no wrapper part to reach
  * through with `::part`.
  *
- * Name the card with `aria-label` or `aria-labelledby`. These are the only
- * names that work with server rendering, because reading a title from the light
- * DOM needs a DOM, and the server has none. **A named card is a group**, so a
+ * Name the card with `label`, as a Stat Group is named, or with `aria-label`
+ * or `aria-labelledby`. These are the only names that work with server
+ * rendering, because reading a title from the light DOM needs a DOM, and the
+ * server has none. `label` is set through `ElementInternals`, so it writes no
+ * attribute onto the card. **A named card is a group**, so a
  * reader entering it hears its name; an unnamed one has no role, since a group
  * with no name only adds "group" to what a reader says.
  *
@@ -55,6 +57,16 @@ import { property, state } from 'lit/decorators.js'
  */
 @customElement('helix-headless-card')
 export class HelixHeadlessCard extends HelixElement {
+  /**
+   * The card's accessible name, which makes it a named group.
+   *
+   * The name `Stat.Group` and the other named regions take, set through
+   * `ElementInternals`. `aria-label` and `aria-labelledby` written on the card
+   * name it too, and win over this, as an author's attribute does.
+   */
+  @property()
+  label = ''
+
   /**
    * Places the media after the content. By default it comes before.
    *
@@ -97,8 +109,8 @@ export class HelixHeadlessCard extends HelixElement {
     super.willUpdate(changed)
     // On the host, since the host is the box. Set here rather than in
     // `connectedCallback`, which the server never calls.
-    const named = Boolean(this.namedBy?.trim() || this.labelledBy?.trim())
-    hostAria(this.internals, { role: named ? 'group' : '' })
+    const named = Boolean(this.label.trim() || this.namedBy?.trim() || this.labelledBy?.trim())
+    hostAria(this.internals, { label: this.label, role: named ? 'group' : '' })
   }
 
   /* Read after every render as well as on `slotchange`, because a hydrated

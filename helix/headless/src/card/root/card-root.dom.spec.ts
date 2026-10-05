@@ -92,6 +92,24 @@ describe('card regions', () => {
     expect(role(card)).toBeNull()
   })
 
+  /* Stat Group and the other named regions take `label`; a card took only the
+     ARIA attributes. Through internals, so the host carries nothing more. */
+  test('is a group named by label, with no attribute written', async () => {
+    const card = (await mount(
+      '<helix-headless-card label="Storage">Body</helix-headless-card>',
+    )) as HTMLElement & {
+      internals: ElementInternals
+      label: string
+      updateComplete: Promise<boolean>
+    }
+    expect(role(card)).toBe('group')
+    expect(card.internals.ariaLabel).toBe('Storage')
+    expect(card.hasAttribute('aria-label')).toBe(false)
+    card.label = ''
+    await card.updateComplete
+    expect(role(card)).toBeNull()
+  })
+
   test('and named by a heading it points at', async () => {
     const card = await mount(
       '<helix-headless-card aria-labelledby="t"><h2 id="t" slot="header">Storage</h2></helix-headless-card>',
