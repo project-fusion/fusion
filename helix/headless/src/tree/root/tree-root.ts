@@ -222,21 +222,35 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     return this.items.map((item) => item.value).filter((value) => value !== '')
   }
 
+  /**
+   * Whether an item holds others, read from the tree as well as from the item.
+   *
+   * **An item hydrating what a server sent has not said it is a branch yet**:
+   * it learns that from its children on the render after, and nothing then
+   * asks the tree again. Read from its own render alone, a folder served with
+   * one of its files checked was counted a leaf and drawn unchecked rather
+   * than partly checked, once hydrated.
+   */
+  private holds(item: HelixHeadlessTreeItem): boolean {
+    return item.isBranch || this.items.some((other) => other !== item && item.contains(other))
+  }
+
   /** What the multiple selection reads of an item. */
   private rowOf(item: HelixHeadlessTreeItem): CheckableRow {
-    const leaves = item.isBranch
+    const branch = this.holds(item)
+    const leaves = branch
       ? this.items
           .filter(
             (other) =>
               other !== item &&
               item.contains(other) &&
-              !other.isBranch &&
+              !this.holds(other) &&
               !other.disabled &&
               other.value !== '',
           )
           .map((other) => other.value)
       : []
-    return { branch: item.isBranch, disabled: item.disabled, leaves, value: item.value }
+    return { branch, disabled: item.disabled, leaves, value: item.value }
   }
 
   /**

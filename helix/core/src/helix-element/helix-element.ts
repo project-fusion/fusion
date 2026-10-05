@@ -119,6 +119,24 @@ const SCROLLER = css`
 `
 
 /**
+ * A box whose rows are drawn and taken away as it scrolls, which
+ * `VirtualizeController` marks `data-virtual` once it watches it.
+ *
+ * **The browser's scroll anchoring fights the window.** Chromium keeps the
+ * content a reader was looking at in place when what is above it changes, and
+ * a virtual window changes exactly that on every move: the spacer above grows
+ * and the rows are swapped. Measured on a 500 row list scrolled to 330, the
+ * offset went to 138, then 522, then back to 330 before it settled, and the
+ * list reported four ranges for one scroll. The window already keeps the rows
+ * where they belong, so anchoring has nothing left to do here but move them.
+ */
+const VIRTUAL = css`
+  [data-virtual] {
+    overflow-anchor: none;
+  }
+`
+
+/**
  * Turns a drawing that runs along the line of text, or a glyph that points
  * along it, round with it on a right-to-left page.
  *
@@ -619,7 +637,15 @@ export class HelixElement extends LitElement {
   protected static override finalizeStyles(
     styles?: CSSResultOrNative | CSSResultOrNative[],
   ): CSSResultOrNative[] {
-    return [BOX_SIZING, HIDDEN, SCROLLER, MIRROR, SETTLED, ...LitElement.finalizeStyles(styles)]
+    return [
+      BOX_SIZING,
+      HIDDEN,
+      SCROLLER,
+      VIRTUAL,
+      MIRROR,
+      SETTLED,
+      ...LitElement.finalizeStyles(styles),
+    ]
   }
 
   /**
