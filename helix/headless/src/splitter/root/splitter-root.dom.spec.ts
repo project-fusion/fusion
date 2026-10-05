@@ -1195,3 +1195,15 @@ describe('the window splitter keys and names', () => {
     expect(separator(host).getAttribute('aria-label')).toBe('Resize the sidebar')
   })
 })
+
+describe('the channel between two splitters', () => {
+  /* `cross` and `uncross` were public methods kept off the manifest only, so a
+     script could still call them. */
+  test('is nothing a script can call on the element', async () => {
+    const host = (await mount(
+      '<helix-headless-splitter><div slot="start"></div><div slot="end"></div></helix-headless-splitter>',
+    )) as HTMLElement & Record<string, unknown>
+    expect(host.cross).toBeUndefined()
+    expect(host.uncross).toBeUndefined()
+  })
+})

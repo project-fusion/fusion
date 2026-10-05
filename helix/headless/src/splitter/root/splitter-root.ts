@@ -31,6 +31,20 @@ import { snapTo } from '../snap.js'
  */
 const STACK_BELOW = 512
 
+/** What a nested splitter tells the one it crosses. */
+interface Crossed {
+  /** Records that `by` crosses this splitter at `at` percent along it. */
+  cross(by: HelixHeadlessSplitter, at: number): void
+  /** Forgets `by`, which has left the tree. */
+  uncross(by: HelixHeadlessSplitter): void
+}
+
+/**
+ * Each splitter's channel, by splitter. A map rather than methods, so the
+ * coordination between two splitters is nothing a consumer can call.
+ */
+const channel = new WeakMap<HelixHeadlessSplitter, Crossed>()
+
 /**
  * @summary Two panes and a divider that you can move.
  *
@@ -427,8 +441,8 @@ export class HelixHeadlessSplitter extends HelixElement {
    * divider, because the child fills the pane and the pane spans this splitter
    * end to end on the axis the divider runs.
    *
-   * Not `@state`, because the array is mutated in place. `cross` and `uncross`
-   * request the update themselves.
+   * Not `@state`, because the array is mutated in place. The channel's `cross`
+   * and `uncross` request the update themselves.
    */
   private crossings: Array<{ at: number; by: HelixHeadlessSplitter }> = []
 
@@ -944,35 +958,35 @@ export class HelixHeadlessSplitter extends HelixElement {
   }
 
   /**
-   * @internal Records that a nested splitter crosses this one at `at` percent
-   * along it.
-   *
-   * Public because it is the whole of the channel between the two, and it runs
-   * one way: the child tells the parent where it is, and the parent draws the
-   * corner and drives them both. Nothing is read back, so neither has to know
-   * anything about the other's state.
+   * Opens the channel a nested splitter reports through: where it crosses this
+   * one, and when it has left. It runs one way, the child telling the parent
+   * where it is and the parent drawing the corner and driving them both, so
+   * nothing is read back. Kept off the element, so it is no API of it.
    */
-  cross(by: HelixHeadlessSplitter, at: number): void {
-    const found = this.crossings.find((crossing) => crossing.by === by)
-    if (found) {
-      if (found.at === at) {
-        return
-      }
-      found.at = at
-    } else {
-      this.crossings.push({ at, by })
-    }
-    this.requestUpdate()
-  }
-
-  /** @internal Forgets a nested splitter that has left the tree. See `cross`. */
-  uncross(by: HelixHeadlessSplitter): void {
-    const at = this.crossings.findIndex((crossing) => crossing.by === by)
-    if (at === -1) {
-      return
-    }
-    this.crossings.splice(at, 1)
-    this.requestUpdate()
+  constructor() {
+    super()
+    channel.set(this, {
+      cross: (by, at) => {
+        const found = this.crossings.find((crossing) => crossing.by === by)
+        if (found) {
+          if (found.at === at) {
+            return
+          }
+          found.at = at
+        } else {
+          this.crossings.push({ at, by })
+        }
+        this.requestUpdate()
+      },
+      uncross: (by) => {
+        const at = this.crossings.findIndex((crossing) => crossing.by === by)
+        if (at === -1) {
+          return
+        }
+        this.crossings.splice(at, 1)
+        this.requestUpdate()
+      },
+    })
   }
 
   /**
@@ -1005,7 +1019,7 @@ export class HelixHeadlessSplitter extends HelixElement {
     }
     this.outer = outer
     this.crossedAt = this.position
-    outer.cross(this, this.position)
+    channel.get(outer)?.cross(this, this.position)
   }
 
   private readonly handleCornerDown = (event: PointerEvent): void => {
@@ -1154,7 +1168,9 @@ export class HelixHeadlessSplitter extends HelixElement {
     super.disconnectedCallback()
     this.sizes?.disconnect()
     this.sizes = undefined
-    this.outer?.uncross(this)
+    if (this.outer) {
+      channel.get(this.outer)?.uncross(this)
+    }
     this.outer = null
     this.crossedAt = undefined
   }
@@ -1200,7 +1216,7 @@ export class HelixHeadlessSplitter extends HelixElement {
        follows this divider through a drag instead of catching up at the end. */
     if (this.outer && this.showing !== this.crossedAt) {
       this.crossedAt = this.showing
-      this.outer.cross(this, this.showing)
+      channel.get(this.outer)?.cross(this, this.showing)
     }
   }
 
