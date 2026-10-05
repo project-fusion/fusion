@@ -219,3 +219,29 @@ describe('the panel of a time input', () => {
     expect(part(host, 'surface')?.getAttribute('aria-label')).toBe('Choose a time')
   })
 })
+
+describe('a time input with seconds and a clock of its own', () => {
+  test('takes a typed time to the second, and writes it so when idle', async () => {
+    const host = await field('seconds locale="en-US"')
+    await type(host, '14:05:09')
+    expect(host.value).toBe('14:05:09')
+    expect(internals(host).validity.valid).toBe(true)
+    control(host).dispatchEvent(new FocusEvent('blur'))
+    await host.updateComplete
+    expect(control(host).value).toBe('2:05:09 PM')
+  })
+
+  test('without seconds, a time with them is not one it holds', async () => {
+    const host = await field()
+    await type(host, '14:05:09')
+    expect(internals(host).validity.badInput).toBe(true)
+  })
+
+  test('hour-cycle writes the field and the list on the clock it names', async () => {
+    const host = await field('locale="en-US" hour-cycle="h23" default-value="14:05"')
+    expect(control(host).value).toBe('14:05')
+    const picker = part(host, 'picker') as HTMLElement & { hourCycle?: string; seconds: boolean }
+    expect(picker.hourCycle).toBe('h23')
+    expect(picker.seconds).toBe(false)
+  })
+})

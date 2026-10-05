@@ -6,15 +6,12 @@ import {
   timeAsValue as fromTime,
   type HelixBeforeChangeEvent,
   HelixFormElement,
-  isTimeValue,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
   MixinPickerEditing,
   MixinPickerField,
   MixinTokens,
-  valueAsMinutes,
-  writeTime,
   writtenList,
 } from '@fusion.dev/helix-core'
 import { clock } from '@fusion.dev/helix-icons'
@@ -22,6 +19,13 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
+import {
+  clockLocale,
+  type HourCycle,
+  isClockValue,
+  valueAsSeconds,
+  writeClock,
+} from '../../time-picker/clock.js'
 /* Base elements here, styled ones in the styled file. The arrangement Date
    Input has with its calendar. */
 import '../../tag/index.js'
@@ -39,7 +43,8 @@ import '../../time-picker/index.js'
  * You can type a time or pick one. The list offers times at a step, and the
  * field lets you enter any time, such as `09:07`.
  *
- * The value is always `HH:mm` on a 24-hour clock, because that is what the form
+ * The value is always `HH:mm` on a 24-hour clock, or `HH:mm:ss` with
+ * `seconds`, because that is what the form
  * submits, what `min` and `max` compare against, and what sorts correctly as a
  * string. While idle, the field shows the time in the user's locale format.
  * Once the caret is in the field, it shows the value itself, because a
@@ -160,6 +165,15 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   disableTimes = ''
 
   /**
+   * The clock the times are written on: `h12` for twelve hours with a
+   * meridiem, `h23` for twenty-four. Absent is the locale's own.
+   *
+   * Handed to the list. The value is `HH:mm` on twenty-four hours either way.
+   */
+  @property({ attribute: 'hour-cycle' })
+  hourCycle?: HourCycle
+
+  /**
    * Language tag the times are written in.
    *
    * Absent uses the runtime's own.
@@ -230,7 +244,16 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
   removeLabel = 'Remove {name}'
 
   /**
-   * How far apart the offered times are, in minutes.
+   * Whether times carry their seconds: the value is `HH:mm:ss`, a typed time
+   * may give them, the field writes them, and the list's `step` counts seconds.
+   * See Time Picker's `seconds`.
+   */
+  @property({ type: Boolean })
+  seconds = false
+
+  /**
+   * How far apart the offered times are, in minutes, or in seconds with
+   * `seconds`.
    */
   @property({ type: Number })
   step = 15
@@ -272,9 +295,16 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       .filter(Boolean)
   }
 
+  /** Whether a typed time is one this field holds, to the second where it holds seconds. */
+  private isTime(at: string): boolean {
+    return isClockValue(at, this.seconds)
+  }
+
   /** One time, written the way `time-style` asks for. */
   private written(at: string): string {
-    return this.timeStyle === 'iso' || !isTimeValue(at) ? at : writeTime(at, this.locale)
+    return this.timeStyle === 'iso' || !this.isTime(at)
+      ? at
+      : writeClock(at, clockLocale(this.locale, this.hourCycle), this.seconds)
   }
 
   /** What the field shows: the value while it is being edited, a reading when not. */
@@ -320,7 +350,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       return
     }
     const held = this.held
-    if (event.key === 'Enter' && isTimeValue(this.draft)) {
+    if (event.key === 'Enter' && this.isTime(this.draft)) {
       event.preventDefault()
       if (!held.includes(this.draft)) {
         this.requestPicked([...held, this.draft].sort().join(','))
@@ -345,7 +375,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
    */
   private get picked(): string {
     const held = this.held
-    return held.length > 0 && held.every(isTimeValue) ? held.join(',') : ''
+    return held.length > 0 && held.every((one) => this.isTime(one)) ? held.join(',') : ''
   }
 
   private readonly handleInput = (event: Event): void => {
@@ -367,7 +397,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       .split(',')
       .map((one) => one.trim())
       .filter(Boolean)
-    const whole = held.length > 0 && held.every(isTimeValue)
+    const whole = held.length > 0 && held.every((one) => this.isTime(one))
     this.requestValue(whole ? held.join(',') : typed)
     this.restore()
   }
@@ -422,33 +452,34 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
 
        **Every time in the value, not the value itself**, which is what Date
        Input's own note says and what this was missing. A range holds two and a
-       multiple holds any number, joined by commas, so `isTimeValue` on the whole
+       multiple holds any number, joined by commas, so `isClockValue` on the whole
        string answered false for every range that had been filled in: two times
        chosen from the picker reported "Enter a time as HH:mm" and the field went
        invalid on being used correctly. */
     const held = this.held
-    const floor = valueAsMinutes(this.min) ?? 0
-    const ceiling = valueAsMinutes(this.max) ?? 1439
-    if (held.length > 0 && !held.every(isTimeValue)) {
+    const floor = valueAsSeconds(this.min) ?? 0
+    const ceiling = valueAsSeconds(this.max) ?? 86_399
+    const shape = this.seconds ? 'HH:mm:ss' : 'HH:mm'
+    if (held.length > 0 && !held.every((one) => this.isTime(one))) {
       return (
         this.badInputMessage ||
         (this.mode === undefined
-          ? 'Enter a time as HH:mm.'
-          : 'Enter times as HH:mm, separated by commas.')
+          ? `Enter a time as ${shape}.`
+          : `Enter times as ${shape}, separated by commas.`)
       )
     }
-    if (held.some((one) => (valueAsMinutes(one) ?? 0) < floor)) {
+    if (held.some((one) => (valueAsSeconds(one) ?? 0) < floor)) {
       return fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
-        min: writeTime(this.min, this.locale),
+        min: writeClock(this.min, clockLocale(this.locale, this.hourCycle), this.seconds),
       })
     }
-    if (held.some((one) => (valueAsMinutes(one) ?? 0) > ceiling)) {
+    if (held.some((one) => (valueAsSeconds(one) ?? 0) > ceiling)) {
       return fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
-        max: writeTime(this.max, this.locale),
+        max: writeClock(this.max, clockLocale(this.locale, this.hourCycle), this.seconds),
       })
     }
-    const barred = writtenList(this.disableTimes)
-    if (held.some((one) => barred.includes(one))) {
+    const barred = writtenList(this.disableTimes).map(valueAsSeconds)
+    if (held.some((one) => barred.includes(valueAsSeconds(one)))) {
       return this.unavailableMessage || 'Choose a time that is available.'
     }
     if (this.mode === 'range' && held.length > 2) {
@@ -519,9 +550,11 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
       disable-times=${this.disableTimes || nothing}
       manual
       label=${this.label || 'Time'}
+      hour-cycle=${this.hourCycle ?? nothing}
       locale=${this.locale || nothing}
       max=${this.max}
       min=${this.min}
+      ?seconds=${this.seconds}
       step=${this.step}
       .value=${this.picked}
       @helix-before-change=${this.handlePicked}

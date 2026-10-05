@@ -560,3 +560,84 @@ describe('focus on a time picker', () => {
     expect(host.shadowRoot?.activeElement?.getAttribute('data-column')).toBe('hour')
   })
 })
+
+describe('a clock and a precision of your choosing', () => {
+  /* Web Awesome's time input has seconds, and both peers let a page set the
+     clock; Helix had neither. */
+  const wheels = async (attrs = ''): Promise<Time> => {
+    const host = (await mount(
+      `<helix-headless-time-picker variant="wheels" ${attrs}></helix-headless-time-picker>`,
+    )) as Time
+    await host.updateComplete
+    return host
+  }
+  const column = (host: Time, which: string): HTMLElement =>
+    host.shadowRoot?.querySelector(`[data-column="${which}"]`) as HTMLElement
+
+  test('hour-cycle writes the twenty-four hour clock in a locale that writes twelve', async () => {
+    const list = await picker('locale="en-US" hour-cycle="h23" min="13:00" max="13:00"')
+    expect(options(list)[0]?.textContent?.trim()).toBe('13:00')
+    const host = await wheels('locale="en-US" hour-cycle="h23"')
+    expect(column(host, 'meridiem')).toBeNull()
+    expect(column(host, 'hour').querySelectorAll('[part~="option"]')).toHaveLength(24)
+  })
+
+  test('and the twelve hour clock in one that writes twenty-four', async () => {
+    const host = await wheels('locale="en-GB" hour-cycle="h12"')
+    expect(column(host, 'meridiem')).not.toBeNull()
+  })
+
+  test('seconds add a wheel, and step counts seconds', async () => {
+    const host = await wheels('seconds step="15" default-value="09:15:30" locale="en-GB"')
+    const seconds = [...column(host, 'second').querySelectorAll('[part~="option"]')].map((one) =>
+      one.getAttribute('value'),
+    )
+    expect(seconds).toEqual(['0', '15', '30', '45'])
+    column(host, 'second').dispatchEvent(
+      new CustomEvent('helix-before-change', {
+        bubbles: true,
+        composed: true,
+        detail: { value: '45' },
+      }),
+    )
+    await host.updateComplete
+    expect(host.value).toBe('09:15:45')
+  })
+
+  test('a list with seconds writes them on every row and in the value', async () => {
+    const host = await picker('seconds step="30" min="09:00:00" max="09:01:00" locale="en-US"')
+    expect(options(host).map((one) => one.getAttribute('value'))).toEqual([
+      '09:00:00',
+      '09:00:30',
+      '09:01:00',
+    ])
+    expect(options(host)[1]?.textContent?.trim()).toBe('9:00:30 AM')
+  })
+
+  test('Left and Right move between the wheels, and stop at the ends', async () => {
+    const host = await wheels('locale="en-GB" default-value="09:15"')
+    const hour = column(host, 'hour') as HTMLElement & { focus(): void }
+    const minute = column(host, 'minute')
+    let focused: Element | null = null
+    minute.focus = () => {
+      focused = minute
+    }
+    const right = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'ArrowRight',
+    })
+    hour.dispatchEvent(right)
+    expect(right.defaultPrevented).toBe(true)
+    expect(focused).toBe(minute)
+    const past = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'ArrowRight',
+    })
+    minute.dispatchEvent(past)
+    expect(past.defaultPrevented).toBe(false)
+  })
+})
