@@ -380,6 +380,7 @@ export {
   definedTags,
   duplicateRegistrations,
 } from './utils/custom-element/custom-element.js'
+export { segmentName } from './utils/date-segments/date-segments.js'
 export {
   type DrawDismissOptions,
   drawDismiss,
@@ -524,6 +525,7 @@ export {
   valueAsTime,
 } from './utils/value-as/value-as.js'
 export { watchTheme } from './utils/watch-theme/watch-theme.js'
+export { wordsConverter } from './utils/words-converter/words-converter.js'
 export { writeClock, writeTime } from './utils/write-time/write-time.js'
 export {
   commaList,
