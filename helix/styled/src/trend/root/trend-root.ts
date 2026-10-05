@@ -1,7 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTrend } from '@fusion.dev/helix-headless/trend'
 import type { CSSResultGroup } from 'lit'
-import '../../icon/index.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './trend-root.css.js'
 

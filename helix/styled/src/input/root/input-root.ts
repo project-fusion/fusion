@@ -1,10 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessInput } from '@fusion.dev/helix-headless/input'
 import type { CSSResultGroup } from 'lit'
-/* The clear and reveal buttons render one, and a custom element registers on
-   import: a consumer importing this family alone would otherwise get an inert
-   unknown element where the mark should be. */
-import '../../icon/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'

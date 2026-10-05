@@ -1,10 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFilterInput } from '@fusion.dev/helix-headless/filter-input'
 import type { CSSResultGroup } from 'lit'
-/* The clear button renders one, and a custom element registers on import: a
-   consumer importing this family alone would otherwise get an inert unknown
-   element where the mark should be. */
-import '../../icon/index.js'
 /* The suggestions are `helix-option` elements a consumer slots in, and a custom
    element registers on import: a consumer importing this family alone would
    otherwise get inert unknown elements in the panel. */

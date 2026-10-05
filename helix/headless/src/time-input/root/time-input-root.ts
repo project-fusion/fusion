@@ -24,7 +24,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 /* Base elements here, styled ones in the styled file. The arrangement Date
    Input has with its calendar. */
-import '../../icon/index.js'
 import '../../tag/index.js'
 import '../../time-picker/index.js'
 

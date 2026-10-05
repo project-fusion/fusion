@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { build } from './build.js'
 
 /**
@@ -82,6 +82,21 @@ describe('a set of somebody else\u2019s drawings', () => {
     const indexed = planted()
     build({ index: true, out: indexed.out, sources: [{ directory: indexed.directory }] })
     expect(readFileSync(indexed.out, 'utf8')).toContain('export const icons')
+  })
+
+  test('one glyph imported from an indexed set bundles alone', async () => {
+    /* The record sits beside the glyphs, so its keys decide whether a bundler
+       can drop it. Bun keeps an object whose keys read a property. */
+    const { directory, out } = planted()
+    build({ index: true, out, sources: [{ directory }] })
+    expect(readFileSync(out, 'utf8')).toContain("  'ring-heavy': ringHeavy,")
+
+    const entry = join(dirname(out), 'entry.ts')
+    writeFileSync(entry, "import { peak } from './icons.generated.ts'\nconsole.log(peak)\n")
+    const bundled = await Bun.build({ entrypoints: [entry], minify: true })
+    const code = (await bundled.outputs[0]?.text()) ?? ''
+    expect(code).toContain('M12 2')
+    expect(code).not.toContain('circle')
   })
 
   test('a name nothing draws is refused, and says where it looked', () => {
