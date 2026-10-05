@@ -188,7 +188,7 @@ const PACKAGES = [
   { entry: '@fusion.dev/helix-icons', note: 'The whole glyph set.' },
   {
     entry: '@fusion.dev/helix-theme',
-    note: 'The derivation engine. Most sites run it at build time, and a theme switcher runs it in the browser.',
+    note: 'The JavaScript that runs the derivation engine. Most sites run it at build time, and a theme switcher runs it in the browser.',
   },
   { entry: '@fusion.dev/helix', note: 'Every styled family.' },
   { entry: 'lit', note: 'Lit itself, listed so you can subtract it from every row above.' },
@@ -232,6 +232,18 @@ const STYLESHEETS = [
     path: 'helix/styles/dist/tokens.css',
   },
 ]
+
+/**
+ * The derivation engine itself, which its package's entry loads when it runs.
+ *
+ * **Measured as a file, beside the bundle.** The entry fetches this at run time,
+ * so `Bun.build` never sees it, and the package row alone came to 1.4 kB for an
+ * engine a theme switcher downloads at 126 kB.
+ */
+const ENGINE_WASM = {
+  note: 'The derivation engine itself, in WebAssembly. The entry above loads it when the engine runs.',
+  path: 'helix/theme/wasm/fusion_helix_theme_bg.wasm',
+}
 
 /**
  * How many measurements run at once.
@@ -470,6 +482,9 @@ const packages = await pooled(PACKAGES, async (entry, index) => ({
   ...entry,
   ...(await measure(`package-${index}`, `export * from '${entry.entry}'\n`)),
 }))
+
+const engineWasm = await sizes(readFileSync(join(root, ENGINE_WASM.path)))
+const engineEntry = packages.find((one) => one.entry === '@fusion.dev/helix-theme')
 
 const stylesheets = await pooled(STYLESHEETS, async (sheet) => ({
   ...sheet,
@@ -745,10 +760,14 @@ const lines = [
   '',
   '| Package | Raw | Gzip | Brotli | |',
   '|---|---|---|---|---|',
-  ...packages.map(
-    (one) =>
-      `| \`${one.entry}\` | ${grouped(one.raw)} | ${grouped(one.gzip)} | ${grouped(one.brotli)} | ${one.note} |`,
-  ),
+  ...packages.flatMap((one) => [
+    `| \`${one.entry}\` | ${grouped(one.raw)} | ${grouped(one.gzip)} | ${grouped(one.brotli)} | ${one.note} |`,
+    ...(one === engineEntry
+      ? [
+          `| \`${ENGINE_WASM.path.split('/').at(-1)}\` | ${grouped(engineWasm.raw)} | ${grouped(engineWasm.gzip)} | ${grouped(engineWasm.brotli)} | ${ENGINE_WASM.note} |`,
+        ]
+      : []),
+  ]),
   '',
   '## Stylesheets',
   '',
@@ -845,9 +864,9 @@ const claims = [
     value: kb(stylesheets.find((sheet) => sheet.path.endsWith('dist/tokens.css')).brotli),
   },
   {
-    label: 'The derivation engine',
-    note: 'Most sites run it when they build. A theme switcher runs it in the browser.',
-    value: kb(packages.find((one) => one.entry === '@fusion.dev/helix-theme').brotli),
+    label: 'The derivation engine, compressed',
+    note: 'Most sites run it when they build and ship none of it. A theme switcher downloads all of it.',
+    value: kb(engineEntry.brotli + engineWasm.brotli),
   },
   {
     label: 'Of the first component is shared',
