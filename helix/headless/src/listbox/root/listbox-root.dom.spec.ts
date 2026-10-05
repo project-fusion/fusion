@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
   hasLayout,
+  hasState,
   mount,
   part,
   registerDom,
@@ -625,5 +626,78 @@ describe('the filter field', () => {
   test('says it narrows a list, as a combobox input does', async () => {
     const host = (await list('filterable')) as Updatable
     expect(field(host).getAttribute('aria-autocomplete')).toBe('list')
+  })
+})
+
+describe('a filter says how many it left', () => {
+  /* React Aria and Web Awesome say the count as a filter narrows; only "No
+     matches" was said here, so a query that left forty and one that left one
+     sounded the same. */
+  const live = (host: Updatable): string => part(host, 'live')?.textContent?.trim() ?? ''
+
+  test('the region says the count, in the singular for one', async () => {
+    const host = (await list('filterable')) as Updatable & {
+      requestFilter: (next: string) => boolean
+    }
+    expect(live(host)).toBe('')
+    host.requestFilter('a')
+    await settle(host)
+    expect(live(host)).toBe('3 results')
+    host.requestFilter('gam')
+    await settle(host)
+    expect(live(host)).toBe('1 result')
+  })
+
+  test('none left says the empty text, and a cleared filter says nothing', async () => {
+    const host = (await list('filterable')) as Updatable & {
+      requestFilter: (next: string) => boolean
+    }
+    host.requestFilter('zzz')
+    await settle(host)
+    expect(live(host)).toBe('No matches')
+    host.requestFilter('')
+    await settle(host)
+    expect(live(host)).toBe('')
+  })
+
+  test('the words are the page’s', async () => {
+    const host = (await list(
+      'filterable result-label="{count} Treffer" results-label="{count} Treffer gesamt"',
+    )) as Updatable & { requestFilter: (next: string) => boolean }
+    host.requestFilter('beta')
+    await settle(host)
+    expect(live(host)).toBe('1 Treffer')
+  })
+})
+
+describe('the empty and loading lines', () => {
+  test('take slotted content in place of their text', async () => {
+    document.body.innerHTML = `<helix-headless-listbox label="L">
+      <p slot="empty">Nothing yet. <a href="#new">Add one</a></p>
+      <span slot="loading">Fetching</span>
+    </helix-headless-listbox>`
+    const host = document.body.firstElementChild as Updatable & { loading: boolean }
+    await settle(host)
+    const empty = part(host, 'empty')?.querySelector('slot[name="empty"]') as HTMLSlotElement
+    expect(empty.assignedElements()[0]?.textContent).toContain('Add one')
+    host.loading = true
+    await settle(host)
+    const loading = part(host, 'loading')?.querySelector('slot[name="loading"]') as HTMLSlotElement
+    expect(loading.assignedElements()[0]?.textContent).toBe('Fetching')
+  })
+
+  test('and the host says which it is showing', async () => {
+    const host = (await list('filterable')) as Updatable & {
+      loading: boolean
+      requestFilter: (next: string) => boolean
+    }
+    expect(hasState(host, 'empty')).toBe(false)
+    host.requestFilter('zzz')
+    await settle(host)
+    expect(hasState(host, 'empty')).toBe(true)
+    host.loading = true
+    await settle(host)
+    expect(hasState(host, 'loading')).toBe(true)
+    expect(hasState(host, 'empty')).toBe(false)
   })
 })
