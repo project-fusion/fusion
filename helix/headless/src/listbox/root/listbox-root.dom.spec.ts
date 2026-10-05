@@ -701,3 +701,26 @@ describe('the empty and loading lines', () => {
     expect(hasState(host, 'empty')).toBe(false)
   })
 })
+
+describe('ranges from the keyboard', () => {
+  /* APG's multiple-selection listbox: Shift with Home or End takes in every
+     option from the highlight to that end. */
+  test('Shift and End add every option from the highlight to the last', async () => {
+    const host = (await list('multiple')) as Updatable & { value: string }
+    await press(host, 'ArrowDown')
+    await press(host, 'ArrowDown')
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'End', shiftKey: true }))
+    await settle(host)
+    expect(host.value.split(',').sort()).toEqual(['three', 'two'].sort())
+  })
+
+  test('and Control, Shift and Home every option back to the first', async () => {
+    const host = (await list('multiple')) as Updatable & { value: string }
+    await press(host, 'End')
+    host.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, ctrlKey: true, key: 'Home', shiftKey: true }),
+    )
+    await settle(host)
+    expect(host.value.split(',').sort()).toEqual(['one', 'three', 'two'])
+  })
+})
