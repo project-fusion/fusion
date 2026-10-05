@@ -121,6 +121,52 @@
   padding: var(--popover-padding, var(--helix-space-none));
 }
 
+/* No ring on the panel itself, which takes focus only where it holds nothing
+   that can: the same choice `Dialog` makes for its panel. */
+[part="popover"]:focus,
+[part="popover"]:focus-visible {
+  outline: none;
+}
+
+/* The point, drawn with `arrow`, half outside the panel on the edge facing the
+   trigger. The floating pass places it; the panel's own edge is drawn on the
+   two sides turned outward, which are physical because a placement is. */
+[part~="arrow"] {
+  background-color: var(--helix-color-surface-overlay);
+  block-size: var(--popover-arrow-size, 0.5rem);
+  inline-size: var(--popover-arrow-size, 0.5rem);
+  position: absolute;
+  rotate: 45deg;
+}
+
+[part="popover"][data-placement^="bottom"] [part~="arrow"] {
+  border-left: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
+  border-top: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
+}
+
+[part="popover"][data-placement^="top"] [part~="arrow"] {
+  border-bottom: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
+  border-right: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
+}
+
+[part="popover"][data-placement^="right"] [part~="arrow"] {
+  border-bottom: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
+  border-left: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
+}
+
+[part="popover"][data-placement^="left"] [part~="arrow"] {
+  border-right: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
+  border-top: var(--popover-border-width, var(--helix-border-floating)) solid
+    var(--popover-border-color, var(--helix-color-border));
+}
+
 /* Not printed, being an overlay. */
 @media print {
   :host {

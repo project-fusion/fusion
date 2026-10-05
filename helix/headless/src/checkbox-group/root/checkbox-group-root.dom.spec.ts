@@ -302,3 +302,71 @@ describe('a refused change to the set', () => {
     expect(g.value).toBe('design,mind')
   })
 })
+
+describe('the set as a list', () => {
+  /* A value holding a comma could not round-trip through the comma string. */
+  test('values reads and writes values that hold a comma', async () => {
+    const g = (await mount(`<helix-headless-checkbox-group label="Cities">
+      <helix-headless-checkbox value="Paris, TX">Paris</helix-headless-checkbox>
+      <helix-headless-checkbox value="Austin">Austin</helix-headless-checkbox>
+    </helix-headless-checkbox-group>`)) as Group & { values: string[] }
+    await settle(g)
+    g.values = ['Paris, TX']
+    await settle(g)
+    expect(g.boxes.map((box) => box.checked)).toEqual([true, false])
+    expect(g.values).toEqual(['Paris, TX'])
+    await tick(g, 1)
+    expect(g.values).toEqual(['Paris, TX', 'Austin'])
+  })
+})
+
+describe('select all', () => {
+  type Selecting = Group & { values: string[] }
+  const box = (g: Group) =>
+    part(g, 'select-all') as HTMLElement & {
+      checked: boolean
+      indeterminate: boolean
+      updateComplete: Promise<unknown>
+    }
+  const press = async (g: Group) => {
+    await box(g).updateComplete
+    box(g).shadowRoot?.querySelector<HTMLElement>('[part="control"]')?.click()
+    await settle(g)
+  }
+
+  test('is drawn only where asked for, and is no member of the set', async () => {
+    expect(part(await group(), 'select-all')).toBeNull()
+    const g = await group('label="Verticals" select-all value="design"')
+    await settle(g)
+    expect(box(g)?.localName).toBe('helix-headless-checkbox')
+    expect(g.boxes).toHaveLength(3)
+    expect([box(g).checked, box(g).indeterminate]).toEqual([false, true])
+  })
+
+  test('checks every enabled box, then unchecks them all, in one change each', async () => {
+    const g = (await group('label="Verticals" select-all value="design"')) as Selecting
+    ;(g.boxes[2] as unknown as { disabled: boolean }).disabled = true
+    await settle(g)
+    const heard: string[] = []
+    g.addEventListener('change', () => heard.push(g.value))
+    await press(g)
+    expect(g.values).toEqual(['design', 'mind'])
+    expect([box(g).checked, box(g).indeterminate]).toEqual([false, true])
+    ;(g.boxes[2] as unknown as { disabled: boolean }).disabled = false
+    await press(g)
+    expect(g.values).toEqual(['design', 'mind', 'energy'])
+    expect([box(g).checked, box(g).indeterminate]).toEqual([true, false])
+    await press(g)
+    expect(g.values).toEqual([])
+    expect(heard).toEqual(['design,mind', 'design,mind,energy', ''])
+  })
+
+  test('a refused change leaves every box as it was', async () => {
+    const g = (await group('label="Verticals" select-all value="design"')) as Selecting
+    await settle(g)
+    g.addEventListener('helix-before-change', (event) => event.preventDefault())
+    await press(g)
+    expect(g.values).toEqual(['design'])
+    expect(box(g).checked).toBe(false)
+  })
+})

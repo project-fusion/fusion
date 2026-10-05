@@ -47,6 +47,11 @@ export {
   type Placement,
   type Side,
 } from './controllers/floating-controller/floating-controller.js'
+export {
+  controlsIn,
+  FocusScopeController,
+  type FocusScopeOptions,
+} from './controllers/focus-scope-controller/focus-scope-controller.js'
 export { FullscreenController } from './controllers/fullscreen-controller/fullscreen-controller.js'
 export { HostClickController } from './controllers/host-click-controller/host-click-controller.js'
 export { IdleController } from './controllers/idle-controller/idle-controller.js'

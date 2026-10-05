@@ -5,6 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './checkbox-group-root.css.js'
+import '../../checkbox/index.js'
 
 /**
  * @summary A group of related checkboxes under one label, with one value for the set.
@@ -23,6 +24,8 @@ import { styles } from './checkbox-group-root.css.js'
  */
 @customElement('helix-checkbox-group')
 export class HelixCheckboxGroup extends HelixHeadlessCheckboxGroup {
+  static override tier = 'helix-'
+
   /**
    * The direction the checkboxes run. Set `horizontal` for a row. Unset is a
    * column.
