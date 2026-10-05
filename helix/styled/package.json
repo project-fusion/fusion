@@ -45,9 +45,9 @@
     "element-events": "build-element-events --package styled",
     "styles": "build-styles .",
     "test": "bun run element-events && bun run test:pure && bun run test:dom && bun run test:ssr",
-    "test:dom": "bun test dom.spec",
-    "test:pure": "bun test pure.spec",
-    "test:ssr": "bun test ssr.spec",
+    "test:dom": "bun test --conditions helix-development dom.spec",
+    "test:pure": "bun test --conditions helix-development pure.spec",
+    "test:ssr": "bun test --conditions helix-development ssr.spec",
     "typecheck": "bun run element-events && tsc -p tsconfig.json --noEmit && bun run typecheck:examples",
     "typecheck:examples": "tsc -p tsconfig.examples.json"
   },

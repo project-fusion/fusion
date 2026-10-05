@@ -73,6 +73,12 @@ framework writes beside the control in the same pass counts. The warning has the
 kind `missing-name`, so `@fusion.dev/helix-diagnostics` counts it with the
 other runtime events.
 
+The warning prints in development builds only. Vite and webpack ask for the
+`development` export condition while you develop, and so do
+`bun --conditions development` and `node --conditions=development`. A production
+build resolves the check to a function that does nothing and carries none of
+its code.
+
 ### `label` and `aria-label`
 
 `label` renders visible text and names the control through that text.

@@ -19,6 +19,19 @@
     },
     "./custom-elements.json": "./custom-elements.json"
   },
+  "imports": {
+    "#audit-name": {
+      "helix-source": {
+        "development": "./src/utils/audit-name/audit-name.ts",
+        "helix-development": "./src/utils/audit-name/audit-name.ts",
+        "default": "./src/utils/audit-name/audit-name-off.ts"
+      },
+      "types": "./dist/utils/audit-name/audit-name.d.ts",
+      "development": "./dist/utils/audit-name/audit-name.js",
+      "helix-development": "./dist/utils/audit-name/audit-name.js",
+      "default": "./dist/utils/audit-name/audit-name-off.js"
+    }
+  },
   "files": [
     "custom-elements.json",
     "dist"
@@ -28,7 +41,7 @@
   "scripts": {
     "analyze": "bun --bun helix-cem",
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
-    "test": "bun test src",
+    "test": "bun test --conditions helix-source --conditions helix-development src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
