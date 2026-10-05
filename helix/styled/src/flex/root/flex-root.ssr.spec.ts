@@ -33,4 +33,13 @@ describe('flex server output', () => {
       '<slot></slot>',
     )
   })
+
+  test('wrap writes nothing while off, and its named value as written', () => {
+    expect(
+      hostAttributes(ssr(html`<helix-flex .wrap=${false}>x</helix-flex>`), 'helix-flex'),
+    ).toEqual([])
+    expect(
+      hostAttributes(ssr(html`<helix-flex .wrap=${'reverse'}>x</helix-flex>`), 'helix-flex'),
+    ).toEqual(['wrap'])
+  })
 })

@@ -35,4 +35,10 @@ describe('grid server output', () => {
       '<slot></slot>',
     )
   })
+
+  test('the span helper and the per-axis gaps are plain CSS, so they hold before upgrade', () => {
+    const served = styles(ssr(html`<helix-grid row-gap="sm">x</helix-grid>`))
+    expect(served).toContain('[data-grid-span="full"]')
+    expect(served).toContain(':host([row-gap="sm"])')
+  })
 })

@@ -1,0 +1,38 @@
+<!-- @summary A title split from its actions, a cluster of tags, and an icon flanking its text. -->
+
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-flex
+    gap="sm"
+    layout="split"
+  >
+    <helix-text as="h3">Invoices</helix-text>
+    <helix-flex gap="xs">
+      <helix-button>Export</helix-button>
+      <helix-button
+        emphasis="solid"
+        tone="primary"
+      >New invoice</helix-button>
+    </helix-flex>
+  </helix-flex>
+
+  <helix-flex
+    gap="xs"
+    layout="cluster"
+  >
+    <helix-tag>Design</helix-tag>
+    <helix-tag>Engineering</helix-tag>
+    <helix-tag>Research</helix-tag>
+    <helix-tag>Operations</helix-tag>
+  </helix-flex>
+
+  <helix-flex
+    gap="sm"
+    layout="flank"
+  >
+    <helix-icon name="info"></helix-icon>
+    <helix-text as="p">Invoices sent before the fix show the correct due date the next time you open them.</helix-text>
+  </helix-flex>
+</helix-flex>

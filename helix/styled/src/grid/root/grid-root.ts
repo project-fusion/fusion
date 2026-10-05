@@ -16,7 +16,8 @@ import { styles } from './grid-root.css.js'
  * `render`, where the server renders it: the adopted sheet cascades after that
  * element, and a reset there would undo every `min`.
  */
-const UNINHERITED = '--grid-columns: initial; --_grid-template: initial;'
+const UNINHERITED =
+  '--grid-areas: initial; --grid-columns: initial; --grid-rows: initial; --_grid-template: initial;'
 
 /** A number with a length unit, or a bare number inside a function. */
 const NUMBER =
@@ -79,6 +80,14 @@ const lengthOf = (value: string | undefined): string | undefined => {
  * If you set both, `min` wins. The grid is presentation only, so there is no
  * headless tier.
  *
+ * `row-gap` and `column-gap` set one axis each and win over `gap` on theirs.
+ * `--grid-rows` and `--grid-areas` set the rows and named areas, and a child
+ * takes its place with `grid-area` in your own stylesheet.
+ *
+ * **A child can span columns with `data-grid-span`.** `data-grid-span="full"`
+ * runs from the first column to the last, such as a heading across a set of
+ * cards, and a number from `2` to `6` spans that many columns.
+ *
  * @since 0.1.0
  * @status stable
  * @category layout
@@ -87,7 +96,9 @@ const lengthOf = (value: string | undefined): string | undefined => {
  *
  * @slot - The items to lay out.
  *
+ * @cssproperty --grid-areas - The named areas, as `grid-template-areas` takes them, such as `"rail main"`. A child takes its area with `grid-area`.
  * @cssproperty --grid-columns - An explicit track list. It overrides `min` and `columns`. Use it for tracks of unequal widths, which neither attribute can set.
+ * @cssproperty --grid-rows - An explicit row track list, such as `auto minmax(0, 1fr) auto`. Rows are sized by their content when it is unset.
  */
 @customElement('helix-grid')
 export class HelixGrid extends HelixElement {
@@ -110,6 +121,25 @@ export class HelixGrid extends HelixElement {
   alignItems?: 'start' | 'center' | 'end' | 'stretch'
 
   /**
+   * How cells fill the grid when no child places itself, set as
+   * `grid-auto-flow`.
+   *
+   * `column` fills each column before the next. `dense` and `column-dense`
+   * also move a later small cell back into an earlier gap. Moving them changes
+   * only where they are drawn, so focus and a screen reader still follow the
+   * markup.
+   */
+  @property({ attribute: 'auto-flow', reflect: true })
+  autoFlow?: 'row' | 'column' | 'dense' | 'column-dense'
+
+  /**
+   * The space between columns, as a step on the space scale. Wins over `gap`
+   * across the row.
+   */
+  @property({ attribute: 'column-gap', reflect: true })
+  columnGap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
+
+  /**
    * A fixed number of equal columns.
    *
    * Two to six are plain CSS. Any other count is written into the shadow
@@ -125,6 +155,15 @@ export class HelixGrid extends HelixElement {
   gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
   /**
+   * How each cell aligns within its column. Sets `justify-items`.
+   *
+   * Named for the CSS property it sets, the way `alignItems` is. Absent, every
+   * cell stretches to the width of its column.
+   */
+  @property({ attribute: 'justify-items', reflect: true })
+  justifyItems?: 'start' | 'center' | 'end' | 'stretch'
+
+  /**
    * The minimum column width. The grid fits as many columns as the width allows.
    *
    * A length, such as `12rem`, or `calc()`, `clamp()`, `min()`, `max()` and
@@ -136,6 +175,13 @@ export class HelixGrid extends HelixElement {
    */
   @property()
   min = ''
+
+  /**
+   * The space between rows, as a step on the space scale. Wins over `gap` down
+   * the column.
+   */
+  @property({ attribute: 'row-gap', reflect: true })
+  rowGap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
   /**
    * The rule the shadow root's own `<style>` holds: the reset, and the track
