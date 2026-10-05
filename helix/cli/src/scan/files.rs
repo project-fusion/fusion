@@ -87,7 +87,12 @@ pub fn list(root: &Path, outside: Option<&Path>) -> Vec<PathBuf> {
             .stdout
             .split(|byte| *byte == 0)
             .filter(|name| !name.is_empty())
-            .map(|name| root.join(String::from_utf8_lossy(name).as_ref()))
+            /* Joined a part at a time: `git` writes `/` on every system. */
+            .map(|name| {
+                String::from_utf8_lossy(name)
+                    .split('/')
+                    .fold(root.to_owned(), |path, part| path.join(part))
+            })
             .collect(),
         _ => {
             let mut found = Vec::new();

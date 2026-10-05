@@ -33,7 +33,7 @@ mod weight;
 
 use std::collections::{HashMap, HashSet};
 use std::hash::{BuildHasher, RandomState};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use fusion_rules::error::{Failure, Outcome};
@@ -220,13 +220,10 @@ fn run_id() -> String {
 /// finds it.
 fn installed(root: &Path, package: &str) -> Option<String> {
     root.ancestors().find_map(|directory| {
-        let text = std::fs::read_to_string(
-            directory
-                .join("node_modules")
-                .join(package)
-                .join("package.json"),
-        )
-        .ok()?;
+        let folder = package
+            .split('/')
+            .fold(directory.join("node_modules"), |path, part| path.join(part));
+        let text = std::fs::read_to_string(folder.join("package.json")).ok()?;
         serde_json::from_str::<Value>(&text)
             .ok()?
             .get("version")?
@@ -298,6 +295,17 @@ fn size(bytes: u64) -> String {
         format!("{:.1} MB", bytes / 1_000_000.0)
     } else {
         format!("{:.1} kB", bytes / 1000.0)
+    }
+}
+
+/// A folder the scan reads, made absolute without resolving links: a
+/// resolved Windows path takes no `/` as a separator, and the files `git`
+/// names are joined to it.
+fn folder(path: &Path, what: &str) -> Outcome<PathBuf> {
+    match std::path::absolute(path) {
+        Ok(found) if found.is_dir() => Ok(found),
+        Ok(_) => Err(Failure::input(what, "there is no such folder")),
+        Err(error) => Err(Failure::input(what, error.to_string())),
     }
 }
 
@@ -435,22 +443,18 @@ pub fn run(args: &Scan, from: &Path, json: bool, paint: Paint) -> Outcome<Code> 
         .dir
         .as_ref()
         .map_or_else(|| from.to_owned(), |dir| from.join(dir));
-    let root = given.canonicalize().map_err(|error| {
-        Failure::input(
-            format!("Could not read {}", given.display()),
-            error.to_string(),
-        )
-    })?;
+    let root = folder(&given, &format!("Could not read {}", given.display()))?;
     let index = installed_lint(&root)?;
     let file = settings(args, &root, from)?;
     let resolved = config::resolve(file.as_ref());
     let build = match &args.build {
-        Some(dir) => Some(from.join(dir).canonicalize().map_err(|error| {
-            Failure::input(
-                format!("Could not read the build in {}", from.join(dir).display()),
-                error.to_string(),
-            )
-        })?),
+        Some(dir) => {
+            let dir = from.join(dir);
+            Some(folder(
+                &dir,
+                &format!("Could not read the build in {}", dir.display()),
+            )?)
+        }
         None => None,
     };
 
