@@ -1381,6 +1381,18 @@ describe('canvas review fixes', () => {
  * the surface's: what `Map` frames drags its own view.
  */
 describe('canvas tones', () => {
+  /* Lit's `Object` converter read a typo as `null`, and reading a tone's
+     words off it threw while the cards drew. */
+  test('tone-labels that do not parse are no words, and the cards still draw', async () => {
+    const host = await canvas(
+      `tone-labels="oops"`,
+      `<helix-headless-canvas-node name="a" x="0" y="0" width="80" height="40" tone="danger">A</helix-headless-canvas-node>`,
+    )
+    expect((host as unknown as { toneLabels: unknown }).toneLabels).toEqual({})
+    await (card(host, 'a') as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(card(host, 'a').shadowRoot?.querySelector('[part="node"]')).not.toBeNull()
+  })
+
   test('a tone the page named is read with the card and the connection, and one it did not is not', async () => {
     const host = await canvas(
       `tone-labels='{"danger": "Blocked"}'`,

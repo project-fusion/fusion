@@ -145,7 +145,11 @@ an `overflow` they had no way of knowing was missing.
   is styled with `::slotted()`. Regions lose their `part`, which is the right
   trade: a header is whatever element the consumer slotted, not a wrapper we put
   around it. Keep a wrapper only where it carries something real, as `<nav>`
-  does in AppHeader, being a landmark whether or not it is filled.
+  does in AppHeader, being a landmark whether or not it is filled. A part on
+  the bare slot is not a wrapper and stays: `<slot part="header">` draws no
+  box, passes inherited properties, and lets a page give the region a box with
+  `::part(header) { display: block }`. Card's regions and Stat's value are
+  named this way.
 
 ### State goes in markup, and the mirror is only a hook on top of it
 

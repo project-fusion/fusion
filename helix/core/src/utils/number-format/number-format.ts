@@ -50,7 +50,8 @@ const literal = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/gu, '
  *
  * The locale's group separators are dropped and its decimal separator read as
  * a point, so `1.234,5` in `de-DE` is 1234.5. A currency sign, a percent sign
- * and a unit the options write are dropped too, and a percent is read back as
+ * and a unit the options write are dropped too, in the plural and the
+ * singular, and a percent is read back as
  * the fraction it shows: `25 %` is 0.25. A point is read as a decimal point in
  * a locale that groups with something else, which is what a decimal keypad
  * types.
@@ -60,14 +61,25 @@ export const parseNumber = (
   locale = '',
   options?: Intl.NumberFormatOptions,
 ): number | null => {
-  const parts = formatter(locale, options).formatToParts(-12345.6)
-  const of = (type: string): string[] =>
-    parts.filter((part) => part.type === type).map((part) => part.value)
+  const format = formatter(locale, options)
+  const parts = format.formatToParts(-12345.6)
+  /* And a sample of one, whose words are the singular where the locale has
+     one: `1 kilogram` beside `-12,345.6 kilograms`. */
+  const one = format.formatToParts(1)
+  const of = (type: string, from = parts): string[] =>
+    from.filter((part) => part.type === type).map((part) => part.value)
   const group = of('group')[0] ?? ','
   const decimal = of('decimal')[0] ?? '.'
-  const dropped = [...of('currency'), ...of('percentSign'), ...of('unit'), ...of('literal')]
-    .map((one) => one.trim())
+  const named = (from: Intl.NumberFormatPart[]): string[] => [
+    ...of('currency', from),
+    ...of('percentSign', from),
+    ...of('unit', from),
+    ...of('literal', from),
+  ]
+  /* Longest first, so `kilogram` never leaves the `s` of `kilograms`. */
+  const dropped = [...new Set([...named(parts), ...named(one)].map((word) => word.trim()))]
     .filter(Boolean)
+    .sort((a, b) => b.length - a.length)
   const percent = options?.style === 'percent' && /[%\u066a\u2030]/u.test(text)
   let read = text.replace(/[\s\u00a0\u202f]/gu, '')
   for (const one of dropped) {

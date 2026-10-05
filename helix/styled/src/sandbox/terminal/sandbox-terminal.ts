@@ -4,11 +4,11 @@ import {
   HelixBeforeChangeEvent,
   HelixElement,
   requestChange,
+  wordsConverter,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { wordsConverter } from '../../shared/words/words.js'
 import { type ConsoleLevel, LEVELS, shows } from '../levels.js'
 import { styles } from './sandbox-terminal.css.js'
 
