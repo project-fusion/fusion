@@ -765,6 +765,21 @@ describe('splitter under a consumer that owns the position', () => {
     await host.updateComplete
   }
 
+  /* Web Awesome's snap: a drag that comes near a written point lands on it, a
+     bare number as a percentage and a length measured along the box. */
+  test('a drag near a snap point lands on it, and one beyond the threshold does not', async () => {
+    const host = await splitter('position="50" snap="25, 150px" snap-threshold="12"')
+    Object.defineProperty(host, 'getBoundingClientRect', {
+      value: () => ({ bottom: 100, height: 100, left: 0, right: 200, top: 0, width: 200 }),
+    })
+    await drag(host, 0.5, 0.28)
+    expect(host.position).toBe(25)
+    await drag(host, 0.25, 0.72)
+    expect(host.position).toBe(75)
+    await drag(host, 0.75, 0.4)
+    expect(host.position).toBe(40)
+  })
+
   test('a splitter whose markup declared a position can still be dragged', async () => {
     /* A declared `position` is a seed, not a claim of ownership: there is
        nothing to defer to, and the drag applies like any other change.
