@@ -43,6 +43,10 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
  * @documentation https://fusion.dev/helix/components/pin-input
  *
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
+ * @slot hint - Help under the control, for content richer than the `hint` text.
+ * @slot label - The label, for content richer than the `label` text.
+ *
  * @event {Event} change - The code was filled, or an edited code lost focus.
  * @event {HelixBeforeChangeEvent} helix-before-change - The code is about to change. Cancelable.
  * @event {HelixCompleteEvent} helix-complete - The last box was filled.

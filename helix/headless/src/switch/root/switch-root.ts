@@ -34,6 +34,8 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/switch
  *
  * @slot - The label that names what the switch turns on.
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
+ * @slot hint - Help under the control, for content richer than the `hint` text.
  *
  * @event {Event} change - Sent from the input after the state changes.
  * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired before the state changes, and cancelable.

@@ -113,6 +113,9 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @documentation https://fusion.dev/helix/components/filter-input
  *
  * @slot end - Content after the text, such as a count or a control.
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
+ * @slot hint - Help under the control, for content richer than the `hint` text.
+ * @slot label - The label, for content richer than the `label` text.
  * @slot start - Content before the text, such as a search icon.
  * @slot suggestions - Suggestions for what to type next, as `Option`s and `Option.Group`s.
  * @slot tags - The active filters, as `FilterChip`s or `Tag`s.

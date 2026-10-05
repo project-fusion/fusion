@@ -119,6 +119,7 @@ const accepts = (file: File, accept: string): boolean => {
  *
  * @slot feedback - The message that says what is wrong with the chosen files.
  * @slot hint - Help under the field.
+ * @slot label - The label, for content richer than the `label` text.
  * @slot trigger - The content that opens the picker when pressed.
  *
  * @event {Event} change - Fired after the value changes.

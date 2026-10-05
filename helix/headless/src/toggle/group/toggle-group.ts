@@ -32,6 +32,9 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  *
  * @slot - The group's items.
  * @slot end - Content after the track, on the same line, such as a count or a reset.
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
+ * @slot hint - Help under the control, for content richer than the `hint` text.
+ * @slot label - The label, for content richer than the `label` text.
  * @slot start - Content before the track, on the same line, such as an icon or a caption.
  *
  * @event {Event} change - Fired after the value changes.

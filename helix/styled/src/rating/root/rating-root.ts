@@ -19,6 +19,9 @@ import { styles } from './rating-root.css.js'
  * @aliases Stars, Score, Review score
  * @documentation https://fusion.dev/helix/components/rating
  *
+ * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
+ * @slot hint - Help under the control, for content richer than the `hint` text.
+ * @slot label - The label, for content richer than the `label` text.
  * @slot mark - The shape of a mark, copied into every position. When the slot is
  * empty, the stylesheet draws a mark, and `--rating-mark` changes its shape.
  *
