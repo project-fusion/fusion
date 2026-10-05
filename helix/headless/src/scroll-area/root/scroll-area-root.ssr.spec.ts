@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -39,5 +39,25 @@ describe('scroll area server output', () => {
       'viewport',
     )
     expect(markup).not.toContain('tabindex')
+  })
+
+  test('serves no scrollbars unless asked for', () => {
+    expect(
+      servedParts(ssr(html`<helix-headless-scroll-area><p>One</p></helix-headless-scroll-area>`)),
+    ).toEqual(['edges', 'viewport'])
+  })
+
+  test('serves the scrollbars it was asked for hidden, because the server cannot measure', () => {
+    /* Whether an axis has anything past it is a reading of a laid-out box. A
+       scrollbar served showing would be drawn over content that fits. */
+    const markup = ssr(
+      html`<helix-headless-scroll-area scrollbars="auto"><p>One</p></helix-headless-scroll-area>`,
+    )
+    for (const name of ['scrollbar-vertical', 'scrollbar-horizontal', 'corner']) {
+      expect(partTag(markup, name)).toMatch(/\shidden/)
+      expect(partTag(markup, name)).not.toContain('scrollbar-visible')
+      expect(partTag(markup, name)).not.toContain('--scroll-area')
+    }
+    expect(hostAttributes(markup, 'helix-headless-scroll-area')).toEqual(['scrollbars'])
   })
 })

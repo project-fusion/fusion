@@ -1,0 +1,88 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+helix-headless-scroll-area {
+  block-size: 12rem;
+  display: block;
+  inline-size: 20rem;
+  position: relative;
+}
+
+/* The browser's own scrollbar goes, since the component draws one. */
+helix-headless-scroll-area::part(viewport) {
+  block-size: 100%;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+helix-headless-scroll-area::part(viewport):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+/* Each scrollbar over the content at its edge, and shown only while the
+   component names it visible. */
+helix-headless-scroll-area::part(scrollbar) {
+  opacity: 0;
+  position: absolute;
+  touch-action: none;
+  transition: opacity 150ms;
+  user-select: none;
+}
+
+helix-headless-scroll-area::part(scrollbar-visible) {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  helix-headless-scroll-area::part(scrollbar) {
+    transition: none;
+  }
+}
+
+helix-headless-scroll-area::part(scrollbar-vertical) {
+  inline-size: 0.625rem;
+  inset-block: 0;
+  inset-inline-end: 0;
+}
+
+helix-headless-scroll-area::part(scrollbar-horizontal) {
+  block-size: 0.625rem;
+  inset-block-end: 0;
+  inset-inline: 0;
+}
+
+/* The thumb's length is its share of the track, and its start is how far
+   along the content is, times the room the thumb has left. */
+helix-headless-scroll-area::part(thumb) {
+  --_thumb: max(1.5rem, var(--scroll-area-thumb-fraction) * 100%);
+
+  background-color: var(--_gray-line);
+  border-radius: 9999px;
+  position: absolute;
+}
+
+helix-headless-scroll-area::part(thumb-vertical) {
+  block-size: var(--_thumb);
+  inset-block-start: calc(var(--scroll-area-scroll-fraction) * (100% - var(--_thumb)));
+  inset-inline: 2px;
+}
+
+helix-headless-scroll-area::part(thumb-horizontal) {
+  inline-size: var(--_thumb);
+  inset-block: 2px;
+  inset-inline-start: calc(var(--scroll-area-scroll-fraction) * (100% - var(--_thumb)));
+}
+
+helix-headless-scroll-area p {
+  color: var(--_gray-strong);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+  padding-inline-end: 1rem;
+}
