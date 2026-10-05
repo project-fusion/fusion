@@ -3,48 +3,13 @@ import { property } from 'lit/decorators.js'
 import { PopoverController } from '../../controllers/popover-controller/popover-controller.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import { reportValues } from '../../utils/report-values/report-values.js'
+import { tabStops } from '../../utils/tab-stops/tab-stops.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
 import type { MixinControllerValueInterface } from '../mixin-controller-value/mixin-controller-value.js'
 import type { MixinFieldInterface } from '../mixin-field/mixin-field.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
-
-/**
- * Every element in `root` that Tab stops at, in the order Tab reaches them,
- * through shadow roots and slots.
- *
- * Through them because a panel's controls are inside the picker's shadow root
- * and often a button's inside that, so a light-DOM query finds none of them.
- * Walked in the composed tree's order: a host's shadow root in place of its
- * children, and a slot's assigned elements in place of its fallback. A host
- * that delegates its focus is passed through to what it delegates to.
- */
-const tabStops = (root: Element): HTMLElement[] => {
-  const found: HTMLElement[] = []
-  const visit = (node: Element): void => {
-    const element = node as HTMLElement
-    if (element.hidden || element.inert) {
-      return
-    }
-    if (
-      element.tabIndex >= 0 &&
-      !element.shadowRoot?.delegatesFocus &&
-      !(element as HTMLButtonElement).disabled &&
-      element.getClientRects().length > 0
-    ) {
-      found.push(element)
-    }
-    const assigned = node instanceof HTMLSlotElement ? node.assignedElements() : []
-    const children =
-      assigned.length > 0 ? assigned : [...(node.shadowRoot ?? node).children]
-    for (const child of children) {
-      visit(child)
-    }
-  }
-  visit(root)
-  return found
-}
 
 /**
  * What this is applied over: a form field that opens, holds a value and has a

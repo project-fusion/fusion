@@ -270,6 +270,7 @@ export {
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
+export { countLabel } from './utils/count-label/count-label.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export {
   type Color,
