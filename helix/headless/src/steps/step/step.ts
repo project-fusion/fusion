@@ -5,6 +5,7 @@ import {
   HelixSelectEvent,
   hostAria,
   StatusController,
+  slottedWords,
 } from '@fusion.dev/helix-core'
 import { check, circle, record } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -183,7 +184,9 @@ export class HelixHeadlessStep extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     if (changed.get('complete') === false && this.complete) {
-      const name = (this.textContent ?? '').replace(/\s+/g, ' ').trim()
+      /* The name alone, without the description or the content slotted
+         beside it. */
+      const name = slottedWords(this, [''])
       this.status.say(name === '' ? this.completeLabel : `${name}, ${this.completeLabel}`)
     }
   }

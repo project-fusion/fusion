@@ -375,6 +375,31 @@ describe('a tree of check marks', () => {
     expect((host as Tree & { values: string[] }).values).toEqual(['c'])
   })
 
+  /* The tree pattern's keys for many: Control+A checks everything or clears
+     it, and Shift with an arrow moves and checks. */
+  test('Control+A checks every item and clears them, and Shift+Down moves and checks', async () => {
+    const host = await mount(files)
+    const [docs, a, b] = (await settleTree(host)) as Item[]
+    const values = (): string[] => (host as Tree & { values: string[] }).values
+    const key = (item: Item, init: KeyboardEventInit): void => {
+      ;(part(item, 'item') ?? item).dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, ...init }),
+      )
+    }
+    key(docs as Item, { ctrlKey: true, key: 'a' })
+    await settleTree(host)
+    expect(values()).toEqual(['a', 'b', 'c'])
+    key(docs as Item, { key: 'a', metaKey: true })
+    await settleTree(host)
+    expect(values()).toEqual([])
+    ;(docs as Item).open = true
+    await settleTree(host)
+    key(a as Item, { key: 'ArrowDown', shiftKey: true })
+    await settleTree(host)
+    expect(values()).toEqual(['b'])
+    expect((b as Item & { focusable: boolean }).focusable).toBe(true)
+  })
+
   test('says which rows are checked and which are partly, where a sheet can read it', async () => {
     const host = await mount(files)
     const [docs, a] = (await settleTree(host)) as Item[]

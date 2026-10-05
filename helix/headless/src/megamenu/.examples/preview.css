@@ -130,7 +130,6 @@ helix-headless-megamenu::part(surface):popover-open {
 /* A panel taking over from another grows or shrinks from that one's size. */
 helix-headless-megamenu:is(:state(from-start), :state(from-end))::part(surface) {
   animation: megamenu-resize 200ms ease-out;
-  overflow: clip;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -139,15 +138,18 @@ helix-headless-megamenu:is(:state(from-start), :state(from-end))::part(surface) 
   }
 }
 
+/* Clipped only while it resizes, so nothing changes about the open panel. */
 @keyframes megamenu-resize {
   from {
     block-size: var(--megamenu-from-block-size);
     inline-size: var(--megamenu-from-inline-size);
+    overflow: clip;
   }
 
   to {
     block-size: var(--megamenu-surface-block-size);
     inline-size: var(--megamenu-surface-inline-size);
+    overflow: clip;
   }
 }
 

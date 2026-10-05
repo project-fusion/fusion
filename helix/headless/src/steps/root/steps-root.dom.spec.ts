@@ -411,6 +411,21 @@ describe('a finished stage', () => {
     expect(part(review as Step, 'live')?.textContent).toBe('Review, Complete')
   })
 
+  /* The whole step's text was read, so a stage with a description said it
+     too: "Review Check the order, Complete". */
+  test('says its name alone, without its description', async () => {
+    const host = (await mount(`<helix-headless-steps>
+      <helix-headless-step>Review<span slot="description">Check the order</span></helix-headless-step>
+    </helix-headless-steps>`)) as Steps
+    const step = host.querySelector('helix-headless-step') as Step
+    await step.updateComplete
+    step.complete = true
+    await step.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 40))
+    await step.updateComplete
+    expect(part(step, 'live')?.textContent).toBe('Review, Complete')
+  })
+
   test('the current stage puts aria-current on its button', async () => {
     const host = await steps()
     const [, payment] = [...host.querySelectorAll('helix-headless-step')] as Step[]
