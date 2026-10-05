@@ -9,6 +9,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { separatorsAfter } from '../format.js'
 
 /** What a cell accepts, which decides the keyboard a phone offers. */
 export type PinType = 'alphanumeric' | 'numeric' | 'text'
@@ -32,6 +33,12 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * Only the first cell has `autocomplete="one-time-code"`, because the hint
  * applies to the whole field.
  *
+ * `autosubmit` submits the form once the last box is filled, through the form's
+ * default button where there is one. `format` draws separators between the
+ * boxes, such as the dash in `###-###`, as text a screen reader skips. Delete
+ * removes the character in the focused box and pulls the rest of the code
+ * back, as Backspace removes the one before it.
+ *
  * The row of cells always runs left to right, with `dir="ltr"`, including in
  * Arabic and Hebrew. The first box is the leftmost, a paste fills to the right,
  * and the right arrow moves to the next box. The label, hint, and feedback
@@ -53,6 +60,7 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @event {Event} input - The code changed.
  *
  * @csspart cell - One box.
+ * @csspart separator - The text `format` draws between two boxes.
  * @csspart feedback - The message that says what is wrong with the code.
  * @csspart field - The row of boxes, ordered left to right in every language.
  * @csspart hint - The help under the boxes, shown while there is no feedback.
@@ -94,10 +102,26 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   autocomplete = 'one-time-code'
 
   /**
+   * Whether the form is submitted once the last box is filled, as Web
+   * Awesome's `autosubmit` and Radix's `autoSubmit`. Only for a code the field
+   * took: a refused last character submits nothing.
+   */
+  @property({ type: Boolean })
+  autosubmit = false
+
+  /**
    * Accessible name for one box, with `{index}` and `{length}` filled in.
    */
   @property({ attribute: 'cell-label' })
   cellLabel = 'Character {index} of {length}'
+
+  /**
+   * Separators drawn between the boxes: `#` or `*` for a box and anything
+   * else as it is written, so `###-###` draws a dash after the third. The
+   * separators are hidden from screen readers and are not part of the value.
+   */
+  @property()
+  format = ''
 
   /**
    * How many characters the code has.
@@ -239,6 +263,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
            commit. There is no inner control to relay one from: six boxes each
            fire their own, and none of them means the code is entered. */
         this.commit()
+        if (this.autosubmit) {
+          this.submitImplicitly()
+        }
       }
     })
   }
@@ -338,7 +365,17 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         : event.key === 'End'
           ? Math.min(this.value.length, this.count - 1)
           : at + step
-    if (event.key === 'Backspace' && cell.value === '' && at > 0) {
+    if (event.key === 'Delete' && at < this.value.length) {
+      /* The character in this box goes and the rest of the code moves back
+         one, the way Delete works in one text field. */
+      const characters = this.characters
+      characters.splice(at, 1)
+      this.requestValue(characters.join('').replace(/\s+$/, ''))
+      this.updateComplete.then(() => {
+        this.paint()
+        this.cells[at]?.focus()
+      })
+    } else if (event.key === 'Backspace' && cell.value === '' && at > 0) {
       const characters = this.characters
       characters[at - 1] = ''
       this.requestValue(characters.join('').replace(/\s+$/, ''))
@@ -567,6 +604,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
 
   protected override render(): TemplateResult {
     const characters = this.characters
+    const separators = separatorsAfter(this.format, this.count)
     /* `renderGroupLabel` and not `renderLabel`, which is what every other
        grouped control here uses. `renderLabel` emits `for="control"` and no
        element in this template carries that id, because a pin input is a row of
@@ -600,7 +638,11 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
             @keydown=${this.handleKeydown}
             @keypress=${this.handleKeypress}
             @paste=${this.handlePaste}
-          />`,
+          />${
+            separators[at]
+              ? html`<span part="separator" aria-hidden="true">${separators[at]}</span>`
+              : nothing
+          }`,
         )}
       </div>
       ${this.renderHint()}${this.renderFeedback()}`

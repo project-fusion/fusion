@@ -23,10 +23,11 @@
    outranks. */
 [part="cell"] {
   all: unset;
-  background-color: var(--helix-color-well);
-  block-size: var(--helix-size-control);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
+  background-color: var(--pin-input-cell-background-color, var(--helix-color-well));
+  block-size: var(--pin-input-cell-size, var(--helix-size-control));
+  border: var(--helix-border-thin) solid
+    var(--pin-input-cell-border-color, var(--helix-color-border));
+  border-radius: var(--pin-input-cell-radius, var(--helix-radii-sm));
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
@@ -35,7 +36,7 @@
      a code is typed into it. */
   font-variant-numeric: tabular-nums;
   font-weight: var(--helix-weight-medium);
-  inline-size: var(--helix-size-control);
+  inline-size: var(--pin-input-cell-size, var(--helix-size-control));
   text-align: center;
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -91,6 +92,14 @@
    character had: `password` renders a bullet that sits high in a small box. */
 :host([mask]) [part="cell"] {
   font-size: var(--helix-text-xl);
+}
+
+/* A separator `format` draws reads as punctuation between the boxes, centered
+   on them and quieter than a typed character. */
+[part="separator"] {
+  align-self: center;
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-lg);
 }
 
 /* Quieter than a typed character, and it has to be said here because a cell is
