@@ -157,8 +157,11 @@ describe('the no-copy attribute follows the property', () => {
 describe('line numbers and a highlighter', () => {
   type Block = Updatable & { highlight?: (code: string) => string }
   const copyValue = (el: Element): string =>
-    (el.shadowRoot?.querySelector('helix-headless-copy-button') as HTMLElement & { value: string })
-      .value
+    (
+      el.shadowRoot?.querySelector('helix-headless-copy-button') as
+        | (HTMLElement & { value: string })
+        | null
+    )?.value ?? ''
 
   test('numbers each line in a gutter hidden from readers and left out of a copy', async () => {
     const el = (await mount(
