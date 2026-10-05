@@ -153,6 +153,32 @@
   inline-size: var(--helix-size-icon);
 }
 
+/* A slotted replacement is sized like the default glyph, so swapping it does
+   not change the control. */
+[part="previous"] ::slotted(*),
+[part="next"] ::slotted(*),
+[part="dismiss"] ::slotted(*) {
+  --icon-size: var(--helix-size-icon);
+
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
+/* **A viewer a reader can zoom keeps every gesture on the picture**: two
+   fingers pinch the item rather than the page, and one finger drags it once it
+   is zoomed. */
+:host(:state(zoomable)) [part="dialog"] {
+  touch-action: none;
+}
+
+:host(:state(zoomable)) [part="viewport"] {
+  cursor: zoom-in;
+}
+
+:host(:state(zoomed)) [part="viewport"] {
+  cursor: grab;
+}
+
 [part="previous"]:hover,
 [part="next"]:hover,
 [part="dismiss"]:hover {
