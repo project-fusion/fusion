@@ -1,9 +1,11 @@
-/* The scrolling box, and it is the only thing this tier styles.
+/* The scrolling box, and the ring on the row holding focus.
  *
  * Rows are the consumer's markup in the light DOM, so their treatment is the
  * consumer's stylesheet. A rule here reaching a row would be the design system
  * styling markup it did not write, and it would also be unreachable in the
- * other direction the moment anybody wanted to change it. */
+ * other direction the moment anybody wanted to change it. The focus ring is
+ * the exception, because the list is what moves focus between rows: it is the
+ * library's ring, and a document rule on the row still wins over it. */
 :host {
   display: block;
 }
@@ -20,6 +22,12 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-inline: var(--helix-size-focus-reach);
+}
+
+/* Inset, so the viewport's clipping leaves all four sides of it. */
+::slotted([data-index]:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* The spacers are geometry, not content. They carry the room the rows outside
