@@ -21,6 +21,10 @@ import { styles } from './textarea-root.css.js'
  * @documentation https://fusion.dev/helix/components/textarea
  *
  * @cssproperty --textarea-background-color - Fill behind the text.
+ * @cssproperty --textarea-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
+ * @cssproperty --textarea-padding - Space between the edge of the field and the text.
+ * @cssproperty --textarea-radius - Corner radius of the field.
+ * @cssproperty --textarea-resize - Which way a reader can drag the field: `vertical` by default, `none`, `both` or `horizontal`. A field under `auto-grow` has nothing to drag.
  */
 @customElement('helix-textarea')
 export class HelixTextarea extends HelixHeadlessTextarea {

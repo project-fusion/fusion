@@ -4,10 +4,11 @@
    control, so the focus ring is drawn once around the whole thing. */
 [part="field"] {
   background-color: var(--textarea-background-color, var(--helix-color-well));
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
+  border: var(--helix-border-thin) solid var(--textarea-border-color, var(--helix-color-border));
+  border-radius: var(--textarea-radius, var(--helix-radii-sm));
   display: flex;
-  padding: var(--helix-space-xs);
+  gap: var(--helix-space-2xs);
+  padding: var(--textarea-padding, var(--helix-space-xs));
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
@@ -31,7 +32,16 @@
   /* Down only. A field the reader can drag wider than the form holding it is a
      field that breaks the layout, and the block axis is the one they actually
      want: more room for what they are writing. */
-  resize: vertical;
+  resize: var(--textarea-resize, vertical);
+}
+
+/* Whatever is at either end keeps its size and sits at the first line, so the
+   text is what gives way and an icon stays beside where writing starts. */
+slot[name="start"]::slotted(*),
+slot[name="end"]::slotted(*) {
+  align-self: flex-start;
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
 }
 
 /* Nothing to drag when the box is following the content itself. */

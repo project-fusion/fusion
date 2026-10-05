@@ -10,6 +10,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { grownHeight, lineMetrics } from '../grow.js'
 
 /**
  * @summary A multi-line text field.
@@ -24,6 +25,8 @@ import { property } from 'lit/decorators.js'
  *
  * `rows` sets the starting height, and `auto-grow` makes the field grow with
  * its content. You can use both: `rows` sets where an empty field begins.
+ * `max-rows` stops the growth at that many lines, and the field scrolls past
+ * them.
  *
  * @since 0.1.0
  * @status stable
@@ -31,9 +34,11 @@ import { property } from 'lit/decorators.js'
  * @aliases Multiline, TextArea
  * @documentation https://fusion.dev/helix/components/textarea
  *
+ * @slot end - After the text, for an icon or an action beside it.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
  * @slot label - The label, for content richer than the `label` text.
+ * @slot start - Before the text, for an icon.
  *
  * @event {Event} change - Sent from the textarea when the user finishes an edit.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
@@ -108,6 +113,13 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    */
   @property({ attribute: 'maxlength', type: Number })
   maxLength?: number
+
+  /**
+   * How many lines an `auto-grow` field grows to before it scrolls. Absent,
+   * it grows with all of its text.
+   */
+  @property({ attribute: 'max-rows', type: Number })
+  maxRows?: number
 
   /**
    * The fewest characters the value can have.
@@ -204,7 +216,12 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     if (next === 0) {
       return
     }
-    control.style.blockSize = `${next}px`
+    /* Held to `max-rows`, measured from the box's own line height, and allowed
+       to scroll past it. Inline, so it wins over a sheet's `overflow: hidden`
+       for a growing field, which is there for the uncapped case. */
+    const grown = grownHeight(next, this.maxRows, lineMetrics(getComputedStyle(control)))
+    control.style.blockSize = `${grown.height}px`
+    control.style.overflowY = grown.scrolls ? 'auto' : ''
   }
 
   /**
@@ -417,6 +434,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
     <div part="field">
+      <slot name="start"></slot>
       <textarea
         part="control"
         id=${this.controlId}
@@ -437,6 +455,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
         @input=${this.handleInput}
         @change=${this.handleChange}
       ></textarea>
+      <slot name="end"></slot>
     </div>
     ${this.renderHint()}${this.renderFeedback()}`
   }

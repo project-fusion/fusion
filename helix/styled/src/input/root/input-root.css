@@ -10,12 +10,12 @@
   align-items: center;
   background-color: var(--input-background-color, var(--helix-color-well));
   block-size: var(--_input-size);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
+  border: var(--helix-border-thin) solid var(--input-border-color, var(--helix-color-border));
+  border-radius: var(--input-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground-subtle);
   display: flex;
   gap: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-xs);
+  padding-inline: var(--input-padding-inline, var(--helix-space-xs));
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
