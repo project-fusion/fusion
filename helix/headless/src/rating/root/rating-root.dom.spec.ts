@@ -208,10 +208,16 @@ describe('the lowest score a rating offers', () => {
   })
 
   test('is what clearing returns to, which is what the property always meant', async () => {
-    const host = (await rating('min="2" value="4"')) as HTMLElement & {
+    /* Chosen after load, since a reset returns a `value` the markup wrote, as
+       a native control's reset does. */
+    const host = (await rating('min="2"')) as HTMLElement & {
       formResetCallback: () => void
       updateComplete: Promise<unknown>
+      value: string
     }
+    host.value = '4'
+    await host.updateComplete
+    expect(scoreOf(host)).toBe(4)
     host.formResetCallback()
     await host.updateComplete
     expect(scoreOf(host)).toBe(2)
@@ -346,6 +352,25 @@ describe('a rating as a field', () => {
     expect(field.contains(part(host, 'marks'))).toBe(true)
     expect(field.contains(part(host, 'value'))).toBe(true)
     expect(field.contains(part(host, 'label'))).toBe(false)
+  })
+})
+
+describe('a rating with a shape for its unfilled marks', () => {
+  /* Zag and Web Awesome draw a filled and an outlined star. One slot gave
+     both layers the same shape, so an unfilled mark could differ only in
+     color. */
+  test('copies empty-mark into the track and mark into the fill', async () => {
+    const host = await mount(
+      `<helix-headless-rating label="Rate" value="2"><i slot="mark" data-shape="full"></i><i slot="empty-mark" data-shape="empty"></i></helix-headless-rating>`,
+    )
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    const layer = (name: string): (string | undefined)[] =>
+      [...(part(host, name)?.querySelectorAll<HTMLElement>('[part="mark"] > i') ?? [])].map(
+        (one) => one.dataset.shape,
+      )
+    expect(layer('track')).toEqual(['empty', 'empty', 'empty', 'empty', 'empty'])
+    expect(layer('fill')).toEqual(['full', 'full', 'full', 'full', 'full'])
+    expect(part(host, 'track')?.hasAttribute('data-slotted')).toBe(true)
   })
 })
 
@@ -555,12 +580,23 @@ describe('a rating with a floor and no answer', () => {
 })
 
 describe('a score between steps', () => {
-  /* An average such as 3.5 on whole marks matched no option, and the rating
-     left the tab order. */
-  test('keeps one tab stop, on the step below it', async () => {
+  /* An average such as 3.5 on whole marks matched no option, so no option was
+     checked and the rating left the tab order. */
+  const at = (host: HTMLElement, attribute: string, value: string): (string | undefined)[] =>
+    options(host)
+      .filter((option) => option.getAttribute(attribute) === value)
+      .map((option) => option.dataset.score)
+
+  test('checks the nearest step, which holds the one tab stop', async () => {
+    const host = await rating('value="3.6"')
+    expect(at(host, 'aria-checked', 'true')).toEqual(['4'])
+    expect(at(host, 'tabindex', '0')).toEqual(['4'])
+  })
+
+  test('and halfway between two, the lower', async () => {
     const host = await rating('value="3.5"')
-    const stops = options(host).filter((option) => option.getAttribute('tabindex') === '0')
-    expect(stops.map((option) => option.dataset.score)).toEqual(['3'])
+    expect(at(host, 'aria-checked', 'true')).toEqual(['3'])
+    expect(at(host, 'tabindex', '0')).toEqual(['3'])
   })
 })
 

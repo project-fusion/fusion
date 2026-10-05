@@ -9,10 +9,10 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { cleanCode, type PinCase, type PinType } from '../code.js'
 import { separatorsAfter } from '../format.js'
 
-/** What a cell accepts, which decides the keyboard a phone offers. */
-export type PinType = 'alphanumeric' | 'numeric' | 'text'
+export type { PinCase, PinType } from '../code.js'
 
 /**
  * @summary A field for a short code, with one box for each character.
@@ -43,6 +43,21 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * Arabic and Hebrew. The first box is the leftmost, a paste fills to the right,
  * and the right arrow moves to the next box. The label, hint, and feedback
  * follow the page's direction.
+ *
+ * **Keyboard.** Each box is a tab stop of its own, as each is a real input.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | A character | Fills the box and moves to the next one. A longer run is read as a paste. |
+ * | Left, Right | Moves to the box before or after. |
+ * | Home, End | Moves to the first box, or to the box after the last character. |
+ * | Backspace | In an empty box, clears the box before it and moves there. |
+ * | Delete | Removes the character in the box and pulls the rest of the code back. |
+ * | Enter | Submits the form. |
+ *
+ * The row has `role="group"` and the field's name, and each box is named by
+ * `cell-label`, such as "Character 2 of 6". `helix-complete` is a
+ * `HelixCompleteEvent` sent once the last box is filled.
  *
  * @since 0.1.0
  * @status stable
@@ -108,6 +123,14 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    */
   @property({ type: Boolean })
   autosubmit = false
+
+  /**
+   * How typed and pasted letters are cased: `upper`, `lower`, or `preserve`
+   * to keep them as typed. Web Awesome's OTP input takes the same `case`, for
+   * a code a service reads in one case.
+   */
+  @property()
+  case: PinCase = 'preserve'
 
   /**
    * Accessible name for one box, with `{index}` and `{length}` filled in.
@@ -207,16 +230,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     return Array.from({ length: this.count }, (_, at) => this.value[at] ?? '')
   }
 
-  /** Everything this box would accept, with the rest dropped. */
+  /** Everything this box would accept, with the rest dropped and cased. */
   private clean(text: string): string {
-    const trimmed = text.trim()
-    if (this.type === 'numeric') {
-      return trimmed.replace(/\D/g, '')
-    }
-    if (this.type === 'alphanumeric') {
-      return trimmed.replace(/[^0-9A-Za-z]/g, '')
-    }
-    return trimmed
+    return cleanCode(text, this.type, this.case)
   }
 
   /**

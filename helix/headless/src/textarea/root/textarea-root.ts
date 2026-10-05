@@ -1,6 +1,8 @@
 import {
   AriaForwardController,
   customElement,
+  drawIcon,
+  HelixClearEvent,
   HelixFormElement,
   holdCaret,
   isRtl,
@@ -8,6 +10,7 @@ import {
   MixinField,
   restoreValue,
 } from '@fusion.dev/helix-core'
+import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { grownHeight, lineMetrics } from '../grow.js'
@@ -28,6 +31,11 @@ import { grownHeight, lineMetrics } from '../grow.js'
  * `max-rows` stops the growth at that many lines, and the field scrolls past
  * them.
  *
+ * `clearable` draws a button that empties the field while it holds text, and
+ * sends `helix-clear`, as `Input` does. `validate` adds your own rule, run on
+ * every change once the browser finds nothing wrong, as React Aria's
+ * TextField `validate` does.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -42,15 +50,18 @@ import { grownHeight, lineMetrics } from '../grow.js'
  *
  * @event {Event} change - Sent from the textarea when the user finishes an edit.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
+ * @event {HelixClearEvent} helix-clear - Fired after the clear button has emptied the field, after `input` and `change`.
  * @event {Event} input - Fired after the value changes.
  *
+ * @csspart clear - The button that empties the field, under `clearable`.
  * @csspart control - The textarea itself.
  * @csspart feedback - The message that says what is wrong.
  * @csspart field - The box that holds the textarea.
  * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart label - The label above the field.
  *
- * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate blank - The field holds no text.
+ * @cssstate invalid - The control has an error to show, from the browser's validation, `validate`, or your `feedback`.
  */
 @customElement('helix-headless-textarea')
 export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -81,6 +92,18 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    */
   @property({ attribute: 'auto-grow', reflect: true, type: Boolean })
   autoGrow = false
+
+  /**
+   * Draws a button that empties the field while it holds text.
+   */
+  @property({ type: Boolean })
+  clearable = false
+
+  /**
+   * The accessible name of the clear button, which shows only an icon.
+   */
+  @property({ attribute: 'clear-label' })
+  clearLabel = 'Clear'
 
   /**
    * How many characters wide the box is, when the layout does not set its
@@ -348,7 +371,28 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     // The platform's verdict, copied rather than recomputed, with the control as
     // the anchor so a validity bubble points at the text and not at the host.
     this.copyValidity(control)
+    const own = control.validity.valid ? this.validate?.(this.value) : undefined
+    const message = Array.isArray(own) ? own.join(' ') : typeof own === 'string' ? own : ''
+    if (message !== '') {
+      this.internals.setValidity({ customError: true }, message, control)
+    }
     this.refreshFeedback()
+  }
+
+  /**
+   * Empties the field and puts the caret back in it, through `requestValue`,
+   * so a consumer who owns the value can refuse. `Input` clears the same way.
+   */
+  private readonly handleClear = (): void => {
+    if (this.value !== '' && this.requestValue('')) {
+      this.announceChange()
+      this.dispatchEvent(new HelixClearEvent())
+    }
+    const control = this.control
+    if (control) {
+      restoreValue(control, this.value)
+      control.focus()
+    }
   }
 
   /* Rebuilt on reconnection, because nothing else does it.
@@ -397,6 +441,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.toggleState('blank', this.value === '')
     /* Never before the first update, which is the one the server does: there is
        no render root to query there, and `querySelector` is not merely empty on
        Lit's element shim, it is undefined. There is also no caret to keep before
@@ -423,6 +468,14 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    */
   @property({ type: Number })
   rows = 3
+
+  /**
+   * Your own rule for the value, run on every change once the browser finds
+   * nothing wrong. Return a message, or a list of them, to mark the field
+   * invalid, and `true`, `null`, or nothing to accept the value.
+   */
+  @property({ attribute: false })
+  validate?: (value: string) => string | string[] | true | null | undefined
 
   /**
    * How the browser wraps the text, and whether the breaks are submitted with
@@ -456,6 +509,18 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
         @change=${this.handleChange}
       ></textarea>
       <slot name="end"></slot>
+      ${
+        this.clearable && this.value !== '' && !this.isDisabled && !this.readOnly
+          ? html`<button
+              part="clear"
+              type="button"
+              aria-label=${this.clearLabel}
+              @click=${this.handleClear}
+            >
+              ${drawIcon(x)}
+            </button>`
+          : nothing
+      }
     </div>
     ${this.renderHint()}${this.renderFeedback()}`
   }

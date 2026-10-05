@@ -116,3 +116,51 @@ describe('textarea', () => {
     expect(host.hasAttribute('auto-grow')).toBe(true)
   })
 })
+
+describe('clearing, your own rule, and an empty field', () => {
+  type Area = HTMLElement & {
+    updateComplete: Promise<unknown>
+    validate?: (value: string) => string | string[] | true | null | undefined
+    validationMessage: string
+    value: string
+  }
+
+  /* Input had clearable and helix-clear, and Textarea had neither. */
+  test('clearable draws a button that empties the field and sends helix-clear last', async () => {
+    const host = (await mount(
+      '<helix-headless-textarea label="Note" clearable value="Draft"></helix-headless-textarea>',
+    )) as Area
+    const heard: string[] = []
+    for (const name of ['input', 'change', 'helix-clear']) {
+      host.addEventListener(name, () => heard.push(name))
+    }
+    ;(part(host, 'clear') as HTMLButtonElement).click()
+    await host.updateComplete
+    expect(host.value).toBe('')
+    expect(heard).toEqual(['input', 'change', 'helix-clear'])
+    expect(part(host, 'clear')).toBeNull()
+  })
+
+  test('validate runs on every change and its message is the verdict', async () => {
+    const host = (await mount(
+      '<helix-headless-textarea label="Note" value="Hi"></helix-headless-textarea>',
+    )) as Area
+    host.validate = (value) => (value.length < 5 ? ['Too short.', 'Say more.'] : null)
+    await host.updateComplete
+    expect(host.validationMessage).toBe('Too short. Say more.')
+    host.value = 'Hello there'
+    await host.updateComplete
+    expect(host.validationMessage).toBe('')
+  })
+
+  test('says it is blank while it holds no text', async () => {
+    const host = (await mount(
+      '<helix-headless-textarea label="Note"></helix-headless-textarea>',
+    )) as Area
+    const states = (host as unknown as { internals: ElementInternals }).internals.states
+    expect(states.has('blank')).toBe(true)
+    host.value = 'Hi'
+    await host.updateComplete
+    expect(states.has('blank')).toBe(false)
+  })
+})

@@ -44,6 +44,35 @@ slot[name="end"]::slotted(*) {
   flex: 0 0 auto;
 }
 
+/* The clear button, dressed as `Input` dresses its own, at the first line
+   beside the text. */
+[part="clear"] {
+  --icon-size: var(--helix-size-icon-tight);
+  all: unset;
+
+  align-items: center;
+  align-self: flex-start;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-block-size: var(--helix-size-icon-loose);
+  min-inline-size: var(--helix-size-icon-loose);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="clear"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="clear"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 /* Nothing to drag when the box is following the content itself. */
 :host([auto-grow]) [part="control"] {
   overflow: hidden;
