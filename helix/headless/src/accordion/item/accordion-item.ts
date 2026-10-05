@@ -50,7 +50,7 @@ const TRIGGER_ID = 'trigger'
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The section is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The section is about to open. Cancelable: cancel it to keep it closed.
- * @event {Event} toggle - The section opened or closed. The event carries `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - The section opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart chevron - The open and close indicator.
  * @csspart container - The outer wrapper.

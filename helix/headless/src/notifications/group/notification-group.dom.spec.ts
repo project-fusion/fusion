@@ -107,6 +107,20 @@ describe('folding', () => {
     expect(slot?.assignedElements().length).toBe(3)
   })
 
+  /* The open mixin sends it, and the class declares it, so the event is on
+     the reference page and in the framework typings. */
+  test('and says so afterwards with toggle', async () => {
+    const el = await group('collapsible')
+    const heard: string[] = []
+    el.addEventListener('toggle', (event) => {
+      heard.push((event as Event & { newState: string }).newState)
+    })
+    ;(part(el, 'trigger') as HTMLButtonElement | null)?.click()
+    await el.updateComplete
+    await el.updateComplete
+    expect(heard).toEqual(['open'])
+  })
+
   /* Control is an action rather than a mode, which is the pattern every stateful
      component here answers to: a consumer takes the decision by refusing. */
   test('and refusing the request leaves it folded', async () => {

@@ -248,6 +248,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @aliases Board, JSON Canvas, Whiteboard
  * @documentation https://fusion.dev/helix/components/canvas
  *
+ * @slot - The board's `helix-canvas-node` and `helix-canvas-edge` elements, drawn on the plane.
  * @slot empty - Content shown when the document has no nodes.
  * @slot footer - Content below the board.
  * @slot header - Content above the board.
