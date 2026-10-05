@@ -152,6 +152,19 @@ describe('color picker', () => {
     expect(host.value).toBe('#00ff00')
   })
 
+  test('a color set from outside is drawn, after a move that changed nothing', async () => {
+    // A second move to black hands back the black already there, so no update
+    // follows it. The flag marking the next update as the picker's own was left
+    // standing, the value set next was taken for the picker's, and the square
+    // stayed on the green hue the drag had.
+    const host = await picker('default-value="#00ff00"')
+    await axis(host, 'brightness', 0)
+    await axis(host, 'brightness', 0)
+    host.value = '#3366ff'
+    await settle(host)
+    expect(part(host, 'grid')?.getAttribute('style')).toContain('--color-picker-hue: 225')
+  })
+
   test('nothing chosen starts somewhere every control can move from', async () => {
     // Not black, which is where `<input type="color">` starts: from there the
     // hue ramp moves nothing and the square is one flat color.
