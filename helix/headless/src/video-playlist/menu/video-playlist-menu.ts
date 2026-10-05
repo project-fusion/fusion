@@ -40,6 +40,8 @@ import '../../menu/index.js'
  * @csspart entry-mark - The mark at the end of an entry: a check mark when it is checked, or a caret when it opens a submenu.
  * @csspart entry-shortcut - The key drawn for an entry's shortcut. The playlist's entries set none.
  * @csspart entry-shortcut-kbd - The key inside `entry-shortcut`.
+ * @csspart entry-shortcut-key - One key of an entry's shortcut chord, inside `entry-shortcut`. The playlist's entries set none.
+ * @csspart entry-shortcut-separator - The `+` between two keys of an entry's shortcut, where the platform writes one.
  * @csspart entry-start - The column at the start of an entry. It is a slot and is always present.
  * @csspart menu - The menu that holds the entries.
  * @csspart menu-back - The button that goes back from a submenu.
@@ -224,7 +226,8 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
         (entry) => html`<${this.tag('menu-item')}
           part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start"
           value=${entry.value}
           checkable
           ?checked=${entry.current}

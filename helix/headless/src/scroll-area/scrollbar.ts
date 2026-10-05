@@ -10,6 +10,19 @@
 /** Which scrollbars are drawn, and when. Absent keeps the browser's own. */
 export type Scrollbars = 'always' | 'auto' | 'hover' | 'scroll'
 
+/** The two axes a scrollbar runs along. */
+export type Axis = 'horizontal' | 'vertical'
+
+/** The box a scrollbar reads, as the numbers it reads off it. */
+export interface Box {
+  clientHeight: number
+  clientWidth: number
+  scrollHeight: number
+  scrollLeft: number
+  scrollTop: number
+  scrollWidth: number
+}
+
 /** One axis of the viewport, read off the box. */
 export interface Extent {
   /** How much of the content the viewport shows, `clientHeight` or `clientWidth`. */
@@ -91,4 +104,30 @@ export const showsScrollbar = (
     return true
   }
   return moment.active || moment.held || (mode === 'hover' && moment.hovered)
+}
+
+/**
+ * One axis of a box, counted from its start whichever way the line runs: a
+ * right-to-left box counts `scrollLeft` down from zero, so its offset is the
+ * distance from zero.
+ */
+export const extentOf = (box: Box, axis: Axis): Extent =>
+  axis === 'vertical'
+    ? { client: box.clientHeight, offset: box.scrollTop, scroll: box.scrollHeight }
+    : { client: box.clientWidth, offset: Math.abs(box.scrollLeft), scroll: box.scrollWidth }
+
+/**
+ * Where a pointer is along a track, counted from the track's start: its top,
+ * or its left edge, or its right edge on a right-to-left page.
+ */
+export const alongTrack = (
+  pointer: number,
+  track: { bottom: number; left: number; right: number; top: number },
+  axis: Axis,
+  rtl: boolean,
+): number => {
+  if (axis === 'vertical') {
+    return pointer - track.top
+  }
+  return rtl ? track.right - pointer : pointer - track.left
 }

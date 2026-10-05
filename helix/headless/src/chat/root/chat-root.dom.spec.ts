@@ -330,3 +330,26 @@ describe('a transcript with nothing in it', () => {
     expect(part(host, 'empty')).toBeNull()
   })
 })
+
+describe('the other side typing', () => {
+  test('draws three dots and who is typing in the status band, and takes them away', async () => {
+    const element = (await mount(markup())) as Chat & { typing: string; typingLabel: string }
+    await element.updateComplete
+    expect(part(element, 'typing')).toBeNull()
+    element.typing = 'Ada'
+    await element.updateComplete
+    const status = part(element, 'status') as HTMLElement
+    expect(status.hasAttribute('data-empty')).toBe(false)
+    expect(part(element, 'typing')?.textContent?.trim()).toBe('Ada is typing')
+    expect(part(element, 'indicator')?.getAttribute('aria-hidden')).toBe('true')
+    // Inside the band's own region, so a screen reader hears the words.
+    expect(status.contains(part(element, 'typing'))).toBe(true)
+    element.typingLabel = '{author} schreibt'
+    await element.updateComplete
+    expect(part(element, 'typing')?.textContent?.trim()).toBe('Ada schreibt')
+    element.typing = ''
+    await element.updateComplete
+    expect(part(element, 'typing')).toBeNull()
+    expect(status.hasAttribute('data-empty')).toBe(true)
+  })
+})

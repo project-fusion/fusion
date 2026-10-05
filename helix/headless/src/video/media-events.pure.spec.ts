@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { MEDIA_EVENTS, relayedCopy, relayMedia } from './media-events.js'
+import { MEDIA_EVENTS, relayMedia } from './media-events.js'
 
 const relayed: readonly string[] = MEDIA_EVENTS
 
@@ -30,19 +30,6 @@ describe('the relayed media events', () => {
   })
 })
 
-describe('a relayed copy', () => {
-  /* As the platform sends it. A bubbling copy reaches no React handler, since
-     `bindReactHandler` skips a bubbling relay on the grounds that React's own
-     root listener already hears it, and for these names React's does not. */
-  test('neither bubbles nor composes, and cannot be refused', () => {
-    const copy = relayedCopy(new Event('timeupdate', { bubbles: true, composed: true }))
-    expect(copy.type).toBe('timeupdate')
-    expect(copy.bubbles).toBe(false)
-    expect(copy.composed).toBe(false)
-    expect(copy.cancelable).toBe(false)
-  })
-})
-
 describe('relaying', () => {
   test('sends every media event on from the host, and stops when asked', () => {
     const video = new EventTarget()
@@ -51,7 +38,7 @@ describe('relaying', () => {
     for (const name of MEDIA_EVENTS) {
       host.addEventListener(name, (event) => heard.push(event.type))
     }
-    const stop = relayMedia(video, host)
+    const stop = relayMedia(video, (event) => host.dispatchEvent(new Event(event.type)))
     for (const name of MEDIA_EVENTS) {
       video.dispatchEvent(new Event(name))
     }
@@ -69,7 +56,7 @@ describe('relaying', () => {
     host.addEventListener('click', () => {
       heard += 1
     })
-    relayMedia(video, host)
+    relayMedia(video, (event) => host.dispatchEvent(new Event(event.type)))
     video.dispatchEvent(new Event('click'))
     expect(heard).toBe(0)
   })

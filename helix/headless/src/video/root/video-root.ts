@@ -92,11 +92,22 @@ const clock = (seconds: number): string => {
  * not drawn, and the keys below are not bound, so a key press does not seek
  * twice.
  *
- * The keys match other players, and they are bound on the element only:
- * - Space and `k` play or pause.
- * - The arrow keys seek and change the volume.
- * - `m` mutes.
- * - `f` toggles fullscreen.
+ * **Keyboard.** The keys match other players, and they are bound on the
+ * element only, so they work while focus is on the player.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Space, `k` | Plays or pauses. Space on a button presses the button. |
+ * | Right, Left | Moves 5 seconds forward or back. |
+ * | Shift with Right or Left | Moves 10 seconds forward or back. |
+ * | `l`, `j` | Moves 10 seconds forward or back, as the skip buttons do. |
+ * | Up, Down | Raises or lowers the volume by a tenth. |
+ * | `m` | Mutes or unmutes. |
+ * | `f` | Enters or leaves fullscreen. |
+ * | Tab | Moves through the controls on the bar. |
+ *
+ * On the scrubber and the volume slider, the arrow keys, Page Up, Page Down,
+ * Home, and End move the slider, as on any range input.
  *
  * `<source>` and `<track>` children are copied into the video. A media element
  * selects resources from its own child nodes, and a slot is one node, so
@@ -182,6 +193,8 @@ const clock = (seconds: number): string => {
  * @csspart entry-mark - The trailing mark: a check mark when the row is checked, or a caret when it opens a submenu.
  * @csspart entry-shortcut - The key drawn for a row's shortcut. The player's rows set none.
  * @csspart entry-shortcut-kbd - The key inside `entry-shortcut`.
+ * @csspart entry-shortcut-key - One key of a row's shortcut chord, inside `entry-shortcut`. The player's rows set none.
+ * @csspart entry-shortcut-separator - The `+` between two keys of a row's shortcut, where the platform writes one.
  * @csspart entry-start - The leading column that holds the `start` slot. It is always rendered.
  * @csspart failure - The message shown when the source cannot be played.
  * @csspart forward - The button that skips forward ten seconds.
@@ -1342,7 +1355,7 @@ export class HelixHeadlessVideo extends HelixElement {
       /* After the template's own listeners on the same video, so a consumer
          reading the player in a handler reads the state the event moved. The
          video is never replaced, so this is bound once and never undone. */
-      relayMedia(video, this)
+      relayMedia(video, (event) => this.relayNativeEvent(event))
     }
   }
 
@@ -1541,7 +1554,8 @@ export class HelixHeadlessVideo extends HelixElement {
       <${this.tag('menu-item')}
         part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start"
         value="off"
         checkable
         exclusive
@@ -1554,7 +1568,8 @@ export class HelixHeadlessVideo extends HelixElement {
       ${tracks.map(
         (track, at) => html`<${this.tag('menu-item')} part="entry"
         exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start"
           value=${track.language || String(at)}
           checkable
           exclusive
@@ -1599,7 +1614,8 @@ export class HelixHeadlessVideo extends HelixElement {
     if (one === 'remote') {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start"
         value="remote"
         @helix-select=${() => void this.remote.prompt()}
       >
@@ -1610,7 +1626,8 @@ export class HelixHeadlessVideo extends HelixElement {
     if (one === 'speed') {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start" value="speed" @helix-select=${() => this.cycleSpeed()}>
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start" value="speed" @helix-select=${() => this.cycleSpeed()}>
         <slot name="speed-icon" slot="start">${drawIcon(gauge)}</slot>
         ${this.speedLabel}: ${this.rate}x
       </${this.tag('menu-item')}>`
@@ -1619,7 +1636,8 @@ export class HelixHeadlessVideo extends HelixElement {
       const back = one === 'rewind'
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start"
         value=${one}
         @helix-select=${() => this.skipBy(back ? -SKIP_SECONDS : SKIP_SECONDS)}
       >
@@ -1634,7 +1652,8 @@ export class HelixHeadlessVideo extends HelixElement {
     if (one === 'previous') {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start" value="previous" @helix-select=${() => this.skip(true)}>
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start" value="previous" @helix-select=${() => this.skip(true)}>
         <slot name="previous-icon" slot="start">${drawIcon(skipBack)}</slot>
         ${this.previousLabel}
       </${this.tag('menu-item')}>`
@@ -1642,7 +1661,8 @@ export class HelixHeadlessVideo extends HelixElement {
     if (one === 'next') {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start" value="next" @helix-select=${() => this.skip(false)}>
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start" value="next" @helix-select=${() => this.skip(false)}>
         <slot name="next-icon" slot="start">${drawIcon(skipForward)}</slot>
         ${this.nextLabel}
       </${this.tag('menu-item')}>`
@@ -1651,7 +1671,8 @@ export class HelixHeadlessVideo extends HelixElement {
       const local = ownFile(this.src)
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start"
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start"
         ?download=${local}
         href=${this.src}
         rel=${local ? nothing : 'noreferrer'}
@@ -1664,7 +1685,8 @@ export class HelixHeadlessVideo extends HelixElement {
     }
     return html`<${this.tag('menu-item')} part="entry"
     exportparts="end: entry-end, item: entry-item, mark: entry-mark, shortcut: entry-shortcut,
-        shortcut-kbd: entry-shortcut-kbd, start: entry-start" value="pip" @helix-select=${() => void this.togglePip()}>
+        shortcut-kbd: entry-shortcut-kbd, shortcut-key: entry-shortcut-key,
+        shortcut-separator: entry-shortcut-separator, start: entry-start" value="pip" @helix-select=${() => void this.togglePip()}>
       <slot name="pip-icon" slot="start">${drawIcon(pictureInPicture)}</slot>
       ${this.pipLabel}
     </${this.tag('menu-item')}>`

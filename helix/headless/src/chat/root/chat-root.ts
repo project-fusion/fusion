@@ -1,5 +1,6 @@
 import {
   customElement,
+  fillTemplate,
   HelixBeforePinEvent,
   HelixElement,
   HelixHistoryEvent,
@@ -145,8 +146,10 @@ const spoken = (message: Element): string =>
  * `sent` or `failed` when your server answers. Add the reply as a turn with
  * `state="streaming"`, write its text as it arrives, and set `state` to `sent`
  * when it is complete. While the user types, the composer sends
- * `helix-typing`, which you can pass on to the other side. Show the other
- * side's typing in the `status` slot.
+ * `helix-typing`, which you can pass on to the other side. When the other side
+ * types, set `typing` to their name: the status band draws three dots and
+ * "Ada is typing" (`typing-label`), which a screen reader hears, and clearing
+ * it takes them away. Anything slotted into `status` is drawn first.
  *
  * A screen reader names each turn by its author and its time, such as "You, 2
  * minutes ago". Set `me-label` and `message-label` to say it in your language,
@@ -183,6 +186,7 @@ const spoken = (message: Element): string =>
  * @csspart empty - Shown when the conversation has no turns.
  * @csspart header - The region above the transcript.
  * @csspart history - Shown at the top of the transcript while older turns load.
+ * @csspart indicator - The three dots before the words that say who is typing, which the styled tier animates as a message's are. Hidden from screen readers.
  * @csspart live - The region where screen readers announce each turn once it has arrived.
  * @csspart loading - Shown while the history loads.
  * @csspart log - The transcript, which scrolls.
@@ -209,6 +213,7 @@ const spoken = (message: Element): string =>
  * @csspart resume - The control shown while the user is scrolled away from the bottom.
  * @csspart status - The status region, outside the log.
  * @csspart turn - The wrapper around the message drawn for one turn from `turns`.
+ * @csspart typing - The words that say who is typing, in the status band, while `typing` names someone.
  */
 @customElement('helix-headless-chat')
 export class HelixHeadlessChat extends MixinCollection(HelixElement) {
@@ -330,6 +335,22 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    */
   @property({ attribute: false })
   turns: readonly ChatTurn[] = []
+
+  /**
+   * Who on the other side is typing, by name, or empty while nobody is.
+   *
+   * Set it from your connection, and clear it when they stop or send. The
+   * status band says it with `typing-label`.
+   */
+  @property()
+  typing = ''
+
+  /**
+   * What the status band says while someone is typing. `{author}` is the
+   * name in `typing`.
+   */
+  @property({ attribute: 'typing-label' })
+  typingLabel = '{author} is typing'
 
   @state()
   private pinnedState: boolean | undefined = undefined
@@ -1007,8 +1028,15 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       <div part="resume" ?hidden=${!away || !this.has('resume')} @click=${this.handleResume}>
         <slot name="resume"></slot>
       </div>
-      <div part="status" role="status" ?data-empty=${!this.has('status')}>
-        <slot name="status"></slot>
+      <div part="status" role="status" ?data-empty=${!this.has('status') && this.typing === ''}>
+        <slot name="status"></slot>${
+          this.typing === ''
+            ? nothing
+            : html`<span part="typing"
+                ><span part="indicator" aria-hidden="true"></span
+                >${fillTemplate(this.typingLabel, { author: this.typing })}</span
+              >`
+        }
       </div>
       <div part="composer" ?hidden=${!this.has('composer')}>
         <slot name="composer"></slot>

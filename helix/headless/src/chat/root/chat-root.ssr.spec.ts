@@ -103,4 +103,15 @@ describe('chat server output', () => {
     const settled = ssr(html`<helix-headless-chat label="Support"></helix-headless-chat>`)
     expect(partTag(settled, 'history')).toBe('')
   })
+
+  test('serves who is typing, which a server knows from the property', () => {
+    const served = ssr(
+      html`<helix-headless-chat label="Support" typing="Ada"></helix-headless-chat>`,
+    )
+    expect(partTag(served, 'typing')).not.toBe('')
+    expect(rendered(served, 'helix-headless-chat')).toContain('Ada is typing')
+    expect(
+      partTag(ssr(html`<helix-headless-chat label="Support"></helix-headless-chat>`), 'typing'),
+    ).toBe('')
+  })
 })

@@ -57,6 +57,43 @@ describe('the scroll events', () => {
   })
 })
 
+describe('one axis', () => {
+  test('orientation clips the other axis, which then has no scrollbar', async () => {
+    const vertical = await area('orientation="vertical" scrollbars="always"')
+    const view = part(vertical, 'viewport') as HTMLElement
+    expect(view.style.overflowX).toBe('hidden')
+    expect(view.style.overflowY).toBe('')
+    view.dispatchEvent(new Event('scroll'))
+    await vertical.updateComplete
+    expect(part(vertical, 'scrollbar-horizontal')?.hasAttribute('hidden')).toBe(true)
+    expect(part(vertical, 'scrollbar-vertical')?.hasAttribute('hidden')).toBe(false)
+    const horizontal = await area('orientation="horizontal"')
+    expect((part(horizontal, 'viewport') as HTMLElement).style.overflowY).toBe('hidden')
+    expect((part(await area(), 'viewport') as HTMLElement).hasAttribute('style')).toBe(false)
+  })
+})
+
+describe('a thumb dragged across the content', () => {
+  test('sends one scrollend from the host, once it is let go', async () => {
+    const host = await area('scrollbars="always"')
+    const heard: string[] = []
+    host.addEventListener('scrollend', (event) => heard.push(event.type))
+    const view = part(host, 'viewport') as HTMLElement
+    const bar = part(host, 'scrollbar-vertical') as HTMLElement
+    const thumb = part(host, 'thumb-vertical') as HTMLElement
+    thumb.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, button: 0, composed: true }),
+    )
+    for (let step = 0; step < 3; step += 1) {
+      view.dispatchEvent(new Event('scrollend'))
+    }
+    expect(heard).toEqual([])
+    bar.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }))
+    await new Promise((done) => setTimeout(done, 150))
+    expect(heard).toEqual(['scrollend'])
+  })
+})
+
 /** Gives the viewport a size and a content length, which happy-dom has none of. */
 const sized = (view: HTMLElement, client: number, scroll: number): void => {
   Object.defineProperty(view, 'clientHeight', { configurable: true, value: client })
