@@ -7,7 +7,7 @@ import { auditName } from './audit-name-off.js'
  * Which module `#audit-name` is in each build.
  *
  * The repository's specs run with the audit: core's `test` script passes
- * `bun test --conditions helix-source --conditions helix-development`, and
+ * `bun test src --conditions helix-source --conditions helix-development`, and
  * `helix-development` takes the same module `development` does without also
  * switching Lit to its development build. These ask what each build gets.
  */

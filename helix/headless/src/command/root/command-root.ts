@@ -62,8 +62,8 @@ const parse = (hotkey: string) => {
  *
  * @slot - The commands, and any groups of them.
  * @slot empty - What the palette shows when typing matches no commands, for content richer than `empty-text`.
- * @slot footer - Content under the list, such as the keys that work in the palette.
  * @slot error - What the palette shows while `load-error` is set, for content richer than its text.
+ * @slot footer - Content under the list, such as the keys that work in the palette.
  * @slot loading - What the palette shows while the commands load, for content richer than `loading-text`.
  * @slot no-results - What the palette shows when typing matches no commands, for content richer than `no-results-text`.
  *

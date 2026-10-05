@@ -179,7 +179,7 @@ describe('a lone dismissed element the listener removes', () => {
     const lone = document.querySelector('probe-removable') as Removable
     await lone.updateComplete
     lone.addEventListener('helix-dismiss', () => lone.remove())
-    ;(lone.shadowRoot?.querySelector('[part="dismiss"]') as HTMLElement).focus()
+    ;(lone.shadowRoot?.querySelector('[part="dismiss"]') as HTMLElement | null)?.focus()
     return lone
   }
 

@@ -18,7 +18,7 @@ describe('the highlight example', () => {
     }
     await block.updateComplete
     const code = block.shadowRoot?.querySelector('[part="code"]')
-    expect([...(code?.querySelectorAll('span') ?? [])].map((span) => span.textContent)).toEqual([
+    expect([...(code?.querySelectorAll('b') ?? [])].map((span) => span.textContent)).toEqual([
       'const',
     ])
     const copy = block.shadowRoot?.querySelector('[part="copy"]') as HTMLElement & {
