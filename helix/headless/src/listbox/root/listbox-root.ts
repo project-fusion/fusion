@@ -1,9 +1,8 @@
 import {
   AriaForwardController,
+  countLabel,
   customElement,
   DisabledCascadeController,
-  fillTemplate,
-  formatNumbers,
   HelixFilterEvent,
   HelixFormElement,
   type HelixSelectEvent,
@@ -438,10 +437,7 @@ export class HelixHeadlessListbox extends MixinCollection(
       this.announced = ''
       return
     }
-    const one = new Intl.PluralRules(this.lang || undefined).select(count) === 'one'
-    this.announced = fillTemplate(one ? this.resultLabel : this.resultsLabel, {
-      count: formatNumbers(this.lang)(count),
-    })
+    this.announced = countLabel(count, this.resultLabel, this.resultsLabel, this.lang)
   }
 
   /**
