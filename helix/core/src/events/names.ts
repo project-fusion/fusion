@@ -72,6 +72,7 @@ export const helixEventNames: ReadonlySet<string> = new Set([
   'helix-next',
   'helix-panel-resize',
   'helix-pin',
+  'helix-press',
   'helix-previous',
   'helix-range-change',
   'helix-read',
