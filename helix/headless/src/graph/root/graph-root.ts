@@ -13,6 +13,7 @@ import {
   HelixGraphZoomEvent,
   MixinControllerActive,
   MixinViewport,
+  scrollItemIntoView,
   type ViewportGestureLabels,
   type ViewportPanDetail,
   type ViewportZoomDetail,
@@ -21,6 +22,7 @@ import {
 import { list, magnifyingGlass } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import {
   type Adjacency,
@@ -471,24 +473,52 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   /**
    * Moves the keyboard to a row, and the list to show it.
    *
-   * **Scrolled by the row's own box where it is drawn, and by the estimate
-   * where it is not**, so a jump to the end of ten thousand notes lands there
-   * and the row is drawn by the update the scroll asks for.
+   * **The row the keys are on is always drawn**, beside the window where it is
+   * outside it, so `aria-activedescendant` names a row that exists. The list
+   * then scrolls to it, see `revealCursor`.
    */
   private moveTo(index: number): void {
     const last = this.entries.length - 1
     this.cursor = Math.min(Math.max(index, 0), Math.max(last, 0))
+    void this.updateComplete.then(() => this.revealCursor())
+  }
+
+  /**
+   * Brings the cursor's row into the list's box.
+   *
+   * **By the row's own box once it is in the window, and by the window
+   * otherwise.** The offset of a row that has not been drawn is a guess at its
+   * height, and a guess at 32 pixels was where End and Page Down sent the list
+   * when rows were taller: the list landed far from the row, which then was
+   * not drawn. So the window is moved toward the row, the rows it draws are
+   * measured, and the next try starts from there, a few times at most.
+   */
+  private revealCursor(attempts = 8): void {
     const list = this.partNamed('list')
     if (!list) {
       return
     }
-    const row = this.renderRoot.querySelector?.<HTMLElement>(`[data-index="${this.cursor}"]`)
-    if (row) {
-      row.scrollIntoView?.({ block: 'nearest' })
-    } else {
-      list.scrollTop = this.cursor * 32
+    const { first, last } = this.virtualize.window
+    if (this.cursor >= first && this.cursor < last) {
+      const row = this.renderRoot.querySelector?.<HTMLElement>(`[data-index="${this.cursor}"]`)
+      if (row) {
+        scrollItemIntoView(row, { scroller: list })
+      }
+      return
     }
+    if (attempts === 0) {
+      return
+    }
+    this.virtualize.reveal(this.cursor)
     this.virtualize.measure()
+    void this.updateComplete.then(() => this.revealCursor(attempts - 1))
+  }
+
+  /** The cursor's row, where it is outside the window and drawn beside it. */
+  private get keptRow(): number | undefined {
+    const { first, last } = this.virtualize.window
+    const cursor = this.cursor
+    return this.entries.length > 0 && (cursor < first || cursor >= last) ? cursor : undefined
   }
 
   /**
@@ -514,6 +544,39 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       event.preventDefault()
       event.stopPropagation()
       this.choose(this.cursor)
+      return
+    }
+    if (event.key.length === 1 && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.typeahead(event.key)
+    }
+  }
+
+  /** What has been typed toward a note's name, and when the last letter came. */
+  private typed = { at: 0, text: '' }
+
+  /**
+   * Moves to the next note whose name starts with what was typed, as a
+   * listbox does. Letters within half a second of each other run together,
+   * and a repeated letter steps through the names that start with it.
+   */
+  private typeahead(letter: string): void {
+    const now = Date.now()
+    const text = now - this.typed.at < 500 ? this.typed.text + letter : letter
+    this.typed = { at: now, text }
+    const wanted = text.toLocaleLowerCase()
+    const repeated = [...wanted].every((one) => one === wanted[0])
+    const prefix = repeated ? (wanted[0] ?? '') : wanted
+    const entries = this.entries
+    const start = repeated ? this.cursor + 1 : this.cursor
+    for (let step = 0; step < entries.length; step += 1) {
+      const at = (start + step) % entries.length
+      const entry = entries[at]
+      if (entry && nameOf(entry.node).toLocaleLowerCase().startsWith(prefix)) {
+        this.moveTo(at)
+        return
+      }
     }
   }
 
@@ -603,16 +666,38 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     </slot>`
   }
 
-  private renderRows(): TemplateResult[] {
+  private renderRows(): TemplateResult {
     const { first, last } = this.virtualize.window
     const total = this.entries.length
-    return this.entries.slice(first, last).map((entry, offset) => {
-      const index = first + offset
-      const relation = this.relationText(entry)
-      const chosen = entry.relation === 'selected'
-      /* The part names written into the attribute and not built apart from
+    const indices = Array.from(
+      { length: Math.max(0, Math.min(last, total) - first) },
+      (_, at) => first + at,
+    )
+    const kept = this.keptRow
+    if (kept !== undefined && kept < total) {
+      if (kept < first) {
+        indices.unshift(kept)
+      } else {
+        indices.push(kept)
+      }
+    }
+    /* **Keyed by the row's place in the list.** Drawn by position, a window
+       that moved one row reused every element and wrote the next row into it,
+       so the browser's scroll anchoring held the reused element still and
+       moved the offset a row further, which moved the window again: the
+       offset ran on a row per pass until the controller gave up. Keyed, the
+       row leaving is removed and the spacer takes its room, so nothing
+       under the reader moves. */
+    return html`${repeat(
+      indices,
+      (index) => index,
+      (index) => {
+        const entry = this.entries[index] as Entry
+        const relation = this.relationText(entry)
+        const chosen = entry.relation === 'selected'
+        /* The part names written into the attribute and not built apart from
          it, so the manifest sees each one. */
-      return html`<div
+        return html`<div
         part="note${chosen ? ' note-selected' : entry.relation ? ' note-linked' : ''}${index === this.cursor ? ' note-cursor' : ''}"
         role="option"
         id=${`note-${index}`}
@@ -629,11 +714,21 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
         <span part="note-name">${nameOf(entry.node)}</span>
         ${relation ? html`<span part="note-relation" aria-hidden="true">${relation}</span>` : nothing}
       </div>`
-    })
+      },
+    )}`
   }
 
   protected override render(): TemplateResult {
-    const { after, before } = this.virtualize.window
+    const window = this.virtualize.window
+    /* The cursor's row, drawn beside the window, takes its room out of the
+       spacer on its side so the rows in the window stay where they were. */
+    const kept = this.keptRow
+    const room = kept === undefined ? 0 : this.virtualize.sizeOf(kept)
+    const before = Math.max(
+      0,
+      window.before - (kept !== undefined && kept < window.first ? room : 0),
+    )
+    const after = Math.max(0, window.after - (kept !== undefined && kept >= window.last ? room : 0))
     const cursor = this.entries.length > 0 ? `note-${this.cursor}` : nothing
     return html`<div
       part="region"
@@ -687,9 +782,9 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
             @keydown=${this.handleListKeydown}
             @scroll=${() => this.virtualize.measure()}
           >
-            <div part="before" style="block-size: ${before}px"></div>
+            <div part="before" role="presentation" style="block-size: ${before}px"></div>
             ${this.renderRows()}
-            <div part="after" style="block-size: ${after}px"></div>
+            <div part="after" role="presentation" style="block-size: ${after}px"></div>
           </div>
         </div>
       </div>

@@ -129,6 +129,34 @@ describe('graph frame', () => {
     expect(panned).toEqual([])
   })
 
+  /* The list draws a window of its rows. End and Page Down pointed the active
+     descendant at rows that were not drawn, wherever rows were not the 32
+     pixels the window guessed, so a screen reader heard nothing. */
+  test('the row the keys are on is drawn wherever the window is', async () => {
+    const many = Array.from({ length: 500 }, (_, at) => ({ id: `n${at}`, label: `Note ${at}` }))
+    const host = await graph('', many, [])
+    const scope = host.shadowRoot as ShadowRoot
+    for (const name of ['End', 'Home', 'PageDown', 'PageDown', 'PageDown']) {
+      key(list(host), name)
+      await settle(host)
+      const id = list(host).getAttribute('aria-activedescendant') ?? ''
+      expect(scope.getElementById(id)).not.toBeNull()
+    }
+    expect(list(host).getAttribute('aria-activedescendant')).toBe('note-30')
+    const spacers = ['before', 'after'].map((name) => part(host, name)?.getAttribute('role'))
+    expect(spacers).toEqual(['presentation', 'presentation'])
+  })
+
+  test('a letter moves to the next note whose name starts with it', async () => {
+    const host = await graph()
+    key(list(host), 'd')
+    await settle(host)
+    const scope = host.shadowRoot as ShadowRoot
+    expect(
+      scope.getElementById(list(host).getAttribute('aria-activedescendant') ?? '')?.textContent,
+    ).toContain('Delta')
+  })
+
   test('the arrows on the frame pan the drawing', async () => {
     const host = await graph()
     const panned: unknown[] = []
