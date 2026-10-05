@@ -1,6 +1,8 @@
 import {
   commaList,
   customElement,
+  deepActiveElement,
+  deepContains,
   HelixBeforeChangeEvent,
   HelixElement,
   hostAria,
@@ -11,10 +13,10 @@ import {
   slottedWords,
   whenHydrated,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessTag } from '../root/tag-root.js'
-import { pressedValue, type TagSelectionMode } from '../selection.js'
+import { pressedValue, prunedValue, type TagSelectionMode } from '../selection.js'
 
 /**
  * @summary A set of tags that the arrow keys move through, and that can be removed and selected from the keyboard.
@@ -31,9 +33,16 @@ import { pressedValue, type TagSelectionMode } from '../selection.js'
  * `single` selects one at a time and `multiple` any number. `value` holds the
  * selected tags' values, separated by commas, and a change asks with
  * `helix-before-change` and tells with `change`. Enter on a tag with an
- * `href` follows its link. A `disabled` tag is passed over.
+ * `href` follows its link. A `disabled` tag is passed over. A selected tag
+ * that is removed leaves `value`, which then sends `change`.
  *
- * Name the set with `label`.
+ * Name the set with `label`. Each tag is named by its words alone, without
+ * its remove button.
+ *
+ * **Removing the last tag keeps focus in the group.** With no tags left the
+ * set is a `group` rather than a grid, and focus moves to its `empty` part,
+ * which holds the `empty` slot: put words there such as "No filters" for a
+ * reader to hear.
  *
  * @since 0.1.0
  * @status stable
@@ -41,10 +50,13 @@ import { pressedValue, type TagSelectionMode } from '../selection.js'
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tags, in the order they are read.
+ * @slot empty - Shown in place of the tags while there are none, such as "No filters".
  *
  * @event {Event} change - Fired once a press has changed which tags are selected.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press changes which tags are selected, with the `value` it would leave. Cancelable.
  * @event {HelixDismissEvent} helix-dismiss - A tag's remove button was pressed, or Delete or Backspace on the focused tag. Bubbles from that tag, which is its `target`; remove the tag in response. Cancelable.
+ *
+ * @csspart empty - Holds the `empty` slot while the group has no tags, rendered only then. Takes focus when the last tag is removed.
  */
 @customElement('helix-headless-tag-group')
 export class HelixHeadlessTagGroup extends HelixElement {
@@ -221,6 +233,48 @@ export class HelixHeadlessTagGroup extends HelixElement {
     }
   }
 
+  /**
+   * What happens once a tag has asked to be removed and the page has had its
+   * turn: a selected tag that left takes its value out of `value`, and focus
+   * that the last tag took with it comes to the group's `empty` part.
+   *
+   * Asked after the event and again a frame later, as `MixinDismissible`
+   * asks, because a framework removes the tag on its next render rather than
+   * in the handler. A cancelled dismissal changes nothing.
+   */
+  private readonly handleDismiss = (event: Event): void => {
+    const tag = this.tagOf(event)
+    if (!tag) {
+      return
+    }
+    const had = deepContains(this, deepActiveElement())
+    const settle = async (): Promise<void> => {
+      if (event.defaultPrevented || tag.isConnected) {
+        return
+      }
+      const left = this.tags.map((one) => this.valueFor(one))
+      const pruned = prunedValue(this.value, this.valueFor(tag), left)
+      if (pruned !== this.value) {
+        this.value = pruned
+        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+      }
+      const active = document.activeElement
+      if (!had || this.tags.length > 0 || (active !== null && active !== document.body)) {
+        return
+      }
+      this.requestUpdate()
+      await this.updateComplete
+      this.renderRoot.querySelector<HTMLElement>('[part~="empty"]')?.focus()
+    }
+    queueMicrotask(() => void settle())
+    requestAnimationFrame(() => void settle())
+  }
+
+  private readonly handleSlotchange = (): void => {
+    this.sync()
+    this.requestUpdate()
+  }
+
   /* Wherever the reader lands, by key or by pointer, holds the stop next. */
   private readonly handleFocusin = (event: FocusEvent): void => {
     const tag = this.tagOf(event)
@@ -235,6 +289,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('click', this.handleClick)
     this.addEventListener('focusin', this.handleFocusin)
+    this.addEventListener('helix-dismiss', this.handleDismiss)
   }
 
   override disconnectedCallback(): void {
@@ -242,14 +297,25 @@ export class HelixHeadlessTagGroup extends HelixElement {
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('focusin', this.handleFocusin)
+    this.removeEventListener('helix-dismiss', this.handleDismiss)
+  }
+
+  /**
+   * Whether the group is known to hold no tags, which a server and a
+   * hydrating render cannot know: there it holds whatever it was given.
+   */
+  private get empty(): boolean {
+    return this.childrenKnown && this.tags.length === 0
   }
 
   /* The set is a grid of rows, said through `ElementInternals` so nothing is
-     written onto the host. `willUpdate`, which a server calls too. */
+     written onto the host. `willUpdate`, which a server calls too. A grid with
+     no rows is no grid, so an emptied set is a group of nothing. */
   protected override willUpdate(changed: PropertyValues<this>): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: 'grid' })
-    this.internals.ariaMultiSelectable = this.selectionMode === 'multiple' ? 'true' : null
+    const empty = this.empty
+    hostAria(this.internals, { label: this.label, role: empty ? 'group' : 'grid' })
+    this.internals.ariaMultiSelectable = this.selectionMode === 'multiple' && !empty ? 'true' : null
   }
 
   protected override updated(changed: PropertyValues<this>): void {
@@ -258,8 +324,13 @@ export class HelixHeadlessTagGroup extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* A tag arriving or leaving changes who holds the stop. */
-    return html`<slot @slotchange=${() => this.sync()}></slot>`
+    /* A tag arriving or leaving changes who holds the stop, and whether the
+       set is empty. The `empty` part only while it is, so a set of tags
+       renders what it did. */
+    const empty = this.empty
+      ? html`<div part="empty" tabindex="-1"><slot name="empty"></slot></div>`
+      : nothing
+    return html`<slot @slotchange=${this.handleSlotchange}></slot>${empty}`
   }
 }
 

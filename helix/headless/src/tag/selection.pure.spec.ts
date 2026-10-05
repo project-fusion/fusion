@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { pressedValue } from './selection.js'
+import { pressedValue, prunedValue } from './selection.js'
 
 describe('a press on a tag', () => {
   test('in a single selection selects it alone, and again selects none', () => {
@@ -14,5 +14,19 @@ describe('a press on a tag', () => {
 
   test('selects nothing where the group selects nothing', () => {
     expect(pressedValue('none', 'a', 'b')).toBe('a')
+  })
+})
+
+describe('a tag that leaves', () => {
+  test('takes its value out where no tag left stands for it', () => {
+    expect(prunedValue('a, b c', 'b c', ['a'])).toBe('a')
+  })
+
+  test('keeps it where another tag still stands for it', () => {
+    expect(prunedValue('a, b', 'b', ['a', 'b'])).toBe('a, b')
+  })
+
+  test('leaves a value that never held it as written', () => {
+    expect(prunedValue('a,b', 'c', [])).toBe('a,b')
   })
 })

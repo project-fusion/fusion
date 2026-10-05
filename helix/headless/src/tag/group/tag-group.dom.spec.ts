@@ -173,6 +173,83 @@ describe('selecting tags', () => {
   })
 })
 
+/* What a removal leaves behind: RAC's useListData takes a removed key out of
+   the selection, and focus never drops to the page. */
+describe('a tag removed from a group', () => {
+  const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
+
+  test('takes its value out of `value` where it was selected, and says so', async () => {
+    const one = await group('selection-mode="multiple" value="Apple, Plum"', FRUIT)
+    const heard: string[] = []
+    one.group.addEventListener('change', () => heard.push(one.group.value))
+    one.group.addEventListener('helix-dismiss', (event) => (event.target as Tag).remove())
+    const plum = one.tags[2] as Tag
+    cell(plum).focus()
+    press(plum, 'Delete')
+    await frame()
+    expect([one.group.value, heard]).toEqual(['Apple', ['Apple']])
+  })
+
+  test('leaves `value` alone where it was not selected, or the removal was refused', async () => {
+    const one = await group('selection-mode="multiple" value="Apple"', FRUIT)
+    one.group.addEventListener('helix-dismiss', (event) => event.preventDefault(), { once: true })
+    press(one.tags[0] as Tag, 'Delete')
+    await frame()
+    one.group.addEventListener('helix-dismiss', (event) => (event.target as Tag).remove())
+    press(one.tags[2] as Tag, 'Delete')
+    await frame()
+    expect(one.group.value).toBe('Apple')
+  })
+
+  test('as the last one keeps focus in the group, which is then a group of nothing', async () => {
+    const one = await group(
+      '',
+      '<helix-headless-tag dismissible>Apple</helix-headless-tag><span slot="empty">No fruit</span>',
+    )
+    one.group.addEventListener('helix-dismiss', (event) => (event.target as Tag).remove())
+    const apple = one.tags[0] as Tag
+    cell(apple).focus()
+    press(apple, 'Delete')
+    await frame()
+    await one.group.updateComplete
+    const empty = part(one.group, 'empty') as HTMLElement
+    expect(one.group.shadowRoot?.activeElement).toBe(empty)
+    const internals = (one.group as unknown as { internals: ElementInternals }).internals
+    expect(internals.role).toBe('group')
+  })
+
+  test('renders no `empty` part while there are tags', async () => {
+    const one = await group('', FRUIT)
+    expect(part(one.group, 'empty')).toBeNull()
+  })
+})
+
+/* A row's name was its content, so a tag called Open with a remove button read
+   "Open Remove Open". React Aria names the row by its text. */
+describe('a row', () => {
+  test('is named by its words alone, its category first', async () => {
+    const one = await group(
+      '',
+      '<helix-headless-tag dismissible><span slot="start">Status</span>Open</helix-headless-tag>',
+    )
+    const tag = one.tags[0] as Tag
+    await tag.updateComplete
+    const internals = (tag as unknown as { internals: ElementInternals }).internals
+    expect([internals.ariaLabel, cell(tag).getAttribute('aria-label')]).toEqual([
+      'Status Open',
+      'Status Open',
+    ])
+  })
+
+  test('and a tag on its own is named as it was', async () => {
+    await mount('<helix-headless-tag dismissible>Open</helix-headless-tag>')
+    const tag = document.querySelector('helix-headless-tag') as Tag
+    await tag.updateComplete
+    const internals = (tag as unknown as { internals: ElementInternals }).internals
+    expect(internals.ariaLabel).toBeNull()
+  })
+})
+
 describe('a link tag in a group', () => {
   test('follows its link on Enter, its link being out of the tab order', async () => {
     const one = await group('', '<helix-headless-tag href="#apple">Apple</helix-headless-tag>')
