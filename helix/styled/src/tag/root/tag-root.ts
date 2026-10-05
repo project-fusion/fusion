@@ -18,13 +18,17 @@ import { styles } from './tag-root.css.js'
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tag's label.
+ * @slot dismiss-icon - Replaces the glyph on the remove button.
  *
  * @event {HelixDismissEvent} helix-dismiss - The remove button was pressed. The tag does not remove itself, so remove it in response. Cancelable.
  *
+ * @csspart cell - The grid cell in a `Tag.Group`, which takes focus and draws the ring round the whole tag.
  * @csspart dismiss - The remove button, when `dismissible`.
+ * @csspart link - The link around the label, under `href`.
  *
  * @cssproperty --tag-background-color - The fill behind the tag.
  * @cssproperty --tag-border-color - The color of the tag's edge.
+ * @cssproperty --tag-disabled-opacity - How strongly a `disabled` tag is drawn.
  * @cssproperty --tag-foreground-color - The label color.
  * @cssproperty --tag-radius - The corner radius of the tag.
  */

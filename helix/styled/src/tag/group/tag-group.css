@@ -1,0 +1,7 @@
+/* A row of tags that wraps, the gap a step of space either way, so a set of
+   filters under a search field reads as one block. */
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tag-group-gap, var(--helix-space-2xs));
+}
