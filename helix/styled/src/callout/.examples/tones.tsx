@@ -4,6 +4,10 @@ export function Example() {
       direction="column"
       gap="sm"
     >
+      <helix-callout tone="neutral">
+        <span slot="heading">Note</span>
+        Drafts are saved every minute.
+      </helix-callout>
       <helix-callout tone="info">
         <span slot="heading">Information</span>
         The next release ships on Tuesday.

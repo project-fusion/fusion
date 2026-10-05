@@ -23,6 +23,7 @@ describe('callout tone', () => {
   test('each tone names itself', async () => {
     for (const [tone, label] of [
       ['info', 'Information'],
+      ['neutral', 'Note'],
       ['success', 'Success'],
       ['warning', 'Warning'],
       ['danger', 'Error'],

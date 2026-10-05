@@ -31,7 +31,7 @@ describe('callout', () => {
     expect(part(note, 'icon-mark')?.tagName.toLowerCase()).toBe('svg')
   })
 
-  test('info is the resting color, and each of the other three rewrites the one variable', () => {
+  test('info is the resting color, and each of the others rewrites the one variable', () => {
     /* One variable feeds the wash, the bar and the mark, so a tone is a single
        line and the three cannot disagree. `info` needs no rule of its own, and
        a rule for it would be the resting state written twice. */
@@ -42,6 +42,11 @@ describe('callout', () => {
         `--_callout-color: var(--helix-color-${tone})`,
       )
     }
+    /* A note reports no status, so it takes the muted ink, which stays in the
+       neutral ramp on any palette. */
+    expect(rule(':host([tone="neutral"])')).toContain(
+      '--_callout-color: var(--helix-color-foreground-muted)',
+    )
   })
 
   test('the tone survives grayscale as a bar on the inline start, clipped by the box', () => {

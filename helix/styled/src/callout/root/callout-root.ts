@@ -4,10 +4,12 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './callout-root.css.js'
 
 /**
- * @summary A passage set apart as information, a warning, or an error.
+ * @summary A passage set apart as a note, information, a warning, or an error.
  *
  * @description
- * The background is a tint of the tone's status color, mixed with `color-mix`.
+ * The background is a tint of the tone's color, mixed with `color-mix`. A
+ * `neutral` callout is drawn in the muted ink, for a note that reports no
+ * status, so it keeps to the palette whatever the brand.
  * A bar on the inline start edge also marks the tone, so it still shows in
  * grayscale and for people who do not distinguish the hues.
  *
