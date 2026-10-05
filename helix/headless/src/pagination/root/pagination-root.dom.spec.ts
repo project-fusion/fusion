@@ -229,6 +229,34 @@ describe('pagination state', () => {
     part(nav, 'previous')?.dispatchEvent(new Event('click', { bubbles: true }))
     expect(announced).toBe(false)
   })
+
+  /* `helix-navigate` is the request, so a consumer following the page needs
+     the notification after it, sent once the page is on the element. */
+  test('says where it is once it has moved', async () => {
+    const nav = (await mount(
+      '<helix-headless-pagination default-page="2" pages="12"></helix-headless-pagination>',
+    )) as HTMLElement & { page: number }
+    const heard: string[] = []
+    nav.addEventListener('helix-activate', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${nav.page}`)
+      expect(event.cancelable).toBe(false)
+    })
+    part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
+    expect(heard).toEqual(['3@3'])
+  })
+
+  test('and says nothing when the move was refused', async () => {
+    const nav = await mount(
+      '<helix-headless-pagination default-page="2" pages="12"></helix-headless-pagination>',
+    )
+    nav.addEventListener('helix-navigate', (event) => event.preventDefault())
+    let heard = false
+    nav.addEventListener('helix-activate', () => {
+      heard = true
+    })
+    part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
+    expect(heard).toBe(false)
+  })
 })
 
 describe('pagination links', () => {
@@ -279,6 +307,20 @@ describe('pagination links', () => {
     const click = new Event('click', { bubbles: true, cancelable: true })
     part(nav, 'next')?.dispatchEvent(click)
     expect(click.defaultPrevented).toBe(false)
+  })
+
+  /* The page moves a task after the click, so the browser reads the link that
+     was clicked, and the notification waits with it. */
+  test('says where it is once the link has been read', async () => {
+    const nav = (await mount(
+      '<helix-headless-pagination default-page="2" href="/p/{page}" pages="6"></helix-headless-pagination>',
+    )) as HTMLElement & { page: number }
+    const heard: number[] = []
+    nav.addEventListener('helix-activate', () => heard.push(nav.page))
+    part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
+    expect(heard).toEqual([])
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(heard).toEqual([3])
   })
 })
 

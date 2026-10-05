@@ -106,6 +106,9 @@ against a dispatch, so every event you can listen for is documented.
 | `helix-before-toggle` | A checked state is about to flip, cancelable |
 | `helix-before-open`, `helix-before-close` | An open state is about to change, cancelable |
 | `helix-before-activate`, `helix-activate` | A set is about to make a different child current, cancelable, and then did |
+| `helix-before-pin`, `helix-pin` | A chat transcript is about to be pinned to the bottom or let go of it, cancelable, and then was |
+| `helix-before-resize`, `helix-resized` | A splitter's divider is about to settle, cancelable, and then did |
+| `helix-before-collapse`, `helix-collapse` | A splitter's pane is about to shut or reopen, cancelable, and then did |
 | `helix-select` | An item was chosen from a set |
 | `helix-dismiss` | A user asked for something to close |
 | `helix-next`, `helix-previous` | Movement through a sequence |
@@ -139,13 +142,19 @@ is sent before the change, and you refuse the change with `preventDefault()`:
 - `helix-sort`, `helix-filter`, `helix-select`, and `helix-reorder` on Data Table
 - `helix-select` on Carousel
 
-These requests send no notification after the change:
+Each of these requests had its name before the library had a word for the
+notification, so the notification has its own name. It is sent after the
+change, is not cancelable, and carries the new state:
 
-- Splitter's `helix-before-resize` and `helix-before-collapse`
-- Chat's `helix-before-pin`
-- Pagination Size's `helix-before-change`
+- `helix-activate` after the page moves on Pagination and Data Table, and after
+  the slide moves on Carousel
+- `helix-sorted`, `helix-filtered`, `helix-selected`, and `helix-reordered` on
+  Data Table
+- `input` and `change` together on Pagination Size, as a native `<select>`
+  sends them
 
-Read the element's state after the request when you need the result.
+A request that is refused sends no notification. Date Picker's `helix-navigate`
+moves the month on show, and the month sends no notification.
 
 ## Events in a framework
 

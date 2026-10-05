@@ -268,6 +268,32 @@ describe('carousel selection can be refused', () => {
     expect(seen).toBe('1')
     expect(host.index).toBe(0)
   })
+
+  /* `helix-select` is the request, so a consumer following the slide in view
+     needs the notification after it, sent once the index is on the element. */
+  test('a move that stood is announced again once it has happened', async () => {
+    const host = await carousel()
+    const heard: string[] = []
+    host.addEventListener('helix-activate', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${host.index}`)
+      expect(event.cancelable).toBe(false)
+    })
+    host.goTo(2)
+    await host.updateComplete
+    expect(heard).toEqual(['2@2'])
+  })
+
+  test('and a refused one is not', async () => {
+    const host = await carousel()
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    let heard = false
+    host.addEventListener('helix-activate', () => {
+      heard = true
+    })
+    host.goTo(2)
+    await host.updateComplete
+    expect(heard).toBe(false)
+  })
 })
 
 describe('carousel, controlled and uncontrolled', () => {

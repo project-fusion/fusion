@@ -34,16 +34,19 @@ import '../../select/index.js'
  * `ElementInternals.states`.
  *
  * `value` is the current size, and `default-value` is the size from the markup.
- * Changing it dispatches `helix-before-change`. Re-querying and returning to
- * page one is up to you, because only you know whether the current position
- * should be kept.
+ * Changing it dispatches `helix-before-change`, and then `input` and `change`
+ * once the size has moved, as a native `<select>` sends them together.
+ * Re-querying and returning to page one is up to you, because only you know
+ * whether the current position should be kept.
  *
  * @since 0.1.0
  * @status stable
  * @aliases Page size, Rows per page
  * @documentation https://fusion.dev/helix/components/pagination
  *
+ * @event {Event} change - Fired after the size changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the size changes, and cancelable. Canceling it is the only way to stop a size change.
+ * @event {Event} input - Fired after the size changes, with `change`.
  *
  * @csspart control - The select.
  * @csspart control-feedback - The message that says what is wrong with the value.
@@ -163,6 +166,10 @@ export class HelixHeadlessPaginationSize extends HelixElement {
         const previous = this.value
         this.valueState = size
         this.requestUpdate('value', previous)
+        /* The notification, in the shape `HelixFormElement` gives every value
+           control: `input` composed, as the platform's is, and `change` not. */
+        this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+        this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
       },
       event: (size) => new HelixBeforeChangeEvent({ value: String(size) }),
       host: this,
@@ -183,6 +190,16 @@ export class HelixHeadlessPaginationSize extends HelixElement {
         control.value = String(this.current)
       }
     })
+  }
+
+  /**
+   * The select's own `input` and `change`, stopped so this element is the one
+   * voice for a size. `input` is composed, so left alone it crossed this
+   * shadow boundary and arrived looking like this element's, with no `change`
+   * after it, and a refused size still sent it.
+   */
+  private readonly stopNative = (event: Event): void => {
+    event.stopPropagation()
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -220,6 +237,8 @@ export class HelixHeadlessPaginationSize extends HelixElement {
       label=${this.label}
       .value=${String(this.current)}
       @helix-before-change=${this.handleChange}
+      @input=${this.stopNative}
+      @change=${this.stopNative}
     >
       ${this.options.map(
         (size) =>

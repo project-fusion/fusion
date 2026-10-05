@@ -242,6 +242,50 @@ describe('splitter settling', () => {
     await host.updateComplete
     expect(host.position).toBe(30)
   })
+
+  /* The two requests are proposals another listener may refuse, so a consumer
+     storing the layout needs the notification after each, sent once the state
+     is on the element. */
+  test('a settling that stood is announced again once it has happened', async () => {
+    const host = await splitter('default-position="50" step="5"')
+    const heard: string[] = []
+    host.addEventListener('helix-resized', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${host.position}`)
+      expect(event.cancelable).toBe(false)
+    })
+    await press(host, 'ArrowRight')
+    expect(heard).toEqual(['55@55'])
+  })
+
+  test('and a refused one is not, while the collapse it reached still is', async () => {
+    const host = (await splitter('default-position="40" collapsed-size="10"')) as Splitter & {
+      collapsed?: 'end' | 'start'
+    }
+    host.addEventListener('helix-before-resize', (event) => event.preventDefault())
+    const heard: string[] = []
+    host.addEventListener('helix-resized', () => heard.push('resized'))
+    host.addEventListener('helix-collapse', (event) => {
+      heard.push(
+        `collapse ${(event as CustomEvent<{ value: string }>).detail.value}@${host.collapsed}`,
+      )
+    })
+    await press(host, 'Home')
+    expect(heard).toEqual(['collapse start@start'])
+  })
+
+  test('Enter reopening a shut pane is announced as a collapse to nothing', async () => {
+    const host = (await splitter('default-position="40"')) as Splitter & {
+      collapsed?: 'end' | 'start'
+    }
+    await press(host, 'Enter')
+    const heard: string[] = []
+    host.addEventListener('helix-collapse', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    await press(host, 'Enter')
+    expect(heard).toEqual([''])
+    expect(host.collapsed).toBeUndefined()
+  })
 })
 
 const nested = async (

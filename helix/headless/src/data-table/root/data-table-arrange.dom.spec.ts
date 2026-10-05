@@ -81,6 +81,20 @@ describe('selection', () => {
     ])
   })
 
+  /* `helix-select` is the request, so a consumer storing the selection needs
+     the notification after it, sent once `selected` has moved. */
+  test('a choice that stood is announced again as `helix-selected`', async () => {
+    const element = await table('selectable row-key="id"')
+    const heard: string[] = []
+    element.addEventListener('helix-selected', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${element.selected}`)
+      expect(event.cancelable).toBe(false)
+    })
+    boxes(element)[1]?.requestChecked(true)
+    await element.updateComplete
+    expect(heard).toEqual(['d@d'])
+  })
+
   test('refusing the choice leaves the selection as it was', async () => {
     const element = await table('selectable row-key="id" default-selected="a"')
     element.addEventListener('helix-select', (event) => event.preventDefault())
@@ -211,6 +225,28 @@ describe('column order', () => {
     )
     await element.updateComplete
     expect(element.order).toBe('size name')
+  })
+
+  test('a move that stood is announced again as `helix-reordered`, and a refused one is not', async () => {
+    const element = await table('reorderable')
+    const heard: string[] = []
+    element.addEventListener('helix-reordered', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${element.order}`)
+    })
+    const grip = (field: string): HTMLElement =>
+      element
+        .querySelector(`helix-headless-table-column[field="${field}"]`)
+        ?.shadowRoot?.querySelector('[part="grip"]') as HTMLElement
+    grip('name').dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowRight' }),
+    )
+    await element.updateComplete
+    element.addEventListener('helix-reorder', (event) => event.preventDefault())
+    grip('name').dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowLeft' }),
+    )
+    await element.updateComplete
+    expect(heard).toEqual(['size name@size name'])
   })
 
   /* Counted among all of them, the step went past the hidden column: the order

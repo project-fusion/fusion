@@ -250,6 +250,35 @@ describe('the pin', () => {
     expect(seen).toEqual([{ value: 'true' }])
   })
 
+  /* The request is a proposal another listener may refuse, so a consumer
+     following the pin needs the notification after it. */
+  test('a pin that stood is announced again once it has happened', async () => {
+    const element = await chat()
+    element.pinned = false
+    await element.updateComplete
+    const heard: string[] = []
+    element.addEventListener('helix-pin', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${element.pinned}`)
+      expect(event.cancelable).toBe(false)
+    })
+    element.resume()
+    expect(heard).toEqual(['true@true'])
+  })
+
+  test('and a refused one is not', async () => {
+    const element = await chat()
+    element.pinned = false
+    await element.updateComplete
+    element.addEventListener('helix-before-pin', (event) => event.preventDefault())
+    let heard = false
+    element.addEventListener('helix-pin', () => {
+      heard = true
+    })
+    element.resume()
+    expect(heard).toBe(false)
+    expect(element.pinned).toBe(false)
+  })
+
   /**
    * A reflected property with a truthy default writes its attribute on upgrade
    * whether or not the consumer wrote one, so the server serves one set of

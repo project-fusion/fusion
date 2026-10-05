@@ -3,6 +3,7 @@ import {
   deepActiveElement,
   fillTemplate,
   formatNumbers,
+  HelixActivateEvent,
   HelixElement,
   HelixNavigateEvent,
   hostAria,
@@ -107,6 +108,7 @@ const fill = (
  * @slot next-icon - The glyph on the forward-one-page control, usually a caret.
  * @slot previous-icon - The glyph on the back-one-page control, usually a caret.
  *
+ * @event {HelixActivateEvent} helix-activate - Fired after the page changes, with the new page as a string in `detail.value`. In `href` mode it comes a task after the click, once the page has moved.
  * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. Canceling it is the only way to stop a page change. `detail.page` is the page asked for, as a number, and `detail.value` is the same page as a string.
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
@@ -482,6 +484,10 @@ export class HelixHeadlessPagination extends HelixElement {
     const previous = this.page
     this.pageState = page
     this.requestUpdate('page', previous)
+    /* The notification after the request, the one a set sends once a
+       different member is current: `helix-navigate` is a proposal another
+       listener may refuse, so it cannot tell a consumer where the reader is. */
+    this.dispatchEvent(new HelixActivateEvent({ value: String(page) }))
   }
 
   /**

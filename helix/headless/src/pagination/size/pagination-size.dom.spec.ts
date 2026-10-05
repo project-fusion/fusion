@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -140,6 +140,45 @@ describe('pagination size', () => {
     await it.updateComplete
     expect(announced).toBe('25')
     expect(it.value).toBe(25)
+  })
+
+  /* A value control's notification, `input` and `change` together as a native
+     `<select>` sends them, from this element and once the size is on it. The
+     select inside sends its own, which are stopped: `input` is composed and
+     reached the page looking like this element's. */
+  test('says input and change once the size has moved, from itself alone', async () => {
+    const it = (await mount(
+      '<helix-headless-pagination-size default-value="10" sizes="10,25"></helix-headless-pagination-size>',
+    )) as Size
+    await settle(it)
+    const heard: string[] = []
+    for (const type of ['change', 'input']) {
+      it.addEventListener(type, (event) => {
+        heard.push(`${type}@${(event.composedPath()[0] as Element).localName}:${it.value}`)
+      })
+    }
+    ;(control(it) as unknown as { requestValue(next: string): boolean }).requestValue('25')
+    await settle(it)
+    expect(heard.toSorted()).toEqual([
+      'change@helix-headless-pagination-size:25',
+      'input@helix-headless-pagination-size:25',
+    ])
+  })
+
+  test('and says nothing when the size was refused', async () => {
+    const it = (await mount(
+      '<helix-headless-pagination-size default-value="10" sizes="10,25"></helix-headless-pagination-size>',
+    )) as Size
+    await settle(it)
+    it.addEventListener('helix-before-change', (event) => event.preventDefault())
+    const heard: string[] = []
+    for (const type of ['change', 'input']) {
+      it.addEventListener(type, () => heard.push(type))
+    }
+    ;(control(it) as unknown as { requestValue(next: string): boolean }).requestValue('25')
+    await settle(it)
+    expect(heard).toEqual([])
+    expect(it.value).toBe(10)
   })
 })
 
