@@ -54,3 +54,31 @@ describe('one description list pair', () => {
     expect(host.getAttributeNames()).toEqual(['label'])
   })
 })
+
+/**
+ * Several values for one label. A term with three authors was three items
+ * with the same label; written as `<dd>` elements, they are one term and its
+ * three descriptions, as in a native `<dl>`.
+ */
+describe('a pair with several values', () => {
+  test('puts the consumer’s `<dd>` elements after its `<dt>`, in place of its own', async () => {
+    const host = await item('label="Authors"', '<dd>Ada Lovelace</dd><dd>Grace Hopper</dd>')
+    await host.updateComplete
+    expect(part(host, 'value')).toBeNull()
+    expect(part(host, 'label')?.localName).toBe('dt')
+    const slot = host.shadowRoot?.querySelector('slot:not([name])') as HTMLSlotElement
+    expect(slot.parentElement).toBeNull()
+    expect(slot.assignedElements().map((one) => one.textContent)).toEqual([
+      'Ada Lovelace',
+      'Grace Hopper',
+    ])
+  })
+
+  test('takes its own `<dd>` back when the values are text again', async () => {
+    const host = await item('label="Authors"', '<dd>Ada Lovelace</dd>')
+    host.replaceChildren(document.createTextNode('Ada Lovelace'))
+    await host.updateComplete
+    await host.updateComplete
+    expect(part(host, 'value')?.localName).toBe('dd')
+  })
+})
