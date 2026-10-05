@@ -905,7 +905,11 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     super.updated(changed)
     this.releaseCaret?.()
     this.releaseCaret = undefined
-    this.internals.setFormValue(this.formValue())
+    /* The text as the restore state, because with tokens the value is a
+       `FormData`, and a page the browser brings back would hand that back to
+       a restore that reads text: the field came back empty. The tokens are
+       your elements, and come back with your markup. */
+    this.internals.setFormValue(this.formValue(), this.value)
     this.sayCount()
     /* The control's own validity, anchored on it, the way `Input` takes it.
        The control is in this shadow root and takes no part in the form, so
