@@ -912,6 +912,34 @@ describe('the months and the years', () => {
     expect(root(cal).querySelector('[part="periods"]')?.getAttribute('aria-label')).toBe('2004')
   })
 
+  test('a year chosen keeps the month in view, or the nearest month the bounds allow', async () => {
+    const focused = (cal: Viewing): string | null | undefined =>
+      periods(cal)
+        .find((one) => one.getAttribute('tabindex') === '0')
+        ?.getAttribute('aria-label')
+    const cal = (await calendar('default-month="2026-08" max-view="year" view="year"')) as Viewing
+    periods(cal)
+      .find((one) => one.textContent === '2020')
+      ?.click()
+    await cal.updateComplete
+    expect(cal.view).toBe('month')
+    expect(focused(cal)).toBe('Aug 2020')
+    const bounded = (await calendar(
+      'default-month="2026-08" max-view="year" view="year" max="2027-03-15"',
+    )) as Viewing
+    periods(bounded)
+      .find((one) => one.textContent === '2027')
+      ?.click()
+    await bounded.updateComplete
+    expect(focused(bounded)).toBe('Mar 2027')
+  })
+
+  test('a date in year 1 is a date, shown in a month of year 1', async () => {
+    const cal = (await calendar('value="0001-08-04"')) as Viewing
+    expect(cal.month).toBe('0001-08')
+    expect((cal as unknown as { validity: ValidityState }).validity.valid).toBe(true)
+  })
+
   test('a month outside the bounds is offered as unavailable and refuses a press', async () => {
     const cal = (await calendar('default-month="2026-08" min="2026-04-10" view="month"')) as Viewing
     expect(periods(cal)[2]?.getAttribute('aria-disabled')).toBe('true')

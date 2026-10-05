@@ -93,6 +93,7 @@ describe('input date server output', () => {
     expect(hasPart(markup, 'control')).toBe(false)
     const order = [...shadow.matchAll(/data-segment="([a-z]+)"/gi)].map((match) => match[1])
     expect(order).toEqual(['day', 'month', 'year'])
-    expect(shadow).toContain('aria-label="Monat"')
+    expect(shadow).toContain('aria-label="Monat,"')
+    expect(shadow).toContain('aria-labelledby="control-month label"')
   })
 })

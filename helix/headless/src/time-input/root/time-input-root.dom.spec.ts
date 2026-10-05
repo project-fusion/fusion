@@ -237,6 +237,19 @@ describe('a time input with seconds and a clock of its own', () => {
     expect(internals(host).validity.badInput).toBe(true)
   })
 
+  test('a time before min or past max sets the flag a time input sets', async () => {
+    const host = await field('min="09:00" max="17:00" disable-times="12:00"')
+    await type(host, '08:30')
+    expect(internals(host).validity.rangeUnderflow).toBe(true)
+    expect(internals(host).validity.badInput).toBeFalsy()
+    await type(host, '18:00')
+    expect(internals(host).validity.rangeOverflow).toBe(true)
+    await type(host, '12:00')
+    expect(internals(host).validity.badInput).toBe(true)
+    await type(host, '10:00')
+    expect(internals(host).validity.valid).toBe(true)
+  })
+
   test('hour-cycle writes the field and the list on the clock it names', async () => {
     const host = await field('locale="en-US" hour-cycle="h23" default-value="14:05"')
     expect(control(host).value).toBe('14:05')

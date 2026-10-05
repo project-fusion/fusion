@@ -23,7 +23,10 @@ import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
 import type { MixinControllerValueInterface } from '../mixin-controller-value/mixin-controller-value.js'
 import type { MixinFieldInterface } from '../mixin-field/mixin-field.js'
-import type { MixinPickerFieldInterface } from '../mixin-picker-field/mixin-picker-field.js'
+import {
+  type MixinPickerFieldInterface,
+  verdictFlags,
+} from '../mixin-picker-field/mixin-picker-field.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -345,7 +348,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       }
       const anchor = this.anchor ?? undefined
       const partial = isPartial(this.segmentedKind, this.parts, this.layout)
-      const message = this.validate()
+      const fault = verdictFlags(this.validate())
       if (partial) {
         this.internals.setValidity(
           { badInput: true },
@@ -360,8 +363,8 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
             (this.segmentedKind === 'date' ? 'Enter a date.' : 'Enter a time.'),
           anchor,
         )
-      } else if (message !== '') {
-        this.internals.setValidity({ badInput: true }, message, anchor)
+      } else if (fault !== null) {
+        this.internals.setValidity(fault[0], fault[1], anchor)
       } else {
         this.internals.setValidity({})
       }
@@ -393,13 +396,22 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
           const { max, min } = segmentRange(kind, this.parts, twelve)
           const text = segmentText(kind, this.parts, twelve, locale)
           const empty = shown === undefined
+          const id = `${this.controlId}-${kind}`
+          const editable = !this.isDisabled && !(this as { readOnly?: boolean }).readOnly
+          /* Named with the field's label after its own, "month, Starts", as
+             React Aria names a segment: VoiceOver on iOS does not read a
+             group's name, so a segment named "month" alone left the reader
+             unsure which date it was in. */
           return html`<span
             part="segment${empty ? ' segment-placeholder' : ''}"
+            id=${id}
             data-segment=${kind}
             role="spinbutton"
             tabindex=${this.isDisabled ? '-1' : '0'}
             inputmode=${kind === 'dayPeriod' ? nothing : 'numeric'}
-            aria-label=${segmentName(kind, locale)}
+            enterkeyhint=${editable ? 'next' : nothing}
+            aria-label=${this.labeled ? `${segmentName(kind, locale)},` : segmentName(kind, locale)}
+            aria-labelledby=${this.labeled ? `${id} ${this.labelId}` : nothing}
             aria-valuemin=${min}
             aria-valuemax=${max}
             aria-valuenow=${shown ?? nothing}

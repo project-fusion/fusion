@@ -633,7 +633,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
   }
 
   /** What is wrong with the dates, which the text input cannot say. */
-  protected override validate(): string {
+  protected override validate(): string | readonly [keyof ValidityStateFlags, string] {
     /* Bounds are checked here rather than left to the input, which is `text`
        and has no idea what a date is: `min` and `max` on a text input do
        nothing, and `type="date"` is what was given up to own the calendar.
@@ -654,15 +654,25 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     /* The bound as the field writes a date, the way Time Input writes its
        own: a reader who sees "4 Aug 2026" in the field is told about the same
        day in the same words. */
+    /* Each with the flag a native date input sets for it, as Date Picker
+       reports them: `rangeUnderflow`, `rangeOverflow` and `stepMismatch`. A
+       date the calendar bars by name is `badInput`, React Aria's choice for an
+       unavailable date, there being no native flag for one. */
     if (this.min !== '' && held.some((one) => one < this.min)) {
-      return fillTemplate(this.rangeUnderflowMessage || 'Choose a date on or after {min}.', {
-        min: this.written(this.min),
-      })
+      return [
+        'rangeUnderflow',
+        fillTemplate(this.rangeUnderflowMessage || 'Choose a date on or after {min}.', {
+          min: this.written(this.min),
+        }),
+      ]
     }
     if (this.max !== '' && held.some((one) => one > this.max)) {
-      return fillTemplate(this.rangeOverflowMessage || 'Choose a date on or before {max}.', {
-        max: this.written(this.max),
-      })
+      return [
+        'rangeOverflow',
+        fillTemplate(this.rangeOverflowMessage || 'Choose a date on or before {max}.', {
+          max: this.written(this.max),
+        }),
+      ]
     }
     /* What the calendar bars, a typed or seeded date is barred from too.
        Measured before this: a weekend typed into a field that disables
@@ -675,7 +685,10 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       return this.unavailableMessage || 'Choose a date that is available.'
     }
     if (why.includes('step')) {
-      return this.stepMismatchMessage || 'Choose one of the dates the calendar offers.'
+      return [
+        'stepMismatch',
+        this.stepMismatchMessage || 'Choose one of the dates the calendar offers.',
+      ]
     }
     if (this.mode === 'range' && held.length > 2) {
       return this.rangeLengthMessage || 'A range is two dates.'

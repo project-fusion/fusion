@@ -120,10 +120,31 @@ export declare class MixinPickerFieldInterface {
    *
    * The one check the platform cannot make: the control is `type="text"` and
    * has no idea what a date, a time or a color is, so the family says what one
-   * looks like and `sync` reports it as `badInput`. Empty means the platform's
-   * own verdict stands.
+   * looks like. A message alone is reported as `badInput`; a flag and a
+   * message, such as `['rangeUnderflow', 'Choose a date on or after…']`, sets
+   * that flag, as a native date input does for its `min`. Empty means the
+   * platform's own verdict stands.
    */
-  protected validate(): string
+  protected validate(): PickerVerdict
+}
+
+/**
+ * What a picker field finds wrong: a message, reported as `badInput`, or the
+ * validity flag to set and its message. Empty means nothing is wrong.
+ */
+export type PickerVerdict = string | readonly [flag: keyof ValidityStateFlags, message: string]
+
+/**
+ * A verdict as the flags and the message `setValidity` takes, or `null` where
+ * there is nothing wrong.
+ */
+export const verdictFlags = (
+  verdict: PickerVerdict,
+): [flags: ValidityStateFlags, message: string] | null => {
+  if (typeof verdict === 'string') {
+    return verdict === '' ? null : [{ badInput: true }, verdict]
+  }
+  return [{ [verdict[0]]: true }, verdict[1]]
 }
 
 /**
@@ -277,7 +298,7 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
     /**
      * What is wrong with the value, in the reader's words, or nothing.
      */
-    protected validate(): string {
+    protected validate(): PickerVerdict {
       return ''
     }
 
@@ -319,11 +340,11 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
       if (!control) {
         return
       }
-      const message = this.validate()
-      if (message === '') {
+      const fault = verdictFlags(this.validate())
+      if (fault === null) {
         this.copyValidity(control)
       } else {
-        this.internals.setValidity({ badInput: true }, message, control)
+        this.internals.setValidity(fault[0], fault[1], control)
       }
       this.refreshFeedback()
     }

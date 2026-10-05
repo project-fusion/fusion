@@ -1,4 +1,4 @@
-import { valueAsDate as asDate, dateAsValue as fromDate } from '../value-as/value-as.js'
+import { valueAsDate as asDate, dateAsValue as fromDate, utcDate } from '../value-as/value-as.js'
 import { writtenList } from '../written-list/written-list.js'
 
 /*
@@ -48,11 +48,11 @@ export const weekStartOf = (locale: string): number => {
 
 /** A month as `YYYY-MM`. */
 export const monthOf = (date: Date): string =>
-  `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
+  `${String(date.getUTCFullYear()).padStart(4, '0')}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`
 
 /** A date some days away, which may be negative, at midnight UTC. */
 export const addDays = (date: Date, days: number): Date =>
-  new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + days))
+  utcDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + days)
 
 /** Whether two dates fall in the same month of the same year. */
 export const sameMonth = (left: Date, right: Date): boolean =>
@@ -63,11 +63,9 @@ export const sameMonth = (left: Date, right: Date): boolean =>
  * last of a short one instead of rolling into the month after it.
  */
 export const addMonths = (date: Date, months: number): Date => {
-  const target = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + months, 1))
-  const last = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate()
-  return new Date(
-    Date.UTC(target.getUTCFullYear(), target.getUTCMonth(), Math.min(date.getUTCDate(), last)),
-  )
+  const target = utcDate(date.getUTCFullYear(), date.getUTCMonth() + months, 1)
+  const last = utcDate(target.getUTCFullYear(), target.getUTCMonth() + 1, 0).getUTCDate()
+  return utcDate(target.getUTCFullYear(), target.getUTCMonth(), Math.min(date.getUTCDate(), last))
 }
 
 /** What bars a date, besides `min` and `max`. */
@@ -200,7 +198,7 @@ export const periodCells = ({ max, min, page, shown, today, view }: PeriodPage):
   const start = years ? yearPageOf(page) : page
   return Array.from({ length: 12 }, (_, index) => {
     const at = years ? start + index : index
-    const first = new Date(Date.UTC(years ? at : start, years ? 0 : index, 1))
+    const first = utcDate(years ? at : start, years ? 0 : index, 1)
     return {
       at,
       chosen: years ? at === shown.getUTCFullYear() : monthOf(first) === monthOf(shown),

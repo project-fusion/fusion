@@ -116,7 +116,26 @@ describe('a row of segments', () => {
   test('follows the locale, German writing the day first', async () => {
     const host = await mount('value="2026-08-04" locale="de-DE"')
     expect(segments(host).map((one) => one.dataset.segment)).toEqual(['day', 'month', 'year'])
-    expect(segment(host, 'month').getAttribute('aria-label')).toBe('Monat')
+    expect(segment(host, 'month').getAttribute('aria-label')).toBe('Monat,')
+  })
+
+  test('names each segment with the field label after its own, and offers Next', async () => {
+    const host = await mount('value="2026-08-04"')
+    const month = segment(host, 'month')
+    expect(month.getAttribute('aria-label')).toBe('month,')
+    expect(month.getAttribute('aria-labelledby')).toBe(`${month.id} label`)
+    expect(month.getAttribute('enterkeyhint')).toBe('next')
+    host.setAttribute('disabled', '')
+    await host.updateComplete
+    expect(month.hasAttribute('enterkeyhint')).toBe(false)
+  })
+
+  test('names a segment by its own name where the field has no label', async () => {
+    document.body.innerHTML = `<${tag} segmented value="2026-08-04"></${tag}>`
+    const host = document.querySelector(tag) as Probe
+    await host.updateComplete
+    expect(segment(host, 'month').getAttribute('aria-label')).toBe('month')
+    expect(segment(host, 'month').hasAttribute('aria-labelledby')).toBe(false)
   })
 
   test('is the text field without `segmented`', async () => {
