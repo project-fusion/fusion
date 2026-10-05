@@ -6,6 +6,10 @@
  * open. Everything below is a Helix token or a documented hook, so a theme
  * changes it, and both color modes follow from one copy.
  *
+ * **Your brand color is one line.** With no brand set, Helix draws in ink,
+ * near-black in light mode and near-white in dark. Set `--helix-seed-brand` on
+ * `:root`, and every token follows it.
+ *
  * **Color appears in two places, and both are named.** The wordmark takes
  * `--helix-color-brand-mark`, the token for the brand as a graphic, and a
  * chosen row takes `--helix-color-primary-subtle` through the parts the table
