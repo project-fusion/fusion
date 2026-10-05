@@ -21,6 +21,9 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessTag } from '../root/tag-root.js'
 
+/** How many tags a group lets a reader select: core's `SelectionMode`. */
+export type TagSelectionMode = SelectionMode
+
 /**
  * @summary A set of tags that the arrow keys move through, and that can be removed and selected from the keyboard.
  *
@@ -61,9 +64,6 @@ import { HelixHeadlessTag } from '../root/tag-root.js'
  *
  * @csspart empty - Holds the `empty` slot while the group has no tags, rendered only then. Takes focus when the last tag is removed.
  */
-/** How many tags a group lets a reader select: core's `SelectionMode`. */
-export type TagSelectionMode = SelectionMode
-
 @customElement('helix-headless-tag-group')
 export class HelixHeadlessTagGroup extends HelixElement {
   /**

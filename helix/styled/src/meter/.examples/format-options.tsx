@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-meter
-      format-options='{"style":"unit","unit":"gigabyte"}'
+      formatOptions={{ style: 'unit', unit: 'gigabyte' }}
       high={28}
       label="Storage"
       low={16}

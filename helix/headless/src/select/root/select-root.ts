@@ -626,21 +626,6 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   }
 
   /**
-   * What names the trigger: the label, then the choice.
-   *
-   * **A button is named by its label alone**, and what it shows is not read:
-   * the `<label for>` wins over the button's own text. Read from Chromium's
-   * tree, a Select showing "Spanish" was a button named "Language", with the
-   * choice in no name or value, so a reader never heard what was chosen. A
-   * native `<select>` says both, and this names the trigger by both, the label
-   * and then the value, in that order.
-   *
-   * A consumer's own `aria-labelledby` on the host wins, and so does a
-   * `<label>` that names the host where there is no `label`. Both are carried
-   * to the trigger by `AriaForwardController`, which reads the value after
-   * them, so nothing is written here to fight it.
-   */
-  /**
    * What names the list once it opens: the `label`, the host's `aria-label`,
    * or the words of what names the host from outside, its `aria-labelledby`
    * or a `<label>` for it.
@@ -665,6 +650,21 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       .join(' ')
   }
 
+  /**
+   * What names the trigger: the label, then the choice.
+   *
+   * **A button is named by its label alone**, and what it shows is not read:
+   * the `<label for>` wins over the button's own text. Read from Chromium's
+   * tree, a Select showing "Spanish" was a button named "Language", with the
+   * choice in no name or value, so a reader never heard what was chosen. A
+   * native `<select>` says both, and this names the trigger by both, the label
+   * and then the value, in that order.
+   *
+   * A consumer's own `aria-labelledby` on the host wins, and so does a
+   * `<label>` that names the host where there is no `label`. Both are carried
+   * to the trigger by `AriaForwardController`, which reads the value after
+   * them, so nothing is written here to fight it.
+   */
   private get triggerNames(): string | typeof nothing {
     const outside = (this.internals.labels?.length ?? 0) > 0 && !this.labeled
     if (this.hasAttribute('aria-labelledby') || outside) {

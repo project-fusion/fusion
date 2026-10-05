@@ -57,7 +57,8 @@ describe('a region awaited', () => {
     await settle()
     root.append(document.createElement('p'))
     await settle()
-    expect(found).toEqual([region])
+    expect(found.length).toBe(1)
+    expect(found[0]).toBe(region)
     root.remove()
   })
 
@@ -75,7 +76,7 @@ describe('a region awaited', () => {
     region.id = 'late'
     root.append(region)
     await settle()
-    expect(found).toEqual([])
+    expect(found.length).toBe(0)
     root.remove()
   })
 })

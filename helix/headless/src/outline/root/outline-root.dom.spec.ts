@@ -1,6 +1,9 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
+/* Browser only: happy-dom lays nothing out. */
+const inBrowser = hasLayout() ? test : (): void => {}
+
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
@@ -261,9 +264,12 @@ describe('the heading slot', () => {
 /* Browser only: which box scrolls is a question of layout. */
 describe('following the section in view', () => {
   const rail = async (attrs: string) => {
-    const links = Array.from({ length: 40 }, (_, at) => `<a href="#s${at}">Section ${at}</a>`).join(
-      '',
-    )
+    /* One link to a line, so the rail is taller than its box at any width:
+       inline links share lines, and a wide page fitted the thirtieth in view. */
+    const links = Array.from(
+      { length: 40 },
+      (_, at) => `<a href="#s${at}" style="display: block">Section ${at}</a>`,
+    ).join('')
     const sections = Array.from(
       { length: 40 },
       (_, at) => `<section id="s${at}" style="block-size: 400px"><h2>Section ${at}</h2></section>`,
@@ -278,24 +284,21 @@ describe('following the section in view', () => {
     return { box: root.querySelector('#rail') as HTMLElement, outline, root }
   }
 
-  test.if(hasLayout())(
-    'scrolls the rail to the link of the section in view, and only the rail',
-    async () => {
-      const { box, outline, root } = await rail('follow behavior="smooth"')
-      root
-        .querySelector<HTMLAnchorElement>('a[href="#s30"]')
-        ?.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }))
-      await outline.updateComplete
-      const link = root.querySelector('a[href="#s30"]') as HTMLElement
-      const shown = box.getBoundingClientRect()
-      const at = link.getBoundingClientRect()
-      expect(at.top).toBeGreaterThanOrEqual(shown.top - 1)
-      expect(at.bottom).toBeLessThanOrEqual(shown.bottom + 1)
-      expect(box.scrollTop).toBeGreaterThan(0)
-    },
-  )
+  inBrowser('scrolls the rail to the link of the section in view, and only the rail', async () => {
+    const { box, outline, root } = await rail('follow behavior="smooth"')
+    root
+      .querySelector<HTMLAnchorElement>('a[href="#s30"]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, cancelable: true }))
+    await outline.updateComplete
+    const link = root.querySelector('a[href="#s30"]') as HTMLElement
+    const shown = box.getBoundingClientRect()
+    const at = link.getBoundingClientRect()
+    expect(at.top).toBeGreaterThanOrEqual(shown.top - 1)
+    expect(at.bottom).toBeLessThanOrEqual(shown.bottom + 1)
+    expect(box.scrollTop).toBeGreaterThan(0)
+  })
 
-  test.if(hasLayout())('leaves the rail where it is without follow', async () => {
+  inBrowser('leaves the rail where it is without follow', async () => {
     const { box, outline, root } = await rail('behavior="smooth"')
     root
       .querySelector<HTMLAnchorElement>('a[href="#s30"]')

@@ -403,7 +403,9 @@ export class HelixHeadlessQrCode extends HelixElement {
     setTimeout(() => URL.revokeObjectURL(url))
   }
 
-  private renderCode(result: ReturnType<typeof encode> | undefined): SVGTemplateResult | typeof nothing {
+  private renderCode(
+    result: ReturnType<typeof encode> | undefined,
+  ): SVGTemplateResult | typeof nothing {
     if (result === undefined) {
       return nothing
     }

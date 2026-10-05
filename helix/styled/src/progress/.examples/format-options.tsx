@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-progress
-      format-options='{"style":"unit","unit":"megabyte"}'
+      formatOptions={{ style: 'unit', unit: 'megabyte' }}
       label="Uploading"
       max={120}
       show-value

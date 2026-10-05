@@ -49,7 +49,7 @@ import { nearestStep } from '../steps.js'
  * @event {Event} change - The score was chosen. Sent together with `input`, because each choice commits the score.
  * @event {HelixBeforeChangeEvent} helix-before-change - The score is about to change. Cancelable: cancel it to keep the current score.
  * @event {HelixClearEvent} helix-clear - The rating went back to unrated, under `clearable`. Sent after `input` and `change`.
- * @event {HelixPreviewEvent} helix-preview - The score under the pointer, shown before it is chosen, or `''` once the marks show the score again. Sent as the preview changes, not on every move.
+ * @event {HelixPreviewEvent} helix-preview - The score under the pointer, shown before it is chosen, or `''` once the marks show the score again. Sent once each time the preview changes.
  * @event {Event} input - The score changed.
  *
  * @csspart feedback - The message that says what is wrong.

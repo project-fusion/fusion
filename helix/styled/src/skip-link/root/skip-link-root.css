@@ -16,7 +16,7 @@
   border: var(--helix-space-none);
   clip-path: inset(50%);
   inline-size: 1px;
-  margin: -1px;
+  margin: var(--helix-space-none);
   overflow: hidden;
   padding: var(--helix-space-none);
   position: absolute;

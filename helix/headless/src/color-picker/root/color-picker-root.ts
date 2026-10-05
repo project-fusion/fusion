@@ -800,6 +800,11 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     this.settle()
   }
 
+  /** @internal `feedback` marks the picker invalid, as a field's does. */
+  protected override get validityFeedback(): string {
+    return this.feedback
+  }
+
   /**
    * Reports "required and empty", or clears it.
    *
@@ -808,11 +813,6 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    * the browser's bubble points at the thing to do rather than at the row that
    * states the result.
    */
-  /** @internal `feedback` marks the picker invalid, as a field's does. */
-  protected override get validityFeedback(): string {
-    return this.feedback
-  }
-
   private reportRequired(): void {
     if (this.required && this.value === '') {
       this.internals.setValidity(

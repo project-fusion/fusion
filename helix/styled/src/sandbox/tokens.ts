@@ -5,7 +5,7 @@ export interface SandboxToken {
    * `name`, `string` or `tag`, which each have a color. Absent for text that is
    * not a token, such as spaces and punctuation.
    */
-  kind?: string
+  kind?: string | undefined
   /** The text of the run, exactly as the source has it. */
   text: string
 }

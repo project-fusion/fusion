@@ -43,7 +43,7 @@ describe('quote', () => {
 
   /* Radix Themes' Quote is set in the paragraph's type; a page setting a
      pull quote inline wants a face and a weight of its own. */
-  test('the face and the weight are hooks that rest on the paragraph\'s own', () => {
+  test("the face and the weight are hooks that rest on the paragraph's own", () => {
     expect(rule('[part="quote"]')).toContain('font-family: var(--quote-font-family, inherit)')
     expect(rule('[part="quote"]')).toContain('font-weight: var(--quote-font-weight, inherit)')
   })
