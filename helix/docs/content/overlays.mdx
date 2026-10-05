@@ -153,7 +153,10 @@ it through the same cancelable request as its close control. A `Drawer` with
 with `Tab` to a control past the edge of the window opens it the rest of the
 way, and `snapTo()` moves it from script. In a
 `Lightbox`, a swipe across the viewer shows the next or the previous item. A
-mouse never swipes, because dragging with a mouse selects text.
+mouse never swipes, because dragging with a mouse selects text. A `Lightbox`
+with `max-zoom` also zooms: pinch the item, or double click or double tap it,
+and drag it about once zoomed. It swipes only while the item is at its own
+size.
 
 ## Choose an overlay
 
