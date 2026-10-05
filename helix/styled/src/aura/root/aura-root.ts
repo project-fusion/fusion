@@ -117,12 +117,6 @@ const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software rasterizer|bas
  * allow. Its behavior is drawing to a canvas, so there is no structure for you
  * to restyle and nothing for a headless version to hold.
  *
- * @since 0.1.0
- * @status stable
- * @category media
- * @aliases Backdrop, Background, Atmosphere, Gradient
- * @documentation https://fusion.dev/helix/components/aura
- *
  * **Content placed inside sits over the field**, in a `content` part that
  * covers the aura, so an interactive aura answers the pointer over the
  * content too. Clicks still reach the content. Style `::part(content)` to
@@ -135,7 +129,15 @@ const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software rasterizer|bas
  * Where the gradient shows in place of the shader, the aura matches
  * `:state(fallback)` and sends `helix-aura-fallback` with the reason.
  *
+ * @since 0.1.0
+ * @status stable
+ * @category media
+ * @aliases Backdrop, Background, Atmosphere, Gradient
+ * @documentation https://fusion.dev/helix/components/aura
+ *
  * @slot - Content drawn over the field, such as a heading.
+ *
+ * @event {HelixAuraFallbackEvent} helix-aura-fallback - Fired each time the aura stops drawing its shader and shows its gradient, with the reason.
  *
  * @csspart canvas - The surface the shader draws into.
  * @csspart content - The box over the field that holds the content. It covers the aura.
@@ -146,8 +148,6 @@ const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software rasterizer|bas
  * @cssproperty --aura-peak - The hottest stop, at the center of a shape. Defaults to `--helix-color-primary-active` on a light page and `--helix-color-foreground` on a dark one.
  *
  * @cssstate fallback - The aura shows its gradient: the renderer draws on the CPU, there is no WebGL, or the browser took the context back. Cleared once the shader draws again.
- *
- * @event {HelixAuraFallbackEvent} helix-aura-fallback - Fired each time the aura stops drawing its shader and shows its gradient, with the reason.
  */
 @customElement('helix-aura')
 export class HelixAura extends HelixElement {

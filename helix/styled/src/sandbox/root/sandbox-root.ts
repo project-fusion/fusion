@@ -66,12 +66,12 @@ const PANEL_MAX = 0.8
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. The source pane dispatches it, and you can listen for it on the sandbox. Cancelable: cancel it to keep the source unchanged.
  * @event {HelixBeforePanelResizeEvent} helix-before-panel-resize - Fired before the panel's divider is released, with the panel's height in pixels. A panel dragged closed reports `panel-collapsed-size`, its smallest height. Cancelable: cancel it to keep the current height.
  * @event {HelixBeforeSplitEvent} helix-before-split - Fired before the panes' divider is released, with the lead pane's share. Cancelable: cancel it to keep the current split.
- * @event {HelixEditEvent} helix-edit - Fired after the source was edited, with the new source. The source pane dispatches it, and you can listen for it on the sandbox.
- * @event {HelixPanelResizeEvent} helix-panel-resize - Fired after the panel's divider settled at a new height, with the height in pixels.
- * @event {HelixSplitEvent} helix-split - Fired after the panes' divider settled somewhere new, with the lead pane's share.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves in the source. The source pane dispatches it, and you can listen for it on the sandbox.
  * @event {HelixConsoleEvent} helix-console - Fired once per console call in the preview frame. The preview pane dispatches it.
+ * @event {HelixEditEvent} helix-edit - Fired after the source was edited, with the new source. The source pane dispatches it, and you can listen for it on the sandbox.
+ * @event {HelixPanelResizeEvent} helix-panel-resize - Fired after the panel's divider settled at a new height, with the height in pixels.
  * @event {HelixResizeEvent} helix-resize - Fired by the preview pane when the height of the frame's content changes, with the new height.
+ * @event {HelixSplitEvent} helix-split - Fired after the panes' divider settled somewhere new, with the lead pane's share.
  *
  * @csspart body - The splitter holding the panes above the panel.
  * @csspart corner - The handle where the two dividers cross.
