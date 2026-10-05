@@ -1,6 +1,6 @@
 import { commaList, seriesKey } from '@fusion.dev/helix-core'
 
-/**
+/*
  * The names in a Legend's `hidden-series`, and what a toggle leaves there.
  *
  * Pure and beside the family's `index.ts`, because what a press does to the

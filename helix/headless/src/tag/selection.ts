@@ -1,6 +1,6 @@
 import { commaList, toggleValue } from '@fusion.dev/helix-core'
 
-/**
+/*
  * What a Tag Group's selection comes to, as arithmetic over its tags. Which
  * tag holds the tab stop is core's `rovingStop`.
  *
