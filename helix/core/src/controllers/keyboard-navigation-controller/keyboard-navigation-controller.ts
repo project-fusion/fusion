@@ -294,6 +294,11 @@ export class KeyboardNavigationController implements ReactiveController {
       return
     }
     const items = this.items().filter((item) => !item.disabled)
+    /* Nothing to move to, so the letter is not this set's to take. A closed
+       menu passes no items, and its trigger would otherwise swallow it. */
+    if (items.length === 0) {
+      return
+    }
     const from = this.current(items, event)
     if (this.origin === 'focus' && from === -1) {
       return

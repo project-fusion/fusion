@@ -362,6 +362,12 @@ describe('typeahead', () => {
     expect(asked).toEqual(['focus item-0', 'select item-0', 'focus item-1', 'select item-1'])
   })
 
+  test('leaves a letter alone where there is nothing to move to', () => {
+    const { asked, host } = named([])
+    expect(press(host, 'a')).toBe(false)
+    expect(asked).toEqual([])
+  })
+
   test('leaves a shortcut alone', () => {
     const { asked, host } = named(['Apple'])
     const event = new KeyboardEvent('keydown', {

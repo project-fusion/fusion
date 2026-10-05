@@ -57,7 +57,7 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @event {HelixBeforeCloseEvent} helix-before-close - The menu is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The menu is about to open. Cancelable: cancel it to keep it closed.
  * @event {HelixSelectEvent} helix-select - An item was chosen. Cancelable: cancel it to keep the menu open.
- * @event {Event} toggle - The menu opened or closed. The event carries `newState` and `oldState`.
+ * @event {ToggleEvent} toggle - The menu opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart back - The control that returns from a submenu.
  * @csspart back-mark - The glyph on the back control of a submenu.
@@ -174,7 +174,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   private tellTrigger(): void {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
-    tellDisclosure(slot?.assignedElements({ flatten: false })[0], this.open, 'menu')
+    /* Flattened, because a component that wraps a menu forwards its own
+       trigger slot into this one, and the element assigned here is then that
+       `<slot>`. The trigger is what it holds. */
+    tellDisclosure(slot?.assignedElements({ flatten: true })[0], this.open, 'menu')
   }
 
   /** The element the surface opens against. */
