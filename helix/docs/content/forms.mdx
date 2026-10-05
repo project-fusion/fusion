@@ -146,10 +146,16 @@ its message once the reader has edited the field.
 Tab, and pressing a `<label>` that names the control does the same. In a group,
 that is the chosen radio, or the first one when nothing is chosen.
 
-Pressing Enter in `Input`, `NumberInput`, or `PinInput` submits its form, as
-Enter in a native text field does. The form's first submit button is pressed,
-and a `helix-button type="submit"` counts as one, for a native field too. A form
-with no submit button is submitted when it has only one text field.
+Pressing Enter in a single-line field submits its form, as Enter in a native
+text field does. These fields do it:
+
+- `Input`, `NumberInput`, and `PinInput`
+- `DateInput`, `TimeInput`, and `ColorInput`
+- `Combobox`, while its list is closed
+
+The form's first submit button is pressed, and a `helix-button type="submit"`
+counts as one, for a native field too. A form with no submit button is
+submitted when it has only one text field.
 
 `Radio.Group` and `Toggle.Group` take part in the form for their members. Each
 group owns the `name`, the `value`, and the validity. A single radio is an
