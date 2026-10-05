@@ -273,3 +273,106 @@ describe('the tab stop and the keys that find a row', () => {
     expect([a?.open, b?.open]).toEqual([true, true])
   })
 })
+
+const settleTree = async (host: HTMLElement): Promise<Item[]> => {
+  const rows = [...host.querySelectorAll('helix-headless-tree-item')] as Item[]
+  for (let turn = 0; turn < 3; turn += 1) {
+    await (host as Tree).updateComplete
+    await Promise.all(rows.map((row) => row.updateComplete))
+    await new Promise((resolve) => setTimeout(resolve))
+  }
+  return rows
+}
+
+describe('a disabled item', () => {
+  /* Web Awesome's and Ark's disabled tree items: seen and reached, chosen and
+     opened by nothing a reader does. */
+  test('is reached by the arrows, says it is unavailable, and opens and chooses nothing', async () => {
+    const host = await mount(`
+      <helix-headless-tree label="Files">
+        <helix-headless-tree-item value="a">A</helix-headless-tree-item>
+        <helix-headless-tree-item value="b" disabled>B
+          <helix-headless-tree-item slot="children" value="c">C</helix-headless-tree-item>
+        </helix-headless-tree-item>
+      </helix-headless-tree>`)
+    const [a, b] = await settleTree(host)
+    await press(a as Item, 'ArrowDown')
+    expect(document.activeElement).toBe(b ?? null)
+    expect(part(b as Item, 'item')?.getAttribute('aria-disabled')).toBe('true')
+    await press(b as Item, 'Enter')
+    await press(b as Item, 'ArrowRight')
+    part(b as Item, 'row')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    await settleTree(host)
+    expect((b as Item).open).toBe(false)
+    expect((host as Tree & { active: string }).active).not.toBe('b')
+  })
+})
+
+describe('a lazy item', () => {
+  /* Web Awesome's lazy item: a branch with nothing in it yet, whose children
+     are fetched when it opens. */
+  test('is a branch before it has children, and asks for them when it opens', async () => {
+    const host = await mount(`
+      <helix-headless-tree label="Files">
+        <helix-headless-tree-item value="remote" lazy>Remote</helix-headless-tree-item>
+      </helix-headless-tree>`)
+    const [remote] = (await settleTree(host)) as [Item]
+    let asked = 0
+    host.addEventListener('helix-load', () => {
+      asked += 1
+    })
+    expect(part(remote, 'item')?.getAttribute('aria-expanded')).toBe('false')
+    await press(remote, 'ArrowRight')
+    await remote.updateComplete
+    expect(asked).toBe(1)
+    expect(part(remote, 'item')?.getAttribute('aria-busy')).toBe('true')
+  })
+})
+
+describe('a tree of check marks', () => {
+  const files = `
+    <helix-headless-tree label="Files" selection-mode="multiple">
+      <helix-headless-tree-item value="docs">Docs
+        <helix-headless-tree-item slot="children" value="a">A</helix-headless-tree-item>
+        <helix-headless-tree-item slot="children" value="b">B</helix-headless-tree-item>
+      </helix-headless-tree-item>
+      <helix-headless-tree-item value="c">C</helix-headless-tree-item>
+    </helix-headless-tree>`
+
+  /* Web Awesome's multiple selection and Ark's checkbox tree: a branch checks
+     what it holds, and says when it holds a mix. */
+  test('says it is multiselectable, and a branch checks every item under it', async () => {
+    const host = await mount(files)
+    const [docs, a, b, c] = (await settleTree(host)) as Item[]
+    expect(part(host, 'tree')?.getAttribute('aria-multiselectable')).toBe('true')
+    expect(part(c as Item, 'item')?.getAttribute('aria-checked')).toBe('false')
+    expect(part(c as Item, 'item')?.hasAttribute('aria-selected')).toBe(false)
+    part(docs as Item, 'checkbox')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    await settleTree(host)
+    expect((host as Tree & { values: string[] }).values).toEqual(['a', 'b'])
+    expect(part(docs as Item, 'item')?.getAttribute('aria-checked')).toBe('true')
+    expect((docs as Item).open).toBe(false)
+    ;(a as Item).select()
+    await settleTree(host)
+    expect(part(docs as Item, 'item')?.getAttribute('aria-checked')).toBe('mixed')
+    expect(part(docs as Item, 'checkbox')?.getAttribute('part')).toBe('checkbox checkbox-mixed')
+    expect(part(b as Item, 'item')?.getAttribute('aria-checked')).toBe('true')
+  })
+
+  test('Space checks the row and Enter opens a branch', async () => {
+    const host = await mount(files)
+    const [docs, , , c] = (await settleTree(host)) as Item[]
+    await press(c as Item, ' ')
+    await settleTree(host)
+    expect((host as Tree & { values: string[] }).values).toEqual(['c'])
+    await press(docs as Item, 'Enter')
+    await settleTree(host)
+    expect((docs as Item).open).toBe(true)
+    expect((host as Tree & { values: string[] }).values).toEqual(['c'])
+  })
+
+  test('a single-choice tree is not multiselectable', async () => {
+    const { branch } = await tree()
+    expect(part(branch.parentElement as HTMLElement, 'tree')?.hasAttribute('aria-multiselectable')).toBe(false)
+  })
+})
