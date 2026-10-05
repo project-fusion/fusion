@@ -109,6 +109,42 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   @property()
   override value = ''
 
+  /* **Button's own members, which a copy button never uses.** A press copies
+     and does nothing else: no command is sent, no form is submitted or reset,
+     and nothing is disclosed. Each is declared `@internal` so the manifest
+     leaves it off this element's page. `declare` writes no field, so the
+     member Button defines is still the one at runtime. */
+
+  /** @internal A copy button sends no command. */
+  declare command: string
+
+  /** @internal A copy button sends no command. */
+  declare commandFor: string
+
+  /** @internal A copy button discloses nothing. */
+  declare expanded?: boolean
+
+  /** @internal A copy button submits no form. */
+  declare formAction: string
+
+  /** @internal A copy button submits no form. */
+  declare formEnctype: string
+
+  /** @internal A copy button submits no form. */
+  declare formMethod: string
+
+  /** @internal A copy button submits no form. */
+  declare formNoValidate: boolean
+
+  /** @internal A copy button submits no form. */
+  declare formTarget: string
+
+  /** @internal A copy button opens nothing. */
+  declare popup?: 'dialog' | 'grid' | 'listbox' | 'menu' | 'tree'
+
+  /** @internal A copy button never submits or resets, whatever its `type`. */
+  declare type: 'button' | 'submit' | 'reset'
+
   /**
    * The words for the state it is in, used twice on purpose.
    *

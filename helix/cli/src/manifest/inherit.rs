@@ -56,6 +56,38 @@ pub const INHERITS: [&str; 7] = [
     "cssStates",
 ];
 
+/// The key a declaration carries the names it redeclares `@internal` under,
+/// from the first pass until inheritance is over.
+pub const WITHHELD: &str = "_withheld";
+
+/// Takes the withheld names off every declaration, once nothing reads them.
+pub fn withheld(declared: &mut [Vec<Value>]) {
+    for one in declared.iter_mut().flatten() {
+        if let Some(fields) = one.as_object_mut() {
+            fields.remove(WITHHELD);
+        }
+    }
+}
+
+/// Whether the child keeps an inherited entry of `list` to itself.
+///
+/// **A member the child redeclares `@internal` is not inherited either.**
+/// Before this, `@internal` hid only the child's own entry and the parent's
+/// came back through inheritance, so Copy Button published Button's `type`,
+/// `command` and form overrides, which it never uses. The member goes, and the
+/// attribute it declares goes with it, matched by the field it names.
+fn kept_back(entry: &Value, list: &str, names: &BTreeSet<String>) -> bool {
+    let key = match list {
+        "members" => "name",
+        "attributes" => "fieldName",
+        _ => return false,
+    };
+    entry
+        .get(key)
+        .and_then(Value::as_str)
+        .is_some_and(|name| names.contains(name))
+}
+
 /// Manifests of other packages, by the package name a specifier names them by.
 pub type Dependencies = BTreeMap<String, Value>;
 
@@ -276,12 +308,18 @@ struct Link<'a> {
     wrapped: bool,
 }
 
-fn joined(mine: Option<&Value>, theirs: Option<&Value>, link: &Link<'_>) -> Option<Value> {
-    let Link { from, .. } = *link;
+fn joined(
+    mine: Option<&Value>,
+    theirs: Option<&Value>,
+    link: &Link<'_>,
+    withheld: &BTreeSet<String>,
+) -> Option<Value> {
+    let Link { from, list, .. } = *link;
     let theirs: Vec<Value> = theirs
         .and_then(Value::as_array)
         .into_iter()
         .flatten()
+        .filter(|one| !kept_back(one, list, withheld))
         /* **An entry with no name is not passed down.** The analyzer infers an
         event on `MixinControllerActive` from a `dispatchEvent` it could not
         name, and the four classes below it carry no such event: a nameless
@@ -463,6 +501,13 @@ pub fn apply(
     changes how an entry reaching it is read. The base class is the last link
     and anything before it is a mixin this class applied. */
     let wrapped = heritage.len() > 1;
+    let withheld: BTreeSet<String> = declaration
+        .get(WITHHELD)
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|one| one.as_str().map(str::to_owned))
+        .collect();
     for (name, specifier) in heritage {
         /* **A relative import, or none at all, is this package's own.** Both
         resolve against the manifest the first pass wrote, which holds every
@@ -515,7 +560,12 @@ pub fn apply(
             .map(|list| {
                 (
                     list,
-                    joined(declaration.get(list), above.get(list), &link(list)),
+                    joined(
+                        declaration.get(list),
+                        above.get(list),
+                        &link(list),
+                        &withheld,
+                    ),
                 )
             })
             .collect();
@@ -582,4 +632,40 @@ fn wrote(entry: &Value, link: &Link<'_>) -> Option<(usize, usize)> {
                 .position(|two| two.get("name").and_then(Value::as_str) == Some(wanted))?;
             Some((which, at))
         })
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::BTreeSet;
+
+    use serde_json::json;
+
+    use super::{kept_back, withheld, WITHHELD};
+
+    #[test]
+    fn a_member_redeclared_internal_keeps_its_row_and_its_attribute_back() {
+        let names: BTreeSet<String> = ["type".to_owned()].into();
+        assert!(kept_back(&json!({ "name": "type" }), "members", &names));
+        assert!(kept_back(
+            &json!({ "name": "type", "fieldName": "type" }),
+            "attributes",
+            &names
+        ));
+        assert!(!kept_back(&json!({ "name": "value" }), "members", &names));
+        /* An attribute observed through an internal field names no field, and
+        stays: `aria-label` through `namedBy`. */
+        assert!(!kept_back(
+            &json!({ "name": "aria-label" }),
+            "attributes",
+            &names
+        ));
+        assert!(!kept_back(&json!({ "name": "type" }), "slots", &names));
+    }
+
+    #[test]
+    fn the_withheld_names_are_taken_off_once_inheritance_is_over() {
+        let mut declared = vec![vec![json!({ "name": "A", WITHHELD: ["type"] })]];
+        withheld(&mut declared);
+        assert_eq!(declared[0][0], json!({ "name": "A" }));
+    }
 }
