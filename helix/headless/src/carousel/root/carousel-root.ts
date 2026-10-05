@@ -63,7 +63,8 @@ const COUNT_OR_AUTO = {
  *
  * The indicators are one tab stop. The arrow keys along the track move between
  * them, Up and Down on a vertical carousel, and Home and End go to the first
- * and the last.
+ * and the last. Without `loop`, Previous on the first slide and Next on the
+ * last are marked `aria-disabled`.
  *
  * @since 0.1.0
  * @status stable
@@ -1228,6 +1229,21 @@ export class HelixHeadlessCarousel extends HelixElement {
     return `--carousel-run-end: calc(round(${run}, 1px) - (${run}))`
   }
 
+  /**
+   * Whether Previous or Next has nowhere to go, which is only at an end and
+   * without `loop`.
+   *
+   * Said with `aria-disabled` and not `disabled`, so a reader who pressed Next
+   * onto the last slide keeps focus on the control they are on. Not on the
+   * server, which knows no slides and so no ends.
+   */
+  private atEnd(side: 'end' | 'start'): boolean {
+    if (this.loop || this.slides.length < 2) {
+      return false
+    }
+    return side === 'start' ? this.index <= 0 : this.index >= this.positions - 1
+  }
+
   protected override render(): TemplateResult {
     const rotating = this.rotating
     const last = this.slides.length - 1
@@ -1262,6 +1278,7 @@ export class HelixHeadlessCarousel extends HelixElement {
                   part="previous"
                   type="button"
                   aria-label=${this.previousLabel}
+                  aria-disabled=${this.atEnd('start') ? 'true' : nothing}
                   @click=${() => this.goTo(this.index - 1)}
                 >
                   <svg part="previous-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
@@ -1272,6 +1289,7 @@ export class HelixHeadlessCarousel extends HelixElement {
                   part="next"
                   type="button"
                   aria-label=${this.nextLabel}
+                  aria-disabled=${this.atEnd('end') ? 'true' : nothing}
                   @click=${() => this.goTo(this.index + 1)}
                 >
                   <svg part="next-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">

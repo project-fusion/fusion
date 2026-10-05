@@ -138,6 +138,17 @@ describe('carousel', () => {
     expect(cal.index).not.toBe(2)
   })
 
+  test('says Previous and Next have nowhere to go at the ends, unless it loops', async () => {
+    const cal = await carousel()
+    expect(part(cal, 'previous')?.getAttribute('aria-disabled')).toBe('true')
+    expect(part(cal, 'next')?.hasAttribute('aria-disabled')).toBe(false)
+    cal.index = 2
+    await cal.updateComplete
+    expect(part(cal, 'next')?.getAttribute('aria-disabled')).toBe('true')
+    const looping = await carousel('loop')
+    expect(part(looping, 'previous')?.hasAttribute('aria-disabled')).toBe(false)
+  })
+
   test('no rotation control unless it rotates', async () => {
     expect(part(await carousel(), 'rotation')).toBeNull()
     expect(part(await carousel('autoplay'), 'rotation')).not.toBeNull()

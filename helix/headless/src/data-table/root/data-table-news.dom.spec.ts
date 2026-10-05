@@ -59,6 +59,18 @@ describe('a data table saying what changed', () => {
     expect(said(element)).toBe('2 selected')
   })
 
+  /* A search narrowed the rows under a reader in the search field and said
+     nothing about how many were left. */
+  test('says how many rows a search leaves', async () => {
+    const element = (await table()) as Table & { filter: string }
+    element.filter = 'a'
+    await settle(element)
+    expect(said(element)).toBe('3 results')
+    element.filter = 'brav'
+    await settle(element)
+    expect(said(element)).toBe('1 result')
+  })
+
   test('says it in the words it is given', async () => {
     const element = await table(
       'sorted-label="Nach {column} sortiert, {order}" ascending-label="aufsteigend"',
