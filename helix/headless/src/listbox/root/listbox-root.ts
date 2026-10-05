@@ -11,6 +11,7 @@ import {
   MixinCollection,
   MixinControllerValue,
   MixinField,
+  rangeAdd,
   reportValues,
   requestChange,
   scrollItemIntoView,
@@ -23,7 +24,6 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessOptionGroup } from '../../option/group/option-group.js'
 import { HelixHeadlessOption } from '../../option/root/option-root.js'
-import { rangeAdd } from '../range.js'
 
 /** The keys that move within a list, which is every key that moves at all. */
 const MOVES = new Set(['ArrowDown', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageUp'])

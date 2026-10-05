@@ -414,6 +414,7 @@ export {
 export { formatNumber, parseNumber } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export { appleTouch, onApple, type Platform } from './utils/platform/platform.js'
+export { rangeAdd } from './utils/range-add/range-add.js'
 export { type ColorBytes, readColor, rgbOf } from './utils/read-color/read-color.js'
 export {
   byRow,

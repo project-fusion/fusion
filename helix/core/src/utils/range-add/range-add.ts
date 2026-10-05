@@ -1,9 +1,10 @@
 /**
- * What Shift with Home or End adds to a listbox's selection, as arithmetic
- * over the options on show.
+ * What a range adds to a selection of many, as arithmetic over the items on
+ * show.
  *
- * Pure and beside the family's `index.ts`, because which options a range takes
- * in is a fact about a list, and a spec can hold it without a page.
+ * Pure and in core, because Listbox (Shift with Home or End) and Data Table
+ * (Shift with an arrow, Home or End, over rows) take in a range the same way,
+ * and a spec can hold it without a page.
  */
 
 /**
@@ -13,7 +14,8 @@
  *
  * `from` is where the highlight was, as an index into `shown`, or `-1` for no
  * highlight, which takes in the end alone. `to` is the end the key went to.
- * APG's multiple-selection listbox.
+ * APG's multiple-selection listbox, and the same rule over a data table's
+ * rows.
  */
 export const rangeAdd = (
   values: readonly string[],

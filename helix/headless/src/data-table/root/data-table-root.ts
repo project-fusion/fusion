@@ -23,6 +23,7 @@ import {
   isRtl,
   MixinCollection,
   markRegion,
+  rangeAdd,
   reportRuntime,
   requestChange,
   Typeahead,
@@ -43,7 +44,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import { at, edgeOf, type HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import '../../checkbox/index.js'
-import { rangeAdd } from '../../listbox/range.js'
 import '../../pagination/index.js'
 import { type Grown, grow } from '../tree.js'
 import {
