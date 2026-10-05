@@ -159,11 +159,8 @@
   border-radius: var(--helix-radii-sm);
   color: var(--code-block-expand-color, var(--helix-color-foreground-muted));
   cursor: pointer;
-  display: block;
   font-size: var(--helix-text-sm);
-  margin-block-start: var(--helix-space-2xs);
-  padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-xs);
+  padding: var(--helix-space-xs);
 }
 
 [part="expand"]:hover {

@@ -9,7 +9,9 @@ import { property } from 'lit/decorators.js'
  * Renders a real `<q>`, so the browser supplies the quotation marks. It inserts
  * the correct marks for the document's language and nests them correctly when
  * one quotation sits inside another. Do not type quotation marks into the
- * content.
+ * content. A quotation in a language other than the page's takes `lang` on the
+ * element, and its marks follow it: `lang="de"` sets „…“ and `lang="fr"` «…»
+ * inside an English page.
  *
  * For a passage set off from the surrounding text, use a blockquote.
  *
