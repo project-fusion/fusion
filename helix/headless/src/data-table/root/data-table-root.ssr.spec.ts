@@ -202,3 +202,22 @@ describe('the uncontrolled defaults a table takes from markup', () => {
      limitation the note above pins for the cell values, and the seed is
      asserted in the DOM spec instead. */
 })
+
+describe('a data table that loads more, on the server', () => {
+  test('serves the row that asks, after the rows it was given', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-data-table .rows=${rows} label="Files" load-more>
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`),
+    )
+    expect(served).toMatch(/<div\s+part="more"\s+role="row"/)
+    expect(served).toContain('Load more')
+  })
+
+  test('serves none without rows to follow', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-data-table label="Files" load-more></helix-headless-data-table>`),
+    )
+    expect(served).not.toContain('part="more"')
+  })
+})

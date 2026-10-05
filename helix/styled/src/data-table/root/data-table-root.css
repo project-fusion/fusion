@@ -151,6 +151,7 @@
    the cell itself shows where focus is. Inset, so a cell at the edge of the
    scrolling box is not clipped. */
 [part~="cell"]:focus-visible,
+[part="more-cell"]:focus-visible,
 [part~="select"]:focus-visible,
 [part="select-all"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
@@ -233,6 +234,34 @@
 [part="empty"],
 [part="loading"] {
   grid-column: 1 / -1;
+}
+
+/* The row that asks for more rows: one cell across every column, with its
+   button at the inline start of it, where the eye leaves the last row. */
+[part="more"] {
+  display: contents;
+}
+
+[part="more-cell"] {
+  display: flex;
+  grid-column: 1 / -1;
+  padding-block: var(--data-table-padding-block, var(--helix-space-sm));
+}
+
+[part="more-button"] {
+  background: none;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--data-table-color, var(--helix-color-foreground));
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
+  font-size: var(--data-table-text, var(--helix-text-sm));
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+[part="more-button"]:hover {
+  background-color: var(--helix-color-surface-raised);
 }
 
 /*

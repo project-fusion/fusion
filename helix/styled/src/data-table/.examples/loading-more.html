@@ -1,0 +1,34 @@
+<!-- @summary Six rows at first, with a row after them that loads six more each time it is pressed. -->
+
+<helix-data-table
+  id="releases"
+  label="Releases"
+  load-more
+  row-key="version"
+>
+  <helix-table-column field="date">Date</helix-table-column>
+  <helix-table-column
+    field="version"
+    row-header
+  >Version</helix-table-column>
+  <helix-table-column field="notes">Notes</helix-table-column>
+</helix-data-table>
+
+<script>
+  /* `load-more` draws the last row and its button, which sends
+     `helix-load-more`. `row-header` makes each version name its row for a
+     screen reader. Typing a version's first digits moves to it. */
+  const releases = document.getElementById('releases')
+  const batch = (from) =>
+    Array.from({ length: 6 }, (_, index) => ({
+      date: `September ${30 - from - index}, 2026`,
+      notes: index % 2 === 0 ? 'Fixes' : 'Features and fixes',
+      version: `2.${24 - from - index}.0`,
+    }))
+  releases.rows = batch(0)
+  releases.addEventListener('helix-load-more', () => {
+    const next = [...releases.rows, ...batch(releases.rows.length)]
+    releases.rows = next
+    releases.loadMore = next.length < 24
+  })
+</script>

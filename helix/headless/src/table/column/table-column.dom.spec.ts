@@ -127,3 +127,24 @@ describe('table column holding controls', () => {
     expect(label(host)).toBeNull()
   })
 })
+
+describe('a column resized', () => {
+  /* `helix-before-resize` asked and nothing said once the width had moved,
+     where every other request in the family has its notification. */
+  test('says so after the width moves, and not when the request is refused', async () => {
+    const host = await column('resizable')
+    const heard: string[] = []
+    host.addEventListener('helix-resized', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    const resizer = part(host, 'resizer') as HTMLElement
+    resizer.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Home' }))
+    await host.updateComplete
+    expect(host.width).toBe('48px')
+    expect(heard).toEqual(['48px'])
+    host.addEventListener('helix-before-resize', (event) => event.preventDefault())
+    resizer.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
+    await host.updateComplete
+    expect(heard).toEqual(['48px'])
+  })
+})
