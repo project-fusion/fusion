@@ -21,6 +21,9 @@ import { styles } from './video-root.css.js'
  * shows again when the pointer moves, and whenever anything inside it has
  * focus, so you can reach it with the keyboard. A paused video keeps its bar.
  *
+ * An icon put in one of the `-icon` slots is drawn at the size of the glyph it
+ * replaces, and in the control's color.
+ *
  * @since 0.1.0
  * @status stable
  * @category media

@@ -34,6 +34,10 @@ export function Example() {
     say('ended')
   }
 
+  const moved = () => {
+    say('seeked')
+  }
+
   const back = () => {
     say('helix-previous')
   }
@@ -55,6 +59,7 @@ export function Example() {
         onhelix-previous={back}
         onPause={paused}
         onPlay={started}
+        onSeeked={moved}
         poster="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=960"
         ref={clip}
         src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/friday.mp4"

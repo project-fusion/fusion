@@ -600,6 +600,210 @@ if (hasLayout()) {
   })
 }
 
+/* A page building its own readout listens for the position, the volume, the
+ * length, the speed, and a failure. None of them crossed the shadow root, so a
+ * listener on the player heard `play`, `pause` and `ended` and nothing else. */
+describe('the media events', () => {
+  const names = [
+    'timeupdate',
+    'volumechange',
+    'loadedmetadata',
+    'durationchange',
+    'ratechange',
+    'error',
+    'seeking',
+    'seeked',
+    'waiting',
+    'canplay',
+    'progress',
+  ]
+
+  test('reach a listener on the player, under their own names', async () => {
+    const host = await player()
+    const video = part(host, 'video') as HTMLVideoElement
+    const heard: string[] = []
+    for (const name of names) {
+      host.addEventListener(name, (event) => heard.push(event.type))
+    }
+    for (const name of names) {
+      video.dispatchEvent(new Event(name))
+    }
+    expect(heard).toEqual(names)
+  })
+
+  test('and do not bubble past it, as a video sends them', async () => {
+    /* Bubbling, React's root listener would hear them and `bindReactHandler`
+       would skip them, and for these names React's listener is never there. */
+    const host = await player()
+    const video = part(host, 'video') as HTMLVideoElement
+    const seen: Event[] = []
+    const above = (event: Event): void => {
+      seen.push(event)
+    }
+    host.addEventListener('timeupdate', above)
+    document.addEventListener('timeupdate', above)
+    try {
+      video.dispatchEvent(new Event('timeupdate'))
+      expect(seen).toHaveLength(1)
+      expect(seen[0]?.target).toBe(host)
+      expect(seen[0]?.bubbles).toBe(false)
+    } finally {
+      document.removeEventListener('timeupdate', above)
+    }
+  })
+
+  test('play is sent once, by the relay, as before', async () => {
+    const host = await player()
+    const video = part(host, 'video') as HTMLVideoElement
+    let plays = 0
+    host.addEventListener('play', () => {
+      plays += 1
+    })
+    video.dispatchEvent(new Event('play'))
+    expect(plays).toBe(1)
+  })
+})
+
+/* Two stops named "Play", one after the other: the large button over the
+ * picture and the one on the bar. A keyboard met both and a screen reader read
+ * the same control twice. */
+describe('one Play', () => {
+  test('the large button is for the pointer, out of the tab order and the tree', async () => {
+    const host = await player()
+    const start = part(host, 'start') as HTMLElement
+    expect(start.getAttribute('tabindex')).toBe('-1')
+    expect(start.getAttribute('aria-hidden')).toBe('true')
+    const play = part(host, 'play') as HTMLElement
+    expect(play.hasAttribute('tabindex')).toBe(false)
+    expect(play.hasAttribute('aria-hidden')).toBe(false)
+  })
+
+  test('and a press on it plays, and leaves focus on the player', async () => {
+    /* The button is gone once the video plays, which dropped focus to the page
+       and took the keys with it. */
+    const host = await player()
+    const video = part(host, 'video') as HTMLVideoElement
+    let plays = 0
+    Object.defineProperty(video, 'paused', { configurable: true, value: true })
+    video.play = () => {
+      plays += 1
+      return Promise.resolve()
+    }
+    ;(part(host, 'start') as HTMLElement).click()
+    expect(plays).toBe(1)
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'stage'))
+  })
+})
+
+describe('play()', () => {
+  type Playing = Player & { play: () => Promise<void> }
+
+  test('returns the video`s own promise, so a caller can wait for playback', async () => {
+    const host = (await player()) as Playing
+    const video = part(host, 'video') as HTMLVideoElement
+    const started = Promise.resolve()
+    video.play = () => started
+    expect(host.play()).toBe(started)
+  })
+
+  test('and a refusal reaches the caller who waits for it', async () => {
+    const host = (await player()) as Playing
+    const video = part(host, 'video') as HTMLVideoElement
+    const refused = new Error('NotAllowedError')
+    video.play = () => Promise.reject(refused)
+    await expect(host.play()).rejects.toBe(refused)
+  })
+})
+
+describe('the name of the player', () => {
+  /* A literal in the template, so a page in another language heard "Video". */
+  test('is `player-label` where there is no `label`', async () => {
+    const host = await player(
+      '<helix-headless-video player-label="Vidéo" src="/clip.mp4"></helix-headless-video>',
+    )
+    expect(part(host, 'stage')?.getAttribute('aria-label')).toBe('Vidéo')
+  })
+
+  test('and `label` where there is one', async () => {
+    const host = await player(
+      '<helix-headless-video label="A clip" player-label="Vidéo" src="/clip.mp4"></helix-headless-video>',
+    )
+    expect(part(host, 'stage')?.getAttribute('aria-label')).toBe('A clip')
+  })
+})
+
+/* The glyphs were drawn inline, so a page with an icon set of its own had no
+ * way to put it on the bar. Each is now the fallback of a slot named for it. */
+describe('the icon slots', () => {
+  const slotIn = (host: HTMLElement, control: string, name: string): HTMLSlotElement | null =>
+    part(host, control)?.querySelector(`slot[name="${name}"]`) ?? null
+
+  test('hold the drawn glyph as their fallback', async () => {
+    const host = await player(
+      '<helix-headless-video extra-controls="rewind forward previous next speed download" label="A clip" src="blob:clip"></helix-headless-video>',
+    )
+    for (const [control, name] of [
+      ['start', 'start-icon'],
+      ['play', 'play-icon'],
+      ['mute', 'volume-icon'],
+      ['fullscreen', 'fullscreen-icon'],
+      ['rewind', 'rewind-icon'],
+      ['forward', 'forward-icon'],
+      ['previous', 'previous-icon'],
+      ['next', 'next-icon'],
+      ['download', 'download-icon'],
+    ] as const) {
+      const slot = slotIn(host, control, name)
+      expect(slot).not.toBeNull()
+      expect(slot?.querySelector('svg[data-glyph]')).not.toBeNull()
+    }
+  })
+
+  test('and the state a control is in picks the slot', async () => {
+    const host = (await player()) as Player & { full: boolean; muted: boolean }
+    const video = part(host, 'video') as HTMLVideoElement
+    Object.defineProperty(video, 'paused', { configurable: true, value: false })
+    video.dispatchEvent(new Event('play'))
+    host.muted = true
+    host.full = true
+    await host.updateComplete
+    expect(slotIn(host, 'play', 'pause-icon')).not.toBeNull()
+    expect(slotIn(host, 'play', 'play-icon')).toBeNull()
+    expect(slotIn(host, 'mute', 'mute-icon')).not.toBeNull()
+    expect(slotIn(host, 'fullscreen', 'exit-fullscreen-icon')).not.toBeNull()
+  })
+
+  test('take an icon the page slots in place of the glyph', async () => {
+    const host = await player(`<helix-headless-video label="A clip" src="/clip.mp4">
+      <svg slot="play-icon" viewBox="0 0 1 1"></svg>
+    </helix-headless-video>`)
+    const slot = slotIn(host, 'play', 'play-icon') as HTMLSlotElement
+    expect(slot.assignedElements()).toHaveLength(1)
+  })
+
+  test('reach the rows of the overflow menu too', async () => {
+    /* A control lives on the bar or in the menu, never both, so one slot name
+       serves either place. */
+    const host = await player(
+      '<helix-headless-video label="A clip" overflow-controls="next speed" src="/clip.mp4"></helix-headless-video>',
+    )
+    const menu = part(host, 'overflow') as HTMLElement
+    const rows = menu.querySelectorAll('[part="entry"] > slot[slot="start"]')
+    expect([...rows].map((one) => one.getAttribute('name'))).toEqual(['next-icon', 'speed-icon'])
+  })
+
+  test('and a slotted icon is not copied into the video with the sources', async () => {
+    // Only what the default slot holds is media, and a named icon is not in it.
+    const host = await player(`<helix-headless-video label="A clip" src="/clip.mp4">
+      <svg slot="play-icon" viewBox="0 0 1 1"></svg>
+      <source src="/clip.webm" type="video/webm" />
+    </helix-headless-video>`)
+    const video = part(host, 'video') as HTMLVideoElement
+    expect(video.querySelectorAll('source')).toHaveLength(1)
+    expect(video.querySelector('svg')).toBeNull()
+  })
+})
+
 describe('pressing the picture', () => {
   const media = async (markup?: string): Promise<{ host: Player; video: HTMLVideoElement }> => {
     const host = await player(markup)
