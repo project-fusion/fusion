@@ -63,9 +63,10 @@ const SCRUB_FINE = 16
  * The locale's group separators are read in every field, so `1,234` is a
  * number in `en-US`.
  *
- * On iOS and iPadOS the field is a text field described as a number field,
- * with no `role="spinbutton"`, which VoiceOver reads as a slider you cannot
- * type in. React Aria's NumberField does the same.
+ * On iOS and iPadOS the field is a plain text field, with no
+ * `role="spinbutton"`, which VoiceOver reads as a slider you cannot type in,
+ * and no role description, so VoiceOver says the field is required. React
+ * Aria's NumberField does the same.
  *
  * Validity follows the platform's rules: `min`, `max`, and `step` are checked
  * and reported through the host's own `setValidity`, under the platform's flag
@@ -227,13 +228,6 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
-
-  /**
-   * What the field is described as on iOS and iPadOS, where it carries no
-   * spinbutton role. See the class description.
-   */
-  @property({ attribute: 'role-description' })
-  roleDescription = 'number field'
 
   /**
    * Makes the label a grip that changes the value when it is dragged.
@@ -809,7 +803,6 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           .value=${this.shown}
           type="text"
           role=${this.touchApple ? nothing : 'spinbutton'}
-          aria-roledescription=${this.touchApple ? this.roleDescription : nothing}
           inputmode="decimal"
           autocomplete=${this.autocomplete || nothing}
           name=${this.name || nothing}

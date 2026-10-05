@@ -59,4 +59,14 @@ describe('screening arriving files', () => {
     expect(kept.map((one) => one.name)).toEqual(['b.png'])
     expect(refused.map((one) => one.reason)).toEqual(['count'])
   })
+
+  test('a single-file field that accepts nothing keeps the file it holds', () => {
+    const held = file('a.png', 'image/png')
+    const { kept, refused } = screenFiles([file('b.txt', 'text/plain')], [held], {
+      accept: 'image/*',
+      multiple: false,
+    })
+    expect(kept).toEqual([held])
+    expect(refused.map((one) => one.reason)).toEqual(['type'])
+  })
 })

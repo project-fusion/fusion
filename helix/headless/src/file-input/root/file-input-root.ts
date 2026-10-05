@@ -292,7 +292,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
       return
     }
     event.preventDefault()
-    this.take(pasted, this.multiple ? this.files : [])
+    this.take(pasted, this.files)
   }
 
   /**
@@ -523,9 +523,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
     if (dropped.length === 0) {
       return
     }
-    // A single-file control takes the last thing dropped, the way choosing
-    // again in the picker replaces rather than adds.
-    this.take(dropped, this.multiple ? this.files : [])
+    // A single-file control takes the last file it accepts, the way choosing
+    // again in the picker replaces what it held, and keeps what it held when
+    // it accepts none.
+    this.take(dropped, this.files)
   }
 
   /**

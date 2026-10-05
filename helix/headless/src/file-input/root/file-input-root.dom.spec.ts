@@ -492,6 +492,26 @@ describe('screening the files that arrive', () => {
     expect(changes).toBe(0)
   })
 
+  test('a refused drop or paste on a single-file field keeps the file it holds', async () => {
+    const host = (await field('accept="image/*"')) as Screening
+    let changes = 0
+    host.addEventListener('change', () => {
+      changes += 1
+    })
+    await dropOn(host, [sized('a.png', 10, 'image/png')])
+    expect(host.files.map((file) => file.name)).toEqual(['a.png'])
+    await dropOn(host, [sized('notes.txt', 10)])
+    expect(host.files.map((file) => file.name)).toEqual(['a.png'])
+    const carrier = new DataTransfer()
+    carrier.items.add(sized('todo.txt', 4))
+    const event = new Event('paste', { bubbles: true, cancelable: true }) as ClipboardEvent
+    Object.defineProperty(event, 'clipboardData', { value: carrier })
+    part(host, 'field')?.dispatchEvent(event)
+    await host.updateComplete
+    expect(host.files.map((file) => file.name)).toEqual(['a.png'])
+    expect(changes).toBe(1)
+  })
+
   test('files pasted onto the field are taken as a drop is', async () => {
     const host = (await field('multiple')) as Screening
     const carrier = new DataTransfer()

@@ -351,14 +351,18 @@ describe('select all', () => {
     g.addEventListener('change', () => heard.push(g.value))
     await press(g)
     expect(g.values).toEqual(['design', 'mind'])
-    expect([box(g).checked, box(g).indeterminate]).toEqual([false, true])
+    expect([box(g).checked, box(g).indeterminate]).toEqual([true, false])
+    await press(g)
+    expect(g.values).toEqual([])
+    expect([box(g).checked, box(g).indeterminate]).toEqual([false, false])
+    await press(g)
     ;(g.boxes[2] as unknown as { disabled: boolean }).disabled = false
     await press(g)
     expect(g.values).toEqual(['design', 'mind', 'energy'])
     expect([box(g).checked, box(g).indeterminate]).toEqual([true, false])
     await press(g)
     expect(g.values).toEqual([])
-    expect(heard).toEqual(['design,mind', 'design,mind,energy', ''])
+    expect(heard).toEqual(['design,mind', '', 'design,mind', 'design,mind,energy', ''])
   })
 
   test('a refused change leaves every box as it was', async () => {

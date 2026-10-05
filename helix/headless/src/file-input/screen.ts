@@ -59,7 +59,8 @@ const refusal = (file: File, rules: ScreenRules): RefusedFile | undefined => {
 /**
  * Screens arriving files against the rules, given the files the field keeps.
  * `kept` is what the field holds afterward: the files it keeps and the
- * arrivals it took, or for a single-file field the last arrival it took.
+ * arrivals it took, or for a single-file field the last arrival it took, and
+ * the file it keeps when it took none.
  */
 export const screenFiles = (
   arriving: File[],
