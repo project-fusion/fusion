@@ -123,6 +123,18 @@ slot[name="icon"]::slotted(*) {
   min-inline-size: 0;
 }
 
+/* A title and a line of detail, where the message has them: the title in a
+   heavier weight, and the detail quieter under it. */
+::slotted([slot="heading"]) {
+  display: block;
+  font-weight: var(--helix-weight-semibold);
+}
+
+::slotted([slot="description"]) {
+  color: var(--helix-color-foreground-muted);
+  display: block;
+}
+
 /* Its own row, in the message's column, so it starts where the words start and
    the space under the mark is a gutter rather than a place to put a button.
    Measured at 12px before this moved. */

@@ -120,6 +120,30 @@ describe('what a message is to a screen reader', () => {
     await danger.updateComplete
     expect(internalsOf(danger).ariaLive).toBe('assertive')
   })
+
+  test('named by its words, where it has no heading', async () => {
+    const plain = (await mount(
+      '<helix-headless-toast-item>Saved</helix-headless-toast-item>',
+    )) as Item
+    await plain.updateComplete
+    expect(internalsOf(plain).ariaLabelledByElements).toEqual([part(plain, 'content') as Element])
+  })
+
+  test('named by its heading and described by its description, where it has them', async () => {
+    const item = (await mount(
+      `<helix-headless-toast-item>
+        <span slot="heading">Upload failed</span>
+        <span slot="description">The file is larger than 10 MB.</span>
+      </helix-headless-toast-item>`,
+    )) as Item
+    await item.updateComplete
+    const heading = item.querySelector('[slot="heading"]') as Element
+    const description = item.querySelector('[slot="description"]') as Element
+    expect(internalsOf(item).ariaLabelledByElements?.[0]).toBe(heading)
+    expect(internalsOf(item).ariaDescribedByElements?.[0]).toBe(description)
+    expect(part(item, 'heading')?.localName).toBe('slot')
+    expect(part(item, 'description')?.localName).toBe('slot')
+  })
 })
 
 describe('a swipe', () => {

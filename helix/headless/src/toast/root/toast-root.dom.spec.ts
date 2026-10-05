@@ -326,6 +326,30 @@ describe('add()', () => {
     expect(item.isConnected).toBe(false)
   })
 
+  test('takes a heading, which names the message, and puts the message under it', async () => {
+    const host = (await region()) as HTMLElement & {
+      add(message: string, options?: { heading?: string }): Item
+    }
+    const item = host.add('The file is larger than 10 MB.', { heading: 'Upload failed' })
+    await item.updateComplete
+    expect(item.querySelector('[slot="heading"]')?.textContent).toBe('Upload failed')
+    expect(item.querySelector('[slot="description"]')?.textContent).toBe(
+      'The file is larger than 10 MB.',
+    )
+  })
+
+  test('takes an action, which goes in the message’s actions slot', async () => {
+    const host = (await region()) as HTMLElement & {
+      add(message: string, options?: { action?: Element }): Item
+    }
+    const undo = document.createElement('button')
+    undo.textContent = 'Undo'
+    const item = host.add('Deleted', { action: undo })
+    expect(undo.parentElement).toBe(item)
+    expect(undo.getAttribute('slot')).toBe('actions')
+    expect(item.firstChild?.textContent).toBe('Deleted')
+  })
+
   test('never removes a message the page rendered itself', async () => {
     const host = await region('<helix-headless-toast-item>Mine</helix-headless-toast-item>')
     const item = host.querySelector('helix-headless-toast-item') as Item
