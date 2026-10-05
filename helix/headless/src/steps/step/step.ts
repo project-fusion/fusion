@@ -45,6 +45,7 @@ import '../../button/index.js'
  * @csspart description - The line under the name.
  * @csspart label - The step's name, which is a control.
  * @csspart label-button - The button inside the label.
+ * @csspart label-live - The live region inside that button, rendered only from the first time the button is pending.
  * @csspart label-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
  * @csspart marker - The shape carrying the number or the check.
@@ -131,7 +132,7 @@ export class HelixHeadlessStep extends HelixElement {
   protected renderLabel(): TemplateResult {
     return html`<${this.tag('button')}
       part="label"
-      exportparts="button: label-button, text: label-text"
+      exportparts="button: label-button, live: label-live, text: label-text"
       emphasis="ghost"
       ?disabled=${this.disabled}
       @click=${this.select}

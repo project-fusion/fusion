@@ -118,9 +118,11 @@ const kind = (file: File): string => {
  * @csspart file - One chosen file.
  * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart kind - A file's type.
+ * @csspart kind-cell - The grid cell around the tag, rendered only when the tag sits in a `Tag.Group`.
  * @csspart kind-dismiss - The remove button, when `dismissible`.
  * @csspart kind-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart kind-label - The label, trimmed to its capitals and baseline.
+ * @csspart kind-link - The link around the label, when the tag has an `href`.
  * @csspart kind-start - The category before the label.
  * @csspart label - The label above the field.
  * @csspart list - The chosen files.
@@ -129,9 +131,11 @@ const kind = (file: File): string => {
  * @csspart name - A file's name.
  * @csspart remove - The control that removes a file.
  * @csspart size - A file's size.
+ * @csspart size-cell - The grid cell around the tag, rendered only when the tag sits in a `Tag.Group`.
  * @csspart size-dismiss - The remove button, when `dismissible`.
  * @csspart size-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart size-label - The label, trimmed to its capitals and baseline.
+ * @csspart size-link - The link around the label, when the tag has an `href`.
  * @csspart size-start - The category before the label.
  * @csspart trigger - The label that opens the picker.
  *
@@ -626,10 +630,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    */
   protected renderMeta(file: File): TemplateResult {
     return html`<${this.tag('tag')} part="size"
-    exportparts="dismiss: size-dismiss, dismiss-mark: size-dismiss-mark, label: size-label, start: size-start">${size(file.size, this.locale)}</${this.tag('tag')}>
+    exportparts="cell: size-cell, dismiss: size-dismiss, dismiss-mark: size-dismiss-mark, label: size-label, link: size-link, start: size-start">${size(file.size, this.locale)}</${this.tag('tag')}>
       <${this.tag('tag')}
         part="kind"
-      exportparts="dismiss: kind-dismiss, dismiss-mark: kind-dismiss-mark, label: kind-label, start: kind-start">${kind(file)}</${this.tag('tag')}>`
+      exportparts="cell: kind-cell, dismiss: kind-dismiss, dismiss-mark: kind-dismiss-mark, label: kind-label, link: kind-link, start: kind-start">${kind(file)}</${this.tag('tag')}>`
   }
 
   protected override render(): TemplateResult {
