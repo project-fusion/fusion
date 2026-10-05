@@ -257,3 +257,80 @@ slot[name="start"]::slotted(*) {
   margin-inline-start: var(--tree-chevron-gap, var(--helix-space-none));
   order: var(--tree-chevron-order, 0);
 }
+
+/* An icon slotted in the chevron's place is sized, colored and turned the same
+   way. */
+slot[name="chevron"]::slotted(*) {
+  align-self: center;
+  block-size: var(--_tree-chevron);
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+  inline-size: var(--_tree-chevron);
+  margin-inline-start: var(--tree-chevron-gap, var(--helix-space-none));
+  order: var(--tree-chevron-order, 0);
+  transform: rotate(-90deg);
+  transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:dir(rtl)) slot[name="chevron"]::slotted(*) {
+  transform: rotate(90deg);
+}
+
+:host(:state(open)) slot[name="chevron"]::slotted(*) {
+  transform: rotate(0deg);
+}
+
+/* The check mark of a tree under `selection-mode="multiple"`: the checkbox's
+   own box, at the size of the chevron beside it. */
+[part~="checkbox"] {
+  align-self: center;
+  background-color: var(--tree-checkbox-background-color, var(--helix-color-background));
+  block-size: var(--tree-checkbox-size, var(--_tree-chevron));
+  border: var(--helix-border-thin) solid var(--tree-checkbox-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  color: var(--tree-checkbox-mark-color, var(--helix-color-foreground));
+  display: grid;
+  flex: 0 0 auto;
+  inline-size: var(--tree-checkbox-size, var(--_tree-chevron));
+  place-items: center;
+}
+
+[part~="checkbox-checked"],
+[part~="checkbox-mixed"] {
+  border-color: var(--tree-checkbox-border-color, var(--helix-color-foreground));
+}
+
+[part~="checkbox"] svg {
+  block-size: 80%;
+  inline-size: 80%;
+}
+
+/* A row out of play is seen and reached, and does nothing under the pointer. */
+:host([disabled]) [part="row"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+:host([disabled]) [part="row"]:hover {
+  background-color: transparent;
+  color: var(--helix-color-foreground-muted);
+}
+
+/* A branch waiting for its children breathes, so the press reads as heard. */
+:host(:state(loading)) [part="toggle"],
+:host(:state(loading)) slot[name="chevron"]::slotted(*) {
+  animation: tree-loading var(--helix-duration-slow) var(--helix-easing-standard) infinite alternate;
+}
+
+@keyframes tree-loading {
+  to {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host(:state(loading)) [part="toggle"],
+  :host(:state(loading)) slot[name="chevron"]::slotted(*) {
+    animation: none;
+  }
+}
