@@ -51,7 +51,7 @@ export type ListItemCurrent = 'date' | 'location' | 'page' | 'step' | 'time' | '
  * @slot end - Trailing content.
  * @slot start - Leading content, usually an icon or an avatar.
  *
- * @event {Event} helix-action - The reader pressed Enter on the row, or pressed the row in a list that selects nothing, in a list with `selection-mode`. Read the row from `target`. A row with `href` follows its link instead.
+ * @event {HelixActionEvent} helix-action - The reader pressed Enter on the row, or pressed the row in a list that selects nothing, in a list with `selection-mode`. Read the row from `target`. A row with `href` follows its link instead.
  *
  * @csspart link - The link, when the row has `href`. It holds every region except `end`.
  * @csspart row - The row's layout. It sits inside the host so the host can carry a list marker. In a list with `selection-mode` it is the grid cell that takes focus.

@@ -1563,6 +1563,142 @@ export class HelixLoadMoreEvent extends Event {
   }
 }
 
+/**
+ * A lazy branch opened and asks for its children: a tree item with `lazy`.
+ * Sent from the item, so `target` is the branch to fill.
+ *
+ * Carries nothing, because the children are the consumer's to fetch. Not
+ * cancelable: the branch is already open, and says it is busy until children
+ * arrive.
+ */
+export class HelixLoadEvent extends Event {
+  static readonly eventName = 'helix-load'
+
+  constructor() {
+    super(HelixLoadEvent.eventName, { bubbles: true, cancelable: false, composed: true })
+  }
+}
+
+/** Detail carried by `helix-range-change`. */
+export interface RangeDetail {
+  /** The index of the first item on screen. */
+  first: number
+  /** One past the index of the last item on screen. */
+  last: number
+}
+
+/**
+ * The items on screen changed: a virtual list was scrolled or resized, or its
+ * items changed. Carries the new range, which the list's `range` also holds.
+ * Not cancelable: the list has already moved.
+ */
+export class HelixRangeChangeEvent extends CustomEvent<RangeDetail> {
+  static readonly eventName = 'helix-range-change'
+
+  constructor(detail: RangeDetail) {
+    super(HelixRangeChangeEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * Rows opened or closed in place: a data table's tree of rows. Carries every
+ * open row's key, separated by commas, which the table's `expanded` also
+ * holds. Not cancelable: the rows have already moved.
+ */
+export class HelixExpandEvent extends CustomEvent<ChangeDetail> {
+  static readonly eventName = 'helix-expand'
+
+  constructor(detail: ChangeDetail) {
+    super(HelixExpandEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A sequence played to its last entry and stopped there: a video playlist
+ * with no `repeat`. Carries nothing, because the playlist still holds the last
+ * entry. Not cancelable: playback has already ended.
+ */
+export class HelixEndEvent extends Event {
+  static readonly eventName = 'helix-end'
+
+  constructor() {
+    super(HelixEndEvent.eventName, { bubbles: true, cancelable: false, composed: true })
+  }
+}
+
+/** Detail carried by `helix-typing`. */
+export interface TypingDetail {
+  /** Whether the user is writing now, as a boolean and not a word that reads like one. */
+  typing: boolean
+}
+
+/**
+ * The user started or stopped writing: a chat composer, for a typing
+ * indicator on the other side. Carries which, as the composer's `typing` does.
+ * Not cancelable: it reports what the user did.
+ */
+export class HelixTypingEvent extends CustomEvent<TypingDetail> {
+  static readonly eventName = 'helix-typing'
+
+  constructor(detail: TypingDetail) {
+    super(HelixTypingEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A reader acted on a row: Enter on a list row, or a press in a list that
+ * selects nothing. Sent from the row, so `target` is the row acted on.
+ *
+ * Carries nothing, because the row is the whole of the answer. Not cancelable:
+ * a row with a link follows it and sends nothing, so there is no default left
+ * to refuse.
+ */
+export class HelixActionEvent extends Event {
+  static readonly eventName = 'helix-action'
+
+  constructor() {
+    super(HelixActionEvent.eventName, { bubbles: true, cancelable: false, composed: true })
+  }
+}
+
+/**
+ * A checked state changed after `helix-before-toggle` let it: a map layer
+ * shown or hidden from the layers menu. Sent from what changed, with the state
+ * it now holds.
+ *
+ * **Not the native `toggle`.** That one is a `ToggleEvent` saying a popover or
+ * a `<details>` opened or closed, with `newState` of `open` or `closed`, and a
+ * layer shown on a map is neither: it is the request's own verb without
+ * `before`, carrying the same `checked` the request did.
+ */
+export class HelixToggleEvent extends CustomEvent<ToggleDetail> {
+  static readonly eventName = 'helix-toggle'
+
+  constructor(detail: ToggleDetail) {
+    super(HelixToggleEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
 /** Detail carried by `helix-copy`. */
 export interface CopyDetail {
   /** What was put on the clipboard. */
@@ -2137,6 +2273,7 @@ export class HelixHistoryEvent extends CustomEvent<Record<string, never>> {
  * forgotten.
  */
 const registry = {
+  HelixActionEvent,
   HelixActivateEvent,
   HelixAuraFallbackEvent,
   HelixBeforeActivateEvent,
@@ -2168,6 +2305,8 @@ const registry = {
   HelixCreateEvent,
   HelixDismissEvent,
   HelixEditEvent,
+  HelixEndEvent,
+  HelixExpandEvent,
   HelixFacetEvent,
   HelixFilterEvent,
   HelixFilteredEvent,
@@ -2179,6 +2318,7 @@ const registry = {
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   HelixHistoryEvent,
+  HelixLoadEvent,
   HelixLoadMoreEvent,
   HelixMapClusterEvent,
   HelixMapPanEvent,
@@ -2193,6 +2333,7 @@ const registry = {
   HelixPanelResizeEvent,
   HelixPinEvent,
   HelixPreviousEvent,
+  HelixRangeChangeEvent,
   HelixReadEvent,
   HelixReconnectEvent,
   HelixRejectEvent,
@@ -2212,7 +2353,9 @@ const registry = {
   HelixSortEvent,
   HelixSortedEvent,
   HelixSplitEvent,
+  HelixToggleEvent,
   HelixTourAskEvent,
+  HelixTypingEvent,
 } as const
 
 /**
