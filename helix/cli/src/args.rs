@@ -136,8 +136,11 @@ pub enum Theme {
     /// Write a starter intent.
     Init(Init),
     /// Emit the theme as CSS.
+    ///
+    /// Both modes as one block of `light-dark()` pairs, unless the intent
+    /// names a `scheme`.
     Build(Build),
-    /// Report every pair the theme was checked against.
+    /// Report every pair the theme was checked against, in each mode.
     ///
     /// Exits 1 when a pair fails, so it works as a gate, and prints the matrix
     /// either way, so it works as an answer. Opens a screen on a terminal and
