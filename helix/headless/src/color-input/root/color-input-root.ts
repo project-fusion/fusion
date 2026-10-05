@@ -456,6 +456,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
           ?required=${this.required}
           @change=${this.handleCommit}
           @input=${this.handleInput}
+          @keypress=${this.handleKeypress}
         />`
         }
         <slot name="end"></slot>

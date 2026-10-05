@@ -593,3 +593,37 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('choosing several from the keyboard', () => {
+  const key = async (
+    host: Updatable,
+    name: string,
+    init: KeyboardEventInit = {},
+  ): Promise<void> => {
+    host.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name, ...init }),
+    )
+    await settle(host)
+  }
+
+  test('Shift with an arrow adds the option it moves to', async () => {
+    const host = (await list('multiple default-value="one"')) as Updatable & { value: string }
+    await key(host, 'ArrowDown', { shiftKey: true })
+    expect(host.value).toBe('one,two')
+  })
+
+  test('Control+A chooses every option, and again takes them all back', async () => {
+    const host = (await list('multiple')) as Updatable & { value: string }
+    await key(host, 'a', { ctrlKey: true })
+    expect(host.value).toBe('one,two,three')
+    await key(host, 'a', { ctrlKey: true })
+    expect(host.value).toBe('')
+  })
+})
+
+describe('the filter field', () => {
+  test('says it narrows a list, as a combobox input does', async () => {
+    const host = (await list('filterable')) as Updatable
+    expect(field(host).getAttribute('aria-autocomplete')).toBe('list')
+  })
+})

@@ -148,8 +148,10 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * The arrow keys, Home, End, PageUp and PageDown move the highlight, and typed
  * letters move it to the next option whose words start with them. In a
  * single-choice list the highlight is the choice unless `manual` is set; then
- * Enter, Space or a click chooses. In a filter field, Space, Home, End and
- * letters edit the text.
+ * Enter, Space or a click chooses. With `multiple`, Space toggles the
+ * highlighted option, Shift with an arrow adds the option it moves to, and
+ * Control+A or Command+A chooses every option, or none where all are chosen.
+ * In a filter field, Space, Home, End and letters edit the text.
  *
  * @since 0.1.0
  * @status stable
@@ -560,6 +562,23 @@ export class HelixHeadlessListbox extends MixinCollection(
       }
       return
     }
+    /* Control+A, or Command+A, chooses every option a reader can reach, and
+       takes them all back where all are chosen already, which is APG's
+       multiple-selection listbox. Not in a field, where it selects the text. */
+    if (
+      this.multiple &&
+      !typing &&
+      event.key.toLowerCase() === 'a' &&
+      (event.ctrlKey || event.metaKey) &&
+      !event.altKey
+    ) {
+      event.preventDefault()
+      const reachable = shown.map((option) => option.value)
+      const all = reachable.every((value) => this.values.includes(value))
+      const kept = this.values.filter((value) => !reachable.includes(value))
+      this.requestValue((all ? kept : [...kept, ...reachable]).join(','))
+      return
+    }
     if (!typing && typesCharacter(event)) {
       event.preventDefault()
       const value = this.typeaheadTo(event.key)
@@ -595,6 +614,11 @@ export class HelixHeadlessListbox extends MixinCollection(
     const target = shown[next]
     if (target) {
       this.arrive(target.value)
+      /* Shift with an arrow adds the option arrived at, which is how APG's
+         multiple-selection listbox extends a selection from the keyboard. */
+      if (this.multiple && !typing && event.shiftKey && !this.values.includes(target.value)) {
+        this.choose(target.value)
+      }
     }
   }
 
@@ -1098,6 +1122,7 @@ export class HelixHeadlessListbox extends MixinCollection(
                 .value=${this.filter}
                 placeholder=${this.filterLabel}
                 aria-label=${this.filterLabel}
+                aria-autocomplete="list"
                 aria-controls="items"
                 ?disabled=${this.isDisabled}
                 @input=${this.handleFilter}

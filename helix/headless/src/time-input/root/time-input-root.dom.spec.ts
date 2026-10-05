@@ -201,3 +201,13 @@ describe('the events a time input sends', () => {
     expect(log).toEqual(['input', 'input', 'change'])
   })
 })
+
+describe('the panel of a time input', () => {
+  /* The trigger said it opened a listbox, and the surface had no role. */
+  test('is the dialog the trigger says it opens', async () => {
+    const host = await field()
+    expect(part(host, 'trigger')?.getAttribute('aria-haspopup')).toBe('dialog')
+    expect(part(host, 'surface')?.getAttribute('role')).toBe('dialog')
+    expect(part(host, 'surface')?.getAttribute('aria-label')).toBe('Choose a time')
+  })
+})

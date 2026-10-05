@@ -73,6 +73,9 @@ export declare class MixinPickerFieldInterface {
    */
   protected readonly handleTriggerClick: () => void
 
+  /** Enter in the text submits the form, as it does in a native text field. */
+  protected readonly handleKeypress: (event: KeyboardEvent) => void
+
   /**
    * Escape shuts the panel without moving the value, Tab out of the text shuts
    * a panel the reader is passing, and ArrowDown in the text moves into it.
@@ -423,6 +426,25 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
 
     /** Whether the trigger opened the panel, so focus moves into the picker. */
     private fromTrigger = false
+
+    /**
+     * Enter in the text submits the form, as it does in a native text field.
+     *
+     * The text is in a shadow root and has no form owner, so the platform
+     * never runs implicit submission for it. On `keypress`, where the platform
+     * runs its own, so an Enter a family or a consumer prevented on `keydown`,
+     * such as one that adds a date in `multiple`, submits nothing.
+     */
+    protected readonly handleKeypress = (event: KeyboardEvent): void => {
+      if (event.key === 'Enter' && !event.defaultPrevented) {
+        this.submitImplicitly()
+      }
+    }
+
+    /** @internal A single line of text counts against implicit submission. */
+    protected override get blocksImplicitSubmission(): boolean {
+      return this.control !== null
+    }
 
     /**
      * The trigger's press: opens the panel with focus in the picker, or closes

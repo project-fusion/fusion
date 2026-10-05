@@ -710,3 +710,40 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('Enter in a closed combobox', () => {
+  /* The field is in a shadow root with no form owner, and the list took Enter
+     even with the panel shut, so the form never submitted. */
+  test('presses the form’s default button', async () => {
+    document.body.innerHTML = `<form><helix-headless-combobox label="L" name="c" default-value="go">
+      <helix-headless-option value="go">Go</helix-headless-option>
+    </helix-headless-combobox><button>Send</button></form>`
+    const host = document.querySelector('helix-headless-combobox') as Updatable
+    await settle(host)
+    let pressed = 0
+    document.querySelector('button')?.addEventListener('click', (event) => {
+      event.preventDefault()
+      pressed += 1
+    })
+    await press(host, 'Enter')
+    control(host).dispatchEvent(
+      new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' }),
+    )
+    expect(pressed).toBe(1)
+  })
+})
+
+describe('a read-only combobox', () => {
+  test('keeps its choice, and its list stays shut', async () => {
+    const host = (await combobox('readonly default-value="go"')) as Updatable & {
+      open: boolean
+      requestValue(next: string): boolean
+      value: string
+    }
+    expect(control(host).readOnly).toBe(true)
+    await press(host, 'ArrowDown')
+    expect(host.open).toBe(false)
+    expect(host.requestValue('rs')).toBe(false)
+    expect(host.value).toBe('go')
+  })
+})

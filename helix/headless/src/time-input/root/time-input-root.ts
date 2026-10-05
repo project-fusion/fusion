@@ -609,6 +609,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
           @focus=${this.handleFocus}
           @input=${this.handleInput}
           @keydown=${this.handleDraftKey}
+          @keypress=${this.handleKeypress}
         />
         <button
           part="trigger"
@@ -616,7 +617,7 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
           aria-controls="surface"
           aria-disabled=${this.readOnly ? 'true' : nothing}
           aria-expanded=${this.open ? 'true' : 'false'}
-          aria-haspopup="listbox"
+          aria-haspopup="dialog"
           aria-label=${this.triggerLabel}
           ?disabled=${this.isDisabled}
           @click=${this.handleTriggerClick}
@@ -625,9 +626,18 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
         </button>
       </div>
 
+      ${
+        /* A dialog named by the trigger's words, as on Date Input and Color
+           Input. The trigger said it opened a listbox, and the surface had no
+           role at all; the list inside is in another shadow root, which no
+           IDREF reaches, and the wheels are three lists. */
+        ''
+      }
       <div
         part="surface"
         id="surface"
+        role="dialog"
+        aria-label=${this.triggerLabel}
         popover="manual"
         ?hidden=${!this.open}
         @keydown=${this.handleWheelEnter}
