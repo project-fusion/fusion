@@ -465,3 +465,63 @@ describe('Enter in a box', () => {
     expect(submitted).toBe(1)
   })
 })
+
+describe('a read-only code', () => {
+  /* A paste event fires on a focused read-only box, and the handler wrote the
+     clipboard into the code while the keys beside it were refused. */
+  test('refuses a paste', async () => {
+    const host = await pin('length="4" readonly default-value="1234"')
+    await paste(host, 0, '9999')
+    expect(host.value).toBe('1234')
+  })
+})
+
+describe('a code completed and refused', () => {
+  /* An auto-submit wired to `helix-complete` submitted a code the field did not
+     hold, because the event was sent with what was proposed. */
+  test('sends no helix-complete for the code it refused', async () => {
+    const host = await pin('length="4"')
+    host.addEventListener('helix-before-change', (event) => {
+      if ((event as CustomEvent<{ value: string }>).detail.value.length === 4) {
+        event.preventDefault()
+      }
+    })
+    const completed: string[] = []
+    host.addEventListener('helix-complete', (event) => {
+      completed.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    await paste(host, 0, '1234')
+    expect(completed).toEqual([])
+    expect(host.value).toBe('')
+  })
+
+  test('and sends it for a code it took', async () => {
+    const host = await pin('length="4"')
+    const completed: string[] = []
+    host.addEventListener('helix-complete', (event) => {
+      completed.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    await paste(host, 0, '1234')
+    expect(completed).toEqual(['1234'])
+  })
+})
+
+describe('Home and End', () => {
+  const press = (host: Pin, at: number, key: string): void => {
+    cells(host)[at]?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }),
+    )
+  }
+
+  test('Home goes to the first box', async () => {
+    const host = await pin('length="4" default-value="12"')
+    press(host, 2, 'Home')
+    expect(host.shadowRoot?.activeElement).toBe(cells(host)[0] ?? null)
+  })
+
+  test('End goes to the end of the code', async () => {
+    const host = await pin('length="4" default-value="12"')
+    press(host, 0, 'End')
+    expect(host.shadowRoot?.activeElement).toBe(cells(host)[2] ?? null)
+  })
+})

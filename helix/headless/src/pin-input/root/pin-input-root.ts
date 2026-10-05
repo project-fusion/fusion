@@ -64,7 +64,10 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.partNamed('cell'),
+    /* The group, which names the row. Forwarded to the first box, a host
+       `aria-labelledby` replaced that box's "Character 1 of 4" and left the
+       group and every other box without the field's name. */
+    target: () => this.partNamed('field'),
   })
 
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
@@ -213,12 +216,15 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     }
     const next = characters.join('')
     const filled = Math.min(this.count - 1, start + cleaned.length)
-    this.requestValue(next)
+    const applied = this.requestValue(next)
     this.updateComplete.then(() => {
       this.paint()
       this.cells[filled]?.focus()
       this.cells[filled]?.select()
-      if (next.length === this.count) {
+      /* Only a code the element took. A refused last character left the
+         shorter code in place, and announcing the refused one sent an
+         auto-submit a code the field does not hold. */
+      if (applied && this.value === next && next.length === this.count) {
         this.dispatchEvent(new HelixCompleteEvent({ value: next }))
         /* And a native `change`, because a filled code is this control's
            commit. There is no inner control to relay one from: six boxes each
@@ -288,7 +294,8 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   private readonly handlePaste = (event: ClipboardEvent): void => {
     const cell = event.target as HTMLInputElement
     const at = this.cells.indexOf(cell)
-    if (at === -1) {
+    // A read-only box still takes a paste event, and the keys are guarded too.
+    if (at === -1 || this.isDisabled || this.readOnly) {
       return
     }
     // Taken here rather than left to `input`, so the browser does not first put
@@ -303,6 +310,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * Backspace in an empty box goes back and clears the one it lands in, which
    * is what makes a code correctable without the reader hunting for the box
    * they meant. In a full box it does what it always does and is left alone.
+   *
+   * Home goes to the first box and End to the end of the code, the box after
+   * its last character, which is where the caret goes in a single text field.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const cell = event.target as HTMLInputElement
@@ -312,7 +322,13 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     }
     /* Not `inlineStep`: the row is left to right whatever the page, so the key
        pointing right is the one that moves on in every script. */
-    const to = at + (event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0)
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
+    const to =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? Math.min(this.value.length, this.count - 1)
+          : at + step
     if (event.key === 'Backspace' && cell.value === '' && at > 0) {
       const characters = this.characters
       characters[at - 1] = ''
