@@ -72,16 +72,18 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   }
 
   /**
-   * Whether the item holds the group's tab stop while nothing is chosen.
+   * Whether the item holds the group's tab stop. Unset, the chosen item holds
+   * it.
    *
-   * The stop normally rides on the selection, and an unanswered group has no
-   * selection, so without this the keyboard cannot reach it. Written by the
-   * group, with no attribute: it is coordination between elements, and
-   * `tabindex` on a host the consumer rendered is the change a React consumer's
-   * hydration reports and does not patch up.
+   * Written by the group on every item: `true` for the chosen item, or for the
+   * first item that can be chosen while there is no selection to carry the
+   * stop, and `false` for every item, the chosen one too, while a toolbar the
+   * group sits in holds the stop. No attribute: it is coordination between
+   * elements, and `tabindex` on a host the consumer rendered is the change a
+   * React consumer's hydration reports and does not patch up.
    */
   @property({ attribute: false })
-  focusable = false
+  focusable?: boolean
 
   /**
    * Asks for the render that follows a hydration, so the stop stops being every
@@ -89,8 +91,8 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
    *
    * `tabindex` reads `childrenKnown` and a hydrating render is one where that is
    * false, which is what keeps the hydrating render the server's. Nothing else
-   * would ask: the group writes an already-false `focusable` onto every choice
-   * but one, which changes nothing and so re-renders nothing.
+   * is sure to ask: a write from the group that leaves `focusable` as it was
+   * re-renders nothing.
    */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
@@ -115,7 +117,7 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
       role="radio"
       aria-checked=${this.selected ? 'true' : 'false'}
       ?disabled=${this.disabled}
-      tabindex=${this.selected || this.focusable || !this.childrenKnown ? '0' : '-1'}
+      tabindex=${(this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
     >
       <slot></slot>
