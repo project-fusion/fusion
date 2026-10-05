@@ -71,6 +71,15 @@ describe('accordion server output', () => {
     expect(partTag(markup, 'content')).toContain('role="region"')
   })
 
+  test('a closed section find in page searches is served with no landmark', () => {
+    const markup = ssr(
+      html`<helix-headless-accordion-item hidden-until-found><span slot="summary">S</span>x</helix-headless-accordion-item>`,
+    )
+    expect(partTag(markup, 'content')).toContain('hidden="until-found"')
+    expect(partTag(markup, 'content')).not.toContain('role=')
+    expect(partTag(markup, 'content')).not.toContain('aria-labelledby')
+  })
+
   test('the accordion renders without walking children it cannot see', () => {
     expect(hasPart(item('closed'), 'container')).toBe(true)
   })

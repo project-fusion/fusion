@@ -87,6 +87,19 @@ describe('a section find in page can search', () => {
     expect(part(host, 'trigger')?.getAttribute('aria-expanded')).toBe('true')
   })
 
+  /* `content-visibility` hides the content and leaves the region's own box in
+     the tree, so every closed section was listed as an empty landmark. */
+  test('is no landmark while closed, and the region again once open', async () => {
+    const host = await item('hidden-until-found')
+    const content = part(host, 'content') as HTMLElement
+    expect(content.hasAttribute('role')).toBe(false)
+    expect(content.hasAttribute('aria-labelledby')).toBe(false)
+    host.open = true
+    await host.updateComplete
+    expect(content.getAttribute('role')).toBe('region')
+    expect(content.getAttribute('aria-labelledby')).toBe('trigger')
+  })
+
   test('a refused opening puts the region back to hidden until found', async () => {
     const host = await item('hidden-until-found')
     host.addEventListener('helix-before-open', (event) => event.preventDefault())
@@ -116,5 +129,12 @@ describe('the chevron', () => {
     const host = await item()
     const slot = host.shadowRoot?.querySelector('slot[name="chevron"]')
     expect(slot?.querySelector('[part="chevron"]')).not.toBeNull()
+  })
+
+  /* A glyph written as text, such as "+", joined the trigger's name. */
+  test('keeps what is slotted there out of the trigger name', async () => {
+    const host = await item()
+    const slot = host.shadowRoot?.querySelector('slot[name="chevron"]')
+    expect(slot?.getAttribute('aria-hidden')).toBe('true')
   })
 })

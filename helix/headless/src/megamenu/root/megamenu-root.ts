@@ -2,6 +2,7 @@ import {
   anchorElement,
   customElement,
   deepContains,
+  focusableElements,
   HelixElement,
   MixinControllerOpen,
   PopoverController,
@@ -23,6 +24,26 @@ import { property, state } from 'lit/decorators.js'
 let showing: HelixHeadlessMegamenu | undefined
 
 /**
+ * Every megamenu on the page, so a press on another one's trigger counts as
+ * moving along the bar. Closing on that press would close this panel before the
+ * other opens, and the hand-over would have no direction.
+ */
+const connected = new Set<HelixHeadlessMegamenu>()
+
+/**
+ * The megamenu a pointer is pressing, from the press until the click that ends
+ * it. A press moves focus before the click opens anything, and the open panel
+ * must not close on that focus move, or the hand-over has no direction.
+ */
+let pressed: HelixHeadlessMegamenu | undefined
+
+const release = (): void => {
+  setTimeout(() => {
+    pressed = undefined
+  })
+}
+
+/**
  * @summary A section of a navigation with a trigger that opens a panel of links.
  *
  * @description
@@ -42,11 +63,17 @@ let showing: HelixHeadlessMegamenu | undefined
  * along the row and see each section.
  *
  * When one panel opens in place of another, each says which way the reader
- * moved, as Radix's `data-motion` does: the one opening is
- * `:state(from-start)` or `:state(from-end)`, by where the one closing sits in
- * the bar, and the one closing is `:state(to-start)` or `:state(to-end)`. A
- * stylesheet slides them on that. Put megamenus in a `Navigation` with
- * `arrows` and the arrow keys move between their triggers.
+ * moved, as Radix's `data-motion` does. Moving toward the end of the bar, the
+ * one opening is `:state(from-end)` and the one closing is `:state(to-start)`;
+ * moving back, they are `:state(from-start)` and `:state(to-end)`. A
+ * stylesheet slides them on that. Start and end follow the reading direction,
+ * so on a right-to-left page the end is on the left. A panel that opens or
+ * closes on its own carries none of the four. A press on another megamenu's
+ * trigger hands over the same way as hovering it.
+ *
+ * Put megamenus in a `Navigation` with `arrows` and the arrow keys move
+ * between their triggers. Down Arrow on the trigger of an open panel moves
+ * focus to the panel's first link.
  *
  * @since 0.1.0
  * @status stable
@@ -66,12 +93,12 @@ let showing: HelixHeadlessMegamenu | undefined
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  *
- * @cssstate from-end - The panel opened in place of one later in the bar, so it can enter from that side.
- * @cssstate from-start - The panel opened in place of one earlier in the bar.
+ * @cssstate from-end - The panel opened in place of one earlier in the bar, so it can enter from the end side.
+ * @cssstate from-start - The panel opened in place of one later in the bar, so it can enter from the start side.
  * @cssstate narrow - The page is narrower than `band-below`, so the panel is shown as a band whatever its variant.
  * @cssstate open - The panel is open, and the trigger is shown as current.
- * @cssstate to-end - The panel closed because one later in the bar opened, so it can leave toward it.
- * @cssstate to-start - The panel closed because one earlier in the bar opened.
+ * @cssstate to-end - The panel closed because one earlier in the bar opened, so it can leave toward the end.
+ * @cssstate to-start - The panel closed because one later in the bar opened, so it can leave toward the start.
  */
 @customElement('helix-headless-megamenu')
 export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
@@ -186,8 +213,10 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     anchor: () => this.trigger,
     /* The host, not the panel. A press on the trigger is a press on this
        element, and counting it as outside would close the panel on the way to
-       the click that toggles it. `Menu` says the same about its own. */
-    boundary: () => this,
+       the click that toggles it. `Menu` says the same about its own. Every
+       other megamenu too: a press on one of them opens it, and opening it
+       closes this one with a direction. */
+    boundary: () => [...connected],
     onDismiss: () => this.close(),
     open: () => this.open,
     place: () => !this.banded,
@@ -223,6 +252,27 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    */
   get navigationControl(): HTMLElement {
     return this.trigger
+  }
+
+  /**
+   * Down Arrow on the trigger of an open panel moves focus to the panel's first
+   * link or control, as Radix's navigation menu does.
+   */
+  private readonly handleKeyDown = (event: KeyboardEvent): void => {
+    if (event.key !== 'ArrowDown' || !this.open || event.defaultPrevented) {
+      return
+    }
+    const trigger = this.trigger
+    if (!event.composedPath().includes(trigger)) {
+      return
+    }
+    const first = focusableElements(this).find(
+      (element) => element !== trigger && !element.closest('[slot="trigger"]'),
+    )
+    if (first) {
+      event.preventDefault()
+      first.focus()
+    }
   }
 
   /** Shuts it and puts the reader back where they were. */
@@ -348,6 +398,9 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
     this.pointer = event.pointerType
+    pressed = this
+    window.addEventListener('pointerup', release, { capture: true, once: true })
+    window.addEventListener('pointercancel', release, { capture: true, once: true })
   }
 
   private readonly handlePointerEnter = (event: PointerEvent): void => {
@@ -389,6 +442,10 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     if (!this.open || next === null || deepContains(this, next)) {
       return
     }
+    /* A press on another megamenu opens that one, which closes this one. */
+    if (pressed !== undefined && pressed !== this && deepContains(pressed, next)) {
+      return
+    }
     this.requestOpen(false)
   }
 
@@ -405,6 +462,12 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
        for the people making them, so both toggle. */
     if (event.detail === 0 || (this.pointer !== undefined && this.pointer !== 'mouse')) {
       this.requestOpen(!this.open)
+      return
+    }
+    /* A mouse press that beat the hover's wait opens it now: the wait it
+       cleared was about to. */
+    if (!this.open) {
+      this.requestOpen(true)
     }
   }
 
@@ -459,6 +522,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.watchWidth()
+    connected.add(this)
     /* On the window and capturing, so a band over a scrolling panel hears that
        too rather than only the page's own scrolling. Passive: this measures and
        never prevents. */
@@ -468,6 +532,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.addEventListener('pointerenter', this.handlePointerEnter)
     this.addEventListener('pointerleave', this.handlePointerLeave)
     this.addEventListener('focusout', this.handleFocusOut)
+    this.addEventListener('keydown', this.handleKeyDown)
   }
 
   override disconnectedCallback(): void {
@@ -480,6 +545,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.removeEventListener('pointerenter', this.handlePointerEnter)
     this.removeEventListener('pointerleave', this.handlePointerLeave)
     this.removeEventListener('focusout', this.handleFocusOut)
+    this.removeEventListener('keydown', this.handleKeyDown)
+    connected.delete(this)
     this.stop()
     if (showing === this) {
       showing = undefined
@@ -503,24 +570,53 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     if (this.open) {
       const previous = showing && showing !== this ? showing : undefined
       /* Which way the reader moved along the bar: toward the end where this
-         one comes after the one closing. */
+         one comes after the one closing. Radix pairs them the same way: the
+         one opening enters from the side the reader moved toward, and the one
+         closing leaves toward the side they came from. */
       const forward =
         previous !== undefined &&
         (previous.compareDocumentPosition(this) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
       this.motion(previous ? (forward ? 'from-end' : 'from-start') : undefined)
+      HelixHeadlessMegamenu.settle(this, previous)
       if (previous) {
-        previous.motion(forward ? 'to-end' : 'to-start')
-        previous.requestOpen(false)
+        previous.motion(forward ? 'to-start' : 'to-end')
+        previous.handedOver = true
+        if (!previous.requestOpen(false)) {
+          previous.handedOver = false
+          previous.motion(undefined)
+        }
       }
       showing = this
-    } else if (showing === this) {
+      return
+    }
+    if (showing === this) {
       showing = undefined
     }
+    /* Closed on its own, so it moved nowhere, and neither did any other. */
+    if (!this.handedOver) {
+      HelixHeadlessMegamenu.settle()
+    }
+    this.handedOver = false
   }
 
   /**
+   * Clears the direction of every panel but the two in a hand-over, so only
+   * the latest move is ever described.
+   */
+  private static settle(...moving: (HelixHeadlessMegamenu | undefined)[]): void {
+    for (const megamenu of connected) {
+      if (!moving.includes(megamenu)) {
+        megamenu.motion(undefined)
+      }
+    }
+  }
+
+  /** Whether the panel is closing because another one opened in its place. */
+  private handedOver = false
+
+  /**
    * Says which way the reader moved when one panel took over from another.
-   * Nothing clears all four, for a panel opened on its own.
+   * Nothing clears all four, for a panel opened or closed on its own.
    */
   private motion(to: 'from-end' | 'from-start' | 'to-end' | 'to-start' | undefined): void {
     this.toggleState('from-end', to === 'from-end')

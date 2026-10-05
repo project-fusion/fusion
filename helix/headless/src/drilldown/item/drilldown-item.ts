@@ -192,7 +192,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
    * an icon of your own replaces it by being slotted.
    */
   protected renderMark(): TemplateResult {
-    return html`<slot name="chevron"
+    return html`<slot name="chevron" aria-hidden="true"
       ><svg part="mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
         ${unsafeSVG(caretRight.content)}
       </svg></slot
