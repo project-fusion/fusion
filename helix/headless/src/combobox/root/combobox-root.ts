@@ -98,6 +98,7 @@ const isInsertion = (event: Event): boolean =>
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens. Cancelable: cancel it to keep the panel closed.
  * @event {HelixCreateEvent} helix-create - Fired when the user adds a value that is not in the list. Cancelable.
  * @event {HelixFilterEvent} helix-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and do the filtering yourself.
+ * @event {HelixLoadMoreEvent} helix-load-more - Fired once the list is scrolled within a screen of its end, once for each number of options, and not while `loading` is set. Add the next page and set `loading` while you fetch it.
  * @event {Event} input - Fired after the value changes.
  * @event {ToggleEvent} toggle - Fired when the panel opens or closes, with `newState` and `oldState`.
  *
@@ -266,6 +267,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    */
   @property({ attribute: 'no-results-text' })
   noResultsText?: string
+
+  /**
+   * What opens the list: `input`, typing or pressing Down; `focus`, also
+   * arriving in the field, by Tab or a press; or `manual`, only Down, Alt+Down
+   * or a press on the caret, so typing narrows a list the reader has asked
+   * for. React Aria's `menuTrigger`.
+   */
+  @property({ attribute: 'open-on' })
+  openOn: 'focus' | 'input' | 'manual' = 'input'
 
   /**
    * Text shown while nothing has been chosen.
@@ -583,7 +593,9 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       return
     }
     this.requestOpen(false)
+    this.refocusing = true
     this.partNamed('control')?.focus()
+    this.refocusing = false
   }
 
   /**
@@ -694,10 +706,27 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     } else {
       this.narrow(typed, inserted)
     }
-    if (!this.open) {
+    if (!this.open && this.openOn !== 'manual') {
       this.requestOpen(true)
     }
   }
+
+  /**
+   * Arriving in the field opens the list where `open-on` is `focus`, unless
+   * this element is handing focus back to it as the list closes.
+   */
+  private readonly handleFocus = (): void => {
+    if (this.openOn !== 'focus' || this.open || this.refocusing) {
+      return
+    }
+    if (this.isDisabled || this.readOnly) {
+      return
+    }
+    this.requestOpen(true)
+  }
+
+  /** Whether `close` is putting focus back in the field, which opens nothing. */
+  private refocusing = false
 
   /** The narrowing waiting out `filterDelay`, if any. */
   private readonly narrowing = new DelayController(this, { renders: false })
@@ -778,6 +807,14 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       this.commitEmptied()
       if (this.open) {
         this.requestOpen(false)
+      } else if (this.openOn === 'manual' && this.editing) {
+        /* What a close does, for a field that was typed into and never
+           opened: the words go back to the choice, and the list is whole. */
+        this.typed = ''
+        this.suggestion = ''
+        this.editing = false
+        this.listbox?.requestFilter('')
+        this.requestUpdate()
       }
       return
     }
@@ -945,8 +982,13 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     if (event.composedPath().some((node) => node instanceof HelixHeadlessTag)) {
       return
     }
+    /* With `open-on="manual"`, a press into the text is for the caret in it;
+       the caret indicator still opens. */
+    const onText = event.composedPath().includes(this.partNamed('control') as EventTarget)
+    this.refocusing = true
     this.partNamed('control')?.focus()
-    if (!this.open) {
+    this.refocusing = false
+    if (!this.open && !(this.openOn === 'manual' && onText)) {
       this.requestOpen(true)
     }
   }
@@ -1077,8 +1119,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        All three, not the listbox's copy alone. A surviving `typed` is
        invisible on close, because a closed single-choice field shows the
        chosen words instead, and comes back with the list behind it showing
-       everything the moment it reopens. */
-    if (!this.open) {
+       everything the moment it reopens.
+
+       With `open-on="manual"` the reader types into a shut field on purpose,
+       so there only the close itself clears it. */
+    if (!this.open && (this.openOn !== 'manual' || changed.has('open'))) {
       this.typed = ''
       this.suggestion = ''
       this.editing = false
@@ -1107,7 +1152,9 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * arrowing in to check the choice lost sight of it.
    */
   private get fieldText(): string {
-    if (this.multiple || (this.open && this.editing)) {
+    /* A shut field shows what was typed only where typing does not open it,
+       `open-on="manual"`, the reader having typed into it on purpose. */
+    if (this.multiple || ((this.open || this.openOn === 'manual') && this.editing)) {
       return this.suggestion || this.typed
     }
     return this.word
@@ -1254,6 +1301,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
           ?disabled=${this.isDisabled}
           ?readonly=${this.readOnly}
           .value=${this.fieldText}
+          @focus=${this.handleFocus}
           @input=${this.handleInput}
           @keydown=${this.handleKeydown}
           @keypress=${this.handleKeypress}

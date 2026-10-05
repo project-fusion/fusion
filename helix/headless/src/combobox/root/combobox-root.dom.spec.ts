@@ -857,3 +857,38 @@ describe('the statuses a combobox hands its list', () => {
     expect(forward(given)?.getAttribute('slot')).toBe('no-results')
   })
 })
+
+describe('what opens a combobox', () => {
+  test('`open-on="focus"` opens on arrival, and not as the list hands focus back', async () => {
+    const host = (await combobox('open-on="focus"')) as Updatable & { open: boolean }
+    control(host).dispatchEvent(new FocusEvent('focus'))
+    await settle(host)
+    expect(host.open).toBe(true)
+    await press(host, 'Escape')
+    expect(host.open).toBe(false)
+  })
+
+  test('`open-on="manual"` stays shut as you type, and Down opens what the typing left', async () => {
+    const host = (await combobox('open-on="manual"')) as Updatable & { open: boolean }
+    await type(host, 'ru')
+    expect(host.open).toBe(false)
+    expect(control(host).value).toBe('ru')
+    await press(host, 'ArrowDown')
+    expect(host.open).toBe(true)
+    expect(shown(host)).toEqual(['Rust', 'Ruby'])
+    await press(host, 'Escape')
+    await type(host, 'go')
+    await press(host, 'Tab')
+    expect(control(host).value).toBe('')
+    expect(shown(host)).toEqual(['Rust', 'Ruby', 'Go'])
+  })
+
+  test('typing opens it by default, and arriving does not', async () => {
+    const host = (await combobox()) as Updatable & { open: boolean }
+    control(host).dispatchEvent(new FocusEvent('focus'))
+    await settle(host)
+    expect(host.open).toBe(false)
+    await type(host, 'r')
+    expect(host.open).toBe(true)
+  })
+})
