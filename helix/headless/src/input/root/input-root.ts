@@ -8,6 +8,7 @@ import {
   MixinControllerValue,
   MixinField,
   restoreValue,
+  submitImplicitly,
 } from '@fusion.dev/helix-core'
 import { eye, eyeSlash, x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -360,7 +361,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    */
   private readonly handleKeypress = (event: KeyboardEvent): void => {
     if (event.key === 'Enter' && !event.defaultPrevented) {
-      this.submitImplicitly()
+      submitImplicitly(this.form)
     }
   }
 

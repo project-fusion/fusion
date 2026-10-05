@@ -15,6 +15,7 @@ import {
   scrollItemIntoView,
   slottedWords,
   tellDisclosure,
+  typeaheadBy,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -183,7 +184,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     items: () => (this.open ? this.items : []),
     reserved: () => ['ArrowLeft', 'ArrowRight'],
     selects: () => false,
-    typeahead: (item) => slottedWords(item as HelixHeadlessMenuItem, ['']),
+    typeahead: typeaheadBy((item) => slottedWords(item as HelixHeadlessMenuItem, [''])),
   })
 
   /** Carries a host `aria-label` and `aria-labelledby` to the surface. */

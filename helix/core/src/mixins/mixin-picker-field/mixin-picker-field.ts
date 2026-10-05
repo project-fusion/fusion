@@ -2,6 +2,7 @@ import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { PopoverController } from '../../controllers/popover-controller/popover-controller.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
+import { submitImplicitly } from '../../utils/implicit-submit/implicit-submit.js'
 import { reportValues } from '../../utils/report-values/report-values.js'
 import { tabStops } from '../../utils/tab-stops/tab-stops.js'
 import type { MixinControllerOpenInterface } from '../mixin-controller-open/mixin-controller-open.js'
@@ -477,7 +478,7 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
      */
     protected readonly handleKeypress = (event: KeyboardEvent): void => {
       if (event.key === 'Enter' && !event.defaultPrevented) {
-        this.submitImplicitly()
+        submitImplicitly(this.form)
       }
     }
 

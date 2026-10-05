@@ -16,22 +16,6 @@ const VALIDITY_FLAGS = [
   'valueMissing',
 ] as const
 
-/** The native input types that count against implicit submission, from the HTML standard. */
-const BLOCKING_TYPES = new Set([
-  'date',
-  'datetime-local',
-  'email',
-  'month',
-  'number',
-  'password',
-  'search',
-  'tel',
-  'text',
-  'time',
-  'url',
-  'week',
-])
-
 /** What a control last reported through `setValidity`, kept so a custom error can be laid over it. */
 interface Reported {
   anchor: HTMLElement | undefined
@@ -504,7 +488,9 @@ export class HelixFormElement extends HelixElement {
 
   /**
    * @internal Whether this control is a field that counts against implicit
-   * submission: a single line of text, as `<input type="text">` is.
+   * submission: a single line of text, as `<input type="text">` is. Read by
+   * `submitImplicitly` in `utils/implicit-submit`, which only the controls
+   * that submit on Enter import.
    */
   protected get blocksImplicitSubmission(): boolean {
     return false
@@ -518,71 +504,6 @@ export class HelixFormElement extends HelixElement {
   /** @internal Activates the control as its form's default button. */
   protected activate(): void {
     this.click()
-  }
-
-  /**
-   * Submits the form the way pressing Enter in a native text field does.
-   *
-   * The control's own input is in a shadow root and has no form owner, so the
-   * platform never runs implicit submission for it. This runs it: the form's
-   * default button is activated, the first submit button in it, a Helix one
-   * included. With none, the form is submitted when it holds no more than one
-   * field that counts against implicit submission, and nothing happens
-   * otherwise.
-   *
-   * @reference https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#implicit-submission implicit submission
-   */
-  protected submitImplicitly(): void {
-    const { form } = this
-    if (!form) {
-      return
-    }
-    const elements = [...form.elements]
-    const button = HelixFormElement.defaultButton(form)
-    if (button) {
-      if (button.matches(':disabled')) {
-        return
-      }
-      if (button instanceof HelixFormElement) {
-        button.activate()
-      } else {
-        ;(button as HTMLElement).click()
-      }
-      return
-    }
-    const blocking = elements.filter((element) =>
-      element instanceof HelixFormElement
-        ? element.blocksImplicitSubmission
-        : element instanceof HTMLInputElement && BLOCKING_TYPES.has(element.type),
-    )
-    if (blocking.length <= 1) {
-      form.requestSubmit()
-    }
-  }
-
-  /** The form's default button, the first submit button in it, native or Helix. */
-  protected static defaultButton(form: HTMLFormElement): Element | undefined {
-    return [...form.elements].find((element) => HelixFormElement.submits(element))
-  }
-
-  /** Whether `target` is a native field of `form` that Enter submits it from. */
-  protected static submitsOnEnter(target: EventTarget | undefined, form: HTMLFormElement): boolean {
-    return (
-      target instanceof HTMLInputElement && target.form === form && BLOCKING_TYPES.has(target.type)
-    )
-  }
-
-  /** Whether `element` is a submit button, native or Helix. */
-  protected static submits(element: Element): boolean {
-    if (element instanceof HelixFormElement) {
-      return element.submitsForm
-    }
-    if (element instanceof HTMLButtonElement) {
-      return element.type === 'submit'
-    }
-    return (
-      element instanceof HTMLInputElement && (element.type === 'submit' || element.type === 'image')
-    )
   }
 
   /**

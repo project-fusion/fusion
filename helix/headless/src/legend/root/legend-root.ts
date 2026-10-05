@@ -9,6 +9,7 @@ import {
   SourceController,
   seriesIndex,
   seriesKey,
+  typeaheadBy,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -161,7 +162,7 @@ export class HelixHeadlessLegend extends HelixElement {
         : [],
     origin: 'focus',
     selects: () => false,
-    typeahead: (item) => (item as { words?: string }).words ?? '',
+    typeahead: typeaheadBy((item) => (item as { words?: string }).words ?? ''),
   })
 
   /** The table this legend last wrote its `hidden-series` to, so leaving undoes it. */

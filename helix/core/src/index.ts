@@ -72,8 +72,6 @@ export {
   type KeyboardNavigationOptions,
   type KeyboardOrigin,
   type NavigableItem,
-  Typeahead,
-  typesCharacter,
 } from './controllers/keyboard-navigation-controller/keyboard-navigation-controller.js'
 export {
   MediaSessionController,
@@ -410,6 +408,12 @@ export { formatNumbers } from './utils/format-numbers/format-numbers.js'
 export { headingIn, headingsIn } from './utils/heading-in/heading-in.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
 export {
+  defaultButton,
+  submitImplicitly,
+  submits,
+  submitsOnEnter,
+} from './utils/implicit-submit/implicit-submit.js'
+export {
   type DisableableItem,
   forgetDisabled,
   inheritDisabled,
@@ -509,6 +513,12 @@ export {
   type ToneMark,
   toneMark,
 } from './utils/tone-marks/tone-marks.js'
+export {
+  Typeahead,
+  type TypeaheadBy,
+  typeaheadBy,
+  typesCharacter,
+} from './utils/typeahead/typeahead.js'
 export {
   dateAsValue,
   isClockValue,

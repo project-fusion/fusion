@@ -4,7 +4,8 @@ import type { TemplateResult } from 'lit'
 
 /**
  * What every form control inherits from its base: the validity API, where
- * focus goes, implicit submission, and the fieldset that disabled it.
+ * focus goes, and the fieldset that disabled it. Implicit submission is
+ * `utils/implicit-submit`'s.
  *
  * **The test double's `checkValidity` always answers true**, so what is
  * asserted here is the verdict the control hands the platform, read back
@@ -17,7 +18,6 @@ type Probe = HTMLElement & {
   internals: ElementInternals
   isDisabled: boolean
   setCustomValidity(message: string): void
-  submitImplicitly(): void
   updateComplete: Promise<boolean>
   validationAnchor(anchor?: HTMLElement): HTMLElement | undefined
   validationMessage: string
@@ -167,56 +167,5 @@ describe('a fieldset that disabled the control', () => {
     host.disabled = false
     await host.updateComplete
     expect(host.isDisabled).toBe(false)
-  })
-})
-
-describe('Enter in a text control', () => {
-  const submits = (form: HTMLFormElement): (() => number) => {
-    let count = 0
-    form.addEventListener('submit', (event) => {
-      event.preventDefault()
-      count += 1
-    })
-    return () => count
-  }
-
-  test('presses the form’s default button', async () => {
-    const host = await mount(
-      '<form><probe-form-control></probe-form-control><button type="submit">Go</button></form>',
-    )
-    const button = document.querySelector('button') as HTMLButtonElement
-    let pressed = 0
-    button.addEventListener('click', () => {
-      pressed += 1
-    })
-    host.submitImplicitly()
-    expect(pressed).toBe(1)
-  })
-
-  test('submits a form with no button and no other text field', async () => {
-    const host = await mount('<form><probe-form-control></probe-form-control></form>')
-    const count = submits(host.closest('form') as HTMLFormElement)
-    host.submitImplicitly()
-    expect(count()).toBe(1)
-  })
-
-  /* Two native fields beside it, because the double leaves a custom element
-     out of `form.elements`, which a browser does not. */
-  test('and does nothing in a form with other text fields and no button', async () => {
-    const host = await mount(
-      '<form><probe-form-control></probe-form-control><input name="a" /><input name="b" /></form>',
-    )
-    const count = submits(host.closest('form') as HTMLFormElement)
-    host.submitImplicitly()
-    expect(count()).toBe(0)
-  })
-
-  test('nor where the default button is disabled', async () => {
-    const host = await mount(
-      '<form><probe-form-control></probe-form-control><button disabled>Go</button></form>',
-    )
-    const count = submits(host.closest('form') as HTMLFormElement)
-    host.submitImplicitly()
-    expect(count()).toBe(0)
   })
 })

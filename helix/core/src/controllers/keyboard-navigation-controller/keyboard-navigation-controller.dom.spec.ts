@@ -1,10 +1,10 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { typeaheadBy } from '../../utils/typeahead/typeahead.js'
 import {
   KeyboardNavigationController,
   type KeyboardNavigationOptions,
   type NavigableItem,
-  Typeahead,
 } from './keyboard-navigation-controller.js'
 
 /**
@@ -324,7 +324,7 @@ describe('typeahead', () => {
     options: Omit<KeyboardNavigationOptions, 'items'> = {},
   ): { asked: string[]; host: HTMLElement } => {
     const { asked, host, items } = set('a'.repeat(names.length), {
-      typeahead: (item) => names[items.indexOf(item as Item)] ?? '',
+      typeahead: typeaheadBy((item) => names[items.indexOf(item as Item)] ?? ''),
       ...options,
     })
     return { asked, host }
@@ -391,18 +391,6 @@ describe('typeahead', () => {
     host.dispatchEvent(event)
     expect(event.defaultPrevented).toBe(false)
     expect(asked).toEqual([])
-  })
-})
-
-describe('Typeahead', () => {
-  test('starts a new word after a pause', () => {
-    const search = new Typeahead({ timeout: 500 })
-    expect(search.match('c', ['Cambodia', 'Denmark'], -1, 0)).toBe(0)
-    expect(search.match('d', ['Cambodia', 'Denmark'], 0, 1000)).toBe(1)
-  })
-
-  test('matches nothing where no item starts with the word', () => {
-    expect(new Typeahead().match('z', ['Apple', 'Banana'], 0)).toBe(-1)
   })
 })
 

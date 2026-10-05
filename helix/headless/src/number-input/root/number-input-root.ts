@@ -12,6 +12,7 @@ import {
   MixinField,
   parseNumber,
   restoreValue,
+  submitImplicitly,
 } from '@fusion.dev/helix-core'
 import { minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -774,7 +775,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    */
   private readonly handleKeypress = (event: KeyboardEvent): void => {
     if (event.key === 'Enter' && !event.defaultPrevented) {
-      this.submitImplicitly()
+      submitImplicitly(this.form)
     }
   }
 

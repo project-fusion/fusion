@@ -6,6 +6,7 @@ import {
   HelixFormElement,
   MixinControllerValue,
   MixinField,
+  submitImplicitly,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -285,7 +286,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
            fire their own, and none of them means the code is entered. */
         this.commit()
         if (this.autosubmit) {
-          this.submitImplicitly()
+          submitImplicitly(this.form)
         }
       }
     })
@@ -615,7 +616,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    */
   private readonly handleKeypress = (event: KeyboardEvent): void => {
     if (event.key === 'Enter' && !event.defaultPrevented) {
-      this.submitImplicitly()
+      submitImplicitly(this.form)
     }
   }
 

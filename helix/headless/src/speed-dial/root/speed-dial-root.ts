@@ -9,6 +9,7 @@ import {
   PopoverController,
   slottedWords,
   tellDisclosure,
+  typeaheadBy,
 } from '@fusion.dev/helix-core'
 import { plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -89,7 +90,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     // None while closed, when the actions are hidden and cannot take focus.
     items: () => (this.open ? this.items : []),
     selects: () => false,
-    typeahead: (item) => slottedWords(item as HelixHeadlessSpeedDialItem, ['']),
+    typeahead: typeaheadBy((item) => slottedWords(item as HelixHeadlessSpeedDialItem, [''])),
   })
 
   /**
