@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, registerDom } from '@fusion.dev/helix-testing/dom'
+import filter from '../.examples/filter.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import windowed from '../.examples/windowed.html' with { type: 'text' }
 
@@ -89,4 +90,23 @@ describe('the windowed example', () => {
       expect(inspector().shadowRoot?.activeElement).toBe(tree())
     },
   )
+})
+
+describe('the filter example', () => {
+  run('opens on the entries that hold the filter, each on a tinted ground', async () => {
+    await example(filter)
+    await idle()
+    const field = inspector().shadowRoot?.querySelector<HTMLInputElement>('[part="search-field"]')
+    expect(field?.value).toBe('sfo1')
+    const matched = rows().filter((row) =>
+      row.getAttribute('part')?.split(' ').includes('row-match'),
+    )
+    expect(matched.map((row) => row.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+      '1: "sfo1"',
+      'region: "sfo1"',
+    ])
+    const ground = (row: HTMLElement): string => getComputedStyle(row).backgroundColor
+    const plain = rows().find((row) => !matched.includes(row)) as HTMLElement
+    expect(ground(matched[0] as HTMLElement)).not.toBe(ground(plain))
+  })
 })

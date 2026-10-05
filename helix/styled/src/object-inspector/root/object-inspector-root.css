@@ -45,7 +45,33 @@
   padding-block: var(--helix-space-xs);
 }
 
-[part="header"] + [part="frame"] [part="tree"] {
+/* The filter field is a band of the same frame, under the header where there
+   is one, so the three read as one box. */
+[part="search-field"] {
+  appearance: none;
+  background-color: var(--object-inspector-background-color, var(--helix-color-background));
+  border: var(--helix-border-thin) solid
+    var(--object-inspector-border-color, var(--helix-color-border));
+  border-block-end: none;
+  border-start-end-radius: var(--object-inspector-radius, var(--helix-radii-lg));
+  border-start-start-radius: var(--object-inspector-radius, var(--helix-radii-lg));
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inline-size: 100%;
+  margin: 0;
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-md);
+}
+
+[part="search-field"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="header"] + [part="search-field"],
+:is([part="header"], [part="search-field"]) ~ [part="frame"] [part="tree"] {
   border-start-end-radius: var(--helix-radii-none);
   border-start-start-radius: var(--helix-radii-none);
 }
@@ -106,6 +132,14 @@
 [part="tree"]:focus-visible [part~="row-active"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* What a filter matched, under the ground the active row takes. */
+[part~="row-match"] {
+  background-color: var(
+    --object-inspector-match-background-color,
+    var(--helix-color-accent-subtle)
+  );
 }
 
 [part="toggle"] {
