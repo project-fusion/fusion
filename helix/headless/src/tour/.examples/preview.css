@@ -203,11 +203,16 @@ helix-headless-tour-stop {
   display: contents;
 }
 
+/* Placed by the box the tour publishes, which is where it also writes it. */
 helix-headless-tour::part(spotlight) {
+  block-size: var(--tour-spotlight-height);
   border-radius: var(--_radius-surface);
   box-shadow: 0 0 0 100vmax light-dark(rgb(0 0 0 / 0.4), rgb(0 0 0 / 0.64));
+  inline-size: var(--tour-spotlight-width);
+  left: var(--tour-spotlight-x);
   pointer-events: none;
   position: fixed;
+  top: var(--tour-spotlight-y);
   z-index: 1000;
 }
 
