@@ -76,6 +76,7 @@ import '../../option/index.js'
  *
  * @csspart column - One column of the wheels.
  * @csspart column-empty - The text shown when the filter hides every option.
+ * @csspart column-error - A wheel's `error` part, which Time Picker never sets: its times do not load.
  * @csspart column-feedback - The message that says what is wrong with the value.
  * @csspart column-filter-icon - The icon beside the filter field.
  * @csspart column-filter-mark - The default icon beside the filter field, shown when none is slotted.
@@ -89,6 +90,7 @@ import '../../option/index.js'
  * @csspart columns - The row of columns, in `wheels`.
  * @csspart list - The listbox holding the times, in `list`.
  * @csspart list-empty - The text shown when the filter hides every option.
+ * @csspart list-error - The list's `error` part, which Time Picker never sets: its times do not load.
  * @csspart list-feedback - The message that says what is wrong with the value.
  * @csspart list-filter-icon - The icon beside the filter field.
  * @csspart list-filter-mark - The default icon beside the filter field, shown when none is slotted.
@@ -870,7 +872,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       part="column"
       data-column=${part}
       aria-invalid=${this.invalid ? 'true' : nothing}
-      exportparts="empty: column-empty, feedback: column-feedback, filter-icon: column-filter-icon,
+      exportparts="empty: column-empty, error: column-error, feedback: column-feedback, filter-icon: column-filter-icon,
         filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
         live: column-live, loading: column-loading, search: column-search, search-field: column-search-field"
       aria-label=${label}
@@ -998,7 +1000,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     return html`<${this.tag('listbox')}
       part="list"
       aria-invalid=${this.invalid ? 'true' : nothing}
-      exportparts="empty: list-empty, feedback: list-feedback, filter-icon: list-filter-icon,
+      exportparts="empty: list-empty, error: list-error, feedback: list-feedback, filter-icon: list-filter-icon,
         filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,
         live: list-live, loading: list-loading, search: list-search, search-field: list-search-field"
       aria-label=${this.listName}

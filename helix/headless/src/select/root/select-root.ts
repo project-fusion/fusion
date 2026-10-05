@@ -75,6 +75,7 @@ import '../../listbox/index.js'
  * @csspart label - The label above the trigger.
  * @csspart listbox - The list inside the panel.
  * @csspart listbox-empty - The text shown when the filter hides every option.
+ * @csspart listbox-error - The inner list's `error` part, shown while its `load-error` is set.
  * @csspart listbox-feedback - The inner list's message that says what is wrong with the value.
  * @csspart listbox-filter-icon - The icon beside the filter field.
  * @csspart listbox-filter-mark - The default icon beside the filter field, shown when none is slotted.
@@ -586,10 +587,10 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       loading-text=${this.loadingText}
       ?loading=${this.loading}
       part="listbox"
-      exportparts="empty: listbox-empty, feedback: listbox-feedback, filter-icon: listbox-filter-icon,
-        filter-mark: listbox-filter-mark, hint: listbox-hint, items: listbox-items,
-        label: listbox-label, live: listbox-live, loading: listbox-loading, search: listbox-search,
-        search-field: listbox-search-field"
+      exportparts="empty: listbox-empty, error: listbox-error, feedback: listbox-feedback,
+        filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
+        items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
+        search: listbox-search, search-field: listbox-search-field"
       .value=${this.value}
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}
