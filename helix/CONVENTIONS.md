@@ -1273,6 +1273,13 @@ for the tier and whether to publish typings, and finds everything else.
   rule refuses exactly what is left. **Writing out half a union is worse than
   the name**, because a shorter list reads as the whole of it, so a union with a
   name in it is not substituted at all.
+- **A member a class redeclares `@internal` leaves its page, inherited or
+  not.** `@internal` hid only the class's own entry, and the parent's came back
+  through inheritance, so Copy Button published Button's `type`, `command` and
+  form overrides, which it never uses. Redeclare such a member with `declare`
+  and an `@internal` block: `declare` writes no field, so the parent's member
+  still runs, and the manifest drops the member and the attribute it declares.
+  The analyzer did not do this; it is the one place the generator says less.
 - **Document mixin members on the mixin's inner class**, not only on the
   exported `declare class`. The interface is what TypeScript reads; the inner
   class is what the manifest reads.
