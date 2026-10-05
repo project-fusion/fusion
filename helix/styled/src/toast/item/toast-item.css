@@ -203,6 +203,30 @@ slot[name="icon"]::slotted(*) {
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* Under the finger while a swipe moves it, and back to rest when it lets go.
+   Only while swiping, so a message at rest has no transform of its own. The
+   browser keeps the vertical pan, on the regions inside as well, the item
+   being a scroll container that stops the rule reaching through it. */
+[part="item"],
+[part="item"] > * {
+  touch-action: pan-y;
+}
+
+/* **And the slot itself, given a box for it.** Words slotted with no element
+   around them take their touch behavior from the box they are laid out in, and
+   a slot draws none, so a swipe over a bare message was the page's to pan.
+   A block holding the words lays them out exactly as the region did. */
+[part="content"] > slot {
+  display: block;
+  touch-action: pan-y;
+}
+
+[part="item"][data-swiping] {
+  transition: none;
+  translate: var(--toast-swipe-x, 0) 0;
+  user-select: none;
+}
+
 /* How long is left, and only where a duration was given. */
 [part="timer"] {
   animation: helix-toast-drain var(--toast-duration, 0ms) linear forwards;

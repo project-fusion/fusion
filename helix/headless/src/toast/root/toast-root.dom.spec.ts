@@ -58,13 +58,27 @@ const region = async (items = ''): Promise<HTMLElement> =>
   )) as HTMLElement
 
 describe('toast region', () => {
-  test('is a polite live region, never an assertive one', async () => {
-    /* `role="alert"` interrupts whatever a reader is being told, and almost
-       nothing arriving in a corner of the screen has earned that. */
+  test('is a landmark, and a polite live region', async () => {
+    /* A region, so a reader finds the stack among the page's landmarks. Polite,
+       because `role="alert"` interrupts whatever a reader is being told; a
+       danger message says so on its own. */
     const host = await region()
     const internals = (host as unknown as { internals?: ElementInternals }).internals
-    expect(internals?.role).toBe('status')
+    expect(internals?.role).toBe('region')
     expect(internals?.ariaLive).toBe('polite')
+  })
+
+  test('says its hotkey in its name, in the consumer’s words', async () => {
+    const host = (await mount(
+      '<helix-headless-toast label="Mitteilungen ({hotkey})" hotkey="Alt+T"></helix-headless-toast>',
+    )) as HTMLElement
+    expect((host as unknown as { internals?: ElementInternals }).internals?.ariaLabel).toBe(
+      'Mitteilungen (Alt+T)',
+    )
+    const plain = (await mount('<helix-headless-toast></helix-headless-toast>')) as HTMLElement
+    expect((plain as unknown as { internals?: ElementInternals }).internals?.ariaLabel).toBe(
+      'Notifications (F8)',
+    )
   })
 
   test('announces arrivals and says nothing when one goes', async () => {
@@ -254,5 +268,70 @@ describe('focus when a message goes', () => {
     await one?.updateComplete
     await new Promise((resolve) => setTimeout(resolve, 0))
     expect(two?.shadowRoot?.activeElement?.getAttribute('part')).toBe('dismiss')
+  })
+})
+
+describe('the hotkey', () => {
+  const key = (init: KeyboardEventInit): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init })
+    document.dispatchEvent(event)
+    return event
+  }
+
+  /* The way back is read through the shadow roots' `activeElement`, which
+     happy-dom cannot answer for an element focused inside one, so it is
+     checked in Chromium. */
+  test('takes focus to the first control in the stack', async () => {
+    const opener = document.createElement('button')
+    document.body.append(opener)
+    opener.focus()
+    const host = await region(
+      '<helix-headless-toast-item dismissible>Saved</helix-headless-toast-item>',
+    )
+    const item = host.querySelector('helix-headless-toast-item') as Item
+    await item.updateComplete
+    /* Watched rather than read back: happy-dom's `activeElement` on a shadow
+       root throws for an element focused inside it. */
+    const dismiss = item.shadowRoot?.querySelector('[part="dismiss"]') as HTMLElement
+    let focused = 0
+    dismiss.addEventListener('focus', () => {
+      focused += 1
+    })
+    expect(key({ key: 'F8' }).defaultPrevented).toBe(true)
+    expect(focused).toBe(1)
+    opener.remove()
+  })
+
+  test('does nothing with nothing showing, or for another key', async () => {
+    await region()
+    expect(key({ key: 'F8' }).defaultPrevented).toBe(false)
+    expect(key({ ctrlKey: true, key: 'F8' }).defaultPrevented).toBe(false)
+  })
+})
+
+describe('add()', () => {
+  test('shows a message of the region’s tier from script, and removes it once dismissed', async () => {
+    const host = (await region()) as HTMLElement & {
+      add(message: string, options?: { tone?: string }): Item
+    }
+    const item = host.add('Saved', { tone: 'success' })
+    await item.updateComplete
+    expect(item.localName).toBe('helix-headless-toast-item')
+    expect(item.textContent).toBe('Saved')
+    expect(item.getAttribute('tone')).toBe('success')
+    expect(item.hasAttribute('dismissible')).toBe(true)
+    item.dismiss()
+    await item.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(item.isConnected).toBe(false)
+  })
+
+  test('never removes a message the page rendered itself', async () => {
+    const host = await region('<helix-headless-toast-item>Mine</helix-headless-toast-item>')
+    const item = host.querySelector('helix-headless-toast-item') as Item
+    item.dismiss()
+    await item.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(item.isConnected).toBe(true)
   })
 })

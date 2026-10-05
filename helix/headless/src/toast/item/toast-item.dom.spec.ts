@@ -102,3 +102,82 @@ describe('one toast message', () => {
     expect(item.open).toBe(false)
   })
 })
+
+describe('what a message is to a screen reader', () => {
+  const internalsOf = (one: Element) =>
+    (one as unknown as { internals: ElementInternals }).internals
+
+  test('an alertdialog, polite unless it is danger', async () => {
+    const plain = (await mount(
+      '<helix-headless-toast-item>Saved</helix-headless-toast-item>',
+    )) as Item
+    await plain.updateComplete
+    expect(internalsOf(plain).role).toBe('alertdialog')
+    expect(internalsOf(plain).ariaLive ?? null).toBeNull()
+    const danger = (await mount(
+      '<helix-headless-toast-item tone="danger">Failed</helix-headless-toast-item>',
+    )) as Item
+    await danger.updateComplete
+    expect(internalsOf(danger).ariaLive).toBe('assertive')
+  })
+})
+
+describe('a swipe', () => {
+  const swipe = (found: Item, dx: number, pointerType = 'touch'): HTMLElement => {
+    const box = found.shadowRoot?.querySelector('[part="item"]') as HTMLElement
+    box.getBoundingClientRect = () => ({ height: 60, width: 300 }) as DOMRect
+    const at = (type: string, x: number, time: number, target: EventTarget): void => {
+      const event = new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: 10,
+        composed: true,
+        pointerId: 5,
+        pointerType,
+      })
+      Object.defineProperty(event, 'timeStamp', { value: time })
+      target.dispatchEvent(event)
+    }
+    at('pointerdown', 0, 0, box)
+    at('pointermove', dx, 1000, window)
+    return box
+  }
+  const release = (x: number): void => {
+    const event = new PointerEvent('pointerup', {
+      bubbles: true,
+      button: 0,
+      clientX: x,
+      pointerId: 5,
+    })
+    Object.defineProperty(event, 'timeStamp', { value: 2000 })
+    window.dispatchEvent(event)
+  }
+
+  test('follows the finger toward the end of the line, and past halfway dismisses', async () => {
+    const found = (await mount(
+      '<helix-headless-toast-item>Saved</helix-headless-toast-item>',
+    )) as Item
+    await found.updateComplete
+    const box = swipe(found, 200)
+    expect(box.style.getPropertyValue('--toast-swipe-x')).toBe('200px')
+    release(200)
+    await found.updateComplete
+    expect(found.open).toBe(false)
+  })
+
+  test('short of halfway it goes back, and a mouse moves nothing', async () => {
+    const found = (await mount(
+      '<helix-headless-toast-item>Saved</helix-headless-toast-item>',
+    )) as Item
+    await found.updateComplete
+    const box = swipe(found, 60)
+    release(60)
+    await found.updateComplete
+    expect(found.open).toBe(true)
+    expect(box.style.getPropertyValue('--toast-swipe-x')).toBe('')
+    swipe(found, 200, 'mouse')
+    expect(box.style.getPropertyValue('--toast-swipe-x')).toBe('')
+    release(200)
+  })
+})
