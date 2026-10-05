@@ -19,6 +19,7 @@ import '../breadcrumb/breadcrumb.js'
  *
  * @slot - The trail's items, in order from root to current page.
  *
+ * @csspart expand - The button in the folded crumb that shows the whole trail.
  * @csspart list - The ordered list.
  *
  * @cssproperty --breadcrumbs-font-size - Size of the trail's text.

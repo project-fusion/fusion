@@ -1,6 +1,6 @@
 import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { html } from 'lit/static-html.js'
 import '../breadcrumb/breadcrumb.js'
@@ -40,6 +40,12 @@ export interface BreadcrumbItem {
  * array of `{ label, href }`, drawn as crumbs in order, the last one as the
  * current page. Slotted crumbs follow them. Use one way or the other in a trail.
  *
+ * With `max-items`, a trail drawn from `items` that is longer folds its middle
+ * into one crumb: the first crumb, a button, then the last `max-items` less one.
+ * The button is named by `expand-label` and shows the whole trail, moving focus
+ * to the first crumb it brought back. A new `items` folds again. Slotted crumbs
+ * do not fold; write the folded crumb where the gap should be.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -50,14 +56,23 @@ export interface BreadcrumbItem {
  * the crumb that holds the folded items where the gap should appear.
  *
  * @csspart crumb - Each crumb drawn from `items`.
+ * @csspart crumb-collapsed - The crumb that holds the folded middle of a trail longer than `max-items`.
  * @csspart crumb-current - The crumb drawn from `items` for the current page.
  * @csspart crumb-link - The link, or the current page's words, of a crumb drawn from `items`.
  * @csspart crumb-separator - The separator before a crumb drawn from `items`.
  * @csspart crumb-separator-mark - The chevron before a crumb drawn from `items`.
+ * @csspart expand - The button in the folded crumb that shows the whole trail.
  * @csspart list - The ordered list.
  */
 @customElement('helix-headless-breadcrumbs')
 export class HelixHeadlessBreadcrumbs extends HelixElement {
+  /**
+   * The name of the button that shows a folded trail's hidden crumbs. `{count}`
+   * is replaced by how many it shows. Translate it with the page.
+   */
+  @property({ attribute: 'expand-label' })
+  expandLabel = 'Show {count} more'
+
   /**
    * The trail as data, drawn as crumbs before any you slot. The last item is the
    * current page.
@@ -75,12 +90,43 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
   @property()
   label = 'Breadcrumb'
 
+  /**
+   * The most crumbs a trail drawn from `items` shows before it folds its middle
+   * into one, counting the first and the last. Unset, it never folds. At least
+   * 2, so the first crumb and the current page always show.
+   */
+  @property({ attribute: 'max-items', type: Number })
+  maxItems?: number
+
+  /** Whether a reader has asked to see the whole of a folded trail. */
+  @state()
+  private expanded = false
+
+  /** Shows the whole trail and moves focus to the first crumb it brought back. */
+  private readonly expand = (): void => {
+    this.expanded = true
+    this.updateComplete.then(() => {
+      const crumb = this.renderRoot.querySelectorAll('[part~="crumb"]')[1]
+      crumb?.shadowRoot?.querySelector<HTMLElement>('a, [part="link"]')?.focus()
+    })
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host through internals, so the landmark is the element itself and
     // an author's `aria-label` names it without anything being copied inward.
     // The default name goes the same way, and an attribute beats internals.
     hostAria(this.internals, { label: this.label, role: 'navigation' })
+    if (changed.has('items') && changed.get('items') !== undefined) {
+      this.expanded = false
+    }
+  }
+
+  /** How many crumbs drawn from `items` are folded away, or 0. */
+  private get folded(): number {
+    const most = this.maxItems ?? 0
+    const count = this.items.length
+    return !this.expanded && most >= 2 && count > most ? count - most : 0
   }
 
   /** The crumbs `items` describes, each a crumb of this tier. */
@@ -90,9 +136,29 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
     }
     const crumb = this.tag('breadcrumb')
     const last = this.items.length - 1
-    return html`${repeat(
-      this.items,
-      (item, index) => html`<${crumb}
+    const folded = this.folded
+    /* The first crumb, then the fold, then the rest from past what it holds. */
+    const shown = this.items
+      .map((item, index) => ({ index, item }))
+      .filter(({ index }) => folded === 0 || index === 0 || index > folded)
+    const fold =
+      folded === 0
+        ? nothing
+        : html`<${crumb}
+            part="crumb crumb-collapsed"
+            exportparts="link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
+            ><button
+              part="expand"
+              type="button"
+              aria-label=${this.expandLabel.replace('{count}', String(folded))}
+              @click=${this.expand}
+            >
+              …
+            </button></${crumb}
+          >`
+    const first = shown.slice(0, 1)
+    const rest = shown.slice(1)
+    const draw = ({ index, item }: { index: number; item: BreadcrumbItem }) => html`<${crumb}
         part="crumb${index === last ? ' crumb-current' : ''}"
         exportparts="link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
         href=${index === last ? nothing : (item.href ?? nothing)}
@@ -100,7 +166,11 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
         target=${item.target ?? nothing}
         ?current=${index === last}
         >${item.label}</${crumb}
-      >`,
+      >`
+    return html`${repeat(first, ({ index }) => index, draw)}${fold}${repeat(
+      rest,
+      ({ index }) => index,
+      draw,
     )}`
   }
 

@@ -31,7 +31,7 @@
 
 [part="item"]:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--speed-dial-item-disabled-opacity, 0.5);
 }
 
 /* Round, raised and the size of a small control: the same shape as the button
@@ -48,16 +48,18 @@
   display: inline-flex;
   inline-size: var(--speed-dial-item-size, var(--helix-size-control-tight));
   justify-content: center;
+  /* Always the mark's, so a dial that hides its names can turn the rest of the
+     row off and leave this. */
+  pointer-events: auto;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 [part="item"]:not(:disabled):hover [part="icon"] {
-  background-color: color-mix(
-    in oklab,
-    var(--helix-color-foreground) 6%,
-    var(--helix-color-surface-overlay)
+  background-color: var(
+    --speed-dial-item-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 6%, var(--helix-color-surface-overlay))
   );
   box-shadow: var(--helix-shadow-lg);
 }
@@ -84,7 +86,7 @@
   box-shadow: var(--helix-shadow-sm);
   color: var(--speed-dial-label-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--speed-dial-label-font-size, var(--helix-text-sm));
   font-weight: var(--helix-weight-medium);
   opacity: var(--_speed-dial-label-opacity, 1);
   padding: var(--helix-space-2xs) var(--helix-space-xs);

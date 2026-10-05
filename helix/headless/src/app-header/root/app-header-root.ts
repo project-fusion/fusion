@@ -31,8 +31,11 @@ import { inSectioningContent } from '../sectioning.js'
  * The host is the page's `banner` landmark. Placed inside `main`, `article`,
  * `aside`, `nav` or `section`, it is a plain box instead, as a native
  * `<header>` is there, so a header inside a card or a pane does not add a
- * second banner. A server cannot see the ancestors, so it serves the banner and
- * the browser corrects it when the element connects.
+ * second banner. The ancestors are read as the accessibility tree reads them,
+ * through the slots that take the header in, so one slotted into a component
+ * that draws a `<nav>`, such as `Navigation`, is not a banner either. A server
+ * cannot see the ancestors, so it serves the banner and the browser corrects
+ * it when the element connects.
  *
  * @since 0.1.0
  * @status stable
@@ -162,12 +165,24 @@ export class HelixHeadlessAppHeader extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.landmark = inSectioningContent(this) ? '' : 'banner'
-    hostAria(this.internals, { role: this.landmark })
+    this.readLandmark()
+    /* Again once the components around it have drawn, which is when a slot
+       they render, inside a `<nav>` of theirs, has taken this element in. */
+    setTimeout(() => {
+      if (this.isConnected) {
+        this.readLandmark()
+      }
+    })
     // Never reached on the server, which is correct: there is no scroll
     // position to read there, and the un-scrolled markup it emits is what a
     // fresh load actually shows.
     this.listen()
+  }
+
+  /** Whether this header is the page's banner, read from where it sits. */
+  private readLandmark(): void {
+    this.landmark = inSectioningContent(this) ? '' : 'banner'
+    hostAria(this.internals, { role: this.landmark })
   }
 
   override disconnectedCallback(): void {

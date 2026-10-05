@@ -220,3 +220,45 @@ describe('a row with a shortcut', () => {
     expect(part(host, 'item')?.hasAttribute('aria-keyshortcuts')).toBe(false)
   })
 })
+
+describe('the words that describe a row', () => {
+  /* React Aria's description slot: the row is named by its label, and a line
+     under it, or a count after it, describes it. The count joined the name. */
+  test('describe the row and stay out of its name', async () => {
+    const host = await mount(
+      '<helix-headless-menu-item>Copy<span slot="description">Copies the selection</span><span slot="end">3</span></helix-headless-menu-item>',
+    )
+    const item = part(host, 'item') as HTMLElement
+    expect(item.getAttribute('aria-describedby')).toBe('description end-words')
+    for (const name of ['description', 'end']) {
+      const slot = host.shadowRoot?.querySelector(`slot[name="${name}"]`)
+      expect(slot?.getAttribute('aria-hidden')).toBe('true')
+    }
+    expect(host.shadowRoot?.getElementById('description')?.getAttribute('name')).toBe('description')
+  })
+
+  test('and a row with neither is described by nothing', async () => {
+    const host = await mount('<helix-headless-menu-item>Copy</helix-headless-menu-item>')
+    expect(part(host, 'item')?.hasAttribute('aria-describedby')).toBe(false)
+    expect(
+      host.shadowRoot?.querySelector('slot[name="description"]')?.hasAttribute('data-empty'),
+    ).toBe(true)
+  })
+})
+
+describe('the marks of your own', () => {
+  /* The check and the caret had no slot, so neither could be replaced. */
+  test('replace the check of a checked row and the caret of a row with a page', async () => {
+    const ticked = await mount('<helix-headless-menu-item checked>Wrap</helix-headless-menu-item>')
+    const check = ticked.shadowRoot?.querySelector('slot[name="check"]')
+    expect(check?.querySelector('[part="mark"]')).not.toBeNull()
+    expect(check?.getAttribute('aria-hidden')).toBe('true')
+    const opens = (await mount(
+      '<helix-headless-menu-item>More<helix-headless-menu-item slot="submenu">X</helix-headless-menu-item></helix-headless-menu-item>',
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    await opens.updateComplete
+    const chevron = opens.shadowRoot?.querySelector('slot[name="chevron"]')
+    expect(chevron?.querySelector('[part="mark"]')).not.toBeNull()
+    expect(chevron?.getAttribute('aria-hidden')).toBe('true')
+  })
+})

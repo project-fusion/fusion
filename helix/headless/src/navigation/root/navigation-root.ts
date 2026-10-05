@@ -73,8 +73,9 @@ const navigable = (item: HTMLElement): NavigableItem => {
  * @documentation https://fusion.dev/helix/components/navigation
  *
  * @slot - The destinations, as your own links.
+ * @slot indicator - A marker of your own, drawn inside the `indicator` part, where the current destination's place and size reach it.
  *
- * @csspart indicator - The marker that moves to the current destination.
+ * @csspart indicator - The marker that moves to the current destination. It carries the destination's place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size`, and `data-placed` once it has been placed.
  * @csspart nav - The navigation landmark.
  */
 @customElement('helix-headless-navigation')
@@ -147,7 +148,7 @@ export class HelixHeadlessNavigation extends HelixElement {
 
   /** The destinations the consumer slotted. */
   private get items(): HTMLElement[] {
-    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot')
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot:not([name])')
     return (slot?.assignedElements() ?? []) as HTMLElement[]
   }
 
@@ -199,7 +200,7 @@ export class HelixHeadlessNavigation extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`<nav part="nav" aria-label=${this.label}>
-      <div part="indicator" aria-hidden="true"></div>
+      <div part="indicator" aria-hidden="true"><slot name="indicator"></slot></div>
       <slot @slotchange=${() => this.watch()}></slot>
     </nav>`
   }
