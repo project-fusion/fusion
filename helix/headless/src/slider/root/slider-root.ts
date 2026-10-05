@@ -450,7 +450,10 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
 
     /* One input per thumb, each spanning the whole range so both read against
        the same track. The lower one paints the fill and the upper one's track
-       is transparent, because two stacked tracks would paint the ramp twice. */
+       is transparent, because two stacked tracks would paint the ramp twice.
+       Each tells a screen reader it stops at the other, as the multi-thumb
+       slider pattern asks, through `aria-valuemin` and `aria-valuemax`: the
+       inputs' own bounds stay the whole track. */
     /* **The lower thumb answers to `control`, and it has to answer to
        something.** `MixinField.renderLabel` writes `<label for="control">` for
        every field in the library, so a range branch that does not render that id
@@ -472,6 +475,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         step=${this.step}
         .value=${String(at)}
         aria-labelledby=${this.labeled ? `${this.labelId} ${which}-name` : `${which}-name`}
+        aria-valuemin=${which === 'end' ? start : nothing}
+        aria-valuemax=${which === 'start' ? end : nothing}
         aria-valuetext=${this.spoken(at)}
         aria-describedby=${this.describedBy ?? nothing}
         aria-invalid=${this.invalidity ?? nothing}
