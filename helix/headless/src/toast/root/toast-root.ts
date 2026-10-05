@@ -2,6 +2,8 @@ import {
   customElement,
   deepActiveElement,
   deepContains,
+  FocusScopeController,
+  fillTemplate,
   focusableElements,
   HelixElement,
   hostAria,
@@ -9,6 +11,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { matchesHotkey, parseHotkey } from '../hotkey.js'
 
 /**
  * @summary The region that holds toast messages, and the only element that announces them.
@@ -19,9 +22,15 @@ import { property } from 'lit/decorators.js'
  * announce a region that arrives already holding its message. `Radio.Group` is
  * part of its family for the same reason.
  *
- * **The region is polite, never assertive.** `role="alert"` interrupts whatever
- * a screen reader is reading. For something that cannot wait, use a `Dialog`,
- * which stops the page for every user.
+ * **The region is a landmark named by `label`, and a polite live region.** A
+ * `danger` message is announced assertively, and every other one politely.
+ * Each message is an `alertdialog` named by its words, so a reader who moves
+ * into the stack hears which message they are on.
+ *
+ * **`hotkey` takes focus to the stack and back**, F8 unless you set it, and
+ * `label` says which key: `{hotkey}` in it is filled in, so the default name
+ * is "Notifications (F8)". Pressed while focus is in the stack, it gives focus
+ * back to where it was.
  *
  * **The region never creates or removes items.** You render items and remove
  * them. An item requests closing with a cancelable `helix-dismiss` event. A
@@ -29,9 +38,11 @@ import { property } from 'lit/decorators.js'
  * and the DOM stay in sync. It hides on its own unless you set `open`, which
  * makes the state yours.
  *
- * There is no `toast.show()`. For a `toast()` function, write a small one over
- * your app's state, which also lets you render the same messages on the server,
- * in a test, or more than once.
+ * **`add()` shows a message from script**, for a page with no framework state
+ * to render them from: it appends a message of the region's own tier and
+ * removes it once it has been dismissed and has finished leaving. Messages
+ * you render yourself stay yours, and the region never removes them. A touch
+ * or a pen swipes a message away toward the end of the line.
  *
  * **The stack is in the top layer.** The `region` part is a `popover="manual"`
  * shown while a message is showing, and shown again above a modal dialog that
@@ -56,15 +67,23 @@ import { property } from 'lit/decorators.js'
  *
  * @event {HelixDismissEvent} helix-dismiss - A message is being dismissed, by its control or by its timer. The message sends it, and you can listen for it on the region. Cancelable: canceling it keeps the message.
  *
- * @csspart region - The stack the messages are in. It is in the top layer while a message shows.
+ * @csspart region - The stack the messages are in. It is in the top layer while a message shows, and takes focus from `hotkey` where no message holds a control.
  */
 @customElement('helix-headless-toast')
 export class HelixHeadlessToast extends HelixElement {
   /**
-   * Accessible name for the region, such as "Notifications".
+   * The key that takes focus to the stack and back, such as `F8` or `Alt+T`:
+   * keys joined by `+`, the last one the key. Empty turns it off.
    */
   @property()
-  label = 'Notifications'
+  hotkey = 'F8'
+
+  /**
+   * Accessible name for the region, with `{hotkey}` filled in. Translate it with
+   * the rest of your interface.
+   */
+  @property()
+  label = 'Notifications ({hotkey})'
 
   /**
    * Which corner or edge the stack sits at.
@@ -106,7 +125,12 @@ export class HelixHeadlessToast extends HelixElement {
     /* On the host through internals, so the region is a landmark to anything
        walking the light DOM as well as to a screen reader, and so nothing is
        written onto the host as an attribute a server's markup never had. */
-    hostAria(this.internals, { label: this.label, role: 'status' })
+    /* A landmark, so a reader finds the stack among the page's regions, and a
+       live region as well, which a region may be. */
+    hostAria(this.internals, {
+      label: fillTemplate(this.label, { hotkey: this.hotkey }),
+      role: 'region',
+    })
     this.internals.ariaLive = 'polite'
     /* Additions are what a reader needs; a message going away is not news, and
        announcing removals means every dismissal is read out. */
@@ -121,6 +145,86 @@ export class HelixHeadlessToast extends HelixElement {
 
   /** The element focus came from when it entered the stack. */
   private focusOrigin: HTMLElement | undefined
+
+  /* Where the hotkey takes focus: the first control in a showing message, or
+     the stack itself. */
+  private readonly scope = new FocusScopeController(this, {
+    /* Each message's own way in, its dismiss control or the first thing in it
+       that takes focus, since a message's control is in its shadow root. */
+    contents: () =>
+      this.showing.flatMap((one) => {
+        const target = focusTarget(one)
+        return target ? [target] : []
+      }),
+    surface: () => this.region,
+  })
+
+  /** Takes focus to the stack and back, on `hotkey`. */
+  private readonly handleHotkey = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented || !matchesHotkey(event, parseHotkey(this.hotkey))) {
+      return
+    }
+    if (this.scope.holdsFocus) {
+      event.preventDefault()
+      this.scope.leave()
+      return
+    }
+    if (this.showing.length > 0) {
+      event.preventDefault()
+      this.scope.enter()
+    }
+  }
+
+  /** Messages `add()` made, which are the region's to remove. */
+  private readonly made = new WeakSet<Element>()
+
+  /**
+   * Shows a message from script, and returns the element.
+   *
+   * The message is the region's own tier of `Toast.Item`, appended to the
+   * stack, holding `message` as its text. The region removes it once it has
+   * been dismissed and has finished leaving, which is the one case where it
+   * removes anything: a message you render stays yours.
+   */
+  add(
+    message: string,
+    options: {
+      dismissible?: boolean
+      duration?: number
+      tone?: 'danger' | 'info' | 'success' | 'warning'
+    } = {},
+  ): HTMLElement {
+    const tier = (this.constructor as typeof HelixElement).tier
+    const item = document.createElement(`${tier}toast-item`)
+    item.textContent = message
+    if (options.tone) {
+      item.setAttribute('tone', options.tone)
+    }
+    if (options.duration !== undefined) {
+      item.setAttribute('duration', String(options.duration))
+    }
+    if (options.dismissible ?? true) {
+      item.toggleAttribute('dismissible', true)
+    }
+    this.made.add(item)
+    this.append(item)
+    return item
+  }
+
+  /** Removes a message `add()` made, once it has hidden and finished leaving. */
+  private sweep(): void {
+    for (const one of [...this.children]) {
+      if (!(one instanceof HTMLElement) || !one.hidden || !this.made.has(one)) {
+        continue
+      }
+      this.made.delete(one)
+      const running =
+        typeof one.getAnimations === 'function' ? one.getAnimations({ subtree: true }) : []
+      void Promise.allSettled(running.map((animation) => animation.finished)).then(() =>
+        one.remove(),
+      )
+    }
+  }
 
   /** Watches the messages arrive and hide, to raise or lower the stack. */
   private watcher: MutationObserver | undefined
@@ -285,8 +389,10 @@ export class HelixHeadlessToast extends HelixElement {
     super.connectedCallback()
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('helix-dismiss', this.handleDismiss)
+    document.addEventListener('keydown', this.handleHotkey)
     this.watcher = new MutationObserver((records) => {
       this.place(records.flatMap((record) => [...record.addedNodes]))
+      this.sweep()
     })
     this.watcher.observe(this, {
       attributeFilter: ['hidden'],
@@ -303,6 +409,7 @@ export class HelixHeadlessToast extends HelixElement {
     super.disconnectedCallback()
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('helix-dismiss', this.handleDismiss)
+    document.removeEventListener('keydown', this.handleHotkey)
     this.watcher?.disconnect()
     this.watcher = undefined
   }
@@ -313,7 +420,7 @@ export class HelixHeadlessToast extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="region" popover="manual"><slot></slot></div>`
+    return html`<div part="region" popover="manual" tabindex="-1"><slot></slot></div>`
   }
 }
 
