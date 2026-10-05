@@ -1,6 +1,8 @@
 import {
+  AriaForwardController,
   valueAsNumber as asNumber,
   customElement,
+  fillTemplate,
   numberAsValue as fromNumber,
   HelixFormElement,
   KeyboardNavigationController,
@@ -161,6 +163,23 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ attribute: 'value-text' })
   valueText = ''
+
+  /**
+   * The name of each mark a reader can choose, with `{score}` and `{max}`
+   * filled in. Set it to translate "3 out of 5".
+   *
+   * Also what a read-only rating says for its score where `value-text` is
+   * empty.
+   */
+  @property({ attribute: 'option-label' })
+  optionLabel = '{score} out of {max}'
+
+  /* The row of marks is what a reader is on, a radiogroup, and the host is a
+     generic beside it: a host `aria-labelledby` and a page's `<label>` named
+     the host and left the radiogroup unnamed. */
+  protected readonly aria = new AriaForwardController(this, {
+    target: () => this.partNamed('marks'),
+  })
 
   /**
    * The shape a consumer slotted, if they slotted one.
@@ -484,11 +503,34 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     this.sync()
   }
 
+  /** The name of one score, as `optionLabel` writes it. */
+  private nameFor(score: number): string {
+    return fillTemplate(this.optionLabel, { max: this.max, score })
+  }
+
+  /**
+   * The option holding the tab stop: the chosen one, or for a score between
+   * steps, such as an average of 3.5 on whole marks, the step below it, and
+   * the first while nothing is chosen. Between steps no option matched, and
+   * the rating left the tab order.
+   */
+  private stopAt(answered: boolean, first: number | undefined): number | undefined {
+    if (!answered) {
+      return first
+    }
+    const below = this.steps.filter((score) => score <= this.score)
+    return below.at(-1) ?? first
+  }
+
   protected override render(): TemplateResult {
     const showing = this.previewing ?? this.score
-    const said = this.valueText || `${this.score} out of ${this.max}`
+    const said = this.valueText || this.nameFor(this.score)
     const count = Math.max(0, Math.round(this.max))
     const first = this.steps[0]
+    /* The floor is drawn while nothing is chosen and is not an answer, so no
+       option claims to be checked until one is. */
+    const answered = this.value !== '' && Number.isFinite(Number.parseFloat(this.value))
+    const stop = this.stopAt(answered, first)
 
     const mark = (layer: string, index: number): TemplateResult =>
       html`<span part="mark">${this.markFor(layer, index)}</span>`
@@ -566,16 +608,12 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
                 part="option"
                 role="radio"
                 type="button"
-                aria-checked=${this.score === score ? 'true' : 'false'}
-                aria-label=${`${score} out of ${this.max}`}
+                aria-checked=${answered && this.score === score ? 'true' : 'false'}
+                aria-label=${this.nameFor(score)}
                 data-score=${String(score)}
                 style=${`--rating-step: ${index + 1}`}
                 ?disabled=${this.isDisabled}
-                tabindex=${
-                  this.score === score || (this.score === this.floor && score === first)
-                    ? '0'
-                    : '-1'
-                }
+                tabindex=${score === stop ? '0' : '-1'}
                 @click=${this.handleOptionClick}
                 @pointerenter=${this.handleOptionEnter}
               ></button>`,

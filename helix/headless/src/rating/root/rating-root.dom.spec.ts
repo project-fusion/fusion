@@ -536,3 +536,44 @@ describe('the name of the set', () => {
     expect(scope.getElementById(named)?.textContent?.trim()).toBe('Service')
   })
 })
+
+describe('a rating with a floor and no answer', () => {
+  /* The floor is drawn and is not an answer, and the lowest option said it was
+     checked while the value was empty and the form submitted nothing. */
+  test('has no option checked', async () => {
+    const host = await rating('min="2"')
+    expect(
+      options(host).filter((option) => option.getAttribute('aria-checked') === 'true'),
+    ).toEqual([])
+  })
+
+  test('and still has one tab stop, on the first option', async () => {
+    const host = await rating('min="2"')
+    const stops = options(host).filter((option) => option.getAttribute('tabindex') === '0')
+    expect(stops.map((option) => option.dataset.score)).toEqual(['2'])
+  })
+})
+
+describe('a score between steps', () => {
+  /* An average such as 3.5 on whole marks matched no option, and the rating
+     left the tab order. */
+  test('keeps one tab stop, on the step below it', async () => {
+    const host = await rating('value="3.5"')
+    const stops = options(host).filter((option) => option.getAttribute('tabindex') === '0')
+    expect(stops.map((option) => option.dataset.score)).toEqual(['3'])
+  })
+})
+
+describe('the names of the options', () => {
+  /* The names were English built into the template, with no property to
+     translate them. */
+  test('come from option-label, in the page’s words', async () => {
+    const host = await rating('option-label="{score} von {max}"')
+    expect(options(host)[2]?.getAttribute('aria-label')).toBe('3 von 5')
+  })
+
+  test('and name a read-only score where value-text is empty', async () => {
+    const host = await rating('readonly value="4" option-label="{score} von {max}"')
+    expect(part(host, 'marks')?.getAttribute('aria-label')).toBe('4 von 5')
+  })
+})
