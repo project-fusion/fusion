@@ -2,6 +2,7 @@ import {
   customElement,
   HelixElement,
   MixinSelectableItem,
+  plainClick,
   reflectElements,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -80,7 +81,7 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
    * opens it and chooses nothing here.
    */
   private readonly handleLinkClick = (event: MouseEvent): void => {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    if (!plainClick(event)) {
       return
     }
     if (!this.select()) {

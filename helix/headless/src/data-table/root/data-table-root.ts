@@ -29,6 +29,8 @@ import {
   reportRuntime,
   requestChange,
   Typeahead,
+  toggleEvery,
+  treeArrow,
   typesCharacter,
   VirtualizeController,
   writtenList,
@@ -1442,18 +1444,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** Asks for every row, or for none where every one already was. */
   private chooseAll(): void {
-    const every = this.everyKey
-    const keys = this.chosen
-    if (every.length > 0 && every.every((key) => keys.has(key))) {
-      for (const key of every) {
-        keys.delete(key)
-      }
-    } else {
-      for (const key of every) {
-        keys.add(key)
-      }
-    }
-    this.requestSelected(keys)
+    this.requestSelected(new Set(toggleEvery(this.chosen, this.everyKey)))
   }
 
   /**
@@ -2531,14 +2522,18 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return false
     }
     const placed = this.tree().placed.get(row)
-    const forward = inlineStep(this, event.key) > 0
-    if (placed?.branch && placed.open !== forward) {
+    /* `child` and nothing are the next column, which the caller moves to. */
+    const arrow = treeArrow(
+      { branch: placed?.branch ?? false, open: placed?.open ?? false },
+      inlineStep(this, event.key) > 0 ? 1 : -1,
+    )
+    if (arrow === 'open' || arrow === 'close') {
       event.preventDefault()
-      this.toggleOpen(row, forward)
+      this.toggleOpen(row, arrow === 'open')
       return true
     }
     const parent = placed?.parent ? this.drawnPage.indexOf(placed.parent) : -1
-    if (!forward && parent >= 0) {
+    if (arrow === 'parent' && parent >= 0) {
       event.preventDefault()
       this.moveTo(parent, place.column)
       return true

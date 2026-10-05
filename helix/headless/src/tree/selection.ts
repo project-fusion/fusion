@@ -1,3 +1,4 @@
+import { toggleEvery } from '@fusion.dev/helix-core'
 /** What the multiple selection reads of a row. */
 export interface CheckableRow {
   /** Whether the row is a branch, holding rows of its own. */
@@ -42,18 +43,5 @@ export const pressRow = (
   chosen: readonly string[],
   order: readonly string[],
 ): string[] => {
-  if (row.disabled) {
-    return [...chosen]
-  }
-  const values = valuesOf(row)
-  const all = values.every((value) => chosen.includes(value))
-  const next = new Set(chosen)
-  for (const value of values) {
-    if (all) {
-      next.delete(value)
-    } else {
-      next.add(value)
-    }
-  }
-  return order.filter((value) => next.has(value))
+  return row.disabled ? [...chosen] : toggleEvery(chosen, valuesOf(row), order)
 }

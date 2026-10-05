@@ -98,6 +98,10 @@ export {
   type PopoverOptions,
 } from './controllers/popover-controller/popover-controller.js'
 export {
+  RelativeClockController,
+  type RelativeClockOptions,
+} from './controllers/relative-clock-controller/relative-clock-controller.js'
+export {
   RemotePlaybackController,
   type RemoteReport,
 } from './controllers/remote-playback-controller/remote-playback-controller.js'
@@ -413,6 +417,7 @@ export {
 } from './utils/follow-link/follow-link.js'
 export { formatNumbers } from './utils/format-numbers/format-numbers.js'
 export { headingIn, headingsIn } from './utils/heading-in/heading-in.js'
+export { headingLevel } from './utils/heading-level/heading-level.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
 export {
   defaultButton,
@@ -437,6 +442,7 @@ export {
 } from './utils/media-copy/media-copy.js'
 export { formatNumber, parseNumber } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
+export { plainClick } from './utils/plain-click/plain-click.js'
 export { appleTouch, onApple, type Platform } from './utils/platform/platform.js'
 export { pressType, type RecentPress } from './utils/press-type/press-type.js'
 export { rangeAdd } from './utils/range-add/range-add.js'
@@ -520,6 +526,7 @@ export {
   type ToneMark,
   toneMark,
 } from './utils/tone-marks/tone-marks.js'
+export { type TreeArrow, type TreeArrowRow, treeArrow } from './utils/tree-arrow/tree-arrow.js'
 export {
   Typeahead,
   type TypeaheadBy,
@@ -546,6 +553,10 @@ export { wordsConverter } from './utils/words-converter/words-converter.js'
 export { writeClock, writeTime } from './utils/write-time/write-time.js'
 export {
   commaList,
+  pressedValue,
+  prunedValue,
+  type SelectionMode,
+  toggleEvery,
   toggleValue,
   writtenList,
   writtenNumbers,

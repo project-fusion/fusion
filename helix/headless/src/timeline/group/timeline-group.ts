@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, headingLevel, hostAria } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -55,7 +55,7 @@ export class HelixHeadlessTimelineGroup extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    const level = Math.min(6, Math.max(1, Math.trunc(this.headingLevel ?? 3)))
+    const level = headingLevel(this.headingLevel)
     return html`<div part="heading" id=${HEADING_ID} role="heading" aria-level=${level}>
         <slot name="heading">${this.label}</slot>
       </div>
