@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTableRow } from '@fusion.dev/helix-headless/table'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './table-row.css.js'
+import '../../checkbox/index.js'
 
 /**
  * @summary One row of a table.
@@ -20,6 +21,8 @@ import { styles } from './table-row.css.js'
  */
 @customElement('helix-table-row')
 export class HelixTableRow extends HelixHeadlessTableRow {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

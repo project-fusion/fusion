@@ -518,3 +518,126 @@ describe('an empty table', () => {
     expect(empty.querySelector('[role="cell"]')?.textContent).toBe('Nothing to show')
   })
 })
+
+describe('a table sort, told after it stood', () => {
+  test('sends helix-sorted with the order, and nothing for a refused one', async () => {
+    const host = (await mount(sortable)) as Sorting
+    await settle(host)
+    const heard: string[] = []
+    host.addEventListener('helix-sorted', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    const column = host.querySelector('[field="count"]') as HTMLElement
+    ;(part(column, 'sort') as HTMLElement).click()
+    await settle(host)
+    expect(heard).toEqual(['count:asc'])
+    host.addEventListener('helix-sort', (event) => event.preventDefault())
+    ;(part(column, 'sort') as HTMLElement).click()
+    await settle(host)
+    expect(heard).toEqual(['count:asc'])
+  })
+})
+
+describe('a table with a caption', () => {
+  test('keeps the caption out of its rows', async () => {
+    const host = (await mount(
+      markup.replace(
+        '<helix-headless-table-column>Service',
+        '<h2 slot="caption">Deployments this week</h2><helix-headless-table-column>Service',
+      ),
+    )) as Updating
+    await settle(host)
+    expect(slotted(host).map((row) => row.localName)).toEqual(['helix-headless-table-row'])
+    const caption = host.shadowRoot?.querySelector('slot[name="caption"]') as HTMLSlotElement
+    expect(caption.assignedElements().map((one) => one.localName)).toEqual(['h2'])
+  })
+})
+
+describe('a selectable table', () => {
+  type Selecting = Updating & { selected: string }
+
+  const selectable = `
+    <helix-headless-table label="Services" selectable default-selected="billing">
+      <helix-headless-table-column>Service</helix-headless-table-column>
+      <helix-headless-table-row value="web"><helix-headless-table-cell>web</helix-headless-table-cell></helix-headless-table-row>
+      <helix-headless-table-row value="billing"><helix-headless-table-cell>billing</helix-headless-table-cell></helix-headless-table-row>
+    </helix-headless-table>`
+
+  const rows = (host: HTMLElement) =>
+    [...host.querySelectorAll('helix-headless-table-row')] as (HTMLElement & {
+      updateComplete: Promise<boolean>
+    })[]
+
+  const ask = (checkbox: Element | null | undefined, checked: boolean): void => {
+    checkbox?.dispatchEvent(
+      new CustomEvent('helix-before-toggle', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        detail: { checked },
+      }),
+    )
+  }
+
+  test('draws a checkbox cell in each row, named for it, ahead of the columns', async () => {
+    const host = (await mount(selectable)) as Selecting
+    await settle(host)
+    const [web, billing] = rows(host)
+    await web?.updateComplete
+    const box = web?.shadowRoot?.querySelector('[part="checkbox"]')
+    expect(box?.getAttribute('aria-label')).toBe('Select web')
+    expect((box as unknown as { checked: boolean }).checked).toBe(false)
+    expect(
+      (billing?.shadowRoot?.querySelector('[part="checkbox"]') as unknown as { checked: boolean })
+        .checked,
+    ).toBe(true)
+    expect(template(host)).toMatch(/--table-template: max-content /)
+    expect(part(host, 'select-all')?.getAttribute('role')).toBe('columnheader')
+  })
+
+  test('asks before a row is chosen, and says so after', async () => {
+    const host = (await mount(selectable)) as Selecting
+    await settle(host)
+    const heard: string[] = []
+    host.addEventListener('helix-selected', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    ask(rows(host)[0]?.shadowRoot?.querySelector('[part="checkbox"]'), true)
+    await settle(host)
+    expect(host.selected).toBe('billing,web')
+    expect(heard).toEqual(['billing,web'])
+    expect((part(host, 'live') as HTMLElement).textContent).toBe('2 selected')
+    host.addEventListener('helix-select', (event) => event.preventDefault())
+    ask(rows(host)[0]?.shadowRoot?.querySelector('[part="checkbox"]'), false)
+    await settle(host)
+    expect(host.selected).toBe('billing,web')
+  })
+
+  test('the heading selects every row, and then none', async () => {
+    const host = (await mount(selectable)) as Selecting
+    await settle(host)
+    ask(part(host, 'select-all')?.querySelector('[part="checkbox"]'), true)
+    await settle(host)
+    expect(host.selected.split(',').sort()).toEqual(['billing', 'web'])
+    ask(part(host, 'select-all')?.querySelector('[part="checkbox"]'), true)
+    await settle(host)
+    expect(host.selected).toBe('')
+  })
+
+  test('leaves a checkbox the consumer put in a cell alone', async () => {
+    const host = (await mount(selectable)) as Selecting
+    await settle(host)
+    const own = document.createElement('input')
+    own.setAttribute('part', 'checkbox')
+    rows(host)[0]?.querySelector('helix-headless-table-cell')?.append(own)
+    const event = new CustomEvent('helix-before-toggle', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      detail: { checked: true },
+    })
+    own.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(false)
+    expect(host.selected).toBe('billing')
+  })
+})

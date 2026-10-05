@@ -4,3 +4,25 @@
 :host {
   display: contents;
 }
+
+/* The checkbox cell of a selectable table: a cell's box, the rule under it
+   included, since the row has no box to draw one. */
+[part~="select"] {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  box-sizing: border-box;
+  display: flex;
+  min-block-size: var(--helix-size-control);
+  padding-inline: var(--helix-space-none) var(--helix-space-md);
+}
+
+/* **A chosen row is washed across every cell**, as Data Table washes it: the
+   row has no box of its own to fill. */
+:host(:state(selected)) [part~="select"],
+:host(:state(selected)) ::slotted(*) {
+  background-color: color-mix(
+    in srgb,
+    var(--helix-color-primary) 10%,
+    var(--helix-color-background)
+  );
+}

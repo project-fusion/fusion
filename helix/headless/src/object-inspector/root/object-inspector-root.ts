@@ -86,8 +86,8 @@ import { ancestorsOf, entries, flatten, type Row, search, seed } from '../rows.j
  * @event {HelixActivateEvent} helix-activate - The active row moved, by a key or a click. The detail's `value` is its path.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The active row is about to move, with its new path. Cancelable: cancel it to keep the row where it is.
  * @event {HelixCopyEvent} helix-copy - A value was put on the clipboard, from the copy button or the keyboard.
- * @event {HelixFilteredEvent} helix-filtered - The filter field changed `filter`, which now holds the text.
  * @event {HelixFilterEvent} helix-filter - Text was typed in the filter field, with what it now holds. Cancelable: cancel it to keep the filter as it was.
+ * @event {HelixFilteredEvent} helix-filtered - The filter field changed `filter`, which now holds the text.
  *
  * @csspart after - The space the rows below the drawn rows would take, when `windowed` is set.
  * @csspart before - The space the rows above the drawn rows would take, when `windowed` is set.

@@ -21,6 +21,27 @@
   display: contents;
 }
 
+/* The caption, above the grid, in the weight of a table's own heading. A bare
+   slot, so a table with none takes no room. */
+::slotted([slot="caption"]) {
+  color: var(--table-caption-color, var(--helix-color-foreground));
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--table-caption-text, var(--helix-text-md));
+  font-weight: var(--helix-weight-semibold);
+  margin-block: var(--helix-space-none) var(--table-caption-gap, var(--helix-space-sm));
+}
+
+/* The checkbox heading of a selectable table, the band the column headings are. */
+[part="select-all"] {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  box-sizing: border-box;
+  display: flex;
+  min-block-size: var(--helix-size-control-loose);
+  padding-inline: var(--helix-space-none) var(--helix-space-md);
+}
+
 /* What a collection says instead of rows is `shared/collection/state`'s. */
 
 /* Rows that are already there stay, and dim, while a new set arrives. */
