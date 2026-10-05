@@ -62,7 +62,9 @@ const KEYS = new Set([
  * Arrow opens a shut branch and then moves into it, and Left Arrow shuts an
  * open one and then moves to its parent, the two swapping on a right-to-left
  * page. Home and End go to the first and the last item, Enter and Space choose
- * or open, and the tree's one tab stop stays on the item last reached.
+ * or open, and the tree's one tab stop stays on the item last reached. In a
+ * tree of check marks, Control+A (Command+A on an Apple keyboard) checks every
+ * item or clears them all, and Shift with Up or Down Arrow moves and checks.
  *
  * @since 0.1.0
  * @status stable
@@ -375,6 +377,41 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     return true
   }
 
+  /**
+   * The keys of a tree of check marks, as the tree pattern gives them:
+   * Control+A (Command+A on an Apple keyboard) checks every item, or clears
+   * them all where every one is checked, and Shift with Up or Down Arrow moves
+   * to the item before or after and checks or unchecks it.
+   *
+   * Returns whether the press was one of those.
+   */
+  private handleMultiple(current: HelixHeadlessTreeItem, event: KeyboardEvent): boolean {
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'a') {
+      const leaves = this.items
+        .filter((item) => !this.holds(item) && !item.disabled && item.value !== '')
+        .map((item) => item.value)
+      this.requestActive(
+        pressRow(
+          { branch: true, disabled: false, leaves, value: '' },
+          this.values,
+          this.order,
+        ).join(','),
+      )
+      this.syncItems()
+      return true
+    }
+    if (event.shiftKey && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+      const visible = this.visibleItems
+      const next = visible[visible.indexOf(current) + (event.key === 'ArrowDown' ? 1 : -1)]
+      if (next) {
+        this.focusOn(next)
+        next.select()
+      }
+      return true
+    }
+    return false
+  }
+
   private move(from: HelixHeadlessTreeItem, delta: number): void {
     const visible = this.visibleItems
     const index = visible.indexOf(from)
@@ -412,6 +449,10 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
      * no-op: it returns the element it was called on. */
     const current = closestInstance(event.target as Element | null, HelixHeadlessTreeItem)
     if (!current || !this.items.includes(current)) {
+      return
+    }
+    if (this.multiple && this.handleMultiple(current, event)) {
+      event.preventDefault()
       return
     }
     if (this.handleTyping(current, event)) {
