@@ -778,3 +778,51 @@ describe('an option that is a link', () => {
     expect(host.value).toBe('')
   })
 })
+
+describe('a filter that waits for typing to rest', () => {
+  const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+
+  test('filters once, on the word, after `filter-delay`', async () => {
+    const host = (await list('filterable filter-delay="30"')) as Updatable & { filter: string }
+    const heard: string[] = []
+    host.addEventListener('helix-filter', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    type(host, 'g')
+    type(host, 'ga')
+    type(host, 'gam')
+    expect(host.filter).toBe('')
+    expect(field(host).value).toBe('gam')
+    await wait(60)
+    await settle(host)
+    expect(heard).toEqual(['gam'])
+    expect(host.filter).toBe('gam')
+  })
+
+  test('filters at once where an arrow key comes before the rest', async () => {
+    const host = (await list('filterable filter-delay="1000"')) as Updatable & { filter: string }
+    type(host, 'be')
+    field(host).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowDown' }),
+    )
+    await settle(host)
+    expect(host.filter).toBe('be')
+  })
+
+  test('Escape takes text still waiting, so nothing filters later', async () => {
+    const host = (await list('filterable filter-delay="20"')) as Updatable & { filter: string }
+    type(host, 'al')
+    field(host).dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Escape',
+      }),
+    )
+    await wait(40)
+    await settle(host)
+    expect(host.filter).toBe('')
+    expect(field(host).value).toBe('')
+  })
+})
