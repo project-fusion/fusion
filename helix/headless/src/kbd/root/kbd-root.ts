@@ -9,7 +9,7 @@ import {
   onApple,
   printableChord,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { claimShortcut, releaseShortcut } from '../shortcut.js'
 
@@ -114,6 +114,11 @@ const ELSEWHERE: Record<string, string> = {
  * the shortcut with the control. A chord the page wrote there itself is left
  * alone, and the key takes back only what it added.
  *
+ * `caps` draws a chord as a key per key: each is a `key` part and the `+`
+ * between two a `separator` part, so a sheet can draw a cap for each.
+ * `key-labels` renames any key, on every platform, such as
+ * `key-labels='{"mod":"Command"}'`.
+ *
  * @since 0.1.0
  * @status stable
  * @category typography
@@ -124,10 +129,24 @@ const ELSEWHERE: Record<string, string> = {
  *
  * @event {HelixShortcutEvent} helix-shortcut - The chord was pressed. Cancelable: cancel it to let the key press keep its usual effect.
  *
- * @csspart kbd - The key.
+ * @csspart kbd - The key, or the chord under `keys`.
+ * @csspart key - One key of a chord under `keys` and `caps`, such as `Ctrl` in `Ctrl+K`.
+ * @csspart separator - The `+` between two keys of a chord under `keys` and `caps`, drawn where the platform writes one: on Windows and Linux, and not on an Apple keyboard.
  */
 @customElement('helix-headless-kbd')
 export class HelixHeadlessKbd extends HelixElement {
+  /**
+   * Draws a chord under `keys` as one key per key, each a `key` part with a
+   * `separator` part between two where the platform writes a `+`, as GitHub
+   * and most docs draw `Ctrl` `K`.
+   *
+   * Absent, a chord is one key holding the whole label, as it always was.
+   * Reflected, because the styled tier draws the caps on the keys and not on
+   * the whole.
+   */
+  @property({ reflect: true, type: Boolean })
+  caps = false
+
   /**
    * The id of the control the shortcut works, which is given the chord as its
    * `aria-keyshortcuts`.
@@ -153,6 +172,20 @@ export class HelixHeadlessKbd extends HelixElement {
    */
   @property()
   keys = ''
+
+  /**
+   * Names for keys in place of the platform's own, by the key's name in
+   * `keys`, written as JSON in the attribute: `key-labels='{"mod":"Command",
+   * "enter":"Return"}'` shows `Command` and `Return` wherever `mod` and
+   * `enter` are written.
+   *
+   * For a page in another language, or a product with its own word for a key.
+   * Absent, the platform's glyphs and words are used. Only what is shown
+   * changes: the chord written onto `aria-keyshortcuts` keeps the names a
+   * screen reader knows.
+   */
+  @property({ attribute: 'key-labels', type: Object })
+  keyLabels?: Record<string, string>
 
   /**
    * Where the chord is listened for. `control` listens inside the control the
@@ -234,13 +267,15 @@ export class HelixHeadlessKbd extends HelixElement {
    * ask and serves the words, and a render that differs is a text Lit records
    * and never writes, so a Mac kept Ctrl. The update after hydration asks.
    */
-  private get label(): string {
+  private get label(): { keys: string[]; separator: string } {
     const apple = !this.hydrating && onApple()
     const names = apple ? APPLE : ELSEWHERE
-    const parts = chordParts(this.keys).map(
-      (part) => names[part.toLowerCase()] ?? (part.length === 1 ? part.toUpperCase() : part),
-    )
-    return parts.join(apple ? '' : '+')
+    const own = this.keyLabels ?? {}
+    const keys = chordParts(this.keys).map((part) => {
+      const name = part.toLowerCase()
+      return own[name] ?? names[name] ?? (part.length === 1 ? part.toUpperCase() : part)
+    })
+    return { keys, separator: apple ? '' : '+' }
   }
 
   private listen(): void {
@@ -317,7 +352,27 @@ export class HelixHeadlessKbd extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<kbd part="kbd">${this.keys === '' ? html`<slot></slot>` : this.label}</kbd>`
+    if (this.keys === '') {
+      return html`<kbd part="kbd"><slot></slot></kbd>`
+    }
+    /* One text node unless `caps` asks for a part per key: a chord split into
+       elements is laid out as several runs of text, which places a glyph from
+       a fallback font a fraction of a pixel away from where one run put it. */
+    const { keys, separator } = this.label
+    return html`<kbd part="kbd">${this.caps ? this.renderChord() : keys.join(separator)}</kbd>`
+  }
+
+  /**
+   * The chord under `caps`, a part for each key and for each `+` between two,
+   * so a sheet can draw a cap per key. Written with no space between, so a
+   * chord reads as the one label it was.
+   */
+  protected renderChord(): TemplateResult {
+    const { keys, separator } = this.label
+    return html`${keys.map(
+      (key, index) =>
+        html`${index > 0 && separator !== '' ? html`<span part="separator">${separator}</span>` : nothing}<span part="key">${key}</span>`,
+    )}`
   }
 }
 

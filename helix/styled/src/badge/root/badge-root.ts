@@ -24,6 +24,7 @@ import { styles } from './badge-root.css.js'
  * @aliases Count, Indicator, Pip
  * @documentation https://fusion.dev/helix/components/badge
  *
+ * @cssproperty --badge-attention-duration - How long one beat of `attention` takes.
  * @cssproperty --badge-background-color - The fill of the indicator.
  * @cssproperty --badge-color - The color of the count, to pair with a fill set through `--badge-background-color`.
  * @cssproperty --badge-gap - The space between the content and the count under `placement="inline"`.
@@ -32,6 +33,27 @@ import { styles } from './badge-root.css.js'
  */
 @customElement('helix-badge')
 export class HelixBadge extends HelixHeadlessBadge {
+  /**
+   * An effect that draws the eye to the mark: `pulse` swells it in a loop and
+   * `bounce` hops it, as Web Awesome's badge does.
+   *
+   * Absent is still, which is right for almost every count: a mark that moves
+   * is a mark that interrupts. Still for a reader who asked the system for
+   * less motion, and while the mark is going away.
+   */
+  @property({ reflect: true })
+  attention?: 'bounce' | 'pulse'
+
+  /**
+   * How strongly the mark is drawn: `solid`, `outlined` or `subtle`, `Tag`'s
+   * axis.
+   *
+   * Absent is `solid`, the tone's fill. `outlined` draws the fill as a ring on
+   * the page's ground and `subtle` as a tint, both with the page's ink.
+   */
+  @property({ reflect: true })
+  emphasis?: 'outlined' | 'solid' | 'subtle'
+
   /**
    * Where the mark sits: a corner, `top-start`, `bottom-end` or `bottom-start`,
    * or `inline`, in the line after the content.

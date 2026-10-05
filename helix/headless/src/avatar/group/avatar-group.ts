@@ -1,21 +1,21 @@
 import {
   customElement,
+  fillTemplate,
   HelixElement,
   hostAria,
-  reportRuntime,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
- * The largest `max` a stylesheet can hide past.
+ * The largest `max` a stylesheet folds a server's markup at.
  *
- * The fold is `:host([max="N"]) ::slotted(:nth-child(n + N+1))`, one selector
+ * The rule is `:host([max="N"]) ::slotted(:nth-child(n + N+1))`, one selector
  * per value, because `An+B` takes a literal and no custom property can be read
- * into it. So the range is finite, and it is written down beside the count that
- * has to agree with it: a count that folds and a stylesheet that does not would
- * put a "+5" beside five avatars that are still on screen.
+ * into it. So the range a stylesheet covers is finite. The group folds any
+ * `max` itself once it runs, with the platform's `hidden`; past this one, a
+ * server's markup shows every avatar until the page hydrates.
  */
 export const FOLDS_UP_TO = 12
 
@@ -30,9 +30,10 @@ export const FOLDS_UP_TO = 12
  * hidden.
  *
  * Avatars past `max` stay in the DOM and are hidden. The group writes `hidden`
- * on each of them, so they are hidden on the headless tier as well, and the
- * count is read out as `overflow-label`, such as "3 more", so a screen reader
- * hears that there are more people than the ones it can reach.
+ * on each of them, so they are hidden on the headless tier as well, and at any
+ * `max`. The count is read out as `overflow-label`, such as "3 more: Grace
+ * Hopper, Alan Turing, Barbara Liskov", so a screen reader hears who is there
+ * past the ones it can reach.
  *
  * @since 0.1.0
  * @status stable
@@ -73,13 +74,14 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
   max?: number
 
   /**
-   * What a screen reader is told the count is, with `{count}` for the number.
+   * What a screen reader is told the count is, with `{count}` for the number
+   * and `{names}` for the people it stands for, by each avatar's `name`.
    *
    * The count shows "+3", which reads as "plus three" and says nothing about
-   * what was counted.
+   * what was counted, nor who.
    */
   @property({ attribute: 'overflow-label' })
-  overflowLabel = '{count} more'
+  overflowLabel = '{count} more: {names}'
 
   /** The avatars this group hid, so it unhides only those. */
   private readonly folded = new WeakSet<HTMLElement>()
@@ -101,12 +103,8 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
    */
   get overflow(): number {
     const limit = this.max ?? 0
-    const limited = limit > 0 && limit <= FOLDS_UP_TO
-    return limited ? Math.max(this.avatars.length - limit, 0) : 0
+    return limit > 0 ? Math.max(this.avatars.length - limit, 0) : 0
   }
-
-  /** Said once per element, because a re-render is not a second mistake. */
-  private warned = false
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -121,22 +119,6 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.fold()
-    /* Nothing hides anything here: the stylesheet does it, from `max` on the
-       host. What is left is saying so when a `max` is set that no rule can
-       match, because showing everyone is a defensible answer and showing
-       everyone beside a "+5" is not. */
-    const limit = this.max ?? 0
-    if (limit > FOLDS_UP_TO && this.avatars.length > limit && !this.warned) {
-      this.warned = true
-      reportRuntime({
-        kind: 'max-past-fold',
-        message:
-          `<${this.localName}> has max="${this.max}", past the ${FOLDS_UP_TO} the fold is written for, ` +
-          'so every avatar is shown and none are counted. Lower `max`, or hand the group the ' +
-          'avatars you want shown.',
-        tag: this.localName,
-      })
-    }
   }
 
   /**
@@ -145,14 +127,14 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
    * **State in markup, so the headless tier folds too.** The fold was a styled
    * rule alone, and on the headless tier every avatar was drawn beside a "+3".
    * The styled rule stays, because it is what folds a server's markup before
-   * this runs. Written through `whenHydrated`, so an avatar's hydrating render
-   * is the server's, and undone only on the avatars this group hid.
+   * this runs, up to `FOLDS_UP_TO`, and this folds at any `max`. Written
+   * through `whenHydrated`, so an avatar's hydrating render is the server's,
+   * and undone only on the avatars this group hid.
    */
   private fold(): void {
     const limit = this.max ?? 0
-    const limited = limit > 0 && limit <= FOLDS_UP_TO
     for (const [index, avatar] of this.avatars.entries()) {
-      const past = limited && index >= limit
+      const past = limit > 0 && index >= limit
       if (past && !avatar.hidden) {
         this.folded.add(avatar)
         whenHydrated(avatar, () => {
@@ -167,6 +149,23 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
     }
   }
 
+  /**
+   * The names of the people past `max`, by each avatar's `name`, then its
+   * `aria-label`, in the order they are read.
+   */
+  private foldedNames(): string[] {
+    const limit = this.max ?? 0
+    return this.avatars
+      .slice(limit)
+      .map(
+        (avatar) =>
+          (avatar as HTMLElement & { name?: string }).name ||
+          avatar.getAttribute('aria-label') ||
+          '',
+      )
+      .filter(Boolean)
+  }
+
   protected override render(): TemplateResult {
     const past = this.overflow
     /* An image named by the label, and not hidden: the people past `max` are
@@ -178,7 +177,10 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
           ? html`<span
               part="overflow"
               role="img"
-              aria-label=${this.overflowLabel.replace('{count}', String(past))}
+              aria-label=${fillTemplate(this.overflowLabel, {
+                count: String(past),
+                names: this.foldedNames().join(', '),
+              }).replace(/[\s:,]+$/, '')}
               >+${past}</span
             >`
           : ''

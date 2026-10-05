@@ -47,9 +47,13 @@ describe('badge', () => {
        so. `primary` is the resting fill and still sayable, so a generated page
        can state what it means rather than leave the attribute off. */
     const missing = TONES.filter(
-      (tone) => !sheet().includes(`:host([tone="${tone}"]) [part="indicator"]`),
+      (tone) => !new RegExp(`:host\\(\\[tone="${tone}"\\]\\) \\{\\s*--_badge-fill:`).test(sheet()),
     )
     expect(missing).toEqual([])
+    /* One fill, read by the indicator through the hook. */
+    expect(rule('[part="indicator"]')).toContain(
+      'background-color: var(--badge-background-color, var(--_badge-fill))',
+    )
   })
 
   test('each family of fill carries its own label, and neutral sets its own ink', () => {
@@ -66,10 +70,9 @@ describe('badge', () => {
     expect(sheet()).toMatch(
       /:host\(\[tone="warning"\]\) \{\s*--_badge-on: var\(--helix-color-foreground-on-status\)/,
     )
-    expect(rule(':host([tone="neutral"]) [part="indicator"]')).toContain(
-      'var(--helix-color-foreground)',
+    expect(sheet()).toMatch(
+      /:host\(\[tone="neutral"\]\) \{[^}]*--_badge-on: var\(--helix-color-foreground\)/,
     )
-    expect(rule(':host([tone="success"]) [part="indicator"]')).not.toMatch(/\ncolor:/)
   })
 
   test('the ring is a rule in the page color, so the mark stays separate from what it overlaps', () => {
@@ -84,9 +87,20 @@ describe('badge', () => {
      darken the count to keep it readable. */
   test('the count takes its color from a hook, on every fill', () => {
     expect(rule('[part="indicator"]')).toContain('color: var(--badge-color, var(--_badge-on))')
-    expect(rule(':host([tone="neutral"]) [part="indicator"]')).toContain(
-      'color: var(--badge-color, var(--helix-color-foreground))',
+    /* Neutral's ink goes through the same hook, as `--_badge-on`. */
+    expect(sheet()).not.toMatch(/:host\(\[tone="neutral"\]\) \[part="indicator"\]/)
+  })
+
+  /* wa-badge has an appearance axis and an attention effect; this had
+     neither. */
+  test('emphasis draws the fill as a ring or a tint, and attention moves the mark', () => {
+    expect(rule(':host([emphasis="outlined"]) [part="indicator"]')).toContain(
+      'inset 0 0 0 var(--helix-border-thick) var(--_badge-fill)',
     )
+    expect(rule(':host([emphasis="subtle"]) [part="indicator"]')).toContain('color-mix(')
+    expect(sheet()).toContain('@keyframes badge-pulse')
+    expect(sheet()).toContain('@keyframes badge-bounce')
+    expect(sheet()).toMatch(/prefers-reduced-motion: reduce[^}]*\{[^}]*animation: none/)
   })
 
   test('the hooks the docs name are what the sheet reads', () => {

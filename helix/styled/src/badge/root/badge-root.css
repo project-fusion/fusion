@@ -11,6 +11,9 @@
   /* The label on the fill: the primary's by default, and each family's own
      where a tone below names another fill. */
   --_badge-on: var(--helix-color-foreground-on-primary);
+  /* The fill, the primary's by default and each tone's own below, held once so
+     `emphasis` can draw it as an outline or a tint. */
+  --_badge-fill: var(--helix-color-primary-surface);
   display: inline-flex;
   position: relative;
   vertical-align: middle;
@@ -23,7 +26,7 @@
      fills: `primary` is the color primary *text* is set in, which in a dark
      scheme is a light blue. White on it measured 3.2:1, and only in dark,
      because in light the two happen to land the same way round. */
-  background-color: var(--badge-background-color, var(--helix-color-primary-surface));
+  background-color: var(--badge-background-color, var(--_badge-fill));
   block-size: var(--_badge-size);
   border-radius: var(--helix-radii-full);
   /* A ring in the page's own color, so the mark stays separate from whatever it
@@ -112,15 +115,15 @@
 /* The brand, said as well as defaulted. `Announcement` gives the reason for
    spelling out a value that is also the resting one: a generated page should be
    able to say what it means rather than express it by leaving an attribute off. */
-:host([tone="primary"]) [part="indicator"] {
-  background-color: var(--badge-background-color, var(--helix-color-primary-surface));
+:host([tone="primary"]) {
+  --_badge-fill: var(--helix-color-primary-surface);
 }
 
 /* The second emphasis: the second color a theme names, and the brand itself
    until one is named. So this renders as `primary` on a palette with one brand
    color, which is the honest answer rather than a complement nobody chose. */
-:host([tone="accent"]) [part="indicator"] {
-  background-color: var(--badge-background-color, var(--helix-color-accent-surface));
+:host([tone="accent"]) {
+  --_badge-fill: var(--helix-color-accent-surface);
 }
 
 :host([tone="accent"]) {
@@ -134,29 +137,29 @@
   --_badge-on: var(--helix-color-foreground-on-status);
 }
 
-:host([tone="info"]) [part="indicator"] {
-  background-color: var(--badge-background-color, var(--helix-color-info-surface));
+:host([tone="info"]) {
+  --_badge-fill: var(--helix-color-info-surface);
 }
 
-:host([tone="success"]) [part="indicator"] {
-  background-color: var(--badge-background-color, var(--helix-color-success-surface));
+:host([tone="success"]) {
+  --_badge-fill: var(--helix-color-success-surface);
 }
 
-:host([tone="warning"]) [part="indicator"] {
-  background-color: var(--badge-background-color, var(--helix-color-warning-surface));
+:host([tone="warning"]) {
+  --_badge-fill: var(--helix-color-warning-surface);
 }
 
 /* The alarming one, which is the exception rather than the default. A badge is
    usually a count of things waiting, and a count is news rather than a warning:
    red on everything that has unread anything is a page that is always
    shouting. */
-:host([tone="danger"]) [part="indicator"] {
-  background-color: var(--badge-background-color, var(--helix-color-danger-surface));
+:host([tone="danger"]) {
+  --_badge-fill: var(--helix-color-danger-surface);
 }
 
-:host([tone="neutral"]) [part="indicator"] {
-  background-color: var(--badge-background-color, var(--helix-color-surface-raised));
-  color: var(--badge-color, var(--helix-color-foreground));
+:host([tone="neutral"]) {
+  --_badge-fill: var(--helix-color-surface-raised);
+  --_badge-on: var(--helix-color-foreground);
 }
 
 /*
@@ -200,6 +203,85 @@
   box-shadow: none;
   position: static;
   translate: none;
+}
+
+/*
+ * **`emphasis`, `Tag`'s axis.** Absent and `solid` are the fill. `outlined`
+ * draws the fill as a ring on the page's ground, and `subtle` as a tint, each
+ * with the page's ink, which reads on the page's ground in every tone.
+ */
+:host([emphasis="outlined"]) [part="indicator"] {
+  background-color: var(--badge-background-color, var(--helix-color-background));
+  box-shadow:
+    inset 0 0 0 var(--helix-border-thick) var(--_badge-fill),
+    0 0 0 var(--helix-border-thick) var(--badge-ring-color, var(--helix-color-background));
+  color: var(--badge-color, var(--helix-color-foreground));
+}
+
+:host([emphasis="subtle"]) [part="indicator"] {
+  background-color: var(
+    --badge-background-color,
+    color-mix(in oklab, var(--_badge-fill) 22%, var(--helix-color-background))
+  );
+  color: var(--badge-color, var(--helix-color-foreground));
+}
+
+:host([emphasis="outlined"][placement="inline"]) [part="indicator"] {
+  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--_badge-fill);
+}
+
+/*
+ * **`attention`, to draw the eye to a count that matters**, as Web Awesome's
+ * badge does: `pulse` rings out from the mark and `bounce` hops it. Through
+ * `transform`, which neither the placement's `translate` nor the arrival's
+ * `scale` uses, so the three compose. Still for a reader who asked for less
+ * motion.
+ */
+:host([attention="pulse"]) [part="indicator"]:not([data-blank]) {
+  animation: badge-pulse var(--badge-attention-duration, 1.5s) var(--helix-easing-standard) infinite;
+}
+
+:host([attention="bounce"]) [part="indicator"]:not([data-blank]) {
+  animation: badge-bounce var(--badge-attention-duration, 1s) var(--helix-easing-standard) infinite;
+}
+
+@keyframes badge-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+@keyframes badge-bounce {
+  0%,
+  20%,
+  53%,
+  100% {
+    transform: translateY(0);
+  }
+
+  40%,
+  43% {
+    transform: translateY(-30%);
+  }
+
+  70% {
+    transform: translateY(-15%);
+  }
+
+  90% {
+    transform: translateY(-4%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host([attention]) [part="indicator"] {
+    animation: none;
+  }
 }
 
 /* Print: a count.
