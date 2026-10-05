@@ -1,4 +1,4 @@
-import { customElement, DelayController, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, DelayController, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -319,6 +319,18 @@ export class HelixHeadlessImage extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
     this.settle()
+    /* Once, at the first render: an image with no `alt` is announced by its
+       file name, and empty is how a page says it is decoration. Hidden from
+       the reader, it needs neither. */
+    if (this.alt === undefined && this.getAttribute('aria-hidden') !== 'true') {
+      reportRuntime({
+        kind: 'missing-alt',
+        message:
+          `<${this.localName}> has no \`alt\`, so a screen reader announces its file name. ` +
+          'Describe the picture in `alt`, or write `alt=""` for one that is decoration.',
+        tag: this.localName,
+      })
+    }
   }
 
   /**

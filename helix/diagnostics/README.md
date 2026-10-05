@@ -246,6 +246,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `min-out-of-range` | A rating's `min` is not a score between 0 and its `max` |
 | `misplaced-handler` | A React `on` prop names an event that another element dispatches |
 | `misread-direction` | A stat was given `up`, `down` or `neutral`, which are Trend's directions and lay nothing out |
+| `missing-alt` | An image has no `alt`, so a screen reader announces its file name |
 | `missing-layout` | The three.js graph driver could not load `d3-force-3d` |
 | `missing-name` | A button or form control has no accessible name |
 | `missing-row-key` | A selectable data table has no `row-key`, so it knows each row by its place |

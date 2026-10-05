@@ -205,3 +205,16 @@ describe('line numbers and a highlighter', () => {
     expect(el.shadowRoot?.querySelector('slot:not([name])')?.hasAttribute('hidden')).toBe(false)
   })
 })
+
+describe('the copy button of a named block', () => {
+  test('says the name of its block, so several on a page are told apart', async () => {
+    const named = await mount(
+      '<helix-headless-code-block label="app.ts">const a = 1</helix-headless-code-block>',
+    )
+    const copyOf = (host: Element): Element | null | undefined =>
+      host.shadowRoot?.querySelector('helix-headless-copy-button')
+    expect(copyOf(named)?.getAttribute('label')).toBe('Copy code, app.ts')
+    const plain = await mount('<helix-headless-code-block>const a = 1</helix-headless-code-block>')
+    expect(copyOf(plain)?.getAttribute('label')).toBe('Copy code')
+  })
+})
