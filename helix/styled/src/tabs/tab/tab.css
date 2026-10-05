@@ -18,21 +18,21 @@
      Through a variable, because a variant that puts a frame around the row has
      to hand the tab a share of the frame rather than the whole control height.
      `segmented` does exactly that. */
-  block-size: var(--_tab-height, var(--tab-block-size, var(--helix-size-control)));
+  block-size: var(--_tab-height, var(--tabs-tab-block-size, var(--helix-size-control)));
   border: none;
   /* Transparent always. The mark that says which tab is current is one
      element in the strip that travels, not a border that blinks off here and
      on there. The width is kept so the box is the same either way. */
   border-block-end: var(--helix-border-thick) solid transparent;
   border-radius: var(--_tab-radius, var(--helix-radii-none));
-  color: var(--tab-color, var(--helix-color-foreground-subtle));
+  color: var(--tabs-tab-color, var(--helix-color-foreground-subtle));
   cursor: pointer;
   font: inherit;
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
   display: inline-flex;
   justify-content: center;
-  padding-inline: var(--tab-padding-inline, var(--helix-space-sm));
+  padding-inline: var(--tabs-tab-padding-inline, var(--helix-space-sm));
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-normal) var(--helix-easing-emphasized),
@@ -58,7 +58,7 @@
 :host(:state(selected)) [part="tab"]:hover {
   background-color: var(--_tab-selected-surface, transparent);
   box-shadow: var(--_tab-selected-shadow, none);
-  color: var(--tab-selected-color, var(--helix-color-foreground));
+  color: var(--tabs-tab-selected-color, var(--helix-color-foreground));
 }
 
 [part="tab"]:disabled {

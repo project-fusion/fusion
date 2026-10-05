@@ -154,7 +154,7 @@
 [part~="select"]:focus-visible,
 [part="select-all"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: calc(-1 * var(--helix-size-focus-ring));
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* The checkbox column: the same box as a cell, the box centered in it. */

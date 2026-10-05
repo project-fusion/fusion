@@ -94,7 +94,7 @@ if (hasLayout()) {
       const host = (await mount(
         markup.replace(
           '<helix-tabs default-active="one">',
-          '<helix-tabs default-active="one" style="--tabs-gap: 20px; --tab-padding-inline: 30px; --tab-panel-padding-block-start: 40px">',
+          '<helix-tabs default-active="one" style="--tabs-gap: 20px; --tabs-tab-padding-inline: 30px; --tabs-panel-padding-block-start: 40px">',
         ),
       )) as Updatable
       await host.updateComplete
