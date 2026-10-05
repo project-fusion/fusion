@@ -31,8 +31,13 @@
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
   display: inline-flex;
-  justify-content: center;
+  /* A tab set in a column makes each tab as wide as the column, its words at
+     the start. */
+  inline-size: var(--_tab-inline-size, auto);
+  justify-content: var(--_tab-justify, center);
   padding-inline: var(--tabs-tab-padding-inline, var(--helix-space-sm));
+  /* A tab with an `href` is an anchor, and reads as a tab all the same. */
+  text-decoration: none;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-normal) var(--helix-easing-emphasized),
