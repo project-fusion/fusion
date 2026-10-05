@@ -11,6 +11,7 @@ import { nothing, type PropertyValues, type ReactiveController, type TemplateRes
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
+import '../../checkbox/index.js'
 
 /**
  * @summary A group of related checkboxes under one label, with one value for the set.
@@ -63,6 +64,16 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @csspart items - The element that holds the checkboxes, laid out by `orientation`.
  * @csspart label - The group's label, above the checkboxes.
  * @csspart select-all - The box that checks or unchecks every box, under `select-all`.
+ * @csspart select-all-box - The select-all box's box, under the mark.
+ * @csspart select-all-control - The select-all box's native input.
+ * @csspart select-all-feedback - The select-all box's own message, which it never shows.
+ * @csspart select-all-field - The row that holds the select-all box and its label.
+ * @csspart select-all-hint - The select-all box's own help, which it never shows.
+ * @csspart select-all-label - The words beside the select-all box.
+ * @csspart select-all-mark - The select-all box's check mark, or its dash while only some boxes are checked.
+ * @csspart select-all-mark-checked - Added to `select-all-mark` while every box is checked.
+ * @csspart select-all-mark-dash - Added to `select-all-mark` while only some boxes are checked, and kept until every one is.
+ * @csspart select-all-mark-indeterminate - Added to `select-all-mark` while only some boxes are checked.
  *
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
@@ -72,6 +83,18 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
      converter that makes an empty one absent rather than `name=""`. What it
      means differs slightly and the property does not: the group submits nothing
      under it, and hands it to every box that has none. */
+
+  /**
+   * Whether a box above the set checks or unchecks every enabled box.
+   */
+  @property({ attribute: 'select-all', type: Boolean })
+  selectAll = false
+
+  /**
+   * The words beside the box `select-all` draws.
+   */
+  @property({ attribute: 'select-all-label' })
+  selectAllLabel = 'Select all'
 
   /**
    * The checked values, comma separated.
@@ -91,18 +114,6 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
       .map((entry) => entry.trim())
       .filter(Boolean)
   }
-
-  /**
-   * Whether a box above the set checks or unchecks every enabled box.
-   */
-  @property({ attribute: 'select-all', type: Boolean })
-  selectAll = false
-
-  /**
-   * The words beside the box `select-all` draws.
-   */
-  @property({ attribute: 'select-all-label' })
-  selectAllLabel = 'Select all'
 
   /**
    * The checked values, as a list, in the order the boxes are written.
@@ -457,6 +468,10 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     const box = this.tag('checkbox')
     return html`<${box}
       part="select-all"
+      exportparts="box: select-all-box, control: select-all-control,
+        feedback: select-all-feedback, field: select-all-field, hint: select-all-hint,
+        label: select-all-label, mark: select-all-mark, mark-checked: select-all-mark-checked,
+        mark-dash: select-all-mark-dash, mark-indeterminate: select-all-mark-indeterminate"
       .checked=${every}
       .indeterminate=${ticked > 0 && !every}
       ?disabled=${this.isDisabled}

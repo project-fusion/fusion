@@ -60,11 +60,11 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @event {Event} input - The code changed.
  *
  * @csspart cell - One box.
- * @csspart separator - The text `format` draws between two boxes.
  * @csspart feedback - The message that says what is wrong with the code.
  * @csspart field - The row of boxes, ordered left to right in every language.
  * @csspart hint - The help under the boxes, shown while there is no feedback.
  * @csspart label - The label above the boxes.
+ * @csspart separator - The text `format` draws between two boxes.
  *
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */

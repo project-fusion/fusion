@@ -22,15 +22,15 @@ import { styles } from './switch-root.css.js'
  * it, and the control looks like a small dash. The width follows the height, so
  * setting `--switch-block-size` widens the switch too and keeps the proportion.
  *
+ * The thumb is an element, the `thumb` part, and holds an icon for each state:
+ * one in the `on` slot shows while the switch is on, and one in the `off` slot
+ * while it is off.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @aliases Toggle switch, On/off
  * @documentation https://fusion.dev/helix/components/switch
- *
- * The thumb is an element, the `thumb` part, and holds an icon for each state:
- * one in the `on` slot shows while the switch is on, and one in the `off` slot
- * while it is off.
  *
  * @slot - The label that names what the switch turns on.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
