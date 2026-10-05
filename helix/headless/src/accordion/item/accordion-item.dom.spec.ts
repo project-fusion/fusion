@@ -71,3 +71,50 @@ describe('one accordion section', () => {
     expect(part(await item(), 'chevron')).not.toBeNull()
   })
 })
+
+describe('a section find in page can search', () => {
+  /* React Aria's disclosure: a closed section is searched, and a match opens
+     it. Without it, text in a closed FAQ answer was invisible to Control+F. */
+  test('is hidden until found and not inert while closed, and a match opens it', async () => {
+    const host = await item('hidden-until-found')
+    const content = part(host, 'content') as HTMLElement
+    expect(content.getAttribute('hidden')).toBe('until-found')
+    expect(content.hasAttribute('inert')).toBe(false)
+    content.dispatchEvent(new Event('beforematch'))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(content.hasAttribute('hidden')).toBe(false)
+    expect(part(host, 'trigger')?.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  test('a refused opening puts the region back to hidden until found', async () => {
+    const host = await item('hidden-until-found')
+    host.addEventListener('helix-before-open', (event) => event.preventDefault())
+    const content = part(host, 'content') as HTMLElement
+    content.removeAttribute('hidden')
+    content.dispatchEvent(new Event('beforematch'))
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    expect(content.getAttribute('hidden')).toBe('until-found')
+  })
+
+  test('an accordion turns it on for every section', async () => {
+    document.body.innerHTML = `<helix-headless-accordion hidden-until-found>
+      <helix-headless-accordion-item><span slot="summary">A</span>Body</helix-headless-accordion-item>
+    </helix-headless-accordion>`
+    const section = document.querySelector('helix-headless-accordion-item') as Item
+    await (document.body.firstElementChild as Item).updateComplete
+    await new Promise((resolve) => setTimeout(resolve))
+    await section.updateComplete
+    expect(part(section, 'content')?.getAttribute('hidden')).toBe('until-found')
+  })
+})
+
+describe('the chevron', () => {
+  /* The drawn caret was the only indicator a section could have. */
+  test('is the fallback of a slot an icon of your own replaces', async () => {
+    const host = await item()
+    const slot = host.shadowRoot?.querySelector('slot[name="chevron"]')
+    expect(slot?.querySelector('[part="chevron"]')).not.toBeNull()
+  })
+})

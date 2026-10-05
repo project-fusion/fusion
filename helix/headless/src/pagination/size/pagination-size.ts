@@ -2,7 +2,7 @@ import {
   customElement,
   formatNumbers,
   HelixBeforeChangeEvent,
-  HelixElement,
+  HelixFormElement,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -38,6 +38,11 @@ import '../../select/index.js'
  * once the size has moved, as a native `<select>` sends them together.
  * Re-querying and returning to page one is up to you, because only you know
  * whether the current position should be kept.
+ *
+ * It takes part in a form. Give it a `name` and the size in force is submitted
+ * under that name, so a `GET` form carries it in the address beside the page.
+ * A form reset returns it to `default-value`, and `disabled`, or a disabled
+ * `<fieldset>` around it, turns the select off.
  *
  * @since 0.1.0
  * @status stable
@@ -79,7 +84,7 @@ import '../../select/index.js'
  * @cssstate empty - While there are no sizes to offer.
  */
 @customElement('helix-headless-pagination-size')
-export class HelixHeadlessPaginationSize extends HelixElement {
+export class HelixHeadlessPaginationSize extends HelixFormElement {
   /**
    * The size to start on when `value` is not set.
    */
@@ -168,8 +173,8 @@ export class HelixHeadlessPaginationSize extends HelixElement {
         this.requestUpdate('value', previous)
         /* The notification, in the shape `HelixFormElement` gives every value
            control: `input` composed, as the platform's is, and `change` not. */
-        this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+        this.announceInput()
+        this.announceChange()
       },
       event: (size) => new HelixBeforeChangeEvent({ value: String(size) }),
       host: this,
@@ -202,11 +207,31 @@ export class HelixHeadlessPaginationSize extends HelixElement {
     event.stopPropagation()
   }
 
+  /** Returns to the size the markup declared, as a native `<select>` does on a reset. */
+  override formResetCallback(): void {
+    super.formResetCallback()
+    const previous = this.value
+    this.valueState = undefined
+    this.requestUpdate('value', previous)
+  }
+
+  /** Takes back the size a browser restores with the form, or the declared one. */
+  formStateRestoreCallback(state: string | File | FormData | null): void {
+    const size = typeof state === 'string' ? Number.parseInt(state, 10) : Number.NaN
+    const previous = this.value
+    this.valueState = Number.isFinite(size) && size > 0 ? size : undefined
+    this.requestUpdate('value', previous)
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     /* Through `toggleState`, like `Pagination`'s: an engine without
        `CustomStateSet` gets an empty select rather than no element. */
     this.toggleState('empty', this.options.length === 0)
+    /* The size in force, which is what the select shows, and nothing where no
+       size is offered. */
+    const current = this.current
+    this.internals.setFormValue(current > 0 ? String(current) : null)
   }
 
   /**
@@ -235,6 +260,7 @@ export class HelixHeadlessPaginationSize extends HelixElement {
         listbox-search-field: control-listbox-search-field, surface: control-surface,
         trigger: control-trigger, value: control-value"
       label=${this.label}
+      ?disabled=${this.isDisabled}
       .value=${String(this.current)}
       @helix-before-change=${this.handleChange}
       @input=${this.stopNative}

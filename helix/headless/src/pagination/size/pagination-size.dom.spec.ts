@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
+import { formValue, hasState, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -193,5 +193,31 @@ describe('pagination size with nothing to offer', () => {
     )
     expect(part(it, 'control')).toBeNull()
     expect(hasState(it, 'empty')).toBe(true)
+  })
+})
+
+describe('pagination size in a form', () => {
+  /* A GET form could carry the page and not the size, because the size was no
+     form control: the footer had to be rebuilt in script to keep it. */
+  test('submits the size in force, follows a choice, and returns to the default on a reset', async () => {
+    const it = (await mount(
+      '<helix-headless-pagination-size name="per" sizes="10,25,50" default-value="25"></helix-headless-pagination-size>',
+    )) as Size & { formResetCallback: () => void }
+    expect(formValue(it)).toBe('25')
+    control(it).dispatchEvent(choose(it, '50'))
+    await settle(it)
+    expect(formValue(it)).toBe('50')
+    it.formResetCallback()
+    await settle(it)
+    expect(it.value).toBe(25)
+    expect(formValue(it)).toBe('25')
+  })
+
+  test('a size no one named submits the first one offered, and a disabled one turns the select off', async () => {
+    const it = (await mount(
+      '<helix-headless-pagination-size name="per" sizes="10,25" disabled></helix-headless-pagination-size>',
+    )) as Size
+    expect(formValue(it)).toBe('10')
+    expect(control(it).hasAttribute('disabled')).toBe(true)
   })
 })

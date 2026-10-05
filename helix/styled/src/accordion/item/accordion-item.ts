@@ -19,6 +19,8 @@ import { styles } from './accordion-item.css.js'
  * @documentation https://fusion.dev/helix/components/accordion
  *
  * @slot - The content shown when the section is open.
+ * @slot chevron - Replaces the open and close indicator. A slotted icon is sized, colored and
+ *   turned like the drawn one.
  * @slot summary - The text of the button that opens and closes the section. Always shown.
  *
  * @csspart chevron - The open and close indicator.
