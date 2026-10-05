@@ -1,4 +1,9 @@
-import { customElement, HelixElement, MixinSelectableItem } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  MixinSelectableItem,
+  reflectElements,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -75,15 +80,14 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
     }
   }
 
-  /** Points the control's `aria-controls` at the panel, where the engine can. */
+  /**
+   * Points the control's `aria-controls` at the panel, where the engine can.
+   * The control is this tab's own, so the reference is always its to clear.
+   */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    const control = this.renderRoot.querySelector('[part="tab"]') as
-      | (Element & { ariaControlsElements?: Element[] | null })
-      | null
-    if (control && 'ariaControlsElements' in control) {
-      control.ariaControlsElements = this.controls ? [this.controls] : null
-    }
+    const control = this.renderRoot.querySelector('[part="tab"]')
+    reflectElements(control, 'ariaControlsElements', this.controls ? [this.controls] : [], true)
   }
 
   /**

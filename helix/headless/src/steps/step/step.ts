@@ -38,7 +38,8 @@ import '../../button/index.js'
  * A finished stage says so in words: the name's button is described by
  * `complete-label`, "Complete" unless you translate it, and a stage that
  * becomes complete while the page is open says it once in a polite live
- * region. The current stage's button carries `aria-current="step"`.
+ * region. The current stage's button carries `aria-current="step"`, and only
+ * the button, so the state is said once, on the control.
  *
  * @since 0.1.0
  * @status stable
@@ -158,8 +159,9 @@ export class HelixHeadlessStep extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* No `ariaCurrent` here: the name's button carries `aria-current="step"`,
+       and the state is said once, on the control a reader is on. */
     hostAria(this.internals, { role: 'listitem' })
-    this.internals.ariaCurrent = this.current ? 'step' : null
   }
 
   /**
