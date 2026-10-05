@@ -28,7 +28,8 @@ helix-headless-icon::part(svg) {
 }
 
 /* The region is a popover in the top layer, so it is the box to place, and the
-   UA's centered, bordered popover box is undone. */
+   UA's centered, bordered, fit-content popover box is undone: at fit-content it
+   would hug the inline start, where the stack belongs at the end. */
 helix-headless-toast::part(region) {
   align-items: flex-end;
   background: none;
@@ -36,10 +37,12 @@ helix-headless-toast::part(region) {
   color: inherit;
   display: flex;
   flex-direction: column;
+  inline-size: auto;
   inset: auto;
   inset-block-end: 1.5rem;
   inset-inline: 1.5rem;
   margin: 0;
+  max-inline-size: none;
   overflow: visible;
   padding: 0;
   pointer-events: none;
