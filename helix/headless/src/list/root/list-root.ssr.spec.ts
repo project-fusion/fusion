@@ -10,7 +10,7 @@ describe('list server output', () => {
        is read off an element with no children, so the only shadow root in it is
        that element's own. */
     const list = ssr(html`<helix-headless-list></helix-headless-list>`)
-    expect(rendered(list, 'helix-headless-list')).toContain('<slot></slot>')
+    expect(rendered(list, 'helix-headless-list')).toMatch(/<slot\s*><\/slot>/)
 
     const row = ssr(html`<helix-headless-list-item></helix-headless-list-item>`)
     expect(partTag(row, 'row')).toMatch(/^<div\b/)
@@ -23,5 +23,34 @@ describe('list server output', () => {
     )
     expect(hostAttributes(markup, 'helix-headless-list')).toEqual(['label'])
     expect(hostAttributes(markup, 'helix-headless-list-item')).toEqual([])
+  })
+
+  /* `start` needs no rows to know, so the served list already counts from it. */
+  test('a start is served as the number the rows count from', () => {
+    const markup = ssr(html`<helix-headless-list kind="ordered" start="5"></helix-headless-list>`)
+    expect(rendered(markup, 'helix-headless-list')).toMatch(
+      /<slot style="--list-first: 5; --list-step: 1"/,
+    )
+    const down = ssr(
+      html`<helix-headless-list kind="ordered" reversed start="3"></helix-headless-list>`,
+    )
+    expect(rendered(down, 'helix-headless-list')).toMatch(
+      /<slot style="--list-first: 3; --list-step: -1"/,
+    )
+  })
+
+  /* Counting down from the number of rows needs the rows, which a server does
+     not have, so the served list counts from one until it runs. */
+  test('reversed with no start serves the ordinary count', () => {
+    const markup = ssr(html`<helix-headless-list kind="ordered" reversed></helix-headless-list>`)
+    expect(rendered(markup, 'helix-headless-list')).toMatch(/<slot\s*><\/slot>/)
+  })
+
+  test('a row in a plain list serves no grid cell and no tab stop', () => {
+    const plain = ssr(
+      html`<helix-headless-list><helix-headless-list-item>x</helix-headless-list-item></helix-headless-list>`,
+    )
+    expect(partTag(plain, 'row')).not.toContain('gridcell')
+    expect(partTag(plain, 'row')).not.toContain('tabindex')
   })
 })
