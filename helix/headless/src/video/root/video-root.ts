@@ -51,6 +51,7 @@ import { html } from 'lit/static-html.js'
    a copy of its own to remind anyone. */
 import '../../menu/index.js'
 import { HelixHeadlessMenu } from '../../menu/root/menu-root.js'
+import { relayMedia } from '../media-events.js'
 import { barControls, type Conditions, menuControls, ownFile } from './extra-controls.js'
 import { takeKey } from './keys.js'
 
@@ -103,6 +104,11 @@ const clock = (seconds: number): string => {
  * `readyState` of zero, and it would not play. They are copied so your light
  * DOM stays intact, and are copied again whenever the slot changes.
  *
+ * The player sends every media event of its inner video under the same name,
+ * without bubbling, as a `<video>` sends it. Listen on the player as you would
+ * on a video: `timeupdate`, `volumechange`, `loadedmetadata`, `error`, and the
+ * rest.
+ *
  * @since 0.1.0
  * @status stable
  * @category media
@@ -110,15 +116,52 @@ const clock = (seconds: number): string => {
  * @documentation https://fusion.dev/helix/components/video
  *
  * @slot - `<source>` and `<track>` elements, which are copied into the video.
+ * @slot captions-icon - Replaces the glyph on the captions control.
  * @slot controls - Extra controls, added to the control bar before the fullscreen button.
+ * @slot download-icon - Replaces the glyph on the download control, on the bar or in the `overflow` menu.
+ * @slot exit-fullscreen-icon - Replaces the glyph on the fullscreen control while the player fills the screen.
+ * @slot forward-icon - Replaces the glyph on the control that skips forward, on the bar or in the `overflow` menu.
+ * @slot fullscreen-icon - Replaces the glyph on the fullscreen control.
  * @slot header - Content over the top left of the picture, such as a heading and a back button.
+ * @slot more-icon - Replaces the glyph on the button that opens the `overflow` menu.
+ * @slot mute-icon - Replaces the glyph on the mute control while there is no sound.
+ * @slot next-icon - Replaces the glyph on the control that asks for the next video, on the bar or in the `overflow` menu.
+ * @slot pause-icon - Replaces the glyph on the play control while the video plays.
+ * @slot pip-icon - Replaces the glyph on the picture-in-picture control, on the bar or in the `overflow` menu.
+ * @slot play-icon - Replaces the glyph on the play control while the video is paused.
  * @slot poster - Shown over the video until it starts.
+ * @slot previous-icon - Replaces the glyph on the control that asks for the previous video, on the bar or in the `overflow` menu.
+ * @slot remote-icon - Replaces the glyph on the control that plays on another device, on the bar or in the `overflow` menu.
+ * @slot rewind-icon - Replaces the glyph on the control that skips back, on the bar or in the `overflow` menu.
+ * @slot speed-icon - Replaces the glyph beside the playback speed in the `overflow` menu. On the bar, the speed is shown as a number.
+ * @slot start-icon - Replaces the glyph on the large play button over the picture.
+ * @slot volume-icon - Replaces the glyph on the mute control while there is sound.
  *
- * @event {Event} ended - The video reached its end. Relayed from the inner video, since the native event does not cross the shadow boundary.
+ * @event {Event} abort - The media stopped loading before it finished, without an error.
+ * @event {Event} canplay - Enough has loaded to start playing.
+ * @event {Event} canplaythrough - Enough has loaded to play to the end without stopping, at the current rate.
+ * @event {Event} durationchange - The duration changed, which it does once the metadata is in.
+ * @event {Event} emptied - The media was reset, as when `src` changes.
+ * @event {Event} ended - The video reached its end.
+ * @event {Event} error - The source could not be loaded or played. The player shows `error-label` as well.
  * @event {HelixNextEvent} helix-next - The next video was requested. Load it in response.
  * @event {HelixPreviousEvent} helix-previous - The previous video was requested. Load it in response.
- * @event {Event} pause - Playback paused. Relayed from the inner video.
- * @event {Event} play - Playback started. Relayed from the inner video.
+ * @event {Event} loadeddata - The frame at the current position has loaded.
+ * @event {Event} loadedmetadata - The duration and the size of the video are known.
+ * @event {Event} loadstart - The video started looking for its media.
+ * @event {Event} pause - Playback paused.
+ * @event {Event} play - Playback was asked to start.
+ * @event {Event} playing - Playback started, or started again after waiting for data.
+ * @event {Event} progress - More of the media has downloaded.
+ * @event {Event} ratechange - The playback rate changed. Read `playbackRate`.
+ * @event {Event} resize - The video's own width or height changed. Read `videoWidth` and `videoHeight`.
+ * @event {Event} seeked - A move to a new position finished.
+ * @event {Event} seeking - A move to a new position started.
+ * @event {Event} stalled - The browser is trying to load more data and none is arriving.
+ * @event {Event} suspend - Loading paused on purpose, as when `preload` asks for no more.
+ * @event {Event} timeupdate - The position changed. Read `currentTime`.
+ * @event {Event} volumechange - The volume or the mute changed. Read `volume` and `muted`.
+ * @event {Event} waiting - Playback stopped to wait for more data.
  *
  * @csspart captions - The button that turns captions on and off.
  * @csspart captions-menu - The menu of caption languages, when the video has more than one track.
@@ -184,10 +227,10 @@ export class HelixHeadlessVideo extends HelixElement {
    * Whether the video starts playing on its own. Browsers allow this only while
    * it is muted.
    *
-   * Forwarded rather than acted on. Whether an unprompted play is permitted is
-   * the browser's policy and not this element's, and `play()` already swallows
-   * the refusal: what follows a refused autoplay is a paused player showing its
-   * start control, which is the correct thing to be looking at.
+   * Forwarded to the video, which decides. Whether an unprompted play is
+   * permitted is the browser's policy, and what follows a refused autoplay is a
+   * paused player showing its start control, which is the correct thing to be
+   * looking at.
    */
   @property({ reflect: true, type: Boolean })
   autoplay = false
@@ -406,6 +449,13 @@ export class HelixHeadlessVideo extends HelixElement {
   pipLabel = 'Picture in picture'
 
   /**
+   * The name of the player when `label` is not set. The player is a group, and
+   * this is what a screen reader calls it on arriving.
+   */
+  @property({ attribute: 'player-label' })
+  playerLabel = 'Video'
+
+  /**
    * The name of the play control while pressing it would start the video.
    */
   @property({ attribute: 'play-label' })
@@ -484,6 +534,14 @@ export class HelixHeadlessVideo extends HelixElement {
    * `none` is for the cases where that is wrong rather than right: a muted loop
    * behind a hero, a grid of eight thumbnails, anything where the video is
    * decoration rather than something to start.
+   *
+   * **It is for the pointer, and the bar's Play is for everyone else.** Both
+   * play the video, so a keyboard met two stops called "Play" one after the
+   * other and a screen reader read the same button twice. The large one is out
+   * of the tab order and hidden from assistive technology while the bar is
+   * drawn, which is whenever it is: it shows only while the video is not
+   * playing, and the bar does not fade then. A press on it leaves focus on the
+   * player, so the keys go on working once it has gone.
    *
    * A value rather than a boolean, so the resting state is the attribute's
    * absence: a boolean defaulting to on would have to be spelled as its own
@@ -817,15 +875,27 @@ export class HelixHeadlessVideo extends HelixElement {
   }
 
   /**
-   * Starts playback, if the browser allows it.
+   * Starts playback, and returns the video's own promise: it settles when
+   * playback starts, and rejects when the browser refuses.
    *
-   * The rejection is swallowed on purpose: a browser refuses `play()` when
-   * nothing the reader did asked for it, and that is a policy answer rather than
-   * a fault. What follows a refused play is a paused player showing its start
-   * control, which is the correct thing to be looking at.
+   * **A refusal is not reported as an unhandled rejection.** A browser refuses
+   * `play()` when nothing the reader did asked for it, and that is a policy
+   * answer: what follows is a paused player showing its start control. So the
+   * promise is marked handled here, and a caller who awaits it still hears the
+   * refusal.
+   *
+   * Before the first render there is no video yet, and the promise waits for
+   * one.
    */
-  play(): void {
-    void this.video?.play().catch(() => {})
+  play(): Promise<void> {
+    const video = this.video
+    const started = video
+      ? video.play()
+      : this.updateComplete.then(async () => {
+          await this.video?.play()
+        })
+    started.catch(() => {})
+    return started
   }
 
   /** Pauses playback and leaves the current frame showing. */
@@ -843,7 +913,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return
     }
     if (video.paused) {
-      this.play()
+      void this.play()
     } else {
       this.pause()
     }
@@ -958,17 +1028,15 @@ export class HelixHeadlessVideo extends HelixElement {
     this.failed = true
   }
 
-  /* Relayed, because none of these cross a shadow boundary on their own. The
-     video is inside this element's shadow root, so a consumer listening on the
-     element they wrote hears nothing at all without this. Input relays `change`
-     for the same reason. */
   /* `emptied` is in the list for a reason worth keeping. Assigning `src` runs
      the media load algorithm, which stops playback and sets `paused` without
      firing `pause`: the only events are `emptied` and `loadstart`. Listening for
      `play` and `pause` alone, this element went on believing it was playing
      after a playlist pointed it at the next entry, so the start control it draws
      only when paused stayed hidden and there was nothing at all to press.
-     Measured: `paused` true, `playing` true, no `pause` event in the log. */
+     Measured: `paused` true, `playing` true, no `pause` event in the log.
+
+     What a consumer hears of these is `relayMedia`'s, in `media-events.ts`. */
   private readonly handleState = (event: Event): void => {
     const video = this.video
     this.playing = video ? !video.paused : false
@@ -979,26 +1047,6 @@ export class HelixHeadlessVideo extends HelixElement {
       this.claimSession()
     }
     this.session.report(this.playing)
-    /* Non-bubbling, which is what the platform sends and what makes these reach
-       a React consumer at all.
-     *
-     * `play`, `pause` and `ended` are in react-dom's `nonDelegatedEvents`, read
-     * out of the installed 19.2.8 rather than remembered: it concatenates the
-     * whole media list onto `beforetoggle cancel close invalid load scroll
-     * scrollend toggle`. React attaches those directly to `<video>`, `<audio>`
-     * and `<img>` and never to a custom element, so nothing at the root hears
-     * them. `bindReactHandler` is what closes that, and `reactPropFor` skips
-     * anything that bubbles, on the grounds that a bubbling relay is already
-     * reaching React's delegated listener and a second binding would double
-     * every call.
-     *
-     * So these three were sending `bubbles: true` into the one branch that
-     * refuses to bind, and `onPlay`, `onPause` and `onEnded` on
-     * `<helix-headless-video>` were silent in React. The comment beside
-     * `reactPropFor` named this exact trio as fixed while this line kept it
-     * broken. Matching the platform's own propagation fixes it and is what
-     * `Image` already does with `load` and `error`. */
-    this.dispatchEvent(new Event(event.type, { bubbles: false, composed: false }))
   }
 
   /**
@@ -1192,6 +1240,20 @@ export class HelixHeadlessVideo extends HelixElement {
   }
 
   /**
+   * A press on the large play button plays, and leaves focus on the player.
+   *
+   * The button takes focus from the press and is gone once the video plays,
+   * which drops focus to the page, and the keys bound to the player stop
+   * answering. Moved to the stage first, they keep working. The press came from
+   * a pointer, the button being out of the tab order, so the stage draws no
+   * ring for it.
+   */
+  private readonly handleStart = (): void => {
+    this.partNamed<HTMLElement>('stage')?.focus({ preventScroll: true })
+    this.toggle()
+  }
+
+  /**
    * The keys every player uses, bound to this element rather than the document.
    *
    * A video is not a command palette: its keys belong to it while a reader is
@@ -1274,6 +1336,10 @@ export class HelixHeadlessVideo extends HelixElement {
       this.silent = video.muted
       this.loudness = video.volume
       void this.remote.attach(video)
+      /* After the template's own listeners on the same video, so a consumer
+         reading the player in a handler reads the state the event moved. The
+         video is never replaced, so this is bound once and never undone. */
+      relayMedia(video, this)
     }
   }
 
@@ -1326,7 +1392,7 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-pressed=${this.remoteConnected ? 'true' : 'false'}
         @click=${() => void this.remote.prompt()}
       >
-        ${drawIcon(airplay)}
+        <slot name="remote-icon">${drawIcon(airplay)}</slot>
       </button>`
     }
     /* Two templates rather than one with the name bound in, for the reason
@@ -1339,7 +1405,7 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-label=${fillTemplate(this.rewindLabel, { seconds: SKIP_SECONDS })}
         @click=${() => this.skipBy(-SKIP_SECONDS)}
       >
-        ${drawIcon(arrowCounterClockwise)}
+        <slot name="rewind-icon">${drawIcon(arrowCounterClockwise)}</slot>
       </button>`
     }
     if (one === 'forward') {
@@ -1349,7 +1415,7 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-label=${fillTemplate(this.forwardLabel, { seconds: SKIP_SECONDS })}
         @click=${() => this.skipBy(SKIP_SECONDS)}
       >
-        ${drawIcon(arrowClockwise)}
+        <slot name="forward-icon">${drawIcon(arrowClockwise)}</slot>
       </button>`
     }
     if (one === 'speed') {
@@ -1373,7 +1439,7 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-label=${this.previousLabel}
         @click=${() => this.skip(true)}
       >
-        ${drawIcon(skipBack)}
+        <slot name="previous-icon">${drawIcon(skipBack)}</slot>
       </button>`
     }
     if (one === 'next') {
@@ -1383,7 +1449,7 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-label=${this.nextLabel}
         @click=${() => this.skip(false)}
       >
-        ${drawIcon(skipForward)}
+        <slot name="next-icon">${drawIcon(skipForward)}</slot>
       </button>`
     }
     if (one === 'download') {
@@ -1409,7 +1475,7 @@ export class HelixHeadlessVideo extends HelixElement {
         rel=${local ? nothing : 'noreferrer'}
         aria-label=${this.downloadLabel}
       >
-        ${drawIcon(download)}
+        <slot name="download-icon">${drawIcon(download)}</slot>
       </a>`
     }
     return html`<button
@@ -1418,7 +1484,7 @@ export class HelixHeadlessVideo extends HelixElement {
       aria-label=${this.pipLabel}
       @click=${() => void this.togglePip()}
     >
-      ${drawIcon(pictureInPicture)}
+      <slot name="pip-icon">${drawIcon(pictureInPicture)}</slot>
     </button>`
   }
 
@@ -1451,7 +1517,7 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-pressed=${this.captioned ? 'true' : 'false'}
         @click=${() => this.toggleCaptions()}
       >
-        ${drawIcon(closedCaptioning)}
+        <slot name="captions-icon">${drawIcon(closedCaptioning)}</slot>
       </button>`
     }
     return html`<${this.tag('menu')} part="captions-menu"
@@ -1467,7 +1533,7 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-haspopup="menu"
         aria-expanded=${this.menuOpen === 'captions' ? 'true' : 'false'}
       >
-        ${drawIcon(closedCaptioning)}
+        <slot name="captions-icon">${drawIcon(closedCaptioning)}</slot>
       </button>
       <${this.tag('menu-item')}
         part="entry"
@@ -1531,14 +1597,14 @@ export class HelixHeadlessVideo extends HelixElement {
         value="remote"
         @helix-select=${() => void this.remote.prompt()}
       >
-        ${drawIcon(airplay, { slot: 'start' })}
+        <slot name="remote-icon" slot="start">${drawIcon(airplay)}</slot>
         ${this.remoteLabel}
       </${this.tag('menu-item')}>`
     }
     if (one === 'speed') {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="item: entry-item, mark: entry-mark, start: entry-start" value="speed" @helix-select=${() => this.cycleSpeed()}>
-        ${drawIcon(gauge, { slot: 'start' })}
+        <slot name="speed-icon" slot="start">${drawIcon(gauge)}</slot>
         ${this.speedLabel}: ${this.rate}x
       </${this.tag('menu-item')}>`
     }
@@ -1549,21 +1615,25 @@ export class HelixHeadlessVideo extends HelixElement {
         value=${one}
         @helix-select=${() => this.skipBy(back ? -SKIP_SECONDS : SKIP_SECONDS)}
       >
-        ${drawIcon(back ? arrowCounterClockwise : arrowClockwise, { slot: 'start' })}
+        ${
+          back
+            ? html`<slot name="rewind-icon" slot="start">${drawIcon(arrowCounterClockwise)}</slot>`
+            : html`<slot name="forward-icon" slot="start">${drawIcon(arrowClockwise)}</slot>`
+        }
         ${fillTemplate(back ? this.rewindLabel : this.forwardLabel, { seconds: SKIP_SECONDS })}
       </${this.tag('menu-item')}>`
     }
     if (one === 'previous') {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="item: entry-item, mark: entry-mark, start: entry-start" value="previous" @helix-select=${() => this.skip(true)}>
-        ${drawIcon(skipBack, { slot: 'start' })}
+        <slot name="previous-icon" slot="start">${drawIcon(skipBack)}</slot>
         ${this.previousLabel}
       </${this.tag('menu-item')}>`
     }
     if (one === 'next') {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="item: entry-item, mark: entry-mark, start: entry-start" value="next" @helix-select=${() => this.skip(false)}>
-        ${drawIcon(skipForward, { slot: 'start' })}
+        <slot name="next-icon" slot="start">${drawIcon(skipForward)}</slot>
         ${this.nextLabel}
       </${this.tag('menu-item')}>`
     }
@@ -1577,13 +1647,13 @@ export class HelixHeadlessVideo extends HelixElement {
         target=${local ? nothing : '_blank'}
         value="download"
       >
-        ${drawIcon(download, { slot: 'start' })}
+        <slot name="download-icon" slot="start">${drawIcon(download)}</slot>
         ${this.downloadLabel}
       </${this.tag('menu-item')}>`
     }
     return html`<${this.tag('menu-item')} part="entry"
     exportparts="item: entry-item, mark: entry-mark, start: entry-start" value="pip" @helix-select=${() => void this.togglePip()}>
-      ${drawIcon(pictureInPicture, { slot: 'start' })}
+      <slot name="pip-icon" slot="start">${drawIcon(pictureInPicture)}</slot>
       ${this.pipLabel}
     </${this.tag('menu-item')}>`
   }
@@ -1597,7 +1667,11 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-label=${this.playing ? this.pauseLabel : this.playLabel}
         @click=${() => this.toggle()}
       >
-        ${drawIcon(this.playing ? pause : play)}
+        ${
+          this.playing
+            ? html`<slot name="pause-icon">${drawIcon(pause)}</slot>`
+            : html`<slot name="play-icon">${drawIcon(play)}</slot>`
+        }
       </button>
       <span part="time">${clock(this.position)} / ${clock(this.knownDuration)}</span>
       <!-- Left to right on every page. A player's timeline is a tape running
@@ -1635,7 +1709,11 @@ export class HelixHeadlessVideo extends HelixElement {
           }
         }}
       >
-        ${drawIcon(this.silent || this.loudness === 0 ? speakerX : speakerHigh)}
+        ${
+          this.silent || this.loudness === 0
+            ? html`<slot name="mute-icon">${drawIcon(speakerX)}</slot>`
+            : html`<slot name="volume-icon">${drawIcon(speakerHigh)}</slot>`
+        }
       </button>
       <input
         part="volume"
@@ -1670,7 +1748,7 @@ export class HelixHeadlessVideo extends HelixElement {
                 aria-haspopup="menu"
                 aria-expanded=${this.menuOpen === 'overflow' ? 'true' : 'false'}
               >
-                ${drawIcon(dotsThreeVertical)}
+                <slot name="more-icon">${drawIcon(dotsThreeVertical)}</slot>
               </button>
               ${this.overflow.map((one) => this.renderOverflowItem(one))}
             </${this.tag('menu')}>`
@@ -1694,9 +1772,45 @@ export class HelixHeadlessVideo extends HelixElement {
         aria-pressed=${this.full ? 'true' : 'false'}
         @click=${() => void this.fullscreen.toggle()}
       >
-        ${drawIcon(this.full ? cornersIn : cornersOut)}
+        ${
+          this.full
+            ? html`<slot name="exit-fullscreen-icon">${drawIcon(cornersIn)}</slot>`
+            : html`<slot name="fullscreen-icon">${drawIcon(cornersOut)}</slot>`
+        }
       </button>
     </div>`
+  }
+
+  /**
+   * The large play button over the picture, or nothing.
+   *
+   * Drawn whenever the video is not playing, which is what the mark means:
+   * press this to play. Not only before the first play, which would make the
+   * mark mean two different things at two moments that are the same state.
+   * Every player a reader has used shows it on pause, and the one who paused to
+   * study a frame clears it by pressing the thing in the way.
+   *
+   * Not drawn at all where the browser draws its own controls, since that bar
+   * has a play button and two would be two.
+   */
+  protected renderStart(): TemplateResult | typeof nothing {
+    if (
+      this.controls ||
+      this.playing ||
+      this.buffering ||
+      this.failed ||
+      this.startControl === 'none'
+    ) {
+      return nothing
+    }
+    return html`<button
+      part="start"
+      type="button"
+      tabindex="-1"
+      aria-hidden="true"
+      aria-label=${this.playLabel}
+      @click=${this.handleStart}
+    ><slot name="start-icon">${drawIcon(play)}</slot></button>`
   }
 
   protected override render(): TemplateResult {
@@ -1709,7 +1823,7 @@ export class HelixHeadlessVideo extends HelixElement {
         part="stage"
         tabindex=${this.controls ? nothing : '0'}
         role=${this.controls ? nothing : 'group'}
-        aria-label=${this.controls ? nothing : this.label || 'Video'}
+        aria-label=${this.controls ? nothing : this.label || this.playerLabel}
         @keydown=${this.handleKeydown}
         @pointermove=${this.idler.stir}
         @pointerleave=${this.idler.leave}
@@ -1810,30 +1924,7 @@ export class HelixHeadlessVideo extends HelixElement {
             </div>`
           : nothing
       }
-      ${
-        /* Whenever it is not playing, which is what the mark means: press this
-           to play. Not only before the first play, which would make the mark
-           mean two different things at two moments that are the same state.
-           Every player a reader has used shows it on pause, and the one who
-           paused to study a frame clears it by pressing the thing in the way.
-
-           Not drawn at all where the browser draws its own controls, since that
-           bar has a play button and two would be two. */
-        this.controls ||
-        this.playing ||
-        this.buffering ||
-        this.failed ||
-        this.startControl === 'none'
-          ? nothing
-          : html`<button
-              part="start"
-              type="button"
-              aria-label=${this.playLabel}
-              @click=${() => this.toggle()}
-            >
-              ${drawIcon(play)}
-            </button>`
-      }
+      ${this.renderStart()}
       ${this.controls ? nothing : this.renderBar()}
     </div>`
   }

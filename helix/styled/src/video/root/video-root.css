@@ -175,6 +175,19 @@
   min-inline-size: var(--helix-size-icon-loose);
 }
 
+/* An icon slotted in place of a glyph, at the glyph's size. `::slotted()` never
+   reaches the glyph this element draws as the fallback, and the glyph's own rule
+   never reaches what a page slots, so each takes a rule reading the same
+   `--icon-size` the control sets. The color needs none: the icon inherits it
+   from the control, as the glyph does. Wherever the slot sits, on the bar, on
+   the large play button or in a row of the `overflow` menu, the size is that
+   place's. */
+slot[name$="-icon"]::slotted(*) {
+  block-size: var(--icon-size, var(--helix-size-icon));
+  flex: 0 0 auto;
+  inline-size: var(--icon-size, var(--helix-size-icon));
+}
+
 [part="controls"] :where(a, button):focus-visible,
 [part="scrubber"]:focus-visible,
 [part="volume"]:focus-visible {

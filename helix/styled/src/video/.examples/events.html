@@ -53,6 +53,7 @@
   clip.addEventListener('play', () => say('play', at()))
   clip.addEventListener('pause', () => say('pause', at()))
   clip.addEventListener('ended', () => say('ended', at()))
+  clip.addEventListener('seeked', () => say('seeked', at()))
   clip.addEventListener('helix-previous', () => {
     say('helix-previous', 'the previous button was pressed')
   })
