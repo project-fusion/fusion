@@ -30,6 +30,14 @@ describe('card visual axes', () => {
     expect(styles(served)).toContain(':host([separation="elevated"])')
   })
 
+  /* `plain` is no frame at all, and it kept the theme's surface shadow, so a
+     plain card in a theme that separates with shadows still floated. */
+  test('plain clears the shadow along with the fill and the edge', () => {
+    const served = ssr(html`<helix-card .separation=${'plain'}></helix-card>`)
+    const rule = styles(served).split(':host([separation="plain"]) {')[1]?.split('}')[0] ?? ''
+    expect(rule).toContain('--card-shadow: none')
+  })
+
   test('material reflects too, and the sheet describes the value asked for', () => {
     const served = ssr(html`<helix-card .material=${'frosted'}></helix-card>`)
     expect(hostTag(served, TAG)).toContain('material="frosted"')

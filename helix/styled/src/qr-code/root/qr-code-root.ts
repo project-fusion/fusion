@@ -20,8 +20,8 @@ import { styles } from './qr-code-root.css.js'
  * @category media
  * @documentation https://fusion.dev/helix/components/qr-code
  *
- * @cssproperty --qr-code-background-color - The fill behind the modules, including the quiet zone.
- * @cssproperty --qr-code-color - Color of the dark modules. Defaults to the page's text color.
+ * @cssproperty --qr-code-background-color - The fill behind the modules, including the quiet zone and the logo's box.
+ * @cssproperty --qr-code-color - Color of the dark modules. Defaults to the dark media ink, which is the same in both color schemes so the code scans.
  * @cssproperty --qr-code-finder-color - Color of the three corner squares. Defaults
  * to the color of the modules.
  * @cssproperty --qr-code-logo-padding - The clear space around the center logo.

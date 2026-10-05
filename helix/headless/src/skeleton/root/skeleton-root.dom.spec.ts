@@ -7,15 +7,29 @@ beforeAll(async () => {
 })
 
 describe('skeleton', () => {
-  test('says the region is filling rather than saying nothing', async () => {
+  /* It was an empty live region marked busy, which holds nothing and never
+     changes, so a screen reader announced nothing at all while the docs said
+     it announced the loading. */
+  test('is hidden from a screen reader unless it is named', async () => {
     const skeleton = (await mount(
       '<helix-headless-skeleton></helix-headless-skeleton>',
     )) as HTMLElement & {
       internals?: ElementInternals
     }
-    expect(skeleton.internals?.ariaBusy).toBe('true')
-    expect(skeleton.internals?.ariaLive).toBe('polite')
-    expect(skeleton.hasAttribute('aria-busy')).toBe(false)
+    expect(skeleton.internals?.ariaHidden).toBe('true')
+    expect(skeleton.internals?.ariaLive ?? null).toBeNull()
+    expect(skeleton.hasAttribute('aria-hidden')).toBe(false)
+  })
+
+  test('and named, it is a busy indicator read out by that name', async () => {
+    const skeleton = (await mount(
+      '<helix-headless-skeleton label="Loading profile"></helix-headless-skeleton>',
+    )) as HTMLElement & {
+      internals?: ElementInternals
+    }
+    expect(skeleton.internals?.role).toBe('progressbar')
+    expect(skeleton.internals?.ariaLabel).toBe('Loading profile')
+    expect(skeleton.internals?.ariaHidden ?? null).toBeNull()
   })
 
   test("the shape is the styled tier's, not the headless tier's", async () => {

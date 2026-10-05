@@ -14,11 +14,13 @@ const NOTE = { icon: TONE_MARKS.info.icon, label: 'Note' }
  *
  * @description
  * `tone` is on the headless tier because it carries meaning. It picks the icon
- * and the icon's accessible name, so a screen reader announces "Error" for an
- * error callout whether or not the color is seen.
+ * and the icon region's accessible name, so a screen reader announces "Error"
+ * for an error callout whether or not the color is seen. Set `tone-label` to
+ * say the name in another language.
  *
  * The icon is the fallback content of a slot. Slot your own icon to replace it,
- * and the default disappears with no extra check.
+ * and the default disappears with no extra check. The tone's name stays on the
+ * region around it.
  *
  * A callout sets a passage apart inside a document and is read where it sits.
  * For page-level chrome above the masthead that is a live region and can be
@@ -35,7 +37,7 @@ const NOTE = { icon: TONE_MARKS.info.icon, label: 'Note' }
  * @slot icon - Replaces the icon chosen by `tone`.
  *
  * @csspart content - The content region.
- * @csspart icon - The icon region.
+ * @csspart icon - The icon region, an image named for the tone.
  * @csspart icon-mark - The icon for the tone, shown when no icon is slotted.
  */
 @customElement('helix-headless-callout')
@@ -58,6 +60,15 @@ export class HelixHeadlessCallout extends HelixElement {
   tone?: 'danger' | 'info' | 'neutral' | 'success' | 'warning'
 
   /**
+   * What a screen reader is told the tone is, such as "Fehler".
+   *
+   * Absent is the English for the tone: "Error", "Information", "Note",
+   * "Success" or "Warning".
+   */
+  @property({ attribute: 'tone-label' })
+  toneLabel = ''
+
+  /**
    * The mark for the callout's tone, behind a seam.
    *
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
@@ -70,9 +81,9 @@ export class HelixHeadlessCallout extends HelixElement {
    * `render` has already resolved the tone and a second lookup is a second
    * place for the fallback to disagree with the tone around it.
    */
-  protected renderIcon(icon: { content: string; viewBox: string }, label: string): TemplateResult {
+  protected renderIcon(icon: { content: string; viewBox: string }, _label: string): TemplateResult {
     return html`<slot name="icon">
-      <svg part="icon-mark" fill="currentColor" viewBox=${icon.viewBox} role="img" aria-label=${label}>
+      <svg part="icon-mark" fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
         ${unsafeSVG(icon.content)}
       </svg>
     </slot>`
@@ -86,7 +97,12 @@ export class HelixHeadlessCallout extends HelixElement {
     const { icon, label } =
       this.tone === 'neutral' ? NOTE : (toneMark(this.tone) ?? TONE_MARKS.info)
 
-    return html`<span part="icon">${this.renderIcon(icon, label)}</span>
+    /* **The name is on the region, so it survives a slotted icon.** It was on
+       the fallback glyph, and a consumer's own icon replaced the glyph and the
+       tone's name with it, which left the color as the only thing saying
+       "Error". */
+    const named = this.toneLabel || label
+    return html`<span part="icon" role="img" aria-label=${named}>${this.renderIcon(icon, named)}</span>
       <div part="content">
         <slot name="heading"></slot>
         <slot></slot>

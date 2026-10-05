@@ -3,6 +3,12 @@
   inline-size: 100%;
 }
 
+/* A block stands in for something with no line height to borrow, so it takes
+   the control step until a page sizes it. With no height it drew nothing. */
+:host(:not([shape])) {
+  block-size: var(--skeleton-block-size, var(--helix-size-control));
+}
+
 /* A line of text is one line tall whatever it is standing in for. */
 :host([shape="text"]) {
   block-size: 1em;

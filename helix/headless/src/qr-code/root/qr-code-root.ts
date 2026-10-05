@@ -120,6 +120,10 @@ const pathFor = (
  * the same mark makes the code unscannable. The default is `M`, and `H` when the
  * `logo` slot is filled.
  *
+ * A higher level holds fewer characters, so a value that fits at `M` can be too
+ * long once a logo raises the level to `H`. A value too long for the level
+ * draws no code, and the element fires `error`.
+ *
  * @since 0.1.0
  * @status stable
  * @category media
@@ -127,6 +131,8 @@ const pathFor = (
  * @documentation https://fusion.dev/helix/components/qr-code
  *
  * @slot logo - A logo for the center. A code with a logo scans only at a high correction level.
+ *
+ * @event {Event} error - The value is too long for a code at the correction level, so no code is drawn.
  *
  * @csspart code - The square code image.
  * @csspart finders - The three corner squares, which can take their own color.
@@ -206,6 +212,46 @@ export class HelixHeadlessQrCode extends HelixElement {
     return this.correction ?? (this.logo ? 'H' : 'M')
   }
 
+  /** The value and level that did not fit, so `error` fires once for each. */
+  private overflowed = ''
+
+  /**
+   * The code for the value at the level, or undefined where the value is too
+   * long for it.
+   *
+   * `encode` throws for a value past the level's capacity, and it threw inside
+   * the render: the update rejected and the last code stayed on screen. A
+   * logo raising the level to `H` was the easy way to get there, since `H`
+   * holds the fewest characters.
+   */
+  private encoded(): ReturnType<typeof encode> | undefined {
+    try {
+      return encode(this.value, { border: 0, ecc: this.level })
+    } catch (error) {
+      if (error instanceof RangeError) {
+        return undefined
+      }
+      throw error
+    }
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    /* Told once per value and level, after the render that drew nothing, as an
+       image says it failed. Not on a server, which runs no `updated`. */
+    const key = `${this.level}:${this.value}`
+    if (this.value !== '' && this.encoded() === undefined) {
+      if (this.overflowed !== key) {
+        this.overflowed = key
+        this.dispatchEvent(
+          new Event('error', { bubbles: false, cancelable: false, composed: false }),
+        )
+      }
+    } else {
+      this.overflowed = ''
+    }
+  }
+
   private renderCode(): SVGTemplateResult | typeof nothing {
     if (this.value === '') {
       return nothing
@@ -213,7 +259,10 @@ export class HelixHeadlessQrCode extends HelixElement {
     /* Regenerated on every render rather than cached. It is a pure function of
        two properties, Lit only renders when one of them moved, and a cache here
        would be a second place for them to disagree. */
-    const result = encode(this.value, { border: 0, ecc: this.level })
+    const result = this.encoded()
+    if (result === undefined) {
+      return nothing
+    }
     const size = result.size
     /* The quiet zone, in the `viewBox` rather than in a wrapper's padding. Four
        modules is what the specification requires and what a scanner looks for,
