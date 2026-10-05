@@ -26,3 +26,84 @@
   background-color: var(--helix-color-surface);
   outline: none;
 }
+
+/* **Under `highlight`, the field is drawn transparent over a colored copy of
+   its own text.** Both sit in one grid cell of a box that scrolls, so the
+   copy is as tall as the text and the field stretches to it: neither scrolls
+   on its own, and the two never drift. Every metric that places a character
+   is set on both.
+
+   The row is at least as tall as the text, and fills the box beyond that. An
+   `auto` row in a box of fixed height grows only into the room the box has,
+   which left the text overflowing a row the height of the box. */
+[part="field"] {
+  background-color: var(--sandbox-source-background-color, var(--helix-color-background));
+  block-size: 100%;
+  display: grid;
+  grid-template-rows: minmax(max-content, auto);
+  overflow: auto;
+}
+
+[part="field"]:focus-within {
+  background-color: var(--helix-color-surface);
+}
+
+[part="field"] > [part="highlight"],
+[part="field"] > [part="source"] {
+  border: none;
+  box-sizing: border-box;
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  letter-spacing: normal;
+  line-height: var(--helix-leading-normal);
+  margin: 0;
+  min-block-size: var(--sandbox-source-min-block-size, 12rem);
+  overflow-wrap: break-word;
+  padding: var(--helix-space-sm);
+  tab-size: 2;
+  white-space: pre-wrap;
+}
+
+[part="field"] > [part="highlight"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[part="field"] > [part="source"],
+[part="field"] > [part="source"]:focus-visible {
+  -webkit-text-fill-color: transparent;
+  align-self: stretch;
+  background-color: transparent;
+  block-size: auto;
+  caret-color: var(--helix-color-foreground);
+  color: transparent;
+  overflow: hidden;
+}
+
+/* The syntax tokens the editor uses, so a highlighter's kinds read the same
+   colors in both, each behind a hook of its own. */
+[part="token"][data-kind="callable"] {
+  color: var(--sandbox-source-callable-color, var(--helix-color-syntax-callable));
+}
+[part="token"][data-kind="comment"] {
+  color: var(--sandbox-source-comment-color, var(--helix-color-syntax-comment));
+}
+[part="token"][data-kind="constant"] {
+  color: var(--sandbox-source-constant-color, var(--helix-color-syntax-constant));
+}
+[part="token"][data-kind="invalid"] {
+  color: var(--sandbox-source-invalid-color, var(--helix-color-syntax-invalid));
+}
+[part="token"][data-kind="keyword"] {
+  color: var(--sandbox-source-keyword-color, var(--helix-color-syntax-keyword));
+}
+[part="token"][data-kind="name"] {
+  color: var(--sandbox-source-name-color, var(--helix-color-syntax-name));
+}
+[part="token"][data-kind="string"] {
+  color: var(--sandbox-source-string-color, var(--helix-color-syntax-string));
+}
+[part="token"][data-kind="tag"] {
+  color: var(--sandbox-source-tag-color, var(--helix-color-syntax-tag));
+}

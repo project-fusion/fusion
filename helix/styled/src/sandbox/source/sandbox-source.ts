@@ -10,6 +10,7 @@ import {
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
+import { drawnRuns, type SandboxHighlight } from '../tokens.js'
 import { styles } from './sandbox-source.css.js'
 
 /** Keys that only ever modify another, and so are not a press of their own. */
@@ -26,6 +27,16 @@ const MODIFIERS = new Set(['Alt', 'AltGraph', 'Control', 'Meta', 'Shift'])
  * field, press Escape and then Tab. Shift+Tab moves focus back as it does
  * anywhere else. The field's description says so to a screen reader.
  *
+ * **`highlight` colors the source** with a highlighter you bring, such as one
+ * built on Lezer, Prism or Shiki. It is a function from the source to runs of
+ * text, each with an optional kind, and the pane draws the runs under a
+ * transparent field, so typing, selection and undo stay the textarea's. The
+ * kinds are `callable`, `comment`, `constant`, `invalid`, `keyword`, `name`,
+ * `string` and `tag`, each colored by the `--helix-color-syntax-*` token of
+ * its name and a hook of its own, such as `--sandbox-source-keyword-color`.
+ * A run of any other kind is drawn in the field's own color. Every run with a
+ * kind is a `token` part, and carries its kind as `data-kind`.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Editor, Code pane
@@ -35,10 +46,21 @@ const MODIFIERS = new Set(['Alt', 'AltGraph', 'Control', 'Meta', 'Shift'])
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.
  * @event {HelixEditEvent} helix-edit - Fired after the source was edited, with the new source.
  *
+ * @csspart field - The box that scrolls the field and its colors together, under `highlight`.
+ * @csspart highlight - The colored copy of the source drawn under the field, under `highlight`.
  * @csspart source - The editable region.
+ * @csspart token - One run of the source that has a kind, under `highlight`.
  *
  * @cssproperty --sandbox-source-background-color - Fill behind the source.
+ * @cssproperty --sandbox-source-callable-color - Color of a `callable` run, under `highlight`. Defaults to `--helix-color-syntax-callable`.
+ * @cssproperty --sandbox-source-comment-color - Color of a `comment` run, under `highlight`. Defaults to `--helix-color-syntax-comment`.
+ * @cssproperty --sandbox-source-constant-color - Color of a `constant` run, under `highlight`. Defaults to `--helix-color-syntax-constant`.
+ * @cssproperty --sandbox-source-invalid-color - Color of an `invalid` run, under `highlight`. Defaults to `--helix-color-syntax-invalid`.
+ * @cssproperty --sandbox-source-keyword-color - Color of a `keyword` run, under `highlight`. Defaults to `--helix-color-syntax-keyword`.
  * @cssproperty --sandbox-source-min-block-size - Minimum height of the pane.
+ * @cssproperty --sandbox-source-name-color - Color of a `name` run, under `highlight`. Defaults to `--helix-color-syntax-name`.
+ * @cssproperty --sandbox-source-string-color - Color of a `string` run, under `highlight`. Defaults to `--helix-color-syntax-string`.
+ * @cssproperty --sandbox-source-tag-color - Color of a `tag` run, under `highlight`. Defaults to `--helix-color-syntax-tag`.
  */
 @customElement('helix-sandbox-source')
 export class HelixSandboxSource extends HelixElement {
@@ -47,6 +69,18 @@ export class HelixSandboxSource extends HelixElement {
    */
   @property({ attribute: 'field-label' })
   fieldLabel = 'Example source'
+
+  /**
+   * Colors the source: a function from the source and the pane's `name` to
+   * runs of text, each with an optional kind, such as
+   * `[{ text: '<' }, { kind: 'tag', text: 'p' }, { text: '>' }]`.
+   *
+   * Absent, the pane is a plain field. Runs whose text does not add up to the
+   * source are drawn as the source, uncolored, so the colors never drift from
+   * the caret. Set it as a property.
+   */
+  @property({ attribute: false })
+  highlight?: SandboxHighlight
 
   /**
    * The field's description, read by screen readers while Tab indents.
@@ -172,6 +206,23 @@ export class HelixSandboxSource extends HelixElement {
   }
 
   protected override render(): TemplateResult {
+    const field = this.renderField()
+    if (!this.highlight) {
+      return field
+    }
+    /* The trailing newline gives a last empty line its height, as the field
+       gives it one. */
+    const runs = drawnRuns(this.value, this.highlight(this.value, this.name))
+    return html`<div part="field">
+      <pre part="highlight" aria-hidden="true">${runs.map(({ kind, text }) =>
+        kind ? html`<span part="token" data-kind=${kind}>${text}</span>` : text,
+      )}${'\n'}</pre>
+      ${field}
+    </div>`
+  }
+
+  /** The field itself and its description, which is the whole pane without `highlight`. */
+  private renderField(): TemplateResult {
     return html`<textarea
       part="source"
       aria-label=${this.fieldLabel}
