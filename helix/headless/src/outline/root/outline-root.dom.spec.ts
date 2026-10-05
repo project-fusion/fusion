@@ -88,6 +88,22 @@ describe('outline scrolling', () => {
     expect(document.activeElement).toBe(target)
   })
 
+  /* A contents list is written `<ul><li><a>` more often than as a run of
+     anchors, and the outline read only the anchors slotted directly: it found
+     no sections in a nested list and did nothing, silently. */
+  test('finds the links nested in a list, as it finds a run of anchors', async () => {
+    const nav = (await mount(
+      '<div><helix-headless-outline behavior="smooth" label="On this page">' +
+        '<ul><li><a href="#one">One</a><ul><li><a href="#two">Two</a></li></ul></li></ul>' +
+        '</helix-headless-outline>' +
+        '<section id="one"><h2>One</h2></section><section id="two"><h2>Two</h2></section></div>',
+    )) as HTMLElement
+    const outline = nav.querySelector('helix-headless-outline') as Nav
+    await outline.updateComplete
+    expect(press(nav, '#two').defaultPrevented).toBe(true)
+    expect(nav.querySelector('a[href="#two"]')?.getAttribute('aria-current')).toBe('location')
+  })
+
   test('a modified click is left alone, being a new tab rather than a jump', async () => {
     const { root } = await page('behavior="smooth"')
     const event = new MouseEvent('click', {

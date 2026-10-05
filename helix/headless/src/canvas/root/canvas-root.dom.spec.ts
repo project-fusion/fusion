@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -2181,6 +2181,25 @@ describe('canvas at its edges', () => {
     )
     expect(await walk(host)).toEqual(['a', 'edge:up', 'edge:down', 'b', 'c'])
   })
+
+  /* Chromium makes an SVG element with a focus listener focusable, and the
+     edges' SVG carried one, so Tab stopped on an unnamed layer between the
+     board and the first card. Browser only: happy-dom focuses an SVG element
+     whatever listens to it. */
+  ;(hasLayout() ? test : test.skip)(
+    'the layer the connections are drawn on is no stop',
+    async () => {
+      const host = await canvas(
+        '',
+        `<helix-headless-canvas-node name="a" x="0" y="0" width="200" height="100">First</helix-headless-canvas-node>
+       <helix-headless-canvas-node name="b" x="260" y="0" width="200" height="100">Second</helix-headless-canvas-node>
+       <helix-headless-canvas-edge from="a" to="b"></helix-headless-canvas-edge>`,
+      )
+      const layer = part(host, 'edges') as SVGSVGElement
+      layer.focus()
+      expect(host.shadowRoot?.activeElement).not.toBe(layer)
+    },
+  )
 
   test('two unnamed connections between the same cards are two stops', async () => {
     const host = await canvas(

@@ -19,6 +19,10 @@ import { property } from 'lit/decorators.js'
  * render one inside the outline's shadow root, and the hrefs are fragments on
  * the same page.
  *
+ * Write the anchors flat, with `data-level` for their depth, or nested in
+ * lists, `<ul><li><a>`. A screen reader hears a nested list's levels; it hears
+ * `data-level` as a flat run of links.
+ *
  * The current section is decided by the headings' positions. An
  * `IntersectionObserver` with a band near the top fails both ways: when
  * headings are far apart, none is in the band and no section is marked, and
@@ -30,7 +34,7 @@ import { property } from 'lit/decorators.js'
  * @aliases Table of contents, On this page, Outline
  * @documentation https://fusion.dev/helix/components/outline
  *
- * @slot - The links, as anchors with fragment hrefs.
+ * @slot - The links, as anchors with fragment hrefs, or lists holding them.
  *
  * @event {HelixActivateEvent} helix-activate - Fired when the section in view changes, with its id as the value. It reports the scroll position and cannot be prevented.
  *
@@ -115,13 +119,22 @@ export class HelixHeadlessOutline extends HelixElement {
 
   private observer: IntersectionObserver | undefined
 
-  /** The links, in document order. Empty on the server, which has no tree. */
+  /**
+   * The links, in document order. Empty on the server, which has no tree.
+   *
+   * **Anchors inside what is slotted count too.** A contents list is written
+   * `<ul><li><a>` more often than as a run of anchors, and reading only the
+   * anchors assigned to the slot found no sections in it: nothing was marked,
+   * nothing was announced, and nothing said why.
+   */
   private get links(): HTMLAnchorElement[] {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot')
-    return (slot?.assignedElements({ flatten: true }) ?? []).filter(
-      (element): element is HTMLAnchorElement =>
-        element instanceof HTMLAnchorElement &&
-        element.getAttribute('href')?.startsWith('#') === true,
+    const fragment = (element: Element): element is HTMLAnchorElement =>
+      element instanceof HTMLAnchorElement && element.getAttribute('href')?.startsWith('#') === true
+    return (slot?.assignedElements({ flatten: true }) ?? []).flatMap((element) =>
+      fragment(element)
+        ? [element]
+        : [...element.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')].filter(fragment),
     )
   }
 
