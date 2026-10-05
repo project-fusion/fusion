@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasState,
+  mount,
+  part,
+  registerDom,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -330,5 +337,75 @@ describe('a button with no name', () => {
     expect(
       await warnedOn('<helix-headless-icon-button><svg></svg></helix-headless-icon-button>'),
     ).toHaveLength(1)
+  })
+})
+
+describe('a pending button', () => {
+  type Pending = Updatable & { pending: boolean; updateComplete: Promise<unknown> }
+
+  /* React Aria's isPending: the press is refused, focus stays, and the wait
+     is said. A disabled button would drop focus to the page. */
+  test('is busy and refuses the press, and stays a focusable button', async () => {
+    const button = (await mount(
+      '<helix-headless-button pending>Save</helix-headless-button>',
+    )) as Pending
+    const inner = control(button) as HTMLButtonElement
+    expect(inner.getAttribute('aria-busy')).toBe('true')
+    expect(inner.getAttribute('aria-disabled')).toBe('true')
+    expect(inner.disabled).toBe(false)
+    expect(hasState(button, 'pending')).toBe(true)
+    button.pending = false
+    await button.updateComplete
+    expect(inner.hasAttribute('aria-busy')).toBe(false)
+    expect(hasState(button, 'pending')).toBe(false)
+  })
+
+  test('a press reaches no listener and submits nothing', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-button type="submit" pending>Send</helix-headless-button></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    const button = document.querySelector('helix-headless-button') as Pending
+    await button.updateComplete
+    let submitted = 0
+    let heard = 0
+    form.requestSubmit = () => {
+      submitted += 1
+    }
+    button.addEventListener('click', () => {
+      heard += 1
+    })
+    ;(control(button) as HTMLElement).click()
+    expect([submitted, heard]).toEqual([0, 0])
+    button.pending = false
+    await button.updateComplete
+    ;(control(button) as HTMLElement).click()
+    expect([submitted, heard]).toEqual([1, 1])
+  })
+
+  test('says the wait when it becomes pending under focus, and clears it after', async () => {
+    const button = (await mount(
+      '<helix-headless-button pending-label="Saving">Save</helix-headless-button>',
+    )) as Pending
+    expect(part(button, 'live')).toBeNull()
+    ;(control(button) as HTMLElement).focus()
+    button.pending = true
+    await button.updateComplete
+    await new Promise((done) => setTimeout(done, 40))
+    await button.updateComplete
+    expect(part(button, 'live')?.textContent).toBe('Saving')
+    expect(part(button, 'live')?.getAttribute('role')).toBe('status')
+    button.pending = false
+    await button.updateComplete
+    await new Promise((done) => setTimeout(done, 40))
+    await button.updateComplete
+    expect(part(button, 'live')?.textContent).toBe('')
+  })
+
+  test('says nothing when it becomes pending without focus', async () => {
+    const button = (await mount('<helix-headless-button>Save</helix-headless-button>')) as Pending
+    button.pending = true
+    await button.updateComplete
+    await new Promise((done) => setTimeout(done, 40))
+    expect(part(button, 'live')).toBeNull()
   })
 })

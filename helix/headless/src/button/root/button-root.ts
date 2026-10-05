@@ -7,7 +7,7 @@ import {
   supportsInvokers,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /**
  * @summary Triggers an action, submits a form, or navigates.
@@ -38,6 +38,9 @@ import { property } from 'lit/decorators.js'
  * As the first submit button in its form, it is the form's default button:
  * Enter in a text field of the form presses it, as it presses a native one.
  *
+ * Set `pending` while the action a press started is still running. The button
+ * keeps focus and refuses presses, and a reader on it hears `pending-label`.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions
@@ -48,7 +51,10 @@ import { property } from 'lit/decorators.js'
  * @slot start - Content before the label, usually an icon.
  *
  * @csspart button - The inner control.
+ * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is rendered from the first time the button is pending, and the styled button clips it out of view.
  * @csspart text - The button's words, which the styled button trims to their capitals and baseline so the letters sit at the middle in any font.
+ *
+ * @cssstate pending - The button is pending: `pending` is set.
  */
 @customElement('helix-headless-button')
 export class HelixHeadlessButton extends HelixFormElement {
@@ -201,6 +207,28 @@ export class HelixHeadlessButton extends HelixFormElement {
   label = ''
 
   /**
+   * Whether the action the button started is still running.
+   *
+   * A pending button keeps focus and stays in the tab order, and refuses every
+   * press: a click, Enter and Space, and Enter in a field of its form. The
+   * click does not reach your listeners. The inner control carries
+   * `aria-busy` and `aria-disabled`, and when the button becomes pending while
+   * it has focus, a reader hears `pending-label`. The styled button draws a
+   * turning ring over its words.
+   *
+   * `disabled` takes the button out of reach. Use `pending` for the wait after
+   * a press, so focus stays where the reader left it.
+   */
+  @property({ type: Boolean })
+  pending = false
+
+  /**
+   * What a reader hears when the button becomes pending while it has focus.
+   */
+  @property({ attribute: 'pending-label' })
+  pendingLabel = 'Loading'
+
+  /**
    * What kind of panel this button opens, where it opens one: `menu` for a
    * `Menu`.
    *
@@ -212,13 +240,72 @@ export class HelixHeadlessButton extends HelixFormElement {
   @property({ attribute: false })
   popup?: 'dialog' | 'grid' | 'listbox' | 'menu' | 'tree'
 
+  /**
+   * Whether the status region is rendered: from the first time the button is
+   * pending, so a button that never waits carries no live region.
+   */
+  @state()
+  private spoke = false
+
+  /** What the status region says. */
+  @state()
+  private said = ''
+
+  /**
+   * Says `pendingLabel` when the button becomes pending under focus, and
+   * clears it when the wait ends.
+   *
+   * **Only under focus**, as React Aria announces it: the reader who pressed
+   * the button is the one waiting, and a button elsewhere on the page that
+   * starts waiting is not news to them. The region arrives empty and takes its
+   * words a frame later, since a region that arrives with its words is read
+   * inconsistently.
+   */
+  private sayPending(): void {
+    const focused = (this.renderRoot as ShadowRoot | undefined)?.activeElement != null
+    if (!focused && this.said === '') {
+      return
+    }
+    const words = this.pending && focused ? this.pendingLabel : ''
+    if (!this.spoke) {
+      this.spoke = true
+    }
+    const fill = (): void => {
+      this.said = words
+    }
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(fill)
+    } else {
+      fill()
+    }
+  }
+
+  /**
+   * @internal The live region a pending button speaks in, for a subclass that
+   * replaces the template, as `CopyButton` does.
+   */
+  protected renderLive(): TemplateResult | typeof nothing {
+    return this.spoke ? html`<span part="live" role="status">${this.said}</span>` : nothing
+  }
+
   /** Moves focus to the inner control, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
     ...HelixFormElement.shadowRootOptions,
     delegatesFocus: true,
   }
 
-  private readonly handleClick = (): void => {
+  private readonly handleClick = (event: Event): void => {
+    /* **Refused before anything else, and kept from the page.** A native
+       disabled button sends no click at all. A pending one has to stay
+       focusable, so the click is stopped here, at the control, before it
+       reaches a listener on the host, and its default is prevented so an
+       invoker command does not run either. */
+    if (this.pending) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      return
+    }
+
     /* **Re-linked here, and this is the line that makes a trigger reliable.**
      *
      * From `updated` alone the target resolves once, whenever the button last
@@ -416,9 +503,17 @@ export class HelixHeadlessButton extends HelixFormElement {
     this.commandTarget()?.dispatchEvent(new HelixFallbackCommandEvent(this.command, this))
   }
 
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    this.toggleState('pending', this.pending)
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.linkCommand()
+    if (changed.has('pending') && changed.get('pending') !== undefined) {
+      this.sayPending()
+    }
   }
 
   /** @internal A submit button is what its form's implicit submission presses. */
@@ -456,7 +551,7 @@ export class HelixHeadlessButton extends HelixFormElement {
       return
     }
     event.preventDefault()
-    if (!this.isDisabled) {
+    if (!this.isDisabled && !this.pending) {
       this.activate()
     }
   }
@@ -495,6 +590,8 @@ export class HelixHeadlessButton extends HelixFormElement {
       type="button"
       aria-expanded=${this.expanded === undefined ? nothing : String(this.expanded)}
       aria-haspopup=${this.popup ?? nothing}
+      aria-busy=${this.pending ? 'true' : nothing}
+      aria-disabled=${this.pending ? 'true' : nothing}
       aria-label=${this.label || nothing}
       command=${this.command || nothing}
       tabindex=${stop}
@@ -502,7 +599,7 @@ export class HelixHeadlessButton extends HelixFormElement {
       @click=${this.handleClick}
     >
       ${label}
-    </button>`
+    </button>${this.renderLive()}`
   }
 }
 
