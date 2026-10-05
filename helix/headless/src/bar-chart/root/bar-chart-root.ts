@@ -294,7 +294,9 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       z === undefined
         ? 0
         : Math.max(
-            ...[...ticks(domain), ...ticks(other)].map((level) => formatNumbers(this.locale)(level).length),
+            ...[...ticks(domain), ...ticks(other)].map(
+              (level) => formatNumbers(this.locale)(level).length,
+            ),
           )
 
     /* The second axis wears its series' color when exactly one series is on it,

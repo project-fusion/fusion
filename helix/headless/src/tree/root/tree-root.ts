@@ -231,7 +231,9 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   }
 
   /** The nearest item around `item` that a reader can see, if any. */
-  private visibleAncestor(item: HelixHeadlessTreeItem | undefined): HelixHeadlessTreeItem | undefined {
+  private visibleAncestor(
+    item: HelixHeadlessTreeItem | undefined,
+  ): HelixHeadlessTreeItem | undefined {
     const visible = this.visibleItems
     let node = item?.parentElement ?? null
     while (node && node !== this) {

@@ -28,7 +28,10 @@ const PERCENTS = new Map<string, Intl.NumberFormat>()
 const percentIn = (locale: string): Intl.NumberFormat => {
   let found = PERCENTS.get(locale)
   if (!found) {
-    found = new Intl.NumberFormat(locale || undefined, { maximumFractionDigits: 0, style: 'percent' })
+    found = new Intl.NumberFormat(locale || undefined, {
+      maximumFractionDigits: 0,
+      style: 'percent',
+    })
     PERCENTS.set(locale, found)
   }
   return found

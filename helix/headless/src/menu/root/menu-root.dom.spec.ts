@@ -670,7 +670,9 @@ describe('the trigger of a menu', () => {
     /* happy-dom implements no element reflection, so the reference is read
        only where the engine has it. */
     if ('ariaLabelledByElements' in surface) {
-      expect(surface.ariaLabelledByElements).toEqual([host.querySelector('[slot="trigger"]') as Element])
+      expect(surface.ariaLabelledByElements).toEqual([
+        host.querySelector('[slot="trigger"]') as Element,
+      ])
     }
   })
 
