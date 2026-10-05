@@ -379,6 +379,18 @@ describe('the name of each turn', () => {
     expect(label(message)).toBe('Moi (2 minutes ago)')
   })
 
+  test('a turn by them with no label and no time is named by the chat’s turn-label', async () => {
+    const element = (await mount(`<helix-headless-chat label="Support" turn-label="Nachricht">
+      <helix-headless-chat-message author="them">Hallo</helix-headless-chat-message>
+    </helix-headless-chat>`)) as Chat
+    await settle(element)
+    const message = element.querySelector('helix-headless-chat-message') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await message.updateComplete
+    expect(label(message)).toBe('Nachricht')
+  })
+
   test('a turn handed over as data is named by its author label', async () => {
     const element = (await mount(
       '<helix-headless-chat label="Support"></helix-headless-chat>',

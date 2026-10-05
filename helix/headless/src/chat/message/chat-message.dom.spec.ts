@@ -259,8 +259,9 @@ describe('the name a screen reader gives the turn', () => {
     expect(label(await message(`author="them" at="${ago(120_000)}"`))).toBe('2 minutes ago')
   })
 
-  test('a turn with no author and no time takes no name, rather than an empty one', async () => {
-    expect(label(await message())).toBeNull()
+  test('a turn with no author and no time is named as a message, rather than left unnamed', async () => {
+    expect(label(await message())).toBe('Message')
+    expect(label(await message('author="them"'))).toBe('Message')
   })
 
   test('the label follows a change', async () => {

@@ -5,6 +5,7 @@ import {
   HelixElement,
   IndicatorController,
   reflectElements,
+  scrollItemIntoView,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -32,6 +33,9 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  * `data-level` is at the top level.
  *
  * A heading slotted into `heading` names the navigation, in place of `label`.
+ *
+ * In a contents rail with a scrollbar of its own, `follow` keeps the link of
+ * the section in view showing as the reader scrolls the page.
  *
  * The current section is decided by the headings' positions. An
  * `IntersectionObserver` with a band near the top fails both ways: when
@@ -99,6 +103,15 @@ export class HelixHeadlessOutline extends HelixElement {
    */
   @property()
   behavior: ScrollBehavior = 'auto'
+
+  /**
+   * Keeps the link of the section in view in view itself, in an outline
+   * longer than the box it scrolls in, such as a contents rail with a
+   * scrollbar of its own. Only that box moves: never the page, and never the
+   * box the sections scroll in.
+   */
+  @property({ type: Boolean })
+  follow = false
 
   /**
    * The navigation's name, read by screen readers. A heading in the `heading`
@@ -311,7 +324,32 @@ export class HelixHeadlessOutline extends HelixElement {
        * so a current link set in heavier weight and rewrapped onto a second
        * line is measured at the height it now has. */
       this.indicator.place()
+      if (this.follow && active) {
+        this.reveal(active.link)
+      }
       this.dispatchEvent(new HelixActivateEvent({ value: next }))
+    }
+  }
+
+  /**
+   * Scrolls the box the links scroll in to show `link`, under `follow`.
+   *
+   * The nearest box above the link that scrolls, and only where it is the
+   * rail's own: the page, the box the sections scroll in, or a box holding it
+   * would move the reading under the reader, which is the scroll this marks.
+   */
+  private reveal(link: HTMLElement): void {
+    const sections = this.scroller
+    const page = this.page
+    for (let node = link.parentElement; node && node !== page; node = node.parentElement) {
+      const { overflowY } = getComputedStyle(node)
+      if (!/auto|scroll|overlay/.test(overflowY) || node.scrollHeight <= node.clientHeight) {
+        continue
+      }
+      if (node !== sections && !node.contains(sections)) {
+        scrollItemIntoView(link, { scroller: node })
+      }
+      return
     }
   }
 
