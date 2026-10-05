@@ -16,7 +16,7 @@ import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
-import { optionsAmong } from '../../option/root/option-root.js'
+import { type HelixHeadlessOption, optionsAmong } from '../../option/root/option-root.js'
 import '../../listbox/index.js'
 
 /**
@@ -33,6 +33,9 @@ import '../../listbox/index.js'
  *
  * `Select` owns the value, passes it down to the listbox, and takes changes
  * back, so the value lives in one place.
+ *
+ * Set `valueContent` to draw the trigger's content from the chosen options,
+ * and several chosen options are written as a list in the reader's language.
  *
  * In the open list the arrow keys, Home, End, PageUp, PageDown and typed
  * letters move the highlight, and Enter, Space or a click chooses it and
@@ -146,6 +149,19 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    */
   @property()
   placeholder = 'Choose'
+
+  /**
+   * What the trigger shows for the chosen options: a function given them, in
+   * the order they appear, that returns text, an element or a Lit template.
+   *
+   * For a trigger that shows more than the words, an avatar beside a name or a
+   * count of a long set, as React Aria's `SelectValue` takes children. The
+   * trigger is named by what this draws, so keep the words in it. Nothing
+   * chosen still shows `placeholder`. A property only, there being no way to
+   * write a function in markup.
+   */
+  @property({ attribute: false })
+  valueContent?: ((chosen: readonly HelixHeadlessOption[]) => unknown) | undefined
 
   /**
    * Which option is chosen, as an index, or `-1` where none is.
@@ -268,13 +284,31 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    */
   private get display(): string | typeof nothing {
     const chosen = new Set(this.value === '' ? [] : this.value.split(','))
-    const words = optionsAmong(this.knownChildren)
-      .filter((option) => chosen.has(option.value))
-      .map((option) => option.text)
+    const words = this.chosenOptions.map((option) => option.text)
     if (words.length > 0) {
-      return words.join(', ')
+      /* A list in the reader's language, as React Aria writes one: `unit` and
+         `short` is "A, B, C" in English and each language's own separators in
+         the rest. */
+      return new Intl.ListFormat(this.lang || undefined, { style: 'short', type: 'unit' }).format(
+        words,
+      )
     }
     return chosen.size > 0 && !this.childrenKnown ? nothing : this.placeholder
+  }
+
+  /** The chosen options, in the order they appear. None on a server or while hydrating. */
+  private get chosenOptions(): HelixHeadlessOption[] {
+    const chosen = new Set(this.value === '' ? [] : this.value.split(','))
+    return optionsAmong(this.knownChildren).filter((option) => chosen.has(option.value))
+  }
+
+  /**
+   * What the trigger shows, behind a seam: what `value-content` draws for the
+   * chosen options, or their words, or the placeholder.
+   */
+  protected renderValue(): unknown {
+    const chosen = this.chosenOptions
+    return this.valueContent && chosen.length > 0 ? this.valueContent(chosen) : this.display
   }
 
   /** Where the highlight goes when the list opens, set by the key that opened it. */
@@ -619,7 +653,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         @keydown=${this.handleTriggerKeydown}
       >
         <slot name="start"></slot>
-        <span part="value" id="value">${this.display}</span>
+        <span part="value" id="value">${this.renderValue()}</span>
         ${
           /* Before the indicator, not after it. The caret is the affordance
              saying the control opens, so it stays the last thing in the trigger

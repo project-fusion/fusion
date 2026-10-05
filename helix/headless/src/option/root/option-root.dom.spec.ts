@@ -157,3 +157,14 @@ describe('the options among some elements', () => {
     expect(found[1]).toBe(grouped)
   })
 })
+
+describe('an option whose words are not what a reader types', () => {
+  /* React Aria's textValue: a row drawn as a picture, or written in another
+     script, still needs words for typeahead and a filter to match. */
+  test('text-value is what it is matched by and what a trigger shows', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="jp" text-value="Japan">日本</helix-headless-option>',
+    )) as HTMLElement & { text: string }
+    expect(host.text).toBe('Japan')
+  })
+})

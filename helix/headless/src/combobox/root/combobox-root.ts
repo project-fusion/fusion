@@ -60,7 +60,8 @@ const isInsertion = (event: Event): boolean =>
  * the highlighted one. As typing narrows the list, a screen reader hears how
  * many options are left, such as "3 results". Space, Home, End and letters edit the text, and Enter in
  * a closed field is left to the form. Emptying the field and leaving it clears
- * a single choice; Escape puts the chosen words back.
+ * a single choice; Escape puts the chosen words back, and a second Escape on
+ * the closed field clears the choice.
  *
  * With `multiple`, each chosen option is a tag in the field with its own remove
  * control. The panel stays open and the filter clears after each choice, so the
@@ -140,6 +141,19 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   protected readonly aria = new AriaForwardController(this, {
     target: () => this.partNamed('control'),
   })
+
+  /**
+   * Whether text that names no option is taken as the value, as React Aria's
+   * `allowsCustomValue`.
+   *
+   * For a field where the list is a help and not the whole of the answer, a
+   * city or a job title. What was typed becomes the value when the reader
+   * leaves the field or presses Enter with nothing highlighted, and text that
+   * names an option takes that option. Unlike `creatable`, no event asks
+   * first and no option is expected to be added: the value is the text.
+   */
+  @property({ attribute: 'allows-custom-value', type: Boolean })
+  allowsCustomValue = false
 
   /**
    * What the browser may autofill in the text field, as a platform token.
@@ -550,6 +564,34 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       this.requestValue('')
     }
     this.emptied = false
+    this.commitTyped()
+  }
+
+  /**
+   * Takes what was typed as the answer, where `allows-custom-value` asks: the
+   * option its words name, or the text itself. Returns whether it took any.
+   */
+  private commitTyped(): boolean {
+    const typed = this.typed.trim()
+    if (!this.allowsCustomValue || !this.editing || typed === '') {
+      return false
+    }
+    const named = (this.listbox?.options ?? []).find(
+      (option) => option.text.trim().toLowerCase() === typed.toLowerCase(),
+    )
+    const answer = named?.value ?? typed
+    if (this.multiple) {
+      if (!this.values.includes(answer)) {
+        this.requestValue([...this.values, answer].join(','))
+      }
+    } else if (answer !== this.value) {
+      this.requestValue(answer)
+    }
+    this.typed = ''
+    this.suggestion = ''
+    this.editing = false
+    this.listbox?.requestFilter('')
+    return true
   }
 
   /** The options the arrows can reach. */
@@ -665,6 +707,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       if (this.open) {
         event.preventDefault()
         this.close()
+        return
+      }
+      /* A second Escape, on the closed field, clears a single choice, which is
+         the optional key the APG combobox lists. Only where there is one, so
+         an Escape on an empty field still reaches a dialog around it. */
+      if (!this.multiple && this.value !== '' && !this.readOnly) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.requestValue('')
       }
       return
     }
@@ -689,6 +740,20 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     if (event.key === 'Enter' && this.creation !== '' && (this.onCreate || !this.showing)) {
       event.preventDefault()
       this.create()
+      return
+    }
+    /* Enter with nothing highlighted takes the typed text, where custom values
+       are allowed: with a match highlighted, Enter belongs to it. */
+    if (
+      event.key === 'Enter' &&
+      this.allowsCustomValue &&
+      !this.reachable.some((option) => option.active) &&
+      this.commitTyped()
+    ) {
+      event.preventDefault()
+      if (!this.multiple) {
+        this.close()
+      }
       return
     }
     /* A closed field hands nothing to the list. Its highlight is whatever the

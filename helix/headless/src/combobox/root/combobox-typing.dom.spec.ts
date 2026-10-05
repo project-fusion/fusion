@@ -169,3 +169,85 @@ describe('combobox typing, as a screen reader hears it', () => {
     expect(handed.textContent?.trim()).toBe('Nothing')
   })
 })
+
+describe('combobox taking text that names no option', () => {
+  /* React Aria's allowsCustomValue: the list is a help, and the answer may be
+     something it does not hold. */
+  const key = async (host: HTMLElement, name: string): Promise<KeyboardEvent> => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: name,
+    })
+    part(host, 'control')?.dispatchEvent(event)
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    return event
+  }
+
+  test('leaving the field takes the text as the value', async () => {
+    const host = (await mount(
+      OPTIONS.replace('label="Language"', 'label="Language" allows-custom-value'),
+    )) as HTMLElement & { value: string }
+    await type(host, 'Elixir')
+    await key(host, 'Tab')
+    expect(host.value).toBe('Elixir')
+  })
+
+  test('and text that names an option takes that option', async () => {
+    const host = (await mount(
+      OPTIONS.replace('label="Language"', 'label="Language" allows-custom-value'),
+    )) as HTMLElement & { value: string }
+    await type(host, 'ruby')
+    await key(host, 'Tab')
+    expect(host.value).toBe('ruby')
+  })
+
+  test('Enter with nothing matching takes the text, and closes the list', async () => {
+    const host = (await mount(
+      OPTIONS.replace('label="Language"', 'label="Language" allows-custom-value'),
+    )) as HTMLElement & { open: boolean; value: string }
+    await type(host, 'Zig')
+    const enter = await key(host, 'Enter')
+    expect(enter.defaultPrevented).toBe(true)
+    expect(host.value).toBe('Zig')
+    expect(host.open).toBe(false)
+  })
+
+  test('without it, leaving puts the chosen words back and holds no text', async () => {
+    const host = (await mount(OPTIONS)) as HTMLElement & { value: string }
+    await type(host, 'Elixir')
+    await key(host, 'Tab')
+    expect(host.value).toBe('')
+  })
+})
+
+describe('a second Escape', () => {
+  test('on the closed field clears a single choice, and is stopped', async () => {
+    const host = (await mount(
+      OPTIONS.replace('label="Language"', 'label="Language" default-value="rust"'),
+    )) as HTMLElement & { open: boolean; value: string; updateComplete: Promise<unknown> }
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Escape',
+    })
+    part(host, 'control')?.dispatchEvent(event)
+    await host.updateComplete
+    expect(host.value).toBe('')
+    expect(event.defaultPrevented).toBe(true)
+  })
+
+  test('and on an empty field is left for whatever holds it', async () => {
+    const host = (await mount(OPTIONS)) as HTMLElement & { updateComplete: Promise<unknown> }
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Escape',
+    })
+    part(host, 'control')?.dispatchEvent(event)
+    expect(event.defaultPrevented).toBe(false)
+  })
+})

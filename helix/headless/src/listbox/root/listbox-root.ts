@@ -150,7 +150,8 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * letters move it to the next option whose words start with them. In a
  * single-choice list the highlight is the choice unless `manual` is set; then
  * Enter, Space or a click chooses. With `multiple`, Space toggles the
- * highlighted option, Shift with an arrow adds the option it moves to, and
+ * highlighted option, Shift with an arrow adds the option it moves to, Shift
+ * with Home or End adds every option from the highlight to that end, and
  * Control+A or Command+A chooses every option, or none where all are chosen.
  * In a filter field, Space, Home, End and letters edit the text.
  *
@@ -665,6 +666,19 @@ export class HelixHeadlessListbox extends MixinCollection(
     const target = shown[next]
     if (target) {
       this.arrive(target.value)
+      /* Shift with Home or End, with or without Control, takes in every option
+         from the highlight to that end, which is APG's multiple-selection
+         listbox. */
+      const ranged = event.key === 'Home' || event.key === 'End'
+      if (this.multiple && !typing && event.shiftKey && ranged) {
+        const [from, to] = at < 0 ? [next, next] : [Math.min(at, next), Math.max(at, next)]
+        const span = shown.slice(from, to + 1).map((option) => option.value)
+        const added = span.filter((value) => !this.values.includes(value))
+        if (added.length > 0) {
+          this.requestValue([...this.values, ...added].join(','))
+        }
+        return
+      }
       /* Shift with an arrow adds the option arrived at, which is how APG's
          multiple-selection listbox extends a selection from the keyboard. */
       if (this.multiple && !typing && event.shiftKey && !this.values.includes(target.value)) {

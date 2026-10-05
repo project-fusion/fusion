@@ -198,6 +198,18 @@ export class HelixHeadlessOption extends HelixElement {
   selected = false
 
   /**
+   * The words a reader types to reach this choice, where the row's own words
+   * are not them: typeahead, a filter and a combobox match against it, and a
+   * select's trigger shows it.
+   *
+   * For a row whose content is a picture, an avatar beside a name and a role,
+   * or a name written in another script, as React Aria's `textValue`. Empty
+   * reads the row's words, then `label`.
+   */
+  @property({ attribute: 'text-value' })
+  textValue = ''
+
+  /**
    * The value that identifies the option, and that a form submits.
    */
   @property()
@@ -242,9 +254,13 @@ export class HelixHeadlessOption extends HelixElement {
    * it is in every comparison too.
    *
    * **The `label` where the slot holds nothing**, which is what the row shows
-   * then, so the six read the words a reader sees.
+   * then, so the six read the words a reader sees. `text-value` wins over both,
+   * being the consumer saying outright what the words are.
    */
   get text(): string {
+    if (this.textValue !== '') {
+      return this.textValue
+    }
     return (
       [...this.childNodes]
         .filter(
