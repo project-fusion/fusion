@@ -52,6 +52,12 @@ type Player = HTMLElement & {
  * sends `helix-end`. `shuffle` plays the entries in a random order, starting
  * from the one that is current, and `previous` retraces that order.
  *
+ * **Keyboard.** Each entry is a button in the tab order, and Enter or Space
+ * plays it. The current entry carries `aria-current`. While focus is on the
+ * player, the player's own keys work, and `Video` lists them. Its previous
+ * and next controls move through the entries in the same order the playlist
+ * does.
+ *
  * @since 0.1.0
  * @status stable
  * @category media
