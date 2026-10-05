@@ -1,4 +1,4 @@
-import { commaList } from '@fusion.dev/helix-core'
+import { commaList, type RefusedFile } from '@fusion.dev/helix-core'
 
 /**
  * Which of the files arriving at a file field it takes, and why it refuses the
@@ -7,18 +7,8 @@ import { commaList } from '@fusion.dev/helix-core'
  * with its reason.
  */
 
-/** Why a file was not taken. */
-export type Refusal = 'count' | 'invalid' | 'size' | 'type'
-
-/** One file that was not taken, and why. */
-export interface RefusedFile {
-  /** The file. */
-  readonly file: File
-  /** What your `validate` said about it, where it was the one refusing. */
-  readonly message?: string
-  /** Why it was not taken. */
-  readonly reason: Refusal
-}
+/* A refused file is core's `RefusedFile`, which `helix-reject` carries. */
+export type { Refusal, RefusedFile } from '@fusion.dev/helix-core'
 
 /** The rules a field screens arriving files by. */
 export interface ScreenRules {
