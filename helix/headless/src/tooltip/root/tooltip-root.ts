@@ -7,6 +7,7 @@ import {
   hostAria,
   linkDescription,
   MixinControllerOpen,
+  onUnlessFalse,
   type Placement,
   PopoverController,
   reportRuntime,
@@ -67,7 +68,9 @@ const warmth = (): Warmth => {
  *
  * The tooltip shows on hover and on focus. It hides on pointer leave, on blur,
  * on Escape, and when the trigger is activated. The pointer can move from the
- * trigger onto the bubble and the bubble stays.
+ * trigger onto the bubble and the bubble stays, unless you set
+ * `hoverable="false"`. `delay` is how long the pointer rests before it shows,
+ * and `delay-out` how long it stays once the pointer leaves.
  *
  * Once one tooltip is showing, moving to another trigger shows its tooltip
  * with no `delay`, and the first one hides. The same holds for `skip-delay`
@@ -129,7 +132,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   delay = 400
 
   /**
-   * How long the bubble stays after the pointer leaves, in milliseconds.
+   * How long the bubble stays after the pointer leaves the trigger or the
+   * bubble, in milliseconds: the close delay. It is the time a reader has to
+   * cross the gap onto the bubble.
    */
   @property({ attribute: 'delay-out', type: Number })
   delayOut = 100
@@ -162,6 +167,15 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    */
   @property()
   for = ''
+
+  /**
+   * Whether the pointer can move onto the bubble and the bubble stays, so a
+   * reader can read it under a magnifier or select its words, as WCAG 1.4.13
+   * asks. `hoverable="false"` hides the bubble once the pointer reaches it,
+   * for a bubble that covers something a reader moves on to.
+   */
+  @property({ converter: onUnlessFalse })
+  hoverable = true
 
   /**
    * The space between the trigger and the tip of the bubble, in pixels.
@@ -521,6 +535,10 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * listeners already hold it.
    */
   private readonly holdOnBubble = (): void => {
+    if (!this.hoverable) {
+      this.hideLater()
+      return
+    }
     if (!this.named) {
       return
     }

@@ -18,6 +18,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { hideOutside } from '../hide-outside.js'
 
 /**
  * @summary A panel that opens next to its trigger and holds any content.
@@ -27,9 +28,11 @@ import { property, state } from 'lit/decorators.js'
  * commands, `Select` holds options, and `Tooltip` holds a description. Popover
  * holds any content you put in it, so it has no keyboard handling of its own.
  *
- * The trigger is slotted and stays your own element. The popover writes nothing
- * onto it, including `aria-expanded`, `id`, and `tabindex`, because changing
- * your markup after upgrade causes a React hydration mismatch.
+ * The trigger is slotted and stays your own element. A Helix trigger is told
+ * whether the popover is open inside its own shadow root. On a plain element,
+ * such as a `<button>`, the popover writes `aria-expanded` only once a reader
+ * has pressed it, which is after any hydration, and never where you wrote
+ * `aria-expanded` yourself. It writes nothing else onto your markup.
  *
  * The panel is in the top layer through the popover API, so it needs no
  * `z-index`, and an ancestor with `overflow: hidden`, `transform`, `filter`, or
@@ -46,7 +49,9 @@ import { property, state } from 'lit/decorators.js'
  *
  * `modal` keeps `Tab` inside the panel while it is open and says so with
  * `aria-modal`, for a panel that has to be answered before the page goes on.
- * Without it the popover does not trap focus.
+ * The rest of the page is hidden from screen readers with `aria-hidden` while
+ * it is open, so the virtual cursor stays in the panel too. Without it the
+ * popover does not trap focus.
  *
  * The panel's name is `label` when you set it. Otherwise it is the first
  * heading in the panel, or the elements an `aria-labelledby` on the host names.
@@ -108,8 +113,9 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   label = 'Popover'
 
   /**
-   * Keeps `Tab` inside the panel while it is open, and marks the panel
-   * `aria-modal`. A press outside and Escape still close it.
+   * Keeps `Tab` inside the panel while it is open, marks the panel
+   * `aria-modal`, and hides the rest of the page from screen readers. A press
+   * outside and Escape still close it.
    */
   @property({ type: Boolean })
   modal = false
@@ -337,11 +343,28 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('focusout', this.handleFocusOut)
+    this.addEventListener('click', this.notePress, { capture: true })
+  }
+
+  /**
+   * A press on the slotted trigger, heard on the host on the way down, before
+   * the trigger slot's own listener opens the panel and the update that
+   * schedules reads it in `tellTrigger`.
+   */
+  private readonly notePress = (event: Event): void => {
+    const trigger = this.renderRoot
+      ?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+      ?.assignedElements({ flatten: false })[0]
+    if (trigger && event.composedPath().includes(trigger)) {
+      this.pressed = true
+    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('focusout', this.handleFocusOut)
+    this.removeEventListener('click', this.notePress, { capture: true })
+    this.hideAround()
   }
 
   private readonly handleTriggerClick = (): void => {
@@ -352,10 +375,53 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  /** Tells a slotted trigger the disclosure state, by property. See `tellDisclosure`. */
+  /** Whether a reader has pressed the trigger, which is after any hydration. */
+  private pressed = false
+
+  /** The plain trigger this popover writes `aria-expanded` on, once it may. */
+  private told: Element | undefined
+
+  /**
+   * Tells a slotted trigger the disclosure state.
+   *
+   * A Helix trigger by property, through `tellDisclosure`. A plain element,
+   * which has no shadow root to keep the state out of the markup, by
+   * `aria-expanded`, and only from a reader's first press on: by then a server
+   * or a framework has long finished writing the element, so the write cannot
+   * be a hydration mismatch. One that already carries `aria-expanded` is the
+   * consumer's to keep, and is left alone.
+   */
   private tellTrigger(): void {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
-    tellDisclosure(slot?.assignedElements({ flatten: false })[0], this.open)
+    const trigger = slot?.assignedElements({ flatten: false })[0]
+    if (!trigger || trigger.localName.includes('-')) {
+      tellDisclosure(trigger, this.open)
+      return
+    }
+    if (trigger !== this.told) {
+      if (!this.pressed || trigger.hasAttribute('aria-expanded')) {
+        return
+      }
+      this.told = trigger
+    }
+    trigger.setAttribute('aria-expanded', String(this.open))
+  }
+
+  /** Whether the first update, which is the server's, has passed. */
+  private settled = false
+
+  /** Shows the page again, while a modal panel has it hidden. */
+  private showOutside: (() => void) | undefined
+
+  /** Hides the page outside a modal panel while it is open, and shows it again after. */
+  private hideAround(): void {
+    const hide = this.open && this.modal && this.isConnected
+    if (hide && !this.showOutside) {
+      this.showOutside = hideOutside([this, ...(this.invoker ? [this.invoker] : [])])
+    } else if (!hide && this.showOutside) {
+      this.showOutside()
+      this.showOutside = undefined
+    }
   }
 
   /**
@@ -378,6 +444,13 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
        and discards. */
     this.tellTrigger()
     this.nameByHeading()
+    /* Never on the first update for the same reason as focus below: a popover
+       served open was opened by nobody, and the page it would hide is the
+       server's. */
+    if (this.settled) {
+      this.hideAround()
+    }
+    this.settled = true
     /* Into the panel once it is up, which the controller has done by now, and
        never on the first update: a popover served open has not been opened by
        anybody, and taking focus as the page loads would move a reader who has

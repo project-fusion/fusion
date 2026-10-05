@@ -375,3 +375,86 @@ describe('the panel’s name and its point', () => {
     expect(part(pointed, 'arrow')?.getAttribute('aria-hidden')).toBe('true')
   })
 })
+
+describe('a plain trigger', () => {
+  const plain = async (extra = ''): Promise<Popover> =>
+    (await mount(
+      `<helix-headless-popover label="Details">
+        <button slot="trigger" ${extra}>Details</button>
+        <button id="inside">Inside</button>
+      </helix-headless-popover>`,
+    )) as Popover
+
+  test('carries nothing until a reader presses it, and then says whether the panel is open', async () => {
+    const host = await plain()
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLButtonElement
+    expect(trigger.hasAttribute('aria-expanded')).toBe(false)
+    trigger.click()
+    /* happy-dom does not carry an event through slot assignment, so the
+       trigger slot's own listener, which opens the panel in a browser, never
+       hears the press here. */
+    if (!host.open) {
+      host.show()
+    }
+    await host.updateComplete
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    host.open = false
+    await host.updateComplete
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('is not written to where the consumer wrote aria-expanded', async () => {
+    const host = await plain('aria-expanded="false"')
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLButtonElement
+    trigger.click()
+    await host.updateComplete
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('is not warned about', async () => {
+    const log = (globalThis as Record<symbol, unknown>)[Symbol.for('fusion.dev/helix/runtime-log')]
+    const before = Array.isArray(log) ? log.length : 0
+    const host = await plain()
+    host.show()
+    await host.updateComplete
+    const after = (globalThis as Record<symbol, unknown>)[
+      Symbol.for('fusion.dev/helix/runtime-log')
+    ]
+    const told = (Array.isArray(after) ? after.slice(before) : []) as { kind: string }[]
+    expect(told.filter((one) => one.kind === 'untold-trigger')).toEqual([])
+  })
+})
+
+describe('the page around a modal popover', () => {
+  test('is hidden from screen readers while it is open, and shown again when it closes', async () => {
+    const page = await mount(
+      `<div><p id="beside">Beside</p>
+        <helix-headless-popover modal label="Filters">
+          <button slot="trigger">Filters</button>
+          <button>Apply</button>
+        </helix-headless-popover></div>`,
+    )
+    const host = page.querySelector('helix-headless-popover') as Popover
+    const beside = page.querySelector('#beside') as HTMLElement
+    host.show()
+    await host.updateComplete
+    expect(beside.getAttribute('aria-hidden')).toBe('true')
+    expect(host.hasAttribute('aria-hidden')).toBe(false)
+    host.hide()
+    await host.updateComplete
+    expect(beside.hasAttribute('aria-hidden')).toBe(false)
+  })
+
+  test('is left alone around an ordinary one', async () => {
+    const page = await mount(
+      `<div><p id="beside">Beside</p>
+        <helix-headless-popover label="Filters">
+          <button slot="trigger">Filters</button>
+        </helix-headless-popover></div>`,
+    )
+    const host = page.querySelector('helix-headless-popover') as Popover
+    host.show()
+    await host.updateComplete
+    expect(page.querySelector('#beside')?.hasAttribute('aria-hidden')).toBe(false)
+  })
+})

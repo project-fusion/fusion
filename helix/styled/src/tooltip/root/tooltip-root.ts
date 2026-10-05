@@ -24,7 +24,11 @@ import { styles } from './tooltip-root.css.js'
  * @cssproperty --tooltip-arrow-size - The size of the arrow on the bubble's edge.
  * @cssproperty --tooltip-backdrop - The blur behind a `frosted` or `glass` bubble.
  * @cssproperty --tooltip-background-color - The fill of the bubble.
+ * @cssproperty --tooltip-color - The color of the bubble's words.
+ * @cssproperty --tooltip-font-size - The size of the bubble's words.
  * @cssproperty --tooltip-max-inline-size - The widest the bubble grows before its text wraps.
+ * @cssproperty --tooltip-padding - The space between the bubble's edge and its words.
+ * @cssproperty --tooltip-radius - The bubble's corner radius.
  */
 @customElement('helix-tooltip')
 export class HelixTooltip extends HelixHeadlessTooltip {

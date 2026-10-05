@@ -18,10 +18,10 @@
 
   background-color: var(--tooltip-background-color, var(--helix-color-surface-inverse));
   border: none;
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-inverse);
+  border-radius: var(--tooltip-radius, var(--helix-radii-sm));
+  color: var(--tooltip-color, var(--helix-color-foreground-inverse));
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  font-size: var(--tooltip-font-size, var(--helix-text-xs));
   /* Stated, because a tooltip inherits from wherever its trigger happens to sit
      and a trigger sits anywhere. */
   font-weight: var(--helix-weight-regular);
@@ -31,7 +31,7 @@
   max-inline-size: var(--tooltip-max-inline-size, 16rem);
   /* Out until placed, and `data-placed` below is what lets it in. */
   opacity: 0;
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  padding: var(--tooltip-padding, var(--helix-space-2xs) var(--helix-space-xs));
   position: fixed;
   scale: 0;
   /* And it leaves the same way it arrived. */
@@ -83,7 +83,7 @@
 :host([material="frosted"]) [part~="tooltip"],
 :host([material="glass"]) [part~="tooltip"] {
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  color: var(--helix-color-foreground);
+  color: var(--tooltip-color, var(--helix-color-foreground));
 }
 
 /* It grows out of its own point, so a tooltip above its trigger expands downward

@@ -475,6 +475,39 @@ describe('moving onto the bubble', () => {
     await tip.updateComplete
     expect(tip.open).toBe(true)
   })
+
+  test('hides a `for` tooltip with `hoverable="false"`', async () => {
+    const host = (await mount(
+      `<div><button id="trigger" aria-describedby="tip">Save</button>
+        <helix-headless-tooltip id="tip" for="trigger" content="Save your work" delay="0" delay-out="0" hoverable="false"></helix-headless-tooltip></div>`,
+    )) as HTMLElement
+    const tip = host.querySelector('helix-headless-tooltip') as unknown as Tooltip
+    const trigger = host.querySelector('button') as HTMLButtonElement
+    await tip.updateComplete
+    trigger.dispatchEvent(new Event('pointerenter'))
+    await new Promise((resolve) => setTimeout(resolve, 5))
+    await tip.updateComplete
+    trigger.dispatchEvent(new Event('pointerleave'))
+    part(tip, 'tooltip')?.dispatchEvent(new Event('pointerenter'))
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    await tip.updateComplete
+    expect(tip.open).toBe(false)
+  })
+
+  test('hides a wrapping tooltip with `hoverable="false"` once the pointer is on the bubble', async () => {
+    const tip = (await mount(
+      `<helix-headless-tooltip content="Save your work" delay="0" delay-out="0" hoverable="false"><button>Save</button></helix-headless-tooltip>`,
+    )) as unknown as Tooltip
+    await tip.updateComplete
+    ;(tip as unknown as HTMLElement).dispatchEvent(new Event('pointerenter'))
+    await new Promise((resolve) => setTimeout(resolve, 5))
+    await tip.updateComplete
+    expect(tip.open).toBe(true)
+    part(tip, 'tooltip')?.dispatchEvent(new Event('pointerenter'))
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    await tip.updateComplete
+    expect(tip.open).toBe(false)
+  })
 })
 
 describe('tooltips that are warm', () => {

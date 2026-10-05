@@ -41,3 +41,13 @@ describe('tooltip visual axes', () => {
     expect(bare).not.toContain('material=')
   })
 })
+
+describe('tooltip hooks', () => {
+  test('the bubble’s words, corners, and room are each a hook with the token behind it', () => {
+    const sheet = styles(ssr(html`<helix-tooltip content="Save"></helix-tooltip>`))
+    expect(sheet).toContain('var(--tooltip-color, var(--helix-color-foreground-inverse))')
+    expect(sheet).toContain('var(--tooltip-font-size, var(--helix-text-xs))')
+    expect(sheet).toContain('var(--tooltip-padding, var(--helix-space-2xs) var(--helix-space-xs))')
+    expect(sheet).toContain('var(--tooltip-radius, var(--helix-radii-sm))')
+  })
+})
