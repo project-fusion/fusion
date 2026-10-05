@@ -204,8 +204,8 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * of the band.
    *
    * Absent writes none. A slice under a twentieth of the whole takes no
-   * label, there being no room on it for one. The labels are drawn, not read:
-   * the summary says every share.
+   * label, there being no room on it for one. A screen reader hears every
+   * share in the summary, and the labels are hidden from it.
    */
   @property({ attribute: 'slice-labels', reflect: true, type: Boolean })
   sliceLabels = false
@@ -569,7 +569,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * amount, as `AreaChart` writes a part's share under `share`: "612 (24%)".
    *
    * The share is what the ring shows and the table does not, so a reading
-   * said by key gives it too, and not only the summary.
+   * said by key gives it too, as the summary does.
    */
   private withShare(share: DonutShare): Row[] {
     const rows = this.sourceRows

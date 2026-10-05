@@ -8,6 +8,11 @@ beforeAll(async () => {
 
 const svg = (host: HTMLElement): Element | null => part(host, 'svg')
 
+/* A missing name is said once the page has settled, a frame after load,
+   which happy-dom's document already is. */
+const settled = (): Promise<void> =>
+  new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => done())))
+
 describe('icon rendering', () => {
   test('draws the named glyph from the set', async () => {
     // The markup is the icon's own, several elements at once rather than one
@@ -38,6 +43,11 @@ describe('icon rendering', () => {
     await icon.updateComplete
     icon.setAttribute('mirror', '')
     await icon.updateComplete
+    expect(heard).toBe(0)
+    await settled()
+    icon.setAttribute('mirror', 'x')
+    await icon.updateComplete
+    await settled()
     expect(heard).toBe(1)
     icon.name = 'check'
     await icon.updateComplete
@@ -57,6 +67,7 @@ describe('icon rendering', () => {
       )) as HTMLElement & { updateComplete: Promise<unknown> }
       icon.setAttribute('mirror', '')
       await icon.updateComplete
+      await settled()
     } finally {
       console.warn = original
     }
@@ -231,6 +242,25 @@ describe('a name the page registered', () => {
     expect(heard).toEqual(['load'])
   })
 
+  /* A library a page registers after the element has rendered is not a
+     missing glyph: the name waits for the page to settle before it is said
+     to draw nothing. */
+  test('says nothing of a name a library registered later still draws', async () => {
+    const { registerIconLibrary } = await import('../index.js')
+    const icon = (await mount('<helix-headless-icon></helix-headless-icon>')) as Icon
+    let errors = 0
+    icon.addEventListener('error', () => {
+      errors += 1
+    })
+    icon.name = 'spec-late:camera'
+    await icon.updateComplete
+    registerIconLibrary('spec-late', (name) => glyph(name))
+    await icon.updateComplete
+    await settled()
+    expect(errors).toBe(0)
+    expect(drawnName(icon)).toBe('camera')
+  })
+
   test('fires `error` when the library answers nothing', async () => {
     const { registerIconLibrary } = await import('../index.js')
     registerIconLibrary('spec-empty', () => Promise.resolve(undefined))
@@ -246,6 +276,7 @@ describe('a name the page registered', () => {
       await icon.updateComplete
       await new Promise((resolve) => setTimeout(resolve, 0))
       await icon.updateComplete
+      await settled()
     } finally {
       console.warn = original
     }

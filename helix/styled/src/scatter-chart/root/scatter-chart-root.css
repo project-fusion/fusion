@@ -46,7 +46,7 @@
 }
 
 /* A series' line of best fit, under `trend`: dashed, so it reads as drawn
-   from the points rather than as one of them, in the series' color. */
+   from the points, in the series' color. */
 [part="trend"] {
   fill: none;
   stroke: var(--chart-series);

@@ -279,7 +279,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :host([attention]) [part="indicator"] {
+  :host([attention="pulse"]) [part="indicator"]:not([data-blank]),
+  :host([attention="bounce"]) [part="indicator"]:not([data-blank]) {
     animation: none;
   }
 }

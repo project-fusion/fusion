@@ -4,6 +4,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { resolveIcon, watchIcons } from '../registry.js'
+import { afterPageSettles } from '../settle.js'
 
 /**
  * @summary A named icon from the Helix set.
@@ -32,7 +33,8 @@ import { resolveIcon, watchIcons } from '../registry.js'
  * rendered is drawn then.
  *
  * A name with no match renders nothing, and the element fires `error`, so a
- * typo in a name can be heard.
+ * typo in a name can be heard. It waits until the page has loaded and painted
+ * first, so a library a later module registers is not taken for a typo.
  *
  * An icon is decorative by default and hidden from assistive technology. Set
  * `label` only when the icon is the only carrier of meaning, such as in a
@@ -187,8 +189,8 @@ export class HelixHeadlessIcon extends HelixElement {
     this.drawn = this.icon ?? this.lookup()
   }
 
-  /* Said once per name, after the render that drew nothing. A server runs no
-     `updated`, so nothing fires there. */
+  /* Said once per name, once the page has settled after the render that drew
+     nothing. A server runs no `updated`, so nothing fires there. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     if (this.arrived === this.name && this.drawn !== undefined) {
@@ -196,23 +198,41 @@ export class HelixHeadlessIcon extends HelixElement {
     }
     this.arrived = ''
     if (this.drawn === undefined && this.name !== '' && !this.waiting) {
-      if (this.missed !== this.name) {
-        this.missed = this.name
-        this.dispatchEvent(
-          new Event('error', { bubbles: false, cancelable: false, composed: false }),
-        )
-        reportRuntime({
-          kind: 'unknown-icon',
-          message:
-            `<${this.localName} name="${this.name}"> names no registered icon, so it draws ` +
-            'nothing. Check the name, register the glyph with `registerIcons`, or import it ' +
-            'and pass it as `icon`.',
-          tag: this.localName,
-        })
+      if (this.missed !== this.name && this.pending !== this.name) {
+        this.pending = this.name
+        afterPageSettles(() => this.reportMissing())
       }
     } else {
       this.missed = ''
     }
+  }
+
+  /** The name a report is waiting on the page to settle for, so it is asked once. */
+  private pending = ''
+
+  /**
+   * Says a name drew nothing, once the page has had its chance to register
+   * it: a library registered by a module further down the page, or by the
+   * page's own script after this element, is not a missing glyph. Asked again
+   * then, and said only where the name still draws nothing and nothing is
+   * still on its way.
+   */
+  private reportMissing(): void {
+    const name = this.pending
+    this.pending = ''
+    if (this.name !== name || this.drawn !== undefined || this.waiting || !this.isConnected) {
+      return
+    }
+    this.missed = name
+    this.dispatchEvent(new Event('error', { bubbles: false, cancelable: false, composed: false }))
+    reportRuntime({
+      kind: 'unknown-icon',
+      message:
+        `<${this.localName} name="${name}"> names no registered icon, so it draws ` +
+        'nothing. Check the name, register the glyph with `registerIcons`, or import it ' +
+        'and pass it as `icon`.',
+      tag: this.localName,
+    })
   }
 
   protected override render(): TemplateResult | typeof nothing {

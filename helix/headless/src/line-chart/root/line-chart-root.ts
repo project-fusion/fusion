@@ -173,6 +173,17 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   }
 
   /**
+   * Draws a mark on every reading, the `marker` part, so a reader sees where
+   * the readings are, as well as the line between them.
+   *
+   * Absent draws none, except on a reading with a blank on either side: it
+   * has no line to be part of, so it takes a mark, the `marker` part with
+   * `marker-lone` beside it, or it would not be drawn at all.
+   */
+  @property({ reflect: true, type: Boolean })
+  markers = false
+
+  /**
    * The shape of the mark on each series' last reading.
    *
    * Absent is a dot, and absent rather than defaulted because a reflecting
@@ -207,17 +218,6 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    */
   @property({ reflect: true })
   terminus?: 'none' | 'ring' | 'square' | 'triangle'
-
-  /**
-   * Draws a mark on every reading, the `marker` part, so a reader sees where
-   * the readings are and not only the line between them.
-   *
-   * Absent draws none, except on a reading with a blank on either side: it
-   * has no line to be part of, so it takes a mark, the `marker` part with
-   * `marker-lone` beside it, or it would not be drawn at all.
-   */
-  @property({ reflect: true, type: Boolean })
-  markers = false
 
   /** The domain every series is drawn against, which the tooltip also needs. */
   private range(series: Series[]): [number, number] {
@@ -530,7 +530,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       ({ depth, lone, point }) =>
         html`<span
           aria-hidden="true"
-          part=${lone ? 'marker marker-lone' : 'marker'}
+          part="marker${lone ? ' marker-lone' : ''}"
           style=${`--chart-series: var(--chart-series-${seriesIndex(depth)}); inset-inline-start: ${
             (x(point.at) / PLOT_WIDTH) * 100
           }%; inset-block-start: ${(y(point.value) / PLOT_HEIGHT) * 100}%`}
