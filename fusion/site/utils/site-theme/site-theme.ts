@@ -32,13 +32,22 @@ export interface StoredTheme {
   settings: ThemeSettings
   tokens: readonly { hex: string; name: string }[]
   /**
-   * What shape the record is in.
+   * What shape the record is in, and which engine wrote it.
    */
-  version: 1
+  version: 2
 }
 
-/** The only version this build will read back. */
-export const THEME_VERSION = 1
+/**
+ * The only version this build will read back.
+ *
+ * **2 since Helix 0.141.0, the release that made ink the default.** That
+ * release gave each fill its own label token, `foreground-on-primary` among
+ * them, and a theme saved before it has none. Restored, its old colors stood
+ * beside the stylesheet's new labels: in dark mode the home page's "Coming
+ * soon" tag came out white on white. A theme saved before is now left unread,
+ * and the page draws in its own palette until the reader picks again.
+ */
+export const THEME_VERSION = 2
 
 /**
  * Reads the stored theme, or nothing.
