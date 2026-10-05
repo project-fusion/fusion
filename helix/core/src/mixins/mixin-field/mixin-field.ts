@@ -1,7 +1,7 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { auditName } from '../../controllers/aria-forward-controller/aria-forward-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
+import { auditName } from '../../utils/audit-name/audit-name.js'
 import { hostAria } from '../../utils/host-aria/host-aria.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
