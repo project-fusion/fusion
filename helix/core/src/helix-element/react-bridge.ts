@@ -1,6 +1,6 @@
 import type { LitElement } from 'lit'
 import { eventsForTag } from '../events/element-events.js'
-import { helixEventNames } from '../events/events.js'
+import { helixEventNames } from '../events/names.js'
 import { reportRuntime } from '../utils/report-runtime/report-runtime.js'
 
 /*
