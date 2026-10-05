@@ -238,10 +238,8 @@ const REACT_WIRES = new Set(['scroll', 'scrollend'])
  * declared public API and all of them otherwise silent in React.
  *
  * The name is React's own casing, `onError` rather than `onerror`, because that
- * is what a consumer writes and therefore what is in the props bag. Every
- * native we relay is a single word, so capitalising the first letter is the
- * whole of the rule; a two-word name like `loadeddata` would be `onLoadedData`
- * and needs the list extending rather than the rule generalising.
+ * is what a consumer writes and therefore what is in the props bag. See
+ * `reactNativeProp`.
  */
 export const reactPropFor = (event: Event): string | undefined => {
   if (event.type.includes('-')) {
@@ -250,8 +248,39 @@ export const reactPropFor = (event: Event): string | undefined => {
   if (event.bubbles || REACT_WIRES.has(event.type)) {
     return undefined
   }
-  return `on${event.type.charAt(0).toUpperCase()}${event.type.slice(1)}`
+  return reactNativeProp(event.type)
 }
+
+/**
+ * React's casing for the native events whose names are two words run together.
+ *
+ * React spells these as two words, `onTimeUpdate` for `timeupdate`, and that
+ * is the prop its own `<video>` typings teach a consumer to write. The media
+ * names are the ones `Video` relays from its inner `<video>`; `scrollend` is
+ * `Scroll Area`'s. A single word needs no entry: its first letter is the whole
+ * of the rule.
+ */
+const REACT_CASING: Readonly<Record<string, string>> = {
+  canplay: 'onCanPlay',
+  canplaythrough: 'onCanPlayThrough',
+  durationchange: 'onDurationChange',
+  loadeddata: 'onLoadedData',
+  loadedmetadata: 'onLoadedMetadata',
+  loadstart: 'onLoadStart',
+  ratechange: 'onRateChange',
+  scrollend: 'onScrollEnd',
+  timeupdate: 'onTimeUpdate',
+  volumechange: 'onVolumeChange',
+}
+
+/**
+ * The prop React reads for a native event: `onError` for `error`, and
+ * `onTimeUpdate` for `timeupdate`.
+ *
+ * The JSX typings name the same props, so a consumer writes what this binds.
+ */
+export const reactNativeProp = (type: string): string =>
+  REACT_CASING[type] ?? `on${type.charAt(0).toUpperCase()}${type.slice(1)}`
 
 /**
  * The lowercase spelling of a native event's prop, `ontoggle` or `onchange`.

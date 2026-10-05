@@ -53,6 +53,16 @@ describe('handlers for events the manifest declares', () => {
     expect(next).toContain('onToggle?: (event: Event & { currentTarget: T }) => void;')
   })
 
+  /* `onTimeupdate` typed a prop React reads as a listener for an event named
+     `Timeupdate`, and the element binds `onTimeUpdate`, React's own spelling. */
+  test('spells a two-word native name as React does', () => {
+    const next = scene(BAG, ['timeupdate', 'loadedmetadata', 'canplaythrough', 'scrollend'])
+    for (const name of ['onTimeUpdate', 'onLoadedMetadata', 'onCanPlayThrough', 'onScrollEnd']) {
+      expect(next).toContain(`${name}?: (event: Event & { currentTarget: T }) => void;`)
+    }
+    expect(next).not.toContain('onTimeupdate')
+  })
+
   /* `onToggle={(event) => event.newState}` did not compile, the handler taking
      a bare `Event` while every element sends a `ToggleEvent`. */
   test('takes the platform type every element declares', () => {
