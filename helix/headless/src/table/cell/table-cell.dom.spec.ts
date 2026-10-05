@@ -7,6 +7,7 @@ import {
   part,
   registerDom,
   role,
+  settle,
 } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -51,6 +52,39 @@ describe('one table cell', () => {
     host.header = true
     await host.updateComplete
     expect(role(host)).toBe('columnheader')
+  })
+
+  /* The first cell of a row of values names that row, which is what every
+     shipped example writes `header` for. As a `columnheader` it stacked a
+     second heading under the column's, and a reader moving along the row heard
+     no row header at all. */
+  test('heads its row where values sit beside it, and its column in a row of headers', async () => {
+    const values = await mount(`<helix-headless-table-row>
+      <helix-headless-table-cell header>web-app</helix-headless-table-cell>
+      <helix-headless-table-cell>us-east-1</helix-headless-table-cell>
+    </helix-headless-table-row>`)
+    await settle(values.firstElementChild as Cell)
+    const [named, value] = [...values.children] as Cell[]
+    expect(role(named as Cell)).toBe('rowheader')
+    expect(role(value as Cell)).toBe('cell')
+
+    const headers = await mount(`<helix-headless-table-row>
+      <helix-headless-table-cell header>Service</helix-headless-table-cell>
+      <helix-headless-table-cell header>Region</helix-headless-table-cell>
+    </helix-headless-table-row>`)
+    await settle(headers.firstElementChild as Cell)
+    expect([...headers.children].map((one) => role(one as Cell))).toEqual([
+      'columnheader',
+      'columnheader',
+    ])
+
+    /* The value beside it becoming a header too turns the row into a row of
+       headers, and the first cell hears about it. */
+    const second = value as Cell
+    second.header = true
+    await second.updateComplete
+    await (named as Cell).updateComplete
+    expect(role(named as Cell)).toBe('columnheader')
   })
 
   /* A cell generates no box: it is a grid item of the table, so what it renders

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -104,5 +104,26 @@ describe('table column with no heading words', () => {
     await host.updateComplete
     expect(part(host, 'grip')?.getAttribute('aria-label')).toBe('Move column')
     expect(part(host, 'resizer')?.getAttribute('aria-label')).toBe('Resize column')
+  })
+})
+
+describe('table column holding controls', () => {
+  /* A header takes its name from its content, and the grip and the separator
+     are content: the cells under a resizable column were read with "Status 544
+     pixels" as their header, and a reorderable one with "Move File File". */
+  test('is named by its words alone, and the controls keep their own names', async () => {
+    const host = (await mount(
+      '<helix-headless-table-column resizable>Status</helix-headless-table-column>',
+    )) as Column & { movable: boolean }
+    host.movable = true
+    await host.updateComplete
+    expect(label(host)).toBe('Status')
+    expect(part(host, 'grip')?.getAttribute('aria-label')).toBe('Move Status')
+    expect(part(host, 'resizer')?.getAttribute('aria-label')).toBe('Resize Status')
+  })
+
+  test('is named by its content where it holds none', async () => {
+    const host = await column()
+    expect(label(host)).toBeNull()
   })
 })

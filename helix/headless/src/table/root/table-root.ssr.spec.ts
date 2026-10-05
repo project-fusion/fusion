@@ -47,7 +47,8 @@ describe('table server output', () => {
         ssr(html`<helix-headless-table-row></helix-headless-table-row>`),
         'helix-headless-table-row',
       ),
-    ).toContain('<slot></slot>')
+      // A `slotchange` listener here too, so the same space inside the tag.
+    ).toMatch(/<slot\s*><\/slot>/)
     expect(
       rendered(
         ssr(html`<helix-headless-table-cell></helix-headless-table-cell>`),

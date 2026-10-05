@@ -398,7 +398,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
        is: it is this element's own semantics rather than markup a consumer
        wrote, and an attribute here is one more thing hydration can disagree
        about. */
-    hostAria(this.internals, { role: 'columnheader' })
+    /* **Named by its words alone where it holds controls.** A header takes its
+       name from its content, and a grip and a separator are content: "Move File
+       File 412 pixels" was the name every cell under it was read with. The
+       controls keep their own names. */
+    const named = this.movable || this.resizable
+    hostAria(this.internals, { label: named ? this.name : '', role: 'columnheader' })
     /* Set here rather than through `hostAria`, which carries the four semantics
        every family needs and not this one. */
     this.internals.ariaSort = this.canSort ? (this.sorted ?? 'none') : null
