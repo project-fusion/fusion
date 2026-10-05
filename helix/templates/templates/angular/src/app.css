@@ -10,10 +10,10 @@
  * near-black in light mode and near-white in dark. Set `--helix-seed-brand` on
  * `:root`, and every token follows it.
  *
- * **Color appears in two places, and both are named.** The wordmark takes
- * `--helix-color-brand-mark`, the token for the brand as a graphic, and a
- * chosen row takes `--helix-color-primary-subtle` through the parts the table
- * publishes. Everywhere else the page is ink on the background, and the
+ * **Color appears in two places, and both are named.** Each tile's icon takes
+ * `--helix-color-primary` on `--helix-color-primary-subtle`, and a chosen row
+ * takes `--helix-color-primary-subtle` through the parts the table publishes.
+ * Everywhere else the page is the foreground on the background, and the
  * components carry their own color.
  */
 
@@ -63,18 +63,16 @@ helix-app-header {
   --app-header-max-inline-size: 56rem;
 }
 
-/* The mark beside the project's name, the one graphic on the page and the
-   reason `--helix-color-brand-mark` exists. WCAG asks 3:1 of a graphic and 4.5:1
-   of text, so a mark can sit closer to a theme's brand color than any text
-   color can. Swap the glyph, or replace the whole element with your own logo. */
+/* The wordmark, a word for now, in the foreground: a quiet link is muted until
+   it is pointed at, and the name is the strongest thing in the bar. Give it your
+   own name, or put your logo beside it in `--helix-color-brand-mark`, the token
+   for the brand as a graphic: WCAG asks 3:1 of a graphic and 4.5:1 of text, so a
+   mark can sit closer to a theme's brand color than any text color can. */
 .wordmark {
   align-items: center;
+  color: var(--helix-color-foreground);
   display: inline-flex;
   gap: var(--helix-space-xs);
-}
-
-.wordmark helix-icon {
-  color: var(--helix-color-brand-mark);
 }
 
 /*
@@ -189,12 +187,21 @@ helix-app-header {
  * **The panel is the library at work**, so all it needs from here is room. Two
  * documented hooks: the figures come down a step from the display size, which
  * suits one figure on its own and is too loud for three in an 18rem column, and
- * the gap around the rule between them comes in from `2xl`, which `divided`
- * doubles, leaving no room for a number.
+ * the gap between them is wide enough to set them apart with no rule.
+ *
+ * **Level with the buttons where the panel has a column of its own**, so it
+ * sits low, under the brightest part of the light, and its figures line up with
+ * the actions beside them.
  */
 .specimen {
-  --stat-group-gap: var(--helix-space-md);
-  --stat-value-size: var(--helix-text-xl);
+  --stat-group-gap: var(--helix-space-xl);
+  --stat-value-size: var(--helix-text-2xl);
+}
+
+@media (width >= 60rem) {
+  .specimen {
+    align-self: end;
+  }
 }
 
 /* A section is its heading and its one block, closer together than two sections

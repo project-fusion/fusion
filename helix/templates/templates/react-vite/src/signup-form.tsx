@@ -105,11 +105,10 @@ export function SignupForm() {
 
         <aside className="notes">
           {/* The one fact you need before typing your name into a page you have
-              had for five minutes, so it is a callout. `tone` is the meaning,
-              and the component draws it with a tint mixed from the status color
-              and a bar on the inline start, so it survives being read in
-              grayscale. */}
-          <helix-callout tone="info">
+              had for five minutes, so it is a callout. `neutral` is a note that
+              reports no status, drawn in the muted ink with a bar on the inline
+              start, so it stays in the palette, ink or brand. */}
+          <helix-callout tone="neutral">
             The form posts nothing. Submit it, and a message shows exactly what a server would
             receive.
           </helix-callout>

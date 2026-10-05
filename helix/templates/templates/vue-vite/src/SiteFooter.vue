@@ -9,19 +9,16 @@ import { DOCS } from './docs.ts'
   and a caption, which on a tall window left the bottom third of the screen
   empty. The footer is also where the links you want once belong.
 
-  `data-link="subtle"` reads as body text until it is hovered, which suits a
-  row of links under a rule.
+  `data-link="quiet"` sets a link in the muted ink with no underline, and it
+  takes the foreground on hover, which suits a row of links under a rule.
 -->
 <template>
   <footer class="site-footer">
     <div class="footer-row">
-      <helix-text as="p" emphasis="subtle" variant="caption">
-        Every component here has a page, with its API, its parts, and its examples.
-      </helix-text>
       <div class="footer-links">
-        <a data-link="subtle" :href="DOCS.gallery">Components</a>
-        <a data-link="subtle" :href="DOCS.elements">Documentation</a>
-        <a data-link="subtle" :href="DOCS.vue">Vue</a>
+        <a data-link="quiet" :href="DOCS.gallery">Components</a>
+        <a data-link="quiet" :href="DOCS.elements">Documentation</a>
+        <a data-link="quiet" :href="DOCS.vue">Vue</a>
       </div>
     </div>
   </footer>

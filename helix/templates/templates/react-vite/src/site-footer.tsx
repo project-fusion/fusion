@@ -8,24 +8,21 @@ import { DOCS } from './docs.js'
  * empty, as if the layout had run out. The footer is also where the links you
  * want once belong, so the landing page no longer carries them.
  *
- * `data-link="subtle"` reads as body text until it is hovered, which suits a
- * row of links under a rule.
+ * `data-link="quiet"` sets a link in the muted ink with no underline, and it
+ * takes the foreground on hover, which suits a row of links under a rule.
  */
 export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="footer-row">
-        <helix-text as="p" emphasis="subtle" variant="caption">
-          Every component here has a page, with its API, its parts, and its examples.
-        </helix-text>
         <div className="footer-links">
-          <a data-link="subtle" href={DOCS.gallery}>
+          <a data-link="quiet" href={DOCS.gallery}>
             Components
           </a>
-          <a data-link="subtle" href={DOCS.elements}>
+          <a data-link="quiet" href={DOCS.elements}>
             Documentation
           </a>
-          <a data-link="subtle" href={DOCS.react}>
+          <a data-link="quiet" href={DOCS.react}>
             React
           </a>
         </div>
