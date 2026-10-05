@@ -183,6 +183,7 @@ export {
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   HelixHistoryEvent,
+  HelixLoadMoreEvent,
   HelixMapClusterEvent,
   HelixMapPanEvent,
   HelixMapPartChangeEvent,

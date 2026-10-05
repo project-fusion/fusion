@@ -64,3 +64,15 @@ describe('the notifications a sandbox sends once a request is applied', () => {
     }
   })
 })
+
+describe('the event a reader sends to ask for more items', () => {
+  test('is helix-load-more, carries nothing and cannot be canceled', async () => {
+    const { HelixLoadMoreEvent } = await import('./events.js')
+    const event = new HelixLoadMoreEvent()
+    expect(event.type).toBe('helix-load-more')
+    expect(event.bubbles).toBe(true)
+    expect(event.composed).toBe(true)
+    expect(event.cancelable).toBe(false)
+    expect(helixEventNames.has('helix-load-more')).toBe(true)
+  })
+})

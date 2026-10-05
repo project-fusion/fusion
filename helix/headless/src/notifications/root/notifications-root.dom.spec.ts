@@ -469,3 +469,27 @@ describe('moving through the feed with the keys', () => {
     expect(internals.map((one) => one.ariaSetSize ?? null)).toEqual([null, null, null])
   })
 })
+
+describe('asking for more', () => {
+  test('draws no button unless asked to', async () => {
+    const host = await feed()
+    expect(part(host, 'more')).toBeNull()
+  })
+
+  test('the load-more button sends helix-load-more, and hides while the feed is loading', async () => {
+    const host = (await feed(
+      `<helix-headless-notifications label="Inbox" load-more load-more-label="Older">
+        <helix-headless-notification>One</helix-headless-notification>
+      </helix-headless-notifications>`,
+    )) as HTMLElement & { loading: boolean; updateComplete: Promise<boolean> }
+    const asked: string[] = []
+    host.addEventListener('helix-load-more', (event) => asked.push(event.type))
+    const more = part(host, 'more') as HTMLButtonElement
+    expect(more.textContent?.trim()).toBe('Older')
+    more.click()
+    expect(asked).toEqual(['helix-load-more'])
+    host.loading = true
+    await host.updateComplete
+    expect(part(host, 'more')).toBeNull()
+  })
+})

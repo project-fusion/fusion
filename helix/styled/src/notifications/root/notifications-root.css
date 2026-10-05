@@ -108,6 +108,29 @@
   color: var(--helix-color-foreground);
 }
 
+/* The way to the next page, a quiet full-width row under the last item. */
+[part="more"] {
+  background: none;
+  border: 0;
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inline-size: 100%;
+  padding-block: var(--helix-space-sm);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="more"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="more"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
 [part="mark-all"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
@@ -131,7 +154,8 @@
     overflow-y: visible;
   }
 
-  [part="mark-all"] {
+  [part="mark-all"],
+  [part="more"] {
     display: none;
   }
 }
