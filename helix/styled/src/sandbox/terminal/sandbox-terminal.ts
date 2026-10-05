@@ -39,21 +39,21 @@ const LIMIT = 200
  * level is read before it, except a plain `log`, so an error does not sound
  * like any other line.
  *
+ * **`controls` adds a clear button and a level filter** above the log. Both
+ * are also yours to drive without them: `clear()` empties the log, and
+ * `level` hides the quieter lines.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Console, Output
  * @documentation https://fusion.dev/helix/components/sandbox
  *
- * **`controls` adds a clear button and a level filter** above the log. Both
- * are also yours to drive without them: `clear()` empties the log, and
- * `level` hides the quieter lines.
- *
  * @csspart clear - The button that empties the log, under `controls`.
  * @csspart controls - The row holding the clear button and the level filter, under `controls`.
  * @csspart count - How many times a repeated line was written.
  * @csspart empty - Shown while nothing has been written, or while the level filter hides every line.
- * @csspart filter - The level filter, a native select, under `controls`.
  * @csspart entry - One line.
+ * @csspart filter - The level filter, a native select, under `controls`.
  * @csspart level - The console level a line was written at.
  * @csspart log - The scrolling region.
  * @csspart message - The text of a line.

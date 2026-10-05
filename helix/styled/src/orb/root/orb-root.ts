@@ -116,18 +116,22 @@ const GRAY: ColorBytes = [128, 128, 128]
  * drawing of your own, the headless `Loader` holds the same busy progress bar
  * and its name.
  *
+ * Each state is also a custom state, such as `:state(thinking)` or
+ * `:state(done)`, so a page can style what sits around an orb by what it shows,
+ * whether the state was written as an attribute or set from script.
+ *
  * @since 0.8.0
  * @status stable
  * @category feedback
  * @aliases Thinking, Activity, Agent, Status
  * @documentation https://fusion.dev/helix/components/orb
  *
- * Each state is also a custom state, such as `:state(thinking)` or
- * `:state(done)`, so a page can style what sits around an orb by what it shows,
- * whether the state was written as an attribute or set from script.
- *
  * @csspart canvas - The canvas the dots are drawn on.
  * @csspart live - The live region that says the new state when `announce` is set. It is rendered from the first change of state and clipped out of view.
+ *
+ * @cssproperty --orb-color - The color of the nearest dots. Defaults to `currentColor`.
+ * @cssproperty --orb-ground - The color the farthest dots fade toward. Defaults to the page's background.
+ * @cssproperty --orb-size - The diameter. Overrides `size`.
  *
  * @cssstate connecting - The orb shows `connecting`.
  * @cssstate done - The orb shows `done`.
@@ -136,10 +140,6 @@ const GRAY: ColorBytes = [128, 128, 128]
  * @cssstate thinking - The orb shows `thinking`, which is also what a state it does not draw shows.
  * @cssstate waiting - The orb shows `waiting`.
  * @cssstate working - The orb shows `working`.
- *
- * @cssproperty --orb-color - The color of the nearest dots. Defaults to `currentColor`.
- * @cssproperty --orb-ground - The color the farthest dots fade toward. Defaults to the page's background.
- * @cssproperty --orb-size - The diameter. Overrides `size`.
  */
 @customElement('helix-orb')
 export class HelixOrb extends HelixElement {
