@@ -30,14 +30,20 @@ describe('steps', () => {
     expect(internals(host).ariaLabel).toBe('Checkout')
   })
 
-  test('each step is an item, and only the current one says so', async () => {
+  test('each step is an item, and its button says which one is current', async () => {
     const host = await steps()
     const all = [...host.querySelectorAll('helix-headless-step')] as HTMLElement[]
     for (const step of all) {
       await (step as unknown as Steps).updateComplete
     }
     expect(all.map((s) => internals(s).role)).toEqual(['listitem', 'listitem', 'listitem'])
-    expect(all.map((s) => internals(s).ariaCurrent)).toEqual([null, 'step', null])
+    // Said once, on the control: the item itself carries no state.
+    expect(all.map((s) => internals(s).ariaCurrent ?? null)).toEqual([null, null, null])
+    expect(all.map((s) => part(s, 'label')?.getAttribute('aria-current') ?? null)).toEqual([
+      null,
+      'step',
+      null,
+    ])
   })
 
   test('every step draws one mark, and which one is its own state', async () => {
@@ -99,7 +105,7 @@ describe('steps', () => {
     await host.updateComplete
     const step = host.querySelector('helix-headless-step') as HTMLElement
     await (step as unknown as Steps).updateComplete
-    expect(internals(step).ariaCurrent).toBe('step')
+    expect(part(step, 'label')?.getAttribute('aria-current')).toBe('step')
     expect(step.shadowRoot?.querySelector('svg')).not.toBeNull()
   })
 })
@@ -360,5 +366,14 @@ describe('a finished stage', () => {
     const [, payment] = [...host.querySelectorAll('helix-headless-step')] as Step[]
     await payment?.updateComplete
     expect(part(payment as Step, 'label')?.getAttribute('aria-current')).toBe('step')
+  })
+
+  test('and the button carries it to the control inside, where a reader is', async () => {
+    const host = await steps()
+    const [, payment] = [...host.querySelectorAll('helix-headless-step')] as Step[]
+    await payment?.updateComplete
+    const label = part(payment as Step, 'label') as Steps
+    await label.updateComplete
+    expect(part(label, 'button')?.getAttribute('aria-current')).toBe('step')
   })
 })

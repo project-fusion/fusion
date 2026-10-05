@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, label, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -75,7 +75,9 @@ describe('tabs selection', () => {
     const host = await mount(markup)
     const tab = part(tabs(host)[0] as HTMLElement, 'tab')
     expect(label(panels(host)[0] as HTMLElement)).toBe('One')
-    expect(tab?.hasAttribute('aria-controls')).toBe(false)
+    /* Never an IDREF. A browser with element reflection writes the attribute
+       empty when the reference is set, which names no id. */
+    expect(tab?.getAttribute('aria-controls') ?? '').toBe('')
     expect(part(panels(host)[0] as HTMLElement, 'panel')?.hasAttribute('aria-labelledby')).toBe(
       false,
     )
@@ -449,6 +451,44 @@ describe('each tab and the panel it shows', () => {
     const [one, two] = tabs(host) as (Updatable & { controls?: Element })[]
     expect(one?.controls).toBe(panels(host)[0])
     expect(two?.controls).toBe(panels(host)[1])
+  })
+
+  /* happy-dom has no element reflection, so the accessor is stood in on the
+     button, as an engine with reflection provides it, and taken off after. */
+  const reflected = Object.getOwnPropertyDescriptor(
+    HTMLButtonElement.prototype,
+    'ariaControlsElements',
+  )
+  afterEach(() => {
+    if (reflected) {
+      Object.defineProperty(HTMLButtonElement.prototype, 'ariaControlsElements', reflected)
+    } else {
+      delete (HTMLButtonElement.prototype as unknown as Record<string, unknown>)
+        .ariaControlsElements
+    }
+  })
+
+  test("and each tab's control holds its panel as a reference", async () => {
+    Object.defineProperty(HTMLButtonElement.prototype, 'ariaControlsElements', {
+      configurable: true,
+      get(this: { held?: Element[] | null }) {
+        return this.held ?? null
+      },
+      set(this: { held?: Element[] | null }, value: Element[] | null) {
+        this.held = value
+      },
+    })
+    const host = (await mount(markup)) as Updatable
+    await host.updateComplete
+    for (const tab of tabs(host)) {
+      await tab.updateComplete
+    }
+    const held = tabs(host).map(
+      (tab) =>
+        (part(tab, 'tab') as unknown as { ariaControlsElements: Element[] | null })
+          .ariaControlsElements,
+    )
+    expect(held).toEqual(panels(host).map((panel) => [panel]))
   })
 })
 

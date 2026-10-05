@@ -1,5 +1,8 @@
 /** The ARIA properties that take elements rather than ids. */
-export type ElementsProperty = 'ariaDescribedByElements' | 'ariaLabelledByElements'
+export type ElementsProperty =
+  | 'ariaControlsElements'
+  | 'ariaDescribedByElements'
+  | 'ariaLabelledByElements'
 
 /** An element with ARIA element reflection, where the engine has it. */
 type Reflecting = Element & Partial<Record<ElementsProperty, Element[] | null>>
@@ -15,8 +18,8 @@ type Reflecting = Element & Partial<Record<ElementsProperty, Element[] | null>>
  * caller wrote it**, which `owned` says, so a name another hand wrote stays.
  *
  * Dialog and Drawer name their panel by its header this way, Popover by its
- * first heading, Dialog describes itself by its body, and a Tour stop names
- * and describes its panel.
+ * first heading, Dialog describes itself by its body, a Tour stop names and
+ * describes its panel, and a Tab points its control at the panel it shows.
  */
 export const reflectElements = (
   target: Element | null | undefined,

@@ -7,6 +7,7 @@ beforeAll(() => {
 })
 
 type Reflecting = HTMLElement & {
+  ariaControlsElements: Element[] | null
   ariaDescribedByElements: Element[] | null
   ariaLabelledByElements: Element[] | null
 }
@@ -14,8 +15,13 @@ type Reflecting = HTMLElement & {
 /* happy-dom has no element reflection, so the accessors are stood in, as an
    engine with reflection provides them. */
 const reflecting = <T extends HTMLElement>(element: T): T & Reflecting => {
-  Object.defineProperty(element, 'ariaDescribedByElements', { value: null, writable: true })
-  Object.defineProperty(element, 'ariaLabelledByElements', { value: null, writable: true })
+  for (const property of [
+    'ariaControlsElements',
+    'ariaDescribedByElements',
+    'ariaLabelledByElements',
+  ]) {
+    Object.defineProperty(element, property, { value: null, writable: true })
+  }
   return element as T & Reflecting
 }
 
@@ -25,6 +31,15 @@ describe('reflecting the elements that name a panel', () => {
     const heading = document.createElement('h2')
     expect(reflectElements(panel, 'ariaLabelledByElements', [heading], false)).toBe(true)
     expect(panel.ariaLabelledByElements).toEqual([heading])
+  })
+
+  test('writes the element a control controls, the same way', () => {
+    const tab = reflecting(document.createElement('button'))
+    const panel = document.createElement('div')
+    expect(reflectElements(tab, 'ariaControlsElements', [panel], false)).toBe(true)
+    expect(tab.ariaControlsElements).toEqual([panel])
+    expect(reflectElements(tab, 'ariaControlsElements', [], true)).toBe(false)
+    expect(tab.ariaControlsElements).toBeNull()
   })
 
   test('clears only what the caller wrote', () => {
