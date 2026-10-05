@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -8,10 +8,12 @@ beforeAll(async () => {
   await import('../../popover/index.js')
 })
 
-/* A tooltip that hid in the test before is still warm here, a few milliseconds
-   later, and the next one would skip its delay. Each test starts cold. */
+/* A tooltip that hid in one test is still warm in the next, a few milliseconds
+   later, and would skip its delay. Each test leaves the page cold. After rather
+   than before, because the browser harness carries afterEach and not
+   beforeEach. */
 const WARMTH = Symbol.for('fusion.helix.tooltip.warmth')
-beforeEach(() => {
+afterEach(() => {
   delete (globalThis as unknown as Record<symbol, unknown>)[WARMTH]
 })
 

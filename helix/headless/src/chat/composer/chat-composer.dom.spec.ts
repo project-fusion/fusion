@@ -125,12 +125,12 @@ describe('the value', () => {
 
   test('the input a consumer hears comes from the composer', async () => {
     const element = await composer()
-    let target: EventTarget | null = null
+    const heard: Array<EventTarget | null> = []
     element.addEventListener('input', (event) => {
-      target = event.target
+      heard.push(event.target)
     })
     await type(element, 'Typed')
-    expect(target).toBe(element)
+    expect(heard.at(-1)).toBe(element)
   })
 })
 
