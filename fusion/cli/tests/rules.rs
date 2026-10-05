@@ -770,6 +770,49 @@ fn strays() {
     );
 }
 
+/// The channel's own call, a spec replacing the method, and a comment naming
+/// it are all clean; a call in a library module is the fault.
+#[test]
+fn warnings() {
+    const SETTINGS: &str = r#"{
+  "warnings": {
+    "channel": "packages/lib/src/channel.ts",
+    "roots": ["packages/lib/src"]
+  }
+}"#;
+    let widget = |body: &str| {
+        format!(
+            "// The channel prints with console.warn.\nimport {{ report }} from './channel'\n\n\
+             export const check = (): void => {{\n  {body}\n}}\n"
+        )
+    };
+    plant(
+        "workspace",
+        "warnings",
+        &[
+            ("package.json", ROOT),
+            ("fusion.json", SETTINGS),
+            (
+                "packages/lib/src/channel.ts",
+                "export const report = (text: string): void => {\n  console.warn(text)\n}\n",
+            ),
+            ("packages/lib/src/widget.ts", &widget("report('checked')")),
+            (
+                "packages/lib/src/widget.dom.spec.ts",
+                "console.warn = () => {}\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "packages/lib/src/widget.ts",
+                &widget("console.warn('checked')"),
+            );
+        },
+        "calls `console.warn` itself",
+        "packages/lib/src/widget.ts:5",
+    );
+}
+
 /// A family is a manifest module declaring a tag, keyed by the segment after
 /// `src/`; a drawing is a `.tsx` under `art/` named for it.
 #[test]

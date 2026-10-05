@@ -25,6 +25,7 @@ pub mod scripts;
 pub mod shaders;
 pub mod shipped;
 pub mod strays;
+pub mod warnings;
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -122,6 +123,9 @@ pub struct Settings {
     /// Paths inside `hydrates` that are their own document, with nothing to
     /// hydrate, where registering at module scope is what an entry point is for.
     pub standalone: Vec<String>,
+    /// The channel a library's warnings go through, and the roots held to it.
+    #[serde(default)]
+    pub warnings: Warnings,
 }
 
 /// The three paths the gallery rule reads, which are one subject.
@@ -164,6 +168,20 @@ pub struct Site {
     /// The generated document per route, which is the catalog a link resolves
     /// against, and the assets served at their own paths beside it.
     pub routes: String,
+}
+
+/// The one module a library's warnings go through, and the roots that use it.
+///
+/// **Grouped, because the two are one subject**: a root held to a channel it
+/// cannot reach would report every warning it has as a fault.
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct Warnings {
+    /// The module every warning goes through, which prints one when nothing is
+    /// listening, and so the one module that calls `console.warn`.
+    pub channel: String,
+    /// Roots whose modules warn through the channel.
+    pub roots: Vec<String>,
 }
 
 /// What the spec rules need to know about a workspace they do not assume.
@@ -228,6 +246,10 @@ pub fn floor() -> Rule {
 }
 
 /// Every rule, in the order they are listed and run.
+#[expect(
+    clippy::too_many_lines,
+    reason = "every rule is one entry in one list, and a list split in two is two places to miss one"
+)]
 pub fn all() -> Vec<Rule> {
     vec![
         Rule {
@@ -326,6 +348,12 @@ pub fn all() -> Vec<Rule> {
             name: "shipped",
             run: Runner::Source(shipped::run),
             summary: "nothing in `dist` outlives the source it was compiled from",
+        },
+        Rule {
+            fix: None,
+            name: "warnings",
+            run: Runner::Source(warnings::run),
+            summary: "a library warns through its channel, and only the channel prints",
         },
     ]
 }

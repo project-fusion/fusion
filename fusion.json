@@ -153,5 +153,15 @@
       "ssr.spec.ts": "test:ssr"
     }
   },
-  "standalone": ["fusion/site/preview"]
+  "standalone": ["fusion/site/preview"],
+  "warnings": {
+    "channel": "helix/core/src/utils/report-runtime/report-runtime.ts",
+    "roots": [
+      "helix/core/src",
+      "helix/graph/src",
+      "helix/headless/src",
+      "helix/map/src",
+      "helix/styled/src"
+    ]
+  }
 }
