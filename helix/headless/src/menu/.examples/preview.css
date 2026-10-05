@@ -149,7 +149,7 @@ helix-headless-menu-item::part(mark) {
   padding-inline-start: 0.5rem;
 }
 
-helix-headless-menu-item[checked]::part(mark) {
+helix-headless-menu-item:state(checked)::part(mark) {
   color: var(--_gray-strong);
 }
 

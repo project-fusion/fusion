@@ -1,4 +1,11 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  deepActiveElement,
+  HelixBeforeToggleEvent,
+  HelixElement,
+  HelixSelectEvent,
+  requestChange,
+} from '@fusion.dev/helix-core'
 import { caretRight, check } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -18,6 +25,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * only one can be on. A row that opens a page keeps `menuitem` and sets
  * `aria-haspopup`.
  *
+ * Choosing a choice row checks or unchecks it before `helix-select` is sent,
+ * so a listener reads the new `checked`. An `exclusive` row turns on and turns
+ * off the `exclusive` rows next to it. Cancel `helix-before-toggle` to keep a
+ * row as it is and set `checked` yourself.
+ *
  * The menu sets whether the row's page is showing as a property, never as an
  * attribute. An attribute written onto your element after it upgrades causes a
  * hydration mismatch.
@@ -31,12 +43,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot start - Content before the label, such as an icon.
  * @slot submenu - The rows of a submenu that this row opens.
  *
+ * @event {HelixBeforeToggleEvent} helix-before-toggle - A choice row is about to be checked or unchecked, carrying the state asked for. Cancelable: cancel it to keep the row as it is.
  * @event {HelixSelectEvent} helix-select - The row was chosen. Cancelable: cancel it to keep the menu open.
  *
  * @csspart item - The row, which is an `<a>` where `href` is set.
  * @csspart mark - The trailing mark: a check mark when the row is checked, or a caret
  * when it opens a submenu. A row never shows both, so they share one column.
  * @csspart start - The leading column that holds the `start` slot. It is always rendered.
+ *
+ * @cssstate checked - The row is checked.
  */
 @customElement('helix-headless-menu-item')
 export class HelixHeadlessMenuItem extends HelixElement {
@@ -50,14 +65,20 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * thing they are not.
    *
    * `checked` implies it, so a row that is on never has to say both.
+   *
+   * Choosing the row checks or unchecks it, after a `helix-before-toggle` that
+   * you can cancel.
    */
   @property({ reflect: true, type: Boolean })
   checkable = false
 
   /**
    * Whether the row is checked.
+   *
+   * The row changes it when it is chosen. Not reflected: the attribute is the
+   * state you start the row in, and `:state(checked)` carries the current one.
    */
-  @property({ reflect: true, type: Boolean })
+  @property({ type: Boolean })
   checked = false
 
   /**
@@ -79,11 +100,11 @@ export class HelixHeadlessMenuItem extends HelixElement {
   /**
    * Whether only one row in its set can be checked at a time.
    *
-   * Announcement and nothing else, the way `checkable` is: this element applies
-   * no choice and polices no group, so what it does is tell a reader which kind
-   * of set they are in. `menuitemcheckbox` says every row here is independent,
-   * which for a run of comparisons, or the values of a filter that compares
-   * against one, is the opposite of true.
+   * The set is the run of `exclusive` rows next to this one, up to the first
+   * element that is not one, such as a divider. Choosing a row in it checks
+   * that row and unchecks the others. Choosing the row that is checked leaves
+   * it checked. `menuitemradio` tells a reader which kind of set they are in,
+   * where `menuitemcheckbox` says every row is independent.
    *
    * Meaningless without `checkable`, since a row that cannot be ticked is not
    * one of a set of anything.
@@ -217,6 +238,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.toggleState('checked', this.checked)
     if (!this.childrenKnown) {
       return
     }
@@ -300,20 +322,68 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * just opened.
    */
   get selected(): boolean {
-    /* Asked of the document, not of the shadow root. Focus lands on the control
-       inside this row, and the platform retargets it: from outside a shadow
-       tree, `activeElement` is the host, which is this element. So the document
-       already answers the question and nothing has to walk a tree to do it.
-       `ShadowRoot.activeElement` is also the reading that does not survive
-       happy-dom, which climbs `getRootNode()` to the top and then dereferences
-       what it ran out of. */
-    return this.ownerDocument.activeElement === this
+    /* The focused node itself, found through every shadow root, and asked
+       whether it is in this row's own. `document.activeElement` stops at the
+       outermost host, which is this row only while the menu is in the document
+       tree: inside another component's shadow root it is that component, and
+       no row was ever current. A row holding a submenu is not current while a
+       row of that submenu has focus, which a containment test would say it
+       was. */
+    const active = deepActiveElement()
+    return active !== null && active.getRootNode() === this.renderRoot
+  }
+
+  /**
+   * Checks or unchecks a choice row.
+   *
+   * An `exclusive` row only turns on, and turning on turns its set off.
+   */
+  private tick(): void {
+    if (!(this.checkable || this.checked) || this.hasSubmenu) {
+      return
+    }
+    const next = this.exclusive ? true : !this.checked
+    if (next === this.checked) {
+      return
+    }
+    const applied = requestChange({
+      apply: (checked) => {
+        this.checked = checked
+      },
+      event: (checked) => new HelixBeforeToggleEvent({ checked }),
+      host: this,
+      next,
+    })
+    if (applied && this.exclusive) {
+      for (const peer of this.exclusivePeers()) {
+        peer.checked = false
+      }
+    }
+  }
+
+  /** The other `exclusive` rows in this row's run of siblings. */
+  private exclusivePeers(): HelixHeadlessMenuItem[] {
+    const peers: HelixHeadlessMenuItem[] = []
+    const inSet = (node: Element | null): node is HelixHeadlessMenuItem =>
+      node !== null &&
+      (node as Partial<HelixHeadlessMenuItem>).isMenuItem === true &&
+      (node as HelixHeadlessMenuItem).exclusive &&
+      node.slot === this.slot
+    for (const step of ['previousElementSibling', 'nextElementSibling'] as const) {
+      let node = this[step]
+      while (inSet(node)) {
+        peers.push(node)
+        node = node[step]
+      }
+    }
+    return peers
   }
 
   private choose(): void {
     if (this.disabled) {
       return
     }
+    this.tick()
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 

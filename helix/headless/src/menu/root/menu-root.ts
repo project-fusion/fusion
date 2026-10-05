@@ -1,7 +1,10 @@
 import {
+  AriaForwardController,
   anchorElement,
   customElement,
   DrilldownController,
+  deepActiveElement,
+  deepContains,
   HelixElement,
   inlineStep,
   KeyboardNavigationController,
@@ -10,6 +13,7 @@ import {
   type Placement,
   PopoverController,
   scrollItemIntoView,
+  slottedWords,
   tellDisclosure,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
@@ -25,6 +29,12 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * The trigger is slotted and stays your own element, as with the tooltip. The
  * menu renders its surface in the top layer with the popover API, so an
  * ancestor with `overflow: hidden` does not clip it and it needs no `z-index`.
+ *
+ * Slot a `helix-button` or `helix-icon-button` as the trigger, and the menu
+ * tells it that it opens a menu and whether the menu is open. A plain
+ * `<button>` can only be told by writing attributes onto your markup, which
+ * the menu does not do, so give it `aria-haspopup="menu"` and set its
+ * `aria-expanded` from the `toggle` event.
  *
  * Submenus drill down. A submenu replaces the panel's content, and a back row
  * returns to the previous page. One panel avoids the diagonal pointer path that
@@ -73,9 +83,13 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
 
   /**
    * Accessible name for the surface.
+   *
+   * Empty by default, which names the surface by its trigger, so a menu opened
+   * from "Actions" is announced as "Actions". An `aria-label` or
+   * `aria-labelledby` on the host names it too, and wins over both.
    */
   @property()
-  label = 'Menu'
+  label = ''
 
   /**
    * Space between the trigger and the surface, in pixels.
@@ -123,9 +137,18 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * menu that drills, so those keys are spoken for here rather than unhandled.
    */
   protected readonly keys = new KeyboardNavigationController(this, {
-    items: () => this.items,
+    /* None while closed: the rows are hidden, and a key on the trigger is this
+       element's to answer. Down and Up there open the menu. */
+    items: () => (this.open ? this.items : []),
     reserved: () => ['ArrowLeft', 'ArrowRight'],
     selects: () => false,
+    typeahead: (item) => slottedWords(item as HelixHeadlessMenuItem, ['']),
+  })
+
+  /** Carries a host `aria-label` and `aria-labelledby` to the surface. */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('surface'),
   })
 
   private readonly panel = new PopoverController(this, {
@@ -176,12 +199,18 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
 
   /** Opens the menu. */
   show(): void {
+    this.openAt('first')
+  }
+
+  /** Opens the menu with focus on its first or its last row. */
+  private openAt(end: 'first' | 'last'): void {
     if (this.open || !this.requestOpen(true)) {
       return
     }
     this.updateComplete.then(() => {
       // Raised in `updated()`, which the state change has just scheduled.
-      this.items[0]?.focus()
+      const items = this.items
+      ;(end === 'first' ? items[0] : items[items.length - 1])?.focus()
     })
   }
 
@@ -195,9 +224,13 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     /* Only where the menu still had it. A dismissal that did not take focus with
        it, a press somewhere else on the page, should leave focus where the
        reader put it rather than yanking it back to the trigger. `Popover`
-       guards the same way, and `document.activeElement` retargets to the item
-       host here, which is what makes the containment test work. */
-    if (this.contains(document.activeElement)) {
+       guards the same way.
+
+       The focused node is found through every shadow root. A menu that another
+       component renders in its own shadow root sees `document.activeElement` as
+       that component's host, which this element does not contain, so focus was
+       dropped to the page on Escape. */
+    if (deepContains(this, deepActiveElement())) {
       this.trigger.focus()
     }
   }
@@ -277,8 +310,12 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (!this.open) {
+      this.handleClosedKeydown(event)
+      return
+    }
     const items = this.items
-    const at = items.indexOf(document.activeElement as HelixHeadlessMenuItem)
+    const at = items.findIndex((item) => item.selected)
     /* In is where a submenu's caret points and out is back along the line, so
        on a right-to-left page the left arrow opens and the right comes back. */
     const along = inlineStep(this, event.key)
@@ -304,6 +341,25 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       return
     }
     event.preventDefault()
+  }
+
+  /**
+   * Down and Up on the trigger open the menu on its first and its last row.
+   *
+   * Everything else passes through. Escape in particular is not this element's
+   * while the menu is closed, so a dialog around the menu still closes on it.
+   */
+  private handleClosedKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') {
+      return
+    }
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+    const triggers = slot?.assignedElements({ flatten: true }) ?? []
+    if (!event.composedPath().some((node) => triggers.includes(node as Element))) {
+      return
+    }
+    event.preventDefault()
+    this.openAt(event.key === 'ArrowDown' ? 'first' : 'last')
   }
 
   private readonly handleTriggerClick = (): void => {
@@ -353,6 +409,32 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        something it can ask. */
     this.toggleState('drilled', !this.drilldown.atRoot)
     this.markColumns()
+    this.nameSurface()
+  }
+
+  /**
+   * Names the surface by its trigger, where nothing else names it.
+   *
+   * By element reference, which is the one direction that crosses: the surface
+   * is in this shadow root and the trigger is in the tree around it. A host
+   * `aria-labelledby` is carried down by `aria`, and a host `aria-label` or
+   * `label` is a name of its own, so each of them clears this reference.
+   */
+  private nameSurface(): void {
+    const surface = this.partNamed('surface') as
+      | (HTMLElement & { ariaLabelledByElements?: Element[] | null })
+      | null
+    if (!surface || !('ariaLabelledByElements' in surface)) {
+      return
+    }
+    if (this.hasAttribute('aria-labelledby')) {
+      return
+    }
+    const trigger = this.renderRoot
+      ?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+      ?.assignedElements({ flatten: true })[0]
+    const named = this.label !== '' || this.hasAttribute('aria-label')
+    surface.ariaLabelledByElements = trigger && !named ? [trigger] : null
   }
 
   /**
@@ -429,7 +511,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
         popover="manual"
         role="menu"
         aria-busy=${this.loading ? 'true' : nothing}
-        aria-label=${this.label}
+        aria-label=${this.label || nothing}
         data-drilled=${this.drilldown.atRoot ? nothing : ''}
         ?hidden=${!this.open}
       >
