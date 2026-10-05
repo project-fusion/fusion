@@ -146,7 +146,15 @@ export const TOKENS: Token[] = [
      pagination summary and the text an input paints. Measured before the
      change: 3.53, 3.62, 3.78, 3.95 in light and 3.59 in dark. */
   ['color-foreground-subtle', 'light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))'],
-  ['color-foreground-on-accent', 'var(--_helix-neutral-0)'],
+  /* **The label on a fill, one per role.** A brand fill and a status fill are
+     dark enough to carry white in both modes. An ink fill is the opposite of
+     the page, light in the dark, so its label is the page's own color, and one
+     name could not be dark on the ink fill and white on the danger fill beside
+     it. The primary and the accent read their label off their own seed, which
+     is white where the seed is set and unset where it is not. */
+  ['color-foreground-on-primary', 'var(--_helix-brand-on, var(--helix-color-background))'],
+  ['color-foreground-on-accent', 'var(--_helix-accent-on, var(--helix-color-background))'],
+  ['color-foreground-on-status', 'var(--_helix-neutral-0)'],
   /* The mode's opposite, for a surface that has to read as separate from the
      page rather than as part of it: a tooltip, a toast. */
   ['color-surface-inverse', 'light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))'],
@@ -189,13 +197,26 @@ export const TOKENS: Token[] = [
     'color-border',
     'light-dark(color-mix(in oklab, var(--_helix-neutral-300) 60%, var(--_helix-neutral-200)), color-mix(in oklab, var(--_helix-neutral-700) 30%, var(--_helix-neutral-800)))',
   ],
-  /* Interaction. */
-  ['color-primary', 'light-dark(var(--_helix-brand-500), var(--_helix-brand-400))'],
-  ['color-primary-hover', 'light-dark(var(--_helix-brand-600), var(--_helix-brand-300))'],
-  ['color-primary-active', 'light-dark(var(--_helix-brand-700), var(--_helix-brand-200))'],
-  ['color-primary-subtle', 'light-dark(var(--_helix-brand-50), var(--_helix-brand-900))'],
-  /* A fill that carries `--helix-color-foreground-on-accent`, which is the one
-     job no accent token in this set was doing. Measured by painting each pair
+  /* Interaction. Each brand step falls back to the ink step it stands in for,
+     which is the whole palette when no brand is named. */
+  [
+    'color-primary',
+    'light-dark(var(--_helix-brand-500, var(--_helix-ink-500)), var(--_helix-brand-400, var(--_helix-ink-400)))',
+  ],
+  [
+    'color-primary-hover',
+    'light-dark(var(--_helix-brand-600, var(--_helix-ink-600)), var(--_helix-brand-300, var(--_helix-ink-300)))',
+  ],
+  [
+    'color-primary-active',
+    'light-dark(var(--_helix-brand-700, var(--_helix-ink-700)), var(--_helix-brand-200, var(--_helix-ink-200)))',
+  ],
+  [
+    'color-primary-subtle',
+    'light-dark(var(--_helix-brand-50, var(--_helix-ink-50)), var(--_helix-brand-900, var(--_helix-ink-900)))',
+  ],
+  /* A brand fill, which carries white, and that was the one job no accent
+     token in this set was doing. Measured by painting each pair
      to a canvas and reading the pixels back, `getComputedStyle` reporting
      `oklch(...)` verbatim: primary 2.80, danger 3.12, info 2.64, success 2.51,
      warning 1.84. Body text wants 4.5 and large text wants 3, so four of the
@@ -207,14 +228,40 @@ export const TOKENS: Token[] = [
   /* The accent, step for step with primary, because a tone that behaves
      differently from the one beside it is a tone a consumer has to learn
      separately. */
-  ['color-accent', 'light-dark(var(--_helix-accent-500), var(--_helix-accent-400))'],
-  ['color-accent-hover', 'var(--_helix-accent-600)'],
-  ['color-accent-active', 'var(--_helix-accent-700)'],
-  ['color-accent-subtle', 'light-dark(var(--_helix-accent-50), var(--_helix-accent-900))'],
-  ['color-accent-surface', 'var(--_helix-accent-600)'],
-  ['color-accent-surface-hover', 'var(--_helix-accent-700)'],
-  ['color-primary-surface', 'var(--_helix-brand-600)'],
-  ['color-primary-surface-hover', 'var(--_helix-brand-700)'],
+  [
+    'color-accent',
+    'light-dark(var(--_helix-accent-500, var(--_helix-ink-500)), var(--_helix-accent-400, var(--_helix-ink-400)))',
+  ],
+  [
+    'color-accent-hover',
+    'light-dark(var(--_helix-accent-600, var(--_helix-ink-600)), var(--_helix-accent-600, var(--_helix-ink-300)))',
+  ],
+  [
+    'color-accent-active',
+    'light-dark(var(--_helix-accent-700, var(--_helix-ink-700)), var(--_helix-accent-700, var(--_helix-ink-200)))',
+  ],
+  [
+    'color-accent-subtle',
+    'light-dark(var(--_helix-accent-50, var(--_helix-ink-50)), var(--_helix-accent-900, var(--_helix-ink-900)))',
+  ],
+  /* An ink fill is the ink itself, light in the dark, and its hover darkens
+     from there like a brand fill's does. */
+  [
+    'color-accent-surface',
+    'light-dark(var(--_helix-accent-600, var(--_helix-ink-500)), var(--_helix-accent-600, var(--_helix-ink-400)))',
+  ],
+  [
+    'color-accent-surface-hover',
+    'light-dark(var(--_helix-accent-700, var(--_helix-ink-600)), var(--_helix-accent-700, var(--_helix-ink-450)))',
+  ],
+  [
+    'color-primary-surface',
+    'light-dark(var(--_helix-brand-600, var(--_helix-ink-500)), var(--_helix-brand-600, var(--_helix-ink-400)))',
+  ],
+  [
+    'color-primary-surface-hover',
+    'light-dark(var(--_helix-brand-700, var(--_helix-ink-600)), var(--_helix-brand-700, var(--_helix-ink-450)))',
+  ],
   /* **The ring is the border's color, said as an alias so the two cannot drift
      again.** Both were a bare `--_helix-brand-500`, and the note above records
      them as having resolved identically. That was true in light and had stopped
@@ -242,7 +289,10 @@ export const TOKENS: Token[] = [
      `@fusion.dev/helix-theme` solves this one against 3 and `primary` against
      the theme's own target, so a brand that has to travel a long way to be
      readable as text travels much less here. */
-  ['color-brand-mark', 'light-dark(var(--_helix-brand-500), var(--_helix-brand-400))'],
+  [
+    'color-brand-mark',
+    'light-dark(var(--_helix-brand-500, var(--_helix-ink-500)), var(--_helix-brand-400, var(--_helix-ink-400)))',
+  ],
   /* Syntax. */
   [
     'color-syntax-callable',
@@ -312,67 +362,67 @@ export const TOKENS: Token[] = [
      and they are closer than is comfortable. */
   [
     'color-series-1',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.595 calc(0.221 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-seed-brand) 0.62 calc(0.206 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.595 calc(0.221 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-series-origin) 0.62 calc(0.206 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
   ],
   [
     'color-series-2',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.645 calc(0.238 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-seed-brand) 0.645 calc(0.238 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.645 calc(0.238 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-series-origin) 0.645 calc(0.238 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
   ],
   [
     'color-series-3',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.625 calc(0.126 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ), oklch( from var(--_helix-seed-brand) 0.885 calc(0.179 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.625 calc(0.126 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ), oklch( from var(--_helix-series-origin) 0.885 calc(0.179 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ) )',
   ],
   [
     'color-series-4',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.565 calc(0.295 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-seed-brand) 0.62 calc(0.252 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.565 calc(0.295 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-series-origin) 0.62 calc(0.252 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
   ],
   [
     'color-series-5',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.64 calc(0.133 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ), oklch( from var(--_helix-seed-brand) 0.815 calc(0.17 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.64 calc(0.133 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ), oklch( from var(--_helix-series-origin) 0.815 calc(0.17 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ) )',
   ],
   [
     'color-series-6',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.63 calc(0.11 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ), oklch( from var(--_helix-seed-brand) 0.825 calc(0.144 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.63 calc(0.11 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ), oklch( from var(--_helix-series-origin) 0.825 calc(0.144 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ) )',
   ],
   [
     'color-series-7',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.66 calc(0.277 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-seed-brand) 0.66 calc(0.277 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.66 calc(0.277 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-series-origin) 0.66 calc(0.277 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
   ],
   [
     'color-series-8',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.63 calc(0.154 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ), oklch( from var(--_helix-seed-brand) 0.895 calc(0.219 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.63 calc(0.154 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ), oklch( from var(--_helix-series-origin) 0.895 calc(0.219 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ) )',
   ],
   [
     'color-series-9',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.52 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-seed-brand) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
   ],
   [
     'color-series-10',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.6 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-seed-brand) 0.78 calc(0.129 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.129 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
   ],
   [
     'color-series-11',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.52 calc(0.105 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ), oklch( from var(--_helix-seed-brand) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.105 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ) )',
   ],
   [
     'color-series-12',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.6 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-seed-brand) 0.78 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
   ],
   [
     'color-series-13',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.52 calc(0.108 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ), oklch( from var(--_helix-seed-brand) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.108 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ) )',
   ],
   [
     'color-series-14',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.6 calc(0.105 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ), oklch( from var(--_helix-seed-brand) 0.78 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.105 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ) )',
   ],
   [
     'color-series-15',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.52 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-seed-brand) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
   ],
   [
     'color-series-16',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.6 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ), oklch( from var(--_helix-seed-brand) 0.78 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ) )',
   ],
   /* The quiet eight, at chroma 0.07. *Muted is a treatment, not a license to
      be indistinguishable.** At 0.05 the closest pair of the eight measured
@@ -390,35 +440,35 @@ export const TOKENS: Token[] = [
      Measured across 0.046 to 0.10 in both modes. */
   [
     'color-series-17',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-seed-brand) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
   ],
   [
     'color-series-18',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-seed-brand) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
   ],
   [
     'color-series-19',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ), oklch( from var(--_helix-seed-brand) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ) )',
   ],
   [
     'color-series-20',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-seed-brand) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
   ],
   [
     'color-series-21',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ), oklch( from var(--_helix-seed-brand) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ) )',
   ],
   [
     'color-series-22',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ), oklch( from var(--_helix-seed-brand) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ) )',
   ],
   [
     'color-series-23',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-seed-brand) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
   ],
   [
     'color-series-24',
-    'light-dark( oklch( from var(--_helix-seed-brand) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ), oklch( from var(--_helix-seed-brand) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ) )',
   ],
   ['color-info', 'light-dark(var(--_helix-info-600), var(--_helix-info-400))'],
   /* Both arms, like every other color here. A single value leaves a severity
@@ -439,11 +489,11 @@ export const TOKENS: Token[] = [
      room there than the neutral ink, not more. */
   [
     'color-primary-muted',
-    'light-dark(oklch(from var(--_helix-brand-500) l calc(c * 0.5) h), oklch(from var(--_helix-brand-400) l calc(c * 0.5) h))',
+    'light-dark(oklch(from var(--_helix-brand-500, var(--_helix-ink-500)) l calc(c * 0.5) h), oklch(from var(--_helix-brand-400, var(--_helix-ink-400)) l calc(c * 0.5) h))',
   ],
   [
     'color-accent-muted',
-    'light-dark(oklch(from var(--_helix-accent-500) l calc(c * 0.5) h), oklch(from var(--_helix-accent-400) l calc(c * 0.5) h))',
+    'light-dark(oklch(from var(--_helix-accent-500, var(--_helix-ink-500)) l calc(c * 0.5) h), oklch(from var(--_helix-accent-400, var(--_helix-ink-400)) l calc(c * 0.5) h))',
   ],
   [
     'color-danger-muted',
@@ -461,7 +511,7 @@ export const TOKENS: Token[] = [
     'color-warning-muted',
     'light-dark(oklch(from var(--_helix-warning-600) l calc(c * 0.5) h), oklch(from var(--_helix-warning-400) l calc(c * 0.5) h))',
   ],
-  /* Fills that carry `foreground-on-accent`. */
+  /* Fills that carry `foreground-on-status`. */
   ['color-danger-surface', 'var(--_helix-danger-600)'],
   ['color-danger-surface-hover', 'var(--_helix-danger-700)'],
   ['color-info-surface', 'var(--_helix-info-600)'],

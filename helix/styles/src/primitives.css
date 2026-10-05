@@ -14,12 +14,25 @@
   /* The intent inputs. **The public names are the ones without the underscore,
      and that is not cosmetic.** The convention here is that a single leading
      underscore means `helix/styles` only, and it is enforced from the outside. */
-  /* The default lightness is the engine's answer, not a hand-picked one.** At
-     0.58 this seed is `#2275e8`, which reads 4.395:1 on white and 4.395:1 under
-     the on-accent ink: under AA on both sides of the one pair the palette uses
-     most. Handed the same color as a brand, `deriveTheme` solves the role down
-     to 0.539 and clears it at 5.229:1 and 4.923:1. */
-  --_helix-seed-brand: var(--helix-seed-brand, oklch(0.539 0.19 258));
+  /* **No brand until you name one, and that is the default.** A palette with
+     no brand is ink, drawn from the neutral ramp, so the brand ramp below is
+     unset until you set `--helix-seed-brand`, and each token takes its ink
+     step as the fallback for its brand step.
+
+     `--_helix-unset` is the guaranteed-invalid value, declared. A custom
+     property that reads it through a `var()` with no fallback of its own is
+     invalid at computed-value time, which for a custom property is that same
+     value, so it carries through every derived rung: with no brand,
+     `--_helix-brand-600` is as unset as the seed. A fallback color here would
+     be a brand you did not choose. `var(--helix-seed-brand)` alone says the
+     same thing as a read of a name nothing declares, which the `tokens` audit
+     refuses. */
+  --_helix-unset: initial;
+  --_helix-seed-brand: var(--helix-seed-brand, var(--_helix-unset));
+  /* The color the chart series rotate from: the brand where there is one, and
+     hue 258 where there is not, which is where they have always started. Only
+     its hue is read, each series stating its own lightness and chroma. */
+  --_helix-series-origin: var(--helix-seed-brand, oklch(0.539 0.19 258));
   /*
    *  The second color, and by default there is not one.
    *
@@ -56,12 +69,13 @@
      tradeoff worth knowing about.** Defaulting to the safe value would make
      every harmony legible and would also make an undefined accent a slightly
      darker brand rather than the brand, which is the one thing this change
-     exists to avoid. Reading the angle to decide between them is the conditional
-     CSS does not have: a `var()` with no fallback is guaranteed-invalid and does
-     propagate, and it was built and measured working, but `check:css:hexes`
-     resolves tokens with its own substituter that throws on an undeclared name
-     rather than modeling that propagation, and the `tokens` audit refuses the
-     dangling read. Both are right about every other case.
+     exists to avoid. Reading the angle to decide between them is a conditional:
+     a `var()` with no fallback is guaranteed-invalid and does propagate, and it
+     was built and measured working. At the time `check:css:hexes` resolved
+     tokens with a substituter that threw on an undeclared name and did not
+     model that propagation, and the `tokens` audit refuses the dangling read.
+     The brand seed above now carries the same propagation through the declared
+     `--_helix-unset`, which both accept, so this can be revisited the same way.
 
      So a consumer choosing a harmony in the cyan band sets this alongside the
      angle. `--helix-seed-accent-lightness: 0.51` is safe at every angle. */
@@ -250,6 +264,39 @@
   --_helix-brand-50: oklch(from var(--_helix-seed-brand) 0.95 calc(c * 0.25) h);
   --_helix-brand-900: oklch(from var(--_helix-seed-brand) 0.28 calc(c * 0.5) h);
 
+  /* **The label on a brand fill: white, written relative to the brand so that
+     it exists only where a brand does.** A brand fill is dark in both modes.
+     With no brand this is unset like the ramp above, and the label falls back
+     to the page's own color, which is what reads on an ink fill. */
+  --_helix-brand-on: oklch(from var(--_helix-seed-brand) 1 0 0);
+
+  /* ------------------------------------------------------- ink --------- */
+  /* **Ink: the emphasis of a palette that names no brand.** The neutral's own
+     near-black on a light page and near-white on a dark one, so a warm gray
+     theme has a warm ink. It sits a step short of the text, which is black or
+     white, so a hovered control has a step further to go, and a link is told
+     from the words around it by its underline.
+
+     **Held at one lightness.** A brand is solved: it moves the least distance
+     that clears 4.5:1, which keeps as much of its color as it can. Ink has no
+     color to keep, and the least distance from white that clears 4.5:1 is a
+     mid gray, which reads as a control switched off. `@fusion.dev/helix-theme`
+     holds its ink at the same two lightnesses, 0.21 and 0.91.
+
+     Numbered for the brand rung each one stands in for, so `primary` reads
+     `--_helix-brand-500` and falls back to `--_helix-ink-500`, with the brand's
+     own offsets. 450 is the one rung the brand has no use for: an ink fill is
+     light in the dark, and its hover darkens from there. */
+  --_helix-ink-500: var(--_helix-neutral-800);
+  --_helix-ink-600: oklch(from var(--_helix-ink-500) calc(l - 0.05) c h);
+  --_helix-ink-700: oklch(from var(--_helix-ink-500) calc(l - 0.1) c h);
+  --_helix-ink-400: var(--_helix-neutral-300);
+  --_helix-ink-450: oklch(from var(--_helix-ink-400) calc(l - 0.05) c h);
+  --_helix-ink-300: oklch(from var(--_helix-ink-400) calc(l + 0.05) c h);
+  --_helix-ink-200: var(--_helix-neutral-0);
+  --_helix-ink-50: oklch(0.95 var(--_helix-neutral-cast));
+  --_helix-ink-900: oklch(0.28 var(--_helix-neutral-cast));
+
   /* ------------------------------------------------------- accent ------ */
   /* The same six steps the brand takes, from the accent seed, so `accent`
      behaves everywhere `primary` does and a component needs no second recipe.
@@ -271,6 +318,8 @@
   --_helix-accent-400: oklch(from var(--_helix-seed-accent) calc(l + 0.13) c h);
   --_helix-accent-50: oklch(from var(--_helix-seed-accent) 0.95 calc(c * 0.25) h);
   --_helix-accent-900: oklch(from var(--_helix-seed-accent) 0.28 calc(c * 0.5) h);
+  /* The label on an accent fill, for the brand's reason. */
+  --_helix-accent-on: oklch(from var(--_helix-seed-accent) 1 0 0);
 
   /* ------------------------------------------------------- status ------ */
   --_helix-info-500: oklch(0.58 0.16 245);

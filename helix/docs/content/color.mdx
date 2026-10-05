@@ -39,14 +39,18 @@ separation](./surfaces-and-separation).
 Inks are the colors that go on grounds. The base ink is `foreground`.
 
 - `foreground-muted` and `foreground-subtle` are for text that recedes.
-- `foreground-on-accent` is for text on a filled accent color.
+- Text on a filled color takes the ink named for that fill:
+  - `foreground-on-primary` on `primary-surface`
+  - `foreground-on-accent` on `accent-surface`
+  - `foreground-on-status` on the four status fills
 
 ### Intent
 
 Intent colors show what something means.
 
 - `primary` and `accent` are for emphasis. Each has `-hover`, `-active`, and
-  `-subtle` variants.
+  `-subtle` variants. With no brand color set, both are ink: near-black in
+  light mode and near-white in dark mode.
 - `info`, `success`, `warning`, and `danger` are for status. Each has a
   `-surface` and a `-surface-hover` variant for the tinted box that holds the
   message.

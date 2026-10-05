@@ -308,10 +308,11 @@ export class HelixAura extends HelixElement {
    * change only when the color mode does. The controller already says when
    * that happens, so this is filled from there and from the first paint.
    */
+  /* The default theme's dark page, ink on black, until the first read. */
   private palette: { glow: TokenColor; ground: TokenColor; haze: TokenColor; peak: TokenColor } = {
-    glow: [0.29, 0.61, 1],
+    glow: [0.88, 0.88, 0.88],
     ground: [0, 0, 0],
-    haze: [0.02, 0.15, 0.34],
+    haze: [0.16, 0.16, 0.16],
     peak: [1, 1, 1],
   }
 
@@ -839,21 +840,21 @@ export class HelixAura extends HelixElement {
   /**
    * Resolves the ramp. Called when the palette moves, not when a frame draws.
    *
-   * Light pages peak on a deep brand blue and dark ones on the foreground, and
-   * the ground is what says which: mixing a saturated hue toward near-black
-   * takes the chroma out of exactly the pixels carrying the most of it. Read
-   * from the ground's own luminance rather than asked of the color mode, which
-   * is a private token this tier may not reach for.
+   * Light pages peak on the pressed `primary-active` and dark ones on the
+   * foreground, and the ground is what says which: mixing a saturated hue
+   * toward near-black takes the chroma out of exactly the pixels carrying the
+   * most of it. Read from the ground's own luminance rather than asked of the
+   * color mode, which is a private token this tier may not reach for.
    */
   private readPalette(): void {
     const ground = this.tokens.read('--helix-color-background', [0, 0, 0])
     const light = ground[0] * 0.2126 + ground[1] * 0.7152 + ground[2] * 0.0722 > 0.5
     this.palette = {
-      glow: this.tokens.read('--helix-color-primary', [0.29, 0.61, 1]),
+      glow: this.tokens.read('--helix-color-primary', [0.88, 0.88, 0.88]),
       ground,
-      haze: this.tokens.read('--helix-color-primary-subtle', [0.02, 0.15, 0.34]),
+      haze: this.tokens.read('--helix-color-primary-subtle', [0.16, 0.16, 0.16]),
       peak: light
-        ? this.tokens.read('--helix-color-primary-active', [0.1, 0.2, 0.55])
+        ? this.tokens.read('--helix-color-primary-active', [0.02, 0.02, 0.02])
         : this.tokens.read('--helix-color-foreground', [1, 1, 1]),
     }
   }

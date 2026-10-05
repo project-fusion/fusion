@@ -8,6 +8,9 @@
   --_badge-text: var(--helix-text-xs);
   --_badge-inset: var(--helix-space-2xs);
   --_badge-dot: var(--helix-space-xs);
+  /* The label on the fill: the primary's by default, and each family's own
+     where a tone below names another fill. */
+  --_badge-on: var(--helix-color-foreground-on-primary);
   display: inline-flex;
   position: relative;
   vertical-align: middle;
@@ -16,7 +19,7 @@
 [part="indicator"] {
   align-items: center;
   /* **`primary-surface`, not `primary`.** The ink here is
-     `foreground-on-accent`, and the grounds that ink is solved against are the
+     `foreground-on-primary`, and the grounds that ink is solved against are the
      fills: `primary` is the color primary *text* is set in, which in a dark
      scheme is a light blue. White on it measured 3.2:1, and only in dark,
      because in light the two happen to land the same way round. */
@@ -28,7 +31,7 @@
      separating ring is a rule like any other and a theme that thickens its
      rules should thicken this with them. */
   box-shadow: 0 0 0 var(--helix-border-thick) var(--badge-ring-color, var(--helix-color-background));
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--_badge-on);
   display: inline-flex;
   font-size: var(--_badge-text);
   font-weight: var(--helix-weight-semibold);
@@ -97,9 +100,9 @@
 /* **The fills, which are `Tag`'s.** A badge and a tag are the same kind of
    thing, a small mark carrying a meaning beside something else, and they had
    different vocabularies for no reason anybody decided. Every one of these is a
-   `*-surface` token, and the token file says what that means: "fills that carry
-   `foreground-on-accent`", so the ink above is already solved for all of them
-   and none of these rules touches it.
+   `*-surface` token, and each family's fill has its own label: the primary's
+   on the base rule, the accent's, and the one the four statuses share, each set
+   as `--_badge-on`.
 
    `neutral` is the exception and says so by setting its own ink: it is a rung on
    the surface ladder rather than a status fill, so the ink is the page's
@@ -117,6 +120,17 @@
    color, which is the honest answer rather than a complement nobody chose. */
 :host([tone="accent"]) [part="indicator"] {
   background-color: var(--badge-background-color, var(--helix-color-accent-surface));
+}
+
+:host([tone="accent"]) {
+  --_badge-on: var(--helix-color-foreground-on-accent);
+}
+
+:host([tone="danger"]),
+:host([tone="info"]),
+:host([tone="success"]),
+:host([tone="warning"]) {
+  --_badge-on: var(--helix-color-foreground-on-status);
 }
 
 :host([tone="info"]) [part="indicator"] {

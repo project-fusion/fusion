@@ -219,13 +219,29 @@ export const declarations = (css) => {
 }
 
 /**
+ * The guaranteed-invalid value: what a property declared `initial` holds, and
+ * what a value holds when it reads one through a `var()` with no fallback.
+ *
+ * **It carries up to the nearest fallback, the way CSS carries it.** The brand
+ * seed is `var(--helix-seed-brand, var(--_helix-unset))`, so with no brand every
+ * rung derived from it holds this, and each token takes the ink step its brand
+ * step falls back to. A sentinel, so no string a stylesheet could hold is
+ * mistaken for it.
+ */
+export const INVALID = Symbol('guaranteed-invalid')
+
+/**
  * Substitutes every `var()` against the declarations, fallbacks included.
  *
  * The public seeds are the point of the fallbacks: `--helix-seed-brand` is not
- * declared anywhere, so `var(--helix-seed-brand, oklch(…))` resolves to the
- * literal, which is what "by default" means for this whole table.
+ * declared anywhere, so a `var()` of it resolves to its fallback, which is what
+ * "by default" means for this whole table. Returns {@link INVALID} where the
+ * value reads the guaranteed-invalid value with no fallback to take.
  */
 export const substitute = (value, declared, seen = new Set()) => {
+  if (value.trim() === 'initial') {
+    return INVALID
+  }
   let text = value
   for (;;) {
     const at = text.indexOf('var(')
@@ -235,16 +251,23 @@ export const substitute = (value, declared, seen = new Set()) => {
     const inner = body(text, at + 3)
     const [name, ...rest] = parts(inner)
     const fallback = rest.join(', ')
-    let replacement
+    let replacement = INVALID
     if (declared.has(name)) {
       if (seen.has(name)) {
         throw new Error(`\`${name}\` resolves through itself`)
       }
       replacement = substitute(declared.get(name), declared, new Set([...seen, name]))
-    } else if (rest.length > 0) {
-      replacement = substitute(fallback, declared, seen)
-    } else {
+    } else if (rest.length === 0) {
       throw new Error(`\`${name}\` is declared nowhere and has no fallback`)
+    }
+    if (replacement === INVALID) {
+      if (rest.length === 0) {
+        return INVALID
+      }
+      replacement = substitute(fallback, declared, seen)
+      if (replacement === INVALID) {
+        return INVALID
+      }
     }
     text = text.slice(0, at) + replacement + text.slice(at + 4 + inner.length + 1)
   }
@@ -426,4 +449,17 @@ export const layers = (primitives, tokens) => {
 
 /** The whole of it: a declared token value to the hex a browser paints. */
 export const paint = (value, declared, scheme) =>
-  toHex(evaluate(substitute(value, declared), scheme))
+  toHex(evaluate(resolveVariables(value, declared), scheme))
+
+/**
+ * A value with every `var()` substituted, refusing one that resolves to nothing.
+ * A token that is the guaranteed-invalid value paints no color at all, which is
+ * a broken token, so it is an error here.
+ */
+export const resolveVariables = (value, declared) => {
+  const text = substitute(value, declared)
+  if (text === INVALID) {
+    throw new Error(`\`${value}\` resolves to the guaranteed-invalid value`)
+  }
+  return text
+}

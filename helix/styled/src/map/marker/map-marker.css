@@ -10,11 +10,11 @@
   /* **What a point holding a letter is filled with, and the letter's ink.**
      Not the tone itself: white on the brand or a status color measured 2.80
      on primary and 3.12 on danger in dark mode, and 4.40 on primary in light,
-     which is why the token layer pairs `foreground-on-accent` with the
-     `-surface` fills and nothing else. A bare dot carries no text and keeps
+     which is why the token layer pairs each `-surface` fill with its role's
+     label, `foreground-on-primary` here. A bare dot carries no text and keeps
      the tone. */
   --_map-marker-fill: var(--map-marker-color, var(--helix-color-primary-surface));
-  --_map-marker-ink: var(--map-marker-ink, var(--helix-color-foreground-on-accent));
+  --_map-marker-ink: var(--map-marker-ink, var(--helix-color-foreground-on-primary));
   /* **The point's measures, which the axes below move together**: its size,
      larger where it holds an icon; how far its center stands above the place,
      which a pin raises so its tip is what stands there; and its edge and its
@@ -240,7 +240,7 @@
       transparent
     ),
     var(--_map-marker-shadow);
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--helix-color-foreground-on-primary);
   font-size: calc(var(--_map-marker-size) * 0.42);
   font-variant-numeric: tabular-nums;
   rotate: none;
@@ -381,14 +381,17 @@
 :host([tone="accent"]) {
   --_map-marker-color: var(--helix-color-accent);
   --_map-marker-fill: var(--helix-color-accent-surface);
+  --_map-marker-ink: var(--map-marker-ink, var(--helix-color-foreground-on-accent));
 }
 :host([tone="danger"]) {
   --_map-marker-color: var(--helix-color-danger);
   --_map-marker-fill: var(--helix-color-danger-surface);
+  --_map-marker-ink: var(--map-marker-ink, var(--helix-color-foreground-on-status));
 }
 :host([tone="info"]) {
   --_map-marker-color: var(--helix-color-info);
   --_map-marker-fill: var(--helix-color-info-surface);
+  --_map-marker-ink: var(--map-marker-ink, var(--helix-color-foreground-on-status));
 }
 /* Muted ink has no fill of its own to carry white, and is muted text's
    contrast against the surface either way round, so the letter is the surface. */
@@ -400,10 +403,12 @@
 :host([tone="success"]) {
   --_map-marker-color: var(--helix-color-success);
   --_map-marker-fill: var(--helix-color-success-surface);
+  --_map-marker-ink: var(--map-marker-ink, var(--helix-color-foreground-on-status));
 }
 :host([tone="warning"]) {
   --_map-marker-color: var(--helix-color-warning);
   --_map-marker-fill: var(--helix-color-warning-surface);
+  --_map-marker-ink: var(--map-marker-ink, var(--helix-color-foreground-on-status));
 }
 
 /* **A place already passed is muted, not faded**, the way the route behind

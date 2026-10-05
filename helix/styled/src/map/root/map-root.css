@@ -219,7 +219,7 @@
 [part="tilt"][aria-pressed="true"] {
   background-color: var(--helix-color-primary-surface);
   border-color: var(--helix-color-primary-surface);
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--helix-color-foreground-on-primary);
 }
 
 [part="tilt"][aria-pressed="true"]:hover {

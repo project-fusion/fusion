@@ -42,7 +42,7 @@
  */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { evaluate, layers, substitute, toHex, toSrgb } from '@fusion.dev/scripts/paint'
+import { evaluate, layers, resolveVariables, toHex, toSrgb } from '@fusion.dev/scripts/paint'
 import { root } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
@@ -74,7 +74,7 @@ const stylesheet = ['primitives', 'tokens']
  * arithmetic. Six of these do straddle one.
  */
 const resolved = (value, scheme) => {
-  const color = evaluate(substitute(value, declared), scheme)
+  const color = evaluate(resolveVariables(value, declared), scheme)
   return { ...toSrgb(color), hex: toHex(color) }
 }
 
