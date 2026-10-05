@@ -5,7 +5,7 @@ import {
   MixinControllerOpen,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessAccordion } from '../root/accordion-root.js'
@@ -30,6 +30,10 @@ const TRIGGER_ID = 'trigger'
  * Holds its own open state. Used alone, outside an accordion, it works as a
  * disclosure.
  *
+ * The trigger sits inside a heading, so a screen reader lists the section with
+ * the page's headings. The level is the item's `heading-level`, then the
+ * accordion's, then 3.
+ *
  * Content stays mounted when the item is closed, so it can animate and its text
  * is present in server-rendered HTML. Closed content has both `hidden` and
  * `inert`. `hidden` collapses it when no stylesheet is loaded. `inert` keeps it
@@ -52,6 +56,7 @@ const TRIGGER_ID = 'trigger'
  * @csspart container - The outer wrapper.
  * @csspart content - The region that holds the content.
  * @csspart content-inner - The clipping box inside the animated region.
+ * @csspart heading - The heading that holds the trigger.
  * @csspart trigger - The button that opens and closes the section, holding the summary.
  *
  * @cssstate open - While the item is open.
@@ -103,6 +108,26 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    */
   @property({ reflect: true })
   name?: string
+
+  /**
+   * The level of the heading around the trigger, from 1 to 6.
+   *
+   * Unset takes the accordion's `heading-level`, and 3 where that is unset
+   * too.
+   */
+  @property({ attribute: 'heading-level', type: Number })
+  headingLevel?: number
+
+  /**
+   * @internal The accordion's `heading-level`, written by the accordion. A
+   * property, because an attribute written onto your element after it upgrades
+   * causes a hydration mismatch.
+   */
+  @property({ attribute: false })
+  groupHeadingLevel: number | undefined = undefined
+
+  /** Whether the item was open at the last update, and `undefined` before one. */
+  private wasOpen: boolean | undefined = undefined
 
   /**
    * The nearest accordion above this item, if there is one.
@@ -165,15 +190,39 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
       return
     }
 
-    if (next && (mode !== undefined || (this.name !== undefined && this.name !== ''))) {
-      for (const peer of this.peers) {
-        if (peer !== this && peer.open) {
-          // A peer whose consumer refuses the request stays open, which can
-          // legitimately leave two open.
-          peer.requestOpen(false)
-        }
+    if (next) {
+      this.closePeers()
+    }
+  }
+
+  /** Closes the other open items in this item's set, where it has one. */
+  private closePeers(): void {
+    if (this.accordion?.mode === undefined && (this.name === undefined || this.name === '')) {
+      return
+    }
+    for (const peer of this.peers) {
+      if (peer !== this && peer.open) {
+        // A peer whose consumer refuses the request stays open, which can
+        // legitimately leave two open.
+        peer.requestOpen(false)
       }
     }
+  }
+
+  /**
+   * Closes the peers of an item opened any other way than its trigger: `open`
+   * set from a script, `requestOpen` or `toggleOpen`. The trigger already
+   * closed them, so for a press this finds nothing open.
+   *
+   * Not on the first update. What the markup opens is the accordion's to
+   * settle, once every item is there to compare.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (this.wasOpen === false && this.open) {
+      this.closePeers()
+    }
+    this.wasOpen = this.open
   }
 
   /**
@@ -218,8 +267,10 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    */
   protected override render(): TemplateResult {
     const open = this.open
+    const level = Math.min(6, Math.max(1, this.headingLevel ?? this.groupHeadingLevel ?? 3))
     return html`
       <div part="container">
+        <div part="heading" role="heading" aria-level=${level}>
         <button
           id=${TRIGGER_ID}
           aria-controls=${CONTENT_ID}
@@ -232,6 +283,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
           <slot name="summary"></slot>
           ${this.chevronPlacement === 'start' ? nothing : this.renderChevron()}
         </button>
+        </div>
         <div
           id=${CONTENT_ID}
           aria-labelledby=${TRIGGER_ID}

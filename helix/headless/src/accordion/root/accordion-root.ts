@@ -3,8 +3,9 @@ import {
   HelixElement,
   KeyboardNavigationController,
   type NavigableItem,
+  whenHydrated,
 } from '@fusion.dev/helix-core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessAccordionItem } from '../item/accordion-item.js'
 
@@ -50,6 +51,10 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
  * The keyboard listener belongs to the controller and is attached on connect,
  * so it does not run on the server.
  *
+ * Each trigger sits inside a heading, level 3 unless `heading-level` says
+ * otherwise, so the sections are in a screen reader's list of headings. Set the
+ * level that fits the page's outline.
+ *
  * @since 0.1.0
  * @status stable
  * @category layout
@@ -67,11 +72,24 @@ export class HelixHeadlessAccordion extends HelixElement {
    * no attribute on the host. `single` keeps exactly one open and refuses to
    * close the last; `single-collapsible` keeps at most one and lets it close.
    *
+   * Held however a section opens: a press, `open` set from a script,
+   * `toggleOpen()`, or `default-open` in the markup. Opening one closes the
+   * others, and on first render only the first section written open stays
+   * open. Under `single` the first section opens when none is written open.
+   *
    * A union rather than a mode plus a `collapsible` boolean, which would make
    * `collapsible` alongside `multiple` expressible and meaningless.
    */
   @property({ reflect: true })
   mode?: 'single' | 'single-collapsible'
+
+  /**
+   * The level of the heading around each trigger, from 1 to 6.
+   *
+   * Unset is 3. An item's own `heading-level` wins over this.
+   */
+  @property({ attribute: 'heading-level', type: Number })
+  headingLevel?: number
 
   /** The accordion's own items, in the order they are written. Browser only. */
   get items(): HelixHeadlessAccordionItem[] {
@@ -91,8 +109,48 @@ export class HelixHeadlessAccordion extends HelixElement {
     selects: () => false,
   })
 
+  /**
+   * Holds the mode over the sections as written, and passes the heading level
+   * down. A section opened later closes its peers itself.
+   */
+  private settle(): void {
+    const items = this.items
+    for (const item of items) {
+      whenHydrated(item, () => {
+        item.groupHeadingLevel = this.headingLevel
+      })
+    }
+    if (this.mode === undefined) {
+      return
+    }
+    const open = items.filter((item) => item.open)
+    for (const extra of open.slice(1)) {
+      whenHydrated(extra, () => {
+        extra.open = false
+      })
+    }
+    const first = items[0]
+    if (this.mode === 'single' && open.length === 0 && first) {
+      whenHydrated(first, () => {
+        first.open = true
+      })
+    }
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.settle()
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (this.hasUpdated && (changed.has('mode') || changed.has('headingLevel'))) {
+      this.settle()
+    }
+  }
+
   protected override render(): TemplateResult {
-    return html`<slot></slot>`
+    return html`<slot @slotchange=${() => this.settle()}></slot>`
   }
 }
 

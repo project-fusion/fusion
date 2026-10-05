@@ -196,3 +196,78 @@ describe('accordion keyboard navigation', () => {
     expect([moved, event.defaultPrevented]).toEqual([false, false])
   })
 })
+
+describe('a single accordion however its sections open', () => {
+  type Updating = Item & { toggleOpen(): boolean; updateComplete: Promise<unknown> }
+
+  const settled = async (host: HTMLElement): Promise<Updating[]> => {
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    const found = items(host) as Updating[]
+    for (const item of found) {
+      await item.updateComplete
+    }
+    for (const item of found) {
+      await item.updateComplete
+    }
+    return found
+  }
+
+  const state = (found: Item[]): boolean[] => found.map((item) => item.open)
+
+  test('keeps the first section written open, and only that one', async () => {
+    const host = await mount(`
+      <helix-headless-accordion mode="single">
+        <helix-headless-accordion-item><span slot="summary">One</span>1</helix-headless-accordion-item>
+        <helix-headless-accordion-item default-open><span slot="summary">Two</span>2</helix-headless-accordion-item>
+        <helix-headless-accordion-item default-open><span slot="summary">Three</span>3</helix-headless-accordion-item>
+      </helix-headless-accordion>`)
+    expect(state(await settled(host))).toEqual([false, true, false])
+  })
+
+  test('opens the first section where none is written open', async () => {
+    const host = await mount(
+      three.replace('<helix-headless-accordion>', '<helix-headless-accordion mode="single">'),
+    )
+    expect(state(await settled(host))).toEqual([true, false, false])
+  })
+
+  test('closes the others when a script opens one', async () => {
+    const host = await mount(
+      three.replace('<helix-headless-accordion>', '<helix-headless-accordion mode="single">'),
+    )
+    const found = await settled(host)
+    at(found, 2).open = true
+    await settled(host)
+    expect(state(found)).toEqual([false, false, true])
+    at(found, 1).toggleOpen()
+    await settled(host)
+    expect(state(found)).toEqual([false, true, false])
+  })
+})
+
+describe('the heading around each trigger', () => {
+  const heading = (item: Item): Element | null | undefined =>
+    item.shadowRoot?.querySelector('[part="heading"]')
+
+  test('holds the trigger at level 3 unless the accordion or the item says otherwise', async () => {
+    const host = await mount(`
+      <helix-headless-accordion heading-level="2">
+        <helix-headless-accordion-item><span slot="summary">One</span>1</helix-headless-accordion-item>
+        <helix-headless-accordion-item heading-level="4"><span slot="summary">Two</span>2</helix-headless-accordion-item>
+      </helix-headless-accordion>`)
+    const found = items(host)
+    for (const item of found) {
+      await (item as Item & { updateComplete: Promise<unknown> }).updateComplete
+    }
+    const [one, two] = found as [Item, Item]
+    expect(heading(one)?.getAttribute('role')).toBe('heading')
+    expect(heading(one)?.querySelector('[part="trigger"]')).not.toBeNull()
+    expect(heading(one)?.getAttribute('aria-level')).toBe('2')
+    expect(heading(two)?.getAttribute('aria-level')).toBe('4')
+
+    const alone = (await mount(
+      '<helix-headless-accordion-item><span slot="summary">Alone</span>A</helix-headless-accordion-item>',
+    )) as Item
+    expect(heading(alone)?.getAttribute('aria-level')).toBe('3')
+  })
+})
