@@ -23,10 +23,21 @@ import { styles } from './megamenu-root.css.js'
  *   `--helix-border-floating`, which is `0` unless a theme changes it, so the panel stands out
  *   by its shadow.
  * @cssproperty --megamenu-column-size - The minimum width of a column before the grid wraps.
+ * @cssproperty --megamenu-duration - How long the panel takes to open and close.
  * @cssproperty --megamenu-full-size - The maximum width of the band's contents, which are centered in it.
+ * @cssproperty --megamenu-gap - The space between the panel's columns.
+ * @cssproperty --megamenu-padding - The space inside the card's edge.
  * @cssproperty --megamenu-shadow - The shadow under the panel. Follows `--helix-shadow-floating`,
  *   so the panel has a shadow by default, because it sits over content you cannot predict.
  * @cssproperty --megamenu-size - The maximum width of the panel.
+ * @cssproperty --megamenu-trigger-color - The trigger's text color at rest.
+ * @cssproperty --megamenu-trigger-font-size - The size of the trigger's text.
+ * @cssproperty --megamenu-trigger-font-weight - The weight of the trigger's text.
+ * @cssproperty --megamenu-trigger-hover-color - The trigger's text color under the pointer.
+ * @cssproperty --megamenu-trigger-open-background-color - The trigger's fill while its panel is open.
+ * @cssproperty --megamenu-trigger-open-color - The trigger's text color while its panel is open.
+ * @cssproperty --megamenu-trigger-padding-inline - The space either side of the trigger's text.
+ * @cssproperty --megamenu-trigger-radius - The trigger's corners.
  */
 @customElement('helix-megamenu')
 export class HelixMegamenu extends HelixHeadlessMegamenu {

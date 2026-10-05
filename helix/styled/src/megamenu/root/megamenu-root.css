@@ -11,23 +11,23 @@
   box-sizing: border-box;
 
   align-items: center;
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
+  border-radius: var(--megamenu-trigger-radius, var(--helix-radii-sm));
+  color: var(--megamenu-trigger-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   display: inline-flex;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
+  font-size: var(--megamenu-trigger-font-size, var(--helix-text-sm));
+  font-weight: var(--megamenu-trigger-font-weight, var(--helix-weight-medium));
   gap: var(--helix-space-2xs);
   min-block-size: var(--helix-size-control-tight);
-  padding-inline: var(--helix-space-xs);
+  padding-inline: var(--megamenu-trigger-padding-inline, var(--helix-space-xs));
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 [part="trigger"]:hover {
-  color: var(--helix-color-foreground);
+  color: var(--megamenu-trigger-hover-color, var(--helix-color-foreground));
 }
 
 [part="trigger"]:focus-visible {
@@ -37,8 +37,11 @@
 
 /* Open reads like the current destination. */
 [part="trigger"][aria-expanded="true"] {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
-  color: var(--helix-color-foreground);
+  background-color: var(
+    --megamenu-trigger-open-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
+  color: var(--megamenu-trigger-open-color, var(--helix-color-foreground));
 }
 
 /* Top layer, because a header carries `overflow` or a `transform`. The panel is
@@ -75,7 +78,7 @@
      column, a wrapping container's max-content width being one item's: 219
      pixels against the 653 the tracks give. */
   display: grid;
-  gap: var(--helix-space-xl);
+  gap: var(--megamenu-gap, var(--helix-space-xl));
   grid-auto-columns: minmax(var(--megamenu-column-size, 15rem), 1fr);
   grid-auto-flow: column;
   /* Nothing gives a fixed top-layer panel a width, so `1fr` resolves against
@@ -84,13 +87,13 @@
   margin: var(--helix-space-none);
   /* `100%`, not `100vw`: the difference is the scrollbar's gutter. */
   max-inline-size: min(var(--megamenu-size, 52rem), calc(100% - var(--helix-space-xl) * 2));
-  padding: var(--helix-space-md);
+  padding: var(--megamenu-padding, var(--helix-space-md));
   /* `display` and `overlay` ride along with `allow-discrete`, or the panel
      vanishes on the frame it is told to close and there is no exit at all. */
   transition:
-    clip-path var(--helix-duration-slow) var(--helix-easing-decelerate),
-    display var(--helix-duration-slow) allow-discrete,
-    overlay var(--helix-duration-slow) allow-discrete;
+    clip-path var(--megamenu-duration, var(--helix-duration-slow)) var(--helix-easing-decelerate),
+    display var(--megamenu-duration, var(--helix-duration-slow)) allow-discrete,
+    overlay var(--megamenu-duration, var(--helix-duration-slow)) allow-discrete;
 }
 
 /* A transition does not run on an element arriving from `display: none` unless

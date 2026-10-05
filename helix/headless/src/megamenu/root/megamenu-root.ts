@@ -71,9 +71,19 @@ const release = (): void => {
  * closes on its own carries none of the four. A press on another megamenu's
  * trigger hands over the same way as hovering it.
  *
+ * While a panel is open its surface carries its own size, as
+ * `--megamenu-surface-inline-size` and `--megamenu-surface-block-size`, and a
+ * panel that took over from another also carries that one's size, as
+ * `--megamenu-from-inline-size` and `--megamenu-from-block-size`. Radix's
+ * navigation menu publishes the same pair from its shared viewport, so a
+ * stylesheet can grow or shrink one panel into the next.
+ *
  * Put megamenus in a `Navigation` with `arrows` and the arrow keys move
  * between their triggers. Down Arrow on the trigger of an open panel moves
- * focus to the panel's first link.
+ * focus to the panel's first link, Escape closes the panel and returns focus
+ * to its trigger, and Tab moves through the panel's links and closes it on the
+ * way out. The trigger says `aria-expanded`, and the panel is a group named by
+ * `label`.
  *
  * @since 0.1.0
  * @status stable
@@ -91,6 +101,10 @@ const release = (): void => {
  * @csspart surface - The floating panel that opens.
  * @csspart trigger - The default trigger button, shown when the `trigger` slot is empty.
  *
+ * @cssproperty --megamenu-from-block-size - The height of the panel this one took over from, written on the surface while it is open.
+ * @cssproperty --megamenu-from-inline-size - The width of the panel this one took over from, written on the surface while it is open.
+ * @cssproperty --megamenu-surface-block-size - The panel's own height, written on the surface while it is open.
+ * @cssproperty --megamenu-surface-inline-size - The panel's own width, written on the surface while it is open.
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  *
  * @cssstate from-end - The panel opened in place of one earlier in the bar, so it can enter from the end side.
@@ -577,6 +591,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
         previous !== undefined &&
         (previous.compareDocumentPosition(this) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
       this.motion(previous ? (forward ? 'from-end' : 'from-start') : undefined)
+      this.from = previous?.size
       HelixHeadlessMegamenu.settle(this, previous)
       if (previous) {
         previous.motion(forward ? 'to-start' : 'to-end')
@@ -613,6 +628,35 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
 
   /** Whether the panel is closing because another one opened in its place. */
   private handedOver = false
+
+  /** The panel's size the last time it was open, in pixels. */
+  private size: { block: number; inline: number } | undefined
+
+  /** The size of the panel this one took over from, if it took over. */
+  private from: { block: number; inline: number } | undefined
+
+  /**
+   * Writes the panel's size onto its surface, and the size of the panel it
+   * took over from, for a stylesheet that grows one into the next.
+   */
+  private measure(): void {
+    const surface = this.partNamed('surface')
+    if (!surface) {
+      return
+    }
+    /* Measured with no size to grow from, so a sheet animating from the last
+       one has not already moved the box being measured. */
+    surface.style.removeProperty('--megamenu-from-inline-size')
+    surface.style.removeProperty('--megamenu-from-block-size')
+    const box = surface.getBoundingClientRect()
+    this.size = { block: Math.round(box.height), inline: Math.round(box.width) }
+    surface.style.setProperty('--megamenu-surface-inline-size', `${this.size.inline}px`)
+    surface.style.setProperty('--megamenu-surface-block-size', `${this.size.block}px`)
+    if (this.from) {
+      surface.style.setProperty('--megamenu-from-inline-size', `${this.from.inline}px`)
+      surface.style.setProperty('--megamenu-from-block-size', `${this.from.block}px`)
+    }
+  }
 
   /**
    * Says which way the reader moved when one panel took over from another.
@@ -675,6 +719,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.tellTrigger()
     if (this.open) {
       this.band()
+      this.measure()
     }
   }
 

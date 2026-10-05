@@ -25,6 +25,19 @@ describe('nav bar', () => {
     expect(part(nav, 'indicator')?.getAttribute('aria-hidden')).toBe('true')
   })
 
+  /* A marker of your own rides the indicator's geometry, and it is no
+     destination: the arrow keys and the marker read only the default slot. */
+  test('takes a marker of your own inside the indicator, and does not count it as a destination', async () => {
+    const nav = await mount(
+      bar.replace('<a aria-current', '<span slot="indicator" id="mine"></span><a aria-current'),
+    )
+    const slot = nav.shadowRoot?.querySelector('slot[name="indicator"]') as HTMLSlotElement
+    expect(slot.parentElement).toBe(part(nav, 'indicator') as HTMLElement)
+    expect(slot.assignedElements()[0]?.id).toBe('mine')
+    const items = (nav as unknown as { items: HTMLElement[] }).items
+    expect(items.map((item) => item.textContent)).toEqual(['Design', 'Mind'])
+  })
+
   test("the current item is the consumer's `aria-current`, not a copy of it", async () => {
     // Marking it twice would let the two drift, and `aria-current` is what
     // navigation actually uses.

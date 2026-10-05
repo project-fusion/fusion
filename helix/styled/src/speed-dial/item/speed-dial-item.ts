@@ -19,9 +19,12 @@ import { styles } from './speed-dial-item.css.js'
  *
  * @cssproperty --speed-dial-item-background-color - Fill of the round icon.
  * @cssproperty --speed-dial-item-color - Color of the icon.
+ * @cssproperty --speed-dial-item-disabled-opacity - How faint a disabled action is drawn.
+ * @cssproperty --speed-dial-item-hover-background-color - Fill of the round icon under the pointer.
  * @cssproperty --speed-dial-item-size - Edge length of the icon.
  * @cssproperty --speed-dial-label-background-color - Fill of the chip holding the action's name.
  * @cssproperty --speed-dial-label-color - Color of the action's name.
+ * @cssproperty --speed-dial-label-font-size - Size of the action's name.
  */
 @customElement('helix-speed-dial-item')
 export class HelixSpeedDialItem extends HelixHeadlessSpeedDialItem {

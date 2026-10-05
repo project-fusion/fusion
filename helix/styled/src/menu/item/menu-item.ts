@@ -21,6 +21,7 @@ import { styles } from './menu-item.css.js'
  * @aliases Menu option, Menu row
  * @documentation https://fusion.dev/helix/components/menu
  *
+ * @cssproperty --menu-item-description-color - Color of the line under the label.
  * @cssproperty --menu-item-detail-color - Color of the shortcut and the words in the `end` slot.
  * @cssproperty --menu-item-end - Width of the trailing column, including the gap before it, which holds a check mark or a submenu caret.
  * @cssproperty --menu-item-hover-color - Fill under the pointer.

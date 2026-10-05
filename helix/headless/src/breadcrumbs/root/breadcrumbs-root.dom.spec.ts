@@ -140,3 +140,44 @@ describe('a trail written as data', () => {
     expect(drawn[0]?.shadowRoot?.querySelector('a[part="link"]')?.getAttribute('href')).toBe('/')
   })
 })
+
+describe('a long trail written as data', () => {
+  type Trail = HTMLElement & { items: unknown; updateComplete: Promise<unknown> }
+  const words = (crumbs: HTMLElement): string[] =>
+    [...(crumbs.shadowRoot?.querySelectorAll('helix-headless-breadcrumb') ?? [])].map(
+      (crumb) => crumb.textContent?.trim() ?? '',
+    )
+
+  /* A trail longer than it has room for folds its middle into one crumb, the
+     first crumb and the current page always showing. */
+  test('folds its middle under max-items, and the button shows the whole of it', async () => {
+    const crumbs = (await mount(
+      '<helix-headless-breadcrumbs max-items="3"></helix-headless-breadcrumbs>',
+    )) as Trail
+    crumbs.items = ['Home', 'Docs', 'Guides', 'Forms', 'Validation'].map((label) => ({
+      href: `#${label}`,
+      label,
+    }))
+    await crumbs.updateComplete
+    expect(words(crumbs)).toEqual(['Home', '…', 'Forms', 'Validation'])
+    const button = part(crumbs, 'expand') as HTMLButtonElement
+    expect(button.getAttribute('aria-label')).toBe('Show 2 more')
+    button.click()
+    await crumbs.updateComplete
+    expect(words(crumbs)).toEqual(['Home', 'Docs', 'Guides', 'Forms', 'Validation'])
+    /* A new trail folds again. */
+    crumbs.items = ['A', 'B', 'C', 'D'].map((label) => ({ href: `#${label}`, label }))
+    await crumbs.updateComplete
+    expect(words(crumbs)).toEqual(['A', '…', 'C', 'D'])
+  })
+
+  test('and a trail no longer than max-items does not fold', async () => {
+    const crumbs = (await mount(
+      '<helix-headless-breadcrumbs max-items="3"></helix-headless-breadcrumbs>',
+    )) as Trail
+    crumbs.items = ['A', 'B', 'C'].map((label) => ({ href: `#${label}`, label }))
+    await crumbs.updateComplete
+    expect(words(crumbs)).toEqual(['A', 'B', 'C'])
+    expect(part(crumbs, 'expand')).toBeNull()
+  })
+})

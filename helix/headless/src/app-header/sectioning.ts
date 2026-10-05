@@ -20,20 +20,26 @@ const SECTIONING = [
 
 /**
  * Whether an element sits inside sectioning content, read across shadow
- * boundaries as the accessibility tree reads it.
+ * boundaries as the accessibility tree reads it: through the slot an element
+ * is assigned to, so a header slotted into a component that draws a `<nav>`
+ * around its slot, as `Navigation` does, is inside that `<nav>`.
  *
  * Client only: a server has no ancestors to read.
  */
 export const inSectioningContent = (element: Element): boolean => {
-  let node: Element | null = element.parentElement ?? hostOf(element)
+  let node: Element | null = above(element)
   while (node) {
     if (node.matches(SECTIONING)) {
       return true
     }
-    node = node.parentElement ?? hostOf(node)
+    node = above(node)
   }
   return false
 }
+
+/** The element above this one in the flat tree, which is the one a reader is in. */
+const above = (element: Element): Element | null =>
+  element.assignedSlot ?? element.parentElement ?? hostOf(element)
 
 /** The host of the shadow root an element sits in, or nothing. */
 const hostOf = (element: Element): Element | null => {

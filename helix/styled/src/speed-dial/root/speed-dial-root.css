@@ -169,15 +169,15 @@
      `primary` is 2.96:1 in dark against 4.50:1 over `primary-surface`.
      `primary-surface` exists for exactly this and its own comment says so, and
      its label is `foreground-on-primary`. */
-  background-color: var(--helix-color-primary-surface);
-  block-size: var(--helix-size-control);
+  background-color: var(--speed-dial-background-color, var(--helix-color-primary-surface));
+  block-size: var(--speed-dial-size, var(--helix-size-control));
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-md);
+  box-shadow: var(--speed-dial-shadow, var(--helix-shadow-md));
   box-sizing: border-box;
-  color: var(--helix-color-foreground-on-primary);
+  color: var(--speed-dial-color, var(--helix-color-foreground-on-primary));
   cursor: pointer;
   display: inline-flex;
-  inline-size: var(--helix-size-control);
+  inline-size: var(--speed-dial-size, var(--helix-size-control));
   justify-content: center;
   transition: box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -209,7 +209,16 @@
 
 /* **Names on demand.** Under `labels="hover"` each action's name is drawn only
    while its action is under the pointer or has focus, as a tooltip is. It stays
-   in the accessibility tree either way, being only transparent. */
+   in the accessibility tree either way, being only transparent, and a hidden
+   name takes no pointer, so the page under it stays the page's. */
 :host([labels="hover"]) {
   --_speed-dial-label-opacity: 0;
+}
+
+/* Only the round marks take the pointer then, each action's `icon` part asking
+   for it back, so a press beside a mark, on a name nobody can see, reaches the
+   page under it. */
+:host([labels="hover"]) [part="actions"],
+:host([labels="hover"]) [part="actions"] ::slotted(*) {
+  pointer-events: none;
 }

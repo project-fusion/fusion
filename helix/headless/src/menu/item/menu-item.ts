@@ -45,13 +45,25 @@ import '../../kbd/index.js'
  * nothing: the shortcut is the page's to bind. Other trailing words, such as a
  * count, go in the `end` slot.
  *
+ * The row is named by its label alone. Words in `description`, a line under the
+ * label, and in `end` describe it instead, through `aria-describedby`, as
+ * React Aria's menu item does with its description: a reader hears "Copy",
+ * then "Copies the selection".
+ *
+ * The check mark and the caret are the fallbacks of the `check` and `chevron`
+ * slots, so a mark of your own replaces either by being slotted. Neither is
+ * read as part of the row's name.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Menu option, Menu row
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The label.
- * @slot end - Words after the label, such as a count or a detail, beside any `shortcut`.
+ * @slot check - Replaces the check mark of a checked row, such as with your own icon.
+ * @slot chevron - Replaces the caret of a row that opens a submenu.
+ * @slot description - A line under the label that describes the row. It describes the row to a screen reader and is not part of its name.
+ * @slot end - Words after the label, such as a count or a detail, beside any `shortcut`. They describe the row and are not part of its name.
  * @slot start - Content before the label, such as an icon.
  * @slot submenu - The rows of a submenu that this row opens.
  *
@@ -64,6 +76,8 @@ import '../../kbd/index.js'
  * when it opens a submenu. A row never shows both, so they share one column.
  * @csspart shortcut - The key drawn for `shortcut`.
  * @csspart shortcut-kbd - The key inside it.
+ * @csspart shortcut-key - One key of the shortcut's chord, such as `Ctrl`.
+ * @csspart shortcut-separator - The `+` between two keys of the shortcut, where the platform writes one.
  * @csspart start - The leading column that holds the `start` slot. It is always rendered.
  *
  * @cssstate checked - The row is checked.
@@ -252,6 +266,10 @@ export class HelixHeadlessMenuItem extends HelixElement {
   @state()
   private end = false
 
+  /** Whether anything is slotted under the label, read the way `start` is. */
+  @state()
+  private description = false
+
   /**
    * Both answers, from the children, before each render.
    *
@@ -271,6 +289,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
     this.submenu = named('submenu')
     this.start = named('start')
     this.end = named('end')
+    this.description = named('description')
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -297,13 +316,44 @@ export class HelixHeadlessMenuItem extends HelixElement {
     this.end = (slot?.assignedNodes().length ?? 0) > 0
   }
 
+  /** Re-reads whether anything is under the label, as `readStart` does before it. */
+  private readonly readDescription = (): void => {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="description"]')
+    this.description = (slot?.assignedNodes().length ?? 0) > 0
+  }
+
+  /**
+   * The line under the label. The slot is hidden from the row's name and named
+   * by the row's `aria-describedby`, which reads it all the same: a description
+   * is read from what it points at, hidden or not. No box of its own, so a row
+   * with no description lays out as it did; `data-empty` says which it is.
+   */
+  protected renderDescription(): TemplateResult {
+    return html`<slot
+      id="description"
+      name="description"
+      aria-hidden="true"
+      ?data-empty=${!this.description}
+      @slotchange=${this.readDescription}
+    ></slot>`
+  }
+
+  /** What describes the row: the line under its label and the words after it. */
+  private get describedBy(): string | typeof nothing {
+    const ids = [this.description ? 'description' : '', this.end ? 'end-words' : '']
+      .filter((id) => id !== '')
+      .join(' ')
+    return ids === '' ? nothing : ids
+  }
+
   /**
    * The trailing column: the shortcut's key, then whatever is slotted in `end`.
    * Drawn by `Kbd`, interpolated so each tier draws its own.
    *
    * The key is hidden from the accessibility tree, since the row's
    * `aria-keyshortcuts` says it in words a screen reader reads as keys: inside
-   * the row its glyphs became part of the row's name.
+   * the row its glyphs became part of the row's name. The `end` words are
+   * hidden from the name too, and describe the row instead.
    */
   protected renderEnd(): TemplateResult {
     const kbd = this.tag('kbd')
@@ -313,11 +363,11 @@ export class HelixHeadlessMenuItem extends HelixElement {
           ? nothing
           : staticHtml`<${kbd}
               part="shortcut"
-              exportparts="kbd: shortcut-kbd"
+              exportparts="kbd: shortcut-kbd, key: shortcut-key, separator: shortcut-separator"
               aria-hidden="true"
               keys=${this.shortcut}
             ></${kbd}>`
-      }<slot name="end" @slotchange=${this.readEnd}></slot
+      }<slot id="end-words" name="end" aria-hidden="true" @slotchange=${this.readEnd}></slot
     ></span>`
   }
 
@@ -490,6 +540,44 @@ export class HelixHeadlessMenuItem extends HelixElement {
     this.handleClick()
   }
 
+  /**
+   * The trailing mark: the caret of a row that opens a page, or the tick of a
+   * checked one, each the fallback of a slot a mark of your own replaces.
+   *
+   * One trailing column, and a row is never both: a way into a page has nothing
+   * to tick, and a choice opens nothing. The tick sits after the label rather
+   * than before it, so the labels start at the edge of the row and the marks
+   * line up down the side they are read from.
+   *
+   * `data-mirror` is what tells the two apart. They share a part name because
+   * they share a column, and only one of them is directional: a caret has to
+   * mirror in a right-to-left document and a tick must not, which Unicode's own
+   * mirroring list agrees on. The attribute is on an element in this shadow
+   * root rather than on the host, so it is the divider's `data-empty` and not a
+   * hydration hazard.
+   *
+   * Nothing to mark, so nothing is drawn. The column this would have sat in is
+   * reserved by the menu when some row on the page needs one, so the labels
+   * still line up without every row carrying an empty box to line them up with.
+   */
+  protected renderMark(submenu: boolean): TemplateResult | typeof nothing {
+    if (submenu) {
+      return html`<slot name="chevron" aria-hidden="true"
+        ><svg part="mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+          ${unsafeSVG(caretRight.content)}
+        </svg></slot
+      >`
+    }
+    if (this.checked) {
+      return html`<slot name="check" aria-hidden="true"
+        ><svg part="mark" fill="currentColor" viewBox=${check.viewBox} aria-hidden="true">
+          ${unsafeSVG(check.content)}
+        </svg></slot
+      >`
+    }
+    return nothing
+  }
+
   protected override render(): TemplateResult | typeof nothing {
     // The page this row opened is showing, so what it contributes is the slot
     // its rows are assigned to and nothing else. Its own row belongs to the
@@ -534,44 +622,9 @@ export class HelixHeadlessMenuItem extends HelixElement {
           ><slot name="start" @slotchange=${this.readStart}></slot
         ></span>
         <slot></slot>
+        ${this.renderDescription()}
         ${this.renderEnd()}
-        ${
-          // One trailing column, and a row is never both: a way into a page has
-          // nothing to tick, and a choice opens nothing. The tick sits after the
-          // label rather than before it, so the labels start at the edge of the
-          // row and the marks line up down the side they are read from.
-          //
-          // `data-mirror` is what tells the two apart. They share a part name
-          // because they share a column, and only one of them is directional: a
-          // caret has to mirror in a right-to-left document and a tick must not,
-          // which Unicode's own mirroring list agrees on. The attribute is on an
-          // element in this shadow root rather than on the host, so it is the
-          // divider's `data-empty` and not a hydration hazard.
-          submenu
-            ? html`<svg
-                part="mark"
-                data-mirror
-                fill="currentColor"
-                viewBox=${caretRight.viewBox}
-                aria-hidden="true"
-              >
-                ${unsafeSVG(caretRight.content)}
-              </svg>`
-            : this.checked
-              ? html`<svg
-                  part="mark"
-                  fill="currentColor"
-                  viewBox=${check.viewBox}
-                  aria-hidden="true"
-                >
-                  ${unsafeSVG(check.content)}
-                </svg>`
-              : /* Nothing to mark, so nothing is drawn. The column this would
-                   have sat in is reserved by the menu when some row on the page
-                   needs one, so the labels still line up without every row
-                   carrying an empty box to line them up with. */
-                nothing
-        }`
+        ${this.renderMark(submenu)}`
     return html`${
       linked
         ? html`<a
@@ -582,6 +635,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
             ?download=${this.download}
             role=${role}
             aria-checked=${checkedState}
+            aria-describedby=${this.describedBy}
             aria-haspopup=${submenu ? 'menu' : nothing}
             aria-keyshortcuts=${keys}
             tabindex="-1"
@@ -592,6 +646,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
             part="item"
             role=${role}
             aria-checked=${checkedState}
+            aria-describedby=${this.describedBy}
             aria-disabled=${this.disabled ? 'true' : nothing}
             aria-haspopup=${submenu ? 'menu' : nothing}
             aria-keyshortcuts=${keys}

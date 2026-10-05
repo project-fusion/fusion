@@ -33,4 +33,19 @@ describe('inSectioningContent', () => {
     root.innerHTML = '<span id="inside"></span>'
     expect(inSectioningContent(root.getElementById('inside') as Element)).toBe(true)
   })
+
+  /* A header slotted into a component that draws a `<nav>` around its slot is
+     inside that `<nav>`, as the accessibility tree reads it. Walking the light
+     DOM went from the header to the component's host and past the `<nav>`. */
+  test('reads through the slot an element is assigned to', () => {
+    document.body.innerHTML = '<div id="host"><span id="here"></span></div>'
+    const host = document.getElementById('host') as HTMLElement
+    const root = host.attachShadow({ mode: 'open' })
+    root.innerHTML = '<nav><slot></slot></nav>'
+    const here = document.getElementById('here') as Element
+    /* happy-dom assigns no slots, so `assignedSlot` is supplied here: the half
+       under test is the walk through it. */
+    Object.defineProperty(here, 'assignedSlot', { value: root.querySelector('slot') })
+    expect(inSectioningContent(here)).toBe(true)
+  })
 })

@@ -117,6 +117,22 @@
   min-inline-size: 0;
 }
 
+/* A line under the label, in the label's column. Only where there is one, so
+   a row without it keeps a single row. */
+slot[name="description"] {
+  color: var(--menu-item-description-color, var(--helix-color-foreground-subtle));
+  display: block;
+  font-weight: var(--helix-weight-regular);
+  grid-column: 2;
+  grid-row: 2;
+  min-inline-size: 0;
+  padding-block-end: var(--helix-space-2xs);
+}
+
+slot[name="description"][data-empty] {
+  display: none;
+}
+
 /* A shortcut and the words in `end` sit in a track of their own before the
    mark, which is no width on a row with neither. */
 [part="end"] {
@@ -132,8 +148,11 @@
   display: none;
 }
 
-[part="mark"] {
+[part="mark"],
+slot[name="check"]::slotted(*),
+slot[name="chevron"]::slotted(*) {
   grid-column: 4;
+  grid-row: 1;
 }
 
 /* Nothing before the label, so no box before the label. The slot inside it stays
@@ -156,7 +175,9 @@
 
    `justify-self: end` puts it against the trailing edge of that track, leaving
    the seam on the side the label is on. */
-[part="mark"] {
+[part="mark"],
+slot[name="check"]::slotted(*),
+slot[name="chevron"]::slotted(*) {
   block-size: var(--helix-size-icon);
   inline-size: var(--helix-size-icon);
   justify-self: end;
@@ -164,11 +185,13 @@
 
 /* The mark is monotone, and checked is a step in strength rather than a change
    of hue. */
-svg[part="mark"] {
+svg[part="mark"],
+slot[name="chevron"]::slotted(*) {
   color: var(--helix-color-foreground-subtle);
 }
 
-:host(:state(checked)) svg[part="mark"] {
+:host(:state(checked)) svg[part="mark"],
+slot[name="check"]::slotted(*) {
   color: var(--helix-color-foreground);
 }
 
