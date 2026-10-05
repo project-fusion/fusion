@@ -252,3 +252,115 @@ describe('the page behind an open viewer', () => {
     expect([held, root.style.overflow]).toEqual(['hidden', ''])
   })
 })
+
+describe('the built-in controls', () => {
+  test('are not drawn unless asked for, so a composed chrome is the only one', async () => {
+    const host = await lightbox()
+    for (const name of ['previous', 'next', 'dismiss']) {
+      expect(part(host, name)).toBeNull()
+    }
+  })
+
+  test('are three buttons named in the consumer’s words', async () => {
+    const host = await lightbox(
+      'controls previous-label="Zurück" next-label="Weiter" dismiss-label="Schließen"',
+    )
+    const names = ['previous', 'next', 'dismiss'].map((name) => {
+      const control = part(host, name) as HTMLButtonElement
+      return `${control.localName} ${control.getAttribute('aria-label')}`
+    })
+    expect(names).toEqual(['button Zurück', 'button Weiter', 'button Schließen'])
+  })
+
+  test('walk the set and close it, and say when there is nothing further', async () => {
+    const host = await lightbox('controls default-open')
+    expect(part(host, 'previous')?.getAttribute('aria-disabled')).toBe('true')
+    ;(part(host, 'next') as HTMLButtonElement).click()
+    await host.updateComplete
+    expect(shown(host)).toBe('two')
+    expect(part(host, 'previous')?.hasAttribute('aria-disabled')).toBe(false)
+    ;(part(host, 'next') as HTMLButtonElement).click()
+    await host.updateComplete
+    expect(part(host, 'next')?.getAttribute('aria-disabled')).toBe('true')
+    ;(part(host, 'dismiss') as HTMLButtonElement).click()
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+
+  test('never say there is nothing further in a set that loops', async () => {
+    const host = await lightbox('controls loop default-open')
+    expect(part(host, 'previous')?.hasAttribute('aria-disabled')).toBe(false)
+  })
+})
+
+describe('each item is a slide', () => {
+  const groups = async (host: Lightbox): Promise<HTMLElement[]> => {
+    const items = [...host.children] as Array<HTMLElement & { updateComplete: Promise<unknown> }>
+    await Promise.all(items.map((item) => item.updateComplete))
+    return items.map((item) => part(item, 'item') as HTMLElement)
+  }
+
+  test('a group with the role description slide, named by its label', async () => {
+    const host = await lightbox()
+    const [first] = await groups(host)
+    expect(first?.getAttribute('aria-roledescription')).toBe('slide')
+    expect(first?.getAttribute('aria-label')).toBe('A harbour')
+  })
+
+  test('named by its place in the set where it has no label, in the consumer’s words', async () => {
+    const host = (await mount(
+      `<helix-headless-lightbox slide-label="Bild {index} von {count}" slide-role-label="Folie">
+        <helix-headless-lightbox-item value="one"></helix-headless-lightbox-item>
+        <helix-headless-lightbox-item value="two"></helix-headless-lightbox-item>
+      </helix-headless-lightbox>`,
+    )) as Lightbox
+    const all = await groups(host)
+    expect(all.map((one) => one.getAttribute('aria-label'))).toEqual([
+      'Bild 1 von 2',
+      'Bild 2 von 2',
+    ])
+    expect(all[1]?.getAttribute('aria-roledescription')).toBe('Folie')
+  })
+})
+
+describe('a swipe across the picture', () => {
+  const swipe = (host: Lightbox, dx: number, pointerType = 'touch'): void => {
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.getBoundingClientRect = () => ({ height: 300, width: 400 }) as DOMRect
+    const surface = part(host, 'dialog') as HTMLElement
+    const at = (type: string, x: number, time: number, target: EventTarget): void => {
+      const event = new PointerEvent(type, {
+        bubbles: true,
+        button: 0,
+        clientX: x,
+        clientY: 100,
+        composed: true,
+        pointerId: 9,
+        pointerType,
+      })
+      Object.defineProperty(event, 'timeStamp', { value: time })
+      target.dispatchEvent(event)
+    }
+    at('pointerdown', 200, 0, surface)
+    at('pointermove', 200 + dx, 1000, window)
+    at('pointerup', 200 + dx, 2000, window)
+  }
+
+  test('toward the start of the line shows the next item, and back the previous', async () => {
+    const host = await lightbox('default-open')
+    swipe(host, -150)
+    await host.updateComplete
+    expect(shown(host)).toBe('two')
+    swipe(host, 150)
+    await host.updateComplete
+    expect(shown(host)).toBe('one')
+  })
+
+  test('a short one and a mouse drag move nothing', async () => {
+    const host = await lightbox('default-open')
+    swipe(host, -40)
+    swipe(host, -150, 'mouse')
+    await host.updateComplete
+    expect(shown(host)).toBe('one')
+  })
+})
