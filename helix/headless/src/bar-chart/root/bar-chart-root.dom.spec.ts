@@ -288,3 +288,40 @@ describe('reading by key', () => {
     expect(part(host, 'tooltip-label')?.textContent).toBe('Q1')
   })
 })
+
+/* A legend hides a series through the table the two share. A hidden series is
+   not drawn, so it is not said either. */
+describe('a series a legend hid', () => {
+  test('is left out of the summary, the readout and the series keys', async () => {
+    await import('../../legend/index.js')
+    const channels = `<table id="channels">
+      <caption>Sessions by channel</caption>
+      <thead><tr><th>Month</th><th>Direct</th><th>Referral</th></tr></thead>
+      <tbody>
+        <tr><th>Jan</th><td>10</td><td>4</td></tr>
+        <tr><th>Mar</th><td>25</td><td>9</td></tr>
+      </tbody>
+    </table>`
+    const host = await chart(
+      `${channels}<helix-headless-legend for="channels" hidden-series="Direct"></helix-headless-legend>`,
+      'for="channels"',
+    )
+    const legend = document.querySelector('helix-headless-legend') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await legend.updateComplete
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(host, 'summary')?.textContent?.trim()).toBe(
+      'Sessions by channel. Highest: Referral Mar 9.',
+    )
+    for (const key of ['ArrowRight', 'ArrowDown']) {
+      part(host, 'plot')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+    }
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    /* One series is left, so the down arrow walks the readings, as it does on
+       a chart of one series, and never rests on the hidden one. */
+    expect(part(host, 'live')?.textContent).toBe('Mar: Referral 9')
+  })
+})

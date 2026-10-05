@@ -90,7 +90,8 @@ export interface TooltipAt {
  *
  * The chart's `pointer` is one, and is what every chart passes.
  */
-export type ReadingCursor = Pick<ChartPointerController, 'column' | 'keyed'>
+export type ReadingCursor = Pick<ChartPointerController, 'column' | 'keyed'> &
+  Partial<Pick<ChartPointerController, 'shows'>>
 
 /**
  * What a pointer resting on a reading shows, as `Tooltip` pointed at a mark.
@@ -150,7 +151,9 @@ export const drawTooltip = (
     reading === undefined || rows.length === 0
       ? nothing
       : html`<span aria-live="polite" part="live" role="status">${
-          reading.keyed && row ? spokenReading(row, reading.column) : ''
+          reading.keyed && row
+            ? spokenReading(row, reading.column, (cell) => reading.shows?.(cell) !== false)
+            : ''
         }</span>`
   if (!row || rows.length === 0) {
     return live

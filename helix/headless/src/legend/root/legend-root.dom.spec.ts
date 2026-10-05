@@ -150,7 +150,11 @@ describe('chart legend', () => {
 /* Under `toggles` each name is a button that hides its series in every chart
    reading the same table. A series keeps its color while it is hidden. */
 describe('toggling a series', () => {
-  type Legend = HTMLElement & { hiddenSeries: string; updateComplete: Promise<unknown> }
+  type Legend = HTMLElement & {
+    hiddenSeries: string
+    requestUpdate: (...args: unknown[]) => void
+    updateComplete: Promise<unknown>
+  }
   const toggles = (host: HTMLElement): HTMLButtonElement[] => [
     ...(host.shadowRoot?.querySelectorAll<HTMLButtonElement>('[part="toggle"]') ?? []),
   ]
@@ -221,6 +225,80 @@ describe('toggling a series', () => {
     await host.updateComplete
     await chart.updateComplete
     expect(lines()).toHaveLength(3)
+  })
+
+  /* Each write asks every reader of the table to redraw, the other legend
+     among them. Two legends that each wrote their own list back on every
+     update asked each other forever and the page never finished loading.
+     Counted, so a loop fails here rather than hanging the run. */
+  test('two on one table settle on the list written last, and both show it', async () => {
+    await mount(`<div>${TRAFFIC}</div>`)
+    let asked = 0
+    const made = ['Direct', 'Referral'].map((list) => {
+      const one = document.createElement('helix-headless-legend') as Legend
+      const request = one.requestUpdate.bind(one)
+      one.requestUpdate = (...args: unknown[]) => {
+        asked += 1
+        if (asked < 60) {
+          request(...args)
+        }
+      }
+      one.setAttribute('for', 'traffic')
+      one.setAttribute('hidden-series', list)
+      one.toggleAttribute('toggles', true)
+      document.body.append(one)
+      return one
+    })
+    for (let round = 0; round < 4; round += 1) {
+      for (const one of made) {
+        await one.updateComplete
+      }
+    }
+    expect(asked).toBeLessThan(60)
+    expect(made.map((one) => one.hiddenSeries)).toEqual(['Referral', 'Referral'])
+    toggles(made[1] as Legend)[0]?.click()
+    for (let round = 0; round < 4; round += 1) {
+      for (const one of made) {
+        await one.updateComplete
+      }
+    }
+    expect(made.map((one) => one.hiddenSeries)).toEqual(['Direct, Referral', 'Referral, Direct'])
+    expect(toggles(made[0] as Legend).map((one) => one.getAttribute('aria-pressed'))).toEqual([
+      'false',
+      'true',
+      'false',
+    ])
+  })
+
+  /* A legend of the rows and one of the columns share a table and not a list. */
+  test('a legend of the rows and one of the columns each keep what they hid', async () => {
+    const both = `<table id="mixed"><thead><tr><th>Month</th><th>Direct</th><th>Referral</th></tr></thead><tbody><tr><th scope="row">Jan</th><td>10</td><td>4</td></tr><tr><th scope="row">Feb</th><td>12</td><td>6</td></tr></tbody></table>`
+    await mount(
+      `<div>${both}<helix-headless-legend for="mixed" toggles hidden-series="Direct"></helix-headless-legend><helix-headless-legend entries="categories" for="mixed" toggles hidden-series="Feb"></helix-headless-legend></div>`,
+    )
+    const [series, rows] = [...document.querySelectorAll<Legend>('helix-headless-legend')]
+    for (let round = 0; round < 3; round += 1) {
+      await series?.updateComplete
+      await rows?.updateComplete
+    }
+    expect([series?.hiddenSeries, rows?.hiddenSeries]).toEqual(['Direct', 'Feb'])
+  })
+
+  /* A legend joining a table another legend already wrote shows what is
+     hidden, and a legend with no list clears nothing. */
+  test('a legend with no list of its own shows the list on the table and clears nothing', async () => {
+    await mount(
+      `<div>${TRAFFIC}<helix-headless-legend for="traffic" toggles hidden-series="Search"></helix-headless-legend></div>`,
+    )
+    const first = document.querySelector('helix-headless-legend') as Legend
+    await first.updateComplete
+    const second = document.createElement('helix-headless-legend') as Legend
+    second.setAttribute('for', 'traffic')
+    second.toggleAttribute('toggles', true)
+    document.body.append(second)
+    await second.updateComplete
+    await first.updateComplete
+    expect([first.hiddenSeries, second.hiddenSeries]).toEqual(['Search', 'Search'])
   })
 
   /* A ring's legend names its rows, and a hidden row is no slice: the others

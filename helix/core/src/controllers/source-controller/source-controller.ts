@@ -202,21 +202,30 @@ export class SourceController implements ReactiveController {
 
   /**
    * Hides these series on the table and shows every other, for every chart
-   * and legend reading it, which then redraw.
+   * and legend reading it, which then redraw. Answers the table it wrote to,
+   * or null where `for` names none.
+   *
+   * Given `among`, only those names are shown or hidden, and a series hidden
+   * outside them stays hidden. A legend passes its own entries, so a legend
+   * of the rows and a legend of the columns on one table each keep what the
+   * other hid.
    *
    * Names are matched without regard to case or surrounding space, as a
    * column's heading is everywhere else. Nothing happens where `for` names no
-   * table, or the set is already this one.
+   * table, or the set is already this one, so two writers that agree stop
+   * asking each other to redraw.
    */
-  hide(names: Iterable<string>): void {
+  hide(names: Iterable<string>, among?: Iterable<string>): Element | null {
     const element = this.resolve()
     if (!element) {
-      return
+      return null
     }
-    const next = new Set([...names].map(seriesKey).filter(Boolean))
     const now = HIDDEN.get(element) ?? NONE
+    const mine = among === undefined ? undefined : new Set([...among].map(seriesKey))
+    const kept = mine === undefined ? [] : [...now].filter((one) => !mine.has(one))
+    const next = new Set([...kept, ...[...names].map(seriesKey)].filter(Boolean))
     if (next.size === now.size && [...next].every((one) => now.has(one))) {
-      return
+      return element
     }
     if (next.size === 0) {
       HIDDEN.delete(element)
@@ -226,6 +235,7 @@ export class SourceController implements ReactiveController {
     for (const reader of READERS.get(element) ?? []) {
       reader.host.requestUpdate()
     }
+    return element
   }
 
   /** Counts this controller among the readers of the table it watches, or of none. */
