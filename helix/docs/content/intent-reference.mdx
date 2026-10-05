@@ -27,7 +27,7 @@ empty intent, `{}`, is a valid theme.
 
 | Field | What it controls |
 |---|---|
-| `brand` | Your main brand color. Without one, the theme is ink |
+| `brand` | Your main brand color, or `{ light, dark }` for a different one in each mode. Without one, the theme is ink, and so is a mode the pair leaves out |
 | `accent` | The second emphasis color. Defaults to the brand color, or to ink with no brand. `{ from: 'brand', rotate: 180 }` gives the complementary color, and needs a brand |
 | `background` | The page's color, `{ light, dark }`, for a page that is not pure white or pure black. The surfaces keep their contrast with it, and the grays take its tint. A page no text color can reach the contrast target on is refused |
 | `neutral` | The gray ramp, which can be tinted toward the brand. With `background`, it takes the page's tint |
@@ -35,6 +35,12 @@ empty intent, `{}`, is a valid theme.
 | `chroma` | How saturated the palette is, independent of hue |
 | `scheme` | `'light'` or `'dark'`, for a theme that has only one mode |
 | `tokens` | Literal overrides by token name, for values no other field sets |
+
+**A brand color that already meets the contrast target is used as it is.**
+Where it clears every surface it lands on, it is the primary color, and where
+its label clears on it, it is the fill. A navy brand stays navy on a light page.
+A color that does not meet the target keeps its hue and chroma, and its
+lightness moves only as far as the target needs.
 
 `accent` can be defined relative to the brand. `status` colors cannot. If
 `danger` rotated with the brand, your users would have to learn a new warning

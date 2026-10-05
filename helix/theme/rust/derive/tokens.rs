@@ -7,7 +7,7 @@
 //! as a list: a token silently missing is a token nobody notices is missing.
 
 use crate::derive::accent::{seeded, settle};
-use crate::derive::emphasis::{emphasis, ink, Emphasis};
+use crate::derive::emphasis::{chosen, emphasis, ink, Emphasis};
 use crate::derive::fills::{filled_grounds, hover_of, on_fill, on_ink, status_fills, Fill};
 use crate::derive::inks::{neutral_inks, NeutralInks};
 use crate::derive::marks::{brand_mark, focus_ring, inverse};
@@ -102,7 +102,7 @@ impl Phases {
         named: Option<(Oklch, Oklch)>,
         neutral: Cast,
     ) -> Self {
-        let primary = named.map_or_else(|| ink(neutral, ctx), |(_, brand)| emphasis(brand, ctx));
+        let primary = named.map_or_else(|| ink(neutral, ctx), |(_, brand)| chosen(brand, ctx));
         /* **Ink counts as an ordinary brand's loudness, as far as the statuses
         go.** `harmony` pulls a status toward the palette's own loudness, and ink
         has none to pull toward: taken as a brand at chroma 0, the default
@@ -122,10 +122,12 @@ impl Phases {
                     Seed::Color(_) => 0.0,
                     Seed::Relation(relation) => relation.allowance.unwrap_or(45.0),
                 };
-                let accent = emphasis(
-                    settle(seed, pinned, bound, primary.raw, &statuses, ctx),
-                    ctx,
-                );
+                let settled = settle(seed, pinned, bound, primary.raw, &statuses, ctx);
+                let accent = if pinned {
+                    chosen(settled, ctx)
+                } else {
+                    emphasis(settled, ctx)
+                };
                 let origin = if pinned {
                     Origin::Pinned
                 } else {

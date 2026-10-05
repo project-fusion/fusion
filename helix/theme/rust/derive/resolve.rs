@@ -6,8 +6,8 @@
 
 use crate::derive::Cast;
 use crate::intent::{
-    to_oklch, Background, Chroma, Color, Font, Material, Motion, Neutral, PairingRequest, Scheme,
-    Seed, Separation, Status, StatusSeed, ThemeIntent, STATUS_NAMES,
+    to_oklch, Background, Brand, Chroma, Color, Font, Material, Motion, Neutral, PairingRequest,
+    Scheme, Seed, Separation, Status, StatusSeed, ThemeIntent, STATUS_NAMES,
 };
 use crate::model::{Contrast, INKS};
 use crate::oklch::{fit_to_gamut, shipped_contrast_ratio, Oklch, GAMUT_STEPS};
@@ -92,7 +92,8 @@ pub struct Resolved {
     /// accent nobody named is the brand, so there is no seed to fill in.
     pub accent: Option<Seed>,
     pub background: Background,
-    /// `None` when the intent names no brand, which makes the theme ink.
+    /// The brand for the scheme being derived. `None` when the intent names none
+    /// for it, which makes the theme ink.
     pub brand: Option<Color>,
     pub chroma: Chroma,
     pub contrast_target: f64,
@@ -149,6 +150,7 @@ pub fn default_pairings(contrast_target: f64) -> Vec<PairingRequest> {
 #[must_use]
 pub fn defaults(intent: &ThemeIntent) -> Resolved {
     let contrast_target = intent.contrast_target.unwrap_or(4.5);
+    let scheme = intent.scheme.unwrap_or_default();
     Resolved {
         /* **Unnamed, the accent is the brand, not a rotation off it.** The
         complement shipped here and in the stylesheet, and the stylesheet
@@ -161,7 +163,11 @@ pub fn defaults(intent: &ThemeIntent) -> Resolved {
         brand's way and hand back a near miss. */
         accent: intent.accent.clone(),
         background: intent.background.clone().unwrap_or_default(),
-        brand: intent.brand.clone(),
+        brand: intent
+            .brand
+            .as_ref()
+            .and_then(|brand| brand.for_scheme(scheme))
+            .cloned(),
         chroma: intent.chroma.unwrap_or_default(),
         contrast_target,
         density: intent.density.unwrap_or(1.0),
@@ -178,7 +184,7 @@ pub fn defaults(intent: &ThemeIntent) -> Resolved {
             .clone()
             .unwrap_or_else(|| default_pairings(contrast_target)),
         radius: intent.radius.unwrap_or(0.5),
-        scheme: intent.scheme.unwrap_or_default(),
+        scheme,
         separation: intent.separation.unwrap_or_default(),
         status: intent.status.clone().unwrap_or_default(),
         tokens: intent.tokens.clone().unwrap_or_default(),
@@ -211,9 +217,7 @@ fn range(label: &str, message: &str) -> IntentError {
 /// is meaningful in, or when the brand is not a color this engine can read.
 pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     let resolved = defaults(intent);
-    if let Some(color) = &resolved.brand {
-        readable_brand(color)?;
-    }
+    readable_brands(intent.brand.as_ref())?;
     finite("contrastTarget", resolved.contrast_target)?;
     finite("density", resolved.density)?;
     finite("radius", resolved.radius)?;
@@ -279,7 +283,7 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     if matches!(resolved.accent, Some(Seed::Relation(_))) && resolved.brand.is_none() {
         return Err(range(
             "accent",
-            "is related to the brand, and this theme names none. Name the accent as a color",
+            "is related to the brand, and this theme names none for this scheme. Name the accent as a color",
         ));
     }
 
@@ -333,22 +337,47 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     Ok(resolved)
 }
 
-/// Refuses a brand that is not a color, or one whose numbers are not numbers.
-fn readable_brand(color: &Color) -> Result<(), IntentError> {
+/// Refuses every brand color given that cannot be read, whichever scheme is
+/// derived.
+///
+/// **Both halves of a pair, as every page is in [`resolve`]**: a pair whose
+/// dark half cannot be read is refused on a light derive too, so the file is
+/// fixed before the half that fails is ever reached.
+fn readable_brands(brand: Option<&Brand>) -> Result<(), IntentError> {
+    match brand {
+        Some(Brand::One(color)) => readable_brand("brand", color),
+        Some(Brand::Each(pair)) => {
+            for (label, color) in [("brand.light", &pair.light), ("brand.dark", &pair.dark)] {
+                if let Some(color) = color {
+                    readable_brand(label, color)?;
+                }
+            }
+            Ok(())
+        }
+        None => Ok(()),
+    }
+}
+
+/// Refuses a brand that is not a color, or one whose numbers are not numbers,
+/// named by where it was given: `brand`, or `brand.light` and `brand.dark`.
+fn readable_brand(label: &str, color: &Color) -> Result<(), IntentError> {
     let brand = to_oklch(color).ok_or_else(|| IntentError::Unreadable {
-        label: "brand".to_owned(),
+        label: label.to_owned(),
         value: color.to_string(),
     })?;
 
-    finite("brand.chroma", brand.chroma)?;
-    finite("brand.hue", brand.hue)?;
-    finite("brand.lightness", brand.lightness)?;
+    finite(&format!("{label}.chroma"), brand.chroma)?;
+    finite(&format!("{label}.hue"), brand.hue)?;
+    finite(&format!("{label}.lightness"), brand.lightness)?;
 
     if brand.chroma < 0.0 {
-        return Err(range("brand.chroma", "must not be negative"));
+        return Err(range(&format!("{label}.chroma"), "must not be negative"));
     }
     if !(0.0..=1.0).contains(&brand.lightness) {
-        return Err(range("brand.lightness", "must be between 0 and 1"));
+        return Err(range(
+            &format!("{label}.lightness"),
+            "must be between 0 and 1",
+        ));
     }
     Ok(())
 }

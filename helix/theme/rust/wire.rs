@@ -6,11 +6,16 @@
 //! `serde` for the one consumer that needs it is how a small artifact stops
 //! being small.
 //!
-//! Three of the intent's types are TypeScript unions, and a union is the one
-//! shape `derive` cannot be pointed at: `Color` is a hex string or a triple,
-//! `Seed` is a color or a relationship, and `StatusSeed` is a color or a bare
-//! hue. Each gets a wire enum that `serde(untagged)` *can* read, and a
-//! conversion. The rest are plain derives on the types themselves.
+//! Four of the intent's types are TypeScript unions, and a union is the one
+//! shape `derive` cannot be pointed at:
+//!
+//! - `Color` is a hex string or a triple.
+//! - `Brand` is a color or a pair of them, one per scheme.
+//! - `Seed` is a color or a relationship.
+//! - `StatusSeed` is a color or a bare hue.
+//!
+//! Each gets a wire enum that `serde(untagged)` *can* read, and a conversion.
+//! The rest are plain derives on the types themselves.
 //!
 //! **`deny_unknown_fields` everywhere, which is a departure from the
 //! TypeScript** and the right one: a mistyped key is silently ignored by
@@ -27,7 +32,7 @@
 use serde::de::{Deserializer, Error as _, MapAccess, Visitor};
 use serde::Deserialize;
 
-use crate::intent::{Color, Relation, Seed, StatusSeed};
+use crate::intent::{Brand, BrandPair, Color, Relation, Seed, StatusSeed};
 use crate::oklch::Oklch;
 
 #[derive(Deserialize)]
@@ -56,6 +61,25 @@ impl<'de> Deserialize<'de> for Color {
                 hue: triple.hue,
                 lightness: triple.lightness,
             }),
+        })
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(untagged)]
+enum BrandWire {
+    /* A color first, so a triple is read as one color. A pair's keys are
+    `light` and `dark`, which no triple has, and `deny_unknown_fields` on both
+    is what keeps the two apart. */
+    One(Color),
+    Each(BrandPair),
+}
+
+impl<'de> Deserialize<'de> for Brand {
+    fn deserialize<D: Deserializer<'de>>(reader: D) -> Result<Self, D::Error> {
+        Ok(match BrandWire::deserialize(reader)? {
+            BrandWire::One(color) => Self::One(color),
+            BrandWire::Each(pair) => Self::Each(pair),
         })
     }
 }

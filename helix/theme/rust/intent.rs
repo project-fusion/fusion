@@ -239,6 +239,45 @@ impl Background {
     }
 }
 
+/// The brand: one color for both schemes, or one for each.
+///
+/// **One color is solved against each scheme's page**, which is what most
+/// consumers want. A pair names the color each scheme takes, the way
+/// [`Background`] does, for a brand whose light and dark faces are two colors: a
+/// navy that turns sky blue, or a near-black that turns near-white. A scheme the
+/// pair leaves out has no brand, and is ink.
+#[derive(Clone, Debug, PartialEq)]
+pub enum Brand {
+    Each(BrandPair),
+    One(Color),
+}
+
+/// A brand color for each scheme. Either may be left out.
+#[derive(Clone, Debug, Default, PartialEq)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Deserialize),
+    serde(deny_unknown_fields, rename_all = "camelCase")
+)]
+pub struct BrandPair {
+    pub dark: Option<Color>,
+    pub light: Option<Color>,
+}
+
+impl Brand {
+    /// The color a scheme takes, where it takes one.
+    #[must_use]
+    pub fn for_scheme(&self, scheme: Scheme) -> Option<&Color> {
+        match self {
+            Self::One(color) => Some(color),
+            Self::Each(pair) => match scheme {
+                Scheme::Dark => pair.dark.as_ref(),
+                Scheme::Light => pair.light.as_ref(),
+            },
+        }
+    }
+}
+
 /// The cast every gray carries. Chroma 0 is a dead gray and is the default,
 /// matching `primitives.css`: a fixed chroma is a rising *saturation* as a
 /// surface darkens, so a trace that looks right on a light page reads navy
@@ -363,12 +402,12 @@ pub struct ThemeIntent {
     pub accent: Option<Seed>,
     /// The page's color for each scheme. Unset is pure white and pure black.
     pub background: Option<Background>,
-    /// The one color most consumers care about. **Unnamed, the theme is ink**:
-    /// the primary is the neutral's own near-black on a light page and
-    /// near-white on a dark one, and a filled control is drawn in it with the
-    /// page's color for its label.
+    /// The one color most consumers care about, or one for each scheme.
+    /// **Unnamed, the theme is ink**: the primary is the neutral's own
+    /// near-black on a light page and near-white on a dark one, and a filled
+    /// control is drawn in it with the page's color for its label.
     #[cfg_attr(feature = "serde", serde(default))]
-    pub brand: Option<Color>,
+    pub brand: Option<Brand>,
     pub chroma: Option<Chroma>,
     /// 4.5 is WCAG AA and the default, being the figure with legal weight; 7 is
     /// AAA.
@@ -406,7 +445,7 @@ impl ThemeIntent {
     #[must_use]
     pub fn new(brand: Color) -> Self {
         Self {
-            brand: Some(brand),
+            brand: Some(Brand::One(brand)),
             ..Self::ink()
         }
     }

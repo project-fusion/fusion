@@ -129,6 +129,24 @@ fn an_intent_with_no_brand_builds_ink_in_both_modes() {
     assert!(!css.contains("--helix-seed-brand"), "{css}");
 }
 
+/// **A brand for each mode is the brand each mode takes**, read from the file
+/// as `{ "light": ..., "dark": ... }`. Both colors already read where they are
+/// given, so each mode's primary is its brand as written.
+#[test]
+fn a_brand_for_each_mode_builds_each_mode_from_its_own() {
+    let sandbox = Sandbox::new(
+        "two-brands",
+        Some(r##"{ "brand": { "light": "#1e3a8a", "dark": "#7dd3fc" } }"##),
+    );
+    let build = run(&sandbox.0, &["theme", "build"]);
+    assert_eq!(code(&build), 0, "{}", err(&build));
+    let css = out(&build);
+    assert!(
+        css.contains("--helix-color-primary: light-dark(#1e3a8a, #7dd3fc);"),
+        "{css}"
+    );
+}
+
 /// A `scheme` in the intent is that one mode, and no pairs.
 #[test]
 fn a_scheme_in_the_intent_builds_that_mode_alone() {

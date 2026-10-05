@@ -29,7 +29,7 @@ fn intent_schema() -> serde_json::Value {
     serde_json::json!({
         "properties": {
             "intent": {
-                "description": "A theme intent, the same JSON `helix.theme.json` holds. Every key is optional. `brand` is a hex color, and without one the theme is ink: near-black on a light page and near-white on a dark one. Without `scheme` (\"light\" or \"dark\") the theme is derived in both modes. Other keys include `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density`, and `separation`.",
+                "description": "A theme intent, the same JSON `helix.theme.json` holds. Every key is optional. `brand` is a hex color, or `{ \"light\": hex, \"dark\": hex }` for one per mode, and without one the theme is ink: near-black on a light page and near-white on a dark one. Without `scheme` (\"light\" or \"dark\") the theme is derived in both modes. Other keys include `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density`, and `separation`.",
                 "type": "object",
             },
         },

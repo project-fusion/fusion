@@ -31693,9 +31693,9 @@
     },
     {
       "collisions": [
-        "primary and danger are 0.025 apart in OKLab, below 0.08, so a reader cannot reliably tell them apart"
+        "primary and danger are 0.043 apart in OKLab, below 0.08, so a reader cannot reliably tell them apart"
       ],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #000000;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #ca3135;\n  --helix-color-foreground-on-primary: #f8f8f8;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-foreground-on-status: #f8f8f8;\n  --helix-color-primary-hover: #b81c26;\n  --helix-color-primary-active: #a50018;\n  --helix-color-primary-subtle: #ffe9e6;\n  --helix-color-primary-surface: #d2393b;\n  --helix-color-accent: #ca3135;\n  --helix-color-accent-hover: #b81c26;\n  --helix-color-accent-active: #a50018;\n  --helix-color-accent-subtle: #ffe9e6;\n  --helix-color-accent-surface: #d2393b;\n  --helix-color-danger: #d62627;\n  --helix-color-info: #0073b7;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-muted: #a25b56;\n  --helix-color-accent-muted: #a25b56;\n  --helix-color-danger-muted: #a75851;\n  --helix-color-info-muted: #44739a;\n  --helix-color-success-muted: #477959;\n  --helix-color-warning-muted: #8f672b;\n  --helix-color-primary-surface-hover: #c0262c;\n  --helix-color-accent-surface-hover: #c0262c;\n  --helix-color-danger-surface: #da2c2b;\n  --helix-color-danger-surface-hover: #c80f1a;\n  --helix-color-info-surface: #0077bd;\n  --helix-color-info-surface-hover: #0069a6;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #f15754;\n  --helix-color-brand-mark: #c1272d;\n  --helix-seed-accent: #ca3135;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.555;\n  --helix-seed-brand: #ca3135;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 25;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #000000;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #c1272d;\n  --helix-color-foreground-on-primary: #f8f8f8;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-foreground-on-status: #f8f8f8;\n  --helix-color-primary-hover: #af0b1e;\n  --helix-color-primary-active: #990016;\n  --helix-color-primary-subtle: #ffe9e6;\n  --helix-color-primary-surface: #c1272d;\n  --helix-color-accent: #c1272d;\n  --helix-color-accent-hover: #af0b1e;\n  --helix-color-accent-active: #990016;\n  --helix-color-accent-subtle: #ffe9e6;\n  --helix-color-accent-surface: #c1272d;\n  --helix-color-danger: #d62627;\n  --helix-color-info: #0073b7;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-muted: #a25b56;\n  --helix-color-accent-muted: #a25b56;\n  --helix-color-danger-muted: #a75851;\n  --helix-color-info-muted: #44739a;\n  --helix-color-success-muted: #477959;\n  --helix-color-warning-muted: #8f672b;\n  --helix-color-primary-surface-hover: #af0b1e;\n  --helix-color-accent-surface-hover: #af0b1e;\n  --helix-color-danger-surface: #da2c2b;\n  --helix-color-danger-surface-hover: #c80f1a;\n  --helix-color-info-surface: #0077bd;\n  --helix-color-info-surface-hover: #0069a6;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #f15754;\n  --helix-color-brand-mark: #c1272d;\n  --helix-seed-accent: #c1272d;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.529;\n  --helix-seed-brand: #c1272d;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 25;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "red",
       "pairings": [
         {
@@ -31797,28 +31797,28 @@
         {
           "background": "color-primary-surface",
           "foreground": "color-foreground-on-primary",
-          "ratio": 4.505564413572457,
+          "ratio": 5.499433463928369,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-primary-surface-hover",
           "foreground": "color-foreground-on-primary",
-          "ratio": 5.562369282042277,
+          "ratio": 6.843516823145167,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-surface",
           "foreground": "color-foreground-on-accent",
-          "ratio": 4.505564413572457,
+          "ratio": 5.499433463928369,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-surface-hover",
           "foreground": "color-foreground-on-accent",
-          "ratio": 5.562369282042277,
+          "ratio": 6.843516823145167,
           "status": "pass",
           "target": 4.5
         },
@@ -31894,84 +31894,84 @@
         {
           "background": "color-background",
           "foreground": "color-primary",
-          "ratio": 5.247317690015433,
+          "ratio": 5.840485981456889,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-primary",
-          "ratio": 5.027296925894404,
+          "ratio": 5.595593587972986,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-primary",
-          "ratio": 4.813032945510115,
+          "ratio": 5.357108737675709,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-primary",
-          "ratio": 5.247317690015433,
+          "ratio": 5.840485981456889,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-primary",
-          "ratio": 4.687219588891877,
+          "ratio": 5.217073163499011,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-primary-subtle",
           "foreground": "color-primary",
-          "ratio": 4.510244363914542,
+          "ratio": 5.020092271240081,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-background",
           "foreground": "color-accent",
-          "ratio": 5.247317690015433,
+          "ratio": 5.840485981456889,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface",
           "foreground": "color-accent",
-          "ratio": 5.027296925894404,
+          "ratio": 5.595593587972986,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-raised",
           "foreground": "color-accent",
-          "ratio": 4.813032945510115,
+          "ratio": 5.357108737675709,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-overlay",
           "foreground": "color-accent",
-          "ratio": 5.247317690015433,
+          "ratio": 5.840485981456889,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-surface-sunken",
           "foreground": "color-accent",
-          "ratio": 4.687219588891877,
+          "ratio": 5.217073163499011,
           "status": "pass",
           "target": 4.5
         },
         {
           "background": "color-accent-subtle",
           "foreground": "color-accent",
-          "ratio": 4.510244363914542,
+          "ratio": 5.020092271240081,
           "status": "pass",
           "target": 4.5
         },
@@ -32397,10 +32397,10 @@
         }
       ],
       "seeds": {
-        "seed-accent": "#ca3135",
+        "seed-accent": "#c1272d",
         "seed-accent-hue": "0",
-        "seed-accent-lightness": "0.555",
-        "seed-brand": "#ca3135",
+        "seed-accent-lightness": "0.529",
+        "seed-brand": "#c1272d",
         "seed-chroma-scale": "1",
         "seed-density": "1",
         "seed-neutral-chroma": "0",
@@ -32501,38 +32501,38 @@
         },
         {
           "chromaReduced": false,
-          "contrast": 5.247317690015433,
-          "hex": "#ca3135",
+          "contrast": 5.840485981456889,
+          "hex": "#c1272d",
           "name": "color-primary",
           "origin": "derived",
           "value": {
             "chroma": 0.18919254311138597,
             "hue": 24.967066524811045,
-            "lightness": 0.5550822079181672
+            "lightness": 0.5293052991405797
           }
         },
         {
           "chromaReduced": false,
-          "contrast": 4.505564413572457,
+          "contrast": 5.499433463928369,
           "hex": "#f8f8f8",
           "name": "color-foreground-on-primary",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 0.0,
-            "lightness": 0.9776343741906226
+            "lightness": 0.9776343813461292
           }
         },
         {
           "chromaReduced": false,
-          "contrast": 4.505564413572457,
+          "contrast": 5.499433463928369,
           "hex": "#f8f8f8",
           "name": "color-foreground-on-accent",
           "origin": "derived",
           "value": {
             "chroma": 0.0,
             "hue": 0.0,
-            "lightness": 0.9776343741906226
+            "lightness": 0.9776343813461292
           }
         },
         {
@@ -32544,29 +32544,29 @@
           "value": {
             "chroma": 0.0,
             "hue": 0.0,
-            "lightness": 0.9776343741906226
+            "lightness": 0.9776343813461292
           }
         },
         {
           "chromaReduced": false,
-          "hex": "#b81c26",
+          "hex": "#af0b1e",
           "name": "color-primary-hover",
           "origin": "derived",
           "value": {
             "chroma": 0.18919254311138597,
             "hue": 24.967066524811045,
-            "lightness": 0.5050822079181672
+            "lightness": 0.4793052991405797
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#a50018",
+          "hex": "#990016",
           "name": "color-primary-active",
           "origin": "derived",
           "value": {
-            "chroma": 0.1846419667775654,
+            "chroma": 0.17421340480466596,
             "hue": 24.967066524811045,
-            "lightness": 0.4550822079181672
+            "lightness": 0.4293052991405797
           }
         },
         {
@@ -32582,47 +32582,47 @@
         },
         {
           "chromaReduced": false,
-          "hex": "#d2393b",
+          "hex": "#c1272d",
           "name": "color-primary-surface",
           "origin": "derived",
           "value": {
             "chroma": 0.18919254311138597,
             "hue": 24.967066524811045,
-            "lightness": 0.5762435626983642
+            "lightness": 0.5293052991405797
           }
         },
         {
           "chromaReduced": false,
-          "contrast": 5.247317690015433,
-          "hex": "#ca3135",
+          "contrast": 5.840485981456889,
+          "hex": "#c1272d",
           "name": "color-accent",
           "origin": "derived",
           "value": {
             "chroma": 0.18919254311138597,
             "hue": 24.967066524811045,
-            "lightness": 0.5550822079181672
+            "lightness": 0.5293052991405797
           }
         },
         {
           "chromaReduced": false,
-          "hex": "#b81c26",
+          "hex": "#af0b1e",
           "name": "color-accent-hover",
           "origin": "derived",
           "value": {
             "chroma": 0.18919254311138597,
             "hue": 24.967066524811045,
-            "lightness": 0.5050822079181672
+            "lightness": 0.4793052991405797
           }
         },
         {
           "chromaReduced": true,
-          "hex": "#a50018",
+          "hex": "#990016",
           "name": "color-accent-active",
           "origin": "derived",
           "value": {
-            "chroma": 0.1846419667775654,
+            "chroma": 0.17421340480466596,
             "hue": 24.967066524811045,
-            "lightness": 0.4550822079181672
+            "lightness": 0.4293052991405797
           }
         },
         {
@@ -32638,13 +32638,13 @@
         },
         {
           "chromaReduced": false,
-          "hex": "#d2393b",
+          "hex": "#c1272d",
           "name": "color-accent-surface",
           "origin": "derived",
           "value": {
             "chroma": 0.18919254311138597,
             "hue": 24.967066524811045,
-            "lightness": 0.5762435626983642
+            "lightness": 0.5293052991405797
           }
         },
         {
@@ -32769,24 +32769,24 @@
         },
         {
           "chromaReduced": false,
-          "hex": "#c0262c",
+          "hex": "#af0b1e",
           "name": "color-primary-surface-hover",
           "origin": "derived",
           "value": {
             "chroma": 0.18919254311138597,
             "hue": 24.967066524811045,
-            "lightness": 0.5262435626983641
+            "lightness": 0.4793052991405797
           }
         },
         {
           "chromaReduced": false,
-          "hex": "#c0262c",
+          "hex": "#af0b1e",
           "name": "color-accent-surface-hover",
           "origin": "derived",
           "value": {
             "chroma": 0.18919254311138597,
             "hue": 24.967066524811045,
-            "lightness": 0.5262435626983641
+            "lightness": 0.4793052991405797
           }
         },
         {
@@ -50212,6 +50212,3708 @@
             "chroma": 0.0,
             "hue": 258.0,
             "lightness": 0.21
+          }
+        }
+      ],
+      "violations": []
+    },
+    {
+      "collisions": [],
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #000000;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #1e3a8a;\n  --helix-color-foreground-on-primary: #f8f8f8;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-foreground-on-status: #f8f8f8;\n  --helix-color-primary-hover: #122b7a;\n  --helix-color-primary-active: #081c6b;\n  --helix-color-primary-subtle: #e7efff;\n  --helix-color-primary-surface: #1e3a8a;\n  --helix-color-accent: #1e3a8a;\n  --helix-color-accent-hover: #122b7a;\n  --helix-color-accent-active: #081c6b;\n  --helix-color-accent-subtle: #e7efff;\n  --helix-color-accent-surface: #1e3a8a;\n  --helix-color-danger: #ca3a35;\n  --helix-color-info: #0073b7;\n  --helix-color-success: #027f48;\n  --helix-color-warning: #966500;\n  --helix-color-primary-muted: #5c6e98;\n  --helix-color-accent-muted: #5c6e98;\n  --helix-color-danger-muted: #a05c55;\n  --helix-color-info-muted: #4b7294;\n  --helix-color-success-muted: #4e785c;\n  --helix-color-warning-muted: #8b6837;\n  --helix-color-primary-surface-hover: #122b7a;\n  --helix-color-accent-surface-hover: #122b7a;\n  --helix-color-danger-surface: #ce3f38;\n  --helix-color-danger-surface-hover: #bc2d29;\n  --helix-color-info-surface: #0377bc;\n  --helix-color-info-surface-hover: #0069a6;\n  --helix-color-success-surface: #0e834b;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #6589e1;\n  --helix-color-brand-mark: #1e3a8a;\n  --helix-seed-accent: #1e3a8a;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.379;\n  --helix-seed-brand: #1e3a8a;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 265.5;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "label": "navy",
+      "pairings": [
+        {
+          "background": "color-background",
+          "foreground": "color-foreground",
+          "ratio": 21.0,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-foreground",
+          "ratio": 20.119467064985724,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-foreground",
+          "ratio": 19.261973035868383,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-foreground",
+          "ratio": 21.0,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-foreground",
+          "ratio": 18.758462357639324,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-subtle",
+          "foreground": "color-foreground",
+          "ratio": 18.18838562328475,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-subtle",
+          "foreground": "color-foreground",
+          "ratio": 18.18838562328475,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-overlay",
+          "foreground": "color-foreground",
+          "status": "unverifiable",
+          "target": 4.5
+        },
+        {
+          "background": "color-well",
+          "foreground": "color-foreground",
+          "status": "unverifiable",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-foreground-muted",
+          "ratio": 5.098907547355162,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-foreground-muted",
+          "ratio": 4.885109641258063,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-foreground-muted",
+          "ratio": 4.6769056995019485,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-foreground-muted",
+          "ratio": 5.098907547355162,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-foreground-muted",
+          "ratio": 4.554650728197374,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-surface",
+          "foreground": "color-foreground-on-primary",
+          "ratio": 9.753132594384452,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-surface-hover",
+          "foreground": "color-foreground-on-primary",
+          "ratio": 11.96739805460922,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-surface",
+          "foreground": "color-foreground-on-accent",
+          "ratio": 9.753132594384452,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-surface-hover",
+          "foreground": "color-foreground-on-accent",
+          "ratio": 11.96739805460922,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-danger-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.501730354013627,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-danger-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.5768992172963205,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-info-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.5261512642789645,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-info-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.5368938598261055,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-success-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.52820135751521,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-success-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.607454100706489,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-warning-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.5004599020905465,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-warning-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.55424692976324,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-inverse",
+          "foreground": "color-foreground-inverse",
+          "ratio": 7.259815580646369,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-media",
+          "foreground": "color-foreground-media",
+          "status": "unverifiable",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-primary",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-primary",
+          "ratio": 9.923670604572445,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-primary",
+          "ratio": 9.500722607845564,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-primary",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-primary",
+          "ratio": 9.25237238562095,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-subtle",
+          "foreground": "color-primary",
+          "ratio": 8.971189304936344,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-accent",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-accent",
+          "ratio": 9.923670604572445,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-accent",
+          "ratio": 9.500722607845564,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-accent",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-accent",
+          "ratio": 9.25237238562095,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-subtle",
+          "foreground": "color-accent",
+          "ratio": 8.971189304936344,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-danger",
+          "ratio": 5.038457795235216,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-danger",
+          "ratio": 4.8271945556931195,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-danger",
+          "ratio": 4.621458961627694,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-danger",
+          "ratio": 5.038457795235216,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-danger",
+          "ratio": 4.500653375832106,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-info",
+          "ratio": 5.077279843594242,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-info",
+          "ratio": 4.864388790138583,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-info",
+          "ratio": 4.657067973470016,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-info",
+          "ratio": 5.077279843594242,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-info",
+          "ratio": 4.535331563107785,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-success",
+          "ratio": 5.082400395371674,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-success",
+          "ratio": 4.869294636464324,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-success",
+          "ratio": 4.6617647320540945,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-success",
+          "ratio": 5.082400395371674,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-success",
+          "ratio": 4.539905547763369,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-warning",
+          "ratio": 5.050167131404407,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-warning",
+          "ratio": 4.83841291776021,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-warning",
+          "ratio": 4.632199195797165,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-warning",
+          "ratio": 5.050167131404407,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-warning",
+          "ratio": 4.5111128587731875,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-primary-muted",
+          "ratio": 5.073892702713396,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-primary-muted",
+          "ratio": 4.861143672548265,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-primary-muted",
+          "ratio": 4.653961163169275,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-primary-muted",
+          "ratio": 5.073892702713396,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-primary-muted",
+          "ratio": 4.53230596526429,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-accent-muted",
+          "ratio": 5.073892702713396,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-accent-muted",
+          "ratio": 4.861143672548265,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-accent-muted",
+          "ratio": 4.653961163169275,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-accent-muted",
+          "ratio": 5.073892702713396,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-accent-muted",
+          "ratio": 4.53230596526429,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-danger-muted",
+          "ratio": 5.052023198024805,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-danger-muted",
+          "ratio": 4.840191159247805,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-danger-muted",
+          "ratio": 4.633901648425493,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-danger-muted",
+          "ratio": 5.052023198024805,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-danger-muted",
+          "ratio": 4.5127708090509016,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-info-muted",
+          "ratio": 5.080169562885429,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-info-muted",
+          "ratio": 4.867157343096015,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-info-muted",
+          "ratio": 4.659718530378019,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-info-muted",
+          "ratio": 5.080169562885429,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-info-muted",
+          "ratio": 4.537912834086254,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-success-muted",
+          "ratio": 5.04193215341054,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-success-muted",
+          "ratio": 4.830523233544568,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-success-muted",
+          "ratio": 4.624645770841506,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-success-muted",
+          "ratio": 5.04193215341054,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-success-muted",
+          "ratio": 4.503756881405858,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-warning-muted",
+          "ratio": 5.080948676721036,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-warning-muted",
+          "ratio": 4.867903788579604,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-warning-muted",
+          "ratio": 4.660433162268178,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-warning-muted",
+          "ratio": 5.080948676721036,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-warning-muted",
+          "ratio": 4.538608785398519,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-focus-ring",
+          "ratio": 3.3768285115017265,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-focus-ring",
+          "ratio": 3.2352376200601785,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-focus-ring",
+          "ratio": 3.0973514159665627,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-focus-ring",
+          "ratio": 3.3768285115017265,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-focus-ring",
+          "ratio": 3.016386215295636,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-brand-mark",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-brand-mark",
+          "ratio": 9.923670604572445,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-brand-mark",
+          "ratio": 9.500722607845564,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-brand-mark",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-brand-mark",
+          "ratio": 9.25237238562095,
+          "status": "pass",
+          "target": 3.0
+        }
+      ],
+      "seeds": {
+        "seed-accent": "#1e3a8a",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.379",
+        "seed-brand": "#1e3a8a",
+        "seed-chroma-scale": "1",
+        "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "265.5",
+        "seed-radii": "0.5rem"
+      },
+      "tokens": [
+        {
+          "chromaReduced": false,
+          "hex": "#ffffff",
+          "name": "color-background",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 1.0
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#fafafa",
+          "name": "color-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.985
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 1.4115336199566344,
+          "hex": "#d9d9d9",
+          "name": "color-border",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.8868377804756165
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 21.0,
+          "hex": "#000000",
+          "name": "color-foreground",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.0
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.098907547355162,
+          "hex": "#6e6e6e",
+          "name": "color-foreground-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.5399718475341797
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#f5f5f5",
+          "name": "color-surface-raised",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.97
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#ffffff",
+          "name": "color-surface-overlay",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 1.0
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#f2f2f2",
+          "name": "color-surface-sunken",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.96
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 10.357982247884618,
+          "hex": "#1e3a8a",
+          "name": "color-primary",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 9.753132594384452,
+          "hex": "#f8f8f8",
+          "name": "color-foreground-on-primary",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.9776343761036161
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 9.753132594384452,
+          "hex": "#f8f8f8",
+          "name": "color-foreground-on-accent",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.9776343761036161
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 4.501730354013627,
+          "hex": "#f8f8f8",
+          "name": "color-foreground-on-status",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.9776343761036161
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#122b7a",
+          "name": "color-primary-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.32905917263375983
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#081c6b",
+          "name": "color-primary-active",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.2790591726337598
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#e7efff",
+          "name": "color-primary-subtle",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.023609218597412107,
+            "hue": 265.522187764832,
+            "lightness": 0.95
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#1e3a8a",
+          "name": "color-primary-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 10.357982247884618,
+          "hex": "#1e3a8a",
+          "name": "color-accent",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#122b7a",
+          "name": "color-accent-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.32905917263375983
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#081c6b",
+          "name": "color-accent-active",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.2790591726337598
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#e7efff",
+          "name": "color-accent-subtle",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.023609218597412107,
+            "hue": 265.522187764832,
+            "lightness": 0.95
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#1e3a8a",
+          "name": "color-accent-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.038457795235216,
+          "hex": "#ca3a35",
+          "name": "color-danger",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.18113119255780571,
+            "hue": 27.0,
+            "lightness": 0.5628067016601561
+          }
+        },
+        {
+          "chromaReduced": true,
+          "contrast": 5.077279843594242,
+          "hex": "#0073b7",
+          "name": "color-info",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.1356375527068721,
+            "hue": 245.0,
+            "lightness": 0.5384544181823729
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.082400395371674,
+          "hex": "#027f48",
+          "name": "color-success",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12937942325557553,
+            "hue": 155.0,
+            "lightness": 0.5256541442871094
+          }
+        },
+        {
+          "chromaReduced": true,
+          "contrast": 5.050167131404407,
+          "hex": "#966500",
+          "name": "color-warning",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.11504008108990427,
+            "hue": 75.0,
+            "lightness": 0.5448328399658204
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.073892702713396,
+          "hex": "#5c6e98",
+          "name": "color-primary-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.06888060279039566,
+            "hue": 265.522187764832,
+            "lightness": 0.5418175506591798
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.073892702713396,
+          "hex": "#5c6e98",
+          "name": "color-accent-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.06888060279039566,
+            "hue": 265.522187764832,
+            "lightness": 0.5418175506591798
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.052023198024805,
+          "hex": "#a05c55",
+          "name": "color-danger-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.09056559627890286,
+            "hue": 27.0,
+            "lightness": 0.5522195434570312
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.080169562885429,
+          "hex": "#4b7294",
+          "name": "color-info-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.06900235906964028,
+            "hue": 245.0,
+            "lightness": 0.5383243560791016
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.04193215341054,
+          "hex": "#4e785c",
+          "name": "color-success-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.06468971162778776,
+            "hue": 155.0,
+            "lightness": 0.5341303825378418
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.080948676721036,
+          "hex": "#8b6837",
+          "name": "color-warning-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.07978397767427158,
+            "hue": 75.0,
+            "lightness": 0.5427620887756348
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#122b7a",
+          "name": "color-primary-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.32905917263375983
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#122b7a",
+          "name": "color-accent-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.32905917263375983
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#ce3f38",
+          "name": "color-danger-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.18113119255780571,
+            "hue": 27.0,
+            "lightness": 0.5750418996810914
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#bc2d29",
+          "name": "color-danger-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.18113119255780571,
+            "hue": 27.0,
+            "lightness": 0.5250418996810914
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#0377bc",
+          "name": "color-info-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13800471813928056,
+            "hue": 245.0,
+            "lightness": 0.5516829538345337
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#0069a6",
+          "name": "color-info-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12639763186023217,
+            "hue": 245.0,
+            "lightness": 0.5016829538345337
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#0e834b",
+          "name": "color-success-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12937942325557553,
+            "hue": 155.0,
+            "lightness": 0.5388477301597594
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#007340",
+          "name": "color-success-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12096253526958087,
+            "hue": 155.0,
+            "lightness": 0.4888477301597594
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#9c6800",
+          "name": "color-warning-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.11822131745861889,
+            "hue": 75.0,
+            "lightness": 0.5599379324913023
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#895b00",
+          "name": "color-warning-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.10769303053350428,
+            "hue": 75.0,
+            "lightness": 0.5099379324913023
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#161616",
+          "name": "color-surface-inverse",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.2
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 7.259815580646369,
+          "hex": "#a4a4a4",
+          "name": "color-foreground-inverse",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.7170897483825683
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 3.3768285115017265,
+          "hex": "#6589e1",
+          "name": "color-focus-ring",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.6442476654052736
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 10.357982247884618,
+          "hex": "#1e3a8a",
+          "name": "color-brand-mark",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        }
+      ],
+      "violations": []
+    },
+    {
+      "collisions": [],
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #000000;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #1e3a8a;\n  --helix-color-foreground-on-primary: #f8f8f8;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-foreground-on-status: #f8f8f8;\n  --helix-color-primary-hover: #122b7a;\n  --helix-color-primary-active: #081c6b;\n  --helix-color-primary-subtle: #e7efff;\n  --helix-color-primary-surface: #1e3a8a;\n  --helix-color-accent: #1e3a8a;\n  --helix-color-accent-hover: #122b7a;\n  --helix-color-accent-active: #081c6b;\n  --helix-color-accent-subtle: #e7efff;\n  --helix-color-accent-surface: #1e3a8a;\n  --helix-color-danger: #ca3a35;\n  --helix-color-info: #0073b7;\n  --helix-color-success: #027f48;\n  --helix-color-warning: #966500;\n  --helix-color-primary-muted: #5c6e98;\n  --helix-color-accent-muted: #5c6e98;\n  --helix-color-danger-muted: #a05c55;\n  --helix-color-info-muted: #4b7294;\n  --helix-color-success-muted: #4e785c;\n  --helix-color-warning-muted: #8b6837;\n  --helix-color-primary-surface-hover: #122b7a;\n  --helix-color-accent-surface-hover: #122b7a;\n  --helix-color-danger-surface: #ce3f38;\n  --helix-color-danger-surface-hover: #bc2d29;\n  --helix-color-info-surface: #0377bc;\n  --helix-color-info-surface-hover: #0069a6;\n  --helix-color-success-surface: #0e834b;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #6589e1;\n  --helix-color-brand-mark: #1e3a8a;\n  --helix-seed-accent: #1e3a8a;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.379;\n  --helix-seed-brand: #1e3a8a;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 265.5;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "label": "two-brands",
+      "pairings": [
+        {
+          "background": "color-background",
+          "foreground": "color-foreground",
+          "ratio": 21.0,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-foreground",
+          "ratio": 20.119467064985724,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-foreground",
+          "ratio": 19.261973035868383,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-foreground",
+          "ratio": 21.0,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-foreground",
+          "ratio": 18.758462357639324,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-subtle",
+          "foreground": "color-foreground",
+          "ratio": 18.18838562328475,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-subtle",
+          "foreground": "color-foreground",
+          "ratio": 18.18838562328475,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-overlay",
+          "foreground": "color-foreground",
+          "status": "unverifiable",
+          "target": 4.5
+        },
+        {
+          "background": "color-well",
+          "foreground": "color-foreground",
+          "status": "unverifiable",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-foreground-muted",
+          "ratio": 5.098907547355162,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-foreground-muted",
+          "ratio": 4.885109641258063,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-foreground-muted",
+          "ratio": 4.6769056995019485,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-foreground-muted",
+          "ratio": 5.098907547355162,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-foreground-muted",
+          "ratio": 4.554650728197374,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-surface",
+          "foreground": "color-foreground-on-primary",
+          "ratio": 9.753132594384452,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-surface-hover",
+          "foreground": "color-foreground-on-primary",
+          "ratio": 11.96739805460922,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-surface",
+          "foreground": "color-foreground-on-accent",
+          "ratio": 9.753132594384452,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-surface-hover",
+          "foreground": "color-foreground-on-accent",
+          "ratio": 11.96739805460922,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-danger-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.501730354013627,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-danger-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.5768992172963205,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-info-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.5261512642789645,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-info-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.5368938598261055,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-success-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.52820135751521,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-success-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.607454100706489,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-warning-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.5004599020905465,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-warning-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.55424692976324,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-inverse",
+          "foreground": "color-foreground-inverse",
+          "ratio": 7.259815580646369,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-media",
+          "foreground": "color-foreground-media",
+          "status": "unverifiable",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-primary",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-primary",
+          "ratio": 9.923670604572445,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-primary",
+          "ratio": 9.500722607845564,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-primary",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-primary",
+          "ratio": 9.25237238562095,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-subtle",
+          "foreground": "color-primary",
+          "ratio": 8.971189304936344,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-accent",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-accent",
+          "ratio": 9.923670604572445,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-accent",
+          "ratio": 9.500722607845564,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-accent",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-accent",
+          "ratio": 9.25237238562095,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-subtle",
+          "foreground": "color-accent",
+          "ratio": 8.971189304936344,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-danger",
+          "ratio": 5.038457795235216,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-danger",
+          "ratio": 4.8271945556931195,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-danger",
+          "ratio": 4.621458961627694,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-danger",
+          "ratio": 5.038457795235216,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-danger",
+          "ratio": 4.500653375832106,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-info",
+          "ratio": 5.077279843594242,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-info",
+          "ratio": 4.864388790138583,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-info",
+          "ratio": 4.657067973470016,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-info",
+          "ratio": 5.077279843594242,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-info",
+          "ratio": 4.535331563107785,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-success",
+          "ratio": 5.082400395371674,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-success",
+          "ratio": 4.869294636464324,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-success",
+          "ratio": 4.6617647320540945,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-success",
+          "ratio": 5.082400395371674,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-success",
+          "ratio": 4.539905547763369,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-warning",
+          "ratio": 5.050167131404407,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-warning",
+          "ratio": 4.83841291776021,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-warning",
+          "ratio": 4.632199195797165,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-warning",
+          "ratio": 5.050167131404407,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-warning",
+          "ratio": 4.5111128587731875,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-primary-muted",
+          "ratio": 5.073892702713396,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-primary-muted",
+          "ratio": 4.861143672548265,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-primary-muted",
+          "ratio": 4.653961163169275,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-primary-muted",
+          "ratio": 5.073892702713396,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-primary-muted",
+          "ratio": 4.53230596526429,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-accent-muted",
+          "ratio": 5.073892702713396,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-accent-muted",
+          "ratio": 4.861143672548265,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-accent-muted",
+          "ratio": 4.653961163169275,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-accent-muted",
+          "ratio": 5.073892702713396,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-accent-muted",
+          "ratio": 4.53230596526429,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-danger-muted",
+          "ratio": 5.052023198024805,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-danger-muted",
+          "ratio": 4.840191159247805,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-danger-muted",
+          "ratio": 4.633901648425493,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-danger-muted",
+          "ratio": 5.052023198024805,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-danger-muted",
+          "ratio": 4.5127708090509016,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-info-muted",
+          "ratio": 5.080169562885429,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-info-muted",
+          "ratio": 4.867157343096015,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-info-muted",
+          "ratio": 4.659718530378019,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-info-muted",
+          "ratio": 5.080169562885429,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-info-muted",
+          "ratio": 4.537912834086254,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-success-muted",
+          "ratio": 5.04193215341054,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-success-muted",
+          "ratio": 4.830523233544568,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-success-muted",
+          "ratio": 4.624645770841506,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-success-muted",
+          "ratio": 5.04193215341054,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-success-muted",
+          "ratio": 4.503756881405858,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-warning-muted",
+          "ratio": 5.080948676721036,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-warning-muted",
+          "ratio": 4.867903788579604,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-warning-muted",
+          "ratio": 4.660433162268178,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-warning-muted",
+          "ratio": 5.080948676721036,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-warning-muted",
+          "ratio": 4.538608785398519,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-focus-ring",
+          "ratio": 3.3768285115017265,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-focus-ring",
+          "ratio": 3.2352376200601785,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-focus-ring",
+          "ratio": 3.0973514159665627,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-focus-ring",
+          "ratio": 3.3768285115017265,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-focus-ring",
+          "ratio": 3.016386215295636,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-brand-mark",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-brand-mark",
+          "ratio": 9.923670604572445,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-brand-mark",
+          "ratio": 9.500722607845564,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-brand-mark",
+          "ratio": 10.357982247884618,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-brand-mark",
+          "ratio": 9.25237238562095,
+          "status": "pass",
+          "target": 3.0
+        }
+      ],
+      "seeds": {
+        "seed-accent": "#1e3a8a",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.379",
+        "seed-brand": "#1e3a8a",
+        "seed-chroma-scale": "1",
+        "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "265.5",
+        "seed-radii": "0.5rem"
+      },
+      "tokens": [
+        {
+          "chromaReduced": false,
+          "hex": "#ffffff",
+          "name": "color-background",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 1.0
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#fafafa",
+          "name": "color-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.985
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 1.4115336199566344,
+          "hex": "#d9d9d9",
+          "name": "color-border",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.8868377804756165
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 21.0,
+          "hex": "#000000",
+          "name": "color-foreground",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.0
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.098907547355162,
+          "hex": "#6e6e6e",
+          "name": "color-foreground-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.5399718475341797
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#f5f5f5",
+          "name": "color-surface-raised",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.97
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#ffffff",
+          "name": "color-surface-overlay",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 1.0
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#f2f2f2",
+          "name": "color-surface-sunken",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.96
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 10.357982247884618,
+          "hex": "#1e3a8a",
+          "name": "color-primary",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 9.753132594384452,
+          "hex": "#f8f8f8",
+          "name": "color-foreground-on-primary",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.9776343761036161
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 9.753132594384452,
+          "hex": "#f8f8f8",
+          "name": "color-foreground-on-accent",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.9776343761036161
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 4.501730354013627,
+          "hex": "#f8f8f8",
+          "name": "color-foreground-on-status",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.9776343761036161
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#122b7a",
+          "name": "color-primary-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.32905917263375983
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#081c6b",
+          "name": "color-primary-active",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.2790591726337598
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#e7efff",
+          "name": "color-primary-subtle",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.023609218597412107,
+            "hue": 265.522187764832,
+            "lightness": 0.95
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#1e3a8a",
+          "name": "color-primary-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 10.357982247884618,
+          "hex": "#1e3a8a",
+          "name": "color-accent",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#122b7a",
+          "name": "color-accent-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.32905917263375983
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#081c6b",
+          "name": "color-accent-active",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.2790591726337598
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#e7efff",
+          "name": "color-accent-subtle",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.023609218597412107,
+            "hue": 265.522187764832,
+            "lightness": 0.95
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#1e3a8a",
+          "name": "color-accent-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.038457795235216,
+          "hex": "#ca3a35",
+          "name": "color-danger",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.18113119255780571,
+            "hue": 27.0,
+            "lightness": 0.5628067016601561
+          }
+        },
+        {
+          "chromaReduced": true,
+          "contrast": 5.077279843594242,
+          "hex": "#0073b7",
+          "name": "color-info",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.1356375527068721,
+            "hue": 245.0,
+            "lightness": 0.5384544181823729
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.082400395371674,
+          "hex": "#027f48",
+          "name": "color-success",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12937942325557553,
+            "hue": 155.0,
+            "lightness": 0.5256541442871094
+          }
+        },
+        {
+          "chromaReduced": true,
+          "contrast": 5.050167131404407,
+          "hex": "#966500",
+          "name": "color-warning",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.11504008108990427,
+            "hue": 75.0,
+            "lightness": 0.5448328399658204
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.073892702713396,
+          "hex": "#5c6e98",
+          "name": "color-primary-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.06888060279039566,
+            "hue": 265.522187764832,
+            "lightness": 0.5418175506591798
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.073892702713396,
+          "hex": "#5c6e98",
+          "name": "color-accent-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.06888060279039566,
+            "hue": 265.522187764832,
+            "lightness": 0.5418175506591798
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.052023198024805,
+          "hex": "#a05c55",
+          "name": "color-danger-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.09056559627890286,
+            "hue": 27.0,
+            "lightness": 0.5522195434570312
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.080169562885429,
+          "hex": "#4b7294",
+          "name": "color-info-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.06900235906964028,
+            "hue": 245.0,
+            "lightness": 0.5383243560791016
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.04193215341054,
+          "hex": "#4e785c",
+          "name": "color-success-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.06468971162778776,
+            "hue": 155.0,
+            "lightness": 0.5341303825378418
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.080948676721036,
+          "hex": "#8b6837",
+          "name": "color-warning-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.07978397767427158,
+            "hue": 75.0,
+            "lightness": 0.5427620887756348
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#122b7a",
+          "name": "color-primary-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.32905917263375983
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#122b7a",
+          "name": "color-accent-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.32905917263375983
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#ce3f38",
+          "name": "color-danger-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.18113119255780571,
+            "hue": 27.0,
+            "lightness": 0.5750418996810914
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#bc2d29",
+          "name": "color-danger-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.18113119255780571,
+            "hue": 27.0,
+            "lightness": 0.5250418996810914
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#0377bc",
+          "name": "color-info-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13800471813928056,
+            "hue": 245.0,
+            "lightness": 0.5516829538345337
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#0069a6",
+          "name": "color-info-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12639763186023217,
+            "hue": 245.0,
+            "lightness": 0.5016829538345337
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#0e834b",
+          "name": "color-success-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12937942325557553,
+            "hue": 155.0,
+            "lightness": 0.5388477301597594
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#007340",
+          "name": "color-success-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12096253526958087,
+            "hue": 155.0,
+            "lightness": 0.4888477301597594
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#9c6800",
+          "name": "color-warning-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.11822131745861889,
+            "hue": 75.0,
+            "lightness": 0.5599379324913023
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#895b00",
+          "name": "color-warning-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.10769303053350428,
+            "hue": 75.0,
+            "lightness": 0.5099379324913023
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#161616",
+          "name": "color-surface-inverse",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.2
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 7.259815580646369,
+          "hex": "#a4a4a4",
+          "name": "color-foreground-inverse",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 265.522187764832,
+            "lightness": 0.7170897483825683
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 3.3768285115017265,
+          "hex": "#6589e1",
+          "name": "color-focus-ring",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.6442476654052736
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 10.357982247884618,
+          "hex": "#1e3a8a",
+          "name": "color-brand-mark",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.13776120558079133,
+            "hue": 265.522187764832,
+            "lightness": 0.3790591726337598
+          }
+        }
+      ],
+      "violations": []
+    },
+    {
+      "collisions": [],
+      "css": ":root {\n  --helix-color-background: #000000;\n  --helix-color-surface: #121212;\n  --helix-color-border: #272727;\n  --helix-color-foreground: #ffffff;\n  --helix-color-foreground-muted: #818181;\n  --helix-color-surface-raised: #181818;\n  --helix-color-surface-overlay: #181818;\n  --helix-color-surface-sunken: #0b0b0b;\n  --helix-color-primary: #7dd3fc;\n  --helix-color-foreground-on-primary: #f8f8f8;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-foreground-on-status: #f8f8f8;\n  --helix-color-primary-hover: #a4e1ff;\n  --helix-color-primary-active: #cbedff;\n  --helix-color-primary-subtle: #002432;\n  --helix-color-primary-surface: #1b7ba0;\n  --helix-color-accent: #7dd3fc;\n  --helix-color-accent-hover: #a4e1ff;\n  --helix-color-accent-active: #cbedff;\n  --helix-color-accent-subtle: #002432;\n  --helix-color-accent-surface: #1b7ba0;\n  --helix-color-danger: #d6574e;\n  --helix-color-info: #3486c3;\n  --helix-color-success: #39905e;\n  --helix-color-warning: #ae7500;\n  --helix-color-primary-muted: #608698;\n  --helix-color-accent-muted: #608698;\n  --helix-color-danger-muted: #af7069;\n  --helix-color-info-muted: #6184a2;\n  --helix-color-success-muted: #63896f;\n  --helix-color-warning-muted: #9a7b50;\n  --helix-color-primary-surface-hover: #006c90;\n  --helix-color-accent-surface-hover: #006c90;\n  --helix-color-danger-surface: #c54841;\n  --helix-color-danger-surface-hover: #b43832;\n  --helix-color-info-surface: #2377b4;\n  --helix-color-info-surface-hover: #0a69a4;\n  --helix-color-success-surface: #278150;\n  --helix-color-success-surface-hover: #117342;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #eeeeee;\n  --helix-color-foreground-inverse: #4d4d4d;\n  --helix-color-focus-ring: #006c91;\n  --helix-color-brand-mark: #7dd3fc;\n  --helix-seed-accent: #7dd3fc;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.828;\n  --helix-seed-brand: #7dd3fc;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 230.3;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "label": "two-brands-dark",
+      "pairings": [
+        {
+          "background": "color-background",
+          "foreground": "color-foreground",
+          "ratio": 21.0,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-foreground",
+          "ratio": 18.733663902900595,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-foreground",
+          "ratio": 17.756264715186326,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-foreground",
+          "ratio": 17.756264715186326,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-foreground",
+          "ratio": 19.682627652657427,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-subtle",
+          "foreground": "color-foreground",
+          "ratio": 16.173647815127765,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-subtle",
+          "foreground": "color-foreground",
+          "ratio": 16.173647815127765,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-overlay",
+          "foreground": "color-foreground",
+          "status": "unverifiable",
+          "target": 4.5
+        },
+        {
+          "background": "color-well",
+          "foreground": "color-foreground",
+          "status": "unverifiable",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-foreground-muted",
+          "ratio": 5.390523994585384,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-foreground-muted",
+          "ratio": 4.808774513099225,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-foreground-muted",
+          "ratio": 4.5578843334010335,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-foreground-muted",
+          "ratio": 4.5578843334010335,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-foreground-muted",
+          "ratio": 5.052365554197126,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-surface",
+          "foreground": "color-foreground-on-primary",
+          "ratio": 4.506933342023905,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-surface-hover",
+          "foreground": "color-foreground-on-primary",
+          "ratio": 5.5735959074917005,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-surface",
+          "foreground": "color-foreground-on-accent",
+          "ratio": 4.506933342023905,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-surface-hover",
+          "foreground": "color-foreground-on-accent",
+          "ratio": 5.5735959074917005,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-danger-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.517290043358867,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-danger-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.566317851035037,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-info-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.525651289130793,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-info-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.539471178798022,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-success-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.553839528814228,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-success-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.562543723014543,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-warning-surface",
+          "foreground": "color-foreground-on-status",
+          "ratio": 4.5004599020905465,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-warning-surface-hover",
+          "foreground": "color-foreground-on-status",
+          "ratio": 5.55424692976324,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-inverse",
+          "foreground": "color-foreground-inverse",
+          "ratio": 7.285779000845928,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-media",
+          "foreground": "color-foreground-media",
+          "status": "unverifiable",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-primary",
+          "ratio": 12.5953560241201,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-primary",
+          "ratio": 11.236055547297155,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-primary",
+          "ratio": 10.649832178394918,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-primary",
+          "ratio": 10.649832178394918,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-primary",
+          "ratio": 11.805223941686267,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-primary-subtle",
+          "foreground": "color-primary",
+          "ratio": 9.700612020965066,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-accent",
+          "ratio": 12.5953560241201,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-accent",
+          "ratio": 11.236055547297155,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-accent",
+          "ratio": 10.649832178394918,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-accent",
+          "ratio": 10.649832178394918,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-accent",
+          "ratio": 11.805223941686267,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-accent-subtle",
+          "foreground": "color-accent",
+          "ratio": 9.700612020965066,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-danger",
+          "ratio": 5.332517996932415,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-danger",
+          "ratio": 4.757028567176218,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-danger",
+          "ratio": 4.50883815009653,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-danger",
+          "ratio": 4.50883815009653,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-danger",
+          "ratio": 4.997998389748349,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-info",
+          "ratio": 5.34407787657979,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-info",
+          "ratio": 4.76734089575107,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-info",
+          "ratio": 4.5186124492915045,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-info",
+          "ratio": 4.5186124492915045,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-info",
+          "ratio": 5.0088330948344835,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-success",
+          "ratio": 5.324905387816727,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-success",
+          "ratio": 4.750237516671577,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-success",
+          "ratio": 4.5024014118759865,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-success",
+          "ratio": 4.5024014118759865,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-success",
+          "ratio": 4.9908633349536204,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-warning",
+          "ratio": 5.3442500350106075,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-warning",
+          "ratio": 4.76749447471207,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-warning",
+          "ratio": 4.518758015513912,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-warning",
+          "ratio": 4.518758015513912,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-warning",
+          "ratio": 5.0089944534197715,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-primary-muted",
+          "ratio": 5.360797877234448,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-primary-muted",
+          "ratio": 4.7822564611187195,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-primary-muted",
+          "ratio": 4.53274981870399,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-primary-muted",
+          "ratio": 4.53274981870399,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-primary-muted",
+          "ratio": 5.024504216131522,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-accent-muted",
+          "ratio": 5.360797877234448,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-accent-muted",
+          "ratio": 4.7822564611187195,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-accent-muted",
+          "ratio": 4.53274981870399,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-accent-muted",
+          "ratio": 4.53274981870399,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-accent-muted",
+          "ratio": 5.024504216131522,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-danger-muted",
+          "ratio": 5.344444373150726,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-danger-muted",
+          "ratio": 4.767667839731141,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-danger-muted",
+          "ratio": 4.518922335488207,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-danger-muted",
+          "ratio": 4.518922335488207,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-danger-muted",
+          "ratio": 5.0091766003364695,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-info-muted",
+          "ratio": 5.330510039906123,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-info-muted",
+          "ratio": 4.755237310411359,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-info-muted",
+          "ratio": 4.507140349311027,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-info-muted",
+          "ratio": 4.507140349311027,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-info-muted",
+          "ratio": 4.996116395915442,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-success-muted",
+          "ratio": 5.338333318874327,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-success-muted",
+          "ratio": 4.7622162951165485,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-success-muted",
+          "ratio": 4.513755216563416,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-success-muted",
+          "ratio": 4.513755216563416,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-success-muted",
+          "ratio": 5.003448904818016,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-warning-muted",
+          "ratio": 5.323025892667867,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-warning-muted",
+          "ratio": 4.748560858079869,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-warning-muted",
+          "ratio": 4.500812230285793,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-warning-muted",
+          "ratio": 4.500812230285793,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-warning-muted",
+          "ratio": 4.9891017443255254,
+          "status": "pass",
+          "target": 4.5
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-focus-ring",
+          "ratio": 3.553891614631853,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-focus-ring",
+          "ratio": 3.170352907421422,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-focus-ring",
+          "ratio": 3.0049447751659115,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-focus-ring",
+          "ratio": 3.0049447751659115,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-focus-ring",
+          "ratio": 3.330948827080965,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-background",
+          "foreground": "color-brand-mark",
+          "ratio": 12.5953560241201,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface",
+          "foreground": "color-brand-mark",
+          "ratio": 11.236055547297155,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-raised",
+          "foreground": "color-brand-mark",
+          "ratio": 10.649832178394918,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-overlay",
+          "foreground": "color-brand-mark",
+          "ratio": 10.649832178394918,
+          "status": "pass",
+          "target": 3.0
+        },
+        {
+          "background": "color-surface-sunken",
+          "foreground": "color-brand-mark",
+          "ratio": 11.805223941686267,
+          "status": "pass",
+          "target": 3.0
+        }
+      ],
+      "seeds": {
+        "seed-accent": "#7dd3fc",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.828",
+        "seed-brand": "#7dd3fc",
+        "seed-chroma-scale": "1",
+        "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "230.3",
+        "seed-radii": "0.5rem"
+      },
+      "tokens": [
+        {
+          "chromaReduced": false,
+          "hex": "#000000",
+          "name": "color-background",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.0
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#121212",
+          "name": "color-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 230.31789338093245,
+            "lightness": 0.182
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 1.405771261133048,
+          "hex": "#272727",
+          "name": "color-border",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 230.31789338093245,
+            "lightness": 0.27068161964416504
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 21.0,
+          "hex": "#ffffff",
+          "name": "color-foreground",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 230.31789338093245,
+            "lightness": 1.0
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.390523994585384,
+          "hex": "#818181",
+          "name": "color-foreground-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 230.31789338093245,
+            "lightness": 0.6015597277879716
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#181818",
+          "name": "color-surface-raised",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 230.31789338093245,
+            "lightness": 0.21
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#181818",
+          "name": "color-surface-overlay",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 230.31789338093245,
+            "lightness": 0.21
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#0b0b0b",
+          "name": "color-surface-sunken",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 230.31789338093245,
+            "lightness": 0.15
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 12.5953560241201,
+          "hex": "#7dd3fc",
+          "name": "color-primary",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.10127680860613877,
+            "hue": 230.31789338093245,
+            "lightness": 0.8275864957767686
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 4.506933342023905,
+          "hex": "#f8f8f8",
+          "name": "color-foreground-on-primary",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.9776343689113374
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 4.506933342023905,
+          "hex": "#f8f8f8",
+          "name": "color-foreground-on-accent",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.9776343689113374
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 4.517290043358867,
+          "hex": "#f8f8f8",
+          "name": "color-foreground-on-status",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 0.0,
+            "lightness": 0.9776343689113374
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#a4e1ff",
+          "name": "color-primary-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.07467997886800853,
+            "hue": 230.31789338093245,
+            "lightness": 0.8775864957767686
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#cbedff",
+          "name": "color-primary-active",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.043382352740431326,
+            "hue": 230.31789338093245,
+            "lightness": 0.9275864957767685
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#002432",
+          "name": "color-primary-subtle",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.048782444000244146,
+            "hue": 230.31789338093245,
+            "lightness": 0.242
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#1b7ba0",
+          "name": "color-primary-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.10127680860613877,
+            "hue": 230.31789338093245,
+            "lightness": 0.5475140500068665
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 12.5953560241201,
+          "hex": "#7dd3fc",
+          "name": "color-accent",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.10127680860613877,
+            "hue": 230.31789338093245,
+            "lightness": 0.8275864957767686
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#a4e1ff",
+          "name": "color-accent-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.07467997886800853,
+            "hue": 230.31789338093245,
+            "lightness": 0.8775864957767686
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#cbedff",
+          "name": "color-accent-active",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.043382352740431326,
+            "hue": 230.31789338093245,
+            "lightness": 0.9275864957767685
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#002432",
+          "name": "color-accent-subtle",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.048782444000244146,
+            "hue": 230.31789338093245,
+            "lightness": 0.242
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#1b7ba0",
+          "name": "color-accent-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.10127680860613877,
+            "hue": 230.31789338093245,
+            "lightness": 0.5475140500068665
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.332517996932415,
+          "hex": "#d6574e",
+          "name": "color-danger",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.1609687626507609,
+            "hue": 27.0,
+            "lightness": 0.6193502497673036
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.34407787657979,
+          "hex": "#3486c3",
+          "name": "color-info",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12264286678153212,
+            "hue": 245.0,
+            "lightness": 0.5974179434776306
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.324905387816727,
+          "hex": "#39905e",
+          "name": "color-success",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.11497768760768635,
+            "hue": 155.0,
+            "lightness": 0.5872597676515579
+          }
+        },
+        {
+          "chromaReduced": true,
+          "contrast": 5.3442500350106075,
+          "hex": "#ae7500",
+          "name": "color-warning",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12771024294829247,
+            "hue": 75.0,
+            "lightness": 0.6049829542636872
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.360797877234448,
+          "hex": "#608698",
+          "name": "color-primary-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.05063840430306939,
+            "hue": 230.31789338093245,
+            "lightness": 0.5974283498525619
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.360797877234448,
+          "hex": "#608698",
+          "name": "color-accent-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.05063840430306939,
+            "hue": 230.31789338093245,
+            "lightness": 0.5974283498525619
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.344444373150726,
+          "hex": "#af7069",
+          "name": "color-danger-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.08048438132538045,
+            "hue": 27.0,
+            "lightness": 0.6102280497550965
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.330510039906123,
+          "hex": "#6184a2",
+          "name": "color-info-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.06132143339076606,
+            "hue": 245.0,
+            "lightness": 0.5980095529556275
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.338333318874327,
+          "hex": "#63896f",
+          "name": "color-success-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.05748884380384318,
+            "hue": 155.0,
+            "lightness": 0.592517482638359
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 5.323025892667867,
+          "hex": "#9a7b50",
+          "name": "color-warning-muted",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.07090290735807325,
+            "hue": 75.0,
+            "lightness": 0.6017252880334854
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#006c90",
+          "name": "color-primary-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.09958975681788172,
+            "hue": 230.31789338093245,
+            "lightness": 0.4975140500068665
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#006c90",
+          "name": "color-accent-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.09958975681788172,
+            "hue": 230.31789338093245,
+            "lightness": 0.4975140500068665
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#c54841",
+          "name": "color-danger-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.1609687626507609,
+            "hue": 27.0,
+            "lightness": 0.572556153535843
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#b43832",
+          "name": "color-danger-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.1609687626507609,
+            "hue": 27.0,
+            "lightness": 0.522556153535843
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#2377b4",
+          "name": "color-info-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12264286678153212,
+            "hue": 245.0,
+            "lightness": 0.5514613366127015
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#0a69a4",
+          "name": "color-info-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.12264286678153212,
+            "hue": 245.0,
+            "lightness": 0.5014613366127014
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#278150",
+          "name": "color-success-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.11497768760768635,
+            "hue": 155.0,
+            "lightness": 0.539024953842163
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#117342",
+          "name": "color-success-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.11497768760768635,
+            "hue": 155.0,
+            "lightness": 0.489024953842163
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#9c6800",
+          "name": "color-warning-surface",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.1182213694764999,
+            "hue": 75.0,
+            "lightness": 0.5599379324913023
+          }
+        },
+        {
+          "chromaReduced": true,
+          "hex": "#895b00",
+          "name": "color-warning-surface-hover",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.10769306777832381,
+            "hue": 75.0,
+            "lightness": 0.5099379324913023
+          }
+        },
+        {
+          "chromaReduced": false,
+          "hex": "#eeeeee",
+          "name": "color-surface-inverse",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 230.31789338093245,
+            "lightness": 0.95
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 7.285779000845928,
+          "hex": "#4d4d4d",
+          "name": "color-foreground-inverse",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.0,
+            "hue": 230.31789338093245,
+            "lightness": 0.42208278775215147
+          }
+        },
+        {
+          "chromaReduced": true,
+          "contrast": 3.553891614631853,
+          "hex": "#006c91",
+          "name": "color-focus-ring",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.09974883246311328,
+            "hue": 230.31789338093245,
+            "lightness": 0.49831050097942337
+          }
+        },
+        {
+          "chromaReduced": false,
+          "contrast": 12.5953560241201,
+          "hex": "#7dd3fc",
+          "name": "color-brand-mark",
+          "origin": "derived",
+          "value": {
+            "chroma": 0.10127680860613877,
+            "hue": 230.31789338093245,
+            "lightness": 0.8275864957767686
           }
         }
       ],

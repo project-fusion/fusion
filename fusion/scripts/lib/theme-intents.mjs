@@ -111,4 +111,15 @@ export const INTENTS = [
   { intent: {}, label: 'ink' },
   { intent: { scheme: 'dark' }, label: 'ink-dark' },
   { intent: { accent: '#db2777' }, label: 'ink-accent' },
+  /* A brand that already reads on a light page, kept as it is: the primary and
+     its fill are the navy itself, where a solve lightened it to the target and
+     handed back a mid blue. */
+  { intent: { brand: '#1e3a8a' }, label: 'navy' },
+  /* A brand for each scheme, each derived in its own: the navy on the light
+     page and the sky blue on the dark one. */
+  { intent: { brand: { dark: '#7dd3fc', light: '#1e3a8a' } }, label: 'two-brands' },
+  {
+    intent: { brand: { dark: '#7dd3fc', light: '#1e3a8a' }, scheme: 'dark' },
+    label: 'two-brands-dark',
+  },
 ]

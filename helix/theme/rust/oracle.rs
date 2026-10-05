@@ -45,7 +45,7 @@ use serde_json::Value;
 
 use crate::css::{to_css, to_css_modes};
 use crate::derive::accent::{seeded, settle};
-use crate::derive::emphasis::{emphasis, ink};
+use crate::derive::emphasis::{chosen, emphasis, ink};
 use crate::derive::inks::neutral_inks;
 use crate::derive::marks::walk_outward;
 use crate::derive::report::Outcome;
@@ -57,9 +57,9 @@ use crate::derive::theme::derive_theme;
 use crate::derive::tokens::derive_tokens;
 use crate::derive::{perceptual_distance, token, Cast, DerivedToken, Deriving, Origin};
 use crate::intent::{
-    is_relation, status_seed, to_oklch, Character, Chroma, Color, Floating, Font, From, Material,
-    Mechanism, Motion, Relation, Scheme, Seed, Separation, Status, StatusSeed, ThemeIntent, Weight,
-    STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
+    is_relation, status_seed, to_oklch, Brand, BrandPair, Character, Chroma, Color, Floating, Font,
+    From, Material, Mechanism, Motion, Relation, Scheme, Seed, Separation, Status, StatusSeed,
+    ThemeIntent, Weight, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
 };
 use crate::model::{GROUNDS, INKS};
 use crate::oklch::{
@@ -854,7 +854,18 @@ pub fn labels() -> Vec<&'static str> {
         "ink",
         "ink-dark",
         "ink-accent",
+        "navy",
+        "two-brands",
+        "two-brands-dark",
     ]
+}
+
+/// The pair `two-brands` derives from, in light and in dark.
+fn two_brands() -> Brand {
+    Brand::Each(BrandPair {
+        dark: Some(Color::Hex("#7dd3fc".to_owned())),
+        light: Some(Color::Hex("#1e3a8a".to_owned())),
+    })
 }
 
 /// Rebuilds the intent the oracle derived a theme from, by label.
@@ -900,8 +911,8 @@ pub fn intent_for(label: &str) -> ThemeIntent {
             });
         }
         "aaa" => intent.contrast_target = Some(7.0),
-        "red" => intent.brand = Some(Color::Hex("#c1272d".to_owned())),
-        "amber" => intent.brand = Some(Color::Hex("#f59e0b".to_owned())),
+        "red" => intent.brand = Some(Brand::One(Color::Hex("#c1272d".to_owned()))),
+        "amber" => intent.brand = Some(Brand::One(Color::Hex("#f59e0b".to_owned()))),
         "quiet" => {
             intent.chroma = Some(Chroma {
                 ceiling: None,
@@ -923,7 +934,7 @@ pub fn intent_for(label: &str) -> ThemeIntent {
                 ("color-primary".to_owned(), Color::Hex("#7c3aed".to_owned())),
             ]);
         }
-        "pale" => intent.brand = Some(Color::Hex("#fef08a".to_owned())),
+        "pale" => intent.brand = Some(Brand::One(Color::Hex("#fef08a".to_owned()))),
         "expressive" => {
             intent.font = Some(Font {
                 base: Some(16.0),
@@ -1011,6 +1022,17 @@ pub fn intent_for(label: &str) -> ThemeIntent {
         "ink-accent" => {
             intent.brand = None;
             intent.accent = Some(Seed::Color(Color::Hex("#db2777".to_owned())));
+        }
+        /* A brand that already reads on a light page, kept as it is: the primary
+        and its fill are the navy itself, where a solve lightened it to the
+        target and handed back a mid blue. */
+        "navy" => intent.brand = Some(Brand::One(Color::Hex("#1e3a8a".to_owned()))),
+        /* A brand for each scheme, each derived in its own: the navy on the light
+        page and the sky blue on the dark one. */
+        "two-brands" => intent.brand = Some(two_brands()),
+        "two-brands-dark" => {
+            intent.brand = Some(two_brands());
+            intent.scheme = Some(Scheme::Dark);
         }
         other => panic!("no intent is recorded for `{other}`"),
     }
@@ -1306,7 +1328,7 @@ fn deriving_for(
         scheme: resolved.scheme,
         surfaces: built,
     };
-    let primary = brand.map_or_else(|| ink(neutral, &ctx), |brand| emphasis(brand, &ctx));
+    let primary = brand.map_or_else(|| ink(neutral, &ctx), |brand| chosen(brand, &ctx));
     let loudness = brand.map_or(REFERENCE_CHROMA, |brand| brand.chroma);
     (resolved, ctx, primary, loudness)
 }
@@ -1457,7 +1479,12 @@ fn the_accent_lands_where_the_typescript_lands() {
                 } else {
                     Origin::Related
                 };
-                (emphasis(settled, &ctx), origin)
+                let steps = if pinned {
+                    chosen(settled, &ctx)
+                } else {
+                    emphasis(settled, &ctx)
+                };
+                (steps, origin)
             }
         };
 
