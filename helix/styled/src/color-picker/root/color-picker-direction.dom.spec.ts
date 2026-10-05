@@ -42,10 +42,15 @@ if (hasLayout()) {
       return square.getBoundingClientRect().left + Number.parseFloat(drawn.left) + width / 2 + flip
     }
 
+    /* Half a mark in from the edge, which is as close as the mark comes to one:
+       centered on the edge itself, half of it was outside the picker. */
     test('puts a full color at the left, where the square is saturated', async () => {
       const host = await picker()
       const square = part(host, 'grid') as HTMLElement
-      expect(Math.abs(center(square) - square.getBoundingClientRect().left)).toBeLessThanOrEqual(1)
+      const half = Number.parseFloat(getComputedStyle(square, '::after').width) / 2
+      expect(
+        Math.abs(center(square) - (square.getBoundingClientRect().left + half)),
+      ).toBeLessThanOrEqual(1)
     })
 
     test('and a press at the right edge takes the color out', async () => {
