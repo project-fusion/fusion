@@ -128,3 +128,14 @@ describe('a direction meant for Trend', () => {
     expect(warnings[0]).toContain('helix-trend')
   })
 })
+
+/* A value written as text has no element of its own to style, so the slot it
+   arrives through is the part. */
+describe('the value part', () => {
+  test('is the slot the value arrives through, drawing no box of its own', async () => {
+    const stat = await mount('<helix-headless-stat>4,210</helix-headless-stat>')
+    const value = stat.shadowRoot?.querySelector('[part="value"]')
+    expect(value?.tagName).toBe('SLOT')
+    expect((value as HTMLSlotElement).assignedNodes()[0]?.textContent).toBe('4,210')
+  })
+})

@@ -31,21 +31,19 @@ describe('empty', () => {
   })
 
   test('the icon takes the large step, so it moves with density', () => {
-    expect(rule('slot[name="icon"]::slotted(*)')).toContain(
-      '--icon-size: var(--helix-size-icon-lg)',
-    )
+    expect(rule('slot[name="icon"]::slotted(*)')).toContain('var(--helix-size-icon-lg)')
   })
 
   test('the heading is the one thing at full strength', () => {
     const heading = rule('slot[name="heading"]::slotted(*)')
-    expect(heading).toContain('color: var(--helix-color-foreground)')
-    expect(heading).toContain('font-size: var(--helix-text-lg)')
-    expect(rule('slot:not([name])')).toContain('color: var(--helix-color-foreground-muted)')
+    expect(heading).toContain('var(--helix-color-foreground))')
+    expect(heading).toContain('var(--helix-text-lg)')
+    expect(rule('slot:not([name])')).toContain('var(--helix-color-foreground-muted)')
   })
 
   test('the explanation runs to a measure a centered line can be read at', () => {
     // Centered text past about fifty characters loses the reader on the return sweep.
-    expect(rule('slot:not([name])::slotted(*)')).toContain('max-inline-size: 46ch')
+    expect(rule('slot:not([name])::slotted(*)')).toContain('46ch)')
   })
 
   test('carries no attribute of its own, and echoes the one the base tier reflects as written', async () => {
@@ -53,5 +51,30 @@ describe('empty', () => {
     expect(bare.getAttributeNames()).toEqual([])
     const quiet = await mount('<helix-empty no-announce>Nothing here.</helix-empty>')
     expect(quiet.getAttributeNames()).toEqual(['no-announce'])
+  })
+})
+
+/* One hook per visual decision, each falling back to the value it replaced,
+   so a page can retune the block without reaching past its slots. */
+describe('empty hooks', () => {
+  test('the block, the icon, the heading, the message and the actions each take one', () => {
+    expect(rule(':host')).toContain('gap: var(--empty-gap, var(--helix-space-sm))')
+    const icon = rule('slot[name="icon"]::slotted(*)')
+    expect(icon).toContain('--icon-size: var(--empty-icon-size, var(--helix-size-icon-lg))')
+    expect(icon).toContain('color: var(--empty-icon-color, var(--helix-color-foreground-subtle))')
+    const heading = rule('slot[name="heading"]::slotted(*)')
+    expect(heading).toContain('color: var(--empty-heading-color, var(--helix-color-foreground))')
+    expect(heading).toContain('font-size: var(--empty-heading-size, var(--helix-text-lg))')
+    const message = rule('slot:not([name])')
+    expect(message).toContain(
+      'color: var(--empty-message-color, var(--helix-color-foreground-muted))',
+    )
+    expect(message).toContain('font-size: var(--empty-message-size, var(--helix-text-sm))')
+    expect(rule('slot:not([name])::slotted(*)')).toContain(
+      'max-inline-size: var(--empty-message-measure, 46ch)',
+    )
+    expect(rule('slot[name="actions"]::slotted(*)')).toContain(
+      'margin-block-start: var(--empty-actions-gap, var(--helix-space-sm))',
+    )
   })
 })

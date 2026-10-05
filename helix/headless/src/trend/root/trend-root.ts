@@ -56,6 +56,7 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @documentation https://fusion.dev/helix/components/trend
  *
  * @slot - The metric that moved.
+ * @slot icon - Replaces the arrow, such as with a glyph of your own set. Slot the one for the current direction.
  * @slot label - The period the metric moved over.
  *
  * @csspart direction - The direction as a word, for people who cannot see the arrow.
@@ -118,6 +119,32 @@ export class HelixHeadlessTrend extends HelixElement {
   @property({ attribute: 'worse-label' })
   worseLabel = 'worse'
 
+  /**
+   * The arrow for the direction, as the fallback of the `icon` slot.
+   *
+   * Slot fallback, so the page replaces it by slotting a glyph of its own and
+   * a trend with none draws the arrow it always did; and a method, so the tier
+   * above replaces it by overriding. The word beside it still says the
+   * direction either way.
+   */
+  protected renderIcon(icon: { content: string; viewBox: string }): TemplateResult {
+    /* Written out rather than through `drawIcon`, because this one needs a
+       `part` and a part behind an interpolation is one the manifest cannot see:
+       the helper's `part=${…}` binding took `[part="icon"]` out of the
+       stylesheet's reach. */
+    return html`<slot name="icon"
+      ><svg
+        aria-hidden="true"
+        data-glyph
+        fill="currentColor"
+        part="icon"
+        viewBox=${icon.viewBox}
+      >
+        ${unsafeSVG(icon.content)}
+      </svg></slot
+    >`
+  }
+
   protected override render(): TemplateResult {
     const direction = readDirection(this.direction)
     /* Silent on a neutral move, whatever `good` says. Neither better nor worse
@@ -131,19 +158,7 @@ export class HelixHeadlessTrend extends HelixElement {
        Lit SSR writes a `<!--lit-part-->` marker around every binding, and two
        bindings put a pair of comments between "Up" and ", worse" in the served
        markup, which a spec then cannot assert in one string. */
-    /* Written out rather than through `drawIcon`, because this one needs a
-       `part` and a part behind an interpolation is one the manifest cannot see:
-       the helper's `part=${…}` binding took `[part="icon"]` out of the
-       stylesheet's reach. */
-    return html`<svg
-        aria-hidden="true"
-        data-glyph
-        fill="currentColor"
-        part="icon"
-        viewBox=${direction.icon.viewBox}
-      >
-        ${unsafeSVG(direction.icon.content)}
-      </svg>
+    return html`${this.renderIcon(direction.icon)}
       <span part="direction">${`${this[direction.word]}${judgment}`}</span>
       <slot></slot>
       <slot name="label"></slot>`

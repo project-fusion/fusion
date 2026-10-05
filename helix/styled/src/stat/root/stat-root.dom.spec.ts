@@ -48,7 +48,7 @@ describe('stat', () => {
       'font-size: var(--stat-value-size, calc(var(--helix-text-3xl) / var(--helix-text-md) * 1em))',
     )
     expect(rule('helix-stat', 'slot[name="unit"]::slotted(*)')).toContain(
-      'color: var(--helix-color-foreground-muted)',
+      'var(--helix-color-foreground-muted)',
     )
   })
 
@@ -87,5 +87,20 @@ describe('stat', () => {
   test('the hooks the docs name are what the sheets read', () => {
     expect(sheet('helix-stat')).toMatch(/var\(\s*--stat-value-size,/)
     expect(sheet('helix-stat-group')).toMatch(/var\(\s*--stat-group-gap,/)
+  })
+})
+
+describe('stat hooks', () => {
+  test('every visual decision has a hook that falls back to the value it replaced', () => {
+    expect(rule('helix-stat', ':host')).toContain('gap: var(--stat-gap, var(--helix-space-2xs))')
+    const label = rule('helix-stat', 'slot[name="label"]::slotted(*)')
+    expect(label).toContain('color: var(--stat-label-color, var(--helix-color-foreground-muted))')
+    expect(label).toContain('font-size: var(--stat-label-size, calc(')
+    const unit = rule('helix-stat', 'slot[name="unit"]::slotted(*)')
+    expect(unit).toContain('color: var(--stat-unit-color, var(--helix-color-foreground-muted))')
+    expect(unit).toContain('font-size: var(--stat-unit-size, calc(')
+    expect(rule('helix-stat', 'slot:not([name])')).toContain(
+      'color: var(--stat-value-color, var(--helix-color-foreground))',
+    )
   })
 })

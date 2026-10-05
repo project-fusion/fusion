@@ -5,7 +5,7 @@ export function Example() {
         name="folder-open"
         slot="icon"
       ></helix-icon>
-      <span slot="heading">No projects yet</span>
+      <h3 slot="heading">No projects yet</h3>
       Projects you create appear here.
     </helix-empty>
   )
