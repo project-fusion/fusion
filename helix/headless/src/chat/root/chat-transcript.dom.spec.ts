@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, label, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { ChatTurn } from './chat-root.js'
 
 /* What a transcript says, what it asks for, and what it draws from data. The
@@ -14,6 +14,8 @@ beforeAll(async () => {
 interface Chat extends HTMLElement {
   history: string
   label: string
+  meLabel: string
+  messageLabel: string
   turns: readonly ChatTurn[]
   updateComplete: Promise<unknown>
 }
@@ -348,5 +350,54 @@ describe('turns handed over as data', () => {
     const slot = element.shadowRoot?.querySelector<HTMLSlotElement>('slot[name="messages"]')
     expect(slot?.assignedElements()).toHaveLength(0)
     expect(drawn(element)).toHaveLength(2)
+  })
+})
+
+describe('the name of each turn', () => {
+  const ago = new Date(Date.now() - 120_000).toISOString()
+
+  /**
+   * The chat holds the sentence and the word for `me`, so a page in another
+   * language sets them once. A turn written as a child hears them from the
+   * chat, after it has hydrated.
+   */
+  test('a turn written as a child is named in the chat’s words', async () => {
+    const element = (await mount(`<helix-headless-chat label="Support" me-label="Vous"
+      message-label="{author} ({time})">
+      <helix-headless-chat-message author="me" at="${ago}">Bonjour</helix-headless-chat-message>
+    </helix-headless-chat>`)) as Chat
+    await settle(element)
+    const message = element.querySelector('helix-headless-chat-message') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await message.updateComplete
+    expect(label(message)).toBe('Vous (2 minutes ago)')
+
+    element.meLabel = 'Moi'
+    await settle(element)
+    await message.updateComplete
+    expect(label(message)).toBe('Moi (2 minutes ago)')
+  })
+
+  test('a turn handed over as data is named by its author label', async () => {
+    const element = (await mount(
+      '<helix-headless-chat label="Support"></helix-headless-chat>',
+    )) as Chat
+    element.turns = [
+      { at: ago, author: 'them', authorLabel: 'Support', key: 'a', text: 'Hello' },
+      { at: ago, author: 'me', key: 'b', text: 'Hi' },
+    ]
+    await settle(element)
+    await frame()
+    const drawn = [
+      ...(element.shadowRoot?.querySelectorAll<HTMLElement & { updateComplete: Promise<unknown> }>(
+        '[part="turn"] > helix-headless-chat-message',
+      ) ?? []),
+    ]
+    await Promise.all(drawn.map((message) => message.updateComplete))
+    expect(drawn.map((message) => label(message))).toEqual([
+      'Support, 2 minutes ago',
+      'You, 2 minutes ago',
+    ])
   })
 })

@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* One turn, and the four things that can have happened to it. */
 
@@ -10,6 +10,7 @@ beforeAll(async () => {
 
 interface Message extends HTMLElement {
   at: string
+  authorLabel: string
   internals?: ElementInternals
   state: string
   updateComplete: Promise<unknown>
@@ -229,5 +230,83 @@ describe('the wait before the first token', () => {
       setTimeout(resolve, 0)
     })
     expect(part(element, 'content')?.hasAttribute('data-empty')).toBe(false)
+  })
+})
+
+describe('the name a screen reader gives the turn', () => {
+  const ago = (ms: number) => new Date(Date.now() - ms).toISOString()
+
+  /**
+   * An article is never named by its content, so a turn with no name was
+   * heard as "article" and a reader had to read each one to learn who wrote
+   * it.
+   */
+  test('a turn by me is named "You" and its time', async () => {
+    const element = await message(`author="me" at="${ago(120_000)}"`)
+    expect(label(element)).toBe('You, 2 minutes ago')
+  })
+
+  test('the author label names the turn, whoever the author is', async () => {
+    const element = await message(`author="them" author-label="Support" at="${ago(120_000)}"`)
+    expect(label(element)).toBe('Support, 2 minutes ago')
+  })
+
+  test('an author written as a name is the name', async () => {
+    expect(label(await message('author="Grace Hopper"'))).toBe('Grace Hopper')
+  })
+
+  test('a turn by them with no label is named by its time alone', async () => {
+    expect(label(await message(`author="them" at="${ago(120_000)}"`))).toBe('2 minutes ago')
+  })
+
+  test('a turn with no author and no time takes no name, rather than an empty one', async () => {
+    expect(label(await message())).toBeNull()
+  })
+
+  test('the label follows a change', async () => {
+    const element = await message('author="them"')
+    element.authorLabel = 'Ada'
+    await element.updateComplete
+    expect(label(element)).toBe('Ada')
+  })
+})
+
+describe('the time moves on', () => {
+  interface Ticker {
+    waiting: Set<{ at: number; run: () => void }>
+  }
+  const ticker = () =>
+    (globalThis as unknown as Record<symbol, Ticker | undefined>)[Symbol.for('helix.ticker')]
+  const realNow = Date.now
+
+  afterEach(() => {
+    Date.now = realNow
+  })
+
+  /**
+   * The reading was computed once, when `at` was set, so a transcript left
+   * open said "now" for the rest of the session. The turn asks the shared
+   * ticker for the moment its words go stale and reads the clock again then.
+   */
+  test('a reading that goes stale is read again, and its name with it', async () => {
+    const said = Date.now() - 30_000
+    const element = await message(`author="me" at="${new Date(said).toISOString()}"`)
+    expect(part(element, 'time')?.textContent).toBe('now')
+    const waiting = [...(ticker()?.waiting ?? [])]
+    expect(waiting.length).toBeGreaterThan(0)
+    Date.now = () => said + 61_000
+    for (const one of waiting) {
+      one.run()
+    }
+    await element.updateComplete
+    expect(part(element, 'time')?.textContent).toBe('1 minute ago')
+    expect(label(element)).toBe('You, 1 minute ago')
+  })
+
+  test('a turn taken off the page stops asking', async () => {
+    const element = await message(`at="${new Date().toISOString()}"`)
+    const before = ticker()?.waiting.size ?? 0
+    element.remove()
+    expect(ticker()?.waiting.size ?? 0).toBeLessThan(before)
   })
 })

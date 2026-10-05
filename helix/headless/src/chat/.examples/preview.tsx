@@ -33,6 +33,7 @@ export function Example() {
       <helix-headless-chat-message
         at={at[0]}
         author="them"
+        author-label="Support"
         state="sent"
       >
         How can I help?
@@ -49,6 +50,7 @@ export function Example() {
       <helix-headless-chat-message
         at={at[2]}
         author="them"
+        author-label="Support"
         state="streaming"
       >
         I am checking the migration now
