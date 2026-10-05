@@ -7,16 +7,13 @@ import { styles } from './toast-root.css.js'
  * @summary The region that holds toast messages, and the only element that announces them.
  *
  * @description
- * Fixed to the window. The region spans a whole edge, so it ignores the pointer
- * and only the messages receive clicks. Content beside a message stays
- * clickable.
+ * Fixed to the window, in the top layer. The region spans a whole edge, so it
+ * ignores the pointer and only the messages receive clicks. Content beside a
+ * message stays clickable.
  *
- * **Place the region at the root of your application.** `position: fixed`
- * positions against the viewport only while no ancestor has `transform`,
- * `filter`, `perspective`, or `contain`. Any of these makes that ancestor the
- * containing block, and an ancestor with `overflow: hidden` still clips the
- * region. The other floating surfaces in Helix use the top layer for the same
- * reason.
+ * Because the stack is in the top layer, an ancestor with `transform`,
+ * `filter`, `contain`, or `overflow: hidden` does not move or clip it, and a
+ * message that arrives while a modal dialog is open shows above the dialog.
  *
  * @since 0.1.0
  * @status stable

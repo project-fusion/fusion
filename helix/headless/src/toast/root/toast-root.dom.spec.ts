@@ -205,3 +205,58 @@ describe('toast item', () => {
     expect(asked).toBe(false)
   })
 })
+
+describe('the stack and the top layer', () => {
+  test('is a manual popover, so it can sit above a dialog opened after it', async () => {
+    const region = await mount(
+      `<helix-headless-toast><helix-headless-toast-item>Saved</helix-headless-toast-item></helix-headless-toast>`,
+    )
+    expect(region.shadowRoot?.querySelector('[part="region"]')?.getAttribute('popover')).toBe(
+      'manual',
+    )
+  })
+
+  /* Only where the browser has the popover API; happy-dom does not show one. */
+  test('shows while a message shows, and goes once none is left', async () => {
+    const region = (await mount(
+      `<helix-headless-toast><helix-headless-toast-item>Saved</helix-headless-toast-item></helix-headless-toast>`,
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    const stack = region.shadowRoot?.querySelector('[part="region"]') as HTMLElement
+    if (typeof stack.showPopover !== 'function') {
+      return
+    }
+    await region.updateComplete
+    const shown = stack.matches(':popover-open')
+    const item = region.querySelector('helix-headless-toast-item') as Item
+    item.dismiss()
+    await item.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect([shown, stack.matches(':popover-open')]).toEqual([true, false])
+  })
+})
+
+describe('focus when a message goes', () => {
+  /* The dismiss control had focus and went with its message, so focus fell to
+     the body. It moves to the next message, as it does in React Aria. */
+  test('moves to the next message', async () => {
+    const region = (await mount(
+      `<helix-headless-toast>
+        <helix-headless-toast-item id="one" dismissible>One</helix-headless-toast-item>
+        <helix-headless-toast-item id="two" dismissible>Two</helix-headless-toast-item>
+      </helix-headless-toast>`,
+    )) as HTMLElement
+    const [one, two] = [...region.querySelectorAll('helix-headless-toast-item')] as Item[]
+    await one?.updateComplete
+    await two?.updateComplete
+    const dismiss = one?.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]')
+    dismiss?.focus()
+    if (!one?.matches(':focus-within')) {
+      // A double that does not track focus into a shadow root has nothing to ask.
+      return
+    }
+    dismiss?.click()
+    await one.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(two?.shadowRoot?.activeElement?.getAttribute('part')).toBe('dismiss')
+  })
+})
