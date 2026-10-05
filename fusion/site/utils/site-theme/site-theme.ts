@@ -16,6 +16,15 @@ export const OWNED = '--helix-'
 /** The flag that turns the token layer's own declarations back on. */
 export const THEME_FLAG = 'helixTheme'
 
+/**
+ * The flag on the root while the theme has a brand color.
+ *
+ * **A stylesheet cannot tell a brand from ink by its tokens.** With no brand,
+ * `--helix-color-primary` is the ink, the same color as the foreground, and a
+ * style that wants a second tone has to know which of the two it has.
+ */
+export const BRAND_FLAG = 'siteBrand'
+
 /** What a reader set, which is what the controls need back. */
 export interface ThemeSettings {
   accentHue: number
@@ -106,6 +115,7 @@ export const clearSiteThemeFrom = (node: HTMLElement): void => {
     }
   }
   delete node.dataset[THEME_FLAG]
+  delete node.dataset[BRAND_FLAG]
 }
 
 /**
