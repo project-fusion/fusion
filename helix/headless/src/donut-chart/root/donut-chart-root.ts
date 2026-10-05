@@ -6,6 +6,7 @@ import {
   MixinChartSource,
   PLOT_HEIGHT,
   PLOT_WIDTH,
+  type Row,
   seriesIndex,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
@@ -520,6 +521,29 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     />`
   }
   /**
+   * The rows the tooltip reads, with the slice's share of the whole after its
+   * amount, as `AreaChart` writes a part's share under `share`: "612 (24%)".
+   *
+   * The share is what the ring shows and the table does not, so a reading
+   * said by key gives it too, and not only the summary.
+   */
+  private withShare(share: DonutShare): Row[] {
+    const rows = this.sourceRows
+    const column = this.plottedColumns[0]
+    const row = rows[share.row]
+    const cell = column === undefined ? undefined : row?.cells[column]
+    if (!row || !cell || column === undefined) {
+      return rows
+    }
+    const cells = [...row.cells]
+    cells[column] = {
+      ...cell,
+      text: `${cell.text} (${percentIn(this.locale).format(share.fraction)})`,
+    }
+    return rows.map((one, index) => (index === share.row ? { ...row, cells } : one))
+  }
+
+  /**
    * What a pointer resting on a slice shows.
    *
    * Placed in the middle rather than along an axis, a ring having none, and the
@@ -564,7 +588,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     const turned = this.sweep === 'half' && this.pointer.mirrored
     const across = Math.cos(angle) > 0 !== turned
     return drawTooltip(
-      this.sourceRows,
+      this.withShare(share),
       share.row,
       this.tag('tooltip'),
       {

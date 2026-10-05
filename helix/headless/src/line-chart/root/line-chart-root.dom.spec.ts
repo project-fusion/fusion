@@ -365,7 +365,7 @@ describe('reading by key', () => {
     expect(part(host, 'live')?.textContent).toBe('')
     press(host, 'End')
     await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
-    expect(part(host, 'live')?.textContent).toBe('Feb: Direct 20, Referral 8')
+    expect(part(host, 'live')?.textContent).toBe('Feb: Direct 20, Referral 8 (2 of 2)')
     expect(part(host, 'tooltip-label')?.textContent).toBe('Feb')
   })
 })
@@ -380,7 +380,7 @@ describe('reading one series by key', () => {
       )
     }
     await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
-    expect(part(host, 'live')?.textContent).toBe('Jan, Referral 4')
+    expect(part(host, 'live')?.textContent).toBe('Jan, Referral 4 (1 of 2)')
     expect(part(host, 'tooltip-cell-current')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
       'Referral 4',
     )
@@ -410,10 +410,40 @@ describe('a series a legend hid', () => {
       await host.updateComplete
     }
     await press('ArrowRight')
-    expect(part(host, 'live')?.textContent).toBe('Jan: Referral 4')
+    expect(part(host, 'live')?.textContent).toBe('Jan: Referral 4 (1 of 2)')
     /* One series is left, so the up and down arrows walk the readings, as
        they do on a chart of one series, and never rest on the hidden one. */
     await press('ArrowDown')
-    expect(part(host, 'live')?.textContent).toBe('Feb: Referral 8')
+    expect(part(host, 'live')?.textContent).toBe('Feb: Referral 8 (2 of 2)')
+  })
+})
+
+/* A page names an element with `aria-label`, and the chart is a generic
+   around its plot, so the name has to reach the plot to reach anybody. */
+describe('naming and placing a reading', () => {
+  test('an `aria-label` on the chart names its plot, before `label` and the caption', async () => {
+    const host = await chart(CHANNELS, 'for="channels" label="Ignored" aria-label="Visits"')
+    expect(part(host, 'plot')?.getAttribute('aria-label')).toBe('Visits')
+    host.setAttribute('aria-label', 'Sessions')
+    await (host as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(part(host, 'plot')?.getAttribute('aria-label')).toBe('Sessions')
+  })
+
+  test('`position-label` words where a reading stands, in `locale`, and empty says none', async () => {
+    const host = (await chart(
+      CHANNELS,
+      'for="channels" position-label="{position} von {count}" locale="ar-EG"',
+    )) as HTMLElement & { positionLabel: string; updateComplete: Promise<boolean> }
+    const press = async (key: string): Promise<void> => {
+      part(host, 'plot')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+      await host.updateComplete
+    }
+    await press('End')
+    expect(part(host, 'live')?.textContent).toBe('Feb: Direct 20, Referral 8 (٢ von ٢)')
+    host.positionLabel = ''
+    await press('Home')
+    expect(part(host, 'live')?.textContent).toBe('Jan: Direct 10, Referral 4')
   })
 })

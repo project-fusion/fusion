@@ -1,4 +1,6 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { fillTemplate } from '../../utils/fill-template/fill-template.js'
+import { formatNumbers } from '../../utils/format-numbers/format-numbers.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
 import { stepReading } from './reading-step.js'
 
@@ -53,6 +55,16 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
    * The keys pass over a hidden reading, as they pass over a hidden series.
    */
   showsReading?(at: number): boolean
+  /**
+   * The words for where a reading stands among them, with `{position}` and
+   * `{count}` to fill. Absent or empty, no position is said.
+   */
+  readonly positionLabel?: string
+  /**
+   * The locale the position's numbers are written in. Absent or empty is the
+   * runtime's own.
+   */
+  readonly locale?: string
 }
 
 /**
@@ -183,6 +195,25 @@ export class ChartPointerController implements ReactiveController {
    */
   shows(cell: number): boolean {
     return this.host.showsColumn?.(cell) !== false
+  }
+
+  /**
+   * Where the reading stands among the shown readings, in the host's
+   * `positionLabel`, such as "2 of 12". Empty with no reading, and where the
+   * host gives no words.
+   *
+   * Counted among the shown readings, so a slice a legend hid is not one of
+   * the count.
+   */
+  get position(): string {
+    const words = this.host.positionLabel ?? ''
+    const shown = this.shown()
+    const place = shown.indexOf(this.at)
+    if (words === '' || place < 0) {
+      return ''
+    }
+    const format = formatNumbers(this.host.locale ?? '')
+    return fillTemplate(words, { count: format(shown.length), position: format(place + 1) })
   }
 
   /**

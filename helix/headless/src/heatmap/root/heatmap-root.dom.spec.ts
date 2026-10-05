@@ -391,7 +391,7 @@ describe('reading by key', () => {
     ])
     press(element, 'End')
     await element.updateComplete
-    expect(part(element, 'live')?.textContent).toBe('Tue: 2')
+    expect(part(element, 'live')?.textContent).toBe('Tue: 2 (2 of 2)')
     expect(cells(element).map((one) => one.getAttribute('part'))).toEqual([
       'cell',
       'cell cell-active',
@@ -405,6 +405,6 @@ describe('reading by key', () => {
     press(element, 'Home')
     press(element, 'ArrowRight')
     await element.updateComplete
-    expect(part(element, 'live')?.textContent).toBe('Day 8: 7')
+    expect(part(element, 'live')?.textContent).toBe('Day 8: 7 (8 of 14)')
   })
 })
