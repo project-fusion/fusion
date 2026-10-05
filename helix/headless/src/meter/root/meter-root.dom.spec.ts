@@ -279,3 +279,39 @@ describe('meter drawn round', () => {
     expect(host.shadowRoot?.querySelector('[part="groove"]')).toBeNull()
   })
 })
+
+/* RAC's visible Label and Web Awesome's label slot: words on the page that also
+   name the reading, so the two cannot disagree. */
+describe('a visible label', () => {
+  type Host = HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
+
+  test('names the meter with the words it shows, in place of `label`', async () => {
+    const host = (await mount(
+      '<helix-headless-meter label="Fallback" value="40"><span slot="label">Disk  used</span></helix-headless-meter>',
+    )) as Host
+    expect(host.internals.ariaLabel).toBe('Disk used')
+  })
+
+  test('arriving later renames it, and leaving gives `label` back', async () => {
+    const host = (await mount(
+      '<helix-headless-meter label="Fallback" value="40"></helix-headless-meter>',
+    )) as Host
+    expect(host.internals.ariaLabel).toBe('Fallback')
+    const words = document.createElement('span')
+    words.slot = 'label'
+    words.textContent = 'Memory'
+    host.append(words)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    expect(host.internals.ariaLabel).toBe('Memory')
+    words.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    expect(host.internals.ariaLabel).toBe('Fallback')
+  })
+
+  test('is a bare slot, so without one nothing new is drawn', async () => {
+    const host = (await mount('<helix-headless-meter value="40"></helix-headless-meter>')) as Host
+    expect(host.shadowRoot?.querySelector('slot[name="label"]')?.parentNode).toBe(host.shadowRoot)
+  })
+})

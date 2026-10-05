@@ -110,3 +110,14 @@ describe('meter', () => {
     }
   })
 })
+
+describe('a slotted label', () => {
+  test('sits above the meter across the whole row, with hooks that fall back to today', () => {
+    const label = rule('slot[name="label"]::slotted(*)')
+    expect(label).toContain('grid-column: 1 / -1')
+    expect(label).toContain('display: block')
+    expect(label).toContain('color: var(--meter-label-color, var(--helix-color-foreground))')
+    expect(label).toContain('font-size: var(--meter-label-size, var(--helix-text-sm))')
+    expect(label).toContain('margin-block-end: var(--meter-label-gap, var(--helix-space-2xs))')
+  })
+})

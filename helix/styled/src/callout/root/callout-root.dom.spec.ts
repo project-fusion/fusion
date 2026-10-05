@@ -35,28 +35,31 @@ describe('callout', () => {
     /* One variable feeds the wash, the bar and the mark, so a tone is a single
        line and the three cannot disagree. `info` needs no rule of its own, and
        a rule for it would be the resting state written twice. */
-    expect(rule(':host')).toContain('--_callout-color: var(--helix-color-info)')
+    expect(rule(':host')).toContain('--_callout-tone: var(--helix-color-info)')
     expect(sheet()).not.toContain(':host([tone="info"])')
     for (const tone of ['success', 'warning', 'danger']) {
       expect(rule(`:host([tone="${tone}"])`)).toContain(
-        `--_callout-color: var(--helix-color-${tone})`,
+        `--_callout-tone: var(--helix-color-${tone})`,
       )
     }
     /* A note reports no status, so it takes the muted ink, which stays in the
        neutral ramp on any palette. */
     expect(rule(':host([tone="neutral"])')).toContain(
-      '--_callout-color: var(--helix-color-foreground-muted)',
+      '--_callout-tone: var(--helix-color-foreground-muted)',
     )
   })
 
   test('the tone survives grayscale as a bar on the inline start, clipped by the box', () => {
     /* A bar drawn inside and clipped rather than a border: a thick border on
        one side of a rounded box thins to a crescent at each end. */
-    expect(rule(':host::before')).toContain('inline-size: var(--helix-border-thick)')
+    expect(rule(':host')).toContain(
+      '--_callout-bar: var(--callout-bar-width, var(--helix-border-thick))',
+    )
+    expect(rule(':host::before')).toContain('inline-size: var(--_callout-bar)')
     expect(rule(':host::before')).toContain('background-color: var(--_callout-color)')
     expect(rule(':host')).toContain('overflow: hidden')
     expect(rule(':host')).toContain(
-      'padding-inline-start: calc(var(--helix-space-md) + var(--helix-border-thick))',
+      'padding-inline-start: calc(var(--_callout-inset) + var(--_callout-bar))',
     )
   })
 
@@ -79,5 +82,41 @@ describe('callout', () => {
       // A fallback written across lines keeps its line breaks in the sheet.
       expect(sheet()).toMatch(new RegExp(`var\\(\\s*${hook},`))
     }
+  })
+})
+
+/* wa-callout's appearance and size, through the house's axis and hooks: the
+   box's edge is `separation`, and the size is the inset and the type. */
+describe('callout separation and hooks', () => {
+  test('`outlined` draws the edge in the tone with no fill, the same size as the tint', () => {
+    const outlined = rule(':host([separation="outlined"])')
+    expect(outlined).toContain('transparent')
+    expect(outlined).toContain('box-shadow: inset')
+    expect(outlined).not.toMatch(/^\s*border/m)
+  })
+
+  test('`plain` drops the fill and keeps the bar', () => {
+    expect(rule(':host([separation="plain"])')).toContain('transparent')
+    expect(sheet()).not.toContain(':host([separation="plain"])::before')
+  })
+
+  test('reflects, so the sheet can reach it from a script', async () => {
+    const note = (await mount('<helix-callout>Text</helix-callout>')) as HTMLElement & {
+      separation?: string
+      updateComplete: Promise<boolean>
+    }
+    note.separation = 'outlined'
+    await note.updateComplete
+    expect(note.getAttribute('separation')).toBe('outlined')
+  })
+
+  test('every hook falls back to the value it replaced', () => {
+    const host = rule(':host')
+    expect(host).toContain('--_callout-color: var(--callout-accent-color, var(--_callout-tone))')
+    expect(host).toContain('--_callout-bar: var(--callout-bar-width, var(--helix-border-thick))')
+    expect(host).toContain('--_callout-inset: var(--callout-padding, var(--helix-space-md))')
+    expect(host).toContain('font-size: var(--callout-font-size, var(--helix-text-sm))')
+    expect(host).toContain('gap: var(--callout-gap, var(--helix-space-sm))')
+    expect(rule(':host::before')).toContain('inline-size: var(--_callout-bar)')
   })
 })
