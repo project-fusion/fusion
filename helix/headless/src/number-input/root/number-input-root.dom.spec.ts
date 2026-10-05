@@ -400,3 +400,74 @@ describe('Enter in the field', () => {
     expect(submitted).toBe(1)
   })
 })
+
+describe('leaving a number out of range', () => {
+  /* The field's `change` arrives before its `blur`, so it was relayed with the
+     number as typed and the clamp after it sent `input` alone: a consumer
+     saving on `change` kept 150 while the form submitted 100. */
+  test('announces change with the clamped number', async () => {
+    const host = await field('max="100"')
+    await type(host, '150')
+    const heard: string[] = []
+    host.addEventListener('input', () => heard.push(`input:${host.value}`))
+    host.addEventListener('change', () => heard.push(`change:${host.value}`))
+    control(host).dispatchEvent(new Event('change'))
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(heard).toEqual(['input:100', 'change:100'])
+  })
+})
+
+describe('a number in a locale that writes a decimal comma', () => {
+  /* The decimal keypad on a phone in such a locale types a comma, and the
+     field read `1,5` as not a number and blocked the form. */
+  test('is read as a decimal', async () => {
+    const host = await field('locale="de-DE" step="0.1"')
+    await type(host, '1,5')
+    expect(control(host).getAttribute('aria-valuenow')).toBe('1.5')
+    control(host).dispatchEvent(new Event('blur'))
+    await host.updateComplete
+    expect(host.value).toBe('1.5')
+    expect(formValue(host)).toBe('1.5')
+  })
+
+  test('and stays not a number where the locale groups with a comma', async () => {
+    const host = await field('locale="en-US" step="0.1"')
+    await type(host, '1,5')
+    expect(control(host).hasAttribute('aria-valuenow')).toBe(false)
+  })
+})
+
+describe('a number off the step grid', () => {
+  /* The description promised `step` reaches validity, and a value written off
+     the grid submitted unchanged. */
+  test('is invalid, as in a native number field', async () => {
+    const host = (await field('step="1" default-value="1.5"')) as Field & {
+      validity: ValidityState
+      validationMessage: string
+    }
+    expect(host.validity.stepMismatch).toBe(true)
+    expect(host.validationMessage).toBe(
+      'Please enter a valid value. The two nearest valid values are 1 and 2.',
+    )
+  })
+
+  test('counted from min', async () => {
+    const host = (await field('min="1" step="2" default-value="3"')) as Field & {
+      validity: ValidityState
+    }
+    expect(host.validity.valid).toBe(true)
+  })
+})
+
+describe('what a screen reader says for the value', () => {
+  test('carries the unit a consumer wrote for it', async () => {
+    const host = await field('default-value="4" value-text="{value} kilograms"')
+    expect(control(host).getAttribute('aria-valuetext')).toBe('4 kilograms')
+  })
+
+  test('and nothing beyond the number by default', async () => {
+    const host = await field('default-value="4"')
+    expect(control(host).hasAttribute('aria-valuetext')).toBe(false)
+  })
+})

@@ -53,8 +53,9 @@ const SCRUB_FINE = 16
  *
  * `inputmode="decimal"` keeps the numeric keypad on phones.
  *
- * Validity still comes from the platform: `min`, `max`, and `step` are mirrored
- * onto the host's own `setValidity`.
+ * Validity follows the platform's rules: `min`, `max`, and `step` are checked
+ * and reported through the host's own `setValidity`, under the platform's flag
+ * names.
  *
  * Stepping is separate from typing, so a number is not corrected while you type
  * it.
@@ -144,6 +145,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   largeStep?: number
 
   /**
+   * The locale a typed number is read in, such as `de-DE`. Empty reads it in
+   * the browser's language.
+   *
+   * Where the locale writes a decimal comma, `1,5` is read as one and a half,
+   * which is what the decimal keypad on a phone in that locale types. A dot is
+   * read as a decimal point in every locale.
+   */
+  @property()
+  locale = ''
+
+  /**
    * The largest value allowed.
    *
    * Absent has no ceiling.
@@ -201,10 +213,29 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   scrub = false
 
   /**
-   * How far one step moves.
+   * How far one step moves. A value off the step grid, counted from `min`, is
+   * invalid, as it is in a native number field.
    */
   @property({ type: Number })
   step = 1
+
+  /**
+   * The message the browser shows when the number is off the step grid, with
+   * `{below}` and `{above}` filled in with the nearest valid values.
+   */
+  @property({ attribute: 'step-mismatch-message' })
+  stepMismatchMessage?: string
+
+  /**
+   * What a screen reader says for the value, with `{value}` filled in, such as
+   * `{value} kilograms`.
+   *
+   * A unit slotted into `end` is drawn beside the number and is not part of
+   * what the spinbutton announces, so it goes here too. Empty announces the
+   * number alone.
+   */
+  @property({ attribute: 'value-text' })
+  valueText = ''
 
   private get control(): HTMLInputElement | null {
     return this.partNamed<HTMLInputElement>('control')
@@ -212,11 +243,29 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
 
   /** The value as a number, or `null` where the field holds nothing usable. */
   private get numeric(): number | null {
-    if (this.value.trim() === '') {
+    const text = this.value.trim()
+    if (text === '') {
       return null
     }
-    const parsed = Number(this.value)
+    /* A decimal comma where the locale writes one, and nowhere else: in a
+       locale whose comma groups thousands, `1,5` is not a number a native field
+       would take either. Only where there is no dot, so `1.234,5` is not read
+       as two decimal points. */
+    const read =
+      decimalComma(this.locale) && text.includes(',') && !text.includes('.')
+        ? text.replace(',', '.')
+        : text
+    const parsed = read.includes(',') ? Number.NaN : Number(read)
     return Number.isFinite(parsed) ? parsed : null
+  }
+
+  /** Whether `value` is on the step grid, counted from `min`. */
+  private onStep(value: number): boolean {
+    const step = Math.abs(this.step) || 1
+    const anchor = this.min ?? 0
+    const steps = (value - anchor) / step
+    // To the precision the grid is written in, so 0.1 + 0.2 is on a 0.1 grid.
+    return Math.abs(steps - Math.round(steps)) < 1e-9
   }
 
   /**
@@ -314,13 +363,10 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * gesture and inventing somewhere is how the grip happened.
    */
   protected override renderLabel(): TemplateResult | typeof nothing {
-    if (!this.scrub) {
+    if (!this.scrub || !this.labeled) {
       return super.renderLabel()
     }
     const hidden = this.label === '' ? this.getAttribute('aria-label') : null
-    if (this.label === '' && !hidden) {
-      return nothing
-    }
     return html`<label
       part="label"
       for=${this.controlId}
@@ -442,18 +488,40 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * the same as preventing one.
    */
   private readonly handleBlur = (): void => {
+    /* A value the reader did not type, written by a script or seeded off the
+       grid, is settled here too, and a settled value is a committed one. */
+    if (this.settle()) {
+      this.announceChange()
+    }
+  }
+
+  /**
+   * Pulls a typed number into range and onto the step grid, and returns
+   * whether that moved the value.
+   */
+  private settle(): boolean {
     const control = this.control
     const parsed = this.numeric
     if (!control || parsed === null) {
-      return
+      return false
     }
+    const before = this.value
     this.requestValue(String(this.clamp(parsed)))
     restoreValue(control, this.value)
+    return this.value !== before
   }
 
-  /** Relayed, because `change` does not cross a shadow boundary on its own. */
+  /**
+   * Relayed, because `change` does not cross a shadow boundary on its own.
+   *
+   * **Settled first.** The field's `change` arrives before its `blur`, so
+   * relaying it as it came announced the number as typed, 150 in a field whose
+   * `max` is 100, and the clamp that followed sent `input` alone: a consumer
+   * saving on `change` kept 150 while the form submitted 100.
+   */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
+    this.settle()
     this.announceChange()
   }
 
@@ -543,6 +611,20 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         fillTemplate(this.rangeOverflowMessage || 'Value must be {max} or less.', {
           max: this.max,
         }),
+        control,
+      )
+    } else if (parsed !== null && !this.onStep(parsed)) {
+      const step = Math.abs(this.step) || 1
+      const anchor = this.min ?? 0
+      const below = this.clamp(anchor + Math.floor((parsed - anchor) / step) * step)
+      const above = this.clamp(anchor + Math.ceil((parsed - anchor) / step) * step)
+      this.internals.setValidity(
+        { stepMismatch: true },
+        fillTemplate(
+          this.stepMismatchMessage ||
+            'Please enter a valid value. The two nearest valid values are {below} and {above}.',
+          { above, below },
+        ),
         control,
       )
     } else {
@@ -657,6 +739,11 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           aria-valuemin=${this.min ?? nothing}
           aria-valuemax=${this.max ?? nothing}
           aria-valuenow=${parsed ?? nothing}
+          aria-valuetext=${
+            this.valueText && parsed !== null
+              ? fillTemplate(this.valueText, { value: this.value })
+              : nothing
+          }
           ?disabled=${this.isDisabled}
           ?readonly=${this.readOnly}
           ?required=${this.required}
@@ -696,6 +783,19 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   set valueAsNumber(count: number) {
     this.value = fromNumber(count)
   }
+}
+
+/** Whether a locale writes a decimal comma, read once per locale. */
+const commas = new Map<string, boolean>()
+
+const decimalComma = (locale: string): boolean => {
+  let comma = commas.get(locale)
+  if (comma === undefined) {
+    const parts = new Intl.NumberFormat(locale || undefined).formatToParts(1.5)
+    comma = parts.find((part) => part.type === 'decimal')?.value === ','
+    commas.set(locale, comma)
+  }
+  return comma
 }
 
 /**
