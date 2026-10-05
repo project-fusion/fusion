@@ -13,6 +13,7 @@ type Probe = HTMLElement & {
   checked: boolean
   readOnly: boolean
   requestChecked(next: boolean): boolean
+  resetChecked(): void
   updateComplete: Promise<boolean>
 }
 
@@ -80,5 +81,24 @@ describe('a read-only checked control', () => {
     host.checked = true
     await host.updateComplete
     expect(host.checked).toBe(true)
+  })
+})
+
+describe('a checked control put back by a form reset', () => {
+  test('returns to the checked attribute where there is no default-checked', async () => {
+    const host = await mount(`<${tag} checked></${tag}>`)
+    host.requestChecked(false)
+    await host.updateComplete
+    host.resetChecked()
+    await host.updateComplete
+    expect(host.checked).toBe(true)
+  })
+
+  test('reads the attribute as it is at the reset, as a native checkbox does', async () => {
+    const host = await mount(`<${tag} checked></${tag}>`)
+    host.removeAttribute('checked')
+    host.resetChecked()
+    await host.updateComplete
+    expect(host.checked).toBe(false)
   })
 })
