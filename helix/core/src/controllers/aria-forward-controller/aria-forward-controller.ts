@@ -8,9 +8,10 @@ export interface AriaForwardOptions {
    *
    * For a control named by its content, a button or a switch, which has no
    * `label` to render it into. A field renders its `aria-label` as a clipped
-   * label already, so it leaves this off.
+   * label already, so it leaves this off. A function is asked on every
+   * forward, for a subclass that names the control itself.
    */
-  label?: boolean
+  label?: boolean | (() => boolean)
   /**
    * Whether the control has a name of its own, where its own labels do not
    * say.
@@ -151,7 +152,11 @@ export class AriaForwardController implements ReactiveController {
   private recorded: HTMLElement | undefined
 
   /** Whether a host `aria-label` is carried down. See the option. */
-  private readonly label: boolean
+  private readonly asked: boolean | (() => boolean)
+
+  private get label(): boolean {
+    return typeof this.asked === 'function' ? this.asked() : this.asked
+  }
 
   /** The component's own answer to whether the control is named. See the option. */
   private readonly named: (() => boolean) | undefined
@@ -159,7 +164,7 @@ export class AriaForwardController implements ReactiveController {
   constructor(host: ReactiveControllerHost & HTMLElement, options: AriaForwardOptions) {
     this.host = host
     this.target = options.target
-    this.label = options.label === true
+    this.asked = options.label ?? false
     this.named = options.named
     host.addController(this)
   }
@@ -280,7 +285,7 @@ export class AriaForwardController implements ReactiveController {
       attributeFilter: [
         ...RELATIONSHIPS.map(([attribute]) => attribute),
         ...STATES,
-        ...(this.label ? ['aria-label'] : []),
+        ...(this.asked === false ? [] : ['aria-label']),
       ],
     })
     this.host.addEventListener('focusin', this.refresh)

@@ -65,9 +65,8 @@ describe('icon button', () => {
     for (const emphasis of ['solid', 'outlined', 'subtle']) {
       expect(sheet()).toContain(`:host([emphasis="${emphasis}"]) [part="button"]`)
     }
-    expect(rule(':host([emphasis="solid"]) [part="button"]')).toContain(
-      'background-color: var(--_icon-button-fill)',
-    )
+    // Behind the public hook, which falls back to it.
+    expect(rule(':host([emphasis="solid"]) [part="button"]')).toContain('var(--_icon-button-fill)')
   })
 
   test('each tone rewrites the surface variables the rules read, and the fill is not the tone', () => {
@@ -110,5 +109,18 @@ describe('icon button', () => {
       // A fallback written across lines keeps its line breaks in the sheet.
       expect(sheet()).toMatch(new RegExp(`var\\(\\s*${hook},`))
     }
+  })
+})
+
+describe('the color hooks', () => {
+  /* Button publishes its fill and ink, and Icon Button drew only from private
+     variables, so recoloring one meant matching its hover by hand. */
+  test('the fill and the icon color read public properties first', () => {
+    const base = rule('[part="button"]')
+    expect(base).toContain('var(--icon-button-background-color')
+    expect(base).toContain('var(--icon-button-foreground-color')
+    expect(rule(':host(:not(:disabled)) [part="button"]:hover')).toContain(
+      '--icon-button-background-color-hover',
+    )
   })
 })
