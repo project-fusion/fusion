@@ -1,5 +1,5 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import type { CSSResultGroup } from 'lit'
+import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { literal, type StaticValue, html as staticHtml } from 'lit/static-html.js'
 import { styles } from './text-root.css.js'
@@ -61,6 +61,11 @@ export class HelixText extends HelixElement {
    * The HTML element to render.
    *
    * Decides the outline and the semantics.
+   *
+   * **`label` gives the label ramp and labels no control.** The element is in
+   * this one's shadow root, which neither `for` nor a wrapped control can
+   * reach, so a page that writes either is warned. Name a Helix field with its
+   * own `label`, and a native control with `<label data-text="label">`.
    */
   @property({ reflect: true })
   as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label'
@@ -101,7 +106,8 @@ export class HelixText extends HelixElement {
   /**
    * The type style, which sets the size, weight, leading, and tracking.
    *
-   * Defaults to the one that matches `as`.
+   * Defaults to the one that matches `as`: `body` for `p`, `body-strong` for
+   * `strong`, `h5` and `h6`. A `span` or an `em` keeps the type around it.
    */
   @property({ reflect: true })
   variant?:
@@ -114,6 +120,32 @@ export class HelixText extends HelixElement {
     | 'caption'
     | 'label'
     | 'code'
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('as') && this.as === 'label' && this.labelsNothing()) {
+      reportRuntime({
+        kind: 'unreachable-label',
+        message:
+          '<helix-text as="label"> names no control: its label is in a shadow root, which ' +
+          '`for` and a wrapped control cannot reach. Give a Helix field its own `label`, or ' +
+          'write `<label data-text="label">` for a native control.',
+        tag: this.localName,
+      })
+    }
+  }
+
+  /** Whether the page wrote this as the label of a control, which it cannot be. */
+  private labelsNothing(): boolean {
+    const fields = [...this.querySelectorAll('*')].some(
+      (element) => (element.constructor as { formAssociated?: boolean }).formAssociated === true,
+    )
+    return (
+      fields ||
+      this.hasAttribute('for') ||
+      this.querySelector('input, select, textarea, button, meter, output, progress') !== null
+    )
+  }
 
   protected override render(): unknown {
     /* `Object.hasOwn`, not a truthy index.

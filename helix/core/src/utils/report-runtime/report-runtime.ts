@@ -59,6 +59,8 @@ export type RuntimeKind =
   | 'unknown-event'
   /** A tooltip's trigger does not name it in `aria-describedby`, so it is not read out. */
   | 'unlinked-trigger'
+  /** A Text rendered as a label wraps or names a control, which its shadow root cannot reach. */
+  | 'unreachable-label'
   /** A virtualized list's box has no height of its own, so its window never settles. */
   | 'unsettled-window'
   /** A slotted trigger is a plain element, which cannot be told it opens something. */
