@@ -39,6 +39,9 @@ import { styles } from './number-input-root.css.js'
  * @csspart increment - The button that steps the value up.
  *
  * @cssproperty --number-input-background-color - The fill behind the number.
+ * @cssproperty --number-input-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
+ * @cssproperty --number-input-radius - Corner radius of the field.
+ * @cssproperty --number-input-size - Height of the field.
  */
 @customElement('helix-number-input')
 export class HelixNumberInput extends HelixHeadlessNumberInput {
