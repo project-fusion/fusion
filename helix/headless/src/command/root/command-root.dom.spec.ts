@@ -294,3 +294,31 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('the palette says how many commands are left', () => {
+  test('in its own words as typing narrows the list', async () => {
+    const host = await palette()
+    listbox(host).requestFilter('e')
+    await settle(host)
+    const live = () =>
+      listbox(host).shadowRoot?.querySelector('[part="live"]')?.textContent?.trim() ?? ''
+    expect(live()).toBe('3 commands')
+    listbox(host).requestFilter('new')
+    await settle(host)
+    expect(live()).toBe('1 command')
+  })
+
+  test('and its empty line takes slotted content', async () => {
+    const host = await palette(
+      markup.replace(
+        '</helix-headless-command>',
+        '<p slot="empty">No commands. <kbd>Esc</kbd> to close</p></helix-headless-command>',
+      ),
+    )
+    listbox(host).requestFilter('zzz')
+    await settle(host)
+    const empty = listbox(host).shadowRoot?.querySelector('[part="empty"] slot') as HTMLSlotElement
+    const flattened = empty.assignedNodes({ flatten: true })
+    expect(flattened.map((node) => node.textContent).join('')).toContain('to close')
+  })
+})

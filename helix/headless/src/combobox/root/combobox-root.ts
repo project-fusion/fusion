@@ -57,7 +57,8 @@ const isInsertion = (event: Event): boolean =>
  * Focus stays in the text field. The arrow keys move through the list with the
  * listbox's public `navigate` method. `role="combobox"` is on the input itself.
  * ArrowDown and ArrowUp open the list on the chosen option, and Enter chooses
- * the highlighted one. Space, Home, End and letters edit the text, and Enter in
+ * the highlighted one. As typing narrows the list, a screen reader hears how
+ * many options are left, such as "3 results". Space, Home, End and letters edit the text, and Enter in
  * a closed field is left to the form. Emptying the field and leaving it clears
  * a single choice; Escape puts the chosen words back.
  *
@@ -77,11 +78,13 @@ const isInsertion = (event: Event): boolean =>
  * @documentation https://fusion.dev/helix/components/combobox
  *
  * @slot - The options.
+ * @slot empty - What the list shows when typing hides every option, for content richer than `empty-text`.
  * @slot end - After the text, for a unit or a clear button.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - The hint, for content richer than plain text.
  * @slot indicator - Replaces the caret that shows the field opens a list.
  * @slot label - The label, for content richer than plain text.
+ * @slot loading - What the list shows while the options load, for content richer than `loading-text`.
  * @slot start - Before the text, for an icon.
  *
  * @event {Event} change - Fired after the value changes.
@@ -109,7 +112,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart listbox-hint - Help under the list.
  * @csspart listbox-items - The element that holds the options.
  * @csspart listbox-label - The label above the list.
- * @csspart listbox-live - The inner list's `live` part, the region screen readers announce its empty and loading messages from.
+ * @csspart listbox-live - The inner list's `live` part, the region screen readers announce its empty and loading messages, and how many options typing left, from.
  * @csspart listbox-loading - Shown while the options are loading.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The filter field inside that region.
@@ -256,6 +259,21 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    */
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove {name}'
+
+  /**
+   * What a screen reader hears when typing leaves one option. `{count}` is
+   * the count.
+   */
+  @property({ attribute: 'result-label' })
+  resultLabel = '{count} result'
+
+  /**
+   * What a screen reader hears when typing leaves any other number of
+   * options. `{count}` is the count, and `Intl.PluralRules` picks between the
+   * two.
+   */
+  @property({ attribute: 'results-label' })
+  resultsLabel = '{count} results'
 
   /**
    * Whether the field completes the word as the user types.
@@ -988,6 +1006,8 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       aria-label=${this.listLabel}
       empty-text=${this.emptyText}
       loading-text=${this.loadingText}
+      result-label=${this.resultLabel}
+      results-label=${this.resultsLabel}
       ?loading=${this.loading}
       ?multiple=${this.multiple}
       .value=${this.value}
@@ -1002,6 +1022,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
            property, so nothing else would schedule the update that fixes
            it. -->
       <slot @slotchange=${() => this.requestUpdate()}></slot>
+      <!-- Handed on to the list's own, with the text as this slot's fallback:
+           a slot passed into another is assigned there whether or not anything
+           fills it, so the list's fallback would never show. -->
+      <slot name="empty" slot="empty">${this.emptyText}</slot>
+      <slot name="loading" slot="loading">${this.loadingText}</slot>
     </${this.tag('listbox')}>`
   }
 

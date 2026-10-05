@@ -50,7 +50,8 @@ const parse = (hotkey: string) => {
  * write one binding.
  *
  * The filter is cleared when the palette closes, so each opening starts from
- * the full list. Combobox and Select do the same.
+ * the full list. Combobox and Select do the same. As typing narrows the list, a
+ * screen reader hears how many commands are left, such as "3 commands".
  *
  * @since 0.1.0
  * @status stable
@@ -59,7 +60,9 @@ const parse = (hotkey: string) => {
  * @documentation https://fusion.dev/helix/components/command
  *
  * @slot - The commands, and any groups of them.
+ * @slot empty - What the palette shows when typing matches no commands, for content richer than `empty-text`.
  * @slot footer - Content under the list, such as the keys that work in the palette.
+ * @slot loading - What the palette shows while the commands load, for content richer than `loading-text`.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The palette is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The palette is about to open. Cancelable: cancel it to keep it closed.
@@ -77,7 +80,7 @@ const parse = (hotkey: string) => {
  * @csspart listbox-hint - Help text under the list.
  * @csspart listbox-items - The list of commands.
  * @csspart listbox-label - The label above the list.
- * @csspart listbox-live - The listbox's `live` part, a live region that holds the empty and loading text for screen readers.
+ * @csspart listbox-live - The listbox's `live` part, a live region that holds the empty and loading text, and how many commands typing left, for screen readers.
  * @csspart listbox-loading - The text shown while the commands are loading.
  * @csspart listbox-search - The region that holds the filter field.
  * @csspart listbox-search-field - The filter field.
@@ -128,6 +131,21 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   @property()
   placeholder = 'Search commands'
+
+  /**
+   * What a screen reader hears when typing leaves one command. `{count}` is
+   * the count.
+   */
+  @property({ attribute: 'result-label' })
+  resultLabel = '{count} command'
+
+  /**
+   * What a screen reader hears when typing leaves any other number of
+   * commands. `{count}` is the count, and `Intl.PluralRules` picks between the
+   * two.
+   */
+  @property({ attribute: 'results-label' })
+  resultsLabel = '{count} commands'
 
   /**
    * Whether the consumer put anything under the list.
@@ -363,6 +381,8 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         empty-text=${this.emptyText}
         filter-label=${this.placeholder}
         loading-text=${this.loadingText}
+        result-label=${this.resultLabel}
+        results-label=${this.resultsLabel}
         ?loading=${this.loading}
         filterable
         @helix-before-change=${this.handleChange}
@@ -370,6 +390,10 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         @input=${this.stopInner}
       >
         <slot></slot>
+        <!-- Handed on with the text as the fallback, for the reason Combobox
+             gives: the list's own fallback never shows behind a passed slot. -->
+        <slot name="empty" slot="empty">${this.emptyText}</slot>
+        <slot name="loading" slot="loading">${this.loadingText}</slot>
       </${this.tag('listbox')}>
       <div ?hidden=${!this.footed} part="footer" slot="footer">
         <slot
