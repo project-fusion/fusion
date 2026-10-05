@@ -166,20 +166,42 @@ describe('the status an avatar reports', () => {
    never flashes them. */
 describe('fallback delay', () => {
   const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+  /* A real browser answers a missing file at once, with an error: a picture
+     that failed rather than one still on its way. The browser's own load and
+     error are kept from the component, so the picture stays on its way until
+     the spec dispatches one. */
+  const stillLoading = <T extends HTMLElement>(host: T): T => {
+    for (const type of ['error', 'load']) {
+      host.shadowRoot?.addEventListener(
+        type,
+        (event) => {
+          if (event.isTrusted) {
+            event.stopImmediatePropagation()
+          }
+        },
+        { capture: true },
+      )
+    }
+    return host
+  }
 
   test('without one, a loading picture shows no initials, as before', async () => {
-    const avatar = (await mount(
-      '<helix-headless-avatar name="Ada Lovelace" src="/ada.avif"></helix-headless-avatar>',
-    )) as Updatable
+    const avatar = stillLoading(
+      (await mount(
+        '<helix-headless-avatar name="Ada Lovelace" src="/ada.avif"></helix-headless-avatar>',
+      )) as Updatable,
+    )
     await wait(20)
     await avatar.updateComplete
     expect(part(avatar, 'initials')).toBeNull()
   })
 
   test('the initials stand in once the wait is over, and the picture keeps loading', async () => {
-    const avatar = (await mount(
-      '<helix-headless-avatar name="Ada Lovelace" src="/ada.avif" fallback-delay="10"></helix-headless-avatar>',
-    )) as Updatable
+    const avatar = stillLoading(
+      (await mount(
+        '<helix-headless-avatar name="Ada Lovelace" src="/ada.avif" fallback-delay="10"></helix-headless-avatar>',
+      )) as Updatable,
+    )
     expect(part(avatar, 'initials')).toBeNull()
     await wait(30)
     await avatar.updateComplete

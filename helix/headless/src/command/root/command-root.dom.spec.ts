@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -328,19 +328,23 @@ describe('a command that is a link', () => {
     <helix-headless-option value="docs" href="/docs">Read the docs</helix-headless-option>
   </helix-headless-command>`
   const followed: string[] = []
-  document.addEventListener(
-    'click',
-    (event) => {
-      if (event.target instanceof HTMLAnchorElement) {
-        followed.push(event.target.getAttribute('href') ?? '')
-        event.preventDefault()
-      }
-    },
-    { capture: true },
-  )
+  /* Caught on the way down and kept from navigating, for one test at a time:
+     left on the document, it would cancel every link click in the files after
+     this one. */
+  const follow = (event: Event): void => {
+    if (event.target instanceof HTMLAnchorElement) {
+      followed.push(event.target.getAttribute('href') ?? '')
+      event.preventDefault()
+    }
+  }
+  const catchLinks = (): void => {
+    followed.length = 0
+    document.addEventListener('click', follow, { capture: true })
+  }
+  afterEach(() => document.removeEventListener('click', follow, { capture: true }))
 
   test('closes the palette, says its href, and the link is followed', async () => {
-    followed.length = 0
+    catchLinks()
     const host = await palette(linked)
     host.open = true
     await settle(host)
@@ -354,7 +358,7 @@ describe('a command that is a link', () => {
   })
 
   test('canceled, keeps the palette open and follows nothing', async () => {
-    followed.length = 0
+    catchLinks()
     const host = await palette(linked)
     host.open = true
     await settle(host)

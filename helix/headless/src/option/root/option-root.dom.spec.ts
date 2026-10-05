@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -170,21 +170,27 @@ describe('an option whose words are not what a reader types', () => {
 })
 
 describe('an option that is a link', () => {
-  /* What an anchor would hear, caught on the way down and kept from navigating. */
+  /* What an anchor would hear, caught on the way down and kept from navigating.
+     Each catcher comes off the document after its test: left on, it would
+     cancel every link click in the files after this one. */
+  const catchers: ((event: Event) => void)[] = []
+  afterEach(() => {
+    for (const catcher of catchers.splice(0)) {
+      document.removeEventListener('click', catcher, { capture: true })
+    }
+  })
   const followed = (): string[] => {
     const heard: string[] = []
-    document.addEventListener(
-      'click',
-      (event) => {
-        if (event.target instanceof HTMLAnchorElement) {
-          heard.push(
-            `${event.target.getAttribute('href')} ${event.target.target}${(event as MouseEvent).metaKey ? ' meta' : ''}`,
-          )
-          event.preventDefault()
-        }
-      },
-      { capture: true },
-    )
+    const catcher = (event: Event): void => {
+      if (event.target instanceof HTMLAnchorElement) {
+        heard.push(
+          `${event.target.getAttribute('href')} ${event.target.target}${(event as MouseEvent).metaKey ? ' meta' : ''}`,
+        )
+        event.preventDefault()
+      }
+    }
+    catchers.push(catcher)
+    document.addEventListener('click', catcher, { capture: true })
     return heard
   }
 

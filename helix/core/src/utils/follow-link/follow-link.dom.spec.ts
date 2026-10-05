@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 import { followLink } from './follow-link.js'
 
@@ -6,19 +6,26 @@ beforeAll(() => {
   registerDom()
 })
 
+/* Each catcher comes off the document after its test: left on, it would cancel
+   every link click in the files after this one. */
+const catchers: ((event: Event) => void)[] = []
+afterEach(() => {
+  for (const catcher of catchers.splice(0)) {
+    document.removeEventListener('click', catcher, { capture: true })
+  }
+})
+
 /** Every click an anchor hears, caught on the way down and kept from navigating. */
 const clicks = (): { anchor: HTMLAnchorElement; event: MouseEvent }[] => {
   const heard: { anchor: HTMLAnchorElement; event: MouseEvent }[] = []
-  document.addEventListener(
-    'click',
-    (event) => {
-      if (event.target instanceof HTMLAnchorElement) {
-        heard.push({ anchor: event.target, event })
-        event.preventDefault()
-      }
-    },
-    { capture: true },
-  )
+  const catcher = (event: Event): void => {
+    if (event.target instanceof HTMLAnchorElement) {
+      heard.push({ anchor: event.target, event: event as MouseEvent })
+      event.preventDefault()
+    }
+  }
+  catchers.push(catcher)
+  document.addEventListener('click', catcher, { capture: true })
   return heard
 }
 

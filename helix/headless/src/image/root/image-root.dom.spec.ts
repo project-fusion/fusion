@@ -287,13 +287,31 @@ if (hasLayout()) {
 /* Radix's `delayMs`: a picture that arrives inside the wait never flashes a
    placeholder. */
 describe('placeholder delay and states', () => {
+  /* A real browser answers a missing file at once, with an error: a picture
+     that failed rather than one still on its way. The browser's own load and
+     error are kept from the component, so the picture stays on its way until
+     the spec dispatches one. */
+  const stillLoading = <T extends HTMLElement>(host: T): T => {
+    for (const type of ['error', 'load']) {
+      host.shadowRoot?.addEventListener(
+        type,
+        (event) => {
+          if (event.isTrusted) {
+            event.stopImmediatePropagation()
+          }
+        },
+        { capture: true },
+      )
+    }
+    return host
+  }
   const placeholderHidden = (host: HTMLElement): boolean =>
     part(host, 'placeholder')?.hasAttribute('hidden') ?? true
   const states = (host: HTMLElement): ElementInternals['states'] =>
     (host as unknown as { internals: ElementInternals }).internals.states
 
   test('keeps the placeholder hidden until the wait is over', async () => {
-    const host = await image('src="/pier.avif" placeholder-delay="30"')
+    const host = stillLoading(await image('src="/pier.avif" placeholder-delay="30"'))
     expect(placeholderHidden(host)).toBe(true)
     await new Promise((resolve) => setTimeout(resolve, 60))
     await host.updateComplete
@@ -306,7 +324,7 @@ describe('placeholder delay and states', () => {
   })
 
   test('a picture that arrives inside the wait never shows one', async () => {
-    const host = await image('src="/pier.avif" placeholder-delay="30"')
+    const host = stillLoading(await image('src="/pier.avif" placeholder-delay="30"'))
     host.shadowRoot?.querySelector('img')?.dispatchEvent(new Event('load'))
     await new Promise((resolve) => setTimeout(resolve, 60))
     await host.updateComplete

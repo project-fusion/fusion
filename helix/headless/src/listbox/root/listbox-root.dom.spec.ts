@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
   hasLayout,
@@ -736,19 +736,23 @@ describe('an option that is a link', () => {
     return host
   }
   const followed: string[] = []
-  document.addEventListener(
-    'click',
-    (event) => {
-      if (event.target instanceof HTMLAnchorElement) {
-        followed.push(event.target.getAttribute('href') ?? '')
-        event.preventDefault()
-      }
-    },
-    { capture: true },
-  )
+  /* Caught on the way down and kept from navigating, for one test at a time:
+     left on the document, it would cancel every link click in the files after
+     this one. */
+  const follow = (event: Event): void => {
+    if (event.target instanceof HTMLAnchorElement) {
+      followed.push(event.target.getAttribute('href') ?? '')
+      event.preventDefault()
+    }
+  }
+  const catchLinks = (): void => {
+    followed.length = 0
+    document.addEventListener('click', follow, { capture: true })
+  }
+  afterEach(() => document.removeEventListener('click', follow, { capture: true }))
 
   test('is passed over by the arrows without being chosen or followed', async () => {
-    followed.length = 0
+    catchLinks()
     const host = await linked('default-value="one"')
     await press(host, 'ArrowDown')
     expect(host.value).toBe('one')
@@ -756,7 +760,7 @@ describe('an option that is a link', () => {
   })
 
   test('is followed by Enter, and the selection stays as it was', async () => {
-    followed.length = 0
+    catchLinks()
     const host = await linked('manual default-value="one"')
     await press(host, 'ArrowDown')
     await press(host, 'Enter')
@@ -765,7 +769,7 @@ describe('an option that is a link', () => {
   })
 
   test('is followed by a press, and its helix-select reaches the page', async () => {
-    followed.length = 0
+    catchLinks()
     const host = await linked()
     const said: unknown[] = []
     document.body.addEventListener('helix-select', (event) =>
