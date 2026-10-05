@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  appleTouch,
   valueAsNumber as asNumber,
   customElement,
   fillTemplate,
@@ -16,7 +17,6 @@ import { minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { appleTouch } from '../platform.js'
 
 /**
  * How far a pointer travels for one step of the value, in pixels.

@@ -8,6 +8,7 @@ import {
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
+  rovingStop,
   toggleValue,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -155,12 +156,10 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     /* A toolbar's stop follows focus, so Tab comes back to the button a reader
        left. Then the first pressed one, as a radio group's is its answer. */
     if (this.multiple) {
-      const left = this.lastFocused
-      if (left && items.includes(left) && !left.disabled) {
-        return left
-      }
-      const first = items.find((item) => item.pressed && !item.disabled)
-      return first ?? items.find((item) => !item.disabled)
+      return rovingStop(items, this.lastFocused, {
+        disabled: (item) => item.disabled,
+        selected: (item) => item.pressed === true,
+      })
     }
     const active = items.find((item) => item.value === this.value)
     return active && !active.disabled ? active : items.find((item) => !item.disabled)

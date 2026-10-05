@@ -1,12 +1,17 @@
 import {
+  ariaChord,
+  chordParts,
   customElement,
   elementById,
   HelixElement,
   HelixShortcutEvent,
+  matchesChord,
+  onApple,
+  printableChord,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { ariaChord, claimShortcut, releaseShortcut } from '../shortcut.js'
+import { claimShortcut, releaseShortcut } from '../shortcut.js'
 
 /**
  * Whether a node is something a reader types into.
@@ -85,10 +90,6 @@ const ELSEWHERE: Record<string, string> = {
   tab: 'Tab',
   up: '↑',
 }
-
-/** Whether the keyboard in front of the reader labels its modifiers with glyphs. */
-const onApple = (): boolean =>
-  typeof navigator !== 'undefined' && /mac|iphone|ipad|ipod/i.test(navigator.userAgent)
 
 /**
  * @summary A keyboard key or chord, set inline with text.
@@ -236,11 +237,9 @@ export class HelixHeadlessKbd extends HelixElement {
   private get label(): string {
     const apple = !this.hydrating && onApple()
     const names = apple ? APPLE : ELSEWHERE
-    const parts = this.keys
-      .split('+')
-      .map((part) => part.trim())
-      .filter((part) => part !== '')
-      .map((part) => names[part.toLowerCase()] ?? (part.length === 1 ? part.toUpperCase() : part))
+    const parts = chordParts(this.keys).map(
+      (part) => names[part.toLowerCase()] ?? (part.length === 1 ? part.toUpperCase() : part),
+    )
     return parts.join(apple ? '' : '+')
   }
 
@@ -293,10 +292,14 @@ export class HelixHeadlessKbd extends HelixElement {
        field and press slash, and it would have shipped to the docs site doing
        nothing. What is ambiguous is `/` competing with every field on the page,
        which is the `document` case and the only one this refuses. */
-    if (this.within === 'document' && this.printable && typing(press.composedPath()[0])) {
+    if (
+      this.within === 'document' &&
+      printableChord(this.keys) &&
+      typing(press.composedPath()[0])
+    ) {
       return
     }
-    if (!this.matches_(press)) {
+    if (!matchesChord(press, this.keys, onApple())) {
       return
     }
     /* Announced before it is consumed, so a consumer can refuse it: the key
@@ -306,60 +309,6 @@ export class HelixHeadlessKbd extends HelixElement {
     if (!shortcut.defaultPrevented) {
       press.preventDefault()
     }
-  }
-
-  /**
-   * Whether this chord types a character, and so is indistinguishable from
-   * typing.
-   *
-   * One code point means a character rather than a name: `/` and `?` are
-   * printable, `escape` and `enter` are not. **Shift is allowed beside it**,
-   * because Shift is how a character is typed: `shift+?` and `shift+a` are a
-   * question mark and a capital A in a field, and taking them ate every one
-   * a reader typed on the page.
-   */
-  private get printable(): boolean {
-    const parts = this.keys
-      .split('+')
-      .map((part) => part.trim().toLowerCase())
-      .filter((part) => part !== '')
-    const key = parts.at(-1) ?? ''
-    return [...key].length === 1 && parts.slice(0, -1).every((modifier) => modifier === 'shift')
-  }
-
-  /** Whether a press is this chord, modifiers and all. */
-  private matches_(press: KeyboardEvent): boolean {
-    const parts = this.keys
-      .split('+')
-      .map((part) => part.trim().toLowerCase())
-      .filter((part) => part !== '')
-    if (parts.length === 0) {
-      return false
-    }
-    const wanted = parts[parts.length - 1] ?? ''
-    const modifiers = new Set(parts.slice(0, -1))
-    const apple = onApple()
-    /* `mod` is one key, the platform's: Command on Apple devices and Control
-       elsewhere. The other one is then checked like any modifier the chord
-       does not name, so Control and Command together do not answer `mod+k`. */
-    const ctrl = modifiers.has('ctrl') || (modifiers.has('mod') && !apple)
-    const meta = modifiers.has('cmd') || modifiers.has('meta') || (modifiers.has('mod') && apple)
-    /* **A symbol is typed with Shift, so Shift says nothing about it.** On a US
-       layout `?` arrives as `?` with `shiftKey` set, and a chord of `?` that
-       refused Shift could never be pressed at all: the web's most common help
-       shortcut, unbindable except as `shift+?`. A letter has a shifted form of
-       its own, so `a` still refuses Shift and `shift+a` still asks for it. */
-    const symbol = wanted.toLowerCase() === wanted.toUpperCase() && [...wanted].length === 1
-    /* Every modifier is checked in both directions, so `mod+k` is not answered
-       by `shift+mod+k`: a chord a reader did not press is a chord that should
-       go to whatever did want it. */
-    return (
-      press.key.toLowerCase() === wanted &&
-      (modifiers.has('shift') ? press.shiftKey : symbol || !press.shiftKey) &&
-      (modifiers.has('alt') || modifiers.has('opt') ? press.altKey : !press.altKey) &&
-      (ctrl ? press.ctrlKey : !press.ctrlKey) &&
-      (meta ? press.metaKey : !press.metaKey)
-    )
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

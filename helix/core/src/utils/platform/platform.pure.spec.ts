@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { appleTouch } from './platform.js'
+import { appleTouch, onApple } from './platform.js'
 
 describe('an Apple touch device', () => {
   test('is an iPhone, an iPad, or an iPad asking for the desktop site', () => {
@@ -17,5 +17,18 @@ describe('an Apple touch device', () => {
     )
     expect(appleTouch({ platform: 'Win32', userAgent: 'Windows NT 10.0' })).toBe(false)
     expect(appleTouch(undefined)).toBe(false)
+  })
+})
+
+describe('an Apple keyboard', () => {
+  test('is a Mac, an iPhone or an iPad, by the user agent', () => {
+    expect(onApple({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)' })).toBe(true)
+    expect(onApple({ userAgent: 'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X)' })).toBe(true)
+  })
+
+  test('is not another platform, nor a server with no keyboard to ask', () => {
+    expect(onApple({ userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' })).toBe(false)
+    expect(onApple({ userAgent: 'Mozilla/5.0 (X11; Linux x86_64)' })).toBe(false)
+    expect(onApple(undefined)).toBe(false)
   })
 })

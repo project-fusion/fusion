@@ -1,51 +1,10 @@
 /**
- * A chord written for `Kbd.keys` in the words `aria-keyshortcuts` takes, and
- * the bookkeeping that writes it onto the control a shortcut belongs to.
+ * The bookkeeping that writes a chord onto the control a shortcut belongs to,
+ * in the words core's `ariaChord` spells it in.
  *
- * Beside the family's `index.ts`, because the translation is a fact about ARIA
- * and the attribute is a fact about another element, and neither is the key's
- * template.
+ * Beside the family's `index.ts`, because the attribute is a fact about
+ * another element, and not the key's template.
  */
-
-/** Each name `keys` accepts, as `aria-keyshortcuts` spells it: the UI Events key values. */
-const ARIA: Record<string, string> = {
-  alt: 'Alt',
-  backspace: 'Backspace',
-  cmd: 'Meta',
-  ctrl: 'Control',
-  del: 'Delete',
-  down: 'ArrowDown',
-  enter: 'Enter',
-  esc: 'Escape',
-  escape: 'Escape',
-  left: 'ArrowLeft',
-  meta: 'Meta',
-  opt: 'Alt',
-  right: 'ArrowRight',
-  shift: 'Shift',
-  space: 'Space',
-  tab: 'Tab',
-  up: 'ArrowUp',
-}
-
-/**
- * `mod+k` as `aria-keyshortcuts` writes it: `Meta+K` on an Apple keyboard and
- * `Control+K` elsewhere. A letter is written in capitals and a symbol as
- * itself. Empty for no keys.
- */
-export const ariaChord = (keys: string, apple: boolean): string =>
-  keys
-    .split('+')
-    .map((part) => part.trim())
-    .filter((part) => part !== '')
-    .map((part) => {
-      const name = part.toLowerCase()
-      if (name === 'mod') {
-        return apple ? 'Meta' : 'Control'
-      }
-      return ARIA[name] ?? (part.length === 1 ? part.toUpperCase() : part)
-    })
-    .join('+')
 
 /** The space-separated list with `chord` added once. */
 export const withShortcut = (list: string | null, chord: string): string => {

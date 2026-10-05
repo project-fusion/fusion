@@ -7,6 +7,7 @@ import {
   hostAria,
   MixinCollection,
   markRegion,
+  rovingStop,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -344,7 +345,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    */
   private rove(): void {
     const rows = this.reachable
-    const stop = this.stopRow && rows.includes(this.stopRow) ? this.stopRow : rows[0]
+    const stop = rovingStop(rows, this.stopRow)
     const direct = this.rows
     for (const row of this.items) {
       const position = direct.indexOf(row) + 1
