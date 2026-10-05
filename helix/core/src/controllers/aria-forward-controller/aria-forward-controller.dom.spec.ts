@@ -246,3 +246,65 @@ describe('every update rather than only the first', () => {
     expect(control.getAttribute('aria-expanded')).toBe('false')
   })
 })
+
+describe('a state a consumer wrote on the host', () => {
+  /* A pressed toggle button is a `helix-button` with `aria-pressed`, and the
+     state was left on a generic host the reader never lands on. */
+  test('aria-pressed reaches the control', () => {
+    const { control, forward } = scene('aria-pressed="true"')
+    forward.hostUpdated()
+    expect(control.getAttribute('aria-pressed')).toBe('true')
+  })
+})
+
+describe('a name a consumer wrote on the host', () => {
+  test('aria-label reaches a control named by its content, which asks for it', () => {
+    document.body.innerHTML = '<span aria-label="Close"></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    Object.assign(host, { addController: () => {} })
+    const control = reflecting()
+    host.attachShadow({ mode: 'open' }).append(control)
+    const forward = new AriaForwardController(host as never, { label: true, target: () => control })
+    forward.hostUpdated()
+    expect(control.getAttribute('aria-label')).toBe('Close')
+    host.removeAttribute('aria-label')
+    forward.hostUpdated()
+    expect(control.hasAttribute('aria-label')).toBe(false)
+  })
+
+  /* A field renders its `aria-label` as a clipped label already, so it is
+     carried only where a component asks. */
+  test('and stays where it is for a control that does not ask', () => {
+    const { control, forward } = scene('aria-label="Close"')
+    forward.hostUpdated()
+    expect(control.hasAttribute('aria-label')).toBe(false)
+  })
+})
+
+describe('a label the page wrote for the host', () => {
+  /** A host the platform has given labels, as it gives a form-associated one. */
+  const labeled = (control: HTMLElement): AriaForwardController => {
+    document.body.innerHTML = '<label id="outer">Email</label><span></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    const label = document.getElementById('outer')
+    Object.assign(host, { addController: () => {} })
+    Object.defineProperty(host, 'labels', { value: [label] })
+    host.attachShadow({ mode: 'open' }).append(control)
+    return new AriaForwardController(host as never, { target: () => control })
+  }
+
+  /* The platform names the host, a generic the reader never lands on, and the
+     textbox inside went unnamed. */
+  test('names a control that has no name of its own', () => {
+    const control = reflecting()
+    labeled(control).hostUpdated()
+    expect(held(control, 'ariaLabelledByElements')).toEqual(['outer'])
+  })
+
+  test('and leaves a control that has one alone', () => {
+    const control = reflecting()
+    control.setAttribute('aria-label', 'Own name')
+    labeled(control).hostUpdated()
+    expect(held(control, 'ariaLabelledByElements')).toBeNull()
+  })
+})

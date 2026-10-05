@@ -60,6 +60,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
+    label: true,
     target: () => this.partNamed('control'),
   })
 

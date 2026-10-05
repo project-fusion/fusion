@@ -445,3 +445,23 @@ describe('the row of cells', () => {
     expect(scope.getElementById(named)?.textContent?.trim()).toBe('Code')
   })
 })
+
+describe('Enter in a box', () => {
+  /* Each box is in a shadow root and has no form owner, so the platform never
+     ran implicit submission for one. */
+  test('submits a form with no button and no other field', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-pin-input name="code" label="Code"></helix-headless-pin-input></form>'
+    const host = document.querySelector('helix-headless-pin-input') as Pin
+    await host.updateComplete
+    let submitted = 0
+    document.querySelector('form')?.addEventListener('submit', (event) => {
+      event.preventDefault()
+      submitted += 1
+    })
+    cells(host)[0]?.dispatchEvent(
+      new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' }),
+    )
+    expect(submitted).toBe(1)
+  })
+})

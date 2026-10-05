@@ -2,6 +2,81 @@ import type { PropertyValues } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixElement } from '../helix-element/helix-element.js'
 
+/** The flags a validity carries, read by name because a `ValidityState` keeps them on its prototype. */
+const VALIDITY_FLAGS = [
+  'badInput',
+  'customError',
+  'patternMismatch',
+  'rangeOverflow',
+  'rangeUnderflow',
+  'stepMismatch',
+  'tooLong',
+  'tooShort',
+  'typeMismatch',
+  'valueMissing',
+] as const
+
+/** The native input types that count against implicit submission, from the HTML standard. */
+const BLOCKING_TYPES = new Set([
+  'date',
+  'datetime-local',
+  'email',
+  'month',
+  'number',
+  'password',
+  'search',
+  'tel',
+  'text',
+  'time',
+  'url',
+  'week',
+])
+
+/** What a control last reported through `setValidity`, kept so a custom error can be laid over it. */
+interface Reported {
+  anchor: HTMLElement | undefined
+  flags: ValidityStateFlags
+  message: string
+}
+
+/**
+ * Whether the platform can move focus to `element`, which a validation anchor
+ * has to be: an anchor that cannot take focus leaves the form blocked with no
+ * bubble and nothing focused.
+ */
+const takesFocus = (element: HTMLElement): boolean =>
+  (element.tabIndex >= 0 || element.hasAttribute('tabindex')) &&
+  !(element as HTMLElement & { disabled?: boolean }).disabled &&
+  (typeof element.checkVisibility !== 'function' || element.checkVisibility())
+
+/** Whether `element` is where Tab would stop: focusable, in the sequence, and drawn. */
+const isTabStop = (element: Element): element is HTMLElement =>
+  element instanceof HTMLElement &&
+  element.tabIndex >= 0 &&
+  !(element as HTMLElement & { disabled?: boolean }).disabled &&
+  !element.hidden &&
+  !element.inert &&
+  (typeof element.checkVisibility !== 'function' || element.checkVisibility())
+
+/**
+ * The first tab stop under `node`, walking the tree a reader tabs through: into
+ * shadow roots, and through a slot to what is assigned to it.
+ */
+const firstTabStop = (node: Element | ShadowRoot): HTMLElement | null => {
+  const children =
+    node instanceof HTMLSlotElement ? node.assignedElements({ flatten: true }) : [...node.children]
+  for (const child of children) {
+    if (isTabStop(child)) {
+      return child
+    }
+    const found = (child.shadowRoot ? firstTabStop(child.shadowRoot) : null) ?? firstTabStop(child)
+    if (found) {
+      return found
+    }
+  }
+  return null
+}
+
 /**
  * @summary Base for every element that participates in a form.
  *
@@ -13,8 +88,17 @@ import { HelixElement } from '../helix-element/helix-element.js'
  * `internals` comes from `HelixElement`, which attaches it for every component.
  * `attachInternals()` throws on a second call, so only one class attaches it.
  *
- * The class carries only what every form participant needs. `value`, validity,
- * and the reset and restore callbacks are added with the first input component.
+ * The class carries only what every form participant needs. `value` and the
+ * reset and restore callbacks are added with the first input component.
+ *
+ * **The validity API is the platform's, read through `internals`**, so
+ * `checkValidity()`, `reportValidity()` and `setCustomValidity()` work on the
+ * host as they do on a native control. A custom message is laid over whatever
+ * the control itself reports, which is why `setValidity` is wrapped below.
+ *
+ * **Focus goes to the control's first tab stop**, for `focus()` and for a
+ * press on a `<label>` that names the host. A host is not focusable itself, so
+ * without this a label press focused nothing on half the controls.
  *
  * @since 0.1.0
  * @status experimental
@@ -123,6 +207,27 @@ export class HelixFormElement extends HelixElement {
   }
 
   /**
+   * Whether an ancestor `<fieldset disabled>` holds the control, outside its
+   * first `<legend>`, read from the tree.
+   *
+   * For the one case the callback cannot report: a control disabled itself and
+   * by a fieldset, whose own `disabled` is then removed. The effective state does
+   * not change, so the platform does not call, and the fieldset's hold has to
+   * be read.
+   */
+  private get heldByFieldset(): boolean {
+    let fieldset = this.parentElement?.closest('fieldset[disabled]') ?? null
+    while (fieldset) {
+      const legend = fieldset.querySelector(':scope > legend')
+      if (!legend?.contains(this)) {
+        return true
+      }
+      fieldset = fieldset.parentElement?.closest('fieldset[disabled]') ?? null
+    }
+    return false
+  }
+
+  /**
    * Called by the browser when the form is reset. It does nothing here, and
    * every override calls it.
    *
@@ -135,8 +240,14 @@ export class HelixFormElement extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    if (changed.get('disabled') === true && !this.disabled && this.isConnected) {
+      this.formDisabled = this.heldByFieldset
+    }
     // Off for either reason, and said once for every control in the library.
     this.internals.ariaDisabled = this.isDisabled ? 'true' : null
+    if (this.validityFeedback !== this.appliedFeedback) {
+      this.applyValidity()
+    }
   }
 
   /**
@@ -196,6 +307,283 @@ export class HelixFormElement extends HelixElement {
     reflect: true,
   })
   name = ''
+
+  constructor() {
+    super()
+    /* **Wrapped, so a custom error survives the control's next report.** Every
+       control reports its own verdict through `internals.setValidity` on each
+       update, and the platform keeps one verdict per element, so a message set
+       through `setCustomValidity` or `feedback` would be gone the moment the
+       control next reported. Wrapping the one call every family already makes
+       keeps the two in one place without asking each family to merge them. */
+    const internals = this.internals
+    const report = internals.setValidity.bind(internals)
+    this.reportValidityTo = report
+    internals.setValidity = (
+      flags?: ValidityStateFlags,
+      message?: string,
+      anchor?: HTMLElement,
+    ) => {
+      this.reported = { anchor, flags: flags ?? {}, message: message ?? '' }
+      this.applyValidity()
+    }
+  }
+
+  /** The platform's own `setValidity`, which the wrapper above calls. */
+  private readonly reportValidityTo: ElementInternals['setValidity']
+
+  /** What the control last reported, before any custom error is laid over it. */
+  private reported: Reported = { anchor: undefined, flags: {}, message: '' }
+
+  /** The message `setCustomValidity` was given. */
+  private customValidity = ''
+
+  /** The `validityFeedback` the platform was last told about. */
+  private appliedFeedback = ''
+
+  /**
+   * @internal A message that marks the control invalid, from a layer above this
+   * one. `MixinField` answers with `feedback`, so a field showing what is wrong
+   * does not submit.
+   */
+  protected get validityFeedback(): string {
+    return ''
+  }
+
+  /**
+   * Hands the platform the control's own verdict with any custom error on top,
+   * anchored where focus can go.
+   */
+  private applyValidity(): void {
+    const feedback = this.validityFeedback
+    this.appliedFeedback = feedback
+    const custom = this.customValidity || feedback
+    const flags: ValidityStateFlags = {}
+    for (const flag of VALIDITY_FLAGS) {
+      if (this.reported.flags[flag] === true) {
+        flags[flag] = true
+      }
+    }
+    if (custom !== '') {
+      flags.customError = true
+    }
+    if (Object.keys(flags).length === 0) {
+      this.reportValidityTo({})
+      return
+    }
+    this.reportValidityTo(
+      flags,
+      custom || this.reported.message,
+      this.validationAnchor(this.reported.anchor),
+    )
+  }
+
+  /**
+   * Where the browser points its bubble: the anchor a control gave if focus
+   * can go there, and its first tab stop otherwise.
+   *
+   * A group anchors on a part that holds its members and cannot take focus,
+   * and the platform then refuses the submission, logs that the control is
+   * not focusable, and leaves the reader on the submit button.
+   */
+  protected validationAnchor(anchor?: HTMLElement): HTMLElement | undefined {
+    if (anchor && takesFocus(anchor)) {
+      return anchor
+    }
+    return this.focusTarget ?? anchor
+  }
+
+  /**
+   * Whether the control meets its constraints, and why not.
+   *
+   * @reference https://developer.mozilla.org/docs/Web/API/ElementInternals/validity ElementInternals.validity
+   */
+  get validity(): ValidityState {
+    return this.internals.validity
+  }
+
+  /** The message the browser would show for the control, or an empty string. */
+  get validationMessage(): string {
+    return this.internals.validationMessage
+  }
+
+  /** Whether the control is checked when its form is submitted. */
+  get willValidate(): boolean {
+    return this.internals.willValidate
+  }
+
+  /**
+   * Returns whether the control is valid, and fires `invalid` on it when it is
+   * not.
+   */
+  checkValidity(): boolean {
+    return this.internals.checkValidity()
+  }
+
+  /**
+   * Returns whether the control is valid, and when it is not, fires `invalid`
+   * and shows the browser's message at the control.
+   */
+  reportValidity(): boolean {
+    this.applyValidity()
+    return this.internals.reportValidity()
+  }
+
+  /**
+   * Marks the control invalid with `message`, or clears that with an empty
+   * string, as on a native control. The form does not submit while it is set.
+   */
+  setCustomValidity(message: string): void {
+    this.customValidity = message
+    this.applyValidity()
+    this.requestUpdate()
+  }
+
+  /**
+   * The element focus goes to: the control's first tab stop, or `null` where
+   * there is none.
+   *
+   * Read through shadow roots and slots, so a group lands on the member that
+   * holds its tab stop, which is the chosen radio in a radio group.
+   */
+  protected get focusTarget(): HTMLElement | null {
+    const root = this.shadowRoot
+    return root ? firstTabStop(root) : null
+  }
+
+  /** Moves focus to the control, as focusing a native control does. */
+  override focus(options?: FocusOptions): void {
+    const target = this.focusTarget
+    if (target) {
+      target.focus(options)
+      return
+    }
+    super.focus(options)
+  }
+
+  /**
+   * Focuses the control when its `<label>` is pressed.
+   *
+   * The label sends the host a click of the browser's own after trying to
+   * focus it, and a host that is not focusable takes nothing from that try.
+   * Only a click that starts at the host and that the browser sent: one from
+   * inside has landed where it meant to, and `click()` from a script does not
+   * focus a native control either.
+   */
+  private readonly focusFromLabel = (event: MouseEvent): void => {
+    if (!event.isTrusted || event.composedPath()[0] !== this || this.isDisabled) {
+      return
+    }
+    if (!this.matches(':focus-within')) {
+      this.focus()
+    }
+  }
+
+  /**
+   * Re-anchors the verdict as the form checks it, because the control's
+   * members may have rendered since it last reported, and the anchor read then
+   * was the best there was.
+   */
+  private readonly refreshAnchor = (): void => {
+    if (!this.internals.validity.valid) {
+      this.applyValidity()
+    }
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('click', this.focusFromLabel)
+    this.addEventListener('invalid', this.refreshAnchor)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('click', this.focusFromLabel)
+    this.removeEventListener('invalid', this.refreshAnchor)
+  }
+
+  /**
+   * @internal Whether this control is a field that counts against implicit
+   * submission: a single line of text, as `<input type="text">` is.
+   */
+  protected get blocksImplicitSubmission(): boolean {
+    return false
+  }
+
+  /** @internal Whether this control submits its form, for finding the form's default button. */
+  protected get submitsForm(): boolean {
+    return false
+  }
+
+  /** @internal Activates the control as its form's default button. */
+  protected activate(): void {
+    this.click()
+  }
+
+  /**
+   * Submits the form the way pressing Enter in a native text field does.
+   *
+   * The control's own input is in a shadow root and has no form owner, so the
+   * platform never runs implicit submission for it. This runs it: the form's
+   * default button is activated, the first submit button in it, a Helix one
+   * included. With none, the form is submitted when it holds no more than one
+   * field that counts against implicit submission, and nothing happens
+   * otherwise.
+   *
+   * @reference https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#implicit-submission implicit submission
+   */
+  protected submitImplicitly(): void {
+    const { form } = this
+    if (!form) {
+      return
+    }
+    const elements = [...form.elements]
+    const button = HelixFormElement.defaultButton(form)
+    if (button) {
+      if (button.matches(':disabled')) {
+        return
+      }
+      if (button instanceof HelixFormElement) {
+        button.activate()
+      } else {
+        ;(button as HTMLElement).click()
+      }
+      return
+    }
+    const blocking = elements.filter((element) =>
+      element instanceof HelixFormElement
+        ? element.blocksImplicitSubmission
+        : element instanceof HTMLInputElement && BLOCKING_TYPES.has(element.type),
+    )
+    if (blocking.length <= 1) {
+      form.requestSubmit()
+    }
+  }
+
+  /** The form's default button, the first submit button in it, native or Helix. */
+  protected static defaultButton(form: HTMLFormElement): Element | undefined {
+    return [...form.elements].find((element) => HelixFormElement.submits(element))
+  }
+
+  /** Whether `target` is a native field of `form` that Enter submits it from. */
+  protected static submitsOnEnter(target: EventTarget | undefined, form: HTMLFormElement): boolean {
+    return (
+      target instanceof HTMLInputElement && target.form === form && BLOCKING_TYPES.has(target.type)
+    )
+  }
+
+  /** Whether `element` is a submit button, native or Helix. */
+  protected static submits(element: Element): boolean {
+    if (element instanceof HelixFormElement) {
+      return element.submitsForm
+    }
+    if (element instanceof HTMLButtonElement) {
+      return element.type === 'submit'
+    }
+    return (
+      element instanceof HTMLInputElement && (element.type === 'submit' || element.type === 'image')
+    )
+  }
 
   /**
    * The form the control belongs to, or `null`.

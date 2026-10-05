@@ -206,12 +206,6 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   @property({ type: Number })
   step = 1
 
-  /** Focus is delegated to the field, so the host is never the focus target. */
-  static override shadowRootOptions: ShadowRootInit = {
-    ...HelixFormElement.shadowRootOptions,
-    delegatesFocus: true,
-  }
-
   private get control(): HTMLInputElement | null {
     return this.partNamed<HTMLInputElement>('control')
   }
@@ -558,7 +552,13 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     this.refreshFeedback()
   }
 
-  /** Puts the cursor in the field. */
+  /**
+   * Puts the cursor in the field.
+   *
+   * **No `delegatesFocus`**, because the platform's delegate is the first
+   * focusable element, which is the Decrease stepper: a label pressed for the
+   * field landed on it, and the arrows then did nothing.
+   */
   override focus(options?: FocusOptions): void {
     this.control?.focus(options)
   }
@@ -596,6 +596,23 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     this.releaseCaret?.()
     this.releaseCaret = undefined
     this.sync()
+  }
+
+  /**
+   * Enter submits the form, as it does in a native text field.
+   *
+   * On `keypress`, where the platform runs its own implicit submission, so a
+   * consumer who prevents the `keydown` for Enter stops this too.
+   */
+  private readonly handleKeypress = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' && !event.defaultPrevented) {
+      this.submitImplicitly()
+    }
+  }
+
+  /** @internal A single line of text counts against implicit submission. */
+  protected override get blocksImplicitSubmission(): boolean {
+    return true
   }
 
   protected override render(): TemplateResult {
@@ -647,6 +664,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           @change=${this.handleChange}
           @input=${this.handleInput}
           @keydown=${this.handleKeydown}
+          @keypress=${this.handleKeypress}
         />
         <slot name="end"></slot>
         <button

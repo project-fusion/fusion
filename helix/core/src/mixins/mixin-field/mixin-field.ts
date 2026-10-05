@@ -250,7 +250,53 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
 
     /** Whether a label is drawn at all, in either shape. */
     protected get labeled(): boolean {
-      return this.label !== '' || Boolean(this.getAttribute('aria-label'))
+      return (
+        this.label !== '' ||
+        Boolean(this.getAttribute('aria-label')) ||
+        this.filledSlots.has('label')
+      )
+    }
+
+    /**
+     * The named slots a consumer has put content in, among `label` and `hint`.
+     *
+     * **Asked of the slot, because the property cannot answer.** A label or a
+     * hint is drawn only when there is something in it, and slotted content
+     * changes no property, so a field given `<span slot="label">` and no
+     * `label` drew no label at all and its control went unnamed. With nothing
+     * else to show, each renders a bare slot, which takes no box, and the slot
+     * reports what arrives in it.
+     */
+    @state()
+    private filledSlots = new Set<string>()
+
+    /**
+     * Records whether the `label` or `hint` slot has content, which moves it
+     * into its part.
+     *
+     * On the render root, so the binding leaves the served markup as it was.
+     */
+    private readonly noteSlotted = (event: Event): void => {
+      const slot = event.target as HTMLSlotElement
+      if (slot.name !== 'label' && slot.name !== 'hint') {
+        return
+      }
+      const filled = slot.assignedNodes().length > 0
+      if (filled !== this.filledSlots.has(slot.name)) {
+        const next = new Set(this.filledSlots)
+        next[filled ? 'add' : 'delete'](slot.name)
+        this.filledSlots = next
+      }
+    }
+
+    /** A slot with no part around it, for content that may arrive. */
+    private bareSlot(name: 'hint' | 'label'): TemplateResult {
+      return name === 'label' ? html`<slot name="label"></slot>` : html`<slot name="hint"></slot>`
+    }
+
+    /** @internal `feedback` marks a form-associated field invalid, so it does not submit. */
+    protected get validityFeedback(): string {
+      return this.validates ? this.feedback : ''
     }
 
     /**
@@ -378,7 +424,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       if (this.resolvedFeedback !== '') {
         return FEEDBACK_ID
       }
-      return this.hint === '' ? undefined : HINT_ID
+      return this.hint === '' && !this.filledSlots.has('hint') ? undefined : HINT_ID
     }
 
     /**
@@ -410,8 +456,8 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
          `renderGroupLabel` is what the styled tier lays out and a group that
          drew nothing would collapse its own first row. */
       const hidden = this.label === '' ? this.getAttribute('aria-label') : null
-      if (this.label === '' && !hidden) {
-        return nothing
+      if (this.label === '' && !hidden && !this.filledSlots.has('label')) {
+        return this.bareSlot('label')
       }
       return html`<span part="label" id=${this.labelId} ?data-hidden=${hidden !== null}
         ><slot name="label">${this.label || hidden}</slot></span
@@ -445,8 +491,8 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      */
     protected renderLabel(): TemplateResult | typeof nothing {
       const hidden = this.label === '' ? this.getAttribute('aria-label') : null
-      if (this.label === '' && !hidden) {
-        return nothing
+      if (this.label === '' && !hidden && !this.filledSlots.has('label')) {
+        return this.bareSlot('label')
       }
       return html`<label
         part="label"
@@ -467,10 +513,15 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * getting to the one that matters.
      */
     protected renderHint(): TemplateResult | typeof nothing {
-      if (this.hint === '' || this.resolvedFeedback !== '') {
+      if (this.resolvedFeedback !== '') {
         return nothing
       }
-      return html`<p part="hint" id=${HINT_ID}><slot name="hint">${this.hint}</slot></p>`
+      if (this.hint === '' && !this.filledSlots.has('hint')) {
+        return this.bareSlot('hint')
+      }
+      return html`<p part="hint" id=${HINT_ID}
+        ><slot name="hint">${this.hint}</slot></p
+      >`
     }
 
     /**
@@ -639,6 +690,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       }
       this.addEventListener('invalid', touch)
       this.addEventListener('change', touch)
+      this.renderRoot.addEventListener('slotchange', this.noteSlotted)
     }
   }
 

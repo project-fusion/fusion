@@ -380,3 +380,23 @@ describe("input number in the page's words", () => {
     )
   })
 })
+
+describe('Enter in the field', () => {
+  /* The `<input>` is in a shadow root and has no form owner, so the platform
+     never ran implicit submission for it. */
+  test('submits a form with no button and no other field', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-number-input name="n" label="Guests"></helix-headless-number-input></form>'
+    const host = document.querySelector('helix-headless-number-input') as Field
+    await host.updateComplete
+    let submitted = 0
+    document.querySelector('form')?.addEventListener('submit', (event) => {
+      event.preventDefault()
+      submitted += 1
+    })
+    control(host).dispatchEvent(
+      new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' }),
+    )
+    expect(submitted).toBe(1)
+  })
+})

@@ -291,6 +291,23 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
     }
   }
 
+  /**
+   * Enter submits the form, as it does in a native text field.
+   *
+   * On `keypress`, where the platform runs its own implicit submission, so a
+   * consumer who prevents the `keydown` for Enter stops this too.
+   */
+  private readonly handleKeypress = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' && !event.defaultPrevented) {
+      this.submitImplicitly()
+    }
+  }
+
+  /** @internal A single line of text counts against implicit submission. */
+  protected override get blocksImplicitSubmission(): boolean {
+    return true
+  }
+
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
@@ -416,6 +433,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
         ?required=${this.required}
         @input=${this.handleInput}
         @change=${this.handleChange}
+        @keypress=${this.handleKeypress}
       />
       <slot name="end"></slot>
       <!-- In the tab order, unlike the browser's own search clear, which is not
