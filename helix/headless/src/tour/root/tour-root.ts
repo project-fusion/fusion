@@ -2,6 +2,7 @@ import {
   customElement,
   deepActiveElement,
   deepContains,
+  fillTemplate,
   HelixActivateEvent,
   HelixBeforeActivateEvent,
   HelixCompleteEvent,
@@ -14,6 +15,7 @@ import {
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
 import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
+import { onPage, waitFor } from '../wait.js'
 
 /**
  * @summary A guided tour of an interface, one stop at a time.
@@ -34,6 +36,13 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * `open`, `default-open`, `helix-before-open`, `helix-before-close` and
  * `toggle` work as they do on `Dialog`. Setting `open` starts the run, and
  * `skip()` and `requestOpen(false)` end it early.
+ *
+ * Each stop is told its place in the run, from `progress-label`, such as "2 of
+ * 5". It describes the stop's panel, so a screen reader says it at every stop,
+ * and `progress` draws it in the panel as well. A dialog or a floating stop,
+ * which has nothing to light, is shown over the `backdrop` part. At a `wait`
+ * stop the run waits for that stop's target to be on the page, and moves on by
+ * itself.
  *
  * **Focus follows the run.** Opening moves focus to the first stop's panel,
  * and moving on from a control in a stop moves it to the next one. Ending the
@@ -58,6 +67,7 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * @event {HelixTourAskEvent} helix-tour-ask - Fired when a stop's control is pressed to move the tour. The stop sends it, and the tour handles it.
  * @event {ToggleEvent} toggle - Sent when the tour starts or ends, with `newState` and `oldState`.
  *
+ * @csspart backdrop - Behind a dialog or a floating stop, which lights nothing. It draws no box until you give it one.
  * @csspart spotlight - The box over the current target. It also draws the dimmed area around the target.
  *
  * @cssstate open - While the tour is running.
@@ -129,6 +139,19 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: 'next-label' })
   nextLabel = ''
+
+  /**
+   * Draws each stop's place in the run in its panel, as well as saying it.
+   */
+  @property({ type: Boolean })
+  progress = false
+
+  /**
+   * Each stop's place in the run, with `{index}` and `{count}` filled in.
+   * Translate it with the rest of your text.
+   */
+  @property({ attribute: 'progress-label' })
+  progressLabel = '{index} of {count}'
 
   /**
    * Label for the control that leaves the tour.
@@ -287,6 +310,9 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     window.removeEventListener('scroll', this.handleViewport, { capture: true })
     this.sizer?.disconnect()
     this.sized = undefined
+    this.unwait?.()
+    this.unwait = undefined
+    this.waiting = undefined
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -305,6 +331,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     this.settle()
     this.light()
     this.follow(changed)
+    this.wait()
   }
 
   /** Where focus was when the tour opened, to give it back when it ends. */
@@ -381,6 +408,11 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
         stop.current = this.open && index === at
         stop.first = index === 0
         stop.last = index === stops.length - 1
+        stop.position = fillTemplate(this.progressLabel, {
+          count: stops.length,
+          index: index + 1,
+        })
+        stop.progress = this.progress
         if (this.backLabel !== '') {
           stop.backLabel = this.backLabel
         }
@@ -399,14 +431,74 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
 
   /** The current stop's target while the run is open, which is what the light falls on. */
   private get lit(): HTMLElement | null | undefined {
-    const stops = this.stops
-    return this.open
-      ? stops[Math.max(0, Math.min(this.index, stops.length - 1))]?.target
-      : undefined
+    const stop = this.current
+    /* A bubble only: a dialog and a floating stop point at nothing, and a wait
+       stop shows nothing. */
+    return this.open && stop?.type === undefined ? stop?.target : undefined
   }
+
+  /** The stop being shown, or nothing where there are no stops. */
+  private get current(): HelixHeadlessTourStop | undefined {
+    const stops = this.stops
+    return stops[Math.max(0, Math.min(this.index, stops.length - 1))]
+  }
+
+  /** Stops waiting, where a `wait` stop is waiting. */
+  private unwait: (() => void) | undefined
+
+  /** The `wait` stop being waited on, so a render that changed nothing starts nothing. */
+  private waiting: HelixHeadlessTourStop | undefined
+
+  /**
+   * Waits at a `wait` stop for its target to be on the page, then moves on.
+   *
+   * On the stop's own root, which is where its `for` resolves.
+   */
+  private wait(): void {
+    const stop = this.open ? this.current : undefined
+    const next = stop?.type === 'wait' ? stop : undefined
+    if (next === this.waiting) {
+      return
+    }
+    this.unwait?.()
+    this.unwait = undefined
+    this.waiting = next
+    if (!next) {
+      return
+    }
+    this.unwait = waitFor(
+      next.getRootNode(),
+      () => onPage(next.target),
+      () => {
+        this.waiting = undefined
+        this.unwait = undefined
+        /* A microtask on, so the move is its own update rather than one inside
+           this element's own. */
+        queueMicrotask(() => {
+          if (this.open && this.current === next) {
+            this.next()
+          }
+        })
+      },
+    )
+  }
+
+  /**
+   * Whether the current stop is shown over the backdrop: a dialog or a floating
+   * stop, or one with no target, which have nothing to light. Read with the
+   * light, after the stops are known, since the first render cannot know them.
+   */
+  @state()
+  private veiled = false
 
   /** Reads the current target's box, which is where the light falls. */
   private light(): void {
+    const stop = this.open ? this.current : undefined
+    const veiled =
+      stop !== undefined && stop.type !== 'wait' && (stop.type !== undefined || !stop.target)
+    if (veiled !== this.veiled) {
+      this.veiled = veiled
+    }
     const target = this.lit
     this.watch(target)
     if (!target || typeof target.getBoundingClientRect !== 'function') {
@@ -453,7 +545,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
        direction. As `inset-inline-start` it was the right edge on a
        right-to-left page, so the light fell on the mirror of its target and
        the stop beside it pointed into the dark. */
-    return html`${
+    return html`${this.veiled ? html`<div part="backdrop" aria-hidden="true"></div>` : ''}${
       spot === undefined
         ? ''
         : html`<div
