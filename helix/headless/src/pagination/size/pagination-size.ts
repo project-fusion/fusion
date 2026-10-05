@@ -60,6 +60,7 @@ import '../../select/index.js'
  * @csspart control-label - The label beside the number.
  * @csspart control-listbox - The list inside the panel.
  * @csspart control-listbox-empty - The text shown when the filter hides every option.
+ * @csspart control-listbox-error - The inner list's `error` part, shown while its `load-error` is set.
  * @csspart control-listbox-feedback - The inner list's message that says what is wrong with the value.
  * @csspart control-listbox-filter-icon - The icon beside the filter field.
  * @csspart control-listbox-filter-mark - The default icon beside the filter field, shown when none is slotted.
@@ -253,7 +254,7 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
       part="control"
       exportparts="feedback: control-feedback, hint: control-hint, indicator: control-indicator,
         label: control-label, listbox: control-listbox, listbox-empty: control-listbox-empty,
-        listbox-feedback: control-listbox-feedback, listbox-filter-icon: control-listbox-filter-icon,
+        listbox-error: control-listbox-error, listbox-feedback: control-listbox-feedback, listbox-filter-icon: control-listbox-filter-icon,
         listbox-filter-mark: control-listbox-filter-mark, listbox-hint: control-listbox-hint,
         listbox-items: control-listbox-items, listbox-label: control-listbox-label,
         listbox-live: control-listbox-live, listbox-loading: control-listbox-loading, listbox-search: control-listbox-search,

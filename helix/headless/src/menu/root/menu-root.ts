@@ -54,6 +54,20 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * its heading. Between runs of rows, a `<helix-divider announced>` is a
  * separator a screen reader announces.
  *
+ * Keys: Enter, Space or Down Arrow on the trigger opens the menu on its first
+ * row, and Up Arrow on its last. In the menu, Up and Down Arrow move between
+ * rows, Home and End go to the first and the last, a typed letter moves to
+ * the next row whose name starts with it, Enter and Space choose, Right Arrow
+ * opens a row's submenu and Left Arrow goes back, the two swapping on a
+ * right-to-left page, and Escape closes the menu and returns focus to the
+ * trigger. Tab closes it and moves on.
+ *
+ * While it is open, the surface carries the trigger's width as
+ * `--floating-anchor-inline-size` and the room left below it as
+ * `--floating-available-block-size`, as Radix's dropdown menu publishes its
+ * trigger's width, for a menu as wide as its trigger:
+ * `helix-menu::part(surface) { min-inline-size: var(--floating-anchor-inline-size) }`.
+ *
  * With `context`, the trigger is an area and the menu is its context menu: a
  * right-click, a long press, Shift+F10 or the menu key over the area opens it
  * at the pointer, or at the area's corner from the keyboard, as Radix's context

@@ -127,6 +127,30 @@ helix-headless-megamenu::part(surface):popover-open {
   display: grid;
 }
 
+/* A panel taking over from another grows or shrinks from that one's size. */
+helix-headless-megamenu:is(:state(from-start), :state(from-end))::part(surface) {
+  animation: megamenu-resize 200ms ease-out;
+  overflow: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  helix-headless-megamenu:is(:state(from-start), :state(from-end))::part(surface) {
+    animation: none;
+  }
+}
+
+@keyframes megamenu-resize {
+  from {
+    block-size: var(--megamenu-from-block-size);
+    inline-size: var(--megamenu-from-inline-size);
+  }
+
+  to {
+    block-size: var(--megamenu-surface-block-size);
+    inline-size: var(--megamenu-surface-inline-size);
+  }
+}
+
 helix-headless-megamenu[data-narrow]::part(surface) {
   border: none;
   border-block-end: 1px solid var(--_gray-edge);

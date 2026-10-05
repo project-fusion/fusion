@@ -15,6 +15,31 @@
   padding: var(--helix-space-none);
 }
 
+/* The button standing in for the folded middle of a long trail, drawn as a
+   crumb's link is: the same padding, corner, ink and hover fill. */
+[part="expand"] {
+  all: unset;
+  border-radius: var(--breadcrumbs-radius, var(--helix-radii-sm));
+  box-sizing: border-box;
+  color: var(--breadcrumbs-link-color, var(--helix-color-foreground-muted));
+  cursor: pointer;
+  line-height: var(--helix-leading-normal);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+[part="expand"]:hover {
+  background-color: var(
+    --breadcrumbs-hover-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
+  color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
+}
+
+[part="expand"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 /* Print: where this page sits, which is worth having on a page with no back button.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

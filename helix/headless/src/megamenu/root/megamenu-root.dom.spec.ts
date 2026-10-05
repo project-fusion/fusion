@@ -395,6 +395,28 @@ describe('a megamenu', () => {
     expect(hasState(first, 'to-start')).toBe(true)
   })
 
+  test('and the one taking over carries the size of the one it replaced', async () => {
+    /* Radix's viewport size, for a sheet that grows one panel into the next. */
+    const bar = (await mount(
+      `<nav>
+        <helix-headless-megamenu id="a" label="A"><a href="/a">A</a></helix-headless-megamenu>
+        <helix-headless-megamenu id="b" label="B"><a href="/b">B</a></helix-headless-megamenu>
+      </nav>`,
+    )) as HTMLElement
+    const first = bar.querySelector('#a') as Section
+    const second = bar.querySelector('#b') as Section
+    await first.updateComplete
+    first.open = true
+    await first.updateComplete
+    const surface = (host: Section) => part(host, 'surface') as HTMLElement
+    expect(surface(first).style.getPropertyValue('--megamenu-surface-inline-size')).toMatch(/px$/)
+    expect(surface(first).style.getPropertyValue('--megamenu-from-inline-size')).toBe('')
+    second.open = true
+    await second.updateComplete
+    expect(surface(second).style.getPropertyValue('--megamenu-from-inline-size')).toMatch(/px$/)
+    expect(surface(second).style.getPropertyValue('--megamenu-from-block-size')).toMatch(/px$/)
+  })
+
   test('and asks rather than overrules, so a consumer holding one open is heard', async () => {
     // The other closes through `requestOpen`, which announces first.
     const bar = (await mount(
