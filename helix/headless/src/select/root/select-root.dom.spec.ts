@@ -406,3 +406,32 @@ describe('select and the options it holds', () => {
     expect(shown(host)).toBe('Bravo')
   })
 })
+
+describe('what the trigger shows', () => {
+  /* React Aria's SelectValue draws the trigger from the chosen item; Helix
+     showed the words alone. */
+  test('value-content draws it from the chosen options', async () => {
+    const host = (await select('default-value="two"')) as Updatable & {
+      valueContent?: (chosen: readonly { text: string; value: string }[]) => unknown
+    }
+    host.valueContent = (chosen) => `★ ${chosen.map((one) => one.text).join('')}`
+    await settle(host)
+    expect(shown(host)).toBe('★ Beta')
+  })
+
+  test('and nothing chosen still shows the placeholder', async () => {
+    const host = (await select('placeholder="Pick one"')) as Updatable & {
+      valueContent?: () => unknown
+    }
+    host.valueContent = () => 'never'
+    await settle(host)
+    expect(shown(host)).toBe('Pick one')
+  })
+
+  test('several chosen are a list in the reader’s language', async () => {
+    const english = await select('multiple default-value="one,two"')
+    expect(shown(english)).toBe('Alpha, Beta')
+    const japanese = await select('multiple lang="ja" default-value="one,two"')
+    expect(shown(japanese)).toBe('Alpha Beta')
+  })
+})
