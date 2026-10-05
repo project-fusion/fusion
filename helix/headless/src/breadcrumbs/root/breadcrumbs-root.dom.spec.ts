@@ -106,3 +106,14 @@ describe('breadcrumb items', () => {
     expect(slot.assignedElements()).toHaveLength(1)
   })
 })
+
+describe('the trail without a name of its own', () => {
+  /* An unnamed navigation landmark is one a reader cannot choose by name, and
+     every example was adding "Breadcrumb" by hand. */
+  test('is named Breadcrumb, through internals so the host stays as written', async () => {
+    const crumbs = await mount(trail)
+    const internals = (crumbs as unknown as { internals: ElementInternals }).internals
+    expect(internals.ariaLabel).toBe('Breadcrumb')
+    expect(crumbs.hasAttribute('aria-label')).toBe(false)
+  })
+})

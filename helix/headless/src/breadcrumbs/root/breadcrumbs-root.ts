@@ -1,13 +1,15 @@
 import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
 
 /**
  * @summary Shows the path to the current page.
  *
  * @description
- * The host is the navigation landmark, so an `aria-label` on it names the
- * trail. When a page has more than one navigation landmark, screen reader users
- * choose between them by name.
+ * The host is the navigation landmark, named "Breadcrumb" by default. An
+ * `aria-label` on the host names the trail instead, and so does `label`. When a
+ * page has more than one navigation landmark, screen reader users choose
+ * between them by name.
  *
  * The `<ol>` has an explicit `role="list"`, because Safari removes list
  * semantics from a list with `list-style: none`, and the trail always hides its
@@ -32,11 +34,19 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  */
 @customElement('helix-headless-breadcrumbs')
 export class HelixHeadlessBreadcrumbs extends HelixElement {
+  /**
+   * The landmark's name, read by screen readers. An `aria-label` on the host
+   * wins over it.
+   */
+  @property()
+  label = 'Breadcrumb'
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host through internals, so the landmark is the element itself and
     // an author's `aria-label` names it without anything being copied inward.
-    hostAria(this.internals, { role: 'navigation' })
+    // The default name goes the same way, and an attribute beats internals.
+    hostAria(this.internals, { label: this.label, role: 'navigation' })
   }
 
   protected override render(): TemplateResult {

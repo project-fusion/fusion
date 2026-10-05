@@ -119,3 +119,27 @@ describe('app header', () => {
     expect(seen).toEqual([])
   })
 })
+
+describe('an app header over a scrolling container', () => {
+  test('lifts when the element named by scroller scrolls, and ignores the window', async () => {
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
+    const shell = await mount(
+      '<div><helix-headless-app-header scroller="content"></helix-headless-app-header><main id="content"></main></div>',
+    )
+    const header = shell.querySelector('helix-headless-app-header') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    await header.updateComplete
+    const heard: boolean[] = []
+    header.addEventListener('helix-scrolled', (event) => {
+      heard.push((event as CustomEvent<{ scrolled: boolean }>).detail.scrolled)
+    })
+    const content = shell.querySelector('#content') as HTMLElement
+    Object.defineProperty(content, 'scrollTop', { configurable: true, value: 240 })
+    content.dispatchEvent(new Event('scroll'))
+    expect(heard).toEqual([true])
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
+    window.dispatchEvent(new Event('scroll'))
+    expect(heard).toEqual([true])
+  })
+})

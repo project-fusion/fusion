@@ -1,4 +1,9 @@
-import { customElement, HelixElement, IndicatorController } from '@fusion.dev/helix-core'
+import {
+  AriaForwardController,
+  customElement,
+  HelixElement,
+  IndicatorController,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -17,7 +22,9 @@ import { property } from 'lit/decorators.js'
  *
  * The component moves a marker to the current item. It finds the current item
  * by reading `aria-current`, so the attribute that screen readers announce also
- * places the marker.
+ * places the marker. Any value but `false` counts, so a sidebar of sections on
+ * one page can mark the section in view with `aria-current="location"`. Where
+ * several are marked, `page` wins.
  *
  * Set `orientation="vertical"` to stack the destinations in a column, for a
  * sidebar.
@@ -39,7 +46,16 @@ export class HelixHeadlessNavigation extends HelixElement {
      measured from the physical left and applied from the inline-start edge
      travels the wrong way in a right-to-left document. */
   private readonly indicator = new IndicatorController(this, {
-    active: () => this.items.find((item) => item.getAttribute('aria-current') === 'page'),
+    active: () => {
+      const items = this.items
+      const marked = (item: HTMLElement): boolean => {
+        const current = item.getAttribute('aria-current')
+        return current !== null && current !== 'false'
+      }
+      return (
+        items.find((item) => item.getAttribute('aria-current') === 'page') ?? items.find(marked)
+      )
+    },
     indicator: () => this.partNamed('indicator'),
     observe: () => this.items,
     surface: () => this.partNamed('nav'),
@@ -47,9 +63,19 @@ export class HelixHeadlessNavigation extends HelixElement {
 
   /**
    * The landmark's name, read by screen readers.
+   *
+   * An `aria-label` or `aria-labelledby` on the host names the landmark too,
+   * and wins over this, so a footer navigation written the usual way is not a
+   * second "Main".
    */
   @property()
   label = 'Main'
+
+  /** Carries a host `aria-label` and `aria-labelledby` to the `<nav>`. */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('nav'),
+  })
 
   /**
    * Stacks the destinations in a column, for a sidebar, where unset is a row

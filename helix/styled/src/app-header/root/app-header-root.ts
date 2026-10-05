@@ -27,11 +27,9 @@ import { styles } from './app-header-root.css.js'
  * @aliases Masthead, Navbar, TopBar
  * @documentation https://fusion.dev/helix/components/app-header
  *
- * @slot - Primary navigation.
+ * @slot - The middle region, usually a `Navigation`.
  * @slot end - Trailing content, usually a call to action.
  * @slot start - Leading content, usually a wordmark.
- *
- * @csspart content - The centered row inside the banner.
  *
  * @cssproperty --app-header-backdrop - The filter behind the banner. Set it to `none` when you pair the header with a panel.
  * @cssproperty --app-header-background-color - Fill behind the banner.
