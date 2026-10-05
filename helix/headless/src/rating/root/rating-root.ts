@@ -4,6 +4,7 @@ import {
   customElement,
   fillTemplate,
   numberAsValue as fromNumber,
+  HelixClearEvent,
   HelixFormElement,
   KeyboardNavigationController,
   MixinControllerValue,
@@ -44,7 +45,7 @@ import { property, state } from 'lit/decorators.js'
  *
  * @event {Event} change - The score was chosen. Sent together with `input`, because each choice commits the score.
  * @event {HelixBeforeChangeEvent} helix-before-change - The score is about to change. Cancelable: cancel it to keep the current score.
- * @event {Event} helix-clear - The rating went back to unrated, under `clearable`. Sent after `input` and `change`.
+ * @event {HelixClearEvent} helix-clear - The rating went back to unrated, under `clearable`. Sent after `input` and `change`.
  * @event {Event} input - The score changed.
  *
  * @csspart feedback - The message that says what is wrong.
@@ -502,7 +503,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   /** Back to unrated, through the same cancelable request as a score, and said. */
   private clear(): void {
     if (this.value !== '' && !this.readOnly && !this.isDisabled && this.requestValue('')) {
-      this.dispatchEvent(new Event('helix-clear', { bubbles: true, composed: true }))
+      this.dispatchEvent(new HelixClearEvent())
     }
   }
 

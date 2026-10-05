@@ -1428,6 +1428,64 @@ export class HelixCreateEvent extends CustomEvent<CreateDetail> {
   }
 }
 
+/** Detail carried by `helix-aura-fallback`. */
+export interface AuraFallbackDetail {
+  /**
+   * Why the gradient shows: `software` for a renderer that draws on the CPU,
+   * `unavailable` for no WebGL or a shader the browser refused, and `lost` for
+   * a context the browser took back, on a GPU reset or past its limit of about
+   * sixteen.
+   */
+  reason: 'lost' | 'software' | 'unavailable'
+}
+
+/**
+ * An aura stopped drawing its shader and shows its gradient, and says why.
+ *
+ * Sent each time it falls back, from the aura, which then matches
+ * `:state(fallback)` until it draws again. Not cancelable: there is nothing
+ * left to refuse.
+ */
+export class HelixAuraFallbackEvent extends CustomEvent<AuraFallbackDetail> {
+  static readonly eventName = 'helix-aura-fallback'
+
+  constructor(detail: AuraFallbackDetail) {
+    super(HelixAuraFallbackEvent.eventName, {
+      bubbles: true,
+      cancelable: false,
+      composed: true,
+      detail,
+    })
+  }
+}
+
+/**
+ * A reader cleared the value: an input's clear button emptied the field, or a
+ * clearable rating went back to unrated.
+ *
+ * Sent after the value is cleared, and after the `input` and `change` the
+ * clear sends. Carries nothing, because the value is the cleared one.
+ */
+export class HelixClearEvent extends Event {
+  static readonly eventName = 'helix-clear'
+
+  constructor() {
+    super(HelixClearEvent.eventName, { bubbles: true, cancelable: false, composed: true })
+  }
+}
+
+/**
+ * A press put nothing on the clipboard: the browser refused the write, such as
+ * on a page without the clipboard permission, or there was nothing to copy.
+ */
+export class HelixCopyErrorEvent extends Event {
+  static readonly eventName = 'helix-copy-error'
+
+  constructor() {
+    super(HelixCopyErrorEvent.eventName, { bubbles: true, cancelable: false, composed: true })
+  }
+}
+
 /** Detail carried by `helix-copy`. */
 export interface CopyDetail {
   /** What was put on the clipboard. */
@@ -2003,6 +2061,7 @@ export class HelixHistoryEvent extends CustomEvent<Record<string, never>> {
  */
 const registry = {
   HelixActivateEvent,
+  HelixAuraFallbackEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCloseEvent,
@@ -2022,10 +2081,12 @@ const registry = {
   HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
   HelixCaretEvent,
+  HelixClearEvent,
   HelixCollapseEvent,
   HelixCompleteEvent,
   HelixConnectEvent,
   HelixConsoleEvent,
+  HelixCopyErrorEvent,
   HelixCopyEvent,
   HelixCreateEvent,
   HelixDismissEvent,

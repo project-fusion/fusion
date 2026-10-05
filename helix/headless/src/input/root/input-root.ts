@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   drawIcon,
+  HelixClearEvent,
   HelixFormElement,
   holdCaret,
   MixinControllerValue,
@@ -48,7 +49,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  *
  * @event {Event} change - Sent when the user finishes changing the value. Relayed from the native input.
  * @event {HelixBeforeChangeEvent} helix-before-change - The text is about to change. Cancelable: cancel it to keep the current text.
- * @event {Event} helix-clear - Fired after the clear button has emptied the field, after `input` and `change`.
+ * @event {HelixClearEvent} helix-clear - Fired after the clear button has emptied the field, after `input` and `change`.
  * @event {Event} input - Fired as the value changes.
  *
  * @csspart clear - The button that empties the field.
@@ -338,7 +339,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
        consumer saving on `change` never learned the field was emptied. */
     if (this.value !== '' && this.requestValue('')) {
       this.announceChange()
-      this.dispatchEvent(new Event('helix-clear', { bubbles: true, composed: true }))
+      this.dispatchEvent(new HelixClearEvent())
     }
     const control = this.control
     if (control) {

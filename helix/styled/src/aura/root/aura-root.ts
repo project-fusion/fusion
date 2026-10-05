@@ -1,15 +1,17 @@
 import {
   customElement,
+  HelixAuraFallbackEvent,
   HelixElement,
   MAX_FRAME_STEP,
   PaintGateController,
-  type TokenColor,
+  readColor,
   TokenColorController,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
 import { tiltFor } from '../axis.js'
+import { type AuraPalette, paletteOf, RESTING_PALETTE } from '../palette.js'
 import { FRAGMENT, INTERACTIONS, SHAPES, VERTEX } from '../shader.js'
 import { styles } from './aura-root.css.js'
 
@@ -121,7 +123,31 @@ const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software rasterizer|bas
  * @aliases Backdrop, Background, Atmosphere, Gradient
  * @documentation https://fusion.dev/helix/components/aura
  *
+ * **Content placed inside sits over the field**, in a `content` part that
+ * covers the aura, so an interactive aura answers the pointer over the
+ * content too. Clicks still reach the content. Style `::part(content)` to
+ * place it, such as centering a hero's heading.
+ *
+ * **The colors are the theme's, and each has a hook**: `--aura-ground`,
+ * `--aura-haze`, `--aura-glow` and `--aura-peak`, read by the shader and by the
+ * fallback gradient alike, from wherever on the page you set them.
+ *
+ * Where the gradient shows in place of the shader, the aura matches
+ * `:state(fallback)` and sends `helix-aura-fallback` with the reason.
+ *
+ * @slot - Content drawn over the field, such as a heading.
+ *
  * @csspart canvas - The surface the shader draws into.
+ * @csspart content - The box over the field that holds the content. It covers the aura.
+ *
+ * @cssproperty --aura-glow - The bright stop of the ramp. Defaults to `--helix-color-primary`.
+ * @cssproperty --aura-ground - The page the field fades into. Defaults to `--helix-color-background`.
+ * @cssproperty --aura-haze - The faint stop between the ground and the glow. Defaults to `--helix-color-primary-subtle`.
+ * @cssproperty --aura-peak - The hottest stop, at the center of a shape. Defaults to `--helix-color-primary-active` on a light page and `--helix-color-foreground` on a dark one.
+ *
+ * @cssstate fallback - The aura shows its gradient: the renderer draws on the CPU, there is no WebGL, or the browser took the context back. Cleared once the shader draws again.
+ *
+ * @event {HelixAuraFallbackEvent} helix-aura-fallback - Fired each time the aura stops drawing its shader and shows its gradient, with the reason.
  */
 @customElement('helix-aura')
 export class HelixAura extends HelixElement {
@@ -292,11 +318,16 @@ export class HelixAura extends HelixElement {
     | 'threads'
     | 'waves'
 
-  /** Repaints when the palette moves, which no re-render would do on its own. */
-  private readonly tokens = new TokenColorController(this, () => {
-    this.readPalette()
-    this.paintOnce()
-  })
+  constructor() {
+    super()
+    /* Repaints when the palette moves, which no re-render would do on its own.
+       Kept by the host it registers with, since nothing here reads from it: the
+       palette is read off the canvas, where a page's hooks reach. */
+    new TokenColorController(this, () => {
+      this.readPalette()
+      this.paintOnce()
+    })
+  }
 
   /**
    * The four ramp stops, resolved.
@@ -309,12 +340,13 @@ export class HelixAura extends HelixElement {
    * that happens, so this is filled from there and from the first paint.
    */
   /* The default theme's dark page, ink on black, until the first read. */
-  private palette: { glow: TokenColor; ground: TokenColor; haze: TokenColor; peak: TokenColor } = {
-    glow: [0.88, 0.88, 0.88],
-    ground: [0, 0, 0],
-    haze: [0.16, 0.16, 0.16],
-    peak: [1, 1, 1],
-  }
+  private palette: AuraPalette = { ...RESTING_PALETTE }
+
+  /** Why the gradient shows, while it does, or `undefined` while the shader draws. */
+  private fallback: HelixAuraFallbackEvent['detail']['reason'] | undefined
+
+  /** Why the last `build` drew nothing, for the fallback it leads to. */
+  private refused: HelixAuraFallbackEvent['detail']['reason'] = 'unavailable'
 
   private canvas: HTMLCanvasElement | null = null
   private gl: WebGL2RenderingContext | null = null
@@ -455,7 +487,8 @@ export class HelixAura extends HelixElement {
     /* `aria-hidden` on the canvas rather than on the host, because a consumer
        may want to label the region this sits behind and a hidden host would
        take that with it. The canvas itself never has anything to announce. */
-    return html`<canvas part="canvas" aria-hidden="true"></canvas>`
+    return html`<canvas part="canvas" aria-hidden="true"></canvas>
+      <div part="content"><slot></slot></div>`
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -506,6 +539,7 @@ export class HelixAura extends HelixElement {
       this.gl = null
     }
     if (!this.program && !this.gl?.isContextLost() && !this.build()) {
+      this.fallBack(this.refused)
       return
     }
     this.canvas?.addEventListener('webglcontextlost', this.handleLost)
@@ -626,8 +660,10 @@ export class HelixAura extends HelixElement {
        covers it. Nothing else changes: no context is made, so `start` returns
        here exactly as it does for a reader with no WebGL at all. */
     if (HelixAura.drawsInSoftware()) {
+      this.refused = 'software'
       return false
     }
+    this.refused = 'unavailable'
 
     /* `antialias` off, because nothing here has a geometric edge to alias:
        every boundary is a gradient the shader computes. Multisampling would
@@ -676,6 +712,8 @@ export class HelixAura extends HelixElement {
       return false
     }
     this.canvas?.toggleAttribute('hidden', false)
+    this.fallback = undefined
+    this.toggleState('fallback', false)
     gl.useProgram(this.program)
     for (const name of [
       'uBloom',
@@ -813,6 +851,24 @@ export class HelixAura extends HelixElement {
     }
     this.program = null
     this.canvas?.toggleAttribute('hidden', true)
+    this.fallBack('lost')
+  }
+
+  /**
+   * Shows the gradient, and says so once for each time it starts to.
+   *
+   * The state is what a stylesheet reads, and the event is what a script
+   * logs, such as to count how many readers see the gradient. Sent again only
+   * after the shader has drawn in between, so a context that is lost while
+   * the gradient already shows is not said twice.
+   */
+  private fallBack(reason: HelixAuraFallbackEvent['detail']['reason']): void {
+    if (this.fallback !== undefined) {
+      return
+    }
+    this.fallback = reason
+    this.toggleState('fallback', true)
+    this.dispatchEvent(new HelixAuraFallbackEvent({ reason }))
   }
 
   /**
@@ -840,22 +896,15 @@ export class HelixAura extends HelixElement {
   /**
    * Resolves the ramp. Called when the palette moves, not when a frame draws.
    *
-   * Light pages peak on the pressed `primary-active` and dark ones on the
-   * foreground, and the ground is what says which: mixing a saturated hue
-   * toward near-black takes the chroma out of exactly the pixels carrying the
-   * most of it. Read from the ground's own luminance rather than asked of the
-   * color mode, which is a private token this tier may not reach for.
+   * From the canvas's own computed style, which carries each stop on a color
+   * property: the `--aura-*` hook where a page set one, and the token
+   * otherwise. `paletteOf` says which property is which, and how the peak is
+   * chosen for a light page or a dark one.
    */
   private readPalette(): void {
-    const ground = this.tokens.read('--helix-color-background', [0, 0, 0])
-    const light = ground[0] * 0.2126 + ground[1] * 0.7152 + ground[2] * 0.0722 > 0.5
-    this.palette = {
-      glow: this.tokens.read('--helix-color-primary', [0.88, 0.88, 0.88]),
-      ground,
-      haze: this.tokens.read('--helix-color-primary-subtle', [0.16, 0.16, 0.16]),
-      peak: light
-        ? this.tokens.read('--helix-color-primary-active', [0.02, 0.02, 0.02])
-        : this.tokens.read('--helix-color-foreground', [1, 1, 1]),
+    const canvas = this.renderRoot.querySelector('canvas')
+    if (canvas) {
+      this.palette = paletteOf(getComputedStyle(canvas), readColor)
     }
   }
 

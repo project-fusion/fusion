@@ -17,3 +17,28 @@ describe('the event a file field sends for the files it refused', () => {
     expect(helixEventNames.has('helix-reject')).toBe(true)
   })
 })
+
+describe('the events that carried no class before', () => {
+  test('helix-clear and helix-copy-error bubble out of the shadow root and cannot be canceled', async () => {
+    const { HelixClearEvent, HelixCopyErrorEvent } = await import('./events.js')
+    for (const event of [new HelixClearEvent(), new HelixCopyErrorEvent()]) {
+      expect(event.bubbles).toBe(true)
+      expect(event.composed).toBe(true)
+      expect(event.cancelable).toBe(false)
+    }
+    expect(new HelixClearEvent().type).toBe('helix-clear')
+    expect(new HelixCopyErrorEvent().type).toBe('helix-copy-error')
+    expect(helixEventNames.has('helix-clear')).toBe(true)
+    expect(helixEventNames.has('helix-copy-error')).toBe(true)
+  })
+
+  test('helix-aura-fallback says why the gradient shows', async () => {
+    const { HelixAuraFallbackEvent } = await import('./events.js')
+    const event = new HelixAuraFallbackEvent({ reason: 'lost' })
+    expect(event.type).toBe('helix-aura-fallback')
+    expect(event.detail.reason).toBe('lost')
+    expect(event.bubbles).toBe(true)
+    expect(event.cancelable).toBe(false)
+    expect(helixEventNames.has('helix-aura-fallback')).toBe(true)
+  })
+})

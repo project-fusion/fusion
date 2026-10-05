@@ -34,7 +34,11 @@ describe('aura server output', () => {
        thought to rule out. `not.toContain('#version')` goes on passing whatever
        is added beside the canvas, which is the blind assertion `servedParts`
        exists to replace: the frame here is one empty canvas over the host's own
-       gradient, and that is the entire claim. */
-    expect(servedParts(ssr(html`<helix-aura variant="rays"></helix-aura>`))).toEqual(['canvas'])
+       gradient, and the empty box the content sits in, and that is the entire
+       claim. */
+    expect(servedParts(ssr(html`<helix-aura variant="rays"></helix-aura>`))).toEqual([
+      'canvas',
+      'content',
+    ])
   })
 })

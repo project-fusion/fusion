@@ -1,4 +1,10 @@
 :host {
+  /* Each stop is its hook, or the theme's token. The canvas reads the same
+     three below, and the peak, which only the shader draws. */
+  --_aura-glow: var(--aura-glow, var(--helix-color-primary));
+  --_aura-ground: var(--aura-ground, var(--helix-color-background));
+  --_aura-haze: var(--aura-haze, var(--helix-color-primary-subtle));
+
   position: relative;
   display: block;
   inline-size: 100%;
@@ -14,9 +20,9 @@
      down too gives 2.1 and 251.4, worse in both. */
   background-image: radial-gradient(
     120% 90% at 62% 12%,
-    color-mix(in oklab, var(--helix-color-primary) 38%, var(--helix-color-background)) 0%,
-    var(--helix-color-primary-subtle) 38%,
-    var(--helix-color-background) 78%
+    color-mix(in oklab, var(--_aura-glow) 38%, var(--_aura-ground)) 0%,
+    var(--_aura-haze) 38%,
+    var(--_aura-ground) 78%
   );
 }
 
@@ -36,6 +42,33 @@
   display: block;
   inline-size: 100%;
   block-size: 100%;
+
+  /* **The ramp, carried on color properties a canvas never paints**, because
+     a custom property is handed back as the text that was written and a color
+     property is resolved by the engine first. The script reads these, so each
+     stop takes its hook from anywhere above the aura, as the gradient does.
+     The peak is carried twice, the light page's and the dark page's, and the
+     script picks one by the ground. */
+  caret-color: var(--aura-peak, var(--helix-color-foreground));
+  color: var(--_aura-glow);
+  column-rule-color: var(--aura-peak, var(--helix-color-primary-active));
+  outline-color: var(--_aura-ground);
+  text-decoration-color: var(--_aura-haze);
+}
+
+/* **Over the field and covering it, so it changes nothing about the aura's
+   box**, which is the box the page gives it. Not hit-testable itself, so a
+   background stays a background where the content leaves it bare, and the
+   content is, so its links and buttons work. A pointer over the content is
+   still over the aura, so an interactive aura answers it there too. */
+[part="content"] {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+::slotted(*) {
+  pointer-events: auto;
 }
 
 /* While the browser holds the context, because a lost canvas is not reliably

@@ -224,6 +224,33 @@ describe('aura', () => {
     expect(host.isConnected).toBe(true)
   })
 
+  test('with no WebGL it says it shows the gradient, once, and why', async () => {
+    /* happy-dom has no WebGL, which is a reader on a refused context. In a
+       browser the stub above names a GPU, so this half is happy-dom's. */
+    if (hasLayout()) {
+      return
+    }
+    const reasons: string[] = []
+    const heard = (event: Event): void => {
+      reasons.push((event as CustomEvent<{ reason: string }>).detail.reason)
+    }
+    document.addEventListener('helix-aura-fallback', heard)
+    try {
+      const host = await mount(undrawn())
+      expect(hasState(host, 'fallback')).toBe(true)
+      expect(reasons).toEqual(['unavailable'])
+    } finally {
+      document.removeEventListener('helix-aura-fallback', heard)
+    }
+  })
+
+  test('content placed inside sits in the content part, over the canvas', async () => {
+    const host = await mount('<helix-aura style="block-size: 0"><h1>Ship faster</h1></helix-aura>')
+    const content = host.shadowRoot?.querySelector('[part="content"]')
+    const slot = content?.querySelector('slot')
+    expect(slot?.assignedElements()).toEqual([host.querySelector('h1') as Element])
+  })
+
   test('the fallback never paints the brand color at full strength', async () => {
     /* **A regression guard on a bug nobody could catch by looking once.** The
        canvas is transparent until its first paint, so whatever the host paints
@@ -245,8 +272,9 @@ describe('aura', () => {
        out five unrelated tests in this file. */
     const { styles } = await import('./aura-root.css.js')
     const sheet = (styles as { cssText?: string }).cssText ?? String(styles)
-    expect(sheet).toContain('color-mix(in oklab, var(--helix-color-primary) 38%')
-    expect(sheet).not.toMatch(/var\(--helix-color-primary\)\s+0%/)
+    expect(sheet).toContain('color-mix(in oklab, var(--_aura-glow) 38%')
+    expect(sheet).toContain('--_aura-glow: var(--aura-glow, var(--helix-color-primary))')
+    expect(sheet).not.toMatch(/var\(--_aura-glow\)\s+0%/)
   })
 
   test('the variant reflects and the numbers do not', async () => {
@@ -390,6 +418,41 @@ describe('aura', () => {
       expect(host.shadowRoot?.querySelector('canvas')?.hasAttribute('hidden')).toBe(false)
       expect(getComputedStyle(host).backgroundImage).toContain('radial-gradient')
       expect(await framesBooked(4)).toBe(0)
+      expect(hasState(host, 'fallback')).toBe(true)
+    })
+
+    test('a renderer that draws keeps no fallback state', async () => {
+      const host = await mount(undrawn())
+      expect(hasState(host, 'fallback')).toBe(false)
+    })
+
+    test('each color hook reaches the canvas and the gradient alike', async () => {
+      const wrapper = await mount(
+        `<div style="--aura-glow: rgb(255, 0, 0); --aura-haze: rgb(1, 2, 3); --aura-ground: rgb(4, 5, 6); --aura-peak: rgb(7, 8, 9)">${undrawn()}</div>`,
+      )
+      const host = wrapper.querySelector('helix-aura') as HTMLElement
+      const canvas = host.shadowRoot?.querySelector('canvas') as HTMLCanvasElement
+      const carried = getComputedStyle(canvas)
+      expect(carried.color).toBe('rgb(255, 0, 0)')
+      expect(carried.textDecorationColor).toBe('rgb(1, 2, 3)')
+      expect(carried.outlineColor).toBe('rgb(4, 5, 6)')
+      expect(carried.columnRuleColor).toBe('rgb(7, 8, 9)')
+      expect(carried.caretColor).toBe('rgb(7, 8, 9)')
+      expect(getComputedStyle(host).backgroundImage).toContain('rgb(1, 2, 3)')
+    })
+
+    test('a press on the content reaches it, and the bare field passes it through', async () => {
+      const wrapper = await mount(
+        '<div style="position: relative; block-size: 120px"><button id="under" style="position: absolute; inset-block-end: 0">Under</button><helix-aura style="position: absolute; inset: 0"><button id="over">Over</button></helix-aura></div>',
+      )
+      const over = wrapper.querySelector('#over') as HTMLElement
+      const under = wrapper.querySelector('#under') as HTMLElement
+      const at = (element: HTMLElement): Element | null => {
+        const box = element.getBoundingClientRect()
+        return document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)
+      }
+      expect(at(over)).toBe(over)
+      expect(at(under)).toBe(under)
     })
 
     test('a renderer with a hardware name keeps the drawing path', async () => {
@@ -498,9 +561,15 @@ describe('aura', () => {
       const lost = new Promise((resolve) => {
         canvas.addEventListener('webglcontextlost', resolve, { once: true })
       })
+      const reasons: string[] = []
+      host.addEventListener('helix-aura-fallback', (event) => {
+        reasons.push((event as CustomEvent<{ reason: string }>).detail.reason)
+      })
       lose.loseContext()
       await lost
       expect(await framesBooked(4)).toBe(0)
+      expect(hasState(host, 'fallback')).toBe(true)
+      expect(reasons).toEqual(['lost'])
       /* The fallback is the host's own gradient, and what it needs is nothing
          in front of it: a lost canvas is not reliably transparent. */
       expect(getComputedStyle(host).backgroundImage).toContain('radial-gradient')
@@ -515,6 +584,7 @@ describe('aura', () => {
       lose.restoreContext()
       await restored
       expect(canvas.checkVisibility()).toBe(true)
+      expect(hasState(host, 'fallback')).toBe(false)
       expect(await until(() => draws.count >= before + 2)).toBe(true)
     })
 

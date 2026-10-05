@@ -1,14 +1,17 @@
 import {
   type ColorBytes,
   customElement,
+  drawStatus,
   HelixElement,
   hostAria,
   PaintGateController,
   readColor,
+  StatusController,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import {
   blendStaged,
   evenSphere,
@@ -57,6 +60,24 @@ interface Dot {
   z: number
 }
 
+/**
+ * Reads `state-labels` as a JSON object of words keyed by state. Anything
+ * else, including JSON that does not parse, is no words, so every state keeps
+ * its English one.
+ */
+const labelsConverter = {
+  fromAttribute: (value: string | null): Partial<Record<OrbState, string>> => {
+    try {
+      const parsed: unknown = JSON.parse(value ?? '')
+      return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+        ? (parsed as Partial<Record<OrbState, string>>)
+        : {}
+    } catch {
+      return {}
+    }
+  },
+}
+
 /** What an unreadable color answers with, mid gray in both modes. */
 const GRAY: ColorBytes = [128, 128, 128]
 
@@ -101,7 +122,20 @@ const GRAY: ColorBytes = [128, 128, 128]
  * @aliases Thinking, Activity, Agent, Status
  * @documentation https://fusion.dev/helix/components/orb
  *
+ * Each state is also a custom state, such as `:state(thinking)` or
+ * `:state(done)`, so a page can style what sits around an orb by what it shows,
+ * whether the state was written as an attribute or set from script.
+ *
  * @csspart canvas - The canvas the dots are drawn on.
+ * @csspart live - The live region that says the new state when `announce` is set. It is rendered from the first change of state and clipped out of view.
+ *
+ * @cssstate connecting - The orb shows `connecting`.
+ * @cssstate done - The orb shows `done`.
+ * @cssstate fetching - The orb shows `fetching`.
+ * @cssstate listening - The orb shows `listening`.
+ * @cssstate thinking - The orb shows `thinking`, which is also what a state it does not draw shows.
+ * @cssstate waiting - The orb shows `waiting`.
+ * @cssstate working - The orb shows `working`.
  *
  * @cssproperty --orb-color - The color of the nearest dots. Defaults to `currentColor`.
  * @cssproperty --orb-ground - The color the farthest dots fade toward. Defaults to the page's background.
@@ -109,7 +143,18 @@ const GRAY: ColorBytes = [128, 128, 128]
  */
 @customElement('helix-orb')
 export class HelixOrb extends HelixElement {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
+
+  /**
+   * Says each new state through a polite live region, such as "Working" and
+   * then "Done".
+   *
+   * Off by default, because the name and the busy state already change with
+   * the state, and an orb beside a stream of messages would otherwise talk
+   * over them. Set it on an orb that is the only sign of progress on the page.
+   */
+  @property({ type: Boolean })
+  announce = false
 
   /**
    * The name read by screen readers. Defaults to the name of the state, such
@@ -147,9 +192,9 @@ export class HelixOrb extends HelixElement {
    * verb we have not made a shape for should cost a reader a less specific
    * indicator, not an empty box where the indicator was.
    *
-   * Not reflected: no rule selects on it, because the state is drawn rather than
-   * styled. A consumer writing the attribute can still select on their own
-   * markup.
+   * Not reflected, because a state set from script would then write an
+   * attribute onto the host after a server sent it without one. Each state is
+   * a custom state instead, such as `:state(working)`.
    */
   @property()
   state: OrbState = 'thinking'
@@ -157,11 +202,16 @@ export class HelixOrb extends HelixElement {
   /**
    * The word for each state, for a page in another language.
    *
-   * A state left out keeps its English word, and `label` wins over both. It is
-   * a property with no attribute, keyed by state, such as `{ thinking: '…' }`.
+   * A state left out keeps its English word, and `label` wins over both.
+   * Keyed by state, such as `{ thinking: '…' }`. As an attribute it is that
+   * object as JSON, such as `state-labels='{"done":"Terminé"}'`, so server
+   * markup and plain HTML can carry the words too.
    */
-  @property({ attribute: false })
+  @property({ attribute: 'state-labels', converter: labelsConverter })
   stateLabels: Partial<Record<OrbState, string>> = {}
+
+  /** The region `announce` speaks in. */
+  private readonly status = new StatusController(this)
 
   private canvas: HTMLCanvasElement | undefined
   private context: CanvasRenderingContext2D | null = null
@@ -239,8 +289,20 @@ export class HelixOrb extends HelixElement {
     })
     this.internals.ariaBusy = state === 'done' ? 'false' : 'true'
 
+    /* One literal per state, so each is documented and checked by name. */
+    this.toggleState('connecting', state === 'connecting')
+    this.toggleState('done', state === 'done')
+    this.toggleState('fetching', state === 'fetching')
+    this.toggleState('listening', state === 'listening')
+    this.toggleState('thinking', state === 'thinking')
+    this.toggleState('waiting', state === 'waiting')
+    this.toggleState('working', state === 'working')
+
     if (changed.has('state') && changed.get('state') !== undefined) {
       this.turn()
+      if (this.announce) {
+        this.status.say(this.label || this.stateLabels[state] || LABELS[state])
+      }
     }
   }
 
@@ -248,7 +310,7 @@ export class HelixOrb extends HelixElement {
     /* `aria-hidden` on the canvas rather than the host: the host carries the
        name and the role through `ElementInternals`, and the canvas has nothing
        of its own to announce. */
-    return html`<canvas part="canvas" aria-hidden="true"></canvas>`
+    return html`<canvas part="canvas" aria-hidden="true"></canvas>${drawStatus(this.status)}`
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
