@@ -1,12 +1,26 @@
-/* Only the revealed state is written here. While the host is not focused the
-   base layer's visually hidden recipe holds it, and a document rule beats every
-   declaration below, so there is nothing for this sheet to undo. */
+/* Revealed while focus is inside, and placed in a corner of the viewport. */
 :host {
   display: block;
   inset-block-start: var(--skip-link-inset-block, var(--helix-space-sm));
   inset-inline-start: var(--skip-link-inset-inline, var(--helix-space-sm));
   position: fixed;
   z-index: var(--helix-layer-overlay);
+}
+
+/* Hidden until focus reaches it, by the base layer's visually hidden recipe,
+   written here so the link is hidden with or without that layer. It stays in
+   the tab order while nobody can see it, which `display: none` would not
+   keep. The more specific `:host()` wins over the block above. */
+:host(:not(:focus-within)) {
+  block-size: 1px;
+  border: var(--helix-space-none);
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: var(--helix-space-none);
+  position: absolute;
+  white-space: nowrap;
 }
 
 [part="link"] {

@@ -36,7 +36,8 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * `values` where an item's value holds a comma. The form receives one entry
  * per pressed value, and a page the browser brings back presses the same
  * items again. The indicator stays hidden, and each pressed item is marked
- * with `:state(pressed)`.
+ * with `:state(pressed)`. Inside a toolbar it is a named group of that
+ * toolbar's controls instead, so a reader meets one toolbar.
  *
  * `orientation="vertical"` runs the items down a column, says so to the
  * accessibility tree, and the up and down arrows move between them.
@@ -373,6 +374,24 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     this.linkHost()
   }
 
+  /**
+   * The group's role: a radio group, a toolbar of pressed buttons, or, for
+   * pressed buttons inside a toolbar, a group.
+   *
+   * **A toolbar inside a toolbar is a reader's dead end**, so inside one the
+   * pressed buttons are a named group of the outer toolbar, as React Aria's
+   * ToggleButtonGroup demotes itself. Read by tag and by role, since the
+   * outer toolbar is a Helix one or the page's own `role="toolbar"`.
+   */
+  private get groupRole(): 'group' | 'radiogroup' | 'toolbar' {
+    if (!this.multiple) {
+      return 'radiogroup'
+    }
+    return this.parentElement?.closest('[role="toolbar"], helix-toolbar, helix-headless-toolbar')
+      ? 'group'
+      : 'toolbar'
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     /* Before `setFormValue` below, which reads the value this may have just
@@ -386,7 +405,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
        `linkHost` sets, because this is the half a server can write. The
        reference wins on the client, which is what lets a consumer slot a label
        richer than a string. */
-    hostAria(this.internals, { label: this.label, role: this.multiple ? 'toolbar' : 'radiogroup' })
+    hostAria(this.internals, { label: this.label, role: this.groupRole })
     this.internals.ariaOrientation = this.orientation ?? null
     // `null` rather than an empty string when nothing is chosen, which is the
     // difference between a control that submits nothing and one that submits a

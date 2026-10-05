@@ -25,6 +25,13 @@ import { styles } from './navigation-root.css.js'
  *   raised on the bar.
  * @cssproperty --navigation-item-color - Text color of a destination that is not the current one. Read by the page's stylesheet, which styles the links you slot.
  * @cssproperty --navigation-item-current-color - Text color of the current destination, the one marked `aria-current="page"`.
+ * @cssproperty --navigation-item-current-font-weight - Weight of the current destination's text.
+ * @cssproperty --navigation-item-font-size - Size of a destination's text.
+ * @cssproperty --navigation-item-font-weight - Weight of a destination's text.
+ * @cssproperty --navigation-item-hover-background-color - Background of a destination under the pointer.
+ * @cssproperty --navigation-item-hover-color - Text color of a destination under the pointer.
+ * @cssproperty --navigation-item-padding-inline - Space either side of a destination's text.
+ * @cssproperty --navigation-item-radius - Corner radius of a destination, which its hover background follows.
  */
 @customElement('helix-navigation')
 export class HelixNavigation extends HelixHeadlessNavigation {
