@@ -362,3 +362,13 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('a message made by add()', () => {
+  test('is this tier’s message, so it is drawn like a rendered one', async () => {
+    const host = (await region()) as HTMLElement & {
+      add(message: string, options?: { tone?: string }): HTMLElement
+    }
+    const added = host.add('Added', { tone: 'info' })
+    expect(added.localName).toBe('helix-toast-item')
+  })
+})

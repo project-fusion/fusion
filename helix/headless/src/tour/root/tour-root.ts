@@ -1,4 +1,5 @@
 import {
+  controlsIn,
   customElement,
   deepActiveElement,
   deepContains,
@@ -14,6 +15,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
+import { stopBefore } from '../back.js'
 import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
 import { onPage, waitFor } from '../wait.js'
 
@@ -206,12 +208,18 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     this.move(this.index + 1)
   }
 
-  /** Goes to the previous stop. It does nothing on the first stop. */
+  /**
+   * Goes to the previous stop, passing over a `wait` stop, which shows nothing.
+   * It does nothing on the first stop, or where only `wait` stops come before.
+   */
   back(): void {
-    if (this.index <= 0) {
-      return
+    const to = stopBefore(
+      this.stops.map((stop) => stop.type),
+      this.index,
+    )
+    if (to !== undefined) {
+      this.move(to)
     }
-    this.move(this.index - 1)
   }
 
   /**
@@ -360,7 +368,14 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     const opened = changed.has('open') && this.open && changed.get('open') === false
     const closed = changed.has('open') && !this.open && changed.get('open') === true
     const active = deepActiveElement()
-    const inside = active === null || active === document.body || deepContains(this, active)
+    const inside =
+      active === null ||
+      active === document.body ||
+      deepContains(this, active) ||
+      (this.parked !== undefined && active === this.parked)
+    if (opened || closed || changed.has('index')) {
+      this.parked = undefined
+    }
     if (opened) {
       if (active instanceof HTMLElement && !deepContains(this, active)) {
         this.returnFocus = active
@@ -377,11 +392,39 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  /** Focuses the current stop's panel once the stop has shown it. */
+  /**
+   * Where focus was put while a `wait` stop waits, so the move on from it still
+   * counts as a move from inside the tour while focus has stayed there.
+   */
+  private parked: HTMLElement | undefined
+
+  /**
+   * Focuses the current stop's panel once the stop has shown it.
+   *
+   * A `wait` stop shows no panel, and focus would fall to the body. It goes to
+   * the target of the stop before instead, which is usually the control the
+   * reader is asked to use, such as the button that opens the menu the stop
+   * waits for. Where that target holds no control, it goes back to where it
+   * was when the tour opened.
+   */
   private focusCurrent(): void {
     const stops = this.stops
-    const stop = stops[Math.max(0, Math.min(this.index, stops.length - 1))]
+    const at = Math.max(0, Math.min(this.index, stops.length - 1))
+    const stop = stops[at]
     if (!stop) {
+      return
+    }
+    if (stop.type === 'wait') {
+      const before = stopBefore(
+        stops.map((one) => one.type),
+        at,
+      )
+      const target = before === undefined ? undefined : stops[before]?.target
+      const park = (target ? controlsIn([target])[0] : undefined) ?? this.returnFocus
+      if (park?.isConnected) {
+        park.focus()
+        this.parked = park
+      }
       return
     }
     void stop.updateComplete.then(() => {

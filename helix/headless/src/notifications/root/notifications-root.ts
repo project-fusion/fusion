@@ -46,7 +46,8 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * **`load-more` adds a button after the list** that sends `helix-load-more`,
  * for a feed that holds one page of a longer list. Append the next page, set
  * `loading` while it is on its way, and take `load-more` off once there is
- * nothing more. The button is hidden while the feed is loading.
+ * nothing more. While the feed is loading the button stays, so focus stays on
+ * it, and it is `aria-disabled` and sends nothing.
  *
  * @since 0.1.0
  * @status stable
@@ -69,7 +70,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @csspart live - A copy of the empty and loading messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the feed is loading.
  * @csspart mark-all - The control that marks everything read.
- * @csspart more - The button after the list that asks for more, while `load-more` is set and the feed is not loading.
+ * @csspart more - The button after the list that asks for more, while `load-more` is set. It is `aria-disabled` while the feed is loading.
  *
  * @cssstate media - While a notification in the list holds something in its media slot, so every row keeps that column.
  */
@@ -367,9 +368,11 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   private rove(): void {
     const rows = this.reachable
     const stop = rovingStop(rows, this.stopRow)
-    const direct = this.rows
-    for (const row of this.items) {
-      const position = direct.indexOf(row) + 1
+    /* Among every row, through a group as well: `total` counts notifications,
+       and a group is a pile of them, not one more. */
+    const items = this.items
+    for (const row of items) {
+      const position = items.indexOf(row) + 1
       whenHydrated(row, () => {
         row.stop = row === stop
         row.position = this.total === undefined ? 0 : position
@@ -494,14 +497,24 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
             : nothing
         }
       </div>
-      <div part="list" role="list" aria-busy=${this.loading ? 'true' : nothing}>
+      <div
+        part="list"
+        role="list"
+        aria-busy=${this.loading ? 'true' : nothing}
+        aria-label=${this.label || nothing}
+      >
         <slot name="items" @slotchange=${this.handleSlotChange}></slot>
         ${this.renderStatus(hasItems)}
       </div>
       ${this.renderLive(hasItems)}
       ${
-        this.loadMore && !this.loading
-          ? html`<button part="more" type="button" @click=${this.askForMore}>
+        this.loadMore
+          ? html`<button
+              part="more"
+              type="button"
+              aria-disabled=${this.loading ? 'true' : nothing}
+              @click=${this.askForMore}
+            >
               ${this.loadMoreLabel}
             </button>`
           : nothing
@@ -509,9 +522,17 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
       <div part="footer"><slot name="footer"></slot></div>`
   }
 
-  /** Asks for the next page, for the `load-more` button. */
+  /**
+   * Asks for the next page, for the `load-more` button, unless a page is
+   * already on its way.
+   *
+   * The button stays while the feed is loading, marked `aria-disabled`, so
+   * focus stays on it: removed, it took focus with it to the body.
+   */
   private readonly askForMore = (): void => {
-    this.dispatchEvent(new HelixLoadMoreEvent())
+    if (!this.loading) {
+      this.dispatchEvent(new HelixLoadMoreEvent())
+    }
   }
 
   /**

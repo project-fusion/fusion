@@ -526,4 +526,53 @@ describe('stops with nothing to light', () => {
     await element.updateComplete
     expect(element.index).toBe(2)
   })
+
+  test('while a wait stop waits, focus is on the target of the stop before it', async () => {
+    const element = await tour(
+      `<helix-headless-tour-stop for="target">Open the menu</helix-headless-tour-stop>
+       <helix-headless-tour-stop type="wait" for="menu"></helix-headless-tour-stop>
+       <helix-headless-tour-stop for="target">Pick one</helix-headless-tour-stop>`,
+    )
+    const [first] = element.stops as unknown as (HTMLElement & {
+      updateComplete: Promise<boolean>
+    })[]
+    await first?.updateComplete
+    first?.focus()
+    element.next()
+    await element.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(element.index).toBe(1)
+    expect(document.activeElement?.id).toBe('target')
+  })
+
+  test('Back from the stop after a wait stop goes past the wait stop', async () => {
+    const element = await tour(
+      `<helix-headless-tour-stop for="target">Open the menu</helix-headless-tour-stop>
+       <helix-headless-tour-stop type="wait" for="target"></helix-headless-tour-stop>
+       <helix-headless-tour-stop for="target">Pick one</helix-headless-tour-stop>`,
+    )
+    element.next()
+    await element.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await element.updateComplete
+    expect(element.index).toBe(2)
+    element.back()
+    await element.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await element.updateComplete
+    expect(element.index).toBe(0)
+  })
+
+  test('and Back does nothing where only wait stops come before', async () => {
+    const element = await tour(
+      `<helix-headless-tour-stop type="wait" for="target"></helix-headless-tour-stop>
+       <helix-headless-tour-stop for="target">Pick one</helix-headless-tour-stop>`,
+    )
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await element.updateComplete
+    expect(element.index).toBe(1)
+    element.back()
+    await element.updateComplete
+    expect(element.index).toBe(1)
+  })
 })

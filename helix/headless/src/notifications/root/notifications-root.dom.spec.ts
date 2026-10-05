@@ -461,6 +461,22 @@ describe('moving through the feed with the keys', () => {
     expect(internals.map((one) => one.ariaSetSize)).toEqual(['40', '40'])
   })
 
+  test('with a total, a row inside a group says its place among all the rows', async () => {
+    const element = await feed(`
+      <helix-headless-notifications total="40">
+        <helix-headless-notification>One</helix-headless-notification>
+        <helix-headless-notification-group label="Earlier">
+          <helix-headless-notification>Two</helix-headless-notification>
+          <helix-headless-notification>Three</helix-headless-notification>
+        </helix-headless-notification-group>
+      </helix-headless-notifications>`)
+    const rows = await settled(element)
+    const internals = rows.map(
+      (row) => (row as unknown as { internals: ElementInternals }).internals,
+    )
+    expect(internals.map((one) => one.ariaPosInSet)).toEqual(['1', '2', '3'])
+  })
+
   test('without one, the browser counts and nothing is written', async () => {
     const rows = await settled(await feed())
     const internals = rows.map(
@@ -476,7 +492,7 @@ describe('asking for more', () => {
     expect(part(host, 'more')).toBeNull()
   })
 
-  test('the load-more button sends helix-load-more, and hides while the feed is loading', async () => {
+  test('the load-more button sends helix-load-more, and is disabled while the feed is loading', async () => {
     const host = (await feed(
       `<helix-headless-notifications label="Inbox" load-more load-more-label="Older">
         <helix-headless-notification>One</helix-headless-notification>
@@ -490,6 +506,48 @@ describe('asking for more', () => {
     expect(asked).toEqual(['helix-load-more'])
     host.loading = true
     await host.updateComplete
-    expect(part(host, 'more')).toBeNull()
+    expect(part(host, 'more')).toBe(more)
+    expect(more.getAttribute('aria-disabled')).toBe('true')
+    more.click()
+    expect(asked).toEqual(['helix-load-more'])
+    host.loading = false
+    await host.updateComplete
+    expect(more.hasAttribute('aria-disabled')).toBe(false)
+  })
+
+  test('focus stays on the load-more button while the next page loads and after it arrives', async () => {
+    const host = (await feed(
+      `<helix-headless-notifications label="Inbox" load-more>
+        <helix-headless-notification>One</helix-headless-notification>
+      </helix-headless-notifications>`,
+    )) as unknown as HTMLElement & { loading: boolean; updateComplete: Promise<boolean> }
+    host.addEventListener('helix-load-more', () => {
+      host.loading = true
+    })
+    const more = part(host, 'more') as HTMLButtonElement
+    more.focus()
+    more.click()
+    await host.updateComplete
+    expect(host.shadowRoot?.activeElement).toBe(more)
+    const row = document.createElement('helix-headless-notification')
+    row.textContent = 'Two'
+    host.append(row)
+    host.loading = false
+    await host.updateComplete
+    expect(host.shadowRoot?.activeElement).toBe(more)
+  })
+})
+
+describe('the list’s name', () => {
+  test('is the feed’s label', async () => {
+    const element = await feed()
+    expect(part(element, 'list')?.getAttribute('aria-label')).toBe('Activity')
+  })
+
+  test('and nothing where the feed has no label', async () => {
+    const element = await feed(
+      '<helix-headless-notifications><helix-headless-notification>One</helix-headless-notification></helix-headless-notifications>',
+    )
+    expect(part(element, 'list')?.hasAttribute('aria-label')).toBe(false)
   })
 })
