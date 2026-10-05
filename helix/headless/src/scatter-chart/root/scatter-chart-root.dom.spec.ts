@@ -206,3 +206,26 @@ describe('reading by key', () => {
     expect(part(host, 'point-active')).not.toBeNull()
   })
 })
+
+describe('trend', () => {
+  const trends = (host: HTMLElement): Element[] => [
+    ...(host.shadowRoot?.querySelectorAll('[part="trend"]') ?? []),
+  ]
+
+  test('absent draws no line of best fit', async () => {
+    expect(trends(await chart(SPEND, 'for="spend"'))).toHaveLength(0)
+  })
+
+  /* Revenue is twice spend, so the line runs corner to corner of a plot whose
+     range is the round numbers around the points. */
+  test('draws each series its line of best fit, across the plot, in its color', async () => {
+    const host = await chart(LOAD, 'for="load" trend')
+    const lines = trends(host)
+    expect(lines.map((one) => one.getAttribute('data-series'))).toEqual(['1', '2'])
+    expect(lines[0]?.getAttribute('x1')).toBe('0')
+    expect(lines[0]?.getAttribute('x2')).toBe('100')
+    const spend = await chart(SPEND, 'for="spend" trend')
+    const [line] = trends(spend)
+    expect([line?.getAttribute('y1'), line?.getAttribute('y2')]).toEqual(['100', '0'])
+  })
+})

@@ -106,6 +106,24 @@
   color: var(--chart-series);
 }
 
+/* A mark on a reading, under `markers` and on a reading no line reaches: a
+   dot in its series' color, centered on the reading, ringed in the page's
+   ground so it reads over the line. */
+[part~="marker"] {
+  background-color: var(--chart-series);
+  block-size: var(--line-chart-marker-size, 6px);
+  border-radius: var(--helix-radii-full);
+  box-shadow: 0 0 0 var(--helix-border-thin) var(--helix-color-background);
+  inline-size: var(--line-chart-marker-size, 6px);
+  pointer-events: none;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+:host(:dir(rtl)) [part~="marker"] {
+  translate: 50% -50%;
+}
+
 /*
  *  One hole per series, which is why the list is written by the component.
  *

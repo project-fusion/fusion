@@ -325,3 +325,36 @@ describe('a series a legend hid', () => {
     expect(part(host, 'live')?.textContent).toBe('Mar: Referral 9 (2 of 2)')
   })
 })
+
+/* WA Pro's bar chart stacks through Chart.js; side by side was all this drew. */
+describe('stacked', () => {
+  const MIX = `<table id="mix">
+    <thead><tr><th>Quarter</th><th>New</th><th>Renewed</th></tr></thead>
+    <tbody>
+      <tr><th>Q1</th><td>30</td><td>10</td></tr>
+      <tr><th>Q2</th><td>20</td><td>60</td></tr>
+    </tbody>
+  </table>`
+  const box = (one: Element): number[] =>
+    ['x', 'y', 'width', 'height'].map((name) => Number(one.getAttribute(name)))
+  /* Two decimals, which is what the drawing writes. */
+  const near = (actual: number, expected: number): boolean => Math.abs(actual - expected) < 0.01
+
+  test('stands each series on the ones before it, one column a category, scaled to the totals', async () => {
+    const host = await chart(MIX, 'for="mix" stacked')
+    const [q1New = [], q1Renewed = [], q2New = [], q2Renewed = []] = bars(host).map(box)
+    /* One column a category: the same x and the same width for both series. */
+    expect([q1New[0], q1New[2]]).toEqual([q1Renewed[0], q1Renewed[2]])
+    /* The tallest stack, 80, fills the box; 30 and 10 are 30 and 10 of 80. */
+    expect(near((q2New[3] ?? 0) + (q2Renewed[3] ?? 0), 100)).toBe(true)
+    expect(near(q1New[3] ?? 0, 37.5)).toBe(true)
+    expect(near((q1Renewed[1] ?? 0) + (q1Renewed[3] ?? 0), q1New[1] ?? 0)).toBe(true)
+  })
+
+  test('absent stands them side by side, as before', async () => {
+    const host = await chart(MIX, 'for="mix"')
+    const [q1New = [], q1Renewed = []] = bars(host).map(box)
+    expect(q1New[0]).not.toBe(q1Renewed[0])
+    expect(near(q1Renewed[3] ?? 0, 100 / 6)).toBe(true)
+  })
+})

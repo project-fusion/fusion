@@ -293,3 +293,24 @@
   position: absolute;
   white-space: nowrap;
 }
+
+/* Each slice's share under `slice-labels`, on a small plate of the page's own
+   surface so the words read over any series color. */
+[part="slice-label"] {
+  background-color: var(--donut-chart-slice-label-background-color, var(--helix-color-surface));
+  border-radius: var(--helix-radii-sm);
+  color: var(--donut-chart-slice-label-color, var(--helix-color-foreground));
+  font-family: var(--helix-font-sans);
+  font-size: var(--donut-chart-slice-label-font-size, var(--helix-text-xs));
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  padding: 0 var(--helix-space-2xs);
+  pointer-events: none;
+  position: absolute;
+  translate: -50% -50%;
+  white-space: nowrap;
+}
+
+:host([sweep="half"]:dir(rtl)) [part="slice-label"] {
+  translate: 50% -50%;
+}

@@ -68,6 +68,8 @@ import '../../tooltip/index.js'
  * @csspart line - The line for one series.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
+ * @csspart marker - The mark on one reading, under `markers`, and on a reading with a blank on either side. Placed with `inset-inline-start` and `inset-block-start`, and carries its series color as `--chart-series`.
+ * @csspart marker-lone - A `marker` on a reading with a blank on either side, which no line reaches. Set alongside `marker`.
  * @csspart plot - The drawing, which takes focus to be read by key.
  * @csspart summary - The chart's name and each series' latest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the lines and areas sit on.
@@ -205,6 +207,17 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    */
   @property({ reflect: true })
   terminus?: 'none' | 'ring' | 'square' | 'triangle'
+
+  /**
+   * Draws a mark on every reading, the `marker` part, so a reader sees where
+   * the readings are and not only the line between them.
+   *
+   * Absent draws none, except on a reading with a blank on either side: it
+   * has no line to be part of, so it takes a mark, the `marker` part with
+   * `marker-lone` beside it, or it would not be drawn at all.
+   */
+  @property({ reflect: true, type: Boolean })
+  markers = false
 
   /** The domain every series is drawn against, which the tooltip also needs. */
   private range(series: Series[]): [number, number] {
@@ -383,6 +396,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
         ${series.map((one, depth) => this.renderSeries(one, depth, x, y))}
       </svg>
       ${this.renderTermini(ends)}
+      ${this.renderMarkers(series, x, y)}
       ${this.renderTooltip()}
     </div>`
   }
@@ -483,6 +497,43 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
           aria-hidden="true"
           part="terminus"
           style=${`--chart-series: var(--chart-series-${end.index}); --chart-terminus-x: ${end.x}%; --chart-terminus-y: ${end.y}%`}
+        ></span>`,
+    )}`
+  }
+
+  /**
+   * The marks on the readings: every one under `markers`, and otherwise only
+   * a reading no line reaches, which has a blank on either side.
+   *
+   * Elements beside the drawing, as the termini are, so a mark is round in a
+   * drawing `preserveAspectRatio="none"` stretches. Placed from the inline
+   * start, as the drawing is mirrored.
+   */
+  protected renderMarkers(
+    series: Series[],
+    x: (value: number) => number,
+    y: (value: number) => number,
+  ): TemplateResult | typeof nothing {
+    const marks = series.flatMap((one, depth) =>
+      this.showsSeries(one.name)
+        ? unbroken(one).flatMap((run) =>
+            run.length > 1 && !this.markers
+              ? []
+              : run.map((point) => ({ depth, lone: run.length === 1, point })),
+          )
+        : [],
+    )
+    if (marks.length === 0) {
+      return nothing
+    }
+    return html`${marks.map(
+      ({ depth, lone, point }) =>
+        html`<span
+          aria-hidden="true"
+          part=${lone ? 'marker marker-lone' : 'marker'}
+          style=${`--chart-series: var(--chart-series-${seriesIndex(depth)}); inset-inline-start: ${
+            (x(point.at) / PLOT_WIDTH) * 100
+          }%; inset-block-start: ${(y(point.value) / PLOT_HEIGHT) * 100}%`}
         ></span>`,
     )}`
   }

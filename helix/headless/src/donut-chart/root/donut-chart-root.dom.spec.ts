@@ -365,3 +365,30 @@ describe('reading by key', () => {
     ])
   })
 })
+
+/* Labels on slices, which every peer charting library draws and this one did
+   not: the shares were in the summary and the tooltip only. */
+describe('slice labels', () => {
+  const labels = (host: HTMLElement): Element[] => [
+    ...(host.shadowRoot?.querySelectorAll('[part="slice-label"]') ?? []),
+  ]
+
+  test('absent writes none', async () => {
+    expect(labels(await chart(TRAFFIC, 'for="traffic"'))).toHaveLength(0)
+  })
+
+  test('write each share on its slice, hidden from a reader who hears the summary', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic" slice-labels locale="en"')
+    const all = labels(host)
+    expect(all.length).toBeGreaterThan(0)
+    expect(all[0]?.getAttribute('aria-hidden')).toBe('true')
+    expect(all.every((one) => /^\d+%$/.test(one.textContent ?? ''))).toBe(true)
+    expect(all[0]?.getAttribute('style')).toContain('left:')
+  })
+
+  test('a slice under a twentieth of the whole takes none', async () => {
+    const tiny = `<table id="tiny"><tbody><tr><th>Big</th><td>98</td></tr><tr><th>Small</th><td>2</td></tr></tbody></table>`
+    const host = await chart(tiny, 'for="tiny" slice-labels locale="en"')
+    expect(labels(host).map((one) => one.textContent)).toEqual(['98%'])
+  })
+})

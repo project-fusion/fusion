@@ -12,6 +12,7 @@ import {
   PLOT_HEIGHT,
   PLOT_WIDTH,
   type Series,
+  type SeriesPoint,
   seriesIndex,
   seriesNames,
   ticks,
@@ -19,6 +20,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { stackEnds, stackSpans } from '../stack.js'
 import '../../tooltip/index.js'
 
 /**
@@ -206,6 +208,19 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   @property({ reflect: true })
   secondary?: string
 
+  /**
+   * Stacks a category's columns into one, each series standing on the ones
+   * before it, so the column's height is the category's total.
+   *
+   * Absent stands them side by side, as it always did. A negative reading
+   * hangs below zero on the negatives before it, so neither direction hides
+   * the other. The scale fits the stacks, not the single readings. A series
+   * in `lines` is still a line, measured on its own reading; columns on the
+   * second scale stack among themselves.
+   */
+  @property({ reflect: true, type: Boolean })
+  stacked = false
+
   /** The series names on the second scale, lowercased and trimmed. */
   private get scaled(): Set<string> {
     return new Set(seriesNames(this.secondary))
@@ -269,8 +284,24 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        the rest. */
     const shown = series.filter((one) => this.showsSeries(one.name))
     const values = shown.flatMap((one) => one.points.map((point) => point.value))
+    /* Stacked, a scale holds the stacks: the lines' own readings and the top
+       and foot of each category's columns. */
+    const lined = this.lined
+    const readingsOf = (group: Series[]): number[] => {
+      if (!this.stacked) {
+        return group.flatMap((one) => one.points.map((point) => point.value))
+      }
+      const columns = group.filter((one) => !lined.has(one.name.trim().toLowerCase()))
+      const slots = columns.map((one) => byRow(one, categories.length))
+      return [
+        ...group
+          .filter((one) => lined.has(one.name.trim().toLowerCase()))
+          .flatMap((one) => one.points.map((point) => point.value)),
+        ...stackEnds(categories.map((_, at) => slots.map((one) => one[at]?.value))),
+      ]
+    }
     const on = (which: (one: Series) => boolean): number[] => {
-      const found = shown.filter(which).flatMap((one) => one.points.map((point) => point.value))
+      const found = readingsOf(shown.filter(which))
       return found.length > 0 ? found : values.length > 0 ? values : [0]
     }
     const [low, high] = extent(scaled.size === 0 ? on(() => true) : on((one) => !own(one)))
@@ -412,8 +443,11 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        Centered in the stride rather than flush against it, so the gap between two
        columns is the same size everywhere and the group sits where it did. One
        series has no neighbor to be separated from and keeps the full stride. */
-    const stride = (slot * 0.72) / Math.max(columns.length, 1)
-    const gap = columns.length > 1 ? stride * 0.08 : 0
+    /* Stacked, the columns of a category are one column, so it takes the
+       whole stride and no gap. */
+    const abreast = this.stacked ? 1 : columns.length
+    const stride = (slot * 0.72) / Math.max(abreast, 1)
+    const gap = abreast > 1 ? stride * 0.08 : 0
     const thickness = stride - gap
 
     /* **The geometry is computed for the axis it is drawn on, not rotated onto
@@ -432,10 +466,12 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       depth: number,
       tone: number,
       scale: (value: number) => number,
+      from?: number,
     ): TemplateResult => {
       const at = scale(value)
-      const along = Math.min(floor, at)
-      const size = Math.abs(floor - at)
+      const base = from === undefined ? floor : scale(from)
+      const along = Math.min(base, at)
+      const size = Math.abs(base - at)
       /* `0.14` is half of what the group leaves over, `(1 - 0.72) / 2` from the
          stride above, and it is what centers the group in its slot. The two
          numbers are one decision written twice: move the 0.72 alone and every
@@ -522,14 +558,18 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
               data-active=${this.pointer.at === index ? '' : nothing}
               part="group${this.pointer.at === index ? ' group-active' : ''}"
             >
-              ${columns.map(({ slots, one, tone }, depth) => {
-                const point = slots[index]
-                /* A blank cell is no column at all, which is what a blank says.
+              ${
+                this.stacked
+                  ? this.renderStack(columns, index, against, bar)
+                  : columns.map(({ slots, one, tone }, depth) => {
+                      const point = slots[index]
+                      /* A blank cell is no column at all, which is what a blank says.
                    A column of no height would claim a zero. */
-                return point === undefined
-                  ? nothing
-                  : bar(point.value, index, depth, tone, against(one))
-              })}
+                      return point === undefined
+                        ? nothing
+                        : bar(point.value, index, depth, tone, against(one))
+                    })
+              }
             </g>`,
         )}
         ${
@@ -546,6 +586,34 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       </svg>
       ${this.renderTooltip()}
     </div>`
+  }
+
+  /**
+   * One category's columns stacked into one, each on the ones before it on
+   * its own scale, through the pure `stackSpans`.
+   */
+  private renderStack(
+    columns: { one: Series; slots: (SeriesPoint | undefined)[]; tone: number }[],
+    index: number,
+    against: (one: Series) => (value: number) => number,
+    bar: (
+      value: number,
+      index: number,
+      depth: number,
+      tone: number,
+      scale: (value: number) => number,
+      from?: number,
+    ) => TemplateResult,
+  ): TemplateResult[] {
+    const scales = [...new Set(columns.map(({ one }) => against(one)))]
+    return scales.flatMap((scale) => {
+      const mine = columns.filter(({ one }) => against(one) === scale)
+      const spans = stackSpans(mine.map(({ slots }) => slots[index]?.value))
+      return mine.flatMap(({ tone }, place) => {
+        const span = spans[place]
+        return span === undefined ? [] : [bar(span[1], index, 0, tone, scale, span[0])]
+      })
+    })
   }
 
   /**
@@ -747,10 +815,18 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
        mirrored, and the bubble goes on that side because a placement is
        physical. */
     const shown = series.filter((one) => this.showsSeries(one.name))
-    const values = shown
+    const reached = shown
       .map((one) => byRow(one, this.readings)[at]?.value)
       .filter((one): one is number => one !== undefined)
-    const all = shown.flatMap((one) => one.points.map((point) => point.value))
+    /* Stacked, the far end is the top of the stack. */
+    const values = this.stacked ? stackEnds([reached]) : reached
+    const all = this.stacked
+      ? stackEnds(
+          Array.from({ length: this.readings }, (_, row) =>
+            shown.map((one) => byRow(one, this.readings)[row]?.value),
+          ),
+        )
+      : shown.flatMap((one) => one.points.map((point) => point.value))
     const [low, high] = extent(all.length > 0 ? all : [0])
     const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
     const sideways = this.orientation === 'horizontal'

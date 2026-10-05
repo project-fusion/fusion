@@ -16,6 +16,7 @@ import {
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
+import { correlation, leastSquares } from '../fit.js'
 
 /** How near a pointer has to be to a point to be asking about it, in pixels. */
 const REACH = 24
@@ -75,26 +76,6 @@ const nice = ([low, high]: [number, number]): [number, number] => {
   return [round(Math.floor(low / step) * step), round(Math.ceil(high / step) * step)]
 }
 
-/** Pearson's r, or nothing where there are too few points or no spread to have one. */
-const correlation = (pairs: Array<[number, number]>): number | undefined => {
-  if (pairs.length < 3) {
-    return undefined
-  }
-  const mean = (values: number[]): number =>
-    values.reduce((sum, one) => sum + one, 0) / values.length
-  const across = mean(pairs.map(([x]) => x))
-  const up = mean(pairs.map(([, y]) => y))
-  let both = 0
-  let xs = 0
-  let ys = 0
-  for (const [x, y] of pairs) {
-    both += (x - across) * (y - up)
-    xs += (x - across) ** 2
-    ys += (y - up) ** 2
-  }
-  return xs === 0 || ys === 0 ? undefined : both / Math.sqrt(xs * ys)
-}
-
 /**
  * @summary A chart that shows whether two measures move together, with one point per row.
  *
@@ -107,6 +88,9 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  *
  * Both axes are labeled, because both positions are values. The ticks sit at
  * round numbers, and the range extends to them.
+ *
+ * `trend` draws each series' line of best fit, by least squares, across the
+ * plot in the series' color.
  *
  * The summary gives each series' correlation coefficient and its number of
  * points. The table has every number, and the drawing is hidden from screen
@@ -142,7 +126,7 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * @csspart point - One row, as a point.
  * @csspart point-active - A point in the row under the pointer. Set alongside `point`.
  * @csspart summary - The text that says how strongly the measures relate, for people who cannot see the points.
- * @csspart svg - The drawing surface the gridlines sit on.
+ * @csspart svg - The drawing surface the gridlines and the trend lines sit on.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -159,6 +143,7 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * @csspart tooltip-right - The bubble while it is right of the reading. Set alongside `tooltip`.
  * @csspart tooltip-top - The bubble while it is above the reading. Set alongside `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
+ * @csspart trend - One series' line of best fit, under `trend`. Carries its series color as `--chart-series`.
  * @csspart x-axis - The values along the horizontal axis, under the plot.
  * @csspart x-name - The name of the horizontal measure.
  * @csspart x-tick - One labeled value on the horizontal axis. Each axis has its own tick part, because `::part()` cannot tell which axis a tick is on.
@@ -194,6 +179,18 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
    */
   @property({ attribute: 'points-label' })
   pointsLabel = 'points'
+
+  /**
+   * Draws each series' line of best fit across the plot, by least squares, in
+   * the series' color: the regression line a reader would otherwise draw by
+   * eye.
+   *
+   * Absent draws none. A series with fewer than two points, or with every
+   * point at one measure across, has no line to draw. The summary already
+   * gives each series' correlation, which says how near the points are to it.
+   */
+  @property({ reflect: true, type: Boolean })
+  trend = false
 
   /** The points as last drawn, which the pointer searches. */
   private drawn: ScatterPoint[] = []
@@ -361,6 +358,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
               )
             : nothing
         }
+        ${this.renderTrends(field, along, up)}
       </svg>
       ${field.points.map((point) => {
         const index = seriesIndex(point.depth)
@@ -374,6 +372,40 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
       })}
       ${this.renderTooltip()}
     </div>`
+  }
+
+  /**
+   * Each shown series' line of best fit, from one end of the measure across
+   * to the other, under `trend`. The drawing clips a line that leaves the
+   * plot.
+   */
+  protected renderTrends(
+    field: ScatterField,
+    along: (value: number) => number,
+    up: (value: number) => number,
+  ): TemplateResult[] | typeof nothing {
+    if (!this.trend) {
+      return nothing
+    }
+    const [start, end] = field.x
+    return field.yNames.flatMap((name, depth) => {
+      const fit = this.showsSeries(name) ? leastSquares(field.pairs[depth] ?? []) : undefined
+      if (fit === undefined) {
+        return []
+      }
+      const index = seriesIndex(depth)
+      return [
+        svg`<line
+          data-series=${index}
+          part="trend"
+          style="--chart-series: var(--chart-series-${index})"
+          x1=${along(start)}
+          x2=${along(end)}
+          y1=${up(fit.intercept + fit.slope * start)}
+          y2=${up(fit.intercept + fit.slope * end)}
+        />`,
+      ]
+    })
   }
 
   /**
