@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
+import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
 import paging from '../.examples/paging.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import searching from '../.examples/searching.html' with { type: 'text' }
@@ -155,5 +156,20 @@ describe('the windowed-paging example', () => {
     next(assets)
     await idle()
     expect(first(assets)).toBe('asset-0501.webp')
+  })
+})
+
+describe('the loading-more example', () => {
+  run('six rows named by their version, and six more from the last row', async () => {
+    await example(loadingMore)
+    const releases = document.getElementById('releases') as HTMLElement & { rows: unknown[] }
+    await idle()
+    expect(rows(releases)).toHaveLength(6)
+    expect(rows(releases)[0]?.querySelector('[role="rowheader"]')?.textContent?.trim()).toBe(
+      '2.24.0',
+    )
+    ;(releases.shadowRoot?.querySelector('[part="more-button"]') as HTMLElement | null)?.click()
+    await idle()
+    expect(rows(releases)).toHaveLength(12)
   })
 })
