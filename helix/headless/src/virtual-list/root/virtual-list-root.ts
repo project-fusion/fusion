@@ -1,12 +1,17 @@
 import {
   AriaForwardController,
+  commaList,
   customElement,
   elementById,
+  HelixBeforeChangeEvent,
   HelixElement,
   HelixLoadMoreEvent,
   HelixRangeChangeEvent,
+  rangeAdd,
+  requestChange,
   searchableById,
   Typeahead,
+  toggleValue,
   typesCharacter,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
@@ -86,6 +91,17 @@ export interface VirtualListRange {
  * `aria-setsize`, so a screen reader says "4,000 of 10,000". The row holding
  * focus stays drawn when it scrolls out.
  *
+ * **Selecting.** `selection-mode` makes the list a list box a reader chooses
+ * from: `single` selects one item and `multiple` any number. Space or a press
+ * selects an item, Shift with Space, Up, Down, Home, End or a press takes in
+ * the items from the last one chosen, and Control or Command with A selects
+ * them all, in `multiple`. `value` holds the chosen items' keys, separated by
+ * commas, in the order of the set: `key-field` names each item's key, and a
+ * string or a number item is its own key. A change asks with
+ * `helix-before-change` and tells with `change`. Each row is an `option`
+ * marked `aria-selected`, so a row's own links and buttons are not reached
+ * there: keep those to a list without `selection-mode`.
+ *
  * **Loading more.** `helix-range-change` fires as the items on screen change,
  * and `range` holds them. `helix-load-more` fires once a reader is within one
  * screen of the end, once for each length of the set: add to `items` and it can
@@ -114,6 +130,8 @@ export interface VirtualListRange {
  * @slot - The `<template>` that defines one row. The list writes the rows it renders beside it, and this slot shows them between the two spacers.
  * @slot loading - Content for the row after the last item while `loading` is set. Falls back to `loading-label`.
  *
+ * @event {Event} change - Fired once a press or a key has changed which items are selected, in a list with `selection-mode`.
+ * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press or a key changes which items are selected, with the `value` it would leave. Cancelable.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader comes within one screen of the last item, once for each length of the set.
  * @event {HelixRangeChangeEvent} helix-range-change - Fired when the items on screen change, with the new `first` and `last`, which `range` also holds.
  *
@@ -149,6 +167,14 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   @property({ attribute: false })
   items: readonly unknown[] | undefined
+
+  /**
+   * The field of each item that is its key in `value`, as a key or a path of
+   * keys. Empty reads a string or a number item as its own key, and any
+   * other item by its place in the set.
+   */
+  @property({ attribute: 'key-field' })
+  keyField = ''
 
   /**
    * The list's name, read by screen readers, because only some of its rows
@@ -200,6 +226,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
   renderItem: VirtualListRenderer | undefined
 
   /**
+   * Makes the list a list box a reader chooses from: `single` selects one
+   * item, and `multiple` any number. Unset is a list a reader reads.
+   */
+  @property({ attribute: 'selection-mode' })
+  selectionMode?: 'multiple' | 'single'
+
+  /**
    * The field of each item that typing matches, as a key or a path of keys
    * (`author.name`).
    *
@@ -208,6 +241,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   @property({ attribute: 'text-field' })
   textField = ''
+
+  /**
+   * The keys of the chosen items, separated by commas, in a list with
+   * `selection-mode`. Set it to start with items chosen.
+   */
+  @property()
+  value = ''
 
   /**
    * The parsed script.
@@ -245,6 +285,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /** The letters typed at the list, which move to the item they start. */
   private readonly typeahead = new Typeahead()
+
+  /** The key of the item a Shift range runs from: the last one chosen. */
+  private anchor: string | undefined
 
   /**
    * Watches the source and the tree around it.
@@ -349,6 +392,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     /* On the host, because the rows are light DOM and their events reach it
        without crossing a shadow boundary. */
     this.addEventListener('keydown', this.handleKeydown)
+    this.addEventListener('click', this.handleClick)
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('focusout', this.handleFocusOut)
     if (typeof MutationObserver === 'undefined') {
@@ -366,6 +410,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('keydown', this.handleKeydown)
+    this.removeEventListener('click', this.handleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('focusout', this.handleFocusOut)
     this.watcher?.disconnect()
@@ -493,7 +538,21 @@ export class HelixHeadlessVirtualList extends HelixElement {
       }
       return
     }
-    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+    const toggle = event.ctrlKey || event.metaKey
+    if (this.selectionMode && !event.altKey) {
+      if (toggle && event.key.toLowerCase() === 'a' && this.selectionMode === 'multiple') {
+        event.preventDefault()
+        this.choose(this.keys().join(','))
+        return
+      }
+      if (event.key === ' ' && !toggle) {
+        event.preventDefault()
+        this.press(at, event.shiftKey)
+        return
+      }
+    }
+    const extend = event.shiftKey && this.selectionMode === 'multiple'
+    if (event.altKey || toggle || (event.shiftKey && !extend)) {
       return
     }
     const { first, last } = this.virtualize.visible()
@@ -503,6 +562,112 @@ export class HelixHeadlessVirtualList extends HelixElement {
     }
     event.preventDefault()
     void this.focusIndex(next)
+    if (extend) {
+      this.anchor ??= this.keyAt(at)
+      this.press(next, true)
+    }
+  }
+
+  /** The key of item `at` in `value`. See `keyField`. */
+  private keyAt(at: number): string {
+    const item = this.data[at]
+    if (this.keyField !== '' && item !== null && typeof item === 'object') {
+      return textOf(valueAt(item, this.keyField))
+    }
+    return typeof item === 'string' || typeof item === 'number' ? String(item) : String(at)
+  }
+
+  /** Every item's key, in the order of the set. */
+  private keys(): string[] {
+    return this.data.map((_, at) => this.keyAt(at))
+  }
+
+  /** The keys chosen now. */
+  private get chosen(): Set<string> {
+    return new Set(commaList(this.value))
+  }
+
+  /**
+   * Selects item `at`, or lets it go, asking first. With `extend`, in
+   * `multiple`, the items from the anchor to it are taken in, as Data Table
+   * and List take in a range. Otherwise the item is where the next range runs
+   * from.
+   */
+  private press(at: number, extend = false): void {
+    const mode = this.selectionMode
+    const key = this.keyAt(at)
+    if (!mode || at < 0 || at >= this.data.length) {
+      return
+    }
+    const now = commaList(this.value)
+    if (extend && mode === 'multiple') {
+      const keys = this.keys()
+      const from = this.anchor === undefined ? -1 : keys.indexOf(this.anchor)
+      const range = rangeAdd(now, keys, from, at)
+      if (range) {
+        this.choose(this.inOrder(range))
+      }
+      return
+    }
+    this.anchor = key
+    if (mode === 'single') {
+      this.choose(now.length === 1 && now[0] === key ? '' : key)
+      return
+    }
+    this.choose(this.inOrder(toggleValue(now, key)))
+  }
+
+  /** Keys in the order of the set, a key it no longer holds kept after them. */
+  private inOrder(keys: readonly string[]): string {
+    const wanted = new Set(keys)
+    const ordered = this.keys().filter((key) => wanted.has(key))
+    const placed = new Set(ordered)
+    return [...ordered, ...keys.filter((key) => !placed.has(key))].join(',')
+  }
+
+  /** Asks for a new `value`, and says so once it has moved. */
+  private choose(next: string): void {
+    if (next === this.value) {
+      return
+    }
+    requestChange({
+      apply: (value) => {
+        this.value = value
+        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
+      },
+      event: (value) => new HelixBeforeChangeEvent({ value }),
+      host: this,
+      next,
+    })
+  }
+
+  /**
+   * A press on a row selects it, in a list with `selection-mode`, except on a
+   * control of its own. Shift takes in a range.
+   */
+  private readonly handleClick = (event: MouseEvent): void => {
+    if (!this.selectionMode) {
+      return
+    }
+    const path = event.composedPath()
+    const row = path.find(
+      (node): node is HTMLElement => node instanceof HTMLElement && node.parentElement === this,
+    )
+    const at = this.indexOf(row ?? null)
+    if (at === undefined) {
+      return
+    }
+    const inner = path.slice(0, path.indexOf(row as HTMLElement))
+    if (
+      inner.some(
+        (node) =>
+          node instanceof HTMLElement &&
+          node.matches('a[href], button, input, select, textarea, label'),
+      )
+    ) {
+      return
+    }
+    this.press(at, event.shiftKey && this.selectionMode === 'multiple')
   }
 
   /**
@@ -574,11 +739,24 @@ export class HelixHeadlessVirtualList extends HelixElement {
       : undefined
   }
 
-  /** Writes a row's role and its place in the set. */
+  /**
+   * Writes a row's role, and whether it is chosen in a list that selects:
+   * `option` with `aria-selected` there, and `listitem` otherwise. Every pass,
+   * since a choice changes no row's content.
+   */
+  private mark(element: Element, at: number, chosen: ReadonlySet<string>): void {
+    element.setAttribute('role', this.selectionMode ? 'option' : 'listitem')
+    if (this.selectionMode) {
+      element.setAttribute('aria-selected', String(chosen.has(this.keyAt(at))))
+    } else {
+      element.removeAttribute('aria-selected')
+    }
+  }
+
+  /** Writes a row's place in the set. */
   private stamp(element: Element, at: number): void {
     /* The real index and the real total, not the position in the window. A
        reader arrowing through this should hear where they are in the set. */
-    element.setAttribute('role', 'listitem')
     element.setAttribute('aria-posinset', String(at + 1))
     element.setAttribute('aria-setsize', String(this.data.length))
     /* Which item this drew, for the controller to measure it against. The
@@ -685,7 +863,11 @@ export class HelixHeadlessVirtualList extends HelixElement {
       last,
       onScreen: this.virtualize.visible().first,
     })
+    const chosen = this.chosen
     for (const [at, group] of drawn) {
+      for (const element of group) {
+        this.mark(element, at, chosen)
+      }
       const stop = at === this.active
       group[0]?.setAttribute('tabindex', stop ? '0' : '-1')
       if (stop && (fresh.has(at) || this.released !== at)) {
@@ -705,7 +887,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
     return html`<div
       data-scroller
       part="viewport"
-      role="list"
+      role=${this.selectionMode ? 'listbox' : 'list'}
+      aria-multiselectable=${this.selectionMode === 'multiple' ? 'true' : nothing}
       aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label}
       @scroll=${() => {
@@ -720,7 +903,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
         /* An item of the list that is not one of the set, so it carries no
            place in it, as React Aria's loading row does. */
         this.loading
-          ? html`<div part="loading" role="listitem">
+          ? html`<div part="loading" role=${this.selectionMode ? 'option' : 'listitem'}>
               <slot name="loading">${this.loadingLabel}</slot>
             </div>`
           : nothing
