@@ -8,6 +8,7 @@ export function Example() {
         <helix-menu-item
           checkable
           checked
+          exclusive
           slot="submenu"
           value="one-a"
         >
@@ -15,6 +16,7 @@ export function Example() {
         </helix-menu-item>
         <helix-menu-item
           checkable
+          exclusive
           slot="submenu"
           value="one-b"
         >

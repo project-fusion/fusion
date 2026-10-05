@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { at, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -115,5 +115,70 @@ describe('a row draws no box it has nothing to put in', () => {
       '<helix-headless-menu-item checkable checked value="a">Copy</helix-headless-menu-item>',
     )) as HTMLElement
     expect(part(el, 'mark')).not.toBeNull()
+  })
+})
+
+describe('choosing a row that can be ticked', () => {
+  type Row = HTMLElement & { checked: boolean; updateComplete: Promise<boolean> }
+
+  const rows = async (markup: string): Promise<Row[]> => {
+    const host = await mount(`<div>${markup}</div>`)
+    const found = [...host.querySelectorAll('helix-headless-menu-item')] as Row[]
+    for (const one of found) {
+      await one.updateComplete
+    }
+    return found
+  }
+
+  const choose = async (row: Row): Promise<void> => {
+    ;(part(row, 'item') as HTMLElement).click()
+    await row.updateComplete
+  }
+
+  test('ticks and unticks it, and a listener reads the new state', async () => {
+    const [row] = (await rows(
+      '<helix-headless-menu-item checkable value="a">Show hidden</helix-headless-menu-item>',
+    )) as [Row]
+    let heard: boolean | undefined
+    row.addEventListener('helix-select', () => {
+      heard = row.checked
+    })
+    await choose(row)
+    expect(row.checked).toBe(true)
+    expect(heard).toBe(true)
+    expect(part(row, 'item')?.getAttribute('aria-checked')).toBe('true')
+    await choose(row)
+    expect(row.checked).toBe(false)
+  })
+
+  test('records the state without writing the attribute', async () => {
+    const [row] = (await rows(
+      '<helix-headless-menu-item checkable value="a">Show hidden</helix-headless-menu-item>',
+    )) as [Row]
+    await choose(row)
+    expect(row.hasAttribute('checked')).toBe(false)
+    expect(hasState(row, 'checked')).toBe(true)
+  })
+
+  test('asks first, and a refusal keeps the row as it is', async () => {
+    const [row] = (await rows(
+      '<helix-headless-menu-item checkable value="a">Show hidden</helix-headless-menu-item>',
+    )) as [Row]
+    row.addEventListener('helix-before-toggle', (event) => event.preventDefault())
+    await choose(row)
+    expect(row.checked).toBe(false)
+  })
+
+  test('an exclusive row turns its run on and off, and stops at a divider', async () => {
+    const found = await rows(`
+      <helix-headless-menu-item checkable exclusive checked value="name">Name</helix-headless-menu-item>
+      <helix-headless-menu-item checkable exclusive value="date">Date</helix-headless-menu-item>
+      <hr />
+      <helix-headless-menu-item checkable exclusive checked value="asc">Ascending</helix-headless-menu-item>`)
+    await choose(at(found, 1))
+    expect(found.map((one) => one.checked)).toEqual([false, true, true])
+    /* Choosing the row that is on leaves it on, as a radio does. */
+    await choose(at(found, 1))
+    expect(found.map((one) => one.checked)).toEqual([false, true, true])
   })
 })

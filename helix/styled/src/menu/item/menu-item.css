@@ -152,7 +152,7 @@ svg[part="mark"] {
   color: var(--helix-color-foreground-subtle);
 }
 
-:host([checked]) svg[part="mark"] {
+:host(:state(checked)) svg[part="mark"] {
   color: var(--helix-color-foreground);
 }
 

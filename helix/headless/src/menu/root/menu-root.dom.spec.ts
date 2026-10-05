@@ -591,3 +591,124 @@ describe('a menu with nothing on its page', () => {
     expect(part(host, 'empty')).toBeNull()
   })
 })
+
+describe('the trigger of a menu', () => {
+  const rows = `<helix-headless-menu-item value="rename">Rename</helix-headless-menu-item>
+    <helix-headless-menu-item value="duplicate">Duplicate</helix-headless-menu-item>
+    <helix-headless-menu-item value="delete">Delete</helix-headless-menu-item>`
+
+  const pressOn = (target: Element, key: string): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    target.dispatchEvent(event)
+    return event
+  }
+
+  const settleRows = async (host: Menu): Promise<Item[]> => {
+    await host.updateComplete
+    const items = [...host.querySelectorAll('helix-headless-menu-item')] as Item[]
+    for (const one of items) {
+      await (one as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    }
+    await host.updateComplete
+    return items
+  }
+
+  /* A dialog around the menu closes on Escape, and the trigger is where focus
+     rests after every use of the menu. */
+  test('lets Escape through while the menu is closed', async () => {
+    const host = await menu(rows)
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLElement
+    let heard = false
+    host.parentElement?.addEventListener('keydown', () => {
+      heard = true
+    })
+    const event = pressOn(trigger, 'Escape')
+    expect(event.defaultPrevented).toBe(false)
+    expect(heard).toBe(true)
+  })
+
+  test('opens on Down with the first row, and on Up with the last', async () => {
+    const host = await menu(rows)
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLElement
+    pressOn(trigger, 'ArrowDown')
+    let items = await settleRows(host)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(items[0]?.ownerDocument.activeElement).toBe(at(items, 0))
+
+    host.open = false
+    items = await settleRows(host)
+    pressOn(trigger, 'ArrowUp')
+    items = await settleRows(host)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(items[0]?.ownerDocument.activeElement).toBe(at(items, 2))
+  })
+
+  test('moves to the next row that starts with a typed letter', async () => {
+    const host = await menu(rows)
+    host.open = true
+    const items = await settleRows(host)
+    at(items, 0).focus()
+    pressOn(host, 'd')
+    expect(items[0]?.ownerDocument.activeElement).toBe(at(items, 1))
+    pressOn(host, 'd')
+    expect(items[0]?.ownerDocument.activeElement).toBe(at(items, 2))
+  })
+
+  test('names the surface after the trigger unless a name is given', async () => {
+    const host = (await mount(
+      `<helix-headless-menu><button slot="trigger">Actions</button>${rows}</helix-headless-menu>`,
+    )) as Menu
+    const surface = part(host, 'surface') as HTMLElement & { ariaLabelledByElements?: Element[] }
+    expect(surface.hasAttribute('aria-label')).toBe(false)
+    /* happy-dom implements no element reflection, so the reference is read
+       only where the engine has it. */
+    if ('ariaLabelledByElements' in surface) {
+      expect(surface.ariaLabelledByElements).toEqual([host.querySelector('[slot="trigger"]') as Element])
+    }
+  })
+
+  test('takes its name from an aria-label on the host', async () => {
+    const host = (await mount(
+      `<helix-headless-menu aria-label="File actions"><button slot="trigger">Open</button>${rows}</helix-headless-menu>`,
+    )) as Menu
+    expect(part(host, 'surface')?.getAttribute('aria-label')).toBe('File actions')
+  })
+})
+
+describe('a menu inside another component', () => {
+  test('returns focus to its trigger on Escape', async () => {
+    const outer = await mount('<div></div>')
+    const root = outer.attachShadow({ mode: 'open' })
+    root.innerHTML = `<helix-headless-menu label="Inner"><button slot="trigger">Open</button>
+      <helix-headless-menu-item value="one">One</helix-headless-menu-item>
+      <helix-headless-menu-item value="two">Two</helix-headless-menu-item></helix-headless-menu>`
+    const host = root.querySelector('helix-headless-menu') as Menu
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLElement
+    host.open = true
+    await host.updateComplete
+    const items = [...host.querySelectorAll('helix-headless-menu-item')] as Item[]
+    for (const one of items) {
+      await (one as unknown as { updateComplete: Promise<boolean> }).updateComplete
+    }
+    at(items, 0).focus()
+    expect((at(items, 0) as unknown as { selected: boolean }).selected).toBe(true)
+    at(items, 0).dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Escape',
+      }),
+    )
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    expect(root.activeElement).toBe(trigger)
+  })
+})
