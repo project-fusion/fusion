@@ -91,8 +91,9 @@ examples put the closing tag on the same line as the opening tag.
 
 ## Set a button's width with the layout
 
-A button has no `width` or `fill` property, for the same reason it has no `size`
-property. How wide a control is depends on the region it is in.
+A button has no `fill` property and no `size` property. How wide a control is
+depends on the region it is in. `width="full"` fills the row a button sits in,
+and the layout decides everything else.
 
 A button already stretches in a column flex or a grid, because a stretch-aligned
 parent stretches its children:
@@ -170,8 +171,8 @@ and then a second attribute to hide it is the same as having no visible label.
 
 `Option`, `Listbox`, and `Select` are three families so that the keyboard
 handling, the filtering, the multi-select rules, and the active-item tracking
-are written once. `Select` renders a `Listbox` internally. A future combobox
-will too, and so would a command palette.
+are written once. `Select` renders a `Listbox` internally, and so does `Combobox`. A command
+palette would too.
 
 For the same reason, we wrote `DrilldownController`. Since it was first written,
 `Menu` had held a page stack and derived its rows, and none of that code

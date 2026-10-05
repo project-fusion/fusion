@@ -260,6 +260,20 @@ describe('moving between stops', () => {
     expect(tour.index).toBe(0)
   })
 
+  test('says it moved, after the move, and not when refused', async () => {
+    const tour = await run()
+    const seen: string[] = []
+    tour.addEventListener('helix-activate', (event) => {
+      seen.push(`${(event as CustomEvent<{ value: string }>).detail.value} at ${tour.index}`)
+    })
+    tour.next()
+    await tour.updateComplete
+    tour.addEventListener('helix-before-activate', (event) => event.preventDefault())
+    tour.next()
+    await tour.updateComplete
+    expect(seen).toEqual(['1 at 1'])
+  })
+
   test('and moves where nothing refused', async () => {
     const tour = await run()
     const seen: string[] = []

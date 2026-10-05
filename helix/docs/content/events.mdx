@@ -105,6 +105,7 @@ against a dispatch, so every event you can listen for is documented.
 | `helix-before-change` | A value is about to change, cancelable |
 | `helix-before-toggle` | A checked state is about to flip, cancelable |
 | `helix-before-open`, `helix-before-close` | An open state is about to change, cancelable |
+| `helix-before-activate`, `helix-activate` | A set is about to make a different child current, cancelable, and then did |
 | `helix-select` | An item was chosen from a set |
 | `helix-dismiss` | A user asked for something to close |
 | `helix-next`, `helix-previous` | Movement through a sequence |
@@ -127,7 +128,24 @@ Every stateful component also sends native events once the change is applied:
 - `load` and `error` on an image
 
 Each component's page lists the events it dispatches, with the class and the
-detail.
+detail. The table above lists the common ones.
+
+## Requests under a plain name
+
+A few events with no `before` in their name are also cancelable requests. Each
+is sent before the change, and you refuse the change with `preventDefault()`:
+
+- `helix-navigate` on Pagination, Data Table, and Date Picker
+- `helix-sort`, `helix-filter`, `helix-select`, and `helix-reorder` on Data Table
+- `helix-select` on Carousel
+
+These requests send no notification after the change:
+
+- Splitter's `helix-before-resize` and `helix-before-collapse`
+- Chat's `helix-before-pin`
+- Pagination Size's `helix-before-change`
+
+Read the element's state after the request when you need the result.
 
 ## Events in a framework
 

@@ -90,9 +90,11 @@ button.
 ## Import `elements.css` beside the base layer
 
 ```ts
-import '@fusion.dev/helix-styles/base.css'
 import '@fusion.dev/helix-styles/helix.css'
 ```
+
+`helix.css` imports `elements.css` after the primitives, the tokens, and the
+base layer. If you import the layers one at a time, import `elements.css` last.
 
 `elements.css` hides each tag with `:not(:defined)` until the element upgrades.
 It uses `visibility`, so the page does not reflow. Without it, a card appears as
@@ -111,6 +113,24 @@ import '@fusion.dev/helix' // ❌ the barrel
 
 Import one component family per module, so you do not ship the whole library to
 use a button.
+
+## Turn off an attribute that is on by default
+
+A boolean attribute is off until you write it, with four exceptions. These are
+on until you write the string `"false"`:
+
+- `modal` on Drawer
+- `playsinline` on Video
+- `default-pinned` on Chat
+- `tab-indents` on Sandbox Source
+
+```html
+<helix-drawer modal="false"></helix-drawer>
+```
+
+In JSX, `modal={false}` sets the property and does the same. Other features
+that are on by default turn off with an attribute named `no-`, such as
+`no-copy`.
 
 ## Declarative shadow DOM is opt-in
 

@@ -2,6 +2,7 @@ import {
   customElement,
   deepActiveElement,
   deepContains,
+  HelixActivateEvent,
   HelixBeforeActivateEvent,
   HelixCompleteEvent,
   HelixElement,
@@ -48,6 +49,7 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  *
  * @slot - The stops, in the order they are shown.
  *
+ * @event {HelixActivateEvent} helix-activate - Fired after the current stop changes, with the new index.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current stop changes, with the new index. Cancelable: call `preventDefault()` to stay on the current stop.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the user ends the tour early. Cancelable: call `preventDefault()` to keep the tour open.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before `requestOpen(true)` starts the tour. Cancelable: call `preventDefault()` to keep it closed.
@@ -213,7 +215,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
   /* The one path every stateful change in the library goes through: it
      announces, then applies where nothing refused. */
   private move(to: number): void {
-    requestChange({
+    const moved = requestChange({
       apply: (value) => {
         this.index = value
       },
@@ -221,6 +223,12 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
       host: this,
       next: to,
     })
+    /* The notification after the request, as every other set sends one: a
+       consumer following the tour heard only the proposal, and had no event
+       for a move nobody refused. */
+    if (moved) {
+      this.dispatchEvent(new HelixActivateEvent({ value: String(this.index) }))
+    }
   }
 
   private readonly handleAsk = (event: Event): void => {

@@ -583,6 +583,7 @@ const comparison = () => {
 
   const rows = []
   const losses = []
+  let measured = 0
   for (const part of parts) {
     const mine = ours.get(part)
     if (!mine) {
@@ -600,6 +601,7 @@ const comparison = () => {
       rows.push(
         `| | ${system.name} | ${grouped(theirs.raw)} | ${grouped(theirs.gzip)} | ${grouped(theirs.brotli)} |`,
       )
+      measured += 1
       if (theirs.gzip < mine.gzip) {
         losses.push({ by: mine.gzip - theirs.gzip, name: system.name, part })
       }
@@ -612,19 +614,21 @@ const comparison = () => {
   return [
     '## Compared with other systems',
     '',
-    `We compare Helix with four other libraries of custom elements. \`turbo run peers\` measured them on ${peers.measured}. It installs pinned versions into \`.local\` and bundles them with the same harness as the tables above. The Helix rows are measured on every run of \`bun run gen:metrics\`, so they always match this repository.`,
+    `We compare Helix with the libraries of custom elements listed under the table. \`turbo run peers\` measured them on ${peers.measured}. It installs pinned versions into \`.local\` and bundles them with the same harness as the tables above. The Helix rows are measured on every run of \`bun run gen:metrics\`, so they always match this repository.`,
     '',
     `Every system in the table is built on Lit. The runtime is the same library in every column, so the differences come from the components. React component libraries are left out, because comparing a custom element with a React component would measure the framework.`,
     '',
-    'The table has no whole-library row. That row would compare how many components each vendor ships and how each vendor counts a component. It would look like a measurement and mean little. The table compares five components that every system has.',
+    'The table has no whole-library row. That row would compare how many components each vendor ships and how each vendor counts a component. It would look like a measurement and mean little. The table compares components that most systems ship, and a system without one says so.',
     '',
     '| Component | System | Raw | Gzip | Brotli |',
     '|---|---|---|---|---|',
     ...rows,
     '',
     losses.length === 0
-      ? 'Helix is the smallest on all five components. The result covers these five components only.'
-      : `At least one system is smaller than Helix on ${beaten.map((one) => `\`${one}\``).join(', ')}. The largest gap is ${worst.part} against ${worst.name}, at ${grouped(worst.by)} bytes gzipped. ${losses.length} of ${rows.length - parts.length} peer measurements are smaller than the Helix row.`,
+      ? 'Helix is the smallest on every component in the table. The result covers these components only.'
+      : `At least one system is smaller than Helix on ${beaten.map((one) => `\`${one}\``).join(', ')}. The largest gap is ${worst.part} against ${worst.name}, at ${grouped(worst.by)} bytes gzipped. ${losses.length} of ${measured} peer measurements are smaller than the Helix row.`,
+    '',
+    "Helix's `radio` family includes Radio Group, so its row carries an element that some peer rows measure without.",
     '',
     ...peers.systems.map(
       (system) => `- **${system.name}** \`${system.package}@${system.version}\`. ${system.note}`,
@@ -820,7 +824,7 @@ lines.push(
   '',
   'We list these gaps so you know what the numbers above leave out.',
   '',
-  '- **No whole-library comparison, and no more than five components.** The comparison above covers five components in four systems. Adding a component means choosing the matching element in each system by hand, so we add components one at a time.',
+  '- **No whole-library comparison, and a short list of components.** Adding a component means choosing the matching element in each system by hand, so we add components one at a time.',
   "- **The peer numbers are pinned, so they age.** The comparison shows the date they were measured. Run `turbo run peers` to refresh them. No check fails when they are old. Another library's release changes nothing in this repository, so a check based on the date would fail for no useful reason.",
   '- **No first paint.** The timings above measure single components. First paint depends on the whole page, so the app that renders the page should measure it.',
   "- **No per-component stylesheet bytes.** Each family's CSS is compiled into its JavaScript, so every number above already includes it. `elements.css` is the light-DOM layer, and it is in the stylesheet table.",
