@@ -134,8 +134,9 @@ if (hasLayout()) {
     /* **A fitted carousel's last position moves with the window**, which a
        declared one's never does. Widened, the reader is left resting somewhere
        the track can no longer be, so the index comes back inside what the new
-       count leaves and goes out as the announcement every other index change
-       does. */
+       count leaves. Nobody asked for that move, so it is written with no
+       `helix-select`: a request a consumer could refuse would leave the index
+       past the last place. */
     test('widening the track brings the index back inside what it leaves', async () => {
       const host = await shelf(340)
       const heard: string[] = []
@@ -146,7 +147,7 @@ if (hasLayout()) {
       await idle()
       expect(host.positions).toBe(4)
       expect(host.index).toBe(3)
-      expect(heard).toEqual(['helix-select'])
+      expect(heard).toEqual([])
     })
 
     /* The other direction needs nothing said: a narrower track has more places

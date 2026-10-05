@@ -128,3 +128,12 @@ helix-headless-carousel::part(indicator):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
+
+helix-headless-carousel::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

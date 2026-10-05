@@ -133,9 +133,14 @@ describe('carousel', () => {
      nothing, while the control still said rotation was running. */
   test('rotation goes round from the last slide to the first, without `loop`', async () => {
     const cal = await carousel('autoplay interval="20" default-index="2"')
-    await new Promise((done) => setTimeout(done, 60))
-    await cal.updateComplete
-    expect(cal.index).not.toBe(2)
+    /* Watched rather than read once: three slides at 20 ms each come round to
+       the last again, and a single read lands wherever the timers have got to. */
+    const seen = new Set<number>()
+    for (let tick = 0; tick < 20 && !seen.has(0); tick++) {
+      await new Promise((done) => setTimeout(done, 5))
+      seen.add(cal.index)
+    }
+    expect(seen.has(0)).toBe(true)
   })
 
   test('says Previous and Next have nowhere to go at the ends, unless it loops', async () => {
