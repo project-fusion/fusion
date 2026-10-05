@@ -363,7 +363,8 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     const clauses = field.yNames.map((name, depth) => {
       const pairs = field.pairs[depth] ?? []
       const r = correlation(pairs)
-      const strength = r === undefined ? '' : `, ${this.correlationLabel} ${coefficientIn(this.locale).format(r)}`
+      const strength =
+        r === undefined ? '' : `, ${this.correlationLabel} ${coefficientIn(this.locale).format(r)}`
       return `${name} / ${field.xName}: ${pairs.length} ${this.pointsLabel}${strength}`
     })
     const named = this.named ? `${this.named}. ` : ''

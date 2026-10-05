@@ -341,7 +341,9 @@ describe('moving through a page by key', () => {
   }
 
   const key = (from: Element, name: string): void => {
-    from.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: name }))
+    from.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: name }),
+    )
   }
 
   /* The row renders `aria-disabled` so it can be reached and say why it cannot

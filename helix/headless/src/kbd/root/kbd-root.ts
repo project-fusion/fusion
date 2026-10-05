@@ -266,9 +266,7 @@ export class HelixHeadlessKbd extends HelixElement {
       .map((part) => part.trim().toLowerCase())
       .filter((part) => part !== '')
     const key = parts.at(-1) ?? ''
-    return (
-      [...key].length === 1 && parts.slice(0, -1).every((modifier) => modifier === 'shift')
-    )
+    return [...key].length === 1 && parts.slice(0, -1).every((modifier) => modifier === 'shift')
   }
 
   /** Whether a press is this chord, modifiers and all. */

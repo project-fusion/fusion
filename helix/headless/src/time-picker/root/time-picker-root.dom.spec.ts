@@ -479,15 +479,13 @@ describe('a grid of times that refuses or insists', () => {
 
 describe('the wheels stay inside the bounds', () => {
   const turn = async (host: Time, which: string, value: string): Promise<void> => {
-    host.shadowRoot
-      ?.querySelector(`[data-column="${which}"]`)
-      ?.dispatchEvent(
-        new CustomEvent('helix-before-change', {
-          bubbles: true,
-          composed: true,
-          detail: { value },
-        }),
-      )
+    host.shadowRoot?.querySelector(`[data-column="${which}"]`)?.dispatchEvent(
+      new CustomEvent('helix-before-change', {
+        bubbles: true,
+        composed: true,
+        detail: { value },
+      }),
+    )
     await host.updateComplete
   }
 

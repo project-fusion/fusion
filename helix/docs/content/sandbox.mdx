@@ -100,8 +100,14 @@ registers your elements, for the reason under "How the preview is isolated".
 
 ```html
 <!doctype html>
-<link rel="stylesheet" href="/helix.css">
-<script src="/elements.js" defer></script>
+<link
+  href="/helix.css"
+  rel="stylesheet"
+>
+<script
+  defer
+  src="/elements.js"
+></script>
 <style id="example-styles"></style>
 <script defer>
   addEventListener('message', ({ data }) => {

@@ -161,7 +161,11 @@ is the map's. Give the container a position, such as `position: relative`:
 
 ```html
 <section class="hero">
-  <helix-map fill credit-placement="bottom-end" label="Downtown Austin">
+  <helix-map
+    credit-placement="bottom-end"
+    fill
+    label="Downtown Austin"
+  >
     <div id="map"></div>
   </helix-map>
   <div class="hero-words">
@@ -235,7 +239,10 @@ A map embedded in a page, such as a hero, takes the wheel from a reader who is
 scrolling past it. Set `gestures` on the frame to share them:
 
 ```html
-<helix-map gestures="cooperative" label="Downtown Austin">
+<helix-map
+  gestures="cooperative"
+  label="Downtown Austin"
+>
   <div id="map"></div>
 </helix-map>
 ```
