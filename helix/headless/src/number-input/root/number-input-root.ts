@@ -146,6 +146,18 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   decrementLabel = 'Decrease'
 
   /**
+   * `Intl.NumberFormat` options the number is shown with while the field is
+   * not being edited: a currency, a percent, a unit, or a number of decimals.
+   * Written as JSON in the attribute.
+   *
+   * ```html
+   * <helix-number-input format-options='{"style":"currency","currency":"EUR"}'></helix-number-input>
+   * ```
+   */
+  @property({ attribute: 'format-options', type: Object })
+  formatOptions?: Intl.NumberFormatOptions
+
+  /**
    * The name of the step up button, read by screen readers.
    */
   @property({ attribute: 'increment-label' })
@@ -158,18 +170,6 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * and a property because ten of a step of `0.01` is a hundredth and rarely
    * what a reader wants from a whole key.
    */
-  /**
-   * `Intl.NumberFormat` options the number is shown with while the field is
-   * not being edited: a currency, a percent, a unit, or a number of decimals.
-   * Written as JSON in the attribute.
-   *
-   * ```html
-   * <helix-number-input format-options='{"style":"currency","currency":"EUR"}'></helix-number-input>
-   * ```
-   */
-  @property({ attribute: 'format-options', type: Object })
-  formatOptions?: Intl.NumberFormatOptions
-
   @property({ attribute: 'large-step', type: Number })
   largeStep?: number
 
@@ -212,13 +212,6 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * The message the browser shows when the number is above `max`, with `{max}`
    * filled in.
    */
-  /**
-   * What the field is described as on iOS and iPadOS, where it carries no
-   * spinbutton role. See the class description.
-   */
-  @property({ attribute: 'role-description' })
-  roleDescription = 'number field'
-
   @property({ attribute: 'range-overflow-message' })
   rangeOverflowMessage?: string
 
@@ -234,6 +227,13 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
+
+  /**
+   * What the field is described as on iOS and iPadOS, where it carries no
+   * spinbutton role. See the class description.
+   */
+  @property({ attribute: 'role-description' })
+  roleDescription = 'number field'
 
   /**
    * Makes the label a grip that changes the value when it is dragged.

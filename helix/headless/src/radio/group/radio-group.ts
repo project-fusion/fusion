@@ -12,6 +12,9 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessRadio } from '../root/radio-root.js'
 
+/** The keys that move the answer in a radio group. */
+const MOVING_KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home'])
+
 /**
  * @summary A set of radios where exactly one can be chosen.
  *
@@ -62,9 +65,6 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  *
  * @cssstate invalid - The group has an error to show, from the browser's validation or from your `feedback`.
  */
-/** The keys that move the answer in a radio group. */
-const MOVING_KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home'])
-
 @customElement('helix-headless-radio-group')
 export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
   /**

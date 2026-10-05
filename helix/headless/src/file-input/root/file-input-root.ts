@@ -108,8 +108,8 @@ const kind = (file: File): string => {
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen files change, with their names, and cancelable. Canceling it keeps the files the field had, even when the browser has already written a new pick.
- * @event {Event} input - Fired after the value changes.
  * @event {CustomEvent} helix-reject - Fired when files arrive and some are refused. `detail.files` lists each with its `reason`: `type`, `size`, `count` or `invalid`, and your `validate` message.
+ * @event {Event} input - Fired after the value changes.
  *
  * @csspart control - The file input itself, which carries the label and validity.
  * @csspart detail - A file's name, with its size and type below it.
@@ -180,8 +180,12 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   locale = ''
 
   /**
-   * Whether more than one file can be chosen.
+   * The most files the field holds, under `multiple`. Files past it are
+   * refused.
    */
+  @property({ attribute: 'max-files', type: Number })
+  maxFiles?: number
+
   /**
    * The most bytes one file may have. A larger one is refused.
    */
@@ -189,12 +193,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   maxFileSize?: number
 
   /**
-   * The most files the field holds, under `multiple`. Files past it are
-   * refused.
+   * Whether more than one file can be chosen.
    */
-  @property({ attribute: 'max-files', type: Number })
-  maxFiles?: number
-
   @property({ reflect: true, type: Boolean })
   multiple = false
 

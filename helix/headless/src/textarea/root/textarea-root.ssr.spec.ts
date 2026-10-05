@@ -88,8 +88,11 @@ describe('textarea server output', () => {
   })
 
   test('the field serves a start and an end slot either side of the text', () => {
-    const markup = ssr(html`<helix-headless-textarea label="Notes"></helix-headless-textarea>`)
-    expect(markup).toMatch(/<slot name="start"><\/slot>\s*(<!--[^>]*-->\s*)*<textarea/)
-    expect(markup).toMatch(/<\/textarea>\s*(<!--[^>]*-->\s*)*<slot name="end">/)
+    const shown = rendered(
+      ssr(html`<helix-headless-textarea label="Notes"></helix-headless-textarea>`),
+      'helix-headless-textarea',
+    )
+    expect(shown).toMatch(/<slot name="start"><\/slot>\s*(<!--[^>]*-->\s*)*<textarea/)
+    expect(shown).toMatch(/<\/textarea>\s*(<!--[^>]*-->\s*)*<slot name="end">/)
   })
 })
