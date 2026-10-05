@@ -28,9 +28,37 @@ describe('the words a dialog is described by', () => {
     expect(text(wordsIn(slot))).toEqual(['One.'])
   })
 
-  test('stop at a custom element, which may draw a control', () => {
+  test('stop at a custom element that has not upgraded, which may draw a control', () => {
     const slot = slotted('<helix-headless-input></helix-headless-input><p>After.</p>')
     expect(wordsIn(slot)).toEqual([])
+  })
+
+  test('go on through a custom element that has upgraded and draws no control', () => {
+    if (!customElements.get('x-words')) {
+      class Words extends HTMLElement {
+        constructor() {
+          super()
+          this.attachShadow({ mode: 'open' }).innerHTML = '<slot></slot>'
+        }
+      }
+      customElements.define('x-words', Words)
+    }
+    const slot = slotted('<x-words>One.</x-words><p>Two.</p>')
+    expect(text(wordsIn(slot))).toEqual(['One.', 'Two.'])
+  })
+
+  test('stop at a custom element that takes focus', () => {
+    if (!customElements.get('x-field')) {
+      class Field extends HTMLElement {
+        constructor() {
+          super()
+          this.attachShadow({ delegatesFocus: true, mode: 'open' }).innerHTML = '<input>'
+        }
+      }
+      customElements.define('x-field', Field)
+    }
+    const slot = slotted('<p>One.</p><x-field></x-field><p>After.</p>')
+    expect(text(wordsIn(slot))).toEqual(['One.'])
   })
 
   test('leave out an element with no words in it', () => {

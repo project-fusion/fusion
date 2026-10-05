@@ -434,7 +434,7 @@ describe('the close control', () => {
 })
 
 describe('the snap point it rests at', () => {
-  type Snapping = Drawer & { snapTo(point: number): void }
+  type Snapping = Drawer & { snap: number; snapTo(point: number): void }
   const sheet = async (): Promise<Snapping> => {
     const drawer = (await mount(
       `<helix-headless-drawer label="Sheet" placement="bottom" snap-points="0.5 1">
@@ -447,24 +447,24 @@ describe('the snap point it rests at', () => {
     return drawer
   }
 
-  test('is on the panel, and the host says when it is short of the whole panel', async () => {
+  test('is `snap`, and the host says when it is short of the whole panel', async () => {
     const drawer = await sheet()
-    const panel = part(drawer, 'panel') as HTMLElement
-    expect(panel.style.getPropertyValue('--drawer-snap')).toBe('0.5')
+    expect(drawer.snap).toBe(0.5)
     expect(hasState(drawer, 'snapped')).toBe(true)
     drawer.snapTo(0.9)
-    expect(panel.style.getPropertyValue('--drawer-snap')).toBe('1')
+    expect(drawer.snap).toBe(1)
     expect(hasState(drawer, 'snapped')).toBe(false)
+    drawer.snapTo(0.4)
     drawer.close()
     await drawer.updateComplete
-    expect(panel.style.getPropertyValue('--drawer-snap')).toBe('')
+    expect([drawer.snap, hasState(drawer, 'snapped')]).toEqual([1, false])
   })
 
-  test('is not written on a drawer without snap points', async () => {
-    const drawer = (await mount(markup)) as Drawer
+  test('is the whole panel on a drawer without snap points', async () => {
+    const drawer = (await mount(markup)) as Drawer & { snap: number }
     drawer.show()
     await drawer.updateComplete
-    expect((part(drawer, 'panel') as HTMLElement).style.getPropertyValue('--drawer-snap')).toBe('')
+    expect(drawer.snap).toBe(1)
     expect(hasState(drawer, 'snapped')).toBe(false)
   })
 
@@ -482,6 +482,6 @@ describe('the snap point it rests at', () => {
     expect(hasState(drawer, 'snapped')).toBe(true)
     low.focus()
     expect(hasState(drawer, 'snapped')).toBe(false)
-    expect((part(drawer, 'panel') as HTMLElement).style.getPropertyValue('--drawer-snap')).toBe('1')
+    expect(drawer.snap).toBe(1)
   })
 })
