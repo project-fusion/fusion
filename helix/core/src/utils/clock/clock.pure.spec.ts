@@ -1,46 +1,16 @@
 import { describe, expect, test } from 'bun:test'
+import { secondsAsValue } from '../value-as/value-as.js'
+import { writeClock } from '../write-time/write-time.js'
 import {
   clockLocale,
-  isClockValue,
   isTwelveHour,
   nearestTime,
   offeredTimes,
-  secondsAsValue,
-  valueAsSeconds,
+  timeBarred,
+  timeFault,
   wheelParts,
   wholeHour,
-  writeClock,
 } from './clock.js'
-
-describe('reading and writing a time', () => {
-  test('reads both shapes, and nothing out of range', () => {
-    expect(valueAsSeconds('09:30')).toBe(34_200)
-    expect(valueAsSeconds('09:30:15')).toBe(34_215)
-    expect(valueAsSeconds('24:00')).toBeNull()
-    expect(valueAsSeconds('09:60')).toBeNull()
-    expect(valueAsSeconds('9:30')).toBeNull()
-  })
-
-  test('holds seconds only where asked', () => {
-    expect(isClockValue('09:30')).toBe(true)
-    expect(isClockValue('09:30:15')).toBe(false)
-    expect(isClockValue('09:30:15', true)).toBe(true)
-    expect(isClockValue('09:30', true)).toBe(true)
-  })
-
-  test('writes a value, wrapping past midnight', () => {
-    expect(secondsAsValue(34_215)).toBe('09:30')
-    expect(secondsAsValue(34_215, true)).toBe('09:30:15')
-    expect(secondsAsValue(86_400 + 60)).toBe('00:01')
-  })
-
-  test('writes a time the way the locale does, to the second where asked', () => {
-    expect(writeClock('14:05', 'en-US')).toBe('2:05 PM')
-    expect(writeClock('14:05:09', 'en-US', true)).toBe('2:05:09 PM')
-    expect(writeClock('14:05', 'en-GB')).toBe('14:05')
-    expect(writeClock('half past', 'en-US')).toBe('half past')
-  })
-})
 
 describe('the clock a locale writes on', () => {
   test('is the locale’s own unless a cycle is given', () => {
@@ -89,5 +59,42 @@ describe('the wheels', () => {
     expect(wholeHour(12, 'PM')).toBe(12)
     expect(wholeHour(1, 'PM')).toBe(13)
     expect(wholeHour(17)).toBe(17)
+  })
+})
+
+describe('what is wrong with a time', () => {
+  const rules = { disableTimes: '12:00, 13:30:00', max: '17:00', min: '09:00' }
+
+  test('a time before min, then past max', () => {
+    expect(timeFault('08:59', rules)).toBe('rangeUnderflow')
+    expect(timeFault('17:00:01', rules)).toBe('rangeOverflow')
+    expect(timeFault('09:00', rules)).toBeNull()
+    expect(timeFault('17:00', rules)).toBeNull()
+  })
+
+  test('with no bounds, the whole day', () => {
+    const open = { disableTimes: '', max: '', min: '' }
+    expect(timeFault('00:00', open)).toBeNull()
+    expect(timeFault('23:59:59', open)).toBeNull()
+  })
+
+  test('a time barred by name, to the minute or the second alike', () => {
+    expect(timeFault('12:00:00', rules)).toBe('unavailable')
+    expect(timeFault('13:30', rules)).toBe('unavailable')
+    expect(timeBarred(12 * 3600, rules.disableTimes)).toBe(true)
+    expect(timeBarred(12 * 3600 + 1, rules.disableTimes)).toBe(false)
+  })
+
+  test('a time off the times on offer, only where they are given', () => {
+    const offered = offeredTimes('09:00', '17:00', 30)
+    expect(timeFault('09:15', { ...rules, offered })).toBe('stepMismatch')
+    expect(timeFault('09:30', { ...rules, offered })).toBeNull()
+    expect(timeFault('09:15', rules)).toBeNull()
+  })
+
+  test('the bounds are asked before the name, and the name before the step', () => {
+    const offered = offeredTimes('09:00', '17:00', 60)
+    expect(timeFault('08:00', { ...rules, disableTimes: '08:00', offered })).toBe('rangeUnderflow')
+    expect(timeFault('12:00', { ...rules, offered: [] })).toBe('unavailable')
   })
 })

@@ -1,30 +1,29 @@
 import {
+  clockLocale,
   customElement,
+  dayPeriod,
   elementById,
   fillTemplate,
   type HelixBeforeChangeEvent,
   HelixFormElement,
-  inlineStep,
-  MixinControllerValue,
-  reportValues,
-  writtenList,
-} from '@fusion.dev/helix-core'
-import { nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
-import { html } from 'lit/static-html.js'
-import {
-  clockLocale,
-  dayPeriod,
   type HourCycle,
+  inlineStep,
   isTwelveHour,
+  MixinControllerValue,
   nearestTime,
   offeredTimes,
+  reportValues,
   secondsAsValue,
+  timeBarred,
+  timeFault,
   valueAsSeconds,
   wheelParts,
   wholeHour,
   writeClock,
-} from '../clock.js'
+} from '@fusion.dev/helix-core'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
 /* Relative, so this registers the headless elements and the styled file's
    identical imports register the styled ones. `tier` picks which the template
    asks for. */
@@ -291,7 +290,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   /** The same question of seconds since midnight, matching `09:30` and `09:30:00` alike. */
   private barredAt(at: number): boolean {
-    return writtenList(this.disableTimes).some((one) => valueAsSeconds(one) === at)
+    return timeBarred(at, this.disableTimes)
   }
 
   /**
@@ -593,32 +592,35 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * submitted, where a native time input reports the bound it is past.
    */
   private fault(at: string): [keyof ValidityStateFlags, string] | undefined {
-    const seconds = valueAsSeconds(at) ?? 0
-    const floor = valueAsSeconds(this.min) ?? 0
-    const ceiling = valueAsSeconds(this.max) ?? 86_399
-    if (seconds < floor) {
-      return [
-        'rangeUnderflow',
-        fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
-          min: writeClock(this.min, this.clock, this.seconds),
-        }),
-      ]
+    switch (
+      timeFault(at, {
+        disableTimes: this.disableTimes,
+        max: this.max,
+        min: this.min,
+        offered: this.times,
+      })
+    ) {
+      case 'rangeUnderflow':
+        return [
+          'rangeUnderflow',
+          fillTemplate(this.rangeUnderflowMessage || 'Choose a time at or after {min}.', {
+            min: writeClock(this.min, this.clock, this.seconds),
+          }),
+        ]
+      case 'rangeOverflow':
+        return [
+          'rangeOverflow',
+          fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
+            max: writeClock(this.max, this.clock, this.seconds),
+          }),
+        ]
+      case 'unavailable':
+        return ['badInput', this.unavailableMessage || 'Choose a time that is available.']
+      case 'stepMismatch':
+        return ['stepMismatch', this.stepMismatchMessage || 'Choose one of the times on offer.']
+      default:
+        return undefined
     }
-    if (seconds > ceiling) {
-      return [
-        'rangeOverflow',
-        fillTemplate(this.rangeOverflowMessage || 'Choose a time at or before {max}.', {
-          max: writeClock(this.max, this.clock, this.seconds),
-        }),
-      ]
-    }
-    if (this.barred(at)) {
-      return ['badInput', this.unavailableMessage || 'Choose a time that is available.']
-    }
-    if (!this.times.includes(seconds)) {
-      return ['stepMismatch', this.stepMismatchMessage || 'Choose one of the times on offer.']
-    }
-    return undefined
   }
 
   /**

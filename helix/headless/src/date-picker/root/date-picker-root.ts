@@ -1,5 +1,9 @@
 import {
+  addDays,
+  addMonths,
   valueAsDate as asDate,
+  barredBy,
+  type CalendarView,
   customElement,
   fillTemplate,
   dateAsValue as fromDate,
@@ -7,28 +11,25 @@ import {
   HelixNavigateEvent,
   hostAria,
   inlineStep,
+  datesIn as list,
+  localToday,
   MixinControllerValue,
+  monthOf,
+  monthOut,
+  periodCells,
+  periodKey,
   reportValues,
   requestChange,
+  sameMonth,
+  weekStartOf,
+  YEARS_SHOWN,
+  yearOut,
+  yearPageOf,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import {
-  addDays,
-  addMonths,
-  barredBy,
-  type CalendarView,
-  datesIn as list,
-  localToday,
-  monthOf,
-  periodMove,
-  sameMonth,
-  weekStartOf,
-  YEARS_SHOWN,
-  yearPageOf,
-} from '../calendar.js'
 
 /** Keys the grid answers to, per the APG date grid. */
 const KEYS = new Set([
@@ -633,19 +634,12 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
 
   /** Whether a month, as its first day, lies wholly outside `min` and `max`. */
   private monthOut(first: Date): boolean {
-    const month = monthOf(first)
-    return (
-      (this.min !== '' && month < this.min.slice(0, 7)) ||
-      (this.max !== '' && month > this.max.slice(0, 7))
-    )
+    return monthOut(first, this.min, this.max)
   }
 
   /** Whether a year lies wholly outside `min` and `max`. */
   private yearOut(year: number): boolean {
-    return (
-      (this.min !== '' && year < Number(this.min.slice(0, 4))) ||
-      (this.max !== '' && year > Number(this.max.slice(0, 4)))
-    )
+    return yearOut(year, this.min, this.max)
   }
 
   /** Changes the view, and takes focus to its tab stop once it has drawn. */
@@ -743,21 +737,19 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
       this.choosePeriod(stop)
       return
     }
-    const index = this.view === 'year' ? stop - yearPageOf(stop) : stop
-    const delta = periodMove(event.key, index, inlineStep(this, event.key))
-    if (delta === null) {
+    const moved = periodKey(
+      this.view === 'year' ? 'year' : 'month',
+      stop,
+      this.periodYear,
+      event.key,
+      inlineStep(this, event.key),
+    )
+    if (moved === null) {
       return
     }
     event.preventDefault()
-    if (this.view === 'year') {
-      const year = stop + delta
-      this.periodFocus = year
-      this.pageYear = year
-    } else {
-      const months = this.periodYear * 12 + stop + delta
-      this.pageYear = Math.floor(months / 12)
-      this.periodFocus = ((months % 12) + 12) % 12
-    }
+    this.periodFocus = moved.focus
+    this.pageYear = moved.pageYear
     void this.updateComplete.then(() => this.focus())
   }
 
@@ -1289,18 +1281,15 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
           new Date(Date.UTC(page + YEARS_SHOWN - 1, 0, 1)),
         )}`
       : yearName.format(new Date(Date.UTC(page, 0, 1)))
-    const today = localToday()
     const stop = this.periodStop
-    const cells = Array.from({ length: 12 }, (_, index) => {
-      const at = years ? page + index : index
-      const first = new Date(Date.UTC(years ? at : page, years ? 0 : index, 1))
-      const out = years ? this.yearOut(at) : this.monthOut(first)
-      const current = years
-        ? String(at) === today.slice(0, 4)
-        : monthOf(first) === today.slice(0, 7)
-      const chosen = years
-        ? at === this.shown.getUTCFullYear()
-        : monthOf(first) === monthOf(this.shown)
+    const cells = periodCells({
+      max: this.max,
+      min: this.min,
+      page: this.periodYear,
+      shown: this.shown,
+      today: localToday(),
+      view: years ? 'year' : 'month',
+    }).map(({ at, chosen, current, first, out }) => {
       const words = years ? yearName.format(first) : monthName.format(first)
       return html`<span
         part="period${chosen ? ' period-selected' : ''}${current ? ' period-current' : ''}${out ? ' period-disabled' : ''}"

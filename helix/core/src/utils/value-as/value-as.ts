@@ -154,6 +154,47 @@ export const minutesAsValue = (minutes: number): string => {
 /** Whether a value is a time these controls can hold, which is minute precision. */
 export const isTimeValue = (value: string): boolean => valueAsMinutes(value) !== null
 
+/** `HH:mm`, or `HH:mm:ss`, on a twenty-four hour clock. */
+const CLOCK = /^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/
+
+/** The seconds in a day. */
+const DAY_SECONDS = 86_400
+
+/**
+ * The seconds since midnight a value names, or `null` where it is not a time.
+ *
+ * **To the second, which is what Time Picker and Time Input hold under
+ * `seconds`.** `valueAsMinutes` above stays at minute precision for the
+ * controls that never carry one. Both shapes are read whatever a control
+ * writes, so a value with seconds handed to a field without them is a time it
+ * can judge, off its step, rather than text it cannot read.
+ */
+export const valueAsSeconds = (value: string): number | null => {
+  const parts = CLOCK.exec(value.trim())
+  if (!parts) {
+    return null
+  }
+  return Number(parts[1]) * 3600 + Number(parts[2]) * 60 + Number(parts[3] ?? 0)
+}
+
+/**
+ * Whether a value is a time a control holds: `HH:mm`, or either shape where it
+ * holds `seconds`.
+ */
+export const isClockValue = (value: string, seconds = false): boolean =>
+  valueAsSeconds(value) !== null && (seconds || value.trim().length === 5)
+
+/**
+ * Seconds since midnight as `HH:mm`, or `HH:mm:ss` with `seconds`, wrapping
+ * rather than running off the day.
+ */
+export const secondsAsValue = (at: number, seconds = false): string => {
+  const whole = ((Math.round(at) % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS
+  const pad = (part: number): string => String(part).padStart(2, '0')
+  const clock = `${pad(Math.floor(whole / 3600))}:${pad(Math.floor(whole / 60) % 60)}`
+  return seconds ? `${clock}:${pad(whole % 60)}` : clock
+}
+
 /**
  * The number a value holds, or `NaN`.
  *

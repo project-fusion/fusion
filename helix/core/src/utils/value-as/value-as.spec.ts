@@ -1,14 +1,17 @@
 import { describe, expect, test } from 'bun:test'
 import {
   dateAsValue,
+  isClockValue,
   isDateValue,
   isTimeValue,
   minutesAsValue,
   numberAsValue,
+  secondsAsValue,
   timeAsValue,
   valueAsDate,
   valueAsMinutes,
   valueAsNumber,
+  valueAsSeconds,
   valueAsTime,
 } from './value-as.js'
 
@@ -155,5 +158,30 @@ describe('a time as minutes since midnight', () => {
     expect(isTimeValue('09:30')).toBe(true)
     expect(isTimeValue('10:30:00')).toBe(false)
     expect(isTimeValue('')).toBe(false)
+  })
+})
+
+describe('a time to the second', () => {
+  test('reads both shapes, and nothing out of range', () => {
+    expect(valueAsSeconds('09:30')).toBe(34_200)
+    expect(valueAsSeconds('09:30:15')).toBe(34_215)
+    expect(valueAsSeconds(' 09:30 ')).toBe(34_200)
+    expect(valueAsSeconds('24:00')).toBeNull()
+    expect(valueAsSeconds('09:60')).toBeNull()
+    expect(valueAsSeconds('9:30')).toBeNull()
+  })
+
+  test('holds seconds only where asked', () => {
+    expect(isClockValue('09:30')).toBe(true)
+    expect(isClockValue('09:30:15')).toBe(false)
+    expect(isClockValue('09:30:15', true)).toBe(true)
+    expect(isClockValue('09:30', true)).toBe(true)
+  })
+
+  test('writes a value, wrapping past midnight', () => {
+    expect(secondsAsValue(34_215)).toBe('09:30')
+    expect(secondsAsValue(34_215, true)).toBe('09:30:15')
+    expect(secondsAsValue(86_400 + 60)).toBe('00:01')
+    expect(secondsAsValue(-60)).toBe('23:59')
   })
 })

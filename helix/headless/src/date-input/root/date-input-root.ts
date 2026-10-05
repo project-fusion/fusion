@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   valueAsDate as asDate,
+  barredBy,
   customElement,
   fillTemplate,
   dateAsValue as fromDate,
@@ -20,7 +21,6 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
-import { barredBy } from '../../date-picker/calendar.js'
 import '../../date-picker/index.js'
 import '../../tag/index.js'
 
