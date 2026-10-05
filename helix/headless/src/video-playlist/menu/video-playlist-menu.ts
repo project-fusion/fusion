@@ -7,7 +7,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { list } from '@fusion.dev/helix-icons'
 import { nothing, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
 import { HelixHeadlessVideoPlaylist } from '../root/video-playlist-root.js'
@@ -68,6 +68,22 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
    */
   @property()
   placement = 'top-end'
+
+  /** Whether the menu is open, for the built-in trigger to say so. */
+  @state()
+  private open = false
+
+  /**
+   * Notes the menu opening and closing, for the built-in trigger.
+   *
+   * The trigger is this element's own button, so the state is written onto it
+   * here. The menu cannot write onto a plain button slotted into it.
+   */
+  private readonly heardToggle = (event: Event): void => {
+    if (event.target === event.currentTarget) {
+      this.open = (event as Event & { newState?: string }).newState === 'open'
+    }
+  }
 
   private observer: MutationObserver | undefined
 
@@ -172,12 +188,18 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
 
   /** The menu itself, behind a method so a styled tier can render another one. */
   protected renderMenu(): TemplateResult {
-    const active = this.playlist?.active
     return html`<${this.tag('menu')} part="menu"
     exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
-      live: menu-live, loading: menu-loading, surface: menu-surface, title: menu-title" label=${this.label} placement=${this.placement}>
+      live: menu-live, loading: menu-loading, surface: menu-surface, title: menu-title" label=${this.label} placement=${this.placement}
+      @toggle=${this.heardToggle}>
       <slot name="trigger" slot="trigger">
-        <button part="trigger" type="button" aria-label=${this.label}>${drawIcon(list)}</button>
+        <button
+          part="trigger"
+          type="button"
+          aria-label=${this.label}
+          aria-haspopup="menu"
+          aria-expanded=${this.open ? 'true' : 'false'}
+        >${drawIcon(list)}</button>
       </slot>
       ${this.entries.map(
         (entry) => html`<${this.tag('menu-item')}
@@ -185,7 +207,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
       exportparts="item: entry-item, mark: entry-mark, start: entry-start"
           value=${entry.value}
           checkable
-          ?checked=${entry.value === active}
+          ?checked=${entry.current}
           ?disabled=${entry.disabled}
           exclusive
           @helix-select=${(event: Event) => {

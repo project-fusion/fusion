@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -189,6 +189,61 @@ describe('video playlist menu', () => {
     menu.dispatchEvent(new CustomEvent('helix-before-open', { bubbles: true, composed: true }))
     await menu.updateComplete
     expect(await ticked(menu)).toEqual(['false', 'true', 'false'])
+  })
+
+  /* The playlist plays its first entry when nothing names one, and the menu
+     marked no entry until one was named. */
+  test('marks the entry playing when nothing named it', async () => {
+    const playlist = (await mount(`<helix-headless-video-playlist label="Episodes">
+      <helix-headless-video label="Player" slot="player">
+        <helix-headless-video-playlist-menu slot="controls"></helix-headless-video-playlist-menu>
+      </helix-headless-video>
+      <helix-headless-video-playlist-item src="/one.mp4" value="one">One</helix-headless-video-playlist-item>
+      <helix-headless-video-playlist-item src="/two.mp4" value="two">Two</helix-headless-video-playlist-item>
+    </helix-headless-video-playlist>`)) as Playlist
+    const menu = playlist.querySelector('helix-headless-video-playlist-menu') as Menu
+    await playlist.updateComplete
+    await menu.updateComplete
+    menu.dispatchEvent(new CustomEvent('helix-before-open', { bubbles: true, composed: true }))
+    await menu.updateComplete
+    expect(await ticked(menu)).toEqual(['true', 'false'])
+  })
+
+  test('its trigger says it opens a menu, and whether the menu is open', async () => {
+    const { menu } = await mountMenu()
+    const trigger = part(menu, 'trigger') as HTMLElement
+    expect(trigger.getAttribute('aria-haspopup')).toBe('menu')
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    const inner = part(menu, 'menu') as HTMLElement
+    inner.dispatchEvent(
+      Object.assign(new Event('toggle'), { newState: 'open', oldState: 'closed' }),
+    )
+    await menu.updateComplete
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  /* The menu sits in the player's bar, so its keys bubbled to the player:
+     ArrowDown lowered the volume and Space toggled playback. Browser only:
+     happy-dom does not carry an event from a slotted node through its slot, so
+     the press never reaches the player there and this passes against code that
+     takes it. */
+  ;(hasLayout() ? test : test.skip)('its keys stay its own inside the player', async () => {
+    const { menu, playlist } = await mountMenu()
+    const player = playlist.querySelector('helix-headless-video') as HTMLElement
+    const video = player.shadowRoot?.querySelector('video') as HTMLVideoElement
+    let toggles = 0
+    video.play = () => {
+      toggles += 1
+      return Promise.resolve()
+    }
+    const volume = video.volume
+    for (const key of ['ArrowDown', ' ']) {
+      entries(menu)[1]?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+    }
+    expect(video.volume).toBe(volume)
+    expect(toggles).toBe(0)
   })
 
   test('names itself and its trigger from one property', async () => {

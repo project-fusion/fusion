@@ -692,3 +692,73 @@ describe('what the player says', () => {
     expect(part(host, 'failure')?.textContent?.trim()).toBe('No luck with that one')
   })
 })
+
+/* Space is how a button is pressed. The stage took every key that bubbled to
+ * it, so Space on Mute played the video and left it unmuted, and a menu row
+ * chosen with Space also toggled playback. */
+describe('the keys around the controls', () => {
+  const press = (target: Element, key: string): boolean =>
+    target.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+
+  /** The player, with play and pause counted instead of played. */
+  const counted = async (markup?: string): Promise<{ host: Player; toggles: () => number }> => {
+    const host = await player(markup)
+    const video = part(host, 'video') as HTMLVideoElement
+    let toggles = 0
+    video.play = () => {
+      toggles += 1
+      return Promise.resolve()
+    }
+    video.pause = () => {
+      toggles += 1
+    }
+    return { host, toggles: () => toggles }
+  }
+
+  test('Space on a control is the control’s, and Space on the picture plays', async () => {
+    const { host, toggles } = await counted()
+    press(part(host, 'mute') as Element, ' ')
+    expect(toggles()).toBe(0)
+    press(part(host, 'stage') as Element, ' ')
+    expect(toggles()).toBe(1)
+  })
+
+  test('a press a control already handled is left alone', async () => {
+    const { host, toggles } = await counted()
+    const mute = part(host, 'mute') as Element
+    mute.addEventListener('keydown', (event) => event.preventDefault())
+    press(mute, 'k')
+    expect(toggles()).toBe(0)
+  })
+
+  test('a press inside the player’s menu is the menu’s', async () => {
+    const { host, toggles } = await counted(
+      '<helix-headless-video label="A clip" src="/clip.mp4" overflow-controls="next"></helix-headless-video>',
+    )
+    const video = part(host, 'video') as HTMLVideoElement
+    const row = host.shadowRoot?.querySelector('[part="entry"]') as Element
+    const volume = video.volume
+    press(row, 'ArrowDown')
+    press(row, ' ')
+    expect(video.volume).toBe(volume)
+    expect(toggles()).toBe(0)
+  })
+
+  /* The player's menus are opened by its own buttons, which said neither that
+     they open a menu nor whether it was open, and Helix warned about its own
+     markup. */
+  test('a menu button says it opens a menu, and whether the menu is open', async () => {
+    const host = await player(
+      '<helix-headless-video label="A clip" src="/clip.mp4" overflow-controls="next"></helix-headless-video>',
+    )
+    const more = part(host, 'more') as HTMLElement
+    expect(more.getAttribute('aria-haspopup')).toBe('menu')
+    expect(more.getAttribute('aria-expanded')).toBe('false')
+    const menu = part(host, 'overflow') as HTMLElement
+    menu.dispatchEvent(Object.assign(new Event('toggle'), { newState: 'open', oldState: 'closed' }))
+    await host.updateComplete
+    expect(more.getAttribute('aria-expanded')).toBe('true')
+  })
+})

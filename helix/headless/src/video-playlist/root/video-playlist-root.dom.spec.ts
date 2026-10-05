@@ -116,10 +116,13 @@ describe('a video playlist', () => {
     expect(host.active).toBe('two')
   })
 
+  /* As the player sends it: relayed from the `<video>` without bubbling, the
+     way the platform sends `ended`. A bubbling event here is what let the
+     playlist pass this while it never advanced behind a real player. */
   test('and reaching the end advances it too', async () => {
     const host = await list()
     await host.updateComplete
-    player(host).dispatchEvent(new Event('ended', { bubbles: true }))
+    player(host).dispatchEvent(new Event('ended'))
     await host.updateComplete
     expect(host.active).toBe('two')
   })
@@ -129,7 +132,7 @@ describe('a video playlist', () => {
     await host.updateComplete
     host.requestActive('two')
     await host.updateComplete
-    player(host).dispatchEvent(new Event('ended', { bubbles: true }))
+    player(host).dispatchEvent(new Event('ended'))
     await host.updateComplete
     // Three is disabled, so there is nowhere after two to go.
     expect(host.active).toBe('two')

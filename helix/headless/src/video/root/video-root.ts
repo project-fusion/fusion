@@ -50,6 +50,7 @@ import { html } from 'lit/static-html.js'
    this tier writes the template and the styled tier inherits it without having
    a copy of its own to remind anyone. */
 import '../../menu/index.js'
+import { HelixHeadlessMenu } from '../../menu/root/menu-root.js'
 import { barControls, type Conditions, menuControls, ownFile } from './extra-controls.js'
 import { takeKey } from './keys.js'
 
@@ -552,6 +553,10 @@ export class HelixHeadlessVideo extends HelixElement {
 
   @state()
   private captioned = false
+
+  /** Which of the player's own menus is open, for its trigger to say so. */
+  @state()
+  private menuOpen: 'captions' | 'overflow' | undefined = undefined
 
   /**
    * Which caption track is showing, or `-1` for none.
@@ -1194,6 +1199,12 @@ export class HelixHeadlessVideo extends HelixElement {
     if (!video) {
       return
     }
+    /* A press inside a menu is the menu's, whether the menu is one of the
+       player's own or one slotted into the bar, the playlist's say: its arrows
+       move between rows and its Space chooses one. */
+    if (event.composedPath().some((node) => node instanceof HelixHeadlessMenu)) {
+      return
+    }
     const taken = takeKey(event, video, {
       fullscreen: () => void this.fullscreen.toggle(),
       seek: (seconds) => this.seek(seconds),
@@ -1431,8 +1442,16 @@ export class HelixHeadlessVideo extends HelixElement {
     return html`<${this.tag('menu')} part="captions-menu"
     exportparts="back: captions-menu-back, back-mark: captions-menu-back-mark, empty: captions-menu-empty,
       header: captions-menu-header, live: captions-menu-live, loading: captions-menu-loading, surface: captions-menu-surface,
-      title: captions-menu-title" label=${this.subtitlesLabel} placement="top-end">
-      <button part="captions" slot="trigger" type="button" aria-label=${this.subtitlesLabel}>
+      title: captions-menu-title" label=${this.subtitlesLabel} placement="top-end"
+      @toggle=${(event: Event) => this.heardMenu('captions', event)}>
+      <button
+        part="captions"
+        slot="trigger"
+        type="button"
+        aria-label=${this.subtitlesLabel}
+        aria-haspopup="menu"
+        aria-expanded=${this.menuOpen === 'captions' ? 'true' : 'false'}
+      >
         ${drawIcon(closedCaptioning)}
       </button>
       <${this.tag('menu-item')}
@@ -1459,6 +1478,25 @@ export class HelixHeadlessVideo extends HelixElement {
         </${this.tag('menu-item')}>`,
       )}
     </${this.tag('menu')}>`
+  }
+
+  /**
+   * Notes which menu opened or closed, so its trigger says so.
+   *
+   * **The trigger is this element's own button**, so the state is written onto
+   * it here: a menu cannot write onto a plain button slotted into it, and the
+   * button said neither that it opens a menu nor whether that menu was open.
+   */
+  private heardMenu(menu: 'captions' | 'overflow', event: Event): void {
+    if (event.target !== event.currentTarget) {
+      return
+    }
+    const open = (event as Event & { newState?: string }).newState === 'open'
+    if (open) {
+      this.menuOpen = menu
+    } else if (this.menuOpen === menu) {
+      this.menuOpen = undefined
+    }
   }
 
   /*
@@ -1605,8 +1643,16 @@ export class HelixHeadlessVideo extends HelixElement {
           : html`<${this.tag('menu')} part="overflow"
           exportparts="back: overflow-back, back-mark: overflow-back-mark, empty: overflow-empty,
             header: overflow-header, live: overflow-live, loading: overflow-loading, surface: overflow-surface,
-            title: overflow-title" label=${this.moreLabel} placement="top-end">
-              <button part="more" slot="trigger" type="button" aria-label=${this.moreLabel}>
+            title: overflow-title" label=${this.moreLabel} placement="top-end"
+            @toggle=${(event: Event) => this.heardMenu('overflow', event)}>
+              <button
+                part="more"
+                slot="trigger"
+                type="button"
+                aria-label=${this.moreLabel}
+                aria-haspopup="menu"
+                aria-expanded=${this.menuOpen === 'overflow' ? 'true' : 'false'}
+              >
                 ${drawIcon(dotsThreeVertical)}
               </button>
               ${this.overflow.map((one) => this.renderOverflowItem(one))}
