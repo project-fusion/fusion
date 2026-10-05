@@ -329,6 +329,7 @@ export {
 } from './utils/read-series/read-series.js'
 export {
   type Relative,
+  type RelativeOptions,
   relativeTime,
 } from './utils/relative-time/relative-time.js'
 export { measuring, RENDER_SLOT, reportRender } from './utils/report-render/report-render.js'

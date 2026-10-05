@@ -2,27 +2,16 @@ import {
   customElement,
   elapsedTime,
   HelixElement,
+  type Relative,
   relativeTime,
   subscribe,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { formatOptions } from '../options.js'
 
 /** A date with no time of day, `YYYY-MM-DD`, which names a day rather than an instant. */
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
-
-/** The `Intl.DateTimeFormat` options this element carries, in its own spelling. */
-interface Absolute {
-  day?: 'numeric' | '2-digit'
-  hour?: 'numeric' | '2-digit'
-  minute?: 'numeric' | '2-digit'
-  month?: 'numeric' | '2-digit' | 'long' | 'short' | 'narrow'
-  second?: 'numeric' | '2-digit'
-  timeZone?: string
-  timeZoneName?: 'long' | 'short'
-  weekday?: 'long' | 'short' | 'narrow'
-  year?: 'numeric' | '2-digit'
-}
 
 /**
  * @summary A timestamp, formatted for the user's locale.
@@ -35,6 +24,16 @@ interface Absolute {
  * "1d". After six days it shows a date. In en-US, `Intl.NumberFormat` narrow
  * renders both `minute` and `month` as `m`, so a compact "3m" could mean three
  * minutes or three months. `elapsedTime` in `helix/core` does the measurement.
+ *
+ * **`relative` shows the same reading in words**, such as "3 hours ago" at
+ * `long`, "3 hr. ago" at `short` and "3h ago" at `narrow`, the styles
+ * `sl-relative-time` offers. `numeric="always"` says "1 day ago" where the
+ * default says "yesterday".
+ *
+ * **`date-style` and `time-style` take each locale's own pattern**, such as
+ * "Tuesday, August 4, 2026" at `full`, and stand in for the separate fields,
+ * which `Intl` refuses beside them. `hour-cycle` sets a twelve or twenty-four
+ * hour clock either way.
  *
  * **The text refreshes on one timer shared by the page.** Each element
  * schedules an update for when its current reading expires, and an element
@@ -81,6 +80,13 @@ export class HelixHeadlessFormatDate extends HelixElement {
   date = ''
 
   /**
+   * The locale's own pattern for the date: `full`, `long`, `medium`, or
+   * `short`. Set, it stands in for `weekday`, `day`, `month`, `year` and `era`.
+   */
+  @property({ attribute: 'date-style' })
+  dateStyle?: 'full' | 'long' | 'medium' | 'short'
+
+  /**
    * How the day of the month is written, where a date is shown.
    */
   @property()
@@ -98,10 +104,26 @@ export class HelixHeadlessFormatDate extends HelixElement {
   elapsed = false
 
   /**
+   * How the era is written, such as AD, where a date is shown.
+   */
+  @property()
+  era?: 'long' | 'narrow' | 'short'
+
+  /**
    * How the hour is written, where a time of day is shown.
    */
   @property()
   hour?: 'numeric' | '2-digit'
+
+  /**
+   * The clock a time of day is written on: `h12` or `h11` for twelve hours,
+   * `h23` or `h24` for twenty-four.
+   *
+   * Absent is the locale's own, which is right unless your product shows every
+   * reader the same clock whatever their language.
+   */
+  @property({ attribute: 'hour-cycle' })
+  hourCycle?: 'h11' | 'h12' | 'h23' | 'h24'
 
   /**
    * The locale to format the timestamp in.
@@ -124,10 +146,36 @@ export class HelixHeadlessFormatDate extends HelixElement {
   month?: 'numeric' | '2-digit' | 'long' | 'short' | 'narrow'
 
   /**
+   * Whether a `relative` reading may use a word for a number: `auto` says
+   * "yesterday" and "now", and `always` says "1 day ago" and "in 0 seconds".
+   */
+  @property()
+  numeric?: 'always' | 'auto'
+
+  /**
+   * Shows how long ago the timestamp was, or how long until it, in words, in
+   * place of the date: `long` ("3 hours ago"), `short` ("3 hr. ago") or
+   * `narrow` ("3h ago").
+   *
+   * The reading refreshes as it goes stale, as `elapsed` does, and the whole
+   * date is its title. `elapsed` wins where both are set.
+   */
+  @property()
+  relative?: 'long' | 'narrow' | 'short'
+
+  /**
    * How the second is written, where a time of day is shown.
    */
   @property()
   second?: 'numeric' | '2-digit'
+
+  /**
+   * The locale's own pattern for the time of day: `full`, `long`, `medium`, or
+   * `short`. Set, it stands in for `hour`, `minute`, `second` and
+   * `time-zone-name`.
+   */
+  @property({ attribute: 'time-style' })
+  timeStyle?: 'full' | 'long' | 'medium' | 'short'
 
   /**
    * The time zone to read the timestamp in.
@@ -191,41 +239,38 @@ export class HelixHeadlessFormatDate extends HelixElement {
   }
 
   /** Every `Intl.DateTimeFormat` option a consumer set, and none they did not. */
-  private get options(): Absolute {
-    const asked: Absolute = {}
-    if (this.day) {
-      asked.day = this.day
-    }
-    if (this.hour) {
-      asked.hour = this.hour
-    }
-    if (this.minute) {
-      asked.minute = this.minute
-    }
-    if (this.month) {
-      asked.month = this.month
-    }
-    if (this.second) {
-      asked.second = this.second
-    }
-    /* A day with no time is midnight UTC once parsed, and read in a zone west
-       of it that is the day before. Measured before this: `2026-08-04` read
-       "August 3, 2026" in Los Angeles. */
-    if (this.timeZone) {
-      asked.timeZone = this.timeZone
-    } else if (this.dateOnly) {
-      asked.timeZone = 'UTC'
-    }
-    if (this.timeZoneName) {
-      asked.timeZoneName = this.timeZoneName
-    }
-    if (this.weekday) {
-      asked.weekday = this.weekday
-    }
-    if (this.year) {
-      asked.year = this.year
-    }
-    return asked
+  private get options(): Intl.DateTimeFormatOptions {
+    return formatOptions({
+      dateOnly: this.dateOnly,
+      dateStyle: this.dateStyle,
+      day: this.day,
+      era: this.era,
+      hour: this.hour,
+      hourCycle: this.hourCycle,
+      minute: this.minute,
+      month: this.month,
+      second: this.second,
+      timeStyle: this.timeStyle,
+      timeZone: this.timeZone,
+      timeZoneName: this.timeZoneName,
+      weekday: this.weekday,
+      year: this.year,
+    })
+  }
+
+  /** Whether the reading is how long ago rather than the date. */
+  private get reading(): boolean {
+    return this.elapsed || this.relative !== undefined
+  }
+
+  /** What the reading says now, and when it stops being true. */
+  private readingAt(moment: Date, now: Date): Relative {
+    return this.elapsed
+      ? elapsedTime(this.locale)(moment, now)
+      : relativeTime(this.locale, {
+          numeric: this.numeric ?? 'auto',
+          style: this.relative ?? 'long',
+        })(moment, now)
   }
 
   override connectedCallback(): void {
@@ -267,7 +312,13 @@ export class HelixHeadlessFormatDate extends HelixElement {
     if (this.childrenKnown) {
       this.read()
     }
-    if (changed.has('date') || changed.has('elapsed') || changed.has('locale')) {
+    if (
+      changed.has('date') ||
+      changed.has('elapsed') ||
+      changed.has('locale') ||
+      changed.has('numeric') ||
+      changed.has('relative')
+    ) {
       this.tick()
     }
   }
@@ -303,12 +354,12 @@ export class HelixHeadlessFormatDate extends HelixElement {
     this.stopTicking?.()
     this.stopTicking = undefined
     const moment = this.moment
-    if (!moment || !this.elapsed) {
+    if (!moment || !this.reading) {
       return
     }
     const now = new Date()
     this.clock = now.getTime()
-    const { next } = elapsedTime(this.locale)(moment, now)
+    const { next } = this.readingAt(moment, now)
     /* Only on a page. A server runs `willUpdate` and has nobody to update a
        reading for, and a subscription there is a timer up to an hour long that
        holds the element after its markup has been sent: measured, rendering the
@@ -325,7 +376,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
       return nothing
     }
     const datetime = this.dateOnly ? (this.date || this.written).trim() : moment.toISOString()
-    if (!this.elapsed) {
+    if (!this.reading) {
       const text = new Intl.DateTimeFormat(this.locale || undefined, this.options).format(moment)
       return html`<time part="time" datetime=${datetime}>${text}</time>`
     }
@@ -338,14 +389,18 @@ export class HelixHeadlessFormatDate extends HelixElement {
     const whole = new Intl.DateTimeFormat(this.locale || undefined, {
       dateStyle: 'long',
       ...(this.dateOnly ? {} : { timeStyle: 'short' }),
+      ...(this.hourCycle ? { hourCycle: this.hourCycle } : {}),
       ...(zone ? { timeZone: zone } : {}),
     }).format(moment)
+    /* Named in full whatever is shown, so "3h ago" at `narrow` is heard as
+       "3 hours ago", with the same choice of word or number. */
+    const spoken = relativeTime(this.locale, { numeric: this.numeric ?? 'auto' })(moment, now).text
     return html`<time
       part="time"
       datetime=${datetime}
-      aria-label=${relativeTime(this.locale)(moment, now).text}
+      aria-label=${spoken}
       title=${whole}
-    >${elapsedTime(this.locale)(moment, now).text}</time>`
+    >${this.readingAt(moment, now).text}</time>`
   }
 }
 
