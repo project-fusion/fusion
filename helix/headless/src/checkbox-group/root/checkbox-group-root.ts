@@ -7,8 +7,9 @@ import {
   hostAria,
   MixinField,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type ReactiveController, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type ReactiveController, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
 import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
 
 /**
@@ -27,6 +28,11 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * `value` is the checked values, separated by commas, in the order the
  * checkboxes are written, read from the boxes themselves. Setting it checks
  * exactly those values and unchecks the rest.
+ *
+ * `select-all` draws a box above the set that checks every enabled box, or
+ * unchecks them all once every one is checked. It shows a dash while only some
+ * are checked, and changes the set through the same cancelable
+ * `helix-before-change` a box does.
  *
  * A checkbox is a member wherever it sits inside the group, in a row or a grid
  * cell of your own, unless another group inside this one holds it. A field of
@@ -56,6 +62,7 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @csspart hint - The help under the checkboxes.
  * @csspart items - The element that holds the checkboxes, laid out by `orientation`.
  * @csspart label - The group's label, above the checkboxes.
+ * @csspart select-all - The box that checks or unchecks every box, under `select-all`.
  *
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  */
@@ -70,31 +77,59 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
    * The checked values, comma separated.
    *
    * Read from the boxes once they are known, so a box a script ticks directly
-   * is in it at once. Written, it is pushed onto the boxes.
+   * is in it at once. Written, it is pushed onto the boxes. A box whose value
+   * holds a comma cannot be named here: use `values`.
    */
   @property()
   get value(): string {
-    if (this.pending || !this.hasUpdated || !this.childrenKnown) {
-      return this.declared
-    }
-    const boxes = this.boxes
-    return boxes.length === 0
-      ? this.declared
-      : boxes
-          .filter((box) => box.checked)
-          .map((box) => box.value)
-          .join(',')
+    return this.values.join(',')
   }
 
   set value(next: string) {
-    const previous = this.declared
-    this.declared = next
+    this.values = next
+      .split(',')
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+  }
+
+  /**
+   * Whether a box above the set checks or unchecks every enabled box.
+   */
+  @property({ attribute: 'select-all', type: Boolean })
+  selectAll = false
+
+  /**
+   * The words beside the box `select-all` draws.
+   */
+  @property({ attribute: 'select-all-label' })
+  selectAllLabel = 'Select all'
+
+  /**
+   * The checked values, as a list, in the order the boxes are written.
+   *
+   * The same set as `value`, and the one to use where a value may hold a
+   * comma. Written, it checks exactly those boxes and unchecks the rest.
+   */
+  @property({ attribute: false })
+  get values(): string[] {
+    if (this.pending || !this.hasUpdated || !this.childrenKnown) {
+      return [...this.declared]
+    }
+    const boxes = this.boxes
+    return boxes.length === 0
+      ? [...this.declared]
+      : boxes.filter((box) => box.checked).map((box) => box.value)
+  }
+
+  set values(next: string[]) {
+    const previous = this.value
+    this.declared = [...next]
     this.pending = true
     this.requestUpdate('value', previous)
   }
 
-  /** The value last written, which the boxes are given at the next update. */
-  private declared = ''
+  /** The values last written, which the boxes are given at the next update. */
+  private declared: string[] = []
 
   /**
    * Whether `declared` has yet to reach the boxes.
@@ -126,7 +161,9 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
    */
   private readonly member: ReactiveController = {
     hostUpdated: () => {
-      if (this.isConnected && this.value !== this.judged) {
+      /* And under `select-all` on every box update, since the box above the
+         set draws what the boxes hold once they have taken a new value. */
+      if (this.isConnected && (this.selectAll || this.value !== this.judged)) {
         this.requestUpdate()
       }
     },
@@ -197,12 +234,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
       return
     }
     this.pending = false
-    const wanted = new Set(
-      this.declared
-        .split(',')
-        .map((entry) => entry.trim())
-        .filter(Boolean),
-    )
+    const wanted = new Set(this.declared)
     for (const box of boxes) {
       box.checked = wanted.has(box.value)
     }
@@ -258,13 +290,12 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     const next = this.boxes
       .filter((box) => (box === changed ? wanted : box.checked))
       .map((box) => box.value)
-      .join(',')
 
-    if (!this.dispatchEvent(new HelixBeforeChangeEvent({ value: next }))) {
+    if (!this.dispatchEvent(new HelixBeforeChangeEvent({ value: next.join(',') }))) {
       event.preventDefault()
       return
     }
-    this.value = next
+    this.values = next
     /* Under the platform's own name, after the value has moved, so a consumer
        binding `onChange` reads the group's new value off the target.
 
@@ -386,12 +417,61 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     this.linkHost()
   }
 
+  /**
+   * Checks every enabled box, or unchecks them all once every one is checked.
+   *
+   * The box's own request is refused, since the box shows what the set holds
+   * and the set is moved here, through one cancelable `helix-before-change`
+   * for the whole set, as a box moves it.
+   */
+  private readonly handleSelectAll = (event: Event): void => {
+    event.preventDefault()
+    event.stopPropagation()
+    const enabled = this.boxes.filter((box) => !box.isDisabled)
+    const every = enabled.length > 0 && enabled.every((box) => box.checked)
+    const next = this.boxes
+      .filter((box) => (enabled.includes(box) ? !every : box.checked))
+      .map((box) => box.value)
+    if (!this.dispatchEvent(new HelixBeforeChangeEvent({ value: next.join(',') }))) {
+      return
+    }
+    this.values = next
+    this.announceInput()
+    this.announceChange()
+  }
+
+  /**
+   * The box above the set that checks or unchecks every box, under
+   * `select-all`, behind a seam a tier can move.
+   *
+   * Checked while every box is, and showing a dash while only some are. It is
+   * in this shadow root, so it is no member of the set and submits nothing.
+   */
+  protected renderSelectAll(): TemplateResult | typeof nothing {
+    if (!this.selectAll) {
+      return nothing
+    }
+    const boxes = this.childrenKnown ? this.boxes : []
+    const ticked = boxes.filter((box) => box.checked).length
+    const every = boxes.length > 0 && ticked === boxes.length
+    const box = this.tag('checkbox')
+    return html`<${box}
+      part="select-all"
+      .checked=${every}
+      .indeterminate=${ticked > 0 && !every}
+      ?disabled=${this.isDisabled}
+      label=${this.selectAllLabel}
+      @helix-before-toggle=${this.handleSelectAll}
+      @input=${(event: Event) => event.stopPropagation()}
+    ></${box}>`
+  }
+
   protected override render(): TemplateResult {
     /* The list is an element of its own, because the label and the hint are the
        host's children too and `orientation` lays out whatever is in the flex
        container. On the host, a horizontal group would have put its own label
        in the row beside the first box. */
-    return html`${this.renderGroupLabel()}
+    return html`${this.renderGroupLabel()}${this.renderSelectAll()}
       <div part="items">
         ${
           /* A box arriving after first render has neither the shared name nor

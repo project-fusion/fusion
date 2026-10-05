@@ -28,6 +28,9 @@ import { property, state } from 'lit/decorators.js'
  * A read-only rating displays a score, which is the most common use. It is
  * announced as a displayed value and does not look disabled.
  *
+ * With `clearable`, pressing the chosen score again, or Backspace or Delete on
+ * the marks, takes the rating back to unrated and sends `helix-clear`.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -41,6 +44,7 @@ import { property, state } from 'lit/decorators.js'
  *
  * @event {Event} change - The score was chosen. Sent together with `input`, because each choice commits the score.
  * @event {HelixBeforeChangeEvent} helix-before-change - The score is about to change. Cancelable: cancel it to keep the current score.
+ * @event {Event} helix-clear - The rating went back to unrated, under `clearable`. Sent after `input` and `change`.
  * @event {Event} input - The score changed.
  *
  * @csspart feedback - The message that says what is wrong.
@@ -73,6 +77,14 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * the radio group this announces itself as.
    */
   protected override readonly announcesInput = false
+
+  /**
+   * Whether a reader can take the rating back to unrated: by pressing the
+   * chosen score again, or with Backspace or Delete. Zag's rating group
+   * clears the same way.
+   */
+  @property({ type: Boolean })
+  clearable = false
 
   /**
    * How many marks there are.
@@ -381,8 +393,18 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
          gesture testable rather than making the specs drive a real device. */
     }
     this.dragging = event.pointerId
+    this.pressedOn = score
     this.previewing = Number.parseFloat(score)
   }
+
+  /** The score a press began on, so releasing on the chosen one can clear it. */
+  private pressedOn: string | undefined = undefined
+
+  /**
+   * Whether a drag has just chosen, so the click a browser may send after it
+   * does not choose again. Cleared a task later, since the click may not come.
+   */
+  private dragChose = false
 
   private readonly handleDragMove = (event: PointerEvent): void => {
     if (this.dragging !== event.pointerId) {
@@ -401,9 +423,23 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     this.dragging = undefined
     this.previewing = undefined
     const score = this.scoreAt(event.clientX)
-    if (score !== undefined) {
-      this.requestValue(score)
+    if (score === undefined) {
+      return
     }
+    this.dragChose = true
+    setTimeout(() => {
+      this.dragChose = false
+    }, 0)
+    if (this.clearsAt(score) && score === this.pressedOn) {
+      this.clear()
+      return
+    }
+    this.requestValue(score)
+  }
+
+  /** Whether a press on `score` takes a clearable rating back to unrated. */
+  private clearsAt(score: string): boolean {
+    return this.clearable && this.value !== '' && Number(score) === Number(this.value)
   }
 
   /* A canceled pointer is the system taking the gesture away, which is not the
@@ -443,8 +479,31 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   }
 
   private readonly handleOptionClick = (event: MouseEvent): void => {
+    if (this.dragChose) {
+      return
+    }
     const option = event.currentTarget as HTMLElement
-    this.requestValue(option.dataset.score ?? '')
+    const score = option.dataset.score ?? ''
+    if (this.clearsAt(score)) {
+      this.clear()
+      return
+    }
+    this.requestValue(score)
+  }
+
+  /** Backspace and Delete take a clearable rating back to unrated. */
+  private readonly handleClearKey = (event: KeyboardEvent): void => {
+    if (this.clearable && (event.key === 'Backspace' || event.key === 'Delete')) {
+      event.preventDefault()
+      this.clear()
+    }
+  }
+
+  /** Back to unrated, through the same cancelable request as a score, and said. */
+  private clear(): void {
+    if (this.value !== '' && !this.readOnly && !this.isDisabled && this.requestValue('')) {
+      this.dispatchEvent(new Event('helix-clear', { bubbles: true, composed: true }))
+    }
   }
 
   private readonly handleOptionEnter = (event: MouseEvent): void => {
@@ -583,6 +642,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
       data-slotted=${this.markSource ? '' : nothing}
       style=${`--rating-full: ${Math.floor(showing)}; --rating-part: ${showing - Math.floor(showing)}; --rating-steps: ${this.positions.length}`}
       @pointercancel=${this.handleDragCancel}
+      @keydown=${this.handleClearKey}
       @pointerdown=${this.handleDragStart}
       @pointermove=${this.handleDragMove}
       @pointerup=${this.handleDragEnd}

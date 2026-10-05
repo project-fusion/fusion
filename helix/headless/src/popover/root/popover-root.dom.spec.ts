@@ -245,3 +245,97 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('focus on the way in', () => {
+  const withControls = async (extra = ''): Promise<Popover> =>
+    (await mount(
+      `<helix-headless-popover ${extra}>
+        <button slot="trigger">Filters</button>
+        <h3>Filters</h3>
+        <button id="first">Apply</button>
+        <button id="last">Clear</button>
+      </helix-headless-popover>`,
+    )) as Popover
+
+  test('moves to the first control in the panel when it opens', async () => {
+    const host = await withControls()
+    host.show()
+    await host.updateComplete
+    expect(document.activeElement?.id).toBe('first')
+  })
+
+  test('moves to the panel itself where it holds no control', async () => {
+    const host = await popover()
+    host.show()
+    await host.updateComplete
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'popover'))
+  })
+
+  test('stays where it is for a popover served open, which nobody opened', async () => {
+    const host = await withControls('default-open')
+    expect(host.contains(document.activeElement)).toBe(false)
+  })
+
+  test('goes back to the trigger when the panel closes from inside', async () => {
+    const host = await withControls()
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLElement
+    trigger.focus()
+    host.show()
+    await host.updateComplete
+    expect(document.activeElement?.id).toBe('first')
+    host.hide()
+    await host.updateComplete
+    expect(document.activeElement).toBe(trigger)
+  })
+})
+
+describe('a modal popover', () => {
+  test('says so, and keeps Tab inside, wrapping at either end', async () => {
+    const host = (await mount(
+      `<helix-headless-popover modal>
+        <button slot="trigger">Filters</button>
+        <button id="first">Apply</button>
+        <button id="last">Clear</button>
+      </helix-headless-popover>`,
+    )) as Popover
+    host.show()
+    await host.updateComplete
+    expect(part(host, 'popover')?.getAttribute('aria-modal')).toBe('true')
+    ;(host.querySelector('#last') as HTMLElement).focus()
+    const tab = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Tab' })
+    host.querySelector('#last')?.dispatchEvent(tab)
+    expect(tab.defaultPrevented).toBe(true)
+    expect(document.activeElement?.id).toBe('first')
+  })
+
+  test('and an ordinary one leaves Tab alone', async () => {
+    const host = await popover()
+    host.show()
+    await host.updateComplete
+    expect(part(host, 'popover')?.hasAttribute('aria-modal')).toBe(false)
+  })
+})
+
+describe('the panel’s name and its point', () => {
+  test('is the first heading in the panel where label was left alone', async () => {
+    const host = (await mount(
+      `<helix-headless-popover>
+        <button slot="trigger">Filters</button>
+        <div><h3>Filters</h3></div>
+      </helix-headless-popover>`,
+    )) as Popover & { requestUpdate(): void }
+    const panel = part(host, 'popover') as HTMLElement & Record<string, unknown>
+    /* happy-dom has no element reflection, so the accessor is stood in. */
+    Object.defineProperty(panel, 'ariaLabelledByElements', { value: null, writable: true })
+    host.requestUpdate()
+    await host.updateComplete
+    const names = (panel.ariaLabelledByElements as Element[] | null)?.map((one) => one.textContent)
+    expect(names).toEqual(['Filters'])
+  })
+
+  test('no point unless asked for, and one with `arrow`', async () => {
+    expect(part(await popover(), 'arrow')).toBeNull()
+    const pointed = await popover('arrow')
+    expect(part(pointed, 'arrow')?.getAttribute('aria-hidden')).toBe('true')
+  })
+})

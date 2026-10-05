@@ -22,6 +22,7 @@ import { styles } from './popover-root.css.js'
  * @aliases Popper, Flyout, Overlay
  * @documentation https://fusion.dev/helix/components/popover
  *
+ * @cssproperty --popover-arrow-size - Size of the point drawn with `arrow`. Tooltip's point is the same size.
  * @cssproperty --popover-border-color - Color of the panel's edge.
  * @cssproperty --popover-border-width - Width of the panel's edge. Defaults to
  *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
