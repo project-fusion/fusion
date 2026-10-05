@@ -3,26 +3,26 @@
    declaration below, so there is nothing for this sheet to undo. */
 :host {
   display: block;
-  inset-block-start: var(--helix-space-sm);
-  inset-inline-start: var(--helix-space-sm);
+  inset-block-start: var(--skip-link-inset-block, var(--helix-space-sm));
+  inset-inline-start: var(--skip-link-inset-inline, var(--helix-space-sm));
   position: fixed;
   z-index: var(--helix-layer-overlay);
 }
 
 [part="link"] {
-  background-color: var(--helix-color-surface-inverse);
+  background-color: var(--skip-link-background-color, var(--helix-color-surface-inverse));
   border: var(--skip-link-border-width, var(--helix-border-floating)) solid
     var(--skip-link-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--skip-link-radius, var(--helix-radii-sm));
   box-shadow: var(--skip-link-shadow, var(--helix-shadow-floating));
-  color: var(--helix-color-foreground-inverse);
+  color: var(--skip-link-color, var(--helix-color-foreground-inverse));
   display: inline-block;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--skip-link-font-size, var(--helix-text-sm));
   font-weight: var(--helix-weight-medium);
   line-height: var(--helix-leading-normal);
-  padding-block: var(--helix-space-sm);
-  padding-inline: var(--helix-space-md);
+  padding-block: var(--skip-link-padding-block, var(--helix-space-sm));
+  padding-inline: var(--skip-link-padding-inline, var(--helix-space-md));
   text-decoration: none;
 }
 

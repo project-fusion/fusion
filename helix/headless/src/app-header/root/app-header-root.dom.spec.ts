@@ -143,3 +143,16 @@ describe('an app header over a scrolling container', () => {
     expect(heard).toEqual([true])
   })
 })
+
+describe('an app header inside sectioning content', () => {
+  /* A native <header> is a banner only at the top of the page. One in a card,
+     a pane or an article is a plain box, and a second banner there sent screen
+     reader users to the wrong place from the landmarks list. */
+  test('is no banner inside main, and is one again when moved to the top', async () => {
+    await mount('<main><helix-headless-app-header></helix-headless-app-header></main>')
+    const header = document.querySelector('helix-headless-app-header') as HTMLElement
+    expect(role(header)).toBeNull()
+    document.body.append(header)
+    expect(role(header)).toBe('banner')
+  })
+})

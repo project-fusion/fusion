@@ -63,12 +63,14 @@ describe('breadcrumbs', () => {
     expect(part(at(items, 0), 'link')?.tagName).toBe('A')
     expect(part(at(items, 2), 'link')?.tagName).toBe('SPAN')
     expect(crumbRule('[part="link"]')).toContain('text-decoration: none')
-    expect(crumbRule('[part="link"]')).toContain('color: var(--helix-color-foreground-muted)')
+    expect(crumbRule('[part="link"]')).toContain(
+      'color: var(--breadcrumbs-link-color, var(--helix-color-foreground-muted))',
+    )
   })
 
   test('the current page reads as where you are, keyed on the attribute the base tier reflects', () => {
     expect(crumbRule(':host([current]) [part="link"]')).toContain(
-      'color: var(--helix-color-foreground)',
+      'color: var(--breadcrumbs-current-color, var(--helix-color-foreground))',
     )
   })
 
@@ -87,10 +89,15 @@ describe('breadcrumbs', () => {
   test('the hooks the docs name are what the sheets read', () => {
     // A fallback written across lines keeps its line breaks in the sheet.
     expect(sheet('helix-breadcrumbs')).toMatch(/var\(\s*--breadcrumbs-gap,/)
+    expect(sheet('helix-breadcrumbs')).toMatch(/var\(\s*--breadcrumbs-font-size,/)
     for (const hook of [
       '--breadcrumbs-control-padding-inline',
       '--breadcrumbs-control-size',
+      '--breadcrumbs-current-color',
+      '--breadcrumbs-font-weight',
       '--breadcrumbs-hover-color',
+      '--breadcrumbs-link-color',
+      '--breadcrumbs-radius',
       '--breadcrumbs-separator-color',
     ]) {
       expect(sheet('helix-breadcrumb')).toMatch(new RegExp(`var\\(\\s*${hook},`))

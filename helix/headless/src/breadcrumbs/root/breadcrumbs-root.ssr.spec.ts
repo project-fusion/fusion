@@ -83,3 +83,21 @@ describe('breadcrumbs fold, server rendered', () => {
     expect(crumbs.filter((tag) => tag.includes('hidden'))).toEqual([])
   })
 })
+
+describe('a trail written as data, served', () => {
+  /* The crumbs are the component's own render, so a server writes them and the
+     trail is whole before any script runs. */
+  test('serves a crumb for each item, the last one current', () => {
+    const served = rendered(
+      ssr(
+        html`<helix-headless-breadcrumbs
+          .items=${[{ href: '/', label: 'Home' }, { href: '/work', label: 'Work' }]}
+        ></helix-headless-breadcrumbs>`,
+      ),
+      'helix-headless-breadcrumbs',
+    )
+    expect(served).toMatch(/<helix-headless-breadcrumb\s[^>]*part="crumb"[^>]*href="\/"/)
+    expect(served).toMatch(/<helix-headless-breadcrumb\s[^>]*part="crumb crumb-current"/)
+    expect(served).toContain('Work')
+  })
+})

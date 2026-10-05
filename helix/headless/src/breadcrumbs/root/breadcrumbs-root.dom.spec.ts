@@ -117,3 +117,26 @@ describe('the trail without a name of its own', () => {
     expect(crumbs.hasAttribute('aria-label')).toBe(false)
   })
 })
+
+describe('a trail written as data', () => {
+  /* React Aria's `items`: a router's matched routes become crumbs with no
+     markup written by hand, and the last one is where the reader is. */
+  test('draws a crumb for each item, linking all but the last, which is current', async () => {
+    const crumbs = await mount('<helix-headless-breadcrumbs></helix-headless-breadcrumbs>')
+    ;(crumbs as HTMLElement & { items: unknown }).items = [
+      { href: '/', label: 'Home' },
+      { href: '/work', label: 'Work' },
+      { href: '/work/helix', label: 'Helix' },
+    ]
+    await (crumbs as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    const drawn = [
+      ...(crumbs.shadowRoot?.querySelectorAll('helix-headless-breadcrumb') ?? []),
+    ] as (HTMLElement & { updateComplete: Promise<unknown> })[]
+    await Promise.all(drawn.map((crumb) => crumb.updateComplete))
+    expect(drawn.map((crumb) => crumb.textContent)).toEqual(['Home', 'Work', 'Helix'])
+    expect(drawn.map((crumb) => crumb.getAttribute('href'))).toEqual(['/', '/work', null])
+    expect(drawn.map((crumb) => crumb.hasAttribute('current'))).toEqual([false, false, true])
+    expect(drawn[2]?.getAttribute('part')).toBe('crumb crumb-current')
+    expect(drawn[0]?.shadowRoot?.querySelector('a[part="link"]')?.getAttribute('href')).toBe('/')
+  })
+})
