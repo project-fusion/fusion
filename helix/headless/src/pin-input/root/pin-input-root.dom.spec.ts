@@ -563,4 +563,14 @@ describe('the gaps Zag and Web Awesome close', () => {
     expect(separators[0]?.previousElementSibling).toBe(cells(host)[2] as Element)
     expect(part(await pin(), 'separator')).toBeNull()
   })
+
+  /* Web Awesome's OTP input has case, for a code a service reads in one case. */
+  test('case writes typed and pasted letters in the case asked for', async () => {
+    const host = await pin('length="4" type="alphanumeric" case="upper"')
+    await paste(host, 0, 'ab3x')
+    expect(host.value).toBe('AB3X')
+    const lower = await pin('length="4" type="alphanumeric" case="lower"')
+    await arrive(lower, 0, 'Q')
+    expect(lower.value).toBe('q')
+  })
 })

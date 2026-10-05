@@ -124,6 +124,21 @@
   );
 }
 
+/* A single thumb with an `origin` fills from there to the thumb, so the fill
+   is a span like a range's, between `--slider-from` and `--slider-to`. */
+[part="control"][data-origin] {
+  --_slider-track-image: var(
+    --slider-track-image,
+    linear-gradient(
+      var(--_slider-along),
+      var(--_slider-track-color) calc(var(--slider-from, 0) * 100%),
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-from, 0) * 100%),
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-to, 0) * 100%),
+      var(--_slider-track-color) calc(var(--slider-to, 0) * 100%)
+    )
+  );
+}
+
 /* The native range, stripped to its track. The thumb is styled separately
    below, per engine, because the pseudo-elements that name it are not shared
    and a selector list containing an unknown one is dropped whole. */
@@ -499,6 +514,20 @@
   margin-block: calc(var(--_slider-thumb-length) / 2);
   margin-inline: 0;
   writing-mode: vertical-lr;
+}
+
+/* The same span, bottom to top. */
+:host([orientation="vertical"]) [part="control"][data-origin] {
+  --_slider-track-image: var(
+    --slider-track-image,
+    linear-gradient(
+      to top,
+      var(--_slider-track-color) calc(var(--slider-from, 0) * 100%),
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-from, 0) * 100%),
+      var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-to, 0) * 100%),
+      var(--_slider-track-color) calc(var(--slider-to, 0) * 100%)
+    )
+  );
 }
 
 /* The marks turn with the track: their length becomes the track's thickness,

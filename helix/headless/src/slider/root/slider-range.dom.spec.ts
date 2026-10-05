@@ -111,6 +111,35 @@ describe('a slider with two thumbs', () => {
     const host = await slider('range default-value="20,70" show-value')
     expect(part(host, 'output')?.textContent?.trim()).toBe('20 to 70')
   })
+
+  test("and range-text joins the two in the page's words", async () => {
+    const host = await slider(
+      'range default-value="20,70" show-value range-text="{start} bis {end}"',
+    )
+    expect(part(host, 'output')?.textContent?.trim()).toBe('20 bis 70')
+  })
+})
+
+describe('a single thumb with an origin', () => {
+  const style = (host: Slider): string =>
+    (thumbs(host)[0] as HTMLInputElement).getAttribute('style') ?? ''
+
+  test('fills from the middle of the track to the thumb, on either side', async () => {
+    const below = await slider('origin="center" min="-50" max="50" default-value="-30"')
+    expect(style(below)).toContain('--slider-from: 0.2; --slider-to: 0.5')
+    const above = await slider('origin="center" min="-50" max="50" default-value="30"')
+    expect(style(above)).toContain('--slider-from: 0.5; --slider-to: 0.8')
+    expect(thumbs(above)[0]?.dataset.origin).toBe('center')
+  })
+
+  test('fills from max with end, and from min with none', async () => {
+    expect(style(await slider('origin="end" default-value="25"'))).toContain(
+      '--slider-from: 0.25; --slider-to: 1',
+    )
+    const plain = await slider('default-value="25"')
+    expect(style(plain)).toBe('--slider-fraction: 0.25')
+    expect(thumbs(plain)[0]?.hasAttribute('data-origin')).toBe(false)
+  })
 })
 
 describe('a range nobody has touched', () => {

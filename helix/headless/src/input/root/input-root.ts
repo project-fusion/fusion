@@ -33,7 +33,10 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * which a reset restores.
  *
  * Validity comes from the browser. `type` and `required` are set on the real
- * input, and its `validity` is copied to the host.
+ * input, and its `validity` is copied to the host. `validate` adds your own
+ * rule, run on every change once the browser finds nothing wrong, as React
+ * Aria's TextField `validate` does. What it returns is the message the field
+ * shows once the user has edited it, and the message a submit raises.
  *
  * @since 0.1.0
  * @status stable
@@ -61,7 +64,8 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @csspart reveal - The button that shows and hides a password.
  * @csspart reveal-pressed - The reveal button while the password is shown, added beside `reveal`.
  *
- * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate blank - The field holds no text.
+ * @cssstate invalid - The control has an error to show, from the browser's validation, `validate`, or your `feedback`.
  */
 @customElement('helix-headless-input')
 export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -384,6 +388,11 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
        without it the validity bubble points at the host, which is a box with no
        text in it. */
     this.copyValidity(control)
+    const own = control.validity.valid ? this.validate?.(this.value) : undefined
+    const message = Array.isArray(own) ? own.join(' ') : typeof own === 'string' ? own : ''
+    if (message !== '') {
+      this.internals.setValidity({ customError: true }, message, control)
+    }
     // Straight after, because validity moved without any property moving.
     this.refreshFeedback()
   }
@@ -432,6 +441,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.toggleState('blank', this.value === '')
     /* Never before the first update, which is the one the server does: there is
        no render root to query there, and `querySelector` is not merely empty on
        Lit's element shim, it is undefined. There is also no caret to keep before
@@ -483,6 +493,14 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    */
   @property()
   type: InputType = 'text'
+
+  /**
+   * Your own rule for the value, run on every change once the browser finds
+   * nothing wrong. Return a message, or a list of them, to mark the field
+   * invalid, and `true`, `null`, or nothing to accept the value.
+   */
+  @property({ attribute: false })
+  validate?: (value: string) => string | string[] | true | null | undefined
 
   protected override render(): TemplateResult {
     /* Label, field, and one line under it.

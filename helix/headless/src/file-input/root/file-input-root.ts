@@ -97,7 +97,20 @@ const kind = (file: File): string => {
  * is screened: `accept`, `max-file-size`, `max-files` and your own `validate`
  * can refuse it. A refused file is left out, `helix-reject` lists each one with
  * its reason, and a reader hears `rejected-text` with the names filled in.
- * `directory` asks the picker for a folder.
+ * `directory` asks the picker for a folder. `transformFiles` changes the files
+ * a field takes before it holds them, such as shrinking an image.
+ *
+ * Each chosen file is a row: its name, its size and type as tags, and a
+ * remove button. `renderFile` draws the row's details your own way, and the
+ * `remove-icon` slot replaces the button's icon.
+ *
+ * **Keyboard.** The input is the tab stop, and each file's remove button is
+ * one more.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Enter, Space | On the input, opens the picker. On a remove button, removes that file and moves focus to the button of the file in its place, or back to the input. |
+ * | Control+V, Command+V | Takes files from the clipboard, as a drop does. |
  *
  * @since 0.1.0
  * @status stable
@@ -108,6 +121,7 @@ const kind = (file: File): string => {
  * @slot feedback - The message that says what is wrong with the chosen files.
  * @slot hint - Help under the field.
  * @slot label - The label, for content richer than the `label` text.
+ * @slot remove-icon - The icon on each file's remove button, in place of the bin. Each button shows a copy.
  * @slot trigger - The content that opens the picker when pressed.
  *
  * @event {Event} change - Fired after the value changes.
@@ -225,6 +239,23 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   removeLabel = 'Remove {name}'
 
   /**
+   * Draws a file's row in place of its name, size, and type: a Lit template, a
+   * string, or a DOM node, given the file and its place in the list. The
+   * remove button stays beside it.
+   */
+  @property({ attribute: false })
+  renderFile?: (file: File, index: number) => unknown
+
+  /**
+   * Your own step between taking files and holding them, such as shrinking an
+   * image, as Zag's file upload `transformFiles`. It is given the files taken
+   * from one pick, drop, or paste and returns the files to hold, or a promise
+   * of them. A promise that rejects refuses those files, with its message.
+   */
+  @property({ attribute: false })
+  transformFiles?: (files: File[]) => File[] | Promise<File[]>
+
+  /**
    * The trigger's text when nothing is slotted into it.
    */
   @property({ attribute: 'trigger-label' })
@@ -242,7 +273,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
 
   /**
    * Screens arriving files and commits what is taken, after the files the
-   * field keeps. Refused files are announced and said.
+   * field keeps, through `transformFiles` where it is set. Refused files are
+   * announced and said.
    */
   private take(arriving: File[], keeping: File[], picked = false): void {
     const { kept, refused } = screenFiles(arriving, keeping, {
@@ -259,12 +291,60 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
        whatever it holds, as before. */
     const same = (one: File[], two: File[]): boolean =>
       one.length === two.length && one.every((file, at) => file === two[at])
-    if (picked || !(same(kept, this.committed) && same(kept, this.files))) {
-      this.commit(kept)
+    const transform = this.transformFiles
+    const taken = kept.filter((file) => !keeping.includes(file))
+    if (!transform || taken.length === 0) {
+      if (picked || !(same(kept, this.committed) && same(kept, this.files))) {
+        this.commit(kept)
+      }
+      if (refused.length > 0) {
+        this.refuse(refused)
+      }
+      return
     }
-    if (refused.length > 0) {
-      this.refuse(refused)
+    const held = kept.filter((file) => keeping.includes(file))
+    Promise.resolve()
+      .then(() => transform(taken))
+      .then(
+        (made) => {
+          this.commit([...held, ...made])
+          if (refused.length > 0) {
+            this.refuse(refused)
+          }
+        },
+        (error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error)
+          if (picked) {
+            this.commit(held)
+          }
+          this.refuse([
+            ...refused,
+            ...taken.map((file) => ({ file, message, reason: 'invalid' as const })),
+          ])
+        },
+      )
+  }
+
+  /** The element slotted into `remove-icon`, which each remove button copies. */
+  @state()
+  private removeIcon: Element | undefined = undefined
+
+  /** One copy of `removeIcon` per row, kept so a render does not replace it. */
+  private readonly removeIcons = new Map<number, Node>()
+
+  private readonly handleRemoveIcon = (event: Event): void => {
+    this.removeIcons.clear()
+    this.removeIcon = (event.target as HTMLSlotElement).assignedElements({ flatten: true })[0]
+  }
+
+  /** The icon on one row's remove button: a copy of `remove-icon`, or the bin. */
+  private removeMark(at: number): unknown {
+    if (!this.removeIcon) {
+      return drawIcon(trash)
     }
+    const held = this.removeIcons.get(at) ?? this.removeIcon.cloneNode(true)
+    this.removeIcons.set(at, held)
+    return held
   }
 
   /** Sends `helix-reject` and says which files were left out. */
@@ -657,6 +737,9 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
           <slot name="trigger">${this.triggerLabel}</slot>
         </label>
       </div>
+      <!-- Hidden, because this is where the icon arrives: each remove button
+           shows a copy. -->
+      <slot name="remove-icon" hidden @slotchange=${this.handleRemoveIcon}></slot>
       <!-- The hint sits under the field and the list goes last, which is the
            one ordering decision this component makes differently from the way it
            reads. Reasoning above renderMeta. -->
@@ -669,10 +752,14 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
               ${files.map(
                 (file, at) => html`<li part="file">
                   <span part="detail">
-                    <span part="name">${file.name}</span>
-                    <span part="meta">
-                      ${this.renderMeta(file)}
-                    </span>
+                    ${
+                      this.renderFile
+                        ? this.renderFile(file, at)
+                        : html`<span part="name">${file.name}</span>
+                          <span part="meta">
+                            ${this.renderMeta(file)}
+                          </span>`
+                    }
                   </span>
                   <button
                     part="remove"
@@ -682,7 +769,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
                     ?disabled=${this.isDisabled}
                     @click=${this.handleRemove}
                   >
-                    ${drawIcon(trash)}
+                    ${this.removeMark(at)}
                   </button>
                 </li>`,
               )}

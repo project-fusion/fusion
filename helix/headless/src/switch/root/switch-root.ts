@@ -27,6 +27,16 @@ import { property } from 'lit/decorators.js'
  * press, the same as a checkbox. The hint and the message go below the row,
  * because the switch and its label share one line.
  *
+ * **Keyboard.** The switch is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Space | Turns the switch on or off, as a native checkbox does. |
+ *
+ * The input carries `role="switch"`, so a screen reader says "on" or "off".
+ * `aria-readonly` is set under `readonly`, and `aria-invalid` and
+ * `aria-describedby` point at the message while one shows.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms

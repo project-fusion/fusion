@@ -524,3 +524,60 @@ describe('screening the files that arrive', () => {
     expect(event.defaultPrevented).toBe(true)
   })
 })
+
+describe('your own rows and your own step', () => {
+  type Shaping = HTMLElement & {
+    files: File[]
+    renderFile?: (file: File, index: number) => unknown
+    transformFiles?: (files: File[]) => File[] | Promise<File[]>
+    updateComplete: Promise<unknown>
+  }
+  const text = (name: string): File => new File(['x'], name, { type: 'text/plain' })
+  const dropOn = async (host: HTMLElement, files: File[]): Promise<void> => {
+    const carrier = new DataTransfer()
+    for (const file of files) {
+      carrier.items.add(file)
+    }
+    const event = new Event('drop', { bubbles: true, cancelable: true }) as DragEvent
+    Object.defineProperty(event, 'dataTransfer', { value: carrier })
+    part(host, 'field')?.dispatchEvent(event)
+    await new Promise((done) => setTimeout(done, 0))
+    await (host as Shaping).updateComplete
+  }
+
+  /* Zag's file upload lets a consumer draw each item. The row was name, size
+     and type, and only a subclass could change it. */
+  test('renderFile draws each row, and the remove button stays', async () => {
+    const host = (await field('multiple')) as Shaping
+    host.renderFile = (file, index) => `${index + 1}. ${file.name}`
+    await dropOn(host, [text('a.txt'), text('b.txt')])
+    const rows = [...(host.shadowRoot?.querySelectorAll('[part="detail"]') ?? [])]
+    expect(rows.map((row) => row.textContent?.trim())).toEqual(['1. a.txt', '2. b.txt'])
+    expect(host.shadowRoot?.querySelectorAll('[part="remove"]').length).toBe(2)
+    expect(part(host, 'name')).toBeNull()
+  })
+
+  /* Zag's transformFiles. */
+  test('transformFiles changes the files taken before the field holds them', async () => {
+    const host = (await field('multiple')) as Shaping
+    host.transformFiles = async (files) => files.map((file) => text(`small-${file.name}`))
+    await dropOn(host, [text('a.txt')])
+    expect(host.files.map((file) => file.name)).toEqual(['small-a.txt'])
+    await dropOn(host, [text('b.txt')])
+    expect(host.files.map((file) => file.name)).toEqual(['small-a.txt', 'small-b.txt'])
+  })
+
+  test('and a transform that fails refuses its files, with its message', async () => {
+    const host = (await field('multiple')) as Shaping
+    host.transformFiles = () => Promise.reject(new Error('Too large to shrink'))
+    const heard: string[] = []
+    host.addEventListener('helix-reject', (event) => {
+      const { files } = (event as CustomEvent<{ files: { file: File; message?: string }[] }>).detail
+      heard.push(...files.map((one) => `${one.file.name}:${one.message}`))
+    })
+    await dropOn(host, [text('a.txt')])
+    await new Promise((done) => setTimeout(done, 0))
+    expect(host.files).toEqual([])
+    expect(heard).toEqual(['a.txt:Too large to shrink'])
+  })
+})

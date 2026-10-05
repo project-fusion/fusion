@@ -30,7 +30,13 @@ import { property } from 'lit/decorators.js'
  *
  * A range with two thumbs is two inputs stacked on one track, because there is
  * no native two-thumb range. Each thumb keeps its own value.
- * `min-steps-between-thumbs` keeps them that many steps apart.
+ * `min-steps-between-thumbs` keeps them that many steps apart, and the readout
+ * joins the two as `range-text` writes them.
+ *
+ * `origin` sets where a single thumb's fill starts: at `min`, at the middle of
+ * the track, or at `max`. A balance or an offset from zero fills from the
+ * middle, as Zag's slider `origin` does. The fill's ends are published as
+ * `--slider-from` and `--slider-to`.
  *
  * `format-options` writes the value with `Intl.NumberFormat` in `locale`, as a
  * currency, a percent or a unit, and `formatter` writes it with a function of
@@ -43,6 +49,20 @@ import { property } from 'lit/decorators.js'
  * seeds that midpoint into `defaultValue`, so the value matches the handle from
  * the first render. HTML does not apply `required` to a range either, so it is
  * not set on the input. It only adds the marker beside the label.
+ *
+ * **Keyboard.** Each thumb is one tab stop, and its keys are the native
+ * range's.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Right, Up | Moves the thumb up by `step`. |
+ * | Left, Down | Moves the thumb down by `step`. |
+ * | Page Up, Page Down | Moves the thumb by a larger step. |
+ * | Home, End | Moves the thumb to its lowest or highest value. |
+ *
+ * Each thumb is an `<input type="range">` with `aria-valuetext` where the value
+ * is formatted or worded. A range's thumbs say they stop at each other with
+ * `aria-valuemin` and `aria-valuemax`.
  *
  * @since 0.1.0
  * @status stable
@@ -69,9 +89,9 @@ import { property } from 'lit/decorators.js'
  * @csspart output - The current value, shown beside the track.
  *
  * @cssproperty --slider-fraction - The value as a fraction of the range, 0 to 1.
- * @cssproperty --slider-from - Where a range's filled span starts, as a fraction of the track, 0 to 1.
+ * @cssproperty --slider-from - Where the filled span starts, as a fraction of the track, 0 to 1: a range's lower thumb, or a single thumb's `origin`.
  * @cssproperty --slider-marker-at - Where one marker sits, as a percentage of the track.
- * @cssproperty --slider-to - Where a range's filled span ends, as a fraction of the track, 0 to 1.
+ * @cssproperty --slider-to - Where the filled span ends, as a fraction of the track, 0 to 1: a range's upper thumb, or the farther of a single thumb and its `origin`.
  *
  * @cssstate invalid - The slider has an error to show, from the browser's validation or from your `feedback`.
  */
@@ -191,6 +211,14 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   orientation?: 'horizontal' | 'vertical'
 
   /**
+   * Where a single thumb's fill starts: `start` at `min`, `center` at the
+   * middle of the track, or `end` at `max`. Absent is `start`. A range fills
+   * between its thumbs and ignores it.
+   */
+  @property({ reflect: true })
+  origin?: 'center' | 'end' | 'start'
+
+  /**
    * Adds a second thumb, so the value is a pair.
    *
    * The pair is one string, `"10,50"`, which is what a form submits and what
@@ -199,6 +227,13 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ reflect: true, type: Boolean })
   range = false
+
+  /**
+   * How the readout joins a range's two values, with `{start}` and `{end}`
+   * filled in. Write it in the page's language, such as `{start} bis {end}`.
+   */
+  @property({ attribute: 'range-text' })
+  rangeText = '{start} to {end}'
 
   /**
    * Shows the chosen value beside the track.
@@ -222,7 +257,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    *
    * Widest rather than current, so the box never changes size at all. Measured
    * off the bounds because that is what the readout can ever say: the longer of
-   * the two ends, twice, plus the four of " to " when both are shown. Negative
+   * the two ends, twice, plus the words `range-text` puts between them when
+   * both are shown. Negative
    * bounds are covered by measuring the rendered string rather than the digits,
    * since the sign is a character like any other.
    *
@@ -232,7 +268,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   private get reserve(): number {
     const widest = Math.max(this.said(this.min).length, this.said(this.max).length)
-    return this.range ? widest * 2 + ' to '.length : widest
+    return this.range
+      ? widest * 2 + fillTemplate(this.rangeText, { end: '', start: '' }).length
+      : widest
   }
 
   /**
@@ -383,6 +421,19 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
       return 0
     }
     return this.along(this.snapped(this.valueAsNumber))
+  }
+
+  /**
+   * A single thumb's fill: `--slider-fraction`, and under `origin` the span
+   * from the origin to the thumb as `--slider-from` and `--slider-to`.
+   */
+  private get fillStyle(): string {
+    const fraction = this.fraction
+    if (!this.origin) {
+      return `--slider-fraction: ${fraction}`
+    }
+    const at = { center: 0.5, end: 1, start: 0 }[this.origin] ?? 0
+    return `--slider-fraction: ${fraction}; --slider-from: ${Math.min(at, fraction)}; --slider-to: ${Math.max(at, fraction)}`
   }
 
   /**
@@ -596,7 +647,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
               part="control"
               id=${this.controlId}
               type="range"
-              style="--slider-fraction: ${this.fraction}"
+              style=${this.fillStyle}
+              data-origin=${this.origin ?? nothing}
               min=${this.min}
               max=${this.max}
               step=${this.step}
@@ -642,7 +694,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
               for=${this.range ? 'control control-end' : 'control'}
               aria-hidden="true"
               style=${`--_slider-output-reserve: ${this.reserve}ch`}
-              >${this.range ? `${this.said(start)} to ${this.said(end)}` : this.said(this.value)}</output
+              >${
+                this.range
+                  ? fillTemplate(this.rangeText, { end: this.said(end), start: this.said(start) })
+                  : this.said(this.value)
+              }</output
             >`
           : nothing
       }

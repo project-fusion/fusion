@@ -14,6 +14,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { nearestStep } from '../steps.js'
 
 /**
  * @summary A row of marks, such as stars, for giving or showing a score.
@@ -38,6 +39,7 @@ import { property, state } from 'lit/decorators.js'
  * @aliases Stars, Score, Review score
  * @documentation https://fusion.dev/helix/components/rating
  *
+ * @slot empty-mark - The shape of an unfilled mark, copied into every position of the track, such as an outlined star beside a filled `mark`. Without it, the track copies `mark`.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - Help under the control, for content richer than the `hint` text.
  * @slot label - The label, for content richer than the `label` text.
@@ -320,7 +322,8 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
 
   /** The shape for one place, or nothing when the stylesheet is drawing it. */
   private markFor(layer: string, index: number): Node | undefined {
-    if (!this.markSource) {
+    const source = layer === 'track' ? (this.emptySource ?? this.markSource) : this.markSource
+    if (!source) {
       return undefined
     }
     const key = `${layer}:${index}`
@@ -328,15 +331,25 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     if (held) {
       return held
     }
-    const clone = this.markSource.cloneNode(true)
+    const clone = source.cloneNode(true)
     this.clones.set(key, clone)
     return clone
   }
 
   private readonly handleMarkSlot = (event: Event): void => {
+    const slot = event.target as HTMLSlotElement
+    const source = slot.assignedElements({ flatten: true })[0]
     this.clones.clear()
-    this.markSource = (event.target as HTMLSlotElement).assignedElements({ flatten: true })[0]
+    if (slot.name === 'empty-mark') {
+      this.emptySource = source
+    } else {
+      this.markSource = source
+    }
   }
+
+  /** The element slotted into `empty-mark`, which the track copies. */
+  @state()
+  private emptySource: Element | undefined = undefined
 
   /**
    * The step under a point on the row, or the nearest one to it.
@@ -564,6 +577,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     if (!this.markRead && this.childrenKnown) {
       this.markRead = true
       this.markSource = this.knownChildren.find((child) => child.slot === 'mark')
+      this.emptySource = this.knownChildren.find((child) => child.slot === 'empty-mark')
     }
   }
 
@@ -579,17 +593,17 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   }
 
   /**
-   * The option holding the tab stop: the chosen one, or for a score between
-   * steps, such as an average of 3.5 on whole marks, the step below it, and
-   * the first while nothing is chosen. Between steps no option matched, and
-   * the rating left the tab order.
+   * The option that is checked and holds the tab stop: the chosen one, or for
+   * a score between steps, such as an average of 3.4 on whole marks, the
+   * nearest step, and the first while nothing is chosen. Between steps no
+   * option matched, so no option was checked and the rating left the tab
+   * order.
    */
   private stopAt(answered: boolean, first: number | undefined): number | undefined {
     if (!answered) {
       return first
     }
-    const below = this.steps.filter((score) => score <= this.score)
-    return below.at(-1) ?? first
+    return nearestStep(this.steps, this.score) ?? first
   }
 
   protected override render(): TemplateResult {
@@ -655,9 +669,15 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
         hidden
         @slotchange=${this.handleMarkSlot}
       ></slot>
+      <slot
+        name="empty-mark"
+        hidden
+        @slotchange=${this.handleMarkSlot}
+      ></slot>
       <span
         part="track"
         aria-hidden="true"
+        data-slotted=${this.emptySource ? '' : nothing}
         >${marksIn('track')}</span
       >
       <span
@@ -679,7 +699,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
                 part="option"
                 role="radio"
                 type="button"
-                aria-checked=${answered && this.score === score ? 'true' : 'false'}
+                aria-checked=${answered && score === stop ? 'true' : 'false'}
                 aria-label=${this.nameFor(score)}
                 data-score=${String(score)}
                 style=${`--rating-step: ${index + 1}`}

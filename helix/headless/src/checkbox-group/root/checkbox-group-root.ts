@@ -46,6 +46,9 @@ import { type SetBox, selectAllPress, selectAllState } from '../select-all.js'
  * only for validity and never calls `setFormValue`, so the browser does not
  * generate a message for it.
  *
+ * **Keyboard.** Each box is its own tab stop, as a set of native checkboxes
+ * is, and Space checks the focused one. The select-all box comes first.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
