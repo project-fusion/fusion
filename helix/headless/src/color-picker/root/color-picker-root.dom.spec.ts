@@ -873,3 +873,20 @@ describe('the message under a color picker', () => {
     ).toBe(false)
   })
 })
+
+describe('a preset taken', () => {
+  test('is written with its own numbers, not a rounding step away', async () => {
+    const host = await picker('swatches="#00aa00, rgb(10 20 30)"')
+    const swatches = [...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part="swatch"]') ?? [])]
+    swatches[0]?.click()
+    await host.updateComplete
+    expect(host.value).toBe('#00aa00')
+    swatches[1]?.click()
+    await host.updateComplete
+    expect(host.value).toBe('#0a141e')
+    const rgb = await picker('format="rgb" alpha swatches="#00aa0080"')
+    ;(rgb.shadowRoot?.querySelector('[part="swatch"]') as HTMLElement).click()
+    await rgb.updateComplete
+    expect(rgb.value).toBe('rgba(0, 170, 0, 0.5)')
+  })
+})
