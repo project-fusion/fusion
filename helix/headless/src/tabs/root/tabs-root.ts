@@ -39,6 +39,17 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * Each tab says which panel it controls through `aria-controls`, set as an
  * element reference to the panel's host, where the engine has reflection.
  *
+ * Keys, on the tab list: Left and Right Arrow move between tabs, and so do Up
+ * and Down; Home and End go to the first and the last. The horizontal arrows
+ * follow the reading direction, so on a right-to-left page Left moves on.
+ * Disabled tabs are passed over. Tab leaves the list for the selected panel,
+ * which is a tab stop only while it holds nothing focusable.
+ *
+ * The `indicator` part moves to the selected tab and carries its place and
+ * size, so a mark of your own can be drawn there: style the part, or slot an
+ * element into `indicator`, which sits inside the part and reads the same
+ * properties.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -46,6 +57,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tabs, as direct children of this element.
+ * @slot indicator - A mark of your own, drawn inside the `indicator` part, where `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size` reach it.
  * @slot panels - The panels, as direct children of this element. Panels inside a wrapper are not paired with tabs, because pairing reads only the direct children.
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the active tab changes, so the element already holds the new value.
@@ -298,7 +310,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
         aria-orientation=${this.orientation === 'vertical' ? 'vertical' : nothing}
       >
         <slot @slotchange=${this.handleSlotChange}></slot>
-        <span part="indicator" aria-hidden="true"></span>
+        <span part="indicator" aria-hidden="true"><slot name="indicator"></slot></span>
       </div>
       <div part="panels"><slot name="panels" @slotchange=${this.handleSlotChange}></slot></div>`
   }

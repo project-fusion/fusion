@@ -30,6 +30,14 @@ import { styles } from './accordion-item.css.js'
  * @csspart heading - The heading that holds the trigger.
  * @csspart trigger - The button that opens and closes the section, holding the summary.
  *
+ * @cssproperty --accordion-item-chevron-color - The color of the open and close indicator.
+ * @cssproperty --accordion-item-chevron-hover-color - The indicator's color while the pointer is on the trigger.
+ * @cssproperty --accordion-item-color - The color of the trigger's text.
+ * @cssproperty --accordion-item-content-color - The color of the content's text.
+ * @cssproperty --accordion-item-disabled-opacity - How faint a disabled trigger is drawn.
+ * @cssproperty --accordion-item-font-size - The size of the trigger's text.
+ * @cssproperty --accordion-item-font-weight - The weight of the trigger's text.
+ * @cssproperty --accordion-item-hover-background-color - The trigger's fill while the pointer is on it. Unset, there is none.
  * @cssproperty --accordion-item-padding - The padding of the trigger and the content.
  */
 @customElement('helix-accordion-item')

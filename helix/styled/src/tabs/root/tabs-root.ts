@@ -25,13 +25,17 @@ import { styles } from './tabs-root.css.js'
  * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tabs, as direct children of this element.
+ * @slot indicator - A mark of your own, drawn inside the `indicator` part, where the selected tab's place and size reach it.
  * @slot panels - The panels, as direct children of this element. Panels inside a wrapper are not paired with tabs, because pairing reads only the direct children.
  *
+ * @csspart indicator - The mark that moves to the selected tab. It carries the selected tab's place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size`.
  * @csspart panels - The panel container.
  * @csspart tabs - The tab list.
  *
  * @cssproperty --tabs-gap - The space between tabs.
  * @cssproperty --tabs-indicator-color - The fill of the mark on the current tab: the bar under `underlined`, and the pill otherwise.
+ * @cssproperty --tabs-indicator-radius - The corners of the mark.
+ * @cssproperty --tabs-indicator-shadow - The shadow under the mark, which the pill and `segmented` draw.
  * @cssproperty --tabs-indicator-thickness - The height of the bar under `underlined`.
  * @cssproperty --tabs-rule-color - The color of the rule under the row in `underlined`.
  */

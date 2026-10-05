@@ -123,6 +123,18 @@ describe('a section find in page can search', () => {
   })
 })
 
+describe('the height a stylesheet animates to', () => {
+  /* Radix's --radix-accordion-content-height, for keyframes of your own. */
+  test('is written on the content part once the section is open', async () => {
+    const host = await item()
+    const content = part(host, 'content') as HTMLElement
+    expect(content.style.getPropertyValue('--accordion-content-height')).toBe('')
+    host.open = true
+    await host.updateComplete
+    expect(content.style.getPropertyValue('--accordion-content-height')).toMatch(/^\d+px$/)
+  })
+})
+
 describe('the chevron', () => {
   /* The drawn caret was the only indicator a section could have. */
   test('is the fallback of a slot an icon of your own replaces', async () => {

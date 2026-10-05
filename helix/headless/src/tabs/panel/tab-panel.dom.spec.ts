@@ -45,6 +45,23 @@ describe('one tab panel', () => {
   /* The panel is hidden in its markup rather than by a stylesheet, and it stays
      focusable, which is the tabpanel pattern: a panel of prose with nothing
      tabbable in it has to be reachable from the tab. */
+  /* The ARIA tabs pattern, as React Aria's panel does it: a panel holding a
+     link or a control is reached through that, so Tab from the list does not
+     stop on the panel first. */
+  test('is no tab stop while it holds something focusable, and is one again without it', async () => {
+    const host = (await mount(
+      `<helix-headless-tab-panel value="one" selected>Body <a href="#more">More</a></helix-headless-tab-panel>`,
+    )) as Panel
+    await host.updateComplete
+    await new Promise((resolve) => setTimeout(resolve))
+    await host.updateComplete
+    expect(part(host, 'panel')?.hasAttribute('tabindex')).toBe(false)
+    host.querySelector('a')?.remove()
+    await new Promise((resolve) => setTimeout(resolve))
+    await host.updateComplete
+    expect(part(host, 'panel')?.getAttribute('tabindex')).toBe('0')
+  })
+
   test('is hidden in its markup, and is a tab stop when it is showing', async () => {
     const host = await panel('selected')
     const showing = part(host, 'panel')

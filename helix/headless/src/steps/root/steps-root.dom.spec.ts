@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { at, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -341,6 +341,56 @@ describe('a linear sequence', () => {
     await host.updateComplete
     expect(host.active).toBe('a')
     expect(host.previous()).toBe(false)
+  })
+})
+
+describe('a stage your own check holds', () => {
+  /* Ark UI's isStepValid: asked about the stage the reader is on before a move
+     forward, and the stage says it is invalid while the answer is no. */
+  test('keeps the reader there and marks the stage, until the check passes', async () => {
+    const { all, host } = await linear()
+    let ok = false
+    ;(host as unknown as { validate: (step: Step) => boolean }).validate = () => ok
+    at(all, 0).complete = true
+    await at(all, 0).updateComplete
+    expect(host.next()).toBe(false)
+    await at(all, 0).updateComplete
+    expect(host.active).toBe('a')
+    expect(hasState(at(all, 0), 'invalid')).toBe(true)
+    ok = true
+    expect(host.next()).toBe(true)
+    await at(all, 0).updateComplete
+    expect(hasState(at(all, 0), 'invalid')).toBe(false)
+    await host.updateComplete
+    expect(host.active).toBe('b')
+    /* Back is never asked. */
+    ok = false
+    expect(host.previous()).toBe(true)
+  })
+})
+
+describe('how far through a sequence is', () => {
+  /* Ark UI's progress part and percent. */
+  test('is the share of finished stages, on a progress part a sheet can draw', async () => {
+    const host = await steps()
+    await new Promise((resolve) => setTimeout(resolve))
+    await host.updateComplete
+    expect((host as Steps & { progress: number }).progress).toBe(33)
+    const bar = part(host, 'progress') as HTMLElement
+    expect(bar.getAttribute('role')).toBe('progressbar')
+    expect(bar.getAttribute('aria-valuenow')).toBe('33')
+    expect(bar.style.getPropertyValue('--steps-progress')).toBe('33%')
+    expect(bar.hasAttribute('hidden')).toBe(true)
+    expect(hasState(host, 'complete')).toBe(false)
+    for (const step of host.querySelectorAll('helix-headless-step')) {
+      ;(step as Step).complete = true
+    }
+    for (let turn = 0; turn < 3; turn += 1) {
+      await new Promise((resolve) => setTimeout(resolve))
+      await host.updateComplete
+    }
+    expect(bar.getAttribute('aria-valuenow')).toBe('100')
+    expect(hasState(host, 'complete')).toBe(true)
   })
 })
 

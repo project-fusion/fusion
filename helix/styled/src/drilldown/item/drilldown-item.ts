@@ -15,7 +15,13 @@ import { styles } from './drilldown-item.css.js'
  * @aliases Panel item, Drill row
  * @documentation https://fusion.dev/helix/components/drilldown
  *
+ * @cssproperty --drilldown-item-block-size - Height of a row.
+ * @cssproperty --drilldown-item-color - Color of a row's words.
+ * @cssproperty --drilldown-item-disabled-opacity - How faint a disabled row is drawn.
+ * @cssproperty --drilldown-item-font-size - Size of a row's words.
  * @cssproperty --drilldown-item-hover-color - Fill when a row is under the pointer.
+ * @cssproperty --drilldown-item-mark-color - Color of the caret on a row that opens a page.
+ * @cssproperty --drilldown-item-padding-inline - Space at either end of a row.
  */
 @customElement('helix-drilldown-item')
 export class HelixDrilldownItem extends HelixHeadlessDrilldownItem {

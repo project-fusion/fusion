@@ -22,8 +22,18 @@ import { styles } from './drilldown-root.css.js'
  * @aliases Panel, Nested list, Drill-in
  * @documentation https://fusion.dev/helix/components/drilldown
  *
+ * @cssproperty --drilldown-back-color - Color of the back button's icon.
+ * @cssproperty --drilldown-back-hover-background-color - Fill of the back button under the pointer.
  * @cssproperty --drilldown-background-color - Fill behind the pages.
+ * @cssproperty --drilldown-duration - How long a page takes to slide in.
+ * @cssproperty --drilldown-header-block-size - Height of the bar above a page.
+ * @cssproperty --drilldown-header-border-color - Color of the rule under the bar above a page.
  * @cssproperty --drilldown-inline-size - Width of the region.
+ * @cssproperty --drilldown-page-padding-block - Space above and below a page's rows.
+ * @cssproperty --drilldown-title-color - Color of the page's name.
+ * @cssproperty --drilldown-title-font-size - Size of the page's name.
+ * @cssproperty --drilldown-title-font-weight - Weight of the page's name.
+ * @cssproperty --drilldown-travel - How far a page slides as it arrives, along the line of text.
  */
 @customElement('helix-drilldown')
 export class HelixDrilldown extends HelixHeadlessDrilldown {
