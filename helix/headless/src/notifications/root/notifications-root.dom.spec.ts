@@ -481,7 +481,7 @@ describe('asking for more', () => {
       `<helix-headless-notifications label="Inbox" load-more load-more-label="Older">
         <helix-headless-notification>One</helix-headless-notification>
       </helix-headless-notifications>`,
-    )) as HTMLElement & { loading: boolean; updateComplete: Promise<boolean> }
+    )) as unknown as HTMLElement & { loading: boolean; updateComplete: Promise<boolean> }
     const asked: string[] = []
     host.addEventListener('helix-load-more', (event) => asked.push(event.type))
     const more = part(host, 'more') as HTMLButtonElement

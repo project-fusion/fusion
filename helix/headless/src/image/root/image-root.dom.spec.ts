@@ -345,3 +345,21 @@ describe('placeholder delay and states', () => {
     expect(states(host).has('error')).toBe(true)
   })
 })
+
+describe('an image with no alt', () => {
+  test('is reported once, and one with an alt or hidden from the reader is not', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      await mount('<helix-headless-image src="/a.png"></helix-headless-image>')
+      await mount('<helix-headless-image src="/a.png" alt=""></helix-headless-image>')
+      await mount('<helix-headless-image src="/a.png" alt="A road"></helix-headless-image>')
+      await mount('<helix-headless-image src="/a.png" aria-hidden="true"></helix-headless-image>')
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('alt=""')
+  })
+})
