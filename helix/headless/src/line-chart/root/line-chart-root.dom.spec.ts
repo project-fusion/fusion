@@ -386,3 +386,34 @@ describe('reading one series by key', () => {
     )
   })
 })
+
+/* A legend hides a series through the table the two share. A hidden line is
+   not drawn, so it is not said either: not in the summary, not in a reading
+   said whole, and the series keys pass over it. */
+describe('a series a legend hid', () => {
+  test('is left out of the summary, the readout and the series keys', async () => {
+    await import('../../legend/index.js')
+    await mount(
+      `<div>${CHANNELS}<helix-headless-line-chart for="channels"></helix-headless-line-chart><helix-headless-legend for="channels" hidden-series="Direct"></helix-headless-legend></div>`,
+    )
+    const host = document.querySelector('helix-headless-line-chart') as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    const legend = document.querySelector('helix-headless-legend') as typeof host
+    await legend.updateComplete
+    await host.updateComplete
+    expect(part(host, 'summary')?.textContent?.trim()).toBe('Sessions by channel, Feb: Referral 8.')
+    const press = async (key: string): Promise<void> => {
+      part(host, 'plot')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+      await host.updateComplete
+    }
+    await press('ArrowRight')
+    expect(part(host, 'live')?.textContent).toBe('Jan: Referral 4')
+    /* One series is left, so the up and down arrows walk the readings, as
+       they do on a chart of one series, and never rest on the hidden one. */
+    await press('ArrowDown')
+    expect(part(host, 'live')?.textContent).toBe('Feb: Referral 8')
+  })
+})

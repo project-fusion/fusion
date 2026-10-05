@@ -38,6 +38,21 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
    * drawn from, such as a scatter's measure across.
    */
   seriesOf?(cell: number): number | undefined
+  /**
+   * Whether the series drawn from the cell at this place in a row is shown,
+   * which it is unless a legend hid it. Absent, every series is shown.
+   *
+   * The series keys pass over a hidden one, and the readout leaves it out.
+   */
+  showsColumn?(cell: number): boolean
+  /**
+   * Whether the reading at this place is shown, for a chart whose readings
+   * a legend can hide: a ring's slices are its rows. Absent, every reading is
+   * shown.
+   *
+   * The keys pass over a hidden reading, as they pass over a hidden series.
+   */
+  showsReading?(at: number): boolean
 }
 
 /**
@@ -160,13 +175,40 @@ export class ChartPointerController implements ReactiveController {
     return this.series < 0 ? undefined : this.columns()[this.series]
   }
 
-  /** The cells a series key can rest on: every column a series was drawn from. */
+  /**
+   * Whether the series drawn from the cell at this place in a row is shown.
+   *
+   * The readout asks, so a reading said whole leaves out what a legend hid,
+   * as the drawing does.
+   */
+  shows(cell: number): boolean {
+    return this.host.showsColumn?.(cell) !== false
+  }
+
+  /**
+   * The cells a series key can rest on: every column a series was drawn
+   * from, and is still drawn from.
+   */
   private columns(): number[] {
     const host = this.host
-    const all = host.plottedColumns ?? []
-    return host.seriesOf === undefined
+    return (host.plottedColumns ?? []).filter(
+      (one) => (host.seriesOf === undefined || host.seriesOf(one) !== undefined) && this.shows(one),
+    )
+  }
+
+  /**
+   * The readings the keys walk, by place: every one, less those a legend hid.
+   *
+   * The keys step through this list and not through the count, so a hidden
+   * slice is passed over as if it were not in the table, which is how the
+   * ring draws it.
+   */
+  private shown(): number[] {
+    const host = this.host
+    const all = Array.from({ length: host.readings }, (_, at) => at)
+    return host.showsReading === undefined
       ? all
-      : all.filter((one) => host.seriesOf?.(one) !== undefined)
+      : all.filter((at) => host.showsReading?.(at) !== false)
   }
 
   /**
@@ -293,7 +335,8 @@ export class ChartPointerController implements ReactiveController {
     if (!this.fromPlot(event) || event.altKey || event.ctrlKey || event.metaKey) {
       return
     }
-    const count = this.host.readings
+    const shown = this.shown()
+    const count = shown.length
     if (count === 0) {
       return
     }
@@ -304,9 +347,11 @@ export class ChartPointerController implements ReactiveController {
       }
       return
     }
+    /* Stepped by place among the shown readings, so a hidden one is never
+       landed on, and turned back into the reading's own place after. */
     const next = stepReading(
       event.key,
-      { at: this.at, series: this.series },
+      { at: shown.indexOf(this.at), series: this.series },
       {
         axis: this.axis,
         count,
@@ -318,7 +363,8 @@ export class ChartPointerController implements ReactiveController {
     if (next === undefined) {
       return
     }
-    const { at, series } = next
+    const at = shown[next.at] ?? -1
+    const { series } = next
     event.preventDefault()
     if (at === this.at && series === this.series && this.keyed) {
       return
@@ -350,10 +396,11 @@ export class ChartPointerController implements ReactiveController {
       /* A selector the engine does not know: take it as the keyboard, which
          is the reader this is for. */
     }
-    if (!visible || this.host.readings === 0) {
+    const first = this.shown()[0]
+    if (!visible || first === undefined) {
       return
     }
-    this.at = 0
+    this.at = first
     this.keyed = true
     this.moved = true
     this.host.requestUpdate()

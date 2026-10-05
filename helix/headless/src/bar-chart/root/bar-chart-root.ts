@@ -339,7 +339,8 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    *
    * The highest, because which category leads is the question a bar chart is
    * read for, and the table beside it has every other number. The reading is
-   * written the way the table writes it, such as `$128k` for `128000`.
+   * written the way the table writes it, such as `$128k` for `128000`. A
+   * series a legend hid is not drawn and is not said.
    */
   protected renderSummary(series: Series[]): TemplateResult {
     const rows = this.sourceRows
@@ -349,7 +350,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
         (best, point) => (best === undefined || point.value > best.value ? point : best),
         undefined,
       )
-      if (top === undefined) {
+      if (top === undefined || !this.showsSeries(one.name)) {
         return []
       }
       const text = rows[top.at]?.cells[columns[depth] ?? -1]?.text ?? String(top.value)

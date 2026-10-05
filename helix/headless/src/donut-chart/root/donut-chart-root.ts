@@ -298,6 +298,14 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     return this.shares.length
   }
 
+  /**
+   * Whether the slice at this place is drawn, which a slice a legend hid is
+   * not. The keys pass over it, as the ring closes over it.
+   */
+  showsReading(at: number): boolean {
+    return (this.shares[at]?.fraction ?? 0) > 0
+  }
+
   protected override render(): TemplateResult {
     const shares = this.shares
     /* No middle where there is no hole. A `center` part over a pie would put

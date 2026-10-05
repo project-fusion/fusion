@@ -30,6 +30,10 @@ describe('a reading in words', () => {
     expect(spokenReading({ cells: [{ name: 'A', text: ' ' }], label: 'Q1' })).toBe('Q1')
   })
 
+  test('leaves out a series a legend hid', () => {
+    expect(spokenReading(ROW, undefined, (cell) => cell !== 0)).toBe('March: Status Outage')
+  })
+
   test('leaves out a heading the table does not have', () => {
     expect(spokenReading({ cells: [{ name: '', text: '7' }], label: 'Mon' })).toBe('Mon: 7')
   })
