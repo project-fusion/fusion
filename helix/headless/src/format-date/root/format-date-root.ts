@@ -1,6 +1,15 @@
-import { customElement, elapsedTime, HelixElement, subscribe } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  elapsedTime,
+  HelixElement,
+  relativeTime,
+  subscribe,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+
+/** A date with no time of day, `YYYY-MM-DD`, which names a day rather than an instant. */
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
 
 /** The `Intl.DateTimeFormat` options this element carries, in its own spelling. */
 interface Absolute {
@@ -31,9 +40,15 @@ interface Absolute {
  * schedules an update for when its current reading expires, and an element
  * showing a date schedules none, so a long feed left open costs almost nothing.
  *
- * **The output is always `<time datetime>`**, so screen readers, copy and
- * paste, and scripts parsing the page get the exact instant, whatever the
- * visible text says.
+ * **The output is always `<time datetime>`**, so copy and paste and scripts
+ * parsing the page get the exact instant, whatever the visible text says. A
+ * screen reader reads the text, so an `elapsed` reading is named in full, such
+ * as "3 hours ago", and carries the whole date as its title.
+ *
+ * **A date with no time, such as `2026-08-04`, is that day everywhere.** It is
+ * formatted in UTC unless `time-zone` says otherwise, as Date Input and Date
+ * Picker format their dates, so a reader west of UTC sees August 4 and not
+ * August 3.
  *
  * @since 0.1.0
  * @status stable
@@ -160,6 +175,11 @@ export class HelixHeadlessFormatDate extends HelixElement {
 
   private watching: MutationObserver | undefined = undefined
 
+  /** Whether the timestamp is a day with no time, which is formatted in UTC. */
+  private get dateOnly(): boolean {
+    return DATE_ONLY.test((this.date || this.written).trim())
+  }
+
   /** The timestamp, or nothing where there is not one to read. */
   private get moment(): Date | undefined {
     const source = this.date || this.written
@@ -188,8 +208,13 @@ export class HelixHeadlessFormatDate extends HelixElement {
     if (this.second) {
       asked.second = this.second
     }
+    /* A day with no time is midnight UTC once parsed, and read in a zone west
+       of it that is the day before. Measured before this: `2026-08-04` read
+       "August 3, 2026" in Los Angeles. */
     if (this.timeZone) {
       asked.timeZone = this.timeZone
+    } else if (this.dateOnly) {
+      asked.timeZone = 'UTC'
     }
     if (this.timeZoneName) {
       asked.timeZoneName = this.timeZoneName
@@ -299,10 +324,28 @@ export class HelixHeadlessFormatDate extends HelixElement {
     if (!moment) {
       return nothing
     }
-    const text = this.elapsed
-      ? elapsedTime(this.locale)(moment, new Date(this.clock ?? Date.now())).text
-      : new Intl.DateTimeFormat(this.locale || undefined, this.options).format(moment)
-    return html`<time part="time" datetime=${moment.toISOString()}>${text}</time>`
+    const datetime = this.dateOnly ? (this.date || this.written).trim() : moment.toISOString()
+    if (!this.elapsed) {
+      const text = new Intl.DateTimeFormat(this.locale || undefined, this.options).format(moment)
+      return html`<time part="time" datetime=${datetime}>${text}</time>`
+    }
+    /* The compact reading is what a feed shows, and "3h" is what a screen
+       reader read for it, with the instant in `datetime` exposed to nobody. So
+       the reading is named in full, "3 hours ago", and the whole date is its
+       title. `time` is a role that takes a name. */
+    const now = new Date(this.clock ?? Date.now())
+    const zone = this.timeZone || (this.dateOnly ? 'UTC' : undefined)
+    const whole = new Intl.DateTimeFormat(this.locale || undefined, {
+      dateStyle: 'long',
+      ...(this.dateOnly ? {} : { timeStyle: 'short' }),
+      ...(zone ? { timeZone: zone } : {}),
+    }).format(moment)
+    return html`<time
+      part="time"
+      datetime=${datetime}
+      aria-label=${relativeTime(this.locale)(moment, now).text}
+      title=${whole}
+    >${elapsedTime(this.locale)(moment, now).text}</time>`
   }
 }
 

@@ -92,8 +92,8 @@ Six families format numbers or dates and take a `locale`:
 
 | | |
 |---|---|
-| `Date Input`, `Date Picker` | Date formats and first day of week |
-| `Time Input`, `Time Picker` | 12 or 24 hour, and separators |
+| `Date Input`, `Date Picker` | Date formats, and the first day of the week where `first-day-of-week` is not set |
+| `Time Input`, `Time Picker` | 12 or 24 hour, separators, and the AM and PM on the wheels |
 | `Pagination` | Grouped thousands in page numbers |
 | `File Input` | File sizes |
 
@@ -107,6 +107,15 @@ Six families format numbers or dates and take a `locale`:
 If you do not set `locale`, these controls use the browser's locale, which is
 usually correct. Set `locale` when your users choose your application's
 language separately from the language of their operating system.
+
+The first day of the week comes from `Intl.Locale`'s week information, which
+Firefox does not provide. There, and where you set no `locale`, the week starts
+on Sunday. Set `first-day-of-week` to choose the day yourself.
+
+`locale` formats dates, times, and numbers. It does not translate the words a
+control speaks, such as "Previous month" on a calendar or "Hour" on a time
+wheel. Set those through their properties, such as `previous-label` and
+`next-label` on Date Picker and Date Input, and `hour-label` on Time Picker.
 
 Formatting uses `Intl`, so Helix bundles no locale data, and you have nothing to
 keep up to date.
@@ -137,7 +146,12 @@ it reports:
 - `bad-input-message`
 - `range-underflow-message`
 - `range-overflow-message`
+- `step-mismatch-message`
 - `too-short-message`
+
+Date Picker, Date Input, Time Picker, and Time Input also take
+`unavailable-message`, for a date or time that `disable-dates`, `disable-days`,
+or `disable-times` rules out.
 
 A message appears in the browser's own validation bubble and on the line under
 the field. `feedback` does not reach the bubble. If you do not set a message, a
