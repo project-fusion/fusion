@@ -3,6 +3,7 @@ import {
   customElement,
   HelixBeforeChangeEvent,
   HelixElement,
+  KeyboardNavigationController,
   requestChange,
   type Series,
   SourceController,
@@ -10,7 +11,7 @@ import {
   seriesKey,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { isHidden, toggledNames } from '../hidden-series.js'
 
 /**
@@ -34,7 +35,10 @@ import { isHidden, toggledNames } from '../hidden-series.js'
  * **`toggles` makes each entry a button that hides its series.** Every chart
  * reading the same table draws without a hidden series and fits its scale to
  * the rest, and the series keeps its color. The button says whether its
- * series is shown with `aria-pressed`. `hidden-series` holds the hidden names,
+ * series is shown with `aria-pressed`. The buttons are one tab stop: the
+ * arrow keys move between them, Home and End go to the first and the last,
+ * and a typed letter goes to the next name starting with it.
+ * `hidden-series` holds the hidden names,
  * so a page can start with some hidden or read which are. Two legends on one
  * table show the same hidden series: the list written last wins, and the
  * other legend takes it for its own entries.
@@ -127,6 +131,38 @@ export class HelixHeadlessLegend extends HelixElement {
   /* One controller rather than the resolve-and-watch each chart would write
      out for itself, which drifts into two names for the same lookup. */
   protected readonly source = new SourceController(this)
+
+  /**
+   * The toggle that holds the one tab stop, by place: the one a reader was
+   * last on, or the first.
+   */
+  @state()
+  private stop = 0
+
+  /**
+   * The arrow keys, Home, End and typed letters among the toggles, so a
+   * legend of twelve series is one tab stop and not twelve, as a toolbar of
+   * toggle buttons is. Nothing without `toggles`, where there is nothing to
+   * press.
+   */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () =>
+      this.toggles
+        ? [...this.renderRoot.querySelectorAll<HTMLButtonElement>('[part="toggle"]')].map(
+            (button) => ({
+              contains: (node: Node | null) => button.contains(node),
+              disabled: false,
+              focusItem: () => button.focus(),
+              select: () => {},
+              selected: false,
+              words: button.textContent?.trim() ?? '',
+            }),
+          )
+        : [],
+    origin: 'focus',
+    selects: () => false,
+    typeahead: (item) => (item as { words?: string }).words ?? '',
+  })
 
   /** The table this legend last wrote its `hidden-series` to, so leaving undoes it. */
   private wroteTo: Element | null = null
@@ -261,8 +297,10 @@ export class HelixHeadlessLegend extends HelixElement {
      * the first color is the one failure this component exists to prevent. This
      * was the sixth copy. */
     const named = this.label || this.source.element?.querySelector('caption')?.textContent?.trim()
+    const names = this.names()
+    const stop = Math.min(this.stop, names.length - 1)
     return html`<ul aria-label=${named || nothing} part="list" role="list">
-      ${this.names().map((name, index) => {
+      ${names.map((name, index) => {
         const off = isHidden(this.hiddenSeries, name)
         return html`<li
           data-series=${seriesIndex(index)}
@@ -270,7 +308,7 @@ export class HelixHeadlessLegend extends HelixElement {
           style="--chart-series: var(--chart-series-${seriesIndex(index)})"
           role="listitem"
         >
-          ${this.toggles ? this.renderToggle(name, off) : html`<span part="name">${name}</span>`}
+          ${this.toggles ? this.renderToggle(name, off, index, index === stop) : html`<span part="name">${name}</span>`}
         </li>`
       })}
     </ul>`
@@ -280,14 +318,20 @@ export class HelixHeadlessLegend extends HelixElement {
    * The button around a name under `toggles`, behind a seam a tier can move.
    *
    * Pressed while its series is shown, which is the state a reader changes by
-   * pressing it: a toggle button says whether its thing is on.
+   * pressing it: a toggle button says whether its thing is on. `holds` says
+   * whether it is the one tab stop, which is the last toggle a reader was on,
+   * the toggle at `index`.
    */
-  protected renderToggle(name: string, off: boolean): TemplateResult {
+  protected renderToggle(name: string, off: boolean, index = 0, holds = true): TemplateResult {
     return html`<button
       aria-pressed=${off ? 'false' : 'true'}
       part="toggle"
+      tabindex=${holds ? '0' : '-1'}
       type="button"
       @click=${() => this.toggle(name)}
+      @focus=${() => {
+        this.stop = index
+      }}
     >
       <span part="name">${name}</span>
     </button>`

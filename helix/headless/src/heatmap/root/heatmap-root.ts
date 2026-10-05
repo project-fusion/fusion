@@ -4,6 +4,7 @@ import {
   CHART_PLOT,
   customElement,
   drawTooltip,
+  formatNumbers,
   HelixElement,
   HelixResizeEvent,
   MixinChartSource,
@@ -45,7 +46,13 @@ import { fits, type Reading, toneOf } from './buckets.js'
  * down arrows move a cell, the left and right arrows move a column, which is a
  * week with `rows="7"`, and Home and End go to the first and the last. The
  * tooltip follows, the `live` part says the cell's row in words, and Escape
- * puts the tooltip away.
+ * puts the tooltip away. PageUp and PageDown move four columns, which is four
+ * weeks with `rows="7"`.
+ *
+ * **The strip describes itself.** The `overview` part says the busiest
+ * reading and the total of the readings drawn, "Busiest: 11 Jun 12; Total
+ * 84", and the strip is described by it, as every chart is by its summary.
+ * Hide it visually. The `summary` slot is still yours, for words of your own.
  *
  * @since 0.1.0
  * @status stable
@@ -66,6 +73,7 @@ import { fits, type Reading, toneOf } from './buckets.js'
  * @csspart footer - The three-slot row under the strip.
  * @csspart live - The readout: a polite live region that says the cell the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
+ * @csspart overview - The busiest reading and the total of the readings drawn, written as a sentence for screen readers, which describes the strip. Rendered once there are cells. Hide it visually.
  * @csspart start - The leading slot's box.
  * @csspart strip - The grid of cells, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart summary - The middle slot's box.
@@ -103,6 +111,12 @@ import { fits, type Reading, toneOf } from './buckets.js'
  */
 @customElement('helix-headless-heatmap')
 export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
+  /**
+   * The word the `overview` puts before the busiest reading.
+   */
+  @property({ attribute: 'busiest-label' })
+  busiestLabel = 'Busiest'
+
   /**
    * Shown when the table has no readings in it.
    *
@@ -178,6 +192,12 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    */
   @property()
   tones = ''
+
+  /**
+   * The word the `overview` puts before the total of the readings drawn.
+   */
+  @property({ attribute: 'total-label' })
+  totalLabel = 'Total'
 
   /**
    * How many cells are actually drawn.
@@ -481,6 +501,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
        empty strip has nothing to read and stays a picture. */
     const readable = cells.length > 0
     return html`<div
+        aria-describedby=${readable ? 'helix-chart-summary' : nothing}
         aria-label=${this.named || 'Heatmap'}
         part="strip"
         id=${CHART_PLOT}
@@ -524,7 +545,36 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
         <span part="start"><slot name="start"></slot></span>
         <span part="summary"><slot name="summary"></slot></span>
         <span part="end"><slot name="end"></slot></span>
-      </div>`
+      </div>${readable ? this.renderOverview(cells) : nothing}`
+  }
+
+  /**
+   * What the strip shows, in a sentence: the busiest reading drawn, as the
+   * table writes it, and the total of them all, in `locale`. The strip is
+   * described by it, so a reader landing on the strip hears what it holds
+   * before walking it.
+   */
+  protected renderOverview(cells: Reading[]): TemplateResult {
+    const rows = this.sourceRows
+    const offset = this.points.length - cells.length
+    const column = this.plottedColumns[0] ?? -1
+    let busiest = -1
+    let total = 0
+    cells.forEach((cell, index) => {
+      if (cell.value === undefined) {
+        return
+      }
+      total += cell.value
+      if (busiest < 0 || cell.value > (cells[busiest]?.value ?? 0)) {
+        busiest = index
+      }
+    })
+    const row = rows[offset + busiest]
+    const most = row
+      ? `${this.busiestLabel}: ${row.label} ${row.cells[column]?.text ?? ''}`.trim()
+      : ''
+    const sum = `${this.totalLabel} ${formatNumbers(this.locale)(total)}`
+    return html`<p id="helix-chart-summary" part="overview">${most ? `${most}; ${sum}` : sum}.</p>`
   }
 
   /**

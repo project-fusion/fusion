@@ -324,3 +324,31 @@ describe('toggling a series', () => {
     ).toEqual(['2', '2'])
   })
 })
+
+/* A legend of twelve series was twelve tab stops. A set of toggle buttons is
+   one stop, walked with the arrows, as a toolbar is. */
+describe('the toggles as one tab stop', () => {
+  type Legend = HTMLElement & { updateComplete: Promise<unknown> }
+  const buttons = (host: HTMLElement): HTMLButtonElement[] => [
+    ...(host.shadowRoot?.querySelectorAll<HTMLButtonElement>('[part="toggle"]') ?? []),
+  ]
+  const press = (host: HTMLElement, key: string): void => {
+    host.shadowRoot?.activeElement?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+    )
+  }
+
+  test('the first toggle holds the stop, and the arrows, Home, End and a letter move it', async () => {
+    const host = (await legend(TRAFFIC, 'for="traffic" toggles')) as Legend
+    expect(buttons(host).map((one) => one.getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
+    buttons(host)[0]?.focus()
+    press(host, 'ArrowRight')
+    await host.updateComplete
+    expect(host.shadowRoot?.activeElement).toBe(buttons(host)[1])
+    expect(buttons(host).map((one) => one.getAttribute('tabindex'))).toEqual(['-1', '0', '-1'])
+    press(host, 'End')
+    expect(host.shadowRoot?.activeElement).toBe(buttons(host)[2])
+    press(host, 'd')
+    expect(host.shadowRoot?.activeElement).toBe(buttons(host)[0])
+  })
+})

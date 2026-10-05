@@ -85,3 +85,23 @@ describe('a grid of readings', () => {
     expect(walk(['Home', 'ArrowDown'], { ...WEEKS, series: 3 })).toEqual({ at: 1, series: -1 })
   })
 })
+
+describe('a page of readings', () => {
+  const layout = { axis: 'inline' as const, count: 40, grid: 1, page: 10, rtl: false, series: 1 }
+
+  test('PageDown moves a page on and PageUp a page back, never off either end', () => {
+    expect(stepReading('PageDown', { at: 5, series: -1 }, layout)?.at).toBe(15)
+    expect(stepReading('PageUp', { at: 5, series: -1 }, layout)?.at).toBe(0)
+    expect(stepReading('PageDown', { at: 35, series: -1 }, layout)?.at).toBe(39)
+  })
+
+  test('the same way on a right-to-left page, later being further down the table', () => {
+    expect(stepReading('PageDown', { at: 5, series: -1 }, { ...layout, rtl: true })?.at).toBe(15)
+  })
+
+  test('from no reading starts at the first or the last, and with no page leaves the key alone', () => {
+    expect(stepReading('PageUp', { at: -1, series: -1 }, layout)?.at).toBe(39)
+    const { page: _, ...none } = layout
+    expect(stepReading('PageDown', { at: 5, series: -1 }, none)).toBeUndefined()
+  })
+})

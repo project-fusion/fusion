@@ -131,7 +131,8 @@ helix-headless-heatmap::part(empty) {
   text-align: center;
 }
 
-helix-headless-heatmap::part(live) {
+helix-headless-heatmap::part(live),
+helix-headless-heatmap::part(overview) {
   block-size: 1px;
   clip-path: inset(50%);
   inline-size: 1px;

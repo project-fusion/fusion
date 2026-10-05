@@ -408,3 +408,45 @@ describe('reading by key', () => {
     expect(part(element, 'live')?.textContent).toBe('Day 8: 7 (8 of 14)')
   })
 })
+
+/* Every other chart says what it shows in a summary; a strip said nothing of
+   its own, and a reader had to walk ninety cells to find the busiest. */
+describe('the overview', () => {
+  test('says the busiest reading and the total, and describes the strip', async () => {
+    const element = await strip('locale="en"', [
+      ['Mon', 3],
+      ['Tue', 1200],
+      ['Wed', 40],
+    ])
+    expect(part(element, 'overview')?.textContent).toBe('Busiest: Tue 1200; Total 1,243.')
+    expect(part(element, 'strip')?.getAttribute('aria-describedby')).toBe('helix-chart-summary')
+    expect(part(element, 'overview')?.id).toBe('helix-chart-summary')
+  })
+
+  test('in words the page can change', async () => {
+    const element = await strip('busiest-label="Höchster" total-label="Summe" locale="de"', [
+      ['Mo', 1500],
+      ['Di', 2],
+    ])
+    expect(part(element, 'overview')?.textContent).toBe('Höchster: Mo 1500; Summe 1.502.')
+  })
+
+  test('is not there while the strip has nothing to read', async () => {
+    const element = await strip('', [])
+    expect(part(element, 'overview')).toBeNull()
+  })
+})
+
+describe('a page of cells by key', () => {
+  test('PageDown moves four columns, four weeks in a calendar', async () => {
+    const days = Array.from({ length: 70 }, (_, day) => [`Day ${day + 1}`, day] as [string, number])
+    const element = await strip('rows="7" min-cell="0"', days)
+    for (const key of ['Home', 'PageDown']) {
+      part(element, 'strip')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+    }
+    await element.updateComplete
+    expect(part(element, 'live')?.textContent).toBe('Day 29: 28 (29 of 70)')
+  })
+})
