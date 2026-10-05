@@ -109,11 +109,19 @@ describe('input time', () => {
     expect(host.open).toBe(false)
   })
 
-  test('reaching the field from outside opens the list', async () => {
+  test('pressing into the field from outside opens the list', async () => {
     const host = await field()
+    control(host).dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
     control(host).dispatchEvent(new FocusEvent('focus', { relatedTarget: null }))
     await host.updateComplete
     expect(host.open).toBe(true)
+  })
+
+  test('tabbing into the field leaves the list shut', async () => {
+    const host = await field()
+    control(host).dispatchEvent(new FocusEvent('focus', { relatedTarget: null }))
+    await host.updateComplete
+    expect(host.open).toBe(false)
   })
 
   test('but a hand-off from inside does not, or picking a time reopens it', async () => {
