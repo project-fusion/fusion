@@ -738,3 +738,12 @@ describe('aura variance', () => {
     expect(SHAPES.filter((name) => bodyOf(name).includes('uVariance'))).toEqual(VARIES)
   })
 })
+
+describe('aura shader', () => {
+  test('ships no comment inside the string', () => {
+    /* No minifier reads inside a template literal, so a GLSL comment ships in
+       every bundle. The notes live in JavaScript comments the build strips. */
+    expect(FRAGMENT).not.toContain('/*')
+    expect(FRAGMENT).not.toContain('//')
+  })
+})

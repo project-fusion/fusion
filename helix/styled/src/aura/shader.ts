@@ -63,6 +63,10 @@ export const VERTEX = `#version 300 es
  * the template literal early, and what follows is parsed as JavaScript: it has
  * silently stripped every brace out of a shader and left the driver reporting a
  * syntax error two hundred lines from the cause. The build fails on it.
+ *
+ * **Each comment is JavaScript, in an empty interpolation.** A GLSL comment is
+ * part of the string, and no minifier reads inside a template literal, so 38 kB
+ * of notes shipped in every bundle. The build strips a JavaScript comment.
  */
 export const FRAGMENT = `#version 300 es
   precision highp float;
@@ -81,7 +85,8 @@ export const FRAGMENT = `#version 300 es
   uniform float uBloom;
   uniform float uGain;
 
-  /* How much the members of a population differ from one another, 1 being the
+  ${
+    /* How much the members of a population differ from one another, 1 being the
      resting amount and 0 a set that is uniform. Read by six of the eleven
      shapes, the ones made of many similar things, whether those are counted or
      continuous: streaks has lanes, particles has motes, rays has a fan, aurora
@@ -90,9 +95,11 @@ export const FRAGMENT = `#version 300 es
      that do not read it refuse it. Braid, waves and flow have a single subject
      and nothing to vary. Threads and lattice are even on purpose, a scatter of
      strands and a regular structure each being what it is because its members do
-     not differ. */
+     not differ. */ ''
+  }
   uniform float uVariance;
-  /* Where the pointer has been, as x, y and age. Age runs 0 at the moment it
+  ${
+    /* Where the pointer has been, as x, y and age. Age runs 0 at the moment it
      was left to 1 when it has faded, so a spent slot costs a compare.
 
      **This is what a fluid gets from a framebuffer, bought for eight vec3s.** A
@@ -103,7 +110,8 @@ export const FRAGMENT = `#version 300 es
      pass this component already makes, at a fixed cost that does not grow with
      how long the page has been open. What it cannot do is conserve anything, so
      there is no diffusion and no pressure: the wake decays rather than
-     spreading. Worth knowing before this is asked to be a simulation. */
+     spreading. Worth knowing before this is asked to be a simulation. */ ''
+  }
   uniform vec3 uTrail[9];
   uniform vec3 uGround;
   uniform vec3 uHaze;
@@ -117,10 +125,12 @@ export const FRAGMENT = `#version 300 es
   float noise(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
-    /* Quintic rather than cubic. Cubic smoothstep leaves a second derivative
+    ${
+      /* Quintic rather than cubic. Cubic smoothstep leaves a second derivative
        discontinuity at every cell edge, which four octaves of lighting turn
        into a faint square lattice: visible on a large soft field and exactly
-       the artifact that reads as cheap. */
+       the artifact that reads as cheap. */ ''
+    }
     vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
     return mix(
       mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
@@ -129,9 +139,11 @@ export const FRAGMENT = `#version 300 es
     );
   }
 
-  /* Each octave is rotated as well as scaled. Doubling alone stacks every
+  ${
+    /* Each octave is rotated as well as scaled. Doubling alone stacks every
      octave on the same axes, so value noise keeps its grid however many are
-     summed. An irrational angle means no two octaves ever line up again. */
+     summed. An irrational angle means no two octaves ever line up again. */ ''
+  }
   const mat2 TURN = mat2(0.8, 0.6, -0.6, 0.8);
 
   float fbm(vec2 p) {
@@ -145,43 +157,49 @@ export const FRAGMENT = `#version 300 es
     return sum;
   }
 
-  /* Domain warping: the field is sampled at coordinates another field bends.
+  ${
+    /* Domain warping: the field is sampled at coordinates another field bends.
      This is the single largest difference between noise that reads as organic
      and noise that reads as television static, and it costs two more fbm calls
-     rather than a different algorithm. */
+     rather than a different algorithm. */ ''
+  }
   float warped(vec2 p, float t) {
     vec2 q = vec2(fbm(p + vec2(0.0, t)), fbm(p + vec2(5.2, 1.3 - t)));
     vec2 r = vec2(fbm(p + 4.0 * q + vec2(1.7, 9.2)), fbm(p + 4.0 * q + vec2(8.3, 2.8)));
     return fbm(p + 4.0 * r);
   }
 
-  /* An exponential falloff without the corner.
-   *
-   * Both abs and length have a vertex at zero and their derivative jumps
-   * across it, so a falloff built on either acquires a hard line exactly along
-   * the axis it is brightest on. That is a crease in something meant to be
-   * light, and it is what put a chevron through the braid wherever the
-   * pointer's height crossed a strand.
-   *
-   * Softening the distance rather than the exponent keeps the tails identical
-   * and rounds only the point. The softening scales with the rate, so a tight
-   * falloff is rounded tightly and a broad one broadly: at zero the result is
-   * exp(-0.06) whatever the rate is, six per cent off the peak, which is not
-   * visible as flattening.
-   *
-   * Takes the squared distance, because every caller already has one and a
-   * square root taken here is the one that would have reintroduced the vertex.
-   */
+  ${
+    /* An exponential falloff without the corner.
+     *
+     * Both abs and length have a vertex at zero and their derivative jumps
+     * across it, so a falloff built on either acquires a hard line exactly along
+     * the axis it is brightest on. That is a crease in something meant to be
+     * light, and it is what put a chevron through the braid wherever the
+     * pointer's height crossed a strand.
+     *
+     * Softening the distance rather than the exponent keeps the tails identical
+     * and rounds only the point. The softening scales with the rate, so a tight
+     * falloff is rounded tightly and a broad one broadly: at zero the result is
+     * exp(-0.06) whatever the rate is, six per cent off the peak, which is not
+     * visible as flattening.
+     *
+     * Takes the squared distance, because every caller already has one and a
+     * square root taken here is the one that would have reintroduced the vertex.
+     */ ''
+  }
   float falloff(float d2, float k) {
     float soft = 0.06 / k;
     return exp(-sqrt(d2 + soft * soft) * k);
   }
 
-  /* Two strands half a turn apart, inside a wider volume. */
+  ${/* Two strands half a turn apart, inside a wider volume. */ ''}
   float braid(vec2 q, float t, vec2 qp, float reach) {
-    /* The strands lean toward the pointer where it is alongside them, and are
+    ${
+      /* The strands lean toward the pointer where it is alongside them, and are
        unmoved where it is not. A braid is a thing with a length, so what it can
-       answer with is a bend at a height, not a bulge at a point. */
+       answer with is a bend at a height, not a bulge at a point. */ ''
+    }
     float alongside = falloff((q.y - qp.y) * (q.y - qp.y), 1.1) * reach;
     float lean = qp.x * alongside * 0.45;
     float lit = 0.0;
@@ -191,16 +209,19 @@ export const FRAGMENT = `#version 300 es
       lit += 0.8 * falloff(x * x, 13.0);
     }
     float volume = falloff(q.x * q.x, 2.6);
-    /* Compressed hard across the shaft and stretched along it. The same octaves
-       sampled square read as haze; this way they read as filaments. */
+    ${
+      /* Compressed hard across the shaft and stretched along it. The same octaves
+       sampled square read as haze; this way they read as filaments. */ ''
+    }
     float streak = fbm(vec2(q.x * 9.0, q.y * 0.55 - t * 2.4));
     float haze = warped(vec2(q.x * 0.8 + 4.0, q.y * 0.45), t * 0.5);
     return lit * mix(0.35, 1.65, streak) + volume * 0.3 * mix(0.35, 1.05, haze);
   }
 
-  /* A fan from a source above the frame, cut into filaments by angle. */
+  ${/* A fan from a source above the frame, cut into filaments by angle. */ ''}
   float rays(vec2 q, float t, vec2 qp, float reach) {
-    /* The pointer occludes, rather than the source moving. Swinging the source
+    ${
+      /* The pointer occludes, rather than the source moving. Swinging the source
        re-aims the whole fan, which is a thing a light does and not a thing that
        happens when something passes in front of one, so the source is fixed and
        the pointer is a blocker.
@@ -209,7 +230,8 @@ export const FRAGMENT = `#version 300 es
        object covers as seen from the source, and it only exists further along
        than the object is. A fragment nearer the source than the blocker is in
        front of it and stays lit, which is the whole difference between an
-       occluder and a dark patch that follows the cursor. */
+       occluder and a dark patch that follows the cursor. */ ''
+    }
     vec2 o = vec2(0.0, 1.45);
     vec2 v = q - o;
     float dist = length(v);
@@ -218,39 +240,48 @@ export const FRAGMENT = `#version 300 es
     vec2 vp = qp - o;
     float distToBlocker = length(vp);
     float angToBlocker = atan(vp.x, -vp.y);
-    /* Widened with distance, so the object reads as a fixed size rather than
-       as a wedge that grows the further out it is carried. */
+    ${
+      /* Widened with distance, so the object reads as a fixed size rather than
+       as a wedge that grows the further out it is carried. */ ''
+    }
     float halfAngle = 0.055 / max(distToBlocker, 0.35);
     float across = (ang - angToBlocker) / halfAngle;
-    /* Cast from the near edge of the object rather than from somewhere past it.
+    ${
+      /* Cast from the near edge of the object rather than from somewhere past it.
        Ramping in over a fifth of a unit started the shadow below the thing
-       supposedly casting it, which reads as two objects. */
+       supposedly casting it, which reads as two objects. */ ''
+    }
     float behind = smoothstep(-0.03, 0.05, dist - distToBlocker);
     float shadow = exp(-across * across) * behind * reach;
 
     float fan = fbm(vec2(ang * 8.0, dist * 0.5 - t * 1.8));
     float dust = warped(vec2(ang * 2.0, dist * 0.7), t * 0.4);
     float spread = smoothstep(0.85, 0.05, abs(ang));
-    /* The fan is a population too, even though it is continuous rather than
+    ${
+      /* The fan is a population too, even though it is continuous rather than
        counted: how far apart its light and dark run is how much one ray differs
        from the next. Both ends travel toward the midpoint, so a variance of 0
-       is an even wash and a variance of 1 is exactly the pair this always had. */
+       is an even wash and a variance of 1 is exactly the pair this always had. */ ''
+    }
     float rv = clamp(uVariance, 0.0, 1.0);
     float lit = spread * mix(mix(0.85, 0.2, rv), mix(0.85, 1.5, rv), fan) *
       mix(0.75, 1.15, dust) * falloff(dot(v, v), 0.8);
     return lit * (1.0 - shadow * 0.82);
   }
 
-  /* Curtains on a drifting horizon. */
+  ${/* Curtains on a drifting horizon. */ ''}
   float aurora(vec2 q, float t, vec2 qp, float reach) {
-    /* The curtain waves harder where the pointer is, rather than being lifted
+    ${
+      /* The curtain waves harder where the pointer is, rather than being lifted
        by it. An aurora is a sheet with an amplitude, and a swell only raised
        the whole thing locally, which is a bump in a line. Multiplying the
        amplitude bends it instead: the folds deepen and the ridge travels
-       further, which is what an aurora does when it is disturbed. */
+       further, which is what an aurora does when it is disturbed. */ ''
+    }
     float agitate = falloff((q.x - qp.x) * (q.x - qp.x), 1.5) * reach;
 
-    /* A curtain stands. It does not hang.
+    ${
+      /* A curtain stands. It does not hang.
 
        A falloff symmetric about the ridge is a band with a wavy center line,
        and vertical noise on a band is an equalizer. An aurora has a sharp lower
@@ -260,75 +291,96 @@ export const FRAGMENT = `#version 300 es
 
        Two of them, offset and at different depths, because a single sheet reads
        as a decal and what makes the real thing look like drapery is one curtain
-       seen through another. */
+       seen through another. */ ''
+    }
     float lit = 0.0;
     for (int i = 0; i < 2; i++) {
       float f = float(i);
-      /* Two octaves, not a warp. A warp folds the domain back on itself and
+      ${
+        /* Two octaves, not a warp. A warp folds the domain back on itself and
          puts high frequencies in the ridge, and against a hard top edge every
          wiggle becomes a spike: the first pass came out a mountain range. What
          an aurora has is a long undulation with a few folds in it, which is
-         what a low fundamental and one overtone give. */
+         what a low fundamental and one overtone give. */ ''
+      }
       float ridge =
         ((noise(vec2(q.x * (0.55 + f * 0.2) + f * 4.0, t * 0.3)) - 0.5) * 1.7 +
           (noise(vec2(q.x * (1.3 + f * 0.4) + f * 9.0, t * 0.45)) - 0.5) * 0.55) *
           (1.0 + agitate * 2.0) +
         f * 0.22;
-      /* **The sheet stands on the ridge rather than hanging from it, and that
+      ${
+        /* **The sheet stands on the ridge rather than hanging from it, and that
          inversion is the whole difference between an aurora and a landscape.**
          A hard edge with mass under it is a mountain silhouette: one unbroken
          ridge line across the frame with a striped solid below it. A curtain's
          lower border is its sharpest, brightest line, and what rises from it
-         thins and breaks into rays. */
+         thins and breaks into rays. */ ''
+      }
       float depth = q.y - ridge;
-      /* Sharp, but not a cliff: the edge is where the light stops, and a step
+      ${
+        /* Sharp, but not a cliff: the edge is where the light stops, and a step
          narrower than a pixel is an aliased line rather than an edge.
 
          **The border's sharpness varies along it.** A line of even weight reads
          as drawn rather than lit however it wanders. A real lower border is
          hard where the sheet faces us and diffuse where it turns away, so the
-         crispness is drawn from the same slow noise the folds are. */
+         crispness is drawn from the same slow noise the folds are. */ ''
+      }
       float crisp = mix(0.04, 0.3, noise(vec2(q.x * 0.8 + f * 5.0, t * 0.15)));
       float edge = smoothstep(-crisp, crisp * 0.5, depth);
-      /* Steep, so the curtain thins instead of filling everything above the
+      ${
+        /* Steep, so the curtain thins instead of filling everything above the
          border. At 1.5 it still stood at a fifth a whole unit up, which with
          the bundles over it painted a solid wall of stripes from the border to
-         the top of the frame. A curtain is mostly the bottom of a curtain. */
+         the top of the frame. A curtain is mostly the bottom of a curtain. */ ''
+      }
       float rise = exp(-max(depth, 0.0) * (2.9 + f * 1.1));
-      /* Stretched along the fall, so the striations are the vertical rays a
+      ${
+        /* Stretched along the fall, so the striations are the vertical rays a
          curtain is actually made of rather than texture on a stripe. Not
          stretched harder than this: at 0.35 a ray held one value for its whole
-         length, which is a picket fence however the bundles are shaped. */
+         length, which is a picket fence however the bundles are shaped. */ ''
+      }
       float rays = fbm(vec2(q.x * (9.0 + f * 4.0), q.y * 0.9 - t * (2.2 + f)));
 
-      /* A rim along the top edge. The brightest part of a curtain is the line
+      ${
+        /* A rim along the top edge. The brightest part of a curtain is the line
          where the field lines end, and without it the sheet fades in from
          nothing and reads as fog with stripes rather than as something with a
          boundary. Wide enough to see: at k = 26 this was two pixels and might
-         as well not have been there. */
+         as well not have been there. */ ''
+      }
       float rim = falloff(depth * depth, 7.0) * 0.45;
 
-      /* **A curtain is not the width of the sky.** Running edge to edge is what
+      ${
+        /* **A curtain is not the width of the sky.** Running edge to edge is what
          made the ridge read as a horizon: a horizon is continuous and a curtain
          is not. Broken into lengths by a slow mask, with real gaps between
-         them, it becomes some number of curtains rather than one long one. */
+         them, it becomes some number of curtains rather than one long one. */ ''
+      }
       float lengths = smoothstep(0.2, 0.66, noise(vec2(q.x * 1.15 + f * 13.0, t * 0.12)));
 
-      /* Rays clump. Straight fbm is evenly spaced striping, which is a picket
+      ${
+        /* Rays clump. Straight fbm is evenly spaced striping, which is a picket
          fence whatever else is done to it, and the floor under it lit the sheet
          everywhere so the rays only ever read as texture on a solid band.
          Pushing the midtones apart leaves bright bundles with real gaps
-         between them, and the low floor is what lets the gaps be gaps. */
+         between them, and the low floor is what lets the gaps be gaps. */ ''
+      }
       float bundles = smoothstep(0.34, 0.86, rays);
 
-      /* The curtain is a draped sheet, so it is bright where a fold turns edge
+      ${
+        /* The curtain is a draped sheet, so it is bright where a fold turns edge
          on and nearly out where it faces us. A narrow range here is a band of
-         even brightness, which is the other half of what made it read flat. */
+         even brightness, which is the other half of what made it read flat. */ ''
+      }
       float foldNoise = noise(vec2(q.x * 1.5 + f * 7.0, t * 0.25));
 
-      /* Bundles and folds are what a curtain is made many of, so both answer
+      ${
+        /* Bundles and folds are what a curtain is made many of, so both answer
          variance about their own midpoint: at 0 an even sheet, at 1 the
-         clumping and the deep folds this was tuned to. */
+         clumping and the deep folds this was tuned to. */ ''
+      }
       float av = clamp(uVariance, 0.0, 1.0);
       float bundled = mix(mix(0.85, 0.1, av), mix(0.85, 1.6, av), bundles);
       float folded = mix(mix(0.775, 0.15, av), mix(0.775, 1.4, av), foldNoise);
@@ -337,26 +389,29 @@ export const FRAGMENT = `#version 300 es
     return lit;
   }
 
-  /* Light traveling in lanes, at speed.
-   *
-   * The one shape here that is about motion rather than about a form. Each lane
-   * carries a trail with its own speed, length and phase, so the field reads as
-   * something passing rather than something standing.
-   *
-   * The wrap is deliberately outside the frame. A trail restarting is a pop, so
-   * the travel runs to plus and minus 1.8 while the visible field ends nearer
-   * 1.2, and the reset happens where nobody is looking.
-   *
-   * The pointer is an obstacle: lanes bow around it and slow through it, the way
-   * anything moving past a body does. Pushed outward in proportion to the offset
-   * rather than by its sign, because a sign is a discontinuity and a
-   * discontinuity in a displacement is a crease.
-   */
+  ${
+    /* Light traveling in lanes, at speed.
+     *
+     * The one shape here that is about motion rather than about a form. Each lane
+     * carries a trail with its own speed, length and phase, so the field reads as
+     * something passing rather than something standing.
+     *
+     * The wrap is deliberately outside the frame. A trail restarting is a pop, so
+     * the travel runs to plus and minus 1.8 while the visible field ends nearer
+     * 1.2, and the reset happens where nobody is looking.
+     *
+     * The pointer is an obstacle: lanes bow around it and slow through it, the way
+     * anything moving past a body does. Pushed outward in proportion to the offset
+     * rather than by its sign, because a sign is a discontinuity and a
+     * discontinuity in a displacement is a crease.
+     */ ''
+  }
   float streaks(vec2 q, float t, vec2 qp, float reach) {
     float near = falloff(dot(q - qp, q - qp), 1.6) * reach;
     vec2 s = q + vec2((q.x - qp.x) * near * 1.1, 0.0);
 
-    /* Three lanes are visited, not one, and that is the fix for a square edge.
+    ${
+      /* Three lanes are visited, not one, and that is the fix for a square edge.
 
        Each lane draws its speed, phase and length from a hash of its index, so
        every one of them is at a different point in its cycle. Sampled from the
@@ -373,21 +428,25 @@ export const FRAGMENT = `#version 300 es
        **Few lanes, and not all of them carry anything.** A streak is an event,
        and a field of simultaneous events is a texture. A dead lane contributes
        nothing anywhere rather than being cut off somewhere, so it costs the
-       three lane blend nothing. */
+       three lane blend nothing. */ ''
+    }
     float laneF = s.x * 1.6;
     float base = floor(laneF);
 
     float lit = 0.0;
-    /* Three lanes, which is what the widths support. The tail spreads to at
+    ${
+      /* Three lanes, which is what the widths support. The tail spreads to at
        most 0.15 and lanes sit 0.417 apart, so one lane out carries about a
        fiftieth and the lane that drops out of the visited set, two out, is
        around a ten millionth. That dropped lane is where a step could appear,
-       and it is the whole reason this loop is not a single lane. */
+       and it is the whole reason this loop is not a single lane. */ ''
+    }
     for (int k = -1; k <= 1; k++) {
       float id = base + float(k);
       float within = laneF - (id + 0.5);
 
-      /* Speed, length, width and spacing all scale from a common resting value,
+      ${
+        /* Speed, length, width and spacing all scale from a common resting value,
          so a variance of 0 is a rank of equal streaks at one speed rather than
          a special case. Phase is never scaled: lanes sharing a phase march in
          lockstep, which is not a uniform population but a broken one.
@@ -398,17 +457,21 @@ export const FRAGMENT = `#version 300 es
          makes exp(-behind / len) grow instead of decay and the lane becomes a
          full-height white bar. Measured at 2, the frame held 93 apparent lanes
          and six straight edges. There is nothing above 1 worth reaching, the
-         resting spread already being fourfold in speed. */
+         resting spread already being fourfold in speed. */ ''
+      }
       float v = clamp(uVariance, 0.0, 1.0);
       float alive = step(0.42, hash(vec2(id, 97.0)));
       float speed = mix(1.3, 0.55 + hash(vec2(id, 11.0)) * 1.5, v);
       float phase = hash(vec2(id, 29.0));
-      /* Long enough that the trail dominates the head, which is what the shape
+      ${
+        /* Long enough that the trail dominates the head, which is what the shape
          is named for, and no longer: a plume that stays bright for two and a
-         half units is a searchlight, and the frame is two units tall. */
+         half units is a searchlight, and the frame is two units tall. */ ''
+      }
       float len = mix(0.85, 0.5 + hash(vec2(id, 47.0)) * 0.8, v);
 
-      /* **The lane is periodic, not a single streak that is put back when it
+      ${
+        /* **The lane is periodic, not a single streak that is put back when it
          runs out.** With fract() over a fixed span of 3.6 a head left the top
          at 1.8 and was moved to -1.8, taking whatever of its tail was still on
          screen with it. That span is only off screen while the frame is small
@@ -427,12 +490,14 @@ export const FRAGMENT = `#version 300 es
          a grid however much else about them differs, and it has to exceed the
          tail length, or a streak's tail reaches the next one's nose and the
          lane reads as a dashed line rather than as separate things
-         traveling. */
+         traveling. */ ''
+      }
       float gap = mix(4.2, 3.2 + hash(vec2(id, 59.0)) * 2.2, v);
       float travel = phase + t * speed * 1.8 / gap;
       float u = s.y / gap - travel;
       float w = fract(u);
-      /* **A streak is one solid, not a brightness curve times a fixed width.**
+      ${
+        /* **A streak is one solid, not a brightness curve times a fixed width.**
          Drawn separably it is a dart, and that is what these were: along the
          lane the light stopped over a fifth of a unit, across it the lane kept
          its full width the whole way, and the level sets of such a product meet
@@ -441,17 +506,21 @@ export const FRAGMENT = `#version 300 es
          So each term carries its own width. The tail leaves the head narrow and
          spreads as it falls behind, and the front is a round cap rather than a
          full-width wall cut off across the lane. Together that is a teardrop,
-         which is the silhouette the thing actually has. */
+         which is the silhouette the thing actually has. */ ''
+      }
       float across = within / 1.6;
-      /* Narrow across the lane. Lanes sit 0.417 apart and a sigma of 0.15
+      ${
+        /* Narrow across the lane. Lanes sit 0.417 apart and a sigma of 0.15
          overlapped both neighbors, so the frame came out a blue wash with no
          streaks in it at all. Length against width is what makes a streak read
          as a streak: at a ratio near four these were stubby rods with rounded
          ends whichever way they tapered, and the fix for that is proportion
-         rather than another change of profile. */
+         rather than another change of profile. */ ''
+      }
       float wide = mix(0.045, 0.03 + hash(vec2(id, 71.0)) * 0.04, v);
 
-      /* **A comet is a nucleus with a coma, and a plume behind it.** A round
+      ${
+        /* **A comet is a nucleus with a coma, and a plume behind it.** A round
          cap the width of the body with the body widening behind it draws a bulb
          on a shaft; tapering the front instead draws a hairline that reads as a
          scratch. The fault common to both is a head glow computed from the
@@ -460,7 +529,8 @@ export const FRAGMENT = `#version 300 es
 
          The glow is centered on the head, measured to whichever head is nearer
          along the lane, so it is symmetric about the nucleus the way a coma
-         is. */
+         is. */ ''
+      }
       float behind = (1.0 - w) * gap;
       float ahead = w * gap;
       float toHead = min(ahead, behind);
@@ -470,7 +540,8 @@ export const FRAGMENT = `#version 300 es
       float nucleus = exp(-near2 / (2.0 * nose * nose));
       float coma = exp(-near2 / (2.0 * (nose * 3.0) * (nose * 3.0))) * 0.42;
 
-      /* The plume opens fast and fades fast, and is never as bright as the
+      ${
+        /* The plume opens fast and fades fast, and is never as bright as the
          head. A tail that holds its brightness for its whole length is a
          streak of paint; what makes a comet read is that almost all of the
          light is in the first tenth of it.
@@ -479,10 +550,12 @@ export const FRAGMENT = `#version 300 es
          only behind, so its value would step from nothing to something at the
          nucleus; ramping it in over a seventh of its own length puts that
          transition under the brightest part of the coma, where there is nothing
-         left to see. */
+         left to see. */ ''
+      }
       float onset = 1.0 - exp(-behind / (0.15 * len));
 
-      /* **The straight edge was a min().** Clamping the plume's width with
+      ${
+        /* **The straight edge was a min().** Clamping the plume's width with
          min(nose * (1 + behind * 3), 0.16) saturates at a constant value of
          behind, and a constant behind is a straight line across the lane: above
          it the width was fixed and below it grew, and the kink between the two
@@ -491,12 +564,13 @@ export const FRAGMENT = `#version 300 es
          must not have.
     
          An exponential approach reaches the same limit without ever having a
-         corner, so there is no line to see anywhere. */
+         corner, so there is no line to see anywhere. */ ''
+      }
       float spread = nose + (0.11 - nose) * (1.0 - exp(-behind * 1.3));
       float tail = exp(-behind / len) * onset *
         exp(-(across * across) / (2.0 * spread * spread)) * 0.5;
 
-      /* Slowed where the pointer is, which is the other half of an obstacle. */
+      ${/* Slowed where the pointer is, which is the other half of an obstacle. */ ''}
       float weight = mix(1.0, 0.5 + hash(vec2(id, 83.0)) * 0.95, v);
       lit += (nucleus + coma + tail) * alive * weight * mix(1.0, 0.45, near);
     }
@@ -504,30 +578,35 @@ export const FRAGMENT = `#version 300 es
     return lit * mix(0.55, 1.35, grain) * falloff(dot(q, q), 0.42);
   }
 
-  /* Broad bands rolling under a warp.
-   *
-   * The softest shape here, and the only one with no filaments in it at all:
-   * where braid and threads are made of lines, this is made of gradients. The
-   * warp is what stops it sliding: bands moved by phase alone travel sideways
-   * like a barcode, and bands moved through a warped domain roll.
-   *
-   * The pointer drags them. Bowing the phase toward it bends the crests without
-   * changing how many there are, which is what a surface does when something
-   * pulls across it.
-   */
+  ${
+    /* Broad bands rolling under a warp.
+     *
+     * The softest shape here, and the only one with no filaments in it at all:
+     * where braid and threads are made of lines, this is made of gradients. The
+     * warp is what stops it sliding: bands moved by phase alone travel sideways
+     * like a barcode, and bands moved through a warped domain roll.
+     *
+     * The pointer drags them. Bowing the phase toward it bends the crests without
+     * changing how many there are, which is what a surface does when something
+     * pulls across it.
+     */ ''
+  }
   float waves(vec2 q, float t, vec2 qp, float reach) {
     float pull = falloff(dot(q - qp, q - qp), 1.2) * reach;
-    /* **The warp was eating the waves.** At an amplitude of 2.4 against a band
+    ${
+      /* **The warp was eating the waves.** At an amplitude of 2.4 against a band
        frequency of 1.7 it swung the sine's argument by about four radians,
        which is more than a whole period: the wavefronts were destroyed rather
        than bent and what came out was turbulence. It read as marbled paper, and
        at a low scale it filled the frame with near white.
     
-       A tenth of that bends the fronts and leaves them fronts. */
+       A tenth of that bends the fronts and leaves them fronts. */ ''
+    }
     float warp = warped(vec2(q.x * 0.5, q.y * 0.4), t * 0.3) - 0.5;
     vec2 w = q + warp * 0.32;
 
-    /* Two systems crossing, lit where they agree, which is what the shape is
+    ${
+      /* Two systems crossing, lit where they agree, which is what the shape is
        named for.
 
        **And the frequency has to be high enough to be a wave at all.** At 2.3
@@ -539,16 +618,19 @@ export const FRAGMENT = `#version 300 es
 
        The two are deliberately not harmonic. Close but unequal frequencies beat
        against each other, and the slow traveling interference that produces is
-       the thing worth watching. */
+       the thing worth watching. */ ''
+    }
     float a = sin((w.y * 8.1 + w.x * 2.3) - t * 0.9 - pull * 1.4);
     float b = sin((w.y * 5.3 - w.x * 3.4) + t * 0.6 + pull * 1.0);
 
-    /* **Added, these two make a lattice, not a wave field.** Equal amplitudes
+    ${
+      /* **Added, these two make a lattice, not a wave field.** Equal amplitudes
        crossing at an angle give a regular grid of lobes, which came out as
        bubble wrap and got worse the more of it fitted on screen. Waves are
        lines. So one system carries the fronts and the other only varies their
        brightness along their length, which is what a real swell does: the
-       crests stay crests and are taller in some places than others. */
+       crests stay crests and are taller in some places than others. */ ''
+    }
     float band = a * 0.5 + 0.5;
     band *= mix(0.45, 1.0, b * 0.5 + 0.5);
 
@@ -556,26 +638,31 @@ export const FRAGMENT = `#version 300 es
     return pow(band, 2.2) * mix(0.55, 1.2, grain) * falloff(dot(q, q), 0.4);
   }
 
-  /* Luminous threads, woven to a pinch.
-   *
-   * Five curves at different frequencies and speeds, each a thin bright line
-   * rather than a band: what makes this read as woven is that they cross, and
-   * what makes it read as one object rather than five is the pinch, where every
-   * amplitude narrows at once and the whole weave gathers.
-   *
-   * The pointer is the pinch, which is the interaction this shape is for.
-   * Carrying it along drags the gathering point with it and the threads open
-   * behind and close ahead.
-   */
+  ${
+    /* Luminous threads, woven to a pinch.
+     *
+     * Five curves at different frequencies and speeds, each a thin bright line
+     * rather than a band: what makes this read as woven is that they cross, and
+     * what makes it read as one object rather than five is the pinch, where every
+     * amplitude narrows at once and the whole weave gathers.
+     *
+     * The pointer is the pinch, which is the interaction this shape is for.
+     * Carrying it along drags the gathering point with it and the threads open
+     * behind and close ahead.
+     */ ''
+  }
   float threads(vec2 q, float t, vec2 qp, float reach) {
     float pinchAt = mix(0.0, qp.x, reach);
-    /* Narrowed, not collapsed. At 0.88 the amplitude and the spacing both fell
+    ${
+      /* Narrowed, not collapsed. At 0.88 the amplitude and the spacing both fell
        to a tenth and all seven threads landed on the same line, which is a
        bright blob rather than a gathering: what a pinch has to preserve is that
-       there are still threads in it. */
+       there are still threads in it. */ ''
+    }
     float gather = 1.0 - falloff((q.x - pinchAt) * (q.x - pinchAt), 1.1) * 0.6;
 
-    /* Seven, and every one of them the same thread.
+    ${
+      /* Seven, and every one of them the same thread.
 
        What makes a weave read as a weave is that the strands are alike and only
        their phase differs, which is also what makes it a wave rather than a
@@ -585,23 +672,28 @@ export const FRAGMENT = `#version 300 es
 
        So one amplitude, one thickness, one weight, one frequency, and the
        phases fanned evenly across a turn. Alike, they cross at regular
-       intervals instead of at coincidences. */
+       intervals instead of at coincidences. */ ''
+    }
     float lit = 0.0;
     for (int i = 0; i < 7; i++) {
       float f = float(i);
       float phase = f * (6.2831853 / 7.0);
 
-      /* Evenly spaced, and the spacing collapses at the pinch along with the
+      ${
+        /* Evenly spaced, and the spacing collapses at the pinch along with the
          amplitude: threads that only narrow still run parallel through it,
          where threads that also converge actually gather. It closes less than
-         the amplitude does, so they draw together without stacking. */
+         the amplitude does, so they draw together without stacking. */ ''
+      }
       float lane = (f - 3.0) * 0.17 * mix(1.0, gather, 0.65);
       float amp = 0.34 * gather;
 
-      /* A second harmonic at a third the frequency and a third the amplitude,
+      ${
+        /* A second harmonic at a third the frequency and a third the amplitude,
          which bends the long run of each thread without breaking it into
          wiggles. Low and quiet is the difference between a wave with character
-         and a wave with noise on it. */
+         and a wave with noise on it. */ ''
+      }
       float y =
         lane +
         sin(q.x * 1.5 + t * 0.55 + phase) * amp +
@@ -609,23 +701,27 @@ export const FRAGMENT = `#version 300 es
 
       lit += falloff((q.y - y) * (q.y - y), 24.0);
     }
-    /* Quiet grain. At the old depth it was texture on the threads rather than
-       air around them, and a wave with grain on it is a wobble again. */
+    ${
+      /* Quiet grain. At the old depth it was texture on the threads rather than
+       air around them, and a wave with grain on it is a wobble again. */ ''
+    }
     float grain = fbm(vec2(q.x * 2.0, q.y * 2.0 - t));
     return lit * mix(0.85, 1.12, grain) * falloff(dot(q, q), 0.4);
   }
 
-  /* Points adrift, and pushed aside.
-   *
-   * One per cell of a coarse lattice, jittered off center so the lattice never
-   * shows, and drifting on its own small orbit. Nine cells are visited because a
-   * point near a boundary has to be drawn by its neighbors too, which is what
-   * stops them popping in and out at the seams.
-   *
-   * The pointer repels. Pushing along the offset rather than by its sign keeps
-   * the displacement smooth, and it is the one response here where the reader
-   * is plainly moving things rather than lighting them.
-   */
+  ${
+    /* Points adrift, and pushed aside.
+     *
+     * One per cell of a coarse lattice, jittered off center so the lattice never
+     * shows, and drifting on its own small orbit. Nine cells are visited because a
+     * point near a boundary has to be drawn by its neighbors too, which is what
+     * stops them popping in and out at the seams.
+     *
+     * The pointer repels. Pushing along the offset rather than by its sign keeps
+     * the displacement smooth, and it is the one response here where the reader
+     * is plainly moving things rather than lighting them.
+     */ ''
+  }
   float particles(vec2 q, float t, vec2 qp, float reach) {
     float lit = 0.0;
     vec2 cell = floor(q * 2.6);
@@ -646,14 +742,17 @@ export const FRAGMENT = `#version 300 es
         at += away * push * 0.55;
 
         vec2 off = q - at;
-        /* Size varies with the rest, or a field whose members already differed
+        ${
+          /* Size varies with the rest, or a field whose members already differed
            in brightness and in how fast they wandered is still made of one
            object repeated. Nine cells are visited here, so unlike a streak lane
            a mote may be broader as well as tighter without leaving an edge
-           anywhere. */
+           anywhere. */ ''
+        }
         float grade = mix(52.0, 52.0 * (0.62 + hash(c + 5.7) * 0.95), v);
 
-        /* **Round, because a particle is round.** Stretching a mote along a
+        ${
+          /* **Round, because a particle is round.** Stretching a mote along a
            direction drawn per mote is not motion, it is orientation, so a field
            of them reads as grains of rice pointing every which way rather than
            as particles at all. Motion, if it is ever wanted here, has to come
@@ -662,7 +761,8 @@ export const FRAGMENT = `#version 300 es
 
            The halo stays. An order of magnitude wider and a tenth the strength,
            so a mote sits in the field rather than on top of it: a hard little
-           disc on a dark ground is a pixel, and light has a neighborhood. */
+           disc on a dark ground is a pixel, and light has a neighborhood. */ ''
+        }
         float core = falloff(dot(off, off), grade);
         float halo = falloff(dot(off, off), grade * 0.16) * 0.1;
         lit += (core + halo) * mix(0.8, 0.35 + a * 0.9, v);
@@ -671,30 +771,32 @@ export const FRAGMENT = `#version 300 es
     return lit * falloff(dot(q, q), 0.4);
   }
 
-  /* Ink in a viscous medium, drawn through by where the pointer went.
-   *
-   * **The wake is one stroke, not eight marks.** A vortex per trail point,
-   * rotating the sample around its own center, draws eight discrete swirls fading
-   * in place: a row of blobs rather than anything a hand had done. The marks are
-   * a polyline. Distance is measured to the nearest *segment*, age is
-   * interpolated along it, and what a reader sees is a continuous stroke however
-   * far apart the samples fell.
-   *
-   * **And the displacement runs along the stroke, not around it.** Pushing the
-   * sample down the tangent is advection: the pattern is carried the way the
-   * hand went, which is what stirring looks like. Rotating it around a point is
-   * a whirlpool, and eight whirlpools is a washing machine.
-   *
-   * The marks arrive oldest first, so consecutive indices are consecutive in
-   * time. In the ring they are not, and a segment drawn across the wrap joined
-   * the newest mark to the oldest with a bright bar through the middle of the
-   * field.
-   *
-   * Nine, not eight: eight committed marks and the live head, which is held
-   * outside the ring so that committing appends rather than overwrites. A
-   * zero-length segment between the newest mark and the head is skipped below,
-   * which is what makes the commit invisible.
-   */
+  ${
+    /* Ink in a viscous medium, drawn through by where the pointer went.
+     *
+     * **The wake is one stroke, not eight marks.** A vortex per trail point,
+     * rotating the sample around its own center, draws eight discrete swirls fading
+     * in place: a row of blobs rather than anything a hand had done. The marks are
+     * a polyline. Distance is measured to the nearest *segment*, age is
+     * interpolated along it, and what a reader sees is a continuous stroke however
+     * far apart the samples fell.
+     *
+     * **And the displacement runs along the stroke, not around it.** Pushing the
+     * sample down the tangent is advection: the pattern is carried the way the
+     * hand went, which is what stirring looks like. Rotating it around a point is
+     * a whirlpool, and eight whirlpools is a washing machine.
+     *
+     * The marks arrive oldest first, so consecutive indices are consecutive in
+     * time. In the ring they are not, and a segment drawn across the wrap joined
+     * the newest mark to the oldest with a bright bar through the middle of the
+     * field.
+     *
+     * Nine, not eight: eight committed marks and the live head, which is held
+     * outside the ring so that committing appends rather than overwrites. A
+     * zero-length segment between the newest mark and the head is skipped below,
+     * which is what makes the commit invisible.
+     */ ''
+  }
   float flowWake(vec2 at, mat2 turn, vec2 shift, out vec2 push) {
     push = vec2(0.0);
     float wake = 0.0;
@@ -705,11 +807,13 @@ export const FRAGMENT = `#version 300 es
       if (a.z >= 1.0 || b.z >= 1.0) {
         continue;
       }
-      /* The marks arrive in screen space, and the field is sampled after a
+      ${
+        /* The marks arrive in screen space, and the field is sampled after a
          rotation, a scale and a parallax shift. Compared without carrying them
          through the same three, the wake sits somewhere else entirely: at a
          tilt of 42 and a scale of 1.7 it landed most of a frame from the
-         cursor, which is what read as offset rather than as lagging. */
+         cursor, which is what read as offset rather than as lagging. */ ''
+      }
       vec2 pa = turn * (a.xy - shift) * uScale;
       vec2 pb = turn * (b.xy - shift) * uScale;
       vec2 ab = pb - pa;
@@ -720,27 +824,30 @@ export const FRAGMENT = `#version 300 es
       float t = clamp(dot(at - pa, ab) / len2, 0.0, 1.0);
       vec2 off = at - (pa + ab * t);
 
-      /* Elongated along the stroke, not round about it.
+      ${
+        /* Elongated along the stroke, not round about it.
       
          A circular falloff makes the wake a tube of even thickness, which is
          what a pipe looks like and not what a stirred medium does. Ink pulled
          through a liquid smears the way the hand went: it reaches further along
          the direction of travel than across it. Weighting the along component
          down stretches the ellipse into that direction, and costs one dot
-         product. */
+         product. */ ''
+      }
       vec2 tangent = ab * inversesqrt(len2);
       float alongOff = dot(off, tangent);
       float acrossOff = dot(off, vec2(-tangent.y, tangent.x));
       float shaped = acrossOff * acrossOff + alongOff * alongOff * 0.3;
 
-      /* Squared, so a wake thins as it dies rather than switching off. */
+      ${/* Squared, so a wake thins as it dies rather than switching off. */ ''}
       float life = 1.0 - mix(a.z, b.z, t);
       float w = life * life * falloff(shaped, 3.2);
       wake += w;
       push += (ab * inversesqrt(len2)) * w;
     }
 
-    /* Limited, because an unbounded displacement folds and a fold is a crease.
+    ${
+      /* Limited, because an unbounded displacement folds and a fold is a crease.
     
        Where the map from sample to displaced sample stops being one to one,
        neighboring samples land on the same value and the pattern piles into a
@@ -752,7 +859,8 @@ export const FRAGMENT = `#version 300 es
        The falloff is about a third of a unit wide, so the displacement has to
        stay under that for the map to stay monotone. Saturating rather than
        clamped: a clamp is a corner, and a corner in a displacement is the same
-       crease by another route. */
+       crease by another route. */ ''
+    }
     float mag = length(push);
     push = mag > 0.0 ? push * (0.24 / (0.9 + mag)) : vec2(0.0);
     return wake;
@@ -761,10 +869,11 @@ export const FRAGMENT = `#version 300 es
   float flow(vec2 q, float t, mat2 turn, vec2 shift) {
     vec2 push;
     float wake = flowWake(q, turn, shift, push);
-    /* Already limited inside, so it is applied whole. */
+    ${/* Already limited inside, so it is applied whole. */ ''}
     vec2 p = q + push;
 
-    /* The field is warped by itself twice over, which is what gives a liquid
+    ${
+      /* The field is warped by itself twice over, which is what gives a liquid
        its folded look: each sample is displaced by the field's own value, so
        structure gathers into sheets rather than staying a cloud.
 
@@ -775,54 +884,66 @@ export const FRAGMENT = `#version 300 es
        act on.
 
        Isotropic noise cannot make a current, so anything wanting one has to
-       carry a direction, and that is a bigger change than this shape wants. */
+       carry a direction, and that is a bigger change than this shape wants. */ ''
+    }
     float ink = warped(p * 0.55, t * 0.55);
     float sheet = warped(p * 1.1 + vec2(3.1, 1.7), t * 0.35);
 
-    /* Voids, not an even swatch. With a floor under each term the lowest the
+    ${
+      /* Voids, not an even swatch. With a floor under each term the lowest the
        field can reach is a quarter lit, so every fragment lands in the same
        middle band and there is no structure to look at.
 
        And a slow large mass over the top, thresholded rather than merely
        varied: a gentle modulation over a field that is lit everywhere is still
        lit everywhere, and what a liquid needs is somewhere it simply is not.
-       The empty parts of the frame are what give the full parts a shape. */
+       The empty parts of the frame are what give the full parts a shape. */ ''
+    }
     float mass = smoothstep(0.24, 0.72, noise(vec2(p.x * 0.45 - t * 0.1, p.y * 0.4 + t * 0.07)));
-    /* The void floor sits well above zero. At a low scale the mass noise varies
+    ${
+      /* The void floor sits well above zero. At a low scale the mass noise varies
        less across the frame than the frame is wide, so a reader can sit inside
        one void and see almost nothing: measured at scale 0.5, which came out
        near black. Empty has to mean faint, not absent, or the shape can
-       disappear entirely at a setting the property explicitly allows. */
+       disappear entirely at a setting the property explicitly allows. */ ''
+    }
     float body = mix(0.05, 1.4, ink) * mix(0.4, 1.2, sheet) * mix(0.22, 1.45, mass);
 
-    /* The resting state matters more than the stirred one: most readers never
+    ${
+      /* The resting state matters more than the stirred one: most readers never
        move the pointer, and a shape that is dark until touched is a shape most
        people never see. With the voids in, halving an untouched field takes it
        to a dim murk that reads as wet rock, so the wake lifts from a resting
-       level that is already worth looking at. */
+       level that is already worth looking at. */ ''
+    }
     return body * (0.85 + clamp(wake, 0.0, 1.0) * 0.5) * falloff(dot(q, q), 0.55);
   }
 
-  /* Light through moving water, focused into a web.
-   *
-   * **A caustic is where a wavefront folds, not where it is bright.** Sampling
-   * a noise field and lighting the high parts gives clouds; what makes the
-   * pattern on a pool floor is that the surface bends light and neighboring
-   * rays land on the same spot. The cheap stand-in for that is the *zero* of a
-   * displaced wave sum rather than its peak: 1 - |sum| is thin and bright
-   * exactly where the sum crosses, which is the fold.
-   *
-   * abs() puts a derivative discontinuity along each of those lines, and here
-   * that is the drawing rather than a fault: a caustic edge is genuinely sharp,
-   * which is the whole reason it reads as light rather than as fog.
-   */
+  ${
+    /* Light through moving water, focused into a web.
+     *
+     * **A caustic is where a wavefront folds, not where it is bright.** Sampling
+     * a noise field and lighting the high parts gives clouds; what makes the
+     * pattern on a pool floor is that the surface bends light and neighboring
+     * rays land on the same spot. The cheap stand-in for that is the *zero* of a
+     * displaced wave sum rather than its peak: 1 - |sum| is thin and bright
+     * exactly where the sum crosses, which is the fold.
+     *
+     * abs() puts a derivative discontinuity along each of those lines, and here
+     * that is the drawing rather than a fault: a caustic edge is genuinely sharp,
+     * which is the whole reason it reads as light rather than as fog.
+     */ ''
+  }
   float caustics(vec2 q, float t, vec2 qp, float reach) {
-    /* The pointer is a stone in the water: the surface it disturbs is a ring
-       of extra phase, so the web tightens around it rather than brightening. */
+    ${
+      /* The pointer is a stone in the water: the surface it disturbs is a ring
+       of extra phase, so the web tightens around it rather than brightening. */ ''
+    }
     float dropD = length(q - qp);
     float drop = falloff(dropD * dropD, 1.4) * reach;
 
-    /* The layers are the population, and the pool says which of their cells are
+    ${
+      /* The layers are the population, and the pool says which of their cells are
        bright. Three depths of fold, each at its own frequency and carrying its
        own weight in the sum, are three sizes of the same thing, and the slow
        depth over the top is how far the lit part of the pool is from the dark
@@ -842,7 +963,8 @@ export const FRAGMENT = `#version 300 es
        layer's frequency runs 2.05 - 0.55v and the far layer's weight 0.78 -
        0.22v, so at 2 the near web is drawn at 0.95, under half the scale it was
        tuned at, and past 3.5 the far layer's weight crosses zero and that layer
-       lights everything the folds are not. */
+       lights everything the folds are not. */ ''
+    }
     float cv = clamp(uVariance, 0.0, 1.0);
 
     float lit = 0.0;
@@ -850,8 +972,10 @@ export const FRAGMENT = `#version 300 es
       float f = float(i);
       vec2 p = q * mix(2.05, 1.5 + f * 0.55, cv);
 
-      /* Warped by the field's own value, so the wavefronts bend the way a
-         surface does rather than sliding as a rigid pattern. */
+      ${
+        /* Warped by the field's own value, so the wavefronts bend the way a
+         surface does rather than sliding as a rigid pattern. */ ''
+      }
       vec2 w = p + vec2(
         noise(p * 1.25 + vec2(t * 0.42 + f * 4.0, 0.0)),
         noise(p * 1.1 - vec2(0.0, t * 0.36 + f * 7.0))
@@ -862,49 +986,59 @@ export const FRAGMENT = `#version 300 es
       lit += pow(fold, 7.0) * mix(0.78, 1.0 - f * 0.22, cv);
     }
 
-    /* **The pool has a lit part and a dark part.** Three layers of folds at one
+    ${
+      /* **The pool has a lit part and a dark part.** Three layers of folds at one
        density fill the frame edge to edge and every version of it looks the
        same: bright everywhere carries the same amount of information as dark
        everywhere. A slow depth over the top decides where the light is getting
        through, so the web has somewhere to be faint and the eye somewhere to
-       start. */
+       start. */ ''
+    }
     float pool = smoothstep(0.2, 0.78, noise(vec2(q.x * 0.55 - t * 0.09, q.y * 0.5 + t * 0.06)));
 
-    /* And the stone brightens what it disturbs as well as bending it, or the
-       only evidence of a pointer is a phase shift nobody can see. */
+    ${
+      /* And the stone brightens what it disturbs as well as bending it, or the
+       only evidence of a pointer is a phase shift nobody can see. */ ''
+    }
     float dim = warped(q * 0.7, t * 0.2);
     return lit * mix(0.55, 1.25, dim) *
       mix(mix(0.75, 0.25, cv), mix(0.75, 1.25, cv), pool) *
       (1.0 + drop * 0.9) * falloff(dot(q, q), 0.4);
   }
 
-  /* A lattice in perspective, lit at its nodes.
-   *
-   * **The one shape here that is not weather.** Everything else in this set is
-   * a fluid, a light or a sky, and a design system is none of those: it is a
-   * structure, regular, with the interesting part at the joints. So this is
-   * drawn rather than simulated, and it is the only one with straight lines in
-   * it on purpose.
-   *
-   * Perspective is a divide, not a matrix. Scaling the grid by 1 / (1 + depth)
-   * makes the cells shrink with distance and the whole thing recede, which is
-   * the entire trick and costs one division.
-   */
+  ${
+    /* A lattice in perspective, lit at its nodes.
+     *
+     * **The one shape here that is not weather.** Everything else in this set is
+     * a fluid, a light or a sky, and a design system is none of those: it is a
+     * structure, regular, with the interesting part at the joints. So this is
+     * drawn rather than simulated, and it is the only one with straight lines in
+     * it on purpose.
+     *
+     * Perspective is a divide, not a matrix. Scaling the grid by 1 / (1 + depth)
+     * makes the cells shrink with distance and the whole thing recede, which is
+     * the entire trick and costs one division.
+     */ ''
+  }
   float lattice(vec2 q, float t, vec2 qp, float reach) {
-    /* The pointer lifts the plane nearest it, so the lattice crowds where a
+    ${
+      /* The pointer lifts the plane nearest it, so the lattice crowds where a
        reader is looking. A structure answers by changing its spacing, which is
-       the only thing about a lattice that can move without breaking it. */
+       the only thing about a lattice that can move without breaking it. */ ''
+    }
     vec2 away = q - qp;
     float near = falloff(dot(away, away), 1.8) * reach;
 
-    /* **A ground plane, not a mirrored one.** Dividing by abs(p.y) makes two
+    ${
+      /* **A ground plane, not a mirrored one.** Dividing by abs(p.y) makes two
        floors meeting along y = 0, which reads as a bowtie with a crease down
        the middle rather than as anything receding. Dividing by the distance
        below a horizon is the actual projection: one plane, cells shrinking as
        they approach it, and nothing above it to fold back.
     
        It travels as well, so the structure arrives rather than sitting still.
-       Perspective and motion together are what say the plane is a plane. */
+       Perspective and motion together are what say the plane is a plane. */ ''
+    }
     float below = max(1.45 - q.y, 0.14);
     float depth = 1.0 / below;
     vec2 g = vec2(
@@ -913,36 +1047,45 @@ export const FRAGMENT = `#version 300 es
     );
     vec2 cell = fract(g) - 0.5;
 
-    /* The rails, thinner the further back they are, so the grid does not turn
-       into a solid sheet at the horizon. */
+    ${
+      /* The rails, thinner the further back they are, so the grid does not turn
+       into a solid sheet at the horizon. */ ''
+    }
     float rail = min(abs(cell.x), abs(cell.y));
     float lines = falloff(rail * rail, 24.0);
 
-    /* The joints, which is where a lattice is actually a lattice, and brighter
-       than the rails between them: a grid of even weight is graph paper. */
+    ${
+      /* The joints, which is where a lattice is actually a lattice, and brighter
+       than the rails between them: a grid of even weight is graph paper. */ ''
+    }
     float node = falloff(dot(cell, cell), 26.0) * 2.1 * (0.6 + near * 0.9);
 
-    /* Faded toward the horizon, or the cells pile into a solid sheet exactly
-       where they are smallest. */
+    ${
+      /* Faded toward the horizon, or the cells pile into a solid sheet exactly
+       where they are smallest. */ ''
+    }
     float far = smoothstep(0.0, 0.55, below) * smoothstep(3.4, 1.3, below);
 
     float dust = warped(q * 0.9, t * 0.25);
     return (lines * 0.5 + node) * far * mix(0.7, 1.2, dust) * falloff(dot(q, q), 0.42);
   }
 
-  /* Cells, lit along the seams between them.
-   *
-   * **Provenance as a picture.** A Voronoi field is a set of territories, each
-   * one everything nearer to its own point than to any other, and the drawing
-   * is not the cells but the boundaries: where two claims meet is exactly
-   * what Trace is about. Nothing here is lit except the disagreements.
-   *
-   * The wall is the second nearest distance minus the nearest, which is zero
-   * on the boundary and grows into the interior. It is a genuine distance, so
-   * it needs no epsilon and produces no crease.
-   */
+  ${
+    /* Cells, lit along the seams between them.
+     *
+     * **Provenance as a picture.** A Voronoi field is a set of territories, each
+     * one everything nearer to its own point than to any other, and the drawing
+     * is not the cells but the boundaries: where two claims meet is exactly
+     * what Trace is about. Nothing here is lit except the disagreements.
+     *
+     * The wall is the second nearest distance minus the nearest, which is zero
+     * on the boundary and grows into the interior. It is a genuine distance, so
+     * it needs no epsilon and produces no crease.
+     */ ''
+  }
   float fracture(vec2 q, float t, vec2 qp, float reach) {
-    /* The territories are the population, and how far each site wanders off its
+    ${
+      /* The territories are the population, and how far each site wanders off its
        own cell center is the whole of what makes one differ from the next: the
        rates are already shared, so the spread is the amplitude and nothing
        else. At 0 every site sits at its center and every claim is the same
@@ -967,7 +1110,8 @@ export const FRAGMENT = `#version 300 es
        the two nearest sites have to be inside them: the swing reaches
        0.42 * v * sqrt(2) of a cell at its corner, which passes a whole cell at
        v = 1.68, and past that a site can be nearer than anything the loop
-       looked at and the seam snaps along the lattice it was drawn to hide. */
+       looked at and the seam snaps along the lattice it was drawn to hide. */ ''
+    }
     float fv = clamp(uVariance, 0.0, 1.0);
 
     vec2 g = q * 2.1;
@@ -981,14 +1125,18 @@ export const FRAGMENT = `#version 300 es
         vec2 o = vec2(float(i), float(j));
         vec2 id = base + o;
 
-        /* Each site drifts on its own small orbit, so the seams breathe rather
-           than the whole field sliding. */
+        ${
+          /* Each site drifts on its own small orbit, so the seams breathe rather
+           than the whole field sliding. */ ''
+        }
         float a = hash(id) * 6.2831853;
         float b = hash(id + 41.7) * 6.2831853;
         vec2 site = o + 0.5 + 0.42 * fv * vec2(sin(t * 0.5 + a), cos(t * 0.42 + b));
 
-        /* Sites near the pointer are pushed away from it, which opens the
-           cells there: a territory answers by giving ground. */
+        ${
+          /* Sites near the pointer are pushed away from it, which opens the
+           cells there: a territory answers by giving ground. */ ''
+        }
         vec2 world = (id + 0.5) / 2.1;
         vec2 shove = world - qp;
         site += normalize(shove + 0.0001) * falloff(dot(shove, shove), 2.4) * reach * 0.5;
@@ -1006,7 +1154,8 @@ export const FRAGMENT = `#version 300 es
     float wall = second - first;
     float seam = falloff(wall * wall, 17.0);
 
-    /* **Not every seam is lit the same.** At one brightness the field is a
+    ${
+      /* **Not every seam is lit the same.** At one brightness the field is a
        mosaic of equal cells, which is a texture; what makes a set of
        territories read is that some borders are contested and most are not. A
        slow field decides which, and the dark stretches give the lit ones a
@@ -1016,7 +1165,8 @@ export const FRAGMENT = `#version 300 es
        direction: how far apart the contested borders and the quiet ones are
        lit. Both ends travel toward the midpoint, so a variance of 0 is that
        mosaic, every border at one brightness, and the paragraph above is a
-       description of what asking for no variance gets rather than a fault. */
+       description of what asking for no variance gets rather than a fault. */ ''
+    }
     float contested = smoothstep(0.24, 0.8, noise(vec2(q.x * 0.6 + t * 0.07, q.y * 0.55 - t * 0.05)));
 
     float grain = warped(q * 1.3, t * 0.3);
@@ -1025,22 +1175,25 @@ export const FRAGMENT = `#version 300 es
       falloff(dot(q, q), 0.42);
   }
 
-  /* The sampling frame, the shape branch, and the ramp from field to color. */
+  ${/* The sampling frame, the shape branch, and the ramp from field to color. */ ''}
   void main() {
     vec2 p = uv * 2.0 - 1.0;
     float aspect = uResolution.x / max(uResolution.y, 1.0);
     p.x *= aspect;
 
-    /* **No global response, parallax included.** Every named interaction is a
+    ${
+      /* **No global response, parallax included.** Every named interaction is a
        promise about what the pointer does, and translating the whole field is
        not any of them: a consumer asking for a light asked for a light, not for
        a light and a lean. Small is not the test.
 
        What answers the pointer is each shape, in the terms it is made of, and
-       the three generics for a consumer who asks for one. */
+       the three generics for a consumer who asks for one. */ ''
+    }
     vec2 q = p;
 
-    /* **The tilt is an angle on the screen, not in the sampling space.**
+    ${
+      /* **The tilt is an angle on the screen, not in the sampling space.**
      
        p.x is stretched by the aspect before anything is rotated, so a
        rotation applied here is a rotation in an anisotropic space, which is a
@@ -1052,23 +1205,28 @@ export const FRAGMENT = `#version 300 es
     
        Solving aspect * tan(a) = tan(tilt) gives the angle to rotate by. The two
        argument atan is what makes 90 work: tan blows up there, while
-       atan(1, 0) is exactly a quarter turn. */
+       atan(1, 0) is exactly a quarter turn. */ ''
+    }
     float want = radians(uTilt);
     float a = atan(sin(want), cos(want) * aspect);
     mat2 turn = mat2(cos(a), sin(a), -sin(a), cos(a));
     q = turn * q * uScale;
 
-    /* The pointer, carried into the same frame the shapes are drawn in, so each
-       one can answer it in its own terms. */
+    ${
+      /* The pointer, carried into the same frame the shapes are drawn in, so each
+       one can answer it in its own terms. */ ''
+    }
     vec2 qp = turn * uPointer * uScale;
 
     float t = uTime * 0.06;
 
-    /* A shape answers for itself only when nothing else has been asked for.
+    ${
+      /* A shape answers for itself only when nothing else has been asked for.
        Given a generic response, its own is switched off rather than layered
        under: two answers to one gesture is how a shared zoom and a shared glow
        got here in the first place, applied identically to every shape and
-       saying nothing about any of them. */
+       saying nothing about any of them. */ ''
+    }
     float own = uInteraction == 0 ? uReach : 0.0;
 
     float d = 0.0;
@@ -1096,12 +1254,15 @@ export const FRAGMENT = `#version 300 es
       d = fracture(q, t, qp, own);
     }
 
-    /* Bloom as an exponent on the field rather than a term inside each shape.
+    ${
+      /* Bloom as an exponent on the field rather than a term inside each shape.
        Every shape is a density that falls off, so a power tightens or spreads
-       that falloff and one control means the same thing in all of them. */
+       that falloff and one control means the same thing in all of them. */ ''
+    }
     d = pow(max(d, 0.0), mix(2.0, 0.5, clamp(uBloom, 0.0, 1.0))) * uGain;
 
-    /* The generic answers, for a consumer who has asked for one.
+    ${
+      /* The generic answers, for a consumer who has asked for one.
     
        All three are functions of distance from the pointer and nothing else,
        which is exactly what makes them generic and exactly what makes them say
@@ -1109,7 +1270,8 @@ export const FRAGMENT = `#version 300 es
        there is something at the cursor over a dark field. The shadow option is
        that gesture inverted, which suits a bright field where a lamp would be
        invisible. The ripple option is the one with a clock in it, so it keeps
-       moving after the pointer has stopped. */
+       moving after the pointer has stopped. */ ''
+    }
     if (uInteraction != 0 && uInteraction != 4) {
       vec2 toCursor = p - uPointer;
       float near = falloff(dot(toCursor, toCursor), 3.0) * uReach;
@@ -1125,18 +1287,22 @@ export const FRAGMENT = `#version 300 es
 
     d *= mix(0.65, 1.35, smoothstep(-1.0, 1.0, q.y));
 
-    /* Rolled off rather than clipped. A hard clamp flattens the core into a
+    ${
+      /* Rolled off rather than clipped. A hard clamp flattens the core into a
        plateau of one value, which is what makes a bright shader look like a
-       sticker; this compresses toward one and keeps the gradient inside it. */
+       sticker; this compresses toward one and keeps the gradient inside it. */ ''
+    }
     float lift = 1.0 - exp(-max(d, 0.0) * 1.15);
 
     vec3 rgb = mix(uGround, uHaze, smoothstep(0.0, 0.16, lift));
     rgb = mix(rgb, uGlow, smoothstep(0.10, 0.46, lift));
     rgb = mix(rgb, uPeak, smoothstep(0.40, 0.72, lift) * 0.6);
 
-    /* Dithered before the buffer quantizes. A falloff this soft spans a few
+    ${
+      /* Dithered before the buffer quantizes. A falloff this soft spans a few
        hundred 8-bit steps across a screen, and without a sub-step of noise it
-       paints as visible rings. */
+       paints as visible rings. */ ''
+    }
     float dither = (hash(gl_FragCoord.xy) - 0.5) / 255.0;
     color = vec4(rgb + dither, 1.0);
   }
