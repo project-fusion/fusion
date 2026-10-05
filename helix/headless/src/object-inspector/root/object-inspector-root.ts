@@ -1,12 +1,20 @@
 import {
   AriaForwardController,
   CopyController,
+  countLabel,
   customElement,
+  drawStatus,
   elementById,
   fillTemplate,
   formatNumbers,
+  HelixActivateEvent,
+  HelixBeforeActivateEvent,
   HelixElement,
+  HelixFilterEvent,
+  HelixFilteredEvent,
   inlineStep,
+  requestChange,
+  StatusController,
   scrollItemIntoView,
   searchableById,
   VirtualizeController,
@@ -17,28 +25,7 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html as staticHtml } from 'lit/static-html.js'
 import '../../copy-button/index.js'
-
-/** One visible line of the tree: a value, where it sits, and whether it is open. */
-interface Row {
-  branch: boolean
-  depth: number
-  /** The property name or array index this value is under; absent for the root. */
-  key?: string
-  open: boolean
-  path: string
-  position: number
-  siblings: number
-  value: unknown
-}
-
-const branchy = (value: unknown): value is object => value !== null && typeof value === 'object'
-
-const entries = (value: object): [string, unknown][] =>
-  Array.isArray(value) ? value.map((item, at) => [String(at), item]) : Object.entries(value)
-
-/** A child's path under its parent's, escaped the way a JSON Pointer escapes one. */
-const child = (path: string, key: string): string =>
-  `${path}/${key.replaceAll('~', '~0').replaceAll('/', '~1')}`
+import { ancestorsOf, entries, flatten, type Row, search, seed } from '../rows.js'
 
 /**
  * @summary A structured value shown as a tree, where you can close branches,
@@ -61,6 +48,22 @@ const child = (path: string, key: string): string =>
  * row. Each row carries its real level, position, and set size, including in
  * a windowed tree.
  *
+ * `active` is the active row's path, written the way a JSON Pointer writes it:
+ * the empty string for the root and `/meta/tags/0` for an entry under it.
+ * Moving to another row sends `helix-before-activate`, which you can cancel,
+ * and then `helix-activate`, both with the path. Writing `active` moves there
+ * and opens the branches around it, and sends nothing. `expanded` holds the
+ * open branches by path, and writing it opens those and closes the rest. A row
+ * that closes around the active one hands it to the nearest open branch.
+ *
+ * `filter` narrows the tree to the entries whose key or value holds the text,
+ * ignoring case, and the branches that lead to them, which it opens. A matched
+ * branch keeps everything under it. Each matched row carries `row-match`, and
+ * a screen reader hears how many entries matched from `result-label` and
+ * `results-label`. `filterable` adds a field that sets it: typing sends
+ * `helix-filter`, which you can cancel, and then `helix-filtered`, and Down
+ * moves from the field to the tree.
+ *
  * A new `value` keeps the branches a reader opened or closed, and the active
  * row, where the new value still has them. A branch the old value did not have
  * opens to `default-depth`.
@@ -80,7 +83,11 @@ const child = (path: string, key: string): string =>
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
  * @documentation https://fusion.dev/helix/components/object-inspector
  *
+ * @event {HelixActivateEvent} helix-activate - The active row moved, by a key or a click. The detail's `value` is its path.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - The active row is about to move, with its new path. Cancelable: cancel it to keep the row where it is.
  * @event {HelixCopyEvent} helix-copy - A value was put on the clipboard, from the copy button or the keyboard.
+ * @event {HelixFilteredEvent} helix-filtered - The filter field changed `filter`, which now holds the text.
+ * @event {HelixFilterEvent} helix-filter - Text was typed in the filter field, with what it now holds. Cancelable: cancel it to keep the filter as it was.
  *
  * @csspart after - The space the rows below the drawn rows would take, when `windowed` is set.
  * @csspart before - The space the rows above the drawn rows would take, when `windowed` is set.
@@ -105,10 +112,13 @@ const child = (path: string, key: string): string =>
  * @csspart header - The bar that holds the label, when there is one.
  * @csspart key - A property name or an array index.
  * @csspart label - The label.
+ * @csspart live - How many entries a filter matched, in a region that screen readers announce when it changes. Drawn from the first filter on. Visually hidden in the styled tier.
  * @csspart null - A `null`.
  * @csspart number - A number.
  * @csspart row - One entry, as a tree item.
  * @csspart row-active - The entry the keyboard is on. Set alongside `row`.
+ * @csspart row-match - An entry whose key or value holds the filter. Set alongside `row`.
+ * @csspart search-field - The field that sets `filter`, with `filterable`.
  * @csspart string - A string, in quotes.
  * @csspart summary - The brackets that stand for a branch's contents.
  * @csspart toggle - The caret on a branch. It points down when the branch is open and sideways when it is closed.
@@ -118,6 +128,26 @@ const child = (path: string, key: string): string =>
  */
 @customElement('helix-headless-object-inspector')
 export class HelixHeadlessObjectInspector extends HelixElement {
+  /**
+   * The active row's path, such as `/meta/tags/0`, and the empty string for the
+   * root.
+   *
+   * Reading gives the row the keys are on. Writing moves there, opening the
+   * branches around it, and sends no event, the way a script's write to any
+   * current value sends none. A path the value does not hold moves to the
+   * nearest branch above it that it does.
+   */
+  @property()
+  get active(): string {
+    return this.wanted ?? this.rows[this.cursor]?.path ?? ''
+  }
+
+  set active(path: string) {
+    const previous = this.active
+    this.wanted = path
+    this.requestUpdate('active', previous)
+  }
+
   /**
    * The copy button's accessible name on a row with a key, with the key filled
    * in as `{name}`.
@@ -142,6 +172,39 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    */
   @property({ attribute: 'default-depth', type: Number })
   defaultDepth = 1
+
+  /**
+   * The open branches, by path, in no set order.
+   *
+   * Writing opens exactly these and closes every other, keeping the active row
+   * where it stays visible. A property, never an attribute.
+   */
+  @property({ attribute: false })
+  get expanded(): string[] {
+    return [...this.opened]
+  }
+
+  set expanded(paths: string[]) {
+    const previous = this.expanded
+    this.declared = new Set(paths)
+    this.opened = this.declared
+    this.requestUpdate('expanded', previous)
+  }
+
+  /**
+   * Text the tree is narrowed to: the entries whose key or value holds it,
+   * ignoring case, and the branches that lead to them. Empty shows everything.
+   */
+  @property()
+  filter = ''
+
+  /** Whether to show a field that sets `filter`. */
+  @property({ type: Boolean })
+  filterable = false
+
+  /** The filter field's placeholder and accessible name. */
+  @property({ attribute: 'filter-label' })
+  filterLabel = 'Filter'
 
   /**
    * The id of a `<script type="application/json">` holding the value.
@@ -191,6 +254,17 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   @property({ attribute: 'no-copy', type: Boolean })
   noCopy = false
 
+  /** What a screen reader hears when a filter matches one entry. `{count}` is the count. */
+  @property({ attribute: 'result-label' })
+  resultLabel = '{count} result'
+
+  /**
+   * What a screen reader hears when a filter matches any other number of
+   * entries. `{count}` is the count. The two are chosen by `Intl.PluralRules`.
+   */
+  @property({ attribute: 'results-label' })
+  resultsLabel = '{count} results'
+
   /**
    * The tree's accessible name when `label` is empty and the host names it
    * with neither `aria-label` nor `aria-labelledby`.
@@ -229,7 +303,21 @@ export class HelixHeadlessObjectInspector extends HelixElement {
 
   /** The row the arrow keys are on, by its place among the visible rows. */
   @state()
-  private active = 0
+  private cursor = 0
+
+  /** A path written to `active` and not yet found among the rows. */
+  private wanted: string | undefined
+
+  /**
+   * The branches written to `expanded`, until the next update applies them.
+   *
+   * Its own field, because a property declared with an accessor is in the
+   * first update's changes whether or not anybody wrote it.
+   */
+  private declared: Set<string> | undefined
+
+  /** The paths the filter matched, or nothing while there is no filter. */
+  private found: Set<string> | undefined
 
   /** Set by a keyboard move, so the next render brings the active row into view. */
   private revealing = false
@@ -245,6 +333,9 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     label: true,
     target: () => this.partNamed('tree'),
   })
+
+  /** Says how many entries a filter matched. */
+  private readonly status = new StatusController(this)
 
   /**
    * How tall a row is taken to be before it has been drawn, in pixels.
@@ -277,43 +368,6 @@ export class HelixHeadlessObjectInspector extends HelixElement {
 
   private readonly copier = new CopyController(this)
 
-  /** Every visible row, in order, for the tree as it stands. */
-  private flatten(): Row[] {
-    const rows: Row[] = []
-    if (this.root === undefined) {
-      return rows
-    }
-    const visit = (
-      value: unknown,
-      path: string,
-      depth: number,
-      position: number,
-      siblings: number,
-      key?: string,
-    ): void => {
-      const branch = branchy(value)
-      const open = branch && this.opened.has(path)
-      rows.push({
-        branch,
-        depth,
-        open,
-        path,
-        position,
-        siblings,
-        value,
-        ...(key === undefined ? {} : { key }),
-      })
-      if (open) {
-        const children = entries(value)
-        children.forEach(([name, item], at) => {
-          visit(item, child(path, name), depth + 1, at + 1, children.length, name)
-        })
-      }
-    }
-    visit(this.root, '', 0, 1, 1)
-    return rows
-  }
-
   /**
    * Opens every branch shallower than `defaultDepth`.
    *
@@ -324,27 +378,30 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    * place on every update.
    */
   private seed(keep: boolean): void {
-    const opened = new Set<string>()
-    const branches = new Set<string>()
-    const visit = (value: unknown, path: string, depth: number): void => {
-      if (!branchy(value)) {
-        return
-      }
-      branches.add(path)
-      const known = keep && this.branches.has(path)
-      if (known ? this.opened.has(path) : depth < this.defaultDepth) {
-        opened.add(path)
-      }
-      for (const [name, item] of entries(value)) {
-        visit(item, child(path, name), depth + 1)
-      }
-    }
-    visit(this.root, '', 0)
+    const { branches, opened } = seed(
+      this.root,
+      this.defaultDepth,
+      keep ? this.branches : undefined,
+      this.opened,
+    )
     this.branches = branches
     this.opened = opened
     if (!keep) {
-      this.active = 0
+      this.cursor = 0
     }
+  }
+
+  /** Opens the branches around each path, where the value has them. */
+  private openAround(paths: Iterable<string>): void {
+    const opened = new Set(this.opened)
+    for (const path of paths) {
+      for (const above of ancestorsOf(path)) {
+        if (this.branches.has(above)) {
+          opened.add(above)
+        }
+      }
+    }
+    this.opened = opened
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -360,19 +417,63 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       this.load()
     }
     /* The path the active row is on, so it stays there when the rows move. */
-    const was = this.rows[this.active]?.path
-    if (changed.has('value') || changed.has('read') || changed.has('defaultDepth')) {
+    const was = this.rows[this.cursor]?.path
+    const written = this.declared
+    this.declared = undefined
+    const fresh = changed.has('value') || changed.has('read')
+    if (fresh || changed.has('defaultDepth')) {
       this.seed(!changed.has('defaultDepth'))
     }
+    /* A consumer's `expanded` is exactly what opens, a new value or not. */
+    if (written) {
+      this.opened = written
+    }
+    if (fresh || changed.has('filter')) {
+      this.found = this.filter.trim() === '' ? undefined : search(this.root, this.filter)
+      this.openAround(this.found ?? [])
+    }
+    const wanted = this.root === undefined ? undefined : this.wanted
+    if (wanted !== undefined) {
+      this.wanted = undefined
+      this.openAround([wanted])
+    }
     if (
-      changed.has('value') ||
-      changed.has('read') ||
-      changed.has('opened') ||
-      changed.has('defaultDepth')
+      fresh ||
+      wanted !== undefined ||
+      ['active', 'defaultDepth', 'expanded', 'filter', 'opened'].some((name) => changed.has(name))
     ) {
-      this.rows = this.flatten()
-      const found = was === undefined ? -1 : this.rows.findIndex((row) => row.path === was)
-      this.active = found >= 0 ? found : Math.min(this.active, Math.max(0, this.rows.length - 1))
+      this.rows = flatten(this.root, this.opened, this.found)
+      this.cursor = this.place(wanted ?? was, changed.has('filter'))
+    }
+    if (changed.has('filter') && this.hasUpdated) {
+      this.tell()
+    }
+  }
+
+  /**
+   * Where the active row goes once the rows have moved: onto `path` where it
+   * is still shown, onto the first match where a filter just hid it, and
+   * otherwise onto the nearest branch around it that is.
+   */
+  private place(path: string | undefined, filtered: boolean): number {
+    const rows = this.rows
+    const at = (one: string): number => rows.findIndex((row) => row.path === one)
+    const own = path === undefined ? -1 : at(path)
+    if (own >= 0 || path === undefined) {
+      return own >= 0 ? own : Math.min(this.cursor, Math.max(0, rows.length - 1))
+    }
+    const match = filtered ? rows.findIndex((row) => row.match) : -1
+    const around = ancestorsOf(path)
+      .reverse()
+      .map(at)
+      .find((one) => one >= 0)
+    return match >= 0 ? match : (around ?? 0)
+  }
+
+  /** Says how many entries the filter matched, and nothing for an empty one. */
+  private tell(): void {
+    if (this.found) {
+      this.status.say(countLabel(this.found.size, this.resultLabel, this.resultsLabel, this.lang))
     }
   }
 
@@ -418,7 +519,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    */
   private reveal(attempts = 8): void {
     const tree = this.partNamed('tree')
-    const row = tree?.querySelector<HTMLElement>(`[data-index="${this.active}"]`)
+    const row = tree?.querySelector<HTMLElement>(`[data-index="${this.cursor}"]`)
     if (row) {
       // Inside the tree only: `Element.scrollIntoView` takes the page with it.
       scrollItemIntoView(row)
@@ -432,9 +533,9 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     }
     const height = first.offsetHeight || HelixHeadlessObjectInspector.ESTIMATE
     const from = Number(
-      this.active > Number(last.dataset.index) ? last.dataset.index : first.dataset.index,
+      this.cursor > Number(last.dataset.index) ? last.dataset.index : first.dataset.index,
     )
-    tree.scrollTop += (this.active - from) * height
+    tree.scrollTop += (this.cursor - from) * height
     this.virtualize.measure()
     void this.updateComplete.then(() => this.reveal(attempts - 1))
   }
@@ -460,15 +561,37 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     this.opened = opened
   }
 
-  private move(to: number): void {
-    const last = this.rows.length - 1
-    this.active = Math.max(0, Math.min(to, last))
+  /**
+   * Moves the active row, asking first: `helix-before-activate` with the path,
+   * then `helix-activate` once it has moved. Returns whether it is there.
+   */
+  private move(to: number): boolean {
+    const at = Math.max(0, Math.min(to, this.rows.length - 1))
+    const path = this.rows[at]?.path
+    if (path === undefined) {
+      return false
+    }
+    if (at !== this.cursor) {
+      const moved = requestChange({
+        apply: () => {
+          this.cursor = at
+        },
+        event: (value) => new HelixBeforeActivateEvent({ value }),
+        host: this,
+        next: path,
+      })
+      if (!moved) {
+        return false
+      }
+      this.dispatchEvent(new HelixActivateEvent({ value: path }))
+    }
     this.revealing = true
+    return true
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const rows = this.rows
-    const row = rows[this.active]
+    const row = rows[this.cursor]
     if (!row) {
       return
     }
@@ -484,10 +607,10 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     }
     switch (event.key) {
       case 'ArrowDown':
-        this.move(this.active + 1)
+        this.move(this.cursor + 1)
         break
       case 'ArrowUp':
-        this.move(this.active - 1)
+        this.move(this.cursor - 1)
         break
       case 'Home':
         this.move(0)
@@ -503,13 +626,13 @@ export class HelixHeadlessObjectInspector extends HelixElement {
           if (row.branch && !row.open) {
             this.toggle(row, true)
           } else if (row.open) {
-            this.move(this.active + 1)
+            this.move(this.cursor + 1)
           }
         } else if (row.open) {
           this.toggle(row, false)
         } else {
           const parent = rows.findLastIndex(
-            (candidate, at) => at < this.active && candidate.depth === row.depth - 1,
+            (candidate, at) => at < this.cursor && candidate.depth === row.depth - 1,
           )
           if (parent >= 0) {
             this.move(parent)
@@ -564,7 +687,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     const wanted = text.toLocaleLowerCase()
     const repeated = [...wanted].every((one) => one === wanted[0])
     const rows = this.rows
-    const start = wanted.length === 1 || repeated ? this.active + 1 : this.active
+    const start = wanted.length === 1 || repeated ? this.cursor + 1 : this.cursor
     for (let step = 0; step < rows.length; step += 1) {
       const at = (start + step) % rows.length
       const key = rows[at]?.key?.toLocaleLowerCase()
@@ -575,10 +698,36 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     }
   }
 
+  /** A press opens or closes the row it lands on, once that row is the active one. */
   private handleRowClick(index: number, row: Row): void {
-    this.active = index
-    if (row.branch) {
+    if (this.move(index) && row.branch) {
       this.toggle(row)
+    }
+  }
+
+  /** Text typed in the filter field, asked for before the tree narrows to it. */
+  private readonly handleFilterInput = (event: Event): void => {
+    const field = event.currentTarget as HTMLInputElement
+    const applied = requestChange({
+      apply: (value) => {
+        this.filter = value
+      },
+      event: (value) => new HelixFilterEvent({ value }),
+      host: this,
+      next: field.value,
+    })
+    if (applied) {
+      this.dispatchEvent(new HelixFilteredEvent({ value: field.value }))
+    } else {
+      field.value = this.filter
+    }
+  }
+
+  /** Down from the filter field goes to the tree, where the matches are. */
+  private readonly handleFilterKeydown = (event: KeyboardEvent): void => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      this.partNamed('tree')?.focus()
     }
   }
 
@@ -634,16 +783,22 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    * attribute would be a second spelling with no reader. The name is the one a
    * consumer can reach, nothing being able to follow `::part()` with an
    * attribute selector.
+   *
+   * **`aria-selected="false"` on every row**, because nothing here is chosen.
+   * Chromium takes the active descendant of a single-selection tree as selected
+   * when no row says otherwise, so every arrow press was also announced as a
+   * selection. An explicit false is the one thing that turns that off.
    */
   private renderRow(row: Row, index: number): TemplateResult {
-    const active = index === this.active
+    const active = index === this.cursor
     return html`<div
-      part="row${active ? ' row-active' : ''}"
+      part="row${active ? ' row-active' : ''}${row.match ? ' row-match' : ''}"
       role="treeitem"
       id=${`row-${index}`}
       data-index=${index}
       aria-level=${row.depth + 1}
       aria-posinset=${row.position}
+      aria-selected="false"
       aria-setsize=${row.siblings}
       aria-expanded=${row.branch ? String(row.open) : nothing}
       style=${`--object-inspector-level: ${row.depth}`}
@@ -687,15 +842,30 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     const shown = rows.slice(first, last)
     return html`${
       this.label ? html`<div part="header"><span part="label">${this.label}</span></div>` : nothing
+    }${
+      this.filterable
+        ? html`<input
+            part="search-field"
+            type="search"
+            spellcheck="false"
+            .value=${this.filter}
+            placeholder=${this.filterLabel}
+            aria-label=${this.filterLabel}
+            aria-controls="tree"
+            @input=${this.handleFilterInput}
+            @keydown=${this.handleFilterKeydown}
+          />`
+        : nothing
     }
       <div part="frame">
         <div
           part="tree"
+          id="tree"
           role="tree"
           tabindex="0"
           ?data-scroller=${this.windowed}
           aria-label=${this.label || this.treeLabel}
-          aria-activedescendant=${rows.length > 0 ? `row-${this.active}` : nothing}
+          aria-activedescendant=${rows.length > 0 ? `row-${this.cursor}` : nothing}
           @keydown=${this.handleKeydown}
           @scroll=${() => this.virtualize.measure()}
         >
@@ -703,8 +873,9 @@ export class HelixHeadlessObjectInspector extends HelixElement {
           ${shown.map((row, at) => this.renderRow(row, first + at))}
           ${this.windowed ? html`<div part="after" role="presentation" style="block-size: ${after}px"></div>` : nothing}
         </div>
-        ${this.noCopy ? nothing : this.renderCopyButton(rows[this.active])}
-      </div>`
+        ${this.noCopy ? nothing : this.renderCopyButton(rows[this.cursor])}
+      </div>
+      ${drawStatus(this.status)}`
   }
 }
 

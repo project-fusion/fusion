@@ -79,4 +79,34 @@ describe('object inspector server output', () => {
       'tooltip',
     ])
   })
+
+  /* A filter written in the markup is the server's to apply: the narrowed
+     rows are the first response, and hydration finds the same ones. */
+  test('a filter in the markup serves only the matches and the way to them', () => {
+    const markup = ssr(
+      html`<helix-headless-object-inspector
+        filter="main"
+        .value=${{ meta: { branch: 'main' }, name: 'dpl' }}
+      ></helix-headless-object-inspector>`,
+    )
+    const shown = rendered(markup, 'helix-headless-object-inspector')
+    expect(shown).toMatch(/part="row row-match"/)
+    expect(shown).toContain('branch')
+    expect(shown).not.toContain('dpl')
+  })
+
+  test('`filterable` serves the field, and nothing says a count before a filter', () => {
+    const markup = ssr(
+      html`<helix-headless-object-inspector filterable></helix-headless-object-inspector>`,
+    )
+    expect(partTag(markup, 'search-field')).toContain('type="search"')
+    expect(servedParts(markup)).not.toContain('live')
+  })
+
+  test('every row says it is not selected', () => {
+    const markup = ssr(
+      html`<helix-headless-object-inspector .value=${{ a: 1 }}></helix-headless-object-inspector>`,
+    )
+    expect(partTag(markup, 'row')).toContain('aria-selected="false"')
+  })
 })
