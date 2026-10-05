@@ -35,4 +35,22 @@ describe('virtual list server output', () => {
     expect(markup).not.toContain('aria-posinset')
     expect(hostAttributes(markup, 'helix-headless-virtual-list')).not.toContain('data-rows')
   })
+
+  test('serves the empty frame for items given as a property, which it draws once upgraded', () => {
+    /* Rows are light DOM the list writes on the client, so a server has none
+       to send whatever `items` holds, and the frame it sends is the one a
+       hydrating client draws first. */
+    const markup = withoutStyles(
+      ssr(
+        html`<helix-headless-virtual-list
+          label="Rows"
+          .items=${[{ name: 'a' }, { name: 'b' }]}
+          .renderItem=${(item: { name: string }) => item.name}
+        ></helix-headless-virtual-list>`,
+      ),
+    )
+    expect(hasPart(markup, 'viewport')).toBe(true)
+    expect(markup).not.toContain('aria-posinset')
+    expect(markup).not.toContain('tabindex')
+  })
 })

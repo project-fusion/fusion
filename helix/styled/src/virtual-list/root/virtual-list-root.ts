@@ -8,9 +8,10 @@ import { styles } from './virtual-list-root.css.js'
  * @summary A list that renders only the rows of a long set that are on screen.
  *
  * @description
- * The styled tier styles only the scrolling box. Rows are your markup in the
- * light DOM, so your stylesheet styles them the same as any other content, and
- * this tier sets no rules for them.
+ * The styled tier styles the scrolling box and draws the focus ring on the row
+ * holding focus. Rows are your markup in the light DOM, so your stylesheet
+ * styles them the same as any other content, and a rule of yours on a row wins
+ * over the ring.
  *
  * @category layout
  * @since 0.1.0

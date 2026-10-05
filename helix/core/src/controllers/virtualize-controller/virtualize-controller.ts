@@ -69,6 +69,17 @@ export interface Window {
   last: number
 }
 
+/** Where `reveal` puts an item, and how it gets there. */
+export interface RevealOptions {
+  /**
+   * Where the item lands: the least distance that shows it whole (`nearest`,
+   * the default), or at the box's `start`, `center` or `end`.
+   */
+  align?: 'center' | 'end' | 'nearest' | 'start'
+  /** The platform's scroll behavior. Instant when left out. */
+  behavior?: ScrollBehavior
+}
+
 /**
  * How many times an update this asked for may change the answer again.
  *
@@ -114,35 +125,14 @@ const UNSTABLE = 10
  * track, so the room the absent rows would have taken is left as padding before
  * and after. A reader dragging that thumb is dragging against the real length.
  *
- * **What it does not do, and the reason is narrower than it first looks.** True
- * virtualization means never creating the rows that are not on screen, and that
- * needs the set as *data*. Two channels are shut: a consumer's items arrive as
- * light-DOM children, which exist by the time this could decide not to create
- * them, and an `items` property cannot survive React hydration, which skips
- * every property it would have to apply imperatively (see `bindReactHandler`,
- * and the note in the rules that objects and functions have that bug and are
- * not fixed).
- *
- * **A third channel is open.** Data as *text*
- * in the markup, a `<script type="application/json">` child or an attribute, is
- * neither a property nor a node per row: React's hydration bug cannot touch text
- * it renders as a child, a server emits it, and the node count is one. The
- * charts already read data out of the document this way, `for="<id>"` at a real
- * `<table>`, so the pattern is in the library rather than being invented for
- * this.
- *
- * So the thing actually blocked is the *row template*. Turning an item into
- * markup wants either a render function, which is a function property and dies
- * on the same bug, or a `<template>` with named holes, which survives because it
- * is markup and which no component here asks anyone to write. That is a decision
- * about what this library is willing to look like, not a platform limit, and it
- * is open at #71.
- *
- * So what this buys is the expensive half rather than all of it: the rows
- * outside the window are not laid out and not painted, which is where the time
- * goes in a long list, and the node count stays. That is worth having and it is
- * not worth calling something it is not. An element that windows children it
- * was handed is not a virtual list, whatever it is named.
+ * **The set arrives as data**, which is what lets a host create only the rows
+ * in the window. A host takes it through a property (an `items` array, which
+ * `applyReactProperties` carries across React hydration with every other object
+ * property) or as text in the markup (a `<script type="application/json">`
+ * named by `for`, which a server emits and which is one node whatever the
+ * row count). A host that is handed its rows as light-DOM children still gets
+ * the expensive half from this: the rows outside the window are not laid out
+ * and not painted, and the node count stays.
  *
  * **One estimate, not per-row measurement.** Measuring every row to place it is
  * how a virtual list ends up reading the layout it is trying to avoid, and it
@@ -333,6 +323,75 @@ export class VirtualizeController implements ReactiveController {
   }
 
   /**
+   * The items on screen, with no overscan: `first` is the item at the top of
+   * the box and `last` is one past the item at its bottom, so
+   * `items.slice(first, last)` is what a reader sees.
+   *
+   * For a host that reports what is visible, where `window` is what is drawn.
+   * An empty span (`first === last`) while the box has no height or the set
+   * no items.
+   */
+  visible(): { first: number; last: number } {
+    const box = this.options.container()
+    const total = Math.max(0, this.options.count())
+    if (!box || total === 0) {
+      return { first: 0, last: 0 }
+    }
+    const top = Math.max(0, box.scrollTop)
+    const bottom = top + box.clientHeight
+    if (!this.measuring()) {
+      const size = Math.max(1, this.options.estimate())
+      const first = Math.min(Math.floor(top / size), total)
+      return { first, last: Math.max(first, Math.min(total, Math.ceil(bottom / size))) }
+    }
+    const first = this.heights.indexAt(top, total)
+    let last = first
+    while (last < total && this.heights.before(last, total) < bottom) {
+      last += 1
+    }
+    return { first, last }
+  }
+
+  /**
+   * How much of the set lies below the bottom of the box, in pixels.
+   *
+   * For a host that asks for more items as a reader nears the end. Read from
+   * the arithmetic and not from `scrollHeight`, which also counts whatever the
+   * host draws around the rows.
+   */
+  remaining(): number {
+    const box = this.options.container()
+    const total = Math.max(0, this.options.count())
+    if (!box) {
+      return 0
+    }
+    const length = this.measuring()
+      ? this.heights.total(total)
+      : total * Math.max(1, this.options.estimate())
+    return Math.max(0, length - Math.max(0, box.scrollTop) - box.clientHeight)
+  }
+
+  /**
+   * The two spacers' heights for the window, with item `kept` drawn too.
+   *
+   * For a host that keeps an item outside the window drawn, the row holding
+   * focus say. The item takes its own room out of the spacer on its side, so
+   * the scrollbar still measures the set. Every host that keeps a focused row
+   * asks this, so the arithmetic is written once.
+   */
+  spacers(kept?: number): { after: number; before: number } {
+    const { after, before, first, last } = this.window
+    if (kept === undefined || (kept >= first && kept < last)) {
+      return { after, before }
+    }
+    const room = this.sizeOf(kept)
+    return {
+      after: kept >= last ? Math.max(0, after - room) : after,
+      before: kept < first ? Math.max(0, before - room) : before,
+    }
+  }
+
+  /**
    * Measures what was just drawn, and holds the reader still if it moved.
    *
    * **This is the pass the fixed-estimate note warns about, made to terminate.**
@@ -428,28 +487,58 @@ export class VirtualizeController implements ReactiveController {
   }
 
   /**
-   * Scrolls the box the least distance that shows item `index` whole.
+   * Scrolls the box to show item `index`.
    *
-   * For a host moving focus to an item outside the window, whose own element
-   * cannot be scrolled to because it is not drawn where it belongs. `inset` is
-   * how far into the box the items start, for a heading that sticks at its
-   * top and covers that much of every item scrolled under it.
+   * By default the least distance that shows it whole, for a host moving focus
+   * to an item outside the window, whose own element cannot be scrolled to
+   * because it is not drawn where it belongs. `inset` is how far into the box
+   * the items start, for a heading that sticks at its top and covers that much
+   * of every item scrolled under it.
+   *
+   * `align` puts the item at the box's `start`, `center` or `end` instead, and
+   * `behavior` is the platform's, for a host whose consumer asked to be taken
+   * to an item. A smooth scroll moves the window through the box's own
+   * `scroll` events, the same as a reader scrolling.
    */
-  reveal(index: number, inset = 0): void {
+  reveal(index: number, inset = 0, { align = 'nearest', behavior }: RevealOptions = {}): void {
     const box = this.options.container()
     if (!box) {
       return
     }
-    const total = Math.max(0, this.options.count())
-    const top = this.measuring()
-      ? this.heights.before(index, total)
-      : index * Math.max(1, this.options.estimate())
-    const bottom = top + this.sizeOf(index) + inset
-    if (top < box.scrollTop) {
-      box.scrollTop = top
-    } else if (bottom > box.scrollTop + box.clientHeight) {
-      box.scrollTop = bottom - box.clientHeight
+    const top = this.offsetOf(index)
+    const size = this.sizeOf(index)
+    const room = box.clientHeight - inset
+    let to: number
+    if (align === 'start') {
+      to = top
+    } else if (align === 'center') {
+      to = top - inset - (room - size) / 2
+    } else if (align === 'end') {
+      to = top + size + inset - box.clientHeight
+    } else if (top < box.scrollTop) {
+      to = top
+    } else if (top + size + inset > box.scrollTop + box.clientHeight) {
+      to = top + size + inset - box.clientHeight
+    } else {
+      return
     }
+    const next = Math.max(0, to)
+    if (behavior && typeof box.scrollTo === 'function') {
+      box.scrollTo({ behavior, top: next })
+    } else {
+      box.scrollTop = next
+    }
+  }
+
+  /**
+   * Where item `index` starts along the scroll axis, in pixels from the top of
+   * the set: what was measured above it, or the estimate.
+   */
+  offsetOf(index: number): number {
+    const total = Math.max(0, this.options.count())
+    return this.measuring()
+      ? this.heights.before(index, total)
+      : Math.max(0, Math.min(index, total)) * Math.max(1, this.options.estimate())
   }
 
   /**
