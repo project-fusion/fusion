@@ -46,6 +46,13 @@
   position: absolute;
 }
 
+/* A note that reports no status, in the muted ink. A status keeps its hue on
+   every palette, because the hue is what it says; this has nothing to say, so
+   it stays in the neutral ramp, ink included. */
+:host([tone="neutral"]) {
+  --_callout-color: var(--helix-color-foreground-muted);
+}
+
 :host([tone="success"]) {
   --_callout-color: var(--helix-color-success);
 }

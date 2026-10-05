@@ -4,7 +4,13 @@ import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
- * @summary A passage set apart as information, a warning, or an error.
+ * The mark for a `neutral` callout, which reports no status: the information
+ * mark, named for what the passage is.
+ */
+const NOTE = { icon: TONE_MARKS.info.icon, label: 'Note' }
+
+/**
+ * @summary A passage set apart as a note, information, a warning, or an error.
  *
  * @description
  * `tone` is on the headless tier because it carries meaning. It picks the icon
@@ -44,12 +50,12 @@ export class HelixHeadlessCallout extends HelixElement {
    * What kind of attention the passage needs.
    *
    * `tone` is the axis for what a thing means, and this is a subset of it: a
-   * callout reports a status and never a brand role, so it takes four of the
-   * seven values. One word per axis is the whole of the registry, which is why
-   * there is no `severity` beside it.
+   * callout reports a status, or `neutral` for an aside that reports none, and
+   * never a brand role, so it takes five of the seven values. One word per axis
+   * is the whole of the registry, which is why there is no `severity` beside it.
    */
   @property({ reflect: true })
-  tone?: 'danger' | 'info' | 'success' | 'warning'
+  tone?: 'danger' | 'info' | 'neutral' | 'success' | 'warning'
 
   /**
    * The mark for the callout's tone, behind a seam.
@@ -77,7 +83,8 @@ export class HelixHeadlessCallout extends HelixElement {
        is therefore always *about* something. `Toast.Item` takes the same lookup
        and draws nothing instead, since a message is just the next thing that
        happened. Same vocabulary, two honest answers to an absent tone. */
-    const { icon, label } = toneMark(this.tone) ?? TONE_MARKS.info
+    const { icon, label } =
+      this.tone === 'neutral' ? NOTE : (toneMark(this.tone) ?? TONE_MARKS.info)
 
     return html`<span part="icon">${this.renderIcon(icon, label)}</span>
       <div part="content">
