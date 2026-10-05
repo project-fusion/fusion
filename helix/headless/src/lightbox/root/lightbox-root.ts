@@ -562,7 +562,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    * The viewer's own controls, behind a seam a tier above can move.
    *
    * After the item in the order, so `Tab` from the viewer reaches the picture's
-   * content first. `aria-disabled` at the ends rather than `disabled`, so a
+   * content first. `aria-disabled` at the ends, and never `disabled`, so a
    * control that has just shown the last picture keeps focus.
    */
   protected renderControls(): TemplateResult {

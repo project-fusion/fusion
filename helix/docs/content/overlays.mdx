@@ -81,8 +81,15 @@ to the element that opened it. `Dialog` does this, and so does `Drawer` unless
 you set `modal="false"`. The page behind a modal `Dialog` or `Drawer` does not
 scroll while it is open.
 
-`Popover` does not trap focus. When focus moves out of its trigger and its
-panel, the popover closes.
+Opening a `Popover` moves focus to the first control in its panel, or to the
+panel where it holds none, and closing it from inside gives focus back to the
+trigger. It does not trap focus unless you set `modal`, which keeps `Tab` in the
+panel until it closes. When focus moves out of its trigger and its panel, the
+popover closes.
+
+Press F8 to move focus to the `Toast` stack, and press it again to go back.
+Set `hotkey` on the stack to use another key. The stack's name says which key
+it is.
 
 The fields with a panel behave the same way:
 
@@ -94,6 +101,12 @@ The fields with a panel behave the same way:
 
 **A tooltip never takes focus.** A tooltip only describes a control, so it
 cannot contain a button. For something with a button in it, use a `Popover`.
+
+A tooltip describes its trigger by itself, whether it wraps the trigger or
+names it with `for`. A Helix trigger is described as soon as it has rendered.
+A plain element in your markup is described the first time a reader points at
+it or focuses it, so the link is never written into markup your server sent.
+Write `aria-describedby` yourself to have the link in the server's markup.
 
 ## Keep an overlay open
 
@@ -117,6 +130,20 @@ Overlays animate in with `@starting-style`. They animate out with a transition
 on the `overlay` and `display` properties, which allows an exit animation on an
 element the browser is about to remove from the top layer. Every overlay
 responds to `prefers-reduced-motion`.
+
+`Dialog` and `Drawer` also say where they are in the journey:
+`:state(entering)` holds from the moment they open until their entrance has
+finished, and `:state(exiting)` from the moment they close until their exit has
+finished. Select on them to draw an entrance or an exit of your own.
+
+## Swiping an overlay away
+
+A touch or a pen swipes a `Drawer` toward the edge it came from, and a `Toast`
+message toward the end of the line. A swipe past halfway, or a quick one, closes
+it through the same cancelable request as its close control. A `Drawer` with
+`snap-points` comes to rest at the nearest point, such as half open. In a
+`Lightbox`, a swipe across the viewer shows the next or the previous item. A
+mouse never swipes, because dragging with a mouse selects text.
 
 ## Choose an overlay
 

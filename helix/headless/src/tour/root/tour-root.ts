@@ -472,8 +472,8 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
       () => {
         this.waiting = undefined
         this.unwait = undefined
-        /* A microtask on, so the move is its own update rather than one inside
-           this element's own. */
+        /* A microtask on, so the move is an update of its own, after the one
+           that found the target. */
         queueMicrotask(() => {
           if (this.open && this.current === next) {
             this.next()
