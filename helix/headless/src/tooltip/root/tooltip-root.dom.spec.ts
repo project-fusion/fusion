@@ -617,15 +617,26 @@ describe('the knobs on what shows it', () => {
   })
 
   test('`skip-delay` is how long the next one shows at once', async () => {
-    const first = await tooltip('content="One" delay="0"')
-    const second = await tooltip('content="Two" delay="5000" skip-delay="0"')
-    first.show()
-    await first.updateComplete
-    first.hide()
-    await first.updateComplete
-    second.dispatchEvent(new Event('pointerenter'))
-    await second.updateComplete
-    expect(second.open).toBe(false)
-    second.dispatchEvent(new Event('pointerleave'))
+    /* One page, both connected: a popover that is not in the document cannot
+       be shown, so the first has to still be there to hide. */
+    const host = (await mount(
+      `<div>
+        <helix-headless-tooltip content="One" delay="0"><button>One</button></helix-headless-tooltip>
+        <helix-headless-tooltip content="Two" delay="5000" skip-delay="0"><button>Two</button></helix-headless-tooltip>
+      </div>`,
+    )) as HTMLElement
+    const [first, second] = [
+      ...host.querySelectorAll('helix-headless-tooltip'),
+    ] as unknown as Tooltip[]
+    await first?.updateComplete
+    await second?.updateComplete
+    first?.show()
+    await first?.updateComplete
+    first?.hide()
+    await first?.updateComplete
+    second?.dispatchEvent(new Event('pointerenter'))
+    await second?.updateComplete
+    expect(second?.open).toBe(false)
+    second?.dispatchEvent(new Event('pointerleave'))
   })
 })

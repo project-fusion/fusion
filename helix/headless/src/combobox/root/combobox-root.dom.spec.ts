@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import {
   at,
   formValue,
@@ -759,16 +759,20 @@ describe('a read-only combobox', () => {
 
 describe('a combobox with an option that is a link', () => {
   const followed: string[] = []
-  document.addEventListener(
-    'click',
-    (event) => {
-      if (event.target instanceof HTMLAnchorElement) {
-        followed.push(event.target.getAttribute('href') ?? '')
-        event.preventDefault()
-      }
-    },
-    { capture: true },
-  )
+  /* Caught on the way down and kept from navigating, for one test at a time:
+     left on the document, it would cancel every link click in the files after
+     this one. */
+  const follow = (event: Event): void => {
+    if (event.target instanceof HTMLAnchorElement) {
+      followed.push(event.target.getAttribute('href') ?? '')
+      event.preventDefault()
+    }
+  }
+  const catchLinks = (): void => {
+    followed.length = 0
+    document.addEventListener('click', follow, { capture: true })
+  }
+  afterEach(() => document.removeEventListener('click', follow, { capture: true }))
   const linked = async (): Promise<Updatable & { open: boolean; value: string }> => {
     document.body.innerHTML = `<helix-headless-combobox label="L">
       <helix-headless-option value="home">Home</helix-headless-option>
@@ -781,7 +785,7 @@ describe('a combobox with an option that is a link', () => {
   }
 
   test('follows it, selects nothing, and closes as a choice does', async () => {
-    followed.length = 0
+    catchLinks()
     const host = await linked()
     ;(host.children[1] as HTMLElement & { select(): void }).select()
     await settle(host)
@@ -791,7 +795,7 @@ describe('a combobox with an option that is a link', () => {
   })
 
   test('stays open and follows nothing where the page cancels it', async () => {
-    followed.length = 0
+    catchLinks()
     const host = await linked()
     host.addEventListener('helix-select', (event) => event.preventDefault())
     ;(host.children[1] as HTMLElement & { select(): void }).select()

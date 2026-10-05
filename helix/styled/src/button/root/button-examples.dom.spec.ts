@@ -24,6 +24,8 @@ describe('the pending example', () => {
     expect(save.pending).toBe(true)
     control.click()
     expect(heard).toBe(1)
+    /* The property moves at once and the markup on the next render. */
+    await (save as unknown as { updateComplete: Promise<boolean> }).updateComplete
     expect(control.getAttribute('aria-busy')).toBe('true')
     expect(save.shadowRoot?.activeElement).toBe(control)
   })
