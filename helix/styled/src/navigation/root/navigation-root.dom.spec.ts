@@ -104,6 +104,40 @@ describe('navigation', () => {
       expect(current).toBe('rgb(4, 5, 6)')
       expect(other).toBe('rgb(1, 2, 3)')
     })
+
+    test('in a browser, a destination takes its size, weight, space and corner from the hooks', async () => {
+      const nav = await mount(`<helix-navigation label="Sections"
+        style="--navigation-item-font-size: 17px; --navigation-item-font-weight: 300;
+          --navigation-item-current-font-weight: 800; --navigation-item-padding-inline: 13px;
+          --navigation-item-radius: 7px">
+        <a aria-current="page" href="#one">One</a>
+        <a href="#two">Two</a>
+      </helix-navigation>`)
+      await idle()
+      const [current, other] = [...nav.querySelectorAll('a')].map((link) => getComputedStyle(link))
+      expect(other?.fontSize).toBe('17px')
+      expect(other?.fontWeight).toBe('300')
+      expect(current?.fontWeight).toBe('800')
+      expect(other?.paddingInlineStart).toBe('13px')
+      expect(other?.borderTopLeftRadius).toBe('7px')
+    })
+
+    /* No pointer to hold over a link here, so the page's hover rule is read
+       for the two hooks it names. */
+    test('in a browser, the hover rule reads its two hooks', () => {
+      const hover = [...document.styleSheets]
+        .flatMap((one) => [...one.cssRules])
+        .find(
+          (one): one is CSSStyleRule =>
+            one instanceof CSSStyleRule &&
+            one.selectorText.includes('helix-navigation a') &&
+            one.selectorText.endsWith(':hover'),
+        )
+      expect(hover?.style.getPropertyValue('background-color')).toContain(
+        '--navigation-item-hover-background-color',
+      )
+      expect(hover?.style.getPropertyValue('color')).toContain('--navigation-item-hover-color')
+    })
   }
 
   test('carries no attribute of its own', async () => {

@@ -690,7 +690,7 @@ helix-toggle::part(item) {
   border: none;
   /* The group's, so the item and the thumb behind it draw the same curve. */
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
-  color: var(--helix-color-foreground-muted);
+  color: var(--toggle-item-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   display: inline-flex;
   /* Fills the segment rather than sitting at its label width inside it. */
@@ -699,7 +699,7 @@ helix-toggle::part(item) {
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
   justify-content: center;
-  padding-inline: var(--helix-space-sm);
+  padding-inline: var(--toggle-item-padding-inline, var(--helix-space-sm));
   text-decoration: none;
   /* Nothing of its own behind it: the group's traveling thumb is the one
      surface, and this sits above it. */
@@ -729,7 +729,7 @@ helix-toggle-group helix-toggle::part(item):hover {
    choosing a file nudged the row it was in. */
 helix-toggle:state(selected)::part(item) {
   background-color: transparent;
-  color: var(--helix-color-foreground);
+  color: var(--toggle-item-color-selected, var(--helix-color-foreground));
 }
 
 /* Several pressed at once: each pressed item carries the marker's fill, which
@@ -737,7 +737,7 @@ helix-toggle:state(selected)::part(item) {
    shadow rule cannot reach this, because the document's `::part(item)` color
    above beats it. */
 helix-toggle:state(pressed)::part(item) {
-  color: var(--helix-color-foreground);
+  color: var(--toggle-item-color-selected, var(--helix-color-foreground));
 }
 
 helix-toggle[disabled]::part(item) {
@@ -763,13 +763,13 @@ helix-toggle[disabled]::part(item) {
      beside it. Additive on purpose: a direct child resolves both to the same 32,
      and in a taller bar the percentage still wins. */
   min-block-size: var(--helix-size-control-sm);
-  border-radius: var(--helix-radii-sm);
+  border-radius: var(--navigation-item-radius, var(--helix-radii-sm));
   color: var(--navigation-item-color, var(--helix-color-foreground-muted));
   display: inline-flex;
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
+  font-size: var(--navigation-item-font-size, var(--helix-text-sm));
+  font-weight: var(--navigation-item-font-weight, var(--helix-weight-medium));
   justify-content: center;
-  padding-inline: var(--helix-space-sm);
+  padding-inline: var(--navigation-item-padding-inline, var(--helix-space-sm));
   text-decoration: none;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -786,8 +786,11 @@ helix-toggle[disabled]::part(item) {
 }
 
 :where([data-navigation-item], helix-navigation a):hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
-  color: var(--helix-color-foreground);
+  background-color: var(
+    --navigation-item-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+  );
+  color: var(--navigation-item-hover-color, var(--helix-color-foreground));
 }
 
 /* Pinned to a corner, which is a fact about the page and not about the control.
@@ -999,7 +1002,7 @@ helix-toggle[disabled]::part(item) {
 /* No surface of its own. */
 :where([data-navigation-item], helix-navigation a)[aria-current="page"] {
   color: var(--navigation-item-current-color, var(--helix-color-foreground));
-  font-weight: var(--helix-weight-semibold);
+  font-weight: var(--navigation-item-current-font-weight, var(--helix-weight-semibold));
 }
 
 /* Above the marker, which sits behind every item. */
@@ -1519,11 +1522,9 @@ helix-toast:not([data-color-mode]) {
    loses its table semantics in the accessibility tree, which is the one thing
    this rule exists to keep.
 
-   **The skip link is hidden by this same rule until focus reaches it.** It has
-   to stay in the tab order while nobody can see it, which is exactly what this
-   rule preserves and what `display: none` would not. */
-[data-hidden-visually],
-helix-skip-link:not(:focus-within) {
+   The skip link hides itself the same way until focus reaches it, in its own
+   sheet, so it is hidden with or without this file. */
+[data-hidden-visually] {
   block-size: 1px;
   border: var(--helix-space-none);
   clip-path: inset(50%);

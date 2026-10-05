@@ -19,6 +19,12 @@ import { styles } from './toggle-root.css.js'
  * @slot - The item's label.
  *
  * @csspart item - The radio button.
+ *
+ * @cssproperty --toggle-item-color - Text color of an item that is not chosen. Read by the base
+ *   layer, which styles the `item` part.
+ * @cssproperty --toggle-item-color-selected - Text color of the chosen item, and of each pressed
+ *   item in a group that allows several.
+ * @cssproperty --toggle-item-padding-inline - Space either side of an item's label.
  */
 @customElement('helix-toggle')
 export class HelixToggle extends HelixHeadlessToggle {

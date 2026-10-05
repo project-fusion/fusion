@@ -346,6 +346,19 @@ describe('a group where several can be pressed', () => {
     expect(button(items(group)[0] as HTMLElement).hasAttribute('role')).toBe(false)
   })
 
+  /* A toolbar inside a toolbar: React Aria demotes the inner one to a group,
+     so a reader hears group "Format" inside toolbar "Editor". */
+  test('is a named group, not a toolbar, inside a toolbar', async () => {
+    document.body.innerHTML = `<div role="toolbar" aria-label="Editor">
+      <helix-headless-toggle-group label="Format" selection-mode="multiple">
+        <helix-headless-toggle value="bold">Bold</helix-headless-toggle>
+      </helix-headless-toggle-group>
+    </div>`
+    const group = document.querySelector('helix-headless-toggle-group') as Updatable
+    await group.updateComplete
+    expect(role(group)).toBe('group')
+  })
+
   test('a press presses or releases one item, in the order they are written', async () => {
     const group = await toolbar()
     button(items(group)[2] as HTMLElement).click()
