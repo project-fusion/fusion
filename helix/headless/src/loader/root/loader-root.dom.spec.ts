@@ -89,6 +89,30 @@ describe('a loader for a region drawn after it', () => {
     expect(region.getAttribute('aria-busy')).toBe('true')
   })
 
+  /* A `for` with a typo marked nothing, and nothing said so. */
+  test('says once, as it leaves, that it never found its region', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const host = await mount(
+        '<div><helix-headless-loader for="reslts"></helix-headless-loader><helix-headless-loader for="later"></helix-headless-loader></div>',
+      )
+      await frame()
+      const region = document.createElement('section')
+      region.id = 'later'
+      host.append(region)
+      await settle()
+      for (const loader of host.querySelectorAll('helix-headless-loader')) {
+        loader.remove()
+      }
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('for="reslts"')
+  })
+
   test('stops waiting once it leaves the page', async () => {
     const host = await mount(
       '<div><helix-headless-loader for="gone"></helix-headless-loader></div>',

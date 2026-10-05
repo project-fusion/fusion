@@ -14,12 +14,16 @@
   /* The tone, or a color of the page's own through the hook. */
   --_callout-color: var(--callout-accent-color, var(--_callout-tone));
   --_callout-bar: var(--callout-bar-thickness, var(--helix-border-thick));
-  --_callout-inset: var(--callout-padding, var(--helix-space-md));
+  /* The control steps, which are `space-md` and `text-sm` at the resting
+     density, so a callout in a `data-density` region is set as tight or as
+     loose as the controls beside it, as Card is, rather than through a `size`
+     of its own. */
+  --_callout-inset: var(--callout-padding, var(--helix-space-control));
   /* Its own size rather than the page's. A callout is an aside inside prose, so
      it sets its type a step down from the body it interrupts: inheriting left
      it at 15 while its own title was 14, which is a title smaller than the text
      under it. */
-  font-size: var(--callout-font-size, var(--helix-text-sm));
+  font-size: var(--callout-font-size, var(--helix-text-control));
   background-color: var(
     --callout-background-color,
     color-mix(in oklab, var(--_callout-color) 10%, transparent)
@@ -171,7 +175,7 @@ slot[name="heading"]::slotted(*) {
      first words of the content run together as one sentence in two weights,
      which reads as emphasis rather than as a heading. */
   display: block;
-  font-size: var(--callout-font-size, var(--helix-text-sm));
+  font-size: var(--callout-font-size, var(--helix-text-control));
   font-weight: var(--helix-weight-semibold);
   margin: var(--helix-space-none);
 }

@@ -18,6 +18,10 @@ import { styles } from './callout-root.css.js'
  * draws it. `separation` is where the box ends: absent is the tint with the
  * bar, `outlined` an edge with no fill, and `plain` the bar and the mark alone.
  *
+ * The inset and the type follow `data-density`, as the controls around a
+ * callout do: set it on a region for tighter or looser callouts, or set
+ * `--callout-padding` and `--callout-font-size` on one.
+ *
  * @since 0.1.0
  * @status stable
  * @category markers
@@ -37,9 +41,9 @@ import { styles } from './callout-root.css.js'
  * @cssproperty --callout-accent-color - The color of the bar, the mark and the tint, in place of the tone's.
  * @cssproperty --callout-background-color - The fill behind the callout.
  * @cssproperty --callout-bar-thickness - The thickness of the bar on the inline start edge.
- * @cssproperty --callout-font-size - The size of the callout's text.
+ * @cssproperty --callout-font-size - The size of the callout's text. Defaults to the control text step, which follows `data-density`.
  * @cssproperty --callout-gap - The space between the mark and the content.
- * @cssproperty --callout-padding - The inset around the content, to which the bar's width is added at the start.
+ * @cssproperty --callout-padding - The inset around the content, to which the bar's width is added at the start. Defaults to the control space step, which follows `data-density`.
  * @cssproperty --callout-radius - The corner radius of the callout.
  */
 @customElement('helix-callout')

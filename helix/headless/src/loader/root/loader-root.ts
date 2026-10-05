@@ -4,6 +4,7 @@ import {
   elementById,
   HelixElement,
   hostAria,
+  reportRuntime,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -91,6 +92,9 @@ export class HelixHeadlessLoader extends HelixElement {
   /** Stops waiting for a region `for` names that is not on the page yet. */
   private stopAwaiting: (() => void) | undefined
 
+  /** Whether `for` has named an element while the loader was on the page. */
+  private found = false
+
   /** Whether the loader is still waiting out its `delay`. */
   private get waiting(): boolean {
     return this.delay > 0 && !this.due.elapsed
@@ -109,6 +113,18 @@ export class HelixHeadlessLoader extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    /* Said as the loader leaves, when a region drawn late can no longer be the
+       reason: a `for` that never named anything marked nothing busy, which no
+       reader of the page would notice. */
+    if (this.stopAwaiting && !this.found) {
+      reportRuntime({
+        kind: 'missing-target',
+        message:
+          `<${this.localName} for="${this.for}"> named no element in its tree while it was on ` +
+          'the page, so no region was marked busy. Give the region that id.',
+        tag: this.localName,
+      })
+    }
     this.stopAwaiting?.()
     this.stopAwaiting = undefined
     this.release()
@@ -135,6 +151,7 @@ export class HelixHeadlessLoader extends HelixElement {
     if (region) {
       claimBusy(region)
       this.region = region
+      this.found = true
     }
   }
 
@@ -148,6 +165,7 @@ export class HelixHeadlessLoader extends HelixElement {
   protected override updated(changed: PropertyValues<this>): void {
     super.updated(changed)
     if (changed.has('for') && changed.get('for') !== undefined) {
+      this.found = false
       this.mark()
     }
   }
