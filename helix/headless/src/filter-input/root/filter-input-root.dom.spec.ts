@@ -248,13 +248,20 @@ describe('what the form receives', () => {
   test('the text, then one entry for each token that says what it filters', async () => {
     document.body.innerHTML = `<form><helix-headless-filter-input label="Filter" name="q" value="refund">
       <helix-headless-filter-chip slot="tags" name="status">open, pending</helix-headless-filter-chip>
-      <helix-headless-filter-chip slot="tags" name="team" operator="not">ops</helix-headless-filter-chip>
+      <helix-headless-filter-chip slot="tags" name="team" operator="none" operator-label="is none of">ops</helix-headless-filter-chip>
+      <helix-headless-filter-chip slot="tags" name="created" operator="after" operator-label="is after"><span slot="field">Made</span>2024</helix-headless-filter-chip>
       <span slot="tags" value="saved:mine">Mine</span>
       <span slot="tags">Says nothing</span>
     </helix-headless-filter-input></form>`
     const host = document.querySelector('helix-headless-filter-input') as Updatable
     await settle(host)
     const sent = formValue(host as HTMLElement) as unknown as FormData
-    expect(sent.getAll('q')).toEqual(['refund', 'status:open,pending', '-team:ops', 'saved:mine'])
+    expect(sent.getAll('q')).toEqual([
+      'refund',
+      'status:open,pending',
+      '-team:ops',
+      'created[after]:2024',
+      'saved:mine',
+    ])
   })
 })

@@ -533,8 +533,9 @@ describe('the wheel', () => {
 
 describe('on iOS and iPadOS', () => {
   /* VoiceOver reads a spinbutton text field as a slider a reader cannot type
-     in, so React Aria drops the role there and describes the field. */
-  test('the field is described as a number field and carries no spinbutton role', async () => {
+     in, so React Aria drops the role there. It writes no role description on
+     iOS either, so VoiceOver says the field is required. */
+  test('the field is a plain text field, with no spinbutton role and no role description', async () => {
     const agent = Object.getOwnPropertyDescriptor(navigator, 'userAgent')
     Object.defineProperty(navigator, 'userAgent', {
       configurable: true,
@@ -543,7 +544,7 @@ describe('on iOS and iPadOS', () => {
     try {
       const host = await field()
       expect(control(host).hasAttribute('role')).toBe(false)
-      expect(control(host).getAttribute('aria-roledescription')).toBe('number field')
+      expect(control(host).hasAttribute('aria-roledescription')).toBe(false)
     } finally {
       if (agent) {
         Object.defineProperty(navigator, 'userAgent', agent)
