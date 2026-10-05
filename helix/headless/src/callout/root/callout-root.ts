@@ -1,5 +1,13 @@
-import { customElement, HelixElement, hostAria, TONE_MARKS, toneMark } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import {
+  customElement,
+  HelixElement,
+  hostAria,
+  MixinDismissible,
+  TONE_MARKS,
+  toneMark,
+} from '@fusion.dev/helix-core'
+import { x } from '@fusion.dev/helix-icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -22,6 +30,10 @@ const NOTE = { icon: TONE_MARKS.info.icon, label: 'Note' }
  * and the default disappears with no extra check. The tone's name stays on the
  * region around it.
  *
+ * Set `dismissible` for a note a reader may put away, as Shoelace's `closable`
+ * alert does. The button fires `helix-dismiss` and the callout stays until a
+ * listener removes it, so the page decides whether it comes back.
+ *
  * A callout sets a passage apart inside a document and is read where it sits.
  * For page-level chrome above the masthead that is a live region and can be
  * dismissed, use `Announcement`.
@@ -33,15 +45,20 @@ const NOTE = { icon: TONE_MARKS.info.icon, label: 'Note' }
  * @documentation https://fusion.dev/helix/components/callout
  *
  * @slot - The callout's content.
+ * @slot dismiss-icon - Replaces the cross inside the dismiss button.
  * @slot heading - A heading above the content.
  * @slot icon - Replaces the icon chosen by `tone`.
  *
+ * @event {HelixDismissEvent} helix-dismiss - The dismiss button was pressed. The callout does not remove itself, so remove it in response. Cancelable.
+ *
  * @csspart content - The content region.
+ * @csspart dismiss - The button that dismisses the callout, shown when `dismissible` is set.
+ * @csspart dismiss-mark - The cross on the dismiss button, shown when the `dismiss-icon` slot is empty.
  * @csspart icon - The icon region, an image named for the tone.
  * @csspart icon-mark - The icon for the tone, shown when no icon is slotted.
  */
 @customElement('helix-headless-callout')
-export class HelixHeadlessCallout extends HelixElement {
+export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the box.
@@ -89,6 +106,19 @@ export class HelixHeadlessCallout extends HelixElement {
     </slot>`
   }
 
+  /**
+   * The cross inside the dismiss button, behind a seam, for the reason
+   * `renderIcon` gives: the slot answers the page and the method the tier
+   * above.
+   */
+  protected renderDismissIcon(): TemplateResult {
+    return html`<slot name="dismiss-icon">
+      <svg part="dismiss-mark" viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
+        ${unsafeSVG(x.content)}
+      </svg>
+    </slot>`
+  }
+
   protected override render(): TemplateResult {
     /* Falls back to `info`, because a callout exists to set a passage apart and
        is therefore always *about* something. `Toast.Item` takes the same lookup
@@ -106,7 +136,20 @@ export class HelixHeadlessCallout extends HelixElement {
       <div part="content">
         <slot name="heading"></slot>
         <slot></slot>
-      </div>`
+      </div>${
+        /* A plain `<button>`, as `Announcement` draws its own, so the styled
+           tier reaches the control itself through `[part="dismiss"]`. */
+        this.dismissible
+          ? html`<button
+              part="dismiss"
+              type="button"
+              aria-label=${this.dismissLabel}
+              @click=${() => this.dismiss()}
+            >
+              ${this.renderDismissIcon()}
+            </button>`
+          : nothing
+      }`
   }
 }
 
