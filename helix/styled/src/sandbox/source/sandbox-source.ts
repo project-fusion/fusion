@@ -2,6 +2,7 @@ import {
   customElement,
   HelixBeforeEditEvent,
   HelixCaretEvent,
+  HelixEditEvent,
   HelixElement,
   onUnlessFalse,
   restoreValue,
@@ -32,6 +33,7 @@ const MODIFIERS = new Set(['Alt', 'AltGraph', 'Control', 'Meta', 'Shift'])
  *
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. Cancelable: cancel it to keep the source unchanged.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.
+ * @event {HelixEditEvent} helix-edit - Fired after the source was edited, with the new source.
  *
  * @csspart source - The editable region.
  *
@@ -50,7 +52,8 @@ export class HelixSandboxSource extends HelixElement {
    * The field's description, read by screen readers while Tab indents.
    */
   @property({ attribute: 'keys-description' })
-  keysDescription = 'Tab inserts two spaces. To leave, press Escape and then Tab.'
+  keysDescription =
+    'Tab inserts two spaces. To leave, press Escape and then Tab, or press Shift+Tab to go back.'
 
   /**
    * Which source this pane holds. Every `helix-before-edit` event includes it.
@@ -131,10 +134,14 @@ export class HelixSandboxSource extends HelixElement {
    */
   private edit(field: HTMLTextAreaElement, next: string): void {
     const request = new HelixBeforeEditEvent({ value: next })
-    if (this.dispatchEvent(request)) {
+    const accepted = this.dispatchEvent(request)
+    if (accepted) {
       this.value = next
     }
     restoreValue(field, this.value)
+    if (accepted) {
+      this.dispatchEvent(new HelixEditEvent({ value: next }))
+    }
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {

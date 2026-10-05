@@ -47,7 +47,7 @@ const CONFIRM = 1600
  * @slot failed - The icon shown after a copy that put nothing on the clipboard. Defaults to a cross.
  *
  * @event {HelixCopyEvent} helix-copy - Fired after the clipboard write succeeds.
- * @event {HelixCopyErrorEvent} helix-copy-error - Fired when a press put nothing on the clipboard: the browser refused the write, or there was nothing to copy.
+ * @event {HelixCopyErrorEvent} helix-copy-error - Fired when a press put nothing on the clipboard: the browser did not allow the write, or there was nothing to copy.
  *
  * @csspart button - The inner button.
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is rendered from the first time the button is pending.

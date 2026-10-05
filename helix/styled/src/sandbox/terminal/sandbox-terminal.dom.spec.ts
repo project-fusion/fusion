@@ -102,4 +102,44 @@ describe('sandbox terminal', () => {
     expect(part(term, 'entry')).toBeNull()
     expect(part(term, 'empty')).not.toBeNull()
   })
+
+  test('has no controls unless asked, and the asked-for ones clear and filter', async () => {
+    const plain = await terminal()
+    expect(part(plain, 'controls')).toBeNull()
+
+    const term = (await mount(
+      '<helix-sandbox-terminal controls></helix-sandbox-terminal>',
+    )) as Terminal & { level?: string | undefined }
+    term.write({ level: 'log', text: 'hi' })
+    term.write({ level: 'warn', text: 'careful' })
+    term.write({ level: 'error', text: 'Boom' })
+    await term.updateComplete
+
+    const filter = part(term, 'filter') as HTMLSelectElement
+    expect(filter.getAttribute('aria-label')).toBe('Levels shown')
+    filter.value = 'warn'
+    filter.dispatchEvent(new Event('change'))
+    await term.updateComplete
+    expect(term.level).toBe('warn')
+    expect(lines(term).map((line) => line.text)).toEqual(['careful', 'Boom'])
+
+    term.level = undefined
+    await term.updateComplete
+    expect(lines(term)).toHaveLength(3)
+
+    ;(part(term, 'clear') as HTMLButtonElement).click()
+    await term.updateComplete
+    expect(lines(term)).toEqual([])
+    expect(part(term, 'empty')).not.toBeNull()
+  })
+
+  test('`level` hides the quieter lines without the controls', async () => {
+    const term = (await mount(
+      '<helix-sandbox-terminal level="error"></helix-sandbox-terminal>',
+    )) as Terminal
+    term.write({ level: 'warn', text: 'careful' })
+    term.write({ level: 'error', text: 'Boom' })
+    await term.updateComplete
+    expect(lines(term).map((line) => line.text)).toEqual(['Boom'])
+  })
 })

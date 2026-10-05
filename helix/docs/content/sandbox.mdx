@@ -72,6 +72,15 @@ In a source pane, Tab inserts two spaces. Shift+Tab moves focus back, and
 Escape then Tab moves it forward. The field's description says this to a
 screen reader.
 
+Each request has a notification once it is applied: `helix-edit` after
+`helix-before-edit`, `helix-split` after `helix-before-split`, and
+`helix-panel-resize` after `helix-before-panel-resize`. Listen for these to
+store the arrangement or the source.
+
+Set `controls` on `helix-sandbox-terminal` for a clear button and a level
+filter above the log. Without them, `clear()` empties the log, and `level`
+hides the quieter lines.
+
 ## The frame document
 
 `helix-sandbox-preview` loads `src` into a sandboxed frame. You provide that
@@ -94,9 +103,13 @@ its own frame, and only from an opaque origin, so the frame keeps the sandbox
 it was given. The types are exported from `@fusion.dev/helix/sandbox` as
 `PreviewMessage` and its members.
 
-A minimal frame follows. `/helix.css` is the stylesheet from
-`@fusion.dev/helix-styles`, and `/elements.js` is a classic script that
-registers your elements, for the reason under "How the preview is isolated".
+`servePreview` from `@fusion.dev/helix/sandbox` is that protocol, written for
+you. Call it once in the frame document, after your elements are defined. It
+writes each render into `#preview-root`, runs the example's scripts, relays
+its console, reports its height and its presses, and adds the rules for the
+four layouts. A frame follows. `/helix.css` is the stylesheet from
+`@fusion.dev/helix-styles`, and `/frame.js` is a classic script you bundle,
+for the reason under "How the preview is isolated":
 
 ```html
 <!doctype html>
@@ -104,20 +117,23 @@ registers your elements, for the reason under "How the preview is isolated".
   href="/helix.css"
   rel="stylesheet"
 >
+<div id="preview-root"></div>
 <script
   defer
-  src="/elements.js"
+  src="/frame.js"
 ></script>
-<style id="example-styles"></style>
-<script defer>
-  addEventListener('message', ({ data }) => {
-    if (data?.type !== 'helix-preview-render') return
-    document.getElementById('example-styles').textContent = data.styles
-    document.body.innerHTML = data.source
-  })
-  parent.postMessage({ type: 'helix-preview-ready' }, '*')
-</script>
 ```
+
+```ts
+// frame.ts, bundled to /frame.js as a classic script
+import '@fusion.dev/helix'
+import { servePreview } from '@fusion.dev/helix/sandbox'
+
+servePreview()
+```
+
+Pass `onReplace` to take down what an example mounted before the next one
+replaces it, and `onRender` to act after each render, such as mounting a map.
 
 ## Console output from the example
 
