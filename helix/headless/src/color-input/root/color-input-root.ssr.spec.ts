@@ -58,4 +58,15 @@ describe('color input server output', () => {
     expect(partTag(shut, 'surface')).toMatch(/\shidden[\s=>]/)
     expect(partTag(shut, 'trigger')).toContain('aria-expanded="false"')
   })
+
+  test('the picker forwards its buttons\u2019 live regions, so they can be styled from outside', () => {
+    const forwards = partTag(
+      ssr(
+        html`<helix-headless-color-input label="Brand" default-open></helix-headless-color-input>`,
+      ),
+      'picker',
+    )
+    expect(forwards).toContain('eyedropper-live: picker-eyedropper-live')
+    expect(forwards).toContain('format-live: picker-format-live')
+  })
 })

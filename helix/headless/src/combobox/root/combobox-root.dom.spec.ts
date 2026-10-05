@@ -297,6 +297,15 @@ describe('combobox holding several', () => {
     ...(host as HTMLElement).shadowRoot!.querySelectorAll<HTMLElement>('[part="tag"]'),
   ]
 
+  test('a token forwards every part of its tag, so each can be styled from outside', async () => {
+    const host = await many()
+    await type(host, 'ru')
+    await press(host, 'Enter')
+    const forwarded = (at(tags(host), 0).getAttribute('exportparts') ?? '').split(/,\s*/)
+    expect(forwarded).toContain('cell: tag-cell')
+    expect(forwarded).toContain('link: tag-link')
+  })
+
   test('each chosen token is removable, and the control says which one it removes', async () => {
     /* A token's dismiss control is a cross, so `removeLabel` is its whole
        accessible name. It reaches the token through the `Tag` this renders,
