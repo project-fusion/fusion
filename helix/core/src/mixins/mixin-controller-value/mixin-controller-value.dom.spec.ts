@@ -202,6 +202,22 @@ describe('a form putting a control back', () => {
     expect(host.value).toBe('seed')
   })
 
+  test('a reset returns to the value attribute where there is no default-value', async () => {
+    const host = await mount(`<${tag} value="declared"></${tag}>`)
+    host.requestValue('typed')
+    await host.updateComplete
+    ;(host as unknown as { formResetCallback(): void }).formResetCallback()
+    await host.updateComplete
+    expect(host.value).toBe('declared')
+  })
+
+  test('and to default-value where both are written', async () => {
+    const host = await mount(`<${tag} default-value="seed" value="declared"></${tag}>`)
+    ;(host as unknown as { formResetCallback(): void }).formResetCallback()
+    await host.updateComplete
+    expect(host.value).toBe('seed')
+  })
+
   test('a restore with state takes it', async () => {
     const host = await mount(`<${tag} default-value="seed"></${tag}>`)
     ;(
@@ -220,5 +236,14 @@ describe('a form putting a control back', () => {
     ).formStateRestoreCallback(null)
     await host.updateComplete
     expect(host.value).toBe('seed')
+  })
+
+  test('and a restore with none and no default-value falls back to the value attribute', async () => {
+    const host = await mount(`<${tag} value="declared"></${tag}>`)
+    ;(
+      host as unknown as { formStateRestoreCallback(s: string | null): void }
+    ).formStateRestoreCallback(null)
+    await host.updateComplete
+    expect(host.value).toBe('declared')
   })
 })

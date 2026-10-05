@@ -1562,8 +1562,11 @@ form. Four things follow, and the ones a mixin does not do are the component's.
   what goes in the entry list is not always the string (a file input submits
   `FormData`, a date picker submits what its calendar resolved).
 - **It returns.** `formResetCallback` puts it back to what the markup declared,
-  both halves, the consumer's and the control's. The value mixin has it; a
-  component holding state of its own has to write it.
+  both halves, the consumer's and the control's. What the markup declared is
+  `default-value` where it is written, and the `value` attribute where it is
+  not, as a native control resets to its `value`; `default-checked` and
+  `checked` likewise. The value and checked mixins have it; a component holding
+  state of its own has to write it.
 - **It restores.** `formStateRestoreCallback` for a browser bringing a form back,
   falling back to the declared value rather than to empty, a restore with no
   state being the same situation as a fresh form.

@@ -106,11 +106,13 @@ current value. The pair comes from the platform. A native input reflects its
 `value` *content attribute* to `defaultValue`, and it keeps a dirty flag. Once a
 user has typed, the flag stops the attribute from changing the value.
 
-**A form reset clears a `value` or `checked` you wrote in markup.** A native
-`<input value="Ada">` resets to `Ada`, and `<helix-input value="Ada">` resets to
-empty, because a Helix control resets to `default-value` and `default-checked`.
-Write the starting value of a form control as `default-value`, or
-`default-checked` for a checkbox or a switch.
+**A form reset returns to a `value` or `checked` you wrote in markup**, as it
+does on a native control: `<input value="Ada">` and `<helix-input value="Ada">`
+both reset to `Ada`. Where `default-value` or `default-checked` is written, the
+reset returns to that instead. The attribute is read at the reset, and a
+framework that sets `value` as a property writes no attribute, so write the
+starting value of a form control as `default-value`, or `default-checked` for a
+checkbox or a switch, when a reset has to return to it.
 
 ## State is published as a custom state
 

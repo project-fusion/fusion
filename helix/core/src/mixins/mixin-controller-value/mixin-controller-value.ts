@@ -14,7 +14,9 @@ type Constructor<T> = new (...args: any[]) => T
  */
 export declare class MixinControllerValueInterface {
   /**
-   * The value the control starts with. A form reset returns it to this value.
+   * The value the control starts with. A form reset returns it to this value,
+   * and to the `value` attribute where this one is not written, as a native
+   * control resets to the `value` it declares.
    *
    * Separate from `value`, which is where the control is now, and gone from the
    * reader's view the moment they change anything.
@@ -48,7 +50,7 @@ export declare class MixinControllerValueInterface {
 
   requestValue(next: string): boolean
 
-  /** Returns the control to its `defaultValue`. */
+  /** Returns the control to its `defaultValue`, or to its `value` attribute where there is none. */
   formResetCallback(): void
 
   /** Restores the value when the browser brings a form back. */
@@ -80,7 +82,9 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
   // when resolving inherited members into dependent packages.
   class ValueElement extends Base {
     /**
-     * The value the control starts with. A form reset returns it to this value.
+     * The value the control starts with. A form reset returns it to this value,
+     * and to the `value` attribute where this one is not written, as a native
+     * control resets to the `value` it declares.
      */
     @property({ attribute: 'default-value' })
     defaultValue = ''
@@ -176,7 +180,25 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
     }
 
     /**
-     * Returns the control to its `defaultValue`.
+     * What the markup declared: `undefined` where `default-value` is written,
+     * so the value reads it, and the `value` attribute where it is not.
+     *
+     * **The platform's rule.** `<input value="Ada">` declares "Ada" and a
+     * reset returns to it, because the attribute is the input's default. A
+     * Helix control has a `default-value` for that, since its `value` attribute
+     * sets the state, and where a page wrote only `value` the reset went to
+     * empty. `value` never reflects, so the attribute is still what the page
+     * wrote.
+     */
+    private get declared(): string | undefined {
+      return this.hasAttribute('default-value')
+        ? undefined
+        : (this.getAttribute('value') ?? undefined)
+    }
+
+    /**
+     * Returns the control to its `defaultValue`, or to its `value` attribute
+     * where there is no `default-value`.
      *
      * Both halves are dropped, the consumer's and the control's, because a
      * reset means the form is as it was served. Clearing only the internal one
@@ -185,23 +207,23 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
     override formResetCallback(): void {
       super.formResetCallback()
       const previous = this.value
-      this.valueState = undefined
+      this.valueState = this.declared
       this.requestUpdate('value', previous)
     }
 
     /**
      * Restores the value when the browser brings a form back.
      *
-     * Falling back to `defaultValue` rather than to empty, because a restore
-     * with no state is a form the browser has nothing recorded for, which is
-     * the same situation as a fresh one.
+     * Falling back to what the markup declared rather than to empty, because
+     * a restore with no state is a form the browser has nothing recorded for,
+     * which is the same situation as a fresh one.
      */
     formStateRestoreCallback(state: string | File | FormData | null): void {
       const previous = this.value
       /* A string or nothing. A control that submits several entries saves its
          form data as the state unless it names one, and a value that is not a
          string throws the first time anything splits it. */
-      this.valueState = typeof state === 'string' ? state : undefined
+      this.valueState = typeof state === 'string' ? state : this.declared
       this.requestUpdate('value', previous)
     }
   }
