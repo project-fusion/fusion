@@ -112,7 +112,22 @@ describe('donut chart', () => {
 
   test('the drawing is hidden, because the table it read is the readable one', async () => {
     const host = await chart(TRAFFIC, 'for="traffic"')
-    expect(part(host, 'plot')?.getAttribute('aria-hidden')).toBe('true')
+    expect(host.shadowRoot?.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  /* The plot was hidden whole, and the middle with it: a total slotted there,
+     which the table does not hold, reached no screen reader. */
+  test('and the middle is not, since a total there is not in the table', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    const center = part(host, 'center')
+    expect(center?.closest('[aria-hidden="true"]')).toBeNull()
+  })
+
+  test('the summary names the chart and gives each slice its share', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    expect(part(host, 'summary')?.textContent?.trim()).toBe(
+      'Sessions by source: Direct 50%, Search 30%, Social 20%.',
+    )
   })
 
   /* **No `title` on the plot, and so nothing here asserting one.** On an element
@@ -140,7 +155,7 @@ describe('donut chart', () => {
 
 describe('donut chart tooltip', () => {
   const hover = async (host: HTMLElement, index: number): Promise<void> => {
-    segments(host)[index]?.dispatchEvent(new Event('pointerenter'))
+    segments(host)[index]?.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }))
     await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
   }
 
@@ -154,6 +169,15 @@ describe('donut chart tooltip', () => {
        The bubble is `Tooltip`'s now and reaches a consumer through `exportparts`;
        what the chart still owns is the content it slots into it. */
     expect(host.shadowRoot?.querySelector('[part="tooltip-label"]')?.textContent).toBe('Search')
+  })
+
+  /* A touch has no hover: heard, it opened the bubble under the finger and
+     left it there after the finger lifted, which the other charts never do. */
+  test('a touch does not open it', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    segments(host)[1]?.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'touch' }))
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(host.shadowRoot?.querySelector('[part="tooltip-label"]')).toBeNull()
   })
 
   test('nothing is shown until a pointer is on a slice', async () => {

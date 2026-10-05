@@ -243,3 +243,19 @@ describe('a blank cell', () => {
     expect(d.startsWith('M62.5,')).toBe(true)
   })
 })
+
+/* `label` and the caption were documented to name the chart and did nothing:
+   the drawing is hidden, and nothing else was rendered. */
+describe('the summary', () => {
+  test('names the chart from the caption and gives each series its highest reading', async () => {
+    const host = await chart(REVENUE, 'for="revenue"')
+    expect(part(host, 'summary')?.textContent?.trim()).toBe(
+      'Revenue by quarter. Highest: Revenue Q3 $200k.',
+    )
+  })
+
+  test('and from `label` where one is set, in words the page can change', async () => {
+    const host = await chart(REVENUE, 'for="revenue" label="Sales" highest-label="Höchster"')
+    expect(part(host, 'summary')?.textContent?.trim()).toBe('Sales. Höchster: Revenue Q3 $200k.')
+  })
+})

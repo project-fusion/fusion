@@ -102,10 +102,22 @@ describe('the data comes from the table', () => {
    * The table is the accessible representation and is already in the markup, so
    * the drawing is a picture of it and takes `role="img"` with a name. A grid of
    * ninety spans with no name is ninety things a screen reader has to walk.
+   *
+   * The strip and not the host: on the host, the footer's slots were inside an
+   * image, whose children are presentational.
    */
   test('the strip is a named picture, since the table beside it is the reading', async () => {
     const element = await strip('label="Uptime"', [['Mon', 1]])
-    expect(role(element)).toBe('img')
+    expect(part(element, 'strip')?.getAttribute('role')).toBe('img')
+    expect(part(element, 'strip')?.getAttribute('aria-label')).toBe('Uptime')
+    expect(role(element)).toBeNull()
+  })
+
+  /* The charting docs promise a caption names the chart unless `label` is set.
+     The strip was named 'Heatmap' whatever the caption said. */
+  test('and the caption of the table names it where no label is set', async () => {
+    const element = await strip('', [['Mon', 1]])
+    expect(part(element, 'strip')?.getAttribute('aria-label')).toBe('Uptime')
   })
 
   test('an empty table says so rather than drawing nothing', async () => {
@@ -157,7 +169,9 @@ describe('tones', () => {
     ])
     expect(element.shadowRoot?.querySelector('[part="mark"]')).toBeNull()
 
-    cells(element)[1]?.dispatchEvent(new Event('pointerover', { bubbles: true, composed: true }))
+    cells(element)[1]?.dispatchEvent(
+      new PointerEvent('pointerover', { bubbles: true, composed: true, pointerType: 'mouse' }),
+    )
     await element.updateComplete
 
     const marks = element.shadowRoot?.querySelectorAll('[part="mark"]') ?? []
@@ -189,7 +203,7 @@ describe('tones', () => {
 
     const drawn = cells(element)
     cells(element)[drawn.length - 1]?.dispatchEvent(
-      new Event('pointerover', { bubbles: true, composed: true }),
+      new PointerEvent('pointerover', { bubbles: true, composed: true, pointerType: 'mouse' }),
     )
     await element.updateComplete
     expect(part(element, 'tooltip-label')?.textContent).toBe('Thu')
@@ -311,5 +325,21 @@ describe('a blank cell', () => {
     )
     await element.updateComplete
     expect(element.shadowRoot?.querySelector('[part="tooltip-label"]')?.textContent).toBe('Wed')
+  })
+})
+
+/* A touch has no hover: heard, it opened the bubble under the finger and left
+   it there after the finger lifted, which the other charts never do. */
+describe('a touch', () => {
+  test('does not open the tooltip', async () => {
+    const element = await strip('', [
+      ['Mon', 1],
+      ['Tue', 2],
+    ])
+    cells(element)[1]?.dispatchEvent(
+      new PointerEvent('pointerover', { bubbles: true, composed: true, pointerType: 'touch' }),
+    )
+    await element.updateComplete
+    expect(element.shadowRoot?.querySelector('[part="tooltip-label"]')).toBeNull()
   })
 })

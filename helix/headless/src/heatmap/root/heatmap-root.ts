@@ -5,7 +5,6 @@ import {
   drawTooltip,
   HelixElement,
   HelixResizeEvent,
-  hostAria,
   MixinChartSource,
   markRegion,
   searchableById,
@@ -59,7 +58,7 @@ import { fits, type Reading, toneOf } from './buckets.js'
  * @csspart footer - The three-slot row under the strip.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart start - The leading slot's box.
- * @csspart strip - The grid of cells.
+ * @csspart strip - The grid of cells. It is an image, named by `label` or by the caption of the table.
  * @csspart summary - The middle slot's box.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -388,11 +387,6 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     this.observer = undefined
   }
 
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label || 'Heatmap', role: 'img' })
-  }
-
   /**
    * Says on the footer whether any of its three slots holds anything.
    *
@@ -443,9 +437,15 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     const palette = writtenList(this.tones)
     const cells = this.drawn
 
+    /* **The strip is the picture, and the footer is beside it.** The role was
+       the host's, which put the start, summary and end slots inside an image,
+       whose children are presentational. Named by `named`, so a table's
+       caption names it as it names every other chart. */
     return html`<div
+        aria-label=${this.named || 'Heatmap'}
         part="strip"
         id=${CHART_PLOT}
+        role="img"
         style="--heatmap-rows: ${this.rowCount}"
         @pointerover=${this.onPointerOver}
         @pointerleave=${this.onPointerLeave}
@@ -531,10 +531,14 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    *
    * `pointerover` on the strip rather than a listener per cell: the event
    * bubbles, so one handler covers however many cells there are, and unlike
-   * `mouseover` it is delivered for a pen and for the touch that follows a long
-   * press.
+   * `mouseover` it is delivered for a pen.
    */
   private readonly onPointerOver = (event: PointerEvent): void => {
+    /* A mouse or a pen, the rule every chart's pointer keeps: a touch opened
+       the bubble under the finger and left it there after the finger lifted. */
+    if (!this.pointer.accepts(event)) {
+      return
+    }
     const cell = (event.target as Element | null)?.closest?.('[part="cell"]')
     const index = Number(cell?.getAttribute('data-index') ?? -1)
     this.hovered = Number.isInteger(index) ? index : -1

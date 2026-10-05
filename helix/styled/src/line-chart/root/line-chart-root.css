@@ -260,3 +260,15 @@
 :host([material="frosted"]) [part="line"] {
   stroke-opacity: calc(0.88 * var(--helix-material-opacity));
 }
+
+/* The summary is for screen readers, and the drawing is what a sighted reader
+   reads. */
+[part="summary"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

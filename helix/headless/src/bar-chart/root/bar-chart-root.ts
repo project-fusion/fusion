@@ -34,7 +34,9 @@ import '../../tooltip/index.js'
  * the way `vector-effect` does for strokes.
  *
  * The table is the accessible representation, and the drawing is `aria-hidden`,
- * so screen reader users get the numbers themselves.
+ * so screen reader users get the numbers themselves. The `summary` part names
+ * the chart, from `label` or the table's caption, and gives each series' highest
+ * reading.
  *
  * The component writes the custom properties below with numbers it computes,
  * and the stylesheet that draws the chart reads them. Do not set them yourself.
@@ -59,6 +61,7 @@ import '../../tooltip/index.js'
  * @csspart line - A series drawn as a line, named in `lines`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
+ * @csspart summary - The chart's name and each series' highest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the bars and lines sit on.
  * @csspart tick - One number on an axis.
  * @csspart tooltip - The tooltip bubble, forwarded from `Tooltip`.
@@ -144,8 +147,8 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    * turns on its side, and neither is as readable as putting them down the left
    * where they read normally.
    *
-   * `orientation` and not `orientation`, which `Trend` uses in the same group for
-   * which way a number moved.
+   * Named `orientation` because `direction` is taken: `Trend` uses it in the
+   * same group for which way a number moved.
    */
   @property({ reflect: true })
   orientation?: 'horizontal'
@@ -186,6 +189,12 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
    */
   @property({ reflect: true })
   secondary?: string
+
+  /**
+   * The word the summary puts before each series' highest reading.
+   */
+  @property({ attribute: 'highest-label' })
+  highestLabel = 'Highest'
 
   /** The series names on the second scale, lowercased and trimmed. */
   private get scaled(): Set<string> {
@@ -306,7 +315,33 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       z === undefined ? nothing : this.renderAxis(y, domain, 'primary', sideways, widest)
     }${this.renderPlot(series, categories, y, domain, floor, z)}${
       z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
-    }${this.renderLabels(categories)}`
+    }${this.renderLabels(categories)}${this.renderSummary(series)}`
+  }
+
+  /**
+   * What a reader who cannot see the columns is told: the chart's name and
+   * each series' highest reading.
+   *
+   * The highest, because which category leads is the question a bar chart is
+   * read for, and the table beside it has every other number. The reading is
+   * written the way the table writes it, so `$128k` and not `128000`.
+   */
+  protected renderSummary(series: Series[]): TemplateResult {
+    const rows = this.sourceRows
+    const columns = this.plottedColumns
+    const highest = series.flatMap((one, depth) => {
+      const top = one.points.reduce<(typeof one.points)[number] | undefined>(
+        (best, point) => (best === undefined || point.value > best.value ? point : best),
+        undefined,
+      )
+      if (top === undefined) {
+        return []
+      }
+      const text = rows[top.at]?.cells[columns[depth] ?? -1]?.text ?? String(top.value)
+      return [`${one.name} ${top.label} ${text}`]
+    })
+    const named = this.named ? `${this.named}. ` : ''
+    return html`<p part="summary">${named}${this.highestLabel}: ${highest.join('; ')}.</p>`
   }
 
   /**

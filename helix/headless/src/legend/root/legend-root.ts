@@ -5,7 +5,7 @@ import {
   SourceController,
   seriesIndex,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -75,6 +75,15 @@ export class HelixHeadlessLegend extends HelixElement {
   @property()
   for = ''
 
+  /**
+   * The name of the list, which a screen reader announces before its entries.
+   *
+   * Absent names the list after the table's caption, so a page with several
+   * charts has a legend list for each that says which chart it keys.
+   */
+  @property()
+  label = ''
+
   /* One controller rather than the resolve-and-watch each chart would write
      out for itself, which drifts into two names for the same lookup. */
   protected readonly source = new SourceController(this)
@@ -115,7 +124,8 @@ export class HelixHeadlessLegend extends HelixElement {
      * missed, and a legend naming a ninth series beside a chart painting it in
      * the first color is the one failure this component exists to prevent. This
      * was the sixth copy. */
-    return html`<ul part="list" role="list">
+    const named = this.label || this.source.element?.querySelector('caption')?.textContent?.trim()
+    return html`<ul aria-label=${named || nothing} part="list" role="list">
       ${this.names().map(
         (name, index) => html`<li
           data-series=${seriesIndex(index)}

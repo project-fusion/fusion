@@ -100,6 +100,15 @@ describe('chart legend', () => {
     expect(part(host, 'swatch')).toBeNull()
   })
 
+  /* A page of several charts had several unnamed lists, and nothing said which
+     chart each one keyed. */
+  test('the list is named by the caption of the table, or by `label`', async () => {
+    const list = (host: HTMLElement) => part(host, 'list')?.getAttribute('aria-label')
+    expect(list(await legend(PLANS, 'for="plans" entries="categories"'))).toBe('Accounts by plan')
+    expect(list(await legend(PLANS, 'for="plans" label="Plans"'))).toBe('Plans')
+    expect(list(await legend(TRAFFIC, 'for="traffic"'))).toBeNull()
+  })
+
   test('naming nothing, or naming something that is not a table, is an empty list', async () => {
     expect(names(await legend(TRAFFIC, ''))).toEqual([])
     expect(names(await legend(TRAFFIC, 'for="not-here"'))).toEqual([])

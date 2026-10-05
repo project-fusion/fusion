@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The styled tier, which is paint over the headless behavior. The tones, the
  * bucketing and the published count are the headless tier's and are asserted
@@ -31,8 +31,8 @@ const strip = async (attributes = '') => {
 }
 
 describe('the styled heatmap', () => {
-  test('it is still a named picture', async () => {
-    expect(role(await strip())).toBe('img')
+  test('its strip is still a named picture', async () => {
+    expect(part(await strip(), 'strip')?.getAttribute('role')).toBe('img')
   })
 
   test('a cell per reading, each carrying its tone', async () => {
