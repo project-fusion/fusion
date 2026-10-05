@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The composer, which is one field and one rule about Enter. */
 
@@ -10,6 +10,11 @@ beforeAll(async () => {
 
 interface Composer extends HTMLElement {
   disabled: boolean
+  form: HTMLFormElement | null
+  formResetCallback: () => void
+  formStateRestoreCallback: (state: string | null) => void
+  typing: boolean
+  typingTimeout: number
   send: () => boolean
   submitOn: 'button' | 'enter'
   updateComplete: Promise<unknown>
@@ -242,5 +247,90 @@ describe('the shape of the composer', () => {
     )) as Composer
     await filled.updateComplete
     expect(part(filled, 'start')?.hasAttribute('data-empty')).toBe(false)
+  })
+})
+
+describe('in a form', () => {
+  const inForm = async (attributes = '') => {
+    const form = (await mount(
+      `<form><helix-headless-chat-composer name="draft" ${attributes}></helix-headless-chat-composer></form>`,
+    )) as HTMLFormElement
+    const element = form.querySelector('helix-headless-chat-composer') as Composer
+    await element.updateComplete
+    return element
+  }
+
+  test('the draft is the value it submits, and an empty one submits nothing', async () => {
+    const element = await inForm()
+    expect(formValue(element)).toBeNull()
+    await type(element, 'Where is my order?')
+    expect(formValue(element)).toBe('Where is my order?')
+    element.send()
+    await element.updateComplete
+    expect(formValue(element)).toBeNull()
+  })
+
+  test('a reset puts back the draft the markup declared', async () => {
+    const element = await inForm('value="Hello"')
+    await type(element, 'Something else')
+    element.formResetCallback()
+    await element.updateComplete
+    expect(element.value).toBe('Hello')
+    expect((part(element, 'field') as HTMLTextAreaElement).value).toBe('Hello')
+  })
+
+  test('a restore brings the draft back, and an empty one the declared draft', async () => {
+    const element = await inForm('value="Hello"')
+    element.formStateRestoreCallback('Kept')
+    expect(element.value).toBe('Kept')
+    element.formStateRestoreCallback(null)
+    expect(element.value).toBe('Hello')
+  })
+})
+
+describe('typing', () => {
+  test('starting to write says so once, and sending says it stopped', async () => {
+    const element = await composer()
+    const heard: boolean[] = []
+    element.addEventListener('helix-typing', () => heard.push(element.typing))
+    await type(element, 'H')
+    await type(element, 'He')
+    expect(heard).toEqual([true])
+    element.send()
+    expect(heard).toEqual([true, false])
+  })
+
+  test('a pause of the timeout says it stopped', async () => {
+    const element = await composer('typing-timeout="10"')
+    const heard: boolean[] = []
+    element.addEventListener('helix-typing', () => heard.push(element.typing))
+    await type(element, 'Hello')
+    await new Promise((resolve) => {
+      setTimeout(resolve, 30)
+    })
+    expect(heard).toEqual([true, false])
+    expect(element.typing).toBe(false)
+  })
+
+  test('clearing the field says it stopped', async () => {
+    const element = await composer()
+    await type(element, 'Hello')
+    await type(element, '')
+    expect(element.typing).toBe(false)
+  })
+
+  test('it bubbles, so the chat around the composer hears it', async () => {
+    const element = await composer()
+    let heard = 0
+    const hear = (): void => {
+      heard += 1
+    }
+    document.body.addEventListener('helix-typing', hear)
+    try {
+      await type(element, 'Hi')
+    } finally {
+      document.body.removeEventListener('helix-typing', hear)
+    }
+    expect(heard).toBeGreaterThan(0)
   })
 })
