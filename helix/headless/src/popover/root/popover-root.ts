@@ -269,21 +269,48 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
 
   /** Closes the panel and puts focus back on the trigger. */
   hide(): void {
+    this.close(true)
+  }
+
+  /**
+   * Closes the panel, giving focus back to the trigger where `giveBack` is set
+   * and focus is inside the panel that is going away. A popover dismissed by a
+   * press somewhere else has not taken focus with it, and pulling focus back to
+   * the trigger would move a reader who was already somewhere else on purpose.
+   */
+  private close(giveBack: boolean): void {
     if (!this.open || !this.requestOpen(false)) {
       return
     }
     this.panel.hide()
-    /* Only when focus is inside the panel that is going away. A popover
-       dismissed by a press somewhere else has not taken focus with it, and
-       pulling focus back to the trigger would move a reader who was already
-       somewhere else on purpose. */
-    /* `deepActiveElement`, which walks into shadow roots. `document.activeElement`
-       stops at the outermost host, so a popover living inside another
-       component's shadow root never saw its own focus and never gave it back to
-       the trigger. The util exists for this. */
-    if (this.contains(deepActiveElement())) {
+    if (giveBack && this.focusInside) {
       this.trigger.focus()
     }
+  }
+
+  /**
+   * Whether focus is in the panel, on the panel itself or on anything slotted
+   * into it. `deepActiveElement`, which walks into shadow roots:
+   * `document.activeElement` stops at the outermost host, so a popover living
+   * inside another component's shadow root would never see its own focus.
+   */
+  private get focusInside(): boolean {
+    return this.scope.holdsFocus || this.contains(deepActiveElement())
+  }
+
+  /**
+   * Whether the update under way closes the panel while focus is inside it,
+   * read before the panel is hidden and focus has fallen to the body.
+   */
+  private closingFromInside = false
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* However the panel closes: `hide()` has already moved focus, so this is
+       the path where `open` itself was set, as a controlled popover in React
+       or Vue closes it. */
+    this.closingFromInside =
+      changed.has('open') && !this.open && changed.get('open') === true && this.focusInside
   }
 
   /**
@@ -303,7 +330,8 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     if (this.contains(next) || this.renderRoot.contains(next) || this.invoker?.contains(next)) {
       return
     }
-    this.hide()
+    /* Focus is already on its way to `next`, which is where the reader went. */
+    this.close(false)
   }
 
   override connectedCallback(): void {
@@ -356,6 +384,10 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
        not asked for anything. */
     if (changed.has('open') && this.open && changed.get('open') === false) {
       this.scope.enter()
+    }
+    if (this.closingFromInside) {
+      this.closingFromInside = false
+      this.trigger.focus()
     }
   }
 

@@ -126,6 +126,14 @@
   color: var(--helix-color-foreground);
 }
 
+/* While the next page is on its way. It keeps its place and its focus, and
+   reads as resting. */
+[part="more"][aria-disabled="true"],
+[part="more"][aria-disabled="true"]:hover {
+  color: var(--helix-color-foreground-subtle);
+  cursor: default;
+}
+
 [part="more"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
