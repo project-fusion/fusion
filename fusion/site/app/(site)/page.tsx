@@ -68,11 +68,16 @@ export default function Home() {
             edge: 39% at 1.7, 15% at 3.5. Hero and
             footer sit dimmer than the middle bands do, which is a page-length
             gradient rather than a seam, and is the price of one canvas over nine
-            screens instead of two over four. */}
+            screens instead of two over four.
+
+            **`gain` at 0.75 since the site went to ink.** The field is drawn in
+            the primary, which in dark mode is now a near-white at lightness
+            0.91 where Fusion's blue sat at 0.67, about two and a half times the
+            light. */}
         <helix-aura
           class={styles.reelAura}
           data-layer
-          gain={1.05}
+          gain={0.75}
           scale={3.5}
           speed={1}
           terminus={0.5625}
