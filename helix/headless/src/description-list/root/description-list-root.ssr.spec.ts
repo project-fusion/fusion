@@ -35,4 +35,20 @@ describe('description list server output', () => {
     const bare = ssr(html`<helix-headless-description-list></helix-headless-description-list>`)
     expect(hostAttributes(bare, 'helix-headless-description-list')).not.toContain('direction')
   })
+
+  test('a label writes nothing onto the host beyond what the consumer wrote', () => {
+    const named = ssr(
+      html`<helix-headless-description-list label="Server details"></helix-headless-description-list>`,
+    )
+    expect(hostAttributes(named, 'helix-headless-description-list')).toEqual(['label'])
+  })
+
+  /* A server cannot see the consumer's `<dd>` elements, so it serves the
+     item's own around them, and the item lets go of it once it runs. */
+  test('an item with several values is served with its own `<dd>`', () => {
+    const served = ssr(html`<helix-headless-description-list-item label="Authors"
+      ><dd>Ada</dd><dd>Grace</dd></helix-headless-description-list-item
+    >`)
+    expect(partTag(served, 'value')).toMatch(/^<dd\b/)
+  })
 })

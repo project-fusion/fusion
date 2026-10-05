@@ -1,5 +1,5 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import { html, type TemplateResult } from 'lit'
+import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -16,6 +16,11 @@ import { property } from 'lit/decorators.js'
  * tree, so the pairs appear inside the list. Measured in Chromium, the result
  * matches a plain `<dl>` with the same content node for node, both with a
  * slotted label and with an item set to `display: contents`.
+ *
+ * **A named list is a named group.** A `<dl>` takes no name in ARIA 1.2, so
+ * the list becomes a group around it when it has `label`, `aria-label` or
+ * `aria-labelledby`, and the name lands on the group. Unnamed, the host adds
+ * nothing to the tree.
  *
  * @since 0.1.0
  * @status stable
@@ -46,6 +51,52 @@ export class HelixHeadlessDescriptionList extends HelixElement {
    */
   @property({ reflect: true })
   direction?: 'row'
+
+  /**
+   * The list's name, read by screen readers, such as "Server details". It
+   * makes the list a named group.
+   */
+  @property()
+  label = ''
+
+  /**
+   * Hears a name written on the element, which no property mirrors.
+   *
+   * Lit observes the attributes of its own properties only, and `ariaLabel`
+   * and `ariaLabelledByElements` belong to the platform.
+   */
+  static override get observedAttributes(): string[] {
+    // biome-ignore lint/complexity/noThisInStatic: super runs Lit's getter with the subclass as this, so a styled list keeps its own attributes, where the class name would read the base's
+    return [...super.observedAttributes, 'aria-label', 'aria-labelledby']
+  }
+
+  /**
+   * Called by the browser when an observed attribute changes. A name written
+   * or taken off asks for an update, because it decides whether the list is a
+   * group.
+   */
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, old, value)
+    if (name === 'aria-label' || name === 'aria-labelledby') {
+      this.requestUpdate()
+    }
+  }
+
+  /** Whether anything names the list. */
+  private get named(): boolean {
+    return (
+      this.label !== '' ||
+      Boolean(this.getAttribute?.('aria-label')) ||
+      Boolean(this.getAttribute?.('aria-labelledby'))
+    )
+  }
+
+  /* Said through `ElementInternals`, so nothing is written onto the host. In
+     `willUpdate`, which a server calls too. */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    hostAria(this.internals, { label: this.label, role: this.named ? 'group' : '' })
+  }
 
   protected override render(): TemplateResult {
     return html`<dl part="list"><slot></slot></dl>`

@@ -10,15 +10,20 @@
 :host {
   column-gap: var(--helix-space-md);
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
+  /* Each `--_timeline-*` below is set by the timeline for a layout other than
+     this column, and falls back to the column. */
+  grid-template-columns: var(--_timeline-columns, auto minmax(0, 1fr));
+  grid-template-rows: var(--_timeline-rows, auto minmax(0, 1fr));
 }
 
 [part="rail"] {
+  align-items: var(--_timeline-rail-align, normal);
   display: grid;
-  grid-row: 1 / -1;
-  grid-template-rows: subgrid;
-  justify-items: center;
+  grid-column: var(--_timeline-rail-column, auto);
+  grid-row: var(--_timeline-rail-row, 1 / -1);
+  grid-template-columns: var(--_timeline-rail-columns, none);
+  grid-template-rows: var(--_timeline-rail-rows, subgrid);
+  justify-items: var(--_timeline-rail-justify, center);
 }
 
 /* The line arriving from the entry above, which runs the height of the time.
@@ -35,6 +40,7 @@
   background-color: var(--helix-color-border);
   block-size: 100%;
   content: "";
+  display: var(--_timeline-arrive-display, block);
   grid-column: 1;
   grid-row: 1;
   inline-size: var(--timeline-rail-size, var(--helix-border-thin));
@@ -49,16 +55,24 @@
    grid items in one cell stack, and the margin is what keeps the line below the
    thing it leaves rather than drawn across it. */
 [part="rail"]::after {
-  align-self: stretch;
+  align-self: var(--_timeline-leave-align, stretch);
   background-color: var(--helix-color-border);
+  block-size: var(--_timeline-leave-block-size, auto);
   content: "";
   /* The column said as well as the row. Auto-placement puts two items that name
      only a row into two columns, so the line came down beside the mark instead
      of out of it, in a rail one column wider than it looked. */
-  grid-column: 1;
-  grid-row: 2;
-  inline-size: var(--timeline-rail-size, var(--helix-border-thin));
-  margin-block-start: var(--timeline-marker-size, var(--helix-size-icon-md));
+  grid-column: var(--_timeline-leave-column, 1);
+  grid-row: var(--_timeline-leave-row, 2);
+  inline-size: var(
+    --_timeline-leave-inline-size,
+    var(--timeline-rail-size, var(--helix-border-thin))
+  );
+  justify-self: var(--_timeline-leave-justify, auto);
+  margin-block-start: var(
+    --_timeline-leave-margin-block,
+    var(--timeline-marker-size, var(--helix-size-icon-md))
+  );
 }
 
 :host(:last-child) [part="rail"]::after {
@@ -102,7 +116,7 @@
   color: var(--_timeline-tone, var(--helix-color-foreground-subtle));
   display: inline-flex;
   grid-column: 1;
-  grid-row: 2;
+  grid-row: var(--_timeline-marker-row, 2);
   inline-size: var(--timeline-marker-size, var(--helix-size-icon-md));
   justify-content: center;
 }
@@ -151,21 +165,38 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
-  grid-column: 2;
-  grid-row: 1;
+  grid-column: var(--_timeline-time-column, 2);
+  grid-row: var(--_timeline-time-row, 1);
   padding-block-end: var(--helix-space-2xs);
+  /* Inherited where no layout sets it: a property that is not set falls back
+     to `unset`, which for `text-align` is the text around the timeline. */
+  text-align: var(--_timeline-time-align);
 }
 
 [part="content"] {
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
-  grid-column: 2;
-  grid-row: 2;
+  grid-column: var(--_timeline-content-column, 2);
+  grid-row: var(--_timeline-content-row, 2);
   min-inline-size: 0;
-  padding-block-end: var(--timeline-gap, var(--helix-space-lg));
+  padding-block-end: var(--_timeline-content-block-end, var(--timeline-gap, var(--helix-space-lg)));
+  padding-inline-end: var(--_timeline-content-inline-end, var(--helix-space-none));
 }
 
 :host(:last-child) [part="content"] {
   padding-block-end: var(--helix-space-none);
+  padding-inline-end: var(--helix-space-none);
+}
+
+/* Every other entry on the start side, where the timeline alternates. The
+   time and what happened set to the line they sit against. */
+:host(:nth-child(even)) [part="time"] {
+  grid-column: var(--_timeline-even-column, var(--_timeline-time-column, 2));
+  text-align: var(--_timeline-even-align, var(--_timeline-time-align));
+}
+
+:host(:nth-child(even)) [part="content"] {
+  grid-column: var(--_timeline-even-column, var(--_timeline-content-column, 2));
+  text-align: var(--_timeline-even-align);
 }

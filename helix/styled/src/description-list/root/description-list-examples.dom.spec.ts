@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import preview from '../.examples/preview.html' with { type: 'text' }
+import several from '../.examples/several-values.html' with { type: 'text' }
 import stacked from '../.examples/stacked.html' with { type: 'text' }
 import totals from '../.examples/totals.html' with { type: 'text' }
 
@@ -115,5 +116,28 @@ describe('the stacked example, as a control', () => {
     await example(stacked)
     await idle()
     expect(new Set(items().map((item) => Math.round(ink(item).right))).size).toBeGreaterThan(1)
+  })
+})
+
+describe('the several-values example', () => {
+  /* The second value is auto-placed under the label unless it is put in the
+     values' column, which is the one thing the item's sheet has to say. */
+  run('every value of a label sits in the values column, one under the next', async () => {
+    await example(several)
+    await idle()
+    const values = [...document.querySelectorAll('helix-description-list-item dd')].map((dd) =>
+      dd.getBoundingClientRect(),
+    )
+    const first = (
+      part(
+        document.querySelector('helix-description-list-item') as HTMLElement,
+        'value',
+      ) as HTMLElement
+    ).getBoundingClientRect()
+    expect(values).toHaveLength(2)
+    for (const value of values) {
+      expect(Math.round(value.left)).toBe(Math.round(first.left))
+    }
+    expect((values[1] as DOMRect).top).toBeGreaterThanOrEqual((values[0] as DOMRect).bottom)
   })
 })

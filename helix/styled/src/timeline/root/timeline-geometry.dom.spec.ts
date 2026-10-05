@@ -8,9 +8,9 @@ beforeAll(async () => {
 
 type Entry = HTMLElement & { datetime: string; updateComplete: Promise<boolean> }
 
-const timeline = async (entries: string): Promise<HTMLElement> => {
+const timeline = async (entries: string, attributes = ''): Promise<HTMLElement> => {
   const host = (await mount(
-    `<helix-timeline label="History">${entries}</helix-timeline>`,
+    `<helix-timeline label="History" ${attributes}>${entries}</helix-timeline>`,
   )) as HTMLElement & { updateComplete: Promise<boolean> }
   await host.updateComplete
   for (const one of host.querySelectorAll('helix-timeline-item')) {
@@ -87,6 +87,48 @@ describe('a timeline, as the stylesheet draws it', () => {
         return Math.round(box.left + box.width / 2)
       })
       expect(new Set(centers).size).toBe(1)
+    })
+  }
+})
+
+/* Where each layout puts an entry. The reading order is the written order in
+   all of them, which is the DOM's and needs no assertion; what moves is the
+   box. */
+describe('the layouts, as the stylesheet draws them', () => {
+  if (hasLayout()) {
+    const boxes = (host: HTMLElement, name: string): DOMRect[] =>
+      [...host.querySelectorAll('helix-timeline-item')].map((one) =>
+        (part(one as HTMLElement, name) as HTMLElement).getBoundingClientRect(),
+      )
+
+    test('opposite: the time on the start side of the line, what happened on the end side', async () => {
+      const host = await timeline(three, 'layout="opposite"')
+      const rails = boxes(host, 'rail')
+      boxes(host, 'time').forEach((time, index) => {
+        expect(time.right).toBeLessThanOrEqual(at(rails, index).left + 1)
+      })
+      boxes(host, 'content').forEach((content, index) => {
+        expect(content.left).toBeGreaterThanOrEqual(at(rails, index).right - 1)
+      })
+    })
+
+    test('alternate: the first entry on the end side, the second on the start side', async () => {
+      const host = await timeline(three, 'layout="alternate"')
+      const rails = boxes(host, 'rail')
+      const contents = boxes(host, 'content')
+      expect(at(contents, 0).left).toBeGreaterThanOrEqual(at(rails, 0).right - 1)
+      expect(at(contents, 1).right).toBeLessThanOrEqual(at(rails, 1).left + 1)
+      expect(at(contents, 2).left).toBeGreaterThanOrEqual(at(rails, 2).right - 1)
+    })
+
+    test('horizontal: the entries side by side in the order they are read', async () => {
+      const host = await timeline(three, 'orientation="horizontal"')
+      const marks = boxes(host, 'marker')
+      expect(at(marks, 1).left).toBeGreaterThan(at(marks, 0).right)
+      expect(at(marks, 2).left).toBeGreaterThan(at(marks, 1).right)
+      expect(Math.round(at(marks, 1).top)).toBe(Math.round(at(marks, 0).top))
+      const times = boxes(host, 'time')
+      expect(at(times, 0).top).toBeGreaterThanOrEqual(at(marks, 0).bottom - 1)
     })
   }
 })
