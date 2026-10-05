@@ -364,3 +364,84 @@ describe('a swipe across the picture', () => {
     expect(shown(host)).toBe('one')
   })
 })
+
+describe('the built-in controls’ glyphs', () => {
+  test('are slot fallback, so each can be replaced by slotting', async () => {
+    const host = await lightbox('controls')
+    const slotIn = (name: string): string | null | undefined =>
+      part(host, name)?.querySelector('slot')?.getAttribute('name')
+    expect([slotIn('previous'), slotIn('next'), slotIn('dismiss')]).toEqual([
+      'previous-icon',
+      'next-icon',
+      'dismiss-icon',
+    ])
+    expect(part(host, 'dismiss-mark')).not.toBeNull()
+  })
+})
+
+describe('zooming into the shown item', () => {
+  type Zooming = Lightbox & { zoomTo(scale: number): void }
+  const opened = async (extra: string): Promise<Zooming> => {
+    const host = (await lightbox(extra)) as Zooming
+    host.show()
+    await host.updateComplete
+    ;(part(host, 'viewport') as HTMLElement).getBoundingClientRect = () =>
+      ({ bottom: 300, height: 300, left: 0, right: 400, top: 0, width: 400 }) as DOMRect
+    return host
+  }
+  const double = (host: Lightbox): void => {
+    part(host, 'viewport')?.dispatchEvent(
+      new MouseEvent('dblclick', { bubbles: true, clientX: 200, clientY: 150, composed: true }),
+    )
+  }
+  const zoom = (host: Lightbox): string =>
+    (part(host, 'viewport') as HTMLElement).style.getPropertyValue('--lightbox-zoom')
+
+  test('is off unless `max-zoom` allows it', async () => {
+    const host = await opened('')
+    double(host)
+    expect(zoom(host)).toBe('')
+    expect(hasState(host, 'zoomable')).toBe(false)
+  })
+
+  test('a double press zooms all the way in and back out, said on the viewport and the host', async () => {
+    const host = await opened('max-zoom="3"')
+    expect(hasState(host, 'zoomable')).toBe(true)
+    double(host)
+    expect(zoom(host)).toBe('3')
+    expect(hasState(host, 'zoomed')).toBe(true)
+    double(host)
+    expect(zoom(host)).toBe('')
+    expect(hasState(host, 'zoomed')).toBe(false)
+  })
+
+  test('the keys zoom in and out, and 0 puts it back', async () => {
+    const host = await opened('max-zoom="3"')
+    const press = (key: string): KeyboardEvent => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key,
+      })
+      part(host, 'dialog')?.dispatchEvent(event)
+      return event
+    }
+    expect(press('+').defaultPrevented).toBe(true)
+    expect(zoom(host)).toBe('1.5')
+    press('+')
+    press('-')
+    expect(zoom(host)).toBe('1.5')
+    press('0')
+    expect(zoom(host)).toBe('')
+  })
+
+  test('the next item starts at its own size', async () => {
+    const host = await opened('max-zoom="3"')
+    host.zoomTo(2)
+    expect(zoom(host)).toBe('2')
+    host.next()
+    await host.updateComplete
+    expect(zoom(host)).toBe('')
+  })
+})

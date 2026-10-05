@@ -3,6 +3,8 @@ import {
   customElement,
   deepActiveElement,
   deepContains,
+  drawDismiss,
+  drawDismissGlyph,
   FullscreenController,
   fillTemplate,
   HelixElement,
@@ -20,11 +22,13 @@ import {
   unlockScroll,
   whenHydrated,
 } from '@fusion.dev/helix-core'
-import { caretLeft, caretRight, x } from '@fusion.dev/helix-icons'
+import { caretLeft, caretRight } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
+import type { Offset } from '../zoom.js'
+import { ZoomController } from '../zoom-controller.js'
 
 /**
  * @summary A viewer that shows one item at a time over the page.
@@ -44,9 +48,18 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
  * focus stays in the dialog.
  *
  * Set `controls` for the viewer's own previous, next and close controls, named
- * by `previous-label`, `next-label` and `dismiss-label`. Without it, compose the
- * chrome yourself in the `header` and `footer` slots, with buttons that send
- * `--previous`, `--next` and `--close`.
+ * by `previous-label`, `next-label` and `dismiss-label`, whose glyphs you can
+ * replace in the `previous-icon`, `next-icon` and `dismiss-icon` slots. Without
+ * it, compose the chrome yourself in the `header` and `footer` slots, with
+ * buttons that send `--previous`, `--next` and `--close`.
+ *
+ * **Set `max-zoom` to let a reader zoom into the shown item**, such as `3`.
+ * Two fingers pinch it, a double click or a double tap zooms all the way in
+ * about the point pressed and back out, and once zoomed one pointer drags it
+ * about. `+` and `-` zoom in and out from the keyboard, and `0` puts it back.
+ * The scale and the offset are on the `viewport` part as `--lightbox-zoom`,
+ * `--lightbox-pan-x` and `--lightbox-pan-y`, written only while zoomed, and a
+ * swipe moves to the next item only while the item is at its own size.
  *
  * Each item is a slide: a `group` with the role description in
  * `slide-role-label`, named by its `label` or by `slide-label`. A touch or a pen
@@ -66,8 +79,11 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
  * @documentation https://fusion.dev/helix/components/lightbox
  *
  * @slot - The items, which are `<helix-headless-lightbox-item>` elements.
+ * @slot dismiss-icon - Replaces the glyph inside the close control.
  * @slot footer - Content below the item, such as a counter or a thumbnail strip.
  * @slot header - Content above the item, such as a title and a close button.
+ * @slot next-icon - Replaces the glyph inside the next control.
+ * @slot previous-icon - Replaces the glyph inside the previous control.
  *
  * @event {Event} close - Fired when the viewer closes. The component dispatches it again from the host, because the dialog's own event does not leave the shadow root.
  * @event {HelixActivateEvent} helix-activate - Fired after the shown item changes, when the element already holds the new item.
@@ -78,17 +94,23 @@ import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
  *
  * @csspart dialog - The native dialog element.
  * @csspart dismiss - The close control, drawn with `controls`.
- * @csspart dismiss-mark - The glyph on the close control.
+ * @csspart dismiss-mark - The glyph on the close control, where none is slotted.
  * @csspart live - The live region that announces which item is shown.
  * @csspart next - The control that shows the next item, drawn with `controls`.
- * @csspart next-mark - The glyph on the next control.
+ * @csspart next-mark - The glyph on the next control, where none is slotted.
  * @csspart previous - The control that shows the previous item, drawn with `controls`.
- * @csspart previous-mark - The glyph on the previous control.
+ * @csspart previous-mark - The glyph on the previous control, where none is slotted.
  * @csspart viewport - The box the current item is shown in.
+ *
+ * @cssproperty --lightbox-pan-x - How far the zoomed item is moved across from the middle of the viewport, in pixels, toward the right. Written only while zoomed.
+ * @cssproperty --lightbox-pan-y - How far the zoomed item is moved down from the middle of the viewport, in pixels. Written only while zoomed.
+ * @cssproperty --lightbox-zoom - The scale the shown item is zoomed to, such as `2`. Written only while zoomed.
  *
  * @cssstate fullscreen - While the viewer fills the screen.
  * @cssstate idle - The user has been still long enough for the controls to hide.
  * @cssstate open - While the viewer is open.
+ * @cssstate zoomable - While `max-zoom` lets a reader zoom.
+ * @cssstate zoomed - While the shown item is zoomed past its own size.
  */
 @customElement('helix-headless-lightbox')
 export class HelixHeadlessLightbox extends MixinControllerActive(
@@ -134,6 +156,13 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    */
   @property({ reflect: true, type: Boolean })
   loop = false
+
+  /**
+   * How far a reader can zoom into the shown item, as a scale, such as `3`.
+   * `1`, the default, turns zooming off.
+   */
+  @property({ attribute: 'max-zoom', type: Number })
+  maxZoom = 1
 
   /**
    * The next control's accessible name.
@@ -188,8 +217,12 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   /* A swipe across the viewer, read by `swipeStep` as next or previous. The
      whole viewer, since the picture may be far smaller than the screen. */
   protected readonly swipes = new SwipeController(this, {
-    axis: () => (this.open ? 'x' : undefined),
+    axis: () => (this.open && !this.zoomer.engaged ? 'x' : undefined),
     end: (dx, _dy, vx) => {
+      /* Two fingers came down while it was under way: a pinch, not a swipe. */
+      if (this.zoomer.pinched) {
+        return
+      }
       const width = this.partNamed('viewport')?.getBoundingClientRect().width ?? 0
       const step = swipeStep(dx, vx, width, isRtl(this))
       if (step !== 0) {
@@ -200,6 +233,32 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     start: (_target, event) => event.pointerType !== 'mouse',
     surface: () => this.dialog,
   })
+
+  /* Pinch, double press and drag, about the viewport. */
+  private readonly zoomer = new ZoomController(this, {
+    max: () => (this.open ? this.maxZoom : 1),
+    onChange: (scale, pan) => this.drawZoom(scale, pan),
+    surface: () => this.partNamed('viewport'),
+  })
+
+  /** Writes the zoom on the viewport, and nothing at the item's own size. */
+  private drawZoom(scale: number, pan: Offset): void {
+    const viewport = this.partNamed('viewport')
+    const zoomed = scale > 1
+    viewport?.style.setProperty('--lightbox-zoom', zoomed ? String(scale) : '')
+    viewport?.style.setProperty('--lightbox-pan-x', zoomed ? `${Math.round(pan.x)}px` : '')
+    viewport?.style.setProperty('--lightbox-pan-y', zoomed ? `${Math.round(pan.y)}px` : '')
+    this.toggleState('zoomed', zoomed)
+    this.idle.stir()
+  }
+
+  /**
+   * Zooms the shown item to `scale`, held between `1` and `max-zoom`, about
+   * the middle of the viewport.
+   */
+  zoomTo(scale: number): void {
+    this.zoomer.zoomTo(scale)
+  }
 
   private readonly fullscreen = new FullscreenController(this, (full) => {
     this.filled = full
@@ -368,6 +427,10 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     if (keyClaimed(event) || event.altKey || event.ctrlKey || event.metaKey) {
       return
     }
+    if (this.zoomKey(event.key)) {
+      event.preventDefault()
+      return
+    }
     const along = inlineStep(this, event.key)
     if (along === 1 || event.key === 'ArrowDown') {
       event.preventDefault()
@@ -382,6 +445,24 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       event.preventDefault()
       this.toEnd(this.items.length - 1)
     }
+  }
+
+  /** `+` and `-` zoom in and out by half again, and `0` puts the item back. Returns whether it was one. */
+  private zoomKey(key: string): boolean {
+    if (this.maxZoom <= 1) {
+      return false
+    }
+    const scale = this.zoomer.scale
+    if (key === '+' || key === '=') {
+      this.zoomer.zoomTo(scale * 1.5)
+    } else if (key === '-') {
+      this.zoomer.zoomTo(scale / 1.5)
+    } else if (key === '0') {
+      this.zoomer.reset()
+    } else {
+      return false
+    }
+    return true
   }
 
   /** Home and End, which are an index rather than a step. */
@@ -427,6 +508,11 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     hostAria(this.internals, { label: this.label })
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
+    this.toggleState('zoomable', this.maxZoom > 1)
+    /* Every item starts at its own size, and a closed viewer keeps no zoom. */
+    if (changed.has('active') || (changed.has('open') && !this.open)) {
+      this.zoomer.reset()
+    }
     /* Before render and not after, or the region renders one move behind: the
        reading is this element's own state, so computing it in `updated` puts it
        into the *next* render and announces the picture the reader has just left. */
@@ -573,9 +659,11 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
         aria-disabled=${this.atEnd(-1) ? 'true' : nothing}
         @click=${() => this.previous()}
       >
-        <svg part="previous-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
-          ${unsafeSVG(caretLeft.content)}
-        </svg>
+        <slot name="previous-icon">
+          <svg part="previous-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+            ${unsafeSVG(caretLeft.content)}
+          </svg>
+        </slot>
       </button>
       <button
         part="next"
@@ -584,20 +672,17 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
         aria-disabled=${this.atEnd(1) ? 'true' : nothing}
         @click=${() => this.next()}
       >
-        <svg part="next-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
-          ${unsafeSVG(caretRight.content)}
-        </svg>
+        <slot name="next-icon">
+          <svg part="next-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+            ${unsafeSVG(caretRight.content)}
+          </svg>
+        </slot>
       </button>
-      <button
-        part="dismiss"
-        type="button"
-        aria-label=${this.dismissLabel}
-        @click=${() => this.close()}
-      >
-        <svg part="dismiss-mark" fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">
-          ${unsafeSVG(x.content)}
-        </svg>
-      </button>`
+      ${drawDismiss({
+        label: this.dismissLabel,
+        mark: html`<slot name="dismiss-icon">${drawDismissGlyph()}</slot>`,
+        onDismiss: () => this.close(),
+      })}`
   }
 }
 

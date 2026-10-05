@@ -25,6 +25,13 @@
   display: none;
 }
 
+/* Zoomed, the scale and the offset the viewer writes while a reader zooms. The
+   three are unset at the item's own size, which leaves the declaration
+   invalid and the item with no transform at all. */
+[part="item"] {
+  transform: translate(var(--lightbox-pan-x), var(--lightbox-pan-y)) scale(var(--lightbox-zoom));
+}
+
 /* Whatever was opened, held inside the viewport rather than sized by it. */
 [part="item"] ::slotted(*) {
   max-block-size: 100%;
