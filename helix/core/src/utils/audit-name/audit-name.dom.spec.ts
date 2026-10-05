@@ -33,6 +33,17 @@ describe('the name estimate', () => {
     expect(hasName(inShadow('<input aria-labelledby="l"><span id="l"></span>'))).toBe(false)
   })
 
+  test('takes no words from the part that shows the value', () => {
+    const trigger = inShadow(
+      '<button aria-labelledby="value"><span part="value" id="value">Choose</span></button>',
+    )
+    const value = trigger.querySelector('[part="value"]')
+    expect(hasName(trigger)).toBe(true)
+    expect(hasName(trigger, value)).toBe(false)
+    trigger.insertAdjacentHTML('afterbegin', '<span>Language</span>')
+    expect(hasName(trigger, value)).toBe(true)
+  })
+
   test('takes content only where the role is named by it', () => {
     expect(hasName(inShadow('<button><slot></slot></button>'))).toBe(true)
     expect(hasName(inShadow('<div role="switch"><slot></slot></div>'))).toBe(true)
@@ -104,6 +115,13 @@ describe('the warning', () => {
         ),
       ),
     ).toEqual([])
+  })
+
+  test('a select that shows only its placeholder is reported', async () => {
+    const { control, host } = button('<span></span>', '<span part="value" id="value">Choose</span>')
+    control.setAttribute('aria-labelledby', 'value')
+    const value = () => control.querySelector('[part="value"]')
+    expect(await warned(() => auditName(host, () => control, '', undefined, value))).toHaveLength(1)
   })
 
   test('words hidden from the reader name nothing', async () => {

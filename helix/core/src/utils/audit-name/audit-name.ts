@@ -3,11 +3,21 @@ import { reportRuntime } from '../report-runtime/report-runtime.js'
 /**
  * The words a node gives a name computed from its content: its text, read
  * through slots, and the `aria-label` or `alt` of a picture in it, such as an
- * icon named by its own label. A node hidden from the reader gives none.
+ * icon named by its own label. A node hidden from the reader gives none, and
+ * so does `shown`, the part where a control shows its value.
+ *
+ * Exported for `AriaForwardController`, which asks whether a control's own
+ * label has words in it.
  */
-const nameText = (node: Node): string => {
+export const nameText = (node: Node, shown?: Element | null): string => {
+  if (node === shown) {
+    return ''
+  }
   if (node instanceof HTMLSlotElement) {
-    return node.assignedNodes({ flatten: true }).map(nameText).join('')
+    return node
+      .assignedNodes({ flatten: true })
+      .map((one) => nameText(one, shown))
+      .join('')
   }
   if (node.nodeType === Node.TEXT_NODE) {
     return node.textContent ?? ''
@@ -22,18 +32,18 @@ const nameText = (node: Node): string => {
   if (said?.trim()) {
     return said
   }
-  return [...node.childNodes].map(nameText).join('')
+  return [...node.childNodes].map((one) => nameText(one, shown)).join('')
 }
 
 /** Whether the ids in an IDREF list name something with words, in the tree `from` is in. */
-const namesWithWords = (ids: string | null, from: Node): boolean => {
+const namesWithWords = (ids: string | null, from: Node, shown?: Element | null): boolean => {
   const root = from.getRootNode() as Document | ShadowRoot
   return (ids ?? '')
     .split(/\s+/)
     .filter(Boolean)
     .some((id) => {
       const found = root.getElementById?.(id)
-      return found ? nameText(found).trim() !== '' : false
+      return found ? nameText(found, shown).trim() !== '' : false
     })
 }
 
@@ -59,19 +69,24 @@ const NAMED_BY_CONTENT = new Set([
  * **An estimate, cheap on purpose.** It answers whether any route holds words,
  * which is what the warning is about, and leaves the order the routes win in
  * to the browser.
+ *
+ * **What the control shows as its value is no name**, so the words in
+ * `shown` count for no route. A Select with no label names its trigger by the
+ * part that shows the choice, and while nothing is chosen that part shows the
+ * placeholder, "Choose", which says nothing about what is being chosen.
  */
-export const hasName = (element: HTMLElement): boolean => {
+export const hasName = (element: HTMLElement, shown?: Element | null): boolean => {
   for (const attribute of ['aria-label', 'title', 'placeholder']) {
     if (element.getAttribute(attribute)?.trim()) {
       return true
     }
   }
-  if (namesWithWords(element.getAttribute('aria-labelledby'), element)) {
+  if (namesWithWords(element.getAttribute('aria-labelledby'), element, shown)) {
     return true
   }
   const referenced = (element as HTMLElement & { ariaLabelledByElements?: Element[] | null })
     .ariaLabelledByElements
-  if ((referenced ?? []).some((one) => nameText(one).trim() !== '')) {
+  if ((referenced ?? []).some((one) => nameText(one, shown).trim() !== '')) {
     return true
   }
   const labels = (element as HTMLElement & { labels?: NodeList | null }).labels
@@ -79,7 +94,7 @@ export const hasName = (element: HTMLElement): boolean => {
     return true
   }
   const role = element.getAttribute('role') ?? (element.localName === 'button' ? 'button' : '')
-  return NAMED_BY_CONTENT.has(role) && nameText(element).trim() !== ''
+  return NAMED_BY_CONTENT.has(role) && nameText(element, shown).trim() !== ''
 }
 
 /** The elements whose name has been read, so each is warned about once. */
@@ -112,13 +127,16 @@ const readWaiting = (): void => {
  * tells `@fusion.dev/helix-diagnostics` with `core.warnings: false`.
  *
  * `also` answers for a name the component gave through its internals, which no
- * attribute shows. `fix` is the sentence that says how to name it.
+ * attribute shows. `fix` is the sentence that says how to name it. `shown` is
+ * the part where the control shows its value or its placeholder, whose words
+ * are no name.
  */
 export const auditName = (
   host: HTMLElement,
   control: () => HTMLElement | null,
   fix: string,
   also?: () => boolean,
+  shown?: () => Element | null,
 ): void => {
   if (audited.has(host) || waiting.has(host)) {
     return
@@ -134,7 +152,8 @@ export const auditName = (
     }
     audited.add(host)
     const inner = control()
-    if (also?.() || hasName(host) || (inner !== null && hasName(inner))) {
+    const value = shown?.()
+    if (also?.() || hasName(host) || (inner !== null && hasName(inner, value))) {
       return
     }
     reportRuntime({
