@@ -15,18 +15,18 @@
 [part="item"] {
   all: unset;
   align-items: center;
-  block-size: var(--helix-size-control-tight);
+  block-size: var(--drilldown-item-block-size, var(--helix-size-control-tight));
   box-sizing: border-box;
   inline-size: 100%;
-  color: var(--helix-color-foreground);
+  color: var(--drilldown-item-color, var(--helix-color-foreground));
   cursor: pointer;
   display: flex;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--drilldown-item-font-size, var(--helix-text-sm));
   gap: var(--helix-space-xs);
   /* Inline padding on the row rather than on the panel, so the fill reaches
      both edges and the words still start where the header's do. */
-  padding-inline: var(--helix-space-sm);
+  padding-inline: var(--drilldown-item-padding-inline, var(--helix-space-sm));
   user-select: none;
 }
 
@@ -47,7 +47,7 @@
 [part="mark"],
 slot[name="chevron"]::slotted(*) {
   block-size: var(--helix-size-icon-tight);
-  color: var(--helix-color-foreground-subtle);
+  color: var(--drilldown-item-mark-color, var(--helix-color-foreground-subtle));
   flex: none;
   inline-size: var(--helix-size-icon-tight);
 }
@@ -69,5 +69,5 @@ slot[name="chevron"]::slotted(*) {
 
 :host([disabled]) [part="item"] {
   cursor: default;
-  opacity: 0.5;
+  opacity: var(--drilldown-item-disabled-opacity, 0.5);
 }

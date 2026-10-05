@@ -74,4 +74,14 @@ describe('one tab', () => {
     expect(part(host, 'tab')).not.toBeNull()
     expect(host.textContent?.trim()).toBe('One')
   })
+
+  /* `focus()` on the host left focus where it was, for a button tab and a link
+     tab alike: the host is not focusable and delegates nothing. */
+  test('takes focus on its control when a script focuses it', async () => {
+    for (const attributes of ['', 'href="#one"']) {
+      const host = await tab(attributes)
+      host.focus()
+      expect(host.shadowRoot?.activeElement).toBe(part(host, 'tab'))
+    }
+  })
 })

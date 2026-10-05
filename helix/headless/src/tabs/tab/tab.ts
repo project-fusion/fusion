@@ -66,6 +66,14 @@ export class HelixHeadlessTab extends MixinSelectableItem(HelixElement) {
   target?: string
 
   /**
+   * Moves focus to the tab's control, the button or the link inside it, so a
+   * script can focus the tab the way it focuses a native one.
+   */
+  override focus(options?: FocusOptions): void {
+    this.partNamed('tab')?.focus(options)
+  }
+
+  /**
    * Chooses the tab before the browser follows its link, and keeps the browser
    * from following where the choice was refused. A press with a modifier, or
    * with a button other than the main one, opens the link where the browser

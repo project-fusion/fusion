@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -375,10 +375,42 @@ describe('a tree of check marks', () => {
     expect((host as Tree & { values: string[] }).values).toEqual(['c'])
   })
 
+  test('says which rows are checked and which are partly, where a sheet can read it', async () => {
+    const host = await mount(files)
+    const [docs, a] = (await settleTree(host)) as Item[]
+    ;(a as Item).select()
+    await settleTree(host)
+    expect(hasState(a as Item, 'checked')).toBe(true)
+    expect(hasState(docs as Item, 'mixed')).toBe(true)
+    expect(hasState(docs as Item, 'checked')).toBe(false)
+  })
+
   test('a single-choice tree is not multiselectable', async () => {
     const { branch } = await tree()
     expect(
       part(branch.parentElement as HTMLElement, 'tree')?.hasAttribute('aria-multiselectable'),
     ).toBe(false)
+  })
+})
+
+describe('a tree that chooses only the items at the ends', () => {
+  /* Web Awesome's leaf mode: a branch opens and closes, and only a leaf is
+     chosen, even where the branch carries a value. */
+  test('opens a branch on a press and chooses only its leaves', async () => {
+    const host = await mount(`
+      <helix-headless-tree label="Files" selection-mode="leaf">
+        <helix-headless-tree-item value="docs">Docs
+          <helix-headless-tree-item slot="children" value="a">A</helix-headless-tree-item>
+        </helix-headless-tree-item>
+      </helix-headless-tree>`)
+    const [docs, a] = (await settleTree(host)) as Item[]
+    await press(docs as Item, 'Enter')
+    await settleTree(host)
+    expect((docs as Item).open).toBe(true)
+    expect((host as Tree & { active: string }).active).not.toBe('docs')
+    expect(part(host, 'tree')?.hasAttribute('aria-multiselectable')).toBe(false)
+    await press(a as Item, 'Enter')
+    await settleTree(host)
+    expect((host as Tree & { active: string }).active).toBe('a')
   })
 })

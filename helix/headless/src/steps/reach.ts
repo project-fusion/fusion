@@ -25,3 +25,12 @@ export const canReach = (steps: readonly ReachableStep[], from: number, to: numb
   }
   return true
 }
+
+/**
+ * How far through a sequence is, from 0 to 100: the share of its stages that
+ * are complete, rounded to a whole number. An empty sequence is at 0.
+ */
+export const progressOf = (steps: readonly Pick<ReachableStep, 'complete'>[]): number =>
+  steps.length === 0
+    ? 0
+    : Math.round((steps.filter((step) => step.complete).length / steps.length) * 100)

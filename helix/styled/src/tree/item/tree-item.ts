@@ -42,6 +42,15 @@ import { styles } from './tree-item.css.js'
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
  * @cssproperty --tree-gap - Space between rows.
  * @cssproperty --tree-indent - Indent added per level.
+ * @cssproperty --tree-row-checked-background-color - Fill of a checked row, in a tree with `selection-mode="multiple"`. Unset, the box alone marks it.
+ * @cssproperty --tree-row-checked-color - Text color of a checked row, in a tree with `selection-mode="multiple"`.
+ * @cssproperty --tree-row-color - Text color of a row at rest.
+ * @cssproperty --tree-row-disabled-opacity - How faint a disabled row is drawn.
+ * @cssproperty --tree-row-hover-background-color - Fill of a row under the pointer.
+ * @cssproperty --tree-row-hover-color - Text color of a row under the pointer.
+ * @cssproperty --tree-row-radius - Corners of a row's fill.
+ * @cssproperty --tree-row-selected-background-color - Fill of the chosen row, in a tree of one choice.
+ * @cssproperty --tree-row-selected-color - Text color of the chosen row, in a tree of one choice.
  * @cssproperty --tree-row-size - Minimum height of a row, so rows with and without an icon match.
  */
 @customElement('helix-tree-item')

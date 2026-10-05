@@ -23,8 +23,11 @@
      docs link still 24 square, and the padding it grows into is inside the row
      rather than beyond it. */
   align-items: center;
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
+  /* Through a private, so a checked row takes a fill only where a page asks
+     for one, and the hover below still wins over it. */
+  background-color: var(--_tree-row-fill, transparent);
+  border-radius: var(--tree-row-radius, var(--helix-radii-sm));
+  color: var(--_tree-row-ink, var(--tree-row-color, var(--helix-color-foreground-muted)));
   cursor: pointer;
   display: flex;
   /* The row's own size, which the tree's `nesting` decides. At `peer` nothing
@@ -101,7 +104,10 @@
    no `href` toggles from anywhere in its row, so an affordance taken off a
    heading would leave the chevron as the only way into what it holds. */
 [part="row"]:has([part="toggle"]) {
-  color: var(--_tree-heading-ink, var(--helix-color-foreground-muted));
+  color: var(
+    --_tree-row-ink,
+    var(--_tree-heading-ink, var(--tree-row-color, var(--helix-color-foreground-muted)))
+  );
   font-size: var(--_tree-heading-text, var(--_tree-text, var(--helix-text-sm)));
   font-weight: var(--helix-weight-medium);
   letter-spacing: var(--_tree-heading-tracking, var(--helix-tracking-normal));
@@ -126,14 +132,20 @@ slot[name="children"]::slotted(*) {
 }
 
 [part="row"]:hover {
-  background-color: var(--helix-color-surface-raised);
-  color: var(--helix-color-foreground);
+  background-color: var(--tree-row-hover-background-color, var(--helix-color-surface-raised));
+  color: var(--tree-row-hover-color, var(--helix-color-foreground));
 }
 
 /* A surface, not the accent. */
 :host(:state(selected)) [part="row"] {
-  background-color: var(--helix-color-surface-sunken);
-  color: var(--helix-color-foreground);
+  background-color: var(--tree-row-selected-background-color, var(--helix-color-surface-sunken));
+  color: var(--tree-row-selected-color, var(--helix-color-foreground));
+}
+
+/* A checked row is marked by its box alone, unless a page asks for more. */
+:host(:state(checked)) [part="row"] {
+  --_tree-row-fill: var(--tree-row-checked-background-color, transparent);
+  --_tree-row-ink: var(--tree-row-checked-color);
 }
 
 /* Both, because `href` moves which element the tab stop is on: without one the
@@ -309,12 +321,12 @@ slot[name="chevron"]::slotted(*) {
 /* A row out of play is seen and reached, and does nothing under the pointer. */
 :host([disabled]) [part="row"] {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--tree-row-disabled-opacity, 0.5);
 }
 
 :host([disabled]) [part="row"]:hover {
   background-color: transparent;
-  color: var(--helix-color-foreground-muted);
+  color: var(--tree-row-color, var(--helix-color-foreground-muted));
 }
 
 /* A branch waiting for its children breathes, so the press reads as heard. */

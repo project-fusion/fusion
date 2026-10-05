@@ -64,6 +64,8 @@ import '../../button/index.js'
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
  * @csspart marker - The shape carrying the number or the check.
  * @csspart state - The words that describe a finished stage's button. Hidden.
+ *
+ * @cssstate invalid - The sequence's `validate` last answered that this stage is not valid.
  */
 @customElement('helix-headless-step')
 export class HelixHeadlessStep extends HelixElement {
@@ -91,6 +93,13 @@ export class HelixHeadlessStep extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * @internal Set by the sequence: whether its `validate` last answered that
+   * this stage is not valid. Recorded as `:state(invalid)`.
+   */
+  @property({ attribute: false })
+  invalid = false
 
   /**
    * @internal Set by a linear sequence: whether the stage is out of reach
@@ -162,6 +171,7 @@ export class HelixHeadlessStep extends HelixElement {
     /* No `ariaCurrent` here: the name's button carries `aria-current="step"`,
        and the state is said once, on the control a reader is on. */
     hostAria(this.internals, { role: 'listitem' })
+    this.toggleState('invalid', this.invalid)
   }
 
   /**

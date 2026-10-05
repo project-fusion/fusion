@@ -40,6 +40,10 @@ const TRIGGER_ID = 'trigger'
  * out of the tab order and the accessibility tree after the styled tier's
  * `display` overrides `hidden`.
  *
+ * While it is open, the content part carries the content's height as
+ * `--accordion-content-height`, as Radix's accordion does, for a stylesheet
+ * that animates the section open with keyframes of its own.
+ *
  * Set `hidden-until-found` and the browser's find in page searches a closed
  * section too: a match opens it, with `helix-before-open` first, as React
  * Aria's disclosure does. The content is then `hidden="until-found"` while
@@ -64,6 +68,8 @@ const TRIGGER_ID = 'trigger'
  * @csspart content-inner - The clipping box inside the animated region.
  * @csspart heading - The heading that holds the trigger.
  * @csspart trigger - The button that opens and closes the section, holding the summary.
+ *
+ * @cssproperty --accordion-content-height - The height of the content, in pixels, written on the `content` part while the section is open.
  *
  * @cssstate open - While the item is open.
  */
@@ -283,6 +289,21 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
       this.closePeers()
     }
     this.wasOpen = this.open
+    this.measure()
+  }
+
+  /**
+   * Writes the content's height onto the content part while the section is
+   * open. `scrollHeight`, so a sheet that clips the box while it grows still
+   * reads the whole height.
+   */
+  private readonly measure = (): void => {
+    const content = this.partNamed('content')
+    const inner = this.partNamed('content-inner')
+    if (!content || !inner || !this.open) {
+      return
+    }
+    content.style.setProperty('--accordion-content-height', `${inner.scrollHeight}px`)
   }
 
   /**
@@ -361,7 +382,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
           @beforematch=${this.handleBeforeMatch}
         >
           <div part="content-inner">
-            <slot></slot>
+            <slot @slotchange=${this.measure}></slot>
           </div>
         </div>
       </div>

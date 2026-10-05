@@ -33,7 +33,7 @@ describe('accordion server output', () => {
        here is the item's own. */
     const closed = ssr(html`<helix-headless-accordion-item></helix-headless-accordion-item>`)
     expect(rendered(closed, 'helix-headless-accordion-item')).toMatch(
-      /<div part="content-inner">\s*<slot><\/slot>/,
+      /<div part="content-inner">\s*(<!--lit-node \d+-->)?<slot\s*><\/slot>/,
     )
   })
 

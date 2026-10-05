@@ -30,7 +30,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * Pressing a branch, or Enter or Space on it, opens or closes it. A branch with
  * a `value` is chosen as well and sends `helix-select`, unless the tree has
- * `nesting="heading"`, where a branch names the list under it.
+ * `nesting="heading"`, where a branch names the list under it, or
+ * `selection-mode="leaf"`, where only the items at the ends are chosen.
  *
  * A `disabled` item is reached by the arrow keys and announced as unavailable,
  * and a press, Enter or Space on it does nothing.
@@ -67,7 +68,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @cssproperty --tree-level - How deep this row sits, counting from one as `aria-level` does, for the indent.
  *
+ * @cssstate checked - While it is checked, in a tree with `selection-mode="multiple"`.
  * @cssstate loading - While a `lazy` item is open and its children have not arrived.
+ * @cssstate mixed - While some of a branch's items are checked, in a tree with `selection-mode="multiple"`.
  * @cssstate open - While its children are shown.
  * @cssstate selected - While it is selected.
  */
@@ -96,8 +99,9 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
 
   /**
    * @internal Set by the tree: whether a branch heads the list under it, as
-   * under `nesting="heading"`. Such a branch only opens and closes when it is
-   * pressed, because it names a list and is not a destination of its own.
+   * under `nesting="heading"`, or is not chosen at all, as under
+   * `selection-mode="leaf"`. Such a branch only opens and closes when it is
+   * pressed.
    */
   @property({ attribute: false })
   heads = false
@@ -435,6 +439,8 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('selected', this.selected)
+    this.toggleState('checked', this.checkable && this.checked === true)
+    this.toggleState('mixed', this.checkable && this.checked === 'mixed')
     this.toggleState('loading', this.open && this.lazy)
     if (this.childrenKnown) {
       this.branch = this.knownChildren.some((child) => child.slot === 'children')

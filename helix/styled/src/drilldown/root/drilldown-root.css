@@ -22,8 +22,9 @@
  *      the rows' `size-control-tight` is eight pixels at the default density, which
  *      is enough to separate the bar from the list without making it a banner.
  */
-  block-size: var(--helix-size-control);
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  block-size: var(--drilldown-header-block-size, var(--helix-size-control));
+  border-block-end: var(--helix-border-thin) solid
+    var(--drilldown-header-border-color, var(--helix-color-border));
   display: flex;
   gap: var(--helix-space-2xs);
   padding-inline: var(--helix-space-2xs);
@@ -35,7 +36,7 @@
   block-size: var(--helix-size-control-tight);
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
-  color: var(--helix-color-foreground-muted);
+  color: var(--drilldown-back-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   display: flex;
   inline-size: var(--helix-size-control-tight);
@@ -49,7 +50,10 @@ slot[name="back-icon"]::slotted(*) {
 }
 
 [part="back"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(
+    --drilldown-back-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
   color: var(--helix-color-foreground);
 }
 
@@ -59,10 +63,10 @@ slot[name="back-icon"]::slotted(*) {
 }
 
 [part="title"] {
-  color: var(--helix-color-foreground);
+  color: var(--drilldown-title-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
+  font-size: var(--drilldown-title-font-size, var(--helix-text-sm));
+  font-weight: var(--drilldown-title-font-weight, var(--helix-weight-medium));
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -72,28 +76,38 @@ slot[name="back-icon"]::slotted(*) {
    `data-direction`, which the stack writes because only it knows: both moves
    replace one page with another and the styles cannot tell them apart. */
 [part="page"] {
-  padding-block: var(--helix-space-2xs);
+  /* Which way the inline axis runs, so a page going deeper arrives from the
+     side the text runs toward. */
+  --_drilldown-sign: 1;
+
+  padding-block: var(--drilldown-page-padding-block, var(--helix-space-2xs));
+}
+
+:host(:dir(rtl)) [part="page"] {
+  --_drilldown-sign: -1;
 }
 
 :host([data-direction="forward"]) [part="page"] {
-  animation: drilldown-forward var(--helix-duration-normal) var(--helix-easing-decelerate);
+  animation: drilldown-forward var(--drilldown-duration, var(--helix-duration-normal))
+    var(--helix-easing-decelerate);
 }
 
 :host([data-direction="back"]) [part="page"] {
-  animation: drilldown-back var(--helix-duration-normal) var(--helix-easing-decelerate);
+  animation: drilldown-back var(--drilldown-duration, var(--helix-duration-normal))
+    var(--helix-easing-decelerate);
 }
 
 @keyframes drilldown-forward {
   from {
     opacity: 0;
-    translate: 12% 0;
+    translate: calc(var(--drilldown-travel, 12%) * var(--_drilldown-sign, 1)) 0;
   }
 }
 
 @keyframes drilldown-back {
   from {
     opacity: 0;
-    translate: -12% 0;
+    translate: calc(var(--drilldown-travel, 12%) * var(--_drilldown-sign, 1) * -1) 0;
   }
 }
 
