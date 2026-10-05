@@ -53,7 +53,17 @@ const COUNT_OR_AUTO = {
  *
  * **Rotation stops on focus and on hover, and stays stopped** until the user
  * starts it again, as the APG requires. The rotation control is labeled with
- * the action it performs and is first in the tab order.
+ * the action it performs and is first in the tab order. Rotation goes on from
+ * the last slide to the first, with or without `loop`, which is about the
+ * reader's own moves.
+ *
+ * A move the reader makes is announced, the slide's position read from a
+ * polite live region. While the carousel rotates the region is off, so a
+ * screen reader is not interrupted every few seconds.
+ *
+ * The indicators are one tab stop. The arrow keys along the track move between
+ * them, Up and Down on a vertical carousel, and Home and End go to the first
+ * and the last.
  *
  * @since 0.1.0
  * @status stable
@@ -69,6 +79,7 @@ const COUNT_OR_AUTO = {
  * @csspart indicator - One indicator. Pressing it moves to its slide.
  * @csspart indicator-current - The indicator for the slide in view, alongside `indicator`.
  * @csspart indicators - The row of indicators that shows which slide is in view.
+ * @csspart live - The region that announces the slide a move lands on. Visually hidden in the styled tier.
  * @csspart next - The control that moves to the next slide.
  * @csspart next-mark - The glyph on the next control.
  * @csspart previous - The control that moves to the previous slide.
@@ -195,6 +206,9 @@ export class HelixHeadlessCarousel extends HelixElement {
 
   /** How many panes were drawn at the last update, to scroll when the first are. */
   private scrolledFor = 0
+
+  /** What the live region says: the position of the slide the last move landed on. */
+  private said = ''
 
   /**
    * The carousel's name, read by screen readers.
@@ -451,10 +465,8 @@ export class HelixHeadlessCarousel extends HelixElement {
    * **A fitted carousel's last position moves with the window**, which a
    * declared one's never does: eight slides at one across has eight places to
    * stand and four across has five, so a track widened while the reader sits on
-   * the last of them is a track resting somewhere it can no longer be. Through
-   * `goTo`, so the correction goes out as the same cancelable announcement
-   * every other index change does and a consumer holding `index` hears it
-   * rather than being overwritten.
+   * the last of them is a track resting somewhere it can no longer be. See
+   * `holdIndex` for why the correction is not a request.
    *
    * Only on a change, so the observer's own re-render cannot feed itself.
    */
@@ -464,8 +476,26 @@ export class HelixHeadlessCarousel extends HelixElement {
       return
     }
     this.fitted = fitted
-    if (this.index > this.positions - 1) {
-      this.goTo(this.positions - 1)
+    this.holdIndex()
+  }
+
+  /**
+   * Puts the index back on the last place the track can stand, where fewer
+   * places are left than it counted.
+   *
+   * **Written, with no request.** Nobody asked for this move: a slide was
+   * removed, the window widened, or `per-view` went up. It went out as a
+   * cancelable `helix-select`, which a consumer reading the event as a reader's
+   * request had no reason to expect, and refusing it left the index past the
+   * last slide, with no current indicator and no tab stop, and asked again on
+   * every update. An index that cannot be refused is not a request.
+   */
+  private holdIndex(): void {
+    const last = this.positions - 1
+    if (this.slides.length > 0 && this.index > last) {
+      const previous = this.index
+      this.indexState = Math.max(0, last)
+      this.requestUpdate('index', previous)
     }
   }
 
@@ -580,12 +610,24 @@ export class HelixHeadlessCarousel extends HelixElement {
    * the right, the left arrow is the one that moves on.
    */
   private readonly handleIndicatorKeydown = (event: KeyboardEvent): void => {
-    const step = inlineStep(this, event.key)
-    if (step === 0) {
+    const vertical = this.orientation === 'vertical'
+    const step = vertical
+      ? event.key === 'ArrowDown'
+        ? 1
+        : event.key === 'ArrowUp'
+          ? -1
+          : 0
+      : inlineStep(this, event.key)
+    let to = this.index + step
+    if (event.key === 'Home') {
+      to = 0
+    } else if (event.key === 'End') {
+      to = this.positions - 1
+    } else if (step === 0) {
       return
     }
     event.preventDefault()
-    this.goTo(this.index + step)
+    this.goTo(to)
     this.updateComplete.then(() => {
       this.renderRoot.querySelector<HTMLElement>('[part~="indicator-current"]')?.focus()
     })
@@ -792,7 +834,13 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (!this.rotating || this.slides.length < 2) {
       return
     }
-    this.timer = setInterval(() => this.goTo(this.index + 1), this.interval)
+    /* Round to the first slide after the last, `loop` or not. Without it,
+       rotation stopped on the last slide while its control still said it was
+       running and the timer went on firing at nothing. */
+    this.timer = setInterval(
+      () => this.goTo(this.index >= this.positions - 1 ? 0 : this.index + 1),
+      this.interval,
+    )
   }
 
   /**
@@ -1009,6 +1057,13 @@ export class HelixHeadlessCarousel extends HelixElement {
        this, but the scroll that follows a press is ours, and ours is not read. */
     if (changed.has('index')) {
       this.showing = undefined
+      /* Not on the first render, which is the carousel arriving. */
+      if (this.hasUpdated) {
+        this.said = fillTemplate(this.slideLabel, {
+          count: this.slides.length,
+          index: this.index + 1,
+        })
+      }
     }
     /* A count that has been asked for again has not been answered again. The
        watch is rebuilt in `updated` and the reading arrives with it, and until
@@ -1066,9 +1121,7 @@ export class HelixHeadlessCarousel extends HelixElement {
      * and could not see a slide removed under a declared count either, where
      * six slides three across falling to four leaves two places and an index
      * of 3 inside the slides and outside the run. */
-    if (this.slides.length > 0 && this.index > this.positions - 1) {
-      this.goTo(this.positions - 1)
-    }
+    this.holdIndex()
     this.watchPane()
     this.assign()
   }
@@ -1252,6 +1305,12 @@ export class HelixHeadlessCarousel extends HelixElement {
           </div>`,
         )}
       </div>
+      ${
+        /* The slide a move lands on, said politely, and nothing while the
+           carousel rotates: a region announcing every few seconds talks over
+           whatever else a reader is listening to. */
+        ''
+      }<span part="live" aria-live=${rotating ? 'off' : 'polite'}>${this.said}</span>
       ${
         /* A count nobody has yet is not a run of one, so a fitted track serves
            no dots until its box has been laid out and measured. Drawn from a
