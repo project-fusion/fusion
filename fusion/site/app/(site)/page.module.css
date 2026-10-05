@@ -220,15 +220,6 @@
 
 /* ── Theme this page ───────────────────────────────────────────────── */
 
-/* ── One brand control per page ────────────────────────────────────── */
-
-/**
- * Hides the showcase's own brand input inside a draft.
- */
-.oneBrand :global(helix-color-input) {
-  display: none;
-}
-
 /* ── Draft C's type scale ──────────────────────────────────────────── */
 
 /**
