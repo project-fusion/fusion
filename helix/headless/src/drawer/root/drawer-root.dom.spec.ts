@@ -143,7 +143,10 @@ describe('a press on the drawer', () => {
     await drawer.updateComplete
     const panel = part(drawer, 'panel') as HTMLElement
     const box = panel.getBoundingClientRect()
-    press(panel, box.left, box.bottom)
+    /* A made `MouseEvent` holds its point in whole pixels in Chromium, so a
+       corner at 603.66 would be pressed at 603, outside the box. The press is
+       on the first whole pixel inside it. */
+    press(panel, Math.ceil(box.left), Math.floor(box.bottom))
     await drawer.updateComplete
     expect(drawer.open).toBe(true)
   })

@@ -69,15 +69,18 @@ const pointer = (target: EventTarget, type: string, clientX: number, clientY: nu
 }
 
 describe('a sortable heading', () => {
-  geometry('is a button the keyboard reaches, and the column host is not', async () => {
+  geometry('is a cell the keyboard reaches, and the column host is not', async () => {
     const element = await table()
     const name = column(element, 'name')
-    const sort = inner(name, 'sort')
-    sort.focus()
-    expect(name.shadowRoot?.activeElement).toBe(sort)
-    expect(sort.tabIndex).toBe(0)
+    const cell = inner(name, 'column')
+    cell.focus()
+    expect(name.shadowRoot?.activeElement).toBe(cell)
+    expect(cell.getAttribute('role')).toBe('columnheader')
     /* The styled column is `display: contents`, so it has no box to focus. The
-       button is the only stop, and a heading without `sortable` has none. */
+       table is one tab stop whose arrows move between cells, so the heading
+       cell takes focus and its sort button leaves the order, and a heading
+       without `sortable` has no button. */
+    expect(inner(name, 'sort').tabIndex).toBe(-1)
     expect(inner(column(element, 'size'), 'sort')).toBeNull()
   })
 })

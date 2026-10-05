@@ -32,7 +32,10 @@ describe('the preview’s cell bubble, flipped below the strip', () => {
       await example(preview, sheet)
       const host = document.querySelector('helix-headless-heatmap') as HTMLElement
       const cell = host.shadowRoot?.querySelectorAll('[part~="cell"]')[4] as HTMLElement
-      cell.dispatchEvent(new Event('pointerover', { bubbles: true, composed: true }))
+      // A mouse: a touch does not open the bubble.
+      cell.dispatchEvent(
+        new PointerEvent('pointerover', { bubbles: true, composed: true, pointerType: 'mouse' }),
+      )
       await idle()
       const tip = part(host, 'tooltip-anchor') as HTMLElement
       const bubble = part(tip, 'tooltip') as HTMLElement
