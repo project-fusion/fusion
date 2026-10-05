@@ -69,6 +69,14 @@ describe('one axis', () => {
     expect(part(vertical, 'scrollbar-vertical')?.hasAttribute('hidden')).toBe(false)
     const horizontal = await area('orientation="horizontal"')
     expect((part(horizontal, 'viewport') as HTMLElement).style.overflowY).toBe('hidden')
+    // A clipped axis has no edges with more past it, so no fade promises a scroll.
+    const tall = part(horizontal, 'viewport') as HTMLElement
+    Object.defineProperty(tall, 'clientHeight', { configurable: true, value: 100 })
+    Object.defineProperty(tall, 'scrollHeight', { configurable: true, value: 400 })
+    tall.dispatchEvent(new Event('scroll'))
+    await horizontal.updateComplete
+    expect(hasState(horizontal, 'more-block-end')).toBe(false)
+    expect(hasState(horizontal, 'scrolls')).toBe(false)
     expect((part(await area(), 'viewport') as HTMLElement).hasAttribute('style')).toBe(false)
   })
 })
