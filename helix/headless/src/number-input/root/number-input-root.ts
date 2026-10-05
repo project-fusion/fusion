@@ -75,6 +75,19 @@ const SCRUB_FINE = 16
  * Stepping is separate from typing, so a number is not corrected while you type
  * it.
  *
+ * **Keyboard.** The field is one tab stop, and the stepper buttons are not in
+ * the tab order.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Up, Down | Steps the value up or down by `step`. |
+ * | Page Up, Page Down | Steps by `large-step` steps, ten by default. |
+ * | Home, End | Goes to `min` or `max`, where there is one. Without one, moves the caret. |
+ * | Enter | Commits the typed number and submits the form, as a native field does. |
+ *
+ * The field has `role="spinbutton"` with `aria-valuenow`, `aria-valuemin`,
+ * `aria-valuemax`, and the formatted text in `aria-valuetext`.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms

@@ -30,7 +30,8 @@ import { styles } from './checkbox-root.css.js'
  * @cssproperty --checkbox-card-border-color - The border color of the card.
  * @cssproperty --checkbox-card-padding - The padding of the card.
  * @cssproperty --checkbox-checked-color - The border color of a checked box when `--checkbox-border-color` is not set.
- * @cssproperty --checkbox-mark-color - The color of the check mark and the dash.
+ * @cssproperty --checkbox-icon-size - The width and height of an icon slotted into `check` or `dash`. It fills the box by default.
+ * @cssproperty --checkbox-mark-color - The color of the check mark and the dash, and of an icon slotted into `check` or `dash`.
  * @cssproperty --checkbox-size - The width and height of the box.
  */
 @customElement('helix-checkbox')

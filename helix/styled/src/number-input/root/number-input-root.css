@@ -51,7 +51,7 @@
    jump about under a repeated press. */
 [part="control"] {
   font-variant-numeric: tabular-nums;
-  padding-inline: var(--helix-space-xs);
+  padding-inline: var(--number-input-padding-inline, var(--helix-space-xs));
   text-align: center;
 }
 
@@ -82,12 +82,13 @@ slot[name="end"]::slotted(*) {
   all: unset;
   align-items: center;
   align-self: stretch;
+  background-color: var(--number-input-stepper-background-color, transparent);
   box-sizing: border-box;
-  color: var(--helix-color-foreground-muted);
+  color: var(--number-input-stepper-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   display: flex;
   flex: none;
-  inline-size: var(--helix-size-control);
+  inline-size: var(--number-input-stepper-size, var(--helix-size-control));
   justify-content: center;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -95,17 +96,19 @@ slot[name="end"]::slotted(*) {
 }
 
 [part="decrement"] {
-  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-inline-end: var(--helix-border-thin) solid
+    var(--number-input-stepper-border-color, var(--helix-color-border));
 }
 
 [part="increment"] {
-  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  border-inline-start: var(--helix-border-thin) solid
+    var(--number-input-stepper-border-color, var(--helix-color-border));
 }
 
 [part="decrement"]:hover:not(:disabled),
 [part="increment"]:hover:not(:disabled) {
-  background-color: var(--helix-color-surface);
-  color: var(--helix-color-foreground);
+  background-color: var(--number-input-stepper-background-color-hover, var(--helix-color-surface));
+  color: var(--number-input-stepper-color-hover, var(--helix-color-foreground));
 }
 
 /* Spent at a bound, and dimmed rather than removed: a stepper that loses a
@@ -119,8 +122,8 @@ slot[name="end"]::slotted(*) {
 
 [part="decrement"] svg,
 [part="increment"] svg {
-  block-size: var(--helix-size-icon-tight);
-  inline-size: var(--helix-size-icon-tight);
+  block-size: var(--number-input-stepper-icon-size, var(--helix-size-icon-tight));
+  inline-size: var(--number-input-stepper-icon-size, var(--helix-size-icon-tight));
 }
 
 /*

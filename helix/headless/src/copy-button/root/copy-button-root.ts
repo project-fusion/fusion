@@ -8,9 +8,6 @@ import { HelixHeadlessIconButton } from '../../icon-button/root/icon-button-root
 import { readFrom } from '../from.js'
 import '../../tooltip/index.js'
 
-/** How long the confirmation stands before the button goes back to itself. */
-const CONFIRM = 1600
-
 /**
  * @summary A button that copies a string to the clipboard and confirms the copy.
  *
@@ -80,6 +77,13 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    */
   @property({ attribute: 'error-label' })
   errorLabel = 'Could not copy'
+
+  /**
+   * How long the confirmation or the failure stands, in milliseconds, before
+   * the button goes back to `label`.
+   */
+  @property({ attribute: 'feedback-duration', type: Number })
+  feedbackDuration = 1600
 
   /**
    * The element to copy from, by its id: `key` for its text, `key[value]` for
@@ -197,7 +201,11 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * can run before there is a timer to clear), and registers itself so the timer
    * is released without an override here.
    */
-  private readonly clipboard = new CopyController(this, { after: CONFIRM })
+  /* A getter, so the controller reads `feedback-duration` at each press. */
+  private readonly clipboard = new CopyController(
+    this,
+    Object.defineProperty({}, 'after', { get: () => this.feedbackDuration }),
+  )
 
   private get copied(): boolean {
     return this.clipboard.copied

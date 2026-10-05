@@ -32,9 +32,11 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * say whether they are pressed with `aria-pressed`, as React Aria's
  * ToggleButtonGroup and Radix's ToggleGroup do. A press presses or releases
  * one item, the arrow keys move focus without pressing, and `value` is the
- * pressed values, comma separated, which `values` also gives as a list. The
- * form receives one entry per pressed value. The indicator stays hidden, and
- * each pressed item is marked with `:state(pressed)`.
+ * pressed values, comma separated, which `values` also gives as a list. Use
+ * `values` where an item's value holds a comma. The form receives one entry
+ * per pressed value, and a page the browser brings back presses the same
+ * items again. The indicator stays hidden, and each pressed item is marked
+ * with `:state(pressed)`.
  *
  * `orientation="vertical"` runs the items down a column, says so to the
  * accessibility tree, and the up and down arrows move between them.
@@ -301,15 +303,23 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
         return
       }
       const value = (event as CustomEvent<{ value: string }>).detail.value
-      this.requestValue(
-        this.multiple
-          ? toggleValue(
-              this.values,
-              value,
-              this.items.map((item) => item.value),
-            ).join(',')
-          : value,
+      if (!this.multiple) {
+        this.requestValue(value)
+        return
+      }
+      const next = toggleValue(
+        this.values,
+        value,
+        this.items.map((item) => item.value),
       )
+      /* The list goes in first, so a listener reading `values` while the
+         change is announced reads it whole, and comes back out if the change
+         is refused. */
+      const was = this.chosen
+      this.chosen = next
+      if (!this.requestValue(next.join(','))) {
+        this.chosen = was
+      }
     })
   }
 
@@ -424,11 +434,35 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
    */
   @property({ attribute: false })
   get values(): string[] {
-    return this.multiple ? commaList(this.value) : this.value === '' ? [] : [this.value]
+    if (!this.multiple) {
+      return this.value === '' ? [] : [this.value]
+    }
+    /* The list as written while `value` still says the same thing, so a value
+       holding a comma comes back whole. A `value` written since is split. */
+    return this.chosen && this.chosen.join(',') === this.value
+      ? [...this.chosen]
+      : commaList(this.value)
   }
 
   set values(next: string[]) {
+    this.chosen = [...next]
     this.value = next.join(',')
+  }
+
+  /** The pressed values as a list last written, which `values` reads. */
+  private chosen: string[] | undefined = undefined
+
+  /**
+   * Presses the items a page the browser brings back held. Under
+   * `selection-mode="multiple"` the saved state is the form's entries, one per
+   * pressed value, which the shared restore leaves alone.
+   */
+  override formStateRestoreCallback(state: string | File | FormData | null): void {
+    if (!(state instanceof FormData) || !this.multiple) {
+      super.formStateRestoreCallback(state)
+      return
+    }
+    this.values = state.getAll(this.name).filter((one): one is string => typeof one === 'string')
   }
 
   /**
