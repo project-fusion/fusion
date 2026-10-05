@@ -77,7 +77,12 @@ export function ThemeTry({
                 aria-pressed={brand === YOURS}
                 className={styles.trySwatch}
                 onClick={() => onBrand(YOURS)}
-                style={{ '--swatch': sent.settings.brand } as React.CSSProperties}
+                style={
+                  {
+                    /* A theme with no brand is ink, the foreground of either mode. */
+                    '--swatch': sent.settings.brand || 'var(--helix-color-foreground)',
+                  } as React.CSSProperties
+                }
                 type="button"
               />
             ) : null}
