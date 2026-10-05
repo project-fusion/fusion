@@ -18,8 +18,15 @@ import { property } from 'lit/decorators.js'
  * The host has `role="list"`, because the entries are your elements in the
  * light DOM. `Steps` does the same.
  *
- * A timeline runs down the page and has no horizontal layout. For stages laid
- * out horizontally, use `Steps`, which is horizontal by default.
+ * **Group entries by date with `Timeline.Group`**, which puts a heading such as
+ * "Today" over its entries. The group is an entry of the timeline, and its
+ * entries are a list of their own named by the heading.
+ *
+ * **The reading order is the order you write the entries in**, in every layout
+ * the styled tier draws: down the page, either side of a line down the middle,
+ * or across the page. Inside each entry the time is read before what happened.
+ * Write the entries in the order the events happened, oldest or newest first,
+ * and the layout only moves where they are drawn.
  *
  * @since 0.1.0
  * @status stable
@@ -27,7 +34,7 @@ import { property } from 'lit/decorators.js'
  * @aliases Activity feed, History, Changelog, Audit trail
  * @documentation https://fusion.dev/helix/components/timeline
  *
- * @slot - The entries.
+ * @slot - The entries, and any groups of them.
  */
 @customElement('helix-headless-timeline')
 export class HelixHeadlessTimeline extends HelixElement {

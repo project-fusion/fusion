@@ -9,6 +9,75 @@
   flex-direction: column;
 }
 
+/* The layouts. An entry cannot see this host's attributes from its own shadow
+   root, so the timeline hands each layout down as properties the entry's grid
+   reads, and an entry inside a group inherits them through it. Unset, every
+   one of them falls back to the column the entry draws on its own. */
+
+/* The line down the middle, the time on the start side and what happened on
+   the end side. */
+:host([layout="opposite"]) {
+  --_timeline-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  --_timeline-content-column: 3;
+  --_timeline-rail-column: 2;
+  --_timeline-time-align: end;
+  --_timeline-time-column: 1;
+  --_timeline-time-row: 2;
+}
+
+/* The line down the middle, and each entry on the other side from the one
+   before it: the first on the end side, the second on the start side. */
+:host([layout="alternate"]) {
+  --_timeline-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  --_timeline-content-column: 3;
+  --_timeline-even-align: end;
+  --_timeline-even-column: 1;
+  --_timeline-rail-column: 2;
+  --_timeline-time-column: 3;
+}
+
+/* Across the page: the line runs along the top, each entry's mark on it, and
+   the time and what happened under the mark. The entries share the width, and
+   the space between two of them is the end of the first, which the line runs
+   through. A `layout` has no meaning across the page and is set aside. */
+:host([orientation="horizontal"]) {
+  --_timeline-arrive-display: none;
+  --_timeline-columns: minmax(0, 1fr);
+  --_timeline-content-block-end: var(--helix-space-none);
+  --_timeline-content-column: 1;
+  --_timeline-content-inline-end: var(--timeline-gap, var(--helix-space-lg));
+  --_timeline-content-row: 3;
+  --_timeline-direction: row;
+  --_timeline-entry-flex: 1 1 0;
+  --_timeline-even-align: initial;
+  --_timeline-even-column: initial;
+  --_timeline-leave-align: center;
+  --_timeline-leave-block-size: var(--timeline-rail-size, var(--helix-border-thin));
+  --_timeline-leave-column: 2;
+  --_timeline-leave-inline-size: auto;
+  --_timeline-leave-justify: stretch;
+  --_timeline-leave-margin-block: var(--helix-space-none);
+  --_timeline-leave-row: 1;
+  --_timeline-marker-row: 1;
+  --_timeline-rail-align: center;
+  --_timeline-rail-column: 1;
+  --_timeline-rail-columns: auto minmax(0, 1fr);
+  --_timeline-rail-justify: start;
+  --_timeline-rail-row: 1;
+  --_timeline-rail-rows: auto;
+  --_timeline-rows: auto auto minmax(0, 1fr);
+  --_timeline-time-align: initial;
+  --_timeline-time-column: 1;
+  --_timeline-time-row: 2;
+
+  flex-direction: row;
+}
+
+:host([orientation="horizontal"]) ::slotted(*) {
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+
 /* Print: what happened and when.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

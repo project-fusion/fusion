@@ -30,6 +30,20 @@
   text-align: var(--_description-list-value-align, start);
 }
 
+/* Several values, as `<dd>` elements of the consumer's: each one drawn as the
+   value is, and each in the values' column, where auto-placement would put the
+   second under the label. */
+::slotted(dd) {
+  color: var(--helix-color-foreground);
+  font-variant-numeric: var(--_description-list-value-figures, normal);
+  grid-column: -2 / -1;
+  justify-self: var(--_description-list-value-align, stretch);
+  margin: 0;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  text-align: var(--_description-list-value-align, start);
+}
+
 /* Print: a label never ends one page with its value starting the next, which
    reads as two unrelated lines on paper, where a screen would have scrolled. */
 @media print {

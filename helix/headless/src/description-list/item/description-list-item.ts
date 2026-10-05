@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -14,11 +14,17 @@ import { property } from 'lit/decorators.js'
  * such as a tag, an avatar, or a link. The label is almost always text, so it
  * is also a property.
  *
+ * **For a label with several values, write each value as a `<dd>`**, such as
+ * the authors of a paper. The item then puts your `<dd>` elements after its
+ * `<dt>` in place of its own, so a screen reader hears one term and each of
+ * its descriptions, as in a native `<dl>`. A server cannot see your elements,
+ * so the served item wraps them in its own `<dd>` until it runs.
+ *
  * @since 0.1.0
  * @status stable
  * @documentation https://fusion.dev/helix/components/description-list
  *
- * @slot - The value.
+ * @slot - The value, or several `<dd>` elements for several values.
  * @slot label - The label, when it is more than text. Falls back to `label`.
  *
  * @csspart label - The `<dt>`, holding the label.
@@ -36,9 +42,33 @@ export class HelixHeadlessDescriptionListItem extends HelixElement {
   @property()
   label = ''
 
+  /**
+   * Whether the values are the consumer's own `<dd>` elements, which the item
+   * then does not wrap. Unknown on a server and while hydrating, where the
+   * item draws its own.
+   */
+  private get several(): boolean {
+    return this.knownChildren.some((child) => child.localName === 'dd')
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   protected override render(): TemplateResult {
-    return html`<dt part="label"><slot name="label">${this.label}</slot></dt>
-      <dd part="value"><slot></slot></dd>`
+    const label = html`<dt part="label"><slot name="label">${this.label}</slot></dt>`
+    /* The same slot either way, so a value changing from text to `<dd>`
+       elements moves nothing but the wrapper. */
+    return this.several
+      ? html`${label}<slot @slotchange=${this.handleSlotChange}></slot>`
+      : html`${label}
+          <dd part="value"><slot @slotchange=${this.handleSlotChange}></slot></dd>`
+  }
+
+  /** A value arriving or leaving can change whether the item wraps them. */
+  private readonly handleSlotChange = (): void => {
+    this.requestUpdate()
   }
 }
 
