@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessIconButton } from '@fusion.dev/helix-headless/icon-button'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { MixinControlSurface } from '../../shared/mixin-control-surface/mixin-control-surface.js'
 import { styles } from './icon-button-root.css.js'
 
@@ -26,6 +27,7 @@ import { styles } from './icon-button-root.css.js'
  * @slot - The icon.
  *
  * @csspart button - The inner button.
+ * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is clipped out of view and still read.
  *
  * @cssproperty --icon-button-background-color - Fill behind the button, in every state.
  * @cssproperty --icon-button-background-color-hover - Fill behind the button under the pointer. Without it, `--icon-button-background-color` also applies on hover.
@@ -33,6 +35,9 @@ import { styles } from './icon-button-root.css.js'
  * @cssproperty --icon-button-radius - Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`.
  * @cssproperty --icon-button-shadow - Shadow of a raised icon button.
  * @cssproperty --icon-button-size - Edge length of the control.
+ * @cssproperty --icon-button-spinner-size - Size of the ring a pending button turns.
+ *
+ * @cssstate pending - The button is pending: `pending` is set. A ring turns over its hidden icon.
  */
 @customElement('helix-icon-button')
 export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton) {
@@ -66,7 +71,7 @@ export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton
   @property({ reflect: true })
   shape?: 'circle'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

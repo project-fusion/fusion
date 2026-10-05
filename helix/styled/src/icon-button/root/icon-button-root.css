@@ -13,6 +13,8 @@
  */
 :host {
   --_icon-button-edge: var(--helix-color-border);
+  /* `Loader`'s own turn, so two rings on one page agree. */
+  --_icon-button-turn: 0.8s;
   --_icon-button-ink: var(--helix-color-foreground-muted);
   --_icon-button-ink-hover: var(--helix-color-foreground);
   /*
@@ -243,6 +245,45 @@
 :host(:disabled) [part="button"] {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+/* **Pending: the icon stays where it is, unseen, and a ring turns over it**,
+   as on `Button`. The ring is the control's own `::after`, so the headless
+   tier renders nothing for it. */
+:host(:state(pending)) [part="button"] {
+  cursor: progress;
+  position: relative;
+}
+
+:host(:state(pending)) [part="button"] > * {
+  visibility: hidden;
+}
+
+:host(:state(pending)) [part="button"]::after {
+  animation: helix-icon-button-turn var(--_icon-button-turn) linear infinite;
+  block-size: var(--icon-button-spinner-size, 1.15em);
+  border: var(--helix-border-thick) solid color-mix(in oklab, currentColor 30%, transparent);
+  border-block-start-color: currentColor;
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  content: "";
+  inline-size: var(--icon-button-spinner-size, 1.15em);
+  inset: 0;
+  margin: auto;
+  position: absolute;
+}
+
+@keyframes helix-icon-button-turn {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* Slowed rather than stopped, as `Loader` does. */
+@media (prefers-reduced-motion: reduce) {
+  :host(:state(pending)) [part="button"]::after {
+    animation-duration: calc(var(--helix-duration-slow) * 12);
+  }
 }
 
 /*
