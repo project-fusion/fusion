@@ -33,6 +33,7 @@
   grid-template-columns:
     var(--menu-item-start, 0px)
     minmax(0, 1fr)
+    auto
     var(--menu-item-end, 0px);
   /* **The menu's own step, not a step inside it.** The surface already moves
      `--helix-size-control` to `sm` so that "a control slotted into a row is the
@@ -116,8 +117,23 @@
   min-inline-size: 0;
 }
 
-[part="mark"] {
+/* A shortcut and the words in `end` sit in a track of their own before the
+   mark, which is no width on a row with neither. */
+[part="end"] {
+  align-items: center;
+  color: var(--menu-item-detail-color, var(--helix-color-foreground-subtle));
+  display: flex;
+  gap: var(--helix-space-2xs);
   grid-column: 3;
+  padding-inline-start: var(--helix-space-sm);
+}
+
+[part="end"][data-empty] {
+  display: none;
+}
+
+[part="mark"] {
+  grid-column: 4;
 }
 
 /* Nothing before the label, so no box before the label. The slot inside it stays

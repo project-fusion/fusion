@@ -481,7 +481,11 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
        pattern's checkbox reading: a reader hears "checked", "not checked" or
        "partially checked". */
     const chosen = this.checkable ? undefined : this.selected ? 'true' : 'false'
-    const checked = this.checkable ? (this.checked === 'mixed' ? 'mixed' : String(this.checked)) : undefined
+    const checked = this.checkable
+      ? this.checked === 'mixed'
+        ? 'mixed'
+        : String(this.checked)
+      : undefined
     const busy = this.open && this.lazy ? 'true' : nothing
     const off = this.disabled ? 'true' : nothing
     /* **A render the tree has not reached holds the stop open.** `focusable` is

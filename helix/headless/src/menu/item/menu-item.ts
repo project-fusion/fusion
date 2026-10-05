@@ -1,15 +1,21 @@
 import {
+  ariaChord,
   customElement,
   deepActiveElement,
   HelixBeforeToggleEvent,
   HelixElement,
   HelixSelectEvent,
+  onApple,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { caretRight, check } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html as staticHtml } from 'lit/static-html.js'
+/* Relative, so this registers the base key and the styled file's identical
+   import registers the styled one. `tier` picks which the template asks for. */
+import '../../kbd/index.js'
 
 /**
  * @summary One row in a menu: a command, a choice, or a way into a submenu.
@@ -34,21 +40,30 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * attribute. An attribute written onto your element after it upgrades causes a
  * hydration mismatch.
  *
+ * `shortcut` shows a row's keyboard shortcut after its label, drawn by `Kbd`
+ * in the platform's glyphs, and gives the row `aria-keyshortcuts`. It binds
+ * nothing: the shortcut is the page's to bind. Other trailing words, such as a
+ * count, go in the `end` slot.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Menu option, Menu row
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The label.
+ * @slot end - Words after the label, such as a count or a detail, beside any `shortcut`.
  * @slot start - Content before the label, such as an icon.
  * @slot submenu - The rows of a submenu that this row opens.
  *
  * @event {HelixBeforeToggleEvent} helix-before-toggle - A choice row is about to be checked or unchecked, carrying the state asked for. Cancelable: cancel it to keep the row as it is.
  * @event {HelixSelectEvent} helix-select - The row was chosen. Cancelable: cancel it to keep the menu open.
  *
+ * @csspart end - The trailing column that holds the shortcut and the `end` slot. It is always rendered.
  * @csspart item - The row, which is an `<a>` where `href` is set.
  * @csspart mark - The trailing mark: a check mark when the row is checked, or a caret
  * when it opens a submenu. A row never shows both, so they share one column.
+ * @csspart shortcut - The key drawn for `shortcut`.
+ * @csspart shortcut-kbd - The key inside it.
  * @csspart start - The leading column that holds the `start` slot. It is always rendered.
  *
  * @cssstate checked - The row is checked.
@@ -149,6 +164,15 @@ export class HelixHeadlessMenuItem extends HelixElement {
   rel = ''
 
   /**
+   * The row's keyboard shortcut as a chord, such as `mod+s`, shown after the
+   * label in the platform's glyphs and given to the row as
+   * `aria-keyshortcuts`. `mod` is Command on an Apple keyboard and Control
+   * elsewhere. Showing a shortcut does not bind it.
+   */
+  @property()
+  shortcut = ''
+
+  /**
    * Whether the page showing is this row's submenu, or one below it.
    *
    * Separate from `onPage`, and it has to be. A row that opened a page is not
@@ -224,6 +248,10 @@ export class HelixHeadlessMenuItem extends HelixElement {
   @state()
   private start = false
 
+  /** Whether anything is slotted after the label, read the way `start` is. */
+  @state()
+  private end = false
+
   /**
    * Both answers, from the children, before each render.
    *
@@ -242,6 +270,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
     const named = (name: string): boolean => this.knownChildren.some((child) => child.slot === name)
     this.submenu = named('submenu')
     this.start = named('start')
+    this.end = named('end')
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -260,6 +289,36 @@ export class HelixHeadlessMenuItem extends HelixElement {
   private readonly readStart = (): void => {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="start"]')
     this.start = (slot?.assignedNodes().length ?? 0) > 0
+  }
+
+  /** Re-reads whether anything is after the label, as `readStart` does before it. */
+  private readonly readEnd = (): void => {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="end"]')
+    this.end = (slot?.assignedNodes().length ?? 0) > 0
+  }
+
+  /**
+   * The trailing column: the shortcut's key, then whatever is slotted in `end`.
+   * Drawn by `Kbd`, interpolated so each tier draws its own.
+   *
+   * The key is hidden from the accessibility tree, since the row's
+   * `aria-keyshortcuts` says it in words a screen reader reads as keys: inside
+   * the row its glyphs became part of the row's name.
+   */
+  protected renderEnd(): TemplateResult {
+    const kbd = this.tag('kbd')
+    return html`<span part="end" ?data-empty=${!this.end && this.shortcut === ''}
+      >${
+        this.shortcut === ''
+          ? nothing
+          : staticHtml`<${kbd}
+              part="shortcut"
+              exportparts="kbd: shortcut-kbd"
+              aria-hidden="true"
+              keys=${this.shortcut}
+            ></${kbd}>`
+      }<slot name="end" @slotchange=${this.readEnd}></slot
+    ></span>`
   }
 
   /**
@@ -467,10 +526,15 @@ export class HelixHeadlessMenuItem extends HelixElement {
     const ticks = this.checkable || this.checked
     const role = ticks ? (this.exclusive ? 'menuitemradio' : 'menuitemcheckbox') : 'menuitem'
     const checkedState = ticks ? (this.checked ? 'true' : 'false') : nothing
+    /* In this reader's platform's words, and in the server's while hydrating
+       what one sent, which has no keyboard to ask. */
+    const keys =
+      this.shortcut === '' ? nothing : ariaChord(this.shortcut, !this.hydrating && onApple())
     const inside = html`<span part="start" ?data-empty=${!this.start}
           ><slot name="start" @slotchange=${this.readStart}></slot
         ></span>
         <slot></slot>
+        ${this.renderEnd()}
         ${
           // One trailing column, and a row is never both: a way into a page has
           // nothing to tick, and a choice opens nothing. The tick sits after the
@@ -519,6 +583,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
             role=${role}
             aria-checked=${checkedState}
             aria-haspopup=${submenu ? 'menu' : nothing}
+            aria-keyshortcuts=${keys}
             tabindex="-1"
             @click=${this.handleClick}
             @keydown=${this.handleKeydown}
@@ -529,6 +594,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
             aria-checked=${checkedState}
             aria-disabled=${this.disabled ? 'true' : nothing}
             aria-haspopup=${submenu ? 'menu' : nothing}
+            aria-keyshortcuts=${keys}
             tabindex=${this.disabled ? nothing : '-1'}
             @click=${this.handleClick}
             @keydown=${this.handleKeydown}

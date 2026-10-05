@@ -1,0 +1,11 @@
+/* The field the context menu opens over. */
+.area {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  font: inherit;
+  inline-size: 100%;
+  min-block-size: 6rem;
+  padding: var(--helix-space-sm);
+}

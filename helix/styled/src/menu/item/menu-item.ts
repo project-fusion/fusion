@@ -1,6 +1,8 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMenuItem } from '@fusion.dev/helix-headless/menu'
 import type { CSSResultGroup } from 'lit'
+/* Inherited from the base along with the template: the shortcut's key. */
+import '../../kbd/index.js'
 import { styles } from './menu-item.css.js'
 
 /**
@@ -19,12 +21,15 @@ import { styles } from './menu-item.css.js'
  * @aliases Menu option, Menu row
  * @documentation https://fusion.dev/helix/components/menu
  *
+ * @cssproperty --menu-item-detail-color - Color of the shortcut and the words in the `end` slot.
  * @cssproperty --menu-item-end - Width of the trailing column, including the gap before it, which holds a check mark or a submenu caret.
  * @cssproperty --menu-item-hover-color - Fill under the pointer.
  * @cssproperty --menu-item-start - Width of the leading column, including the gap after it, for a row with more than a mark. The menu sets it for each page, and `0` removes the column.
  */
 @customElement('helix-menu-item')
 export class HelixMenuItem extends HelixHeadlessMenuItem {
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = styles
 }
 

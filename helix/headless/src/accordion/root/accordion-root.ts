@@ -153,7 +153,10 @@ export class HelixHeadlessAccordion extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (this.hasUpdated && (changed.has('mode') || changed.has('headingLevel') || changed.has('hiddenUntilFound'))) {
+    if (
+      this.hasUpdated &&
+      (changed.has('mode') || changed.has('headingLevel') || changed.has('hiddenUntilFound'))
+    ) {
       this.settle()
     }
   }
