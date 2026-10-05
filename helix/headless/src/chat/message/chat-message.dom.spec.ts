@@ -83,6 +83,21 @@ describe('the states', () => {
     expect(seen).toEqual([{ target: 'helix-headless-chat-message', value: 'What was said' }])
   })
 
+  /* The whole `textContent` carried what was slotted beside the words, so a
+     retry sent "Where is my order?CopyOrder page". */
+  test('retry offers the words and none of the controls or sources beside them', async () => {
+    const element = await turn(
+      'Where is my order?<button slot="actions">Copy</button><a slot="sources" href="#o">Order page</a>',
+      'state="failed"',
+    )
+    let value = ''
+    element.addEventListener('helix-send', (event) => {
+      value = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    ;(part(element, 'retry') as HTMLElement).click()
+    expect(value).toBe('Where is my order?')
+  })
+
   /**
    * A retry that stands is a turn on its way, which is what `sending` means.
    * Without it the reader pressed the control and the turn sat at "Not sent"

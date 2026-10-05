@@ -336,7 +336,19 @@ export class HelixHeadlessChatMessage extends HelixElement {
       apply: (next) => {
         this.state = next
       },
-      event: () => new HelixSendEvent({ value: this.textContent?.trim() ?? '' }),
+      /* The turn's words only. The whole `textContent` carried the controls
+         and sources slotted beside them, so a retry sent "Where is my
+         order?CopyOrder page". The transcript's announcer reads them the same
+         way. */
+      event: () =>
+        new HelixSendEvent({
+          value: [...this.childNodes]
+            .filter((node) => !(node.nodeType === 1 && (node as Element).hasAttribute('slot')))
+            .map((node) => node.textContent ?? '')
+            .join('')
+            .replace(/\s+/g, ' ')
+            .trim(),
+        }),
       host: this,
       next: 'sending',
     })
