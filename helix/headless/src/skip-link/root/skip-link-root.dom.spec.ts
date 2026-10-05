@@ -104,4 +104,23 @@ describe('a skip link', () => {
     expect(press(await page('href="#nowhere"'))).toBe(true)
     expect(press(await page('href="/elsewhere"'))).toBe(true)
   })
+
+  /* A target id that matches nothing was silent, and the link did nothing a
+     keyboard reader could notice. A link to another page is the browser's. */
+  test('warns once when its in-page target is missing', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const missing = await page('href="#nowhere"')
+      press(missing)
+      press(missing)
+      press(await page('href="/elsewhere"'))
+      press(await page())
+    } finally {
+      console.warn = original
+    }
+    expect(warnings.length).toBe(1)
+    expect(warnings[0]).toContain('#nowhere')
+  })
 })
