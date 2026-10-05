@@ -40,12 +40,18 @@ const TRIGGER_ID = 'trigger'
  * out of the tab order and the accessibility tree after the styled tier's
  * `display` overrides `hidden`.
  *
+ * Set `hidden-until-found` and the browser's find in page searches a closed
+ * section too: a match opens it, with `helix-before-open` first, as React
+ * Aria's disclosure does. The content is then `hidden="until-found"` while
+ * closed, and not `inert`, since an inert region is never searched.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Collapsible, Expander, Disclosure
  * @documentation https://fusion.dev/helix/components/accordion
  *
  * @slot - The content shown when the section is open.
+ * @slot chevron - Replaces the open and close indicator, such as with your own icon.
  * @slot summary - The text of the button that opens and closes the section. Always shown.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The section is about to close. Cancelable: cancel it to keep it open.
@@ -58,6 +64,9 @@ const TRIGGER_ID = 'trigger'
  * @csspart content-inner - The clipping box inside the animated region.
  * @csspart heading - The heading that holds the trigger.
  * @csspart trigger - The button that opens and closes the section, holding the summary.
+ *
+ * @cssproperty --accordion-content-height - The height of the content when open, in pixels,
+ *   measured whenever it changes, for a stylesheet that animates the section its own way.
  *
  * @cssstate open - While the item is open.
  */
@@ -76,14 +85,21 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
   @property({ attribute: 'chevron-placement', reflect: true })
   chevronPlacement?: 'auto' | 'start' | 'end' | 'none'
 
-  /** The chevron, or nothing when suppressed. */
-  private renderChevron(): TemplateResult | typeof nothing {
+  /**
+   * The chevron, or nothing when suppressed.
+   *
+   * The drawn chevron is the `chevron` slot's fallback, so an icon of your own
+   * replaces it by being slotted, and a tier drawing its own overrides this.
+   */
+  protected renderChevron(): TemplateResult | typeof nothing {
     if (this.chevronPlacement === 'none') {
       return nothing
     }
-    return html`<svg part="chevron" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
-      ${unsafeSVG(caretDown.content)}
-    </svg>`
+    return html`<slot name="chevron"
+      ><svg part="chevron" fill="currentColor" viewBox=${caretDown.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretDown.content)}
+      </svg></slot
+    >`
   }
 
   /**
@@ -102,6 +118,13 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
   groupHeadingLevel: number | undefined = undefined
 
   /**
+   * @internal The accordion's `hidden-until-found`, written by the accordion,
+   * for the reason `groupHeadingLevel` is a property.
+   */
+  @property({ attribute: false })
+  groupHiddenUntilFound = false
+
+  /**
    * The level of the heading around the trigger, from 1 to 6.
    *
    * Unset takes the accordion's `heading-level`, and 3 where that is unset
@@ -109,6 +132,18 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    */
   @property({ attribute: 'heading-level', type: Number })
   headingLevel?: number
+
+  /**
+   * Whether find in page searches the section while it is closed, and opens it
+   * on a match.
+   *
+   * Off by default. A closed section is then `hidden="until-found"`, which
+   * hides through `content-visibility`, so a stylesheet that animates the
+   * section closed shows an empty box for the length of that animation. The
+   * accordion's own `hidden-until-found` turns it on for every section.
+   */
+  @property({ attribute: 'hidden-until-found', type: Boolean })
+  hiddenUntilFound = false
 
   /**
    * A group name. Opening an item closes the other items with the same name,
@@ -132,6 +167,43 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    */
   @property({ reflect: true })
   name?: string
+
+  /** Whether find in page searches this section while it is closed. */
+  private get findable(): boolean {
+    return this.hiddenUntilFound || this.groupHiddenUntilFound
+  }
+
+  /**
+   * Opens the section find in page has matched in, before the match is shown.
+   *
+   * The browser removes `hidden` itself. A refusal puts it back, so the trigger
+   * and the region still agree.
+   */
+  private readonly handleBeforeMatch = (event: Event): void => {
+    if (this.open || this.requestOpen(true)) {
+      return
+    }
+    ;(event.currentTarget as HTMLElement).setAttribute('hidden', 'until-found')
+  }
+
+  /** Watches the content's size, for `--accordion-content-height`. */
+  private sizes: ResizeObserver | undefined
+
+  /**
+   * Publishes how tall the content is when open.
+   *
+   * `scrollHeight` of the inner box, which is the content's whole height
+   * whatever the region is clipped to. A closed region with no box reads 0
+   * and leaves the last height in place.
+   */
+  private readonly measure = (): void => {
+    const inner = this.renderRoot?.querySelector<HTMLElement>('[part="content-inner"]')
+    const region = this.renderRoot?.querySelector<HTMLElement>('[part="content"]')
+    const height = inner?.scrollHeight ?? 0
+    if (region && height > 0) {
+      region.style.setProperty('--accordion-content-height', `${height}px`)
+    }
+  }
 
   /** Whether the item was open at the last update, and `undefined` before one. */
   private wasOpen: boolean | undefined = undefined
@@ -233,6 +305,34 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
       this.closePeers()
     }
     this.wasOpen = this.open
+    if (changed.has('open')) {
+      this.measure()
+    }
+  }
+
+  /** Starts watching the content's size, once there is a render to watch. */
+  private watchSize(): void {
+    const inner = this.hasUpdated ? this.renderRoot.querySelector('[part="content-inner"]') : null
+    if (inner && !this.sizes && typeof ResizeObserver !== 'undefined') {
+      this.sizes = new ResizeObserver(this.measure)
+      this.sizes.observe(inner)
+    }
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.watchSize()
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.watchSize()
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.sizes?.disconnect()
+    this.sizes = undefined
   }
 
   /**
@@ -264,16 +364,17 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * part outranks it and the transition runs exactly as before. Measured on
    * both tiers.
    *
-   * **Not `hidden="until-found"`**, which would be the better accordion and is
-   * a different piece of work. It hides through `content-visibility` rather
-   * than `display`, which an author `display` does not override, so a collapsed
-   * section a sheet animates would open to nothing. It also needs a
-   * `beforematch` handler to set `open`, or find-in-page reveals text while the
-   * trigger still reports collapsed.
+   * **`hidden="until-found"` only where it was asked for.** It hides through
+   * `content-visibility` rather than `display`, which an author `display` does
+   * not override, so a section a sheet animates closed shows an empty box while
+   * it shrinks. `beforematch` sets `open`, so find in page never reveals text
+   * under a trigger that still reports collapsed.
    *
-   * `inert` stays. `hidden` answers the reader who can see and `inert` answers
-   * the one tabbing through, and wherever a sheet overrides `display`, `inert`
-   * is the only one of the two still in force.
+   * `inert` stays, except under `until-found`. `hidden` answers the reader who
+   * can see and `inert` answers the one tabbing through, and wherever a sheet
+   * overrides `display`, `inert` is the only one of the two still in force.
+   * `content-visibility: hidden` keeps skipped content out of the tab order and
+   * the accessibility tree by itself, and an inert region is never searched.
    */
   protected override render(): TemplateResult {
     const open = this.open
@@ -299,9 +400,10 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
           id=${CONTENT_ID}
           aria-labelledby=${TRIGGER_ID}
           part="content"
-          ?hidden=${!open}
-          ?inert=${!open}
+          hidden=${open ? nothing : this.findable ? 'until-found' : ''}
+          ?inert=${!open && !this.findable}
           role="region"
+          @beforematch=${this.handleBeforeMatch}
         >
           <div part="content-inner">
             <slot></slot>

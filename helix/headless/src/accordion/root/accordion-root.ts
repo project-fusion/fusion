@@ -74,6 +74,14 @@ export class HelixHeadlessAccordion extends HelixElement {
   headingLevel?: number
 
   /**
+   * Whether find in page searches every closed section, and opens the one it
+   * matches in. Each item's own `hidden-until-found` turns it on for that item
+   * alone.
+   */
+  @property({ attribute: 'hidden-until-found', type: Boolean })
+  hiddenUntilFound = false
+
+  /**
    * How many sections may be open at once.
    *
    * Absent is `multiple`, so nothing closes unexpectedly and the default costs
@@ -118,6 +126,7 @@ export class HelixHeadlessAccordion extends HelixElement {
     for (const item of items) {
       whenHydrated(item, () => {
         item.groupHeadingLevel = this.headingLevel
+        item.groupHiddenUntilFound = this.hiddenUntilFound
       })
     }
     if (this.mode === undefined) {
@@ -144,7 +153,7 @@ export class HelixHeadlessAccordion extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (this.hasUpdated && (changed.has('mode') || changed.has('headingLevel'))) {
+    if (this.hasUpdated && (changed.has('mode') || changed.has('headingLevel') || changed.has('hiddenUntilFound'))) {
       this.settle()
     }
   }
