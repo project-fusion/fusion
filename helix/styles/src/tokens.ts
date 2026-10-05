@@ -486,14 +486,16 @@ export const TOKENS: Token[] = [
      the floor exactly, and these take the tone's step as it stands, which is
      the approximation a stylesheet can make. One and not two because #124
      measured the readable range as holding one quiet step, and a tone has less
-     room there than the neutral ink, not more. */
+     room there than the neutral ink, not more. With no brand, the primary and
+     the accent are ink, which has no chroma to give up, so their quiet ink is
+     the neutral's own, `foreground-muted`. */
   [
     'color-primary-muted',
-    'light-dark(oklch(from var(--_helix-brand-500, var(--_helix-ink-500)) l calc(c * 0.5) h), oklch(from var(--_helix-brand-400, var(--_helix-ink-400)) l calc(c * 0.5) h))',
+    'light-dark(var(--_helix-brand-quiet-500, var(--helix-color-foreground-muted)), var(--_helix-brand-quiet-400, var(--helix-color-foreground-muted)))',
   ],
   [
     'color-accent-muted',
-    'light-dark(oklch(from var(--_helix-accent-500, var(--_helix-ink-500)) l calc(c * 0.5) h), oklch(from var(--_helix-accent-400, var(--_helix-ink-400)) l calc(c * 0.5) h))',
+    'light-dark(var(--_helix-accent-quiet-500, var(--helix-color-foreground-muted)), var(--_helix-accent-quiet-400, var(--helix-color-foreground-muted)))',
   ],
   [
     'color-danger-muted',
