@@ -1101,3 +1101,38 @@ describe('a divider beside a shut pane', () => {
     expect(separator(host).hasAttribute('aria-valuetext')).toBe(false)
   })
 })
+
+describe('the window splitter keys and names', () => {
+  type Collapsing = Splitter & { collapsed: 'end' | 'start' | undefined }
+
+  /* Enter is the pattern's key for collapsing the primary pane, and with
+     `min` set it is the only key that reaches the collapse. */
+  test('Enter collapses the start pane past min, and Enter opens it where it was', async () => {
+    const host = (await splitter('default-position="60" min="20"')) as Collapsing
+    await press(host, 'Enter')
+    expect(host.collapsed).toBe('start')
+    expect(host.position).toBe(0)
+    await press(host, 'Enter')
+    expect(host.collapsed).toBeUndefined()
+    expect(host.position).toBe(60)
+  })
+
+  test('and a refused collapse leaves the pane open', async () => {
+    const host = (await splitter('default-position="60"')) as Collapsing
+    host.addEventListener('helix-before-collapse', (event) => event.preventDefault())
+    await press(host, 'Enter')
+    expect(host.collapsed).toBeUndefined()
+    expect(host.position).toBe(60)
+  })
+
+  test('the divider says which pane it sizes', async () => {
+    const host = await splitter()
+    const controls = separator(host).getAttribute('aria-controls')
+    expect(host.shadowRoot?.getElementById(controls ?? '')).toBe(part(host, 'start') as HTMLElement)
+  })
+
+  test('takes its name from an aria-label on the host', async () => {
+    const host = await splitter('aria-label="Resize the sidebar"')
+    expect(separator(host).getAttribute('aria-label')).toBe('Resize the sidebar')
+  })
+})

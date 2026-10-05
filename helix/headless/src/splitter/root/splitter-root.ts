@@ -1,4 +1,5 @@
 import {
+  AriaForwardController,
   capturePointer,
   closestInstance,
   customElement,
@@ -39,9 +40,10 @@ const STACK_BELOW = 512
  * added at `firstUpdated` and is not in the server markup. Before it appears,
  * both dividers work on their own.
  *
- * The divider has `role="separator"` and `aria-valuenow`. Drag it with a
- * pointer or move it with the arrow keys, and press `Home` or `End` to move it
- * to its bounds. A drag in progress is tracked as a state, so both dividers a
+ * The divider has `role="separator"` and `aria-valuenow`, and `aria-controls`
+ * names the start pane. Drag it with a pointer or move it with the arrow keys,
+ * press `Home` or `End` to move it to its bounds, and press `Enter` to collapse
+ * the start pane and open it again. A drag in progress is tracked as a state, so both dividers a
  * corner moves stay lit for as long as they move.
  *
  * By default, `min` and `max` let the divider reach either edge, so you can
@@ -176,9 +178,18 @@ export class HelixHeadlessSplitter extends HelixElement {
 
   /**
    * The divider's name, read by screen readers.
+   *
+   * An `aria-label` or `aria-labelledby` on the host names the divider too,
+   * and wins over this.
    */
   @property()
   label = 'Resize panes'
+
+  /** Carries a host `aria-label` and `aria-labelledby` to the divider. */
+  protected readonly aria = new AriaForwardController(this, {
+    label: true,
+    target: () => this.partNamed('separator'),
+  })
 
   /**
    * How close the divider can come to the end, in the same units as `min`.
@@ -781,6 +792,11 @@ export class HelixHeadlessSplitter extends HelixElement {
    * only place in a splitter where a second axis means anything.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter') {
+      this.toggleCollapse()
+      event.preventDefault()
+      return
+    }
     const toward = this.travel(event.key)
     let next: number
     if (toward !== 0) {
@@ -822,6 +838,38 @@ export class HelixHeadlessSplitter extends HelixElement {
     return key === 'ArrowDown' ? 1 : key === 'ArrowUp' ? -1 : 0
   }
 
+  /**
+   * Collapses the start pane, or opens whichever pane is collapsed, which is
+   * what `Enter` does on the divider.
+   *
+   * The window splitter pattern's own key, and the one way the keyboard
+   * reaches `collapsed` where `min` keeps `Home` short of the edge. Collapse
+   * overrides `min` and `max`, as it does for every other way in.
+   *
+   * Asked through `helix-before-collapse` alone. The pane opens back to the
+   * position it was collapsed from, or to `default-position` where that was
+   * the edge itself.
+   */
+  private toggleCollapse(): void {
+    const shut = this.collapsed
+    const opened = shut ? undefined : this.position
+    requestChange({
+      apply: (value) => {
+        const previous = this.collapsed
+        if (opened !== undefined) {
+          this.positionState = opened
+        } else if (this.shutAt(this.clamp(this.positionState ?? this.defaultPosition))) {
+          this.positionState = this.defaultPosition
+        }
+        this.collapsedState = value === '' ? 'none' : (value as 'end' | 'start')
+        this.requestUpdate('collapsed', previous)
+      },
+      event: (value) => new HelixBeforeCollapseEvent({ value }),
+      host: this,
+      next: shut ? '' : 'start',
+    })
+  }
+
   /** Puts the divider back where the markup put it. */
   private reset(): void {
     /* `default-position`, never the position captured at first render. Those
@@ -861,7 +909,8 @@ export class HelixHeadlessSplitter extends HelixElement {
   }
 
   /**
-   * Records that a nested splitter crosses this one at `at` percent along it.
+   * @internal Records that a nested splitter crosses this one at `at` percent
+   * along it.
    *
    * Public because it is the whole of the channel between the two, and it runs
    * one way: the child tells the parent where it is, and the parent draws the
@@ -881,7 +930,7 @@ export class HelixHeadlessSplitter extends HelixElement {
     this.requestUpdate()
   }
 
-  /** Forgets a nested splitter that has left the tree. See `cross`. */
+  /** @internal Forgets a nested splitter that has left the tree. See `cross`. */
   uncross(by: HelixHeadlessSplitter): void {
     const at = this.crossings.findIndex((crossing) => crossing.by === by)
     if (at === -1) {
@@ -1138,6 +1187,7 @@ export class HelixHeadlessSplitter extends HelixElement {
        one on the host is one a React consumer's server markup never had. */
     return html`<div
         part="start"
+        id="start"
         ?data-dragging=${this.dragging}
         style="--splitter-position: ${position}%"
       >
@@ -1147,6 +1197,7 @@ export class HelixHeadlessSplitter extends HelixElement {
         part="separator"
         role="separator"
         tabindex="0"
+        aria-controls="start"
         aria-label=${this.label}
         aria-orientation=${this.vertical ? 'horizontal' : 'vertical'}
         aria-valuemax=${this.collapsed ? 100 : this.clamp(this.maxPercent)}
