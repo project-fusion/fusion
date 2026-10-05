@@ -1,11 +1,13 @@
 import {
   customElement,
+  deepContains,
   focusableElements,
   HelixElement,
   HelixReadEvent,
   hostAria,
   MixinCollection,
   markRegion,
+  whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -29,6 +31,14 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * you own `read`, nothing changes until you set it. `unread` is derived from
  * the items and written to an attribute, so a stylesheet and a badge can both
  * use it without counting.
+ *
+ * **The feed is one `Tab` stop for its rows.** Each row takes focus itself and
+ * is read by its label. `ArrowDown` and `ArrowUp` move to the next and the
+ * previous row, `Home` and `End` to the first and the last, and `PageDown` and
+ * `PageUp` move a row on or back from anywhere inside one, as in the APG feed
+ * pattern. The controls inside a row stay in the `Tab` order. Set `total` when
+ * the feed holds one page of a longer list, and each row says its place in the
+ * whole of it.
  *
  * @since 0.1.0
  * @status stable
@@ -86,6 +96,16 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'mark-all-label' })
   markAllLabel = 'Mark all as read'
+
+  /**
+   * How many notifications there are in all, where the feed holds only some of
+   * them, read as each row's `aria-setsize`. `-1` says the count is unknown.
+   *
+   * Unset, the browser counts the rows it can see, which is right for a feed
+   * that holds everything.
+   */
+  @property({ type: Number })
+  total?: number
 
   /**
    * How many items are unread, counted from the items themselves.
@@ -259,14 +279,104 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     }
   }
 
+  /** The row `Tab` stops on, once a reader has been to one. */
+  private stopRow: HelixHeadlessNotification | undefined
+
+  /**
+   * The rows a reader can reach with the keys: every row in the feed, in order,
+   * less the ones a folded group renders nowhere.
+   */
+  private get reachable(): HelixHeadlessNotification[] {
+    return this.items.filter((row) => !('assignedSlot' in row) || row.assignedSlot !== null)
+  }
+
+  /** The row whose own box is the element focus is on, if it is one. */
+  private rowFocused(target: EventTarget | undefined): HelixHeadlessNotification | undefined {
+    return this.reachable.find((row) => rowBox(row) === target)
+  }
+
+  /** A row taking focus becomes the feed's stop, so `Tab` comes back to it. */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const row = this.rowFocused(event.composedPath()[0])
+    if (row && row !== this.stopRow) {
+      this.stopRow = row
+      this.rove()
+    }
+  }
+
+  /**
+   * Moves between rows.
+   *
+   * The arrows and `Home` and `End` only from a row's own box, so a control in
+   * a row keeps its keys. `PageDown` and `PageUp` from anywhere in a row, which
+   * is how the APG feed pattern moves on from inside an article.
+   */
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
+      return
+    }
+    const rows = this.reachable
+    const from = event.composedPath()[0]
+    const own = this.rowFocused(from)
+    const inside = own ?? rows.find((row) => from instanceof Node && deepContains(row, from))
+    if (!inside) {
+      return
+    }
+    const at = rows.indexOf(inside)
+    const to = (
+      {
+        ArrowDown: own ? at + 1 : undefined,
+        ArrowUp: own ? at - 1 : undefined,
+        End: own ? rows.length - 1 : undefined,
+        Home: own ? 0 : undefined,
+        PageDown: at + 1,
+        PageUp: at - 1,
+      } as Record<string, number | undefined>
+    )[event.key]
+    if (to === undefined) {
+      return
+    }
+    event.preventDefault()
+    const next = rows[Math.max(0, Math.min(to, rows.length - 1))]
+    if (next) {
+      this.stopRow = next
+      this.rove()
+      rowBox(next)?.focus()
+    }
+  }
+
+  /**
+   * Tells each row whether it is the stop, and where it sits in the feed.
+   *
+   * Through each row's own properties, written once it has hydrated, so a
+   * server's markup stays the server's: every row is a stop until this runs.
+   */
+  private rove(): void {
+    const rows = this.reachable
+    const stop = this.stopRow && rows.includes(this.stopRow) ? this.stopRow : rows[0]
+    const direct = this.rows
+    for (const row of this.items) {
+      const position = direct.indexOf(row) + 1
+      whenHydrated(row, () => {
+        row.stop = row === stop
+        row.position = this.total === undefined ? 0 : position
+        row.setSize = this.total ?? 0
+      })
+    }
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-read', this.handleRead)
+    this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('keydown', this.handleKeydown)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-read', this.handleRead)
+    this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('keydown', this.handleKeydown)
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -339,6 +449,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     this.assign()
     this.markEmpty()
     this.markMedia()
+    this.rove()
     /* Written after the render rather than reflected during it, so it follows
        every change rather than only the first.
 
@@ -408,6 +519,10 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     })
   }
 }
+
+/** The box a row takes focus on. */
+const rowBox = (row: HelixHeadlessNotification): HTMLElement | null =>
+  row.shadowRoot?.querySelector<HTMLElement>('[part="item"]') ?? null
 
 declare global {
   interface HTMLElementTagNameMap {
