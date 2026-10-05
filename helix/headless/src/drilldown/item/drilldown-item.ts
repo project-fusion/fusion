@@ -38,6 +38,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @documentation https://fusion.dev/helix/components/drilldown
  *
  * @slot - The row's label.
+ * @slot chevron - Replaces the caret of a row that opens a page, such as with your own icon.
  * @slot end - Content after the label, usually an icon or a count.
  * @slot page - The rows of the page this row opens.
  * @slot start - Content before the label, usually an icon.
@@ -80,17 +81,16 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   readonly isDrilldownItem = true
 
   /**
-   * Whether the page showing is the one this row is on.
-   *
-   * Written by the stack.
+   * @internal Whether the page showing is the one this row is on. Written by
+   * the stack, and not a consumer's to set: a framework reading `onPage` as an
+   * event handler is why it is kept off the typings.
    */
   @property({ attribute: false })
   onPage = true
 
   /**
-   * Whether this row's own page is the one showing.
-   *
-   * Written by the stack.
+   * @internal Whether this row's own page is the one showing. Written by the
+   * stack.
    */
   @property({ attribute: false })
   showingPage = false
@@ -187,6 +187,18 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
     this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
   }
 
+  /**
+   * The caret of a row that opens a page, as the `chevron` slot's fallback, so
+   * an icon of your own replaces it by being slotted.
+   */
+  protected renderMark(): TemplateResult {
+    return html`<slot name="chevron"
+      ><svg part="mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+        ${unsafeSVG(caretRight.content)}
+      </svg></slot
+    >`
+  }
+
   protected override render(): TemplateResult | typeof nothing {
     if (this.showingPage) {
       return html`<slot name="page" @slotchange=${this.readPage}></slot>`
@@ -224,13 +236,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
       <slot name="start"></slot>
       <span part="label"><slot></slot></span>
       <slot name="end"></slot>
-      ${
-        this.page
-          ? html`<svg part="mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
-              ${unsafeSVG(caretRight.content)}
-            </svg>`
-          : nothing
-      }
+      ${this.page ? this.renderMark() : nothing}
     </button>
     <div hidden><slot name="page" @slotchange=${this.readPage}></slot></div>`
   }

@@ -41,10 +41,10 @@
 
   align-items: center;
   aspect-ratio: 1;
-  background-color: var(--helix-color-surface-overlay);
+  background-color: var(--speed-dial-item-background-color, var(--helix-color-surface-overlay));
   border-radius: var(--helix-radii-full);
   box-shadow: var(--helix-shadow-md);
-  color: var(--helix-color-foreground);
+  color: var(--speed-dial-item-color, var(--helix-color-foreground));
   display: inline-flex;
   inline-size: var(--speed-dial-item-size, var(--helix-size-control-tight));
   justify-content: center;
@@ -79,13 +79,22 @@
 /* A chip, because a dial floats over a page and a bare word over a photograph
    is a word nobody can read. Its own surface, the same one the mark takes. */
 [part="label"] {
-  background-color: var(--helix-color-surface-overlay);
+  background-color: var(--speed-dial-label-background-color, var(--helix-color-surface-overlay));
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-sm);
-  color: var(--helix-color-foreground);
+  color: var(--speed-dial-label-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-medium);
+  opacity: var(--_speed-dial-label-opacity, 1);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   white-space: nowrap;
+}
+
+/* Shown while its action is under the pointer or has focus, where a dial hides
+   its names until asked. */
+[part="item"]:hover [part="label"],
+[part="item"]:focus-visible [part="label"] {
+  opacity: 1;
 }

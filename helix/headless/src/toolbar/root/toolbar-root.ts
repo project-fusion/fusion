@@ -80,6 +80,14 @@ interface Control {
  * focus counts as a control, including your own elements. A child that takes no
  * focus, such as a divider, is skipped. A menu is reached at its trigger.
  *
+ * Controls inside a plain wrapper, such as a `Button Group`, are each a stop
+ * of the toolbar's own, as React Aria's toolbar flattens a group: the arrows
+ * walk through the group's buttons and on past it, and the group takes no tab
+ * stop of its own.
+ *
+ * The arrows wrap from the last control to the first. Set `stop-at-ends` to
+ * keep them at the ends, as Radix's `loop` set to false does.
+ *
  * A nested composite, such as a toggle group, is one stop on the toolbar's
  * axis: the toolbar's arrows move past it, and the arrows across the toolbar
  * move inside it. A composite with a `focusable` property, as Toggle Group
@@ -127,6 +135,13 @@ export class HelixHeadlessToolbar extends HelixElement {
   @property({ reflect: true })
   orientation?: 'horizontal' | 'vertical'
 
+  /**
+   * Whether the arrow keys stop at the first and the last control. Unset, they
+   * wrap around from one end to the other.
+   */
+  @property({ attribute: 'stop-at-ends', type: Boolean })
+  stopAtEnds = false
+
   private watcher: MutationObserver | undefined
 
   /**
@@ -148,9 +163,14 @@ export class HelixHeadlessToolbar extends HelixElement {
       ) {
         continue
       }
-      const stops = takesFocus(child) ? this.inside(child) : this.within(child)
-      if (stops.length > 0) {
-        controls.push({ child, stops })
+      if (takesFocus(child)) {
+        controls.push({ child, stops: this.inside(child) })
+        continue
+      }
+      /* A wrapper that takes no focus, a button group or a menu around its
+         trigger: each control in it is a stop of the toolbar's own. */
+      for (const stop of this.within(child)) {
+        controls.push({ child: stop, stops: [stop] })
       }
     }
     return controls
@@ -335,10 +355,13 @@ export class HelixHeadlessToolbar extends HelixElement {
     }
 
     let next = current
+    const last = controls.length - 1
     if (forward) {
-      next = (current + 1) % controls.length
+      next = this.stopAtEnds ? Math.min(current + 1, last) : (current + 1) % controls.length
     } else if (back) {
-      next = (current - 1 + controls.length) % controls.length
+      next = this.stopAtEnds
+        ? Math.max(current - 1, 0)
+        : (current - 1 + controls.length) % controls.length
     } else if (event.key === 'Home') {
       next = 0
     } else if (event.key === 'End') {
