@@ -27,6 +27,7 @@ import '../../listbox/index.js'
 /* And the tags, for the same reason: `multiple` renders one per chosen option
    and a custom element registers on import. */
 import '../../tag/index.js'
+import { afterLinkFollowed } from '../../listbox/links.js'
 
 /**
  * Whether an edit added characters rather than taking them away.
@@ -937,8 +938,14 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     this.reportRequired(this.value === '', 'Choose one to continue.', 'control')
   }
 
+  /** A link option, once followed, closes the panel as a choice does. */
+  private readonly handleLinkFollowed = (event: Event): void => {
+    afterLinkFollowed(event, () => this.requestOpen(false))
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
+    this.addEventListener('helix-select', this.handleLinkFollowed)
     this.watcher = new MutationObserver(() => this.requestUpdate())
     this.watcher.observe(this, {
       attributeFilter: ['label', 'value'],
@@ -950,6 +957,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('helix-select', this.handleLinkFollowed)
     this.watcher?.disconnect()
     this.watcher = undefined
   }

@@ -18,6 +18,7 @@ import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import { type HelixHeadlessOption, optionsAmong } from '../../option/root/option-root.js'
 import '../../listbox/index.js'
+import { afterLinkFollowed } from '../../listbox/links.js'
 
 /**
  * @summary A control that opens a list of options to choose from.
@@ -333,8 +334,14 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    */
   private watchers: MutationObserver[] = []
 
+  /** A link option, once followed, closes the panel as a choice does. */
+  private readonly handleLinkFollowed = (event: Event): void => {
+    afterLinkFollowed(event, () => this.requestOpen(false))
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
+    this.addEventListener('helix-select', this.handleLinkFollowed)
     const words = new MutationObserver(() => this.requestUpdate())
     words.observe(this, {
       attributeFilter: ['label', 'value'],
@@ -349,6 +356,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('helix-select', this.handleLinkFollowed)
     for (const watcher of this.watchers) {
       watcher.disconnect()
     }
