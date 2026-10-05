@@ -70,6 +70,7 @@ const parse = (hotkey: string) => {
  * @event {HelixBeforeCloseEvent} helix-before-close - The palette is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The palette is about to open. Cancelable: cancel it to keep it closed.
  * @event {HelixFilterEvent} helix-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the commands yourself, for example on a server while `loading` is set.
+ * @event {HelixLoadMoreEvent} helix-load-more - Fired once the list is scrolled within a screen of its end, once for each number of commands, and not while `loading` is set. Add the next page and set `loading` while you fetch it.
  * @event {HelixSelectEvent} helix-select - A command was chosen, with its `href` where the option is a link. Cancelable: cancel it to keep the palette open, and to keep the browser from following the link.
  * @event {ToggleEvent} toggle - The palette opened or closed. The event carries `newState` and `oldState`.
  *
