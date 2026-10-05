@@ -1,5 +1,6 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { auditName } from '../../controllers/aria-forward-controller/aria-forward-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { hostAria } from '../../utils/host-aria/host-aria.js'
 
@@ -31,6 +32,9 @@ export declare class MixinFieldInterface {
 
   /** Whether a label is drawn at all, in either shape. */
   protected get labeled(): boolean
+
+  /** The element in the shadow root a reader lands on and hears the name of. */
+  protected get namedControl(): HTMLElement | null
 
   /**
    * Help text shown under the control. A validation message replaces it.
@@ -247,6 +251,23 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      */
     @property({ attribute: 'aria-label' })
     protected namedBy: string | null = null
+
+    /**
+     * @internal The element in the shadow root a reader lands on and hears
+     * the name of, which the check for a missing name reads: the control the
+     * label points at, or the first native control drawn.
+     *
+     * A family whose name sits on an element of its own, a row of cells or a
+     * set of stars, answers with that element, so the name of one cell does
+     * not count as the name of the row.
+     */
+    protected get namedControl(): HTMLElement | null {
+      return (
+        this.renderRoot?.querySelector<HTMLElement>(`#${this.controlId}`) ??
+        this.renderRoot?.querySelector<HTMLElement>('input, button, select, textarea') ??
+        null
+      )
+    }
 
     /** Whether a label is drawn at all, in either shape. */
     protected get labeled(): boolean {
@@ -691,6 +712,20 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       this.addEventListener('invalid', touch)
       this.addEventListener('change', touch)
       this.renderRoot.addEventListener('slotchange', this.noteSlotted)
+      /* **Every field is asked whether it is named**, once it has rendered,
+         and told so through the runtime channel when it is not. The control is
+         the element the label points at, and a group, which has none, is named
+         by its label or by its host. */
+      auditName(
+        this,
+        () => this.namedControl,
+        'Give it a `label`, an `aria-label`, words in its label, or a `<label for>` that names it.',
+        () =>
+          this.labeled ||
+          [...this.children].some(
+            (child) => child.slot === 'label' && (child.textContent ?? '').trim() !== '',
+          ),
+      )
     }
   }
 

@@ -186,6 +186,11 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     target: () => this.partNamed('marks'),
   })
 
+  /** @internal The element a missing name is checked on: the set of stars, so the name of one star does not count as the name of the rating. */
+  protected override get namedControl(): HTMLElement | null {
+    return this.partNamed('marks')
+  }
+
   /**
    * The shape a consumer slotted, if they slotted one.
    *
