@@ -1,18 +1,30 @@
 import {
   AriaForwardController,
+  commaList,
   customElement,
   fillTemplate,
+  type HelixBeforeToggleEvent,
   HelixElement,
+  HelixSelectEvent,
+  HelixSelectedEvent,
   HelixSortEvent,
+  HelixSortedEvent,
   MixinCollection,
+  reflectElements,
   requestChange,
   splitValues,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+/* `static-html`'s `html`, because the checkbox's tag is interpolated. */
+import { html } from 'lit/static-html.js'
+import '../../checkbox/index.js'
 import { cycle, type DataRow, format, parse, sort } from '../../data-table/root/order.js'
 import { edgeOf, type HelixHeadlessTableColumn } from '../column/table-column.js'
 import type { HelixHeadlessTableRow } from '../row/table-row.js'
+
+/** A row as the table reads it: the consumer's element, a table row where it is one. */
+type Row = Element & Partial<HelixHeadlessTableRow>
 
 /**
  * The first `wanted` tracks of a track list, one entry each, so every declared
@@ -119,6 +131,17 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  * the rows in the sorted order. `helix-sort` asks first, so you can refuse it
  * and reorder the rows yourself.
  *
+ * A `caption` names the table: slot a heading or a line of text into it, and
+ * the table is named by its words. An `aria-label` or `aria-labelledby` on the
+ * host wins over it.
+ *
+ * `selectable` adds a column of checkboxes. Each row is known by its `value`,
+ * and `selected` holds the chosen keys, comma separated, the same shape
+ * `DataTable` uses. The checkbox in the heading selects every row. For a grid
+ * a reader moves through with the arrow keys, with typeahead and range
+ * selection, use `DataTable`. To act on one row, put a link or a button in a
+ * cell.
+ *
  * The CSS custom properties listed for this component are written by it and
  * read by the stylesheet that draws it. Do not set them. Each holds a number
  * the component computes and CSS cannot, so the stylesheet can draw the table
@@ -131,13 +154,29 @@ const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.
+ * @slot caption - Words that name the table, shown above it, such as a heading.
  *
+ * @event {HelixSelectEvent} helix-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
+ * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with every selected key, separated by commas.
  * @event {HelixSortEvent} helix-sort - A different sort order was requested, as `field:direction`, or empty for the order the rows were written in. Cancelable: cancel it to keep the current order.
+ * @event {HelixSortedEvent} helix-sorted - Fired after the sort order changes, with the new order.
  *
+ * @csspart checkbox - The checkbox in the heading that selects every row, in a `selectable` table.
+ * @csspart checkbox-box - The box drawn for the checkbox's input.
+ * @csspart checkbox-control - The checkbox's input.
+ * @csspart checkbox-feedback - Forwarded from the checkbox. Not shown in the table.
+ * @csspart checkbox-field - The row that holds the checkbox's box.
+ * @csspart checkbox-hint - Forwarded from the checkbox. Not shown in the table.
+ * @csspart checkbox-label - Forwarded from the checkbox. The label is read by screen readers only.
+ * @csspart checkbox-mark - The check mark, or the dash while some rows are selected.
+ * @csspart checkbox-mark-checked - Added to `checkbox-mark` while its box is checked.
+ * @csspart checkbox-mark-dash - Added to `checkbox-mark` while it draws the dash, which it keeps until its box is checked.
+ * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
  * @csspart empty - The text shown when there are no rows.
  * @csspart head - The row that holds the column headings. It has `display: contents`, so it takes no space of its own.
  * @csspart live - A live region that repeats the empty and loading text, so screen readers announce it when it changes. Visually hidden in the styled tier.
  * @csspart loading - The text shown while the rows are loading.
+ * @csspart select-all - The heading that holds the checkbox that selects every row.
  * @csspart table - The grid.
  *
  * @cssproperty --table-template - The column track list the table works out from its columns. The component writes it inline on the element that reads it, so setting it has no effect. Set `columns` to change the tracks.
@@ -182,6 +221,13 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   columns = ''
 
   /**
+   * The keys selected at the start, separated by commas. Used until `selected`
+   * is set.
+   */
+  @property({ attribute: 'default-selected' })
+  defaultSelected = ''
+
+  /**
    * The starting sort order, used until `sort` is set.
    */
   @property({ attribute: 'default-sort' })
@@ -199,6 +245,49 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    */
   @property()
   label = ''
+
+  /**
+   * Adds a column of checkboxes for selecting rows. Each row is known by its
+   * `value`, and by its place among the rows as written where it has none.
+   */
+  @property({ type: Boolean })
+  selectable = false
+
+  /** The name of the checkbox in the heading that selects every row. */
+  @property({ attribute: 'select-all-label' })
+  selectAllLabel = 'Select every row'
+
+  /**
+   * The keys of the selected rows, separated by commas.
+   *
+   * A reader's press fires `helix-select` first, and refusing it leaves the
+   * selection as it was. `default-selected` seeds a selection this element
+   * then owns.
+   */
+  @property()
+  get selected(): string {
+    return this.selectedState ?? this.defaultSelected
+  }
+
+  set selected(next: string) {
+    const previous = this.selected
+    this.selectedState = next
+    this.requestUpdate('selected', previous)
+  }
+
+  /**
+   * What screen readers hear when the chosen rows change. `{count}` is how many
+   * rows are chosen.
+   */
+  @property({ attribute: 'selected-label' })
+  selectedLabel = '{count} selected'
+
+  /**
+   * The name of a row's checkbox. `{row}` is replaced with the words of the
+   * row's first cell.
+   */
+  @property({ attribute: 'select-row-label' })
+  selectRowLabel = 'Select {row}'
 
   /**
    * The sort order, as `field:direction`, where `field` is a sortable column's
@@ -234,6 +323,12 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   @state()
   private sortState: string | undefined = undefined
 
+  @state()
+  private selectedState: string | undefined = undefined
+
+  /** Whether the caption names the table, so taking it away clears only this element's own name. */
+  private captioned = false
+
   /**
    * Carries a host `aria-label` and `aria-labelledby` to the grid, which is
    * the element with the `table` role.
@@ -256,6 +351,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         const previous = this.sort
         this.sortState = value
         this.requestUpdate('sort', previous)
+        this.dispatchEvent(new HelixSortedEvent({ value }))
       },
       event: (value) => new HelixSortEvent({ value }),
       host: this,
@@ -328,7 +424,129 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         : this.unsortedLabel
     }
     this.heardSort = current
+    const selected = this.selectable ? this.selected : ''
+    if (this.hasUpdated && current === this.heardSortBefore && selected !== this.heardSelected) {
+      said = fillTemplate(this.selectedLabel, { count: this.chosen.size })
+    }
+    this.heardSortBefore = current
+    this.heardSelected = selected
     return said
+  }
+
+  /** The sort as the last render had it, so a selection said beside a sort waits. */
+  private heardSortBefore: string | undefined = undefined
+
+  /** The selection last heard, so a render that changed nothing says nothing. */
+  private heardSelected: string | undefined = undefined
+
+  /** The rows as written, each with the key `selected` lists it by. */
+  private get keyed(): { key: string; row: Row }[] {
+    return this.slotted.map((row, index) => ({
+      key: (row as Row).value || String(index),
+      row: row as Row,
+    }))
+  }
+
+  /** The keys selected now. */
+  private get chosen(): Set<string> {
+    return new Set(commaList(this.selected))
+  }
+
+  /** Asks for a different set of selected rows, and reports whether the request stood. */
+  private requestSelected(keys: ReadonlySet<string>): boolean {
+    return requestChange({
+      apply: (value) => {
+        const previous = this.selected
+        this.selectedState = value
+        this.requestUpdate('selected', previous)
+        this.dispatchEvent(new HelixSelectedEvent({ value }))
+      },
+      event: (value) => new HelixSelectEvent({ value }),
+      host: this,
+      next: [...keys].join(','),
+    })
+  }
+
+  /**
+   * A checkbox this table drew asked to change: a row's, or the one in the
+   * heading. Refused, and asked of the selection instead, so a box shows only
+   * what `selected` says. A checkbox a consumer put in a cell is theirs and is
+   * left alone.
+   */
+  private readonly handleToggle = (event: HelixBeforeToggleEvent): void => {
+    const origin = event.composedPath()[0]
+    if (!(origin instanceof Element) || origin.getAttribute('part') !== 'checkbox') {
+      return
+    }
+    const root = origin.getRootNode()
+    const keys = this.chosen
+    if (root === this.renderRoot) {
+      event.preventDefault()
+      const every = this.keyed.map(({ key }) => key)
+      const all = every.length > 0 && every.every((key) => keys.has(key))
+      for (const key of every) {
+        if (all) {
+          keys.delete(key)
+        } else {
+          keys.add(key)
+        }
+      }
+      this.requestSelected(keys)
+      return
+    }
+    const found = this.keyed.find(({ row }) => row.shadowRoot === root)
+    if (!found) {
+      return
+    }
+    event.preventDefault()
+    if (event.detail.checked) {
+      keys.add(found.key)
+    } else {
+      keys.delete(found.key)
+    }
+    this.requestSelected(keys)
+  }
+
+  /**
+   * Tells each row whether it is selected and what its checkbox is called.
+   *
+   * Pushed down for the reason the sort is: the selection is the table's, and
+   * the checkbox is drawn by the row.
+   */
+  private markSelected(): void {
+    const keys = this.chosen
+    for (const { key, row } of this.keyed) {
+      if (!row.isTableRow) {
+        continue
+      }
+      row.selectable = this.selectable
+      row.selected = keys.has(key)
+      row.selectLabel = fillTemplate(this.selectRowLabel, {
+        row: textOf(row.children[0]) || key,
+      })
+    }
+  }
+
+  /**
+   * Names the table by its caption, where the host names it no other way.
+   *
+   * Through element reflection, because the caption is the consumer's markup
+   * and the table is in this shadow root, which an id cannot reach across.
+   */
+  private nameByCaption(): void {
+    const named = this.hasAttribute('aria-label') || this.hasAttribute('aria-labelledby')
+    const caption = named ? [] : this.captions
+    this.captioned = reflectElements(
+      this.partNamed('table'),
+      'ariaLabelledByElements',
+      caption,
+      this.captioned,
+    )
+  }
+
+  /** What the caption slot is given. */
+  private get captions(): Element[] {
+    return [...(this.children ?? [])].filter((child) => child.getAttribute('slot') === 'caption')
   }
 
   /**
@@ -391,6 +609,13 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * track for one that declares neither.
    */
   private get template(): string {
+    const tracks = this.tracks
+    /* The checkboxes take what they need and no more, ahead of everything. */
+    return this.selectable && tracks ? `max-content ${tracks}` : tracks
+  }
+
+  /** The tracks of the columns, before any checkbox column. */
+  private get tracks(): string {
     const declared = this.tableColumns
     if (declared.length === 0) {
       return this.columns
@@ -483,6 +708,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.watcher = new MutationObserver(() => this.requestUpdate())
     this.watcher.observe(this, { characterData: true, childList: true, subtree: true })
     this.addEventListener('click', this.handleHeadClick)
+    this.addEventListener('helix-before-toggle', this.handleToggle)
   }
 
   override disconnectedCallback(): void {
@@ -490,6 +716,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.watcher?.disconnect()
     this.watcher = undefined
     this.removeEventListener('click', this.handleHeadClick)
+    this.removeEventListener('helix-before-toggle', this.handleToggle)
   }
 
   /**
@@ -518,7 +745,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   /** The rows: every child that is not a column, which is what the body slot is assigned. */
   protected override get slotted(): Element[] {
     const columns = new Set<Element>(this.tableColumns)
-    return [...(this.children ?? [])].filter((child) => !columns.has(child))
+    return [...(this.children ?? [])].filter(
+      (child) => !columns.has(child) && child.getAttribute('slot') !== 'caption',
+    )
   }
 
   private assign(): void {
@@ -537,6 +766,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     }
     head.assign(...this.tableColumns)
     body.assign(...this.arrangedRows)
+    this.renderRoot
+      ?.querySelector<HTMLSlotElement>('slot[name="caption"]')
+      ?.assign(...this.captions)
   }
 
   /**
@@ -614,18 +846,43 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.assign()
     this.alignCells()
     this.markSorted()
+    this.markSelected()
+    this.nameByCaption()
+  }
+
+  /** The heading of the checkbox column, which selects every row. */
+  private renderSelectAll(): TemplateResult | typeof nothing {
+    if (!this.selectable) {
+      return nothing
+    }
+    const every = this.keyed.map(({ key }) => key)
+    const keys = this.chosen
+    const count = every.filter((key) => keys.has(key)).length
+    const checkbox = this.tag('checkbox')
+    return html`<span part="select-all" role="columnheader"
+      ><${checkbox}
+        part="checkbox"
+        exportparts="box: checkbox-box, control: checkbox-control, feedback: checkbox-feedback,
+          field: checkbox-field, hint: checkbox-hint, label: checkbox-label, mark: checkbox-mark,
+          mark-checked: checkbox-mark-checked, mark-dash: checkbox-mark-dash,
+          mark-indeterminate: checkbox-mark-indeterminate"
+        aria-label=${this.selectAllLabel}
+        .checked=${every.length > 0 && count === every.length}
+        .indeterminate=${count > 0 && count < every.length}
+      ></${checkbox}
+    ></span>`
   }
 
   protected override render(): TemplateResult {
     const template = this.template
-    return html`<div
+    return html`<slot name="caption"></slot><div
       part="table"
       role="table"
       aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label || 'Table'}
       style=${template ? `--table-template: ${template}` : ''}
     >
-      <div part="head" role="row"><slot name="columns"></slot></div>
+      <div part="head" role="row">${this.renderSelectAll()}<slot name="columns"></slot></div>
       <slot
         @slotchange=${(event: Event) => {
           this.countRows(event)
