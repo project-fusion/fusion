@@ -43,8 +43,13 @@
 }
 
 /* No fill on hover. */
-[part="trigger"]:hover [part="chevron"] {
+[part="trigger"]:hover:not(:disabled) [part="chevron"] {
   color: var(--helix-color-foreground);
+}
+
+[part="trigger"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* Inset, because the trigger runs to the item's edge and an outset ring would be

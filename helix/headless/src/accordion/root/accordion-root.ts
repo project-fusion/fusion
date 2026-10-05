@@ -21,12 +21,12 @@ import { HelixHeadlessAccordionItem } from '../item/accordion-item.js'
  * trigger is retargeted to the item at the accordion's boundary, so the item
  * being the target is exactly "the press came from a trigger".
  *
- * Arriving chooses nothing, since a trigger is not a choice, and nothing here
- * is disabled: `<details>` has no such state and neither does the item.
+ * Arriving chooses nothing, since a trigger is not a choice. A disabled item
+ * is skipped, its trigger being a disabled button that cannot take focus.
  */
 const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
   contains: (node) => node === item,
-  disabled: false,
+  disabled: item.disabled,
   focusItem: () => item.focusTrigger(),
   select: () => {},
   selected: false,
