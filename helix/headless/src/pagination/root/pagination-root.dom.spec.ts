@@ -652,13 +652,15 @@ describe('pagination links', () => {
 
   /* The browser reads the href of a clicked link after the click listeners
      and their microtasks, so the link has to point where it did when it was
-     pressed until a task has passed. */
+     pressed until a task has passed. The click is a plain `Event`, which runs
+     the listeners and does not follow the link: `click()` in a browser would
+     navigate the page that runs the specs. */
   test('keep their address until the browser has followed them', async () => {
     const nav = (await mount(
       '<helix-headless-pagination default-page="5" href="?p={page}" pages="20"></helix-headless-pagination>',
     )) as Nav
     const next = part(nav, 'next') as HTMLAnchorElement
-    next.click()
+    next.dispatchEvent(new Event('click', { bubbles: true, cancelable: true, composed: true }))
     await Promise.resolve()
     await nav.updateComplete
     expect(next.getAttribute('href')).toBe('?p=6')

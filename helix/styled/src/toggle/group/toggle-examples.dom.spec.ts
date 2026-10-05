@@ -13,11 +13,13 @@ beforeAll(async () => {
 const run = hasLayout() ? test : (): void => {}
 
 describe('the events example', () => {
-  run('pressing one proposes it, announces it, commits it and selects it', async () => {
+  /* The toggle's `helix-select` is a request the group reads once every
+     listener has had it, so it comes first, ahead of the group's own. */
+  run('pressing one asks for it, proposes it, announces it and commits it', async () => {
     await example(events)
     const roomy = document.querySelector('helix-toggle[value="lg"]') as HTMLElement
     ;(part(roomy, 'item') as HTMLElement).click()
     await idle()
-    expect(logged()).toEqual(['helix-before-change', 'input', 'change', 'helix-select'])
+    expect(logged()).toEqual(['helix-select', 'helix-before-change', 'input', 'change'])
   })
 })

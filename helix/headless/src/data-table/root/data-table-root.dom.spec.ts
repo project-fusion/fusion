@@ -972,9 +972,12 @@ describe('the grid keyboard', () => {
     await settled(element)
     await new Promise((resolve) => setTimeout(resolve, 0))
     await settled(element)
+    /* Which rows the window holds depends on how tall a row is drawn, which
+       differs with and without layout, so this asks only that the window left
+       the top and the focused row stayed. */
     const drawn = bodyRows(element).map((row) => row.getAttribute('data-row'))
     expect(drawn.length).toBeLessThan(100)
-    expect(drawn).toContain('100')
+    expect(drawn).not.toContain('1')
     expect(drawn).toContain('0')
     expect(cell.isConnected).toBe(true)
     expect(focused(element)).toBe(cell)

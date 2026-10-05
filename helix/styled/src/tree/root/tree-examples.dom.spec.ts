@@ -22,7 +22,9 @@ describe('the events example', () => {
     expect(logged()).toEqual(['helix-before-activate', 'helix-select'])
   })
 
-  run('and a branch folds from anywhere in its row, asking first', async () => {
+  /* A branch with a value is chosen as well as folded, as a file explorer's
+     folder is, so the press asks for both. */
+  run('and a branch is chosen and folds from anywhere in its row, asking first', async () => {
     await example(events)
     const helix = document.querySelector('helix-tree-item[value="helix"]') as HTMLElement & {
       open: boolean
@@ -30,7 +32,12 @@ describe('the events example', () => {
     const was = helix.open
     ;(part(helix, 'row') as HTMLElement).click()
     await idle()
-    expect(logged()).toEqual([was ? 'helix-before-close' : 'helix-before-open', 'toggle'])
+    expect(logged()).toEqual([
+      'helix-before-activate',
+      'helix-select',
+      was ? 'helix-before-close' : 'helix-before-open',
+      'toggle',
+    ])
   })
 })
 
