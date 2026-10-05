@@ -252,10 +252,11 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
       validate: this.validate,
     })
     /* Nothing taken and nothing moved, as when every dropped file is refused:
-       no change to announce. */
+       no change to announce. A pick is the platform's own `change`, relayed
+       whatever it holds, as before. */
     const same = (one: File[], two: File[]): boolean =>
       one.length === two.length && one.every((file, at) => file === two[at])
-    if (!(same(kept, this.committed) && same(kept, this.files))) {
+    if (picked || !(same(kept, this.committed) && same(kept, this.files))) {
       this.commit(kept)
     }
     if (refused.length > 0) {
