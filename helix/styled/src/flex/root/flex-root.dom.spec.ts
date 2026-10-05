@@ -87,6 +87,22 @@ describe('flex layout', () => {
     expect(getComputedStyle(start).alignItems).toBe('flex-start')
   })
 
+  /* The description once said the rest were pushed to the end, and a third
+     item sat midway instead. The words now say what the layout does. */
+  laid(
+    'split puts the first item at the start, the last at the end, and spaces any between',
+    async () => {
+      const row = await mount(
+        '<helix-flex layout="split" style="inline-size: 600px"><i style="inline-size: 50px; display: block">a</i><i style="inline-size: 50px; display: block">b</i><i style="inline-size: 50px; display: block">c</i></helix-flex>',
+      )
+      const start = row.getBoundingClientRect().left
+      const lefts = [...row.querySelectorAll('i')].map((item) =>
+        Math.round(item.getBoundingClientRect().left - start),
+      )
+      expect(lefts).toEqual([0, 275, 550])
+    },
+  )
+
   laid(
     'flank gives the last item the rest of the row, and stacks the pair when it cannot',
     async () => {

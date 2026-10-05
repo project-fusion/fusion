@@ -42,7 +42,7 @@ describe('text', () => {
 
   test('`lines` clamps the part to that many lines, and a count that is no count clamps nothing', async () => {
     const clamped = await mount('<helix-text lines="2">Long</helix-text>')
-    expect(part(clamped, 'text')?.getAttribute('style')).toBe('-webkit-line-clamp: 2')
+    expect(part(clamped, 'text')?.getAttribute('style')).toContain('-webkit-line-clamp: 2')
     const plain = await mount('<helix-text lines="none">Long</helix-text>')
     expect(part(plain, 'text')?.hasAttribute('style')).toBe(false)
     const unset = await mount('<helix-text>Long</helix-text>')
@@ -64,6 +64,17 @@ describe('lines, alignment and wrapping', () => {
       Math.round(line * 2),
     )
     expect(getComputedStyle(clamped as HTMLElement).display).toBe('block')
+  })
+
+  /* The box and the overflow were rules on any `lines`, so `lines="0"` hid
+     what overflowed the text and clamped nothing. */
+  laid('a count that is no count cuts nothing off', async () => {
+    for (const lines of ['0', '1.5', 'none']) {
+      const text = await mount(`<helix-text lines="${lines}">Long</helix-text>`)
+      const drawn = part(text, 'text') as HTMLElement
+      expect(getComputedStyle(drawn).overflow).toBe('visible')
+      expect(getComputedStyle(drawn).display).not.toBe('-webkit-box')
+    }
   })
 
   laid('`text-align` and `text-wrap` set the properties they are named for', async () => {

@@ -86,7 +86,10 @@ const lengthOf = (value: string | undefined): string | undefined => {
  *
  * **A child can span columns with `data-grid-span`.** `data-grid-span="full"`
  * runs from the first column to the last, such as a heading across a set of
- * cards, and a number from `2` to `6` spans that many columns.
+ * cards, and a number from `2` to `6` spans that many columns. A number wider
+ * than the grid adds columns of no width beside the real ones, as CSS does,
+ * so in a `min` grid, whose count changes with its width, use `full` for a
+ * child that must span them all.
  *
  * @since 0.1.0
  * @status stable

@@ -692,6 +692,38 @@ describe('aura', () => {
         window.matchMedia = real
       }
     })
+
+    /* **A hook can change after the aura starts**, from a class, a style or a
+       scoped theme, and the gradient picks it up at once. The shader read its
+       palette at start and on a color mode change only, so it kept the old
+       glow while the gradient showed the new one. */
+    test('a color hook changed while it draws reaches the shader on the next frame', async () => {
+      const host = (await mount(drawn())) as HTMLElement & { palette: { glow: number[] } }
+      const draws = countDraws(host)
+      if (!draws) {
+        return
+      }
+      expect(await until(() => draws.count >= 2)).toBe(true)
+      host.style.setProperty('--aura-glow', 'rgb(255, 0, 0)')
+      expect(await until(() => host.palette.glow.join() === '1,0,0')).toBe(true)
+    })
+
+    test('a color hook changed while the loop is stopped paints one frame in it', async () => {
+      const host = (await mount(drawn())) as HTMLElement & {
+        gate: { stop(): void }
+        palette: { glow: number[] }
+      }
+      const draws = countDraws(host)
+      if (!draws) {
+        return
+      }
+      expect(await until(() => draws.count >= 2)).toBe(true)
+      host.gate.stop()
+      const held = draws.count
+      host.style.setProperty('--aura-glow', 'rgb(0, 0, 255)')
+      expect(await until(() => host.palette.glow.join() === '0,0,1')).toBe(true)
+      expect(draws.count).toBe(held + 1)
+    })
   }
 })
 

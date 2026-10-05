@@ -29,21 +29,23 @@ export interface ServePreviewOptions {
  * shrinks each top-level child to its own content and centers it, which is
  * the difference for a component whose root is a full-width block. They
  * select the root by its `data-preview-root` attribute, so they reach nothing
- * an example draws inside it.
+ * an example draws inside it. The three that fill the viewport count their
+ * padding inside that height, so the root never overflows the frame.
  */
 export const LAYOUT_RULES = `
 :root { --preview-measure: 48rem; }
 [data-preview-root][data-layout="padded"] { padding: var(--helix-space-lg, 1.5rem); }
 [data-preview-root][data-layout="centered"], [data-preview-root][data-layout="hug"] {
-  align-content: center; display: block; inline-size: min(100%, var(--preview-measure));
-  margin-inline: auto; min-block-size: 100dvh; padding: var(--helix-space-lg, 1.5rem);
+  align-content: center; box-sizing: border-box; display: block;
+  inline-size: min(100%, var(--preview-measure)); margin-inline: auto; min-block-size: 100dvh;
+  padding: var(--helix-space-lg, 1.5rem);
 }
 [data-preview-root][data-layout="centered"] { text-align: center; }
 [data-preview-root][data-layout="centered"] > * { margin-inline: auto; text-align: start; }
 [data-preview-root][data-layout="hug"] > * {
   inline-size: fit-content; margin-inline: auto; max-inline-size: 100%;
 }
-[data-preview-root][data-layout="fullscreen"] { min-block-size: 100dvh; padding: 0; }
+[data-preview-root][data-layout="fullscreen"] { box-sizing: border-box; min-block-size: 100dvh; padding: 0; }
 `
 
 /** Whether `data` is a render message, as the preview sends one. */
@@ -206,9 +208,29 @@ export const servePreview = (options: ServePreviewOptions = {}): (() => void) =>
     measure()
   }
 
-  const press = (): void => post({ type: 'helix-preview-press' })
+  /* **The root and each child it holds.** `centered`, `hug` and `fullscreen`
+     hold the root at least as tall as the viewport, which the preview sizes
+     to the last height posted, so the root does not change size when what it
+     holds shrinks, and only a child says so. A `display: contents` child has
+     no box to watch, so its own children are watched in its place. Watched
+     again whenever the children change, which a render and an example's own
+     script both do. */
   const watcher = new ResizeObserver(measure)
-  watcher.observe(root)
+  const watch = (): void => {
+    watcher.disconnect()
+    watcher.observe(root)
+    for (const child of root.children) {
+      const placed = getComputedStyle(child).display === 'contents' ? child.children : [child]
+      for (const box of placed) {
+        watcher.observe(box)
+      }
+    }
+  }
+  const children = new MutationObserver(watch)
+  children.observe(root, { childList: true })
+  watch()
+
+  const press = (): void => post({ type: 'helix-preview-press' })
   window.addEventListener('error', failed)
   window.addEventListener('message', render)
   document.addEventListener('pointerdown', press, { capture: true, passive: true })
@@ -219,6 +241,7 @@ export const servePreview = (options: ServePreviewOptions = {}): (() => void) =>
       console[level] = originals[index] as (typeof console)[typeof level]
     })
     watcher.disconnect()
+    children.disconnect()
     window.removeEventListener('error', failed)
     window.removeEventListener('message', render)
     document.removeEventListener('pointerdown', press, { capture: true })

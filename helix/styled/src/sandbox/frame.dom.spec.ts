@@ -18,7 +18,13 @@ beforeAll(() => {
   send = window.postMessage
 })
 
+let Watcher: typeof ResizeObserver
+beforeAll(() => {
+  Watcher = globalThis.ResizeObserver
+})
+
 afterEach(() => {
+  globalThis.ResizeObserver = Watcher
   stop?.()
   stop = undefined
   window.postMessage = send
@@ -87,6 +93,34 @@ describe('servePreview', () => {
     render({ source: '<p>Hi</p>', styles: 'p { color: blue }' })
     expect(root.firstElementChild).toBe(first)
     expect(renders).toEqual([true, false])
+  })
+
+  /* A layout that fills the viewport holds the root at the frame's height, so
+     the root never shrinks with what it holds, and a watcher on the root alone
+     never posted a smaller size: a preview stayed at its tallest. */
+  test('watches each child the root holds, so a child that shrinks is heard', async () => {
+    const watched: Element[] = []
+    globalThis.ResizeObserver = class {
+      observe(target: Element): void {
+        watched.push(target)
+      }
+      disconnect(): void {
+        watched.length = 0
+      }
+      unobserve(): void {}
+    } as unknown as typeof ResizeObserver
+    const root = serve()
+    expect(watched.length).toBe(1)
+    expect(watched[0]).toBe(root)
+    render({
+      layout: 'centered',
+      source: '<div id="tall">a</div><p style="display: contents"><b>b</b></p>',
+    })
+    await Promise.resolve()
+    expect(watched.length).toBe(3)
+    expect(watched[0]).toBe(root)
+    expect(watched[1]).toBe(root.querySelector('#tall') as Element)
+    expect(watched[2]).toBe(root.querySelector('b') as Element)
   })
 
   test('posts what the example logs, and puts the console back when it stops', () => {
