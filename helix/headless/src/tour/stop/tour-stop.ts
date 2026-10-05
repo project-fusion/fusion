@@ -7,10 +7,11 @@ import {
   PopoverController,
   type Side,
 } from '@fusion.dev/helix-core'
-import type { PropertyValues, TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import '../../button/index.js'
+import { stopNaming } from '../naming.js'
 
 /**
  * @summary One stop on a tour: the element it points at, and a panel of content about it.
@@ -26,7 +27,16 @@ import '../../button/index.js'
  * - **Visibility.** The stop shows when it is `current`, which the root sets.
  *
  * Put any content in the stop, such as a `Card`, or a heading and a line of
- * text. There are no fixed title or body parts.
+ * text. The `heading` and `description` slots are optional places for the
+ * title and the line under it, which then name and describe the panel.
+ *
+ * **A stop has a type.** Without one it is a bubble pointing at its target.
+ * `type="dialog"` is a panel in the middle of the window, over a backdrop, for
+ * a welcome or a summary with nothing to point at. `type="floating"` is a
+ * panel in a corner of the window, which the styled tier puts at the end of
+ * the line, for a note that points at nothing in particular. `type="wait"` shows nothing: the tour waits
+ * for the element `for` names to be on the page, such as a menu the reader has
+ * to open, and moves on by itself.
  *
  * **The buttons are slot fallback.** With nothing in the `actions` slot, you
  * get Back, Next, and Skip, already wired. Slot your own `actions` and drive
@@ -36,9 +46,12 @@ import '../../button/index.js'
  * on the page from markup. It resolves against the stop's root node, so a stop
  * inside a shadow tree points at a target in that tree.
  *
- * The panel is a `group`, named by the first heading in the stop's content,
- * and only while the stop is shown. `focus()` moves focus to the panel, which
- * is what the tour does when it opens or moves on.
+ * The panel is a `group`, and a `dialog` for a dialog stop, only while the
+ * stop is shown. It is named by the `heading` slot, then by the first heading
+ * in the content, then by `label`, and otherwise by its place in the tour. It
+ * is described by the `description` slot and by its place, such as "2 of 5",
+ * so a screen reader says where the reader is at every stop. `focus()` moves
+ * focus to the panel, which is what the tour does when it opens or moves on.
  *
  * @since 0.1.0
  * @status stable
@@ -47,6 +60,8 @@ import '../../button/index.js'
  *
  * @slot - The stop's content. Any content works, such as a card, or a heading and a line.
  * @slot actions - Replaces the controls, which are Back, Next, and Skip.
+ * @slot description - A line under the title, which describes the panel.
+ * @slot heading - The stop's title, which names the panel.
  *
  * @event {HelixTourAskEvent} helix-tour-ask - Fired when one of the stop's controls is pressed, to move the tour.
  *
@@ -58,14 +73,20 @@ import '../../button/index.js'
  * @csspart arrow-top - The arrow while the panel is above its target, on the panel's bottom edge. Applied with `arrow`.
  * @csspart back - The control that goes to the previous stop.
  * @csspart back-button - The button inside `back`.
+ * @csspart back-live - The live region inside `back`.
  * @csspart back-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart bubble - The panel that points at the target.
  * @csspart content - The region holding the slotted content.
+ * @csspart description - The slot the description is in. It draws no box until you give it one.
+ * @csspart heading - The slot the title is in. It draws no box until you give it one.
  * @csspart next - The control that goes to the next stop, and finishes the tour on the last stop.
  * @csspart next-button - The button inside `next`.
+ * @csspart next-live - The live region inside `next`.
  * @csspart next-text - The words on that button, trimmed to their capitals and baseline.
+ * @csspart progress - The stop's place in the tour, such as "2 of 5". It describes the panel, and is shown when the tour has `progress`.
  * @csspart skip - The control that ends the tour early.
  * @csspart skip-button - The button inside `skip`.
+ * @csspart skip-live - The live region inside `skip`.
  * @csspart skip-text - The words on that button, trimmed to their capitals and baseline.
  *
  * @cssstate placed-bottom - The panel sits below its target.
@@ -112,6 +133,13 @@ export class HelixHeadlessTourStop extends HelixElement {
   for = ''
 
   /**
+   * The panel's name, where neither the `heading` slot nor the content holds a
+   * heading.
+   */
+  @property()
+  label = ''
+
+  /**
    * Whether the stop is the last one. Its next control then shows `doneLabel`.
    */
   @property({ reflect: true, type: Boolean })
@@ -130,10 +158,36 @@ export class HelixHeadlessTourStop extends HelixElement {
   placement: Placement = 'bottom'
 
   /**
+   * @internal Set by the tour: the stop's place in it, such as "2 of 5".
+   */
+  @property({ attribute: false })
+  position = ''
+
+  /**
+   * @internal Set by the tour: whether the stop's place is drawn as well as
+   * read.
+   */
+  @property({ attribute: false })
+  progress = false
+
+  /**
    * Label for the control that leaves the tour.
    */
   @property({ attribute: 'skip-label' })
   skipLabel = 'Skip'
+
+  /**
+   * What kind of stop this is. Unset, it is a bubble pointing at its target.
+   *
+   * - `dialog`: a panel in the middle of the window, over a backdrop
+   * - `floating`: a panel in a corner of the window
+   * - `wait`: nothing shown, while the tour waits for the target to be on the page
+   *
+   * Reflected, because the styled tier places a dialog and a floating panel by
+   * it, and unset at rest, so no default is written onto the host.
+   */
+  @property({ reflect: true })
+  type?: 'dialog' | 'floating' | 'wait'
 
   /**
    * The side of its target the panel last landed on, which names the arrow's
@@ -187,6 +241,9 @@ export class HelixHeadlessTourStop extends HelixElement {
       this.toggleState('placed-top', side === 'top')
       this.side = side
     },
+    /* Measured against the target only for a bubble: a dialog and a floating
+       panel are placed by their stylesheet. */
+    place: () => this.type === undefined,
     placement: () => this.placement,
     surface: () => this.partNamed('bubble'),
   })
@@ -208,22 +265,33 @@ export class HelixHeadlessTourStop extends HelixElement {
   }
 
   /**
-   * Names the panel by the first heading in the content, by element
-   * reference: the heading is in the light DOM and the panel in this shadow
-   * root, which an IDREF cannot cross.
+   * Names and describes the panel, by element reference: the words are in the
+   * light DOM and the panel in this shadow root, which an IDREF cannot cross.
+   * `stopNaming` decides which words.
    */
   private nameByHeading(): void {
     const bubble = this.partNamed('bubble') as
-      | (HTMLElement & { ariaLabelledByElements?: Element[] | null })
+      | (HTMLElement & {
+          ariaDescribedByElements?: Element[] | null
+          ariaLabelledByElements?: Element[] | null
+        })
       | null
     if (!bubble || !('ariaLabelledByElements' in bubble)) {
       return
     }
-    const heading = 'h1, h2, h3, h4, h5, h6, [role="heading"]'
-    const found = [...this.children].flatMap((one) =>
-      one.matches(heading) ? [one] : [...one.querySelectorAll(heading)],
-    )[0]
-    bubble.ariaLabelledByElements = found ? [found] : null
+    const slotted = (name: string): Element[] =>
+      this.renderRoot
+        .querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
+        ?.assignedElements({ flatten: true }) ?? []
+    const { describedBy, labelledBy } = stopNaming({
+      content: [...this.children].filter((one) => !one.slot),
+      description: slotted('description'),
+      heading: slotted('heading'),
+      labeled: this.label !== '',
+      progress: this.position === '' ? null : this.partNamed('progress'),
+    })
+    bubble.ariaLabelledByElements = labelledBy.length > 0 ? labelledBy : null
+    bubble.ariaDescribedByElements = describedBy.length > 0 ? describedBy : null
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -233,7 +301,7 @@ export class HelixHeadlessTourStop extends HelixElement {
        property, because `current` is written onto this element by the root and
        is not a property this element decides. The controller does the top layer
        and the placement; when is ours. */
-    if (this.current) {
+    if (this.current && this.type !== 'wait') {
       this.floating.show()
     } else {
       this.floating.hide()
@@ -253,7 +321,7 @@ export class HelixHeadlessTourStop extends HelixElement {
     return html`<slot name="actions">
       <${this.tag('button')}
         part="skip"
-      exportparts="button: skip-button, text: skip-text" emphasis="ghost" @click=${() => this.ask('skip')}>
+      exportparts="button: skip-button, live: skip-live, text: skip-text" emphasis="ghost" @click=${() => this.ask('skip')}>
         ${this.skipLabel}
       </${this.tag('button')}>
       ${
@@ -261,7 +329,7 @@ export class HelixHeadlessTourStop extends HelixElement {
           ? ''
           : html`<${this.tag('button')}
               part="back"
-      exportparts="button: back-button, text: back-text"
+      exportparts="button: back-button, live: back-live, text: back-text"
               emphasis="outlined"
               @click=${() => this.ask('back')}
             >
@@ -270,7 +338,7 @@ export class HelixHeadlessTourStop extends HelixElement {
       }
       <${this.tag('button')}
         part="next"
-      exportparts="button: next-button, text: next-text"
+      exportparts="button: next-button, live: next-live, text: next-text"
         emphasis="solid"
         tone="primary"
         @click=${() => this.ask('next')}
@@ -289,9 +357,10 @@ export class HelixHeadlessTourStop extends HelixElement {
     return html`<div
       part="bubble"
       popover="manual"
-      role="group"
+      role=${this.type === 'dialog' ? 'dialog' : 'group'}
       tabindex="-1"
-      ?hidden=${!this.current}
+      aria-label=${this.label || nothing}
+      ?hidden=${!this.current || this.type === 'wait'}
     >
       ${
         /* The one surface in this library that draws an arrow, and every other
@@ -306,7 +375,17 @@ export class HelixHeadlessTourStop extends HelixElement {
         part="arrow${this.side ? { bottom: ' arrow-bottom', left: ' arrow-left', right: ' arrow-right', top: ' arrow-top' }[this.side] : ''}"
         aria-hidden="true"
       ></div>
+      <slot name="heading" part="heading" @slotchange=${this.nameByHeading}></slot>
+      <slot name="description" part="description" @slotchange=${this.nameByHeading}></slot>
       <div part="content"><slot></slot></div>
+      ${
+        /* Said always, through the panel's description, and drawn only when the
+           tour asks: a panel's position is the screen reader's to hear at every
+           stop, and a sighted reader may not want the count. */
+        this.position === ''
+          ? ''
+          : html`<span part="progress" ?hidden=${!this.progress}>${this.position}</span>`
+      }
       <div part="actions">
         ${this.renderActions()}
       </div>

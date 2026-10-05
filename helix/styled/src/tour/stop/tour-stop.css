@@ -46,6 +46,40 @@
   display: none;
 }
 
+/* **A dialog stop sits in the middle of the window**, which the user agent's
+   `inset: 0` already asks for and the `margin: 0` above took away. */
+:host([type="dialog"]) [part="bubble"] {
+  margin: auto;
+}
+
+/* **A floating stop sits in the corner at the end of the line**, clear of the
+   window's edges by the same step a toast keeps. */
+:host([type="floating"]) [part="bubble"] {
+  inset: auto;
+  inset-block-end: var(--helix-space-lg);
+  inset-inline-end: var(--helix-space-lg);
+}
+
+/* The title, and the line under it, when they are slotted on their own. */
+::slotted([slot="heading"]) {
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-semibold);
+  margin: var(--helix-space-none);
+}
+
+::slotted([slot="description"]) {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+}
+
+/* The place in the run, drawn when the tour has `progress`. */
+[part="progress"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
 [part="content"] {
   display: flex;
   flex-direction: column;
@@ -108,4 +142,10 @@
 [part="bubble"][data-placement^="left"] [part~="arrow"] {
   border-right: var(--helix-border-thin) solid var(--helix-color-border);
   border-top: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+/* A dialog and a floating stop point at nothing. After the arrow's own rules,
+   which it outranks. */
+:host([type]) [part~="arrow"] {
+  display: none;
 }

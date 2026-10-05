@@ -47,3 +47,15 @@ describe('tour stop server output', () => {
     expect(rendered(ssr(last), TAG)).not.toContain('Carry on')
   })
 })
+
+describe('tour stop server output, the title and the place', () => {
+  test('serves the heading and description slots as parts, and no place before the tour has told it one', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-tour-stop for="x"></helix-headless-tour-stop>`),
+      'helix-headless-tour-stop',
+    )
+    expect(served).toMatch(/<slot\s+name="heading"\s+part="heading"/)
+    expect(served).toMatch(/<slot\s+name="description"\s+part="description"/)
+    expect(served).not.toContain('part="progress"')
+  })
+})

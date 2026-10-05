@@ -23,6 +23,16 @@
   z-index: var(--helix-layer-overlay);
 }
 
+/* Behind a dialog or a floating stop, which light nothing: the same tint the
+   spotlight paints around a target, over the whole page. */
+[part="backdrop"] {
+  background-color: var(--tour-scrim-color, var(--helix-color-overlay));
+  inset: 0;
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--helix-layer-overlay);
+}
+
 /*
  *  Not printed. The spotlight is over the page rather than part of it, and on
  * paper there is no over: it would print as a slab across whatever it covered.
