@@ -106,6 +106,14 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   locale = ''
 
   /**
+   * @internal Set by the feed: this row's place in it, counting from one, read
+   * as `aria-posinset`. Zero leaves the place to the browser, which counts the
+   * rows it can see.
+   */
+  @property({ attribute: false })
+  position = 0
+
+  /**
    * Whether the notification has been read.
    *
    * Set it and this element defers: a reader's click fires `helix-read` and
@@ -130,6 +138,21 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
     this.readState = next
     this.requestUpdate('read', previous)
   }
+
+  /**
+   * @internal Set by the feed: how many rows the feed holds in all, read as
+   * `aria-setsize`, and `-1` when nobody knows. Zero leaves it to the browser.
+   */
+  @property({ attribute: false })
+  setSize = 0
+
+  /**
+   * @internal Set by the feed: whether `Tab` stops on this row. Every row is a
+   * stop until the feed has chosen one, which is also what a server sends, so
+   * the first render on the client is the server's.
+   */
+  @property({ attribute: false })
+  stop = true
 
   /**
    * What a screen reader hears before an unread notification's text.
@@ -176,6 +199,11 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { role: 'listitem' })
+    /* Through internals, so a feed that holds one page of a longer list says
+       where the reader is in the whole of it without writing onto the
+       consumer's element. */
+    this.internals.ariaPosInSet = this.position > 0 ? String(this.position) : null
+    this.internals.ariaSetSize = this.setSize === 0 ? null : String(this.setSize)
     /* The mirror the stylesheet selects on, kept off the host's attributes for
        the reason on `read` itself. */
     this.toggleState('read', this.read)
@@ -302,10 +330,20 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    return html`<div part="item">
+    /* **The row takes focus itself**, so a reader moves through the feed with
+       the arrow keys, row by row, and reads each one by its label. A group named
+       by the label, because a focused box with no role and no name is read as
+       nothing at all. `tabindex` is the feed's to choose: one row is the stop,
+       the rest are reached with the arrows. */
+    return html`<div
+      part="item"
+      role="group"
+      aria-labelledby="label"
+      tabindex=${this.stop ? 0 : -1}
+    >
       <span part="media"><slot name="media"></slot></span>
       <div part="body">
-        <div part="label">${
+        <div id="label" part="label">${
           /* An empty image named for the state, so the word is read with the
              row and draws nothing: an empty inline box inside the label's own
              line. This tier has no stylesheet to hide text with. */

@@ -32,8 +32,18 @@ describe('notification server output', () => {
       ssr(html`<helix-headless-notification at=${at}></helix-headless-notification>`),
       'helix-headless-notification',
     )
-    expect(served).toMatch(/<div part="label">.*<slot><\/slot><\/div>/su)
+    expect(served).toMatch(/<div id="label" part="label">.*<slot><\/slot><\/div>/su)
     expect(served).toContain('<span role="img" aria-label="Unread"></span>')
+  })
+
+  test('the row is served as a tab stop named by its label, before a feed has chosen one', () => {
+    const served = rendered(
+      ssr(html`<helix-headless-notification at=${at}></helix-headless-notification>`),
+      'helix-headless-notification',
+    )
+    expect(served).toMatch(
+      /<div\s+part="item"\s+role="group"\s+aria-labelledby="label"\s+tabindex="0"/su,
+    )
   })
 
   test('the exact instant is in `datetime`, whatever clock computed the reading', () => {

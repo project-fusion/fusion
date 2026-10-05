@@ -374,3 +374,98 @@ describe('focus after marking everything read', () => {
     expect(row.shadowRoot?.activeElement?.getAttribute('part')).toBe('dismiss')
   })
 })
+
+describe('moving through the feed with the keys', () => {
+  type Row = HTMLElement & { stop: boolean; updateComplete: Promise<unknown> }
+  const box = (row: Element): HTMLElement =>
+    row.shadowRoot?.querySelector('[part="item"]') as HTMLElement
+  const settled = async (element: Feed): Promise<Row[]> => {
+    const rows = element.items as unknown as Row[]
+    await Promise.all(rows.map((row) => row.updateComplete))
+    return rows
+  }
+  const press = (row: Element, key: string, from: Element = box(row)): KeyboardEvent => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key,
+    })
+    from.dispatchEvent(event)
+    return event
+  }
+
+  test('one row is the feed’s tab stop, and the others are reached with the arrows', async () => {
+    const rows = await settled(await feed())
+    expect(rows.map((row) => box(row).getAttribute('tabindex'))).toEqual(['0', '-1', '-1'])
+  })
+
+  test('each row is a group named by its label, which says it is unread', async () => {
+    const [row] = await settled(await feed())
+    const item = box(row as Row)
+    expect(item.getAttribute('role')).toBe('group')
+    const label = item.querySelector(`#${item.getAttribute('aria-labelledby')}`)
+    expect(label?.getAttribute('part')).toBe('label')
+  })
+
+  test('ArrowDown and ArrowUp move a row, and the stop moves with focus', async () => {
+    const element = await feed()
+    const rows = await settled(element)
+    box(rows[0] as Row).focus()
+    const event = press(rows[0] as Row, 'ArrowDown')
+    expect(event.defaultPrevented).toBe(true)
+    await settled(element)
+    expect(rows[1]?.shadowRoot?.activeElement).toBe(box(rows[1] as Row))
+    expect(rows.map((row) => box(row).getAttribute('tabindex'))).toEqual(['-1', '0', '-1'])
+    press(rows[1] as Row, 'ArrowUp')
+    await settled(element)
+    expect(rows[0]?.shadowRoot?.activeElement).toBe(box(rows[0] as Row))
+  })
+
+  test('Home and End go to the first and the last row', async () => {
+    const element = await feed()
+    const rows = await settled(element)
+    press(rows[0] as Row, 'End')
+    await settled(element)
+    expect(rows[2]?.shadowRoot?.activeElement).toBe(box(rows[2] as Row))
+    press(rows[2] as Row, 'Home')
+    await settled(element)
+    expect(rows[0]?.shadowRoot?.activeElement).toBe(box(rows[0] as Row))
+  })
+
+  test('an arrow on a control inside a row is the control’s, and PageDown is the feed’s', async () => {
+    const element = await feed(`
+      <helix-headless-notifications>
+        <helix-headless-notification>One <button slot="actions">Open</button></helix-headless-notification>
+        <helix-headless-notification>Two</helix-headless-notification>
+      </helix-headless-notifications>`)
+    const rows = await settled(element)
+    const button = rows[0]?.querySelector('button') as HTMLButtonElement
+    expect(press(rows[0] as Row, 'ArrowDown', button).defaultPrevented).toBe(false)
+    expect(press(rows[0] as Row, 'PageDown', button).defaultPrevented).toBe(true)
+    await settled(element)
+    expect(rows[1]?.shadowRoot?.activeElement).toBe(box(rows[1] as Row))
+  })
+
+  test('with a total, each row says its place in the whole list', async () => {
+    const element = await feed(`
+      <helix-headless-notifications total="40">
+        <helix-headless-notification>One</helix-headless-notification>
+        <helix-headless-notification>Two</helix-headless-notification>
+      </helix-headless-notifications>`)
+    const rows = (await settled(element)) as unknown as Array<Row & { internals: ElementInternals }>
+    const internals = rows.map(
+      (row) => (row as unknown as { internals: ElementInternals }).internals,
+    )
+    expect(internals.map((one) => one.ariaPosInSet)).toEqual(['1', '2'])
+    expect(internals.map((one) => one.ariaSetSize)).toEqual(['40', '40'])
+  })
+
+  test('without one, the browser counts and nothing is written', async () => {
+    const rows = await settled(await feed())
+    const internals = rows.map(
+      (row) => (row as unknown as { internals: ElementInternals }).internals,
+    )
+    expect(internals.map((one) => one.ariaSetSize ?? null)).toEqual([null, null, null])
+  })
+})
